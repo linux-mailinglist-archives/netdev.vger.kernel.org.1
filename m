@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-219507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A964B419F9
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:28:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85BEB419BE
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14D9B683867
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEAD5166783
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A102F3610;
-	Wed,  3 Sep 2025 09:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aaJiHxMm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4402EAB65;
+	Wed,  3 Sep 2025 09:18:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1952EB5BD;
-	Wed,  3 Sep 2025 09:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8342285074;
+	Wed,  3 Sep 2025 09:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756891678; cv=none; b=e7EzWgq2MNihAEdzbpe7OnWjfNha5VsEwhYRFCDzTyuRTvwPsm2oa4jGgiMHhpLqP6NDdd8sWnZKZo207whlrKGBsLiqNEo8tTNpz9LXNLfX8bUUc2ME/S+KdRn3MPKvJ8XEBUYs0GhzILeBTd0qoyaPV+DLrsRdMgZ8KyV1h48=
+	t=1756891096; cv=none; b=rZ1gO7FVqgIN70u/dAgPevIwJz6STD4S5q5p+mIPjNyfEZ2UgZ1gAcU8UNpxmJr68Ms81uxwh7n3PjoAyJEEHa/9aG3yCO46Z1d8YrKFjyK0yFhK1dbTw0IkberQ8Pnx9tkokvxrWyj8zdmyqMmLZ8xg35m5ITUjq8tjOY+B+us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756891678; c=relaxed/simple;
-	bh=zoygvyrvbpRQP0lvFaQr5ZvBPQrrVcLHonREwQLABLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O1fxwRSilvqOszdpkL1hYBIDVSkQNt+pzpB130KhXKmhpap8ryjjiVrm1WlqssNg2Ki9XN0zo1z3vwlszlgRjzXJykI/kqyqv8Az5FE44PUVlVhCDEpb+0zFv8m6Z+XFd0JNF1BDthpljebKmYhWAln1aKPBjuCKFm8I3O/FdL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aaJiHxMm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 094DEC4CEF0;
-	Wed,  3 Sep 2025 09:27:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756891677;
-	bh=zoygvyrvbpRQP0lvFaQr5ZvBPQrrVcLHonREwQLABLU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aaJiHxMmxm+KDWV54GEw0wFKqHa23MozUT9t1F6E6ykgPQidtVov9eFpwyt2PT/e1
-	 ykvXi8dABrzbhFHZac+ksIqZX5jqvgdo+i/bFDYYqs72VAONSagJP7/hSdvvYCxKz1
-	 eI1/thKT/ROliJ9DvpqJgMsGdmQ2Nm7CxoQr1q03RenOSahf10HJFkPQBnUPtjYevu
-	 7P7PWKjHLGsxIaf3fDgTDHGDy72eJAoJ0j0J3xFjm2UsyWc53a8WTuSfAJkdS7HDlA
-	 Rn/Cqm6KHIE+bQpWm2+d5YOls7aiPXWdMtpkunQRf6ofwIiK55Vv7GdgjI45bB7G7g
-	 0BP6SbigvujPw==
-Date: Wed, 3 Sep 2025 10:27:50 +0100
-From: Lee Jones <lee@kernel.org>
-To: a0282524688@gmail.com
-Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
-	andi.shyti@kernel.org, mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
-	jdelvare@suse.com, alexandre.belloni@bootlin.com,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH RESEND v14 0/7] Add Nuvoton NCT6694 MFD drivers
-Message-ID: <20250903092750.GG2163762@google.com>
-References: <20250825092403.3301266-1-a0282524688@gmail.com>
+	s=arc-20240116; t=1756891096; c=relaxed/simple;
+	bh=L8kekbtlJ61/+0qI8FN7jAv35CVMrvcJVzR3Bq6Jpm8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GEPmxKZ9m1U3KCLr5QLVghVKb48jQSByq78JJ81ARvCbZ7PUPj31hrDvOUp3xn0J7afyt++/YpfoT7Ep9pMBfI6y3LqIXr4MJLlSrAM/PKTjEBeoEcTa5qAe15EL2eyG4rClzQ7xSXO5PFmoouCU/AhqSeNnBXVemCK0tcJCvtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cGxlW1dlFz2VRgR;
+	Wed,  3 Sep 2025 17:15:03 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 308871A016C;
+	Wed,  3 Sep 2025 17:18:10 +0800 (CST)
+Received: from huawei.com (10.50.159.234) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 3 Sep
+ 2025 17:18:09 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH net-next] ipv6: Add sanity checks on ipv6_devconf.seg6_enabled
+Date: Wed, 3 Sep 2025 17:39:48 +0800
+Message-ID: <20250903093948.3030670-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250825092403.3301266-1-a0282524688@gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-On Mon, 25 Aug 2025, a0282524688@gmail.com wrote:
+In ipv6_srh_rcv() we use min(net->ipv6.devconf_all->seg6_enabled,
+idev->cnf.seg6_enabled) is intended to return 0 when either value is zero,
+but if one of the values is negative it will in fact return non-zero.
 
-> From: Ming Yu <a0282524688@gmail.com>
-> 
-> This patch series introduces support for Nuvoton NCT6694, a peripheral
-> expander based on USB interface. It models the chip as an MFD driver
-> (1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
-> WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ net/ipv6/addrconf.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Doesn't apply.
-
-Please rebase onto v6.17-rc1 and submit a [RESEND].
-
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 40e9c336f6c5..87f14532cb7e 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -7193,6 +7193,8 @@ static const struct ctl_table addrconf_sysctl[] = {
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_ONE,
+ 	},
+ #ifdef CONFIG_IPV6_SEG6_HMAC
+ 	{
 -- 
-Lee Jones [李琼斯]
+2.34.1
+
 
