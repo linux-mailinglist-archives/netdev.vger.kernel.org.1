@@ -1,96 +1,103 @@
-Return-Path: <netdev+bounces-219553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E733DB41E63
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:08:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F088DB41EA6
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:17:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 712851B25D75
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:08:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC955547B11
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4232DCF65;
-	Wed,  3 Sep 2025 12:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4AD2DA77E;
+	Wed,  3 Sep 2025 12:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Np+4jTMi"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="KYU+xiYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6331E2BD597;
-	Wed,  3 Sep 2025 12:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949CA284662
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 12:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756901263; cv=none; b=dZyGoyaFRo17o49qJ1LSlQ7cdmLTFrbaF6ZxNBurmGMyg3jmM4Zqfg+cp8OcFg1IvIR/nz05DRYYc+WOskWww6FUPxMw5uV9Zz98gsrX0aaQZIkNlMl3xBaky096tciqnZzQMIswfQVZDgveKNBU3Cy1/NJje6G9eAfbS3qq+qE=
+	t=1756901823; cv=none; b=mPXxEFRayUujPZaK8Xpxh21hbHP+76/MZ2CVOlz/w6jkD4EwAYhdHTHOR2VfeChYTgDPAJmP1Ms++UI8eBZHJofk2r0k76HwngArLfASJal5D20YVwM3+Ch0SdjPIG04VjpFaFENj0sjniHvWOwFAxOQhuLPpXrf0wXf9+VP2Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756901263; c=relaxed/simple;
-	bh=MgBZIiU63PhDZRAMVyVp9++ETTOL9/NSN/2iNcCA55o=;
+	s=arc-20240116; t=1756901823; c=relaxed/simple;
+	bh=T9zMBVSfXXkcPKE4WZiFLlE4rfzCAascmEHlP0GQHuc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QJv5nAVvruzGOUfFYti10S1d3PeNuWP3qYXr8A69Pz6bzyB5ffuk5ASgvNPLdljkKA96CJJWUFtsvpJHaD+929gbSgTcigrQS84RwKLZ0mAkqHlehfj8aRQVBesnxhZVWH+MYymEoJd9xKpq7nN6N/qAJlEvN9myTwZY/e3ga34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Np+4jTMi; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756901262; x=1788437262;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MgBZIiU63PhDZRAMVyVp9++ETTOL9/NSN/2iNcCA55o=;
-  b=Np+4jTMi6dpF5XN8iFhl8Eck3qhxQPtJETxl4q4sxRMAKCmRWDYcgaKF
-   2ombjZS162fOWNLczCkAH6n6FjSzxTaiEUI5OoQHX0pGmo2cXf1du9Fo9
-   WClPUWbsyGMRMXPNz954icq5hBMfUfHpBZvTKjUXr9Z7ws+JuV8ZC7U5O
-   dnNysvC+DVkyDYmmvU/H6bwaSBLkV17M5JXbReQmH9fndCrzwz2lv8I16
-   0yu+IUg6NJY2U/M81hN+tA3Xc2MSik0ZgTDCq5ojgIw1bQI928MuBCSoP
-   rT770yLs45MDiccYp3RXU4J0/PnoGTtBpAHeD89hNyF2jtEbDdSlGep33
-   A==;
-X-CSE-ConnectionGUID: Pm6nojv3QyuCODBd8i0rcw==
-X-CSE-MsgGUID: ZyXtbbjoRa+mPbGtYNwozQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="59355718"
-X-IronPort-AV: E=Sophos;i="6.18,235,1751266800"; 
-   d="scan'208";a="59355718"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 05:06:30 -0700
-X-CSE-ConnectionGUID: xnoEev97Q2SK1BNCRg1grQ==
-X-CSE-MsgGUID: eVdKWMdaT4ywl7c+Qn4mMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,235,1751266800"; 
-   d="scan'208";a="172024814"
-Received: from lkp-server02.sh.intel.com (HELO 06ba48ef64e9) ([10.239.97.151])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Sep 2025 05:06:23 -0700
-Received: from kbuild by 06ba48ef64e9 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1utmEs-0003nj-0s;
-	Wed, 03 Sep 2025 12:05:50 +0000
-Date: Wed, 3 Sep 2025 20:05:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: MD Danish Anwar <danishanwar@ti.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Xin Guo <guoxin09@huawei.com>, Lei Wei <quic_leiwei@quicinc.com>,
-	Lee Trager <lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>,
-	Fan Gong <gongfan1@huawei.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	Suman Anna <s-anna@ti.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Tero Kristo <kristo@kernel.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/8] net: rpmsg-eth: Register device as netdev
-Message-ID: <202509031942.reUez3UI-lkp@intel.com>
-References: <20250902090746.3221225-6-danishanwar@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FsuH+1DBRdquZuHi62S62Sz/e/DNIlrrTre8w9OTE3ObiFQj66nJ5V9QstyGXgf21sme816/zIGF6sHxMrdvzun2H/FlXLw/QRWFbyn+OhioMKGZAqi5Ltts3OHPLlvXXLrONOtdZRrZSW/Yo/8CqSibFBjuhjL/zVRx5lPiqVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=KYU+xiYt; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 583BF1FR013805
+	for <netdev@vger.kernel.org>; Wed, 3 Sep 2025 12:17:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=ylMxvgn2/5WfIAh5ue+ghLhJ
+	nilgf124w34Bfp/g+Q0=; b=KYU+xiYtbGF16ZrnYQ30qSyxDrDHePo4wS4BDehd
+	xZDa7FuTtBmztCwX2/BxLelgs45bcCSAdA9j42JfwuSLoG+3ivRmYQB/HjkJ9Ohw
+	8oTsN1MEN8qm7wn9Y6qbX/JpDM9S3myjJzAzJCurU/iAqH9TbTI/wIVhfvC4dfke
+	FSNwgdcwi39udkw7U9+6Nk2FpYj7vhBK5ooRoy6kXtrIvHDJYTDV5hYdIhstXQTZ
+	jw78iRxKqKTRKZk9gzjbpC+43PhVF6MpICFQjkZG6jQHsmnK3gsuLVKp8+CHyHvU
+	swMRUtp9telc5Ol7FfWNZVUdkkHhD9Qh2+nJASDzg7YOrw==
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48uscv3qpw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 12:17:00 +0000 (GMT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4b31bea5896so42314981cf.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 05:17:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756901820; x=1757506620;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ylMxvgn2/5WfIAh5ue+ghLhJnilgf124w34Bfp/g+Q0=;
+        b=SnVqVoiBmACz8MVnhcfxyBTXJYaryqQkkA7HsLTcS+jh1WfwZ8OLFZl42g+mrSqnWu
+         CM+2AcBsHsgrD1tEPgoOimPLka+lYHACfFM2SQ1D2RQjszC8R7y9i+/brI7e4La4o36a
+         M0XU81BxS2blw3yOkTg7qzBTjpHinndUDSL8L/VqlSNsoCTd/EAH1GEPo9HNmVnxHDVd
+         /OhxA8c16qwOL+MTDMMr/40shlFBRqmCZ1/3fofYjSHBXCrgs76aki/tB/udQ+k4JWIN
+         bmWJhH+jXMmDgTxQNFMuRF1KtuOEITY5UxNA2fd/oQyHXbVC80Ytq3/xcysvmY7E0MQP
+         gIHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBLN0nOCEv4WRpmpnIy2jZyPQF/J5zBRu/0zU34s1s5nsJBmurRgCcXZdOdKdRiOHAtaqsUKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLBTN6+I9Sc0KN4+FW4OOAEzi8mulsocjrO1qCvbHjq25zlXrK
+	yWWZzqLPwImj/FTJ6fpG31n6zvXeChBYX3DgRJhoyvoWduDfRLWBClt3+6e/EKuzkpHDFCAVwF2
+	cL2Sb3WY6efpq/2WoKJrXeiWhjDiRxV7gUgSuDvmvuYvFdp5tvl1piWse9+c=
+X-Gm-Gg: ASbGncvEGDqJeGuvkzlZ2+eo9mSmFwsThYA5PX495nRArpW4bWPGn6oRGCoMo5W/oTn
+	V5xZjPxvbx83QKEgQ/Inhww8IMKvPZdOpq1jOgSeacgVPvERA1IiiO3oPctYKC0bhkwnyVvEdUZ
+	JgKuR+n7a+DvPtGxg2ZMfUwJJ57P5CJgk56gmFYg+VDSKWyvJalfhhGxpcYV9m/cLaZGCAn1gV+
+	EIPlNfnDvJ6zfHh57XjUB4kKaI/oU0pahtMt/AeJFimcgR46wvQZbJEDRBDklnZDUMQEBY2Ajkz
+	fhHlqQXr/xh3TgsZlt48uf59QuB408ib9uAZP+P+BuAHUGeXzt42VJYSL3oBER6fGvWbRBzbZ/z
+	mw0XMFvj5wblxxn41xN03LTDEhmyq+KduWBsLZN1HT0IOfArRYYsk
+X-Received: by 2002:a05:622a:1898:b0:4af:af49:977f with SMTP id d75a77b69052e-4b31d843106mr158036021cf.30.1756901819522;
+        Wed, 03 Sep 2025 05:16:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFf1JntwKpKDnqktzqn0jP9DtdNKaSUHktaQ51gxNmKUeO36CmdMwvJ8YX8+atEfF8/F8jfpw==
+X-Received: by 2002:a05:622a:1898:b0:4af:af49:977f with SMTP id d75a77b69052e-4b31d843106mr158035581cf.30.1756901818930;
+        Wed, 03 Sep 2025 05:16:58 -0700 (PDT)
+Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5608ace9c89sm482916e87.91.2025.09.03.05.16.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 05:16:56 -0700 (PDT)
+Date: Wed, 3 Sep 2025 15:16:55 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>, kernel@oss.qualcomm.com,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org,
+        Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
+Subject: Re: [PATCH v2 05/13] arm64: dts: qcom: lemans-evk: Enable GPI DMA
+ and QUPv3 controllers
+Message-ID: <olv66qntttvpj7iinsug7accikhexxrjgtqvd5eijhxouokxgy@un3q7mkzs7yj>
+References: <20250903-lemans-evk-bu-v2-0-bfa381bf8ba2@oss.qualcomm.com>
+ <20250903-lemans-evk-bu-v2-5-bfa381bf8ba2@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,119 +106,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250902090746.3221225-6-danishanwar@ti.com>
+In-Reply-To: <20250903-lemans-evk-bu-v2-5-bfa381bf8ba2@oss.qualcomm.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMSBTYWx0ZWRfX5XjiBKgRA6aO
+ /wcAA7be1oy7KqMAaIBEMyvc4R9C5pBrBxY1g/oaKloCtSLS7CdjovhsCW+9uPd1HjdiX72duoL
+ AliJ3nX5enjJ+mPrY6O8MM0G+a7R+RhWxPpcYRSHQnI0jTnEkvE3zmqdXEF/oXthLJExC2ITLFp
+ k4NHJYyLeAmHOtdCiAkpXxhCSyNcb9lozsxHxIAHqXXDdN7oJJrQy2hkcnBvME0hg7zFY6e1jhp
+ gbc3HVkGwIPNgYdcDXyIULapNwKxB2V6rzusHraZjI5boit+F0MlMuvY79denKFDEjFjghH2Yrs
+ t1oSmu8/CIK20VJkq6NMB6r1BuoAjo5geXLM10T0eZLRluCM5b4vsDuQvsy/tpj8Al3FTuKs1BL
+ Xb4BQ9xX
+X-Authority-Analysis: v=2.4 cv=A8xsP7WG c=1 sm=1 tr=0 ts=68b831bc cx=c_pps
+ a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=yJojWOMRYYMA:10 a=EUspDBNiAAAA:8 a=DESvhSBXdVqio9EQXHkA:9 a=CjuIK1q_8ugA:10
+ a=a_PwQJl-kcHnX1M80qC6:22
+X-Proofpoint-ORIG-GUID: YFGLiwZZzZpg9Z2cpN0JNK_pKUvBqOMM
+X-Proofpoint-GUID: YFGLiwZZzZpg9Z2cpN0JNK_pKUvBqOMM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-03_06,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0 impostorscore=0 bulkscore=0 clxscore=1015
+ suspectscore=0 malwarescore=0 priorityscore=1501 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300031
 
-Hi MD,
+On Wed, Sep 03, 2025 at 05:17:06PM +0530, Wasim Nazir wrote:
+> From: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
+> 
+> Enable GPI DMA controllers (gpi_dma0, gpi_dma1, gpi_dma2) and QUPv3
+> interfaces (qupv3_id_0, qupv3_id_2) in the device tree to support
+> DMA and peripheral communication on the Lemans EVK platform.
+> 
+> Signed-off-by: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
+> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> ---
+>  arch/arm64/boot/dts/qcom/lemans-evk.dts | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/lemans-evk.dts b/arch/arm64/boot/dts/qcom/lemans-evk.dts
+> index c60629c3369e..196c5ee0dd34 100644
+> --- a/arch/arm64/boot/dts/qcom/lemans-evk.dts
+> +++ b/arch/arm64/boot/dts/qcom/lemans-evk.dts
+> @@ -277,6 +277,18 @@ vreg_l8e: ldo8 {
+>  	};
+>  };
+>  
+> +&gpi_dma0 {
+> +	status = "okay";
+> +};
+> +
+> +&gpi_dma1 {
+> +	status = "okay";
+> +};
+> +
+> +&gpi_dma2 {
+> +	status = "okay";
+> +};
+> +
+>  &i2c18 {
+>  	status = "okay";
+>  
+> @@ -367,10 +379,18 @@ &mdss0_dp1_phy {
+>  	status = "okay";
+>  };
+>  
+> +&qupv3_id_0 {
+> +	status = "okay";
+> +};
+> +
+>  &qupv3_id_1 {
+>  	status = "okay";
+>  };
+>  
+> +&qupv3_id_2 {
+> +	status = "okay";
+> +};
 
-kernel test robot noticed the following build warnings:
+You've added i2c18 device in patch 1, but it could not be enabled before
+this one because it's a part of QUP2.
 
-[auto build test WARNING on 2fd4161d0d2547650d9559d57fc67b4e0a26a9e3]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/MD-Danish-Anwar/dt-bindings-net-ti-rpmsg-eth-Add-DT-binding-for-RPMSG-ETH/20250902-171411
-base:   2fd4161d0d2547650d9559d57fc67b4e0a26a9e3
-patch link:    https://lore.kernel.org/r/20250902090746.3221225-6-danishanwar%40ti.com
-patch subject: [PATCH net-next v2 5/8] net: rpmsg-eth: Register device as netdev
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20250903/202509031942.reUez3UI-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250903/202509031942.reUez3UI-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509031942.reUez3UI-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from include/linux/device.h:15,
-                    from include/linux/of_reserved_mem.h:5,
-                    from drivers/net/ethernet/rpmsg_eth.c:8:
-   drivers/net/ethernet/rpmsg_eth.c: In function 'rpmsg_eth_validate_handshake':
->> drivers/net/ethernet/rpmsg_eth.c:26:44: warning: format '%lu' expects argument of type 'long unsigned int', but argument 3 has type 'unsigned int' [-Wformat=]
-      26 |                 dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
-     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
-         |                              ^~~
-   include/linux/dev_printk.h:154:56: note: in expansion of macro 'dev_fmt'
-     154 |         dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
-         |                                                        ^~~~~~~
-   drivers/net/ethernet/rpmsg_eth.c:26:17: note: in expansion of macro 'dev_err'
-      26 |                 dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
-         |                 ^~~~~~~
-   drivers/net/ethernet/rpmsg_eth.c:26:109: note: format string is defined here
-      26 |                 dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
-         |                                                                                                           ~~^
-         |                                                                                                             |
-         |                                                                                                             long unsigned int
-         |                                                                                                           %u
->> drivers/net/ethernet/rpmsg_eth.c:42:44: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 5 has type 'phys_addr_t' {aka 'unsigned int'} [-Wformat=]
-      42 |                 dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
-         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
-     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
-         |                              ^~~
-   include/linux/dev_printk.h:154:56: note: in expansion of macro 'dev_fmt'
-     154 |         dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
-         |                                                        ^~~~~~~
-   drivers/net/ethernet/rpmsg_eth.c:42:17: note: in expansion of macro 'dev_err'
-      42 |                 dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
-         |                 ^~~~~~~
-   drivers/net/ethernet/rpmsg_eth.c:42:127: note: format string is defined here
-      42 |                 dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
-         |                                                                                                                            ~~~^
-         |                                                                                                                               |
-         |                                                                                                                               long long unsigned int
-         |                                                                                                                            %x
-
-
-vim +26 drivers/net/ethernet/rpmsg_eth.c
-
-   > 8	#include <linux/of_reserved_mem.h>
-     9	#include <linux/remoteproc.h>
-    10	#include "rpmsg_eth.h"
-    11	
-    12	/**
-    13	 * rpmsg_eth_validate_handshake - Validate handshake parameters from remote
-    14	 * @port: Pointer to rpmsg_eth_port structure
-    15	 * @shm_info: Pointer to shared memory info received from remote
-    16	 *
-    17	 * Checks buffer size, magic numbers, and TX/RX offsets in the handshake
-    18	 * response to ensure they match expected values and are within valid ranges.
-    19	 *
-    20	 * Return: 0 on success, -EINVAL on validation failure.
-    21	 */
-    22	static int rpmsg_eth_validate_handshake(struct rpmsg_eth_port *port,
-    23						struct rpmsg_eth_shm *shm_info)
-    24	{
-    25		if (shm_info->buff_slot_size != RPMSG_ETH_BUFFER_SIZE) {
-  > 26			dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
-    27				RPMSG_ETH_BUFFER_SIZE,
-    28				shm_info->buff_slot_size);
-    29			return -EINVAL;
-    30		}
-    31	
-    32		if (readl(port->shm + port->tx_offset + HEAD_MAGIC_NUM_OFFSET) != RPMSG_ETH_SHM_MAGIC_NUM ||
-    33		    readl(port->shm + port->rx_offset + HEAD_MAGIC_NUM_OFFSET) != RPMSG_ETH_SHM_MAGIC_NUM ||
-    34		    readl(port->shm + port->tx_offset + TAIL_MAGIC_NUM_OFFSET(port->tx_max_buffers)) != RPMSG_ETH_SHM_MAGIC_NUM ||
-    35		    readl(port->shm + port->rx_offset + TAIL_MAGIC_NUM_OFFSET(port->rx_max_buffers)) != RPMSG_ETH_SHM_MAGIC_NUM) {
-    36			dev_err(port->common->dev, "Magic number mismatch in handshake at head/tail\n");
-    37			return -EINVAL;
-    38		}
-    39	
-    40		if (shm_info->tx_offset >= port->buf_size ||
-    41		    shm_info->rx_offset >= port->buf_size) {
-  > 42			dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
-    43				shm_info->tx_offset,
-    44				shm_info->rx_offset,
-    45				port->buf_size);
-    46			return -EINVAL;
-    47		}
-    48	
-    49		return 0;
-    50	}
-    51	
+> +
+>  &sleep_clk {
+>  	clock-frequency = <32768>;
+>  };
+> 
+> -- 
+> 2.51.0
+> 
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+With best wishes
+Dmitry
 
