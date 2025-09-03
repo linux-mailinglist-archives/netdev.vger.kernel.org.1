@@ -1,108 +1,180 @@
-Return-Path: <netdev+bounces-219663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 288B6B428A9
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 20:28:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34114B428AA
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 20:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D861A3ABC96
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:28:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E64BC3ACFD7
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221873629A3;
-	Wed,  3 Sep 2025 18:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF6D3629A3;
+	Wed,  3 Sep 2025 18:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="md+9jir5"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="SNSuEtTk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39322F3619
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 18:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2191F7080D;
+	Wed,  3 Sep 2025 18:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756924130; cv=none; b=TzI7jtPiTDNw/hkTW2BxbAzklgsJhjy7MlCQJa3UIMEpMC+prxchCaM2z5KeEvHasPWUBtaYu1fLFQJnBUsOFq3nJR8zT7k7jlK1efrtUny+IlkXLHifvaVsQrEv8uN9DTv2cCGvEkPIqeCN3rif8cXWyaHliffgUAcBXwgVv0o=
+	t=1756924187; cv=none; b=Mz7zPnaC3bzY7Wt67hQ4m1Qxr4NKDsMCWqCum5MGoeIGqJ+RR5e87g8oDs6YDt+h+r95lGgVH52DJClgQSOI57J6wz0Zt7ql0KY8ys3tiTHSKOgSAaTOKAJ5JMnPWg832djHCmopvemiZzWtcxG+3bJ+enBp5Hsyy+Se8TJ0UDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756924130; c=relaxed/simple;
-	bh=FjHVk/M7R7cq6oenTQHnHeIq5ckPjb7qqqcOY6jQcyg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZwZMSPMA5qC2Lu/w6GOia7ZrzAKma67VxTf6gw6TNGWaYvZQYMG8Azx4fjPwpHpWZUPVUeWnBs6xMid8GzJ4XkkOGUcPu2RkS7CoLMabHDuyTVv134sSfyw2EbNQhIEtMJEWK78pAHmj0QjkA/dNZrY2dBrBfoLJSRyXnr0Zw0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=md+9jir5; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-24b21006804so2517005ad.3
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 11:28:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756924128; x=1757528928; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FjHVk/M7R7cq6oenTQHnHeIq5ckPjb7qqqcOY6jQcyg=;
-        b=md+9jir5LsycZRgJNKnGTJu0DtopN1odHFmsvIlIC22RnWxfcKs96niB12uic4o82Y
-         zsx9mjJLLIE51+nbuf6wxFuP351ujACB8lx6h5qhpApLui3Juf0YMdzoQsVC9xWdCtG/
-         JPygT0lUUGj0cE8RUHgfSEd2W9KNGkofxPX4VvHhjHR/lTYsm7RPfeCPpn58anct9lcX
-         EijCkAnMBrPwtcoNbLtqg9YP6Z4YhI7pRXcIK3OC2XNhAd53u+FTnQ2IWsYdccXO8OiN
-         A8mgo+2l7q52Ln25n5kAnKfgfQmRzfHVZ8y/4z+FiTVrOAsjKsnJCMzc7nbqgBWSGAaR
-         pGhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756924128; x=1757528928;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FjHVk/M7R7cq6oenTQHnHeIq5ckPjb7qqqcOY6jQcyg=;
-        b=dfo0o0sIccVooFhyiYdMBLBejdEbnaLBQtpqj97/Alm6nphsBaclIPvZivZ7JTyv5k
-         Bncl3CATAWbzCOau3mFtob2AfXi+iw+MTeAlY6qb9Li/xbkahEQzI3W5Aod9onuVttzU
-         NvE6r5QwtWHLQQo87RRSUFIFyDh38xlU9Cutp+y3dntgFkxUX/zO3WhDCcQOQfuXLBXf
-         QeNqJ2+mqxnANOaEhcPUiih/fHkmipMi2AiIGRIux5WA3SRTbrUDoQfWUTK3DAYV4PFm
-         3ULO6035kcQDd/QvcqKTU+VE3SytYFB8tcH/S5EAs/ut92UL0zfj9+3TFMNJ7ts04Ig9
-         xSpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWNyNmO9J7VOvoPtvue64YbYQ1vQljSoeCujb3tQ/pcB8IsldrXFAHRDzXYN1qmRAi2E+A7Wrk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+s+gTyfM99FolRz18DmfBwr1CzY/8FKcnL83zh5nj9wbYeHbP
-	L6vGFPJgFMDpHQgnEtWa6dLIMJDDC7b/NDCms/u06HMHOPJnMbcdilWW1ut0h8TPuW955fSnhEC
-	Hski5rxqDNzvtshL6nwDusRTeqJPzpiM4tvCtb1cI
-X-Gm-Gg: ASbGncvsUgU6qHL0Lhh7zfGnxzzN7GkDPRoiQhLAuw+tnIdo9dM7NKVQW74BZnvdFV3
-	Uu6+7BNAwvBDX0727ht72GsS0LypCRsSZQLUjCWIOv083OZtvFHAsDFhREad0mNJlgHhqbqWKoc
-	/wZaYopHgT73DR2+WKRQtmQFfUacM9Rm0dSbDgQ+aFNFYuQ91ycU0j9ey9PnHE9mUA/iv18ilR8
-	pHGUOKXN93wMZUTRsS4PV+ZrYecyQtwyEEenAPi16SZJF3MAoseifTgZJggZnodUdvjvdiFT8vG
-X-Google-Smtp-Source: AGHT+IG1nKWDxbUJxqxs6RYKPRpHqJJ91jm62O5cmdOiCed2IZb45LyK9LKWlLmP01cUKiwWQG03OzI6UeIkTBpwbHI=
-X-Received: by 2002:a17:903:46d0:b0:24c:9c14:5638 with SMTP id
- d9443c01a7336-24c9c145a13mr30662455ad.22.1756924127776; Wed, 03 Sep 2025
- 11:28:47 -0700 (PDT)
+	s=arc-20240116; t=1756924187; c=relaxed/simple;
+	bh=cehNlJaxTRrcDcnzDZIS1lpCvx5tR7CWnbDqFtkqSrU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oyu3nAd3/NXiC2MAJrHDhamrcPSGPFwbMxZq6LF5qe+4VE/n1ZK6fuXl0XGeKEKAaOSrAC+1XInEHnCWSGzZqPH5sigtu5vFmxd0OLlLWOeG+GFMGi+dE87uRt92HgoRij9/g+Zki1zDG0uZvXNuww/UV8N75qdTr+bbofpviIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=SNSuEtTk; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.143] (pd9eaae6b.dip0.t-ipconnect.de [217.234.174.107])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 583ITcPq005603
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 3 Sep 2025 20:29:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1756924179;
+	bh=cehNlJaxTRrcDcnzDZIS1lpCvx5tR7CWnbDqFtkqSrU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=SNSuEtTk4+I6vUrgUvK5S7O/t2TyUoE/a2UpLgjG13TXuEuUpI3xC6ajp+d+/n0cX
+	 CHfvSPKZPCV7kKJTInT7H3F7AwFSn4MSz2YxHzQCI9FNTvZt7Bt+tRTglNEcwTxRRk
+	 zMytn+QMN4TNWYf9RCvKBOchxBenm9/1cOZYtshc=
+Message-ID: <e4355e3f-95fb-47b6-b46e-daf0d5e60417@tu-dortmund.de>
+Date: Wed, 3 Sep 2025 20:29:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903084720.1168904-1-edumazet@google.com> <20250903084720.1168904-3-edumazet@google.com>
- <CADVnQyn-=hBRJ10L7AapP4nuZQ1x38B=1+4+KdQgt0kDMo8MXQ@mail.gmail.com>
-In-Reply-To: <CADVnQyn-=hBRJ10L7AapP4nuZQ1x38B=1+4+KdQgt0kDMo8MXQ@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 3 Sep 2025 11:28:36 -0700
-X-Gm-Features: Ac12FXyt-z1ST_dZSS6BnTz_SE0Nb-DaL4FJM0V62KC5KrKvR5TZB-cqoBCRD-w
-Message-ID: <CAAVpQUD9iFBcPkfqODhB-yeD=oB0qztBMp2MA_W3Psr8Xv9fZw@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] selftests/net: packetdrill: add tcp_close_no_rst.pkt
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH 1/4] ptr_ring_spare: Helper to check if spare capacity of size
+ cnt is available
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, eperezma@redhat.com,
+        stephen@networkplumber.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+        kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
+References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
+ <20250902080957.47265-2-simon.schippers@tu-dortmund.de>
+ <20250903085610-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20250903085610-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 3, 2025 at 8:09=E2=80=AFAM Neal Cardwell <ncardwell@google.com>=
- wrote:
+Michael S. Tsirkin wrote:
+> On Tue, Sep 02, 2025 at 10:09:54AM +0200, Simon Schippers wrote:
+>> The implementation is inspired by ptr_ring_empty.
+>>
+>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>> ---
+>>  include/linux/ptr_ring.h | 71 ++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 71 insertions(+)
+>>
+>> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+>> index 551329220e4f..6b8cfaecf478 100644
+>> --- a/include/linux/ptr_ring.h
+>> +++ b/include/linux/ptr_ring.h
+>> @@ -243,6 +243,77 @@ static inline bool ptr_ring_empty_bh(struct ptr_ring *r)
+>>  	return ret;
+>>  }
+>>  
+>> +/*
+>> + * Check if a spare capacity of cnt is available without taking any locks.
+> 
+> Not sure what "spare" means here. I think you mean
+> 
+> Check if the ring has enough space to produce a given
+> number of entries.
+> 
+>> + *
+>> + * If cnt==0 or cnt > r->size it acts the same as __ptr_ring_empty.
+> 
+> Logically, cnt = 0 should always be true, cnt > size should always be
+> false then?
+> 
+> Why do you want it to act as __ptr_ring_empty?
+> 
+> 
+>> + *
+>> + * The same requirements apply as described for __ptr_ring_empty.
+> 
+> 
+> Which is:
+> 
+>  * However, if some other CPU consumes ring entries at the same time, the value
+>  * returned is not guaranteed to be correct.
+> 
+> 
+> but it's not right here yes? consuming entries will just add more
+> space ...
+> 
+> Also:
+>  * In this case - to avoid incorrectly detecting the ring
+>  * as empty - the CPU consuming the ring entries is responsible
+>  * for either consuming all ring entries until the ring is empty,
+>  * or synchronizing with some other CPU and causing it to
+>  * re-test __ptr_ring_empty and/or consume the ring enteries
+>  * after the synchronization point.
+> 
+> how would you apply this here?
+> 
+> 
+>> + */
+>> +static inline bool __ptr_ring_spare(struct ptr_ring *r, int cnt)
+>> +{
+>> +	int size = r->size;
+>> +	int to_check;
+>> +
+>> +	if (unlikely(!size || cnt < 0))
+>> +		return true;
+>> +
+>> +	if (cnt > size)
+>> +		cnt = 0;
+>> +
+>> +	to_check = READ_ONCE(r->consumer_head) - cnt;
+>> +
+>> +	if (to_check < 0)
+>> +		to_check += size;
+>> +
+>> +	return !r->queue[to_check];
+>> +}
+>> +
+> 
+> I will have to look at how this is used to understand if it's
+> correct. But I think we need better documentation.
+> 
+> 
+>> +static inline bool ptr_ring_spare(struct ptr_ring *r, int cnt)
+>> +{
+>> +	bool ret;
+>> +
+>> +	spin_lock(&r->consumer_lock);
+>> +	ret = __ptr_ring_spare(r, cnt);
+>> +	spin_unlock(&r->consumer_lock);
+>> +
+>> +	return ret;
+> 
+> 
+> I don't understand why you take the consumer lock here.
+> If a producer is running it will make the value wrong,
+> if consumer is running it will just create more space.
+> 
 >
-> On Wed, Sep 3, 2025 at 4:47=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > This test makes sure we do send a FIN on close()
-> > if the receive queue contains data that was consumed.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
->
-> Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+I agree, I messed up the ptr_ring helper.
+Your proposed approach is way superior and I will use that one instead.
+
+The idea behind the cnt was to have an option if the producer may produce
+multiple entries like tap_handle_frame with GSO. But of course this should
+be in a different patch since I will not cover tap_handle_frame, which is
+used by ipvtap and macvtap, in this patch series.
 
