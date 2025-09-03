@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-219583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BB7B4209A
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:12:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B34B420C0
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2C11560281
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 13:12:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD56E7A5A43
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 13:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805E930BBA4;
-	Wed,  3 Sep 2025 13:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090BD30E828;
+	Wed,  3 Sep 2025 13:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="S7l7Pc4C"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="YYM1WWB3"
 X-Original-To: netdev@vger.kernel.org
 Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013051.outbound.protection.outlook.com [40.107.159.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4522303C9E;
-	Wed,  3 Sep 2025 13:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E1F302CDC;
+	Wed,  3 Sep 2025 13:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756904891; cv=fail; b=rgTs44jStFbi0lmeVV/zr3N3HzT0HxRN4apzWjyzQHE3CK3KJ0T61DgyhS+AU4ZjpzByk6kgaaii+KA6dxWkBe+mlYmFgBAK5Q/MIrbY2MHfgoTSk8yuQim/NGxuMlslJIzzh3uYkdAmDGfyQP611++W06V/K3vr0dVGxX102wQ=
+	t=1756904893; cv=fail; b=QbJq57wmKgWy2TtpiqQF6wkXD1mRyhah7CBkUNBrOcGJRnvrCFRHZ7wMz5rZrjSvmgwm3Hzy5mwf961E5nmJdrUbUIIp4uKxF4fkzuKTv3DpxisHOHjy1JMiWdCwBbpcVPYfWz9tGD4H+Dhl9RPqwVN5LPdOHPU/FQU22bRcP74=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756904891; c=relaxed/simple;
-	bh=VhUcTaK46blh7CGsuvIqYVS7RSgJfAGwtDinUS26YeQ=;
+	s=arc-20240116; t=1756904893; c=relaxed/simple;
+	bh=yg+HjEe/IABl83n0z+V8ZKF8/QGGwd8WAVd8DpvNbVg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=t4OYcGmjPn8TCeVP9OYIrPkCPSsXz1q0eP6HurNNFpNw/pb82xvuNfFfMgxxS9vinbsoMLIWUjkwx9rpZz6fDcqJHvNWu+kTjFMW1PMExF1Hj5Njg7jlI3/0szeyogXU7mKHJkxir5vLkh333v9UmfGy9tmuMMuivuQGbd68gps=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=S7l7Pc4C; arc=fail smtp.client-ip=40.107.159.51
+	 Content-Type:MIME-Version; b=DCxZVTqoj33rZYMBmxfpF5CmzVdNxxrI1tzOLO8zahfjjMzBwpWUqG1OTcJAAfEWmRZJ84U+AgY1gnQxbEDHqykaEYAwkWXeHih9wKq8tuR0fWrw2q3ZqwaKE/ygJTSab2z1HY0i1zsJ3qyNINkI9sDj1ddtqfzT9LPIDllYWtc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=YYM1WWB3; arc=fail smtp.client-ip=40.107.159.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xBWp+f5ugHa8Tt7fkX9XzPxMcEQoSOroNIrIXFZMs4HSYgYob/x5hDqhfknTpizY7kdj+i6s52nIwcdc+Ze0PcuIttbnMkbEguUyGII9mfw9E5tAZcJfzFzav9Q6iv2ONG3ZSoubRe1nphc6wol8deCQeJ9AvkFP0LKD2sZiCIT+MYNrM48WifLbQ+oFPWZG7aQpDRrwjftCM7dQJcPyBpAU2WY4MYuxIxcLmGZGTbjXHYFzfY4j8/fQnIsOk4Jtk8EEHpMITHMTBJRaen271QS9LIqCAqioYco7F/g/JKhPFacSdZSvMqTqPXG9F8I4jjXkBvxlngZZzS9Rn8vs3w==
+ b=Nzji+IymRRlqR7H8sryycT6W0LG+8C2DK+yTE4Ad3VlwOoWE8k94ir32nyXsebZ3Nw/FW2oTo+qgxN5589slsKa647fWKxZtv4R9tTNqubqAtgftSNY6qCmsczw7tmlV39v4SEeJNYTjboMElpqIAsbhGBOwG+xBuTtkP6I6MSKnRwGqS7LiY9u5kTZWyy89NTKwcoit3AwxaEbpQLBucRl1ey9e4GuJ6QT6Ww6ytzXNFfz7hc01qwXD47q35cG2ulFZJ+rx1WnYzWtQahda8lnimBOR3lgP4XuyRm0COH9no/8CS+ZZPb9WyJkDtTF8AL8uAyuC3RzE8tVeIHdZlw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2LFyGAXqpoNzEJiGhsaErrvmGFgCzhmDA1NeyoR7X8o=;
- b=vcFaixaZTyWzZuJ42A2U866Q4jmIgcnzGKyORThWUvvMb8Et+Ee5TX7W5ZxJy0HVvTr3/NLiLbrneYmSV3CqEzZSpLrvVCGv9YF+TYczKuUzg4z4GEcndPvwvR7mrEvCWjoqMAgVOxYuI9f1nF86qxJ4O4WJtLXmpWbJZXUvUnlrE1OvfiO1vtl+1rIYHFJDmvtku15ii/UQ9vL6Vsyt0CoIuwXes2iNF7VpGj7O4VHqIYjOgV74QE6ENszZ73tybXmWnBEVoLdY22vQeOdlD8Ki5duXe0Y9r3JkLtIka4Als5OqFlGFipAis4rUz+Vn22IMMMaHqHDLgQxsohANdg==
+ bh=/h+EZQ06yPwEDBK6OttNNTqQz9r7LzBnBWIz+0Gflqc=;
+ b=NkjEcVsPFDL0A138DwfkKbgN5AB5hL38TayNq4MiifFTD5gNTBW0h5kid7zmEah5QS7clgs8tKbHBPW04hldaI3hzaJUyi75UcLanp31b9HSBMdLSgEY4eqr98pe6FSqHp4JMc4cFf13ctRGckxFutiUv02MJKW/+oIdFA7ZcjYqXGq0Bxwz0MGysRBUfMgKjYK6gn6uVCtH09x5XBkDX02m9NwzMwq+j6v/r23rvYNw815l0d/Bq6IdxsFEvwitQx2VFw2Jw8aJb/M07cFfWGRIzqUk242y3N0ELD0NxTkUxIUFvzDL+FJbUgekUcfEBQcN1Wc3XakXhKRtASKkYw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2LFyGAXqpoNzEJiGhsaErrvmGFgCzhmDA1NeyoR7X8o=;
- b=S7l7Pc4C7PUjZvAxok8wBPF+EORcwMjDEVRbpgSGS2Y7ZHqp2tzGZkzbFd7xzcbPbD2wVkX12CbTiWDfE41N4CerOITDrtTDhdjUvQxu63UQGxdG2o804v4MRcidU8aoM7+SllyuUGrj77YEA9frX9/MrBjGT9JV2VmDy8Tao63zQ8cuT2CIiDe8GmBfAlECjS9d5iSmPx1/mwgt3QutepSTJzfwKppI8419dRm4Pl8WxxbOHtGOijgPp6eiwPiGUcp/KjqKUEoOWrNdAmcOVcrUIqNZJwtkboz9I7SeHBG5qDkpo3fAXHKvvpORfNkiib+38HEEFB6T1waIlrkYdQ==
+ bh=/h+EZQ06yPwEDBK6OttNNTqQz9r7LzBnBWIz+0Gflqc=;
+ b=YYM1WWB3iwEhRI1YuSYwHCtOWRNxQNhNfgWOfqIEtoP+ZWbXAVzX/BMGjS1zPk2Qdq3NBvQfGUY0rMn64INyCAGbMxfclEy24iXG8uiFzlqOvrhxs/TirvfdHAtNGzflPZRPApcu8vYpD5suzJuU5IFVwblHJ+KNJ9hXB7M+Fas80w1ayNXzpMImuM9vw+j7all78CoAxfVvKyoFnkn03lVDFFqEQZDI0tRz5BexCvb6Wq51l3jkABR+MBvTAFg9zB0vi0DwXohQbg/Hky9pHU3BHWKGciYmlcx4EeIbshX04bYw8dyzRncjsQIrxu2/7JLW4yD0qcXqPQNdQ+eorQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
  by VI0PR04MB10420.eurprd04.prod.outlook.com (2603:10a6:800:21a::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Wed, 3 Sep
- 2025 13:07:59 +0000
+ 2025 13:08:02 +0000
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2%7]) with mapi id 15.20.9094.015; Wed, 3 Sep 2025
- 13:07:59 +0000
+ 13:08:01 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
@@ -72,9 +72,9 @@ Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Luo Jie <quic_luoj@quicinc.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 4/6] net: phy: aquantia: report and configure in-band autoneg capabilities
-Date: Wed,  3 Sep 2025 16:07:28 +0300
-Message-Id: <20250903130730.2836022-5-vladimir.oltean@nxp.com>
+Subject: [PATCH net-next 5/6] net: phy: aquantia: create and store a 64-bit firmware image fingerprint
+Date: Wed,  3 Sep 2025 16:07:29 +0300
+Message-Id: <20250903130730.2836022-6-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250903130730.2836022-1-vladimir.oltean@nxp.com>
 References: <20250903130730.2836022-1-vladimir.oltean@nxp.com>
@@ -91,336 +91,248 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI0PR04MB10420:EE_
-X-MS-Office365-Filtering-Correlation-Id: c99fefe8-8c68-4391-c3df-08ddeaeae7c5
+X-MS-Office365-Filtering-Correlation-Id: 3f6f25b4-183d-4472-4917-08ddeaeae8d8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|19092799006|366016|1800799024|52116014|376014|7416014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0NT/6kKfTUW3Ad+FzBUHIsHjN5u2S2h7MGRSRNkFZ+oiGOKulWz75eyamtL0?=
- =?us-ascii?Q?S3EYWfgDUqehdS7X8siDoSnoSoW+CszZjBJGmoEk3JHOcZ999HfYpHdpsJCN?=
- =?us-ascii?Q?796gs8uYcliuM1aiasgblutxZj1E2aKe25jUPAdGQ2+YoMKMazUVxc/K8jad?=
- =?us-ascii?Q?OSf789ExuJbP8PyWQBqqkSNstx8wII9o7UPHca2tXlQ4p8lVLinBCHyuW6vB?=
- =?us-ascii?Q?5jojKzil9EePb5bVWxSOI8n5h8jALMYl3nuH4mgqHSn/BZHPBoH3zfGO3n6e?=
- =?us-ascii?Q?XDXsA/Offwc6f1SaR+7k3f7xQPIjOXLX/t2/tdsaUTwpraEgYbp3sHazzjTN?=
- =?us-ascii?Q?7rXPMSWEMwzh3qhsBLX+4aHfe6iwzXCqa5diY8nwp012EuBQv3b1VjjMA91e?=
- =?us-ascii?Q?gr7/gEptOAa8qlKg8PbqSgvaxfCIpsdvULWVFbYaahftu7v0fDPTdamKJFZN?=
- =?us-ascii?Q?ReRg6mQZFzgoXF61yHxpoESX/5rsGxooz2UWc/GqIx0ZL6bZJ4179/orHGe/?=
- =?us-ascii?Q?64i4dWlgVo8JDPzcZ76kvfwXRyypu4DlgPa8tk6uHCfATGNFOJIBXQp1oP8f?=
- =?us-ascii?Q?8JH3oTrDUYL9+/iFV6WThbwQ2c9NF8SCGVoaeuXx7mFSHosq9KEc575mdzb6?=
- =?us-ascii?Q?ITx2nK8uL9E+9pzfkFu2sNkELsW5VG+GNQ5QU3RKIkdKZcW+jOUQCk3+5LRi?=
- =?us-ascii?Q?G+vZ08lAFxh2c3bsno144090XQjyKWFzQr2BT5h9Ut7k+LRrEjt4fs9DTM1G?=
- =?us-ascii?Q?yGc4dQWpmab9K6tahqUSf+LZILrnoCayihrykee+M1Lb5kdDtYKO7e8G86IT?=
- =?us-ascii?Q?aPwYv3GGsdv2aiGWCFou7HTtq2YNqqTZnVoueUvez49ezNe5WPi2A/H++7Hv?=
- =?us-ascii?Q?qVWTEni3X1Gho8FqWPVRc1fYu0cnKlmoYMy4jm07dM40P6EK0YKUd6G47AN6?=
- =?us-ascii?Q?DcXMAFAEyMvf0j4X/bRTBOkDyC5hxS2iP5UxmsiaXuyc/wz2tNWcEfDtfvlx?=
- =?us-ascii?Q?PHX/iqETr+ok8MU7yeHQFjd6zUB+6uq8JBVpstnYfZhGkh/+1A67SVZMldw4?=
- =?us-ascii?Q?kHTNdaZ5UCGC3Ze1DzUr8f/kZlqJHj5sG1WA121kTBmeX2ci+2lx7ZVpTCyP?=
- =?us-ascii?Q?7dCbrEwxofCoCONe1TmdzUoV8HFfhQhIFO1IE/p65vb6VKeLFfQMlW6BpP7Z?=
- =?us-ascii?Q?rpvu2qiRqz0b4BZMTTETw1XqFhohuCgZMWpjxwZwZn2U9/BcTnxYvHKwtZJc?=
- =?us-ascii?Q?hnrPUEavATH+XbURELA1/QMbbT/Ss8XV9BbkunEG2bRm9v5FyYrXV58EhjtS?=
- =?us-ascii?Q?ADMdgOuUxVCTZiZmVNxBsLf/MlP4/cX7FDaC3MAY7imJvAogDOEB+clWpIoX?=
- =?us-ascii?Q?tpWQs0FJOmKQtV7zkcqD6hGYNvQVp6uh3wlmdjHQYNkNcgJt7TbiMmHXePIr?=
- =?us-ascii?Q?eT3d+l3X/34=3D?=
+	=?us-ascii?Q?3XnRBCAmtPnxdd9bTBboq+45c0XkUUfBYqkScFHA1/h8gfnwF94bfI/jFzQh?=
+ =?us-ascii?Q?nEJPJY44yE64MJaL7r01U4lcvvjZT5d71q0u3D+G9f72HiJMGdgUoFXihn8l?=
+ =?us-ascii?Q?AhqPAdJV808aSecFDsHMLDMvv8VQBsdtDHwpVY7nRTOQi3q8tACt9CV2fbdV?=
+ =?us-ascii?Q?IIXZU38b4sj62Zj2rJyFirlsF2nTuOlfyhiWzi6rNMR7zkKhQL4NcmsEpid9?=
+ =?us-ascii?Q?WUbnF4Jv/dLQiLUP3bux53yne9UxWCGCFaXxVrPb0Z86/mkA9IypTXQZveP4?=
+ =?us-ascii?Q?IAJre+09HMqA1uF5fiKmKVS+8+dBgsvv5+lZBHfMGxqtagJQjIPwgT0ONs1b?=
+ =?us-ascii?Q?WTmvUYDMGuYEFLGYBFvE19JslUJLRwbJwch2Bf7NjMtozTnEAiiJRg9m6MI9?=
+ =?us-ascii?Q?bQ7FHr6MTzu/D/XWzJ9AeaONOLy+LT9PtdU5i9Re6HS/LWnaGK1GbAKzjQIE?=
+ =?us-ascii?Q?7/0iKcNiqigyBZQ8rr3lNl+7cQOM+KtoPJo3JDQAf7SM1+iaRs/RC/VsWnLh?=
+ =?us-ascii?Q?EgRPpyrleovmLb0HZgRaKhIXZWKG7eGJDwepX18CxySFFVWpS8r/nIvmuvlh?=
+ =?us-ascii?Q?T4i36zC1RDWp6g+enLQV8ntsoW9nMs3t5oZtPPdps4Gv6KkJbPJpPxkdk+Lv?=
+ =?us-ascii?Q?ExowkYxxeUnbHTgP8rwP9knS0B5j53IXZaGlYCQfu1qqgIGYO1hMV7aRo92H?=
+ =?us-ascii?Q?AmYznmK+PYfzPuTl5eXdJ1Dy2BD1qF+kJACixfsCaG4NEAVuj+2RLuBvEJJW?=
+ =?us-ascii?Q?E0orfuc1baAigLT78p6bJo2qIOqb8tWR/pTDIb2S0zFEbR3DTOSwg0ODxonk?=
+ =?us-ascii?Q?OUiM0RBReDfEeyDuxCqmQ4tsoKoTICa6bFqhwaps09B173VqTb7vwP3ys4fK?=
+ =?us-ascii?Q?ryMvWVbgodImMvHkYP0Z9BGmrsAfC7W6DQgbcO9AeMQZPDj9J2LUaLCN8OPu?=
+ =?us-ascii?Q?tUvIg/8leCzpkOHNi7kD/iY+ZxWE7KsKo4WOiIY/ngo1NgUsb4h/5+X0Qk//?=
+ =?us-ascii?Q?c3acn/49IBSMWlq5Lmk6zVs0jWqUxB9FIvKNUN4WkGUkDmKwSffVpietSh/I?=
+ =?us-ascii?Q?BQjNBCy1LQioNopoQ5EnoQZkNSAFL0sEHsq9ex+P7hl+DTrPYmBG8LYeAur6?=
+ =?us-ascii?Q?LaJInAOCjzg4jTvklSLQMmX18HAUDhEWLMUwvUpA4cu8bSmHdf4CBQ/QhXdB?=
+ =?us-ascii?Q?dCE4q+88GmOmMFjgqNRtLlwbDi4GXO/U5fdMiAaV9fR84r4m45WCC/7e/kLR?=
+ =?us-ascii?Q?6TbatBXOLDp1aHCmcJBk/fZ9tIckJXhhvdxwiQON1IhNyI4rL5MsS9uHDF9x?=
+ =?us-ascii?Q?A9/D072vrVNNPoteT3Y9ufbv6BDD6cLhZv01awkUb0lOsOyiA0ug4tap253Y?=
+ =?us-ascii?Q?WtzbuezXjxLY+0dITHW0KDSn/h1cZOwUUSShH7xqrlEG0qijcu68Rz4OdW7G?=
+ =?us-ascii?Q?cMqm5Z/u1W2slvp9o/ESJw7JmmbLsccY8Z/BQm8pZguqR3yawkoCo9IS0A2Y?=
+ =?us-ascii?Q?hm7R+PaBGG/ajE4=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(1800799024)(52116014)(376014)(7416014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6LeSyyiGp7kuwU7/ub9KafRLOvN7EMpEgriOX/GwVd5K8A2gfUffsZNODEyd?=
- =?us-ascii?Q?A2pEeVlvl6XAklV1WuaHNoYLyJbOErpE9qvw0bh3RPvg+/d6EIx2+GxLC8xX?=
- =?us-ascii?Q?0Hr4pDbr7svjlLXf9s1+xNgxP5G/raUwRT+hlHasGUgHQYH5D9/XaTkvgQyG?=
- =?us-ascii?Q?jmr+JFDJ2yVnmoXa7MrT3nqa7I47Vdx3pGdB7ZTZ436xUpBEcmyajRrOaRoY?=
- =?us-ascii?Q?gKBL9jkUs+rNknT3Q5Aiu/Pk0GrSEGlGx/Dl3KMiGq0aPxhaEzZj64q1zpwj?=
- =?us-ascii?Q?mzGEByNuGhFXA9blWd2FRX8xe5fml/Lj9l166rDDuLZmkzWhIisu7MvVQQjZ?=
- =?us-ascii?Q?CHEjcXt/MpiBpqjTEpmwmKPdX2Tj40vTe8jcBnaZmzI9VPOT0vK6xdrsyRwD?=
- =?us-ascii?Q?100BrgG0wjtl97fblE4Sx3N5EkjzHcz9XvrK5VUMPzlwoWGWJV9dtGqdyVX5?=
- =?us-ascii?Q?ysUwfET3TTQzkp5d2FyYA6bT3KpjROL8U5sy9fIySNvXeF732vdPr/xlA3xi?=
- =?us-ascii?Q?Q6J5HaJAGKlRF5SVALQdv/xGPYBLyX/AZUBlB+BBhTbJrUvxMZ+G8PJBA9aq?=
- =?us-ascii?Q?6epKGMP/k6GeICHKSWS6UZwbYYWo2mKTs73XPosuLgI7GHARvp0c/jzVhN4I?=
- =?us-ascii?Q?pYr1SZxeiHksqAkUbXNGpcm5CUeNHePE/AISSTidqtlJbe3IfJBqvcXIvbJ7?=
- =?us-ascii?Q?BtkHUpCgi3FjB7nM4kvyu+bhHbAgg6y4w70tLiqs+dCQyhhXu/IyDAHRrht4?=
- =?us-ascii?Q?lufLtVCh6ugfCLD0F6I1/sIybGXqEnIIh5gwuynBVUw2JD2LqBh16jvkELLF?=
- =?us-ascii?Q?T1LJraywB6xyV6fmskfczwNt/hvFVmf90ZDHmrXIVxKg59sxSAn99Pds7N5Q?=
- =?us-ascii?Q?g+i8nKU2nkW9ecBuRUMLRejU6kNgAHNgzQeXAS3oYjFWKynfMnGwLqSQNQm4?=
- =?us-ascii?Q?6p9DBSP6Yv7rS8p1Lkon86YpyyNSb2n3PMNMfegY5uaGdOG4//FlrHxbKgTd?=
- =?us-ascii?Q?vZP8DD7f66d9BZxGfUQ4FJ3DS7M+usOBzGTkKONH9oCTUI8f+5FCEwInU6a5?=
- =?us-ascii?Q?jafueZvK9OWpOoZhJr/1K0yTZ7lhKL71rk6/AAvRBNapISUMPI1dMOmcsl7B?=
- =?us-ascii?Q?IGdCTnk3jvQ5gM6hnz583I3EkQiT5dJsf6RZvaLe7A6JquZO9cDLKyoa7vAX?=
- =?us-ascii?Q?DTNncwUaWRUrFBV3s7uwk4MUOmAjUZwx4667eA9Hc1gptokcKCtUC/1/bPcc?=
- =?us-ascii?Q?uBoJL5G83xrQ5IFtFYvdnSMikRZ62OTwA60SXtKM45mETUoACi7DRsKueYtb?=
- =?us-ascii?Q?dOIy4ZgJvDYEy1cuzjfMelP7rWPHcGsprhx7Pbbcc+dP7pDUQTgeT8pcs5bP?=
- =?us-ascii?Q?SvQ5R7UQy8LSIjTDx94BOtyohMKQAK0ADQZFR1HPty8CSx2AuXOdIUZ4OrJa?=
- =?us-ascii?Q?aLUvYc5BHYSAYb9MRYOd28Ga+8tpCXZAO0TXKq8zhfSb61dEK7DU45UX4YRV?=
- =?us-ascii?Q?2OOQK6kL+0iQ53FSzScviQD2EL5ARTF03b2xtYC693b0y+qVBXJGazCkjzAt?=
- =?us-ascii?Q?Ct1a1Q65ocnXR90p1kTEuATqhyW628PyPBht4n/q?=
+	=?us-ascii?Q?128FOB/+uXy7hAJ1d0qLkT/HGPcPCNUkjSie0Ps90+t362PbodyLQ38iPDTc?=
+ =?us-ascii?Q?W1D7d8zL/H1wh7OH358+X0DwAmSO1vAspvxt7oN7D3s4mDgVrut14QsKszmy?=
+ =?us-ascii?Q?s1V9FMp6FkKWx5uuYxfcIlDiHfw9lFPvkIXFIcQ4FqYsN+gO3tna7FiukqLG?=
+ =?us-ascii?Q?vv0TTDWSvPkWjDxKnRprcxnJ1HXeA8F363YRiRNm8ODW7oI0WBKt/SHxsERO?=
+ =?us-ascii?Q?I/bE+cjgaThqeczc9y97WgaB48No/unJNkyZqf9i7h728n2NcIr5+eGqw06O?=
+ =?us-ascii?Q?J27UC9nDGzaTDVF3fMN8UVBzYxLYM3AXa6Nf+nk7dJNjDejE5pbnjlCVq6p4?=
+ =?us-ascii?Q?Ub0E7Xcwt/zlTnI7fBzVHCgfk28PJTMnl6ZjY25nilgerTcAuEFbumdSdMvN?=
+ =?us-ascii?Q?kkrlH/wOR3e2q1ceSyUW6ghIbzlLu8dMv6vo//b4q7wVhuBtWKOqSGbq/11w?=
+ =?us-ascii?Q?l0MBG6eWyqCjsQXhsiWs/RKaYzWKkby8ny45VUlyoMCdYvLdWh2ZEJ7GU9sl?=
+ =?us-ascii?Q?FHRIZBpk8rRWsmA9bCBEf3lwNhGEgQZ1k8Er7J6MfKrL9tDgeDysfpNnUmpW?=
+ =?us-ascii?Q?J27svotCJTqXIIWvyNLhu/7HVzwOQp1+Qs5BJKKOdK2ySR0xHF93vRLF5b1S?=
+ =?us-ascii?Q?U6nbuMBwg4QuXPyWEMHIZiCWUqQsY8S19+2anrWYp8laUvg8o0yekSOhmTkH?=
+ =?us-ascii?Q?PwpYp/iOrKLIUljqiJKl5gHrH7eyJRN7YKCcC4RN7vxdbih/9rMXHvrxnp0v?=
+ =?us-ascii?Q?ozisKmVYafE+rWVyJ8iN2ozLVjatKmdU1PekR0FF1ikNQlTeRWDUFe4wbqwR?=
+ =?us-ascii?Q?TLmw7w99s/RiLxg2EvEwNCaJvNxaiEzk2l+2hV9lg5r/Ps29U72kFtfVblzM?=
+ =?us-ascii?Q?qyeYkbnGqiO/tAS+PlCn05JGVlVHFr8v55qHOLXof4M8ugGqu+RHz0bbueNv?=
+ =?us-ascii?Q?bdDdrytYpUbAd34TbJKiY85avRzQIcaiRPrkeu0Qbpkg/xeiFtCDimqaCtWC?=
+ =?us-ascii?Q?sAx/6LPXRo0hkXE7mKyuuJzwccr8RLj7qRdnJdxF5x4FT8+LYutt2GYoOg90?=
+ =?us-ascii?Q?QPcQ9Y2apLMud3qt8UA6aO91NLZaq2eSnImpbj+jpTnWEvvWmzPfvuXBNMFG?=
+ =?us-ascii?Q?CqfDeSGCfjkJpNmhjFJYiHIlXL2dUR9BRgrbtV4PsA+JLoqzrPT44uxJeY6q?=
+ =?us-ascii?Q?RthizdK8kORYV1qGvikP5NXLyrntnGeRnwQkxiPuoKe4EEJw5Pe3A/XumVgx?=
+ =?us-ascii?Q?QwiK9WxCFlKxUroC0E/HpaEygI5v0lme8IYZKQz8T9oFUtbxlwzvERruvdHW?=
+ =?us-ascii?Q?w7BQZCgQ/zL5l9klcEPh+BCPDaD4OnpLSa0SnlXXx88PKELqshT7acqf/Bg7?=
+ =?us-ascii?Q?C/m9p8Z6KD3ID7yGH6ygy+LlMM8HHn9JbNwdK7uL3xKoXexFAeDRqWHyemtq?=
+ =?us-ascii?Q?blCbw+Id+OwoJLASZRV73ynAc2ewhxvC+pfbhPpfvyTrdZMeG2YqkdHJUd0w?=
+ =?us-ascii?Q?7NALAzXHTPPBtlEhdXCBbLShB8JOOcFpfRSk8ai1YtDlIhN5sm6YDCgXn3+U?=
+ =?us-ascii?Q?9f0EW75HtAtL1Rw/XP57pYbIfWyJDQBZKkkRccAo?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c99fefe8-8c68-4391-c3df-08ddeaeae7c5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f6f25b4-183d-4472-4917-08ddeaeae8d8
 X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2025 13:07:59.1150
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2025 13:08:00.9364
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vjypcJFTCPeTo50+2iCPRxNDMjjieFBV+kHgkNth54cSM564OOJzxWA7m4vgvLZ92SnM8FGrOyCx9wJlCE9QxQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: hNEa5pa/1WEjvHGz38I409t1s2r5jOTaBAM8CESpZKYYcRcgAJq+jPLPnbpMztYsIdTSjj082HZee2W1wpfFHQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10420
 
-The Global System Configuration registers for each media side link speed
-have bit 3 which controls auto-negotiation for the system interface.
-Since bits 2:0 of the same register indicate the SerDes protocol for the
-same system interface, it makes sense to filter these registers for the
-SerDes protocol matching phydev->interface, and to read/write the
-auto-negotiation bit.
+Some PHY features cannot be queried through MDIO registers and require
+alternative driver detection methods.
 
-However, experimentally, USXGMII in-band auto-negotiation is unaffected
-by this bit, and instead reacts to bit 3 of register 4.C441 (PHY XS
-Transmit Reserved Vendor Provisioning 2).
+One such feature is 10G-QXGMII (4 ports of up to 2.5G multiplexed over
+a single SerDes lane), or "MUSX" as it is called by Aquantia/Marvell.
+The firmware has provisioning to modify some registers which seem
+inaccessible for read or write over MDIO, which configure an internal
+mux for MUSX. To the host, over MDIO, the system interface appears
+indistinguishable from single-port-per-lane USXGMII.
 
-Both the Global System Configuration as well as the aforementioned
-register 4.C441 are documented as PD (Provisioning Defaults), i.e. each
-PHY firmware may provision its own values.
+Marvell FAE Ziang You recommended a detection method for this feature
+based on a tuple which should hopefully identify the firmware build
+uniquely. Most of the tuple items are already printed by
+aqr107_chip_info(), and an extra set is the misc ID (reg 1.c41d) and the
+misc version (reg 1.c41e). These are auto-generated by the Marvell
+firmware tool for formal builds, and should be unique (not my claim).
 
-I was initially planning to only read these values and not support
-changing them (instead just the MAC PCS reconfigures itself, if it can).
-But there is one problem: Linux expects that the in-band capability is
-configured the same for all speeds where a given SerDes protocol is used.
-I was going to add logic that detects mismatched vendor provisioning
-(in-band autoneg enabled for speed X, disabled for speed Y) and warn
-about it and return 0 (unknown capabilities).
+In addition, at least for the builds provided to NXP and redistributed
+here:
+https://github.com/nxp-qoriq/qoriq-firmware-aquantia/tree/master
+these registers are part of the name, for example in
+AQR-G3_v4.3.C-AQR_NXP_SPF-30841_MUSX_ID40019_VER1198.cld, reg 1.c41d
+will contain 40019 and reg 1.c41e will contain 1198.
 
-Funnily enough, there is already a known instance where speed 2500 has
-"autoneg 1" and the lower speeds have "autoneg 0":
-https://lore.kernel.org/netdev/aJH8n0zheqB8tWzb@FUE-ALEWI-WINX/
+Note that according to commit 43429a0353af ("net: phy: aquantia: report
+PHY details like firmware version"), the "chip may be functional even
+w/o firmware image." In that case, we can't construct a fingerprint and
+it will remain zero. That shouldn't imact the use case though.
 
-I don't think it's worth fighting the battle with inconsistent firmware
-images built by Aquantia/Marvell, and reporting that to the user, when
-we have the ability to modify these fields to values that make sense to
-us. We see the same situation with all the aqr*_get_features() functions
-which fix up nonsensical supported link modes.
-
-Furthermore, altering the in-band auto-negotiation setting can be
-considered a minor change, compared to changing the SerDes protocol in
-its entirety, for which we are still not prepared.
-
-Testing was done on:
-- AQR107 (Gen2) in USXGMII mode, as found on the NXP LX2160A-RDB.
-- AQR112 (Gen3) in USXGMII mode, as found on the NXP SCH-30842 riser
-  card, plugged into LS1028A-QDS.
-- AQR412C (Gen3) in 10G-QXGMII mode, as found on the NXP SCH-30841 riser
-  card, plugged into the LS1028A-QDS.
-- AQR115 (Gen4) in SGMII mode, as found on the NXP LS1046A-RDB rev E.
+Dereferencing phydev->priv should be ok in all cases: all
+aqr_gen1_config_init() callers have also previously called
+aqr107_probe().
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- drivers/net/phy/aquantia/aquantia.h      |  1 +
- drivers/net/phy/aquantia/aquantia_main.c | 77 ++++++++++++++++++++++++
- 2 files changed, 78 insertions(+)
+ drivers/net/phy/aquantia/aquantia.h      | 20 +++++++++++
+ drivers/net/phy/aquantia/aquantia_main.c | 42 ++++++++++++++++++++----
+ 2 files changed, 55 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/phy/aquantia/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
-index 492052cf1e6e..3fc7044bcdc7 100644
+index 3fc7044bcdc7..2911965f0868 100644
 --- a/drivers/net/phy/aquantia/aquantia.h
 +++ b/drivers/net/phy/aquantia/aquantia.h
-@@ -55,6 +55,7 @@
- #define VEND1_GLOBAL_CFG_SERDES_MODE_SGMII	3
- #define VEND1_GLOBAL_CFG_SERDES_MODE_OCSGMII	4
- #define VEND1_GLOBAL_CFG_SERDES_MODE_XFI5G	6
-+#define VEND1_GLOBAL_CFG_AUTONEG_ENA		BIT(3)
- #define VEND1_GLOBAL_CFG_RATE_ADAPT		GENMASK(8, 7)
- #define VEND1_GLOBAL_CFG_RATE_ADAPT_NONE	0
- #define VEND1_GLOBAL_CFG_RATE_ADAPT_USX		1
+@@ -153,6 +153,24 @@
+ 
+ #define AQR_MAX_LEDS				3
+ 
++/* Custom driver definitions for constructing a single variable out of
++ * aggregate firmware build information. These do not represent hardware
++ * fields.
++ */
++#define AQR_FW_FINGERPRINT_MAJOR		GENMASK_ULL(63, 56)
++#define AQR_FW_FINGERPRINT_MINOR		GENMASK_ULL(55, 48)
++#define AQR_FW_FINGERPRINT_BUILD_ID		GENMASK_ULL(47, 40)
++#define AQR_FW_FINGERPRINT_PROV_ID		GENMASK_ULL(39, 32)
++#define AQR_FW_FINGERPRINT_MISC_ID		GENMASK_ULL(31, 16)
++#define AQR_FW_FINGERPRINT_MISC_VER		GENMASK_ULL(15, 0)
++#define AQR_FW_FINGERPRINT(major, minor, build_id, prov_id, misc_id, misc_ver) \
++	(FIELD_PREP(AQR_FW_FINGERPRINT_MAJOR, major) | \
++	 FIELD_PREP(AQR_FW_FINGERPRINT_MINOR, minor) | \
++	 FIELD_PREP(AQR_FW_FINGERPRINT_BUILD_ID, build_id) | \
++	 FIELD_PREP(AQR_FW_FINGERPRINT_PROV_ID, prov_id) | \
++	 FIELD_PREP(AQR_FW_FINGERPRINT_MISC_ID, misc_id) | \
++	 FIELD_PREP(AQR_FW_FINGERPRINT_MISC_VER, misc_ver))
++
+ struct aqr107_hw_stat {
+ 	const char *name;
+ 	int reg;
+@@ -203,6 +221,7 @@ struct aqr_global_syscfg {
+ 
+ struct aqr107_priv {
+ 	u64 sgmii_stats[AQR107_SGMII_STAT_SZ];
++	u64 fingerprint;
+ 	unsigned long leds_active_low;
+ 	unsigned long leds_active_high;
+ 	bool wait_on_global_cfg;
+@@ -216,6 +235,7 @@ static inline int aqr_hwmon_probe(struct phy_device *phydev) { return 0; }
+ #endif
+ 
+ int aqr_firmware_load(struct phy_device *phydev);
++int aqr_firmware_read_fingerprint(struct phy_device *phydev);
+ 
+ int aqr_phy_led_blink_set(struct phy_device *phydev, u8 index,
+ 			  unsigned long *delay_on,
 diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 309eecbf71f1..a9bd35b3be4b 100644
+index a9bd35b3be4b..5fbf392a84b2 100644
 --- a/drivers/net/phy/aquantia/aquantia_main.c
 +++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -35,6 +35,9 @@
- #define PHY_ID_AQR115C	0x31c31c33
- #define PHY_ID_AQR813	0x31c31cb2
+@@ -88,6 +88,9 @@
+ #define MDIO_AN_TX_VEND_INT_MASK2		0xd401
+ #define MDIO_AN_TX_VEND_INT_MASK2_LINK		BIT(0)
  
-+#define MDIO_PHYXS_VEND_PROV2			0xc441
-+#define MDIO_PHYXS_VEND_PROV2_USX_AN		BIT(3)
++#define PMAPMD_FW_MISC_ID			0xc41d
++#define PMAPMD_FW_MISC_VER			0xc41e
 +
- #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_MASK	GENMASK(7, 3)
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_KR	0
-@@ -1056,6 +1059,52 @@ static int aqr_gen4_config_init(struct phy_device *phydev)
- 	return aqr_gen1_wait_processor_intensive_op(phydev);
+ #define PMAPMD_RSVD_VEND_PROV			0xe400
+ #define PMAPMD_RSVD_VEND_PROV_MDI_CONF		GENMASK(1, 0)
+ #define PMAPMD_RSVD_VEND_PROV_MDI_REVERSE	BIT(0)
+@@ -677,27 +680,46 @@ int aqr_wait_reset_complete(struct phy_device *phydev)
+ 	return ret;
  }
  
-+static unsigned int aqr_gen2_inband_caps(struct phy_device *phydev,
-+					 phy_interface_t interface)
-+{
-+	if (interface == PHY_INTERFACE_MODE_SGMII ||
-+	    interface == PHY_INTERFACE_MODE_USXGMII)
-+		return LINK_INBAND_ENABLE | LINK_INBAND_DISABLE;
-+
-+	return 0;
-+}
-+
-+static int aqr_gen2_config_inband(struct phy_device *phydev, unsigned int modes)
-+{
+-static void aqr107_chip_info(struct phy_device *phydev)
++static int aqr_build_fingerprint(struct phy_device *phydev)
+ {
+ 	u8 fw_major, fw_minor, build_id, prov_id;
 +	struct aqr107_priv *priv = phydev->priv;
++	u16 misc_id, misc_ver;
+ 	int val;
+ 
+ 	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_FW_ID);
+ 	if (val < 0)
+-		return;
++		return val;
+ 
+ 	fw_major = FIELD_GET(VEND1_GLOBAL_FW_ID_MAJOR, val);
+ 	fw_minor = FIELD_GET(VEND1_GLOBAL_FW_ID_MINOR, val);
+ 
+ 	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_RSVD_STAT1);
+ 	if (val < 0)
+-		return;
++		return val;
+ 
+ 	build_id = FIELD_GET(VEND1_GLOBAL_RSVD_STAT1_FW_BUILD_ID, val);
+ 	prov_id = FIELD_GET(VEND1_GLOBAL_RSVD_STAT1_PROV_ID, val);
+ 
+-	phydev_dbg(phydev, "FW %u.%u, Build %u, Provisioning %u\n",
+-		   fw_major, fw_minor, build_id, prov_id);
++	val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_FW_MISC_ID);
++	if (val < 0)
++		return val;
 +
-+	if (phydev->interface == PHY_INTERFACE_MODE_USXGMII) {
-+		u16 set = 0;
++	misc_id = val;
 +
-+		if (modes == LINK_INBAND_ENABLE)
-+			set = MDIO_PHYXS_VEND_PROV2_USX_AN;
++	val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_FW_MISC_VER);
++	if (val < 0)
++		return val;
 +
-+		return phy_modify_mmd(phydev, MDIO_MMD_PHYXS,
-+				      MDIO_PHYXS_VEND_PROV2,
-+				      MDIO_PHYXS_VEND_PROV2_USX_AN, set);
-+	}
++	misc_ver = val;
 +
-+	for (int i = 0; i < AQR_NUM_GLOBAL_CFG; i++) {
-+		struct aqr_global_syscfg *syscfg = &priv->global_cfg[i];
-+		u16 set = 0;
-+		int err;
++	priv->fingerprint = AQR_FW_FINGERPRINT(fw_major, fw_minor, build_id,
++					       prov_id, misc_id, misc_ver);
 +
-+		if (syscfg->interface != phydev->interface)
-+			continue;
-+
-+		if (modes == LINK_INBAND_ENABLE)
-+			set = VEND1_GLOBAL_CFG_AUTONEG_ENA;
-+
-+		err = phy_modify_mmd(phydev, MDIO_MMD_VEND1,
-+				     aqr_global_cfg_regs[i].reg,
-+				     VEND1_GLOBAL_CFG_AUTONEG_ENA, set);
-+		if (err)
-+			return err;
-+	}
++	phydev_dbg(phydev, "FW %u.%u, Build %u, Provisioning %u, Misc ID %u, Version %u\n",
++		   fw_major, fw_minor, build_id, prov_id, misc_id, misc_ver);
 +
 +	return 0;
-+}
-+
- static int aqr107_probe(struct phy_device *phydev)
- {
- 	int ret;
-@@ -1134,6 +1183,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQCS109),
-@@ -1159,6 +1210,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR111),
-@@ -1184,6 +1237,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR111B0),
-@@ -1209,6 +1264,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR405),
-@@ -1217,6 +1274,8 @@ static struct phy_driver aqr_driver[] = {
- 	.config_intr	= aqr_config_intr,
- 	.handle_interrupt = aqr_handle_interrupt,
- 	.read_status	= aqr_read_status,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR112),
-@@ -1241,6 +1300,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR412),
-@@ -1260,6 +1321,8 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR412C),
-@@ -1279,6 +1342,8 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR113),
-@@ -1303,6 +1368,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR113C),
-@@ -1327,6 +1394,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps    = aqr_gen2_inband_caps,
-+	.config_inband  = aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR114C),
-@@ -1352,6 +1421,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps    = aqr_gen2_inband_caps,
-+	.config_inband  = aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR115),
-@@ -1377,6 +1448,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR115C),
-@@ -1402,6 +1475,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR813),
-@@ -1426,6 +1501,8 @@ static struct phy_driver aqr_driver[] = {
- 	.led_hw_control_set = aqr_phy_led_hw_control_set,
- 	.led_hw_control_get = aqr_phy_led_hw_control_get,
- 	.led_polarity_set = aqr_phy_led_polarity_set,
-+	.inband_caps	= aqr_gen2_inband_caps,
-+	.config_inband	= aqr_gen2_config_inband,
- },
- };
+ }
  
+ static int aqr107_config_mdi(struct phy_device *phydev)
+@@ -745,8 +767,14 @@ static int aqr_gen1_config_init(struct phy_device *phydev)
+ 	     "Your devicetree is out of date, please update it. The AQR107 family doesn't support XGMII, maybe you mean USXGMII.\n");
+ 
+ 	ret = aqr_wait_reset_complete(phydev);
+-	if (!ret)
+-		aqr107_chip_info(phydev);
++	if (!ret) {
++		/* The PHY might work without a firmware image, so only build a
++		 * fingerprint if the firmware was initialized.
++		 */
++		ret = aqr_build_fingerprint(phydev);
++		if (ret)
++			return ret;
++	}
+ 
+ 	ret = aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
+ 	if (ret)
 -- 
 2.34.1
 
