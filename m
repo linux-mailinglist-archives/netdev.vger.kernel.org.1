@@ -1,126 +1,153 @@
-Return-Path: <netdev+bounces-219420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06506B412F2
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:31:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07552B412F7
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:32:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A30851B633E7
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 03:32:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6608E1B636EE
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 03:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92651DE4CE;
-	Wed,  3 Sep 2025 03:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139C12C324D;
+	Wed,  3 Sep 2025 03:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Icy85zbs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6/aA16+"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EB542048;
-	Wed,  3 Sep 2025 03:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D2932F740;
+	Wed,  3 Sep 2025 03:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756870295; cv=none; b=TCIG0brfgCUdjW5MaQ+QTySEX3C0QmsF4VQDgPHsnCuVtcNWshQYpMlAHlv0R8HZzr9wR9YQBEctkprfOOW7AuIapEhzNdpG17k1w4i7lz1KR+eDWCRDrGuMj2RPNlbIEEwvuEtmngFSJHwl/UQ6ms6PjZRnWRcnaNq7W121d2c=
+	t=1756870341; cv=none; b=UKNfRQPDhSb7p+4/Wfv3XTdfIs51PaiHxO7AlU7Uco5oz+sqOxjHF438ibH4JKa8AP2YMf+khgEPDyedmjsftH24qI+mIFRJnPUHcYo8z5Qlx+IYXF72k7g1MAh2uhXjB1ImChypZP2VO0mj/WCiIinulK1zPAzhlEwEgx3o4L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756870295; c=relaxed/simple;
-	bh=4d9mLeW3Q+EUZn/A4+IBvHiKSklhOVboTTlUHZHeDG4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RnoyzgZeyM1l/5vAtILTB9dWkBU+kjVxh9I15hz8ZpG3uttoRgvmLwwQte5oRsPD3/7919CUQYFzXqsvzRN4vaw7ZJ+kK9SMcISQqkPRGVoY6JanbBl9QDGX0Vc+syk8Hz8q1mSyeRi/ku/Z1SI6HRxNCYr9DWiEOMCvNPenln8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Icy85zbs; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1756870291;
-	bh=oVaQkSdSvcCdDKN3m7ueTdePXOwfRyJ398Y5h6mLEpo=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=Icy85zbsNn3V5cPMdb3x6rJpqF01YsmfFsDV6WhLKau5qsl1F1JaifyKC76k8RIEV
-	 /XxZWidYP/y2VL6QnstbUHHUr6H4ZEye8i3NEEDgntM4cK/CUtyMgaUQVMx1GicytA
-	 Q1KyjQdHFeZhtVBZa2MORbonGYMgO9bLl+2aLRlrsSPIcRZUOvS+EUaI8x93z96VQ9
-	 UTEAVypj2gBJCNkvr15zILIyalt/ODyKP7jpnoL/1eUiKew+xhj/hTRbU8Tlf2RZAJ
-	 HcEbPLgC73WbsW61Aoo406ccvX6glLnTHBFxjhCTfM8h5OAJaZ1AHCQcuVyKdklrca
-	 rTAyArEe7ZHTQ==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 5930369374;
-	Wed,  3 Sep 2025 11:31:30 +0800 (AWST)
-Message-ID: <a0be916bc2e1736279362b91dbda932f60ac378c.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next v27 1/1] mctp pcc: Implement MCTP over PCC
- Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>, Adam Young
- <admiyo@os.amperecomputing.com>, Matt Johnston <matt@codeconstruct.com.au>,
-  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Wed, 03 Sep 2025 11:31:30 +0800
-In-Reply-To: <958f555a-1187-44ef-95df-c93474888208@amperemail.onmicrosoft.com>
-References: <20250828043331.247636-1-admiyo@os.amperecomputing.com>
-	 <20250828043331.247636-2-admiyo@os.amperecomputing.com>
-	 <eb156195ce9a0f9c0f2c6bc46c7dcdaf6e83c96d.camel@codeconstruct.com.au>
-	 <e28eeb4f-98a4-4db6-af96-c576019d3af1@amperemail.onmicrosoft.com>
-	 <c22e5f4dc6d496cec2c5645eac5f43aa448d0c48.camel@codeconstruct.com.au>
-	 <3d30c216-e49e-4d85-8f1b-581306033909@amperemail.onmicrosoft.com>
-	 <958f555a-1187-44ef-95df-c93474888208@amperemail.onmicrosoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1756870341; c=relaxed/simple;
+	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J5t5VZXgL/5Iof6OoWLFo3U1JfXrDUBu3hVZfePtCs16N4B/zwrcpCdWF5EmmR9bz4kftQTc+tOyppvPyFtKM+m5+YtnovbWV3uiDJ8FjlShx5IrpkZg3QttQElhH/1khn+snkJjD9WDehyCIr2qMeogk0BceX0EmBfunuymcOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6/aA16+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C22F8C4CEF0;
+	Wed,  3 Sep 2025 03:32:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756870340;
+	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=c6/aA16+bBkQH51tR2bcv5SM6tXtTwJMULf4022Tate2FmzdfUbzGvPiP2fkcVpWI
+	 RriSmrsN2ZlJj0IloB/qX3FQ3Nx9cN4lqbucrjYT4KLxt2DgUbVBqvIKo2olMXLgfB
+	 9N5kKv4v3IBmC1YJev3/3rxoXwXwhR46dCAt8jPxByNLb/XkehQ3Po6KdKfM7VpmMm
+	 1Q1BM8WVxFsEMqVtGOxGMqeKmeEKRty2lb7WMxAWqJ6tmtHvJWE+KovB1IE7Kw9o50
+	 ge8OGusvBxfm+9So2e0mbnLX+HsjFa6ZxAt4PFAo/YR4SAEcoNc0h0IuibbyWbTQJn
+	 FVh2NdAaEjS2A==
+Message-ID: <3242f4a2-9a5f-4165-8d24-5c2387967277@kernel.org>
+Date: Tue, 2 Sep 2025 22:32:05 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/14] Documentation: amd-pstate: Use internal link to
+ kselftest
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Documentation <linux-doc@vger.kernel.org>,
+ Linux DAMON <damon@lists.linux.dev>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ Linux Power Management <linux-pm@vger.kernel.org>,
+ Linux Block Devices <linux-block@vger.kernel.org>,
+ Linux BPF <bpf@vger.kernel.org>,
+ Linux Kernel Workflows <workflows@vger.kernel.org>,
+ Linux KASAN <kasan-dev@googlegroups.com>,
+ Linux Devicetree <devicetree@vger.kernel.org>,
+ Linux fsverity <fsverity@lists.linux.dev>,
+ Linux MTD <linux-mtd@lists.infradead.org>,
+ Linux DRI Development <dri-devel@lists.freedesktop.org>,
+ Linux Kernel Build System <linux-lbuild@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Sound <linux-sound@vger.kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+ Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+ Jonathan Corbet <corbet@lwn.net>, SeongJae Park <sj@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
+ <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+ Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe Perches <joe@perches.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>,
+ Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+ tytso@mit.edu, Richard Weinberger <richard@nod.at>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Waiman Long <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>,
+ David Arinzon <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>,
+ Andrew Lunn <andrew@lunn.ch>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Alexandru Ciobotaru <alcioa@amazon.com>,
+ The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ Steve French <stfrench@microsoft.com>,
+ Meetakshi Setiya <msetiya@microsoft.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Bart Van Assche <bvanassche@acm.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
+ <linux@weissschuh.net>, Masahiro Yamada <masahiroy@kernel.org>
+References: <20250829075524.45635-1-bagasdotme@gmail.com>
+ <20250829075524.45635-5-bagasdotme@gmail.com>
+Content-Language: en-US
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <20250829075524.45635-5-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Adam,
+On 8/29/2025 2:55 AM, Bagas Sanjaya wrote:
+> Convert kselftest docs link to internal cross-reference.
+> 
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> ---
+>   Documentation/admin-guide/pm/amd-pstate.rst | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/pm/amd-pstate.rst b/Documentation/admin-guide/pm/amd-pstate.rst
+> index e1771f2225d5f0..37082f2493a7c1 100644
+> --- a/Documentation/admin-guide/pm/amd-pstate.rst
+> +++ b/Documentation/admin-guide/pm/amd-pstate.rst
+> @@ -798,5 +798,4 @@ Reference
+>   .. [3] Processor Programming Reference (PPR) for AMD Family 19h Model 51h, Revision A1 Processors
+>          https://www.amd.com/system/files/TechDocs/56569-A1-PUB.zip
+>   
+> -.. [4] Linux Kernel Selftests,
+> -       https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html
+> +.. [4] Documentation/dev-tools/kselftest.rst
 
-> Without the wrapping I get:
-> WARNING: Violation(s) in mctp-pcc.c
-> Line 275
-> =C2=A0=C2=A0=C2=A0=C2=A0 struct mctp_pcc_ndev *mctp_pcc_ndev =3D netdev_p=
-riv(ndev);
-> =C2=A0=C2=A0=C2=A0=C2=A0 struct mctp_pcc_mailbox *outbox =3D &mctp_pcc_nd=
-ev->outbox;
->=20
-> I could move the initialization of outbox, but that seems wrong. The=20
-> wrapping is the least bad option here.
+Acked-by: Mario Limonciello (AMD) <superm1@kernel.org>
 
-You're kind-of tricking your RCT checker there, by introducing this
-unnecessary wrap - and the results are not RCT. I wouldn't call that the
-best option.
-
-The netdev docs say this:
-
-    If there are dependencies between the variables preventing the ordering
-    move the initialization out of line.
-
-But I think this is a fairly legitimate case of breaking RCT for better
-readability, and preserving variable-initiness. We have exactly this,
-intentionally, in existing code, eg.:
-
-    static void mctp_usb_out_complete(struct urb *urb)
-    {
-            struct sk_buff *skb =3D urb->context;
-            struct net_device *netdev =3D skb->dev;
-            int status;
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dri=
-vers/net/mctp/mctp-usb.c#n38
-
-- which triggers no checkpatch/NIPA warnings.
-
-The wrapping in the middle of declarations seem odd for a non-80-col
-line.
-
-I would suggest either out-of-line, or slightly-broken RCT, over the
-checker-workaround format. However, I would not reject a patch on this
-choice of style alone :D
-
-Cheers,
-
-
-Jeremy
 
