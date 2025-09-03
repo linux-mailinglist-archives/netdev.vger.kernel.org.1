@@ -1,345 +1,137 @@
-Return-Path: <netdev+bounces-219710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 329C6B42C12
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 23:43:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A42FDB42C15
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 23:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCEC156630C
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:43:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63E0BA00C2D
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669422EC08B;
-	Wed,  3 Sep 2025 21:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789202EBBA8;
+	Wed,  3 Sep 2025 21:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbzAwtcs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="imhn+ath"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CF41A7264
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 21:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D1B1A7264
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 21:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756935804; cv=none; b=bT6+8K/BbL5oRsl6TMYG2oSf24EhyGF/jDZj1q4VBVMOqO60gzM/Jovc8CCkORtT2/ou7Fy7DUtFgkhGgFxg6Pb4LtppC/teamP6n1wVWBm+hoqHn3MkXSEJhpzXwPyXlpRcL2cVJS0AaEK/vDXmYmlaqv5T9Qs/gqBDRIuDDis=
+	t=1756935861; cv=none; b=kkXDHy3ml53RC/MZFRyfuULyTnL0hALsi/1ujnCbeiBqw3DYEyRPdvoTVLsu/7ux+LHUAKUpB7/K7e1GEY4+NnnxXIj4np7T/Iws0FEaAAhG/sCiEyDLmcCV7174B5j839nvK672sDSPtqg3I3Efs8s+NHM2X4rNQZBkxa6hDQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756935804; c=relaxed/simple;
-	bh=Qr70gD4oeMlQ4hQY5AUixqYTA1Zv8k4BE9mjTHwEK4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=riF83siv2H8nHGIv58V29TNPGxm5kNl7hOMDhL06FiPGu5pwQlRJq70pTTPQk2OjlUNG4iLVsfyGpsXQBJS7ls7irV8yjW9I8J9uTuR7sFynUTIx1jEohhUkrxXNW+VhD/bvuJNUqaljHbkNBBM7FRoUTpGdi1g463W3xUDcfMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DbzAwtcs; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1756935861; c=relaxed/simple;
+	bh=lJzSgJib4EFoOQeYqgZwa8EDwxl7ibD+9/ogk06CkQ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=icKbtu5KEyyv30Nuf/iD37fvXWEAig/rYjjvrB09JofkvIapCCy3/HSGn4QRYvLYPIG9luoj9NK29vFl//KYaNGX7vffwD2+FEUMOxz67VMtXTrcd6wfo0nAKqHmVmE+oOPtNNu3VqzAyFS5+gBS2t4rAzTj+HkVQqKkhstdToo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=imhn+ath; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756935801;
+	s=mimecast20190719; t=1756935858;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nlfl+ymrxqrkR6VsHpIygLrlWaJMalsml29q6ojxouU=;
-	b=DbzAwtcsL+qzntJk50Pt7h2/OgW/hIKo8MSpfNBXa3WjJsD7FBWAVCikZGsze/p+0zY3th
-	D2uQy5yjF71+sEC2OWVnZR0daBahWXiykHSBV/861YB4ajW3sFHXs1XhmJy6038d/FJAkW
-	vNz9eHjcTiE40n8uzAb+w2l+7k1kqkM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6IuCNS7pDho9ZKiwaVee/+v5YbDlDITCmQruYWgSMFA=;
+	b=imhn+athoYEnOH/HD+UYWzYUCJ1g4K31tXxXLmT09L9NxJZhSjVlNLCiqpN+e0CGjrr5fd
+	3D918nnrHdOdtqYrmPGYxMM8671c3f0hY1CMB/bpxT/8iYlaigM9RCKqOL00TPHCIx1jV6
+	eTU2KnduPBnuAfHcC4YwsG4HhMS6XoM=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-59-5mVl2GwpMje-etqBTuRtdA-1; Wed, 03 Sep 2025 17:43:19 -0400
-X-MC-Unique: 5mVl2GwpMje-etqBTuRtdA-1
-X-Mimecast-MFC-AGG-ID: 5mVl2GwpMje-etqBTuRtdA_1756935798
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3e014bf8ebfso177529f8f.0
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 14:43:19 -0700 (PDT)
+ us-mta-353-qcRpAYhEMk2AqxC07qJ0mQ-1; Wed, 03 Sep 2025 17:44:17 -0400
+X-MC-Unique: qcRpAYhEMk2AqxC07qJ0mQ-1
+X-Mimecast-MFC-AGG-ID: qcRpAYhEMk2AqxC07qJ0mQ_1756935857
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-71e781fd54aso6381147b3.1
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 14:44:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756935798; x=1757540598;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nlfl+ymrxqrkR6VsHpIygLrlWaJMalsml29q6ojxouU=;
-        b=MZ9o/V6rso49iCllEEsY3f8/jvSszPXgFtK6m6fJgXFZkuAWnBEOuDtMsB2zFjob6E
-         v/P2mXtdoJmN/po3f9XT7NKTD/+Gu2zjUlL2qlGTQnCvzQwMJoI1+kXlh/sDclftQVn5
-         meYNyAc3IBHu4VqP07c1wm2agX1q9JRAKfUT+cUeSwKTZhVe0NtpfLt+es5rJy04mVKI
-         QHJmaKOTqISgS+HNXXkm8KHjW8xd28QeWZq/tcTtLHoM87DS0kiNAl4CNsHLTUeL/dfz
-         cfkZaEnXk0Maj9EEQ9ToJ23gf8XYSjXVHrqhVfozVxXvIJer7gSLUzswWSRKLAPnEINb
-         i7kg==
-X-Forwarded-Encrypted: i=1; AJvYcCVtBvOnZemYnTiz61isNtslBZN+ZT/GCyHmbpyWFkWYMRNl5tii5WGpF68mXM0Jj+4evKtBx+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfBy0lsR7ZUQxMUQwIy9HI8OPRbTUm67vLqZTHRkpC0N4JYDCq
-	2J9Rua3PED51CoI8nvyuzcbilTD4cRo+f0V9h8k86mgbqShES6OrepyBt0gFgZIDtL8dxU1BVnf
-	tH+qAug1xUNeJalSVTpn8oSGSKjOvKoS2MxziRP8x4hwHmYD84v9BgPX3lA==
-X-Gm-Gg: ASbGncvL1nPKmhnInw9feV0M4Vk3r0f6HIlrSuCIuoKa8mYiZ0Cg3mnr1eJWUubuq9U
-	szq0qGdwzNPNF1YsYMyMlHL+KQFflYEHBDH0rQjZcUAu+1RKqzh+6MDCBs1NCO0hrMHOQ+p8w53
-	gjJoKxJhJLMSDEpT76pMIBHm7WSuvjZMdPxSBbIPefkp+FVMkA/hdX57c4YrahduFUVXJ1u65Er
-	xvue8Jesys9VpAGubzpMaxYBS9Jq9JcfgUaMrY/SQHyLATT/Y+63wxnLrPMZUPd3Ihq5W3luUcK
-	IzVoitkbUJ+itQBR3V1Mq661viOC2EXnXXd4MR2YDZvd
-X-Received: by 2002:a05:6000:144b:b0:3d9:70cc:6dc1 with SMTP id ffacd0b85a97d-3d970cc6f4emr8255703f8f.6.1756935798167;
-        Wed, 03 Sep 2025 14:43:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHZu9hA/7PLviQ4gIWA7oM5crom8Ph7AzFyaj1R55D4GAmgifp7G1T9eRvT4my+FOozDc0MOQ==
-X-Received: by 2002:a05:6000:144b:b0:3d9:70cc:6dc1 with SMTP id ffacd0b85a97d-3d970cc6f4emr8255685f8f.6.1756935797706;
-        Wed, 03 Sep 2025 14:43:17 -0700 (PDT)
-Received: from fedora.redhat.com ([147.235.216.242])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf270fbd01sm25529918f8f.13.2025.09.03.14.43.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 14:43:17 -0700 (PDT)
-From: mheib@redhat.com
-To: intel-wired-lan@lists.osuosl.org
-Cc: przemyslawx.patynowski@intel.com,
-	jiri@resnulli.us,
-	netdev@vger.kernel.org,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	aleksandr.loktionov@intel.com,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Mohammad Heib <mheib@redhat.com>
-Subject: [PATCH net-next,v3,2/2] i40e: support generic devlink param "max_mac_per_vf"
-Date: Thu,  4 Sep 2025 00:43:05 +0300
-Message-ID: <20250903214305.57724-2-mheib@redhat.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250903214305.57724-1-mheib@redhat.com>
-References: <20250903214305.57724-1-mheib@redhat.com>
+        d=1e100.net; s=20230601; t=1756935856; x=1757540656;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6IuCNS7pDho9ZKiwaVee/+v5YbDlDITCmQruYWgSMFA=;
+        b=mKBAK5sC0kOxIbHz/SXXE0nmo0n+opJkH7RaOvlT9gz8yBzi9Z1Kx3eO2TqnxDcm9p
+         Fczq52QtyUnTjnkAa9p/XuuFz5XLHJIdfvdJhpGKR9xsNj7ZSj5AyaJ0yk+OPZj3b/bD
+         Odk/9cVA7J/yts+BC1mPFXmcy5S+495I5W0QnMKacxkXV2kFMC/noNu70+1GHLVX/SRm
+         xR0AWSqMfaaKpPU1hSbD0Za9PDnhzg1ONXgRAieCZzGGH+OiPzYsy0Ml+lGqpFXVgfnh
+         hf/CTXLIG/jkUXe98Y9wWJKZwIg+3w3BVJIRccv/HA7S58V2P1ONhqbM/aLtImxwGsWX
+         SBng==
+X-Forwarded-Encrypted: i=1; AJvYcCVZhP/1rE1pG2mI/cv+v0oxXg6mW73ZGuwkUCHn1Uakynqwh2P7IYx9GJFR7jDUHU7F2h9GiiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywa+dzmqo92MgLBeoNFnahPtYLCGc6BD4cccnk3CeMxTmSLeRxt
+	bvh4xu4hvK9sl45GKF/aoG9dHHwS+iWABILhnLm4nuNp+quhZOty8u8XUmoIQdXeUiHbfDX10YE
+	iIo4eryn2laYr7n2wzn6AQTrDpqtvsFtRzud8YX9w49oRdWs2TB+dUHC6Ug==
+X-Gm-Gg: ASbGncvZhU265nXJg1c86dGdP5vRnJ9voiN3cNI+JeITNqKuIFsBvKXOsExK+wDhQKQ
+	ufGVqZZzlcvPy0OaQ6pMwPhmoZH2e5455P0Z6igwk2J5R1aTpeoU5RAHQhMr5Ms0UDOQkvnFYDM
+	Oeb/SUKDcsWperMYkugF5EctZsqty3ytWaVNVOXlaNXPvF/Bs8ZYbPl43/3A3MH1NSGXw5nHK6m
+	25LNRrS2zPSXm10JoOVnaMUxRvqqrBXoFmc7hjZe8ZtQGeDeeN6LqvKmD5kDQypoKiq8Iw9Hey3
+	hOPE5q0vTqf+YGmCesZzV8JcuWoe/MZORxH1qvadHKY=
+X-Received: by 2002:a05:690c:8e10:b0:723:b3a6:781c with SMTP id 00721157ae682-723b3a67b21mr48037497b3.43.1756935856642;
+        Wed, 03 Sep 2025 14:44:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFZwb3LytZni2u9cZ2InCnvHlul8mehbMHJNDAE0FmjECYBPUHP1jyQCKVnIWbCznr4CyjB/w==
+X-Received: by 2002:a05:690c:8e10:b0:723:b3a6:781c with SMTP id 00721157ae682-723b3a67b21mr48037247b3.43.1756935856029;
+        Wed, 03 Sep 2025 14:44:16 -0700 (PDT)
+Received: from [192.168.68.125] ([147.235.216.242])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-723a8511f0asm16193297b3.34.2025.09.03.14.44.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Sep 2025 14:44:15 -0700 (PDT)
+Message-ID: <7a6d4052-537d-4de6-b1af-a26e362704ab@redhat.com>
+Date: Thu, 4 Sep 2025 00:44:12 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next,v2,1/2] devlink: Add new "max_mac_per_vf" generic
+ device param
+To: Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org
+Cc: przemyslawx.patynowski@intel.com, jiri@resnulli.us,
+ netdev@vger.kernel.org, horms@kernel.org, aleksandr.loktionov@intel.com,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
+References: <20250903190229.49193-1-mheib@redhat.com>
+ <6033dd40-8adc-48f4-9acb-be50d992add7@intel.com>
+Content-Language: en-US
+From: mohammad heib <mheib@redhat.com>
+In-Reply-To: <6033dd40-8adc-48f4-9acb-be50d992add7@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Mohammad Heib <mheib@redhat.com>
+Hi Jacob,
 
-Currently the i40e driver enforces its own internally calculated per-VF MAC
-filter limit, derived from the number of allocated VFs and available
-hardware resources. This limit is not configurable by the administrator,
-which makes it difficult to control how many MAC addresses each VF may
-use.
+Thanks for the review.
 
-This patch adds support for the new generic devlink runtime parameter
-"max_mac_per_vf" which provides administrators with a way to cap the
-number of MAC addresses a VF can use:
+It’s indeed an easy change. I’m wondering why untrusted VFs were 
+originally limited to 16+2 MACs, and if changing this (overwriting that 
+behavior) could be risky.
 
-- When the parameter is set to 0 (default), the driver continues to use
-  its internally calculated limit.
+Anyway, I applied your suggestions in v3.
 
-- When set to a non-zero value, the driver applies this value as a strict
-  cap for VFs, overriding the internal calculation.
-
-Important notes:
-
-- The configured value is a theoretical maximum. Hardware limits may
-  still prevent additional MAC addresses from being added, even if the
-  parameter allows it.
-
-- Since MAC filters are a shared hardware resource across all VFs,
-  setting a high value may cause resource contention and starve other
-  VFs.
-
-- This change gives administrators predictable and flexible control over
-  VF resource allocation, while still respecting hardware limitations.
-
-- Previous discussion about this change:
-  https://lore.kernel.org/netdev/20250805134042.2604897-2-dhill@redhat.com
-  https://lore.kernel.org/netdev/20250823094952.182181-1-mheib@redhat.com
-
-Signed-off-by: Mohammad Heib <mheib@redhat.com>
----
- Documentation/networking/devlink/i40e.rst     | 32 +++++++++++++
- drivers/net/ethernet/intel/i40e/i40e.h        |  4 ++
- .../net/ethernet/intel/i40e/i40e_devlink.c    | 48 ++++++++++++++++++-
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 31 ++++++++----
- 4 files changed, 105 insertions(+), 10 deletions(-)
-
-diff --git a/Documentation/networking/devlink/i40e.rst b/Documentation/networking/devlink/i40e.rst
-index d3cb5bb5197e..524524fdd3de 100644
---- a/Documentation/networking/devlink/i40e.rst
-+++ b/Documentation/networking/devlink/i40e.rst
-@@ -7,6 +7,38 @@ i40e devlink support
- This document describes the devlink features implemented by the ``i40e``
- device driver.
- 
-+Parameters
-+==========
-+
-+.. list-table:: Generic parameters implemented
-+    :widths: 5 5 90
-+
-+    * - Name
-+      - Mode
-+      - Notes
-+    * - ``max_mac_per_vf``
-+      - runtime
-+      - Controls the maximum number of MAC addresses a VF can use
-+        on i40e devices.
-+
-+        By default (``0``), the driver enforces its internally calculated per-VF
-+        MAC filter limit, which is based on the number of allocated VFS.
-+
-+        If set to a non-zero value, this parameter acts as a strict cap:
-+        the driver will use the user-provided value instead of its internal
-+        calculation.
-+
-+        **Important notes:**
-+        - MAC filters are a **shared hardware resource** across all VFs.
-+          Setting a high value may cause other VFs to be starved of filters.
-+
-+        - This value is a **theoretical maximum**. The hardware may return
-+          errors when its absolute limit is reached, regardless of the value
-+          set here.
-+
-+        The default value is ``0`` (internal calculation is used).
-+
-+
- Info versions
- =============
- 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 801a57a925da..d2d03db2acec 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -574,6 +574,10 @@ struct i40e_pf {
- 	struct i40e_vf *vf;
- 	int num_alloc_vfs;	/* actual number of VFs allocated */
- 	u32 vf_aq_requests;
-+	/* If set to non-zero, the device uses this value
-+	 * as maximum number of MAC filters per VF.
-+	 */
-+	u32 max_mac_per_vf;
- 	u32 arq_overflows;	/* Not fatal, possibly indicative of problems */
- 	struct ratelimit_state mdd_message_rate_limit;
- 	/* DCBx/DCBNL capability for PF that indicates
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-index cc4e9e2addb7..cd01e35da94e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-@@ -5,6 +5,35 @@
- #include "i40e.h"
- #include "i40e_devlink.h"
- 
-+static int i40e_max_mac_per_vf_set(struct devlink *devlink,
-+				   u32 id,
-+				   struct devlink_param_gset_ctx *ctx,
-+				   struct netlink_ext_ack *extack)
-+{
-+	struct i40e_pf *pf = devlink_priv(devlink);
-+
-+	pf->max_mac_per_vf = ctx->val.vu32;
-+	return 0;
-+}
-+
-+static int i40e_max_mac_per_vf_get(struct devlink *devlink,
-+				   u32 id,
-+				   struct devlink_param_gset_ctx *ctx)
-+{
-+	struct i40e_pf *pf = devlink_priv(devlink);
-+
-+	ctx->val.vu32 = pf->max_mac_per_vf;
-+	return 0;
-+}
-+
-+static const struct devlink_param i40e_dl_params[] = {
-+	DEVLINK_PARAM_GENERIC(MAX_MAC_PER_VF,
-+			      BIT(DEVLINK_PARAM_CMODE_RUNTIME),
-+			      i40e_max_mac_per_vf_get,
-+			      i40e_max_mac_per_vf_set,
-+			      NULL),
-+};
-+
- static void i40e_info_get_dsn(struct i40e_pf *pf, char *buf, size_t len)
- {
- 	u8 dsn[8];
-@@ -165,7 +194,18 @@ void i40e_free_pf(struct i40e_pf *pf)
-  **/
- void i40e_devlink_register(struct i40e_pf *pf)
- {
--	devlink_register(priv_to_devlink(pf));
-+	struct devlink *dl = priv_to_devlink(pf);
-+	struct device *dev = &pf->pdev->dev;
-+	int err;
-+
-+	err = devlink_params_register(dl, i40e_dl_params,
-+				      ARRAY_SIZE(i40e_dl_params));
-+	if (err)
-+		dev_err(dev,
-+			"devlink params register failed with error %d", err);
-+
-+	devlink_register(dl);
-+
- }
- 
- /**
-@@ -176,7 +216,11 @@ void i40e_devlink_register(struct i40e_pf *pf)
-  **/
- void i40e_devlink_unregister(struct i40e_pf *pf)
- {
--	devlink_unregister(priv_to_devlink(pf));
-+	struct devlink *dl = priv_to_devlink(pf);
-+
-+	devlink_unregister(dl);
-+	devlink_params_unregister(dl, i40e_dl_params,
-+				  ARRAY_SIZE(i40e_dl_params));
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 081a4526a2f0..6e154a8aa474 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -2935,33 +2935,48 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
- 		if (!f)
- 			++mac_add_cnt;
- 	}
--
--	/* If this VF is not privileged, then we can't add more than a limited
--	 * number of addresses.
-+	/* Determine the maximum number of MAC addresses this VF may use.
-+	 *
-+	 * - For untrusted VFs: use a fixed small limit.
-+	 *
-+	 * - For trusted VFs: limit is calculated by dividing total MAC
-+	 *  filter pool across all VFs/ports.
- 	 *
--	 * If this VF is trusted, it can use more resources than untrusted.
--	 * However to ensure that every trusted VF has appropriate number of
--	 * resources, divide whole pool of resources per port and then across
--	 * all VFs.
-+	 * - User can override this by devlink param "max_mac_per_vf".
-+	 *   If set its value is used as a strict cap for both trusted and
-+	 *   untrusted VFs.
-+	 *   Note:
-+	 *    even when overridden, this is a theoretical maximum; hardware
-+	 *    may reject additional MACs if the absolute HW limit is reached.
- 	 */
- 	if (!vf_trusted)
- 		mac_add_max = I40E_VC_MAX_MAC_ADDR_PER_VF;
- 	else
- 		mac_add_max = I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs, hw->num_ports);
- 
-+	if (pf->max_mac_per_vf > 0)
-+		mac_add_max = pf->max_mac_per_vf;
-+
- 	/* VF can replace all its filters in one step, in this case mac_add_max
- 	 * will be added as active and another mac_add_max will be in
- 	 * a to-be-removed state. Account for that.
- 	 */
- 	if ((i40e_count_active_filters(vsi) + mac_add_cnt) > mac_add_max ||
- 	    (i40e_count_all_filters(vsi) + mac_add_cnt) > 2 * mac_add_max) {
-+		if (pf->max_mac_per_vf == mac_add_max && mac_add_max > 0) {
-+			dev_err(&pf->pdev->dev,
-+				"Cannot add more MAC addresses: VF reached its maximum allowed limit (%d)\n",
-+				mac_add_max);
-+				return -EPERM;
-+		}
- 		if (!vf_trusted) {
- 			dev_err(&pf->pdev->dev,
- 				"Cannot add more MAC addresses, VF is not trusted, switch the VF to trusted to add more functionality\n");
- 			return -EPERM;
- 		} else {
- 			dev_err(&pf->pdev->dev,
--				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
-+				"Cannot add more MAC addresses: trusted VF reached its maximum allowed limit (%d)\n",
-+				mac_add_max);
- 			return -EPERM;
- 		}
- 	}
--- 
-2.50.1
+On 9/3/25 11:11 PM, Jacob Keller wrote:
+> 
+> 
+> On 9/3/2025 12:02 PM, mheib@redhat.com wrote:
+>> From: Mohammad Heib <mheib@redhat.com>
+>>
+>> Add a new device generic parameter to controls the maximum
+>> number of MAC filters allowed per VF.
+>>
+>> While this parameter is named `max_mac_per_vf`, the exact enforcement
+>> policy may vary between drivers. For example, i40e applies this limit
+>> only to trusted VFs, whereas other drivers may choose to apply it
+>> uniformly across all VFs. The goal is to provide a consistent devlink
+>> interface, while allowing flexibility for driver-specific behavior.
+>>
+> 
+> Would it make more sense to apply the limit to all VFs if set, and apply
+> the default variable behavior for when its unset? This would avoid the
+> need to have this much flexibility and latitude for each driver.
+> 
+> It seems like that wouldn't be too difficult.
 
 
