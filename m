@@ -1,86 +1,95 @@
-Return-Path: <netdev+bounces-219502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D85BEB419BE
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F08B8B41A66
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEAD5166783
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:18:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8105165DCC
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4402EAB65;
-	Wed,  3 Sep 2025 09:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600822D543B;
+	Wed,  3 Sep 2025 09:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="HcFGa0Tr"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8342285074;
-	Wed,  3 Sep 2025 09:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3241D1E5B7C
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 09:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756891096; cv=none; b=rZ1gO7FVqgIN70u/dAgPevIwJz6STD4S5q5p+mIPjNyfEZ2UgZ1gAcU8UNpxmJr68Ms81uxwh7n3PjoAyJEEHa/9aG3yCO46Z1d8YrKFjyK0yFhK1dbTw0IkberQ8Pnx9tkokvxrWyj8zdmyqMmLZ8xg35m5ITUjq8tjOY+B+us=
+	t=1756892767; cv=none; b=XoF6tDym3+yUFv/NXyXAbccYvfr3GYiWnE8FdTpj3qSYdF3F6hQyx71IpthdEr9ylXmhdTD3lczvvyB0Fl+3Ddpynr86QI0+PWYQh9ERP69/EyuCC3WWzarpG9UoEdUw0CvdDBu9OZNJEGs+i/CkPKStajBzk0dfFY3dK69HwxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756891096; c=relaxed/simple;
-	bh=L8kekbtlJ61/+0qI8FN7jAv35CVMrvcJVzR3Bq6Jpm8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GEPmxKZ9m1U3KCLr5QLVghVKb48jQSByq78JJ81ARvCbZ7PUPj31hrDvOUp3xn0J7afyt++/YpfoT7Ep9pMBfI6y3LqIXr4MJLlSrAM/PKTjEBeoEcTa5qAe15EL2eyG4rClzQ7xSXO5PFmoouCU/AhqSeNnBXVemCK0tcJCvtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cGxlW1dlFz2VRgR;
-	Wed,  3 Sep 2025 17:15:03 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 308871A016C;
-	Wed,  3 Sep 2025 17:18:10 +0800 (CST)
-Received: from huawei.com (10.50.159.234) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 3 Sep
- 2025 17:18:09 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net-next] ipv6: Add sanity checks on ipv6_devconf.seg6_enabled
-Date: Wed, 3 Sep 2025 17:39:48 +0800
-Message-ID: <20250903093948.3030670-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756892767; c=relaxed/simple;
+	bh=mJEZezaaAvDWlpLgZGr6gvr2k1GiPwLmXdP8VleSAVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dD38rYvlUm3R6JXFWhu+ry1iu3Qe2wOrVsoNQ8cVSD8wKGCFBgzoFdAoc3nKaR26Sy8M0kelgkmGp1HkPj5EonL6p+Foq3yociM9WGf269S9Ag0WDMU/sl06CoJrJWkfIOfLlm43m/+uKxsR3Bq3LDdbL/sWuR2p53AHkgbZCoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=HcFGa0Tr; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=qZD6
+	3uFUUWm/vKdNbnOPDAIu7KIlkgvjimOu757PzOY=; b=HcFGa0Trj5A9lugbOuv7
+	nAQ5a//v4VMybK49wDJ16RvfaBJRqz5Gc4hMYVLUwU4fuWIqXYNzIkB8ugrLOCuR
+	zRzjJ1K3u4rhVCKCjFv5PQwxE80LdYfCT+wUcIsuXgRkMN6wdyVRshzoGBrkqb1h
+	q1IkJQSdr90orGtWPU4blEZOluYp+t+7LbiaPcmzrI5JCI79F8GOZEjxg4BA8D8p
+	LB1quYysEiyyu/lVvEM3mpR6jfRlUiYi23qPZCGy9yENwiFjmaMZhy3hvlWWCGUz
+	HtOGfDjsQ7xCi6D/wTxJRgG3hlJm/Q+RmHDiPc2tZE6nIKS+/11l5NZr7zUWe2XP
+	2Q==
+Received: (qmail 3244023 invoked from network); 3 Sep 2025 11:45:53 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 3 Sep 2025 11:45:53 +0200
+X-UD-Smtp-Session: l3s3148p1@/45yeOI9IIMujnu+
+Date: Wed, 3 Sep 2025 11:45:52 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Matthew Gerlach <matthew.gerlach@altera.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH v2 2/2] dt-bindings: net: renesas,rzn1-gmac: Constrain
+ interrupts
+Message-ID: <aLgOUGOp7Db0keZ-@ninjato>
+References: <20250902154051.263156-3-krzysztof.kozlowski@linaro.org>
+ <20250902154051.263156-4-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902154051.263156-4-krzysztof.kozlowski@linaro.org>
 
-In ipv6_srh_rcv() we use min(net->ipv6.devconf_all->seg6_enabled,
-idev->cnf.seg6_enabled) is intended to return 0 when either value is zero,
-but if one of the values is negative it will in fact return non-zero.
+On Tue, Sep 02, 2025 at 05:40:53PM +0200, Krzysztof Kozlowski wrote:
+> Renesas RZN1 GMAC uses three interrupts in in-kernel DTS and common
+> snps,dwmac.yaml binding is flexible, so define precise constraint for
+> this device.
+> 
+> Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- net/ipv6/addrconf.c | 2 ++
- 1 file changed, 2 insertions(+)
+Double checked with the original RZ/N1 docs:
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 40e9c336f6c5..87f14532cb7e 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -7193,6 +7193,8 @@ static const struct ctl_table addrconf_sysctl[] = {
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE,
- 	},
- #ifdef CONFIG_IPV6_SEG6_HMAC
- 	{
--- 
-2.34.1
+Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
 
