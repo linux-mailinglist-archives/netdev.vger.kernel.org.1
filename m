@@ -1,228 +1,189 @@
-Return-Path: <netdev+bounces-219430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E62B41488
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 07:48:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6EC9B414AA
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:06:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 072485426C1
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:48:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1806547C4E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 06:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8582D2D3A75;
-	Wed,  3 Sep 2025 05:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5922D6E55;
+	Wed,  3 Sep 2025 06:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WVG27D3a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pc9uqEt1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91F420EB
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 05:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC2928368A
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 06:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756878533; cv=none; b=jOgezMVbIL7d/HO6Wlx5Puerhe/ICOknu2vEhasIiE6sW7cSKw+ZbbSW2vT84t2LTXUoVlmckjXKIwvS/xh6cRoP0zHHWTHLD2NzccUMC6Pazb2Fwsm28AEqZCef1A2gm1Ntt4Aohzt9ROjZp2WDuFqPXq53ZldHpA+sdLaHwEI=
+	t=1756879555; cv=none; b=sMCGkOxeWGFUb5n4fFAhAm/+phkeGTNc+JU7xu2E/R3Z9aLS8GNQPvA1BGn4mV6JTXCr2Gd9sTiyVd4sT02bTErckGD9B+NLHjtI3ccqS/twF8+y0l2cq4wSoLQQV49mgT8kAqsSQcups13db0HBG8mQZGM+jUs83KBdv1uitqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756878533; c=relaxed/simple;
-	bh=P29/hUvtfmngsYKe9sFiSxCme71KO+tZ//APrhmWcqw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q1UhoSdp/v5u2IKSHVKWuxAr9EHKbMS4qmWRIZZWEa/1HS248bwKj2X+YVmjr3bSBjWvRC9HCDHVuvuLTw5EoBNOulWTZKcbw3ZNwPXQ85xXGLcT5y8PK8HGG9ut0rBeQ4AGpCuaykUxiEo/FJCdHiy43gP025FUFaJKB/HZNJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WVG27D3a; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-772627dd50aso678696b3a.1
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 22:48:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756878531; x=1757483331; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gWNtOWjoWu1hFCQ7mzKzkzXVkr6pinoXVR6Y+Qq/u/8=;
-        b=WVG27D3apfQtFErd02cmSWOUrC0GTleG9R6jPZlYa+05FH3WOqY7YJfHe/luhP7bUm
-         yvwDyZJu3vxvqKNZ5VEzxX6e8w/iYrH9bOXFO5cKbHJ3VPYVl7fl35WAo5NJ+XVN3/Na
-         lymbwNtgDK8mq99WwkgRwwIhq4iblw9080YnpHXqfgvtcWDYUD/gWWUPn/aB6FF085Pj
-         SmCXiB9lLinhj5N9v3qaHwlIKlb1i5+DmWXymGSsyMmD4vzDVNqdXessXYJDCisVaQR6
-         MXmxE8Pyiu8EaEAY+mjQro/cfAuXGvD6NC+1j+808Uv0QKKOPSoX3JjsWIVRo+tlc45g
-         s52A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756878531; x=1757483331;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gWNtOWjoWu1hFCQ7mzKzkzXVkr6pinoXVR6Y+Qq/u/8=;
-        b=ClDcM4hSsb+j/uqTM6CTWOMqwmtw/VuQjFNIBMuNCLwz30lVsZ0wkJ4cM4x4jaPYjF
-         kBGWZwUbl9OrozfyrFbmUE8RI1RSE4/ljfVn5Rt6DozaFrVzEFEEdU44oITJTt4Ws6bf
-         Pt7LMoeIiGugo2F1Scq83HCbDLByqsQIx2VDAIZBKFK743yAyFGTc/AybRTdF2EtMpAl
-         Oh7LRQGjRsKfnKiQgrjzr+092w9r/tjIOgR5O6+g6YxskSYQ6QKOaOoz12T1/J21b+tE
-         Q64IB+Pmfv4nj95iWec1miNsmiV/m8Zlu2Rou7i9MLMQBJgnk9gBKrYgpNsmMmXO3Lu3
-         zCxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVbv8D2QtB+4oE7pRAtCNACRg8F7etexTQkbFoeshvKuXOhCNUsGI4bj1v9FMp0h8jExVqSFoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY2iIkxmS8BdpGnLe/cF94IUPiMC1XWwP4/0nssuNiephwOCbB
-	UEykxnrgSDfTarV1XhbToDJUjRECHqHcje1tRnlC6aEaRhb26nVh/L9uQyjlrzrCwQtZo6pUr3N
-	NyvqYsqK9BWXm1fruQ/ooAihxYJXGcqgmcSbOnbV4
-X-Gm-Gg: ASbGncssaoqsIZFIEv/zMNfbqz8yumlzQUz8X302YqxAYc8CUs0PsJZjL/1R5xafX4Q
-	OooxMwx4TzDNThsSzi7vMFu7BC6GichA7eLQ1SGJ+FyvknfgQM3JwvAv8xabRNytOLhoJ0huq8w
-	CXPvquPmf3sNLnMYmmIpZkgHcDutnElSa5Gi5EG7YuXsqyAgTzsiwD0BBqhE75w4J23YiN1bARi
-	/FDP7UOHxoGcqvsPj0K3AYrHh1FnwUULtc1OyuLnfHVvD5WAPQotpWt5p/sd329GleUIOgGx1OM
-	Sg==
-X-Google-Smtp-Source: AGHT+IGjfiai4bO062h7HkwbbcAYqfycwh71PciC8ZkLKwqKJSoO5mFGDsW3/19paAbypLpPbkCqRxU2i3UxOGBn648=
-X-Received: by 2002:a05:6a20:3d05:b0:246:273:1c67 with SMTP id
- adf61e73a8af0-24602731fc5mr5071965637.18.1756878530807; Tue, 02 Sep 2025
- 22:48:50 -0700 (PDT)
+	s=arc-20240116; t=1756879555; c=relaxed/simple;
+	bh=XOapVgaqOVcZ5SeMIrHRggXFpGYHiKdTB7LZfT4Jj+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q7wQUvoMCld5SjJs1k1ZSy110zmxA+uY8wCM0QKezeXll2w8vnnXUSUh+DWz3qEwvXUwM6ELOmCdO6tH8OiZ2DQK4eseB57zoERk4tonc2/0SMF0B2YoWz3Kj9rRvs3PUB2lgsb422MPnx+G13GGIGpaecQbvow/qQ+bdu8y2io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pc9uqEt1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56E70C4CEF0;
+	Wed,  3 Sep 2025 06:05:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756879554;
+	bh=XOapVgaqOVcZ5SeMIrHRggXFpGYHiKdTB7LZfT4Jj+s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pc9uqEt19PGlR2klcNPomheSUEMk1tmRZP4CgOQlf3Jf0bxmHcndJkg7yRv5JJyzB
+	 aeR46G6i5VT+uvvKTX3LKWxj5fBY82FQPofvef98nMNAKkYOWwVQT86fo7YKNftKlq
+	 1ez4dU6QNRUWdZlOFx46cq6r5llER49VUUlX9xe9D27ZUEaoe3rO9apyGce4ipkHU8
+	 JE+tG/BELh/Tn4jqI/PbjG4OSDW6vXXHcCPrGNpz9eQMF03LhgZTg4vUZDmpgOY9iK
+	 bHL7C9YaTUjhe4XUzI6jXoRwcIcjwQsmA7w0cGBdJIGG47f7E2g/VOVu4nKZlWd56N
+	 bzSgqrJL/AXrQ==
+Date: Tue, 2 Sep 2025 23:05:52 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Patrisious Haddad <phaddad@nvidia.com>,
+	Raed Salem <raeds@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Kiran Kella <kiran.kella@broadcom.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v10 11/19] net/mlx5e: Support PSP offload
+ functionality
+Message-ID: <aLfawAgTtPDK_ZWf@x130>
+References: <20250828162953.2707727-1-daniel.zahka@gmail.com>
+ <20250828162953.2707727-12-daniel.zahka@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903024406.2418362-1-xuanqiang.luo@linux.dev> <CAAVpQUCKDi0aZcraeZaMY4ebuoBoB_Ymdy1RGb1247JznArTJg@mail.gmail.com>
-In-Reply-To: <CAAVpQUCKDi0aZcraeZaMY4ebuoBoB_Ymdy1RGb1247JznArTJg@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 2 Sep 2025 22:48:39 -0700
-X-Gm-Features: Ac12FXypT0KtkDow4x8mQK-4RkoW1j2N2q4RwFyYORlJOmucgs1eq6pRAvY14ys
-Message-ID: <CAAVpQUDZFCYNMQ08uRLu388cmggckzPeP=N7WncFyxN-_hgaMw@mail.gmail.com>
-Subject: Re: [PATCH net] inet: Avoid established lookup missing active sk
-To: Xuanqiang Luo <xuanqiang.luo@linux.dev>
-Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org, 
-	kernelxing@tencent.com, netdev@vger.kernel.org, 
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250828162953.2707727-12-daniel.zahka@gmail.com>
 
-On Tue, Sep 2, 2025 at 10:16=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
+On 28 Aug 09:29, Daniel Zahka wrote:
+>From: Raed Salem <raeds@nvidia.com>
 >
-> On Tue, Sep 2, 2025 at 7:45=E2=80=AFPM Xuanqiang Luo <xuanqiang.luo@linux=
-.dev> wrote:
-> >
-> > From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-> >
-> > Since the lookup of sk in ehash is lockless, when one CPU is performing=
- a
-> > lookup while another CPU is executing delete and insert operations
-> > (deleting reqsk and inserting sk), the lookup CPU may miss either of
-> > them, if sk cannot be found, an RST may be sent.
-> >
-> > The call trace map is drawn as follows:
-> >    CPU 0                           CPU 1
-> >    -----                           -----
-> >                                 spin_lock()
-> >                                 sk_nulls_del_node_init_rcu(osk)
-> > __inet_lookup_established()
-> >                                 __sk_nulls_add_node_rcu(sk, list)
-> >                                 spin_unlock()
+>Add PSP offload related IFC structs, layouts, and enumerations. Implement
+>.set_config and .rx_spi_alloc PSP device operations. Driver does not need
+>to make use of the .set_config operation. Stub .assoc_add and .assoc_del
+>PSP operations.
 >
-> This usually does not happen except for local communication, and
-> retrying on the client side is much better than penalising all lookups
-> for SYN.
+>Introduce the MLX5_EN_PSP configuration option for enabling PSP offload
+>support on mlx5 devices.
 >
-> >
-> > We can try using spin_lock()/spin_unlock() to wait for ehash updates
-> > (ensuring all deletions and insertions are completed) after a failed
-> > lookup in ehash, then lookup sk again after the update. Since the sk
-> > expected to be found is unlikely to encounter the aforementioned scenar=
-io
-> > multiple times consecutively, we only need one update.
-> >
-> > Similarly, an issue occurs in tw hashdance. Try adjusting the order in
-> > which it operates on ehash: remove sk first, then add tw. If sk is miss=
-ed
-> > during lookup, it will likewise wait for the update to find tw, without
-> > worrying about the skc_refcnt issue that would arise if tw were found
-> > first.
-> >
-> > Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / =
-hlist_nulls")
-> > Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-> > ---
-> >  net/ipv4/inet_hashtables.c    | 12 ++++++++++++
-> >  net/ipv4/inet_timewait_sock.c |  9 ++++-----
-> >  2 files changed, 16 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> > index ceeeec9b7290..4eb3a55b855b 100644
-> > --- a/net/ipv4/inet_hashtables.c
-> > +++ b/net/ipv4/inet_hashtables.c
-> > @@ -505,6 +505,7 @@ struct sock *__inet_lookup_established(const struct=
- net *net,
-> >         unsigned int hash =3D inet_ehashfn(net, daddr, hnum, saddr, spo=
-rt);
-> >         unsigned int slot =3D hash & hashinfo->ehash_mask;
-> >         struct inet_ehash_bucket *head =3D &hashinfo->ehash[slot];
-> > +       bool try_lock =3D true;
-> >
-> >  begin:
-> >         sk_nulls_for_each_rcu(sk, node, &head->chain) {
-> > @@ -528,6 +529,17 @@ struct sock *__inet_lookup_established(const struc=
-t net *net,
-> >          */
-> >         if (get_nulls_value(node) !=3D slot)
-> >                 goto begin;
-> > +
-> > +       if (try_lock) {
-> > +               spinlock_t *lock =3D inet_ehash_lockp(hashinfo, hash);
-> > +
-> > +               try_lock =3D false;
-> > +               spin_lock(lock);
-> > +               /* Ensure ehash ops under spinlock complete. */
-> > +               spin_unlock(lock);
-> > +               goto begin;
-> > +       }
-> > +
-> >  out:
-> >         sk =3D NULL;
-> >  found:
-> > diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_soc=
-k.c
-> > index 875ff923a8ed..a91e02e19c53 100644
-> > --- a/net/ipv4/inet_timewait_sock.c
-> > +++ b/net/ipv4/inet_timewait_sock.c
-> > @@ -139,14 +139,10 @@ void inet_twsk_hashdance_schedule(struct inet_tim=
-ewait_sock *tw,
-> >
-> >         spin_lock(lock);
-> >
-> > -       /* Step 2: Hash TW into tcp ehash chain */
-> > -       inet_twsk_add_node_rcu(tw, &ehead->chain);
+>Signed-off-by: Raed Salem <raeds@nvidia.com>
+>Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+>Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+>Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+>---
 >
-> You are adding a new RST scenario where the corresponding
-> socket is not found and a listener or no socket is found.
+>Notes:
+>    v7:
+>    - use flexible array declaration instead of 0-length array declaration
+>      in struct mlx5_ifc_psp_gen_spi_out_bits
+>    v4:
+>    - remove unneeded psp.c/psp.h files
+>    - remove unneeded struct psp_key_spi usage
+>    v1:
+>    - https://lore.kernel.org/netdev/20240510030435.120935-10-kuba@kernel.org/
 >
-> The try_lock part is not guaranteed to happen after twsk
-> insertion below.
+> .../net/ethernet/mellanox/mlx5/core/Kconfig   |  11 ++
+> .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +
+> drivers/net/ethernet/mellanox/mlx5/core/en.h  |   3 +
+> .../ethernet/mellanox/mlx5/core/en/params.c   |   4 +-
+> .../mellanox/mlx5/core/en_accel/psp.c         | 140 ++++++++++++++++++
+> .../mellanox/mlx5/core/en_accel/psp.h         |  47 ++++++
+> .../mellanox/mlx5/core/en_accel/psp_offload.c |  44 ++++++
+> .../net/ethernet/mellanox/mlx5/core/en_main.c |   9 ++
+> drivers/net/ethernet/mellanox/mlx5/core/fw.c  |   6 +
+> .../net/ethernet/mellanox/mlx5/core/main.c    |   1 +
+> .../mellanox/mlx5/core/steering/hws/definer.c |   2 +-
+> include/linux/mlx5/device.h                   |   4 +
+> include/linux/mlx5/mlx5_ifc.h                 |  95 +++++++++++-
+> 13 files changed, 361 insertions(+), 7 deletions(-)
+> create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
+> create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
+> create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_offload.c
+>
 
-Oh no, spin_lock() dance sychronises the threads but I still
-think this is rather harmful for normal cases; now sending
-an unmatched packet can trigger lock dance, which is easily
-abused for DDoS.
-
+[...]
 
 >
->
-> > -
-> > -       /* Step 3: Remove SK from hash chain */
-> > +       /* Step 2: Remove SK from hash chain */
-> >         if (__sk_nulls_del_node_init_rcu(sk))
-> >                 sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-> >
-> > -
-> >         /* Ensure above writes are committed into memory before updatin=
-g the
-> >          * refcount.
-> >          * Provides ordering vs later refcount_inc().
-> > @@ -161,6 +157,9 @@ void inet_twsk_hashdance_schedule(struct inet_timew=
-ait_sock *tw,
-> >          */
-> >         refcount_set(&tw->tw_refcnt, 3);
-> >
-> > +       /* Step 3: Hash TW into tcp ehash chain */
-> > +       inet_twsk_add_node_rcu(tw, &ehead->chain);
-> > +
-> >         inet_twsk_schedule(tw, timeo);
-> >
-> >         spin_unlock(lock);
-> > --
-> > 2.25.1
-> >
+>+struct mlx5_ifc_psp_cap_bits {
+>+	u8         reserved_at_0[0x1];
+
+The below cap is not set or checked in the whole series:
+The only occurrence is this definition.
+
+$ git grep psp_crypto_offload tmp/psp
+tmp/psp:include/linux/mlx5/mlx5_ifc.h:  u8 psp_crypto_offload[0x1]; /* Set by the driver */
+
+This should be at least checked in mlx5_is_psp_device();
+
+>+	u8         psp_crypto_offload[0x1]; /* Set by the driver */
+
+This comment is not true, the cap is advertised by FW on a psp
+capable device. Nothing is needed from driver.
+
+On CX7 and CX8 (FW already PSP capable, without this series):
+
+$ mlx5ctl 0000:17:00.0 cap -i cmd_hca_cap  | grep psp
+         psp_old: 0x0 (0)
+         psp: 0x1 (1)
+
+$ mlx5ctl 0000:17:00.0 cap -i psp_cap
+Node: psp_cap
+         psp_crypto_offload: 0x1 (1)
+                             ^^^^^^^ (Advertised by FW already)
+         psp_crypto_esp_aes_gcm_256_encrypt: 0x1 (1)
+         psp_crypto_esp_aes_gcm_128_encrypt: 0x1 (1)
+         psp_crypto_esp_aes_gcm_256_decrypt: 0x1 (1)
+         psp_crypto_esp_aes_gcm_128_decrypt: 0x1 (1)
+         log_max_num_of_psp_spi: 0xb (11)
+
+On Cx6-LX (Crypto, but not psp capable):
+$ mlx5ctl 0000:97:00.0 cap -i cmd_hca_cap | grep -E "psp|crypto"
+         psp_old: 0x0 (0)
+         psp: 0x0 (0)
+         crypto: 0x1 (1)
+
+$ mlx5ctl 0000:97:00.0 cap -i psp_cap
+Error : opcode 0, syndrome 0x3d6c79 fw status 3 status 0
+query cap (0x1e) failed opcode 0x100 opmod 0x3d
+
+I will clean this up as part of my mlx5-next PR, my cleanup will cause a
+conflict when re-basing this series on top of the PR+netdev, so just take
+my changes "current" to resolve the conflict.
+
+>+	u8         reserved_at_2[0x1];
+>+	u8         psp_crypto_esp_aes_gcm_256_encrypt[0x1];
+>+	u8         psp_crypto_esp_aes_gcm_128_encrypt[0x1];
+>+	u8         psp_crypto_esp_aes_gcm_256_decrypt[0x1];
+>+	u8         psp_crypto_esp_aes_gcm_128_decrypt[0x1];
+>+	u8         reserved_at_7[0x4];
+>+	u8         log_max_num_of_psp_spi[0x5];
+>+	u8         reserved_at_10[0x7f0];
+>+};
+
 
