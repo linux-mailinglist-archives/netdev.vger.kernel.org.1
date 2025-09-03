@@ -1,144 +1,170 @@
-Return-Path: <netdev+bounces-219496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98536B41999
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:09:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40249B4199E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:11:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4354C3A675A
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:09:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BA1317242F
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BBB2ED873;
-	Wed,  3 Sep 2025 09:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262642ECE9E;
+	Wed,  3 Sep 2025 09:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j8+LcGFv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC42223DCE;
-	Wed,  3 Sep 2025 09:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8866D258CDF;
+	Wed,  3 Sep 2025 09:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756890577; cv=none; b=ksgTJ2xkOrwy2XjGfrqV1Ay1b3+gQTPCKuMol7m6kSSqQ4WbM0iKAXlkBy6XwIA04gnEeq9qXYRH9nkqK3Jq1Hy63dN3mw7rj+2YthY6I+HYAkYSlWGt8w3mCVH4KR6FKDtDNF/NMrnp0NFcdHuo34NNewxhUh4Ovt/KYfHvmNg=
+	t=1756890664; cv=none; b=iy5TOY3umR9vdaMHJq6rQTOBlEZX78u1cXqqYAQbyHg/neWtm3pTfoO25NEjqe9PnGCjRXfwK7AQio3MT6XHMGvfpmgtWcMOVv3w1c1Zp84RYInRM0UiGPNTyBNfYUObuBVIyOoF5qGFf/GBEZUiRZT3iSbDl+bzfesjCDXi15k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756890577; c=relaxed/simple;
-	bh=JG3kU4+IKhOimswTwjTS5/L31x/mRfFyh3IRcpw1f1g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T4jm95162Z3OZufoNmXDhRGrwDDxxQi+H9LdSpnmH8En8tZy8tzfQHeKCh0hea37Rqv9HK1eSHQrxwxRaXWyEaeeBtJitLNJ7PGT6Z9zJKcFST8WUtPtBmLm2x9o14yL2rPP2oEXTzkE3ag+CCzPo1jK+EOgDPpp20zQBXI/okc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-895fc1c8f05so2286497241.3;
-        Wed, 03 Sep 2025 02:09:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756890574; x=1757495374;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oj9gesqCWEZX1N1hZgTvpmSqcv2Iw8bLBhaQ9r1RKbk=;
-        b=ZyV2MsJBKAkAyfBdpRGU0l/Ep72oQXoBQLmYFhgrC/WAPIVRYYM37EY6IN8s4xxJ0S
-         1T/sTocUKwmV8U8CTkxyXMzHtqaYO43HclQF6nKCXQJEuIyiECuBJdbpcYQbRS+62vfA
-         NIVUj4AOTPtUuXBPcUSTFWfyDtJPxgRGEGKfEgmGBFTM/M1DuoDUyF1997QGCygCu0DY
-         Rs6RwrxE883wX2m+66njc8qf0H1UT5cPZk36Y3xkzL3eXbBD1cy/tf/MNFSLydPneRkd
-         tlRmerUVcRCqWFPtzIY8wy6Y7qdSWAt1q5HMqVIpa6yi7F3Z7cMoznds7h4uCif7bsI2
-         0FWA==
-X-Forwarded-Encrypted: i=1; AJvYcCVc6MBbmeyI8uDvKpa+YwuL8bp48fJyGzATb7FZOsZs7GglmpCyDvtIjy2+OrJbrKqiWG68znAZ@vger.kernel.org, AJvYcCWo6K4GEYpMI0Mjl8J8b63ELU8r/9t9d8ilzoXmTxfyIS+uOSuGNqKwjEdzTf6p+vBVE79R5sxx5YMbu7hh@vger.kernel.org, AJvYcCWwzgfhljFPnDCHx88F+EvjsLNEsSn2/uciSnKSE1qMVpVqF3dlOBUfsM0wMW1CGyAh4DFCSODX9e4m@vger.kernel.org, AJvYcCXqa3nbrp7Jr/vXFDzOzfxPwUYvdmSUNSzEqVQ+DMRQHuiGPJiD8sJrNcZs8+2uj7UY74/ZPpV0aILtGxzqm6FXacQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2IVfDyx9FYoXIZh7/fr+fPvihbHtoT095DC5oZCwv253GHBaH
-	rW8P0ynHmDBaZiXpFxoG3DaZSnrhP2JoVAozZCAi+QuwhKhnIvJRavuMJcwLdBtE
-X-Gm-Gg: ASbGnctHorCvdPJTIf0y7iEUUBfudsQrvB27OjFb2NzCVaZCEq48m/x9UDvtWUebBEK
-	W8uXnqQIayCBtJBzbjKK7wArnGzVmWL3sqmYXwmCMxwMVt0oFxzYZKP+Y+rmLOddnjHLFNUNSUv
-	oWgjLs+iVn94i8Xf4vATo8mZE5dz2NdllE4EihZcJxZQczShg/4EA4jGVEmMcCwk6Z7D1Irt6TP
-	lXUp9VxHvS5cMX+S9LpwMozCXfcql5wZitr1SBMaXTBZocnHiFg7vYz1u+js08QQpR/MKssKmxf
-	dRyGhDpWxe1rX5fBmOGS6oAQS8hk8jGdXOmtMGSVG0VlTOU4LaUTXtfYljKQRsSUgzfxQWaS0Tf
-	8hrEp+xrJVTxQFtBhMbglPMj9sg1QdGReYJ11CIrkW/jHhm8rUGoyDiNbzNrWY4HlFA10zJk=
-X-Google-Smtp-Source: AGHT+IGRVMbUsk9ZqVbooWta6KzBj6dA9KPYDQKwxh6UCti7AU/1R8vw0+D7CeAFEWuaR8GByFGHWQ==
-X-Received: by 2002:a05:6102:6897:b0:527:4113:6aef with SMTP id ada2fe7eead31-52b1ba1ac44mr5595055137.17.1756890574341;
-        Wed, 03 Sep 2025 02:09:34 -0700 (PDT)
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com. [209.85.217.42])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-89607330273sm3302672241.18.2025.09.03.02.09.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Sep 2025 02:09:33 -0700 (PDT)
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-531fe8d4619so621408137.2;
-        Wed, 03 Sep 2025 02:09:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVhIrSJ8Ckyo0dh+yDimegcT9BJxpcL9KTpy7lJ/atYjT1tNwN7wghibXdIrNJeWgdR3ZCNh1VVJmhn@vger.kernel.org, AJvYcCVlnLIuEfMYc/cZjv8K96CIYBPZB+zkRiLHH8fldS+4e42NAgdZjR7TVgAGjotjoQDBcWHbb2oaKRK7NUbD@vger.kernel.org, AJvYcCVmTeQOqv7c+e/qRrKul9AhPbXOYX1FhGK8XfGGpg5mUXkU/9rwWmecrXe2WS86kI2cNF0jvu/Dkyytd7EvP02UzCg=@vger.kernel.org, AJvYcCW2qyXGxPvEbK5gRzxB40/VR5xIM51VRWeGDqaM5TrLW576BO6W9OF984IA3dOyWqVTMcj+JvEy@vger.kernel.org
-X-Received: by 2002:a05:6102:3581:b0:524:5266:f74c with SMTP id
- ada2fe7eead31-52b1c8811fdmr4553436137.31.1756890572867; Wed, 03 Sep 2025
- 02:09:32 -0700 (PDT)
+	s=arc-20240116; t=1756890664; c=relaxed/simple;
+	bh=obY43WZ36Ui+bl12bWl48e1L9yiSSKaPY6THe3nPNm4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kjs9ittPMjwqrMmh7OxF7dJvyfsXV30p+JI62Ig1YSfSQ/rsiiroOOEDc+a1VfPhdPw+9AFULTxBpVBiHhUZgQsFO00k2JrkTrPsGivg9L+Dvfm5/4j05mzeagVDdZnD1iG0K7QzDV+vstajzZjVMnKJxM03hqNbttKcPC9FHcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j8+LcGFv; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 50C224E40BBC;
+	Wed,  3 Sep 2025 09:10:54 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1BF37606C3;
+	Wed,  3 Sep 2025 09:10:54 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B2F4A1C22DB60;
+	Wed,  3 Sep 2025 11:10:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1756890652; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=3qfmCT2IJRj9E7bccRvk2rX7BuXxyaqOfnAhEGgrxro=;
+	b=j8+LcGFvEoytc8+gnOIPE0orhclkJo48lN0sjoHZyVo/GAsKJUOmV9gbSlKLcvbLvoEiB6
+	/kN+ZmtvppXoUKxlLkPiRYlXNp5T5t2p5qjFhxLMBaDDJ++eeJa16+E+3v/XkcCtMxMGqf
+	SoD/H1RBHBwm5izhAuP/iEQPs6HxM/SBN0Pej2Q4HlXaxfPCM8DPEuvKl6+8+9OQkrAr6B
+	cdvSp1oWygbpyYdNClXt4mKUlWrSR/uPTIzN5XgMNeQvxaaDZgemlPGFNOFPYWn0I52hYy
+	DwJnFj+jxtQ3sRgXz5spKFaO3VMG9zLIJtuLeYOlwGEQxQZk+EdBHL/LBFjt3g==
+Date: Wed, 3 Sep 2025 11:10:25 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
+ <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, kernel@pengutronix.de, Dent Project
+ <dentproject@linuxfoundation.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, linux-doc@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>
+Subject: Re: [PATCH net-next v2 4/4] net: pse-pd: pd692x0: Add devlink
+ interface for configuration save/reset
+Message-ID: <20250903111025.4642efb7@kmaincent-XPS-13-7390>
+In-Reply-To: <aLfp5H5CTa24wA7H@pengutronix.de>
+References: <20250829-feature_poe_permanent_conf-v2-0-8bb6f073ec23@bootlin.com>
+	<20250829-feature_poe_permanent_conf-v2-4-8bb6f073ec23@bootlin.com>
+	<20250901133100.3108c817@kernel.org>
+	<20250902164314.12ce43b4@kmaincent-XPS-13-7390>
+	<20250902134212.4ceb5bc3@kernel.org>
+	<20250902134844.7e3593b9@kernel.org>
+	<aLfp5H5CTa24wA7H@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902001302.3823418-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <20250902001302.3823418-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20250902001302.3823418-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 3 Sep 2025 11:09:21 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdU_BHtHznN8C7s0Yf=nxBaXb94MLFD-Pcz73W8hJhxc-w@mail.gmail.com>
-X-Gm-Features: Ac12FXxX9lgyaKAr8UpWw-SXRvkRdNef9IMOHkwD6ZbZ-DdxK6PzWj_7-XFm7Aw
-Message-ID: <CAMuHMdU_BHtHznN8C7s0Yf=nxBaXb94MLFD-Pcz73W8hJhxc-w@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/4] dt-bindings: net: renesas,rzv2h-gbeth:
- Document Renesas RZ/T2H and RZ/N2H SoCs
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Russell King <linux@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Prabhakar,
+On Wed, 3 Sep 2025 09:10:28 +0200
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-Thanks for your patch!
+> On Tue, Sep 02, 2025 at 01:48:44PM -0700, Jakub Kicinski wrote:
+> > On Tue, 2 Sep 2025 13:42:12 -0700 Jakub Kicinski wrote: =20
+> > > On Tue, 2 Sep 2025 16:43:14 +0200 Kory Maincent wrote: =20
+> > > > > Sorry for not offering a clear alternative, but I'm not aware of =
+any
+> > > > > precedent for treating devlink params as action triggers. devlink
+> > > > > params should be values that can be set and read, which is clearl=
+y not
+> > > > > the case here:     =20
+> > > >=20
+> > > > Ok.
+> > > > We could save the configuration for every config change and add a
+> > > > reset-conf action to devlink reload uAPI? The drawback it that it w=
+ill
+> > > > bring a bit of latency (about 110ms) for every config change.
+> > > >=20
+> > > > Or adding a new devlink uAPI like a devlink conf but maybe we don't
+> > > > have enough cases to add such generic new uAPI.
+> > > > Or get back to the first proposition to use sysfs.=20
+> > > >=20
+> > > > What do you think?   =20
+> > >=20
+> > > If you are asking for my real preference, abstracting away whether it=
+'s
+> > > doable and justifiable amount of effort for you -- I'd explore using
+> > > flags in the ethtool header to control whether setting is written to
+> > > the flash. =20
+> >=20
+> > PS. failing that the less uAPI the better. Tho, given that the whole
+> > point here is giving user the ability to write the flash -- asking for
+> > uAPI-light approach feels contradictory.
+> >=20
+> > Taking a step back -- the "save to flash" is something that OEM FW
+> > often supports. But for Linux-based control the "save to flash" should
+> > really be equivalent to updating some user space config. When user
+> > configures interfaces in OpenWRT we're not flashing them into the
+> > device tree... Could you perhaps explain what makes updating the
+> > in-flash config a high-priority requirement for PoE?
+> >  =20
+>=20
+> I think the main use case question is: what happens if the application
+> CPU reboots?
+> Do we go back to =E2=80=9Csafe defaults=E2=80=9D? But what are safe defau=
+lts - that can
+> vary a lot between systems.
 
-On Tue, 2 Sept 2025 at 02:13, Prabhakar <prabhakar.csengg@gmail.com> wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->
-> Document the Ethernet MAC (GMAC) IP present on the Renesas RZ/T2H
-> (R9A09G077) and RZ/N2H (R9A09G087) SoCs. The GMAC IP on RZ/N2H is
-> identical to that found on the RZ/T2H SoC.
->
-> While the RZ/V2H(P), RZ/T2H, and RZ/N2H SoCs all integrate the Synopsys
-> DesignWare MAC (version 5.20), the hardware is synthesized with different
-> options compared to the RZ/V2H(P):
->   - RZ/T2H requires only 3 clocks instead of 7
->   - RZ/T2H supports 8 RX/TX queue pairs instead of 4
->   - RZ/T2H needs 2 reset controls with reset-names property, vs. a single
->     unnamed reset
->   - RZ/T2H has the split header feature enabled, while it is disabled on
->     RZ/V2H(P)
->
-> To accommodate these differences, introduce a new generic compatible
-> string `renesas,rzt2h-gbeth`, used as a fallback for both RZ/T2H and
-> RZ/N2H SoCs.
+In case of CPU reboot, the port matrix will be flashed, which means the
+controller is restarted and the ports get disconnected.
+Therefore indeed we will go back to default settings.
+=20
+> In many setups, if the CPU reboots it also means the bridge is down, so
+> there is no packet forwarding. In that case, does it even make sense to
+> keep providing PoE power if the networking part is non-functional?
 
-Until now, we didn't have any family-specific "renesas,rzt2h-*"
-compatible values.  Instead, we always used " renesas,r9a09g077-<foo>"
-as a fallback for "renesas,r9a09g087-<foo>".
-Is there any good reason to start deviating from this?
+It depends, we might not want to reboot the Powered Devices if the switch
+reboot. I don't currently have specific case in mind which could need this
+behavior.
+Mainly, the Dent Project final aim was to support mainline all the features
+supported in their poed tool.
+https://github.com/dentproject/poed/blob/main/dentos-poe-agent/opt/poeagent=
+/docs/Userguide
 
-> The DT schema is updated to validate the clocks, resets, reset-names,
-> interrupts, and interrupt-names properties accordingly. Also extend
-> `snps,dwmac.yaml` with the new `renesas,rzt2h-gbeth` compatible.
->
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Another angle: does it make sense to overwrite the hardware power-on
+> defaults each time the system starts? Or should we rather be able to
+> read back the stored defaults from the hardware into the driver and work
+> with them?
 
-Gr{oetje,eeting}s,
+Yes that is one of the design proposition, but we will still need a way to
+reset the conf as said before.
 
-                        Geert
+> Does anyone here have field experience with similar devices? How are
+> these topics usually handled outside of my bubble?
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Kyle any field experience on this?
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
