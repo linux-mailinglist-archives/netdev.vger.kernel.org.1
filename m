@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-219411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35B81B4129C
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 04:56:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB28B4129E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 04:56:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 955C170173B
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:55:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EECF1B286CA
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF612264CC;
-	Wed,  3 Sep 2025 02:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7A622DFB5;
+	Wed,  3 Sep 2025 02:55:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B538221F1F;
-	Wed,  3 Sep 2025 02:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1404F221F1F;
+	Wed,  3 Sep 2025 02:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756868118; cv=none; b=jH4IitDfCWSqCk7tLElhC8uedNji1dpGbxCyHMpkbnyU0lO52Sc/YqmLdA3AaUsPv++AxUrKlOrXb4m6GAlx6u3Eq9zWMcYaROARPX+jHJkCRzjp1jQf4LZSwrQ+/oCxx6RaW2FdUL9Pqm483Ylx/EIqKD+ipTNDuRw2cyuB4uA=
+	t=1756868130; cv=none; b=iUo/NXzdBYgCHaQ4q+oXKekRk3acooMKoiiPI4ioLZSdS+UgQRx30nM4h+X5ZPdVn9AQ6QlqjrVEDYODi7+lSJqL3NSySU0MQ5aXrf8SjJDTDw19NTlyuIBaTIM0LXMNs2b9me/w2a6o+b972NG7QMQYgpel09uWXBNhtL5RF0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756868118; c=relaxed/simple;
-	bh=XY/SGvz8wgnHMRUZ9tHkIsnc5GBocnPOPFwPCfAThRw=;
+	s=arc-20240116; t=1756868130; c=relaxed/simple;
+	bh=5LGuZGxVKskEe5DqUywZbiWg1ADjSLJ7u/dqeIk1baI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pDsfbv0UQYsYlVSbKUFbYrYjrI2qJUQi1x8vxZbEEHArzry4SL1fzBcFvGeNyjFa7k8aaR1k6XlM9yxJXS7SJwpilmMeFVr1Rxy/VIF/jAb2KLWFy0uD4mK/45s1pJQOioLNdoXrL1RuVjuB212HHZLAcMn36eKY97KFRGJ/T8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.204.34.129
+	 MIME-Version; b=LWrxOz1/6Gfr3M27P7jxz5xt8WVQQDWjNm7bOhs0CRpfPGaFxYHsXcHP8XLUsyg6CIdRx6MJ3gqsEQvTNipdFO+lM0/5No5VaLzpLfuwZK/wWp8+D1vZFi4R8POUpEsTvSL8LHwPRTXowxCrb+OldcTyvzP2jE6AMWBHGGU1xN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.92.39.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz11t1756868091t34a0861e
-X-QQ-Originating-IP: Xzlkz+H7HJQa1mo970y3TT8v7tu7d/yZ18EmRy0oY0s=
+X-QQ-mid: esmtpsz11t1756868095t28bdc190
+X-QQ-Originating-IP: IFGt7nmtSSzO71zw5zmQ/zGFc+QnLjsa6jv+M5GIkcs=
 Received: from localhost.localdomain ( [203.174.112.180])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 03 Sep 2025 10:54:48 +0800 (CST)
+	id ; Wed, 03 Sep 2025 10:54:52 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11199163564162961598
+X-BIZMAIL-ID: 6000544590696539859
 EX-QQ-RecipientCnt: 28
 From: Dong Yibo <dong100@mucse.com>
 To: andrew+netdev@lunn.ch,
@@ -67,9 +67,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
 	dong100@mucse.com
-Subject: [PATCH net-next v10 3/5] net: rnpgbe: Add basic mbx ops support
-Date: Wed,  3 Sep 2025 10:54:28 +0800
-Message-Id: <20250903025430.864836-4-dong100@mucse.com>
+Subject: [PATCH net-next v10 4/5] net: rnpgbe: Add basic mbx_fw support
+Date: Wed,  3 Sep 2025 10:54:29 +0800
+Message-Id: <20250903025430.864836-5-dong100@mucse.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250903025430.864836-1-dong100@mucse.com>
 References: <20250903025430.864836-1-dong100@mucse.com>
@@ -82,530 +82,449 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Nwz8Cs33/LprvJCX+8tlIIkTpAgHaBD8KFjRhxnKo7uLItzA+n6qW7FM
-	ZgJQyZ4EnbO5hdWEA9WulleGVsjNf3cp1RWDTZZ+MlgfjgbJi0TrP1RvmiL/YKkdCQX1BTo
-	UsYK09e9g1ugZsilVEh08EfsH3KvqC+bkP0Z6JfBHnPkWpGf8fKxVMoMJdL84cisNNySnjy
-	X0S8Ejc0EwCbl/Ex2bN/mqtXXfb+L7g2jYjofo2FAn+ABa17yyg4jyACee5n5B/ZVdDxU/p
-	j6ZvfQsrneXZUcwTX9cawh51ROVjo+KKYsC6cvZHKuC3Jt4dFWy8KyPAGHj1eooPVsldnE1
-	Tgo8fMeXWR3QKgIF0fUdQxawnF2k2o9QrEYumiMAiyA+7gFakLrN66Tzr9a3qpkgOXj4oie
-	nF5E6LG+12sEb0Kb6RaDQ3BenTcFsilpbYNFj1Wr0cWbGIaPVKRu2qzVY35RCQYNbagyTV2
-	ZIQKgv/z4D0esE3faK+V81Y289+sWQl2W+/Aqron5VN6rqXI4odZES19H4vB0MaBq22KDvq
-	7mwVOgFqEgnbK9lMfyqPgq0R5k0S1Jy0tEZs7QNarbfHrcYsKySyk+mhc7UKorHGOENHpiY
-	BP2Y44zJsTCKtfmvUfhEXqUlr/r6u4bNINofpwGAV6MVFADjbSvVNzGYYdtss2enmAvdSt+
-	s3Q1GqeHgjBibm55Icz3CZSp1uXobAt1XGKEE0etlOv7LZ9OeevIL4ikDirRsd4JX5eP2nc
-	0SH4kAMswWcvB1rz1iH2isrQOsGzgdjyPxhJbfK64zcsi7JSvXJZ2t8R+smdaJd1oJhQb6p
-	XSEPgPJuFZQICmQU08wOjlkgOlnymSXuGaHw1/4qtCoo5XtRYcgLW+gmhsEpebkGj6ENjxi
-	a57omHm6kxRhuu1FcsNBipEY2a7OfcZEgyMJy/P+G5smcv/rson7AKxbmUpuVre2R772uax
-	zKhFlPmRj1Z3qFhh4PgJcOL+lYyj18q4xyT07At5YIGbHB5geBo3TAQBAq3AYyMB2Jb++4X
-	BBIWSKZDXzmwG2gBGm
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-XMAILINFO: NkLA2q2LD229wshJrtN9PYJ1yPuxDSKIY5UlCC7x0FD2JD1tE6KMfoYI
+	8dAySSDX0jvkQPROMguPaTra7Fr4AbKIZtYI0ZTvSI5Hmo6gaJScU08AFWuHTzGkjBXBAgM
+	As8E1hDz4lLiR8DJAIM/tCe87LUg6xwmtjQkK0rGWvqibD2HLqnInNXrJPRq5MlLG5wGcg6
+	UoBKHE8SPtg3DQsz9kwf0pothRM1UZ4ZPHWrNkxLmjmTPUMA8px0iUAPKFprcCowH8fDQOz
+	vRHZfsyJ/u4spFgqNQ0qwfDH8qjfg13q2xaES902p7z8ZlTLy+l+ahAuEr2Y++xITsHXOct
+	5EZ1HYqdAo/CXj1alZefXSxD5V7EftYiKs5IRF76RS3sigypPfBcm5nVH+OMqh8/Y/vYNzv
+	k/796Sv5sglxIjzO0MCq0b6kEjYPlVSaE22+E5kIMgAWD5b1V0DX4MPgeJ2dMVEu39gG41R
+	UUs+15ms9j93aqw9znKNaqwBPNlBSmrCmiNf4u484GkwIvmfLHUOILua9HfruXLeZbJXJf3
+	I0K3UusnwKD/irqxlvAeQL1tX0TZ5yqE8b0NixpKmkFP2TFqkCY1ReGhyXGZMg2VvhEtMiC
+	qYA2DOh3YZUu92u0HeBvKpju5+w6M3sP72Gp83MI5DWLFaQqJ8Yb4FvBQPhQjucLwVff0Zt
+	Cjk3+wodU+JUQrcaxeUR2a4sXxPVMgZQV0p7FjblJ1K8DwdWLm1agKsmcEKvVRYb8zN/Jwf
+	r3l2t3x2bkCjPVABc3NaNNwoKp65/ZNgrkMc3wT4iaT8KWht3U4HGdqjTXVkCBuxOO1mCo0
+	qmPOgSNAMLDT7r2I5lGOPUrg2J2eioR/zh/99vtOzXcDfL0NJBloT1bZuWJH2PvuAtK/9bd
+	CfqFkxggnTDGGdc2hA47U57NmHAZ3GhnIhnyJCK5qOsR1hiIpFlUtnxD+XB8IgDYBfozz5A
+	q1802uss/ZlTSa8cjx7dfhHKrfc4eAA8lmHSw2AVSt1CHzj3uRKHQppUudOukN4C4L33icI
+	S+JNJoHxZ5A2cYaaUo
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 X-QQ-RECHKSPAM: 0
 
-Initialize basic mbx function.
+Initialize basic mbx_fw ops, such as get_capability, reset phy
+and so on.
 
 Signed-off-by: Dong Yibo <dong100@mucse.com>
 ---
  drivers/net/ethernet/mucse/rnpgbe/Makefile    |   3 +-
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  16 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |   3 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 393 ++++++++++++++++++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  25 ++
- 5 files changed, 439 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
- create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |   1 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 250 ++++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 126 +++++++++
+ 4 files changed, 379 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
 
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-index 42c359f459d9..5fc878ada4b1 100644
+index 5fc878ada4b1..de8bcb7772ab 100644
 --- a/drivers/net/ethernet/mucse/rnpgbe/Makefile
 +++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
-@@ -6,4 +6,5 @@
- 
+@@ -7,4 +7,5 @@
  obj-$(CONFIG_MGBE) += rnpgbe.o
  rnpgbe-objs := rnpgbe_main.o\
--	       rnpgbe_chip.o
-+	       rnpgbe_chip.o\
-+	       rnpgbe_mbx.o
+ 	       rnpgbe_chip.o\
+-	       rnpgbe_mbx.o
++	       rnpgbe_mbx.o\
++	       rnpgbe_mbx_fw.o
 diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-index 9a86e67d6395..7999bb99306b 100644
+index 7999bb99306b..4d2cca59fb23 100644
 --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
 +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-@@ -5,6 +5,7 @@
- #define _RNPGBE_H
- 
- #include <linux/types.h>
-+#include <linux/mutex.h>
- 
- extern const struct rnpgbe_info rnpgbe_n500_info;
- extern const struct rnpgbe_info rnpgbe_n210_info;
-@@ -23,7 +24,22 @@ enum rnpgbe_hw_type {
- 	rnpgbe_hw_unknown
+@@ -51,6 +51,7 @@ struct mucse_hw {
+ 	void __iomem *hw_addr;
+ 	struct pci_dev *pdev;
+ 	enum rnpgbe_hw_type hw_type;
++	u8 pfvfnum;
+ 	struct mucse_mbx_info mbx;
  };
  
-+struct mucse_mbx_stats {
-+	u32 msgs_tx;
-+	u32 msgs_rx;
-+	u32 acks;
-+	u32 reqs;
-+};
-+
- struct mucse_mbx_info {
-+	struct mucse_mbx_stats stats;
-+	u32 timeout;
-+	u32 usec_delay;
-+	u16 size;
-+	u16 fw_req;
-+	u16 fw_ack;
-+	/* lock for only one use mbx */
-+	struct mutex lock;
- 	/* fw <--> pf mbx */
- 	u32 fw_pf_shm_base;
- 	u32 pf2fw_mbox_ctrl;
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-index 179621ea09f3..f38daef752a3 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-@@ -1,8 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright(c) 2020 - 2025 Mucse Corporation. */
- 
-+#include <linux/string.h>
-+
- #include "rnpgbe.h"
- #include "rnpgbe_hw.h"
-+#include "rnpgbe_mbx.h"
- 
- /**
-  * rnpgbe_init_common - Setup common attribute
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
 new file mode 100644
-index 000000000000..856cd4c8ab6f
+index 000000000000..30612c577c99
 --- /dev/null
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-@@ -0,0 +1,393 @@
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+@@ -0,0 +1,250 @@
 +// SPDX-License-Identifier: GPL-2.0
-+/* Copyright(c) 2022 - 2025 Mucse Corporation. */
++/* Copyright(c) 2020 - 2025 Mucse Corporation. */
 +
 +#include <linux/pci.h>
-+#include <linux/errno.h>
-+#include <linux/delay.h>
-+#include <linux/iopoll.h>
++#include <linux/if_ether.h>
 +
 +#include "rnpgbe.h"
-+#include "rnpgbe_mbx.h"
 +#include "rnpgbe_hw.h"
++#include "rnpgbe_mbx.h"
++#include "rnpgbe_mbx_fw.h"
 +
 +/**
-+ * mbx_data_rd32  - Reads reg with base mbx->fw_pf_shm_base
-+ * @mbx: pointer to the MBX structure
-+ * @reg: register offset
-+ *
-+ * Return: register value
-+ **/
-+static u32 mbx_data_rd32(struct mucse_mbx_info *mbx, u32 reg)
-+{
-+	struct mucse_hw *hw = container_of(mbx, struct mucse_hw, mbx);
-+
-+	return readl(hw->hw_addr + mbx->fw_pf_shm_base + reg);
-+}
-+
-+/**
-+ * mbx_data_wr32  - Writes value to reg with base mbx->fw_pf_shm_base
-+ * @mbx: pointer to the MBX structure
-+ * @reg: register offset
-+ * @value: value to be written
-+ *
-+ **/
-+static void mbx_data_wr32(struct mucse_mbx_info *mbx, u32 reg, u32 value)
-+{
-+	struct mucse_hw *hw = container_of(mbx, struct mucse_hw, mbx);
-+
-+	writel(value, hw->hw_addr + mbx->fw_pf_shm_base + reg);
-+}
-+
-+/**
-+ * mbx_ctrl_rd32  - Reads reg with base mbx->fw2pf_mbox_vec
-+ * @mbx: pointer to the MBX structure
-+ * @reg: register offset
-+ *
-+ * Return: register value
-+ **/
-+static u32 mbx_ctrl_rd32(struct mucse_mbx_info *mbx, u32 reg)
-+{
-+	struct mucse_hw *hw = container_of(mbx, struct mucse_hw, mbx);
-+
-+	return readl(hw->hw_addr + mbx->fw2pf_mbox_vec + reg);
-+}
-+
-+/**
-+ * mbx_ctrl_wr32  - Writes value to reg with base mbx->fw2pf_mbox_vec
-+ * @mbx: pointer to the MBX structure
-+ * @reg: register offset
-+ * @value: value to be written
-+ *
-+ **/
-+static void mbx_ctrl_wr32(struct mucse_mbx_info *mbx, u32 reg, u32 value)
-+{
-+	struct mucse_hw *hw = container_of(mbx, struct mucse_hw, mbx);
-+
-+	writel(value, hw->hw_addr + mbx->fw2pf_mbox_vec + reg);
-+}
-+
-+/**
-+ * mucse_mbx_get_fwreq - Read fw req from reg
-+ * @mbx: pointer to the mbx structure
-+ *
-+ * Return: the fwreq value
-+ **/
-+static u16 mucse_mbx_get_fwreq(struct mucse_mbx_info *mbx)
-+{
-+	return mbx_data_rd32(mbx, MBX_FW2PF_COUNTER) & GENMASK_U32(15, 0);
-+}
-+
-+/**
-+ * mucse_mbx_get_fwack - Read fw ack from reg
-+ * @mbx: pointer to the MBX structure
-+ *
-+ * Return: the fwack value
-+ **/
-+static u16 mucse_mbx_get_fwack(struct mucse_mbx_info *mbx)
-+{
-+	return (mbx_data_rd32(mbx, MBX_FW2PF_COUNTER) >> 16);
-+}
-+
-+/**
-+ * mucse_mbx_inc_pf_req - Increase req
++ * mucse_fw_send_cmd_wait - Send cmd req and wait for response
 + * @hw: pointer to the HW structure
++ * @req: pointer to the cmd req structure
++ * @reply: pointer to the fw reply structure
 + *
-+ * mucse_mbx_inc_pf_req read pf_req from hw, then write
-+ * new value back after increase
-+ **/
-+static void mucse_mbx_inc_pf_req(struct mucse_hw *hw)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	u16 req;
-+	u32 v;
-+
-+	v = mbx_data_rd32(mbx, MBX_PF2FW_COUNTER);
-+	req = (v & GENMASK_U32(15, 0));
-+	req++;
-+	v &= GENMASK_U32(31, 16);
-+	v |= req;
-+	mbx_data_wr32(mbx, MBX_PF2FW_COUNTER, v);
-+	hw->mbx.stats.msgs_tx++;
-+}
-+
-+/**
-+ * mucse_mbx_inc_pf_ack - Increase ack
-+ * @hw: pointer to the HW structure
-+ *
-+ * mucse_mbx_inc_pf_ack read pf_ack from hw, then write
-+ * new value back after increase
-+ **/
-+static void mucse_mbx_inc_pf_ack(struct mucse_hw *hw)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	u16 ack;
-+	u32 v;
-+
-+	v = mbx_data_rd32(mbx, MBX_PF2FW_COUNTER);
-+	ack = (v >> 16) & GENMASK_U32(15, 0);
-+	ack++;
-+	v &= GENMASK_U32(15, 0);
-+	v |= (ack << 16);
-+	mbx_data_wr32(mbx, MBX_PF2FW_COUNTER, v);
-+	hw->mbx.stats.msgs_rx++;
-+}
-+
-+/**
-+ * mucse_check_for_msg_pf - Check to see if the fw has sent mail
-+ * @hw: pointer to the HW structure
-+ *
-+ * Return: 0 if the fw has set the Status bit or else -EIO
-+ **/
-+static int mucse_check_for_msg_pf(struct mucse_hw *hw)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	u16 hw_req_count;
-+
-+	hw_req_count = mucse_mbx_get_fwreq(mbx);
-+	/* chip's register is reset to 0 when rc send reset
-+	 * mbx command. This causes 'hw_req_count != hw->mbx.fw_req'
-+	 * be TRUE before fw really reply. Driver must wait fw reset
-+	 * done reply before using chip, we must check no-zero.
-+	 **/
-+	if (hw_req_count != 0 && hw_req_count != hw->mbx.fw_req) {
-+		hw->mbx.stats.reqs++;
-+		return 0;
-+	}
-+
-+	return -EIO;
-+}
-+
-+/**
-+ * mucse_poll_for_msg - Wait for message notification
-+ * @hw: pointer to the HW structure
++ * mucse_fw_send_cmd_wait sends req to pf-fw mailbox and wait
++ * reply from fw.
 + *
 + * Return: 0 on success, negative errno on failure
 + **/
-+static int mucse_poll_for_msg(struct mucse_hw *hw)
++static int mucse_fw_send_cmd_wait(struct mucse_hw *hw,
++				  struct mbx_fw_cmd_req *req,
++				  struct mbx_fw_cmd_reply *reply)
 +{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	int countdown = mbx->timeout;
-+	int val;
++	int len = le16_to_cpu(req->datalen);
++	int retry_cnt = 3;
++	int err;
 +
-+	return read_poll_timeout(mucse_check_for_msg_pf,
-+				 val, val == 0, mbx->usec_delay,
-+				 countdown * mbx->usec_delay,
-+				 false, hw);
++	mutex_lock(&hw->mbx.lock);
++	err = mucse_write_posted_mbx(hw, (u32 *)req, len);
++	if (err)
++		goto out;
++	do {
++		err = mucse_read_posted_mbx(hw, (u32 *)reply,
++					    sizeof(*reply));
++		if (err)
++			goto out;
++		/* mucse_write_posted_mbx return 0 means fw has
++		 * received request, wait for the expect opcode
++		 * reply with 'retry_cnt' times.
++		 */
++	} while (--retry_cnt >= 0 && reply->opcode != req->opcode);
++out:
++	mutex_unlock(&hw->mbx.lock);
++	if (!err && retry_cnt < 0)
++		return -ETIMEDOUT;
++	if (!err && reply->error_code)
++		return -EIO;
++
++	return err;
 +}
 +
 +/**
-+ * mucse_check_for_ack_pf - Check to see if the VF has ACKed
-+ * @hw: pointer to the HW structure
-+ *
-+ * Return: 0 if the fw has set the Status bit or else -EIO
++ * build_get_hw_info_req - build req with GET_HW_INFO opcode
++ * @req: pointer to the cmd req structure
 + **/
-+static int mucse_check_for_ack_pf(struct mucse_hw *hw)
++static void build_get_hw_info_req(struct mbx_fw_cmd_req *req)
 +{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	u16 hw_fw_ack;
-+
-+	hw_fw_ack = mucse_mbx_get_fwack(mbx);
-+	/* chip's register is reset to 0 when rc send reset
-+	 * mbx command. This causes 'hw_fw_ack != hw->mbx.fw_ack'
-+	 * be TRUE before fw really reply. Driver must wait fw reset
-+	 * done reply before using chip, we must check no-zero.
-+	 **/
-+	if (hw_fw_ack != 0 && hw_fw_ack != hw->mbx.fw_ack) {
-+		hw->mbx.stats.acks++;
-+		return 0;
-+	}
-+
-+	return -EIO;
++	req->flags = 0;
++	req->opcode = cpu_to_le16(GET_HW_INFO);
++	req->datalen = cpu_to_le16(MBX_REQ_HDR_LEN);
++	req->reply_lo = 0;
++	req->reply_hi = 0;
 +}
 +
 +/**
-+ * mucse_poll_for_ack - Wait for message acknowledgment
++ * mucse_mbx_get_info - Get hw info from fw
 + * @hw: pointer to the HW structure
 + *
-+ * Return: 0 if it successfully received a message acknowledgment
-+ **/
-+static int mucse_poll_for_ack(struct mucse_hw *hw)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	int countdown = mbx->timeout;
-+	int val;
-+
-+	return read_poll_timeout(mucse_check_for_ack_pf,
-+				 val, val == 0, mbx->usec_delay,
-+				 countdown * mbx->usec_delay,
-+				 false, hw);
-+}
-+
-+/**
-+ * mucse_obtain_mbx_lock_pf - Obtain mailbox lock
-+ * @hw: pointer to the HW structure
-+ *
-+ * This function maybe used in an irq handler.
-+ *
-+ * Return: 0 if we obtained the mailbox lock or else -EIO
-+ **/
-+static int mucse_obtain_mbx_lock_pf(struct mucse_hw *hw)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	int try_cnt = 5000;
-+	u32 reg;
-+
-+	reg = PF2FW_MBOX_CTRL(mbx);
-+	while (try_cnt-- > 0) {
-+		mbx_ctrl_wr32(mbx, reg, MBOX_PF_HOLD);
-+		/* force write back before check */
-+		wmb();
-+		if (mbx_ctrl_rd32(mbx, reg) & MBOX_PF_HOLD)
-+			return 0;
-+		udelay(100);
-+	}
-+	return -EIO;
-+}
-+
-+/**
-+ * mucse_read_mbx_pf - Read a message from the mailbox
-+ * @hw: pointer to the HW structure
-+ * @msg: the message buffer
-+ * @size: length of buffer
-+ *
-+ * This function copies a message from the mailbox buffer to the caller's
-+ * memory buffer. The presumption is that the caller knows that there was
-+ * a message due to a fw request so no polling for message is needed.
++ * mucse_mbx_get_info tries to get hw info from hw.
 + *
 + * Return: 0 on success, negative errno on failure
 + **/
-+static int mucse_read_mbx_pf(struct mucse_hw *hw, u32 *msg, u16 size)
++static int mucse_mbx_get_info(struct mucse_hw *hw)
 +{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	int size_inwords = size / 4;
-+	u32 ctrl_reg;
-+	int ret;
-+	int i;
++	struct mbx_fw_cmd_reply reply = {};
++	struct mbx_fw_cmd_req req = {};
++	struct hw_info info = {};
++	int err;
 +
-+	ctrl_reg = PF2FW_MBOX_CTRL(mbx);
++	build_get_hw_info_req(&req);
++	err = mucse_fw_send_cmd_wait(hw, &req, &reply);
++	if (!err) {
++		memcpy(&info, &reply.hw_info, sizeof(struct hw_info));
++		hw->pfvfnum = le16_to_cpu(info.pfnum) & GENMASK_U16(7, 0);
++	}
 +
-+	ret = mucse_obtain_mbx_lock_pf(hw);
-+	if (ret)
-+		return ret;
-+	for (i = 0; i < size_inwords; i++)
-+		msg[i] = mbx_data_rd32(mbx, MBX_FW_PF_SHM_DATA + 4 * i);
-+	/* Hw need write data_reg at last */
-+	mbx_data_wr32(mbx, MBX_FW_PF_SHM_DATA, 0);
-+	hw->mbx.fw_req = mucse_mbx_get_fwreq(mbx);
-+	mucse_mbx_inc_pf_ack(hw);
-+	mbx_ctrl_wr32(mbx, ctrl_reg, 0);
++	return err;
++}
 +
++/**
++ * mucse_mbx_sync_fw - Try to sync with fw
++ * @hw: pointer to the HW structure
++ *
++ * mucse_mbx_sync_fw tries to sync with fw. It is only called in
++ * probe. Nothing (register network) todo if failed.
++ * Try more times to do sync.
++ *
++ * Return: 0 on success, negative errno on failure
++ **/
++int mucse_mbx_sync_fw(struct mucse_hw *hw)
++{
++	int try_cnt = 3;
++	int err;
++
++	do {
++		err = mucse_mbx_get_info(hw);
++		if (err == -ETIMEDOUT)
++			continue;
++		break;
++	} while (try_cnt--);
++
++	return err;
++}
++
++/**
++ * build_powerup - build req with powerup opcode
++ * @req: pointer to the cmd req structure
++ * @is_powerup: true for powerup, false for powerdown
++ **/
++static void build_powerup(struct mbx_fw_cmd_req *req,
++			  bool is_powerup)
++{
++	req->flags = 0;
++	req->opcode = cpu_to_le16(POWER_UP);
++	req->datalen = cpu_to_le16(sizeof(req->powerup) +
++				   MBX_REQ_HDR_LEN);
++	req->reply_lo = 0;
++	req->reply_hi = 0;
++#define FIXED_VERSION 0xFFFFFFFF
++	req->powerup.version = cpu_to_le32(FIXED_VERSION);
++	if (is_powerup)
++		req->powerup.status = cpu_to_le32(1);
++	else
++		req->powerup.status = cpu_to_le32(0);
++}
++
++/**
++ * mucse_mbx_powerup - Echo fw to powerup
++ * @hw: pointer to the HW structure
++ * @is_powerup: true for powerup, false for powerdown
++ *
++ * mucse_mbx_powerup echo fw to change working frequency
++ * to normal after received true, and reduce working frequency
++ * if false.
++ *
++ * Return: 0 on success, negative errno on failure
++ **/
++int mucse_mbx_powerup(struct mucse_hw *hw, bool is_powerup)
++{
++	struct mbx_fw_cmd_req req = {};
++	int len;
++	int err;
++
++	build_powerup(&req, is_powerup);
++	len = le16_to_cpu(req.datalen);
++	mutex_lock(&hw->mbx.lock);
++
++	if (is_powerup) {
++		err = mucse_write_posted_mbx(hw, (u32 *)&req,
++					     len);
++	} else {
++		err = mucse_write_mbx_pf(hw, (u32 *)&req,
++					 len);
++	}
++
++	mutex_unlock(&hw->mbx.lock);
++	return err;
++}
++
++/**
++ * build_reset_hw_req - build req with RESET_HW opcode
++ * @req: pointer to the cmd req structure
++ **/
++static void build_reset_hw_req(struct mbx_fw_cmd_req *req)
++{
++	req->flags = 0;
++	req->opcode = cpu_to_le16(RESET_HW);
++	req->datalen = cpu_to_le16(MBX_REQ_HDR_LEN);
++	req->reply_lo = 0;
++	req->reply_hi = 0;
++}
++
++/**
++ * mucse_mbx_reset_hw - Posts a mbx req to reset hw
++ * @hw: pointer to the HW structure
++ *
++ * mucse_mbx_reset_hw posts a mbx req to firmware to reset hw.
++ *
++ * Return: 0 on success, negative errno on failure
++ **/
++int mucse_mbx_reset_hw(struct mucse_hw *hw)
++{
++	struct mbx_fw_cmd_reply reply = {};
++	struct mbx_fw_cmd_req req = {};
++
++	build_reset_hw_req(&req);
++	return mucse_fw_send_cmd_wait(hw, &req, &reply);
++}
++
++/**
++ * build_get_macaddress_req - build req with get_mac opcode
++ * @req: pointer to the cmd req structure
++ * @port_mask: port valid for this cmd
++ * @pfvfnum: pfvfnum for this cmd
++ **/
++static void build_get_macaddress_req(struct mbx_fw_cmd_req *req,
++				     int port_mask, int pfvfnum)
++{
++	req->flags = 0;
++	req->opcode = cpu_to_le16(GET_MAC_ADDRESS);
++	req->datalen = cpu_to_le16(sizeof(req->get_mac_addr) +
++				   MBX_REQ_HDR_LEN);
++	req->reply_lo = 0;
++	req->reply_hi = 0;
++	req->get_mac_addr.port_mask = cpu_to_le32(port_mask);
++	req->get_mac_addr.pfvf_num = cpu_to_le32(pfvfnum);
++}
++
++/**
++ * mucse_mbx_get_macaddr - Posts a mbx req to request macaddr
++ * @hw: pointer to the HW structure
++ * @pfvfnum: index of pf/vf num
++ * @mac_addr: pointer to store mac_addr
++ * @port: port index
++ *
++ * mucse_mbx_get_macaddr posts a mbx req to firmware to get mac_addr.
++ *
++ * Return: 0 on success, negative errno on failure
++ **/
++int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
++			  u8 *mac_addr,
++			  int port)
++{
++	struct mbx_fw_cmd_reply reply = {};
++	struct mbx_fw_cmd_req req = {};
++	int err;
++
++	build_get_macaddress_req(&req, BIT(port), pfvfnum);
++	err = mucse_fw_send_cmd_wait(hw, &req, &reply);
++	if (err)
++		return err;
++	if (le32_to_cpu(reply.mac_addr.ports) & BIT(port))
++		memcpy(mac_addr, reply.mac_addr.addrs[port].mac, ETH_ALEN);
++	else
++		return -ENODATA;
 +	return 0;
 +}
-+
-+/**
-+ * mucse_read_posted_mbx - Wait for message notification and receive message
-+ * @hw: pointer to the HW structure
-+ * @msg: the message buffer
-+ * @size: length of buffer
-+ *
-+ * Return: 0 if it successfully received a message notification and
-+ * copied it into the receive buffer
-+ **/
-+int mucse_read_posted_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
-+{
-+	int ret;
-+
-+	ret = mucse_poll_for_msg(hw);
-+	if (ret)
-+		return ret;
-+
-+	return mucse_read_mbx_pf(hw, msg, size);
-+}
-+
-+/**
-+ * mucse_mbx_reset - Reset mbx info, sync info from regs
-+ * @hw: pointer to the HW structure
-+ *
-+ * This function reset all mbx variables to default.
-+ **/
-+static void mucse_mbx_reset(struct mucse_hw *hw)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	u32 v;
-+
-+	v = mbx_data_rd32(mbx, MBX_FW2PF_COUNTER);
-+	hw->mbx.fw_req = v & GENMASK_U32(15, 0);
-+	hw->mbx.fw_ack = (v >> 16) & GENMASK_U32(15, 0);
-+	mbx_ctrl_wr32(mbx, PF2FW_MBOX_CTRL(mbx), 0);
-+	mbx_ctrl_wr32(mbx, FW_PF_MBOX_MASK(mbx), GENMASK_U32(31, 16));
-+}
-+
-+/**
-+ * mucse_init_mbx_params_pf - Set initial values for pf mailbox
-+ * @hw: pointer to the HW structure
-+ *
-+ * Initializes the hw->mbx struct to correct values for pf mailbox
-+ */
-+void mucse_init_mbx_params_pf(struct mucse_hw *hw)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+
-+	mbx->usec_delay = 100;
-+	mbx->timeout = (4 * USEC_PER_SEC) / mbx->usec_delay;
-+	mbx->stats.msgs_tx = 0;
-+	mbx->stats.msgs_rx = 0;
-+	mbx->stats.reqs = 0;
-+	mbx->stats.acks = 0;
-+	mbx->size = MUCSE_MAILBOX_BYTES;
-+	mutex_init(&mbx->lock);
-+	mucse_mbx_reset(hw);
-+}
-+
-+/**
-+ * mucse_write_mbx_pf - Place a message in the mailbox
-+ * @hw: pointer to the HW structure
-+ * @msg: the message buffer
-+ * @size: length of buffer
-+ *
-+ * This function maybe used in an irq handler.
-+ *
-+ * Return: 0 if it successfully copied message into the buffer
-+ **/
-+int mucse_write_mbx_pf(struct mucse_hw *hw, u32 *msg, u16 size)
-+{
-+	struct mucse_mbx_info *mbx = &hw->mbx;
-+	int size_inwords = size / 4;
-+	u32 ctrl_reg;
-+	int ret;
-+	int i;
-+
-+	ctrl_reg = PF2FW_MBOX_CTRL(mbx);
-+	ret = mucse_obtain_mbx_lock_pf(hw);
-+	if (ret)
-+		return ret;
-+
-+	for (i = 0; i < size_inwords; i++)
-+		mbx_data_wr32(mbx, MBX_FW_PF_SHM_DATA + i * 4, msg[i]);
-+
-+	/* flush msg and acks as we are overwriting the message buffer */
-+	hw->mbx.fw_ack = mucse_mbx_get_fwack(mbx);
-+	mucse_mbx_inc_pf_req(hw);
-+	mbx_ctrl_wr32(mbx, ctrl_reg, MBOX_CTRL_REQ);
-+
-+	return 0;
-+}
-+
-+/**
-+ * mucse_write_posted_mbx - Write a message to the mailbox, wait for ack
-+ * @hw: pointer to the HW structure
-+ * @msg: the message buffer
-+ * @size: length of buffer
-+ *
-+ * Return: 0 if it successfully copied message into the buffer and
-+ * received an ack to that message within delay * timeout period
-+ **/
-+int mucse_write_posted_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
-+{
-+	int ret;
-+
-+	ret = mucse_write_mbx_pf(hw, msg, size);
-+	if (ret)
-+		return ret;
-+	return mucse_poll_for_ack(hw);
-+}
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
 new file mode 100644
-index 000000000000..110c1ee025ba
+index 000000000000..d2dcad82f775
 --- /dev/null
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-@@ -0,0 +1,25 @@
++++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+@@ -0,0 +1,126 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
 +
-+#ifndef _RNPGBE_MBX_H
-+#define _RNPGBE_MBX_H
++#ifndef _RNPGBE_MBX_FW_H
++#define _RNPGBE_MBX_FW_H
++
++#include <linux/types.h>
++#include <linux/errno.h>
++#include <linux/wait.h>
 +
 +#include "rnpgbe.h"
 +
-+#define MUCSE_MAILBOX_BYTES 56
-+#define MBX_FW2PF_COUNTER 0
-+#define MBX_PF2FW_COUNTER 4
-+#define MBX_FW_PF_SHM_DATA 8
-+#define FW2PF_MBOX_VEC 0
-+#define PF2FW_MBOX_CTRL(mbx) ((mbx)->pf2fw_mbox_ctrl)
-+#define FW_PF_MBOX_MASK(mbx) ((mbx)->fw_pf_mbox_mask)
-+#define MBOX_CTRL_REQ BIT(0)
-+#define MBOX_PF_HOLD BIT(3)
-+#define MBOX_IRQ_EN 0
-+#define MBOX_IRQ_DISABLE 1
++#define MBX_REQ_HDR_LEN 24
 +
-+int mucse_write_mbx_pf(struct mucse_hw *hw, u32 *msg, u16 size);
-+int mucse_write_posted_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
-+void mucse_init_mbx_params_pf(struct mucse_hw *hw);
-+int mucse_read_posted_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
-+#endif /* _RNPGBE_MBX_H */
++enum MUCSE_FW_CMD {
++	GET_HW_INFO = 0x0601,
++	GET_MAC_ADDRESS = 0x0602,
++	RESET_HW = 0x0603,
++	POWER_UP = 0x0803,
++};
++
++struct hw_info {
++	u8 link_stat;
++	u8 port_mask;
++	__le32 speed;
++	__le16 phy_type;
++	__le16 nic_mode;
++	__le16 pfnum;
++	__le32 fw_version;
++	__le32 axi_mhz;
++	union {
++		u8 port_id[4];
++		__le32 port_ids;
++	};
++	__le32 bd_uid;
++	__le32 phy_id;
++	__le32 wol_status;
++	union {
++		__le32 ext_info;
++		struct {
++			u32 valid : 1;
++			u32 wol_en : 1;
++			u32 pci_preset_runtime_en : 1;
++			u32 smbus_en : 1;
++			u32 ncsi_en : 1;
++			u32 rpu_en : 1;
++			u32 v2 : 1;
++			u32 pxe_en : 1;
++			u32 mctp_en : 1;
++			u32 yt8614 : 1;
++			u32 pci_ext_reset : 1;
++			u32 rpu_availble : 1;
++			u32 fw_lldp_ability : 1;
++			u32 lldp_enabled : 1;
++			u32 only_1g : 1;
++			u32 force_down_en: 1;
++		} e_host;
++	};
++} __packed;
++
++/* FW stores extended information in 'ext_info' as a 32-bit
++ * little-endian value. To make these flags easily accessible in the
++ * kernel (via named 'bitfields' instead of raw bitmask operations),
++ * we use the union's 'e_host' struct, which provides named bits
++ * (e.g., 'wol_en', 'smbus_en')
++ */
++static inline void info_update_host_endian(struct hw_info *info)
++{
++	u32 host_val = le32_to_cpu(info->ext_info);
++
++	info->e_host = *(typeof(info->e_host) *)&host_val;
++}
++
++#define FLAGS_DD BIT(0)
++#define FLAGS_ERR BIT(2)
++
++struct mbx_fw_cmd_req {
++	__le16 flags;
++	__le16 opcode;
++	__le16 datalen;
++	__le16 ret_value;
++	__le32 cookie_lo;
++	__le32 cookie_hi;
++	__le32 reply_lo;
++	__le32 reply_hi;
++	union {
++		u8 data[32];
++		struct {
++			__le32 version;
++			__le32 status;
++		} powerup;
++		struct {
++			__le32 port_mask;
++			__le32 pfvf_num;
++		} get_mac_addr;
++	};
++} __packed;
++
++struct mbx_fw_cmd_reply {
++	__le16 flags;
++	__le16 opcode;
++	__le16 error_code;
++	__le16 datalen;
++	__le32 cookie_lo;
++	__le32 cookie_hi;
++	union {
++		u8 data[40];
++		struct mac_addr {
++			__le32 ports;
++			struct _addr {
++				/* for macaddr:01:02:03:04:05:06
++				 * mac-hi=0x01020304 mac-lo=0x05060000
++				 */
++				u8 mac[8];
++			} addrs[4];
++		} mac_addr;
++		struct hw_info hw_info;
++	};
++} __packed;
++
++int mucse_mbx_sync_fw(struct mucse_hw *hw);
++int mucse_mbx_powerup(struct mucse_hw *hw, bool is_powerup);
++int mucse_mbx_reset_hw(struct mucse_hw *hw);
++int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
++			  u8 *mac_addr, int port);
++#endif /* _RNPGBE_MBX_FW_H */
 -- 
 2.25.1
 
