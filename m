@@ -1,80 +1,53 @@
-Return-Path: <netdev+bounces-219509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D45AB41A8E
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AECA5B41AB1
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67FC67AADA4
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:49:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C1F07AAA5F
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1962E9EDD;
-	Wed,  3 Sep 2025 09:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0D72C1591;
+	Wed,  3 Sep 2025 09:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="FA8zyiB3"
+	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="iucDSkmk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DE52E8B8F
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 09:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED0D2BE04B;
+	Wed,  3 Sep 2025 09:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756893039; cv=none; b=ZeaL6EVeHBTpn9lY0TOjlXq5umIBWjuYsTEw4lTevKwDmwwioZICJsfzr40kIrZ2HFd7GK+uUFPp9S+pWU/+K/3T3Kc7XL6DKVsScZ02WdIP8b/luIXBYby1b27gkxBdcwzSqn70byTvZGhxq6ALsRx+ndVQf809MZEhwil1lUw=
+	t=1756893117; cv=none; b=QVHO5E1TfedV/A1pN9BfG43LiTyTxKM7D5BY5uT3MHUop5NSriuHz3oEtiP6teetIrNg4r+e7laHskIFS1u9lpuox00aD9H1y1Glju0Z7cfXTTqCrzy53vs9nsxyoJk7GfrXFr9tCNPaiJ0nGwR5Ej1vzvj2NuldOQoUYz6vVpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756893039; c=relaxed/simple;
-	bh=y4SmvqFyzVL/4kEo5tFGJ5dtK0pYlccbQR7ytEDScbs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aRiX4+Py4r1vMCaMbLxlVxGmx4h20SAnPrxi4CcuB/xffLsPSrt2RAC5e4VBCwTs2N7haCuBUEu6yuppocuiOtJW9EeBFXmEDNKsGvMVR+VKd5Mo70Gxl30d0NPhPYEkWH3hbaZny3cJ8npSYVp/NfxxdmW+/GGKVU26sKR0WSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=FA8zyiB3; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-337f6cdaf2cso13240721fa.2
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 02:50:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1756893035; x=1757497835; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oss/upyPNwJtn/fltx3esN6MAKGxMbEK7lkKnUGVPx4=;
-        b=FA8zyiB3AfaG8/kdKp9xZnv9UvS4l2lcCOI0FWL2tXRwKh8QPCsKKWgmVAQsRFfbKz
-         i3EvucbaXgILLkvO5ewv0t/9siE34HUSrUO98Qt0TFhi45CmN0ROp0m1JeJqQ++VDaJ5
-         upzdLIU2uS7aiB0z3TVH9PWHJc+Um6U7nzCDkUe345huFAiNbhG6jYT1puB1BAHSCrBS
-         6O1NoNqKl4VbsDoRq5iP8c0z3yjqn5qeTH58FGzifdPZ26+MkH/DkcOUvsbPKwLIY7of
-         xQzi4rDXdUHGBWIQPSAgbf9FuZdQ7hr7caW1m3Jrb/oeHUeD92+mQLyeRTorVOAD7PKH
-         DEzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756893035; x=1757497835;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oss/upyPNwJtn/fltx3esN6MAKGxMbEK7lkKnUGVPx4=;
-        b=Xh4GZUGkKFaoUPcljO4xmY6OncRSjzh/ne0b32N8b9GQf/oKIW6BApsP9HwE9ij66k
-         NeTmwzAnOYG8vfiW3a2M0AC6iLOQvoeUX2o+xITwsLK5O0vmWRgtuUdR6x7bnzeZrC1T
-         Hi1FYrgHvwUbgN4IbkKfIAiCW5ha8Bi3VICLeCMExItUKAqxfxREJVQhIHCfQ1KPYt3p
-         Xyzj5BwCjsk+77BuMjcWe6HD43Db4/jp3GUznHOXmIZGpTXe4YW5SEEboSa82y6/YSdF
-         7bMA4oJ+ID6cIyXnemtNGQYj5YwMS2xFk7DBGE1o7Dejy0qqKC8yT5LuF9+v03AvxOWj
-         XoXA==
-X-Gm-Message-State: AOJu0YyuRJkzPkH+q9hDWy0AoK2cpMxgabIHp9LLS/4u5IYwyXzDTy6f
-	925Da+NRHqK2Dl4GjIPvAN2beluskw8azz5iDqXD5vMiLL3OE5B35TxRszFLr66+FUU=
-X-Gm-Gg: ASbGnctie73nkb1nXjKI1VAhpgczo/gFEYy3HjfFQOD89etXj3cHGCJGQu5SAWYLIWQ
-	NAYbbp9taJQZMptazHzbLxeP8fQstLNVHcdlRSLSHDrmaeLjCiT+cwrjNXd/U6op4LuVOxEaXLR
-	qvtjnHB3ayNj917snnlILuMVW14n/6ILZgCKwZZWYUrkjWci/kgfGUGX3pTSwWjxuczjj5BWzct
-	M+HIXj7FmuHzWxBEmmq2WPTYafIjlxkld0sWp49Ndu8q608KfyJZWE0MmcQuaD4x0jyvuHvH8sa
-	HX3IiWW6vRv9dEudfQAjy5vsANGkWHAR5163mnijDowASugvtvMgpzmZ/g9EYT1iT1PRdrsr1Xf
-	1W+q/+F4aB5wOOu/oRHpsGHv5sQIXvIbn1CxpmtvbZpnIp6TR/UMNOt+1WL9QLWU1SxPzN1WxIm
-	+qlA==
-X-Google-Smtp-Source: AGHT+IFOB02LLjF4/yAcx/WQMkEzEgitOnaygv9HUGO8U3NQlscMdgj/0vgyMWwEY6T6pKZh03dqbg==
-X-Received: by 2002:a05:651c:2113:b0:337:ec9a:a516 with SMTP id 38308e7fff4ca-337ec9aab87mr20953191fa.13.1756893032939;
-        Wed, 03 Sep 2025 02:50:32 -0700 (PDT)
-Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-337f4c50f88sm8994531fa.13.2025.09.03.02.50.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Sep 2025 02:50:32 -0700 (PDT)
-Message-ID: <810b9e10-9bc5-4fe3-a4a4-f45c6c13b8b4@blackwall.org>
-Date: Wed, 3 Sep 2025 12:50:30 +0300
+	s=arc-20240116; t=1756893117; c=relaxed/simple;
+	bh=Xx2ydQGqVoFMD1srX09hzZyciu6fNnn0p9i7lyoKVv0=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=PxRUSNbBjDgb5pZfL/ZJdWGbSxHCUUjm2zIDsYX5naib6MCAg4x9Ff4GD0FchTxmWTwP1rz51ep8aRAPR+junddHUZIHRQZn8W9KNrGEKuyqCPalweAqFRblezGsh884y1TaRFWkBQrCLFvCBQXIPaeuUj5X7eDQtOZSguLqDzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=iucDSkmk; arc=none smtp.client-ip=212.27.42.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
+Received: from [44.168.19.11] (unknown [86.195.82.193])
+	(Authenticated sender: bernard.pidoux@free.fr)
+	by smtp4-g21.free.fr (Postfix) with ESMTPSA id F1FFA19F733;
+	Wed,  3 Sep 2025 11:51:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+	s=smtp-20201208; t=1756893112;
+	bh=Xx2ydQGqVoFMD1srX09hzZyciu6fNnn0p9i7lyoKVv0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iucDSkmkVKwnKqRPNQFn6alWglE3Hx1nMu9nDY6KBFvAvnDZlPiN6swjqLWwFB0e7
+	 R4rugGjzawdsjMvnpm/sOf0LkAuxNmBaM/iLARkPeYG6Y0PIDYDrgkpuPh0Njm7KZ1
+	 MCVIjbUYCwH0TL+nKzW5Th1IopK+wwKuE/MeldRwy1+6cPIj6vRVZv0wUbIM2A8yst
+	 PUqKUnmJ0UQE+KR3EmK6cJAdvckKfHVskjZVkVtxhPSD0oYQtR8ZkauKNrDNLVGvaR
+	 MnY4NYLht48WcY4/TDuRv9C+8niwqaEsl6Aze3k5OroyB5SJEe+GQaBTm8HtqL16QE
+	 XLmJZU/s4+udw==
+Content-Type: multipart/mixed; boundary="------------7U161Bgr2AMYp5mcqPaG0la8"
+Message-ID: <938ad48d-a4a3-4729-a46d-4473e190f1a1@free.fr>
+Date: Wed, 3 Sep 2025 11:51:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,424 +55,491 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] bonding: Remove support for use_carrier
-To: Stanislav Fomichev <stfomichev@gmail.com>, Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- linux-doc@vger.kernel.org
-References: <2029487.1756512517@famine> <aLcXNO6ginmuiBOw@mini-arch>
+Subject: [BUG] [ROSE] slab-use-after-free in lock_timer_base
+To: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+References: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+ <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
+ <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
+ <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
+ <d073ac34a39c02287be6d67622229a1e@vanheusden.com>
+ <6a5cf9cf-9984-4e1b-882f-b9b427d3c096@free.fr>
+ <aKxZy7XVRhYiHu7c@stanley.mountain>
+ <0c694353-2904-40c2-bf65-181fe4841ea0@free.fr>
+ <CANn89iJ6QYYXhzuF1Z3nUP=7+u_-GhKmCbBb4yr15q-it4rrUA@mail.gmail.com>
+ <4542b595-2398-4219-b643-4eda70a487f3@free.fr> <aK9AuSkhr37VnRQS@strlen.de>
+ <eb979954-b43c-4e3d-8830-10ac0952e606@free.fr>
+ <1713f383-c538-4918-bc64-13b3288cd542@free.fr>
+ <CANn89i+Me3hgy05EK8sSCNkH1Wj5f49rv_UvgFNuFwPf4otu7w@mail.gmail.com>
+ <CANn89iLi=ObSPAg69uSPRS+pNwGw9jVSQJfT34ZAp3KtSrx2Gg@mail.gmail.com>
+ <cd0461e0-8136-4f90-df7b-64f1e43e78d4@trinnet.net>
+ <80dad7a3-3ca1-4f63-9009-ef5ac9186612@free.fr>
+ <CANn89iJGdn2J-UwK9ux+m9r8mRhAND_t2kU6mLCs=RszBhCyRA@mail.gmail.com>
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <aLcXNO6ginmuiBOw@mini-arch>
+From: Bernard Pidoux <bernard.pidoux@free.fr>
+In-Reply-To: <CANn89iJGdn2J-UwK9ux+m9r8mRhAND_t2kU6mLCs=RszBhCyRA@mail.gmail.com>
+
+This is a multi-part message in MIME format.
+--------------7U161Bgr2AMYp5mcqPaG0la8
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 9/2/25 19:11, Stanislav Fomichev wrote:
-> On 08/29, Jay Vosburgh wrote:
->> 	 Remove the implementation of use_carrier, the link monitoring
->> method that utilizes ethtool or ioctl to determine the link state of an
->> interface in a bond.  Bonding will always behaves as if use_carrier=1,
->> which relies on netif_carrier_ok() to determine the link state of
->> interfaces.
->>
->> 	To avoid acquiring RTNL many times per second, bonding inspects
->> link state under RCU, but not under RTNL.  However, ethtool
->> implementations in drivers may sleep, and therefore this strategy is
->> unsuitable for use with calls into driver ethtool functions.
->>
->> 	The use_carrier option was introduced in 2003, to provide
->> backwards compatibility for network device drivers that did not support
->> the then-new netif_carrier_ok/on/off system.  Device drivers are now
->> expected to support netif_carrier_*, and the use_carrier backwards
->> compatibility logic is no longer necessary.
->>
->> 	The option itself remains, but when queried always returns 1,
->> and may only be set to 1.
->>
->> Link: https://lore.kernel.org/lkml/000000000000eb54bf061cfd666a@google.com/
->> Link: https://lore.kernel.org/netdev/20240718122017.d2e33aaac43a.I10ab9c9ded97163aef4e4de10985cd8f7de60d28@changeid/
->> Signed-off-by: Jay Vosburgh <jv@jvosburgh.net>
->>
->> ---
->>
->> Note: Deliberately omitting a Fixes tag to avoid removing functionality
->> in older kernels that may be in use.
-> 
-> What about syzbot metadata?
-> 
-> Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=b8c48ea38ca27d150063
-> 
-> ?
-> 
->>   Documentation/networking/bonding.rst |  79 +++----------------
->>   drivers/net/bonding/bond_main.c      | 113 ++-------------------------
->>   drivers/net/bonding/bond_netlink.c   |  14 ++--
->>   drivers/net/bonding/bond_options.c   |   7 +-
->>   drivers/net/bonding/bond_sysfs.c     |   6 +-
->>   include/net/bonding.h                |   1 -
->>   6 files changed, 28 insertions(+), 192 deletions(-)
->>
->> diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
->> index f8f5766703d4..a2b42ae719d2 100644
->> --- a/Documentation/networking/bonding.rst
->> +++ b/Documentation/networking/bonding.rst
->> @@ -582,10 +582,8 @@ miimon
->>   	This determines how often the link state of each slave is
->>   	inspected for link failures.  A value of zero disables MII
->>   	link monitoring.  A value of 100 is a good starting point.
->> -	The use_carrier option, below, affects how the link state is
->> -	determined.  See the High Availability section for additional
->> -	information.  The default value is 100 if arp_interval is not
->> -	set.
->> +
->> +	The default value is 100 if arp_interval is not set.
->>   
->>   min_links
->>   
->> @@ -896,25 +894,14 @@ updelay
->>   
->>   use_carrier
->>   
->> -	Specifies whether or not miimon should use MII or ETHTOOL
->> -	ioctls vs. netif_carrier_ok() to determine the link
->> -	status. The MII or ETHTOOL ioctls are less efficient and
->> -	utilize a deprecated calling sequence within the kernel.  The
->> -	netif_carrier_ok() relies on the device driver to maintain its
->> -	state with netif_carrier_on/off; at this writing, most, but
->> -	not all, device drivers support this facility.
->> -
->> -	If bonding insists that the link is up when it should not be,
->> -	it may be that your network device driver does not support
->> -	netif_carrier_on/off.  The default state for netif_carrier is
->> -	"carrier on," so if a driver does not support netif_carrier,
->> -	it will appear as if the link is always up.  In this case,
->> -	setting use_carrier to 0 will cause bonding to revert to the
->> -	MII / ETHTOOL ioctl method to determine the link state.
->> -
->> -	A value of 1 enables the use of netif_carrier_ok(), a value of
->> -	0 will use the deprecated MII / ETHTOOL ioctls.  The default
->> -	value is 1.
->> +	Obsolete option that previously selected between MII /
->> +	ETHTOOL ioctls and netif_carrier_ok() to determine link
->> +	state.
->> +
->> +	All link state checks are now done with netif_carrier_ok().
->> +
->> +	For backwards compatibility, this option's value may be inspected
->> +	or set.  The only valid setting is 1.
->>   
->>   xmit_hash_policy
->>   
->> @@ -2036,22 +2023,8 @@ depending upon the device driver to maintain its carrier state, by
->>   querying the device's MII registers, or by making an ethtool query to
->>   the device.
->>   
->> -If the use_carrier module parameter is 1 (the default value),
->> -then the MII monitor will rely on the driver for carrier state
->> -information (via the netif_carrier subsystem).  As explained in the
->> -use_carrier parameter information, above, if the MII monitor fails to
->> -detect carrier loss on the device (e.g., when the cable is physically
->> -disconnected), it may be that the driver does not support
->> -netif_carrier.
->> -
->> -If use_carrier is 0, then the MII monitor will first query the
->> -device's (via ioctl) MII registers and check the link state.  If that
->> -request fails (not just that it returns carrier down), then the MII
->> -monitor will make an ethtool ETHTOOL_GLINK request to attempt to obtain
->> -the same information.  If both methods fail (i.e., the driver either
->> -does not support or had some error in processing both the MII register
->> -and ethtool requests), then the MII monitor will assume the link is
->> -up.
->> +The MII monitor relies on the driver for carrier state information (via
->> +the netif_carrier subsystem).
->>   
->>   8. Potential Sources of Trouble
->>   ===============================
->> @@ -2135,34 +2108,6 @@ This will load tg3 and e1000 modules before loading the bonding one.
->>   Full documentation on this can be found in the modprobe.d and modprobe
->>   manual pages.
->>   
->> -8.3. Painfully Slow Or No Failed Link Detection By Miimon
->> ----------------------------------------------------------
->> -
->> -By default, bonding enables the use_carrier option, which
->> -instructs bonding to trust the driver to maintain carrier state.
->> -
->> -As discussed in the options section, above, some drivers do
->> -not support the netif_carrier_on/_off link state tracking system.
->> -With use_carrier enabled, bonding will always see these links as up,
->> -regardless of their actual state.
->> -
->> -Additionally, other drivers do support netif_carrier, but do
->> -not maintain it in real time, e.g., only polling the link state at
->> -some fixed interval.  In this case, miimon will detect failures, but
->> -only after some long period of time has expired.  If it appears that
->> -miimon is very slow in detecting link failures, try specifying
->> -use_carrier=0 to see if that improves the failure detection time.  If
->> -it does, then it may be that the driver checks the carrier state at a
->> -fixed interval, but does not cache the MII register values (so the
->> -use_carrier=0 method of querying the registers directly works).  If
->> -use_carrier=0 does not improve the failover, then the driver may cache
->> -the registers, or the problem may be elsewhere.
->> -
->> -Also, remember that miimon only checks for the device's
->> -carrier state.  It has no way to determine the state of devices on or
->> -beyond other ports of a switch, or if a switch is refusing to pass
->> -traffic while still maintaining carrier on.
->> -
->>   9. SNMP agents
->>   ===============
->>   
->> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
->> index 257333c88710..f25c2d2c9181 100644
->> --- a/drivers/net/bonding/bond_main.c
->> +++ b/drivers/net/bonding/bond_main.c
->> @@ -142,8 +142,7 @@ module_param(downdelay, int, 0);
->>   MODULE_PARM_DESC(downdelay, "Delay before considering link down, "
->>   			    "in milliseconds");
->>   module_param(use_carrier, int, 0);
->> -MODULE_PARM_DESC(use_carrier, "Use netif_carrier_ok (vs MII ioctls) in miimon; "
->> -			      "0 for off, 1 for on (default)");
->> +MODULE_PARM_DESC(use_carrier, "option obsolete, use_carrier cannot be disabled");
->>   module_param(mode, charp, 0);
->>   MODULE_PARM_DESC(mode, "Mode of operation; 0 for balance-rr, "
->>   		       "1 for active-backup, 2 for balance-xor, "
->> @@ -830,77 +829,6 @@ const char *bond_slave_link_status(s8 link)
->>   	}
->>   }
->>   
->> -/* if <dev> supports MII link status reporting, check its link status.
->> - *
->> - * We either do MII/ETHTOOL ioctls, or check netif_carrier_ok(),
->> - * depending upon the setting of the use_carrier parameter.
->> - *
->> - * Return either BMSR_LSTATUS, meaning that the link is up (or we
->> - * can't tell and just pretend it is), or 0, meaning that the link is
->> - * down.
->> - *
->> - * If reporting is non-zero, instead of faking link up, return -1 if
->> - * both ETHTOOL and MII ioctls fail (meaning the device does not
->> - * support them).  If use_carrier is set, return whatever it says.
->> - * It'd be nice if there was a good way to tell if a driver supports
->> - * netif_carrier, but there really isn't.
->> - */
->> -static int bond_check_dev_link(struct bonding *bond,
->> -			       struct net_device *slave_dev, int reporting)
->> -{
->> -	const struct net_device_ops *slave_ops = slave_dev->netdev_ops;
->> -	struct mii_ioctl_data *mii;
->> -	struct ifreq ifr;
->> -	int ret;
->> -
->> -	if (!reporting && !netif_running(slave_dev))
->> -		return 0;
->> -
->> -	if (bond->params.use_carrier)
->> -		return netif_carrier_ok(slave_dev) ? BMSR_LSTATUS : 0;
->> -
->> -	/* Try to get link status using Ethtool first. */
->> -	if (slave_dev->ethtool_ops->get_link) {
->> -		netdev_lock_ops(slave_dev);
->> -		ret = slave_dev->ethtool_ops->get_link(slave_dev);
->> -		netdev_unlock_ops(slave_dev);
->> -
->> -		return ret ? BMSR_LSTATUS : 0;
->> -	}
->> -
->> -	/* Ethtool can't be used, fallback to MII ioctls. */
->> -	if (slave_ops->ndo_eth_ioctl) {
->> -		/* TODO: set pointer to correct ioctl on a per team member
->> -		 *       bases to make this more efficient. that is, once
->> -		 *       we determine the correct ioctl, we will always
->> -		 *       call it and not the others for that team
->> -		 *       member.
->> -		 */
->> -
->> -		/* We cannot assume that SIOCGMIIPHY will also read a
->> -		 * register; not all network drivers (e.g., e100)
->> -		 * support that.
->> -		 */
->> -
->> -		/* Yes, the mii is overlaid on the ifreq.ifr_ifru */
->> -		strscpy_pad(ifr.ifr_name, slave_dev->name, IFNAMSIZ);
->> -		mii = if_mii(&ifr);
->> -
->> -		if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIPHY) == 0) {
->> -			mii->reg_num = MII_BMSR;
->> -			if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIREG) == 0)
->> -				return mii->val_out & BMSR_LSTATUS;
->> -		}
->> -	}
->> -
->> -	/* If reporting, report that either there's no ndo_eth_ioctl,
->> -	 * or both SIOCGMIIREG and get_link failed (meaning that we
->> -	 * cannot report link status).  If not reporting, pretend
->> -	 * we're ok.
->> -	 */
->> -	return reporting ? -1 : BMSR_LSTATUS;
->> -}
->> -
->>   /*----------------------------- Multicast list ------------------------------*/
->>   
->>   /* Push the promiscuity flag down to appropriate slaves */
->> @@ -1966,7 +1894,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
->>   	const struct net_device_ops *slave_ops = slave_dev->netdev_ops;
->>   	struct slave *new_slave = NULL, *prev_slave;
->>   	struct sockaddr_storage ss;
->> -	int link_reporting;
->>   	int res = 0, i;
->>   
->>   	if (slave_dev->flags & IFF_MASTER &&
->> @@ -1976,12 +1903,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
->>   		return -EPERM;
->>   	}
->>   
->> -	if (!bond->params.use_carrier &&
->> -	    slave_dev->ethtool_ops->get_link == NULL &&
->> -	    slave_ops->ndo_eth_ioctl == NULL) {
->> -		slave_warn(bond_dev, slave_dev, "no link monitoring support\n");
->> -	}
->> -
->>   	/* already in-use? */
->>   	if (netdev_is_rx_handler_busy(slave_dev)) {
->>   		SLAVE_NL_ERR(bond_dev, slave_dev, extack,
->> @@ -2195,29 +2116,10 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
->>   
->>   	new_slave->last_tx = new_slave->last_rx;
->>   
->> -	if (bond->params.miimon && !bond->params.use_carrier) {
->> -		link_reporting = bond_check_dev_link(bond, slave_dev, 1);
->> -
->> -		if ((link_reporting == -1) && !bond->params.arp_interval) {
->> -			/* miimon is set but a bonded network driver
->> -			 * does not support ETHTOOL/MII and
->> -			 * arp_interval is not set.  Note: if
->> -			 * use_carrier is enabled, we will never go
->> -			 * here (because netif_carrier is always
->> -			 * supported); thus, we don't need to change
->> -			 * the messages for netif_carrier.
->> -			 */
->> -			slave_warn(bond_dev, slave_dev, "MII and ETHTOOL support not available for slave, and arp_interval/arp_ip_target module parameters not specified, thus bonding will not detect link failures! see bonding.txt for details\n");
->> -		} else if (link_reporting == -1) {
->> -			/* unable get link status using mii/ethtool */
->> -			slave_warn(bond_dev, slave_dev, "can't get link status from slave; the network driver associated with this interface does not support MII or ETHTOOL link status reporting, thus miimon has no effect on this interface\n");
->> -		}
->> -	}
->> -
->>   	/* check for initial state */
->>   	new_slave->link = BOND_LINK_NOCHANGE;
->>   	if (bond->params.miimon) {
->> -		if (bond_check_dev_link(bond, slave_dev, 0) == BMSR_LSTATUS) {
->> +		if (netif_carrier_ok(slave_dev)) {
->>   			if (bond->params.updelay) {
->>   				bond_set_slave_link_state(new_slave,
->>   							  BOND_LINK_BACK,
->> @@ -2759,7 +2661,7 @@ static int bond_miimon_inspect(struct bonding *bond)
->>   	bond_for_each_slave_rcu(bond, slave, iter) {
->>   		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
->>   
->> -		link_state = bond_check_dev_link(bond, slave->dev, 0);
->> +		link_state = netif_carrier_ok(slave->dev);
->>   
->>   		switch (slave->link) {
->>   		case BOND_LINK_UP:
->> @@ -6257,10 +6159,10 @@ static int __init bond_check_params(struct bond_params *params)
->>   		downdelay = 0;
->>   	}
->>   
->> -	if ((use_carrier != 0) && (use_carrier != 1)) {
->> -		pr_warn("Warning: use_carrier module parameter (%d), not of valid value (0/1), so it was set to 1\n",
->> -			use_carrier);
->> -		use_carrier = 1;
->> +	if (use_carrier != 1) {
->> +		pr_err("Error: invalid use_carrier parameter (%d)\n",
->> +		       use_carrier);
->> +		return -EINVAL;
->>   	}
->>   
->>   	if (num_peer_notif < 0 || num_peer_notif > 255) {
->> @@ -6507,7 +6409,6 @@ static int __init bond_check_params(struct bond_params *params)
->>   	params->updelay = updelay;
->>   	params->downdelay = downdelay;
->>   	params->peer_notif_delay = 0;
->> -	params->use_carrier = use_carrier;
->>   	params->lacp_active = 1;
->>   	params->lacp_fast = lacp_fast;
->>   	params->primary[0] = 0;
->> diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
->> index 57fff2421f1b..e573b34a1bbc 100644
->> --- a/drivers/net/bonding/bond_netlink.c
->> +++ b/drivers/net/bonding/bond_netlink.c
->> @@ -259,13 +259,11 @@ static int bond_changelink(struct net_device *bond_dev, struct nlattr *tb[],
->>   			return err;
->>   	}
->>   	if (data[IFLA_BOND_USE_CARRIER]) {
->> -		int use_carrier = nla_get_u8(data[IFLA_BOND_USE_CARRIER]);
->> -
->> -		bond_opt_initval(&newval, use_carrier);
->> -		err = __bond_opt_set(bond, BOND_OPT_USE_CARRIER, &newval,
->> -				     data[IFLA_BOND_USE_CARRIER], extack);
->> -		if (err)
->> -			return err;
->> +		if (nla_get_u8(data[IFLA_BOND_USE_CARRIER]) != 1) {
->> +			NL_SET_ERR_MSG_ATTR(extack, data[IFLA_BOND_USE_CARRIER],
->> +					    "option obsolete, use_carrier cannot be disabled");
->> +			return -EINVAL;
->> +		}
->>   	}
->>   	if (data[IFLA_BOND_ARP_INTERVAL]) {
->>   		int arp_interval = nla_get_u32(data[IFLA_BOND_ARP_INTERVAL]);
->> @@ -688,7 +686,7 @@ static int bond_fill_info(struct sk_buff *skb,
->>   			bond->params.peer_notif_delay * bond->params.miimon))
->>   		goto nla_put_failure;
->>   
->> -	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, bond->params.use_carrier))
->> +	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, 1))
->>   		goto nla_put_failure;
->>   
->>   	if (nla_put_u32(skb, IFLA_BOND_ARP_INTERVAL, bond->params.arp_interval))
->> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
->> index 3b6f815c55ff..c0a5eb8766b5 100644
->> --- a/drivers/net/bonding/bond_options.c
->> +++ b/drivers/net/bonding/bond_options.c
->> @@ -187,7 +187,6 @@ static const struct bond_opt_value bond_primary_reselect_tbl[] = {
->>   };
->>   
->>   static const struct bond_opt_value bond_use_carrier_tbl[] = {
->> -	{ "off", 0,  0},
->>   	{ "on",  1,  BOND_VALFLAG_DEFAULT},
->>   	{ NULL,  -1, 0}
->>   };
->> @@ -419,7 +418,7 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
->>   	[BOND_OPT_USE_CARRIER] = {
->>   		.id = BOND_OPT_USE_CARRIER,
->>   		.name = "use_carrier",
->> -		.desc = "Use netif_carrier_ok (vs MII ioctls) in miimon",
->> +		.desc = "option obsolete, use_carrier cannot be disabled",
->>   		.values = bond_use_carrier_tbl,
->>   		.set = bond_option_use_carrier_set
->>   	},
->> @@ -1091,10 +1090,6 @@ static int bond_option_peer_notif_delay_set(struct bonding *bond,
->>   static int bond_option_use_carrier_set(struct bonding *bond,
->>   				       const struct bond_opt_value *newval)
->>   {
->> -	netdev_dbg(bond->dev, "Setting use_carrier to %llu\n",
->> -		   newval->value);
->> -	bond->params.use_carrier = newval->value;
->> -
->>   	return 0;
-> 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> 
-> nit: any reason not to return -EINVAL here when the new value is not "1"?
-> You do it for the module param, but not for the sysfs file here.
-> 
+On 6.16.4 kernel patched with last ROSE commit for refcount use 
+rose_remove_node() is causing refcount_t: underflow; use-after-free
 
-bond options code already returns EINVAL for values not described in the option's value
-table, after Jay removed "0" from there it should automatically cause -EINVAL to be returned
+List:       linux-stable-commits
+Subject:    Patch "net: rose: split remove and free operations in 
+rose_remove_neigh()" has been added to the 6.1
+From:       Sasha Levin <sashal () kernel ! org>
+Date:       2025-08-30 20:20:24
+Message-ID: 20250830202024.2485006-1-sashal () kernel ! org
 
+Bernard Pidoux
+F6BVP / AI7BG
+--------------7U161Bgr2AMYp5mcqPaG0la8
+Content-Type: text/plain; charset=UTF-8; name="slab-use-after-free"
+Content-Disposition: attachment; filename="slab-use-after-free"
+Content-Transfer-Encoding: base64
 
+77u/WzUwMzU1LjA3NzMyNV0gSGVyZSBJIGFtOiByb3NlX3JlbW92ZV9ub2RlOjIwOQpbNTAz
+NTUuMDc3Mzk2XSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT0KWzUwMzU1LjA3NzQxMV0gQlVHOiBLQVNBTjogc2xh
+Yi11c2UtYWZ0ZXItZnJlZSBpbiBsb2NrX3RpbWVyX2Jhc2UgKGtlcm5lbC90aW1lL3RpbWVy
+LmM6MTAwMCAoZGlzY3JpbWluYXRvciAyKSkgCls1MDM1NS4wNzc0NDddIFJlYWQgb2Ygc2l6
+ZSA0IGF0IGFkZHIgZmZmZjg4ODEzMzU2Nzk5OCBieSB0YXNrIGF4MjVpcGQvMjI0NwoKWzUw
+MzU1LjA3NzQ2OF0gQ1BVOiAxIFVJRDogMCBQSUQ6IDIyNDcgQ29tbTogYXgyNWlwZCBOb3Qg
+dGFpbnRlZCA2LjE2LjQtbG9jYWwtZGlydHkgIzMgUFJFRU1QVCh2b2x1bnRhcnkpCls1MDM1
+NS4wNzc0ODFdIEhhcmR3YXJlIG5hbWU6IFRvIGJlIGZpbGxlZCBieSBPLkUuTS4gVG8gYmUg
+ZmlsbGVkIGJ5IE8uRS5NLi9DSzMsIEJJT1MgNS4wMTEgMDkvMTYvMjAyMApbNTAzNTUuMDc3
+NDg2XSBDYWxsIFRyYWNlOgpbNTAzNTUuMDc3NDg5XSAgPFRBU0s+Cls1MDM1NS4wNzc0OTRd
+IGR1bXBfc3RhY2tfbHZsIChsaWIvZHVtcF9zdGFjay5jOjEyMykgCls1MDM1NS4wNzc1MTBd
+IHByaW50X3JlcG9ydCAobW0va2FzYW4vcmVwb3J0LmM6Mzc5IG1tL2thc2FuL3JlcG9ydC5j
+OjQ4MikgCls1MDM1NS4wNzc1MjNdID8gX19wZnhfX3Jhd19zcGluX2xvY2tfaXJxc2F2ZSAo
+a2VybmVsL2xvY2tpbmcvc3BpbmxvY2suYzoxNjEpIApbNTAzNTUuMDc3NTM1XSA/IHVucmVn
+aXN0ZXJfbmV0ZGV2aWNlX3F1ZXVlIChuZXQvY29yZS9kZXYuYzoxMTk5OCkgCls1MDM1NS4w
+Nzc1NDddID8ga2FzYW5fY29tcGxldGVfbW9kZV9yZXBvcnRfaW5mbyAobW0va2FzYW4vcmVw
+b3J0X2dlbmVyaWMuYzoxNzkgKGRpc2NyaW1pbmF0b3IgMTQpKSAKWzUwMzU1LjA3NzU2MV0g
+a2FzYW5fcmVwb3J0IChtbS9rYXNhbi9yZXBvcnQuYzo1OTcpIApbNTAzNTUuMDc3NTY3XSA/
+IGxvY2tfdGltZXJfYmFzZSAoa2VybmVsL3RpbWUvdGltZXIuYzoxMDAwIChkaXNjcmltaW5h
+dG9yIDIpKSAKWzUwMzU1LjA3NzU4MV0gPyBsb2NrX3RpbWVyX2Jhc2UgKGtlcm5lbC90aW1l
+L3RpbWVyLmM6MTAwMCAoZGlzY3JpbWluYXRvciAyKSkgCls1MDM1NS4wNzc1OTZdIF9fYXNh
+bl9yZXBvcnRfbG9hZDRfbm9hYm9ydCAobW0va2FzYW4vcmVwb3J0X2dlbmVyaWMuYzozODAp
+IApbNTAzNTUuMDc3NjA3XSBsb2NrX3RpbWVyX2Jhc2UgKGtlcm5lbC90aW1lL3RpbWVyLmM6
+MTAwMCAoZGlzY3JpbWluYXRvciAyKSkgCls1MDM1NS4wNzc2MThdIF9fdGltZXJfZGVsZXRl
+X3N5bmMgKGtlcm5lbC90aW1lL3RpbWVyLmM6MTQ2MSBrZXJuZWwvdGltZS90aW1lci5jOjE2
+MjApIApbNTAzNTUuMDc3NjI4XSA/IF9fcGZ4X19fdGltZXJfZGVsZXRlX3N5bmMgKGtlcm5l
+bC90aW1lL3RpbWVyLmM6MTU5MSkgCls1MDM1NS4wNzc2MzVdID8gX19rYXNhbl9zbGFiX2Zy
+ZWUgKG1tL2thc2FuL2NvbW1vbi5jOjI4MSkgCls1MDM1NS4wNzc2NDRdIHRpbWVyX2RlbGV0
+ZV9zeW5jIChrZXJuZWwvdGltZS90aW1lci5jOjE2NzYpIApbNTAzNTUuMDc3NjUzXSByb3Nl
+X3JlbW92ZV9uZWlnaCAobmV0L3Jvc2Uvcm9zZV9yb3V0ZS5jOjIzNykgcm9zZSAKWzUwMzU1
+LjA3NzY4M10gcm9zZV9ydF9kZXZpY2VfZG93biAoLi9pbmNsdWRlL2xpbnV4L2luc3RydW1l
+bnRlZC5oOjk2IC4vaW5jbHVkZS9saW51eC9hdG9taWMvYXRvbWljLWluc3RydW1lbnRlZC5o
+OjQwMCAuL2luY2x1ZGUvbGludXgvcmVmY291bnQuaDozODkgLi9pbmNsdWRlL2xpbnV4L3Jl
+ZmNvdW50Lmg6NDMyIC4vaW5jbHVkZS9saW51eC9yZWZjb3VudC5oOjQ1MCAuL2luY2x1ZGUv
+bmV0L3Jvc2UuaDoxNjIgbmV0L3Jvc2Uvcm9zZV9yb3V0ZS5jOjUyMCkgcm9zZSAKWzUwMzU1
+LjA3NzcwMF0gPyBfcmF3X3NwaW5fdW5sb2NrX2JoIChrZXJuZWwvbG9ja2luZy9zcGlubG9j
+ay5jOjIxMSkgCls1MDM1NS4wNzc3MTRdID8gcm9zZV9raWxsX2J5X25laWdoIChuZXQvcm9z
+ZS9hZl9yb3NlLmM6MTc4KSByb3NlIApbNTAzNTUuMDc3NzM1XSByb3NlX2RldmljZV9ldmVu
+dCAobmV0L3Jvc2UvYWZfcm9zZS5jOjI0OSkgcm9zZSAKWzUwMzU1LjA3Nzc1Ml0gbm90aWZp
+ZXJfY2FsbF9jaGFpbiAoa2VybmVsL25vdGlmaWVyLmM6ODcpIApbNTAzNTUuMDc3NzY2XSA/
+IG5sbXNnX25vdGlmeSAoLi9pbmNsdWRlL25ldC9uZXRsaW5rLmg6MTE1MSAuL2luY2x1ZGUv
+bmV0L25ldGxpbmsuaDoxMTcwIG5ldC9uZXRsaW5rL2FmX25ldGxpbmsuYzoyNTk1KSAKWzUw
+MzU1LjA3Nzc4M10gcmF3X25vdGlmaWVyX2NhbGxfY2hhaW4gKGtlcm5lbC9ub3RpZmllci5j
+OjQ1NCkgCls1MDM1NS4wNzc3OTddIGNhbGxfbmV0ZGV2aWNlX25vdGlmaWVyc19pbmZvIChu
+ZXQvY29yZS9kZXYuYzoyMjMxKSAKWzUwMzU1LjA3NzgxMl0gZGV2X2Nsb3NlX21hbnkgKG5l
+dC9jb3JlL2Rldi5jOjE3ODYpIApbNTAzNTUuMDc3ODE5XSA/IF9fcGZ4X3N0YWNrX3RyYWNl
+X2NvbnN1bWVfZW50cnkgKGtlcm5lbC9zdGFja3RyYWNlLmM6ODMpIApbNTAzNTUuMDc3ODI4
+XSA/IF9fcGZ4X2Rldl9jbG9zZV9tYW55IChuZXQvY29yZS9kZXYuYzoxNzczKSAKWzUwMzU1
+LjA3NzgzNl0gPyB1cGRhdGVfc3RhY2tfc3RhdGUgKC4vYXJjaC94ODYvaW5jbHVkZS9hc20v
+dW53aW5kLmg6MTExIChkaXNjcmltaW5hdG9yIDEpIC4vYXJjaC94ODYvaW5jbHVkZS9hc20v
+dW53aW5kLmg6MTI3IChkaXNjcmltaW5hdG9yIDEpIGFyY2gveDg2L2tlcm5lbC91bndpbmRf
+ZnJhbWUuYzoyNTMgKGRpc2NyaW1pbmF0b3IgMSkpIApbNTAzNTUuMDc3ODUwXSB1bnJlZ2lz
+dGVyX25ldGRldmljZV9tYW55X25vdGlmeSAobmV0L2NvcmUvZGV2LmM6MTIwNjEpIApbNTAz
+NTUuMDc3ODYyXSA/IF9fcGZ4X3VucmVnaXN0ZXJfbmV0ZGV2aWNlX21hbnlfbm90aWZ5IChu
+ZXQvY29yZS9kZXYuYzoxMjAxNikgCls1MDM1NS4wNzc4NzBdID8gaXNfYnBmX3RleHRfYWRk
+cmVzcyAoa2VybmVsL2JwZi9jb3JlLmM6NzczIChkaXNjcmltaW5hdG9yIDEpKSAKWzUwMzU1
+LjA3Nzg3OV0gPyBrZXJuZWxfdGV4dF9hZGRyZXNzIChrZXJuZWwvZXh0YWJsZS5jOjEyNSAo
+ZGlzY3JpbWluYXRvciAxKSBrZXJuZWwvZXh0YWJsZS5jOjk0IChkaXNjcmltaW5hdG9yIDEp
+KSAKWzUwMzU1LjA3Nzg5MV0gPyBfX2tlcm5lbF90ZXh0X2FkZHJlc3MgKGtlcm5lbC9leHRh
+YmxlLmM6NzkgKGRpc2NyaW1pbmF0b3IgMSkpIApbNTAzNTUuMDc3ODk5XSA/IHVud2luZF9n
+ZXRfcmV0dXJuX2FkZHJlc3MgKGFyY2gveDg2L2tlcm5lbC91bndpbmRfZnJhbWUuYzoxOSAo
+ZGlzY3JpbWluYXRvciAxKSkgCls1MDM1NS4wNzc5MDldID8gX19wZnhfc3RhY2tfdHJhY2Vf
+Y29uc3VtZV9lbnRyeSAoa2VybmVsL3N0YWNrdHJhY2UuYzo4MykgCls1MDM1NS4wNzc5MTdd
+ID8gYXJjaF9zdGFja193YWxrIChhcmNoL3g4Ni9rZXJuZWwvc3RhY2t0cmFjZS5jOjI2KSAK
+WzUwMzU1LjA3NzkzMV0gdW5yZWdpc3Rlcl9uZXRkZXZpY2VfcXVldWUgKG5ldC9jb3JlL2Rl
+di5jOjExOTk4KSAKWzUwMzU1LjA3Nzk0MV0gPyBfX3BmeF91bnJlZ2lzdGVyX25ldGRldmlj
+ZV9xdWV1ZSAobmV0L2NvcmUvZGV2LmM6MTE5ODcpIApbNTAzNTUuMDc3OTQ4XSA/IF9fa2Fz
+YW5fY2hlY2tfd3JpdGUgKG1tL2thc2FuL3NoYWRvdy5jOjM4KSAKWzUwMzU1LjA3Nzk1OV0g
+PyBydG5sX2xvY2sgKG5ldC9jb3JlL3J0bmV0bGluay5jOjgxKSAKWzUwMzU1LjA3Nzk3Ml0g
+dW5yZWdpc3Rlcl9uZXRkZXYgKC4vaW5jbHVkZS9uZXQvbmV0X25hbWVzcGFjZS5oOjQwOSAu
+L2luY2x1ZGUvbGludXgvbmV0ZGV2aWNlLmg6MjcxMyBuZXQvY29yZS9kZXYuYzoyMTU4IG5l
+dC9jb3JlL2Rldi5jOjEyMTcxKSAKWzUwMzU1LjA3Nzk3OV0gbWtpc3NfY2xvc2UgKGRyaXZl
+cnMvbmV0L2hhbXJhZGlvL21raXNzLmM6ODAwKSBta2lzcyAKWzUwMzU1LjA3Nzk5M10gdHR5
+X2xkaXNjX2Nsb3NlIChkcml2ZXJzL3R0eS90dHlfbGRpc2MuYzo0NTcpIApbNTAzNTUuMDc4
+MDAzXSB0dHlfbGRpc2NfaGFuZ3VwIChkcml2ZXJzL3R0eS90dHlfbGRpc2MuYzo2MTQgZHJp
+dmVycy90dHkvdHR5X2xkaXNjLmM6NzI5KSAKWzUwMzU1LjA3ODAxMl0gX190dHlfaGFuZ3Vw
+LnBhcnQuMCAoLi9pbmNsdWRlL2xpbnV4L3NwaW5sb2NrLmg6Mzc2IGRyaXZlcnMvdHR5L3R0
+eV9pby5jOjYyMykgCls1MDM1NS4wNzgwMjJdID8gbXV0ZXhfdW5sb2NrICguL2FyY2gveDg2
+L2luY2x1ZGUvYXNtL2F0b21pYzY0XzY0Lmg6MTAxIChkaXNjcmltaW5hdG9yIDUpIC4vaW5j
+bHVkZS9saW51eC9hdG9taWMvYXRvbWljLWFyY2gtZmFsbGJhY2suaDo0MzI5IChkaXNjcmlt
+aW5hdG9yIDUpIC4vaW5jbHVkZS9saW51eC9hdG9taWMvYXRvbWljLWxvbmcuaDoxNTA2IChk
+aXNjcmltaW5hdG9yIDUpIC4vaW5jbHVkZS9saW51eC9hdG9taWMvYXRvbWljLWluc3RydW1l
+bnRlZC5oOjQ0ODEgKGRpc2NyaW1pbmF0b3IgNSkga2VybmVsL2xvY2tpbmcvbXV0ZXguYzox
+NjcgKGRpc2NyaW1pbmF0b3IgNSkga2VybmVsL2xvY2tpbmcvbXV0ZXguYzo1MzcgKGRpc2Ny
+aW1pbmF0b3IgNSkpIApbNTAzNTUuMDc4MDM1XSB0dHlfdmhhbmd1cCAoZHJpdmVycy90dHkv
+dHR5X2lvLmM6NjkyKSAKWzUwMzU1LjA3ODA0NF0gcHR5X2Nsb3NlIChkcml2ZXJzL3R0eS9w
+dHkuYzo4MSkgCls1MDM1NS4wNzgwNTZdIHR0eV9yZWxlYXNlIChkcml2ZXJzL3R0eS90dHlf
+aW8uYzoxNzQ4KSAKWzUwMzU1LjA3ODA2M10gPyBfX3BmeF9sb2Nrc19yZW1vdmVfZmlsZSAo
+ZnMvbG9ja3MuYzoyNjg2KSAKWzUwMzU1LjA3ODA3NF0gX19mcHV0IChmcy9maWxlX3RhYmxl
+LmM6NDY1KSAKWzUwMzU1LjA3ODA4NF0gPyBfcmF3X3NwaW5fbG9ja19pcnEgKC4vYXJjaC94
+ODYvaW5jbHVkZS9hc20vYXRvbWljLmg6MTA3IChkaXNjcmltaW5hdG9yIDQpIC4vaW5jbHVk
+ZS9saW51eC9hdG9taWMvYXRvbWljLWFyY2gtZmFsbGJhY2suaDoyMTcwIChkaXNjcmltaW5h
+dG9yIDQpIC4vaW5jbHVkZS9saW51eC9hdG9taWMvYXRvbWljLWluc3RydW1lbnRlZC5oOjEz
+MDIgKGRpc2NyaW1pbmF0b3IgNCkgLi9pbmNsdWRlL2FzbS1nZW5lcmljL3FzcGlubG9jay5o
+OjExMSAoZGlzY3JpbWluYXRvciA0KSAuL2luY2x1ZGUvbGludXgvc3BpbmxvY2suaDoxODcg
+KGRpc2NyaW1pbmF0b3IgNCkgLi9pbmNsdWRlL2xpbnV4L3NwaW5sb2NrX2FwaV9zbXAuaDox
+MjAgKGRpc2NyaW1pbmF0b3IgNCkga2VybmVsL2xvY2tpbmcvc3BpbmxvY2suYzoxNzAgKGRp
+c2NyaW1pbmF0b3IgNCkpIApbNTAzNTUuMDc4MDkyXSA/IF9fcGZ4X19yYXdfc3Bpbl9sb2Nr
+X2lycSAoa2VybmVsL2xvY2tpbmcvc3BpbmxvY2suYzoxNjkpIApbNTAzNTUuMDc4MTAyXSBf
+X19fZnB1dCAoZnMvZmlsZV90YWJsZS5jOjQ5NCkgCls1MDM1NS4wNzgxMTBdIHRhc2tfd29y
+a19ydW4gKGtlcm5lbC90YXNrX3dvcmsuYzoyMjgpIApbNTAzNTUuMDc4MTE5XSA/IF9fcGZ4
+X3Rhc2tfd29ya19ydW4gKGtlcm5lbC90YXNrX3dvcmsuYzoxOTUpIApbNTAzNTUuMDc4MTI4
+XSBkb19leGl0IChrZXJuZWwvZXhpdC5jOjk2NSkgCls1MDM1NS4wNzgxNDBdID8gZG9fd3Bf
+cGFnZSAobW0vbWVtb3J5LmM6NDAxNykgCls1MDM1NS4wNzgxNTNdID8gX19wZnhfZG9fZXhp
+dCAoa2VybmVsL2V4aXQuYzo4OTcpIApbNTAzNTUuMDc4MTY1XSA/IF9fcGZ4X3phcF9vdGhl
+cl90aHJlYWRzIChrZXJuZWwvc2lnbmFsLmM6MTMzOCkgCls1MDM1NS4wNzgxNzJdID8gX19w
+ZnhfZG9fd3BfcGFnZSAobW0vbWVtb3J5LmM6Mzk0MCkgCls1MDM1NS4wNzgxODJdIGRvX2dy
+b3VwX2V4aXQgKGtlcm5lbC9leGl0LmM6MTA4NikgCls1MDM1NS4wNzgxOTJdIF9feDY0X3N5
+c19leGl0X2dyb3VwIChrZXJuZWwvZXhpdC5jOjExMTQpIApbNTAzNTUuMDc4MjAwXSB4NjRf
+c3lzX2NhbGwgKGFyY2gveDg2L2VudHJ5L3N5c2NhbGxfNjQuYzozNykgCls1MDM1NS4wNzgy
+MDldIGRvX3N5c2NhbGxfNjQgKGFyY2gveDg2L2VudHJ5L3N5c2NhbGxfNjQuYzo2MyAoZGlz
+Y3JpbWluYXRvciAxKSBhcmNoL3g4Ni9lbnRyeS9zeXNjYWxsXzY0LmM6OTQgKGRpc2NyaW1p
+bmF0b3IgMSkpIApbNTAzNTUuMDc4MjE5XSA/IF9faGFuZGxlX21tX2ZhdWx0IChtbS9tZW1v
+cnkuYzo2MDg1IG1tL21lbW9yeS5jOjYyMTIpIApbNTAzNTUuMDc4MjI3XSA/IF9fcGZ4X19f
+aGFuZGxlX21tX2ZhdWx0IChtbS9tZW1vcnkuYzo2MTIxKSAKWzUwMzU1LjA3ODIzNV0gPyBf
+X2thc2FuX2NoZWNrX3JlYWQgKG1tL2thc2FuL3NoYWRvdy5jOjMyKSAKWzUwMzU1LjA3ODI0
+M10gPyBjb3VudF9tZW1jZ19ldmVudHMgKC4vYXJjaC94ODYvaW5jbHVkZS9hc20vYXRvbWlj
+Lmg6MjMgLi9pbmNsdWRlL2xpbnV4L2F0b21pYy9hdG9taWMtYXJjaC1mYWxsYmFjay5oOjQ1
+NyAuL2luY2x1ZGUvbGludXgvYXRvbWljL2F0b21pYy1pbnN0cnVtZW50ZWQuaDozMyBtbS9t
+ZW1jb250cm9sLmM6NTYwIG1tL21lbWNvbnRyb2wuYzo1ODUgbW0vbWVtY29udHJvbC5jOjU2
+NCBtbS9tZW1jb250cm9sLmM6ODQ4KSAKWzUwMzU1LjA3ODI1NF0gPyBoYW5kbGVfbW1fZmF1
+bHQgKG1tL21lbW9yeS5jOjYyNTQgbW0vbWVtb3J5LmM6NjQwNykgCls1MDM1NS4wNzgyNjVd
+ID8gX19rYXNhbl9jaGVja19yZWFkIChtbS9rYXNhbi9zaGFkb3cuYzozMikgCls1MDM1NS4w
+NzgyNzRdID8gZnByZWdzX2Fzc2VydF9zdGF0ZV9jb25zaXN0ZW50ICguL2FyY2gveDg2L2lu
+Y2x1ZGUvYXNtL2JpdG9wcy5oOjIwNiAoZGlzY3JpbWluYXRvciAxKSAuL2FyY2gveDg2L2lu
+Y2x1ZGUvYXNtL2JpdG9wcy5oOjIzOCAoZGlzY3JpbWluYXRvciAxKSAuL2luY2x1ZGUvYXNt
+LWdlbmVyaWMvYml0b3BzL2luc3RydW1lbnRlZC1ub24tYXRvbWljLmg6MTQyIChkaXNjcmlt
+aW5hdG9yIDEpIC4vaW5jbHVkZS9saW51eC90aHJlYWRfaW5mby5oOjEyNiAoZGlzY3JpbWlu
+YXRvciAxKSBhcmNoL3g4Ni9rZXJuZWwvZnB1L2NvcmUuYzo4NjIgKGRpc2NyaW1pbmF0b3Ig
+MSkpIApbNTAzNTUuMDc4Mjg2XSA/IGlycWVudHJ5X2V4aXRfdG9fdXNlcl9tb2RlICguL2Fy
+Y2gveDg2L2luY2x1ZGUvYXNtL2VudHJ5LWNvbW1vbi5oOjY1IChkaXNjcmltaW5hdG9yIDEp
+IC4vaW5jbHVkZS9saW51eC9lbnRyeS1jb21tb24uaDozMzIgKGRpc2NyaW1pbmF0b3IgMSkg
+a2VybmVsL2VudHJ5L2NvbW1vbi5jOjE4NCAoZGlzY3JpbWluYXRvciAxKSkgCls1MDM1NS4w
+NzgyOThdID8gaXJxZW50cnlfZXhpdCAoa2VybmVsL2VudHJ5L2NvbW1vbi5jOjMyMCkgCls1
+MDM1NS4wNzgzMDhdID8gZXhjX3BhZ2VfZmF1bHQgKGFyY2gveDg2L21tL2ZhdWx0LmM6MTUz
+NikgCls1MDM1NS4wNzgzMTZdIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSAoYXJj
+aC94ODYvZW50cnkvZW50cnlfNjQuUzoxMzApIApbNTAzNTUuMDc4MzI2XSBSSVA6IDAwMzM6
+MHg3NmUwOGIwZWUyMWQKWzUwMzU1LjA3ODMzNV0gQ29kZTogVW5hYmxlIHRvIGFjY2VzcyBv
+cGNvZGUgYnl0ZXMgYXQgMHg3NmUwOGIwZWUxZjMuCgpDb2RlIHN0YXJ0aW5nIHdpdGggdGhl
+IGZhdWx0aW5nIGluc3RydWN0aW9uCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT0KWzUwMzU1LjA3ODM0MF0gUlNQOiAwMDJiOjAwMDA3ZmZkY2YwOGRhNzgg
+RUZMQUdTOiAwMDAwMDIwNiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDBlNwpbNTAzNTUuMDc4
+MzUyXSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwNzZlMDhiMjA0ZmE4IFJDWDog
+MDAwMDc2ZTA4YjBlZTIxZApbNTAzNTUuMDc4MzU3XSBSRFg6IDAwMDAwMDAwMDAwMDAwZTcg
+UlNJOiBmZmZmZmZmZmZmZmZmZjg4IFJESTogMDAwMDAwMDAwMDAwMDAwMQpbNTAzNTUuMDc4
+MzYxXSBSQlA6IDAwMDA3ZmZkY2YwOGRhZDAgUjA4OiAwMDAwN2ZmZGNmMDhkYTE4IFIwOTog
+MDAwMDAwMDAwMDAwMDAwMApbNTAzNTUuMDc4MzY2XSBSMTA6IDAwMDA3ZmZkY2YwOGQ5OGYg
+UjExOiAwMDAwMDAwMDAwMDAwMjA2IFIxMjogMDAwMDAwMDAwMDAwMDAwMQpbNTAzNTUuMDc4
+MzcxXSBSMTM6IDAwMDAwMDAwMDAwMDAwMDAgUjE0OiAwMDAwMDAwMDAwMDAwMDAxIFIxNTog
+MDAwMDc2ZTA4YjIwNGZjMApbNTAzNTUuMDc4MzgwXSAgPC9UQVNLPgoKWzUwMzU1LjA3ODYx
+MV0gQWxsb2NhdGVkIGJ5IHRhc2sgMjM3NiBvbiBjcHUgMSBhdCA4MC4wMTk2ODZzOgpbNTAz
+NTUuMDc4NjI1XSBrYXNhbl9zYXZlX3N0YWNrIChtbS9rYXNhbi9jb21tb24uYzo0OCkgCls1
+MDM1NS4wNzg2NDhdIGthc2FuX3NhdmVfdHJhY2sgKG1tL2thc2FuL2NvbW1vbi5jOjY4KSAK
+WzUwMzU1LjA3ODY1OV0ga2FzYW5fc2F2ZV9hbGxvY19pbmZvIChtbS9rYXNhbi9nZW5lcmlj
+LmM6NTYzKSAKWzUwMzU1LjA3ODY3Ml0gX19rYXNhbl9rbWFsbG9jIChtbS9rYXNhbi9jb21t
+b24uYzozNzcgbW0va2FzYW4vY29tbW9uLmM6Mzk0KSAKWzUwMzU1LjA3ODY4NF0gX19rbWFs
+bG9jX2NhY2hlX25vcHJvZiAobW0vc2x1Yi5jOjQzNjYpIApbNTAzNTUuMDc4NzA1XSByb3Nl
+X3J0X2lvY3RsICguL2luY2x1ZGUvbGludXgvc2xhYi5oOjkwNSBuZXQvcm9zZS9yb3NlX3Jv
+dXRlLmM6ODUgbmV0L3Jvc2Uvcm9zZV9yb3V0ZS5jOjc2MCkgcm9zZSAKWzUwMzU1LjA3ODcz
+MV0gcm9zZV9pb2N0bCAobmV0L3Jvc2UvYWZfcm9zZS5jOjEzODcpIHJvc2UgCls1MDM1NS4w
+Nzg3NDddIHNvY2tfZG9faW9jdGwgKG5ldC9zb2NrZXQuYzoxMTk4KSAKWzUwMzU1LjA3ODc2
+NF0gc29ja19pb2N0bCAobmV0L3NvY2tldC5jOjEzMTYpIApbNTAzNTUuMDc4NzcyXSBfX3g2
+NF9zeXNfaW9jdGwgKGZzL2lvY3RsLmM6NTIgZnMvaW9jdGwuYzo5MDcgZnMvaW9jdGwuYzo4
+OTMgZnMvaW9jdGwuYzo4OTMpIApbNTAzNTUuMDc4Nzg2XSB4NjRfc3lzX2NhbGwgKGFyY2gv
+eDg2L2VudHJ5L3N5c2NhbGxfNjQuYzo0MSkgCls1MDM1NS4wNzg4MDNdIGRvX3N5c2NhbGxf
+NjQgKGFyY2gveDg2L2VudHJ5L3N5c2NhbGxfNjQuYzo2MyAoZGlzY3JpbWluYXRvciAxKSBh
+cmNoL3g4Ni9lbnRyeS9zeXNjYWxsXzY0LmM6OTQgKGRpc2NyaW1pbmF0b3IgMSkpIApbNTAz
+NTUuMDc4ODE4XSBlbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJhbWUgKGFyY2gveDg2L2Vu
+dHJ5L2VudHJ5XzY0LlM6MTMwKSAKCls1MDM1NS4wNzg4MzNdIEZyZWVkIGJ5IHRhc2sgMjI0
+NyBvbiBjcHUgMSBhdCA1MDM1NS4wNzczOTNzOgpbNTAzNTUuMDc4ODQyXSBrYXNhbl9zYXZl
+X3N0YWNrIChtbS9rYXNhbi9jb21tb24uYzo0OCkgCls1MDM1NS4wNzg4NTZdIGthc2FuX3Nh
+dmVfdHJhY2sgKG1tL2thc2FuL2NvbW1vbi5jOjY4KSAKWzUwMzU1LjA3ODg2Ml0ga2FzYW5f
+c2F2ZV9mcmVlX2luZm8gKG1tL2thc2FuL2dlbmVyaWMuYzo1NzkgKGRpc2NyaW1pbmF0b3Ig
+MSkpIApbNTAzNTUuMDc4ODcxXSBfX2thc2FuX3NsYWJfZnJlZSAobW0va2FzYW4vY29tbW9u
+LmM6MjcxKSAKWzUwMzU1LjA3ODg3OV0ga2ZyZWUgKG1tL3NsdWIuYzo0NjQ4IChkaXNjcmlt
+aW5hdG9yIDMpIG1tL3NsdWIuYzo0ODQ3IChkaXNjcmltaW5hdG9yIDMpKSAKWzUwMzU1LjA3
+ODg5M10gcm9zZV9ydF9kZXZpY2VfZG93biAoLi9pbmNsdWRlL25ldC9yb3NlLmg6MTY2IC4v
+aW5jbHVkZS9uZXQvcm9zZS5oOjE2MCBuZXQvcm9zZS9yb3NlX3JvdXRlLmM6NTEyKSByb3Nl
+IApbNTAzNTUuMDc4OTEwXSByb3NlX2RldmljZV9ldmVudCAobmV0L3Jvc2UvYWZfcm9zZS5j
+OjI0OSkgcm9zZSAKWzUwMzU1LjA3ODkyM10gbm90aWZpZXJfY2FsbF9jaGFpbiAoa2VybmVs
+L25vdGlmaWVyLmM6ODcpIApbNTAzNTUuMDc4OTM2XSByYXdfbm90aWZpZXJfY2FsbF9jaGFp
+biAoa2VybmVsL25vdGlmaWVyLmM6NDU0KSAKWzUwMzU1LjA3ODk0N10gY2FsbF9uZXRkZXZp
+Y2Vfbm90aWZpZXJzX2luZm8gKG5ldC9jb3JlL2Rldi5jOjIyMzEpIApbNTAzNTUuMDc4OTU3
+XSBkZXZfY2xvc2VfbWFueSAobmV0L2NvcmUvZGV2LmM6MTc4NikgCls1MDM1NS4wNzg5NjVd
+IHVucmVnaXN0ZXJfbmV0ZGV2aWNlX21hbnlfbm90aWZ5IChuZXQvY29yZS9kZXYuYzoxMjA2
+MSkgCls1MDM1NS4wNzg5NzNdIHVucmVnaXN0ZXJfbmV0ZGV2aWNlX3F1ZXVlIChuZXQvY29y
+ZS9kZXYuYzoxMTk5OCkgCls1MDM1NS4wNzg5ODJdIHVucmVnaXN0ZXJfbmV0ZGV2ICguL2lu
+Y2x1ZGUvbmV0L25ldF9uYW1lc3BhY2UuaDo0MDkgLi9pbmNsdWRlL2xpbnV4L25ldGRldmlj
+ZS5oOjI3MTMgbmV0L2NvcmUvZGV2LmM6MjE1OCBuZXQvY29yZS9kZXYuYzoxMjE3MSkgCls1
+MDM1NS4wNzg5ODldIG1raXNzX2Nsb3NlIChkcml2ZXJzL25ldC9oYW1yYWRpby9ta2lzcy5j
+OjgwMCkgbWtpc3MgCls1MDM1NS4wNzg5OTldIHR0eV9sZGlzY19jbG9zZSAoZHJpdmVycy90
+dHkvdHR5X2xkaXNjLmM6NDU3KSAKWzUwMzU1LjA3OTAwOF0gdHR5X2xkaXNjX2hhbmd1cCAo
+ZHJpdmVycy90dHkvdHR5X2xkaXNjLmM6NjE0IGRyaXZlcnMvdHR5L3R0eV9sZGlzYy5jOjcy
+OSkgCls1MDM1NS4wNzkwMTRdIF9fdHR5X2hhbmd1cC5wYXJ0LjAgKC4vaW5jbHVkZS9saW51
+eC9zcGlubG9jay5oOjM3NiBkcml2ZXJzL3R0eS90dHlfaW8uYzo2MjMpIApbNTAzNTUuMDc5
+MDI2XSB0dHlfdmhhbmd1cCAoZHJpdmVycy90dHkvdHR5X2lvLmM6NjkyKSAKWzUwMzU1LjA3
+OTAzNF0gcHR5X2Nsb3NlIChkcml2ZXJzL3R0eS9wdHkuYzo4MSkgCls1MDM1NS4wNzkwNDZd
+IHR0eV9yZWxlYXNlIChkcml2ZXJzL3R0eS90dHlfaW8uYzoxNzQ4KSAKWzUwMzU1LjA3OTA1
+M10gX19mcHV0IChmcy9maWxlX3RhYmxlLmM6NDY1KSAKWzUwMzU1LjA3OTA2Nl0gX19fX2Zw
+dXQgKGZzL2ZpbGVfdGFibGUuYzo0OTQpIApbNTAzNTUuMDc5MDc2XSB0YXNrX3dvcmtfcnVu
+IChrZXJuZWwvdGFza193b3JrLmM6MjI4KSAKWzUwMzU1LjA3OTA4N10gZG9fZXhpdCAoa2Vy
+bmVsL2V4aXQuYzo5NjUpIApbNTAzNTUuMDc5MDk2XSBkb19ncm91cF9leGl0IChrZXJuZWwv
+ZXhpdC5jOjEwODYpIApbNTAzNTUuMDc5MTAzXSBfX3g2NF9zeXNfZXhpdF9ncm91cCAoa2Vy
+bmVsL2V4aXQuYzoxMTE0KSAKWzUwMzU1LjA3OTExM10geDY0X3N5c19jYWxsIChhcmNoL3g4
+Ni9lbnRyeS9zeXNjYWxsXzY0LmM6MzcpIApbNTAzNTUuMDc5MTI3XSBkb19zeXNjYWxsXzY0
+IChhcmNoL3g4Ni9lbnRyeS9zeXNjYWxsXzY0LmM6NjMgKGRpc2NyaW1pbmF0b3IgMSkgYXJj
+aC94ODYvZW50cnkvc3lzY2FsbF82NC5jOjk0IChkaXNjcmltaW5hdG9yIDEpKSAKWzUwMzU1
+LjA3OTE0MF0gZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lIChhcmNoL3g4Ni9lbnRy
+eS9lbnRyeV82NC5TOjEzMCkgCgpbNTAzNTUuMDc5MTU2XSBUaGUgYnVnZ3kgYWRkcmVzcyBi
+ZWxvbmdzIHRvIHRoZSBvYmplY3QgYXQgZmZmZjg4ODEzMzU2NzkwMAp3aGljaCBiZWxvbmdz
+IHRvIHRoZSBjYWNoZSBrbWFsbG9jLXJuZC0xNS0xOTIgb2Ygc2l6ZSAxOTIKWzUwMzU1LjA3
+OTE2NV0gVGhlIGJ1Z2d5IGFkZHJlc3MgaXMgbG9jYXRlZCAxNTIgYnl0ZXMgaW5zaWRlIG9m
+CmZyZWVkIDE5Mi1ieXRlIHJlZ2lvbiBbZmZmZjg4ODEzMzU2NzkwMCwgZmZmZjg4ODEzMzU2
+NzljMCkKCls1MDM1NS4wNzkxNzhdIFRoZSBidWdneSBhZGRyZXNzIGJlbG9uZ3MgdG8gdGhl
+IHBoeXNpY2FsIHBhZ2U6Cls1MDM1NS4wNzkxODldIHBhZ2U6IHJlZmNvdW50OjAgbWFwY291
+bnQ6MCBtYXBwaW5nOjAwMDAwMDAwMDAwMDAwMDAgaW5kZXg6MHgwIHBmbjoweDEzMzU2Nwpb
+NTAzNTUuMDc5MjAxXSBrc20gZmxhZ3M6IDB4MTdmZmZmYzAwMDAwMDAobm9kZT0wfHpvbmU9
+MnxsYXN0Y3B1cGlkPTB4MWZmZmZmKQpbNTAzNTUuMDc5MjEzXSBwYWdlX3R5cGU6IGY1KHNs
+YWIpCls1MDM1NS4wNzkyMjVdIHJhdzogMDAxN2ZmZmZjMDAwMDAwMCBmZmZmODg4MTAwMDU5
+Y2MwIGZmZmZlYTAwMDRjNjAzODAgZGVhZDAwMDAwMDAwMDAwMwpbNTAzNTUuMDc5MjM0XSBy
+YXc6IDAwMDAwMDAwMDAwMDAwMDAgMDAwMDAwMDAwMDEwMDAxMCAwMDAwMDAwMGY1MDAwMDAw
+IDAwMDAwMDAwMDAwMDAwMDAKWzUwMzU1LjA3OTI0MF0gcGFnZSBkdW1wZWQgYmVjYXVzZTog
+a2FzYW46IGJhZCBhY2Nlc3MgZGV0ZWN0ZWQKCls1MDM1NS4wNzkyNTBdIE1lbW9yeSBzdGF0
+ZSBhcm91bmQgdGhlIGJ1Z2d5IGFkZHJlc3M6Cls1MDM1NS4wNzkyNTddICBmZmZmODg4MTMz
+NTY3ODgwOiAwMCAwMCAwMCBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBm
+YwpbNTAzNTUuMDc5MjY1XSAgZmZmZjg4ODEzMzU2NzkwMDogZmEgZmIgZmIgZmIgZmIgZmIg
+ZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIKWzUwMzU1LjA3OTI3Ml0gPmZmZmY4ODgx
+MzM1Njc5ODA6IGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZjIGZjIGZjIGZjIGZjIGZjIGZj
+IGZjCls1MDM1NS4wNzkyNzhdICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCls1MDM1
+NS4wNzkyODVdICBmZmZmODg4MTMzNTY3YTAwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMApbNTAzNTUuMDc5MjkyXSAgZmZmZjg4ODEzMzU2N2E4
+MDogMDAgMDAgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMKWzUw
+MzU1LjA3OTI5OF0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09Cls1MDM1NS4wNzkzMzVdIERpc2FibGluZyBsb2Nr
+IGRlYnVnZ2luZyBkdWUgdG8ga2VybmVsIHRhaW50Cls1MDM1NS4wNzkzNDVdIC0tLS0tLS0t
+LS0tLVsgY3V0IGhlcmUgXS0tLS0tLS0tLS0tLQpbNTAzNTUuMDc5MzUxXSByZWZjb3VudF90
+OiB1bmRlcmZsb3c7IHVzZS1hZnRlci1mcmVlLgpbNTAzNTUuMDc5Mzg5XSBXQVJOSU5HOiBD
+UFU6IDEgUElEOiAyMjQ3IGF0IGxpYi9yZWZjb3VudC5jOjI4IHJlZmNvdW50X3dhcm5fc2F0
+dXJhdGUgKGxpYi9yZWZjb3VudC5jOjI4IChkaXNjcmltaW5hdG9yIDEpKSAKWzUwMzU1LjA3
+OTQwNV0gTW9kdWxlcyBsaW5rZWQgaW46IG5ldHJvbSBta2lzcyByb3NlIGF4MjUgc25kX3Nl
+cV9kdW1teSBzbmRfaHJ0aW1lciBjbWFjIG5sc191dGY4IGNpZnMgY2lmc19hcmM0IG5sc191
+Y3MyX3V0aWxzIG5ldGZzIGNpZnNfbWQ0IHNuZF9oZGFfY29kZWNfaGRtaSB4ODZfcGtnX3Rl
+bXBfdGhlcm1hbCBpbnRlbF9wb3dlcmNsYW1wIGNvcmV0ZW1wIGk5MTUgcXJ0ciBrdm1faW50
+ZWwgc25kX2hkYV9jb2RlY19yZWFsdGVrIHNuZF9oZGFfY29kZWNfZ2VuZXJpYyBrdm0gc25k
+X2hkYV9zY29kZWNfY29tcG9uZW50IHNuZF9oZGFfaW50ZWwgc25kX2ludGVsX2RzcGNmZyBz
+bmRfaGRhX2NvZGVjIHNwaV9ub3Igc25kX2h3ZGVwIHNuZF9oZGFfY29yZSBtdGQgc25kX3Bj
+bSBhdDI0IG1laV9oZGNwIG1laV9weHAgc3BpX2ludGVsX3BsYXRmb3JtIHNwaV9pbnRlbCBp
+bnRlbF9yYXBsX21zciBpcnFieXBhc3Mgc25kX3NlcSBwb2x5dmFsX2NsbXVsbmkgZ2hhc2hf
+Y2xtdWxuaV9pbnRlbCBhZXNuaV9pbnRlbCBiaW5mbXRfbWlzYyBzbmRfc2VxX2RldmljZSBy
+YXBsIGkyY19hbGdvX2JpdCBwcm9jZXNzb3JfdGhlcm1hbF9kZXZpY2VfcGNpX2xlZ2FjeSBk
+cm1fYnVkZHkgaW50ZWxfc29jX2R0c19pb3NmIGludGVsX2NzdGF0ZSB0dG0gcHJvY2Vzc29y
+X3RoZXJtYWxfZGV2aWNlIHByb2Nlc3Nvcl90aGVybWFsX3d0X2hpbnQgc25kX3RpbWVyIGky
+Y19pODAxIHBsYXRmb3JtX3RlbXBlcmF0dXJlX2NvbnRyb2wgaTJjX3NtYnVzIHNuZCBwcm9j
+ZXNzb3JfdGhlcm1hbF9yZmltIGludGVsX3BjaF90aGVybWFsIG1laV9tZSBwcm9jZXNzb3Jf
+dGhlcm1hbF9yYXBsIGxwY19pY2ggaW50ZWxfcmFwbF9jb21tb24gc291bmRjb3JlIG1laSBk
+cm1fZGlzcGxheV9oZWxwZXIgcHJvY2Vzc29yX3RoZXJtYWxfd3RfcmVxIGludGVsX3BtY19j
+b3JlIHByb2Nlc3Nvcl90aGVybWFsX3Bvd2VyX2Zsb29yIHByb2Nlc3Nvcl90aGVybWFsX21i
+b3ggaW50MzQweF90aGVybWFsX3pvbmUgcG10X3RlbGVtZXRyeSBwbXRfY2xhc3MKWzUwMzU1
+LjA3OTY3NV0gIGludGVsX3BtY19zc3JhbV90ZWxlbWV0cnkgdmlkZW8gYWNwaV9wYWQgd21p
+IGludGVsX3ZzZWMgbmxzX2lzbzg4NTlfMSBpbnB1dF9sZWRzIG1hY19oaWQgc2NoX2ZxX2Nv
+ZGVsIG1zciBwYXJwb3J0X3BjIHBwZGV2IGxwIHBhcnBvcnQgZWZpX3BzdG9yZSBuZm5ldGxp
+bmsgZG1pX3N5c2ZzIGF1dG9mczQgcjgxNjkgYWhjaSByZWFsdGVrIGxpYmFoY2kgaGlkX2dl
+bmVyaWMgdXNiaGlkIGhpZCB1YXMgdXNiX3N0b3JhZ2UgW2xhc3QgdW5sb2FkZWQ6IG1raXNz
+XQpbNTAzNTUuMDc5NzgzXSBDUFU6IDEgVUlEOiAwIFBJRDogMjI0NyBDb21tOiBheDI1aXBk
+IFRhaW50ZWQ6IEcgICAgQiAgICAgICAgICAgICAgIDYuMTYuNC1sb2NhbC1kaXJ0eSAjMyBQ
+UkVFTVBUKHZvbHVudGFyeSkKWzUwMzU1LjA3OTc5OF0gVGFpbnRlZDogW0JdPUJBRF9QQUdF
+Cls1MDM1NS4wNzk4MDRdIEhhcmR3YXJlIG5hbWU6IFRvIGJlIGZpbGxlZCBieSBPLkUuTS4g
+VG8gYmUgZmlsbGVkIGJ5IE8uRS5NLi9DSzMsIEJJT1MgNS4wMTEgMDkvMTYvMjAyMApbNTAz
+NTUuMDc5ODExXSBSSVA6IDAwMTA6cmVmY291bnRfd2Fybl9zYXR1cmF0ZSAobGliL3JlZmNv
+dW50LmM6MjggKGRpc2NyaW1pbmF0b3IgMSkpIApbNTAzNTUuMDc5ODIxXSBDb2RlOiBlYiA5
+NyAwZiBiNiAxZCA3NSA3MyA4ZCAwMyA4MCBmYiAwMSAwZiA4NyBmZSA4MCA4MSBmZSA4MyBl
+MyAwMSA3NSA4MiA0OCBjNyBjNyA0MCA1MSBhYyBiMyBjNiAwNSA1OSA3MyA4ZCAwMyAwMSBl
+OCA1MiBjMCBhYSBmZSA8MGY+IDBiIGU5IDY4IGZmIGZmIGZmIDBmIGI2IDFkIDQ3IDczIDhk
+IDAzIDgwIGZiIDAxIDBmIDg3IGJiIDgwIDgxCkFsbCBjb2RlCj09PT09PT09CiAgIDA6CWVi
+IDk3ICAgICAgICAgICAgICAgIAlqbXAgICAgMHhmZmZmZmZmZmZmZmZmZjk5CiAgIDI6CTBm
+IGI2IDFkIDc1IDczIDhkIDAzIAltb3Z6YmwgMHgzOGQ3Mzc1KCVyaXApLCVlYnggICAgICAg
+ICMgMHgzOGQ3MzdlCiAgIDk6CTgwIGZiIDAxICAgICAgICAgICAgIAljbXAgICAgJDB4MSwl
+YmwKICAgYzoJMGYgODcgZmUgODAgODEgZmUgICAgCWphICAgICAweGZmZmZmZmZmZmU4MTgx
+MTAKICAxMjoJODMgZTMgMDEgICAgICAgICAgICAgCWFuZCAgICAkMHgxLCVlYngKICAxNToJ
+NzUgODIgICAgICAgICAgICAgICAgCWpuZSAgICAweGZmZmZmZmZmZmZmZmZmOTkKICAxNzoJ
+NDggYzcgYzcgNDAgNTEgYWMgYjMgCW1vdiAgICAkMHhmZmZmZmZmZmIzYWM1MTQwLCVyZGkK
+ICAxZToJYzYgMDUgNTkgNzMgOGQgMDMgMDEgCW1vdmIgICAkMHgxLDB4MzhkNzM1OSglcmlw
+KSAgICAgICAgIyAweDM4ZDczN2UKICAyNToJZTggNTIgYzAgYWEgZmUgICAgICAgCWNhbGwg
+ICAweGZmZmZmZmZmZmVhYWMwN2MKICAyYToqCTBmIDBiICAgICAgICAgICAgICAgIAl1ZDIJ
+CTwtLSB0cmFwcGluZyBpbnN0cnVjdGlvbgogIDJjOgllOSA2OCBmZiBmZiBmZiAgICAgICAJ
+am1wICAgIDB4ZmZmZmZmZmZmZmZmZmY5OQogIDMxOgkwZiBiNiAxZCA0NyA3MyA4ZCAwMyAJ
+bW92emJsIDB4MzhkNzM0NyglcmlwKSwlZWJ4ICAgICAgICAjIDB4MzhkNzM3ZgogIDM4Ogk4
+MCBmYiAwMSAgICAgICAgICAgICAJY21wICAgICQweDEsJWJsCiAgM2I6CTBmICAgICAgICAg
+ICAgICAgICAgIAkuYnl0ZSAweGYKICAzYzoJODcgICAgICAgICAgICAgICAgICAgCS5ieXRl
+IDB4ODcKICAzZDoJYmIgICAgICAgICAgICAgICAgICAgCS5ieXRlIDB4YmIKICAzZToJODAg
+ICAgICAgICAgICAgICAgICAgCS5ieXRlIDB4ODAKICAzZjoJODEgICAgICAgICAgICAgICAg
+ICAgCS5ieXRlIDB4ODEKCkNvZGUgc3RhcnRpbmcgd2l0aCB0aGUgZmF1bHRpbmcgaW5zdHJ1
+Y3Rpb24KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAw
+OgkwZiAwYiAgICAgICAgICAgICAgICAJdWQyCiAgIDI6CWU5IDY4IGZmIGZmIGZmICAgICAg
+IAlqbXAgICAgMHhmZmZmZmZmZmZmZmZmZjZmCiAgIDc6CTBmIGI2IDFkIDQ3IDczIDhkIDAz
+IAltb3Z6YmwgMHgzOGQ3MzQ3KCVyaXApLCVlYnggICAgICAgICMgMHgzOGQ3MzU1CiAgIGU6
+CTgwIGZiIDAxICAgICAgICAgICAgIAljbXAgICAgJDB4MSwlYmwKICAxMToJMGYgICAgICAg
+ICAgICAgICAgICAgCS5ieXRlIDB4ZgogIDEyOgk4NyAgICAgICAgICAgICAgICAgICAJLmJ5
+dGUgMHg4NwogIDEzOgliYiAgICAgICAgICAgICAgICAgICAJLmJ5dGUgMHhiYgogIDE0Ogk4
+MCAgICAgICAgICAgICAgICAgICAJLmJ5dGUgMHg4MAogIDE1Ogk4MSAgICAgICAgICAgICAg
+ICAgICAJLmJ5dGUgMHg4MQpbNTAzNTUuMDc5ODMxXSBSU1A6IDAwMTg6ZmZmZjg4ODExNDBj
+ZjM3MCBFRkxBR1M6IDAwMDEwMjQ2Cls1MDM1NS4wNzk4NDJdIFJBWDogMDAwMDAwMDAwMDAw
+MDAwMCBSQlg6IDAwMDAwMDAwMDAwMDAwMDAgUkNYOiAwMDAwMDAwMDAwMDAwMDAwCls1MDM1
+NS4wNzk4NDldIFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IDAwMDAwMDAwMDAwMDAwMDAg
+UkRJOiAwMDAwMDAwMDAwMDAwMDAwCls1MDM1NS4wNzk4NTZdIFJCUDogZmZmZjg4ODExNDBj
+ZjM4MCBSMDg6IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiAwMDAwMDAwMDAwMDAwMDAwCls1MDM1
+NS4wNzk4NjRdIFIxMDogMDAwMDAwMDAwMDAwMDAwMCBSMTE6IDAwMDAwMDAwMDAwMDAwMDAg
+UjEyOiAwMDAwMDAwMDAwMDAwMDAzCls1MDM1NS4wNzk4NzFdIFIxMzogZmZmZjg4ODEyOGQ2
+N2EwMCBSMTQ6IGZmZmY4ODgxMmQ3ZTAwMDAgUjE1OiBmZmZmODg4MTMzNTY3OTAwCls1MDM1
+NS4wNzk4NzldIEZTOiAgMDAwMDAwMDAwMDAwMDAwMCgwMDAwKSBHUzpmZmZmODg4MjU5MmZk
+MDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDAKWzUwMzU1LjA3OTg4OF0gQ1M6ICAw
+MDEwIERTOiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMwpbNTAzNTUuMDc5
+ODk2XSBDUjI6IDAwMDA3NmUwOGIyNjUwMDggQ1IzOiAwMDAwMDAwMTFlOGJlMDA2IENSNDog
+MDAwMDAwMDAwMDE3MjZmMApbNTAzNTUuMDc5OTA0XSBDYWxsIFRyYWNlOgpbNTAzNTUuMDc5
+OTEwXSAgPFRBU0s+Cls1MDM1NS4wNzk5MTddIHJvc2VfcnRfZGV2aWNlX2Rvd24gKC4vaW5j
+bHVkZS9saW51eC9yZWZjb3VudC5oOjQwMCAuL2luY2x1ZGUvbGludXgvcmVmY291bnQuaDo0
+MzIgLi9pbmNsdWRlL2xpbnV4L3JlZmNvdW50Lmg6NDUwIC4vaW5jbHVkZS9uZXQvcm9zZS5o
+OjE2MiBuZXQvcm9zZS9yb3NlX3JvdXRlLmM6NTIwKSByb3NlIApbNTAzNTUuMDc5OTM3XSA/
+IF9yYXdfc3Bpbl91bmxvY2tfYmggKGtlcm5lbC9sb2NraW5nL3NwaW5sb2NrLmM6MjExKSAK
+WzUwMzU1LjA3OTk0OF0gPyByb3NlX2tpbGxfYnlfbmVpZ2ggKG5ldC9yb3NlL2FmX3Jvc2Uu
+YzoxNzgpIHJvc2UgCls1MDM1NS4wNzk5NjldIHJvc2VfZGV2aWNlX2V2ZW50IChuZXQvcm9z
+ZS9hZl9yb3NlLmM6MjQ5KSByb3NlIApbNTAzNTUuMDc5OTg2XSBub3RpZmllcl9jYWxsX2No
+YWluIChrZXJuZWwvbm90aWZpZXIuYzo4NykgCls1MDM1NS4wNzk5OThdID8gbmxtc2dfbm90
+aWZ5ICguL2luY2x1ZGUvbmV0L25ldGxpbmsuaDoxMTUxIC4vaW5jbHVkZS9uZXQvbmV0bGlu
+ay5oOjExNzAgbmV0L25ldGxpbmsvYWZfbmV0bGluay5jOjI1OTUpIApbNTAzNTUuMDgwMDEx
+XSByYXdfbm90aWZpZXJfY2FsbF9jaGFpbiAoa2VybmVsL25vdGlmaWVyLmM6NDU0KSAKWzUw
+MzU1LjA4MDAyMl0gY2FsbF9uZXRkZXZpY2Vfbm90aWZpZXJzX2luZm8gKG5ldC9jb3JlL2Rl
+di5jOjIyMzEpIApbNTAzNTUuMDgwMDM0XSBkZXZfY2xvc2VfbWFueSAobmV0L2NvcmUvZGV2
+LmM6MTc4NikgCls1MDM1NS4wODAwNDRdID8gX19wZnhfc3RhY2tfdHJhY2VfY29uc3VtZV9l
+bnRyeSAoa2VybmVsL3N0YWNrdHJhY2UuYzo4MykgCls1MDM1NS4wODAwNTVdID8gX19wZnhf
+ZGV2X2Nsb3NlX21hbnkgKG5ldC9jb3JlL2Rldi5jOjE3NzMpIApbNTAzNTUuMDgwMDY3XSA/
+IHVwZGF0ZV9zdGFja19zdGF0ZSAoLi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS91bndpbmQuaDox
+MTEgKGRpc2NyaW1pbmF0b3IgMSkgLi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS91bndpbmQuaDox
+MjcgKGRpc2NyaW1pbmF0b3IgMSkgYXJjaC94ODYva2VybmVsL3Vud2luZF9mcmFtZS5jOjI1
+MyAoZGlzY3JpbWluYXRvciAxKSkgCls1MDM1NS4wODAwODJdIHVucmVnaXN0ZXJfbmV0ZGV2
+aWNlX21hbnlfbm90aWZ5IChuZXQvY29yZS9kZXYuYzoxMjA2MSkgCls1MDM1NS4wODAwOTZd
+ID8gX19wZnhfdW5yZWdpc3Rlcl9uZXRkZXZpY2VfbWFueV9ub3RpZnkgKG5ldC9jb3JlL2Rl
+di5jOjEyMDE2KSAKWzUwMzU1LjA4MDEwN10gPyBpc19icGZfdGV4dF9hZGRyZXNzIChrZXJu
+ZWwvYnBmL2NvcmUuYzo3NzMgKGRpc2NyaW1pbmF0b3IgMSkpIApbNTAzNTUuMDgwMTE5XSA/
+IGtlcm5lbF90ZXh0X2FkZHJlc3MgKGtlcm5lbC9leHRhYmxlLmM6MTI1IChkaXNjcmltaW5h
+dG9yIDEpIGtlcm5lbC9leHRhYmxlLmM6OTQgKGRpc2NyaW1pbmF0b3IgMSkpIApbNTAzNTUu
+MDgwMTMxXSA/IF9fa2VybmVsX3RleHRfYWRkcmVzcyAoa2VybmVsL2V4dGFibGUuYzo3OSAo
+ZGlzY3JpbWluYXRvciAxKSkgCls1MDM1NS4wODAxNDFdID8gdW53aW5kX2dldF9yZXR1cm5f
+YWRkcmVzcyAoYXJjaC94ODYva2VybmVsL3Vud2luZF9mcmFtZS5jOjE5IChkaXNjcmltaW5h
+dG9yIDEpKSAKWzUwMzU1LjA4MDE1Ml0gPyBfX3BmeF9zdGFja190cmFjZV9jb25zdW1lX2Vu
+dHJ5IChrZXJuZWwvc3RhY2t0cmFjZS5jOjgzKSAKWzUwMzU1LjA4MDE2NV0gPyBhcmNoX3N0
+YWNrX3dhbGsgKGFyY2gveDg2L2tlcm5lbC9zdGFja3RyYWNlLmM6MjYpIApbNTAzNTUuMDgw
+MTg0XSB1bnJlZ2lzdGVyX25ldGRldmljZV9xdWV1ZSAobmV0L2NvcmUvZGV2LmM6MTE5OTgp
+IApbNTAzNTUuMDgwMTk3XSA/IF9fcGZ4X3VucmVnaXN0ZXJfbmV0ZGV2aWNlX3F1ZXVlIChu
+ZXQvY29yZS9kZXYuYzoxMTk4NykgCls1MDM1NS4wODAyMjFdID8gX19rYXNhbl9jaGVja193
+cml0ZSAobW0va2FzYW4vc2hhZG93LmM6MzgpIApbNTAzNTUuMDgwMjM1XSA/IHJ0bmxfbG9j
+ayAobmV0L2NvcmUvcnRuZXRsaW5rLmM6ODEpIApbNTAzNTUuMDgwMjUxXSB1bnJlZ2lzdGVy
+X25ldGRldiAoLi9pbmNsdWRlL25ldC9uZXRfbmFtZXNwYWNlLmg6NDA5IC4vaW5jbHVkZS9s
+aW51eC9uZXRkZXZpY2UuaDoyNzEzIG5ldC9jb3JlL2Rldi5jOjIxNTggbmV0L2NvcmUvZGV2
+LmM6MTIxNzEpIApbNTAzNTUuMDgwMjYyXSBta2lzc19jbG9zZSAoZHJpdmVycy9uZXQvaGFt
+cmFkaW8vbWtpc3MuYzo4MDApIG1raXNzIApbNTAzNTUuMDgwMjc2XSB0dHlfbGRpc2NfY2xv
+c2UgKGRyaXZlcnMvdHR5L3R0eV9sZGlzYy5jOjQ1NykgCls1MDM1NS4wODAyODhdIHR0eV9s
+ZGlzY19oYW5ndXAgKGRyaXZlcnMvdHR5L3R0eV9sZGlzYy5jOjYxNCBkcml2ZXJzL3R0eS90
+dHlfbGRpc2MuYzo3MjkpIApbNTAzNTUuMDgwMzAwXSBfX3R0eV9oYW5ndXAucGFydC4wICgu
+L2luY2x1ZGUvbGludXgvc3BpbmxvY2suaDozNzYgZHJpdmVycy90dHkvdHR5X2lvLmM6NjIz
+KSAKWzUwMzU1LjA4MDMxMF0gPyBtdXRleF91bmxvY2sgKC4vYXJjaC94ODYvaW5jbHVkZS9h
+c20vYXRvbWljNjRfNjQuaDoxMDEgKGRpc2NyaW1pbmF0b3IgNSkgLi9pbmNsdWRlL2xpbnV4
+L2F0b21pYy9hdG9taWMtYXJjaC1mYWxsYmFjay5oOjQzMjkgKGRpc2NyaW1pbmF0b3IgNSkg
+Li9pbmNsdWRlL2xpbnV4L2F0b21pYy9hdG9taWMtbG9uZy5oOjE1MDYgKGRpc2NyaW1pbmF0
+b3IgNSkgLi9pbmNsdWRlL2xpbnV4L2F0b21pYy9hdG9taWMtaW5zdHJ1bWVudGVkLmg6NDQ4
+MSAoZGlzY3JpbWluYXRvciA1KSBrZXJuZWwvbG9ja2luZy9tdXRleC5jOjE2NyAoZGlzY3Jp
+bWluYXRvciA1KSBrZXJuZWwvbG9ja2luZy9tdXRleC5jOjUzNyAoZGlzY3JpbWluYXRvciA1
+KSkgCls1MDM1NS4wODAzMjddIHR0eV92aGFuZ3VwIChkcml2ZXJzL3R0eS90dHlfaW8uYzo2
+OTIpIApbNTAzNTUuMDgwMzM3XSBwdHlfY2xvc2UgKGRyaXZlcnMvdHR5L3B0eS5jOjgxKSAK
+WzUwMzU1LjA4MDM1MF0gdHR5X3JlbGVhc2UgKGRyaXZlcnMvdHR5L3R0eV9pby5jOjE3NDgp
+IApbNTAzNTUuMDgwMzYxXSA/IF9fcGZ4X2xvY2tzX3JlbW92ZV9maWxlIChmcy9sb2Nrcy5j
+OjI2ODYpIApbNTAzNTUuMDgwMzc2XSBfX2ZwdXQgKGZzL2ZpbGVfdGFibGUuYzo0NjUpIApb
+NTAzNTUuMDgwMzg3XSA/IF9yYXdfc3Bpbl9sb2NrX2lycSAoLi9hcmNoL3g4Ni9pbmNsdWRl
+L2FzbS9hdG9taWMuaDoxMDcgKGRpc2NyaW1pbmF0b3IgNCkgLi9pbmNsdWRlL2xpbnV4L2F0
+b21pYy9hdG9taWMtYXJjaC1mYWxsYmFjay5oOjIxNzAgKGRpc2NyaW1pbmF0b3IgNCkgLi9p
+bmNsdWRlL2xpbnV4L2F0b21pYy9hdG9taWMtaW5zdHJ1bWVudGVkLmg6MTMwMiAoZGlzY3Jp
+bWluYXRvciA0KSAuL2luY2x1ZGUvYXNtLWdlbmVyaWMvcXNwaW5sb2NrLmg6MTExIChkaXNj
+cmltaW5hdG9yIDQpIC4vaW5jbHVkZS9saW51eC9zcGlubG9jay5oOjE4NyAoZGlzY3JpbWlu
+YXRvciA0KSAuL2luY2x1ZGUvbGludXgvc3BpbmxvY2tfYXBpX3NtcC5oOjEyMCAoZGlzY3Jp
+bWluYXRvciA0KSBrZXJuZWwvbG9ja2luZy9zcGlubG9jay5jOjE3MCAoZGlzY3JpbWluYXRv
+ciA0KSkgCls1MDM1NS4wODA0MDBdID8gX19wZnhfX3Jhd19zcGluX2xvY2tfaXJxIChrZXJu
+ZWwvbG9ja2luZy9zcGlubG9jay5jOjE2OSkgCls1MDM1NS4wODA0MTJdIF9fX19mcHV0IChm
+cy9maWxlX3RhYmxlLmM6NDk0KSAKWzUwMzU1LjA4MDQyM10gdGFza193b3JrX3J1biAoa2Vy
+bmVsL3Rhc2tfd29yay5jOjIyOCkgCls1MDM1NS4wODA0MzVdID8gX19wZnhfdGFza193b3Jr
+X3J1biAoa2VybmVsL3Rhc2tfd29yay5jOjE5NSkgCls1MDM1NS4wODA0NDldIGRvX2V4aXQg
+KGtlcm5lbC9leGl0LmM6OTY1KSAKWzUwMzU1LjA4MDQ2Ml0gPyBkb193cF9wYWdlIChtbS9t
+ZW1vcnkuYzo0MDE3KSAKWzUwMzU1LjA4MDQ3OF0gPyBfX3BmeF9kb19leGl0IChrZXJuZWwv
+ZXhpdC5jOjg5NykgCls1MDM1NS4wODA0ODhdID8gX19wZnhfemFwX290aGVyX3RocmVhZHMg
+KGtlcm5lbC9zaWduYWwuYzoxMzM4KSAKWzUwMzU1LjA4MDQ5OV0gPyBfX3BmeF9kb193cF9w
+YWdlIChtbS9tZW1vcnkuYzozOTQwKSAKWzUwMzU1LjA4MDUxM10gZG9fZ3JvdXBfZXhpdCAo
+a2VybmVsL2V4aXQuYzoxMDg2KSAKWzUwMzU1LjA4MDUyNV0gX194NjRfc3lzX2V4aXRfZ3Jv
+dXAgKGtlcm5lbC9leGl0LmM6MTExNCkgCls1MDM1NS4wODA1MzZdIHg2NF9zeXNfY2FsbCAo
+YXJjaC94ODYvZW50cnkvc3lzY2FsbF82NC5jOjM3KSAKWzUwMzU1LjA4MDU1MF0gZG9fc3lz
+Y2FsbF82NCAoYXJjaC94ODYvZW50cnkvc3lzY2FsbF82NC5jOjYzIChkaXNjcmltaW5hdG9y
+IDEpIGFyY2gveDg2L2VudHJ5L3N5c2NhbGxfNjQuYzo5NCAoZGlzY3JpbWluYXRvciAxKSkg
+Cls1MDM1NS4wODA1NjVdID8gX19oYW5kbGVfbW1fZmF1bHQgKG1tL21lbW9yeS5jOjYwODUg
+bW0vbWVtb3J5LmM6NjIxMikgCls1MDM1NS4wODA1NzldID8gX19wZnhfX19oYW5kbGVfbW1f
+ZmF1bHQgKG1tL21lbW9yeS5jOjYxMjEpIApbNTAzNTUuMDgwNTkzXSA/IF9fa2FzYW5fY2hl
+Y2tfcmVhZCAobW0va2FzYW4vc2hhZG93LmM6MzIpIApbNTAzNTUuMDgwNjA1XSA/IGNvdW50
+X21lbWNnX2V2ZW50cyAoLi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9hdG9taWMuaDoyMyAuL2lu
+Y2x1ZGUvbGludXgvYXRvbWljL2F0b21pYy1hcmNoLWZhbGxiYWNrLmg6NDU3IC4vaW5jbHVk
+ZS9saW51eC9hdG9taWMvYXRvbWljLWluc3RydW1lbnRlZC5oOjMzIG1tL21lbWNvbnRyb2wu
+Yzo1NjAgbW0vbWVtY29udHJvbC5jOjU4NSBtbS9tZW1jb250cm9sLmM6NTY0IG1tL21lbWNv
+bnRyb2wuYzo4NDgpIApbNTAzNTUuMDgwNjE5XSA/IGhhbmRsZV9tbV9mYXVsdCAobW0vbWVt
+b3J5LmM6NjI1NCBtbS9tZW1vcnkuYzo2NDA3KSAKWzUwMzU1LjA4MDYzMl0gPyBfX2thc2Fu
+X2NoZWNrX3JlYWQgKG1tL2thc2FuL3NoYWRvdy5jOjMyKSAKWzUwMzU1LjA4MDY0Ml0gPyBm
+cHJlZ3NfYXNzZXJ0X3N0YXRlX2NvbnNpc3RlbnQgKC4vYXJjaC94ODYvaW5jbHVkZS9hc20v
+Yml0b3BzLmg6MjA2IChkaXNjcmltaW5hdG9yIDEpIC4vYXJjaC94ODYvaW5jbHVkZS9hc20v
+Yml0b3BzLmg6MjM4IChkaXNjcmltaW5hdG9yIDEpIC4vaW5jbHVkZS9hc20tZ2VuZXJpYy9i
+aXRvcHMvaW5zdHJ1bWVudGVkLW5vbi1hdG9taWMuaDoxNDIgKGRpc2NyaW1pbmF0b3IgMSkg
+Li9pbmNsdWRlL2xpbnV4L3RocmVhZF9pbmZvLmg6MTI2IChkaXNjcmltaW5hdG9yIDEpIGFy
+Y2gveDg2L2tlcm5lbC9mcHUvY29yZS5jOjg2MiAoZGlzY3JpbWluYXRvciAxKSkgCls1MDM1
+NS4wODA2NTRdID8gaXJxZW50cnlfZXhpdF90b191c2VyX21vZGUgKC4vYXJjaC94ODYvaW5j
+bHVkZS9hc20vZW50cnktY29tbW9uLmg6NjUgKGRpc2NyaW1pbmF0b3IgMSkgLi9pbmNsdWRl
+L2xpbnV4L2VudHJ5LWNvbW1vbi5oOjMzMiAoZGlzY3JpbWluYXRvciAxKSBrZXJuZWwvZW50
+cnkvY29tbW9uLmM6MTg0IChkaXNjcmltaW5hdG9yIDEpKSAKWzUwMzU1LjA4MDY2OV0gPyBp
+cnFlbnRyeV9leGl0IChrZXJuZWwvZW50cnkvY29tbW9uLmM6MzIwKSAKWzUwMzU1LjA4MDY4
+MF0gPyBleGNfcGFnZV9mYXVsdCAoYXJjaC94ODYvbW0vZmF1bHQuYzoxNTM2KSAKWzUwMzU1
+LjA4MDY5MV0gZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lIChhcmNoL3g4Ni9lbnRy
+eS9lbnRyeV82NC5TOjEzMCkgCls1MDM1NS4wODA3MDNdIFJJUDogMDAzMzoweDc2ZTA4YjBl
+ZTIxZApbNTAzNTUuMDgwNzEzXSBDb2RlOiBVbmFibGUgdG8gYWNjZXNzIG9wY29kZSBieXRl
+cyBhdCAweDc2ZTA4YjBlZTFmMy4KCkNvZGUgc3RhcnRpbmcgd2l0aCB0aGUgZmF1bHRpbmcg
+aW5zdHJ1Y3Rpb24KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PQpbNTAzNTUuMDgwNzIwXSBSU1A6IDAwMmI6MDAwMDdmZmRjZjA4ZGE3OCBFRkxBR1M6IDAw
+MDAwMjA2IE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMGU3Cls1MDM1NS4wODA3MzRdIFJBWDog
+ZmZmZmZmZmZmZmZmZmZkYSBSQlg6IDAwMDA3NmUwOGIyMDRmYTggUkNYOiAwMDAwNzZlMDhi
+MGVlMjFkCls1MDM1NS4wODA3NDJdIFJEWDogMDAwMDAwMDAwMDAwMDBlNyBSU0k6IGZmZmZm
+ZmZmZmZmZmZmODggUkRJOiAwMDAwMDAwMDAwMDAwMDAxCls1MDM1NS4wODA3NTBdIFJCUDog
+MDAwMDdmZmRjZjA4ZGFkMCBSMDg6IDAwMDA3ZmZkY2YwOGRhMTggUjA5OiAwMDAwMDAwMDAw
+MDAwMDAwCls1MDM1NS4wODA3NTldIFIxMDogMDAwMDdmZmRjZjA4ZDk4ZiBSMTE6IDAwMDAw
+MDAwMDAwMDAyMDYgUjEyOiAwMDAwMDAwMDAwMDAwMDAxCls1MDM1NS4wODA3NjhdIFIxMzog
+MDAwMDAwMDAwMDAwMDAwMCBSMTQ6IDAwMDAwMDAwMDAwMDAwMDEgUjE1OiAwMDAwNzZlMDhi
+MjA0ZmMwCls1MDM1NS4wODA3ODJdICA8L1RBU0s+Cls1MDM1NS4wODA3ODhdIC0tLVsgZW5k
+IHRyYWNlIDAwMDAwMDAwMDAwMDAwMDAgXS0tLQpbNTAzNTUuMDgwNzk4XSBIZXJlIEkgYW06
+IHJvc2VfcmVtb3ZlX25vZGU6MjA5Cls1MDM1NS4wODA4MjZdIEhlcmUgSSBhbTogcm9zZV9y
+ZW1vdmVfbm9kZToyMDkKWzUwMzU3LjM1Mjc4NV0gTkVUOiBVbnJlZ2lzdGVyZWQgUEZfTkVU
+Uk9NIHByb3RvY29sIGZhbWlseQpyb290QHVidW50dS1mNmJ2cDovbWVkaWEvdWRpc2svaG9t
+ZS9iZXJuYXJkIwoNCg==
+
+--------------7U161Bgr2AMYp5mcqPaG0la8--
 
