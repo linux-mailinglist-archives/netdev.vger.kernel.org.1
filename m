@@ -1,272 +1,170 @@
-Return-Path: <netdev+bounces-219619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4CDAB425E3
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:50:05 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D433B425CE
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:47:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BEF03A10CA
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:49:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0F03B4E4F40
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32ECF286D6B;
-	Wed,  3 Sep 2025 15:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B6B28541F;
+	Wed,  3 Sep 2025 15:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="MoqhkWoK"
 X-Original-To: netdev@vger.kernel.org
-Received: from bregans-1.gladserv.net (bregans-1.gladserv.net [185.128.211.58])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C115D28725C;
-	Wed,  3 Sep 2025 15:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.128.211.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5131E51EE
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 15:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756914588; cv=none; b=jx61gYEavdL9+jq4os3bvdM8OjH5+weoeGjyhYujIg4e5Kvp4M2JKpDlfMcRzZS3KSzQd3+Xag7NCTQFU7zKNp5V1Ad2awqx3/NsOT4J9s9J57/Qvm+8O6kNHJ8B7vQWN/6CPgh+ubdOBCDYJEu3HuSlBw/qcKsBNrA10OolVY4=
+	t=1756914470; cv=none; b=eh/8UuMRiIE5AUXLBhi9M63WlmSFJryOWHt7Zhi+ueXW8Mcxog54Dg7bqAzzQq3WNz+esyNVjSVeXxEJlxymr3O8zznbgfTmhUjaRczhxNIMflzaiitLkCAB863oQmGXirEqP9lDnwiqCqTItlyUX0tWYj4ZQwLWH0HJxYprSc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756914588; c=relaxed/simple;
-	bh=qpPfbKMt25hjwiG3TOlLtDGm5aHPNIMurOHL/19cYsY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EkXV4CIlafiuqLpRA17vEDWnQ6R6UNz24d/oayFJPgvnQJ455oGuoERY2RXChT1mkp0Un416ChMChs8iL0808YgYeU/scj+6h4GK/Zsv7EM3OJBG/0IjKuRQWqdAzl34n4HfXkm8kt3Cppd/vyDoHYAEDNmtkWH2M+8+R/LSBAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.211.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=librecast.net
-From: Brett A C Sheffield <bacs@librecast.net>
-To: willemdebruijn.kernel@gmail.com
-Cc: bacs@librecast.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	willemb@google.com
-Subject: [PATCH net-next v6] selftests: net: add test for ipv6 fragmentation
-Date: Wed,  3 Sep 2025 15:46:01 +0000
-Message-ID: <20250903154925.13481-1-bacs@librecast.net>
-X-Mailer: git-send-email 2.49.1
+	s=arc-20240116; t=1756914470; c=relaxed/simple;
+	bh=XInwh7iVomsQx5qogF3hzih+Y3WyM16GQrfW14cftWI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mUdgr5jvjbtERNwenyoKvufJEeMK3FqhRCeCiBMy1Mj9Qj3COdzbPTMg/qIPbLu15mW2P1bYacE6If4tAfhRQZvZcgQ7wQCcgrFsiELoie4YLxZacmE0pDOwX2dXdcDNCQ2Pn8HpOegA2IKhh9nmd100fnSBGJkjat54SQlClF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=MoqhkWoK; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 583Dx7F4008689
+	for <netdev@vger.kernel.org>; Wed, 3 Sep 2025 15:47:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	oU9zNSZ+JNQecUFr9QN7ywvBOG1sjWRxRq01g9yamiI=; b=MoqhkWoKRseuQIXB
+	zhRJ6euWY97pDSUuhd3mKCZpuIgDFvV/gqKtF8qamruclyNzXc6uR+s/w1GXm5wl
+	mOHlceyHakYFsQU2zLvvRoZF1urhyT0xldpqnRx/iZnPzn4thFCjDJ80HDATBZ80
+	+Bkg9dZmYVh8WKf7PenuHvVjizd43iSjFLxK9Cqp/M3+EsOMA6jz1w2DLotpCoS5
+	uCqGKy1LarQoximJsUB9CeBPnzw2viL3VacWZA0IUK7veCA2hDogndrU+gagpO+c
+	3BTzR43Th+S5McMANst+BNgapNJBsojjIsnK2OpJazJ+vxAxm/PUsgKqYWuHZ1Iy
+	AJd+lA==
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48uscv4ck2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 15:47:46 +0000 (GMT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-244581953b8so650725ad.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 08:47:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756914465; x=1757519265;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oU9zNSZ+JNQecUFr9QN7ywvBOG1sjWRxRq01g9yamiI=;
+        b=rWWHdxCK0fxF6YG7tDWktr3WCwn5E+dZeAo77aMK+TxxRaMg5cqayDs8Ax05eBqPye
+         Wn8RoQ3mDWxa+wM7bp7Vt8EnQjedx84KBL5OPEQWj4szFygyuTHJOJTdcEK2ZalPURKQ
+         wktymJgMDKDPRZEzCwCyTy4vxondsJ3awrx80LOsVRVdD1jHcX8aafzRlDYmX9yaGFYd
+         BKhVhaVNkrEMNgSIU2OF/qRZ0uV5DazOK1OLOZ8tOBIAaobSiTj3KEC9KtmXIb+Tekr0
+         LdGcPz536BsCb7a9yCc7cVq2C7FVDr1ZNnCeJ5guHPzxz0zeuOMtaJlllAYtrxvwKO23
+         5wpg==
+X-Forwarded-Encrypted: i=1; AJvYcCXgEsEO3A8vuswu7bwxYC9q+LQLrd/3BTQL1HUYyWQ5AYjYg4HYryCqIdAweOzN4ded5Fk5ljM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/T/cFwy+rYBOOTJ147HTAKceXRtv/grUiif/2efFq2mWom839
+	XBRhEjZUEGZzNUCWOgysrpVbdO+/rqBHm4Y6fJfcdBQrc4Vo0s3xjpwQ2hhWDt7ggVr0LdLotsQ
+	XYvXbdiYl/3zpn8RGSobtDyHZjjUXlGn23hxBSC2pEMaUX8qIKysxN8bnVPI=
+X-Gm-Gg: ASbGncsV+DjDPT9jvquRTk+BNBIq2g5+4lniy3VJ3tImpp5EBWrdM4/HMigMo5ItDPe
+	gb7yj+qOgbKsIsDJycES4MpEzGQbrct0Uan0Jk4qb1CHDVptqfvxmR3AmG/SkW9cL4+Kmmq5K4W
+	CDek+Nl8aWriGrka77Gtz7hv92+8PA1rrtuu49qg6Pn62ygJvp29fAegN1CkzNuklZDuANmfXBH
+	AjrYKcTg0OTDJTU2WBz8X4WDb2JtJ0cAtXUWYEpxUJOYwj/YVTZyBjAUvyiFuxgft0RJmu/yx7F
+	xIpTO/R55NDOVzR5m0OTpkLTzFtYF5H2U35LXZRMpqRBxxfGUM4OvDXVP36nfhEIbzHk
+X-Received: by 2002:a17:902:c950:b0:24b:1585:6363 with SMTP id d9443c01a7336-24b158565c2mr73678215ad.8.1756914465247;
+        Wed, 03 Sep 2025 08:47:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF4YwLQKquajxMk71cIseTHOUFmzvVFh27auBfgVNaa4odZqX0nZOQA82oA2Q+AJfG8X0fGzA==
+X-Received: by 2002:a17:902:c950:b0:24b:1585:6363 with SMTP id d9443c01a7336-24b158565c2mr73677845ad.8.1756914464769;
+        Wed, 03 Sep 2025 08:47:44 -0700 (PDT)
+Received: from hu-wasimn-hyd.qualcomm.com ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24903705b91sm166483095ad.12.2025.09.03.08.47.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 08:47:44 -0700 (PDT)
+Date: Wed, 3 Sep 2025 21:17:38 +0530
+From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>, kernel@oss.qualcomm.com,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org, Monish Chunara <quic_mchunara@quicinc.com>
+Subject: Re: [PATCH v2 04/13] arm64: dts: qcom: lemans-evk: Add nvmem-layout
+ for EEPROM
+Message-ID: <aLhjGuaAybp2CeIg@hu-wasimn-hyd.qualcomm.com>
+References: <20250903-lemans-evk-bu-v2-0-bfa381bf8ba2@oss.qualcomm.com>
+ <20250903-lemans-evk-bu-v2-4-bfa381bf8ba2@oss.qualcomm.com>
+ <39c258b4-cd1f-4fc7-a871-7d2298389bf8@oss.qualcomm.com>
+ <aLhMkp+QRIKlgYMx@hu-wasimn-hyd.qualcomm.com>
+ <aLhZ8VpI4/fzo9h8@hu-wasimn-hyd.qualcomm.com>
+ <c7b87a26-2529-4306-86b3-0b62805f0a2a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <c7b87a26-2529-4306-86b3-0b62805f0a2a@oss.qualcomm.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMSBTYWx0ZWRfXxGzA4+TP3TNC
+ 2fgsqAgp5KavLtgSdyT2YAfs7k9cF0e9MZaqGZ/1hBQxt9LARHFN8oMQ4So/ZLWOKhtjAmbj8iy
+ nhj/jDYymEpoa0i2TzJIbAL4N6tbEWhElzsfwmuyZRoLj9dmP373RA0dwFJUpNoIVUiAbzF10oa
+ fMi48N+Y6D8rXGDQAJP35bMRyUDom6pojpDfwKuO9jLArIcsytkrKJAvzKCDqXNp8YoprHgJUmO
+ /0h/uAfsa+pqnCGRTKC95SaVDhu/63knFYeydW9ogmkBMv7iasIUEVey0tRjnCYkuE9zb0NMjqn
+ +UhH1EOUFY6ISFjdzIFAfV1//VdKc4q6ICPb+b+gPe18jQ5LMLYEVR5Z5uPHv2ra/CxsA7bFlO2
+ 4f0oPDCQ
+X-Authority-Analysis: v=2.4 cv=A8xsP7WG c=1 sm=1 tr=0 ts=68b86322 cx=c_pps
+ a=IZJwPbhc+fLeJZngyXXI0A==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8 a=QqZMUp9YY9ei_m5RKlQA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=uG9DUKGECoFWVXl0Dc02:22
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: rEq5dt3aJCxYURMYTK7S72xcjIkYzrfE
+X-Proofpoint-GUID: rEq5dt3aJCxYURMYTK7S72xcjIkYzrfE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-03_08,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0 impostorscore=0 bulkscore=0 clxscore=1015
+ suspectscore=0 malwarescore=0 priorityscore=1501 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300031
 
-Add selftest for the IPv6 fragmentation regression which affected
-several stable kernels.
+On Wed, Sep 03, 2025 at 05:12:44PM +0200, Konrad Dybcio wrote:
+> On 9/3/25 5:08 PM, Wasim Nazir wrote:
+> > On Wed, Sep 03, 2025 at 07:41:30PM +0530, Wasim Nazir wrote:
+> >> On Wed, Sep 03, 2025 at 02:29:11PM +0200, Konrad Dybcio wrote:
+> >>> On 9/3/25 1:47 PM, Wasim Nazir wrote:
+> >>>> From: Monish Chunara <quic_mchunara@quicinc.com>
+> >>>>
+> >>>> Define the nvmem layout on the EEPROM connected via I2C to enable
+> >>>> structured storage and access to board-specific configuration data,
+> >>>> such as MAC addresses for Ethernet.
+> >>>
+> >>> The commit subject should emphasize the introduction of the EEPROM
+> >>> itself, with the layout being a minor detail, yet the description of
+> >>> its use which you provided is important and welcome
+> >>>
+> >>
+> >> Thanks, Konrad, for pointing this out. I’ll update it in the next
+> >> series.
+> > 
+> > Moreover, I notice that compatible definition is missing for this
+> > EEPROM. I will add it in next series.
+> 
+> I think the pattern match in at24.yaml should catch it
+> 
 
-Commit a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to
-stable without some prerequisite commits.  This caused a regression when
-sending IPv6 UDP packets by preventing fragmentation and instead
-returning -1 (EMSGSIZE).
+The EEPROM used on this platform is from Giantec, which requires a
+dedicated compatible string.
+While the generic "atmel,24c256" compatible is already supported in
+at24.yaml.
 
-Add selftest to check for this issue by attempting to send a packet
-larger than the interface MTU. The packet will be fragmented on a
-working kernel, with sendmsg(2) correctly returning the expected number
-of bytes sent.  When the regression is present, sendmsg returns -1 and
-sets errno to EMSGSIZE.
-
-Link: https://lore.kernel.org/stable/aElivdUXqd1OqgMY@karahi.gladserv.com
-Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
----
-Thanks again Willem for the review.
-
-v6 changes:
- - port -> network byte order
- - remove unecessary variable err
- - check return value of close()
-
-v5 changes:
- - disable_dad: delete - not needed for lo
- - main: simplify failure paths
- - main: char -> static char buf
- - setup: remove pointless return value
- - setup: remove unused variable fd
- - setup: merge with interface_up() to simplify
- - setup: check all system call return values
- - remove no longer used headers
-
-v4 changes:
- - fix "else should follow close brace" (checkpatch ERROR)
-
-v3 changes:
- - add usleep instead of busy polling on sendmsg
- - simplify error handling by using error() and leaving cleanup to O/S
- - use loopback interface - don't bother creating TAP
- - send to localhost (::1)
-
-v2 changes:
- - remove superfluous namespace calls - unshare(2) suffices
- - remove usleep(). Don't wait for the interface to be ready, just send, and
-   handle the (less likely) error case by retrying.
- - set destination address only once
- - document our use of the IPv6 link-local source address
- - send to port 9 (DISCARD) instead of 4242 (DONT PANIC)
- - ensure sockets are closed on failure paths
- - use KSFT exit codes for clarity
-
-v5: https://lore.kernel.org/netdev/20250902142502.27278-1-bacs@librecast.net
-v4: https://lore.kernel.org/netdev/20250901123757.13112-1-bacs@librecast.net
-v3: https://lore.kernel.org/netdev/20250901112248.5218-1-bacs@librecast.net
-v2: https://lore.kernel.org/netdev/20250831102908.14655-1-bacs@librecast.net
-v1: https://lore.kernel.org/netdev/20250825092548.4436-3-bacs@librecast.net
-
- tools/testing/selftests/net/.gitignore        |   1 +
- tools/testing/selftests/net/Makefile          |   1 +
- .../selftests/net/ipv6_fragmentation.c        | 114 ++++++++++++++++++
- 3 files changed, 116 insertions(+)
- create mode 100644 tools/testing/selftests/net/ipv6_fragmentation.c
-
-diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-index 47c293c2962f..3d4b4a53dfda 100644
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@ -16,6 +16,7 @@ ip_local_port_range
- ipsec
- ipv6_flowlabel
- ipv6_flowlabel_mgr
-+ipv6_fragmentation
- log.txt
- msg_oob
- msg_zerocopy
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index eef0b8f8a7b0..276e0481d996 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -117,6 +117,7 @@ TEST_GEN_FILES += tfo
- TEST_PROGS += tfo_passive.sh
- TEST_PROGS += broadcast_pmtu.sh
- TEST_PROGS += ipv6_force_forwarding.sh
-+TEST_GEN_PROGS += ipv6_fragmentation
- TEST_PROGS += route_hint.sh
- 
- # YNL files, must be before "include ..lib.mk"
-diff --git a/tools/testing/selftests/net/ipv6_fragmentation.c b/tools/testing/selftests/net/ipv6_fragmentation.c
-new file mode 100644
-index 000000000000..267ef62b5c72
---- /dev/null
-+++ b/tools/testing/selftests/net/ipv6_fragmentation.c
-@@ -0,0 +1,114 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Author: Brett A C Sheffield <bacs@librecast.net>
-+ *
-+ * Kernel selftest for the IPv6 fragmentation regression which affected stable
-+ * kernels:
-+ *
-+ *   https://lore.kernel.org/stable/aElivdUXqd1OqgMY@karahi.gladserv.com
-+ *
-+ * Commit: a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to stable
-+ * without some prerequisite commits.
-+ *
-+ * This caused a regression when sending IPv6 UDP packets by preventing
-+ * fragmentation and instead returning -1 (EMSGSIZE).
-+ *
-+ * This selftest demonstrates the issue by sending an IPv6 UDP packet to
-+ * localhost (::1) on the loopback interface from the autoconfigured link-local
-+ * address.
-+ *
-+ * sendmsg(2) returns bytes sent correctly on a working kernel, and returns -1
-+ * (EMSGSIZE) when the regression is present.
-+ *
-+ * The regression was not present in the mainline kernel, but add this test to
-+ * catch similar breakage in future.
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <error.h>
-+#include <net/if.h>
-+#include <netinet/in.h>
-+#include <sched.h>
-+#include <stdio.h>
-+#include <sys/ioctl.h>
-+#include <sys/socket.h>
-+#include <unistd.h>
-+#include "../kselftest.h"
-+
-+#define MTU 1500
-+#define LARGER_THAN_MTU 8192
-+
-+static void setup(void)
-+{
-+	struct ifreq ifr = {
-+		.ifr_name = "lo"
-+	};
-+	int ctl;
-+
-+	/* we need to set MTU, so do this in a namespace to play nicely */
-+	if (unshare(CLONE_NEWNET) == -1)
-+		error(KSFT_FAIL, errno, "unshare");
-+
-+	ctl = socket(AF_LOCAL, SOCK_STREAM, 0);
-+	if (ctl == -1)
-+		error(KSFT_FAIL, errno, "socket");
-+
-+	/* ensure MTU is smaller than what we plan to send */
-+	ifr.ifr_mtu = MTU;
-+	if (ioctl(ctl, SIOCSIFMTU, &ifr) == -1)
-+		error(KSFT_FAIL, errno, "ioctl: set MTU");
-+
-+	/* bring up interface */
-+	if (ioctl(ctl, SIOCGIFFLAGS, &ifr) == -1)
-+		error(KSFT_FAIL, errno, "ioctl SIOCGIFFLAGS");
-+	ifr.ifr_flags = ifr.ifr_flags | IFF_UP;
-+	if (ioctl(ctl, SIOCSIFFLAGS, &ifr) == -1)
-+		error(KSFT_FAIL, errno, "ioctl: bring interface up");
-+
-+	if (close(ctl) == -1)
-+		error(KSFT_FAIL, errno, "close");
-+}
-+
-+int main(void)
-+{
-+	struct in6_addr addr = {
-+		.s6_addr[15] = 0x01,  /* ::1 */
-+	};
-+	struct sockaddr_in6 sa = {
-+		.sin6_family = AF_INET6,
-+		.sin6_addr = addr,
-+		.sin6_port = htons(9) /* port 9/udp (DISCARD) */
-+	};
-+	static char buf[LARGER_THAN_MTU] = {0};
-+	struct iovec iov = { .iov_base = buf, .iov_len = sizeof(buf) };
-+	struct msghdr msg = {
-+		.msg_iov = &iov,
-+		.msg_iovlen = 1,
-+		.msg_name = (struct sockaddr *)&sa,
-+		.msg_namelen = sizeof(sa),
-+	};
-+	ssize_t rc;
-+	int s;
-+
-+	printf("Testing IPv6 fragmentation\n");
-+	setup();
-+	s = socket(AF_INET6, SOCK_DGRAM, 0);
-+send_again:
-+	rc = sendmsg(s, &msg, 0);
-+	if (rc == -1) {
-+		/* if interface wasn't ready, try again */
-+		if (errno == EADDRNOTAVAIL) {
-+			usleep(1000);
-+			goto send_again;
-+		}
-+		error(KSFT_FAIL, errno, "sendmsg");
-+	} else if (rc != LARGER_THAN_MTU) {
-+		error(KSFT_FAIL, errno, "sendmsg returned %zi, expected %i",
-+				rc, LARGER_THAN_MTU);
-+	}
-+	printf("[PASS] sendmsg() returned %zi\n", rc);
-+	if (close(s) == -1)
-+		error(KSFT_FAIL, errno, "close");
-+	return KSFT_PASS;
-+}
-
-base-commit: cd8a4cfa6bb43a441901e82f5c222dddc75a18a3
 -- 
-2.49.1
-
+Regards,
+Wasim
 
