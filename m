@@ -1,332 +1,121 @@
-Return-Path: <netdev+bounces-219453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FDD8B4153B
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:31:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC37B41555
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6F491B60273
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 06:31:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE42164980
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 06:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6192D7DD3;
-	Wed,  3 Sep 2025 06:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3237E2D6E6C;
+	Wed,  3 Sep 2025 06:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rT4K4aO4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UdfpPUB/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D690D19F12A;
-	Wed,  3 Sep 2025 06:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E8E2D77E9
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 06:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756881089; cv=none; b=DInyANQAHEQqa/1hqh+oKETXizuB83mebatJfhlvW+zoE+GGHcAncXgdEj/TSmhyF3ylSRLxRyHlIoPFWj0ihat+A2/gT/unVPn+llvGITKmWw6jT3xY9d/Wfpw1IZdul6TnRYhRtB6FMPII484p6mowl2cYX/tUi+q169fZQDk=
+	t=1756881625; cv=none; b=h22iUK2bXdmGS4pZx4K49JSu6JuToSf9L/bdrbW08j/ssaYw66+VXl/MnBsmPEX8ynlu7D//1M1BrbPueblclC+07ifueKwuSqsL/DfOq9HWtRtsW+S1Wx1bULwGBDA8Y/w7Xo4Or+v7yM2cK3bxpHBKudRDjIge1yGPu6JCvNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756881089; c=relaxed/simple;
-	bh=ldislTIt+17gO2sVf1eVo5RITYkzJQ6Xjsnbxe8sLgU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ll8JhtKcqxQiuSNs2Upx13SaVf90i45IduKKBv//FuYbgR3LuYNSipnm1Wqzs/zYyR5i0QQqqEOymcpqthgRj/f6rHYAykHoDdyJLxFbHnK3mXPq+72pY2cneKLa53ixWaMp2YNCERvGKJ8ziP+ndS/T4QAkSQEU2Ti6NvygN4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rT4K4aO4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54B7CC4CEF0;
-	Wed,  3 Sep 2025 06:31:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756881088;
-	bh=ldislTIt+17gO2sVf1eVo5RITYkzJQ6Xjsnbxe8sLgU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rT4K4aO4GfuAXb/TeKFqa6NWGxW6ZQv3WbZZr4nKPcI76lspWISAz9YqyJupyYmHJ
-	 s3+BttvuS1sTpmFNMlJ++nNx9JK/WT95CQx+3vaPsnMyYiBTb5rj5ZNjRJiqUC4zDN
-	 N/0txuV019o59RZcTF8iADecJF3Brbyl/uTni6eaxEpMWU3XCNdOqYH1AdyShH1y0/
-	 21xFCcEtE/W25LbDmO1kfVkjIqOzpMwWIVWTN6VhOXI4K/1jJ/DHLE31lKNyJBhg4s
-	 PxAfPw8ed8CThGbNSY3yENccSTlZzGWD7IASM5Qb5sgLzPpoLKh2POH29go9KSS6q8
-	 Me85sMK9zO71g==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	linux-rdma@vger.kernel.org,
-	Leon Romanovsky <leonro@nvidia.com>,
-	netdev@vger.kernel.org,
-	mbloch@nvidia.com,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Daniel Zahka <daniel.zahka@gmail.com>,
-	Raed Salem <raeds@nvidia.com>
-Subject: [PATCH 1/1] net/mlx5: Add PSP capabilities structures and bits
-Date: Tue,  2 Sep 2025 23:30:50 -0700
-Message-ID: <20250903063050.668442-2-saeed@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250903063050.668442-1-saeed@kernel.org>
-References: <20250903063050.668442-1-saeed@kernel.org>
+	s=arc-20240116; t=1756881625; c=relaxed/simple;
+	bh=I7dn+ByUDb13NbtwhJa5c65T8gw93qnSbGbhwt6saoU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gUCQjFET1dfjZoIvJe4SSF5pn5cg7fjYqJjukOfuoM7xDzvwUYRyfZhwVPcrO4iaowm+Kt80ihz8Lfvam2mX83iw12HDZ7sLV0E8uK9X/BnVCcKAxUFkFQ1HtabRXlYKr4zjUbL6WSXfQFGwS9guTdoCJMnohtOhFCGPeavevLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UdfpPUB/; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b2fa418ef3so58778891cf.0
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 23:40:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756881622; x=1757486422; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LZROVpDLsg/RMaGyQc2L1zm8XIhSAwyyqCJqyKcSBkc=;
+        b=UdfpPUB/XxosTHLYSHkWS+AdGscbknowdpybrk87RX7Uc+uAmo92SOom2MgMqRUlR1
+         MjEkvdCKX7Ds38JwQ7HVmtb30s4zFZ3tA/ddUBKEEYp0ViKq5vXuJHZ4gYhjKHpF5miz
+         7mCBaW+UoEZQDQwPpjGajla6W4T3/isAUq1oqJwKodzT/4e8BCCS/nRcRv3rwIA7ENpq
+         5k3vN/2mzhUGx+M4QmrO5mSsdfqU/gc87258v1QeHz/uQr07A3/gRDIS0kTtArKBrQ62
+         +RwmPJsgSl/S6A/froWFRhqOBx92KK6cRqcqGthCGfUXHxA2J+kYKEeyQ/kadgVo1EsR
+         +RgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756881622; x=1757486422;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LZROVpDLsg/RMaGyQc2L1zm8XIhSAwyyqCJqyKcSBkc=;
+        b=s1G9cEvVzsi8fKPVBtPNPJdBXLNHcaID06z/tQ3uVGnraN4tE75uvBzWfYR3tw2geY
+         KeFrKD2tz8bweFHlfIu7QeYgf+iiqyw1+Fgn/5HYr87pqcaSr8Xp/CTboLrOt/0frUFs
+         jgBvOU2j14wpMi4lGTp2jZMRcDf0KMMIz4uGMqjd5L4lXNBBpMXkQaTChZrAlV7LxiD1
+         gngFz2egWeQNAGBvHo+Qi3xVcOfQQx/WuKufMcJO75WHz1+5UzgEECprs1bLQN3NRMa+
+         e/wp5kxlge8JNiV3ZXzQAyd2igxC55MCOsEMEHYp3+NH/0Hh2O5iQU+qIVxDUPozmBjN
+         1IVg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5xToAQWCH/SDBml21HdMwL9iQWin67YeHcDAmJozG9j6gfbHOe1+jMmmgtrOe38RItVxXlxI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmwUTiD8Nd/Xjx4j7i71BlAc3cb0jg3pvTJk9F/E/chq+HlXkf
+	2CD3Knb1zZpUXeT63In33F4xH6ZRlICvGo9Cu2m1Oa2nmRyk0MDkDtMQKhUG9Pqy47fzxKRUEP3
+	xg85jjKfTkKyKyYUaQ+m+yGh+4Q6odMO53GQMYUl1
+X-Gm-Gg: ASbGncubVCtCtKe/+V7eR8jsDaCIFsQzZCqUhuGQ9rcuwRGMUMvVDNkjuBkcQWz7DyC
+	eZ73CcO9/oV1yBA+o7qM/vTbfJCqb7WSUsSTgJTTEEjaqa9/Hbj5wtyNOkOGmh8wxZManLgWA2g
+	rAGp30MRwB8xxf60MYLfmgrEFQqtpswc3kGGAg3aqQ9xYLETWCK49wogfDt6tXJ0KCshemRKeEB
+	viVDpKt/Rk3XxzHdGo9rXRo
+X-Google-Smtp-Source: AGHT+IHARsXXGrtwJJveuJtqCTwyZ1Wed6t1P5yMrOvhki4ZqUEPp/Dq0VXQZ2cil2KfojtklOQxf1XEcDeYXoxFGEg=
+X-Received: by 2002:a05:622a:1984:b0:4b4:95f9:ada3 with SMTP id
+ d75a77b69052e-4b49608f3a5mr2366221cf.60.1756881621977; Tue, 02 Sep 2025
+ 23:40:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250903024406.2418362-1-xuanqiang.luo@linux.dev>
+In-Reply-To: <20250903024406.2418362-1-xuanqiang.luo@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Sep 2025 23:40:10 -0700
+X-Gm-Features: Ac12FXyZI6Czfydvl7ogRcbkHggDSoBwxCpKPzZK1zSshOwTmdUAUCkdFFHVQMc
+Message-ID: <CANn89i+XH95h4UANWpR-39LSRkvM3LL=_pRL0+6fp6dwTZxn_g@mail.gmail.com>
+Subject: Re: [PATCH net] inet: Avoid established lookup missing active sk
+To: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+Cc: kuniyu@google.com, davem@davemloft.net, kuba@kernel.org, 
+	kernelxing@tencent.com, netdev@vger.kernel.org, 
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+On Tue, Sep 2, 2025 at 7:46=E2=80=AFPM Xuanqiang Luo <xuanqiang.luo@linux.d=
+ev> wrote:
+>
+> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>
+> Since the lookup of sk in ehash is lockless, when one CPU is performing a
+> lookup while another CPU is executing delete and insert operations
+> (deleting reqsk and inserting sk), the lookup CPU may miss either of
+> them, if sk cannot be found, an RST may be sent.
+>
+> The call trace map is drawn as follows:
+>    CPU 0                           CPU 1
+>    -----                           -----
+>                                 spin_lock()
+>                                 sk_nulls_del_node_init_rcu(osk)
+> __inet_lookup_established()
+>                                 __sk_nulls_add_node_rcu(sk, list)
+>                                 spin_unlock()
+>
+> We can try using spin_lock()/spin_unlock() to wait for ehash updates
+> (ensuring all deletions and insertions are completed) after a failed
+> lookup in ehash, then lookup sk again after the update. Since the sk
+> expected to be found is unlikely to encounter the aforementioned scenario
+> multiple times consecutively, we only need one update.
 
-Add mlx5_ifc PSP related capabilities structures and HW definitions
-needed for PSP support in mlx5.
-
-Link: https://lore.kernel.org/netdev/20250828162953.2707727-1-daniel.zahka@gmail.com/
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/fw.c  |  6 ++
- .../net/ethernet/mellanox/mlx5/core/main.c    |  1 +
- .../mellanox/mlx5/core/steering/hws/definer.c |  2 +-
- include/linux/mlx5/device.h                   |  4 +
- include/linux/mlx5/mlx5_ifc.h                 | 95 ++++++++++++++++++-
- 5 files changed, 103 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw.c b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-index 57476487e31f..eeb4437975f2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-@@ -294,6 +294,12 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
- 			return err;
- 	}
- 
-+	if (MLX5_CAP_GEN(dev, psp)) {
-+		err = mlx5_core_get_caps(dev, MLX5_CAP_PSP);
-+		if (err)
-+			return err;
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index 8517d4e5d5ef..0951c7cc1b5f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -1798,6 +1798,7 @@ static const int types[] = {
- 	MLX5_CAP_VDPA_EMULATION,
- 	MLX5_CAP_IPSEC,
- 	MLX5_CAP_PORT_SELECTION,
-+	MLX5_CAP_PSP,
- 	MLX5_CAP_MACSEC,
- 	MLX5_CAP_ADV_VIRTUALIZATION,
- 	MLX5_CAP_CRYPTO,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/definer.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/definer.c
-index c6436c3a7a83..c4bb6967f74d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/definer.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/definer.c
-@@ -1280,7 +1280,7 @@ hws_definer_conv_misc2(struct mlx5hws_definer_conv_data *cd,
- 	struct mlx5hws_definer_fc *fc = cd->fc;
- 	struct mlx5hws_definer_fc *curr_fc;
- 
--	if (HWS_IS_FLD_SET_SZ(match_param, misc_parameters_2.reserved_at_1a0, 0x8) ||
-+	if (HWS_IS_FLD_SET_SZ(match_param, misc_parameters_2.psp_syndrome, 0x8) ||
- 	    HWS_IS_FLD_SET_SZ(match_param,
- 			      misc_parameters_2.ipsec_next_header, 0x8) ||
- 	    HWS_IS_FLD_SET_SZ(match_param, misc_parameters_2.reserved_at_1c0, 0x40) ||
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index 9d2467f982ad..72a83666e67f 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -1248,6 +1248,7 @@ enum mlx5_cap_type {
- 	MLX5_CAP_IPSEC,
- 	MLX5_CAP_CRYPTO = 0x1a,
- 	MLX5_CAP_SHAMPO = 0x1d,
-+	MLX5_CAP_PSP = 0x1e,
- 	MLX5_CAP_MACSEC = 0x1f,
- 	MLX5_CAP_GENERAL_2 = 0x20,
- 	MLX5_CAP_PORT_SELECTION = 0x25,
-@@ -1487,6 +1488,9 @@ enum mlx5_qcam_feature_groups {
- #define MLX5_CAP_SHAMPO(mdev, cap) \
- 	MLX5_GET(shampo_cap, mdev->caps.hca[MLX5_CAP_SHAMPO]->cur, cap)
- 
-+#define MLX5_CAP_PSP(mdev, cap)\
-+	MLX5_GET(psp_cap, (mdev)->caps.hca[MLX5_CAP_PSP]->cur, cap)
-+
- enum {
- 	MLX5_CMD_STAT_OK			= 0x0,
- 	MLX5_CMD_STAT_INT_ERR			= 0x1,
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index 44d497272162..e9f14a0c7f4f 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -314,6 +314,8 @@ enum {
- 	MLX5_CMD_OP_CREATE_UMEM                   = 0xa08,
- 	MLX5_CMD_OP_DESTROY_UMEM                  = 0xa0a,
- 	MLX5_CMD_OP_SYNC_STEERING                 = 0xb00,
-+	MLX5_CMD_OP_PSP_GEN_SPI                   = 0xb10,
-+	MLX5_CMD_OP_PSP_ROTATE_KEY                = 0xb11,
- 	MLX5_CMD_OP_QUERY_VHCA_STATE              = 0xb0d,
- 	MLX5_CMD_OP_MODIFY_VHCA_STATE             = 0xb0e,
- 	MLX5_CMD_OP_SYNC_CRYPTO                   = 0xb12,
-@@ -489,12 +491,14 @@ struct mlx5_ifc_flow_table_prop_layout_bits {
- 	u8         execute_aso[0x1];
- 	u8         reserved_at_47[0x19];
- 
--	u8         reserved_at_60[0x2];
-+	u8         reformat_l2_to_l3_psp_tunnel[0x1];
-+	u8         reformat_l3_psp_tunnel_to_l2[0x1];
- 	u8         reformat_insert[0x1];
- 	u8         reformat_remove[0x1];
- 	u8         macsec_encrypt[0x1];
- 	u8         macsec_decrypt[0x1];
--	u8         reserved_at_66[0x2];
-+	u8         psp_encrypt[0x1];
-+	u8         psp_decrypt[0x1];
- 	u8         reformat_add_macsec[0x1];
- 	u8         reformat_remove_macsec[0x1];
- 	u8         reparse[0x1];
-@@ -703,7 +707,7 @@ struct mlx5_ifc_fte_match_set_misc2_bits {
- 
- 	u8         metadata_reg_a[0x20];
- 
--	u8         reserved_at_1a0[0x8];
-+	u8         psp_syndrome[0x8];
- 	u8         macsec_syndrome[0x8];
- 	u8         ipsec_syndrome[0x8];
- 	u8         ipsec_next_header[0x8];
-@@ -1511,6 +1515,21 @@ struct mlx5_ifc_macsec_cap_bits {
- 	u8    reserved_at_40[0x7c0];
- };
- 
-+struct mlx5_ifc_psp_cap_bits {
-+	u8         reserved_at_0[0x1];
-+	u8         psp_crypto_offload[0x1];
-+	u8         reserved_at_2[0x1];
-+	u8         psp_crypto_esp_aes_gcm_256_encrypt[0x1];
-+	u8         psp_crypto_esp_aes_gcm_128_encrypt[0x1];
-+	u8         psp_crypto_esp_aes_gcm_256_decrypt[0x1];
-+	u8         psp_crypto_esp_aes_gcm_128_decrypt[0x1];
-+	u8         reserved_at_7[0x4];
-+	u8         log_max_num_of_psp_spi[0x5];
-+	u8         reserved_at_10[0x10];
-+
-+	u8         reserved_at_20[0x7e0];
-+};
-+
- enum {
- 	MLX5_WQ_TYPE_LINKED_LIST  = 0x0,
- 	MLX5_WQ_TYPE_CYCLIC       = 0x1,
-@@ -1876,7 +1895,9 @@ struct mlx5_ifc_cmd_hca_cap_bits {
- 
- 	u8         reserved_at_2a0[0x7];
- 	u8         mkey_pcie_tph[0x1];
--	u8         reserved_at_2a8[0x3];
-+	u8         reserved_at_2a8[0x2];
-+
-+	u8         psp[0x1];
- 	u8         shampo[0x1];
- 	u8         reserved_at_2ac[0x4];
- 	u8         max_wqe_sz_rq[0x10];
-@@ -3803,6 +3824,7 @@ union mlx5_ifc_hca_cap_union_bits {
- 	struct mlx5_ifc_macsec_cap_bits macsec_cap;
- 	struct mlx5_ifc_crypto_cap_bits crypto_cap;
- 	struct mlx5_ifc_ipsec_cap_bits ipsec_cap;
-+	struct mlx5_ifc_psp_cap_bits psp_cap;
- 	u8         reserved_at_0[0x8000];
- };
- 
-@@ -3832,6 +3854,7 @@ enum {
- enum {
- 	MLX5_FLOW_CONTEXT_ENCRYPT_DECRYPT_TYPE_IPSEC   = 0x0,
- 	MLX5_FLOW_CONTEXT_ENCRYPT_DECRYPT_TYPE_MACSEC  = 0x1,
-+	MLX5_FLOW_CONTEXT_ENCRYPT_DECRYPT_TYPE_PSP     = 0x2,
- };
- 
- struct mlx5_ifc_vlan_bits {
-@@ -7159,6 +7182,8 @@ enum mlx5_reformat_ctx_type {
- 	MLX5_REFORMAT_TYPE_DEL_ESP_TRANSPORT_OVER_UDP = 0xa,
- 	MLX5_REFORMAT_TYPE_ADD_ESP_TRANSPORT_OVER_IPV6 = 0xb,
- 	MLX5_REFORMAT_TYPE_ADD_ESP_TRANSPORT_OVER_UDPV6 = 0xc,
-+	MLX5_REFORMAT_TYPE_ADD_PSP_TUNNEL = 0xd,
-+	MLX5_REFORMAT_TYPE_DEL_PSP_TUNNEL = 0xe,
- 	MLX5_REFORMAT_TYPE_INSERT_HDR = 0xf,
- 	MLX5_REFORMAT_TYPE_REMOVE_HDR = 0x10,
- 	MLX5_REFORMAT_TYPE_ADD_MACSEC = 0x11,
-@@ -7285,6 +7310,7 @@ enum {
- 	MLX5_ACTION_IN_FIELD_IPSEC_SYNDROME    = 0x5D,
- 	MLX5_ACTION_IN_FIELD_OUT_EMD_47_32     = 0x6F,
- 	MLX5_ACTION_IN_FIELD_OUT_EMD_31_0      = 0x70,
-+	MLX5_ACTION_IN_FIELD_PSP_SYNDROME      = 0x71,
- };
- 
- struct mlx5_ifc_alloc_modify_header_context_out_bits {
-@@ -13079,6 +13105,7 @@ enum {
- 	MLX5_GENERAL_OBJECT_TYPE_ENCRYPTION_KEY_PURPOSE_TLS = 0x1,
- 	MLX5_GENERAL_OBJECT_TYPE_ENCRYPTION_KEY_PURPOSE_IPSEC = 0x2,
- 	MLX5_GENERAL_OBJECT_TYPE_ENCRYPTION_KEY_PURPOSE_MACSEC = 0x4,
-+	MLX5_GENERAL_OBJECT_TYPE_ENCRYPTION_KEY_PURPOSE_PSP = 0x6,
- };
- 
- struct mlx5_ifc_tls_static_params_bits {
-@@ -13496,4 +13523,64 @@ enum mlx5e_pcie_cong_event_mod_field {
- 	MLX5_PCIE_CONG_EVENT_MOD_THRESH   = BIT(2),
- };
- 
-+struct mlx5_ifc_psp_rotate_key_in_bits {
-+	u8         opcode[0x10];
-+	u8         uid[0x10];
-+
-+	u8         reserved_at_20[0x10];
-+	u8         op_mod[0x10];
-+
-+	u8         reserved_at_40[0x40];
-+};
-+
-+struct mlx5_ifc_psp_rotate_key_out_bits {
-+	u8         status[0x8];
-+	u8         reserved_at_8[0x18];
-+
-+	u8         syndrome[0x20];
-+
-+	u8         reserved_at_40[0x40];
-+};
-+
-+enum mlx5_psp_gen_spi_in_key_size {
-+	MLX5_PSP_GEN_SPI_IN_KEY_SIZE_128 = 0x0,
-+	MLX5_PSP_GEN_SPI_IN_KEY_SIZE_256 = 0x1,
-+};
-+
-+struct mlx5_ifc_key_spi_bits {
-+	u8         spi[0x20];
-+
-+	u8         reserved_at_20[0x60];
-+
-+	u8         key[8][0x20];
-+};
-+
-+struct mlx5_ifc_psp_gen_spi_in_bits {
-+	u8         opcode[0x10];
-+	u8         uid[0x10];
-+
-+	u8         reserved_at_20[0x10];
-+	u8         op_mod[0x10];
-+
-+	u8         reserved_at_40[0x20];
-+
-+	u8         key_size[0x2];
-+	u8         reserved_at_62[0xe];
-+	u8         num_of_spi[0x10];
-+};
-+
-+struct mlx5_ifc_psp_gen_spi_out_bits {
-+	u8         status[0x8];
-+	u8         reserved_at_8[0x18];
-+
-+	u8         syndrome[0x20];
-+
-+	u8         reserved_at_40[0x10];
-+	u8         num_of_spi[0x10];
-+
-+	u8         reserved_at_60[0x20];
-+
-+	struct mlx5_ifc_key_spi_bits key_spi[];
-+};
-+
- #endif /* MLX5_IFC_H */
--- 
-2.50.1
-
+No need for a lock really...
+- add the new node (with a temporary 'wrong' nulls value),
+- delete the old node
+- replace the nulls value by the expected one.
 
