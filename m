@@ -1,79 +1,64 @@
-Return-Path: <netdev+bounces-219636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D4ECB4272C
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:44:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEAA8B4272E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446205676B2
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:44:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3668448095C
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD64307AFC;
-	Wed,  3 Sep 2025 16:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74383126B3;
+	Wed,  3 Sep 2025 16:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Emx9N4el"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9BB304971;
-	Wed,  3 Sep 2025 16:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79952304971;
+	Wed,  3 Sep 2025 16:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756917876; cv=none; b=UITIU8MtjdOuzMSxjSRkDsbor64fAmkSrsyleJ5fxYN9Khg0S2oBMvnyOR4XAAs8WqBUPxYSLJHeNJ0AXZnNMR2wkPklGjoLgdFKh7LbkCrZs6AZEo2kGynmXel6IwZ/3ZAATKhPdrk4wo9tScA7lyxAJeUcqriDw/Ign2SPmXI=
+	t=1756917878; cv=none; b=pWBPrVV/ITo1+S7/1HKCq57xinTNE00p3VccDr+hifOuYCZtNvc+nVADwKmCGlVgecspmdVveyyxGo8zN5QZPykxTL45Xg5KLsCFWblVM9rZ8m4KtD6o5B+8R0GSAtAv4lcImveVugBI+km8q3BjR81mt/0k6KLt+fUCRKg5kzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756917876; c=relaxed/simple;
-	bh=ariY+FcwAGaGYyROXJ//ip+a+qed9bzuJqi587Emzwg=;
+	s=arc-20240116; t=1756917878; c=relaxed/simple;
+	bh=i/Nlpyf6049cvEbac9097z7Dtvp2kNHFjvpzDfbTlhI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mWp5Tzmz9TkIBpWrMPmuYdpnnc23M/eahLFgS7WNwspHiOsAP/MPKgXzZpYKFxP7mNrDAPT02enD3hDyuYDtkFJGnHmHZfxRQOHIBBD5j8v/RkWTVibBIUDdRjeI36+4mgvqqNGSTy+KzPZj23mkYt5E/GK8SI2dxR9gYZ+Xv0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-61e8fe26614so61197a12.1;
-        Wed, 03 Sep 2025 09:44:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756917873; x=1757522673;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t9FL6tV8n13zlBvWYA3e3xfxYg9pjFXyRGdxyyVqxgY=;
-        b=bbXFH0FVl/pQx5GEvDg864XUfVolmy5QOnHAKYX7kHhRYLK1Ple3ppuvf/brX4NRDH
-         5TsAAIk4TcNIoEU/FV7MZqRqlUv9yKJNKQI3q8T6vFjHli8KFGAqddoxLNWLecuqm5il
-         d+VaoeUE8O3fcqLsFdPmZ30Lzk7w35coDLek8Y0gcaHD3YatH3ITENxB5emhhOi0Fh8T
-         z2alWqkqKXL7N0wNI+r9rg4XwwgVSrlWouYLwK3Ymfyc5ZO4un7Algmp1aqRbhEp9d+O
-         ic4rjth0Xxsp6jx6f27omJLkZQjGT1yPtoIj3RrrARAxXKVwH7KJzvMZNvdC/JMlp3tq
-         9b3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUi9CrIR6d8MVFobzqleMksP3bL5AR9IB8m7yQygNTYWkgeZjvLgV4n3uxS73GKLb6h8hijC1FWsybwRGE=@vger.kernel.org, AJvYcCXQWC7SH6uVxkuRMtH8XIsozkxy7RdlvoEJnYl1VaRit81eBpx2nb2p2oVZ/TOegdA6tapVSUV6@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzOqa3Qor8leQ51+RAnQphQrKWkpdZtVIB3WsOJU3NoRArt3io
-	8jw6WoDAps8qsnqkmq7RN8wvptJ6rCgGnTz0WTW0ollgM6tmkrns9iBE
-X-Gm-Gg: ASbGncu5qlUqvgrEr64Y2AptVFqYY5WOyhw5mPyzVKLx9F8FqsRTaIe2ibXAbIaYKsu
-	KMPU1l/LrjzVTuHelZvhYN8ATL+qSmvV++vGhS4DWKFVbRLpUSNqbnEzDJ0FAzxbkoOyKYjAGFB
-	3w1+Q4Agr78x3x6YTkKcgymp6YTcacj6V3X0nNiC9qtcJC4aRmTF8NuvMGivMoGfA+KxPOQO1NS
-	NjVUAsjwN3Q8aw/iDa6q0VVjcNWPszL5NAp50Nv8VXouC4kaEISb6TOJiErbXGPjhBK/iYsfmyN
-	1Z1sOqfNYVu8xEhVjZrUr1KiWI/V0J3kCmHVZB4ldUmXEBoEa91lje9tcfjAyk3uS1U6R1CNCtf
-	rLq1jd79T0eB2
-X-Google-Smtp-Source: AGHT+IHfDVVrl1wHNyJKDwCmpxOKb3QmVNSXv+pI7nurrc1BarqU4QHmNG3rluy6cGrnQiIAHjnrBA==
-X-Received: by 2002:a17:906:5909:b0:b04:1b90:8d7a with SMTP id a640c23a62f3a-b041b908f01mr1209368966b.27.1756917872692;
-        Wed, 03 Sep 2025 09:44:32 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:1::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b01af44a01fsm1099042866b.23.2025.09.03.09.44.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 09:44:32 -0700 (PDT)
-Date: Wed, 3 Sep 2025 09:44:29 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-devel@lists.linux.dev, kernel-team@meta.com, efault@gmx.de, calvin@wbinvd.org
-Subject: Re: [PATCH 3/7] netpoll: Move netpoll_cleanup implementation to
- netconsole
-Message-ID: <vxad5ijytxk66i2rja2uzmueajzpbccy3xcc4nokfnc6chapqb@j2kxvpyb63rh>
-References: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
- <20250902-netpoll_untangle_v3-v1-3-51a03d6411be@debian.org>
- <willemdebruijn.kernel.2c7a6dc71163b@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KFge0Xkk0fOYFusFidHJETtqcSYORv224Rh2Gkc9s/Y88UupolFimpvgQ9IqvueXATvJKSbfGaXW/V8efrxG5BPKLcMfyAnnw6p7qW8Sx6yr96HFruT3mPW5+5GXmcM3gy1nlwaJ5H9dGsX6QmvjTtfhLxcGbR3b8rgBxHOEVew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Emx9N4el; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B04DC4CEE7;
+	Wed,  3 Sep 2025 16:44:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756917878;
+	bh=i/Nlpyf6049cvEbac9097z7Dtvp2kNHFjvpzDfbTlhI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Emx9N4elMpE1TUw9YeZsO399zAbTV/bxbFiYSQokruUc89e9oB8nrJh7Sh+dg+Qht
+	 r5CfHYLOcf1ohP8dDx9r6HpV2nyS8kcCLpJthfFtfq1azbE7SaKiK844WVxC0FW41c
+	 8TgId8zBbe+zZdnyfskvSU16TEo3Hp9GdThETGMyqyLvXeXnvIkHIZ0dOUeC9XFIl8
+	 Orc31/q+fEPNlnulcN7nhFLVyIy+WViMxeybSlzDt9rM0havE/OXuuCTqCmYa/6yjs
+	 DDp7Ct+EHA23QKZEKzm61gUM9gxgccgJX1mQjjjf47OzETK3L9GgJ/6xU4L92aH6N/
+	 saetrm8P4i9hg==
+Date: Wed, 3 Sep 2025 17:44:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dong Yibo <dong100@mucse.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, rdunlap@infradead.org,
+	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v10 3/5] net: rnpgbe: Add basic mbx ops support
+Message-ID: <20250903164431.GD361157@horms.kernel.org>
+References: <20250903025430.864836-1-dong100@mucse.com>
+ <20250903025430.864836-4-dong100@mucse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,36 +67,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <willemdebruijn.kernel.2c7a6dc71163b@gmail.com>
+In-Reply-To: <20250903025430.864836-4-dong100@mucse.com>
 
-On Tue, Sep 02, 2025 at 06:49:26PM -0400, Willem de Bruijn wrote:
-> Breno Leitao wrote:
-> > Shift the definition of netpoll_cleanup() from netpoll core to the
-> > netconsole driver, updating all relevant file references. This change
-> > centralizes cleanup logic alongside netconsole target management,
-> > 
-> > Given netpoll_cleanup() is only called by netconsole, keep it there.
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
+On Wed, Sep 03, 2025 at 10:54:28AM +0800, Dong Yibo wrote:
+> Initialize basic mbx function.
 > 
-> What's the rationale for making this a separate patch, as the
-> previous patch also moves the other netconsole specific code from
-> netpoll.c to netconsole.c?
+> Signed-off-by: Dong Yibo <dong100@mucse.com>
 
-I just tried to isolate the changes in small patches as possible.
-previous functions needed to go all together, given it was they were in
-a chain.
+...
 
-this one netpoll_cleanup() is more independent, so, I decided to
-separate it, making the patches smaller individually.
+> +/**
+> + * mucse_mbx_inc_pf_req - Increase req
+> + * @hw: pointer to the HW structure
+> + *
+> + * mucse_mbx_inc_pf_req read pf_req from hw, then write
+> + * new value back after increase
+> + **/
+> +static void mucse_mbx_inc_pf_req(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	u16 req;
+> +	u32 v;
+> +
+> +	v = mbx_data_rd32(mbx, MBX_PF2FW_COUNTER);
+> +	req = (v & GENMASK_U32(15, 0));
 
-> And/or consider updating prefix from netpoll_.. to netconsole_..
+nit1: Unnecessary parentheses
+nit2: I would have used FIELD_GET here in conjunction with something like.
 
-Good point, and I agree with the feedback.
+      #define MBX_PF2FW_COUNTER_MASK GENMASK_U32(15, 0)
 
-In cases like this, should I rename the function while moving, or,
-adding an additional patch to rename them?
+> +	req++;
+> +	v &= GENMASK_U32(31, 16);
+> +	v |= req;
 
-Thanks for the review,
---breno
+      And using FIELD_PREP is probably more succinct here.
+
+      Likewise in the following function
+
+> +	mbx_data_wr32(mbx, MBX_PF2FW_COUNTER, v);
+> +	hw->mbx.stats.msgs_tx++;
+> +}
+> +
+> +/**
+> + * mucse_mbx_inc_pf_ack - Increase ack
+> + * @hw: pointer to the HW structure
+> + *
+> + * mucse_mbx_inc_pf_ack read pf_ack from hw, then write
+> + * new value back after increase
+> + **/
+> +static void mucse_mbx_inc_pf_ack(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	u16 ack;
+> +	u32 v;
+> +
+> +	v = mbx_data_rd32(mbx, MBX_PF2FW_COUNTER);
+> +	ack = (v >> 16) & GENMASK_U32(15, 0);
+> +	ack++;
+> +	v &= GENMASK_U32(15, 0);
+> +	v |= (ack << 16);
+> +	mbx_data_wr32(mbx, MBX_PF2FW_COUNTER, v);
+> +	hw->mbx.stats.msgs_rx++;
+> +}
+
+...
+
+> +/**
+> + * mucse_mbx_reset - Reset mbx info, sync info from regs
+> + * @hw: pointer to the HW structure
+> + *
+> + * This function reset all mbx variables to default.
+> + **/
+> +static void mucse_mbx_reset(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	u32 v;
+> +
+> +	v = mbx_data_rd32(mbx, MBX_FW2PF_COUNTER);
+> +	hw->mbx.fw_req = v & GENMASK_U32(15, 0);
+> +	hw->mbx.fw_ack = (v >> 16) & GENMASK_U32(15, 0);
+
+I'd use FIELD_GET here too.
+
+> +	mbx_ctrl_wr32(mbx, PF2FW_MBOX_CTRL(mbx), 0);
+> +	mbx_ctrl_wr32(mbx, FW_PF_MBOX_MASK(mbx), GENMASK_U32(31, 16));
+> +}
+
+...
 
