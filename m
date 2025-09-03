@@ -1,163 +1,204 @@
-Return-Path: <netdev+bounces-219629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9A03B426B3
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:21:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAD02B426E9
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4D981BC1207
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:21:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33DF33B0A84
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0022C0F72;
-	Wed,  3 Sep 2025 16:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E642F1FD7;
+	Wed,  3 Sep 2025 16:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="BrtsH0fi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107BD2C0286
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 16:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED852EB849
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 16:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756916440; cv=none; b=m1gH6e/U7OlYOqK+wM7V4dSJ4KwjpnsGmfpZs9ASenc46q4wIg4A9m2mkfcmzbbzVnlsCFMwPMe9ycEASzsmLnt344nBjjCYjnlS3qk8y0XiQb06m2uaw6pqfcH0xGMEQWv/9aatbHVXPug0TUaxiFpHUw0P2KL7NWanH7TRYVo=
+	t=1756916924; cv=none; b=KOeQt0W4NZAh6kwNOCvP1K5IY5kDtoYeQ4UQh0/C6w2PBoi0/jSYAWljJQ+EWNBF21XQ7Jy1rmyYZn1M2dFUlDHz7UpHCzujWX4JprPNS7swrCLIU3FjcPf5kD85ZLvEKW7eZ7N4vB9/6oME06fMt+CXK59FwNOMZdBRrXjJrgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756916440; c=relaxed/simple;
-	bh=MJ+hOYM0xYx9RTqyxpkuDg/HtSLuqe1fKTmw6TmqLtU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u4HyNjC9tbwZC1BMS/oyO608W572SyiPCJCCU1hbQCw3gMI0t/F4XacK6EaDzRWP/QxrkAl5MDOwYOS7elY0vBM86VS255vPZa3mCYqFxJmTsl8+Lyd3kQ1rm5vNFBGA+OFDTX/VRZ5JIQX+MS+51OXkGGDooRdmMMFOteJs5Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3f46ca1f136so313955ab.1
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 09:20:38 -0700 (PDT)
+	s=arc-20240116; t=1756916924; c=relaxed/simple;
+	bh=h4uzpxwbZv5GjsKYDvvfHvKOFpa5oECNqTN6Yy9bj4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j9QQmHrc6h12CiVK6Xb9aAVaDn4RRN4nS1YwLGV8YnTXCo+bpG4WgGLiKxUDHYVq0xzRyN2dvBUFQwRDhVEFVWjHaZnTz6vpAc3qIg3d8cl/Vmv2FVDjs1NCQvBrCj67RVg6gI32ASJA2HhWs1siy4mi1QXqLy2xZkhM201y0q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=BrtsH0fi; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 583Dxqf4030576
+	for <netdev@vger.kernel.org>; Wed, 3 Sep 2025 16:28:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	3W8v279knRH3OWhUMa8czqjX5zZ7UZx/tVNRcDruII4=; b=BrtsH0fiD+ApJV97
+	Y0r9qpTkipdek14wqYg/qYx6vUcKC5WywT42WJk+qpFhicqfMW0Y953Ef1q8HRtR
+	3XUl31g0QSVQDhyUNDwOg5IEN4A5+JfyL6cqV8MYQQCsbWtXYEeqtWCbo+GbldCq
+	FMpRJ5ISzRilwhIo6oBI1IyaWHYhqd+7YxC0pzCm+w37ldRAbgEK0ej6Bxw9d2lv
+	1eW/FOyx7Lr6LamPW/hK3uH1vcUBcFWk0pT3HtSVBnoKqELJPgLJihXSsopen1cg
+	lLsOzVMyEvFI+vf5kZe0dN/cbkmP2fBxMkmK+EJqj0jdQ9krQW7iqAqtHqw3OvOL
+	2sKAfg==
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48urw04fj1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 16:28:41 +0000 (GMT)
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-7725b77b795so83037b3a.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 09:28:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756916438; x=1757521238;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ne1sbICVvddwd6AuruJKbf9hL2yygBbdnhHoBV7WzMY=;
-        b=iGs1XJ+8NC20i2HxH3njuVzdEk2BdgVpfGk7GZjGquOXu2ryq6lC+x35+XDTvCvC1E
-         /i707z3KLEI0OpgU57MEh846tgmH0eCoJHED4IOtaiFkADH3rCcavRpqbuo2trTemvfx
-         MfP6R4Qo59eKSt7viaTLY4q8J96rWjaN/rRV2+7NBh9hNxt2oT7oKt59o9oGZPwNRV7f
-         iv3BI9HSIO6+88+nri8bSS7VSSJfi2IYcAvK0j0oVUzab0ZHAthedjIklTgAaSz0/JAf
-         9QTyqkWw6uVkD0RcqWMVLF72NdsgoToT1S4YIRgH30Q6Q2BC6mEfkUzOrBAfJiwvIEI2
-         lyBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXRNSf8iopGYDcOftSjPckrPAuOTNtQljeAOKe9NZoQ+GOWrgBVxVNe/Y56ebacBI74U4pYrOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7bVQRUqlYSXBo5b5COn2lrzSmkGTlxInWOxIGS5q3xib2Wkqs
-	Iu06RAamMmpU+s/uzfEI3YvkSQEsjygT+eoMCUZ5as9FmhMQu4OprHXbJVCEUCHtdMl2pRTW5DQ
-	jguOl432FibTCGygvO9oVHR+H97z3AR/oeSvFyfy3pcDPUUhWYLS5h+kPex4=
-X-Google-Smtp-Source: AGHT+IHqE/81WZO4JO1QzMvBbgv3oJ8HqsxCqArABYMYFUBGB3SugcnkXjmJD/4AO0BM6d1frLLLS5dZYT8SgCLAtul39VCWRfN+
+        d=1e100.net; s=20230601; t=1756916920; x=1757521720;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3W8v279knRH3OWhUMa8czqjX5zZ7UZx/tVNRcDruII4=;
+        b=wI/T05lQsy1y7IDXf5AJ3lWizU1pPM7G8ECzjYO/ELAwEtrct3cCgd37F9vJtgxj9r
+         plTR2DYq3Q0bzEFhYR20b2k9Fe3Vo8LEaB6IUnGxB7i1e+xz7HxcHUeU1cmjN0VwgbJe
+         trZ/aMgkgWZ9FvfCNSzPvAsdnZJAg8wsaHs8gNLXcW3AAT6b5Tbxdb7cpdS+YQrCaeFD
+         mtrOaJRB+1p3FoXCA+Ez312UIkQVvCY61h1U8EV50YNfIp3OSAsjLj6QG/9sKU69lJbt
+         ZrQbZoZnnC4giiJ3GgoN0qJ7oht5Q+hIv4yLWmOvWePyzEOQa2uUQCw3zpWu/kNS7jq+
+         ZpXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvdM1cBQtm75uaeJ7fqDLmGRFhyXoGURZcU9RuecFiC+bIQQstnGIpU1d5XWZLKYJD4It9bfk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybrdRuQp0V5aQNj6FwG+MEdrfFgo9q2K5C4bzByf6In7oidVv5
+	E1DUubps8WAgKkxc+77/aezsGEJiCR6j4yJyyRjoC5SZLYeixreL8oW6d/upS05fYSPEt0KLik9
+	jBeIphb0kdHvjFOWLAQdI9aj4VSTztyROwlhp1Kh60bNuIV0UMiiWReB6O2KouEcmrRw=
+X-Gm-Gg: ASbGncuuhW8vbzf9fCe/xLOj9AFoHLRRPxAtNmPjk9EZEer73ND3NOdsdNcZFAmbXw8
+	iF/bw2U1+y1QOk02ph4a2wT6MPzSWGw2+WhVAWECfbOfW2Qk4J4LLA/c3uey3oEnCr+qG2nvZDc
+	WeGrPoJDVYKqIJaesmFcGzUTKzQ2fXHGI62LjuO8y3w1nPZ1lgyuxQr5sqdfsncWvx8GfsaqcTK
+	+wOWwP30oqcssTBcQCj2fLo1eweCvSlpVu4itAPyHVc1hWK49g8Sz0ign8XtvqZvfYMokU4G9bF
+	oN6Bi3R9BVaTNreRFDnBFQFJyGjWV237LO9cDy/hDKUBKPTYH/txFE35qQy6uRdtfCHv
+X-Received: by 2002:a05:6a00:2314:b0:772:bb4:a1c8 with SMTP id d2e1a72fcca58-7723e387c08mr16394838b3a.23.1756916920305;
+        Wed, 03 Sep 2025 09:28:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxMR7hBz3AXIbxT3k+26DZmNA55+biuruOPc4EMsmI//RROhDkSqh0Pri4+DqMIllJh0FwlQ==
+X-Received: by 2002:a05:6a00:2314:b0:772:bb4:a1c8 with SMTP id d2e1a72fcca58-7723e387c08mr16394797b3a.23.1756916919720;
+        Wed, 03 Sep 2025 09:28:39 -0700 (PDT)
+Received: from hu-wasimn-hyd.qualcomm.com ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7725ad1e086sm9459942b3a.20.2025.09.03.09.28.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 09:28:39 -0700 (PDT)
+Date: Wed, 3 Sep 2025 21:58:33 +0530
+From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>, kernel@oss.qualcomm.com,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org, Monish Chunara <quic_mchunara@quicinc.com>
+Subject: Re: [PATCH 2/5] arm64: dts: qcom: lemans: Add SDHC controller and
+ SDC pin configuration
+Message-ID: <aLhssUQa7tvUfu2j@hu-wasimn-hyd.qualcomm.com>
+References: <20250826-lemans-evk-bu-v1-0-08016e0d3ce5@oss.qualcomm.com>
+ <20250826-lemans-evk-bu-v1-2-08016e0d3ce5@oss.qualcomm.com>
+ <rxd4js6hb5ccejge2i2fp2syqlzdghqs75hb5ufqrhvpwubjyz@zwumzc7wphjx>
+ <c82d44af-d107-4e84-b5ae-eeb624bc03af@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c26d:0:b0:3e5:5357:6dd4 with SMTP id
- e9e14a558f8ab-3f401fcf532mr241983595ab.20.1756916437900; Wed, 03 Sep 2025
- 09:20:37 -0700 (PDT)
-Date: Wed, 03 Sep 2025 09:20:37 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b86ad5.050a0220.3db4df.01f7.GAE@google.com>
-Subject: [syzbot] [net?] [bpf?] WARNING in sock_hash_delete_elem (2)
-From: syzbot <syzbot+ca62aaf39105978cd946@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, jakub@cloudflare.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	willemb@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c82d44af-d107-4e84-b5ae-eeb624bc03af@oss.qualcomm.com>
+X-Proofpoint-GUID: yORUE0-Ua0nOs7zO5JvkmLx0vQlF6x0X
+X-Proofpoint-ORIG-GUID: yORUE0-Ua0nOs7zO5JvkmLx0vQlF6x0X
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAyNyBTYWx0ZWRfX08AdaHOPcrbc
+ cFjxFLbRPPKHWdkLW+LZZ/UJZnXpcct3KCZOHVnscnumHUGyLuBYlzq8yyEXUJ+G1Am/+0nlVrv
+ agMQTPRUAdLORXPHVIjh3qfnNGP2O/Kkh9MaxwX3FCyK1/mn/dtbKUcaMkcdG47j7PrhFOILenK
+ c3iBP7DBJEHAXAxRZoiutzrcZhPclh4//OxcQOYUqjE93OYHh5QP+awBLTNiivVKXmd4uOaeAgz
+ DteyHLC7Zyyv01saqDm56vL/A33HnqzPasurL9q0iyIsPT6LSSvfZR97EsuoLo0cg2VQFuPnws3
+ 0i3OBB95DSkTlCLUqqozV6U89SCwtH6zmevEUJV+21TRzb6lbERnu9N1modd7j8PBerJlwPNKd0
+ BJoYejig
+X-Authority-Analysis: v=2.4 cv=NrDRc9dJ c=1 sm=1 tr=0 ts=68b86cb9 cx=c_pps
+ a=rEQLjTOiSrHUhVqRoksmgQ==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
+ a=Jh9KyP6SycQYY5kWdYcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=2VI0MkxyNR6bbpdq8BZq:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-03_08,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 malwarescore=0 priorityscore=1501 phishscore=0
+ impostorscore=0 spamscore=0 bulkscore=0 adultscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508300027
 
-Hello,
+On Wed, Sep 03, 2025 at 06:12:59PM +0200, Konrad Dybcio wrote:
+> On 8/27/25 3:20 AM, Dmitry Baryshkov wrote:
+> > On Tue, Aug 26, 2025 at 11:51:01PM +0530, Wasim Nazir wrote:
+> >> From: Monish Chunara <quic_mchunara@quicinc.com>
+> >>
+> >> Introduce the SDHC v5 controller node for the Lemans platform.
+> >> This controller supports either eMMC or SD-card, but only one
+> >> can be active at a time. SD-card is the preferred configuration
+> >> on Lemans targets, so describe this controller.
+> >>
+> >> Define the SDC interface pins including clk, cmd, and data lines
+> >> to enable proper communication with the SDHC controller.
+> >>
+> >> Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
+> >> Co-developed-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> >> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> >> ---
+> >>  arch/arm64/boot/dts/qcom/lemans.dtsi | 70 ++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 70 insertions(+)
+> >>
+> >> diff --git a/arch/arm64/boot/dts/qcom/lemans.dtsi b/arch/arm64/boot/dts/qcom/lemans.dtsi
+> >> index 99a566b42ef2..a5a3cdba47f3 100644
+> >> --- a/arch/arm64/boot/dts/qcom/lemans.dtsi
+> >> +++ b/arch/arm64/boot/dts/qcom/lemans.dtsi
+> >> @@ -3834,6 +3834,36 @@ apss_tpdm2_out: endpoint {
+> >>  			};
+> >>  		};
+> >>  
+> >> +		sdhc: mmc@87c4000 {
+> >> +			compatible = "qcom,sa8775p-sdhci", "qcom,sdhci-msm-v5";
+> >> +			reg = <0x0 0x087c4000 0x0 0x1000>;
+> >> +
+> >> +			interrupts = <GIC_SPI 383 IRQ_TYPE_LEVEL_HIGH>,
+> >> +				     <GIC_SPI 521 IRQ_TYPE_LEVEL_HIGH>;
+> >> +			interrupt-names = "hc_irq", "pwr_irq";
+> >> +
+> >> +			clocks = <&gcc GCC_SDCC1_AHB_CLK>,
+> >> +				 <&gcc GCC_SDCC1_APPS_CLK>;
+> >> +			clock-names = "iface", "core";
+> >> +
+> >> +			interconnects = <&aggre1_noc MASTER_SDC 0 &mc_virt SLAVE_EBI1 0>,
+> >> +					<&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_SDC1 0>;
+> >> +			interconnect-names = "sdhc-ddr", "cpu-sdhc";
+> >> +
+> >> +			iommus = <&apps_smmu 0x0 0x0>;
+> >> +			dma-coherent;
+> >> +
+> >> +			resets = <&gcc GCC_SDCC1_BCR>;
+> >> +
+> >> +			no-sdio;
+> >> +			no-mmc;
+> >> +			bus-width = <4>;
+> > 
+> > This is the board configuration, it should be defined in the EVK DTS.
+> 
+> Unless the controller is actually incapable of doing non-SDCards
+> 
+> But from the limited information I can find, this one should be able
+> to do both
+> 
 
-syzbot found the following issue on:
+It’s doable, but the bus width differs when this controller is used for
+eMMC, which is supported on the Mezz board. So, it’s cleaner to define
+only what’s needed for each specific usecase on the board.
 
-HEAD commit:    5c3b3264e585 Merge tag 'x86_urgent_for_v6.17_rc4' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=142cae34580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bd9738e00c1bbfb4
-dashboard link: https://syzkaller.appspot.com/bug?extid=ca62aaf39105978cd946
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/37953b384dff/disk-5c3b3264.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/df5cc1c4e51d/vmlinux-5c3b3264.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2ed6195eae9f/bzImage-5c3b3264.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ca62aaf39105978cd946@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt))
-WARNING: CPU: 1 PID: 9889 at kernel/softirq.c:172 __local_bh_disable_ip+0x342/0x400 kernel/softirq.c:172
-Modules linked in:
-CPU: 1 UID: 0 PID: 9889 Comm: syz.3.1233 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:__local_bh_disable_ip+0x342/0x400 kernel/softirq.c:172
-Code: 0f b6 04 28 84 c0 0f 85 b5 00 00 00 83 3d 59 8e 98 0d 00 75 19 90 48 c7 c7 00 b2 09 8b 48 c7 c6 40 b2 09 8b e8 df 61 fe ff 90 <0f> 0b 90 90 90 e9 fc fd ff ff 44 89 f9 80 e1 07 80 c1 03 38 c1 0f
-RSP: 0018:ffffc9000439f980 EFLAGS: 00010246
-RAX: 313d6c056ac6e300 RBX: 1ffff92000873f34 RCX: 0000000000080000
-RDX: ffffc9000e563000 RSI: 000000000000025d RDI: 000000000000025e
-RBP: ffffc9000439fa80 R08: 0000000000000000 R09: 0000000000000000
-R10: dffffc0000000000 R11: ffffed1017124863 R12: 1ffff110049edc89
-R13: dffffc0000000000 R14: ffffffff8184ca61 R15: ffff888024f6e44c
-FS:  00007f22097a66c0(0000) GS:ffff8881269c2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 00000000504d4000 CR4: 00000000003526f0
-DR0: 0000000000000006 DR1: 0000000000000003 DR2: 0000000000000401
-DR3: 0000000000000404 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- local_bh_disable include/linux/bottom_half.h:20 [inline]
- spin_lock_bh include/linux/spinlock_rt.h:87 [inline]
- sock_hash_delete_elem+0xc6/0x320 net/core/sock_map.c:952
- bpf_prog_0fcbc4c83748eeda+0x46/0x4e
- bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
- __bpf_prog_run include/linux/filter.h:718 [inline]
- bpf_prog_run include/linux/filter.h:725 [inline]
- bpf_prog_run_pin_on_cpu include/linux/filter.h:742 [inline]
- bpf_flow_dissect+0x132/0x400 net/core/flow_dissector.c:1024
- bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1416
- bpf_prog_test_run+0x2ca/0x340 kernel/bpf/syscall.c:4590
- __sys_bpf+0x581/0x870 kernel/bpf/syscall.c:6047
- __do_sys_bpf kernel/bpf/syscall.c:6139 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6137 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6137
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f220b53ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f22097a6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f220b775fa0 RCX: 00007f220b53ebe9
-RDX: 0000000000000050 RSI: 0000200000000180 RDI: 000000000000000a
-RBP: 00007f220b5c1e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f220b776038 R14: 00007f220b775fa0 R15: 00007fff2055aba8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Regards,
+Wasim
 
