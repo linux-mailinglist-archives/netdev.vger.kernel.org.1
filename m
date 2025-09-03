@@ -1,308 +1,137 @@
-Return-Path: <netdev+bounces-219425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D39AAB4134F
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:59:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1A3B41351
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 06:01:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72D5C7A39D5
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 03:57:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6960E7C01E4
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 04:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD042D0C60;
-	Wed,  3 Sep 2025 03:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C35273810;
+	Wed,  3 Sep 2025 04:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WoklH15e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UmJSZHwR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC8A2D0637
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 03:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006AC1E3DDB
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 04:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756871942; cv=none; b=mzhN9mdByk7cVJzj9wW22nqtzAjOWz2fxZQPfXX/s1LAaUg+jY+M/JZDVUoL5IE4gfaFeOvvgW/bCbmRc/L9k7SYCfTHsnoPPRnong3ef0hgVk7/Zqu0aMTgRYlaYa7KhQlnOX60uAdFY/eraNehbaY0+d7DuMzcc2r1kua5Wdw=
+	t=1756872057; cv=none; b=SzPUw0rA8VUnHBjm6H9nhFxK8lUSLb4Dlf0VFhElI4ythQl6TDvDZQZ6/dELY1jWkJX+KfMUmoG+i0AGY2JQSB8QnmEZacnon3UNXBslPQ/noMYvpGua5Dskh6/7d0SA06uI+V1RQgwqBuZ9SEjEpI4KbJ6HjARXSyXhRXapMVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756871942; c=relaxed/simple;
-	bh=qzvTJpLJDXLe11E6NDRPmJZpCGYNC2vOrFDW5FckhVQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m2d1vsx0B0EAS198bFA4LKfV4bwPOFXY08+uyszl4x7336YoBwqFgrJabGo3hbL0BCSgCU5ZK7RHVk9opbDAQYji3q/7awIhL3cA6IpWmKp2Uu2JXiIcO+JKqnN9IeTAYqOFawkE7sR0iVQ6mn97ODSgbdCuBhHO4PH6Rjl9ljE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WoklH15e; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756871941; x=1788407941;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=qzvTJpLJDXLe11E6NDRPmJZpCGYNC2vOrFDW5FckhVQ=;
-  b=WoklH15e5SOcG7fAC70o1XuVnP2H/trH+ilwqRDIyl+VwnfUhfXSJ9+z
-   +a1eECBgUkaTvzuKVx7CKTGvnZyuTe3U41C56st8ZfngWmsyrx55dc7zQ
-   KcsDm9fg3LaYLXPyBvPztbbVCe6caytqzrStomM4sKLeGvgqBkfmFmtpg
-   fYS0BehvAxjs75fZOowX0Fy4igetlf6MeNStOxqDJg4fVrNQ7G6EbcT/I
-   hWhpZr/BeYudSnHBrwRAKAsRVynKdfszsAZqDNOeOZ/cIWi4+Uk1zY3KL
-   8lZ6fz69SVO92hjEJoJoNse7c6XW32OuYQHJxaDoYnmF8wFvVO3B3qrWL
-   w==;
-X-CSE-ConnectionGUID: cQp4eGaOTLy0j7QHbABFPA==
-X-CSE-MsgGUID: tUpWypF8ReaR0KATyqCkyQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="70552144"
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="70552144"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 20:59:00 -0700
-X-CSE-ConnectionGUID: rG0Tm50xRaie3qHr8NwFig==
-X-CSE-MsgGUID: pLfxLJfKSwC8Thj3rPxK3Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="171036126"
-Received: from unknown (HELO localhost.jf.intel.com) ([10.166.80.55])
-  by orviesa009.jf.intel.com with ESMTP; 02 Sep 2025 20:59:00 -0700
-From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: madhu.chittim@intel.com,
-	netdev@vger.kernel.org,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v4] idpf: add support for IDPF PCI programming interface
-Date: Tue,  2 Sep 2025 20:58:52 -0700
-Message-ID: <20250903035853.23095-1-pavan.kumar.linga@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1756872057; c=relaxed/simple;
+	bh=U0jjFOIRPE2pVoUMIlyB9h7+kH8XE4j8UQpdjONzyjE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gZyeSn9DApWxFOuwgo28PN1ZQagE7vqU2Sgrmjqyp+gBdINbh6Sn4v4qpIDOOsUVWWfAEOM1W/AUaY5cO/cxwND+4B29TF+1xG8Ve8OvXF+y25/6fSx1lUWwTsKVQewbCo5DxE6AHM8wsvqjoeJK57x279QYPfTizxvxVRgrZX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UmJSZHwR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756872054;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U0jjFOIRPE2pVoUMIlyB9h7+kH8XE4j8UQpdjONzyjE=;
+	b=UmJSZHwR5CYaLmI4vKNd5wAVcPl1OysAUtPK/DffvAYAVhrSc14imCYyZ0FUsNMLrvOoJ4
+	M6+XKgTtAUVjiHs43oetMbCA8lWHJvwvwpn5PP5PWow0b2dF32pDsIPJMqTfi2LiOiWLpC
+	Me9XItxhqIW7shlfzGSYJy/uT5JES9s=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-3Wx_u8QoN_Gk96XHc_e0gg-1; Wed, 03 Sep 2025 00:00:53 -0400
+X-MC-Unique: 3Wx_u8QoN_Gk96XHc_e0gg-1
+X-Mimecast-MFC-AGG-ID: 3Wx_u8QoN_Gk96XHc_e0gg_1756872052
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-24aa3cf81a8so43638665ad.2
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 21:00:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756872052; x=1757476852;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U0jjFOIRPE2pVoUMIlyB9h7+kH8XE4j8UQpdjONzyjE=;
+        b=aNPw+8LgGP+xyieO4Knm7iaQYw+sQvcTuiZztt/8qa/2ddMawz8t+Nzx1FHpgXg916
+         lv7ve8Xhw2jtBLzKrjxwY3e+thD9UO1E/Omb1vysdA668rOaSFsUlBTjgBVsPTxyAj39
+         wgYiLaBhXCVNIjbHzS46+vN2ShgrLXz4xnjtv9o2V74LHCqCPVhayBSvs5mVEHcOaIEA
+         XV7W/FmMfE8oOcNoXkAz15sOM7hatFgmy5YM3mJdMpyN6Ow/Wjpi7jQxghB2q1dK5ByN
+         vDefu8bQQlxGZpWtSQ01LhvdIGdiM9pUBYs/nE2n6E01OX3NqrvpNXKvbcXulOftanHy
+         /jaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZYi3YieVlVrGZWtelVBFBWHEFdJ1FWtS0/jHSPTWFv9gyi5wyebMafgwvjrc+2Cl3IgI2XfI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTeP0EQd81LQRrXHA5okQPqM2e0H6w+MUiiuXqHq2/LEx/6Kpi
+	lDZtStG7OWiAjoR2vbS8HgQLCvJgQLq9nCLaz5PEoQntZpW+RoCSvzhIye1tSH6/4952I0EwiYJ
+	SAyMFqDl4+tuBVZqsEWJIJB5y0UVBIaisW+a5iYZp1G+zF6iXh7+DsyU+LSq0MLVMRQRsjmtpZe
+	lJXuYQiPx9Nbg/CZPnPGjGUHSluIdvloYW
+X-Gm-Gg: ASbGncseib2tzNwM/NhmMqTraCsYEmjGsLKX1oJJTCeHITIjPmpgr19hEaQWh7vGT8U
+	Ri6jJNVH8aPPlODDeyPz1Slstx2VP2sgHU6URwRh1KElBuWAAQ5O9GuXg2PJdJ3VsXGRcP7ZQxF
+	vLvQAgHhlOdZq+hyqOxBAklA==
+X-Received: by 2002:a17:903:1ab0:b0:246:76ed:e25d with SMTP id d9443c01a7336-24944b15b8cmr169377705ad.50.1756872052069;
+        Tue, 02 Sep 2025 21:00:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5aB6Qqxj9qWYTbp0SCLMQoviI6dY5kYYbJnZhA2Hm84dGyl7OdRCsvBI+vTe21NUsYwxF2ONdt98uJqVn0hA=
+X-Received: by 2002:a17:903:1ab0:b0:246:76ed:e25d with SMTP id
+ d9443c01a7336-24944b15b8cmr169377215ad.50.1756872051574; Tue, 02 Sep 2025
+ 21:00:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
+In-Reply-To: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 3 Sep 2025 12:00:40 +0800
+X-Gm-Features: Ac12FXzvemknOpwKY7V_bPmSMDz5x5JOaUgCJhdjwkkYam90CI_kt2z3omxI2R8
+Message-ID: <CACGkMEviyLXU46YE=FmON-VomyWUtmjevE8FOFq=wwvjsmVoQQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/4] TUN/TAP & vhost_net: netdev queue flow
+ control to avoid ptr_ring tail drop
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, mst@redhat.com, eperezma@redhat.com, 
+	stephen@networkplumber.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
-on our current generation hardware. Future hardware exposes a new set of
-device IDs for each generation. To avoid adding a new device ID for each
-generation and to make the driver forward and backward compatible,
-make use of the IDPF PCI programming interface to load the driver.
+On Tue, Sep 2, 2025 at 4:10=E2=80=AFPM Simon Schippers
+<simon.schippers@tu-dortmund.de> wrote:
+>
+> This patch series deals with TUN/TAP and vhost_net which drop incoming
+> SKBs whenever their internal ptr_ring buffer is full. Instead, with this
+> patch series, the associated netdev queue is stopped before this happens.
+> This allows the connected qdisc to function correctly as reported by [1]
+> and improves application-layer performance, see benchmarks.
+>
+> This patch series includes TUN, TAP, and vhost_net because they share
+> logic. Adjusting only one of them would break the others. Therefore, the
+> patch series is structured as follows:
+> 1. New ptr_ring_spare helper to check if the ptr_ring has spare capacity
+> 2. Netdev queue flow control for TUN: Logic for stopping the queue upon
+> full ptr_ring and waking the queue if ptr_ring has spare capacity
+> 3. Additions for TAP: Similar logic for waking the queue
+> 4. Additions for vhost_net: Calling TUN/TAP methods for waking the queue
+>
+> Benchmarks ([2] & [3]):
+> - TUN: TCP throughput over real-world 120ms RTT OpenVPN connection
+> improved by 36% (117Mbit/s vs 185 Mbit/s)
+> - TAP: TCP throughput to local qemu VM stays the same (2.2Gbit/s), an
+> improvement by factor 2 at emulated 120ms RTT (98Mbit/s vs 198Mbit/s)
+> - TAP+vhost_net: TCP throughput to local qemu VM approx. the same
+> (23.4Gbit/s vs 23.9Gbit/s), same performance at emulated 120ms RTT
+> (200Mbit/s)
+> - TUN/TAP/TAP+vhost_net: Reduction of ptr_ring size to ~10 packets
+> possible without losing performance
+>
+> Possible future work:
+> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
+> - Adaption of the netdev queue flow control for ipvtap & macvtap
 
-Write and read the VF_ARQBAL mailbox register to find if the current
-device is a PF or a VF.
+Could you please run pktgen on TUN as well to see the difference?
 
-PCI SIG allocated a new programming interface for the IDPF compliant
-ethernet network controller devices. It can be found at:
-https://members.pcisig.com/wg/PCI-SIG/document/20113
-with the document titled as 'PCI Code and ID Assignment Revision 1.16'
-or any latest revisions.
-
-Tested this patch by doing a simple driver load/unload on Intel IPU E2000
-hardware which supports 0x1452 and 0x145C device IDs and new hardware
-which supports the IDPF PCI programming interface.
-
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
----
-v4:
-- add testing info
-- use resource_size_t instead of long
-- add error statement for ioremap failure
-
-v3:
-- reworked logic to avoid gotos
-
-v2:
-- replace *u8 with *bool in idpf_is_vf_device function parameter
-- use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
-
----
- drivers/net/ethernet/intel/idpf/idpf.h        |  1 +
- drivers/net/ethernet/intel/idpf/idpf_main.c   | 73 ++++++++++++++-----
- drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 40 ++++++++++
- 3 files changed, 97 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index c56abf8b4c92..4a16e481faf7 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -1041,6 +1041,7 @@ void idpf_mbx_task(struct work_struct *work);
- void idpf_vc_event_task(struct work_struct *work);
- void idpf_dev_ops_init(struct idpf_adapter *adapter);
- void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
-+int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf);
- int idpf_intr_req(struct idpf_adapter *adapter);
- void idpf_intr_rel(struct idpf_adapter *adapter);
- u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index 8c46481d2e1f..493604d50143 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -7,11 +7,57 @@
- 
- #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
- 
-+#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
-+#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
-+	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
-+
- MODULE_DESCRIPTION(DRV_SUMMARY);
- MODULE_IMPORT_NS("LIBETH");
- MODULE_IMPORT_NS("LIBETH_XDP");
- MODULE_LICENSE("GPL");
- 
-+/**
-+ * idpf_dev_init - Initialize device specific parameters
-+ * @adapter: adapter to initialize
-+ * @ent: entry in idpf_pci_tbl
-+ *
-+ * Return: %0 on success, -%errno on failure.
-+ */
-+static int idpf_dev_init(struct idpf_adapter *adapter,
-+			 const struct pci_device_id *ent)
-+{
-+	bool is_vf = false;
-+	int err;
-+
-+	if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF) {
-+		err = idpf_is_vf_device(adapter->pdev, &is_vf);
-+		if (err)
-+			return err;
-+		if (is_vf) {
-+			idpf_vf_dev_ops_init(adapter);
-+			adapter->crc_enable = true;
-+		} else {
-+			idpf_dev_ops_init(adapter);
-+		}
-+
-+		return 0;
-+	}
-+
-+	switch (ent->device) {
-+	case IDPF_DEV_ID_PF:
-+		idpf_dev_ops_init(adapter);
-+		break;
-+	case IDPF_DEV_ID_VF:
-+		idpf_vf_dev_ops_init(adapter);
-+		adapter->crc_enable = true;
-+		break;
-+	default:
-+		return -ENODEV;
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * idpf_remove - Device removal routine
-  * @pdev: PCI device information struct
-@@ -165,21 +211,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	adapter->req_tx_splitq = true;
- 	adapter->req_rx_splitq = true;
- 
--	switch (ent->device) {
--	case IDPF_DEV_ID_PF:
--		idpf_dev_ops_init(adapter);
--		break;
--	case IDPF_DEV_ID_VF:
--		idpf_vf_dev_ops_init(adapter);
--		adapter->crc_enable = true;
--		break;
--	default:
--		err = -ENODEV;
--		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
--			ent->device);
--		goto err_free;
--	}
--
- 	adapter->pdev = pdev;
- 	err = pcim_enable_device(pdev);
- 	if (err)
-@@ -259,11 +290,18 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* setup msglvl */
- 	adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
- 
-+	err = idpf_dev_init(adapter, ent);
-+	if (err) {
-+		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
-+			ent->device);
-+		goto destroy_vc_event_wq;
-+	}
-+
- 	err = idpf_cfg_hw(adapter);
- 	if (err) {
- 		dev_err(dev, "Failed to configure HW structure for adapter: %d\n",
- 			err);
--		goto err_cfg_hw;
-+		goto destroy_vc_event_wq;
- 	}
- 
- 	mutex_init(&adapter->vport_ctrl_lock);
-@@ -284,7 +322,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	return 0;
- 
--err_cfg_hw:
-+destroy_vc_event_wq:
- 	destroy_workqueue(adapter->vc_event_wq);
- err_vc_event_wq_alloc:
- 	destroy_workqueue(adapter->stats_wq);
-@@ -304,6 +342,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- static const struct pci_device_id idpf_pci_tbl[] = {
- 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
- 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
-+	{ PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, ~0)},
- 	{ /* Sentinel */ }
- };
- MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-index 7527b967e2e7..4774b933ae50 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-@@ -7,6 +7,46 @@
- 
- #define IDPF_VF_ITR_IDX_SPACING		0x40
- 
-+#define IDPF_VF_TEST_VAL		0xFEED0000
-+
-+/**
-+ * idpf_is_vf_device - Helper to find if it is a VF device
-+ * @pdev: PCI device information struct
-+ * @is_vf: used to update VF device status
-+ *
-+ * Return: %0 on success, -%errno on failure.
-+ */
-+int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf)
-+{
-+	struct resource mbx_region;
-+	resource_size_t mbx_start;
-+	void __iomem *mbx_addr;
-+	resource_size_t len;
-+
-+	resource_set_range(&mbx_region,	VF_BASE, IDPF_VF_MBX_REGION_SZ);
-+
-+	mbx_start = pci_resource_start(pdev, 0) + mbx_region.start;
-+	len = resource_size(&mbx_region);
-+
-+	mbx_addr = ioremap(mbx_start, len);
-+	if (!mbx_addr) {
-+		pci_err(pdev, "Failed to allocate BAR0 mbx region\n");
-+
-+		return -EIO;
-+	}
-+
-+	writel(IDPF_VF_TEST_VAL, mbx_addr + VF_ARQBAL - VF_BASE);
-+
-+	/* Force memory write to complete before reading it back */
-+	wmb();
-+
-+	*is_vf = readl(mbx_addr + VF_ARQBAL - VF_BASE) == IDPF_VF_TEST_VAL;
-+
-+	iounmap(mbx_addr);
-+
-+	return 0;
-+}
-+
- /**
-  * idpf_vf_ctlq_reg_init - initialize default mailbox registers
-  * @adapter: adapter structure
--- 
-2.43.0
+Thanks
 
 
