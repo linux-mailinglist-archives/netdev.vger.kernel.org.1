@@ -1,79 +1,97 @@
-Return-Path: <netdev+bounces-219633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC10B42709
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:38:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEAF7B4271A
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:41:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD0B01BA7730
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:38:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 088FD687868
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5D12FDC23;
-	Wed,  3 Sep 2025 16:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4773002CD;
+	Wed,  3 Sep 2025 16:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="XLM1yyr4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZOZ8YC6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95D72BCF6A;
-	Wed,  3 Sep 2025 16:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8883229B77C;
+	Wed,  3 Sep 2025 16:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756917487; cv=none; b=DUklgh9FMN4078iRsjJmecCdJB67cizOEffu1sNmvqI+qOYtqLv3iLFeLgQQam1EOnofTgUmoN7ZJsmHecQXDb0/ZD3Ww9uNvNdtGN5GJyKp9+5GgSl+WcqRb4kSi4d5H4xyp4lmT6gmtuZUncLwU2X2kP50Cm7N+Eiff42BhsM=
+	t=1756917659; cv=none; b=XwEs9JhzpDNUE8STZr6j/yCt+n7SYq6bs+nE0l9/FSDBZgvvu2pX4VkxKrolU8zqqXbL7Ukjhrfxz/Mre9Cm2+64wCeL6Wye++6SB+ekZhje6+Q/7+QhCN4yo+JSgrqOJjX1wLhjgo7Kd81Vh4W1bHjiwETqK2E3NmMwkG91Ee4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756917487; c=relaxed/simple;
-	bh=Yquc3KVHRLklhexhuLuC/+JucDeDU9QiXHPxulI9nfY=;
+	s=arc-20240116; t=1756917659; c=relaxed/simple;
+	bh=SsiclISk443zkOK/H3wMBLBs3D4jxyQEPB6xGixEaKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YAuZQPwM5/z1zX8topNNvEcOHw2og1CWr46dHjYVrLa5I+VUOj/k55ajwveMGwdFVD43LaTzBLZRjRTQgMCPYYiZjkKoyb/HT+zPKQ6eP92AcBH+D8ODe7ZZaEzkPp9o7bY1/nbKDvNr3I+Rlxy7vQdp/BPTNRwXTSrURs7O67M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=XLM1yyr4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DAA9C4CEE7;
-	Wed,  3 Sep 2025 16:38:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1756917486;
-	bh=Yquc3KVHRLklhexhuLuC/+JucDeDU9QiXHPxulI9nfY=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=LL/Wxzq7bmrygSVwyO/P/BFBTp+zOy4+Dv77R/LPKJNoGQ05vlXfpNiKAWzfUFlxhDJbx5IRvo7uITrFpHoCZw57VTGMJMgjxV5ys3s8sVFkMCTSkNlshEnRmsRdnFx5p11NfTvBDvCE1j1B7kqsuDLteGmF694c3UAETtGGGJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZOZ8YC6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4A0BC4CEE7;
+	Wed,  3 Sep 2025 16:40:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756917658;
+	bh=SsiclISk443zkOK/H3wMBLBs3D4jxyQEPB6xGixEaKM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XLM1yyr4A6S086tC52nRdRcU9pFN659GrXfAHVKVmEbcFNJCRio/gGbt+tCTLLYFV
-	 IKgfsvGh6kAu221D3jiXh84RynBK7EhGB8C6PVYm/LpcT61firLmkJh/pOGqGIsdCM
-	 86hRHA8eKnynLpc6uB6aKke7u/aMHh+8SSBc0vLI=
-Date: Wed, 3 Sep 2025 18:38:03 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: =?iso-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>
-Cc: Allison Henderson <allison.henderson@oracle.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	b=hZOZ8YC6UQdFrcZMTGlBg7kafdrpx+RnTT8cCfWGSESuJ8j4KdS0rbRM+1MCroxyU
+	 Z4pooXVOYQ8SHc0uWLKMQBmNq/Pr6E3VF+1zWS/bdtgxEidW2zi1wzC6/DSqrtNHKl
+	 5W9c4/IDSCOJ5fPusqW3HNNq1GdDRy/MjIFfFNIxzfDrWbdy8C36fkTDsQPSHYqXBD
+	 X7864DmEJ9Pq6D3WHYk9yxwcIGZEJyd4xh+EUuyrYS/h6Ivq732V22jN+9or3bvJ6F
+	 3T8eahvr8M7uHRyKBnNUxggnNLoE2mBbIupVTvjsIdzF2EWQZm/3Db4Z4127t0lEfw
+	 6SERT7dpGm/fQ==
+Date: Wed, 3 Sep 2025 11:40:57 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Matthew Gerlach <matthew.gerlach@altera.com>, netdev@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, stable@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] rds: ib: Remove unused extern definition
-Message-ID: <2025090340-rejoicing-kleenex-c29d@gregkh>
-References: <20250903163140.3864215-1-haakon.bugge@oracle.com>
- <20250903163140.3864215-2-haakon.bugge@oracle.com>
+	linux-renesas-soc@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-kernel@vger.kernel.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: altr,socfpga-stmmac: Constrain
+ interrupts
+Message-ID: <175691765626.2450401.13914030815174267647.robh@kernel.org>
+References: <20250902154051.263156-3-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250903163140.3864215-2-haakon.bugge@oracle.com>
+In-Reply-To: <20250902154051.263156-3-krzysztof.kozlowski@linaro.org>
 
-On Wed, Sep 03, 2025 at 06:31:37PM +0200, Håkon Bugge wrote:
-> Fixes: 2cb2912d6563 ("RDS: IB: add Fastreg MR (FRMR) detection support")
-> Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
+
+On Tue, 02 Sep 2025 17:40:52 +0200, Krzysztof Kozlowski wrote:
+> STMMAC on SoCFPGA uses exactly one interrupt in in-kernel DTS and common
+> snps,dwmac.yaml binding is flexible, so define precise constraint for
+> this device.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
 > ---
->  net/rds/ib_mr.h | 1 -
->  1 file changed, 1 deletion(-)
+> 
+> Changes in v2:
+> 1. Minor typo in commit msg.
+> ---
+>  .../devicetree/bindings/net/altr,socfpga-stmmac.yaml       | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
 
-I know I can't take patches without any changelog text, but maybe other
-maintainer are more lax :)
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
 
-good luck!
-
-greg k-h
 
