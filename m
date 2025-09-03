@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F4049B42CDF
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:40:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B8FB42CE2
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 420454E0485
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:40:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F32791BC74DD
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203F52E7623;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6E82ECD1A;
 	Wed,  3 Sep 2025 22:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UxIhqxa1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N6RhNx8j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F3E4A2D;
-	Wed,  3 Sep 2025 22:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FB42D9485;
+	Wed,  3 Sep 2025 22:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756939205; cv=none; b=ubQs+lwiN9Et9F2pgNQgZ2Cl6bDuf/oQk06RE3LWqbOA5aJLTjzelxdiIKevq4J9IUGIE9dEYg58qtg0OJwGXL1yPm2T7MJXxZ2D3+tgBhIHpINT/NtG8HnEiPvoqcYvVUa1iH0/gEM4d36Cw67GcxxHe3em3KNxZAPj3jOWK8A=
+	t=1756939205; cv=none; b=Mq8H3M3bxbWvFAjUKTxzRktuXDguR1C4QwxHGJ/WRxR81S51pMlKxdIAzSelv2H9JTAWQfXVNeIXMN6po29Qf/hI+84XjvEmGQJKfWaVBQK3vn7xTbaAcai9R1hF9TE0mlfX12gjPHzOwuIxh1jAbLNQixRcuNKlbizW6r3LIqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756939205; c=relaxed/simple;
-	bh=/E5Zj/BgMYUYauQyehlWEkdZYsK/ulBZEgIkhcsOnqw=;
+	bh=vb66h9+AzAw2lQhvhLgXxbLZecvq8uS2NeBKhLSK7Gk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hJLHV7QdyZDxH1nsrIvtsE2iciFo8Q9N2gG48JRPoBSN743l8Ux0V127h0eDPdfp+WzY3JkOoozZQlQ9dK7JlKKABraCT6ns0TyMmpG2Uyn+GRRYDHc4v4664mj2pVOTJEp1GNQWjSa7Bx+j9ROqBdaPweNBi+mazzTQsHD9pZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UxIhqxa1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DC2CC4CEE7;
-	Wed,  3 Sep 2025 22:40:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=HU0nhMARdDqXUAWv5q/RI5TVh4B63qFR1TYz9XiWBofLjY8K8WSp/YxlRKV8jcWLBvaoLuJaiLqF+tFAKoxMzAhInm9g3s8hT/5D3rWTzL/2HEE4dvNojea+4lz2roM3Z5e00g3dnYmTNtOWENv2xKds2+ClN+71VSjKLY+4jl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N6RhNx8j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65CC8C4CEF4;
+	Wed,  3 Sep 2025 22:40:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756939203;
-	bh=/E5Zj/BgMYUYauQyehlWEkdZYsK/ulBZEgIkhcsOnqw=;
+	s=k20201202; t=1756939204;
+	bh=vb66h9+AzAw2lQhvhLgXxbLZecvq8uS2NeBKhLSK7Gk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UxIhqxa1ctx5OutYvCteapR5w1Bx0s2acUWHdxFqNpQlEcAhd7Dpu5YRVXLuYxwJT
-	 dJk0dQdx9b8eqFGnGCH8T0ORVBFU0N0Ng/oJXwgMs4bp98BLDm8490ncOQzuXrK/cW
-	 47KJ1UG+z/alWfHvw871WxiWHvGZXtJs4hWBesDTNZlvrq/93T0qvEpcFKpByr2TxE
-	 LWhQUOxnw4ScX3VQQR+1lv3R6Z1EhXobRSS+kFY/YWXpoLN2cVdnIV5QLOZ2MAClFF
-	 JbV0wtYfpeud+EBpvT3wiSvu0+5Z1nVHVUgdPpSGoXTc0atdUD1d1IZ2mXulGjEwAS
-	 gQzznvxmcKQcw==
+	b=N6RhNx8jpRROyDZe+XUWTkfm1JtwHinLea//T8JIUgoujDUDTvV/fzLjeq3NijALK
+	 PtjnUz3Ij0I3iRQtKM1m9RNvrnmDApzwbQx3DBMhiX7JOOeUA2urDZkNIxMZ0oPUFO
+	 dyITwlOW6DDwDGzF7Y1Kb2xdl1XGQETChSx8ShkWKCZUtOx3IfQYRmjL7smjHE5SSN
+	 BGMSgo8qzH9Ebb66sbypzr/QVW4mg4EFBIWBxo7IuTjs+6wjgLR/pK1Xc5pJIcZ0e3
+	 gHJccWVPVB72HhNsUbLlqomja6f6Hu/0MWKeb8Qlvpz+7YaPAi7hm1hcRgDfZmvdg/
+	 3hHfOr3aaAJpg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 6DC43383C259;
-	Wed,  3 Sep 2025 22:40:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE77D383C259;
+	Wed,  3 Sep 2025 22:40:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] rust: phy: use to_result for error handling
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: altr,socfpga-stmmac: Constrain
+ interrupts
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175693920825.1224224.13952038246418907969.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Sep 2025 22:40:08 +0000
-References: <20250821091235.800-1-work@onurozkan.dev>
-In-Reply-To: <20250821091235.800-1-work@onurozkan.dev>
-To: =?utf-8?q?Onur_=C3=96zkan_=3Cwork=40onurozkan=2Edev=3E?=@codeaurora.org
-Cc: rust-for-linux@vger.kernel.org, fujita.tomonori@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- boqun.feng@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
- dakr@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <175693920948.1224224.17708323821757004154.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Sep 2025 22:40:09 +0000
+References: <20250902154051.263156-3-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20250902154051.263156-3-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: matthew.gerlach@altera.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, romain.gantois@bootlin.com,
+ geert+renesas@glider.be, magnus.damm@gmail.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 21 Aug 2025 12:12:35 +0300 you wrote:
-> Simplifies error handling by replacing the manual check
-> of the return value with the `to_result` helper.
+On Tue,  2 Sep 2025 17:40:52 +0200 you wrote:
+> STMMAC on SoCFPGA uses exactly one interrupt in in-kernel DTS and common
+> snps,dwmac.yaml binding is flexible, so define precise constraint for
+> this device.
 > 
-> Signed-off-by: Onur Özkan <work@onurozkan.dev>
-> ---
->  rust/kernel/net/phy.rs | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
 > 
 > [...]
 
 Here is the summary with links:
-  - rust: phy: use to_result for error handling
-    https://git.kernel.org/netdev/net-next/c/a7ddedc84c59
+  - [v2,1/2] dt-bindings: net: altr,socfpga-stmmac: Constrain interrupts
+    https://git.kernel.org/netdev/net-next/c/f672fcd8e6c4
+  - [v2,2/2] dt-bindings: net: renesas,rzn1-gmac: Constrain interrupts
+    https://git.kernel.org/netdev/net-next/c/69cd99350740
 
 You are awesome, thank you!
 -- 
