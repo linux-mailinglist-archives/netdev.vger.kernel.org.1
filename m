@@ -1,422 +1,183 @@
-Return-Path: <netdev+bounces-219680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61756B4296D
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:03:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D0FB4296A
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B00121BC2DB7
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:03:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 124B53BF7F9
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F8C2D7DD2;
-	Wed,  3 Sep 2025 19:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78ED369339;
+	Wed,  3 Sep 2025 19:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W9tNQLvs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3+ggaHG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737E92D660F
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 19:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA82E2C2AA2
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 19:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756926174; cv=none; b=a2xzQLzMmY3b+YKlhbp7ow4mTLVC5ubbs0RI4aHvRGcA7JhCkxB3VejVchzRJ7zsQTsrNcWEB/UICPEENeCwa1a/uvI6KAT4+rHson0N0dPGSmWBqnJ+sGrJRwEF0VVTYLPD9MH6wLX6YzGLMOK5PTPatOAsPIGdTcABoSdDaro=
+	t=1756926169; cv=none; b=qG+JbH5KhoECUX3ecEOEwunrjCa/QOU6MbKZ+2ItwX02Rek22MIEza+lyGb49jvC/e4Efok+BZkka7xCuSvQqB1k/ksvQfbsp9uiABZCL2WJmXKg01cA0HH49C6P4FMFbJsfHZWFkmIcBOUwwKkwxZYXzQvoQkBpzE1B+/9c1oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756926174; c=relaxed/simple;
-	bh=gj6aYZ7KQ1aqhXUG3Ur52eLx4emNHQiYmnCTH+MCwmY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=J08AUD8hHJttVvPcgXo7HGx0WVrh95j468NkQ4H0ZEdN7ZrS4aBYK0o/M8pn3NQq4/Yr8j/Ffp/b6RbLpSpfleVQmXUN1h5T658Uuvp/uleB4BDK2ls3kj8ev4VYX8Uhqbelqooa8ljrUZjN4VczF/ols+9JU4/3gSfHcWKqT7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W9tNQLvs; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32811874948so112475a91.2
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 12:02:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756926169; x=1757530969; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vzF4zJ5+F1zF9VaKrU/tXWM1tjtt/QoM4YGbOeZxyBQ=;
-        b=W9tNQLvszgdha1+oynwM0f0mG5SfWdHZ6vDF/PC/rweDdDPDR5HtO+sEnLkAszTnH5
-         upRvYOtvPiEw9Rp5XRjxtLdK8x/f7pSMyFyZPdULuqHTuLNyy7pZyQORUm2j5zhnVnE0
-         OXSC9YV5GdTEYExRD8RmaWVV0FYBTC3IVB+6VErc6kynEhHASu4lihN+l7ZaRiFBdrnn
-         WMWGwiB1XCjCl9+KPvj17dcE5FCaYB4ukMQ0PKE6Nl1VCs8l7sZZKFkktSAIDMNt38+i
-         0cPndAN0TaG1K/4PmfoBfl4WLljD5sc45Fu2HEEHNh9quxnvuZcQRGvI4AzSe3ljJod3
-         8T4Q==
+	s=arc-20240116; t=1756926169; c=relaxed/simple;
+	bh=xTtxSXE1yvDONysLDA9KqzBNgxSs0B2LZNlNuY0JSO4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OH+2TOU1wlbAe6wL8/YKjooARNiCtuw4pHCGMbXb4BIOe9vl1WMCMO+V96uKhYUrS49x7YmNrLLlpMxD+3oyuyMyxeuwkwlyMzI3o++fhvXtbAb4uF7nAIc8xfwGCMmPKhsEMLs3O8FQgt8FogQUovwtgeNZKAGFRXZwaBvQ+0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a3+ggaHG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756926165;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YRc9qQhtPu4aJgrWe6QIrpHXB4Ut/KhAlfEhBqE7V54=;
+	b=a3+ggaHGJNThzghQzQ5y5JSHDBOZASzUDpVLUOAD9oo+9YqzGdc0EOiP9cyQAPq9W1VqY6
+	nf3O0tZd7hY36G2UM6NlpbCT3UAtdH2/P/sjconKsFWD5zo+KjNKmXnjTdHd/0hxsvi7RT
+	cbOqOfnTkayrNdnkNS6J9jZRRwS/eM4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-680-joMlbTwsPGCM0ErbIFOjOg-1; Wed, 03 Sep 2025 15:02:44 -0400
+X-MC-Unique: joMlbTwsPGCM0ErbIFOjOg-1
+X-Mimecast-MFC-AGG-ID: joMlbTwsPGCM0ErbIFOjOg_1756926163
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45cb612d362so1362895e9.3
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 12:02:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756926169; x=1757530969;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vzF4zJ5+F1zF9VaKrU/tXWM1tjtt/QoM4YGbOeZxyBQ=;
-        b=r6gQVBQikI2Qi4FxX1g9789VTkBl/BDymNc2mosi/MNXNbEbPKWXAW5o3xRZNbeiO5
-         91dH94WFXsy43p2IBhGX2Nun3t4QHPa24mGcvXyP4L0DCmUxuexmS209d8engZnI1pfu
-         LLUZd1gqB5/ufR1ltg3lB4pTCehBdZAn+Dl6dMqRqOO5Or1j9XwgKnPjC0qLSwGCgszG
-         i2I8MiZ/+nhp87ULx+GoJAA9fpH4JcbyoZvHBfEPilUyWRgp6QWItta2EswQP0KPGGI5
-         gunE9A5RzCWSUMrRQY0H9USWICaIWSFIQNhGfqOz8MbJqH/jy1SipchavdTwsZed+r56
-         z2tg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFdy+Fd73wr1E/sgRc7XTvvekVoxQKWI7OZHquvxAjUPDwm7FYhmqrSSkM43aVDUFHEkga7EU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2vxnRDFdUXYcy3SMal6+4Xow7WXENflGLZZhOODVgyP09ahRg
-	b4UnSQHC0g6fLu6jpQDixrUqIBsQgOCWkpe/BI5HvydHowrHnVP4jmnxUY2yH2FeCnFaGvaeWPe
-	Xbo0evw==
-X-Google-Smtp-Source: AGHT+IELOo2GRkjTPUTVgvOb0l9KOXwTyVVAAUseHJuaZjmTyh3t9jPNV7rbNRv+rNipdEvHh3NDb6TeoMw=
-X-Received: from pjbsl11.prod.google.com ([2002:a17:90b:2e0b:b0:325:8e70:8d5e])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d603:b0:311:b413:f5e1
- with SMTP id 98e67ed59e1d1-328156e4731mr19519055a91.32.1756926168800; Wed, 03
- Sep 2025 12:02:48 -0700 (PDT)
-Date: Wed,  3 Sep 2025 19:02:04 +0000
-In-Reply-To: <20250903190238.2511885-1-kuniyu@google.com>
+        d=1e100.net; s=20230601; t=1756926163; x=1757530963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YRc9qQhtPu4aJgrWe6QIrpHXB4Ut/KhAlfEhBqE7V54=;
+        b=auXnYtkU/IeivZJ3yVEP51LTMc0oPJFsCb+HFo9BV++hdCOxSXEzrw10k2VD3Mr5Q/
+         PX5YIlR23VVEtXVLjwyi100DT090W7damhYfwXMoz3T2WZIWCGfPxeBvaUKMWsnevXMM
+         o7QVRG4zKH5SqABZIpis5W1mZcsCPOIb7enfMgs+iyvyHkPFbpnHFaJ3ghHkXsH2oAPb
+         wo/MIDjCq/3TTWSh6ZMMiDUnIsS54nv4U+rrBuQPgW0kuk1dj95Gm95JBjMdJuaGj3dG
+         jNyrcqDKu1u6eHZo51diF75g1by/xOAgKZDb1iMEyu3SLSyQ0W36HVHv885AzPGLBNRE
+         ZqOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnSUm+spXyTBeXvXj+Ayj69hw3Oj/CmsrTjH2DJQE2y5Xrlbj7KpruqWwskCfXrJrQcWiunoI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxfwk0QKti0ng5vxj1WeJPIvgL7nMj79Xwd0x696eg+rjnKm7Ad
+	q1oj4Bwx6HHtnx9ZgwylXivk/oLN1Al5VCG3ctQEKASHCY5oYk4uuywOl/4gSy6OIySL9LIvGfS
+	btklHJ5TMoA/lmjuPK5kvL1QNH+uvzvyljqMDO0c+2m8el7f/R7HVnSfVGA==
+X-Gm-Gg: ASbGnctxp8EiQc1Td24UgYbbUXRXlxC9oBUH2OviiRcJ1lCxfoHEwfYY3bFcCFPYpBP
+	K2cQDjERw9CjsM3x+7BeeaSjjpnjOL5XA6JDZl63YQAjBUEqXDu2HTobCKG1p5oU+ycsgDhVJoE
+	B9YGRyPCYzU0iFbwevMh6h7fi2P7GJJlYQwcoqwoyn7lLwVV8l9xbomyZGp0Bk9vBmA9Fx7oz+A
+	rg2WdVBC5J4P9g5e0UprTZNzw4qQ+PE104esC7+8knOTcIBpSrCt9LUqACW18zQGgDrB5zT+Kkj
+	tnEE1DJ9CaXe+zK4pq5nG8WnMqKxzejr/jSr5JmlKI/bcAc=
+X-Received: by 2002:a05:600c:3b14:b0:45b:9c93:d237 with SMTP id 5b1f17b1804b1-45cfc8a9d32mr15316605e9.14.1756926162961;
+        Wed, 03 Sep 2025 12:02:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHlZeBDIpo6ChshSjx9wt03zDRLgVFsNe6iBStfpel8EqkMRCiAdP47I2pV+o8YyqRg2cs+qw==
+X-Received: by 2002:a05:600c:3b14:b0:45b:9c93:d237 with SMTP id 5b1f17b1804b1-45cfc8a9d32mr15316305e9.14.1756926162511;
+        Wed, 03 Sep 2025 12:02:42 -0700 (PDT)
+Received: from fedora.redhat.com ([2001:4df4:5814:7700:7fb2:f956:4fb9:7689])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b6f0c6b99sm331978655e9.4.2025.09.03.12.02.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 12:02:42 -0700 (PDT)
+From: mheib@redhat.com
+To: intel-wired-lan@lists.osuosl.org
+Cc: przemyslawx.patynowski@intel.com,
+	jiri@resnulli.us,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	aleksandr.loktionov@intel.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Mohammad Heib <mheib@redhat.com>
+Subject: [PATCH net-next,v2,1/2] devlink: Add new "max_mac_per_vf" generic device param
+Date: Wed,  3 Sep 2025 22:02:28 +0300
+Message-ID: <20250903190229.49193-1-mheib@redhat.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250903190238.2511885-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
-Message-ID: <20250903190238.2511885-6-kuniyu@google.com>
-Subject: [PATCH v5 bpf-next/net 5/5] selftest: bpf: Add test for SK_BPF_MEMCG_SOCK_ISOLATED.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The test does the following for IPv4/IPv6 x TCP/UDP sockets
-with/without BPF prog.
+From: Mohammad Heib <mheib@redhat.com>
 
-  1. Create socket pairs
-  2. Send a bunch of data that requires more than 256 pages
-  3. Read memory_allocated from the 3rd column in /proc/net/protocols
-  4. Check if unread data is charged to memory_allocated
+Add a new device generic parameter to controls the maximum
+number of MAC filters allowed per VF.
 
-If BPF prog is attached, memory_allocated should not be changed,
-but we allow a small error (up to 10 pages) in case other processes
-on the host use some amounts of TCP/UDP memory.
+While this parameter is named `max_mac_per_vf`, the exact enforcement
+policy may vary between drivers. For example, i40e applies this limit
+only to trusted VFs, whereas other drivers may choose to apply it
+uniformly across all VFs. The goal is to provide a consistent devlink
+interface, while allowing flexibility for driver-specific behavior.
 
-At 2., the test actually sends more than 1024 pages because the sysctl
-net.core.mem_pcpu_rsv is 256 is by default, which means 256 pages are
-buffered per cpu before reporting to sk->sk_prot->memory_allocated.
+For example, to limit a VF to 3 MAC addresses:
+ $ devlink dev param set pci/0000:3b:00.0 name max_mac_per_vf \
+        value 3 \
+        cmode runtime
 
-  BUF_SINGLE (1024) * NR_SEND (128) * NR_SOCKETS (64) / 4096
-  = 2048 pages
-
-When it's reduced to 1024 pages, the following assertion for the
-non-isolated case got flaky.
-
-  ASSERT_GT(memory_allocated[1], memory_allocated[0] + 256, ...)
-
-We use kern_sync_rcu() for UDP because UDP recv queue is destroyed
-after 1 RCU grace period.
-
-The test takes ~0.5s on QEMU w/ KVM but takes 2s w/o KVM.
-
-  # time ./test_progs -t sk_memcg
-  #370/1   sk_memcg/TCP       :OK
-  #370/2   sk_memcg/UDP       :OK
-  #370/3   sk_memcg/TCPv6     :OK
-  #370/4   sk_memcg/UDPv6     :OK
-  #370     sk_memcg:OK
-  Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
-
-  real	0m0.473s
-  user	0m0.009s
-  sys	0m0.201s
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Mohammad Heib <mheib@redhat.com>
 ---
-v5:
-  * Use kern_sync_rcu()
-  * Double NR_SEND to 128
+ Documentation/networking/devlink/devlink-params.rst | 8 ++++++++
+ include/net/devlink.h                               | 4 ++++
+ net/devlink/param.c                                 | 5 +++++
+ 3 files changed, 17 insertions(+)
 
-v4:
-  * Only use inet_create() hook
-  * Test bpf_getsockopt()
-  * Add serial_ prefix
-  * Reduce sleep() and the amount of sent data
----
- .../selftests/bpf/prog_tests/sk_memcg.c       | 218 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/sk_memcg.c  |  38 +++
- 2 files changed, 256 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sk_memcg.c b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-new file mode 100644
-index 000000000000..66bdff2d6ec7
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-@@ -0,0 +1,218 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
+diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
+index 211b58177e12..2bc9995fd849 100644
+--- a/Documentation/networking/devlink/devlink-params.rst
++++ b/Documentation/networking/devlink/devlink-params.rst
+@@ -143,3 +143,11 @@ own name.
+    * - ``clock_id``
+      - u64
+      - Clock ID used by the device for registering DPLL devices and pins.
++   * - ``max_mac_per_vf``
++     - u32
++     - Controls the maximum number of MAC address filters that can be assigned
++       to a Virtual Function (VF).
++       The exact enforcement may depend on driver capabilities. For example,
++       some drivers may apply this limit only to *trusted* VFs, while others may
++       apply it to all VFs uniformly. This allows a consistent parameter across
++       devices while leaving flexibility for driver-specific behavior.
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index b32c9ceeb81d..dde5dcbca625 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -530,6 +530,7 @@ enum devlink_param_generic_id {
+ 	DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
+ 	DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
+ 	DEVLINK_PARAM_GENERIC_ID_CLOCK_ID,
++	DEVLINK_PARAM_GENERIC_ID_MAX_MAC_PER_VF,
+ 
+ 	/* add new param generic ids above here*/
+ 	__DEVLINK_PARAM_GENERIC_ID_MAX,
+@@ -594,6 +595,9 @@ enum devlink_param_generic_id {
+ #define DEVLINK_PARAM_GENERIC_CLOCK_ID_NAME "clock_id"
+ #define DEVLINK_PARAM_GENERIC_CLOCK_ID_TYPE DEVLINK_PARAM_TYPE_U64
+ 
++#define DEVLINK_PARAM_GENERIC_MAX_MAC_PER_VF_NAME "max_mac_per_vf"
++#define DEVLINK_PARAM_GENERIC_MAX_MAC_PER_VF_TYPE DEVLINK_PARAM_TYPE_U32
 +
-+#include <test_progs.h>
-+#include "sk_memcg.skel.h"
-+#include "network_helpers.h"
-+
-+#define NR_SOCKETS	64
-+#define NR_SEND		128
-+#define BUF_SINGLE	1024
-+#define BUF_TOTAL	(BUF_SINGLE * NR_SEND)
-+
-+struct test_case {
-+	char name[10]; /* protocols (%-9s) in /proc/net/protocols, see proto_seq_printf(). */
-+	int family;
-+	int type;
-+	int (*create_sockets)(struct test_case *test_case, int sk[], int len);
-+};
-+
-+static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int server, i;
-+
-+	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+	ASSERT_GE(server, 0, "start_server_str");
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = connect_to_fd(server, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "connect_to_fd"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = accept(server, NULL, NULL);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "accept"))
-+			return sk[i * 2 + 1];
-+	}
-+
-+	close(server);
-+
-+	return 0;
-+}
-+
-+static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int i, err, rcvbuf = BUF_TOTAL;
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "start_server"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = connect_to_fd(sk[i * 2], 0);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "connect_to_fd"))
-+			return sk[i * 2 + 1];
-+
-+		err = connect_fd_to_fd(sk[i * 2], sk[i * 2 + 1], 0);
-+		if (!ASSERT_EQ(err, 0, "connect_fd_to_fd"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2 + 1], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int get_memory_allocated(struct test_case *test_case)
-+{
-+	long memory_allocated = -1;
-+	char *line = NULL;
-+	size_t unused;
-+	FILE *f;
-+
-+	f = fopen("/proc/net/protocols", "r");
-+	if (!ASSERT_OK_PTR(f, "fopen"))
-+		goto out;
-+
-+	while (getline(&line, &unused, f) != -1) {
-+		unsigned int unused_0;
-+		int unused_1;
-+		int ret;
-+
-+		if (strncmp(line, test_case->name, sizeof(test_case->name)))
-+			continue;
-+
-+		ret = sscanf(line + sizeof(test_case->name), "%4u %6d  %6ld",
-+			     &unused_0, &unused_1, &memory_allocated);
-+		ASSERT_EQ(ret, 3, "sscanf");
-+		break;
-+	}
-+
-+	ASSERT_NEQ(memory_allocated, -1, "get_memory_allocated");
-+
-+	free(line);
-+	fclose(f);
-+out:
-+	return memory_allocated;
-+}
-+
-+static int check_isolated(struct test_case *test_case, bool isolated)
-+{
-+	char buf[BUF_SINGLE] = {};
-+	long memory_allocated[2];
-+	int sk[NR_SOCKETS] = {};
-+	int err = -1, i, j;
-+
-+	memory_allocated[0] = get_memory_allocated(test_case);
-+	if (!ASSERT_GE(memory_allocated[0], 0, "memory_allocated[0]"))
-+		goto out;
-+
-+	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-+	if (err)
-+		goto close;
-+
-+	/* Must allocate pages >= net.core.mem_pcpu_rsv */
-+	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-+		for (j = 0; j < NR_SEND; j++) {
-+			int bytes = send(sk[i], buf, sizeof(buf), 0);
-+
-+			/* Avoid too noisy logs when something failed. */
-+			if (bytes != sizeof(buf))
-+				ASSERT_EQ(bytes, sizeof(buf), "send");
-+		}
-+	}
-+
-+	memory_allocated[1] = get_memory_allocated(test_case);
-+	if (!ASSERT_GE(memory_allocated[1], 0, "memory_allocated[1]"))
-+		goto close;
-+
-+	if (isolated) {
-+		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "isolated");
-+	} else {
-+		/* By default, net.core.mem_pcpu_rsv == 256 pages */
-+		ASSERT_GT(memory_allocated[1], memory_allocated[0] + 256, "not isolated");
-+	}
-+
-+close:
-+	for (i = 0; i < ARRAY_SIZE(sk); i++)
-+		close(sk[i]);
-+
-+	if (test_case->type == SOCK_DGRAM) {
-+		/* Give 150ms to let RCU destruct UDP sockets */
-+		kern_sync_rcu();
-+	}
-+out:
-+	return err;
-+}
-+
-+void run_test(struct test_case *test_case)
-+{
-+	struct sk_memcg *skel;
-+	int cgroup, err;
-+
-+	skel = sk_memcg__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	cgroup = test__join_cgroup("/sk_memcg");
-+	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
-+		goto destroy_skel;
-+
-+	err = check_isolated(test_case, false);
-+	if (!ASSERT_EQ(err, 0, "test_isolated(false)"))
-+		goto close_cgroup;
-+
-+	skel->links.sock_create = bpf_program__attach_cgroup(skel->progs.sock_create, cgroup);
-+	if (!ASSERT_OK_PTR(skel->links.sock_create, "attach_cgroup(sock_create)"))
-+		goto close_cgroup;
-+
-+	err = check_isolated(test_case, true);
-+	ASSERT_EQ(err, 0, "test_isolated(false)");
-+
-+close_cgroup:
-+	close(cgroup);
-+destroy_skel:
-+	sk_memcg__destroy(skel);
-+}
-+
-+struct test_case test_cases[] = {
+ #define DEVLINK_PARAM_GENERIC(_id, _cmodes, _get, _set, _validate)	\
+ {									\
+ 	.id = DEVLINK_PARAM_GENERIC_ID_##_id,				\
+diff --git a/net/devlink/param.c b/net/devlink/param.c
+index 41dcc86cfd94..62fd789ae01c 100644
+--- a/net/devlink/param.c
++++ b/net/devlink/param.c
+@@ -102,6 +102,11 @@ static const struct devlink_param devlink_param_generic[] = {
+ 		.name = DEVLINK_PARAM_GENERIC_CLOCK_ID_NAME,
+ 		.type = DEVLINK_PARAM_GENERIC_CLOCK_ID_TYPE,
+ 	},
 +	{
-+		.name = "TCP       ",
-+		.family = AF_INET,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
++		.id = DEVLINK_PARAM_GENERIC_ID_MAX_MAC_PER_VF,
++		.name = DEVLINK_PARAM_GENERIC_MAX_MAC_PER_VF_NAME,
++		.type = DEVLINK_PARAM_GENERIC_MAX_MAC_PER_VF_TYPE,
 +	},
-+	{
-+		.name = "UDP       ",
-+		.family = AF_INET,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+	},
-+	{
-+		.name = "TCPv6     ",
-+		.family = AF_INET6,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+	},
-+	{
-+		.name = "UDPv6     ",
-+		.family = AF_INET6,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+	},
-+};
-+
-+void serial_test_sk_memcg(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		test__start_subtest(test_cases[i].name);
-+		run_test(&test_cases[i]);
-+	}
-+}
-diff --git a/tools/testing/selftests/bpf/progs/sk_memcg.c b/tools/testing/selftests/bpf/progs/sk_memcg.c
-new file mode 100644
-index 000000000000..a613c1deeede
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/sk_memcg.c
-@@ -0,0 +1,38 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <errno.h>
-+
-+SEC("cgroup/sock_create")
-+int sock_create(struct bpf_sock *ctx)
-+{
-+	u32 flags = SK_BPF_MEMCG_SOCK_ISOLATED;
-+	int err;
-+
-+	err = bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+			     &flags, sizeof(flags));
-+	if (err)
-+		goto err;
-+
-+	flags = 0;
-+
-+	err = bpf_getsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+			     &flags, sizeof(flags));
-+	if (err)
-+		goto err;
-+
-+	if (flags != SK_BPF_MEMCG_SOCK_ISOLATED) {
-+		err = -EINVAL;
-+		goto err;
-+	}
-+
-+	return 1;
-+
-+err:
-+	bpf_set_retval(err);
-+	return 0;
-+}
-+
-+char LICENSE[] SEC("license") = "GPL";
+ };
+ 
+ static int devlink_param_generic_verify(const struct devlink_param *param)
 -- 
-2.51.0.338.gd7d06c2dae-goog
+2.50.1
 
 
