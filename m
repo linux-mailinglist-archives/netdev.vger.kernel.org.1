@@ -1,202 +1,112 @@
-Return-Path: <netdev+bounces-219587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A304AB4216F
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:27:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAD5FB421B1
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D93D687C7D
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 13:26:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3DB57BB662
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 13:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D51E3043A9;
-	Wed,  3 Sep 2025 13:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC29301031;
+	Wed,  3 Sep 2025 13:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inadvantage.onmicrosoft.com header.i=@inadvantage.onmicrosoft.com header.b="E9hhUNwV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1LcaJFB"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2101.outbound.protection.outlook.com [40.107.237.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B82302CBE;
-	Wed,  3 Sep 2025 13:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.101
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756905979; cv=fail; b=AVhhgu2+QFZ45qo+X5XBzRVNFOJ7bwpK/NGUxDGNRZD44+5FLurZsa61jHRXi6wl3CKg+E7W8UoyXMzj2crPvqcpdRiIQmax1gSoCfj06CJU9cGJ7+ScH2Zte4+IJlfUp4WPdXusbWwyLBgPlEjNfHxVHIkLED+ZnxAfDqz8zGw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756905979; c=relaxed/simple;
-	bh=pm8V7Vv7VXnHAMxfqVx2ulUtwkSKAhR3sb/ieChilEg=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=eT7THy+fncO45MQ31lEYmv/pFJsHSGZsm7e6EF7/IsGZl2Yb63mWrBqFAMZWY/ruWFW/YWrgcJAd8QvxslDZjuk5s5UE8LqhORvye6sLB49DvyMYpKt6h8bYdxDsIumFkPmy2S/tySSz27dVnToXhL7lxvoZA1Um2jM4k4l1qEI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=in-advantage.com; spf=pass smtp.mailfrom=in-advantage.com; dkim=pass (1024-bit key) header.d=inadvantage.onmicrosoft.com header.i=@inadvantage.onmicrosoft.com header.b=E9hhUNwV; arc=fail smtp.client-ip=40.107.237.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=in-advantage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=in-advantage.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R/keXfSYDNM7KI/nq/Mk/n1bl+msCKyk3N0cAP6FI/WnSwqMrzym4IVjvwMfsHfUL7Oqrq1M0AzbSpNNe97+74s7vYdHaXUzPSTN8Njh+fxmq39BR539tlaekO/hzX5NckNzerkhboOlORxqOJEnZCCq0K6stM+Rc3hjprEm0ew8uT44ISC5ur0xI/f2Hftfs3DPuc1Yr0o4cW+zAczvx4PhqMNe8YLSoXuBdSbuHvfq9xD9UIvkMxeHshZsPH6SWFoCK2K0TdPQ/8phR1S8PdQY/2UOPPW2Q4ZR09Br4n6LId81IzbC5wLB2gN/3xaU+z1Ye6T68tqttdkcQKbWiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MYY7F4zPa0aOuWdtnwAlVwD9y9LhRBoFiBzoWMQxt68=;
- b=ucUK+mxCYGwkOdXF4CST79zLdewcbAqAbKDD/u//VujyU8K9JpU37W8rD7echH8J0KCGDRVTZBQjJ2B30liy+vMIILW+EI1b0vVuy44dmlvsXPh7v2UqPeLZK1v+cjEXs7T2/8KiOcnv3dFwjE+oNDu2rTF5mOx68HxSozlRDx3LDkhk9dOYp/PT5ca4jiQPxmDn8296SP0vt4zJLhwGaKUm2esk/VBi2ovLhpKZomB7wblUUPfdevL8Z+S1D8IWIZz+NQtBU38KJYm93HbV3u2fKWk0Ge2Ii9X/Aqrj8DEMuGo78tD8MKgC0aOAVWz/W15vYvYYdKHqmKRVk1KsOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=in-advantage.com; dmarc=pass action=none
- header.from=in-advantage.com; dkim=pass header.d=in-advantage.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F04302776;
+	Wed,  3 Sep 2025 13:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756906134; cv=none; b=WngF8Dc4Q/kRCEg6d4knRNe1g6sPy50oPay/tYalp5lamcu5ekYwIL0xxOT3vG2EdJemPziBng3NV9TArySXDkuQbFKPY/d0llVDg6XXYMd7x7X+BhFFEQfDV8OZL9s135cE3ildKFQKtgyzxAs6wniEra+tRth0ChXJWndwLZ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756906134; c=relaxed/simple;
+	bh=hsABvs17BadY5osyuv6Ozk7YDzMdfHke4VNm2Ky2Fzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eSKG5uK8YsnA6vYexg8zcNjO2rMXVx5C1ShfTgb3hwiAvCjr/FdUkBZ2xy0fvQAwK3ZsJoB3xXz7y5d758L/bhxGk4HHmaB4vRih6Ji0RKVvu7gdS7rRIk1O2tlFeie3AZP7t+S2vIzLP7G4YlxLLhYZ+ry72saBfcVSeUK6+MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1LcaJFB; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45b844f1b18so2116965e9.1;
+        Wed, 03 Sep 2025 06:28:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=inadvantage.onmicrosoft.com; s=selector2-inadvantage-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MYY7F4zPa0aOuWdtnwAlVwD9y9LhRBoFiBzoWMQxt68=;
- b=E9hhUNwVdcRQJEyMVxWreWC9sHhDMTMYGyrt57FGaDyFqPni+Y121StURlhZskWtZT3YK6GSz+YfhUe6GJVoNJ/FeGjbYn6GoFTn2H9Ba74sB9P6pk3DBoGdwKDUM3bSRSkolkq8va8KpXzZJbVZ+Yv9B3VM3YVY9XhL9bV9SB4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=in-advantage.com;
-Received: from DS4PPF3984739DB.namprd10.prod.outlook.com
- (2603:10b6:f:fc00::d15) by DS0PR10MB7293.namprd10.prod.outlook.com
- (2603:10b6:8:f4::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Wed, 3 Sep
- 2025 13:26:13 +0000
-Received: from DS4PPF3984739DB.namprd10.prod.outlook.com
- ([fe80::ba61:8a1f:3eb5:a710]) by DS4PPF3984739DB.namprd10.prod.outlook.com
- ([fe80::ba61:8a1f:3eb5:a710%5]) with mapi id 15.20.9094.016; Wed, 3 Sep 2025
- 13:26:13 +0000
-From: Colin Foster <colin.foster@in-advantage.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Steve Glendinning <steve.glendinning@shawell.net>,
-	"David S. Miller" <davem@davemloft.net>,
+        d=gmail.com; s=20230601; t=1756906131; x=1757510931; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ip7GEHTLGREs3wFJiE55XHO29SvS6xXq6xvgtwM1hmk=;
+        b=U1LcaJFBIl9DYc3Da6+Qdsa6u9UuELK/FrhMWzGd7P9oF1RQJ6H1Z/qfheYrlTVSC5
+         /csr2DSMrOE5oXQqBNZsakGgCtoSeO/1/ZG4UVXLesozlp2TKufgxCrn/H4TMGYxE+MH
+         yp8fGN46vJM+rqFFTeHO+ZkZbAuzygOIVlwsHpDs0nwM5Z4Xmj5+B1I30X6+aKjKO+sa
+         k/P6m1ffNDzULUteTui6vUgiCfTfh2GSZuZyJOJwSfD6ZFFjafYatQBX9yFkqK5Utba3
+         h8L+kMNXUlZlZ15W2uH29QV9PNmbw/JCVjLYrTD4unugwmmq6BnUmul3eT6y4oJ27uMM
+         zzTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756906131; x=1757510931;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ip7GEHTLGREs3wFJiE55XHO29SvS6xXq6xvgtwM1hmk=;
+        b=QCquI9PgiHGAFoPDwqUozxpB+tt5O4lsOsljeiLczN5Vr0NvcHKjxTGCSp/LShPBkG
+         uSf/3sWOLGXjvPqlndy4LsJbDsQJKQNeWOi4wbr5ShiYYNsCBic5J1HphVub/2awBZE/
+         vg7rJZViaFdVfIsp+upu3LKz8WK/RumZOAPOpWFe8a7nDDlfxOrldvyh3YsKwu3bhm1O
+         PlZFe5zjFwJiFLHgxM2F0JuMGBcwlfyfGBe8dBc5fVFC9SAB4yj9RWu5VOeZWzZEoleX
+         aAZGdQkgJ98mpSaX01eNjCWvqR+ivS0eT/h4+D0RNmfLJwXY7gc8CvKwIyWBazpyPF0K
+         L8TA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0NhsTUeAq9uLwpZGXPmcKDpjoKCTtA919bSxPYEKHaWbAo77recRyU/KzpYCl3xYFWyofW1nZ@vger.kernel.org, AJvYcCWw+Qv7oITd2d7sePiCXuReLaa8E1xtsRGbVgEZAZceMgU3rudLcumctjelZxRNQgi4RNQJ0tpoH8mutmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqPAC/08Ll4ISrY2enacRbhN+sMKpr4sc6trB0PrjXX01eWRLM
+	OocfS1s5n9XLftGyt2CJA/MpOw8HSAYCfFOwVTrDaIV6VebA41CoFef6q5bORbU5
+X-Gm-Gg: ASbGncvtUCrrzREiCVPETO3kzltztFK5Y+Q8F7pal0AXMC4/VdCNwoW9HtMzc66MWxj
+	fQuqP+X0n3OX5QEjyM2FxmSLTLzV9JtMbVGjBB31Y9Vkjw3JwNdB1o+BPDc2HE1MSjHCFLh165m
+	B/z22wxcnjNAY10i9dEzPCpy/zoyOYFUwpmKVV6fcbze/sZQcjDH2JVymhDJ7+iQFa0khjfV1HV
+	CJRBftHs+PIT0KozZqprKm4B3OmrlPo5lH0I/FrnWRAPDucTHP3lVe8d2rlqEMSWKtN7bUV6Se2
+	axCwWvpfiLK+muprF3Jmd29fIZg1wo7S3a4Z6KET1SWrUYA+8HPO6U30X7GJmXcFZ/AgaYWTIgp
+	IukJYT/OkiJ52IhQnD7K0A8ZEiA==
+X-Google-Smtp-Source: AGHT+IFeJ6G/GbGn+sWTQsbcWZbTftScTGIoGy1BjSSWZN3VsmKFELydGycedx9xP/3uz2B9wV8LrQ==
+X-Received: by 2002:a05:600c:6385:b0:459:ddd6:1cbf with SMTP id 5b1f17b1804b1-45b81e2235amr68213045e9.0.1756906131066;
+        Wed, 03 Sep 2025 06:28:51 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d005:3b00:e6e0:f5a6:e762:89fa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45cb6e44373sm7552185e9.3.2025.09.03.06.28.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 06:28:49 -0700 (PDT)
+Date: Wed, 3 Sep 2025 16:28:46 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Qianfeng Rong <rongqianfeng@vivo.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v2] smsc911x: add second read of EEPROM mac when possible corruption seen
-Date: Wed,  3 Sep 2025 08:26:10 -0500
-Message-ID: <20250903132610.966787-1-colin.foster@in-advantage.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR13CA0036.namprd13.prod.outlook.com
- (2603:10b6:208:160::49) To DS4PPF3984739DB.namprd10.prod.outlook.com
- (2603:10b6:f:fc00::d15)
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: dsa_loop: use int type to store negative error
+ codes
+Message-ID: <20250903132846.h4eeqi5faqkghrzv@skbuf>
+References: <20250903123404.395946-1-rongqianfeng@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS4PPF3984739DB:EE_|DS0PR10MB7293:EE_
-X-MS-Office365-Filtering-Correlation-Id: da9f7c67-a712-4c9f-0251-08ddeaed73db
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bbvdZe6tkfk/S2lAszoVc2C1zCg+7maxHbT+p8pB/q210NW2rPF9ksw4ZXPo?=
- =?us-ascii?Q?4/NjKoTBTrc7XtmCaDQ/frc6z3KuirT1sKBwqtEgZVWAdIl314aB1k8Dc8Rm?=
- =?us-ascii?Q?8yLetkM1zQu3IlX+0H/BkpB99r7vr4kkqrsTCn2UUKO+jJEYQ/btij5fHTLm?=
- =?us-ascii?Q?0lD6jWhl3c1k9hmeMlB+xdK5zC9UvWpjzM9tDtc0I5iBimKSZgvv5hnagoEe?=
- =?us-ascii?Q?eQG3tNtxssWBPqArQkbu2tLcDdJmPSeVH8UqkfcdB8p6es+FB1ScMKAadP1q?=
- =?us-ascii?Q?PZNot/tZCaP3gZM7mpMBRRRFJeMPCZ/nS8BknWDOv7ngCK+OxNSFOpycGfyG?=
- =?us-ascii?Q?QWXpRKWi+dbJ/IFU1p5INkEbE6J7oilxWfWSAGbsml5TrjUhmuqOIrv7kTGH?=
- =?us-ascii?Q?isYE+A4QRP+8M1NDgJRo+fGyLan0TyORcmoZena56A3mYFhrg2WwRIvHPb6G?=
- =?us-ascii?Q?IMobWrZhTZcAyQWF8Z0fPG3Ln+ytAJwAqMVAaIo2nHGV8pt2nnb67hLaq4bD?=
- =?us-ascii?Q?jyzMsKMHyrtC4ZoiF196kcPBb3Sj/iPFE45SHTclL1i/KorC5xmICtsKY93h?=
- =?us-ascii?Q?giqMZcsxFCHF9TAM8Fs94eUoO/x4t4RzDunLHkuz6ENAih1PraMLZBZrtmK9?=
- =?us-ascii?Q?Ocrm+csPkblvrQhMXpZ2mXTcyxnU2XcCKdrz/eaXrIg9K5YtzDbpGSVgWChB?=
- =?us-ascii?Q?ZSSKwtcryChRAd63JkPXJOKjiSemrn8sbxpB24J7ij1ESxAR1Mz1lK48IVmG?=
- =?us-ascii?Q?vCXotIRrqCk6nJhKwefU7o42GjmdjQf1IhQp0v48IQxTSY5fiPnSMr3gtUai?=
- =?us-ascii?Q?fUSuKJ4q7CD8AksP3BPk56OGj+SStZgB/SRhG5iHYfYPlStmdUR6ZxutNMgD?=
- =?us-ascii?Q?vvg0ZNqaGabR5Ew2TJ7U8F6XKLz6PCT02GofqTv8vzR/JuoRhzPCqZgjrS+5?=
- =?us-ascii?Q?4EkvtwfKlqz3BIRsQs7PcHiZqesLVmM6a2XelBbGO/oWCYzKIheCIaHv4CZz?=
- =?us-ascii?Q?AdlrftMpRfY+giiZjY3N/DUZ6M8q6LEAHKjdGccnBMkPSZbmw0U7o+CD/HsR?=
- =?us-ascii?Q?5wwrlaK9VZpmHgfYNh+iXPWo67V29wDGJCY7mU2DqXm+Fesa01/H4a3dR6Hn?=
- =?us-ascii?Q?Ugr8NQePrv9+CtKmRxS37FspzVqJmWzvf/rYuBuHx+/ng0L0xfTJ8uJIspCH?=
- =?us-ascii?Q?ef2+nyvgw/Lk4XbULE+j0yxl/+ZirvPgtdMDVtNSC52QfFNc0YcFhB+hmkUl?=
- =?us-ascii?Q?J7v9swzCQUzwr4XHZcFf/WYXzzTAVlKSF8TXq12+AEbkI6wRHyoLMl6O4KCm?=
- =?us-ascii?Q?bzDdtRDkwTZhsRXW3voVlp+nC40b1g5VfKs+bjfoiiMaHbl0gylyGQKCPo4/?=
- =?us-ascii?Q?J+JH5m0mu/qoF9aZsD1lRlyaOSRIl7ZNYSsdGT+c23cBkC1Saxj88EROeUxM?=
- =?us-ascii?Q?av/5KjeqCTo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PPF3984739DB.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6ZrG3CoTOjNCtt9eAwosira0AdKB76AeRF8ehPquQgna5Nv1ZhxNraRDR0mA?=
- =?us-ascii?Q?H3Gq5E3tUa/j2Qr5yjAhc86J6TYIH18uWfNGW1C/Ltg7u/Tgr3s7Ayav9uUY?=
- =?us-ascii?Q?XwYhU/lw6ajt3XE6eqYYkhYWM/snSpPHrZmeVBDW5CkIW8aOyTELgpjE64ET?=
- =?us-ascii?Q?2EWpFawLz+v8TxDcVNAokUyxZk1A6RBrqD1aTYw/T7MYMmZsoyaaEp6n/dJY?=
- =?us-ascii?Q?mEIOKTAermuSca4ZnkMI5zJsY4LWqqdtcTfygjL8mYjzQTb4c6KSMbPzNsr5?=
- =?us-ascii?Q?VtUatalj5AsUjnySVWa9Govm3k7KvwBQ2hgR5OgeCXEeYKRPyaSHcnYKsSML?=
- =?us-ascii?Q?EOCYhozZMpG1Q7f2vBO3kO1f6ckUBnev3VPbT34U2cI7xTWLfg4cAPiHWzIl?=
- =?us-ascii?Q?sa/DORCcv3nbCdBHZjrgjxoUVepE1BwY6Nj23WSdKb7jec1uTHwCBsUeoEqY?=
- =?us-ascii?Q?l84jeKW5a38lTm07PI+ZahKunl8VYHqcBS3L/LlmZXwR2mpuOB3V3xfOY9FA?=
- =?us-ascii?Q?nKxQojpaXmrBiVVYnIsn4DN8dHDt+GH35gUw2777xuyA/1bousOB2TfrKhaz?=
- =?us-ascii?Q?l0qY/TYSdVhaWfuQaex17UcU+TzGNeT3MW1jZfGO2wHYbTAa4IxHaMuQhbSP?=
- =?us-ascii?Q?sDBIqNF+6HXYEX5yneOeEetPQNcDc8L+/KlLmO8C7O8K0m/EGJe9qPQY4KJc?=
- =?us-ascii?Q?6c00XptRF7YxYuNCzYCbspn2RRMD7O3CPkddbha0xsw/EQTN5k9qv6noypaS?=
- =?us-ascii?Q?tmi5zyXKd4DdAtRDxY133THWjkMIHpeAX04P8c7aDHUWvW4AXGT3LQmI318L?=
- =?us-ascii?Q?876Z3ofru5XCXRXr7C9+5gpxkt03WdQvJRiagot1cmWbeILbEBrpHI4WWoDO?=
- =?us-ascii?Q?4NDmyTjoXh7BGZ2u/zcyjRSq/x/c1QFg9rxN8uUVDinw/1iSZWWEYirVizMT?=
- =?us-ascii?Q?3Rvm2pO6oJWkuUqbHHQ6EWG5SwZEMD94Po1TddnHpesLqi6HY01aAweVeEhn?=
- =?us-ascii?Q?9uaOPMZTxjWIMzJVjCKjLzVhxwz0nUu6J5hfHeWTs5GnhJlhbeG0kVxXDY6v?=
- =?us-ascii?Q?R8iPAyycb/lqgZ7SZVDVnpnyAEp3FArFiQ6p8uMcI9l3BtFb1GnUWRbitUEq?=
- =?us-ascii?Q?f/BL6ZMKylyLpqlvxyNhbSAUkv+7yA3Sg0vZqlCFNymLD70W6IugC6X8zupG?=
- =?us-ascii?Q?xuZZ/zI+lZnWwcGr7an8t6K/I5qeE85kxTiebIiFpIM8w8EWarsJrZan7zL2?=
- =?us-ascii?Q?5oqcMnC1QlYDho+8fpHos4SuhJX5wa+e/mECnJekayOJxQY0rzCGvEqnnOmN?=
- =?us-ascii?Q?6sf+bFUvVC3ql289veGNGq1QBqx41MRo2ia55a9vN6DMOC8keqH6St2ZA3oM?=
- =?us-ascii?Q?e14UZU8ghyHxuaBqLw4EtF4F8kiwEwjGEL+CpC5w73jcwhQCf0ntE1VSflEX?=
- =?us-ascii?Q?4PdPVRL4dvJbcz21UoOxtarhQiQATwJ5Vi0OIF5T3NnWCFC0BSrU0fm5L0o3?=
- =?us-ascii?Q?FJv0YM7VuGzChTEtqoseGN4kXf58IQrFsBudzNRwYQaoPw/jnTy2pIJZrVoa?=
- =?us-ascii?Q?03ImEIoIX7c2QqLBGC465z3ds7jrVeeqTE95CEd4B8L7S10KzgTRyVpcbSeq?=
- =?us-ascii?Q?mjfqIj5OY56ZHa8NWiFZEDY=3D?=
-X-OriginatorOrg: in-advantage.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da9f7c67-a712-4c9f-0251-08ddeaed73db
-X-MS-Exchange-CrossTenant-AuthSource: DS4PPF3984739DB.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2025 13:26:13.0257
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 48e842ca-fbd8-4633-a79d-0c955a7d3aae
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RG73Wu7zIpkn0nOaWzOZfW43EOaLTCylRTwp5TuvbXPATnfLF4w7rex/WMdZA8rP55PQnFMeoXmg5sgbfOfIDoVGmbGTXC/N+1nc+fL3934=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7293
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250903123404.395946-1-rongqianfeng@vivo.com>
 
-When the EEPROM MAC is read by way of ADDRH, it can return all 0s the
-first time. Subsequent reads succeed.
+On Wed, Sep 03, 2025 at 08:34:03PM +0800, Qianfeng Rong wrote:
+> Change the 'ret' variable in dsa_loop_init() from unsigned int to int, as
+> it needs to store either negative error codes or zero returned by
+> mdio_driver_register().
+> 
+> Storing the negative error codes in unsigned type, doesn't cause an issue
+> at runtime but can be confusing.  Additionally, assigning negative error
+> codes to unsigned type may trigger a GCC warning when the -Wsign-conversion
+> flag is enabled.
+> 
+> No effect on runtime.
+> 
+> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
+> ---
 
-This is fully reproduceable on the Phytec PCM049 SOM.
-
-Re-read the ADDRH when this behaviour is observed, in an attempt to
-correctly apply the EEPROM MAC address.
-
-Signed-off-by: Colin Foster <colin.foster@in-advantage.com>
----
- drivers/net/ethernet/smsc/smsc911x.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/smsc/smsc911x.c b/drivers/net/ethernet/smsc/smsc911x.c
-index a2e511912e6a9..a0a4bb051a4c5 100644
---- a/drivers/net/ethernet/smsc/smsc911x.c
-+++ b/drivers/net/ethernet/smsc/smsc911x.c
-@@ -2162,10 +2162,20 @@ static const struct net_device_ops smsc911x_netdev_ops = {
- static void smsc911x_read_mac_address(struct net_device *dev)
- {
- 	struct smsc911x_data *pdata = netdev_priv(dev);
--	u32 mac_high16 = smsc911x_mac_read(pdata, ADDRH);
--	u32 mac_low32 = smsc911x_mac_read(pdata, ADDRL);
-+	u32 mac_high16, mac_low32;
- 	u8 addr[ETH_ALEN];
- 
-+	mac_high16 = smsc911x_mac_read(pdata, ADDRH);
-+	mac_low32 = smsc911x_mac_read(pdata, ADDRL);
-+
-+	/* The first mac_read in some setups can incorrectly read 0. Re-read it
-+	 * to get the full MAC if this is observed.
-+	 */
-+	if (mac_high16 == 0) {
-+		SMSC_TRACE(pdata, probe, "Re-read MAC ADDRH\n");
-+		mac_high16 = smsc911x_mac_read(pdata, ADDRH);
-+	}
-+
- 	addr[0] = (u8)(mac_low32);
- 	addr[1] = (u8)(mac_low32 >> 8);
- 	addr[2] = (u8)(mac_low32 >> 16);
--- 
-2.43.0
-
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
