@@ -1,170 +1,161 @@
-Return-Path: <netdev+bounces-219497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40249B4199E
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:11:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C1F2B419A3
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BA1317242F
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:11:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C7101888EC4
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262642ECE9E;
-	Wed,  3 Sep 2025 09:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DABC2E7BBC;
+	Wed,  3 Sep 2025 09:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j8+LcGFv"
+	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="tIOFxGBE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8866D258CDF;
-	Wed,  3 Sep 2025 09:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5DB2750F2
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 09:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756890664; cv=none; b=iy5TOY3umR9vdaMHJq6rQTOBlEZX78u1cXqqYAQbyHg/neWtm3pTfoO25NEjqe9PnGCjRXfwK7AQio3MT6XHMGvfpmgtWcMOVv3w1c1Zp84RYInRM0UiGPNTyBNfYUObuBVIyOoF5qGFf/GBEZUiRZT3iSbDl+bzfesjCDXi15k=
+	t=1756890702; cv=none; b=UedGFz7QYgmKrP6TvVj4Zw8L4N2a6OcL2kezhuGI0MGFDy5I8J2BBHI2T/ZwW+nuxhiDpvy5HqtiGiO7RDjA7iClWaY/m01wK5pC77WL8ZsSMENDTqCjNWme09Ka7GNgAizz7BMADtUFmDRdaiAykmR0wKSN0DlsTHHICoIgonI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756890664; c=relaxed/simple;
-	bh=obY43WZ36Ui+bl12bWl48e1L9yiSSKaPY6THe3nPNm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kjs9ittPMjwqrMmh7OxF7dJvyfsXV30p+JI62Ig1YSfSQ/rsiiroOOEDc+a1VfPhdPw+9AFULTxBpVBiHhUZgQsFO00k2JrkTrPsGivg9L+Dvfm5/4j05mzeagVDdZnD1iG0K7QzDV+vstajzZjVMnKJxM03hqNbttKcPC9FHcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j8+LcGFv; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 50C224E40BBC;
-	Wed,  3 Sep 2025 09:10:54 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1BF37606C3;
-	Wed,  3 Sep 2025 09:10:54 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B2F4A1C22DB60;
-	Wed,  3 Sep 2025 11:10:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1756890652; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=3qfmCT2IJRj9E7bccRvk2rX7BuXxyaqOfnAhEGgrxro=;
-	b=j8+LcGFvEoytc8+gnOIPE0orhclkJo48lN0sjoHZyVo/GAsKJUOmV9gbSlKLcvbLvoEiB6
-	/kN+ZmtvppXoUKxlLkPiRYlXNp5T5t2p5qjFhxLMBaDDJ++eeJa16+E+3v/XkcCtMxMGqf
-	SoD/H1RBHBwm5izhAuP/iEQPs6HxM/SBN0Pej2Q4HlXaxfPCM8DPEuvKl6+8+9OQkrAr6B
-	cdvSp1oWygbpyYdNClXt4mKUlWrSR/uPTIzN5XgMNeQvxaaDZgemlPGFNOFPYWn0I52hYy
-	DwJnFj+jxtQ3sRgXz5spKFaO3VMG9zLIJtuLeYOlwGEQxQZk+EdBHL/LBFjt3g==
-Date: Wed, 3 Sep 2025 11:10:25 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, kernel@pengutronix.de, Dent Project
- <dentproject@linuxfoundation.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>
-Subject: Re: [PATCH net-next v2 4/4] net: pse-pd: pd692x0: Add devlink
- interface for configuration save/reset
-Message-ID: <20250903111025.4642efb7@kmaincent-XPS-13-7390>
-In-Reply-To: <aLfp5H5CTa24wA7H@pengutronix.de>
-References: <20250829-feature_poe_permanent_conf-v2-0-8bb6f073ec23@bootlin.com>
-	<20250829-feature_poe_permanent_conf-v2-4-8bb6f073ec23@bootlin.com>
-	<20250901133100.3108c817@kernel.org>
-	<20250902164314.12ce43b4@kmaincent-XPS-13-7390>
-	<20250902134212.4ceb5bc3@kernel.org>
-	<20250902134844.7e3593b9@kernel.org>
-	<aLfp5H5CTa24wA7H@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1756890702; c=relaxed/simple;
+	bh=h7HaQrYowixfllC9fgcb9aNp8qv16i28nxzg5O5XMCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GeQnM93kN0qJGx348UTIYQrcRn0oAUEHjp9Zz3mjXzVCCDKhesWtKLZaXWkGu83+gP6wKUx3mrkTyFLE1zcI0m3pC1W+GzcCdNZsqOcibFvRlJH195DG2/nxlm1KJ3AzBdgim4YjWhZq9xGC7whJMfjV7MAK3xbVmVBYI7Kzavg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=tIOFxGBE; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4cGxgQ1CGXz9tgY;
+	Wed,  3 Sep 2025 11:11:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
+	t=1756890690;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CSpwFETYc1LsmkYCDIJ6WtqhZ/SKBwnx6a6qoeAYkd0=;
+	b=tIOFxGBEsx/Ysut7ESJ/S2maB5P1TD/vz4VTBf1sEsm7W5oTE29ecWZo+CkS3sG5/VBVQQ
+	RvoJ/CxZKvEyaSK4QLIkFq8fzgoxkyONbY5IkQq1EuKoRTuov+tUtItinUGjiOMOzUxv3m
+	TC45BwXorLe50DwT1kQTUZ2si/Hnb1wfJ3648qohGeEluH2lwRgybx/aDutFiO5NHkXb82
+	04aWjd4ZAFWIS9ygBW6p8Q8ZeRjUg2uq3VJOkmvCP/++n6B6uoa+P6uZRf5L4H5pD4qvB6
+	p9r2YNZP1U2aBC1CNV79Is+qC8XzEJs9QrjQkE+sLewhDbKaaKz81Happt8Edg==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of listout@listout.xyz designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=listout@listout.xyz
+Date: Wed, 3 Sep 2025 14:41:21 +0530
+From: Brahmajit Das <listout@listout.xyz>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, 
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2] net: intel: fm10k: Fix parameter
+ idx set but not used
+Message-ID: <dyfxrfwy3qulor3sgfuuzxpx7jc4mbot4b7ci5marqlyxdusp4@uvf5fknefnfb>
+References: <e13abc99-fb35-4bc4-b110-9ddfa8cdb442@linux.dev>
+ <20250902072422.603237-1-listout@listout.xyz>
+ <IA3PR11MB8986925DD6DBF282C160AADBE501A@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <IA3PR11MB8986925DD6DBF282C160AADBE501A@IA3PR11MB8986.namprd11.prod.outlook.com>
+X-Rspamd-Queue-Id: 4cGxgQ1CGXz9tgY
 
-On Wed, 3 Sep 2025 09:10:28 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+On 03.09.2025 06:08, Loktionov, Aleksandr wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Brahmajit Das
+> > Sent: Tuesday, September 2, 2025 9:24 AM
+> > To: vadim.fedorenko@linux.dev
+> > Cc: andrew+netdev@lunn.ch; Nguyen, Anthony L
+> > <anthony.l.nguyen@intel.com>; davem@davemloft.net; intel-wired-
+> > lan@lists.osuosl.org; kuba@kernel.org; listout@listout.xyz;
+> > netdev@vger.kernel.org; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>
+> > Subject: [Intel-wired-lan] [PATCH v2] net: intel: fm10k: Fix parameter
+> > idx set but not used
+> > 
+> > Variable idx is set in the loop, but is never used resulting in dead
+> > code. Building with GCC 16, which enables
+> > -Werror=unused-but-set-parameter= by default results in build error.
+> > This patch removes the idx parameter, since all the callers of the
+> > fm10k_unbind_hw_stats_q as 0 as idx anyways.
+> > 
+> > Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> > Signed-off-by: Brahmajit Das <listout@listout.xyz>
+> > ---
+> > changes in v2:
+> > 	- Removed the idx parameter, since all callers of
+> > 	fm10k_unbind_hw_stats_q passes idx as 0 anyways.
+> > ---
+> >  drivers/net/ethernet/intel/fm10k/fm10k_common.c | 5 ++---
+> >  drivers/net/ethernet/intel/fm10k/fm10k_common.h | 2 +-
+> >  drivers/net/ethernet/intel/fm10k/fm10k_pf.c     | 2 +-
+> >  drivers/net/ethernet/intel/fm10k/fm10k_vf.c     | 2 +-
+> >  4 files changed, 5 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_common.c
+> > b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
+> > index f51a63fca513..1f919a50c765 100644
+> > --- a/drivers/net/ethernet/intel/fm10k/fm10k_common.c
+> > +++ b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
+> > @@ -447,17 +447,16 @@ void fm10k_update_hw_stats_q(struct fm10k_hw
+> > *hw, struct fm10k_hw_stats_q *q,
+> >  /**
+> >   *  fm10k_unbind_hw_stats_q - Unbind the queue counters from their
+> > queues
+> >   *  @q: pointer to the ring of hardware statistics queue
+> > - *  @idx: index pointing to the start of the ring iteration
+> >   *  @count: number of queues to iterate over
+> >   *
+> >   *  Function invalidates the index values for the queues so any
+> > updates that
+> >   *  may have happened are ignored and the base for the queue stats is
+> > reset.
+> >   **/
+> The kernel-doc comment still mentions @idx.
+> Everything else if fine.
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+> 
+Hi Aleksandr, can you please point out how I can remove the kernel-doc
+comment. I thought removing the line
+	@idx: index pointing to the start of the ring iteration
+from fm10k_common.c would do that.
 
-> On Tue, Sep 02, 2025 at 01:48:44PM -0700, Jakub Kicinski wrote:
-> > On Tue, 2 Sep 2025 13:42:12 -0700 Jakub Kicinski wrote: =20
-> > > On Tue, 2 Sep 2025 16:43:14 +0200 Kory Maincent wrote: =20
-> > > > > Sorry for not offering a clear alternative, but I'm not aware of =
-any
-> > > > > precedent for treating devlink params as action triggers. devlink
-> > > > > params should be values that can be set and read, which is clearl=
-y not
-> > > > > the case here:     =20
-> > > >=20
-> > > > Ok.
-> > > > We could save the configuration for every config change and add a
-> > > > reset-conf action to devlink reload uAPI? The drawback it that it w=
-ill
-> > > > bring a bit of latency (about 110ms) for every config change.
-> > > >=20
-> > > > Or adding a new devlink uAPI like a devlink conf but maybe we don't
-> > > > have enough cases to add such generic new uAPI.
-> > > > Or get back to the first proposition to use sysfs.=20
-> > > >=20
-> > > > What do you think?   =20
-> > >=20
-> > > If you are asking for my real preference, abstracting away whether it=
-'s
-> > > doable and justifiable amount of effort for you -- I'd explore using
-> > > flags in the ethtool header to control whether setting is written to
-> > > the flash. =20
-> >=20
-> > PS. failing that the less uAPI the better. Tho, given that the whole
-> > point here is giving user the ability to write the flash -- asking for
-> > uAPI-light approach feels contradictory.
-> >=20
-> > Taking a step back -- the "save to flash" is something that OEM FW
-> > often supports. But for Linux-based control the "save to flash" should
-> > really be equivalent to updating some user space config. When user
-> > configures interfaces in OpenWRT we're not flashing them into the
-> > device tree... Could you perhaps explain what makes updating the
-> > in-flash config a high-priority requirement for PoE?
-> >  =20
->=20
-> I think the main use case question is: what happens if the application
-> CPU reboots?
-> Do we go back to =E2=80=9Csafe defaults=E2=80=9D? But what are safe defau=
-lts - that can
-> vary a lot between systems.
+I'm open to sending in a v3 with any changes required.
+> > -void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32
+> > count)
+> > +void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 count)
+> >  {
+> >  	u32 i;
+> > 
+> > -	for (i = 0; i < count; i++, idx++, q++) {
+> > +	for (i = 0; i < count; i++, q++) {
+> >  		q->rx_stats_idx = 0;
+> >  		q->tx_stats_idx = 0;
+> >  	}
+> 
+> ...
 
-In case of CPU reboot, the port matrix will be flashed, which means the
-controller is restarted and the ports get disconnected.
-Therefore indeed we will go back to default settings.
-=20
-> In many setups, if the CPU reboots it also means the bridge is down, so
-> there is no packet forwarding. In that case, does it even make sense to
-> keep providing PoE power if the networking part is non-functional?
-
-It depends, we might not want to reboot the Powered Devices if the switch
-reboot. I don't currently have specific case in mind which could need this
-behavior.
-Mainly, the Dent Project final aim was to support mainline all the features
-supported in their poed tool.
-https://github.com/dentproject/poed/blob/main/dentos-poe-agent/opt/poeagent=
-/docs/Userguide
-
-> Another angle: does it make sense to overwrite the hardware power-on
-> defaults each time the system starts? Or should we rather be able to
-> read back the stored defaults from the hardware into the driver and work
-> with them?
-
-Yes that is one of the design proposition, but we will still need a way to
-reset the conf as said before.
-
-> Does anyone here have field experience with similar devices? How are
-> these topics usually handled outside of my bubble?
-
-Kyle any field experience on this?
-
+-- 
 Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+listout
 
