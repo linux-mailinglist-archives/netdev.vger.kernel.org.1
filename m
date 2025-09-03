@@ -1,112 +1,88 @@
-Return-Path: <netdev+bounces-219733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C58B42D0B
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:54:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56ED4B42D33
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 01:09:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5C311BC1B93
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:54:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C66E188B65F
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 23:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4D72EE263;
-	Wed,  3 Sep 2025 22:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4582E8E14;
+	Wed,  3 Sep 2025 23:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XctDD/MJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tITAqU+S"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAD02ECD07;
-	Wed,  3 Sep 2025 22:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2383919F12A;
+	Wed,  3 Sep 2025 23:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756940043; cv=none; b=BQbGfKdJisj7e0sOx1DmQ9m0E2OqRCWfn+WbjwS0Sb89XXdsDQUDvFNDuZ951z0poUc4pkODB8SYXoJECXE6kDiuJFOLq/g53NSfeDlQIzwYP+G82ekIdmyJs6AUR0CaEMfLNdyaZuK+Hhn+a0RAetXQSzfObmz5GMAv8W5HgoQ=
+	t=1756940986; cv=none; b=Jx4kDDdeM2UB322iST8ZX7QTcxYp9etpuYiJY7oPC3QIheQP6ols7f/9dcF25IgL84EUyp6fo69pwFwwmK01OVK16pJpb/LNlFtt//o7fFdVI5wxfdIjOxp3sN3+z5oprGmln6stQA9ZVdw44QVhwJ33o1Ouj+y2Eg6ERzt4VNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756940043; c=relaxed/simple;
-	bh=XfTPu2oZ7lfmXdMQ6ihXpC+gQo+ikABjst2FKnf0inU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ukyET23szbgTZWB0HEFp5EcvkmahAtb2R97VEkwNOwXQ6I7q4Sc9Myw7k/MaZYsFxPIo0pg5TcL3KMwM31UUZGRmzMkDhJjOxme49920cM7XNRKgAfPWD8PDNSBIyh8GBhb9hRcIQfNCY1D2Q0DFxVSJUPRNgp7qzfRf7GYoqrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XctDD/MJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=H5iWDKFTWxPvKGPHXejnuF9lWu57HYhTyaWxcyUeEPE=; b=XctDD/MJgzIUbVqE0lww2FJ8kZ
-	sA9QSTEXXngpkXfvLS5Fx3CQ93+j/ac+UadPrgplOU7y1udBaZTXJtEyyawYBMtGqwxFndpFK2nN0
-	Nhr1zLbaEUIga6mpFMTc9+pxldwyZPUFBOoab725qdn8aJtuVusrySMqTwgQTUwJUaRI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1utwM3-0076X8-Hm; Thu, 04 Sep 2025 00:53:27 +0200
-Date: Thu, 4 Sep 2025 00:53:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org,
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v10 5/5] net: rnpgbe: Add register_netdev
-Message-ID: <b9a066d0-17b5-4da5-9c5d-8fe848e00896@lunn.ch>
-References: <20250903025430.864836-1-dong100@mucse.com>
- <20250903025430.864836-6-dong100@mucse.com>
+	s=arc-20240116; t=1756940986; c=relaxed/simple;
+	bh=MnK5x+u2vsPXChCOwxVvcYRQZplc/jyPK8RAoWfnHi0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hZBsWUl1qaf4hYqFpUgimDbYU8b2SQBRJc4ViYHJPJbGGRpeWa7XXqIWrU9ddzXGtjsEIs7VETL5s+2f0BAO/FLg2ZHGfL9I0oXPrIxht73PR7MT31A6gnbudFI5BIVeqX3UYkdyvlxTl/yBJ05M6y++3S3CG9meGHKMku3cqKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tITAqU+S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF9AC4CEE7;
+	Wed,  3 Sep 2025 23:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756940985;
+	bh=MnK5x+u2vsPXChCOwxVvcYRQZplc/jyPK8RAoWfnHi0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tITAqU+S6D1DX72m9n4YtUvDUDRaHlrMFN9k3XZPR3JQ1lSOv2ql64hxXM4K6uLDz
+	 9XDBZ6Ao4LNpfimuotUaBNu1Jqv2T+qj+vdVyc664H+3kkv+Fy8o1LaBDsR54JJeW5
+	 WfAPlkgJCx27MRzTdEyULR9cRkrTvaNIuXIecWNlToiHlsucIJN8kldnitvUKR2BvG
+	 goD33eW5RHWckONI0vcagIYYZTdijmiLAkA9OY3LKpwNVdWKIJbpggGmiwygereOxo
+	 4Aow0nehnDx9kDq4+nmd1A5GNa9ZEjalGkrQ701zC0jNytrSkQJa+R9Xp8fMCoN53G
+	 rFsb9ib80i01w==
+Date: Wed, 3 Sep 2025 16:09:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ netfilter-devel@vger.kernel.org, pablo@netfilter.org
+Subject: Re: [PATCH net 1/2] selftests: netfilter: fix udpclash tool hang
+Message-ID: <20250903160944.27826c84@kernel.org>
+In-Reply-To: <aLjFWzreiLM8nWgL@strlen.de>
+References: <20250902185855.25919-1-fw@strlen.de>
+	<20250902185855.25919-2-fw@strlen.de>
+	<20250903151554.5c72661e@kernel.org>
+	<aLjFWzreiLM8nWgL@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250903025430.864836-6-dong100@mucse.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
->   * rnpgbe_add_adapter - Add netdev for this pci_dev
->   * @pdev: PCI device information structure
-> @@ -78,6 +129,38 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
->  
->  	hw->hw_addr = hw_addr;
->  	info->init(hw);
-> +	mucse_init_mbx_params_pf(hw);
-> +	err = hw->ops->echo_fw_status(hw, true, mucse_fw_powerup);
-> +	if (err) {
-> +		dev_warn(&pdev->dev, "Send powerup to hw failed %d\n", err);
-> +		dev_warn(&pdev->dev, "Maybe low performance\n");
-> +	}
-> +
-> +	err = mucse_mbx_sync_fw(hw);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Sync fw failed! %d\n", err);
-> +		goto err_free_net;
-> +	}
+On Thu, 4 Sep 2025 00:52:20 +0200 Florian Westphal wrote:
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> > On Tue,  2 Sep 2025 20:58:54 +0200 Florian Westphal wrote: =20
+> > > Yi Chen reports that 'udpclash' loops forever depending on compiler
+> > > (and optimization level used); while (x =3D=3D 1) gets optimized into
+> > > for (;;).  Switch to stdatomic to prevent this. =20
+> >=20
+> > gcc version 15.1.1 (F42) w/ whatever flags kselftests use appear to be
+> > unaware of this macro:
+> >=20
+> > udpclash.c:33:26: error: implicit declaration of function =E2=80=98ATOM=
+IC_VAR_INIT=E2=80=99; did you mean =E2=80=98ATOMIC_FLAG_INIT=E2=80=99? [-Wi=
+mplicit-function-declaration]
+> >    33 | static atomic_int wait =3D ATOMIC_VAR_INIT(1);
+> >       |                          ^~~~~~~~~~~~~~~
+> >       |                          ATOMIC_FLAG_INIT
+> > udpclash.c:33:26: error: initializer element is not constant
+> > Could you perhaps use volatile instead? =20
+>=20
+> That works too.  I'll send a new PR tomorrow, its late here.
 
-The order here seems odd. Don't you want to synchronise the mbox
-before you power up? If your are out of sync, the power up could fail,
-and you keep in lower power mode? 
-
-> +	netdev->netdev_ops = &rnpgbe_netdev_ops;
-> +	netdev->watchdog_timeo = 5 * HZ;
-> +	err = hw->ops->reset_hw(hw);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Hw reset failed %d\n", err);
-> +		goto err_free_net;
-> +	}
-> +	err = hw->ops->get_perm_mac(hw);
-> +	if (err == -EINVAL) {
-> +		dev_warn(&pdev->dev, "Try to use random MAC\n");
-> +		eth_random_addr(hw->perm_addr);
-
-eth_random_addr() cannot fail. So you don't try to use a random MAC
-address, you are using a random MAC address/
-
-	Andrew
+=F0=9F=91=8D=EF=B8=8F FWIW I'll be sending the PR tomorrow so plenty time..
 
