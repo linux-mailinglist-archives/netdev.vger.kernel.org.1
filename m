@@ -1,193 +1,163 @@
-Return-Path: <netdev+bounces-219628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B93B426B4
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:21:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9A03B426B3
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DAC927B97B6
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:17:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4D981BC1207
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4322D4B77;
-	Wed,  3 Sep 2025 16:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="KEu0qlNq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0022C0F72;
+	Wed,  3 Sep 2025 16:20:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844C92D1F44;
-	Wed,  3 Sep 2025 16:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107BD2C0286
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 16:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756916266; cv=none; b=irtgFh7ZxW/9V2+yqtpA0MqpEirR5JbMYytAle964QmKCIWMyS92y9qJmQ5HvTmsGybMp0yf3Em7KZ1w6IXQ02/nqw8YH9DLRfu563NtELyazDOK4/nBxXQh9b9ZLwQ3ez56apDSlzWTSGGYRzAFgYCu0D0hYrIpQgjGuESjPnc=
+	t=1756916440; cv=none; b=m1gH6e/U7OlYOqK+wM7V4dSJ4KwjpnsGmfpZs9ASenc46q4wIg4A9m2mkfcmzbbzVnlsCFMwPMe9ycEASzsmLnt344nBjjCYjnlS3qk8y0XiQb06m2uaw6pqfcH0xGMEQWv/9aatbHVXPug0TUaxiFpHUw0P2KL7NWanH7TRYVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756916266; c=relaxed/simple;
-	bh=40lehCKBugHinswqoHnpQqnJORE8caA8xtKHTMajjy4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=kY+yjRRGtGmtq/eju3ADsCfBgiH6W3gs/cjtBbit368IVnj8T3ttVm2bJWhadJPuK+G/p7w5d9iWuB3uU0O+oBfekQ96J6+bJQ72x0jFk81zdoCvQG6tZ8sUN8PY9UmlQIprFqsxQJWTH4ZxCx3g828Ijadq0QeMiwSxSujic64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=KEu0qlNq; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=9cJnPOGanCbByCRx0wy1KMAjtkHYfjJnIkC0w2nhhAk=;
-	b=KEu0qlNqxOlS3L2qYTIsYAizqOC4i+XrOGC8kP+hgjPnbX0InWFzoFgyCe+nKQ
-	oIQAav3goZqhyrVOsdiB69UAm24fzm9kxaaQ8lIQ5EmNjQ/pybulTzEQqhPPydRT
-	5LH2QZqKK3IdRdy6+VTYfw3mRk2kGc4vN4IHtZyKRPips=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wAXSCYFarhoDW05GQ--.9058S2;
-	Thu, 04 Sep 2025 00:17:10 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: kerneljasonxing@gmail.com,
-	willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v10 2/2] net: af_packet: Use hrtimer to do the retire operation
-Date: Thu,  4 Sep 2025 00:17:09 +0800
-Message-Id: <20250903161709.563847-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756916440; c=relaxed/simple;
+	bh=MJ+hOYM0xYx9RTqyxpkuDg/HtSLuqe1fKTmw6TmqLtU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u4HyNjC9tbwZC1BMS/oyO608W572SyiPCJCCU1hbQCw3gMI0t/F4XacK6EaDzRWP/QxrkAl5MDOwYOS7elY0vBM86VS255vPZa3mCYqFxJmTsl8+Lyd3kQ1rm5vNFBGA+OFDTX/VRZ5JIQX+MS+51OXkGGDooRdmMMFOteJs5Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3f46ca1f136so313955ab.1
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 09:20:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756916438; x=1757521238;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ne1sbICVvddwd6AuruJKbf9hL2yygBbdnhHoBV7WzMY=;
+        b=iGs1XJ+8NC20i2HxH3njuVzdEk2BdgVpfGk7GZjGquOXu2ryq6lC+x35+XDTvCvC1E
+         /i707z3KLEI0OpgU57MEh846tgmH0eCoJHED4IOtaiFkADH3rCcavRpqbuo2trTemvfx
+         MfP6R4Qo59eKSt7viaTLY4q8J96rWjaN/rRV2+7NBh9hNxt2oT7oKt59o9oGZPwNRV7f
+         iv3BI9HSIO6+88+nri8bSS7VSSJfi2IYcAvK0j0oVUzab0ZHAthedjIklTgAaSz0/JAf
+         9QTyqkWw6uVkD0RcqWMVLF72NdsgoToT1S4YIRgH30Q6Q2BC6mEfkUzOrBAfJiwvIEI2
+         lyBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXRNSf8iopGYDcOftSjPckrPAuOTNtQljeAOKe9NZoQ+GOWrgBVxVNe/Y56ebacBI74U4pYrOg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7bVQRUqlYSXBo5b5COn2lrzSmkGTlxInWOxIGS5q3xib2Wkqs
+	Iu06RAamMmpU+s/uzfEI3YvkSQEsjygT+eoMCUZ5as9FmhMQu4OprHXbJVCEUCHtdMl2pRTW5DQ
+	jguOl432FibTCGygvO9oVHR+H97z3AR/oeSvFyfy3pcDPUUhWYLS5h+kPex4=
+X-Google-Smtp-Source: AGHT+IHqE/81WZO4JO1QzMvBbgv3oJ8HqsxCqArABYMYFUBGB3SugcnkXjmJD/4AO0BM6d1frLLLS5dZYT8SgCLAtul39VCWRfN+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAXSCYFarhoDW05GQ--.9058S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxXF1fAr1fuFWDJw1kGF13twb_yoWrWr4UpF
-	WUKa4xGr4kJanFgr1xZws7Ar1Sqw13JFZ8Jrs3X3y5ArWDWFyfJFy29FyYvFWSqF4kWFn2
-	vr48GrW5AFs3A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U-18PUUUUU=
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibge9Cmi4Y8iRZQAAsR
+X-Received: by 2002:a92:c26d:0:b0:3e5:5357:6dd4 with SMTP id
+ e9e14a558f8ab-3f401fcf532mr241983595ab.20.1756916437900; Wed, 03 Sep 2025
+ 09:20:37 -0700 (PDT)
+Date: Wed, 03 Sep 2025 09:20:37 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68b86ad5.050a0220.3db4df.01f7.GAE@google.com>
+Subject: [syzbot] [net?] [bpf?] WARNING in sock_hash_delete_elem (2)
+From: syzbot <syzbot+ca62aaf39105978cd946@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jakub@cloudflare.com, john.fastabend@gmail.com, 
+	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 2, 2025 at 23:43 +0800 Jason Xing <kerneljasonxing@gmail.com> wrote:
+Hello,
 
-> >         p1->max_frame_len = p1->kblk_size - BLK_PLUS_PRIV(p1->blk_sizeof_priv);
-> >         prb_init_ft_ops(p1, req_u);
-> > -       prb_setup_retire_blk_timer(po);
-> > +       hrtimer_setup(&p1->retire_blk_timer, prb_retire_rx_blk_timer_expired,
-> > +                     CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
-> > +       hrtimer_start(&p1->retire_blk_timer, p1->interval_ktime,
-> > +                     HRTIMER_MODE_REL_SOFT);
-> 
-> You expect to see it start at the setsockopt phase? Even if it's far
-> from the real use of recv at the moment.
-> 
-> >         prb_open_block(p1, pbd);
-> >  }
+syzbot found the following issue on:
 
-Before applying this patch, init_prb_bdqc also start the timer by mod_timer:
+HEAD commit:    5c3b3264e585 Merge tag 'x86_urgent_for_v6.17_rc4' of git:/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=142cae34580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bd9738e00c1bbfb4
+dashboard link: https://syzkaller.appspot.com/bug?extid=ca62aaf39105978cd946
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-init_prb_bdqc
-  prb_open_block
-    _prb_refresh_rx_retire_blk_timer
-      mod_timer
+Unfortunately, I don't have any reproducer for this issue yet.
 
-So the current timer's start time is almost the same as it was before applying
-the patch.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/37953b384dff/disk-5c3b3264.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/df5cc1c4e51d/vmlinux-5c3b3264.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2ed6195eae9f/bzImage-5c3b3264.xz
 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ca62aaf39105978cd946@syzkaller.appspotmail.com
 
-> > @@ -917,7 +873,6 @@ static void prb_open_block(struct tpacket_kbdq_core *pkc1,
-> >         pkc1->pkblk_end = pkc1->pkblk_start + pkc1->kblk_size;
-> >
-> >         prb_thaw_queue(pkc1);
-> > -       _prb_refresh_rx_retire_blk_timer(pkc1);
-> 
-> Could you say more on why you remove this here and only reset/update
-> the expiry time in the timer handler? Probably I missed something
-> appearing in the previous long discussion.
-> 
-> >
-> >         smp_wmb();
-> >  }
-
-In the description of [PATCH net-next v10 0/2] net: af_packet: optimize retire operation:
-
-Changes in v7:
-  When the callback return, without sk_buff_head lock protection, __run_hrtimer will
-  enqueue the timer if return HRTIMER_RESTART. Setting the hrtimer expires while
-  enqueuing a timer may cause chaos in the hrtimer red-black tree.
-
-Neither hrtimer_set_expires nor hrtimer_forward_now is allowed when the hrtimer has
-already been enqueued. Therefore, the only place where the hrtimer timeout can be set is
-within the callback, at which point the hrtimer is in a non-enqueued state and can have
-its timeout set.
-
-
-Changes in v8:
-  Simplify the logic related to setting timeout, as suggestd by Willem de Bruijn.
-  Currently timer callback just restarts itself unconditionally, so delete the
- 'out:' label, do not forward hrtimer in prb_open_block, call hrtimer_forward_now
-  directly and always return HRTIMER_RESTART. The only special case is when
-  prb_open_block is called from tpacket_rcv. That would set the timeout further
-  into the future than the already queued timer. An earlier timeout is not
-  problematic. No need to add complexity to avoid that.
-
-This paragraph explains that if the block's retire timeout is not adjusted within
-the timer callback, it will only result in an earlier-than-expected retire timeout,
-which is not problematic. Therefore, it is unnecessary to increase the logical complexity
-to ensure block retire timeout occurs as expected each time.
-
-
-> The whole structure needs a new organization?
-> 
-> Before:
->         /* size: 152, cachelines: 3, members: 22 */
->         /* sum members: 144, holes: 2, sum holes: 8 */
->         /* paddings: 1, sum paddings: 4 */
->         /* last cacheline: 24 bytes */
-> After:
->         /* size: 176, cachelines: 3, members: 19 */
->         /* sum members: 163, holes: 4, sum holes: 13 */
->         /* paddings: 1, sum paddings: 4 */
->         /* forced alignments: 1, forced holes: 1, sum forced holes: 6 */
->         /* last cacheline: 48 bytes */
-
-What about the following organization:?
-
-/* kbdq - kernel block descriptor queue */
-struct tpacket_kbdq_core {
-	struct pgv	*pkbdq;
-	unsigned int	feature_req_word;
-	unsigned int	hdrlen;
-	unsigned short	kactive_blk_num;
-	unsigned short	blk_sizeof_priv;
-	unsigned char	reset_pending_on_curr_blk;
-
-	char		*pkblk_start;
-	char		*pkblk_end;
-	int		kblk_size;
-	unsigned int	max_frame_len;
-	unsigned int	knum_blocks;
-	char		*prev;
-	char		*nxt_offset;
-
-	unsigned short  version;
-	
-	uint64_t	knxt_seq_num;
-	struct sk_buff	*skb;
-
-	rwlock_t	blk_fill_in_prog_lock;
-
-	/* timer to retire an outstanding block */
-	struct hrtimer  retire_blk_timer;
-
-	/* Default is set to 8ms */
-#define DEFAULT_PRB_RETIRE_TOV	(8)
-
-	ktime_t		interval_ktime;
-};
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt))
+WARNING: CPU: 1 PID: 9889 at kernel/softirq.c:172 __local_bh_disable_ip+0x342/0x400 kernel/softirq.c:172
+Modules linked in:
+CPU: 1 UID: 0 PID: 9889 Comm: syz.3.1233 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:__local_bh_disable_ip+0x342/0x400 kernel/softirq.c:172
+Code: 0f b6 04 28 84 c0 0f 85 b5 00 00 00 83 3d 59 8e 98 0d 00 75 19 90 48 c7 c7 00 b2 09 8b 48 c7 c6 40 b2 09 8b e8 df 61 fe ff 90 <0f> 0b 90 90 90 e9 fc fd ff ff 44 89 f9 80 e1 07 80 c1 03 38 c1 0f
+RSP: 0018:ffffc9000439f980 EFLAGS: 00010246
+RAX: 313d6c056ac6e300 RBX: 1ffff92000873f34 RCX: 0000000000080000
+RDX: ffffc9000e563000 RSI: 000000000000025d RDI: 000000000000025e
+RBP: ffffc9000439fa80 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: ffffed1017124863 R12: 1ffff110049edc89
+R13: dffffc0000000000 R14: ffffffff8184ca61 R15: ffff888024f6e44c
+FS:  00007f22097a66c0(0000) GS:ffff8881269c2000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000000504d4000 CR4: 00000000003526f0
+DR0: 0000000000000006 DR1: 0000000000000003 DR2: 0000000000000401
+DR3: 0000000000000404 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ local_bh_disable include/linux/bottom_half.h:20 [inline]
+ spin_lock_bh include/linux/spinlock_rt.h:87 [inline]
+ sock_hash_delete_elem+0xc6/0x320 net/core/sock_map.c:952
+ bpf_prog_0fcbc4c83748eeda+0x46/0x4e
+ bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
+ __bpf_prog_run include/linux/filter.h:718 [inline]
+ bpf_prog_run include/linux/filter.h:725 [inline]
+ bpf_prog_run_pin_on_cpu include/linux/filter.h:742 [inline]
+ bpf_flow_dissect+0x132/0x400 net/core/flow_dissector.c:1024
+ bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1416
+ bpf_prog_test_run+0x2ca/0x340 kernel/bpf/syscall.c:4590
+ __sys_bpf+0x581/0x870 kernel/bpf/syscall.c:6047
+ __do_sys_bpf kernel/bpf/syscall.c:6139 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6137 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6137
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f220b53ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f22097a6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f220b775fa0 RCX: 00007f220b53ebe9
+RDX: 0000000000000050 RSI: 0000200000000180 RDI: 000000000000000a
+RBP: 00007f220b5c1e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f220b776038 R14: 00007f220b775fa0 R15: 00007fff2055aba8
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Thanks
-Xin Zhao
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
