@@ -1,224 +1,302 @@
-Return-Path: <netdev+bounces-219528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C0EB41B76
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:14:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF756B41C60
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:55:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 919DA7A14B2
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:13:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AADF23B5E11
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F0B2E8B86;
-	Wed,  3 Sep 2025 10:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB702F39A2;
+	Wed,  3 Sep 2025 10:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="QbG6lPvz";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VZu2ISvU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZtZFcIYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD29B2D6607;
-	Wed,  3 Sep 2025 10:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C64B2F39D3;
+	Wed,  3 Sep 2025 10:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756894478; cv=none; b=oc/aqZzcMFR/WSoQsAGhMH9iMwXz2CU1RPNCAgkYw6mSmUiZQ9L0B8GPj5KJbeIRYWv1c21J5KlR2JwKuFFq/4Vm+Gk1GVi95zdz0YneLZPbmE4NqgEknRcL2in80twND8Tl/lhBGUotoP52EoUsx+RA5B5LfSrp6QrDcD6Dl4g=
+	t=1756896773; cv=none; b=aGzSTAvIEMPvYOZP9cQSrehD02QRm3dcvltJGtCIfr2X0djneKmuwzl6j9AC1Kw8EZORx9MTlfUqsWXibAaHLBrfKqtPt4KKOzv30m9hjku0isudwekdie73aupNWvDCnfhhBrogfeVvT4QgQqXQTTVOfQTD6lZ2D4UByCT6XKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756894478; c=relaxed/simple;
-	bh=hlNJJ1G1+WNeeg0idSskM8WMibWqKJQhvR2nOpoOetc=;
+	s=arc-20240116; t=1756896773; c=relaxed/simple;
+	bh=HGjnf8eVllcIUSL3TnUPNDJIjvbpjCLHddwGD9q4Uzc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SxwN+2PqT0UIszlBDhfkF59iPZsSuiIZxdLXjGJuNpDanyDjegDDhAWqFq8qJJc3wjg02kzwl2G5NVhdOQtPyaW86duCaYUb+EOboHRVlBOhFHSHN1CG86xX5kOPjOZDuShqnVeFidZEafCS54H97n44tZ5wOkAELOi+a7FZxdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=QbG6lPvz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VZu2ISvU; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id ACD29140040F;
-	Wed,  3 Sep 2025 06:14:34 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Wed, 03 Sep 2025 06:14:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1756894474; x=
-	1756980874; bh=oJuMg/CtAgpONPrIwJ9LStLAGu5PdybtBuhkGLCzAmk=; b=Q
-	bG6lPvzJYcwQG418ETq2b97m+hlxfdAoUP5JPMAupm172i/UsXJnHWktoOs8a/pv
-	8zIrgLzvQfZ4xONUBNXEs7R+HMSwy9OOsI0enwjJHmn4HxzXjt5ksjE6uN7nHx1o
-	vvEZZ726NSSMzhkT1bH9F6pkGuq/qKVNVMTs1cz19LcWgvXE+mSQ9diPHocfAiFe
-	eBHGX6FvXcGzLBTpxwGaxEI58HDuFDv2A7+Hs9IFbuaa41lfDtSWAYN9pT94mUBd
-	CsymewpHEW0Do+qikSbIJgoR46yNzS27sAG/hXGqcodlb5YhAyFujWDiJ+oxLuRy
-	MCFNuXFBxc9TuKONhtOjA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1756894474; x=1756980874; bh=oJuMg/CtAgpONPrIwJ9LStLAGu5PdybtBuh
-	kGLCzAmk=; b=VZu2ISvUdQorLiXIJIICz5mEaQaZsIciadVzXt5gZeyFqZ6qn+p
-	oFZtxXJ+4FdpOgw9DUkkydjb1BBYaEIyX2KAxn38FqJ/y9C++iQsjf6pXLXHyw7o
-	HZGMrajbEuRfLUQVnoGSKsN/Rhyy0YljC+oZK5CC1y3hmpVniy++grfA8Y5R4ByI
-	/mnNZR+RSiwMKtoPDmmE8uDYUTbDVlQSw2qkHY9oO97ZVo2QcHGNrmWDOwfC6Icr
-	ybMjIWUZVXyUKZUpftwTaeN18E3LeFFiCqK82z768R26Jxc6nYgj5xNoclxoN0n6
-	r1etLObVf24BhmyaZYJd10VcfdID2jKMoJQ==
-X-ME-Sender: <xms:ChW4aCEiu6KFgYPU5JPyISDJW_s-IohWvZcf9W7MZFMVxvwVfLJgFg>
-    <xme:ChW4aH7BPmHjesKbc63hGI1xKsMalV39FWM5rjqg2nKr1VSUgGfk2-FIJpXZ2mLGn
-    6SRRkCrmfD1AFnDWe4>
-X-ME-Received: <xmr:ChW4aJQWmK7GdEFst2QgsKCQ3vD2oE6kIW2lKxG6kexUh2vaTocfG9BLyHb0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvkeejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvuefffefg
-    udffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
-    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtohepfihilhhfrhgvugdrohhpvghnshhouhhrtggvse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
-    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
-    rghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtohepjhhohhhnrdhfrghsthgr
-    sggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:ChW4aC4mNmbndpE4ETOzphb3H3ZkvoOYV-XpP8JEFvzufYGTfqWAQA>
-    <xmx:ChW4aGSq-MiMaQmAIfnPZSFqEr5J5Bg_cdesPtimy9rg0IgUUJyqvA>
-    <xmx:ChW4aHkE7XONpN1fnbvpPX6Rp9FKh9L_tM9viiel-1m4lmNkU4QxMw>
-    <xmx:ChW4aKTB4nZ9rLLc5ZpZc3AAlEozTWEA7gVkmrR-H_kCKGHfUI099Q>
-    <xmx:ChW4aMaK6iJx6oeBXD-1B8tpoT0r_JBLKvbMltlUepdlXJ7lSszJrL1J>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 3 Sep 2025 06:14:33 -0400 (EDT)
-Date: Wed, 3 Sep 2025 12:14:32 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Wilfred Mallawa <wilfred.opensource@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	john.fastabend@gmail.com, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alistair.francis@wdc.com, dlemoal@kernel.org,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>
-Subject: Re: [PATCH v3] net/tls: support maximum record size limit
-Message-ID: <aLgVCGbq0b6PJXbY@krikkit>
-References: <20250903014756.247106-2-wilfred.opensource@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=X8/uetctbpRNy4ad3AnpUJIsmVN4cRwKLn/WpYhv+INDa7vztk1VqHK20VR/9IDcabDLHaCfkxlsthvzn3hZf2+beqyORNLRJDOJy++9va2L2MK6Ly74jBY0+KkpdWmmckY+U3N9+R4Y4E4lWlbp/x/xvT4+XaYL0kN8Uwi8nFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZtZFcIYS; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756896772; x=1788432772;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HGjnf8eVllcIUSL3TnUPNDJIjvbpjCLHddwGD9q4Uzc=;
+  b=ZtZFcIYSzR0CYRBkd2HnSV3xsBMJdqPobDNlDNrT1NM+2wccwMd1R3bZ
+   UlBtac5/g8jRYZ56I86pu5Yy3V7h54GCfXm+Ryvt7mG9ShhjukL5/6YLG
+   Vqx/3FVXXtDM8A8Iqq5yvz6cNPL99G9iDnh5bQ63UL7mWhjdi0tVWCFGk
+   ZcqIQde/c+kY5oY1aYuVznYCcgJJjdkYehVjSkhO+qwZT9H6LLj8eRvTY
+   /X/WgX3LW03pRcYJW0yU4lpa9mLBiLLPzNoZ+TDGMA3NxIXai0it/xnWk
+   9utHHGujBT30G65cftQyMRM/x9LPYg/RayjCR+5OH6VFH44hTAwhju5oD
+   A==;
+X-CSE-ConnectionGUID: NuQ5+UKtSi6n13m4Za9MNg==
+X-CSE-MsgGUID: Bw48pVLWRNmMv4kqEPrwnQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="76806445"
+X-IronPort-AV: E=Sophos;i="6.18,235,1751266800"; 
+   d="scan'208";a="76806445"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 03:52:31 -0700
+X-CSE-ConnectionGUID: 8GSnf1gKQ16GwFnFpq3bKQ==
+X-CSE-MsgGUID: 2dz0rNFeQAuUw/Pkn4bkQw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
+   d="scan'208";a="171701529"
+Received: from lkp-server02.sh.intel.com (HELO 06ba48ef64e9) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 03 Sep 2025 03:51:34 -0700
+Received: from kbuild by 06ba48ef64e9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1utl4b-0003l5-10;
+	Wed, 03 Sep 2025 10:51:04 +0000
+Date: Wed, 3 Sep 2025 18:50:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>,
+	Mina Almasry <almasrymina@google.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 2/2] net: devmem: use niov array for token
+ management
+Message-ID: <202509031855.54vuvsX1-lkp@intel.com>
+References: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-2-d946169b5550@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250903014756.247106-2-wilfred.opensource@gmail.com>
+In-Reply-To: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-2-d946169b5550@meta.com>
 
-note: since this is a new feature, the subject prefix should be
-"[PATCH net-next vN]" (ie add "net-next", the target tree for "new
-feature" changes)
+Hi Bobby,
 
-2025-09-03, 11:47:57 +1000, Wilfred Mallawa wrote:
-> diff --git a/Documentation/networking/tls.rst b/Documentation/networking/tls.rst
-> index 36cc7afc2527..0232df902320 100644
-> --- a/Documentation/networking/tls.rst
-> +++ b/Documentation/networking/tls.rst
-> @@ -280,6 +280,13 @@ If the record decrypted turns out to had been padded or is not a data
->  record it will be decrypted again into a kernel buffer without zero copy.
->  Such events are counted in the ``TlsDecryptRetry`` statistic.
->  
-> +TLS_TX_RECORD_SIZE_LIM
-> +~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +During a TLS handshake, an endpoint may use the record size limit extension
-> +to specify a maximum record size. This allows enforcing the specified record
-> +size limit, such that outgoing records do not exceed the limit specified.
+kernel test robot noticed the following build errors:
 
-Maybe worth adding a reference to the RFC that defines this extension?
-I'm not sure if that would be helpful to readers of this doc or not.
+[auto build test ERROR on cd8a4cfa6bb43a441901e82f5c222dddc75a18a3]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/net-devmem-rename-tx_vec-to-vec-in-dmabuf-binding/20250903-054553
+base:   cd8a4cfa6bb43a441901e82f5c222dddc75a18a3
+patch link:    https://lore.kernel.org/r/20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-2-d946169b5550%40meta.com
+patch subject: [PATCH net-next 2/2] net: devmem: use niov array for token management
+config: x86_64-defconfig (https://download.01.org/0day-ci/archive/20250903/202509031855.54vuvsX1-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250903/202509031855.54vuvsX1-lkp@intel.com/reproduce)
 
-> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-> index a3ccb3135e51..94237c97f062 100644
-> --- a/net/tls/tls_main.c
-> +++ b/net/tls/tls_main.c
-[...]
-> @@ -1022,6 +1075,7 @@ static int tls_init(struct sock *sk)
->  
->  	ctx->tx_conf = TLS_BASE;
->  	ctx->rx_conf = TLS_BASE;
-> +	ctx->tx_record_size_limit = TLS_MAX_PAYLOAD_SIZE;
->  	update_sk_prot(sk, ctx);
->  out:
->  	write_unlock_bh(&sk->sk_callback_lock);
-> @@ -1065,7 +1119,7 @@ static u16 tls_user_config(struct tls_context *ctx, bool tx)
->  
->  static int tls_get_info(struct sock *sk, struct sk_buff *skb, bool net_admin)
->  {
-> -	u16 version, cipher_type;
-> +	u16 version, cipher_type, tx_record_size_limit;
->  	struct tls_context *ctx;
->  	struct nlattr *start;
->  	int err;
-> @@ -1110,7 +1164,13 @@ static int tls_get_info(struct sock *sk, struct sk_buff *skb, bool net_admin)
->  		if (err)
->  			goto nla_failure;
->  	}
-> -
-> +	tx_record_size_limit = ctx->tx_record_size_limit;
-> +	if (tx_record_size_limit) {
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509031855.54vuvsX1-lkp@intel.com/
 
-You probably meant to update that to:
+All errors (new ones prefixed by >>):
 
-    tx_record_size_limit != TLS_MAX_PAYLOAD_SIZE
-
-Otherwise, now that the default is TLS_MAX_PAYLOAD_SIZE, it will
-always be exported - which is not wrong either. So I'd either update
-the conditional so that the attribute is only exported for non-default
-sizes (like in v2), or drop the if() and always export it.
-
-> +		err = nla_put_u16(skb, TLS_INFO_TX_RECORD_SIZE_LIM,
-> +				  tx_record_size_limit);
-> +		if (err)
-> +			goto nla_failure;
-> +	}
-
-[...]
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index bac65d0d4e3e..28fb796573d1 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -1079,7 +1079,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
->  		orig_size = msg_pl->sg.size;
->  		full_record = false;
->  		try_to_copy = msg_data_left(msg);
-> -		record_room = TLS_MAX_PAYLOAD_SIZE - msg_pl->sg.size;
-> +		record_room = tls_ctx->tx_record_size_limit - msg_pl->sg.size;
-
-If we entered tls_sw_sendmsg_locked with an existing open record, this
-could end up being negative and confuse the rest of the code.
-
-    send(MSG_MORE) returns with an open record of length len1
-    setsockopt(TLS_INFO_TX_RECORD_SIZE_LIM, limit < len1)
-    send() -> record_room < 0
+   net/ipv4/tcp.c: In function 'tcp_recvmsg_dmabuf':
+>> net/ipv4/tcp.c:2502:41: error: implicit declaration of function 'net_devmem_dmabuf_binding_get'; did you mean 'net_devmem_dmabuf_binding_put'? [-Werror=implicit-function-declaration]
+    2502 |                                         net_devmem_dmabuf_binding_get(binding);
+         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         |                                         net_devmem_dmabuf_binding_put
+   cc1: some warnings being treated as errors
 
 
-Possibly not a problem with a "well-behaved" userspace, but we can't
-rely on that.
+vim +2502 net/ipv4/tcp.c
 
-
-Pushing out the pending "too big" record at the time we set
-tx_record_size_limit would likely make the peer close the connection
-(because it's already told us to limit our TX size), so I guess we'd
-have to split the pending record into tx_record_size_limit chunks
-before we start processing the new message (either directly at
-setsockopt(TLS_INFO_TX_RECORD_SIZE_LIM) time, or the next send/etc
-call). The final push during socket closing, and maybe some more
-codepaths that deal with ctx->open_rec, would also have to do that.
-
-I think additional selftests for
-    send(MSG_MORE), TLS_INFO_TX_RECORD_SIZE_LIM, send
-and
-    send(MSG_MORE), TLS_INFO_TX_RECORD_SIZE_LIM, close
-verifying the received record sizes would make sense, since it's a bit
-tricky to get that right.
+  2390	
+  2391	/* On error, returns the -errno. On success, returns number of bytes sent to the
+  2392	 * user. May not consume all of @remaining_len.
+  2393	 */
+  2394	static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+  2395				      unsigned int offset, struct msghdr *msg,
+  2396				      int remaining_len)
+  2397	{
+  2398		struct dmabuf_cmsg dmabuf_cmsg = { 0 };
+  2399		unsigned int start;
+  2400		int i, copy, n;
+  2401		int sent = 0;
+  2402		int err = 0;
+  2403	
+  2404		do {
+  2405			start = skb_headlen(skb);
+  2406	
+  2407			if (skb_frags_readable(skb)) {
+  2408				err = -ENODEV;
+  2409				goto out;
+  2410			}
+  2411	
+  2412			/* Copy header. */
+  2413			copy = start - offset;
+  2414			if (copy > 0) {
+  2415				copy = min(copy, remaining_len);
+  2416	
+  2417				n = copy_to_iter(skb->data + offset, copy,
+  2418						 &msg->msg_iter);
+  2419				if (n != copy) {
+  2420					err = -EFAULT;
+  2421					goto out;
+  2422				}
+  2423	
+  2424				offset += copy;
+  2425				remaining_len -= copy;
+  2426	
+  2427				/* First a dmabuf_cmsg for # bytes copied to user
+  2428				 * buffer.
+  2429				 */
+  2430				memset(&dmabuf_cmsg, 0, sizeof(dmabuf_cmsg));
+  2431				dmabuf_cmsg.frag_size = copy;
+  2432				err = put_cmsg_notrunc(msg, SOL_SOCKET,
+  2433						       SO_DEVMEM_LINEAR,
+  2434						       sizeof(dmabuf_cmsg),
+  2435						       &dmabuf_cmsg);
+  2436				if (err)
+  2437					goto out;
+  2438	
+  2439				sent += copy;
+  2440	
+  2441				if (remaining_len == 0)
+  2442					goto out;
+  2443			}
+  2444	
+  2445			/* after that, send information of dmabuf pages through a
+  2446			 * sequence of cmsg
+  2447			 */
+  2448			for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
+  2449				skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+  2450				struct net_devmem_dmabuf_binding *binding;
+  2451				struct net_iov *niov;
+  2452				u64 frag_offset;
+  2453				size_t size;
+  2454				u32 token;
+  2455				int end;
+  2456	
+  2457				/* !skb_frags_readable() should indicate that ALL the
+  2458				 * frags in this skb are dmabuf net_iovs. We're checking
+  2459				 * for that flag above, but also check individual frags
+  2460				 * here. If the tcp stack is not setting
+  2461				 * skb_frags_readable() correctly, we still don't want
+  2462				 * to crash here.
+  2463				 */
+  2464				if (!skb_frag_net_iov(frag)) {
+  2465					net_err_ratelimited("Found non-dmabuf skb with net_iov");
+  2466					err = -ENODEV;
+  2467					goto out;
+  2468				}
+  2469	
+  2470				niov = skb_frag_net_iov(frag);
+  2471				if (!net_is_devmem_iov(niov)) {
+  2472					err = -ENODEV;
+  2473					goto out;
+  2474				}
+  2475	
+  2476				end = start + skb_frag_size(frag);
+  2477				copy = end - offset;
+  2478	
+  2479				if (copy > 0) {
+  2480					copy = min(copy, remaining_len);
+  2481	
+  2482					frag_offset = net_iov_virtual_addr(niov) +
+  2483						      skb_frag_off(frag) + offset -
+  2484						      start;
+  2485					dmabuf_cmsg.frag_offset = frag_offset;
+  2486					dmabuf_cmsg.frag_size = copy;
+  2487	
+  2488					binding = net_devmem_iov_binding(niov);
+  2489	
+  2490					if (!sk->sk_user_frags.binding) {
+  2491						sk->sk_user_frags.binding = binding;
+  2492	
+  2493						size = binding->dmabuf->size / PAGE_SIZE;
+  2494						sk->sk_user_frags.urefs = kzalloc(size,
+  2495										  GFP_KERNEL);
+  2496						if (!sk->sk_user_frags.urefs) {
+  2497							sk->sk_user_frags.binding = NULL;
+  2498							err = -ENOMEM;
+  2499							goto out;
+  2500						}
+  2501	
+> 2502						net_devmem_dmabuf_binding_get(binding);
+  2503					}
+  2504	
+  2505					if (WARN_ONCE(sk->sk_user_frags.binding != binding,
+  2506						      "binding changed for devmem socket")) {
+  2507						err = -EFAULT;
+  2508						goto out;
+  2509					}
+  2510	
+  2511					token = net_iov_virtual_addr(niov) >> PAGE_SHIFT;
+  2512					binding->vec[token] = niov;
+  2513					dmabuf_cmsg.frag_token = token;
+  2514	
+  2515					/* Will perform the exchange later */
+  2516					dmabuf_cmsg.dmabuf_id = net_devmem_iov_binding_id(niov);
+  2517	
+  2518					offset += copy;
+  2519					remaining_len -= copy;
+  2520	
+  2521					err = put_cmsg_notrunc(msg, SOL_SOCKET,
+  2522							       SO_DEVMEM_DMABUF,
+  2523							       sizeof(dmabuf_cmsg),
+  2524							       &dmabuf_cmsg);
+  2525					if (err)
+  2526						goto out;
+  2527	
+  2528					atomic_inc(&sk->sk_user_frags.urefs[token]);
+  2529	
+  2530					atomic_long_inc(&niov->pp_ref_count);
+  2531	
+  2532					sent += copy;
+  2533	
+  2534					if (remaining_len == 0)
+  2535						goto out;
+  2536				}
+  2537				start = end;
+  2538			}
+  2539	
+  2540			if (!remaining_len)
+  2541				goto out;
+  2542	
+  2543			/* if remaining_len is not satisfied yet, we need to go to the
+  2544			 * next frag in the frag_list to satisfy remaining_len.
+  2545			 */
+  2546			skb = skb_shinfo(skb)->frag_list ?: skb->next;
+  2547	
+  2548			offset = offset - start;
+  2549		} while (skb);
+  2550	
+  2551		if (remaining_len) {
+  2552			err = -EFAULT;
+  2553			goto out;
+  2554		}
+  2555	
+  2556	out:
+  2557		if (!sent)
+  2558			sent = err;
+  2559	
+  2560		return sent;
+  2561	}
+  2562	
 
 -- 
-Sabrina
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
