@@ -1,168 +1,151 @@
-Return-Path: <netdev+bounces-219621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9AA6B425F7
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:52:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85FEB425F9
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:52:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2B251890079
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:51:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 986363A1CA0
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 15:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683C3286D7B;
-	Wed,  3 Sep 2025 15:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2336E2874E4;
+	Wed,  3 Sep 2025 15:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I3y67Mlb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZMCt5Am0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F9A2405F8
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 15:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1476A21D5B3;
+	Wed,  3 Sep 2025 15:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756914668; cv=none; b=kUYY/G9VMxQAbkAu1RXVK8ox/w3lTulSaMCvTqKqTAYDlfdv6EAugkqSV1QOjLNVYlbn9xStHsdi4I5LlAUNdT35NqG1TR3BlyUxIKSGRfgU0DQcXYQZJQZ1hXlc1+o4Y2A2PYpVjpkav6yBcpvVsr8dae9zGcX19Pe6JR67zcI=
+	t=1756914736; cv=none; b=pXiG5o6HGjGxWAoWKw6ZT+TlFhw4d/eVsL25iuOMxdFpT206+fGw3rTTZaMel/u6ONGKg9dA9+5YY5IwVlcQo/kXG3QHmOhDr5G0Ot8Jjfilxzq0nU7324kcjYlj0btcZRGVTuKwp+s6EQR18JeKQyN9OhSfnjvX/GVgyJcTID0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756914668; c=relaxed/simple;
-	bh=e0JHaBP8/GVFYEwhAJPRax04g5O5lWewA8BXZ8PnRM4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zc63qPv9igjzLaOyRuGCC8o9fhoKTw49CgaU5g62BIIGIjnxHyeh718zrwWaZAtPgbpM57mlgizvW19za+B3ALVJSgUG9mvlGgjO77dURA0l60eyLGXbJ840Nt2eWcUdBk2hAgTbX5RB+4bJ9A+XEyHz9mxRkpLxVta0kHDIaEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I3y67Mlb; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-720f0dd2809so11135266d6.3
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 08:51:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756914665; x=1757519465; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5YoHnX0hblFct0Koft9iwqKNnoFVZeTTlcteszDq+zc=;
-        b=I3y67MlbHrs/Hb9GMOp3zQsSdycQeRjTaUnahT705Xvz91jVBBbxHGrbzzBoc91lmp
-         ipcPvw0wq4ebAEWg24AApQhAXU6q7UUVf+AYBo0q1kJwRzKB4tysoorx79xb7LVeRC74
-         fjrSej9u2jMnVfCTnTm0WM5zthb1642+5MYSYBTlbz7CABdVEslawMmRSu4gb+aeoAjm
-         AlhKxJ2IisxlV5MRqGXz35VSgPrQXEM9athftKd/T9QbUc3Rs6MqlHvHiRUePX4YA7GV
-         dvrBnmeablTrUICYNto4DO6VMsA+eoIUTJdplwPuG1oncXZUIEXDDEWDCqvDH3f5SCzB
-         lRzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756914665; x=1757519465;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5YoHnX0hblFct0Koft9iwqKNnoFVZeTTlcteszDq+zc=;
-        b=PRw3znNguR9AQyQkqn/jf/5jUy5WKMsObRADtWhoGaxrCgZh/fRoNFGUVaTwOCdLwm
-         JrKwI7L7aNpGZNaiTYnBB++jFwL7SVPVmalHNsVMAiwhLcBaYiwfwI5+WEIRpdmjv/5h
-         fZwvMrQxBa8UmD2ougwGK+e8SC1xTBvzHMstHaaiDJDBmWtWsdk8hkEeAFDob3N0y8t7
-         Jk0PKFs1Nd4zhOjZJZQ1+WrBUgMCnwP9l2jzN2iOis0/EgzIGRhZTStEbPQSBn2Cw1vy
-         bPSjgYSqbA3O/Xrfe9pN70w30RM5qs5RofNZ8zGeWlzg6Z92RL+RIZkaSPiGtzEkkx71
-         /y7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWjY93218NFU9gG+Ul+2k25yzW5rX3YyyXdqfa1uG5ieNLrx5wIqL5WGvV5g/YmgJKI1/OnqiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhAsLDAIn3m1iwN2PCc0/Rf+a3GmEP438ojgvz4Y145zQoDxHs
-	PRY854qleBLr8LuuxYr/Oup+diIyvnpF4IxYRebT0fz1vbcRmkNPg2sH
-X-Gm-Gg: ASbGnctA6Fpch8ToA3WyU4qpZ+3pY4bAnEKE1pPjdXAmfLZANUJ4UpTTaY91dFpAomO
-	hJp8kbXhs1V8arm17Ee7VbZdoiWwjG+pgp2Fp1qsqQMK/OeStRtYvNQp9Wv8Bdnd3HviLojI+NP
-	UCo+nA1JQ5TPYwWQViOP+NilOnbMVKPcvxqh2wooHNTWcOkNK56DXyjNdkf+2pmMu8aZtZyKsHS
-	xs1y9JJuGI4vhd2vtA6mmYxg8AV2JwJhkv1iJOf/AajKxl0/zjvCv7tpMSWvlcnfps7JuKdk9qY
-	kdQ8NG6YEZAjw6YGg9xXiQCUvZa8ncQ2VHoN7eKS5LFbK07uAB7O6WHoAZmNyQfVz8up7jv5ZkA
-	PtmeRidWdW8ke1Opwe5EwMXQHdJuBJDdC6VhL2rjoOxT/PPvKrPfA0Q==
-X-Google-Smtp-Source: AGHT+IG77Q2fx7264wuU0FDvLpt59gGCsHgQIRieiDCdL4yj2Vv+vo2LUAaCjYFD6q1o4rxYbOl9CA==
-X-Received: by 2002:a05:6214:501b:b0:726:a561:87ca with SMTP id 6a1803df08f44-726a5802428mr21645416d6.58.1756914665528;
-        Wed, 03 Sep 2025 08:51:05 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1145:4:6a18:1fad:946c:1c48? ([2620:10d:c091:500::1:90f4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-720b682faf5sm30694866d6.65.2025.09.03.08.51.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Sep 2025 08:51:04 -0700 (PDT)
-Message-ID: <13540207-c99e-408b-a116-2a34825f7e10@gmail.com>
-Date: Wed, 3 Sep 2025 11:51:03 -0400
+	s=arc-20240116; t=1756914736; c=relaxed/simple;
+	bh=a1yA4jUQ5l1E5iJTp9AQgTYYm687vZMk3gU+OqtM9Qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3QbB8yeeBtDL1Q2wUYsc05t0OweYWtyPSEuEHVo8GS64725aIwloEmf/z41S2Mb135/V5NbtAJ6kAzW2SvozYRAaTl3BZGKCS/4u9TrJWIHPu8AmikivdUzMY3iqNE44tgF/hSowRgUfIVBBUTE0F0kBJZDDBheh8KTbPbNaA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ZMCt5Am0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UO8sfqFJi/fVejE+Tg3iYyOh3DnadUFH30obltVdUHc=; b=ZMCt5Am0uW7ZzyWprCxlWsJBlI
+	IRytku73GtWFO5o1WFmDNqzFdJlYjQz8kCrMDWr7T1AFIEB4QMaQEtbgRRGH0Nw5PTPO4654Q8puI
+	lx4Vh+Id7lLGELyH8zSMhPIAOyX9h+4g1zPhbsi6ucu2OGp82HADyV5YeiRb8qr8JFqVBrNkrzbLS
+	kQKi0w9X+YH0ibESholcPALDcUSuAFkUtyq+SX6YtbEz6zra/8bNBfQsGZwW20EqnF6GTwCAVWzTG
+	k5i6cXGDTPXtSOPUvOzjdTAL5wrlzMlBM/2GgvlaTMLlpEWzqoyG0EPJykx4ftjHtyaKsc0qijLPo
+	8MSfz1Tw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44846)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1utpmN-000000000kl-0biF;
+	Wed, 03 Sep 2025 16:52:11 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1utpmL-000000000f5-17Dg;
+	Wed, 03 Sep 2025 16:52:09 +0100
+Date: Wed, 3 Sep 2025 16:52:09 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 1/2] net: phylink: add lock for serializing
+ concurrent pl->phydev writes with resolver
+Message-ID: <aLhkKVsbrkXmFbgK@shell.armlinux.org.uk>
+References: <20250903152348.2998651-1-vladimir.oltean@nxp.com>
+ <aLheK_1pYbirLe8R@shell.armlinux.org.uk>
+ <20250903153120.4oiwyz6bxfj3fuuv@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 00/19] add basic PSP encryption for TCP
- connections
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Boris Pismenny <borisp@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
- <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
- Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Kiran Kella <kiran.kella@broadcom.com>,
- Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-References: <20250828162953.2707727-1-daniel.zahka@gmail.com>
- <aLdIUZbwF83DbUiv@x130>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <aLdIUZbwF83DbUiv@x130>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250903153120.4oiwyz6bxfj3fuuv@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+
+On Wed, Sep 03, 2025 at 06:31:20PM +0300, Vladimir Oltean wrote:
+> On Wed, Sep 03, 2025 at 04:26:35PM +0100, Russell King (Oracle) wrote:
+> > On Wed, Sep 03, 2025 at 06:23:47PM +0300, Vladimir Oltean wrote:
+> > > @@ -2305,6 +2314,7 @@ void phylink_disconnect_phy(struct phylink *pl)
+> > >  
+> > >  	phy = pl->phydev;
+> > >  	if (phy) {
+> > > +		mutex_lock(&pl->phy_lock);
+> > 
+> > If we can, I think it would be better to place this a couple of lines
+> > above and move the unlock.
+> 
+> Sorry for potentially misunderstanding, do you mean like this?
+> 
+> 	mutex_lock(&pl->phy_lock);
+> 	phy = pl->phydev;
+> 	if (phy) {
+> 		mutex_lock(&phy->lock);
+> 		mutex_lock(&pl->state_mutex);
+> 		pl->phydev = NULL;
+> 		pl->phy_enable_tx_lpi = false;
+> 		pl->mac_tx_clk_stop = false;
+> 		mutex_unlock(&pl->state_mutex);
+> 		mutex_unlock(&phy->lock);
+> 		mutex_unlock(&pl->phy_lock);
+> 		flush_work(&pl->resolve);
+> 
+> 		phy_disconnect(phy);
+> 	} else {
+> 		mutex_unlock(&pl->phy_lock);
+> 	}
+> 
+> move the unlock where? because flush_work(&pl->resolve) needs to happen
+> unlocked, otherwise we'll deadlock with phylink_resolve().
+> 
+> Additionally, dereferincing pl->phydev under rtnl_lock() is already safe,
+> and doesn't need the secondary clock.
+
+The reason I'm making the suggestion is for consistency. If the lock
+is there to ensure that reading pl->phydev is done safely, having one
+site where we read it and then take the lock makes it look confusing.
+I've also been thinking that it should be called pl->phydev_mutex
+(note that phylink uses _mutex for mutexes.)
+
+To avoid it looking weird, what about this:
+
+	mutex_lock(&pl->phy_lock);
+	phy = pl->phydev;
+	if (phy) {
+		mutex_lock(&phy->lock);
+		mutex_lock(&pl->state_mutex);
+		pl->phydev = NULL;
+		pl->phy_enable_tx_lpi = false;
+		pl->mac_tx_clk_stop = false;
+		mutex_unlock(&pl->state_mutex);
+		mutex_unlock(&phy->lock);
+	}
+	mutex_unlock(&pl->phy_lock);
+
+	if (phy) 
+ 		flush_work(&pl->resolve);
+ 
+ 		phy_disconnect(phy);
+ 	}
 
 
-
-On 9/2/25 3:41 PM, Saeed Mahameed wrote:
-> On 28 Aug 09:29, Daniel Zahka wrote:
->> .../mellanox/mlx5/core/en_accel/psp.c | 195 +++++
->> .../mellanox/mlx5/core/en_accel/psp.h         |  49 ++
->> .../mellanox/mlx5/core/en_accel/psp_fs.c      | 736 ++++++++++++++++++
->> .../mellanox/mlx5/core/en_accel/psp_fs.h      |  30 +
->> .../mellanox/mlx5/core/en_accel/psp_offload.c |  44 ++
->
-> A bit too much control path files, psp_offload.c holds only two level
-> functions for key management and rotation, while psp_fs is.c 
-> implementing the flow steering part and psp.c is the netdev API facing 
-> implementation,
-> do we really need three files ? You can sparate the logic inside one file
-> by bottom up design rather than 3 split files.
-> psp is a well defined protocol, I don't expect it to scale larger than a
-> 1-2k lines of code in mlx5, so let's keep it simple, just consolidate all
-> files into one en_accel/psp.{c,h} and leave rxtx.c data path separate.
->
-> Also As Jakub pointed out on V7, mlx5_ifc changes need to be separated 
-> into
-> own patch, "net/mlx5e: Support PSP offload functionality" need to 
-> split at
-> the point where we cache ps caps on driver load, so main.c and 
-> mlx5_if.c in
-> that patch have to go into own patch and then pulled into mlx5-next 
-> branch
-> to avoid any conflict. Let me know if you need any assistance.
->
->
->> .../mellanox/mlx5/core/en_accel/psp_rxtx.c | 200 +++++
->> .../mellanox/mlx5/core/en_accel/psp_rxtx.h    | 121 +++
->> .../net/ethernet/mellanox/mlx5/core/en_main.c |   9 +
->> .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  49 +-
->> .../net/ethernet/mellanox/mlx5/core/en_tx.c   |  10 +-
->> drivers/net/ethernet/mellanox/mlx5/core/fw.c  |   6 +
->> .../ethernet/mellanox/mlx5/core/lib/crypto.h  |   1 +
->> .../net/ethernet/mellanox/mlx5/core/main.c    |   1 +
->> .../mellanox/mlx5/core/steering/hws/definer.c |   2 +-
->
-
-Hello Saeed,
-I want confirm that I understand the ask here. So, I will consolidate 
-all of:
-
-.../mellanox/mlx5/core/en_accel/psp.c | 195 +++++
-.../mellanox/mlx5/core/en_accel/psp.h |  49 ++
-.../mellanox/mlx5/core/en_accel/psp_fs.c | 736 ++++++++++++++++++
-.../mellanox/mlx5/core/en_accel/psp_fs.h |  30 +
-.../mellanox/mlx5/core/en_accel/psp_offload.c |  44 ++
-
-into en_accel/psp.[ch]. And then for the ifc changes, I will rebase 
-after your PR is merged. And then no action is needed beyond that on the 
-other files. Is that right?
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
