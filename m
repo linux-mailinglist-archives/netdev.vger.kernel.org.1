@@ -1,94 +1,96 @@
-Return-Path: <netdev+bounces-219717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8593B42C8E
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:10:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B7D0B42CAB
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10A4C1BC4422
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DBC7C573D
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBE12ED853;
-	Wed,  3 Sep 2025 22:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A4E26B764;
+	Wed,  3 Sep 2025 22:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/z3YDuk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f29Eyqlq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59FC2ECEAE;
-	Wed,  3 Sep 2025 22:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33860BA3F;
+	Wed,  3 Sep 2025 22:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756937403; cv=none; b=uYjK8rmA873hWeLhX7FdjG8i/P0cWcl1Pqg8fhYqx9/YKDFxIi28jCOGOgyubJoIRkcnc4GSX6r1YqhJ7MULkWUIrCrpUO9Zpq5+WXUoj7CPPJZ/sqxX6DOyOj5BWu3HV1rpAS1k5FbTpK1c9ucptF+l8ysd1Kk9ZXCVB4TuQT0=
+	t=1756937756; cv=none; b=Dk87y3D4yH9meF9m/QMWPNh61gb+1uA8HiPP15tc7JlrD2ti1OKWXmXmEQ7BJClpMoCXKcYY8Q4qI4T1LB0wX4Ossm86tymRD6cHIJUNsRffad53ZScgLeqeIJiBmBckhyiaBFk7VFEYwryKqDqmhco5Jl1j8iDVfIESBR3W4As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756937403; c=relaxed/simple;
-	bh=cJLDDvPcPL4O4YAzuxUUFnnO+/RebYjcF6y3auColIE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H84E+GGe8IX2HXncvNdNWZi22sn3kdwL2gcU2l6sTyRccUHZtFuen2V8uf1mB7yQqK/12B0ZShye23ycGB5z9PPwr/knI4AhutLQ/mkz/YOPeMMITr2k45VS8tWJl7KaFvda0/7eeR+sDap5EyGCJ9qZ/PL1fJGmmWksEOHQ9zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/z3YDuk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 680CEC4CEE7;
-	Wed,  3 Sep 2025 22:10:02 +0000 (UTC)
+	s=arc-20240116; t=1756937756; c=relaxed/simple;
+	bh=FjCxsXTO2y1dcCLjYVy+WtH9zNK8OPmf+oe47T3YX4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cDdXX4+2eMRq88N5421E1UUjamkTOK0M2GJe7FB3I8aozxX/7dhMzw0VaHWelUPYh8aFUZmIVDy3IJRv974ZQenW1LrM2uM2YNGcDiMIaic3mgIG9bpNV+jCTC1sJn9tATPlxdH6Tk4lTtbGsF3H32JPN55unJvYPkpeerHJYeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f29Eyqlq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 771E0C4CEE7;
+	Wed,  3 Sep 2025 22:15:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756937402;
-	bh=cJLDDvPcPL4O4YAzuxUUFnnO+/RebYjcF6y3auColIE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=M/z3YDukG4DzBpvAw3wQlZxaA2yf3Xcj9l2r6kCR+Br+cBNwFWZABrRP2c95NtezD
-	 tkIeY+mk0tHMaBYSjQ5bwbSeVFwDPM+xt7lMrWFrUUfk/rWhcRU3zkkz0zfRHlywTo
-	 j59KNUBlYMasit5z9odTYFTY27eTYzWXOms/l/zWrYK7mZPktOJiTa/UZQe3hwoq+a
-	 BIUhxQsIqfhzhWRFecsJ+152kxdw9UUzm/nKeRaXaO7e/O0aszTltn1AudnHuH3xtF
-	 c05gK2vqlldHRer8GAJ/WsimQ+iNWC683se0szDRVRL+CHh5bqaoeLQxMiOLx+AhqN
-	 j0JMXfoe7zQCg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC32383C259;
-	Wed,  3 Sep 2025 22:10:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756937755;
+	bh=FjCxsXTO2y1dcCLjYVy+WtH9zNK8OPmf+oe47T3YX4Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f29EyqlqLRMXeIWuZJitiNpeH+sT89UwgxyPvp2eO7nIggZXyOzUvRmFT664V3Y+5
+	 hT4Qe6gNYItnV3OsnFVhk+sKwkV9Xt30TkTk9J7wLXh+dK3V6nvNbzRe6UShvacKq7
+	 1Vdn49ucvrmSBc4RdoT4+sK6MVIQQAsp0ShyTrzXFuPdQ9ZEQhvi4qtX9taKHq0MAG
+	 6Hra8sQuQJGCtKJZRD8Gegr0oR3Bcau9cs9TR49LkWir54tKASsb22+aLo8/3BU/DF
+	 v4zuvzEQ+P7fxHWIAsJZFBrurUDtcdGc7Ts/9tVh7PZIdd+sxhkcDZ+Lf17KY69B22
+	 FaLE2GI9aB4nA==
+Date: Wed, 3 Sep 2025 15:15:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ <netfilter-devel@vger.kernel.org>, pablo@netfilter.org
+Subject: Re: [PATCH net 1/2] selftests: netfilter: fix udpclash tool hang
+Message-ID: <20250903151554.5c72661e@kernel.org>
+In-Reply-To: <20250902185855.25919-2-fw@strlen.de>
+References: <20250902185855.25919-1-fw@strlen.de>
+	<20250902185855.25919-2-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] mlx5 PSP IFC bits
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175693740749.1217361.16080488330185740117.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Sep 2025 22:10:07 +0000
-References: <20250903063050.668442-1-saeed@kernel.org>
-In-Reply-To: <20250903063050.668442-1-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, jgg@nvidia.com, saeedm@nvidia.com,
- linux-rdma@vger.kernel.org, leonro@nvidia.com, netdev@vger.kernel.org,
- mbloch@nvidia.com, tariqt@nvidia.com, daniel.zahka@gmail.com,
- raeds@nvidia.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue,  2 Sep 2025 20:58:54 +0200 Florian Westphal wrote:
+> Yi Chen reports that 'udpclash' loops forever depending on compiler
+> (and optimization level used); while (x =3D=3D 1) gets optimized into
+> for (;;).  Switch to stdatomic to prevent this.
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+gcc version 15.1.1 (F42) w/ whatever flags kselftests use appear to be
+unaware of this macro:
 
-On Tue,  2 Sep 2025 23:30:49 -0700 you wrote:
-> From: Saeed Mahameed <saeedm@nvidia.com>
-> 
-> Hi Jakub, Jason,
-> 
-> This PR has a single patch to add mlx5_ifc PSP related capabilities structures
-> and HW definitions needed for PSP support in mlx5.
-> 
-> [...]
+udpclash.c:33:26: error: implicit declaration of function =E2=80=98ATOMIC_V=
+AR_INIT=E2=80=99; did you mean =E2=80=98ATOMIC_FLAG_INIT=E2=80=99? [-Wimpli=
+cit-function-declaration]
+   33 | static atomic_int wait =3D ATOMIC_VAR_INIT(1);
+      |                          ^~~~~~~~~~~~~~~
+      |                          ATOMIC_FLAG_INIT
+udpclash.c:33:26: error: initializer element is not constant
 
-Here is the summary with links:
-  - [GIT,PULL] mlx5 PSP IFC bits
-    https://git.kernel.org/netdev/net-next/c/0e2a5208cc3d
+Could you perhaps use volatile instead?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> +#include <stdatomic.h>
+>  #include <stdio.h>
+>  #include <string.h>
+>  #include <stdlib.h>
+> @@ -29,7 +30,7 @@ struct thread_args {
+>  	int sockfd;
+>  };
+> =20
+> -static int wait =3D 1;
+> +static atomic_int wait =3D ATOMIC_VAR_INIT(1);
+> =20
+>  static void *thread_main(void *varg)
+>  {
 
 
