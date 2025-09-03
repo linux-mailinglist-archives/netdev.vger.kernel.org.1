@@ -1,239 +1,193 @@
-Return-Path: <netdev+bounces-219470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6277FB4174C
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:54:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E8FB41752
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE7447A2FEA
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 07:52:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C7F918887C9
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 07:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127E02DC330;
-	Wed,  3 Sep 2025 07:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6AC2DE6F5;
+	Wed,  3 Sep 2025 07:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ba1F5h2Z"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="POC3XKuk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384E12D9492
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 07:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756886037; cv=fail; b=H+jDA4UXhL8oxPCH0ncLLI8GaW65wrp0db4msbFJ9w3cYgaTJi/6WNwu0FsIKPWz3/RJk/oEkLC9dotww2ZE9Atcbx9Mhp26PMOFy/sR7tzVgLe3B19NfhBV7soPwXAqwjRRNphG6+4vcrxQVUkTgDZ93oiXDnK9oav1aSdwcu4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756886037; c=relaxed/simple;
-	bh=Couf9uWp32FtbjSh5ZkgKwBV0PxWrgeDj6ISjA5UVTA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JdC8M7pejAhEORJxTy/6WcqvsDkfPGzhUtM6HBJKdEbIYJwJ+3IJ0rw+gJQRcSWxDH0hJuscQ2Qyfg3Mv42QHGsYsIWUBfp5jC3J280OQV1U+2NzmhYwprg1oYvM2b8rk62YcuruYf+dWDns6MctTzr1oWYglxcwgJrWFj5x510=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ba1F5h2Z; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756886035; x=1788422035;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Couf9uWp32FtbjSh5ZkgKwBV0PxWrgeDj6ISjA5UVTA=;
-  b=Ba1F5h2ZFc+/ckstPjnjzp66PPhhKkCRQTH9CnIqv/S+OcdNWCD+FuL9
-   /6vAnQCYZ1vC5ELM8OnxHcF5zba1Loz9YG7pIuFZ9hdBt+8WGLa58pAI1
-   Wf4zTMqwRnOZ/Xi6LGl5IippHBpwVqy0sfijRNEaik4DnqyFPlsKb+lCw
-   0NEzlE8t8a50YDJHDlzNFBYKTKR6smH4Dl711lIUglc+YS8YTt0g+ZMfN
-   zhe0cmtCpQpmxuaQW5oPvzU8vxXu6l424fxbzjoh7QzY1yVFimEjDIKoX
-   am/ou8+b0i3No+f/07dPXMv/TNiSspgcI713O0UnT27Txff3YX7voDX0A
-   g==;
-X-CSE-ConnectionGUID: 6hyO+6eOQsGso6OOrHkFGg==
-X-CSE-MsgGUID: HW7Inu0qTWy2z7vSi9s8VQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="58219754"
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="58219754"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 00:53:54 -0700
-X-CSE-ConnectionGUID: zP+m3md+RqS4GiPz56GPtg==
-X-CSE-MsgGUID: bXPu43OVTZeIqvntBP7NkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="171075713"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 00:53:54 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 3 Sep 2025 00:53:53 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Wed, 3 Sep 2025 00:53:53 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.70) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 3 Sep 2025 00:53:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hbZXQTB0NrBB3EEbYxfywTj7yWmMlqjnJaciuKSdz5l/u7RDOGdKClCL6cfwmNTXhtoz1WGtq7xniP2lG8OMFwQzC5O2m6ha0Nvy/Gf+pA8jL94igiBQ2ufwY1C5kIqy1xX+ztrdMpPL8fX+nq1/Lipy5MtnWt80g9jbbA2MuvoHZlSvDGifbH7UyH8CQhVTE89/wPGvi759SI87FPR/t/ByNfHO2XRVciXYT2Ft8gEtPrsQrQUb4GA8TRbyQOXM3ls7C9q9ClxzE2Sa05ixkWRz5rHcg6qKYWYL59vTl2O56MUE/Ol0WLfiigm7gUKlzuD4G1S8uPOxxhXvukFnaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9MJcc1vpk6PRoFHtxrZ2YJZOrpyd2UXFcVblnCpq4IM=;
- b=WP515JAcdeESr1dm1IMzkTKLJEN5ohWxo2mr6Bds7+9vigCqLRZDtag9ORaI764k2UBpVYxvaZmP+0VuEpOohge8qcq4eycGZHQhODkA7RZyZ0/MQMKLFQOrEjnXQXBcThLBatSX6cxEmwg4tuXwsn+89GymBAD70KQw+q4OOyEWYdbnizCh6P4ahFno8y6VygKJynWEKUFsAHJb230FKRoVCtGexQneEzUZtzTXOPiCcnLItJYfmLZFugbB0hPnu8XvybfUbCa9MHFNO8cN6S1ouVb1HUY8FzADCGSf516JuOHBDTIMtLI2SOqdBsvIJagmm03y02aFOu0waiJp0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH3PPF67C992ECC.namprd11.prod.outlook.com
- (2603:10b6:518:1::d28) by PH3PPF37A184CA6.namprd11.prod.outlook.com
- (2603:10b6:518:1::d15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.25; Wed, 3 Sep
- 2025 07:53:50 +0000
-Received: from PH3PPF67C992ECC.namprd11.prod.outlook.com
- ([fe80::8435:3b39:7eee:480]) by PH3PPF67C992ECC.namprd11.prod.outlook.com
- ([fe80::8435:3b39:7eee:480%7]) with mapi id 15.20.9052.021; Wed, 3 Sep 2025
- 07:53:50 +0000
-From: "Singh, PriyaX" <priyax.singh@intel.com>
-To: "intel-wired-lan-bounces@osuosl.org" <intel-wired-lan-bounces@osuosl.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, "Lobakin,
- Aleksander" <aleksander.lobakin@intel.com>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "Zaremba, Larysa" <larysa.zaremba@intel.com>,
-	"(Meetup2) MTR-FM1-AVLAB1" <fm1avlab1@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kubiak, Michal" <michal.kubiak@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Buvaneswaran, Sujai"
-	<sujai.buvaneswaran@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 2/3] ice: drop page
- splitting and recycling
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 2/3] ice: drop page
- splitting and recycling
-Thread-Index: AQHcCH0wIKVwiQnJSUel9OyxNh24HLR/f+UAgAANGoCAAaZeUIAACpXg
-Date: Wed, 3 Sep 2025 07:53:50 +0000
-Message-ID: <PH3PPF67C992ECC0B4A37DB80F8D88270609101A@PH3PPF67C992ECC.namprd11.prod.outlook.com>
-References: <20250808155659.1053560-1-michal.kubiak@intel.com>
- <20250808155659.1053560-3-michal.kubiak@intel.com>
- <PH0PR11MB501328DFC538260A11368B499606A@PH0PR11MB5013.namprd11.prod.outlook.com>
- <PH3PPF67C992ECC2AD31E5DB372B564E20A9106A@PH3PPF67C992ECC.namprd11.prod.outlook.com>
- <PH3PPF67C992ECC42A31833C78908719A7A9101A@PH3PPF67C992ECC.namprd11.prod.outlook.com>
-In-Reply-To: <PH3PPF67C992ECC42A31833C78908719A7A9101A@PH3PPF67C992ECC.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH3PPF67C992ECC:EE_|PH3PPF37A184CA6:EE_
-x-ms-office365-filtering-correlation-id: 54f4d261-605e-4b44-0896-08ddeabf055a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?7qf9SCqIltx3hkoXvu6GRreXqb+6CTnb1r3YRMbh7BTtslU8dTm1ODC90jO6?=
- =?us-ascii?Q?pmzidex4XHOLPoHsUz6bbpmscMwAI2d3cU+GepchprCLOmldKqCX+RfCOOCG?=
- =?us-ascii?Q?Xl+rKHeIFp8+CiZZ6bS4ySawb0pDr1+Xt2ztlSw6v1klCHgLlAyDJD0i/b7d?=
- =?us-ascii?Q?bvlIxAbtbAgPa2F/LgD7DrycBpZ7jsb7WTqxwUBLuSRju3T3LIHiJ02bbefc?=
- =?us-ascii?Q?BAsZL7Qo4JhnjttrWtZ7u3AUCHgOyb9j8bRraVyNJPMuZYMx7T76BedVMwlj?=
- =?us-ascii?Q?iDrjhlyEb3GjF0Mznf1eVhwLWn677KNLzm7FaT5sqjTwUX6Vq0mdVVq6Diu6?=
- =?us-ascii?Q?8t24PRcB8LXvIb4GMfN1nqq6QpezC/XWRaT4TJPA/VzVR+reimiHh0zdkT2C?=
- =?us-ascii?Q?lK1ZTCmJXe/+DxHzzaY1Ss0x6Ax+tnXHt71F5i9ADchFZ+1YqGyrwlgym6Qz?=
- =?us-ascii?Q?svWqiIG18BijzK7V+7ctwCbQ26Pvn60ixz1vMEZjuY3mEFEL549HOw0Ecag3?=
- =?us-ascii?Q?2jQUdr5lI0OAVRiVxY/7Y6CoWQi7wYeVB/FBkeEfGwCYtefA3sKEGcT+AGHA?=
- =?us-ascii?Q?QXs5Oc+XGsV/Es/RoZZshl2hZRdeM3iQxdItgYTVnG7e7AyMsSWhcMtPsnk6?=
- =?us-ascii?Q?gCHzA3tt2tOq7uEVoapiybigkWu4HR+MjfmLvZe8Q12BZLO2GO3rmSDj+6/b?=
- =?us-ascii?Q?uQedjIehBpfvMNAXJHLiQ/rV1UeLmD+4/Hap1DmfCMTMQ99DkQAW2LVur8nR?=
- =?us-ascii?Q?TAYIGxQ9PGoJyjcU1WVcOdeY2sIv85Mj+TCzpyvij/kT/EuP7revYHUHW1vr?=
- =?us-ascii?Q?LUWR7HyZ7JVCTzKW3l/6gwsb5UqRA6gUdSF4W3czNB+QXK5oxif1QISBzks5?=
- =?us-ascii?Q?xaPYX0U4ZMw/TQ1X7mtq2QABV2p22YKM6sLOvlfs1dOfaOPgFGcmlhrd5z9V?=
- =?us-ascii?Q?tvhkH+9XnQ++qBbZgCyEbLBsuvxSle03kBbsNpxyOxLiBXcOUrm53eMdMoy4?=
- =?us-ascii?Q?dUOW+zbdyZSdou17dw9ULE7nnJxntMiFs2DRkwyXJQX/Kl7Xwutux2Sj/Rey?=
- =?us-ascii?Q?avlA8xQYRIUKRNLxf5R6u2s0nfsxK3kCGU7WuaJLS9mWsT5xubz6vx93xneO?=
- =?us-ascii?Q?T0uwnMPIL5lIIVWJNQHu1Zh/LKb+IqXxhPmPKmiiP7ra6KvwtRavl7MRlh2k?=
- =?us-ascii?Q?VXGb2vn+dyIri+8xhTynBbM7SEKUrRI+hpbIzFnbAYFNm76GfW5uvwBLHFIf?=
- =?us-ascii?Q?eirKEOLAKvOKOVWskCBbR00bZbSyNUt3fiUgSG09qM0M6B/0t7d1p4egBDex?=
- =?us-ascii?Q?JPqpk97ArzGC35//Od/VYfIB5+50xLgU+f8K8UWo5Fjjivg858F0BZaeWJ4P?=
- =?us-ascii?Q?HHJ0LaJbrp/TBAyGR1q2rgIuou3MA37U9hxwRC5moMUySd/PTOS2CBMVmWIf?=
- =?us-ascii?Q?GedefzXx9V0Uqp0VWOP9FLsW5nVmyx8zK1edWLZ3u14XD5ua3oTni7ZQhWIt?=
- =?us-ascii?Q?rhUIc+FYrTRjJ8M=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPF67C992ECC.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xnxgXW/MLzgXekoGnQuCoeUg7KTzv70D4xKVMyBFzOglyrcGwv8s7z2aETDv?=
- =?us-ascii?Q?ozzr5QQNmoMuPiWbgt6lJoyxMXLwAX6IuqCODrqdte3H32W3i9kzO+C/6rF3?=
- =?us-ascii?Q?qdtal2upUnqy7EjrsgvfCI1IFJ3XOWAv+Zmc9FTm2y5o+v017ohWwpHuxerD?=
- =?us-ascii?Q?uOHvm92rDMJvSv1Vd+FW0RWQpMZdD9R8DvneBPvWJzsI+gXcRoKatqg5iYDh?=
- =?us-ascii?Q?ONroCctNF10j1CggyE+JuRLrrww14sd5v0GnZmqhQ6flG6MsRSErHmFtP5Xj?=
- =?us-ascii?Q?fxgvHCsvhUWzEM0sbSqz6VU6shmIWq8HyV7y1H5xbUWxRUFTNkXilAPoDfSK?=
- =?us-ascii?Q?Vp99iNQNe6z4j7C1ggiOkLJYJU/TjyfgdUWaWdtGfQuhr/JkSyNFwWFJbzJf?=
- =?us-ascii?Q?uPyBhziDidESED0pCY8IHAyrDggQHhg0lqb5gyLzrC9/JonRYIzjvHCaSg6v?=
- =?us-ascii?Q?LFYI2P/XWpZYmxgtvHwgClPzIAbRvbNAN5A8y4wWnMFkWQQBPN+nPFpou4g+?=
- =?us-ascii?Q?wlQzPh+bkZNwYYc6iS1cq+TMQahiWYbumSO10DbGXFckck35ejQLRnilmVgP?=
- =?us-ascii?Q?WzMaZqvj+jnkggwbpPA3/kZ8WOSfSQPwtYwJGYRzg3lVeGaPU2UEGp2YcGyA?=
- =?us-ascii?Q?mtqmSmpvo8pjQOjpF/XC39xLLXMuoy5W4/EAA6BoKrtlU9kA6dtPjXQgeceB?=
- =?us-ascii?Q?6kNBIffFiOXmweejvyP7hLFN1/bwYOwbIL5N8uDF7fj2e1/UJsd1feJTRFE/?=
- =?us-ascii?Q?ZCCu1ESWaYiX9A7Om6Cq4Kb5QepWYxYKylcIXgIkROdt9oUBfnt0ozi5pf5c?=
- =?us-ascii?Q?NhErzOuaNj+rJQ4Q6b26mMmSicQkGnGRsVxgAlrz8hA+B43qZtzMnFf0EhZ5?=
- =?us-ascii?Q?qij4s0abu80nCPSHRLF7Qn+C69r+RB4+kJpU+rTzr0xJ+THAcg9uz7apMrnG?=
- =?us-ascii?Q?74k7wUWVW72d13/ehkvP3nw8cy3M6YQURd8XJbbJhHLj6vWiUG33Xj+nTrkC?=
- =?us-ascii?Q?mI17sAlpcyi2afm8iUCoT3dgsxSCSpQkXMF0q0QJ1PZwM5yu5/6oC7Ri0z8b?=
- =?us-ascii?Q?7wFbKNMckwXfYhPBmXO21kC7s8gLUUp69H8HBWwBBoYfwOdw3a27DAI/vP4n?=
- =?us-ascii?Q?oyWh/VkLr3jqIq8IlHeC34n0r+8bFf2mzQULkGVfo84oOEt/sW9SRRLCTYAy?=
- =?us-ascii?Q?lxKIc8DoJwXbOGVKF9Pt/VhsO31flCE5KRBdkmsPVvBStBe5QZrDXTmbRovw?=
- =?us-ascii?Q?ZI9bAZ3Dp/GN5mb0vB2bwC+QiBtMZEBotyadEs97Bspc7EDEqSVG93MQFqGR?=
- =?us-ascii?Q?VoLaBzUqGCvEYeV04E1BWgI20q2jXmXKTyJT7yN6SZoJ+4hVFa76XF/u+QGO?=
- =?us-ascii?Q?e8RPzWVJUY6xfodZZZc14+SKpoAK9ZwZlfhg1rIDahWnXE0tW7WI7CdKQaTU?=
- =?us-ascii?Q?6GN+rxv0Pjw1nXjPqnKQgZhxSVOxtnFq1yT2HWgbyaLksfw934h1yr5eY4Ke?=
- =?us-ascii?Q?zPLGdNsa89GOJe+HMA3sZZs8afwPZOP8CBdB3MsIz5ETbalWoJZeKZNQd6ox?=
- =?us-ascii?Q?vQgDt93xahKLiZBkQ0BKqKIzFxztTEw7MS9wPhzk?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE632E0927
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 07:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756886131; cv=none; b=D9y4cjhrzgghFUxgNw/5LxCtZTDMZSUyPragt2f/8/FAmKqWe96XkbjsoOYj9my8YWC8m24q3KkvnZ5K9w0bZcVEST7+LUafbVrR8mTszpIOQhenYcAP5MWbBtsku/GFO5PnlFmocHoNdHiZhCoc9sfWo2rmCTJyUQMqEQUAIIs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756886131; c=relaxed/simple;
+	bh=g500nRtMnlnY4iqhJIx76GnVFL/Rrge0jIDp+YREYCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=izIGx0gj21nDfvO2IqSnTj1DnSWQgKhhbfHEA/0WkAdn3Ls402FmT4ZBWF6xWuP2PCFMqsIgLNqX8eUD3Ctns+pRqJ1ldmY8nIyN49/OsGPORWCx8BUMf0SYOgTkOn4UR0iPQpDr+3zKkPFCHz7ONSxC2elWBl65F9hG0hctX+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=POC3XKuk; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3ca7ad52-bfd6-4619-abef-93bf5be3969c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756886121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OKPfAP7fpF7Kp2xYnUEQ+yluPjtk40mnFtOGQd5osDs=;
+	b=POC3XKukB+Vw0YEQ0cxFm+bFk9vDEbpEK/UIhXWXt5SsodyXW3fPo0siifVhjKwuNdbR6X
+	pqNIScOSg/QyA3f9BORCi7m+fGaRwiBIuBfCCQp+XjG1mgF76RMrDjWPztMoopUKqcU3to
+	3GvVspVu1LbA3MaKbsMb8KCzH2n+dmc=
+Date: Wed, 3 Sep 2025 15:54:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH3PPF67C992ECC.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54f4d261-605e-4b44-0896-08ddeabf055a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Sep 2025 07:53:50.5454
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 29qKCM2tnuh62gN4NDdisUOHUAPc5w2sUzHACEseXOtPeDmJeBkuyseUFE7iGj9CRuBGJRczIRmsOkMVO5r6vg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF37A184CA6
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH net] inet: Avoid established lookup missing active sk
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+ kernelxing@tencent.com, netdev@vger.kernel.org,
+ Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+References: <20250903024406.2418362-1-xuanqiang.luo@linux.dev>
+ <CAAVpQUCKDi0aZcraeZaMY4ebuoBoB_Ymdy1RGb1247JznArTJg@mail.gmail.com>
+ <CAAVpQUDZFCYNMQ08uRLu388cmggckzPeP=N7WncFyxN-_hgaMw@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: luoxuanqiang <xuanqiang.luo@linux.dev>
+In-Reply-To: <CAAVpQUDZFCYNMQ08uRLu388cmggckzPeP=N7WncFyxN-_hgaMw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> As part of the transition toward Page Pool integration, remove the
-> legacy page splitting and recycling logic from the ice driver. This
-> mirrors the approach taken in commit 920d86f3c552 ("iavf: drop page
-> splitting and recycling").
->=20
-> The previous model attempted to reuse partially consumed pages by
-> splitting them and tracking their usage across descriptors. While this
-> was once a memory optimization, it introduced significant complexity
-> and overhead in the Rx path, including:
-> - Manual refcount management and page reuse heuristics;
-> - Per-descriptor buffer shuffling, which could involve moving dozens
->    of `ice_rx_buf` structures per NAPI cycle;
-> - Increased branching and cache pressure in the hotpath.
->=20
-> This change simplifies the Rx logic by always allocating fresh pages
-> and letting the networking stack handle their lifecycle. Although this
-> may temporarily reduce performance (up to ~98% in some XDP cases), it
-> greatly improves maintainability and paves the way for Page Pool,
-> which will restore and exceed previous performance levels.
+
+在 2025/9/3 13:48, Kuniyuki Iwashima 写道:
+> On Tue, Sep 2, 2025 at 10:16 PM Kuniyuki Iwashima <kuniyu@google.com> wrote:
+>> On Tue, Sep 2, 2025 at 7:45 PM Xuanqiang Luo <xuanqiang.luo@linux.dev> wrote:
+>>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>>
+>>> Since the lookup of sk in ehash is lockless, when one CPU is performing a
+>>> lookup while another CPU is executing delete and insert operations
+>>> (deleting reqsk and inserting sk), the lookup CPU may miss either of
+>>> them, if sk cannot be found, an RST may be sent.
+>>>
+>>> The call trace map is drawn as follows:
+>>>     CPU 0                           CPU 1
+>>>     -----                           -----
+>>>                                  spin_lock()
+>>>                                  sk_nulls_del_node_init_rcu(osk)
+>>> __inet_lookup_established()
+>>>                                  __sk_nulls_add_node_rcu(sk, list)
+>>>                                  spin_unlock()
+>> This usually does not happen except for local communication, and
+>> retrying on the client side is much better than penalising all lookups
+>> for SYN.
+>>
+>>> We can try using spin_lock()/spin_unlock() to wait for ehash updates
+>>> (ensuring all deletions and insertions are completed) after a failed
+>>> lookup in ehash, then lookup sk again after the update. Since the sk
+>>> expected to be found is unlikely to encounter the aforementioned scenario
+>>> multiple times consecutively, we only need one update.
+>>>
+>>> Similarly, an issue occurs in tw hashdance. Try adjusting the order in
+>>> which it operates on ehash: remove sk first, then add tw. If sk is missed
+>>> during lookup, it will likewise wait for the update to find tw, without
+>>> worrying about the skc_refcnt issue that would arise if tw were found
+>>> first.
+>>>
+>>> Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
+>>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>> ---
+>>>   net/ipv4/inet_hashtables.c    | 12 ++++++++++++
+>>>   net/ipv4/inet_timewait_sock.c |  9 ++++-----
+>>>   2 files changed, 16 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+>>> index ceeeec9b7290..4eb3a55b855b 100644
+>>> --- a/net/ipv4/inet_hashtables.c
+>>> +++ b/net/ipv4/inet_hashtables.c
+>>> @@ -505,6 +505,7 @@ struct sock *__inet_lookup_established(const struct net *net,
+>>>          unsigned int hash = inet_ehashfn(net, daddr, hnum, saddr, sport);
+>>>          unsigned int slot = hash & hashinfo->ehash_mask;
+>>>          struct inet_ehash_bucket *head = &hashinfo->ehash[slot];
+>>> +       bool try_lock = true;
+>>>
+>>>   begin:
+>>>          sk_nulls_for_each_rcu(sk, node, &head->chain) {
+>>> @@ -528,6 +529,17 @@ struct sock *__inet_lookup_established(const struct net *net,
+>>>           */
+>>>          if (get_nulls_value(node) != slot)
+>>>                  goto begin;
+>>> +
+>>> +       if (try_lock) {
+>>> +               spinlock_t *lock = inet_ehash_lockp(hashinfo, hash);
+>>> +
+>>> +               try_lock = false;
+>>> +               spin_lock(lock);
+>>> +               /* Ensure ehash ops under spinlock complete. */
+>>> +               spin_unlock(lock);
+>>> +               goto begin;
+>>> +       }
+>>> +
+>>>   out:
+>>>          sk = NULL;
+>>>   found:
+>>> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+>>> index 875ff923a8ed..a91e02e19c53 100644
+>>> --- a/net/ipv4/inet_timewait_sock.c
+>>> +++ b/net/ipv4/inet_timewait_sock.c
+>>> @@ -139,14 +139,10 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>>
+>>>          spin_lock(lock);
+>>>
+>>> -       /* Step 2: Hash TW into tcp ehash chain */
+>>> -       inet_twsk_add_node_rcu(tw, &ehead->chain);
+>> You are adding a new RST scenario where the corresponding
+>> socket is not found and a listener or no socket is found.
+>>
+>> The try_lock part is not guaranteed to happen after twsk
+>> insertion below.
+
+I'm sorry, I didn't get it. If try_lock can search again, other places 
+should have left the spinlock critical section. That means twsk should 
+have been inserted already. Or maybe I missed some details. Could you 
+please explain more clearly? Your guidance would be really helpful. :)
+
+> Oh no, spin_lock() dance sychronises the threads but I still
+> think this is rather harmful for normal cases; now sending
+> an unmatched packet can trigger lock dance, which is easily
+> abused for DDoS.
 >
-> The `ice_rx_buf` array is retained for now to minimize diffstat and
-> ease future replacement with a shared buffer abstraction.
->=20
-> Co-developed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice.h          |   2 +
->   drivers/net/ethernet/intel/ice/ice_base.c     | 26 ++--
->   drivers/net/ethernet/intel/ice/ice_txrx.c     | 136 ++----------------
->   drivers/net/ethernet/intel/ice/ice_txrx.h     |   8 --
->   drivers/net/ethernet/intel/ice/ice_virtchnl.c |   5 +-
->  5 files changed, 25 insertions(+), 152 deletions(-)
->=20
-Tested-by: Priya Singh <priyax.singh@intel.com>
+I agree this scenario is possible. It does make DDoS attacks more 
+impactful. Thanks for pointing that out. However, this is the best 
+approach I can think of right now. Thanks Xuanqiang
+
+>>
+>>> -
+>>> -       /* Step 3: Remove SK from hash chain */
+>>> +       /* Step 2: Remove SK from hash chain */
+>>>          if (__sk_nulls_del_node_init_rcu(sk))
+>>>                  sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>>>
+>>> -
+>>>          /* Ensure above writes are committed into memory before updating the
+>>>           * refcount.
+>>>           * Provides ordering vs later refcount_inc().
+>>> @@ -161,6 +157,9 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>>           */
+>>>          refcount_set(&tw->tw_refcnt, 3);
+>>>
+>>> +       /* Step 3: Hash TW into tcp ehash chain */
+>>> +       inet_twsk_add_node_rcu(tw, &ehead->chain);
+>>> +
+>>>          inet_twsk_schedule(tw, timeo);
+>>>
+>>>          spin_unlock(lock);
+>>> --
+>>> 2.25.1
+>>>
 
