@@ -1,193 +1,161 @@
-Return-Path: <netdev+bounces-219405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC40DB41252
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 04:29:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 514D2B4127B
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 04:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACF9120794B
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:29:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B7793BA1C4
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB306221F00;
-	Wed,  3 Sep 2025 02:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF5B3594B;
+	Wed,  3 Sep 2025 02:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="apuNg1dw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jpQ1GaYx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F9012CD8B;
-	Wed,  3 Sep 2025 02:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82981E49F
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 02:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756866592; cv=none; b=osIvC9BvHZl82I11ycOheOJihqF0aipVCf7UGLlKfhM7ATo8mvhRJbR7lDqzJIMJgzRZR2Hd9i8lPV+n3rOMNTgZ8gRhdNiqbCAkPdYDpbjQD3drKWrkcjJOVSaulsTyDaLAJ5792/vHXI0i2YjTvVbGnp5z4019zj0Uwa10lK4=
+	t=1756867555; cv=none; b=m7HxiRFzZLorRX57qFMyEDLSerYXBoKkfq2vi1+jx+twqrJsE+r8v7WF8z6jLO+NjqzeHMm35EmCfgCSTCCZzmc7Ja4PpksHi7E7IpLuOCxncQWkiuYUxrPfyBOqUnrudlr/xzEPwsQrFEQAGnQ3mvgGIOJCGIfYoxdaouom/XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756866592; c=relaxed/simple;
-	bh=cMJk8XDura2jwFwIq4nHCXtOUCFn9WeInWpuFuAjFoo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VpMc6epYHAj/UObxb1+7XEn8oI5V8II10D1hLELl6stwZ8OUA1X7g+fvgyVdR43K/bbPkcBi7wZ49yYFlm7m50Hua4tVK84Qkc91JWQVeJcUbtIC2MCnl/jWnpqEKj45hBL5TnWdHFFbCwMUOXAQ8A+RNHdBdjenhah+eujMZU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=apuNg1dw; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756866592; x=1788402592;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cMJk8XDura2jwFwIq4nHCXtOUCFn9WeInWpuFuAjFoo=;
-  b=apuNg1dwmNIMHPzPBihNt5AUJh7gOmXoE/AIv/+xIIdMV0I4kIdP40X7
-   GYRSg1sjEWMtloNlZKbFkM8PQEjJzkTTTAIm6QHOBQca+2+Qycwhy0C9k
-   PKHle2euRj3uGppO0oS14bsbkbTO/8Pp6IRm3Pj8qHiB0t4xaBJZ355GF
-   TGlPfpVDKh7oZXeQwx4yyvgr2fBjYDlh0tSa0saMu2blKXfXWTZmH5By+
-   Gj3dUfWRnx08B39GNyL0ss9uBSTo+N658QFA/gecYGKeLfUqSVEz83gd2
-   oUiTv+3V3ovc/zZl4SyFhbardopN5PCEdbCrkfoTSBEwBmdP/nx/Mft3W
-   A==;
-X-CSE-ConnectionGUID: s3LZP3xQTWKwJT1o3TNuig==
-X-CSE-MsgGUID: llW/FfVLQrqlRoJv0O3fFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="70266549"
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="70266549"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 19:29:51 -0700
-X-CSE-ConnectionGUID: tr3x36N2T8SX9nfyKJSAtQ==
-X-CSE-MsgGUID: 5QQI7eWbTfq4JbgdHWjfDQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="175812902"
-Received: from lkp-server02.sh.intel.com (HELO 06ba48ef64e9) ([10.239.97.151])
-  by orviesa004.jf.intel.com with ESMTP; 02 Sep 2025 19:29:47 -0700
-Received: from kbuild by 06ba48ef64e9 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1utdFK-0003GR-06;
-	Wed, 03 Sep 2025 02:29:19 +0000
-Date: Wed, 3 Sep 2025 10:29:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	magnus.karlsson@intel.com, stfomichev@gmail.com,
-	kerneljasonxing@gmail.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Eryk Kubanski <e.kubanski@partner.samsung.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH v8 bpf] xsk: fix immature cq descriptor production
-Message-ID: <202509031029.iL7rCVvQ-lkp@intel.com>
-References: <20250902220613.2331265-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1756867555; c=relaxed/simple;
+	bh=mWmSxW49NzhxHqLvpvEE57eZ69aR7os/RZgl/cMZIVQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cwExGTpR2rvKXJV1w2lKMCD2eHTEE/0vwhkVU797xE4LJhptaAzDPn/R90bcBt4AYPZ6j5qUUufELjcJ7cbARckdQvmecMDa2isulHAdpqt21BlnfzvfR1l0Dc4BqUoEZagVW/eO6igrzyvgHfLAw+QXxXy1HaE4P3iXynVXdmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jpQ1GaYx; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756867550;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=L1JxLnfXA8pw9Zd+H/FkimGg1gqWzledc3w8tzJI70c=;
+	b=jpQ1GaYxmPRbh6S0qUT1tBzWSlbsFOEfS1HZ88oJsKGubXnDze33KHNV4lqSOHebuNKBxU
+	HOTpvfABMXDaAa+BxW689qj3WVom5NUFEeke+FYyY7z6eyBz14Awb7dtEvVt/z/5urSpMw
+	AmwjDtfDpaXNF45gZ03akgvCNnjMuf8=
+From: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+To: edumazet@google.com,
+	kuniyu@google.com
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	kernelxing@tencent.com,
+	netdev@vger.kernel.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Subject: [PATCH net] inet: Avoid established lookup missing active sk
+Date: Wed,  3 Sep 2025 10:44:06 +0800
+Message-Id: <20250903024406.2418362-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250902220613.2331265-1-maciej.fijalkowski@intel.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Maciej,
+From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-kernel test robot noticed the following build warnings:
+Since the lookup of sk in ehash is lockless, when one CPU is performing a
+lookup while another CPU is executing delete and insert operations
+(deleting reqsk and inserting sk), the lookup CPU may miss either of
+them, if sk cannot be found, an RST may be sent.
 
-[auto build test WARNING on bpf/master]
+The call trace map is drawn as follows:
+   CPU 0                           CPU 1
+   -----                           -----
+                                spin_lock()
+                                sk_nulls_del_node_init_rcu(osk)
+__inet_lookup_established()
+                                __sk_nulls_add_node_rcu(sk, list)
+                                spin_unlock()
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/xsk-fix-immature-cq-descriptor-production/20250903-060850
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git master
-patch link:    https://lore.kernel.org/r/20250902220613.2331265-1-maciej.fijalkowski%40intel.com
-patch subject: [PATCH v8 bpf] xsk: fix immature cq descriptor production
-config: riscv-randconfig-001-20250903 (https://download.01.org/0day-ci/archive/20250903/202509031029.iL7rCVvQ-lkp@intel.com/config)
-compiler: riscv32-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250903/202509031029.iL7rCVvQ-lkp@intel.com/reproduce)
+We can try using spin_lock()/spin_unlock() to wait for ehash updates
+(ensuring all deletions and insertions are completed) after a failed
+lookup in ehash, then lookup sk again after the update. Since the sk
+expected to be found is unlikely to encounter the aforementioned scenario
+multiple times consecutively, we only need one update.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509031029.iL7rCVvQ-lkp@intel.com/
+Similarly, an issue occurs in tw hashdance. Try adjusting the order in
+which it operates on ehash: remove sk first, then add tw. If sk is missed
+during lookup, it will likewise wait for the update to find tw, without
+worrying about the skc_refcnt issue that would arise if tw were found
+first.
 
-All warnings (new ones prefixed by >>):
+Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
+Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+---
+ net/ipv4/inet_hashtables.c    | 12 ++++++++++++
+ net/ipv4/inet_timewait_sock.c |  9 ++++-----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
-   net/xdp/xsk.c: In function 'xsk_cq_submit_addr_locked':
->> net/xdp/xsk.c:572:38: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-     xskq_prod_write_addr(pool->cq, idx, (u64)skb_shinfo(skb)->destructor_arg);
-                                         ^
-   net/xdp/xsk.c: In function 'xsk_set_destructor_arg':
->> net/xdp/xsk.c:625:36: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-     skb_shinfo(skb)->destructor_arg = (void *)addr;
-                                       ^
-
-
-vim +572 net/xdp/xsk.c
-
-   560	
-   561	static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
-   562					      struct sk_buff *skb)
-   563	{
-   564		struct xsk_addr_node *pos, *tmp;
-   565		u32 descs_processed = 0;
-   566		unsigned long flags;
-   567		u32 idx;
-   568	
-   569		spin_lock_irqsave(&pool->cq_lock, flags);
-   570		idx = xskq_get_prod(pool->cq);
-   571	
- > 572		xskq_prod_write_addr(pool->cq, idx, (u64)skb_shinfo(skb)->destructor_arg);
-   573		descs_processed++;
-   574	
-   575		if (unlikely(XSKCB(skb)->num_descs > 1)) {
-   576			list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
-   577				xskq_prod_write_addr(pool->cq, idx + descs_processed,
-   578						     pos->addr);
-   579				descs_processed++;
-   580				list_del(&pos->addr_node);
-   581				kmem_cache_free(xsk_tx_generic_cache, pos);
-   582			}
-   583		}
-   584		xskq_prod_submit_n(pool->cq, descs_processed);
-   585		spin_unlock_irqrestore(&pool->cq_lock, flags);
-   586	}
-   587	
-   588	static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
-   589	{
-   590		unsigned long flags;
-   591	
-   592		spin_lock_irqsave(&pool->cq_lock, flags);
-   593		xskq_prod_cancel_n(pool->cq, n);
-   594		spin_unlock_irqrestore(&pool->cq_lock, flags);
-   595	}
-   596	
-   597	static void xsk_inc_num_desc(struct sk_buff *skb)
-   598	{
-   599		XSKCB(skb)->num_descs++;
-   600	}
-   601	
-   602	static u32 xsk_get_num_desc(struct sk_buff *skb)
-   603	{
-   604		return XSKCB(skb)->num_descs;
-   605	}
-   606	
-   607	static void xsk_destruct_skb(struct sk_buff *skb)
-   608	{
-   609		struct xsk_tx_metadata_compl *compl = &skb_shinfo(skb)->xsk_meta;
-   610	
-   611		if (compl->tx_timestamp) {
-   612			/* sw completion timestamp, not a real one */
-   613			*compl->tx_timestamp = ktime_get_tai_fast_ns();
-   614		}
-   615	
-   616		xsk_cq_submit_addr_locked(xdp_sk(skb->sk)->pool, skb);
-   617		sock_wfree(skb);
-   618	}
-   619	
-   620	static void xsk_set_destructor_arg(struct sk_buff *skb, u64 addr)
-   621	{
-   622		BUILD_BUG_ON(sizeof(struct xsk_addr_head) > sizeof(skb->cb));
-   623		INIT_LIST_HEAD(&XSKCB(skb)->addrs_list);
-   624		XSKCB(skb)->num_descs = 0;
- > 625		skb_shinfo(skb)->destructor_arg = (void *)addr;
-   626	}
-   627	
-
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index ceeeec9b7290..4eb3a55b855b 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -505,6 +505,7 @@ struct sock *__inet_lookup_established(const struct net *net,
+ 	unsigned int hash = inet_ehashfn(net, daddr, hnum, saddr, sport);
+ 	unsigned int slot = hash & hashinfo->ehash_mask;
+ 	struct inet_ehash_bucket *head = &hashinfo->ehash[slot];
++	bool try_lock = true;
+ 
+ begin:
+ 	sk_nulls_for_each_rcu(sk, node, &head->chain) {
+@@ -528,6 +529,17 @@ struct sock *__inet_lookup_established(const struct net *net,
+ 	 */
+ 	if (get_nulls_value(node) != slot)
+ 		goto begin;
++
++	if (try_lock) {
++		spinlock_t *lock = inet_ehash_lockp(hashinfo, hash);
++
++		try_lock = false;
++		spin_lock(lock);
++		/* Ensure ehash ops under spinlock complete. */
++		spin_unlock(lock);
++		goto begin;
++	}
++
+ out:
+ 	sk = NULL;
+ found:
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 875ff923a8ed..a91e02e19c53 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -139,14 +139,10 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ 
+ 	spin_lock(lock);
+ 
+-	/* Step 2: Hash TW into tcp ehash chain */
+-	inet_twsk_add_node_rcu(tw, &ehead->chain);
+-
+-	/* Step 3: Remove SK from hash chain */
++	/* Step 2: Remove SK from hash chain */
+ 	if (__sk_nulls_del_node_init_rcu(sk))
+ 		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+ 
+-
+ 	/* Ensure above writes are committed into memory before updating the
+ 	 * refcount.
+ 	 * Provides ordering vs later refcount_inc().
+@@ -161,6 +157,9 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ 	 */
+ 	refcount_set(&tw->tw_refcnt, 3);
+ 
++	/* Step 3: Hash TW into tcp ehash chain */
++	inet_twsk_add_node_rcu(tw, &ehead->chain);
++
+ 	inet_twsk_schedule(tw, timeo);
+ 
+ 	spin_unlock(lock);
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
 
