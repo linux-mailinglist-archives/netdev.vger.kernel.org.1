@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-219484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B264DB418FC
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42CB4B41900
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:47:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FFF9163C65
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16315166910
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01E62868AF;
-	Wed,  3 Sep 2025 08:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB612EC0AC;
+	Wed,  3 Sep 2025 08:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tQAtw3Ro"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J+5scImy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431421DD877
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 08:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D008D2D6626
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 08:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756889244; cv=none; b=TCem1r5BCj4atk9RGqeXqXa1ssxmd8oon9M/4JCqDRvQ3UIplynFrbB0p91iqOCNB1lrvkmdz6GDjC50JI9T3YrxxQISry/d001ZnAorXg/29wHIGF+a3h7t7KcigGnOw9HEdjct6IdSKLsZl+2OD5T88/5sOTZJCKRDiYE8XrA=
+	t=1756889246; cv=none; b=AymwOjdIjFQJA9Q3hTkRjdFuwlFEpm7O+qu7eQ3omb6qnjW7PJXXtbZ9TcqozA7z4hFwE97X8ztvxucwHAbkP6piLWebN/VuFGPs1imairi/b4iNAe02sPEfJmySsIbv5PCa1yqsvGhahry5nvYoXQPV0JkNwAwi5JxIo/wn02g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756889244; c=relaxed/simple;
-	bh=ZXJT/6JxumP7oBE48MP8RQ60Mkhe0hhEKiBXAHIHBaw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TJ5BWyYAgQMO5qMtkN7r2opzhFPN6qzgkHEb8DQ8RNpgz5uxrH9vSiXjejxSq//UscvH+HH5U3lQkwskdD/miEHC5mRKdpmrsb75iniTvGTAYZGti6ZETwH23xdzhB5P7iZFf96KWngCVOme+gH49BAYPcecYVecbc9nt3a4Oxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tQAtw3Ro; arc=none smtp.client-ip=209.85.217.74
+	s=arc-20240116; t=1756889246; c=relaxed/simple;
+	bh=TEFuWtdLEAhJ8Tk1DqE9bXVM+4D8SUdI01QbOZji6Po=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=elg8dd4Vm/eWZdhbsc9qn9F2+cLAo6fxpe+KT+S+M13XiB9+WiTH1gF16wCNUstqMjCPa2x2b69hLbZG0yHaewv0P+UTIYgZNApOppn5ecw+WgOdnkRTkDcplmg5As7de7e0LbzvfCZKEoHD7s1MOkbPQCNhW1cW4v1A66szwxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J+5scImy; arc=none smtp.client-ip=209.85.219.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-52ae22973feso599011137.2
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 01:47:23 -0700 (PDT)
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-70de0bdb600so103291226d6.1
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 01:47:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756889242; x=1757494042; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=J0i9YJY4pWsIji81M8kmfkmeIM1SxPrmw48BqNVGnOc=;
-        b=tQAtw3RopxloscGK4xrPDNA3JzACnW414pTwN25F7Z+Xec+HKooxzIMq9GlHXkcNkD
-         rqBjA2UGrKDRvkqk4JwqBJzZsUjBpFaE7k9TuEeotsHv9vL9HUiM98Jdi+wTk/bSC/7T
-         1o4O7R4f4YIvFFKYMXVVMafo1Phe3YwNyIsjEk8U/j4rxEcYOzwbDUcediIfPmenqhTQ
-         s1zzUd/WcHRckcxHJ7WiZ/oEKNLBYRNw/5EuTwWM4TcWyOokhC98irNpAxTM9KVUkjmE
-         i/gEVhjxmo9lXdsq4bpCKaQnp+S7Z3OB4BxWDNnwgpMJPNyFA812v1/Gn19s3xP8kVqY
-         f2Yw==
+        d=google.com; s=20230601; t=1756889243; x=1757494043; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pApEgp2fnjlNrU8yRUBF4pdimj4jDwv5KlXQKO+Z18E=;
+        b=J+5scImylEFnoe4j+++JS78w6rcF6M23oRgck0TkdAwKBy/RWlVUel2f3Ffam4S95v
+         AhNJCwWsYXCRSRnyRvm4N1JG5HAlUrMTjef1y4Kgg6mzFcBF7AzohnqZ1HkSuZy7XFzo
+         23ol523xurCVsD/EGcspgRwZelpieDKyy7xdbsuGN492fLjShLYvfA6xx1/Ze201hBxZ
+         fsPHH4NeKp4ewWNUFcw06MUMcL3tfNXy8rwGYDV//cDoaF5O9TNYLrg5wBTzFQMqn0Rp
+         SAXcduue3w4BOFX68TpsqX814Isse7REktzRvvL6XrR648BYh+S55CZWGOUxzoLvk3W1
+         L2pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756889242; x=1757494042;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J0i9YJY4pWsIji81M8kmfkmeIM1SxPrmw48BqNVGnOc=;
-        b=NlQyi6j82c3RkyXZ1y48SHgjwLrI3xA/Vm/wMBRsbioFUZn3piAyD1w2rjmT2sKk3e
-         SclkZ+v0VfUgN9RU1sgKH9JnVneRmJmL1uZrfdDHre/lvr12QNjjIWJbHw+16+y/1tZh
-         6EdZy9MaGuaoktuFv9FRVD2g7Y6ctZRCVZbSiggJofxJlV6AtLMq+25iGXm6eDZtlWRO
-         wPbnkazei0HYT7UIMwrFEzVGNiOSYXgRyehkd8iN6pLypnVOzLEYqCmNwN7GTF2Hgtf/
-         7QI/qZSGtmM7xRv/ZPTa4SF2GWvnhx4kyXiErwsZzfPaqwrOWlYTEjEGOUNwkR6mPQO/
-         u7Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCWewofqL6QVLpxUwlRN1Glv7+gogRzPw15/q5a2Ffgxsx+/evqcH3ExcFHmnProJhzM7eMkkXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1gEabGb8mOS1O5OVs2aL3m5jrI1XzC6UQsCcOS28tvhNrvldu
-	K1juvw/df1lDKso2t5Wfzq4KUDuQ0P/kl/6LPbucvKtihf0F18P8oIsv2tAWJUyEnAiZmg1C7xV
-	Vkz2WJEr1HAj7bA==
-X-Google-Smtp-Source: AGHT+IEUKCycOl+OZGf0gW6HetoeTMEvjdETQK8FCvHrU6iW5FofHV7T9/psP4eD4lxLgTpcebjvZ/pdeaRSwg==
-X-Received: from vsbdm25.prod.google.com ([2002:a05:6102:5a99:b0:530:e8a2:1031])
+        d=1e100.net; s=20230601; t=1756889243; x=1757494043;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pApEgp2fnjlNrU8yRUBF4pdimj4jDwv5KlXQKO+Z18E=;
+        b=MoVB7ZQujvJZ2p3J/Cv0A9FzBl9dRR0vk5DUovy4SlYgIjcN6cuBKA0LpuSeQA5Pg5
+         aHCx0GYdg7LymfMv1Ag2r6H+7gUrs2xni2V/PXWPn4gixJXovxebYCGplk/ohTU8eTCE
+         zSrqHzeRx6LTqj7F+m3HAbyKHdp8bpzkL2ER0DmmdwSLObTBme3r3b3C7uCaxoSEHwge
+         hmtqUh/bVhtmW6Si8+G/uywma0FsivRfLjkioiSJstqwMLUxP6nmqY4yGj8jzkjQ1Xoq
+         imPOoIZHtRLJQtK9eJP2L40PdFhy4/4rP83HMSTBTQ3WQkXaAV72SpmGxEDkLeBPdKqo
+         E0Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCVT5fNTZi1ss4bPjP2xied0MOT/8p9u+QLSdqChJBzfE4RoCICXW8LHnCGdjI/b/RlOjFopbOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwejQorpEb8rG8jOl2zX7Hqhii7AcAgFcZqNDbgiRipKtsRPSX6
+	VkTPtNwptnVw/fMc31n3/9DonogKK9Hvg5cHpNKaijaeuGwMEIfFNbwVuTMZgjiLrWx21M2xTS8
+	p6HIic9YL5L7sbw==
+X-Google-Smtp-Source: AGHT+IEOlKhuQGwwutfKk+1Y55rpfkdPqLBz6nyDlIj8kVhiIDs3hlDJQb2NXB7owjAYYiFSpYevhdwGDcRRLA==
+X-Received: from qvwe4.prod.google.com ([2002:a05:6214:1624:b0:70d:f0d8:f5a3])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:ccb:b0:523:712d:44a1 with SMTP id ada2fe7eead31-52b1b6fbac3mr3618260137.19.1756889242119;
- Wed, 03 Sep 2025 01:47:22 -0700 (PDT)
-Date: Wed,  3 Sep 2025 08:47:17 +0000
+ 2002:a05:6214:5014:b0:70d:eb6d:b7ea with SMTP id 6a1803df08f44-70fac87021dmr149270746d6.33.1756889243654;
+ Wed, 03 Sep 2025 01:47:23 -0700 (PDT)
+Date: Wed,  3 Sep 2025 08:47:18 +0000
+In-Reply-To: <20250903084720.1168904-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250903084720.1168904-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
-Message-ID: <20250903084720.1168904-1-edumazet@google.com>
-Subject: [PATCH net-next 0/3] tcp: __tcp_close() changes
+Message-ID: <20250903084720.1168904-2-edumazet@google.com>
+Subject: [PATCH net-next 1/3] tcp: fix __tcp_close() to only send RST when required
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -80,22 +83,48 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netd
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-First patch fixes a rare bug.
+If the receive queue contains payload that was already
+received, __tcp_close() can send an unexpected RST.
 
-Second patch adds a corresponding packetdrill test.
+Refine the code to take tp->copied_seq into account,
+as we already do in tcp recvmsg().
 
-Third patch is a small optimization.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/tcp.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Eric Dumazet (3):
-  tcp: fix __tcp_close() to only send RST when required
-  selftests/net: packetdrill: add tcp_close_no_rst.pkt
-  tcp: use tcp_eat_recv_skb in __tcp_close()
-
- net/ipv4/tcp.c                                | 13 ++++----
- .../net/packetdrill/tcp_close_no_rst.pkt      | 32 +++++++++++++++++++
- 2 files changed, 39 insertions(+), 6 deletions(-)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_close_no_rst.pkt
-
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 40b774b4f587..39eb03f6d07f 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -3099,8 +3099,8 @@ bool tcp_check_oom(const struct sock *sk, int shift)
+ 
+ void __tcp_close(struct sock *sk, long timeout)
+ {
++	bool data_was_unread = false;
+ 	struct sk_buff *skb;
+-	int data_was_unread = 0;
+ 	int state;
+ 
+ 	WRITE_ONCE(sk->sk_shutdown, SHUTDOWN_MASK);
+@@ -3119,11 +3119,12 @@ void __tcp_close(struct sock *sk, long timeout)
+ 	 *  reader process may not have drained the data yet!
+ 	 */
+ 	while ((skb = __skb_dequeue(&sk->sk_receive_queue)) != NULL) {
+-		u32 len = TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb)->seq;
++		u32 end_seq = TCP_SKB_CB(skb)->end_seq;
+ 
+ 		if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
+-			len--;
+-		data_was_unread += len;
++			end_seq--;
++		if (after(end_seq, tcp_sk(sk)->copied_seq))
++			data_was_unread = true;
+ 		__kfree_skb(skb);
+ 	}
+ 
 -- 
 2.51.0.338.gd7d06c2dae-goog
 
