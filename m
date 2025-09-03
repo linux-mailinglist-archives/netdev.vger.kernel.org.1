@@ -1,109 +1,190 @@
-Return-Path: <netdev+bounces-219665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26ED5B428AE
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 20:31:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F37B428C3
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 20:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D00651890F83
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:31:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4530D1BA8007
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B49F29E11B;
-	Wed,  3 Sep 2025 18:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D12368081;
+	Wed,  3 Sep 2025 18:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4PHeePXh"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="S/nI+8UA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F791624C0
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 18:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9453629B8;
+	Wed,  3 Sep 2025 18:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756924259; cv=none; b=foz2FQNdcEtoQh3wOqaXFzdoFDXCc6XJcpLyv5uvJHf9oZIoF6w3qCXk/J9NkdH08mPsV01Z//tGra1bCYzb0tWayTmp/NF41WTB0WL18JbuPfr9+IxvypHNhtNufYE6UmvTyjx2oAsgQ3oYGLovW6pfVgCV2aani3eRE4xVbdc=
+	t=1756924553; cv=none; b=ORE/TU7Hvlpfib3M3JfSzbQutI0Twy1Zyd8C8ttNclObkKZal54SOuBjoABhQk9xh+8yw6jG7yqLKXFJjWm5oBKdxzmFjPycRkB/dvTggjrCTY1lnCUOXUC2mcIE7SvmSVeaGPmuFCpCoMbCqQQgKEAtb9OzTrwf7BNXq2B+dhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756924259; c=relaxed/simple;
-	bh=zLpvGXFcIOMN9u53D97LhLpkwH9jAP3DSRcZrFXwoiI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RMstc5dkKB4kuG9w9Lwsy29bDdBBzKy+9eooQtM+yz+Byec2pSB5+l8fVQV3QicC6ts9w/pB8e8D0eZo6mONCJBZtug84g4rgp+IuXipp7/Qh95Dz7ABhqqWRvBaHj+taqr0Kc236C9ZvndGod3sLMpHxW9Q/C1Nyj3JUfqQR9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4PHeePXh; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2445806e03cso3504945ad.1
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 11:30:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756924257; x=1757529057; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zLpvGXFcIOMN9u53D97LhLpkwH9jAP3DSRcZrFXwoiI=;
-        b=4PHeePXhqFGzd8JlKGgJ1+02IsAqoxIzzDJpfFTWPGtIYD4Oy8IDiC4mE+gaGyGsjF
-         u8/edwD3zhNhYIztHvjcVBevbG5G8oCcbnvq4CzVJPPyfNwqEONhyi93ARDN4Pp8eMTX
-         QeVLIBhyeSThQuBYHqoWQBE0HRlZsBYnPbe+et8L0Mnk1YY2WjuBVxD+AER54Bnn5cnC
-         OYk1dMEtLItJqM9C3C5bg4PWa4VKGG5+XZMjLZy7nZJnmAiunf8wl95LsbmV8uWG0Fqq
-         GezVqpSHT7JWxS2CeJGTHvqLLBFVXjYlsFmEJ8xpDhId0trPGDcZoPuic1pA+d460j5N
-         Tjtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756924257; x=1757529057;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zLpvGXFcIOMN9u53D97LhLpkwH9jAP3DSRcZrFXwoiI=;
-        b=T9Fgl7HNmuiL59efsknogjx5JRtRN+fwcDN4T4Q0N27Y2vlrSrNHPhWBgFHl83b0Ai
-         SMLSLikD8LaGk++CNSRbVe6VlNNph/F8M3aBoYNEfHYO9++/eYwUTCKfZ5XW7oAa0CwK
-         h5zxOzrQL4RxMfB5W6H0HWasBUAurmx00QfjIF/nUP/jq3XzFdCGf5uwu8SYvkN3PuEE
-         boZsR58+vq6PGobalzx/5m7HbS0yStIV+zEpaji4MmDKGSBdi4ZzhIunqCW7cVHtI+fA
-         PsjemmiDn0p25xplFmZZuF2RG9PxjTAeen2aXCe35oL7m2MfUh6Z+zRCp/WmjjOTz3i0
-         8pbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVsFYIW8D00Yxdv1zt4NOYFDR8EpQVZfxHd/6RiyQfvQnRuE6JozugIhwF+zEg1hI6LStGCYh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz74wLswXmJlg5pv513yqRv0tL6R9SZhMazIglR8Cij0n+5EUOZ
-	zrmCqEmvsOnXvX4/QppsQ1WvCRWuT5PfpKY9cjtpnP2UslbysAePKvKehHjj8Cc8OCt6dfwsrNY
-	1LeBox0A28+Hgj4MF8/U1RHs16nuvKipPzM/kaMOR
-X-Gm-Gg: ASbGncty/ZynTvC/l4JfKm/NnfQMo67jkL5ODGYTAmTHmHV4uH3AQJZrA/yaJbLa52e
-	tsZsxhsZ1T3YX+scJyTIAdKPT/20KdEmVLNO2fF7ahT1DmgwXVHD+4TIbePIY9w3UDwUmCq9tWA
-	JUhN3UHqZAZ3FIXwKlzfPSds3V4FETTSaXhnP8nwkGwQzcDH8wJq1NoyqOXlttHKhvCs8ngCaqx
-	RhG1ODo4qkhxHEt1bhujI0iTAe6l5ByGWHdScts+Pwy+BrPBDT2Wp3EM0JF/CFt7HhIdgEEKWIs
-X-Google-Smtp-Source: AGHT+IGXwwtdwHkGzuEcioj/XqmU7m2+uPoc0sq16Edy2usFHYEvAdIqzq+ITOGK/eLpnmrJCNFKmhz8L0+3npiXLEI=
-X-Received: by 2002:a17:903:283:b0:249:2cef:1cfe with SMTP id
- d9443c01a7336-24944880455mr232785635ad.6.1756924257118; Wed, 03 Sep 2025
- 11:30:57 -0700 (PDT)
+	s=arc-20240116; t=1756924553; c=relaxed/simple;
+	bh=7CxDRWpb5torW5UwqUmMDtS55zZkyHgBohxIpCgTqH8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jFam6WtgK50ej1ufskwBx2s9BiFgskeec4ZGnzthxxwsLgMIy3VnYFTbLSWJbX4E3LM/u/7gUyvWt9Ti6WQ40RoV1xh1mKkv9X2r8ZXfaMojsKsrZJwCb1Jpoo9oxgDg8C2vV0361CzNcgabjshtmCP6yXvo3CBEkCpoLa2qUh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=S/nI+8UA; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.143] (pd9eaae6b.dip0.t-ipconnect.de [217.234.174.107])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 583IZkXr011583
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 3 Sep 2025 20:35:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1756924547;
+	bh=7CxDRWpb5torW5UwqUmMDtS55zZkyHgBohxIpCgTqH8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=S/nI+8UAvrumliQ5UoNRW8b94SZ+X+lBBoXjP9w2hemiKDS+T2mv912n7FT2vfKIq
+	 aNky0170uSg/V3lWjA8wW213dVmUg9jL7M9IE01of1JLsfchOKPIm6lFaiZ2sMlKKr
+	 8MtTgL7RS42MHmwz8v5P4RGwABvB71Bm9cndRduk=
+Message-ID: <40916cac-1237-4b7a-976d-3b62c85c895b@tu-dortmund.de>
+Date: Wed, 3 Sep 2025 20:35:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903084720.1168904-1-edumazet@google.com> <20250903084720.1168904-4-edumazet@google.com>
- <CADVnQymopx3uxsn1vCts0mDKEOZWT9==X2VE-oC3rzg_AEdFAA@mail.gmail.com>
-In-Reply-To: <CADVnQymopx3uxsn1vCts0mDKEOZWT9==X2VE-oC3rzg_AEdFAA@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 3 Sep 2025 11:30:44 -0700
-X-Gm-Features: Ac12FXyjopOXeOvpsu9JWFNAQMRNSHRUtytRkgphe8EMi5uN3KuDeX57uqVfVe4
-Message-ID: <CAAVpQUChQhHSEh_ekiRHcXZ49ye-4kzW8ZmR4u_UKsKM2XHT0Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] tcp: use tcp_eat_recv_skb in __tcp_close()
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH 2/4] netdev queue flow control for TUN
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, jasowang@redhat.com,
+        mst@redhat.com, eperezma@redhat.com, stephen@networkplumber.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux.dev, kvm@vger.kernel.org
+Cc: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
+ <20250902080957.47265-3-simon.schippers@tu-dortmund.de>
+ <willemdebruijn.kernel.243baccfedc16@gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <willemdebruijn.kernel.243baccfedc16@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 3, 2025 at 8:09=E2=80=AFAM Neal Cardwell <ncardwell@google.com>=
- wrote:
->
-> On Wed, Sep 3, 2025 at 4:47=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > Small change to use tcp_eat_recv_skb() instead
-> > of __kfree_skb(). This can help if an application
-> > under attack has to close many sockets with unread data.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
->
-> Reviewed-by: Neal Cardwell <ncardwell@google.com>
+Willem de Bruijn wrote:
+> Simon Schippers wrote:
+>> The netdev queue is stopped in tun_net_xmit after inserting an SKB into
+>> the ring buffer if the ring buffer became full because of that. If the
+>> insertion into the ptr_ring fails, the netdev queue is also stopped and
+>> the SKB is dropped. However, this never happened in my testing.
+> 
+> Indeed, since the last successful insertion will always pause the
+> queue before this can happen. Since this cannot be reached, no need
+> to add the code defensively. If in doubt, maybe add a
+> NET_DEBUG_WARN_ON_ONCE.
+> 
+>> To ensure
+>> that the ptr_ring change is available to the consumer before the netdev
+>> queue stop, an smp_wmb() is used.
+>>
+>> Then in tun_ring_recv, the new helper wake_netdev_queue is called in the
+>> blocking wait queue and after consuming an SKB from the ptr_ring. This
+>> helper first checks if the netdev queue has stopped. Then with the paired
+>> smp_rmb() it is known that tun_net_xmit will not produce SKBs anymore.
+>> With that knowledge, the helper can then wake the netdev queue if there is
+>> at least a single spare slot in the ptr_ring by calling ptr_ring_spare
+>> with cnt=1.
+>>
+>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>> ---
+>>  drivers/net/tun.c | 33 ++++++++++++++++++++++++++++++---
+>>  1 file changed, 30 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index cc6c50180663..735498e221d8 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -1060,13 +1060,21 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>  
+>>  	nf_reset_ct(skb);
+>>  
+>> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>> +	queue = netdev_get_tx_queue(dev, txq);
+>> +	if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
+>> +		/* Paired with smp_rmb() in wake_netdev_queue. */
+>> +		smp_wmb();
+>> +		netif_tx_stop_queue(queue);
+>>  		drop_reason = SKB_DROP_REASON_FULL_RING;
+>>  		goto drop;
+>>  	}
+>> +	if (ptr_ring_full(&tfile->tx_ring)) {
+>> +		/* Paired with smp_rmb() in wake_netdev_queue. */
+>> +		smp_wmb();
+>> +		netif_tx_stop_queue(queue);
+>> +	}
+>>  
+>>  	/* dev->lltx requires to do our own update of trans_start */
+>> -	queue = netdev_get_tx_queue(dev, txq);
+>>  	txq_trans_cond_update(queue);
+>>  
+>>  	/* Notify and wake up reader process */
+>> @@ -2110,6 +2118,24 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>  	return total;
+>>  }
+>>  
+>> +static inline void wake_netdev_queue(struct tun_file *tfile)
+>> +{
+>> +	struct netdev_queue *txq;
+>> +	struct net_device *dev;
+>> +
+>> +	rcu_read_lock();
+>> +	dev = rcu_dereference(tfile->tun)->dev;
+>> +	txq = netdev_get_tx_queue(dev, tfile->queue_index);
+>> +
+>> +	if (netif_tx_queue_stopped(txq)) {
+>> +		/* Paired with smp_wmb() in tun_net_xmit. */
+>> +		smp_rmb();
+>> +		if (ptr_ring_spare(&tfile->tx_ring, 1))
+>> +			netif_tx_wake_queue(txq);
+>> +	}
+>> +	rcu_read_unlock();
+>> +}
+>> +
+>>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>  {
+>>  	DECLARE_WAITQUEUE(wait, current);
+>> @@ -2139,7 +2165,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>  			error = -EFAULT;
+>>  			break;
+>>  		}
+>> -
+>> +		wake_netdev_queue(tfile);
+> 
+> Why wake when no entry was consumed?
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+I do it because the queue may not have been woken the last time after
+consuming an SKB. However, I am not sure if it is still absolutely
+necessary after all the changes in the code. Still, I think it is wise to
+do it to avoid being stuck in the wait queue under any circumstances.
+
+> 
+> Also keep the empty line.
+>
+
+Okay :)
+
+>>  		schedule();
+>>  	}
+>>  
+>> @@ -2147,6 +2173,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>  	remove_wait_queue(&tfile->socket.wq.wait, &wait);
+>>  
+>>  out:
+>> +	wake_netdev_queue(tfile);
+>>  	*err = error;
+>>  	return ptr;
+>>  }
+>> -- 
+>> 2.43.0
+>>
+> 
+> 
 
