@@ -1,84 +1,62 @@
-Return-Path: <netdev+bounces-219684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB3FBB429CC
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:23:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D01CCB42A09
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:36:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76A1B6884B0
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:23:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B25D7B711B
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442AA369342;
-	Wed,  3 Sep 2025 19:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3903A3629AC;
+	Wed,  3 Sep 2025 19:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="agOSIsWI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ocaVzao4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A366636809C
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 19:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14D02C18A;
+	Wed,  3 Sep 2025 19:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756927387; cv=none; b=hfZsXPNDF9G0YuNJBbWnuhjzJupzjwTrKs9Qcy5OakJEt6UD+75jKZ5q7s9t4827KTolIFx6RVRAir4gf5FsKdUn08RMj5NroxK9PGN70SLExF/T3P+UjiaU1GYRUKreU+TLDZnEXwI/D3NXQ0SpFxYB7zE3vwfpRkgaeXjjZYA=
+	t=1756928181; cv=none; b=ndt3RZhfYgjZsb67SmWap6oCzHILQakFNQuoPDbY6rjNx+gKbH/KVz7mFxahfs9T8H8KjjTFArtkHC5SoyQABR0sADydvPZeCIBPsPSxODoTPDhdTchN1uwfbCVDLPxy2piTEr2nOM7GBf3wtZ0tNqgMaQdzriISvWuQAzu89w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756927387; c=relaxed/simple;
-	bh=XA088yhodMv3GZY1MWvIooSa2d+edHICESp6BUVgcY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iX8zhU8MHOcy8b22a4D4JUOQ9dIzyhSc9rhcDcCEa8P9q5aulF6u2ZJT69vs8NzTKQZWDqAXxoHG3yiZmPYrQxWBoDj5BIc/urneOAk6xdOqivBOi4v4ir9fb4fk4CQgEqIxl4a7ROHcBxc+BuNX5PXCyy7jc0pajmwVg2Ljtyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=agOSIsWI; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756927386; x=1788463386;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XA088yhodMv3GZY1MWvIooSa2d+edHICESp6BUVgcY0=;
-  b=agOSIsWIgWbzK/kCzMpOP907s5+fU2UA+WQ+xhzr3blHYeHnBMNwY9AK
-   a6aj4l+OvkRxSquvYxAdweFV4IUmlGCBbE0IQ/gTG3AuVhgcuNYJM8T/q
-   lBLpHilMgZSEkAzlTQZ/tSqzGXNuum2TKQtY1KrzGmS5By9tiBvKbjE7g
-   bdskQvRSiIrCwCjb8LFv5H/eaCsDq4aS1OfVhUl6do7MJbmcs703MbGY0
-   ud7RzW55oH3g1MZ46gar8h/Beyu4teySqDYNdZKIvbuD04bqLPxydDlaW
-   MyOV9/YMKbthzl3maAP0DS7889dgLp1k2mjQ0qRqxrGBupA2JgwZuTJWn
-   w==;
-X-CSE-ConnectionGUID: rZGgYKl9SLiA9sixpmjGLA==
-X-CSE-MsgGUID: wO9ruMn/T7m8BhMi8jGTcg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11542"; a="58286207"
-X-IronPort-AV: E=Sophos;i="6.18,236,1751266800"; 
-   d="scan'208";a="58286207"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 12:23:05 -0700
-X-CSE-ConnectionGUID: VT1qezjQTjaDcds07cIUrQ==
-X-CSE-MsgGUID: rf6DrBTgRBK9NZdqF1NQvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,236,1751266800"; 
-   d="scan'208";a="171233845"
-Received: from smile.fi.intel.com ([10.237.72.52])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 12:23:02 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1utt4N-0000000B4Hf-1TsR;
-	Wed, 03 Sep 2025 22:22:59 +0300
-Date: Wed, 3 Sep 2025 22:22:59 +0300
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	s=arc-20240116; t=1756928181; c=relaxed/simple;
+	bh=J5VDjAzU4bP2iNAyELFb3jm1tCgK9MjUGPIE6C22Gdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=u3rU247m8p6EeBeU9o817R75aAV5ckOgzc6GzfM4io+UXXBAKRkzb5EHh46R5fKTbYf2KT/fppZSZV4k324/wkSINpkUkRWvsxugJw7FGtbv+lT2ujpayeDXXx6/giaDMWwzRo0v9iXj4BKA4qcbjiFJvSGbvzbTai/C3IPOEaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ocaVzao4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3982C4CEE7;
+	Wed,  3 Sep 2025 19:36:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756928180;
+	bh=J5VDjAzU4bP2iNAyELFb3jm1tCgK9MjUGPIE6C22Gdg=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ocaVzao4pHj7eKEMcbd5Gjt92N6UK53kmHR2XF447/zhQoXmw8ED4iAm8ilUtAevr
+	 vKKdTzgnJB9FZ1a+PVsxADdMDORDhph18ZzFI/AdYmCUQTYzzC/Cz/GKlZS9k1Zp9e
+	 NUT1+eg71S5VoVdEIEVAU4AaUwVtZPQXN2u+rLVMtT5EMAtSknA7fwUlQx8dAotCLT
+	 U9zjAzodQ6z5ATB5gzCWpsQe4EnD+a1Dzt2oh3l4QiKDfzIiGjs5jXyKiKt1azlZ9F
+	 L5BJUGaHOfxeUz/4t2P+LZ3uQGRmemu7XC5xnuUYUudbHtyjsMRq9/ZdI0Zq9DwdS5
+	 /SI2PRaNEUmdQ==
+Date: Wed, 3 Sep 2025 21:36:13 +0200
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alex Marginean <alexandru.marginean@nxp.com>, imx@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: enetc: Correct endianness handling in
- _enetc_rd_reg64
-Message-ID: <aLiVk0QYg1VUm9tT@smile.fi.intel.com>
-References: <20250624-etnetc-le-v1-1-a73a95d96e4e@kernel.org>
- <aLiVHw4WQW69A5qL@smile.fi.intel.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] virtio_net: Fix alignment and avoid
+ -Wflex-array-member-not-at-end warning
+Message-ID: <aLiYrQGdGmaDTtLF@kspp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,53 +65,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aLiVHw4WQW69A5qL@smile.fi.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Sep 03, 2025 at 10:21:03PM +0300, Andy Shevchenko wrote:
-> On Tue, Jun 24, 2025 at 05:35:12PM +0100, Simon Horman wrote:
-> > enetc_hw.h provides two versions of _enetc_rd_reg64.
-> > One which simply calls ioread64() when available.
-> > And another that composes the 64-bit result from ioread32() calls.
-> > 
-> > In the second case the code appears to assume that each ioread32() call
-> > returns a little-endian value. However both the shift and logical or
-> > used to compose the return value would not work correctly on big endian
-> > systems if this were the case. Moreover, this is inconsistent with the
-> > first case where the return value of ioread64() is assumed to be in host
-> > byte order.
-> > 
-> > It appears that the correct approach is for both versions to treat the
-> > return value of ioread*() functions as being in host byte order. And
-> > this patch corrects the ioread32()-based version to do so.
-> > 
-> > This is a bug but would only manifest on big endian systems
-> > that make use of the ioread32-based implementation of _enetc_rd_reg64.
-> > While all in-tree users of this driver are little endian and
-> > make use of the ioread64-based implementation of _enetc_rd_reg64.
-> > Thus, no in-tree user of this driver is affected by this bug.
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
+Use the new TRAILING_OVERLAP() helper to fix the following warning:
+
+drivers/net/virtio_net.c:429:46: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+
+This helper creates a union between a flexible-array member (FAM)
+and a set of members that would otherwise follow it (in this case
+`u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];`). This
+overlays the trailing members (rss_hash_key_data) onto the FAM
+(hash_key_data) while keeping the FAM and the start of MEMBERS aligned.
+The static_assert() ensures this alignment remains, and it's
+intentionally placed inmediately after `struct virtnet_info` (no
+blank line in between).
+
+Notice that due to tail padding in flexible `struct
+virtio_net_rss_config_trailer`, `rss_trailer.hash_key_data`
+(at offset 83 in struct virtnet_info) and `rss_hash_key_data` (at
+offset 84 in struct virtnet_info) are misaligned by one byte. See
+below:
+
+struct virtio_net_rss_config_trailer {
+        __le16                     max_tx_vq;            /*     0     2 */
+        __u8                       hash_key_length;      /*     2     1 */
+        __u8                       hash_key_data[];      /*     3     0 */
+
+        /* size: 4, cachelines: 1, members: 3 */
+        /* padding: 1 */
+        /* last cacheline: 4 bytes */
+};
+
+struct virtnet_info {
 ...
+        struct virtio_net_rss_config_trailer rss_trailer; /*    80     4 */
 
-> > @@ -507,7 +507,7 @@ static inline u64 _enetc_rd_reg64(void __iomem *reg)
-> >  		tmp = ioread32(reg + 4);
-> >  	} while (high != tmp);
-> >  
-> > -	return le64_to_cpu((__le64)high << 32 | low);
-> > +	return (u64)high << 32 | low;
-> >  }
-> 
-> Description and the visible context rings a bell like this is probably a
-> reimplementation of ioread64_lo_hi().
+        /* XXX last struct has 1 byte of padding */
 
-And important to add, if the respective (-lo-hi.h) is included, ioread64()
-automatically will be ioread64_lo_hi() and hence code can drop all these custom
-calls, but again, I haven't looked into it for the details.
+        u8                         rss_hash_key_data[40]; /*    84    40 */
+...
+        /* size: 832, cachelines: 13, members: 48 */
+        /* sum members: 801, holes: 8, sum holes: 31 */
+        /* paddings: 2, sum paddings: 5 */
+};
 
+After changes, those members are correctly aligned at offset 795:
+
+struct virtnet_info {
+...
+        union {
+                struct virtio_net_rss_config_trailer rss_trailer; /*   792     4 */
+                struct {
+                        unsigned char __offset_to_hash_key_data[3]; /*   792     3 */
+                        u8         rss_hash_key_data[40]; /*   795    40 */
+                };                                       /*   792    43 */
+        };                                               /*   792    44 */
+...
+        /* size: 840, cachelines: 14, members: 47 */
+        /* sum members: 801, holes: 8, sum holes: 35 */
+        /* padding: 4 */
+        /* paddings: 1, sum paddings: 4 */
+        /* last cacheline: 8 bytes */
+};
+
+As a last note `struct virtio_net_rss_config_hdr *rss_hdr;` is also
+moved to the end, since it seems those three members should stick
+around together. :)
+
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+
+This should probably include the following tag:
+
+	Fixes: ed3100e90d0d ("virtio_net: Use new RSS config structs")
+
+but I'd like to hear some feedback, first.
+
+Thanks!
+
+ drivers/net/virtio_net.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 975bdc5dab84..f4964a18a214 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -425,9 +425,6 @@ struct virtnet_info {
+ 	u16 rss_indir_table_size;
+ 	u32 rss_hash_types_supported;
+ 	u32 rss_hash_types_saved;
+-	struct virtio_net_rss_config_hdr *rss_hdr;
+-	struct virtio_net_rss_config_trailer rss_trailer;
+-	u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+ 
+ 	/* Has control virtqueue */
+ 	bool has_cvq;
+@@ -493,7 +490,16 @@ struct virtnet_info {
+ 	struct failover *failover;
+ 
+ 	u64 device_stats_cap;
++
++	struct virtio_net_rss_config_hdr *rss_hdr;
++
++	/* Must be last --ends in a flexible-array member. */
++	TRAILING_OVERLAP(struct virtio_net_rss_config_trailer, rss_trailer, hash_key_data,
++		u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
++	);
+ };
++static_assert(offsetof(struct virtnet_info, rss_trailer.hash_key_data) ==
++	      offsetof(struct virtnet_info, rss_hash_key_data));
+ 
+ struct padded_vnet_hdr {
+ 	struct virtio_net_hdr_v1_hash hdr;
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.43.0
 
 
