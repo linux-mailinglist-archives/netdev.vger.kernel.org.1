@@ -1,179 +1,179 @@
-Return-Path: <netdev+bounces-219653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22499B42826
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:46:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45810B4284E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:48:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC732202EC2
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:46:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8743581D4E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01081D554;
-	Wed,  3 Sep 2025 17:46:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE1B32ED40;
+	Wed,  3 Sep 2025 17:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zpfMhLM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB402F29
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 17:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0EBC19343B
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 17:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756921594; cv=none; b=mKwb26rnSNbJtkNjMKcryq1evtW8eqZnrhH9aIayj75o13jC1c3zhDyr5w1rBbeY9ENSR/WitLFj7zmPhtzPByqsQHBLf3a4yBrAt/tf1uqkK5sunzYTlOjDZohAU++snS2hsL41zx3eQBvvNNFHPAsGdLB6chMKRcM4L05nu2M=
+	t=1756921698; cv=none; b=NRUzrus9MmGpNEYr3M40u+gHwf1EfgQMQ9TtZRQFpacLNdIY2dTMg0WkjIvipG/wnF8kmWVB9lexN2YH4k6qElFRSxuDwrkM5HE2ieIhuFuFG0UlUDnrVPo6B3y2wXbSvbY9IhUMN8TRr1V2WYO6JPVJgqzdbobHz+MmE7ugoD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756921594; c=relaxed/simple;
-	bh=zZhZCXb/kDx+4A4UKV/f5yV//7oJoKKMGlRbg52zu0c=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=q3ZRWtBcMwSobejj7vBvZDl5GAcA8LRN1QdFyVHwYwHYQEbJvN7miGEeDzE2U+8mw6EnvUurrEYlnXrQKgROHl4gpTD0gHf7uuRTTHjbvnYs26hJf7Iy1Uo9kh2L7PwMXPozke1okcR2gl0tEUUIZBZTws2GnJPU3ALv5zUf6v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ea2bd7b667so2465115ab.0
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 10:46:32 -0700 (PDT)
+	s=arc-20240116; t=1756921698; c=relaxed/simple;
+	bh=c4mp1P+AVhQChX8bvcyDr7A98eKYXWOZgDj6BeMFYCo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FjdHpOMTrl7cw1boE4eOcdMLU2knWbfyE+n6XZSfUSQ20X4UERD4m8irNqYHjT/yVRD7cre5+b+E4AmAdAcuRh3W3JhaocxFY3B9a9+R7wp/EvFOSzy3bTmN4jknhdi3C9zOyLEe8zOXRrbpf7AB4cK7CSA0gQzskRIbs+zXGY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zpfMhLM2; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b49715fdfbso4816561cf.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 10:48:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756921696; x=1757526496; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Vy9TngyXyqSloUyUMMVxxS/JAmJEYz2dOW30au4wF9Y=;
+        b=zpfMhLM2DERqMlb51G/ojBaVy9onk92RVgauep/kyHl0aoU/Nw9OAt2CAejiwjy1DP
+         kKcblWLOgXPL88PYvFkUrP0OZNTnRSdB2fRWK3otnk3WPeVZRcvtJQG3kLSidZLU1UF0
+         cUPN3CdPDZWy22dNjs6B5cbxJjsxE5Ma1WWkuW7MXYmAk6ROPC+hZKEPeqSjqvivj8EW
+         AfiefLjbkWBgHV3F8heoeQ8i7UYmYbpy6dZh3h5UUoqVTTnvi4XRmOq/iYfEXYQFFFet
+         N2I98wqTDSRB0mpnK0ru0dDF78b1Vzyk6S+YPRTbtSnsUPQ1jFovCt9tDxzW/krVGl/d
+         LEOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756921592; x=1757526392;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dKSwqifOLdDaIbVTuf5YJyDDnSy1g3uyCxhGGW90rrQ=;
-        b=cXLi0Nk/RrhbOXKf/tryIlfLUOFR/000IQ91SoNNNdFaux/t8L2WAJOfAeELHtm8+I
-         zS+6zCeCM1K7Hi4W9jJL0B8/K5sB9kA0tFTqYzvboFfwidTQsUcHAMRZ/WzOI82ErA8E
-         s9PrQfdz/MOcOb81zxJ6bdjL/1wd51PRpfhrf5Z8qcrdPyU+7+0RcpygN5/Prp51bBOF
-         ZblSso27xTzLOGyR+9tTchUl7Pzico5y7yMmoxppjxQPd63tNYkblGnYMyyZuydEENMH
-         ZfH39L7kNjpzuCtfhdBOxO7Pbqzm/y4AS/7ov8t23OFnheohw5oSWVhRlEtvKN0NyLPH
-         Clow==
-X-Forwarded-Encrypted: i=1; AJvYcCVydNgf/0hfIWFUpKgPHT/up7+OdjGjSoHPi+S0qbecyDprOzmlYZpDLOBo4ui4lmBvr7aWuqM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXNYz4K/mK3ASbmcvgs2ebDFW6IHNNSLApe+yUs+JnVXOHVsGY
-	hHzbrSYLxEdygNOV63gpk4zK3XhLY1jv2sQoUoA3hkroHLGtNrD25rT0TsRynf3C3JJ4sddLNgW
-	TQeLQCX1f4jSFXjyzkVjLxOnS77UMlma3ZLFNWDlyMTgKdD4xKiRudfQD3uk=
-X-Google-Smtp-Source: AGHT+IFFJxVR9s3LuLEmG7cWeFeZaUwXJ4lBSwQ+DRJx+m3dHv4u9mHDWmorhzFaF/E+dT/BaHFjmuVPM/5MJbbk4N6aQIQ64c7N
+        d=1e100.net; s=20230601; t=1756921696; x=1757526496;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vy9TngyXyqSloUyUMMVxxS/JAmJEYz2dOW30au4wF9Y=;
+        b=QVpX2nZ2wsKGTa2Wv23KL060njUgoI59w7vOsBb+5l26EK8/U9GvpOv7QwNfhVfRic
+         vPVIYcWYLHm1aSUPvftyMgam6htPEoG4gPv0imdT64Vi36y54A1Y6gvUgPSowee1wBk3
+         XqRhdvpEhCJ79qfxOaYTZcHvtUlRNutmxQ6b4hbwwhN7dCcSFqzQn8ADkNKei18fVRQU
+         8Z08kheaUESzF6LUkEtpVYT2h3RXcjyTY3M29loYcOZDDXVbxAWVjJ/XyJcRI9dnwFu6
+         J5eJFG/gbzYAv6XejQkrx2xYmoT27vesAuYHte7IhsZBwc/NYK5a6mnomGzdwixIPEVE
+         xXfA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfkf8LUpXBmRtkUohfEXBO7FI7vDMOi6Dw1nl4cwFTl2RjZnvSJMPEznUNDW0thgIfg4sKks8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCi6/Ktss5QCfcOSdKOnGl8X9fWv203u0ChoqPa2/qLbpFcF3s
+	Khfmb/3qVFlQdUu70gZ80sdm5cazrptJ6niysBzPdARzHxJOQblYmIzjfnYq4c5QdXUW0H7l6AT
+	sf3C07t82c9QzYw==
+X-Google-Smtp-Source: AGHT+IFZaP11d/IsGmahtsp7YRCwSrbP6l1H4aDgjBRxpG2FXTB0kWUF+zJyaxtOgXDyIXEd7cYRBd5JK+skAQ==
+X-Received: from qkbef1.prod.google.com ([2002:a05:620a:8081:b0:7f8:fedc:9cd6])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:2a12:b0:4b3:4d20:302 with SMTP id d75a77b69052e-4b34d2015ccmr83391301cf.81.1756921695696;
+ Wed, 03 Sep 2025 10:48:15 -0700 (PDT)
+Date: Wed,  3 Sep 2025 17:48:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17c9:b0:3f0:dce:2550 with SMTP id
- e9e14a558f8ab-3f401be27a3mr241636105ab.19.1756921592288; Wed, 03 Sep 2025
- 10:46:32 -0700 (PDT)
-Date: Wed, 03 Sep 2025 10:46:32 -0700
-In-Reply-To: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b87ef8.050a0220.3db4df.01fb.GAE@google.com>
-Subject: [syzbot ci] Re: net: devmem: improve cpu cost of RX token management
-From: syzbot ci <syzbot+ci4cf7c6dde1c8793c@syzkaller.appspotmail.com>
-To: almasrymina@google.com, bobbyeshleman@gmail.com, bobbyeshleman@meta.com, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, willemb@google.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
+Message-ID: <20250903174811.1930820-1-edumazet@google.com>
+Subject: [PATCH net-next] net: call cond_resched() less often in __release_sock()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot ci has tested the following series
+While stress testing TCP I had unexpected retransmits and sack packets
+when a single cpu receives data from multiple high-throughput flows.
 
-[v1] net: devmem: improve cpu cost of RX token management
-https://lore.kernel.org/all/20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com
-* [PATCH net-next 1/2] net: devmem: rename tx_vec to vec in dmabuf binding
-* [PATCH net-next 2/2] net: devmem: use niov array for token management
+super_netperf 4 -H srv -T,10 -l 3000 &
 
-and found the following issue:
-general protection fault in sock_devmem_dontneed
+Tcpdump extract:
 
-Full report is available here:
-https://ci.syzbot.org/series/c0dc7223-4222-461c-b04b-b6f0004c7509
+ 00:00:00.000007 IP6 clnt > srv: Flags [.], seq 26062848:26124288, ack 1, win 66, options [nop,nop,TS val 651460834 ecr 3100749131], length 61440
+ 00:00:00.000006 IP6 clnt > srv: Flags [.], seq 26124288:26185728, ack 1, win 66, options [nop,nop,TS val 651460834 ecr 3100749131], length 61440
+ 00:00:00.000005 IP6 clnt > srv: Flags [P.], seq 26185728:26243072, ack 1, win 66, options [nop,nop,TS val 651460834 ecr 3100749131], length 57344
+ 00:00:00.000006 IP6 clnt > srv: Flags [.], seq 26243072:26304512, ack 1, win 66, options [nop,nop,TS val 651460844 ecr 3100749141], length 61440
+ 00:00:00.000005 IP6 clnt > srv: Flags [.], seq 26304512:26365952, ack 1, win 66, options [nop,nop,TS val 651460844 ecr 3100749141], length 61440
+ 00:00:00.000007 IP6 clnt > srv: Flags [P.], seq 26365952:26423296, ack 1, win 66, options [nop,nop,TS val 651460844 ecr 3100749141], length 57344
+ 00:00:00.000006 IP6 clnt > srv: Flags [.], seq 26423296:26484736, ack 1, win 66, options [nop,nop,TS val 651460853 ecr 3100749150], length 61440
+ 00:00:00.000005 IP6 clnt > srv: Flags [.], seq 26484736:26546176, ack 1, win 66, options [nop,nop,TS val 651460853 ecr 3100749150], length 61440
+ 00:00:00.000005 IP6 clnt > srv: Flags [P.], seq 26546176:26603520, ack 1, win 66, options [nop,nop,TS val 651460853 ecr 3100749150], length 57344
+ 00:00:00.003932 IP6 clnt > srv: Flags [P.], seq 26603520:26619904, ack 1, win 66, options [nop,nop,TS val 651464844 ecr 3100753141], length 16384
+ 00:00:00.006602 IP6 clnt > srv: Flags [.], seq 24862720:24866816, ack 1, win 66, options [nop,nop,TS val 651471419 ecr 3100759716], length 4096
+ 00:00:00.013000 IP6 clnt > srv: Flags [.], seq 24862720:24866816, ack 1, win 66, options [nop,nop,TS val 651484421 ecr 3100772718], length 4096
+ 00:00:00.000416 IP6 srv > clnt: Flags [.], ack 26619904, win 1393, options [nop,nop,TS val 3100773185 ecr 651484421,nop,nop,sack 1 {24862720:24866816}], length 0
 
-***
+After analysis, it appears this is because of the cond_resched()
+call from  __release_sock().
 
-general protection fault in sock_devmem_dontneed
+When current thread is yielding, while still holding the TCP socket lock,
+it might regain the cpu after a very long time.
 
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      864ecc4a6dade82d3f70eab43dad0e277aa6fc78
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/6c521908-0a73-48bc-a0fd-2576cf868361/config
-C repro:   https://ci.syzbot.org/findings/9374f388-d643-42ea-831b-872eb5000b3c/c_repro
-syz repro: https://ci.syzbot.org/findings/9374f388-d643-42ea-831b-872eb5000b3c/syz_repro
+Other peer TLP/RTO is firing (multiple times) and packets are retransmit,
+while the initial copy is waiting in the socket backlog or receive queue.
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 UID: 0 PID: 5993 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:sock_devmem_dontneed+0x3fd/0x960 net/core/sock.c:1112
-Code: 8b 44 24 40 44 8b 28 44 03 6c 24 14 48 8b 44 24 20 42 80 3c 20 00 74 08 4c 89 ff e8 4d eb c9 f8 4d 8b 3f 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 ff e8 34 eb c9 f8 4d 8b 3f 4c 89 f8 48
-RSP: 0018:ffffc90001c4fac0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 1ffff11004ddcfe0
-RDX: ffff88801f6a8000 RSI: 0000000000000400 RDI: 0000000000000000
-RBP: ffffc90001c4fc50 R08: ffffc90001c4fbdf R09: 0000000000000000
-R10: ffffc90001c4fb60 R11: fffff52000389f7c R12: dffffc0000000000
-R13: 00000000ffffffff R14: 0000000000000000 R15: 0000000000000000
-FS:  000055558634d500(0000) GS:ffff8880b8614000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b30e63fff CR3: 0000000026b68000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- sk_setsockopt+0x682/0x2dc0 net/core/sock.c:1302
- do_sock_setsockopt+0x11b/0x1b0 net/socket.c:2340
- __sys_setsockopt net/socket.c:2369 [inline]
- __do_sys_setsockopt net/socket.c:2375 [inline]
- __se_sys_setsockopt net/socket.c:2372 [inline]
- __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2372
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fea2bb8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc81c63348 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007fea2bdc5fa0 RCX: 00007fea2bb8ebe9
-RDX: 0000000000000050 RSI: 0000000000000001 RDI: 0000000000000003
-RBP: 00007fea2bc11e19 R08: 0000000000000048 R09: 0000000000000000
-R10: 0000200000000100 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fea2bdc5fa0 R14: 00007fea2bdc5fa0 R15: 0000000000000005
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:sock_devmem_dontneed+0x3fd/0x960 net/core/sock.c:1112
-Code: 8b 44 24 40 44 8b 28 44 03 6c 24 14 48 8b 44 24 20 42 80 3c 20 00 74 08 4c 89 ff e8 4d eb c9 f8 4d 8b 3f 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 ff e8 34 eb c9 f8 4d 8b 3f 4c 89 f8 48
-RSP: 0018:ffffc90001c4fac0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 1ffff11004ddcfe0
-RDX: ffff88801f6a8000 RSI: 0000000000000400 RDI: 0000000000000000
-RBP: ffffc90001c4fc50 R08: ffffc90001c4fbdf R09: 0000000000000000
-R10: ffffc90001c4fb60 R11: fffff52000389f7c R12: dffffc0000000000
-R13: 00000000ffffffff R14: 0000000000000000 R15: 0000000000000000
-FS:  000055558634d500(0000) GS:ffff8880b8614000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b30e63fff CR3: 0000000026b68000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	8b 44 24 40          	mov    0x40(%rsp),%eax
-   4:	44 8b 28             	mov    (%rax),%r13d
-   7:	44 03 6c 24 14       	add    0x14(%rsp),%r13d
-   c:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
-  11:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
-  16:	74 08                	je     0x20
-  18:	4c 89 ff             	mov    %r15,%rdi
-  1b:	e8 4d eb c9 f8       	call   0xf8c9eb6d
-  20:	4d 8b 3f             	mov    (%r15),%r15
-  23:	4c 89 f8             	mov    %r15,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 ff             	mov    %r15,%rdi
-  34:	e8 34 eb c9 f8       	call   0xf8c9eb6d
-  39:	4d 8b 3f             	mov    (%r15),%r15
-  3c:	4c 89 f8             	mov    %r15,%rax
-  3f:	48                   	rex.W
+In this patch, I call cond_resched() only once every 16 packets.
 
+Modern TCP stack now spends less time per packet in the backlog,
+especially because ACK are no longer sent (commit 133c4c0d3717
+"tcp: defer regular ACK while processing socket backlog")
 
-***
+Before:
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
+clnt:/# nstat -n;sleep 10;nstat|egrep "TcpOutSegs|TcpRetransSegs|TCPFastRetrans|TCPTimeouts|Probes|TCPSpuriousRTOs|DSACK"
+TcpOutSegs                      19046186           0.0
+TcpRetransSegs                  1471               0.0
+TcpExtTCPTimeouts               1397               0.0
+TcpExtTCPLossProbes             1356               0.0
+TcpExtTCPDSACKRecv              1352               0.0
+TcpExtTCPSpuriousRTOs           114                0.0
+TcpExtTCPDSACKRecvSegs          1352               0.0
 
+After:
+
+clnt:/# nstat -n;sleep 10;nstat|egrep "TcpOutSegs|TcpRetransSegs|TCPFastRetrans|TCPTimeouts|Probes|TCPSpuriousRTOs|DSACK"
+TcpOutSegs                      19218936           0.0
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+ net/core/sock.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 9a8290fcc35d..0a93443a7402 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3187,23 +3187,27 @@ void __release_sock(struct sock *sk)
+ 	__acquires(&sk->sk_lock.slock)
+ {
+ 	struct sk_buff *skb, *next;
++	int nb = 0;
+ 
+ 	while ((skb = sk->sk_backlog.head) != NULL) {
+ 		sk->sk_backlog.head = sk->sk_backlog.tail = NULL;
+ 
+ 		spin_unlock_bh(&sk->sk_lock.slock);
+ 
+-		do {
++		while (1) {
+ 			next = skb->next;
+ 			prefetch(next);
+ 			DEBUG_NET_WARN_ON_ONCE(skb_dst_is_noref(skb));
+ 			skb_mark_not_on_list(skb);
+ 			sk_backlog_rcv(sk, skb);
+ 
+-			cond_resched();
+-
+ 			skb = next;
+-		} while (skb != NULL);
++			if (!skb)
++				break;
++
++			if (!(++nb & 15))
++				cond_resched();
++		}
+ 
+ 		spin_lock_bh(&sk->sk_lock.slock);
+ 	}
+-- 
+2.51.0.338.gd7d06c2dae-goog
+
 
