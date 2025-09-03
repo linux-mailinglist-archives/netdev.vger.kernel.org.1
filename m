@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D29DFB42C70
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:00:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5999B42C8B
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:10:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 096883AC439
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:00:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2951E3A6064
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781202ECEBB;
-	Wed,  3 Sep 2025 22:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00162EB843;
+	Wed,  3 Sep 2025 22:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1ktGG9/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ko6oU/8q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5070A2ECE85;
-	Wed,  3 Sep 2025 22:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F272E62B3;
+	Wed,  3 Sep 2025 22:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756936805; cv=none; b=FSIz/OKGkrekFeO8AqXjG3hirjg4Ngm00p2hdmBdXPJvIGDEK11NYvax9fcaU5BkUZNEhvNyHAgkb92dTcG4E5qiyKEjU7EPDQWCx99KhcXf1rwVpHDfq8ymAn5h/R/vJiH39V3lpjVtKT2/q4wqRp4xU/ABw7ReVbnO524MvEA=
+	t=1756937402; cv=none; b=NC5PCdZZZjiUJ0LASlxWprgv4OUu6jSzQYT9SjRoanTLvFcRxhR7myOMU4qpLLQDe6+sqk+8FugqdMTJrsldZqF3CCmxBqR7Zjuc4ivT+HjjiCvf7Ik1Chz1Tg/yTedOMWAv4Wxcz3uCKPoMdIusjpzXPQQQI/D2tQXGnPkqip0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756936805; c=relaxed/simple;
-	bh=j2uz/uBc95ntK406fyB0Vzgd7wrrK7lbbgNWWZf4d8M=;
+	s=arc-20240116; t=1756937402; c=relaxed/simple;
+	bh=QfaT9OiSqbUSoOuU4wwCC/v88A3txMCqwpY40/rFaOQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OBRj6UZbNVDsnve5GUHkCRn7tmDJuDb6IdYsRosqp1e5/BDG0ZI/DaLgUJLbthQqw5zuFvvbZ/Wq3xI4FP9hJIRHUV2/utjGwytN/NKtT3r96qSFfygU9P1VqD7e1bj5aIItKbXgZW3I6+dBbJ7uFXNZrzfcfS/Rs5R5b52/mjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1ktGG9/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6212C4CEE7;
-	Wed,  3 Sep 2025 22:00:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=eMAsSo+aOl+y1YjHeYAjsdHOhwS0TDrQAWGl06WHjf8AwyjPev9bN8sQuIj8zImMI1gpsoHNL0Thfjbnzr6Yv9SzfqCitcta6hs1VCVlQPlxuawnqCZwhXxIhtzBsXRgc2TbKMKC1nBfAc6iwPAcejCx0PHiWNUCgpXxG98SrA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ko6oU/8q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3691FC4CEF4;
+	Wed,  3 Sep 2025 22:10:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756936804;
-	bh=j2uz/uBc95ntK406fyB0Vzgd7wrrK7lbbgNWWZf4d8M=;
+	s=k20201202; t=1756937401;
+	bh=QfaT9OiSqbUSoOuU4wwCC/v88A3txMCqwpY40/rFaOQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=N1ktGG9/wrP7GMvTulUqibncIHIs8Yc9OUcSgRQaa6j6yV7b77l26AAB1Ip94OLz2
-	 ElAHI3NVG0z7y01ALkf2TG/bZZiBmkR/O362ru41Vq3dy82x3HoAN1hgMeAs9hzeqa
-	 q+DjmY31FgG83GclqoDnt5liBbtkLPuSqkGR8LUPr2wVtYXngM8LMwB6HJJaD/hTzo
-	 51f94L3GK99qSuIanJ9LgqUFA8b5lQa3m5v75EkCJeeKXpAZYCbw9WkDQqUEH+MKux
-	 Em6u2Hq2/8bmCmLYX/PqJSc8m6hgaq6Cmaj17P7AItfs8E16SEKhQm0QzSMx/621cE
-	 mR8y7vqfO39aQ==
+	b=Ko6oU/8quscrYCyxI4Xlt1wSrxTE7CYE9qWKMJ7dc05+pXFR0oKHYWFBtWj0a4J3q
+	 O1UTDLgSBnFom97aY/4Y7JomMsIg9w/oYEtLY7A7Wk7FdJU5Lt3lzdewH/Gzk5ifKn
+	 wHRbsmPZLqh5p6/03qtj40Cfk8ovM2/rLrFlO827nqyaw/tglwjqhALeVe3XsrOf1t
+	 hgKJhsRRydbru9PoU+CMiGCc1NDv/bM1H9bPj8Iu6YtfdBgCNfgxttGDH5BW2eg6qt
+	 1EriRKzv3L2n/FZzzJ5NkHtsLS/Yk338HvX7F+LdfIOGk5qiRk0RaOSD9T5jBLB78c
+	 cuaUrF1xF5GzQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CFD383C259;
-	Wed,  3 Sep 2025 22:00:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CA6383C259;
+	Wed,  3 Sep 2025 22:10:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-2025-09-03
+Subject: Re: [PATCH 1/1] net/mlx5: Add PSP capabilities structures and bits
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175693681001.1214607.6796099697795000995.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Sep 2025 22:00:10 +0000
-References: <20250903075602.30263-4-johannes@sipsolutions.net>
-In-Reply-To: <20250903075602.30263-4-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+ <175693740626.1217361.17270265115984686138.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Sep 2025 22:10:06 +0000
+References: <20250903063050.668442-2-saeed@kernel.org>
+In-Reply-To: <20250903063050.668442-2-saeed@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, jgg@nvidia.com, saeedm@nvidia.com,
+ linux-rdma@vger.kernel.org, leonro@nvidia.com, netdev@vger.kernel.org,
+ mbloch@nvidia.com, tariqt@nvidia.com, daniel.zahka@gmail.com,
+ raeds@nvidia.com
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to netdev/net-next.git (main)
+by Saeed Mahameed <saeedm@nvidia.com>:
 
-On Wed,  3 Sep 2025 09:55:25 +0200 you wrote:
-> Hi,
+On Tue,  2 Sep 2025 23:30:50 -0700 you wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
 > 
-> Just a few fixes this time, mostly buffer overflows and two
-> Qualcomm driver fixes. I know there's some more stuff coming
-> for iwlwifi, but I didn't have it yet.
+> Add mlx5_ifc PSP related capabilities structures and HW definitions
+> needed for PSP support in mlx5.
 > 
-> Please pull and let us know if there's any problem.
+> Link: https://lore.kernel.org/netdev/20250828162953.2707727-1-daniel.zahka@gmail.com/
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] wireless-2025-09-03
-    https://git.kernel.org/netdev/net/c/c5142df58d5a
+  - [1/1] net/mlx5: Add PSP capabilities structures and bits
+    https://git.kernel.org/netdev/net-next/c/04a3134f88a4
 
 You are awesome, thank you!
 -- 
