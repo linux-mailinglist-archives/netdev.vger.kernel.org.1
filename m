@@ -1,337 +1,234 @@
-Return-Path: <netdev+bounces-220124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E03B4483A
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 23:13:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8356CB44846
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 23:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCD6717C8AB
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20BCA17D105
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC4629D295;
-	Thu,  4 Sep 2025 21:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E508B29CB56;
+	Thu,  4 Sep 2025 21:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AcmhCGZs"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="P5XtHR+e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011018.outbound.protection.outlook.com [52.101.70.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B742C29AB02;
-	Thu,  4 Sep 2025 21:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757020399; cv=none; b=ApFCeVd7hYbsK47+NSe3ebUlGjoXihStzhwS1lCYFODdye4jjF6nn4yKuhipfBxtG/VreYFHJjzsRn/okx3EwP30Lt+uvi4s76rLvF+/HXLo92FgmoNrIc8jdRB6SsHMpcFCxnrHLTJY5cBs8J5wN/W/D/2CcLBQbx0qge2A4SM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757020399; c=relaxed/simple;
-	bh=hFC6Nms8C9ZkV5HnsMqil0Xb8sl6YFpXTCVKesSFKnI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tYn5PLDH1Jo2l5Zz605ciHtAmW6f7aGOGfLvro+eL0nlwxndzPsL1glGeERnApCH38Xmrg0mf99BbSjt7qEtLBkiS+PLq1XuVltU+8CqCCgQBSgZZJnvRHmEEXde89K6vUTkkjP8fonDAlBTQMjS/6ceSpWBoX/2Y2tFxqdFRBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AcmhCGZs; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584JislO021545;
-	Thu, 4 Sep 2025 21:13:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=q7bxqLDXoCV8WUS1V
-	9DL3EafhTM2XLjsHohmB9OjoGE=; b=AcmhCGZsE+f3KacQIiFNRAta1I+vuAV2b
-	LtAPXSMqMYTZTDeiwTfBKuN+oVt0YLXZC2oPFVluRWqKU+HetLwempkD+z8BbmXr
-	nbfAb2ERVreSAyrX+bavglGKqZiT5USFi9sFg5vdzrQW84Hthvkxo9IG+kRhQUL6
-	XJoP/2AMPERn8qDt+2nEripDQMOVRWcAqHSm5CYayU8ERkleCxQ75P5VHlvYJZQ6
-	QcUcuLceixlo2egCn63VCmUH36sTBDkJMUPntLS1MWTo8mnQoYmqYLNJCPLvMhNV
-	i9frgikcJaLj0Zsil/apY9FLcfhfjDk9j5fGsnWmKjh4Mk7sPPWDg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usurcqn6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 21:13:12 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 584Kubh5023452;
-	Thu, 4 Sep 2025 21:13:12 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usurcqn3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 21:13:11 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 584Ixlwx021184;
-	Thu, 4 Sep 2025 21:13:10 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vcmpxfnd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 21:13:10 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 584LD66b46334214
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 4 Sep 2025 21:13:06 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C491320043;
-	Thu,  4 Sep 2025 21:13:06 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7E54120040;
-	Thu,  4 Sep 2025 21:13:06 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  4 Sep 2025 21:13:06 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Subject: [PATCH net-next 2/2] net/smc: handle -ENOMEM from smc_wr_alloc_link_mem gracefully
-Date: Thu,  4 Sep 2025 23:12:53 +0200
-Message-ID: <20250904211254.1057445-3-pasic@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250904211254.1057445-1-pasic@linux.ibm.com>
-References: <20250904211254.1057445-1-pasic@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10E1277C98;
+	Thu,  4 Sep 2025 21:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757020421; cv=fail; b=CwnXVv5ZN8LVrNr3VrmoWXKMB2gLvyL7AJEdJDKXOJQhU4z4vUtO8Q95XCS3DDxEpM9iIWLGK6Tvu4JUDWXKMSxOxadohr4/zyF9BN4mzsv7d4Rg/pNzR5GIR/EDJORAR8Jwh2cdYcfbwt/1CxPoTSOqV1c9qeNhfoSuC9djczU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757020421; c=relaxed/simple;
+	bh=n8HaXUvq4dOXujnEWiQnDd3xk+tw+LA3Wr853ciwzD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=oDXUcbjTqM8TItHbf2OPv3Gj33BQH8c2fzv/MV2ZbiVu+ozVEhXjVFLfjtnwXRqVYs8y+0k7t49yFhWaZqqKCYSEfTELGcH7h6sqUvKHP00qV3Iy0d06tLfNzCSqRPxEEIlB7EcVs/M37Fx3FGwp0R0CzouXvAtXiVlVdBAEFXM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=P5XtHR+e; arc=fail smtp.client-ip=52.101.70.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TCYLL7khUaD2v7+cjoRSi4bLrR3jMeb/8zZdvGP1hIm/uMEZ71we63nHnjKLS8p3tk6pvZrE+wjH7HpQaXOWdAeFoFEzrf2/oT1/zgeXxASP4+naKkYAzY2xvhf/3nn669QcGgzoCUs+aN4TtPTOCAYe8DJP/T8wfImUHfF8frGZJsctPRG1OKd7Fpai6Y5Y1y6fv4h3x6VsvNoxTtneW4wUn0p2BZgy4lpcszd+X57y/soErJxCm6mGQjaVEtnsKy4INlDxwrUeNtlamcqGpjyZGasISohPpFpQNLLBsm2wha+id9bJVZR/vXoJFxmobJV662mPCIYMhGPTC6AHsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aqRlE9SZq9qZEjb7arWLJ0NvIKrfiZd33cYIH0Mkx/M=;
+ b=WVuDG+eOC6Q/TqnBu2S5UFTxictiRrcO2zzn8QQaJ7H8Xc3Axo/IZUbnPchEgkNu76cBXnJZDSLx8E1DYNQFbcDnOGdAFU2LfS1CBaLBTf5ppmr4DkCsTZDqZGJlifPmobhLMLco8r1dzwLfp7pmL20iPVOgOMAsEDp2A4PPTmoW6YzngnX2w1OfhRHGWF9Y6a0arIDkOweHjB2y9fflMcM5xR06PR6heo2yDb0sAK+J4NJRwqzofheMPQb3mwGFmeD64GCUMTzakBHQkOca60SaVhEFyCz+G4V2rIrI1UwgfTSl/sKC5f09WrgcouIA+HlZwvo8Pyp1zvuBWYeybA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aqRlE9SZq9qZEjb7arWLJ0NvIKrfiZd33cYIH0Mkx/M=;
+ b=P5XtHR+evfANp0kikH+uPfWN4MYFokv8EKrBfE3VeHRic8mGRa0choezvnNd5eJgREYbR0WAgz9Qd9kSWf1+459jJdMoE45S5hueD6TI3VMmG1tiFDkUFcxqidNSsbWQpEghmbCsVsWfgNGCQBrU9YAJbgbBhKSu1GVsKL93mMSGJd7W/BZ78NUgl66wR++Cd7xSVxX/ZRt3d6Ng9E0MytQNhIuSDauRJmOeRLDnzt7aApcZ9DsmeagvzGzhx0fq9IZChfLkP2fih2iZO2PUJlchXic0S+QqurdR6WuwUfsdthaP4ZcOqK3LyDuvcmxtDeIrOAS0yWnLNUYJNT8s8w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB9PR04MB9626.eurprd04.prod.outlook.com (2603:10a6:10:309::18)
+ by AS8PR04MB7765.eurprd04.prod.outlook.com (2603:10a6:20b:2ae::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.17; Thu, 4 Sep
+ 2025 21:13:35 +0000
+Received: from DB9PR04MB9626.eurprd04.prod.outlook.com
+ ([fe80::55ef:fa41:b021:b5dd]) by DB9PR04MB9626.eurprd04.prod.outlook.com
+ ([fe80::55ef:fa41:b021:b5dd%5]) with mapi id 15.20.9094.015; Thu, 4 Sep 2025
+ 21:13:35 +0000
+Date: Thu, 4 Sep 2025 17:13:26 -0400
+From: Frank Li <Frank.li@nxp.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: Wei Fang <wei.fang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-imx@nxp.com
+Subject: Re: [PATCH v5 net-next 3/5] net: fec: add rx_frame_size to support
+ configurable RX length
+Message-ID: <aLoA9mVfYoGOfIUg@lizhi-Precision-Tower-5810>
+References: <20250904203502.403058-1-shenwei.wang@nxp.com>
+ <20250904203502.403058-4-shenwei.wang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250904203502.403058-4-shenwei.wang@nxp.com>
+X-ClientProxiedBy: SJ0PR03CA0005.namprd03.prod.outlook.com
+ (2603:10b6:a03:33a::10) To DB9PR04MB9626.eurprd04.prod.outlook.com
+ (2603:10a6:10:309::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMCBTYWx0ZWRfX0bkxGRNwBPTM
- 0+T/lgY0FxHe+qLbexriYhrHeeemslx8RNxsS/riuQMs0peoLeEnjaOnOdO0avozXri6szFkZ4S
- 6HQ1cpl4dlCN9B6Om6I4/mxWBquByAxuU0nJXv/R7x0N5dLAnjAO07p6PelQmiH7SSjGPpL57b9
- FdDOd59xEkVhT2+r6qwG1R4i2QVTlxiRdoQGWW7JXOCtcGe9lZR7c8rKEGo24RYc+NgFq5C+qVH
- 4yQw6XHGRjxXyzmNagaTO9MgxG90pbPjOElJTHMOnkGJ1qdt8shQhCAGIUkBE/6hlROFmIZWLSt
- 7IWwDqqWtSYSNWQcKXrZXYjDI+rpvweiIj4xK36Ig1vM4BQejK5ghqpPri1UG23k945ZJruzivQ
- uhhUDgXj
-X-Proofpoint-GUID: 1qU3_8re3h3iooajrEp7y9Iwnmn-pJka
-X-Proofpoint-ORIG-GUID: 4bbmx_NnqJcWUh89kPKyVUrszrR6RGnQ
-X-Authority-Analysis: v=2.4 cv=Ao/u3P9P c=1 sm=1 tr=0 ts=68ba00e8 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=7VMdMTDjWeNOirE0wYMA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-04_07,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 phishscore=0 impostorscore=0 priorityscore=1501 spamscore=0
- suspectscore=0 bulkscore=0 adultscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508300030
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB9PR04MB9626:EE_|AS8PR04MB7765:EE_
+X-MS-Office365-Filtering-Correlation-Id: 44227a49-debd-4d55-beb1-08ddebf7e8ec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|7416014|19092799006|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?vG/Jhzpvs8s5kNOiTG/aorP6muZDAH5xtMb4YHCSccfAKzP9F5h8lWGflTOE?=
+ =?us-ascii?Q?gcELYc6b+ZPQVWSjz4L+pcYnytZpYzJN9ydeXACVRh+BK2jDovh1IEvzSiUP?=
+ =?us-ascii?Q?exiaz5ujUdGC6YnX1rRjON2lajKu8FfROWTo0ykfwO4h9YoL/9CZT1dnGWN/?=
+ =?us-ascii?Q?Xenn47JZJp84qzrS6T2B7gYacP01FXCxO4xnBBo0BErzWKyEzLpKdlrxsJuD?=
+ =?us-ascii?Q?QravmVYUQgcmKymysEa+CezMuRbzwmrIvGdMA9fRrTiGalL72jg7iOZRKNFp?=
+ =?us-ascii?Q?+yohrk9IjMcBCnllV4lemmIXFr6dOs6o1Z81v4Rm/W5GjbPOBFTOBgQP5/Rx?=
+ =?us-ascii?Q?604gO4w3swvXyEescKkpOIxy5kHCaCFokaCPgwJTxfSONPBX5ND21pAY4sRr?=
+ =?us-ascii?Q?i30ackHgn+znL1AZq4f6A3ejO04sbZugPwhp6SCWpQcoXG2dr3EWnupEZKqM?=
+ =?us-ascii?Q?1aEZ49W2s4+mAC4ji11ben8NTiVqq4XT9wK/mUhdGDBzYk8mkj0VSzgKbnK5?=
+ =?us-ascii?Q?tVY79u1KYefF3yJuvDVnA9DZrQXYvTUZbYpNHqplgtO98aRA1zGFwWjxC8Is?=
+ =?us-ascii?Q?3vIThGrJv4xPitG2kldsZqLWubeMtwzd6+D+LpoiumZv1dnPl9BXMbB6tMCC?=
+ =?us-ascii?Q?Pb/NbNRc0jR3qUCWnmRXYWe9BsdN8aPTNBaW/PUDAjiTjOENmZKey98V5oC+?=
+ =?us-ascii?Q?57gGe/yKeAt0sPpGCNIsdfuqrWHzfzOHrBh/3LEih4VYWbeyoo7lEmGsYjKp?=
+ =?us-ascii?Q?8S+aGISR5m+OFgrqUO3uy9mREmeN1TfpPyDbxoA9VFRSfp0S5hBe0xeoazz0?=
+ =?us-ascii?Q?jJHBd/OnGo4IPoIgTkb+8sXTIIWiy8IkFpLkghqsP2aLp144IczRakV9VVUg?=
+ =?us-ascii?Q?SI5WnPh6wDFdK6rETX8ds4d/LW0Py6KnyWSeTsl2eErM2AjF6Y+BP1CUdOIE?=
+ =?us-ascii?Q?HiKvxKpdzxnmZYH3IvtDWiRApXQsrztSoqLDqKcpFcpwdViCpqj2RYajV4sM?=
+ =?us-ascii?Q?X7UZSDc8fqt2w8rAgyVyZ/Mzk1MlNRbuRitovaDexuaD66vXNtf20NBtJqgP?=
+ =?us-ascii?Q?ApOhEppylrghE8UDUH5dW/M9FF7NO6nQ7Bu0fi8+RDtgp7cHx4tcNEOrNZiH?=
+ =?us-ascii?Q?jYfZQi+0INNI4ww8TOoLgLJbi8ahPZVD+Tdj9vdxc8Z8AWsn0NbtKfaxwl9f?=
+ =?us-ascii?Q?a7pP5reNV1uPHCqmz+Ix23ar8zr63rvrMlOHJnEv9CA9c6lmatVFqy8rGV4Y?=
+ =?us-ascii?Q?p4yqUIHdWE3d6nSEosZ4s3335kDY/Km2a4nMTdFXl0uAzEObRFBH/OTxzbFP?=
+ =?us-ascii?Q?hI6iKo+KD7Gzkv0ViICROCesm0i1NWAMFhHCRx2LUwjENsPgu3jx4ToH1A62?=
+ =?us-ascii?Q?XgSdPNRpe26NqjUvEj0OlN3+nLTZfYH7RuJgppPTuM5GJACNAeMElxmlSOc8?=
+ =?us-ascii?Q?V5Int/AAr3+uhe8xM9BV9XncBTyDwkeC1JNp6lAlPoc1+SLizfwkVQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9626.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(7416014)(19092799006)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?02fp2C90jD7fFHbTFueWT+gNL+MwLANzZ/Fy059k+LZZ+bmyMx/gV4Rn8fIH?=
+ =?us-ascii?Q?kegMMEQqX0rw4jI2Rbpd+yKnupDuTa2yL1FJacemul85JPBW8RbC6kv0mG+0?=
+ =?us-ascii?Q?/FO7dcI6LJmCYTQEPh9f8QGMdp3PR9G4lcqXnqwRyQRWUa2nhbZcZJoOMIf6?=
+ =?us-ascii?Q?3Jo3D4O+NKzKnSlh6sYrZnJ2zqGhNLxqTzFBcbYUbQ/ghU89Nj30CogpWA27?=
+ =?us-ascii?Q?tgDoKjU/M+A1FTCyKcm1A0hBYeQSvieoYM9ElOQZF8jEyMNAbdHHs1aJBd55?=
+ =?us-ascii?Q?lbtKMlvAXQO+vrmuHHKbU6Pex2ZgsUZkybr8DBGqOZLGXQy4cB72jSke22lh?=
+ =?us-ascii?Q?35DFYNBAviuvO4AvcX+xc/gMbKLaQWDnDw7uv4FSk5EsyCNCpIwGYDkkZm2q?=
+ =?us-ascii?Q?GIqhKU/W0LVRj25/YtB4aB2Q5Mp9szwIVly/dVUDfj8XKvN10sdklX0vjbIe?=
+ =?us-ascii?Q?4WHvM4AN60yYxdvnJ5yThDGz2ZQXNZAX4V7UBhGR9iFhy53pNeasHX3uSxH4?=
+ =?us-ascii?Q?WX+2vUDiwbnqT0OVbRj4q+JvhDOdrlkNDwRQWxp2xLYBIgaPp+evIAEAtKij?=
+ =?us-ascii?Q?jsj54YzGFwfwJi8NvY8sts2Z57e1qld3z8vKMWLfrJxEb7lSFXNYW15owx6z?=
+ =?us-ascii?Q?CjOaGumUFRqqgSK6NcIi7G+f2FN7jMXYYSK/z4oc5w6aUY8nWHbzNdzfAdWX?=
+ =?us-ascii?Q?nwcbfeTYDoI5k6CUSrdgx4uliNxYTED83evsoftLP4ch2cxDZ8EZqdOkfG6F?=
+ =?us-ascii?Q?oNMvz8S2Cm7jzAOROHJBbfziWJtcJI4CNieESqN67SRfvt6uzdLMGEeR+rdn?=
+ =?us-ascii?Q?CKCo8cD69TOyweUrJYuMSz62FcIlDw3cZHXzL9otgC5SH5hhR+40Pe1VWR1q?=
+ =?us-ascii?Q?8sl4g40j/w9fW9h7tTaaAjIVWAH3EVDh21pnjChQa3nlP3ZPfrcLdBaon4fY?=
+ =?us-ascii?Q?aegoZtGOfM4BGticbPgTObwHRXyVyPEAEWWghglZgG7j3UCnDiz0TAq0Qlj/?=
+ =?us-ascii?Q?klqm2JCbRUUlSKt14uleElcnoPjMqbfAQ2RgqVGlYeB6Ul0GtOSz2fwrgnGp?=
+ =?us-ascii?Q?yxz5m/NclH8KZZ9vKhcHfKxQ7/f/hFiUHnL7t+F5IrqZX520KtKXR+cP92GO?=
+ =?us-ascii?Q?JjN05zCMQyr3tajOvbkmh9ynB7Rj1BZ3UePR+oocSBkKXT3Eq7h1dXpvitmK?=
+ =?us-ascii?Q?FpL4fYEjAU1sCMJePTuskqn1vwOVHGJmkCoDhSJM6/NzyfG0K6pQGBabfNNx?=
+ =?us-ascii?Q?GbxkpRe1x2h3ktOeyL/QssFSloLOYUH4SQo2mM4bY66zMF0Lbyyd/mDVrN2x?=
+ =?us-ascii?Q?y99a4fUlhLLSCuUPlm5iN+t0IeXa/jrkWZaeVQcW1B9xwQBAZoPTUDF7kSrR?=
+ =?us-ascii?Q?jy9aT49RutClDbWdi0GZ9VVGyChhX4GF9q4n9QLgJeJQqehLbKT+52I+4YXW?=
+ =?us-ascii?Q?bUaSuf7/BBdw/lZx8pf3G++S6GyMMq4LFyF5gWtqHD4sZAybTjXvqQxuq+WJ?=
+ =?us-ascii?Q?IkQv9y+vgrPjPhS4qvnVn//+YMeEPr8vP1DzSlpbcHEYHHyZjXvfyEssnJxU?=
+ =?us-ascii?Q?GC0CiiAxffd2jS14oKVm/Kp/UeG8WwcIl+2s8N1P?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 44227a49-debd-4d55-beb1-08ddebf7e8ec
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9626.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2025 21:13:35.6523
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6pgfh+JgGtn5O5EIJMTdkKqH5XVl0MhTbIz2686y9/fow3rHe08n282ldZjJWJ/HgzZ+3UbZIYGVcoqhb5Rd/Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7765
 
-Currently if a -ENOMEM from smc_wr_alloc_link_mem() is handled by
-giving up and going the way of a TCP fallback. This was reasonable
-before the sizes of the allocations there were compile time constants
-and reasonably small. But now those are actually configurable.
+On Thu, Sep 04, 2025 at 03:35:00PM -0500, Shenwei Wang wrote:
+> Add a new rx_frame_size member in the fec_enet_private structure to
+> track the RX buffer size. On the Jumbo frame enabled system, the value
+> will be recalculated whenever the MTU is updated, allowing the driver
+> to allocate RX buffer efficiently.
+>
+> Configure the MAX_FL (Maximum Frame Length) based on the current MTU,
+> by changing the OPT_FRAME_SIZE macro.
+>
+> Configure the TRUNC_FL (Frame Truncation Length) based on the smaller
+> value between max_buf_size and the rx_frame_size to maintain consistent
+> RX error behavior, regardless of whether Jumbo frames are enabled.
+>
+> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
+> ---
 
-So instead of giving up, keep retrying with half of the requested
-size unless we dip below the old static sizes -- then give up!
+Reviewed-by: Frank Li <Frank.Li@nxp.com>
 
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
----
- Documentation/networking/smc-sysctl.rst |  9 ++++---
- net/smc/smc_core.c                      | 34 +++++++++++++++++--------
- net/smc/smc_core.h                      |  2 ++
- net/smc/smc_wr.c                        | 28 ++++++++++----------
- 4 files changed, 46 insertions(+), 27 deletions(-)
-
-diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
-index c687092329e3..c8dbe7ac8bdf 100644
---- a/Documentation/networking/smc-sysctl.rst
-+++ b/Documentation/networking/smc-sysctl.rst
-@@ -85,9 +85,10 @@ smcr_max_send_wr - INTEGER
- 
- 	Please be aware that all the buffers need to be allocated as a physically
- 	continuous array in which each element is a single buffer and has the size
--	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
-+	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retrying
-+	with half of the buffer count until it is ether successful or (unlikely)
-+	we dip below the old hard coded value which is 16 where we give up much
- 	like before having this control.
--	this control.
- 
- 	Default: 16
- 
-@@ -104,7 +105,9 @@ smcr_max_recv_wr - INTEGER
- 
- 	Please be aware that all the buffers need to be allocated as a physically
- 	continuous array in which each element is a single buffer and has the size
--	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
-+	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retrying
-+	with half of the buffer count until it is ether successful or (unlikely)
-+	we dip below the old hard coded value which is 16 where we give up much
- 	like before having this control.
- 
- 	Default: 48
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index 262746e304dd..da2bde99ebc6 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -810,6 +810,8 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
- 	lnk->clearing = 0;
- 	lnk->path_mtu = lnk->smcibdev->pattr[lnk->ibport - 1].active_mtu;
- 	lnk->link_id = smcr_next_link_id(lgr);
-+	lnk->max_send_wr = lgr->max_send_wr;
-+	lnk->max_recv_wr = lgr->max_recv_wr;
- 	lnk->lgr = lgr;
- 	smc_lgr_hold(lgr); /* lgr_put in smcr_link_clear() */
- 	lnk->link_idx = link_idx;
-@@ -836,27 +838,39 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
- 	rc = smc_llc_link_init(lnk);
- 	if (rc)
- 		goto out;
--	rc = smc_wr_alloc_link_mem(lnk);
--	if (rc)
--		goto clear_llc_lnk;
- 	rc = smc_ib_create_protection_domain(lnk);
- 	if (rc)
--		goto free_link_mem;
--	rc = smc_ib_create_queue_pair(lnk);
--	if (rc)
--		goto dealloc_pd;
-+		goto clear_llc_lnk;
-+	do {
-+		rc = smc_ib_create_queue_pair(lnk);
-+		if (rc)
-+			goto dealloc_pd;
-+		rc = smc_wr_alloc_link_mem(lnk);
-+		if (!rc)
-+			break;
-+		else if (rc != -ENOMEM) /* give up */
-+			goto destroy_qp;
-+		/* retry with smaller ... */
-+		lnk->max_send_wr /= 2;
-+		lnk->max_recv_wr /= 2;
-+		/* ... unless droping below old SMC_WR_BUF_SIZE */
-+		if (lnk->max_send_wr < 16 || lnk->max_recv_wr < 48)
-+			goto destroy_qp;
-+		smc_ib_destroy_queue_pair(lnk);
-+	} while (1);
-+
- 	rc = smc_wr_create_link(lnk);
- 	if (rc)
--		goto destroy_qp;
-+		goto free_link_mem;
- 	lnk->state = SMC_LNK_ACTIVATING;
- 	return 0;
- 
-+free_link_mem:
-+	smc_wr_free_link_mem(lnk);
- destroy_qp:
- 	smc_ib_destroy_queue_pair(lnk);
- dealloc_pd:
- 	smc_ib_dealloc_protection_domain(lnk);
--free_link_mem:
--	smc_wr_free_link_mem(lnk);
- clear_llc_lnk:
- 	smc_llc_link_clear(lnk, false);
- out:
-diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
-index b883f43fc206..92d70c57d23d 100644
---- a/net/smc/smc_core.h
-+++ b/net/smc/smc_core.h
-@@ -172,6 +172,8 @@ struct smc_link {
- 	struct completion	llc_testlink_resp; /* wait for rx of testlink */
- 	int			llc_testlink_time; /* testlink interval */
- 	atomic_t		conn_cnt; /* connections on this link */
-+	u16			max_send_wr;
-+	u16			max_recv_wr;
- };
- 
- /* For now we just allow one parallel link per link group. The SMC protocol
-diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-index 85ebc65f1546..4759041d3b02 100644
---- a/net/smc/smc_wr.c
-+++ b/net/smc/smc_wr.c
-@@ -548,9 +548,9 @@ void smc_wr_remember_qp_attr(struct smc_link *lnk)
- 		    IB_QP_DEST_QPN,
- 		    &init_attr);
- 
--	lnk->wr_tx_cnt = min_t(size_t, lnk->lgr->max_send_wr,
-+	lnk->wr_tx_cnt = min_t(size_t, lnk->max_send_wr,
- 			       lnk->qp_attr.cap.max_send_wr);
--	lnk->wr_rx_cnt = min_t(size_t, lnk->lgr->max_recv_wr,
-+	lnk->wr_rx_cnt = min_t(size_t, lnk->max_recv_wr,
- 			       lnk->qp_attr.cap.max_recv_wr);
- }
- 
-@@ -742,51 +742,51 @@ int smc_wr_alloc_lgr_mem(struct smc_link_group *lgr)
- int smc_wr_alloc_link_mem(struct smc_link *link)
- {
- 	/* allocate link related memory */
--	link->wr_tx_bufs = kcalloc(link->lgr->max_send_wr,
-+	link->wr_tx_bufs = kcalloc(link->max_send_wr,
- 				   SMC_WR_BUF_SIZE, GFP_KERNEL);
- 	if (!link->wr_tx_bufs)
- 		goto no_mem;
--	link->wr_rx_bufs = kcalloc(link->lgr->max_recv_wr, SMC_WR_BUF_SIZE,
-+	link->wr_rx_bufs = kcalloc(link->max_recv_wr, SMC_WR_BUF_SIZE,
- 				   GFP_KERNEL);
- 	if (!link->wr_rx_bufs)
- 		goto no_mem_wr_tx_bufs;
--	link->wr_tx_ibs = kcalloc(link->lgr->max_send_wr,
-+	link->wr_tx_ibs = kcalloc(link->max_send_wr,
- 				  sizeof(link->wr_tx_ibs[0]), GFP_KERNEL);
- 	if (!link->wr_tx_ibs)
- 		goto no_mem_wr_rx_bufs;
--	link->wr_rx_ibs = kcalloc(link->lgr->max_recv_wr,
-+	link->wr_rx_ibs = kcalloc(link->max_recv_wr,
- 				  sizeof(link->wr_rx_ibs[0]),
- 				  GFP_KERNEL);
- 	if (!link->wr_rx_ibs)
- 		goto no_mem_wr_tx_ibs;
--	link->wr_tx_rdmas = kcalloc(link->lgr->max_send_wr,
-+	link->wr_tx_rdmas = kcalloc(link->max_send_wr,
- 				    sizeof(link->wr_tx_rdmas[0]),
- 				    GFP_KERNEL);
- 	if (!link->wr_tx_rdmas)
- 		goto no_mem_wr_rx_ibs;
--	link->wr_tx_rdma_sges = kcalloc(link->lgr->max_send_wr,
-+	link->wr_tx_rdma_sges = kcalloc(link->max_send_wr,
- 					sizeof(link->wr_tx_rdma_sges[0]),
- 					GFP_KERNEL);
- 	if (!link->wr_tx_rdma_sges)
- 		goto no_mem_wr_tx_rdmas;
--	link->wr_tx_sges = kcalloc(link->lgr->max_send_wr, sizeof(link->wr_tx_sges[0]),
-+	link->wr_tx_sges = kcalloc(link->max_send_wr, sizeof(link->wr_tx_sges[0]),
- 				   GFP_KERNEL);
- 	if (!link->wr_tx_sges)
- 		goto no_mem_wr_tx_rdma_sges;
--	link->wr_rx_sges = kcalloc(link->lgr->max_recv_wr,
-+	link->wr_rx_sges = kcalloc(link->max_recv_wr,
- 				   sizeof(link->wr_rx_sges[0]) * link->wr_rx_sge_cnt,
- 				   GFP_KERNEL);
- 	if (!link->wr_rx_sges)
- 		goto no_mem_wr_tx_sges;
--	link->wr_tx_mask = bitmap_zalloc(link->lgr->max_send_wr, GFP_KERNEL);
-+	link->wr_tx_mask = bitmap_zalloc(link->max_send_wr, GFP_KERNEL);
- 	if (!link->wr_tx_mask)
- 		goto no_mem_wr_rx_sges;
--	link->wr_tx_pends = kcalloc(link->lgr->max_send_wr,
-+	link->wr_tx_pends = kcalloc(link->max_send_wr,
- 				    sizeof(link->wr_tx_pends[0]),
- 				    GFP_KERNEL);
- 	if (!link->wr_tx_pends)
- 		goto no_mem_wr_tx_mask;
--	link->wr_tx_compl = kcalloc(link->lgr->max_send_wr,
-+	link->wr_tx_compl = kcalloc(link->max_send_wr,
- 				    sizeof(link->wr_tx_compl[0]),
- 				    GFP_KERNEL);
- 	if (!link->wr_tx_compl)
-@@ -907,7 +907,7 @@ int smc_wr_create_link(struct smc_link *lnk)
- 		goto dma_unmap;
- 	}
- 	smc_wr_init_sge(lnk);
--	bitmap_zero(lnk->wr_tx_mask, lnk->lgr->max_send_wr);
-+	bitmap_zero(lnk->wr_tx_mask, lnk->max_send_wr);
- 	init_waitqueue_head(&lnk->wr_tx_wait);
- 	rc = percpu_ref_init(&lnk->wr_tx_refs, smcr_wr_tx_refs_free, 0, GFP_KERNEL);
- 	if (rc)
--- 
-2.48.1
-
+>  drivers/net/ethernet/freescale/fec.h      | 1 +
+>  drivers/net/ethernet/freescale/fec_main.c | 5 +++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
+> index 47317346b2f3..f1032a11aa76 100644
+> --- a/drivers/net/ethernet/freescale/fec.h
+> +++ b/drivers/net/ethernet/freescale/fec.h
+> @@ -621,6 +621,7 @@ struct fec_enet_private {
+>  	unsigned int total_rx_ring_size;
+>  	unsigned int max_buf_size;
+>  	unsigned int pagepool_order;
+> +	unsigned int rx_frame_size;
+>
+>  	struct	platform_device *pdev;
+>
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index f046d32a62fb..cf5118838f9c 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -253,7 +253,7 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
+>  #if defined(CONFIG_M523x) || defined(CONFIG_M527x) || defined(CONFIG_M528x) || \
+>      defined(CONFIG_M520x) || defined(CONFIG_M532x) || defined(CONFIG_ARM) || \
+>      defined(CONFIG_ARM64)
+> -#define	OPT_FRAME_SIZE	(fep->max_buf_size << 16)
+> +#define	OPT_FRAME_SIZE	((fep->netdev->mtu + ETH_HLEN + ETH_FCS_LEN) << 16)
+>  #else
+>  #define	OPT_FRAME_SIZE	0
+>  #endif
+> @@ -1191,7 +1191,7 @@ fec_restart(struct net_device *ndev)
+>  		else
+>  			val &= ~FEC_RACC_OPTIONS;
+>  		writel(val, fep->hwp + FEC_RACC);
+> -		writel(fep->max_buf_size, fep->hwp + FEC_FTRL);
+> +		writel(min(fep->rx_frame_size, fep->max_buf_size), fep->hwp + FEC_FTRL);
+>  	}
+>  #endif
+>
+> @@ -4560,6 +4560,7 @@ fec_probe(struct platform_device *pdev)
+>  	pinctrl_pm_select_sleep_state(&pdev->dev);
+>
+>  	fep->pagepool_order = 0;
+> +	fep->rx_frame_size = FEC_ENET_RX_FRSIZE;
+>  	fep->max_buf_size = PKT_MAXBUF_SIZE;
+>  	ndev->max_mtu = fep->max_buf_size - ETH_HLEN - ETH_FCS_LEN;
+>
+> --
+> 2.43.0
+>
 
