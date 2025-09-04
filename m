@@ -1,123 +1,112 @@
-Return-Path: <netdev+bounces-219833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 001D1B434D7
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 09:59:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27C25B434E1
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 754FA1C82128
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:00:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D76701C82AA4
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616332BE02D;
-	Thu,  4 Sep 2025 07:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E405C2BEC45;
+	Thu,  4 Sep 2025 08:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ppg+lKZn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZhSHOWo/"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859F42BE635;
-	Thu,  4 Sep 2025 07:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDACC2BEC2D;
+	Thu,  4 Sep 2025 08:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756972776; cv=none; b=dbA/cLV2bF8bgGb0XNncwqYLyba4rMrLXXJseNC+tXEAkLJk/sU/NXaamvBMAnzpCD7QHwJ5U1dwyMUfByVhgsNz3Ay3gIjxa/rOD8vIP9a/+keUVvdWWugqtqB1Ox0cFbWCyAepbpfoiCjrfD8wKh2DQ0scELZ64qtWkh+0VK8=
+	t=1756972802; cv=none; b=fWDiZp5NG8tmQPe8Kph/7kGEl1MdMEKRWpzhM37YWTVB0nUNRJ9v6ofeUZJCKfZNWNs93MsU13u369PtyDbeXpxlpXgN2J7trADV8ux4aLi6kl5YQHR/yNt5AGrqKcgavmpsMZXjrCXe3bwLNPospL8K/HdsL+Kbq3KCx9PR+a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756972776; c=relaxed/simple;
-	bh=OLHGYL2VYkLqPI5tT25FMVUxYYK7trdummRfW3EuY1M=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uSOA20C+7c5rCytqaSnUwIKyMTopwaVDxoB8QW9BbeIwgtXoe2ke3KsWQUU8Oj9l29enFeBR7EAvqaSxu7WQYOR+e5Q3b84Hhlvqx96zOXqcTBIXM8FLcQoO/hFxi6C6ym5sP30l2HQurXdvUHMLwWbHX7SeGmnxShJciAjhIFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ppg+lKZn; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756972774; x=1788508774;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OLHGYL2VYkLqPI5tT25FMVUxYYK7trdummRfW3EuY1M=;
-  b=ppg+lKZnxkJUVJS4J3Co7vB6s3yqP136TBKdZb+kvZ6BqnNmcB+5xa36
-   prPAXlbANqL4eC34D+QRC9S0LJKR7yyOunE0lWdCr0UjMCvns5J07OA19
-   ZlayqlaOnOZIyM5Afi0x/fijrat0S38BNkIFX/iYgllttA18fo3d/8Yhy
-   YdJJ7/3HYJ5pcT/jJJWTkftwZ0ctAeIwq2tVxs9oDwAwv1y1OHWsQ4nmC
-   Oe/fBruTDDp+kqHNqXShm7RCHVU9CBCUGTzBYzb/Q5iILSoje0dDDO6SW
-   9pYrMeds613TX709xd8wVvlNoLRVx5Pb3Kgieg09FZvRSLacI6BJvvIbM
-   Q==;
-X-CSE-ConnectionGUID: WO2Pu+71Q/qFJxgIkpaNTw==
-X-CSE-MsgGUID: AwdDj6oFQDuhD9MN31fgtg==
-X-IronPort-AV: E=Sophos;i="6.18,237,1751266800"; 
-   d="scan'208";a="51778964"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2025 00:59:33 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 4 Sep 2025 00:59:13 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Thu, 4 Sep 2025 00:59:12 -0700
-Date: Thu, 4 Sep 2025 09:55:31 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <vadim.fedorenko@linux.dev>,
-	<vladimir.oltean@nxp.com>, <viro@zeniv.linux.org.uk>,
-	<quentin.schulz@bootlin.com>, <atenart@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v3] phy: mscc: Stop taking ts_lock for tx_queue and
- use its own lock
-Message-ID: <20250904075531.gcovqmarfan4vx7w@DEN-DL-M31836.microchip.com>
-References: <20250902121259.3257536-1-horatiu.vultur@microchip.com>
- <20250903170558.73054e68@kernel.org>
+	s=arc-20240116; t=1756972802; c=relaxed/simple;
+	bh=LTfSK6bm0uoDmpF/XmAaaSZU4qORee0HC7EH0q/Ptpk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ues39li9bGVEJrlZmys2vr74EDUNQIcNG3NK9Z8tuucFDhBWH3+aWwxCxFitCBdh4SNq5/L7pHhNY3VVANM1ptxY1hODY5ZOe875gHgpaBMiDWz1rGtvGaOXulvbiP+uPGTnhd8i7luobxVAeiiQnxwIEQZjfpKxZVKenZLYRPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZhSHOWo/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB477C4CEF4;
+	Thu,  4 Sep 2025 08:00:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756972802;
+	bh=LTfSK6bm0uoDmpF/XmAaaSZU4qORee0HC7EH0q/Ptpk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZhSHOWo/nxz9p8qppx08leARXGv7SpENcwjjT9yby0I4mZ39+1CH7CFBRNQxkzeBY
+	 GQwkWxk2Jpv6PgtUiS4wO+2h1KZ7x6DRJR24z/DALys7/pn+xVXtpABUjg8FbG0/og
+	 Vb+uIXtwVnTIilN2tQRjo2yaHPqS3YoHzteWKATnn4UNY0l6CzKKDX2xz3aen6PMrU
+	 2fnUfRj4piQjjMJrZhJ6KoGHaXlI2DXrolM+nRt84Q5r7/dEY/bq3k+Jf/c7PFZPLM
+	 ceIjRAC+LJ6GbIAKmcEV9SQcRvvu1faD7eD3r0+j61JK3R6Zm2EsW3tpum/4R3NzcZ
+	 fTeg5HpkVDCEA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB8EB383C25A;
+	Thu,  4 Sep 2025 08:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20250903170558.73054e68@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: atm: fix memory leak in atm_register_sysfs when
+ device_register fail
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175697280674.1344869.4481080369917304414.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Sep 2025 08:00:06 +0000
+References: <20250901063537.1472221-1-wangliang74@huawei.com>
+In-Reply-To: <20250901063537.1472221-1-wangliang74@huawei.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kuniyu@google.com, kay.sievers@vrfy.org,
+ gregkh@suse.de, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The 09/03/2025 17:05, Jakub Kicinski wrote:
+Hello:
 
-Hi Jakub,
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
+On Mon, 1 Sep 2025 14:35:37 +0800 you wrote:
+> When device_register() return error in atm_register_sysfs(), which can be
+> triggered by kzalloc fail in device_private_init() or other reasons,
+> kmemleak reports the following memory leaks:
 > 
-> On Tue, 2 Sep 2025 14:12:59 +0200 Horatiu Vultur wrote:
-> > -     len = skb_queue_len(&ptp->tx_queue);
-> > +     len = skb_queue_len_lockless(&ptp->tx_queue);
-> >       if (len < 1)
-> >               return;
-> >
-> >       while (len--) {
-> > -             skb = __skb_dequeue(&ptp->tx_queue);
-> > +             skb = skb_dequeue(&ptp->tx_queue);
-> >               if (!skb)
-> >                       return;
+> unreferenced object 0xffff88810182fb80 (size 8):
+>   comm "insmod", pid 504, jiffies 4294852464
+>   hex dump (first 8 bytes):
+>     61 64 75 6d 6d 79 30 00                          adummy0.
+>   backtrace (crc 14dfadaf):
+>     __kmalloc_node_track_caller_noprof+0x335/0x450
+>     kvasprintf+0xb3/0x130
+>     kobject_set_name_vargs+0x45/0x120
+>     dev_set_name+0xa9/0xe0
+>     atm_register_sysfs+0xf3/0x220
+>     atm_dev_register+0x40b/0x780
+>     0xffffffffa000b089
+>     do_one_initcall+0x89/0x300
+>     do_init_module+0x27b/0x7d0
+>     load_module+0x54cd/0x5ff0
+>     init_module_from_file+0xe4/0x150
+>     idempotent_init_module+0x32c/0x610
+>     __x64_sys_finit_module+0xbd/0x120
+>     do_syscall_64+0xa8/0x270
+>     entry_SYSCALL_64_after_hwframe+0x77/0x7f
 > 
-> Isn't checking len completely unnecessary? skb_dequeue() will return
-> null if the list is empty, which you are already handling.
+> [...]
 
-I don't think so, because if the skb doesn't match the sig then the skb
-is added back to the tx_queue.
+Here is the summary with links:
+  - [net] net: atm: fix memory leak in atm_register_sysfs when device_register fail
+    https://git.kernel.org/netdev/net/c/0a228624bcc0
 
-/* Valid signature but does not match the one of the
- * packet in the FIFO right now, reschedule it for later
- * packets.
- */
-skb_queue_tail(&ptp->tx_queue, skb);
-
-
-Then if we change to check until skb_dequeue returns NULL we might be in
-an infinite loop.
-
-> --
-> pw-bot: cr
-
+You are awesome, thank you!
 -- 
-/Horatiu
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
