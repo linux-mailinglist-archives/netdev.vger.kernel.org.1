@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C25B434E1
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:00:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F06B434FD
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:10:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D76701C82AA4
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:00:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11BD2585063
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E405C2BEC45;
-	Thu,  4 Sep 2025 08:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189892BEC21;
+	Thu,  4 Sep 2025 08:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZhSHOWo/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WY5OWu4v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDACC2BEC2D;
-	Thu,  4 Sep 2025 08:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E382AE68;
+	Thu,  4 Sep 2025 08:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756972802; cv=none; b=fWDiZp5NG8tmQPe8Kph/7kGEl1MdMEKRWpzhM37YWTVB0nUNRJ9v6ofeUZJCKfZNWNs93MsU13u369PtyDbeXpxlpXgN2J7trADV8ux4aLi6kl5YQHR/yNt5AGrqKcgavmpsMZXjrCXe3bwLNPospL8K/HdsL+Kbq3KCx9PR+a4=
+	t=1756973408; cv=none; b=ByF/02nGBAtlntujT5DY5x7XPatKsfWd02wO3qjk+14Je4XtVZAWoKnuW+u5Olqm2cSqZn4j1YTop57JNiOATTmJNsijlDU5/wpMSZUBYNrDUbEliNgWfrLO0edBpI3JwZBd32ntixUHu6YRwXmQIet059R/Y5cslGdSi+nFAQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756972802; c=relaxed/simple;
-	bh=LTfSK6bm0uoDmpF/XmAaaSZU4qORee0HC7EH0q/Ptpk=;
+	s=arc-20240116; t=1756973408; c=relaxed/simple;
+	bh=N0pMFl+FVaU2TYzc04EZv0vGw6J8lXA6WMCnQ79xkv0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ues39li9bGVEJrlZmys2vr74EDUNQIcNG3NK9Z8tuucFDhBWH3+aWwxCxFitCBdh4SNq5/L7pHhNY3VVANM1ptxY1hODY5ZOe875gHgpaBMiDWz1rGtvGaOXulvbiP+uPGTnhd8i7luobxVAeiiQnxwIEQZjfpKxZVKenZLYRPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZhSHOWo/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB477C4CEF4;
-	Thu,  4 Sep 2025 08:00:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BhcR+8pmA8wfJCOBlLxu55r30QTUpnMZcuwSksC4GPx8se2WsaHn5fkjHac58AKX52HhQJjxZchS5vrsVh15qwV7sUaQoL9OhtYouC7BgrVtNGuZSGa7zsg7qKBP2ZYKu2PliYTwkUllvHV2mcbW+7Q5pdGuIVazFa8DLU/bSow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WY5OWu4v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 511BEC4CEF1;
+	Thu,  4 Sep 2025 08:10:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756972802;
-	bh=LTfSK6bm0uoDmpF/XmAaaSZU4qORee0HC7EH0q/Ptpk=;
+	s=k20201202; t=1756973407;
+	bh=N0pMFl+FVaU2TYzc04EZv0vGw6J8lXA6WMCnQ79xkv0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZhSHOWo/nxz9p8qppx08leARXGv7SpENcwjjT9yby0I4mZ39+1CH7CFBRNQxkzeBY
-	 GQwkWxk2Jpv6PgtUiS4wO+2h1KZ7x6DRJR24z/DALys7/pn+xVXtpABUjg8FbG0/og
-	 Vb+uIXtwVnTIilN2tQRjo2yaHPqS3YoHzteWKATnn4UNY0l6CzKKDX2xz3aen6PMrU
-	 2fnUfRj4piQjjMJrZhJ6KoGHaXlI2DXrolM+nRt84Q5r7/dEY/bq3k+Jf/c7PFZPLM
-	 ceIjRAC+LJ6GbIAKmcEV9SQcRvvu1faD7eD3r0+j61JK3R6Zm2EsW3tpum/4R3NzcZ
-	 fTeg5HpkVDCEA==
+	b=WY5OWu4vVwWJRlhRpjyQ2HTNSxsXj3jzbobGTvgsbx8bo8ak/YBbykp9i9sSl6dnI
+	 loClSlpJCj2bjxn/1oU0PMMGO3jjdp72d+g5615Jsf+kVQqSoML8ZLSgWwNUZKbDCD
+	 rFP9P8kZspxsVYgw4Ro2//pW7hdjxuVUbCrB2l4oHukRGWi/Bc8Z1yIdbsXXrZ7ViT
+	 dmc5NIQpkA95/a4d8Vi6TqvvjYsmYqYOXayGXo3wneN5PmruqDkGZUz49MLou6r/IA
+	 Ka4jI/xNcOIc4ofN57CxNc9GsQuvIdzfJG68BUivhT8FjjRNTEiFfUEMSUfNGEIhm9
+	 zIsyprG7a+MAw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB8EB383C25A;
-	Thu,  4 Sep 2025 08:00:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E47383C259;
+	Thu,  4 Sep 2025 08:10:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,56 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: atm: fix memory leak in atm_register_sysfs when
- device_register fail
+Subject: Re: [net-next PATCH v5 0/4] net: renesas: rswitch: R-Car S4 add HW
+ offloading for layer 2 switching
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175697280674.1344869.4481080369917304414.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Sep 2025 08:00:06 +0000
-References: <20250901063537.1472221-1-wangliang74@huawei.com>
-In-Reply-To: <20250901063537.1472221-1-wangliang74@huawei.com>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, kuniyu@google.com, kay.sievers@vrfy.org,
- gregkh@suse.de, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <175697341225.1714378.5684224526256527137.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Sep 2025 08:10:12 +0000
+References: <20250901-add_l2_switching-v5-0-5f13e46860d5@renesas.com>
+In-Reply-To: <20250901-add_l2_switching-v5-0-5f13e46860d5@renesas.com>
+To: Michael Dege <michael.dege@renesas.com>
+Cc: yoshihiro.shimoda.uh@renesas.com, niklas.soderlund@ragnatech.se,
+ paul@pbarker.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nikita.yoush@cogentembedded.com,
+ andrew@lunn.ch, niklas.soderlund+renesas@ragnatech.se
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Mon, 1 Sep 2025 14:35:37 +0800 you wrote:
-> When device_register() return error in atm_register_sysfs(), which can be
-> triggered by kzalloc fail in device_private_init() or other reasons,
-> kmemleak reports the following memory leaks:
+On Mon, 01 Sep 2025 06:58:04 +0200 you wrote:
+> Hello!
 > 
-> unreferenced object 0xffff88810182fb80 (size 8):
->   comm "insmod", pid 504, jiffies 4294852464
->   hex dump (first 8 bytes):
->     61 64 75 6d 6d 79 30 00                          adummy0.
->   backtrace (crc 14dfadaf):
->     __kmalloc_node_track_caller_noprof+0x335/0x450
->     kvasprintf+0xb3/0x130
->     kobject_set_name_vargs+0x45/0x120
->     dev_set_name+0xa9/0xe0
->     atm_register_sysfs+0xf3/0x220
->     atm_dev_register+0x40b/0x780
->     0xffffffffa000b089
->     do_one_initcall+0x89/0x300
->     do_init_module+0x27b/0x7d0
->     load_module+0x54cd/0x5ff0
->     init_module_from_file+0xe4/0x150
->     idempotent_init_module+0x32c/0x610
->     __x64_sys_finit_module+0xbd/0x120
->     do_syscall_64+0xa8/0x270
->     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> The current R-Car S4 rswitch driver only supports port based fowarding.
+> This patch set adds HW offloading for L2 switching/bridgeing. The driver
+> hooks into switchdev.
+> 
+> 1. Rename the base driver file to keep the driver name (rswitch.ko)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: atm: fix memory leak in atm_register_sysfs when device_register fail
-    https://git.kernel.org/netdev/net/c/0a228624bcc0
+  - [net-next,v5,1/4] net: renesas: rswitch: rename rswitch.c to rswitch_main.c
+    https://git.kernel.org/netdev/net-next/c/5ee21c004c0b
+  - [net-next,v5,2/4] net: renesas: rswitch: configure default ageing time
+    https://git.kernel.org/netdev/net-next/c/622303250c51
+  - [net-next,v5,3/4] net: renesas: rswitch: add offloading for L2 switching
+    https://git.kernel.org/netdev/net-next/c/b7502b1043de
+  - [net-next,v5,4/4] net: renesas: rswitch: add modifiable ageing time
+    https://git.kernel.org/netdev/net-next/c/92e913a3df3c
 
 You are awesome, thank you!
 -- 
