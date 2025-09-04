@@ -1,135 +1,107 @@
-Return-Path: <netdev+bounces-219940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18841B43CF0
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:21:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B9F1B43D1C
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:26:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE22C3B8F48
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 13:21:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93AB554217D
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 13:26:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE7D2F5331;
-	Thu,  4 Sep 2025 13:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36CC9302CA6;
+	Thu,  4 Sep 2025 13:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GIduNvg/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ohkmD2BQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3FB158DAC;
-	Thu,  4 Sep 2025 13:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1EC3002D8
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 13:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756992079; cv=none; b=V/gZJnFopJE8Jw+60wVT9HpexAWT1AhoQPgBJxFxYEAe5eI0GRjR/WJvV/tvWns4QApfizaqcmM573SRd053jlEjXIdUzDjnTt288qcU8KlRULSuD7yFdFMEgMUcx44XEcGNmwkmaVSnU/31upBEElXpMoLJVHQjbXYw50aNsHA=
+	t=1756992360; cv=none; b=GsJje/T+/cHv6VCsj0B6lETSuTal9d1udy6E4jEBG+D/o/kvyCIMgU1Y0uAsjc83sTlHgHtQ4/RNhNSpkPwjarnSoEgDRp1z+EGP/C9HgQvkTcLbOeMt4XRTMT14xj4pZ/d6ypV4sOjvXCro5WKMmzd3tuPp6mttzYeA55lOAXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756992079; c=relaxed/simple;
-	bh=/0B3jovSesp/hxR08tvuxjzy1mvl0Jv+lkX17ZO+zUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GxT5D1Z6RPxxp1cmx2N51EdyuGB13fvH2/eC5A0rY416kQx4Fz7fDyjtFNfZ1vQs4jyr61OHjbx5RH7qzmHW5nHWrwGkjJD/3PjSCungxPsA+8ASSQYb8LxIpvQ49NK+wt5Uxe9s7BjZezfsTDUPuBwc4roYSr1kOgP0y7r+VDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GIduNvg/; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-71d60110772so11171997b3.0;
-        Thu, 04 Sep 2025 06:21:17 -0700 (PDT)
+	s=arc-20240116; t=1756992360; c=relaxed/simple;
+	bh=sb6Kxlmejddd0tUY47YICFy6lvnT/yqueXLmemKkczQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cLkXRntjxaeuoAbyn9MkdkcnZikXOEmrH4MmxXXVxVUsM6os6EyNPSH2rJlRIbli+TbMcod+4YWoGF/rKq/J2t+rmwgD8WtvB/V7LS6PNpF7dEGR7rjX+uNvYo2LavF2VlIX2MIrvF9PNlFpcIfdHEjjC9dIRG1mkB/lb35ikmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ohkmD2BQ; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7e870646b11so230529085a.2
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 06:25:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756992077; x=1757596877; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UW3lWz1gWateAvfJ4OmLaSxYKXnyj9z9mVCRV3AJ32A=;
-        b=GIduNvg/Tj3AOqfhcp6fWcMKkPYbvFK1ex6+DvQjQiz/NZ4e3JPQbubFWoi3nuc9da
-         Br9fi581SrCqghUcU6scW4/JyG1qRHpFTMY4CFcl00Oe1YqtBnDHD+HnJigl516pQvdR
-         QGxHzUpcrReE+ccMCN/wD2ZvOof/rgAOFkAbKZFpHqV1wtY3fwt9msTtJoVhK8hWfknI
-         o/TbRs6IxMCb2IHpGm7hSZltuzgTGII2vLLZaWDk4bmxrql6UE8DyuVPjXqsMUungz6g
-         KrDzK6uR4K3cR1EFhqdPZD3AL40oI+5I8bONuKAz4JKHoZNQW5pYCe6dkgHT+K0nlsa6
-         vgcw==
+        d=google.com; s=20230601; t=1756992357; x=1757597157; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QX+rgbGC5nOPjv/m79hzIrArC65aRzslMvQnWhwDZ1k=;
+        b=ohkmD2BQCzYplb7KtlS8lji06PI9aK4EbApRg+Os0JpRyY90R0PdkNesuztOCfCbv2
+         M25ewjGFub7DhtLRw+e9fYYIHV/sTLHMrjAXeHXZdQ2ccxEm8GKK0LQ2ypOKHXcJPIRC
+         alV7dp07iBDxzLoCdAZgbcmm7yOHR+aarXJB2S71Z8jYpCdB5uN6/cEPe1RbWTUn0yZW
+         uC9HoAbQEoKBIevaawXCzQxEy6l63sf7oKTwIXhtDavNUo6GrZeN5bzzl866mw2tsvEn
+         +5PTOkTMw5AS+pzm0v/+MllXZgwS9JAl4QoZ71gw2dXrSCNT+oYGvN0s+09fkQ168kkI
+         2EiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756992077; x=1757596877;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UW3lWz1gWateAvfJ4OmLaSxYKXnyj9z9mVCRV3AJ32A=;
-        b=OHAfVT+Fvzx22HuQ2C2s2GQJOjf+Y737bDZus32PGgL3rPTeQclU0VsH/A02H+qoId
-         UQ3ts0g4WwUkZFsVIfIAfDPXbJh8u+J550q4PR3FrqpwMoAoPUnO3D8UR6zEJ5ts1jLG
-         026uqr4zOsTrtHEVb/pPanXwAoyHObOh6tsrDqs1I4mL4DalN/Fpk115SLENfLJAoR+8
-         mIm1IwGYnxWzwA8k0t58UZMWteSCq+Oq+ZG5y/s9KypXvaKyYDN24iAJ2qxFTR8kZ4OI
-         U3r9sepUUmsGGhj9BlstfDjqjqNsaXw7tSoVSRI9u8v88HaLjSTqeCb5N5OpiyY1GCE0
-         D78w==
-X-Forwarded-Encrypted: i=1; AJvYcCU0byhzbYajmMZLMvTSVWy23Ks5ijp8Ac9LfPHcLpMqbrNyZYmISvBRpY0aBUhPMHp/YXfnhUqpbUFp@vger.kernel.org, AJvYcCUUKBSY6IJA820geomG5RwdiE07Rgz11Gdnhu8cxEbdqK7lFzjx1SYfoQaN4J65GaWZv61eb5eZ@vger.kernel.org, AJvYcCVy1fKaDnhE3I53PkZbkvPpeC0OTnHA3dr6DDmSDVMt7GMSbD21aTZIxT/Ph9gXQ6n5FXJT1jh42W4HhR5g@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxkaiMfHQA4+1yZ0iltrI+NNdZB8E6m2rdTW6qZL+z7uFvgfga
-	ATcGAwBDitlbjefJQb/kFCvXZ18pjUxblFrP7lxgnATwI5hi225TBZW/
-X-Gm-Gg: ASbGncvkmIQfWyIgDdd8QsJIjMEiM7pmcFMc8KIjCH5AHFgwacYKgaG5scAJPDH2D/I
-	dboORqRgBP5uqVcG38YOt0gZeVHHXjf0GyoTnrhWjNmN9bWJzvAibkq1HcIv3M2GEwMWWXAQRsA
-	kzR4TmGKdFV97lnsCwjrXqXEMN5kKy81grF5/ycqUW6QzBGOjWzxfl+n9mqCvRgy8pTgSxQmG7z
-	z/+kJ6RAzLi9e2C6/76kxIJJu7vYv5RNDDPvTleD5dbiTwzBLrpD+2fRxbuR/oOSKdUFbHey2df
-	I4YDfTg/TpG2GWZUjT3uhdPGcGIzb+L+AKfYwq8FaJn6iE3Si8U7/ib9OTjokVOxiQjx6V/6Mz5
-	JxHNxqVyvpUIfObZNCwMP4X3wTF+xdadCv3UHsgoEGEXdgd/lSAOU
-X-Google-Smtp-Source: AGHT+IF9+DoFzLHOQRcPIJ7cBivUYyoDwWq+J13ybXKomD3r4/KZ33bHYn/W4QL4kQIHtZodp5+7Tg==
-X-Received: by 2002:a05:690c:4c11:b0:719:4cff:16db with SMTP id 00721157ae682-722764f3cd0mr60887077b3.25.1756992076451;
-        Thu, 04 Sep 2025 06:21:16 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-723a8503a46sm21340297b3.46.2025.09.04.06.21.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 06:21:15 -0700 (PDT)
-Date: Thu, 4 Sep 2025 06:21:12 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	vadim.fedorenko@linux.dev, Frank.Li@nxp.com, shawnguo@kernel.org,
-	fushi.peng@nxp.com, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: Re: [PATCH v6 net-next 03/17] ptp: add helpers to get the phc_index
- by of_node or dev
-Message-ID: <aLmSSC90dWDfhGkL@hoboy.vegasvil.org>
-References: <20250827063332.1217664-1-wei.fang@nxp.com>
- <20250827063332.1217664-4-wei.fang@nxp.com>
+        d=1e100.net; s=20230601; t=1756992357; x=1757597157;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QX+rgbGC5nOPjv/m79hzIrArC65aRzslMvQnWhwDZ1k=;
+        b=aqZW84DLSgpfc1DCTIH55zVnvUgKU1nrJHb57+JXp6wEYWcVXE4ckAzkHM9eXNPCoJ
+         AGnzNpBsh9m24P2J5bakl8BCAOZqtP8g/FY9clGrpYP3ct7bg2C1HJyXygB6AcmuYjuH
+         81jKpXBT3CG9TMWPUoONtg1D7wvplZBIbkdHddOrLjCNfS9mtEw8/dCAwRwpcjuPylTy
+         I07KD5ycMgkCKYHTFQTjemgt+TCBU+7U74AUICmewhybJRQSRVpOyIFJxyrVUcfy/1rN
+         X17583ccC2CPU+TmNcgacLNbVyn248XOE3i1qFHC9BX/zdwZWV6opRo2T3cPxyxDa1+R
+         gLUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVvMVUUvdrJ7CeYvJ7FR8+WCUvaxWoP98uj/ZZz+YsjuOh9GSEV+CqLzJp40H0JnqysXINKUA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4URCzdnAu0D4vi5xAkCPWhyFSjnvgnaA4aLs3Omg9NpYxo145
+	RziO98fsPfUtetbf4oZFHFHxwFgpMITAtch6q1bD3+Hw8aGZqxVzjBxBsWJbr/CbD8hdkSOqkwb
+	uv0jkuBnX6simGw==
+X-Google-Smtp-Source: AGHT+IEUXkt6paEcJeG+BbIYiuVbZff7cq/lyTwja9S/P8PUbnSEMZZsntFzjPrwl6+qSwV2j9wxLyOeLBKaDg==
+X-Received: from qkpb1.prod.google.com ([2002:a05:620a:2701:b0:7ea:681:9611])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:394d:b0:7fe:71ca:a5d5 with SMTP id af79cd13be357-7ff26eaac2amr2306778685a.10.1756992357420;
+ Thu, 04 Sep 2025 06:25:57 -0700 (PDT)
+Date: Thu,  4 Sep 2025 13:25:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250827063332.1217664-4-wei.fang@nxp.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
+Message-ID: <20250904132554.2891227-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] ipv6: snmp: avoid performance issue with RATELIMITHOST
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Jamie Bainbridge <jamie.bainbridge@gmail.com>, Abhishek Rawal <rawal.abhishek92@gmail.com>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Aug 27, 2025 at 02:33:18PM +0800, Wei Fang wrote:
-> Some Ethernet controllers do not have an integrated PTP timer function.
-> Instead, the PTP timer is a separated device and provides PTP hardware
-> clock to the Ethernet controller to use. Therefore, the Ethernet
-> controller driver needs to obtain the PTP clock's phc_index in its
-> ethtool_ops::get_ts_info(). Currently, most drivers implement this in
-> the following ways.
-> 
-> 1. The PTP device driver adds a custom API and exports it to the Ethernet
-> controller driver.
-> 2. The PTP device driver adds private data to its device structure. So
-> the private data structure needs to be exposed to the Ethernet controller
-> driver.
-> 
-> When registering the ptp clock, ptp_clock_register() always saves the
-> ptp_clock pointer to the private data of ptp_clock::dev. Therefore, as
-> long as ptp_clock::dev is obtained, the phc_index can be obtained. So
-> the following generic APIs can be added to the ptp driver to obtain the
-> phc_index.
-> 
-> 1. ptp_clock_index_by_dev(): Obtain the phc_index by the device pointer
-> of the PTP device.
-> 2.ptp_clock_index_by_of_node(): Obtain the phc_index by the of_node
-> pointer of the PTP device.
-> 
-> Also, we can add another API like ptp_clock_index_by_fwnode() to get the
-> phc_index by fwnode of PTP device. However, this API is not used in this
-> patch set, so it is better to add it when needed.
-> 
-> Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> Reviewed-by: Frank Li <Frank.Li@nxp.com>
+Addition of ICMP6_MIB_RATELIMITHOST in commit d0941130c9351
+("icmp: Add counters for rate limits") introduced a performance
+drop in case of DOS (like receiving UDP packets
+to closed ports).
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+Per netns ICMP6_MIB_RATELIMITHOST tracking uses per-cpu
+storage and is enough, we do not need per-device and slow tracking
+for this metric.
+
+Eric Dumazet (3):
+  ipv6: snmp: remove icmp6type2name[]
+  ipv6: snmp: do not use SNMP_MIB_SENTINEL anymore
+  ipv6: snmp: do not track per idev ICMP6_MIB_RATELIMITHOST
+
+ include/net/ip.h | 11 ++++++
+ net/ipv6/icmp.c  |  3 +-
+ net/ipv6/proc.c  | 87 ++++++++++++++++++++++++++----------------------
+ 3 files changed, 60 insertions(+), 41 deletions(-)
+
+-- 
+2.51.0.338.gd7d06c2dae-goog
+
 
