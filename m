@@ -1,213 +1,302 @@
-Return-Path: <netdev+bounces-219798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D2F4B43077
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:27:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F900B430B5
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D34CB1C23CB1
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:27:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD319563FA0
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B7726E71D;
-	Thu,  4 Sep 2025 03:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16BC62264B1;
+	Thu,  4 Sep 2025 03:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFhSmq+f"
+	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="UJbp9oQO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C821F1302;
-	Thu,  4 Sep 2025 03:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02ECF1940A1
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 03:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756956424; cv=none; b=nnxIHyv2wgBQQRgAUwyW4mwlOXYXiU5isOFS3C80HOBH2vj2BNln0+3Gy8ESUXHjV+fCX0nhtefaN6Z9tv85Fzmy/SgHQCRf4NAzRoMSr8ivsY6ZZd8d9tIqFhsdEnZUHcAyQFyjYfWiuMeG98d5+tlkpzTmQ73aZYAA6MiUMwY=
+	t=1756958317; cv=none; b=j2kjNTGLEdEI9fdnnF+h0FZWNIFaYYLp7X13WLiyOM6AWG6+jaaWiCNR6WF5ZOsq6X22vh7NVs6D0V3gJ4AW/9VRZozU9cUZePjcj0gAq4yhoHORB6Huw74/7zMSSFipSMc59nJI6iKOz1d4QvOn8T+tf5oNIN3Gcir4QgAVLM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756956424; c=relaxed/simple;
-	bh=T7o2vR9v/NyTpj4YHVsT0sDyK1JkjQg5Xz4p1ImpF10=;
+	s=arc-20240116; t=1756958317; c=relaxed/simple;
+	bh=+rXXxOB+OEB8xG56G10rYz3XXsV4fu6ja9srvzVKxxo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NbGDrwKX+Fbrdb4j/Yxp3NST6nd9C2hlVIV5xn7M+213JE/+9giLugKBnfmbrtpTGGDs1QcN7mixkiUpBP4DD2+CONGW7rKPyGFgoxSrHzeZECLzA6g7JuUreBOe2mWRifLqQxi0f8BvkfUCzN7AcLvKQIzw2lyi5R5lD/JZAH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jFhSmq+f; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3f65d600d35so6610025ab.0;
-        Wed, 03 Sep 2025 20:27:03 -0700 (PDT)
+	 To:Cc:Content-Type; b=lrYg+48wDdWqSk+5Y+ts8PLP0+UwhfRpo1a55t9eOqBUxm3WK3WDZc173nXrEcsK51VKwZDayidcmtNyC7kWvbH/GgJD0GKZ7LK+twpMT3PbRYfqItjkW2fIOoVrUDqmv6yVMWyvol0xv1vETv71l44SqEF9bIU4WRGGceaowVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=UJbp9oQO; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-55f6b0049fbso675335e87.0
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 20:58:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756956422; x=1757561222; darn=vger.kernel.org;
+        d=openai.com; s=google; t=1756958313; x=1757563113; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bP9u6IDD8DedDeQulxVxdn26xs4TZxFphEmYs0nd0AY=;
-        b=jFhSmq+fkGU9HgrenBkQthHWEyAknVggYI+/J8MBO0XRe/xOAjl/uuCbtdSRQTQmS9
-         1tRtiYzBM3nS9E82VvTFFVs0MSF/0aIwp/6xXXP50er4O3OSuUofyFdIU9IRZaQSQvu2
-         Fvhe+THAqJKhPwsWJrAtmtXgg9pFwCya7t+cBeSrfb5y/s0WJYlSBwNT+O9TeV40cmlq
-         C//z1zFdvXjyFKQ5TyVdtC3cXBk5QhlaecPTz9MrKiaTyQ1qSDdp2K+dk1u2sOSxtdWd
-         EB+pzRCwfC16lEBxSyZDW6jFLl1t7yYoof99Aiqx8BC3qgwf2UdirlCE0TqZehMvt0SS
-         ZOhw==
+        bh=8VhhM16Stf7vyA77g+HaAZhQu0TNv44cntB0IdQQAV4=;
+        b=UJbp9oQOAtrC9sUDnJDJ8dRmKIW7hx7LZ+1xwwkiaUFPeJh6HBG57/dXcT2geoxwib
+         aj1Sx+sh7z0mUmXOmqNhyfetO3ZpEc5Nx2oSsHaXRYvdqVsska6rTAdO8R4iqbMxnkOZ
+         +hk3/sAAtm5i8An1e2as3SFC02o+3B1x9Hebw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756956422; x=1757561222;
+        d=1e100.net; s=20230601; t=1756958313; x=1757563113;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bP9u6IDD8DedDeQulxVxdn26xs4TZxFphEmYs0nd0AY=;
-        b=eZY4fQ2CDUGzB/A++kS/M1XRmcD3VlLdMnF4EIr8He4j6QSxYI3LSRAQrLPXR9KcCU
-         Sk+dT+bXJeEN1iTm74kEEj+GMutFHHRP2TIVcK7Qg1ZuvtALHBUxHykiQxUCVsZ/kuHn
-         WL1qFsp2gGxr9gslnz+HU6ZWL/5gtzL3yHm5WZKkOovNpJUlVbSoZMQYSlYTmeOd/ULP
-         MNP0HLNtsyR9FeycxpH73TYW/Lj5i/HjvVqGfD5vmBiWd/VHMyQn1eER9pPGypz5FZYM
-         SVzTQ5/2fwuWSIc+5S3lMNEX26xcC2iD4bMfyg4UDIcPi7tEuai+HRDGID0vYBxYNByB
-         RG1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWhbPcs33b3E5oAJlqLWknPDys8pls7KaXWC4xwAxtrIOr3cl0cgYvz/dY1LqbKn09nhIN/DvFdr8bEWGM=@vger.kernel.org, AJvYcCWtCLAceuvDiu/3c7c72L+ccvwlS6X/hn1gchm6UC4lCBr6UVvUqqFaQxWekO+7b8FsICrxKRI6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6mn+1qWxduvNKVe+A7kgMFny7jc5nCLTUIbzPtWbSX4R73q2x
-	QXMpIwVJ251UFZGX3C+3RSAmJgKvXOY/sk1zE1xE8gwpB6d0INka8DvoSmK9v77wn4LaCPleAXB
-	UKk3zNLHHRub3lRrk/3w4/mWd+gSEee0=
-X-Gm-Gg: ASbGncul95fX7Y5gqWva7VfXun2qvAJC8q4orl5fKXsDogbSesQoBZFBj3ztte3wRZ4
-	wBBxTr6NTKrfIxgIISYJSxQIyUEQ2KLQ8HzgBv/369txjm+tF7Ci0Xj6uj6fAhKpsDOCZBPnLIB
-	1PtL5Qo2ffMmiDw+aQxDQc6F7OxcEPq8wFz8B+OuWqfHEN7Lue+q0apf2enFhPyFT3TAjj4PYhG
-	Zutm+L+XHXRzTnu
-X-Google-Smtp-Source: AGHT+IFEJoPaNt7tgEVdA9038q9wZC7h1mgWs+ysmO1YruDQCgZ7grUdUWptBw+9V1QPVyWeWoh5iUy+M3r3jRfLweE=
-X-Received: by 2002:a05:6e02:168c:b0:3f1:6141:8a40 with SMTP id
- e9e14a558f8ab-3f4021cb5ffmr281884885ab.23.1756956422190; Wed, 03 Sep 2025
- 20:27:02 -0700 (PDT)
+        bh=8VhhM16Stf7vyA77g+HaAZhQu0TNv44cntB0IdQQAV4=;
+        b=RyxbJOKMXP8SSAnzApRZuBjVgsYQwX/56Kff/cBN4rj97p7Xg4EKAjB8GfoU0y5YdP
+         t/+FIxzOi9JGoCbAZj1nHU4+BW4K86PBy/AfyUT+GHbRgQkXNLZSF+wMT5x9an/xX6CX
+         WHvz+oWYrgMpusMxu7muIPMv9dmwFuPijr3xtNdR6SzN3dOFcdYdnpwt1SqhAwga1roP
+         BIWztxpvMyrTGjQsTsDtLH+rXBXLgm3Z+jUbuwUwzQaDFpy7KDKWshNfaK7k3de03fPk
+         GlBwD8X5sR5y5X5S3jX7E1I5ZhYjOwMYtQ1Fybgf6bXwzswGD642mdqD1VaVyga9ZQtK
+         yF8g==
+X-Forwarded-Encrypted: i=1; AJvYcCW39ylrYHhJ4naOMzaQFWVE6WfU2/Vxhw0EYVizIW3v+nEeWbW6E0hl6CBDyFGBvkZT5cGdANQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLAU8gwX0vmfqNnaOtPFcZr4ykWyp8n+ta6PQ/UQ4bpIDHHESp
+	MZhm/7sEhuamV0Or9DlzJ7y6V5TChSJQWbx1mhlsJnZl7K6iyaXHsO7UJhObQrOgrat04kVkPof
+	u0AuymBnyoUlYMyEqa8CK0yMb1aQucY4UztZ/yTL8lw==
+X-Gm-Gg: ASbGncsQr1/bNn1Lc3Y0lLDI/hTwyyOreqwo1SDJXUHLgpMsRw8euzjGkWOF4ma/HJO
+	sXXhqs517SEprvjGsnHBpDO/bvJU9eYV7o9CHxZfWg6hxuYT3xcmNJKxEJS1O3plXPLAVJJzJjB
+	O2LrDUZdIBPqA1T37DTsz1+1koW/EsCdl1+WFafA9n9VmIqJthviBZVz0aBAnw828KD+p0qqGgx
+	ePWJJmC4KgNQoFr7AwLsivIUmKkaQJK4kt/u8HIwBfrN55Kx2ztATSUdsOx6S0=
+X-Google-Smtp-Source: AGHT+IGzBhzHz6EsCdpX8zlmDcPUrnT7rfCaeQWIlJN2l0CB+B2qTgqLypR8Mhfahru8f6wrnnqX3weuqiRAVdajrpM=
+X-Received: by 2002:a05:6512:3b12:b0:55f:3ebc:133d with SMTP id
+ 2adb3069b0e04-55f708b5558mr5115245e87.21.1756958313081; Wed, 03 Sep 2025
+ 20:58:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903170716.595528-1-jackzxcui1989@163.com>
-In-Reply-To: <20250903170716.595528-1-jackzxcui1989@163.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 4 Sep 2025 11:26:26 +0800
-X-Gm-Features: Ac12FXwGF5iy9mf_S8K4jjwnYmB644KAbE1Rd4FOgkrdNcUrcjWYN8oW58ugqg0
-Message-ID: <CAL+tcoB0dbRnQUFqV9WEzZx+UxjYTt_yP21951HPvu9Dg9jxeg@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 2/2] net: af_packet: Use hrtimer to do the
- retire operation
-To: Xin Zhao <jackzxcui1989@163.com>
-Cc: willemdebruijn.kernel@gmail.com, edumazet@google.com, ferenc@fejes.dev, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250828-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v4-0-bfcd5033a77c@openai.com>
+ <20250828-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v4-2-bfcd5033a77c@openai.com>
+ <b840533a-25e1-4884-9d9e-222d9bf79635@gmail.com> <CADg4-L_83eNn9huME6tuZKeQWyG2xkKCUj9erqzMBGxWt=NKcA@mail.gmail.com>
+ <CAMB2axNT0rF_ToMcj9yagZE3VqHhQpB7MX=zSem5J1gyDqPJcw@mail.gmail.com>
+In-Reply-To: <CAMB2axNT0rF_ToMcj9yagZE3VqHhQpB7MX=zSem5J1gyDqPJcw@mail.gmail.com>
+From: Christoph Paasch <cpaasch@openai.com>
+Date: Wed, 3 Sep 2025 20:58:22 -0700
+X-Gm-Features: Ac12FXyEVxN5ZWKFYDlH8yCF6n5YGB2wVz9YT2Jh-cXuVpUpcRcRiv3hyYG7hic
+Message-ID: <CADg4-L-b9SzPN8EDOc3h_TVAnfTFPQXWpYd3vYD1exXGdH_kOQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/2] net/mlx5: Avoid copying payload to the
+ skb's linear part
+To: Amery Hung <ameryhung@gmail.com>
+Cc: Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 4, 2025 at 1:07=E2=80=AFAM Xin Zhao <jackzxcui1989@163.com> wro=
+On Wed, Sep 3, 2025 at 5:12=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
 te:
 >
-> On Wed, Sep 3, 2025 at 00:42=E2=80=AF+0800 Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
->
-> > One more review from my side is that as to the removal of
-> > delete_blk_timer, I'm afraid it deserves a clarification in the commit
-> > message.
+> On Wed, Sep 3, 2025 at 4:57=E2=80=AFPM Christoph Paasch <cpaasch@openai.c=
+om> wrote:
 > >
-> > > > -       spin_unlock_bh(&rb_queue->lock);
-> > > > -
-> > > > -       prb_del_retire_blk_timer(pkc);
-> > > > -}
-> > > > -
->
-> In the description of [PATCH net-next v10 0/2] net: af_packet: optimize r=
-etire operation:
->
-> Changes in v8:
-> - Delete delete_blk_timer field, as suggested by Willem de Bruijn,
->   hrtimer_cancel will check and wait until the timer callback return and =
-ensure
->   enter enter callback again;
-
-I see the reason now :)
-
-Please know that the history changes through versions will finally be
-removed, only the official message that will be kept in the git. So
-this kind of change, I think, should be clarified officially since
-you're removing a structure member. Adding more descriptions will be
-helpful to readers in the future. Thank you.
-
->
-> I will also emphasize the removal of delete_blk_timer in the commit messa=
-ge for this 2/2
-> commit. The updated commit message for the 2/2 patch is as follows=EF=BC=
-=9A
->
-> Changes in v8:
-> - Simplify the logic related to setting timeout.
-> - Delete delete_blk_timer field, hrtimer_cancel will check and wait until
->   the timer callback return.
->
->
-> > I gradually understand your thought behind this modification. You're
-> > trying to move the timer operation out of prb_open_block() and then
-> > spread the timer operation into each caller.
+> > On Wed, Sep 3, 2025 at 4:39=E2=80=AFPM Amery Hung <ameryhung@gmail.com>=
+ wrote:
+> > >
+> > >
+> > >
+> > > On 8/28/25 8:36 PM, Christoph Paasch via B4 Relay wrote:
+> > > > From: Christoph Paasch <cpaasch@openai.com>
+> > > >
+> > > > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
+> > > > bytes from the page-pool to the skb's linear part. Those 256 bytes
+> > > > include part of the payload.
+> > > >
+> > > > When attempting to do GRO in skb_gro_receive, if headlen > data_off=
+set
+> > > > (and skb->head_frag is not set), we end up aggregating packets in t=
+he
+> > > > frag_list.
+> > > >
+> > > > This is of course not good when we are CPU-limited. Also causes a w=
+orse
+> > > > skb->len/truesize ratio,...
+> > > >
+> > > > So, let's avoid copying parts of the payload to the linear part. We=
+ use
+> > > > eth_get_headlen() to parse the headers and compute the length of th=
+e
+> > > > protocol headers, which will be used to copy the relevant bits ot t=
+he
+> > > > skb's linear part.
+> > > >
+> > > > We still allocate MLX5E_RX_MAX_HEAD for the skb so that if the netw=
+orking
+> > > > stack needs to call pskb_may_pull() later on, we don't need to real=
+locate
+> > > > memory.
+> > > >
+> > > > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NI=
+C and
+> > > > LRO enabled):
+> > > >
+> > > > BEFORE:
+> > > > =3D=3D=3D=3D=3D=3D=3D
+> > > > (netserver pinned to core receiving interrupts)
+> > > > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> > > >   87380  16384 262144    60.01    32547.82
+> > > >
+> > > > (netserver pinned to adjacent core receiving interrupts)
+> > > > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
+> > > >   87380  16384 262144    60.00    52531.67
+> > > >
+> > > > AFTER:
+> > > > =3D=3D=3D=3D=3D=3D
+> > > > (netserver pinned to core receiving interrupts)
+> > > > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> > > >   87380  16384 262144    60.00    52896.06
+> > > >
+> > > > (netserver pinned to adjacent core receiving interrupts)
+> > > >   $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
+> > > >   87380  16384 262144    60.00    85094.90
+> > > >
+> > > > Additional tests across a larger range of parameters w/ and w/o LRO=
+, w/
+> > > > and w/o IPv6-encapsulation, different MTUs (1500, 4096, 9000), diff=
+erent
+> > > > TCP read/write-sizes as well as UDP benchmarks, all have shown equa=
+l or
+> > > > better performance with this patch.
+> > > >
+> > > > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+> > > > ---
+> > > >   drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 5 +++++
+> > > >   1 file changed, 5 insertions(+)
+> > > >
+> > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/driv=
+ers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > index 8bedbda522808cbabc8e62ae91a8c25d66725ebb..792bb647ba28668ad77=
+89c328456e3609440455d 100644
+> > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > @@ -2047,6 +2047,8 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx=
+5e_rq *rq, struct mlx5e_mpw_info *w
+> > > >               dma_sync_single_for_cpu(rq->pdev, addr + head_offset,=
+ headlen,
+> > > >                                       rq->buff.map_dir);
+> > > >
+> > > > +             headlen =3D eth_get_headlen(skb->dev, head_addr, head=
+len);
+> > > > +
+> > >
+> > > Hi,
+> > >
+> > > I am building on top of this patchset and got a kernel crash. It was
+> > > triggered by attaching an xdp program.
+> > >
+> > > I think the problem is skb->dev is still NULL here. It will be set la=
+ter by:
+> > > mlx5e_complete_rx_cqe() -> mlx5e_build_rx_skb() -> eth_type_trans()
 > >
-> > You probably miss the following call trace:
-> > packet_current_rx_frame() -> __packet_lookup_frame_in_block() ->
-> > prb_open_block() -> _prb_refresh_rx_retire_blk_timer()
-> > ?
+> > Hmmm... Not sure what happened here...
+> > I'm almost certain I tested with xdp as well...
 > >
-> > May I ask why bother introducing so many changes like this instead of
-> > leaving it as-is?
+> > I will try again later/tomorrow.
+> >
 >
+> Here is the command that triggers the panic:
 >
+> ip link set dev eth0 mtu 8000 xdp obj
+> /root/ksft-net-drv/net/lib/xdp_native.bpf.o sec xdp.frags
 >
+> and I should have attached the log:
 >
-> Consider the following timing sequence:
-> timer   cpu0 (softirq context, hrtimer timeout)                cpu1 (proc=
-ess context)
-> 0       hrtimer_run_softirq
-> 1         __hrtimer_run_queues
-> 2           __run_hrtimer
-> 3             prb_retire_rx_blk_timer_expired
-> 4               spin_lock(&po->sk.sk_receive_queue.lock);
-> 5               _prb_refresh_rx_retire_blk_timer
-> 6                 hrtimer_forward_now
-> 7               spin_unlock(&po->sk.sk_receive_queue.lock)
-> 8             raw_spin_lock_irq(&cpu_base->lock);              tpacket_rc=
-v
-> 9             enqueue_hrtimer                                    spin_loc=
-k(&sk->sk_receive_queue.lock);
-> 10                                                               packet_c=
-urrent_rx_frame
-> 11                                                                 __pack=
-et_lookup_frame_in_block
-> 12            finish enqueue_hrtimer                                 prb_=
-open_block
-> 13                                                                     _p=
-rb_refresh_rx_retire_blk_timer
-> 14                                                                       =
-hrtimer_is_queued(&pkc->retire_blk_timer) =3D=3D true
-> 15                                                                       =
-hrtimer_forward_now
-> 16                                                                       =
-  WARN_ON
-> On cpu0 in the timing sequence above, enqueue_hrtimer is not protected by=
- sk_receive_queue.lock,
-> while the hrtimer_forward_now is not protected by raw_spin_lock_irq(&cpu_=
-base->lock).
->
-> In my previous email, I provided an explanation. As a supplement, I would
-> like to reiterate a paragraph from my earlier response to Willem.
-> The point is that when the hrtimer is in the enqueued state, you cannot
+> [ 2851.287387] BUG: kernel NULL pointer dereference, address: 00000000000=
+00100
+> [ 2851.301329] #PF: supervisor read access in kernel mode
+> [ 2851.311602] #PF: error_code(0x0000) - not-present page
+> [ 2851.321879] PGD 0 P4D 0
+> [ 2851.326944] Oops: Oops: 0000 [#1] SMP
+> [ 2851.334272] CPU: 11 UID: 0 PID: 0 Comm: swapper/11 Kdump: loaded
+> Tainted: G S          E       6.17.0-rc1-gcf50ef415525 #305 NONE
+> [ 2851.357759] Tainted: [S]=3DCPU_OUT_OF_SPEC, [E]=3DUNSIGNED_MODULE
+> [ 2851.369252] Hardware name: Wiwynn Delta Lake MP/Delta Lake-Class1,
+> BIOS Y3DL401 09/04/2024
+> [ 2851.385787] RIP: 0010:eth_get_headlen+0x16/0x90
+> [ 2851.394850] Code: 5e 41 5f 5d c3 b8 f2 ff ff ff eb f0 cc cc cc cc
+> cc cc cc cc 0f 1f 44 00 00 41 56 53 48 83 ec 10 89 d3 83 fa 0e 72 68
+> 49 89 f6 <48> 8b bf 00 01 00 00 44 0f b7 4e 0c c7 44 24 08 00 00 00 00
+> 48 c7
+> [ 2851.432413] RSP: 0018:ffffc90000720cc8 EFLAGS: 00010212
+> [ 2851.442864] RAX: 0000000000000000 RBX: 000000000000008a RCX: 000000000=
+00000a0
+> [ 2851.457141] RDX: 000000000000008a RSI: ffff8885a5aee100 RDI: 000000000=
+0000000
+> [ 2851.471417] RBP: ffff8883d01f3900 R08: ffff888204c7c000 R09: 000000000=
+0000000
+> [ 2851.485696] R10: ffff8883d01f3900 R11: ffff8885a5aee340 R12: ffff8885a=
+dd00030
+> [ 2851.499969] R13: ffff8885add00030 R14: ffff8885a5aee100 R15: 000000000=
+0000000
+> [ 2851.514245] FS:  0000000000000000(0000) GS:ffff8890b4427000(0000)
+> knlGS:0000000000000000
+> [ 2851.530433] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 2851.541931] CR2: 0000000000000100 CR3: 000000107d412003 CR4: 000000000=
+07726f0
+> [ 2851.556208] PKRU: 55555554
+> [ 2851.561623] Call Trace:
+> [ 2851.566514]  <IRQ>
+> [ 2851.570540]  mlx5e_skb_from_cqe_mpwrq_nonlinear+0x7af/0x8d0
+> [ 2851.581689]  mlx5e_handle_rx_cqe_mpwrq+0xbc/0x180
+> [ 2851.591096]  mlx5e_poll_rx_cq+0x2ef/0x780
+> [ 2851.599114]  mlx5e_napi_poll+0x10c/0x710
+> [ 2851.606959]  __napi_poll+0x28/0x160
+> [ 2851.613934]  net_rx_action+0x1c0/0x350
+> [ 2851.621434]  ? mlx5_eq_comp_int+0xdf/0x190
+> [ 2851.629628]  ? sched_clock+0x5/0x10
+> [ 2851.636603]  ? sched_clock_cpu+0xc/0x170
+> [ 2851.644450]  handle_softirqs+0xd8/0x280
+> [ 2851.652121]  __irq_exit_rcu.llvm.7416059615185659459+0x44/0xd0
+> [ 2851.663788]  common_interrupt+0x85/0x90
+> [ 2851.671457]  </IRQ>
+> [ 2851.675653]  <TASK>
+> [ 2851.679850]  asm_common_interrupt+0x22/0x40
 
-How about tring hrtimer_is_queued() beforehand?
+Oh, I see why I didn't hit the bug when testing with xdp... I wasn't
+using a multi-buffer xdp prog and thus had to reduce the MTU and so
+ended up not using the mlx5e_skb_from_cqe_mpwrq_nonlinear()
+code-path...
 
-IIUC, with this patch applied, we will lose the opportunity to refresh
-the timer when the lookup function (in the above path I mentioned)
-gets called compared to before. If the packet socket tries to look up
-a new block and it doesn't update its expiry time, the timer will soon
-wake up. Does it sound unreasonable?
+I can reproduce the panic and will fix it.
 
-Thanks,
-Jason
 
-> call interfaces like hrtimer_forward_now. The kernel has a WARN_ON check
-> in hrtimer_forward_now for this reason. Similarly, you also cannot call
-> interfaces like hrtimer_set_expires. The kernel does not include a WARN_O=
-N
-> check in hrtimer_set_expires to avoid increasing the code size, as
-> hrtimer_set_expires is an inline function.
+Christoph
+
 >
+> Thanks for taking a look!
+> Amery
 >
-> Thanks
-> Xin Zhao
->
+> > Thanks!
+> > Christoph
+> >
+> > >
+> > >
+> > > >               frag_offset +=3D headlen;
+> > > >               byte_cnt -=3D headlen;
+> > > >               linear_hr =3D skb_headroom(skb);
+> > > > @@ -2123,6 +2125,9 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx=
+5e_rq *rq, struct mlx5e_mpw_info *w
+> > > >                               pagep->frags++;
+> > > >                       while (++pagep < frag_page);
+> > > >               }
+> > > > +
+> > > > +             headlen =3D eth_get_headlen(skb->dev, mxbuf->xdp.data=
+, headlen);
+> > > > +
+> > > >               __pskb_pull_tail(skb, headlen);
+> > > >       } else {
+> > > >               if (xdp_buff_has_frags(&mxbuf->xdp)) {
+> > > >
+> > >
 
