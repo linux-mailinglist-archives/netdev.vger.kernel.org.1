@@ -1,100 +1,80 @@
-Return-Path: <netdev+bounces-219994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C96B441CD
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 18:01:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BDE6B44201
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 18:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A11C93B9BA3
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 16:00:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F4881BC4F25
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 16:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745ED2FE050;
-	Thu,  4 Sep 2025 16:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5212C1595;
+	Thu,  4 Sep 2025 16:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0KCWZz9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ie6a77vf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF632D46D9;
-	Thu,  4 Sep 2025 16:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617EB286426;
+	Thu,  4 Sep 2025 16:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757001604; cv=none; b=FcoOYM1nKU8iDLsR55MySWPoPYkSEja076HZiXJ07KFHLFzkGRQbvaGHJUKojCU1G+ll0JRijLrkzxrV0ANqBsd03TKye0hG09pRc6XZHdWI4ZF7/z9jrxvdnrn5HbkZbGnWRjBagnxdprW88cpw7g+P+GiIYbY/ZW3KN3FV8ag=
+	t=1757001783; cv=none; b=Iufa/QBcHX+SUJLi+I4bN5aMWguXK4ZmAidNJxgaBswNKW8srO2MrnE5cZNv88JrR14tEVtAHfXbBl+kACKY6O7vtiHZFAGzKuV9msvBcoj0/K2U9JPw/73S1EHpUzNQjzRKI8QBHMrHs2a7cIx+pLB1yX5V3dpCzcVD3Tap8lI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757001604; c=relaxed/simple;
-	bh=lolov3uCpPCGuy0ktlYST5T2fAnwkoiMuje9XHp4Whk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pb1VK8v2/3YuUig1s6cneVdt3gGIhQubg0NCvs2TsenZc2xWWPvZM47+ACOB50AngoLGZzX+b0UiPSo/hG90wz0cwecj6jXMY+R4og831145rTOkA2wgP6ZGEVYXPKVzOYm2PuIbC0Rd8x1pdl0huD9a4EbCjfU6XTW8fyWILnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0KCWZz9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26177C4CEF6;
-	Thu,  4 Sep 2025 16:00:04 +0000 (UTC)
+	s=arc-20240116; t=1757001783; c=relaxed/simple;
+	bh=TenZFDl1fP03GOEayZNK8u5iDEN9dJ/DGI5jmc9gK8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ccIRlmw+2Uxls5pzWDjWA9fLCv5u/INC6y8wBXO0+rJQIFTMbE2/2SRWXPIbAk2N29QYZbJwqXtBxvGn1773Ha/MmcrcR5cmDXIuCt+4cE5EucCHrESnpEtL3vUndJVzM19E9pS06ifMfpv0ULnBNCDA9UfRYNkbrUTwAOSU6N0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ie6a77vf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DB18C4CEF1;
+	Thu,  4 Sep 2025 16:03:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757001604;
-	bh=lolov3uCpPCGuy0ktlYST5T2fAnwkoiMuje9XHp4Whk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=H0KCWZz9BoTbXPDGYOrpYbri2qJsDdn8o1gvOvydYMTNUfconXlYKtNixB0kteWbz
-	 YAay5ddeGJujWpOsDKZ4XKGRTBWXvRTc/XXWQnjmCfH24w7I2L94SAPduOUegtLe+v
-	 /zYqj8eIc/KzLVAQyL14OqUwxI1vqtFIZOAgEyQ1vgR2F0+h9Zlb+wSgZZjHdNqFjk
-	 V7gQh3TC1tLMnwK5j+OGY8cZirXUZHye7uLaIeHRpGfMmnTXwA+QMjZer+io0E/g/+
-	 S7hzA4D70M+0dsftJuHXpr3uGHjpkzACJkeYS+iYGourWSy58udbfP2oseIxHXcO6b
-	 Cx3y9lI7aVSwQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D1A383BF69;
-	Thu,  4 Sep 2025 16:00:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1757001783;
+	bh=TenZFDl1fP03GOEayZNK8u5iDEN9dJ/DGI5jmc9gK8A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ie6a77vfe+eGDZBk/e9rreg2KsksttxfzJVc4u7iFWDeoypwL2xkiuQNlpg2fexPh
+	 60YemD6+3d2gHI6QT2mYbBpKsLyPrK+RLSfmesgALG3KezXFDPupSdWANB6rgn+ZGh
+	 8fzzcZLeGenbdsjV2NxgD2CXREYqKmmEJAGfzawX6eQw2RFxtD5xdwGaMUT6dk/BFA
+	 eGBEYxaRapvSixT9zBNQOlmQA5bFPtECZli+YmnheJ5tJQQste0acj2zcJ2gCUsnLy
+	 BjW8q9lwnqaiLKjdxOlBrhXhkuxd2jaRifzJULXMyQVK2La5GbVJk4CWpoeneKibsJ
+	 PMWgjPxXbfvGA==
+Date: Thu, 4 Sep 2025 09:03:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maksimilijan Marosevic <maksimilijan.marosevic@proton.me>
+Cc: davem@davemloft.net, dsahern@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev,
+ syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] ipv6: Check AF_UNSPEC in ip6_route_multipath_add()
+Message-ID: <20250904090301.552ef178@kernel.org>
+In-Reply-To: <20250804204233.1332529-1-maksimilijan.marosevic@proton.me>
+References: <20250804204233.1332529-1-maksimilijan.marosevic@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net/smc and s390/ism: Improve log messages
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175700160899.1861500.7487799283370248516.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Sep 2025 16:00:08 +0000
-References: <20250901145842.1718373-1-wintera@linux.ibm.com>
-In-Reply-To: <20250901145842.1718373-1-wintera@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
- sidraya@linux.ibm.com, wenjia@linux.ibm.com, aswin@linux.ibm.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, horms@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  1 Sep 2025 16:58:40 +0200 you wrote:
-> Separate these two improvements from the dibs layer series [1], as they are
-> actually unrelated.
+On Mon, 04 Aug 2025 20:42:53 +0000 Maksimilijan Marosevic wrote:
+> This check was removed in commit e6f497955fb6 ("ipv6: Check GATEWAY
+> in rtm_to_fib6_multipath_config().") as part of rt6_qualify_for ecmp().
+> The author correctly recognises that rt6_qualify_for_ecmp() returns
+> false if fb_nh_gw_family is set to AF_UNSPEC, but then mistakes
+> AF_UNSPEC for AF_INET6 when reasoning that the check is unnecessary.
+> This means certain malformed entries don't get caught in
+> ip6_route_multipath_add().
 > 
-> Link: https://lore.kernel.org/netdev/20250806154122.3413330-1-wintera@linux.ibm.com/ [1]
-> 
-> Alexandra Winter (2):
->   s390/ism: Log module load/unload
->   net/smc: Improve log message for devices w/o pnetid
-> 
-> [...]
+> This patch reintroduces the AF_UNSPEC check while respecting changes
+> of the initial patch.
 
-Here is the summary with links:
-  - [net-next,1/2] s390/ism: Log module load/unload
-    (no matching commit)
-  - [net-next,2/2] net/smc: Improve log message for devices w/o pnetid
-    https://git.kernel.org/netdev/net-next/c/c975e1dfcc92
+Hi Maksimilijan!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Are you planning to repost this with a test?
+If not I suppose we can enlist the author of the commit to help with
+the selftest..
 
