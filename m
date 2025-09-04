@@ -1,118 +1,109 @@
-Return-Path: <netdev+bounces-219884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F48B43963
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:58:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3819B439AA
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 13:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 389271C80281
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:58:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E25D587F02
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 11:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3985C2FAC05;
-	Thu,  4 Sep 2025 10:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6672FC002;
+	Thu,  4 Sep 2025 11:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Hceoe2W9"
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="dnmK9/UP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mail-m1973188.qiye.163.com (mail-m1973188.qiye.163.com [220.197.31.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032BB29B233;
-	Thu,  4 Sep 2025 10:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EA42EC08B;
+	Thu,  4 Sep 2025 11:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756983501; cv=none; b=lNnGwC4Dr6RnnU9rlyoZxeC2xKrOYgXyZigCgoNPm1+F3ImpKHP27S3Ld7FouwzzZuHxeUuG++gpNd/8Uy0ITwOg3gFuHVOmsZ9pLUZSUzLkKZqh7l6LWBfZ+MH3+Z1WpUK680Ms3SaqyL1Jcf+Ol6jG8EXs9nS6AKUa6NcikbQ=
+	t=1756984424; cv=none; b=FtP2WBGTXt6ouVHMuUy5nUaJPfxj9ftwj0t/1rfblcfoA3Odpio9+kCnPjFYMbGUGmg7MY3gkC+1p07/gDlcdZ64xoRtb14rLZPSfC3YZPqBBQ9USQhVksGI3EN9gYiuzHDwQ3M9TPsJF9GPd14wIWW3nzXZtP+CWWm8ZO9gN5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756983501; c=relaxed/simple;
-	bh=otwBCMWbzbMUnF3uxye8IWWKXIFYIahmm24+U7WrjCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HJgQZyQN348RUmBlw56doQ+Au3ZA9wYV5jjiYGRbjzcU8bPdZXZTzGiWg23TTpHcuwJTkK/Mm1M+4VzaybwC14nGHFLodfJj/XDzrWNRHvShFen2R3FQzjNhVinqy5GU4cwgh/faoYvJarKC1q8a+4OFyYPIbCynPmDTA5Fk79Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Hceoe2W9; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0+dGMtdtbtPkJn14dHatEx4CiUjsN+rJYDHVha04vms=; b=Hceoe2W9SjDvm+/UrrvyknUWpK
-	4OF4nbG9zdLI7FmDlGd4t+cGFfcNs4Cb8m8ZMZN5iNhs7TbMrSp1O+UEOs7eA8XtUpg2yyV58e8GO
-	ty2qX1Aqn19LOsV34Jjou2Xa1/fCJIv199mdEXYheDlPIa3WJzmRRg+I80XTOf5K64kX0tXQqb1y2
-	YcmwP26pbT0FzdCxUylGypZw8MXNbEi8scU3mmHiw1kQnlK+IRXmCjIyuiXgXQqrtI2gpe0xjLb0F
-	yJx9lmSLgBdwv/wouAniGZcCnEH9x4OiFPa0ZYqUqtVeIq7C6w77gA3OX8EuCUmVUUCyiptzkgim6
-	HL889VZA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55126)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uu7fN-000000001r8-1SFK;
-	Thu, 04 Sep 2025 11:58:09 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uu7fM-000000001S6-0098;
-	Thu, 04 Sep 2025 11:58:08 +0100
-Date: Thu, 4 Sep 2025 11:58:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
- contain invalid address
-Message-ID: <aLlwv3v8ACha8b-3@shell.armlinux.org.uk>
-References: <20250904031222.40953-3-ziyao@disroot.org>
+	s=arc-20240116; t=1756984424; c=relaxed/simple;
+	bh=VR+slzUaA5P3b/xmVtL0y9/SvFdjzQ6rC/I6OeGj5H0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bL0Q392HbzWj6Vyg5L8Is3ThzPJxS+wXsjLsUUqRhARZk8MjOB/YiUZ4NoTvt6TsQIz5fJR9Qjp+3b2tizEdnzMy/FIzkk3wytDTbkUqIKE2GuqXZGOXmO6AnCRn6ccqbIiu5X9Zero8i5Rk33mBgw3WW2pTQhrsWWW6yfgycJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=dnmK9/UP; arc=none smtp.client-ip=220.197.31.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
+Received: from [172.16.12.153] (unknown [58.22.7.114])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 21b2ecee9;
+	Thu, 4 Sep 2025 18:58:13 +0800 (GMT+08:00)
+Message-ID: <b0f9d781-6b8f-49dd-bfa1-456a26d01290@rock-chips.com>
+Date: Thu, 4 Sep 2025 18:58:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250904031222.40953-3-ziyao@disroot.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't contain
+ invalid address
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Simon Horman <horms@kernel.org>
+Cc: Yao Zi <ziyao@disroot.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
+References: <20250904031222.40953-3-ziyao@disroot.org>
+ <20250904103443.GH372207@horms.kernel.org>
+ <aLluvYQ-i-Z9vyp7@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+In-Reply-To: <aLluvYQ-i-Z9vyp7@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-HM-Tid: 0a991460843203abkunm7caaa1364336ff
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQktCT1ZOGEtOSEJLSE0dTEpWFRQJFh
+	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
+	hVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=dnmK9/UPjJ1KtwkXs3RJue/a/vLG/YZOsysbscDZnwQNDQ5c4C0amKOXSiZUmTfNj8kHxAwVGhJt7sRb1ow7t8d3Ekv6iAXbCUl6eiSd+h5CO81xKVPLvWmod1zbw4ATKS+DhKoAd5OkjF+3GaDMCJC5hwrLGmZOR2S/m/p7nWI=; c=relaxed/relaxed; s=default; d=rock-chips.com; v=1;
+	bh=oO8OiE3oPK2BXfQ71EAQVoAAmLr86e+akm6hPKvxYiw=;
+	h=date:mime-version:subject:message-id:from;
 
-On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
->  	if (plat->phy_node) {
->  		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
->  		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
-> -		/* If it is not integrated_phy, clk_phy is optional */
-> +		/*
-> +		 * If it is not integrated_phy, clk_phy is optional. But we must
-> +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
-> +		 * the error code could be wrongly taken as an invalid pointer.
-> +		 */
 
-I'm concerned by this. This code is getting the first clock from the DT
-description of the PHY. We don't know what type of PHY it is, or what
-the DT description of that PHY might suggest that the first clock would
-be.
+On 9/4/2025 6:49 PM, Russell King (Oracle) wrote:
+> On Thu, Sep 04, 2025 at 11:34:43AM +0100, Simon Horman wrote:
+>> Thanks, and sorry for my early confusion about applying this patch.
+>>
+>> I agree that the bug you point out is addressed by this patch.
+>> Although I wonder if it is cleaner not to set bsp_priv->clk_phy
+>> unless there is no error, rather than setting it then resetting
+>> it if there is an error.
+> +1 !
+>
+>> More importantly, I wonder if there is another bug: does clk_set_rate need
+>> to be called in the case where there is no error and bsp_priv->integrated_phy
+>> is false?
+> I think there's another issue:
+>
+> static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+> {
+> ...
+>          if (plat->phy_node) {
+>                  bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+> ...
+>
+> static void rk_gmac_remove(struct platform_device *pdev)
+> {
+> ...
+>          if (priv->plat->phy_node && bsp_priv->integrated_phy)
+>                  clk_put(bsp_priv->clk_phy);
+>
+> So if bsp_priv->integrated_phy is false, then we get the clock but
+> don't put it.
 
-However, we're geting it and setting it to 50MHz. What if the clock is
-not what we think it is?
+Yes! Just remove "bsp_priv->integrated_phy"
 
-I'm not sure we should be delving in to some other device's DT
-properties to then get resources that it _uses_ to then effectively
-take control those resources.
-
-I think we need way more detail on what's going on. Commit da114122b83
-merely stated:
-
-    For external phy, clk_phy should be optional, and some external phy
-    need the clock input from clk_phy. This patch adds support for setting
-    clk_phy for external phy.
-
-If the external PHY requires a clock supplied to it, shouldn't the PHY
-driver itself be getting that clock and setting it appropriately?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
