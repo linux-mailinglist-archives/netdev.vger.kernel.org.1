@@ -1,145 +1,103 @@
-Return-Path: <netdev+bounces-219851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB712B437AB
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 11:54:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 656A2B437AE
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 11:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95C033A854E
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 09:54:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B0F21B20FBE
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 09:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC422D3731;
-	Thu,  4 Sep 2025 09:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DA52D3731;
+	Thu,  4 Sep 2025 09:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="lXUfOehW";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jj4OQoB6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TD0N2Afy"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8C07081F;
-	Thu,  4 Sep 2025 09:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D177081F;
+	Thu,  4 Sep 2025 09:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756979650; cv=none; b=dn63/jf5WnR/rOFsmj+BFGCnfet9wFKNRvLPHz/bC//wg5iZAmjG0J2zhymbWU1I4k1jndvD77M3gI8xY9L29qPRgyMYXiyfigFsTYz8JUc3NNM2VVuCqgXlwv9r0MpEaa59g3JEKrTl57nxYoUOQgqfCqOz4ivhloCjlo3m9vk=
+	t=1756979703; cv=none; b=hdF8+SwRU7kY0E33xtvMYNgQfNWAqNvNh3IxPaAIQCi2hCfBWSrbfEGI6nAylwUV5CzkW4NytmHWzN2tFeWgIlCLHs+Rozgv0HJhYWXT7MUUTCHR0BkMb/p/EgdwyvxnDQBBe11b4H8Qp57WPrmrxgpCbs5lhEUCAw3kYEEgdfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756979650; c=relaxed/simple;
-	bh=VbZVS5Dg4DDI6OYnVGP2ic6emtQx1a8qK46eYzbd1iI=;
+	s=arc-20240116; t=1756979703; c=relaxed/simple;
+	bh=PkwoREsB9/pKPRtysjzXpw88sUFZQqfBBJxGudm+f48=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eogfm/vxw5Oc/eAjARZ8QZuIVDHWSwSYd1BIOkXWRYqegKHGFI7g07zcCOot3cafogdfYTFEwBnbVFouCcNuJO/hTim9xKQrMFmkVmmdCrdHeB3T8tyDcwBNSkya5ZuR+c8A8BzwbGgpNLY7B0r78E6JvdWxeDy+RwDdufNyGFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=lXUfOehW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jj4OQoB6; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 4BE8A14001F0;
-	Thu,  4 Sep 2025 05:54:06 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Thu, 04 Sep 2025 05:54:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1756979646; x=
-	1757066046; bh=b47tdDARfEiTwuQ3hf+5RWFsfXNqTxNJTg2FAkCOtvk=; b=l
-	XUfOehWOft9uDlScA3+oh0pL26WPX5Q2FGllngz2njoiaqnsbcvC14/A18DsEl8E
-	1yrWufLLCBt+pcGEyJFVvOg5/5FT/SJlyiGSWcZYAylC9Wp1m1KioJ6CRRUtLfT7
-	R4e/PT9IqniHuGizCRmgnqApuonHulvUY0qFfZn+zE2iJ5b6re+DWi6JzW4Ngrwk
-	ogb1IbqJXnQJgDk7Pt2ipIaXMpsdacHEo4uYIarAUdvfeW42E8ylaFdutFoc4aNw
-	kFHimInBzwn1UYMK//vwE+8Ou4pxhYtMZ6MN/hLoayp5DOKSUziQagF0Jg6Bq1Zk
-	4Obr9v9ZX0mi8o4+hmCmw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1756979646; x=1757066046; bh=b47tdDARfEiTwuQ3hf+5RWFsfXNqTxNJTg2
-	FAkCOtvk=; b=jj4OQoB67s5a0bCCfu+VoDdUJuiC152+JdZMAMd3kAKRWu/rX5b
-	7MF6gVt5QZ0iI9s2dc5ceZHL1nmTGCfQJZ3Aa9XQ9WfrXifvikE6Pb3J8cHJM59G
-	BEhscZC4CEnZJZYlAhKXxCia53lp9XzzYCHytMp9BTbZzJA/3SuqePnLfCTJ+4aH
-	UUt5HeOZwpwVOHz25MK76tR5gakx0gvFWEgW7FpLBC+hijgf0TbtPcKLclWSzUIP
-	1DbtMTDl1vzVgJtOxj/RTw8aT+WWVJFkP0zUIp9pO6XMwj7MflmNQWes2UnedVvH
-	APmzLBnEOBXyADE7SgCOTcv8Stok0f7LLwg==
-X-ME-Sender: <xms:vWG5aAyVPmhngvGNzdyC8wEoEazSYva0DXr9P10c8GGB97GRXyKeBw>
-    <xme:vWG5aI3RGU7E7Kp5Cmd5qU28FVfn4QsZHbCR0l64BTtV1WwI8Fvo0GWyj6fVfcSSE
-    v8aG150n73gnS5sUZs>
-X-ME-Received: <xmr:vWG5aPdmHyjpcd9Mmlxe4rVvAVXhoaGiGBWHB3ZnuxiSkZ0_jUvdbg0S24Us>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehjeduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvuefffefg
-    udffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
-    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtohepfihilhhfrhgvugdrohhpvghnshhouhhrtggvse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
-    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
-    rghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtohepjhhohhhnrdhfrghsthgr
-    sggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:vWG5aFVSUKzu3lL76TbjuZE4561OxO7Nr_z2JE16FKRXL0air6IbdQ>
-    <xmx:vWG5aP-AvKsk6f3YZ9FQ6xYnivFmNEdPdBdGChT2k-XkQWWTp6F9jg>
-    <xmx:vWG5aHimAjWLAHuG_oRjyRIGoLxipxgHz6o1imOQ5bHAeRWpbqaZVQ>
-    <xmx:vWG5aDfVt5U1wSRK5VZXN4hPPcMl3OyPYw7_VtNGq9q9fYkObvkwYg>
-    <xmx:vmG5aPOdtRs-jLpk28JFvnYPyUbEFo1zDO8w3DdEbYbqH5QFAQscnKS1>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 4 Sep 2025 05:54:05 -0400 (EDT)
-Date: Thu, 4 Sep 2025 11:54:03 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Wilfred Mallawa <wilfred.opensource@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	john.fastabend@gmail.com, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alistair.francis@wdc.com, dlemoal@kernel.org,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>
-Subject: Re: [PATCH v3] net/tls: support maximum record size limit
-Message-ID: <aLlhuyBQ8C610qv-@krikkit>
-References: <20250903014756.247106-2-wilfred.opensource@gmail.com>
- <aLgVCGbq0b6PJXbY@krikkit>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gCwWhwtjOvdlreqZS0/64IB7eOYuKMKIBshL/AlEroHVgJx9Lwpo5S3JulF63nIuUUvIII7P4GTYXBJJ3mVxjk6kwRh+vZLfeCo+55uYnvZ9mWi2kfH8FjPloZST2G6R3bzTjdzh2ZgphCVpJixPvqm5dr3DRCLqkXK6i2vzr4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TD0N2Afy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3B5FC4CEF1;
+	Thu,  4 Sep 2025 09:54:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756979702;
+	bh=PkwoREsB9/pKPRtysjzXpw88sUFZQqfBBJxGudm+f48=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TD0N2AfykrOHqznsu9h1ZxeWsqAwTt0PUB0Iftz9PpWRbfPjknJt4qVMDq3BLA81i
+	 eI6ZQHOafWau1RyiBiHCISdcsQ8n2ALkLIW9Xbq5b+gQu66zDctJG17dCXnH9QxPMU
+	 B2Ay/I4KM9GO+/+4LVDKXTDq2iGmDidL3t6eHAZHpvpOcpyimiT0DmK2wIYU0OoTSo
+	 33enSCOo3P57BkyNnRf16VpjQHzu9zrL0IH4g+B520euaqSqIFnSDVi93kNZ4MFvVo
+	 XxOE+R6Fn74sYv34SsqQxiE96EdBQOeUXUsMGDuKIl8stF4HG0e45zYe2r91WJqNoJ
+	 0f+lTV2ZzxXog==
+Date: Thu, 4 Sep 2025 10:54:57 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
+ contain invalid address
+Message-ID: <20250904095457.GE372207@horms.kernel.org>
+References: <20250904031222.40953-3-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aLgVCGbq0b6PJXbY@krikkit>
+In-Reply-To: <20250904031222.40953-3-ziyao@disroot.org>
 
-2025-09-03, 12:14:32 +0200, Sabrina Dubroca wrote:
-> 2025-09-03, 11:47:57 +1000, Wilfred Mallawa wrote:
-> Pushing out the pending "too big" record at the time we set
-> tx_record_size_limit would likely make the peer close the connection
-> (because it's already told us to limit our TX size), so I guess we'd
-> have to split the pending record into tx_record_size_limit chunks
-> before we start processing the new message (either directly at
-> setsockopt(TLS_INFO_TX_RECORD_SIZE_LIM) time, or the next send/etc
-> call). The final push during socket closing, and maybe some more
-> codepaths that deal with ctx->open_rec, would also have to do that.
+On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
+> We must set the clk_phy pointer to NULL to indicating it isn't available
+> if the optional phy clock couldn't be obtained. Otherwise the error code
+> returned by of_clk_get() could be wrongly taken as an address, causing
+> invalid pointer dereference when later clk_phy is passed to
+> clk_prepare_enable().
 > 
-> I think additional selftests for
->     send(MSG_MORE), TLS_INFO_TX_RECORD_SIZE_LIM, send
-> and
->     send(MSG_MORE), TLS_INFO_TX_RECORD_SIZE_LIM, close
-> verifying the received record sizes would make sense, since it's a bit
-> tricky to get that right.
+> Fixes: da114122b831 ("net: ethernet: stmmac: dwmac-rk: Make the clk_phy could be used for external phy")
+> Signed-off-by: Yao Zi <ziyao@disroot.org>
 
-Hmm, after thinking about this a bit more, maybe we don't need to
-care? There could be more records larger than the new limit already
-pushed out to TCP but not received by the peer, and we can't do
-anything about those.
+...
 
-I suspect it's not a problem in practice because of what the TLS
-exchange between the peers setting up this extension looks like? (ie,
-there should never be an open record at this stage - unless userspace
-delays doing this setsockopt after getting the message from the peer,
-but then maybe we can call that a buggy userspace)
+Hi,
 
--- 
-Sabrina
+I this patch doesn't seem to match upstream code.
+
+Looking over the upstream code, it seems to me that
+going into the code in question .clk_phy should
+be NULL, as bsp_priv it is allocated using devm_kzalloc()
+over in rk_gmac_setup()
+
+While the upstream version of the code your patch modifies
+is as follows. And doesn't touch .clk_phy if integrated_phy is not set.
+
+        if (plat->phy_node && bsp_priv->integrated_phy) {
+                bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+                ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+                if (ret)
+                        return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+                clk_set_rate(bsp_priv->clk_phy, 50000000);
+        }
+
+Am I missing something?
 
