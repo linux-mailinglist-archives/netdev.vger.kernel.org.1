@@ -1,68 +1,90 @@
-Return-Path: <netdev+bounces-219785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D003B42F7F
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 04:13:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A3D4B42F81
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 04:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28924680F3E
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:13:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F367F680CEC
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9371E3DE5;
-	Thu,  4 Sep 2025 02:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05201DF965;
+	Thu,  4 Sep 2025 02:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="jej/3PHh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZIy48jA"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08841E3DF2;
-	Thu,  4 Sep 2025 02:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5E01DF75A;
+	Thu,  4 Sep 2025 02:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756951929; cv=none; b=SR7ZT1kAftgjmrPqEKWvDWAi6RhTPmXTvCgahRWbishhQQYuFpGj50Fy7fS7XXRPpJo2LN1goWnmI8i4hd1KIH/RZWU1z4++Y4NwokvfzDQ3luKK4ESuohJV7uWjhPnMCL72AR7yLIIQBZJuw1IYw/qSAdeXLiF9DrvmiOF3/Fk=
+	t=1756952025; cv=none; b=H0WHza/3OWGZ6RZOqx7xdRxypgK/D6iQh5tTTaN7MrceTbSNY8S+8xxELvD0kwdZFLnp6dEEG/4fFWfl4GjcJ93trROYDYlFAr0GW94zvIZdhNa9HYW9QybyR9u+ydkqHgwpFPpkIehamB0TmY72+KDjVHW783LOPXvKb2flP+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756951929; c=relaxed/simple;
-	bh=elo34a7kXzxnuVCXuHUnNsz4xvsXFb4e0AwTQYIPjqQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ukj39bTOE4oDQD0QU10tWr1rsqr2xrgPROUaQgtPzmxEJJKAjQ5rCGOYsKK2vPYX2X4XmTu2VDzURE9ps2tC/oVVKh+u1fewjiRVmPGQyf437Cyb0QywOX7IvfejMehH3/DBk1MHBUXQ5PGoIjrDGqsuv1tUdGR1ED8dViRShaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=jej/3PHh; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 5842BSx043060713, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1756951889; bh=4NjR6lrJbCSVIfVV84b0NexDgbOS+5WtG1RVDA5wIj0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=jej/3PHhWcaY2tKDD5pMvjnIP7N0IH8yDuocuclZL9VxkO9tJeENHFx3OdnVRAY+Z
-	 eIg4i+HUVozvaKXbq7kO0rmtesTnyP7jmhjGBIF311N/VxPhrCj7/KJnPnZxueStsK
-	 VgIZQmbl4B24rz1P4yEJm/Xu9rf88Qpxk+XpjR95zK2KEbq2NxfCSsUgvilNgIDkk1
-	 x0Tm8blS2Kn0uVJumxkPC9pYGyEMe1tCQE5lJFHxMvEnPl9lBcFF5WDQ+nIrQ/kPP0
-	 /YDvnbl2QWsm0hFbFlOOqMI3AYipgV+REn2r4JbThzBQoIxoed0JiSPio01p4LOKcv
-	 /+fXoYsQOPFgw==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 5842BSx043060713
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 4 Sep 2025 10:11:29 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.33; Thu, 4 Sep 2025 10:11:28 +0800
-Received: from 172.29.32.27 (172.29.32.27) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.1544.33 via Frontend
- Transport; Thu, 4 Sep 2025 10:11:28 +0800
-From: ChunHao Lin <hau@realtek.com>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        ChunHao Lin
-	<hau@realtek.com>
-Subject: [PATCH net-next] r8169: set EEE speed down ratio to 1
-Date: Thu, 4 Sep 2025 10:11:23 +0800
-Message-ID: <20250904021123.5734-1-hau@realtek.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756952025; c=relaxed/simple;
+	bh=3g7cY+03XIWLWUoKFNp3F/aqlhRv74KCmVg2qDPm5W0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TnQeabAG9ZGHoevG1q9ysyI1VkE7pZ3wftLqiKl0Is5Ryx7usYJk06XTObVcZGT+uigpVX6dGWOEEfDPlYQ1vFJ7ItaHEJYAB3o29QVJlKM8Ln+fGJ0Fu40FJiU5gYBnhoC7aLgIq+itvnpAt6SORmqtB6F7W8CZErUtZLPndbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZIy48jA; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7722c88fc5fso536904b3a.2;
+        Wed, 03 Sep 2025 19:13:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756952024; x=1757556824; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3hUrML5WljsUlFCqa+ikOvh0WLrz2uOx6fHEzlvAb34=;
+        b=eZIy48jAwE8HH1RiA7UVfduIZLUZNNw6CKg/7vTQHCp4fuxrSNLiEJPMCYzIB/Oy4s
+         1uCog4SktbYruZzVwhtfoTGmpa4xRkE9sGgmea6HrmrynfmH2/ea5uNuCxLxnVeRQWxo
+         Q3P6d7Hxs2p2gy0P0BEsEgCx8OYKy1DdmfKvLS7CfZ/avLAbhgPWJevYhjle9nZlnpnt
+         NaZbsyGPvU5gE4oH2Sl7G/mrYYsSLE93BwMwUAvRb79oNkUUWfL+OmzguXhWAqO5MKDF
+         +2ZSzk7QlNS9UbNPANsnBkwmIG8rOpr6HarFxnpWkV3344J+6kadDZfSj2xpIIIR73lq
+         ZWLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756952024; x=1757556824;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3hUrML5WljsUlFCqa+ikOvh0WLrz2uOx6fHEzlvAb34=;
+        b=naprSQbuKfijn/AlONLSt4UYbovM5J0jf7T99Nh74VnmxhW8XNhIF0BrZwIXOaqQ/6
+         B+J3FlPABO0Lakz+1my6JyJBGOxVgrv4HEnMdYKBbMVDsvPg33DbQ7HT8/pmjzxT+p2H
+         RTvcyHkWsK2TXQ+OzKqnU3qCdbsi9Niwm+ZuLn/4gvS/zKT5FRR0j6YQT0L7Ar/xWq2e
+         4KmjXLqXuMIvsWucsXY9J4enctYX0wd3k5t5555HF8tS+WZE7Mp5V14Ax3col4/RF3Hd
+         SfNiB2YPqX+2NIhJ73wwKQ71VrvyODZ/lr6DB7cSiO/8mDjiBHBOlOuAnltLci+nFH4s
+         SITw==
+X-Forwarded-Encrypted: i=1; AJvYcCVLt73kchFckVwE3v1vJgHJ79GhZLKyxi3ltgEz0GMGTztOM6X5g+gutfVvUoljFm3feA5uDKGZ@vger.kernel.org, AJvYcCVamgXcNCvxmGgSP7ryGPF7K+Oh/DlrGskqUKyIUqBuHfoLiyforWMG6CxalyaRKWv8eHed1xke9fm9@vger.kernel.org, AJvYcCWAHUTE1xWW7RlS+6r91s5PNsDdMt1m9CUjVvHD9gq2QTtys+XzWudIy76+cI1wwelxyL4tnkEYfbCLSJE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya4D+GHy7IYf+TSL5xOC9deuH4YbDi8aVurqMUwha5rNndByuc
+	oETtI3Mlovmtjp/afN2n+mq2Bldy6Me0Ce2IB+6XLccOdJQTyp7i1Ize
+X-Gm-Gg: ASbGnctOdaE8TFPfNqwbyoZam94v6+3IqWJPu/cEaikIJpFG7IEN322ni1h0/JPYLDR
+	8fj3ny/wa0toO8DOQ6ABMcwNKCrxLZCOaHDJj5asgGrGCBcPfXN6Jx6AagLAd9vNHr1TnHyWgBd
+	pk/3CvFBrCYe12J/H5A9exuvzrG2r0hscPX+tsZ2v+hrYHgcqH7cJWRvkMU4k+o4D/D7nPKNwap
+	YuEbHCCZNWN7sdjOeh+IwMbtjYhPDPjH+19SY2eseZGdntd4LWMJOPQiimCpHlRtNDKx5dgaVOC
+	WRvEs0AZr/9VVnTVbgVib/v1HLqncyhjxXmped1zC+Ug0Iq3ejl1N6C2qM7A1PvK5DzLF03DUNa
+	qeiDZQCFWXy0PceNWVfTlKQFZ
+X-Google-Smtp-Source: AGHT+IF9X57LhT2xyoyX21PxzcP6C6ovW9Qg3hf6aWtPbtciUJUmtB+wCBsuYJCDRZwrBWc/16R0/g==
+X-Received: by 2002:a05:6a00:114b:b0:76e:8e95:1382 with SMTP id d2e1a72fcca58-7723e1f466cmr17967981b3a.5.1756952023447;
+        Wed, 03 Sep 2025 19:13:43 -0700 (PDT)
+Received: from gmail.com ([223.166.84.15])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77241f08b45sm13976803b3a.22.2025.09.03.19.13.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 19:13:43 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Felix Fietkau <nbd@nbd.name>
+Subject: [RFC PATCH net-next] ppp: enable TX scatter-gather
+Date: Thu,  4 Sep 2025 10:13:28 +0800
+Message-ID: <20250904021328.24329-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,49 +92,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-EEE speed down ratio (mac ocp 0xe056[7:4]) is used to control EEE speed down
-rate. The larger this value is, the more power can save. But it actually save
-less power then expected, but will impact compatibility. So set it to 1 (mac
-ocp 0xe056[7:4] = 0) to improve compatibility.
+When chan->direct_xmit is true, and no compressors are in use, PPP
+prepends its header to a skb, and calls dev_queue_xmit directly. In this
+mode the skb does not need to be linearized.
+Enable NETIF_F_SG and NETIF_F_FRAGLIST if chan->direct_xmit is true, so
+the networking core can transmit non-linear skbs directly. The
+compressors still require a linear buffer so call skb_linearize() before
+passing skb->data to them.
+This is required to support PPPoE GSO.
 
-Signed-off-by: ChunHao Lin <hau@realtek.com>
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+RFC:
+ This depends on a pending fix:
+  https://lore.kernel.org/netdev/20250903100726.269839-1-dqfext@gmail.com/
+ There are also alternative approaches:
+ - set SG and FRAGLIST unconditionally, and use skb_linearize()
+   on !chan->direct_xmit paths.
+ - don't use skb_linearize(), instead fix the compressors to handle
+   non-linear sk_buffs.
+ - conditionally set SG and FRAGLIST based on whether compressors are
+   in use.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 9c601f271c02..e5427dfce268 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -3409,7 +3409,7 @@ static void rtl_hw_start_8168h_1(struct rtl8169_private *tp)
- 		r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1ms_ini);
+ drivers/net/ppp/ppp_generic.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index f9f0f16c41d1..3bf37871a1aa 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -1710,6 +1710,12 @@ pad_compress_skb(struct ppp *ppp, struct sk_buff *skb)
+ 		ppp->xcomp->comp_extra + ppp->dev->hard_header_len;
+ 	int compressor_skb_size = ppp->dev->mtu +
+ 		ppp->xcomp->comp_extra + PPP_HDRLEN;
++	/* Until we fix the compressor need to make sure data portion is
++	 * linear.
++	 */
++	if (skb_linearize(skb))
++		return NULL;
++
+ 	new_skb = alloc_skb(new_skb_size, GFP_ATOMIC);
+ 	if (!new_skb) {
+ 		if (net_ratelimit())
+@@ -1797,6 +1803,12 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
+ 	case PPP_IP:
+ 		if (!ppp->vj || (ppp->flags & SC_COMP_TCP) == 0)
+ 			break;
++		/* Until we fix the compressor need to make sure data portion
++		 * is linear.
++		 */
++		if (skb_linearize(skb))
++			goto drop;
++
+ 		/* try to do VJ TCP header compression */
+ 		new_skb = alloc_skb(skb->len + ppp->dev->hard_header_len - 2,
+ 				    GFP_ATOMIC);
+@@ -3516,10 +3528,13 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 		ret = -ENOTCONN;
+ 		goto outl;
  	}
- 
--	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0070);
-+	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0000);
- 	r8168_mac_ocp_modify(tp, 0xe052, 0x6000, 0x8008);
- 	r8168_mac_ocp_modify(tp, 0xe0d6, 0x01ff, 0x017f);
- 	r8168_mac_ocp_modify(tp, 0xd420, 0x0fff, 0x047f);
-@@ -3514,7 +3514,7 @@ static void rtl_hw_start_8117(struct rtl8169_private *tp)
- 		r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1ms_ini);
- 	}
- 
--	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0070);
-+	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0000);
- 	r8168_mac_ocp_write(tp, 0xea80, 0x0003);
- 	r8168_mac_ocp_modify(tp, 0xe052, 0x0000, 0x0009);
- 	r8168_mac_ocp_modify(tp, 0xd420, 0x0fff, 0x047f);
-@@ -3715,7 +3715,7 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
- 	r8168_mac_ocp_modify(tp, 0xc0b4, 0x0000, 0x000c);
- 	r8168_mac_ocp_modify(tp, 0xeb6a, 0x00ff, 0x0033);
- 	r8168_mac_ocp_modify(tp, 0xeb50, 0x03e0, 0x0040);
--	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
-+	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0000);
- 	r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
- 	r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
- 	if (tp->mac_version == RTL_GIGA_MAC_VER_70 ||
+-	if (pch->chan->direct_xmit)
++	if (pch->chan->direct_xmit) {
+ 		ppp->dev->priv_flags |= IFF_NO_QUEUE;
+-	else
++		ppp->dev->features |= NETIF_F_SG | NETIF_F_FRAGLIST;
++	} else {
+ 		ppp->dev->priv_flags &= ~IFF_NO_QUEUE;
++		ppp->dev->features &= ~(NETIF_F_SG | NETIF_F_FRAGLIST);
++	}
+ 	spin_unlock_bh(&pch->downl);
+ 	if (pch->file.hdrlen > ppp->file.hdrlen)
+ 		ppp->file.hdrlen = pch->file.hdrlen;
 -- 
 2.43.0
 
