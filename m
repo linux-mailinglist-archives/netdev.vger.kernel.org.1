@@ -1,162 +1,317 @@
-Return-Path: <netdev+bounces-220096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D70DB44748
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:26:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6784AB4474F
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:29:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AC37547B16
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 20:26:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 326D37B39A5
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 20:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D7B27FB2F;
-	Thu,  4 Sep 2025 20:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F80B27FD4A;
+	Thu,  4 Sep 2025 20:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JWnUNe3P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YsvzQEgu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32022253F05
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 20:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B6227E077
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 20:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757017613; cv=none; b=Xu5JrYyaIhcKBpfjpmtjrjhSpgdbjFVbb4YMftMWkdHFlZLDxVhAc8Y3SHTdeZT+sNmKZpTiJ68eDrSxfJrVvBeWHwv9Pwa6i8KEmxER++R5dji7JdllxmBZ32D6hQUHMkTojvqe93UqN0cqA6odzuAJxCyq2bQOTwMIhgqcQOQ=
+	t=1757017763; cv=none; b=OrobNHv6UHK/+t2n90xkuo2u9urPqgmzXqPoBbKj2sD+/+01Zl2u8DOUpZX78RUklU0yVoY9TP2p8jP4CzHlVujHhrFnbselQKYNBH8jwXNq757DtwYN8Y3HVok0+8ubmkA2XP2OPwSd60UBqCQa/qRwHkdv0wwLe/qvE8tcOog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757017613; c=relaxed/simple;
-	bh=3jq8gL/8fyYI5NeZhwgKmkK68YhvLRKew9hlZyeKQY0=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=uGJlQxcSc814jo/L9ggnEz2pV9EGYjx/uji56ApRRHQrIKAobsGwKH9XrBDJU3uVSzDiBtSK+qaP3Xun+aTrM/Xa0O66NVX3O3oRBL2Ajv+6Xd8ob8nSobPQHvXrBHzHJMynJN/+LU8lh1mYoNnrSSfr9/oPb8+wfuvY6AmtfIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JWnUNe3P; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-61cb4370e7bso2298345a12.3
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 13:26:51 -0700 (PDT)
+	s=arc-20240116; t=1757017763; c=relaxed/simple;
+	bh=se8SYT0zJTJAzPl7zJgMNfbY7t89aC3dE7YmRyqLsBo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gvDOVFDCOI4BubJvYOBgRktk+EhXoammAVF5JbqT0PsApuPgGSaDnLvfgaGqwzOj+vrHXJ7/r9g/uYqTg3wE+i569LHSHXCCM1E16So7CxDIkZDp5Cmz6DuL62H6nTFKlWJl7KPh6DptgXeTlQ6+WZFH57nAxuJ+KyB6WX8bGV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YsvzQEgu; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-244580523a0so15933435ad.1
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 13:29:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757017610; x=1757622410; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nj1/FkTqsYqqeLVCG7Zj4aMYuIelgGiltbJZ37u+yO8=;
-        b=JWnUNe3PXNLg4QmsK3Wqa+V/IOuDwWD3I9+n6faQr+B6rJjJO5rETOeximnPKRQUv2
-         A6W9VpnvcthB/FWXj4zUPwZxxeHTWBO8+B5QitUx2Uy1EW/0t8SrupeOGhRfp1B7HSXK
-         QYO59WJkxUemRWeLbbVZ8nPWFG34fRa+81DdvY1Ktuyw2JjdIYM5mBFDAdm2F2p+f8Oc
-         YifoUGc/bOO+n4p+LU5jxVNRPpAn0TV0OD9LR79vq/UwvqMTzJJEsfKQ9k9tzMsLCRTj
-         aDRaOmUqSGTL7Hws4eUxLZfP5nCe7FjQUphTkastqMFL2Koqrnl9qmlhyK0QFZHuYm0c
-         1U+Q==
+        d=google.com; s=20230601; t=1757017761; x=1757622561; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hAfDLvW/qtjfI9Qhx/Ik6vG7JX89+OS8OERkeUrIYts=;
+        b=YsvzQEgukuZRYTvYKXfLV90DHCHPL3+vNmzYz9Pd2i8Hb7MMONZQjq3kcIzlmRhi5F
+         eOcEUTnCGCgdbatwlQfX2+4pYxFxNSjuEiyH3E6jVGzl3A6kgnbc7vKMjvXDlkhrJ6dr
+         /DmCcYnYoHHWUtP/pQTwFr7jhghKVhDel/ViiYcL3zYlbPRkVnPTkZXfiVdioKY4extr
+         hPABRLkr1qXi5+rSrdriFhKuQ6bMigxwoDafcmqY/ghVeM+WiWx6eofleLh9kTEweGRW
+         iTQl8w78QotrZbhMg2DcuySP1zRdvVEEozP0lYnXFveGDnIkXb6AWgiblEfZyQcgj08b
+         /VFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757017610; x=1757622410;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nj1/FkTqsYqqeLVCG7Zj4aMYuIelgGiltbJZ37u+yO8=;
-        b=ExYlLsse8NBzwE99Cv5UjuW2KMgpwN8Yf5VVZQ2RKePbtlZQJzfCg1PF7Jzw/6S/Eo
-         QW4HyWcBAzMEwJVOrGGhfSXURs1TlWTs/RuhbOzOECwfu7g0GxwqQioC7TWXYROWRyaY
-         dSZFY/cTAn82ndeiTOGaicKZVg6sojKB3mxVnKg4yow6l7CCPTPvAaryuLm4nudPAU37
-         s7/vnn1ske7x2VEcV0gcqG8wOmYzjI7Iw8BVUz1uOy4zsS9TsZhlw/R9gOeGEGBgCVdN
-         uZDolZcJsNYYIjrJjkCuh/kqUeJjfVGyWDMHWU6KTKxmWMMwtmrddk6eEDamIaRbEupi
-         1Ohg==
-X-Gm-Message-State: AOJu0YzMdKT5/RIKhddQHUD70eMZPBv/Iy9EJJhI82TqmzWx0Nny1MNm
-	NPRfBWPb+n9+Unl5k1cC4dqjFXU6nr0RxIf3J0QLeUtySmy34mLP8xz8
-X-Gm-Gg: ASbGnctE+5pvNzueK1N5EA3aP67JHPlr1dN2Yp8OGs3Rf1WxAWRJe5qq4qlzOlnOaue
-	wpoV0p0tUH93CroNHbx+JzwB4nUmq06QrtJGNTTcr66ICbT0O9M5Xy7LjPc/Cpsyhl8oHy8g8nJ
-	O6Y0cv7SNZYm1trkPV+85C6eNF2S9gFdbAgHef1V7tK+ctbxH3WWLDa2UB9nymmhvfKL3FfJoDg
-	VLkN3tV34SWRG5KlYXD57fGLkWhDWLaBjzTDwquZNKQrRqfPGpZcGpWEQNoNOZL8aM6JSzlgiYx
-	/pYqcjLN+J/E2EYnlg+T8G39NzyFHxxSsBPGPbmnu4kICFubAHhMld5aeldbM08HkAJ4Ygt0fhN
-	EhIpo/1yF7B7i9Bq9iKDmW4teJDNEufOMITNBSN02Plu9xK0I2qS2dxxgIETveOMGaaMpIh/MvW
-	mSHhXuT3dTKN7pAP8w+pNjqRYsGWkZK4+w1hxZ3jATvUkm6smuWV5CcZy2/2k=
-X-Google-Smtp-Source: AGHT+IGWrFQvO26dzDyD2KGz6U7WqGvUsZdl+fHLhxUE7zuYXU19t0INNLZk1bsqfv1rYVgJUZhTYw==
-X-Received: by 2002:a17:907:3d16:b0:afe:8bee:fdb9 with SMTP id a640c23a62f3a-b01d8c99b67mr1991054366b.28.1757017610260;
-        Thu, 04 Sep 2025 13:26:50 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f1f:b00:e9b7:b4fa:46b1:7dfd? (p200300ea8f1f0b00e9b7b4fa46b17dfd.dip0.t-ipconnect.de. [2003:ea:8f1f:b00:e9b7:b4fa:46b1:7dfd])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b041f6fb232sm1213984066b.87.2025.09.04.13.26.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Sep 2025 13:26:49 -0700 (PDT)
-Message-ID: <a6c502bc-1736-4bab-98dc-7e194d490c19@gmail.com>
-Date: Thu, 4 Sep 2025 22:26:58 +0200
+        d=1e100.net; s=20230601; t=1757017761; x=1757622561;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hAfDLvW/qtjfI9Qhx/Ik6vG7JX89+OS8OERkeUrIYts=;
+        b=gp2vSJy6iDYmFWiY/ZeY1hLoiG3aqiDdD0aEONxlPURJ7218aAbvTVczmC0iljUhd+
+         frrcB+lmljSWDRTzMQxgtCvBthX2FOYor097auvTR2Q18Y1qqaBXXEqOlyN0iqwpGrHv
+         qVTs6k/wTAOKUjGo8mvT06X9t49obnh1Ync5mkh9hJtoa+dmuwCi9FXv2oIx/OaoeZ5V
+         e89w4d7Cn6/4tzm1lVWO8P9aVZJL5Fum4AVxQodPIT3VT6gQIhWzk5d9Hq/CSQtYDqbY
+         pcO+QtpVFoGr+fRPoMztEzoUjeEeC9XBfC43tZGKw7BxTGKqXKnG/DWbRn5qe3fLEyjx
+         e+SA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwxietybU8oFwZmAP6QxN+qlAn+I4K3AFreVARiZKx1Ktv8IK4+O1WEY2FqTiJuABMk24Qpaw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRWLXtr2fDfMP2yByDO/+fLOenlzgPp2WKDJNXoMoh5xA/ebo5
+	1CD6jJEKTfQQlFYp//EFsC5e2Eo2pwXg2ZuglLZBnUMh0E33Oblnw1JTxcg25siq0XPDzDkZ++u
+	ObgcwgTTudWHUSGs7BI+1eCzhYXr1G1KL3mBvlVv7
+X-Gm-Gg: ASbGncsC1K6n2i/bdVC21AKgtK5U+mTfxKWET8GbjILOelGGIxBC8LGdxwdo3xZBrn8
+	x6lD9B5LbfGKOj3dqWkhY5klxnVjTcsonWpT8JD0/ETnMIe2WLMhpMYdFIPu2IN5K5GnMKwWdxU
+	068qyEibRbVioazI+iiYNGgNYD5/Ijk+TwAw/Tn7C7hJvrnbgnsMqbP6qMODkP5gfofv8rGTnBu
+	4I6nBjZnMEywEYfd/XwbpRmCPjjJV7Orek5Xr22RK+W42n0cWBhL2tPwtAL3OwJy1VP2MHt9fqI
+	obMZRY54rm3Uyg==
+X-Google-Smtp-Source: AGHT+IG7u/5pNUo6AGseBbewB6ZMWSPZIPLT2gzvnsWk7gjT7XkAa3BdoLd0c+79Nd24DzFn1rS0d8g5f5ufNJ8utKE=
+X-Received: by 2002:a17:902:ced2:b0:248:79d4:93bb with SMTP id
+ d9443c01a7336-24944b0dc40mr321307565ad.31.1757017760476; Thu, 04 Sep 2025
+ 13:29:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Madalin Bucur <madalin.bucur@nxp.com>,
- Sean Anderson <sean.anderson@seco.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: fman: clean up included headers
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250829010026.347440-1-kuniyu@google.com> <20250829010026.347440-6-kuniyu@google.com>
+ <904c1ffb-107e-4f14-89b7-d42ac9a5aa14@linux.dev> <CAAVpQUDfQwb2nfGBV8NEONwaBAMVi_5F8+OPFX3=z+W8X9n9ZQ@mail.gmail.com>
+ <CAAVpQUBWsVDu07xrQcqGMo4cHRu41zvb5CWuiUdJx9m6A+_2AQ@mail.gmail.com>
+ <CAAVpQUCyPPO1dfkkU4Hxz67JFcW6dhSfYnmUp0foNMYua_doyg@mail.gmail.com>
+ <40ed29b3-84d7-4812-890d-3676957d503f@linux.dev> <CAAVpQUCLpi+6w1SP=FKVaXwdDHQC_P6B1hzzDC5y4brsf3_UnQ@mail.gmail.com>
+ <26939fec-b70f-4beb-8895-427db69c38a0@linux.dev>
+In-Reply-To: <26939fec-b70f-4beb-8895-427db69c38a0@linux.dev>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 4 Sep 2025 13:29:08 -0700
+X-Gm-Features: Ac12FXwyUXPN3jzgq63teCICDbAFgEj6jSPQihZ_ljUixFf9lFT57vRUe7vUKnA
+Message-ID: <CAAVpQUB8DzEjfc42dMRmGA0mgsHrCtXkPnQXZpG+EQq28xOXCg@mail.gmail.com>
+Subject: Re: [PATCH v4 bpf-next/net 5/5] selftest: bpf: Add test for SK_BPF_MEMCG_SOCK_ISOLATED.
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Both headers aren't used in this source code file.
+On Thu, Sep 4, 2025 at 12:48=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 9/4/25 9:45 AM, Kuniyuki Iwashima wrote:
+> > On Wed, Sep 3, 2025 at 10:51=E2=80=AFPM Martin KaFai Lau <martin.lau@li=
+nux.dev> wrote:
+> >>
+> >> On 9/3/25 10:08 AM, Kuniyuki Iwashima wrote:
+> >>> On Wed, Sep 3, 2025 at 9:59=E2=80=AFAM Kuniyuki Iwashima <kuniyu@goog=
+le.com> wrote:
+> >>>>
+> >>>> On Tue, Sep 2, 2025 at 1:49=E2=80=AFPM Kuniyuki Iwashima <kuniyu@goo=
+gle.com> wrote:
+> >>>>>
+> >>>>> On Tue, Sep 2, 2025 at 1:26=E2=80=AFPM Martin KaFai Lau <martin.lau=
+@linux.dev> wrote:
+> >>>>>>
+> >>>>>> On 8/28/25 6:00 PM, Kuniyuki Iwashima wrote:
+> >>>>>>> The test does the following for IPv4/IPv6 x TCP/UDP sockets
+> >>>>>>> with/without BPF prog.
+> >>>>>>>
+> >>>>>>>      1. Create socket pairs
+> >>>>>>>      2. Send a bunch of data that requires more than 256 pages
+> >>>>>>>      3. Read memory_allocated from the 3rd column in /proc/net/pr=
+otocols
+> >>>>>>>      4. Check if unread data is charged to memory_allocated
+> >>>>>>>
+> >>>>>>> If BPF prog is attached, memory_allocated should not be changed,
+> >>>>>>> but we allow a small error (up to 10 pages) in case other process=
+es
+> >>>>>>> on the host use some amounts of TCP/UDP memory.
+> >>>>>>>
+> >>>>>>> At 2., the test actually sends more than 1024 pages because the s=
+ysctl
+> >>>>>>> net.core.mem_pcpu_rsv is 256 is by default, which means 256 pages=
+ are
+> >>>>>>> buffered per cpu before reporting to sk->sk_prot->memory_allocate=
+d.
+> >>>>>>>
+> >>>>>>>      BUF_SINGLE (1024) * NR_SEND (64) * NR_SOCKETS (64) / 4096
+> >>>>>>>      =3D 1024 pages
+> >>>>>>>
+> >>>>>>> When I reduced it to 512 pages, the following assertion for the
+> >>>>>>> non-isolated case got flaky.
+> >>>>>>>
+> >>>>>>>      ASSERT_GT(memory_allocated[1], memory_allocated[0] + 256, ..=
+.)
+> >>>>>>>
+> >>>>>>> Another contributor to slowness is 150ms sleep to make sure 1 RCU
+> >>>>>>> grace period passes because UDP recv queue is destroyed after tha=
+t.
+> >>>>>>
+> >>>>>> There is a kern_sync_rcu() in testing_helpers.c.
+> >>>>>
+> >>>>> Nice helper :)  Will use it.
+> >>>>>
+> >>>>>>
+> >>>>>>>
+> >>>>>>>      # time ./test_progs -t sk_memcg
+> >>>>>>>      #370/1   sk_memcg/TCP       :OK
+> >>>>>>>      #370/2   sk_memcg/UDP       :OK
+> >>>>>>>      #370/3   sk_memcg/TCPv6     :OK
+> >>>>>>>      #370/4   sk_memcg/UDPv6     :OK
+> >>>>>>>      #370     sk_memcg:OK
+> >>>>>>>      Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+> >>>>>>>
+> >>>>>>>      real       0m1.214s
+> >>>>>>>      user       0m0.014s
+> >>>>>>>      sys        0m0.318s
+> >>>>>>
+> >>>>>> Thanks. It finished much faster in my setup also comparing with th=
+e earlier
+> >>>>>> revision. However, it is a bit flaky when I run it in a loop:
+> >>>>>>
+> >>>>>> check_isolated:FAIL:not isolated unexpected not isolated: actual 8=
+61 <=3D expected 861
+> >>>>>>
+> >>>>>> I usually can hit this at ~40-th iteration.
+> >>>>>
+> >>>>> Oh.. I tested ~10 times manually but will try in a tight loop.
+> >>>>
+> >>>> This didn't reproduce on my QEMU with/without --enable-kvm.
+> >>>>
+> >>>> Changing the assert from _GT to _GE will address the very case
+> >>>> above, but I'm not sure if it's enough.
+> >>>
+> >>> I doubled NR_SEND and it was still faster with kern_sync_rcu()
+> >>> than usleep(), so I'll simply double NR_SEND in v5
+> >>>
+> >>> # time ./test_progs -t sk_memcg
+> >>> ...
+> >>> Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+> >>> real 0m0.483s
+> >>> user 0m0.010s
+> >>> sys 0m0.191s
+> >>>
+> >>>
+> >>>>
+> >>>> Does the bpf CI run tests repeatedly or is this only a manual
+> >>>> scenario ?
+> >>
+> >> I haven't seen bpf CI hit it yet. It is in my manual bash while loop. =
+It should
+> >> not be dismissed so easily. Some flaky CI tests were eventually reprod=
+uced in a
+> >> loop before and fixed. I kept the bash loop continue this time until g=
+rep-ed a
+> >> "0" from the error output:
+> >>
+> >> check_isolated:FAIL:not isolated unexpected not isolated: actual 0 <=
+=3D expected 256
+> >>
+> >> The "long memory_allocated[2]" read from /proc/net/protocols are print=
+ed as 0
+> >> but it is probably actually negative:
+> >>
+> >> static inline long
+> >> proto_memory_allocated(const struct proto *prot)
+> >> {
+> >>           return max(0L, atomic_long_read(prot->memory_allocated));
+> >> }
+> >>
+> >> prot->memory_allocated could be negative afaict but printed as 0 in
+> >> /proc/net/protocols. Even the machine is network quiet after test_prog=
+s started,
+> >> the "prot->memory_allocated" and the "proto->per_cpu_fw_alloc" could b=
+e in some
+> >> random states before the test_progs start.  When I hit "0", it will ta=
+ke some
+> >> efforts to send some random traffic to the machine to get the test wor=
+king again. :(
+> >>
+> >> Also, after reading the selftest closer, I am not sure I understand wh=
+y "+ 256".
+> >> The "proto-> per_cpu_fw_alloc" can start with -255 or +255.
+> >
+> > Actually I didn't expect the random state and assumed the test's
+> > local communication would complete on the same CPU thus 0~255.
+> >
+> > Do you see the flakiness with net.core.mem_pcpu_rsv=3D0 ?
+> >
+> > The per-cpu cache is just for performance and I think it's not
+> > critical for testing and it's fine to set it to 0 during the test.
+> >
+> >
+> >>
+> >> I don't think changing NR_SEND help here. It needs a better way. May b=
+e some
+> >> functions can be traced such that prot->memory_allocated can be read d=
+irectly?
+> >> If fentry and fexit of that function has different memory_allocated va=
+lues, then
+> >> the test could also become more straight forward.
+> >
+> > Maybe like this ?  Not yet tested, but we could attach a prog to
+> > sock_init_data() or somewhere else and trigger it by additional socket(=
+2).
+> >
+> >          memory_allocated =3D sk->sk_prot->memory_allocated;
+> >          nr_cpu =3D bpf_num_possible_cpus();
+> >
+> >          for (i =3D 0; i < nr_cpu; i++) {
+> >                  per_cpu_fw_alloc =3D
+> > bpf_per_cpu_ptr(sk->sk_prot->per_cpu_fw_alloc, i);
+>
+> I suspect passing per_cpu_fw_alloc to bpf_per_cpu_ptr won't work for now.=
+ sk is
+> trusted if it is a "tp_btf" but I don't think the verifier recognizes the
+> sk->sk_prot is a trusted ptr. I haven't tested it though. If the above do=
+es not
+> work, try to directly use the global percpu tcp_memory_per_cpu_fw_alloc. =
+Take a
+> look at how "bpf_prog_active" is used in test_ksyms_btf.c.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/freescale/fman/mac.c | 2 --
- 1 file changed, 2 deletions(-)
+Thanks for the pointer !
+I was looking for a way to read global vars.
 
-diff --git a/drivers/net/ethernet/freescale/fman/mac.c b/drivers/net/ethernet/freescale/fman/mac.c
-index a39fcea6a..f27ff625f 100644
---- a/drivers/net/ethernet/freescale/fman/mac.c
-+++ b/drivers/net/ethernet/freescale/fman/mac.c
-@@ -14,8 +14,6 @@
- #include <linux/device.h>
- #include <linux/phy.h>
- #include <linux/netdevice.h>
--#include <linux/phy_fixed.h>
--#include <linux/phylink.h>
- #include <linux/etherdevice.h>
- #include <linux/libfdt_env.h>
- #include <linux/platform_device.h>
--- 
-2.51.0
+>
+> >                  if (per_cpu_fw_alloc)
+> >                          memory_allocated +=3D *per_cpu_fw_alloc;
+>
+> Yeah. I think figuring out the true memory_allocated value and use it as =
+the
+> before/after value should be good enough. Then no need to worry about the
+> initial states. I wonder why proto_memory_allocated() does not do that fo=
+r
+> /proc/net/protocols but I guess it may not be accurate for a lot of cores=
+.
 
+Probably, and per_cpu_fw_alloc is expected to flip quickly.
+
+>
+> >          }
+> >
+> > per_cpu_fw_alloc might have been added to sk_prot->memory_allocated
+> > during loop, so it's not 100% accurate still.
+> >
+> > Probably we should set net.core.mem_pcpu_rsv=3D0 and stress
+> > memory_allocated before the actual test to drain per_cpu_fw_alloc
+> > (at least on the testing CPU).
+> I think the best is if a suitable kernel func can be traced or figure out=
+ the
+> true memory_allocated value. At least figuring out the true memory_alloca=
+ted
+> seems doable. If nothing of the above works out, mem_pcpu_rsv=3D0 and
+> pre-stress/pre-flush should help by getting the per_cpu_fw_alloc and
+> memory_allocated to some certain states before using it in the before/aft=
+er result.
+>
+> [ Before re-spinning, need to conclude/resolve the on-going discussion in=
+ v5 first ]
+
+I'll wait for Shakeel's response for v5.
 
