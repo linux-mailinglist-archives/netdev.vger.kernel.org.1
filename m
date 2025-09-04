@@ -1,118 +1,100 @@
-Return-Path: <netdev+bounces-219981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72974B43FF5
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:06:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96ADCB43FF8
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422A5A04A57
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:06:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C83D95A18B5
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308B7308F07;
-	Thu,  4 Sep 2025 15:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="UmgIrN24"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEFC308F17;
+	Thu,  4 Sep 2025 15:07:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662E81EB9F2
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 15:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7569305E1D
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 15:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756998397; cv=none; b=UZXZrq3PiqHNK8Tn5Dn5Sx/0TPt1Y8pcLpiGrDOpALdq1/ldyo8oa9YpPZ3wiqPLZmgfF1kChnXvrjPZuH3RlYzmuQpfHIO2QAuNP1e0Qi/fswsXKmo8/f4YUdYP434nuvzweMvi1kOqtxF3xi5VTq1eIcQQJB2fzL7XSiOtrvc=
+	t=1756998427; cv=none; b=Swkk2Qe7KSs6iXhfla4QWbZdbsQdXhJ6MKcGP2N7KPE0mB840EbMCoJP4wwOD61YE6VszTrYDV+30J8y94L8mfpQisv51s8xvlY0Qw2XbpWaec2RcGvv0sDJQ4hPsbFfC4qExEvOqTDCqt96LqMcEA4e+yrtZtIsnKeMpZwVPQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756998397; c=relaxed/simple;
-	bh=GjIMhldMZjLi/k1VMDA0uSdrpQ2tcOhNKetfFoIFYTw=;
-	h=Date:Message-ID:MIME-Version:Content-Type:From:To:Cc:Subject:
-	 References:In-Reply-To; b=CPzpazckDqoRiP7Q03qwkESXYvKcPQeLSWpeuMVXJ08TTXJyiyAsyWTEYeQxbWzli2jhH2lk5M+Y1Q12qp6NuBxWSRtHQDtDt11OtZ6n65yUKB2HjidluG95Go9qLrHrSeBdsc4DjKmGVFV67bZ8q4/0LcjAx0nK2jwCGWnbIGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=UmgIrN24; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-80e33b9e2d3so101230885a.2
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 08:06:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1756998393; x=1757603193; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
-         :mime-version:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+7YNCGfuLeRJGDFZxThdtxp2uXd/nIXSU1+d/iqpvn4=;
-        b=UmgIrN24bZcnKDgQ+hfbmlbI0EQX7VCiJ0iyk6Ht7loHlFNEh3cSEFxt1ZvIsQOUZp
-         61rke9doJgKSUWbMEJMYeLPaOsdJvRBpdys1a53xdDMMcIMcdFBwg1V6w37X6zNxMQQD
-         m3YGJ/jWzQA8fwaoOVfGDUQTEqtDZgznENXvO6I/KyW+bV2esFgYkKcDcCzIheBzXICQ
-         c4XlQhhGBy9+fQ4CCPd+8k83FzrlLRomG6JUoNdYqyn5fAM337Pn68z8FTLAtGOxDD3R
-         UJ1xhBPlWvEMAXVyicR16D59bY5BRqTotBv3p6JCgsy8D3MZpuXnOazdo7RH+rDO2+tr
-         G/lw==
+	s=arc-20240116; t=1756998427; c=relaxed/simple;
+	bh=WdSMSR85x87X0+DfffqCowskGNW4tPHLqZlvNo3jcgU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=e1oXNkjKBkcXBPIeAQf8tWhvso1sr3TkwDqn/Y6j1bK+x4WBfgLHvH+ASH/X2OwPqgnmjercR7WMPoF6S258w4zURZD/uE/i3XfcZwmwwX/aI1QkdjLzAxo0Uczu0t2vlnnO1xiXENksD4xIkmxtnCfw9kCtMs/l4px/6u2RtlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-8875640a843so139040839f.1
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 08:07:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756998393; x=1757603193;
-        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
-         :mime-version:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+7YNCGfuLeRJGDFZxThdtxp2uXd/nIXSU1+d/iqpvn4=;
-        b=DUoYNOUWRbj+aulw5xcmHJeqtUNcUki6KNCg5kv9NOWneKdCnzygvC0v3CXPuodXHT
-         9xxdiLvPqAtn++OVNfWFgKI0CfPTJ5nESxvSBJCFQwPGQ5FiyuvsKX4Y9dirJ/7JpS5V
-         H5YQJFOx5JiRP24GuBArFreWsyRjS72J7AMBVTE09u8jTpIj8hxQNTMKrldjV1XJh90K
-         WYbux5TQK+/GN0zePUnMbjDqGOfyyLjw68emAK0QmYAbJQYagaRkIkkJBgcu0SNL3x/5
-         gGdnaGY7jB5v+QIsnKkCV3ODCW9K/9BX5aU2IYnGC3sNtUo0q/nyPz/5WmH8gnYbw/Gl
-         b26Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXjvM1m0/Tsg34BUzPlhcBRjYWlVBMpax18NM02L7/CTWVgMSdU13nE3vV1aKjhAPN9pAWQvnc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyV2GMC+FtDCd4K2O1ZnQa7vnUCryH8b3cvOeIDqDhplKiHO8yd
-	4MfW0fD9Fp9+rjz0B3N2WUO7FVAGzijEfyh46KDaYmJZZSxJJynv25yGp4Cmlj9v7A==
-X-Gm-Gg: ASbGncvn5MzpsQmO+vt7rNWKawuGJoTN8FLEV5Ay38F7UpvnbwVMRJAa2CaroHX/FDL
-	ggx6dcOrDfInjbyiz6M+kSnZghexQnzlICfM6zprZI0RVZWjtmFiQ8m4FKXkteEwaolbqyWi+H0
-	JXQZeqh8JpDrDBg4ssiaV6ATv6L99fbNkUVEDeYVowZx0gxAXABxzEG3/IQkv6ENw1cwE54hjLA
-	mkxtC47F00MGXYhy9/V/E2nukKGwXN+IoiVneFu3MFdZy0UVBMoajzfhNMTBW0yz4+0OGeLeRwz
-	FJtm+cPZx9Jz7y2oCJqP1Bdhkj6ItPIjmFpBAoRvjUJwGkBFiEDupnpP5NGS9pbiRz1PXQxlRTg
-	BqV1P93JbT3LoW3r1uiZtCyT65FriiOyAlssP9RInXV7qR3yFM8+PvtgJ2wuqjQ2kLAxgxRtar6
-	MCT0Q=
-X-Google-Smtp-Source: AGHT+IHEZYUVpRQ02k7NJUaQish8Bi6v9XojrzC/OeiOZRuFggywJiau6M41XffV1wTKoVjcjfFHig==
-X-Received: by 2002:a05:620a:1a81:b0:7e8:14c:d1a9 with SMTP id af79cd13be357-7ff27b20216mr2265110885a.28.1756998393152;
-        Thu, 04 Sep 2025 08:06:33 -0700 (PDT)
-Received: from localhost (pool-71-126-255-178.bstnma.fios.verizon.net. [71.126.255.178])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-80aac237b51sm289724485a.61.2025.09.04.08.06.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 08:06:32 -0700 (PDT)
-Date: Thu, 04 Sep 2025 11:06:31 -0400
-Message-ID: <cde565adc43452e83958fbe0ab54080d@paul-moore.com>
+        d=1e100.net; s=20230601; t=1756998425; x=1757603225;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tLO91xyldPwJGtv4KAJ9Dss03Zr2mNg6Ty96jb715OM=;
+        b=NQYgq2AgAgXnGW8nsDJB+HpWvi1UctrSggQqMFRj1ynNB8hTtbG1EUaDAs5yvebboW
+         ex42sB4TlIlO2RXtLJMDnjDN4AG4TzDZqhx5m1SQc/iuE6LP4dEj+FmDawPA4gvfIRMu
+         znwe1wz3jjEWC67YYMlCa0m88KcFVsbY3O7s2U5LJos789n1ubkqD+CPYOelhE1ZxS4q
+         /WLtyJpArS58QmXQASTcwC8O0MxgmU/R8amMNdLF5VLU7PsG++5bZKoU5vrrr++k6ypa
+         M1KpaQnbXLs7mx8KkSJ8Kz8iBD/hnOCrF0C0IAKGGA0ceaTm0GWzIbHwpNntFSU2oAVB
+         WDCw==
+X-Forwarded-Encrypted: i=1; AJvYcCVgbNKgEMxeLO21rDbc4HZEcQ3hRLyZw+E+f+F77UdhQbTeIVwjNIBWYSFZXo/KubyYsygAoww=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdWSIZHbBD20FYkHs50a3j6w89RMLrWcHfPaygdcbx7FhqyygR
+	67NhNuMd9K/C51IE+xmfvrZ+IFcWnhbWobGy6xiCcNGraG1IeLXZPqs5K3DzcBr8/LHw92A3B40
+	4hYc09OIC5OO/s82AVceM7+K4qwNxpm+53lbq836bGcU94DBXNx/hdaN/DEg=
+X-Google-Smtp-Source: AGHT+IGPt5XXPZQ71LRSq35os/98bkbkleFEzJZRK9KO1wphEAorWaJE0sjRcGoS9N8q2GtO62tIzPc9fUr+UXPnANVDnXDcNjgk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 
-Content-Type: text/plain; charset=UTF-8 
-Content-Transfer-Encoding: 8bit 
-X-Mailer: pstg-pwork:20250903_1645/pstg-lib:20250903_1606/pstg-pwork:20250903_1645
-From: Paul Moore <paul@paul-moore.com>
-To: Eric Dumazet <edumazet@google.com>, Casey Schaufler <casey@schaufler-ca.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>, syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com, Eric Paris <eparis@redhat.com>, audit@vger.kernel.org
-Subject: Re: [PATCH] audit: init ab->skb_list earlier in audit_buffer_alloc()
-References: <20250904072537.2278210-1-edumazet@google.com>
-In-Reply-To: <20250904072537.2278210-1-edumazet@google.com>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:144c:b0:3ef:969c:c91 with SMTP id
+ e9e14a558f8ab-3f400097800mr372808605ab.6.1756998424765; Thu, 04 Sep 2025
+ 08:07:04 -0700 (PDT)
+Date: Thu, 04 Sep 2025 08:07:04 -0700
+In-Reply-To: <68b93e3c.a00a0220.eb3d.0000.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68b9ab18.050a0220.192772.0008.GAE@google.com>
+Subject: Re: [syzbot] [kernel?] INFO: trying to register non-static key in
+ skb_dequeue (4)
+From: syzbot <syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com>
+To: apparmor@lists.ubuntu.com, audit@vger.kernel.org, casey@schaufler-ca.com, 
+	davem@davemloft.net, edumazet@google.com, eparis@redhat.com, 
+	eric.dumazet@gmail.com, horms@kernel.org, jmorris@namei.org, 
+	john.johansen@canonical.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, luto@kernel.org, 
+	netdev@vger.kernel.org, omosnace@redhat.com, pabeni@redhat.com, 
+	paul@paul-moore.com, peterz@infradead.org, selinux@vger.kernel.org, 
+	serge@hallyn.com, stephen.smalley.work@gmail.com, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
 
-On Sep  4, 2025 Eric Dumazet <edumazet@google.com> wrote:
-> 
-> syzbot found a bug in audit_buffer_alloc() if nlmsg_new() returns NULL.
-> 
-> We need to initialize ab->skb_list before calling audit_buffer_free()
-> which will use both the skb_list spinlock and list pointers.
-> 
-> Fixes: eb59d494eebd ("audit: add record for multiple task security contexts")
-> Reported-by: syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/lkml/68b93e3c.a00a0220.eb3d.0000.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Casey Schaufler <casey@schaufler-ca.com>
-> Cc: Paul Moore <paul@paul-moore.com>
-> Cc: Eric Paris <eparis@redhat.com>
-> Cc: audit@vger.kernel.org
-> ---
->  kernel/audit.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+syzbot has bisected this issue to:
 
-Thanks Eric, merged into audit/dev.
+commit eb59d494eebd4c5414728a35cdea6a0ba78ff26e
+Author: Casey Schaufler <casey@schaufler-ca.com>
+Date:   Sat Aug 16 17:28:58 2025 +0000
 
---
-paul-moore.com
+    audit: add record for multiple task security contexts
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1199fe62580000
+start commit:   5d50cf9f7cf2 Add linux-next specific files for 20250903
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1399fe62580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1599fe62580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7d2429dff5531d80
+dashboard link: https://syzkaller.appspot.com/bug?extid=bb185b018a51f8d91fd2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15b9a312580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16819e62580000
+
+Reported-by: syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com
+Fixes: eb59d494eebd ("audit: add record for multiple task security contexts")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
