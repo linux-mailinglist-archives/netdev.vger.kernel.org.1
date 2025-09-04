@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-219793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339A1B4301F
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 04:58:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A025B43036
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:07:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBE067B6049
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:56:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B66561BC7915
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7551FF5F9;
-	Thu,  4 Sep 2025 02:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38E41FE45A;
+	Thu,  4 Sep 2025 03:06:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C23B134A8;
-	Thu,  4 Sep 2025 02:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B90E1531C8;
+	Thu,  4 Sep 2025 03:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756954703; cv=none; b=IywcqbwG+EEo2Co3jJ9z4heA9h4i2AnHKuvhZmT7BeuqX3dAveCKoL4j1p0i5GfCmiFikWBkWaeBub9RgXMDrLQDULAsx6B59rPe2ZVpf9CPOWcIh7G7WCURzljT39uqQ31HUENe9aUCClWHkO64IwITF+iiUR4w8ITXmJ8SLZY=
+	t=1756955213; cv=none; b=nQ+eIvaNKkCdDGlSHkWxMbm6x+JhpxMsmbLXizSHdqLtBWLvCFNJiQNkQWrBzwu+S03ewvAtNVdhR2+U5eRBms5MXmG0fq8Tji0YqnlpfNKNLoUIKUc0Br4M5rKn5FlMJty6Wwgs0QdBcNuidsIh66Ymhr9yl9IG6M+Ek1fZcyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756954703; c=relaxed/simple;
-	bh=FUEkYJc6NdbKu1rKgI3c9qCXQ7OfRng1lSOl3N8E6qI=;
+	s=arc-20240116; t=1756955213; c=relaxed/simple;
+	bh=SLdDmixQ5xqhW55ySdh8VN5DM9+F8oX01s2pKa/DH6k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uN6f55H5UZfFnQ9EHHIwNXhupsPYn8tTWNCTzuFTo2gJjLylUhIyOj94keMaDcGYN048L+NODrpsFzltQWy1/UrFumzas82QBDXIuLsJ1lnzTHeGpMbvsCY6zuqUleFLjXFFjes0ME2MWk0nW6nIUmUL2C0osb2uLL6uXkcYfCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.243.244.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=XK68zuthdjj4EbXZf+dx+3cdc6/L1XGm84OlG14hgWiUXIzxN+/ZiLXglT9mQ+yf14VRhK/ivf6KL2qmxpd2Xk094wvcGUzrAnqaSm5z1XmcqWaq1eLHt+yI/HnZsh7YK8J4YwT6DMrzpQPfLWvGvtiItHDqT67yAV5Af369lik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.254.200.128
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpgz12t1756954674te0fcd5a6
-X-QQ-Originating-IP: PSxW2zZi0XfpxwxiMjuQj95SLM6jCK8N+GfEA2KUwtk=
+X-QQ-mid: zesmtpgz6t1756955183t967df603
+X-QQ-Originating-IP: c48yHqB4UNo0OeuTt4cMtpB33728CbYBNdyGcXJY+C8=
 Received: from localhost ( [203.174.112.180])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 04 Sep 2025 10:57:51 +0800 (CST)
+	id ; Thu, 04 Sep 2025 11:06:21 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6255393548708386954
-Date: Thu, 4 Sep 2025 10:57:52 +0800
+X-BIZMAIL-ID: 11714803036421506829
+Date: Thu, 4 Sep 2025 11:06:21 +0800
 From: Yibo Dong <dong100@mucse.com>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
@@ -51,11 +51,11 @@ Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
 	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v10 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <79CDF6C59BAFF4D1+20250904025752.GC1015062@nic-Precision-5820-Tower>
+Subject: Re: [PATCH net-next v10 5/5] net: rnpgbe: Add register_netdev
+Message-ID: <6B193997D4E4412A+20250904030621.GD1015062@nic-Precision-5820-Tower>
 References: <20250903025430.864836-1-dong100@mucse.com>
- <20250903025430.864836-5-dong100@mucse.com>
- <19ca3e80-97f7-428a-bf09-f713706fd6ab@lunn.ch>
+ <20250903025430.864836-6-dong100@mucse.com>
+ <b9a066d0-17b5-4da5-9c5d-8fe848e00896@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,108 +64,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <19ca3e80-97f7-428a-bf09-f713706fd6ab@lunn.ch>
+In-Reply-To: <b9a066d0-17b5-4da5-9c5d-8fe848e00896@lunn.ch>
 X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Mh6c5BvFpJVghEK39H3amGAj505Q9pOyjCdm5g3fsQc60UDuei5rskL1
-	87C+hh55KluMs46iNz+Drj3THzdiqg3OANI8DCPenvB+cmEW0UsUhaQq1NSC6jN1Z3AdDAF
-	feoW7yuKK5XpPQXBmVVyQ18yzIrahPQRT4E09W0E/ew3EKQhHtbPUHfb29HEoRAKQYpIuU+
-	djykYAyZnk/6zyD5UnUWWmTtiHBvT0ZFyxVTqQQiDUAz6UnJ4HJtdoBExaI4XEq731P+HGQ
-	YgQukfISiJT7C8+VR6QeFAk1P5NcxEE9/HccxVBkKG7yPE7WM1zGtWxopYqL/XOYwLCuSJl
-	713WEv074MQ1RJjTLsYEp/d/x8LBwHtyLU7BLzrlnMRivzAcMO7rjuTfLCmKzj35SwLK5qM
-	aInTPyPT5y0wmRziv/7mEHPtb/FXiAquhmXNYbLuT+bLCLBlLS5M2Ltsf2GcjMUoHbtYJcN
-	cN2CaFpD6NB3bcl7vUJ/8qD8VlGdj8k3gNvSPX8wGgfBVDnEJUMI7PZsHgOQ9gdQ5cZLJ/h
-	Q2QXdMbKw1WKbXARsF+7rq04XSJljd7mv2dl/ZIKKWr2W77NOkHTgNSNQkYazLDc4IrP6Hq
-	93V/0x25obspdSVx4ZrBl8WTsETleJbOk6ZBZYUNFnYfZEFfd9Nnz1WZ6EfIifOf+q9BZUe
-	aoHeVIz9Ky1EfQ0Mdkui+OVAKPiSh8OOKQUPLO2pVIYqZcATHvIC4dtm43Hjwv1b0Y6eDqx
-	FyMRSALs2jjWVym4grJtNyP69f+9fRUmTLEF2FqyTfphr8JZLBvO4g1ixQfrn9kUrkkmr6f
-	nB/nA6Y0dKEG2bWpuCtvnHxlnxFH9y8d+WiFE7jRfCXXkupYgXeCHSb8SQrZi8XyJ/e+nkm
-	xHxx7agjfCjmDTvWM7FwDJ2MUHuVancjRmdfLW1X7xzB02Dwz7Tq7S1wCeEaBqqiRJJ6d6l
-	lOEFrN8nQuCwNwTPaAj/e3LdRcz6wK4DGvHU4acCnHpYQFVPrZDbiWm1jzeqKwx24J381Uq
-	4G6B1j45JoLEDxBHPyZRbojZbz5Y1QTPNQtLm6diuZYc7BcBkVllfRAlOWkU2pj3+5qXYj1
-	PDTf5BqIGZpGtKFIcYy2CAJ/0bZN/UasQb3nkG9TZAd
+Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OYLtW6Z/0FVZzqayUpquJdjajqK8Qyq9xjpcAcZpYYslO3rY5oCOhUs3
+	uMgpxK1/NcUBnvdxLbjBZq0H0oITfHEaiAio3IaUkgApRgn824268M59/DtBbZTWbFyatGd
+	cW1kfji1en54YAv9y7bmwNbx4wlU/eLWdw5TmOSapqOwl2lTYawqdy1RaUY2QK67dkH8zl4
+	zssjBdX03pOaYamcAJI2CH8abwr5NcpDrbUmf70YvE6Nfgrz3K29Rvx+innKnLM5YzssQnJ
+	K4iXAIzi6iLf7+iA3AlFLx64BDEEP7BbAOkPiWvkT4oyWvZnQ4mD/TqdFBSQ6X7uYHkCiCG
+	F+tN3sPmGm5s05PcJ2e/kkaaJjtoKuuw3TBRi4Qiu+iPsdF0w9ATiYIz4CGDAfich93eXAI
+	N8EFCtEP0Q56jet06kFZfrYMETpEMplFPbwgWOlyXbchLdWZs7fyV4DnWK7l29MjegKKXzg
+	v26qZ7wXvqb1Z8HItIabwhRNH440sKPdaLxRFAfV+x/vWc+BDM1nNKoNFGZmXE9sBkO+wYD
+	+AUqOd4WOgB+Rn4y1tVkXAfhcLbLgYTrka5lEZNCKZ2IgJBDpypLJ8C25UVTpjcCLFRqz3X
+	9lAYE+Z3D0NML5tAU+YZ+JF4GgOGaas5BoK4vsAWFk+0X77n97jecg2o1W6NmrjnMexHZrI
+	yyXb8NhH61cquf9N8G2dbO2Wwvrp9PseDpX9vvl9j7/a/8qrPjW2vW4hTJlBykfGZdsqMTl
+	mYI8JRS+0GrSlcDA6SqvKR7J7K3vh4je03YZIl4+7YiUNSsEw3OLIYY9hcY9hwayFnBDMuA
+	9zVO36tYGTLBT/kjhhABsocTBnj9ylU3Inenipax6rY3tOD38IXP8S8PUmcaoNvzAdpPTBT
+	N/sNuSPEx7gJnaPEqRHvM2CvKWn8+04Ff+MZy31DkzZykR0nV0vaQzfgfk+/QIC/kdrxaRO
+	KLx6WU02lfiM292NYNRdUstQL8Wu+l5ThAPuluIcxcj1ZR0g7pBwR6cagNV657JPwwuxqAS
+	lQBvWt6tzci1ruxtXjFNBUPrwiIwtfKrkqZgtUo/EvIzUG5iEt
 X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
 X-QQ-RECHKSPAM: 0
 
-On Thu, Sep 04, 2025 at 12:45:43AM +0200, Andrew Lunn wrote:
-> > +/**
-> > + * mucse_mbx_powerup - Echo fw to powerup
-> > + * @hw: pointer to the HW structure
-> > + * @is_powerup: true for powerup, false for powerdown
-> > + *
-> > + * mucse_mbx_powerup echo fw to change working frequency
-> > + * to normal after received true, and reduce working frequency
-> > + * if false.
-> > + *
-> > + * Return: 0 on success, negative errno on failure
-> > + **/
-> > +int mucse_mbx_powerup(struct mucse_hw *hw, bool is_powerup)
-> > +{
-> > +	struct mbx_fw_cmd_req req = {};
-> > +	int len;
-> > +	int err;
+On Thu, Sep 04, 2025 at 12:53:27AM +0200, Andrew Lunn wrote:
+> >   * rnpgbe_add_adapter - Add netdev for this pci_dev
+> >   * @pdev: PCI device information structure
+> > @@ -78,6 +129,38 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
+> >  
+> >  	hw->hw_addr = hw_addr;
+> >  	info->init(hw);
+> > +	mucse_init_mbx_params_pf(hw);
+> > +	err = hw->ops->echo_fw_status(hw, true, mucse_fw_powerup);
+> > +	if (err) {
+> > +		dev_warn(&pdev->dev, "Send powerup to hw failed %d\n", err);
+> > +		dev_warn(&pdev->dev, "Maybe low performance\n");
+> > +	}
 > > +
-> > +	build_powerup(&req, is_powerup);
-> > +	len = le16_to_cpu(req.datalen);
-> > +	mutex_lock(&hw->mbx.lock);
-> > +
-> > +	if (is_powerup) {
-> > +		err = mucse_write_posted_mbx(hw, (u32 *)&req,
-> > +					     len);
-> > +	} else {
-> > +		err = mucse_write_mbx_pf(hw, (u32 *)&req,
-> > +					 len);
+> > +	err = mucse_mbx_sync_fw(hw);
+> > +	if (err) {
+> > +		dev_err(&pdev->dev, "Sync fw failed! %d\n", err);
+> > +		goto err_free_net;
 > > +	}
 > 
-> It looks odd that this is asymmetric. Why is a different low level
-> function used between power up and power down?
+> The order here seems odd. Don't you want to synchronise the mbox
+> before you power up? If your are out of sync, the power up could fail,
+> and you keep in lower power mode? 
 > 
-> > +int mucse_mbx_reset_hw(struct mucse_hw *hw)
-> > +{
-> > +	struct mbx_fw_cmd_reply reply = {};
-> > +	struct mbx_fw_cmd_req req = {};
-> > +
-> > +	build_reset_hw_req(&req);
-> > +	return mucse_fw_send_cmd_wait(hw, &req, &reply);
-> > +}
+
+As I explained before, powerup sends mbx and wait fw read out, but
+without response data from fw. mucse_mbx_sync_fw sends mbx and wait for
+the corect response from fw, after mucse_mbx_sync_fw, driver->fw
+request and fw->driver response will be both ok.
+
+> > +	netdev->netdev_ops = &rnpgbe_netdev_ops;
+> > +	netdev->watchdog_timeo = 5 * HZ;
+> > +	err = hw->ops->reset_hw(hw);
+> > +	if (err) {
+> > +		dev_err(&pdev->dev, "Hw reset failed %d\n", err);
+> > +		goto err_free_net;
+> > +	}
+> > +	err = hw->ops->get_perm_mac(hw);
+> > +	if (err == -EINVAL) {
+> > +		dev_warn(&pdev->dev, "Try to use random MAC\n");
+> > +		eth_random_addr(hw->perm_addr);
 > 
-> And this uses a third low level API different to power up and power
-> down?
+> eth_random_addr() cannot fail. So you don't try to use a random MAC
+> address, you are using a random MAC address/
 > 
 > 	Andrew
 > 
 
-There are 3 APIs, they has some different ....
-1. mucse_write_mbx_pf just sends mbx.
-/**
- * mucse_write_mbx_pf - Place a message in the mailbox
- * @hw: pointer to the HW structure
- * @msg: the message buffer
- * @size: length of buffer
- *
- */
+Maybe update it like this?
+if (err == -EINVAL) {
+	dev_warn(&pdev->dev, "Using a random MAC\n");
+....
 
-2. mucse_write_posted_mbx sends mbx and wait fw read out.
-/**
- * mucse_write_posted_mbx - Write a message to the mailbox, wait for ack
- * @hw: pointer to the HW structure
- * @msg: the message buffer
- * @size: length of buffer
- */
-powerdown is called when driver is removed, nothing to do with fw later,
-no need to wait fw's ack.
-Of course, it can use mucse_write_posted_mbx to wait when
-powerdown if you want me to do it?
-
-3. mucse_fw_send_cmd_wait sends mbx, wait fw read out, and wait for
-response.
-/**
- * mucse_fw_send_cmd_wait - Send cmd req and wait for response
- * @hw: pointer to the HW structure
- * @req: pointer to the cmd req structure
- * @reply: pointer to the fw reply structure
- */
-
- Thanks for feedback.
+Thanks for your feedback.
 
 
