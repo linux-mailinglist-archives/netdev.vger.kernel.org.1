@@ -1,88 +1,74 @@
-Return-Path: <netdev+bounces-220113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA87AB447AB
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:50:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C53BB447D0
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 809C83A2D41
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 20:50:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA9857B3461
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 20:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49649284B37;
-	Thu,  4 Sep 2025 20:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5665A288522;
+	Thu,  4 Sep 2025 20:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cafd0cQl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zolpVgXI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A521B4223;
-	Thu,  4 Sep 2025 20:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3F5277035;
+	Thu,  4 Sep 2025 20:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757018996; cv=none; b=Zp7aX1rG5Cx2xyFQZG9XnKJQ0fiCh2i6adL7FoOLXJNcRB10ejivKnGElunSWafGP1JH7nqfjuxRTK8Ff0qw4G8+V5hfXkMfvZGNZPUTGw4KVyUdKrLSnLHF75MI/E1R8xLu8zxZrD4q9oUfWEUtJXTyTB+j60VjumCAgfwiGPE=
+	t=1757019354; cv=none; b=jGN2bbuJCLse7TgllNvn2OBVddLkOd5dmxCtNon1+RvfycdvQTZ473FjESPwvfqI7zxo4T1VGEZ+dHZPGk6jbyVbJi5+3Gtywgg+xb8PJwVr/Lm5Gx/w1oTnOs8W199wI/9JnNg3QdX/KjSflO71u7Ep43mFw6zpprKddXmUsXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757018996; c=relaxed/simple;
-	bh=0Ia6nloHQ0Ff9r1ulZPnl3Zod+d/yZqUp95nBs/ncxI=;
+	s=arc-20240116; t=1757019354; c=relaxed/simple;
+	bh=lOieOaxJl/HJ6EZFMGwfqQSswUxr+WjnasHapA8ngN0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JxszOGD5CdJiZJ8wINM0FM/eyC3iYtEuoM4lrmknkhMAjBoiI1qKWv+8HJ79vhp1l2IqgE1iDQAPHEWMatSDNzdNPnQFmUDY7mnj32MxWaydzoDDEsGzzJ6FZcOCnpXzANjUiqYyEJfhnEZj1V/Dc45V8pTuSNZJ7UtynT22+JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cafd0cQl; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MgQkSL1KPd31q0yGx1YBfBg/BNXTL/hwsPCMI8L4USk=; b=cafd0cQl9t9SZ6QiVZLpIxJfk1
-	nSGxl+L3uTgjh2c26Pg8GivhTLKLI9rB5WC2JhFEvZ7VO5rU3HCGFQ3pXcyRAsXbYnLDPllgZoYYg
-	LtpX1A890+XJGATjLiJUfNfqo7RM9SxLuDg7hLT1XWKLURmspGmuSxCpnPdCz0odRK8XbWovJdMDx
-	yDLtxick2P47burx74WmW4HcMGAQpWah/L4XyGHN7QVmhVZ6rexPUR0bIwvPXGsGTVfJ4HTAa+5Wt
-	XIMg0VOvEWPuugPUjlQHfafL0bRsgUj7xEhA+K61CnKQHtq6OuXyyNsZo+GRwZRf6cTzhFubCO29n
-	XeiF82Kg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57380)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uuGtn-000000002X1-2IMh;
-	Thu, 04 Sep 2025 21:49:39 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uuGth-000000001qx-3mKy;
-	Thu, 04 Sep 2025 21:49:33 +0100
-Date: Thu, 4 Sep 2025 21:49:33 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RBh8m1OWrjTYd7qYsDtD07SDgAMGDaVgelbKNpa+ljRdszNAWIqlO7M1Pssa6d4vPCeJCcJ3u/PcCWj3LS4RAIWmfLiOhOElcYJmJ6ltnPr+pvQxRso+qA/kcGe1iMFLEIFTb8WAhkkv/kBFWl80fy6l52gygBZfXYAoO5VJ+5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zolpVgXI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ICwp4WEpf+oje9C4vXRf3yiDN+RkViycSqnmJpw1338=; b=zolpVgXIc9rGkw3MzPrMLI8sBs
+	bbt2dCAz58ipYDX+/TOV6lQHt/X/j8Gj3Ac06PsyUJMtXK0kkrzh1PZg5pt5iGKGVqJCeFzLB5zhR
+	z9WkSeYjlYmIBtWIJkIBn0Rj5gpVbU93qVAv40k5Of3Pnd5wazSZbHKhowTCYtfzI/rA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uuGzd-007Gtc-TD; Thu, 04 Sep 2025 22:55:41 +0200
+Date: Thu, 4 Sep 2025 22:55:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	Philipp Zabel <p.zabel@pengutronix.de>,
 	Geert Uytterhoeven <geert+renesas@glider.be>,
 	Magnus Damm <magnus.damm@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Biju Das <biju.das.jz@bp.renesas.com>,
 	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v2 2/3] net: stmmac: dwmac-renesas-gbeth: Use OF
- data for configuration
-Message-ID: <aLn7XVnWmHv1Bfe2@shell.armlinux.org.uk>
-References: <20250904203949.292066-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250904203949.292066-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v2 8/9] net: pcs: rzn1-miic: Add per-SoC control
+ for MIIC register unlock/lock
+Message-ID: <fc103af7-0558-46bf-a668-d4d815ae704e@lunn.ch>
+References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250904114204.4148520-9-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,31 +77,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250904203949.292066-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250904114204.4148520-9-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-On Thu, Sep 04, 2025 at 09:39:48PM +0100, Prabhakar wrote:
->  	plat_dat->init = renesas_gbeth_init;
->  	plat_dat->exit = renesas_gbeth_exit;
-> -	plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
-> -			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
-> -			   STMMAC_FLAG_SPH_DISABLE;
-> +	plat_dat->flags |= gbeth->of_data->stmmac_flags;
+> -static void miic_reg_writel(struct miic *miic, int offset, u32 value)
+> +static inline void miic_unlock_regs(struct miic *miic)
+> +{
 
-You include the first two flags in your new device. I would like to see
-at least STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP always being set. The only
-reason we have the STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP flag is to avoid
-changing existing behaviour and causing regressions. New stuff should
-always set this.
+Please don't use inline in C files. The compiler should decide.
 
-If there is a reason not to have this set (e.g., PCS doesn't support
-it) then we need to make that a PCS property and extend phylink's EEE
-support. If there's something wrong in the setup that stmmac does for
-EEE, then I'd like to hear about it as well.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+       Andrew
 
