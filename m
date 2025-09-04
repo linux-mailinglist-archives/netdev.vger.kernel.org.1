@@ -1,193 +1,166 @@
-Return-Path: <netdev+bounces-219812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B75BB431CD
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 07:51:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCE4B431EB
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8239016928B
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:51:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A02EE547A34
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 06:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFF52376F8;
-	Thu,  4 Sep 2025 05:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C853B24A044;
+	Thu,  4 Sep 2025 06:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WkKozhHs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYEXIIsm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964E223D7D8
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 05:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0971B248869
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 06:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756965077; cv=none; b=aizO4GqmwUg/XEYspZA8PyR5WcQx78ZqD54kEZMPThVoTrQc/GmHY7HnShoVcBjnqaiTfFu0y4sB0Q4ap8fMBvFN1yzzeRPIuTnZ3DcPhi/RO9oBv7VgJN17ZNym3h0P1c/4Kk3Y3G2TqNByRKzI/J1UFdNjVubVJI736ia0ayM=
+	t=1756965794; cv=none; b=DiNy17YrSJvfxk1T9nhYRUDHuOZigI/rhJQ3OxEVe+7Mpi8OSCIZp8bE08GvEefngZMg35l4qRleAoEtiY8JD99CWzXRVTv1L0dH3fYkOCO2uxwS46saaHxt3kVnFeMBsAtpnufZu13WKnfjVDOnzFxMZ7NxsnywqC/cXv13pho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756965077; c=relaxed/simple;
-	bh=OOF7HixicOsFQMfTDwMe/QQcFadtCg6wUvl0gIhKc80=;
+	s=arc-20240116; t=1756965794; c=relaxed/simple;
+	bh=ul16gl8P5splpgfMS9AuloAvXzeiJCfXNATBrMDdWck=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JT0UHAQbBuPBjx5IlOdWcjQaLHiuJuHel9rJQWJ9QU0reE3L7+VEcpttnar0quu2SaLkCv/Mn6ZhH7xOh6K4LZrfTT1sBQsm1sHHo9JlBW1KE5pNpd+yHnKtAREz1gu3UHY/KQzQUU5UnlqkZwJGiJkWrCVDYoRbdRVcaea0UjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WkKozhHs; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <40ed29b3-84d7-4812-890d-3676957d503f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756965062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uMFKcVml4hRd8ozRNDMakWh5QQ2N0I2r7+WMED7nTfE=;
-	b=WkKozhHsPeZ+Mee6RbPK4YR9MscoVm+sEWE3ryl4LVQjoYNYH0cxBC8y8K5SQVVeBaYF3b
-	zdr+/mON4dT9CJuwrZD19mspbI96yeRfMjyitKPHeGyROHW2U8Hr9/WebvoLMd95whsUCb
-	jrQgpZX1uGxrrnsCiOG3mm6EhdDFugM=
-Date: Wed, 3 Sep 2025 22:50:53 -0700
+	 In-Reply-To:Content-Type; b=D4cJ7x8r2Fa3HzVJWK6NetRCcV4oA22KUyE5dfoiGR5kWEeGis6DUnenRZyxaJFFMiuIawlumIH8OxD/sVDIeJM5qP8DKCyxx0l3gmZkYYRKYd7GyOrMNxKhAUFN1x4AOyy137fFFt/VcW3l+9ebM5EvN9VmwvjtNufbYmmk5sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BYEXIIsm; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-61e425434bbso1052513a12.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 23:03:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756965791; x=1757570591; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZVPg2qeIl1VYNj4SqJT/f6jtyBMBms1WA1Dy0Nue7wQ=;
+        b=BYEXIIsmJmujwTeux8TiuuiDLoW6ELJ3DM653Ptl+CsTH4bQKnhx1yuVkQzVSVESHM
+         Ja8fDrnTs4uY+TZMPJHMeGi14Xkt4IBh1Cfs3zbUoJz2LznlrqQ1GKmepTxIHSBuXE1Y
+         IEN8dqRSn9xkAjNVK7ZZAYDwF72rpNQnYHYKQnsJMudPE1pBVd3e41qmfIgUbr9eXHQ9
+         4X4vKiKrDv5jirgKlXMAg0HIC6wh3jD6hl8snNgeObRYG4wKO5W0kS4UMMmKHqQTJ54o
+         u2Mp9TZxknAv3uAlrPPtLoEBFvk1/mf0JykzeYgcF4rw7688N6LtABhCIqbWW1rezCYx
+         YaCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756965791; x=1757570591;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZVPg2qeIl1VYNj4SqJT/f6jtyBMBms1WA1Dy0Nue7wQ=;
+        b=Cs8pq+dGLK9Cjiu29CBFCkWreyj4l/OT3QHDd6aagR7Ne5H3DaMaUOAA/gEXw1tV5O
+         fHs5qEc2w1ig0bXq1ckUqfyxkWOOdq2lTZ9sAjo1RJ2fHIRE6gml0bz9nOXD8kYZ7YAM
+         XMLDJDQ/BxQv5cGg5HWgC9vV0nZC6KWsnSji7tGQjZHC1o0uxePbEGFD0pkEAbPigzb1
+         oVVpH6SrkNg6toBK/vYQGWVC+HvQmirKPTaYqlWzZ2hLzsjWHCigxySJRk2Pxl/KUNPw
+         stIU9iy3oKK3VBgfU8shHI1LRjKnAZedG6S0WR2PN1lD6hfRn33kiGR6rGL5uESJyAZr
+         pCBA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ8rgUGt1cSUMxhhBs6Yup6u3UXSDjWG/+j+lXcMcX7U/sglm5ytdNum5eYY4KhIV6AGTOtV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziotYuFjghrSVOb7VgHzxSTzo6yWMtjdgZHewifYTdsyGJEt7X
+	sPjEb/5zOr3aSYCohXL9dKW/B3uzXdZdQ7n62kPA9KRJEJItNCDm5mge
+X-Gm-Gg: ASbGncuCPSRQX625KV8TRLUzwsbQX7GrrDT5BNuxD1Hgx7JB3vGMdQ9ymhWOLD5A/rP
+	M1t+va3w57UOea6x2qgz6zxBXy4fessHe6rwDBmCMSv52DfWJQkmIiBoYnNfCynhdk5jQjjynkl
+	EdTW0WkkAfPECjapK1PvOcuNzTrUX/4C8FQhY34smakyuYfb/WpfcakOhHWh8zrgZtu0+95A+RK
+	66S2/rWSAbrHbubR+QiPQ/b+33PcS78osHKZUiT4cqx3jc0xWWf99mY/BFPANnDCBxDDLK8yoAV
+	rmza/H1s7+Ly6uCzCcy1C/kuE1DGl7XYg5ZHZpk954SvsrGNikFZ2bzf7exJIgwJz31O5cjotqZ
+	ir+F1DTULyITsJWiPaNadlruWGzfnbUkoN1FqDQnlvYngN0Q8wPQ8Gb+vy9EqtobTKSZ0mmY8J2
+	4Oz/wz5Ueo9idVAk7tp9RCmBKmoYJkUUrCbUj8NJRS99A8gJ5So1oEYlyy4+0=
+X-Google-Smtp-Source: AGHT+IF5HOi5wOd8aDJKrCfzafdIrLfJVHtZx9IhHvjxxIoO0DuEabgG9Ni0Ci3UGbFVhw+nEbrk+g==
+X-Received: by 2002:a05:6402:50d3:b0:617:c1e5:bfa9 with SMTP id 4fb4d7f45d1cf-61d26da4410mr16377767a12.33.1756965791090;
+        Wed, 03 Sep 2025 23:03:11 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f1f:b00:1062:8af8:2f20:2501? (p200300ea8f1f0b0010628af82f202501.dip0.t-ipconnect.de. [2003:ea:8f1f:b00:1062:8af8:2f20:2501])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-61d3174074bsm10410087a12.35.2025.09.03.23.03.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Sep 2025 23:03:10 -0700 (PDT)
+Message-ID: <d618cdc8-593f-43e3-8ac1-663e2d6617d9@gmail.com>
+Date: Thu, 4 Sep 2025 08:03:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 bpf-next/net 5/5] selftest: bpf: Add test for
- SK_BPF_MEMCG_SOCK_ISOLATED.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250829010026.347440-1-kuniyu@google.com>
- <20250829010026.347440-6-kuniyu@google.com>
- <904c1ffb-107e-4f14-89b7-d42ac9a5aa14@linux.dev>
- <CAAVpQUDfQwb2nfGBV8NEONwaBAMVi_5F8+OPFX3=z+W8X9n9ZQ@mail.gmail.com>
- <CAAVpQUBWsVDu07xrQcqGMo4cHRu41zvb5CWuiUdJx9m6A+_2AQ@mail.gmail.com>
- <CAAVpQUCyPPO1dfkkU4Hxz67JFcW6dhSfYnmUp0foNMYua_doyg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next] net: phy: fixed_phy: remove link gpio support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Florian Fainelli <f.fainelli@gmail.com>
+References: <230c1f83-6dac-484a-bc80-e62260e56e74@gmail.com>
+ <20250903173204.3ca4969e@kernel.org>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAAVpQUCyPPO1dfkkU4Hxz67JFcW6dhSfYnmUp0foNMYua_doyg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20250903173204.3ca4969e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 9/3/25 10:08 AM, Kuniyuki Iwashima wrote:
-> On Wed, Sep 3, 2025 at 9:59 AM Kuniyuki Iwashima <kuniyu@google.com> wrote:
->>
->> On Tue, Sep 2, 2025 at 1:49 PM Kuniyuki Iwashima <kuniyu@google.com> wrote:
->>>
->>> On Tue, Sep 2, 2025 at 1:26 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>>>
->>>> On 8/28/25 6:00 PM, Kuniyuki Iwashima wrote:
->>>>> The test does the following for IPv4/IPv6 x TCP/UDP sockets
->>>>> with/without BPF prog.
->>>>>
->>>>>     1. Create socket pairs
->>>>>     2. Send a bunch of data that requires more than 256 pages
->>>>>     3. Read memory_allocated from the 3rd column in /proc/net/protocols
->>>>>     4. Check if unread data is charged to memory_allocated
->>>>>
->>>>> If BPF prog is attached, memory_allocated should not be changed,
->>>>> but we allow a small error (up to 10 pages) in case other processes
->>>>> on the host use some amounts of TCP/UDP memory.
->>>>>
->>>>> At 2., the test actually sends more than 1024 pages because the sysctl
->>>>> net.core.mem_pcpu_rsv is 256 is by default, which means 256 pages are
->>>>> buffered per cpu before reporting to sk->sk_prot->memory_allocated.
->>>>>
->>>>>     BUF_SINGLE (1024) * NR_SEND (64) * NR_SOCKETS (64) / 4096
->>>>>     = 1024 pages
->>>>>
->>>>> When I reduced it to 512 pages, the following assertion for the
->>>>> non-isolated case got flaky.
->>>>>
->>>>>     ASSERT_GT(memory_allocated[1], memory_allocated[0] + 256, ...)
->>>>>
->>>>> Another contributor to slowness is 150ms sleep to make sure 1 RCU
->>>>> grace period passes because UDP recv queue is destroyed after that.
->>>>
->>>> There is a kern_sync_rcu() in testing_helpers.c.
->>>
->>> Nice helper :)  Will use it.
->>>
->>>>
->>>>>
->>>>>     # time ./test_progs -t sk_memcg
->>>>>     #370/1   sk_memcg/TCP       :OK
->>>>>     #370/2   sk_memcg/UDP       :OK
->>>>>     #370/3   sk_memcg/TCPv6     :OK
->>>>>     #370/4   sk_memcg/UDPv6     :OK
->>>>>     #370     sk_memcg:OK
->>>>>     Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
->>>>>
->>>>>     real       0m1.214s
->>>>>     user       0m0.014s
->>>>>     sys        0m0.318s
->>>>
->>>> Thanks. It finished much faster in my setup also comparing with the earlier
->>>> revision. However, it is a bit flaky when I run it in a loop:
->>>>
->>>> check_isolated:FAIL:not isolated unexpected not isolated: actual 861 <= expected 861
->>>>
->>>> I usually can hit this at ~40-th iteration.
->>>
->>> Oh.. I tested ~10 times manually but will try in a tight loop.
->>
->> This didn't reproduce on my QEMU with/without --enable-kvm.
->>
->> Changing the assert from _GT to _GE will address the very case
->> above, but I'm not sure if it's enough.
+On 9/4/2025 2:32 AM, Jakub Kicinski wrote:
+> On Tue, 2 Sep 2025 20:37:02 +0200 Heiner Kallweit wrote:
+>> The only user of fixed_phy gpio functionality was here:
+>> arch/arm/boot/dts/nxp/vf/vf610-zii-dev-rev-b.dts
+>> Support for the switch on this board was migrated to phylink
+>> (DSA - mv88e6xxx) years ago, so the functionality is unused now.
+>> Therefore remove it.
 > 
-> I doubled NR_SEND and it was still faster with kern_sync_rcu()
-> than usleep(), so I'll simply double NR_SEND in v5
+> Sorry if I'm mixing things up and misunderstanding.
+> There was a recent conversation regarding backward compat
+> with device trees. Was it related to this patch? Is the policy 
+> that we only care about in-tree device trees?
+> Would it make sense to document in the commit message?
 > 
-> # time ./test_progs -t sk_memcg
-> ...
-> Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
-> real 0m0.483s
-> user 0m0.010s
-> sys 0m0.191s
-> 
-> 
->>
->> Does the bpf CI run tests repeatedly or is this only a manual
->> scenario ?
-
-I haven't seen bpf CI hit it yet. It is in my manual bash while loop. It should 
-not be dismissed so easily. Some flaky CI tests were eventually reproduced in a 
-loop before and fixed. I kept the bash loop continue this time until grep-ed a 
-"0" from the error output:
-
-check_isolated:FAIL:not isolated unexpected not isolated: actual 0 <= expected 256
-
-The "long memory_allocated[2]" read from /proc/net/protocols are printed as 0 
-but it is probably actually negative:
-
-static inline long
-proto_memory_allocated(const struct proto *prot)
-{
-         return max(0L, atomic_long_read(prot->memory_allocated));
-}
-
-prot->memory_allocated could be negative afaict but printed as 0 in 
-/proc/net/protocols. Even the machine is network quiet after test_progs started, 
-the "prot->memory_allocated" and the "proto->per_cpu_fw_alloc" could be in some 
-random states before the test_progs start.  When I hit "0", it will take some 
-efforts to send some random traffic to the machine to get the test working again. :(
-
-Also, after reading the selftest closer, I am not sure I understand why "+ 256". 
-The "proto->per_cpu_fw_alloc" can start with -255 or +255.
-
-I don't think changing NR_SEND help here. It needs a better way. May be some 
-functions can be traced such that prot->memory_allocated can be read directly? 
-If fentry and fexit of that function has different memory_allocated values, then 
-the test could also become more straight forward.
-
+This other conversation was about something different, the deprecated
+old fixed-link binding. Wrt link gpio there is a very small risk
+that there's out-of-tree users who use link gpio with a switch chip
+not handled by DSA. I can mention this in the commit message. And yes,
+my current understanding is that we care about in-tree dt's only.
 
 
