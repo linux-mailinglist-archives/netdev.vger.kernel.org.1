@@ -1,232 +1,268 @@
-Return-Path: <netdev+bounces-220133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11493B44898
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 23:33:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E3E3B448AA
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 23:38:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0140AA11D7
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:33:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 537133BE9EC
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B02B2C235A;
-	Thu,  4 Sep 2025 21:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD78E2C1580;
+	Thu,  4 Sep 2025 21:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+2oi2qJ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="HyTs2Ieh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013001.outbound.protection.outlook.com [52.101.83.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38AB2C032C
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 21:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757021593; cv=none; b=GO1May5zu7xX1MZ1Qudk3/Py6bQSuh2Q79ri4EmDKlf7MdxSUjnj0mt2y8/9gAW29EoPjqUyQi0C81Ovnjmr+CfoiWOvPiDu5l330eem4YKuNMhKZT+qAG62yGRiEFleRxKxmOxyToaeUSlM0hmAbqoJ2NI5u1sCQvz3A+KfPNI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757021593; c=relaxed/simple;
-	bh=9MiI5ZvuCO1wq15mMD/fHkYQx414pGpbtnQ0zoGU7d8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oajoiGghyVgixdE1vlItyxIH/7kP/6iaTCioFD+6WV8KO4P3nCvWxaBmLN3ZeUBZk5gGP1yZ8aly3+26xiY9tS/9djnpkCcBIj/jW0DkbkkWWyGp67ifu38fzN59SdDxbGfyAkPS9QLmnGjCpbAgFEnYfOYezB3mDpgk2W95cE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O+2oi2qJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757021590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G12ZvoIGncdc5q9Oz1isjoS1D9PWqRfwj3EJGyQfxdc=;
-	b=O+2oi2qJ3+Anm9jMzwN7/PwtY4fw8MTbzOUVOhQHBt0ScbkhBHMZooxBU/YkANeJAfFiTi
-	pzWWYJ8IDenSiwubOJHetHK4XxilicS+RGfvXpzqlTi2AXQrf8s/PBJuPBLw84iibZP3SI
-	38OJgcjL26RGljioOymvE/w39vYrtgI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-502-YCAK9JsWNLCOwIlvaspmFw-1; Thu, 04 Sep 2025 17:33:02 -0400
-X-MC-Unique: YCAK9JsWNLCOwIlvaspmFw-1
-X-Mimecast-MFC-AGG-ID: YCAK9JsWNLCOwIlvaspmFw_1757021582
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3dbc72f8d32so666709f8f.3
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 14:33:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757021581; x=1757626381;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G12ZvoIGncdc5q9Oz1isjoS1D9PWqRfwj3EJGyQfxdc=;
-        b=Sg1Y46kCgZWeutoO9Sn6Z+Q2v64DqBl+UOCK832/yqjnwxMVXNQSGJqUFMQYyi2uqH
-         kuOMQ2Maqq6oQMjQiWza/59nJSdYHyDkk5mlswmFFrPqsBmxYauvEct88ho1MfKyClHq
-         hAQuf9zB56vf6XfvSAuH/l74ZVneOw4y/taYVhuN/H9w+rE+DgMZXe50Mbf72mo3l00h
-         I5AsNPU+dnYL6oHMRKp2L+3ktE/utjpcKkMpUTnElRsadrBS1CX2NR9K2w7MXp2jnk+v
-         t4Oq9ynCXtdomfaLQ81UruYN9IIRIV4lAjR+1zqp0Upw0Uq3lSWOcBhk6ltPnpT9s4+u
-         gpmg==
-X-Forwarded-Encrypted: i=1; AJvYcCVoofckGg9MjC6Q5wGLFE4lYhmiVcy/Ipkt31f20bb4sas5Fmw1XYPlFMchoha3/xHbACqCxs8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywr+H4yPZERMgxehEIoUJy939QW7+FhCn0zamByn7oKdiYEPVk6
-	iCrKK0gbndR0Nti8MaqCbsSB3cF3mtt9ecYav81ni5x/yKrMjJlb+6/eMPs2HBQ2HLVvNKSO28/
-	EWnI92PxOs6gSGN6NYQggROYoq/q5yh+rB/j6SfuPQluyM47GrvLtRaQfKw==
-X-Gm-Gg: ASbGncvOEBh4XRQ2CgiJvpAuQUMalDCR2SGl/NpZKNN1at42fXVzC0o6yjv+NQ2Q83u
-	Rg/EuYJiTUGRoO7+DffztqsyZCIAP3EwI3w9Acr6l27OF+ZEjdEcYf40TgonXgQxUiRsQx2IobS
-	PsL0S1eO4euBL9bwg7rYqIz1j5tJp2VnfWwQfe3sCCVHgNNDZOp6TdY1T+9u/8m2UHjpdIzSYiG
-	E/Kh7ueMgrNc9gGao6q/J4qhdWROruPxcYEXQb1Xrd9XNej/Ei6uPKnx263xmE6njojx3LnICpA
-	Er/YW4DsvME1uxsp6UDqBczFvXHnxfGRltCa/96fq7oSc10V5l5dEgElH6d3EJXlQQ==
-X-Received: by 2002:a05:6000:2703:b0:3d3:6525:e35a with SMTP id ffacd0b85a97d-3d36525e8edmr9572277f8f.4.1757021581607;
-        Thu, 04 Sep 2025 14:33:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFfw63CZFozF8s+C6cWdSgHCPxbPiLm75XGfmKwvUvkmtLdSrYut8mMraqSLccxduV85Qv9AQ==
-X-Received: by 2002:a05:6000:2703:b0:3d3:6525:e35a with SMTP id ffacd0b85a97d-3d36525e8edmr9572266f8f.4.1757021581097;
-        Thu, 04 Sep 2025 14:33:01 -0700 (PDT)
-Received: from redhat.com (93-51-222-138.ip268.fastwebnet.it. [93.51.222.138])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7e50e30asm302706375e9.24.2025.09.04.14.33.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 14:33:00 -0700 (PDT)
-Date: Thu, 4 Sep 2025 17:32:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AA12C08C2;
+	Thu,  4 Sep 2025 21:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757021885; cv=fail; b=fpYohWyn1ny6zW0lwj1z70RjKOOq56lsqA/yn4NRYssgTUqcka122nDYgn5Snw7vbUdN3N5OS0lQKHTUNep1bHV0lhb69j6M31bCPK1k6SZT326aqrO4vEX8vkc/YsKPuGVZ6KWyAsF9STfqmS+YT/zASiJ6z7iWbjYfPxz79QY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757021885; c=relaxed/simple;
+	bh=vuTscOQdf++yeKmSni0M1dsuE8TXlUIzP0GPFV2f/U0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nidqInHCPiyLd723aOqFk4/6M4zTA+GCykVBxIWuM6+JDoKtuvTgm3qCo4DQQHhecAVwPBFZ7uD3tCKdD32I6VhvtqqUbo+3gi0xk/mR2E2APY0wEMTIjliH+G2mHcBYi4KNkqQhDrdWe3rSY2xNnam04wzWUoCKWzUY353/kmc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=HyTs2Ieh; arc=fail smtp.client-ip=52.101.83.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=COSAaSEI8tYZ6mVQ7KnJZGouKuDrTJIZWQnnTF3rT9jYym5N3hFktI4JNClcopOE1Ca9sttdTyq1S9SaN6eSfqXB7lg1HCfBul2XUk1A03UYd/xLEQHjKgI5Q+T1RTWaVGCbBAOO+2XLxN7/Sx+bbvP0S7qn9eaXys6Txl0tQ0Q4FsL3v6I9HA1NQhi2VQdOwP4+GD8uDnfQd7jE7H4FCoNZkurgW0pYRBjkNP+JHtz2e4LEl9VVByviUhrhMj9jmJ1nl8kMrxJRjbajNzParFG2GLEq39Wa8jtHtFBJbdfP6baGBIaQSWoU8B8QBBb8FTZ063JG2fRIprKZD4p2/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AGyL0ur0/C+rRrM0Lr38GQEa2yMRX3yCFW1grZfSe9c=;
+ b=yHZ1982l8Ip6509zawObu7z4r47+VQHEzASd7T4o0xNgPs39MDcDML4Eq7MYgeoED/CR80rchDCdWzSmVc/7PK/0e0Ea59o8tU0Gxv4FLB6sIH0M5ygy8yh6KvA992SbwyeK5YXDq7IWgZeuedtaVGzodcWkhIm3xC5QLJFmPbXo7mi3bFBO1nHNC3r0Svm1yVo4dJuhjVIgBorUu8nOuefkydE+xQxk4EOoWaEcipmQ00/xMLAJproIKonw2tvK14gdloqGSlDm4YBGCmt3gkZppV7Lp+e/EUD3wmaC+4YrGTDrqEvPQlRZAW57ToIf+MOoOW7iC8MT4/r3vFRDyA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AGyL0ur0/C+rRrM0Lr38GQEa2yMRX3yCFW1grZfSe9c=;
+ b=HyTs2IehB5OLj7HwF4TwHlLwriSCorSNeOkMK7XecoCfnfx5SnRzcj3SB/ogegiF+KEVTmJz1ukO1ztcES8pl+DSZGY31WPaOAJ372hP8Jl7H5QnwYR6h5NE62RuSzubMdsGT21Vsc285rjICXuL2WCRQTtm6fynVVEezR4UIEvfO03g24F/5N1LBc+rxSUDW0autziE6JZSlWpgX/ikE5czT9pzDCz4TeTjjgbbmMJd7lXxG4j4OCryNXw4a+i0oikWcochOrji+p8KJRJ0Kg8oKoUeEW6KLH/SJfXiYFZvp6Kfx2v+ZHI4adeOzCretRTy/wbEux7i4nXOFJyoMA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB9PR04MB9626.eurprd04.prod.outlook.com (2603:10a6:10:309::18)
+ by DU4PR04MB11409.eurprd04.prod.outlook.com (2603:10a6:10:5d2::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.17; Thu, 4 Sep
+ 2025 21:37:57 +0000
+Received: from DB9PR04MB9626.eurprd04.prod.outlook.com
+ ([fe80::55ef:fa41:b021:b5dd]) by DB9PR04MB9626.eurprd04.prod.outlook.com
+ ([fe80::55ef:fa41:b021:b5dd%5]) with mapi id 15.20.9094.015; Thu, 4 Sep 2025
+ 21:37:56 +0000
+Date: Thu, 4 Sep 2025 17:37:47 -0400
+From: Frank Li <Frank.li@nxp.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: Wei Fang <wei.fang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] virtio_net: Fix alignment and avoid
- -Wflex-array-member-not-at-end warning
-Message-ID: <20250904173150-mutt-send-email-mst@kernel.org>
-References: <aLiYrQGdGmaDTtLF@kspp>
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-imx@nxp.com
+Subject: Re: [PATCH v5 net-next 4/5] net: fec: add change_mtu to support
+ dynamic buffer allocation
+Message-ID: <aLoGqxZYQYB4QyBH@lizhi-Precision-Tower-5810>
+References: <20250904203502.403058-1-shenwei.wang@nxp.com>
+ <20250904203502.403058-5-shenwei.wang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250904203502.403058-5-shenwei.wang@nxp.com>
+X-ClientProxiedBy: SJ0PR05CA0140.namprd05.prod.outlook.com
+ (2603:10b6:a03:33d::25) To DB9PR04MB9626.eurprd04.prod.outlook.com
+ (2603:10a6:10:309::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLiYrQGdGmaDTtLF@kspp>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB9PR04MB9626:EE_|DU4PR04MB11409:EE_
+X-MS-Office365-Filtering-Correlation-Id: a4defbf9-624c-456f-2d22-08ddebfb4f74
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|19092799006|376014|52116014|7416014|1800799024|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HllEQQTezw/aH5BL4Svp2JKuz0Y5bU+f9DgVhkbbqcDWQQaEEFriYKS/dMLn?=
+ =?us-ascii?Q?QT7fIwZDfBgaZd46v38FbSQMYXGzCGSlGbaG1zm5dokfqItw/4qiQJk7CafQ?=
+ =?us-ascii?Q?oRB9YYwNc12FcBntDbnPfcSnakuEosClFfRVukXpgSuo6bXAfLx2ZJJwDeB2?=
+ =?us-ascii?Q?CkPhd/5ijSFHz5nNqRrMyiIuHC2aa62YiHZ717CvKV5uivgN83xzkJ2FDv3Q?=
+ =?us-ascii?Q?vAlZsEw7VMf1/sawRDzGC7wa7O4n61DKvs6M4/rfzSgXDlwh2ZAPWd6AgUtl?=
+ =?us-ascii?Q?WKAckKb6rfjxJHgBLkvT1itsItvEMwDD6NTV3vPKx+wYhFkQguLp/FJ8xx2d?=
+ =?us-ascii?Q?xf2CMtUIFLH1fP7mGmKL0aQz1XTrWbTdJFwQi6WyjjTFbpIQTItJmJBgQEOP?=
+ =?us-ascii?Q?HsBfjfmK7lZ6a0kt3JqPmvBCzMAEHwNU0Dyje4q66/LM9Po7D1qzjFqDh+8m?=
+ =?us-ascii?Q?ZidJoKWP8vZp8dmjd7tgcd6cAwbhv+hiKiSeOQOvzByV9io19BKnKOVD+fWc?=
+ =?us-ascii?Q?+csKAgNqnEcOmMxGARxcg74zjpe+I2GGMSm9YZlkONmeIJ5bDYj0Z/rncO5M?=
+ =?us-ascii?Q?vgbpFHAqyIxm+yotUcayaqw4aGuVfD+G3WDUTZxh3JEDGLVmlsbr6wC+yh46?=
+ =?us-ascii?Q?6vsVO4v3nJcHuyOT5gwRVeJAa1DJ7pxT/5EorypZz7lZ7To5RRgO/Ih7t0Ik?=
+ =?us-ascii?Q?TsSLVSfdDo4K98vFUTtt5FCHYnJD0X+7p3ggEZYndUrpsJKJjLEAnvN6gzBR?=
+ =?us-ascii?Q?rk9BKrdHJyMbX+UO7f2UpHEpVqShs94SQsCyJ5qBwANFIF/lOG7zBQjJjJ4t?=
+ =?us-ascii?Q?JLg1g2eBEp8wjTg+MhBOHKrSmfhiU9QLPi43v6saWOsIGafUn7UUALA3fJsI?=
+ =?us-ascii?Q?AMRISW7HNYbZcpj0KCFoc9t0NyqfJhRz8K7XOaC//fwSm9UTPFV9qSmbaYYb?=
+ =?us-ascii?Q?qay0k3EmnAvQsCpVFP5xUOLtvuYYB2ZVKqZBFBe7KJeW9dJFpr2FQrfFJpzk?=
+ =?us-ascii?Q?RwvmA5nPI4h6WwWP19ylomChj86wo8rcbO4FgBE+34N3sQN86MHfVBImWwSt?=
+ =?us-ascii?Q?mCT6Wknc6Dsp1l88pc7Fvf/lzu7+1xLveeK2DmvUBYiMI/xQ5kKRkClz3DF4?=
+ =?us-ascii?Q?GkcwGpmtAgh6b6PPUQ2knRc3Gz31vtGlB+RP5s0CGrZMEEp2GicBMyiP/cuo?=
+ =?us-ascii?Q?7SMuBoZqug9VbywqH8kWDiGazSsruevZ8BtuoKMTn+8AC0UcMoJYZwprrhJa?=
+ =?us-ascii?Q?IoRcj4/O6m+tBSQPe7M1LoPtbhzmEZ/f3fHJ13m3XugMSNQDJOYjEQrx3xHH?=
+ =?us-ascii?Q?ZM0w+z1/in5RyBwPRnnywAZPUv72Lq9Im/iphd4P9RnMKUCG0m4NMSWMjMJ7?=
+ =?us-ascii?Q?hGqiarArHGmqaxiNhEJFwuWZcCTRClixaAKrKUJw+yAIMMCg7ifej+E9pOq5?=
+ =?us-ascii?Q?REDCLevR59xWy5rvB5PZQ5mIUkpHcLS+KTQkqgCrQ9LEoMBOB4Hswg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9626.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(376014)(52116014)(7416014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tdJmAd27QEBpECnfkavdKzTeyiKLynRzLELEZmiyj/LFhHYy9+JLz8zNawJz?=
+ =?us-ascii?Q?2oYoBEwk/JfG7/TkLLp2A0jD3QJjInPe3WiSxm7UmL3KclBtlwpsIz83YCyx?=
+ =?us-ascii?Q?XMwgvAD295oBaimJzsMl1EEdlMQTfGgqkLoYoaJxgnLLN/4PqrfAQ2OqBcYY?=
+ =?us-ascii?Q?mUZ+WC2maBgyzPgPaM3oUL0zUCazZD/NMvmE0mMKDaUXXUrmoPr8K3+260RG?=
+ =?us-ascii?Q?vMA+EDc0CYirg03QHIlgcFoaSxmABqMYemDzRDj7Mv1h47FLyMdqFe6UHjfE?=
+ =?us-ascii?Q?DzvSBQwBGgMfwY9BOu0Vqk3hG5ACATpNzmVHyNk02de351neXZ8H3C2kOILA?=
+ =?us-ascii?Q?SRknSt9f57lA3su2ptdF9aWJGREXCnFLQ9ZhnRfCNWKnqNz8xjr4hZvx/GmC?=
+ =?us-ascii?Q?iAv1/L7C/CTW5r36k7AZ68qCPadtLOk0Zt0kSG9NJnHljIFYBMb0YJ0tc1O3?=
+ =?us-ascii?Q?AHmNgDpz4afk089PFRnyHnAdDIdJCTtmPfi4fAlMF0ADirwDJNqxO5u+gkH+?=
+ =?us-ascii?Q?8d640aRalmemOiWG55UzKFPrhLPh5jYJuJqUcIZic0uez29R7/9zwcuvqRqB?=
+ =?us-ascii?Q?tJAXf8WTJtpeUAfAtvNWDP4Rh6v4NDLt8Le5I/2g9KDqJHiUxOq06Yg2/N4f?=
+ =?us-ascii?Q?CKVVSlwqsYy5/UpUINtLXr0iZIyelCgPPjqS5mzYhb1h1PdryS/LtJ4q26MC?=
+ =?us-ascii?Q?3ZTu3SxZYMMjasfHh42+8GHvRNTK6kpk99myoeNFCzZnnszicZQSzese9vS9?=
+ =?us-ascii?Q?1CyP7fd1d+FoVe5k1xVTGGPl/6Z3SooQVca9itzsbX2SAY46mygpr2xxPESa?=
+ =?us-ascii?Q?bGVvX06Zb9X++hMQW72BFJR3pKe6sD+hoe3D4Jv/lbRXC73Zl3Q57LpkCgQM?=
+ =?us-ascii?Q?wfMI3tnBJwsc2uULpzMFIjthliItRCZNZyrE3tGJWUk2ytOZ0uQn7KJ3vueD?=
+ =?us-ascii?Q?7VN7rl4L1vXwm6YuZJ3b4d4F3+/hJ0vbFhnfSoKn3PuT0QXJK74W/KphBGnO?=
+ =?us-ascii?Q?oFsQBBh0TfDUZat2voPtxRd4wknK4vB772+C7muW6M6xwy5Q0PeDvo+IEdyP?=
+ =?us-ascii?Q?KCBHJyihc98Z1Ayut/fRWiO4UO1yxEk5fkmKJQEssVXCSkkoJD+IR7//wdYm?=
+ =?us-ascii?Q?WtwJL2wDoHh0mo5WPb3gSgu3BkJAOOsU2ZKS+EeeGg0QuUsyKiA33RV+l5Hk?=
+ =?us-ascii?Q?XTZ91Kyeb7itpqQLCdws9I0iCDKci/XKa+N3YMb7OlnqAunAdP55/fRvBHQY?=
+ =?us-ascii?Q?E63OaShK6GlwMDDJl0sdgplm0YZ8BqXxY8zAeFMBofZzmSXnwz5G83lVFV9x?=
+ =?us-ascii?Q?npXHZlwaBCKJH+BQ0Kx19PglrhHckIUq+oC6k373FlL0asSCa02SFXEXjNil?=
+ =?us-ascii?Q?wFwwefSJdaR+9bEKYADtKHyOC9H5Jw5ASQ4yPIZTRJJIsLd13IrOGGDqgZij?=
+ =?us-ascii?Q?y5Orfnr/wAzu0Tp/48YPbujm9Fwbf+1xfKAbVihhRnHC0a9ULqZ9y8EVT039?=
+ =?us-ascii?Q?NL2owTep+OUruaLXeyFY5f5SJk4Ap99Zd+xTm+bJOyLkBP2K9FFfdIq8/DB/?=
+ =?us-ascii?Q?qOU+06uf4d1VADcMUz52ggUKEgBXatqTrHwB+i00?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a4defbf9-624c-456f-2d22-08ddebfb4f74
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9626.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2025 21:37:56.3532
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Apc9VdbjJNQAOPa09Q/ZrEYAlXJE3EbZjptSQmGsiC2yPAPUuRDf50ft7mjYa8+NQ1n8HavdvK9K5VV2yhKzzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB11409
 
-On Wed, Sep 03, 2025 at 09:36:13PM +0200, Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
-> 
-> Use the new TRAILING_OVERLAP() helper to fix the following warning:
-> 
-> drivers/net/virtio_net.c:429:46: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 
-> This helper creates a union between a flexible-array member (FAM)
-> and a set of members that would otherwise follow it (in this case
-> `u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];`). This
-> overlays the trailing members (rss_hash_key_data) onto the FAM
-> (hash_key_data) while keeping the FAM and the start of MEMBERS aligned.
-> The static_assert() ensures this alignment remains, and it's
-> intentionally placed inmediately after `struct virtnet_info` (no
-> blank line in between).
-> 
-> Notice that due to tail padding in flexible `struct
-> virtio_net_rss_config_trailer`, `rss_trailer.hash_key_data`
-> (at offset 83 in struct virtnet_info) and `rss_hash_key_data` (at
-> offset 84 in struct virtnet_info) are misaligned by one byte. See
-> below:
-> 
-> struct virtio_net_rss_config_trailer {
->         __le16                     max_tx_vq;            /*     0     2 */
->         __u8                       hash_key_length;      /*     2     1 */
->         __u8                       hash_key_data[];      /*     3     0 */
-> 
->         /* size: 4, cachelines: 1, members: 3 */
->         /* padding: 1 */
->         /* last cacheline: 4 bytes */
-> };
-> 
-> struct virtnet_info {
-> ...
->         struct virtio_net_rss_config_trailer rss_trailer; /*    80     4 */
-> 
->         /* XXX last struct has 1 byte of padding */
-> 
->         u8                         rss_hash_key_data[40]; /*    84    40 */
-> ...
->         /* size: 832, cachelines: 13, members: 48 */
->         /* sum members: 801, holes: 8, sum holes: 31 */
->         /* paddings: 2, sum paddings: 5 */
-> };
-> 
-> After changes, those members are correctly aligned at offset 795:
-> 
-> struct virtnet_info {
-> ...
->         union {
->                 struct virtio_net_rss_config_trailer rss_trailer; /*   792     4 */
->                 struct {
->                         unsigned char __offset_to_hash_key_data[3]; /*   792     3 */
->                         u8         rss_hash_key_data[40]; /*   795    40 */
->                 };                                       /*   792    43 */
->         };                                               /*   792    44 */
-> ...
->         /* size: 840, cachelines: 14, members: 47 */
->         /* sum members: 801, holes: 8, sum holes: 35 */
->         /* padding: 4 */
->         /* paddings: 1, sum paddings: 4 */
->         /* last cacheline: 8 bytes */
-> };
-> 
-> As a last note `struct virtio_net_rss_config_hdr *rss_hdr;` is also
-> moved to the end, since it seems those three members should stick
-> around together. :)
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+On Thu, Sep 04, 2025 at 03:35:01PM -0500, Shenwei Wang wrote:
+> Add a fec_change_mtu() handler to recalculate the pagepool_order based
+> on the new_mtu value. It will update the rx_frame_size accordingly if
+> the pagepool_order is changed.
+
+Remove "It will".
+
+>
+> If the interface is running, it stops RX/TX, and recreate the pagepool
+> with the new configuration.
+
+If the interface is running, stop RX/TX and ...
+
+>
+> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
 > ---
-> 
-> This should probably include the following tag:
-> 
-> 	Fixes: ed3100e90d0d ("virtio_net: Use new RSS config structs")
-> 
-> but I'd like to hear some feedback, first.
-> 
-> Thanks!
-> 
-
-
-I would add:
-
-as a result, the RSS key passed to the device is shifted by 1
-byte: the last byte is cut off, and instead a (possibly uninitialized) byte
-is added at the beginning.
-
->  drivers/net/virtio_net.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 975bdc5dab84..f4964a18a214 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -425,9 +425,6 @@ struct virtnet_info {
->  	u16 rss_indir_table_size;
->  	u32 rss_hash_types_supported;
->  	u32 rss_hash_types_saved;
-> -	struct virtio_net_rss_config_hdr *rss_hdr;
-> -	struct virtio_net_rss_config_trailer rss_trailer;
-> -	u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
->  
->  	/* Has control virtqueue */
->  	bool has_cvq;
-> @@ -493,7 +490,16 @@ struct virtnet_info {
->  	struct failover *failover;
->  
->  	u64 device_stats_cap;
+>  drivers/net/ethernet/freescale/fec.h      |  5 +-
+>  drivers/net/ethernet/freescale/fec_main.c | 57 ++++++++++++++++++++++-
+>  2 files changed, 58 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
+> index f1032a11aa76..0127cfa5529f 100644
+> --- a/drivers/net/ethernet/freescale/fec.h
+> +++ b/drivers/net/ethernet/freescale/fec.h
+> @@ -348,10 +348,11 @@ struct bufdesc_ex {
+>   * the skbuffer directly.
+>   */
+>
+...
+>
+> +static int fec_change_mtu(struct net_device *ndev, int new_mtu)
+> +{
+> +	struct fec_enet_private *fep = netdev_priv(ndev);
+> +	int old_mtu, old_order, old_size, order, done;
+> +	int ret = 0;
 > +
-> +	struct virtio_net_rss_config_hdr *rss_hdr;
+> +	order = get_order(new_mtu + ETH_HLEN + ETH_FCS_LEN + FEC_DRV_RESERVE_SPACE);
+> +	old_order = fep->pagepool_order;
+> +	old_size = fep->rx_frame_size;
+> +	old_mtu = READ_ONCE(ndev->mtu);
+> +	fep->pagepool_order = order;
+> +	fep->rx_frame_size = (PAGE_SIZE << order) - FEC_DRV_RESERVE_SPACE;
 > +
-> +	/* Must be last --ends in a flexible-array member. */
-> +	TRAILING_OVERLAP(struct virtio_net_rss_config_trailer, rss_trailer, hash_key_data,
-> +		u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
-> +	);
->  };
-> +static_assert(offsetof(struct virtnet_info, rss_trailer.hash_key_data) ==
-> +	      offsetof(struct virtnet_info, rss_hash_key_data));
->  
->  struct padded_vnet_hdr {
->  	struct virtio_net_hdr_v1_hash hdr;
-> -- 
+> +	if (!netif_running(ndev)) {
+> +		WRITE_ONCE(ndev->mtu, new_mtu);
+> +		return 0;
+> +	}
+> +
+> +	/* Stop TX/RX to update MAX_FL based on the new_mtu
+> +	 * and free/re-allocate the buffers if needs.
+> +	 */
+> +	napi_disable(&fep->napi);
+> +	netif_tx_disable(ndev);
+> +	read_poll_timeout(fec_enet_rx_napi, done, (done == 0),
+> +			  10, 1000, false, &fep->napi, 10);
+> +	fec_stop(ndev);
+
+I think you need move fep->pagepool_order and fep->rx_frame_size to here.
+incase update rx_frame_size impact running queue.
+
+Frank
+> +
+> +	WRITE_ONCE(ndev->mtu, new_mtu);
+> +
+> +	if (order != old_order) {
+> +		fec_enet_free_buffers(ndev);
+> +
+> +		/* Create the pagepool based on the new mtu.
+> +		 * Revert to the original settings if buffer
+> +		 * allocation fails.
+> +		 */
+> +		if (fec_enet_alloc_buffers(ndev) < 0) {
+> +			fep->pagepool_order = old_order;
+> +			fep->rx_frame_size = old_size;
+> +			WRITE_ONCE(ndev->mtu, old_mtu);
+> +			fec_enet_alloc_buffers(ndev);
+> +			ret = -ENOMEM;
+> +		}
+> +	}
+> +
+> +	fec_restart(ndev);
+> +	napi_enable(&fep->napi);
+> +	netif_tx_start_all_queues(ndev);
+> +
+> +	return ret;
+> +}
+> +
+>  static const struct net_device_ops fec_netdev_ops = {
+>  	.ndo_open		= fec_enet_open,
+>  	.ndo_stop		= fec_enet_close,
+> @@ -4029,6 +4081,7 @@ static const struct net_device_ops fec_netdev_ops = {
+>  	.ndo_validate_addr	= eth_validate_addr,
+>  	.ndo_tx_timeout		= fec_timeout,
+>  	.ndo_set_mac_address	= fec_set_mac_address,
+> +	.ndo_change_mtu		= fec_change_mtu,
+>  	.ndo_eth_ioctl		= phy_do_ioctl_running,
+>  	.ndo_set_features	= fec_set_features,
+>  	.ndo_bpf		= fec_enet_bpf,
+> --
 > 2.43.0
-
+>
 
