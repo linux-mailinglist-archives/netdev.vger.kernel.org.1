@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-220084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09AA6B44624
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:07:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44E35B44647
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:18:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC0EC1CC1DD3
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 19:07:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 159537BA9B2
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 19:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC74E25A2A5;
-	Thu,  4 Sep 2025 19:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61ABF26B2A5;
+	Thu,  4 Sep 2025 19:18:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Iao1eaBP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GTF0aUK0"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC5B2417D4
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 19:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E6E33997;
+	Thu,  4 Sep 2025 19:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757012821; cv=none; b=UUVSvsIdUQy+E/IiPshvRNVAsx3fagalw/ujFl/mlRXDwWgOLYXU8h0nxNfyDd9j7+wxjmN7PsXE5GAIKJO9wd7scEJOaAHVMtMnqfjGIFh2Hjsm4hZnbcyEaiIo6ai1pzoAgbltuX56HArv9AxQ42ZYmY+jrBd8Tz+PTctSHlI=
+	t=1757013512; cv=none; b=JZFR1OKtkxapvDhUEdfqR08AmAJxYsTKtmlpnKwr6a+dh4c2+l//xCdKrVaF7eV38wUr+XF6icEf16i1vq7JrvjhjVht1qrgTmOqV/uq6hAepvzCcK1UgugaHKJMoLRuNXXAZzozgbci89xiBE7vLH+fAOxkykQfcZXMoO1Zmu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757012821; c=relaxed/simple;
-	bh=MtfZa1k7punazYHLZHjV6BdtuJwbPDuoroVR20HUX5E=;
+	s=arc-20240116; t=1757013512; c=relaxed/simple;
+	bh=E6qkdjA0Y+1D5PC07L7AvfjLrlIwmg0gVautHyMx4io=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BJ1Idu3nLoWOqE400mw1o8oZVs+8boqD5Kpf6x4jjilfBPZV+3wJLmpWHafWzgh9lCBleTvWN0W5p2LMChuBOurlxkevINa4Xmj+hbOuNwsJNRc3364n4GSw058M0Bl75BppwqO6ZvdqxeiYLTlFg23loqbsETSyz9kfxGgtEk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Iao1eaBP; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=hSvOMxMYYTkcuX6uSPyXNphj2xxTWOKVYuM7y4wy7+zwEU/Oj2qAf2xitBUpqFwwIMw/qNaf0aVPB4y4OadMgRAZ4NrG4cm90+9lXZhT4w8MUYQ+FLs29OiZu/vux/NtxJNpT8U2NCQHrH9xM/atMUMeGWTxIn/U0i2Oa2z7kgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GTF0aUK0; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,30 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZNStzmu/S7k70SieMDJinKLC9M3S5bgWLe20xLF8iK0=; b=Iao1eaBPpwmvC26vIrLRsjIMwp
-	GocEdjrd+xTFgvDV3sp7nvS30n7Rl0j9cU0UTXQvLssnXw9murb3hM3AKQHQkCnBJjrFT4o7blW89
-	AYGstPfv2I2+uzZlaLQIiohAnKcC4yCPlWTqcnjUB2c10vdtCU0z0wdyDZQR5Q8erXaU=;
+	bh=BJSx1g8Qr7Wz2LzAGWRRSblVeUqjF70Pxr0Xq74vkrs=; b=GTF0aUK0j94E9fK21JLE7tIF7g
+	32qAQ22driPh/XOnMOOEAEqa4Ak4/EDqXZ/jl1NvfZ6lA5FhoimjXPq+0//Jojvkx7hNsIOTEuEds
+	n0tkp7hV/hrafSI824g5rzgdLg2G1tRYjUp8AsQ9ClGr1g6qdivICrKOK76IRaat9eFs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uuFIJ-007GCU-LE; Thu, 04 Sep 2025 21:06:51 +0200
-Date: Thu, 4 Sep 2025 21:06:51 +0200
+	id 1uuFTU-007GEZ-SO; Thu, 04 Sep 2025 21:18:24 +0200
+Date: Thu, 4 Sep 2025 21:18:24 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 11/11] net: stmmac: use STMMAC_CSR_xxx
- definitions in platform glue
-Message-ID: <495816bd-221c-40c8-992d-a2b7e2b213d6@lunn.ch>
-References: <aLmBwsMdW__XBv7g@shell.armlinux.org.uk>
- <E1uu8oh-00000001vpT-0vk2@rmk-PC.armlinux.org.uk>
+To: Sebastian Basierski <sebastian.basierski@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Konrad Leszczynski <konrad.leszczynski@intel.com>,
+	davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cezary.rojewski@intel.com
+Subject: Re: [PATCH net 1/3] net: stmmac: replace memcpy with strscpy in
+ ethtool
+Message-ID: <f6cac0bd-3a07-40c3-b07b-f1c7f3b27f45@lunn.ch>
+References: <20250828100237.4076570-1-konrad.leszczynski@intel.com>
+ <20250828100237.4076570-2-konrad.leszczynski@intel.com>
+ <20250901125943.243efb74@kernel.org>
+ <b7a23bef-71d1-47e6-ab20-d8a86fa3e431@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,15 +65,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1uu8oh-00000001vpT-0vk2@rmk-PC.armlinux.org.uk>
+In-Reply-To: <b7a23bef-71d1-47e6-ab20-d8a86fa3e431@intel.com>
 
-On Thu, Sep 04, 2025 at 01:11:51PM +0100, Russell King (Oracle) wrote:
-> Use the STMMAC_CSR_xxx definitions to initialise plat->clk_csr in the
-> platform glue drivers to make the integer values meaningful.
+On Thu, Sep 04, 2025 at 08:53:03PM +0200, Sebastian Basierski wrote:
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> On 9/1/2025 9:59 PM, Jakub Kicinski wrote:
+> > On Thu, 28 Aug 2025 12:02:35 +0200 Konrad Leszczynski wrote:
+> > > Fix kernel exception by replacing memcpy with strscpy when used with
+> > > safety feature strings in ethtool logic.
+> > > 
+> > > [  +0.000023] BUG: KASAN: global-out-of-bounds in stmmac_get_strings+0x17d/0x520 [stmmac]
+> > > [  +0.000115] Read of size 32 at addr ffffffffc0cfab20 by task ethtool/2571
+> > If you hit this with upstream code please mention which string
+> > is not padded. If this can't happen with upstream platforms --
+> > there is no upstream bug. BTW ethtool_puts() is a better choice.
+> Hi Jakub,
+> Sorry for late answer to your review.
+> I double checked and made sure this bug reproduces on upstream platform.
+> Bug seems to appear on first string - i will add this information to commit
+> message.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+By first string, do you mean "Application Transmit Interface Parity
+Check Error"?
 
-    Andrew
+I think it also would be better to change dwmac5_error_desc, so that
+it uses char stat_string[ETH_GSTRING_LEN] __nonstring; like
+stmmac_stats.
+
+     Andrew
 
