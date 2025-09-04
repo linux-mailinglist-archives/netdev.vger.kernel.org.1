@@ -1,122 +1,172 @@
-Return-Path: <netdev+bounces-220136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49BDB448C4
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 23:46:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E94B448D6
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 23:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A1153AC551
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:46:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8400165D41
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172AE2620D2;
-	Thu,  4 Sep 2025 21:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B5A2C326B;
+	Thu,  4 Sep 2025 21:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="G9+uN+4d"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mcYRQTsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781072550AF
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 21:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74D02C21F6;
+	Thu,  4 Sep 2025 21:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757022386; cv=none; b=aEuKZLQbySto6lue/ueitj6rdxxuzM8C5eaRlAPSv6GCeZgwplcNrZecX6k/tYo2JQmUGXDlHSXkqvojYWVoS8t2e1FFlNg4f+BjeBlMhbopiIQtAXOUOLLb2AJ++NeCMDNxUCks9F8Vy+fdMTArVQVZWJFENrI+ILiAiVlEm5M=
+	t=1757022756; cv=none; b=L3nvXj6o2QUTcFS8dRI5oZFM5VU22l9tg9qAbYqBL+ti9we7LYXx4iWn6M4VuGvXYXcbTVEkBsJgnZ1NSgrYp4XXPcCp6e2qiZ6h84Hyi8Z/jSi71tMPdHDt2DIvo3iwKFTLFhQbxC8wQImOoLTtDsQI7f8bKbgEwp23PqD9X4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757022386; c=relaxed/simple;
-	bh=UkcFu038SgzaQoqpHuqh7rm8Kk5hlryjIpk433T8ZFE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GkRyqnrtF1ir/tBmz14OSt32amYLP6FnOtx2kScI7n5GI8CfYW9N9mNCipHW/dO737fPFTMffHBSKrkDARKgjPxBrubwCZIHpDAmG4fKY4kLmPNpTEebR7vhKOOyjhiQ1GhtKOovYP+fAID5UGaeOa3lKm4UJuCHWYXhUD9nyss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=G9+uN+4d; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7722c8d2694so1419409b3a.3
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 14:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1757022384; x=1757627184; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=58UCbBJx7XFHUgMt81Q1QMPCRrjbTg/IHTwhF1TE8Rw=;
-        b=G9+uN+4dAw/RvS1MOeW/F4F4tj36xIFiPcmhTaBt3PyoUFo9/zX+nsuhxIX5+Qj/Wo
-         QFuvjuOVX4BkRawQd+e5UpAHXLiVmf8CJcjk2oSYkXKux7CokX5z4Eph1LECDNaBSu0X
-         UsS1fLwMnLhkYnSeCnS71Mqzh7lNhifSgi8aFneC9FiRc7v3goHjURgEGc0/0hkS/cZp
-         7d+RQU5i4oyp/E6heYca3W9BEdwlV1dTkSV3RwLXTCvrLJlDT9mTCG/BUHKxbvsXUjl+
-         bPa2fUIg+0+cyFEfXel65r0IGW4ToSqx1GSOUqaOJjGO5we71RskF6/p+rPatQ4ejuBQ
-         cjcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757022384; x=1757627184;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=58UCbBJx7XFHUgMt81Q1QMPCRrjbTg/IHTwhF1TE8Rw=;
-        b=Q/uIfyUBLZUBxiMgrLXJuBCsi9TOX07YzoruNAmg9NJJKsEjXQPXavMxNdEPkthJiT
-         TbtAopRFyJMAvUZ7UEUVx9cOlJjyyk2L1SqB97+CmzuxXTfKv9oK6t/mzDXcf9KwLabV
-         dyTtyJuvjZCKSEG4Y36ms/q/cajIq+YvCvne/sxACUeTF3y94LO+Kt4Cq/6h2x8YewQv
-         tgfxyZsYJRVGV/ArCE32DpqMIgOlFx5xelgSnTP2RZRFdP+POa9SwL/wSpRsqXXhrLqd
-         1/6Gqq3/jyGydLOvTCWtIYT/JPppSjQxq7vLzd0vfZpTQsPjOUp7rvlYo9OfxTOTosfG
-         qOng==
-X-Gm-Message-State: AOJu0YxH4frCUQy+fnNDfbbRWhku18/mObAbIPrq52TjZ1LQUQltdmv1
-	j44lKr+P3BXGQE5r2s7QFj8YGqpWEGyPltJQBnUg5YAXCsCUIcXmBQgPaai9/Zq0axYqUPA+b8E
-	dTnQ6v3E+SBuv2PuWhJomsCpP4V9PhMo8bXGYyHlV
-X-Gm-Gg: ASbGncufGb2MkP0o9YVYvCDEodcezzZfErYIJmOOS51Ke4sVIuJqJF11G7qdAw/2ZG3
-	4eZRfbCrpMH4K8GSs/JSC1JD6+lg3x2azWmrK3h8wl2m2ju6jhBdnk5L7m5nyq/a9yImZJEYwbg
-	98ObveafIM4y/KcrXsoacsDGSZkm0YtlfEJkNpw5ECd9jlh6WmTjMa5jjMnJw+6vOAApWDCZ+6W
-	pl0GXQ=
-X-Google-Smtp-Source: AGHT+IHSmBNyZQvwAPcR/toxhKoWlcaMb7YElYq5CeuEyUQYfTCgL75F0sbfJLNBWxvT0UehgGKBnvJC1dOhHKYC0XY=
-X-Received: by 2002:a17:902:d552:b0:248:fbc1:daf6 with SMTP id
- d9443c01a7336-24944ad55a3mr260481835ad.43.1757022383625; Thu, 04 Sep 2025
- 14:46:23 -0700 (PDT)
+	s=arc-20240116; t=1757022756; c=relaxed/simple;
+	bh=Wwb7gLuPH5i2MVOO8a0ZF1bZVeRY0sNVbcFPH0tOyUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T2X1lGydTxcoWppKBX5D4kPWErsPMrtDm5IHj0vfAixpv4NvkAu8HKIdhGtjglyMI8twkKDYZc7XuHEffC8OtTUGjDAq2q+yXwydx3vgbfVYQgJXqZp8yW6kNXX3N9YZITQcIzH4MeLcbtBJ44kt0JvVYyJ9S+5BnWPq66/MvTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mcYRQTsi; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id D2DCE1A0DC0;
+	Thu,  4 Sep 2025 21:52:30 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9B063606C4;
+	Thu,  4 Sep 2025 21:52:30 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 26E03102F0F1B;
+	Thu,  4 Sep 2025 23:52:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1757022748; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=VhdwOIRNIGUQjVektyYqHZFliftV2xljBQytyUGG8AY=;
+	b=mcYRQTsidacdxu16HyA4ytNGA6KapP94Uja9WvEe+/TuVE0a0pj9Q1EPehDG+B50qSYahQ
+	4UHc67bGoXqiUdGHbhQb69APflPOywZ3mUqoJO/e7VMf2KMR0HyYeybzKpmGYIP1pn4M2P
+	Z29bFQRPLprAuG9UCqCQsD6fWy9R4142c5IkTX3hSTf4qL8aYdkaaSqs4Y2QZEOeFNiojO
+	qfQEuUnvCTScyF9mOcr0e9FlAbyCX0n5aAkhnWgW25mNeSQI0ocXDxWSaM+c+Nbi78VHDP
+	GuXdC5LkLK1RR4dakRHjyn1JEBlyyTB4fxWyGyaFkiIK8hMdDY4QkhZEC/yqIw==
+Date: Thu, 4 Sep 2025 23:52:25 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Carolina Jubran <cjubran@nvidia.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stanislav Fomichev
+ <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, Kees Cook
+ <kees@kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>, Dragos
+ Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net] net: dev_ioctl: take ops lock in hwtstamp lower
+ paths
+Message-ID: <20250904235155.7b2b3379@kmaincent-XPS-13-7390>
+In-Reply-To: <20250904182806.2329996-1-cjubran@nvidia.com>
+References: <20250904182806.2329996-1-cjubran@nvidia.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250901083027.183468-1-idosch@nvidia.com> <20250901083027.183468-2-idosch@nvidia.com>
-In-Reply-To: <20250901083027.183468-2-idosch@nvidia.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 4 Sep 2025 17:46:12 -0400
-X-Gm-Features: Ac12FXyloQ_dak-O_Wva3QydnpbJf4zA16Hm_GfCIDXj33RkHuULUszNqR9cDOg
-Message-ID: <CAHC9VhQb8D=2=FX_JaQghA1e==s5XfMyKvdg6=1eVxjimhmqdg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/8] ipv4: cipso: Simplify IP options handling in cipso_v4_error()
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, edumazet@google.com, horms@kernel.org, dsahern@kernel.org, 
-	petrm@nvidia.com, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Mon, Sep 1, 2025 at 4:32=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> wro=
-te:
->
-> When __ip_options_compile() is called with an skb, the IP options are
-> parsed from the skb data into the provided IP option argument. This is
-> in contrast to the case where the skb argument is NULL and the options
-> are parsed from opt->__data.
->
-> Given that cipso_v4_error() always passes an skb to
-> __ip_options_compile(), there is no need to allocate an extra 40 bytes
-> (maximum IP options size).
->
-> Therefore, simplify the function by removing these extra bytes and make
-> the function similar to ipv4_send_dest_unreach() which also calls both
-> __ip_options_compile() and __icmp_send().
->
-> This is a preparation for changing the arguments being passed to
-> __icmp_send().
->
-> No functional changes intended.
->
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+On Thu, 4 Sep 2025 21:28:06 +0300
+Carolina Jubran <cjubran@nvidia.com> wrote:
+
+> ndo hwtstamp callbacks are expected to run under the per-device ops
+> lock. Make the lower get/set paths consistent with the rest of ndo
+> invocations.
+>=20
+> Kernel log:
+> WARNING: CPU: 13 PID: 51364 at ./include/net/netdev_lock.h:70
+> __netdev_update_features+0x4bd/0xe60 ...
+> RIP: 0010:__netdev_update_features+0x4bd/0xe60
+> ...
+> Call Trace:
+> <TASK>
+> netdev_update_features+0x1f/0x60
+> mlx5_hwtstamp_set+0x181/0x290 [mlx5_core]
+> mlx5e_hwtstamp_set+0x19/0x30 [mlx5_core]
+
+Where does these two functions come from? They are not mainline.
+Else LGTM.
+
+> dev_set_hwtstamp_phylib+0x9f/0x220
+> dev_set_hwtstamp_phylib+0x9f/0x220
+> dev_set_hwtstamp+0x13d/0x240
+> dev_ioctl+0x12f/0x4b0
+> sock_ioctl+0x171/0x370
+> __x64_sys_ioctl+0x3f7/0x900
+> ? __sys_setsockopt+0x69/0xb0
+> do_syscall_64+0x6f/0x2e0
+> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> ...
+> </TASK>
+> ....
+> ---[ end trace 0000000000000000 ]---
+>=20
+> Fixes: ffb7ed19ac0a ("net: hold netdev instance lock during ioctl operati=
+ons")
+> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+>=20
 > ---
->  net/ipv4/cipso_ipv4.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
+>  net/core/dev_ioctl.c | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+> index 9c0ad7f4b5d8..ad54b12d4b4c 100644
+> --- a/net/core/dev_ioctl.c
+> +++ b/net/core/dev_ioctl.c
+> @@ -464,8 +464,15 @@ int generic_hwtstamp_get_lower(struct net_device *de=
+v,
+>  	if (!netif_device_present(dev))
+>  		return -ENODEV;
+> =20
+> -	if (ops->ndo_hwtstamp_get)
+> -		return dev_get_hwtstamp_phylib(dev, kernel_cfg);
+> +	if (ops->ndo_hwtstamp_get) {
+> +		int err;
+> +
+> +		netdev_lock_ops(dev);
+> +		err =3D dev_get_hwtstamp_phylib(dev, kernel_cfg);
+> +		netdev_unlock_ops(dev);
+> +
+> +		return err;
+> +	}
+> =20
+>  	/* Legacy path: unconverted lower driver */
+>  	return generic_hwtstamp_ioctl_lower(dev, SIOCGHWTSTAMP, kernel_cfg);
+> @@ -481,8 +488,15 @@ int generic_hwtstamp_set_lower(struct net_device *de=
+v,
+>  	if (!netif_device_present(dev))
+>  		return -ENODEV;
+> =20
+> -	if (ops->ndo_hwtstamp_set)
+> -		return dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
+> +	if (ops->ndo_hwtstamp_set) {
+> +		int err;
+> +
+> +		netdev_lock_ops(dev);
+> +		err =3D dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
+> +		netdev_unlock_ops(dev);
+> +
+> +		return err;
+> +	}
+> =20
+>  	/* Legacy path: unconverted lower driver */
+>  	return generic_hwtstamp_ioctl_lower(dev, SIOCSHWTSTAMP, kernel_cfg);
 
-Acked-by: Paul Moore <paul@paul-moore.com>
+
 
 --=20
-paul-moore.com
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
