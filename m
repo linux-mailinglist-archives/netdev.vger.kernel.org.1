@@ -1,528 +1,341 @@
-Return-Path: <netdev+bounces-219780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4011DB42F33
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:53:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CE0DB42F40
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:54:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BFB91BC7896
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 01:54:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCAC0540E98
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 01:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17D4245012;
-	Thu,  4 Sep 2025 01:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B1F1D416E;
+	Thu,  4 Sep 2025 01:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JbWlcnWC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zC5Gvj/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B9E1EA7CB;
-	Thu,  4 Sep 2025 01:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D581922DD
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 01:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756950693; cv=none; b=JHT7JHN/9URQFzvsh3xA7OrBbwRoHhdVpg3LU0479xSJNiGjm+eKfweCSNsDOBh6VxiHErWrf7MOkPkHUz0XhLlvhp8GuaqZSXRLNAS4KmyD9hvTo1eweFKsEinVi6NO5RdrW9hWlfuyFteYE5feY7cSuWipp8KUxOHiTC/tzGc=
+	t=1756950869; cv=none; b=RfqtHzg1iOSZTtGE6KPMRrojoZbr0eI4OGVmvUgAVv22Dr4IOkmHLMqnZNslAXT46/zfQw6CPXRde7nnHNx7obkGM4WAmVvQSFEuaCCY6RKoW6Od/nX7qt9NXy1opcKozHV6bWxB1qEDzw7BxU5QbU64Q3qP8k6mpAcW5ECoC0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756950693; c=relaxed/simple;
-	bh=490XaeJOSXOPOipAwlaja6D50/cNV+4mssGhLZMnMJo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=K4rsBw4NQqTlELfyS+lZapSIEm/MVPw7r0zBdFHo50Gbr5dPJvRkpghvQO98ybHNkKjRAj0vIw0CXdj9jn/bI4xrtJUJjY6Rp9kQSTp1xTD/O/tDzu+DSoYc7iGNkmxpq76VEpRBDo88TE1VEMy3lYq4DtII2++AHMha9Rw5Q5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JbWlcnWC; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3297a168470so429498a91.3;
-        Wed, 03 Sep 2025 18:51:31 -0700 (PDT)
+	s=arc-20240116; t=1756950869; c=relaxed/simple;
+	bh=XJ2w39arK3fRgybqNhjgZP1Tcx4gajUCbYzSmTWi86k=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=O3JA0nyakuywzGEVH1jxh4jZKNNdye8JbK3B8IzIobB8ukt04NxADKzLymKiKdxxYTrOLUwa7AV3NVFCxwVeoklqUvMRDd0edYdcSXuSZNdnl9Q1FBjkT8cH7Avx3xOgPiBv6PS82VuS9UCbE6/NOBsfQn4BDDKFy+ufqNQtYFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zC5Gvj/n; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24b4aa90c20so6748355ad.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 18:54:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756950691; x=1757555491; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GgDT8yas3IcACX8dpF1Z+jTHl5S85Xg0OLjTZ81TkYA=;
-        b=JbWlcnWCLZGG5b2wC9blY3/pvPEPhQF6OlBjd781i2EUnieNLpU5T08vu/buyc1nwb
-         y2vcuY7A1szPjxKDu/zPJpO9mhwXM2E5jmFUcNHp9Eh9Fgc+uIkwkJlJskXUc6Y6PmDH
-         O48u1U9F7j8WJccvvm6x0R/2oh29O5qkReqHvJ/ZtbNPL9ovl+WXmb/jfOOCgxTB5Zo0
-         hXWX1EkhGUMxp9ZyUW/+mfpr7ZErZ6avWOFCh1I3sRVLvhaNXnxE8CHeAGN0wMI2fV7w
-         G8/6/yfQvdS12ka8tCE/SZ71LbRwzf/XRGScVKkq9cLTxTn1YgDdOSRg/H25HSDRjTw5
-         NQkQ==
+        d=google.com; s=20230601; t=1756950867; x=1757555667; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IRx4kg27853Mr4e9hA+gLj9Dgi+6DG8uKC/JACslLYk=;
+        b=zC5Gvj/nwgtQ9tsSmUjBkGPv6/i1UFpc/ZFuWHg8aMdhfApc10P2/CIK+1CnCGNAz2
+         qRy2D9cUbT06m+8xgoICMuSVDiGNV+KaHnYFWLw8XhF6EHc6ZyPEm5VBjey7Kw6TLZrB
+         b9qVCYTP6Nam5tCKvdprEBGeAv1JoarWKZ6GQiBi/gTYUAgwoR1oQKQcfxJiy1lRyl9i
+         WAtceC8r6Pmv5blSX8C2mvMVVJJ6vKfekSFq0Uxg9I/+Ba/jE8WEY0m9mxaQo1tlh8Nr
+         AjUq3Mt8FMfw1r+moCMdWBxpcVeCpPXUfqXQXDlajzg7+vAMQF+yTu0tPBZJN4cCHgjG
+         yfPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756950691; x=1757555491;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GgDT8yas3IcACX8dpF1Z+jTHl5S85Xg0OLjTZ81TkYA=;
-        b=XDld8QGdPABiuUXaOLFVimYOqrZgabi9vaRYVf9x0jDER7hR1arbGWz2Al5fYnwXPx
-         xVZ10wvcFTlqPx3X4FrX0k7hJKNzB93dmkJUjPGei9uEW0tgz3/7JJ0sYYLqNVpTPOx3
-         k9E7dVrGUzsSjQbbB0D90s+s9AMyct9BctYHtghAwSTCAUriiD1TuRuOrIVjQUYJ91wp
-         j2RUweLlFJOwGIfEdpJHYKekiPZj0jH30unSj9YmPFUOVvAfyoJaw8vVRJuRz+IRDpnr
-         n1N9Lm+fErLNUMsRru8heg2iuPaUN4DGlrOx+IVKpqK9HXY067pXXjfdKptqW1jbZ+Wt
-         nk/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUAaASiEX7uXdBB491rDXFh6SkQ3TSlWZs9ijOH8rpOSG0j+JllUwfnINGTnp29DIgpHWpiFOxtr/qSYw==@vger.kernel.org, AJvYcCV6elvXDhzKk7nU+jeUBPTaSAx2WYMPVtMVpb1YXOUmetXj4wbI0N5r2Xtj7ZFdGYfBCl60R3ogYN6QJ5A=@vger.kernel.org, AJvYcCV71gG74k4tYyHe7BBfotp+WRZSsW2M58kjFTFQZrGKY2SEsidMH8bqYeJxEqPqH83yTUCN9DLt@vger.kernel.org, AJvYcCVGxOIJTBLTlS3ijjvbAN5tOiWXJrq4XVDEJlJyoETtG7dPsU/fkOA9szv92CivF2Yo6fsxUkForvGf@vger.kernel.org, AJvYcCVU2RzMtPj4/R/Zff+vnxrPh/wouhnTscJ+YzkaHhgbHDiB/UIoZvUsvrXJMpX7gg8DAvezIM6WNos=@vger.kernel.org, AJvYcCW7DyT3LrI8Q/g3zUWoIjMyeCWCN7Cl5oUkbE+q/0GuFr/PbVjo/QuJfVPjNS4xUFshTHBq8AL1eSue@vger.kernel.org, AJvYcCXlPLUHBminz6HDvETzd7lqDLPUbtw1stCOXfeVDbni9qhjeKjqoNpxPgHSghYyi/kdMGTHUfGsJdHb@vger.kernel.org, AJvYcCXnaQlJMf2f8kOhqr0RcM3okWZBrAkbIYlHFKDosioZdO9Sq4TLavPRzqv3tPcfNP8cepqblh+aFojmnna9hrY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yztm0iSxqakXbPjuX5N25YVugeZUmYEAfFf4dWnSR1MdrEoA4Qh
-	X2hgqjqvD1KwTKg6N6Tv0nONCWftBwHwUiquYXfmYCmPcz4bL5BPIdBk
-X-Gm-Gg: ASbGncuguNgr9wEol79+hAb6kj778uSO4Q6PJils04ffuH8AvqtWWxhqwCet2vtFY+g
-	mtk6qD87T0z34UCg7Ou5yN5XgISQEXoYzJ/vR2QN95ARa+QKw6tAyzvZ3waZNxbF5koDho/HaOQ
-	4WlLqxnUkhPbs0J4VatZihEQ/IKVztB7lIHIVmabdyWULirjJRLDckOIILHq0n3O0CgjCCu61uz
-	Qp08uoN666FktSH+mn7WOZzfTFfahh9iuQnaAa1p0/sqQu6Aj08GAnyuxsIhvLISKSk2h2jIyWk
-	Z7zC+ymozlNpX1o8SjIhTc9gacY7Z+W/ao/GcX3nREG9abW8lCSX9XB9IaseEzLgnFEVURznwGy
-	0Rt12bXGUt1TuOcMHNyJnrOW2TrFkkNuncOVgq9aBm408XZX6hn+CD8aYU9Zuxco3vMpOReHl9L
-	1am68+NUHA7GE=
-X-Google-Smtp-Source: AGHT+IHHGAsQymzfwZbqXSo9KeT0ANvCpXtZV/5yXUahATQNdz4R9tIeTKD8XgEjSyeUKrwTYEAohA==
-X-Received: by 2002:a17:90b:1d03:b0:320:fda8:fabe with SMTP id 98e67ed59e1d1-328156ba3b0mr19428738a91.22.1756950690388;
-        Wed, 03 Sep 2025 18:51:30 -0700 (PDT)
-Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-329dcc0af56sm7080205a91.24.2025.09.03.18.51.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 18:51:29 -0700 (PDT)
-From: a0282524688@gmail.com
-To: tmyu0@nuvoton.com,
-	lee@kernel.org,
-	linus.walleij@linaro.org,
-	brgl@bgdev.pl,
-	andi.shyti@kernel.org,
-	mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	wim@linux-watchdog.org,
-	linux@roeck-us.net,
-	jdelvare@suse.com,
-	alexandre.belloni@bootlin.com
-Cc: linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	Ming Yu <a0282524688@gmail.com>
-Subject: [PATCH RESEND v14 7/7] rtc: Add Nuvoton NCT6694 RTC support
-Date: Thu,  4 Sep 2025 09:50:48 +0800
-Message-Id: <20250904015048.1801451-8-a0282524688@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250904015048.1801451-1-a0282524688@gmail.com>
-References: <20250904015048.1801451-1-a0282524688@gmail.com>
+        d=1e100.net; s=20230601; t=1756950867; x=1757555667;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IRx4kg27853Mr4e9hA+gLj9Dgi+6DG8uKC/JACslLYk=;
+        b=usbzaMm8q3yZOXUHglE6bSQ20s1RuUzZggu9WUCx/Gq0IeTbFS3prRUPhvblYQtUaC
+         k/Xuz0CpYIf3qqOlEOYsXWmeRK6550Z6vUmnT7Ly9KBfVq3Ab9e7rUiv4V/hCjUGbHAl
+         pRaH4CHx3+A1jbws2wzeyBHT7H19VxLzYdKcjb3LUBA33wqUkIIlx02nuIkkfjlGs7BY
+         2977VKyDmCLWqhfSScBaA7Q8qP/Wv9tv6ahsaA1+cuTqDnTdH7HHKhS0wA4uDpM2lxRS
+         yQbohgnfCymjIN1VRHZack9myzEuQXpGnq/QPNPmxWKISaUhQCL+/ePO6labYhdb3ok6
+         HhLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUI7I5XxCigvG1vMAtuzw1pn5mgV5OkzfivaI6hy3+o3IX+Su6r+e5JsE2W1dQ/PBqjhyx+2Uc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHlt5sR49HP7kQIxxaqhaxByK2W5FTLgOGc6cdn/0CpVefHo9S
+	Kp5n7L+6PowNRzucvAZEC3lX1ulb/YULKea2HLGoygAJCeV44BiaWreOn2kZ6RCZHuynlTjy4id
+	F8aUIoOqf023xfeXxMLtRuA==
+X-Google-Smtp-Source: AGHT+IHcFQSoXchOed2TjeTjT95yO5RWgQUSyQZlzYxtK4QqB68HJsKmykhfTUK/vL/mSNZkLle5C+DJss8Ua6wi
+X-Received: from plrs20.prod.google.com ([2002:a17:902:b194:b0:234:659b:127c])
+ (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:19c6:b0:24c:c1b3:604 with SMTP id d9443c01a7336-24cc1b30801mr16136975ad.1.1756950867079;
+ Wed, 03 Sep 2025 18:54:27 -0700 (PDT)
+Date: Thu,  4 Sep 2025 01:54:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
+Message-ID: <20250904015424.1228665-1-marcharvey@google.com>
+Subject: [PATCH net-next v2] selftests: net: Add tests to verify team driver
+ option set and get.
+From: Marc Harvey <marcharvey@google.com>
+To: jiri@resnulli.us, andrew+netdev@lunn.ch
+Cc: edumazet@google.com, willemb@google.com, maheshb@google.com, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, kuba@kernel.org, 
+	liuhangbin@gmail.com, Marc Harvey <marcharvey@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Ming Yu <a0282524688@gmail.com>
+There are currently no kernel tests that verify setting and getting
+options of the team driver.
 
-This driver supports RTC functionality for NCT6694 MFD device
-based on USB interface.
+In the future, options may be added that implicitly change other
+options, which will make it useful to have tests like these that show
+nothing breaks. There will be a follow up patch to this that adds new
+"rx_enabled" and "tx_enabled" options, which will implicitly affect the
+"enabled" option value and vice versa.
 
-Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Signed-off-by: Ming Yu <a0282524688@gmail.com>
+The tests use teamnl to first set options to specific values and then
+gets them to compare to the set values.
+
+Signed-off-by: Marc Harvey <marcharvey@google.com>
 ---
-Changes since version 13:
+Changes in v2:
+  - Fixed shellcheck failures.
+  - Fixed test failing in vng by adding a config option to enable the
+    team driver's active backup mode.
+  - Link to v1: https://lore.kernel.org/netdev/20250902235504.4190036-1-marcharvey@google.com/
 
-Changes since version 12:
-- Use same email address in the signature
+ .../selftests/drivers/net/team/Makefile       |   6 +-
+ .../testing/selftests/drivers/net/team/config |   1 +
+ .../selftests/drivers/net/team/options.sh     | 192 ++++++++++++++++++
+ 3 files changed, 197 insertions(+), 2 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/team/options.sh
 
-Changes since version 11:
-
-Changes since version 10:
-
-Changes since version 9:
-- Add devm_add_action_or_reset() to dispose irq mapping
-
-Changes since version 8:
-- Modify the signed-off-by with my work address
-- Add irq_dispose_mapping() in the error handling path and in the remove
-  function
-
-Changes since version 7:
-
-Changes since version 6:
-
-Changes since version 5:
-- Modify the module name and the driver name consistently
-
-Changes since version 4:
-- Modify arguments in read/write function to a pointer to cmd_header
-- Modify all callers that call the read/write function
-
-Changes since version 3:
-- Modify array buffer to structure
-- Fix defines and comments
-- Drop private mutex and use rtc core lock
-- Modify device_set_wakeup_capable() to device_init_wakeup()
-
-Changes since version 2:
-- Add MODULE_ALIAS()
-
-Changes since version 1:
-- Add each driver's command structure
-- Fix platform driver registration
-- Drop unnecessary logs
-- Fix overwrite error return values
-- Modify to use dev_err_probe API
-
- MAINTAINERS               |   1 +
- drivers/rtc/Kconfig       |  10 ++
- drivers/rtc/Makefile      |   1 +
- drivers/rtc/rtc-nct6694.c | 297 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 309 insertions(+)
- create mode 100644 drivers/rtc/rtc-nct6694.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bbacc9d48a83..442f24a408a6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18090,6 +18090,7 @@ F:	drivers/hwmon/nct6694-hwmon.c
- F:	drivers/i2c/busses/i2c-nct6694.c
- F:	drivers/mfd/nct6694.c
- F:	drivers/net/can/usb/nct6694_canfd.c
-+F:	drivers/rtc/rtc-nct6694.c
- F:	drivers/watchdog/nct6694_wdt.c
- F:	include/linux/mfd/nct6694.h
+diff --git a/tools/testing/selftests/drivers/net/team/Makefile b/tools/testing/selftests/drivers/net/team/Makefile
+index eaf6938f100e..8b00b70ce67f 100644
+--- a/tools/testing/selftests/drivers/net/team/Makefile
++++ b/tools/testing/selftests/drivers/net/team/Makefile
+@@ -1,11 +1,13 @@
+ # SPDX-License-Identifier: GPL-2.0
+ # Makefile for net selftests
  
-diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
-index 64f6e9756aff..4a8dc8d0a4b7 100644
---- a/drivers/rtc/Kconfig
-+++ b/drivers/rtc/Kconfig
-@@ -416,6 +416,16 @@ config RTC_DRV_NCT3018Y
- 	   This driver can also be built as a module, if so, the module will be
- 	   called "rtc-nct3018y".
+-TEST_PROGS := dev_addr_lists.sh propagation.sh
++TEST_PROGS := dev_addr_lists.sh propagation.sh options.sh
  
-+config RTC_DRV_NCT6694
-+	tristate "Nuvoton NCT6694 RTC support"
-+	depends on MFD_NCT6694
-+	help
-+	  If you say yes to this option, support will be included for Nuvoton
-+	  NCT6694, a USB device to RTC.
-+
-+	  This driver can also be built as a module. If so, the module will
-+	  be called rtc-nct6694.
-+
- config RTC_DRV_RK808
- 	tristate "Rockchip RK805/RK808/RK809/RK817/RK818 RTC"
- 	depends on MFD_RK8XX
-diff --git a/drivers/rtc/Makefile b/drivers/rtc/Makefile
-index 789bddfea99d..610a9ee5fd33 100644
---- a/drivers/rtc/Makefile
-+++ b/drivers/rtc/Makefile
-@@ -119,6 +119,7 @@ obj-$(CONFIG_RTC_DRV_MXC)	+= rtc-mxc.o
- obj-$(CONFIG_RTC_DRV_MXC_V2)	+= rtc-mxc_v2.o
- obj-$(CONFIG_RTC_DRV_GAMECUBE)	+= rtc-gamecube.o
- obj-$(CONFIG_RTC_DRV_NCT3018Y)	+= rtc-nct3018y.o
-+obj-$(CONFIG_RTC_DRV_NCT6694)	+= rtc-nct6694.o
- obj-$(CONFIG_RTC_DRV_NTXEC)	+= rtc-ntxec.o
- obj-$(CONFIG_RTC_DRV_OMAP)	+= rtc-omap.o
- obj-$(CONFIG_RTC_DRV_OPAL)	+= rtc-opal.o
-diff --git a/drivers/rtc/rtc-nct6694.c b/drivers/rtc/rtc-nct6694.c
-new file mode 100644
-index 000000000000..35401a0d9cf5
+ TEST_INCLUDES := \
+ 	../bonding/lag_lib.sh \
+ 	../../../net/forwarding/lib.sh \
+-	../../../net/lib.sh
++	../../../net/lib.sh \
++	../../../net/in_netns.sh \
++	../../../net/lib/sh/defer.sh \
+ 
+ include ../../../lib.mk
+diff --git a/tools/testing/selftests/drivers/net/team/config b/tools/testing/selftests/drivers/net/team/config
+index 636b3525b679..558e1d0cf565 100644
+--- a/tools/testing/selftests/drivers/net/team/config
++++ b/tools/testing/selftests/drivers/net/team/config
+@@ -3,4 +3,5 @@ CONFIG_IPV6=y
+ CONFIG_MACVLAN=y
+ CONFIG_NETDEVSIM=m
+ CONFIG_NET_TEAM=y
++CONFIG_NET_TEAM_MODE_ACTIVEBACKUP=y
+ CONFIG_NET_TEAM_MODE_LOADBALANCE=y
+diff --git a/tools/testing/selftests/drivers/net/team/options.sh b/tools/testing/selftests/drivers/net/team/options.sh
+new file mode 100755
+index 000000000000..82bf22aa3480
 --- /dev/null
-+++ b/drivers/rtc/rtc-nct6694.c
-@@ -0,0 +1,297 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Nuvoton NCT6694 RTC driver based on USB interface.
-+ *
-+ * Copyright (C) 2025 Nuvoton Technology Corp.
-+ */
++++ b/tools/testing/selftests/drivers/net/team/options.sh
+@@ -0,0 +1,192 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
-+#include <linux/bcd.h>
-+#include <linux/irqdomain.h>
-+#include <linux/kernel.h>
-+#include <linux/mfd/nct6694.h>
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+#include <linux/rtc.h>
-+#include <linux/slab.h>
++# These tests verify basic set and get functionality of the team
++# driver options over netlink.
 +
-+/*
-+ * USB command module type for NCT6694 RTC controller.
-+ * This defines the module type used for communication with the NCT6694
-+ * RTC controller over the USB interface.
-+ */
-+#define NCT6694_RTC_MOD		0x08
++# Run in private netns.
++test_dir="$(dirname "$0")"
++if [[ $# -eq 0 ]]; then
++        "${test_dir}"/../../../net/in_netns.sh "$0" __subprocess
++        exit $?
++fi
 +
-+/* Command 00h - RTC Time */
-+#define NCT6694_RTC_TIME	0x0000
-+#define NCT6694_RTC_TIME_SEL	0x00
++ALL_TESTS="
++        team_test_options
++"
 +
-+/* Command 01h - RTC Alarm */
-+#define NCT6694_RTC_ALARM	0x01
-+#define NCT6694_RTC_ALARM_SEL	0x00
++source "${test_dir}/../../../net/lib.sh"
 +
-+/* Command 02h - RTC Status */
-+#define NCT6694_RTC_STATUS	0x02
-+#define NCT6694_RTC_STATUS_SEL	0x00
++TEAM_PORT="team0"
++MEMBER_PORT="dummy0"
 +
-+#define NCT6694_RTC_IRQ_INT_EN	BIT(0)	/* Transmit a USB INT-in when RTC alarm */
-+#define NCT6694_RTC_IRQ_GPO_EN	BIT(5)	/* Trigger a GPO Low Pulse when RTC alarm */
-+
-+#define NCT6694_RTC_IRQ_EN	(NCT6694_RTC_IRQ_INT_EN | NCT6694_RTC_IRQ_GPO_EN)
-+#define NCT6694_RTC_IRQ_STS	BIT(0)	/* Write 1 clear IRQ status */
-+
-+struct __packed nct6694_rtc_time {
-+	u8 sec;
-+	u8 min;
-+	u8 hour;
-+	u8 week;
-+	u8 day;
-+	u8 month;
-+	u8 year;
-+};
-+
-+struct __packed nct6694_rtc_alarm {
-+	u8 sec;
-+	u8 min;
-+	u8 hour;
-+	u8 alarm_en;
-+	u8 alarm_pend;
-+};
-+
-+struct __packed nct6694_rtc_status {
-+	u8 irq_en;
-+	u8 irq_pend;
-+};
-+
-+union __packed nct6694_rtc_msg {
-+	struct nct6694_rtc_time time;
-+	struct nct6694_rtc_alarm alarm;
-+	struct nct6694_rtc_status sts;
-+};
-+
-+struct nct6694_rtc_data {
-+	struct nct6694 *nct6694;
-+	struct rtc_device *rtc;
-+	union nct6694_rtc_msg *msg;
-+	int irq;
-+};
-+
-+static int nct6694_rtc_read_time(struct device *dev, struct rtc_time *tm)
++setup()
 +{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_time *time = &data->msg->time;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_TIME,
-+		.sel = NCT6694_RTC_TIME_SEL,
-+		.len = cpu_to_le16(sizeof(*time))
-+	};
-+	int ret;
-+
-+	ret = nct6694_read_msg(data->nct6694, &cmd_hd, time);
-+	if (ret)
-+		return ret;
-+
-+	tm->tm_sec = bcd2bin(time->sec);		/* tm_sec expect 0 ~ 59 */
-+	tm->tm_min = bcd2bin(time->min);		/* tm_min expect 0 ~ 59 */
-+	tm->tm_hour = bcd2bin(time->hour);		/* tm_hour expect 0 ~ 23 */
-+	tm->tm_wday = bcd2bin(time->week) - 1;		/* tm_wday expect 0 ~ 6 */
-+	tm->tm_mday = bcd2bin(time->day);		/* tm_mday expect 1 ~ 31 */
-+	tm->tm_mon = bcd2bin(time->month) - 1;		/* tm_month expect 0 ~ 11 */
-+	tm->tm_year = bcd2bin(time->year) + 100;	/* tm_year expect since 1900 */
-+
-+	return ret;
++        ip link add name "${MEMBER_PORT}" type dummy
++        ip link add name "${TEAM_PORT}" type team
 +}
 +
-+static int nct6694_rtc_set_time(struct device *dev, struct rtc_time *tm)
++get_and_check_value()
 +{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_time *time = &data->msg->time;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_TIME,
-+		.sel = NCT6694_RTC_TIME_SEL,
-+		.len = cpu_to_le16(sizeof(*time))
-+	};
++        local option_name="$1"
++        local expected_value="$2"
++        local port_flag="$3"
 +
-+	time->sec = bin2bcd(tm->tm_sec);
-+	time->min = bin2bcd(tm->tm_min);
-+	time->hour = bin2bcd(tm->tm_hour);
-+	time->week = bin2bcd(tm->tm_wday + 1);
-+	time->day = bin2bcd(tm->tm_mday);
-+	time->month = bin2bcd(tm->tm_mon + 1);
-+	time->year = bin2bcd(tm->tm_year - 100);
++        local value_from_get
 +
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, time);
++        if ! value_from_get=$(teamnl "${TEAM_PORT}" getoption "${option_name}" \
++                        "${port_flag}"); then
++                echo "Could not get option '${option_name}'" >&2
++                return 1
++        fi
++
++        if [[ "${value_from_get}" != "${expected_value}" ]]; then
++                echo "Incorrect value for option '${option_name}'" >&2
++                echo "get (${value_from_get}) != set (${expected_value})" >&2
++                return 1
++        fi
 +}
 +
-+static int nct6694_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
++set_and_check_get()
 +{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_alarm *alarm = &data->msg->alarm;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_ALARM,
-+		.sel = NCT6694_RTC_ALARM_SEL,
-+		.len = cpu_to_le16(sizeof(*alarm))
-+	};
-+	int ret;
++        local option_name="$1"
++        local option_value="$2"
++        local port_flag="$3"
 +
-+	ret = nct6694_read_msg(data->nct6694, &cmd_hd, alarm);
-+	if (ret)
-+		return ret;
++        local value_from_get
 +
-+	alrm->time.tm_sec = bcd2bin(alarm->sec);
-+	alrm->time.tm_min = bcd2bin(alarm->min);
-+	alrm->time.tm_hour = bcd2bin(alarm->hour);
-+	alrm->enabled = alarm->alarm_en;
-+	alrm->pending = alarm->alarm_pend;
++        if ! teamnl "${TEAM_PORT}" setoption "${option_name}" "${option_value}" \
++                        "${port_flag}"; then
++                echo "'setoption ${option_name} ${option_value}' failed" >&2
++                return 1
++        fi
 +
-+	return ret;
++        get_and_check_value "${option_name}" "${option_value}" "${port_flag}"
++        return $?
 +}
 +
-+static int nct6694_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
++# Get a "port flag" to pass to the `teamnl` command.
++# E.g. $1="dummy0" -> "port=dummy0",
++#      $1=""       -> ""
++get_port_flag()
 +{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_alarm *alarm = &data->msg->alarm;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_ALARM,
-+		.sel = NCT6694_RTC_ALARM_SEL,
-+		.len = cpu_to_le16(sizeof(*alarm))
-+	};
++        local port_name="$1"
 +
-+	alarm->sec = bin2bcd(alrm->time.tm_sec);
-+	alarm->min = bin2bcd(alrm->time.tm_min);
-+	alarm->hour = bin2bcd(alrm->time.tm_hour);
-+	alarm->alarm_en = alrm->enabled ? NCT6694_RTC_IRQ_EN : 0;
-+	alarm->alarm_pend = 0;
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, alarm);
++        if [[ -n "${port_name}" ]]; then
++                echo "--port=${port_name}"
++        fi
 +}
 +
-+static int nct6694_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
++attach_port_if_specified()
 +{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_status *sts = &data->msg->sts;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_STATUS,
-+		.sel = NCT6694_RTC_STATUS_SEL,
-+		.len = cpu_to_le16(sizeof(*sts))
-+	};
++        local port_name="${1}"
 +
-+	if (enabled)
-+		sts->irq_en |= NCT6694_RTC_IRQ_EN;
-+	else
-+		sts->irq_en &= ~NCT6694_RTC_IRQ_EN;
-+
-+	sts->irq_pend = 0;
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, sts);
++        if [[ -n "${port_name}" ]]; then
++                ip link set dev "${port_name}" master "${TEAM_PORT}"
++                return $?
++        fi
 +}
 +
-+static const struct rtc_class_ops nct6694_rtc_ops = {
-+	.read_time = nct6694_rtc_read_time,
-+	.set_time = nct6694_rtc_set_time,
-+	.read_alarm = nct6694_rtc_read_alarm,
-+	.set_alarm = nct6694_rtc_set_alarm,
-+	.alarm_irq_enable = nct6694_rtc_alarm_irq_enable,
-+};
-+
-+static irqreturn_t nct6694_irq(int irq, void *dev_id)
++detach_port_if_specified()
 +{
-+	struct nct6694_rtc_data *data = dev_id;
-+	struct nct6694_rtc_status *sts = &data->msg->sts;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_STATUS,
-+		.sel = NCT6694_RTC_STATUS_SEL,
-+		.len = cpu_to_le16(sizeof(*sts))
-+	};
-+	int ret;
++        local port_name="${1}"
 +
-+	rtc_lock(data->rtc);
-+
-+	sts->irq_en = NCT6694_RTC_IRQ_EN;
-+	sts->irq_pend = NCT6694_RTC_IRQ_STS;
-+	ret = nct6694_write_msg(data->nct6694, &cmd_hd, sts);
-+	if (ret) {
-+		rtc_unlock(data->rtc);
-+		return IRQ_NONE;
-+	}
-+
-+	rtc_update_irq(data->rtc, 1, RTC_IRQF | RTC_AF);
-+
-+	rtc_unlock(data->rtc);
-+
-+	return IRQ_HANDLED;
++        if [[ -n "${port_name}" ]]; then
++                ip link set dev "${port_name}" nomaster
++                return $?
++        fi
 +}
 +
-+static void nct6694_irq_dispose_mapping(void *d)
++#######################################
++# Test that an option's get value matches its set value.
++# Globals:
++#   RET - Used by testing infra like `check_err`.
++#   EXIT_STATUS - Used by `log_test` to whole script exit value.
++# Arguments:
++#   option_name - The name of the option.
++#   value_1 - The first value to try setting.
++#   value_2 - The second value to try setting.
++#   port_name - The (optional) name of the attached port.
++#######################################
++team_test_option()
 +{
-+	struct nct6694_rtc_data *data = d;
++        local option_name="$1"
++        local value_1="$2"
++        local value_2="$3"
++        local possible_values="$2 $3 $2"
++        local port_name="$4"
++        local port_flag
 +
-+	irq_dispose_mapping(data->irq);
++        RET=0
++
++        echo "Setting '${option_name}' to '${value_1}' and '${value_2}'"
++
++        attach_port_if_specified "${port_name}"
++        check_err $? "Couldn't attach ${port_name} to master"
++        port_flag=$(get_port_flag "${port_name}")
++
++        # Set and get both possible values.
++        for value in ${possible_values}; do
++                set_and_check_get "${option_name}" "${value}" "${port_flag}"
++                check_err $? "Failed to set '${option_name}' to '${value}'"
++        done
++
++        detach_port_if_specified "${port_name}"
++        check_err $? "Couldn't detach ${port_name} from its master"
++
++        log_test "Set + Get '${option_name}' test"
 +}
 +
-+static int nct6694_rtc_probe(struct platform_device *pdev)
++#######################################
++# Test that getting a non-existant option fails.
++# Globals:
++#   RET - Used by testing infra like `check_err`.
++#   EXIT_STATUS - Used by `log_test` to whole script exit value.
++# Arguments:
++#   option_name - The name of the option.
++#   port_name - The (optional) name of the attached port.
++#######################################
++team_test_get_option_fails()
 +{
-+	struct nct6694_rtc_data *data;
-+	struct nct6694 *nct6694 = dev_get_drvdata(pdev->dev.parent);
-+	int ret;
++        local option_name="$1"
++        local port_name="$2"
++        local port_flag
 +
-+	data = devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
++        RET=0
 +
-+	data->msg = devm_kzalloc(&pdev->dev, sizeof(union nct6694_rtc_msg),
-+				 GFP_KERNEL);
-+	if (!data->msg)
-+		return -ENOMEM;
++        attach_port_if_specified "${port_name}"
++        check_err $? "Couldn't attach ${port_name} to master"
++        port_flag=$(get_port_flag "${port_name}")
 +
-+	data->irq = irq_create_mapping(nct6694->domain, NCT6694_IRQ_RTC);
-+	if (!data->irq)
-+		return -EINVAL;
++        # Just confirm that getting the value fails.
++        teamnl "${TEAM_PORT}" getoption "${option_name}" "${port_flag}"
++        check_fail $? "Shouldn't be able to get option '${option_name}'"
 +
-+	ret = devm_add_action_or_reset(&pdev->dev, nct6694_irq_dispose_mapping,
-+				       data);
-+	if (ret)
-+		return ret;
++        detach_port_if_specified "${port_name}"
 +
-+	ret = devm_device_init_wakeup(&pdev->dev);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to init wakeup\n");
-+
-+	data->rtc = devm_rtc_allocate_device(&pdev->dev);
-+	if (IS_ERR(data->rtc))
-+		return PTR_ERR(data->rtc);
-+
-+	data->nct6694 = nct6694;
-+	data->rtc->ops = &nct6694_rtc_ops;
-+	data->rtc->range_min = RTC_TIMESTAMP_BEGIN_2000;
-+	data->rtc->range_max = RTC_TIMESTAMP_END_2099;
-+
-+	platform_set_drvdata(pdev, data);
-+
-+	ret = devm_request_threaded_irq(&pdev->dev, data->irq, NULL,
-+					nct6694_irq, IRQF_ONESHOT,
-+					"rtc-nct6694", data);
-+	if (ret < 0)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to request irq\n");
-+
-+	return devm_rtc_register_device(data->rtc);
++        log_test "Get '${option_name}' fails"
 +}
 +
-+static struct platform_driver nct6694_rtc_driver = {
-+	.driver = {
-+		.name	= "nct6694-rtc",
-+	},
-+	.probe		= nct6694_rtc_probe,
-+};
++team_test_options()
++{
++        # Wrong option name behavior.
++        team_test_get_option_fails fake_option1
++        team_test_get_option_fails fake_option2 "${MEMBER_PORT}"
 +
-+module_platform_driver(nct6694_rtc_driver);
++        # Correct set and get behavior.
++        team_test_option mode activebackup loadbalance
++        team_test_option notify_peers_count 0 5
++        team_test_option notify_peers_interval 0 5
++        team_test_option mcast_rejoin_count 0 5
++        team_test_option mcast_rejoin_interval 0 5
++        team_test_option enabled true false "${MEMBER_PORT}"
++        team_test_option user_linkup true false "${MEMBER_PORT}"
++        team_test_option user_linkup_enabled true false "${MEMBER_PORT}"
++        team_test_option priority 10 20 "${MEMBER_PORT}"
++        team_test_option queue_id 0 1 "${MEMBER_PORT}"
++}
 +
-+MODULE_DESCRIPTION("USB-RTC driver for NCT6694");
-+MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS("platform:nct6694-rtc");
++require_command teamnl
++setup
++tests_run
++exit "${EXIT_STATUS}"
 -- 
-2.34.1
+2.51.0.338.gd7d06c2dae-goog
 
 
