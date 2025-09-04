@@ -1,190 +1,193 @@
-Return-Path: <netdev+bounces-219811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E2CDB4319F
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 07:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B75BB431CD
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 07:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E27C162F56
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:32:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8239016928B
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E60A15DBC1;
-	Thu,  4 Sep 2025 05:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFF52376F8;
+	Thu,  4 Sep 2025 05:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NABTh3pu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WkKozhHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEEE8F40
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 05:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964E223D7D8
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 05:51:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756963932; cv=none; b=gbupCPtsubipnC5VPvqe+KfvMkxjw8RwTPUpLcQgeti8ZY0QuKvfzLDvoM62ZHqpqyNt/ulWTlGQoE8KNsxzCBefQqvhi8aeoggeYV/cIhWj8IzfJEe1U+xDtdW6kVgTwPSpo7PKSeVIG6DZQQk4Z1+uHAa28CH5bpRpqx9DdVQ=
+	t=1756965077; cv=none; b=aizO4GqmwUg/XEYspZA8PyR5WcQx78ZqD54kEZMPThVoTrQc/GmHY7HnShoVcBjnqaiTfFu0y4sB0Q4ap8fMBvFN1yzzeRPIuTnZ3DcPhi/RO9oBv7VgJN17ZNym3h0P1c/4Kk3Y3G2TqNByRKzI/J1UFdNjVubVJI736ia0ayM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756963932; c=relaxed/simple;
-	bh=49/jRq1XZRA3ZxYt1Pn7lgZEInrsbuOcCY8AQ02By3M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SzpH2RtVlOBthE6ehgzGASdBKmmXu7XfjRcW4CpgU7ZP/SDIhp5UEPJ3M4PvvP9qFh5fXoc9UhZ3w9gJZ6HpQWOuJ8ZL6aZuRA/PCiVmiEM9iv5ajFcLHYDyERo38zShAPMszJECwfgSZnu0C8GTSSVIZGbmd1D2IPqXazKS33g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NABTh3pu; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-77250e45d36so593991b3a.0
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 22:32:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756963930; x=1757568730; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zm8HG6q2XhOiSXadWpjaeys2T1j23xgSwizMsyr/dq0=;
-        b=NABTh3pujT7vX7w/i67sdVVHT20/hdNNBnKDxwfItZH3fwmc4vWFfbVLLxQ0/LCMeM
-         DaebcicrjFSyOZW0+8te0GTcLoPuRQnR/V+DSXvG4nxV+++nTTCbpP9QhNU/lB/St2+3
-         yLVlWxD7iOtAm+EeiMTVnX87qjkAv660Dil3TfWG2rtsc29GCk2DBFsXPAogG5JOhIie
-         az3SPHFj75Irp6RS4KgE/2TK8990cCbajC3RPtijmWvcVi0fo+4aQcdR0cc7bUEwvtYB
-         mgqyL1qVbqUkRDMvISGJyMEchhQeyhTCqlHIHkAhmjjI28eN2tyY2lxKTgqEC9SMIvhW
-         J86A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756963930; x=1757568730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zm8HG6q2XhOiSXadWpjaeys2T1j23xgSwizMsyr/dq0=;
-        b=IpozpYVXI40l/LmrT5R0p0/HiHZizVgnOHTMcKJms2eUJWLoK7Y4bIyykoa7x5L8ys
-         MDEcL/xmwe1W89KQdixts9bbd6Dplz81HsvBstCEohXIaxlrC2D5zmcNcp1ve5nR1nvW
-         K3s10Wgh7E/E2FocI3/O5UWcpKuG0O3QrXJ7rT2/N3luEddl/NLlPDAINhsiZQv7XPI7
-         ws4/eUQgDuoiZpOz/2ZF2MYOzIjDAiSCLPjhZTdiGWnmZodFlbbx78rQ4oK3GM1n2W64
-         hIW9G2sDsZYEZ5Zh+bbjz8eJIspZKfqUH8ICVY0MVWwOaRZyZWzQ9VXRAeHfKvgaun0d
-         8Xvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVVYBMyv+O50xFyi2xurI0B/3F13TBiy02G1hO4zB90IpzDC70di+KxyVhi0y45ACmHMbkuY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNZ2CdJhsKFLvE8yfsj79HLWsz96NbigaexmqGLTs7m8adc24j
-	Nzd5aHtsFFS6pwm96BBEm/yWYcf6sbv9hJGpCLmFNPew02raq6KRdcosER3wFXQQvp0CnD3JO7R
-	wm4I857nZ1k4jlAD+yPT9RlxayOyWnNO73vbeKRg1xb9wdjXJfxHerZ7lcik=
-X-Gm-Gg: ASbGncur6Rrm7RiQztzQ4I2kFV7gQNV5k4afKCCH5bpQn6RNf7/emjcE2Cmk+omvI13
-	/Epa9OMISpxJ/S7bIpRoMhhyZMSqtpbZRVBvNwE/+DMFouxtZtGcSU4PbKKNALzyMzsCUibqaRX
-	V5qA91AIiRNXmu1YjW4s/4wJOYSw/SZ9H1Sq052x+oLSE3G9uxThk7vE1ZxHEWlxIcwLGCepnkb
-	CDHVy9+8/zZ17X1TP1WpGHszjeKp6R9SD6A76VYnkeHPlYRvoyeDK6be1N96vXmVIxnpEvCRnhm
-	UcU=
-X-Google-Smtp-Source: AGHT+IHELrDGBB2fMB4iIigmJ36+ijhNyJeFGieLN1fGA9wbRPj4CODQ3iwhjzpNsmEhG0SvUZsdafPs0CGU4ZRihW0=
-X-Received: by 2002:a17:902:e78f:b0:24c:c57d:36a2 with SMTP id
- d9443c01a7336-24cc57d4caamr15122735ad.13.1756963929669; Wed, 03 Sep 2025
- 22:32:09 -0700 (PDT)
+	s=arc-20240116; t=1756965077; c=relaxed/simple;
+	bh=OOF7HixicOsFQMfTDwMe/QQcFadtCg6wUvl0gIhKc80=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JT0UHAQbBuPBjx5IlOdWcjQaLHiuJuHel9rJQWJ9QU0reE3L7+VEcpttnar0quu2SaLkCv/Mn6ZhH7xOh6K4LZrfTT1sBQsm1sHHo9JlBW1KE5pNpd+yHnKtAREz1gu3UHY/KQzQUU5UnlqkZwJGiJkWrCVDYoRbdRVcaea0UjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WkKozhHs; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <40ed29b3-84d7-4812-890d-3676957d503f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756965062;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uMFKcVml4hRd8ozRNDMakWh5QQ2N0I2r7+WMED7nTfE=;
+	b=WkKozhHsPeZ+Mee6RbPK4YR9MscoVm+sEWE3ryl4LVQjoYNYH0cxBC8y8K5SQVVeBaYF3b
+	zdr+/mON4dT9CJuwrZD19mspbI96yeRfMjyitKPHeGyROHW2U8Hr9/WebvoLMd95whsUCb
+	jrQgpZX1uGxrrnsCiOG3mm6EhdDFugM=
+Date: Wed, 3 Sep 2025 22:50:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903084720.1168904-1-edumazet@google.com> <20250903084720.1168904-2-edumazet@google.com>
- <CAL+tcoCqey97QW=7n_S8V9t-haSe=mu9iE1sAaDmPPJ+1BkysA@mail.gmail.com>
-In-Reply-To: <CAL+tcoCqey97QW=7n_S8V9t-haSe=mu9iE1sAaDmPPJ+1BkysA@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 3 Sep 2025 22:31:58 -0700
-X-Gm-Features: Ac12FXxrgJTVzJ1XB3u_xrhq4geicd35j1jcF_yGUcc2rZlgYsddwVW7N26OMfg
-Message-ID: <CAAVpQUBgCyC+y+2M7=WKJVk=sivgeZtE2kwCxDLFCrgezycjZg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] tcp: fix __tcp_close() to only send RST when required
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v4 bpf-next/net 5/5] selftest: bpf: Add test for
+ SK_BPF_MEMCG_SOCK_ISOLATED.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+ Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250829010026.347440-1-kuniyu@google.com>
+ <20250829010026.347440-6-kuniyu@google.com>
+ <904c1ffb-107e-4f14-89b7-d42ac9a5aa14@linux.dev>
+ <CAAVpQUDfQwb2nfGBV8NEONwaBAMVi_5F8+OPFX3=z+W8X9n9ZQ@mail.gmail.com>
+ <CAAVpQUBWsVDu07xrQcqGMo4cHRu41zvb5CWuiUdJx9m6A+_2AQ@mail.gmail.com>
+ <CAAVpQUCyPPO1dfkkU4Hxz67JFcW6dhSfYnmUp0foNMYua_doyg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAAVpQUCyPPO1dfkkU4Hxz67JFcW6dhSfYnmUp0foNMYua_doyg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 3, 2025 at 10:04=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Wed, Sep 3, 2025 at 4:47=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > If the receive queue contains payload that was already
-> > received, __tcp_close() can send an unexpected RST.
-> >
-> > Refine the code to take tp->copied_seq into account,
-> > as we already do in tcp recvmsg().
-> >
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->
-> Sorry, Eric. I might be wrong, and I don't think it's a bugfix for now.
->
-> IIUC, it's not possible that one skb stays in the receive queue and
-> all of the data has been consumed in tcp_recvmsg() unless it's
-> MSG_PEEK mode. So my understanding is that the patch tries to cover
-> the case where partial data of skb is read by applications and the
-> whole skb has not been unlinked from the receive queue yet. Sure, as
-> we can learn from tcp_sendsmg(), skb can be partially read.
+On 9/3/25 10:08 AM, Kuniyuki Iwashima wrote:
+> On Wed, Sep 3, 2025 at 9:59 AM Kuniyuki Iwashima <kuniyu@google.com> wrote:
+>>
+>> On Tue, Sep 2, 2025 at 1:49 PM Kuniyuki Iwashima <kuniyu@google.com> wrote:
+>>>
+>>> On Tue, Sep 2, 2025 at 1:26 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>>>
+>>>> On 8/28/25 6:00 PM, Kuniyuki Iwashima wrote:
+>>>>> The test does the following for IPv4/IPv6 x TCP/UDP sockets
+>>>>> with/without BPF prog.
+>>>>>
+>>>>>     1. Create socket pairs
+>>>>>     2. Send a bunch of data that requires more than 256 pages
+>>>>>     3. Read memory_allocated from the 3rd column in /proc/net/protocols
+>>>>>     4. Check if unread data is charged to memory_allocated
+>>>>>
+>>>>> If BPF prog is attached, memory_allocated should not be changed,
+>>>>> but we allow a small error (up to 10 pages) in case other processes
+>>>>> on the host use some amounts of TCP/UDP memory.
+>>>>>
+>>>>> At 2., the test actually sends more than 1024 pages because the sysctl
+>>>>> net.core.mem_pcpu_rsv is 256 is by default, which means 256 pages are
+>>>>> buffered per cpu before reporting to sk->sk_prot->memory_allocated.
+>>>>>
+>>>>>     BUF_SINGLE (1024) * NR_SEND (64) * NR_SOCKETS (64) / 4096
+>>>>>     = 1024 pages
+>>>>>
+>>>>> When I reduced it to 512 pages, the following assertion for the
+>>>>> non-isolated case got flaky.
+>>>>>
+>>>>>     ASSERT_GT(memory_allocated[1], memory_allocated[0] + 256, ...)
+>>>>>
+>>>>> Another contributor to slowness is 150ms sleep to make sure 1 RCU
+>>>>> grace period passes because UDP recv queue is destroyed after that.
+>>>>
+>>>> There is a kern_sync_rcu() in testing_helpers.c.
+>>>
+>>> Nice helper :)  Will use it.
+>>>
+>>>>
+>>>>>
+>>>>>     # time ./test_progs -t sk_memcg
+>>>>>     #370/1   sk_memcg/TCP       :OK
+>>>>>     #370/2   sk_memcg/UDP       :OK
+>>>>>     #370/3   sk_memcg/TCPv6     :OK
+>>>>>     #370/4   sk_memcg/UDPv6     :OK
+>>>>>     #370     sk_memcg:OK
+>>>>>     Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+>>>>>
+>>>>>     real       0m1.214s
+>>>>>     user       0m0.014s
+>>>>>     sys        0m0.318s
+>>>>
+>>>> Thanks. It finished much faster in my setup also comparing with the earlier
+>>>> revision. However, it is a bit flaky when I run it in a loop:
+>>>>
+>>>> check_isolated:FAIL:not isolated unexpected not isolated: actual 861 <= expected 861
+>>>>
+>>>> I usually can hit this at ~40-th iteration.
+>>>
+>>> Oh.. I tested ~10 times manually but will try in a tight loop.
+>>
+>> This didn't reproduce on my QEMU with/without --enable-kvm.
+>>
+>> Changing the assert from _GT to _GE will address the very case
+>> above, but I'm not sure if it's enough.
+> 
+> I doubled NR_SEND and it was still faster with kern_sync_rcu()
+> than usleep(), so I'll simply double NR_SEND in v5
+> 
+> # time ./test_progs -t sk_memcg
+> ...
+> Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+> real 0m0.483s
+> user 0m0.010s
+> sys 0m0.191s
+> 
+> 
+>>
+>> Does the bpf CI run tests repeatedly or is this only a manual
+>> scenario ?
 
-You can find a clear example in patch 2 that this patch fixes.
+I haven't seen bpf CI hit it yet. It is in my manual bash while loop. It should 
+not be dismissed so easily. Some flaky CI tests were eventually reproduced in a 
+loop before and fixed. I kept the bash loop continue this time until grep-ed a 
+"0" from the error output:
 
-Without patch 1, the test fails:
+check_isolated:FAIL:not isolated unexpected not isolated: actual 0 <= expected 256
 
-# ./ksft_runner.sh tcp_close_no_rst.pkt
-...
-tcp_close_no_rst.pkt:32: error handling packet: live packet field
-tcp_fin: expected: 1 (0x1) vs actual: 0 (0x0)
-script packet:  0.140854 F. 1:1(0) ack 1002
-actual packet:  0.140844 R. 1:1(0) ack 1002 win 65535
-not ok 1 ipv4
+The "long memory_allocated[2]" read from /proc/net/protocols are printed as 0 
+but it is probably actually negative:
+
+static inline long
+proto_memory_allocated(const struct proto *prot)
+{
+         return max(0L, atomic_long_read(prot->memory_allocated));
+}
+
+prot->memory_allocated could be negative afaict but printed as 0 in 
+/proc/net/protocols. Even the machine is network quiet after test_progs started, 
+the "prot->memory_allocated" and the "proto->per_cpu_fw_alloc" could be in some 
+random states before the test_progs start.  When I hit "0", it will take some 
+efforts to send some random traffic to the machine to get the test working again. :(
+
+Also, after reading the selftest closer, I am not sure I understand why "+ 256". 
+The "proto->per_cpu_fw_alloc" can start with -255 or +255.
+
+I don't think changing NR_SEND help here. It needs a better way. May be some 
+functions can be traced such that prot->memory_allocated can be read directly? 
+If fentry and fexit of that function has different memory_allocated values, then 
+the test could also become more straight forward.
 
 
->
-> As long as 'TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb)->seq' has data
-> len, and the skb still exists in the receive queue, it can directly
-> means some part of skb hasn't been read yet. We can call it the unread
-> data case then, so the logic before this patch is right.
->
-> Two conditions (1. skb still stays in the queue, 2. skb has data) make
-> sure that the data unread case can be detected and then sends an RST.
-> No need to replace it with copied_seq, I wonder? At least, it's not a
-> bug.
->
-> Thanks,
-> Jason
->
->
->
->
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
-> >  net/ipv4/tcp.c | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index 40b774b4f587..39eb03f6d07f 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -3099,8 +3099,8 @@ bool tcp_check_oom(const struct sock *sk, int shi=
-ft)
-> >
-> >  void __tcp_close(struct sock *sk, long timeout)
-> >  {
-> > +       bool data_was_unread =3D false;
-> >         struct sk_buff *skb;
-> > -       int data_was_unread =3D 0;
-> >         int state;
-> >
-> >         WRITE_ONCE(sk->sk_shutdown, SHUTDOWN_MASK);
-> > @@ -3119,11 +3119,12 @@ void __tcp_close(struct sock *sk, long timeout)
-> >          *  reader process may not have drained the data yet!
-> >          */
-> >         while ((skb =3D __skb_dequeue(&sk->sk_receive_queue)) !=3D NULL=
-) {
-> > -               u32 len =3D TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb)-=
->seq;
-> > +               u32 end_seq =3D TCP_SKB_CB(skb)->end_seq;
-> >
-> >                 if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
-> > -                       len--;
-> > -               data_was_unread +=3D len;
-> > +                       end_seq--;
-> > +               if (after(end_seq, tcp_sk(sk)->copied_seq))
-> > +                       data_was_unread =3D true;
-> >                 __kfree_skb(skb);
-> >         }
-> >
-> > --
-> > 2.51.0.338.gd7d06c2dae-goog
-> >
-> >
 
