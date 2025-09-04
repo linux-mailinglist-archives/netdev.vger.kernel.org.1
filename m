@@ -1,224 +1,318 @@
-Return-Path: <netdev+bounces-219988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD46B4409A
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:29:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40C65B440C4
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:36:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D651D1C86CAD
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:29:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CF1B7A826D
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE59C244690;
-	Thu,  4 Sep 2025 15:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1D527E060;
+	Thu,  4 Sep 2025 15:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JykgU5gr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bz0XGNUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121BC23BD04
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 15:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C42B274B37;
+	Thu,  4 Sep 2025 15:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756999761; cv=none; b=FPb6BtSmeDosWQD8BK2QxoKmxjmVmwF5QnbEZ/U270qShmKOBsfOedtBgSbEoD1RiL1dASVjpkge+uLNnWumaOEKppR0sl1xAhug94BXXztYE3/zCE17IQpkkA400bMvhlv6vKhzJoe836MsgI6ge5wQp9OvLC3eofFswQxWBKU=
+	t=1757000177; cv=none; b=BAgUj21N2EfP8dh6/UeCtYBKK58bF9JtrImtUculGBxiDzjavu7vITVi5Gqp0KR6L2RQ+1qxKPe3qPsLPgMssxpLc0QV+GlRs/mSWwiwKZOXIqjNKf8cKGoipYyuETpy2yf25eOY2Bsv3vKfT5/x41sT+8/ZXJO51AqDlcO29tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756999761; c=relaxed/simple;
-	bh=EUUOJm8+pqfJE0C02BV4F6cE3SBmlMX62RiOmXxnlyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RL+nh+seVAVkziSJC3CRb4lP42+mb7PDM0igW9UZgqLdNmxyLCQHItLW8YgA3SNTlTNI3mo5cZQyS1vNaouHNFF1xMDtYvExZYWRub64c67+qoQyWK4a+7jN92dodQR4gZl9dnnotGWWtzRrUo+QBsxu+p/sGGkAIXEMWwe3N+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JykgU5gr; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5849X74L013476
-	for <netdev@vger.kernel.org>; Thu, 4 Sep 2025 15:29:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	aCKrmPJEFXGT0WYbXHZg3VTYOIhYkJFe7iTrbDkI7Yg=; b=JykgU5grP0LzChRS
-	jo5fMTmzga1W8yeVxF9tViRBvkFXCJtHR7aVYgmLnoqxhr9ttxNTxlGbZsS4LdRN
-	kpsDb53P3r3X5KkbWDFxac815aVm1cUa1fLkD+NMSL3FOGhM9YAkXrkyeUJ6g3r3
-	go9383tqDVDZUo6MbK/JJTuRcmNg1ikvHWaGxgVpgdiWVZtxFlqnPTviuC+i6zOb
-	orDfQhNzgKA3FudfFzcbgNh+zFlz7oubp3DMwkUV0jJ773Z7HdaX0J8xPyo1ow8k
-	K3nxAlgQPa+EMv+QseXkgHtUGVQYJJTg5oHDfA744/Dzy+cff7TLAMoZHK2yoRJS
-	uYvHtQ==
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48w8wybv3k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 15:29:18 +0000 (GMT)
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-24458274406so21329235ad.3
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 08:29:18 -0700 (PDT)
+	s=arc-20240116; t=1757000177; c=relaxed/simple;
+	bh=Zhh+/A9kJtldiBdmzD/Y+hpgYjPTJskTjHqrI3X31TM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=bIF4WEaVQ9QTyC6nSJ1nTC49guaLbZ3LL7tiCdM1Ov1HZ4VNtul+5tDE/Gm0n9BQo6t5QeHUb6KTygARzC0s3q3+1m+mNmcpuckDwpxEsngqpypVP1WnqIgR440m5ShKlN6y+vKc1HK+ie//T0UZJVvh+mFTD0dUiomQZJa1BW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bz0XGNUL; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7f04816589bso117083885a.3;
+        Thu, 04 Sep 2025 08:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757000174; x=1757604974; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FbuSI1OlZ+wbAUYqL8HDadi/6F37Rp4puRFTgu+g04I=;
+        b=Bz0XGNULofM2ECEkRP7yGiZ03R4zmuxQvhX2QsWS8Dz+AUCtLJjvV3QTSD+cFKf1Xb
+         9Hb/f28DV1pfVoVXbKBpjtLsmCKbsGno4KHmECHNkC53yiZsOKqiMJm180VwK0awg6sB
+         jA1tuJXDLqpc22dq3BlZxoUItp7Q7z5Q1efEmG/gkPCjWv34CzFRtioEFy8TD9u+msFM
+         0gJ5T+vBb89MKiVw4EYiHxNxatpw5EUYExhMCkgNpTmB7zccIFQGSVXwQwq9vktJAcwQ
+         x/LANxxauXZjNUsKGBuhqQonADUTxrpQ8KstoRvvryJgtZOA4gJ/L36NEXqupQ1b1YaE
+         s/yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756999757; x=1757604557;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aCKrmPJEFXGT0WYbXHZg3VTYOIhYkJFe7iTrbDkI7Yg=;
-        b=jbeetdCag2n7TGiQHNKQgyQnhHfkkFjXutE1StSZVCn6QAaw9qgNA+U5r+6zIgpSa1
-         DSp7ezx1hsNTRI0oCDqPycSVoUcqIJ/SZGQVbb00QUf2yDtbkEhjoVsJtXAEIkjE0Alc
-         zATaj+Jh4ngbD5QZ5LUihKu+i7FsYxcM1BbQ9UEpZNemo5nK6ICSfOfxcvZ1I1a5xQ3L
-         WTk440QgQxGJ/+8Ykv8dVtrsxiZCYBz5hCxumN1xJq9J/KbjQmDhVf4y2SXswYullIeK
-         V/t++ctk5baBdnQtI5ZAdTcGLPrBjPo5SRUsAw5B7CyXgMT3Y3zs/pemKxhuNqdhtqNE
-         en7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWAv4sDgV9pVQ+bhpktXIu4zBUAp6SOlGdGQ7fs3b+fCfB6d255jel+iBeG+VAuq9Ee6of04xo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWZXfCuqXgSskBFWzzuOezcDFTvmGRv0BodL3fm3cFY29dHEe2
-	PNjQRwTXklsxEkFd+DxcYJNuPvkGK5CCrV4/q6mZ8gx5bTa4Hi0NfPZrrxhnI74NtYvmcSK4cPE
-	WjH5zjwVmgV7UtB/zZ/hAkxawHljQxTv4pfQKFRa+okpSL1NB9KeCtm7OaOo=
-X-Gm-Gg: ASbGncs3LlOz40IqUWtCdmjN99yr1kioV5koyVWD76n1HhQErECEkZUjRLkFKeHFFp9
-	x+Dk4BBiazf4byqYro78NslQm+RxdPU0O5tRcOVGUBbXTlpGfvgIg7IyT0T6mxfSZwM5xVT+T1r
-	+eoD7jMFi4Vzd9r31F47NkvwpFHVLB84kdD/T1h8qVnki5DYCQitajNbFcWPZVvqvLKAWLSiMn8
-	aCVJ/rm1nPjKf2hDtMgYsVkDarE2JAEd2csJTuTKnrhsO8VMe83lfbw6dFGK3QOdQNVGYdr8O6t
-	zELUuZ86+corBmEz5TOE9pocOew8BUvuqd+3OwkvNQgZWFmjTHJPTtZXuBiIeV8DsW1k
-X-Received: by 2002:a17:902:d4c1:b0:24c:92b5:2175 with SMTP id d9443c01a7336-24c92b5262fmr76675945ad.24.1756999757434;
-        Thu, 04 Sep 2025 08:29:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE4JhBNWdG2V+TxgIDesrLMeTY0t0q4ahoJ30jB1TKaWOy2/eOV1xvyNkelIVpDUVQxYmrVWg==
-X-Received: by 2002:a17:902:d4c1:b0:24c:92b5:2175 with SMTP id d9443c01a7336-24c92b5262fmr76675745ad.24.1756999756970;
-        Thu, 04 Sep 2025 08:29:16 -0700 (PDT)
-Received: from hu-wasimn-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-327c5fc5055sm22049502a91.14.2025.09.04.08.29.12
+        d=1e100.net; s=20230601; t=1757000174; x=1757604974;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FbuSI1OlZ+wbAUYqL8HDadi/6F37Rp4puRFTgu+g04I=;
+        b=rjIlppC+7i0NW0Mg2jLllKxUAUasGG+GFlFFY6nWv/aorK7gvMSthArM0ZyI+Q8sqS
+         14V3t6jBTAtaKm2tPVu0vvS7Q6oORoDsJS52VgF9q3EVEs+/YjnsROluKnVmjS4HEVLD
+         V2qP9DeF/T5KQVZUbX9AjsHpXkiBQrpO7JsEpoOQU+A+I87CO3moO1VO0Iw3T4Gfje8N
+         uSpXUaHeU4uSCmrmhdhjevtBgxqSbBicQ5pznueb/VkyiceaV3d18EnVVonGkzSgqm1X
+         jpAaf8TxDLphQHRmUqVKGuAS0VXf+M59UTY8xxPbyno8gR7EjTa2MKHJkQ4ELwyTY5Fq
+         ED4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWMygYtqogbdhBq+0ynXaDunXBiKUa0Y7b6R7s/6NGG9ITt78Xxoe65UgeaP4SkqA7mCeU39DLV@vger.kernel.org, AJvYcCWYIVrbUNdTWDX74dJE5giXkKp5yuQN7UP/ECTEF0MrJmcZS2BbzWkIooMTLHgc/P1DXEPgWCjc24z5y9b4lK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyX9oBD3xE87buVMIlfxQWQ4XgJMyALGiyuoBSJjlbxoXK1wzMd
+	AHKbWp0El+81IoA8L5xWWFjVT1LNxEuJk6dl9ieSMmFwR6PCbPQXD/dm
+X-Gm-Gg: ASbGnctAiEzobU7nHSwmR6vBue0zNuVBeWVkeBts5OP9y+NrxavDeN7G5A16mY3HZFX
+	LyR6Zeu9sSPIiqa3PvSE7KKoTyNhfMbNQKJvpbHvy+cTrm9p+vBRP/tk9DkrLtQn3aMXynS01MF
+	B2ddzDFKfGc67uXv9ZG1BmYj0OgfzVUj6YeqellMt/qiCf7HQ+GskNDMJevTk80lDzgLVEn98Al
+	6PXrmBN3AGm6A9P6FoRT1KPSp4zd2VxeW312JxnKqWpiinx06vE6LlWJfd4CefynC3oHJUugpGM
+	ggFwFW5gvsDfntxR3IQBR/sV7mK97neEXtbSMzfTs1U+eBUsypQp/VrULNoxLm4nYDoiQK9Lpx0
+	mV9Rd3qMISDCMLIkzbNeEWS+hvJ5fmXNKK/hFzeGnoE3fVm1Q8gRayYMkm+S1vcCIoftri3npji
+	K02BJVd38ZOreC
+X-Google-Smtp-Source: AGHT+IEUWEXialSoqxANvjGbEt3w97Qry/VSdQePFuCRtV3f3z4eKdLOAvK1JELh20Zu2eyARMKewA==
+X-Received: by 2002:a05:620a:4490:b0:810:919c:ed26 with SMTP id af79cd13be357-810919ced77mr28805185a.29.1757000173567;
+        Thu, 04 Sep 2025 08:36:13 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4b48f7823casm30749311cf.42.2025.09.04.08.36.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 08:29:16 -0700 (PDT)
-Date: Thu, 4 Sep 2025 20:59:09 +0530
-From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>, kernel@oss.qualcomm.com,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org, Monish Chunara <quic_mchunara@quicinc.com>
-Subject: Re: [PATCH 2/5] arm64: dts: qcom: lemans: Add SDHC controller and
- SDC pin configuration
-Message-ID: <aLmwRSROlgXxw3bI@hu-wasimn-hyd.qualcomm.com>
-References: <20250826-lemans-evk-bu-v1-0-08016e0d3ce5@oss.qualcomm.com>
- <20250826-lemans-evk-bu-v1-2-08016e0d3ce5@oss.qualcomm.com>
- <rxd4js6hb5ccejge2i2fp2syqlzdghqs75hb5ufqrhvpwubjyz@zwumzc7wphjx>
- <c82d44af-d107-4e84-b5ae-eeb624bc03af@oss.qualcomm.com>
- <aLhssUQa7tvUfu2j@hu-wasimn-hyd.qualcomm.com>
- <tqm4sxoya3hue7mof3uqo4nu2b77ionmxi65ewfxtjouvn5xlt@d6ala2j2msbn>
- <3b691f3a-633c-4a7f-bc38-a9c464d83fe1@oss.qualcomm.com>
+        Thu, 04 Sep 2025 08:36:13 -0700 (PDT)
+Date: Thu, 04 Sep 2025 11:36:12 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Marc Harvey <marcharvey@google.com>, 
+ jiri@resnulli.us, 
+ andrew+netdev@lunn.ch
+Cc: edumazet@google.com, 
+ willemb@google.com, 
+ maheshb@google.com, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ kuba@kernel.org, 
+ liuhangbin@gmail.com, 
+ Marc Harvey <marcharvey@google.com>
+Message-ID: <willemdebruijn.kernel.22c2bf5d2d4f3@gmail.com>
+In-Reply-To: <20250904015424.1228665-1-marcharvey@google.com>
+References: <20250904015424.1228665-1-marcharvey@google.com>
+Subject: Re: [PATCH net-next v2] selftests: net: Add tests to verify team
+ driver option set and get.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3b691f3a-633c-4a7f-bc38-a9c464d83fe1@oss.qualcomm.com>
-X-Authority-Analysis: v=2.4 cv=Ycq95xRf c=1 sm=1 tr=0 ts=68b9b04e cx=c_pps
- a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
- a=7jlciowUQMUDIi_Z8n8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=GvdueXVYPmCkWapjIL-Q:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: Lz220iZ21uwbfcS-hlPlLruMRdOUihte
-X-Proofpoint-ORIG-GUID: Lz220iZ21uwbfcS-hlPlLruMRdOUihte
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAxMDEwMSBTYWx0ZWRfX3mrAjj3Lb4Jo
- JRxpLna/r1S4cgSGdlkGl7lNqSUcXSGSUSH1Uke+o5wi7QdDckNm+lZIzaV5FTeiEFAxCT/abu+
- Xge2FgsaxF4sfdZL4wL+bBpShaWBbp8FKGYu+zkrk+QlW1C2sNhQq8p4IULbTpMVd3KfSmmEvRZ
- Ce9LuhJ3JcVhHtPNrF123lSFeIbzZ3DLrCnqvJFNB9sbdeWFBZUokKDnpSvcrnylocYlrb8gqOj
- FsqC0LeRdgQPlkMolk1OOiv7C7vPpA51yIxeh1tPE7p7VaV+h4TuaGHXmUBfgcvNrOPLikTkaiH
- yRBDnBrPdTG+c7T7UfEfYN7t54ChVGPjj/ymnl+QHe+y3bB0FLsJ1QQ7kS+97BzCZAPOWwwfoCU
- zWzGyHQ0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-04_05,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 adultscore=0 phishscore=0 malwarescore=0
- bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509010101
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 04, 2025 at 04:34:05PM +0200, Konrad Dybcio wrote:
-> On 9/4/25 3:35 PM, Dmitry Baryshkov wrote:
-> > On Wed, Sep 03, 2025 at 09:58:33PM +0530, Wasim Nazir wrote:
-> >> On Wed, Sep 03, 2025 at 06:12:59PM +0200, Konrad Dybcio wrote:
-> >>> On 8/27/25 3:20 AM, Dmitry Baryshkov wrote:
-> >>>> On Tue, Aug 26, 2025 at 11:51:01PM +0530, Wasim Nazir wrote:
-> >>>>> From: Monish Chunara <quic_mchunara@quicinc.com>
-> >>>>>
-> >>>>> Introduce the SDHC v5 controller node for the Lemans platform.
-> >>>>> This controller supports either eMMC or SD-card, but only one
-> >>>>> can be active at a time. SD-card is the preferred configuration
-> >>>>> on Lemans targets, so describe this controller.
-> >>>>>
-> >>>>> Define the SDC interface pins including clk, cmd, and data lines
-> >>>>> to enable proper communication with the SDHC controller.
-> >>>>>
-> >>>>> Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
-> >>>>> Co-developed-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> >>>>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> >>>>> ---
-> >>>>>  arch/arm64/boot/dts/qcom/lemans.dtsi | 70 ++++++++++++++++++++++++++++++++++++
-> >>>>>  1 file changed, 70 insertions(+)
-> >>>>>
-> >>>>> diff --git a/arch/arm64/boot/dts/qcom/lemans.dtsi b/arch/arm64/boot/dts/qcom/lemans.dtsi
-> >>>>> index 99a566b42ef2..a5a3cdba47f3 100644
-> >>>>> --- a/arch/arm64/boot/dts/qcom/lemans.dtsi
-> >>>>> +++ b/arch/arm64/boot/dts/qcom/lemans.dtsi
-> >>>>> @@ -3834,6 +3834,36 @@ apss_tpdm2_out: endpoint {
-> >>>>>  			};
-> >>>>>  		};
-> >>>>>  
-> >>>>> +		sdhc: mmc@87c4000 {
-> >>>>> +			compatible = "qcom,sa8775p-sdhci", "qcom,sdhci-msm-v5";
-> >>>>> +			reg = <0x0 0x087c4000 0x0 0x1000>;
-> >>>>> +
-> >>>>> +			interrupts = <GIC_SPI 383 IRQ_TYPE_LEVEL_HIGH>,
-> >>>>> +				     <GIC_SPI 521 IRQ_TYPE_LEVEL_HIGH>;
-> >>>>> +			interrupt-names = "hc_irq", "pwr_irq";
-> >>>>> +
-> >>>>> +			clocks = <&gcc GCC_SDCC1_AHB_CLK>,
-> >>>>> +				 <&gcc GCC_SDCC1_APPS_CLK>;
-> >>>>> +			clock-names = "iface", "core";
-> >>>>> +
-> >>>>> +			interconnects = <&aggre1_noc MASTER_SDC 0 &mc_virt SLAVE_EBI1 0>,
-> >>>>> +					<&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_SDC1 0>;
-> >>>>> +			interconnect-names = "sdhc-ddr", "cpu-sdhc";
-> >>>>> +
-> >>>>> +			iommus = <&apps_smmu 0x0 0x0>;
-> >>>>> +			dma-coherent;
-> >>>>> +
-> >>>>> +			resets = <&gcc GCC_SDCC1_BCR>;
-> >>>>> +
-> >>>>> +			no-sdio;
-> >>>>> +			no-mmc;
-> >>>>> +			bus-width = <4>;
-> >>>>
-> >>>> This is the board configuration, it should be defined in the EVK DTS.
-> >>>
-> >>> Unless the controller is actually incapable of doing non-SDCards
-> >>>
-> >>> But from the limited information I can find, this one should be able
-> >>> to do both
-> >>>
-> >>
-> >> It’s doable, but the bus width differs when this controller is used for
-> >> eMMC, which is supported on the Mezz board. So, it’s cleaner to define
-> >> only what’s needed for each specific usecase on the board.
-> > 
-> > `git grep no-sdio arch/arm64/boot/dts/qcom/` shows that we have those
-> > properties inside the board DT. I don't see a reason to deviate.
+Marc Harvey wrote:
+> There are currently no kernel tests that verify setting and getting
+> options of the team driver.
 > 
-> Just to make sure we're clear
+> In the future, options may be added that implicitly change other
+> options, which will make it useful to have tests like these that show
+> nothing breaks. There will be a follow up patch to this that adds new
+> "rx_enabled" and "tx_enabled" options, which will implicitly affect the
+> "enabled" option value and vice versa.
 > 
-> I want the author to keep bus-width in SoC dt and move the other
-> properties to the board dt
+> The tests use teamnl to first set options to specific values and then
+> gets them to compare to the set values.
 > 
+> Signed-off-by: Marc Harvey <marcharvey@google.com>
+> ---
+> Changes in v2:
+>   - Fixed shellcheck failures.
+>   - Fixed test failing in vng by adding a config option to enable the
+>     team driver's active backup mode.
+>   - Link to v1: https://lore.kernel.org/netdev/20250902235504.4190036-1-marcharvey@google.com/
+> 
+>  .../selftests/drivers/net/team/Makefile       |   6 +-
+>  .../testing/selftests/drivers/net/team/config |   1 +
+>  .../selftests/drivers/net/team/options.sh     | 192 ++++++++++++++++++
+>  3 files changed, 197 insertions(+), 2 deletions(-)
+>  create mode 100755 tools/testing/selftests/drivers/net/team/options.sh
+> 
+> diff --git a/tools/testing/selftests/drivers/net/team/Makefile b/tools/testing/selftests/drivers/net/team/Makefile
+> index eaf6938f100e..8b00b70ce67f 100644
+> --- a/tools/testing/selftests/drivers/net/team/Makefile
+> +++ b/tools/testing/selftests/drivers/net/team/Makefile
+> @@ -1,11 +1,13 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  # Makefile for net selftests
+>  
+> -TEST_PROGS := dev_addr_lists.sh propagation.sh
+> +TEST_PROGS := dev_addr_lists.sh propagation.sh options.sh
+>  
+>  TEST_INCLUDES := \
+>  	../bonding/lag_lib.sh \
+>  	../../../net/forwarding/lib.sh \
+> -	../../../net/lib.sh
+> +	../../../net/lib.sh \
+> +	../../../net/in_netns.sh \
+> +	../../../net/lib/sh/defer.sh \
 
-I'll move the no-sdio and no-mmc properties to the board-specific device
-tree file, and keep the bus-width configuration in the SoC-level file.
+Where is defer used? Also no backslash at last line.
+>  
+>  include ../../../lib.mk
+> diff --git a/tools/testing/selftests/drivers/net/team/config b/tools/testing/selftests/drivers/net/team/config
+> index 636b3525b679..558e1d0cf565 100644
+> --- a/tools/testing/selftests/drivers/net/team/config
+> +++ b/tools/testing/selftests/drivers/net/team/config
+> @@ -3,4 +3,5 @@ CONFIG_IPV6=y
+>  CONFIG_MACVLAN=y
+>  CONFIG_NETDEVSIM=m
+>  CONFIG_NET_TEAM=y
+> +CONFIG_NET_TEAM_MODE_ACTIVEBACKUP=y
+>  CONFIG_NET_TEAM_MODE_LOADBALANCE=y
+> diff --git a/tools/testing/selftests/drivers/net/team/options.sh b/tools/testing/selftests/drivers/net/team/options.sh
+> new file mode 100755
+> index 000000000000..82bf22aa3480
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/team/options.sh
+> @@ -0,0 +1,192 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +# These tests verify basic set and get functionality of the team
+> +# driver options over netlink.
+> +
+> +# Run in private netns.
+> +test_dir="$(dirname "$0")"
+> +if [[ $# -eq 0 ]]; then
+> +        "${test_dir}"/../../../net/in_netns.sh "$0" __subprocess
+> +        exit $?
+> +fi
+> +
+> +ALL_TESTS="
+> +        team_test_options
+> +"
+> +
+> +source "${test_dir}/../../../net/lib.sh"
+> +
+> +TEAM_PORT="team0"
+> +MEMBER_PORT="dummy0"
+> +
+> +setup()
+> +{
+> +        ip link add name "${MEMBER_PORT}" type dummy
+> +        ip link add name "${TEAM_PORT}" type team
+> +}
+> +
+> +get_and_check_value()
+> +{
+> +        local option_name="$1"
+> +        local expected_value="$2"
+> +        local port_flag="$3"
+> +
+> +        local value_from_get
+> +
+> +        if ! value_from_get=$(teamnl "${TEAM_PORT}" getoption "${option_name}" \
+> +                        "${port_flag}"); then
+> +                echo "Could not get option '${option_name}'" >&2
+> +                return 1
+> +        fi
+> +
+> +        if [[ "${value_from_get}" != "${expected_value}" ]]; then
+> +                echo "Incorrect value for option '${option_name}'" >&2
+> +                echo "get (${value_from_get}) != set (${expected_value})" >&2
+> +                return 1
+> +        fi
+> +}
+> +
+> +set_and_check_get()
+> +{
+> +        local option_name="$1"
+> +        local option_value="$2"
+> +        local port_flag="$3"
+> +
+> +        local value_from_get
+> +
+> +        if ! teamnl "${TEAM_PORT}" setoption "${option_name}" "${option_value}" \
+> +                        "${port_flag}"; then
+> +                echo "'setoption ${option_name} ${option_value}' failed" >&2
+> +                return 1
+> +        fi
+> +
+> +        get_and_check_value "${option_name}" "${option_value}" "${port_flag}"
+> +        return $?
+> +}
+> +
+> +# Get a "port flag" to pass to the `teamnl` command.
+> +# E.g. $1="dummy0" -> "port=dummy0",
+> +#      $1=""       -> ""
+> +get_port_flag()
+> +{
+> +        local port_name="$1"
+> +
+> +        if [[ -n "${port_name}" ]]; then
+> +                echo "--port=${port_name}"
+> +        fi
+> +}
+> +
+> +attach_port_if_specified()
+> +{
+> +        local port_name="${1}"
 
+nit: parentheses around single character variable. Inconsistent.
 
--- 
-Regards,
-Wasim
+> +
+> +        if [[ -n "${port_name}" ]]; then
+> +                ip link set dev "${port_name}" master "${TEAM_PORT}"
+> +                return $?
+> +        fi
+> +}
+> +
+> +detach_port_if_specified()
+> +{
+> +        local port_name="${1}"
+> +
+> +        if [[ -n "${port_name}" ]]; then
+> +                ip link set dev "${port_name}" nomaster
+> +                return $?
+> +        fi
+> +}
+> +
+> +#######################################
+> +# Test that an option's get value matches its set value.
+> +# Globals:
+> +#   RET - Used by testing infra like `check_err`.
+> +#   EXIT_STATUS - Used by `log_test` to whole script exit value.
+> +# Arguments:
+> +#   option_name - The name of the option.
+> +#   value_1 - The first value to try setting.
+> +#   value_2 - The second value to try setting.
+> +#   port_name - The (optional) name of the attached port.
+> +#######################################
+
+Just curious: is this a standard documentation format?
+
+> +team_test_option()
+> +{
+> +        local option_name="$1"
+> +        local value_1="$2"
+> +        local value_2="$3"
+> +        local possible_values="$2 $3 $2"
+> +        local port_name="$4"
+> +        local port_flag
+> +
+> +        RET=0
+> +
+> +        echo "Setting '${option_name}' to '${value_1}' and '${value_2}'"
+> +
+> +        attach_port_if_specified "${port_name}"
+> +        check_err $? "Couldn't attach ${port_name} to master"
+
+Can the rest of the test continue if this command failed?
+
+> +        port_flag=$(get_port_flag "${port_name}")
+> +
+> +        # Set and get both possible values.
+> +        for value in ${possible_values}; do
+> +                set_and_check_get "${option_name}" "${value}" "${port_flag}"
+> +                check_err $? "Failed to set '${option_name}' to '${value}'"
+> +        done
+> +
+> +        detach_port_if_specified "${port_name}"
+> +        check_err $? "Couldn't detach ${port_name} from its master"
+> +
+> +        log_test "Set + Get '${option_name}' test"
+> +}
+
 
