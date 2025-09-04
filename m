@@ -1,220 +1,249 @@
-Return-Path: <netdev+bounces-219791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50C56B42FFC
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 04:47:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4D0B43006
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 04:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6C801B21C99
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:48:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93BAF1B252B2
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A34B01C7017;
-	Thu,  4 Sep 2025 02:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E151E0083;
+	Thu,  4 Sep 2025 02:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIQNRML0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgCC0RtK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BCE3C01
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 02:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AB11D63F7;
+	Thu,  4 Sep 2025 02:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756954069; cv=none; b=hX+8h1KdMai858XrMPboG/7HiC0Jci7G4CmkXFAF/bteK5W4fJ36HGtl0+nawiRosUB6SyKbS17HwEVZYJOaWCWG/55gNFG0GlMBcPmcqJY6TkctKuitGBBgXwXRVkXScRzVgW/fG/PgWZF9EbSsK/g8JpM3J275rBO4nzk5DDs=
+	t=1756954271; cv=none; b=l8+7Vx8MJlXldODHqvuflgoo/kOYQHa/jSvwSFmvWw/a9xcbln6FxsMnxkbVhxENFlD0ZHdmqH6eWBeocL3voUHlz3yH7KyYLT8eU3H8+O6ormFd5e06Mg15V8FZI+9yGdpBkNdXgZgRstCnEdpalt0WONiPPhTxBU6CnSPoaSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756954069; c=relaxed/simple;
-	bh=Jq8qiDws42tS3DgBZxRymrwfYw1lrOAh8NEvTO9bXLM=;
+	s=arc-20240116; t=1756954271; c=relaxed/simple;
+	bh=OF30K7FDdcXtvu5oS0/wdWuR2qoZi0C7UesAYg7PKOM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N5/54JeinNNZwPG2RWN1MMkmiQtsFXP6UOL0okIqINrCrKqEXWTqR4ubmfYGKyJ8+kTlrEhlLR5ydvRBoYsmkTUXXisAMSkOZgUNGdljhgD/LZ5t8PYm161uknuuTjxF9OGdBgp0f2Cu9+ELhn8HiI3O07GWchEe3MAcLEqyJSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DIQNRML0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756954066;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nPuBzO5sFF7pz/Em0FpS2T39kkMf6PUBGHFAt6g8pC0=;
-	b=DIQNRML0K4gJ5c5RrfgMXMceuXevmT50ufiGAmwbWB7ZxN75uiDzpGKruszlbtcjFNQqJc
-	YlGSlPGNrb3lUK9HaV3fxtwNUMvHCMHS9gfKcMHGByBBhde77eqUz8YLqSGHjfy6VbqKQd
-	NlOauNhC9OE91v7sEhYJ1jnW/pxQqTE=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-N86LtqJSP7m0cVVvOlxdUw-1; Wed, 03 Sep 2025 22:47:45 -0400
-X-MC-Unique: N86LtqJSP7m0cVVvOlxdUw-1
-X-Mimecast-MFC-AGG-ID: N86LtqJSP7m0cVVvOlxdUw_1756954065
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-324e41e946eso799009a91.0
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 19:47:45 -0700 (PDT)
+	 To:Cc:Content-Type; b=JKnG+z/F9W75JtT0Cbi2q3Li3kkkidV0oF/xNB/QKk32INAkbimYMPj5ehDm8FfUYcaS/rJqvi6B4MyJ00OzsVSJw3rwVxamfl/1eqhrLSaDc4QaIHgE18nG2zVoUHTls70ja7zJeplolDFSc9YwOEKZQoUXeO0AhTJAW/rlwNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cgCC0RtK; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3f05a8fa19bso6397535ab.1;
+        Wed, 03 Sep 2025 19:51:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756954269; x=1757559069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HdYYElzui6keIWtchIjfaAQ3jyOTkggwQRUR9HmccM0=;
+        b=cgCC0RtKqWxTpCjY2aHmQ5AAwT7JvSnMt2KkrRK7g01seedlS+DwzCcjo9oEIMeI5O
+         eI9Sy7AVPh49CEsGc5q7QxkFUq+4JS6qfj4NMhgPbLeooGXNs1bfFpP3IVpHeSayVLPO
+         fP6m9kxrlBIrodwVEfIPFLDlPj02G0KFH6FrUkXk9HZgUjzD04lWF2awQHC6+F52kd++
+         AGMANegsJZXChNz2QNsS9F5pOG8Sr8bfdQNS0x0bzN28EYi8KSPuJijBX51hZJRLoEQJ
+         cywhYAsvfvd/eYYbuSlD+rFIVgULKV7Uthl30fhDNvOHun2R/mInNG6MheKwqtHZwkqb
+         4M6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756954065; x=1757558865;
+        d=1e100.net; s=20230601; t=1756954269; x=1757559069;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nPuBzO5sFF7pz/Em0FpS2T39kkMf6PUBGHFAt6g8pC0=;
-        b=r2OXpen3IZAr856K1tJORkmXfYGOolkNyfGTW1qv4xpdpV9rqjK5L9cs28dV5ZNwOc
-         aWSCFk1MZywEADsWFSLCNLxgakr9NtzCm6Dx6Y5G5iLF2Y9fHj81TmaEO/Srnb8SvAgX
-         eiu7sxrNzh1H4Ta7AbK3gWPUZtrnCbANHARHnDWDwMsp3E/6usOsoxVtrDFB6DwjOpN9
-         ADJKnpC6T5yDx+0D6dN874b6rg4NnRFhZWR1irgOkXpYgq0u4NTyvtFRSj7oHMjSWwl+
-         BdEhychiv6ZzhcHvV9wXqpeLKVJLAPcbhtSkfZaN9kJ510RogYE5XVur45Kx3Vcu6h0k
-         hZrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW40d0vJh+ZxCjVL5hw+qqf1AeZ0VZS7/EpV0rwq55OxzNRm4nFZoa1GLyLdCHOBakevV5MAi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8Mbzu+Qb55xBs4he83C38DmYGipwvw2081L191NtA5L+s92WF
-	FCNgZkvBSSJAeF0tWFOxQsOLAAfTqSsElC+tF2wfIueho94pr4MXhzIUnioZL78djm6DLmC9O0H
-	QISfhQmAfS6bkbbzD7aqu2jvHtUrJZqzBoTjaRsZJqL9QykAHx6SRx5FA3YgHRGe14ZCDMSt0+j
-	+ZSueGkXR1U5ojerUQ7DNMHfbKgOwDh5sD
-X-Gm-Gg: ASbGncsRZDxXYfNm4yxL0t519zqihiE8HSPLG2lUDszHnICll2C5F1BqHEceYjUa0P3
-	d8xIzQr92Za0O0sDpLQwslSkEQess7XYAkbh3dIL0ulhMSSYuCyZisdFsPqnFamDjQz6gtaKZ20
-	lmCCX+UFGwVABWiF6GVxI=
-X-Received: by 2002:a17:90b:2ecc:b0:329:e3dc:db6c with SMTP id 98e67ed59e1d1-329e3dcdc0bmr10993115a91.23.1756954064577;
-        Wed, 03 Sep 2025 19:47:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFkDHqgDH/M72TzEiUNO4/wpezo4wquRaQJWXdohPpca0lZdT3tIFYzQxV00AK8Pp2pJZe1TcsVp6WvFKCncjI=
-X-Received: by 2002:a17:90b:2ecc:b0:329:e3dc:db6c with SMTP id
- 98e67ed59e1d1-329e3dcdc0bmr10993085a91.23.1756954064125; Wed, 03 Sep 2025
- 19:47:44 -0700 (PDT)
+        bh=HdYYElzui6keIWtchIjfaAQ3jyOTkggwQRUR9HmccM0=;
+        b=KhjtIm2Ogkgzu0PQZ2eQax7qzjsDX9QH2WWui9zY055Q2kpzdXMAns5fwYLvEQ9PxU
+         MaBlS2wR2AHmrkUh9R1xAcIN8qWSgTR4t3akCBpq69/tHQIIhR7vL4yi2EorhixYuZmD
+         scxO2+AtsEyDCRlt44wwgVcxLug1YYfu0LKbYy8A1/5kAYAMNCJzyM0I7pmIWBGVreOG
+         l4Q+7RCDXQY5vMNwYzAZTCJ8Cv1U8BjK8ke4it85tYl/yvif8aCBqruDRzfemC2E8HOj
+         ZD2MG8phwdrr1sUlQ+M7Dzv60O/S7yV5oZVr+14TQWFyGRwCUL1Jif3gXQfxquYglae+
+         IoYg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3IYLsBcuP4ow6tmNHS2hOAEbc71vRs4lQxjVw3yfGLSlY7maIDG9MtQ4ZwkkXyrjCIKUUYiAg@vger.kernel.org, AJvYcCXXQRHz1y85IU7hJicknGSZDUArjebz9hmEHUUw6DX75BfHpZJPEau4f9LmhRsvbF07cij4w1o/iKpMEf8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBMy0uG789t43dKgv/61113whikEc16Uq3BtxtnsqDvgxbbpzC
+	48fj6ZNelimyVK/JP60x5Ir28Fq2DwzYd8Da3cAt5rrX9sdIhv/xkZFhiGIuIZh3V1CbBWPSKDb
+	hvEdI+KsASxDXCzqHgvjvYLQwtL+uZ3s=
+X-Gm-Gg: ASbGncu1c9yhOv5nu3RIWQruhQags4j+CCotDNm4MhzAoViioL9YKZkd/P1p49qTzKZ
+	wkewPAmAN0Z0FDjWsaG79LNuFOaju5tpop+OeCcnDQGpef3XHqSKAhwdvfWv+RayTn9IDFtCX7q
+	RdvTbzrHnQu5T5hEnB+HeQ1LJDkQtwTnxowJuXAMg23U8FeVVlnecjsainhEq5fU6K0ME2ojhUE
+	f+uBuA99bhU/NNP
+X-Google-Smtp-Source: AGHT+IHorivs1eX9ym2GXJm6V1JI0kksTBmT/2MdLfNvO45Ayv/9hE9OY3Vl2xIL/+EKHeq6hJhpeBpes3ywnDBbXIg=
+X-Received: by 2002:a05:6e02:1a29:b0:3e9:9473:2801 with SMTP id
+ e9e14a558f8ab-3f400475c1cmr269044215ab.10.1756954268657; Wed, 03 Sep 2025
+ 19:51:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
- <20250902080957.47265-5-simon.schippers@tu-dortmund.de> <willemdebruijn.kernel.251eacee11eca@gmail.com>
- <CACGkMEshZGJfh+Og_xrPeZYoWkBAcvqW8e93_DCr7ix4oOaP8Q@mail.gmail.com> <willemdebruijn.kernel.372e97487ad8b@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.372e97487ad8b@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 4 Sep 2025 10:47:30 +0800
-X-Gm-Features: Ac12FXxK8G6F5K9kP9hZAbVWxKTcqMiuodU5d2Yu_6h48rhPlNy4xjY3e_hnfFc
-Message-ID: <CACGkMEtv+TKu+yBc_+WQsUj3UKqrRPvOVMGFDr7mB3zPHsW=wQ@mail.gmail.com>
-Subject: Re: [PATCH 4/4] netdev queue flow control for vhost_net
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>, mst@redhat.com, eperezma@redhat.com, 
-	stephen@networkplumber.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
+References: <20250903161709.563847-1-jackzxcui1989@163.com>
+In-Reply-To: <20250903161709.563847-1-jackzxcui1989@163.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 4 Sep 2025 10:50:32 +0800
+X-Gm-Features: Ac12FXzdwxlqEKk2jx9QINftmgTEfN5cMlsKYrRHWD3sZdZt8q8gNY-nvXdPgTU
+Message-ID: <CAL+tcoAMM-eeSdLfnqHrBRiLmiTULi5mJF5AaU5scHP=32s1oQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 2/2] net: af_packet: Use hrtimer to do the
+ retire operation
+To: Xin Zhao <jackzxcui1989@163.com>
+Cc: willemdebruijn.kernel@gmail.com, edumazet@google.com, ferenc@fejes.dev, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 3, 2025 at 9:52=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Thu, Sep 4, 2025 at 12:17=E2=80=AFAM Xin Zhao <jackzxcui1989@163.com> wr=
+ote:
 >
-> Jason Wang wrote:
-> > On Wed, Sep 3, 2025 at 5:31=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Simon Schippers wrote:
-> > > > Stopping the queue is done in tun_net_xmit.
-> > > >
-> > > > Waking the queue is done by calling one of the helpers,
-> > > > tun_wake_netdev_queue and tap_wake_netdev_queue. For that, in
-> > > > get_wake_netdev_queue, the correct method is determined and saved i=
-n the
-> > > > function pointer wake_netdev_queue of the vhost_net_virtqueue. Then=
-, each
-> > > > time after consuming a batch in vhost_net_buf_produce, wake_netdev_=
-queue
-> > > > is called.
-> > > >
-> > > > Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> > > > Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> > > > Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-> > > > ---
-> > > >  drivers/net/tap.c      |  6 ++++++
-> > > >  drivers/net/tun.c      |  6 ++++++
-> > > >  drivers/vhost/net.c    | 34 ++++++++++++++++++++++++++++------
-> > > >  include/linux/if_tap.h |  2 ++
-> > > >  include/linux/if_tun.h |  3 +++
-> > > >  5 files changed, 45 insertions(+), 6 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> > > > index 4d874672bcd7..0bad9e3d59af 100644
-> > > > --- a/drivers/net/tap.c
-> > > > +++ b/drivers/net/tap.c
-> > > > @@ -1198,6 +1198,12 @@ struct socket *tap_get_socket(struct file *f=
-ile)
-> > > >  }
-> > > >  EXPORT_SYMBOL_GPL(tap_get_socket);
-> > > >
-> > > > +void tap_wake_netdev_queue(struct file *file)
-> > > > +{
-> > > > +     wake_netdev_queue(file->private_data);
-> > > > +}
-> > > > +EXPORT_SYMBOL_GPL(tap_wake_netdev_queue);
-> > > > +
-> > > >  struct ptr_ring *tap_get_ptr_ring(struct file *file)
-> > > >  {
-> > > >       struct tap_queue *q;
-> > > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > > > index 735498e221d8..e85589b596ac 100644
-> > > > --- a/drivers/net/tun.c
-> > > > +++ b/drivers/net/tun.c
-> > > > @@ -3739,6 +3739,12 @@ struct socket *tun_get_socket(struct file *f=
-ile)
-> > > >  }
-> > > >  EXPORT_SYMBOL_GPL(tun_get_socket);
-> > > >
-> > > > +void tun_wake_netdev_queue(struct file *file)
-> > > > +{
-> > > > +     wake_netdev_queue(file->private_data);
-> > > > +}
-> > > > +EXPORT_SYMBOL_GPL(tun_wake_netdev_queue);
-> > >
-> > > Having multiple functions with the same name is tad annoying from a
-> > > cscape PoV, better to call the internal functions
-> > > __tun_wake_netdev_queue, etc.
-> > >
-> > > > +
-> > > >  struct ptr_ring *tun_get_tx_ring(struct file *file)
-> > > >  {
-> > > >       struct tun_file *tfile;
-> > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > index 6edac0c1ba9b..e837d3a334f1 100644
-> > > > --- a/drivers/vhost/net.c
-> > > > +++ b/drivers/vhost/net.c
-> > > > @@ -130,6 +130,7 @@ struct vhost_net_virtqueue {
-> > > >       struct vhost_net_buf rxq;
-> > > >       /* Batched XDP buffs */
-> > > >       struct xdp_buff *xdp;
-> > > > +     void (*wake_netdev_queue)(struct file *f);
-> > >
-> > > Indirect function calls are expensive post spectre. Probably
-> > > preferable to just have a branch.
-> > >
-> > > A branch in `file->f_op !=3D &tun_fops` would be expensive still as i=
-t
-> > > may touch a cold cacheline.
-> > >
-> > > How about adding a bit in struct ptr_ring itself. Pahole shows plenty
-> > > of holes. Jason, WDYT?
-> > >
+> On Tue, Sep 2, 2025 at 23:43=E2=80=AF+0800 Jason Xing <kerneljasonxing@gm=
+ail.com> wrote:
+>
+> > >         p1->max_frame_len =3D p1->kblk_size - BLK_PLUS_PRIV(p1->blk_s=
+izeof_priv);
+> > >         prb_init_ft_ops(p1, req_u);
+> > > -       prb_setup_retire_blk_timer(po);
+> > > +       hrtimer_setup(&p1->retire_blk_timer, prb_retire_rx_blk_timer_=
+expired,
+> > > +                     CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
+> > > +       hrtimer_start(&p1->retire_blk_timer, p1->interval_ktime,
+> > > +                     HRTIMER_MODE_REL_SOFT);
 > >
-> > I'm not sure I get the idea, did you mean a bit for classifying TUN
-> > and TAP? If this is, I'm not sure it's a good idea as ptr_ring should
-> > have no knowledge of its user.
+> > You expect to see it start at the setsockopt phase? Even if it's far
+> > from the real use of recv at the moment.
+> >
+> > >         prb_open_block(p1, pbd);
+> > >  }
 >
-> That is what I meant.
+> Before applying this patch, init_prb_bdqc also start the timer by mod_tim=
+er:
 >
-> > Consider there were still indirect calls to sock->ops, maybe we can
-> > start from the branch.
+> init_prb_bdqc
+>   prb_open_block
+>     _prb_refresh_rx_retire_blk_timer
+>       mod_timer
 >
-> What do you mean?
+> So the current timer's start time is almost the same as it was before app=
+lying
+> the patch.
 >
-> Tangential: if indirect calls really are needed in a hot path, e.g.,
-> to maintain this isolation of ptr_ring from its users, then
-> INDIRECT_CALL wrappers can be used to avoid the cost.
 >
-> That too effectively breaks the isolation between caller and callee.
-> But only for the most important N callers that are listed in the
-> INDIRECT_CALL_? wrapper.
+> > > @@ -917,7 +873,6 @@ static void prb_open_block(struct tpacket_kbdq_co=
+re *pkc1,
+> > >         pkc1->pkblk_end =3D pkc1->pkblk_start + pkc1->kblk_size;
+> > >
+> > >         prb_thaw_queue(pkc1);
+> > > -       _prb_refresh_rx_retire_blk_timer(pkc1);
+> >
+> > Could you say more on why you remove this here and only reset/update
+> > the expiry time in the timer handler? Probably I missed something
+> > appearing in the previous long discussion.
+> >
+> > >
+> > >         smp_wmb();
+> > >  }
+>
+> In the description of [PATCH net-next v10 0/2] net: af_packet: optimize r=
+etire operation:
+>
+> Changes in v7:
+>   When the callback return, without sk_buff_head lock protection, __run_h=
+rtimer will
+>   enqueue the timer if return HRTIMER_RESTART. Setting the hrtimer expire=
+s while
+>   enqueuing a timer may cause chaos in the hrtimer red-black tree.
+>
+> Neither hrtimer_set_expires nor hrtimer_forward_now is allowed when the h=
+rtimer has
+> already been enqueued. Therefore, the only place where the hrtimer timeou=
+t can be set is
+> within the callback, at which point the hrtimer is in a non-enqueued stat=
+e and can have
+> its timeout set.
 
-Yes, I mean we can try to store the flag for example vhost_virtqueue struct=
-.
-
-Thanks
+Can we use hrtimer_is_queued() instead? Please see tcp_pacing_check()
+as an example. But considering your following explanation, I think
+it's okay now.
 
 >
+>
+> Changes in v8:
+>   Simplify the logic related to setting timeout, as suggestd by Willem de=
+ Bruijn.
+>   Currently timer callback just restarts itself unconditionally, so delet=
+e the
+>  'out:' label, do not forward hrtimer in prb_open_block, call hrtimer_for=
+ward_now
+>   directly and always return HRTIMER_RESTART. The only special case is wh=
+en
+>   prb_open_block is called from tpacket_rcv. That would set the timeout f=
+urther
+>   into the future than the already queued timer. An earlier timeout is no=
+t
+>   problematic. No need to add complexity to avoid that.
+>
+> This paragraph explains that if the block's retire timeout is not adjuste=
+d within
+> the timer callback, it will only result in an earlier-than-expected retir=
+e timeout,
+> which is not problematic. Therefore, it is unnecessary to increase the lo=
+gical complexity
+> to ensure block retire timeout occurs as expected each time.
 
+Sounds fair.
+
+>
+>
+> > The whole structure needs a new organization?
+> >
+> > Before:
+> >         /* size: 152, cachelines: 3, members: 22 */
+> >         /* sum members: 144, holes: 2, sum holes: 8 */
+> >         /* paddings: 1, sum paddings: 4 */
+> >         /* last cacheline: 24 bytes */
+> > After:
+> >         /* size: 176, cachelines: 3, members: 19 */
+> >         /* sum members: 163, holes: 4, sum holes: 13 */
+> >         /* paddings: 1, sum paddings: 4 */
+> >         /* forced alignments: 1, forced holes: 1, sum forced holes: 6 *=
+/
+> >         /* last cacheline: 48 bytes */
+>
+> What about the following organization:?
+>
+> /* kbdq - kernel block descriptor queue */
+> struct tpacket_kbdq_core {
+>         struct pgv      *pkbdq;
+>         unsigned int    feature_req_word;
+>         unsigned int    hdrlen;
+>         unsigned short  kactive_blk_num;
+>         unsigned short  blk_sizeof_priv;
+>         unsigned char   reset_pending_on_curr_blk;
+>
+>         char            *pkblk_start;
+>         char            *pkblk_end;
+>         int             kblk_size;
+>         unsigned int    max_frame_len;
+>         unsigned int    knum_blocks;
+>         char            *prev;
+>         char            *nxt_offset;
+>
+>         unsigned short  version;
+>
+>         uint64_t        knxt_seq_num;
+>         struct sk_buff  *skb;
+>
+>         rwlock_t        blk_fill_in_prog_lock;
+>
+>         /* timer to retire an outstanding block */
+>         struct hrtimer  retire_blk_timer;
+>
+>         /* Default is set to 8ms */
+> #define DEFAULT_PRB_RETIRE_TOV  (8)
+>
+>         ktime_t         interval_ktime;
+> };
+
+Could you share the result after running 'pahole --hex -C
+tpacket_kbdq_core vmlinux'?
+
+Thanks,
+Jason
 
