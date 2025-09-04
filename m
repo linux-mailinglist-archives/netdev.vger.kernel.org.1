@@ -1,67 +1,72 @@
-Return-Path: <netdev+bounces-219930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE642B43BB8
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:36:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99121B43BE3
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:41:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CFF1A00279
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:36:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CF027C6EAC
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932832F0C6E;
-	Thu,  4 Sep 2025 12:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F05E2EBDD0;
+	Thu,  4 Sep 2025 12:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VfuYftdR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loeMV/g0"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86B572604;
-	Thu,  4 Sep 2025 12:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01C92773CB;
+	Thu,  4 Sep 2025 12:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756989354; cv=none; b=I2JKEhCmNrRXuxlQV/GjOkV7/NHsviYfUrEa8Nqg7VU0Yer8yeTxBEamqLrKCJv5kiRBzNckNIwJQjjGjs0zttX017Ervw4pqAs0SwR1h3BOdr6f7uJODWiUEwRRza50+v7NwtG7UI8Hs44TFKCOw1if+Hk2ThbU9S0MAIkXx6k=
+	t=1756989668; cv=none; b=PTCkYoF6YkZ0OoZjjMox6I7u3IFcO7iGR4OXqA8vIQUCyQk4x+cC75e6o8XKSDmD+dgX9XlmBw6kPME9HvDkTfsIChxHmj+r4rXqRpNnW6nUJZ3sqcc0boFmVZUsJhWD7XdX7WEpi2ykFEhjvcTfugV9BsrzfnLAByoxI8r24Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756989354; c=relaxed/simple;
-	bh=PDnxGRWeEjp96hBsqgEYqVc5VvH/OHtMXABg4S2tAPk=;
+	s=arc-20240116; t=1756989668; c=relaxed/simple;
+	bh=9jU8zb2b/nH587dt/8dYtYF2KVZ+ED/9GdGxh52sdzE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4bT49ZzCzVyjG/RwTqLmcgNVWHHyJjvdqgpCRrKCTVaxDP2zuZFThTggevrTk6NBw7SWhOkkgi4mIF+hFqQZBl2bXwzIgl+J+l05U3zeRNK0ATpOKexiA8sQ1Lh0x9A558m7zNsoB2RmqkYSWyNUGe7EqzDWx4Mn1qovAl39Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VfuYftdR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vTMs0h45CDEOQS0xg4zE2o4BKftiiNc3aEpwZSrqS58=; b=VfuYftdRjRctpIk7NA+mQTfInT
-	3dRA62fep07AU7Epi2UpU/IfNfCmO6ILckb8HGEwEFCSoA4QmBiIvsY420tlxnhgeG5nugmtjr+4j
-	tsxsD7pXoxzKtCcyc5kj2/6ZYBggcJysmDDWh6eZLOW2BfwL0uGYS3SC+AeYTzgVHFD8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uu9BC-007D5j-8J; Thu, 04 Sep 2025 14:35:06 +0200
-Date: Thu, 4 Sep 2025 14:35:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yibo Dong <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org,
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v10 5/5] net: rnpgbe: Add register_netdev
-Message-ID: <d30ee369-3711-41d2-95ad-85fa3e1cb65c@lunn.ch>
-References: <20250903025430.864836-1-dong100@mucse.com>
- <20250903025430.864836-6-dong100@mucse.com>
- <b9a066d0-17b5-4da5-9c5d-8fe848e00896@lunn.ch>
- <6B193997D4E4412A+20250904030621.GD1015062@nic-Precision-5820-Tower>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mo0rISihI4EeEZ9quWfGX59WnhThK+EaT/pAGXPfenRuaUoL75Ld96K7xY/mGcTdxojD+XkF77mb7uXcaWtRP44XbTqaP87buIlUjNS3CZnrdeaGR5/UoZfMi19PuyEFrPQCB7QEbPkp0TM7q6DAYcgZFgulv36knml06sEbc8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=loeMV/g0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A547C4CEF0;
+	Thu,  4 Sep 2025 12:41:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756989667;
+	bh=9jU8zb2b/nH587dt/8dYtYF2KVZ+ED/9GdGxh52sdzE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=loeMV/g0UwFle6+MFa/evzbc41eWVXWP0hRZVoFMShRPO6a6M2qqqKcwE52L1NNiu
+	 Y6OcWSNs+SQ7p7AibOD1THtTUnFEBuobBZU/thHdG1j9URXqLxzeJb9873r/KPX7dg
+	 mczz4cEiJJuRojK8VV/NKZNpcbMwksZ8+TWqKRMT6/X1ToZeYOow5gqzTVwnFzJqpC
+	 uVDWXGSz0K0YgNw/GF/jTd0XXzAvv2lQzwKm2FSYZUk7YsXbFPntO74t2bC0CgvZMk
+	 Vh+ND9yiyTcC+lZ9CvVws7N/Zh6yvzpu2nk68i/i0GGuapH059chIiJ3ohwwV1PFNC
+	 aF4s2DnYuEJHQ==
+Date: Thu, 4 Sep 2025 13:41:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v2 0/9] Add PCS support for Renesas RZ/{T2H,N2H}
+ SoCs
+Message-ID: <20250904124101.GJ372207@horms.kernel.org>
+References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,45 +75,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6B193997D4E4412A+20250904030621.GD1015062@nic-Precision-5820-Tower>
+In-Reply-To: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-On Thu, Sep 04, 2025 at 11:06:21AM +0800, Yibo Dong wrote:
-> On Thu, Sep 04, 2025 at 12:53:27AM +0200, Andrew Lunn wrote:
-> > >   * rnpgbe_add_adapter - Add netdev for this pci_dev
-> > >   * @pdev: PCI device information structure
-> > > @@ -78,6 +129,38 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
-> > >  
-> > >  	hw->hw_addr = hw_addr;
-> > >  	info->init(hw);
-> > > +	mucse_init_mbx_params_pf(hw);
-> > > +	err = hw->ops->echo_fw_status(hw, true, mucse_fw_powerup);
-> > > +	if (err) {
-> > > +		dev_warn(&pdev->dev, "Send powerup to hw failed %d\n", err);
-> > > +		dev_warn(&pdev->dev, "Maybe low performance\n");
-> > > +	}
-> > > +
-> > > +	err = mucse_mbx_sync_fw(hw);
-> > > +	if (err) {
-> > > +		dev_err(&pdev->dev, "Sync fw failed! %d\n", err);
-> > > +		goto err_free_net;
-> > > +	}
-> > 
-> > The order here seems odd. Don't you want to synchronise the mbox
-> > before you power up? If your are out of sync, the power up could fail,
-> > and you keep in lower power mode? 
-> > 
+On Thu, Sep 04, 2025 at 12:41:54PM +0100, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > 
-> As I explained before, powerup sends mbx and wait fw read out, but
-> without response data from fw. mucse_mbx_sync_fw sends mbx and wait for
-> the corect response from fw, after mucse_mbx_sync_fw, driver->fw
-> request and fw->driver response will be both ok.
+> Hi All,
+> 
+> This series aims to add PCS support for the Renesas RZ/T2H and RZ/N2H SoCs
+> These SoCs include a MII converter (MIIC) that converts MII to RMII/RGMII
+> or can be set in pass-through mode for MII similar to the RZ/N1 SoC. The
+> MIIC is used in conjunction with the Ethernet switch (ETHSW) available on
+> these SoCs.
 
-Because this is logically the wrong order, this deserves a comment.
+Hi Lad,
 
-You choice of function names for the lower level functions also does
-not help. It is not so easy to look at the function used to know if it
-is a request/response to the firmware, or just a request without a
-response.
+This patch-set depends with the following commit, which is present in
+net but not yet in net-next.
 
-	Andrew
+commit a7195a3d67da ("net: pcs: rzn1-miic: Correct MODCTRL register offset")
+
+Please repost (and if necessary, rebase) once it is present in net-next so
+that the CI runs.
+
+And please ensure that 24h elapses between postings to allow for review.
+
+Thanks!
+
+-- 
+pw-bot: changes-requested
 
