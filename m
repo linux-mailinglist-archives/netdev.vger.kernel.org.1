@@ -1,75 +1,69 @@
-Return-Path: <netdev+bounces-219888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 337A7B4398F
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 13:07:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EB0BB439AC
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 13:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9081B281DE
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 11:08:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F024D587ED1
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 11:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E702E2FC886;
-	Thu,  4 Sep 2025 11:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F612FC01F;
+	Thu,  4 Sep 2025 11:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lEWSoEye"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="iFIfUCLu"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE695EACE;
-	Thu,  4 Sep 2025 11:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5FD2FC00C;
+	Thu,  4 Sep 2025 11:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756984056; cv=none; b=D72pPbhEDuWKS/RGwW0jvh5woy9as3stWgOkfbumkIR19T9zlq0fGy1hoGh681oeVvIOgmdIZkekm+YpES0r6EFsZHcYY/KqylN/bi2/F2PvM9+dqsX+/98H05a46m1Mem3FYI5xxV5CNg91HTOvlRZXEblVhNTBqAJcz7CIoXo=
+	t=1756984454; cv=none; b=QtzwvxXRxZ2ee9imjXcZsOMWBqimUNJ0LKQS1Mdxe+I5kMOF5qMF1Ov/jdWAOIrHxmhmI/qVpwyTIlwIiz6wc3LECtEJKwGbjAq80n/VEfxjLCqKfuXBCubWk4ry17KB9bbqwQQBZ9ko7qFIjW9jvq8RVA4HWmFNTeiprx3XDls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756984056; c=relaxed/simple;
-	bh=7dp7b7mY12c/B3coKnSVOPbX3Q9juVts6oIBbdGtT0w=;
+	s=arc-20240116; t=1756984454; c=relaxed/simple;
+	bh=a9TgE+M7267BdTJIuw3gh/B6w3LpVMeRFli2D8fltPQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lZDXQjuwZ+cG0bCncTHnz0Z4L9Hce6sZxFNVpkvbxJgd5hjicLBimhG12VMbN2C48UktMhR6NgzNlCrgRcg1uofJHSBPnCk6g/VhDqgXXS0Uk5/j1cU1xanYlNkp8sIX8nhjtvx2oroenvR7cHdWJ7OgLDJAJwBeQedinfZ4qNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lEWSoEye; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hhNQHJCCEEIbETm8PsRs80LMVSc5JQABFf4Nlp+TIXg=; b=lEWSoEyeyy0AyBUXEFyFioY2Qr
-	5ViAolylKJpUMXiqgDYZoq8Q2U5vNy3IYHQiNtDaLOL63OeTSyPUN/fZ58GNpOsaL59AcrLDG1GkW
-	4wl4fHb07tolpFqA/OQnNgJqcy4MiF54oENi78ThqDzJrDdEWjk8t+h2hUflqJ2Fhj9uVqfP2k7lr
-	C06yWvlC9kho/WlJKl5pyaT7G6AAavlFJksygtaEGJRIhnQgZBdcdkQLvtFLVB3P7g71C2ECvU3oQ
-	luqQbLl1fCFMiMjc9FsaQy3lb7KEPPDAz769ltbrReVkWXzsRbf6vBWCoJ5BnppVbbt+P82sEeHz5
-	t4bXFjbw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45246)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uu7oN-000000001s7-3uL3;
-	Thu, 04 Sep 2025 12:07:27 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uu7oM-000000001SM-3QdA;
-	Thu, 04 Sep 2025 12:07:26 +0100
-Date: Thu, 4 Sep 2025 12:07:26 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Chaoyi Chen <chaoyi.chen@rock-chips.com>
-Cc: Yao Zi <ziyao@disroot.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=VJc3SYi96lwPIpfLaWbCKhh4EWNFIQTEpyb7+CT+IgLFx6tGSaf/yFYN1Vmn0P513Z1pW4mTNH/1JUE9xSJJ1+NdCSRU/xeE88g9FkGRcR5YlKxcHGK/J3jS+E1cclJA/AMB8v6knwDA+od6CCINQKeE3PhwGmnU/hvgQOmbEGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=iFIfUCLu; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 480E922FC2;
+	Thu,  4 Sep 2025 13:14:09 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id JH20WvHbfP0i; Thu,  4 Sep 2025 13:14:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1756984448; bh=a9TgE+M7267BdTJIuw3gh/B6w3LpVMeRFli2D8fltPQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=iFIfUCLuO/STk0WVtv2IgHQalzKuAMQ5N5EkPwTtlvH7OsMa5p0ToDE8BszzyEA1b
+	 aLAu2FiJOxp7zHXhrQZDsHLZ/tE8yAm9G3Jh+7+bNh07rr4Q/4lQvgCpPdyx7ekqQf
+	 6ry2lOjoW7Gdahi9UxNA4vaEOaXz0iaZMgyN+pJowizj8bDKgNX+2xaUj3uAqbYrYf
+	 X2U+Dsm4NyNxWumzOaPSsV6E86eVL9YsZ/97k9zusBhy/DRNHpPEPxZlpIU7+r0+zY
+	 8RuD8D+oP7WDF/C73vUnRPZvaa2cYeEVTctnLJi/pahfn7rLLq4EDqRS3dz31HRW0Y
+	 SDFRMIyUbxiLA==
+Date: Thu, 4 Sep 2025 11:13:53 +0000
+From: Yao Zi <ziyao@disroot.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
 	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org
 Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
  contain invalid address
-Message-ID: <aLly7lJ05xQjqCWn@shell.armlinux.org.uk>
+Message-ID: <aLl0cbYv-fY-tPpI@pie>
 References: <20250904031222.40953-3-ziyao@disroot.org>
- <aLlwv3v8ACha8b-3@shell.armlinux.org.uk>
- <b5fbeb3f-9962-444d-85b3-3b8a11f69266@rock-chips.com>
- <aLlyb6WvoBiBfUx3@shell.armlinux.org.uk>
+ <20250904103443.GH372207@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,43 +72,134 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aLlyb6WvoBiBfUx3@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250904103443.GH372207@horms.kernel.org>
 
-On Thu, Sep 04, 2025 at 12:05:19PM +0100, Russell King (Oracle) wrote:
-> On Thu, Sep 04, 2025 at 07:03:10PM +0800, Chaoyi Chen wrote:
+On Thu, Sep 04, 2025 at 11:34:43AM +0100, Simon Horman wrote:
+> On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
+> > We must set the clk_phy pointer to NULL to indicating it isn't available
+> > if the optional phy clock couldn't be obtained. Otherwise the error code
+> > returned by of_clk_get() could be wrongly taken as an address, causing
+> > invalid pointer dereference when later clk_phy is passed to
+> > clk_prepare_enable().
 > > 
-> > On 9/4/2025 6:58 PM, Russell King (Oracle) wrote:
-> > > On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
-> > > >   	if (plat->phy_node) {
-> > > >   		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
-> > > >   		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
-> > > > -		/* If it is not integrated_phy, clk_phy is optional */
-> > > > +		/*
-> > > > +		 * If it is not integrated_phy, clk_phy is optional. But we must
-> > > > +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
-> > > > +		 * the error code could be wrongly taken as an invalid pointer.
-> > > > +		 */
-> > > I'm concerned by this. This code is getting the first clock from the DT
-> > > description of the PHY. We don't know what type of PHY it is, or what
-> > > the DT description of that PHY might suggest that the first clock would
-> > > be.
-> > > 
-> > > However, we're geting it and setting it to 50MHz. What if the clock is
-> > > not what we think it is?
+> > Fixes: da114122b831 ("net: ethernet: stmmac: dwmac-rk: Make the clk_phy could be used for external phy")
+> > Signed-off-by: Yao Zi <ziyao@disroot.org>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
 > > 
-> > We only set integrated_phy to 50M, which are all known targets. For external PHYs, we do not perform frequency settings.
+> > On next-20250903, the fixed commit causes NULL pointer dereference on
+> > Radxa E20C during probe of dwmac-rk, a typical dmesg looks like
+> > 
+> > [    0.273324] rk_gmac-dwmac ffbe0000.ethernet: IRQ eth_lpi not found
+> > [    0.273888] rk_gmac-dwmac ffbe0000.ethernet: IRQ sfty not found
+> > [    0.274520] rk_gmac-dwmac ffbe0000.ethernet: PTP uses main clock
+> > [    0.275226] rk_gmac-dwmac ffbe0000.ethernet: clock input or output? (output).
+> > [    0.275867] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: tx_delay.
+> > [    0.276491] rk_gmac-dwmac ffbe0000.ethernet: set tx_delay to 0x30
+> > [    0.277026] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: rx_delay.
+> > [    0.278086] rk_gmac-dwmac ffbe0000.ethernet: set rx_delay to 0x10
+> > [    0.278658] rk_gmac-dwmac ffbe0000.ethernet: integrated PHY? (no).
+> > [    0.279249] Unable to handle kernel paging request at virtual address fffffffffffffffe
+> > [    0.279948] Mem abort info:
+> > [    0.280195]   ESR = 0x000000096000006
+> > [    0.280523]   EC = 0x25: DABT (current EL), IL = 32 bits
+> > [    0.280989]   SET = 0, FnV = 0
+> > [    0.281287]   EA = 0, S1PTW = 0
+> > [    0.281574]   FSC = 0x06: level 2 translation fault
+> > 
+> > where the invalid address is just -ENOENT (-2).
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > index cf619a428664..26ec8ae662a6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > @@ -1414,11 +1414,17 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+> >  	if (plat->phy_node) {
+> >  		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+> >  		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+> > -		/* If it is not integrated_phy, clk_phy is optional */
+> > +		/*
+> > +		 * If it is not integrated_phy, clk_phy is optional. But we must
+> > +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
+> > +		 * the error code could be wrongly taken as an invalid pointer.
+> > +		 */
+> >  		if (bsp_priv->integrated_phy) {
+> >  			if (ret)
+> >  				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+> >  			clk_set_rate(bsp_priv->clk_phy, 50000000);
+> > +		} else if (ret) {
+> > +			bsp_priv->clk_phy = NULL;
+> >  		}
+> >  	}
 > 
-> Same question concerning enabling and disabling another device's clock
-> that the other device should be handling.
+> Thanks, and sorry for my early confusion about applying this patch.
+> 
+> I agree that the bug you point out is addressed by this patch.
+> Although I wonder if it is cleaner not to set bsp_priv->clk_phy
+> unless there is no error, rather than setting it then resetting
+> it if there is an error.
 
-Let me be absolutely clear: I consider *everything* that is going on
-with clk_phy here to be a dirty hack.
+Yes, it sounds more natural to have a temporary variable storing result
+of of_clk_get() and only assign it to clk_phy when the result is valid.
 
-Resources used by a device that has its own driver should be managed
-by _that_ driver alone, not by some other random driver.
+> More importantly, I wonder if there is another bug: does clk_set_rate need
+> to be called in the case where there is no error and bsp_priv->integrated_phy
+> is false?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+In my understanding this may be intended, bsp_priv->integrated_phy is
+only false when an external phy is used, and an external phy might
+require arbitrary clock rates, thus it doesn't seem a good idea to me to
+hardcode the clock rate in the driver.
+
+I guess rate of clk_phy could also be set up with assigned-clock-rates
+in devicetree. If so it may be reasonable to enable the clock only.
+
+> So I am wondering if it makes sense to go with something like this.
+> (Compile tested only!)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 266c53379236..a25816af2c37 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1411,12 +1411,16 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+>  	}
+>  
+>  	if (plat->phy_node) {
+> -		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+> -		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+> -		/* If it is not integrated_phy, clk_phy is optional */
+> -		if (bsp_priv->integrated_phy) {
+> -			if (ret)
+> +		struct clk *clk_phy;
+> +
+> +		clk_phy = of_clk_get(plat->phy_node, 0);
+> +		ret = PTR_ERR_OR_ZERO(clk_phy);
+> +		if (ret) {
+> +			/* If it is not integrated_phy, clk_phy is optional */
+> +			if (bsp_priv->integrated_phy)
+>  				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+> +		} else {
+> +			bsp_priv->clk_phy = clk_phy;
+>  			clk_set_rate(bsp_priv->clk_phy, 50000000);
+>  		}
+>  	}
+> 
+> Please note: if you send an updated patch (against net) please
+> make sure you wait 24h before the original post.
+> 
+> See: https://docs.kernel.org/process/maintainer-netdev.html
+
+Thanks for the tip. While digging through the problematic commit for the
+clk_phy's rate problem, I found others have discovered the problem[1]
+and proposed some fixes (though there hasn't been a formal patch).
+
+I should have read the original thread before sending this patch! Will
+wait for some time and see whether the netdev maintainer prefers waiting
+for original author's fix or taking mine.
+
+Best regards,
+Yao Zi
+
+[1]: https://lore.kernel.org/netdev/a30a8c97-6b96-45ba-bad7-8a40401babc2@samsung.com/
 
