@@ -1,144 +1,118 @@
-Return-Path: <netdev+bounces-219980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE33B43FDA
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:01:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72974B43FF5
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:06:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A174A0442E
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:01:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422A5A04A57
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 15:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349462FD7B8;
-	Thu,  4 Sep 2025 15:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308B7308F07;
+	Thu,  4 Sep 2025 15:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="n8DQcUVM"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="UmgIrN24"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7661DF75A;
-	Thu,  4 Sep 2025 15:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662E81EB9F2
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 15:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756998085; cv=none; b=uZ2KVSsI1ojVPcG8ImoFhER7WxEVSNWiTmRsrpigpI5VuV4kMJ4JpjXFErLxrsbj6qQGKk22p/CS+A2Ub8pRZGrC0C47mokhdexwfRw0CR+qAd+tHjPhbMMvQtAzm2VJbf4tXyuzJGoe/RtY3ebc67dAlEriyhXH0RyQeTeNIes=
+	t=1756998397; cv=none; b=UZXZrq3PiqHNK8Tn5Dn5Sx/0TPt1Y8pcLpiGrDOpALdq1/ldyo8oa9YpPZ3wiqPLZmgfF1kChnXvrjPZuH3RlYzmuQpfHIO2QAuNP1e0Qi/fswsXKmo8/f4YUdYP434nuvzweMvi1kOqtxF3xi5VTq1eIcQQJB2fzL7XSiOtrvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756998085; c=relaxed/simple;
-	bh=l9JRa4X4F7x+/30IpIHfnpxeHKhZluyQDJO44iIji0I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gFA1QHD6iZF+/lSDIDsBFQd28YzkNKT3F30ykqMWnAmKqLD9fmGLQE4pVAEON7wlq/HFngvN5XZqe74Uc1gUHlvOcRS1jYqa8NRKr4kWKCmWZ3TPlu5tkjl4OGthR2kgr/nffKxfJpjHTHeXkxaj1yNjr/GvZs1uPLgnPOQQ6P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=n8DQcUVM; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584EtqXm027829;
-	Thu, 4 Sep 2025 15:01:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=corp-2025-04-25; bh=mbD0BssDocPQ0T17
-	ewmMm3en4cOLmF13gbBhmgWv6Mk=; b=n8DQcUVMLwqvHRrYWtALWg+XhHdizsnV
-	hkMjIgLpbQvJnujFu43kytIq9UTQOv+DLXtfbr/k690ZzHxcv9W8GGvjM4v1zdlg
-	CqnuTb9sUq9SE5+MRyHnZFuvr8Pb/yi783FO4Iobjqhi8PkXG1XRjwZV+C7wcZZI
-	PC5/6aJTXATuyCVM7ErCmRzcPfJ2ImeKls+FksRpViDMNDQtw2EcP+Fedtuo7mQp
-	6BaQ+pZHqoPuxS1nlz3pNMQEDP/eNzK5ky+mowVkI9IRyXoN7nPjt+lEsVbyhOOU
-	xuLBN40M/Jz9ZtV3PbUCRRZS8QHgdBuzx/6jWCTVAyKu4kJmiT47SQ==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ycgn02q7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:01:11 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 584EFIAl036336;
-	Thu, 4 Sep 2025 15:01:10 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrbnj2s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 04 Sep 2025 15:01:10 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 584EwW3A013524;
-	Thu, 4 Sep 2025 15:01:09 GMT
-Received: from lab61.no.oracle.com (lab61.no.oracle.com [10.172.144.82])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 48uqrbnj17-1;
-	Thu, 04 Sep 2025 15:01:09 +0000
-From: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>
-To: Allison Henderson <allison.henderson@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>,
-        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3] rds: ib: Remove unused extern definition
-Date: Thu,  4 Sep 2025 17:01:04 +0200
-Message-ID: <20250904150105.3954918-1-haakon.bugge@oracle.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1756998397; c=relaxed/simple;
+	bh=GjIMhldMZjLi/k1VMDA0uSdrpQ2tcOhNKetfFoIFYTw=;
+	h=Date:Message-ID:MIME-Version:Content-Type:From:To:Cc:Subject:
+	 References:In-Reply-To; b=CPzpazckDqoRiP7Q03qwkESXYvKcPQeLSWpeuMVXJ08TTXJyiyAsyWTEYeQxbWzli2jhH2lk5M+Y1Q12qp6NuBxWSRtHQDtDt11OtZ6n65yUKB2HjidluG95Go9qLrHrSeBdsc4DjKmGVFV67bZ8q4/0LcjAx0nK2jwCGWnbIGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=UmgIrN24; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-80e33b9e2d3so101230885a.2
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 08:06:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1756998393; x=1757603193; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :mime-version:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+7YNCGfuLeRJGDFZxThdtxp2uXd/nIXSU1+d/iqpvn4=;
+        b=UmgIrN24bZcnKDgQ+hfbmlbI0EQX7VCiJ0iyk6Ht7loHlFNEh3cSEFxt1ZvIsQOUZp
+         61rke9doJgKSUWbMEJMYeLPaOsdJvRBpdys1a53xdDMMcIMcdFBwg1V6w37X6zNxMQQD
+         m3YGJ/jWzQA8fwaoOVfGDUQTEqtDZgznENXvO6I/KyW+bV2esFgYkKcDcCzIheBzXICQ
+         c4XlQhhGBy9+fQ4CCPd+8k83FzrlLRomG6JUoNdYqyn5fAM337Pn68z8FTLAtGOxDD3R
+         UJ1xhBPlWvEMAXVyicR16D59bY5BRqTotBv3p6JCgsy8D3MZpuXnOazdo7RH+rDO2+tr
+         G/lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756998393; x=1757603193;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :mime-version:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+7YNCGfuLeRJGDFZxThdtxp2uXd/nIXSU1+d/iqpvn4=;
+        b=DUoYNOUWRbj+aulw5xcmHJeqtUNcUki6KNCg5kv9NOWneKdCnzygvC0v3CXPuodXHT
+         9xxdiLvPqAtn++OVNfWFgKI0CfPTJ5nESxvSBJCFQwPGQ5FiyuvsKX4Y9dirJ/7JpS5V
+         H5YQJFOx5JiRP24GuBArFreWsyRjS72J7AMBVTE09u8jTpIj8hxQNTMKrldjV1XJh90K
+         WYbux5TQK+/GN0zePUnMbjDqGOfyyLjw68emAK0QmYAbJQYagaRkIkkJBgcu0SNL3x/5
+         gGdnaGY7jB5v+QIsnKkCV3ODCW9K/9BX5aU2IYnGC3sNtUo0q/nyPz/5WmH8gnYbw/Gl
+         b26Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXjvM1m0/Tsg34BUzPlhcBRjYWlVBMpax18NM02L7/CTWVgMSdU13nE3vV1aKjhAPN9pAWQvnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyV2GMC+FtDCd4K2O1ZnQa7vnUCryH8b3cvOeIDqDhplKiHO8yd
+	4MfW0fD9Fp9+rjz0B3N2WUO7FVAGzijEfyh46KDaYmJZZSxJJynv25yGp4Cmlj9v7A==
+X-Gm-Gg: ASbGncvn5MzpsQmO+vt7rNWKawuGJoTN8FLEV5Ay38F7UpvnbwVMRJAa2CaroHX/FDL
+	ggx6dcOrDfInjbyiz6M+kSnZghexQnzlICfM6zprZI0RVZWjtmFiQ8m4FKXkteEwaolbqyWi+H0
+	JXQZeqh8JpDrDBg4ssiaV6ATv6L99fbNkUVEDeYVowZx0gxAXABxzEG3/IQkv6ENw1cwE54hjLA
+	mkxtC47F00MGXYhy9/V/E2nukKGwXN+IoiVneFu3MFdZy0UVBMoajzfhNMTBW0yz4+0OGeLeRwz
+	FJtm+cPZx9Jz7y2oCJqP1Bdhkj6ItPIjmFpBAoRvjUJwGkBFiEDupnpP5NGS9pbiRz1PXQxlRTg
+	BqV1P93JbT3LoW3r1uiZtCyT65FriiOyAlssP9RInXV7qR3yFM8+PvtgJ2wuqjQ2kLAxgxRtar6
+	MCT0Q=
+X-Google-Smtp-Source: AGHT+IHEZYUVpRQ02k7NJUaQish8Bi6v9XojrzC/OeiOZRuFggywJiau6M41XffV1wTKoVjcjfFHig==
+X-Received: by 2002:a05:620a:1a81:b0:7e8:14c:d1a9 with SMTP id af79cd13be357-7ff27b20216mr2265110885a.28.1756998393152;
+        Thu, 04 Sep 2025 08:06:33 -0700 (PDT)
+Received: from localhost (pool-71-126-255-178.bstnma.fios.verizon.net. [71.126.255.178])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-80aac237b51sm289724485a.61.2025.09.04.08.06.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Sep 2025 08:06:32 -0700 (PDT)
+Date: Thu, 04 Sep 2025 11:06:31 -0400
+Message-ID: <cde565adc43452e83958fbe0ab54080d@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-04_05,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509040148
-X-Authority-Analysis: v=2.4 cv=evbfzppX c=1 sm=1 tr=0 ts=68b9a9b7 b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=M51BFTxLslgA:10 a=yPCof4ZbAAAA:8
- a=VwQbUJbxAAAA:8 a=vqxsdnOqdfS0dGDShygA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: 5fHTU7woyNNIbJUHD3puzsjcJ9uiBguW
-X-Proofpoint-ORIG-GUID: 5fHTU7woyNNIbJUHD3puzsjcJ9uiBguW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA0MDE0MiBTYWx0ZWRfX+Qe8yCiPCWUX
- UIZ2GJzZmM10cTk1G7HEVzdcT1PbFUofpd6EvxEpbVAwIth+mX0iZz6KALbXECxu31Ghd6MUpfq
- 8RqL9uilOlBZHm+3nJEw8W30I26usWpoIbVOjHwEUn/vve7sfCrWwDbbFmuxCsHKw6njaz+moOd
- /YVGQDm09NzniIxJAJNSpDh3swS52Hq7bQmwrG/35surzkx+WH30PySk+QBxY125Nc8jmw0tECR
- Lw6Wsh9ERkFWigRBJWx+ogrnj0uH7TSCnX4HJJbEyScOoJdWUKokzRQcMXi0oHpxJu3z1jyxXV3
- IBD1nTGeyzQLxeq4OTNCp5O9U9g8iLkO/yXk6aiOk/VTKz3UVTYOO5x3LFsHVLNIuRsjfKAQaxT
- tmHpaEhR
+MIME-Version: 1.0 
+Content-Type: text/plain; charset=UTF-8 
+Content-Transfer-Encoding: 8bit 
+X-Mailer: pstg-pwork:20250903_1645/pstg-lib:20250903_1606/pstg-pwork:20250903_1645
+From: Paul Moore <paul@paul-moore.com>
+To: Eric Dumazet <edumazet@google.com>, Casey Schaufler <casey@schaufler-ca.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>, syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com, Eric Paris <eparis@redhat.com>, audit@vger.kernel.org
+Subject: Re: [PATCH] audit: init ab->skb_list earlier in audit_buffer_alloc()
+References: <20250904072537.2278210-1-edumazet@google.com>
+In-Reply-To: <20250904072537.2278210-1-edumazet@google.com>
 
-In the old days, RDS used FMR (Fast Memory Registration) to register
-IB MRs to be used by RDMA. A newer and better verbs based
-registration/de-registration method called FRWR (Fast Registration
-Work Request) was added to RDS by commit 1659185fb4d0 ("RDS: IB:
-Support Fastreg MR (FRMR) memory registration mode") in 2016.
+On Sep  4, 2025 Eric Dumazet <edumazet@google.com> wrote:
+> 
+> syzbot found a bug in audit_buffer_alloc() if nlmsg_new() returns NULL.
+> 
+> We need to initialize ab->skb_list before calling audit_buffer_free()
+> which will use both the skb_list spinlock and list pointers.
+> 
+> Fixes: eb59d494eebd ("audit: add record for multiple task security contexts")
+> Reported-by: syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/lkml/68b93e3c.a00a0220.eb3d.0000.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Casey Schaufler <casey@schaufler-ca.com>
+> Cc: Paul Moore <paul@paul-moore.com>
+> Cc: Eric Paris <eparis@redhat.com>
+> Cc: audit@vger.kernel.org
+> ---
+>  kernel/audit.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Detection and enablement of FRWR was done in commit 2cb2912d6563
-("RDS: IB: add Fastreg MR (FRMR) detection support"). But said commit
-added an extern bool prefer_frmr, which was not used by said commit -
-nor used by later commits. Hence, remove it.
+Thanks Eric, merged into audit/dev.
 
-Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
-
----
-
-	v2 -> v3:
-	      * As per Jakub's request, removed Cc: and Fixes: tags
-	      * Subject to net-next (instead of net)
-
-	v1 -> v2:
-	      * Added commit message
-	      * Added Cc: stable@vger.kernel.org
----
- net/rds/ib_mr.h | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/rds/ib_mr.h b/net/rds/ib_mr.h
-index ea5e9aee4959e..5884de8c6f45b 100644
---- a/net/rds/ib_mr.h
-+++ b/net/rds/ib_mr.h
-@@ -108,7 +108,6 @@ struct rds_ib_mr_pool {
- };
- 
- extern struct workqueue_struct *rds_ib_mr_wq;
--extern bool prefer_frmr;
- 
- struct rds_ib_mr_pool *rds_ib_create_mr_pool(struct rds_ib_device *rds_dev,
- 					     int npages);
--- 
-2.43.5
-
+--
+paul-moore.com
 
