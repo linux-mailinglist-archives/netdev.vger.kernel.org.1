@@ -1,156 +1,122 @@
-Return-Path: <netdev+bounces-219826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 850B3B43386
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 09:16:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9914B433E3
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 09:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B1E3A68C6
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 07:16:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80411179F7E
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 07:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014732989BF;
-	Thu,  4 Sep 2025 07:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA0429BD80;
+	Thu,  4 Sep 2025 07:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F94ROrFE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="khyjtkZH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f73.google.com (mail-ua1-f73.google.com [209.85.222.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C2624501B;
-	Thu,  4 Sep 2025 07:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3095329B8D0
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 07:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756970208; cv=none; b=PImgXGfIOjHJEECpBWrvpmPLajHEAIrZa5tvKd+W+Q4JyOntjF79HdsFpLVYIWe91HDwBd1kNJjUuLpwQRaPaIkGC+k9y0w3K4P4gXUSMJuyTftPQIV/MSg9bMghrfszAv3PXgjoPNTNBuvlaVIByhnr+rhXUBlTLeUmNk825NQ=
+	t=1756970744; cv=none; b=eEczcBH+YApZN+cIQTDX+ot9pzO9iiVlYZ7XIzU0gzemtjp84ZwiVFprXXFavBAveTNpUif5IUIhURlP36zanFm3d2KYyXma03F2p9c2ba+rOT17/ByLPhaVZOaC5PtwcFyk2iE8ivkp1ijS3MDC/eDQMIhMjYJ+HwZXKHRB0Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756970208; c=relaxed/simple;
-	bh=1+RWVcDIIkiRod+TRNgoORvaOZSUBzh3FfCqknTDUbo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O5VAUejrhD5hXCln0apVIZs3QJrCItdsXMm010X3UzVLdhj363mVbSUC2EfydydvbXgyAblRCkXbKbDe7c1QSZPz0wOFRtBbEzUNt/AEccke/E4oQv5GV/I8DFIhJHpgN9fh9bfZUsxmdcqHaGTVc5oBpEWRu3Y1bLnGXIBDQAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F94ROrFE; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 583I06Yt027831;
-	Thu, 4 Sep 2025 07:16:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=TS0UBg
-	gYq9qgJNvx7S91o1QOtieKgQ4j9xHsjF1SE7w=; b=F94ROrFEux6ZiMlvOFpEgd
-	C9VlT6QYPgM62Fpmj6JSPkwKhE3ohAPg+vh5SD6Zn7u23DqyNnnCXqHq8kpjFTFR
-	/R0/o0mjJo+NFxa4qfvG6n47tqOBGk3SImILuqtbouJt2MUiZrcJDhs/Q232tP0A
-	mdYWNQojPYEtDKs3FqaFCX6RYeOynxMKYtoJ7ZNeVH+znhPdvLqwYuUZj+0tLVqQ
-	OzhhyTP9HKR/FXsGvmLguoGN1mVlGU67/b9gzePX9GFIob31jsgllg7XjjHMLXGj
-	f9GlTcpBkph8tuv7Lf/zky7uBd0zdo9lqw4RSZ93PS7XGMwGuyXPAK5lNDmvqvhQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvg09ry-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 07:16:32 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58478GfV013713;
-	Thu, 4 Sep 2025 07:16:31 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvg09rw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 07:16:31 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5844Avck019404;
-	Thu, 4 Sep 2025 07:16:31 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vd4n35sf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 07:16:31 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5847GRff51184024
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 4 Sep 2025 07:16:27 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8CB532004B;
-	Thu,  4 Sep 2025 07:16:27 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 438CC20043;
-	Thu,  4 Sep 2025 07:16:27 +0000 (GMT)
-Received: from [9.152.224.94] (unknown [9.152.224.94])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  4 Sep 2025 07:16:27 +0000 (GMT)
-Message-ID: <5177c2da-4158-4b12-996d-831ff1ab0708@linux.ibm.com>
-Date: Thu, 4 Sep 2025 09:16:27 +0200
+	s=arc-20240116; t=1756970744; c=relaxed/simple;
+	bh=NoAEI1qxVcsQ6DYeN4T2CiFqL+okoOWU6OTz1fbr+8g=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZOj3VYNWzCpPfm4zUSiZ7Mif+6vetBRTjttcosoSl9LkjUXCPY5jqNeyJiGXh5pvLPgUEJaeN9Ie3xXnl13NJ9eJ/5+K9Zh95XMcJa8t17Q+aeJ0KJJ1+aGkIXN0uNoYJL4yKBXdUotjMhPw+c0q0nQgWAof24kNOalso8kMYA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=khyjtkZH; arc=none smtp.client-ip=209.85.222.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-8972110658cso829838241.3
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 00:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756970742; x=1757575542; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MPQVkAFMgmOhR8+kYXpb7BN7WiH06c2CJj9w5v/CuXw=;
+        b=khyjtkZHk2rFKrX4hwvWt39S5G9qU/wk3CFqk/ggoH1KHcrjDSpxtsJQxVDLGWxMs/
+         alY6ShsmG+Thbhe+OwGkbIUvCj4q4kC+XjQe3FN5dJVEk4ETYAFtv2l4FiGTl9kk2i2h
+         JoOnj9McYbhBQnCyo1xQgFjDpgmb4meuoGYhpPCXrL5vJYabJWYNfe7wZtwM3RDMsj81
+         X6rwQmhfOT3NYLIuwB4Ux+LapFf2E7DA07DH+n0s3CsHxA4iXHqf0tT/u0NxKw3T5yf7
+         v4p07LHT5gST/zfoONlK5jhSOsGi8ThkS1eiluqWxQTujsUeLNt0s54d42XGTZGk/N50
+         NDhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756970742; x=1757575542;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MPQVkAFMgmOhR8+kYXpb7BN7WiH06c2CJj9w5v/CuXw=;
+        b=gryMvNrtUG9Yr/BphktzYhXBegVrLLT1jnGH8Bxbh3E8H47AsFUYaABdRc9jKPglCN
+         gA91sqXUwysBK/DAjSJLWa7JO13a5Hi9AMeP4nVn08HbJVkudFOtntFj+AEj/hhE0umg
+         Hm9AQiN50G4LhijdnN9BlW3fr47qEmjxfQGPOiX5Cuuc4SiUAJgUtkZul03ua4daylzt
+         mhDkwGokmwLBPL8ZxfeUM/CO723jY/cX4BZhl21tbL+YfkQs9k3Sseh3Hb7ju/FkM08t
+         URr9gbilJqoon7SdEiRKzpddsF+jj9Q+HClmyR0FkWGRsJ+/AkCwizO7kJOHAnsy/j9p
+         s3/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWz32K4sWayECRbVriejHczyYfcaKu5srFDYk2HyCLHUH9YdM1zyDQgSXNgQ1jjGkdHCVIJb+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7ncbbJbYBRxqpy1oekzuP3W3l2AhN03y0QbjyiRJpXQA3Ds8W
+	rT698rps81yWpPfb8XwZ1HVA04T1wSzNG40qUfOtSvFn5/43D869pveIxjE23Ic+TMaO3Xx0nXt
+	3/a2x2ozSphx3fg==
+X-Google-Smtp-Source: AGHT+IHbPWd89svBphXZ7pOsltABNLESlaMmG9uM8eaeOdLkw5PpSHqif8D5xIT1A7cB13jOEQimM/Mr8nVHGw==
+X-Received: from vsbbw7.prod.google.com ([2002:a05:6102:5547:b0:523:510:faa5])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:4691:b0:524:2917:61aa with SMTP id ada2fe7eead31-52b1c149c51mr7026803137.32.1756970740886;
+ Thu, 04 Sep 2025 00:25:40 -0700 (PDT)
+Date: Thu,  4 Sep 2025 07:25:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] s390/ism: Log module load/unload
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond
- <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Aswin Karuvally <aswin@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Mahanta Jambigi
- <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250901145842.1718373-1-wintera@linux.ibm.com>
- <20250901145842.1718373-2-wintera@linux.ibm.com>
- <20250903164233.7b2750e8@kernel.org>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20250903164233.7b2750e8@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=behrUPPB c=1 sm=1 tr=0 ts=68b93cd0 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=meDq6FdmJ0PmnKaK2a0A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: E8rj7Yox8s0U02qs8xoMj_gE5Hoiks5R
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzNCBTYWx0ZWRfX9scUnzTkVyjc
- HKTTXbno/KVTwMyRgJovelqt5QWoUzUgzA4vVPsOcXAeYThh+TZI6ob0noFLrqU5s8nu/RIzrJ/
- SgeVlEj06oMhyzkec3zvCiYx4SnSDdY2ZaQ6WIRdDT4SumOg/2/lerpdmux1Ho/LcldgqZxmw0j
- 9PLz916votBQSa25hBoiv39vSfewI5o3O7NpQUXTv3J6czN+36wuncAtr4/3ZPsXFGS9J9FM4A2
- T8PrAeJ47w9mv0Fonkl5/rVru/v8Nh0MmDizjU76BRgnSU4XMOGL1GF9EQlmzeSv/R9HiL3xtS2
- sdxMl+HHA9aDnCD4xlVU7CuDRMzwwors8rG0oAWwdyuFlfiKvAo6ItA0x7yozaHvQEZ+FY+grUl
- 5iGGag15
-X-Proofpoint-GUID: CROkHagpF6zv1arebXtvAW35Gh-l6g-g
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-04_02,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 impostorscore=0 spamscore=0 clxscore=1015 phishscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300034
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
+Message-ID: <20250904072537.2278210-1-edumazet@google.com>
+Subject: [PATCH] audit: init ab->skb_list earlier in audit_buffer_alloc()
+From: Eric Dumazet <edumazet@google.com>
+To: Casey Schaufler <casey@schaufler-ca.com>, Paul Moore <paul@paul-moore.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com, 
+	Eric Paris <eparis@redhat.com>, audit@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot found a bug in audit_buffer_alloc() if nlmsg_new() returns NULL.
 
+We need to initialize ab->skb_list before calling audit_buffer_free()
+which will use both the skb_list spinlock and list pointers.
 
-On 04.09.25 01:42, Jakub Kicinski wrote:
-> On Mon,  1 Sep 2025 16:58:41 +0200 Alexandra Winter wrote:
->> Add log messages to visualize timeline of module loads and unloads.
-> 
-> How deeply do you care about this patch ? I understand the benefit when
-> debugging "interface doesn't exist" issues with just logs at hand.
-> OTOH seeing a litany of "hello" messages on every boot from built-in
-> drivers, is rather annoying. Perhaps this being an s390 driver makes
-> it a bit of a special case..
+Fixes: eb59d494eebd ("audit: add record for multiple task security contexts")
+Reported-by: syzbot+bb185b018a51f8d91fd2@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/68b93e3c.a00a0220.eb3d.0000.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Casey Schaufler <casey@schaufler-ca.com>
+Cc: Paul Moore <paul@paul-moore.com>
+Cc: Eric Paris <eparis@redhat.com>
+Cc: audit@vger.kernel.org
+---
+ kernel/audit.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-tl dr: I don't care very deeply
+diff --git a/kernel/audit.c b/kernel/audit.c
+index bd7474fd8d2c..707483879648 100644
+--- a/kernel/audit.c
++++ b/kernel/audit.c
+@@ -1831,11 +1831,12 @@ static struct audit_buffer *audit_buffer_alloc(struct audit_context *ctx,
+ 	if (!ab)
+ 		return NULL;
+ 
++	skb_queue_head_init(&ab->skb_list);
++
+ 	ab->skb = nlmsg_new(AUDIT_BUFSIZ, gfp_mask);
+ 	if (!ab->skb)
+ 		goto err;
+ 
+-	skb_queue_head_init(&ab->skb_list);
+ 	skb_queue_tail(&ab->skb_list, ab->skb);
+ 
+ 	if (!nlmsg_put(ab->skb, 0, 0, type, 0, 0))
+-- 
+2.51.0.338.gd7d06c2dae-goog
 
-I think s390 users care a lot about debugability and are less concerned
-about log size. As you said, many other modules (on s390) have these
-'hello' messages, so I kind of expected the ism module to show up as well.
-But if you want to reject it, we can live without it ;-)
 
