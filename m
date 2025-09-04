@@ -1,341 +1,186 @@
-Return-Path: <netdev+bounces-219781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE0DB42F40
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:54:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B7B9B42F46
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCAC0540E98
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 01:54:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C69E63BE78B
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 01:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B1F1D416E;
-	Thu,  4 Sep 2025 01:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA341DF247;
+	Thu,  4 Sep 2025 01:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zC5Gvj/n"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="lNdPSrdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013047.outbound.protection.outlook.com [40.107.162.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D581922DD
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 01:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756950869; cv=none; b=RfqtHzg1iOSZTtGE6KPMRrojoZbr0eI4OGVmvUgAVv22Dr4IOkmHLMqnZNslAXT46/zfQw6CPXRde7nnHNx7obkGM4WAmVvQSFEuaCCY6RKoW6Od/nX7qt9NXy1opcKozHV6bWxB1qEDzw7BxU5QbU64Q3qP8k6mpAcW5ECoC0U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756950869; c=relaxed/simple;
-	bh=XJ2w39arK3fRgybqNhjgZP1Tcx4gajUCbYzSmTWi86k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=O3JA0nyakuywzGEVH1jxh4jZKNNdye8JbK3B8IzIobB8ukt04NxADKzLymKiKdxxYTrOLUwa7AV3NVFCxwVeoklqUvMRDd0edYdcSXuSZNdnl9Q1FBjkT8cH7Avx3xOgPiBv6PS82VuS9UCbE6/NOBsfQn4BDDKFy+ufqNQtYFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zC5Gvj/n; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24b4aa90c20so6748355ad.2
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 18:54:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756950867; x=1757555667; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IRx4kg27853Mr4e9hA+gLj9Dgi+6DG8uKC/JACslLYk=;
-        b=zC5Gvj/nwgtQ9tsSmUjBkGPv6/i1UFpc/ZFuWHg8aMdhfApc10P2/CIK+1CnCGNAz2
-         qRy2D9cUbT06m+8xgoICMuSVDiGNV+KaHnYFWLw8XhF6EHc6ZyPEm5VBjey7Kw6TLZrB
-         b9qVCYTP6Nam5tCKvdprEBGeAv1JoarWKZ6GQiBi/gTYUAgwoR1oQKQcfxJiy1lRyl9i
-         WAtceC8r6Pmv5blSX8C2mvMVVJJ6vKfekSFq0Uxg9I/+Ba/jE8WEY0m9mxaQo1tlh8Nr
-         AjUq3Mt8FMfw1r+moCMdWBxpcVeCpPXUfqXQXDlajzg7+vAMQF+yTu0tPBZJN4cCHgjG
-         yfPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756950867; x=1757555667;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IRx4kg27853Mr4e9hA+gLj9Dgi+6DG8uKC/JACslLYk=;
-        b=usbzaMm8q3yZOXUHglE6bSQ20s1RuUzZggu9WUCx/Gq0IeTbFS3prRUPhvblYQtUaC
-         k/Xuz0CpYIf3qqOlEOYsXWmeRK6550Z6vUmnT7Ly9KBfVq3Ab9e7rUiv4V/hCjUGbHAl
-         pRaH4CHx3+A1jbws2wzeyBHT7H19VxLzYdKcjb3LUBA33wqUkIIlx02nuIkkfjlGs7BY
-         2977VKyDmCLWqhfSScBaA7Q8qP/Wv9tv6ahsaA1+cuTqDnTdH7HHKhS0wA4uDpM2lxRS
-         yQbohgnfCymjIN1VRHZack9myzEuQXpGnq/QPNPmxWKISaUhQCL+/ePO6labYhdb3ok6
-         HhLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUI7I5XxCigvG1vMAtuzw1pn5mgV5OkzfivaI6hy3+o3IX+Su6r+e5JsE2W1dQ/PBqjhyx+2Uc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHlt5sR49HP7kQIxxaqhaxByK2W5FTLgOGc6cdn/0CpVefHo9S
-	Kp5n7L+6PowNRzucvAZEC3lX1ulb/YULKea2HLGoygAJCeV44BiaWreOn2kZ6RCZHuynlTjy4id
-	F8aUIoOqf023xfeXxMLtRuA==
-X-Google-Smtp-Source: AGHT+IHcFQSoXchOed2TjeTjT95yO5RWgQUSyQZlzYxtK4QqB68HJsKmykhfTUK/vL/mSNZkLle5C+DJss8Ua6wi
-X-Received: from plrs20.prod.google.com ([2002:a17:902:b194:b0:234:659b:127c])
- (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:19c6:b0:24c:c1b3:604 with SMTP id d9443c01a7336-24cc1b30801mr16136975ad.1.1756950867079;
- Wed, 03 Sep 2025 18:54:27 -0700 (PDT)
-Date: Thu,  4 Sep 2025 01:54:24 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030B51CEAB2;
+	Thu,  4 Sep 2025 01:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756950950; cv=fail; b=rmBFSpNoCxLOKybYS1wWf2hquOUHqk2qa5S2vSWodW37sDR25/Hu7qquRL7i/bWr5qs/3fCoGUpt5yuofadGQ2unV3OtoVghH/+u42TTFOBsLQslPyU5YCQu0Cxh3eJUFcQqV5aQ/hpXEZL4wN9SfNWlgdH7GaVfmcKq9GO2vUg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756950950; c=relaxed/simple;
+	bh=3HAYQnTZyZrZJInGpiBgEQEo8jyELP9DFQO9P044HOU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nct82t1xe6jx1VLO8FaedDbWURAuTB0j+K6+JPAw4V40egke3ey0ywZDmlj4n7pVKVe7Z32BGmOGtGskce0cZ9KOCywykE9VgKPx+dSSWQX0/evNfLI+ScQGtkBbsHlio7vrVKZ+vWx6kTIybyWcdwQu65A1MVanJ4ktWLdEEzU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=lNdPSrdg; arc=fail smtp.client-ip=40.107.162.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=arAT9KpvVleg0KCathKqD5/htFENemCrmWpQlYcN3yOfCRvNqrd6nDBPaGhjbmBhi9JrCYHI27fTgdYy/mMEzgw2n9u7XAbB17NvCzwNk4CglXgi5X1Pf7pk4pjgX0RgDcFnlklEDJeyK56WbGzwokfw8ieh4sm+IQRTEjao7p0K4gp10GHI7RhJYzlRJaAVfkclI0m1In0OL2VFWuXDLzDu8bipcRd7jK42mQ1I+IufMTYmwZunTglLw5xQAwq4BNnso4DAjHgEX0LaswL+pOisoIv0Vs3pGv7Z1NJNWt08EDi3akosTFoUBMo8FL6o0VWitm6kBBGa1PcoD2JH9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3HAYQnTZyZrZJInGpiBgEQEo8jyELP9DFQO9P044HOU=;
+ b=wQzGWq6DPe/eJAwODZYQrgIrfNIvCrRfrJvN7lMiS1INwOZZtSyaPXWENM5c+P/jN3u88daNfhaHkKSGvu+MPWiZlZQRHnpPa2FlUk/HJGw+al9tnjffq767SB7Pfcv5PtHIklQkBAd8v0/cVBd0/Xc+PUtz78AIO5j/2tV7eWCBI2vu1NkgV+mcNaCJJ363E2O+VBef65+JVyPSClU0VKCBajmt93zT7t8b5xnPzPPXWK9KsaWOEq3mRl0odEEnkC+GiolPf0dH9/5eeMw7gp/WSFdoGjoJHEHkUcJA5hRXA2AM6PaLY4wqQJ2zo0tuBgpUd9LYwJnyB8kzypHhNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3HAYQnTZyZrZJInGpiBgEQEo8jyELP9DFQO9P044HOU=;
+ b=lNdPSrdgelg9S33wWPkdtVY/GLuc5VcCIM4VzMFZwaRFYukunloe8IygmIH2UCC4KshbN+95XHpOlrx1sInkrOBgw9RB2Bi0uTurpSLseyJShcQidbeOnomk7kZC6b80o9aZhS3dTHbCB0/3t0RdgWVzoShHPqckc1cHmv/6TioJ+STEuHJid7xKpv4QkI5k9ACNs6pMmg4VMv0B6C0cmJXJXCa+9PExZUraoe2DBqtc2Q8945IZ3Ehf3TwwQV26/X8SP77Vd7Icz6Z3JUEzYKgC6BfxKZO2T8dHkvk6i0U/bHuGXEl+7NoMfZFXjoctI/qqb1Z0zOa/4SNm74HvLg==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PA1PR04MB11529.eurprd04.prod.outlook.com (2603:10a6:102:4e2::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Thu, 4 Sep
+ 2025 01:55:44 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.9094.017; Thu, 4 Sep 2025
+ 01:55:43 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Richard Cochran <richardcochran@gmail.com>
+CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Frank Li <frank.li@nxp.com>, "Y.B. Lu"
+	<yangbo.lu@nxp.com>, "christophe.leroy@csgroup.eu"
+	<christophe.leroy@csgroup.eu>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>
+Subject: RE: [PATCH net-next 0/3] ptp: add pulse signal loopback support for
+ debugging
+Thread-Topic: [PATCH net-next 0/3] ptp: add pulse signal loopback support for
+ debugging
+Thread-Index: AQHcHLD5iK57qqmEXUuEFtuGvb40JbSBd4YAgADLQNA=
+Date: Thu, 4 Sep 2025 01:55:43 +0000
+Message-ID:
+ <PAXPR04MB8510785442793740E5237AFA8800A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250903083749.1388583-1-wei.fang@nxp.com>
+ <aLhFiqHoUnsBAVR7@hoboy.vegasvil.org>
+In-Reply-To: <aLhFiqHoUnsBAVR7@hoboy.vegasvil.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PA1PR04MB11529:EE_
+x-ms-office365-filtering-correlation-id: 4a9bfd32-2a03-4c22-cf36-08ddeb5628a8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|19092799006|1800799024|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?L9K6MPgbF9q7kBYT95X1ZPDB8xrvvtp1Wqsp71YClB3GLks0tjLxnjNYRy7y?=
+ =?us-ascii?Q?a/F8NskFwegcrx2hRrmPIXEZ+3yAgY6klK4HCR9rDk3WcaQIJazl+kDxhYdj?=
+ =?us-ascii?Q?SaepwnWUKgQj7F4S/uCKk4+Pxjd4LwuXf2UOhhSyTMTUcA6bDnC+vcOwRhwc?=
+ =?us-ascii?Q?uE37Huzd8EindlnLpA9bHJT1RuL+jxrV7yFkX6JHB0UpQQ+ZegZIwA19bzla?=
+ =?us-ascii?Q?T9se2jXeJ3U3F3Uacz2FRT6itWOHM0nWF99/g1nB5h90f0//zTHZPRQWAXFD?=
+ =?us-ascii?Q?64slkYfydKnUmxSl9QBO6NPbkr7qxugLjeqEbwfgIXske6tlw7dK/qZnAeSO?=
+ =?us-ascii?Q?wShS9oMgrqwciYLTUeEZSdUYwm2fRE7vlxx7Y2YY+WR/v5oHU65V1MqmdDN3?=
+ =?us-ascii?Q?R4iH65KIsZAMt2bYWVp5fEV8KCJFpppmhrAOgBz4lqIu7b2hcpJhRBZZbX0D?=
+ =?us-ascii?Q?le1Hs/IiG1ptuRGp8mwp0trhozfCzIwn9nbRNhorFmygdzeuotxbXCG4KglO?=
+ =?us-ascii?Q?Jos5AKfzCb6a7MEdUxKfhBM3i4/2GKtqt6X1THGSaDlNbP2oZLVAR9dSawFN?=
+ =?us-ascii?Q?y83b+IpdZ9MllHFEPi2H8VpP89Q8RRMy/iwdiQrTrlXJwiYtvbvEGWFPeQbl?=
+ =?us-ascii?Q?gAYGD+exQYLzaqjgUVGx2HHALUT+ulv4lSiO6Z4wLmVEe4oJORH4XRDBSdGk?=
+ =?us-ascii?Q?uQyC7gi3ahOFoXwbRpkASgyFSPTp5357q9QOiTl12g1GJyg5m9PR4mjQ/WBf?=
+ =?us-ascii?Q?3S1BAJBda5mALUyWrFp5ox1751Pwzfse25W4osDX3GKxB3QR0jPO8j3/4IL4?=
+ =?us-ascii?Q?6us43i1HwMZlSMg+NnpQCGnavtFvE5WUwy7Jf3D5pVCR54ukMpRf/Nr5px+H?=
+ =?us-ascii?Q?VQSJnZ4kv6Vk9do50bEcbsN8YfxnBZGQ5nPsc2XfvycmckzE1GW6wLpNL6zW?=
+ =?us-ascii?Q?/bGrdYo84WijyTlO+rjhR91EQOdlmUeWyRSXAU78oyS9SwruJwdjPBjMQEWV?=
+ =?us-ascii?Q?wzqVgzIYIZwLRE99D17y0TFzap4LHYs3ZyO8WQoomtGjue9GEtZxkjFoZorr?=
+ =?us-ascii?Q?o4Dd8d3CJCsvHRZBtqUzbzh+MKAObFBYlORefbiHxAs9JjzI7L2r9DZikTJS?=
+ =?us-ascii?Q?J4pg1gKroar3vndbVBuu9wfOCHOtNqQbpOWxv6iLQWtl5DX8tvun1QumTkg9?=
+ =?us-ascii?Q?EUcnwOnjPT6xdznAHPz/GTSEKML+333z8w0+H9jSMspqOkYGTihWfz3n4a61?=
+ =?us-ascii?Q?xCKnwzJCNjr+Wf8DGQRHUJILnYIdAlUI5EX34PF+3NpEZTd24Zu1U1XeG88E?=
+ =?us-ascii?Q?iI6KY20zxJZ19xRUqe7P1z0rBzLLPp0fkQIMR53pBvVcpfNteCifmBlapzN7?=
+ =?us-ascii?Q?YwvzV7CpDtjPRS+w55vcrytqzAJR12Q5Hr9ReXFNsXPuariwyQwrsSv11DMH?=
+ =?us-ascii?Q?iuQ7wwuYk1gm0MQdj2S6vN35RkJKzSrHA4JFGYym/VqLKmtNz24kqQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?JxrgnMMi11RsiDXp24Ln5IcwIO3eHXY77CCOeVAwY9qfuDF9+qTGze4ikP8R?=
+ =?us-ascii?Q?wxWDDAnZDr3EuVhqG0OvOfJO0Q/UDRw5Nt4bR98GT0uc7G+aNrNfHcp653SG?=
+ =?us-ascii?Q?3rrULId6H12UI69KojQcE70pYqzB9C60Xa/LfiDbYh81bo1Q6akLe7iuUDAG?=
+ =?us-ascii?Q?aI73A+PPAkq/1ASPtpSRinKDnKjSYGoK0054f0cVxbzS610agZywriPdBF/A?=
+ =?us-ascii?Q?bInE+gNgkAHLP3oO71CIy8vEF3PGnkc38RsoOgAO8hrxZxYupjTG5TqH84uK?=
+ =?us-ascii?Q?IQd4n2pgF2AJr9jdX/8MsFMFqwaQbuf6Nso90wik8bB+X5XIE6TtQF5LayJv?=
+ =?us-ascii?Q?s/E6DCwkfs0yaO+JhZWDg8fk8dl/2Oncm6KE9gW0T4bvc+hg298zf/cKaBGk?=
+ =?us-ascii?Q?yX9Y25P4B8DQHfiLNUZ5cuM/XY2Ze+WDeHqlWePtg3iLtbCMwBC2lgn4np1n?=
+ =?us-ascii?Q?41Ie0ezAWMeKFqZ86coH9FUJ/7hghN6QqrlmOCw6++mO2CEHri1xRy+t2C6Q?=
+ =?us-ascii?Q?4P6Gww7glBawfNcT6TME267TiQLkoe0FikzKEJthT3REqNOFscBc24JvTMDU?=
+ =?us-ascii?Q?4Sfe9RBt6psBAHmZZinEiSVhPbkbbEA1l1MdQ8DWoMkijNZ5DB0PWkzRN87Q?=
+ =?us-ascii?Q?coAZyaG8J71bwQ7iPIHqjb+Fcj+onSucnEex3LrGBJrvNIeNhPZeL3eJs7GB?=
+ =?us-ascii?Q?/qaMOI9/dvkaLOt0veOA3u+8WUgcxRBuMswS3nBOXOaA0ORBTsLf3CGkfTLx?=
+ =?us-ascii?Q?mrwwb1VP8SZVaAaEFf/PTC2sM5fkt4dP++MKsnup8MX47WPlXkZGrU/NDcEf?=
+ =?us-ascii?Q?VupWmPtNZmHnhMsN3l5YDt4NPLSIgtSsmNPv9bE6z7obIY6YFfYuz0jk/AcM?=
+ =?us-ascii?Q?pwyAY6BXQa+3c0jmlxpxx9vJg3JtuiQ+G5Rae4VJD5yXaTl/ssYSfFUzD7/r?=
+ =?us-ascii?Q?Dtt1pMCwIXdqfqvvdqHplVt3Erk5lDwGpp8i9e2O0n86JHhp0cIqesJ+HfX9?=
+ =?us-ascii?Q?cNrHu/oHUI4ByP9h6TWdwwFGY+XXF4jwbp2Xmju8jHNtqs3j9e3lUzH/bJ8H?=
+ =?us-ascii?Q?JNV1OFRiL7+N5ObpMww/Fdaq2dqvhFVkx/lIGGf9CABybtAwpJ9d52zKLrCC?=
+ =?us-ascii?Q?Xhl9Yjyx6+MRDaXNx9hzRDG8mz40K6X7BpbH7rb8kqPKj00Pct8ZnsTt6ZQK?=
+ =?us-ascii?Q?Xw1IvOwoM8SSOcWCtiOv03T24aqBi0xWg9R5Dfvg6Sk7kXKCKEBdzezPFrYM?=
+ =?us-ascii?Q?+1elEOLy7jOFwYppkfpJ4S/PXEe+f7MFX4Gy5IoNfQ16puGKCgl+KHrmEzxR?=
+ =?us-ascii?Q?8QzPBAMxBi80ufbHrui0k2tuqCuEIAeS0dchBVHDKZaXtcp3RQPpR+B0iqK5?=
+ =?us-ascii?Q?q/PpePm4VsRzLz88fKKBrs9A/c5y6+YlJn0/i7T3RQHcOhrB/BAYHbNvSKIf?=
+ =?us-ascii?Q?b3/TnnMBnzrmivv03e5BVTNG9q8vqT8xvov2H8OtWAdj/i8d5V/xOU3Q0BJh?=
+ =?us-ascii?Q?2hNEHxtZLeHfmbZ1co1g1MkSilYZ3XdQedr00hBwsfi/XaLQ2QyMwrH5yRXf?=
+ =?us-ascii?Q?XSC94x5wdQ22x2OuPNs=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
-Message-ID: <20250904015424.1228665-1-marcharvey@google.com>
-Subject: [PATCH net-next v2] selftests: net: Add tests to verify team driver
- option set and get.
-From: Marc Harvey <marcharvey@google.com>
-To: jiri@resnulli.us, andrew+netdev@lunn.ch
-Cc: edumazet@google.com, willemb@google.com, maheshb@google.com, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, kuba@kernel.org, 
-	liuhangbin@gmail.com, Marc Harvey <marcharvey@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a9bfd32-2a03-4c22-cf36-08ddeb5628a8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2025 01:55:43.8162
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: NWWytu1O/8sSzan0/X2Eui70qckoT1yntCenx7oKbM6e7Gn5ynYk5BuBD9bnfl3XVeC4dzWkpfStP6PjemFpvQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB11529
 
-There are currently no kernel tests that verify setting and getting
-options of the team driver.
+> On Wed, Sep 03, 2025 at 04:37:46PM +0800, Wei Fang wrote:
+> > Some PTP devices support looping back the periodic pulse signal for
+> > debugging,
+>=20
+> What kinds of debugs can be resolved by this loopback feature?
+>=20
+> It seems pointless to me...
 
-In the future, options may be added that implicitly change other
-options, which will make it useful to have tests like these that show
-nothing breaks. There will be a follow up patch to this that adds new
-"rx_enabled" and "tx_enabled" options, which will implicitly affect the
-"enabled" option value and vice versa.
 
-The tests use teamnl to first set options to specific values and then
-gets them to compare to the set values.
-
-Signed-off-by: Marc Harvey <marcharvey@google.com>
----
-Changes in v2:
-  - Fixed shellcheck failures.
-  - Fixed test failing in vng by adding a config option to enable the
-    team driver's active backup mode.
-  - Link to v1: https://lore.kernel.org/netdev/20250902235504.4190036-1-marcharvey@google.com/
-
- .../selftests/drivers/net/team/Makefile       |   6 +-
- .../testing/selftests/drivers/net/team/config |   1 +
- .../selftests/drivers/net/team/options.sh     | 192 ++++++++++++++++++
- 3 files changed, 197 insertions(+), 2 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/team/options.sh
-
-diff --git a/tools/testing/selftests/drivers/net/team/Makefile b/tools/testing/selftests/drivers/net/team/Makefile
-index eaf6938f100e..8b00b70ce67f 100644
---- a/tools/testing/selftests/drivers/net/team/Makefile
-+++ b/tools/testing/selftests/drivers/net/team/Makefile
-@@ -1,11 +1,13 @@
- # SPDX-License-Identifier: GPL-2.0
- # Makefile for net selftests
- 
--TEST_PROGS := dev_addr_lists.sh propagation.sh
-+TEST_PROGS := dev_addr_lists.sh propagation.sh options.sh
- 
- TEST_INCLUDES := \
- 	../bonding/lag_lib.sh \
- 	../../../net/forwarding/lib.sh \
--	../../../net/lib.sh
-+	../../../net/lib.sh \
-+	../../../net/in_netns.sh \
-+	../../../net/lib/sh/defer.sh \
- 
- include ../../../lib.mk
-diff --git a/tools/testing/selftests/drivers/net/team/config b/tools/testing/selftests/drivers/net/team/config
-index 636b3525b679..558e1d0cf565 100644
---- a/tools/testing/selftests/drivers/net/team/config
-+++ b/tools/testing/selftests/drivers/net/team/config
-@@ -3,4 +3,5 @@ CONFIG_IPV6=y
- CONFIG_MACVLAN=y
- CONFIG_NETDEVSIM=m
- CONFIG_NET_TEAM=y
-+CONFIG_NET_TEAM_MODE_ACTIVEBACKUP=y
- CONFIG_NET_TEAM_MODE_LOADBALANCE=y
-diff --git a/tools/testing/selftests/drivers/net/team/options.sh b/tools/testing/selftests/drivers/net/team/options.sh
-new file mode 100755
-index 000000000000..82bf22aa3480
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/team/options.sh
-@@ -0,0 +1,192 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# These tests verify basic set and get functionality of the team
-+# driver options over netlink.
-+
-+# Run in private netns.
-+test_dir="$(dirname "$0")"
-+if [[ $# -eq 0 ]]; then
-+        "${test_dir}"/../../../net/in_netns.sh "$0" __subprocess
-+        exit $?
-+fi
-+
-+ALL_TESTS="
-+        team_test_options
-+"
-+
-+source "${test_dir}/../../../net/lib.sh"
-+
-+TEAM_PORT="team0"
-+MEMBER_PORT="dummy0"
-+
-+setup()
-+{
-+        ip link add name "${MEMBER_PORT}" type dummy
-+        ip link add name "${TEAM_PORT}" type team
-+}
-+
-+get_and_check_value()
-+{
-+        local option_name="$1"
-+        local expected_value="$2"
-+        local port_flag="$3"
-+
-+        local value_from_get
-+
-+        if ! value_from_get=$(teamnl "${TEAM_PORT}" getoption "${option_name}" \
-+                        "${port_flag}"); then
-+                echo "Could not get option '${option_name}'" >&2
-+                return 1
-+        fi
-+
-+        if [[ "${value_from_get}" != "${expected_value}" ]]; then
-+                echo "Incorrect value for option '${option_name}'" >&2
-+                echo "get (${value_from_get}) != set (${expected_value})" >&2
-+                return 1
-+        fi
-+}
-+
-+set_and_check_get()
-+{
-+        local option_name="$1"
-+        local option_value="$2"
-+        local port_flag="$3"
-+
-+        local value_from_get
-+
-+        if ! teamnl "${TEAM_PORT}" setoption "${option_name}" "${option_value}" \
-+                        "${port_flag}"; then
-+                echo "'setoption ${option_name} ${option_value}' failed" >&2
-+                return 1
-+        fi
-+
-+        get_and_check_value "${option_name}" "${option_value}" "${port_flag}"
-+        return $?
-+}
-+
-+# Get a "port flag" to pass to the `teamnl` command.
-+# E.g. $1="dummy0" -> "port=dummy0",
-+#      $1=""       -> ""
-+get_port_flag()
-+{
-+        local port_name="$1"
-+
-+        if [[ -n "${port_name}" ]]; then
-+                echo "--port=${port_name}"
-+        fi
-+}
-+
-+attach_port_if_specified()
-+{
-+        local port_name="${1}"
-+
-+        if [[ -n "${port_name}" ]]; then
-+                ip link set dev "${port_name}" master "${TEAM_PORT}"
-+                return $?
-+        fi
-+}
-+
-+detach_port_if_specified()
-+{
-+        local port_name="${1}"
-+
-+        if [[ -n "${port_name}" ]]; then
-+                ip link set dev "${port_name}" nomaster
-+                return $?
-+        fi
-+}
-+
-+#######################################
-+# Test that an option's get value matches its set value.
-+# Globals:
-+#   RET - Used by testing infra like `check_err`.
-+#   EXIT_STATUS - Used by `log_test` to whole script exit value.
-+# Arguments:
-+#   option_name - The name of the option.
-+#   value_1 - The first value to try setting.
-+#   value_2 - The second value to try setting.
-+#   port_name - The (optional) name of the attached port.
-+#######################################
-+team_test_option()
-+{
-+        local option_name="$1"
-+        local value_1="$2"
-+        local value_2="$3"
-+        local possible_values="$2 $3 $2"
-+        local port_name="$4"
-+        local port_flag
-+
-+        RET=0
-+
-+        echo "Setting '${option_name}' to '${value_1}' and '${value_2}'"
-+
-+        attach_port_if_specified "${port_name}"
-+        check_err $? "Couldn't attach ${port_name} to master"
-+        port_flag=$(get_port_flag "${port_name}")
-+
-+        # Set and get both possible values.
-+        for value in ${possible_values}; do
-+                set_and_check_get "${option_name}" "${value}" "${port_flag}"
-+                check_err $? "Failed to set '${option_name}' to '${value}'"
-+        done
-+
-+        detach_port_if_specified "${port_name}"
-+        check_err $? "Couldn't detach ${port_name} from its master"
-+
-+        log_test "Set + Get '${option_name}' test"
-+}
-+
-+#######################################
-+# Test that getting a non-existant option fails.
-+# Globals:
-+#   RET - Used by testing infra like `check_err`.
-+#   EXIT_STATUS - Used by `log_test` to whole script exit value.
-+# Arguments:
-+#   option_name - The name of the option.
-+#   port_name - The (optional) name of the attached port.
-+#######################################
-+team_test_get_option_fails()
-+{
-+        local option_name="$1"
-+        local port_name="$2"
-+        local port_flag
-+
-+        RET=0
-+
-+        attach_port_if_specified "${port_name}"
-+        check_err $? "Couldn't attach ${port_name} to master"
-+        port_flag=$(get_port_flag "${port_name}")
-+
-+        # Just confirm that getting the value fails.
-+        teamnl "${TEAM_PORT}" getoption "${option_name}" "${port_flag}"
-+        check_fail $? "Shouldn't be able to get option '${option_name}'"
-+
-+        detach_port_if_specified "${port_name}"
-+
-+        log_test "Get '${option_name}' fails"
-+}
-+
-+team_test_options()
-+{
-+        # Wrong option name behavior.
-+        team_test_get_option_fails fake_option1
-+        team_test_get_option_fails fake_option2 "${MEMBER_PORT}"
-+
-+        # Correct set and get behavior.
-+        team_test_option mode activebackup loadbalance
-+        team_test_option notify_peers_count 0 5
-+        team_test_option notify_peers_interval 0 5
-+        team_test_option mcast_rejoin_count 0 5
-+        team_test_option mcast_rejoin_interval 0 5
-+        team_test_option enabled true false "${MEMBER_PORT}"
-+        team_test_option user_linkup true false "${MEMBER_PORT}"
-+        team_test_option user_linkup_enabled true false "${MEMBER_PORT}"
-+        team_test_option priority 10 20 "${MEMBER_PORT}"
-+        team_test_option queue_id 0 1 "${MEMBER_PORT}"
-+}
-+
-+require_command teamnl
-+setup
-+tests_run
-+exit "${EXIT_STATUS}"
--- 
-2.51.0.338.gd7d06c2dae-goog
+Vladimir helped explain its purpose in the thread, do you still think
+it is pointless? If so, then I can only add a custom debugfs interface
+to the ptp_netc driver, at least this will be a better debugging feature
+for the NETC Timer. :)
 
 
