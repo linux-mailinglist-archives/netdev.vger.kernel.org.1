@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-219881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C508BB438CF
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:34:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5219FB43931
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78DBA58338F
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:34:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B75B16F967
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA282EDD4D;
-	Thu,  4 Sep 2025 10:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tEOa0jH0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BD3A2FABFB;
+	Thu,  4 Sep 2025 10:48:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441C321859A;
-	Thu,  4 Sep 2025 10:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2854F5E0;
+	Thu,  4 Sep 2025 10:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756982088; cv=none; b=RBw+AXwGrjDw9IWb9uxrvZR7PMj9ILYQQSlQgH3NilgXZjOeZ774U63BMInZExUC7LsYetK4cSNTEkehv1qpu1mgTsOwo+/9Ewip5xovYVw74eyAPvPfj9OtxS4VQXRNwYRbVPDE2Qt0aa39I8tXc8KHxUqFLNaFRAeCsDDYbUE=
+	t=1756982895; cv=none; b=Fhk3462tv+01GrYmTwIS1ueW8Oy5Qs+Gpfs6y55XMB9auk5B8vFmG6iUsFBmxveLMjrFTjEvujuliZWYQE1zCLFIqQidi8H8rvm9Os0Aa/Y31W73FlSJVBKfLde7dQo8u5utN1ibhuY+Yq/zSSoFfQ/gYY0mNrrYGpkPAHmZ+eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756982088; c=relaxed/simple;
-	bh=E5fsuSav1cTXloSIvOFthsHyAkRUga0iYM80pkvxqXo=;
+	s=arc-20240116; t=1756982895; c=relaxed/simple;
+	bh=BnffRtuAO0fHa8klUOka6fWIHzSv4Atuw1W6xeWrTwc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m48IUFkE0bER/xZJYpl34AeWLx/P3xdWoK/NzElv9GDriobcJb/S09fk5VyC9bMQV4A7PSenBYuCLUw/XBSBIzEFS6cdGBh6HVh1OlaFmYaWFjEIUCVVwwIMORQgfAFS5wwiOZGkijdcryDTX1ezpe3lrLt8//B3fj5Rk1VENgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tEOa0jH0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2465BC4CEF8;
-	Thu,  4 Sep 2025 10:34:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756982087;
-	bh=E5fsuSav1cTXloSIvOFthsHyAkRUga0iYM80pkvxqXo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tEOa0jH0jMSyfwjgJz4Mxd6GGKXLT9k5fPU+kzlyT4/pGd4tZamEByKAkG9rmOpfR
-	 SAgS9Cl8LV5HYoO27JRNrqSwpxqd46N+CB4KqCFfx4YjRy2nCM9hJqgRSU2BYtlvyP
-	 P87Dl2kjJt380IBgN4Wo28I2z4XMCB/xEr4Rcbp0P5bPEVnYWvAip1DHmX2Zv3gLst
-	 /gigMdvV6Sbb65sJPbS4YzrBLWHlJAHLoLoYA0bigx9shO25wEVMIKFPFsbl2xbwwq
-	 SobDyMhHt/SK+Y8qbl5NIfan43uN0HMO/8BTJsGHmGiU+piJUW3dIMBhRPdmBmyRV4
-	 APmt7uu2wfoFA==
-Date: Thu, 4 Sep 2025 11:34:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=G4vvS4v97xvv5BfSbaEeLDv86wdUVJ3yrBTcx53gkp9hF8805uQDSE+IZ7wDePfgvaVsRFwCnjpI68sQQNUytdsW+jc9J+iIGs/UyhfyGTH7dMxWvBrPZt/hwVkpnGZsGY6hL5YJjsAXdCxec1P6PQ1fMGu3+BkeYQQ6FoeVWWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 980A51756;
+	Thu,  4 Sep 2025 03:48:04 -0700 (PDT)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C35A73F63F;
+	Thu,  4 Sep 2025 03:48:10 -0700 (PDT)
+Date: Thu, 4 Sep 2025 11:48:07 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Adam Young <admiyo@os.amperecomputing.com>
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
- contain invalid address
-Message-ID: <20250904103443.GH372207@horms.kernel.org>
-References: <20250904031222.40953-3-ziyao@disroot.org>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH net-next v28 1/1] mctp pcc: Implement MCTP over PCC
+ Transport
+Message-ID: <20250904-spiffy-earthworm-of-aptitude-c13fc8@sudeepholla>
+References: <20250904040544.598469-1-admiyo@os.amperecomputing.com>
+ <20250904040544.598469-2-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,109 +59,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250904031222.40953-3-ziyao@disroot.org>
+In-Reply-To: <20250904040544.598469-2-admiyo@os.amperecomputing.com>
 
-On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
-> We must set the clk_phy pointer to NULL to indicating it isn't available
-> if the optional phy clock couldn't be obtained. Otherwise the error code
-> returned by of_clk_get() could be wrongly taken as an address, causing
-> invalid pointer dereference when later clk_phy is passed to
-> clk_prepare_enable().
+Hi Adam,
+
+On Thu, Sep 04, 2025 at 12:05:42AM -0400, Adam Young wrote:
+> Implementation of network driver for
+> Management Control Transport Protocol(MCTP)
+> over Platform Communication Channel(PCC)
 > 
-> Fixes: da114122b831 ("net: ethernet: stmmac: dwmac-rk: Make the clk_phy could be used for external phy")
-> Signed-off-by: Yao Zi <ziyao@disroot.org>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+> DMTF DSP:0292
+> https://www.dmtf.org/sites/default/files/standards/documents/\
+> DSP0292_1.0.0WIP50.pdf
 > 
-> On next-20250903, the fixed commit causes NULL pointer dereference on
-> Radxa E20C during probe of dwmac-rk, a typical dmesg looks like
+> MCTP devices are specified via ACPI by entries
+> in DSDT/SDST and reference channels specified
+> in the PCCT.  Messages are sent on a type 3 and
+> received on a type 4 channel.  Communication with
+> other devices use the PCC based doorbell mechanism;
+> a shared memory segment with a corresponding
+> interrupt and a memory register used to trigger
+> remote interrupts.
 > 
-> [    0.273324] rk_gmac-dwmac ffbe0000.ethernet: IRQ eth_lpi not found
-> [    0.273888] rk_gmac-dwmac ffbe0000.ethernet: IRQ sfty not found
-> [    0.274520] rk_gmac-dwmac ffbe0000.ethernet: PTP uses main clock
-> [    0.275226] rk_gmac-dwmac ffbe0000.ethernet: clock input or output? (output).
-> [    0.275867] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: tx_delay.
-> [    0.276491] rk_gmac-dwmac ffbe0000.ethernet: set tx_delay to 0x30
-> [    0.277026] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: rx_delay.
-> [    0.278086] rk_gmac-dwmac ffbe0000.ethernet: set rx_delay to 0x10
-> [    0.278658] rk_gmac-dwmac ffbe0000.ethernet: integrated PHY? (no).
-> [    0.279249] Unable to handle kernel paging request at virtual address fffffffffffffffe
-> [    0.279948] Mem abort info:
-> [    0.280195]   ESR = 0x000000096000006
-> [    0.280523]   EC = 0x25: DABT (current EL), IL = 32 bits
-> [    0.280989]   SET = 0, FnV = 0
-> [    0.281287]   EA = 0, S1PTW = 0
-> [    0.281574]   FSC = 0x06: level 2 translation fault
+> This driver takes advantage of PCC mailbox buffer
+> management. The data section of the struct sk_buff
+> that contains the outgoing packet is sent to the mailbox,
+> already properly formatted  as a PCC message.  The driver
+> is also responsible for allocating a struct sk_buff that
+> is then passed to the mailbox and used to record the
+> data in the shared buffer. It maintains a list of both
+> outging and incoming sk_buffs to match the data buffers
 > 
-> where the invalid address is just -ENOENT (-2).
+> If the mailbox ring buffer is full, the driver stops the
+> incoming packet queues until a message has been sent,
+> freeing space in the ring buffer.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> index cf619a428664..26ec8ae662a6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> @@ -1414,11 +1414,17 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
->  	if (plat->phy_node) {
->  		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
->  		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
-> -		/* If it is not integrated_phy, clk_phy is optional */
-> +		/*
-> +		 * If it is not integrated_phy, clk_phy is optional. But we must
-> +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
-> +		 * the error code could be wrongly taken as an invalid pointer.
-> +		 */
->  		if (bsp_priv->integrated_phy) {
->  			if (ret)
->  				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
->  			clk_set_rate(bsp_priv->clk_phy, 50000000);
-> +		} else if (ret) {
-> +			bsp_priv->clk_phy = NULL;
->  		}
->  	}
+> When the Type 3 channel outbox receives a txdone response
+> interrupt, it consumes the outgoing sk_buff, allowing
+> it to be freed.
+> 
 
-Thanks, and sorry for my early confusion about applying this patch.
+Sorry for not reviewing your mailbox changes in time, but I have
+comments/concerns on the changes merged. I will respond on the original
+thread with questions if I manage to find it, but it doesn't look good
+at all to me. So I would want these changes to be on hold(not to be
+merged at all).
 
-I agree that the bug you point out is addressed by this patch.
-Although I wonder if it is cleaner not to set bsp_priv->clk_phy
-unless there is no error, rather than setting it then resetting
-it if there is an error.
-
-More importantly, I wonder if there is another bug: does clk_set_rate need
-to be called in the case where there is no error and bsp_priv->integrated_phy
-is false?
-
-So I am wondering if it makes sense to go with something like this.
-(Compile tested only!)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 266c53379236..a25816af2c37 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1411,12 +1411,16 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
- 	}
- 
- 	if (plat->phy_node) {
--		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
--		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
--		/* If it is not integrated_phy, clk_phy is optional */
--		if (bsp_priv->integrated_phy) {
--			if (ret)
-+		struct clk *clk_phy;
-+
-+		clk_phy = of_clk_get(plat->phy_node, 0);
-+		ret = PTR_ERR_OR_ZERO(clk_phy);
-+		if (ret) {
-+			/* If it is not integrated_phy, clk_phy is optional */
-+			if (bsp_priv->integrated_phy)
- 				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
-+		} else {
-+			bsp_priv->clk_phy = clk_phy;
- 			clk_set_rate(bsp_priv->clk_phy, 50000000);
- 		}
- 	}
-
-Please note: if you send an updated patch (against net) please
-make sure you wait 24h before the original post.
-
-See: https://docs.kernel.org/process/maintainer-netdev.html
+-- 
+Regards,
+Sudeep
 
