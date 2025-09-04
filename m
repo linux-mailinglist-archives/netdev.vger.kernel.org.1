@@ -1,154 +1,202 @@
-Return-Path: <netdev+bounces-219817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B52DDB43227
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:16:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6598AB4322F
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 718A17C46A1
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 06:16:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F9271668A9
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 06:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A9B248F52;
-	Thu,  4 Sep 2025 06:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1F8259CBD;
+	Thu,  4 Sep 2025 06:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="lKh6Aatz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIH072QM"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52254243969;
-	Thu,  4 Sep 2025 06:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6959C2417D4
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 06:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756966599; cv=none; b=GGpEI7mu4UJZ2gLKnGoMDxY6VjMk6dzbKGtoHaje0qINptGQZ1rwN0decApJ53dG19lt9vUO/zyiC+TzB+KHLldChNQ3O1y9/ZxJRndcYE3hX59vDkHbMB2r6FogEahjqG/yqm2g4m0XafEwveGkWo6NINNrjA70mweyADx/2us=
+	t=1756966786; cv=none; b=nU1xlIAKlVC+Gv5OjinC7lABQxy6niZvYo4fSdptWOFgC1Q600cH7zwysDjnr5tvHIV+HhJqsJoFB/azJK0NKGKEUqTOiUaB1230V/xskOTB/sdTjRzZUcYyHh8AlD2oxHRtBb7E0S73fw6RZlWjspohy+PBREwgABW/pZsoCuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756966599; c=relaxed/simple;
-	bh=c2nW3/KugqyY7pq43bJf9Y2vSQqLlGEPOYwEur+SKZk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ErSrBsL+ru25drJTZR0uA7PUGAn4IhBjlZzIh0aadxwoPag1riAdYGIqZ3eZPGSYuvXsRXcu5V7rd51o4q/lFHyfSJzI4fRP7db8FoiGo+XPrnyyZmOZoACKaVFwf1VorMwMhHumCgfc8iHCnnhG6BQymnn0mKwybMqPtGTVwYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=lKh6Aatz; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1756966786; c=relaxed/simple;
+	bh=sEv0vVkJRS2KUdMsNq+q9ROY+kL0WtoO4W828p76puk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jQBHQhf6T4/YqKkSNJZ4NJCKkjwbLaEvu6z7LGLlIhGkbUTaiupG09/3ZLrBrUtpIkasglRSbNXDBntqdB5ILW6JNdbBYwRYa92sYF2nGKs513Kv6yay4gsPGv9CQoK6qqzn3WBDTeI0XNdO2NlSs+HS5sDNYqAWTkOwc6m6oe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HIH072QM; arc=none smtp.client-ip=209.85.166.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3f663225a2bso5499035ab.1
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 23:19:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1756966589;
-	bh=c2nW3/KugqyY7pq43bJf9Y2vSQqLlGEPOYwEur+SKZk=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=lKh6Aatz5mv014BoB+Z+Ao7PJ5twnX2TKJP6xpJsTbGIBZpE/gqnk/JPmrOZWO7qF
-	 RrAx34nfvPXC9r/v4ZwCQVyfN5ADQLin7vTXjkChE1iy7S1lUC2ofUJ4ohyZj6JRaF
-	 kFcRurYGixKKJxzZnao9Fcf3RwGlgZkI445ur+A3h71l10nJiM0y8QaLOlmUV/NRly
-	 szJ0zNnCXUJHmDuHqFiYBOlCDi02PzjCVfuhLN3n3fuxw9QW9wFN7JeRVIFrjZgqzC
-	 6sLV0cFSjaEYF8gtBjorQpvmE+2j3O7TQF+aoU7AVerDMYV8CSzKSN4J9PdcauYyQG
-	 FaT4v7+MW0bzg==
-Received: from [192.168.72.161] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id DEF8D640B6;
-	Thu,  4 Sep 2025 14:16:27 +0800 (AWST)
-Message-ID: <b4891bd683d4802d6ab3c542b446c14081ecf8d6.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next v28 1/1] mctp pcc: Implement MCTP over PCC
- Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@os.amperecomputing.com>, Matt Johnston
- <matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>, ALOK TIWARI <alok.a.tiwari@oracle.com>
-Date: Thu, 04 Sep 2025 14:16:27 +0800
-In-Reply-To: <20250904040544.598469-2-admiyo@os.amperecomputing.com>
-References: <20250904040544.598469-1-admiyo@os.amperecomputing.com>
-	 <20250904040544.598469-2-admiyo@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2 
+        d=gmail.com; s=20230601; t=1756966784; x=1757571584; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b44M1LvapLMYobQZ5mgV9Bk/DD4mzHbNf8HQ7pWMx1o=;
+        b=HIH072QMleU49lrXFOYyLfY+umC2agPI82ukMTzOBitaLhZ+QxFv8A81uBetAvLnEq
+         l2oJw2oEx+LP2jS+zORrxYEsUWQerU2LRP1s7afXj1ZGueLg7WF8S0G05C3curUuKZS6
+         g2ksUN4x7QR0nmza0BeHyTkIsftwEdD3xjyz9AuoXmm9nCJ3NgimxRzDBKYch6wFPJ+y
+         zKOLkGsgsdfKPs1FsUuqwFctv+CQLr1TVDNIhFdREGqEKizNHYLzDzvi9qLoax7UmNi9
+         r56WK5hsnauORESdGmIBm3NmMCCJ+Yo6UEaiHoymkXhojAEboCj5isW+fvWcCJfn5G61
+         XSOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756966784; x=1757571584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b44M1LvapLMYobQZ5mgV9Bk/DD4mzHbNf8HQ7pWMx1o=;
+        b=hYOdYVavu6JuzAdAF39nSLpJSxcmpcRQwRygFko/N7CKkY9kasC8XPcS1CeFcgwqqb
+         HtYLgl0OffYXwXhN+80C3vXIwPmPkTrAPYYE6DZt1B7NcY9dJNgQHmobEp6TSxACGAOm
+         GNJqhP1xz+iE9KqZFXaCg7Ftnx0PGrTqBOO7ghHpIxaVB6E0pL8ZSBNx6ZKnYroxGnp+
+         RVKj5kd0NGk7bqYdxa9zOsZB9QS5pURlfXJG1t9lnEjxTY3mlMBLGJCf2sAMvTh5qXDo
+         yMctEM8mUK56JAF0GQtpai3Ks3UeiRhHkaPy4LXd5av6jLdHw/6qztJ/nsadtsEcfgQf
+         16kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUyHPLmZjm+giiYYknHdxv11Z99ZRb3HOHmskivgYbdEuoa7lYH5S9VPHYfPprunRXM9Okkdj4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yws6fzm18iWtMl3kD/GUS9cOSFZM0Gb+eIiVSLXZZQMV4LiFbDj
+	rRZMTR14jtv6wPnRoHhzJMeShQP2+0pPCmins0doXZb/txhDv2Xa0tn1HBY6v4OQV6u8FFHCJ0c
+	hwPzg6eKscAIEkIYMHMdlUjyQlOXiOTU=
+X-Gm-Gg: ASbGncs0ZJd3yNYMveiqu6jp6wNjqTCCcrKyPO955rZh1sNuCK0p4AoIXj1bf9fciDp
+	GO9GMfPrIBdrl7zEzBhLmENwPDn3JZ4i9vK5wTxwArpu7twUnnpHa0a8X8FVQMSkMRGSMYFWRIQ
+	1rWvRAHLhTzHRwpdk0o8nGYJBosWdR5DRx047Efu5b/EG5TIpofr3BU1J0Je0S6TUwQ3PV7ht8h
+	UnJBBk=
+X-Google-Smtp-Source: AGHT+IE3Rr/v64th8kfLDeU7CBbUXsOc9NaH0qizZKpujNqRWK49QELtYasp2HnzTNVmUj6gUI1kIDUQStIt9C033fQ=
+X-Received: by 2002:a92:c24d:0:b0:3f0:bd1b:8b2f with SMTP id
+ e9e14a558f8ab-3f3d410e14dmr370038955ab.3.1756966784404; Wed, 03 Sep 2025
+ 23:19:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250903084720.1168904-1-edumazet@google.com> <20250903084720.1168904-2-edumazet@google.com>
+ <CAL+tcoCqey97QW=7n_S8V9t-haSe=mu9iE1sAaDmPPJ+1BkysA@mail.gmail.com> <CAAVpQUBgCyC+y+2M7=WKJVk=sivgeZtE2kwCxDLFCrgezycjZg@mail.gmail.com>
+In-Reply-To: <CAAVpQUBgCyC+y+2M7=WKJVk=sivgeZtE2kwCxDLFCrgezycjZg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 4 Sep 2025 14:19:08 +0800
+X-Gm-Features: Ac12FXxqxjZSqYJLeR1zupdhxnAVDivn1ee2TcX_wPxuhjNtVZbkPy3Hiy86vOM
+Message-ID: <CAL+tcoBJxe6GkosVCS5Vzwk_z8W1WmxqLFELzXNwCRSYkQUyHw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] tcp: fix __tcp_close() to only send RST when required
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgQWRhbSwKCllvdSBzZWVtIHRvIGhhdmUgbWlzc2VkIGFueSBmaXhlcyBmcm9tIEFsb2sncyBy
-ZXZpZXcgaGVyZS4KCkZ1cnRoZXIgY29tbWVudHMgaW5saW5lOgoKPiArc3RhdGljIGludCBtY3Rw
-X3BjY19uZG9fb3BlbihzdHJ1Y3QgbmV0X2RldmljZSAqbmRldikKPiArewo+ICvCoMKgwqDCoMKg
-wqDCoHN0cnVjdCBtY3RwX3BjY19uZGV2ICptY3RwX3BjY19uZGV2ID0KPiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgbmV0ZGV2X3ByaXYobmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBf
-cGNjX21haWxib3ggKm91dGJveCA9Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgICZtY3RwX3BjY19u
-ZGV2LT5vdXRib3g7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX21haWxib3ggKmlu
-Ym94ID0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqAgJm1jdHBfcGNjX25kZXYtPmluYm94Owo+ICsK
-PiArwqDCoMKgwqDCoMKgwqBvdXRib3gtPmNoYW4gPSBwY2NfbWJveF9yZXF1ZXN0X2NoYW5uZWwo
-Jm91dGJveC0+Y2xpZW50LCBvdXRib3gtPmluZGV4KTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoSVNf
-RVJSKG91dGJveC0+Y2hhbikpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVy
-biBQVFJfRVJSKG91dGJveC0+Y2hhbik7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGluYm94LT5jaGFu
-ID0gcGNjX21ib3hfcmVxdWVzdF9jaGFubmVsKCZpbmJveC0+Y2xpZW50LCBpbmJveC0+aW5kZXgp
-Owo+ICvCoMKgwqDCoMKgwqDCoGlmIChJU19FUlIoaW5ib3gtPmNoYW4pKSB7Cj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoHBjY19tYm94X2ZyZWVfY2hhbm5lbChvdXRib3gtPmNoYW4p
-Owo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gUFRSX0VSUihpbmJveC0+
-Y2hhbik7Cj4gK8KgwqDCoMKgwqDCoMKgfQo+ICsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19u
-ZGV2LT5pbmJveC5jaGFuLT5yeF9hbGxvYyA9IG1jdHBfcGNjX3J4X2FsbG9jOwo+ICvCoMKgwqDC
-oMKgwqDCoG1jdHBfcGNjX25kZXYtPmluYm94LmNsaWVudC5yeF9jYWxsYmFjayA9IG1jdHBfcGNj
-X2NsaWVudF9yeF9jYWxsYmFjazsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19uZGV2LT5vdXRi
-b3guY2hhbi0+bWFuYWdlX3dyaXRlcyA9IHRydWU7CgpGcm9tIHYyNToKCj4gTWlub3I6IHlvdSBo
-YXZlIHRoZSBjb252ZW5pZW5jZSB2YXJzIGZvciAtPmluYm94IGFuZCAtPm91dGJveCwgbWF5IGFz
-Cj4gd2VsbCB1c2UgdGhlbS4KCkFsc286IHlvdSdyZSBzZXR0aW5nIHRoZSBjbGllbnQgcnhfY2Fs
-bGJhY2sgKmFmdGVyKiBoYXZpbmcgc2V0IHVwIHRoZQpQQ0MgY2hhbm5lbC4gV29uJ3QgdGhpcyBy
-YWNlIHdpdGggUlggb24gdGhlIGluYm94PwoKPiArc3RhdGljIGludCBpbml0aWFsaXplX01UVShz
-dHJ1Y3QgbmV0X2RldmljZSAqbmRldikKPiArewo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtY3Rw
-X3BjY19uZGV2ICptY3RwX3BjY19uZGV2ID0gbmV0ZGV2X3ByaXYobmRldik7Cj4gK8KgwqDCoMKg
-wqDCoMKgc3RydWN0IG1jdHBfcGNjX21haWxib3ggKm91dGJveDsKPiArwqDCoMKgwqDCoMKgwqBp
-bnQgbWN0cF9wY2NfbXR1Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBvdXRib3ggPSAmbWN0cF9wY2Nf
-bmRldi0+b3V0Ym94Owo+ICvCoMKgwqDCoMKgwqDCoG91dGJveC0+Y2hhbiA9IHBjY19tYm94X3Jl
-cXVlc3RfY2hhbm5lbCgmb3V0Ym94LT5jbGllbnQsIG91dGJveC0+aW5kZXgpOwo+ICvCoMKgwqDC
-oMKgwqDCoG1jdHBfcGNjX210dSA9IG91dGJveC0+Y2hhbi0+c2htZW1fc2l6ZSAtIHNpemVvZihz
-dHJ1Y3QgcGNjX2hlYWRlcik7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKElTX0VSUihvdXRib3gtPmNo
-YW4pKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gUFRSX0VSUihvdXRi
-b3gtPmNoYW4pOwoKWW91IGhhdmUgYWxyZWFkeSBkZXJlZmVyZW5jZWQgb3V0Ym94LT5jaGFuIGJl
-Zm9yZSB0aGlzIGNvbmZpdGlvbmFsLiBNb3ZlCnRoZSB1c2FnZSB0byBhZnRlciB0aGlzIGNoZWNr
-LgoKPiArCj4gK8KgwqDCoMKgwqDCoMKgcGNjX21ib3hfZnJlZV9jaGFubmVsKG1jdHBfcGNjX25k
-ZXYtPm91dGJveC5jaGFuKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRldiA9IG5l
-dGRldl9wcml2KG5kZXYpOwo+ICvCoMKgwqDCoMKgwqDCoG5kZXYtPm10dSA9IE1DVFBfTUlOX01U
-VTsKPiArwqDCoMKgwqDCoMKgwqBuZGV2LT5tYXhfbXR1ID0gbWN0cF9wY2NfbXR1Owo+ICvCoMKg
-wqDCoMKgwqDCoG5kZXYtPm1pbl9tdHUgPSBNQ1RQX01JTl9NVFU7Cj4gKwo+ICvCoMKgwqDCoMKg
-wqDCoHJldHVybiAwOwo+ICt9Cj4gKwo+ICtzdGF0aWMgaW50IG1jdHBfcGNjX2RyaXZlcl9hZGQo
-c3RydWN0IGFjcGlfZGV2aWNlICphY3BpX2RldikKPiArewo+ICvCoMKgwqDCoMKgwqDCoHN0cnVj
-dCBtY3RwX3BjY19sb29rdXBfY29udGV4dCBjb250ZXh0ID0gezB9Owo+ICvCoMKgwqDCoMKgwqDC
-oHN0cnVjdCBtY3RwX3BjY19uZGV2ICptY3RwX3BjY19uZGV2Owo+ICvCoMKgwqDCoMKgwqDCoHN0
-cnVjdCBkZXZpY2UgKmRldiA9ICZhY3BpX2Rldi0+ZGV2Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVj
-dCBuZXRfZGV2aWNlICpuZGV2Owo+ICvCoMKgwqDCoMKgwqDCoGFjcGlfaGFuZGxlIGRldl9oYW5k
-bGU7Cj4gK8KgwqDCoMKgwqDCoMKgYWNwaV9zdGF0dXMgc3RhdHVzOwo+ICvCoMKgwqDCoMKgwqDC
-oGNoYXIgbmFtZVszMl07Cj4gK8KgwqDCoMKgwqDCoMKgaW50IHJjOwo+ICsKPiArwqDCoMKgwqDC
-oMKgwqBkZXZfZGJnKGRldiwgIkFkZGluZyBtY3RwX3BjYyBkZXZpY2UgZm9yIEhJRCAlc1xuIiwK
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYWNwaV9kZXZpY2VfaGlkKGFjcGlfZGV2
-KSk7Cj4gK8KgwqDCoMKgwqDCoMKgZGV2X2hhbmRsZSA9IGFjcGlfZGV2aWNlX2hhbmRsZShhY3Bp
-X2Rldik7Cj4gK8KgwqDCoMKgwqDCoMKgc3RhdHVzID0gYWNwaV93YWxrX3Jlc291cmNlcyhkZXZf
-aGFuZGxlLCAiX0NSUyIsIGxvb2t1cF9wY2N0X2luZGljZXMsCj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgJmNv
-bnRleHQpOwo+ICvCoMKgwqDCoMKgwqDCoGlmICghQUNQSV9TVUNDRVNTKHN0YXR1cykpIHsKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZGV2X2VycihkZXYsICJGQUlMVVJFIHRvIGxv
-b2t1cCBQQ0MgaW5kZXhlcyBmcm9tIENSU1xuIik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoHJldHVybiAtRUlOVkFMOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArCj4gK8KgwqDCoMKg
-wqDCoMKgc25wcmludGYobmFtZSwgc2l6ZW9mKG5hbWUpLCAibWN0cHBjYyVkIiwgY29udGV4dC5p
-bmJveF9pbmRleCk7Cj4gK8KgwqDCoMKgwqDCoMKgbmRldiA9IGFsbG9jX25ldGRldihzaXplb2Yo
-Km1jdHBfcGNjX25kZXYpLCBuYW1lLCBORVRfTkFNRV9QUkVESUNUQUJMRSwKPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtY3RwX3BjY19zZXR1
-cCk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKCFuZGV2KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqByZXR1cm4gLUVOT01FTTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRl
-diA9IG5ldGRldl9wcml2KG5kZXYpOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19pbml0
-aWFsaXplX21haWxib3goZGV2LCAmbWN0cF9wY2NfbmRldi0+aW5ib3gsCj4gK8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGNvbnRleHQuaW5ib3hfaW5kZXgpOwo+ICvCoMKgwqDCoMKgwqDCoG1jdHBfcGNjX2luaXRpYWxp
-emVfbWFpbGJveChkZXYsICZtY3RwX3BjY19uZGV2LT5vdXRib3gsCj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNv
-bnRleHQub3V0Ym94X2luZGV4KTsKPiArwqDCoMKgwqDCoMKgwqBpZiAocmMpCj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gZnJlZV9uZXRkZXY7CgoncmMnIGhhcyBuZXZlciBi
-ZWVuIHNldCBhdCB0aGlzIHBvaW50LgoKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRl
-di0+b3V0Ym94LmNsaWVudC50eF9kb25lID0gbWN0cF9wY2NfdHhfZG9uZTsKPiArwqDCoMKgwqDC
-oMKgwqBtY3RwX3BjY19uZGV2LT5hY3BpX2RldmljZSA9IGFjcGlfZGV2Owo+ICvCoMKgwqDCoMKg
-wqDCoG1jdHBfcGNjX25kZXYtPm5kZXYgPSBuZGV2Owo+ICvCoMKgwqDCoMKgwqDCoGFjcGlfZGV2
-LT5kcml2ZXJfZGF0YSA9IG1jdHBfcGNjX25kZXY7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGluaXRp
-YWxpemVfTVRVKG5kZXYpOwoKaW5pdGlhbGl6ZV9NVFUoKSBoYXMgYW4gaW50IHJldHVybiB2YWx1
-ZTsgZWl0aGVyIG1ha2UgdGhhdCB2b2lkLCBvcgpoYW5kbGUgdGhlIGVycm9yIGhlcmUuCgpDaGVl
-cnMsCgoKSmVyZW15Cg==
+On Thu, Sep 4, 2025 at 1:32=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
+> wrote:
+>
+> On Wed, Sep 3, 2025 at 10:04=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Wed, Sep 3, 2025 at 4:47=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> > >
+> > > If the receive queue contains payload that was already
+> > > received, __tcp_close() can send an unexpected RST.
+> > >
+> > > Refine the code to take tp->copied_seq into account,
+> > > as we already do in tcp recvmsg().
+> > >
+> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> >
+> > Sorry, Eric. I might be wrong, and I don't think it's a bugfix for now.
+> >
+> > IIUC, it's not possible that one skb stays in the receive queue and
+> > all of the data has been consumed in tcp_recvmsg() unless it's
+> > MSG_PEEK mode. So my understanding is that the patch tries to cover
+> > the case where partial data of skb is read by applications and the
+> > whole skb has not been unlinked from the receive queue yet. Sure, as
+> > we can learn from tcp_sendsmg(), skb can be partially read.
+>
+> You can find a clear example in patch 2 that this patch fixes.
 
+Oh, great, a very interesting corner case: resending data with FIN....
+I just wasn't able to read the second patch in time...
+
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+
+Thanks,
+Jason
+
+>
+> Without patch 1, the test fails:
+>
+> # ./ksft_runner.sh tcp_close_no_rst.pkt
+> ...
+> tcp_close_no_rst.pkt:32: error handling packet: live packet field
+> tcp_fin: expected: 1 (0x1) vs actual: 0 (0x0)
+> script packet:  0.140854 F. 1:1(0) ack 1002
+> actual packet:  0.140844 R. 1:1(0) ack 1002 win 65535
+> not ok 1 ipv4
+>
+>
+> >
+> > As long as 'TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb)->seq' has data
+> > len, and the skb still exists in the receive queue, it can directly
+> > means some part of skb hasn't been read yet. We can call it the unread
+> > data case then, so the logic before this patch is right.
+> >
+> > Two conditions (1. skb still stays in the queue, 2. skb has data) make
+> > sure that the data unread case can be detected and then sends an RST.
+> > No need to replace it with copied_seq, I wonder? At least, it's not a
+> > bug.
+> >
+> > Thanks,
+> > Jason
+> >
+> >
+> >
+> >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > ---
+> > >  net/ipv4/tcp.c | 9 +++++----
+> > >  1 file changed, 5 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > index 40b774b4f587..39eb03f6d07f 100644
+> > > --- a/net/ipv4/tcp.c
+> > > +++ b/net/ipv4/tcp.c
+> > > @@ -3099,8 +3099,8 @@ bool tcp_check_oom(const struct sock *sk, int s=
+hift)
+> > >
+> > >  void __tcp_close(struct sock *sk, long timeout)
+> > >  {
+> > > +       bool data_was_unread =3D false;
+> > >         struct sk_buff *skb;
+> > > -       int data_was_unread =3D 0;
+> > >         int state;
+> > >
+> > >         WRITE_ONCE(sk->sk_shutdown, SHUTDOWN_MASK);
+> > > @@ -3119,11 +3119,12 @@ void __tcp_close(struct sock *sk, long timeou=
+t)
+> > >          *  reader process may not have drained the data yet!
+> > >          */
+> > >         while ((skb =3D __skb_dequeue(&sk->sk_receive_queue)) !=3D NU=
+LL) {
+> > > -               u32 len =3D TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb=
+)->seq;
+> > > +               u32 end_seq =3D TCP_SKB_CB(skb)->end_seq;
+> > >
+> > >                 if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
+> > > -                       len--;
+> > > -               data_was_unread +=3D len;
+> > > +                       end_seq--;
+> > > +               if (after(end_seq, tcp_sk(sk)->copied_seq))
+> > > +                       data_was_unread =3D true;
+> > >                 __kfree_skb(skb);
+> > >         }
+> > >
+> > > --
+> > > 2.51.0.338.gd7d06c2dae-goog
+> > >
+> > >
 
