@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-219934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 858CCB43C16
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:53:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66539B43C18
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17DDB1C24060
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:53:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C8E77B8A52
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761582FDC28;
-	Thu,  4 Sep 2025 12:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEC02FF14C;
+	Thu,  4 Sep 2025 12:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="UoxlIyKq"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ggGLlRa9"
 X-Original-To: netdev@vger.kernel.org
 Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011021.outbound.protection.outlook.com [52.101.70.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E962FDC3E;
-	Thu,  4 Sep 2025 12:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E5A2FDC41;
+	Thu,  4 Sep 2025 12:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.21
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756990376; cv=fail; b=d7dld46DlAmkkxFW3iuZrpH1nEi5QlmTuKsxI4m7ncAmFbMEU+phXW1hLBEQx4HUURqann84blmgTJwzoHddSNlqE3br5vC8Bi+PBWSvJCSVJddUP/y6Toy9j24JStTGU0VLbVEi2VOI82iKOqfTgyuCx8BUglTTNUzmchkfPv0=
+	t=1756990379; cv=fail; b=g97IlF3O2b5bCMpt7Bw4grL5CPobaGqv5Xj48WuSkosMwTRCOgwLiyOUJkPLw8H7SVTkeNDqjt7C+PM2KHVPaGmOLSItW2PZSfgZFqTLLFCR1aizPpeUHhpUrK/Y/NnPbYioOFsANlEt65D9gEgS4jQSAIe4YLKvSjCmkq7kMHY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756990376; c=relaxed/simple;
-	bh=yVeIEeSSp5mmNAFLfrWYIw9HF7oiL0X9tXw9Fn9wqvk=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=OebqdNmnvOi7qe+UmLt2plGiLUyrSL/DLzR7U13neCKGzwKmTZnVEbWc+NVgV8k60qaIxMtwuUrJf2Xr6u6dhGP0fOJ+w2PPvzgkkfQvHIMDWZwEy0l1zFOo67GQY5vcxjpMWj2XCGzotgrTvqQ4tvjwlEycI+ORvYb/g2jVgvQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=UoxlIyKq; arc=fail smtp.client-ip=52.101.70.21
+	s=arc-20240116; t=1756990379; c=relaxed/simple;
+	bh=2N5i5BpqdYElFqkGyBCOHhSjl5q7HHdGA9KURmdn6f0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WTGyH3mZimkGVuOLJZzlHuo4FdE+yDo8mQDnC+bHNjnRBsOCLYcBZes/ZaBomzJT3lec3QJus8VmoN+5gosN1YHuXAwmKaahs28noYdbWda22HunjhRLw/q3b3ZQzLxxmCpU4Z1FlaBclITaFGSX0JVTFiz3yao2znAetZQVgTw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ggGLlRa9; arc=fail smtp.client-ip=52.101.70.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PNq9rWAaTfS7KbtabZvR9ULhg5greT9djXUlInjLTY6oie9rZMkd9EuPEt9ijzjkKJXux5QMm3wGoD8rn2Xa3WImXJMOroVQNXkgbcQUdkNXUcvJIlscGsD6ia5bGfSGHLfu9petBNSglpbpMupR/D2djTr+50POS1TXU8xwWy4jTwI3tuUC09ork6iDWkfwdjMn3xYtC7kNG55TT6JUfX8G97PSgI4Ger+q52mO0zlfmCGatuZrwBALCNYaXv3aaqq0yEirPmuTZiknx+hdUApsYL9Pq1922yvlN9MHyELYLATX1ca3TOWk1qXq6CMfTN3WCEuMLFGGJFj1D0Zx1w==
+ b=yXeUOFdpOpUPkefb+nVi9qskAYE/qPIaiQCq9e+pl+T3swTAB1ly3n5RykQiltf3eh5Q6cNA2+0LUC+b/+l+mbq1H6n3lWv+SI7HIa7DCuS/PEz7hbCCQxP+kplLU3S0/6hmjVFezn3d5Iwkz88iN1V8A2hBhxm24MS8Q7epKvGR+KdKy/u4G+j/s3JO4JCFMoT/cThJmsLpX40G0T2fNLcsQGl3PvqbW8Xu37ZJf+FFJg0Mffw1BbmdCt64CRpyRHCBPAkGskPT3VhSMmxNAiC8HKkwO88ABdQIkxjASuwXadX+pE+xYPgmx104nXjjMNi4gLr/60tA4KeX/oemAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wZ8kIuwBi73EGYcYWqgkb0eeSMH4VTaP+izeuP5Xe4E=;
- b=hMa16nl16OdtIqrG0fOpFFeX74IKB1AIQYoOcYvZwk21iLdXh4PofS9j+qUx4J0YTUcT4EcHfNjPcyhuL0ir1dQpimssjlozeAs2fHg9MsrZjhA2YrO4LJsqfdlG/l0hd00x/Qn2xquKbBd891pDFpKGPiZuRN2CIjpAfGXetpp5sdAplxPeMitz7GlNOO73t3SD+qYtJMqwaIX8jBlkYUaGXt28mHlgFoT+ZzrNav0MKZQOHLYUY4ujoxGn+lKkQkdjIjnTLmYCa/j/E5+akzdV5zQIq7E9sPjHjMoD7IjBArMNkDQxtTAZWRcKCoRrvma620EanLSAZ7VBpcG27g==
+ bh=A7FZxjR90/YrFAxe+bZ83SYbRgcFF00ofoN3+ycVIl0=;
+ b=JA71Y8iUPMxHW1n+AvQ/7bF9EjLwG6d2xhwP29kxJSn33xr8maa9NpA9o3N5I5O/wFbq9x+9NmrwKBQmj4FAuHTuooLzUmCCwciBm0994ugQgG5bTpdLZjkS1v7dcbR2xJlgs3qd7Sc3sO71BIJ5R86u7lgSQyrvp3yOtAeo+VAmXeFahQdkceNlAPOWlNrhVz2YyDP0H0BXGo/79l6+3RZFo8etGpBuBCtCjNfT2D53bKrNPdk5W7SZx4HPfAf6thzwXOcRzdGTDwi9RZE1VnXfI1wRdomcG75gjwGsyTcZ8zVT6EFPiIUscGTR+YkLE0CMnDJaq2I8LcLekgyK3Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wZ8kIuwBi73EGYcYWqgkb0eeSMH4VTaP+izeuP5Xe4E=;
- b=UoxlIyKqgvo9lJrKFLmwFLKcWyKjrc8RH9dr19obi1rlagg1loDnrbjoAf6ijMnyIwspu0gw1OodfhamKwvn9LKrryeV/Tt1LHWT62DDG8HxRVl5fyHvQ6ZoeyTpFzOJBrWQGbEGBJcxSoUx0qBwW14npXTW6guCvom5+NyXj9p7v2dVVPMaI+v1uaf+Oj0TCi7Ob1SuBZgZyCa8VyDlWCuMBj1Aljc9nn0XJ9SGyM/KDf5aRpNYK1x7EQGFYEphU+wou3+wSYOLbcNTp1zmHseiVal9x6p7Q1w21jPy8LVzx2eejjhKCDqbzssenStbZYfuOcqmv8Up4TC4CIt00w==
+ bh=A7FZxjR90/YrFAxe+bZ83SYbRgcFF00ofoN3+ycVIl0=;
+ b=ggGLlRa9TpDSlWQxIFPv2WFv4ewNvebu6JHBJGJX1wUSwzAnjRn0pim9ShnftW0qI/5wYuhy4kwhqfT7wFhAO49mQMaJFiKsz3YktqI0TfhmRCKFWGNKso1ndZNUbXHOfYl7aYiU3aMXvdPJIaAVmc1GFuugfGjsmYnrtlvNL8lLlJtzdNT7Yn5gkzv2Yf0SlB1FmQNv8jE6z4T6LjwIOyGVM2ffxZLMQvVH/XvwiQM++vbYZ4+IedXVHZodPF3zxOjGOLRuv/RmdwIdpDVACgUtiXPOy/UiFA8CjB62hTTC7V91HTVY+yhXzhycgKAo4gpBffIw98zZ62XqtNoUQw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
  by VI1PR04MB9836.eurprd04.prod.outlook.com (2603:10a6:800:1d9::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Thu, 4 Sep
- 2025 12:52:49 +0000
+ 2025 12:52:51 +0000
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2%7]) with mapi id 15.20.9094.016; Thu, 4 Sep 2025
- 12:52:49 +0000
+ 12:52:50 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -65,10 +66,12 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 net 1/2] net: phylink: add lock for serializing concurrent pl->phydev writes with resolver
-Date: Thu,  4 Sep 2025 15:52:37 +0300
-Message-Id: <20250904125238.193990-1-vladimir.oltean@nxp.com>
+Subject: [PATCH v3 net 2/2] net: phy: transfer phy_config_inband() locking responsibility to phylink
+Date: Thu,  4 Sep 2025 15:52:38 +0300
+Message-Id: <20250904125238.193990-2-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250904125238.193990-1-vladimir.oltean@nxp.com>
+References: <20250904125238.193990-1-vladimir.oltean@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: AS4P190CA0040.EURP190.PROD.OUTLOOK.COM
@@ -82,212 +85,285 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI1PR04MB9836:EE_
-X-MS-Office365-Filtering-Correlation-Id: 062239e8-4fa8-4094-eff3-08ddebb1f40e
+X-MS-Office365-Filtering-Correlation-Id: 45b325c2-c92d-4a9e-3010-08ddebb1f4c2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|1800799024|19092799006|376014|52116014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?l2kM9RdgrIYumhu5vEqNlzkVpAWSa6GSTOntptqsfVN4RxZSRlq8dAtlwjGn?=
- =?us-ascii?Q?2Gg2SEeLqJo8F3RDVYxhDT1UkWDF+emRDS/rmGmXdUy5G8EU7teG76yZk87X?=
- =?us-ascii?Q?WD6Z8H7xWdNMUMBI8PwoWpzC1DbK0oom2p3kMe5Gp1Q7HYsrmdu9zv90yNeb?=
- =?us-ascii?Q?Yt/rw0mUHIKKGWsaWBYAOZNC++liSH7wchUsTRLSPo36TsG0CW0SNu//CsXx?=
- =?us-ascii?Q?YlPVBQt1QYVBq2MCvTZD2KTTJK/xHAmmpf1BI47T2xNgJytvxFfxiC9dEFoJ?=
- =?us-ascii?Q?XvN0k9Y7rdV7tAosJORerPHtZdIHIfk/uVdARClWlv1jGG+IRIZW8cOK35e7?=
- =?us-ascii?Q?43fiCiOG9eS2Qzl6maT4+qlmOXhn1FBl1/xGPwb72Y02pRlpLLPd7KN2ZyAz?=
- =?us-ascii?Q?n67g6Px2NNxfgkD7X4Q7RkhEhc6niIBRhYwpOTfaT2A52VvJ6w8UIOB85iZE?=
- =?us-ascii?Q?/Z0lRZnUtnDUQg9+UoJvnJ7DO8GNmo0XqykVCo1Ox9a/t2XZbIp3V0roN0tW?=
- =?us-ascii?Q?SE5mlA1oho6tI1ug+XUJ3vmf06U3gRJpzdTJV1taRG1D9U8PZYPD41MHXdw9?=
- =?us-ascii?Q?9SrHBV8FJqiaSu83dF8eoWseHNEaavxO7VEpJQoH8ktgsJ4quS/6BGK/U1Ph?=
- =?us-ascii?Q?bOxVVpXxS38Q4OuoYzXN3pSWzwCcmvUZGCDOazl/QZPDr30rHw5Kkboh+eaK?=
- =?us-ascii?Q?8dQAPMFaB1ZQQGOe3Pr3maf+I8QpLNwJ+FDfZyjJB7F2iBW2pIaR4wA+BupD?=
- =?us-ascii?Q?gt+ICxa5iPl9WW7ReuAXPlbuoABXloW7KYFs2h8hxzh90p67AsWEEbG15FNZ?=
- =?us-ascii?Q?fDEnpQJgtgIaED/kMaYcI8lCe0//pPH2ZQ6ylkZ7KiMbtBLZc3XKHCy8ud9u?=
- =?us-ascii?Q?LU0TUmi5e5fXwKUXXtcnC9sKXqT3wEVkdcnOC/tVgzJvPG7mVe8xzEyFke9/?=
- =?us-ascii?Q?OLMRLIUcaqyVtZ2v6kmsPfdMC6uEG6i4wnqglq1DapuGRHrzlMw9DwUv7T5e?=
- =?us-ascii?Q?b7QrG/2ZKz7hB5+lflSUiRSMN1P//sfTIG85xrS/5bibhHiXW5/d5Y1GHdco?=
- =?us-ascii?Q?mabKlAvzsJ82r26kCeS8IW5Yzirqi8nvgsEqe9JdiFX3GfAtA9AmfeeHj9tg?=
- =?us-ascii?Q?7RuZu4azWBMn2TVyadMuU8uL0eMQoU9ETanr2QMOp9YeV+grXbS4z84ICqdk?=
- =?us-ascii?Q?eKy8B89MzTaHGA+GPTuK2uQMcPUIr+pmWlV28XR77Y0eLPMBLWqdea7pyqoC?=
- =?us-ascii?Q?R7EiOTraVk3Lwm6A/DRVDw13yqhwYoJvRFcYe546vDxPJKGxO3b1CAQVuiww?=
- =?us-ascii?Q?3+VkRkwqRCPEw5Bobs0pBf5s2Jryn4+CZOz327Nmrxm85W9R2ZpuZYlIrX81?=
- =?us-ascii?Q?uYUL9yklKn46zsyKH0JDwAXoDA3Pi4r2pd+wSG2E/Mmkgkhun0GWBwIk0nYQ?=
- =?us-ascii?Q?izwWtd6mMxjjf+ILzDXxXTOvTZZPeqhV?=
+	=?us-ascii?Q?gWOwwdBwndBqSvONHAfNmqAY5n2bnAgsAgXLPcsRQ5lmHVaMe4gvqznNTmfm?=
+ =?us-ascii?Q?KqQKFpTqVLlh620QC3HE9dZeWs58b6FLc/ug2601qg0r+pUcj3C+j+6QQdzT?=
+ =?us-ascii?Q?GGO+OEUSGmF3v0T/vtK7LT3vcYJ4LkGgM2nfJBFa7e32vUo931VUx79uYbOV?=
+ =?us-ascii?Q?c4752H6JTSR0M3JjcFAINy65Qv4IMo03p4MkHQvWLvxn2E2ug+eFE3UcDR3Q?=
+ =?us-ascii?Q?t6FclYOLi5uESKTHlzXGzDwOJVRemVic9BgysAy2sSNsReN5h0YGnPUA/1U4?=
+ =?us-ascii?Q?/F1CFQtPjcowcvwHUSxbgQ92PZg5i7hXU00mcvS7JhtnbC+omSjQT+p9M+5Y?=
+ =?us-ascii?Q?t413aPkCYwv6BhBkuv6zAVvRQk7ZmfF4PRmu4t3Vc9SpBGO9HZClS6bH2w0m?=
+ =?us-ascii?Q?6As2GfDeyKHHGm3SYlNL5Rto6ZfkjyxKgovvS8G0TOmGyo9G0XdSgNt3ph0h?=
+ =?us-ascii?Q?FK8/yRAbvzpcz3/oePHTxN8tpZaf/kMM1mith5aDG8SuqQXbaBUnMvGTg8mP?=
+ =?us-ascii?Q?XHfjRvUKKnZzoFSdiOSNwGNeEl8p8wIf9sRVJuXRGIQc9WgP+a5m9PejyOwg?=
+ =?us-ascii?Q?Skv2PzGdvakdoTmNPA6gy6rnLmh5YMkC3hVRQgHyBFj4/e1f4NQxW8A6RLTH?=
+ =?us-ascii?Q?C+J4rQMalo4iOaomokGYn63xyqKl+BxjpqoRIHOdrV1EDnzTRzGRdeqIiVAO?=
+ =?us-ascii?Q?FZjyzEIyHAEC+l88BHvWlo/ESYeIhZsODHTq7+ILF3sm/u4EwcsJmjkaNjAx?=
+ =?us-ascii?Q?3mB7kitqP3sjcTSetuiI+oeUVlQrWML6hOaIXU5gDAKw2mfGrpN3swwbilO2?=
+ =?us-ascii?Q?8+Bwbl/szvZJwMKu9UTtFVuN1fKzUz+nK+yIlEW04yPXOFoP2x4MM/3tlcfB?=
+ =?us-ascii?Q?gP1Fw4ghxCXwAJFD3wN9BtGwW2U8MiUD/ruJwSUm/akh2Fd6sCVI3cx1+jBo?=
+ =?us-ascii?Q?EWs2C8BeXB3KnJeDTUUJ07kHdyQaGV/aFAXbKXoE5Xie3Mw9bix7vyusuTW6?=
+ =?us-ascii?Q?P7ZSiAp79EkKdiRDTqn9T6pCbUwdkOoUu3C9MA/eUFDHQiOIJweZcId9rtZN?=
+ =?us-ascii?Q?rYPxYvB0bSnquo3Qo0cy4yo9U7KqTH1OlzCou6FB4GOCQvwQzfy2DdP7qnYf?=
+ =?us-ascii?Q?b9nmNHq69o+g5flbTQKAoB6sRxiT77RAY4QlPsfgssue0kh20M/QIMRBCir6?=
+ =?us-ascii?Q?/KfWobcyjQDjlNKqCd5d0XIY1Jrba/GK0fLipjjgrtxgXLJ1TKc7HNyTxWyL?=
+ =?us-ascii?Q?rSn2vcegTz7fbYNtMJFTG4Esvv3TcIQi9Nta43A/blhFWVjDktfl1ldlWTYO?=
+ =?us-ascii?Q?trvbZB0iHj3l+fMf0NchSnfcD1sRWLHB2/6C5NIoEGtCommW0B+2SnYLsOTM?=
+ =?us-ascii?Q?kXhjzM766e20Hfd7nEBtlsbdP5WFExlOAoZqekd0LBK6Ac29nuIiUNMb72sd?=
+ =?us-ascii?Q?dOLE0t7VtwcvsMg5nq0MzPBxILmtmpfd?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?F5Bunz8i9QvnYsCTIdC/pwZO4ing+mPP5ChUUvgkrXf8WV8zalRIkSKv1jQO?=
- =?us-ascii?Q?AYbSEJDa9VoVH/1epzKD3yy2QfDjyjQ/tdvHEISma6uEnmn4xmPNmQ+9H9ms?=
- =?us-ascii?Q?w1zeVCEweDKx6hDUgVvqw6/Q+D+LAWXOyMQZY4QZC8QK2J0RLUgGfLFxW3fH?=
- =?us-ascii?Q?ABhjoMCpXdifVpoKYZRCB191ciNhMcLc38ba0EnaE1AjdmtMXQQuGTswzbyP?=
- =?us-ascii?Q?XJ5nnKTm72pZFoBlVmbVlbYa0JSBk/SxpgCab7y217PjPWabPYGReC+xTQYC?=
- =?us-ascii?Q?fb4PA4UigZQPkRsP3e1F7vX6INnw/h9SBBD3BsnUSI2yTpNtF9crs/am70X5?=
- =?us-ascii?Q?ufLPFTQB7HMuuSy/zzt+FwwekvTv413g3+1xtx+lZJqxt4t24Ap/GUsW/4s3?=
- =?us-ascii?Q?nlDzHnm/Dhnxcav0m525elRbPF/O6G/mLQH0E0a/FgIhAMokjz8P9Ilh0YEX?=
- =?us-ascii?Q?BfMEfKeWqAmIbvr9O7/V3S91bBK+9oeY2QF4Ix0LHA+mQ8HoX8FFZ2g7Wg30?=
- =?us-ascii?Q?x1xjAU5d0x5Q6Q2gCFfi+pQa4pox7lXyEofpIHkcMpHM4vrKoIVj/sM/k7GC?=
- =?us-ascii?Q?v4Jm9J7krqlDXmOdA3008mflGdLet0wXqryghqoh42Zk4IpuipQFps1/YjU/?=
- =?us-ascii?Q?jXTsEskldVYovzhYw7UQ/fBbZC4e9KlWVZWpmzYmNmFmMcakC4plNnURPwh1?=
- =?us-ascii?Q?VgVyl1F9i3nhIq0aNYtmfnVHhwLjHl37ikYnSzTzw/yyqeSUAmXmBxU6+bDs?=
- =?us-ascii?Q?yHm+CYvbrD8uKZx5CkDLBkzYuHf2rxgrwLL/fssEe0F0Ebd8CenzO+8EmRvh?=
- =?us-ascii?Q?2QlaP1CfkeLVfPXTCPoW5CK6eqPzZ53K0DlKT+KxmDCG41uIDmpRqcNyPOgh?=
- =?us-ascii?Q?fHiDsD2/dr5t4LhmguRS7hGWJALzKVNcHXEQ85i9qbCLOsZ6ohN1VoXZkQQy?=
- =?us-ascii?Q?Vb5lglTOqQFGowPzBYzFYe5TCeS6hyLfzJZ0tiyapq8jMjRB+wDXxESGd3dH?=
- =?us-ascii?Q?Tsj6e9GmbKErFUXQ44CLTGA7p3dpy+clWmt0fBZJUTxkokcUZVX1kKonmaLc?=
- =?us-ascii?Q?ncJutaEPT+qwJ6gPZ1LA37pWJvZH1Yf3U4NMGzhqF3N+yEyUIJVsVp1AJCaN?=
- =?us-ascii?Q?PbeRQCM3wxXL+v4BIAdCR94D4HpfsU+N6JAtlaLjlStDihMaTjsY2yR/g/up?=
- =?us-ascii?Q?IaGZNx5MIMxjhPBEuRSeWo2/p6176iLV49OWuC7BcBA9pDYLV6/7YGAyXSsN?=
- =?us-ascii?Q?S3cTkx37sDprWNQzlO7FWCnYpnfIrDNLsT+FHV8OFYqHE1EZlPnBbfgNz52u?=
- =?us-ascii?Q?Fu1g1QAgTSl3IhmGf8kQ7BMVeEVn9912siefxrgBJixJ3VHYXAFo5aOx2d6z?=
- =?us-ascii?Q?0Mq+dekb96e7eqsrkOMcVXCA2CO3hReiJGxSLV4MblSDdF/bHTEEsM85GPZ0?=
- =?us-ascii?Q?NFqf1xG096uBLTpzgZfrZC6zhsVu7Ia0bXGL5rNQlJteZIwf7uREMAxKf7yS?=
- =?us-ascii?Q?GNuAc93xPTuIiVZjNf8lMJzPfNzeR8RQXxRqE7IInOhPaxHc13ZSEwAEejqR?=
- =?us-ascii?Q?WMTSllVv2HgO3zVTVmewuZdX6V4FA8vWmB6vs/JMLB7WPhullNz1wt11iZO9?=
- =?us-ascii?Q?QQ=3D=3D?=
+	=?us-ascii?Q?/WAWGt0Y4j8pRPEdap5VLIa+pvyuC6JWsrKdb3727D6tODSFL7DvLaKOu6i3?=
+ =?us-ascii?Q?T3J1E3qORX4hDHUBkhUDnYjQNEJX8c2GG48Dh3wor+29v4LF42sXVpbRcJmT?=
+ =?us-ascii?Q?h2qCJ3jPjBxR0X8bkJ6O8j+IVzQj8393cXI3IQ+5/4YOMlzGafkjpIf7YGuA?=
+ =?us-ascii?Q?78jscUz1h1KdLOXs5EKQQmim9Rj6InZavbsDNb0KvjcZkbmPsiLon2jmaS2i?=
+ =?us-ascii?Q?/eDSD6ED9ijVZYwcWE5rPEC5ETnZ3h5dIB8btKD6p4hGRcUy8WCNP5MjL7gC?=
+ =?us-ascii?Q?5KK1efDzEUZ0TOWA7p/u/wKA8khuesiCnpiSLWFWqud5ROH+75rCtnM27bJJ?=
+ =?us-ascii?Q?509D/cLH5SX3lLitNmf7Zub9Z0EnHBRPXojHAil6l0+KOd7EVQG2PoqwXCfk?=
+ =?us-ascii?Q?GbNpfvG6aUO71v77dziBQQ5D37cL08U5PZUYmpFIwP3Msp5lebLVwGGL9yCb?=
+ =?us-ascii?Q?Wrug0OsyT/3bV01W/W4khhY2hV/MuxoZzOTI2ngU4RbsnwgJoEbggz4GWhZU?=
+ =?us-ascii?Q?DyNIh16/MtST/hugPUWC7tmih1RihLkllyLRB/xhwb+EqKCBDChIm/wqTrNZ?=
+ =?us-ascii?Q?bKENoDiA+F5dsM8icfGGUTJgGfibBikCg+7QFh96mDqESpVi2SizWk7MhRKn?=
+ =?us-ascii?Q?V9a35rsm4/ZN3277GNT1ppNyQBEs36ZLM6+WiqjMRU2aTkc/QRhHTli9pq5l?=
+ =?us-ascii?Q?0/is0QX4Hl1qQkYsbBbYyHlpP7Sgn+EUXib2cRcNpeYUrK9Pqyj7ZyvxpfkO?=
+ =?us-ascii?Q?N8pQYk+rOvVQtUvIMWUIBXrLgjV+ZOt45SFdF4hJ9ECOU2XfmkgytycrZxQz?=
+ =?us-ascii?Q?3ZvIUjEYHtLway7GdBLJLcqaORTMtu4jhY/sOsbx0UGo1ZetfPOZJ5QUZjT7?=
+ =?us-ascii?Q?99w97qkUWMe9JcqOIfgppQa9xXGa7e5iWjMGjKLEQL9kLlrVS2ItXhzF9H26?=
+ =?us-ascii?Q?tSz0F4GPdBtgyuRw2GTNMLEscWPy81OdDM6hlY2QZqzT2iklyb2n4MHGDcHS?=
+ =?us-ascii?Q?J4KgvWDzt6TlOHGuPexoAQe9VWJ/UZ1xTyQvQaz64lkqmbgpS7HH77NcZlQM?=
+ =?us-ascii?Q?nN4QMTmozP7YcaIfvDBidA7RtOMUpQYGdLy7E1rDxoFApngKeC+lteImE7g7?=
+ =?us-ascii?Q?vmzpzdXAhKjiqM11TXTLaD0Lx5zqoanuDBISkscbnTNQfx9W0HE2x79JWppg?=
+ =?us-ascii?Q?dpt+QW3JoDX7YjPZ3kZLqFZqF0yEvUMzA1tVH2VO2fcwEf/OnqgpuJy0q6SZ?=
+ =?us-ascii?Q?hhb4orkO0OHeQfDGB1/TIteMuZmVQLzAeNg9haOsU5hvSZl4A4cM7ElMq6po?=
+ =?us-ascii?Q?XrKJFcbTvgHVQzaw4WWXr+XPW641cwyL6Nb0wFFlM69PuZ8CUe5CfSRFMJAR?=
+ =?us-ascii?Q?XXNZpv79M3ejA9ci3xg2G/UeXNb0+hQU1McdXMqp9nFCWOtofDdrvPnXL3jr?=
+ =?us-ascii?Q?LW3aCGO6Bqx7RnhI5SyfgghI6s1p3cEehuhd0dR65dKtN9hfU5oT2L0pnJ39?=
+ =?us-ascii?Q?PvJ13T3jBZi1j6d7cS+Ixkp4R5XMP22FDpbGSzKQO1FGCEaHUevb5hl7rXyZ?=
+ =?us-ascii?Q?OA/N4daU0qGx+KuYrAIQxzfAMfe7avDklE7JvbFiMuzLvonm9/DSk9Ik4NwM?=
+ =?us-ascii?Q?Eg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 062239e8-4fa8-4094-eff3-08ddebb1f40e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45b325c2-c92d-4a9e-3010-08ddebb1f4c2
 X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2025 12:52:49.7144
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2025 12:52:50.8400
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bMZ+2G+7LXhfA6O0RObQubKFyibxMIIWo9ZsdTV9zQ+cLymiSrthnq7yeOVvi6224YVZQyrdGAuTVxbFTPJs5g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Cb24RRDu0I6JDeqjYq64j5K67STl9mAJuA2UDuyf3RCfi8pFPo4pMFGHMTRxyvIYFDuToV7ImEhKdkOxn6VsnQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB9836
 
-Currently phylink_resolve() protects itself against concurrent
-phylink_bringup_phy() or phylink_disconnect_phy() calls which modify
-pl->phydev by relying on pl->state_mutex.
+Problem description
+===================
 
-The problem is that in phylink_resolve(), pl->state_mutex is in a lock
-inversion state with pl->phydev->lock. So pl->phydev->lock needs to be
-acquired prior to pl->state_mutex. But that requires dereferencing
-pl->phydev in the first place, and without pl->state_mutex, that is
-racy.
+Lockdep reports a possible circular locking dependency (AB/BA) between
+&pl->state_mutex and &phy->lock, as follows.
 
-Hence the reason for the extra lock. Currently it is redundant, but it
-will serve a functional purpose once mutex_lock(&phy->lock) will be
-moved outside of the mutex_lock(&pl->state_mutex) section.
+phylink_resolve() // acquires &pl->state_mutex
+-> phylink_major_config()
+   -> phy_config_inband() // acquires &pl->phydev->lock
 
-Another alternative considered would have been to let phylink_resolve()
-acquire the rtnl_mutex, which is also held when phylink_bringup_phy()
-and phylink_disconnect_phy() are called. But since phylink_disconnect_phy()
-runs under rtnl_lock(), it would deadlock with phylink_resolve() when
-calling flush_work(&pl->resolve). Additionally, it would have been
-undesirable because it would have unnecessarily blocked many other call
-paths as well in the entire kernel, so the smaller-scoped lock was
-preferred.
+whereas all the other call sites where &pl->state_mutex and
+&pl->phydev->lock have the locking scheme reversed. Everywhere else,
+&pl->phydev->lock is acquired at the top level, and &pl->state_mutex at
+the lower level. A clear example is phylink_bringup_phy().
 
-Link: https://lore.kernel.org/netdev/aLb6puGVzR29GpPx@shell.armlinux.org.uk/
+The outlier is the newly introduced phy_config_inband() and the existing
+lock order is the correct one. To understand why it cannot be the other
+way around, it is sufficient to consider phylink_phy_change(), phylink's
+callback from the PHY device's phy->phy_link_change() virtual method,
+invoked by the PHY state machine.
+
+phy_link_up() and phy_link_down(), the (indirect) callers of
+phylink_phy_change(), are called with &phydev->lock acquired.
+Then phylink_phy_change() acquires its own &pl->state_mutex, to
+serialize changes made to its pl->phy_state and pl->link_config.
+So all other instances of &pl->state_mutex and &phydev->lock must be
+consistent with this order.
+
+Problem impact
+==============
+
+I think the kernel runs a serious deadlock risk if an existing
+phylink_resolve() thread, which results in a phy_config_inband() call,
+is concurrent with a phy_link_up() or phy_link_down() call, which will
+deadlock on &pl->state_mutex in phylink_phy_change(). Practically
+speaking, the impact may be limited by the slow speed of the medium
+auto-negotiation protocol, which makes it unlikely for the current state
+to still be unresolved when a new one is detected, but I think the
+problem is there. Nonetheless, the problem was discovered using lockdep.
+
+Proposed solution
+=================
+
+Practically speaking, the phy_config_inband() requirement of having
+phydev->lock acquired must transfer to the caller (phylink is the only
+caller). There, it must bubble up until immediately before
+&pl->state_mutex is acquired, for the cases where that takes place.
+
+Solution details, considerations, notes
+=======================================
+
+This is the phy_config_inband() call graph:
+
+                          sfp_upstream_ops :: connect_phy()
+                          |
+                          v
+                          phylink_sfp_connect_phy()
+                          |
+                          v
+                          phylink_sfp_config_phy()
+                          |
+                          |   sfp_upstream_ops :: module_insert()
+                          |   |
+                          |   v
+                          |   phylink_sfp_module_insert()
+                          |   |
+                          |   |   sfp_upstream_ops :: module_start()
+                          |   |   |
+                          |   |   v
+                          |   |   phylink_sfp_module_start()
+                          |   |   |
+                          |   v   v
+                          |   phylink_sfp_config_optical()
+ phylink_start()          |   |
+   |   phylink_resume()   v   v
+   |   |  phylink_sfp_set_config()
+   |   |  |
+   v   v  v
+ phylink_mac_initial_config()
+   |   phylink_resolve()
+   |   |  phylink_ethtool_ksettings_set()
+   v   v  v
+   phylink_major_config()
+            |
+            v
+    phy_config_inband()
+
+phylink_major_config() caller #1, phylink_mac_initial_config(), does not
+acquire &pl->state_mutex nor do its callers. It must acquire
+&pl->phydev->lock prior to calling phylink_major_config().
+
+phylink_major_config() caller #2, phylink_resolve() acquires
+&pl->state_mutex, thus also needs to acquire &pl->phydev->lock.
+
+phylink_major_config() caller #3, phylink_ethtool_ksettings_set(), is
+completely uninteresting, because it only calls phylink_major_config()
+if pl->phydev is NULL (otherwise it calls phy_ethtool_ksettings_set()).
+We need to change nothing there.
+
+Other solutions
+===============
+
+The lock inversion between &pl->state_mutex and &pl->phydev->lock has
+occurred at least once before, as seen in commit c718af2d00a3 ("net:
+phylink: fix ethtool -A with attached PHYs"). The solution there was to
+simply not call phy_set_asym_pause() under the &pl->state_mutex. That
+cannot be extended to our case though, where the phy_config_inband()
+call is much deeper inside the &pl->state_mutex section.
+
+Fixes: 5fd0f1a02e75 ("net: phylink: add negotiation of in-band capabilities")
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
 v2->v3:
-- clarify in the commit message that rtnl_lock() in phylink_resolve()
-  wouldn't have worked
-- s/phy_lock/phydev_mutex/
-- expand and refactor critical section in phylink_disconnect_phy()
-- make use of the local "phy" variable in phylink_resolve()
+- remove the patch hunk which replaced "pl->phydev" with the local "phy"
+  variable in phylink_resolve(). It's now in the previous patch.
+
 v2 at:
-https://lore.kernel.org/netdev/20250903152348.2998651-1-vladimir.oltean@nxp.com/
-v1->v2: patch is new
+https://lore.kernel.org/netdev/20250903152348.2998651-2-vladimir.oltean@nxp.com/
 
- drivers/net/phy/phylink.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+v1->v2:
+- rebase over new patch which introduces pl->phy_lock
+- add "Other solutions" section
 
+v1 at:
+https://lore.kernel.org/netdev/20250902134141.2430896-1-vladimir.oltean@nxp.com/
+
+ drivers/net/phy/phy.c     | 12 ++++--------
+ drivers/net/phy/phylink.c |  9 +++++++++
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 13df28445f02..c02da57a4da5 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1065,23 +1065,19 @@ EXPORT_SYMBOL_GPL(phy_inband_caps);
+  */
+ int phy_config_inband(struct phy_device *phydev, unsigned int modes)
+ {
+-	int err;
++	lockdep_assert_held(&phydev->lock);
+ 
+ 	if (!!(modes & LINK_INBAND_DISABLE) +
+ 	    !!(modes & LINK_INBAND_ENABLE) +
+ 	    !!(modes & LINK_INBAND_BYPASS) != 1)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&phydev->lock);
+ 	if (!phydev->drv)
+-		err = -EIO;
++		return -EIO;
+ 	else if (!phydev->drv->config_inband)
+-		err = -EOPNOTSUPP;
+-	else
+-		err = phydev->drv->config_inband(phydev, modes);
+-	mutex_unlock(&phydev->lock);
++		return -EOPNOTSUPP;
+ 
+-	return err;
++	return phydev->drv->config_inband(phydev, modes);
+ }
+ EXPORT_SYMBOL(phy_config_inband);
+ 
 diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index c7f867b361dd..386d37f6bad4 100644
+index 386d37f6bad4..76cc6f6d671b 100644
 --- a/drivers/net/phy/phylink.c
 +++ b/drivers/net/phy/phylink.c
-@@ -67,6 +67,8 @@ struct phylink {
- 	struct timer_list link_poll;
- 
- 	struct mutex state_mutex;
-+	/* Serialize updates to pl->phydev with phylink_resolve() */
-+	struct mutex phydev_mutex;
- 	struct phylink_link_state phy_state;
- 	unsigned int phy_ib_mode;
- 	struct work_struct resolve;
-@@ -1582,8 +1584,11 @@ static void phylink_resolve(struct work_struct *w)
+@@ -1425,6 +1425,7 @@ static void phylink_get_fixed_state(struct phylink *pl,
+ static void phylink_mac_initial_config(struct phylink *pl, bool force_restart)
+ {
  	struct phylink_link_state link_state;
- 	bool mac_config = false;
- 	bool retrigger = false;
-+	struct phy_device *phy;
- 	bool cur_link_state;
++	struct phy_device *phy = pl->phydev;
  
-+	mutex_lock(&pl->phydev_mutex);
-+	phy = pl->phydev;
+ 	switch (pl->req_link_an_mode) {
+ 	case MLO_AN_PHY:
+@@ -1448,7 +1449,11 @@ static void phylink_mac_initial_config(struct phylink *pl, bool force_restart)
+ 	link_state.link = false;
+ 
+ 	phylink_apply_manual_flow(pl, &link_state);
++	if (phy)
++		mutex_lock(&phy->lock);
+ 	phylink_major_config(pl, force_restart, &link_state);
++	if (phy)
++		mutex_unlock(&phy->lock);
+ }
+ 
+ static const char *phylink_pause_to_str(int pause)
+@@ -1589,6 +1594,8 @@ static void phylink_resolve(struct work_struct *w)
+ 
+ 	mutex_lock(&pl->phydev_mutex);
+ 	phy = pl->phydev;
++	if (phy)
++		mutex_lock(&phy->lock);
  	mutex_lock(&pl->state_mutex);
  	cur_link_state = phylink_link_is_up(pl);
  
-@@ -1617,11 +1622,11 @@ static void phylink_resolve(struct work_struct *w)
- 		/* If we have a phy, the "up" state is the union of both the
- 		 * PHY and the MAC
- 		 */
--		if (pl->phydev)
-+		if (phy)
- 			link_state.link &= pl->phy_state.link;
- 
- 		/* Only update if the PHY link is up */
--		if (pl->phydev && pl->phy_state.link) {
-+		if (phy && pl->phy_state.link) {
- 			/* If the interface has changed, force a link down
- 			 * event if the link isn't already down, and re-resolve.
- 			 */
-@@ -1685,6 +1690,7 @@ static void phylink_resolve(struct work_struct *w)
+@@ -1690,6 +1697,8 @@ static void phylink_resolve(struct work_struct *w)
  		queue_work(system_power_efficient_wq, &pl->resolve);
  	}
  	mutex_unlock(&pl->state_mutex);
-+	mutex_unlock(&pl->phydev_mutex);
++	if (phy)
++		mutex_unlock(&phy->lock);
+ 	mutex_unlock(&pl->phydev_mutex);
  }
  
- static void phylink_run_resolve(struct phylink *pl)
-@@ -1820,6 +1826,7 @@ struct phylink *phylink_create(struct phylink_config *config,
- 	if (!pl)
- 		return ERR_PTR(-ENOMEM);
- 
-+	mutex_init(&pl->phydev_mutex);
- 	mutex_init(&pl->state_mutex);
- 	INIT_WORK(&pl->resolve, phylink_resolve);
- 
-@@ -2080,6 +2087,7 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
- 		     dev_name(&phy->mdio.dev), phy->drv->name, irq_str);
- 	kfree(irq_str);
- 
-+	mutex_lock(&pl->phydev_mutex);
- 	mutex_lock(&phy->lock);
- 	mutex_lock(&pl->state_mutex);
- 	pl->phydev = phy;
-@@ -2125,6 +2133,7 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
- 
- 	mutex_unlock(&pl->state_mutex);
- 	mutex_unlock(&phy->lock);
-+	mutex_unlock(&pl->phydev_mutex);
- 
- 	phylink_dbg(pl,
- 		    "phy: %s setting supported %*pb advertising %*pb\n",
-@@ -2303,6 +2312,7 @@ void phylink_disconnect_phy(struct phylink *pl)
- 
- 	ASSERT_RTNL();
- 
-+	mutex_lock(&pl->phydev_mutex);
- 	phy = pl->phydev;
- 	if (phy) {
- 		mutex_lock(&phy->lock);
-@@ -2312,8 +2322,11 @@ void phylink_disconnect_phy(struct phylink *pl)
- 		pl->mac_tx_clk_stop = false;
- 		mutex_unlock(&pl->state_mutex);
- 		mutex_unlock(&phy->lock);
--		flush_work(&pl->resolve);
-+	}
-+	mutex_unlock(&pl->phydev_mutex);
- 
-+	if (phy) {
-+		flush_work(&pl->resolve);
- 		phy_disconnect(phy);
- 	}
- }
 -- 
 2.34.1
 
