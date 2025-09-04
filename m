@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C11CAB43F78
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 16:46:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1512B43F5B
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 16:43:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6731CC2A14
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:43:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40859168AFE
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D11311C39;
-	Thu,  4 Sep 2025 14:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741FF312824;
+	Thu,  4 Sep 2025 14:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BL3yW5WO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bi9gj1bo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FF830E837
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 14:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C47D3126C5;
+	Thu,  4 Sep 2025 14:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756996829; cv=none; b=f0Y2E4uFTV1WfKdJKViMRfB1Qkriuece2/oClmujPkIyyXtySykmLvF2BMnMfC8bBKAihAmHgQmI/sY49J1m4trWgfRFO61cWvkpXH1W86aXw069GSgs2DnsxjiA+qIl49spswh/l5C+cTBmoMiAqyi2QYyWZ/1RyfS5r4whPlo=
+	t=1756996830; cv=none; b=myd9+usurfKY29Ct6R+JIT2EbbT6SVxkB7tOIlREmD/nZKUToBbMnXspMc7SFxgrCVxfVD+sZyPWV80Nxk5vwvdPbEaOBIY9FlMn8FVj2VfPIkXnPmv03EyGwwg+irN1J14aGTg/e3nLOxlQ3UiHVtYj3GATYzt4HEMSS7RcaiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756996829; c=relaxed/simple;
-	bh=iRpZbWTTVO6pnYK2nmAaWkaAuh98yany+tbMCO/q36c=;
+	s=arc-20240116; t=1756996830; c=relaxed/simple;
+	bh=zLL5RYX12tQnydPFucGhVNmYZb5bvJKkl4lN7Q+TVhE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FmHLCu3yPxPfptQpOF/Y3RWgoiwlCe4dhXXzuFF74FS7OS0nd3g+yOptlQeesMGiWE6QfAZtLlilNSpnAX/pIbvvIBEqOiJPdPLBGeTyKETZ+TFuhD/5qZ2bMY17uShManAbgtY0xSdDUBnWCNRPssIkgbLxvZbn64EgYBx0gU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BL3yW5WO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F4ACC4CEF0;
-	Thu,  4 Sep 2025 14:40:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=unDzZa9FH+cUwbo8jogLIJnHX0X3NgJV+65ZwYmPuIGcjl47TEo0oLcptb9x+dYTupVwAk1KGxLkVpo0DCroPqXGH8EH5Mz+TvN0r1IYT0CLcxDrPOdO8L1Ws+1b8i2XtoZ9QdlojkOCp/B+ZaniCTncbkpfudK9pAhzq80PzQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bi9gj1bo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FF3FC4CEF0;
+	Thu,  4 Sep 2025 14:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756996828;
-	bh=iRpZbWTTVO6pnYK2nmAaWkaAuh98yany+tbMCO/q36c=;
+	s=k20201202; t=1756996830;
+	bh=zLL5RYX12tQnydPFucGhVNmYZb5bvJKkl4lN7Q+TVhE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BL3yW5WOCjIlGNjv5+xRt+a5YHRe311pSGMylirFZZF2zkFFBsIaj8GDsS+eOk4lR
-	 Rkp0Jc0uz4c1YPwxnHwN3hMgNvQmH3esN7yoYlRTTrGTB5NDt5UkuefKaRiBV4r6ue
-	 CeTz49pWkbOdJ4aGlPi8biD0Z39D6TOnRo3sn8kPLyQbOA+fLWOSQH7egMmLr7zy5j
-	 E8S38YqHKrizVkdRcwTSWP9w2Sv/AZJCKsii+QXqajF2axDh3E6GWfg9FCqSFooAcH
-	 sEF0JIdybzx+Hc0sXqH7ObZetMeVuMvhVGfYP8RPBWtxzXdags8aD6yFDWZ1crETI0
-	 c41Xt+HyN0+8g==
+	b=Bi9gj1bo9iUHSAEGZUBP9o/Hh2sK1uU1Z3bSyQve9bWypS97Vlbom1L5Dtfrq4qx0
+	 tY1sv7BFudG8xS9LRjCeTUdYeQrDahPvCa58ZljQWuuFm2loB1Y7qyFGomYt7CyEaV
+	 Xnff6fVuhavNza104DDlGF+jx4+Ud62qqpla0h27uQxVCRKC6aZtE4oIGN7H7Uztl9
+	 sRvYe3SEIj/sVHH2LbYe02Zu3SsQHvGP/vQhubeY1ygZ/+C2YhBet6awOPHIdqO91p
+	 OTvVFD9sVg+Rol+5qKIC1iLgb2Ij7ViO145VgoCTbkL7EAILJieUgkhiza0KzniZyo
+	 JD3gQWBHRtymg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE40383BF69;
-	Thu,  4 Sep 2025 14:40:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34AC8383BF69;
+	Thu,  4 Sep 2025 14:40:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] MAINTAINERS: add Sabrina to TLS maintainers
+Subject: Re: [PATCH v2 net 1/2] selftests: netfilter: fix udpclash tool hang
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175699683349.1834386.2234858409679400209.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Sep 2025 14:40:33 +0000
-References: <20250903212054.1885058-1-kuba@kernel.org>
-In-Reply-To: <20250903212054.1885058-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- john.fastabend@gmail.com, sd@queasysnail.net
+ <175699683476.1834386.17488693717476628261.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Sep 2025 14:40:34 +0000
+References: <20250904072548.3267-2-fw@strlen.de>
+In-Reply-To: <20250904072548.3267-2-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Florian Westphal <fw@strlen.de>:
 
-On Wed,  3 Sep 2025 14:20:54 -0700 you wrote:
-> Sabrina has been very helpful reviewing TLS patches, fixing bugs,
-> and, I believe, the last one to implement any major feature in
-> the TLS code base (rekeying). Add her as a maintainer.
+On Thu,  4 Sep 2025 09:25:47 +0200 you wrote:
+> Yi Chen reports that 'udpclash' loops forever depending on compiler
+> (and optimization level used); while (x == 1) gets optimized into
+> for (;;).  Add volatile qualifier to avoid that.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> cc: john.fastabend@gmail.com
-> cc: sd@queasysnail.net
+> While at it, also run it under timeout(1) and fix the resize script
+> to not ignore the timeout passed as second parameter to insert_flood.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] MAINTAINERS: add Sabrina to TLS maintainers
-    https://git.kernel.org/netdev/net/c/6a989d37302a
+  - [v2,net,1/2] selftests: netfilter: fix udpclash tool hang
+    https://git.kernel.org/netdev/net/c/661a4f307fe0
+  - [v2,net,2/2] netfilter: nf_tables: Introduce NFTA_DEVICE_PREFIX
+    https://git.kernel.org/netdev/net/c/4039ce7ef404
 
 You are awesome, thank you!
 -- 
