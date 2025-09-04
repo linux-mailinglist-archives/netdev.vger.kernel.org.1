@@ -1,101 +1,62 @@
-Return-Path: <netdev+bounces-219880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0983FB438C5
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C508BB438CF
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 12:34:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C74E1582864
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:33:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78DBA58338F
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D99B2BEC20;
-	Thu,  4 Sep 2025 10:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA282EDD4D;
+	Thu,  4 Sep 2025 10:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TtMZjazK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tEOa0jH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3473B5661
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 10:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441C321859A;
+	Thu,  4 Sep 2025 10:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756982007; cv=none; b=EYjVuKPIl4fr8YjoggembRLykqh18Uu+nguNgzbi7l0WyYqYtHVKjYi5jhtYRlGb6ZIPkI0O6sTsyKKOZA/06pgQ8I7a826ujeXfh64ymAt15w88bRMdM+MDgNWpW4n0M61Wo1injWEwURKmwV0G6twKzHgwSCLighR5/6qMLbU=
+	t=1756982088; cv=none; b=RBw+AXwGrjDw9IWb9uxrvZR7PMj9ILYQQSlQgH3NilgXZjOeZ774U63BMInZExUC7LsYetK4cSNTEkehv1qpu1mgTsOwo+/9Ewip5xovYVw74eyAPvPfj9OtxS4VQXRNwYRbVPDE2Qt0aa39I8tXc8KHxUqFLNaFRAeCsDDYbUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756982007; c=relaxed/simple;
-	bh=NjbJf+oAzaVSfqbpRClaBTKWISkSDannBo1jz5hnakU=;
+	s=arc-20240116; t=1756982088; c=relaxed/simple;
+	bh=E5fsuSav1cTXloSIvOFthsHyAkRUga0iYM80pkvxqXo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XnCTTIAGB3t48TgsXNXhPrKW8JWbkHTkBI5rQSN1CHe/r/xkOzJqAolSHi4gR3P9ttIX7XxOYynjjQIoBQLC8rWKP61B0a5mFoLq67mMg733ia38jdt59sZfGXTYGtwxaujU21+vKmximionSRcGUvB1p5rfLLnhDueht9tB7o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=TtMZjazK; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id D27037A0053;
-	Thu,  4 Sep 2025 06:33:23 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Thu, 04 Sep 2025 06:33:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1756982003; x=1757068403; bh=NjbJf+oAzaVSfqbpRClaBTKWISkSDannBo1
-	jz5hnakU=; b=TtMZjazK1WZCVEih8ZXJRPwey+zOGfDb3M7XIwzN7OZztR6DhGb
-	SzBK/zjTgWWPBjgauQIOLM/g1+PeOjAMS4h2fUj0j1tyd4hWyncKFcWcjc1hrlG1
-	8wjKDAfm7zKClHAupvuxto1ar8NU9N1jW7HbIlka7nI3wdyvUimDGsXe99bgL6jR
-	ATMSjBeljpOtnjNKtHHbxu+vmDIQ6LvQOFBWoIbc2uLFCOZn6PTxAHUAriszdlEk
-	Z440oHfVOW3WBpwpwRVzkDhUwwu2S2eXNQ36DXWC3/+p90Q7Fh/3/DKn0ImpcxZw
-	lkMII3iy1ta1IeEkcw/sunhFn3yjwVnWaXA==
-X-ME-Sender: <xms:82q5aNSXfzPeu1miH1U9nYh_QvqVRPXqbOMDc7rlPxF-WjQK4-eQ2A>
-    <xme:82q5aCrwEFYG2tTclhNgCRou5yp4A5NPJdZJXQKWnF220PCabuGWFrcKnrzUEc0mp
-    d1SgaERI-utlV4>
-X-ME-Received: <xmr:82q5aP0Yf3_kcAhcqW0vPJmcZsfYB8NJy8TSSknB_ohzPmMNnMIe0XslGgHbwsg9mqkd3RNC4zNZoYQeglvKh7HZo0E5HQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehjeelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgthhhi
-    mhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvghrnh
-    epvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeggefhnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstg
-    hhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehrihgtrghrugessggvjhgrrhgrnhhordhiohdprhgtphhtth
-    hopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehmihhkrgdrfigvshhtvghr
-    sggvrhhgsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhitghhrggvlhdrjhgrmhgv
-    thesihhnthgvlhdrtghomhdprhgtphhtthhopeihvghhvgiikhgvlhhshhgssehgmhgrih
-    hlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdp
-    rhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvg
-    guuhhmrgiivghtsehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:82q5aJ5c_qW-b_iVkiIRTyl2qxqNwrNtUy860DjUvZZnq_p5Bo-zhw>
-    <xmx:82q5aLScfGKT7EkzofjSvtziH3W6pmnCitX_ZS22YVzwSJcT18Xy1A>
-    <xmx:82q5aOWtdqS7dcd_EyBXkk3533eNmM87DB2MHPNGuq7RrFAYNtjphg>
-    <xmx:82q5aAFfatJa5Pg4I4FlrEQKS-aH1w44dVa4b1vrRJHYnscj2ZG9fA>
-    <xmx:82q5aLZoKCMUb-u8Xy6Csh5msD06-_brVo1X6fa0rtORef3zhcxvlirF>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 4 Sep 2025 06:33:22 -0400 (EDT)
-Date: Thu, 4 Sep 2025 13:33:19 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Ricard Bejarano <ricard@bejarano.io>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	netdev@vger.kernel.org, michael.jamet@intel.com,
-	YehezkelShB@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-Message-ID: <aLlq79or3c3brul_@shredder>
-References: <71C2308A-0E9C-4AD3-837A-03CE8EA4CA1D@bejarano.io>
- <b033e79d-17bc-495d-959c-21ddc7f061e4@app.fastmail.com>
- <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
- <F42DF57F-114A-4250-8008-97933F9EE5D0@bejarano.io>
- <0925F705-A611-4897-9F62-1F565213FE24@bejarano.io>
- <75EA103A-A9B8-4924-938B-5F41DD4491CE@bejarano.io>
- <aLYAKG2Aw5t7GKtu@shredder>
- <A68375CA-57E1-4F53-877D-480231F07942@bejarano.io>
- <aLfxueDGLngEb7Rw@shredder>
- <E0922A4A-5715-4758-B067-ACB401BDB363@bejarano.io>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m48IUFkE0bER/xZJYpl34AeWLx/P3xdWoK/NzElv9GDriobcJb/S09fk5VyC9bMQV4A7PSenBYuCLUw/XBSBIzEFS6cdGBh6HVh1OlaFmYaWFjEIUCVVwwIMORQgfAFS5wwiOZGkijdcryDTX1ezpe3lrLt8//B3fj5Rk1VENgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tEOa0jH0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2465BC4CEF8;
+	Thu,  4 Sep 2025 10:34:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756982087;
+	bh=E5fsuSav1cTXloSIvOFthsHyAkRUga0iYM80pkvxqXo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tEOa0jH0jMSyfwjgJz4Mxd6GGKXLT9k5fPU+kzlyT4/pGd4tZamEByKAkG9rmOpfR
+	 SAgS9Cl8LV5HYoO27JRNrqSwpxqd46N+CB4KqCFfx4YjRy2nCM9hJqgRSU2BYtlvyP
+	 P87Dl2kjJt380IBgN4Wo28I2z4XMCB/xEr4Rcbp0P5bPEVnYWvAip1DHmX2Zv3gLst
+	 /gigMdvV6Sbb65sJPbS4YzrBLWHlJAHLoLoYA0bigx9shO25wEVMIKFPFsbl2xbwwq
+	 SobDyMhHt/SK+Y8qbl5NIfan43uN0HMO/8BTJsGHmGiU+piJUW3dIMBhRPdmBmyRV4
+	 APmt7uu2wfoFA==
+Date: Thu, 4 Sep 2025 11:34:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
+ contain invalid address
+Message-ID: <20250904103443.GH372207@horms.kernel.org>
+References: <20250904031222.40953-3-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,30 +65,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E0922A4A-5715-4758-B067-ACB401BDB363@bejarano.io>
+In-Reply-To: <20250904031222.40953-3-ziyao@disroot.org>
 
-On Thu, Sep 04, 2025 at 10:56:29AM +0200, Ricard Bejarano wrote:
-> My assumption was that, due to CRC checksum failures causing L2 loss at every
-> rx end, and because of TCP congestion control back-off, TCP bandwidth drops
-> exponentially with the number of hops.
-> So the problem is not so much the TCP vs. UDP bandwidth, but the L2 loss
-> caused by CRC errors. That L2 loss happens at the rx end because that's when
-> CRC checksums are checked and frames are dropped, but other than cable
-> problems I can only assume that's a bug in the tx end driver.
-> I believe that's why Andrew Lunn pointed at the driver's handling of SKBs with
-> fragments as the possible culprit, but the fix breaks the test completely.
+On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
+> We must set the clk_phy pointer to NULL to indicating it isn't available
+> if the optional phy clock couldn't be obtained. Otherwise the error code
+> returned by of_clk_get() could be wrongly taken as an address, causing
+> invalid pointer dereference when later clk_phy is passed to
+> clk_prepare_enable().
+> 
+> Fixes: da114122b831 ("net: ethernet: stmmac: dwmac-rk: Make the clk_phy could be used for external phy")
+> Signed-off-by: Yao Zi <ziyao@disroot.org>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> On next-20250903, the fixed commit causes NULL pointer dereference on
+> Radxa E20C during probe of dwmac-rk, a typical dmesg looks like
+> 
+> [    0.273324] rk_gmac-dwmac ffbe0000.ethernet: IRQ eth_lpi not found
+> [    0.273888] rk_gmac-dwmac ffbe0000.ethernet: IRQ sfty not found
+> [    0.274520] rk_gmac-dwmac ffbe0000.ethernet: PTP uses main clock
+> [    0.275226] rk_gmac-dwmac ffbe0000.ethernet: clock input or output? (output).
+> [    0.275867] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: tx_delay.
+> [    0.276491] rk_gmac-dwmac ffbe0000.ethernet: set tx_delay to 0x30
+> [    0.277026] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: rx_delay.
+> [    0.278086] rk_gmac-dwmac ffbe0000.ethernet: set rx_delay to 0x10
+> [    0.278658] rk_gmac-dwmac ffbe0000.ethernet: integrated PHY? (no).
+> [    0.279249] Unable to handle kernel paging request at virtual address fffffffffffffffe
+> [    0.279948] Mem abort info:
+> [    0.280195]   ESR = 0x000000096000006
+> [    0.280523]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [    0.280989]   SET = 0, FnV = 0
+> [    0.281287]   EA = 0, S1PTW = 0
+> [    0.281574]   FSC = 0x06: level 2 translation fault
+> 
+> where the invalid address is just -ENOENT (-2).
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index cf619a428664..26ec8ae662a6 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1414,11 +1414,17 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+>  	if (plat->phy_node) {
+>  		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+>  		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+> -		/* If it is not integrated_phy, clk_phy is optional */
+> +		/*
+> +		 * If it is not integrated_phy, clk_phy is optional. But we must
+> +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
+> +		 * the error code could be wrongly taken as an invalid pointer.
+> +		 */
+>  		if (bsp_priv->integrated_phy) {
+>  			if (ret)
+>  				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+>  			clk_set_rate(bsp_priv->clk_phy, 50000000);
+> +		} else if (ret) {
+> +			bsp_priv->clk_phy = NULL;
+>  		}
+>  	}
 
-If you suspect driver/hardware problems, you can try to disable features
-that the driver claims to support and see what helps. You can start by
-disabling all of them, see if it works and then try to pinpoint the
-actual culprit.
+Thanks, and sorry for my early confusion about applying this patch.
 
-ethtool -K tb0 tcp-segmentation-offload off
-ethtool -K tb0 scatter-gather off
-ethtool -K tb0 tx-checksum-ipv4 off
-ethtool -K tb0 tx-checksum-ipv6 off
+I agree that the bug you point out is addressed by this patch.
+Although I wonder if it is cleaner not to set bsp_priv->clk_phy
+unless there is no error, rather than setting it then resetting
+it if there is an error.
 
-I think this should cover it, but you can check the output of "ethtool -k"
-and see if there are other hardware related features that are still
-enabled.
+More importantly, I wonder if there is another bug: does clk_set_rate need
+to be called in the case where there is no error and bsp_priv->integrated_phy
+is false?
+
+So I am wondering if it makes sense to go with something like this.
+(Compile tested only!)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+index 266c53379236..a25816af2c37 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+@@ -1411,12 +1411,16 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+ 	}
+ 
+ 	if (plat->phy_node) {
+-		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+-		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+-		/* If it is not integrated_phy, clk_phy is optional */
+-		if (bsp_priv->integrated_phy) {
+-			if (ret)
++		struct clk *clk_phy;
++
++		clk_phy = of_clk_get(plat->phy_node, 0);
++		ret = PTR_ERR_OR_ZERO(clk_phy);
++		if (ret) {
++			/* If it is not integrated_phy, clk_phy is optional */
++			if (bsp_priv->integrated_phy)
+ 				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
++		} else {
++			bsp_priv->clk_phy = clk_phy;
+ 			clk_set_rate(bsp_priv->clk_phy, 50000000);
+ 		}
+ 	}
+
+Please note: if you send an updated patch (against net) please
+make sure you wait 24h before the original post.
+
+See: https://docs.kernel.org/process/maintainer-netdev.html
 
