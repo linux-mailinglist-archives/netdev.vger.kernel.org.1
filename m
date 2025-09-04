@@ -1,69 +1,92 @@
-Return-Path: <netdev+bounces-219795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207E8B4304D
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:14:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711A5B4305B
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 05:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0DEB207999
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:14:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7FA565E05
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 03:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38CA27FB06;
-	Thu,  4 Sep 2025 03:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C752528313D;
+	Thu,  4 Sep 2025 03:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="IAZv1PYE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQf1d51o"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED391C8CE;
-	Thu,  4 Sep 2025 03:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC8384E07;
+	Thu,  4 Sep 2025 03:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756955637; cv=none; b=kQLMoGmN9mbMFtWV/kkdIZLAUFei8eGZr3yyMnXp2F770ZdAVIwGHB7fdJsAtdR/qPGI/RpYMqLDvSeHz1H8j6iT6UPG/qSYYgRz0f3E2yv30NPO9Rpi4P9tBz+Pg0FaugNH19a/yfG0dtqb4IzkycSRlUD+uJcAE/jXGobYqkQ=
+	t=1756955841; cv=none; b=GENNSjIKgYTqOEbhmfoNZBw9sfcPsp5d5SXsebJ9YOrZ0EU5AfXsxLQyW3tiLlYkYFvRNKonw/+J7Vc80PL+wDJJd2u2bf0PyzLTpGvVIEMKuoawVNhN/bmHNM3yz7siZGw0w9TVXISYLa3W/hgUvNKet6pDZzBlhwACYjBqYJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756955637; c=relaxed/simple;
-	bh=/9+CJqX1fS+UiFee8YHounmOVjuOHZemA2Z3M9XlkQs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NwIGSuSJYyhO6feLNqDLbrpsVaR6OY6O8zCi16ku7VgK2EhRKBlwgqHXjzTAD22CJwYkbpXldoIxIt/FC52cG/8VfMgeY5PHNLCNoBK2z4m1EFUTP0YP8sSQ66VPg+S4Y2EB3anunZjQGySNEE48GyU7dPG6VO8MLw65ISB4fao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=IAZv1PYE; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 32F9D25C7A;
-	Thu,  4 Sep 2025 05:13:53 +0200 (CEST)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id AFJ3nJp-J8Y8; Thu,  4 Sep 2025 05:13:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1756955632; bh=/9+CJqX1fS+UiFee8YHounmOVjuOHZemA2Z3M9XlkQs=;
-	h=From:To:Cc:Subject:Date;
-	b=IAZv1PYEoOH/IBuhDPdjQ4Yr/XQmioZXmZxqmEvX5yuLh2NdlEYpFZjl3mxfeoNS4
-	 6rFOh2EKybtfqR4bpdUwloekmlRk11lxNpgIAW3yppbGdZ7X++wXuXgTo3dNcKbfDq
-	 8u/7F3suLrnFoAj7aidkPIkUqvuBFecg0Dqj14398qr5kFjx+0sUCwmxHZkEQV3ePn
-	 LE1ogfDoNip3D8BDIdxLxB0ynM+3e0TEupGIBcMFXOsM2WNaaJPFg5EQy6H7AibfQZ
-	 BYBWv95rX6375Uk3k4FY38MNvulpBHDtm3uwu6650sI3ZDjZbZeYwxm1dtp1fzAu1S
-	 hwUSTZpKZJVvQ==
-From: Yao Zi <ziyao@disroot.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	David Wu <david.wu@rock-chips.com>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>
-Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1756955841; c=relaxed/simple;
+	bh=EejBiLCxFjywog9sanmt7MIEAs+lWXOyyyaShAeNxJM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kjfq3nkujJ7e5vyFtiwr810tEMIXM/K2o0l84VKmKgPQ2PiTMRDQM7Ck6j38AVLTg7mrube3ZH7A9XQ5WIczpsbkyhaRDTxT1zta4nsJe5IEQFu0nN1uzZ9CHN7LlhJcwyk92wFeAVKxITWyfDzImaeLA1aGgDptRhQ1bJhBoaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GQf1d51o; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2489acda3bbso4968025ad.1;
+        Wed, 03 Sep 2025 20:17:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756955839; x=1757560639; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwlGz5VRP5ZkPZgUDr33RtSbQBaIWanoj51psutpytY=;
+        b=GQf1d51o0STNXobnIiFyOeVVBGuohSOGQFoSalQL8qsJGEfthBCSnm1pxFifshmXB8
+         AIrKm7BNHVWTS8UtuJhSkijp1+5ElI5tTe8B7UGRLCO2gGdQOXzjMH+VlCknXXULSdXy
+         PtRZB+ntSweLyyW/WvmwH0amISTJxRwFRzbd/PlYwurpFRT6pL5ZYGNBgwFPWIysBTvz
+         NrSxd3yYnUtJbqG3Dp0ksg4NGfdNGnea4RDys1kERDknlVBKR9RabLkmc1ZboAI609Tq
+         U/TmiVSAiSFB9FMWj92S72vSQn7fsh/o0inf/TtZ/rKQFvzd7AiTFwCeUcXR6CK0dSH3
+         jlng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756955839; x=1757560639;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CwlGz5VRP5ZkPZgUDr33RtSbQBaIWanoj51psutpytY=;
+        b=T4gixqfm/2W33tJM2RpyCvLSFpktXr+PfWOsf8CI/3WNUVnJtJsa7m3IL4hR3+9Dcy
+         sC0s/mdZt6qnUJOW4A697T9FQI90A1krqn0TrHGkD9NVmmpd3ty5FW8AGJslEXnOUX03
+         gLeugLUYomxttORashIyYjX3QxQ+bA9V65af3EseV5z4UW66hwTi53jotAWbnWPiZKA0
+         kNJSrziHtWsbIMbYBT6OutXV2rJVb9IH0GG4Iynccx4gOCd4Cwxd9H4eYsUjfT068qCZ
+         LIYHq5yftBtartEajBdwJeXwuoj5TtyBU0GlkmAxIRG9ADWPyPk8yd2nTuFyjNQi+tvR
+         zkKg==
+X-Forwarded-Encrypted: i=1; AJvYcCU575lFgPmBted81xUZXfBJa4XgefU9/9eYQxqJL3YqETDxhgG3oOzkDWHXXlcHAzyU0zLM87np@vger.kernel.org, AJvYcCUer3NJqdM6j9JwiiX4inOVYL2KeLiUzH2WJsNT7HKGC/YslS1/2bsfmrUkO6IU/tlOHGmMiStxgwpHwhlc@vger.kernel.org, AJvYcCXL+J0/gurKkanJnK9ixU7Mzl8k/YGsQM4eIQlhOrM3fjAmXNaxnxygVJDOxTjwybMt49HGvWsXA1o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSmADVXYfNeZkkJSc5I8AeNzDC5tsoj1F9T7jcHJqjsALJVirZ
+	z0Q8qW5vtB4c2yD1VbDLyrxl5lZQXHwjK6BwSYaWoRchowL+rhr+n3+d
+X-Gm-Gg: ASbGncuGqO4A1vWL5gm1k8g2wCJSq4YLAKfP5yYlDNzahrIFjwZG6bs9r+9xyf/4G/T
+	eSmo+k9aVLbRpAXAqNWqpEmnPswI8OBCNRoIqch80uf488h5WCA8MgwGg0hgZKVlECGgtArsvru
+	s3z1f7dfksDonKlGkwYTr5WX6gudWjK8zfyoRdC0YgxwpiKOT7ukV6ZyKyrs+WDD02ZYg3KYg69
+	QyjIKUsvyfORxvq8fa4gzFvFwRLe071cl0tS0zTrUqWV3ck1u893BfjP3+SWPmacu0mR0VF4ssH
+	gnGj0ZRMLIOB+ebRlpqOc20gUQit9WSCH98ATjz6rrwjp1ACaN2dALmvDkbE2Y1spA7Q+KiN9GM
+	jE5ZwOnYHEsLtkPcLc/ebSkwRW/AW4Iw2/qO88Ho+M+M2bsNJ8wJQ
+X-Google-Smtp-Source: AGHT+IGCYG6pexWrVDLMOJuhlbs7lAQKJ4a7SRLhFW234N8oy90hekqLgqNebBrdrdxE6UWCH2y2xw==
+X-Received: by 2002:a17:903:98f:b0:24c:cb6b:105b with SMTP id d9443c01a7336-24ccb6b138cmr8087135ad.25.1756955839363;
+        Wed, 03 Sep 2025 20:17:19 -0700 (PDT)
+Received: from fedora ([172.59.162.44])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24ca63c9e71sm25284835ad.95.2025.09.03.20.17.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 20:17:18 -0700 (PDT)
+From: Alex Tran <alex.t.tran@gmail.com>
+To: socketcan@hartkopp.net
+Cc: mkl@pengutronix.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	Yao Zi <ziyao@disroot.org>
-Subject: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't contain invalid address
-Date: Thu,  4 Sep 2025 03:12:24 +0000
-Message-ID: <20250904031222.40953-3-ziyao@disroot.org>
+	Alex Tran <alex.t.tran@gmail.com>
+Subject: [PATCH v1] docs: networking: can: change bcm_msg_head frames member to support flexible array
+Date: Wed,  3 Sep 2025 20:17:09 -0700
+Message-ID: <20250904031709.1426895-1-alex.t.tran@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,64 +95,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We must set the clk_phy pointer to NULL to indicating it isn't available
-if the optional phy clock couldn't be obtained. Otherwise the error code
-returned by of_clk_get() could be wrongly taken as an address, causing
-invalid pointer dereference when later clk_phy is passed to
-clk_prepare_enable().
+The documentation of the 'bcm_msg_head' struct does not match how
+it is defined in 'bcm.h'. Changed the frames member to a flexible array,
+matching the definition in the header file.
 
-Fixes: da114122b831 ("net: ethernet: stmmac: dwmac-rk: Make the clk_phy could be used for external phy")
-Signed-off-by: Yao Zi <ziyao@disroot.org>
+See commit 94dfc73e7cf4 ("treewide: uapi: Replace zero-length arrays with
+flexible-array members")
+
+Bug 217783 <https://bugzilla.kernel.org/show_bug.cgi?id=217783>
+
+Signed-off-by: Alex Tran <alex.t.tran@gmail.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ Documentation/networking/can.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On next-20250903, the fixed commit causes NULL pointer dereference on
-Radxa E20C during probe of dwmac-rk, a typical dmesg looks like
-
-[    0.273324] rk_gmac-dwmac ffbe0000.ethernet: IRQ eth_lpi not found
-[    0.273888] rk_gmac-dwmac ffbe0000.ethernet: IRQ sfty not found
-[    0.274520] rk_gmac-dwmac ffbe0000.ethernet: PTP uses main clock
-[    0.275226] rk_gmac-dwmac ffbe0000.ethernet: clock input or output? (output).
-[    0.275867] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: tx_delay.
-[    0.276491] rk_gmac-dwmac ffbe0000.ethernet: set tx_delay to 0x30
-[    0.277026] rk_gmac-dwmac ffbe0000.ethernet: Can not read property: rx_delay.
-[    0.278086] rk_gmac-dwmac ffbe0000.ethernet: set rx_delay to 0x10
-[    0.278658] rk_gmac-dwmac ffbe0000.ethernet: integrated PHY? (no).
-[    0.279249] Unable to handle kernel paging request at virtual address fffffffffffffffe
-[    0.279948] Mem abort info:
-[    0.280195]   ESR = 0x000000096000006
-[    0.280523]   EC = 0x25: DABT (current EL), IL = 32 bits
-[    0.280989]   SET = 0, FnV = 0
-[    0.281287]   EA = 0, S1PTW = 0
-[    0.281574]   FSC = 0x06: level 2 translation fault
-
-where the invalid address is just -ENOENT (-2).
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index cf619a428664..26ec8ae662a6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1414,11 +1414,17 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
- 	if (plat->phy_node) {
- 		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
- 		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
--		/* If it is not integrated_phy, clk_phy is optional */
-+		/*
-+		 * If it is not integrated_phy, clk_phy is optional. But we must
-+		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
-+		 * the error code could be wrongly taken as an invalid pointer.
-+		 */
- 		if (bsp_priv->integrated_phy) {
- 			if (ret)
- 				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
- 			clk_set_rate(bsp_priv->clk_phy, 50000000);
-+		} else if (ret) {
-+			bsp_priv->clk_phy = NULL;
- 		}
- 	}
+diff --git a/Documentation/networking/can.rst b/Documentation/networking/can.rst
+index bc1b585355f7..7650c4b5be5f 100644
+--- a/Documentation/networking/can.rst
++++ b/Documentation/networking/can.rst
+@@ -742,7 +742,7 @@ The broadcast manager sends responses to user space in the same form:
+             struct timeval ival1, ival2;    /* count and subsequent interval */
+             canid_t can_id;                 /* unique can_id for task */
+             __u32 nframes;                  /* number of can_frames following */
+-            struct can_frame frames[0];
++            struct can_frame frames[];
+     };
  
+ The aligned payload 'frames' uses the same basic CAN frame structure defined
 -- 
-2.50.1
+2.51.0
 
 
