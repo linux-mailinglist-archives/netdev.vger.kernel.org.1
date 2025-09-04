@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-220154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29F0CB4491D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 00:06:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D24B44902
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 00:03:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 515F91C21BB1
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:06:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E1A1A46310
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8F92ECD1C;
-	Thu,  4 Sep 2025 22:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CEA2D7DEE;
+	Thu,  4 Sep 2025 22:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="FP2Bejtv"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="XloSlDjE"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E3B2E975E;
-	Thu,  4 Sep 2025 22:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70F52D6E65;
+	Thu,  4 Sep 2025 22:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757023414; cv=none; b=iTllEApqzbrHj3Nq66+ingV6KtMcbPYXKcWqXvlN3ZSDNS9CaOco4QiwMz0g5EYQehOOq3OB4LlMjs1LZ4Ya7KDkTINVEZtHHgFdmx4XqvNUGSn2Y+xoZ+m2w3w0CYtNC81m2lswOnpVdujOBJtpxLv4MbjC64PmQ6Ded4Fo/H4=
+	t=1757023407; cv=none; b=YnxUituVbhC3YtpWeE8TMN4HpHQhP8f4fxF86BnheSP5TQgbrGrUjcQXv8d/U+JGPmNSc39ZO7TwPC3RNKwX3p8H+O+w9ohbzjRrtOyGhtqz6hJ8RzPGfw3ZhOnvXxTyHCdRq88I8TMl3qi2BrP9M5hiadoIkCOwQx5IE0/RQBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757023414; c=relaxed/simple;
-	bh=121vixZVyWdpVnNNIFvoWmdEy0OO+Zl65XWR5OE1tLw=;
+	s=arc-20240116; t=1757023407; c=relaxed/simple;
+	bh=O56nXG2PIp67W8RUpsWeXklMaE5M2YiL8OY2yAjHgps=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WqB2rAxnDJDjpBEy26hLR4bNKDMy6GQ0vUCs3Is4Lox5ui8tSZGNs3IR0aAhFzZx4NRfSLrIcZN5Q5flm3fK96MTZTZPyScLh9lQ0CxFjxMkA1SaUl/9lS6UWF/ONHl7/YP3tVw0o/FCZ602WpGFtbJ20EDgdDfORNKEOJiLEDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=FP2Bejtv; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=Q3ctWrg8Z6oLLkEO/Gpe+I5lCe+ACuA2q6/a9Hi9SuENkg7ZSKupHKa1rLhCH5CT8FieCtBf9HYLFnfjfcIL4Nj/cLfK3vx/D1Qfiv927upDI+kgz2Bwj6ujcxI5KcWfJ5Ioa7oE69NL2925WI5z6pHGQpuByvQrocO6KnpmWOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=XloSlDjE; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1757023398;
-	bh=121vixZVyWdpVnNNIFvoWmdEy0OO+Zl65XWR5OE1tLw=;
+	bh=O56nXG2PIp67W8RUpsWeXklMaE5M2YiL8OY2yAjHgps=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FP2BejtvAsJh7YFQdMgwp8FMpDrroAdmxWJfk+VTiAEkYKkCcH4qH2rypSLSPsn70
-	 lQTsoSNJIfmXwhsugI2uaBUJWa55ceguOolrLRq0vw1uOCtaVNe6gWdZLuOefW438P
-	 nrQtoS82nYLP5N/QMOUc7tWl0bcH8EjLynuL2sicKiuO0EuiD8PB68VnvSvToircii
-	 okZjy4jCtVJRjoXdgiHOs74fFwM2LNNIa5HjFVmWcyCj3r+nz9KOMxQAlNAVZGlAoI
-	 KusbL9Ds0xfPlvzc3vXb1BRqIY2uS01zZMR4uOC+oPTcwvY0I4SgZSPzwZp9lu5svH
-	 i9ony3xmVz6Sg==
+	b=XloSlDjEBfE2ov65mZY/AkKPSo8kum75TAV4IiZZE6y5QRyHv5Dk8rAYHMRXHnyLA
+	 qVz2l8xCdaRTtTwagNLF7OThfqUc10i3jVVPHCUeA0HaZJQky15k34ZfyqyCFgVDJu
+	 Jx3yC2D7pIzCni86ZFcqy5j0+tTqNxDuC+L77XBL/ddbjGuNN6T5Wmmkx573n2Xs8R
+	 bTwFVAeCx28MgnOUKMVvjZzWGTQ/qwzkR15shoHcbh1RM1nYbDROzoWpzWsi+r2T+L
+	 OU7GRAgqqzUrMXrcScQmM278fwnL+bNoJUFLPiZxYh7hSPYHJeg2qiigx2VNIMzj+U
+	 2ZJvQLis41ENQ==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id B7A6C60396;
-	Thu,  4 Sep 2025 22:03:18 +0000 (UTC)
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 95E9760128;
+	Thu,  4 Sep 2025 22:03:11 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id 7B28E2029CD; Thu, 04 Sep 2025 22:02:58 +0000 (UTC)
+	id 84C42202A16; Thu, 04 Sep 2025 22:02:58 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,9 +60,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	wireguard@lists.zx2c4.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [RFC net-next 07/14] uapi: wireguard: move flag enums
-Date: Thu,  4 Sep 2025 22:02:41 +0000
-Message-ID: <20250904220255.1006675-7-ast@fiberby.net>
+Subject: [RFC net-next 08/14] uapi: wireguard: generate header with ynl-gen
+Date: Thu,  4 Sep 2025 22:02:42 +0000
+Message-ID: <20250904220255.1006675-8-ast@fiberby.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250904-wg-ynl-rfc@fiberby.net>
 References: <20250904-wg-ynl-rfc@fiberby.net>
@@ -75,72 +75,109 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Move the wg*_flag enums, so that they are defined above the
-attribute set enums, as ynl-gen would place them.
+Use ynl-gen to generate the UAPI header for wireguard.
 
-While touching these lines, also pre-compute bitshifted flag
-values, like ynl-gen would generate them.
+Changes in generated header:
+* As __*_F_ALL are not generated by ynl-gen:
+  * All users have been replaced by their current value.
+  * Once the policies are also generated, then the
+    NLA_POLICY_MASK() policies will be kept in sync.
+* Convert the last bit-shifted flag value in enum wgdevice_flag.
+* Trivial include guard rename.
+* Trivial white space changes.
 
-This is an incremental step towards adopting an UAPI header
-generated by ynl-gen.
-
-This is a trivial patch with no behavioural changes intended.
+No behavioural changes intended.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- include/uapi/linux/wireguard.h | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+ drivers/net/wireguard/netlink.c |  6 +++---
+ include/uapi/linux/wireguard.h  | 26 +++++++++++---------------
+ 2 files changed, 14 insertions(+), 18 deletions(-)
 
+diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+index 742d3f88d132..5dae2aa51346 100644
+--- a/drivers/net/wireguard/netlink.c
++++ b/drivers/net/wireguard/netlink.c
+@@ -24,7 +24,7 @@ static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
+ 	[WGDEVICE_A_IFNAME]		= { .type = NLA_NUL_STRING, .len = IFNAMSIZ - 1 },
+ 	[WGDEVICE_A_PRIVATE_KEY]	= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+ 	[WGDEVICE_A_PUBLIC_KEY]		= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+-	[WGDEVICE_A_FLAGS]		= NLA_POLICY_MASK(NLA_U32, __WGDEVICE_F_ALL),
++	[WGDEVICE_A_FLAGS]		= NLA_POLICY_MASK(NLA_U32, 1),
+ 	[WGDEVICE_A_LISTEN_PORT]	= { .type = NLA_U16 },
+ 	[WGDEVICE_A_FWMARK]		= { .type = NLA_U32 },
+ 	[WGDEVICE_A_PEERS]		= NLA_POLICY_NESTED_ARRAY(peer_policy),
+@@ -33,7 +33,7 @@ static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
+ static const struct nla_policy peer_policy[WGPEER_A_MAX + 1] = {
+ 	[WGPEER_A_PUBLIC_KEY]				= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+ 	[WGPEER_A_PRESHARED_KEY]			= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+-	[WGPEER_A_FLAGS]				= NLA_POLICY_MASK(NLA_U32, __WGPEER_F_ALL),
++	[WGPEER_A_FLAGS]				= NLA_POLICY_MASK(NLA_U32, 7),
+ 	[WGPEER_A_ENDPOINT]				= NLA_POLICY_MIN_LEN(sizeof(struct sockaddr)),
+ 	[WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL]	= { .type = NLA_U16 },
+ 	[WGPEER_A_LAST_HANDSHAKE_TIME]			= NLA_POLICY_EXACT_LEN(sizeof(struct __kernel_timespec)),
+@@ -47,7 +47,7 @@ static const struct nla_policy allowedip_policy[WGALLOWEDIP_A_MAX + 1] = {
+ 	[WGALLOWEDIP_A_FAMILY]		= { .type = NLA_U16 },
+ 	[WGALLOWEDIP_A_IPADDR]		= NLA_POLICY_MIN_LEN(sizeof(struct in_addr)),
+ 	[WGALLOWEDIP_A_CIDR_MASK]	= { .type = NLA_U8 },
+-	[WGALLOWEDIP_A_FLAGS]		= NLA_POLICY_MASK(NLA_U32, __WGALLOWEDIP_F_ALL),
++	[WGALLOWEDIP_A_FLAGS]		= NLA_POLICY_MASK(NLA_U32, 1),
+ };
+ 
+ static struct wg_device *lookup_interface(struct nlattr **attrs,
 diff --git a/include/uapi/linux/wireguard.h b/include/uapi/linux/wireguard.h
-index ee63aba7f98f..623ec9527e22 100644
+index 623ec9527e22..b83973aed9f8 100644
 --- a/include/uapi/linux/wireguard.h
 +++ b/include/uapi/linux/wireguard.h
-@@ -15,6 +15,20 @@ enum wgdevice_flag {
- 	WGDEVICE_F_REPLACE_PEERS = 1U << 0,
- 	__WGDEVICE_F_ALL = WGDEVICE_F_REPLACE_PEERS
- };
-+
-+enum wgpeer_flag {
-+	WGPEER_F_REMOVE_ME = 1,
-+	WGPEER_F_REPLACE_ALLOWEDIPS = 2,
-+	WGPEER_F_UPDATE_ONLY = 4,
-+	__WGPEER_F_ALL = WGPEER_F_REMOVE_ME | WGPEER_F_REPLACE_ALLOWEDIPS |
-+			 WGPEER_F_UPDATE_ONLY
-+};
-+
-+enum wgallowedip_flag {
-+	WGALLOWEDIP_F_REMOVE_ME = 1,
-+	__WGALLOWEDIP_F_ALL = WGALLOWEDIP_F_REMOVE_ME
-+};
-+
- enum wgdevice_attribute {
- 	WGDEVICE_A_UNSPEC,
- 	WGDEVICE_A_IFINDEX,
-@@ -30,13 +44,6 @@ enum wgdevice_attribute {
- };
- #define WGDEVICE_A_MAX (__WGDEVICE_A_MAX - 1)
+@@ -1,32 +1,28 @@
+-/* SPDX-License-Identifier: (GPL-2.0 WITH Linux-syscall-note) OR MIT */
+-/*
+- * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+- */
++/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/wireguard.yaml */
++/* YNL-GEN uapi header */
  
--enum wgpeer_flag {
--	WGPEER_F_REMOVE_ME = 1U << 0,
--	WGPEER_F_REPLACE_ALLOWEDIPS = 1U << 1,
--	WGPEER_F_UPDATE_ONLY = 1U << 2,
+-#ifndef _WG_UAPI_WIREGUARD_H
+-#define _WG_UAPI_WIREGUARD_H
++#ifndef _UAPI_LINUX_WIREGUARD_H
++#define _UAPI_LINUX_WIREGUARD_H
+ 
+-#define WG_GENL_NAME "wireguard"
+-#define WG_GENL_VERSION 1
++#define WG_GENL_NAME	"wireguard"
++#define WG_GENL_VERSION	1
+ 
+-#define WG_KEY_LEN 32
++#define WG_KEY_LEN	32
+ 
+ enum wgdevice_flag {
+-	WGDEVICE_F_REPLACE_PEERS = 1U << 0,
+-	__WGDEVICE_F_ALL = WGDEVICE_F_REPLACE_PEERS
++	WGDEVICE_F_REPLACE_PEERS = 1,
+ };
+ 
+ enum wgpeer_flag {
+ 	WGPEER_F_REMOVE_ME = 1,
+ 	WGPEER_F_REPLACE_ALLOWEDIPS = 2,
+ 	WGPEER_F_UPDATE_ONLY = 4,
 -	__WGPEER_F_ALL = WGPEER_F_REMOVE_ME | WGPEER_F_REPLACE_ALLOWEDIPS |
 -			 WGPEER_F_UPDATE_ONLY
--};
- enum wgpeer_attribute {
- 	WGPEER_A_UNSPEC,
- 	WGPEER_A_PUBLIC_KEY,
-@@ -54,10 +61,6 @@ enum wgpeer_attribute {
  };
- #define WGPEER_A_MAX (__WGPEER_A_MAX - 1)
  
--enum wgallowedip_flag {
--	WGALLOWEDIP_F_REMOVE_ME = 1U << 0,
+ enum wgallowedip_flag {
+ 	WGALLOWEDIP_F_REMOVE_ME = 1,
 -	__WGALLOWEDIP_F_ALL = WGALLOWEDIP_F_REMOVE_ME
--};
- enum wgallowedip_attribute {
- 	WGALLOWEDIP_A_UNSPEC,
- 	WGALLOWEDIP_A_FAMILY,
+ };
+ 
+ enum wgdevice_attribute {
+@@ -80,4 +76,4 @@ enum wg_cmd {
+ };
+ #define WG_CMD_MAX (__WG_CMD_MAX - 1)
+ 
+-#endif /* _WG_UAPI_WIREGUARD_H */
++#endif /* _UAPI_LINUX_WIREGUARD_H */
 -- 
 2.51.0
 
