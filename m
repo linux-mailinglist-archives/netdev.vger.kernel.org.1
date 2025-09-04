@@ -1,168 +1,189 @@
-Return-Path: <netdev+bounces-219841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9518AB43655
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 10:56:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A890B4366E
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 11:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF1857B5E74
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:55:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA6093AD4C0
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 09:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00142D12E0;
-	Thu,  4 Sep 2025 08:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="cM2iotGX";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lgOOfTy3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249FE2D1F64;
+	Thu,  4 Sep 2025 08:59:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6228D2D061B
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 08:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8164524167F;
+	Thu,  4 Sep 2025 08:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756976197; cv=none; b=giKJsrhjjZumPtZlCIONgZkWq/LjHoO695wwB8kfsXSJqkSBlLlznzjzJWZDh3tfk52RWq8UEYhF88hQ23N1+g41FNSYUCI+92UsIlYAJWAkwm59faUqU/IDpzGb0mh3UMvTWzRbG9n+7u+r2aP4WWVQw06b9wbwdx+LnjsbMQc=
+	t=1756976398; cv=none; b=limp7ZhStU6ApNUYVu08hwLaiebGgJoVXlXoNeTBCUl80iLAh4WhXXD/1YOZ8DW0p4KWT04KuxzMaqGjY1LlsosMTa64KH1TL8NChm7xYkCSzwiTahMHLLFB9IGJwTcvPH6MkcMoJWPVfyi7z3ehE5Sv61ntm8a8SBDEjxt4mEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756976197; c=relaxed/simple;
-	bh=sKXetZtnyPk0BVKXZ+BUqLNx0KAVF2FTBQY4LjhC+3g=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=t9fW1eneQGe+2j+bL/WF5l+sInKA3CIrIC3iJLFS+RYttZY5anBEc6VwCRZXX3G1FKxwt/qXEQds23m9fM7dupzgteNnmTD0LIMKf9+FoewM4Tba0Em/8gKgqlShgYU88zAPygxnEU2nDEd9yhO1CpwgoWFawKQYXEM5JomHW4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=cM2iotGX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lgOOfTy3; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
-Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
-	by mailfout.phl.internal (Postfix) with ESMTP id 73DE8EC0212;
-	Thu,  4 Sep 2025 04:56:34 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Thu, 04 Sep 2025 04:56:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1756976194;
-	 x=1757062594; bh=sKXetZtnyPk0BVKXZ+BUqLNx0KAVF2FTBQY4LjhC+3g=; b=
-	cM2iotGXb1LST8wR8ipn4T8GZnr9QxteDOouzmFXKpj1M+FwKstJNuyDUCh2G/Vz
-	zX/sRpC83v39FI60cxqRfuTM6fRh3+LIepBQiokniXlO/R/ZY38VKFCr9LuH+KhS
-	4LVvoEY1y3LO1qnSP6qV9mkUZ1UorA0qk5et6yR8x4vs1hZ53i1ZG7jbd9s1tQtk
-	ETzuw74RO1ly9+nnsKM5fac1BtCmOj/JtA4VWw4qPJoyLpJZ17O+3CX+VbX00leN
-	mw674MugljnjfsPhGzPjvDy+IwTfK94OJ4uvHsZYE8/z4ogMmOCbJjbc5YXAgOAP
-	XjTTVW6Ofo7yUatpFcuUXg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1756976194; x=
-	1757062594; bh=sKXetZtnyPk0BVKXZ+BUqLNx0KAVF2FTBQY4LjhC+3g=; b=l
-	gOOfTy3+gB9rvqu5XlryR+vebh2C/DOLHqueRbo9hBl8J0VarJClsu21HF01VR9N
-	6xCDZjAk0Yu5G5Ay1Bw36t5Q5n2Mf5pWSc0jblFcT9Toz9fE9xX1A6W+AKUFi3e1
-	5eQSw9cGDSseFmG7TXS2s8Nhg18q9HAmWZxsL/XR0sZCOk+xOP5lFXoeeGERKLMW
-	BecWC9HwdHUrosr1c9vaLKnNi8dqktNUvP7Bek+VFv0kxmGjlR6lolKnzrrHvFHc
-	YZVTi425C6THbpcELSYX4VHK3GjiNnL31rX83w5hBElx+BfFEmWI9ran8Iaqiy9z
-	QNeoveak8196f3gS8tGxQ==
-X-ME-Sender: <xms:QlS5aHQRL4MtNp-JtGetX8UG7R0MF0J706t_M52wggn5CmKMcXobNw>
-    <xme:QlS5aBbq9srV8-s5VZDZ_Uu0aLA2x6DuNyAFHqleEQ3LYdy2KRrH1fZO819PN0ptF
-    hm3Oks6OtH9GowpL0Q>
-X-ME-Received: <xmr:QlS5aERCnhhywpfNVMgz_0niMHruEJFA_773qCU-XRQ-zSPPLyPORVBR79jtfLxC-wSjtNtygukztzAnTDVk7-jvInuMs5X9KlzxIImd18atvA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehheelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    eptggguffhjgffvefgkfhfvffosehtqhhmtdhhtddvnecuhfhrohhmpeftihgtrghrugcu
-    uegvjhgrrhgrnhhouceorhhitggrrhgusegsvghjrghrrghnohdrihhoqeenucggtffrrg
-    htthgvrhhnpeethfelkeetffehtdegkeduieevhffgveetvdegtdejhfffjeetleegtefh
-    vefhudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hrihgtrghrugessggvjhgrrhgrnhhordhiohdpnhgspghrtghpthhtohepuddupdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehiughoshgthhesihguohhstghhrdhorhhgpd
-    hrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepmhhikhgrrdif
-    vghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhopehnvg
-    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgrvghl
-    rdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohephigvhhgviihkvghlshhhsg
-    esghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhn
-    nhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtph
-    htthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
-X-ME-Proxy: <xmx:QlS5aA9qZoncYw7CCVo1JnbXGgrCNrdskxc_zsEzhlr2IhyKYMwYDQ>
-    <xmx:QlS5aEgN6gjRIzMHnxtDBDVxTipDlLtoQfSRI8nhja5kWSX4ZElWFA>
-    <xmx:QlS5aBaRR4o41lH46UQFUad5Qw8MB8QxDyKvBXz5XhZCDMVXeoWWEg>
-    <xmx:QlS5aJ_HyDPBJy7V4TY9C0WwDI53PXcqVGs2aaAAa6_Ki-F3fMEE7w>
-    <xmx:QlS5aNiX3XOZGidTPVN5bJPWBHKCUeNHURqblAFlp1FP1AdO11071YWI>
-Feedback-ID: i583147b9:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 4 Sep 2025 04:56:32 -0400 (EDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1756976398; c=relaxed/simple;
+	bh=TyJkCCbUPD4VJsWVif6zYXzeJFnFiI63DHb4IK+7uJg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Zxz2KbpUyy3ZWhH0aXmuZj6rts9OQe4H6Ls6Dy42p11A41xDpnormPIm4KpHt6IdjOzqZun+cFt/Jag+2rNS3k50spG/NtwNb7Fk5uoi6rfKvQYPefob/SyBOWJTd3Zp6bBAlmlXer2m15aIDNSXhHSXXz0ikIbAfaQ5Kan5hZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from E0005182LT.eswin.cn (unknown [10.12.96.155])
+	by app1 (Coremail) with SMTP id TAJkCgDn_Q7kVLlosGTIAA--.33516S2;
+	Thu, 04 Sep 2025 16:59:19 +0800 (CST)
+From: weishangjuan@eswincomputing.com
+To: devicetree@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	yong.liang.choong@linux.intel.com,
+	vladimir.oltean@nxp.com,
+	rmk+kernel@armlinux.org.uk,
+	faizal.abdul.rahim@linux.intel.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	inochiama@gmail.com,
+	jan.petrous@oss.nxp.com,
+	jszhang@kernel.org,
+	p.zabel@pengutronix.de,
+	boon.khai.ng@altera.com,
+	0x1207@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	emil.renner.berthing@canonical.com
+Cc: ningyu@eswincomputing.com,
+	linmin@eswincomputing.com,
+	lizhi2@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>
+Subject: [PATCH v5 0/2] Add driver support for Eswin eic7700 SoC ethernet controller
+Date: Thu,  4 Sep 2025 16:59:13 +0800
+Message-Id: <20250904085913.2494-1-weishangjuan@eswincomputing.com>
+X-Mailer: git-send-email 2.31.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-From: Ricard Bejarano <ricard@bejarano.io>
-In-Reply-To: <aLfxueDGLngEb7Rw@shredder>
-Date: Thu, 4 Sep 2025 10:56:29 +0200
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- netdev@vger.kernel.org,
- michael.jamet@intel.com,
- YehezkelShB@gmail.com,
- andrew+netdev@lunn.ch,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E0922A4A-5715-4758-B067-ACB401BDB363@bejarano.io>
-References: <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
- <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
- <71C2308A-0E9C-4AD3-837A-03CE8EA4CA1D@bejarano.io>
- <b033e79d-17bc-495d-959c-21ddc7f061e4@app.fastmail.com>
- <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
- <F42DF57F-114A-4250-8008-97933F9EE5D0@bejarano.io>
- <0925F705-A611-4897-9F62-1F565213FE24@bejarano.io>
- <75EA103A-A9B8-4924-938B-5F41DD4491CE@bejarano.io>
- <aLYAKG2Aw5t7GKtu@shredder>
- <A68375CA-57E1-4F53-877D-480231F07942@bejarano.io>
- <aLfxueDGLngEb7Rw@shredder>
-To: Ido Schimmel <idosch@idosch.org>
-X-Mailer: Apple Mail (2.3826.700.81)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:TAJkCgDn_Q7kVLlosGTIAA--.33516S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZF4ftw1UXFy5try3WrykZrb_yoWrAryrpF
+	W0kry5Wwn8AryxXw4Iyw10kFyfJan7JF1akr1Iqw1fXa1qya90qr4ak3WjgFy7Cr4DZ34Y
+	gay3ZFW7Ca4ay3DanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBm14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26rWY6Fy7MxkIecxEwVCm-wCF04
+	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
+	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Wrv_Gr1UMIIYrxkI7VAKI4
+	8JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4U
+	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
+	8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRAnYwUUUUU
+X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/
 
-> I wrote that it can happen with forwarded traffic, not necessarily
-> bridged traffic. Section 6 from here [1] shows that you get 900+ Mb/s
-> between blue and purple with UDP, whereas with TCP you only get around
-> 5Mb/s.
+From: Shangjuan Wei <weishangjuan@eswincomputing.com>
 
-My assumption was that, due to CRC checksum failures causing L2 loss at =
-every
-rx end, and because of TCP congestion control back-off, TCP bandwidth =
-drops
-exponentially with the number of hops.
-So the problem is not so much the TCP vs. UDP bandwidth, but the L2 loss
-caused by CRC errors. That L2 loss happens at the rx end because that's =
-when
-CRC checksums are checked and frames are dropped, but other than cable
-problems I can only assume that's a bug in the tx end driver.
-I believe that's why Andrew Lunn pointed at the driver's handling of =
-SKBs with
-fragments as the possible culprit, but the fix breaks the test =
-completely.
+This series depends on the config option patch [1].
 
-> Assuming you are talking about [2], it shows 16763 errors out of =
-6360635
-> received packets. That's 0.2%.
+[1] https://lore.kernel.org/all/20250825132427.1618089-3-pinkesh.vaghela@einfochips.com/
 
-Those were aggregated counters, they include multiple tests including =
-some
-below the ~250-300Mb/s threshold where loss begins to appear.
+Updates:
 
-> I suggest removing the custom patches and re-testing with TSO disabled
-> (on both red and blue). If this doesn't help, you can try recording
-> packet drops on blue like I suggested in the previous mail.
+  Changes in v5：
+  - Updated eswin,eic7700-eth.yaml
+    - Use "items" instead "enum" for clock-names
+    - Arrange clocks description in correct order
+    - Delete redundant descriptions for eswin,hsp-sp-csr property
+  - Updated dwmac-eic7700.c  
+    - Optimize the implementation of eic7700_ appy_delay
+    - Update comments and remove reg checking
+    - Use FIELD_PREP in eic7700_apply_delay function
+    - Use clk_bulk related APIs to manage clks
+  - Link to v4: https://lore.kernel.org/all/20250827081135.2243-1-weishangjuan@eswincomputing.com/
 
-Disabling TSO on both ends didn't change the iperf results. I currently =
-have
-no bandwidth to do the perf tests.
+  Changes in v4:
+  - Updated eswin,eic7700-eth.yaml
+    - Modify reg:minItems:1 to reg:maxItems: 1
+    - Delete minItems and maxItems of clock and clock-names
+    - Delete phy-mode and phy-handle properties
+    - Add description for clock
+    - Add types of clock-names
+    - Delete descriptions for rx-internal-delay-ps and tx-internal-delay-ps
+    - Add enum value for rx-internal-delay-ps and tx-internal-delay-ps
+    - Modify description for eswin,hsp-sp-csr property
+    - Delete eswin,syscrg-csr and eswin,dly-hsp-reg properties
+    - Modify phy-mode="rgmii" to phy-mode="rgmii-id"
+  - Updated dwmac-eic7700.c
+    - Remove fix_mac_speed and configure different delays for different rates
+    - Merge the offset of the dly register into the eswin, hsp sp csr attributes
+      for unified management
+    - Add missing Author and optimize the number of characters per
+      line to within 80
+    - Support default delay configuration and add the handling of vendor delay 
+      configuration
+    - Add clks_config for pm_runtime
+    - Modify the attribute format, such as eswin,hsp_sp_csr to eswin,hsp-sp-csr
+  - Link to v3: https://lore.kernel.org/all/20250703091808.1092-1-weishangjuan@eswincomputing.com/
 
-Thanks,
-RB=
+  Changes in v3:
+  - Updated eswin,eic7700-eth.yaml
+    - Modify snps,dwmac to snps,dwmac-5.20
+    - Remove the description of reg
+    - Modify the value of clock minItems and maxItems
+    - Modify the value of clock-names minItems and maxItems
+    - Add descriptions of snps,write-questions, snps,read-questions
+    - Add rx-internal-delay-ps and tx-internal-delay-ps properties
+    - Modify descriptions for custom properties, such as eswin,hsp-sp-csr
+    - Delete snps,axi-config property
+    - Add snps,fixed-burst snps,aal snps,tso properties
+    - Delete snps,lpi_en property
+    - Modify format of custom properties
+  - Updated dwmac-eic7700.c
+    - Simplify drivers and remove unnecessary API and DTS attribute configurations
+    - Increase the mapping from tx/rx_delay_ps to private dly
+  - Link to v2: https://lore.kernel.org/all/aDad+8YHEFdOIs38@mev-dev.igk.intel.com/
+
+  Changes in v2:
+  - Updated eswin,eic7700-eth.yaml
+    - Add snps,dwmac in binding file
+    - Modify the description of reg
+    - Modify the number of clock-names
+    - Changed the names of reset-names and phy-mode
+    - Add description for custom properties, such as eswin,hsp_sp_csr
+    - Delete snps,blen snps,rd_osr_lmt snps,wr_osr_lmt properties
+  - Updated dwmac-eic7700.c
+    - Remove the code related to PHY LED configuration from the MAC driver
+    - Adjust the code format and driver interfaces, such as replacing kzalloc
+      with devm_kzalloc, etc.
+    - Use phylib instead of the GPIO API in the driver to implement the PHY
+      reset function
+  - Link to v1: https://lore.kernel.org/all/20250516010849.784-1-weishangjuan@eswincomputing.com/
+
+Shangjuan Wei (2):
+  dt-bindings: ethernet: eswin: Document for EIC7700 SoC
+  ethernet: eswin: Add eic7700 ethernet driver
+
+ .../bindings/net/eswin,eic7700-eth.yaml       | 128 +++++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 250 ++++++++++++++++++
+ 4 files changed, 390 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+
+-- 
+2.17.1
+
 
