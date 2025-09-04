@@ -1,366 +1,93 @@
-Return-Path: <netdev+bounces-220090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26559B446CE
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:58:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 786D9B44715
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:16:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D94B55A3C05
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 19:58:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37B5EA4079A
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 20:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397F4277814;
-	Thu,  4 Sep 2025 19:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFB327AC3D;
+	Thu,  4 Sep 2025 20:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SWwshMza"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bFJ6flGK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3BD1BD035;
-	Thu,  4 Sep 2025 19:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB3A264A8E;
+	Thu,  4 Sep 2025 20:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757015915; cv=none; b=K4y8mblZ+K6I+v76qh3HhpYWnsG1VEq+EY/tMhk2syxNyi/nduxqRwpMP36DEXcSPx6SyZ14cbCzLZ4fYrg2lPKaJBpgAStDZP1qjixJE4cZZiHhEQyLNRmtMRTb/gPLVBVeFs+LwwDgYKIq2mslnXy0g2xlb8bk66sOGTH8tbk=
+	t=1757016987; cv=none; b=nPGmrnNDL3wfu6yR1/9iEtGBsjbmer1hRFUGMNWLRJcCizarz2nFLSdmdtGk+HF2gMBnTRy9y8O2HtZ6EzojfhPjbpPAIS9WgpK8jfq4qAAn8KNiinAuAW5fWGAR7MUiAFeve+NaRwK7ZH6Vg0hpKOJu6oSLbDmhkoEh9W3Pc1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757015915; c=relaxed/simple;
-	bh=PixqzQGGIrRfX7IIdPxeApKscwbKNdTHmf7PTPgFrow=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qlvW9duK9xm5YWoqhDIZhv2ECnwq2RF1YovKEwXc1l94DbFHxZycc1RKQOj4u3uqm+DPiKVQ8yA2YBtAJJcxGO3tKdgW6WcT2uE2+S9TmzqIVhyxpDK8PLU3vGvYF7rn9WUd9QUfbmVcdOyfywjqrDVgu27b0IFksxzoEKxRlac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SWwshMza; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757015913; x=1788551913;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=PixqzQGGIrRfX7IIdPxeApKscwbKNdTHmf7PTPgFrow=;
-  b=SWwshMza7JWTMOdrWzZuRcX0gqisFChHmhtYHSyaKSa7ZSKYx15w7/dR
-   JaikbTFef+xti7T9Qe5AXvLuMGEnY2dMQZkl3VWzp5gjTFR6Yea+KIjXW
-   vjn7I09YjbIoX6QcPcnfa68Avjd5V4dxKzcfW6Pv1M1Po84j9p0ZIvv2h
-   z7Zpp8aoC4Lr4QXR1LvQ0apXumZKMzO1sfqQaRwF/VSwfrJaEC5gOFkPK
-   pKYgfsikDfUkCuqWHTDSs6yf53ixTwB/q/YgDpniJbjWbCRUmfB8sdja/
-   KNpwNQyg+5TJSjZ9VPx0WXUcfLTslY29Rglc+1XsPV0ZmuY5gtcZqeD6a
-   Q==;
-X-CSE-ConnectionGUID: cRpANMFYQ9O+BORyksUg6Q==
-X-CSE-MsgGUID: Q9Yrd9jQRHqXAETeMbvLLA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11543"; a="70745157"
-X-IronPort-AV: E=Sophos;i="6.18,239,1751266800"; 
-   d="scan'208";a="70745157"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 12:58:32 -0700
-X-CSE-ConnectionGUID: BSuZao85S0KnGRvPaIOlfw==
-X-CSE-MsgGUID: R0onZi9jT1q0mHcMMXt+ow==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,239,1751266800"; 
-   d="scan'208";a="176102768"
-Received: from pthorat-mobl.amr.corp.intel.com (HELO soc-PF51RAGT.clients.intel.com) ([10.246.116.180])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 12:58:31 -0700
-From: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: przemyslaw.kitszel@intel.com,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	jiri@resnulli.us,
-	anthony.l.nguyen@intel.com,
-	Tatyana Nikolova <tatyana.e.nikolova@intel.com>
-Subject: [iwl-next] ice, irdma: Add rdma_qp_limits_sel devlink parameter for irdma
-Date: Thu,  4 Sep 2025 14:57:19 -0500
-Message-ID: <20250904195719.371-1-tatyana.e.nikolova@intel.com>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1757016987; c=relaxed/simple;
+	bh=MHaY1C40/+Jq2DQvFH80kcW82U4tjH4j2jV3lW9ww54=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oMEWlCdP0OThZibkv7igscWfbe4t6OYnQSuO6fQS9JyijbLMu0exk88CVsMwv6u5A+t34kM/oTy7/1ecuLnnZQze2HAfiNWB3JzpZrmBfJrSism3LLpvEwAQJQeYM4N0IUNgzQy+NkgPjRg9zzV8a7/hxdhjWllLdvfwzP3Pc64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bFJ6flGK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=JhLuBPzuzJgNoY9RYve6SyCzVJfZ5HtsC3TCT1JPgHo=; b=bFJ6flGK6d8xUZniycfDLdV5ji
+	sUG6MnVvy94Ax3yTwdQBELJpNaErj05PNye0NZ1e3mBLEtVxJ7O2JbZAMlQBMgx9Qamede9C1+6Hy
+	bSygcKoJ8armozZWbEhbihTQEDzUdP0ke6g8+t756ZqAL0OU2XlGovvrxjaBEbKXkzLc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uuGNL-007GYK-2l; Thu, 04 Sep 2025 22:16:07 +0200
+Date: Thu, 4 Sep 2025 22:16:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v2 2/9] net: pcs: rzn1-miic: Drop trailing comma
+ from of_device_id table
+Message-ID: <8f96f8d7-e2eb-47ee-abf8-4f9c96c74a3d@lunn.ch>
+References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250904114204.4148520-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250904114204.4148520-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Add a devlink parameter to switch between different QP resource profiles
-(max number of QPs) supported by irdma for Intel Ethernet 800 devices. The
-rdma_qp_limits_sel is translated into an index in the rsrc_limits_table to
-select a power of two number between 1 and 256 for max supported QPs (1K-256K).
-To reduce the irdma memory footprint, set the rdma_qp_limits_sel default value
-to 1 (max 1K QPs).
+On Thu, Sep 04, 2025 at 12:41:56PM +0100, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> 
+> Remove the trailing comma after the sentinel entry in the
+> of_device_id match table.
+> 
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
----
-Since the changes to irdma are minor, this is targeted to iwl-next/net-next.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
- Documentation/networking/devlink/ice.rst      |  29 +++++
- drivers/infiniband/hw/irdma/hw.c              |  15 ++-
- drivers/infiniband/hw/irdma/main.c            |   2 +-
- .../net/ethernet/intel/ice/devlink/devlink.c  | 110 ++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_idc.c      |   4 +
- include/linux/net/intel/iidc_rdma_ice.h       |   1 +
- 6 files changed, 154 insertions(+), 7 deletions(-)
-
-diff --git a/Documentation/networking/devlink/ice.rst b/Documentation/networking/devlink/ice.rst
-index 792e9f8c846a..0514815fcf9c 100644
---- a/Documentation/networking/devlink/ice.rst
-+++ b/Documentation/networking/devlink/ice.rst
-@@ -104,6 +104,35 @@ Parameters
-         one port capacity at cost of the another. User needs to disable
-         local forwarding on one of the ports in order have increased capacity
-         on the ``prioritized`` port.
-+    * - ``rdma_qp_limits_sel``
-+      - runtime
-+      - The RDMA QP limits selector controls the max Queue Pairs (QPs) resources
-+        which could be allocated per device. Depending on the available memory in
-+        the system the actual allocated QP number could be smaller. QPs are evenly
-+        distributed across active ports, so more ports mean fewer QPs per port.
-+        Supported values for the QP limits selector are powers of 2, less or equal
-+        to 256 and each value denotes a number of thousands QPs.
-+
-+        ``1`` - 1K QPs
-+
-+        ``2`` - 2K QPs
-+
-+        ``4`` - 4K QPs
-+
-+        ``8`` - 8K QPs
-+
-+        ``16`` - 16K QPs
-+
-+        ``32`` - 32K QPs
-+
-+        ``64`` - 64K QPs
-+
-+        ``128`` - 128K QPs
-+
-+        ``256`` - 256K QPs
-+
-+        Default value of ``rdma_qp_limits_sel`` parameter is ``1`` allowing 1K QPs to
-+        maintain a low memory footprint.
- 
- Info versions
- =============
-diff --git a/drivers/infiniband/hw/irdma/hw.c b/drivers/infiniband/hw/irdma/hw.c
-index 69ce1862eabe..de83a281aaab 100644
---- a/drivers/infiniband/hw/irdma/hw.c
-+++ b/drivers/infiniband/hw/irdma/hw.c
-@@ -4,27 +4,30 @@
- 
- static struct irdma_rsrc_limits rsrc_limits_table[] = {
- 	[0] = {
--		.qplimit = SZ_128,
-+		.qplimit = SZ_1K,
- 	},
- 	[1] = {
--		.qplimit = SZ_1K,
-+		.qplimit = SZ_2K,
- 	},
- 	[2] = {
--		.qplimit = SZ_2K,
-+		.qplimit = SZ_4K,
- 	},
- 	[3] = {
--		.qplimit = SZ_4K,
-+		.qplimit = SZ_8K,
- 	},
- 	[4] = {
- 		.qplimit = SZ_16K,
- 	},
- 	[5] = {
--		.qplimit = SZ_64K,
-+		.qplimit = SZ_32K,
- 	},
- 	[6] = {
--		.qplimit = SZ_128K,
-+		.qplimit = SZ_64K,
- 	},
- 	[7] = {
-+		.qplimit = SZ_128K,
-+	},
-+	[8] = {
- 		.qplimit = SZ_256K,
- 	},
- };
-diff --git a/drivers/infiniband/hw/irdma/main.c b/drivers/infiniband/hw/irdma/main.c
-index 1e840bbd619d..9d8e6e940667 100644
---- a/drivers/infiniband/hw/irdma/main.c
-+++ b/drivers/infiniband/hw/irdma/main.c
-@@ -285,7 +285,7 @@ static void irdma_fill_device_info(struct irdma_device *iwdev,
- 	rf->rsrc_profile = IRDMA_HMC_PROFILE_DEFAULT;
- 	rf->rst_to = IRDMA_RST_TIMEOUT_HZ;
- 	rf->gen_ops.request_reset = irdma_request_reset;
--	rf->limits_sel = 7;
-+	rf->limits_sel = iidc_priv->rdma_qp_limits_sel;
- 	rf->iwdev = iwdev;
- 
- 	mutex_init(&iwdev->ah_tbl_lock);
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index fb2de521731a..19f7f2d77812 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -1461,6 +1461,108 @@ ice_devlink_enable_iw_validate(struct devlink *devlink, u32 id,
- 	return 0;
- }
- 
-+/**
-+ * ice_devlink_rdma_qp_limits_get - Get RDMA QP limits select parameter
-+ * @devlink: pointer to the devlink instance
-+ * @__unused: the parameter ID
-+ * @ctx: context to store the parameter value
-+ *
-+ * Return: zero on success and a negative value on failure.
-+ */
-+static int ice_devlink_rdma_qp_limits_get(struct devlink *devlink, u32 __unused,
-+					   struct devlink_param_gset_ctx *ctx)
-+{
-+	struct ice_pf *pf = devlink_priv(devlink);
-+	struct iidc_rdma_priv_dev_info *privd;
-+	struct iidc_rdma_core_dev_info *cdev;
-+
-+	cdev = pf->cdev_info;
-+	if (!cdev)
-+		return -ENODEV;
-+
-+	privd = cdev->iidc_priv;
-+	ctx->val.vu32 = 1 << privd->rdma_qp_limits_sel;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_rdma_qp_limits_set - Set RDMA QP limits select parameter
-+ * @devlink: pointer to the devlink instance
-+ * @__unused: the parameter ID
-+ * @ctx: context to get the parameter value
-+ * @extack: netlink extended ACK structure
-+ *
-+ * Return: zero on success and a negative value on failure.
-+ */
-+static int ice_devlink_rdma_qp_limits_set(struct devlink *devlink, u32 __unused,
-+					   struct devlink_param_gset_ctx *ctx,
-+					   struct netlink_ext_ack *extack)
-+{
-+	struct ice_pf *pf = devlink_priv(devlink);
-+	struct iidc_rdma_priv_dev_info *privd;
-+	struct iidc_rdma_core_dev_info *cdev;
-+	u32 qp_limits, prev_qp_limits;
-+	int ret;
-+
-+	cdev = pf->cdev_info;
-+	if (!cdev)
-+		return -ENODEV;
-+
-+	privd = cdev->iidc_priv;
-+	prev_qp_limits = privd->rdma_qp_limits_sel;
-+	qp_limits = ilog2(ctx->val.vu32);
-+
-+	if (qp_limits == prev_qp_limits)
-+		return 0;
-+
-+	ice_unplug_aux_dev(pf);
-+	privd->rdma_qp_limits_sel = qp_limits;
-+	ret = ice_plug_aux_dev(pf);
-+	if (ret) {
-+		int err;
-+
-+		privd->rdma_qp_limits_sel = prev_qp_limits;
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to change rdma_qp_limits_sel value");
-+		err = ice_plug_aux_dev(pf);
-+		if (err)
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Unable to restore RDMA capabilities for this function");
-+	}
-+
-+	return ret;
-+}
-+
-+/**
-+ * ice_devlink_rdma_limits_sel_validate - Validate RDMA QP limits select parameter
-+ * @devlink: pointer to devlink instance
-+ * @__unused: the parameter ID
-+ * @val: value to validate
-+ * @extack: netlink extended ACK structure
-+ *
-+ * Supported values are <= 256 and power of 2
-+ *
-+ * Return: zero when passed parameter value is supported or a negative value on
-+ * error.
-+ */
-+static int ice_devlink_rdma_qp_limits_validate(struct devlink *devlink, u32 __unused,
-+						union devlink_param_value val,
-+						struct netlink_ext_ack *extack)
-+{
-+	struct ice_pf *pf = devlink_priv(devlink);
-+
-+        if (!test_bit(ICE_FLAG_RDMA_ENA, pf->flags))
-+		return -EOPNOTSUPP;
-+
-+	if (!is_power_of_2(val.vu32) || val.vu32 > 256) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "RDMA QP Limits Select value should be a power of 2 and <= 256");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- #define DEVLINK_LOCAL_FWD_DISABLED_STR "disabled"
- #define DEVLINK_LOCAL_FWD_ENABLED_STR "enabled"
- #define DEVLINK_LOCAL_FWD_PRIORITIZED_STR "prioritized"
-@@ -1621,6 +1723,7 @@ enum ice_param_id {
- 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
- 	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
- 	ICE_DEVLINK_PARAM_ID_LOCAL_FWD,
-+	ICE_DEVLINK_PARAM_ID_RDMA_QP_LIMITS_SEL,
- };
- 
- static const struct devlink_param ice_dvl_rdma_params[] = {
-@@ -1634,6 +1737,13 @@ static const struct devlink_param ice_dvl_rdma_params[] = {
- 			      ice_devlink_enable_iw_validate),
- 	DEVLINK_PARAM_GENERIC(ENABLE_RDMA, BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
- 			      NULL, NULL, ice_devlink_enable_rdma_validate),
-+	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_RDMA_QP_LIMITS_SEL,
-+			     "rdma_qp_limits_sel",
-+			     DEVLINK_PARAM_TYPE_U32,
-+			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
-+			     ice_devlink_rdma_qp_limits_get,
-+			     ice_devlink_rdma_qp_limits_set,
-+			     ice_devlink_rdma_qp_limits_validate),
- };
- 
- static const struct devlink_param ice_dvl_msix_params[] = {
-diff --git a/drivers/net/ethernet/intel/ice/ice_idc.c b/drivers/net/ethernet/intel/ice/ice_idc.c
-index 6ab53e430f91..6a4e1ac1804b 100644
---- a/drivers/net/ethernet/intel/ice/ice_idc.c
-+++ b/drivers/net/ethernet/intel/ice/ice_idc.c
-@@ -358,6 +358,8 @@ void ice_unplug_aux_dev(struct ice_pf *pf)
- 	}
- }
- 
-+#define ICE_RDMA_QP_LIMITS_SELECT_DFLT  0
-+
- /**
-  * ice_init_rdma - initializes PF for RDMA use
-  * @pf: ptr to ice_pf
-@@ -403,6 +405,8 @@ int ice_init_rdma(struct ice_pf *pf)
- 	privd->vport_id = pf->vsi[0]->vsi_num;
- 
- 	pf->cdev_info->rdma_protocol |= IIDC_RDMA_PROTOCOL_ROCEV2;
-+	privd->rdma_qp_limits_sel = ICE_RDMA_QP_LIMITS_SELECT_DFLT;
-+
- 	ice_setup_dcb_qos_info(pf, &privd->qos_info);
- 	ret = ice_plug_aux_dev(pf);
- 	if (ret)
-diff --git a/include/linux/net/intel/iidc_rdma_ice.h b/include/linux/net/intel/iidc_rdma_ice.h
-index b40eed0e13fe..cb60797427c4 100644
---- a/include/linux/net/intel/iidc_rdma_ice.h
-+++ b/include/linux/net/intel/iidc_rdma_ice.h
-@@ -52,6 +52,7 @@ struct iidc_rdma_priv_dev_info {
- 	struct net_device *netdev;
- 	struct iidc_rdma_qos_params qos_info;
- 	u8 __iomem *hw_addr;
-+	u8 rdma_qp_limits_sel;
- };
- 
- int ice_add_rdma_qset(struct iidc_rdma_core_dev_info *cdev,
--- 
-2.37.3
-
+    Andrew
 
