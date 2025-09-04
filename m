@@ -1,59 +1,65 @@
-Return-Path: <netdev+bounces-219764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C130B42E4D
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:37:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEB9FB42E61
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:48:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61B5D1BC5FC0
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:38:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 638401BC6E03
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:49:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E545915A85A;
-	Thu,  4 Sep 2025 00:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D0D450FE;
+	Thu,  4 Sep 2025 00:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKb0p+c8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f4a+Hk3X"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B314D11185;
-	Thu,  4 Sep 2025 00:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F239A14A9B;
+	Thu,  4 Sep 2025 00:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756946269; cv=none; b=CKlYcwu/JMUPeUx5rQST4uB4vfX/0wPwbuCv3bQkPBhQlBTtI+f/XLsVodYTRbtw8kk6x/bkj30FbQWGobwx18VSMSisGbIdGjU2a3rVMeIEdELvbcxmKhty4K/9nnwjFF6KAKNmg8mEE4Y2WUzzyXpb2QuV2MpBvM/NyogldgU=
+	t=1756946930; cv=none; b=B4UhAAsYDtQJ8IVdmJOMDgTPtCRxOKPENWjzWJTzKC/+CH+Rf9K2ZYv9b2v46Wku02RgBPVd3iCWaD6HvX+8oxoLwjWMlVmPtegf7TxI/RcNOQz30TTrHvGvUkq4FDa4YuV3sN7iGm4EqS8ANt2QAuee1RjG2Zx40jQWi/OCxhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756946269; c=relaxed/simple;
-	bh=NolWOvG4QsvlIv/gjPI7YpwDSettfhcYFKxMsBKbASk=;
+	s=arc-20240116; t=1756946930; c=relaxed/simple;
+	bh=/eZokcjTYsgn7x3TN1nV0vQhMpWaAhi7YQj4lS/oW5w=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VCXxas6hzGZ2HIEo5daq+7Of95w5DhL04kGSd9QCCTUzttpktTFNOISmovxRKwwQaToTvZLQOQNG8ZwzliLySzYXvyTTMDY7DIxUNlxjpLypcAjvw6gwJ/lfuEmG7n5P9FL6JCjxKgnPp8hbGTDcZWkQh7eltiZVx4JpUrOwcTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EKb0p+c8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5CCBC4CEE7;
-	Thu,  4 Sep 2025 00:37:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rte9gRCPFWtsNq4A0xwVoLJdQqSVdY39oC0axF5bkrqbVOexHKjlQ2Nxf1aTwFolZUjiwE4Ho/fZ7f0r6Ok84YIagISHMbZV3h+z1QF21WMWcDnagbUcadzd8jy7cX6zOLizms57S5Y+Tt56xdFgCC7iCHZ2F1nvDbYmMzauvLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f4a+Hk3X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9F46C4CEE7;
+	Thu,  4 Sep 2025 00:48:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756946267;
-	bh=NolWOvG4QsvlIv/gjPI7YpwDSettfhcYFKxMsBKbASk=;
+	s=k20201202; t=1756946929;
+	bh=/eZokcjTYsgn7x3TN1nV0vQhMpWaAhi7YQj4lS/oW5w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EKb0p+c8aqKFipoaV/P5iGdQW8/hboXbUjd0vh960xEZwZlyt3fo9D/2yzUPHCWmT
-	 xJ8EMTMDzjOL7Oh1diNcfmzz74HZux5y6wciqwgpjC6T6vXscfPuzspJwpwZurLe9L
-	 uMsVBTYbHqpWUC/WcBogvvb49wTtbbWpPOBMWXOkD6NYDCCYe4bsUaiDh2ATw0YoPG
-	 dsDV628CPXWiK00SlJnqn7dx1LdZiutQQbisK5G6D5ovRAPbLgCeFzVnQsUR0AY6WM
-	 bU5W07Z/JSXMkdQ4vLBgEHnRXdJP0rt15sc5G3HmVj7tzF0u5skVRSkSj9AbfkSOiv
-	 4EQwHACXfXV4A==
-Date: Wed, 3 Sep 2025 17:37:46 -0700
+	b=f4a+Hk3XTjiN/mfxv9pyjGmIzHB8EyWE1g9mMRhBYpyErEFM2eLS2RLCNLZ9m+flb
+	 usBL3tioZb1jmbnGl2cnprJzZgY+7pXdM1pTdJM/l7LSADXMr8lVMlXEjMiGbORW+l
+	 ylL1uOUITFWfR5Vf2cQlWFj287PPpY3SnuOoIUMARaFXEEbDEiJfG2mlCm55uL15H7
+	 EeIpGd0/dS2PeLYfhNQl8FVow1ttEyNVHftFywOVWIkdDwukIuF755hy2naOdqX4iN
+	 mT+GB2IWk5KvmNBlsutFJjAZgnVXN8wIkBAU7y8uonErOB31WtsIKKO8H9zXSHUUsF
+	 U/aLizS4FgT5Q==
+Date: Wed, 3 Sep 2025 17:48:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
- calvin@wbinvd.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next] selftest: netcons: create a torture test
-Message-ID: <20250903173746.5c04c306@kernel.org>
-In-Reply-To: <20250902-netconsole_torture-v1-1-03c6066598e9@debian.org>
-References: <20250902-netconsole_torture-v1-1-03c6066598e9@debian.org>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: <namcao@linutronix.de>, <jacob.e.keller@intel.com>,
+ <christian.koenig@amd.com>, <sumit.semwal@linaro.org>, <sdf@fomichev.me>,
+ <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+ <ast@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+ <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+ <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
+ <linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+ <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: Re: [PATCH net-next v2 1/6] net: ti: icssg-prueth: Add functions to
+ create and destroy Rx/Tx queues
+Message-ID: <20250903174847.5d8d1c9f@kernel.org>
+In-Reply-To: <20250901100227.1150567-2-m-malladi@ti.com>
+References: <20250901100227.1150567-1-m-malladi@ti.com>
+	<20250901100227.1150567-2-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,32 +69,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 02 Sep 2025 09:33:33 -0700 Breno Leitao wrote:
-> Create a netconsole test that puts a lot of pressure on the netconsole
-> list manipulation. Do it by creating dynamic targets and deleting
-> targets while messages are being sent. Also put interface down while the
-> messages are being sent, as creating parallel targets.
-> 
-> The code launches three background jobs on distinct schedules:
-> 
->  * Toggle netcons target every 30 iterations
->  * create and delete random_target every 50 iterations
->  * toggle iface every 70 iterations
-> 
-> This creates multiple concurrency sources that interact with netconsole
-> states. This is good practice to simulate stress, and exercise netpoll
-> and netconsole locks.
+On Mon, 1 Sep 2025 15:32:22 +0530 Meghana Malladi wrote:
+>  	if (!emac->xdpi.prog && !prog)
+>  		return 0;
+>  
+> -	WRITE_ONCE(emac->xdp_prog, prog);
+> +	if (netif_running(emac->ndev)) {
+> +		prueth_destroy_txq(emac);
+> +		prueth_destroy_rxq(emac);
+> +	}
+> +
+> +	old_prog = xchg(&emac->xdp_prog, prog);
+> +	if (old_prog)
+> +		bpf_prog_put(old_prog);
+> +
+> +	if (netif_running(emac->ndev)) {
+> +		ret = prueth_create_rxq(emac);
 
-Oh, when you said "selftest will be posted later" in the fix I thought
-you meant days, not hours later :) It's better if the fix and test are
-in one series. Better for backports, and it avoid situations like last
-night when the fix was already dropped from pw but this test was still
-running (and crashing the kernel).
+shutting the device down and freeing all rx memory for reconfig is not
+okay. If the system is low on memory the Rx buffer allocations may fail
+and system may drop off the network. You must either pre-allocate or
+avoid freeing the memory, and just restart the queues.
 
-Regarding the test, I think it makes sense. Tho is there a way we can
-reuse more of the existing code? Do you write all these scripts by hand
-or get AI to write them? I was hoping you'd add more tests relating to
-bonding. To confirm bonding still works. And as I mentioned I think
-bonding is still a bit buggy if we "propagate" multiple nps and then
-remove them out of order..
+> +		if (ret) {
+> +			netdev_err(emac->ndev, "Failed to create RX queue: %d\n", ret);
+> +			return ret;
+> +		}
+> +
+> +		ret = prueth_create_txq(emac);
+> +		if (ret) {
+> +			netdev_err(emac->ndev, "Failed to create TX queue: %d\n", ret);
+> +			prueth_destroy_rxq(emac);
+> +			emac->xdp_prog = NULL;
+> +			return ret;
+> +		}
+> +	}
+>  
+>  	xdp_attachment_setup(&emac->xdpi, bpf);
 
