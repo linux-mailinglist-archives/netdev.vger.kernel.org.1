@@ -1,237 +1,268 @@
-Return-Path: <netdev+bounces-220145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D28CB4490D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 00:04:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9AF2B44946
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 00:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04EF2A47ECF
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:04:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EE3EAA5249
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC7A2E5437;
-	Thu,  4 Sep 2025 22:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4822E3397;
+	Thu,  4 Sep 2025 22:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="fHcq7dvZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kDGRrFQy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E2A2DE6FA;
-	Thu,  4 Sep 2025 22:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B7E2E2F1A;
+	Thu,  4 Sep 2025 22:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757023411; cv=none; b=VC27VrXnySinll455Bd+sYezG6RWCLqusr2/+2nFz7g85+M56yuETNQ9n5wFuyGShZQkMRjrXcAx17iaJobfRx0C7BKzWLOqXEEdbRrxJi6PvZ/f7cyceck4czdWeTICRLmddLORkvUtyvjU0zHA8Dkqh1uZBLUdv81phDaDQkE=
+	t=1757023622; cv=none; b=ZrkdSp11eVIQnQxfuai5tGakwGftTAYzTuosZLfUlOTGkZa+cn3h7U91sSbf4WjQr1jELsjToXg+UplwVdVXdF0IdsywbJSX9m0hY/z1ocy6w5B7CUAZq5eWem9FVErMnqdz3JFP+q+OPCRW7i9VD+vyH8TJav7WOEN6/HIdCqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757023411; c=relaxed/simple;
-	bh=oSNm5eg5gYI2AKFp3yCBDv0gEfrms2mI0sAqlg7aafw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JHs/Fn7XtRdDegB7CAmtiT6T/CJAMJe2A180E7VfmtSb/q1KIiIvrKQ4hswxuW8vMAsNEYBw1woPcUvPt3c9LmxfWYU8GakhZAUJgGgYYlswYuFEUUYl34V7t/IULIPORBt/reda3Ikw/QsCmeqeJG2X1HITWbqle868inrrAsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=fHcq7dvZ; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1757023398;
-	bh=oSNm5eg5gYI2AKFp3yCBDv0gEfrms2mI0sAqlg7aafw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fHcq7dvZI6pvfn8YL/iDtqOpQcwj+xwC5DO1di5HGCXTjbl78kQhVe0DNSZMfwjKq
-	 VRdyUOTMBDLGqCY9EvGXVi9Jx+alo7VSBMaFNyjoeNpsznTLk/3hh3X2+1wtxlKcs3
-	 LRD8A66nzCJDkDXfWLGVAmAk5ZHGrTccrGbEzlgqte93tBB6KV5eIGW7m4Z6XPwYAB
-	 dlTpayTugJX9t+AeKLLYc5mkl9wfAZByXV17/RIUIQ19TFrAwtUiuaFjAGxU1M6tXr
-	 eHcBH5VVnGV0+ao/HkMZSnCiWcv2oYOsIRyDJoddw1pCGYw+NcIFiO17xs8CLIYPD7
-	 lPUUD1QZbIsYg==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 4F3066013A;
-	Thu,  4 Sep 2025 22:03:18 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id BFE61202B39; Thu, 04 Sep 2025 22:02:58 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC net-next 14/14] tools: ynl: add sample for wireguard
-Date: Thu,  4 Sep 2025 22:02:48 +0000
-Message-ID: <20250904220255.1006675-14-ast@fiberby.net>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250904-wg-ynl-rfc@fiberby.net>
-References: <20250904-wg-ynl-rfc@fiberby.net>
+	s=arc-20240116; t=1757023622; c=relaxed/simple;
+	bh=jJhRUuO/5DksvNEh02TanYPo+USrmlI2eOgLzi4mPFM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cqvNQ9maIvxak/zNAfIUTy4iWyu5oLoBW8a5B8K8+naW1khtfBPedvU7o5ootgzCe+LrtT0vVjefIMPfBSkH2H29Zl5G83SX/LE2QpU8vUFTskYwJeOApHoUwJvHu5+XX9WPSVjUanoely58YDkehanE9jQIflhtu3tLyLWx7hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kDGRrFQy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9796C4CEF0;
+	Thu,  4 Sep 2025 22:07:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757023621;
+	bh=jJhRUuO/5DksvNEh02TanYPo+USrmlI2eOgLzi4mPFM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=kDGRrFQytiXE5Ip6YxTa0R0mkMN5RaF9UTszBwoFZtJnkO1V/EoecRbaGxKF/ET4F
+	 FPcLYBtr9F+CHIflB8qfiKS/bHBOKFG8Ikm+bOYiwanbskT52gvpIVoAQioRhIRESj
+	 oPIy+k5tg40MdhJBOsWZ/jpvPxEm/3QxQc50aJQucHQjnhNmjdlJltultYDHFIFs98
+	 szz5/d44JMXWUpAO2kc8//+WYcJ3rwHLlv6lxAysPBfQh0jQa009nuGzoKKLs0pusG
+	 LdiHrafda5JQh6sgdFUQc7Zi16Mj9HI1nNyweF22ireYdqnU407EXEOo/Pl1/xBO7d
+	 yzaiwabt7rwxQ==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b045d56e181so222170166b.2;
+        Thu, 04 Sep 2025 15:07:01 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXZZ9UHTu071T5Ex0r/ig/BtpfC3jB1J8aZctP5qy0r/y9NeD1E0yArFLJDCVJXwZgrxCnASF+oryQJkC9f@vger.kernel.org, AJvYcCXucovPLwetTlKrpJElWGg4NGw10IKMate5WrE+yR/4eivtt9X9zJSZl9KUcheMVS+1EWleWGCEseYp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0hdb5HUSKaNmcrGGj6/2F/TxOLJiqCA7agprRS/oCvsMBE+u7
+	KHKMjoKyQ29q0xUGPaOTpxx7LM+I7RwFVgNHik6iKFhlkQWIJhve9lfSRJt0VicDuu2QU2ydewo
+	/2txmABrZM4zY86BuZC9CGuUa7FjEwA==
+X-Google-Smtp-Source: AGHT+IFPU86J5q2os3DqVwm6OQaIRkb2uYTcTl4ECKidm6RB8z6xN09U8ImNFZgAVv9Nyn09Omd/IqLY/RP2kNmAtGk=
+X-Received: by 2002:a17:906:7308:b0:b04:616c:d762 with SMTP id
+ a640c23a62f3a-b04616cdf1fmr904842166b.0.1757023620219; Thu, 04 Sep 2025
+ 15:07:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250815144736.1438060-1-ivecera@redhat.com> <20250820211350.GA1072343-robh@kernel.org>
+ <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com>
+In-Reply-To: <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 4 Sep 2025 17:06:48 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqKui29O_8xGBVx9T2e85Dy0onyAp4mGqChSuuwABOhDqA@mail.gmail.com>
+X-Gm-Features: Ac12FXzrq6H3317mJJXy9VKhjd67b1NEF52ll39fJK2DNVneuUd7QWVkJXMJpLI
+Message-ID: <CAL_JsqKui29O_8xGBVx9T2e85Dy0onyAp4mGqChSuuwABOhDqA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
+ reference property
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com, 
+	Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, 
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a sample application using the generated C library.
+On Fri, Aug 29, 2025 at 8:29=E2=80=AFAM Ivan Vecera <ivecera@redhat.com> wr=
+ote:
+>
+> Hi Rob,
+>
+> On 20. 08. 25 11:13 odp., Rob Herring wrote:
+> > On Fri, Aug 15, 2025 at 04:47:35PM +0200, Ivan Vecera wrote:
+> >> In case of SyncE scenario a DPLL channels generates a clean frequency
+> >> synchronous Ethernet clock (SyncE) and feeds it into the NIC transmit
+> >> path. The DPLL channel can be locked either to the recovered clock
+> >> from the NIC's PHY (Loop timing scenario) or to some external signal
+> >> source (e.g. GNSS) (Externally timed scenario).
+> >>
+> >> The example shows both situations. NIC1 recovers the input SyncE signa=
+l
+> >> that is used as an input reference for DPLL channel 1. The channel loc=
+ks
+> >> to this signal, filters jitter/wander and provides holdover. On output
+> >> the channel feeds a stable, phase-aligned clock back into the NIC1.
+> >> In the 2nd case the DPLL channel 2 locks to a master clock from GNSS a=
+nd
+> >> feeds a clean SyncE signal into the NIC2.
+> >>
+> >>                 +-----------+
+> >>              +--|   NIC 1   |<-+
+> >>              |  +-----------+  |
+> >>              |                 |
+> >>              | RxCLK     TxCLK |
+> >>              |                 |
+> >>              |  +-----------+  |
+> >>              +->| channel 1 |--+
+> >> +------+        |-- DPLL ---|
+> >> | GNSS |---------->| channel 2 |--+
+> >> +------+  RefCLK   +-----------+  |
+> >>                                |
+> >>                          TxCLK |
+> >>                                |
+> >>                 +-----------+  |
+> >>                 |   NIC 2   |<-+
+> >>                 +-----------+
+> >>
+> >> In the situations above the DPLL channels should be registered into
+> >> the DPLL sub-system with the same Clock Identity as PHCs present
+> >> in the NICs (for the example above DPLL channel 1 uses the same
+> >> Clock ID as NIC1's PHC and the channel 2 as NIC2's PHC).
+> >>
+> >> Because a NIC PHC's Clock ID is derived from the NIC's MAC address,
+> >> add a per-channel property 'ethernet-handle' that specifies a referenc=
+e
+> >> to a node representing an Ethernet device that uses this channel
+> >> to synchronize its hardware clock. Additionally convert existing
+> >> 'dpll-types' list property to 'dpll-type' per-channel property.
+> >>
+> >> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> >> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> >> ---
+> >>   .../devicetree/bindings/dpll/dpll-device.yaml | 40 ++++++++++++++++-=
+--
+> >>   .../bindings/dpll/microchip,zl30731.yaml      | 29 +++++++++++++-
+> >>   2 files changed, 62 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml b=
+/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >> index fb8d7a9a3693f..798c5484657cf 100644
+> >> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >> @@ -27,11 +27,41 @@ properties:
+> >>     "#size-cells":
+> >>       const: 0
+> >>
+> >> -  dpll-types:
+> >> -    description: List of DPLL channel types, one per DPLL instance.
+> >> -    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+> >> -    items:
+> >> -      enum: [pps, eec]
+> >
+> > Dropping this is an ABI change. You can't do that unless you are
+> > confident there are no users both in existing DTs and OSs.
+>
+> Get it, will keep.
+>
+> >> +  channels:
+> >> +    type: object
+> >> +    description: DPLL channels
+> >> +    unevaluatedProperties: false
+> >> +
+> >> +    properties:
+> >> +      "#address-cells":
+> >> +        const: 1
+> >> +      "#size-cells":
+> >> +        const: 0
+> >> +
+> >> +    patternProperties:
+> >> +      "^channel@[0-9a-f]+$":
+> >> +        type: object
+> >> +        description: DPLL channel
+> >> +        unevaluatedProperties: false
+> >> +
+> >> +        properties:
+> >> +          reg:
+> >> +            description: Hardware index of the DPLL channel
+> >> +            maxItems: 1
+> >> +
+> >> +          dpll-type:
+> >> +            description: DPLL channel type
+> >> +            $ref: /schemas/types.yaml#/definitions/string
+> >> +            enum: [pps, eec]
+> >> +
+> >> +          ethernet-handle:
+> >> +            description:
+> >> +              Specifies a reference to a node representing an Etherne=
+t device
+> >> +              that uses this channel to synchronize its hardware cloc=
+k.
+> >> +            $ref: /schemas/types.yaml#/definitions/phandle
+> >
+> > Seems a bit odd to me that the ethernet controller doesn't have a link
+> > to this node instead.
+>
+> Do you mean to add a property (e.g. dpll-channel or dpll-device) into
+> net/network-class.yaml ? If so, yes, it would be possible, and the way
+> I look at it now, it would probably be better. The DPLL driver can
+> enumerate all devices across the system that has this specific property
+> and check its value.
 
-Example:
-  [install uapi headers, then]
-  $ make -C tools/net/ynl/lib
-  $ make -C tools/net/ynl/generated
-  $ make -C tools/net/ynl/samples wireguard
-  $ ./tools/net/ynl/samples/wireguard
-  usage: ./tools/net/ynl/samples/wireguard <ifindex|ifname>
-  $ sudo ./tools/net/ynl/samples/wireguard wg-test
-  Interface 3: wg-test
-      Peer 6adfb183a4a2c94a2f92dab5ade762a4788[...]:
-          Data: rx: 42 / tx: 42 bytes
-          Allowed IPs:
-              0.0.0.0/0
-              ::/0
+Yes. Or into ethernet-controller.yaml. Is a DPLL used with wifi,
+bluetooth, etc.?
 
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
- MAINTAINERS                       |   1 +
- tools/net/ynl/samples/.gitignore  |   1 +
- tools/net/ynl/samples/wireguard.c | 104 ++++++++++++++++++++++++++++++
- 3 files changed, 106 insertions(+)
- create mode 100644 tools/net/ynl/samples/wireguard.c
+>
+> See the proposal below...
+>
+> Thanks,
+> Ivan
+>
+> ---
+>   Documentation/devicetree/bindings/dpll/dpll-device.yaml  | 6 ++++++
+>   Documentation/devicetree/bindings/net/network-class.yaml | 7 +++++++
+>   2 files changed, 13 insertions(+)
+>
+> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> index fb8d7a9a3693f..560351df1bec3 100644
+> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> @@ -27,6 +27,12 @@ properties:
+>     "#size-cells":
+>       const: 0
+>
+> +  "#dpll-cells":
+> +    description: |
+> +      Number of cells in a dpll specifier. The cell specifies the index
+> +      of the channel within the DPLL device.
+> +    const: 1
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e8360e4b55c6..dafc374b25d0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -27171,6 +27171,7 @@ S:	Maintained
- F:	Documentation/netlink/specs/wireguard.yaml
- F:	drivers/net/wireguard/
- F:	include/uapi/linux/wireguard_params.h
-+F:	tools/net/ynl/samples/wireguard.c
- F:	tools/testing/selftests/wireguard/
- 
- WISTRON LAPTOP BUTTON DRIVER
-diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
-index 7f5fca7682d7..09c61e4c18cd 100644
---- a/tools/net/ynl/samples/.gitignore
-+++ b/tools/net/ynl/samples/.gitignore
-@@ -7,3 +7,4 @@ rt-addr
- rt-link
- rt-route
- tc
-+wireguard
-diff --git a/tools/net/ynl/samples/wireguard.c b/tools/net/ynl/samples/wireguard.c
-new file mode 100644
-index 000000000000..f1549e585949
---- /dev/null
-+++ b/tools/net/ynl/samples/wireguard.c
-@@ -0,0 +1,104 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <arpa/inet.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <errno.h>
-+#include <ynl.h>
-+
-+#include "wireguard-user.h"
-+
-+static void print_allowed_ip(const struct wireguard_wgallowedip *aip)
-+{
-+	char addr_out[INET6_ADDRSTRLEN];
-+
-+	if (!inet_ntop(aip->family, aip->ipaddr, addr_out, sizeof(addr_out))) {
-+		addr_out[0] = '?';
-+		addr_out[1] = '\0';
-+	}
-+	printf("\t\t\t%s/%u\n", addr_out, aip->cidr_mask);
-+}
-+
-+/* Only printing public key in this demo. For better key formatting,
-+ * use constant-time implementation as found in wireguard-tools.
-+ */
-+static void print_peer_header(const struct wireguard_wgpeer *peer)
-+{
-+	unsigned int i;
-+	uint8_t *key = peer->public_key;
-+	unsigned int len = peer->_len.public_key;
-+
-+	if (len != 32)
-+		return;
-+	printf("\tPeer ");
-+	for (i = 0; i < len; i++)
-+		printf("%02x", key[i]);
-+	printf(":\n");
-+}
-+
-+static void print_peer(const struct wireguard_wgpeer *peer)
-+{
-+	unsigned int i;
-+
-+	print_peer_header(peer);
-+	printf("\t\tData: rx: %llu / tx: %llu bytes\n",
-+	       peer->rx_bytes, peer->tx_bytes);
-+	printf("\t\tAllowed IPs:\n");
-+	for (i = 0; i < peer->_count.allowedips; i++)
-+		print_allowed_ip(&peer->allowedips[i]);
-+}
-+
-+static void build_request(struct wireguard_get_device_req *req, char *arg)
-+{
-+	char *endptr;
-+	int ifindex;
-+
-+	ifindex = strtol(arg, &endptr, 0);
-+	if (endptr != arg + strlen(arg) || errno != 0)
-+		ifindex = 0;
-+	if (ifindex > 0)
-+		wireguard_get_device_req_set_ifindex(req, ifindex);
-+	else
-+		wireguard_get_device_req_set_ifname(req, arg);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct wireguard_get_device_list *devs;
-+	struct wireguard_get_device_req *req;
-+	struct ynl_sock *ys;
-+
-+	if (argc < 2) {
-+		fprintf(stderr, "usage: %s <ifindex|ifname>\n", argv[0]);
-+		return 1;
-+	}
-+
-+	req = wireguard_get_device_req_alloc();
-+	build_request(req, argv[1]);
-+
-+	ys = ynl_sock_create(&ynl_wireguard_family, NULL);
-+	if (!ys)
-+		return 2;
-+
-+	devs = wireguard_get_device_dump(ys, req);
-+	if (!devs)
-+		goto err_close;
-+
-+	ynl_dump_foreach(devs, d) {
-+		unsigned int i;
-+
-+		printf("Interface %d: %s\n", d->ifindex, d->ifname);
-+		for (i = 0; i < d->_count.peers; i++)
-+			print_peer(&d->peers[i]);
-+	}
-+	wireguard_get_device_list_free(devs);
-+	wireguard_get_device_req_free(req);
-+	ynl_sock_destroy(ys);
-+
-+	return 0;
-+
-+err_close:
-+	fprintf(stderr, "YNL (%d): %s\n", ys->err.code, ys->err.msg);
-+	wireguard_get_device_req_free(req);
-+	ynl_sock_destroy(ys);
-+	return 3;
-+}
--- 
-2.51.0
+If it is 1 for everyone, then you don't need a property for it. The
+question is whether it would need to vary. Perhaps some configuration
+flags/info might be needed? Connection type or frequency looking at
+the existing configuration setting?
 
+> +
+>     dpll-types:
+>       description: List of DPLL channel types, one per DPLL instance.
+>       $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+> diff --git a/Documentation/devicetree/bindings/net/network-class.yaml
+> b/Documentation/devicetree/bindings/net/network-class.yaml
+> index 06461fb92eb84..144badb3b7ff1 100644
+> --- a/Documentation/devicetree/bindings/net/network-class.yaml
+> +++ b/Documentation/devicetree/bindings/net/network-class.yaml
+> @@ -17,6 +17,13 @@ properties:
+>       default: 48
+>       const: 48
+>
+> +  dpll:
+> +    description:
+> +      Specifies DPLL device phandle and index of the DPLL channel within
+> +      this device used by this network device to synchronize its hardwar=
+e
+> +      clock.
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+
+If you have cells, then this should be phandle-array.
+
+> +
+>     local-mac-address:
+>       description:
+>         Specifies MAC address that was assigned to the network device
+> described by
+>
 
