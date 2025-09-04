@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-219961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF76B43EB8
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 16:27:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2578B43ED2
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 16:33:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59D561C874E7
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:27:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0E581C88047
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 14:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3274C3090CC;
-	Thu,  4 Sep 2025 14:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F5330DEB4;
+	Thu,  4 Sep 2025 14:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DlqtHD48"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvUs8DD6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082AD30147F;
-	Thu,  4 Sep 2025 14:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2D0307AC6
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 14:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756995888; cv=none; b=pZglBn80k3O1l5lT/wjr+PEiPZxDDP52dXzy71LHROAaIKJYqVFSQqGgefHHqBNWWLVUgp6smVQBM1eWG3h0t5QyuP7INnXY6Ofss/wc5VFFxIiAc+DI6S8Vp1o435RjShfCLPgIDuX5DzKihOPzS2NNjVMnK3fq5OCjaEGdxxg=
+	t=1756996132; cv=none; b=cmS9KrJpbOq/a2llDiVbyXYytUjm7qLqHvniqakKSBfAJTjL25mFdP9CpuVXjHHcNzPw2Fb4nQyZT+382yBc0uLDTZAOFomoAW5KlC4dqA0yjRP7Dxpamji7TBpmsW25EI/gvSBqMVSFq5ja7lC0nHLNlCxe22vCh7tJ0TDOrYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756995888; c=relaxed/simple;
-	bh=TMSFhLV/1wYkSJ97dKJw6ufL7BjjXw84F1bCscmJTtw=;
+	s=arc-20240116; t=1756996132; c=relaxed/simple;
+	bh=iemAXjP6bJjw8GwcJ41g4c70nmja6vnq0CHi0l09YDs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qWaxr7N4WLphvlJ5p78TPp9xC+HCmHf/WA4D6bcc6qJ+om3LhuVucDPp3fJHW3tKUZUDFlajoG3Fv64gn9SPw2YmL910cNHivxXyJOX5KnRXhK9F0vitM5XPDOn5co5e5Q4ynNy9flZ9VSa6tLB7tp4baSiBSy30qCmPtY+8CMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DlqtHD48; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27C5BC4CEF0;
-	Thu,  4 Sep 2025 14:24:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NGI+5FEy69Cg/oGmf+x8q3tcoTn884n+7qLSuV9g/m+Fql3Y1vfmS8TvoppT9DcBRXmT4melKHqPyFiQpxKi+T2FO3Gji+kwYRh/iNdv3b+n51ODHvwOrUbrIhErD0/FzSf8TvZh8OrPSyWN8yQK4p/j7pFwV/zwDaOsxS+Z6Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvUs8DD6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B555DC4CEF0;
+	Thu,  4 Sep 2025 14:28:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756995887;
-	bh=TMSFhLV/1wYkSJ97dKJw6ufL7BjjXw84F1bCscmJTtw=;
+	s=k20201202; t=1756996132;
+	bh=iemAXjP6bJjw8GwcJ41g4c70nmja6vnq0CHi0l09YDs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DlqtHD48YgV+PrFaJtWEk60ZfwIQ08DvnfwAInRIuLG13x92gTVjBWU1ChjPa5ahM
-	 AEfSxcERFIS0Bs97NAUWZWUTIwGlv2eYFuVR2yelqCz1QWzLpTkDg2D5icoi0KAGG9
-	 yTckK9cFA9Y4cWB9YaTPF9yEtvFZyCc0XJjavWv8FghE6w7hVGkbhPRQRVHvoK9wp5
-	 B5sB20in+GorY/jpsQzG7oZYykD4wAASJ5jCdivS3FYuEfoFT6LcTAt5g7SYN6ip4p
-	 c22q959WzyTU7ib43O7cvcVLeTYiSJWxTtGJSpDjT0HTGuyHqnbDLn6Ggt40q7yFZo
-	 gMd/Mh/odYsEA==
-Date: Thu, 4 Sep 2025 07:24:46 -0700
+	b=hvUs8DD6KQbDPLTQDPHN/fTeTgnOAF57w1uKF3+TS+AEOuCfads+NJHKeSFgnH7Gs
+	 tlNUvLXpmvWYRELth0xebC8gyZPlWCCEB+7BuGghXu/hIa4okfoAKOLVf9NjeRMhXh
+	 DkJlyyC8kYnPg+wACIlPm2/GurXbu+T8pktbKpq78ppIVXzLXZ9ta9z9gnRX01xi9x
+	 TeRS0t/lf1DD3HOB9Kgk6WQ0kPdIed3jSnyFbp8OB1T90Pr1seF3vIicUjAflou+iE
+	 oTUObrPIluN4die1d3GjX2XsIAsar+A182l1Cg77Kf/poRcBXhUlh/Qisw2QftwncS
+	 dN0O7wG29+CCA==
+Date: Thu, 4 Sep 2025 07:28:45 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Conley Lee <conleylee@foxmail.com>
-Cc: davem@davemloft.net, wens@csie.org, mripard@kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: sun4i-emac: free dma descriptor
-Message-ID: <20250904072446.5563130d@kernel.org>
-In-Reply-To: <tencent_160BBED8A83CECDE110A344B51B6229B1209@qq.com>
-References: <20250902155731.05a198d7@kernel.org>
-	<tencent_160BBED8A83CECDE110A344B51B6229B1209@qq.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: Simon Horman <horms@kernel.org>, dsahern@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+Subject: Re: [External] : Re: [PATCH net-next] udp_tunnel: Fix typo using
+ netdev_WARN instead of netdev_warn
+Message-ID: <20250904072845.045a162b@kernel.org>
+In-Reply-To: <e022df33-8759-4fa5-a694-d0d16c51d575@oracle.com>
+References: <20250903195717.2614214-1-alok.a.tiwari@oracle.com>
+	<20250904091832.GC372207@horms.kernel.org>
+	<e022df33-8759-4fa5-a694-d0d16c51d575@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,18 +63,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed,  3 Sep 2025 15:49:39 +0800 Conley Lee wrote:
-> In the current implementation of the sun4i-emac driver, when using DMA to
-> receive data packets, the descriptor for the current DMA request is not
-> released in the rx_done_callback.
-> 
-> Fix this by properly releasing the descriptor.
+On Thu, 4 Sep 2025 19:15:57 +0530 ALOK TIWARI wrote:
+> since WARN() triggers backtrace and dumps the file name
+> it is not require here. The failure in udp_tunnel_nic_register()
+> should just be treated as an expected operation failure, not as a kernel bug
 
-Reading the docs, it appears that the need to free the desc is tied to
-setting descriptor reuse flag. Which this driver does not do. So I'm
-unclear why this is needed, maybe the dma engine driver is doing
-something strange?
-
-Could you repost this, CC the dmaengine ML, Vinod and the appropriate
-SoC maintainers?
+You keep saying that without really explaining why.
+I can make a guess, but the motivation should really be part of 
+the commit msg.
 
