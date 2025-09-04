@@ -1,180 +1,246 @@
-Return-Path: <netdev+bounces-220086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 721EFB44682
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:37:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 684E1B446B5
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:48:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DF211C83369
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 19:37:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2150A16D291
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 19:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09F52737E0;
-	Thu,  4 Sep 2025 19:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81068264F9C;
+	Thu,  4 Sep 2025 19:48:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jlg3M5QX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G4G7wffP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B3E25A2BB
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 19:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34FD202C43
+	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 19:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757014640; cv=none; b=bH25xxE0gPd6rhajt9xwbI4oygwvo0n4dwBBbvIWKz734rE1RD6d4Bjm3O2/7ZnsEElD0njwM63ihy3uL4CKEBIJX9DVo6x+WO6qzOzWuxO1PeHEoWY12l2Zp/8H4etY2wYfUP7lRsM/kWAnaBtjAFPzG5TgbNh+5XwX9fuTUCM=
+	t=1757015297; cv=none; b=ayPccd3StQ+QsJwYOnDN0ZUC5+lqQn/txlGMxDcCQEn34ROayFQ4BheSulVT+B06RO7OoocqCSF7ReGUnlwQJAS16Mn7vfwZvtkvWBjOYHgytdsAMwjGOFkwtugvzmqJ0RSr7aul7wDtFnHoCQQZrwZjPdhW/ZrP7qC8hjklOgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757014640; c=relaxed/simple;
-	bh=1zQV/s94K5+h1YGZQMxFS9OiOGoj2u4JLZMij034Jf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ALbPUcC1PYravTi66DskPtGdewgAgFzzSZTvLRmp3SLcBfTlWQHV/BpgUXf8jDdkjCh+UlhMutjRiCb0gi+pUiYq6m66UtWW67S3h/ptAsQbAzNyskhaT/LjRB6Wq+3ixyk6bbc+Xn3G6o6VdOWLjAblPOIYO0EWaCghSiSmMSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jlg3M5QX; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 584Ib2jp004402
-	for <netdev@vger.kernel.org>; Thu, 4 Sep 2025 19:37:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=McF2iXJTB0tw0p4n9n5WkRjm
-	CGCLSHcRJu0PgH1a76w=; b=jlg3M5QXeLWp6cVDKBdqs6MOn5pkhdF00WH6DkWT
-	hHmjLm8bkq10x6uamdNnRlTgwxF+viCZ3Huv5/2qTt82Fr2AiOWVDnLdSWD0U20d
-	l3N2s6AQvK0U7i2ayG5jxamGjaqqKzRxxAX1V77hhS1lGpy8kB2vOm7+u2nwKdLP
-	dY3nZYSxG5/aI9ghuT81Nr5pTiGdhcmFVTM3Ltiq/3Sn6K7tQLWpMN3gxhhoE7Fu
-	rxt8nm/FQTVy00djexljCwo3be0iqspg+bn0c/7WhVei4VDHAT+c0UzAy6jwBKB6
-	B4NkLGp/mR4Hcg+7Gg2CQZaEeYKyZejXI61LeW81UoHwKw==
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48ur8s8rbe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 19:37:18 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b4f738792b0so1722924a12.3
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 12:37:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757014638; x=1757619438;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=McF2iXJTB0tw0p4n9n5WkRjmCGCLSHcRJu0PgH1a76w=;
-        b=eIVUiuEL5BXMfitUqwxrsiT4k9RzvXbZTdjmlM3KiP9GBTE8IXpVbDehiY9ujGBpxg
-         8cpjHMhZh8Sth8BRIVP+H4VCz6b43tn6SLhWAS26Ro2obV54o+xJAqcQQyuKglevcW4a
-         JvT2gGLQAgtFRNfxJ5H/w4p/iAiQMyotPho4qe5kiCxHEhM5vghe5e2fWEeLWkVa7qU6
-         PrQIAgJXy7yQWuUv36P3iefQh91rsmVEd8BbhnOWJyyAWl2qxqDZoYi6eT5aF0KoD8nJ
-         dkKvZjQHzGyqlnc5KCkxX4SUOXnihdc4XfgqQCNAU6//DrEFFfMIoSq5shafllHFZ7og
-         XKeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWb6xC5Xf7AFqSv/i1d6S3aQ+RocZbd5gsHQcCqpMTPKaWSD6e7BouK5fJKfFFNlm5qeWCyZ6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkrKNDnH+CNXRG2BTmSXOtILh2Zgv53B2phXJSNLGJFZZQLy6s
-	u0Ku9PFhDeov/vUe9NzphUwcI20hI326TpYt+K65GFf83uOtEfZspGFwTxg1opnBhOZoyWxT/sY
-	i72NstZJuJDItvgjbG6JggYgUobYXHqR017xZWkbFdGT/ToMPJ3S2rN04VQY=
-X-Gm-Gg: ASbGncsZPVGVz7uGcHDmJvyLvt+HF5vGqFefzjr/BCh/hwBZih8C6/U8FidNatuPqp8
-	3FhKc+/7OXNYxJn829n4o8BMuqvUJ3ali2rOrn+oUD9FHhu8Lowug1L0y5S5soOVHN69WfQrny9
-	NsklPmCU2FFRWOCspJ3FeDIx3jdPKpHfMtkOvFzFUmuhrE+pVPwHAUFSkdGPrGw8vmg6jKa0Kme
-	UT0ePBFzY/XvDB7fW181LV0T/zPcrmEECMmzCegrgsM9A5F8g3uQQHARE8MHo8M8JC8LsHOu0DK
-	X7SMq3nmFNOT41QDXvxXOsFieMmxp+C3oPth2+GQLxyMI6IrqPkDqguqE76ZIne60jb2
-X-Received: by 2002:a17:903:ac3:b0:24c:a269:b6d7 with SMTP id d9443c01a7336-24ce9b57ba6mr14192415ad.50.1757014637695;
-        Thu, 04 Sep 2025 12:37:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF8wfQGHYpfVwabKJx2d0rjdTjkyrNxzu2OZBEviz2cswh6mp15XKTFFB6XMS1SDaXgiS2CFg==
-X-Received: by 2002:a17:903:ac3:b0:24c:a269:b6d7 with SMTP id d9443c01a7336-24ce9b57ba6mr14192115ad.50.1757014637195;
-        Thu, 04 Sep 2025 12:37:17 -0700 (PDT)
-Received: from hu-wasimn-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24ccd655823sm20856515ad.114.2025.09.04.12.37.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 12:37:16 -0700 (PDT)
-Date: Fri, 5 Sep 2025 01:07:10 +0530
-From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>, kernel@oss.qualcomm.com,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-i2c@vger.kernel.org
-Subject: Re: [PATCH v3 05/14] dt-bindings: eeprom: at24: Add compatible for
- Giantec GT24C256C
-Message-ID: <aLnqZktduc/aT05R@hu-wasimn-hyd.qualcomm.com>
-References: <20250904-lemans-evk-bu-v3-0-8bbaac1f25e8@oss.qualcomm.com>
- <20250904-lemans-evk-bu-v3-5-8bbaac1f25e8@oss.qualcomm.com>
- <qya226icirpzue4k2nh6rwcdoalipdtvrxw6esdz4wdyzwhcur@c2bmdwnekmlv>
+	s=arc-20240116; t=1757015297; c=relaxed/simple;
+	bh=nqohl5jgX/PxcHT2z/UszfKDY7KocZbcLutl8HsU95c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ji+N48ABQoXF+xa9a0dGpYq+UBAJMf/NfGTpxr9iWD+xsTcdFtnrW2EE/abXR0D2sbt47lwTXNEQPonzQKoysOcGU0aNQrMIRtbUTDa/tkik4NlPl0ewUHxOrGOvX4LwP78HfPztgKSZxZhjbV2eArAUoexYVXAhJ3vNEuon90w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G4G7wffP; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <26939fec-b70f-4beb-8895-427db69c38a0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757015291;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gm8d/i/wGeuAxF6pbQHB1XvUNQ/PHAtfV3G4ujYsf1Q=;
+	b=G4G7wffPcnURRryCPhCkm6h4fDpqQVnjamUYpmSQmAw8nOIpepq+fUJA3/h3uFVTWIUq/U
+	FW36s5n49w+Wn00y/k8y5+PI080Rf97OpCreSqhBxyZdFyqAkSkK5PjBRGIREYNjIkP87F
+	z84G+Ul1E8oS6DYE9bm7jK3Ui1+61lU=
+Date: Thu, 4 Sep 2025 12:48:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <qya226icirpzue4k2nh6rwcdoalipdtvrxw6esdz4wdyzwhcur@c2bmdwnekmlv>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAxOSBTYWx0ZWRfX6foMKOZ3xsYP
- Ja582FWGSoMU0/qvgryfmxszG6DqN8ZoV+PeDTHGb2PcCzel42bdks+QvOVyc6LCwzEhVEt2G6Q
- bbR5sahe1Q7IaIJK/FUrU0OpWvpSFFFvVxDhkGT+Nu/NrniTy1eP6zjU6+/dqVdTlGL6aF6Im1S
- dfIxb4wAmjNhkuAMZGq01CUv+lOB0mRr2VK+TeZoNqIgK5Gy/wkZM6Hlv0MsO8Bm1M4mDd0uMYv
- OB9drsDwoAwpJMyoUzLUtV2IquqYX7SLA74NAdDLm4LMZs2IW6svQCHzVoU+qzVotIxKxr1K6to
- ALVpJa15tqSYu6/U/E6CuVsmvuCp/GeKU+HdqMPyk9+cYbtPd9zt1fcvMhFaqMVn4CfAevC1DeJ
- IJR4tLLk
-X-Proofpoint-GUID: aT0YsUmBqSNfk1rToim5GtJ4bn10_tlD
-X-Proofpoint-ORIG-GUID: aT0YsUmBqSNfk1rToim5GtJ4bn10_tlD
-X-Authority-Analysis: v=2.4 cv=PNkP+eqC c=1 sm=1 tr=0 ts=68b9ea6e cx=c_pps
- a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=EUspDBNiAAAA:8 a=IAxE5SYkeMM4qmkgMe8A:9
- a=CjuIK1q_8ugA:10 a=x9snwWr2DeNwDh03kgHS:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-04_06,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
- suspectscore=0 adultscore=0 phishscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300019
+Subject: Re: [PATCH v4 bpf-next/net 5/5] selftest: bpf: Add test for
+ SK_BPF_MEMCG_SOCK_ISOLATED.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+ Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250829010026.347440-1-kuniyu@google.com>
+ <20250829010026.347440-6-kuniyu@google.com>
+ <904c1ffb-107e-4f14-89b7-d42ac9a5aa14@linux.dev>
+ <CAAVpQUDfQwb2nfGBV8NEONwaBAMVi_5F8+OPFX3=z+W8X9n9ZQ@mail.gmail.com>
+ <CAAVpQUBWsVDu07xrQcqGMo4cHRu41zvb5CWuiUdJx9m6A+_2AQ@mail.gmail.com>
+ <CAAVpQUCyPPO1dfkkU4Hxz67JFcW6dhSfYnmUp0foNMYua_doyg@mail.gmail.com>
+ <40ed29b3-84d7-4812-890d-3676957d503f@linux.dev>
+ <CAAVpQUCLpi+6w1SP=FKVaXwdDHQC_P6B1hzzDC5y4brsf3_UnQ@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAAVpQUCLpi+6w1SP=FKVaXwdDHQC_P6B1hzzDC5y4brsf3_UnQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Sep 04, 2025 at 07:43:27PM +0300, Dmitry Baryshkov wrote:
-> On Thu, Sep 04, 2025 at 10:09:01PM +0530, Wasim Nazir wrote:
-> > Add the compatible for 256Kb EEPROM from Giantec.
+On 9/4/25 9:45 AM, Kuniyuki Iwashima wrote:
+> On Wed, Sep 3, 2025 at 10:51 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 9/3/25 10:08 AM, Kuniyuki Iwashima wrote:
+>>> On Wed, Sep 3, 2025 at 9:59 AM Kuniyuki Iwashima <kuniyu@google.com> wrote:
+>>>>
+>>>> On Tue, Sep 2, 2025 at 1:49 PM Kuniyuki Iwashima <kuniyu@google.com> wrote:
+>>>>>
+>>>>> On Tue, Sep 2, 2025 at 1:26 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>>>>>
+>>>>>> On 8/28/25 6:00 PM, Kuniyuki Iwashima wrote:
+>>>>>>> The test does the following for IPv4/IPv6 x TCP/UDP sockets
+>>>>>>> with/without BPF prog.
+>>>>>>>
+>>>>>>>      1. Create socket pairs
+>>>>>>>      2. Send a bunch of data that requires more than 256 pages
+>>>>>>>      3. Read memory_allocated from the 3rd column in /proc/net/protocols
+>>>>>>>      4. Check if unread data is charged to memory_allocated
+>>>>>>>
+>>>>>>> If BPF prog is attached, memory_allocated should not be changed,
+>>>>>>> but we allow a small error (up to 10 pages) in case other processes
+>>>>>>> on the host use some amounts of TCP/UDP memory.
+>>>>>>>
+>>>>>>> At 2., the test actually sends more than 1024 pages because the sysctl
+>>>>>>> net.core.mem_pcpu_rsv is 256 is by default, which means 256 pages are
+>>>>>>> buffered per cpu before reporting to sk->sk_prot->memory_allocated.
+>>>>>>>
+>>>>>>>      BUF_SINGLE (1024) * NR_SEND (64) * NR_SOCKETS (64) / 4096
+>>>>>>>      = 1024 pages
+>>>>>>>
+>>>>>>> When I reduced it to 512 pages, the following assertion for the
+>>>>>>> non-isolated case got flaky.
+>>>>>>>
+>>>>>>>      ASSERT_GT(memory_allocated[1], memory_allocated[0] + 256, ...)
+>>>>>>>
+>>>>>>> Another contributor to slowness is 150ms sleep to make sure 1 RCU
+>>>>>>> grace period passes because UDP recv queue is destroyed after that.
+>>>>>>
+>>>>>> There is a kern_sync_rcu() in testing_helpers.c.
+>>>>>
+>>>>> Nice helper :)  Will use it.
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>>      # time ./test_progs -t sk_memcg
+>>>>>>>      #370/1   sk_memcg/TCP       :OK
+>>>>>>>      #370/2   sk_memcg/UDP       :OK
+>>>>>>>      #370/3   sk_memcg/TCPv6     :OK
+>>>>>>>      #370/4   sk_memcg/UDPv6     :OK
+>>>>>>>      #370     sk_memcg:OK
+>>>>>>>      Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+>>>>>>>
+>>>>>>>      real       0m1.214s
+>>>>>>>      user       0m0.014s
+>>>>>>>      sys        0m0.318s
+>>>>>>
+>>>>>> Thanks. It finished much faster in my setup also comparing with the earlier
+>>>>>> revision. However, it is a bit flaky when I run it in a loop:
+>>>>>>
+>>>>>> check_isolated:FAIL:not isolated unexpected not isolated: actual 861 <= expected 861
+>>>>>>
+>>>>>> I usually can hit this at ~40-th iteration.
+>>>>>
+>>>>> Oh.. I tested ~10 times manually but will try in a tight loop.
+>>>>
+>>>> This didn't reproduce on my QEMU with/without --enable-kvm.
+>>>>
+>>>> Changing the assert from _GT to _GE will address the very case
+>>>> above, but I'm not sure if it's enough.
+>>>
+>>> I doubled NR_SEND and it was still faster with kern_sync_rcu()
+>>> than usleep(), so I'll simply double NR_SEND in v5
+>>>
+>>> # time ./test_progs -t sk_memcg
+>>> ...
+>>> Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+>>> real 0m0.483s
+>>> user 0m0.010s
+>>> sys 0m0.191s
+>>>
+>>>
+>>>>
+>>>> Does the bpf CI run tests repeatedly or is this only a manual
+>>>> scenario ?
+>>
+>> I haven't seen bpf CI hit it yet. It is in my manual bash while loop. It should
+>> not be dismissed so easily. Some flaky CI tests were eventually reproduced in a
+>> loop before and fixed. I kept the bash loop continue this time until grep-ed a
+>> "0" from the error output:
+>>
+>> check_isolated:FAIL:not isolated unexpected not isolated: actual 0 <= expected 256
+>>
+>> The "long memory_allocated[2]" read from /proc/net/protocols are printed as 0
+>> but it is probably actually negative:
+>>
+>> static inline long
+>> proto_memory_allocated(const struct proto *prot)
+>> {
+>>           return max(0L, atomic_long_read(prot->memory_allocated));
+>> }
+>>
+>> prot->memory_allocated could be negative afaict but printed as 0 in
+>> /proc/net/protocols. Even the machine is network quiet after test_progs started,
+>> the "prot->memory_allocated" and the "proto->per_cpu_fw_alloc" could be in some
+>> random states before the test_progs start.  When I hit "0", it will take some
+>> efforts to send some random traffic to the machine to get the test working again. :(
+>>
+>> Also, after reading the selftest closer, I am not sure I understand why "+ 256".
+>> The "proto-> per_cpu_fw_alloc" can start with -255 or +255.
 > 
-> Why? Don't describe the change, describe the reason for the change.
+> Actually I didn't expect the random state and assumed the test's
+> local communication would complete on the same CPU thus 0~255.
 > 
-
-Let me know if this properly describe the reason:
-
----
-dt-bindings: eeprom: at24: Add compatible for Giantec GT24C256C
-
-The gt24c256c is another 24c256 compatible EEPROM, and does not
-follow the generic name matching, so add a separate compatible for it.
-This ensures accurate device-tree representation and enables proper
-kernel support for systems using this part.
----
-
-> > 
-> > Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> > ---
-> >  Documentation/devicetree/bindings/eeprom/at24.yaml | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/eeprom/at24.yaml b/Documentation/devicetree/bindings/eeprom/at24.yaml
-> > index 0ac68646c077..50af7ccf6e21 100644
-> > --- a/Documentation/devicetree/bindings/eeprom/at24.yaml
-> > +++ b/Documentation/devicetree/bindings/eeprom/at24.yaml
-> > @@ -143,6 +143,7 @@ properties:
-> >            - const: atmel,24c128
-> >        - items:
-> >            - enum:
-> > +              - giantec,gt24c256c
-> >                - puya,p24c256c
-> >            - const: atmel,24c256
-> >        - items:
-> > 
-> > -- 
-> > 2.51.0
-> > 
+> Do you see the flakiness with net.core.mem_pcpu_rsv=0 ?
 > 
-> -- 
-> With best wishes
-> Dmitry
+> The per-cpu cache is just for performance and I think it's not
+> critical for testing and it's fine to set it to 0 during the test.
+> 
+> 
+>>
+>> I don't think changing NR_SEND help here. It needs a better way. May be some
+>> functions can be traced such that prot->memory_allocated can be read directly?
+>> If fentry and fexit of that function has different memory_allocated values, then
+>> the test could also become more straight forward.
+> 
+> Maybe like this ?  Not yet tested, but we could attach a prog to
+> sock_init_data() or somewhere else and trigger it by additional socket(2).
+> 
+>          memory_allocated = sk->sk_prot->memory_allocated;
+>          nr_cpu = bpf_num_possible_cpus();
+> 
+>          for (i = 0; i < nr_cpu; i++) {
+>                  per_cpu_fw_alloc =
+> bpf_per_cpu_ptr(sk->sk_prot->per_cpu_fw_alloc, i);
 
--- 
-Regards,
-Wasim
+I suspect passing per_cpu_fw_alloc to bpf_per_cpu_ptr won't work for now. sk is 
+trusted if it is a "tp_btf" but I don't think the verifier recognizes the 
+sk->sk_prot is a trusted ptr. I haven't tested it though. If the above does not 
+work, try to directly use the global percpu tcp_memory_per_cpu_fw_alloc. Take a 
+look at how "bpf_prog_active" is used in test_ksyms_btf.c.
+
+>                  if (per_cpu_fw_alloc)
+>                          memory_allocated += *per_cpu_fw_alloc;
+
+Yeah. I think figuring out the true memory_allocated value and use it as the 
+before/after value should be good enough. Then no need to worry about the 
+initial states. I wonder why proto_memory_allocated() does not do that for 
+/proc/net/protocols but I guess it may not be accurate for a lot of cores.
+
+>          }
+> 
+> per_cpu_fw_alloc might have been added to sk_prot->memory_allocated
+> during loop, so it's not 100% accurate still.
+> 
+> Probably we should set net.core.mem_pcpu_rsv=0 and stress
+> memory_allocated before the actual test to drain per_cpu_fw_alloc
+> (at least on the testing CPU).
+I think the best is if a suitable kernel func can be traced or figure out the 
+true memory_allocated value. At least figuring out the true memory_allocated 
+seems doable. If nothing of the above works out, mem_pcpu_rsv=0 and 
+pre-stress/pre-flush should help by getting the per_cpu_fw_alloc and 
+memory_allocated to some certain states before using it in the before/after result.
+
+[ Before re-spinning, need to conclude/resolve the on-going discussion in v5 first ]
 
