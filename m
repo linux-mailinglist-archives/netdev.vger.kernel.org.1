@@ -1,140 +1,156 @@
-Return-Path: <netdev+bounces-219824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 918ACB432C8
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 08:49:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 850B3B43386
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 09:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0745C1883730
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 06:50:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B1E3A68C6
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 07:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9065F28541F;
-	Thu,  4 Sep 2025 06:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014732989BF;
+	Thu,  4 Sep 2025 07:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFFtKopd"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F94ROrFE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F61285069
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 06:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C2624501B;
+	Thu,  4 Sep 2025 07:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756968585; cv=none; b=YDPEPKFYba/HcCryuKqdgy9dbDUkvr+wATvOxBpgR4q8Yw+2MqDIU7ysbmYbsB/FPdAIFC8bi80LoI1xqXxtYk170j8aP+NDhLgmI2YXLbUYgsZkMvxrxBZrR5njqStNOVZjl7XGG9zwukp2WISOL+m3vD1R95F5S9otqDCANKw=
+	t=1756970208; cv=none; b=PImgXGfIOjHJEECpBWrvpmPLajHEAIrZa5tvKd+W+Q4JyOntjF79HdsFpLVYIWe91HDwBd1kNJjUuLpwQRaPaIkGC+k9y0w3K4P4gXUSMJuyTftPQIV/MSg9bMghrfszAv3PXgjoPNTNBuvlaVIByhnr+rhXUBlTLeUmNk825NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756968585; c=relaxed/simple;
-	bh=Mjve9as+XeiIpu4AGRqn4u8NIiTcc7YxtMIECHZ8YKE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V+PtadHo84Gm98DN/4HCer+xT0W3twb1haGKxgd/alMdTKQDddXSmFRjNdcg7nBUTKkoXh7yBPiqXuHHLq2p4tPo9dfJ8aRJbFkleR0JTxpgtwI5R17xiQdsf9nkZxdBDyOOnHXqYiZxgfvR9FbDsE8kINescx0pSztURvQTJWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IFFtKopd; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3f663225a2bso5605985ab.1
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 23:49:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756968583; x=1757573383; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mjve9as+XeiIpu4AGRqn4u8NIiTcc7YxtMIECHZ8YKE=;
-        b=IFFtKopdNnN5qCxZH79CpW3iG+0jrW1BiIZqGTqZJ3rWQTBz7SQWq3ef4CQBJqnIPM
-         oyLYiuO9YiKctaNygzgbfywQX+pB7ThlgaYxq8p+wFQcPT5CtZwl21CJ6cf5MUk6rtsj
-         cEwi67oi3FVSNVEuIhe4eoxnxxlVqjTVJwKrXwWhXaD8/JgDhfgGnp+QefnbHbkZ5TCh
-         JF4DTdGgQHQow+o7sVl46ELEFhpprT2cwKfDheKMIly+GPYDnrxUbhN7jYnjft2YBM8r
-         72yNgfrSmvmHvzcimrXBljPUwBW5osSm7xONXoeoO5wuTDufed6Bmfd1tBwfO+X1TGcZ
-         tK4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756968583; x=1757573383;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Mjve9as+XeiIpu4AGRqn4u8NIiTcc7YxtMIECHZ8YKE=;
-        b=RTivkE1fWBZJwfxHPPcIgf3rjAaE4exBYGZFXY0lhMfivh6OXjuGcGkaxLqqiPobN9
-         1K1NgKIrTjieQLR1AXwT84wSnpzrt74veDiX/O6ESGKGthCKhLBi2kVGKHbVveNcZCHo
-         MhLFJxSNfZ3537hkHt4+2FTiz02T+kMk/De/um0l+c4IB/Po6IY4mJ5yamOmgrOCOuTd
-         N8xm3EDEMOWfqWLA6gOYPifyY+jjCFc2nxHGlHAc0Y6lDBufpo18dYiJ1Wo9mWqE+xQ6
-         8R0NrVZQ7KGPm1n7FCRnYot1dOcKiU115VEshEfL9k1iRXRqauIZHqxCW1E2vh2icQjR
-         znuA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNqQagAVPMWunnxfdbKw/d6w5HkxNbzY3Z8eVk7oQabfpkToz6eMP0UEPkQRA8gR+jFLzAGCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxxd+O/4VMrg5WzozWh4mlVCgHNQbVpGdWHEZxgUaH7JHus+I1S
-	mn5IliJx3URBh8ZD6IVD5BHiCM/yMvKUJtQ5PXaKWZPFu38x2OL8CrHoLMwGWPJSM5dtJUwieqh
-	5q3IIsxLRDMKQ5bh7v5+ajUwmX11SwaA=
-X-Gm-Gg: ASbGncsHBxUTyhf6EH5G+Ve6xFxDvIcXaNoSH7c2gsgx18nl3HUCEUx1u6lr5vjSkRs
-	qC7xsLwyBMQgeaBefoWfrv9u31Vqo724HNUw20NTVCCFVhD4ZW7zwjxLqc0I3mXyAKFDrVEfqxW
-	hGfjA7W4dIXFlw+TO6azYmEO8priNVuF+cyAQfsrrda1kjLs1Iz7sD+pZYhF6sfuR2kM+AXt+Vd
-	BbTcVc=
-X-Google-Smtp-Source: AGHT+IGEeJyHTblpykuHQu4g3FUHHuhXizIB5I/cX8I++TYM3nF2bQWsC8dz5vgCxjpcdjZrFOVjFGE+fqVSAh7PCDk=
-X-Received: by 2002:a05:6e02:144c:b0:3f3:cd20:d7e4 with SMTP id
- e9e14a558f8ab-3f3ffda2be4mr313977075ab.1.1756968583123; Wed, 03 Sep 2025
- 23:49:43 -0700 (PDT)
+	s=arc-20240116; t=1756970208; c=relaxed/simple;
+	bh=1+RWVcDIIkiRod+TRNgoORvaOZSUBzh3FfCqknTDUbo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O5VAUejrhD5hXCln0apVIZs3QJrCItdsXMm010X3UzVLdhj363mVbSUC2EfydydvbXgyAblRCkXbKbDe7c1QSZPz0wOFRtBbEzUNt/AEccke/E4oQv5GV/I8DFIhJHpgN9fh9bfZUsxmdcqHaGTVc5oBpEWRu3Y1bLnGXIBDQAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F94ROrFE; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 583I06Yt027831;
+	Thu, 4 Sep 2025 07:16:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=TS0UBg
+	gYq9qgJNvx7S91o1QOtieKgQ4j9xHsjF1SE7w=; b=F94ROrFEux6ZiMlvOFpEgd
+	C9VlT6QYPgM62Fpmj6JSPkwKhE3ohAPg+vh5SD6Zn7u23DqyNnnCXqHq8kpjFTFR
+	/R0/o0mjJo+NFxa4qfvG6n47tqOBGk3SImILuqtbouJt2MUiZrcJDhs/Q232tP0A
+	mdYWNQojPYEtDKs3FqaFCX6RYeOynxMKYtoJ7ZNeVH+znhPdvLqwYuUZj+0tLVqQ
+	OzhhyTP9HKR/FXsGvmLguoGN1mVlGU67/b9gzePX9GFIob31jsgllg7XjjHMLXGj
+	f9GlTcpBkph8tuv7Lf/zky7uBd0zdo9lqw4RSZ93PS7XGMwGuyXPAK5lNDmvqvhQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvg09ry-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Sep 2025 07:16:32 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58478GfV013713;
+	Thu, 4 Sep 2025 07:16:31 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvg09rw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Sep 2025 07:16:31 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5844Avck019404;
+	Thu, 4 Sep 2025 07:16:31 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vd4n35sf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Sep 2025 07:16:31 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5847GRff51184024
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 4 Sep 2025 07:16:27 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8CB532004B;
+	Thu,  4 Sep 2025 07:16:27 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 438CC20043;
+	Thu,  4 Sep 2025 07:16:27 +0000 (GMT)
+Received: from [9.152.224.94] (unknown [9.152.224.94])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  4 Sep 2025 07:16:27 +0000 (GMT)
+Message-ID: <5177c2da-4158-4b12-996d-831ff1ab0708@linux.ibm.com>
+Date: Thu, 4 Sep 2025 09:16:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903084720.1168904-1-edumazet@google.com> <20250903084720.1168904-2-edumazet@google.com>
- <CAL+tcoCqey97QW=7n_S8V9t-haSe=mu9iE1sAaDmPPJ+1BkysA@mail.gmail.com>
- <CAAVpQUBgCyC+y+2M7=WKJVk=sivgeZtE2kwCxDLFCrgezycjZg@mail.gmail.com>
- <CAL+tcoBJxe6GkosVCS5Vzwk_z8W1WmxqLFELzXNwCRSYkQUyHw@mail.gmail.com> <CANn89iLO1JOw8LKoxAYm5M_tXDFyiSVhEovOPsSf9H08gPwj_Q@mail.gmail.com>
-In-Reply-To: <CANn89iLO1JOw8LKoxAYm5M_tXDFyiSVhEovOPsSf9H08gPwj_Q@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 4 Sep 2025 14:49:07 +0800
-X-Gm-Features: Ac12FXwMWZ5vK3YAHtyRE0U3uRDuNk6V1hWJ7W7gu6NgzxQL7NOu8q3d5SzZG_c
-Message-ID: <CAL+tcoBT8=w9qHZC+P3nV5F2p7q4-r--aDFSn-TnQLMLkavLwg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] tcp: fix __tcp_close() to only send RST when required
-To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] s390/ism: Log module load/unload
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond
+ <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Aswin Karuvally <aswin@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mahanta Jambigi
+ <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250901145842.1718373-1-wintera@linux.ibm.com>
+ <20250901145842.1718373-2-wintera@linux.ibm.com>
+ <20250903164233.7b2750e8@kernel.org>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20250903164233.7b2750e8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=behrUPPB c=1 sm=1 tr=0 ts=68b93cd0 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=meDq6FdmJ0PmnKaK2a0A:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: E8rj7Yox8s0U02qs8xoMj_gE5Hoiks5R
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzNCBTYWx0ZWRfX9scUnzTkVyjc
+ HKTTXbno/KVTwMyRgJovelqt5QWoUzUgzA4vVPsOcXAeYThh+TZI6ob0noFLrqU5s8nu/RIzrJ/
+ SgeVlEj06oMhyzkec3zvCiYx4SnSDdY2ZaQ6WIRdDT4SumOg/2/lerpdmux1Ho/LcldgqZxmw0j
+ 9PLz916votBQSa25hBoiv39vSfewI5o3O7NpQUXTv3J6czN+36wuncAtr4/3ZPsXFGS9J9FM4A2
+ T8PrAeJ47w9mv0Fonkl5/rVru/v8Nh0MmDizjU76BRgnSU4XMOGL1GF9EQlmzeSv/R9HiL3xtS2
+ sdxMl+HHA9aDnCD4xlVU7CuDRMzwwors8rG0oAWwdyuFlfiKvAo6ItA0x7yozaHvQEZ+FY+grUl
+ 5iGGag15
+X-Proofpoint-GUID: CROkHagpF6zv1arebXtvAW35Gh-l6g-g
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-04_02,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 impostorscore=0 spamscore=0 clxscore=1015 phishscore=0
+ priorityscore=1501 adultscore=0 bulkscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300034
 
-On Thu, Sep 4, 2025 at 2:44=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Wed, Sep 3, 2025 at 11:19=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > On Thu, Sep 4, 2025 at 1:32=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google=
-.com> wrote:
-> > >
-> > > On Wed, Sep 3, 2025 at 10:04=E2=80=AFPM Jason Xing <kerneljasonxing@g=
-mail.com> wrote:
-> > > >
-> > > > On Wed, Sep 3, 2025 at 4:47=E2=80=AFPM Eric Dumazet <edumazet@googl=
-e.com> wrote:
-> > > > >
-> > > > > If the receive queue contains payload that was already
-> > > > > received, __tcp_close() can send an unexpected RST.
-> > > > >
-> > > > > Refine the code to take tp->copied_seq into account,
-> > > > > as we already do in tcp recvmsg().
-> > > > >
-> > > > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > > >
-> > > > Sorry, Eric. I might be wrong, and I don't think it's a bugfix for =
-now.
-> > > >
-> > > > IIUC, it's not possible that one skb stays in the receive queue and
-> > > > all of the data has been consumed in tcp_recvmsg() unless it's
-> > > > MSG_PEEK mode. So my understanding is that the patch tries to cover
-> > > > the case where partial data of skb is read by applications and the
-> > > > whole skb has not been unlinked from the receive queue yet. Sure, a=
-s
-> > > > we can learn from tcp_sendsmg(), skb can be partially read.
-> > >
-> > > You can find a clear example in patch 2 that this patch fixes.
-> >
-> > Oh, great, a very interesting corner case: resending data with FIN....
->
-> Linux TCP stack under memory pressure can do that BTW, no need for
-> another implementation :)
->
-> tcp_send_fin()
 
-Thank you, Eric!
+
+On 04.09.25 01:42, Jakub Kicinski wrote:
+> On Mon,  1 Sep 2025 16:58:41 +0200 Alexandra Winter wrote:
+>> Add log messages to visualize timeline of module loads and unloads.
+> 
+> How deeply do you care about this patch ? I understand the benefit when
+> debugging "interface doesn't exist" issues with just logs at hand.
+> OTOH seeing a litany of "hello" messages on every boot from built-in
+> drivers, is rather annoying. Perhaps this being an s390 driver makes
+> it a bit of a special case..
+
+tl dr: I don't care very deeply
+
+I think s390 users care a lot about debugability and are less concerned
+about log size. As you said, many other modules (on s390) have these
+'hello' messages, so I kind of expected the ism module to show up as well.
+But if you want to reject it, we can live without it ;-)
 
