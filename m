@@ -1,170 +1,183 @@
-Return-Path: <netdev+bounces-219786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A3D4B42F81
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 04:13:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73333B42FA5
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 04:19:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F367F680CEC
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:13:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 159345676B9
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 02:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05201DF965;
-	Thu,  4 Sep 2025 02:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37EC61F8691;
+	Thu,  4 Sep 2025 02:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZIy48jA"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="i90ZRoOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5E01DF75A;
-	Thu,  4 Sep 2025 02:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8991EB1A4;
+	Thu,  4 Sep 2025 02:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756952025; cv=none; b=H0WHza/3OWGZ6RZOqx7xdRxypgK/D6iQh5tTTaN7MrceTbSNY8S+8xxELvD0kwdZFLnp6dEEG/4fFWfl4GjcJ93trROYDYlFAr0GW94zvIZdhNa9HYW9QybyR9u+ydkqHgwpFPpkIehamB0TmY72+KDjVHW783LOPXvKb2flP+Y=
+	t=1756952201; cv=none; b=Xg5GxgvqUT1kDRRmycwFt8soKzTEmxMKjQry7Xifj3XDsZbXXxiYahU3lO/Fpc2YrIWQvCfxLMZU8oCG1JEDfDq/t4/Z7aVO/1xuhmc5Xv/A/SaqjPRoIpSSyW+tmLZEkTK3zWoPCATVlQTQ3fuiA3YMnTK8Pdtf/YdhNfSCY9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756952025; c=relaxed/simple;
-	bh=3g7cY+03XIWLWUoKFNp3F/aqlhRv74KCmVg2qDPm5W0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TnQeabAG9ZGHoevG1q9ysyI1VkE7pZ3wftLqiKl0Is5Ryx7usYJk06XTObVcZGT+uigpVX6dGWOEEfDPlYQ1vFJ7ItaHEJYAB3o29QVJlKM8Ln+fGJ0Fu40FJiU5gYBnhoC7aLgIq+itvnpAt6SORmqtB6F7W8CZErUtZLPndbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZIy48jA; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7722c88fc5fso536904b3a.2;
-        Wed, 03 Sep 2025 19:13:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756952024; x=1757556824; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3hUrML5WljsUlFCqa+ikOvh0WLrz2uOx6fHEzlvAb34=;
-        b=eZIy48jAwE8HH1RiA7UVfduIZLUZNNw6CKg/7vTQHCp4fuxrSNLiEJPMCYzIB/Oy4s
-         1uCog4SktbYruZzVwhtfoTGmpa4xRkE9sGgmea6HrmrynfmH2/ea5uNuCxLxnVeRQWxo
-         Q3P6d7Hxs2p2gy0P0BEsEgCx8OYKy1DdmfKvLS7CfZ/avLAbhgPWJevYhjle9nZlnpnt
-         NaZbsyGPvU5gE4oH2Sl7G/mrYYsSLE93BwMwUAvRb79oNkUUWfL+OmzguXhWAqO5MKDF
-         +2ZSzk7QlNS9UbNPANsnBkwmIG8rOpr6HarFxnpWkV3344J+6kadDZfSj2xpIIIR73lq
-         ZWLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756952024; x=1757556824;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3hUrML5WljsUlFCqa+ikOvh0WLrz2uOx6fHEzlvAb34=;
-        b=naprSQbuKfijn/AlONLSt4UYbovM5J0jf7T99Nh74VnmxhW8XNhIF0BrZwIXOaqQ/6
-         B+J3FlPABO0Lakz+1my6JyJBGOxVgrv4HEnMdYKBbMVDsvPg33DbQ7HT8/pmjzxT+p2H
-         RTvcyHkWsK2TXQ+OzKqnU3qCdbsi9Niwm+ZuLn/4gvS/zKT5FRR0j6YQT0L7Ar/xWq2e
-         4KmjXLqXuMIvsWucsXY9J4enctYX0wd3k5t5555HF8tS+WZE7Mp5V14Ax3col4/RF3Hd
-         SfNiB2YPqX+2NIhJ73wwKQ71VrvyODZ/lr6DB7cSiO/8mDjiBHBOlOuAnltLci+nFH4s
-         SITw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLt73kchFckVwE3v1vJgHJ79GhZLKyxi3ltgEz0GMGTztOM6X5g+gutfVvUoljFm3feA5uDKGZ@vger.kernel.org, AJvYcCVamgXcNCvxmGgSP7ryGPF7K+Oh/DlrGskqUKyIUqBuHfoLiyforWMG6CxalyaRKWv8eHed1xke9fm9@vger.kernel.org, AJvYcCWAHUTE1xWW7RlS+6r91s5PNsDdMt1m9CUjVvHD9gq2QTtys+XzWudIy76+cI1wwelxyL4tnkEYfbCLSJE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya4D+GHy7IYf+TSL5xOC9deuH4YbDi8aVurqMUwha5rNndByuc
-	oETtI3Mlovmtjp/afN2n+mq2Bldy6Me0Ce2IB+6XLccOdJQTyp7i1Ize
-X-Gm-Gg: ASbGnctOdaE8TFPfNqwbyoZam94v6+3IqWJPu/cEaikIJpFG7IEN322ni1h0/JPYLDR
-	8fj3ny/wa0toO8DOQ6ABMcwNKCrxLZCOaHDJj5asgGrGCBcPfXN6Jx6AagLAd9vNHr1TnHyWgBd
-	pk/3CvFBrCYe12J/H5A9exuvzrG2r0hscPX+tsZ2v+hrYHgcqH7cJWRvkMU4k+o4D/D7nPKNwap
-	YuEbHCCZNWN7sdjOeh+IwMbtjYhPDPjH+19SY2eseZGdntd4LWMJOPQiimCpHlRtNDKx5dgaVOC
-	WRvEs0AZr/9VVnTVbgVib/v1HLqncyhjxXmped1zC+Ug0Iq3ejl1N6C2qM7A1PvK5DzLF03DUNa
-	qeiDZQCFWXy0PceNWVfTlKQFZ
-X-Google-Smtp-Source: AGHT+IF9X57LhT2xyoyX21PxzcP6C6ovW9Qg3hf6aWtPbtciUJUmtB+wCBsuYJCDRZwrBWc/16R0/g==
-X-Received: by 2002:a05:6a00:114b:b0:76e:8e95:1382 with SMTP id d2e1a72fcca58-7723e1f466cmr17967981b3a.5.1756952023447;
-        Wed, 03 Sep 2025 19:13:43 -0700 (PDT)
-Received: from gmail.com ([223.166.84.15])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77241f08b45sm13976803b3a.22.2025.09.03.19.13.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 19:13:43 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Felix Fietkau <nbd@nbd.name>
-Subject: [RFC PATCH net-next] ppp: enable TX scatter-gather
-Date: Thu,  4 Sep 2025 10:13:28 +0800
-Message-ID: <20250904021328.24329-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1756952201; c=relaxed/simple;
+	bh=WzRgIr8Nsc96FYUeTDhPpbd74zf/aBMieYBWKFYK56Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RHOhL0M3mio8FsfiDv8f0zk+gkcSWGS/JWXSALvcp2mbK4Ymn0mJdOwK2kPvqPIzsi+5GQZ1qQOzgm+f9WIXYoCqkTyukZPPwoKBmPNTPviA3lDXIkKRPys21E8Z7o6UKXPhYkHAghIUwtHqdASabBSTmlR3P7kXrVZrD9OjiiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=i90ZRoOq; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
+	by linux.microsoft.com (Postfix) with ESMTPSA id AF272211938F;
+	Wed,  3 Sep 2025 19:16:37 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AF272211938F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1756952198;
+	bh=a4jumFB4PVokJK1dGa5tFvFLYvH7VS3Usw/M76NBjRw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=i90ZRoOq/9PHAR3KCaZxigllW/rJt9761pZoVNcSfG2k0k8yrrQjtXGtzTjhqKYEa
+	 vk3MOSjtKtSM1u/8MB2oA8JfxdfTkQF7vk0FOKgSHEWKbplGhjLGN+714eXuU+OkHP
+	 v0DqC9hBYEPhR1bpYXVDvxoNQqd7OQ09twpOLTno=
+Message-ID: <ff4c58f1-564d-ddfa-bdff-48ffee6e0d72@linux.microsoft.com>
+Date: Wed, 3 Sep 2025 19:16:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH V0 0/2] Fix CONFIG_HYPERV and vmbus related anamoly
+Content-Language: en-US
+To: Michael Kelley <mhklinux@outlook.com>,
+ "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+ "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
+Cc: "maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+ "mripard@kernel.org" <mripard@kernel.org>,
+ "tzimmermann@suse.de" <tzimmermann@suse.de>,
+ "airlied@gmail.com" <airlied@gmail.com>, "simona@ffwll.ch"
+ <simona@ffwll.ch>, "jikos@kernel.org" <jikos@kernel.org>,
+ "bentiss@kernel.org" <bentiss@kernel.org>,
+ "kys@microsoft.com" <kys@microsoft.com>,
+ "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "decui@microsoft.com" <decui@microsoft.com>,
+ "dmitry.torokhov@gmail.com" <dmitry.torokhov@gmail.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "bhelgaas@google.com" <bhelgaas@google.com>,
+ "James.Bottomley@HansenPartnership.com"
+ <James.Bottomley@HansenPartnership.com>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+ "deller@gmx.de" <deller@gmx.de>, "arnd@arndb.de" <arnd@arndb.de>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>,
+ "horms@kernel.org" <horms@kernel.org>
+References: <20250828005952.884343-1-mrathor@linux.microsoft.com>
+ <SN6PR02MB4157917D84D00DBDAF54BD69D406A@SN6PR02MB4157.namprd02.prod.outlook.com>
+From: Mukesh R <mrathor@linux.microsoft.com>
+In-Reply-To: <SN6PR02MB4157917D84D00DBDAF54BD69D406A@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When chan->direct_xmit is true, and no compressors are in use, PPP
-prepends its header to a skb, and calls dev_queue_xmit directly. In this
-mode the skb does not need to be linearized.
-Enable NETIF_F_SG and NETIF_F_FRAGLIST if chan->direct_xmit is true, so
-the networking core can transmit non-linear skbs directly. The
-compressors still require a linear buffer so call skb_linearize() before
-passing skb->data to them.
-This is required to support PPPoE GSO.
+On 9/2/25 07:42, Michael Kelley wrote:
+> From: Mukesh Rathor <mrathor@linux.microsoft.com> Sent: Wednesday, August 27, 2025 6:00 PM
+>>
+>> At present, drivers/Makefile will subst =m to =y for CONFIG_HYPERV for hv
+>> subdir. Also, drivers/hv/Makefile replaces =m to =y to build in
+>> hv_common.c that is needed for the drivers. Moreover, vmbus driver is
+>> built if CONFIG_HYPER is set, either loadable or builtin.
+>>
+>> This is not a good approach. CONFIG_HYPERV is really an umbrella config that
+>> encompasses builtin code and various other things and not a dedicated config
+>> option for VMBUS. Vmbus should really have a config option just like
+>> CONFIG_HYPERV_BALLOON etc. This small series introduces CONFIG_HYPERV_VMBUS
+>> to build VMBUS driver and make that distinction explicit. With that
+>> CONFIG_HYPERV could be changed to bool.
+> 
+> Separating the core hypervisor support (CONFIG_HYPERV) from the VMBus
+> support (CONFIG_HYPERV_VMBUS) makes sense to me. Overall the code
+> is already mostly in separate source files code, though there's some
+> entanglement in the handling of VMBus interrupts, which could be
+> improved later.
+> 
+> However, I have a compatibility concern. Consider this scenario:
+> 
+> 1) Assume running in a Hyper-V VM with a current Linux kernel version
+>     built with CONFIG_HYPERV=m.
+> 2) Grab a new version of kernel source code that contains this patch set.
+> 3) Run 'make olddefconfig' to create the .config file for the new kernel.
+> 4) Build the new kernel. This succeeds.
+> 5) Install and run the new kernel in the Hyper-V VM. This fails.
+> 
+> The failure occurs because CONFIG_HYPERV=m is no longer legal,
+> so the .config file created in Step 3 has CONFIG_HYPERV=n. The
+> newly built kernel has no Hyper-V support and won't run in a
+> Hyper-V VM.
+> 
+> As a second issue, if in Step 1 the current kernel was built with
+> CONFIG_HYPERV=y, then the .config file for the new kernel will have
+> CONFIG_HYPERV=y, which is better. But CONFIG_HYPERV_VMBUS
+> defaults to 'n', so the new kernel doesn't have any VMBus drivers
+> and won't run in a typical Hyper-V VM.
+> 
+> The second issue could be fixed by assigning CONFIG_HYPERV_VMBUS
+> a default value, such as whatever CONFIG_HYPERV is set to. But
+> I'm not sure how to fix the first issue, except by continuing to
+> allow CONFIG_HYPERV=m. 
 
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-RFC:
- This depends on a pending fix:
-  https://lore.kernel.org/netdev/20250903100726.269839-1-dqfext@gmail.com/
- There are also alternative approaches:
- - set SG and FRAGLIST unconditionally, and use skb_linearize()
-   on !chan->direct_xmit paths.
- - don't use skb_linearize(), instead fix the compressors to handle
-   non-linear sk_buffs.
- - conditionally set SG and FRAGLIST based on whether compressors are
-   in use.
+To certain extent, imo, users are expected to check config files
+for changes when moving to new versions/releases, so it would be a 
+one time burden. CONFIG_HYPERV=m is just broken imo as one sees that
+in .config but magically symbols in drivers/hv are in kerenel.
 
- drivers/net/ppp/ppp_generic.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+Thanks,
+-Mukesh
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index f9f0f16c41d1..3bf37871a1aa 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -1710,6 +1710,12 @@ pad_compress_skb(struct ppp *ppp, struct sk_buff *skb)
- 		ppp->xcomp->comp_extra + ppp->dev->hard_header_len;
- 	int compressor_skb_size = ppp->dev->mtu +
- 		ppp->xcomp->comp_extra + PPP_HDRLEN;
-+	/* Until we fix the compressor need to make sure data portion is
-+	 * linear.
-+	 */
-+	if (skb_linearize(skb))
-+		return NULL;
-+
- 	new_skb = alloc_skb(new_skb_size, GFP_ATOMIC);
- 	if (!new_skb) {
- 		if (net_ratelimit())
-@@ -1797,6 +1803,12 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
- 	case PPP_IP:
- 		if (!ppp->vj || (ppp->flags & SC_COMP_TCP) == 0)
- 			break;
-+		/* Until we fix the compressor need to make sure data portion
-+		 * is linear.
-+		 */
-+		if (skb_linearize(skb))
-+			goto drop;
-+
- 		/* try to do VJ TCP header compression */
- 		new_skb = alloc_skb(skb->len + ppp->dev->hard_header_len - 2,
- 				    GFP_ATOMIC);
-@@ -3516,10 +3528,13 @@ ppp_connect_channel(struct channel *pch, int unit)
- 		ret = -ENOTCONN;
- 		goto outl;
- 	}
--	if (pch->chan->direct_xmit)
-+	if (pch->chan->direct_xmit) {
- 		ppp->dev->priv_flags |= IFF_NO_QUEUE;
--	else
-+		ppp->dev->features |= NETIF_F_SG | NETIF_F_FRAGLIST;
-+	} else {
- 		ppp->dev->priv_flags &= ~IFF_NO_QUEUE;
-+		ppp->dev->features &= ~(NETIF_F_SG | NETIF_F_FRAGLIST);
-+	}
- 	spin_unlock_bh(&pch->downl);
- 	if (pch->file.hdrlen > ppp->file.hdrlen)
- 		ppp->file.hdrlen = pch->file.hdrlen;
--- 
-2.43.0
+
+> See additional minor comments in Patches 1 and 2.
+> 
+> Michael
+> 
+>>
+>> For now, hv_common.c is left as is to reduce conflicts for upcoming patches,
+>> but once merges are mostly done, that and some others should be moved to
+>> virt/hyperv directory.
+>>
+>> Mukesh Rathor (2):
+>>   hyper-v: Add CONFIG_HYPERV_VMBUS option
+>>   hyper-v: Make CONFIG_HYPERV bool
+>>
+>>  drivers/Makefile               |  2 +-
+>>  drivers/gpu/drm/Kconfig        |  2 +-
+>>  drivers/hid/Kconfig            |  2 +-
+>>  drivers/hv/Kconfig             | 14 ++++++++++----
+>>  drivers/hv/Makefile            |  4 ++--
+>>  drivers/input/serio/Kconfig    |  4 ++--
+>>  drivers/net/hyperv/Kconfig     |  2 +-
+>>  drivers/pci/Kconfig            |  2 +-
+>>  drivers/scsi/Kconfig           |  2 +-
+>>  drivers/uio/Kconfig            |  2 +-
+>>  drivers/video/fbdev/Kconfig    |  2 +-
+>>  include/asm-generic/mshyperv.h |  8 +++++---
+>>  net/vmw_vsock/Kconfig          |  2 +-
+>>  13 files changed, 28 insertions(+), 20 deletions(-)
+>>
+>> --
+>> 2.36.1.vfs.0.0
+>>
 
 
