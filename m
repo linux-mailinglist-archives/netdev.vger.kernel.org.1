@@ -1,173 +1,296 @@
-Return-Path: <netdev+bounces-220033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45A96B443ED
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 19:09:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E100CB44446
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 19:26:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 033B116E918
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:09:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30F0517C15C
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 17:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7D72FFDC1;
-	Thu,  4 Sep 2025 17:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB4730ACFD;
+	Thu,  4 Sep 2025 17:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YAs9TejA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KA03Ee0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7692D3731
-	for <netdev@vger.kernel.org>; Thu,  4 Sep 2025 17:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA352F5484;
+	Thu,  4 Sep 2025 17:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757005742; cv=none; b=MoAAWM9vxfgFaNCKQZFN2Z3OfybMWWUQ7PcfmxKYluHJsSBsPcrsvVW0ia2ADlpTtJnkbNDLNm2QLJmPtoZrJn3CaY1Iety/uDclvtjLA9z8ODwJHfucqUvpTBLmLS7c6HuM6juuSGJtuAo29RAivnzXTGnCHTh+xEN1I/orCkE=
+	t=1757006790; cv=none; b=VwBs8969ZK2IEIJaRss6APkg9o98pCk35nVlCXehZmB3CSyu4PhuXQAu+MLiIL3dj920HBBo/0sHlRd0vqYTajDIEn4XUvIEatdw1v5twN0oFFp38PsDB9eRQ9pSAmP9XdPdOfto/QE4PXZ16WEgBs6wIKDplby8MyorA9ItIco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757005742; c=relaxed/simple;
-	bh=rtVoiEqArhk6jdIIAM0VXZHs2vMtXnbobPVPXnd96Ss=;
+	s=arc-20240116; t=1757006790; c=relaxed/simple;
+	bh=EZ4Ig0++pbLqluvGrZc18Gn/h/uLnsrnUXNvG8CGVgI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QtViax1w3iMFTynai1RAetnvU2B6w5RW0+o13kSYOflUpFHe7Cw45gh/fMTVfMQSVtMj+OyHtFH9nNJbKfwv0azqEMBfH2tesZ7cGAb1pgShVkyHkSLwoyxCwHTRKKynmmn36VJMdGoshLxlmoymMEhcKEqrR2rwCLn6X7MZ9SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YAs9TejA; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-61d14448c22so611a12.1
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 10:09:00 -0700 (PDT)
+	 To:Cc:Content-Type; b=BBLk33kPeBCAxKTk0y+mgyRWkY/S9RrEbcxz7yp2SMUWxe4gKak2845Sj6UURzObS3MPoeSQCfPduWkE6vYorwBzC37t/tPfQurG1Fj63kzo+jJxDKOwsN589vsmZ5IBJgywe6IVHk1pZDr2y9BqDvBVxDQ4D8PwtzQC3Q2J3f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KA03Ee0q; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-71d6051afbfso13934187b3.2;
+        Thu, 04 Sep 2025 10:26:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757005739; x=1757610539; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9l+BX4BeciP06MlQ3YhBfi/kk7JAIUUCElY1RG7/WT4=;
-        b=YAs9TejA4b4mW7lVC9ebOHUPc/lOxXuZdTCq7mi3GS93GIGAeGLiE/uc2DHbpFr5bC
-         CNyBETR3rxTLUO3Gk7POXXkpJA53uJnmXxb9dG0/aP4O2iGCXZ08eG63MU1RQ2hCZITU
-         de9OJcHSCZGtoY9uh7+lMQvg2Ocu7avUJg+mmpshVpYzOA4OSnIZNrTOXBWQGJvGSigJ
-         svm+m5/LxTOQlpgii4zQ86HyZjrrfginkOj+UN00yoaio3l0QkZTguThj2TaTctY0E2w
-         xs3RZkKttQ0ZJ0DRuz0g4h+ro+mUzfkznU4CyDm4U+KHKi8icbIAYPBmEGW9rx8VcTxS
-         B7YA==
+        d=gmail.com; s=20230601; t=1757006787; x=1757611587; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sUseh6g4kqp9p2rXZD1SW9na3Fv96A86jzaodeUURis=;
+        b=KA03Ee0qfyUqZXpD/6JyKMfdxz1taYvnfibL3xQSPnot3Os9uIH338FeA/wdnVwoLd
+         HrVnKdIIPG6PiBG7G8xcP/mZnCsKRBs/L+//0qXCSwevqWff+1Y41h/UphBUnVaoxjVp
+         6eEaMqivEKrw1aa/gP5wvlCKWbfbpJOW+5fCqhARmbPE3+oyU7hA1G+aRM7DGjAI95Ky
+         /9rwLujrbGSrT5puiQUGppm27YOv30cxwCcmwU9JmrdyOyyzm5oFXN2XyJ/8Kaeh/Tai
+         E2ZczNeVNPSgPho/1H2HcoKaD2NkcroRr11qfQA2/4PksKAVRkxisRRN5h2bXgbLCS1O
+         8Flw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757005739; x=1757610539;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9l+BX4BeciP06MlQ3YhBfi/kk7JAIUUCElY1RG7/WT4=;
-        b=nNr0hoa47b7flRavBoJe6mlbCgnGjp+/6MWl7dIZyG1iDoJFToMiByo59pQ18Gtkij
-         rxtCNAHpw+kWK+JlQuxNrxjJ+jGzHsiaqBVu7WZoSnj1NEX3SH+IU6336tA0Cxu0XOJi
-         7due4jZe6PvcJOc7+wlEQG+Gtp1KymArIRW7bnLTLxTuLP/CPJcysXUVthIrWZpz4e6x
-         asjlyK+hdkHZglwkgpNfPgwmgJdnuJgBL+rXWmXK9+xRF7leg9w2+TYDwmSePUQgabbt
-         TiIw7e9EcZkmD42KS6Hz6v7/GYZgrtaxORGjD4EcgK6vS2QmFmfcDK6rXl/SmdiaeEwf
-         +ZXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIXOj+2GRwjJ/pP/JjFnqi/31LbDdXtJGX4dLP7sbhjE5uyb15a5Oi8fFXRRe/RgUN2HXN4dU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCZik2tsjKixxm+KPmVZGgYotWRnjyTJyeRa7UQMczSIjAFA2w
-	znI9Zos72ovlf99MPGSobsQ0BXAqWffH0YaruwaBPu3pmDTsIsW9/CPZxJgvHHVmBjIHWmtig7q
-	DX70uBQkk6IY9ghKO3u6IJxUkUi7r22WRXX1Qeg3A
-X-Gm-Gg: ASbGncvU9CspxHl/4KPsc8AK4Fo41vJ5W0I6ez4RN914jn8RQOfz3I2ivufwRIlPnsL
-	hOQd2lqwuGn5YR+PQy3hy4gPd28Gk8p9Sn8RnzKcdLE/uhK5ogMRKIJjFmZhkyKs6KEtPsFoJM8
-	p7NkZ+p8ir6/lso2pRu/aUkzMuKSdkBYy58X7uqyfDzmYvh4y8yokVk3N3WIRNVENRdbBx02g1T
-	rS84WG+2n8Ua46c+wDM5rGE3S7EYJY6O+e+pBUxJeUsXTa0qS7ijr5GIiJYVczZX51Bp7EylEOF
-X-Google-Smtp-Source: AGHT+IF2ruMQe+WqyRmQ/okwctanAc23wDnLh4q8x7OzuSo6MwWq8CGCK4IZ++J24eerKVtO/lIr742TQbMqgGEV01E=
-X-Received: by 2002:a50:934f:0:b0:61c:c9e3:18f9 with SMTP id
- 4fb4d7f45d1cf-61f5bd290c7mr71874a12.3.1757005738679; Thu, 04 Sep 2025
- 10:08:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757006787; x=1757611587;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sUseh6g4kqp9p2rXZD1SW9na3Fv96A86jzaodeUURis=;
+        b=jqvnuNfwh+5h0m+6bpoVsZPsaY+bUb57RkHV5hEflYwXO3269U9bI3QeqObC++gpAw
+         8L/ARhf7vapb7GhH5cQiT+Z16cxVI5NH/mdtQ9v942OrPKxkxO3qIEvQSL37p71E2cHG
+         Nf03IxM3hmqdvv7GzJ9ui7Mx1Y73a+rk0Nb3AgwljfzmEYILTpiUHSyl7V8Fuu9PoerY
+         pyLe9eOwLBvLyhAnYm5lfiqhjk609NBU2eKFmTTLIx6VpufqdRND2M07nmWqBKzGBT9c
+         8j+QTiuzf4QgRUYGAQE9ROwbm/ZAJRBUYGxQ9lr2oCMbr4cNq2HYDBtdc69j31rPPRDQ
+         rSZw==
+X-Forwarded-Encrypted: i=1; AJvYcCWrM1NBE5/e0YASUYE+SlzUCsQ/Rn3mvBdRg9cBOe97C3mzAfRCzf26Kfm8ORNBy0FnQ80SANg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZCBVUy2owy2XKslRSNvEGDRl8bLP44xaaoy/ZUGeEXx0iQRmX
+	+GdgMEZ608E/dthI5mGgeEhhk5lCPatAy3qdn8vqhuICT7zqooqD2dL9dUSYxvRRewyvvob2njY
+	1SYfEODPwVxjoH39zMVne2jAkzRUnJGg=
+X-Gm-Gg: ASbGncsT+b2NaFvqJ9gvNmGIjpxB3vh2K/CcxbuGKkR8cdfcubzNqCSDhotHJFJEFte
+	T+o6SBcY+2uCaHk2BRd+LmvsEg5pMRhaN6d57ujZc5oH5mlHny2IOFsRNN657G0I15Cqsk8rnDs
+	v+h3J2CNtYfnc534I1uKtEBzNCFYs8pW+3AB4sjAGT3HA9Cna7GwGw1HFF23/PEi5H15VjHuXoe
+	vee+Bs=
+X-Google-Smtp-Source: AGHT+IGx3jnOzpltQpFtLJ6oiDv+D1VVFsLiOEtkFP4nBFm8p4HY0HXJ7PMWXuN/Tp73VN1nHY3liACQfvrrOOifd6s=
+X-Received: by 2002:a05:690c:74c7:b0:723:bd45:4ff5 with SMTP id
+ 00721157ae682-723bd45544amr65039767b3.5.1757006787046; Thu, 04 Sep 2025
+ 10:26:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250904015424.1228665-1-marcharvey@google.com> <willemdebruijn.kernel.22c2bf5d2d4f3@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.22c2bf5d2d4f3@gmail.com>
-From: Marc Harvey <marcharvey@google.com>
-Date: Thu, 4 Sep 2025 10:08:46 -0700
-X-Gm-Features: Ac12FXw49kSh6GKY2h7-eXe1I6WZ_M0sYCUqMpP9WWQchylNNQte6QMg8ZJMPxM
-Message-ID: <CANkEMgmYHBw3YA5VBv20Y=BvjAx7a7b=YQfGPtmeFmDHvSauvw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] selftests: net: Add tests to verify team
- driver option set and get.
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: jiri@resnulli.us, andrew+netdev@lunn.ch, edumazet@google.com, 
-	willemb@google.com, maheshb@google.com, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kuba@kernel.org, liuhangbin@gmail.com
+References: <20250825193918.3445531-1-ameryhung@gmail.com> <20250825193918.3445531-2-ameryhung@gmail.com>
+ <76vmglojxf3yqysn5iwthctiacjy6xqcvrzzny74524djwhcf3@ejctdcty3cdz>
+ <CAMB2axOLCakHEGnPcRTd1-ZdcGT6+wximWDOSMY1r9PGerfF0g@mail.gmail.com> <aniua473ljbet6w6ov24z6yzwlzzsbvd2d5dud2gep6kp6j5fg@fngzextb6w46>
+In-Reply-To: <aniua473ljbet6w6ov24z6yzwlzzsbvd2d5dud2gep6kp6j5fg@fngzextb6w46>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 4 Sep 2025 10:26:16 -0700
+X-Gm-Features: Ac12FXx2q_q915X9Patm4wfP-feA-NH31t2kA361SMWg6vHC4odkEWwSKPceHCo
+Message-ID: <CAMB2axP-T5PDZK3E5+Jmq2+_O5vAmX7yxQUQGR5c0RPhaZ0JEg@mail.gmail.com>
+Subject: Re: [RFC bpf-next v1 1/7] net/mlx5e: Fix generating skb from
+ nonlinear xdp_buff
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, kuba@kernel.org, 
+	martin.lau@kernel.org, mohsin.bashr@gmail.com, saeedm@nvidia.com, 
+	tariqt@nvidia.com, mbloch@nvidia.com, maciej.fijalkowski@intel.com, 
+	kernel-team@meta.com, noren@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Aug 28, 2025 at 9:23=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> On Wed, Aug 27, 2025 at 08:44:24PM -0700, Amery Hung wrote:
+> > On Wed, Aug 27, 2025 at 6:45=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
+> > >
+> > > On Mon, Aug 25, 2025 at 12:39:12PM -0700, Amery Hung wrote:
+> > > > [...]
+> > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/driv=
+ers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > index b8c609d91d11..c5173f1ccb4e 100644
+> > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > @@ -1725,16 +1725,17 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_r=
+q *rq, struct mlx5e_wqe_frag_info *wi
+> > > >                            struct mlx5_cqe64 *cqe, u32 cqe_bcnt)
+> > > >  {
+> > > >       struct mlx5e_rq_frag_info *frag_info =3D &rq->wqe.info.arr[0]=
+;
+> > > > +     struct mlx5e_wqe_frag_info *pwi, *head_wi =3D wi;
+> > > >       struct mlx5e_xdp_buff *mxbuf =3D &rq->mxbuf;
+> > > > -     struct mlx5e_wqe_frag_info *head_wi =3D wi;
+> > > >       u16 rx_headroom =3D rq->buff.headroom;
+> > > >       struct mlx5e_frag_page *frag_page;
+> > > >       struct skb_shared_info *sinfo;
+> > > > -     u32 frag_consumed_bytes;
+> > > > +     u32 frag_consumed_bytes, i;
+> > > >       struct bpf_prog *prog;
+> > > >       struct sk_buff *skb;
+> > > >       dma_addr_t addr;
+> > > >       u32 truesize;
+> > > > +     u8 nr_frags;
+> > > >       void *va;
+> > > >
+> > > >       frag_page =3D wi->frag_page;
+> > > > @@ -1775,14 +1776,26 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_r=
+q *rq, struct mlx5e_wqe_frag_info *wi
+> > > >       prog =3D rcu_dereference(rq->xdp_prog);
+> > > >       if (prog && mlx5e_xdp_handle(rq, prog, mxbuf)) {
+> > > >               if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->=
+flags)) {
+> > > > -                     struct mlx5e_wqe_frag_info *pwi;
+> > > > +                     pwi =3D head_wi;
+> > > > +                     while (pwi->frag_page->netmem !=3D sinfo->fra=
+gs[0].netmem && pwi < wi)
+> > > > +                             pwi++;
+> > > >
+> > > Is this trying to skip counting the frags for the linear part? If yes=
+,
+> > > don't understand the reasoning. If not, I don't follow the code.
+> > >
+> > > AFAIU frags have to be counted for the linear part + sinfo->nr_frags.
+> > > Frags could be less after xdp program execution, but the linear part =
+is
+> > > still there.
+> > >
+> >
+> > This is to search the first frag after xdp runs because I thought it
+> > is possible that the first frag (head_wi+1) might be released by
+> > bpf_xdp_pull_data() and then the frag will start from head_wi+2.
+> >
+> > After sleeping on it a bit, it seems it is not possible as there is
+> > not enough room in the linear to completely pull PAGE_SIZE byte of
+> > data from the first frag to the linear area. Is this correct?
+> >
+> Right. AFAIU the usable linear part is smaller due to headroom and
+> tailroom.
+>
+> [...]
+> > > >               if (unlikely(!skb)) {
+> > > >                       mlx5e_page_release_fragmented(rq->page_pool,
+> > > > @@ -2102,20 +2124,25 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct m=
+lx5e_rq *rq, struct mlx5e_mpw_info *w
+> > > >               mlx5e_page_release_fragmented(rq->page_pool, &wi->lin=
+ear_page);
+> > > >
+> > > >               if (xdp_buff_has_frags(&mxbuf->xdp)) {
+> > > > -                     struct mlx5e_frag_page *pagep;
+> > > > +                     struct mlx5e_frag_page *pagep =3D head_page;
+> > > > +
+> > > > +                     truesize =3D nr_frags * PAGE_SIZE;
+> > > I am not sure that this is accurate. The last fragment might be small=
+er
+> > > than page size. It should be aligned to BIT(rq->mpwqe.log_stride_sz).
+> > >
+> >
+> > According to the truesize calculation in
+> > mlx5e_skb_from_cqe_mpwrq_nonlinear() just before mlx5e_xdp_handle().
+> > After the first frag, the frag_offset is always 0 and
+> > pg_consumed_bytes will be PAGE_SIZE. Therefore the last page also
+> > consumes a page, no?
+> >
+> My understanding is that the last pg_consumed_bytes will be a byte_cnt
+> that is smaller than PAGE_SIZE as there is a min operation.
+
+The remaining byte_cnt will then be aligned to
+BIT(rq->mpwqe.log_stride_sz), which is PAGE_SHIFT if there is xdp
+program (per mlx5e_mpwqe_get_log_stride_size()). Therefore, it still
+adds a page to truesize.
+
+I will change to ALIGN(..., BIT(rq->mpwqe.log_stride_sz)) to be
+consistent with existing code.
+
+>
+> > If the last page has variable size, I wonder how can
+> > bpf_xdp_adjust_tail() handle a dynamic tailroom.
+> That is a good point. So this can stay as is I guess.
+>
+> > bpf_xdp_adjust_tail()
+> > requires a driver to specify a static frag size (the maximum size a
+> > frag can grow) when calling __xdp_rxq_info_reg(), which seem to be a
+> > page in mlx5.
+> >
+> This is an issue raised by Nimrod as well. Currently striding rq sets
+> rxq->frag_size to 0. It is set to PAGE_SIZE only in legacy rq mode.
+>
+
+I see.
 
 > >
-> >  TEST_INCLUDES := \
-> >       ../bonding/lag_lib.sh \
-> >       ../../../net/forwarding/lib.sh \
-> > -     ../../../net/lib.sh
-> > +     ../../../net/lib.sh \
-> > +     ../../../net/in_netns.sh \
-> > +     ../../../net/lib/sh/defer.sh \
+> > > >
+> > > >                       /* sinfo->nr_frags is reset by build_skb, cal=
+culate again. */
+> > > > -                     xdp_update_skb_shared_info(skb, frag_page - h=
+ead_page,
+> > > > +                     xdp_update_skb_shared_info(skb, nr_frags,
+> > > >                                                  sinfo->xdp_frags_s=
+ize, truesize,
+> > > >                                                  xdp_buff_is_frag_p=
+fmemalloc(
+> > > >                                                       &mxbuf->xdp))=
+;
+> > > >
+> > > > -                     pagep =3D head_page;
+> > > > -                     do
+> > > > +                     while (pagep->netmem !=3D sinfo->frags[0].net=
+mem && pagep < frag_page)
+> > > > +                             pagep++;
+> > > > +
+> > > > +                     for (i =3D 0; i < nr_frags; i++, pagep++)
+> > > >                               pagep->frags++;
+> > > > -                     while (++pagep < frag_page);
+> > > > +
+> > > > +                     headlen =3D min_t(u16, MLX5E_RX_MAX_HEAD - le=
+n, sinfo->xdp_frags_size);
+> > > > +                     __pskb_pull_tail(skb, headlen);
+> > > >               }
+> > > > -             __pskb_pull_tail(skb, headlen);
+> > > What happens when there are no more frags? (bpf_xdp_frags_shrink_tail=
+()
+> > > shrinked them out). Is that at all possible?
+> >
+> > It is possible for bpf_xdp_frags_shrink_tail() to release all frags.
+> > There is no limit of how much they can shrink. If there is linear
+> > data, the kfunc allows shrinking data_end until ETH_HLEN. Before this
+> > patchset, it could trigger a BUG_ON in __pskb_pull_tail(). After this
+> > set, the driver will pass a empty skb to the upper layer.
+> >
+> I see what you mean.
 >
-> Where is defer used? Also no backslash at last line.
-
-Thank you for the review Willem.
-
-Acknowledged for the backslash, will add in next iteration.
-
-Defer is used by net/lib.sh. If defer.sh isn't included here, then the
-test won't build correctly.
-
-> > +attach_port_if_specified()
-> > +{
-> > +        local port_name="${1}"
+> > For bpf_xdp_pull_data(), in the case of mlx5, I think it is only
+> > possible to release all frags when the first and only frag contains
+> > less than 256 bytes, which is the free space in the linear page.
+> >
+> Why would only 256 bytes be free in the linear area? My understanding
+> is that we have PAGE_SIZE - headroom - tailroom which should be more?
 >
-> nit: parentheses around single character variable. Inconsistent.
 
-Acknowledged, will add in the next iteration.
+mlx5e_skb_from_cqe_mpwrq_nonlinear() currently sets xdp->frame_sz to
+be XDP_PACKET_HEADROOM (256) + MLX5E_RX_MAX_HEAD (256) + sizeof(struct
+skb_shared_info), so only 256 is available to xdp programs to pull
+data in.
 
-> > +#######################################
-> > +# Test that an option's get value matches its set value.
-> > +# Globals:
-> > +#   RET - Used by testing infra like `check_err`.
-> > +#   EXIT_STATUS - Used by `log_test` to whole script exit value.
-> > +# Arguments:
-> > +#   option_name - The name of the option.
-> > +#   value_1 - The first value to try setting.
-> > +#   value_2 - The second value to try setting.
-> > +#   port_name - The (optional) name of the attached port.
-> > +#######################################
+> > >
+> > > In general, I think the code would be nicer if it would do a rewind o=
+f
+> > > the end pointer based on the diff between the old and new nr_frags.
+> > >
+> >
+> > Not sure if I get this. Do you mean calling __pskb_pull_tail() some
+> > how based on the difference between sinfo->nr_frags and nr_frags?
+> >
+> > Thanks for reviewing the patch!
+> >
+> I was suggesting an approach for the whole patch that might be cleaner.
 >
-> Just curious: is this a standard documentation format?
-
-https://google.github.io/styleguide/shellguide.html#function-comments
-But I will make these fit in better with the rest of the selftests.
-
+> Roll back frag_page to the last used fragment after program execution:
 >
-> > +team_test_option()
-> > +{
-> > +        local option_name="$1"
-> > +        local value_1="$2"
-> > +        local value_2="$3"
-> > +        local possible_values="$2 $3 $2"
-> > +        local port_name="$4"
-> > +        local port_flag
-> > +
-> > +        RET=0
-> > +
-> > +        echo "Setting '${option_name}' to '${value_1}' and '${value_2}'"
-> > +
-> > +        attach_port_if_specified "${port_name}"
-> > +        check_err $? "Couldn't attach ${port_name} to master"
+>         frag_page -=3D old_nr_frags - new_nr_frags;
 >
-> Can the rest of the test continue if this command failed?
-
-The test will fail, but the rest of the test will still run. That
-being said, only the first error message is printed by the check_err
-function.
-
-
+> ... and after that you won't need to touch the frag counting loops
+> and the xdp_update_skb_shared_info().
 >
-> > +        port_flag=$(get_port_flag "${port_name}")
-> > +
-> > +        # Set and get both possible values.
-> > +        for value in ${possible_values}; do
-> > +                set_and_check_get "${option_name}" "${value}" "${port_flag}"
-> > +                check_err $? "Failed to set '${option_name}' to '${value}'"
-> > +        done
-> > +
-> > +        detach_port_if_specified "${port_name}"
-> > +        check_err $? "Couldn't detach ${port_name} from its master"
-> > +
-> > +        log_test "Set + Get '${option_name}' test"
-> > +}
->
+
+Got it. This makes the change quite cleaner.
+
+> Thanks,
+> Dragos
 
