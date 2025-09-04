@@ -1,78 +1,102 @@
-Return-Path: <netdev+bounces-220138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A69D8B448E1
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 23:59:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF775B44928
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 00:07:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62BA148885A
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 21:59:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36A737BBDEA
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 22:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3972D3EC5;
-	Thu,  4 Sep 2025 21:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3666D2FC881;
+	Thu,  4 Sep 2025 22:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qzBe+Cu8"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="a53Olmkq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA6B2D29D7;
-	Thu,  4 Sep 2025 21:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6B42D97BD;
+	Thu,  4 Sep 2025 22:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757023168; cv=none; b=LKV6N3mSPym3t2pdaXmq/7mnwSsbtsACaQVLK+99OfMorhMtK8VR7GpUXpxymH4VOT/vlcubbOTTJcMCcg7c/PTzg52VresoY+vls/8h/BcYvQj3jk2cozNOgnpO8pwWdDxpgpO3Vpxz0lIri1cIXwbwNkvc9DlY/E6E3gDQ6V0=
+	t=1757023417; cv=none; b=CnNK5u4InamCDfpirBrxk3AHax3fnBNoYnIMWKUxgZzW5cJfIbkf4y3iMUSzTguMlhEZ8PN9AaXquUsNfAGd2rH4e3uKvJtHpZsOwMVko97zr/JZnnsthPlDpxQKixRDb3Rq558IMZnndnE500vBgkOA1BHOtgNnganbYL9vJUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757023168; c=relaxed/simple;
-	bh=v3lystvLeot+6/SWLgp9xylE+fag16+7WPr29APprdQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mBrxSTVhCoVeAeVlkbfQsVi7Zu5KczHGF8Dg7dCfN3uXeBukXGXXJxpTRP0m6ypJo+DaAd+qE/SMhCi20jMqdEPr004i54RlirLNqYZIgf/HDxLq1+8y5qDPD2XHtLQAgDPOeNZa1Us8mqboxtAfwBo6ZFoolhDqyyhU4MZ4Y/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qzBe+Cu8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA96BC4CEF0;
-	Thu,  4 Sep 2025 21:59:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757023167;
-	bh=v3lystvLeot+6/SWLgp9xylE+fag16+7WPr29APprdQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qzBe+Cu8e9bl8ZEG2xM7fVHDnagWJ1a4hJq0t4SZOfGwelcUfNezBuLwZub777MLw
-	 gOyXZ5LrXI/iq+pRrxtlCVd8UaXsq9Za0yAuu0wg73cXQWauYEXvYYPvEenm4OkOjU
-	 pWbE9WTJsELw1Jd9QVh6ZehXjhXpUItdtk/hwyGnlap4vLKaOEVla6sR0y1Y2wsOUK
-	 ROXc3cHkiXnJvKe8LklltNkF20LlqO/Y6QZXW6a5R/A4shmX5Ur3nLmZi4yvJqc0bj
-	 duGr4gD3tq1riqbA+Y1aQ5cycbm27rkUktUSfkpp+gw91znNxUnxCSmIagxfncD+Yj
-	 uECRjAjKx5x+w==
-Date: Thu, 4 Sep 2025 14:59:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
- calvin@wbinvd.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next v2 0/2] net: selftest: Introduce netconsole
- torture test
-Message-ID: <20250904145925.101e2091@kernel.org>
-In-Reply-To: <20250904-netconsole_torture-v2-0-5775ed5dc366@debian.org>
-References: <20250904-netconsole_torture-v2-0-5775ed5dc366@debian.org>
+	s=arc-20240116; t=1757023417; c=relaxed/simple;
+	bh=ONNek9e9XXLRrSnQiiYpvkro4XvZ25Cp3066DjpUKos=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MZA2f/K57ia7CrG+Rv6wG8kmLAPsnZNOz/vLd/4veU74dM5HVmT/T0zstcEPvBsBzLWXpwJvVPnxNji8mkgUhh8z/1bwkAxMWunGZg6v+0twOfjhqVBjNAEhXxnDj+dKURRp9Ne82WG8iMYYMaIPJdpEmR7+P75fFdADpAUQ6aA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=a53Olmkq; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1757023399;
+	bh=ONNek9e9XXLRrSnQiiYpvkro4XvZ25Cp3066DjpUKos=;
+	h=From:To:Cc:Subject:Date:From;
+	b=a53Olmkqz4aRkLa/ZKdGhn7GnrBtXxsyRrkfDNYG1d/FdeeYyRthcvMvE9EjS2BFw
+	 gbKS4QeYgBxlk8RJFgutfGRq8144lRRUpo61hyhNdCyrBxcfdUnTb4mvZMT4fl2J0r
+	 808iPYKXYKXarcAHLVTwoI6uO/FZ35Qdy3o0iCStTGmbJGf+nzjhWUKoxooW1dz8Sr
+	 raTBQTP5Dj8lUfFp8V6ibFSkr8En1gkkKP2mGnTH+FwKg5SoHsl+8v6U/GQwEg45Yr
+	 qbmVfMOP1x61QVTFGUrU/iJGzkLiqM5If9LgntOKm51b5WddhaOWiPOrlarVDGTPV1
+	 bQxVFP+Xsia2Q==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 1DBA56058A;
+	Thu,  4 Sep 2025 22:03:19 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id 6F0AC201EBF; Thu, 04 Sep 2025 22:01:56 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 00/11] tools: ynl: prepare for wireguard
+Date: Thu,  4 Sep 2025 22:01:23 +0000
+Message-ID: <20250904-wg-ynl-prep@fiberby.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 04 Sep 2025 11:00:39 -0700 Breno Leitao wrote:
-> Create a netconsole test that puts a lot of pressure on the netconsole
-> list manipulation. Do it by creating dynamic targets and deleting
-> targets while messages are being sent. Also put interface down while the
-> 
-> In order to do it, refactor create_dynamic_target(), so it can be used to
-> create random targets in the torture test.
+This series contains the last batch of YNL changes to support
+the wireguard YNL conversion.
 
-You either have to post it in the same series as the fix, or wait for
-the fix to be present in net-next. Without your pending fix this will
-obviously not pass thru the CI :/
+The next batch has been posted as an RFC series here:
+https://lore.kernel.org/netdev/20250904-wg-ynl-rfc@fiberby.net/
+
+Asbjørn Sloth Tønnesen (11):
+  tools: ynl-gen: allow overriding name-prefix for constants
+  tools: ynl-gen: generate nested array policies
+  tools: ynl-gen: add sub-type check
+  tools: ynl-gen: define count iterator in print_dump()
+  tools: ynl-gen: define nlattr *array in a block scope
+  tools: ynl-gen: don't validate nested array attribute types
+  tools: ynl-gen: rename TypeArrayNest to TypeIndexedArray
+  tools: ynl: move nest packing to a helper function
+  tools: ynl: encode indexed-array
+  tools: ynl: decode hex input
+  tools: ynl: add ipv4-or-v6 display hint
+
+ Documentation/netlink/genetlink-legacy.yaml |  2 +-
+ tools/net/ynl/pyynl/lib/ynl.py              | 36 +++++++++++++++---
+ tools/net/ynl/pyynl/ynl_gen_c.py            | 42 ++++++++++++++-------
+ 3 files changed, 59 insertions(+), 21 deletions(-)
+
+-- 
+2.51.0
+
 
