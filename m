@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-220423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C096CB45F7B
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 18:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0584BB45F7C
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 18:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 111F3A07EB3
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:59:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99B19A07F16
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517CA313287;
-	Fri,  5 Sep 2025 16:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3206931B825;
+	Fri,  5 Sep 2025 16:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FcEYqJHb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XDSx8N/i"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F5931329E
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 16:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C0130B533
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 16:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757091510; cv=none; b=loncSInNbkQrbRIoHgVLSDj9ZmiXflRWHyvT9Ko4LGsfXItMKic6odCFtspZST+85VQlkYDzg92uu8gscD7c7cRTa8Lpq54tBBkhW8Ay8nTsOqvHqTrDDuTuWwcmTYc5X134LRLZoDnbF+kMXAnS/HaZwTub4ic0k6UnvRDUqh0=
+	t=1757091512; cv=none; b=HowCyojP0iWNI0LSJOssPTuf4xDS+D0ECEYnRDKsi6LUBYPY5/LsYQJTEAIx/i6CLGJrevDnV2dzNmG4Tf2jgy4dmpa2EmhJeQYpAkE/8ytX1D0RvAgWYFE4qccXMvLhwZJxJWsncMJJtRGobz4m8LmbQJSlpp1o/NBqrxJuMcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757091510; c=relaxed/simple;
-	bh=bMX1T0hAmqDQQeGFXhFBPAsii5kYhQEsDhs0cSPQsx4=;
+	s=arc-20240116; t=1757091512; c=relaxed/simple;
+	bh=vCPPCbYkpWoepFCaRUXjlfAjXQwbw9910DufzH/2FTw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L1W156QQC7U3UGXV5Jo2BY0/p0rzpXBnMIj5P66rvdGpVTqTdfmejPrn42Ot4I/AI3PC2SNkglJaeOCN3Ihbl7T5BOhgK5XZeQcf6nU8VkE20t/vPESmTVnpINC3t3Ghtuw896gcsy0Wcdj80FA3Z9YZBM7K9dQaPDyHK98MA4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FcEYqJHb; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=fA0jbd7x9bZIgJ5xcrbeyepDhy/Ctv9LjyFsXmG3JhMmdedvxnnn1PxuHFeWaPpQ1lpcdKAtK3Tc66yTVMF2tmwpqeenJX3Up20CJoWkB89Q3p7Uz9XytcrBO6NPURNjcb4qzo/P+d7CwtLoz1Ebtl4IHyezVO0nWjH9ahGdINo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XDSx8N/i; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-80acebb7cb7so562605885a.3
-        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 09:58:28 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8063443ef8cso791208385a.1
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 09:58:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757091508; x=1757696308; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757091509; x=1757696309; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dgk5ygaadk5u7SyByUrWe/7zDxjoOS5DC1A0XG9VqHA=;
-        b=FcEYqJHbckL5tDFHj83KwlDX9aHBLxp6KiB6QIWhRq46P16SSyow3fcegual+DyXZn
-         ud+CpxLMkHQNelaZFwJvUKvm743ppn9mmxyRXfIzR9sVOJkrAsZnDLT0bIBbGwZUzaEa
-         +Z8u6GozVTenIL94qsegz/B8wLBCkJFHm7/fK1nRGCdRX+/bi/tBvzW+RmFzX1TxxWGH
-         K1xItAy2J2ZAXx2E8qqb+ii6n2yRN0j3RaXxGBIMVkM5MRn6Ol9MWvc5okROZkayDtxQ
-         u6vKHiLCyGDKMdka+rS4ZqZHBjFMchAI+n0QES48P9U7+/vEUk7Kxr4AHFRaUWyHTdEy
-         +bRQ==
+        bh=EcjLzgMd4qbDwpnU0E77VHdVbc0CwWbA9SiP329+MQ4=;
+        b=XDSx8N/i6i2N/pWF+Wgdwjjh8k89IKErS98aopx75RQNRksKLyWjvfewsGxjmGFnWI
+         h3d9F77yHjqEtggOkGt84Z0YlsbOy18xj8oLUgL8tCMqp5Kl8B+PJXNAJuoqPFsCt1nq
+         3dIrKa8SALwc1uCA3jEx7ZuA32xR/wz8L9hLRYxi1+LxwPJYW5CZgLsDwqon7KUqR/Es
+         5n9aetJozUHREusHe9ox/ABOxVlsUHJohKrRlF2ALKGLy/bIcxIR2tm6iYcsZaNv5ezV
+         6GEoCiF/GtKBhLb60en0vVuWAphKHWPTXY7gLJSSeNXd01vXdZFVYPn1McNS2J9RIW5U
+         OU/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757091508; x=1757696308;
+        d=1e100.net; s=20230601; t=1757091509; x=1757696309;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dgk5ygaadk5u7SyByUrWe/7zDxjoOS5DC1A0XG9VqHA=;
-        b=twfcamQKJM1POQm9B0tcgyvA/bTtiuHks+QSWV639h8eESXcRtna9dqj/IDRzgLHqq
-         nrEzL8KdghyxHiQ047kRzwIf7o0k0MfbgYDExL6YI+/4eXqjngwvOPJbSYdlkIrvjSx2
-         gJYVbxUZG98upHKFfe13L03v4PZvI5y6m/DKwVToHJ9sZRwiEFoR/6NpQYOCwE4/4ZMb
-         edN8kJc5qjQbgrs3jMfvlBmEE1kjyIlsO4byIofMszKwC44YMumsx9lkFlX3Qmme3axl
-         68lJPjAjWxdZJWhuuSjA6G/zYAb3Zjgojm++Y1qDVfy0WUHLMhZ7GW7xfk+H0TmAhJRD
-         vvtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVQNVbuqQB4J3UURGVKeXaFV2pFoprxaQFsKgwaAko5rEG4shJr172lfbZv+vpLmiEMcm74KJo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5/5qdFRx7KA08UQTY4nvtsHH6VFODxRRJdFzdFd+kmvzwjxzr
-	Oa+8iLQcAFuXIrt1fpPtIjcXYhaUatJOvj8Wd+VJxXoMRAtB1m+mgqSI1PTblku7SanubrW5HDE
-	uAUT9+pbKZ/d6eg==
-X-Google-Smtp-Source: AGHT+IFpy9Ne5Jw1gLSuMnEpC9+Gg3wY+gO2rpU1xvy5VOMl2SiAd0zYTOR4bHdsaSw/QGJ89xJBTCZQtMjasQ==
-X-Received: from qknpw4.prod.google.com ([2002:a05:620a:63c4:b0:7fb:26b3:c4a7])
+        bh=EcjLzgMd4qbDwpnU0E77VHdVbc0CwWbA9SiP329+MQ4=;
+        b=cYf0YEIXyuqsJK+vNglIAHl7HuIanfcdMJrXap5lumNri6WaP8TK09uvg1EH3wZSEL
+         7wAENl9mlZAl18kI8fnlL7wgpAVPCL7yeANEnpvtIen5Drts7+aZoVQNTE6Z2z3UnSAY
+         0i4SYIIwUJRiZUgu/XNwZQi+QJ1Yiq6an+Wm+twO02yn2YHGgUIzRFI6fUiAK+BmwdJq
+         5SonxhuDSOxQgunEPEXsylDubGi57/haVoYHAVPAU70ZzgP0Bygb2ZiMY7RZrS4I9eVE
+         cXRzhxlf3Ek61fKzj4HXYollPFSqq7J6kcewNIVcN/2A2XUozBMYWzx2XNgducM/GDkJ
+         3cpw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6aq47p+qOM6jMaVE1jJ6XTSx9C7KIwyFP1UDm7rdADu253k28dE7/ex7kOD37str/XhsZ40I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyqd5IhGBFTZtvCIQv5y3432ANk5EptfidnUxmY+Rpvsx8lkPnJ
+	vLzB+ZibgD3s9uneKZ8SBRc+CsyStMYO71o+D0gSxP2JkRSLnMs2ketdAEJYO4ZCY2LrTJKqgQu
+	XiL2ctG96XR1n9A==
+X-Google-Smtp-Source: AGHT+IHlAPSWVqBI2US4kMycSX9LDj4BiDvtqHDW+I/rssBui9cVWvT610x04UlpEJrVI9qwVM3GOgVROzxa6w==
+X-Received: from qkpg9.prod.google.com ([2002:a05:620a:2789:b0:7f9:16dd:d235])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:18a6:b0:4b5:ece8:8707 with SMTP id d75a77b69052e-4b5ece887b4mr27000511cf.15.1757091507610;
- Fri, 05 Sep 2025 09:58:27 -0700 (PDT)
-Date: Fri,  5 Sep 2025 16:58:12 +0000
+ 2002:a05:620a:4514:b0:80e:ed61:7de with SMTP id af79cd13be357-80eed6109d2mr714400685a.70.1757091509064;
+ Fri, 05 Sep 2025 09:58:29 -0700 (PDT)
+Date: Fri,  5 Sep 2025 16:58:13 +0000
 In-Reply-To: <20250905165813.1470708-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,57 +74,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250905165813.1470708-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.355.g5224444f11-goog
-Message-ID: <20250905165813.1470708-9-edumazet@google.com>
-Subject: [PATCH v2 net-next 8/9] xfrm: snmp: do not use SNMP_MIB_SENTINEL anymore
+Message-ID: <20250905165813.1470708-10-edumazet@google.com>
+Subject: [PATCH v2 net-next 9/9] net: snmp: remove SNMP_MIB_SENTINEL
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
 	Jamie Bainbridge <jamie.bainbridge@gmail.com>, Abhishek Rawal <rawal.abhishek92@gmail.com>, 
 	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Steffen Klassert <steffen.klassert@secunet.com>
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use ARRAY_SIZE(), so that we know the limit at compile time.
+No more user of SNMP_MIB_SENTINEL, we can remove it.
+
+Also remove snmp_get_cpu_field[64]_batch() helpers.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_proc.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ include/net/ip.h   | 23 -----------------------
+ include/net/snmp.h |  5 -----
+ 2 files changed, 28 deletions(-)
 
-diff --git a/net/xfrm/xfrm_proc.c b/net/xfrm/xfrm_proc.c
-index 8e07dd614b0b..5e1fd6b1d503 100644
---- a/net/xfrm/xfrm_proc.c
-+++ b/net/xfrm/xfrm_proc.c
-@@ -45,21 +45,21 @@ static const struct snmp_mib xfrm_mib_list[] = {
- 	SNMP_MIB_ITEM("XfrmInStateDirError", LINUX_MIB_XFRMINSTATEDIRERROR),
- 	SNMP_MIB_ITEM("XfrmInIptfsError", LINUX_MIB_XFRMINIPTFSERROR),
- 	SNMP_MIB_ITEM("XfrmOutNoQueueSpace", LINUX_MIB_XFRMOUTNOQSPACE),
--	SNMP_MIB_SENTINEL
- };
+diff --git a/include/net/ip.h b/include/net/ip.h
+index a1624e8db1ab..380afb691c41 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -326,18 +326,6 @@ static inline u64 snmp_fold_field64(void __percpu *mib, int offt, size_t syncp_o
+ }
+ #endif
  
- static int xfrm_statistics_seq_show(struct seq_file *seq, void *v)
- {
--	unsigned long buff[LINUX_MIB_XFRMMAX];
-+	unsigned long buff[ARRAY_SIZE(xfrm_mib_list)];
-+	const int cnt = ARRAY_SIZE(xfrm_mib_list);
- 	struct net *net = seq->private;
- 	int i;
+-#define snmp_get_cpu_field64_batch(buff64, stats_list, mib_statistic, offset) \
+-{ \
+-	int i, c; \
+-	for_each_possible_cpu(c) { \
+-		for (i = 0; stats_list[i].name; i++) \
+-			buff64[i] += snmp_get_cpu_field64( \
+-					mib_statistic, \
+-					c, stats_list[i].entry, \
+-					offset); \
+-	} \
+-}
+-
+ #define snmp_get_cpu_field64_batch_cnt(buff64, stats_list, cnt,	\
+ 				       mib_statistic, offset)	\
+ { \
+@@ -351,17 +339,6 @@ static inline u64 snmp_fold_field64(void __percpu *mib, int offt, size_t syncp_o
+ 	} \
+ }
  
--	memset(buff, 0, sizeof(unsigned long) * LINUX_MIB_XFRMMAX);
-+	memset(buff, 0, sizeof(buff));
+-#define snmp_get_cpu_field_batch(buff, stats_list, mib_statistic) \
+-{ \
+-	int i, c; \
+-	for_each_possible_cpu(c) { \
+-		for (i = 0; stats_list[i].name; i++) \
+-			buff[i] += snmp_get_cpu_field( \
+-						mib_statistic, \
+-						c, stats_list[i].entry); \
+-	} \
+-}
+-
+ #define snmp_get_cpu_field_batch_cnt(buff, stats_list, cnt, mib_statistic) \
+ { \
+ 	int i, c; \
+diff --git a/include/net/snmp.h b/include/net/snmp.h
+index 4cb4326dfebe..584e70742e9b 100644
+--- a/include/net/snmp.h
++++ b/include/net/snmp.h
+@@ -36,11 +36,6 @@ struct snmp_mib {
+ 	.entry = _entry,			\
+ }
  
- 	xfrm_state_update_stats(net);
--	snmp_get_cpu_field_batch(buff, xfrm_mib_list,
--				 net->mib.xfrm_statistics);
--	for (i = 0; xfrm_mib_list[i].name; i++)
-+	snmp_get_cpu_field_batch_cnt(buff, xfrm_mib_list, cnt,
-+				     net->mib.xfrm_statistics);
-+	for (i = 0; i < cnt; i++)
- 		seq_printf(seq, "%-24s\t%lu\n", xfrm_mib_list[i].name,
- 						buff[i]);
- 
+-#define SNMP_MIB_SENTINEL {	\
+-	.name = NULL,		\
+-	.entry = 0,		\
+-}
+-
+ /*
+  * We use unsigned longs for most mibs but u64 for ipstats.
+  */
 -- 
 2.51.0.355.g5224444f11-goog
 
