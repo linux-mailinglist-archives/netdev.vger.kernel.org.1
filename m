@@ -1,268 +1,310 @@
-Return-Path: <netdev+bounces-220381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F42B45B02
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:54:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9F33B45B0C
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13B9D16E95D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:54:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9D7518826AF
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956383570A6;
-	Fri,  5 Sep 2025 14:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60353728AE;
+	Fri,  5 Sep 2025 14:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y9xE+iWe"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oGI3DZ0Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2702148850
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 14:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757084052; cv=fail; b=RJVfKsXJ6oLJNFK/OPQ5itEU4pDYB197FJX7f9tBQuM/XVNKPHG5+l44lCa3LzNAmQ/UzsAjQP88OPTqF/1jyTLWy2ycURQ9WrHvujV/8WXpwjIG6zTlRCBjyKKWoAN4N+XATzcK3OB9zN7oPyva6JTzQwAMUJxP1yEHWBj7ccA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757084052; c=relaxed/simple;
-	bh=uyAtu6SCGZeBxl1alDs3bCSJ8nNwl0b2B3VrLrakA0Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cOuazWYDPLy1Q6riOw24Of84wrWKSLBlBWaQ0ixaSBZzasRF0wrldJIsVUn0BnMdfyl7ntMqa1jeAufPkBWwGps852GcQjzHJFKds9jh7QD1Ah5kevnbWkeltlsT2liWNGZ9aTjNF5VGYXWDnlowJTimWw6vO2qJPLee6AWq1gs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y9xE+iWe; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757084051; x=1788620051;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=uyAtu6SCGZeBxl1alDs3bCSJ8nNwl0b2B3VrLrakA0Q=;
-  b=Y9xE+iWeb3HPqqkIqFy8gNqGruAgqm7rFY9hMxo14FP+I+t7xqnIqOAm
-   nGASNgzxFn08ko88Sb4CrdBLkf9W6sPe3mxzOBKpgvvQyR27GgM8ByjVY
-   70Sgc27VS+LgXYLFInx2aAxSyd4I3ZnVuHlreP6a4pjIyDRsjoN4o0CXJ
-   YeigrSjX+b5GAvAxqk8t06YXtL3qW4anujzXwvM91s2kj5JEFhnqkUeHT
-   AR6813jxwQtay45uybZsFpGvOiXZYSTz8Qc5m6dEDFmU3mV3NZDpzpXOs
-   eHMlQ56du+ihHOayuQloUTMkK5RGV+A5HE65FoWudK+VsshAu2iK9eSMZ
-   Q==;
-X-CSE-ConnectionGUID: JBVVfgdSRraeS9902U5GFQ==
-X-CSE-MsgGUID: sBvrsVLNRkKxrKupOf/0Mw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11544"; a="47006569"
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="47006569"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 07:54:06 -0700
-X-CSE-ConnectionGUID: 7xyhshQsRWakaE1zx4YfPw==
-X-CSE-MsgGUID: hi+DyBc+Riez7iUjCZwBRQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="176277389"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 07:54:05 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 5 Sep 2025 07:54:04 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 5 Sep 2025 07:54:04 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.53)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 5 Sep 2025 07:54:03 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WgwzeMQt+Jh+BbqMkASTA3wrbpm8aESFj2WWG06Gha39drcA1/uizaOq33xdgaHu6FrGuz/RjSKwbxVvlldFza+RfjqmDL8XGgjsvASxY1FifJ7hw1LN+rZAdnAW/7VZLWHD5PqnV5a1njBG1NxlC37aG6+61o9HO69RVJwSEJFXIrro2kUN2heFy2eK0AnRtOh5cbb87dSzOPd3L2AjawsVqugr6w87SxoE8Q0LBuDo8aT5DyDv9mUlBBx/wtavn2BDaAwoY8pzr3GWCU/X4/+KWPr/Z0Zj4b81+VV3jyzo6V/JC//yaztk7XDiS4/2mWi77/+UDWlrqs0/TBrfHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oQgKnDJInjsZoEewVXv59xTRHo8TciTGSexSP184xzM=;
- b=jni2JRaRqq5JNEuxNoYDJ6KcP3/sgVtjD4ex0O4em42KKyZgTN2gKnTTZ2vb/J3ukSiy2vXVn2IBvxpD+LYphgUmF8cApn+3PiWdSCJwfYlqyA+cuWqKasL2Losz5mVh9EAcuZNDOCgP4wy2rua5XxoSNbVhOkhq8luxb4NV/ZfGJupmM1HNyab8tqbYc/rn0Hqc/fMfpqeN0EBk5V14Ss0yVQPqqSluAYw3JQD+RfobFse0d8zWtf35KkREaHmQpKtOL0iwLV+BLwF+5HA54PVLawaM9Vc9X2dpXR8cZpqpLSQp1jlgNGiRJMrWptJBkuwo78sxDY4R9FiHo6yVKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by CY5PR11MB6140.namprd11.prod.outlook.com (2603:10b6:930:28::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.17; Fri, 5 Sep
- 2025 14:54:01 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31%3]) with mapi id 15.20.9094.018; Fri, 5 Sep 2025
- 14:54:01 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "Korba, Przemyslaw"
-	<przemyslaw.korba@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Olech, Milena" <milena.olech@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH v9 iwl-next] ice: add recovery clock and
- clock 1588 control for E825c
-Thread-Topic: [Intel-wired-lan] [PATCH v9 iwl-next] ice: add recovery clock
- and clock 1588 control for E825c
-Thread-Index: AQHcC8bBzY2NxtyEhUisdaCjbiHDLrRgXTmAgCR0vXA=
-Date: Fri, 5 Sep 2025 14:54:00 +0000
-Message-ID: <IA1PR11MB6219ADDEA32B0C45C4CD0FED9203A@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20250812202025.3610612-1-grzegorz.nitka@intel.com>
- <IA3PR11MB89864D7323B7E3662CAD765AE52AA@IA3PR11MB8986.namprd11.prod.outlook.com>
-In-Reply-To: <IA3PR11MB89864D7323B7E3662CAD765AE52AA@IA3PR11MB8986.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|CY5PR11MB6140:EE_
-x-ms-office365-filtering-correlation-id: 7ee5da00-0cf5-4149-f554-08ddec8c0ccb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?oRIGavSK9BR5zLzfMTH8WgFbGkohk5sjsyuZ2YKicRfGE1/u05Ru4Yphfq3K?=
- =?us-ascii?Q?cSya+GPrW+RycorUj5tsAPPImk7ZQSmQlAx/cRfqvO/W2oLXjIHdkx3cSrdW?=
- =?us-ascii?Q?fvp5rc561u0+Wq3QDQOyMkDwOBsbjlcsWx+CA88T7p78ohHvN860LLod9c8X?=
- =?us-ascii?Q?QVfRn/lzC3UrRVeexHcvsIigsfwVFDHE5DnbxOU34il2bJCguPIONx25uWjp?=
- =?us-ascii?Q?0Ysa5XtfBAR45Ca4T2vKNct9aiYO6Ud96MwzlhuTzOEp6TwjFEQx2XVLtUsd?=
- =?us-ascii?Q?pTh6JZe1AVyYhsdWFPbvRfjRKwa9I0Dl8fOhGJYXYTSWlaN1SBzUNK3he83E?=
- =?us-ascii?Q?HXpRoNfLkVd3xPDpRuh5ujNoqaU1xXV4MDPXvmSV9moRNWzVTupQXbNvht2v?=
- =?us-ascii?Q?nUH+4TulQO0gS4p5wx1lySdwHosFm7N3LlOo5C3j4J1CUZbCpzYqHEsG3+Qx?=
- =?us-ascii?Q?N3tMMls/nvwoANjiLQGw8fKxgO+gG/inuTdGKIMMElcmJERwh/dG+gUwPXp7?=
- =?us-ascii?Q?VtAiztYlSEfwCVLLR2A1CkJZoEYmTgGW8rkbIBjdn1HvLlXVOwfWp/YqTaz9?=
- =?us-ascii?Q?pHF/fzClCBt89piePb3FUMSwnVEApoSNL2Nn7Ha3UedlKPIFmAuw6vkvvcuj?=
- =?us-ascii?Q?kgagJrhLR4T1VhFaA6LSTYpj/Pf9gIJ2U/P2TV/tOnacy3dONhWgLkXaTzTh?=
- =?us-ascii?Q?fEBCtwmv8DXMCuJui6x2T0yWTH56G3+2VnnHjowoczhFT0rdyqDKGS+r9SMl?=
- =?us-ascii?Q?Onb1z7M7P3prYodnWGqPSCVFcLltZtdVHLS3EBHfbv2IYAYVyda6PnNpXlX/?=
- =?us-ascii?Q?vh6ssT3Xvx8cRzo6zCYwF7OrmLlsjjTaSOSMceSPKQBoRUxxfg+ltm0TLcB+?=
- =?us-ascii?Q?StN6Yb6+dM96pI4F1wLQUUei1egdB0V7H+I7aN6Hga6BmT005NSBtOul+mmz?=
- =?us-ascii?Q?Ugsb9SsKCcHVx3JwBpfFOwxGedmPaZC3tpdeOGsLBZFhYq5qyfpjQ6rhgJIN?=
- =?us-ascii?Q?l9msGrtaIOgFrQJyKkQ0bILaEeyfvG9qHeiu/ulEfiOktmFpiS9hIJK6yayJ?=
- =?us-ascii?Q?1TuML5gic9NsqgqpQRUrVvTfRuIr2xJCZvZerNp337CoqMFgxlAJQS+4Nsw5?=
- =?us-ascii?Q?7Lz5I7knJgz1BsbWsmkoppBxnx8du9Q0J6tAfJVpnnI2NVZnPtUntyjoat1o?=
- =?us-ascii?Q?wGchAtEbn84npNe0tMib9dLNLys+qVSX7LB74YtH6AwBvgJ3krrnviuKQurb?=
- =?us-ascii?Q?HLoTEs/0YKRrRKfmxaKWlWq7A5wRoJslyKtR5l3oXpJoLUsVL6zhoVy79OiV?=
- =?us-ascii?Q?xBm2/zusy+vgTgmlV3hRlQ7lScqZI6cPZ8z0sUPXxaZhfQbvq07ezo9qnn0Y?=
- =?us-ascii?Q?8ZkULZHkiyqs0V5BoUNHhY5noqkoMYKGcVprpS/seG/B8gfT5CQwYk7nQYRg?=
- =?us-ascii?Q?yB1D0X3sv89do6Z2W22Ro5x7EyFneiYIQiU0xqzx3nplHuHezmyDVA=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?a/NcAzr/WcU+PP+vYHD7YXQAkjNFhO1rUcXeLd0P7aanPAReTWof7PIhM7l8?=
- =?us-ascii?Q?iHSFjotKT8mdo1u+pTiLGKpcJTNE2zDnRkU7iofMVDdgY3ZqrxyehaY3DOuI?=
- =?us-ascii?Q?TPOoVi88fUXGNMW9qSZ2pvBzoBDfg8wK6orW0TZ4s7MwfHVsXS8uB5qL5PBr?=
- =?us-ascii?Q?BMlzC3BQ3E5G9+RmtmL+1vZbgjcDmED675iMVlWHk0fASMRBrnOYxZbgCzda?=
- =?us-ascii?Q?yH6ylYngcYecfISpSSCK4ifbD8HthWKlvCOPq+UYAlMT3v2gSrcEoaYFtM8V?=
- =?us-ascii?Q?ewg4pFO2+iaxEgwAlgawc7NtcI0jURzsKFhv5I09fd4Devd+3+skxLbp/YRA?=
- =?us-ascii?Q?EV4156L6ei/yytGLrnpndxcEloJ5qAz2UrJuim958hr8d3KQxnn88uk4Objh?=
- =?us-ascii?Q?+ar8WmEL60hl4/DTM7ya3hclrQmmF6G0CnY2ufG+VaXie5cihKnXSEbXe/VM?=
- =?us-ascii?Q?Gqg+NKjSwVTQjGmZa/O4dY3gco6Lm9kyhAtmTpIvLwWRrNEiwJ7nEHwmzV+8?=
- =?us-ascii?Q?CoEq6LU/c55FQzPei5HrWkBu8e5hqABfTWq2b6EKZ6znxFc/RNVpV7K0483v?=
- =?us-ascii?Q?M4OocxN2c3rkIVI1hSMhz++3By6ko1065N1RrYHUYMFS5c/5Nciw7ZhNL2nz?=
- =?us-ascii?Q?g63rxCNrsAxYNtNrGm8bAx80LtbS4j44hx4w/FtxBXf0UQOtAa1sWdF2fIDq?=
- =?us-ascii?Q?i8Mf0T1OPD9Exz+a0b55V0K7dn6dNUIkTpb6sKVr7sQ1kW3kZ8sv3s06kvB6?=
- =?us-ascii?Q?OOqpwRl0n82rSQdBhnmI4A2zeIWIJuyFHCe5VrIAztAzeuBdErrq+LxWAyau?=
- =?us-ascii?Q?WACCbemYHg6D3L0py4baO45Pj8F64byqTnOcpG+7Oh8ul4Szl+gX42m8gLS4?=
- =?us-ascii?Q?Aq9yhEwBcq370ld7sAMlkA9XCCnDePCa/bCXDP+6Blb6PFx9vuiRctl8ygbl?=
- =?us-ascii?Q?fF3q+IejEehSpaHzNwi3QTW+gTC4xruUX0IYUwC7fAnz0CPSnxF7izUA5RRF?=
- =?us-ascii?Q?4YHOVAgz3Z9NAQWrJ5t+j+Ttn74b+iHoNpy8hMIfGuvWZ1lc38BDfB7wVNJg?=
- =?us-ascii?Q?2kAmpRte98wo8pd2foScHd8/60EWnl2SeHmpBdNlkxdRNFcYsuC5rhJhDiel?=
- =?us-ascii?Q?t8D3JtlM07nULgLo6LGWIL2V2sZQlpu4G23ezYT1349N+q88hTIcdl0ldx/e?=
- =?us-ascii?Q?fgVEzYgePFPNbB8HQT2d1dHYnWDmLjf58P/g9yEVdkQVdIxw/cMzzoXJm7rs?=
- =?us-ascii?Q?sCex15p3NvqASUke9kbhpVnQBi4xQ+1xMIEI0fPAp0kweI6g6ThNPKx5nRjw?=
- =?us-ascii?Q?yXPKYquOOUan4F6KHugcvMcHgDckNEuESm7psDy4/ahQsidcqJawieKf1JA7?=
- =?us-ascii?Q?WVk0oQ5tbDYjcv+//8kYkbbPWoHxb0Hm1Gi/IQwPhus+7NZO20pAObdZU5EY?=
- =?us-ascii?Q?4sZQKsh7lkIoDyt4dAsLV0al4MxlV7sNivK0FXY1Ar4Vi7ouM69N0DvlsT5S?=
- =?us-ascii?Q?jMKXrpjJADrynZ4eGf7G/t5r9hH57rKoQLkaYqsKl3gC0f7crcXAgBGmFbso?=
- =?us-ascii?Q?5WjavoDkP5Zzungu+vGaZiAlo3O9LYCCPbYCDpHo?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC9A36CE1C;
+	Fri,  5 Sep 2025 14:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757084083; cv=none; b=MNCBib8sAwegqeTdf/r++lmQk8svCLXc2W/nGV4dS9/wlCWGvvHdyIWD5Wvvx9uxtcEPFGorjc0Wd/U++vEFuKxUToWinFnNDuRhjiin4hZOgUB7/AYg+Sl51wxV6sFysRvJHYVGedys9quvMvtLQyWFEfnN0hqVb9Dl42GqXiA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757084083; c=relaxed/simple;
+	bh=qeSR4qIqUSBvHUJEzB23WTCxGh5d6cfSGfgCyPGYs/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eyY9ktHq4HvYdDuq65FQk0zehluacI0S8HXIOFoYm5kBtNE4uv+LfQg3FAzAYFisCOkRP6mhRw6sc4H/geRcYl4OvR6SdneOtki/CEGZbMvAfueYnoSkKvBzuq1yXnBnsSgB4wlaNGDSYG0qBcV0QEDyY82bgGNmJs2xJ5YSQ5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oGI3DZ0Q; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 585AlqY3008655;
+	Fri, 5 Sep 2025 14:54:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=Rov2MAzAz/Lce47qf9xNKZ10+IfV0/4X6+1aUpftK
+	nc=; b=oGI3DZ0QLbeyd4sLPJK62mmqjx5yCqw/YvbDLNFq5uPJ6tm+3pzziFFcL
+	s0QfMOLPxisdgC9n0wfcpu8rRGjQGcO6ZhPBw9942in1fIzaSkNmOEgg35HAEE9Y
+	Yt72r8DQhflGE4eQjk1wANANFC4aqBFHfXgYNWjmtaoIUO3i/uLI/H41af3HQNy7
+	JLvc9KWeYfT/er+kLZXkuPe6eOJaSUcSMrLhKkaS8WNrgwRxv3tvQNcB9G7vIGoI
+	5NuUU75I5MIFWfF7qz7XRiDVBdmOYw0AQG7LBP/RnCU6t7KzBk0IelmAcSGFVxy+
+	cvtFqfH4+N7Royj4bP4BYhwMDmUMA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48uswds98a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Sep 2025 14:54:33 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 585Ejakv028852;
+	Fri, 5 Sep 2025 14:54:33 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48uswds983-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Sep 2025 14:54:33 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 585Bltsf019927;
+	Fri, 5 Sep 2025 14:54:32 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48vbmuj6vf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Sep 2025 14:54:32 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 585EsSmr24838774
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 5 Sep 2025 14:54:28 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7016620043;
+	Fri,  5 Sep 2025 14:54:28 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5029B20040;
+	Fri,  5 Sep 2025 14:54:28 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri,  5 Sep 2025 14:54:28 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 183CAE111A; Fri, 05 Sep 2025 16:54:28 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Julian Ruess <julianr@linux.ibm.com>,
+        Aswin Karuvally <aswin@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 00/14] dibs - Direct Internal Buffer Sharing
+Date: Fri,  5 Sep 2025 16:54:13 +0200
+Message-ID: <20250905145428.1962105-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ee5da00-0cf5-4149-f554-08ddec8c0ccb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Sep 2025 14:54:01.0337
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Hr0xUZtMzb+MzBcKiwwK6YscWWYSe4ZgN+j8bGuRbEEkyWuBw3i0738TA/H3bLylgGqYzIXnIGNQsucaWcGL0sANPo8TTrKV1pTf1fWbYC0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6140
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=PeP/hjhd c=1 sm=1 tr=0 ts=68baf9a9 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=yJojWOMRYYMA:10 a=3nI6nj7hAAAA:8 a=VwQbUJbxAAAA:8 a=SRrdq9N9AAAA:8
+ a=mkMtH7XpAAAA:8 a=VnNF1IyMAAAA:8 a=QyXUC8HyAAAA:8 a=DPgQZZUEgBTEjLq2gQoA:9
+ a=bb6nGAbfQKYA:10 a=PUQwBqpy_9XipHPXVRm3:22 a=I9Slk6e--tAXHahELIuT:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzNCBTYWx0ZWRfX2B3zMei5wCSN
+ 9XJJ4bMvYkNmy1HzwZxGD+vGTcof4Dud1/e3VgyCaM28F/8DgmKB08q9vEKHG8e4zx6UIWlLOqd
+ 6TbPS8qGKozqe6sDmSw3A3zMHJzFcjPfgJk9+R+1sKBgU8/kvJjb6M2GtlhsU7rS1CJ9fAm+Aej
+ i0oh9CmfiKuzT6jQvV/WoAXu40k+8edo4BlSM87qAUKoS+HjX91td0ZQggp3ID8TKN2in13Fw/J
+ /8VYcpprt2wHzQxOWCZcpmuXawXBKRU8t6F7vCQ/I47jj4r7b7dkWNMC9dzAP1IvXoWBJVbo6u0
+ qoZb+6S40AFn5Nlo31fmUXq0r7UvsP4kXnFVdBQt9B60Fq8cXotCeS85i2PSm9czSBCW+5DA4Wk
+ pPrB47/L
+X-Proofpoint-GUID: nY3Eeb0uyrl0ErNa1dzFfbR1ALHePr44
+X-Proofpoint-ORIG-GUID: pb3ZhSFPg8LWuXxXaZl5TkGXurPSgVdZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-05_05,2025-09-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 priorityscore=1501 malwarescore=0 spamscore=0 adultscore=0
+ impostorscore=0 bulkscore=0 phishscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300034
 
-> -----Original Message-----
-> From: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> Sent: Wednesday, August 13, 2025 12:10 PM
-> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>; intel-wired-
-> lan@lists.osuosl.org
-> Cc: pmenzel@molgen.mpg.de; netdev@vger.kernel.org; Kubalewski,
-> Arkadiusz <arkadiusz.kubalewski@intel.com>; Korba, Przemyslaw
-> <przemyslaw.korba@intel.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; Olech, Milena <milena.olech@intel.com>
-> Subject: RE: [Intel-wired-lan] [PATCH v9 iwl-next] ice: add recovery cloc=
-k and
-> clock 1588 control for E825c
->=20
->=20
->=20
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > Of Grzegorz Nitka
-> > Sent: Tuesday, August 12, 2025 10:20 PM
-> > To: intel-wired-lan@lists.osuosl.org
-> > Cc: pmenzel@molgen.mpg.de; netdev@vger.kernel.org; Kubalewski,
-> > Arkadiusz <arkadiusz.kubalewski@intel.com>; Korba, Przemyslaw
-> > <przemyslaw.korba@intel.com>; Nguyen, Anthony L
-> > <anthony.l.nguyen@intel.com>; Olech, Milena <milena.olech@intel.com>
-> > Subject: [Intel-wired-lan] [PATCH v9 iwl-next] ice: add recovery
-> > clock and clock 1588 control for E825c
-> >
-> > From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-> >
-> > Add control for E825 input pins: phy clock recovery and clock 1588.
-> > E825 does not provide control over platform level DPLL but it
-> > provides control over PHY clock recovery, and PTP/timestamp driven
-> > inputs for platform level DPLL [1].
-> >
-> > Introduce a software controlled layer of abstraction to:
-> > - create a DPLL of type EEC for E825c,
-> > - create recovered clock pin for each PF, and control them through
-> > writing to registers,
-> > - create pin to control clock 1588 for PF0, and control it through
-> > writing to registers.
-> >
->=20
-> ...
->=20
-> > +
-> > +#define ICE_CGU_R10				0x28
-> > +#define ICE_CGU_R10_SYNCE_CLKO_SEL		GENMASK(8, 5)
-> > +#define ICE_CGU_R10_SYNCE_CLKODIV_M1
-> 	GENMASK(13, 9)
-> > +#define ICE_CGU_R10_SYNCE_CLKODIV_LOAD		BIT(14)
-> > +#define ICE_CGU_R10_SYNCE_DCK_RST		BIT(15)
-> > +#define ICE_CGU_R10_SYNCE_ETHCLKO_SEL
-> 	GENMASK(18, 16)
-> > +#define ICE_CGU_R10_SYNCE_ETHDIV_M1		GENMASK(23, 19)
-> > +#define ICE_CGU_R10_SYNCE_ETHDIV_LOAD		BIT(24)
-> > +#define ICE_CGU_R10_SYNCE_DCK2_RST		BIT(25)
-> > +#define ICE_CGU_R10_SYNCE_S_REF_CLK		GENMASK(31, 27)
-> > +
-> > +#define ICE_CGU_R11				0x2C
-> > +#define ICE_CGU_R11_SYNCE_S_BYP_CLK		GENMASK(6, 1)
-> > +
-> > +#define ICE_CGU_BYPASS_MUX_OFFSET_E825C		3
-> > +
-> > +#define SET_PIN_STATE(_pin, _id, _condition) \
-> > +	((_pin)->state[_id] =3D (_condition) ? DPLL_PIN_STATE_CONNECTED
-> > : \
-> > +			       DPLL_PIN_STATE_DISCONNECTED)
-> Can you consider implement it as inline function instead of macro?
->=20
-> Alex
+This series introduces a generic abstraction of existing components like:
+- the s390 specific ISM device (Internal Shared Memory),
+- the SMC-D loopback mechanism (Shared Memory Communication - Direct)
+- the client interface of the SMC-D module to the transport devices
+This generic shim layer can be extended with more devices, more clients and
+more features in the future.
 
-Apologize for late response (summer break time). To be changed in v10.
+This layer is called 'dibs' for Direct Internal Buffer Sharing based on the
+common scheme that these mechanisms enable controlled sharing of memory
+buffers within some containing entity such as a hypervisor or a Linux
+instance.
+
+Benefits:
+- Cleaner separation of ISM and SMC-D functionality
+- simpler and less module dependencies
+- Clear interface definition.
+- Extendable for future devices and clients.
+
+An overview was given at the Netdev 0x19 conference, recordings and slides
+are available [1].
+
+Background / Status quo:
+------------------------
+Currently s390 hardware provides virtual PCI ISM devices (Internal Shared
+Memory). Their driver is in drivers/s390/net/ism_drv.c. The main user is
+SMC-D (net/smc). The ism driver offers a client interface so other
+users/protocols can also use them, but it is still heavily intermingled
+with the smc code. Namely, the ism module cannot be used without the smc
+module, which feels artificial.
+
+There is ongoing work to extend the ISM concept of shared buffers that can
+be accessed directly by another instance on the same hardware: [2] proposed
+a loopback interface (ism_lo), that can be used on non-s390 architectures
+(e.g. between containers or to test SMC-D). A minimal implementation went
+upstream with [3]: ism_lo currently is a part of the smc protocol and
+rather hidden.
+
+[4] proposed a virtio definition of ism (ism_virtio) that can be used
+between kvm guests.
+
+We will shortly send an RFC for an dibs client that uses dibs as transport
+for TTY.
+
+Concept:
+--------
+Create a shim layer in net/dibs that contains common definitions and code
+for all dibs devices and all dibs clients. Any device or client module only
+needs to depend on this dibs layer module and any device or client code
+only needs to include the definitions in include/linux/dibs.h.
+
+The name dibs was chosen to clearly distinguish it from the existing s390
+ism devices. And to emphasize that it is not about sharing whole memory
+regions with anybody, but dedicating single buffers for another system.
+
+Implementation:
+---------------
+The end result of this series is: A dibs shim layer with
+- One dibs client: smc-d
+- Two dibs device drivers: ism and dibs-loopback
+- Everything prepared to add more clients and more device drivers.
+
+Patches 1-2 contain some issues that were found along the way. They make
+sense on their own, but also enable a better structured dibs series.
+
+There are three components that exist today:
+a) smc module (especially SMC-D functionality, which is an ism client today)
+b) ism device driver (supports multiple ism clients today)
+c) smc-loopback (integrated with smc today)
+In order to preserve existing functionality at each step, these are not
+moved to dibs layer by component, instead:
+- the dibs layer is established in parallel to existing code [patches 3-6]
+- then some service functions are moved to the dibs layer [patches 7-12]
+- the actual data movement is moved to the dibs layer [patch 13]
+- and last event handling is moved to the dibs layer [patch 14]
+
+Future:
+-------
+Items that are not part of this patchset but could be added later:
+- dynamically add or remove dibs_loopback. That will be allow for simple
+  testing of add_dev()/del_dev()
+- handle_irq(): Call clients without interrupt context. e.g using
+  threaded interrupts. I left this for a follow-on, because it includes
+  conceptual changes for the smcd receive code.
+- Any improvements of locking scopes. I mainly moved some of the the
+  existing locks to dibs layer. I have the feeling there is room for
+  improvements.
+- The device drivers should not loop through the client array
+- dibs_dev_op.*_dmb() functions reveal unnecessary details of the
+  internal dmb struct to the clients
+- Check whether client calls to dibs_dev_ops should be replaced by
+  interface functions that provide additional value
+- Check whether device driver calls to dibs_client_ops should be replaced
+  by interface functions that provide additional value.
+
+Link: [1] https://netdevconf.info/0x19/sessions/talk/communication-via-internal-shared-memory-ism-time-to-open-up.html
+Link: [2] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+Link: [3] https://lore.kernel.org/linux-kernel//20240428060738.60843-1-guwen@linux.alibaba.com/
+Link: [4] https://groups.oasis-open.org/communities/community-home/digestviewer/viewthread?GroupId=3973&MessageKey=c060ecf9-ea1a-49a2-9827-c92f0e6447b2&CommunityKey=2f26be99-3aa1-48f6-93a5-018dce262226&hlmlt=VT
+
+---
+Changes in v1:
+- Don't change __init in smc_core_init() (was [1]) (Dust Li)
+- Split off log message improvements from this series (was [2,5]) (Dust Li)
+- Fix arch/s390/[debug_]defconfig [4,6,7,14]
+- Helptext of dibs/Kconfig [3,6]
+- include linux/slab.h to avoid Wimplicit-function-declaration of
+  kzalloc() and kfree() [5,6] (Simon Horman and
+                             'kernel test robot <lkp@intel.com>')
+- Fix transient use of undefined 'ism' pointer [7] (Simon Horman)
+- Fix transient scope of IS_ENABLED(CONFIG_ISM) [7,13] (Simon Horman)
+- Change position of is_attached in sruct smc_buf_desc to reduce gaps [1] (Dust Li)
+- Fix SW-pnetid handling for s390 ism devices [9]
+- use dibs->dev instead of defining dibs_get_dev() [8]
+- add const to uuid_t* parameters [12,14] (Julian Ruess)
+- no log message for module load/unload [3] (Jakub Kicinski)
+
+RFC:
+- Link: https://lore.kernel.org/netdev/20250806154122.3413330-1-wintera@linux.ibm.com/
+---
+
+Alexandra Winter (11):
+  net/smc: Remove error handling of unregister_dmb()
+  net/smc: Decouple sf and attached send_buf in smc_loopback
+  net/dibs: Create net/dibs
+  net/dibs: Register smc as dibs_client
+  net/dibs: Register ism as dibs device
+  net/dibs: Define dibs loopback
+  net/dibs: Define dibs_client_ops and dibs_dev_ops
+  net/dibs: Local gid for dibs devices
+  net/dibs: Move vlan support to dibs_dev_ops
+  net/dibs: Move query_remote_gid() to dibs_dev_ops
+  net/dibs: Move data path to dibs layer
+
+Julian Ruess (3):
+  net/dibs: Move struct device to dibs_dev
+  net/dibs: Create class dibs
+  net/dibs: Move event handling to dibs layer
+
+ MAINTAINERS                       |   9 +-
+ arch/s390/configs/debug_defconfig |   4 +-
+ arch/s390/configs/defconfig       |   4 +-
+ drivers/s390/net/Kconfig          |   3 +-
+ drivers/s390/net/ism.h            |  53 ++-
+ drivers/s390/net/ism_drv.c        | 573 +++++++++++-------------------
+ include/linux/dibs.h              | 464 ++++++++++++++++++++++++
+ include/linux/ism.h               |  28 +-
+ include/net/smc.h                 |  51 +--
+ net/Kconfig                       |   1 +
+ net/Makefile                      |   1 +
+ net/dibs/Kconfig                  |  23 ++
+ net/dibs/Makefile                 |   8 +
+ net/dibs/dibs_loopback.c          | 356 +++++++++++++++++++
+ net/dibs/dibs_loopback.h          |  57 +++
+ net/dibs/dibs_main.c              | 278 +++++++++++++++
+ net/smc/Kconfig                   |  16 +-
+ net/smc/Makefile                  |   1 -
+ net/smc/af_smc.c                  |  12 +-
+ net/smc/smc_clc.c                 |   6 +-
+ net/smc/smc_core.c                |   6 +-
+ net/smc/smc_core.h                |   5 +
+ net/smc/smc_diag.c                |   2 +-
+ net/smc/smc_ism.c                 | 224 ++++++------
+ net/smc/smc_ism.h                 |  36 +-
+ net/smc/smc_loopback.c            | 165 +--------
+ net/smc/smc_loopback.h            |  19 +-
+ net/smc/smc_pnet.c                |  25 +-
+ net/smc/smc_tx.c                  |   3 +
+ 29 files changed, 1667 insertions(+), 766 deletions(-)
+ create mode 100644 include/linux/dibs.h
+ create mode 100644 net/dibs/Kconfig
+ create mode 100644 net/dibs/Makefile
+ create mode 100644 net/dibs/dibs_loopback.c
+ create mode 100644 net/dibs/dibs_loopback.h
+ create mode 100644 net/dibs/dibs_main.c
+
+-- 
+2.48.1
+
 
