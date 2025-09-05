@@ -1,302 +1,230 @@
-Return-Path: <netdev+bounces-220314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB75DB4560F
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:17:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A56B45613
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CD227BF571
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 11:15:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2085C188253A
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 11:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B63350821;
-	Fri,  5 Sep 2025 11:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFEEB34A326;
+	Fri,  5 Sep 2025 11:14:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BJ2kHyf8"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QEja0c3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B435D286898;
-	Fri,  5 Sep 2025 11:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757070909; cv=fail; b=QoCiLlGjzmd2ZsrYjqR8XMxklHyzE7W1ULHvms5cmID4GPYBe0U9oUIsqOsA0ftcvljfdD6iaBlJBvrKMKPd6ki/qZKP9rXaZZAMm5Mnoa2txNAYEewMmEbIfLeEkyuhw4veN+XAaW1cd+XIdb4h0i+ZUa3QcXXzLdvR2gROy6Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757070909; c=relaxed/simple;
-	bh=F3zp1Ray7c+F5gjpW6wLs32gmJC1K0NRlUTThh07Rpw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Xn0DtyaUNLwlqJLUiWdhSPSoOfmjovVxZUwR7dQHjPB2ALLPJ41HWjfGe+EngjPJYxhkMOIWB0raPFBsdxNiiqgF/dVRW5AYzanflJzXL//pqUvKjxbRypA/WBByWLZoA+hCSE18VWaugmQuw5eQZmpw2xpOfsoLYejbeX+44Qc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BJ2kHyf8; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757070907; x=1788606907;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=F3zp1Ray7c+F5gjpW6wLs32gmJC1K0NRlUTThh07Rpw=;
-  b=BJ2kHyf8rJ1AlkCmaiwHZZcI4ej6LDxN4UHEVx4p66N1ZFnUcUETuOw1
-   WEi/0rtWUGmkZPqhvvRdjFbUawEpULheZBnBnNboDYcxMlWLzEff4YW/T
-   uWxmqyUMDPIlFTA+zqGbWL0lrSM7clIKSobaOcflcPTE7DNyUZL5hvazc
-   x0jEATgJWRYBawahetLqrX9/NFlnfiKH0hgm/iXUNqeuM2kBH3W039Q9t
-   jlMxIgrSYhEMxF5oWgZWjfOjyKRX+koorMGzsE4DGl+2yHoZNUVBSV4tP
-   d7BJzXTw+6ASnXsgUzI0H2GbAwE+Zb2l+sDTGCDBnoYJCjQpw61Qp+inn
-   A==;
-X-CSE-ConnectionGUID: Rfft9yk9SkKWxFg0825LRA==
-X-CSE-MsgGUID: rAq+ryzxTpWxBOS/tDksgw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11543"; a="58632789"
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="58632789"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 04:14:13 -0700
-X-CSE-ConnectionGUID: 0r4Tnf8KQeSTZVofVB78Yg==
-X-CSE-MsgGUID: EdlUHDxJQfW4U6IrRvVLNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="177379487"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 04:14:12 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 5 Sep 2025 04:14:11 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 5 Sep 2025 04:14:11 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.44)
- by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 5 Sep 2025 04:14:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uvs+PoeYACt+iIIEO8y2YyS5kYfHZpi8EW7dGRE9UeXpd/sk6l20ycGRPoO0sXZTk11YXrufT9z7joFMUcqcYjSVnrIlb7uKzwPFUtTiGhO+ZcxfNlbYOp4/WHt713uLu5nJr58bXA38ANkoLSlagVQ10HtytTS51rWZLCGgM/E9i9KDL9afJuxD6qpWpTYrOSt7c+ViSQhhSQmZzagpv4NLl4pfeCXUyroMjb27vd9WWVAsWx4YVqZdvFWxzOOND8mG8jxtK0ySYe1g21UOCOYBUMM2YpHne6GNHtJqqUm9r3Aah2N3YOAyyChUb80WS0I+0u21g2DZ48GSh/ztcg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F3zp1Ray7c+F5gjpW6wLs32gmJC1K0NRlUTThh07Rpw=;
- b=xhlGYTTNo6Nbla/h+P2qBFTMdI24pyI4z+a9BLMY6RZ3Z9J6wBmGYwS0plwxY4yl3rQK08DciHP5qM1WVxIq4q2isEqpHvAH6JCysa4jyK/7Ak5tP6jueoI533LkeEKjnzXOOPC27xy+rLEtZeIoW3kNvxrNCaIUI/eN4Nv485KEUw4973S+p+DTT6RE3y1jFl50Rp08P45yOFeqVA6XIIkhWQYbf0o+3V/A+grOHo/e3LB6eFvn767eGSDK3/pQW3ifB6YKdpNAQwXLmf4xlONqANpH/1pYQTP8Yvw5o4k26SHPm1c+/JbH3byYeLoYWO+Udoy3QQeRUitp9n/S0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22)
- by PH7PR11MB6031.namprd11.prod.outlook.com (2603:10b6:510:1d2::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Fri, 5 Sep
- 2025 11:14:09 +0000
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38]) by SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38%4]) with mapi id 15.20.9094.016; Fri, 5 Sep 2025
- 11:14:09 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>, "sdf@fomichev.me"
-	<sdf@fomichev.me>, "almasrymina@google.com" <almasrymina@google.com>,
-	"asml.silence@gmail.com" <asml.silence@gmail.com>, "leitao@debian.org"
-	<leitao@debian.org>, "kuniyu@google.com" <kuniyu@google.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>, "Vecera, Ivan" <ivecera@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [RFC PATCH v2] net: add net-device TX clock source selection
- framework
-Thread-Topic: [RFC PATCH v2] net: add net-device TX clock source selection
- framework
-Thread-Index: AQHcGDvl/LMwp05JjkKtLLSsBfpR/LR4pqiAgACPnCCAASTjAIAKIApg
-Date: Fri, 5 Sep 2025 11:14:09 +0000
-Message-ID: <SJ2PR11MB8452D62C5F94C87C6659C5989B03A@SJ2PR11MB8452.namprd11.prod.outlook.com>
-References: <20250828164345.116097-1-arkadiusz.kubalewski@intel.com>
-	<20250828153157.6b0a975f@kernel.org>
-	<SJ2PR11MB8452311927652BEDDAFDE8659B3AA@SJ2PR11MB8452.namprd11.prod.outlook.com>
- <20250829173414.329d8426@kernel.org>
-In-Reply-To: <20250829173414.329d8426@kernel.org>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ2PR11MB8452:EE_|PH7PR11MB6031:EE_
-x-ms-office365-filtering-correlation-id: c1955c10-617c-4886-db07-08ddec6d55cd
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?jqRQ1HtWhXRpjvG2hginNPz3viOQcJB70sb1Rk1zMOMlUR7c52QAU7gJEmBl?=
- =?us-ascii?Q?OBMIfpJRDG0TFVLB8PFAKcTRSiEKk5+Th5oJ4+4D+XHbsVJ8aXXWqr6KxF5D?=
- =?us-ascii?Q?+lVp7QrMNZqK1kYhs//ZyufNUiH8dgevu0wxXTozuqyYXaVUV1lM/VxTTaTA?=
- =?us-ascii?Q?XgGkjGQFfl3LdgBNnrvx94VpNldahH+dXPfIoJcp1SvDhu4DFTHdB05wB2ZR?=
- =?us-ascii?Q?OX7OOhPEb/pgv2f1err7bMn4X5Za+eTtNsNRFe3Qk7mUMUnWgITgadOcpMj+?=
- =?us-ascii?Q?YL7fXv/6ydSqIiZ11NBSh0Y0ulF1brKOIabefCAIIWWe2/Igt2G6/IWGbo6u?=
- =?us-ascii?Q?9HREtZcZGat4SxgzihfqvOonn5WlGFOJ6iKQRMzhLrixM/juQLTY3nnIA2RX?=
- =?us-ascii?Q?SCMINPecbYbV1LesXJ3Mz2jmlYciJw13kfFWxnq2+z754sgnXRybld/WIvnK?=
- =?us-ascii?Q?SrepaXYGUQsdZPr5uQu1vO1A2pdyxePzj2tEIItVynxAfnjbe8RYPDkfvloU?=
- =?us-ascii?Q?BKOIRXy1L539ZK8rsgAHRPwwYWS/ziiO0mvdAkxR5enLKHFs4KXluz59m2/v?=
- =?us-ascii?Q?yTCFxg1NBfTMPmyA3uo9nPvn08Zsgxo4wvBln4/mQZIYGZc7kmwwOfxNK09V?=
- =?us-ascii?Q?MexiVQXfWr8L45pTVAT8grOPOUaa6v8VnhX/eR1zudGUN5atkDb7Ewl/ceRr?=
- =?us-ascii?Q?ZGLpHYVhpRf85tQ598orwKc5X8HBmZet/8aNbRvrddhfvFc11f/w9I8VjKS5?=
- =?us-ascii?Q?3wDgGhr26kozINCejH0wA3e3Z9/FIbvhtaHRrZ9rUQ28/sgMWgJqSfr8z5EJ?=
- =?us-ascii?Q?+249jsqvYouZwswLYZsOuLkSSi9WQNx4l4vIA+pdtz8yyiin8faPk+70dwdE?=
- =?us-ascii?Q?IYJhrfDMczsh/2ns+RPV3iiArdkp/qekysfc6moKtaCFijyF8jeyfxwD0vrz?=
- =?us-ascii?Q?tLwy9ePp7BvK+hSR+Zz7nBk0VklB3ydg/wU1q7xpNnMisF9wZMGoB4sE0bfB?=
- =?us-ascii?Q?ZIp7YpW0QT+z8SMkkVX04BJu2kiTfZOGlr034RpWAPbmalqdvjY88JASurW3?=
- =?us-ascii?Q?Xu4K3nxjFeDKCwawW7rxd1jmZO6rKBzPeWj1gv27ytZchZdPeobREIZPib4L?=
- =?us-ascii?Q?lJSnlCU0RG8WXujc/UWFm74MS7YBpAiJjUihkfWrJPECOyBQjl5o8C/ZGaCY?=
- =?us-ascii?Q?ZJnY/Qs0Ksl1IgtLlsId7y+nJxxAsKYuwdVuhxxWotUo8VQRI1gADPBKx+/K?=
- =?us-ascii?Q?p0nD2KUdpXcpzpr174lwX6f73i4VcgaWJDgrTuR954c71tVd01ZnVsiY8bm/?=
- =?us-ascii?Q?Z4yDo8OuQsqm/tsNx2+T1ROwBClXPG8/7JplEIjUVTagKGztkVEWWVX4yY6m?=
- =?us-ascii?Q?rX1Gu0br1oyORyIMwn1Vu9U3sclUznjdFXZ6jSoJGVAA6X0KGKwShsFbS2nr?=
- =?us-ascii?Q?RXioKiNjoTQa2XQjOThZDbW5qp135J7TFDhT6G1c4MI8Yi9M7xsnKQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8452.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?EDPqn+nwk5+wX0n2+WhBU/ZvjeDR30T6nbtJd+yL6xASmc8tS3YoLGJXUdtP?=
- =?us-ascii?Q?MP/U2BmGrHOirecAEkLnUPXsWc8RareFaWOZ/SrzaqlblHtCSdriLQWm7u1x?=
- =?us-ascii?Q?d7K7hL3KtyThUGEPDV5DTQIk4xDsi+CZz0HJHPIPxDe/+DwNhan1DFdgFlzF?=
- =?us-ascii?Q?lNnzb5+KcRfm9wnJ3JxPNbsmbM8539Vb8QQ7DZVvRKzWWA0u3WZxod9Kg4yi?=
- =?us-ascii?Q?aXaQqpQpAdlaqbJKPHWQgLCkUSZ2MPCpxdsS/SN6c8D0hTR2dvqImZOX6rNB?=
- =?us-ascii?Q?gSJhO1gUmuLzQ51LRcruqy7Xmk+EHfDY3GGshlrEdb/jIrcAsKRFbTb9pPyg?=
- =?us-ascii?Q?Y543k+Qn8W7Ro84lLB582VzdPVhgq74BhTk8JEgKd9AZfDLI3JoXlG2Qi50U?=
- =?us-ascii?Q?7hZJpcYy/f2PFbYxaKXK7lgT4UQ9E6mVzLxP7rJEyxvTt1eKvMwxiJ7D9jqf?=
- =?us-ascii?Q?UGlTwZAzl9XuUkwyt9LwdCi3VDaH3fX/ZdthyQPoB07gWmdzV8p/IX2vxX2d?=
- =?us-ascii?Q?T4odz4oL8DHgClaSAJr79E6A638qZGgz8fpnq26T8tcrBaO0FT4ls0+KuDNi?=
- =?us-ascii?Q?Mfyj+iZWFYR8GUPh8R4/B1G0OTNZZOUWQjYuaAT8iOkniKM6JovARkUZPCS4?=
- =?us-ascii?Q?BDkwgCr18/wi89k+bW1aaGVI/XE3axnJy3eohf2kVKQ2hD6dQKJtJIOPFuLZ?=
- =?us-ascii?Q?eIhNt3Y7jOY0Q1ijDRUvCS4CM1+mZZus45sR5sGVlRBUOuTFFWjuFyToHrle?=
- =?us-ascii?Q?9ngeouyjoZ0CcB7AM2ZfkBEZq1qmbldTj/jb9IanuZhBcpUMagaLq4sstb9D?=
- =?us-ascii?Q?Vutm02R+bLY50EnWZROw7NeDa5LrfwttMfQBhAgXRRuGPwSQU8hKoWsvZXSf?=
- =?us-ascii?Q?ifKgDHArUHwvTwGgFpGbH/i6J1p6VEL1lh1sbzq4TE5H1hin2UgijSNX9iZH?=
- =?us-ascii?Q?OKZ/S/GB0WxHKKyBEa5W9tZRul1QvmGA+ZeICmPn5+90ddA7TNFBxxkI9szB?=
- =?us-ascii?Q?2l/oGmm932sM6TMm4IcbA3YTBEkr6eLMxV8KyzXj6IBOBr6yjAuWsJ0gZj2S?=
- =?us-ascii?Q?agAxOnlHxAoRmg+9Hzgdeuy/iWf5VRsfEUVIO0IvMSiRdRlKIaJcsVxCw1Vj?=
- =?us-ascii?Q?MMxtuQODAih1YxndKP/HmQOkXtZEqm0Df/66AsbNiTZsfwaxEo+qp06rg1kf?=
- =?us-ascii?Q?inIytp8EBXFcKB2pGm76W+16j1+62joF6zUi+IKHczrTSMx3PtVpngeHxfiJ?=
- =?us-ascii?Q?TwlYmNGpRuo5iEcJz1ILgydFZ3GaYANWTbVzW4/Pp+LA2nDjpMtihWkLQx74?=
- =?us-ascii?Q?9LB+UeFpgTgCEKv+BCw2ZKj5kAO2HUhUaNd+a7F08H05OZ2Lj0RQrEkuHD89?=
- =?us-ascii?Q?4/4D2TK6JOJ6pSz0ZTtBNDM6q0AX8/2Y6EsHDBv1EWMTrbwCiwNwa82B5tfI?=
- =?us-ascii?Q?n55+22qrqBws7vm9eUYbM5fzbhGcUx6qzCYHucUEHy8jzJ289dwLgpxceWFV?=
- =?us-ascii?Q?ut8e3RCadO3XrhcA37CEuPslAsNmlT+zDgrqb3WT3hU28vWSMtarwgtG3wUu?=
- =?us-ascii?Q?bkgUHjR5RzMWWGukYnYCFyPDNhKWRnc4RVA8NoztFV9EZ7fPQIEW/+iVU1My?=
- =?us-ascii?Q?KA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB29346A14
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 11:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757070877; cv=none; b=lPC7WEC5PRfBJVLCWqZ5HO3DP7egEs2hG1wd4mCOnfx4ieuAMEyRVqLNfC50DM82faKWzBsA6S+h8Nswe8sAF76ixf08LPR5droH/YHKLuOFFfyhc8ldYI503MVEHobwfT2y8NgJzEVXoUxPP85oz9aTEWtdB9zWL1oXIfC16oA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757070877; c=relaxed/simple;
+	bh=eMmQ9OoGm+P5E4eaGh3F1MRJISstesFzwHdqyCpi4pk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FAAPVI9NdLjXVJZcZi+upSM+1WeRdcqpinVy/zIm2iazLMiwiKY+yxlj1WzW7DZ1jrinTa7iB1NQC7s7xwpki6bi7C5FlBsp64RJhkb/CwkNQpgm+0Kb67GWdaax+h1Z3CipJv0t+IsfxOJg8F88Halct2mICV9JhEdYE7ZLMa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QEja0c3G; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5857iopf023904
+	for <netdev@vger.kernel.org>; Fri, 5 Sep 2025 11:14:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	/FpbTHZW4xFomqVXWX7ayTQvBYf6qoBXa0d+diUXkvY=; b=QEja0c3GC5hhIQb2
+	fD9baFhbJ7Ms/iRoXZlJedqpURgY3oSaACrPnfba2EdQFzNkeTWIVxerLFDbesup
+	WBz8YRPJ8ZC/4Kkx1DhO8p2gh+gjH3O9hD/EwkO+Sgt+0YCjrrkcqbaUXP+WMkoJ
+	R3ApghoHAd/mSNCKhRSu2mV8b6Xj3sFh1e8K8ReVMswfAhNaYV2zOcdIKdpR+737
+	9/DVisxAymcd6g3NsiHZ3eNFeqpdX8ig8AnXQNN/qA3P2nd3uiGuNOZzY3t9lIU7
+	Xtu+KypdF7mkzV6hITjeNtfSe+zNmCaiv0YMNjPQO61bA3N1CprYrJSaFdeq8r7w
+	imAKAA==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48ut2fts4t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 11:14:35 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-804e9d31454so58653485a.1
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 04:14:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757070874; x=1757675674;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/FpbTHZW4xFomqVXWX7ayTQvBYf6qoBXa0d+diUXkvY=;
+        b=dkCnFqT3nDDoMR4Ldvpr4kwUUCntrmPofoBt026Uw8nMZiFuEbIeueTWnvCTm0JvAe
+         +itwDIq6/AHLHNvYxY2VqwNZiXcXob+ZpldtZz60hnDGOyXm6aiWvmezjP9s4WhgMJ3R
+         o7ZwoWXEbnQuoiNg2HtMof53RX8hrAq4GrUD6E2ehShJbUKnPyAkvxxZTCBNtFHRBEcp
+         VV3CT4Xw6eq5zPxFCxwH0IbukiM9y8H9E1xZm0m/gjWvg+a9p2ZC2TasEQtoG/izY/nR
+         e5+d5f1XQjcWpdMG9rta9LSGAup+opB6UnHORHtsjFCTEFGy6kc8Q1vPGp+13ZDIGmnY
+         ETQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVx3nkBzsRW+uC4XwGYMKo82LBf3NvcEdfeotH+X2l0Qmi5y524LW5oM90omae+bU7AOqcGEO8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJcieB704T4d6Z1arB/0AJUrN6DIxT8AbVaBlQxQw9yMBbIdJE
+	LxG89nV5T52H3hcSgqbwbuyF17ERwIGqxSK8zZtpBvHs9tSmJCrgC9hsNcBCGxpunKKE0Oe72pg
+	qJeLM8RsKANN0HdX4iSj6JB8tXiNvamANk5/nvtvk4gOYyDICQ0jxl4htwZs=
+X-Gm-Gg: ASbGnct7fBXBu0Qhh0mqIRAYrH085V0/85hst3PZif/eYYjaemgT5xip2+tBgV0n8Ls
+	M8QbVaC7NPiYf+53rYIp4WD37tTVFxdAK3zr7msa3NNM0cmTe3FzOkI1305F+Gjq0zkV7C5qA/p
+	ApqtD4Ia4rQKxS1Dm+nPZQsTFfrCQy5BRgOAv2xKBmNenbmyciY0NKYKcvDDq3a2cj8tJOlU4+k
+	PZbGUhp5DI78TGbcdM1D2X/aDrUlg01lupooBCLDwgiQSbFlDjwmxf39+PaoGMv5+fZ43bvBxYX
+	ubIp9gl4LEvQgCuffj8oQ6udIL+CB1DGqzrkhNwScxHHWpofAKT3pxDmB16d9aFhgQX4+988RUB
+	gW2vb4fYuwcK2sqpE9DV/SQ==
+X-Received: by 2002:a05:6214:2a88:b0:72b:880d:3bfc with SMTP id 6a1803df08f44-72b880d3c5amr24659086d6.2.1757070873571;
+        Fri, 05 Sep 2025 04:14:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGhxBIevK2sCdJCUPTxNgK1ElXc44o+jt15YDs8l2kK2RYkNbTjat2e9c4WHF0UaaGbTJuaiQ==
+X-Received: by 2002:a05:6214:2a88:b0:72b:880d:3bfc with SMTP id 6a1803df08f44-72b880d3c5amr24658896d6.2.1757070872870;
+        Fri, 05 Sep 2025 04:14:32 -0700 (PDT)
+Received: from [192.168.149.223] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b03ab857474sm1508366066b.89.2025.09.05.04.14.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Sep 2025 04:14:32 -0700 (PDT)
+Message-ID: <57ae28ea-85fd-4f8b-8e74-1efba33f0cd2@oss.qualcomm.com>
+Date: Fri, 5 Sep 2025 13:14:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8452.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1955c10-617c-4886-db07-08ddec6d55cd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Sep 2025 11:14:09.1502
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: t/PIs95i00FYPdbCZUzHORG+M+rv+48hs2nsTO8BETe679dXFWcE6O87L4i2+GDsTMhovBz0siW0iktbdegEzI7E3urZofrZxqVAqsn2LLg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6031
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] arm64: dts: qcom: lemans: Add SDHC controller and SDC
+ pin configuration
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>, kernel@oss.qualcomm.com,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org, Monish Chunara <quic_mchunara@quicinc.com>
+References: <20250826-lemans-evk-bu-v1-0-08016e0d3ce5@oss.qualcomm.com>
+ <20250826-lemans-evk-bu-v1-2-08016e0d3ce5@oss.qualcomm.com>
+ <rxd4js6hb5ccejge2i2fp2syqlzdghqs75hb5ufqrhvpwubjyz@zwumzc7wphjx>
+ <c82d44af-d107-4e84-b5ae-eeb624bc03af@oss.qualcomm.com>
+ <aLhssUQa7tvUfu2j@hu-wasimn-hyd.qualcomm.com>
+ <tqm4sxoya3hue7mof3uqo4nu2b77ionmxi65ewfxtjouvn5xlt@d6ala2j2msbn>
+ <3b691f3a-633c-4a7f-bc38-a9c464d83fe1@oss.qualcomm.com>
+ <zofmya5h3yrz7wfcl4gozsmfjdeaixoir3zrk5kqpymbz5mkha@qxhj26jow5eh>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <zofmya5h3yrz7wfcl4gozsmfjdeaixoir3zrk5kqpymbz5mkha@qxhj26jow5eh>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzOCBTYWx0ZWRfX0TSQvUYPMx2I
+ kguzCG0/dws1zjO4pph/WOmDhrfSRqPYjHZ0VVZ0tbuyxQi1YT4/Pj3zNq85zJEDbe6O9QWse7c
+ VunyozUvHtHWYkJ/E2wInE+ZDjHm4xv5mGpwafAUw6flWGASGH7ltvdXC/Jx5UTeWxEyx8fa5uK
+ ZWwiwRSw1hNxdYNgQCOxdGrZjHlF6ai/j8LMoUdxrok/F7A0SycbpycQU8sefDjY2+BldTGpTb6
+ LWncGegqn3PfPrz1e2i3VonDeDKc6TVDs9eEdqW63+H+Ncz2OZPeJ78KEsjhOLQ6E40EAvR9EId
+ g1JHrAw2iFFZD/1j/SJT0o0IccnU62Tp0Bm1uitfWIQnDqEe2oetlk09LMX4ETNZppZY7yu4zWp
+ aJzkMK2R
+X-Proofpoint-ORIG-GUID: ceYYZkpZmOXjlVuHdfra0LJkL-I6lAwb
+X-Proofpoint-GUID: ceYYZkpZmOXjlVuHdfra0LJkL-I6lAwb
+X-Authority-Analysis: v=2.4 cv=U7iSDfru c=1 sm=1 tr=0 ts=68bac61b cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
+ a=HgT1ff4I_b0h3GnEaV4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=IoWCM6iH3mJn3m4BftBB:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-05_03,2025-09-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 clxscore=1015 impostorscore=0 suspectscore=0
+ malwarescore=0 priorityscore=1501 adultscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300038
 
->From: Jakub Kicinski <kuba@kernel.org>
->Sent: Saturday, August 30, 2025 2:34 AM
-> On Fri, 29 Aug 2025 07:49:46 +0000 Kubalewski, Arkadiusz wrote:
-> > >From: Jakub Kicinski <kuba@kernel.org>
-> > >Sent: Friday, August 29, 2025 12:32 AM
-> > >
-> > >On Thu, 28 Aug 2025 18:43:45 +0200 Arkadiusz Kubalewski wrote: =20
-> > >> Add support for user-space control over network device transmit cloc=
-k
-> > >> sources through a new extended netdevice netlink interface.
-> > >> A network device may support multiple TX clock sources (OCXO, SyncE
-> > >> reference, external reference clocks) which are critical for
-> > >> time-sensitive networking applications and synchronization protocols=
-. =20
-> > >
-> > >how does this relate to the dpll pin in rtnetlink then? =20
-> >=20
-> > In general it doesn't directly. However we could see indirect relation
-> > due to possible DPLL existence in the equation.
-> >=20
-> > The rtnetlink pin was related to feeding the dpll with the signal,
-> > here is the other way around, by feeding the phy TX of given interface
-> > with user selected clock source signal.
-> >=20
-> > Previously if our E810 EEC products with DPLL, all the ports had their
-> > phy TX fed with the clock signal generated by DPLL.
-> > For E830 the user is able to select if the signal is provided from: the
-> > EEC DPLL(SyncE), provided externally(ext_ref), or OCXO.
-> >=20
-> > I assume your suggestion to extend rtnetlink instead of netdev-netlink?
->=20
-> Yes, for sure, but also I'm a little worried about this new API
-> duplicating the DPLL, just being more "shallow".
->=20
-> What is the "synce" option for example? If I set the Tx clock to SyncE
-> something is feeding it from another port, presumably selected by FW or
-> some other tooling?
->=20
+On 9/4/25 7:32 PM, Dmitry Baryshkov wrote:
+> On Thu, Sep 04, 2025 at 04:34:05PM +0200, Konrad Dybcio wrote:
+>> On 9/4/25 3:35 PM, Dmitry Baryshkov wrote:
+>>> On Wed, Sep 03, 2025 at 09:58:33PM +0530, Wasim Nazir wrote:
+>>>> On Wed, Sep 03, 2025 at 06:12:59PM +0200, Konrad Dybcio wrote:
+>>>>> On 8/27/25 3:20 AM, Dmitry Baryshkov wrote:
+>>>>>> On Tue, Aug 26, 2025 at 11:51:01PM +0530, Wasim Nazir wrote:
+>>>>>>> From: Monish Chunara <quic_mchunara@quicinc.com>
+>>>>>>>
+>>>>>>> Introduce the SDHC v5 controller node for the Lemans platform.
+>>>>>>> This controller supports either eMMC or SD-card, but only one
+>>>>>>> can be active at a time. SD-card is the preferred configuration
+>>>>>>> on Lemans targets, so describe this controller.
+>>>>>>>
+>>>>>>> Define the SDC interface pins including clk, cmd, and data lines
+>>>>>>> to enable proper communication with the SDHC controller.
+>>>>>>>
+>>>>>>> Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
+>>>>>>> Co-developed-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+>>>>>>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+>>>>>>> ---
+>>>>>>>  arch/arm64/boot/dts/qcom/lemans.dtsi | 70 ++++++++++++++++++++++++++++++++++++
+>>>>>>>  1 file changed, 70 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/arch/arm64/boot/dts/qcom/lemans.dtsi b/arch/arm64/boot/dts/qcom/lemans.dtsi
+>>>>>>> index 99a566b42ef2..a5a3cdba47f3 100644
+>>>>>>> --- a/arch/arm64/boot/dts/qcom/lemans.dtsi
+>>>>>>> +++ b/arch/arm64/boot/dts/qcom/lemans.dtsi
+>>>>>>> @@ -3834,6 +3834,36 @@ apss_tpdm2_out: endpoint {
+>>>>>>>  			};
+>>>>>>>  		};
+>>>>>>>  
+>>>>>>> +		sdhc: mmc@87c4000 {
+>>>>>>> +			compatible = "qcom,sa8775p-sdhci", "qcom,sdhci-msm-v5";
+>>>>>>> +			reg = <0x0 0x087c4000 0x0 0x1000>;
+>>>>>>> +
+>>>>>>> +			interrupts = <GIC_SPI 383 IRQ_TYPE_LEVEL_HIGH>,
+>>>>>>> +				     <GIC_SPI 521 IRQ_TYPE_LEVEL_HIGH>;
+>>>>>>> +			interrupt-names = "hc_irq", "pwr_irq";
+>>>>>>> +
+>>>>>>> +			clocks = <&gcc GCC_SDCC1_AHB_CLK>,
+>>>>>>> +				 <&gcc GCC_SDCC1_APPS_CLK>;
+>>>>>>> +			clock-names = "iface", "core";
+>>>>>>> +
+>>>>>>> +			interconnects = <&aggre1_noc MASTER_SDC 0 &mc_virt SLAVE_EBI1 0>,
+>>>>>>> +					<&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_SDC1 0>;
+>>>>>>> +			interconnect-names = "sdhc-ddr", "cpu-sdhc";
+>>>>>>> +
+>>>>>>> +			iommus = <&apps_smmu 0x0 0x0>;
+>>>>>>> +			dma-coherent;
+>>>>>>> +
+>>>>>>> +			resets = <&gcc GCC_SDCC1_BCR>;
+>>>>>>> +
+>>>>>>> +			no-sdio;
+>>>>>>> +			no-mmc;
+>>>>>>> +			bus-width = <4>;
+>>>>>>
+>>>>>> This is the board configuration, it should be defined in the EVK DTS.
+>>>>>
+>>>>> Unless the controller is actually incapable of doing non-SDCards
+>>>>>
+>>>>> But from the limited information I can find, this one should be able
+>>>>> to do both
+>>>>>
+>>>>
+>>>> It’s doable, but the bus width differs when this controller is used for
+>>>> eMMC, which is supported on the Mezz board. So, it’s cleaner to define
+>>>> only what’s needed for each specific usecase on the board.
+>>>
+>>> `git grep no-sdio arch/arm64/boot/dts/qcom/` shows that we have those
+>>> properties inside the board DT. I don't see a reason to deviate.
+>>
+>> Just to make sure we're clear
+>>
+>> I want the author to keep bus-width in SoC dt and move the other
+>> properties to the board dt
+> 
+> I think bus-width is also a property of the board. In the end, it's a
+> question of schematics whether we route 1 wire or all 4 wires. git-log
+> shows that bus-width is being sent in both files (and probalby we should
+> sort that out).
 
-In this particular case the "synce" source could point to a DPLL device of =
-EEC
-type, and there is a sense to have it together in one API. Like a two pins
-registered with a netdev, one is input and it would be used for clock recov=
-ery,
-second is output - for tx-clk control - either using the DPLL device produc=
-ed
-signal or not. Probably worth to mention this is the case with 'external' D=
-PLL,
-where ice driver doesn't control a DPLL device but it could use the output =
-as
-is this 'synce' one doing.
+Actually this is the controller capability, so if it can do 8, it should
+be 8 and the MMC core will do whatever it pleases (the not-super-sure
+docs that I have say 8 for this platform)
 
-> Similar on ext-ref, there has to be a DPLL somewhere in the path,
-> in case reference goes away? We assume user knows what "ext-ref" means,
-> it's not connected to any info within Linux, DPLL or PTP.
->=20
-
-Adding control over 'ext-ref' muds up the clean story of above.. The 'ext-r=
-ef'
-source is rather an external pin, which have to be provided with external
-clock signal, not defined anywhere else, or connected directly to DPLL devi=
-ce.
-Purely HW/platform dependent. User needs to know the HW connections, the
-signal to this pin could be produced with external signal generator, same h=
-ost
-but a different DPLL device, or simply different host and device. There can=
- be
-a PLL somewhere between generator and TX PHY but there is no lock status, t=
-hus
-adding new dpll device just to model this seemed an overshot.
-
-Exactly because of nature of 'ext-ref' decided to go with extending the
-net device itself and made it separated from DPLL subsystem.=20
-
-Please share your thoughts, right now I see two ways forward:
-- moving netdev netlink to rt-netlink,
-- kind of hacking into dpll subsystem with 'ext-ref' and output netdev pin.
-
-> OXCO is just an oscillator on the board without a sync. What kind of
-> XO it is likely an unnecessary detail in the context of "what reference
-> drives the eth clock".
->
-
-I agree this could be hidden, unless there is user case for selecting one
-from multiple available in the OS.
-
-> All of these things may make perfect sense when you look at a
-> particular product, but for a generic Linux kernel uAPI it does not
-> feel very natural.
->=20
-
-Yeah, I like generic, but after all we are all HW dependent.
-
-Thank you!
-Arkadiusz
+Konrad
 
