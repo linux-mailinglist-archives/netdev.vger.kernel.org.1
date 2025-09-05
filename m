@@ -1,144 +1,232 @@
-Return-Path: <netdev+bounces-220401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F57B45CA9
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:34:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 702D1B45CAD
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2679416BFAF
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:34:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23E471C83456
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FDF23D7F8;
-	Fri,  5 Sep 2025 15:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DF32F7AA6;
+	Fri,  5 Sep 2025 15:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="CempboGf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CIOs0MwU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBA72FB0A8;
-	Fri,  5 Sep 2025 15:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D6E288C0E;
+	Fri,  5 Sep 2025 15:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757086484; cv=none; b=QdGZQ6WuKmITfewsb8DRndajY30erZK4w2PsMCP0LkBygDN4tSBHT9z61m8lB6M03vW7n5+xVB+f1Gn4oLEf+TmFXC+g/Z9+bTzw1iGjyKQQUZcGhtFzycBe8Cd2S70z+w18Q6R8rPUl7cRXXsKFabNPQSxBIxZ6qdjWUwXBsBk=
+	t=1757086508; cv=none; b=IO8s2wrfhJ4FUroP9q9wi0mmavS78sb7giqMVeoA3YmjdhBvH8ZIvHM0B2pzIgAzapiYaGwIox8rpKYELG48acz8/0equ2bDjt5m54WmTXNpUqhb/aPxpJ2BZ7/y5PYdQDFZfT6NOi32VMJKA1/3PLD+kpNduAZKkOtwHmRTURg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757086484; c=relaxed/simple;
-	bh=wtTFmaz+N02R+TrK0pbOOzB15g2M3Ec/dVGk2zh3GXY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UE/1o9q6maIG4fDkGLoO7nCRntQECbqWeJdhEfmxOKJykn8GOUK9gBCxU0cTYou5Ntkr0jmT6+hdpg5fk9V5E96kAkfugVruxXW7rTbIrqEnN+d1TfSQIGKfspik5Vxl/qLBwP/EX1pfIterpiXdKW+LAJhucIHt2fiAutSyfaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=CempboGf; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1757086477;
-	bh=wtTFmaz+N02R+TrK0pbOOzB15g2M3Ec/dVGk2zh3GXY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CempboGfU5BbL6MvuQKGRxTq8ENz2ywbtLsQw+a5bYzwe9C35xnI3k5YCaHBxwGjn
-	 Sl6s3hIRoVSzYWnBsWgXc9ZJVTVFnG0jhqmZpgfHqGkXzh6D6usbMe/GWYh4wO9hv5
-	 CTG81e9yn3QpQ5HZDhmA2D1WxxdYguvLXgUJRNtLxLtMBvzy2Z6arqa1rgdAfdGm5l
-	 qSFYqUl6IqMCiF+6t4r61zioeI1EjaCvWGP37SCPLK7I3q7nMOJCa2RK3WfoSqCns5
-	 9fhR/ceX5G3OnsdGCZGWXAsI2UrsZa05wFw0gQf4F6oEOrVBMkWptZFw8+Rn9DdcbL
-	 2qEyYp8mCXUow==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 2E4A960078;
-	Fri,  5 Sep 2025 15:34:36 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 1923B200402;
-	Fri, 05 Sep 2025 15:34:33 +0000 (UTC)
-Message-ID: <ab1ee9d4-8cf6-46ae-8c97-56d9a27fbb32@fiberby.net>
-Date: Fri, 5 Sep 2025 15:34:32 +0000
+	s=arc-20240116; t=1757086508; c=relaxed/simple;
+	bh=Dd9GrN9GAAxETey0gekWGcwpoSTvYJkigJI730T+I/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPV0jWWAYr9jpmhgnB9aszkqsEnngwGaZ7f2t4d33UOgfhFDWlUSiv358ESGqHNesCp28HsMGhSBNTx4GT3NMbwcPbvjTnzlKPCtBJY5bnJb7ytfXyDMBi5AlxWn66zMVAX5DGVIVLCeeDg0qVt5XsNvJwyk8RIIlD8+ebOI1Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CIOs0MwU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC64C4CEF1;
+	Fri,  5 Sep 2025 15:35:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757086507;
+	bh=Dd9GrN9GAAxETey0gekWGcwpoSTvYJkigJI730T+I/A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CIOs0MwUE2I3vXSEEPPTN+UByCEoKcgiRiHDw6TewSKVGn4/U8x5RRsuDen7Pv75K
+	 K9i75Y8ZRfml3R3Q1JnpNWMYn34xSqNuDVLpxxgG5HxeJe23vnQtFVTNanWHk41xRo
+	 dn94M2R3O7wAFnCVyCqxqFnWmwNKCJzlhT7uNvn71z5+bXgFxeBmpxwsnmVCJVGXJ0
+	 M3vbD4qErghqHC6JQSa3SvMb/rVimU6/KS1ERkLxBMxnQBnuBxxCH6h500PlXA4ZX3
+	 MIRmtSIRaFJ8WT6T5z5f1J/+8E/HTp/rn9O2xpmyUfu+VnWWNZE96DieKtFu5xkgXi
+	 SRz6ymsmWx+Sw==
+Date: Fri, 5 Sep 2025 16:35:00 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Vivian Wang <uwu@dram.page>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>
+Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <20250905153500.GH553991@horms.kernel.org>
+References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
+ <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 09/11] tools: ynl: encode indexed-array
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250904-wg-ynl-prep@fiberby.net>
- <20250904220156.1006541-9-ast@fiberby.net> <m2ldmtxjh6.fsf@gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <m2ldmtxjh6.fsf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
 
-Hi Donald,
-
-Thanks for the reviews.
-
-On 9/5/25 10:49 AM, Donald Hunter wrote:
-> Asbjørn Sloth Tønnesen <ast@fiberby.net> writes:
+On Fri, Sep 05, 2025 at 07:09:31PM +0800, Vivian Wang wrote:
+> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
+> that only superficially resembles some other embedded MACs. SpacemiT
+> refers to them as "EMAC", so let's just call the driver "k1_emac".
 > 
->> This patch adds support for encoding indexed-array
->> attributes with sub-type nest in pyynl.
->>
->> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
->> ---
->>   tools/net/ynl/pyynl/lib/ynl.py | 17 +++++++++++++++++
->>   1 file changed, 17 insertions(+)
->>
->> diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
->> index 4928b41c636a..a37294a751da 100644
->> --- a/tools/net/ynl/pyynl/lib/ynl.py
->> +++ b/tools/net/ynl/pyynl/lib/ynl.py
->> @@ -564,6 +564,11 @@ class YnlFamily(SpecFamily):
->>               nl_type |= Netlink.NLA_F_NESTED
->>               sub_space = attr['nested-attributes']
->>               attr_payload = self._add_nest_attrs(value, sub_space, search_attrs)
->> +        elif attr['type'] == 'indexed-array' and attr['sub-type'] == 'nest':
->> +            nl_type |= Netlink.NLA_F_NESTED
->> +            sub_space = attr['nested-attributes']
->> +            attr_payload = self._encode_indexed_array(value, sub_space,
->> +                                                      search_attrs)
->>           elif attr["type"] == 'flag':
->>               if not value:
->>                   # If value is absent or false then skip attribute creation.
->> @@ -617,6 +622,9 @@ class YnlFamily(SpecFamily):
->>           else:
->>               raise Exception(f'Unknown type at {space} {name} {value} {attr["type"]}')
->>   
->> +        return self._add_attr_raw(nl_type, attr_payload)
->> +
->> +    def _add_attr_raw(self, nl_type, attr_payload):
->>           pad = b'\x00' * ((4 - len(attr_payload) % 4) % 4)
->>           return struct.pack('HH', len(attr_payload) + 4, nl_type) + attr_payload + pad
->>   
->> @@ -628,6 +636,15 @@ class YnlFamily(SpecFamily):
->>                                              sub_attrs)
->>           return attr_payload
->>   
->> +    def _encode_indexed_array(self, vals, sub_space, search_attrs):
->> +        attr_payload = b''
->> +        nested_flag = Netlink.NLA_F_NESTED
+> Supports RGMII and RMII interfaces. Includes support for MAC hardware
+> statistics counters. PTP support is not implemented.
 > 
-> This line is not doing anything, right?
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Reviewed-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
+> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
+> Tested-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
 
-Right, that line shouldn't be there, it is a remain of an early version, where
-I didn't add the indexes, as NLA_NESTED_ARRAY is actually an unindexed-array.
+...
 
-The wireguard kernel code only sends zero types, and it doesn't care that user-
-space sends an indexed array back, eg. when setting multiple allowed ips.
+> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
 
->> +        for i, val in enumerate(vals):
->> +            idx = i | Netlink.NLA_F_NESTED
->> +            val_payload = self._add_nest_attrs(val, sub_space, search_attrs)
->> +            attr_payload += self._add_attr_raw(idx, val_payload)
->> +        return attr_payload
->> +
->>       def _get_enum_or_unknown(self, enum, raw):
->>           try:
->>               name = enum.entries_by_val[raw].name
+...
 
--- 
-pw-bot: cr
+> +static void emac_init_hw(struct emac_priv *priv)
+> +{
+> +	/* Destination address for 802.3x Ethernet flow control */
+> +	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
+> +
+> +	u32 rxirq = 0, dma = 0;
+> +
+> +	regmap_set_bits(priv->regmap_apmu,
+> +			priv->regmap_apmu_offset + APMU_EMAC_CTRL_REG,
+> +			AXI_SINGLE_ID);
+> +
+> +	/* Disable transmit and receive units */
+> +	emac_wr(priv, MAC_RECEIVE_CONTROL, 0x0);
+> +	emac_wr(priv, MAC_TRANSMIT_CONTROL, 0x0);
+> +
+> +	/* Enable MAC address 1 filtering */
+> +	emac_wr(priv, MAC_ADDRESS_CONTROL, MREGBIT_MAC_ADDRESS1_ENABLE);
+> +
+> +	/* Zero initialize the multicast hash table */
+> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE1, 0x0);
+> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE2, 0x0);
+> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE3, 0x0);
+> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE4, 0x0);
+> +
+> +	/* Configure thresholds */
+> +	emac_wr(priv, MAC_TRANSMIT_FIFO_ALMOST_FULL, DEFAULT_TX_ALMOST_FULL);
+> +	emac_wr(priv, MAC_TRANSMIT_PACKET_START_THRESHOLD,
+> +		DEFAULT_TX_THRESHOLD);
+> +	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
+> +
+> +	/* Configure flow control (enabled in emac_adjust_link() later) */
+> +	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
+> +	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
+> +	emac_wr(priv, MAC_FC_HIGH_PAUSE_TIME, DEFAULT_FC_PAUSE_TIME);
+> +	emac_wr(priv, MAC_FC_PAUSE_LOW_THRESHOLD, 0);
+> +
+> +	/* RX IRQ mitigation */
+> +	rxirq = EMAC_RX_FRAMES & MREGBIT_RECEIVE_IRQ_FRAME_COUNTER_MASK;
+> +	rxirq |= (EMAC_RX_COAL_TIMEOUT
+> +		  << MREGBIT_RECEIVE_IRQ_TIMEOUT_COUNTER_SHIFT) &
+> +		 MREGBIT_RECEIVE_IRQ_TIMEOUT_COUNTER_MASK;
+
+Probably this driver can benefit from using FIELD_PREP and FIELD_GET
+in a number of places. In this case I think it would mean that
+MREGBIT_RECEIVE_IRQ_TIMEOUT_COUNTER_SHIFT can be removed entirely.
+
+> +
+> +	rxirq |= MREGBIT_RECEIVE_IRQ_MITIGATION_ENABLE;
+> +	emac_wr(priv, DMA_RECEIVE_IRQ_MITIGATION_CTRL, rxirq);
+
+...
+
+> +/* Returns number of packets received */
+> +static int emac_rx_clean_desc(struct emac_priv *priv, int budget)
+> +{
+> +	struct net_device *ndev = priv->ndev;
+> +	struct emac_rx_desc_buffer *rx_buf;
+> +	struct emac_desc_ring *rx_ring;
+> +	struct sk_buff *skb = NULL;
+> +	struct emac_desc *rx_desc;
+> +	u32 got = 0, skb_len, i;
+> +	int status;
+> +
+> +	rx_ring = &priv->rx_ring;
+> +
+> +	i = rx_ring->tail;
+> +
+> +	while (budget--) {
+> +		rx_desc = &((struct emac_desc *)rx_ring->desc_addr)[i];
+> +
+> +		/* Stop checking if rx_desc still owned by DMA */
+> +		if (READ_ONCE(rx_desc->desc0) & RX_DESC_0_OWN)
+> +			break;
+> +
+> +		dma_rmb();
+> +
+> +		rx_buf = &rx_ring->rx_desc_buf[i];
+> +
+> +		if (!rx_buf->skb)
+> +			break;
+> +
+> +		got++;
+> +
+> +		dma_unmap_single(&priv->pdev->dev, rx_buf->dma_addr,
+> +				 rx_buf->dma_len, DMA_FROM_DEVICE);
+> +
+> +		status = emac_rx_frame_status(priv, rx_desc);
+> +		if (unlikely(status == RX_FRAME_DISCARD)) {
+> +			ndev->stats.rx_dropped++;
+
+As per the comment in struct net-device,
+ndev->stats should not be used in modern drivers.
+
+Probably you want to implement NETDEV_PCPU_STAT_TSTATS.
+
+Sorry for not mentioning this in an earlier review of
+stats in this driver.
+
+> +			dev_kfree_skb_irq(rx_buf->skb);
+> +			rx_buf->skb = NULL;
+> +		} else {
+> +			skb = rx_buf->skb;
+> +			skb_len = rx_frame_len(rx_desc) - ETH_FCS_LEN;
+> +			skb_put(skb, skb_len);
+> +			skb->dev = ndev;
+> +			ndev->hard_header_len = ETH_HLEN;
+> +
+> +			skb->protocol = eth_type_trans(skb, ndev);
+> +
+> +			skb->ip_summed = CHECKSUM_NONE;
+> +
+> +			napi_gro_receive(&priv->napi, skb);
+> +
+> +			ndev->stats.rx_packets++;
+> +			ndev->stats.rx_bytes += skb_len;
+> +
+> +			memset(rx_desc, 0, sizeof(struct emac_desc));
+> +			rx_buf->skb = NULL;
+> +		}
+> +
+> +		if (++i == rx_ring->total_cnt)
+> +			i = 0;
+> +	}
+> +
+> +	rx_ring->tail = i;
+> +
+> +	emac_alloc_rx_desc_buffers(priv);
+> +
+> +	return got;
+> +}
+
+...
 
