@@ -1,207 +1,159 @@
-Return-Path: <netdev+bounces-220232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F402B44D94
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 07:35:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ACDBB44DE1
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 08:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29060164E9D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 05:35:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D72C65A0611
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 06:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDB422422E;
-	Fri,  5 Sep 2025 05:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="J6x49k3s"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64077269811;
+	Fri,  5 Sep 2025 06:19:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2044.outbound.protection.outlook.com [40.107.101.44])
+Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F1E169AE6;
-	Fri,  5 Sep 2025 05:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757050548; cv=fail; b=r0thp8+tysJ9NN1Hp9hpjFfoPnQBoWw1vMj4UwTzAUbBzrK5af2m+fKqZElXtQmUtN37OHWWnNoUixm1/HmtUCS/YR1WC6sAgTlUIzXdrdHsFzD7iqWnARPJvuH8vJzbyJXD1fWaASPflIGj6AW9pCiAOh/Pa2SbIA1N2gMGATw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757050548; c=relaxed/simple;
-	bh=QAwrTZEy+abBzAKQXolX7i4dcZdzRylyOQqsnldzyDE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eXZ4IR72bi7kfxjF8ct8FQy4KHBB3zcTFEDfn4HjGEkyZx6AmbcyPeWa2AMdywM1Zxk0afO/kEskmyzKh1w8irBuKLoVs61l39xOLls3Et6AzMvmZ4D3wXTKLN/umiuoNXK/M0GHy2XwOAGp6NvusuI3RvNA/vG3VOQ/x0QWyks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=J6x49k3s; arc=fail smtp.client-ip=40.107.101.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GHVt5KYw38XBiQwlOKI08dhDQ+4A37ijwh+8+nV+zma/mybOZUS/s4N1D6oqGVUUmZn0hp94x9ptNHtY/CAZGTz8J8fedIrSgUqq3+FNI/XI2L+AOMZRorUF6IzuFkzgFAZhON/XyBDeX7ywLdfGioWGN8viAmJl1G3OnHdViqIsF45ZpPPXuGjpXdu2hlnZ7vNiFnXkme+c1/yZiU5DnQVCNTwyAKL0/nBKIgAo6jRpKk4niJAAwEcQ/eJQgyDwdjTpcjZvYoeKHvACMfqqRSpiGslr9rw/vir7A3lepE6iUL4BllFWYDJevhHDXz9WDHy9ThkDabrBxvy69P2eIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QAwrTZEy+abBzAKQXolX7i4dcZdzRylyOQqsnldzyDE=;
- b=TU6tULQOWSbpwEIllusqUHPi60McwVmGx7B+7pwt8JBUUovgsKlLh3LJNoFJQ8cR4j4Hp9Y2HFmA+RqfyvVlTMWVmGuDXi8zMm/XiBbrVhgVQ+M38+i5m/MD7GaEkV0GkjNycqdGoZsg/PUhOmYVH5IDZ5YJ5xiIxxCpGjHVly3q+U708G+EndqCTxpn+pPajy82obudPoxDiLRtE7jFTOPhHICPeqs80TKunjO2HEZh5LbbLd2/89j9jSxy8Ls8PJ+Rh5ma80x2niuIyLyu9qvTqWGslWbXZojF7fyJQKWB0N4czXsOVXjzvJPbW5tBTgyNeCxCgK7P80mZGIz04g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QAwrTZEy+abBzAKQXolX7i4dcZdzRylyOQqsnldzyDE=;
- b=J6x49k3sYjvmuMO9pI5jw260dwt+YkkEEOboUw+qWk9nmVuVMrvEJt/AESUWyupfjNQCA2/QjNX7nNFIFEp1gWUpLYnPYMRPiTyu3OhjPb+AC/BTMouUzzq+RpT562rGpegwa2Ga9uiDM6g1ucgnGZJW66datu9z7ujn8c648wkiRub7DxRtTtmWYged0VGQCPyKfW5c3DJlzVGCvbI9Gx9z4jdjYEmGkhnySOOEZqqQYWiU6XENTKv75CnDKpUeM6gDOswA1UANVHN7BpzR4btSJOr0Ku63E1RKy2XfxZlNCBWQgNfR9IwOwwWU/EldyF72LfUi+88Bt1xR4ThCuw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
- by DS0PR12MB6630.namprd12.prod.outlook.com (2603:10b6:8:d2::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.17; Fri, 5 Sep
- 2025 05:35:44 +0000
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.9094.016; Fri, 5 Sep 2025
- 05:35:44 +0000
-Message-ID: <154e30fa-9465-4e4e-a1f4-410ef73c04cf@nvidia.com>
-Date: Fri, 5 Sep 2025 08:35:37 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dev_ioctl: take ops lock in hwtstamp lower paths
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>,
- Kees Cook <kees@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Cosmin Ratiu <cratiu@nvidia.com>,
- Dragos Tatulea <dtatulea@nvidia.com>
-References: <20250904182806.2329996-1-cjubran@nvidia.com>
- <20250904235155.7b2b3379@kmaincent-XPS-13-7390>
-Content-Language: en-US
-From: Carolina Jubran <cjubran@nvidia.com>
-In-Reply-To: <20250904235155.7b2b3379@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0007.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::9)
- To MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4052AD2F;
+	Fri,  5 Sep 2025 06:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757053173; cv=none; b=FHRJiEng2ZI4ncvHsZwYz2Wo/iHDxWAXRTt7kBTkTehlr1YXphG+TFo1QILGV85vWpDl0gXmjSu7kgKbKxISUef8mq4/jIfTKPEoy7kJlTP9AyZYashgl3/q6yepTho/5YTy+GOlJp6EVcVc0v44XXsE8TV9rub68tEIxCx2Whk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757053173; c=relaxed/simple;
+	bh=NhlN6InMMn588qcAitktClqWH4WsbE2cjvjyyXVGWpU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Lq/TVbymN3ZSHQXPvt/+v1kjREH8VTdFIlZDqs+ufiTPrKgOsesti15Atj8XGdHDJ+g3WPBT/nWmc0RFIjT7/0UTEN0NBhjyatyS8o2XBiBnHddQvkWi6qSl2z9h6CkAEP1Z680VXXjvi3GWgQ2GW5D8inO+lsqpr8XHnAbKREk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
+Received: from localhost (128-116-240-228.dyn.eolo.it [128.116.240.228])
+	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id cf8a8994 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 5 Sep 2025 07:52:41 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|DS0PR12MB6630:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78bdaf2a-c6a9-4f92-6239-08ddec3e0eff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K1BzZXhCVG84aDZ2QTJpbGw1N0U5WDNHQ29ob1l5emlzNUV0NFRtRUc0QXJK?=
- =?utf-8?B?QnZ3Qmk3VmtWNk5kSEtXRnZzMWNxekZyOEFwVFJydFdtRVU0ME9nR3ZYRExQ?=
- =?utf-8?B?Zm8rclQyTGVaSEh5bDFKYVNiQ3pjeERJK0JHQXR0cjJ3RnhINkxiQnRFNVFw?=
- =?utf-8?B?UzNGc01OUE9uUFNPYnJaK3VuMDk3aVRURjJmMjlNMzViVTVkdXlBSzhZb0M0?=
- =?utf-8?B?ZmRESmw0L2R0SDRJV3BNa2EzRFFzRkN3dm9BL1g0OEJIQkVwMmN5Vk9jZVVn?=
- =?utf-8?B?enBVODRxOUdqUWNza2RUZ09xbkpIMHhDbUExNENteE1HOFJEbWd2QjZBL1Rk?=
- =?utf-8?B?ZlJMd3ArL20ycVJqNGJNYVkzS1kvQWMxVnpnMFhwQW4zQU5OVWo5QXBQTVN5?=
- =?utf-8?B?STQzYmpaRzRKT2V1V2ZKeGlldGFnQlZLSlV5M0grQlVrVEUxVlJxdE5kM250?=
- =?utf-8?B?a2IzQjVNNE5lRUhBWWlGSGlTbVlvK3oyaWEvWHdCampnQXlTUWlTdGkwWjlm?=
- =?utf-8?B?SFFGS21ORXVscVRKMHRyRXJ4V252OWFybTZscFJVVjk0c2V3SW1Oclc0TE1Y?=
- =?utf-8?B?WmtWL0g3ZS9jU0VTa2FTay9DZHFXT0tMSU5xSlVlRFRWdXFqVUx2RXVPV0k2?=
- =?utf-8?B?RHRPV0lnZS9MaEhnRHZhRExzb091RDVYcUxOOWNUMExSN1NzV0lGVXR2bjhw?=
- =?utf-8?B?UHJRSG9TNDZZV1VIYVNYbGR0K25hQ3NYZFJkSjhZVWNIcjljSXVxQjNGVkF2?=
- =?utf-8?B?Y21CSVRnM3hEc1B6YVp4MmE0TEVuMTQ4NmJaamdYdUZIVmFNaGowY3Z3c0RQ?=
- =?utf-8?B?MzJWY2V3K09EajMrRGlmaWQ0R2pwWllBS0VtcnNqWm1LOGZTMFRkSEFnVUpU?=
- =?utf-8?B?Zk4rbXh5ZEF1QVpMSFdaY1Mrc1hJV3JISFp2YTNHckVmWGpEYXd6UU9IZ0pP?=
- =?utf-8?B?QmJNczU2Y0xTT21qMStzbytxRVY4c05kNjJ1NnRzbktZZXZvYlM0dzlTYzNy?=
- =?utf-8?B?bzB6elM3TURsUXBkYWJqK0N5OHcxMzFKbEdzSlZuM3dzU2tRcWlySXBhalA1?=
- =?utf-8?B?bks1ZGtxQldzRzdLb3RqYldQWmluMkprNm03TUovbm1mTDBybk8wOTF2dG00?=
- =?utf-8?B?Zm9zU3RpQnplQ3FobFQ3WVljMjJRMTdsRHpSbVBiTTB5ZTNCc3d1RHJ2UGho?=
- =?utf-8?B?NkFQWW9EMXZPUDRXajNYVVRSYXVUZVhqMUNVcmQ2TTNSOE9kVTFxRTVMWDVa?=
- =?utf-8?B?Sng3UG9ndUplb3NoUmRZUmVGaXkzNytlN1p5bmJaRHRLTE5vby92WUtSNnhI?=
- =?utf-8?B?Y05MZWhQWWJNZVpNeXVnSUgxY1BzMi9ObzlYajc0Q0YvQnNBeHczZFVERDh0?=
- =?utf-8?B?Uy84YmtKYTdUblRUVXpZU0ZIZXRybUJrZFZvNjE4eDJ0MXgrZjRrREIvM2Js?=
- =?utf-8?B?TUx2OGtLUE4xcHRXUGNzYTRTbHQzM2t2emcxQ0dDMWRPbFd6L01ranZQSzdM?=
- =?utf-8?B?eTBYY3l4eEVXZjc1NzQ1cmMrM3JDMEtvc0s5cFFUZkxiL0doRnZOaGJONXd4?=
- =?utf-8?B?ajlFTG1RajdqK0FURDRGakM5WlBCMTRmUlNpL0RDbm1zczRZNlRWS28vSDN4?=
- =?utf-8?B?aGJlMGFFdFZYL3BPWW8ya1EyWjdmZXBlYy9mUm9vM2t1bkYxY3RzNzk3K0Y5?=
- =?utf-8?B?OEd3WmtrRDJlTEViUnJjY3RZeFVqaWhmeG02S0Iycmp2QW1HVzhnQ3NBRHJT?=
- =?utf-8?B?RVJPK0tLOTNSMktockFwc3UxWEgySnNqUGVaNnZiTDYzaXdIZlNxb1lQS2tC?=
- =?utf-8?B?VEl6QXVZT1c1UkNmanJxL3dnSmM4K1ZnM2lhbmdEMjVBNzZzRlU1MlIvMkNL?=
- =?utf-8?B?Zk1aMFZKUmhrVGdzL1d0QzJSRkR3UUNubmtCVFRVRVQ0Z1E9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OVorcHA0VXpKK0lVUisxMGRMTCtNOWh4eGVSVXYvQ2xCWHdWa0dOL1FBQnJN?=
- =?utf-8?B?QXRvOXoxbG5JZG8rVjNTWVF6NUFxTXRiT1pQcUNtelNHTGlEeG5mWVdrdUU4?=
- =?utf-8?B?czRhdjZpQzNGWVRvU2RJTHduQyt4aElIL2FKbUJBaVhlSE9jaTJFWkUwY3hw?=
- =?utf-8?B?ZEk2SWxReW5veG5TdjQyeHQzdFRtM2x3QnluT2ZTZEJZRlBaaVZHRnBJdDh1?=
- =?utf-8?B?amFZT2FBNTRET3pabFlSQURuV082M2xEUVZDV2RUbVZSTDBCUTd6MGExdzZl?=
- =?utf-8?B?SHh3M3FOT0ZyT3pEVlhUU2JINjkzYzRpWWlyZTRUNDQ3SW40WGJhcXE0cUg1?=
- =?utf-8?B?U1RjS3RJcFFVTUtMV1ZHYmJtK3R3L2dObXpNak41UmxpdGdaTHR1NnU0U3Ru?=
- =?utf-8?B?Y1pLL3Y5Y3l1RzZtZlRiV0Q4Qnl1aTd3QkMzaGZ3Q29lY2oxcTMrTEVOazJ6?=
- =?utf-8?B?RVhXZXMvQ3VQQ1E1clBPSTRSM2FUd0JUbzEvdFlZOWVTeE8rcFlwV05ZajB1?=
- =?utf-8?B?WWV1bGdCZ2ZEOG0wVlpzRDd4MHZud2lRK3dxSmRhTTJoSTdFVnN5cjZLNWVv?=
- =?utf-8?B?bFQ2VThkYXJEdTdRejRMbVBHVUk1dFdjMUdPdWRwWkVHSEdYc0xRUHE0SjhW?=
- =?utf-8?B?a0JYZ0duSlRyclVsUVFicTl4b1Z0THcvc2NaM3lFVlZrOFE4dUlheXNFU2dl?=
- =?utf-8?B?YjdZSVhoZVF0R3NKUzdLZ2pqaEpPTnJqNTlBb0RFMUxObFhZZUpFZzhST3cw?=
- =?utf-8?B?aWl0YWdTUlpCSkxiNHU5ZTNHS3BUd3lXVUN4TS8yWXdMb2VwdmxzNmhlckdz?=
- =?utf-8?B?VFptQnNNTDBNTW5WZCtjMDRUT2R6eEZYZkR3dHIwNjlHTFZVRUxVOHNzcnFI?=
- =?utf-8?B?d3dDaUNZWnpGc25vMFA0NU56VWNta2ZGT2NkNlhvVGUzSlRjRGNwVHVnRU8z?=
- =?utf-8?B?alladGxLMmRnbjhNaU4wTEZ1SEhRMEdLeHZHZkhENWJWQWdXNHhqRDU2NllJ?=
- =?utf-8?B?QzhvaGExREU2WUNmMmd4U3crSUZVQUIwUURPalNRVDQ0WUFKbkwzbzBTK1BS?=
- =?utf-8?B?WVVRekN0S3hiamkzbnhXM1ZjejhsZDZEcmJHYUFjdzFFMTREcHpHa1owTFdk?=
- =?utf-8?B?TlBCb2p4MlM3NFF4RXlVS0dwWDlSa0ljOFA4SHFyVy9mNHpTUWhVMVAxcC9W?=
- =?utf-8?B?YXd3Rkp5em1sV2QvWTcxRFNWditDOW9nNHpnRkE5T2JKNzBROG9ITlNYeUpK?=
- =?utf-8?B?eURQdVNmeHJoZUVkWEQzWCtUZHFmVWtiQjN3R01sSHlQWFJnUmtFcFJCU0da?=
- =?utf-8?B?MzdhckdvQllyNWgwcXpGRllBcUdUaVFSUVlHRkN5UENEMGlyTGFtN3pLRTVW?=
- =?utf-8?B?ZlhiYmxUc3AxWHFHQ2FldUszQ3lnT3lBSlRHRVd2UXo1alNDQ3dsVis2V1lO?=
- =?utf-8?B?U2NWUmdBUk1lb3ZFZklQQXFyejZ6a05rRy83TENOWTNnVmJ1RThFMkJRRHlK?=
- =?utf-8?B?WHVpMEtQNUJkUXFNU2RQN0IyejQxc2xYSjFWczlrMThhY1UrNmhEOGdRS1hE?=
- =?utf-8?B?dkhqZ0lBQ1NSSXFRSHdsZW5pMWgvRGNYaVNUM3NDYlBaYXQxTHhGbGxyRUIv?=
- =?utf-8?B?d0ZvckM3ZjUxODlVNW5Ub08yWHhiTGk4azErNlA5ckNpMVVqcVBsRU1VK0Fr?=
- =?utf-8?B?MW43QXd0dnFFK3NRZnUxZW5ZUlJKaml1T0xUS2QyUFkrRVBMVERCQW1HY2E0?=
- =?utf-8?B?NU9GVWZyTU1FcWkwRzQrbUlaajNKckxoT1pJK0RqRW9zSlViQ0k0OGxvSE1I?=
- =?utf-8?B?UEZQUnFDOEVBTUlwM25DN3kwSS9UaFlTelRma1czUDNRSnFDQTRaOEVTZG0r?=
- =?utf-8?B?YldCV2xoSlJZQkZMZ1NMWUl6VzVTV3dhLzk3M0NFamVhWnVONDY5R2h1UVlS?=
- =?utf-8?B?cGpYMXprb0QreW5sTzBOTlppYVpxbzU5RCt1RzMxS3lmanYydGdGY29INUJK?=
- =?utf-8?B?dzFQTjlGZE95aVRtV29UaGZBWExGVlNGMmZHTFYrR1Z1VkdOek5IdGZOV3Zs?=
- =?utf-8?B?K2VmdG44b3RjZEt2aGUyRFpDSWJpQ3NqMkNYd2NaMkVHWHlibVdOcWFzWnEw?=
- =?utf-8?Q?3CcCjivisRbW6Q2340/UnY7/0?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78bdaf2a-c6a9-4f92-6239-08ddec3e0eff
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2025 05:35:44.3561
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SRITLr0ArcJKmbpDoWWqmLh+9PNiKOeXIy0OyxuRpc/ewnR9hq8DeGRMzJQuKcVh98cSOMHvr3LpbL11UBWyxg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6630
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 05 Sep 2025 07:52:41 +0200
+Message-Id: <DCKMSNY3N59V.3KQCDWA1VJQNQ@bsdbackstore.eu>
+Cc: <kbusch@kernel.org>, <axboe@kernel.dk>, <hch@lst.de>,
+ <sagi@grimberg.me>, <kch@nvidia.com>, "Alistair Francis"
+ <alistair.francis@wdc.com>
+Subject: Re: [PATCH v2 7/7] nvmet-tcp: Support KeyUpdate
+From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
+To: <alistair23@gmail.com>, <chuck.lever@oracle.com>, <hare@kernel.org>,
+ <kernel-tls-handshake@lists.linux.dev>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <linux-nvme@lists.infradead.org>, <linux-nfs@vger.kernel.org>
+X-Mailer: aerc
+References: <20250905024659.811386-1-alistair.francis@wdc.com>
+ <20250905024659.811386-8-alistair.francis@wdc.com>
+In-Reply-To: <20250905024659.811386-8-alistair.francis@wdc.com>
 
-
-On 05/09/2025 0:52, Kory Maincent wrote:
-> On Thu, 4 Sep 2025 21:28:06 +0300
-> Carolina Jubran <cjubran@nvidia.com> wrote:
+On Fri Sep 5, 2025 at 4:46 AM CEST, alistair23 wrote:
+> From: Alistair Francis <alistair.francis@wdc.com>
 >
->> ndo hwtstamp callbacks are expected to run under the per-device ops
->> lock. Make the lower get/set paths consistent with the rest of ndo
->> invocations.
->>
->> Kernel log:
->> WARNING: CPU: 13 PID: 51364 at ./include/net/netdev_lock.h:70
->> __netdev_update_features+0x4bd/0xe60 ...
->> RIP: 0010:__netdev_update_features+0x4bd/0xe60
->> ...
->> Call Trace:
->> <TASK>
->> netdev_update_features+0x1f/0x60
->> mlx5_hwtstamp_set+0x181/0x290 [mlx5_core]
->> mlx5e_hwtstamp_set+0x19/0x30 [mlx5_core]
-> Where does these two functions come from? They are not mainline.
-> Else LGTM.
+> If the nvmet_tcp_try_recv() function return EKEYEXPIRED or if we receive
+> a KeyUpdate handshake type then the underlying TLS keys need to be
+> updated.
+>
+> If the NVMe Host (TLS client) initiates a KeyUpdate this patch will
+> allow the NVMe layer to process the KeyUpdate request and forward the
+> request to userspace. Userspace must then update the key to keep the
+> connection alive.
+>
+> This patch allows us to handle the NVMe host sending a KeyUpdate
+> request without aborting the connection. At this time we don't support
+> initiating a KeyUpdate.
+>
+> Link: https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+> v2:
+>  - Use a helper function for KeyUpdates
+>  - Ensure keep alive timer is stopped
+>  - Wait for TLS KeyUpdate to complete
+>
+>  drivers/nvme/target/tcp.c | 90 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 84 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+> index bee0355195f5..dd09940e9635 100644
+> --- a/drivers/nvme/target/tcp.c
+> +++ b/drivers/nvme/target/tcp.c
+> @@ -175,6 +175,7 @@ struct nvmet_tcp_queue {
+> =20
+>  	/* TLS state */
+>  	key_serial_t		tls_pskid;
+> +	key_serial_t		user_session_id;
+>  	struct delayed_work	tls_handshake_tmo_work;
+> =20
+>  	unsigned long           poll_end;
+> @@ -186,6 +187,8 @@ struct nvmet_tcp_queue {
+>  	struct sockaddr_storage	sockaddr_peer;
+>  	struct work_struct	release_work;
+> =20
+> +	struct completion       tls_complete;
+> +
+>  	int			idx;
+>  	struct list_head	queue_list;
+> =20
+> @@ -836,6 +839,11 @@ static int nvmet_tcp_try_send_one(struct nvmet_tcp_q=
+ueue *queue,
+>  	return 1;
+>  }
+> =20
+> +#ifdef CONFIG_NVME_TARGET_TCP_TLS
+> +static int nvmet_tcp_try_peek_pdu(struct nvmet_tcp_queue *queue);
+> +static void nvmet_tcp_tls_handshake_timeout(struct work_struct *w);
+> +#endif
+> +
+>  static int nvmet_tcp_try_send(struct nvmet_tcp_queue *queue,
+>  		int budget, int *sends)
+>  {
+> @@ -844,6 +852,13 @@ static int nvmet_tcp_try_send(struct nvmet_tcp_queue=
+ *queue,
+>  	for (i =3D 0; i < budget; i++) {
+>  		ret =3D nvmet_tcp_try_send_one(queue, i =3D=3D budget - 1);
+>  		if (unlikely(ret < 0)) {
+> +#ifdef CONFIG_NVME_TARGET_TCP_TLS
+> +			if (ret =3D=3D -EKEYEXPIRED &&
+> +				queue->state !=3D NVMET_TCP_Q_DISCONNECTING &&
+> +				queue->state !=3D NVMET_TCP_Q_TLS_HANDSHAKE) {
+> +					goto done;
+> +			}
+> +#endif
+>  			nvmet_tcp_socket_error(queue, ret);
+>  			goto done;
+>  		} else if (ret =3D=3D 0) {
+> @@ -1110,11 +1125,52 @@ static inline bool nvmet_tcp_pdu_valid(u8 type)
+>  	return false;
+>  }
+> =20
+> +#ifdef CONFIG_NVME_TARGET_TCP_TLS
+> +static int update_tls_keys(struct nvmet_tcp_queue *queue)
+> +{
+> +	int ret;
+> +
+> +	cancel_work(&queue->io_work);
+> +	handshake_req_cancel(queue->sock->sk);
+> +	handshake_sk_destruct_req(queue->sock->sk);
+> +	queue->state =3D NVMET_TCP_Q_TLS_HANDSHAKE;
+> +
+> +	/* Restore the default callbacks before starting upcall */
+> +	read_lock_bh(&queue->sock->sk->sk_callback_lock);
+> +	queue->sock->sk->sk_data_ready =3D  queue->data_ready;
+> +	queue->sock->sk->sk_state_change =3D queue->state_change;
+> +	queue->sock->sk->sk_write_space =3D queue->write_space;
+> +	queue->sock->sk->sk_user_data =3D NULL;
 
-You are right, I hit this when I was working on another patch to
-convert the legacy ndo. I thought it would be nice to have the
-kernel log in the commit message.
+Shouldn't "sk_user_data =3D NULL" be protected by a write lock?
 
-Thanks,
-Carolina
-
+Maurizio
 
