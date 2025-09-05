@@ -1,118 +1,197 @@
-Return-Path: <netdev+bounces-220498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8D0B466E0
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:55:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 139CDB466EC
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 01:01:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91096AA4369
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:55:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B53131C83990
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 23:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C328629E0EE;
-	Fri,  5 Sep 2025 22:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B1A2BE629;
+	Fri,  5 Sep 2025 23:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltmnoZCj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKhh4N0Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F739524F;
-	Fri,  5 Sep 2025 22:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D534072639;
+	Fri,  5 Sep 2025 23:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757112931; cv=none; b=Fm7eSa4YxYM3Mij4NqigKykj4vpnwU/rtYuLvStv7L75/+F8TxI5287hhmGsvsq1rqT0ksT1f9qOdyvShCzOI2kFNIKRYxmTX3rl+3NQSS6S+mkGFAWIx2fV5iVLva/ds2Mib1W4sRL4G0Uk50e+aJkPWyh/3tpHBo4piUYkw8A=
+	t=1757113283; cv=none; b=STHTwbkIUVyVc7/Lt3KdXJswKeeXO6ub4oO/A4fn/hio24PmAXQ4j33bZlZeIH4/EKkF1ydvJyWKcoiZL/hsxI2S6XTK5sfeeH6rQSy+d/V0WUS52Dr+w4Ga30z3Ey9QMdboVM8/bPPo7tSb/lionQYM2sHQjvtVNXMwc+y1ZZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757112931; c=relaxed/simple;
-	bh=uPrwK8eVbVphNHUgZAIwlcd2RvMmVsiM3JfQ2OIgcaY=;
+	s=arc-20240116; t=1757113283; c=relaxed/simple;
+	bh=+lhopyxIHPkimkHLqjBagKsowbxPduHdhl1alB5XIHw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i+Hy1SEouulKJ91xLIBMrpCRarHsXSYiswSRstjTaoWDGes1Ld66IMRS+cC3aPiv4sIAhFE16aCzB//9vc+UGXDrQ+vzm2YrgDqW39Zeqe9dZMOYwMY2v5OtjgCw/UXonzkO9gtFImTOR7P7WBsB4Hm7Ue6obvBqMKJmRvmAj28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ltmnoZCj; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-24456ce0b96so28216605ad.0;
-        Fri, 05 Sep 2025 15:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757112929; x=1757717729; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mg3xYqjwLPUFZtPsYgAb2K8JTjzAXX4Qv6K23DDcfa0=;
-        b=ltmnoZCjpxM7FcopFgu2N9Y0hVVhmQQDaRc4rw9fx0TuNNlqJS0DOkLe8zMrkUgsdf
-         8g7TcS5fs2PuNAZigBuCB51iTEl+/LKs6JhEWec1W5BWaw/Eh6MJeWnvuv9NjuCwx7Jf
-         lERJu6zF8uC2OL0Ydxi1DtezP4wIQsXNTEee4Loiy+hBh0pm3O3iv9sYlrrgcrCfmKCh
-         n7rCyYfpQMKfFbn5lm1jYH72M0ShumFbBeIDbQUiVa3GZcANyhIetNpPA3ZjBkLxeCR2
-         UYtQ+rRZkncm55AT5VHsOnByXcJ3WT0bBSXdNnyymD73ebibQJNs+BZ3fn2Yk6NhVYaj
-         MIfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757112929; x=1757717729;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mg3xYqjwLPUFZtPsYgAb2K8JTjzAXX4Qv6K23DDcfa0=;
-        b=kCMLowuhtGW/lLGHaHPSWEgDnZdqxHvFhRZ+NcI6zye6bw8qCiPDAyzZ2Xo/F8ENkL
-         qlao6ofa0QfghmOGrDhI0VkUffn2DbGZ/8sBKQGYuzuEH3Mk2rfrosKA8Q76cvvZEO9J
-         OAbSY+JoGW+57RRXI8Qze/S1e0IVcAwv7j41XnLbo+jdH7ufZftJgUgTy/nekqVgGdiR
-         Qm9V2Zk6QQ0gQ58Se28k5j1XkBQYKIHaioXq7H260f1aS9eyWLbE1Fk3AMKN+90vRw7F
-         p/jQfZ0oC6UeVs9nrUao47LSLbXbwRzP73nxHkAY6wbyq5Ce5PPzq0bsf4d3pDkXZBiu
-         WWtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVXRbZAOFKC5+lh/+MdTlWQFvKTTvwa+39ZIi9zg0fzw8Mm9VIrvRGdLCy1LjXr5eNa3SIqOIE8@vger.kernel.org, AJvYcCVtMllTIQsp7a6iwkuzGSbozK+4CQhtRm1vjEirvORSTr4mlzYd2SL+P1Xg6YW/rr9nrDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0mTajG4ZFafSRHh5oOnYnJ/oYGIjovQTTa3a4vhyfmUsguWqO
-	d4GvNcn663HyPkg1m9XByp9mq7zChbkG+mJ7zbwBcqQjvYLJmT+IP4FVn2lm
-X-Gm-Gg: ASbGncuJw+KlR/vC1Wj5G5rVaOABOMQXZBPrr48R1MlMbquqvgZh5SLz++5wsilbzJW
-	3fHoiBrKM6VgfgMzC1CcUwzP4gmRk9gjLbLcsa5xjAvQ5I5PWOwmG2k5F8sKkl9+hSUQvraJG3V
-	yEDP6OHPHGInPiQHDSxWiZu0Bl4Xsov9xNT4ukXv6Cy7PTB8Du+IkBO7AeH3o4pyUhwdgYVSQ5A
-	5mHLUj1aqjUUBdOkit9pYX30piJBiauczOZo7601/vH1Pnt2c3IqnkrX+ehtjQq7V6WVZQ4/IN3
-	Qe07tCw0lyhlL1bydl5luBoqeJaNw9Xzmce9OL5W2zl3clrXwqLGz+n/bNRnioHqJIpZTmCXRWM
-	H/Kw1YGqpOOQqCjKwMYW3HYxH2Qf6Vvk9zFnDnb/pqdQiqvnAWsKmBTkdA4s+lMGIBoDPhYe8tO
-	oBZYr7O57EzD+Hu7OiBuWM5w1vUv1+em8eQEbdb7gjwI6R2iJ7BAzDz8x4lVHgCqrvuoWngwG0U
-	eaDYHOygGBNziw=
-X-Google-Smtp-Source: AGHT+IEMDxlPNlEX4ltt7wQyiTdEDoq95VzBoR5OhvPTvdZUzHQl4pbh1lkHKU8Zpq4QHrWLCHpfHw==
-X-Received: by 2002:a17:903:986:b0:240:417d:8166 with SMTP id d9443c01a7336-251788fd271mr3922045ad.19.1757112929532;
-        Fri, 05 Sep 2025 15:55:29 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-24c9669a0e1sm79220835ad.56.2025.09.05.15.55.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 15:55:29 -0700 (PDT)
-Date: Fri, 5 Sep 2025 15:55:28 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	sdf@fomichev.me, michael.chan@broadcom.com,
-	anthony.l.nguyen@intel.com, marcin.s.wojtas@gmail.com,
-	tariqt@nvidia.com, mbloch@nvidia.com, jasowang@redhat.com,
-	bpf@vger.kernel.org, aleksander.lobakin@intel.com,
-	pavan.chebbi@broadcom.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH net-next 0/2] net: xdp: handle frags with unreadable
- memory
-Message-ID: <aLtqYMbHoG6DCXOU@mini-arch>
-References: <20250905221539.2930285-1-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=N75cZXP1uVrHhIJ9EPjB03JXuyOgr/DVmBetbhnxkc2jy5WGQHWzf3CfpoeeT+fOsJzUEx47wPpgyN43SxU3d62W5Po1LCgxkA2EyKIY3vTV+zpKEov7n98vGiJUbFohpyvKvli9clGo6PdRHczPUuzF/vel7BmS57mz0Q44AUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKhh4N0Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2CEDC4CEF1;
+	Fri,  5 Sep 2025 23:01:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757113280;
+	bh=+lhopyxIHPkimkHLqjBagKsowbxPduHdhl1alB5XIHw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FKhh4N0YC7rktiPdXEfXclWanEDKYne9TN6cdcuCjqPCtcq4Rn0r96yLuECJbiw+4
+	 LjwCnjQtLBAm0edveUnCZZYiNonj/7aqKLJr2wGtnUHH+scBK/7r7JUigttXLAScDm
+	 pXeFnpIPvL1/rZKX9LdznwwDYBYkDL4/X0Q74Dlpx/NmySnEYO46ImCPWzvWXVlUfn
+	 7nKQ1fERSefzbF0N9pUOtT2Ew99OpHStRZ+01KHKpecJw2kFIukduhp+K3hQulq8o0
+	 47VhyxuU+d72ralUlgkhIgcgxiZyD9aQX9YFUuu3Ep7hq8BTDKfbNp6DFssdME8qWg
+	 uTEId8/MJZDQg==
+Date: Fri, 5 Sep 2025 16:00:06 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
+Message-ID: <20250905230006.GA1776@sol>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-20-david@redhat.com>
+ <5090355d-546a-4d06-99e1-064354d156b5@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250905221539.2930285-1-kuba@kernel.org>
+In-Reply-To: <5090355d-546a-4d06-99e1-064354d156b5@redhat.com>
 
-On 09/05, Jakub Kicinski wrote:
-> Make XDP helpers compatible with unreadable memory. This is very
-> similar to how we handle pfmemalloc frags today. Record the info
-> in xdp_buf flags as frags get added and then update the skb once
-> allocated.
+On Fri, Sep 05, 2025 at 08:41:23AM +0200, David Hildenbrand wrote:
+> On 01.09.25 17:03, David Hildenbrand wrote:
+> > We can just cleanup the code by calculating the #refs earlier,
+> > so we can just inline what remains of record_subpages().
+> > 
+> > Calculate the number of references/pages ahead of times, and record them
+> > only once all our tests passed.
+> > 
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >   mm/gup.c | 25 ++++++++-----------------
+> >   1 file changed, 8 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index c10cd969c1a3b..f0f4d1a68e094 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -484,19 +484,6 @@ static inline void mm_set_has_pinned_flag(struct mm_struct *mm)
+> >   #ifdef CONFIG_MMU
+> >   #ifdef CONFIG_HAVE_GUP_FAST
+> > -static int record_subpages(struct page *page, unsigned long sz,
+> > -			   unsigned long addr, unsigned long end,
+> > -			   struct page **pages)
+> > -{
+> > -	int nr;
+> > -
+> > -	page += (addr & (sz - 1)) >> PAGE_SHIFT;
+> > -	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
+> > -		pages[nr] = page++;
+> > -
+> > -	return nr;
+> > -}
+> > -
+> >   /**
+> >    * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
+> >    * @page:  pointer to page to be grabbed
+> > @@ -2967,8 +2954,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> >   	if (pmd_special(orig))
+> >   		return 0;
+> > -	page = pmd_page(orig);
+> > -	refs = record_subpages(page, PMD_SIZE, addr, end, pages + *nr);
+> > +	refs = (end - addr) >> PAGE_SHIFT;
+> > +	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+> >   	folio = try_grab_folio_fast(page, refs, flags);
+> >   	if (!folio)
+> > @@ -2989,6 +2976,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> >   	}
+> >   	*nr += refs;
+> > +	for (; refs; refs--)
+> > +		*(pages++) = page++;
+> >   	folio_set_referenced(folio);
+> >   	return 1;
+> >   }
+> > @@ -3007,8 +2996,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+> >   	if (pud_special(orig))
+> >   		return 0;
+> > -	page = pud_page(orig);
+> > -	refs = record_subpages(page, PUD_SIZE, addr, end, pages + *nr);
+> > +	refs = (end - addr) >> PAGE_SHIFT;
+> > +	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+> >   	folio = try_grab_folio_fast(page, refs, flags);
+> >   	if (!folio)
+> > @@ -3030,6 +3019,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+> >   	}
+> >   	*nr += refs;
+> > +	for (; refs; refs--)
+> > +		*(pages++) = page++;
+> >   	folio_set_referenced(folio);
+> >   	return 1;
+> >   }
 > 
-> This series adds the unreadable memory metadata tracking to drivers
-> using xdp_build_skb_from*() with no changes on the driver side - hence
-> the only driver changes here are refactoring. Obviously, unreadable memory
-> is incompatible with XDP today, but thanks to xdp_build_skb_from_buf()
-> increasing number of drivers have a unified datapath, whether XDP is
-> enabled or not.
+> Okay, this code is nasty. We should rework this code to just return the nr and receive a the proper
+> pages pointer, getting rid of the "*nr" parameter.
 > 
-> RFC: https://lore.kernel.org/20250812161528.835855-1-kuba@kernel.org
+> For the time being, the following should do the trick:
+> 
+> commit bfd07c995814354f6b66c5b6a72e96a7aa9fb73b (HEAD -> nth_page)
+> Author: David Hildenbrand <david@redhat.com>
+> Date:   Fri Sep 5 08:38:43 2025 +0200
+> 
+>     fixup: mm/gup: remove record_subpages()
+>     pages is not adjusted by the caller, but idnexed by existing *nr.
+>     Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 010fe56f6e132..22420f2069ee1 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2981,6 +2981,7 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>                 return 0;
+>         }
+> +       pages += *nr;
+>         *nr += refs;
+>         for (; refs; refs--)
+>                 *(pages++) = page++;
+> @@ -3024,6 +3025,7 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>                 return 0;
+>         }
+> +       pages += *nr;
+>         *nr += refs;
+>         for (; refs; refs--)
+>                 *(pages++) = page++;
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Can this get folded in soon?  This bug is causing crashes in AF_ALG too.
+
+Thanks,
+
+- Eric
 
