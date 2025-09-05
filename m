@@ -1,161 +1,188 @@
-Return-Path: <netdev+bounces-220372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0926B45A22
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:12:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A0FB45A28
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44BD27A22DE
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:10:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A7041895B8F
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D21368094;
-	Fri,  5 Sep 2025 14:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591CA36998F;
+	Fri,  5 Sep 2025 14:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SjinW2AM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="o+iRD4GE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15C13629AA;
-	Fri,  5 Sep 2025 14:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A907A3629AA;
+	Fri,  5 Sep 2025 14:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757081548; cv=none; b=cOpIyu5yY5amXZ80unqaHEfXuvp4QUHnkRJ/U6TCRJeTTyydgXQS/3bo/RJF86+Osn0cmuqUtmUzRh8e9oCliX3imG17fSEFa1DfN1uVhiQMcJx+BxyIxOw/yGGRRRq+veFHS9j/Ew7N8CLEJR1MdOA8dfIoMQtnzQ0bqMS/7QA=
+	t=1757081555; cv=none; b=lj/0lzpOixCA1qP7i0Rgq5Hq2857WU+ihcOhiHNAUmIg55Thh4W5S86nVWPCopV7mxTzvpMtjXZBoHVjJ2nrALvv+HxQ5oxgeBACfBNcd8nY2YFuV2BFx8/XzMIS4gS1HL7KkbGAjAwuuqxPvzOz1KuC0xFpotxr05q7fJDv5E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757081548; c=relaxed/simple;
-	bh=d623E1liTi60iAjibtCqAAj0iSP9kDrLBmukVMoZ1bw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bjM9X/Ime8juQdzb/0xNyQRxJOj67G7dKvIjV+bG8nzXXsD+3WBn9N92CSp7+y84YC1QWMZR5v9rU3VM5e5JkIXCUVCPUZzhvDkz1+rI+HIjF+dH7Pk9YoBNyxamRjDnKex2QK7RLIxDnzb5WBBmuvcWOOolBHy0i3XxJvVJotQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SjinW2AM; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757081547; x=1788617547;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=d623E1liTi60iAjibtCqAAj0iSP9kDrLBmukVMoZ1bw=;
-  b=SjinW2AMkl6n+hWtGWiJfjLUszTi95scFPJuHB6xC4N9NMhYIppFTEOD
-   3QH+oUBAVvTaiTPNJOla4TARj+rCpgzwKPa83ZQwvIoyDNJbWvwOdoVRq
-   RdVMHJReSCymw7NyRSyfntY4i3TGSf3xDfr+z9Z8cVDX6b6K4FcmyDiMX
-   mt3tu+Fi1JrRDlIR0dzAnihx5yayBszH9aEi7zLlEvAqxhiZqKlzKwEX7
-   dxA1thkRgsFs2sCuNwmLv1dBKlw0UO/Vu8UYadQ9XDzIu6zFyhobF6xRu
-   QcUhJnAH1VD//86vmwnOuO4XkWorgX59aQAK7pOE7qriz4wTDcNWFjW1E
-   A==;
-X-CSE-ConnectionGUID: JTCJvgHKRc+ls2p+T2XNVg==
-X-CSE-MsgGUID: 32uftZGBSJOmtlIh3NRn/w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11544"; a="62065757"
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="62065757"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 07:12:26 -0700
-X-CSE-ConnectionGUID: 9mM/JCghRqKBgJuUXE6PAQ==
-X-CSE-MsgGUID: X78LcsnRTRWksMka9TIijg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="176511026"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 05 Sep 2025 07:12:22 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uuXAq-0000UZ-1Z;
-	Fri, 05 Sep 2025 14:12:20 +0000
-Date: Fri, 5 Sep 2025 22:11:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, kbusch@kernel.org, axboe@kernel.dk,
-	hch@lst.de, sagi@grimberg.me, kch@nvidia.com, alistair23@gmail.com,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH v2 2/7] net/handshake: Make handshake_req_cancel public
-Message-ID: <202509052149.ChcoGfkh-lkp@intel.com>
-References: <20250905024659.811386-3-alistair.francis@wdc.com>
+	s=arc-20240116; t=1757081555; c=relaxed/simple;
+	bh=VMDdS7EuAR2lHiKsozVaJG52WZNsXNMUBHTuf32Jo5I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B2pswmXM4Z60Tizz5su2MWVihCe2Q0kEWka7Cqcy2zGxD1VnKm735lpD2f4PqTJiAitqj0F/FexiPHIRjWmOxgtdIvWS4QmkdOhC+nF7ZN+PyUcrMHFB5Xoro4Xwghj1BCPMo1rBKpm5Nrnvj+3I0GQMzIxEaOIpEsGUJAZbuvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=o+iRD4GE; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5853Xc4n031771;
+	Fri, 5 Sep 2025 14:12:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=R/zV1C
+	NqF6sG2MnNzBPnk+rjDE4p/E/wNM0jQvtc5CQ=; b=o+iRD4GEAo+/UdOYhHCUNj
+	rBLodqxoB+dFHBw0qYn4urRhmp9+Ld7YsVXNUKTzXuw1aGH8NcZTtEcx00JgaxoT
+	Z5rZNeOUmYBS89SGYgnvTJLctymPqP1OfhFgP1cl+TBq/E/+Kl8bj58HNgBjzkCF
+	FaUZkXn+IliFRjw4GnC0H3fKhj0RcjDWYBaqqAoDuSboehn6X9hNmJZjZxZQxanD
+	5WcAdQJAbFt9jiUNPr50hlpttN+yceQZMvy+1nGk+cSOqkcebPsp4wJDbDSTketz
+	d4r6qDVPdbbTcFuDnMdfo4lPm2r/NEm+e9jK2xwTNc54lsldYXTDHCzyN4PhN/lw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usurgysc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Sep 2025 14:12:29 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 585E7BMX016479;
+	Fri, 5 Sep 2025 14:12:28 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usurgys7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Sep 2025 14:12:28 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 585C4rJT017612;
+	Fri, 5 Sep 2025 14:12:27 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vc111x4c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Sep 2025 14:12:27 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 585ECQeC27525676
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 5 Sep 2025 14:12:26 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 276725805D;
+	Fri,  5 Sep 2025 14:12:26 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5DE825805E;
+	Fri,  5 Sep 2025 14:12:21 +0000 (GMT)
+Received: from [9.39.29.162] (unknown [9.39.29.162])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  5 Sep 2025 14:12:21 +0000 (GMT)
+Message-ID: <4c5347ff-779b-48d7-8234-2aac9992f487@linux.ibm.com>
+Date: Fri, 5 Sep 2025 19:42:19 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250905024659.811386-3-alistair.francis@wdc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net/smc: make wr buffer count configurable
+To: Halil Pasic <pasic@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang
+ <wenjia@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20250904211254.1057445-1-pasic@linux.ibm.com>
+ <20250904211254.1057445-2-pasic@linux.ibm.com>
+ <aLpc4H_rHkHRu0nQ@linux.alibaba.com>
+ <20250905110059.450da664.pasic@linux.ibm.com>
+ <20250905140135.2487a99f.pasic@linux.ibm.com>
+Content-Language: en-US
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+In-Reply-To: <20250905140135.2487a99f.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMCBTYWx0ZWRfX7KKUgk6iFVmQ
+ yML+Za9UEJaK+LkX6q9Y6sXC/mI7Qe4Usq+3LxkrCCU7P3OfRz/gLft5ur6v/6xTXnpCxVyJNI3
+ yA1dDepUxB+GeT27a6naSMMsb7DTt5k1W40+FhOOibr5R0NCizHWmXkCK8bwk8vrpn+U7korLx3
+ i5TX4qRaFT2O/RAcU9ssN38Mmy9AMSfV5S5fkb/imS6Hzta7HVsk6AjQLQCbUfynpx47E2k+l4z
+ hN0j6uVGGLzHTtBzvC6yzZnZMQBfaKXrB5kLD5w1SnlaxyZZekj2JyvXmahj9LV6HF4nXF6y8DY
+ lyDCDgDuqK4CysgQyY4qXkUV5UikTXgCY9GMQYBXshDzgk3LHvC5MQvU65nbYKEpY5MlgiS8W0B
+ R7SLhU1q
+X-Proofpoint-GUID: KpI3tt6SOYpnA3FHAmwT_cdd2oR219cy
+X-Proofpoint-ORIG-GUID: u9qEwTRx78snNTiQBN9ej4uJ3a6I2XJF
+X-Authority-Analysis: v=2.4 cv=Ao/u3P9P c=1 sm=1 tr=0 ts=68baefcd cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=B3rph_lr8uwRdQD9BfQA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-05_04,2025-09-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 phishscore=0 impostorscore=0 priorityscore=1501 spamscore=0
+ suspectscore=0 bulkscore=0 adultscore=0 malwarescore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508300030
 
-Hi,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on trondmy-nfs/linux-next]
-[also build test ERROR on net/main net-next/main linus/master linux-nvme/for-next v6.17-rc4 next-20250905]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/alistair23-gmail-com/net-handshake-Store-the-key-serial-number-on-completion/20250905-105201
-base:   git://git.linux-nfs.org/projects/trondmy/linux-nfs.git linux-next
-patch link:    https://lore.kernel.org/r/20250905024659.811386-3-alistair.francis%40wdc.com
-patch subject: [PATCH v2 2/7] net/handshake: Make handshake_req_cancel public
-config: x86_64-randconfig-001-20250905 (https://download.01.org/0day-ci/archive/20250905/202509052149.ChcoGfkh-lkp@intel.com/config)
-compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250905/202509052149.ChcoGfkh-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509052149.ChcoGfkh-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/handshake/handshake-test.c: In function 'handshake_req_submit_test4':
->> net/handshake/handshake-test.c:237:9: error: implicit declaration of function 'handshake_req_cancel'; did you mean 'handshake_req_next'? [-Werror=implicit-function-declaration]
-     237 |         handshake_req_cancel(sock->sk);
-         |         ^~~~~~~~~~~~~~~~~~~~
-         |         handshake_req_next
-   cc1: some warnings being treated as errors
 
 
-vim +237 net/handshake/handshake-test.c
+On 05/09/25 5:31 pm, Halil Pasic wrote:
+> On Fri, 5 Sep 2025 11:00:59 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+>>> 1. What if the two sides have different max_send_wr/max_recv_wr configurations?
+>>> IIUC, For example, if the client sets max_send_wr to 64, but the server sets
+>>> max_recv_wr to 16, the client might overflow the server's QP receive
+>>> queue, potentially causing an RNR (Receiver Not Ready) error.  
+>>
+>> I don't think the 16 is spec-ed anywhere and if the client and the server
+>> need to agree on the same value it should either be speced, or a
+>> protocol mechanism for negotiating it needs to exist. So what is your
+>> take on this as an SMC maintainer?
+>>
+>> I think, we have tested heterogeneous setups and didn't see any grave
+>> issues. But let me please do a follow up on this. Maybe the other
+>> maintainers can chime in as well.
+> 
+> Did some research and some thinking. Are you concerned about a
+> performance regression for e.g. 64 -> 16 compared to 16 -> 16? According
+> to my current understanding the RNR must not lead to a catastrophic
+> failure, but the RDMA/IB stack is supposed to handle that.
+> 
 
-88232ec1ec5ecf Chuck Lever 2023-04-17  207  
-88232ec1ec5ecf Chuck Lever 2023-04-17  208  static void handshake_req_submit_test4(struct kunit *test)
-88232ec1ec5ecf Chuck Lever 2023-04-17  209  {
-88232ec1ec5ecf Chuck Lever 2023-04-17  210  	struct handshake_req *req, *result;
-88232ec1ec5ecf Chuck Lever 2023-04-17  211  	struct socket *sock;
-18c40a1cc1d990 Chuck Lever 2023-05-19  212  	struct file *filp;
-88232ec1ec5ecf Chuck Lever 2023-04-17  213  	int err;
-88232ec1ec5ecf Chuck Lever 2023-04-17  214  
-88232ec1ec5ecf Chuck Lever 2023-04-17  215  	/* Arrange */
-88232ec1ec5ecf Chuck Lever 2023-04-17  216  	req = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
-88232ec1ec5ecf Chuck Lever 2023-04-17  217  	KUNIT_ASSERT_NOT_NULL(test, req);
-88232ec1ec5ecf Chuck Lever 2023-04-17  218  
-88232ec1ec5ecf Chuck Lever 2023-04-17  219  	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
-88232ec1ec5ecf Chuck Lever 2023-04-17  220  			    &sock, 1);
-88232ec1ec5ecf Chuck Lever 2023-04-17  221  	KUNIT_ASSERT_EQ(test, err, 0);
-18c40a1cc1d990 Chuck Lever 2023-05-19  222  	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
-18c40a1cc1d990 Chuck Lever 2023-05-19  223  	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, filp);
-88232ec1ec5ecf Chuck Lever 2023-04-17  224  	KUNIT_ASSERT_NOT_NULL(test, sock->sk);
-18c40a1cc1d990 Chuck Lever 2023-05-19  225  	sock->file = filp;
-88232ec1ec5ecf Chuck Lever 2023-04-17  226  
-88232ec1ec5ecf Chuck Lever 2023-04-17  227  	err = handshake_req_submit(sock, req, GFP_KERNEL);
-88232ec1ec5ecf Chuck Lever 2023-04-17  228  	KUNIT_ASSERT_EQ(test, err, 0);
-88232ec1ec5ecf Chuck Lever 2023-04-17  229  
-88232ec1ec5ecf Chuck Lever 2023-04-17  230  	/* Act */
-88232ec1ec5ecf Chuck Lever 2023-04-17  231  	result = handshake_req_hash_lookup(sock->sk);
-88232ec1ec5ecf Chuck Lever 2023-04-17  232  
-88232ec1ec5ecf Chuck Lever 2023-04-17  233  	/* Assert */
-88232ec1ec5ecf Chuck Lever 2023-04-17  234  	KUNIT_EXPECT_NOT_NULL(test, result);
-88232ec1ec5ecf Chuck Lever 2023-04-17  235  	KUNIT_EXPECT_PTR_EQ(test, req, result);
-88232ec1ec5ecf Chuck Lever 2023-04-17  236  
-88232ec1ec5ecf Chuck Lever 2023-04-17 @237  	handshake_req_cancel(sock->sk);
-4a0f07d71b0483 Jinjie Ruan 2023-09-19  238  	fput(filp);
-88232ec1ec5ecf Chuck Lever 2023-04-17  239  }
-88232ec1ec5ecf Chuck Lever 2023-04-17  240  
+Hi Dust,
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I configured a client-server setup & did some SMC-R testing by setting
+the values you proposed. Ran iperf3(using smc_run) with max parallel
+connections of 128 & it looks good. No tcp fallback. No obvious errors.
+As Halil mentioned I don't see any catastrophic failure here. Let me
+know if I need to stress the system by some more tests or any specific
+test that you can think may cause RNR errors. The setup is ready & I can
+try it.
+
+*Client* side logs:
+[root@client ~]$ sysctl net.smc.smcr_max_send_wr
+net.smc.smcr_max_send_wr = 64
+[root@client ~]$
+
+[root@client ~]$ smc_run iperf3  -P 128 -t 120 -c 10.25.0.72
+Connecting to host 10.25.0.72, port 5201
+[  5] local 10.25.0.73 port 52544 connected to 10.25.0.72 port 5201
+[  7] local 10.25.0.73 port 52558 connected to 10.25.0.72 port 5201
+
+*Server* side logs:
+[root@server ~]$ sysctl net.smc.smcr_max_recv_wr
+net.smc.smcr_max_recv_wr = 16
+[root@client ~]$
+
+[root@server~]$ smc_run iperf3 -s
+
+-----------------------------------------------------------
+Server listening on 5201 (test #1)
+-----------------------------------------------------------
 
