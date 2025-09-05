@@ -1,104 +1,175 @@
-Return-Path: <netdev+bounces-220450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCED1B46022
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 19:29:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96928B46038
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 19:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69B1F3BCC37
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:28:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5216B5C5E88
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9795A3191C9;
-	Fri,  5 Sep 2025 17:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A75353366;
+	Fri,  5 Sep 2025 17:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aDjljn+b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90EA3191B1;
-	Fri,  5 Sep 2025 17:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173EE352FEF;
+	Fri,  5 Sep 2025 17:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757093310; cv=none; b=L1yTi3oZVf1bDd9oYG4kM/as5a74iJysm8EKBsg+KiBwoLzfTgo5c84/FPqUJyXaGAYHWNBvZiVpCY973yzYRuhS3ORvwcFyK1bXlq+PQ343WgJuSeQdKxd6foBd7YDSqmXclFEPSg3yAN65LPOEq1lrBscjzyuVg2EC2PeUyic=
+	t=1757093635; cv=none; b=YrL535HNV5mnkvm2m36HpJniHN6ElcB5qPaFX/DGiP6pNIBdrwVwv9Qx4+6t7rq2DosdNZehlKAmx+o9xQjUblX5N6fVHFdq6v5vnxgdCnW4U6xGJpH0eYYrDaaq5tSQlZfWyVSjYgpTw5bXWqzI2kd+85teEKa0iYKwDO+v67o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757093310; c=relaxed/simple;
-	bh=n8LTlK/QUILOghMRnynkpFTd9U6GJoTityV7CtqlzF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGgQpKT6Kr8DmBGvj+yA5iV5XxoZONJu3kJRSMqPG/kaES+fuSW9hc2u7+HAMU0He8EenyFYCQOa89NxyMv0fOxsIobeHNCUmngDN6MQN5M+siMicyNmSKK/2Lit9bTaFIANfkyom3g4nnlSCt5OuNOyxUn+hfl08TKAYY+NUDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1757093635; c=relaxed/simple;
+	bh=HVZB1MmylaVxOm+jXUHO6m2dOZroYixExcyQ13jTf2o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cfo0LK6tGuyBekjlkmf8N+NwkIqtnnfkliI318OeoBiwZqhCxt610SzYYaHudo7uyiq9ixFLMfBMZxrZrBWW88lcuI9YG2KKjzRuOTCUNynlDw4ZIIoQMpC8fWbhd1PlcmQERwuizG4YHcYnoXjYx3uT0qw508XgR10lBqTbT7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aDjljn+b; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b042eb09948so440924666b.3;
-        Fri, 05 Sep 2025 10:28:28 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b4e84a61055so1691822a12.0;
+        Fri, 05 Sep 2025 10:33:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757093633; x=1757698433; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kiE89QJUAsvDI3W9wNpGleqnJi9RNLLz1gprJWoXutE=;
+        b=aDjljn+bBkKBcOeVarhnMjNxHM71xLDwlUHj8AI33fL1TcNT3Bz6104GDe+aZMTwfc
+         rBtJE7ifUGuMob35bnAyTynl6vG57fbASbuQ+A+s2uiEidB33HfrsD8rChqH6rYpclzU
+         26Kb2EScEetaY85ZRhmLhHl2ZblfGKQDJPgGLORQA9JhNW0iVKcF+Mb2Zh2Fxk2kjGf3
+         OpTn8ANKLE5oeQtCLPzQGqfMCujZ7cEQY4m/AMr6DkcJimLMI4EzD7VkMuZtpuUYOz3x
+         czV7PpvBiqI+o01POqFRo7QMXOjdfBUXKTeeug5SmiSWA7urQXc6j6w0rr9vYdJlETUT
+         F26w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757093307; x=1757698107;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xIS0xj7/1wkbG7klBxWxd/p3ZEfpHI3pNd+rkKtoedg=;
-        b=wNVbGCyBMR/53piC6nT8YdYre8nOeVc56nmbcwWmEg4fzzE3F5vYP3ZyAwn3W8VOPQ
-         m/aOLorzst8cOCZHncefC+l/qNzEiC8etX2eaqidimU7hDfgLEMsjytp8bIHeHBDQuec
-         i71fQ6EKpdqcN8HIXR+zxnKS9PKmr1mYQ6bfiPNFljhaPuHrp56H1mXgu6Z4uemhnCwW
-         WZhXGCgeB6vmcmTDqP9YI+VdXOlmXpcoHbGPgO6LguDxKhz72RRwqbB4Ms/2t/AgWsdZ
-         WC6626h2QJyOzmdDhPJ0yuibKOUANZq4q/2ti+ETtjWHF7IfVKhDVopjTejAgJdNf55j
-         +JAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUb6yP5wOQAtMtOZRM5t03lsod7Tm4AOKPcnjdup2sTV9W+nPacEAygkevICCYszOwFEIfc1Lnw7UQWXirXcLDf@vger.kernel.org, AJvYcCUe/uWPQLepA8B4WITd2hPTNhp5CkGH4kNPP9NSvF9hWokv/+c1DKmzLsIv9knmtpyqBx/5ldkClSOM7aY=@vger.kernel.org, AJvYcCWHMVjaQNaNPEAmcTLqrvHl07o2pYLLwah+XWPcLimAIbbu5V02P3kqEYdDiksiE6Ozu8B3Rj8v@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEXSlFom2fcWWPjQ/rwS+5uVJLJddwROEPPNNTKeYBi/W3h7z5
-	qFfbtxMQSkASD5pGrsULZZ04W9GyzfS9KNiSNv3bI4Us3ZVBhSbcVLi3
-X-Gm-Gg: ASbGncu5lUh2BC8pngy/tyO0lxFuPNbkAX08BO3IH74KuPzSt5DoGyE+0/NFxXdMat/
-	SwbSLQ7U4JHGX36aigaCR3to6GIzAq2nQ25bY2HG2GoYhxjwIB1xiGF1TpTM8/DkzkDhZdCKH7w
-	jZmB/+fEDAwun2bcNf2sBLlsbD/CgJt2TsqFIgpZI0qp9X1FBoGpkHodSQ1IBWzDrUGctKMDct9
-	6JLBLcSCCJeG65yiVHj36PX0hCrJcv61WMGy281S8jckh49c9F7PINt56PVe+5woLYf5qU9xPg1
-	3f8UGoIBr8gluRSCGSxUgDmAw6725AXj1j8q7RzXYD6FZDdfvtOV11c/8hBtz/dM/C5+l/tJ4f0
-	K77QPZ5mot5qOTl9qolt3Uf/J
-X-Google-Smtp-Source: AGHT+IGQu9KRWT87zu3zQXDe6q9Hj3PmpKvyr8QxNEXEY9pWpDlHawoSPeUoVh9C/rQHm+WkCDo2tg==
-X-Received: by 2002:a17:907:c14:b0:afe:fbee:88a with SMTP id a640c23a62f3a-b01f20bc537mr2478492466b.59.1757093306932;
-        Fri, 05 Sep 2025 10:28:26 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:74::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aff0a591819sm1790884266b.41.2025.09.05.10.28.25
+        d=1e100.net; s=20230601; t=1757093633; x=1757698433;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kiE89QJUAsvDI3W9wNpGleqnJi9RNLLz1gprJWoXutE=;
+        b=XygkIqiMnMtQ+NzKbHWlK4oap9G+xI6k9JRM9Ms3mysOO3c84ASQGglSiRrpL9cfwC
+         Ouf8Drl3ZDtCxWk66bmamaRBwB5kOAlKjjBs9204m81+0wuKeyYHJnbiQDNgKtSBHBNG
+         VTg60tHvFtBuTeTDEH7zRySEr3OUv4eo63GwF0JxEOQXwP6O1X9uNDFzYg/DyP+HLijI
+         si4gu1dRHv3JBmt9SlqiBxOvG0DhhaiZfe2HPHb0bMewLbY2g25NRPvuGPkf+sGsD2cz
+         AlNv3MS7IyDY+qtKOWNfQIemmckb+G/xwMe4pmhjDv6jBFt0ol/xjFSAadzleTXHnnqk
+         vRug==
+X-Gm-Message-State: AOJu0Yx7HhILCSsfbG/lLZi2WEAHVkIWORSGqeKJqzkt2LejFnsXmrYm
+	CdawtkcLt1iZexKIrixglyXNFC26uD/zcAuPwcta3PG28llSgo1Adcurohezzw==
+X-Gm-Gg: ASbGncsIwfESPyy3PTdT6xFnhsXCVvTWN0aXoEgdujS2CpQEJOQnyCU1xROvWHMi5mg
+	/GYDQGkSir8c6jvht5pJafW2CiGYskhyXbWmZT9/9z+0eqAx9ysmryduPSjIHvX35EdUYdwx23d
+	pP344SHC0SzZORn9YVvq0Wp4WJkYZBG334wBb4djBC4uezHEt4pgnpDXxxxh+PEgL5+CgA4E22r
+	WP3apz366GQXABfOwp7a62wQYVGetphuelDC0DYXGojB81tucS6NstHc+WSLM6sKrgdfPRA980C
+	Hr3H+q5/rOw1/X57mJ+xhGH1uDLkBnTPUEKn/lBX/4dybUk1Xh4vAelYNapxPz9TKfyLRo5RjRb
+	7SobzcfHn8LFBBQ==
+X-Google-Smtp-Source: AGHT+IGZnY4Pnm5ZbLHfjinl55/DL4q1p8dxljnnVXbwiwgHxNe8NopIed9ithKokeu8KAsaiq4k4w==
+X-Received: by 2002:a17:902:ce03:b0:248:cd0b:3454 with SMTP id d9443c01a7336-24944873445mr255606935ad.9.1757093633054;
+        Fri, 05 Sep 2025 10:33:53 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:5a::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24b0e860ab5sm111845055ad.5.2025.09.05.10.33.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 10:28:26 -0700 (PDT)
-Date: Fri, 5 Sep 2025 10:27:51 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, asantostc@gmail.com, 
-	efault@gmx.de, calvin@wbinvd.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next v2 0/2] net: selftest: Introduce netconsole
- torture test
-Message-ID: <4suklxl4t6ulo5ndlvw23rk6cgpza2b5qfrudszn4oothihyuv@zgelxgrgfe4k>
-References: <20250904-netconsole_torture-v2-0-5775ed5dc366@debian.org>
- <20250904145925.101e2091@kernel.org>
+        Fri, 05 Sep 2025 10:33:52 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	kuba@kernel.org,
+	stfomichev@gmail.com,
+	martin.lau@kernel.org,
+	mohsin.bashr@gmail.com,
+	noren@nvidia.com,
+	dtatulea@nvidia.com,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	maciej.fijalkowski@intel.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v2 0/7] Add kfunc bpf_xdp_pull_data
+Date: Fri,  5 Sep 2025 10:33:44 -0700
+Message-ID: <20250905173352.3759457-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250904145925.101e2091@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 04, 2025 at 02:59:25PM -0700, Jakub Kicinski wrote:
-> On Thu, 04 Sep 2025 11:00:39 -0700 Breno Leitao wrote:
-> > Create a netconsole test that puts a lot of pressure on the netconsole
-> > list manipulation. Do it by creating dynamic targets and deleting
-> > targets while messages are being sent. Also put interface down while the
-> > 
-> > In order to do it, refactor create_dynamic_target(), so it can be used to
-> > create random targets in the torture test.
-> 
-> You either have to post it in the same series as the fix, or wait for
-> the fix to be present in net-next. Without your pending fix this will
-> obviously not pass thru the CI :/
+RFC v1 -> v2
+  Rebase onto bpf-next
 
-Ack! I've sent the netpoll fix and the selftest in the same patchset, as
-you suggested.
+  Will rebase on the mlx5 patchset that avoids copying payload
+  to linear part by Christoph if that got merged first, or seperate the
+  mlx5 fix from this set.
 
-https://lore.kernel.org/all/20250905-netconsole_torture-v3-0-875c7febd316@debian.org/
+  patch 1
+  - Remove the unnecessary head frag search (Dragos)
+  - Rewind the end frag pointer to simplify the change (Dragos)
+  - Rewind the end frag pointer and recalculate truesize only when the
+    number of frags changed (Dragos)
 
---breno
+  patch 3
+  - Fix len == zero behavior. To mirror bpf_skb_pull_data() correctly,
+    the kfunc should do nothing (Stanislav)
+  - Fix a pointer wrap around bug (Jakub)
+  - Use memmove() when moving sinfo->frags (Jakub)
+  
+---
+
+Hi all,
+
+This patchset introduces a new kfunc bpf_xdp_pull_data() to allow
+pulling nonlinear xdp data. This may be useful when a driver places
+headers in fragments. When an xdp program would like to keep parsing
+packet headers using direct packet access, it can call
+bpf_xdp_pull_data() to make the header available in the linear data
+area. The kfunc can also be used to decapsulate the header in the
+nonlinear data, as currently there is no easy way to do this.
+
+This patchset also tries to fix an issue in the mlx5e driver. The driver
+curretly assumes the packet layout to be unchanged after xdp program
+runs and may generate packet with corrupted data or trigger kernel warning
+if xdp programs calls layout-changing kfunc such as bpf_xdp_adjust_tail(),
+bpf_xdp_adjust_head() or bpf_xdp_pull_data() introduced in this set.
+
+Tested with the added bpf selftest using bpf test_run and also on
+mlx5 with the tools/testing/selftests/drivers/net/{xdp.py, ping.py}. mlx5
+with striding RQ always pass xdp_buff with empty linear data to xdp
+programs. xdp.test_xdp_native_pass_mb would fail to parse the header before
+this patchset.
+
+Thanks!
+Amery
+
+---
+
+Amery Hung (7):
+  net/mlx5e: Fix generating skb from nonlinear xdp_buff
+  bpf: Allow bpf_xdp_shrink_data to shrink a frag from head and tail
+  bpf: Support pulling non-linear xdp data
+  bpf: Clear packet pointers after changing packet data in kfuncs
+  bpf: Support specifying linear xdp packet data size in test_run
+  selftests/bpf: Test bpf_xdp_pull_data
+  selftests: drv-net: Pull data before parsing headers
+
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  38 ++++++-
+ include/net/xdp_sock_drv.h                    |  21 +++-
+ kernel/bpf/verifier.c                         |  13 +++
+ net/bpf/test_run.c                            |   9 +-
+ net/core/filter.c                             | 104 ++++++++++++++++--
+ .../bpf/prog_tests/xdp_context_test_run.c     |   4 +-
+ .../selftests/bpf/prog_tests/xdp_pull_data.c  |  96 ++++++++++++++++
+ .../selftests/bpf/progs/test_xdp_pull_data.c  |  36 ++++++
+ .../selftests/net/lib/xdp_native.bpf.c        |  90 ++++++++++++---
+ 9 files changed, 372 insertions(+), 39 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+
+-- 
+2.47.3
+
 
