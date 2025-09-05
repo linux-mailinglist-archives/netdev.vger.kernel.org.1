@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-220461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 474B7B4620C
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 20:17:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1359EB4620F
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 20:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40B407A2C5F
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 18:16:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCE4917987E
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 18:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4027430596C;
-	Fri,  5 Sep 2025 18:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B0E26FA5E;
+	Fri,  5 Sep 2025 18:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wt7AQhRO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POFVfiDq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FE0305943;
-	Fri,  5 Sep 2025 18:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D24926F28F;
+	Fri,  5 Sep 2025 18:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757096269; cv=none; b=SBWncjKw/OOKGC3yylBxOnYFtBpMsPs+kWcDwxSCfuk4DWLkS+5lxQNRlzQsopsvF460Cwy9KE4Ob1DViiFCpWrag8TJV16ZW5u6u7oSKbMJDf+M55zru0EvGk8HljcYwjhtAhRqHca7qkNgUsKeJCsT/Wp2XlmRKLMexwKlOzY=
+	t=1757096273; cv=none; b=Us7sVnEKV/gRh6YRtBhS7OLi+FVpZ9LFaCQwTqWV+Ua9DbPoKymfqlWv3HfudKA/GxmWvhv/+2IzTtmldFvSfAZ49pYXzkNtbVsUMS+HBcCoP0WozoS9wML1FmjazwYBymqabi1M/pPbdlozp7kucEtx2PsqIKvdSFTi5GvQcVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757096269; c=relaxed/simple;
-	bh=k7lXW7TayfxntnRHFt7x7CGs+qTM3EkXOZ8t/uPQKeo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uLeEIal1z5J8AmKYsPfiiRuIy8KXqbY+uCqGLbZrSS4/30cAQXJiomjtpE76c44Cn33o31YnQZBl/8THG3QplmC4RBK6hV0Z5njaFxFuyX8xHGUhGxyNZ/iT+i+VzHZYumaCQzFvS6RNd6kABA8jFN6oBwPHYqdX2MmZ00+Vths=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wt7AQhRO; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1757096273; c=relaxed/simple;
+	bh=8oP/KHoh/0OB5U9GAwKMQMTl8V+JdjQMnkNXVFeBf9M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=r1gnHnMZHgdPaVtFHAiC21D+B4Z/WwQl3PrCSzgwhzRUHACztlgZd6vfPcVH+L3NzyQpz8H8vm7RRSNepVnKX4u35ySLjBza2M+Crzrt6qWKLCFpsdBCDERHvK0MLZzcljXXlKVJC0eTtUkKjlQEN3As7PfHS3dLLxpBBSAZanM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=POFVfiDq; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-327771edfbbso2360663a91.0;
-        Fri, 05 Sep 2025 11:17:47 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-32b02d88d80so2153944a91.0;
+        Fri, 05 Sep 2025 11:17:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757096267; x=1757701067; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DXzNAc0/jy/V/ldR3DTWdqE1luwlUpOmaeSaBFZiJ5g=;
-        b=Wt7AQhRODFBmRQqIYbKstyDcIXdkGGgBjZnYX+Z+2L6iD61MHnQ1Jk+9feWYPJCZ+t
-         zRyUHpIyjhGbPQs5gGYsZcGJvL5m0lGVXUoWTZrXYdw7+xI9ghyxGmygn+mgpSqlwby3
-         j5LrbJsViZCCvMHjMoEioGe+pDfAxvlJ9ZulBfyYFcmoyPUbV/WwiHB6oJyeOJAeR7uo
-         YZEd2tIgGfiORIDl9wZFW+9jHo88iypkSFdRqQcTg7hhnp1y5LisHikcGsL0G6SDacqV
-         XGA7NjMemLzJCaDEILhZI9KlGj0ODBelQ1n+U5vHJXUfVvKCpEfHu/Ta3BroFHcSTE1r
-         tVOQ==
+        d=gmail.com; s=20230601; t=1757096271; x=1757701071; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b4RN6TwpCX803l0M7xHGRzHAVNXxkwJhNap1NI/5nHc=;
+        b=POFVfiDq4POxUTYRFuX45kc94+a5QJtS8KoYKscvnTcnhqYLVTao6gc98JxxN4GW5N
+         a6OiH4XmDBpWweTELsiKevR4QABYRhNy2ZXyYMwhdvdKj3V6uob/aEUweMLVklJJgTpK
+         7hq8dP0W0V3iEKVdip0zx9Si64h+hZ7yUw55n4vILPeTLrqz3rrobRYHyaQ+DQyg5oiT
+         ooWuRrLsw7KzyIkq40shAfeAdC1AxToGCg3C2RHAYHQKBeb/fYC3SCw8ClH+apTT4SYv
+         wi/B12haNUYC2XiUeYNmDZUqaEg1YBC18OGSwsCO5USwh5tWwGYMA8s8RVrbmWj2bdri
+         ywDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757096267; x=1757701067;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DXzNAc0/jy/V/ldR3DTWdqE1luwlUpOmaeSaBFZiJ5g=;
-        b=BARPxsRd4aABcWstCJ2jFIAO09oQ14JLnA7sSWnXZRzKUyCCbPtZz5DVjYT/IoSW8D
-         CKhZ4aCfzPIw/3ANFBcmLODmUpiAsc73YBShdrsmGa6aRYemj+BhHSQ5q5b4M7coULJ7
-         R7maXjlVg2aq4XVV3lTb8KjH4etjKfQ0u1XyXI35RrCmwBnCt5tRzj/vpezphw/LrjJi
-         RBy/Q2/mXNxNi+0smfn7r0G2LotOf8+/ulUNPuV3Gv9CHJSQrVBShzPcSbX7yxho0gSv
-         2fY9w3bk95ZGL7vX34pg4DD6i4bprlOSSc9fwOo8Vuhb13wv5ysEaSDxVHLrIaEupn6I
-         xfNA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnXYcEfeAyTQ2MDjF7//MpCKXe+boCpCxjEADG456VgUh779muGURNZSdTapt8y4mXVUhQBIw6vv8CT2Tr@vger.kernel.org, AJvYcCWk4hNbdqzJa227GcvlPHriNKrENQ0MWNR8PQhnPxSqD5+aN9K/3d0Gwdf+UlRAN5qWX4gXwr7CzA+r@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH4QGVMXP3X3B9IJWi8KtG6evszDxtNKbBbcLOVs+f+DgSev/B
-	WC0iKtFO+mmBku4I/3cRiyopzdiec57faH1+fGaIDpkqYMxP7QOC+upCdyAsn9NVO4Y=
-X-Gm-Gg: ASbGncuOi0jYAtKoh0mgWC5NU81O5POP1YOYGC6BO24hLwpUxGNom+1u5xZuDa+IS2Q
-	Exb/VHGAHlzg0eDv95Ds0saExye8nExO1G7UwLkUgoe4yUXa9Vriq+Wyla+UNuMjH1DTjN7OMWF
-	g3SLOwV865n5a635y4Wv3Oi7xX+yxPHPCrknXUuafcn+dxFr7r4zoaaFyet+zoEQyzcSvQDdOew
-	ODTGY9bn7JDnQfU7pmBa0xfO28ATm2DGsJp6nSBNxzK2c7VIYuCkdW6ac8HXwci4bhcW7/mbROM
-	b+1ZcMy0uroIlMtDQE/TQ/Jpbp2kqKLjINV74V3kbqCGMp74uyfD8TrbY5wkX0LxlvMzs3bWPyV
-	+KDr/oos2YelvYYD+kfe/mPzrG92rsPiXCpQkKxM2
-X-Google-Smtp-Source: AGHT+IEACK8rz1Fe0a5meBBccK0SV+oq5qfkdHIQ+lcCMl5P4hFxCVJI6Yi0qv36Ucur9MqW/9W5PA==
-X-Received: by 2002:a17:90b:57ed:b0:32b:dbf1:31b7 with SMTP id 98e67ed59e1d1-32bdbf1353fmr2761011a91.2.1757096266713;
-        Fri, 05 Sep 2025 11:17:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757096271; x=1757701071;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b4RN6TwpCX803l0M7xHGRzHAVNXxkwJhNap1NI/5nHc=;
+        b=lOz3Digqk0jNhPI88HU+nJeOgm1mOVc7biE8zr8F2b370Ko5naE/kIFX5Z849zOP9O
+         yoT6JCrjQe6Wff6qoTjx+pXEs3JPEtlBK36XdqdmBPxg6gL+OQKdeK8PhDxJanVf7MMe
+         jU9aQHiGKfVQDqPInnw7zJqBo2tSydN9TB72NH2xVpNoovIxhhge+nVCxkLeYjguLWmo
+         aJF9HtKz7nlBCDFp7uLrzrql1GsSbyrExRHq29TyRCRjvb5SJUihhvHvqzAUHKvL+Pxm
+         Q2iTsDg8cRQKfVV/5UPTM5YWZiRllkMNOEMoGfXoQe/0vmiG6osi9tDDtdnIG1XtWA2c
+         XXXw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/zz8HHJb2xMxy4WmAhDSmFNNMtLYUHoJmWo848KnCv7UrBLS+nf/FCj4N4hiVJR8aHzV/1q4aTNpKml75@vger.kernel.org, AJvYcCVOp0wu6yG5mZeToleu6nEUbuqX/HMJt9H5kK4p2xJ+e4QJBm8AnHEPGVihRenfNFiKxqQFuYXkYZuh@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwkF6akIWpJyG8TELG2QHRu6Y14gdXD1WUnH+YtbFuB2IavyWs
+	ycE3lx+ZqfZw4OJuvfhiF0D9K22pcU5z4kdTzyDX4uT8GzfkZpKwxcIcMVm7G/c3LgA=
+X-Gm-Gg: ASbGnct0gWYplc1dGHHxUxy6h7HG0hJ/Z/A7OdNZNa/HYjvM4pk/VT91w+khXufqvyP
+	/g+v527Ys6T2H7rDAIJk1QTxtB+1kM8GBI6ERwazWLeljqIphYwQA/YP9tG+wMyWbB5ipujrQ3Y
+	fJa8bLOsftWr8Bvkxc8Km5GnLomy9fi3oF/eXxoIYiD4/aYPueWeCwrLtsCuIIbjbmIkAlSlAiv
+	OQHWxCLfy8T8Hr9ZC6Kat6Uwm6y5TDqbbBeCktbiVyxiZIzcBM9NG7AmNPwGBj5K2uDMKemj1Ni
+	6oG58xd+vSzX3jfT2DRPbjoT7shFc42losbb2oqU4iM3w54GiBeMvwmaSwvC3YdZ6AMbGTECBDt
+	cGqQ3gKb6egyUs1ESG1RGdknv2mYRC9lOW4qfCCm9Mr3ueaBHIEk=
+X-Google-Smtp-Source: AGHT+IEid5yAYCZQaLAW4YP2/rbtb719XQYJOtxNDDtIo5bw3nVVaXmokLuGMGp9uFkWQu+KaHBj7g==
+X-Received: by 2002:a17:90b:2685:b0:32b:9f1e:ef0e with SMTP id 98e67ed59e1d1-32b9f1ef0demr7601037a91.23.1757096271205;
+        Fri, 05 Sep 2025 11:17:51 -0700 (PDT)
 Received: from d.home.yangfl.dn42 ([45.32.227.231])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4cd3282dd2sm19964031a12.44.2025.09.05.11.17.42
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4cd3282dd2sm19964031a12.44.2025.09.05.11.17.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 11:17:46 -0700 (PDT)
+        Fri, 05 Sep 2025 11:17:50 -0700 (PDT)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -86,11 +88,14 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Simon Horman <horms@kernel.org>,
 	Russell King <linux@armlinux.org.uk>,
 	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v7 0/3] net: dsa: yt921x: Add support for Motorcomm YT921x
-Date: Sat,  6 Sep 2025 02:17:20 +0800
-Message-ID: <20250905181728.3169479-1-mmyangfl@gmail.com>
+	linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next v7 1/3] dt-bindings: net: dsa: yt921x: Add Motorcomm YT921x switch support
+Date: Sat,  6 Sep 2025 02:17:21 +0800
+Message-ID: <20250905181728.3169479-2-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250905181728.3169479-1-mmyangfl@gmail.com>
+References: <20250905181728.3169479-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,68 +104,191 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Motorcomm YT921x is a series of ethernet switches developed by Shanghai
-Motorcomm Electronic Technology, including:
+The Motorcomm YT921x series is a family of Ethernet switches with up to
+8 internal GbE PHYs and up to 2 GMACs.
 
-  - YT9215S / YT9215RB / YT9215SC: 5 GbE phys
-  - YT9213NB / YT9214NB: 2 GbE phys
-  - YT9218N / YT9218MB: 8 GbE phys
-
-and up to 2 serdes interfaces.
-
-This patch adds basic support for a working DSA switch.
-
-v6: https://lore.kernel.org/r/20250824005116.2434998-1-mmyangfl@gmail.com
-  - handle unforwarded packets in tag driver
-  - move register and struct definitions to header file
-  - rework register abstraction and implement a driver lock
-  - implement *_stats and use a periodic work to fetch MIB
-  - remove EEPROM dump
-  - remove sysfs attr and other debug leftovers
-  - remove ds->user_mii_bus assignment
-  - run selftests and fix any errors found
-v5: https://lore.kernel.org/r/20250820075420.1601068-1-mmyangfl@gmail.com
-  - use enum for reg in dt binding
-  - fix phylink_mac_ops in the driver
-  - fix coding style
-v4: https://lore.kernel.org/r/20250818162445.1317670-1-mmyangfl@gmail.com
-  - remove switchid from dt binding
-  - remove hsr from tag driver
-  - use ratelimited log in tag driver
-v3: https://lore.kernel.org/r/20250816052323.360788-1-mmyangfl@gmail.com
-  - fix words and warnings in dt binding
-  - remove unnecessary dev_warn_ratelimited and u64_from_u32
-  - remove lag and mst
-  - check for mdio results and fix a unlocked write in conduit_state_change
-v2: https://lore.kernel.org/r/20250814065032.3766988-1-mmyangfl@gmail.com
-  - fix words in dt binding
-  - add support for lag and mst
-v1: https://lore.kernel.org/r/20250808173808.273774-1-mmyangfl@gmail.com
-  - fix coding style
-  - add dt binding
-  - add support for fdb, vlan and bridge
-
-David Yang (3):
-  dt-bindings: net: dsa: yt921x: Add Motorcomm YT921x switch support
-  net: dsa: tag_yt921x: add support for Motorcomm YT921x tags
-  net: dsa: yt921x: Add support for Motorcomm YT921x
-
- .../bindings/net/dsa/motorcomm,yt921x.yaml    |  169 +
- drivers/net/dsa/Kconfig                       |    7 +
- drivers/net/dsa/Makefile                      |    1 +
- drivers/net/dsa/yt921x.c                      | 3004 +++++++++++++++++
- drivers/net/dsa/yt921x.h                      |  593 ++++
- include/net/dsa.h                             |    2 +
- include/uapi/linux/if_ether.h                 |    1 +
- net/dsa/Kconfig                               |    6 +
- net/dsa/Makefile                              |    1 +
- net/dsa/tag_yt921x.c                          |  138 +
- 10 files changed, 3922 insertions(+)
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ .../bindings/net/dsa/motorcomm,yt921x.yaml    | 169 ++++++++++++++++++
+ 1 file changed, 169 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
- create mode 100644 drivers/net/dsa/yt921x.c
- create mode 100644 drivers/net/dsa/yt921x.h
- create mode 100644 net/dsa/tag_yt921x.c
 
+diff --git a/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+new file mode 100644
+index 000000000000..275f5feb0160
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+@@ -0,0 +1,169 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/motorcomm,yt921x.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Motorcomm YT921x Ethernet switch family
++
++maintainers:
++  - David Yang <mmyangfl@gmail.com>
++
++description: |
++  The Motorcomm YT921x series is a family of Ethernet switches with up to 8
++  internal GbE PHYs and up to 2 GMACs, including:
++
++    - YT9215S / YT9215RB / YT9215SC: 5 GbE PHYs (Port 0-4) + 2 GMACs (Port 8-9)
++    - YT9213NB: 2 GbE PHYs (Port 1/3) + 1 GMAC (Port 9)
++    - YT9214NB: 2 GbE PHYs (Port 1/3) + 2 GMACs (Port 8-9)
++    - YT9218N: 8 GbE PHYs (Port 0-7)
++    - YT9218MB: 8 GbE PHYs (Port 0-7) + 2 GMACs (Port 8-9)
++
++  Any port can be used as the CPU port.
++
++properties:
++  compatible:
++    const: motorcomm,yt9215
++
++  reg:
++    enum: [0x0, 0x1d]
++
++  reset-gpios:
++    maxItems: 1
++
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++    description: |
++      Internal MDIO bus for the internal GbE PHYs. PHYs 0-7 are used for Port
++      0-7 respectively.
++
++  mdio-external:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++    description: |
++      External MDIO bus to access external components. External PHYs for GMACs
++      (Port 8-9) are expected to be connected to the external MDIO bus in
++      vendor's reference design, but that is not a hard limitation from the
++      chip.
++
++required:
++  - compatible
++  - reg
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        switch@1d {
++            compatible = "motorcomm,yt9215";
++            /* default 0x1d, alternate 0x0 */
++            reg = <0x1d>;
++            reset-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                sw_phy0: phy@0 {
++                    reg = <0x0>;
++                };
++
++                sw_phy1: phy@1 {
++                    reg = <0x1>;
++                };
++
++                sw_phy2: phy@2 {
++                    reg = <0x2>;
++                };
++
++                sw_phy3: phy@3 {
++                    reg = <0x3>;
++                };
++
++                sw_phy4: phy@4 {
++                    reg = <0x4>;
++                };
++            };
++
++            mdio-external {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                phy1: phy@b {
++                    reg = <0xb>;
++                };
++            };
++
++            ports {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                port@0 {
++                    reg = <0>;
++                    label = "lan1";
++                    phy-mode = "internal";
++                    phy-handle = <&sw_phy0>;
++                };
++
++                port@1 {
++                    reg = <1>;
++                    label = "lan2";
++                    phy-mode = "internal";
++                    phy-handle = <&sw_phy1>;
++                };
++
++                port@2 {
++                    reg = <2>;
++                    label = "lan3";
++                    phy-mode = "internal";
++                    phy-handle = <&sw_phy2>;
++                };
++
++                port@3 {
++                    reg = <3>;
++                    label = "lan4";
++                    phy-mode = "internal";
++                    phy-handle = <&sw_phy3>;
++                };
++
++                port@4 {
++                    reg = <4>;
++                    label = "lan5";
++                    phy-mode = "internal";
++                    phy-handle = <&sw_phy4>;
++                };
++
++                /* CPU port */
++                port@8 {
++                    reg = <8>;
++                    phy-mode = "sgmii";
++                    ethernet = <&eth0>;
++
++                    fixed-link {
++                        speed = <1000>;
++                        full-duplex;
++                        pause;
++                        asym-pause;
++                    };
++                };
++
++                /* if external phy is connected to a MAC */
++                port@9 {
++                    reg = <9>;
++                    label = "wan";
++                    phy-mode = "rgmii";
++                    phy-handle = <&phy1>;
++                };
++            };
++        };
++    };
 -- 
 2.50.1
 
