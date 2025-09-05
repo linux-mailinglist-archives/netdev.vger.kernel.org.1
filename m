@@ -1,480 +1,151 @@
-Return-Path: <netdev+bounces-220478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1A5AB46490
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:25:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D67B46492
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:27:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 11E834E0F60
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 20:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A94547C1C97
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 20:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F761274FE3;
-	Fri,  5 Sep 2025 20:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA94727E7FC;
+	Fri,  5 Sep 2025 20:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xK0/NUjQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qc0EqQe+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF6925DB0D
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 20:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECB52798E3
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 20:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757103935; cv=none; b=hywKuXfweibcl8hE0+pNC6a4Lza/NgOrg4So5MqXDCZNgQ1lToH5iYwOECpLHWX0tO47XK2if7tO9xcCfbo+HiVAn0io/Kzp6ROSySgqVH5KdmPM8nexXRWVQDHxR+sxz8xuqp7aeowGqv15TmVhyjPHqyeQLwm5Xv0ZZnDSiXk=
+	t=1757104062; cv=none; b=DEiQpD6eiYV7TYA5K5R5yjqGBiqb1iuSoLmGW7clA7K0cLZRTAVMoFILJvgucujFlosSzGozFw2HHMLIBcZs4T2F/WWrtMDLkoixNgh++Op8fGbwzdK6KNJycvxFIEl9zOqFjrmymFMo1nVOYoSUeNXgNMIEM3viRcYn8w5o1rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757103935; c=relaxed/simple;
-	bh=jDz74jtthF77PeBsMR7o2OGzDzYeLylYv8sJITBwzHc=;
+	s=arc-20240116; t=1757104062; c=relaxed/simple;
+	bh=HMuotU9oaqaKiX+Mfem+55B9TLwJEll44kc3+Qk8w4c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Trk3C1YkxweJ72tPIqSh0b40c1SFeECcGa4Jgq/2PC1kXEiGLKj+btCfgxVARrDkR+/R+GbgzGfqoJXy3uw0k5Jmno/vcZ3GZKxP9MnFw6BumfFi87HgFjcB4AZfxqXespdDNMT/EAvsrAVUmoh8tWgERJPplUZ6AN23dPky0Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xK0/NUjQ; arc=none smtp.client-ip=209.85.167.41
+	 To:Cc:Content-Type; b=a7nI1+8hshcPqOLhEQcsKpsy30vJ6l99xGSlzyml7vMarQiZIVPrqcgwg/hH88+GgLP7zn/V/9M8bfRAJz3GAnje8hQcvCt9++ZlJXDHFjrM56rcPmL2YyliqQaiasPvhknhNsGHX41LE1HHQAaiyLA8xNoYQilN92yyShCL4iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qc0EqQe+; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-55f6b77c91fso523e87.1
-        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 13:25:32 -0700 (PDT)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4b350971a2eso10701cf.1
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 13:27:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757103931; x=1757708731; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757104060; x=1757708860; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+kgKtkFSvFxN0+GOpeYsXguLH3MBg6T1r5BTTkCZlzY=;
-        b=xK0/NUjQqo/hoVq2QmNugemb0MSHJ3Puy3iK/1XltHHynDreQX2xz1JbFk8ZiOg1Y+
-         Fn0OUBhY2/S5dqTfsH7oQeSF0gO/XwVkdLeAe/ATlqObmtG+esTeI6jTxgZBET73+PWf
-         0pXmO055SqE2fH9d6qD7GMwt9epkZOmmilWnB1KtQr9COd3XOx1UEyRDuWMwQDwPzWVi
-         aOQvNK7OL6z9Etu2B81OOuIsFDa6xZCXn+qhkuJKLTGrkCNGraxBAXGYqMYNFIbwcmzs
-         8srrf2Iv+fELp4cNK4EcQAbDsqNQ3PS7+rHUe8t7aOGuYvACq0VDrfyJAb2I66cY4APY
-         WgDg==
+        bh=XnOSyH9gVwIP7L51PyZbW30kMGoAG/Gr8tTNYNRdOAg=;
+        b=qc0EqQe+j8pPqszXzJfuTeZpu22juDkphJWP2rEEu4hKp2C+J+VPUfYqNG0J2sRMK1
+         J9IbR2Ql2Y43RZ8uWp/tJ7B/iGn/xYe+o0Tnoyk59o1J/LXR0RpdtsNhj3wWCgjJYCNC
+         LMzZHB0CnvnQD2ZcMeN0UiveOjsA8+0LlpD4PWsXu0ErBXdrYgtdyznLyJYzrvxw8hHu
+         rI5Ba3xEOZxVS9KCIIK9kiRFCCJpWQ9zWCsmHwfn0SP0TGkkxQhbXRgts2QOLEEg0QTc
+         FcRydOJ7oNsv/BkEdb8RJDmaK7GluSizKNrsHh3Az3dHgQ/0CH8i7yr77GgcKIujY/af
+         K+7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757103931; x=1757708731;
+        d=1e100.net; s=20230601; t=1757104060; x=1757708860;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+kgKtkFSvFxN0+GOpeYsXguLH3MBg6T1r5BTTkCZlzY=;
-        b=E2JCnLDb0fKf+JCcsuHh9chwQKADXoYP9SwHIcNdhqXI376AnF37EEv+EVy0GIg7QV
-         V/1YOp9IfgvwH5pLzzTOdSMLZ1xiodDUI8+B7V1+4HH7PkBjbVtn8j3hq/eYbALPhXP2
-         jMX/qP8CMIvTKHFPKXKQGmXNF2SVokbURFrP6qmxa3K2NYrjVmwZt+5O4CCCnOMkixyo
-         x9RJbJrmAfwCa5vnD8Uk6QcicecWbMnRfBDuDIoixAgBsdS306PNJHhr4oEhWekAQWFq
-         qNdAsRlrfAxBvnE60BzCymDQvyXwdTESbcrvh95ultKXbpseoUodZzy2/lQWlye2cjiK
-         LAEA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZhJCSfd4EFwVVUAiKpfvaOYzqOk7bKZ1+i5NqOCjNc27+8uvBwNqL4s6T+h1mO4wiV6iHSo4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyX3S631vaGKODFJYBK2I5XmN8qysWby/aOMlTUxxEIzRPE5ECD
-	GL5nGDk0YF94iwFu3LDzGjjFqEoOscxcpVUZp5P1wvAW0ueujbIL9+ET4IYxQgsGqFgwzwK2fr4
-	caz0uK5cL0/KiX3gqXNWEVXz3oI3dUGDUTB+/ruuR
-X-Gm-Gg: ASbGncsRnfqbcWXbOFKV2gl8ZLC6QWqC+qHTY35Lvq0hNk4Cy8jO2dx4ulKyp48Kjzl
-	CnzTxwvCFk4DcULV5p4CMapL4jpeY5Eowl5Ng/s5EAVXHGK1n0yH+a9SfZJi03HbSCUJdX2tVJA
-	HCuwfiM16grymc+bvrNlq9wny1rPWy5OrwDum2vMbkYuOtZLOgCB9qxPK5MqjUg3069V+ItibVG
-	FUnRekTL8ZZmY0n67HxdEBdXA==
-X-Google-Smtp-Source: AGHT+IEjoWid/fO8vEMfv+XUMnPq6NXM0UqfApFnVsvTvRttvhe+pHkGQgOO0iJz7aagmll2Km1pmMI4XrtkuYW71QE=
-X-Received: by 2002:a05:6512:617:10b0:55f:68fe:76d4 with SMTP id
- 2adb3069b0e04-5624d92cfb5mr44215e87.5.1757103930911; Fri, 05 Sep 2025
- 13:25:30 -0700 (PDT)
+        bh=XnOSyH9gVwIP7L51PyZbW30kMGoAG/Gr8tTNYNRdOAg=;
+        b=lYvtNRCr3a/3R3wszgonNUjMZQjDr5+P8u0f0vpBWFRufQkhaMkWJTfeog4UyzgSGp
+         ft4K00DQK+M0nWC5lqaNkXAj1jPeRUkbA/TvpESj9awCRlNUzF907RGyflLVK2P/0z8k
+         0FHud/VnaQbzXfk3ZnBRAjpX5sJim3vibEB2c+HwNKRtFHy+muypW4jvxcvP/cOyZSUv
+         fwAYEKjEIXF/8G7RbBB///sHjSr6rQmiRvut6mgVvm5eZFUqAFIrwm/C5QOyrsPk7dlh
+         OyQI5bZzk39vqVL90n3ocYF3p3OeiQsc2qVjKyDu8TiT4Cf+l/f4dmwjWa0yJ39YByjI
+         IRow==
+X-Forwarded-Encrypted: i=1; AJvYcCVSCDnsPerk/ofg78nBJDHphKc7W7W9Dj2wmGuGwXAg8FlqYajoaYPMj9PZzu/SX0TXgz++m64=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJEHxWPCskB/yuuJID5IwAN5LygHykiToLjqSNwNc9AAos1Xs3
+	O3jbVXfrNKMc27kYtZmUT2q8wqzCIGQfwopvpSYXyuLLDoqVyo2ZHc0ouUiqmXl7uctzYC/6gmY
+	Q59nhGWIn4N2bxcuFQFZX8vxhocNsjxfnPF18jhzE4KF0W6XkYW1J4BOKvhM=
+X-Gm-Gg: ASbGncuROlT/eI8DihRnYW+Vh+k4hZHlaGhnORVQVDZn1uUvnLbcP7L+r4JPouN9gXO
+	RkBO0SLB2oZpkqYka63w1UFbhcr6NjrMQKLlNc2td1yc01mrZ2rLHxdGXeRazNlt36BV7DRBzQ1
+	H5vvUjxPO6YoYQbX7o36PlJLB4u4DpPWpWCm2YaQYu8bAdv4NhW7fKitDbC6odmAOuQY9EBb6Mc
+	iVh8ARFZD2wHnQ=
+X-Google-Smtp-Source: AGHT+IGb0MXJP0PPpNgaFvJB25jLD6SvEl/0d/GriZPhi0Fy43Tde7ezxgHRokpkLdf68vDraY1xpX2xAzWehJRs/dU=
+X-Received: by 2002:ac8:7c53:0:b0:4b0:f1f3:db94 with SMTP id
+ d75a77b69052e-4b5f71c0111mr741891cf.5.1757104059628; Fri, 05 Sep 2025
+ 13:27:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
- <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-2-d946169b5550@meta.com>
- <CAHS8izPrf1b_H_FNu2JtnMVpaD6SwHGvg6bC=Fjd4zfp=-pd6w@mail.gmail.com> <aLjaIwkpO64rJtui@devvm11784.nha0.facebook.com>
-In-Reply-To: <aLjaIwkpO64rJtui@devvm11784.nha0.facebook.com>
+References: <20250904182710.1586473-1-sdf@fomichev.me> <CAHS8izOSq+mYmP58eNqC5WFTvXxh+s8gRSrTv6YQdq6jn41pMw@mail.gmail.com>
+ <aLsAP-UgtINNwIMJ@mini-arch>
+In-Reply-To: <aLsAP-UgtINNwIMJ@mini-arch>
 From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 5 Sep 2025 13:25:18 -0700
-X-Gm-Features: Ac12FXyWRe7ahZJ70LMfFa5mWgcNJGy3jsE6h5CiZdZTxZA96gMHBx-UbV5x83g
-Message-ID: <CAHS8izMe+u1pFzX5U_Mvifn3VNY2WGqi_uDvqWdG7RwPKW3z6A@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: devmem: use niov array for token management
-To: Bobby Eshleman <bobbyeshleman@gmail.com>, Matthew Wilcox <willy@infradead.org>, 
-	Samiullah Khawaja <skhawaja@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
+Date: Fri, 5 Sep 2025 13:27:24 -0700
+X-Gm-Features: Ac12FXxNO4qBPz9G8i4siY2NgdPBP8JaFKGrZdh40tif6ilU7toruzJdzZ84m08
+Message-ID: <CAHS8izNR8OSZA-F8d9s4GeRSJsnJKwW1nVc+wv01h8yo=V=6fQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: ncdevmem: don't retry EFAULT
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, shuah@kernel.org, joe@dama.to, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 3, 2025 at 5:15=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gmail.=
-com> wrote:
+On Fri, Sep 5, 2025 at 8:22=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
+.com> wrote:
 >
-> On Wed, Sep 03, 2025 at 01:20:57PM -0700, Mina Almasry wrote:
-> > On Tue, Sep 2, 2025 at 2:36=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gm=
-ail.com> wrote:
+> On 09/04, Mina Almasry wrote:
+> > On Thu, Sep 4, 2025 at 11:27=E2=80=AFAM Stanislav Fomichev <sdf@fomiche=
+v.me> wrote:
 > > >
-> > > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > >
-> > > Improve CPU performance of devmem token management by using page offs=
-ets
-> > > as dmabuf tokens and using them for direct array access lookups inste=
-ad
-> > > of xarray lookups. Consequently, the xarray can be removed. The resul=
-t
-> > > is an average 5% reduction in CPU cycles spent by devmem RX user
-> > > threads.
-> > >
+> > > devmem test fails on NIPA. Most likely we get skb(s) with readable
+> > > frags (why?)
 > >
-> > Great!
+> > I would expect if we get readable frags that the frags land in the
+> > host buffer we provide ncdevmem and we actually hit this error:
 > >
->
-> Hey Mina, thanks for the feedback!
->
-> > > This patch changes the meaning of tokens. Tokens previously referred =
-to
-> > > unique fragments of pages. In this patch tokens instead represent
-> > > references to pages, not fragments.  Because of this, multiple tokens
-> > > may refer to the same page and so have identical value (e.g., two sma=
-ll
-> > > fragments may coexist on the same page). The token and offset pair th=
-at
-> > > the user receives uniquely identifies fragments if needed.  This assu=
-mes
-> > > that the user is not attempting to sort / uniq the token list using
-> > > tokens alone.
-> > >
-> > > A new restriction is added to the implementation: devmem RX sockets
-> > > cannot switch dmabuf bindings. In practice, this is a symptom of inva=
-lid
-> > > configuration as a flow would have to be steered to a different queue=
- or
-> > > device where there is a different binding, which is generally bad for
-> > > TCP flows.
+> > ```
+> >   1                 if (!is_devmem) {
+> >   0                         pr_err("flow steering error");
+> >   1                         goto err_close_client;
+> >   2                 }
+> > ```
 > >
-> > Please do not assume configurations you don't use/care about are
-> > invalid. Currently reconfiguring flow steering while a flow is active
-> > works as intended today. This is a regression that needs to be
-> > resolved. But more importantly, looking at your code, I don't think
-> > this is a restriction you need to introduce?
-> >
+> > which as it says, should be root caused in a flow steering error. I
+> > don't know what would cause an EFAULT off the top of my head.
 >
-> That's fair, let's see if we can lift it.
+> Yea, I don't understand what happens :-( I'm thinking of doing the
+> following as well:
 >
-> > > This restriction is necessary because the 32-bit dmabuf token
-> > > does not have enough bits to represent both the pages in a large dmab=
-uf
-> > > and also a binding or dmabuf ID. For example, a system with 8 NICs an=
-d
-> > > 32 queues requires 8 bits for a binding / queue ID (8 NICs * 32 queue=
-s
-> > > =3D=3D 256 queues total =3D=3D 2^8), which leaves only 24 bits for dm=
-abuf pages
-> > > (2^24 * 4096 / (1<<30) =3D=3D 64GB). This is insufficient for the dev=
-ice and
-> > > queue numbers on many current systems or systems that may need larger
-> > > GPU dmabufs (as for hard limits, my current H100 has 80GB GPU memory =
-per
-> > > device).
-> > >
-> > > Using kperf[1] with 4 flows and workers, this patch improves receive
-> > > worker CPU util by ~4.9% with slightly better throughput.
-> > >
-> > > Before, mean cpu util for rx workers ~83.6%:
-> > >
-> > > Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %st=
-eal  %guest  %gnice   %idle
-> > > Average:       4    2.30    0.00   79.43    0.00    0.65    0.21    0=
-.00    0.00    0.00   17.41
-> > > Average:       5    2.27    0.00   80.40    0.00    0.45    0.21    0=
-.00    0.00    0.00   16.67
-> > > Average:       6    2.28    0.00   80.47    0.00    0.46    0.25    0=
-.00    0.00    0.00   16.54
-> > > Average:       7    2.42    0.00   82.05    0.00    0.46    0.21    0=
-.00    0.00    0.00   14.86
-> > >
-> > > After, mean cpu util % for rx workers ~78.7%:
-> > >
-> > > Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %st=
-eal  %guest  %gnice   %idle
-> > > Average:       4    2.61    0.00   73.31    0.00    0.76    0.11    0=
-.00    0.00    0.00   23.20
-> > > Average:       5    2.95    0.00   74.24    0.00    0.66    0.22    0=
-.00    0.00    0.00   21.94
-> > > Average:       6    2.81    0.00   73.38    0.00    0.97    0.11    0=
-.00    0.00    0.00   22.73
-> > > Average:       7    3.05    0.00   78.76    0.00    0.76    0.11    0=
-.00    0.00    0.00   17.32
-> > >
-> >
-> > I think effectively all you're doing in this patch is removing xarray
-> > with a regular array, right? I'm surprised an xarray account for 5%
-> > cpu utilization. I wonder if you have debug configs turned on during
-> > these experiments. Can you perf trace what about the xarray is taking
-> > so long? I wonder if we're just using xarrays improperly (maybe
-> > hitting constant resizing slow paths or something), and a similar
-> > improvement can be gotten by adjusting the xarray flags or what not.
-> >
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 40b774b4f587..0c18a8c7965f 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -2820,7 +2820,7 @@ static int tcp_recvmsg_locked(struct sock *sk, stru=
+ct msghdr *msg, size_t len,
+>                                                          used);
+>                                 if (err <=3D 0) {
+>                                         if (!copied)
+> -                                               copied =3D -EFAULT;
+> +                                               copied =3D err;
 >
-> That is right.
+>                                         break;
+>                                 }
 >
-> Here is some perf data gathered from:
->
->         perf record -a -g -F 99 -C 0-7 -- sleep 5
->
-> RX queues pinned to 0-3 and kperf server pinned to 4-7.
->
->     11.25%  server       [kernel.kallsyms]                               =
-       [k] tcp_recvmsg
->             |
->              --10.98%--tcp_recvmsg
->                        bpf_trampoline_6442594803
->                        tcp_recvmsg
->                        inet6_recvmsg
->                        ____sys_recvmsg
->                        ___sys_recvmsg
->                        __x64_sys_recvmsg
->                        do_syscall_64
->                        entry_SYSCALL_64_after_hwframe
->                        __libc_recvmsg
->                        |
->                         --2.74%--0x100000082
->
->      5.65%  server       [kernel.kallsyms]                               =
-       [k] xas_store
->             |
->              --5.63%--xas_store
->                        |
->                        |--3.92%--__xa_erase
->                        |          sock_devmem_dontneed
->                        |          sk_setsockopt
->                        |          __x64_sys_setsockopt
->                        |          do_syscall_64
->                        |          entry_SYSCALL_64_after_hwframe
->                        |          __GI___setsockopt
->                        |          0x4f00000001
->                        |
->                        |--0.94%--__xa_alloc
->                        |          tcp_recvmsg
->                        |          bpf_trampoline_6442594803
->                        |          tcp_recvmsg
->                        |          inet6_recvmsg
->                        |          ____sys_recvmsg
->                        |          ___sys_recvmsg
->                        |          __x64_sys_recvmsg
->                        |          do_syscall_64
->                        |          entry_SYSCALL_64_after_hwframe
->                        |          __libc_recvmsg
->                        |
->                         --0.76%--__xa_cmpxchg
->                                   tcp_xa_pool_commit_locked
->                                   tcp_xa_pool_commit
->                                   tcp_recvmsg
->                                   bpf_trampoline_6442594803
->                                   tcp_recvmsg
->                                   inet6_recvmsg
->                                   ____sys_recvmsg
->                                   ___sys_recvmsg
->                                   __x64_sys_recvmsg
->                                   do_syscall_64
->                                   entry_SYSCALL_64_after_hwframe
->                                   __libc_recvmsg
->
->
->      [...]
->
->      1.22%  server       [kernel.kallsyms]                               =
-       [k] xas_find_marked
->             |
->              --1.19%--xas_find_marked
->                        __xa_alloc
->                        tcp_recvmsg
->                        bpf_trampoline_6442594803
->                        tcp_recvmsg
->                        inet6_recvmsg
->                        ____sys_recvmsg
->                        ___sys_recvmsg
->                        __x64_sys_recvmsg
->                        do_syscall_64
->                        entry_SYSCALL_64_after_hwframe
->                        __libc_recvmsg
->
+> Should give us more info for the devmem case... LMK if you don't like
+> it. If I don't hear from you in a couple of days, I'll send it out..
 
-One thing that is a bit weird is that you're seeing 5.67% + 1.19%
-overall overhead for xarrays, but when you do the hacky
-just-give-userspace-the-pointer experiment you see a full 10%
-reduction. But that's beside the point.
+Hmm, the other code paths overwrite the error to EFAULT; I don't know
+if that's significant in some way. But seems fine to me, I don't see
+why not do this, other than maybe potentional confusion with recvmsg
+returning an error not documented here:
 
->
-> Here is the output from zcat /proc/config.gz | grep DEBUG | grep =3Dy, I'=
-m
-> not 100% sure which may be worth toggling. I'm happy to rerun the
-> experiments if any of these are suspicious looking:
->
-> CONFIG_X86_DEBUGCTLMSR=3Dy
-> CONFIG_ARCH_SUPPORTS_DEBUG_PAGEALLOC=3Dy
-> CONFIG_BLK_DEBUG_FS=3Dy
-> CONFIG_BFQ_CGROUP_DEBUG=3Dy
-> CONFIG_CMA_DEBUGFS=3Dy
-> CONFIG_FW_LOADER_DEBUG=3Dy
-> CONFIG_PNP_DEBUG_MESSAGES=3Dy
-> CONFIG_SCSI_LPFC_DEBUG_FS=3Dy
-> CONFIG_MLX4_DEBUG=3Dy
-> CONFIG_INFINIBAND_MTHCA_DEBUG=3Dy
-> CONFIG_NFS_DEBUG=3Dy
-> CONFIG_SUNRPC_DEBUG=3Dy
-> CONFIG_DYNAMIC_DEBUG=3Dy
-> CONFIG_DYNAMIC_DEBUG_CORE=3Dy
-> CONFIG_DEBUG_BUGVERBOSE=3Dy
-> CONFIG_DEBUG_KERNEL=3Dy
-> CONFIG_DEBUG_MISC=3Dy
-> CONFIG_DEBUG_INFO=3Dy
-> CONFIG_DEBUG_INFO_DWARF4=3Dy
-> CONFIG_DEBUG_INFO_COMPRESSED_NONE=3Dy
-> CONFIG_DEBUG_INFO_BTF=3Dy
-> CONFIG_DEBUG_INFO_BTF_MODULES=3Dy
-> CONFIG_DEBUG_FS=3Dy
-> CONFIG_DEBUG_FS_ALLOW_ALL=3Dy
-> CONFIG_SLUB_DEBUG=3Dy
-> CONFIG_DEBUG_PAGE_REF=3Dy
-> CONFIG_ARCH_HAS_DEBUG_WX=3Dy
-> CONFIG_HAVE_DEBUG_KMEMLEAK=3Dy
-> CONFIG_ARCH_HAS_DEBUG_VM_PGTABLE=3Dy
-> CONFIG_ARCH_HAS_DEBUG_VIRTUAL=3Dy
-> CONFIG_DEBUG_MEMORY_INIT=3Dy
-> CONFIG_SCHED_DEBUG=3Dy
-> CONFIG_LOCK_DEBUGGING_SUPPORT=3Dy
-> CONFIG_CSD_LOCK_WAIT_DEBUG=3Dy
-> CONFIG_CSD_LOCK_WAIT_DEBUG_DEFAULT=3Dy
-> CONFIG_DEBUG_CGROUP_REF=3Dy
-> CONFIG_FAULT_INJECTION_DEBUG_FS=3Dy
->
->
+https://linux.die.net/man/2/recvmsg
 
-Thanks for the detailed data here. Nothing overly wrong jumps at me.
+But that seems a minor point.
 
-Cc Matthew Wilcox here. Maybe he can spot something obviously wrong
-with how we're using xarrays that can be optimized.
 
-> For more context, I did a few other experiments before eventually
-> landing on this patch:
->
-> 1) hacky approach - don't do any token management at all, replace dmabuf
->    token with 64-bit pointer to niov, teach recvmsg() /
->    sock_devmem_dontneed() to inc/dec the niov reference directly... this
->    actually reduced the CPU util by a very consistent 10%+ per worker
->    (the largest delta of all my experiements).
->
-> 2) keep xarray, but use RCU/lockless lookups in both recvmsg/dontneed.
->    Use page indices + xa_insert instead of xa_alloc. Acquire lock only if
->    lockless lookup returns null in recvmsg path. Don't erase in dontneed,
->    only take rcu_read_lock() and do lookup. Let xarray grow according to
->    usage and cleanup when the socket is destroyed. Surprisingly, this
->    didn't offer noticeable improvement.
->
-> 3) use normal array but no atomics -- incorrect, but saw good improvement=
-,
->    despite possibility of leaked references.
->
-> 4) use a hashmap + bucket locks instead of xarray --  performed way
->    worse than xarray, no change to token
->
-> > > Mean throughput improves, but falls within a standard deviation (~45G=
-B/s
-> > > for 4 flows on a 50GB/s NIC, one hop).
-> > >
-> > > This patch adds an array of atomics for counting the tokens returned =
-to
-> > > the user for a given page. There is a 4-byte atomic per page in the
-> > > dmabuf per socket. Given a 2GB dmabuf, this array is 2MB.
-> > >
-> > > [1]: https://github.com/facebookexperimental/kperf
-> > >
-> > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > > ---
-> > >  include/net/sock.h       |   5 ++-
-> > >  net/core/devmem.c        |  17 ++++----
-> > >  net/core/devmem.h        |   2 +-
-> > >  net/core/sock.c          |  24 +++++++----
-> > >  net/ipv4/tcp.c           | 107 +++++++++++++++----------------------=
-----------
-> > >  net/ipv4/tcp_ipv4.c      |  40 +++++++++++++++---
-> > >  net/ipv4/tcp_minisocks.c |   2 -
-> > >  7 files changed, 99 insertions(+), 98 deletions(-)
-> > >
-> > > diff --git a/include/net/sock.h b/include/net/sock.h
-> > > index 1e7f124871d2..70c97880229d 100644
-> > > --- a/include/net/sock.h
-> > > +++ b/include/net/sock.h
-> > > @@ -573,7 +573,10 @@ struct sock {
-> > >  #endif
-> > >         struct rcu_head         sk_rcu;
-> > >         netns_tracker           ns_tracker;
-> > > -       struct xarray           sk_user_frags;
-> > > +       struct {
-> > > +               struct net_devmem_dmabuf_binding        *binding;
-> > > +               atomic_t                                *urefs;
-> > > +       } sk_user_frags;
-> > >
-> >
-> > AFAIU, if you made sk_user_frags an array of (unref, binding) tuples
-> > instead of just an array of urefs then you can remove the
-> > single-binding restriction.
-> >
-> > Although, I wonder what happens if the socket receives the netmem at
-> > the same index on 2 different dmabufs. At that point I assume the
-> > wrong uref gets incremented? :(
-> >
->
-> Right. We need some bits to differentiate bindings. Here are some ideas
-> I've had about this, I wonder what your thoughts are on them:
->
-> 1) Encode a subset of bindings and wait for availability if the encoding
-> space becomes exhausted. For example, we could encode the binding in 5
-> bits for outstanding references across 32 bindings and 27 bits (512 GB)
-> of dmabuf. If recvmsg wants to return a reference to a 33rd binding, it
-> waits until the user returns enough tokens to release one of the binding
-> encoding bits (at which point it could be reused for the new reference).
->
-
-This, I think, sounds reasonable. supporting up to 2^5 rx dmabuf
-bindings at once and 2^27 max dmabuf size should be fine for us I
-think. Although you have to be patient with me, I have to make sure
-via tests and code inspection that these new limits will be OK. Also
-please understand the risk that even if the changes don't break us,
-they may break someone and have to be reverted anyway, although I
-think the risk is small.
-
-Another suggestion I got from the team is to use a bitmap instead of
-an array of atomics. I initially thought this could work, but thinking
-about it more, I think that would not work, no? Because it's not 100%
-guaranteed that the socket will only get 1 ref on a net_iov. In the
-case where the driver fragments the net_iov, multiple difference frags
-could point to the same net_iov which means multiple refs. So it seems
-we're stuck with an array of atomic_t.
-
-> 2) opt into an extended token (dmabuf_token_v2) via sockopts, and add
-> the binding ID or other needed information there.
->
-
-Eh, I would say this is an overkill? Today the limit of dma-bufs
-supported is 2^27 and I think the dmabuf size is technically 2^32 or
-something, but I don't know that we need all this flexibility for
-devmem tcp. I think adding a breakdown like above may be fine.
-
-> > One way or another the single-binding restriction needs to be removed
-> > I think. It's regressing a UAPI that currently works.
-> >
-
-Thinking about this more, if we can't figure out a different way and
-have to have a strict 1 socket to 1 dma-buf mapping, that may be
-acceptable...
-
-...the best way to do it is actually to do this, I think, would be to
-actually make sure the user can't break the mapping via `ethtool -N`.
-I.e. when the user tells us to update or delete a flow steering rule
-that belongs to a devmem socket, reject the request altogether. At
-that point we could we can be sure that the mapping would not change
-anyway. Although I don't know how feasible to implement this is.
-
-AFAICT as well AF_XDP is in a similar boat to devmem in this regard.
-The AF_XDP docs require flow steering to be configured for the data to
-be available in the umem (and I assume, if flow steering is
-reconfigured then the data disappears from the umem?). Stan do you
-know how this works? If AF_XDP allows the user to break it by
-reconfiguring flow steering it may also be reasonable to allow the
-user to break a devmem socket as well (although maybe with
-clarification in the docs.
-
---
+--=20
 Thanks,
 Mina
 
