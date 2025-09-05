@@ -1,311 +1,139 @@
-Return-Path: <netdev+bounces-220386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 141FDB45B10
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:55:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB88B45B05
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB4643A5BE8
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:55:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36DB916F8CC
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697E9374291;
-	Fri,  5 Sep 2025 14:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85EE3705BE;
+	Fri,  5 Sep 2025 14:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="K0Y/8SqW"
+	dkim=pass (2048-bit key) header.d=superluminal.eu header.i=@superluminal.eu header.b="YWDkWDlO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D8537426A;
-	Fri,  5 Sep 2025 14:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0800036C091
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 14:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757084086; cv=none; b=M9E4BRlSRHTtD+BVzEQ+q3aNaAdJ6xotcxgJdUxOjSDcx57zdPVAukzf5/3PSpBuovBz0EMeuEjzUiBJIwVKzcfHXBs9XD1l7VAF57LNSQdFXuW5NFSWXcTtUGAJRDpZ7tOvVxSIa6N3vKF6jBH1jnamwVFZYmFhjaRrD9EDi7c=
+	t=1757084072; cv=none; b=J34ImVUDsVI86tFRKFQN7EDrT131JPnpxKbg/btU7jN4ijRO+qlT+idkaTnvD8IN/6ld5IQ+pxZWCipXcoHWqLbxYeCZehMWSJH83x/WpE4nq7/lxaOzIM1BwT393u05Jyyht2YO+jmhf91UWvagBsTpoBd5TFJWjAdH7DsgmsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757084086; c=relaxed/simple;
-	bh=my8n0VdtD6tyNiTnWCJ0CNPczTLx4CJRbjLGICDOhww=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k2Pmhf0OssH2BbL81zDEv+enW+WReq8O+WAXULo+MramgNyyseNCm7c2yxa7CF4Z+MT81IIGZbvhLZ6RcnufNa/6USlGG3ngw+cqRFn23SjcftIJyFn3MOBTBOX/2Cxop540CSJ09a+gALQEVilJMyozQc3Ba15p5mDxWakXxo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=K0Y/8SqW; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 585CxSDG005481;
-	Fri, 5 Sep 2025 14:54:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=XGinc7QtK05TLMEec
-	tvTR+us6jj6cPq6NUC6PBDN/00=; b=K0Y/8SqWgpGTwzkyCYyvhTGW6R+80Yis4
-	WkBjfGOvhdPyjYOIjZdA4j6CE9iE/HC+ifYP6+voS+izQdxR81cx676Lif0MZbV7
-	Ni364XQ4HR1Npq5iF/zlqJznDAUTJMUlU4DILhpAEtUrKlRYDOd6uQG6/RFjbISV
-	8FjbYHmLxTAXmE3/Ec6WG7mOkjlofw0H4MFBmRUId91NC2uQ9+v+oyKDBmTJPcol
-	5X40DCoWewttj7P1mhZ1861xU5pXTiHdmCd17ymteQBRmnpvOKASiVF955HB3oo/
-	xQLI/VdEjx7bLcg9sxKv2Iou4bvD/HSAHpt9AAnZXnzZeutTLdmnA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvg88wm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Sep 2025 14:54:33 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 585EngrN028470;
-	Fri, 5 Sep 2025 14:54:33 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvg88wg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Sep 2025 14:54:33 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 585D0He3019442;
-	Fri, 5 Sep 2025 14:54:32 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vd4n9tv8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Sep 2025 14:54:32 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 585EsScH56689144
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Sep 2025 14:54:28 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6E17D20043;
-	Fri,  5 Sep 2025 14:54:28 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5915E20040;
-	Fri,  5 Sep 2025 14:54:28 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  5 Sep 2025 14:54:28 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id 23C5FE115D; Fri, 05 Sep 2025 16:54:28 +0200 (CEST)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Julian Ruess <julianr@linux.ibm.com>,
-        Aswin Karuvally <aswin@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 04/14] net/dibs: Register smc as dibs_client
-Date: Fri,  5 Sep 2025 16:54:17 +0200
-Message-ID: <20250905145428.1962105-5-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250905145428.1962105-1-wintera@linux.ibm.com>
-References: <20250905145428.1962105-1-wintera@linux.ibm.com>
+	s=arc-20240116; t=1757084072; c=relaxed/simple;
+	bh=2QGDmWuuR0Q3I5spDA6jKf30IjmU5r3dVWiu2VclS8c=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=DaMuRUs01F3d/9obn9jultmiJGhzZ7a2uzvE5vxSine83yAFxp7m3ouKLq6fHvpgmRWnVyUkRfVz0pMh3A2uefTpX0cOxs2KjQa0ayZWl658BOrsYRVvvR4x40SvNpHWmEZwcrZxsd7Hq0R4yVRgbdZ1FOTjT/C+3stNMIaWkkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=superluminal.eu; spf=pass smtp.mailfrom=superluminal.eu; dkim=pass (2048-bit key) header.d=superluminal.eu header.i=@superluminal.eu header.b=YWDkWDlO; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=superluminal.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=superluminal.eu
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b4755f37c3eso1793064a12.3
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 07:54:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=superluminal.eu; s=google; t=1757084069; x=1757688869; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EUGswAdRItueoSYQPU7jm1v44GCGzqxzoNxIhfsat5o=;
+        b=YWDkWDlOiSO0t24AQ3irHXNwg9LbNARWYiP53d3aqXTyTnZxRM1Aq4r+UL5Y6T7FOx
+         rRq/3vqf5z7yGLtJZxEb4BcQD+IB04Ja2Ai+7MFLet0xcGOrKXAKVbWUZ/mcE1sr2ylQ
+         bkvWtm/LkDa7hwsilHsz02sXfq/crBqShdZX/CO2H5IS6xH2xR8r2Sz5QHg55V+6x+GD
+         HK9PaJu4q6SP75LDQDhS69MfeWfca3hEZF9e13Yzak2vquGL7R63ydYGN+ciOz3qUStp
+         FbyQUU/NMMHGxmFCeNKQld6TvKZ84BjaSl7V+MoK8v7nJ7AO4aKoQ6HgDTPcbVHFjrUt
+         qInw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757084069; x=1757688869;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EUGswAdRItueoSYQPU7jm1v44GCGzqxzoNxIhfsat5o=;
+        b=pROjC4xSChLxE9i83YnMFNouEBldXO9BNHeDpPapqxJf/EUotlOX13kXmCgYdqREvj
+         nRXsLNSDTHhr2OEwepfViX+nKGYcN1y8x16AqUqSJ+lgzQRHA/69S0TD10QWTFt5xLwA
+         Khsk3po1tHMOtlPBm8aFotmas0Y+Znuop6s37ZlhXpmloNZqwMZ56PqWEGpEFQgYgLfG
+         tUp5CrAzi82eiRObWnzMpMiHMPCA1KmVUjze0Kk0BPjUK3u/+eUvOVNd1WXYH+2RfzCr
+         FOXCnNMlq0sUEsGxLpsUWfwdXwrkcBEsT7FbGtux72oisG0iM1yJjDZZXOUJgtJs5F3I
+         mP/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX1ZQpigkASBsw9mH/wJVsR1uwj47b+fC1jvBgv0dA8tgUpPHnWHX5eBXrq7EshvxYfcRNqv3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4snN97oYqVNmngLiAWlxQpvSw1KaVGMXGm+uMYF5Olb6l557s
+	znE8T5F2XrP9NDhD5S+tAak7+sqJK0hkAn3whkTLQRt41E04+9czhqS2qrPQVgbN+Ky6IurEWqr
+	zr0ml7wueL9QoyiCvtxITZ//Vpp1UOUIXVZtg/aasA+xtZtibk02E95Q=
+X-Gm-Gg: ASbGnct6sPevbnmz3ux+bc/HyWlt4s8hrBXtxEsHQvQhLNnMoF4ktVuKNADSBOqPkX8
+	7KkYkPEh1JjlFEhFKF1qYq5sCFZ/zSE12LGbPyjbSQGU5VqugSAlz5kNsEd/mcz3XpJX6tuPIJw
+	hgqmfAKQVJjsv61OHzsLQslZRQyrRgFKpmKbIhDvkzqnIg/h4jtS0vkVENwTpUqxNMLxdXMWqkh
+	4rTvX/qzisq0Qv9Ozc=
+X-Google-Smtp-Source: AGHT+IGVDRL34ICZB5fqSj2g9AtAWwf3kFf6mJXzvvv5/3qI+MxVFX9TpEgwbnmZmNOIWDnKTMYULgUtrubVy57+FB4=
+X-Received: by 2002:a17:90b:1d8f:b0:32d:17ce:49d5 with SMTP id
+ 98e67ed59e1d1-32d17ce4d41mr1018715a91.23.1757084068872; Fri, 05 Sep 2025
+ 07:54:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=behrUPPB c=1 sm=1 tr=0 ts=68baf9a9 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=ToqWdGCbH8b2siDz3c8A:9
-X-Proofpoint-ORIG-GUID: pta4jJzoYdXgfzi6t8EsRIciSbVu6vHW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzNCBTYWx0ZWRfX2IE68SkTDoJG
- 6G++oXL9dQXlKlP2Qa0/yDDXHKgHu9sWZZQUt13rHBY7hP/ODUr5eLf+dPyZ9BXVCs344q8LvbU
- GBFeMIiMYvViplQRjN3Ptlj3PwMTGUo8MDAbhHMs8VuKVjsAQi0PWlGEB10IRJCzW1ohmcWOJsE
- 44gJBu5cKOMQ0ckH6bqXEozHt7XzfYr/UlIvEkK7CDLZAwvE8swt/svZJnji1egkoF1S0sYNO+B
- 93TzHlxLwchw3WqAeA97twBG3ZRB6k9vxSflV16duWwc2pCuCa4jBr80cZBHP9Sw3g7ZGmMIKoq
- e3/+88xAZ+daZnoLRWL1koT3VAUtjr9tcSqONCVgpvzMqZyk20LyPMyM2t4ljTDf9pIky7eeTYW
- Hf8tdJdU
-X-Proofpoint-GUID: A4MKpF2E3LZV8OEAdj_PQeAMtRgDbEYg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-05_05,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 impostorscore=0 spamscore=0 clxscore=1015 phishscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300034
+From: Ritesh Oedayrajsingh Varma <ritesh@superluminal.eu>
+Date: Fri, 5 Sep 2025 16:54:18 +0200
+X-Gm-Features: Ac12FXyFQZlSvqRV8e5HtPwJGSWd3jeHqhyyAqZRVdEAQ49uh4b1P8F6oU6aHts
+Message-ID: <CAH6OuBRzMZfa2kR6KYw2-F3mo3LfqwdVDqLSAD6e-xU9C56Fdw@mail.gmail.com>
+Subject: Kernel lockup on bpf_probe_read_kernel in BPF_PROG_TYPE_RAW_TRACEPOINT
+ sched_switch program
+To: bpf <bpf@vger.kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Formally register smc as dibs client. Functionality will be moved by
-follow-on patches from ism_client to dibs_client until eventually
-ism_client can be removed.
-As DIBS is only a shim layer without any dependencies, we can depend SMC
-on DIBS without adding indirect dependencies. A follow-on patch will
-remove dependency of SMC on ISM.
+Hi,
 
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-Reviewed-by: Julian Ruess <julianr@linux.ibm.com>
----
- arch/s390/configs/debug_defconfig |  1 +
- arch/s390/configs/defconfig       |  1 +
- include/linux/dibs.h              | 24 ++++++++++++++++++++-
- net/dibs/dibs_main.c              | 35 +++++++++++++++++++++++++++++++
- net/smc/Kconfig                   |  2 +-
- net/smc/smc_ism.c                 |  6 ++++++
- 6 files changed, 67 insertions(+), 2 deletions(-)
+We're running into an issue with our eBPF-based CPU profiler that
+we've been attempting to debug for a week now. The issue is that as
+soon as our eBPF program(s) are attached, the entire system (kernel)
+hangs, but only on specific distributions. We've managed to reduce the
+problem down to the following code:
 
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index 5e616bc988ac..7bc54f053a3b 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -120,6 +120,7 @@ CONFIG_UNIX=y
- CONFIG_UNIX_DIAG=m
- CONFIG_XFRM_USER=m
- CONFIG_NET_KEY=m
-+CONFIG_DIBS=y
- CONFIG_SMC_DIAG=m
- CONFIG_SMC_LO=y
- CONFIG_INET=y
-diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-index 094599cdaf4d..4bf6f3311f7d 100644
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@ -111,6 +111,7 @@ CONFIG_UNIX=y
- CONFIG_UNIX_DIAG=m
- CONFIG_XFRM_USER=m
- CONFIG_NET_KEY=m
-+CONFIG_DIBS=y
- CONFIG_SMC_DIAG=m
- CONFIG_SMC_LO=y
- CONFIG_INET=y
-diff --git a/include/linux/dibs.h b/include/linux/dibs.h
-index 3f4175aaa732..5c432699becb 100644
---- a/include/linux/dibs.h
-+++ b/include/linux/dibs.h
-@@ -33,10 +33,32 @@
-  * clients.
-  */
- 
-+/* DIBS client
-+ * -----------
-+ */
- #define MAX_DIBS_CLIENTS	8
--
- struct dibs_client {
-+	/* client name for logging and debugging purposes */
- 	const char *name;
-+	/* client index - provided and used by dibs layer */
-+	u8 id;
- };
- 
-+/* Functions to be called by dibs clients:
-+ */
-+/**
-+ * dibs_register_client() - register a client with dibs layer
-+ * @client: this client
-+ *
-+ * Return: zero on success.
-+ */
-+int dibs_register_client(struct dibs_client *client);
-+/**
-+ * dibs_unregister_client() - unregister a client with dibs layer
-+ * @client: this client
-+ *
-+ * Return: zero on success.
-+ */
-+int dibs_unregister_client(struct dibs_client *client);
-+
- #endif	/* _DIBS_H */
-diff --git a/net/dibs/dibs_main.c b/net/dibs/dibs_main.c
-index 68e189932fcf..a5d2be9c3246 100644
---- a/net/dibs/dibs_main.c
-+++ b/net/dibs/dibs_main.c
-@@ -20,6 +20,41 @@ MODULE_LICENSE("GPL");
- /* use an array rather a list for fast mapping: */
- static struct dibs_client *clients[MAX_DIBS_CLIENTS];
- static u8 max_client;
-+static DEFINE_MUTEX(clients_lock);
-+
-+int dibs_register_client(struct dibs_client *client)
-+{
-+	int i, rc = -ENOSPC;
-+
-+	mutex_lock(&clients_lock);
-+	for (i = 0; i < MAX_DIBS_CLIENTS; ++i) {
-+		if (!clients[i]) {
-+			clients[i] = client;
-+			client->id = i;
-+			if (i == max_client)
-+				max_client++;
-+			rc = 0;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&clients_lock);
-+
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(dibs_register_client);
-+
-+int dibs_unregister_client(struct dibs_client *client)
-+{
-+	int rc = 0;
-+
-+	mutex_lock(&clients_lock);
-+	clients[client->id] = NULL;
-+	if (client->id + 1 == max_client)
-+		max_client--;
-+	mutex_unlock(&clients_lock);
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(dibs_unregister_client);
- 
- static int __init dibs_init(void)
- {
-diff --git a/net/smc/Kconfig b/net/smc/Kconfig
-index ba5e6a2dd2fd..40dd60c1d23f 100644
---- a/net/smc/Kconfig
-+++ b/net/smc/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config SMC
- 	tristate "SMC socket protocol family"
--	depends on INET && INFINIBAND
-+	depends on INET && INFINIBAND && DIBS
- 	depends on m || ISM != m
- 	help
- 	  SMC-R provides a "sockets over RDMA" solution making use of
-diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
-index 503a9f93b392..a7a965e3c0ce 100644
---- a/net/smc/smc_ism.c
-+++ b/net/smc/smc_ism.c
-@@ -18,6 +18,7 @@
- #include "smc_pnet.h"
- #include "smc_netlink.h"
- #include "linux/ism.h"
-+#include "linux/dibs.h"
- 
- struct smcd_dev_list smcd_dev_list = {
- 	.list = LIST_HEAD_INIT(smcd_dev_list.list),
-@@ -42,6 +43,9 @@ static struct ism_client smc_ism_client = {
- 	.handle_irq = smcd_handle_irq,
- };
- #endif
-+static struct dibs_client smc_dibs_client = {
-+	.name = "SMC-D",
-+};
- 
- static void smc_ism_create_system_eid(void)
- {
-@@ -623,11 +627,13 @@ int smc_ism_init(void)
- #if IS_ENABLED(CONFIG_ISM)
- 	rc = ism_register_client(&smc_ism_client);
- #endif
-+	rc = dibs_register_client(&smc_dibs_client);
- 	return rc;
- }
- 
- void smc_ism_exit(void)
- {
-+	dibs_unregister_client(&smc_dibs_client);
- #if IS_ENABLED(CONFIG_ISM)
- 	ism_unregister_client(&smc_ism_client);
- #endif
--- 
-2.48.1
+SEC("raw_tracepoint/sched_switch")
+int raw_tracepoint__sched__sched_switch(struct bpf_raw_tracepoint_args *ctx)
+{
+    struct task_struct *prev_task = (struct task_struct
+*)BPF_CORE_READ(ctx, args[1]);
+    struct task_struct *next_task = (struct task_struct
+*)BPF_CORE_READ(ctx, args[2]);
+    return 0;
+}
 
+i.e. this is just a raw tracepoint attached to sched_switch. Loading &
+attaching this program, which just reads the tracepoint args, will
+result in the system immediately locking up on some distributions. It
+works fine on Ubuntu, Debian (on various distros & kernel versions),
+but will hang on Arch and Fedora. As far as we can tell there is no
+relation to kernel version; we've tested both old (5.11 on Fedora 34)
+and new (6.16.3-arch1-1 on Arch) kernels and both hang immediately
+when this program executes.
+
+The code above calls BPF_CORE_READ, which compiles down to
+bpf_probe_read_kernel, which we've verified by dumping the xlated
+version of the program after loading it (without attaching it. And
+indeed, if we replace the BPF_CORE_READ with direct calls to
+bpf_probe_read_kernel, it hangs in the same way.
+
+To debug, we've attempted the following:
+
+- Enabled nmi_watchdog, hardlockup_panic, softlockup_panic and hard &
+softlockup backtraces. This doesn't give any further information.
+- There is no relevant output from dmesg
+- Regarding Arch, of note is that a Manjaro distro with its own kernel
+works fine, but an Arch kernel doesn't. We suspect there is some kind
+of kernel config option this code is interacting badly with, but we
+have been unable to find such an option by diffing the kernel configs
+of both the working & non-working machines.
+- Attaching a kernel debugger via network. Unfortunately, the lockup
+also locks up the networking layer, so gdb is unable to remotely
+inspect the hanging state. We're currently in the process of setting
+up a serial debugger.
+
+We'll continue debugging this on our end once we get the serial
+debugger components, but we were wondering if anybody has seen this
+before or has any tips with regards to tracking down the cause of the
+hang? Any input would be greatly appreciated.
+
+Thanks,
+Ritesh
 
