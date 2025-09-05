@@ -1,422 +1,433 @@
-Return-Path: <netdev+bounces-220364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60560B4592E
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:35:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FECB45937
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:36:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98E2BA46BD3
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:33:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 873F4A63410
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEF635690E;
-	Fri,  5 Sep 2025 13:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDB2352FCC;
+	Fri,  5 Sep 2025 13:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gk0qEOrJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hgW+7Puz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB077352FE8;
-	Fri,  5 Sep 2025 13:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47FC19E7F8
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 13:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757079114; cv=none; b=oaZ6ADfU1RIsdqwmCXuPAQquKQkfmjQh6DROb1VYfiS1R0G1Hw1z0veHFLrFiNUiGsPnze9jMasmk6pBY/Fb9I2r89frBkKIdvqzsm6PpMYJQugZFUEaHgpwluId80x5fHd2qsKrxamyg0ekQujNV1Qf01cE4jUqzQopum+Z7B8=
+	t=1757079241; cv=none; b=JClkRS30rWNhO4D0dAY1UyqVGqY0l4ek6NXL2t+9GYqVSgwOenLxcZYzI7C3gC7LRrS1XZnPUb8fV7Lum0yZHitwXt5svol3b1xAlwca6RQbRzS+fNL2NOPf0oRNRKJn3m+OhgkhsgnaUom5DjuCZTVv7wt/sEOA6X8TGaLYBtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757079114; c=relaxed/simple;
-	bh=dD2pWAomXulcS3/+dPx3Yrf7QGxwFE4KGaN50EHM08Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YbhilQGlkP44GCAR+duVaoYuHrD4ebJdALSFS7rx0QuqrI4h+QH0o4HjXujIUu+NR2VHamR+EMbwNb6AifGWFcpsXMA+QrNKa4vjlPgu3Q+UXD1Fodkvi7t0y1b43c0p6LobKv54cd/bgi21bhrc9NkjCTAXrTi+Pa2amloh65Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gk0qEOrJ; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b2f4ac4786so20793951cf.1;
-        Fri, 05 Sep 2025 06:31:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757079112; x=1757683912; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=30AUT6oybHIq18kHlQCSnYEHacbfTx4Cddlh71/sjbo=;
-        b=gk0qEOrJVv30ADalj4Tbl/PJv67ZunHE05Qi/jdkQg+lfy4fV9lEXjS7F6rthQ0KdR
-         iniBRQjkLL3HmnvBVxD6Gn7riOm6Ebs5AGmqDgnvon6ARl5q0bqxL6O5Ut9TsQZZCtlc
-         XC3SPLrZzn6uZncoplRWoNQij+8Ff6MNm8rffn2xoqvhZrVO3sasQjhM9dzM8yWWsph6
-         +SfTaPkfFUBmK1G62JaAjhRxKFtHLZfvhhMmgcgfnKOtxILQSBhYNyRj8wJmdb1XwkCY
-         cb0ifseFG4DXUXXx+T385M8dTekrVmPtwyV3LJ/sXo55YKEOZBx46VK9pVqEQlbWIJgV
-         LiXw==
+	s=arc-20240116; t=1757079241; c=relaxed/simple;
+	bh=M5kL1DWiHxC8HBRL7RK4kHJCGbD58JRqQpOAjzxS+rM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Rj0fsw7F0t+CKM7P8AzXnbMJImaY413HXh3Cb7PMbzyjEuvp2s3aGG6XARPD0724iCl/vTzsbcyY0aITKh6FCaQMb4ZhXD8LGxNLW0h0IpiFvykuWgEHgYHUZecYz6/tOu2PpIdGO40HxBE3FhVQgio6zWSr0xg7uFvgbWvsH4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hgW+7Puz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757079238;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=L75Ve+iRza3J2BOmhaoByxg544P0HRluNjtPLGxTEYE=;
+	b=hgW+7PuzzlFNKGREnzqUeZNHkBHYHRCPdsy2WgvHc3lggM0LGPkv/SdffWwH5h86wWyTa1
+	8O0D8C0wIIW7RUgKip9g7upjjpm76sfuykSwnPY9slVfzSWqhd2urqZ6GU3PV7ASwPk2oj
+	U8HsO0wZzL4M7VZ9AbChIsvw07xP1MM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-344-pnCYxjXmPPyCPjGRHb6DbA-1; Fri, 05 Sep 2025 09:33:56 -0400
+X-MC-Unique: pnCYxjXmPPyCPjGRHb6DbA-1
+X-Mimecast-MFC-AGG-ID: pnCYxjXmPPyCPjGRHb6DbA_1757079235
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45dd56f0000so8223005e9.2
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 06:33:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757079112; x=1757683912;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=30AUT6oybHIq18kHlQCSnYEHacbfTx4Cddlh71/sjbo=;
-        b=vXLLFliYwMtlK7xFBx3KuVngun6ya2t21jVlm125NRZGJUyL4sRctAla/UO39vEo1m
-         k4+xfrqnVUOJEjZ16TTHsgXINUnTVB7ZDsfYx7/6s0q1h7poVVJ/gg1hRALQIiXZqIX7
-         d4AfFSfTJfl8uY9jVeU14ihgT88YcCuREbvYxSlWFvYWiZmOjpsBoHHV1f5BT91bzfhA
-         dtFgTpyLC0BbkgDold7qtGTHjXNg+A0mwHsYv27QRxn+tmpmGpgLUb5RHQPefYSbF1Zt
-         gW2ir490a0oquS38b9k5vqj2J4t26KVz1x40o/SQt+KY0mcH6kqrxBMDU+oPChdZu1xO
-         sxig==
-X-Forwarded-Encrypted: i=1; AJvYcCUHbLOJOtfOqLmZP36JUTNxa/PUDuISiVQsjZ/ghi2CN3T82NGYqVzylH3OeUZXyvgbNKtlYFU=@vger.kernel.org, AJvYcCWV5UUeCCLq9ewF3G/ecfvy3lDjIrtFUtNaKmovsMh9gNjsEHMWuh7Gqiek8OXPUQ0fS/2ypjKuIHz4mU8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI/F7CFVinjncaFb3FwDUz/yaomtwSPWa0tRhOh25KIu7U/lQG
-	rf4j+Byvh6ET2VRSaUhJTYv+BDwzGFv4HxH/GUyze8k3yjBvmuaif/MkuqAZRPnjW2TeaVRRkUM
-	W88hDzYKvwsjNuT8JpGp+J6w8rS7qsN0=
-X-Gm-Gg: ASbGncuUpsS0jkcPFaF8qTV38T7RBHU6EphZnImq7uryG0NcetqWJQii27fVUlwe/Nc
-	xWjICibhgjL1CdZM1EWW76aedvy/ceTHqDINQi65PZtIJzczsyCjnqCdBtrH4MBjlksngKaeqmj
-	tBNyZK8OSl54c0tDkHvb9NluKDSAjSlM1f1pM0U9aWdU0Q2QXQJaZVuz2/JPdk1PNY4b25UC1On
-	jx7vcOktfrdWtfgMg==
-X-Google-Smtp-Source: AGHT+IEt6aCtE8z5vPljz9s1TGZ8eDMB2c9LDTFXBPOSMZ/UIHmGnDL3XVycTV3DZ3PXIBt5JcrAQzNoByZBWTQLU+E=
-X-Received: by 2002:ac8:5890:0:b0:4b2:9510:79ab with SMTP id
- d75a77b69052e-4b31d80cc5emr293434341cf.13.1757079111458; Fri, 05 Sep 2025
- 06:31:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757079234; x=1757684034;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L75Ve+iRza3J2BOmhaoByxg544P0HRluNjtPLGxTEYE=;
+        b=c4MqYAIfjhZh4JvOu665UgQ4JdaVVvGJAgrcYRniR1RKvQeU41Tft5NHg4CFx5tks2
+         RKNOlr45yxoPZGWIrB+/tK30+kEJuU4C+yuFVQ9edPeOhteb1tlAzFRz+FzckhfI4FQw
+         6B1cv08cx/DGGSufhPtx/4hTL7k+6xTaXBELhE1Wv9jZ46VRqhlYPg/hYC5uyFkmOgor
+         qqm0CA7k2159m0blMu2Ytpn8lS2J6JVqnX16WkNPUiJvxhnZ8DtVMAT23+fGLTzXJPMW
+         rN9Y4Xu+x8in/EYff8Rup7oN3MitA4zQu+m0Gi28Da7kbj0os+BEu3SrKrMXlDYspTNq
+         MijA==
+X-Gm-Message-State: AOJu0YxoI9FFdA4zuH7ecExQvFzL/iFa8+gfoJ8Qm/6a41DU7GhoFHAC
+	lJBEzQF7Nv5oromz1Y9zsO7SXju2dWXd7rSvGqxioQoSRUIul2G0sCiiR3R9mTHAwEs/CV5aLu6
+	BSlSIiHVtc+VLktP+PNFfkC8I9BHo+9ziqzDqXIzJk3xTy2PhZaxxUx1q4A==
+X-Gm-Gg: ASbGncubqXR7HYN52MvVKSBp4Xjt1Ku2kPSxFjNGHkLVPKeVMlXHaLPE0j4UZelGVC7
+	i1YF5TSKWqrHzP4c+Kq2Mu9jB9Ta/7KHNDzL+jSgl6zI04BvfHFfkrA/DAstC+C4TTWP1p35w3v
+	diWn2Mr6oUlckG9q2RWMzYViVmKATgoTlutJYR8gccwgeKERVnJFxpPemgQXFT4/K4mMqbIoSLw
+	4Ot4GujWjwIF8rRT7dmfHNbkgIAcOiup8NOmSjbcTe0dExADlqmbDqP/1oWD3r58ddBGqy8QtGC
+	qrcAsh4eHKjxGNMrwZimXtpeTWkfhj/DPbEFewSGFyK9NS6zixafyshTNe4z07P6gbJQJ3uw240
+	FcLV2rawotkoHZ7zC+UDOPavlHt3kIgrSXJLVNU2F69puwDnsjgMmArBp
+X-Received: by 2002:a05:600c:a47:b0:450:cabd:b4a9 with SMTP id 5b1f17b1804b1-45b8557ca38mr175398935e9.29.1757079234380;
+        Fri, 05 Sep 2025 06:33:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+fK4njzXhUrPEHdg4ZnHjGnWnN0sIDALaf4eBc1iXW75gebk5o/deFisHZbu4fcN8bHC9uA==
+X-Received: by 2002:a05:600c:a47:b0:450:cabd:b4a9 with SMTP id 5b1f17b1804b1-45b8557ca38mr175398545e9.29.1757079233819;
+        Fri, 05 Sep 2025 06:33:53 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f4d:e00:298:59cc:2514:52? (p200300d82f4d0e00029859cc25140052.dip0.t-ipconnect.de. [2003:d8:2f4d:e00:298:59cc:2514:52])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b945332adsm189156785e9.4.2025.09.05.06.33.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Sep 2025 06:33:53 -0700 (PDT)
+Message-ID: <5966d02a-bfda-463c-a2e6-10e9c7eed2f7@redhat.com>
+Date: Fri, 5 Sep 2025 15:33:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK3+h2wLLoVW_daqow_ygbut=KnDkPbvG_C8rOoyaiyFMnrPLg@mail.gmail.com>
- <0b697d49-adbb-48d5-bbfa-f90c79fb3a4d@kernel.org> <CAK3+h2xQFeVtkPb+Sr1k+E0Fre+8hi_QfWYd3ueK-2B1FgJmGA@mail.gmail.com>
- <CAK3+h2xx8Zp-tRvw7rG4XjBWd_2D=TqZ=+cRYp9tzuyva0qeXA@mail.gmail.com> <04169545-c40d-4ae1-8fd9-39e4c47472a4@kernel.org>
-In-Reply-To: <04169545-c40d-4ae1-8fd9-39e4c47472a4@kernel.org>
-From: Vincent Li <vincent.mc.li@gmail.com>
-Date: Fri, 5 Sep 2025 06:31:37 -0700
-X-Gm-Features: Ac12FXz4IDRp9hRggNiMHykOx-iCTzezR5-1gzmeqpGsdE6JG1FJG7O_K5ykTVA
-Message-ID: <CAK3+h2y84g=GDnWgFzNc_pLZQEZDPWxuR0YFsbNqsx5u_YoU5w@mail.gmail.com>
-Subject: Re: [BUG?] driver stmmac reports page_pool_release_retry() stalled
- pool shutdown every minute
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, netdev@vger.kernel.org, 
-	xdp-newbies@vger.kernel.org, loongarch@lists.linux.dev, 
-	Furong Xu <0x1207@gmail.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>, 
-	Philipp Stanner <phasta@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Qunqin Zhao <zhaoqunqin@loongson.cn>, Yanteng Si <si.yanteng@linux.dev>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: next-20250905: x86_64: udpgso_bench.sh triggers NULL deref in
+ zerocopy_fill_skb_from_iter
+From: David Hildenbrand <david@redhat.com>
+To: Eric Dumazet <edumazet@google.com>,
+ Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: Netdev <netdev@vger.kernel.org>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org,
+ Linux Regressions <regressions@lists.linux.dev>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Biggers <ebiggers@google.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+ Ben Copeland <benjamin.copeland@linaro.org>,
+ Anders Roxell <anders.roxell@linaro.org>, Shuah Khan <shuah@kernel.org>,
+ Willem de Bruijn <willemb@google.com>, Pengtao He <hept.hept.hept@gmail.com>
+References: <CA+G9fYsmo39mXw-U7VKJgHWTBB5bXNgwOqNfmDWRqvbqmxnD2g@mail.gmail.com>
+ <CANn89iKciN019j88sGYpi_Boi7ggJoSnV4gOW=5grp+skkKnBA@mail.gmail.com>
+ <a4e4be39-b0e6-4632-878d-0765c9475984@redhat.com>
+ <0118a233-90fc-484b-b539-d8df641a25ad@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <0118a233-90fc-484b-b539-d8df641a25ad@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 5, 2025 at 12:59=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel=
-.org> wrote:
->
->
->
-> On 02/09/2025 01.27, Vincent Li wrote:
-> > On Mon, Sep 1, 2025 at 10:56=E2=80=AFAM Vincent Li <vincent.mc.li@gmail=
-.com> wrote:
-> >>
-> >> On Mon, Sep 1, 2025 at 2:23=E2=80=AFAM Jesper Dangaard Brouer <hawk@ke=
-rnel.org> wrote:
-> >>>
-> >>> On 01/09/2025 04.47, Vincent Li wrote:
-> >>>> Hi,
-> >>>>
-> >>>> I noticed once I attached a XDP program to a dwmac-loongson-pci
-> >>>> network device on a loongarch PC, the kernel logs stalled pool messa=
-ge
-> >>>> below every minute, it seems  not to affect network traffic though. =
-it
-> >>>> does not seem to be architecture dependent, so I decided to report
-> >>>> this to netdev and XDP mailing list in case there is a bug in stmmac
-> >>>> related network device with XDP.
-> >>>>
-> >>>
-> >>> Dragos (Cc'ed) gave a very detailed talk[1] about debugging page_pool
-> >>> leaks, that I highly recommend:
-> >>>    [1]
-> >>> https://netdevconf.info/0x19/sessions/tutorial/diagnosing-page-pool-l=
-eaks.html
-> >>>
-> >>> Before doing kernel debugging with drgn, I have some easier steps, I
-> >>> want you to perform on your hardware (I cannot reproduce given I don'=
-t
-> >>> have this hardware).
-> >>
-> >> I watched the video and slide, I would have difficulty running drgn
-> >> since the loongfire OS [0] I am running does not have proper python
-> >> support. loongfire is a port of IPFire for LoongArch architecture. The
-> >> kernel is upstream stable release 6.15.9  with a backport of LoongArch
-> >> BPF trampoline for supporting xdp-tools. I run loongfire on a
-> >> LoongArch PC for my home Internet. I tried to reproduce this issue on
-> >> the LoongArch PC with a Fedora desktop OS release with the same kernel
-> >> 6.15.9, I can't reproduce the issue, not sure if this is only
-> >> reproducible for firewall/router like Linux OS with stmmac device.
-> >>
-> >>>
-> >>> First step is to check is a socket have unprocessed packets stalled i=
-n
-> >>> it receive-queue (Recv-Q).  Use command 'netstat -tapenu' and look at
-> >>> column "Recv-Q".  If any socket/application have not emptied it's Rec=
-v-Q
-> >>> try to restart this service and see if the "stalled pool shutdown" go=
-es
-> >>> away.
-> >>
-> >> the Recv-Q shows 0 from  'netstat -tapenu'
-> >>
->
-> This tell us that is wasn't an easy case of packets waiting in a socket
-> queue.  Indicating a higher probability of a driver issue.
->
-> >>   [root@loongfire ~]#  netstat -tapenu
-> >> Active Internet connections (servers and established)
-> >> Proto Recv-Q Send-Q Local Address           Foreign Address
-> >> State       User       Inode      PID/Program name
-> >> tcp        0      0 127.0.0.1:8953          0.0.0.0:*
-> >> LISTEN      0          10283      1896/unbound
-> >> tcp        0      0 0.0.0.0:53              0.0.0.0:*
-> >> LISTEN      0          10281      1896/unbound
-> >> tcp        0      0 0.0.0.0:22              0.0.0.0:*
-> >> LISTEN      0          8708       2823/sshd: /usr/sbi
-> >> tcp        0    272 192.168.9.1:22          192.168.9.13:58660
-> >> ESTABLISHED 0          8754       3004/sshd-session:
-> >> tcp6       0      0 :::81                   :::*
-> >> LISTEN      0          7828       2841/httpd
-> >> tcp6       0      0 :::444                  :::*
-> >> LISTEN      0          7832       2841/httpd
-> >> tcp6       0      0 :::1013                 :::*
-> >> LISTEN      0          7836       2841/httpd
-> >> tcp6       0      0 10.0.0.229:444          192.168.9.13:58762
-> >> TIME_WAIT   0          0          -
-> >> udp        0      0 0.0.0.0:53              0.0.0.0:*
-> >>           0          10280      1896/unbound
-> >> udp        0      0 0.0.0.0:67              0.0.0.0:*
-> >>           0          10647      2803/dhcpd
-> >> udp        0      0 10.0.0.229:68           0.0.0.0:*
-> >>           0          8644       2659/dhcpcd: [BOOTP
-> >> udp        0      0 10.0.0.229:123          0.0.0.0:*
-> >>           0          8679       2757/ntpd
-> >> udp        0      0 192.168.9.1:123         0.0.0.0:*
-> >>           0          8678       2757/ntpd
-> >> udp        0      0 127.0.0.1:123           0.0.0.0:*
-> >>           0          8677       2757/ntpd
-> >> udp        0      0 0.0.0.0:123             0.0.0.0:*
-> >>           0          8670       2757/ntpd
-> >> udp        0      0 0.0.0.0:514             0.0.0.0:*
-> >>           0          5689       1864/syslogd
-> >> udp6       0      0 :::123                  :::*
-> >>           0          8667       2757/ntpd
-> >>
-> >>> Second step is compiling kernel with CONFIG_DEBUG_VM enabled. This wi=
-ll
-> >>> warn us if the driver leaked the a page_pool controlled page, without
-> >>> first "releasing" is correctly.  See commit dba1b8a7ab68 ("mm/page_po=
-ol:
-> >>> catch page_pool memory leaks") for how the warning will look like.
-> >>>    (p.s. this CONFIG_DEBUG_VM have surprisingly low-overhead, as long=
- as
-> >>> you don't select any sub-options, so we choose to run with this in
-> >>> production).
-> >>>
-> >>
-> >> I added CONFIG_DEBUG_VM and recompiled the kernel, but no kernel
-> >> warning message about page leak, maybe false positive?
-> >>
->
-> This just tells us that the inflight page_pool page wasn't "illegality"
-> returned to the MM-subsystem.  So, this page is stuck somewhere in the
-> system, still "registered" to a page_pool instance. This is even more
-> indication of a driver bug.
->
-> We are almost out of easy options to try.  The last attempt I want you
-> to try is to unload the NIC drivers kernel module (via rmmod).  And then
-> wait to see if the "stalled pool shutdown" messages disappears. I hope
-> you have some serial console, so you can still observe the kernel log.
->
+On 05.09.25 15:28, David Hildenbrand wrote:
+> On 05.09.25 15:07, David Hildenbrand wrote:
+>> On 05.09.25 14:55, Eric Dumazet wrote:
+>>> On Fri, Sep 5, 2025 at 2:30 AM Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>>>>
+>>>> The following kernel crash was noticed on x86_64 running selftests net
+>>>> udpgso_bench.sh
+>>>> on Linux next-20250905 tag.
+>>>>
+>>>> Regression Analysis:
+>>>> - New regression? yes
+>>>> - Reproducibility? Re-validation is in progress
+>>>>
+>>>> First seen on next-20250905
+>>>> Bad: next-20250905
+>>>> Good: next-20250904
+>>>>
+>>>> Test regression: next-20250905 x86_64 selftests net BUG kernel NULL
+>>>> pointer dereference zerocopy_fill_skb_from_iter
+>>>>
+>>>> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>>>>
+>>>> x86_64:
+>>>>     Test:
+>>>>        * selftests: net: udpgso_bench.sh
+>>>>
+>>>> Test error:
+>>>> selftests: net: udpgso_bench.sh
+>>>> ipv4
+>>>> tcp
+>>>>
+>>>> <trim>
+>>>>
+>>>> # tcp zerocopy
+>>>> [  991.110488] SELinux: unrecognized netlink message: protocol=4
+>>>> nlmsg_type=19 sclass=netlink_tcpdiag_socket pid=64835 comm=ss
+>>>> # RTNETLINK answers: Invalid argument
+>>>> [  991.129878] BUG: kernel NULL pointer dereference, address: 0000000000000008
+>>>> [  991.136850] #PF: supervisor read access in kernel mode
+>>>> [  991.141986] #PF: error_code(0x0000) - not-present page
+>>>> [  991.147118] PGD 0 P4D 0
+>>>> [  991.149657] Oops: Oops: 0000 [#1] SMP PTI
+>>>> [  991.153661] CPU: 0 UID: 0 PID: 64842 Comm: udpgso_bench_tx Tainted:
+>>>> G S                  6.17.0-rc4-next-20250905 #1 PREEMPT(voluntary)
+>>>> [  991.165907] Tainted: [S]=CPU_OUT_OF_SPEC
+>>>> [  991.169825] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+>>>> 2.7 12/07/2021
+>>>> [  991.177209] RIP: 0010:zerocopy_fill_skb_from_iter
+>>>> (include/linux/page-flags.h:284)
+>>>> [ 991.182954] Code: 4d 85 c0 0f 84 04 01 00 00 44 39 c7 41 0f 4d f8 4c
+>>>> 63 de 4a 8b 54 dc 30 49 89 d6 4d 29 ce 49 c1 fe 06 49 d3 ee 4d 85 f6
+>>>> 74 24 <48> 8b 4a 08 f6 c1 01 0f 85 cb 00 00 00 0f 1f 44 00 00 31 c9 48
+>>>> f7
+>>>> All code
+>>>> ========
+>>>>       0: 4d 85 c0              test   %r8,%r8
+>>>>       3: 0f 84 04 01 00 00    je     0x10d
+>>>>       9: 44 39 c7              cmp    %r8d,%edi
+>>>>       c: 41 0f 4d f8          cmovge %r8d,%edi
+>>>>      10: 4c 63 de              movslq %esi,%r11
+>>>>      13: 4a 8b 54 dc 30        mov    0x30(%rsp,%r11,8),%rdx
+>>>>      18: 49 89 d6              mov    %rdx,%r14
+>>>>      1b: 4d 29 ce              sub    %r9,%r14
+>>>>      1e: 49 c1 fe 06          sar    $0x6,%r14
+>>>>      22: 49 d3 ee              shr    %cl,%r14
+>>>>      25: 4d 85 f6              test   %r14,%r14
+>>>>      28: 74 24                je     0x4e
+>>>>      2a:* 48 8b 4a 08          mov    0x8(%rdx),%rcx <-- trapping instruction
+>>>>      2e: f6 c1 01              test   $0x1,%cl
+>>>>      31: 0f 85 cb 00 00 00    jne    0x102
+>>>>      37: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
+>>>>      3c: 31 c9                xor    %ecx,%ecx
+>>>>      3e: 48                    rex.W
+>>>>      3f: f7                    .byte 0xf7
+>>>>
+>>>> Code starting with the faulting instruction
+>>>> ===========================================
+>>>>       0: 48 8b 4a 08          mov    0x8(%rdx),%rcx
+>>>>       4: f6 c1 01              test   $0x1,%cl
+>>>>       7: 0f 85 cb 00 00 00    jne    0xd8
+>>>>       d: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
+>>>>      12: 31 c9                xor    %ecx,%ecx
+>>>>      14: 48                    rex.W
+>>>>      15: f7                    .byte 0xf7
+>>>> [  991.201691] RSP: 0018:ffffb11281d0ba90 EFLAGS: 00010202
+>>>> [  991.206910] RAX: ffffe14ec4208000 RBX: 0000000000005000 RCX: 0000000000000009
+>>>> [  991.214033] RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000001000
+>>>> [  991.221156] RBP: ffffb11281d0bb88 R08: 00000000000020ff R09: ffffe14ec4208000
+>>>> [  991.228280] R10: 0000000000000005 R11: 0000000000000006 R12: ffff96b4825f4200
+>>>> [  991.235406] R13: 0000000000000001 R14: 000000003d6277bf R15: 0000000000000000
+>>>> [  991.242529] FS:  00007f41e80b9740(0000) GS:ffff96b83bc1b000(0000)
+>>>> knlGS:0000000000000000
+>>>> [  991.250608] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [  991.256378] CR2: 0000000000000008 CR3: 0000000106c42003 CR4: 00000000003706f0
+>>>> [  991.263513] Call Trace:
+>>>> [  991.265956]  <TASK>
+>>>> [  991.268055] __zerocopy_sg_from_iter (net/core/datagram.c:?)
+>>>> [  991.272674] ? kmalloc_reserve (net/core/skbuff.c:581)
+>>>> [  991.276599] skb_zerocopy_iter_stream (net/core/skbuff.c:1867)
+>>>> [  991.281219] tcp_sendmsg_locked (net/ipv4/tcp.c:1283)
+>>>> [  991.285493] tcp_sendmsg (net/ipv4/tcp.c:1393)
+>>>> [  991.288896] inet6_sendmsg (net/ipv6/af_inet6.c:661)
+>>>> [  991.292466] __sock_sendmsg (net/socket.c:717)
+>>>> [  991.296126] __sys_sendto (net/socket.c:?)
+>>>> [  991.299785] __x64_sys_sendto (net/socket.c:2235 net/socket.c:2231
+>>>> net/socket.c:2231)
+>>>> [  991.303622] x64_sys_call (arch/x86/entry/syscall_64.c:41)
+>>>> [  991.307462] do_syscall_64 (arch/x86/entry/syscall_64.c:?)
+>>>> [  991.311128] ? irqentry_exit (kernel/entry/common.c:210)
+>>>> [  991.314881] ? exc_page_fault (arch/x86/mm/fault.c:1536)
+>>>> [  991.318720] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+>>>> [  991.323762] RIP: 0033:0x7f41e814b687
+>>>> [ 991.327352] Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00
+>>>> 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10
+>>>> 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff
+>>>> ff
+>>>> All code
+>>>> ========
+>>>>       0: 48 89 fa              mov    %rdi,%rdx
+>>>>       3: 4c 89 df              mov    %r11,%rdi
+>>>>       6: e8 58 b3 00 00        call   0xb363
+>>>>       b: 8b 93 08 03 00 00    mov    0x308(%rbx),%edx
+>>>>      11: 59                    pop    %rcx
+>>>>      12: 5e                    pop    %rsi
+>>>>      13: 48 83 f8 fc          cmp    $0xfffffffffffffffc,%rax
+>>>>      17: 74 1a                je     0x33
+>>>>      19: 5b                    pop    %rbx
+>>>>      1a: c3                    ret
+>>>>      1b: 0f 1f 84 00 00 00 00 nopl   0x0(%rax,%rax,1)
+>>>>      22: 00
+>>>>      23: 48 8b 44 24 10        mov    0x10(%rsp),%rax
+>>>>      28: 0f 05                syscall
+>>>>      2a:* 5b                    pop    %rbx <-- trapping instruction
+>>>>      2b: c3                    ret
+>>>>      2c: 0f 1f 80 00 00 00 00 nopl   0x0(%rax)
+>>>>      33: 83 e2 39              and    $0x39,%edx
+>>>>      36: 83 fa 08              cmp    $0x8,%edx
+>>>>      39: 75 de                jne    0x19
+>>>>      3b: e8 23 ff ff ff        call   0xffffffffffffff63
+>>>>
+>>>> Code starting with the faulting instruction
+>>>> ===========================================
+>>>>       0: 5b                    pop    %rbx
+>>>>       1: c3                    ret
+>>>>       2: 0f 1f 80 00 00 00 00 nopl   0x0(%rax)
+>>>>       9: 83 e2 39              and    $0x39,%edx
+>>>>       c: 83 fa 08              cmp    $0x8,%edx
+>>>>       f: 75 de                jne    0xffffffffffffffef
+>>>>      11: e8 23 ff ff ff        call   0xffffffffffffff39
+>>>> [  991.346124] RSP: 002b:00007ffdd843ba50 EFLAGS: 00000202 ORIG_RAX:
+>>>> 000000000000002c
+>>>> [  991.353680] RAX: ffffffffffffffda RBX: 00007f41e80b9740 RCX: 00007f41e814b687
+>>>> [  991.360806] RDX: 000000000000f180 RSI: 000056251f1fd100 RDI: 0000000000000005
+>>>> [  991.367931] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+>>>> [  991.375063] R10: 0000000004000000 R11: 0000000000000202 R12: 0000000000000000
+>>>> [  991.382193] R13: 000056251f1fb080 R14: 000001a670e438d8 R15: 0000000000000005
+>>>> [  991.389357]  </TASK>
+>>>> [  991.391571] Modules linked in: mptcp_diag tcp_diag inet_diag
+>>>> xt_conntrack xfrm_user ipip bridge stp llc geneve vxlan act_csum
+>>>> act_pedit openvswitch nsh nf_nat nf_conntrack nf_defrag_ipv6
+>>>> nf_defrag_ipv4 psample cls_flower sch_prio xt_mark nft_compat
+>>>> nf_tables sch_ingress act_mirred cls_basic sch_fq_codel vrf pktgen
+>>>> macvtap macvlan tap x86_pkg_temp_thermal ip_tables x_tables [last
+>>>> unloaded: test_bpf]
+>>>> [  991.426812] CR2: 0000000000000008
+>>>> [  991.430121] ---[ end trace 0000000000000000 ]---
+>>>> [  991.434733] RIP: 0010:zerocopy_fill_skb_from_iter
+>>>> (include/linux/page-flags.h:284)
+>>>> [ 991.440477] Code: 4d 85 c0 0f 84 04 01 00 00 44 39 c7 41 0f 4d f8 4c
+>>>> 63 de 4a 8b 54 dc 30 49 89 d6 4d 29 ce 49 c1 fe 06 49 d3 ee 4d 85 f6
+>>>> 74 24 <48> 8b 4a 08 f6 c1 01 0f 85 cb 00 00 00 0f 1f 44 00 00 31 c9 48
+>>>> f7
+>>>> All code
+>>>> ========
+>>>>       0: 4d 85 c0              test   %r8,%r8
+>>>>       3: 0f 84 04 01 00 00    je     0x10d
+>>>>       9: 44 39 c7              cmp    %r8d,%edi
+>>>>       c: 41 0f 4d f8          cmovge %r8d,%edi
+>>>>      10: 4c 63 de              movslq %esi,%r11
+>>>>      13: 4a 8b 54 dc 30        mov    0x30(%rsp,%r11,8),%rdx
+>>>>      18: 49 89 d6              mov    %rdx,%r14
+>>>>      1b: 4d 29 ce              sub    %r9,%r14
+>>>>      1e: 49 c1 fe 06          sar    $0x6,%r14
+>>>>      22: 49 d3 ee              shr    %cl,%r14
+>>>>      25: 4d 85 f6              test   %r14,%r14
+>>>>      28: 74 24                je     0x4e
+>>>>      2a:* 48 8b 4a 08          mov    0x8(%rdx),%rcx <-- trapping instruction
+>>>>      2e: f6 c1 01              test   $0x1,%cl
+>>>>      31: 0f 85 cb 00 00 00    jne    0x102
+>>>>      37: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
+>>>>      3c: 31 c9                xor    %ecx,%ecx
+>>>>      3e: 48                    rex.W
+>>>>      3f: f7                    .byte 0xf7
+>>>>
+>>>> Code starting with the faulting instruction
+>>>> ===========================================
+>>>>       0: 48 8b 4a 08          mov    0x8(%rdx),%rcx
+>>>>       4: f6 c1 01              test   $0x1,%cl
+>>>>       7: 0f 85 cb 00 00 00    jne    0xd8
+>>>>       d: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
+>>>>      12: 31 c9                xor    %ecx,%ecx
+>>>>      14: 48                    rex.W
+>>>>      15: f7                    .byte 0xf7
+>>>> [  991.459215] RSP: 0018:ffffb11281d0ba90 EFLAGS: 00010202
+>>>> [  991.464434] RAX: ffffe14ec4208000 RBX: 0000000000005000 RCX: 0000000000000009
+>>>> [  991.471557] RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000001000
+>>>> [  991.478681] RBP: ffffb11281d0bb88 R08: 00000000000020ff R09: ffffe14ec4208000
+>>>> [  991.485807] R10: 0000000000000005 R11: 0000000000000006 R12: ffff96b4825f4200
+>>>> [  991.492930] R13: 0000000000000001 R14: 000000003d6277bf R15: 0000000000000000
+>>>> [  991.500054] FS:  00007f41e80b9740(0000) GS:ffff96b83bc1b000(0000)
+>>>> knlGS:0000000000000000
+>>>> [  991.508132] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [  991.513870] CR2: 0000000000000008 CR3: 0000000106c42003 CR4: 00000000003706f0
+>>>> [  991.520994] note: udpgso_bench_tx[64842] exited with irqs disabled
+>>>>
+>>>>
+>>>> ## Source
+>>>> * Kernel version: 6.17.0-rc4
+>>>> * Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
+>>>> * Git describe: next-20250905
+>>>> * Git commit: be5d4872e528796df9d7425f2bd9b3893eb3a42c
+>>>> * Architectures: x86_64
+>>>> * Toolchains: clang-nightly
+>>>> * Kconfigs: defconfig+selftests/*/config
+>>>>
+>>>> ## Build
+>>>> * Test log: https://qa-reports.linaro.org/api/testruns/29777495/log_file/
+>>>> * LAVA test log: https://lkft.validation.linaro.org/scheduler/job/8434053#L16943
+>>>> * Test details:
+>>>> https://regressions.linaro.org/lkft/linux-next-master/next-20250905/log-parser-test/oops-oops-oops-smp-pti/
+>>>> * Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32GkXBGNRNDEj5d64zd73eXhXQC
+>>>> * Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32GkU7mdlpISpPeeeEwIfAJuzqG/
+>>>> * Kernel config:
+>>>> https://storage.tuxsuite.com/public/linaro/lkft/builds/32GkU7mdlpISpPeeeEwIfAJuzqG/config
+>>>>
+>>>> --
+>>>> Linaro LKFT
+>>>> https://lkft.linaro.org
+>>>
+>>> I suspect a bug added in mm/gup.c recently
+>>>
+>>> commit db076b5db550aa34169dceee81d0974c7b2a2482
+>>> Author: David Hildenbrand <david@redhat.com>
+>>> Date:   Mon Sep 1 17:03:40 2025 +0200
+>>>
+>>>        mm/gup: remove record_subpages()
+>>>
+>>>        We can just cleanup the code by calculating the #refs earlier, so we can
+>>>        just inline what remains of record_subpages().
+>>>
+>>>        Calculate the number of references/pages ahead of times, and record them
+>>>        only once all our tests passed.
+>>>
+>>>        Link: https://lkml.kernel.org/r/20250901150359.867252-20-david@redhat.com
+>>>        Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>        Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+>>>
+>>
+>> Yes, fix already on its way:
+>>
+>> https://lkml.kernel.org/r/5090355d-546a-4d06-99e1-064354d156b5@redhat.com
+>>
+> 
+> #syz dup: [syzbot] [io-uring?] KASAN: null-ptr-deref Read in io_sqe_buffer_register
 
-rmmod the driver kernel module while the XDP program is attached? if I
-detach the XDP program, the message disappears.
+Sorry for the noise, realized just now that this was not a syzkaller 
+report. :)
 
-> If the "stalled pool shutdown" messages continue, then we have to use
-> the techniques as Dragos did.
->
-> Basically scanning all page's in memory looking for PP_SIGNATURE bit.
-> Here is some example[1] code that walks all memory pages from the kernel
-> side.  This doesn't actually work as a kernel module... if I was you, I
-> would just copy-paste this into the driver or page_pool, and call it
-> when we see the stalled messages.  This will help us identify the
-> page_pool page. (After which I would use Drgn to investigate the state).
->
-> [1]
-> https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/mm/be=
-nch/page_bench06_walk_all.c#L68-L97
->
-can I insert the code in page_pool_release_retry() below right after
-the pr_warn() message line 1187?  What should I print or do in the
-above code if ((page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE) block?
+-- 
+Cheers
 
-1164 static void page_pool_release_retry(struct work_struct *wq)
-1165 {
-1166         struct delayed_work *dwq =3D to_delayed_work(wq);
-1167         struct page_pool *pool =3D container_of(dwq, typeof(*pool),
-release_dw);
-1168         void *netdev;
-1169         int inflight;
-1170
-1171         inflight =3D page_pool_release(pool);
-1172         /* In rare cases, a driver bug may cause inflight to go negati=
-ve.
-1173          * Don't reschedule release if inflight is 0 or negative.
-1174          * - If 0, the page_pool has been destroyed
-1175          * - if negative, we will never recover
-1176          * in both cases no reschedule is necessary.
-1177          */
-1178         if (inflight <=3D 0)
-1179                 return;
-1180
-1181         /* Periodic warning for page pools the user can't see */
-1182         netdev =3D READ_ONCE(pool->slow.netdev);
-1183         if (time_after_eq(jiffies, pool->defer_warn) &&
-1184             (!netdev || netdev =3D=3D NET_PTR_POISON)) {
-1185                 int sec =3D (s32)((u32)jiffies -
-(u32)pool->defer_start) / HZ;
-1186
-1187                 pr_warn("%s() stalled pool shutdown: id %u, %d
-inflight %d sec\n",
-1188                         __func__, pool->user.id, inflight, sec);
-1189                 pool->defer_warn =3D jiffies + DEFER_WARN_INTERVAL;
-1190         }
-1191
-1192         /* Still not ready to be disconnected, retry later */
-1193         schedule_delayed_work(&pool->release_dw, DEFER_TIME);
-1194 }
+David / dhildenb
 
->
-> >> [root@loongfire ~]# grep 'CONFIG_DEBUG_VM=3Dy' /boot/config-6.15.9-ipf=
-ire
-> >>
-> >> CONFIG_DEBUG_VM=3Dy
-> >>
-> >> [root@loongfire ~]# grep -E 'MEM_TYPE_PAGE_POOL|stalled' /var/log/kern=
-.log
-> >>
-> >> Sep  1 10:23:19 loongfire kernel: [    7.484986] dwmac-loongson-pci
-> >> 0000:00:03.0 green0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> >> Sep  1 10:26:44 loongfire kernel: [  212.514302] dwmac-loongson-pci
-> >> 0000:00:03.0 green0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> >> Sep  1 10:27:44 loongfire kernel: [  272.911878]
-> >> page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight 60
-> >> sec
-> >> Sep  1 10:28:44 loongfire kernel: [  333.327876]
-> >> page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight 120
-> >> sec
-> >> Sep  1 10:29:45 loongfire kernel: [  393.743877]
-> >> page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight 181
-> >> sec
-> >>
-> >
-> > I came up a fentry bpf program [0]
-> > https://github.com/vincentmli/loongfire/issues/3 to trace the netdev
-> > value in page_pool_release_retry():
-> >
-> >          /* Periodic warning for page pools the user can't see */
-> >          netdev =3D READ_ONCE(pool->slow.netdev);
-> >          if (time_after_eq(jiffies, pool->defer_warn) &&
-> >              (!netdev || netdev =3D=3D NET_PTR_POISON)) {
-> >                  int sec =3D (s32)((u32)jiffies - (u32)pool->defer_star=
-t) / HZ;
-> >
-> >                  pr_warn("%s() stalled pool shutdown: id %u, %d
-> > inflight %d sec\n",
-> >                          __func__, pool->user.id, inflight, sec);
-> >                  pool->defer_warn =3D jiffies + DEFER_WARN_INTERVAL;
-> >          }
-> >
-> > The bpf program prints netdev  NULL, I wonder if there is left over
-> > page pool allocated initially by the stmmac driver, and  after
-> > attaching XDP program, the page pool allocated initially had netdev
-> > changed to NULL?
-> >
-> > Page Pool: 0x900000010b54f000
-> >    netdev pointer: 0x0
-> >    is NULL: YES
-> >    is NET_PTR_POISON: NO
-> >    condition (!netdev || netdev =3D=3D NET_PTR_POISON): TRUE
-> >
-> > Page Pool: 0x900000010b54f000
-> >    netdev pointer: 0x0
-> >    is NULL: YES
-> >    is NET_PTR_POISON: NO
-> >    condition (!netdev || netdev =3D=3D NET_PTR_POISON): TRUE
-> >
-> >>> Third step is doing kernel debugging like Dragos did in [1].
-> >>>
-> >>> What kernel version are you using?
-> >>
-> >> kernel 6.15.9
-> >>
->
-> Nice, that is a very recent kernel.
-> The above shows us that we are indeed hitting the issue of a "hidden"
-> page_pool instance (related to the page_pool commit Jakub/Kuba added).
->
->
-> >>>
-> >>> In kernel v6.8 we (Kuba) silenced some of the cases.  See commit
-> >>> be0096676e23 ("net: page_pool: mute the periodic warning for visible
-> >>> page pools").
-> >>> To Jakub/kuba can you remind us how to use the netlink tools that can
-> >>> help us inspect the page_pools active on the system?
-> >>>
-> >>>
-> >>>> xdp-filter load green0
-> >>>>
-> >>>
-> >>> Most drivers change memory model and reset the RX rings, when attachi=
-ng
-> >>> XDP.  So, it makes sense that the existing page_pool instances (per R=
-Xq)
-> >>> are freed and new allocated.  Revealing any leaked or unprocessed
-> >>> page_pool pages.
-> >>>
-> >>>
-> >>>> Aug 31 19:19:06 loongfire kernel: [200871.855044] dwmac-loongson-pci=
- 0000:00:03.0 green0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> >>>> Aug 31 19:19:07 loongfire kernel: [200872.810587] page_pool_release_=
-retry() stalled pool shutdown: id 9, 1 inflight 200399 sec
-> >>>
-> >>> It is very weird that a stall time of 200399 sec is reported. This
-> >>> indicate that this have been happening *before* the xdp-filter was
-> >>> attached. The uptime "200871.855044" indicate leak happened 472 sec
-> >>> after booting this system.
-> >>>
-> >>
-> >> Not sure if I pasted the previous log message correctly, but this time
-> >> the log I pasted should be correct,
-> >>
-> >>> Have you seen these dmesg logs before attaching XDP?
-> >>
-> >> I didn't see such a log before attaching XDP.
-> >>
->
->  From above we have established, that it makes sense, as the mentioned
-> commit would have "blocked it" from being printed.
->
-> >>>
-> >>> This will help us know if this page_pool became "invisible" according=
- to
-> >>> Kuba's change, if you run kernel >=3D v6.8.
-> >>>
-> >>>
-> >>>> Aug 31 19:20:07 loongfire kernel: [200933.226488] page_pool_release_=
-retry() stalled pool shutdown: id 9, 1 inflight 200460 sec
-> >>>> Aug 31 19:21:08 loongfire kernel: [200993.642391]
-> >>>> page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
-> >>>> 200520 sec
-> >>>> Aug 31 19:22:08 loongfire kernel: [201054.058292]
-> >>>> page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
-> >>>> 200581 sec
-> >>>>
-> >>>
-> >>> Cc'ed some people that might have access to this hardware, can any of
-> >>> you reproduce?
-> >>>
->
-> Anyone with this hardware?
->
-> >>
-> >> [0]: https://github.com/vincentmli/loongfire
->
-> --Jesper
 
