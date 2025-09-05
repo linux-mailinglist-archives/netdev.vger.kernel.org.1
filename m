@@ -1,145 +1,99 @@
-Return-Path: <netdev+bounces-220491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1FCB46642
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 23:56:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB9DAB46670
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:12:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 889FF1D23FBB
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 21:57:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84F10A4822B
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD5D2F2900;
-	Fri,  5 Sep 2025 21:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021AE2F5492;
+	Fri,  5 Sep 2025 22:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rIhrS3up"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ZXyDRSfH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E4428643B
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 21:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CC92F5474
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 22:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757109410; cv=none; b=lxYsp3PiVs4I6xMkNxLdD72yeNgqjwo4VEXLfJ76HR5ypZ3TNVhemRu6jjFtBy3VQNz9krZ7sHkJ1ToSFLbaJeR42BZ1H/oxmC9MmcZAbkEWDyY4CV5Rbq9cJm0PSRgEKxqj/XxzyVtSAA05vQgYnOUIFdXa/mH/gPbZf7RVobs=
+	t=1757110337; cv=none; b=XyNs/zL0Cpaom+9u5fNeKThYJlzlo5RR8hxdZlrhCY6LQDJcNA9TH4xnv5q65/L91rdlk44wi8qJMy2pUyvmy0W9VbQF43r4Sapv5lsM4i4GWR6iwzu1utgbilCY1rQHvHFy3jzrrbEXhIRhKMo++IbLmWUBnEsAk5dZTYFLfcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757109410; c=relaxed/simple;
-	bh=K4rPEUhgDOci25ECMoMn91PK5HGu+UvUImo0Jrj/eTg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=URwIytBI5vfwQpTKtrj2voHFxnKrDv1HflllFwYx4X+CPR8HQxi5InICqI53RkAAeNw51MQ5WqiSijue+RbfSVrTn+QWZyA8DP2M3bn5Ph296QRG6MCa5Su6JmdXZJ+G+xIxJSY2OZ253LMX7JH5mjxvlV3ojszAxcWCSqwxIyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rIhrS3up; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3277c603b83so1527981a91.2
-        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 14:56:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757109409; x=1757714209; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K4rPEUhgDOci25ECMoMn91PK5HGu+UvUImo0Jrj/eTg=;
-        b=rIhrS3upf8VLji/Ff6dAZ7B9GVFGK+8v7KfuQ9zBdrmSo/WROcS3MP+HlfZlRck6p5
-         P/cW40O4jrNDjF6FQ7ak2vqD+rJ6sFtkj4YYuIb3p5MYVwYKDVJjDr9vaUx5GMwjZ4WS
-         REmoEBCFEhFEceelpidwScH7kWxo03x6E11Y4KhNRdVBYcxQ0mn8iZxrpy1uXaqvGrAN
-         jlBFBuj73yh9Mwy5//ObAmiccRUcyrm9o6heNZ24jZ46wuIbuCH8BGvI8Rcbdx0DhUDD
-         q8BIdaCWogiWTPncLT/JMtt/QVHLLkvITqNfCQczXCH56rtoIDHWdwOvAAm+zyqsoXMW
-         imnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757109409; x=1757714209;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K4rPEUhgDOci25ECMoMn91PK5HGu+UvUImo0Jrj/eTg=;
-        b=AP/uDJbZqaXWS9xv99b5KjgPFgIkuQtRzAGXD8Ku//UBgVoJBXRzyoHCAzckdM//U4
-         e579S0wp129aoWRyNRYo3OHtUBTnB3a55v4KxQnPlzm3bmciPNmRioE0T0FyiwrL8dy0
-         k64sdwQnrh8W+AsW0RhBg84dEtbb+bWgTGgIdZ8Nm7SsP+HTrvPgyiQ5SIXuELzRulFc
-         F+sbk+TXCOEWGfTsZ2lB4yzwTFbNxRG83YgZDBpJnO6XAw9Wm7MvUe+dj7+WtFbyxtAA
-         YCtSsZGRYF2uUJ6f4ww582y/3cExjCUAgzWGgHc5OppTUHpLHpFFFcxe/sYXv+cbXY1r
-         q91w==
-X-Forwarded-Encrypted: i=1; AJvYcCVf7B5JDBDgs/1LGWsMdY+r0LbMgvbUFGUvPB5H+0PpQPI0P6fJMfwzPaQnQCgC4ulMIoqhKOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUN7idAaPMpsbfbm111QqxzfztgYkY6F45/oIni2FHcY8PlLSw
-	/5j4tghtd0h1JqUHBeMkvY+EcG4O1kd8gnqco5nKhjOBT6doHcQAulaJXSR7eiy8ZWu/8A6kh2s
-	c6Y8geByk9AsL4SWAQ3HfBpmEz3QNSZhsQ4IPJ+fz
-X-Gm-Gg: ASbGncs98IyWPOTSxv69oX0v4SoGvsfdQ9FxY5dsPyS0xSMyR0xB5OyRFP5h7v0c0FU
-	vhvwcbSMAu9h6P3C9suQy2qb92pJawMunU8tsOlpElHOFIOKWuisW/DUoUw4qpZnr1/GZgEmTw/
-	h6y2w1Il6O0I1Thypk4Gag8ubwINA6uOn6q1VVjZM4cfMHmX0EjLTYeHtcI3XPbAeGO0x1K+mnr
-	IkBuda8qbGHC9dR9UgJzkG4SkAvXRckRq4kfp3q3Oe8b7shhC1ZR5kMRFuq8vArLGOJNlnkY+7i
-	XdnnzkdEDSriCg==
-X-Google-Smtp-Source: AGHT+IHee2bfwNAMC7Lf9gLv17bkMAwutCH+4xPIrizmqEN9SW0fuoijafwHuVi6n2B6Nt9NE9ZR8AeiczyOlODnHb0=
-X-Received: by 2002:a17:90b:38cb:b0:32b:df0e:928f with SMTP id
- 98e67ed59e1d1-32d43f936ccmr452341a91.37.1757109408411; Fri, 05 Sep 2025
- 14:56:48 -0700 (PDT)
+	s=arc-20240116; t=1757110337; c=relaxed/simple;
+	bh=BS2eV+MmamMy0xsm9+vg8yFdZbJEXJn1T+NTTl6/7oY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ICFViYE+stntmFZ0jw4YX5jBesW9masKODxwl+9ELWO959kKbEzF4eOmIbZbxs6TyxrJ2umZ9kVOSI8ZjJI7vDpMwxfPZB2sp3G42yoxN6knSfVcZJryXKdCYQ/rPZYyxmZ0cwzDEUTVBS2nxlmC5aADuQHNrnSPhRy/BDA6omw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ZXyDRSfH; arc=none smtp.client-ip=109.224.244.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1757110327; x=1757369527;
+	bh=BHaBMEFVDewwSKp7thargfT1P3IxRVYDym7J1XLx8cw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=ZXyDRSfH04X3Kd8NpuKWqSv6SLyErmbJUnFOAcGhMcATkIasuOkCRdZ6hwNiPZ5+Q
+	 BH6LeBvfPwVRjNc2F+EpWab83/C/kncZa2F7DmNjRSbVyBQUIt73luNdFGGGPkhE+N
+	 Jqgv0vyL7Paz9dvu6U520+XlUlPHx4NmNzgVHKwJFeRebdqKsjO7T5RQ+TJi9SEqj0
+	 xhk62cUOrDCxMp/a7mirm9JXWEWW9jm4yuNdEB5kJEVvKHdajw7cjgjIdglmzpRIhg
+	 zEKIn61k1YdQB0EbiRYcB3RO/KdIo0zP4a/xuhueDqamWVYskiEoKnaey58E6rWrdy
+	 1y/I9JEBao16g==
+Date: Fri, 05 Sep 2025 22:12:04 +0000
+To: "kuba@kernel.org" <kuba@kernel.org>
+From: =?utf-8?Q?Maksimilijan_Maro=C5=A1evi=C4=87?= <maksimilijan.marosevic@proton.me>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "dsahern@kernel.org" <dsahern@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com" <syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com>
+Subject: Re: [PATCH 1/1] ipv6: Check AF_UNSPEC in ip6_route_multipath_add()
+Message-ID: <u3HUdiCPiMCv5kkEVMXU9bKhZLDParnZCqUybez-bALHM78ymOclmc2pzUXgAGu-Bdwi30aV_LJkhicY2rwhZdjBzvYWyErXQpDQN3w4Ihs=@proton.me>
+In-Reply-To: <20250904090301.552ef178@kernel.org>
+References: <20250804204233.1332529-1-maksimilijan.marosevic@proton.me> <20250904090301.552ef178@kernel.org>
+Feedback-ID: 97766065:user:proton
+X-Pm-Message-ID: a0a4e673389a6769a8cd4218687215afaa60f323
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903190238.2511885-1-kuniyu@google.com> <20250903190238.2511885-5-kuniyu@google.com>
- <20250904063456.GB2144@cmpxchg.org> <CAAVpQUA+rVJKMXQFATfxT=uX3QaLrCtCG_wtiGF_kt-_KrMRBQ@mail.gmail.com>
- <sathtxzxvi5zz5gh37twfng7srn7nsdlrdlposompqkq646pp5@2r74fqgbalzq>
-In-Reply-To: <sathtxzxvi5zz5gh37twfng7srn7nsdlrdlposompqkq646pp5@2r74fqgbalzq>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 5 Sep 2025 14:56:36 -0700
-X-Gm-Features: Ac12FXx_Dq7bkvb-v_DTHwN8EXWrX7E_LQJFMN4E-0VuPARl91jQFUntqLLHeXc
-Message-ID: <CAAVpQUDjNfU-fqhh4nfPPo1kg0LPcBRbU3ob22k8WtPU_BouZw@mail.gmail.com>
-Subject: Re: [PATCH v5 bpf-next/net 4/5] net-memcg: Allow decoupling memcg
- from global protocol memory accounting.
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Johannes Weiner <hannes@cmpxchg.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 5, 2025 at 2:25=E2=80=AFPM Shakeel Butt <shakeel.butt@linux.dev=
-> wrote:
->
-> On Thu, Sep 04, 2025 at 01:21:47PM -0700, Kuniyuki Iwashima wrote:
-> > On Wed, Sep 3, 2025 at 11:35=E2=80=AFPM Johannes Weiner <hannes@cmpxchg=
-.org> wrote:
-> > >
-> > > On Wed, Sep 03, 2025 at 07:02:03PM +0000, Kuniyuki Iwashima wrote:
-> > > > If all workloads were guaranteed to be controlled under memcg, the =
-issue
-> > > > could be worked around by setting tcp_mem[0~2] to UINT_MAX.
-> > > >
-> > > > In reality, this assumption does not always hold, and processes not
-> > > > controlled by memcg lose the seatbelt and can consume memory up to
-> > > > the global limit, becoming noisy neighbour.
-> > >
-> > > It's been repeatedly pointed out to you that this container
-> > > configuration is not, and cannot be, supported. Processes not
-> > > controlled by memcg have many avenues to become noisy neighbors in a
-> > > multi-tenant system.
-> > >
-> > > So my NAK still applies. Please carry this forward in all future patc=
-h
-> > > submissions even if your implementation changes.
-> >
-> > I see.
-> >
-> > I'm waiting for Shakeel's response as he agreed on decoupling
-> > memcg and tcp_mem and suggested the bpf approach.
->
-> Yes I agreed on decoupling memcg and tcp_mem but not for a weird
-> configuration, so please stop using this motivatioan already. You can
-> motivate the decoupling simply on performance. Why pay the cost
-> of two orthogonal accounting mechanisms concurrently? Also you are not
-> disabling memcg accounting, so we should be good from memcg side. Make
-> this very clear in your commit message.
->
-> I don't care how you plan to use this feature to enable your weird
-> use-case but make sure this feature is beneficial to general Linux
-> users.
+Hi Jakub,
 
-Thank you Shakeel, I will rephrase the commit messages and
-clarify the points above.
+Sorry for the delay.=20
+I've managed to devise a test-case that reliably reproduces the error, but =
+I now believe the fix can be implemented better. Unfortunately, I haven't h=
+ad the chance to work on the new fix these past couple of weeks.
+
+I'll try to finish it this weekend and then run it through syzbot once more=
+.
+
+Maksimilijan
+
+-------- Original Message --------
+On 04/09/2025 18:03, Jakub Kicinski <kuba@kernel.org> wrote:
+
+>  On Mon, 04 Aug 2025 20:42:53 +0000 Maksimilijan Marosevic wrote:
+>  > This check was removed in commit e6f497955fb6 ("ipv6: Check GATEWAY
+>  > in rtm_to_fib6_multipath_config().") as part of rt6_qualify_for ecmp()=
+.
+>  > The author correctly recognises that rt6_qualify_for_ecmp() returns
+>  > false if fb_nh_gw_family is set to AF_UNSPEC, but then mistakes
+>  > AF_UNSPEC for AF_INET6 when reasoning that the check is unnecessary.
+>  > This means certain malformed entries don't get caught in
+>  > ip6_route_multipath_add().
+>  >
+>  > This patch reintroduces the AF_UNSPEC check while respecting changes
+>  > of the initial patch.
+> =20
+>  Hi Maksimilijan!
+> =20
+>  Are you planning to repost this with a test?
+>  If not I suppose we can enlist the author of the commit to help with
+>  the selftest..
+>  
 
