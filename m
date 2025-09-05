@@ -1,55 +1,60 @@
-Return-Path: <netdev+bounces-220354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8230B4587A
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:08:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D99B45896
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81052A43DB7
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:08:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 546D41C8846D
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D2819CCEC;
-	Fri,  5 Sep 2025 13:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD1F28641E;
+	Fri,  5 Sep 2025 13:18:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+m8CXw2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfalbbc0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6323418A6DB
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 13:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E501D5CC9;
+	Fri,  5 Sep 2025 13:18:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757077711; cv=none; b=ShYowPmHzfqoOTCpBITRhcnzgSl1gStwMq2n7XcL6/htqcnHbtksFQSzGHYal8mJPsHWS9dtXWqlhYxYyG7+UsVPDZIi0SnsNkZCUg0sG8iZiAtoq5zYi3rQWre3Pw0lMVj02YSF1lQghHCkMmGSBzKbDFFw6L8FXN7l0uVyBZY=
+	t=1757078309; cv=none; b=Rdi0ie+AO9nB+XQiiy+Wu80dLMuf4mrZkR9ZYU0bnr7rvEcnOG3wdz4iSSLVgmfcfTAzjClH57Dv4T0S+3Jo/8M57rmn3gpKr3T0lDRauyO+sWwzfsUN3I4+Ua9KbzNc6KJuUvLGSGGE6RLeGV4uYBCvcyqMq6gcf9enhREmMDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757077711; c=relaxed/simple;
-	bh=Y+slr3p117oNGx67X0y2iu32EwoLn9c0IOFNr6d3bhM=;
+	s=arc-20240116; t=1757078309; c=relaxed/simple;
+	bh=RAA4rrJfeN8TQeFhBzYY5lBVITfb6FXS1EgUHDAhgbY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e2wpTISzcSsv8muQ5YiTvd/m8xMwrqx+qpE660e03/LNd9b2KM4yGIYnKWykY7evHesuMBWuhVkky5ZA4q1GH3nu2XBGqVonINzXUCVgI+l365Q48CIRAyJwzXuZtoe64/XajVCfP7wv+Tf/YYPGrbjhO44o7ZXPjUaOHaIKGz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+m8CXw2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 480FBC4CEF1;
-	Fri,  5 Sep 2025 13:08:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEdf3NXVlK4c2k+dSnG32oVIeJ4EGmbvR0p2ocHjU9UEoCbeoHGtqHnbWyVo14yFRwMAhf86E7HyGMojFpTQh3dJDgdqMRTY3euG3HLmen1QRdiq2BsJuzRFYituiKKkrUQSugIRUvQwNWj8GxGN2sCJ6BevJIXo+jajA72fWP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfalbbc0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A15DC4CEF1;
+	Fri,  5 Sep 2025 13:18:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757077710;
-	bh=Y+slr3p117oNGx67X0y2iu32EwoLn9c0IOFNr6d3bhM=;
+	s=k20201202; t=1757078309;
+	bh=RAA4rrJfeN8TQeFhBzYY5lBVITfb6FXS1EgUHDAhgbY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y+m8CXw2nQfppPF2qHID5eGaG3GufSFpXdx2twmC77s1dgkrS9jVuHV1Qy2VkQhMS
-	 Ofh/Nh0x95H5XJFuukJdVwwG41Pu/i448pNkJ4mfvRQy7Eim2aLAh0AmZu3eBhmf+i
-	 wg0VQAnLRWItYelEoKTK0ZNPtj0BlmuLWxFm6u3ZSdMKflJ1IDYp7pyM6ZszQAGnIf
-	 IsmNg4RBpcWlpFXVAdFUmVNFEE8jjqq5Zxg/M4Im+97VbDx72RAY272SVgGukQQMix
-	 AMIvmBlgwhBZPTsrOUhJud/DPg4KTN8wsaSK6nVD7iwsgLlTMsuytcUs0ebiB371WT
-	 oM2Hw6/++iN1A==
-Date: Fri, 5 Sep 2025 14:08:27 +0100
+	b=sfalbbc0wK3mEOrEVsTZbNdHh1qtaNoFYkoXswu86BJXqgZtkB2p7ll0PmNFm+UF+
+	 gROQHu45kiB2fB6zc9OocpeaCAl/VSUHMQTcK5dzzrBgfqKjEqoouiaYe0mVXn3hhP
+	 2kpcsQKNAXGCMaKeCuDHKvZBNbFWuLrnetV5rnBM+Lul+hxu1a3YiWmsb1sWrI+HmF
+	 8pxiMX2HVdqmxtozF5RFbwrNM7Av4MtV5kA9VGPoVeyr66E1EOBfErHIwl+nZDi9gV
+	 BRPm5dt9TEUB/FB/dwkJLJ+Ks+3zD13gCA3XbAUMRYXVgNRQ6rjKqP7qlrGvZJFGPw
+	 1nGF+gV/jf+bw==
+Date: Fri, 5 Sep 2025 14:18:23 +0100
 From: Simon Horman <horms@kernel.org>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] udp_tunnel: use netdev_warn() instead of
- netdev_WARN()
-Message-ID: <20250905130827.GD553991@horms.kernel.org>
-References: <20250905055927.2994625-1-alok.a.tiwari@oracle.com>
+To: alistair23@gmail.com
+Cc: chuck.lever@oracle.com, hare@kernel.org,
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
+	kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+	kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH v2 1/7] net/handshake: Store the key serial number on
+ completion
+Message-ID: <20250905131823.GE553991@horms.kernel.org>
+References: <20250905024659.811386-1-alistair.francis@wdc.com>
+ <20250905024659.811386-2-alistair.francis@wdc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,26 +63,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250905055927.2994625-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250905024659.811386-2-alistair.francis@wdc.com>
 
-On Thu, Sep 04, 2025 at 10:59:22PM -0700, Alok Tiwari wrote:
-> netdev_WARN() uses WARN/WARN_ON to print a backtrace along with
-> file and line information. In this case, udp_tunnel_nic_register()
-> returning an error is just a failed operation, not a kernel bug.
+On Fri, Sep 05, 2025 at 12:46:53PM +1000, alistair23@gmail.com wrote:
+
+...
+
+> diff --git a/net/handshake/tlshd.c b/net/handshake/tlshd.c
+
+...
+
+> @@ -83,6 +87,13 @@ static void tls_handshake_remote_peerids(struct tls_handshake_req *treq,
+>  		if (i >= treq->th_num_peerids)
+>  			break;
+>  	}
+> +
+> +	nla_for_each_attr(nla, head, len, rem) {
+> +		if (nla_type(nla) == HANDSHAKE_A_DONE_SESSION_ID) {
+> +			treq->user_session_id = nla_get_u32(nla);
+
+Hi Alistair,
+
+This appears to be addressed by patch 5/7 of this series.
+But struct tls_handshake_req does not have a user_session_id member
+with (only) this patch applied on top of net-next.
+
+This breaks bisection and should be addressed: when each patch is applied
+in turn the resulting source tree should compile.
+
+...
+
+> diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+> index e2c5e0e626f9..1d5829aecf45 100644
+> --- a/net/sunrpc/svcsock.c
+> +++ b/net/sunrpc/svcsock.c
+> @@ -450,7 +450,8 @@ static void svc_tcp_kill_temp_xprt(struct svc_xprt *xprt)
+>   * is present" flag on the xprt and let an upper layer enforce local
+>   * security policy.
+>   */
+
+Please also add user_session_id to the kernel doc for this function (above).
+
+Flagged by W=1 builds and ./scripts/kernel-doc -none 
+
+> -static void svc_tcp_handshake_done(void *data, int status, key_serial_t peerid)
+> +static void svc_tcp_handshake_done(void *data, int status, key_serial_t peerid,
+> +				   key_serial_t user_session_id)
+>  {
+>  	struct svc_xprt *xprt = data;
+>  	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
+> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> index c5f7bbf5775f..3489c4693ff4 100644
+> --- a/net/sunrpc/xprtsock.c
+> +++ b/net/sunrpc/xprtsock.c
+> @@ -2591,7 +2591,8 @@ static int xs_tcp_tls_finish_connecting(struct rpc_xprt *lower_xprt,
+>   * @peerid: serial number of key containing the remote's identity
+>   *
+>   */
+> -static void xs_tls_handshake_done(void *data, int status, key_serial_t peerid)
+> +static void xs_tls_handshake_done(void *data, int status, key_serial_t peerid,
+> +				  key_serial_t user_session_id)
+
+Ditto.
+
+>  {
+>  	struct rpc_xprt *lower_xprt = data;
+>  	struct sock_xprt *lower_transport =
+> -- 
+> 2.50.1
 > 
-> A simple warning message is sufficient, so use netdev_warn()
-> instead of netdev_WARN().
 > 
-> The netdev_WARN use was a typo/misuse.
-> 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-> ---
-> v1 -> v2
-> Modified commit message as discuss with Simon.
-> https://lore.kernel.org/all/20250903195717.2614214-1-alok.a.tiwari@oracle.com/
-
-Thanks for the update.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
 
