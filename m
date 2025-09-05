@@ -1,193 +1,341 @@
-Return-Path: <netdev+bounces-220220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19A76B44C8C
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 06:01:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DE6B44C91
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 06:04:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C14C71BC8A1D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 04:01:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D44841668DE
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 04:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475761F5423;
-	Fri,  5 Sep 2025 04:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C60A1E2834;
+	Fri,  5 Sep 2025 04:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Wm9Nca2b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A2eYj7ef"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1117E1A9F90;
-	Fri,  5 Sep 2025 04:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C139F1E0DE3
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 04:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757044875; cv=none; b=pUHkr1bVv/PyMCuGGRhLRa/xmxH1pqY8k5Sralhfrt0Qiab9YiBdfbjufMVRAfagdBJYAaq6TPql4Lfv3mUfTQluu8YJn/89xfLH5sIfJK+77uDPlOtBJg0Fx8Ky9TxCNCBqS2ffHLRwbp24WHv4Py9JbLIaPE5qi8IAqGxslFM=
+	t=1757045091; cv=none; b=WUHBq4oRBcnRr+RWia8v4rUQ2w+Wz4rI8WV8Ye5z/eVz0iYI9FTtxUtL52CaDBH+nTeNGeQ7ZDpM+ArhtG37CERjvcRf1gCmALtBUP9EGpkP/A6lRdC37m/dcvGmZw4YHBWQGKWszRq1kuE9NijPIoWLjr80HR1D2FYo9N6otdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757044875; c=relaxed/simple;
-	bh=W5kE2AgCsGzW+2u+PZx2LUVNYcq8RpF2NI14kGV6Apk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=rlyulPf6Y8iV5EAq5CM3j+FYaIS3yDgISK8ee9K1iG7R8D1sTvIJh1B7FwsLvsROz9fR+2po2gX3ISvcojTH8eKBRe3iKFzX9gp/z0oQm7OJdhFwg8d6/jRvB8iUY31XIvxrw9W9DtjdrfuW7pIGGdS+PTsZYWgBm+V/CJ+/kvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Wm9Nca2b; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=kBpC1Ipw5nLY7H+V6xpivhpgJYlQ2dQtXeH3Howu9/w=;
-	b=Wm9Nca2bxxV9HDoB6H3faWf5Be8G3n9IoHaq2YZgvigN/X5tsRphggh5Jf7aIC
-	Y+80qci3VjfvKJlb5/r2q/rDgCuhzf1hp0f+q2mlChwT0395La80PG6C8tqltsWh
-	xfZ5BagGJay9iJTH6qT5M/BvGU97pSbqpOIiCxbr/4iP4=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wC3zZBVYLpouCuFGA--.5S2;
-	Fri, 05 Sep 2025 12:00:23 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: kerneljasonxing@gmail.com,
-	willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v10 2/2] net: af_packet: Use hrtimer to do the retire operation
-Date: Fri,  5 Sep 2025 12:00:21 +0800
-Message-Id: <20250905040021.1893488-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1757045091; c=relaxed/simple;
+	bh=PwUTz7z+FWi8rvsQTOzsnt1R5+fa1UGAgcorB19lBko=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MtKrj6Dv0AgY0fi+1Az7bzLUYu6M6ZhfcMLeOWTRcvo4Io+ozuckbCCxsnuFbGSqQihuhlXpxKr1Nj4nW3AmlvKhmrMYEIdWiBdxngHY4j3vc82pvFR1z8VAgodJ7M5CjsTRqHqGT3vnLfHPubj+45Yaiv6f6S4TEgQoVzDVgSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A2eYj7ef; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4d7b23ad44so1133575a12.0
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 21:04:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757045089; x=1757649889; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xzSe+BvKaMS0Yk/BDbkc11n2XGrcdPm0xDpK5jZXbqM=;
+        b=A2eYj7efz9YW7KfwtLxEQK/nWOhDL3Tj47YGPisoF5OslPCTe4+juOZFcV37bY0wkw
+         Q35kkjwIlBCSaYiP0Ur/vuVfUrYqSnv1bENEvOA2DOMc/0Wuvcr7ZIjxZYH47UrK5S7W
+         IWE2ErRupSRAdHNi67vqOez7/iXggzrYc1VsWzD3hDNkWXvsxnrHSODYErqFMKyen++H
+         K6TfCME0rKSLnp/sEc95MJubOEopkOPgJsN2GR2mJQLfxw4DiejaRzLpLNkTaZ0vdrMm
+         dX5YD/wzDutnLe9H83znABc/N+iKkYnfk7hgxeSIfNyUBFy7a4FECLRdVBP/KkMouS9a
+         8YJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757045089; x=1757649889;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xzSe+BvKaMS0Yk/BDbkc11n2XGrcdPm0xDpK5jZXbqM=;
+        b=RnHOW2mPqbAkouQGmpAuLDM7IqF+CxDmERk9mUmyEAgvDlCHTj2B9nAoqfBFv5UxRq
+         1JpLQNlrSi4yxp1FoQbN8XeHv7nlha1tSvUrhzJvJLOU7Rdo8OzTc78y35g2NjlpvZr9
+         FH9vMoyY9hdN+a+tanxTAgejHAG1NoSzIrVClOaL4Jo2fuxr7ZRhyk3DGM26wdLd29ty
+         NY4I2bUAt4D2NODVMYNPPClIhAJ49t9EQY86vz1YK+DbufOUExIsom79RJZ6KIu7X2o0
+         HiYo0QFDnKWXUg6Mo06RS5GrOyq706xkAFxTHf1ykHDBOpHHHrMguC3flx/dA3t5aGkY
+         cSVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWzGLM9cPljk+sH/Rztkp/n5hIHQhPg6XBVLkMmDQSCm7lWglo4BAD2rPhDCN0I+1sXNpP19Yo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlorZQB2AgmJgIh60GMk8v8TFMH8xW5It0TI82c0SD2HKhEv0K
+	j41XiE23d9ZBA08NdTRkeuDHuumYhqK+9OUNX9Iyv/637R+bp0lH3iX2F8lGo4x8iNV4z/YXfuZ
+	VslcFpBHq9TB3xmd+krAXOQ==
+X-Google-Smtp-Source: AGHT+IFLKz6CiGy4wIk+cmybRuyHGuLxSct30ilYhoMtD9odIeFG5s/23vGOkVz9EMN2TikUejP2aNhF+gFem5mZ
+X-Received: from pjbsy8.prod.google.com ([2002:a17:90b:2d08:b0:32b:5f22:e5da])
+ (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:1848:b0:327:531b:b85c with SMTP id 98e67ed59e1d1-328156e38b4mr31773325a91.35.1757045088960;
+ Thu, 04 Sep 2025 21:04:48 -0700 (PDT)
+Date: Fri,  5 Sep 2025 04:04:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wC3zZBVYLpouCuFGA--.5S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Gw4DCF4fXr1kZFWkZFWfAFb_yoWxWF45pa
-	yYq347tr1kJr12vF47Zan7XFy5Aw4rJr15Grn3Gry2k3sxWFyxtFWI9ayFgFW7CF4kKw12
-	vF48trsxAw1DZ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UX2-5UUUUU=
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibhS-Cmi6HujWaQABsV
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250905040441.2679296-1-marcharvey@google.com>
+Subject: [PATCH net-next v3] selftests: net: Add tests to verify team driver
+ option set and get.
+From: Marc Harvey <marcharvey@google.com>
+To: jiri@resnulli.us, andrew+netdev@lunn.ch
+Cc: edumazet@google.com, willemb@google.com, maheshb@google.com, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, kuba@kernel.org, 
+	liuhangbin@gmail.com, Marc Harvey <marcharvey@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 4, 2025 at 11:26 +0800 Jason Xing <kerneljasonxing@gmail.com> wrote:
+There are currently no kernel tests that verify setting and getting
+options of the team driver.
 
-> > In the description of [PATCH net-next v10 0/2] net: af_packet: optimize retire operation:
-> >
-> > Changes in v8:
-> > - Delete delete_blk_timer field, as suggested by Willem de Bruijn,
-> >   hrtimer_cancel will check and wait until the timer callback return and ensure
-> >   enter enter callback again;
-> 
-> I see the reason now :)
-> 
-> Please know that the history changes through versions will finally be
-> removed, only the official message that will be kept in the git. So
-> this kind of change, I think, should be clarified officially since
-> you're removing a structure member. Adding more descriptions will be
-> helpful to readers in the future. Thank you.
+In the future, options may be added that implicitly change other
+options, which will make it useful to have tests like these that show
+nothing breaks. There will be a follow up patch to this that adds new
+"rx_enabled" and "tx_enabled" options, which will implicitly affect the
+"enabled" option value and vice versa.
 
-I will add some more information to the commit message of this 2/2 PATCH.
+The tests use teamnl to first set options to specific values and then
+gets them to compare to the set values.
 
+Signed-off-by: Marc Harvey <marcharvey@google.com>
+---
+Changes in v3:
+  - Applied minor style changes based on v2 feedback.
+  - Link to v2: https://lore.kernel.org/netdev/20250904015424.1228665-1-marcharvey@google.com/
 
+Changes in v2:
+  - Fixed shellcheck failures.
+  - Fixed test failing in vng by adding a config option to enable the
+    team driver's active backup mode.
+  - Link to v1: https://lore.kernel.org/netdev/20250902235504.4190036-1-marcharvey@google.com/
 
-> > Consider the following timing sequence:
-> > timer   cpu0 (softirq context, hrtimer timeout)                cpu1 (process context)
-> > 0       hrtimer_run_softirq
-> > 1         __hrtimer_run_queues
-> > 2           __run_hrtimer
-> > 3             prb_retire_rx_blk_timer_expired
-> > 4               spin_lock(&po->sk.sk_receive_queue.lock);
-> > 5               _prb_refresh_rx_retire_blk_timer
-> > 6                 hrtimer_forward_now
-> > 7               spin_unlock(&po->sk.sk_receive_queue.lock)
-> > 8             raw_spin_lock_irq(&cpu_base->lock);              tpacket_rcv
-> > 9             enqueue_hrtimer                                    spin_lock(&sk->sk_receive_queue.lock);
-> > 10                                                               packet_current_rx_frame
-> > 11                                                                 __packet_lookup_frame_in_block
-> > 12            finish enqueue_hrtimer                                 prb_open_block
-> > 13                                                                     _prb_refresh_rx_retire_blk_timer
-> > 14                                                                       hrtimer_is_queued(&pkc->retire_blk_timer) == true
-> > 15                                                                       hrtimer_forward_now
-> > 16                                                                         WARN_ON
-> > On cpu0 in the timing sequence above, enqueue_hrtimer is not protected by sk_receive_queue.lock,
-> > while the hrtimer_forward_now is not protected by raw_spin_lock_irq(&cpu_base->lock).
-> >
-> > In my previous email, I provided an explanation. As a supplement, I would
-> > like to reiterate a paragraph from my earlier response to Willem.
-> > The point is that when the hrtimer is in the enqueued state, you cannot
-> 
-> How about tring hrtimer_is_queued() beforehand?
-> 
-> IIUC, with this patch applied, we will lose the opportunity to refresh
-> the timer when the lookup function (in the above path I mentioned)
-> gets called compared to before. If the packet socket tries to look up
-> a new block and it doesn't update its expiry time, the timer will soon
-> wake up. Does it sound unreasonable?
+ .../selftests/drivers/net/team/Makefile       |   6 +-
+ .../testing/selftests/drivers/net/team/config |   1 +
+ .../selftests/drivers/net/team/options.sh     | 188 ++++++++++++++++++
+ 3 files changed, 193 insertions(+), 2 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/team/options.sh
 
-
-I actually pointed out the issue with the timeout setting in a previous email:
-https://lore.kernel.org/netdev/20250826030328.878001-1-jackzxcui1989@163.com/.
-
-Regarding the method you mentioned, using hrtimer_is_queued to assist in judgment, I had
-discussed this extensively with Willem in previous emails, and the conclusion was that
-it is not feasible. The reason is that in our scenario, the hrtimer always returns
-HRTIMER_RESTART, unlike the places you pointed out, such as tcp_pacing_check, where the
-corresponding hrtimer callbacks all return HRTIMER_NORESTART. Since our scenario returns
-HRTIMER_RESTART, this can lead to many troublesome issues. The fundamental reason is that
-if HRTIMER_RESTART is returned, the hrtimer module will enqueue the hrtimer after the
-callback returns, which leads to exiting the protection of our sk_receive_queue lock.
-
-Returning to the functionality here, if we really want to update the hrtimer's timeout
-outside of the timer callback, there are two key points to note:
-
-1. Accurately knowing whether the current context is a timer callback or tpacket_rcv.
-2. How to update the hrtimer's timeout in a non-timer callback scenario.
-
-To start with the first point, it has already been explained in previous emails that
-executing hrtimer_forward outside of a timer callback is not allowed. Therefore, we
-must accurately determine whether we are in a timer callback; only in that context can
-we use the hrtimer_forward function to update.
-In the original code, since the same _prb_refresh_rx_retire_blk_timer function was called,
-distinguishing between contexts required code restructuring. Now that this patch removes
-the _prb_refresh_rx_retire_blk_timer function, achieving this accurate distinction is not
-too difficult.
-The key issue is the second point. If we are not inside the hrtimer's callback, we cannot
-use hrtimer_forward to update the timeout. So what other interface can we use? You might
-suggest using hrtimer_start, but fundamentally, hrtimer_start cannot be called if it has
-already been started previously. Therefore, wouldn’t you need to add hrtimer_cancel to
-confirm that the hrtimer has been canceled? Once hrtimer_cancel is added, there will also
-be scenarios where it is restarted, which means we need to consider the concurrent
-scenario when the socket exits and also calls hrtimer_cancel. This might require adding
-logic for that concurrency scenario, and you might even need to reintroduce the
-delete_blk_timer variable to indicate whether the packet_release operation has been
-triggered so that the hrtimer does not restart in the tpacket_rcv scenario.
-
-In fact, in a previous v7 version, I proposed a change that I personally thought was
-quite good, which can be seen here:
-https://lore.kernel.org/netdev/20250822132051.266787-1-jackzxcui1989@163.com/. However,
-this change introduced an additional variable and more logic. Willem also pointed out
-that the added complexity to avoid a non-problematic issue was unnecessary.
-
-As mentioned in Changes in v8:
-  The only special case is when prb_open_block is called from tpacket_rcv.
-  That would set the timeout further into the future than the already queued
-  timer. An earlier timeout is not problematic. No need to add complexity to
-  avoid that.
-
-It is not problematic, as Willem point it out in
-https://lore.kernel.org/netdev/willemdebruijn.kernel.2d7599ee951fd@gmail.com/
-
-
-In the end:
-
-So, if you agree with the current changes in v10 and do not wish to add the timeout
-setting under tpacket_rcv, that’s fine.
-If you do not agree, then the only alternative I can think of is to use a combination
-of hrtimer_cancel and hrtimer_start under prb_open_block, and we would also need to
-reintroduce the delete_blk_timer variable to help determine whether the hrtimer was
-canceled due to the packet_release behavior. If we really want to make this change,
-it does add quite a bit of logic, and we would also need Willem's agreement.
-
-
-Thanks
-Xin Zhao
+diff --git a/tools/testing/selftests/drivers/net/team/Makefile b/tools/testing/selftests/drivers/net/team/Makefile
+index eaf6938f100e..89d854c7e674 100644
+--- a/tools/testing/selftests/drivers/net/team/Makefile
++++ b/tools/testing/selftests/drivers/net/team/Makefile
+@@ -1,11 +1,13 @@
+ # SPDX-License-Identifier: GPL-2.0
+ # Makefile for net selftests
+ 
+-TEST_PROGS := dev_addr_lists.sh propagation.sh
++TEST_PROGS := dev_addr_lists.sh propagation.sh options.sh
+ 
+ TEST_INCLUDES := \
+ 	../bonding/lag_lib.sh \
+ 	../../../net/forwarding/lib.sh \
+-	../../../net/lib.sh
++	../../../net/lib.sh \
++	../../../net/in_netns.sh \
++	../../../net/lib/sh/defer.sh
+ 
+ include ../../../lib.mk
+diff --git a/tools/testing/selftests/drivers/net/team/config b/tools/testing/selftests/drivers/net/team/config
+index 636b3525b679..558e1d0cf565 100644
+--- a/tools/testing/selftests/drivers/net/team/config
++++ b/tools/testing/selftests/drivers/net/team/config
+@@ -3,4 +3,5 @@ CONFIG_IPV6=y
+ CONFIG_MACVLAN=y
+ CONFIG_NETDEVSIM=m
+ CONFIG_NET_TEAM=y
++CONFIG_NET_TEAM_MODE_ACTIVEBACKUP=y
+ CONFIG_NET_TEAM_MODE_LOADBALANCE=y
+diff --git a/tools/testing/selftests/drivers/net/team/options.sh b/tools/testing/selftests/drivers/net/team/options.sh
+new file mode 100755
+index 000000000000..44888f32b513
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/team/options.sh
+@@ -0,0 +1,188 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++# These tests verify basic set and get functionality of the team
++# driver options over netlink.
++
++# Run in private netns.
++test_dir="$(dirname "$0")"
++if [[ $# -eq 0 ]]; then
++        "${test_dir}"/../../../net/in_netns.sh "$0" __subprocess
++        exit $?
++fi
++
++ALL_TESTS="
++        team_test_options
++"
++
++source "${test_dir}/../../../net/lib.sh"
++
++TEAM_PORT="team0"
++MEMBER_PORT="dummy0"
++
++setup()
++{
++        ip link add name "${MEMBER_PORT}" type dummy
++        ip link add name "${TEAM_PORT}" type team
++}
++
++get_and_check_value()
++{
++        local option_name="$1"
++        local expected_value="$2"
++        local port_flag="$3"
++
++        local value_from_get
++
++        if ! value_from_get=$(teamnl "${TEAM_PORT}" getoption "${option_name}" \
++                        "${port_flag}"); then
++                echo "Could not get option '${option_name}'" >&2
++                return 1
++        fi
++
++        if [[ "${value_from_get}" != "${expected_value}" ]]; then
++                echo "Incorrect value for option '${option_name}'" >&2
++                echo "get (${value_from_get}) != set (${expected_value})" >&2
++                return 1
++        fi
++}
++
++set_and_check_get()
++{
++        local option_name="$1"
++        local option_value="$2"
++        local port_flag="$3"
++
++        local value_from_get
++
++        if ! teamnl "${TEAM_PORT}" setoption "${option_name}" \
++                        "${option_value}" "${port_flag}"; then
++                echo "'setoption ${option_name} ${option_value}' failed" >&2
++                return 1
++        fi
++
++        get_and_check_value "${option_name}" "${option_value}" "${port_flag}"
++        return $?
++}
++
++# Get a "port flag" to pass to the `teamnl` command.
++# E.g. $1="dummy0" -> "port=dummy0",
++#      $1=""       -> ""
++get_port_flag()
++{
++        local port_name="$1"
++
++        if [[ -n "${port_name}" ]]; then
++                echo "--port=${port_name}"
++        fi
++}
++
++attach_port_if_specified()
++{
++        local port_name="$1"
++
++        if [[ -n "${port_name}" ]]; then
++                ip link set dev "${port_name}" master "${TEAM_PORT}"
++                return $?
++        fi
++}
++
++detach_port_if_specified()
++{
++        local port_name="$1"
++
++        if [[ -n "${port_name}" ]]; then
++                ip link set dev "${port_name}" nomaster
++                return $?
++        fi
++}
++
++# Test that an option's get value matches its set value.
++# Globals:
++#   RET - Used by testing infra like `check_err`.
++#   EXIT_STATUS - Used by `log_test` for whole script exit value.
++# Arguments:
++#   option_name - The name of the option.
++#   value_1 - The first value to try setting.
++#   value_2 - The second value to try setting.
++#   port_name - The (optional) name of the attached port.
++team_test_option()
++{
++        local option_name="$1"
++        local value_1="$2"
++        local value_2="$3"
++        local possible_values="$2 $3 $2"
++        local port_name="$4"
++        local port_flag
++
++        RET=0
++
++        echo "Setting '${option_name}' to '${value_1}' and '${value_2}'"
++
++        attach_port_if_specified "${port_name}"
++        check_err $? "Couldn't attach ${port_name} to master"
++        port_flag=$(get_port_flag "${port_name}")
++
++        # Set and get both possible values.
++        for value in ${possible_values}; do
++                set_and_check_get "${option_name}" "${value}" "${port_flag}"
++                check_err $? "Failed to set '${option_name}' to '${value}'"
++        done
++
++        detach_port_if_specified "${port_name}"
++        check_err $? "Couldn't detach ${port_name} from its master"
++
++        log_test "Set + Get '${option_name}' test"
++}
++
++# Test that getting a non-existant option fails.
++# Globals:
++#   RET - Used by testing infra like `check_err`.
++#   EXIT_STATUS - Used by `log_test` for whole script exit value.
++# Arguments:
++#   option_name - The name of the option.
++#   port_name - The (optional) name of the attached port.
++team_test_get_option_fails()
++{
++        local option_name="$1"
++        local port_name="$2"
++        local port_flag
++
++        RET=0
++
++        attach_port_if_specified "${port_name}"
++        check_err $? "Couldn't attach ${port_name} to master"
++        port_flag=$(get_port_flag "${port_name}")
++
++        # Just confirm that getting the value fails.
++        teamnl "${TEAM_PORT}" getoption "${option_name}" "${port_flag}"
++        check_fail $? "Shouldn't be able to get option '${option_name}'"
++
++        detach_port_if_specified "${port_name}"
++
++        log_test "Get '${option_name}' fails"
++}
++
++team_test_options()
++{
++        # Wrong option name behavior.
++        team_test_get_option_fails fake_option1
++        team_test_get_option_fails fake_option2 "${MEMBER_PORT}"
++
++        # Correct set and get behavior.
++        team_test_option mode activebackup loadbalance
++        team_test_option notify_peers_count 0 5
++        team_test_option notify_peers_interval 0 5
++        team_test_option mcast_rejoin_count 0 5
++        team_test_option mcast_rejoin_interval 0 5
++        team_test_option enabled true false "${MEMBER_PORT}"
++        team_test_option user_linkup true false "${MEMBER_PORT}"
++        team_test_option user_linkup_enabled true false "${MEMBER_PORT}"
++        team_test_option priority 10 20 "${MEMBER_PORT}"
++        team_test_option queue_id 0 1 "${MEMBER_PORT}"
++}
++
++require_command teamnl
++setup
++tests_run
++exit "${EXIT_STATUS}"
+-- 
+2.51.0.384.g4c02a37b29-goog
 
 
