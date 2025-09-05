@@ -1,138 +1,68 @@
-Return-Path: <netdev+bounces-220495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A71EBB4667F
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:16:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F1D1B46688
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F28761C239F0
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:16:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB21C3AE537
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA97228000B;
-	Fri,  5 Sep 2025 22:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50CC283FC5;
+	Fri,  5 Sep 2025 22:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/t+P5+O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CPy+t+Rw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34B827CCEE;
-	Fri,  5 Sep 2025 22:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEF01D7995;
+	Fri,  5 Sep 2025 22:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757110550; cv=none; b=Tg040FRhERrDvNNbqsWMbKX+MrPFO4phi6hOm2UGrrrPx2rIQWf0Ix6AxiZI5l5CNPhHfbHIOoyFEdG9mc09zOfOFRYbaZ20+H0j9g9LVWKE/ZEUQMIZmLZ3ZbPkirrLvowSiJ7Dg57l5wbxKkqaqUqFK79jZD02pTQIQ1DU5yk=
+	t=1757110740; cv=none; b=jXQOtVsa8eb2CYrO3rcAayOCywCNpMxR59HlIu/pyDe3/xPm3tbzz9nR4VwgoS06NoCGbRlyeahP26pHM4LcXCA8YSYMKoi1Zeszdh8W9qox/S5f3pKh9Bom1Ntzucr9eWvgwZJ+sNpm4K0pw3wEHdtjcXO0xKehhdpMGFieYBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757110550; c=relaxed/simple;
-	bh=RmPWHSmTFGED2+phg1IDhj1Eqmc+Ugmbit9TQn6jp4w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cpg8hzuWezgHmrSNKrktrCbysrosfcvwiGNPfL/lwW1mKjCHq4CNrv3uAZVoyvdr6S4DFtLXYKL4SJX6SLmdPyKSSMx6znOlL3TbyPSqEAJFlZm358rVPiMrsdFv/dN/doVORs25rGR40Xy8XDtUAdp/N4UCajAkjX6J8ZJ2yhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/t+P5+O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EF60C4CEF9;
-	Fri,  5 Sep 2025 22:15:49 +0000 (UTC)
+	s=arc-20240116; t=1757110740; c=relaxed/simple;
+	bh=fr1L5O9T6sQLQSH5FWhvtM3wJ8aCnRcMGPUHkZ6k6Xc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ge7WRmBCcs1uBYhOHkb0DQCQg4wgIfxrmOuhjilh+UXmHW8jx1ghtg1LK3vJP5w2c+6mYfXt5U5pznpmL4wav+yMzXsBzNTOpiruoUC7uKP4aWTiCTJClbIwt8vgih8zI6y2WbCAlak7HXiLTPrfM9uCYLWe4zqdsuqrZc4OsOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CPy+t+Rw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B2D4C4CEF1;
+	Fri,  5 Sep 2025 22:18:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757110550;
-	bh=RmPWHSmTFGED2+phg1IDhj1Eqmc+Ugmbit9TQn6jp4w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D/t+P5+OyhlFwueXEx46sUCxJRrNWV6Vgl1v8Fduoir2KKM50H363p2mrkLiIA5kF
-	 dE4kJFlF4a7QZwmD79qCygMsvE8dj4+QkGocn+kTzfE3kuwEBPjylTuTaTJPoJVlpw
-	 81RWN3jNeN2MA+MCraGq8+0X4uGdFbKRShTpxrw/bg7ch0nx36mukHLypQhidiV5gy
-	 PfUaxf5Sa/iI/KlzkgiianppvcQJRYX7FJvfkzuFhWLRdeebB2FqWyKUumJFq0PLSb
-	 H+ZtO4qj+05WudCpSNUmxguilyP8BzHlBB9I314aQAruZnBNZ/9TT3nFGxif7vD2ou
-	 aqWAmdm0CabGg==
+	s=k20201202; t=1757110740;
+	bh=fr1L5O9T6sQLQSH5FWhvtM3wJ8aCnRcMGPUHkZ6k6Xc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CPy+t+RwcaP/34pNJ9hGO2jyGw9dneGW4dBARkRdCgz10+Rr0hskDOYXg0WQN8B+t
+	 VSM1Gd4SSeGlTZ3/poQffV+R2ztMmpJFnoZiq1oHMJhGhURvq1gDBQZbaOA4q4GFHE
+	 0rff6i4UoStj86oD6XJgkRDqx7x2s/+tMB6Gzrl7194H/VpDCaiYOIjyCvBx/1lVgV
+	 4xgtgp96XokpLKrK7dFiRcWzsrZ2h8V9hLaJcj2x/iAe20aUC+XcNpz1Tzn/vLYhoY
+	 rDmZXjUr11IyTiesQelXL3SFNknwfqEa7vK1SptTu8hfy3W6TVHy9JY8GzNe1jee44
+	 2JYmxg33q9CQw==
+Date: Fri, 5 Sep 2025 15:18:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	michael.chan@broadcom.com,
-	anthony.l.nguyen@intel.com,
-	marcin.s.wojtas@gmail.com,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	jasowang@redhat.com,
-	bpf@vger.kernel.org,
-	aleksander.lobakin@intel.com,
-	pavan.chebbi@broadcom.com,
-	przemyslaw.kitszel@intel.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/2] net: xdp: handle frags with unreadable memory
-Date: Fri,  5 Sep 2025 15:15:39 -0700
-Message-ID: <20250905221539.2930285-3-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250905221539.2930285-1-kuba@kernel.org>
-References: <20250905221539.2930285-1-kuba@kernel.org>
+To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com
+Subject: Re: [v6, net-next 00/10] Add more functionality to BNGE
+Message-ID: <20250905151858.222c6b67@kernel.org>
+In-Reply-To: <20250905224652.48692-1-bhargava.marreddy@broadcom.com>
+References: <20250905224652.48692-1-bhargava.marreddy@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-We don't expect frags with unreadable memory to be presented
-to XDP programs today, but the XDP helpers are designed to be
-usable whether XDP is enabled or not. Support handling frags
-with unreadable memory.
+On Fri,  5 Sep 2025 22:46:42 +0000 Bhargava Marreddy wrote:
+> Date: Fri,  5 Sep 2025 22:46:42 +0000
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- include/net/xdp.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index 57189fc21168..98f984d8f2c6 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -76,6 +76,11 @@ enum xdp_buff_flags {
- 	XDP_FLAGS_FRAGS_PF_MEMALLOC	= BIT(1), /* xdp paged memory is under
- 						   * pressure
- 						   */
-+	/* frags have unreadable mem, this can't be true for real XDP packets,
-+	 * but drivers may use XDP helpers to construct Rx pkt state even when
-+	 * XDP program is not attached.
-+	 */
-+	XDP_FLAGS_FRAGS_UNREADABLE	= BIT(2),
- };
- 
- struct xdp_buff {
-@@ -109,6 +114,11 @@ static __always_inline void xdp_buff_set_frag_pfmemalloc(struct xdp_buff *xdp)
- 	xdp->flags |= XDP_FLAGS_FRAGS_PF_MEMALLOC;
- }
- 
-+static __always_inline void xdp_buff_set_frag_unreadable(struct xdp_buff *xdp)
-+{
-+	xdp->flags |= XDP_FLAGS_FRAGS_UNREADABLE;
-+}
-+
- static __always_inline u32 xdp_buff_get_skb_flags(const struct xdp_buff *xdp)
- {
- 	return xdp->flags;
-@@ -248,6 +258,8 @@ static inline bool xdp_buff_add_frag(struct xdp_buff *xdp, netmem_ref netmem,
- 
- 	if (unlikely(netmem_is_pfmemalloc(netmem)))
- 		xdp_buff_set_frag_pfmemalloc(xdp);
-+	if (unlikely(netmem_is_net_iov(netmem)))
-+		xdp_buff_set_frag_unreadable(xdp);
- 
- 	return true;
- }
-@@ -328,6 +340,7 @@ xdp_update_skb_frags_info(struct sk_buff *skb, u8 nr_frags,
- 	skb->data_len += size;
- 	skb->truesize += truesize;
- 	skb->pfmemalloc |= !!(xdp_flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
-+	skb->unreadable |= !!(xdp_flags & XDP_FLAGS_FRAGS_UNREADABLE);
- }
- 
- /* Avoids inlining WARN macro in fast-path */
--- 
-2.51.0
-
+Please fix the time(zone) on your system. I already asked you once.
 
