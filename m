@@ -1,151 +1,215 @@
-Return-Path: <netdev+bounces-220489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F024DB46594
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 23:33:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B58AB46614
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 23:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7ABA1786D5
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 21:33:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4039CAC421E
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 21:46:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461272F1FF5;
-	Fri,  5 Sep 2025 21:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EBA2F83B6;
+	Fri,  5 Sep 2025 21:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Xaea9Ygw"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="RBETcqgZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A942C2F28F0
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 21:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837102F83AF;
+	Fri,  5 Sep 2025 21:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757107985; cv=none; b=UTSzjcFYAZsy5PyuZDnwn35qF0o0RwLSYKGZzWDXAfQiuP1SgpK3JN4u9hVl88UVdoQltDgNalHIEShH2rsM2R7PqxN2I2m08GOCL7n36AxVb9GIP4gwJhxOBQ9uy3XjPKzUX0p6SWXijVJXap7OgBh0Y66IlWkMcDC3iHFNi8s=
+	t=1757108520; cv=none; b=MQJqL/pGz2CFe2fkZl2KyT1aejkWRldRcNFE+8xoZ3zWm1i48uR7NWuUXgw0qFdnX7h9JBM75j0I9yf9Lq2m1mFTqeTeOs/z28I50wmnOqPnOviCO47QnkTP8X4OCWGMfd+Uz0J8saOBYMgUPNNXwPyWZiUxsPGFq2Ho6OsVRaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757107985; c=relaxed/simple;
-	bh=0DA4pgXerKYiZ8T9P9268FLSCmngT97yHHzENfDQs10=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cbFRtmiBArH5jEN+y0w+ejD6gtN+9uyD7aoTxslTZsk6D4oj9oHA0byGqOTp6dMKuNtam3e0eeyM9K6Oqy4mUBJZ/knZC2JtXBn5tNKu540UBQuFkITfTE6DtCkYcaT5G3zf0zWbM7qHHjbkF612FDTu/dDa6NR970g9MsU3qrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Xaea9Ygw; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tjqTxFzcvjvlbMlPNZxUHe9ttP1UU9TUHZEAEx9gBPQ=; t=1757107983; x=1757971983; 
-	b=Xaea9YgwioEp7LcNRxp6UEJA1YDdcrSmoHmocnML4MBqLQCUm/CHyYdhq4o31Nt8X0XCMo5vk19
-	c0XytfiR2q/H8cBTxK39WZ8C4XOuh2RhUVJJCLJ+N/xfKhtM2NRep4izJ9LYciKM78fiKTKmPaI3X
-	7eDKFaNwv7TeGM2yVIw/ut4+DQeztRbHFRE5EGv4TvUk9M0ufVGELm3O9KdXwqrD0Qu42wkpii2QU
-	xqAoGTgrBbTP5yr4uVkiwma2nC6+bBO0Igxox57ZO8M1VYs5zUuWfOevdnH88U9rGnB7V33S30+3D
-	MHNjt04shx1y9/5ejFOCMxVjrz+EXomuA9KQ==;
-Received: from mail-oa1-f41.google.com ([209.85.160.41]:43316)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uue3D-0001dh-52
-	for netdev@vger.kernel.org; Fri, 05 Sep 2025 14:32:56 -0700
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-31d8778ce02so1293523fac.1
-        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 14:32:55 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzfkI8hNayEOtFDOFQ5g9XBrsWGPYFrtRIhDQht2rJEirVjaB2Y
-	/O2MFSpGoP9XT1bAVcb4IMSjBa9+a7rKeTdjmH5xBZaLcUmAKPRVUemc7HajoYSh5Luf4DZsyQ8
-	Nb41FCLsq2tTsV1Jx0n3GTK00UaifleA=
-X-Google-Smtp-Source: AGHT+IH2czz2woW5ksDeqZfDL+YXM++WGeQgenz5ZW3uNFgUO891iE+pYA5+1yuC1WJaVbJEWK4kPsXb3dMaqhKafI0=
-X-Received: by 2002:a05:6870:4586:b0:2ef:1c81:f2fd with SMTP id
- 586e51a60fabf-31f3bc0183emr2710216fac.16.1757107974494; Fri, 05 Sep 2025
- 14:32:54 -0700 (PDT)
+	s=arc-20240116; t=1757108520; c=relaxed/simple;
+	bh=n1zL1dghlRy0+A8PIhiVW/ZsMjbvNqyCZS6VPJicZms=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ULjqqPZZB6CNffRIHL9Z1SeaR67XtwP2lg2+kcfxU7Nyc4F30/DxK6V/2O+1C8z8kaPttbr7PT+7Du6Rh6RgA4SDDzAXYoDwnsrBtzOmW2iWhvSepkNDvhdWuyASaLfoGav0xNT6xEvX7ApAn0a7ZixX3aXj/A5eIB3+OMOwKp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=RBETcqgZ; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 7E61E20171D3;
+	Fri,  5 Sep 2025 14:41:53 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7E61E20171D3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1757108514;
+	bh=pLTx4Rr8G6NQmZqkGo3pXfMpnw5bZX2ma0h+xMq8JrA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RBETcqgZyxhP4vA+SY74JeEifpJbs8CGGsV8LNL4b3jFuP9zvIq+hI8kC5wZPgcC6
+	 1WT2cgW4wYPCxkj6xOu4yy4jAknNRtnBrBlRHaMKitBQ2PX1olNc+ZlDBCF0VUFtnh
+	 NIUJ2ivqX8aQgh1dtNqaU2+PbzVKxt32fdpclyYk=
+Message-ID: <6a26cbf8-7877-4f39-0ed3-7bbc306f9fe5@linux.microsoft.com>
+Date: Fri, 5 Sep 2025 14:41:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250818205551.2082-1-ouster@cs.stanford.edu> <20250818205551.2082-13-ouster@cs.stanford.edu>
- <CANn89iJ26WjmTBrEKwMJbQCKWYFmz2h25T+kOgLASXPvsDR1BQ@mail.gmail.com>
-In-Reply-To: <CANn89iJ26WjmTBrEKwMJbQCKWYFmz2h25T+kOgLASXPvsDR1BQ@mail.gmail.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Fri, 5 Sep 2025 14:32:18 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmzUFH8RcgGf6tz=BCh_VBQXTg4o7M3HSthdRjD7_eHKoQ@mail.gmail.com>
-X-Gm-Features: Ac12FXyeN54F-KpuHqjhgyLn2omUfFt58n0N012i8GyGP53Gnp9z9NPPPQVkHes
-Message-ID: <CAGXJAmzUFH8RcgGf6tz=BCh_VBQXTg4o7M3HSthdRjD7_eHKoQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 12/15] net: homa: create homa_incoming.c
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Scan-Signature: cb5916722246bf80bd9488153e8e2604
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH V0 0/2] Fix CONFIG_HYPERV and vmbus related anamoly
+Content-Language: en-US
+To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
+ Michael Kelley <mhklinux@outlook.com>,
+ "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+ "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
+Cc: "maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+ "mripard@kernel.org" <mripard@kernel.org>,
+ "tzimmermann@suse.de" <tzimmermann@suse.de>,
+ "airlied@gmail.com" <airlied@gmail.com>, "simona@ffwll.ch"
+ <simona@ffwll.ch>, "jikos@kernel.org" <jikos@kernel.org>,
+ "bentiss@kernel.org" <bentiss@kernel.org>,
+ "kys@microsoft.com" <kys@microsoft.com>,
+ "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "decui@microsoft.com" <decui@microsoft.com>,
+ "dmitry.torokhov@gmail.com" <dmitry.torokhov@gmail.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "bhelgaas@google.com" <bhelgaas@google.com>,
+ "James.Bottomley@HansenPartnership.com"
+ <James.Bottomley@HansenPartnership.com>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+ "deller@gmx.de" <deller@gmx.de>, "arnd@arndb.de" <arnd@arndb.de>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>,
+ "horms@kernel.org" <horms@kernel.org>
+References: <20250828005952.884343-1-mrathor@linux.microsoft.com>
+ <SN6PR02MB4157917D84D00DBDAF54BD69D406A@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <ff4c58f1-564d-ddfa-bdff-48ffee6e0d72@linux.microsoft.com>
+ <SN6PR02MB41573C5451F21286667C5441D400A@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <4f38c613-255c-eaf6-0d50-28f8ffc02fff@linux.microsoft.com>
+ <231f05cb-4f33-48ac-bb2e-1359ed52e606@linux.microsoft.com>
+From: Mukesh R <mrathor@linux.microsoft.com>
+In-Reply-To: <231f05cb-4f33-48ac-bb2e-1359ed52e606@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 2, 2025 at 12:19=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
-> >
-> > +/**
-> > + * homa_message_in_init() - Constructor for homa_message_in.
-> > + * @rpc:          RPC whose msgin structure should be initialized. The
-> > + *                msgin struct is assumed to be zeroes.
-> > + * @length:       Total number of bytes in message.
-> > + * Return:        Zero for successful initialization, or a negative er=
-rno
-> > + *                if rpc->msgin could not be initialized.
-> > + */
-> > +int homa_message_in_init(struct homa_rpc *rpc, int length)
-> > +       __must_hold(rpc->bucket->lock)
-> > +{
-> > +       int err;
-> > +
-> > +       if (length > HOMA_MAX_MESSAGE_LENGTH)
-> > +               return -EINVAL;
-> > +
-> > +       rpc->msgin.length =3D length;
-> > +       skb_queue_head_init(&rpc->msgin.packets);
->
-> Do you need the lock, or can you use __skb_queue_head_init() here for cla=
-rity ?
+On 9/5/25 13:08, Nuno Das Neves wrote:
+> On 9/4/2025 11:18 AM, Mukesh R wrote:
+>> On 9/4/25 09:26, Michael Kelley wrote:
+>>> From: Mukesh R <mrathor@linux.microsoft.com> Sent: Wednesday, September 3, 2025 7:17 PM
+>>>>
+>>>> On 9/2/25 07:42, Michael Kelley wrote:
+>>>>> From: Mukesh Rathor <mrathor@linux.microsoft.com> Sent: Wednesday, August 27, 2025 6:00 PM
+>>>>>>
+>>>>>> At present, drivers/Makefile will subst =m to =y for CONFIG_HYPERV for hv
+>>>>>> subdir. Also, drivers/hv/Makefile replaces =m to =y to build in
+>>>>>> hv_common.c that is needed for the drivers. Moreover, vmbus driver is
+>>>>>> built if CONFIG_HYPER is set, either loadable or builtin.
+>>>>>>
+>>>>>> This is not a good approach. CONFIG_HYPERV is really an umbrella config that
+>>>>>> encompasses builtin code and various other things and not a dedicated config
+>>>>>> option for VMBUS. Vmbus should really have a config option just like
+>>>>>> CONFIG_HYPERV_BALLOON etc. This small series introduces CONFIG_HYPERV_VMBUS
+>>>>>> to build VMBUS driver and make that distinction explicit. With that
+>>>>>> CONFIG_HYPERV could be changed to bool.
+>>>>>
+>>>>> Separating the core hypervisor support (CONFIG_HYPERV) from the VMBus
+>>>>> support (CONFIG_HYPERV_VMBUS) makes sense to me. Overall the code
+>>>>> is already mostly in separate source files code, though there's some
+>>>>> entanglement in the handling of VMBus interrupts, which could be
+>>>>> improved later.
+>>>>>
+>>>>> However, I have a compatibility concern. Consider this scenario:
+>>>>>
+>>>>> 1) Assume running in a Hyper-V VM with a current Linux kernel version
+>>>>>     built with CONFIG_HYPERV=m.
+>>>>> 2) Grab a new version of kernel source code that contains this patch set.
+>>>>> 3) Run 'make olddefconfig' to create the .config file for the new kernel.
+>>>>> 4) Build the new kernel. This succeeds.
+>>>>> 5) Install and run the new kernel in the Hyper-V VM. This fails.
+>>>>>
+>>>>> The failure occurs because CONFIG_HYPERV=m is no longer legal,
+>>>>> so the .config file created in Step 3 has CONFIG_HYPERV=n. The
+>>>>> newly built kernel has no Hyper-V support and won't run in a
+>>>>> Hyper-V VM.
+> 
+> It surprises me a little that =m doesn't get 'fixed up' to =y in this case.
+> I guess any invalid value turns to =n, which makes sense most of the time.
+> 
+>>>>>
+>>>>> As a second issue, if in Step 1 the current kernel was built with
+>>>>> CONFIG_HYPERV=y, then the .config file for the new kernel will have
+>>>>> CONFIG_HYPERV=y, which is better. But CONFIG_HYPERV_VMBUS
+>>>>> defaults to 'n', so the new kernel doesn't have any VMBus drivers
+>>>>> and won't run in a typical Hyper-V VM.
+>>>>>
+>>>>> The second issue could be fixed by assigning CONFIG_HYPERV_VMBUS
+>>>>> a default value, such as whatever CONFIG_HYPERV is set to. But
+>>>>> I'm not sure how to fix the first issue, except by continuing to
+>>>>> allow CONFIG_HYPERV=m.
+> 
+> I'm wondering, is there a path for this change, then? Are there some
+> intermediate step/s we could take to minimize the problem?
+> 
+>>>>
+>>>> To certain extent, imo, users are expected to check config files
+>>>> for changes when moving to new versions/releases, so it would be a
+>>>> one time burden. 
+>>>
+>>> I'm not so sanguine about the impact. For those of us who work with
+>>> Hyper-V frequently, yes, it's probably not that big of an issue -- we can
+>>> figure it out. But a lot of Azure/Hyper-V users aren't that familiar with
+>>> the details of how the Kconfig files are put together. And the issue occurs
+>>> with no error messages that something has gone wrong in building
+>>> the kernel, except that it won't boot. Just running "make olddefconfig"
+>>> has worked in the past, so some users will be befuddled and end up
+>>> generating Azure support incidents. I also wonder about breaking
+>>> automated test suites for new kernels, as they are likely to be running
+>>> "make olddefconfig" or something similar as part of the automation.
+>>>
+>>>> CONFIG_HYPERV=m is just broken imo as one sees that
+>>>> in .config but magically symbols in drivers/hv are in kerenel.
+>>>>
+>>>
+>>> I agree that's not ideal. But note that some Hyper-V code and symbols
+>>> like ms_hyperv_init_platform() and related functions show up when
+>>> CONFIG_HYPERVISOR_GUEST=y, even if CONFIG_HYPERV=n. That's
+>>> the code in arch/x86/kernel/cpu/mshyperv.c and it's because Hyper-V
+>>> is one of the recognized and somewhat hardwired hypervisors (like
+>>> VMware, for example).
+>>>
+>>> Finally, there are about a dozen other places in the kernel that use
+>>> the same Makefile construct to make some code built-in even though
+>>> the CONFIG option is set to "m". That may not be enough occurrences
+>>> to make it standard practice, but Hyper-V guests are certainly not the
+>>> only case.
+>>>
+>>> In my mind, this is judgment call with no absolute right answer. What
+>>> do others think about the tradeoffs?
+>>
+>> Wei had said in private message that he agrees this is a good idea. Nuno
+>> said earlier above: 
+>>
+>> "FWIW I think it's a good idea, interested to hear what others think."
+>>
+> That was before Michael pointed out the potential issues which I was
+> unaware of. Let's see if there's a path that is smoother for all the
+> downstream users who may be compiling with CONFIG_HYPERV=m.
 
-No need for the lock. I hadn't realized that I should then use a
-different initializer. I have now switched to __skb_queue_head_init
-(and added to the documentation for packets).
+Ok, we've already thought of it for sometime and not able to come up
+with any. IMO, it's a minor hickup, not major. This is stalling
+upcoming iommu and other patches which will use CONFIG_HYPERV and 
+add more dependencies, and it would be much harder to straighten 
+out then. So I hope you guys can come up with some solution sooner than
+later, I can't think of any.
 
-> > +               if (n =3D=3D 0) {
-> > +                       atomic_andnot(RPC_PKTS_READY, &rpc->flags);
->
-> All networking uses clear_bit() instead...
+Thanks,
+-Mukesh
 
-I have switched everywhere.
 
-> > +               n =3D 0;
->
-> > +               atomic_or(APP_NEEDS_LOCK, &rpc->flags);
-> > +               homa_rpc_lock(rpc);
-> > +               atomic_andnot(APP_NEEDS_LOCK, &rpc->flags);
->
-> This construct would probably need a helper.
-
-Done, here and elsewhere.
-
-> > +
-> > +done:
-> > +       kfree_skb(skb);
->
->
-> Please double check all your kfree_skb() vs consume_skb()
->
-> perf record -a -e skb:kfree_skb  sleep 60
-> vs
-> perf record -a -e skb:consume_skb  sleep 60
->
-> As a bonus, you can use kfree_skb_reason(skb, some_reason) for future
-> bug hunting
-
-I wasn't aware of the consume_skb/kfree_skb_reason pattern. I've
-checked all uses of kfree_skb and converted to consume_skb where
-appropriate. The code also uses kfree_skb_reason wherever there is an
-appropriate reason code.
-
--John-
 
