@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-220222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E42BB44C9C
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 06:10:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C8DFB44CA0
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 06:12:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A79AB7A9CE9
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 04:08:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECE437B21AA
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 04:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC8425D53B;
-	Fri,  5 Sep 2025 04:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DC9261596;
+	Fri,  5 Sep 2025 04:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AJmhAq/I"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="l7cQTifw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45ADF23185D
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 04:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5662323BD17
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 04:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757045409; cv=none; b=SrLW/9PJ8qeJNQQwf5ArQqJka3obAFIuxk/2oJQdMll+ACzLK73QpcyCG42VCq4NcWP73poUzn8P9RW+pjf11IF+QEQovffGbPyncCXLzPeRDdcqMT9TxwIUyPUl7O3cyXytfVIk3lE/VAMZ4Qs6wljb/Jp+/G2qgCF9mSJqDos=
+	t=1757045524; cv=none; b=Iu7yY0Xm31A7yQg8LPm0Axk08Ih4eGmufvVEgRj96rDlvrQpBMXDbA3t3+51+8XPXO44uEWe1SliLrZqoMx2UKd12FppZQA8PUGJstEUOPtEyqdKC0CGbsy0uKsp4SbmylCirSlafJLr8AJTxC7wut9Gff0uXI5zpZYruQCp24Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757045409; c=relaxed/simple;
-	bh=KLKUHPIcRB0O4muuVCBP8C+yFYqPCsP1VfYmF9nYOvI=;
+	s=arc-20240116; t=1757045524; c=relaxed/simple;
+	bh=GzadoSFoHf9ktPEx0Sr+SSQSuPfeH8BntcvB+4d6yPA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PezEe1+cyxhF6lGwMLE9EgBGXQkMFXDlzmYOVC+BH1XZs7iwsnUqMPxuXxhgAwjjts1wW4sP2bk//9/N9NXfouo0AEBY7HUMjDiTU2jEcfSp+iPOK/Bs/IULo5udpKDvPXYZLwdPdy6VZrXwACGx1TnZIysdRqUr1XbBaXKVMHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=AJmhAq/I; arc=none smtp.client-ip=209.85.167.44
+	 To:Cc:Content-Type; b=ivmbbRpbhDzfmN+a+oM/C7rffvD+Isa8dsayLPSWFHIiSknGDxMyxOB4cR6ZqsoJ6XHu0OlUKG2xNLzIphO2td7UTNnXbYCAav94oxEa2BWCHR1uCGXZthCL7QO06jlSdxyIY/JyZynem7AXcWWSxBesZP1QBZsHgmbW2L15qaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=l7cQTifw; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-55f6507bd53so1841669e87.3
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 21:10:07 -0700 (PDT)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-55f76277413so2066165e87.3
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 21:12:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1757045405; x=1757650205; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1757045519; x=1757650319; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KLKUHPIcRB0O4muuVCBP8C+yFYqPCsP1VfYmF9nYOvI=;
-        b=AJmhAq/IP/BSeLkYccBXDi13Lp40Tvzens1nJ4WoC96MTkj51upPoaMdlbP2lw+rek
-         HmuWGup7FR1jfacuCYzjWNmncw6qQwsRlHjJUpn0vB55FPRTxJZdnhEB+CjTekrH6Lht
-         IhNDMHwmyGKR9OQW7QmfLz4Z7E3axvGkJpoXA=
+        bh=B01bmRXAH2QxWeqvPvWQshPIhSklJV5XtS7pyRMi7sU=;
+        b=l7cQTifwxjqS/Xi9q2iEcfedDQqgxZKIgy+zW1UQOi1JbBvTpMTG0jIxdKn5mI476l
+         0lSKDpkh+kGoXPMHwW5llWOWPkyCKs0oh/Aut+Q5AYmzCWs6JswvJcjHyCXPiyGTQO6Y
+         CcFe5ENXN855ojWzAnn6AiO29dLqZD8n6+X6o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757045405; x=1757650205;
+        d=1e100.net; s=20230601; t=1757045519; x=1757650319;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KLKUHPIcRB0O4muuVCBP8C+yFYqPCsP1VfYmF9nYOvI=;
-        b=TB8cjFBKSj8zsmFqY2c9FqTMRw9FOzTEgnBrpN6Szc8qq/sPdenEkhrPKDsHfovgX/
-         q+U+nJuL0cqLRFGeixz+6iS5o4GL3XrQe1t2WUTCJA1jjvTm02BGahbDnCr+HvM9FrYg
-         mkc7RLhMkGDB93mdPa/7kxb3GctpSwgzdX9Zs4E1CNT6SzFOiaucbV0ZOwxC3xuG8ewC
-         d4N2mssjWFsD5lYoS6PauYcHkPnPr+YoktwLVpD3bIj+GaXVsPgRi/0lgwzdETQl9kdf
-         70VeHPa2hUWrnDI9gKmgKEK77zbqmcvvxkjSwDPpoc0hopxBxh+hcConvbWOLQblQmMb
-         KZtw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3udicmspltCOsigSlfe5CwTLwqvVsKZl6h6Gyw0xe8Kqn1O1W9oyG8XGkl4pPlifGTRxTweU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj4l5NA8QnmYRpg3wCSo9QHNS7gU8I/nNaQGM359SNKWg2qtan
-	x2BzaI82FT0VjrM+5XbXSwQJ4i7G+GYC9SHSLtEc0LKHWq+1ReIki7qDuDbDbq8/qD3wfNTxhvb
-	JvTY5SN6f0WGgT9w4XoriRmtX/rYt5662T8sO8sVp
-X-Gm-Gg: ASbGnctCJKwJyxrdQkAAzN+gVi3O5HxfqG/TDvEQnMgnaQZfuBIe0yYJAwHSs2FZzQ+
-	DSAPg82P3a19+gvZt1FSfFM1+zeFBdWG3Ru+1pz1rTL1JgBGNWGci45hglTHaC+7m+exauAV7bC
-	atekYHvN5+g2TabVRca3nVQY3hYEGde3yRlMy6+fMz1XMqNqagkZqGm1EEo4OgtARcrT3gkqrlq
-	dKTB8IhMk6ytfgmalKpp9DE2fTemWeXsvE5Vw==
-X-Google-Smtp-Source: AGHT+IH7HKhnxC6o9ewQ28R2ZzX9RmDQokY2C+2i+wMjE8WlWqsz+BTU++rL/6Yzgiv59B7OTvBGnUhQzmndeoe72TQ=
-X-Received: by 2002:a05:6512:650f:b0:55f:65f9:512e with SMTP id
- 2adb3069b0e04-55f708a2a7fmr4251279e87.6.1757045405415; Thu, 04 Sep 2025
- 21:10:05 -0700 (PDT)
+        bh=B01bmRXAH2QxWeqvPvWQshPIhSklJV5XtS7pyRMi7sU=;
+        b=HsJbctVAIHS9BWrr+Y+hb96NrZ7zcYBjvuWpJml8vCrXf/C9+RMsVs+CVBnySL1N+P
+         Abtbsbmu3XgJvQHwM48UmUE7OYO5C2d4X6q4+SY889Xs+76Ct8rgXNcUWOoNB0hdEdxr
+         sw+MSZaz1fsN0QasGmgXGSRp8dJ7OcyPJDkVF4Cj2wG+xJuF7txjCcqhSJqQ8oyozLbA
+         YgOS+uXiUUpcVicB2FjC7JRcyDiDquo7Ro0QGzf4NzXXQM4UDXagNUTCObta7qhrT0am
+         REXrE+HVTK6kr1u4a6Cr5Uf/KlhXExx0vpR7pzF5ZGRxvx1+Xc8kb1WAGajydKTPdfi6
+         3PMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjIvR8bpqOL8AiGldm/XFvjDitipzQP9SE1DyOlit9y+IrzgZ2pmz351+9l0LyOEIOHDJ2r6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtNMC4gg7XxOrbWvANyqdkaP5kSlg/M9+YYDT/cn9wSpe6K0vS
+	c/UAdl6Y1q4GLpaxoLd0Mkg7Uaow6ymGO6Fxh537AvQE0iSo/JM4bLwfKXbzDsp+aFp//RfcXNg
+	aAO9IBSKwBzU8s4TDM0ChkXg9BKl67j/yPDiYghmw
+X-Gm-Gg: ASbGncto2fBnXgOV04HT0o4VEz7IZNRsTkYRtLaELuWFw4g0rSM894gO5yYJ7VpkmKI
+	CH4uRf32t1aMGfQF38X3Qv8LBONBj+Gbrx+TcNPslE0ZHj4Pluv7j+k6Bc+xIIKOV2i8KH/IP8G
+	lR5wYVOND21mRB0QlVyH+Ec4o6fybBb6TV8PT+W6IQj98bdyeIUfFVK+r2kQmIOQ63rh9a53Grx
+	iXqRhaweGuu/16xxYu+LF/QmeWwjKTgGW0qsw==
+X-Google-Smtp-Source: AGHT+IHYbfT4YDZymjaehpt2dXCn45+LCQHpybmvo8P6U3yHsdZLz6BM1N5npkfa7ulF9V213ctJPW+ye/twek7OL9E=
+X-Received: by 2002:a2e:b88e:0:b0:336:831d:9e00 with SMTP id
+ 38308e7fff4ca-336caafcd05mr54910501fa.25.1757045519418; Thu, 04 Sep 2025
+ 21:11:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250829091913.131528-1-laura.nao@collabora.com> <20250829091913.131528-4-laura.nao@collabora.com>
-In-Reply-To: <20250829091913.131528-4-laura.nao@collabora.com>
+References: <20250829091913.131528-1-laura.nao@collabora.com> <20250829091913.131528-6-laura.nao@collabora.com>
+In-Reply-To: <20250829091913.131528-6-laura.nao@collabora.com>
 From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Fri, 5 Sep 2025 12:09:54 +0800
-X-Gm-Features: Ac12FXx6pAx7CiAA-H5MAQbshXKRXROm_6MtHlpf5-g4LpJf9Fu8XFakXK69rOQ
-Message-ID: <CAGXv+5ELv9vR7i_Xd7XCC7gBciMXPfQfDAD1WyNy89=pJaLC_w@mail.gmail.com>
-Subject: Re: [PATCH v5 03/27] clk: mediatek: clk-mux: Add ops for mux gates
- with set/clr/upd and FENC
+Date: Fri, 5 Sep 2025 12:11:48 +0800
+X-Gm-Features: Ac12FXxJqW2o_w5uvmk3WVayIoiyKNEplrPyOCeaEvIjyu6tO3A5A0cEjAtjJqA
+Message-ID: <CAGXv+5HaKD_2oUnYkRX+AswFre__ZKah27=+c-RH_W_J5Gio3A@mail.gmail.com>
+Subject: Re: [PATCH v5 05/27] clk: mediatek: clk-mux: Add ops for mux gates
+ with HW voter and FENC
 To: Laura Nao <laura.nao@collabora.com>
 Cc: mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org, 
 	krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com, 
@@ -92,17 +92,166 @@ Cc: mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 29, 2025 at 5:20=E2=80=AFPM Laura Nao <laura.nao@collabora.com>=
+On Fri, Aug 29, 2025 at 5:21=E2=80=AFPM Laura Nao <laura.nao@collabora.com>=
  wrote:
 >
-> MT8196 uses set/clr/upd registers for mux gate enable/disable control,
-> along with a FENC bit to check the status. Add new set of mux gate
-> clock operations with support for set/clr/upd and FENC status logic.
+> MT8196 use a HW voter for mux gate enable/disable control, along with a
+> FENC status bit to check the status. Voting is performed using
+> set/clr/upd registers, with a status bit used to verify the vote state.
+> Add new set of mux gate clock operations with support for voting via
+> set/clr/upd regs and FENC status logic.
 >
 > Reviewed-by: N=C3=ADcolas F. R. A. Prado <nfraprado@collabora.com>
 > Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collab=
 ora.com>
 > Signed-off-by: Laura Nao <laura.nao@collabora.com>
+> ---
+>  drivers/clk/mediatek/clk-mtk.h |  2 +
+>  drivers/clk/mediatek/clk-mux.c | 73 +++++++++++++++++++++++++++++++++-
+>  drivers/clk/mediatek/clk-mux.h | 42 +++++++++++++++++++
+>  3 files changed, 116 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/clk/mediatek/clk-mtk.h b/drivers/clk/mediatek/clk-mt=
+k.h
+> index 11962fac43ea..c381d6a6d908 100644
+> --- a/drivers/clk/mediatek/clk-mtk.h
+> +++ b/drivers/clk/mediatek/clk-mtk.h
+> @@ -20,6 +20,8 @@
+>
+>  #define MHZ (1000 * 1000)
+>
+> +#define MTK_WAIT_HWV_DONE_US   30
+> +
+>  struct platform_device;
+>
+>  /*
+> diff --git a/drivers/clk/mediatek/clk-mux.c b/drivers/clk/mediatek/clk-mu=
+x.c
+> index 3931d157b262..2c2679e158e7 100644
+> --- a/drivers/clk/mediatek/clk-mux.c
+> +++ b/drivers/clk/mediatek/clk-mux.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/clk-provider.h>
+>  #include <linux/compiler_types.h>
+>  #include <linux/container_of.h>
+> +#include <linux/dev_printk.h>
+>  #include <linux/err.h>
+>  #include <linux/mfd/syscon.h>
+>  #include <linux/module.h>
+> @@ -15,6 +16,7 @@
+>  #include <linux/spinlock.h>
+>  #include <linux/slab.h>
+>
+> +#include "clk-mtk.h"
+>  #include "clk-mux.h"
+>
+>  #define MTK_WAIT_FENC_DONE_US  30
+> @@ -22,6 +24,7 @@
+>  struct mtk_clk_mux {
+>         struct clk_hw hw;
+>         struct regmap *regmap;
+> +       struct regmap *regmap_hwv;
+>         const struct mtk_mux *data;
+>         spinlock_t *lock;
+>         bool reparent;
+> @@ -119,6 +122,41 @@ static int mtk_clk_mux_is_enabled(struct clk_hw *hw)
+>         return (val & BIT(mux->data->gate_shift)) =3D=3D 0;
+>  }
+>
+> +static int mtk_clk_mux_hwv_fenc_enable(struct clk_hw *hw)
+> +{
+> +       struct mtk_clk_mux *mux =3D to_mtk_clk_mux(hw);
+> +       u32 val;
+> +       int ret;
+> +
+> +       regmap_write(mux->regmap_hwv, mux->data->hwv_set_ofs,
+> +                    BIT(mux->data->gate_shift));
+> +
+> +       ret =3D regmap_read_poll_timeout_atomic(mux->regmap_hwv, mux->dat=
+a->hwv_sta_ofs,
+> +                                             val, val & BIT(mux->data->g=
+ate_shift), 0,
+> +                                             MTK_WAIT_HWV_DONE_US);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret =3D regmap_read_poll_timeout_atomic(mux->regmap, mux->data->f=
+enc_sta_mon_ofs,
+> +                                             val, val & BIT(mux->data->f=
+enc_shift), 1,
+> +                                             MTK_WAIT_FENC_DONE_US);
+> +
+> +       return ret;
+> +}
+> +
+> +static void mtk_clk_mux_hwv_disable(struct clk_hw *hw)
+> +{
+> +       struct mtk_clk_mux *mux =3D to_mtk_clk_mux(hw);
+> +       u32 val;
+> +
+> +       regmap_write(mux->regmap_hwv, mux->data->hwv_clr_ofs,
+> +                    BIT(mux->data->gate_shift));
+> +
+> +       regmap_read_poll_timeout_atomic(mux->regmap_hwv, mux->data->hwv_s=
+ta_ofs,
+> +                                       val, (val & BIT(mux->data->gate_s=
+hift)),
+> +                                       0, MTK_WAIT_HWV_DONE_US);
+> +}
+> +
+>  static u8 mtk_clk_mux_get_parent(struct clk_hw *hw)
+>  {
+>         struct mtk_clk_mux *mux =3D to_mtk_clk_mux(hw);
+> @@ -190,6 +228,14 @@ static int mtk_clk_mux_determine_rate(struct clk_hw =
+*hw,
+>         return clk_mux_determine_rate_flags(hw, req, mux->data->flags);
+>  }
+>
+> +static bool mtk_clk_mux_uses_hwv(const struct clk_ops *ops)
+> +{
+> +       if (ops =3D=3D &mtk_mux_gate_hwv_fenc_clr_set_upd_ops)
+> +               return true;
+> +
+> +       return false;
+> +}
+> +
+>  const struct clk_ops mtk_mux_clr_set_upd_ops =3D {
+>         .get_parent =3D mtk_clk_mux_get_parent,
+>         .set_parent =3D mtk_clk_mux_set_parent_setclr_lock,
+> @@ -217,9 +263,20 @@ const struct clk_ops mtk_mux_gate_fenc_clr_set_upd_o=
+ps =3D {
+>  };
+>  EXPORT_SYMBOL_GPL(mtk_mux_gate_fenc_clr_set_upd_ops);
+>
+> +const struct clk_ops mtk_mux_gate_hwv_fenc_clr_set_upd_ops =3D {
+> +       .enable =3D mtk_clk_mux_hwv_fenc_enable,
+> +       .disable =3D mtk_clk_mux_hwv_disable,
+> +       .is_enabled =3D mtk_clk_mux_fenc_is_enabled,
+> +       .get_parent =3D mtk_clk_mux_get_parent,
+> +       .set_parent =3D mtk_clk_mux_set_parent_setclr_lock,
+> +       .determine_rate =3D mtk_clk_mux_determine_rate,
+> +};
+> +EXPORT_SYMBOL_GPL(mtk_mux_gate_hwv_fenc_clr_set_upd_ops);
+> +
+>  static struct clk_hw *mtk_clk_register_mux(struct device *dev,
+>                                            const struct mtk_mux *mux,
+>                                            struct regmap *regmap,
+> +                                          struct regmap *regmap_hwv,
+>                                            spinlock_t *lock)
+>  {
+>         struct mtk_clk_mux *clk_mux;
+> @@ -235,8 +292,14 @@ static struct clk_hw *mtk_clk_register_mux(struct de=
+vice *dev,
+>         init.parent_names =3D mux->parent_names;
+>         init.num_parents =3D mux->num_parents;
+>         init.ops =3D mux->ops;
+> +       if (mtk_clk_mux_uses_hwv(init.ops) && !regmap_hwv) {
+> +               return dev_err_ptr_probe(
+> +                       dev, -ENXIO,
+> +                       "regmap not found for hardware voter clocks\n");
+> +       }
+
+Nit: The braces aren't really needed. But no need to respin just for this.
 
 Reviewed-by: Chen-Yu Tsai <wenst@chromium.org>
 
