@@ -1,112 +1,115 @@
-Return-Path: <netdev+bounces-220301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2A89B45561
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:55:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5026B45544
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:48:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9DD5587B87
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:55:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA185A648DF
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896EA31CA74;
-	Fri,  5 Sep 2025 10:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4A431354C;
+	Fri,  5 Sep 2025 10:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nwu5JsVP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WYaKJiyi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF45731A558;
-	Fri,  5 Sep 2025 10:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8992A3148BA
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 10:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757069648; cv=none; b=M0DSV5koTzWvBFmqBCpdUeAbEJE3v/gxFFB11BaJKDnrpTYOgHzqrHyfTxafx/cfGEpSJH7ittKrmEEKOpxHQ1/TXxf6sbeuLAJY+nrTBU1M+qyPoQcydP7fzcUsyQR5/hnGysVVQtRNPKNcHdy7JOLYUJXJdYYx8RtQ0KfqV8A=
+	t=1757069238; cv=none; b=JG0w+fG0C/FqVHfnzy4WmEktrLYmQXMgwiBS6K5hH58Bx5KHN5K/hh7vuQVrpR87N5ROXZrvKp6MtaYOCOVyIslYmvSPp9eEyZRKkQGuO2D8lrZbtNCqEQuoh8n8tvPiDIiHEPW0q/JC/PTYyIFpgUhr8HtwC5YHubViDQLI36o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757069648; c=relaxed/simple;
-	bh=kKIEovFREh+RMQK1agLNyNMEj8+i63lgwl8odv/dpPw=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=cY1sJhfPnUqjq+jEISHfPWGgX/ZRRjvjg+OWifB7/glGngODbXTqAsDQkfy+4Y4nuG55gplA4gsYcjM3lAy4Ccx0UR+U7XD7T3ddmeYct1GQo3Fb5M0ho5PfXSF1/HRYtWBtgRqLdlkwf6tB4M7wxPmo1n8WI9uvFzgXNTPb0GY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nwu5JsVP; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3d19699240dso1849476f8f.1;
-        Fri, 05 Sep 2025 03:54:06 -0700 (PDT)
+	s=arc-20240116; t=1757069238; c=relaxed/simple;
+	bh=tqiu3s9zFltkSv11AxpsXkUUUkqMUieGxD3BL7JwWec=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mlwX/miNuFIS1wxjnTCc69Mitjbgr2RKRADhcfCVY27Q8JR4Wo04B5v3ajZOZ70VNO6vqq8SKz+vfL+Bup29m1XMIWSNG3XnPlj3fj6a/aPhX16gag2A/65GZAUohubiQ6qzcL+WycPgD473DAUWzxkura0UtvUvyqVWzGD5nJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WYaKJiyi; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-811dc3fdc11so16701685a.2
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 03:47:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757069645; x=1757674445; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kKIEovFREh+RMQK1agLNyNMEj8+i63lgwl8odv/dpPw=;
-        b=Nwu5JsVPe+eEXPEwLwePIJAc3GZlEO5jXNo7lRDpYzqBpp7x6i80pbUYSCAJXaj/va
-         bMWeK7ZyXEI1tJVxdK+XpXWV/pR85eHa/Fg+ck6UO6KHu3P0SLdYeeTTzHWGtuAQVv2e
-         pd9iBe+ST+i5UIrumAT6bH8fXIFa4hWCKk1KnTDCpXQE3Q5gDoFw7GFbMfxfnIXqbaWa
-         w3oylkZTv9o/H30LpW9zqhyjEUx563DyxlSMYT7gMkMBUOyEAq+vcRIMfQAQ3iVWW/26
-         rgtOYdx/5etk6O7fZ79sHvx/MFWOH2A7c715PLauKUYb2urA3sV6K0GUiVP2HVbBxlJH
-         pTpg==
+        d=google.com; s=20230601; t=1757069234; x=1757674034; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zy3M+/QDMFTe34OIV0nD0yl53yFOocCSebdPGEJFkD0=;
+        b=WYaKJiyimC59PycZD+Wl6RgPGCNG7VhTffk98C//szr3/mhYdc2yP1J4kJGcsCetyQ
+         vvCwhkNCkv6am91orhrcgj6yl4ZrjyjrOscI2xnBEO9HnYrxnTGpLma/VJqKGF52BLSA
+         usEdJDTV8nHIU9bk6LzpAOUWMUztse7/SQaOHUT+ic3xjE3bJxkhUlh3UI6Ugeeiwi3w
+         IC816SC8yC1QhfgtKs6WWiBJ2pI+N4BKPIv6UWeEsQxgfbTDZZh0N3ULBKxrWpmI7FSk
+         vdxJpwGXIYz+D9oTUeq6YHgtoRuqb8UwFAd5mPryJ41W7CnWw47hfQiTzsjQitVjq8D6
+         tbNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757069645; x=1757674445;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kKIEovFREh+RMQK1agLNyNMEj8+i63lgwl8odv/dpPw=;
-        b=wYkKMh5EiU4oEMlodlbEKk7IM1s5qwEgLhehTH+rB3aO9IS4+SCPYF4sbEI2kq84SP
-         cFhN4HtEQbue1b/9sTwPdhxgWfE+4yElweePBiXnOBezv5xlGxHNA/664JPv0Ok6NSvJ
-         5UQcrY5xkSCPqp+4CIQuK6Hv9g3lP5tGE7fWaUHH6co3VGQJGXu9b0/txmyBSbn2C4Gp
-         wWlk0Um/+URPrVNLBIyjm2gVgAIbBiCsEhpsPdPW5y5pI7991TgoGrN1XTMDRDbzk8qm
-         3lNbGRMjm3Wsrvz48yvLPMdWPjlviZcDy7UsibZjsh6nVqchA7OmA/sH2K/LNb4+dlRh
-         l/+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUREblsMNTpd35LuVcoxYONemClZqpEeUaafUWqJ9s8QYVgye7rnhToB8vq7UOZHTbVwJ5kPjtNvGBceB4=@vger.kernel.org, AJvYcCXInBEjc7fmcIk51c6e1KTulLDO7Mpt2BFTy5J//XplZfB83zcI4YBqCg3gNyKsM6nb7jM+uDVE@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE8OAIwj5xwWDg7s3UunIZHSQOtKl4cPk39sRXAy7PTIZ/gka6
-	1/sRqhVPEBSgcot/bOTkhS3foTmZbC6u1pN/AiQQrQ3Z+61IFsZ+L0F2isaMvQN8
-X-Gm-Gg: ASbGncs0Q3m47VR/z7D2+WQ32xKZFJc4G4WxgEb2I4E6pn01joOyWFR+J75Kea7wcdl
-	QNiOWphx7whrmol7GVzKDOOz2uR4+HXxJ1SXErzscSizcZiLKPqRJffdSrh5Ay+w+poZo4gXMfp
-	9Hi8gcz/5c8uYoPoezaoKcvZEsVoeeYimWLwxWF38zO4u8HReeQElmny3FVT1W366oggwYAq4bl
-	44pDQdoIAqrXTWVtXfjIqluBMNa6+jWnzxIVRgpI6ZNEZKch085VS0r4K65QDOtY+qlhXB2K14D
-	dK6RIYdcq2g+VtkpKQ4ObmPJvd2h24rhEvX0gJQAgzx+SZGWYAse0jpUiS1HDHexnxUdbBfcnp9
-	VNXfuzIXaYJkd5aNaM+7NLFcbeirVQOi0L9cJHvgM4oukkA==
-X-Google-Smtp-Source: AGHT+IHxGOCnDwrLnrDrI91qnSsK6syMZ9DOdu1bcAn2K/11lIA4Xxelsfj+qwKYrbNR8DYfn66WCw==
-X-Received: by 2002:a05:6000:26c1:b0:3c2:502:d944 with SMTP id ffacd0b85a97d-3e2faa20867mr2786820f8f.0.1757069644718;
-        Fri, 05 Sep 2025 03:54:04 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:8157:959d:adbf:6d52])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d21a32dbc5sm28607491f8f.11.2025.09.05.03.54.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 03:54:04 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
- <ast@fiberby.net>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  Jacob Keller <jacob.e.keller@intel.com>,
-  Andrew Lunn <andrew+netdev@lunn.ch>,  wireguard@lists.zx2c4.com,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 08/11] tools: ynl: move nest packing to a
- helper function
-In-Reply-To: <20250904220156.1006541-8-ast@fiberby.net>
-Date: Fri, 05 Sep 2025 11:45:23 +0100
-Message-ID: <m2plc5xjng.fsf@gmail.com>
-References: <20250904-wg-ynl-prep@fiberby.net>
-	<20250904220156.1006541-8-ast@fiberby.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        d=1e100.net; s=20230601; t=1757069234; x=1757674034;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zy3M+/QDMFTe34OIV0nD0yl53yFOocCSebdPGEJFkD0=;
+        b=rAmLiEqypPRzspdK/16v0y9FbsLGCtV6doJDnDpivetlRfbnlSHx5oij6igjp1KaUl
+         rEMvYDZB1arXq8vVQttrkHLrhC1r62a0KZNQQVXNzq2CIqPBi5PlI9kyjjLif/ObbRBI
+         Mpk/KK1bNRx/ARoE59gfsNJqAAq64zjGsKXv5JTr++YoUV9o+qPlj47FeZImvN3S7NYb
+         ud258cW29fsy9lyjaXHBO08f3Z6xdq6vNPgx/8bugJOXW5OaJO3ocNqH+hvSDElvVUrz
+         xcRpmLdInae3UcTNifMPTXuw9xsQ9LTAl72V32SSvnzSSZy2hxNs7CCU+h8mDOJHIRPZ
+         rGrw==
+X-Gm-Message-State: AOJu0Yw54lncKk9AA6eCDDEV/GxWV1S1CL7Q9kA/cCrzFFvkPg+ClHTY
+	tJZkU2Ddxs0+lz9mHiHnL+EmFz3sIN9eurvz/+5RCxSSWZ8rjujEfSOgB7e2/y6YiwcpSlhNcKI
+	9T8SPARcCMWUzScVm6PVQDBhpb6UPoht53EXUKMZZ
+X-Gm-Gg: ASbGnctPY949GgQewNICw6Ruxg3ulvfs47HCrQC4xxuMHyY2BVj0g/cazwmb5aJZOX6
+	OnuI7LC9cIXzBtct2NigYxdYvT8JPcQ/88hVDAOEuiwMmU+m39w2T7pVSO8u6m+sOJH4LakSeon
+	1QXHduxPkiWwkICfoOVkpFH6bI6kvHUNn9xJoiqtLm9SQIqu27KouIBUvbxP8rpP3KQYcMzRwaM
+	O+ldW0JLrdTyt9xDtYV1Kyg
+X-Google-Smtp-Source: AGHT+IEf/phnrXIkufCTZk4sFshrIxsZkHhdjyS4/aEGRW+A2spzOP7s35tJPyhD8Xp2ObBAoTmD8NeiPLucXfyQr3w=
+X-Received: by 2002:a05:620a:4016:b0:7e7:fe1e:80ce with SMTP id
+ af79cd13be357-7ff27b20314mr2475069885a.19.1757069233923; Fri, 05 Sep 2025
+ 03:47:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20250902112652.26293-1-disclosure@aisle.com> <20250903181915.6359-1-disclosure@aisle.com>
+In-Reply-To: <20250903181915.6359-1-disclosure@aisle.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Sep 2025 03:47:02 -0700
+X-Gm-Features: Ac12FXzy0Cy-WdhGEnYslQBiaE0zk7uzikMaUzSMrpzivq_gHWsb4MyLhAXuOfI
+Message-ID: <CANn89iJKZCfsNzM8D=JQqQ=vyaun38oXfcC77AC6BTC0MWvUog@mail.gmail.com>
+Subject: Re: [PATCH net v3] netrom: linearize and validate lengths in nr_rx_frame()
+To: Stanislav Fort <stanislav.fort@aisle.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, linux-hams@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, security@kernel.org, 
+	Stanislav Fort <disclosure@aisle.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
-
-> This patch moves nest packing into a helper function,
-> that can also be used for packing indexed arrays.
+On Wed, Sep 3, 2025 at 11:19=E2=80=AFAM Stanislav Fort <stanislav.fort@aisl=
+e.com> wrote:
 >
-> No behavioural changes intended.
+> Linearize skb and add targeted length checks in nr_rx_frame() to avoid ou=
+t-of-bounds reads and potential use-after-free when processing malformed NE=
+T/ROM frames.
 >
-> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+> - Linearize skb and require at least NR_NETWORK_LEN + NR_TRANSPORT_LEN (2=
+0 bytes) before reading network/transport fields.
+> - For existing sockets path, ensure NR_CONNACK includes the window byte (=
+>=3D 21 bytes).
+> - For CONNREQ handling, ensure window (byte 20) and user address (bytes 2=
+1-27) are present (>=3D 28 bytes).
+> - Maintain existing BPQ extension handling:
+>   - NR_CONNACK len =3D=3D 22 implies 1 extra byte (TTL)
+>   - NR_CONNREQ len =3D=3D 37 implies 2 extra bytes (timeout)
+>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: Stanislav Fort <disclosure@aisle.com>
+> Signed-off-by: Stanislav Fort <disclosure@aisle.com>
+> ---
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
