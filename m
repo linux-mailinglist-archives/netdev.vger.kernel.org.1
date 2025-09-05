@@ -1,98 +1,146 @@
-Return-Path: <netdev+bounces-220437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CEBB45FE3
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 19:21:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 074ECB46006
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 19:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28EE25866BA
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:21:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E82465C88DC
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA47C35A2A3;
-	Fri,  5 Sep 2025 17:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c2dQePiF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6003E31327D;
+	Fri,  5 Sep 2025 17:25:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2898A3568F3
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 17:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCE43191C2;
+	Fri,  5 Sep 2025 17:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757092830; cv=none; b=BabwAKdp7m2+45N8+cndnQTLU6qCrCAJoM4Sio16Y6FZJA7wMYX9ATI9nDzNKhgxSxsGBKLAvPXKSBdYL+nHBBKOH0VqEsAxNMNrPSEYjLRAIQoMOmq2AzrsKDdXIaH6rdot4fMrBzJFb7lzYLN83KdifQY0LA4AxI4mxG1z+9M=
+	t=1757093128; cv=none; b=OQxRQYjHG37qZw8ELWhG3Mc2Yc9tCco5gdt500fyx9RD5IvZtw4OYHghCpuQVDObQFGlr/qB/Rru/backhFykYdDLccUHMxIxq05ryhp92BEXN5+cNkHCcoSOyUDAoAYf7Z1w99RxXlK223vifLj7kCphjH8YmI5LjbY2yNkRaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757092830; c=relaxed/simple;
-	bh=69VwV53pEtbwlpqFCXdqeHzoaEBq/NLT0xcX5Dl5RTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wpk3oaP4DTU8bwgB4q1V63gC+Pi++XYwlFbBDWKfJXWCyTCFRgxaAwcQDrhbrQLUBtoNjdurrjk2owvFHnFduE/gUZr6don1csfi5o2qBso9ItKhgP2z0Ii/uTV2oX6w3JmI4ivT7ZHLFnDKARBMcytURoYz30gVRvP0iN1oFdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c2dQePiF; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9ac027eb-e1fa-43b7-9b36-f5a267e461f8@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757092826;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DwgUa8pyKPwPOQ4M2XhOit+u2/9lsIIMXunBg9kdPhA=;
-	b=c2dQePiF6hmccOFnJ4dZKjS5xDnXsi2rVVVxFF65kEVxvnVunxMge4VTrCLeStOpfCfTVd
-	7nLNVgTZHeQ9Gh3+v23IemaBk4QZHOx/XO2MfasXSqHHstIj8ItL7y/iMFcY+LPCG/U04y
-	6mAgJkDTjGOUS7MbgH6kxvMZOMSbsUg=
-Date: Fri, 5 Sep 2025 10:20:01 -0700
+	s=arc-20240116; t=1757093128; c=relaxed/simple;
+	bh=Qy6YvJoeTji61t1mZRxRlusN42LF2rqUAfct8w5o8JI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Wyn+sbEf4iEArscAjlxLDCAtHabUADoRcScQevApcXIiuLy4Pt0qP6o+m1WeHBSdHK3kRziKL9mAXx68pME6hsZE009Bb1L3Jd+dTxAWAyNZNtb1CauSnJifVoOHMTKPivzBojwlmySQ99fc9+x+rLyojH8V2SV+aM2Yg0zIU9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b046fc9f359so445654066b.0;
+        Fri, 05 Sep 2025 10:25:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757093125; x=1757697925;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZHDYLsHpohNsUyyCoi3m6vc8R+M4yrYz3cLb+AlY1+g=;
+        b=WX8Yz6EY3UuXX0DfLTi1AQTcVLLR5aXHmPiM/oZ/AB2UOT7sVwpROEtA7vUJdo4XhI
+         Gy5eU1mevXkjNSSmqShpt5yWzrJo2qyAaCNoLhDQihmAhbE5QxS75eUcau/PZXOvQRO/
+         2lSe/nwFJGbxV6apmLy8SJqsc8tXJ+ojXLenAUmq11dwQ/7UDyqoAI6JbTosI/yXAu7w
+         olFghr6CI/ZVt2tkVZP1HaeKolNThDeT9KJ9NQJ4N2rZK+LARrgVHb/SmmeiX5+rjVFT
+         YZt1WwLun4EXCf7Pzh7dhhFrHQX6PziQpGFvbD86JOHU/7/3Vw5GF6ZpldPKwZ84vRkQ
+         TWKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+9IGjy2Ar65liBpyhQwsm4bGUz+jFo8vEb8B8Uwp0IHnXpPUbRkV8NJv2aaYo/YEo34tWTwTM@vger.kernel.org, AJvYcCVyG5Q4/3jdWaaDQh7tW9rtDEWPBHnnkoXUZ3juKedrFdzpOtPCS3QFyLGFoG375IDrZzwzk0z+EHnW9Q/uJYg=@vger.kernel.org, AJvYcCWTua/3HWaP4nrGMLgT9/9hYi2SrwAboljBl+sPiKJ8tQ7gy7hBsSh2h7qwp79tni8qWNzOm8as@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+cPhOpTEgCfu1Dra/YtQFfmVtbScKd2AAOPeF+WYELAh6kNx9
+	TmYQN7s/vbhZBq1t5wu9vjxQRkVy4RyLKzX7qdHvti6cDf3Z7/RanhDZ93VWyw==
+X-Gm-Gg: ASbGncthh4AhjRhKKgaMQ+PRhQ9H4KRNptn7MHYLcWSmoYibkBVFLWQc52+r0A+rKP8
+	Hh/K2Szvw6R9Sx3hiWz8naU0sWr9+6j3T3Q+aOQRRDh2b6tmKo56aI/HylBtWyb6X48OygYC7Ue
+	5doEB4Nkv4fO7xBWerH9edYNkgRrGSH4QpY06FlGf/ZQPwYzInw5o7MOkzkV3RMrQeYSegoZX8R
+	zZAh/HMSQzK1Lfc2tcu/tZdelWxO0p8nYOXOzP+E1Lngpek8jbVKAaR3e43njDpQL/5noBQHgUb
+	ipsYWt5C7bgzUJ00NHdjK8O8ds/yPE8WPc1eamr8Lq8cQiGEm/VsF6QZdfK85OsK1PH6DZuNrut
+	/wfKGTd3g5Lpx3m2KVTnosj4=
+X-Google-Smtp-Source: AGHT+IGEGyqyx4VJabm4Vhed5iJmFLI6l0ORIangqVpHuf1vsooKlo5pRRFXuT9M8Vc863VgXbCU/g==
+X-Received: by 2002:a17:907:9283:b0:afe:8761:e76a with SMTP id a640c23a62f3a-b01d971a17dmr2377128466b.39.1757093124506;
+        Fri, 05 Sep 2025 10:25:24 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b04110b94cbsm1495583166b.93.2025.09.05.10.25.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 10:25:23 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net v3 0/3] net: netpoll: fix a memleak and create a
+ selftest
+Date: Fri, 05 Sep 2025 10:25:06 -0700
+Message-Id: <20250905-netconsole_torture-v3-0-875c7febd316@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC bpf-next v1 0/7] Add kfunc bpf_xdp_pull_data
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Nimrod Oren <noren@nvidia.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, kuba@kernel.org, martin.lau@kernel.org,
- mohsin.bashr@gmail.com, saeedm@nvidia.com, tariqt@nvidia.com,
- mbloch@nvidia.com, maciej.fijalkowski@intel.com, kernel-team@meta.com,
- Dragos Tatulea <dtatulea@nvidia.com>
-References: <20250825193918.3445531-1-ameryhung@gmail.com>
- <7695218f-2193-47f8-82ac-fc843a3a56b0@nvidia.com>
- <afdc16b0-fd53-4d4c-b322-09d1a0d8cb86@linux.dev>
- <CAMB2axO1Hb=pNMw8p2Ca+4XfVmDTA+TxbbXaD4G6kxUVEsHERg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAMB2axO1Hb=pNMw8p2Ca+4XfVmDTA+TxbbXaD4G6kxUVEsHERg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPMcu2gC/33N0QrCIBSA4VeRcz3DabrcVe8REaZnmxAaalKMv
+ XvgVUF0/cP3r5AxecwwkhUSVp99DDAS0RGwiwkzUu9gJMAZl0wzTgMWG0OON7yUmMojIT1Mlou
+ JGWu0ho7APeHknw09QcAC547A4nOJ6dVGtW/pn1l72lMmrGJKSX1AfXR49SbsYpqbV/mnsf9pc
+ MqoHAaJTjorlPoytm17A/Tf6rz+AAAA
+X-Change-ID: 20250902-netconsole_torture-8fc23f0aca99
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+ david decotigny <decot@googlers.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+ calvin@wbinvd.org, kernel-team@meta.com, Breno Leitao <leitao@debian.org>, 
+ stable@vger.kernel.org, jv@jvosburgh.net
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1543; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Qy6YvJoeTji61t1mZRxRlusN42LF2rqUAfct8w5o8JI=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoux0Bu+8t4g1U+nbsovlVTHHByY+Ut0opVFiP5
+ QsEmLp0D1CJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaLsdAQAKCRA1o5Of/Hh3
+ bZkrD/47iuzPAjxTw9rChVtNP5hRjUY14UjFbBYWXSLBBwZ7Yk07Jt9Tf43XUi4REVAtE2y667f
+ /MlfZWXuVNVt4FHOzEebxmyEmgHbENV0/zxKXnb1rE8nEwFAd+dHj2UelXsk/QcZGqjqUYv6DYF
+ TcdZWWJdtfbi60NVNn6WchLAqoCAIl8F3pHrnoMmKD8trzisEZAfXdNDTAYj5H+KLYkzE3NRIWv
+ 1xXTg4C/0mcpNXXnGi246xrQ6lCQ5ym5h9b4gddjzqa9SrgBntxWSCrJOvGKG3Jb473JQ+8FwuJ
+ qD3L7gKsuQpKgLVODi0NggwIHbFF6fm6snqucmJ5BX+kSuY0XucVzZbEkcgKiTC0TlomV2DSxWL
+ 5FR22ydDT3As9JLUiEnLfRFfvnzz1GGZSAzJr+iUfl8OoTvRGF4CTeSKfzo9RgdB5xpSSuPao2+
+ 7kEvCLSLREIKHbOxsZyMbrTxgr5godm4KQnbza68z0uG2NdclIHn4k2iAaiX+x26I4vxQzW8HBI
+ wMWy6GVdGFllJsaYj15RwlBMGH/4650NY0vt0TjipzTL7fRDonyoR4fLZvAX1Fph1xdfu3+A7dd
+ imRLI+tkjfoLFbdia0gvgmEIFqRNWSZUxaa4elULHewTzuwsXv+ONbz4xF6x0eIlj0uk7iC6WlQ
+ l/byiO0ix/yyWiA==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On 9/4/25 10:28 AM, Amery Hung wrote:
-> On Fri, Aug 29, 2025 at 11:22 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->> On 8/28/25 6:39 AM, Nimrod Oren wrote:
->>> I'm currently working on a series that converts the xdp_native program
->>> to use dynptr for accessing header data. If accepted, it should provide
->>> better performance, since dynptr can access without copying the data.
->>
->> The bpf_xdp_adjust_tail is aware of xdp_buff_has_frags. Is there a reason that
->> bpf_xdp_adjust_head cannot handle frags also?
-> 
-> I am not aware of reasons that would stop this.
-> 
-> Are you suggesting another way to pop headers? E.g., use
-> bpf_xdp_adjust_head() to shrink the first frag from the front and call
-> bpf_xdp_store_bytes() to move the remaining headers
+Fix a memory leak issue on netpoll and create a netconsole test that exposes
+the problem, when run with kmemleak enabled.
 
-bpf_xdp_pull_data is useful on its own, nothing change there. On top of that, 
-bpf_xdp_adjust_head() should be useful also for bpf prog that does not care 
-about the linear/frag layout and stay with the bpf_dynptr helpers (or the 
-bpf_xdp_{store,load}_bytes you mentioned). Also, if I read it correctly, 
-bpf_xdp_adjust_head can increase the head of multi buf xdp but not shrinking it 
-while the bpf_xdp_adjust_tail can do both. It could be a surprise to use. The 
-adjust_head support can be a followup though. I think some of your work in this 
-series is pretty close to having adjust_head support also, so I was wondering if 
-there is reason that adjust_head cannot be supported.
+This is a merge of two patches I've sent individually and are merged on
+the same patchset[1][2].
+
+Link: https://lore.kernel.org/all/20250904-netconsole_torture-v2-0-5775ed5dc366@debian.org/ [1]
+Link: https://lore.kernel.org/all/20250902165426.6d6cd172@kernel.org/ [2]
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v3:
+- this patchset is a merge of the fix and the selftest together as
+recommended by Jakub.
+
+Changes in v2:
+- Reuse the netconsole creation from lib_netcons.sh. Thus, refactoring
+  the create_dynamic_target() (Jakub)
+- Move the "wait" to after all the messages has been sent.
+- Link to v1: https://lore.kernel.org/r/20250902-netconsole_torture-v1-1-03c6066598e9@debian.org
+
+---
+Breno Leitao (3):
+      netpoll: fix incorrect refcount handling causing incorrect cleanup
+      selftest: netcons: refactor target creation
+      selftest: netcons: create a torture test
+
+ net/core/netpoll.c                                 |   7 +-
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  30 +++--
+ .../selftests/drivers/net/netcons_torture.sh       | 127 +++++++++++++++++++++
+ 4 files changed, 152 insertions(+), 13 deletions(-)
+---
+base-commit: d69eb204c255c35abd9e8cb621484e8074c75eaa
+change-id: 20250902-netconsole_torture-8fc23f0aca99
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
