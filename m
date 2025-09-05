@@ -1,139 +1,170 @@
-Return-Path: <netdev+bounces-220368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72052B459EB
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:59:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC90DB459FF
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:02:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53F061CC37E4
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:59:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE5027A71EE
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B5535E4F0;
-	Fri,  5 Sep 2025 13:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6272E23C8A0;
+	Fri,  5 Sep 2025 14:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QULIUEOP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CIZcQgY/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B0335E4CA
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 13:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5431D618A;
+	Fri,  5 Sep 2025 14:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757080669; cv=none; b=MFFud05YSct+3uveWpAizRF2rOaeY0wJ8B3twwYjvYGo55fwKXM2ZHv4E6pEGQOkg6q/4rKMIqzVaJng6q/BkeJlmKWEVa8P0DlsA4mlrgMQGBi4TrNObkMED2SA6LjrljUM02fZMd2YcEBWHgyjl2uUh21/ct4N7hHVfyyy1Yo=
+	t=1757080947; cv=none; b=qncSgy06pbyZRkaRWJOYgeXimMC/nE50Hyg5pEdp2RAl+hGQh9BC1x57bax/yozzVxjBZ3rKGyNvUP81YLf5D07Pvk+l4XSvtKi6Y1RgljUaif6Fovv0CSvrGEYj8jSjZ1eqhs28VdmnbORks02HGpGsWtnPCbgZwVVhZGIoDlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757080669; c=relaxed/simple;
-	bh=+QXjeDVhfGVrjU2VDmV5AiFXqpEcPzd/wt5cWA+3b9k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=suGx0kS46uScJgiphW5VTKbI3ZhUv1ao67Qprbpsa5j6C0iYHEtGCKeY5xR8XDUSrpeV15mouyjiVGXmuoNsPbLxBDFajywnC769Ng0PeR3pKxau2mBB4rQYF9W1QDX6vo8P76bHI8CLxNrLMHSjDVQYqRJtov1gY6jJgbWaesM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=QULIUEOP; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 585Du1lG030274;
-	Fri, 5 Sep 2025 13:57:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=YUqqfi7GGLUii7GTXIZTIDEOeiyfT
-	/8myi9XvWIW154=; b=QULIUEOP1DWq0oFrj1R46j8uUnBjzmAItUnlK9o+umAaZ
-	cNYWZqmKL7njSowdbszbqxuJcgApTXSGBEK2L3wyDIKQ+ffOM+Jj39R6yL0BX2u3
-	ZeBVQOYUlLHtb4IJweSBYJ2sIUNe4WU3QZfXME+xYLHATjiPO7lGZOVwnBQuY1PI
-	SNBbvGadGSULbzUUKNV/jhZvJ9Cnn2DtCA7+dhQ+s5Zzm/lC6su9L4UrKhIGKK95
-	WK3wDjLtsRsAcCqeEf0ZwBmVWwlretozsMUV5JRwkLZieH2Vutv/ou9lrKYrD5D2
-	2ttcKFN21giI2kLPYrjUfAAKmX2KSKf5+sK903WMQ==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4900gf82wt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 05 Sep 2025 13:57:36 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 585DfQpQ031836;
-	Fri, 5 Sep 2025 13:57:36 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrk92ur-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 05 Sep 2025 13:57:35 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 585DvZ8D008517;
-	Fri, 5 Sep 2025 13:57:35 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrk92u3-1;
-	Fri, 05 Sep 2025 13:57:35 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: jiri@nvidia.com, stanislaw.gruszka@linux.intel.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH v2 net] genetlink: fix genl_bind() invoking bind() after -EPERM
-Date: Fri,  5 Sep 2025 06:57:27 -0700
-Message-ID: <20250905135731.3026965-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1757080947; c=relaxed/simple;
+	bh=p7SNkxBMDceyrMBtDVw3FbEQeKmi497N1GJZiGp7K9k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oc316BLdvNCXfmE+b5o0VJJENgMJ05/sAXsHqDAIp3lEBwQm0FP0w25FSbIsNgbCOk0mOsoR12VTysa+8FkDKMdLbAMkZUU5+LCJKJKT27uRXdcahS0sBvFRpwnKeUOx9sxDfL2NBComrnxJgWuzFkFGqya0KkpTyyPyLRx1/Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CIZcQgY/; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757080946; x=1788616946;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=p7SNkxBMDceyrMBtDVw3FbEQeKmi497N1GJZiGp7K9k=;
+  b=CIZcQgY/UgTrpQDy7tvqE7qRdj7EkebKTSYpSElU+ramiHAxVofjivR1
+   4XdF0w8VyMGHSvy+iRSMggwaM1t7rgY2gGuaiBvXXtuQsbzV20EA44Emf
+   8GYTefXRFmes0i6vMR1c+bpF1y6BdRM/7lbqasIFwN0mpIo3A5s8FpK8B
+   9gpXc1ZHJAOW6UFs8Dqlee0mZHMJarvBJNiNw4JwYFt0xNlANFNjiUebT
+   6uMeqwfN+GH7gJJeSU/AttVW+CQGtZoabA+hqW/hM7/a0PGFXrlAw0AJO
+   3uyy9RdSFEVAZz36r7FzIKXZz3WkudQdh4TmPDBNFSaO1BGW4DKXTt7nt
+   A==;
+X-CSE-ConnectionGUID: i4KiG2UOQceQaajlYYW2gg==
+X-CSE-MsgGUID: xojMqzQCS5ynXaeHcwlpjA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11544"; a="70046424"
+X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
+   d="scan'208";a="70046424"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 07:02:25 -0700
+X-CSE-ConnectionGUID: 7tJWMnQ6TUWYlbJDxGoMTg==
+X-CSE-MsgGUID: FiViECbySquhBvzeXiGqtQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
+   d="scan'208";a="195826206"
+Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 05 Sep 2025 07:02:21 -0700
+Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uuX19-0000Tv-05;
+	Fri, 05 Sep 2025 14:02:19 +0000
+Date: Fri, 5 Sep 2025 22:01:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, kbusch@kernel.org, axboe@kernel.dk,
+	hch@lst.de, sagi@grimberg.me, kch@nvidia.com, alistair23@gmail.com,
+	Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH v2 7/7] nvmet-tcp: Support KeyUpdate
+Message-ID: <202509052153.luapQMZm-lkp@intel.com>
+References: <20250905024659.811386-8-alistair.francis@wdc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-05_04,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- suspectscore=0 malwarescore=0 spamscore=0 mlxscore=0 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509050136
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA1MDEyOSBTYWx0ZWRfX3o8aHKpeKldE
- tDbSYLyj8Xl8KW9Hx8pKo8+eIcTppAI6qApbu36+b7VLv0MSDdNUrZjVCO4HySTbXt6+DWmbrII
- 9wmPykXaJHGrmbDmmyHx2JOosLNkiKv4xA9Cnx7kFv0yuFed3TWYS2ry5KPdkNv911zch7Ge4dq
- Ayn846isjCZpZVoUGCBuMx6gNd6rfIVZRHP3xfjo+8PxJd14ccbVPfCfyN0LqZONEqoP1wnQ0eF
- hV4Mh1jg9qpUO1lJyALrQ9E547gq9XPnsJVLnL4kySLbYFIf0QqFDh4CuZlwZPDAh8DSczAuRAW
- f55l8MOtsgeU3cw9j71jIZC4qMKaWBZrveVJN+CpcL7MYAHa3B9Cn5bD6h4cqNQsTZ1W3jDfyEZ
- oCzARnLF2TbZnzRliOd2xibAjqwuQw==
-X-Proofpoint-GUID: FZPrY4xZrSmwE6gkPk4qwngW6F0h8Ztq
-X-Authority-Analysis: v=2.4 cv=GKEIEvNK c=1 sm=1 tr=0 ts=68baec50 b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=IQN_B5fLJMZ4uxNOhSQA:9
- cc=ntf awl=host:12069
-X-Proofpoint-ORIG-GUID: FZPrY4xZrSmwE6gkPk4qwngW6F0h8Ztq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905024659.811386-8-alistair.francis@wdc.com>
 
-Per family bind/unbind callbacks were introduced to allow families
-to track multicast group consumer presence, e.g. to start or stop
-producing events depending on listeners.
+Hi,
 
-However, in genl_bind() the bind() callback was invoked even if
-capability checks failed and ret was set to -EPERM. This means that
-callbacks could run on behalf of unauthorized callers while the
-syscall still returned failure to user space.
+kernel test robot noticed the following build warnings:
 
-Fix this by only invoking bind() after "if (ret) break;" check
-i.e. after permission checks have succeeded.
+[auto build test WARNING on trondmy-nfs/linux-next]
+[also build test WARNING on net/main net-next/main linus/master v6.17-rc4 next-20250905]
+[cannot apply to linux-nvme/for-next horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Fixes: 3de21a8990d3 ("genetlink: Add per family bind/unbind callbacks")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
-v1 -> v2
-replace if (!ret && family->bind) with separate
-"if (ret) break;" as suggested by Jabuk.
-https://lore.kernel.org/all/20250831190315.1280502-1-alok.a.tiwari@oracle.com/
----
- net/netlink/genetlink.c | 3 +++
- 1 file changed, 3 insertions(+)
+url:    https://github.com/intel-lab-lkp/linux/commits/alistair23-gmail-com/net-handshake-Store-the-key-serial-number-on-completion/20250905-105201
+base:   git://git.linux-nfs.org/projects/trondmy/linux-nfs.git linux-next
+patch link:    https://lore.kernel.org/r/20250905024659.811386-8-alistair.francis%40wdc.com
+patch subject: [PATCH v2 7/7] nvmet-tcp: Support KeyUpdate
+config: s390-randconfig-001-20250905 (https://download.01.org/0day-ci/archive/20250905/202509052153.luapQMZm-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 9.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250905/202509052153.luapQMZm-lkp@intel.com/reproduce)
 
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index 104732d34543..978c129c6095 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -1836,6 +1836,9 @@ static int genl_bind(struct net *net, int group)
- 		    !ns_capable(net->user_ns, CAP_SYS_ADMIN))
- 			ret = -EPERM;
- 
-+		if (ret)
-+			break;
-+
- 		if (family->bind)
- 			family->bind(i);
- 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509052153.luapQMZm-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/nvme/target/tcp.c: In function 'nvmet_tcp_tls_record_ok':
+>> drivers/nvme/target/tcp.c:1173:12: warning: unused variable 'htype' [-Wunused-variable]
+    1173 |  u8 ctype, htype, level, description;
+         |            ^~~~~
+   drivers/nvme/target/tcp.c: In function 'nvmet_tcp_io_work':
+   drivers/nvme/target/tcp.c:1479:5: error: implicit declaration of function 'update_tls_keys'; did you mean 'update_cr_regs'? [-Werror=implicit-function-declaration]
+    1479 |     update_tls_keys(queue);
+         |     ^~~~~~~~~~~~~~~
+         |     update_cr_regs
+   cc1: some warnings being treated as errors
+
+
+vim +/htype +1173 drivers/nvme/target/tcp.c
+
+  1168	
+  1169	static int nvmet_tcp_tls_record_ok(struct nvmet_tcp_queue *queue,
+  1170			struct msghdr *msg, char *cbuf)
+  1171	{
+  1172		struct cmsghdr *cmsg = (struct cmsghdr *)cbuf;
+> 1173		u8 ctype, htype, level, description;
+  1174		int ret = 0;
+  1175	
+  1176		ctype = tls_get_record_type(queue->sock->sk, cmsg);
+  1177		switch (ctype) {
+  1178		case 0:
+  1179			break;
+  1180		case TLS_RECORD_TYPE_DATA:
+  1181			break;
+  1182		case TLS_RECORD_TYPE_ALERT:
+  1183			tls_alert_recv(queue->sock->sk, msg, &level, &description);
+  1184			if (level == TLS_ALERT_LEVEL_FATAL) {
+  1185				pr_err("queue %d: TLS Alert desc %u\n",
+  1186				       queue->idx, description);
+  1187				ret = -ENOTCONN;
+  1188			} else {
+  1189				pr_warn("queue %d: TLS Alert desc %u\n",
+  1190				       queue->idx, description);
+  1191				ret = -EAGAIN;
+  1192			}
+  1193			break;
+  1194		case TLS_RECORD_TYPE_HANDSHAKE:
+  1195			ret = -EAGAIN;
+  1196			break;
+  1197		default:
+  1198			/* discard this record type */
+  1199			pr_err("queue %d: TLS record %d unhandled\n",
+  1200			       queue->idx, ctype);
+  1201			ret = -EAGAIN;
+  1202			break;
+  1203		}
+  1204		return ret;
+  1205	}
+  1206	
+
 -- 
-2.50.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
