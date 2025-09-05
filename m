@@ -1,104 +1,147 @@
-Return-Path: <netdev+bounces-220318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1395DB45655
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:27:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8378B45666
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA3F03BCB4B
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 11:27:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE105A4D15
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 11:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA8D342CA5;
-	Fri,  5 Sep 2025 11:27:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEEB343D92;
+	Fri,  5 Sep 2025 11:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPVamrkN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wv1ats1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C070B342CA2;
-	Fri,  5 Sep 2025 11:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2262632F74D
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 11:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757071655; cv=none; b=IoxyR2femD//UmYRoUMYQMapX5tsWEUHvS6e52TKzDjVWZc1B9pjTDDBMcO+JOfpbTRa0uIuq1H7eSxA/lzJy02A+q7mrysEByVR+FCuypvMXKQbkHoiRa+IvNZKH3/LFA+Htav+cNiwoFR/aFQI712om6E1K+2+jCwv7ET8IAs=
+	t=1757072005; cv=none; b=tCChWRt0e2prDu1ATZpSqqpvpqD03T0xPOboe6j9lKZ/15ChM33mIocrUBcxwLgAucRh4eqLrnpq+Lk7SdzDoakK7NsGohhmEtZN+yRBtxtwG8b9MDmymuS6CxrnAvRvwYP1z9QBAVuYqdFcv4iCnWHb2FDBaQZbdAcMWMYtILE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757071655; c=relaxed/simple;
-	bh=k6gca60XknWskVVSXPPicbnRtDYnJHRpylugD57BQY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IPdmLToPLMaZH/6YDtkMIi5cZzeqDqw0VnHIT3nquu0yzTQUWpFnE7gOsaP13J+E5sAp80S5n6omQqNJ1XuTAA8yNKXA8QdpZDDZeoqpo3hN9ypqcDTcGDxCc+2x8qT37XB+mTufXG5GeOWUBwxTllUX1pb9LmlUS2mMGW+f0vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPVamrkN; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45b8b02dd14so14604875e9.1;
-        Fri, 05 Sep 2025 04:27:33 -0700 (PDT)
+	s=arc-20240116; t=1757072005; c=relaxed/simple;
+	bh=o3hildMwaW8SKO7ju4TnjzbgldI5VhKTu/M3PBEf9Pg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nnK7vsB4AYcut3Budea966GqpTS5G8a1oxAujBLbtWgQKcMn4J3cYLnD2AoR5lLUbLPZGmdHKR4Hmd7XN5HQX0h2P4ZMxHsO2LcUftncZ1niSWCRyP+ACkuO5PfoYj/EAvS6MEnF+G3BmMtxADYJLvld5EE3jB4UZMSJjc2TUHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Wv1ats1l; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-336d3e4df3eso18035121fa.0
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 04:33:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757071652; x=1757676452; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k6gca60XknWskVVSXPPicbnRtDYnJHRpylugD57BQY0=;
-        b=DPVamrkNEMo/USgU31O5WWHhJ+beEG0bna9raeC4dzs5IwDIfT9K63D+jYrgHhh5j/
-         RCxsxaGNfeXrS8+ChsVGHVYoJ10AYYNut9UiK8wmCwFdEssEug1CZxTsW4ga2NdcWU3h
-         eButk/IDaHI/+a8B4kr7l85aJXClSYphPw8Jj0PuVLVPLEGL0TntulnQLTEDRNPlc8AB
-         uqyaA4UULerwHfN7EmetHm9O+/eCaVwVvTAYxj8NC0S1HEQ0ws6+Cg2e4xgVGwdCQokP
-         YvjA3kc4tLpqweQPiJwbhRNwlvijjnV55TWFQM6G+Ww2Idq0VZQ6xmFVHM8bIUVQBS2Z
-         Wsig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757071652; x=1757676452;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1757072001; x=1757676801; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k6gca60XknWskVVSXPPicbnRtDYnJHRpylugD57BQY0=;
-        b=wo+s7G6372Ork5QYHN3M82PoBSiRtmr1UdfMfg74oLUht81jR4dg2CEaLlm5y9HN3p
-         NPH75kZr0VXBiDUuquI/mFq5JU8pxtLtut3ONJV+BT7Qm3b+gccelR/rn56IZ/9KZJ38
-         kNubtgLXdGdRyPNJDuaHy3aYmQFiIjqGHOzmDh1f4o5BVlqzHvRLCDiGY6vE6poTARBT
-         gjt58ZUmztqT3K8DWQDDEbCM6sWeJy5gSQWXZpb+r5OJEfJT/E0ORTToJVqz7Z5XpwQe
-         /kaeBfM0iaCJ2993UzR2YW6ouymZmM9V4GtJsS4BLwOV0UHiLpt3/X4wlHLBNUsnOUfV
-         9lRg==
-X-Forwarded-Encrypted: i=1; AJvYcCURHIFVgelGvr+qd8YEHripLjFg2KUB+boNX3B1y9zMEpQmK0KdVrIMhYnjBEG98dSvSXfi73NE@vger.kernel.org, AJvYcCWF+jbsvnR+aiw4+QsKusHnNY36DUwHhqFYXG0QGooYL/Zmr4sqMRkVIDtf/IJz77DZbTt9hYvTioLLuxg=@vger.kernel.org, AJvYcCWgNn3ueIRo5H7g2n1u+jhT3Zj6g04yOHmxQ5GNJ+NqXaKAV5WroH/BUEapjGMZWHBq5OZWHqE35uP0YPNm32xP@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3TowYkqse1SUax09biZXw0UyErVbqbZGAJPSmmy9ZTLEE4Ig2
-	OT1vGSxiOCVK/lf/ojmT1w9UmmcCsPIuKgY3LSyVwd8J5SeMlhMT1Hzr
-X-Gm-Gg: ASbGncsp091bGMBv84e+qhXQr2b1WXtnBcrqaFmejPg1XsZ8mqk/1lfEHzTs6P1b+8n
-	EWbBP13viHpgqMp6AFOz7biM1AnhTaze5/ii35+9eHArP1fTBEFNhHY3bjdXRZgZokSvr+1459x
-	T/F2lEigLpgnV4RXKFYT+T6d2xJmf6LzavrNPsHdWfBA5Dh6eU0/1RtLbRuq9AJEBtBJ5VI6VEz
-	mxxozxI0rPWDOkOyyC/m8ouaNWUn3NlODB9e2puQMHQBIalXECvxwrSQJ1YFyUKH/PMDLqwjP6d
-	YE7V3hG0EoXB1DK5VdKAkX4bh7VbL0hj5R2cKzm9WrATJTUWix97PgbIl1cXdXsYfCvU/FNul8a
-	68iqDIx6n4wvhajWt+i8NpA+tERYslg==
-X-Google-Smtp-Source: AGHT+IFCwaEkUL3V2ug9ojCoJ94pDdD0UpCfWMbIE+5ocxwbKeoXrjqxDsrGZsO43avkw19l/hK4Hw==
-X-Received: by 2002:a05:600c:8b42:b0:45b:43cc:e557 with SMTP id 5b1f17b1804b1-45b8558a801mr168825985e9.34.1757071651714;
-        Fri, 05 Sep 2025 04:27:31 -0700 (PDT)
-Received: from archlinux ([143.58.192.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45dda4f2a0dsm18608655e9.2.2025.09.05.04.27.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 04:27:31 -0700 (PDT)
-Date: Fri, 5 Sep 2025 12:27:29 +0100
-From: Andre Carvalho <asantostc@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	efault@gmx.de, calvin@wbinvd.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next v2 2/2] selftest: netcons: create a torture test
-Message-ID: <7uzltg7ystb5dzxo2r4kuq2spsg5w52eteh2sg4ldcomlxwj2x@724yzzynyfjx>
-References: <20250904-netconsole_torture-v2-0-5775ed5dc366@debian.org>
- <20250904-netconsole_torture-v2-2-5775ed5dc366@debian.org>
+        bh=e737NFCnB1pAiZwFeuIFUAdoH1qix+jNDtR6tlkeuzc=;
+        b=Wv1ats1lENeDFeCHltS6z4eXYjp2PkHp41U/KSjwkprIJpiwUA2iVdzBaZiRrx1Mt0
+         qHGzczd2Z5jSluwCy8P8ACWB3Gle0ScrGvwq4D87K+DQ+Kn1EKuy9V/NtvOQhoVvhDw1
+         VlhaCRenYJr1p6TqCwmNzarskvRPWlEJDa2Nj8Rx+vO3RPTFL8o/Q46mAI6+DAl6RbDn
+         ZYZKDb0HjPYXY9TG0yQXthJbEdx7DvqMucAOcim7XURySnkfmfW2beuJwk8vwC9AIaRY
+         bPmuFP2vDrK4ShsfmwWPEdFTsf1mqOJIf3RdGn/j4v4G0Gq7NWGy2otXfxbf4BukM+3s
+         cpgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757072001; x=1757676801;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e737NFCnB1pAiZwFeuIFUAdoH1qix+jNDtR6tlkeuzc=;
+        b=tLtW2TLG9X8qZxJloSPiO326dFhz8jJL+NBLZjW4sXHcbMAc/TPHuZ5DFMaeF3okEz
+         6NE09ihtPDVk9IL9P65Y3xCHqWRSLZeRcc+QNfja4VhEPl+f32eHkh7m5zonPT6HoNJO
+         JCRiWhq3+d0jxlUwqUhzm9J/mDfW6ZpMHsfSwW2Ke9xmwhKBsF4RLdEv3qqOD/coJrVN
+         jgWBFzH1akD7Cmxe165LMbD0py4p/2q6Rr/bbjwp0b8l7drGjGevPDA1+KaEYrCux9rN
+         bwyE3dT5kIlf1fxde/WiO1T2zQnhI73dR0gfFxvF4uXwchzqvWEbFiFORU09SeHpLblq
+         7yxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWelCqtvl8J10kBPPXrz6bzUUh3Jgk9bHRsxUtDsqtl4ITm2sMTWohjLNN5JEUB7VC+lX0P0s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEISjaojmdv/GGSJVudRwK6oIO7zI6cKyr4i0f60lI4dv4ia/G
+	psSxa5htVW55h4xeg4nrQ/HZswMAN6uvkeATLMslDC2oyc+D+lhJYA8pOJp76luhJ8WlEytwSAM
+	NbLX5CmVzcYiLZTbvULib5kXGYzS+InFInB4Dgi8eKg==
+X-Gm-Gg: ASbGncvivfEDd6ouPFXsMtebOwoIQOjR1uOVR1Q4uQrn7v36l3P0ccfZ24d+3DJOnzP
+	ZNxqe+2+UqS74B7j+8FJnSI4uGSzWfErKY+tcAZHqjOtNL6r+CxV3YX/H6GUBrR2uvlCtOOkTkW
+	PaoJv+KWiaRq7c6h18CMXfdXKmVEcAaaFDA19Z276RYKSWREuPPChqtlfIdUgEcdvYdWgURsAlg
+	+pj+Hsr9vKZNx076w==
+X-Google-Smtp-Source: AGHT+IGSWO4nCHB8o/6t/y6RH8BOysPzoQ6jiv8gZqcTwwokf+Kq7hYmaaHYY9kCJZ1mu3fJ8bEoY6l6Nt8aDc5ponQ=
+X-Received: by 2002:a2e:a482:0:b0:336:7c7c:5ba5 with SMTP id
+ 38308e7fff4ca-336cad21f17mr50388961fa.23.1757072001159; Fri, 05 Sep 2025
+ 04:33:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250904-netconsole_torture-v2-2-5775ed5dc366@debian.org>
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-14-ariel.dalessandro@collabora.com>
+ <CACRpkdbpKqKyebADj0xPFq3g0biPh-vm4d6C3sd8r0URyfyYRg@mail.gmail.com> <caguo7ud4dapb4yupeq2x4ocwoh4dt5nedwjsyuqsaratugcgz@ozajhsqwfzq6>
+In-Reply-To: <caguo7ud4dapb4yupeq2x4ocwoh4dt5nedwjsyuqsaratugcgz@ozajhsqwfzq6>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 5 Sep 2025 13:33:09 +0200
+X-Gm-Features: Ac12FXx6o0aglHH6TQGfVH200HSX_9WYooYS5LFefZX_Ln3xQz4XYXPyVN0c3dY
+Message-ID: <CACRpkdZRHQ6vuchN8x8d0uPCVMPPHOdBVWiUhzFJNs2paHGbYw@mail.gmail.com>
+Subject: Re: [PATCH v1 13/14] dt-bindings: input/touchscreen: Convert MELFAS
+ MIP4 Touchscreen to YAML
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>, airlied@gmail.com, 
+	amergnat@baylibre.com, andrew+netdev@lunn.ch, andrew-ct.chen@mediatek.com, 
+	angelogioacchino.delregno@collabora.com, broonie@kernel.org, 
+	chunkuang.hu@kernel.org, ck.hu@mediatek.com, conor+dt@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, flora.fu@mediatek.com, 
+	houlong.wei@mediatek.com, jeesw@melfas.com, jmassot@collabora.com, 
+	kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org, 
+	kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com, 
+	louisalexis.eyraud@collabora.com, maarten.lankhorst@linux.intel.com, 
+	matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com, 
+	mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
+	robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch, 
+	support.opensource@diasemi.com, tiffany.lin@mediatek.com, tzimmermann@suse.de, 
+	yunfei.dong@mediatek.com, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
+	linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	linux-sound@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 04, 2025 at 11:00:41AM -0700, Breno Leitao wrote:
-> +# This test aims verify the robustness of netconsole under dynamic
-> +# configurations and concurrent operations.
+On Fri, Sep 5, 2025 at 12:02=E2=80=AFPM Dmitry Torokhov
+<dmitry.torokhov@gmail.com> wrote:
+> On Thu, Aug 21, 2025 at 01:56:24PM +0200, Linus Walleij wrote:
+> > Hi Ariel,
+> >
+> > thanks for your patch!
+> >
+> > On Wed, Aug 20, 2025 at 7:17=E2=80=AFPM Ariel D'Alessandro
+> > <ariel.dalessandro@collabora.com> wrote:
+> >
+> > > +  ce-gpios:
+> > > +    description: GPIO connected to the CE (chip enable) pin of the c=
+hip
+> > > +    maxItems: 1
+> >
+> > Mention that this should always have the flag GPIO_ACTIVE_HIGH
+> > as this is required by the hardware.
+> >
+> > Unfortunately we have no YAML syntax for enforcing flags :/
+>
+> Theoretically there can be an inverter on the line, so from the AP point
+> of view the line is active low while from the peripheral POV the pin is
+> active high...
 
-Just a small nit: "aims to verify" or simply "verifies".
+Yes, I think someone even proposed adding inverters to the
+device tree and was nixed.
 
-Reviewed-by: Andre Carvalho <asantostc@gmail.com>
+It's a matter of phrasing I would say:
+
+"Mention that this should nominally have the flag GPIO_ACTIVE_HIGH
+as this is required by the hardware."
+
+s/always/nominally/g
+
+Yours,
+Linus Walleij
 
