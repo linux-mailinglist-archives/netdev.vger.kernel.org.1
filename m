@@ -1,170 +1,151 @@
-Return-Path: <netdev+bounces-220369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC90DB459FF
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:02:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D43CFB45A01
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:02:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE5027A71EE
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:00:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CAC21C26421
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6272E23C8A0;
-	Fri,  5 Sep 2025 14:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA7735FC2C;
+	Fri,  5 Sep 2025 14:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CIZcQgY/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W44rYqP9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5431D618A;
-	Fri,  5 Sep 2025 14:02:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4A31D79BE
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 14:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757080947; cv=none; b=qncSgy06pbyZRkaRWJOYgeXimMC/nE50Hyg5pEdp2RAl+hGQh9BC1x57bax/yozzVxjBZ3rKGyNvUP81YLf5D07Pvk+l4XSvtKi6Y1RgljUaif6Fovv0CSvrGEYj8jSjZ1eqhs28VdmnbORks02HGpGsWtnPCbgZwVVhZGIoDlE=
+	t=1757080948; cv=none; b=RWSjN1QIOMPp+qGuv962YukklVF4zCCFqUVnzhWqX4Q3qCzJJmAEPnXU5VrKiqi7wgOXVIvb+iNFEi2uLU8Noblz6+f7EWr+jRKNntoDt9IH6rRsQh1SofbX580lkCIpS/ah65mepPan3Iw89i9V7FOg+UqgWaj3YP8mTiqIdss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757080947; c=relaxed/simple;
-	bh=p7SNkxBMDceyrMBtDVw3FbEQeKmi497N1GJZiGp7K9k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oc316BLdvNCXfmE+b5o0VJJENgMJ05/sAXsHqDAIp3lEBwQm0FP0w25FSbIsNgbCOk0mOsoR12VTysa+8FkDKMdLbAMkZUU5+LCJKJKT27uRXdcahS0sBvFRpwnKeUOx9sxDfL2NBComrnxJgWuzFkFGqya0KkpTyyPyLRx1/Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CIZcQgY/; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757080946; x=1788616946;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=p7SNkxBMDceyrMBtDVw3FbEQeKmi497N1GJZiGp7K9k=;
-  b=CIZcQgY/UgTrpQDy7tvqE7qRdj7EkebKTSYpSElU+ramiHAxVofjivR1
-   4XdF0w8VyMGHSvy+iRSMggwaM1t7rgY2gGuaiBvXXtuQsbzV20EA44Emf
-   8GYTefXRFmes0i6vMR1c+bpF1y6BdRM/7lbqasIFwN0mpIo3A5s8FpK8B
-   9gpXc1ZHJAOW6UFs8Dqlee0mZHMJarvBJNiNw4JwYFt0xNlANFNjiUebT
-   6uMeqwfN+GH7gJJeSU/AttVW+CQGtZoabA+hqW/hM7/a0PGFXrlAw0AJO
-   3uyy9RdSFEVAZz36r7FzIKXZz3WkudQdh4TmPDBNFSaO1BGW4DKXTt7nt
-   A==;
-X-CSE-ConnectionGUID: i4KiG2UOQceQaajlYYW2gg==
-X-CSE-MsgGUID: xojMqzQCS5ynXaeHcwlpjA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11544"; a="70046424"
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="70046424"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 07:02:25 -0700
-X-CSE-ConnectionGUID: 7tJWMnQ6TUWYlbJDxGoMTg==
-X-CSE-MsgGUID: FiViECbySquhBvzeXiGqtQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,241,1751266800"; 
-   d="scan'208";a="195826206"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 05 Sep 2025 07:02:21 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uuX19-0000Tv-05;
-	Fri, 05 Sep 2025 14:02:19 +0000
-Date: Fri, 5 Sep 2025 22:01:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, kbusch@kernel.org, axboe@kernel.dk,
-	hch@lst.de, sagi@grimberg.me, kch@nvidia.com, alistair23@gmail.com,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH v2 7/7] nvmet-tcp: Support KeyUpdate
-Message-ID: <202509052153.luapQMZm-lkp@intel.com>
-References: <20250905024659.811386-8-alistair.francis@wdc.com>
+	s=arc-20240116; t=1757080948; c=relaxed/simple;
+	bh=yGBymGwumJV51DZsAN4JFHDYp0fSEWwlKrHyzeM0LuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ARoWX8bz/dkwnqR248ynJ5BBiTxrLnuPKQDjcHW1QgVzp3kcLbk6aw8dDlj3EoFbTitN3M694rwxVAyjG0nHepIYzlOW4sSply5hFI7dYIS5GHBFdQ1dDm6uTb2MdmOilEhyDhaqUbat8XqmdmNnpGu79pGklIuuwGTig2TChnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W44rYqP9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757080946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7hHWvvCpj+Eva3UbhaHhL1SoxFvZsWk18fQWBXIJ0/g=;
+	b=W44rYqP94T3rXFOfWdUbQwiOnz+yEMCmHsApl9F+lTnAwKdGM2yWVBGZQlaMNsX9GLJAUR
+	cBvE7voCBbUta6n7rSWhhmg0KB9nJqmzHWuPqwN6iGVi+CzTrQqS484dVfAcYZbAcj+kw9
+	+gAbFRXua99PWITvwMaVhuwOI0QDgM0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-643-xe2yywkXNniVZbF6tXuSHQ-1; Fri, 05 Sep 2025 10:02:19 -0400
+X-MC-Unique: xe2yywkXNniVZbF6tXuSHQ-1
+X-Mimecast-MFC-AGG-ID: xe2yywkXNniVZbF6tXuSHQ_1757080939
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45b986a7b8aso14381585e9.0
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 07:02:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757080939; x=1757685739;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7hHWvvCpj+Eva3UbhaHhL1SoxFvZsWk18fQWBXIJ0/g=;
+        b=mBHT2Iz+btcFKa7hUVHmU5VIBYt94+k7pZR7FjwZOIRLZL8MC3xNGHJ8W7pT4gUeNz
+         DVKDrpHGAagNWWbufJ+mAE/f8vR80hSvjZ3LP3zc2cNecYG4TxYUuFSrIY0Vyq4ZJW7s
+         VzAZKBwQoL3HUYOyWldA05uADGb0kEst5lyqTmPd3/LEoz5ghoCm3qmWRlgaxOkK9GYL
+         MXuKPrOR3bFwZCSFgQTbsg+PN9LxU2+1HhSwfHFJLQ/Y9WorwCfMegriTgHouAg5M3Hz
+         iv9dyhWZ04w8TV/hoYgU8qrpztnWwK8Qweq4C6Z17cEc3NFmhG4WGDfMBlYW6PwLeQHm
+         vsrA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQO8TZoA9kHizWcka7G2TemZNGqaPBGMlYVjVbc4j+koph/twy//+nW8DAANDkNdBFl2tQYjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwS6HkGzEEz6wbi/Jkpci77jj/odr5Lm0spxZsrstugfYNM7flc
+	HW1tUXo+Nytk4Y9MQuikyOvvJ8tb6+mOi/6pr8V/wmjDwZazK/8+A9IxNOqzOIKbmjAuB+x8Ax0
+	fnZsFZEdzdscrUG1cR631NW9zgDu/h3O84RTz/Hf9aV4c7HjoW+MM//wuEQ==
+X-Gm-Gg: ASbGncuGzjygzXC3WJ17iuiPuJG5rVoegbdpHpXRt4BnHvlxY2b6nbQ6zzrbqeaV2bN
+	/fljyCdY+eCg3/5FECXbz2tb1aYUYDnjVdkjuFYPfmXk4kpTML8i1438whraZF7UtsEaKFIVb41
+	eqV2DSya4ine3UzlYgUq20dpCrpfURyGW6fzQS8X7GLCY9e5NLW90pTeM0+Pcdcp9SOR9m4Ri1r
+	r6y9MUKCMmbN/q4cj1d/v5o2uyDsxql7zGhA8/vjHll4vpMAx6qgyRRNXCq29249f3KEdUZX9wp
+	QFbVh4uH71XtUcF7LcPlup+h2g7x5ogSn+FgmpAcsg54Xgww9r4=
+X-Received: by 2002:a05:600c:4515:b0:45b:8078:b31d with SMTP id 5b1f17b1804b1-45b85525d8dmr194570535e9.6.1757080938516;
+        Fri, 05 Sep 2025 07:02:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG2pgd2xwVG6veFaY0CKMMn16GW411eLnAIn0rFchvq70SknR7/kodVXbZeiKPP5xRQL2/mOA==
+X-Received: by 2002:a05:600c:4515:b0:45b:8078:b31d with SMTP id 5b1f17b1804b1-45b85525d8dmr194569885e9.6.1757080937817;
+        Fri, 05 Sep 2025 07:02:17 -0700 (PDT)
+Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [2a10:fc81:a806:d6a9::1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45dd296ed51sm71823145e9.3.2025.09.05.07.02.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 07:02:17 -0700 (PDT)
+Date: Fri, 5 Sep 2025 16:02:15 +0200
+From: Stefano Brivio <sbrivio@redhat.com>
+To: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dsahern@kernel.org, netdev@vger.kernel.org, Adrian
+ Moreno <amorenoz@redhat.com>
+Subject: Re: [PATCH net] tunnels: reset the GSO metadata before reusing the
+ skb
+Message-ID: <20250905160215.6ca5d764@elisabeth>
+In-Reply-To: <20250904125351.159740-1-atenart@kernel.org>
+References: <20250904125351.159740-1-atenart@kernel.org>
+Organization: Red Hat
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.49; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250905024659.811386-8-alistair.francis@wdc.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On Thu,  4 Sep 2025 14:53:50 +0200
+Antoine Tenart <atenart@kernel.org> wrote:
 
-kernel test robot noticed the following build warnings:
+> If a GSO skb is sent through a Geneve tunnel and if Geneve options are
+> added, the split GSO skb might not fit in the MTU anymore and an ICMP
+> frag needed packet can be generated. In such case the ICMP packet might
+> go through the segmentation logic (and dropped) later if it reaches a
+> path were the GSO status is checked and segmentation is required.
+> 
+> This is especially true when an OvS bridge is used with a Geneve tunnel
+> attached to it. The following set of actions could lead to the ICMP
+> packet being wrongfully segmented:
+> 
+> 1. An skb is constructed by the TCP layer (e.g. gso_type SKB_GSO_TCPV4,
+>    segs >= 2).
+> 
+> 2. The skb hits the OvS bridge where Geneve options are added by an OvS
+>    action before being sent through the tunnel.
+> 
+> 3. When the skb is xmited in the tunnel, the split skb does not fit
+>    anymore in the MTU and iptunnel_pmtud_build_icmp is called to
+>    generate an ICMP fragmentation needed packet. This is done by reusing
+>    the original (GSO!) skb. The GSO metadata is not cleared.
+> 
+> 4. The ICMP packet being sent back hits the OvS bridge again and because
+>    skb_is_gso returns true, it goes through queue_gso_packets...
+> 
+> 5. ...where __skb_gso_segment is called. The skb is then dropped.
+> 
+> 6. Note that in the above example on re-transmission the skb won't be a
+>    GSO one as it would be segmented (len > MSS) and the ICMP packet
+>    should go through.
+> 
+> Fix this by resetting the GSO information before reusing an skb in
+> iptunnel_pmtud_build_icmp and iptunnel_pmtud_build_icmpv6.
+> 
+> Fixes: 4cb47a8644cc ("tunnels: PMTU discovery support for directly bridged IP packets")
+> Reported-by: Adrian Moreno <amorenoz@redhat.com>
+> Signed-off-by: Antoine Tenart <atenart@kernel.org>
 
-[auto build test WARNING on trondmy-nfs/linux-next]
-[also build test WARNING on net/main net-next/main linus/master v6.17-rc4 next-20250905]
-[cannot apply to linux-nvme/for-next horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Thanks for fixing this!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/alistair23-gmail-com/net-handshake-Store-the-key-serial-number-on-completion/20250905-105201
-base:   git://git.linux-nfs.org/projects/trondmy/linux-nfs.git linux-next
-patch link:    https://lore.kernel.org/r/20250905024659.811386-8-alistair.francis%40wdc.com
-patch subject: [PATCH v2 7/7] nvmet-tcp: Support KeyUpdate
-config: s390-randconfig-001-20250905 (https://download.01.org/0day-ci/archive/20250905/202509052153.luapQMZm-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 9.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250905/202509052153.luapQMZm-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509052153.luapQMZm-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/nvme/target/tcp.c: In function 'nvmet_tcp_tls_record_ok':
->> drivers/nvme/target/tcp.c:1173:12: warning: unused variable 'htype' [-Wunused-variable]
-    1173 |  u8 ctype, htype, level, description;
-         |            ^~~~~
-   drivers/nvme/target/tcp.c: In function 'nvmet_tcp_io_work':
-   drivers/nvme/target/tcp.c:1479:5: error: implicit declaration of function 'update_tls_keys'; did you mean 'update_cr_regs'? [-Werror=implicit-function-declaration]
-    1479 |     update_tls_keys(queue);
-         |     ^~~~~~~~~~~~~~~
-         |     update_cr_regs
-   cc1: some warnings being treated as errors
-
-
-vim +/htype +1173 drivers/nvme/target/tcp.c
-
-  1168	
-  1169	static int nvmet_tcp_tls_record_ok(struct nvmet_tcp_queue *queue,
-  1170			struct msghdr *msg, char *cbuf)
-  1171	{
-  1172		struct cmsghdr *cmsg = (struct cmsghdr *)cbuf;
-> 1173		u8 ctype, htype, level, description;
-  1174		int ret = 0;
-  1175	
-  1176		ctype = tls_get_record_type(queue->sock->sk, cmsg);
-  1177		switch (ctype) {
-  1178		case 0:
-  1179			break;
-  1180		case TLS_RECORD_TYPE_DATA:
-  1181			break;
-  1182		case TLS_RECORD_TYPE_ALERT:
-  1183			tls_alert_recv(queue->sock->sk, msg, &level, &description);
-  1184			if (level == TLS_ALERT_LEVEL_FATAL) {
-  1185				pr_err("queue %d: TLS Alert desc %u\n",
-  1186				       queue->idx, description);
-  1187				ret = -ENOTCONN;
-  1188			} else {
-  1189				pr_warn("queue %d: TLS Alert desc %u\n",
-  1190				       queue->idx, description);
-  1191				ret = -EAGAIN;
-  1192			}
-  1193			break;
-  1194		case TLS_RECORD_TYPE_HANDSHAKE:
-  1195			ret = -EAGAIN;
-  1196			break;
-  1197		default:
-  1198			/* discard this record type */
-  1199			pr_err("queue %d: TLS record %d unhandled\n",
-  1200			       queue->idx, ctype);
-  1201			ret = -EAGAIN;
-  1202			break;
-  1203		}
-  1204		return ret;
-  1205	}
-  1206	
+Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Stefano
+
 
