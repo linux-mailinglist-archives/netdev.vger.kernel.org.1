@@ -1,103 +1,207 @@
-Return-Path: <netdev+bounces-220212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13244B44BEF
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 04:55:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C4DB44C4D
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 05:28:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9C945A33B6
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 02:55:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B040A01719
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 03:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B15B1FFC49;
-	Fri,  5 Sep 2025 02:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CA2230BCB;
+	Fri,  5 Sep 2025 03:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="nBWNsNyy"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="P8zUMD8U"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAEA1487F6;
-	Fri,  5 Sep 2025 02:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757040953; cv=none; b=X47FI29oP/Q77eTU6yaML04zEKOWWGjOW3K2yU8N6Ojo9HqE6YTuPs2BanBvgand0aPrm/wqgee7d9k+R8EWqqObXsP6Td8jSIyxEOoTo75uh88eg/J3OmL90wDOAzAFwR86DnZgvYDHJ3jBJ9zd4TxAVhxFqv7FayivrvlMDSo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757040953; c=relaxed/simple;
-	bh=m0NchfMU+6mv+FH2Live2SrPoEDdZN1S9Mkgu9lUtvg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N7A9N7durXuLdIhmHj1bPR+TLSSPgnLKTNC+9Oy/ytLeYAWf46ksYTEOklOiJabQP7nkbwf/e8tMjO/mNrZzSWR0z1Vms2PR+hjfNy3RmknGVK5mySZFdjR41XLqs60Qz5Iq53leCgBYc6yTSiuHGlolZPaCYRPcVTJeMPu/qqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=nBWNsNyy; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=TS
-	2c4+8QcxzYCQJ9dOwqNrRRCyzgODztpgqxHCDceTQ=; b=nBWNsNyyuSn5F3z0s/
-	QzuJv8Nrbaah8YFsYpiXBbpyF3JgDSGG9FNRwAxBqGD7H036I9Q9aK82x5K9KdHu
-	+6UDW257J3VuIKMeyotgPpehQblGttdcVyScOdaRQHYz49Q9OVtUZlMcKyKtr3hY
-	vhtdpt64LiYq5OfcpMbbNZK/s=
-Received: from neo-TianYi510Pro-15ICK.. (unknown [])
-	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wAXNKwdUbpo_djoGA--.23003S2;
-	Fri, 05 Sep 2025 10:55:26 +0800 (CST)
-From: liuqiangneo@163.com
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011018.outbound.protection.outlook.com [52.101.70.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4F9EEBD;
+	Fri,  5 Sep 2025 03:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757042914; cv=fail; b=tXa/28+zt+atwdjcv2g89To9sp5xiH3aAp8EtUdBPcZg8AHdtjJdkOV2ufoXNhwE4+4AefBQ4+fDcKLpTgSrXnVgrCDvY8cJC/j3xKGIyf/OtsAvEWImoubASqDKQZG3YDNVU8wOMxvGNmVvEkPEpaROzU8VG7m6mJpsxBlAGu8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757042914; c=relaxed/simple;
+	bh=DRXKwgYFfO7g9fllB29yqyI21WyazMHUvqn/yDUXlB0=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=V78thv/yumfD/Uyu41F7LDp68xRgR0SnSKy1P61dhYtcgSIqjPQwYMlmTtKSo3yEPdfGLiSFtz6ij+YMunrkYk0rMF/NQf7kW5jtiWwMCcWSyWKDwXSymiZH8tweLNtljb/khf7uJyiTqNPIAcPk1kNIt8q16uSMiN8jOnI75JI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=P8zUMD8U; arc=fail smtp.client-ip=52.101.70.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mzzyqLD75h7Iba6GbwX9M/5f0BBD+MmhtdRe1EMKiE8FGSYNIH0wWDGK4YkUywmfWV3eBxRECn211OCdbSApjjvE27aH4CC1TPFBn9us31CoBGt7JsHKUcFsLmLSI8nH4aZfsfRKacyeZV0shRc57H0QKiET2TGVAdPMzZsFkGUq3oK1JF+OJdh3ZeChj84rq2dvsSg15QBalDG25ZTY9hVJ7D+75PGk+9B8HbrpPFDAK+HxkRiyyeWxs1YM4viXJLqjvap+8qKGGQaXTIj1ThBw64CDDRFS7LR9toST/b5mMEjKez2cqFL5DWcRmRjoH5DKFSsQcsmTRolCJW/eEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T7u9aGrmrTwUlrvZDh+gHMyvUQGn1VMW1dsK2fndlcU=;
+ b=ly7mT0+eXAB5WF5M4K7Jte6+w8CAbUemjKM87vl5GcQvM8+cbFwo9BciX8OLG+4oubFj+/yXLfwsledgoOdsTP13glnjzUQNzE04d9N/gCaio0i1RrIfhgLVBeX/kf5j+qReVsvVWXUYuceeOGdZf4s2BIlg0BouVfR4QEGdsEt5H/y0ay0ViF7YG2uF53Di4pwVfP5cvTTxZI4qVYSuu4ltxxWrmquEPvPAoHI8HJWAeg48eaTD8X3oDj5jE8N8dA+Nr0LFi8WOuHp8G0NdxauALaoP6tbxZgPPDKYmNNjL8grVIu/3fU5uIi2KQErKieo6Sa9/TsbRV1+wFhzzyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T7u9aGrmrTwUlrvZDh+gHMyvUQGn1VMW1dsK2fndlcU=;
+ b=P8zUMD8Uab8QPIBvH+MRDJpmyw0640tUxmXL0hGh2JmWQqlso4J2Qungy1kQTioR4hkszEty2VEappiuXVVANE//O1jd/S8JAWZ8RgH3cusDCntPEbs+pSA4eZdukIo4PX/yKrTXQRp2+DUxzcjkssPEmvM6i0PNF5V8XIIu2rbd1oGJ9Oeb12rYCUUGjRh5JAK0qMGGb6u3zGMuvONzma07G+wEeAnrfN/rUYiIgSGyl1y11mdFdofmOE8UfNgkTFSVs7wyUBG1kxu9lVSSOBlGTCjkglmYyqE3lEDAS0zk9L/SkihR68o2yToYWRmK3JE0L8HDgN/E9i+WEB6Hww==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by DUZPR04MB10013.eurprd04.prod.outlook.com (2603:10a6:10:4d8::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Fri, 5 Sep
+ 2025 03:28:29 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.9094.018; Fri, 5 Sep 2025
+ 03:28:29 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	Frank.Li@nxp.com,
+	yangbo.lu@nxp.com,
+	christophe.leroy@csgroup.eu
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Qiang Liu <liuqiang@kylinos.cn>
-Subject: [PATCH] ixgbe: Remove self-assignment code
-Date: Fri,  5 Sep 2025 10:55:15 +0800
-Message-ID: <20250905025519.58196-1-liuqiangneo@163.com>
-X-Mailer: git-send-email 2.43.0
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: [PATCH v2 net-next 0/3] ptp: add pulse signal loopback support for debugging
+Date: Fri,  5 Sep 2025 11:07:08 +0800
+Message-Id: <20250905030711.1509648-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR03CA0120.apcprd03.prod.outlook.com
+ (2603:1096:4:91::24) To AM9PR04MB8505.eurprd04.prod.outlook.com
+ (2603:10a6:20b:40a::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAXNKwdUbpo_djoGA--.23003S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZF13XryUWr17ur17JFykGrg_yoW8Gr4rpF
-	W8u3sIgry3XF45Way8Xay5Jr90ga92vw4rGFyDAw4rZw1DCrsrGwn7t3y0yFyxZrW0vF1I
-	vF45Aws5C3Z3J3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UGXd8UUUUU=
-X-CM-SenderInfo: 5olx1xxdqj0vrr6rljoofrz/1tbishG-YWi6TaZSWAAAsO
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|DUZPR04MB10013:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f5da766-b432-4c07-c6d4-08ddec2c461b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|52116014|19092799006|376014|7416014|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?7D+Tzj0f+9Rm1ZTHxcPAvyBKUjeQphxzEdJjzld76ncM161VEJ6xMmVVTnsF?=
+ =?us-ascii?Q?hgiGg6+dxn8IWxbov0IEny9hcThUc/ST5uBd12o8N8j+y1qwhoaPe975b0j1?=
+ =?us-ascii?Q?qHNtgK1FwL4REN1VTzdVeGQKckzyUnidI5zZfjqLQvFHPZXHPBTSQOsbABF+?=
+ =?us-ascii?Q?/gn57nBlBM5Y0ucmRFhis8i+lluWGWjLLmU+WZCCbCeJ3fUQ7MUtsaYCK8sH?=
+ =?us-ascii?Q?CS5ZUhTxzp3IbgUX5MzBviC5o4mCBQoZ/VGPaZmk34kKFNJjeVsv0bHtIYav?=
+ =?us-ascii?Q?03qTwuUDji4jh0+rgy0xvWT/snp58aR5Wh0J7Y40h4JmrH4dJxo4hUOSC3D2?=
+ =?us-ascii?Q?VaRE7tcp5nOVkH22nZLuDzsgoQOTCKq7Qi1Z7jZIeS5F076+VOqb1tnf8TCZ?=
+ =?us-ascii?Q?agpYTXzurEusjpbl7md34B9SfSva8uPy70PCMeh08At+MNzb9QfiOdDIzw4s?=
+ =?us-ascii?Q?y3+jABVi7JKz8elk7ykDXE6fR34NTSU9Xre1SYu1dpj64Kfho+1wON5JABLx?=
+ =?us-ascii?Q?Yc1uf9thjrnI7/jN5QQLLDlj2nP8WYt4HLGfuvVNJ8QLIjFjwNV7+lFG01yQ?=
+ =?us-ascii?Q?uLp6CIz2sx137jx86I70RRvZXRxP2wlQ72VuwH8M4m3AnVuqiEHEjuyxZ69G?=
+ =?us-ascii?Q?vCJtuH4OYA4FqgdWDf2ZmlE/ktBw+dRv24oIbJHaziQYHuNSYmuYcDhDL4wa?=
+ =?us-ascii?Q?beON+qMjITv6m+TTdkXZfWo+LzgdTbH1W7d4NcjC626ZwQHzScQmpTsuADCl?=
+ =?us-ascii?Q?3S+AlNBD/rmKjp5Iojyg/AmrcJIfSY3qZ4mLpKPhuXG6rQwBH7NsITHWo8tt?=
+ =?us-ascii?Q?YWxMYwPH1R8UBtaaRZtK+jwWkhF6u2hSl2tdZouLiKhZJp7C1/LYG0V0kzRH?=
+ =?us-ascii?Q?dZ/q07joOUlY01597Yskkef84PvCezuhyPlgGicHkVvHuSgVDacQsTPjWRS+?=
+ =?us-ascii?Q?DJUG+HItBjGYuJJlSAkSW9e0PIRgDZhnD1n0sBDNObWPnwRWAr2kXJl9opWf?=
+ =?us-ascii?Q?5VhDaYMr+RDBbz4LfUpEYWZcZOxksFCFeOs6b+wCQBlChCmABIb2qfUnwiFz?=
+ =?us-ascii?Q?9Lo8oGd77CD7REKhEkV27V7Jv95oNTB0PppCykaflWAT3cRu9C3e1XjNueNf?=
+ =?us-ascii?Q?2SpjsAz4o8PQmc6cgrV8gj/MKL1JF8xWHqBwU4DqWMFRIijTqbhrqA7GmAkA?=
+ =?us-ascii?Q?VR0C+KOUANNyyCKWhSWZJtm5SY6yS6iu6wWNzQGh++QUo9dYa41z/c569DFZ?=
+ =?us-ascii?Q?QlOwE7+EFMtrmCtUOh5aJuyGFdKMxuRv6B6cKmL9Tl7ohAA978a8g5auxwko?=
+ =?us-ascii?Q?1fWJJMPImSGJpjiXZ7/iEQsdirtieTVw85cUhNXJULh/pUIPBbjOeYDk5LNI?=
+ =?us-ascii?Q?Juyz1l/ei6XKsgnpapt1I35XlUzazHQbJgw6nR7YG+EDRKqZ2krCPKSNHvMm?=
+ =?us-ascii?Q?IgSBwdxHbFX71Cj6no4ZLGvXn/6mJNtPtY1Z6J3+Xi+brXdSUvkNmJiJ/3L4?=
+ =?us-ascii?Q?XLedfPFlLG56/IV0sXla/TwtPeBZWPYUxSO4?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(19092799006)(376014)(7416014)(38350700014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?3xbEu6DgRlGYVB7UhI+IrZOxdNUbGK2Whz8LbpRvMHTOS/0M4XBlIUd9m5jO?=
+ =?us-ascii?Q?5G8kONGXr5sXuOdfcXYyasmmCkMv/l26Necs2EjRr41PbndFrcX6+Iv9jthm?=
+ =?us-ascii?Q?Xpy1wXG2vXCeaTdgP8G5Kvum11Pbxwfm8wB9csgxoWxG4g66KqM7c3J59prk?=
+ =?us-ascii?Q?L6vdL8D31OJVd1+k5kkPyHg/cV5C1+NXRwkesUDpf/a1OvJ4LGRNUN9zokgg?=
+ =?us-ascii?Q?KTpteFqZCGNI3yAT0dDq4Q7o9mRw3oQUbZn3x2m1ywpulQB7sOc1pgI0G8sd?=
+ =?us-ascii?Q?3xJfv4dhp/qDbes72b7gIJe+2M8OGyomvprC2elB9hJ2poSAhFZC5NP+WhBT?=
+ =?us-ascii?Q?aYC0OqtaAOBu16fMm72HExAKz4Vv//Q46nmTnjonpq4sEAyFcul0PyZtaFIv?=
+ =?us-ascii?Q?hQfJPXyx6SnV7DHqb2PJEaDeaxNn4VVl+evhSm1dPWSPy3HWCEz5290eHgde?=
+ =?us-ascii?Q?zDWXO9Splf+MQ7RYGepMuY1HN0d2FLZOahb6RV/UNlktPaZ6qR6zevzwaOOa?=
+ =?us-ascii?Q?SDB47HsE/s/ReMyNRfBtw7A20bEYmhHb2TupZiC/7Z23OI1zgDyXrW0OkhAN?=
+ =?us-ascii?Q?r8VH/reGdzO5/tBTxrPVALXHUuRRkikWfIHH5beSSMfNZqr3uqR3/ee3SxVi?=
+ =?us-ascii?Q?qYKz6ruAgmxczv1yao+7LmTLWT4o3AVrQuGdkR4zgjNAZz1s2lLWS4oKV9g3?=
+ =?us-ascii?Q?O//HfEefmz2HWUDAKJSKdEicBFh4992vyD1mgWHkTsWNMVn3DhtWx7F+o2tw?=
+ =?us-ascii?Q?rza1fbRQ3zf6/WutNHEw7EZB7schnZ+pA2R+cGwQdKHpIH4Hh2HaTrWORCg+?=
+ =?us-ascii?Q?LvX3hmQMCLbtFAQ+R2XQeUeHNR56D3VmDi1aUKFSjxAb5rhbkqzBwLF689lj?=
+ =?us-ascii?Q?H4TpWwnmsTMsGrD9Sc8aB7Eveu/aJ+fkl4eHuRX9UhzQ1SwBvIIo1s7egoH1?=
+ =?us-ascii?Q?XZcFBkQAzm/jLJYL6VjwqCReaHOT8YaOalWIqje+XCFO7SmaTiX2871YX6xh?=
+ =?us-ascii?Q?KbNK/unlhGor5wnP6aGZMAwLqp7CKTen3rT+23iKA2anp4cOgXz+p4ohnbnn?=
+ =?us-ascii?Q?P+Dc+hS1Lua22OUKYRkfUE5g6XVulExeXJoVHn1H6jaPH3ygZU3fZ+r6yDlE?=
+ =?us-ascii?Q?kNrLbMiXHvMuFPJUEtDpayW62BTUwm5eHHcwpAbFnJlFRnfW4JvKg4ghKE/c?=
+ =?us-ascii?Q?hdlzw2Fis258REiouSFErKFec+5yIsSm874GwZ7JO9jnnMdqUUUueaDEEUc2?=
+ =?us-ascii?Q?v2jbHmNyCMb7AtyHjmLOEsLx4Z9vvtW2gx5HLDnT4cAeHqVbbFwl27GviOzO?=
+ =?us-ascii?Q?e7z4du701q2ZNJnVnVU5k+LQ40s/sKQe1en9ZZ/FOwBjmJneJyNwwmMm7kUZ?=
+ =?us-ascii?Q?JYpfcNbuLNhZ3IDSqQOnN/ygM5s2VYbWkj9zG1lVg8ffNIm3DeaH017CcmkR?=
+ =?us-ascii?Q?eBwf7yoJYSpndkxgkyYsR6jsP/QK/fQ3Gee8aujuI5Te8dFLge8iKyfKPZk4?=
+ =?us-ascii?Q?OY2CN0OO8l+zSxpj/rLYulhA62yZe3mxEY5E2M3mj7q2UHv22Re5ggMML0rI?=
+ =?us-ascii?Q?jiqYDo3mx6J9ONLRSssOENouLsAOG1s0fXrY4e/K?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f5da766-b432-4c07-c6d4-08ddec2c461b
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8505.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2025 03:28:29.2704
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2tqBZZwZOjdeAzj7Udqiygbc8MSJpfGULHLnCtWrmtuUtKYP7M2aS4NRe/rZUqhOCpx0U0ppUGg6qzBWYILplA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB10013
 
-From: Qiang Liu <liuqiang@kylinos.cn>
+Some PTP devices support looping back the periodic pulse signal for
+debugging. For example, the PTP device of QorIQ platform and the NETC v4
+Timer has the ability to loop back the pulse signal and record the extts
+events for the loopback signal. So we can make sure that the pulse
+intervals and their phase alignment are correct from the perspective of
+the emitting PHC's time base. In addition, we can use this loopback
+feature as a built-in extts event generator when we have no external
+equipment which does that. Therefore, add the generic debugfs interfaces
+to the ptp_clock driver. The first two patch are separated from the
+previous patch set [1]. The third patch is new added.
 
-After obtaining the register value via raw_desc,
-redundant self-assignment operations can be removed.
+[1]: https://lore.kernel.org/imx/20250827063332.1217664-1-wei.fang@nxp.com/ #patch 3 and 9
 
-Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+v2 changes:
+1. The value of "enable" is restricted to 0 or 1.
+2. Fix the typo: covert --> convert
+3. Improve the cover-letter
+---
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index bfeef5b0b99d..6efedf04a963 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -143,18 +143,14 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 
- 	/* Read sync Admin Command response */
- 	if ((hicr & IXGBE_PF_HICR_SV)) {
--		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
-+		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
--			raw_desc[i] = raw_desc[i];
--		}
- 	}
- 
- 	/* Read async Admin Command response */
- 	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
--		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
-+		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
--			raw_desc[i] = raw_desc[i];
--		}
- 	}
- 
- 	/* Handle timeout and invalid state of HICR register */
+Wei Fang (3):
+  ptp: add debugfs interfaces to loop back the periodic output signal
+  ptp: netc: add the periodic output signal loopback support
+  ptp: qoriq: convert to use generic interfaces to set loopback mode
+
+ MAINTAINERS                      |   1 -
+ drivers/ptp/Kconfig              |   2 +-
+ drivers/ptp/Makefile             |   4 +-
+ drivers/ptp/ptp_clock.c          |  69 +++++++++++++++++++++
+ drivers/ptp/ptp_netc.c           |  25 ++++++++
+ drivers/ptp/ptp_qoriq.c          |  24 +++++++-
+ drivers/ptp/ptp_qoriq_debugfs.c  | 101 -------------------------------
+ include/linux/fsl/ptp_qoriq.h    |  10 ---
+ include/linux/ptp_clock_kernel.h |  10 +++
+ 9 files changed, 128 insertions(+), 118 deletions(-)
+ delete mode 100644 drivers/ptp/ptp_qoriq_debugfs.c
+
 -- 
-2.43.0
+2.34.1
 
 
