@@ -1,158 +1,93 @@
-Return-Path: <netdev+bounces-220378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46711B45AB4
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:38:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E71B45AE3
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:47:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDCB11B26D65
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:38:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BFE33B6249
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9163371E82;
-	Fri,  5 Sep 2025 14:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22712148850;
+	Fri,  5 Sep 2025 14:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cBub0rmn"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UJiu6OXI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EDB362061;
-	Fri,  5 Sep 2025 14:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B12572633;
+	Fri,  5 Sep 2025 14:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757083089; cv=none; b=B75lWrric2wLhQ61X+V4aIQsCM66eSckKHtfQHiuCAl7iqbmLy+DM13jtfZF3DN2ouNTFAb3M7XYVojf/JMU0gyGpU/ZZtWPWrLJhU7DIy6kiD6DU/eBikIPk5Fr9bHfM7D5I0awwSDYN5nPu3bEtfEtG05f2QqixKZSBFaXsGs=
+	t=1757083670; cv=none; b=qbmx8aOWRBeCgVgk5lw4BycGUufqrOAYg1XqUvpKHXGtmmkUJPD8Wu+zSndQAc0u+0SRbEt6m7ZP6CU9E2R8lUfCUh5ExOn0NjvMVjd+KR79Fa73UpUms80H9/ZGzOkTMY+wTdeHzurwqfRyjYUfyuAdlCzTMXew87InxktqhI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757083089; c=relaxed/simple;
-	bh=MASUxpUKXpFs6knVd9mA2iPrY94gWLaqivhtucbjwMc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dUrjzkaWPS23o1SoFvAo8r2vyAseilO8AcWUwme4SFeGVXsAKj3WxksBPsvxZZm5bcxxso1mTYXFxJH0Q2CTYIi/IdrtohXGerWRjtrvdpgUX3YBnTxtV9gvlMgYaIjAE5hrBj2pSrlM2DbxvhsCDXcNrR3va7S8XS+RtfnouTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cBub0rmn; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5857adqJ012043;
-	Fri, 5 Sep 2025 14:38:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=tkAuZrdocb41VJ8yvWLMZV4t
-	ZHhlmuHC/I9JgbqAw58=; b=cBub0rmny3LzqQSCZITCY4bfnQ9BhbkiOQaiX/s+
-	bKKM0VODb+tzX9KgCOhBTRoftdQXDguu3ihXpgQt6+gLIIkXSlidUegDFnd1jLxl
-	+bNABUE631UBUy4DSq/L57xUs9WxU4RxUovmf8scYIZIHEsI2Hmdzam0KnaWOpVu
-	4E43D1Ew2HUXn3mogm/sYq5Gu0N0QFooCjeIdN0eg0sr/ykimb8u2J2OsfsS5cJx
-	6Pgqr0gA0tG5VnHHB4trZ/JA8F1VIAKMQCT7nhgtQaJdnuHNPULcWmMer2+C5gB6
-	E1i4izB3mt5/3B4uyUCTga6jhGqRw3rADar1Ho6WIQMnew==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48xmxj7re3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Sep 2025 14:38:02 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 585Ec1gw013625
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 5 Sep 2025 14:38:01 GMT
-Received: from hu-mchunara-hyd.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.24; Fri, 5 Sep 2025 07:37:56 -0700
-Date: Fri, 5 Sep 2025 20:07:42 +0530
-From: Monish Chunara <quic_mchunara@quicinc.com>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-CC: Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
-        Ulf Hansson
-	<ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        "Richard
- Cochran" <richardcochran@gmail.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>, <kernel@oss.qualcomm.com>,
-        <linux-mmc@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-i2c@vger.kernel.org>
-Subject: Re: [PATCH v3 06/14] arm64: dts: qcom: lemans-evk: Add EEPROM and
- nvmem layout
-Message-ID: <aLr1nEKRjOtsrU7f@hu-mchunara-hyd.qualcomm.com>
-References: <20250904-lemans-evk-bu-v3-0-8bbaac1f25e8@oss.qualcomm.com>
- <20250904-lemans-evk-bu-v3-6-8bbaac1f25e8@oss.qualcomm.com>
- <e1c593d2-603c-4c3f-850a-07c14467b8e9@oss.qualcomm.com>
+	s=arc-20240116; t=1757083670; c=relaxed/simple;
+	bh=h1Xy4bqc15Ds0H/78OXHDsavq2SGfz2eRcUEAtt4oE4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=fOuTF/HgPa518kFcU828MH9RIbW1h/C27xB0ee0GkwOol0zMvqGlLVXqFTuQ5vL4pRW/A4iaOB8xB8odviXk2J8n6V3r7JYJAB9xpYbTz9iTxmwjp9ynKYABED0PA1chXnIDB9FrYc8/xSJ7BcpXVaiDnZuz27kRGqyvaHhk8x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UJiu6OXI; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
+	Content-Type; bh=h1Xy4bqc15Ds0H/78OXHDsavq2SGfz2eRcUEAtt4oE4=;
+	b=UJiu6OXI5AavtPzhLN1Kofo1z4/mjuDuf8f7hXpPPIysJw60p5fGC4jQ18d9fB
+	9HdqadTKVX6zEPdg5aw8/QpApbldKNF2eDviQnDYpxrYQFpAo14BFtnkzkv2Am4o
+	s2sjeNfYSWFXasTPdeO9CH7j8CfaQVrQ+A3DIpWsF2/NU=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzsmtp5 (Coremail) with SMTP id QCgvCgCn3+7r97poi7SDBw--.26819S2;
+	Fri, 05 Sep 2025 22:47:09 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: kerneljasonxing@gmail.com,
+	willemdebruijn.kernel@gmail.com,
+	edumazet@google.com,
+	ferenc@fejes.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v10 2/2] net: af_packet: Use hrtimer to do the retire operation
+Date: Fri,  5 Sep 2025 22:47:07 +0800
+Message-Id: <20250905144707.2271747-1-jackzxcui1989@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <e1c593d2-603c-4c3f-850a-07c14467b8e9@oss.qualcomm.com>
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAzMDExNyBTYWx0ZWRfX5L7NJqgHaBpw
- dbDaxj+rCDioODp+ofemAPqr+y+20mPAj3DqoTBhMOmWwpp+djhHXc/4gnH+asyHP7K9j73bqNV
- YoPTCUIho5vxgeq9llKVqAesWyFF3ySYm2pwlwJgZp50GMPNMRO4ffzQvicAGytnHVqh4oW3xo1
- 1jc0UYR1MaPAHZsmtWCAYEsRK8IXhjxsiFzkaHGkeS8FgTBcO3g0MATMVMdk6Bp2UNuzfTOVlw5
- xzg9IRj2img3755To4LhKfTmw/XBuOCz2TZG4i41uJ0Qfyda+ACWm4cQUGybj5YkD8F5sUprnRd
- BSoDFqpFbT4bQswYBI5aQaAcUL3as1rN3BcMGLTXyijQIvYNdDDqlCJ9H1R1P6IR4WMXJjtohne
- fFEcHjss
-X-Authority-Analysis: v=2.4 cv=a5cw9VSF c=1 sm=1 tr=0 ts=68baf5ca cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8
- a=EUspDBNiAAAA:8 a=NN4jPqIYyidG5lZKxlEA:9 a=CjuIK1q_8ugA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: k88Xu5lG7sKzzxmiKnSDX-7Yqs3T9spZ
-X-Proofpoint-ORIG-GUID: k88Xu5lG7sKzzxmiKnSDX-7Yqs3T9spZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-05_04,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 clxscore=1011 bulkscore=0 priorityscore=1501
- phishscore=0 impostorscore=0 adultscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509030117
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:QCgvCgCn3+7r97poi7SDBw--.26819S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Gw1xJr4kGFyftF48uw43Awb_yoWDKFc_ur
+	4qkwn7Aa1DJ3W8Ka12ga1aywn2qrWUGF1jq3W8XwnxK3WrJ3ykC3ZY9FZa9FW8Gw1fWrZx
+	Cws5JrW7A34I9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbknY7UUUUU==
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibh+-Cmi6gnFuvgABs0
 
-On Fri, Sep 05, 2025 at 02:07:50PM +0200, Konrad Dybcio wrote:
-> On 9/4/25 6:39 PM, Wasim Nazir wrote:
-> > From: Monish Chunara <quic_mchunara@quicinc.com>
-> > 
-> > Integrate the GT24C256C EEPROM via I2C to enable access to
-> > board-specific non-volatile data.
-> > 
-> > Also, define an nvmem-layout to expose structured regions within the
-> > EEPROM, allowing consumers to retrieve configuration data such as
-> > Ethernet MAC addresses via the nvmem subsystem.
-> > 
-> > Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
-> > Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> > ---
-> >  arch/arm64/boot/dts/qcom/lemans-evk.dts | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/arch/arm64/boot/dts/qcom/lemans-evk.dts b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> > index c48cb4267b72..30c3e5bead07 100644
-> > --- a/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> > +++ b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> > @@ -319,6 +319,18 @@ expander3: gpio@3b {
-> >  		#gpio-cells = <2>;
-> >  		gpio-controller;
-> >  	};
-> > +
-> > +	eeprom@50 {
-> > +		compatible = "giantec,gt24c256c", "atmel,24c256";
-> > +		reg = <0x50>;
-> > +		pagesize = <64>;
-> > +
-> I'm not super happy that this would be the only line of defense, but
-> you probably want to add 'read-only' to the eeprom node (or not)
->
-The Ethernet interface requires both read and write access at the driver level
-to store and retrieve MAC address and related data; therefore 'read-only' is not
-added here.
+On Fri, Sep 5, 2025 at 14:45 +0800 Jason Xing <kerneljasonxing@gmail.com> wrote:
 
-Regards,
-Monish 
+> BTW, I have to emphasize that after this patch, the hrtimer will run
+> periodically and unconditionally. As far as I know, it's not possible
+> to run hundreds and thousands packet sockets in production, so it
+> might not be a huge problem. Or else, numerous timers are likely to
+> cause spikes/jitters, especially when timeout is very small (which can
+> be 1ms timeout for HZ=1000 system). It would be great if you state the
+> possible side effects in the next version.
+
+The original logic actually involves an unconditional restart in the timer's
+callback. You might be suggesting that if packets come in particularly fast,
+the original logic would reset the timeout when opening a new block in
+tpacket_rcv, so the timeout does not expire immediately. However, if packets
+arrive very quickly, it will also lead to frequent timeout resets, which can
+waste CPU resources.
+I will emphasize in the comments that the current hrtimer expiration logic
+is unconditional and periodic.
+
+
+Thanks
+Xin Zhao
+
 
