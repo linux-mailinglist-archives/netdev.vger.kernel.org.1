@@ -1,197 +1,145 @@
-Return-Path: <netdev+bounces-220347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30682B45827
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:48:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36EC1B45831
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:52:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFBF7A0137D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:48:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C96B4A07BB6
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB285343207;
-	Fri,  5 Sep 2025 12:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4922F350831;
+	Fri,  5 Sep 2025 12:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4bmfXcTw";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rRS9Gq2i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mrZ9pimH"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2FB1F61C;
-	Fri,  5 Sep 2025 12:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C254171C9;
+	Fri,  5 Sep 2025 12:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757076516; cv=none; b=fR3Ca1P70z5yol1V6s/0ApIV/frFoUwK/PLyqPHSHMcjGQbKty8C4SM+rLcH6BNufsf/OGolIkIK1i/o3JZiw7iahNA4P7hnkKYhOtUnbuUxhZC6yyRTg654eC7KxdizWNU0UO3ZDmP1QjHmgnrMLUuyZbp7KfbHrxXY2C8/5lM=
+	t=1757076747; cv=none; b=VbMwwqJBDRxQ7WnyyEgKx8KBBwcoAnQtDw8xwiywzzLGNQXHAR+/EPZVbLTEqhNb0BblhVylkCyNt9nLmEAkasC919yz/zxQGKHM0OsPy9R4eIHzf6y9aCfcG5nA/BDcFRj6swAo7ocHePPbH4ANXviN0SuN8hjf7+xXWOp7SOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757076516; c=relaxed/simple;
-	bh=OMNPmmCMVXMzwDGq3OnNLXfRsxIS0bUTB/lhAmvdiFY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=irSuiYbNsg+12g3UoKQJo/wGqorf56ECeeyk6M5qVDMAxaWk6F42s756TLcRSoCG+UDnRoU4XNK1mk+/JaKpnBXQkAl3ltvTDWIqt1GhPO655wHlrOTv+sdDWWlxSNVmbKm1CMGpnVljNQbhfRs/w7F+3s0bIeQf7bjkXKr98nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4bmfXcTw; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rRS9Gq2i; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: John Ogness <john.ogness@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1757076513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LSUHJh3xDiIm9pW8VoCAg1GSUkePKEwZVjDbv8m8+BI=;
-	b=4bmfXcTw8Y18k0K93MHd2z4xoKhuj27LEKNzagHwUkN3vvLv348EwNEC/QFT+tbDkB/ksF
-	n5EhEpx84GOiHwHdzeMgWUgMwh7Pu1k05YodsaO8JWiGt5anFx5Fn3cyDBHicWhhlodeaQ
-	Z72YmeoMu2brVW207v/cPU1UI0CwLTeeUWIrRcavadaAKMOy5zBYrXStfb/n44/588eg3e
-	OxPF47LDA2fe3eW6an5UlzFXHxCEyGhyJ71UI4kzUF3Yi1RFwiFyfL9HuB4GbmcJQO4M4/
-	2NFgJZ+kzbQBnIqd1cdEq7dUZ6y1Y4Ff6nipNHenwHJRxg1QH/gaq+vxlXCJvQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1757076513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LSUHJh3xDiIm9pW8VoCAg1GSUkePKEwZVjDbv8m8+BI=;
-	b=rRS9Gq2iXNsV6UyxVw72BP9UQxCMNs96GCjrtSxXBoKfZJQ93Osvxj7+0Ke8UX2/7HLs96
-	jmBXJeLI4LnwUNBQ==
-To: Breno Leitao <leitao@debian.org>, Mike Galbraith <efault@gmx.de>, Simon
- Horman <horms@kernel.org>, kuba@kernel.org, calvin@wbinvd.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
- paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>,
- netdev@vger.kernel.org, boqun.feng@gmail.com
-Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-In-Reply-To: <tgp5ddd2xdcvmkrhsyf2r6iav5a6ksvxk66xdw6ghur5g5ggee@cuz2o53younx>
-References: <isnqkmh36mnzm5ic5ipymltzljkxx3oxapez5asp24tivwtar2@4mx56cvxtrnh>
- <3dd73125-7f9b-405c-b5cd-0ab172014d00@gmail.com>
- <hyc64wbklq2mv77ydzfxcqdigsl33leyvebvf264n42m2f3iq5@qgn5lljc4m5y>
- <b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt>
- <4c4ed7b836828d966bc5bf6ef4d800389ba65e77.camel@gmx.de>
- <otlru5nr3g2npwplvwf4vcpozgx3kbpfstl7aav6rqz2zltvcf@famr4hqkwhuv>
- <d1679c5809ffdc82e4546c1d7366452d9e8433f0.camel@gmx.de>
- <7a2b44c9e95673829f6660cc74caf0f1c2c0cffe.camel@gmx.de>
- <tx2ry3uwlgqenvz4fsy2hugdiq36jrtshwyo4a2jpxufeypesi@uceeo7ykvd6w>
- <5b509b1370d42fd0cc109fc8914272be6dcfcd54.camel@gmx.de>
- <tgp5ddd2xdcvmkrhsyf2r6iav5a6ksvxk66xdw6ghur5g5ggee@cuz2o53younx>
-Date: Fri, 05 Sep 2025 14:54:32 +0206
-Message-ID: <84a539f4kf.fsf@jogness.linutronix.de>
+	s=arc-20240116; t=1757076747; c=relaxed/simple;
+	bh=NqYGLAacCanmEB6salf1RZZrzDNNn5EVGytjMgmWrs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k2M1RQKa+I2Y5t4Jph69Rzx0mKp8HlE7PbJgpV1IBQSJFNpG74eRPmqvsbtYk/ZuIXPMWWBPiRIGJ6tFSyJEXhyGVI4+3JsnzNZkMGaH2R2U+dlBk6KCW6wekGclkJwvR7YUz0TLh1uZyu9Ov9KZ2WEG10GXwQA1/aMxfYUPLC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mrZ9pimH; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45b76f3b24eso3717035e9.2;
+        Fri, 05 Sep 2025 05:52:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757076744; x=1757681544; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b8EPKRftEsNcOg9bP+ysM+fNoxSdn7mQqqnV7bP4DPg=;
+        b=mrZ9pimHZyaqLfaO61TtEU+NNcKhqBmYIeQH+x4+7hI6cU5g/Qwqs/20oONGLe9ZV3
+         xVw+Hy7NavNBhjWudPCpJXB4lNAigFudZKjogUXXnaYhuliCbbDrrPhM64WZ7K00J6if
+         lD/tB4Il51EBc+zYQvlrp7j9jZcKHybrXR8NaiGLpv50B4ta7aOKd2PrFj//iIYYSJaR
+         QD5l7rfmcQzrYHzMG1u4L0qakQDrma90IRc5rnLLTqtzbBcTr+eyybU8DtYCADHjDxPj
+         psmm/uPK7bJ8QuL/FvOWFV78/IkrJkKeL8XkCacC59zBL5xgk80JtBt0sylE5eaU0RXb
+         SFEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757076744; x=1757681544;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b8EPKRftEsNcOg9bP+ysM+fNoxSdn7mQqqnV7bP4DPg=;
+        b=nQEcXi735iKr0HvSmqmuw2FwD5Hwocukd26KbLc0EEGCAsFy+9bOddTdSaY7CzFMLP
+         U9aWibtYVJsY77PBlHW6NIhL6wfFz/Lar/eTmW++c69PnaCxfvoNRn93zfgyB8fdkDwh
+         O7I8S31Rkxe1+J+jQIussIuqs4zgXpY4M8iIT3B4AbRgxqmbPBdRSzLET/9dgAh+ZV8P
+         jZY2YDS5z5C94ldEczJkBZQef6kXPF6b5BdFr5h+FIDp0hBiQAaaxrl9VOOah0+HUu5b
+         HnJXlpOyxbFh3BGwTy9Eg5LUdknU16CrRWx73AMwSJI+HWhau1kU//3wnf3d6N56VYot
+         IDYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKsGNi63p3rBpnnbKyHUDpGKDUhHtUBwgCmAobXLNNGb4ysc8kx/EgeYecMrQ6w7hAI5NA2lSEbD34Tmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlOfbbMscrJHk0ZMj5mFFUYzNHaXH2MapeFEfzbrkqWJ6JpcR5
+	Na9hXYermybeKzWfdKu3QgoTj04oHCBRKERKueDniGNgHvsTmCkU3pVQ
+X-Gm-Gg: ASbGncvpEhBHOnWzodTqKW1UigjWrN65GCKUPzug//lUeyeBBVJF5PRjSMMH50Qi0Dv
+	NQhlPwCKNXSOCoHDa2DQUGEEtTFMc3s1H9iGZ6sytFKom83CmG/QNYPoq/e3wN/XDi3Iurf29eN
+	wuOA9uoUSwZ9DdYFl72nbZao5agxJEDU32t85o68FMB0xbzFPHfY+kZH529gmNKqYOylJi2rZav
+	M3UmaAkqnAwa5ckQ1GCID7jED7S7hh0DJDqHm1/8cYjYmAubASdSCftLIr8tBxl4IGdb0WTtLaq
+	PeroqwAecovVEZqr2X91kCunSGFLm4B+oxvPUatdfSSB2YFYd6zZTSmRXhGdTaHqKtCDfBA81Ks
+	C3J6uF4v3iOtdhZSyhekftuLM
+X-Google-Smtp-Source: AGHT+IGn+lDF15CI0F5SJdkwJYe2qk+NQ0oa2DTKUpp+SG3URaVCzFU6fw02csOvWGuKn6rPYnTF9Q==
+X-Received: by 2002:a05:600c:a00c:b0:45c:b6d8:d82a with SMTP id 5b1f17b1804b1-45cb6d8f43emr41078165e9.6.1757076743480;
+        Fri, 05 Sep 2025 05:52:23 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d005:3b00:d7a7:bdbb:3df8:b18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7e7fec07sm319067535e9.10.2025.09.05.05.52.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 05:52:22 -0700 (PDT)
+Date: Fri, 5 Sep 2025 15:52:20 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Horatiu Vultur <horatiu.vultur@microchip.com>,
+	"maintainer:MICROCHIP LAN966X ETHERNET DRIVER" <UNGLinuxDriver@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: lan966x: enforce phy-mode presence
+Message-ID: <20250905125220.mhy7ln4ufhg4onwo@skbuf>
+References: <20250904203834.3660-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250904203834.3660-1-rosenp@gmail.com>
 
-Hi,
+On Thu, Sep 04, 2025 at 01:38:34PM -0700, Rosen Penev wrote:
+> The documentation for lan966x states that phy-mode is a required
+> property but the code does not enforce this. Add an error check.
+> 
+> Fixes: db8bcaad5393 ("net: lan966x: add the basic lan966x driver")
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>  drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> index 7001584f1b7a..5d28710f4fd2 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> @@ -1199,6 +1199,9 @@ static int lan966x_probe(struct platform_device *pdev)
+>  			continue;
+>  
+>  		phy_mode = fwnode_get_phy_mode(portnp);
+> +		if (phy_mode)
+> +			goto cleanup_ports;
 
-Sorry for jumping in so late here. I just stumbled upon this thread.
+It's not really great to submit bug fixes without testing them.
 
-Without understanding the details of the netconsole locking and network
-performance, I would like to mention some things about the NBCON
-interface to clear up some apparent confusion (most likely due to
-insufficient documentation, which I am happy to improve upon).
+/**
+ * fwnode_get_phy_mode - Get phy mode for given firmware node
+ * @fwnode:	Pointer to the given node
+ *
+ * The function gets phy interface string from property 'phy-mode' or
+ * 'phy-connection-type', and return its index in phy_modes table, or errno in
+ * error case.
+ */
 
-Comments below...
+The test you add will only pass for phy-mode = "", where phy_mode will
+be PHY_INTERFACE_MODE_NA. Otherwise, it will be a negative error code,
+or a positive phy_interface_t value, and both will result in a "goto
+cleanup_ports".
 
-On 2025-08-26, Breno Leitao <leitao@debian.org> wrote:
-> On Fri, Aug 22, 2025 at 05:54:28AM +0200, Mike Galbraith wrote:
->> On Thu, 2025-08-21 at 10:35 -0700, Breno Leitao wrote:
->> > > On Thu, Aug 21, 2025 at 05:51:59AM +0200, Mike Galbraith wrote:
->>=20=20
->> > > > > --- a/drivers/net/netconsole.c
->> > > > > +++ b/drivers/net/netconsole.c
->> > > > > @@ -1952,12 +1952,12 @@ static void netcon_write_thread(struct c
->> > > > > =C2=A0static void netconsole_device_lock(struct console *con, un=
-signed long *flags)
->> > > > > =C2=A0{
->> > > > > =C2=A0	/* protects all the targets at the same time */
->> > > > > -	spin_lock_irqsave(&target_list_lock, *flags);
->> > > > > +	spin_lock(&target_list_lock);
->> > >=20
->> > > I personally think this target_list_lock can be moved to an RCU lock.
->> > >=20
->> > > If that is doable, then we probably make netconsole_device_lock()
->> > > to a simple `rcu_read_lock()`, which would solve this problem as wel=
-l.
->>=20
->> The bigger issue for the nbcon patch would seem to be the seemingly
->> required .write_atomic leading to landing here with disabled IRQs.
+What is the impact of the problem? What happens without your fix?
 
-Using spin_lock_irqsave()/spin_unlock_irqrestore() within the
-->device_lock() and ->device->unlock() callbacks is fine. Even with
-PREEMPT_RT this is fine. If you can use RCU to synchronize the target
-list, that is probably a nice optimization, but it is certainly not a
-requirement from the NBCON (and PREEMPT_RT/lockdep) perspective.
-
-> In this case, instead of transmitting through netpoll directly in the
-> .write_atomic context, we could queue the messages for later delivery.
-
-The ->write_atomic() callback is intended to perform immediate
-transmission. It is called with hardware interrupts disabled and is even
-expected to work from NMI context. If you are not able to implement
-these requirements, do not implement ->write_atomic(). Implementing some
-sort of deferrment mechanism is inappropriate. Such a mechanism already
-exists based on ->write_thread().
-
-> With the current implementation, this is not straightforward unless we
-> introduce an additional message copy at the start of .write_atomic.
->
-> This is where the interface between netpoll and netconsole becomes
-> problematic. Ideally, we would avoid carrying extra data into netconsole
-> and instead copy the message into an SKB and queue the SKB for
-> transmission.
->
-> The core issue is that netpoll and netconsole are tightly coupled, and
-> several pieces of functionality that live in netpoll really belong in
-> netconsole. A good example is the SKB pool: that=E2=80=99s a netconsole c=
-oncept,
-> not a netpoll one. None of the other netpoll users send raw char *
-> messages. They all work directly with skbs, so, in order to achieve it,
-> we need to move the concept of skb pool into netconsole, and give
-> netconsole the management of the skb pool.
->
->> WRT my patch, seeing a hard RT crash on wired box cleanly logged with
->> your nbcon patch applied (plus my twiddle mentioned earlier) tells me
->> my patch has lost its original reason to exist.  It's relevant to this
->> thread only in that those once thought to be RT specific IRQ disable
->> spots turned out to actually be RT agnostic wireless sore spots.
->
-> Thanks. As a follow-up, I would suggest the following steps:
->
-> 1) Decouple the SKB pool from netpoll and move it into netconsole
->
->   * This makes netconsole behave like any other netpoll user,
->     interacting with netpoll by sending SKBs.
-> 	* The SKB population logic would then reside in netconsole, where it
-> 	  logically belongs.
->
->   * Enable NBCONS in netconsole, guarded by NETCONSOLE_NBCON
-> 	* In normal .write_atomic() mode, messages should be queued in
-> 	  a workqueue.
-
-This is the wrong approach. It cannot be expected that the workqueue is
-functional during panic. ->write_atomic() needs to be able to write
-directly, most likely using pre-allocated SKBs and pre-setup dedicated
-network queues.
-
-As an example, the graphics people implemented the Blue-Screen-Of-Death
-by preallocating a separate graphics buffer. In case of a crash, the
-hardware simply switches to the "crash buffer", rather than trying to
-integrate and take control of the graphics buffer already in use.
-
-However, it is also important to note that the graphics consoles do not
-implement the ->write_atomic() callback. Instead they register a
-kmsg_dumper to display the panic upon crash. This may also be a good
-approach for netconsole if ->write_atomic() callbacks are not available.
-
-> 	* If oops_in_progress is set, we bypass the queue and
-> 	  transmit the SKB immediately. (Maybe disabling lockdep?!).
-
-NBCON is meant to deprecate @oops_in_progress. However, it is true that
-consoles not implementing ->write_atomic() will never print panic
-output.
-
-John Ogness
+> +
+>  		err = lan966x_probe_port(lan966x, p, phy_mode, portnp);
+>  		if (err)
+>  			goto cleanup_ports;
+> -- 
+> 2.51.0
+> 
+> 
 
