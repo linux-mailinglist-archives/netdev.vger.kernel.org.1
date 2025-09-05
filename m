@@ -1,240 +1,480 @@
-Return-Path: <netdev+bounces-220477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D02B46470
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:15:00 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A5AB46490
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 22:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26BAC189500E
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 20:15:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 11E834E0F60
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 20:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237C0287257;
-	Fri,  5 Sep 2025 20:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F761274FE3;
+	Fri,  5 Sep 2025 20:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bFXe4QaK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xK0/NUjQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010026.outbound.protection.outlook.com [52.101.69.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A347F2848B4;
-	Fri,  5 Sep 2025 20:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.26
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757103295; cv=fail; b=gJBwmIr2wQBTV2+Z0FRUOuBUr7fZP35PwCJM8vCeUZLuazZ84R3Mm6Y2KvoKuOfQcUqkPbz79nyLI4jGtJZ40uRUXPy/ZA91z6+dDXK2MC6to1EcqsaT2cqF+S4pabtgpxW0YXMOjeWaZAnKOEnlwmoPVskuAC8xcJMmS/yMTdE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757103295; c=relaxed/simple;
-	bh=GFcfSzGMn8lL1FJ7tE93N81RTSnQN18F60qwvPnjeJQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cjx0OrtfKN5xiMaAWXTMr/+pAV5GUdBdNqdLcg4cZ6oe8k/5gSUGc2ybOIK3cV31/jPH5SzPGN+CGdn9lk5t0EEspqH75+4IFHpel5Cm+UbzQdgiXUU7ZHsW4WlCpbv9ZIGu1j3B07Z3Km0E6PhPGw7zseS+M5bUyY0Ncldfv0o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bFXe4QaK; arc=fail smtp.client-ip=52.101.69.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NsqlFmeoATjvxR4xnRI3T0xAytAM+Eow9XbZUtDeCdDx69sAZTcco1AdfcFnt11n1Nzfj2StiE7H1AZNmFajbbhmcZL/9ks6PrhV2Ox+XkXVDkRiJUqhDAm56wZUYcyTRkT5lrQEQ6mTOVOzEj10JJ9rsVHNjiCjukSaM3XCpqEP5TdhbwPSojWe/OnHrjN3+v545dwsGZ94vcg7Jv6veyZNYDsS9izUpiLwm32u8RRWCzU/E5qzf5W4DAn7iL8CRzk/XW+HjgO8SCxyvHQ6d8W4Ea+FEzR977bhSx0UJcaS2znLnKH2qaQyoQxnmYU7STTjwDsUYYS/DW+k9bxMkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zGmitsqXdOAQxiJTstjSb2Xeacj9lBISBbXO3PrjZvY=;
- b=AntTt2ZxWCr6AtPHi9HdAY7InTE58xLt1cre8YEgdV9eVhGFHaqpv8mYx6YMt6nhAm9XnhdbkSk49bjkKKCrqXQ1LIIb4cwYeCHgD4yIT7g1nXIsJnTb2oTyOGbJDknpr1aGtITig4adbaWInS3o0Py+I1iQf/WrsZ7yNMr1Qf1reGry/WKRVitemy0tMreOol7CgrdzZ/3Bxy454riY3Q7jlZRGXlxCLLYjTAURCP0w+PHhBJ1EiSOn9URh4dzXhmhR25I3tq6OWz1tQa4elvU55Yh7k3uh+1Lh2Iq1bYAVfzdJbKodik2X3yy443YMCZv3IW6YXhUU5l/99AN++g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zGmitsqXdOAQxiJTstjSb2Xeacj9lBISBbXO3PrjZvY=;
- b=bFXe4QaKIQdTYUQX6N1Dcrt/2lu/nFYnPD4lxD84DvUB171dlizHjXIIctHlO8VbnYFfJoncrAs8cJUCEh5ZYBcXZoaTdy0XmZwulYlj9By3QW0qLWuYaSFcq5fsMSzMrucj7PZUNN/nB/5EL8wlVCWbKTz2r1TaykfdkYFyjDt2FROp43WJ36ASLVSSq0xte3jRygn8ZBthc/QqCCTsTbQjX01EasMQ9tWwcrAQxoDFxpO/zabVsHlRU5KatowUBMtzGrK+e2++jQOlktnc0w8ZBSF3SKR8Q1EVgpH/JpeuOZeFu7WCPRrVq0Vqb3jDYZHxbfHYj9FRMEz/3Y3JJg==
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
- by PA1PR04MB10097.eurprd04.prod.outlook.com (2603:10a6:102:459::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Fri, 5 Sep
- 2025 20:14:49 +0000
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::21bf:975e:f24d:1612]) by PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::21bf:975e:f24d:1612%7]) with mapi id 15.20.9094.015; Fri, 5 Sep 2025
- 20:14:49 +0000
-From: Shenwei Wang <shenwei.wang@nxp.com>
-To: Frank Li <frank.li@nxp.com>
-CC: Wei Fang <wei.fang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	Clark Wang <xiaoning.wang@nxp.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>
-Subject: RE: [PATCH v5 net-next 5/5] net: fec: enable the Jumbo frame support
- for i.MX8QM
-Thread-Topic: [PATCH v5 net-next 5/5] net: fec: enable the Jumbo frame support
- for i.MX8QM
-Thread-Index: AQHcHduHeAsiJ4NpoECvXNvY8BSjBbSDjUGAgAF5FjA=
-Date: Fri, 5 Sep 2025 20:14:49 +0000
-Message-ID:
- <PAXPR04MB91857813EFDD0DB08A36B6DE8903A@PAXPR04MB9185.eurprd04.prod.outlook.com>
-References: <20250904203502.403058-1-shenwei.wang@nxp.com>
- <20250904203502.403058-6-shenwei.wang@nxp.com>
- <aLoHOfNTCtVEFj6q@lizhi-Precision-Tower-5810>
-In-Reply-To: <aLoHOfNTCtVEFj6q@lizhi-Precision-Tower-5810>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|PA1PR04MB10097:EE_
-x-ms-office365-filtering-correlation-id: c94fe002-8d32-4d60-c73f-08ddecb8dda3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|19092799006|1800799024|376014|7416014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?h2hOuSSuFuFfcKPcXtZsgKcah6THiO1cUW2R2dAOgQriAFr0PBI8WQUL8bcq?=
- =?us-ascii?Q?niR1UBM4j5AOUqB+H05OOqVL5SsveOFcPWAfZCzvCHkQVCb/bmnXVmzEbE30?=
- =?us-ascii?Q?/niJYYIlUynjozyy/iCJ4+v5nbpSUTzo99lU9H7vUhphd1vl4aOueK+pgdrD?=
- =?us-ascii?Q?8d2mymhyzEp8iMqY6ueVAWe3Avr6jP8ZlWoRt5KJW9xMudSk3QwldbuIr7Hp?=
- =?us-ascii?Q?H0h5wX8TQja0yMKzhhKt1PINpXbtXSdhX9+bRRylBFjC8kiM+cwoP0LhUKCA?=
- =?us-ascii?Q?1KOVyQAVQDUUFLMziftUfwEiA3ws3UgJlwGHKH4gYGjaLxJDlY17hy7FS+dK?=
- =?us-ascii?Q?j7UE4nheGosdzJL510PP3vWWKbPseX6WWBI77k6VaqmCQ7tpcT1MfoZvqAY7?=
- =?us-ascii?Q?PoiqFQetPNLmEzHjvWbtEcA15T0bwB1JQ+JIicRiSthObY43elUaQDCf+fiy?=
- =?us-ascii?Q?HE17WaHG3BlVuGTplKfyqP/uBR+G8NrVGoczmCEP5+0oi6og2eWKqZPDtCgN?=
- =?us-ascii?Q?fNlZQt/VSR+rDzhJVke9YLEhuTk3bW2tCwtKgGvWs1kH+XQcfOpz3MbLdJCu?=
- =?us-ascii?Q?4XCJmdTIL839qCKxpwXfKrayAviMLbgeEFnDxVzDZurCnykTV+JzIO448pXl?=
- =?us-ascii?Q?0H1bhpdYDaFA45oJaF0JuzdWYuL9sYy6HIrzEUfzUVdBugDVjB/+dtgRx3Kd?=
- =?us-ascii?Q?ycT5xnPZpuLHgAK6tX8e8XMWbm9wlT0I44R/7CwbgdLw8urwUYUiE3NaQDMb?=
- =?us-ascii?Q?BPQdscZsRRVSH9PlxOa27JyLrogU1B/clHix1mRU8/Iz3JcZ5G/IDGM6ag7D?=
- =?us-ascii?Q?xOqXxY7cPAw7ImDcVl6dIEy3jsw1i6eRhXLbv50SC8wojb0K32VcCpYkDIBv?=
- =?us-ascii?Q?GLKlP/9Xmfi5hKAVviQpQZYebuXSzWrXVcBWUb8n7Tq97pV5csKdQfBd2DaW?=
- =?us-ascii?Q?Tsdcvms6aZMgBxgOk4LgxjYtXzfMH0fJHbG36aRirkQI9zaJxA/MQwP7NY6k?=
- =?us-ascii?Q?lRFV6XqoQwcPyh2TXLjLsu8aBZqlAXo5ceClBSHABzrmq61lroA8VL7OR72c?=
- =?us-ascii?Q?6ZrPii0saWB3q4elkCHjXY1UmSFsPqUyTw2Sa/udKSibZugpY6DDfS34wkvr?=
- =?us-ascii?Q?dRW+D7YKixZlI6Yjzn4UmUo0xsLgG/LyV9ztQU2sTdXmkVmlEJfdhfmu7X8n?=
- =?us-ascii?Q?wEtdP/E/484vsQF+zNMVz8dIOE1u/F0CmaYcGuVh1fpmGKc/LlnRuxPGK1fq?=
- =?us-ascii?Q?4EQkivrUF1NHa7E47sncQ8fZoIPRDGnyfnieq4YcCb9kay1ZJf2t8UQU1Vmb?=
- =?us-ascii?Q?aS/grMi3jU7vqL4gw0oiZXMkxSUq3MRkl0s7JunkNu/OmiRJWSf6kBmtS9oe?=
- =?us-ascii?Q?0RX+eKGnJ3NE41nA/DYMH0VHYpNZOYIqq2JyhUZ4/2EZCW2ESayK9X8XmSFJ?=
- =?us-ascii?Q?sJaByIahzmnLHaR3oAVg+le5VpkerYfssRrJjobcJObOhgRuvqKuUA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?gbGRSp2o6ajStis1AlEWU9yHR/slmE5LPmEipmd3aPLKVSpcENQROhPTmR4F?=
- =?us-ascii?Q?WZH1h9iJQojC/h46+6r8hMshx/S4EN1Wdv6fkr4agkePk/GbBcrgbRw+hXFQ?=
- =?us-ascii?Q?B/RupuSfPlK5OBSc9gMwq0M4GJttezh+S/DAjsqwSCAZFbUbQRcXqaK/5bl2?=
- =?us-ascii?Q?enNsVR2TClYeBnLigR/gpEDLbjzZH66HIOJyhlLd0KDujcSGvCkURD44VMk+?=
- =?us-ascii?Q?ndNiP2/Cp6HFnd7rnuntPQ370LLAHJK+wfH55HN7Zv9ZWF8dgahOzqfY4tPO?=
- =?us-ascii?Q?1IXEOrtade3Tzu+XhyKNfxGuK7LtWxtC5M+xsGuEcFFtHS+kET0m277ZMHqY?=
- =?us-ascii?Q?uUcBiC1Nei9ErdwW/NEnH7C3Z9cUVwWRHZwpQpGbvrk7DqR+KDcT+k6po7ke?=
- =?us-ascii?Q?j57PEq0Tg24d/bu/OOa0QOwlA6roakmZ8735YBs/nCi0J/KbcRjfFH6RPnWV?=
- =?us-ascii?Q?Bi2zJsKGQE/u54h5eldZLf9LxVmV35MEF64kyQWJ1vANF/HbVYduHxAA7v+u?=
- =?us-ascii?Q?jdn4/aqYpCjnoVMEWcMJbhWU4GoBmID0jp1RwBnI4jmHVXahKdHqOibQvL3v?=
- =?us-ascii?Q?KuFZM4An6YZwqWrfkU519Zjob/c6D/tZwbVlxMexgv+NGVzZyrZKw1tuXRhh?=
- =?us-ascii?Q?hZXVxGMKytR5S9l3XiCz2TVdRu4Hn0HcrK7sDrRajmQxrL3aBCLCEkt8Slqx?=
- =?us-ascii?Q?sKhIaAtLSav98kiMmt8nCSD/qBQUBG4Qw53uJNqGShuBUIgMz0qhclqQBNkZ?=
- =?us-ascii?Q?BN3YL0mqp9UddTI8I1fbFMm4HTNknFoFtrQ5Ubi6jvvyOIr6mxUK5DVRhlp4?=
- =?us-ascii?Q?8AS055HTXDEYIXPf8+wcVMe8dff/VbmKJWCNXIe6OgquDefSTKl00toD1GvC?=
- =?us-ascii?Q?XxjZarKe5Or3ff5yMBuwlCdY1Fdfp0eacZmxz/MFff2ela6MB/n2Rd8zgR4+?=
- =?us-ascii?Q?YzktpJGYVhpgsjezoc41W6ktW2uWTXxwjP62OWVWtP8o39qO72G5oIL29zCe?=
- =?us-ascii?Q?AUslorvpTKZW06pagkTQtaJuizz2D12khAM/z19twwU77ZK6wZfHmZ1YPpNA?=
- =?us-ascii?Q?PQ830GrxnnyG/8VynDmhOV4Pr0SQiX/PGp+zdfjanAeYdUF69XFN0uPLYZvb?=
- =?us-ascii?Q?EtIZhhmDXMOQkBfkydo91LC0csLxQKtZwwH32uBbyejDRHXqhRItPO5wD0dY?=
- =?us-ascii?Q?xFKd1ugCiwcIi4UGN2m3pUFWkrGnbo62pXFDPe0dRyKOLiTx6GfdB5MWvhex?=
- =?us-ascii?Q?ScsCSxke6tzNst7B6NetRuDipip/JdvH3KTlncn24ArXlLjwD4x2/p1lWi8O?=
- =?us-ascii?Q?4H66nt0pVl5I7ldCdHzlSJRBtlkJ9kyJmpMA+yt82Uxd+eMOtI8oZmZHf7g0?=
- =?us-ascii?Q?uf8bG6583chcr6KuBOk9exjyNjZ9fSFNYxFdOejrdmMK1YJmWmPC5SiKI5eU?=
- =?us-ascii?Q?evrfCUn/xqZ8qSJAd2fKldc9C8zOj1K/melvBUD2dyo9uOrFDNN+cIn1LtYx?=
- =?us-ascii?Q?oo4bpayITAf5K/rdDuh8iuvC7xna3vZeNWfdLS4DHW6NDR2Wx+7kkDLTd053?=
- =?us-ascii?Q?Uv5Zk9nllZ0DXwPVQBw=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF6925DB0D
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 20:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757103935; cv=none; b=hywKuXfweibcl8hE0+pNC6a4Lza/NgOrg4So5MqXDCZNgQ1lToH5iYwOECpLHWX0tO47XK2if7tO9xcCfbo+HiVAn0io/Kzp6ROSySgqVH5KdmPM8nexXRWVQDHxR+sxz8xuqp7aeowGqv15TmVhyjPHqyeQLwm5Xv0ZZnDSiXk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757103935; c=relaxed/simple;
+	bh=jDz74jtthF77PeBsMR7o2OGzDzYeLylYv8sJITBwzHc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Trk3C1YkxweJ72tPIqSh0b40c1SFeECcGa4Jgq/2PC1kXEiGLKj+btCfgxVARrDkR+/R+GbgzGfqoJXy3uw0k5Jmno/vcZ3GZKxP9MnFw6BumfFi87HgFjcB4AZfxqXespdDNMT/EAvsrAVUmoh8tWgERJPplUZ6AN23dPky0Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xK0/NUjQ; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-55f6b77c91fso523e87.1
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 13:25:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757103931; x=1757708731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+kgKtkFSvFxN0+GOpeYsXguLH3MBg6T1r5BTTkCZlzY=;
+        b=xK0/NUjQqo/hoVq2QmNugemb0MSHJ3Puy3iK/1XltHHynDreQX2xz1JbFk8ZiOg1Y+
+         Fn0OUBhY2/S5dqTfsH7oQeSF0gO/XwVkdLeAe/ATlqObmtG+esTeI6jTxgZBET73+PWf
+         0pXmO055SqE2fH9d6qD7GMwt9epkZOmmilWnB1KtQr9COd3XOx1UEyRDuWMwQDwPzWVi
+         aOQvNK7OL6z9Etu2B81OOuIsFDa6xZCXn+qhkuJKLTGrkCNGraxBAXGYqMYNFIbwcmzs
+         8srrf2Iv+fELp4cNK4EcQAbDsqNQ3PS7+rHUe8t7aOGuYvACq0VDrfyJAb2I66cY4APY
+         WgDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757103931; x=1757708731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+kgKtkFSvFxN0+GOpeYsXguLH3MBg6T1r5BTTkCZlzY=;
+        b=E2JCnLDb0fKf+JCcsuHh9chwQKADXoYP9SwHIcNdhqXI376AnF37EEv+EVy0GIg7QV
+         V/1YOp9IfgvwH5pLzzTOdSMLZ1xiodDUI8+B7V1+4HH7PkBjbVtn8j3hq/eYbALPhXP2
+         jMX/qP8CMIvTKHFPKXKQGmXNF2SVokbURFrP6qmxa3K2NYrjVmwZt+5O4CCCnOMkixyo
+         x9RJbJrmAfwCa5vnD8Uk6QcicecWbMnRfBDuDIoixAgBsdS306PNJHhr4oEhWekAQWFq
+         qNdAsRlrfAxBvnE60BzCymDQvyXwdTESbcrvh95ultKXbpseoUodZzy2/lQWlye2cjiK
+         LAEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXZhJCSfd4EFwVVUAiKpfvaOYzqOk7bKZ1+i5NqOCjNc27+8uvBwNqL4s6T+h1mO4wiV6iHSo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyX3S631vaGKODFJYBK2I5XmN8qysWby/aOMlTUxxEIzRPE5ECD
+	GL5nGDk0YF94iwFu3LDzGjjFqEoOscxcpVUZp5P1wvAW0ueujbIL9+ET4IYxQgsGqFgwzwK2fr4
+	caz0uK5cL0/KiX3gqXNWEVXz3oI3dUGDUTB+/ruuR
+X-Gm-Gg: ASbGncsRnfqbcWXbOFKV2gl8ZLC6QWqC+qHTY35Lvq0hNk4Cy8jO2dx4ulKyp48Kjzl
+	CnzTxwvCFk4DcULV5p4CMapL4jpeY5Eowl5Ng/s5EAVXHGK1n0yH+a9SfZJi03HbSCUJdX2tVJA
+	HCuwfiM16grymc+bvrNlq9wny1rPWy5OrwDum2vMbkYuOtZLOgCB9qxPK5MqjUg3069V+ItibVG
+	FUnRekTL8ZZmY0n67HxdEBdXA==
+X-Google-Smtp-Source: AGHT+IEjoWid/fO8vEMfv+XUMnPq6NXM0UqfApFnVsvTvRttvhe+pHkGQgOO0iJz7aagmll2Km1pmMI4XrtkuYW71QE=
+X-Received: by 2002:a05:6512:617:10b0:55f:68fe:76d4 with SMTP id
+ 2adb3069b0e04-5624d92cfb5mr44215e87.5.1757103930911; Fri, 05 Sep 2025
+ 13:25:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c94fe002-8d32-4d60-c73f-08ddecb8dda3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Sep 2025 20:14:49.2746
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hr+tUjp9M3ODbv2uOBcQ7szHyBv2pyWUuBnkG/9aKK1GqwD3pwuuBmXgPs98syna74sxAhYG4QZpOdhG85iDFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10097
+References: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
+ <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-2-d946169b5550@meta.com>
+ <CAHS8izPrf1b_H_FNu2JtnMVpaD6SwHGvg6bC=Fjd4zfp=-pd6w@mail.gmail.com> <aLjaIwkpO64rJtui@devvm11784.nha0.facebook.com>
+In-Reply-To: <aLjaIwkpO64rJtui@devvm11784.nha0.facebook.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 5 Sep 2025 13:25:18 -0700
+X-Gm-Features: Ac12FXyWRe7ahZJ70LMfFa5mWgcNJGy3jsE6h5CiZdZTxZA96gMHBx-UbV5x83g
+Message-ID: <CAHS8izMe+u1pFzX5U_Mvifn3VNY2WGqi_uDvqWdG7RwPKW3z6A@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] net: devmem: use niov array for token management
+To: Bobby Eshleman <bobbyeshleman@gmail.com>, Matthew Wilcox <willy@infradead.org>, 
+	Samiullah Khawaja <skhawaja@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Sep 3, 2025 at 5:15=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gmail.=
+com> wrote:
+>
+> On Wed, Sep 03, 2025 at 01:20:57PM -0700, Mina Almasry wrote:
+> > On Tue, Sep 2, 2025 at 2:36=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gm=
+ail.com> wrote:
+> > >
+> > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > >
+> > > Improve CPU performance of devmem token management by using page offs=
+ets
+> > > as dmabuf tokens and using them for direct array access lookups inste=
+ad
+> > > of xarray lookups. Consequently, the xarray can be removed. The resul=
+t
+> > > is an average 5% reduction in CPU cycles spent by devmem RX user
+> > > threads.
+> > >
+> >
+> > Great!
+> >
+>
+> Hey Mina, thanks for the feedback!
+>
+> > > This patch changes the meaning of tokens. Tokens previously referred =
+to
+> > > unique fragments of pages. In this patch tokens instead represent
+> > > references to pages, not fragments.  Because of this, multiple tokens
+> > > may refer to the same page and so have identical value (e.g., two sma=
+ll
+> > > fragments may coexist on the same page). The token and offset pair th=
+at
+> > > the user receives uniquely identifies fragments if needed.  This assu=
+mes
+> > > that the user is not attempting to sort / uniq the token list using
+> > > tokens alone.
+> > >
+> > > A new restriction is added to the implementation: devmem RX sockets
+> > > cannot switch dmabuf bindings. In practice, this is a symptom of inva=
+lid
+> > > configuration as a flow would have to be steered to a different queue=
+ or
+> > > device where there is a different binding, which is generally bad for
+> > > TCP flows.
+> >
+> > Please do not assume configurations you don't use/care about are
+> > invalid. Currently reconfiguring flow steering while a flow is active
+> > works as intended today. This is a regression that needs to be
+> > resolved. But more importantly, looking at your code, I don't think
+> > this is a restriction you need to introduce?
+> >
+>
+> That's fair, let's see if we can lift it.
+>
+> > > This restriction is necessary because the 32-bit dmabuf token
+> > > does not have enough bits to represent both the pages in a large dmab=
+uf
+> > > and also a binding or dmabuf ID. For example, a system with 8 NICs an=
+d
+> > > 32 queues requires 8 bits for a binding / queue ID (8 NICs * 32 queue=
+s
+> > > =3D=3D 256 queues total =3D=3D 2^8), which leaves only 24 bits for dm=
+abuf pages
+> > > (2^24 * 4096 / (1<<30) =3D=3D 64GB). This is insufficient for the dev=
+ice and
+> > > queue numbers on many current systems or systems that may need larger
+> > > GPU dmabufs (as for hard limits, my current H100 has 80GB GPU memory =
+per
+> > > device).
+> > >
+> > > Using kperf[1] with 4 flows and workers, this patch improves receive
+> > > worker CPU util by ~4.9% with slightly better throughput.
+> > >
+> > > Before, mean cpu util for rx workers ~83.6%:
+> > >
+> > > Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %st=
+eal  %guest  %gnice   %idle
+> > > Average:       4    2.30    0.00   79.43    0.00    0.65    0.21    0=
+.00    0.00    0.00   17.41
+> > > Average:       5    2.27    0.00   80.40    0.00    0.45    0.21    0=
+.00    0.00    0.00   16.67
+> > > Average:       6    2.28    0.00   80.47    0.00    0.46    0.25    0=
+.00    0.00    0.00   16.54
+> > > Average:       7    2.42    0.00   82.05    0.00    0.46    0.21    0=
+.00    0.00    0.00   14.86
+> > >
+> > > After, mean cpu util % for rx workers ~78.7%:
+> > >
+> > > Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %st=
+eal  %guest  %gnice   %idle
+> > > Average:       4    2.61    0.00   73.31    0.00    0.76    0.11    0=
+.00    0.00    0.00   23.20
+> > > Average:       5    2.95    0.00   74.24    0.00    0.66    0.22    0=
+.00    0.00    0.00   21.94
+> > > Average:       6    2.81    0.00   73.38    0.00    0.97    0.11    0=
+.00    0.00    0.00   22.73
+> > > Average:       7    3.05    0.00   78.76    0.00    0.76    0.11    0=
+.00    0.00    0.00   17.32
+> > >
+> >
+> > I think effectively all you're doing in this patch is removing xarray
+> > with a regular array, right? I'm surprised an xarray account for 5%
+> > cpu utilization. I wonder if you have debug configs turned on during
+> > these experiments. Can you perf trace what about the xarray is taking
+> > so long? I wonder if we're just using xarrays improperly (maybe
+> > hitting constant resizing slow paths or something), and a similar
+> > improvement can be gotten by adjusting the xarray flags or what not.
+> >
+>
+> That is right.
+>
+> Here is some perf data gathered from:
+>
+>         perf record -a -g -F 99 -C 0-7 -- sleep 5
+>
+> RX queues pinned to 0-3 and kperf server pinned to 4-7.
+>
+>     11.25%  server       [kernel.kallsyms]                               =
+       [k] tcp_recvmsg
+>             |
+>              --10.98%--tcp_recvmsg
+>                        bpf_trampoline_6442594803
+>                        tcp_recvmsg
+>                        inet6_recvmsg
+>                        ____sys_recvmsg
+>                        ___sys_recvmsg
+>                        __x64_sys_recvmsg
+>                        do_syscall_64
+>                        entry_SYSCALL_64_after_hwframe
+>                        __libc_recvmsg
+>                        |
+>                         --2.74%--0x100000082
+>
+>      5.65%  server       [kernel.kallsyms]                               =
+       [k] xas_store
+>             |
+>              --5.63%--xas_store
+>                        |
+>                        |--3.92%--__xa_erase
+>                        |          sock_devmem_dontneed
+>                        |          sk_setsockopt
+>                        |          __x64_sys_setsockopt
+>                        |          do_syscall_64
+>                        |          entry_SYSCALL_64_after_hwframe
+>                        |          __GI___setsockopt
+>                        |          0x4f00000001
+>                        |
+>                        |--0.94%--__xa_alloc
+>                        |          tcp_recvmsg
+>                        |          bpf_trampoline_6442594803
+>                        |          tcp_recvmsg
+>                        |          inet6_recvmsg
+>                        |          ____sys_recvmsg
+>                        |          ___sys_recvmsg
+>                        |          __x64_sys_recvmsg
+>                        |          do_syscall_64
+>                        |          entry_SYSCALL_64_after_hwframe
+>                        |          __libc_recvmsg
+>                        |
+>                         --0.76%--__xa_cmpxchg
+>                                   tcp_xa_pool_commit_locked
+>                                   tcp_xa_pool_commit
+>                                   tcp_recvmsg
+>                                   bpf_trampoline_6442594803
+>                                   tcp_recvmsg
+>                                   inet6_recvmsg
+>                                   ____sys_recvmsg
+>                                   ___sys_recvmsg
+>                                   __x64_sys_recvmsg
+>                                   do_syscall_64
+>                                   entry_SYSCALL_64_after_hwframe
+>                                   __libc_recvmsg
+>
+>
+>      [...]
+>
+>      1.22%  server       [kernel.kallsyms]                               =
+       [k] xas_find_marked
+>             |
+>              --1.19%--xas_find_marked
+>                        __xa_alloc
+>                        tcp_recvmsg
+>                        bpf_trampoline_6442594803
+>                        tcp_recvmsg
+>                        inet6_recvmsg
+>                        ____sys_recvmsg
+>                        ___sys_recvmsg
+>                        __x64_sys_recvmsg
+>                        do_syscall_64
+>                        entry_SYSCALL_64_after_hwframe
+>                        __libc_recvmsg
+>
 
+One thing that is a bit weird is that you're seeing 5.67% + 1.19%
+overall overhead for xarrays, but when you do the hacky
+just-give-userspace-the-pointer experiment you see a full 10%
+reduction. But that's beside the point.
 
-> -----Original Message-----
-> From: Frank Li <frank.li@nxp.com>
-> Sent: Thursday, September 4, 2025 4:40 PM
-> To: Shenwei Wang <shenwei.wang@nxp.com>
-> Cc: Wei Fang <wei.fang@nxp.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
-> David S. Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> <pabeni@redhat.com>; Alexei Starovoitov <ast@kernel.org>; Daniel Borkmann
-> <daniel@iogearbox.net>; Jesper Dangaard Brouer <hawk@kernel.org>; John
-> Fastabend <john.fastabend@gmail.com>; Clark Wang
-> <xiaoning.wang@nxp.com>; Stanislav Fomichev <sdf@fomichev.me>;
-> imx@lists.linux.dev; netdev@vger.kernel.org; linux-kernel@vger.kernel.org=
-; dl-
-> linux-imx <linux-imx@nxp.com>
-> Subject: Re: [PATCH v5 net-next 5/5] net: fec: enable the Jumbo frame sup=
-port
-> for i.MX8QM
->=20
-> On Thu, Sep 04, 2025 at 03:35:02PM -0500, Shenwei Wang wrote:
-> > Certain i.MX SoCs, such as i.MX8QM and i.MX8QXP, feature enhanced FEC
-> > hardware that supports Ethernet Jumbo frames with packet sizes up to
-> > 16K bytes.
-> >
-> > When Jumbo frames are supported, the TX FIFO may not be large enough
-> > to hold an entire frame. To handle this, the FIFO is configured to
-> > operate in cut-through mode when the frame size exceeds
-> > (PKT_MAXBUF_SIZE - ETH_HLEN - ETH_FCS_LEN), which allows transmission
-> > to begin once the FIFO reaches a certain threshold.
-> >
-> > Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
-> > ---
-> >  drivers/net/ethernet/freescale/fec.h      |  3 +++
-> >  drivers/net/ethernet/freescale/fec_main.c | 25
-> > +++++++++++++++++++----
-> >  2 files changed, 24 insertions(+), 4 deletions(-)
-> >
-> ...
-> >
-> >  	if (fep->bufdesc_ex)
-> > @@ -4614,7 +4626,12 @@ fec_probe(struct platform_device *pdev)
-> >
-> >  	fep->pagepool_order =3D 0;
-> >  	fep->rx_frame_size =3D FEC_ENET_RX_FRSIZE;
-> > -	fep->max_buf_size =3D PKT_MAXBUF_SIZE;
-> > +
-> > +	if (fep->quirks & FEC_QUIRK_JUMBO_FRAME)
-> > +		fep->max_buf_size =3D MAX_JUMBO_BUF_SIZE;
->=20
-> If only use once, needn't define macro.
->=20
+>
+> Here is the output from zcat /proc/config.gz | grep DEBUG | grep =3Dy, I'=
+m
+> not 100% sure which may be worth toggling. I'm happy to rerun the
+> experiments if any of these are suspicious looking:
+>
+> CONFIG_X86_DEBUGCTLMSR=3Dy
+> CONFIG_ARCH_SUPPORTS_DEBUG_PAGEALLOC=3Dy
+> CONFIG_BLK_DEBUG_FS=3Dy
+> CONFIG_BFQ_CGROUP_DEBUG=3Dy
+> CONFIG_CMA_DEBUGFS=3Dy
+> CONFIG_FW_LOADER_DEBUG=3Dy
+> CONFIG_PNP_DEBUG_MESSAGES=3Dy
+> CONFIG_SCSI_LPFC_DEBUG_FS=3Dy
+> CONFIG_MLX4_DEBUG=3Dy
+> CONFIG_INFINIBAND_MTHCA_DEBUG=3Dy
+> CONFIG_NFS_DEBUG=3Dy
+> CONFIG_SUNRPC_DEBUG=3Dy
+> CONFIG_DYNAMIC_DEBUG=3Dy
+> CONFIG_DYNAMIC_DEBUG_CORE=3Dy
+> CONFIG_DEBUG_BUGVERBOSE=3Dy
+> CONFIG_DEBUG_KERNEL=3Dy
+> CONFIG_DEBUG_MISC=3Dy
+> CONFIG_DEBUG_INFO=3Dy
+> CONFIG_DEBUG_INFO_DWARF4=3Dy
+> CONFIG_DEBUG_INFO_COMPRESSED_NONE=3Dy
+> CONFIG_DEBUG_INFO_BTF=3Dy
+> CONFIG_DEBUG_INFO_BTF_MODULES=3Dy
+> CONFIG_DEBUG_FS=3Dy
+> CONFIG_DEBUG_FS_ALLOW_ALL=3Dy
+> CONFIG_SLUB_DEBUG=3Dy
+> CONFIG_DEBUG_PAGE_REF=3Dy
+> CONFIG_ARCH_HAS_DEBUG_WX=3Dy
+> CONFIG_HAVE_DEBUG_KMEMLEAK=3Dy
+> CONFIG_ARCH_HAS_DEBUG_VM_PGTABLE=3Dy
+> CONFIG_ARCH_HAS_DEBUG_VIRTUAL=3Dy
+> CONFIG_DEBUG_MEMORY_INIT=3Dy
+> CONFIG_SCHED_DEBUG=3Dy
+> CONFIG_LOCK_DEBUGGING_SUPPORT=3Dy
+> CONFIG_CSD_LOCK_WAIT_DEBUG=3Dy
+> CONFIG_CSD_LOCK_WAIT_DEBUG_DEFAULT=3Dy
+> CONFIG_DEBUG_CGROUP_REF=3Dy
+> CONFIG_FAULT_INJECTION_DEBUG_FS=3Dy
+>
+>
 
-Using a macro here keeps consistency with the original coding style, while =
-also=20
-making the code cleaner and easier to read.
+Thanks for the detailed data here. Nothing overly wrong jumps at me.
 
+Cc Matthew Wilcox here. Maybe he can spot something obviously wrong
+with how we're using xarrays that can be optimized.
+
+> For more context, I did a few other experiments before eventually
+> landing on this patch:
+>
+> 1) hacky approach - don't do any token management at all, replace dmabuf
+>    token with 64-bit pointer to niov, teach recvmsg() /
+>    sock_devmem_dontneed() to inc/dec the niov reference directly... this
+>    actually reduced the CPU util by a very consistent 10%+ per worker
+>    (the largest delta of all my experiements).
+>
+> 2) keep xarray, but use RCU/lockless lookups in both recvmsg/dontneed.
+>    Use page indices + xa_insert instead of xa_alloc. Acquire lock only if
+>    lockless lookup returns null in recvmsg path. Don't erase in dontneed,
+>    only take rcu_read_lock() and do lookup. Let xarray grow according to
+>    usage and cleanup when the socket is destroyed. Surprisingly, this
+>    didn't offer noticeable improvement.
+>
+> 3) use normal array but no atomics -- incorrect, but saw good improvement=
+,
+>    despite possibility of leaked references.
+>
+> 4) use a hashmap + bucket locks instead of xarray --  performed way
+>    worse than xarray, no change to token
+>
+> > > Mean throughput improves, but falls within a standard deviation (~45G=
+B/s
+> > > for 4 flows on a 50GB/s NIC, one hop).
+> > >
+> > > This patch adds an array of atomics for counting the tokens returned =
+to
+> > > the user for a given page. There is a 4-byte atomic per page in the
+> > > dmabuf per socket. Given a 2GB dmabuf, this array is 2MB.
+> > >
+> > > [1]: https://github.com/facebookexperimental/kperf
+> > >
+> > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > ---
+> > >  include/net/sock.h       |   5 ++-
+> > >  net/core/devmem.c        |  17 ++++----
+> > >  net/core/devmem.h        |   2 +-
+> > >  net/core/sock.c          |  24 +++++++----
+> > >  net/ipv4/tcp.c           | 107 +++++++++++++++----------------------=
+----------
+> > >  net/ipv4/tcp_ipv4.c      |  40 +++++++++++++++---
+> > >  net/ipv4/tcp_minisocks.c |   2 -
+> > >  7 files changed, 99 insertions(+), 98 deletions(-)
+> > >
+> > > diff --git a/include/net/sock.h b/include/net/sock.h
+> > > index 1e7f124871d2..70c97880229d 100644
+> > > --- a/include/net/sock.h
+> > > +++ b/include/net/sock.h
+> > > @@ -573,7 +573,10 @@ struct sock {
+> > >  #endif
+> > >         struct rcu_head         sk_rcu;
+> > >         netns_tracker           ns_tracker;
+> > > -       struct xarray           sk_user_frags;
+> > > +       struct {
+> > > +               struct net_devmem_dmabuf_binding        *binding;
+> > > +               atomic_t                                *urefs;
+> > > +       } sk_user_frags;
+> > >
+> >
+> > AFAIU, if you made sk_user_frags an array of (unref, binding) tuples
+> > instead of just an array of urefs then you can remove the
+> > single-binding restriction.
+> >
+> > Although, I wonder what happens if the socket receives the netmem at
+> > the same index on 2 different dmabufs. At that point I assume the
+> > wrong uref gets incremented? :(
+> >
+>
+> Right. We need some bits to differentiate bindings. Here are some ideas
+> I've had about this, I wonder what your thoughts are on them:
+>
+> 1) Encode a subset of bindings and wait for availability if the encoding
+> space becomes exhausted. For example, we could encode the binding in 5
+> bits for outstanding references across 32 bindings and 27 bits (512 GB)
+> of dmabuf. If recvmsg wants to return a reference to a 33rd binding, it
+> waits until the user returns enough tokens to release one of the binding
+> encoding bits (at which point it could be reused for the new reference).
+>
+
+This, I think, sounds reasonable. supporting up to 2^5 rx dmabuf
+bindings at once and 2^27 max dmabuf size should be fine for us I
+think. Although you have to be patient with me, I have to make sure
+via tests and code inspection that these new limits will be OK. Also
+please understand the risk that even if the changes don't break us,
+they may break someone and have to be reverted anyway, although I
+think the risk is small.
+
+Another suggestion I got from the team is to use a bitmap instead of
+an array of atomics. I initially thought this could work, but thinking
+about it more, I think that would not work, no? Because it's not 100%
+guaranteed that the socket will only get 1 ref on a net_iov. In the
+case where the driver fragments the net_iov, multiple difference frags
+could point to the same net_iov which means multiple refs. So it seems
+we're stuck with an array of atomic_t.
+
+> 2) opt into an extended token (dmabuf_token_v2) via sockopts, and add
+> the binding ID or other needed information there.
+>
+
+Eh, I would say this is an overkill? Today the limit of dma-bufs
+supported is 2^27 and I think the dmabuf size is technically 2^32 or
+something, but I don't know that we need all this flexibility for
+devmem tcp. I think adding a breakdown like above may be fine.
+
+> > One way or another the single-binding restriction needs to be removed
+> > I think. It's regressing a UAPI that currently works.
+> >
+
+Thinking about this more, if we can't figure out a different way and
+have to have a strict 1 socket to 1 dma-buf mapping, that may be
+acceptable...
+
+...the best way to do it is actually to do this, I think, would be to
+actually make sure the user can't break the mapping via `ethtool -N`.
+I.e. when the user tells us to update or delete a flow steering rule
+that belongs to a devmem socket, reject the request altogether. At
+that point we could we can be sure that the mapping would not change
+anyway. Although I don't know how feasible to implement this is.
+
+AFAICT as well AF_XDP is in a similar boat to devmem in this regard.
+The AF_XDP docs require flow steering to be configured for the data to
+be available in the umem (and I assume, if flow steering is
+reconfigured then the data disappears from the umem?). Stan do you
+know how this works? If AF_XDP allows the user to break it by
+reconfiguring flow steering it may also be reasonable to allow the
+user to break a devmem socket as well (although maybe with
+clarification in the docs.
+
+--
 Thanks,
-Shenwei
-
-> Frank
-> > +	else
-> > +		fep->max_buf_size =3D PKT_MAXBUF_SIZE;
-> > +
-> >  	ndev->max_mtu =3D fep->max_buf_size - ETH_HLEN - ETH_FCS_LEN;
-> >
-> >  	ret =3D register_netdev(ndev);
-> > --
-> > 2.43.0
-> >
+Mina
 
