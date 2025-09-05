@@ -1,323 +1,150 @@
-Return-Path: <netdev+bounces-220287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BE60B4532A
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 11:31:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F190B453F6
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD9E0484C41
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 09:31:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7DCA61009
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C82221FD2;
-	Fri,  5 Sep 2025 09:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC436283FE1;
+	Fri,  5 Sep 2025 10:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xIcNh29G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFxi6xLM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BB41FE45A
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 09:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AABD3FF1;
+	Fri,  5 Sep 2025 10:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757064661; cv=none; b=uwRbiPI8gwtsrpaklas+Zv46CQw8/mQE2MTUmeY6MKDVhwAgxNq0GWmBxVyUFUanZN10SbDo6/A90aXzHYK6IyIarUHr/bGvUP4WGII79Xzrxiok51zlJB3ZvVpDDhqDoTNLsJJYDKHdQ8ho/zirozihk3jJCnBRoaXFS4LQa4Y=
+	t=1757066496; cv=none; b=bvmeQrOi7ufd73WxvSjQ6NNqHBtFLcJUOL0VLQjyFEUBp1W2GXDBbKXlTDuiW35IRxzFabitEpQmb0L/zGF2RMHPT+fm8WzP29YSLh6DlMAIpVyK7a8sPQ6HSjPRcHv3QCaVa5BP9/TUHaQ6acTT6A0Pk1LrblgQ3NBxLfsbR+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757064661; c=relaxed/simple;
-	bh=cComBjj/vDPU72+FvDU/MvSfl4KJJjzD7B7BldnVSPI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=mSfcShD/B3kVpXfZlmbxOnmMhhKXc8kfJ384EfR75ADZzL7X8H0Ti2mJ7+UA2IB8MF3KyeTUxj+sSE2320hNULE1FKItUZVFt0N1pukblYt5xC88rLZyqSDvpxn8XWk7MK/AjI4L48anOM/227WRIf0pdLpz/jcXJGITYPms788=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xIcNh29G; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b47175d02dcso1522521a12.3
-        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 02:30:59 -0700 (PDT)
+	s=arc-20240116; t=1757066496; c=relaxed/simple;
+	bh=MI++7xSl6D0d/tvMOVR8S7KiVropv9tJ4R/VEjlTswc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y8kIqibjSEcTNTkqgvkZpGI6TMTGzhR8swqqL5jb23J/PICYcWkJAqQ45VT+o6rPmVTryKtQemK3Yju5AZmyVUiGjBbMoPl7O4e6f9U3Xqn/ac/dCKex9eDRsbFKIO9eWk9faKMoKA/ZdMkW4Oi6J3Le2wdho9CTAbehNYcphvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFxi6xLM; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3df35a67434so1097434f8f.3;
+        Fri, 05 Sep 2025 03:01:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1757064659; x=1757669459; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+LobxBsVhrOLP6eF1oCgb7vPNLRbOh2IXRKPy/RCs6I=;
-        b=xIcNh29GzwH9dnw2XaBpohJleGt/Ng66Iwem73Bf2P+50OVY3657NmKft3NkveS4Gk
-         a4a1S8y/+Vk2YBljNaiym9NoiuH8HhRki5df4HT33ZMBbYQbb/DzpbRi8aulMhXNryAZ
-         dlGRoZ8Q3u7YzjxenEIFLL+30VO4nDH4VbPXrxQYrKN1IykmDnRK3VQMYuWboWG5ZcHR
-         4jryTYWhN/pwM7DOc4bPlC8Fr1n24wXcJtUixPm0E5ZVrQstc5U0tHp7sjjnvGKfSIPb
-         XoJWmJ0vJ0Ui0IaMXq5S3m9nW3Q9EXx00PlrhgXTt3Ool/lpAM7Fx0+RoJrTanJhrxrJ
-         i5og==
+        d=gmail.com; s=20230601; t=1757066493; x=1757671293; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZEQHjjB0tYa1N8cGqzOlMz/FwpV1lIEE+NTIQ2azOHo=;
+        b=MFxi6xLMluKxY3AWeLBVWv/03CFKPLqZ73AE5riExwYq5+9AdrBJ1nBPWd2pMCs21h
+         71OoMpqEfCmTNXI7z64LZsapHeqYl9CJ0v2YXAk+QjIpwtilDYd2A57etV2WhJGkZW9J
+         KwfU0aT28Yuo0e6yiSztEGyKGAjrunvllFQ3ewYnH2Fko34CpC/VqG82CDw7aaBEoS0h
+         P7tz5c0XTBJ88X4dxJf9PSOICnLuywlTMeU0bZBslqmzRBiZ00bURJltrFkmKcNlDn6T
+         B6Wnd9F/lZro477fffcSEOiBd8dqr2HByBLGnOgO1WE+aNPRANEPwwd0pv2X+4yXjjDh
+         usNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757064659; x=1757669459;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+LobxBsVhrOLP6eF1oCgb7vPNLRbOh2IXRKPy/RCs6I=;
-        b=mEzj8mHdpibURAogQbbkOGkMTjalE7GzGPNTsH787Fq1pKKpd/xe0sRauGw96ospFn
-         G4QMBjUVWjcTahPP2LOZi/oSWhjHxtsStkfOK459rJYSODzIVZ++dH7PirRWrkhH7uYS
-         9Wss4BBTP3mSmEVU5TWxGK4vayFFsDdF8W1c9ri9nd1d5ow6PYFP5GUBbqFmNoXQGnfa
-         2UbQqpi5XVNxF+madsYC+xtNGv3XROBza5E9BmGcGhsnpdGaBYxh196BU5PWm/UYnKYh
-         CKJTeoF7Uc0D8p2h9cg5p2KFYSycr4S6P0ADNG/Om3eAK03ETV5eXbWvXUqdQWZ4q1uj
-         6+Fw==
-X-Gm-Message-State: AOJu0Yykh64nQmM660FKBr1n2U2fdfUKqBMGAG+2ucOXL/min5VGS6Id
-	Lq2kNe0KBpZK7ri8yNFNQEvGD+4uG27tftuiHxtJy6BW+DkIIeo++xg/GLEwf59q82EavDIDhuc
-	4y+0el58e2rATGRPv/cX3ubKx7EUTS+kEfaOaX+EH30zZiDaGP7FwCOQ=
-X-Gm-Gg: ASbGnctMpN198KPB1VFr1offZgGm/6SydfoX58Z8WoBvnylJpmafAZrmynO3KWSxx+i
-	mJBabL3mTJjS/d4p+UIUgRvCDerX5OI/BC7TWYhfc3QH4dQCRGbgYCh9SaHoMW0UbdrBWsctL76
-	KknfCCkpKgBiGCky7N3+05Y6pQSJCrBWePxkKNjy5CjJbIeQFEh5iP6WK0tKl9KqOLpzvwUX9/p
-	/+4a2AVtikG7cr3q6vTeS02gpqxuIms6E4cX5B4
-X-Google-Smtp-Source: AGHT+IHXA2PhuxH15MNyIwAlo4Zsa1wegxGTRmX/0N7BbPmF1yBcGj4uXgca0x/iboAEfGk+fwKK4A1E3Kyu6BjOlso=
-X-Received: by 2002:a17:90b:4d92:b0:327:e018:204a with SMTP id
- 98e67ed59e1d1-3281531d3e3mr29191395a91.0.1757064658607; Fri, 05 Sep 2025
- 02:30:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757066493; x=1757671293;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZEQHjjB0tYa1N8cGqzOlMz/FwpV1lIEE+NTIQ2azOHo=;
+        b=pJbgciep+1SAxmSQygJLZv3YDPcI5dHm2sS77Jpn0E37c/+fKbY2AwXHdg5fggLheY
+         zdzT9wR88dJh2IjGY1ogYGOsRWJMofo1uC14N8LsEYXShx5lO9S2bst154IotxPMlC4i
+         xEiPBsBRbP5ZrxNJUPKDnKwgZiKSLL6n325ctH1EGwmsZn4k8tPpv59OoTygleL+aMPn
+         dt7WP08aOQme+9KL44Z9WMPFxe+T7wTrmlcIVjUhD9vfDMBeJojokdYadHKvniRtsIVt
+         pFrW8pu4/y7RRUw0dhJ8IelihV3KVkGR8snoww3qYvsaA2npLIV7pXvlKv5CC94D0U5e
+         l7kg==
+X-Forwarded-Encrypted: i=1; AJvYcCUITINBq1fW5O5ZrgLGCiY/NnsaQ2ksT1Jq1fBKjE2zFHJmCc2buvYqU2lI7fHIyBxB1aHLekgR@vger.kernel.org, AJvYcCUPP1Yph9Yr+0TWs9qAT9GmYi8u+vx9rcfHIvr/wsArU+CPpPjZFmH5uBMJR07HYd+hzyFNWW6dhaMC03ci@vger.kernel.org, AJvYcCURvPxZyF8LmeNWr4B1kkQb+pkAOv/PsR84ls51B3yHx5admBEEq6N0Vx3EronXlkvjaid5ndIE6xsi@vger.kernel.org, AJvYcCXDelpUeUog4cy7Lfk3gu0v13WaFh2HFLYvh4UyiOewxa/cLIpXR7ubI/cTJH/MGCIgdsyEN8hbxsSrUq5B1jmhQOQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMNZxzMKfVnvhHpHbl0GSLvng4KHNBV6Bko9pHrzUhmwppGJNK
+	jLI9evPCAmXZ9TqyNmcjTd3QvuMnBrA8K7hxwqsMlwdH3t9yyJJkyMIJZ+XZCll5EtC5HsWcF+J
+	+ofr+iL9DddGRdIxMfMj92W4k7SubZtc=
+X-Gm-Gg: ASbGncvpeThzhS5hU8jSGnq6b4oK2pk5TPR4Keic1JkUYOb2ZrVKP3WMOFYRZuzairv
+	zFTOmSBzmAjjMh92MA0nVwIkvr2BPPsAyCNIcdCAdUYASiQV0oGgiw06Ggnksk5onZdxWg6CZma
+	AwmPFLGYu6ndvasTkfoVbIXzXQuZU+H8kHGN+RPPWqhjRMUsFaP75hMX5IYsQI4ONFlakpPFaFc
+	Yns44YvkDnEgZc1EPQbIisrZt6zTg==
+X-Google-Smtp-Source: AGHT+IENwDNnaA7LX8QdpGvHVZvc2cHkW8LLzE7YEDl4gIph1nAnHPcvvqrHhi6z/bmYC4D7PBM8OEiEwUc40Anwygw=
+X-Received: by 2002:a05:6000:2383:b0:3e2:6d96:b4da with SMTP id
+ ffacd0b85a97d-3e26d96bc68mr3684568f8f.38.1757066493047; Fri, 05 Sep 2025
+ 03:01:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Fri, 5 Sep 2025 15:00:47 +0530
-X-Gm-Features: Ac12FXzSXlXs-UMpYMYTMehHV94NkxIEElsCgVxRk1HWKsb_351cP0b29GGHSf8
-Message-ID: <CA+G9fYsmo39mXw-U7VKJgHWTBB5bXNgwOqNfmDWRqvbqmxnD2g@mail.gmail.com>
-Subject: next-20250905: x86_64: udpgso_bench.sh triggers NULL deref in zerocopy_fill_skb_from_iter
-To: Netdev <netdev@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Biggers <ebiggers@google.com>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Ben Copeland <benjamin.copeland@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Pengtao He <hept.hept.hept@gmail.com>
+References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250904114204.4148520-7-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <021e970a-f606-4702-9f0e-b4b0576bc5d6@lunn.ch> <CAMuHMdVnhjA0xi+wojMc40Zmv_JBZpOm04GO_ewBSzFndbtegQ@mail.gmail.com>
+In-Reply-To: <CAMuHMdVnhjA0xi+wojMc40Zmv_JBZpOm04GO_ewBSzFndbtegQ@mail.gmail.com>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Fri, 5 Sep 2025 11:01:06 +0100
+X-Gm-Features: Ac12FXxIWUyvkEfUz4q5orurH6BJWRXeslXNcn11rYAmFLfl-aoQgiX5uzP0Hng
+Message-ID: <CA+V-a8unTSqBottT7uDGkSxDYpRAYnpZvRC2RKsm9M0rw09iFQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 6/9] net: pcs: rzn1-miic: Make switch mode
+ mask SoC-specific
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following kernel crash was noticed on x86_64 running selftests net
-udpgso_bench.sh
-on Linux next-20250905 tag.
+Hi Geert,
 
-Regression Analysis:
-- New regression? yes
-- Reproducibility? Re-validation is in progress
+On Fri, Sep 5, 2025 at 8:02=E2=80=AFAM Geert Uytterhoeven <geert@linux-m68k=
+.org> wrote:
+>
+> Hi Andrew,
+>
+> On Thu, 4 Sept 2025 at 22:37, Andrew Lunn <andrew@lunn.ch> wrote:
+> > On Thu, Sep 04, 2025 at 12:42:00PM +0100, Prabhakar wrote:
+> > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > >
+> > > Move the hardcoded switch mode mask definition into the SoC-specific
+> > > miic_of_data structure. This allows each SoC to define its own mask
+> > > value rather than relying on a single fixed constant. For RZ/N1 the
+> > > mask remains GENMASK(4, 0).
+> > >
+> > > This is in preparation for adding support for RZ/T2H, where the
+> > > switch mode mask is GENMASK(2, 0).
+> >
+> > > -#define MIIC_MODCTRL_SW_MODE         GENMASK(4, 0)
+> >
+> > >       miic_reg_writel(miic, MIIC_MODCTRL,
+> > > -                     FIELD_PREP(MIIC_MODCTRL_SW_MODE, cfg_mode));
+> > > +                     ((cfg_mode << __ffs(sw_mode_mask)) & sw_mode_ma=
+sk));
+> >
+> > _ffs() should return 0 for both GENMASK(2,0) and GENMASK(4, 0). So
+> > this __ffs() is pointless.
+> >
+> > You might however want to add a comment that this assumption is being
+> > made.
+>
+> I guess Prabhakar did it this way to make it easier to find
+> candidates for a future conversion to field_prep(), if this ever becomes
+> available[1].
+>
+> [1] "[PATCH v3 0/4] Non-const bitfield helpers"
+>     https://lore.kernel.org/all/cover.1739540679.git.geert+renesas@glider=
+.be
+>
+Ah thanks, I wanted to explore this and add a new macro but I thought
+it might delay this series so I dropped it. Hopefully your series will
+get in soon.
 
-First seen on next-20250905
-Bad: next-20250905
-Good: next-20250904
-
-Test regression: next-20250905 x86_64 selftests net BUG kernel NULL
-pointer dereference zerocopy_fill_skb_from_iter
-
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-x86_64:
- Test:
-    * selftests: net: udpgso_bench.sh
-
-Test error:
-selftests: net: udpgso_bench.sh
-ipv4
-tcp
-
-<trim>
-
-# tcp zerocopy
-[  991.110488] SELinux: unrecognized netlink message: protocol=4
-nlmsg_type=19 sclass=netlink_tcpdiag_socket pid=64835 comm=ss
-# RTNETLINK answers: Invalid argument
-[  991.129878] BUG: kernel NULL pointer dereference, address: 0000000000000008
-[  991.136850] #PF: supervisor read access in kernel mode
-[  991.141986] #PF: error_code(0x0000) - not-present page
-[  991.147118] PGD 0 P4D 0
-[  991.149657] Oops: Oops: 0000 [#1] SMP PTI
-[  991.153661] CPU: 0 UID: 0 PID: 64842 Comm: udpgso_bench_tx Tainted:
-G S                  6.17.0-rc4-next-20250905 #1 PREEMPT(voluntary)
-[  991.165907] Tainted: [S]=CPU_OUT_OF_SPEC
-[  991.169825] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
-2.7 12/07/2021
-[  991.177209] RIP: 0010:zerocopy_fill_skb_from_iter
-(include/linux/page-flags.h:284)
-[ 991.182954] Code: 4d 85 c0 0f 84 04 01 00 00 44 39 c7 41 0f 4d f8 4c
-63 de 4a 8b 54 dc 30 49 89 d6 4d 29 ce 49 c1 fe 06 49 d3 ee 4d 85 f6
-74 24 <48> 8b 4a 08 f6 c1 01 0f 85 cb 00 00 00 0f 1f 44 00 00 31 c9 48
-f7
-All code
-========
-   0: 4d 85 c0              test   %r8,%r8
-   3: 0f 84 04 01 00 00    je     0x10d
-   9: 44 39 c7              cmp    %r8d,%edi
-   c: 41 0f 4d f8          cmovge %r8d,%edi
-  10: 4c 63 de              movslq %esi,%r11
-  13: 4a 8b 54 dc 30        mov    0x30(%rsp,%r11,8),%rdx
-  18: 49 89 d6              mov    %rdx,%r14
-  1b: 4d 29 ce              sub    %r9,%r14
-  1e: 49 c1 fe 06          sar    $0x6,%r14
-  22: 49 d3 ee              shr    %cl,%r14
-  25: 4d 85 f6              test   %r14,%r14
-  28: 74 24                je     0x4e
-  2a:* 48 8b 4a 08          mov    0x8(%rdx),%rcx <-- trapping instruction
-  2e: f6 c1 01              test   $0x1,%cl
-  31: 0f 85 cb 00 00 00    jne    0x102
-  37: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
-  3c: 31 c9                xor    %ecx,%ecx
-  3e: 48                    rex.W
-  3f: f7                    .byte 0xf7
-
-Code starting with the faulting instruction
-===========================================
-   0: 48 8b 4a 08          mov    0x8(%rdx),%rcx
-   4: f6 c1 01              test   $0x1,%cl
-   7: 0f 85 cb 00 00 00    jne    0xd8
-   d: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
-  12: 31 c9                xor    %ecx,%ecx
-  14: 48                    rex.W
-  15: f7                    .byte 0xf7
-[  991.201691] RSP: 0018:ffffb11281d0ba90 EFLAGS: 00010202
-[  991.206910] RAX: ffffe14ec4208000 RBX: 0000000000005000 RCX: 0000000000000009
-[  991.214033] RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000001000
-[  991.221156] RBP: ffffb11281d0bb88 R08: 00000000000020ff R09: ffffe14ec4208000
-[  991.228280] R10: 0000000000000005 R11: 0000000000000006 R12: ffff96b4825f4200
-[  991.235406] R13: 0000000000000001 R14: 000000003d6277bf R15: 0000000000000000
-[  991.242529] FS:  00007f41e80b9740(0000) GS:ffff96b83bc1b000(0000)
-knlGS:0000000000000000
-[  991.250608] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  991.256378] CR2: 0000000000000008 CR3: 0000000106c42003 CR4: 00000000003706f0
-[  991.263513] Call Trace:
-[  991.265956]  <TASK>
-[  991.268055] __zerocopy_sg_from_iter (net/core/datagram.c:?)
-[  991.272674] ? kmalloc_reserve (net/core/skbuff.c:581)
-[  991.276599] skb_zerocopy_iter_stream (net/core/skbuff.c:1867)
-[  991.281219] tcp_sendmsg_locked (net/ipv4/tcp.c:1283)
-[  991.285493] tcp_sendmsg (net/ipv4/tcp.c:1393)
-[  991.288896] inet6_sendmsg (net/ipv6/af_inet6.c:661)
-[  991.292466] __sock_sendmsg (net/socket.c:717)
-[  991.296126] __sys_sendto (net/socket.c:?)
-[  991.299785] __x64_sys_sendto (net/socket.c:2235 net/socket.c:2231
-net/socket.c:2231)
-[  991.303622] x64_sys_call (arch/x86/entry/syscall_64.c:41)
-[  991.307462] do_syscall_64 (arch/x86/entry/syscall_64.c:?)
-[  991.311128] ? irqentry_exit (kernel/entry/common.c:210)
-[  991.314881] ? exc_page_fault (arch/x86/mm/fault.c:1536)
-[  991.318720] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-[  991.323762] RIP: 0033:0x7f41e814b687
-[ 991.327352] Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00
-59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10
-0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff
-ff
-All code
-========
-   0: 48 89 fa              mov    %rdi,%rdx
-   3: 4c 89 df              mov    %r11,%rdi
-   6: e8 58 b3 00 00        call   0xb363
-   b: 8b 93 08 03 00 00    mov    0x308(%rbx),%edx
-  11: 59                    pop    %rcx
-  12: 5e                    pop    %rsi
-  13: 48 83 f8 fc          cmp    $0xfffffffffffffffc,%rax
-  17: 74 1a                je     0x33
-  19: 5b                    pop    %rbx
-  1a: c3                    ret
-  1b: 0f 1f 84 00 00 00 00 nopl   0x0(%rax,%rax,1)
-  22: 00
-  23: 48 8b 44 24 10        mov    0x10(%rsp),%rax
-  28: 0f 05                syscall
-  2a:* 5b                    pop    %rbx <-- trapping instruction
-  2b: c3                    ret
-  2c: 0f 1f 80 00 00 00 00 nopl   0x0(%rax)
-  33: 83 e2 39              and    $0x39,%edx
-  36: 83 fa 08              cmp    $0x8,%edx
-  39: 75 de                jne    0x19
-  3b: e8 23 ff ff ff        call   0xffffffffffffff63
-
-Code starting with the faulting instruction
-===========================================
-   0: 5b                    pop    %rbx
-   1: c3                    ret
-   2: 0f 1f 80 00 00 00 00 nopl   0x0(%rax)
-   9: 83 e2 39              and    $0x39,%edx
-   c: 83 fa 08              cmp    $0x8,%edx
-   f: 75 de                jne    0xffffffffffffffef
-  11: e8 23 ff ff ff        call   0xffffffffffffff39
-[  991.346124] RSP: 002b:00007ffdd843ba50 EFLAGS: 00000202 ORIG_RAX:
-000000000000002c
-[  991.353680] RAX: ffffffffffffffda RBX: 00007f41e80b9740 RCX: 00007f41e814b687
-[  991.360806] RDX: 000000000000f180 RSI: 000056251f1fd100 RDI: 0000000000000005
-[  991.367931] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-[  991.375063] R10: 0000000004000000 R11: 0000000000000202 R12: 0000000000000000
-[  991.382193] R13: 000056251f1fb080 R14: 000001a670e438d8 R15: 0000000000000005
-[  991.389357]  </TASK>
-[  991.391571] Modules linked in: mptcp_diag tcp_diag inet_diag
-xt_conntrack xfrm_user ipip bridge stp llc geneve vxlan act_csum
-act_pedit openvswitch nsh nf_nat nf_conntrack nf_defrag_ipv6
-nf_defrag_ipv4 psample cls_flower sch_prio xt_mark nft_compat
-nf_tables sch_ingress act_mirred cls_basic sch_fq_codel vrf pktgen
-macvtap macvlan tap x86_pkg_temp_thermal ip_tables x_tables [last
-unloaded: test_bpf]
-[  991.426812] CR2: 0000000000000008
-[  991.430121] ---[ end trace 0000000000000000 ]---
-[  991.434733] RIP: 0010:zerocopy_fill_skb_from_iter
-(include/linux/page-flags.h:284)
-[ 991.440477] Code: 4d 85 c0 0f 84 04 01 00 00 44 39 c7 41 0f 4d f8 4c
-63 de 4a 8b 54 dc 30 49 89 d6 4d 29 ce 49 c1 fe 06 49 d3 ee 4d 85 f6
-74 24 <48> 8b 4a 08 f6 c1 01 0f 85 cb 00 00 00 0f 1f 44 00 00 31 c9 48
-f7
-All code
-========
-   0: 4d 85 c0              test   %r8,%r8
-   3: 0f 84 04 01 00 00    je     0x10d
-   9: 44 39 c7              cmp    %r8d,%edi
-   c: 41 0f 4d f8          cmovge %r8d,%edi
-  10: 4c 63 de              movslq %esi,%r11
-  13: 4a 8b 54 dc 30        mov    0x30(%rsp,%r11,8),%rdx
-  18: 49 89 d6              mov    %rdx,%r14
-  1b: 4d 29 ce              sub    %r9,%r14
-  1e: 49 c1 fe 06          sar    $0x6,%r14
-  22: 49 d3 ee              shr    %cl,%r14
-  25: 4d 85 f6              test   %r14,%r14
-  28: 74 24                je     0x4e
-  2a:* 48 8b 4a 08          mov    0x8(%rdx),%rcx <-- trapping instruction
-  2e: f6 c1 01              test   $0x1,%cl
-  31: 0f 85 cb 00 00 00    jne    0x102
-  37: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
-  3c: 31 c9                xor    %ecx,%ecx
-  3e: 48                    rex.W
-  3f: f7                    .byte 0xf7
-
-Code starting with the faulting instruction
-===========================================
-   0: 48 8b 4a 08          mov    0x8(%rdx),%rcx
-   4: f6 c1 01              test   $0x1,%cl
-   7: 0f 85 cb 00 00 00    jne    0xd8
-   d: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
-  12: 31 c9                xor    %ecx,%ecx
-  14: 48                    rex.W
-  15: f7                    .byte 0xf7
-[  991.459215] RSP: 0018:ffffb11281d0ba90 EFLAGS: 00010202
-[  991.464434] RAX: ffffe14ec4208000 RBX: 0000000000005000 RCX: 0000000000000009
-[  991.471557] RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000001000
-[  991.478681] RBP: ffffb11281d0bb88 R08: 00000000000020ff R09: ffffe14ec4208000
-[  991.485807] R10: 0000000000000005 R11: 0000000000000006 R12: ffff96b4825f4200
-[  991.492930] R13: 0000000000000001 R14: 000000003d6277bf R15: 0000000000000000
-[  991.500054] FS:  00007f41e80b9740(0000) GS:ffff96b83bc1b000(0000)
-knlGS:0000000000000000
-[  991.508132] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  991.513870] CR2: 0000000000000008 CR3: 0000000106c42003 CR4: 00000000003706f0
-[  991.520994] note: udpgso_bench_tx[64842] exited with irqs disabled
-
-
-## Source
-* Kernel version: 6.17.0-rc4
-* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-* Git describe: next-20250905
-* Git commit: be5d4872e528796df9d7425f2bd9b3893eb3a42c
-* Architectures: x86_64
-* Toolchains: clang-nightly
-* Kconfigs: defconfig+selftests/*/config
-
-## Build
-* Test log: https://qa-reports.linaro.org/api/testruns/29777495/log_file/
-* LAVA test log: https://lkft.validation.linaro.org/scheduler/job/8434053#L16943
-* Test details:
-https://regressions.linaro.org/lkft/linux-next-master/next-20250905/log-parser-test/oops-oops-oops-smp-pti/
-* Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32GkXBGNRNDEj5d64zd73eXhXQC
-* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32GkU7mdlpISpPeeeEwIfAJuzqG/
-* Kernel config:
-https://storage.tuxsuite.com/public/linaro/lkft/builds/32GkU7mdlpISpPeeeEwIfAJuzqG/config
-
---
-Linaro LKFT
-https://lkft.linaro.org
+Cheers,
+Prabhakar
 
