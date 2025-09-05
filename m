@@ -1,146 +1,169 @@
-Return-Path: <netdev+bounces-220342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 880DBB457C3
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:27:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA1DB457D7
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 14:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CBF21656EA
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:26:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB2513A1C68
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D903D350824;
-	Fri,  5 Sep 2025 12:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC8834F486;
+	Fri,  5 Sep 2025 12:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbX9c/yC"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ThIs20tG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B1A34F483;
-	Fri,  5 Sep 2025 12:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1166C34F466
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 12:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757075170; cv=none; b=GDkyiJ4nGZfGgZ5/2CiE/UvS0tHCC9ahppVgm45IsxczrL8PXkbzSvOT0lXb10CYe1bp7M67AdPCqPtcsibF21z16SspCLJLFCyIgQBsKrSd4iKuUR4KbzzZjzYV0vKP5hmdSpVUorZuJcGfw1RPcmZUSOixdTYxZnLeniC4oAs=
+	t=1757075188; cv=none; b=A7lxaAJuEazB/dafT3TbyP9gZHvSPUWmMBn4pOktzdQe28Wn80UsL8pZhHsnUPsvPx4/u8Gwexaf9UF4zYO9IBMbvaZG75T5JO/ilZGRtNOLQ6uLeBFDRFCL7Vfejl604aXJQknJh5kPtU93XvNJJR9W578H2yzbvw7EIFURMQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757075170; c=relaxed/simple;
-	bh=wwFkWJg5HoUk2hSJWBdQjWw9OgX0W1iFKT/qDU1CpZ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pl6EAUcVoWz9Bvfk4IrJDFw8KMuz6wyOhsmYYYqjJ5whS0bLluyh2SZJM2VGy7+SShATTonSUZVSoVwrcD80a0kwawxhgEBxNgxlZJzjPz6fI0k9tAsiNprcPGGaa0Wpp6ESNo8wuPXUGLMLhS7UbMORPsaXAMkurRsOCI1h2FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DbX9c/yC; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3dcce361897so1425172f8f.3;
-        Fri, 05 Sep 2025 05:26:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757075167; x=1757679967; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pB7S2EtUpEWZ+xx8MbHke+UE3WWH8zMsnHAoeyZ1ARQ=;
-        b=DbX9c/yClCRudfUVRGw0IEporliGe+Ixor7zj/pI6orZYDWc0TlGdWjA0QqdhHURBD
-         YJ8SDUpyhUHvEaFqUlOn7Ru02MNuiW0MQgqKq5hZCGV5zBBKtt/r+m/RPFpoGaAbo4B+
-         thC1VNgP0rRBVBD+IGJoP3mziOgK3+y3P8nLH2x+dGMG7mibMDlwvRZB92yq9KGAk4ng
-         Otx1hCGPuKq/B8B60kNefG/B7/IMZvNnWeaH5LTHhvJ2HrLG7QmA0pm3moI/1rdtX9aW
-         RZNR7Vjn7fAIUatpx03Z287HzSTPlW2FoMh60V7oi2zfdCphwqW1vcyZ90MR4QGChitC
-         z2zw==
+	s=arc-20240116; t=1757075188; c=relaxed/simple;
+	bh=JkUf2vIGxOiyFPoVNdwA17YFnAIws6TxkLfW0TPXFlI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CkPzJTGNY69XrX/aw75oyWrqZSYxOO+7W50G7NkiHtHMozmCkYGG7wAyCXNACxJCG156YCChnaTwJVcZc/U5TWFcXLv3ARAkYrw1LD71rj1pKvMO3Zegqo87Imrx4fZt9coifUSm3CE8Ty6xq/bDCMNeB2fxfFaTw03xQKANWhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ThIs20tG; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5856oTFx008141
+	for <netdev@vger.kernel.org>; Fri, 5 Sep 2025 12:26:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	kyI0487W0JqbBUoFU2qAu9jSBfGKKX4t5Zjxjpcd4FU=; b=ThIs20tGdSL4xOLh
+	zGd7ULBE2BUErfKiBlNO5oeUXwhrBE5DtRFI2Jkq4mM86mMQcoAuB/N9FtJc4kjD
+	5mfvZW3bdqw0RouzAjSFZkcxe2BNrVv16FrN9wXzRhj+DnWzGAH3xS/jPi5LUJ92
+	oOg++dYIYcYZ1M7VsEv2krWlmLwpFZ4/a7kSpqFc+XIG3GUr10Y+y7AbD87x5MAD
+	O7Ei1ghpuyNUCV3HRSOU+epkRljIFcBTI9qcB+tmk4io0y9wVxKl1GjPMmLAaYj2
+	ONYPAV4BUGdA1EOMZfdQPN6jCvjHZNuWi0Q5nh9rHV1ZyIehNux6vnrz+NAn748c
+	TtxMhQ==
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48urmju243-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 12:26:25 +0000 (GMT)
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4b307e1bef2so5856751cf.0
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 05:26:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757075167; x=1757679967;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pB7S2EtUpEWZ+xx8MbHke+UE3WWH8zMsnHAoeyZ1ARQ=;
-        b=TSp+YeYD4O8zfWPxLZ2+KGxZ1oI2nGlKAKYZ/RsKF2rQ0cnVZ5logkDSmlj8njOwTM
-         lrIC86Heeu3OsmHgpRTD9eO4KUaTy1WI8sdkq1Mp3k3cwGyYT1fc6DRqYc51QSbyPupa
-         8t/adFvrRjkZnJy+xFTPZhypKAolrOf4wFonGDbjiMZRQPk7a9FkMoRVwgSVedj8nv0F
-         OcOgKQjhaBY5mX4LRSzUvqWxNZqDe2nsR2FkBBfC7m1rCWDJxF+jV3iUfSdBwkwx7lq8
-         yZ8w/fvXHcV4MVhI5nW2StnD7RzQiQyPQnNe0Ey4hHPN4AvMSG9Nd+Hr1eJ4Ocm4SF85
-         yrbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLZhDWx/MIKuCjNM86kpmibhgS+9u52iDdZUYEFn7iarq55NBOHVrrZ4RDRkTWwuXK7ROqu6wObuSvgK3VS1onfzc=@vger.kernel.org, AJvYcCVbK4R0eq2b8ddILx1X/to940IXd9jlb4yfBjZnkBIRLH4HZ/1b6sYnIbuVKq/59hViK8oGHHPrUcUmASBK@vger.kernel.org, AJvYcCVuip6/gTqmw3nRucsFtcK9dQrK/RV9VLLv8GxaM/YtBbLm/7TOqF+MAJbbO0xD+0kdLMV4jPIFU6KN@vger.kernel.org, AJvYcCXbXdvelBRs7n6l4e9QdrnH7frfu4Hd/RpkiML5tKbLnGhuLAqRVpnwvO+NuTSybx6B527wsCig@vger.kernel.org
-X-Gm-Message-State: AOJu0YwknOP+Ql05XZ4ZFJ7mn4W7sOBaSPjgFDLixDmGXdDUmwqkKynJ
-	HmdnVEFIGUXeGE9nKNVkyg0EeSmAlIg5rszKb95OpjpSBpfvvJk3XkN2n1tq7g8WW7sMF8v2pJB
-	5gEzk8MU3x/YxrU/z+FXurGEZ6N/Aj8A=
-X-Gm-Gg: ASbGncs3a0bZ+x/Z9n3V9h/WqGzNs5wv7UVV91WYZi+S0xbGtic4Ld52/0BGcq3BQhd
-	mCxh7B4lpuI3xlmTYrjC0WBruXpjdSK4ect59vSkM8KFQzKxFBcQhoekpBU7y3gVghmOK7IVe8v
-	2e2dJg+RfhUL5y91KMgadXSVducPRGSaao2fElItThnRUfru18ZjNWmgFnrs2CKgmWIOwIY1UWs
-	pO713YX5+GMCqIZjWuWFgqxqRg+1BmSC4PPEr2vSXz4AwAHaSE=
-X-Google-Smtp-Source: AGHT+IEu9qio4sf+nY+2VNCn7hdbR1T28beFwadrX0mqCszsq8S28vScNVJA04OVTxp/easlutUPryntBuwX/WyqQQs=
-X-Received: by 2002:a05:6000:3111:b0:3dd:6101:4efb with SMTP id
- ffacd0b85a97d-3dd61015026mr8949421f8f.11.1757075167278; Fri, 05 Sep 2025
- 05:26:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757075185; x=1757679985;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kyI0487W0JqbBUoFU2qAu9jSBfGKKX4t5Zjxjpcd4FU=;
+        b=ae3gZy9u0IIDsRuTh7HsePcOGJpp8j4h+LhzX9d8Y4qZYNTzZ6Gag9LmGcDWZOjG2n
+         3G/RyE4pZ5scr6v1WcrBhMyc9pojzMM9SiQxtu7zWoaxndvhE8JPcDArTA/zi8iWIZ1N
+         ND/uOxElJI8Z3xpe2huo8jWqdcgkA38h2Co+FgDYOOZTRtMhcQ+P3WFkei8ex28q1dLY
+         9TNYJfga5+kCcHiRnaQm4dXMg27iNw1sH186mHKIRTue1J99ZWQOT2tvOgQA1ZSDsnV9
+         6SYzKnxUgSGpiolvmKNPM+m7lEU/sx4LA9lvQIlzWakkddMa+9OjnVZHGno3K46AWlLW
+         f8ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW74Xyosx/bTE4lBSvCdH52RzqoF5nNkSIVr98oV9rXUen1tG3SWeUPb+DsHSCO94tr6QbIg8Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL9DugeqxzbZWPFRGr0o5XruLxVDL6/XBgNuDPIDoDRRVBBiRB
+	CwuSSbQj5DZcfAHbWh4Y10BkcYXjNrrbHmFqFXDy+TOGPNpqG9V9hjjTdSjrz+b49CUiaBYjSKv
+	C/YzBRufbDcn/ugQyfaAdXWtK7Mfqe1u1vLCGmXEjGzYy0n/7K5T+o5NVxQg=
+X-Gm-Gg: ASbGncsboeyCA/T4uYfYRJl+6+Q/uI3M3VeDprbTwu9i9ZBzERzxMywUV8tk69L3nyA
+	kABMadrCVq9Ffbvpt18Tf0BqRb/Rwpx9MzZJySPQOp90hyzth7Ro3jG5qeZmLCBBen05mY469AZ
+	Fx/B8rfECd1iOKxsI4q8QaAlncWjG+4Ehg18r8sFoPgjac66pvQVQgGOzZcVTueIo1vG9MQ6o3l
+	/t8+tPxLP20Q3y8NqoyP27bfLGYzLHp38f0jvAFCbLnAmth1EFNxkfC3+AG9F77qWAP7r781ERA
+	aZAL/bWZYa+IF/J+o34Lwsp4HP+GhO5uJqzjjyAd2dACkFRXrNY5yEI8NK7y/R/izvqJk6pFTy3
+	KpNxFgj/0PT7lRv/k8Ka8Fw==
+X-Received: by 2002:a05:622a:295:b0:4b5:a0fb:599e with SMTP id d75a77b69052e-4b5a0fb5d27mr60505311cf.2.1757075185034;
+        Fri, 05 Sep 2025 05:26:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGHIZ1IK9XJ4FfWiCBoKZm9Dc77t4hxWRO8SKHBZ1qvz1azh9QEBjD3+6lYU1NQiV7h5+pluA==
+X-Received: by 2002:a05:622a:295:b0:4b5:a0fb:599e with SMTP id d75a77b69052e-4b5a0fb5d27mr60504851cf.2.1757075184359;
+        Fri, 05 Sep 2025 05:26:24 -0700 (PDT)
+Received: from [192.168.149.223] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b01902d0e99sm1546636466b.12.2025.09.05.05.26.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Sep 2025 05:26:23 -0700 (PDT)
+Message-ID: <34d9ce02-5711-42ec-913a-772ee744b7e4@oss.qualcomm.com>
+Date: Fri, 5 Sep 2025 14:26:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250904203949.292066-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250904203949.292066-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <aLn7XVnWmHv1Bfe2@shell.armlinux.org.uk> <CA+V-a8umpEzwO5XnFVNB-TkDtEh9K48OKqaDE_SwzGfXk+9qEA@mail.gmail.com>
- <aLoFIoqT2A2RmrfR@shell.armlinux.org.uk>
-In-Reply-To: <aLoFIoqT2A2RmrfR@shell.armlinux.org.uk>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Fri, 5 Sep 2025 13:25:41 +0100
-X-Gm-Features: Ac12FXz8sW_rykJvGGWdLFiauLq7H7TD8fJdnQu_wpMQYelqr_sg2nzux9BatIs
-Message-ID: <CA+V-a8ssRu=1aX3VkgoRQioewU-VRs-xT6Z=Qp-RknuwJ0o2GQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/3] net: stmmac: dwmac-renesas-gbeth: Use OF
- data for configuration
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 10/14] arm64: dts: qcom: lemans-evk: Enable first USB
+ controller in device mode
+To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: kernel@oss.qualcomm.com, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+        linux-i2c@vger.kernel.org,
+        Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>
+References: <20250904-lemans-evk-bu-v3-0-8bbaac1f25e8@oss.qualcomm.com>
+ <20250904-lemans-evk-bu-v3-10-8bbaac1f25e8@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20250904-lemans-evk-bu-v3-10-8bbaac1f25e8@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=OemYDgTY c=1 sm=1 tr=0 ts=68bad6f1 cx=c_pps
+ a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=EUspDBNiAAAA:8 a=B3P4ua6ZyXwAq7e7NPAA:9
+ a=QEXdDO2ut3YA:10 a=dawVfQjAaf238kedN5IG:22
+X-Proofpoint-GUID: exC2mWlGYo-4d082v3GANit9-Kme4dWM
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAyNCBTYWx0ZWRfXy8X8zd2lJAsS
+ rwt+IB4V2s6IAe8Njpsrraj9biZ7c95uzRgCqWToHHC0Eq4fpXgeDw8lVfJ0qYA/YxMmeBluMW/
+ yn3vOOgRzqAA466LeA4flEF9aX4M3W8bq28O+ETWDemyKnrUvwqr39jHZVdQq/R+PMQd5eBJVBI
+ CCx2cwydsacluDa0faaL6Tq0AxWoikl/379mQqY7ZvawMa8rXi5f0XAFgmHO8xgORZmDmgJAxpe
+ nzgQAxoQlILyNYwHvhm7G4OHV3IVxTxbPVYD++OodEK6rKHV1SweG3OQwpMr9Jzy3QYAPIlCgfg
+ 1lGqPGWVMQi8C1Le9XDBzuhpvh2dpvMuX26kcU3+a5S72PNolOLPABTQ4XXx/nY799qJOBbLSBb
+ +yuJBjQQ
+X-Proofpoint-ORIG-GUID: exC2mWlGYo-4d082v3GANit9-Kme4dWM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-05_03,2025-09-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ adultscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300024
 
-Hi Russell,
+On 9/4/25 6:39 PM, Wasim Nazir wrote:
+> From: Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>
+> 
+> Enable the first USB controller in device mode on the Lemans EVK
+> board and configure the associated LDO regulators to power
+> the PHYs accordingly.
+> 
+> The USB port is a Type-C port controlled by HD3SS3320 port controller.
+> The role switch notifications would need to be routed to glue driver by
+> adding an appropriate usb-c-connector node in DT. However in the design,
+> the vbus supply that is to be provided to connected peripherals when
+> port is configured as an DFP, is controlled by a GPIO.
+> 
+> There is also one ID line going from Port controller chip to GPIO-50 of
+> the SoC. As per the datasheet of HD3SS3320:
+> 
+> "Upon detecting a UFP device, HD3SS3220 will keep ID pin high if VBUS is
+> not at VSafe0V. Once VBUS is at VSafe0V, the HD3SS3220 will assert ID
+> pin low. This is done to enforce Type-C requirement that VBUS must be
+> at VSafe0V before re-enabling VBUS."
+> 
+> The current HD3SS3220 driver doesn't have this functionality present. So,
+> putting the first USB controller in device mode for now. Once the vbus
+> control based on ID pin is implemented in hd3ss3220.c, the
+> usb-c-connector will be implemented and dr mode would be made OTG.
 
-On Thu, Sep 4, 2025 at 10:31=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Thu, Sep 04, 2025 at 10:10:32PM +0100, Lad, Prabhakar wrote:
-> > Hi Russell,
-> >
-> > On Thu, Sep 4, 2025 at 9:49=E2=80=AFPM Russell King (Oracle)
-> > <linux@armlinux.org.uk> wrote:
-> > >
-> > > On Thu, Sep 04, 2025 at 09:39:48PM +0100, Prabhakar wrote:
-> > > >       plat_dat->init =3D renesas_gbeth_init;
-> > > >       plat_dat->exit =3D renesas_gbeth_exit;
-> > > > -     plat_dat->flags |=3D STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
-> > > > -                        STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
-> > > > -                        STMMAC_FLAG_SPH_DISABLE;
-> > > > +     plat_dat->flags |=3D gbeth->of_data->stmmac_flags;
-> > >
-> > > You include the first two flags in your new device. I would like to s=
-ee
-> > > at least STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP always being set. The only
-> > > reason we have the STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP flag is to avoid
-> > > changing existing behaviour and causing regressions. New stuff should
-> > > always set this.
-> > >
-> > Me confused, STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP flag is set in the new
-> > device [0]. The reason STMMAC_FLAG_SPH_DISABLE flag being dropped in
-> > the new device is SPHEN=3D1 in MAC HW feature reg for the new device.
->
-> What I'm saying is I'd like to see:
->
->         plat_dat->flags |=3D STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
->                            gbeth->of_data->stmmac_flags;
->
-> iow, it is set unconditionally, even if forgotten in a future patch.
->
-Ah got you. Thank you for the clarification.
+Hopefully that's somewhere on our todo list
 
-Cheers,
-Prabhakar
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+
+Konrad
 
