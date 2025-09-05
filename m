@@ -1,170 +1,106 @@
-Return-Path: <netdev+bounces-220404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5D2B45D25
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:55:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66053B45D5A
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 18:02:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5FE65C29CD
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:55:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35E5617B822
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC7631D730;
-	Fri,  5 Sep 2025 15:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7DB2F39A6;
+	Fri,  5 Sep 2025 16:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cu/U+6Ps"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qf19mXo8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E86531D73F
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 15:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCC631D74A;
+	Fri,  5 Sep 2025 16:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757087720; cv=none; b=Iv80Ez8gL7e9z1Z1J7mrlNm+0qpPQctTaRS0HOy5+7wZyVmYn9wb8KBFHAvtHIsmuFbNmf0QTtZYRmJVNQRb+MOyZ7w5IVqMGC1d6rgDUH3iSmMSjvBszRXIlgDPLzBiYCrqdHn3q94FwZK/Z9Pfl/MHX7oaVgxGqYrRR/hjdwc=
+	t=1757088126; cv=none; b=MYE3DViQhik0yK9EegvPFJfAMSVE1vBEYNgd2QhbbvLgo1S08AcL16fab7i/NZYNNaEq/7o9dgWdRSK/SI6WeEDAriCIvXUBFf0VArFa6tFjw75bXayjVulECq7PuE+qU1xYeaBvAPKFUMldDo6i5oMtM+kWO4tu5m58hpvSfk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757087720; c=relaxed/simple;
-	bh=VK5L9ZQl5SjCnEBuOT7vVdJruIk2fkLuhS+o/xPYcMw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PdUgFLcPC1KrHy+gc6U3LzUKDXxzqz27LEFHZWZ7FoYgUjWK6oPsRuo/QqQLvc7twztnBri3xQ6lEoPMoaGxR85Z48xj4pYckcx8Ex4uoPoYCQRuicrOqjcGrsdni8RT+Y2RQGDrp57cdsaP/UvQ/7i4ymCL3fvI+Q0V2qJZyM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cu/U+6Ps; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ca64e62b-740e-4e02-a386-e1016317b071@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757087706;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5SkhDx01VH5ULkTtGZmBjnS7ayJVpHz3ZygQmDSZ2dE=;
-	b=Cu/U+6PsLuRwZnWv3E3Wzw7kScSJJHds5FQyisY7hZ2cFZhr1wFebmDS00NgIUvDISC20c
-	jqLR1yuKPB/o4rskbDHmRuCW9PQ1W88xlz4xNKj8JykWG/iTU2llI7HZIojAN8dn8KU1kW
-	vgZ9r3FJPxIJrxzu629/XpqNrIiGBRU=
-Date: Fri, 5 Sep 2025 08:54:45 -0700
+	s=arc-20240116; t=1757088126; c=relaxed/simple;
+	bh=XtZf11jbbBoilXsBT63MRb4g16CbjYXTUzh33VUyndQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=edUTDMyFRyaN1DsTkFkeEBpfxD4L41xgRF9xhwNNya9sG0eHqt7PZVT6jKAVrf+raN64Kb814Ziz36in91JnyblJM26kEE4bYEQ9hQf2qswSLHcrJaOhedt0s/zN0d4K9fgIrd7Prp+HJmiMD/c4shqW5QePjZxo0Si2RM1pciU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qf19mXo8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13389C4CEF1;
+	Fri,  5 Sep 2025 16:02:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757088126;
+	bh=XtZf11jbbBoilXsBT63MRb4g16CbjYXTUzh33VUyndQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qf19mXo8p1IPKQFY0/UahTIRblVXtBICsSc3ebDDzITfYScFms3XLSzR4XT/AfBD1
+	 OySqhbWgBYAoQIPBm7WPAl1n8ItJ4IVZ7w32lKiBEOSAKlYAoJci+pSJYpRmfsSi+S
+	 2A3XDv2mWJhfeWexq7r+XRNFXiseFSMS/0Xjn9E1F1GwunHAuVWuE1YEbPUGOaSOgV
+	 BS4HYB46R7qujD8hm3bOvz3ki4e8bD4ZNWtYmnU6ro2b4OO6OBOCHVLvphT4el6TtF
+	 MnX+9ukJdOrtuZtElMAFMhCDHRVV/2HCvjYFYPuDpwfXB7OBg+cvAziKtB1RO6aPZc
+	 wMTMMngXUOpIw==
+Date: Fri, 5 Sep 2025 17:01:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+	Vivian Wang <uwu@dram.page>
+Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <20250905160158.GI553991@horms.kernel.org>
+References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
+ <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
+ <20250905153500.GH553991@horms.kernel.org>
+ <0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC bpf-next v2 1/1] libbpf: add compile-time OOB warning to
- bpf_tail_call_static
-Content-Language: en-GB
-To: Hoyeon Lee <hoyeon.lee@suse.com>
-Cc: netdev@vger.kernel.org, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- "open list:BPF [LIBRARY] (libbpf)" <bpf@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:CLANG/LLVM BUILD SUPPORT:Keyword:b(?i:clang|llvm)b"
- <llvm@lists.linux.dev>
-References: <20250905051814.291254-1-hoyeon.lee@suse.com>
- <20250905051814.291254-2-hoyeon.lee@suse.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250905051814.291254-2-hoyeon.lee@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
 
+On Fri, Sep 05, 2025 at 11:45:29PM +0800, Vivian Wang wrote:
 
+...
 
-On 9/4/25 10:18 PM, Hoyeon Lee wrote:
-> Add a compile-time check to bpf_tail_call_static() to warn when a
-> constant slot(index) >= map->max_entries. This uses a small
-> BPF_MAP_ENTRIES() macro together with Clang's diagnose_if attribute.
->
-> Clang front-end keeps the map type with a '(*max_entries)[N]' field,
-> so the expression
->
->      sizeof(*(m)->max_entries) / sizeof(**(m)->max_entries)
->
-> is resolved to N entirely at compile time. This allows diagnose_if()
-> to emit a warning when a constant slot index is out of range.
->
-> Out-of-bounds tail calls are currently silent no-ops at runtime, so
-> emitting a compile-time warning helps detect logic errors earlier.
-> This is currently limited to Clang (due to diagnose_if) and only for
-> constant indices, but should still catch the common cases.
->
-> Signed-off-by: Hoyeon Lee <hoyeon.lee@suse.com>
-> ---
-> Changes in V2:
-> - add function definition for __bpf_tail_call_warn for compile error
->
->   tools/lib/bpf/bpf_helpers.h | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
->
-> diff --git a/tools/lib/bpf/bpf_helpers.h b/tools/lib/bpf/bpf_helpers.h
-> index 80c028540656..98bc1536c497 100644
-> --- a/tools/lib/bpf/bpf_helpers.h
-> +++ b/tools/lib/bpf/bpf_helpers.h
-> @@ -173,6 +173,27 @@ bpf_tail_call_static(void *ctx, const void *map, const __u32 slot)
->   		     :: [ctx]"r"(ctx), [map]"r"(map), [slot]"i"(slot)
->   		     : "r0", "r1", "r2", "r3", "r4", "r5");
->   }
-> +
-> +#if __has_attribute(diagnose_if)
-> +static __always_inline void __bpf_tail_call_warn(int oob)
-> +	__attribute__((diagnose_if(oob, "bpf_tail_call: slot >= max_entries",
-> +				   "warning"))) {};
-> +
-> +#define BPF_MAP_ENTRIES(m) \
-> +	((__u32)(sizeof(*(m)->max_entries) / sizeof(**(m)->max_entries)))
-> +
-> +#ifndef bpf_tail_call_static
-> +#define bpf_tail_call_static(ctx, map, slot)				      \
-> +({									      \
-> +	/* wrapped to avoid double evaluation. */                             \
-> +	const __u32 __slot = (slot);                                          \
-> +	__bpf_tail_call_warn(__slot >= BPF_MAP_ENTRIES(map));                 \
-> +	/* Avoid re-expand & invoke original as (bpf_tail_call_static)(..) */ \
-> +	(bpf_tail_call_static)(ctx, map, __slot);                             \
-> +})
-> +#endif /* bpf_tail_call_static */
-> +#endif
+Hi Vivian,
 
-I got the following error with llvm21.
+> >> +		status = emac_rx_frame_status(priv, rx_desc);
+> >> +		if (unlikely(status == RX_FRAME_DISCARD)) {
+> >> +			ndev->stats.rx_dropped++;
+> > As per the comment in struct net-device,
+> > ndev->stats should not be used in modern drivers.
+> >
+> > Probably you want to implement NETDEV_PCPU_STAT_TSTATS.
+> >
+> > Sorry for not mentioning this in an earlier review of
+> > stats in this driver.
+> >
+> On a closer look, these counters in ndev->stats seems to be redundant
+> with the hardware-tracked statistics, so maybe I should just not bother
+> with updating ndev->stats. Does that make sense?
 
-progs/tailcall_bpf2bpf3.c:20:3: error: bpf_tail_call: slot >= max_entries [-Werror,-Wuser-defined-warnings]
-    20 |                 bpf_tail_call_static(skb, &jmp_table,progs/tailcall_bpf2bpf2.c:17:3 10);
-       | :                ^
-  /home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:190:53: note: expanded from macro
-       'bpf_tail_call_static'
-   190 |         __bpf_tail_call_warn(__slot >= BPF_MAP_ENTRIES(map));                 \
-       |                                                            ^
-/home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:179:17: note: from 'diagnose_if'
-       attribute on '__bpf_tail_call_warn':
-   179 |         __attribute__((diagnose_if(oob, "bpf_tail_call: slot >= max_entries",
-       |                        ^           ~~~
-error: bpf_tail_call: slot >= max_entries [-Werror,-Wuser-defined-warnings]
-    17 |                 bpf_tail_call_static(skb, &jmp_table, 1);
-       |                 ^
-/home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:190:53: note: expanded from macro
-       'bpf_tail_call_static'
-   190 |         __bpf_tail_call_warn(__slot >= BPF_MAP_ENTRIES(map));                 \
-       |                                                            ^
-/home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:179:17: note: from 'diagnose_if'
-       attribute on '__bpf_tail_call_warn':
-   179 |         __attribute__((diagnose_if(oob, "bpf_tail_call: slot >= max_entries",
-       |                        ^           ~~~
-   CLNG-BPF [test_progs] tailcall_poke.bpf.o
-1 error generated.
-make: *** [Makefile:733: /home/yhs/work/bpf-next/tools/testing/selftests/bpf/tailcall_bpf2bpf3.bpf.o] Error 1
+For rx/tx packets/bytes I think that makes sense.
+But what about rx/tx drops?
 
-> +
->   #endif
->   #endif
->
-> --
-> 2.51.0
-
+...
 
