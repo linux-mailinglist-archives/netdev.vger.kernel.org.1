@@ -1,88 +1,160 @@
-Return-Path: <netdev+bounces-220272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29133B451C4
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:41:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D9AB451FB
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0C3B1C82AF5
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 08:41:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CEBEB621AC
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 08:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AA227CCE2;
-	Fri,  5 Sep 2025 08:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D9D290DBB;
+	Fri,  5 Sep 2025 08:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="jLAzdPzV"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="bnumHXjM"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B699229B2E;
-	Fri,  5 Sep 2025 08:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661FC2EBB85
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 08:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757061666; cv=none; b=JqvHWYXY0G1HILL+r/Um5Wg/CvllZODCCwIrrKuX8Vjq1T02yUfXYu6WWHqIK6+cJ7FfTBuu9zYhkP1jjp6vE22v4K2sIpCJYgsGC7Zxqf0bcYbhTClB8+2e47z4xljV7V6faXNEJ0jI/Cwb2Z0Hsqg7eIzTWjc90ByD1Jl91kY=
+	t=1757061778; cv=none; b=L8f7abHw66ysn2nGUh8DVbRg5edfx/DUlV1X7kFLgAxS+4pdhJo4Ax9NzZndFglhxErYVa3qVXK1Oio2myxRvvX2mbQeYhtQ+LdATHklcm4EwBNmu++W45FNk/KLFE1rpcgup2DSFmspDHBuajQR7Afi7esZgHjwWStr47efvHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757061666; c=relaxed/simple;
-	bh=0ZLjfCgKTzkozbgbd8XMdFHbNJtpQPMF/G3+eXv83Ro=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iu7t/gJdOyTjIkpDm4ABCuhw/QjfGF5OlNsP7FUv0EwSMbKCLf8wYwstiDyg5VnfLb87BjdIwNJIzhldSrlW/3QpoWcXkydPSjGjH3Lswkesm8tBkwkgqx6lateynfphiIZt8ZDOTWM99y8vAOQjfFT1pWCL6Vxmmbf89/K5VRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=jLAzdPzV; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1757061621;
-	bh=0ZLjfCgKTzkozbgbd8XMdFHbNJtpQPMF/G3+eXv83Ro=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jLAzdPzV2aXY044w5Se65gc002FZnkX5GP0OcEZBizFhx64QUSMbaZFFfkpIloE6m
-	 PaXwFQNwT985zicojzEdy4oFTVf29K64oQVqPQrzCl2SaXLjKX/jRBTvgCCOHRRe2V
-	 CqHo6zu1ELGT1ZQEw30jg9jAsINbSLd/WPekZ3bFWpGLbIIjW/Y+uQTTBMkh2eHr4t
-	 kUz38aE/GHGKqbgQXfkNLj1N0Ez7mL5eFOGcx2+9DgxWqSx1l7YXEJU9H6KApRjWWH
-	 LXThhsVTqyB0BNld+n8KOu/+gtJAovwCEQ1cgQ+RCKJAhL971pN1t5TYxfWQzaicax
-	 5eTR/qdcQyiwA==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 329D317E0EB8;
-	Fri,  5 Sep 2025 10:40:21 +0200 (CEST)
-Message-ID: <649362e6-5743-4cfa-ad9f-6b828540ea78@collabora.com>
-Date: Fri, 5 Sep 2025 10:40:21 +0200
+	s=arc-20240116; t=1757061778; c=relaxed/simple;
+	bh=EoMaYTYHFXEwCGBlN/IEjhrPWRNTs6kRsDou2dH4cSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dc35QLhcUG796Rqtlvmb8jYxnCkjw+8ju4qG8RbrFCEjaJ7JPXwnOyW6xjH74uDgSXJzwHgZGcelO5ABKCJhCCUuwi+cLM5YwG7TIZVVwrov8vkJ6CBevkZt3UuK0gxSpzyEIUpg5GZGXZU8aGuPLANJx6R+KXqrlLaPkfFcYSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=bnumHXjM; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45dcff2f313so11430815e9.0
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 01:42:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1757061775; x=1757666575; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Upm3gtoelWKi/OiIlfN8TaykvgP8Dbo7GPj1kZ9zlhE=;
+        b=bnumHXjMsPsAYEmJ6Jb9jkgCVgqnF0tMridMkmKh93akDhM38MH2S/Ia3UAZeP/biP
+         GoWOY0x/2+dVTmZXWlK4WDUJ5EKxFmHj5SCF2q7aI1juiq6iREVHszZ0orMZ9PFhoMOM
+         dpDeC5Iv/ClHsF4slfWhwbEI4NCtnhDNNkRmra4HIIoLyF7mdJFCu4veqIfUWdU41dSp
+         q8l5JQ+iG7KYzbzSaI1JAZsC0hiB1de244r6Oi9K6fLoINi6UT007Xa0Zy9rzvXoT9bs
+         l5D8SBBZ/rPqvGrDUg3mo368I27ob4sc0CCJN4aif1xmbDtnKnrCUAFGdgbd1fYcQMGC
+         aPgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757061775; x=1757666575;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Upm3gtoelWKi/OiIlfN8TaykvgP8Dbo7GPj1kZ9zlhE=;
+        b=a/1C1vkTz+ZErMTqby69Jv66s/XrPrcf0Tlzajyj0o3Tpjv4vLGcyrO4D3w7MX/4WQ
+         qlNh8sSKriwqgG2I1nrlAzcC6ATMe9wsIfkQZOT+Mq0HYYBzyyh7+ED5TNUjcsT2WH8e
+         AGkwQVYYEZZSRlfmhHO594v53SWmUvANpG03aOwM1S9WZLPdq06cM9MRNZF/uqN/tKlZ
+         sAAjEyDI7517oXfowvU7/94Tf6fmz6HrbANLTjbM5xmJG+B0FbP5nnv7BeJaa5sF2MHM
+         ZFu6SBvyjW5J/St8924K837YKcZHmE8j0zyHO6JHazHougU2MM50v9hRttt74+K4OhJL
+         3dgw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxhDrJ+8x/8a+b8A16AoPRUPdev4eS4d9/S6PsFbR6KIbyR9TkOjJCvkAYiM8oFUE9rH25xjg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXUzq3yPQunNKwMNcARHBFtRE5OgD4nKkzUrFuCoY1AJ7HwTVk
+	A0gZzeo1QdPurDQT+LjhUkmkDSq2dHOiqjHE3HaF4QZX9ObsLFah4ZAea55IexMXKupEJ6A6fwh
+	EAAeOs39L+A==
+X-Gm-Gg: ASbGncs+O1lA0EBn3Hyw0KfP5iWTByxv5vYjQTz5XsOXZJPIUe8V8AKP5TwCo2nfq+f
+	4wBngrN0E2HztE5Hxa+T2MzmnU/6QgiIOhMeA021N1MkdxwUyUFXXUq3fywfikRXWh83X9HMNIO
+	ymKx1hVnJ86O2gFClo2yny3tFe2SC+xFZdu9d5Xu2o/wny2ONdM3CnPIrYKMBMBxhMJ7dphxeG0
+	mX546wsWbU372mu7rQZU74GzNsaMk64eq7Z3rD44SBMlzqBytayOlu7/WJLV/IAojzKSWQpcNa3
+	vOQ3oR4MvDwaVI6j0loT4QQ3vpr/j0KQBi+WvtZ+y2fwj3vpEQBgisebSKpRI9fA450dqvAmXDw
+	HPUayjtXUCIB8VdvOCtcONWEWab9L
+X-Google-Smtp-Source: AGHT+IEQbkpijCuIHkSH8MhrhTJtQwPADWOBz/A63pVWyItEyOmzIbf0dkH52+ncdnxv4u3S/9wKgA==
+X-Received: by 2002:a5d:584a:0:b0:3e3:24c3:6d71 with SMTP id ffacd0b85a97d-3e324c36f9amr1793548f8f.1.1757061774650;
+        Fri, 05 Sep 2025 01:42:54 -0700 (PDT)
+Received: from u94a ([2401:e180:8d68:75a0:8d2:dc87:a659:a9df])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7723534c0a8sm19618409b3a.79.2025.09.05.01.42.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 01:42:54 -0700 (PDT)
+Date: Fri, 5 Sep 2025 16:42:43 +0800
+From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+To: bpf@vger.kernel.org
+Cc: Hoyeon Lee <hoyeon.lee@suse.com>, netdev@vger.kernel.org, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"open list:CLANG/LLVM BUILD SUPPORT:Keyword:b(?i:clang|llvm)b" <llvm@lists.linux.dev>
+Subject: Re: [RFC bpf-next v2 0/1] libbpf: add compile-time OOB warning to
+ bpf_tail_call_static
+Message-ID: <3pevfugpcd2j44b2wkrjhspn2a2ta627nhnqxc6ty7dxy3nt3v@qhytbn7lmqum>
+References: <20250905051814.291254-1-hoyeon.lee@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 15/27] clk: mediatek: Add MT8196 ufssys clock support
-To: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
- sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- matthias.bgg@gmail.com, p.zabel@pengutronix.de, richardcochran@gmail.com
-Cc: guangjie.song@mediatek.com, wenst@chromium.org,
- linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
- kernel@collabora.com
-References: <20250829091913.131528-1-laura.nao@collabora.com>
- <20250829091913.131528-16-laura.nao@collabora.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <20250829091913.131528-16-laura.nao@collabora.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905051814.291254-1-hoyeon.lee@suse.com>
 
-Il 29/08/25 11:19, Laura Nao ha scritto:
-> Add support for the MT8196 ufssys clock controller, which provides clock
-> gate control for UFS.
+Adding some context that I think was miss per off-list discussion with
+Hoyeon.
+
+On Fri, Sep 05, 2025 at 02:18:11PM +0900, Hoyeon Lee wrote:
+> This RFC adds a compile-time check to bpf_tail_call_static() to warn
+> when a constant slot(index) is >= map->max_entries. This uses a small
+> BPF_MAP_ENTRIES() macro together with Clang's diagnose_if attribute.
+
+This is an attempt to see if it is possible to warn user of out-of-bound
+tail calls, with the assumption being that with bpf_tail_call_static()
+users would not be intentionally calling with an index that is superior
+to the number of entries.
+
+However, there concerns with the current implementation, so this is
+being sent as RFC to gather feedback, and to see if it can be better
+done. Currently the concerns are:
+- use macro to override bpf_tail_call_static()
+- only works for Clang and not GCC
+- uncertain whether this fit into libbpf conventions
+
+> Clang front-end keeps the map type with a '(*max_entries)[N]' field,
+> so the expression
 > 
-> Co-developed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-> Signed-off-by: Laura Nao <laura.nao@collabora.com>
-
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-
-
+>     sizeof(*(m)->max_entries) / sizeof(**(m)->max_entries)
+> 
+> is resolved to N entirely at compile time. This allows diagnose_if()
+> to emit a warning when a constant slot index is out of range.
+> 
+> Example:
+> 
+>     struct { /* BPF_MAP_TYPE_PROG_ARRAY = 3 */
+>         __uint(type, 3);             // int (*type)[3];
+>         __uint(max_entries, 100);    // int (*max_entries)[100];
+>         __type(key, __u32);          // typeof(__u32) *key;
+>         __type(value, __u32);        // typeof(__u32) *value;
+>     } progs SEC(".maps");
+> 
+>     bpf_tail_call_static(ctx, &progs, 111);
+> 
+> produces:
+> 
+>     bound.bpf.c:26:9: warning: bpf_tail_call: slot >= max_entries [-Wuser-defined-warnings]
+>        26 |         bpf_tail_call_static(ctx, &progs, 111);
+>           |         ^
+>     /usr/local/include/bpf/bpf_helpers.h:190:54: note: expanded from macro 'bpf_tail_call_static'
+>       190 |          __bpf_tail_call_warn(__slot >= BPF_MAP_ENTRIES(map));                  \
+>           |                                                             ^
+>     /usr/local/include/bpf/bpf_helpers.h:183:20: note: from 'diagnose_if' attribute on '__bpf_tail_call_warn':
+>       183 |     __attribute__((diagnose_if(oob, "bpf_tail_call: slot >= max_entries", "warning")));
+>           |                    ^           ~~~
+> 
+> Out-of-bounds tail call checkup is no-ops at runtime. Emitting a
+> compile-time warning can help developers detect mistakes earlier. The
+> check is currently limited to Clang (due to diagnose_if) and constant
+> indices, but should catch common errors.
+...
 
