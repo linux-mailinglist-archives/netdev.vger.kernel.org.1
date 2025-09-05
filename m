@@ -1,218 +1,170 @@
-Return-Path: <netdev+bounces-220403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575FFB45D01
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:51:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5D2B45D25
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 17:55:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 607C77C7215
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:49:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5FE65C29CD
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B5C31D742;
-	Fri,  5 Sep 2025 15:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC7631D730;
+	Fri,  5 Sep 2025 15:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cu/U+6Ps"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821ED31D746;
-	Fri,  5 Sep 2025 15:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E86531D73F
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 15:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757087168; cv=none; b=l5IhRk+MPpUkUWf+CgkEutaAw9LHYJnr+SXgAjzY6BAAF+qHNXJSkiyQLzCEa3e9Vc9/SA+GOIgCve57zcHHbjTyk5L56YW6cGuT5ks8tcOEDRI+fUSSlAwcpdK8VdoCBni+THJQmoTVQ0qmnnrSZpHskuICR9T/f792cGlukL4=
+	t=1757087720; cv=none; b=Iv80Ez8gL7e9z1Z1J7mrlNm+0qpPQctTaRS0HOy5+7wZyVmYn9wb8KBFHAvtHIsmuFbNmf0QTtZYRmJVNQRb+MOyZ7w5IVqMGC1d6rgDUH3iSmMSjvBszRXIlgDPLzBiYCrqdHn3q94FwZK/Z9Pfl/MHX7oaVgxGqYrRR/hjdwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757087168; c=relaxed/simple;
-	bh=OKhzNW9ZD2RgTy4457MbKDaoTUd9Wh+DG8e3zQRGXwI=;
+	s=arc-20240116; t=1757087720; c=relaxed/simple;
+	bh=VK5L9ZQl5SjCnEBuOT7vVdJruIk2fkLuhS+o/xPYcMw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s7LPeZV/tvrPO7YnVmvbHY19Ti86okmIdLbHKka6Ftpb0kl/+2qvNYSZMQmTec3tfVkeiwRHwZSzGoZ5OxBouxkCxd8oh/t4aooy4gOFL3QrdD8PfMveWvFCZkUNsWWS2TG/g6lHtEMfzn0RdyKam8ygE0cMA8FicmHGFWVxkn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.106] (unknown [114.241.87.235])
-	by APP-03 (Coremail) with SMTP id rQCowAAnd4GZBbtosNvWAA--.30834S2;
-	Fri, 05 Sep 2025 23:45:29 +0800 (CST)
-Message-ID: <0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
-Date: Fri, 5 Sep 2025 23:45:29 +0800
+	 In-Reply-To:Content-Type; b=PdUgFLcPC1KrHy+gc6U3LzUKDXxzqz27LEFHZWZ7FoYgUjWK6oPsRuo/QqQLvc7twztnBri3xQ6lEoPMoaGxR85Z48xj4pYckcx8Ex4uoPoYCQRuicrOqjcGrsdni8RT+Y2RQGDrp57cdsaP/UvQ/7i4ymCL3fvI+Q0V2qJZyM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cu/U+6Ps; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ca64e62b-740e-4e02-a386-e1016317b071@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757087706;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5SkhDx01VH5ULkTtGZmBjnS7ayJVpHz3ZygQmDSZ2dE=;
+	b=Cu/U+6PsLuRwZnWv3E3Wzw7kScSJJHds5FQyisY7hZ2cFZhr1wFebmDS00NgIUvDISC20c
+	jqLR1yuKPB/o4rskbDHmRuCW9PQ1W88xlz4xNKj8JykWG/iTU2llI7HZIojAN8dn8KU1kW
+	vgZ9r3FJPxIJrxzu629/XpqNrIiGBRU=
+Date: Fri, 5 Sep 2025 08:54:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, Junhui Liu <junhui.liu@pigmoral.tech>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
- Troy Mitchell <troy.mitchell@linux.spacemit.com>, Vivian Wang <uwu@dram.page>
-References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
- <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
- <20250905153500.GH553991@horms.kernel.org>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <20250905153500.GH553991@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC bpf-next v2 1/1] libbpf: add compile-time OOB warning to
+ bpf_tail_call_static
+Content-Language: en-GB
+To: Hoyeon Lee <hoyeon.lee@suse.com>
+Cc: netdev@vger.kernel.org, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ "open list:BPF [LIBRARY] (libbpf)" <bpf@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:CLANG/LLVM BUILD SUPPORT:Keyword:b(?i:clang|llvm)b"
+ <llvm@lists.linux.dev>
+References: <20250905051814.291254-1-hoyeon.lee@suse.com>
+ <20250905051814.291254-2-hoyeon.lee@suse.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20250905051814.291254-2-hoyeon.lee@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:rQCowAAnd4GZBbtosNvWAA--.30834S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXFy8tw4rWFykAF18GFy7trb_yoW7JrWrpa
-	y5ta1DCF1UXF4jgrnaqF4UZFn3t3WfJr1UuFyYyrWF9FnFyrs7KFy8Kr17K34xCFW8uF4Y
-	9w1j9347GFZ8ZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvvb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
-	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
-	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
-	1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
-	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
-	wI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
-	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
-	jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73Uj
-	IFyTuYvjxUvaZXDUUUU
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+X-Migadu-Flow: FLOW_OUT
 
-Hi Simon,
 
-Thanks for the review.
 
-(I have a question about the use of ndev->stats - see below.)
-
-On 9/5/25 23:35, Simon Horman wrote:
-> On Fri, Sep 05, 2025 at 07:09:31PM +0800, Vivian Wang wrote:
->> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
->> that only superficially resembles some other embedded MACs. SpacemiT
->> refers to them as "EMAC", so let's just call the driver "k1_emac".
->>
->> Supports RGMII and RMII interfaces. Includes support for MAC hardware
->> statistics counters. PTP support is not implemented.
->>
->> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
->> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
->> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->> Reviewed-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
->> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
->> Tested-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
-> ...
+On 9/4/25 10:18 PM, Hoyeon Lee wrote:
+> Add a compile-time check to bpf_tail_call_static() to warn when a
+> constant slot(index) >= map->max_entries. This uses a small
+> BPF_MAP_ENTRIES() macro together with Clang's diagnose_if attribute.
 >
->> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-> ...
+> Clang front-end keeps the map type with a '(*max_entries)[N]' field,
+> so the expression
 >
->> +static void emac_init_hw(struct emac_priv *priv)
->> +{
->> +	/* Destination address for 802.3x Ethernet flow control */
->> +	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
->> +
->> +	u32 rxirq = 0, dma = 0;
->> +
->> +	regmap_set_bits(priv->regmap_apmu,
->> +			priv->regmap_apmu_offset + APMU_EMAC_CTRL_REG,
->> +			AXI_SINGLE_ID);
->> +
->> +	/* Disable transmit and receive units */
->> +	emac_wr(priv, MAC_RECEIVE_CONTROL, 0x0);
->> +	emac_wr(priv, MAC_TRANSMIT_CONTROL, 0x0);
->> +
->> +	/* Enable MAC address 1 filtering */
->> +	emac_wr(priv, MAC_ADDRESS_CONTROL, MREGBIT_MAC_ADDRESS1_ENABLE);
->> +
->> +	/* Zero initialize the multicast hash table */
->> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE1, 0x0);
->> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE2, 0x0);
->> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE3, 0x0);
->> +	emac_wr(priv, MAC_MULTICAST_HASH_TABLE4, 0x0);
->> +
->> +	/* Configure thresholds */
->> +	emac_wr(priv, MAC_TRANSMIT_FIFO_ALMOST_FULL, DEFAULT_TX_ALMOST_FULL);
->> +	emac_wr(priv, MAC_TRANSMIT_PACKET_START_THRESHOLD,
->> +		DEFAULT_TX_THRESHOLD);
->> +	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
->> +
->> +	/* Configure flow control (enabled in emac_adjust_link() later) */
->> +	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
->> +	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
->> +	emac_wr(priv, MAC_FC_HIGH_PAUSE_TIME, DEFAULT_FC_PAUSE_TIME);
->> +	emac_wr(priv, MAC_FC_PAUSE_LOW_THRESHOLD, 0);
->> +
->> +	/* RX IRQ mitigation */
->> +	rxirq = EMAC_RX_FRAMES & MREGBIT_RECEIVE_IRQ_FRAME_COUNTER_MASK;
->> +	rxirq |= (EMAC_RX_COAL_TIMEOUT
->> +		  << MREGBIT_RECEIVE_IRQ_TIMEOUT_COUNTER_SHIFT) &
->> +		 MREGBIT_RECEIVE_IRQ_TIMEOUT_COUNTER_MASK;
-> Probably this driver can benefit from using FIELD_PREP and FIELD_GET
-> in a number of places. In this case I think it would mean that
-> MREGBIT_RECEIVE_IRQ_TIMEOUT_COUNTER_SHIFT can be removed entirely.
+>      sizeof(*(m)->max_entries) / sizeof(**(m)->max_entries)
+>
+> is resolved to N entirely at compile time. This allows diagnose_if()
+> to emit a warning when a constant slot index is out of range.
+>
+> Out-of-bounds tail calls are currently silent no-ops at runtime, so
+> emitting a compile-time warning helps detect logic errors earlier.
+> This is currently limited to Clang (due to diagnose_if) and only for
+> constant indices, but should still catch the common cases.
+>
+> Signed-off-by: Hoyeon Lee <hoyeon.lee@suse.com>
+> ---
+> Changes in V2:
+> - add function definition for __bpf_tail_call_warn for compile error
+>
+>   tools/lib/bpf/bpf_helpers.h | 21 +++++++++++++++++++++
+>   1 file changed, 21 insertions(+)
+>
+> diff --git a/tools/lib/bpf/bpf_helpers.h b/tools/lib/bpf/bpf_helpers.h
+> index 80c028540656..98bc1536c497 100644
+> --- a/tools/lib/bpf/bpf_helpers.h
+> +++ b/tools/lib/bpf/bpf_helpers.h
+> @@ -173,6 +173,27 @@ bpf_tail_call_static(void *ctx, const void *map, const __u32 slot)
+>   		     :: [ctx]"r"(ctx), [map]"r"(map), [slot]"i"(slot)
+>   		     : "r0", "r1", "r2", "r3", "r4", "r5");
+>   }
+> +
+> +#if __has_attribute(diagnose_if)
+> +static __always_inline void __bpf_tail_call_warn(int oob)
+> +	__attribute__((diagnose_if(oob, "bpf_tail_call: slot >= max_entries",
+> +				   "warning"))) {};
+> +
+> +#define BPF_MAP_ENTRIES(m) \
+> +	((__u32)(sizeof(*(m)->max_entries) / sizeof(**(m)->max_entries)))
+> +
+> +#ifndef bpf_tail_call_static
+> +#define bpf_tail_call_static(ctx, map, slot)				      \
+> +({									      \
+> +	/* wrapped to avoid double evaluation. */                             \
+> +	const __u32 __slot = (slot);                                          \
+> +	__bpf_tail_call_warn(__slot >= BPF_MAP_ENTRIES(map));                 \
+> +	/* Avoid re-expand & invoke original as (bpf_tail_call_static)(..) */ \
+> +	(bpf_tail_call_static)(ctx, map, __slot);                             \
+> +})
+> +#endif /* bpf_tail_call_static */
+> +#endif
 
-That looks useful. There's a few more uses of *_SHIFT in this driver,
-and I think I can get them all to use FIELD_PREP. I'll change those in
-the next version.
+I got the following error with llvm21.
 
->> +
->> +	rxirq |= MREGBIT_RECEIVE_IRQ_MITIGATION_ENABLE;
->> +	emac_wr(priv, DMA_RECEIVE_IRQ_MITIGATION_CTRL, rxirq);
-> ...
->
->> +/* Returns number of packets received */
->> +static int emac_rx_clean_desc(struct emac_priv *priv, int budget)
->> +{
->> +	struct net_device *ndev = priv->ndev;
->> +	struct emac_rx_desc_buffer *rx_buf;
->> +	struct emac_desc_ring *rx_ring;
->> +	struct sk_buff *skb = NULL;
->> +	struct emac_desc *rx_desc;
->> +	u32 got = 0, skb_len, i;
->> +	int status;
->> +
->> +	rx_ring = &priv->rx_ring;
->> +
->> +	i = rx_ring->tail;
->> +
->> +	while (budget--) {
->> +		rx_desc = &((struct emac_desc *)rx_ring->desc_addr)[i];
->> +
->> +		/* Stop checking if rx_desc still owned by DMA */
->> +		if (READ_ONCE(rx_desc->desc0) & RX_DESC_0_OWN)
->> +			break;
->> +
->> +		dma_rmb();
->> +
->> +		rx_buf = &rx_ring->rx_desc_buf[i];
->> +
->> +		if (!rx_buf->skb)
->> +			break;
->> +
->> +		got++;
->> +
->> +		dma_unmap_single(&priv->pdev->dev, rx_buf->dma_addr,
->> +				 rx_buf->dma_len, DMA_FROM_DEVICE);
->> +
->> +		status = emac_rx_frame_status(priv, rx_desc);
->> +		if (unlikely(status == RX_FRAME_DISCARD)) {
->> +			ndev->stats.rx_dropped++;
-> As per the comment in struct net-device,
-> ndev->stats should not be used in modern drivers.
->
-> Probably you want to implement NETDEV_PCPU_STAT_TSTATS.
->
-> Sorry for not mentioning this in an earlier review of
-> stats in this driver.
->
-On a closer look, these counters in ndev->stats seems to be redundant
-with the hardware-tracked statistics, so maybe I should just not bother
-with updating ndev->stats. Does that make sense?
+progs/tailcall_bpf2bpf3.c:20:3: error: bpf_tail_call: slot >= max_entries [-Werror,-Wuser-defined-warnings]
+    20 |                 bpf_tail_call_static(skb, &jmp_table,progs/tailcall_bpf2bpf2.c:17:3 10);
+       | :                ^
+  /home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:190:53: note: expanded from macro
+       'bpf_tail_call_static'
+   190 |         __bpf_tail_call_warn(__slot >= BPF_MAP_ENTRIES(map));                 \
+       |                                                            ^
+/home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:179:17: note: from 'diagnose_if'
+       attribute on '__bpf_tail_call_warn':
+   179 |         __attribute__((diagnose_if(oob, "bpf_tail_call: slot >= max_entries",
+       |                        ^           ~~~
+error: bpf_tail_call: slot >= max_entries [-Werror,-Wuser-defined-warnings]
+    17 |                 bpf_tail_call_static(skb, &jmp_table, 1);
+       |                 ^
+/home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:190:53: note: expanded from macro
+       'bpf_tail_call_static'
+   190 |         __bpf_tail_call_warn(__slot >= BPF_MAP_ENTRIES(map));                 \
+       |                                                            ^
+/home/yhs/work/bpf-next/tools/testing/selftests/bpf/tools/include/bpf/bpf_helpers.h:179:17: note: from 'diagnose_if'
+       attribute on '__bpf_tail_call_warn':
+   179 |         __attribute__((diagnose_if(oob, "bpf_tail_call: slot >= max_entries",
+       |                        ^           ~~~
+   CLNG-BPF [test_progs] tailcall_poke.bpf.o
+1 error generated.
+make: *** [Makefile:733: /home/yhs/work/bpf-next/tools/testing/selftests/bpf/tailcall_bpf2bpf3.bpf.o] Error 1
 
-Thanks,
-Vivian "dramforever" Wang
+> +
+>   #endif
+>   #endif
+>
+> --
+> 2.51.0
 
 
