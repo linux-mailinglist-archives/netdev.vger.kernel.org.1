@@ -1,238 +1,156 @@
-Return-Path: <netdev+bounces-220362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88AE1B4591E
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:34:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44732B4592A
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 15:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78633B620B1
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:31:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15612B6213C
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1068735A2B7;
-	Fri,  5 Sep 2025 13:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E313353377;
+	Fri,  5 Sep 2025 13:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="I2iDrcK2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB2D352FED;
-	Fri,  5 Sep 2025 13:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4AA35336E
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 13:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757079084; cv=none; b=KZYI/UxVyzdfzM3OAzSz9P4hHvrHXRfn8Ni2GDmzD0cfAMHe3OuBdYh4jDA+iN1/aOCBReYuHCJP6SxBAw6Cu+GWnbi6bcQrMAUjQQoH92OSVqy1sElAVJ6vp32lieKaNqylK+VuhxhgXi5vaaKwjbACVKJNN2IH+HZCW2XCgHg=
+	t=1757079095; cv=none; b=AAIpd1E8yh4BBcWM7mlUY2RQjuCA5eCCLmO7Cpkqh43ScfMufFTo34H/PLay3dEPX9oJwHZhFulF7mGWWRvLpE+oDjry4nncIennrVXF2eijzQgD9wrqF8HC0Ae/otquwpmEc6DU4QnQ2ZhY57VJvq7qNJTkL/EABGXYU9qoDIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757079084; c=relaxed/simple;
-	bh=DODS33Mlp6wYUMyfzXPoShyB43edY282MDJD5w4fBXU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gO6+X0XYq2j1VTre8x4Tgl54SaPciHjwGxouuJ5Bn6uiHjeOFEnWiFSnhR3JBnhL25KRS5nE5e9sASYOM9KYIN8QOvGuPQrhhd3fFPR07/sNwuQ3ISIdTPixP5VKZReSL0HSuH5Zevko6uQrJFWFljMrbZs+lG9HvkSntAFYviU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-b04163fe08dso368296166b.3;
-        Fri, 05 Sep 2025 06:31:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757079081; x=1757683881;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1nu9bR6astpfVuE3kjXZ+NEagS2PXhylWiWkQoswor8=;
-        b=JTVYjKZgV9nK69DCb14Pw6MgazpXkkHQSLSfdkq/iT1cnanaEflHBLuja9xvzOGmDF
-         zN5fDe587tSlWLqDO6YrKB7hyavY6RfCf9TcYVMWVJ4dxA85hKHteBJbb5h5c1AmqUyp
-         LaPjYqSBZGqfmxrxnIZCjeLhjgpV+ixB/H0T/iYtFH2RIVRdj4gJ/L0RgybE23PGncdc
-         I923KqmeiHDxZf7p2PPbPFIYBWUVi2yRDfiL39s9Eos5KNHkIJxwP3DglhfvzOe+kGnr
-         F+sZ6o/ugm5dAXspvGVcAZc6nk9XYoIC1XjJ1fhgBIiQfHdjmhRkrUXSFAnHJj7/IA+0
-         ZqTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUgkmm/VeiEA8PIp5izUR1TvQe2AJv/4qGQmqgUxoff5WQaxkRCzrdc7D3TFm2BeRaD2q8HUKEKb+Uh0ZM=@vger.kernel.org, AJvYcCW+hvlQB+PFXRzFOGE/zwoFSs9HKUu0BIVOL+owVWVwhWjoerH4tJZoCh4nsyFHTFtfUU0N99gUrp47wliTKK6T@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3TT7knoxjIT2PrgtFdpW4MSbXjN6ha4ZpFzT5G76lSB2bCuba
-	IU4rI1EXn/Ld9NW7jb8bn0qkQvgMcj11Xnkigkk/Mm+chHrCWOUYz73r76EIP9NY
-X-Gm-Gg: ASbGncvBpAiMl0Wfb687Gp5b3ttHhQWnD3sAR54e6jKRwnLQ0srJ0wgKArsdYsJtfKM
-	t+lC1LN6/sEW7DNwaaAch7L6wp3nVaWcpOu18Gx0HDhxYzIplaFsj2YVYoxeznLb3mJfOM8ybjy
-	tnu3SZ/PJxjkf3N0o1q4BPyBo74Zz/WIBNin+XRgVVKu1ur5agxkdTQTPYn9vG386x+J91TVyIB
-	Uh1Z2eEKC1CNVgOmHhE3yjTzC7XeJjkENZNqRLEhR4mAUwB9b4vPFJzjjwITd7mFPojcLUXaGO+
-	teqr9CvbBk4izZUPKoUFPmG8/YlPDDKkH00c/tG3s6fv8c4iWEdRulB471CdFRAQF735kdOk1wR
-	yiBQAj/XPrM8MIv2/l1aCz1MLURw2vILkibzLtiMz1HdA27N/P2ncAYtRSboxK5H9FOUmJw==
-X-Google-Smtp-Source: AGHT+IHvr4xeGBs3N9yc3odYnOITFBdbF5NHM8S+tF7FX7XYvrKLzcqmgWJ+02BM5szXFPOUoTmCIQ==
-X-Received: by 2002:a17:906:3990:b0:b04:9a8:1645 with SMTP id a640c23a62f3a-b0409a817a5mr1768378366b.60.1757079080267;
-        Fri, 05 Sep 2025 06:31:20 -0700 (PDT)
-Received: from im-t490s.redhat.com (89-24-56-72.nat.epc.tmcz.cz. [89.24.56.72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0409bf055esm1547277666b.85.2025.09.05.06.31.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 06:31:19 -0700 (PDT)
-From: Ilya Maximets <i.maximets@ovn.org>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	dev@openvswitch.org,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Aaron Conole <aconole@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>
-Subject: [PATCH net 2/2] selftests: openvswitch: add a simple test for tunnel metadata
-Date: Fri,  5 Sep 2025 15:30:56 +0200
-Message-ID: <20250905133105.3940420-3-i.maximets@ovn.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250905133105.3940420-1-i.maximets@ovn.org>
-References: <20250905133105.3940420-1-i.maximets@ovn.org>
+	s=arc-20240116; t=1757079095; c=relaxed/simple;
+	bh=u71qfKOWjyVGncxnFyXAU1KTKw0E7c1hs3vkkIOrnAA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZfMmzYyFrxvK67sbHyg+7sCTMbd5U34qYRWl62s1ztbzsLFdX+7AbO66opTyRVNGPEdnrchP9gMXs3ISbjej6/qt6Wmv5VLqFzvJFDEwgHJsDPhEzk9x5refBGvReQNXBZAb4Nwny1vthnyzKhCAvhPOFK0ja9J/ciLuyLFj9Aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=I2iDrcK2; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5857JQJ3013602;
+	Fri, 5 Sep 2025 13:31:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=+aB+iZJnL8ozb2pDFXduEFu8
+	qABJrtYdff1K70ebeAQ=; b=I2iDrcK2MtkwVOPA+dlHtSA5J7zfQxu0rYmziqH+
+	cbcPv2FznN/UqiPECDfEjy2+99U/vtjuRm/mOLxKIjwofbuMn+2P5ISX3p8sjdL5
+	7qSnITFbD7hRQ5ShNQKxqOjFRMkrL5nu9JgSWvOjNH6hqNovIE3xLIpOe5PZ612N
+	/olG8fUXjIudIjG8fveehNl4AjElKTEQNBJwyg+bWm2UIG1xzdWtUgESRocyamEW
+	ov4MKhunL6PY+xQXMy8BZYFJgWij9N9kdVHfDOjLbgdHBQp1+QZcJCZuDRYJLZ5C
+	nDgX/1qn1WUhXq1NdMHvlBTUqB9CNSxtjm+iL6PWiwqF8A==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48w8wyf709-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Sep 2025 13:31:08 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 585DV7hH029888
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 5 Sep 2025 13:31:07 GMT
+Received: from quicinc.com (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.24; Fri, 5 Sep
+ 2025 06:31:03 -0700
+Date: Fri, 5 Sep 2025 19:00:59 +0530
+From: Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 00/11] net: stmmac: mdio cleanups
+Message-ID: <aLrmEzyxzo1DRBNG@quicinc.com>
+References: <aLmBwsMdW__XBv7g@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aLmBwsMdW__XBv7g@shell.armlinux.org.uk>
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=Ycq95xRf c=1 sm=1 tr=0 ts=68bae61c cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=PHq6YzTAAAAA:8
+ a=COk6AnOGAAAA:8 a=UbDMmHRTMWTSUy5J07AA:9 a=CjuIK1q_8ugA:10
+ a=ZKzU8r6zoKMcqsNulkmm:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: YCkfEWMsAiv0yIOvixc3HIKlFi2tOG5r
+X-Proofpoint-ORIG-GUID: YCkfEWMsAiv0yIOvixc3HIKlFi2tOG5r
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAxMDEwMSBTYWx0ZWRfX7Sk9AX65HGTR
+ +yaae3yNsjsCY8k3TeqkbgczQendvtlfhcSXhcwyCwSe1GYsvrkmA4xgyRtzMFFmCdtFstBtwnJ
+ CEqL2jpzTOtyexlVDjO/w8wBR0pds4NfMBr5ZQtqrfE5RuzClfvkHhVPOVrQuQAaX0U2GKH4pYa
+ lnoU3A1yJTGde98s12J038RTVu1oHLIKHVtsThYO8Al5BR6UuytlJN4bzWhgxK5n/NClbKOm5LE
+ Ar76YeNMBLBC5jr0qrb89AQITGVR97610xG3uxbI7sCDbB8UcWzqJHNhNbcmcM7Bw5Qxhr0w5dm
+ smqkb3iQo6N4fkfWGYNnYdl38Nu+QdNmxkO/7w4/42S3jOWGMr3DDL+mNgPHGvVh3Ekl7Qx3K+C
+ fQ0hZScY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-05_04,2025-09-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 priorityscore=1501 adultscore=0 phishscore=0 malwarescore=0
+ bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2509010101
 
-This test ensures that upon receiving decapsulated packets from a
-tunnel interface in openvswitch, the tunnel metadata fields are
-properly populated.  This partially covers interoperability of the
-kernel tunnel ports and openvswitch tunnels (LWT) and parsing and
-formatting of the tunnel metadata fields of the openvswitch netlink
-uAPI.  Doing so, this test also ensures that fields and flags are
-properly extracted during decapsulation by the tunnel core code,
-serving as a regression test for the previously fixed issue with the
-DF bit not being extracted from the outer IP header.
+On Thu, Sep 04, 2025 at 01:10:42PM +0100, Russell King (Oracle) wrote:
+> On Wed, Sep 03, 2025 at 01:38:57PM +0100, Russell King (Oracle) wrote:
+> Hi,
+> 
+> Clean up the stmmac MDIO code:
+> - provide an address register formatter to avoid repeated code
+> - provide a common function to wait for the busy bit to clear
+> - pre-compute the CR field (mdio clock divider)
+> - move address formatter into read/write functions
+> - combine the read/write functions into a common accessor function
+> - move runtime PM handling into common accessor function
+> - rename register constants to better reflect manufacturer names
+> - move stmmac_clk_csr_set() into stmmac_mdio
+> - make stmmac_clk_csr_set() return the CR field value and remove
+>   priv->clk_csr
+> - clean up if() range tests in stmmac_clk_csr_set()
+> - use STMMAC_CSR_xxx definitions in initialisers
+> 
+> Untested on hardware; would be grateful for any testing people can do.
+> 
 
-The ovs-dpctl.py script already supports all that is necessary for
-the tunnel ports for this test, so we only need to adjust the
-ovs_add_if() function to pass the '-t' port type argument in order
-to be able to create tunnel ports in the openvswitch datapath.
+Picked this series on top of net-next and was able to test on the
+Qualcomm QCS9100 Ride R3 board with the AQR115C Phy. No issues seen with
+C45 MDIO operations, so:
 
-Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 88 +++++++++++++++++--
- 1 file changed, 81 insertions(+), 7 deletions(-)
+Tested-by: Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 3c8d3455d8e7..b327d3061ed5 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -25,6 +25,7 @@ tests="
- 	nat_related_v4				ip4-nat-related: ICMP related matches work with SNAT
- 	netlink_checks				ovsnl: validate netlink attrs and settings
- 	upcall_interfaces			ovs: test the upcall interfaces
-+	tunnel_metadata				ovs: test extraction of tunnel metadata
- 	drop_reason				drop: test drop reasons are emitted
- 	psample					psample: Sampling packets with psample"
- 
-@@ -113,13 +114,13 @@ ovs_add_dp () {
- }
- 
- ovs_add_if () {
--	info "Adding IF to DP: br:$2 if:$3"
--	if [ "$4" != "-u" ]; then
--		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py add-if "$2" "$3" \
--		    || return 1
-+	info "Adding IF to DP: br:$3 if:$4 ($2)"
-+	if [ "$5" != "-u" ]; then
-+		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py add-if \
-+		    -t "$2" "$3" "$4" || return 1
- 	else
- 		python3 $ovs_base/ovs-dpctl.py add-if \
--		    -u "$2" "$3" >$ovs_dir/$3.out 2>$ovs_dir/$3.err &
-+		    -u -t "$2" "$3" "$4" >$ovs_dir/$4.out 2>$ovs_dir/$4.err &
- 		pid=$!
- 		on_exit "ovs_sbx $1 kill -TERM $pid 2>/dev/null"
- 	fi
-@@ -166,9 +167,9 @@ ovs_add_netns_and_veths () {
- 	fi
- 
- 	if [ "$7" != "-u" ]; then
--		ovs_add_if "$1" "$2" "$4" || return 1
-+		ovs_add_if "$1" "netdev" "$2" "$4" || return 1
- 	else
--		ovs_add_if "$1" "$2" "$4" -u || return 1
-+		ovs_add_if "$1" "netdev" "$2" "$4" -u || return 1
- 	fi
- 
- 	if [ $TRACING -eq 1 ]; then
-@@ -756,6 +757,79 @@ test_upcall_interfaces() {
- 	return 0
- }
- 
-+ovs_add_kernel_tunnel() {
-+	local sbxname=$1; shift
-+	local ns=$1; shift
-+	local tnl_type=$1; shift
-+	local name=$1; shift
-+	local addr=$1; shift
-+
-+	info "setting up kernel ${tnl_type} tunnel ${name}"
-+	ovs_sbx "${sbxname}" ip -netns ${ns} link add dev ${name} type ${tnl_type} $* || return 1
-+	on_exit "ovs_sbx ${sbxname} ip -netns ${ns} link del ${name} >/dev/null 2>&1"
-+	ovs_sbx "${sbxname}" ip -netns ${ns} addr add dev ${name} ${addr} || return 1
-+	ovs_sbx "${sbxname}" ip -netns ${ns} link set dev ${name} mtu 1450 up || return 1
-+}
-+
-+test_tunnel_metadata() {
-+	which arping >/dev/null 2>&1 || return $ksft_skip
-+
-+	sbxname="test_tunnel_metadata"
-+	sbx_add "${sbxname}" || return 1
-+
-+	info "setting up new DP"
-+	ovs_add_dp "${sbxname}" tdp0 -V 2:1 || return 1
-+
-+	ovs_add_netns_and_veths "${sbxname}" tdp0 tns left0 l0 \
-+		172.31.110.1/24 || return 1
-+
-+	info "removing veth interface from openvswitch and setting IP"
-+	ovs_del_if "${sbxname}" tdp0 left0 || return 1
-+	ovs_sbx "${sbxname}" ip addr add 172.31.110.2/24 dev left0 || return 1
-+	ovs_sbx "${sbxname}" ip link set left0 up || return 1
-+
-+	info "setting up tunnel port in openvswitch"
-+	ovs_add_if "${sbxname}" "vxlan" tdp0 ovs-vxlan0 -u || return 1
-+	on_exit "ovs_sbx ${sbxname} ip link del ovs-vxlan0"
-+	ovs_wait ip link show ovs-vxlan0 &>/dev/null || return 1
-+	ovs_sbx "${sbxname}" ip link set ovs-vxlan0 up || return 1
-+
-+	configs=$(echo '
-+	    1 172.31.221.1/24 1155332 32   set   udpcsum flags\(df\|csum\)
-+	    2 172.31.222.1/24 1234567 45   set noudpcsum flags\(df\)
-+	    3 172.31.223.1/24 1020304 23 unset   udpcsum flags\(csum\)
-+	    4 172.31.224.1/24 1357986 15 unset noudpcsum' | sed '/^$/d')
-+
-+	while read -r i addr id ttl df csum flags; do
-+		ovs_add_kernel_tunnel "${sbxname}" tns vxlan vxlan${i} ${addr} \
-+			remote 172.31.110.2 id ${id} dstport 4789 \
-+			ttl ${ttl} df ${df} ${csum} || return 1
-+	done <<< "${configs}"
-+
-+	ovs_wait grep -q 'listening on upcall packet handler' \
-+		${ovs_dir}/ovs-vxlan0.out || return 1
-+
-+	info "sending arping"
-+	for i in 1 2 3 4; do
-+		ovs_sbx "${sbxname}" ip netns exec tns \
-+			arping -I vxlan${i} 172.31.22${i}.2 -c 1 \
-+			>${ovs_dir}/arping.stdout 2>${ovs_dir}/arping.stderr
-+	done
-+
-+	info "checking that received decapsulated packets carry correct metadata"
-+	while read -r i addr id ttl df csum flags; do
-+		arp_hdr="arp\\(sip=172.31.22${i}.1,tip=172.31.22${i}.2,op=1,sha="
-+		addrs="src=172.31.110.1,dst=172.31.110.2"
-+		ports="tp_src=[0-9]*,tp_dst=4789"
-+		tnl_md="tunnel\\(tun_id=${id},${addrs},ttl=${ttl},${ports},${flags}\\)"
-+
-+		ovs_sbx "${sbxname}" grep -qE "MISS upcall.*${tnl_md}.*${arp_hdr}" \
-+			${ovs_dir}/ovs-vxlan0.out || return 1
-+	done <<< "${configs}"
-+
-+	return 0
-+}
-+
- run_test() {
- 	(
- 	tname="$1"
--- 
-2.50.1
+	Ayaan
 
+> v2: add "Return:" to patch 1 and 9
+> 
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c  |   5 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-loongson.c   |   3 +-
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h       |   2 +-
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  82 -----
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c  | 345 ++++++++++++---------
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c   |   5 +-
+>  6 files changed, 207 insertions(+), 235 deletions(-)
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
 
