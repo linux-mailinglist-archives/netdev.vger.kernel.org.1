@@ -1,225 +1,119 @@
-Return-Path: <netdev+bounces-220325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A969B456CA
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:46:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A50B456CF
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 13:49:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 056B61C28205
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 11:47:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AADD169235
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 11:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41A9322C94;
-	Fri,  5 Sep 2025 11:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CE23451C4;
+	Fri,  5 Sep 2025 11:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JXGu8hwq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="McN8/iSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8322DC334
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 11:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D9472615;
+	Fri,  5 Sep 2025 11:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757072807; cv=none; b=rgZshmAQKIQUHSlxIng3GKdbOHjyWizL2Ve1ObUq9Rkd6o9XGZWyU1F56etxq5XMn/PwnEKBxAqSSe9DUCmjjAQE+CIFuX7vd+amJWxH5/y7/pQA1GioNj5VRz2tvabaPaAEhit0EM6ZFzaybtsTWQTB8pNCUbV9tdzDpT8/mT4=
+	t=1757072948; cv=none; b=j1ClL2QvMLBpldOxQoDfVzi5cWSam323ga4bKSFYvqxHpqQE1VHjVvYEMCiCELKl/ZJmZgPbyo+wvPYgr6g3cDEmQYaGH6STBOcIcSxBHvtXJdgo40HEezZuhwFN2UvGnLpT6v8Ilz0US5wfpWFzxDXlfgKxpICuzfIp4wRiX2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757072807; c=relaxed/simple;
-	bh=CQXpXgZZAjbSz/XACaaYW80rCegWQbY8lTjj3A2yTbE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hA2Ofi3YlwDGxWMBWZuIKYSlO7Zqo7xH5TSXZg9T1IWgikkCIq4ixooGSkEWRRDz55WW2YPEK1K1ifQZiqRxAK72jIlbRYZGRI8uQGX0wxyCmsCo9v7LQNUinablT+dQavKNtnGAxCqZMXYNrvVw7TWpm4OaRDPgVlW+d9z2OXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JXGu8hwq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35EB3C4CEF1;
-	Fri,  5 Sep 2025 11:46:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757072807;
-	bh=CQXpXgZZAjbSz/XACaaYW80rCegWQbY8lTjj3A2yTbE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JXGu8hwq8INQAbNsAe6XM5RbpbVLA5z8WHVWtn8B7X7ijBTwIVtQlo8lcpSX2vycC
-	 S3UWQtU4dwgzIiqapTJ3wv80M6+XcW2bn+3XM+V3Y9HSoaNg7MVVoZsaHVYAdrHPaT
-	 KQeTec3DtRD9FcYR/BRKOLs+xEGsabTqgVY0IDvcWVS13oY44N6Y8VJnMe7oZBR0Ap
-	 e8acNoNJKjY53fsCd2/YvrfJoJFMsNgvvSdft13KW2QGlnpGYPBB6A0JfsTke9xhfT
-	 A1O757AFU/oW9VqkyWzA276iH4COhRDPMSwfNvJZEHMw/xeNFLuxZzxVFYWk9zwrAG
-	 dLIGiOoFK+U1Q==
-Date: Fri, 5 Sep 2025 12:46:42 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: mheib@redhat.com, intel-wired-lan@lists.osuosl.org,
-	przemyslawx.patynowski@intel.com, jiri@resnulli.us,
-	netdev@vger.kernel.org, aleksandr.loktionov@intel.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH net-next,v3,2/2] i40e: support generic devlink param
- "max_mac_per_vf"
-Message-ID: <20250905114642.GA551420@horms.kernel.org>
-References: <20250903214305.57724-1-mheib@redhat.com>
- <20250903214305.57724-2-mheib@redhat.com>
- <efb80605-187f-4b80-8ba9-8065d1b9e9d0@intel.com>
+	s=arc-20240116; t=1757072948; c=relaxed/simple;
+	bh=Df20U8eLXlwJoFINrMRZTXja8QnLE3DWLst3QAqSPAw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nKWilacpWN2+Z4FsS7wAqVWSaHyJsGf4N6DvX+n4kdFTLDuWDsu3xuWylW3s2Jj3PxBpJoYDq65lh3L3ZRvbuqt1Yv53XvWftboYQ1Vwu04qiuSO5WZxv2cq0o6JP1KV9a37nqR643A2lvqGV71xC+MZn+qNYQFbgUXTs3uXvw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=McN8/iSM; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45b8b02dd14so14765025e9.1;
+        Fri, 05 Sep 2025 04:49:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757072945; x=1757677745; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Df20U8eLXlwJoFINrMRZTXja8QnLE3DWLst3QAqSPAw=;
+        b=McN8/iSMdlOR4XRQ2B9MEBwnkZ5WBOnRryVvIZHzBv+nywnrUoJTjXDVQssX+QT4Z4
+         X/SKSw16rtOFvAyJIW65P9wLHG69/HAqe27W+wfDD5LjSkuJk+EhB9qcrm5+WF6mcnKz
+         3YF2+MwHZrH66syLGMXrX83chTSDkBGM6DmdDsTOjjDRIXLlzZxrhcJXqr8hwFmUiw3y
+         j4ZmKyIA0dgrgaNZNbxkWw0uJAIfHI2xrwLKnUaqKWVHIl0yxWiTyMJwy6DRrKcC1yNs
+         k3lJptMG9SXt4FiefhFQG+YYpnCggDYFUoRg37yEX3qvvlTsRxfweR8iL4mvnW1kudBb
+         eSHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757072945; x=1757677745;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Df20U8eLXlwJoFINrMRZTXja8QnLE3DWLst3QAqSPAw=;
+        b=D7hTAISWn5uryQeHqxawlyeS5bpx55ToghtavECclI9VbavBnf+CduzfUOkpYv18TO
+         srnUbaNKEdwlLmXsq5xSLArDQBdGDRUrp48eFxyVlRUWygyVgGE8ccIVIA2NEE3bYQeS
+         p70mm4foHbKtxYnf+EeTMypAG+4zRlMeFY+P8swml3UUATC3qxG2YOn88W+Cyxt9u84F
+         qUGm51/6PvTf3eaXA/vfiTCzsBBHfELFFrOB0c/fWc5cLQfdjSD1UTQO08ghdmmy6dYs
+         YMXpe0E91n2kZSbqMs3ZzZW+pWQNoluGrRO8cEYRBiMAIPLlnaS3SfKfA7PNWR4n80HG
+         HEiw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKrjWYFeGOBawBB6cnV9q06ZHLbii1Rbi0RIRmDp8FokGd7gFnFH5W+VTMMuAANR8omEpjNRCxFOa6JEKED2YG2ME=@vger.kernel.org, AJvYcCWeR3z+hgmUDU5XYnSjUuqIV9Lj6asrfdBFPNYpJupr9r6xn4qUsg7zSuN1TGIPZxAv9jYkfo+NKvE1@vger.kernel.org, AJvYcCWkIzAUrLWXU8B3hT7y1X3iMWW2s4q/8H0y4cL8uVozwcMML5MzuU+GfaJ00Zo/J7TgFEw4oMfGYxWLcFJ6@vger.kernel.org, AJvYcCXZKvzDnv250vfoWCEKKkvR5gmtle3w2r1AaRvzzhvF2FiEBhnLGK4D7iwRt3ShHO1kBh9isv4T@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4AwtB+Q1icbh3evC4VBYqplba8+4wCJ3i+V7obOC3SfpRIwr/
+	1lw6BklPQDdBkAis3uKvsHkrBrDU+HGUYRHtLZjjw3FlWoIK1nqgKUAqWPdWIkgUoQpgDTFHq6s
+	x81Ke2bUp8Mje9ia/5BTREwGx350dghM=
+X-Gm-Gg: ASbGnctOKGGJjP+idua9fWNgEsZODBKIpB8NJsfQO91q10OCOt1bzaEK5m6jGVDHyeP
+	TQBsP/dM7IdyTgVZ6vOZSyV4FQOe4fF5Hc1ZL40wlV/eb5+Fhqerm2b+oGpsC/+F/LG71cfgLOx
+	uQFs8SaNqUDzsMmj1+2ng9dW00pOnAX7wRUAfy66WEXgdSWN2Kkc+uOVUkiKcqkga6aOalQPP7Q
+	WPs0FCXDjMoAVDxDkfTnYP7T8Bn1JRUWUWVsFnd
+X-Google-Smtp-Source: AGHT+IF5J/PcStKYjOtqRY282bXKtlrfXrUZeJo8APJ8Hek9CEJ63pB//wmxrjL6Rhnna5oOANPbzyFTicW+juKh65Y=
+X-Received: by 2002:a05:600c:3145:b0:45b:64bc:56ea with SMTP id
+ 5b1f17b1804b1-45b8557055dmr196616325e9.23.1757072944367; Fri, 05 Sep 2025
+ 04:49:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <efb80605-187f-4b80-8ba9-8065d1b9e9d0@intel.com>
+References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250904114204.4148520-9-prabhakar.mahadev-lad.rj@bp.renesas.com> <fc103af7-0558-46bf-a668-d4d815ae704e@lunn.ch>
+In-Reply-To: <fc103af7-0558-46bf-a668-d4d815ae704e@lunn.ch>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Fri, 5 Sep 2025 12:48:37 +0100
+X-Gm-Features: Ac12FXypVFHVBLxkEzgMpaSiPzoRNtJcax8RRCNYnh1mWDmNLrR0ebAOwWEKVeM
+Message-ID: <CA+V-a8sP1HBmBr_mbJTwVRAu-ZxKiT7b9KW3o97HOhu8DAUavg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 8/9] net: pcs: rzn1-miic: Add per-SoC control
+ for MIIC register unlock/lock
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 03, 2025 at 03:25:40PM -0700, Jacob Keller wrote:
-> 
-> 
-> On 9/3/2025 2:43 PM, mheib@redhat.com wrote:
-> > From: Mohammad Heib <mheib@redhat.com>
-> > 
-> > Currently the i40e driver enforces its own internally calculated per-VF MAC
-> > filter limit, derived from the number of allocated VFs and available
-> > hardware resources. This limit is not configurable by the administrator,
-> > which makes it difficult to control how many MAC addresses each VF may
-> > use.
-> > 
-> > This patch adds support for the new generic devlink runtime parameter
-> > "max_mac_per_vf" which provides administrators with a way to cap the
-> > number of MAC addresses a VF can use:
-> > 
-> > - When the parameter is set to 0 (default), the driver continues to use
-> >   its internally calculated limit.
-> > 
-> > - When set to a non-zero value, the driver applies this value as a strict
-> >   cap for VFs, overriding the internal calculation.
-> > 
-> > Important notes:
-> > 
-> > - The configured value is a theoretical maximum. Hardware limits may
-> >   still prevent additional MAC addresses from being added, even if the
-> >   parameter allows it.
-> > 
-> > - Since MAC filters are a shared hardware resource across all VFs,
-> >   setting a high value may cause resource contention and starve other
-> >   VFs.
-> > 
-> > - This change gives administrators predictable and flexible control over
-> >   VF resource allocation, while still respecting hardware limitations.
-> > 
-> > - Previous discussion about this change:
-> >   https://lore.kernel.org/netdev/20250805134042.2604897-2-dhill@redhat.com
-> >   https://lore.kernel.org/netdev/20250823094952.182181-1-mheib@redhat.com
-> > 
-> > Signed-off-by: Mohammad Heib <mheib@redhat.com>
-> > ---
-> 
-> This version looks good to me. With or without minor nits relating to
-> rate limiting and adding mac_add_max to the untrusted message:
-> 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Hi Andrew,
 
-Thanks, I'm very pleased to see this one coming together.
+Thank you for the review.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Thu, Sep 4, 2025 at 9:55=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > -static void miic_reg_writel(struct miic *miic, int offset, u32 value)
+> > +static inline void miic_unlock_regs(struct miic *miic)
+> > +{
+>
+> Please don't use inline in C files. The compiler should decide.
+>
+Ok, I will drop this in the next version.
 
-> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> > index 081a4526a2f0..6e154a8aa474 100644
-> > --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> > +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> > @@ -2935,33 +2935,48 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
-> >  		if (!f)
-> >  			++mac_add_cnt;
-> >  	}
-> > -
-> > -	/* If this VF is not privileged, then we can't add more than a limited
-> > -	 * number of addresses.
-> > +	/* Determine the maximum number of MAC addresses this VF may use.
-> > +	 *
-> > +	 * - For untrusted VFs: use a fixed small limit.
-> > +	 *
-> > +	 * - For trusted VFs: limit is calculated by dividing total MAC
-> > +	 *  filter pool across all VFs/ports.
-> >  	 *
-> > -	 * If this VF is trusted, it can use more resources than untrusted.
-> > -	 * However to ensure that every trusted VF has appropriate number of
-> > -	 * resources, divide whole pool of resources per port and then across
-> > -	 * all VFs.
-> > +	 * - User can override this by devlink param "max_mac_per_vf".
-> > +	 *   If set its value is used as a strict cap for both trusted and
-> > +	 *   untrusted VFs.
-> > +	 *   Note:
-> > +	 *    even when overridden, this is a theoretical maximum; hardware
-> > +	 *    may reject additional MACs if the absolute HW limit is reached.
-> >  	 */
-> 
-> Good. I think this is better and allows users to also increase limit for
-> untrusted VFs without requiring them to become fully "trusted" with the
-> all-or-nothing approach. Its more flexible in that regard, and avoids
-> the confusion of the parameter not working because a VF is untrusted.
-
-+1
-
-> >  	if (!vf_trusted)
-> >  		mac_add_max = I40E_VC_MAX_MAC_ADDR_PER_VF;
-> >  	else
-> >  		mac_add_max = I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs, hw->num_ports);
-> >  
-> > +	if (pf->max_mac_per_vf > 0)
-> > +		mac_add_max = pf->max_mac_per_vf;
-> > +
-> 
-> Nice, a clean way to edit the maximum without needing too much special
-> casing.
-> 
-> >  	/* VF can replace all its filters in one step, in this case mac_add_max
-> >  	 * will be added as active and another mac_add_max will be in
-> >  	 * a to-be-removed state. Account for that.
-> >  	 */
-> >  	if ((i40e_count_active_filters(vsi) + mac_add_cnt) > mac_add_max ||
-> >  	    (i40e_count_all_filters(vsi) + mac_add_cnt) > 2 * mac_add_max) {
-> > +		if (pf->max_mac_per_vf == mac_add_max && mac_add_max > 0) {
-> > +			dev_err(&pf->pdev->dev,
-> > +				"Cannot add more MAC addresses: VF reached its maximum allowed limit (%d)\n",
-> > +				mac_add_max);
-> > +				return -EPERM;
-> > +		}
-> 
-> Good, having the specific error message will aid system administrators
-> in debugging.
-
-Also, +1.
-
-> One thought I had, which isn't a knock on your code as we did the same
-> before.. should these be rate limited to prevent VF spamming MAC filter
-> adds clogging up the dmesg buffer?
-> 
-> Given that we didn't do it before, I think its reasonable to not hold
-> this patch up for such a cleanup.
-> 
-> >  		if (!vf_trusted) {
-> >  			dev_err(&pf->pdev->dev,
-> >  				"Cannot add more MAC addresses, VF is not trusted, switch the VF to trusted to add more functionality\n");
-> >  			return -EPERM;
-> >  		} else {
-> 
-> We didn't rate limit it before. I am not sure how fast the VF can
-> actually send messages, so I'm not sure if that change would be required.
-> 
-> You could optionally also report the mac_add_max for the untrusted
-> message as well, but I think its fine to leave as-is in that case as well.
-
-I'm not sure either. I'm more used to rate limits in the datapath,
-where network traffic can result in a log.
-
-I think that if we want to go down the path you suggest then we should
-look at what other logs fall into the same category: generated by VM admin
-actions. And perhaps start by looking in the i40e driver for such cases.
-
-Just my 2c worth on this one.
-
-> 
-> >  			dev_err(&pf->pdev->dev,
-> > -				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
-> > +				"Cannot add more MAC addresses: trusted VF reached its maximum allowed limit (%d)\n",
-> > +				mac_add_max);
-> >  			return -EPERM;
-> >  		}
-> >  	}
-> 
-
-
-
+Cheers,
+Prabhakar
 
