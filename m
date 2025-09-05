@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-220259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D15B4516A
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:30:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD4ECB4516D
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E218FA016F4
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 08:30:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 893F7586976
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 08:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EACD830CDAF;
-	Fri,  5 Sep 2025 08:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C7130F811;
+	Fri,  5 Sep 2025 08:29:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CD53043D3;
-	Fri,  5 Sep 2025 08:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B97A30CD93;
+	Fri,  5 Sep 2025 08:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757060954; cv=none; b=KD5H1mDELSQN4d1qJLdz2GTHTJclwNS13fHcykx61a8f9fiC/nZ6L27WDAG82/nXWhRJopihr6hwegZC7EP08TF5d41EmOpLYt27rmBivwafkfCWtNetNVhEwX76IDQ3Z/1lKDmU/7hzyaBxlhmWyumiAEczRXKgn5r4A4XIj4o=
+	t=1757060956; cv=none; b=dxBhweP3p95xSIdnqL65BsGbtvY2JIImZ1H1dD27pFEYWup3ZKSN/P7j4eqhTQ4Z8r00rEj1SbkDC0IDLi1siqI09fDinjynShfQ5hBfusIVRMUfpQQOSYpFlIblhAePaGoJlgZjuNeIhThO9mOfcWJvdaejR16DE2xV2WhDp+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757060954; c=relaxed/simple;
-	bh=BdLUZ8TXiA8IXqYsfYwdZXA/+837dwMk7kZbQtI7O88=;
+	s=arc-20240116; t=1757060956; c=relaxed/simple;
+	bh=BlZ5Qyg2AvEvaDO5MPR4REot4z1AfmBDWbmZ5/jyIDI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LOIr3ak2pnWM7XssBTzF8yfYXaiC9dxZclEurw9NSQjuK/y1Hx7PJ/xVBfuLBNiS2+sF4F2VhsUeYx3L6Hu/sRruFY4eaij26Qkm2YRlMgRGNDK0rSK3x4v/EUIQ1Rt/AIKg9hXJZjhIJYF2rBe/y8siMLK+wUsQrePAgQ46aUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=RfAcyQYNnIAsHz3TXi1rl4A6yabmKvJIE3X+TsMVYMiKA0LMnk0aHf5+IgttM5u3EC/fjB2xOBzxVeEhxmsYFf+UZjL3xUr29X2rBciJeT7Vsbf7bzrsbK1cSepRT1+DT8dg23LbJAHEiMVafC2+khmg9roy5g93ZFufOVa+pXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4cJ8dQ4kxmz14MSH;
-	Fri,  5 Sep 2025 16:28:58 +0800 (CST)
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cJ8cY4jd2ztTWp;
+	Fri,  5 Sep 2025 16:28:13 +0800 (CST)
 Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9825E1402C8;
+	by mail.maildlp.com (Postfix) with ESMTPS id A87C51402EB;
 	Fri,  5 Sep 2025 16:29:09 +0800 (CST)
 Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
  kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 5 Sep 2025 16:29:05 +0800
+ 15.2.1544.11; Fri, 5 Sep 2025 16:29:07 +0800
 From: Fan Gong <gongfan1@huawei.com>
 To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
@@ -55,9 +55,9 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
 	<vadim.fedorenko@linux.dev>, Suman Ghosh <sumang@marvell.com>, Przemek
  Kitszel <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>,
 	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH net-next v04 05/14] hinic3: Command Queue flush interfaces
-Date: Fri, 5 Sep 2025 16:28:39 +0800
-Message-ID: <be5378bb148410286bb319a82fd2e2f0c9044117.1757057860.git.zhuyikai1@h-partners.com>
+Subject: [PATCH net-next v04 06/14] hinic3: Nic_io initialization
+Date: Fri, 5 Sep 2025 16:28:40 +0800
+Message-ID: <0d48674ae76a54bf52dcdba64fb60eb26e7e7e70.1757057860.git.zhuyikai1@h-partners.com>
 X-Mailer: git-send-email 2.51.0.windows.1
 In-Reply-To: <cover.1757057860.git.zhuyikai1@h-partners.com>
 References: <cover.1757057860.git.zhuyikai1@h-partners.com>
@@ -72,224 +72,190 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  kwepemf100013.china.huawei.com (7.202.181.12)
 
-Add the data structures and functions for command queue flushing.
+Add nic_io initialization to enable NIC service, initialize function table
+and negotiate activation of NIC features.
 
 Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Fan Gong <gongfan1@huawei.com>
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 99 +++++++++++++++++++
- .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  1 +
- .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 12 +++
- .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  1 +
- .../net/ethernet/huawei/hinic3/hinic3_hwif.c  | 26 +++++
- .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  3 +
- 6 files changed, 142 insertions(+)
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c | 15 ++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 23 +++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  2 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    | 51 +++++++++++++++++--
+ 4 files changed, 88 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-index b016806c7f67..abb9586e1217 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-@@ -235,3 +235,102 @@ int hinic3_set_cmdq_depth(struct hinic3_hwdev *hwdev, u16 cmdq_depth)
- 
- 	return 0;
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+index fa418e4f2654..95a213133be9 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+@@ -436,6 +436,18 @@ static void hinic3_uninit_comm_ch(struct hinic3_hwdev *hwdev)
+ 	free_base_mgmt_channel(hwdev);
  }
+ 
++static DEFINE_IDA(hinic3_adev_ida);
 +
-+#define HINIC3_WAIT_CMDQ_IDLE_TIMEOUT    5000
-+
-+static enum hinic3_wait_return check_cmdq_stop_handler(void *priv_data)
++static int hinic3_adev_idx_alloc(void)
 +{
-+	struct hinic3_hwdev *hwdev = priv_data;
-+	enum hinic3_cmdq_type cmdq_type;
-+	struct hinic3_cmdqs *cmdqs;
-+
-+	cmdqs = hwdev->cmdqs;
-+	for (cmdq_type = 0; cmdq_type < cmdqs->cmdq_num; cmdq_type++) {
-+		if (!hinic3_cmdq_idle(&cmdqs->cmdq[cmdq_type]))
-+			return HINIC3_WAIT_PROCESS_WAITING;
-+	}
-+
-+	return HINIC3_WAIT_PROCESS_CPL;
++	return ida_alloc(&hinic3_adev_ida, GFP_KERNEL);
 +}
 +
-+static int wait_cmdq_stop(struct hinic3_hwdev *hwdev)
++static void hinic3_adev_idx_free(int id)
 +{
-+	struct hinic3_cmdqs *cmdqs = hwdev->cmdqs;
-+	enum hinic3_cmdq_type cmdq_type;
++	ida_free(&hinic3_adev_ida, id);
++}
++
+ int hinic3_init_hwdev(struct pci_dev *pdev)
+ {
+ 	struct hinic3_pcidev *pci_adapter = pci_get_drvdata(pdev);
+@@ -451,6 +463,7 @@ int hinic3_init_hwdev(struct pci_dev *pdev)
+ 	hwdev->pdev = pci_adapter->pdev;
+ 	hwdev->dev = &pci_adapter->pdev->dev;
+ 	hwdev->func_state = 0;
++	hwdev->dev_id = hinic3_adev_idx_alloc();
+ 	spin_lock_init(&hwdev->channel_lock);
+ 
+ 	err = hinic3_init_hwif(hwdev);
+@@ -504,6 +517,7 @@ int hinic3_init_hwdev(struct pci_dev *pdev)
+ 	hinic3_free_hwif(hwdev);
+ err_free_hwdev:
+ 	pci_adapter->hwdev = NULL;
++	hinic3_adev_idx_free(hwdev->dev_id);
+ 	kfree(hwdev);
+ 
+ 	return err;
+@@ -519,6 +533,7 @@ void hinic3_free_hwdev(struct hinic3_hwdev *hwdev)
+ 	hinic3_free_cfg_mgmt(hwdev);
+ 	destroy_workqueue(hwdev->workq);
+ 	hinic3_free_hwif(hwdev);
++	hinic3_adev_idx_free(hwdev->dev_id);
+ 	kfree(hwdev);
+ }
+ 
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+index 5b1a91a18c67..049f9536cb86 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+@@ -39,6 +39,12 @@ static int hinic3_feature_nego(struct hinic3_hwdev *hwdev, u8 opcode,
+ 	return 0;
+ }
+ 
++int hinic3_get_nic_feature_from_hw(struct hinic3_nic_dev *nic_dev)
++{
++	return hinic3_feature_nego(nic_dev->hwdev, MGMT_MSG_CMD_OP_GET,
++				   &nic_dev->nic_io->feature_cap, 1);
++}
++
+ int hinic3_set_nic_feature_to_hw(struct hinic3_nic_dev *nic_dev)
+ {
+ 	return hinic3_feature_nego(nic_dev->hwdev, MGMT_MSG_CMD_OP_SET,
+@@ -82,6 +88,23 @@ static int hinic3_set_function_table(struct hinic3_hwdev *hwdev, u32 cfg_bitmap,
+ 	return 0;
+ }
+ 
++int hinic3_init_function_table(struct hinic3_nic_dev *nic_dev)
++{
++	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
++	struct l2nic_func_tbl_cfg func_tbl_cfg = {};
++	u32 cfg_bitmap;
++
++	func_tbl_cfg.mtu = 0x3FFF; /* default, max mtu */
++	func_tbl_cfg.rx_wqe_buf_size = nic_io->rx_buf_len;
++
++	cfg_bitmap = BIT(L2NIC_FUNC_TBL_CFG_INIT) |
++		     BIT(L2NIC_FUNC_TBL_CFG_MTU) |
++		     BIT(L2NIC_FUNC_TBL_CFG_RX_BUF_SIZE);
++
++	return hinic3_set_function_table(nic_dev->hwdev, cfg_bitmap,
++					 &func_tbl_cfg);
++}
++
+ int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
+ {
+ 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+index bf9ce51dc401..6b6851650a37 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+@@ -22,11 +22,13 @@ enum hinic3_nic_event_type {
+ 	HINIC3_NIC_EVENT_LINK_UP   = 1,
+ };
+ 
++int hinic3_get_nic_feature_from_hw(struct hinic3_nic_dev *nic_dev);
+ int hinic3_set_nic_feature_to_hw(struct hinic3_nic_dev *nic_dev);
+ bool hinic3_test_support(struct hinic3_nic_dev *nic_dev,
+ 			 enum hinic3_nic_feature_cap feature_bits);
+ void hinic3_update_nic_feature(struct hinic3_nic_dev *nic_dev, u64 feature_cap);
+ 
++int hinic3_init_function_table(struct hinic3_nic_dev *nic_dev);
+ int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu);
+ 
+ int hinic3_set_mac(struct hinic3_hwdev *hwdev, const u8 *mac_addr, u16 vlan_id,
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
+index 34a1f5bd5ac1..35168f03e0fa 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
+@@ -11,11 +11,56 @@
+ 
+ int hinic3_init_nic_io(struct hinic3_nic_dev *nic_dev)
+ {
+-	/* Completed by later submission due to LoC limit. */
+-	return -EFAULT;
++	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
++	struct hinic3_nic_io *nic_io;
 +	int err;
 +
-+	if (!(cmdqs->status & HINIC3_CMDQ_ENABLE))
-+		return 0;
++	nic_io = kzalloc(sizeof(*nic_io), GFP_KERNEL);
++	if (!nic_io)
++		return -ENOMEM;
 +
-+	cmdqs->status &= ~HINIC3_CMDQ_ENABLE;
-+	err = hinic3_wait_for_timeout(hwdev, check_cmdq_stop_handler,
-+				      HINIC3_WAIT_CMDQ_IDLE_TIMEOUT,
-+				      USEC_PER_MSEC);
++	nic_dev->nic_io = nic_io;
 +
-+	if (err)
-+		goto err_reenable_cmdq;
++	err = hinic3_set_func_svc_used_state(hwdev, COMM_FUNC_SVC_T_NIC, 1);
++	if (err) {
++		dev_err(hwdev->dev, "Failed to set function svc used state\n");
++		goto err_free_nicio;
++	}
++
++	err = hinic3_init_function_table(nic_dev);
++	if (err) {
++		dev_err(hwdev->dev, "Failed to init function table\n");
++		goto err_clear_func_svc_used_state;
++	}
++
++	nic_io->rx_buf_len = nic_dev->rx_buf_len;
++
++	err = hinic3_get_nic_feature_from_hw(nic_dev);
++	if (err) {
++		dev_err(hwdev->dev, "Failed to get nic features\n");
++		goto err_clear_func_svc_used_state;
++	}
++
++	nic_io->feature_cap &= HINIC3_NIC_F_ALL_MASK;
++	nic_io->feature_cap &= HINIC3_NIC_DRV_DEFAULT_FEATURE;
++	dev_dbg(hwdev->dev, "nic features: 0x%llx\n\n", nic_io->feature_cap);
 +
 +	return 0;
 +
-+err_reenable_cmdq:
-+	for (cmdq_type = 0; cmdq_type < cmdqs->cmdq_num; cmdq_type++) {
-+		if (!hinic3_cmdq_idle(&cmdqs->cmdq[cmdq_type]))
-+			dev_err(hwdev->dev, "Cmdq %d is busy\n", cmdq_type);
-+	}
-+	cmdqs->status |= HINIC3_CMDQ_ENABLE;
++err_clear_func_svc_used_state:
++	hinic3_set_func_svc_used_state(hwdev, COMM_FUNC_SVC_T_NIC, 0);
++err_free_nicio:
++	nic_dev->nic_io = NULL;
++	kfree(nic_io);
 +
 +	return err;
-+}
-+
-+int hinic3_func_rx_tx_flush(struct hinic3_hwdev *hwdev)
-+{
-+	struct comm_cmd_clear_doorbell clear_db = {};
-+	struct comm_cmd_clear_resource clr_res = {};
-+	struct hinic3_hwif *hwif = hwdev->hwif;
-+	struct mgmt_msg_params msg_params = {};
-+	int ret = 0;
-+	int err;
-+
-+	err = wait_cmdq_stop(hwdev);
-+	if (err) {
-+		dev_warn(hwdev->dev, "CMDQ is still working, CMDQ timeout value is unreasonable\n");
-+		ret = err;
-+	}
-+
-+	hinic3_disable_doorbell(hwif);
-+
-+	clear_db.func_id = hwif->attr.func_global_idx;
-+	mgmt_msg_params_init_default(&msg_params, &clear_db, sizeof(clear_db));
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_COMM,
-+				       COMM_CMD_FLUSH_DOORBELL, &msg_params);
-+	if (err || clear_db.head.status) {
-+		dev_warn(hwdev->dev, "Failed to flush doorbell, err: %d, status: 0x%x\n",
-+			 err, clear_db.head.status);
-+		if (err)
-+			ret = err;
-+		else
-+			ret = -EFAULT;
-+	}
-+
-+	clr_res.func_id = hwif->attr.func_global_idx;
-+	msg_params.buf_in = &clr_res;
-+	msg_params.in_size = sizeof(clr_res);
-+	err = hinic3_send_mbox_to_mgmt_no_ack(hwdev, MGMT_MOD_COMM,
-+					      COMM_CMD_START_FLUSH,
-+					      &msg_params);
-+	if (err) {
-+		dev_warn(hwdev->dev, "Failed to notice flush message, err: %d\n",
-+			 err);
-+		ret = err;
-+	}
-+
-+	hinic3_enable_doorbell(hwif);
-+
-+	err = hinic3_reinit_cmdq_ctxts(hwdev);
-+	if (err) {
-+		dev_warn(hwdev->dev, "Failed to reinit cmdq\n");
-+		ret = err;
-+	}
-+
-+	return ret;
-+}
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-index 478db3c13281..35b93e36e004 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-@@ -39,5 +39,6 @@ int hinic3_set_dma_attr_tbl(struct hinic3_hwdev *hwdev, u8 entry_idx, u8 st,
- int hinic3_set_wq_page_size(struct hinic3_hwdev *hwdev, u16 func_idx,
- 			    u32 page_size);
- int hinic3_set_cmdq_depth(struct hinic3_hwdev *hwdev, u16 cmdq_depth);
-+int hinic3_func_rx_tx_flush(struct hinic3_hwdev *hwdev);
- 
- #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
-index 87b43a123edb..f5deddcbc29d 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
-@@ -245,6 +245,18 @@ struct comm_cmd_set_cmdq_ctxt {
- 	struct comm_cmdq_ctxt_info ctxt;
- };
- 
-+struct comm_cmd_clear_doorbell {
-+	struct mgmt_msg_head head;
-+	u16                  func_id;
-+	u16                  rsvd1[3];
-+};
-+
-+struct comm_cmd_clear_resource {
-+	struct mgmt_msg_head head;
-+	u16                  func_id;
-+	u16                  rsvd1[3];
-+};
-+
- /* Services supported by HW. HW uses these values when delivering events.
-  * HW supports multiple services that are not yet supported by driver
-  * (e.g. RoCE).
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
-index 258e96ac9b76..fa418e4f2654 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
-@@ -514,6 +514,7 @@ void hinic3_free_hwdev(struct hinic3_hwdev *hwdev)
- 	u64 drv_features[COMM_MAX_FEATURE_QWORD] = {};
- 
- 	hinic3_set_comm_features(hwdev, drv_features, COMM_MAX_FEATURE_QWORD);
-+	hinic3_func_rx_tx_flush(hwdev);
- 	hinic3_uninit_comm_ch(hwdev);
- 	hinic3_free_cfg_mgmt(hwdev);
- 	destroy_workqueue(hwdev->workq);
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
-index f07bcab51ba5..4c6b5aa0d1df 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
-@@ -173,6 +173,32 @@ static enum hinic3_outbound_ctrl hinic3_get_outbound_ctrl_status(struct hinic3_h
- 	return HINIC3_AF5_GET(attr5, OUTBOUND_CTRL);
  }
  
-+void hinic3_enable_doorbell(struct hinic3_hwif *hwif)
-+{
-+	u32 addr, attr4;
-+
-+	addr = HINIC3_CSR_FUNC_ATTR4_ADDR;
-+	attr4 = hinic3_hwif_read_reg(hwif, addr);
-+
-+	attr4 &= ~HINIC3_AF4_DOORBELL_CTRL_MASK;
-+	attr4 |= HINIC3_AF4_SET(ENABLE_DOORBELL, DOORBELL_CTRL);
-+
-+	hinic3_hwif_write_reg(hwif, addr, attr4);
-+}
-+
-+void hinic3_disable_doorbell(struct hinic3_hwif *hwif)
-+{
-+	u32 addr, attr4;
-+
-+	addr = HINIC3_CSR_FUNC_ATTR4_ADDR;
-+	attr4 = hinic3_hwif_read_reg(hwif, addr);
-+
-+	attr4 &= ~HINIC3_AF4_DOORBELL_CTRL_MASK;
-+	attr4 |= HINIC3_AF4_SET(DISABLE_DOORBELL, DOORBELL_CTRL);
-+
-+	hinic3_hwif_write_reg(hwif, addr, attr4);
-+}
-+
- static int db_area_idx_init(struct hinic3_hwif *hwif, u64 db_base_phy,
- 			    u8 __iomem *db_base, u64 db_dwqe_len)
+ void hinic3_free_nic_io(struct hinic3_nic_dev *nic_dev)
  {
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
-index 48e43bfdbfbe..cc93a011c899 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
-@@ -68,6 +68,9 @@ enum hinic3_msix_auto_mask {
- u32 hinic3_hwif_read_reg(struct hinic3_hwif *hwif, u32 reg);
- void hinic3_hwif_write_reg(struct hinic3_hwif *hwif, u32 reg, u32 val);
- 
-+void hinic3_disable_doorbell(struct hinic3_hwif *hwif);
-+void hinic3_enable_doorbell(struct hinic3_hwif *hwif);
+-	/* Completed by later submission due to LoC limit. */
++	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
 +
- int hinic3_alloc_db_addr(struct hinic3_hwdev *hwdev, void __iomem **db_base,
- 			 void __iomem **dwqe_base);
- void hinic3_free_db_addr(struct hinic3_hwdev *hwdev, const u8 __iomem *db_base);
++	hinic3_set_func_svc_used_state(nic_dev->hwdev, COMM_FUNC_SVC_T_NIC, 0);
++	nic_dev->nic_io = NULL;
++	kfree(nic_io);
+ }
 -- 
 2.43.0
 
