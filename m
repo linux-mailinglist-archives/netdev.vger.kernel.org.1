@@ -1,150 +1,137 @@
-Return-Path: <netdev+bounces-220288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F190B453F6
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:01:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D14B45400
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 12:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7DCA61009
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:01:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BEC33A8DF1
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 10:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC436283FE1;
-	Fri,  5 Sep 2025 10:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3D229D29D;
+	Fri,  5 Sep 2025 10:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFxi6xLM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqFbO57f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AABD3FF1;
-	Fri,  5 Sep 2025 10:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA8A285056;
+	Fri,  5 Sep 2025 10:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757066496; cv=none; b=bvmeQrOi7ufd73WxvSjQ6NNqHBtFLcJUOL0VLQjyFEUBp1W2GXDBbKXlTDuiW35IRxzFabitEpQmb0L/zGF2RMHPT+fm8WzP29YSLh6DlMAIpVyK7a8sPQ6HSjPRcHv3QCaVa5BP9/TUHaQ6acTT6A0Pk1LrblgQ3NBxLfsbR+s=
+	t=1757066548; cv=none; b=u3DUd55nLbTKi1Dd2jCsH10Oz/hslwjFl54WIam1OK78ZvYRFo/AHKvtcw642nGxi2RHHazJ0J0ru9L6JQTJIlH3EwkhyQeXTnMvxzh2Q95ra4mCCMYd69beZxrEnONP6aWr8Yk+r7o9PwOCOJT8X6dSgvdU3hf53lmcooGP9h0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757066496; c=relaxed/simple;
-	bh=MI++7xSl6D0d/tvMOVR8S7KiVropv9tJ4R/VEjlTswc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y8kIqibjSEcTNTkqgvkZpGI6TMTGzhR8swqqL5jb23J/PICYcWkJAqQ45VT+o6rPmVTryKtQemK3Yju5AZmyVUiGjBbMoPl7O4e6f9U3Xqn/ac/dCKex9eDRsbFKIO9eWk9faKMoKA/ZdMkW4Oi6J3Le2wdho9CTAbehNYcphvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFxi6xLM; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1757066548; c=relaxed/simple;
+	bh=xFCuwgje1x8qSnyx94AW6aELEqq8okLrf2QkUF9jwFg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V9KP+ECqxZSNGW48kIMQVsWpnceow8TVmcED0h1sCO0wiq22ouiXuY4GlvNZuRbBI2vlPfQwJfudGC8CWXPaPpBELJi3DdEPy7KuCS7/7WWcJsE/TjUQt5Mg5WG6wZvXrTIMg9s7bC41UWOKzYQuLKBpEssWg5bkOgVY/WQpm4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqFbO57f; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3df35a67434so1097434f8f.3;
-        Fri, 05 Sep 2025 03:01:34 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7724cacc32bso1567675b3a.0;
+        Fri, 05 Sep 2025 03:02:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757066493; x=1757671293; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZEQHjjB0tYa1N8cGqzOlMz/FwpV1lIEE+NTIQ2azOHo=;
-        b=MFxi6xLMluKxY3AWeLBVWv/03CFKPLqZ73AE5riExwYq5+9AdrBJ1nBPWd2pMCs21h
-         71OoMpqEfCmTNXI7z64LZsapHeqYl9CJ0v2YXAk+QjIpwtilDYd2A57etV2WhJGkZW9J
-         KwfU0aT28Yuo0e6yiSztEGyKGAjrunvllFQ3ewYnH2Fko34CpC/VqG82CDw7aaBEoS0h
-         P7tz5c0XTBJ88X4dxJf9PSOICnLuywlTMeU0bZBslqmzRBiZ00bURJltrFkmKcNlDn6T
-         B6Wnd9F/lZro477fffcSEOiBd8dqr2HByBLGnOgO1WE+aNPRANEPwwd0pv2X+4yXjjDh
-         usNw==
+        d=gmail.com; s=20230601; t=1757066546; x=1757671346; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mlJOYlx/z1k0Vlh+9uQQpTUfAOydkzaaPUhFUkrjdUk=;
+        b=MqFbO57fvzS/Rea9CCiRD273XNrJWKUPl2+wSN7nhmblTikZfIPBkmChAL12TB15UH
+         j/hqCtq+068yGC2sGGZf6nFn+4u5Sz9qWHjVknqykiwJ/ip2dFl6LuuvrpngmqYFcywT
+         QxGDeGPJ6vMSb8TKIdFWa+5w1V9+0nvHrKYBGr3M8WyZAXTqV9aiT1ikYNIChz4kVXJa
+         8QPHFQY8LfYso9dVvq22P89s6aXOqE+HtaAcirSXC0gJQzhyO3fqA6jyGsRg4edjFkSx
+         y/UHY8XhEHN4hEJSDKV4cjEe1YZO6usFy4+0dabfXM9GaKojvXy6xESWPB4owwAXIiME
+         zjMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757066493; x=1757671293;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZEQHjjB0tYa1N8cGqzOlMz/FwpV1lIEE+NTIQ2azOHo=;
-        b=pJbgciep+1SAxmSQygJLZv3YDPcI5dHm2sS77Jpn0E37c/+fKbY2AwXHdg5fggLheY
-         zdzT9wR88dJh2IjGY1ogYGOsRWJMofo1uC14N8LsEYXShx5lO9S2bst154IotxPMlC4i
-         xEiPBsBRbP5ZrxNJUPKDnKwgZiKSLL6n325ctH1EGwmsZn4k8tPpv59OoTygleL+aMPn
-         dt7WP08aOQme+9KL44Z9WMPFxe+T7wTrmlcIVjUhD9vfDMBeJojokdYadHKvniRtsIVt
-         pFrW8pu4/y7RRUw0dhJ8IelihV3KVkGR8snoww3qYvsaA2npLIV7pXvlKv5CC94D0U5e
-         l7kg==
-X-Forwarded-Encrypted: i=1; AJvYcCUITINBq1fW5O5ZrgLGCiY/NnsaQ2ksT1Jq1fBKjE2zFHJmCc2buvYqU2lI7fHIyBxB1aHLekgR@vger.kernel.org, AJvYcCUPP1Yph9Yr+0TWs9qAT9GmYi8u+vx9rcfHIvr/wsArU+CPpPjZFmH5uBMJR07HYd+hzyFNWW6dhaMC03ci@vger.kernel.org, AJvYcCURvPxZyF8LmeNWr4B1kkQb+pkAOv/PsR84ls51B3yHx5admBEEq6N0Vx3EronXlkvjaid5ndIE6xsi@vger.kernel.org, AJvYcCXDelpUeUog4cy7Lfk3gu0v13WaFh2HFLYvh4UyiOewxa/cLIpXR7ubI/cTJH/MGCIgdsyEN8hbxsSrUq5B1jmhQOQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMNZxzMKfVnvhHpHbl0GSLvng4KHNBV6Bko9pHrzUhmwppGJNK
-	jLI9evPCAmXZ9TqyNmcjTd3QvuMnBrA8K7hxwqsMlwdH3t9yyJJkyMIJZ+XZCll5EtC5HsWcF+J
-	+ofr+iL9DddGRdIxMfMj92W4k7SubZtc=
-X-Gm-Gg: ASbGncvpeThzhS5hU8jSGnq6b4oK2pk5TPR4Keic1JkUYOb2ZrVKP3WMOFYRZuzairv
-	zFTOmSBzmAjjMh92MA0nVwIkvr2BPPsAyCNIcdCAdUYASiQV0oGgiw06Ggnksk5onZdxWg6CZma
-	AwmPFLGYu6ndvasTkfoVbIXzXQuZU+H8kHGN+RPPWqhjRMUsFaP75hMX5IYsQI4ONFlakpPFaFc
-	Yns44YvkDnEgZc1EPQbIisrZt6zTg==
-X-Google-Smtp-Source: AGHT+IENwDNnaA7LX8QdpGvHVZvc2cHkW8LLzE7YEDl4gIph1nAnHPcvvqrHhi6z/bmYC4D7PBM8OEiEwUc40Anwygw=
-X-Received: by 2002:a05:6000:2383:b0:3e2:6d96:b4da with SMTP id
- ffacd0b85a97d-3e26d96bc68mr3684568f8f.38.1757066493047; Fri, 05 Sep 2025
- 03:01:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757066546; x=1757671346;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mlJOYlx/z1k0Vlh+9uQQpTUfAOydkzaaPUhFUkrjdUk=;
+        b=Yp8V2oRr0w1TadIsQ/cwosK4GLfFvr17hMTbT2WVHT7ZSQGmVydWBdQuwY1sER74vS
+         0CU3UptUVRq3VvjquF31o28nNGqp0DafciK1hNqI5myEbD23O1FCJPhPZxdPs+ulL/CR
+         DUfUSIeQ5iqDl3bqd7Wb9yexSy7Gh6886TFgbzBRlRi2+b8PHJrCJGKeQV5ibsZ8bveG
+         8nJ0yYXLCLbe97kdCKRgRwiLcpd8lEauXTBcBQtonHnjqGw6QbWzE6P3iQsZFRNg5aJg
+         xQjPk76zMtUUTnwzBYA53IN9Ikib5arIho9qCdpD/KNTZuiy1KlkujEF8TPmrLjwcNbe
+         +0hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDwf9UEdK6SbDxZAPlEmtP8tJis3pYgcC1ofBv3Pk4soVBkebysQrcIF4nkD/w/JYhYOrtZoo7kQcY@vger.kernel.org, AJvYcCUHrg6HI1mHKkx3gwOeqPfe1t1SuAucy70lFICHH6JEcqLfRIO8r9Re9QRoBXQiYgJf8cSxCnrjJJl5@vger.kernel.org, AJvYcCV/paQgfyO3vvlnvbUtkXn5fnnWUaY8U3HqSS7akqiUL8VyFcUvBOFfy0AOzebSsz1e5zNWy4GaksxiFWo=@vger.kernel.org, AJvYcCVp1m0mGwXhKYN971/GNMGEyPRCPLGwYb5T3ImM4vwoucu3W5BTXNiu5maB4Vt6/XFxj2ffy3Gn@vger.kernel.org, AJvYcCVqk8xjlmRD5qniTA7b3e12JCuImN7Bx2PU6WKJh4cgQAyG6x8KQbZfu90m8tJd/R+/JAET0wYFKbztdJ0=@vger.kernel.org, AJvYcCWcwn17Qzg3x8yi2ngxU7x82cFF+1Ugt7zSS3wIMT+2pqg8ywfyWYlhAYZmrJeIY+1IVbIG7f8T65hkbLY=@vger.kernel.org, AJvYcCXTLACp3knCLvaIkAbHI3901imd2AIpdlYYnQPyQrX3y8guzGPJfPtoCCOfS0TQjlDCdY1XHfRPUqY+8Q==@vger.kernel.org, AJvYcCXYUXW5AK0CLl9E4V/tzPvUcEeC9OjtuPLCKlzPYSyzXsSfsGmqOodCFR31/ztdmjQeUzmsPYaZu79cGpdP@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNJOEDI15f08hJqXRBQ0UFvukJcS3RPdWy5Rpr4stFG0zDErcF
+	eAsO1x/z04SsrejW7LYL/RmrMlxNHyYEdLI05VeWtIdQYKOzCr6f115a
+X-Gm-Gg: ASbGncuV3JaDHwmHENl8AWioH2b9sdqIgYTVBN5MVCMC8n8xX4InxPyxcNGew2I/9mX
+	tNA3KEJpkn3QQUxiotUBxds0PobbKJUamiVCf4z9E+n/K1hq9l/XjBMtzYu7p0bQeF5UjT7zhPa
+	3rjBSWSrQCr+URurEdzFkIV4cDJYJINJ62qcBwM6XQEZ/oqZni96I6TfGB5b86K0ErPhlasis/1
+	cZmK4v8932eF+FhlcJ5rTZqFp+YmXdJqe7o6CkWu8Dgm0iIltboFCFRPQivDi/6e/JxnoSb5hQc
+	czdQE0tyIPMLg095DksxN88UFIeaEkHnVoF6lCrFVBgIbBLXScZbkQyI77fLgGEe2dXPqbvdEpu
+	qA3baCzBJ4XZFBBTg3LaCGOk=
+X-Google-Smtp-Source: AGHT+IEZFsGwp0kL92yq64dCob62/5/Te5BujmP7PaehTnILj7OwdceaDPf5lu2ogbouVgnk8eNmNg==
+X-Received: by 2002:a05:6a00:b47:b0:772:51f6:3518 with SMTP id d2e1a72fcca58-77251f65041mr25029357b3a.14.1757066546096;
+        Fri, 05 Sep 2025 03:02:26 -0700 (PDT)
+Received: from google.com ([2620:15c:9d:2:5133:5770:79e8:362b])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a269e9csm21898326b3a.17.2025.09.05.03.02.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 03:02:25 -0700 (PDT)
+Date: Fri, 5 Sep 2025 03:02:21 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Ariel D'Alessandro <ariel.dalessandro@collabora.com>, 
+	airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
+	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, broonie@kernel.org, 
+	chunkuang.hu@kernel.org, ck.hu@mediatek.com, conor+dt@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com, 
+	jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com, krzk+dt@kernel.org, 
+	kuba@kernel.org, kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com, 
+	louisalexis.eyraud@collabora.com, maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com, 
+	mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org, 
+	p.zabel@pengutronix.de, pabeni@redhat.com, robh@kernel.org, sean.wang@kernel.org, 
+	simona@ffwll.ch, support.opensource@diasemi.com, tiffany.lin@mediatek.com, 
+	tzimmermann@suse.de, yunfei.dong@mediatek.com, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v1 13/14] dt-bindings: input/touchscreen: Convert MELFAS
+ MIP4 Touchscreen to YAML
+Message-ID: <caguo7ud4dapb4yupeq2x4ocwoh4dt5nedwjsyuqsaratugcgz@ozajhsqwfzq6>
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-14-ariel.dalessandro@collabora.com>
+ <CACRpkdbpKqKyebADj0xPFq3g0biPh-vm4d6C3sd8r0URyfyYRg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250904114204.4148520-7-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <021e970a-f606-4702-9f0e-b4b0576bc5d6@lunn.ch> <CAMuHMdVnhjA0xi+wojMc40Zmv_JBZpOm04GO_ewBSzFndbtegQ@mail.gmail.com>
-In-Reply-To: <CAMuHMdVnhjA0xi+wojMc40Zmv_JBZpOm04GO_ewBSzFndbtegQ@mail.gmail.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Fri, 5 Sep 2025 11:01:06 +0100
-X-Gm-Features: Ac12FXxIWUyvkEfUz4q5orurH6BJWRXeslXNcn11rYAmFLfl-aoQgiX5uzP0Hng
-Message-ID: <CA+V-a8unTSqBottT7uDGkSxDYpRAYnpZvRC2RKsm9M0rw09iFQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 6/9] net: pcs: rzn1-miic: Make switch mode
- mask SoC-specific
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACRpkdbpKqKyebADj0xPFq3g0biPh-vm4d6C3sd8r0URyfyYRg@mail.gmail.com>
 
-Hi Geert,
+On Thu, Aug 21, 2025 at 01:56:24PM +0200, Linus Walleij wrote:
+> Hi Ariel,
+> 
+> thanks for your patch!
+> 
+> On Wed, Aug 20, 2025 at 7:17 PM Ariel D'Alessandro
+> <ariel.dalessandro@collabora.com> wrote:
+> 
+> > +  ce-gpios:
+> > +    description: GPIO connected to the CE (chip enable) pin of the chip
+> > +    maxItems: 1
+> 
+> Mention that this should always have the flag GPIO_ACTIVE_HIGH
+> as this is required by the hardware.
+> 
+> Unfortunately we have no YAML syntax for enforcing flags :/
 
-On Fri, Sep 5, 2025 at 8:02=E2=80=AFAM Geert Uytterhoeven <geert@linux-m68k=
-.org> wrote:
->
-> Hi Andrew,
->
-> On Thu, 4 Sept 2025 at 22:37, Andrew Lunn <andrew@lunn.ch> wrote:
-> > On Thu, Sep 04, 2025 at 12:42:00PM +0100, Prabhakar wrote:
-> > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > >
-> > > Move the hardcoded switch mode mask definition into the SoC-specific
-> > > miic_of_data structure. This allows each SoC to define its own mask
-> > > value rather than relying on a single fixed constant. For RZ/N1 the
-> > > mask remains GENMASK(4, 0).
-> > >
-> > > This is in preparation for adding support for RZ/T2H, where the
-> > > switch mode mask is GENMASK(2, 0).
-> >
-> > > -#define MIIC_MODCTRL_SW_MODE         GENMASK(4, 0)
-> >
-> > >       miic_reg_writel(miic, MIIC_MODCTRL,
-> > > -                     FIELD_PREP(MIIC_MODCTRL_SW_MODE, cfg_mode));
-> > > +                     ((cfg_mode << __ffs(sw_mode_mask)) & sw_mode_ma=
-sk));
-> >
-> > _ffs() should return 0 for both GENMASK(2,0) and GENMASK(4, 0). So
-> > this __ffs() is pointless.
-> >
-> > You might however want to add a comment that this assumption is being
-> > made.
->
-> I guess Prabhakar did it this way to make it easier to find
-> candidates for a future conversion to field_prep(), if this ever becomes
-> available[1].
->
-> [1] "[PATCH v3 0/4] Non-const bitfield helpers"
->     https://lore.kernel.org/all/cover.1739540679.git.geert+renesas@glider=
-.be
->
-Ah thanks, I wanted to explore this and add a new macro but I thought
-it might delay this series so I dropped it. Hopefully your series will
-get in soon.
+Theoretically there can be an inverter on the line, so from the AP point
+of view the line is active low while from the peripheral POV the pin is
+active high... 
 
-Cheers,
-Prabhakar
+Thanks.
+
+-- 
+Dmitry
 
