@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-220224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5642AB44CA7
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 06:14:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3022B44CAE
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 06:26:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA673B24B7
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 04:14:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89EB5564EFC
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 04:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAFD258ED7;
-	Fri,  5 Sep 2025 04:13:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D879B232369;
+	Fri,  5 Sep 2025 04:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Pa0nujBX"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="htMXJrRR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED707CA5A
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 04:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1714C75809
+	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 04:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757045639; cv=none; b=sShLQdZnP85fv17WpVxREd5F9pOkytrQUXBo14dKkX1ptKOtGtuxOBsUAiM+Yrwm6EnJ9/P9Aujr8Ef5iwfXRjAf+Mgpmo2x/4XWqYrm712YUIhCVUiXI6F682XM+OOoWHivyLSSeG9j8c45lx7RKcEH0HqZt/7e6U5hZQHSbvs=
+	t=1757046364; cv=none; b=sUrkXoZpgGNHu8cq6EE/0/0KDPRCc+NDxhgeaVDNaLbjnj/gwo/K6NNpnKFIcq3ILd8UAbJ+LC3SfT8o9o+WUnpzScouw9YQItPT8TODQKxZiUGdG7fm9SS1XfV93Gjk8YvoAD3hmZeUet+MM2PYXHbGxZZUV5xKq1dA4Sa93VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757045639; c=relaxed/simple;
-	bh=0fYRl15KIX0WePQH2MFQdJgEu6wtt4B+4sM9XqpEHp0=;
+	s=arc-20240116; t=1757046364; c=relaxed/simple;
+	bh=IHmo68YQ7L/duddAgclVIEvUtWdksnELEMP5v/s9PNQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xxm+hEaDZ1Gx5UO8FQ6F5hUttHte8xHWlYlHUnJ31/+CLazwrO/A83PcPuvl8EQdyBKdzRjTMZ1Q5w4ckyCH76+515TGSVM/fQWM9MnNYiQr+dx/v3UDGMoO98iR8MToTk14Ct4YLJBianvCh/6QrBqiiJA3AiVOrXNmI3cH+YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Pa0nujBX; arc=none smtp.client-ip=209.85.208.173
+	 To:Cc:Content-Type; b=gKRFVcp0qrdTU2Bnx7Id4b56okYgCT8goOpoS6Lu86WV6qwFbonJgzlXFTSHK17nSdZfh56xkp3qu5shA4hWhwaDBfpBIm6aYaX1wOxmJ7+SoSdnehDbdnE4PJxkg51Wjey4XY6Axdd11xcLg9E3UCT5VXcNUtiZkyHmrrGZzEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=htMXJrRR; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-336af6356a5so13788421fa.3
-        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 21:13:57 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55f720ffe34so2246092e87.1
+        for <netdev@vger.kernel.org>; Thu, 04 Sep 2025 21:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1757045636; x=1757650436; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1757046361; x=1757651161; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0fYRl15KIX0WePQH2MFQdJgEu6wtt4B+4sM9XqpEHp0=;
-        b=Pa0nujBXCifPQc3nIHCWUFY3HJpuGZw9+3DSEDyNLt7E6+n5KjdX3pLQI4hxrfHixA
-         lln7Gh9oqN7xgSaWqTJLqCrnDbX+b4f3yCy2mKf4+mVZpEWnmJDLz+JPP7kITlHBT7yq
-         VJlYjFM2/38gZsSnil4Vi96SpNsC2vB8Legb8=
+        bh=IHmo68YQ7L/duddAgclVIEvUtWdksnELEMP5v/s9PNQ=;
+        b=htMXJrRRMGYyCmihQClevvmjDrLBJX7Z/3XgUtOCOU7dthuqse7P5iUGq8/t1mW3V8
+         fcpakuzx0HKkJ30QzYlnKffMhb+SdxpVUetVkESl6QcwonkAFCf2bUV1fGGzNQiN2Pve
+         2oEnzR5onaauL8sipAf9CWGwPWzL2IUhU1GmA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757045636; x=1757650436;
+        d=1e100.net; s=20230601; t=1757046361; x=1757651161;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0fYRl15KIX0WePQH2MFQdJgEu6wtt4B+4sM9XqpEHp0=;
-        b=MXfXZzF1QqpGjnaY3jbU9CapCTK7VC2IlXprvXTt999THnrtJ69twIUxCC57i3tPQJ
-         uZ+WBh+lfv5U49s8eduyZcPTj9QqF+3/X1Qhc3OSvT5upioDW12Nlm2YIW5aiQXbXIJI
-         xmfFMIwJdJeyRhp1zEfIQqM8Gz67E/7HVJqlzh9JIdbI5twSxq3wT4z2IMYl/4iK/wS6
-         9q4OFpX8vlrPovG49JTTr4QC0vjWBuF4Sx9SNaybPL2TSHgg8pRcFK16KMzodSfI1suj
-         DOl+o+wAS4/NdFAA1EnUrE1RUQHm37wEQvcnPhUxb/DjMK1viOKBj4mHPgme8XCug2mK
-         xXOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWJU2vrBbvlldyJ7irelyByHnrlZAGJAcJLnTY9SPNoinZn9VZHHElWD39nZltSPppfO3dCfmM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjFSEOye0xxuz28yCdyC0ZU3GpqVCJm/lkOM+ymzKnlbEt1lfD
-	ORbRktxJ+zfLndWIE9mkwbkPQPiCsMgh0MGcTU8aawCBWZ69ss789A34WbgXExHSWL+JHZaTG04
-	PcyLvpVoD8BFrelCvqZsQHUVv+FAb3SQQ6bgOxFFl
-X-Gm-Gg: ASbGncvlLpGI8l+1ntenb3xCopkIbg3b7HJ5aVBwbzIJU2vY0lCUIaegA65tveqAQvr
-	nzZs+9O/8KOWWZDhA0gi8oCywwzXJ86xrlDF5pMxpsx7tSaGYF+pro3R77PS4xu9xV1CFlFvZIT
-	oRufWjIyBy6QPyXlKKegiTfl4OaBwG3RcytHwjddoe21z2e2ql3kV3aDeI+YLz/qETHSo7WfNIM
-	lHO6YjNFVCTjY4iLgSvDcPPKfWwqgzU5hn8ULeMQ37+4K4C
-X-Google-Smtp-Source: AGHT+IEa0TMIVMFiRNiOTeyQqmllYD/2S0wrm6EQ9v6TWvwu76YIEfNVYAC1dteqcnsTmIHsn61yA6m1gNmuAQeVk3M=
-X-Received: by 2002:a05:651c:2129:b0:336:51d4:16b3 with SMTP id
- 38308e7fff4ca-336caa4a818mr59122681fa.10.1757045636072; Thu, 04 Sep 2025
- 21:13:56 -0700 (PDT)
+        bh=IHmo68YQ7L/duddAgclVIEvUtWdksnELEMP5v/s9PNQ=;
+        b=PiKlLZU9EJ6AcTCUqINXGsxexrRonV0nefQtqNb4+hTzPHY0vLDBdWHEjPcBMGvurD
+         u2A64ZXfu1j1rhDcKUvs8Amj34KcDvDJwHxnvC4jnv4FWbJXH2OSTnS8bECk5NPHaFG+
+         9FybwspVHTdIJnS6h7Q0eFp48SrNk3wrN4TA68bVmcQWU6H3L6lE1VuGudJRREtchR4s
+         m7gRqnFrRpdlpjXlMTQqQEeczfr3eVe5R4wx9rml357dhVv8OTeCfvOq9ebM+UST3lCs
+         qbyJTcr9KNvVq4x8n1hFddt1hVBUPlLI2IhygO6P8hVYHR5yO5ik5qlqVZVlx6A3iA95
+         OBeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrS91HOKu/nlm15cA2ftK3uTWRtf7SHlyy3+i6YkMxj1YyN/RikTl+R7RNIcMgRivmLNWrk8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz//46343OP3C4c0VGfw4O9HzJanrsmhieXK6HgqmjXcwaWbWNt
+	KtLLgUHvTbLbQIOwc51QIrmilH2uFbGGVdc42QSB/Yv1QEsBNThUxPoRPHs/LY8DBAO+32g40KG
+	Enc1k3wCeGu7WWSHOvNSnQjwWR5/CEcyP1DXSm6qh
+X-Gm-Gg: ASbGnctC34WoOB55ooMAJTbrHdswCXlhiO8HrMAGAOtriBgPqsSd17gdC9BYrPGFnT8
+	BdO3m9IxERFgpTLhNApUUE5qN1ZXth0lTqqSLHvWgg5ZXzv0Ba+SBeuPp4T+6CdeTaBgynPMDft
+	1yH2DP9x40/Aba1/tpF1ZEY3HL085ndsT0dw97CMiszEzgKpYcTgafmEuvKXrAGNqECLvMqb+/l
+	kNRrUFzubNhSW+J3gFqkLKlNiTEbqpHfRoV4w==
+X-Google-Smtp-Source: AGHT+IH5pWHA8nQf6AbDXyeEcMeTEINpq+oHNFsdmhAJKkVR1+KEZHE+PC3gHq59gfSmiiSALqCN4LCODqxkvK4xsXI=
+X-Received: by 2002:a05:6512:3c93:b0:55f:552c:f731 with SMTP id
+ 2adb3069b0e04-56099453ef8mr666761e87.7.1757046361254; Thu, 04 Sep 2025
+ 21:26:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250829091913.131528-1-laura.nao@collabora.com> <20250829091913.131528-7-laura.nao@collabora.com>
-In-Reply-To: <20250829091913.131528-7-laura.nao@collabora.com>
+References: <20250829091913.131528-1-laura.nao@collabora.com> <20250829091913.131528-8-laura.nao@collabora.com>
+In-Reply-To: <20250829091913.131528-8-laura.nao@collabora.com>
 From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Fri, 5 Sep 2025 12:13:44 +0800
-X-Gm-Features: Ac12FXztQWtNoog-vK5ygrU2ksjNm_shuXo3XvVwDmyxsQtnU3LNJR6VMH81zew
-Message-ID: <CAGXv+5HjikmVaK_++METYBvTciQt1OTm77TU_e4Zh52MpCZ8bw@mail.gmail.com>
-Subject: Re: [PATCH v5 06/27] clk: mediatek: clk-gate: Refactor
- mtk_clk_register_gate to use mtk_gate struct
+Date: Fri, 5 Sep 2025 12:25:50 +0800
+X-Gm-Features: Ac12FXzDHpGuz6HiaGhCY4WidH-LRTm2axo9L1u6x0u8-eqIT-uiyLk75FyGJCg
+Message-ID: <CAGXv+5FgKsg0sM6EXeTL=du2BY1xgH6jVmtQtb2M0kY3iix-tA@mail.gmail.com>
+Subject: Re: [PATCH v5 07/27] clk: mediatek: clk-gate: Add ops for gates with
+ HW voter
 To: Laura Nao <laura.nao@collabora.com>
 Cc: mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org, 
 	krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com, 
@@ -88,20 +88,21 @@ Cc: mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
 	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	kernel@collabora.com
+	kernel@collabora.com, =?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Aug 29, 2025 at 5:21=E2=80=AFPM Laura Nao <laura.nao@collabora.com>=
  wrote:
 >
-> MT8196 uses a HW voter for gate enable/disable control, with
-> set/clr/sta registers located in a separate regmap. Refactor
-> mtk_clk_register_gate() to take a struct mtk_gate, and add a pointer to
-> it in struct mtk_clk_gate. This allows reuse of the static gate data
-> (including HW voter register offsets) without adding extra function
-> arguments, and removes redundant duplication in the runtime data struct.
+> MT8196 use a HW voter for gate enable/disable control. Voting is
+> performed using set/clr regs, with a status bit used to verify the vote
+> state. Add new set of gate clock operations with support for voting via
+> set/clr regs.
 >
+> Reviewed-by: N=C3=ADcolas F. R. A. Prado <nfraprado@collabora.com>
+> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collab=
+ora.com>
 > Signed-off-by: Laura Nao <laura.nao@collabora.com>
 
 Reviewed-by: Chen-Yu Tsai <wenst@chromium.org>
