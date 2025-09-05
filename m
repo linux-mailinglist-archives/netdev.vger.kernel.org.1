@@ -1,125 +1,124 @@
-Return-Path: <netdev+bounces-220411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7748CB45E3D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 18:34:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19A06B45E4B
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 18:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4084D16536D
-	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:34:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5828A00B3F
+	for <lists+netdev@lfdr.de>; Fri,  5 Sep 2025 16:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6821E04AD;
-	Fri,  5 Sep 2025 16:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="C2sK3xal"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747A4302168;
+	Fri,  5 Sep 2025 16:37:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B53B20330
-	for <netdev@vger.kernel.org>; Fri,  5 Sep 2025 16:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE6331D72C;
+	Fri,  5 Sep 2025 16:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757090056; cv=none; b=gd+0N+wQFTdRESD0yU0INpdL/hxR7L89kxqQ9sfGDjin6DmGOmRPRAZAFxOTdYLYQJFpK7AvSDLGX3WV5h9MFhFluAjV2qqXedzcXA4TvW+5PY1e3XWV+aP87FRFreSUe0MZFnpJFASuTdxnB7aNkDyobrspWksEdyObD5XKQEQ=
+	t=1757090223; cv=none; b=aGGQKseBgi8s+m0fJDBNWmOH0Ir3yn7dzZzqdPkQDJx7omEqS/0MtgTNhwlxSXzxb4eguwZSbMQJidWCcDHiLRM3TAO1ts6FP+BGNm3D7H2q1OxZhXvGlDt/JehBSnTcdp4nUXGNydt1Lpuc9HQc4kHqtsD+Yd/zGMfKYk4AKok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757090056; c=relaxed/simple;
-	bh=Iv6aI5AzC31p+XrPz0ld1Occ0bFRpR3eJKdtMzf1WQk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bUCw0dZWm76HxehtgMZOlDoOC6urG35MgMBa14Zmo/CPLaz6wUHB/fII/V8PoHy0glJWKOQOlhzhXj1MTUKpgo96ux7TxOwiAgiNZzw8/JxxbQ//BTjYzs50id0kUyd3AorE6jOEtmJUW2D6sW7u0vR90oLxQaEpqkgW3zyZrcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=C2sK3xal; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 585FEjjX032086;
-	Fri, 5 Sep 2025 16:34:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=EjnP/wLtNKnoRkE2dW6KYbn19Aftv
-	XuU6y9eFs6HBsw=; b=C2sK3xalTcU8RNI1t6fwMjeUk/FQ/P1cmPRY5hMzOwsl1
-	TYBLNEGlW7rCvTDIZF9KAI70n8r50q0CW2Isv860xEXfSVWVppgQtzdHPuIUeOHe
-	/a/hN0nwCYbkAzPKO9elc4WWN4+rAQs069fUulLTkxCQB/g+orn08Iu7wkHBfMM2
-	T3Sxgz5LpEx1qhy9ITzDeykFStLJ06QftyXYKBKGYdPNRuFPW01WGT6rAGWOzOx3
-	aNTu5g3D9F5pEOcfB4hm4fAMEeDTbQbc5xqOQeBrlYwEgEkAPsaEPpndzXqwc2WZ
-	oVmxNbaDFHHXY4KP9Qkiq+olxf8VB+imWKcaWonWQ==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4902b2g58c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 05 Sep 2025 16:34:00 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 585FT74P031776;
-	Fri, 5 Sep 2025 16:34:00 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqrkewnf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 05 Sep 2025 16:34:00 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 585GXxcf026328;
-	Fri, 5 Sep 2025 16:33:59 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48uqrkewm0-1;
-	Fri, 05 Sep 2025 16:33:59 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] ixgbe: fix typo in function comment for ixgbe_get_num_per_func()
-Date: Fri,  5 Sep 2025 09:33:49 -0700
-Message-ID: <20250905163353.3031910-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1757090223; c=relaxed/simple;
+	bh=WMWV/zs7VqRch5M/3X1/0RlFh3MfGA58RBWGgbiM7Cw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qUQAuOGbtqe9J1M4unug97MwwHw/s465e6JvlTxceoGlDzqoQyYr5N8pStj9OyIpY71tFKGWMzG9FjPu/5ZlD5SLE/NI2GRnTTyr6Y8MbVZOaQqELkAvsIDkS8RutFhIDfEOQ5LCVDw9rMIiEJbQqgGmJ7Q9fFOTlu108Zmbpcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.106] (unknown [114.241.87.235])
+	by APP-05 (Coremail) with SMTP id zQCowAAHqRJZEbtoxoHZAA--.36388S2;
+	Sat, 06 Sep 2025 00:35:37 +0800 (CST)
+Message-ID: <45053235-3b01-42d8-98aa-042681104d11@iscas.ac.cn>
+Date: Sat, 6 Sep 2025 00:35:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-05_05,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- suspectscore=0 malwarescore=0 spamscore=0 mlxscore=0 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509050163
-X-Proofpoint-GUID: HXDJ9ygbnRIbqfJjUMWx-91wpIC5VhA_
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA1MDE1MCBTYWx0ZWRfX4PgtjIxiocoI
- sA7+wNutzvl/2wYa4dLohoL3ngev2iVPy2EAlssPhaR4CO3gW9Dl35HCEV7yeKLXidriA86K0mk
- 7vlf7mVWPcxZ2GDHpvFt9v9P3z7GVP89VWgrv5onWdRiyrrxDuW9fEofRxcyzx4CDSpR/Mcwk4I
- I9Svia0ZMG1P6sZZH6Dd8v0i3m/P4wTUDIJeB80r4SIIQN2+DxDXBvbEl11sMLTQByiC7FV11w0
- Hm4pubFBstLMtZK3IwYPEE2YCc1XcN+jtMB1Fs9sNpos255wik2vH01X455tM8jyJOktVfIPGS2
- vnyJ+R8LAx60/FD+rRtticbkLdJBG7q55VYqO7UqatXcHE6E/20GpDSl0wJNEZd59bLMvSHZBTI
- Ts38PAW0PEMV2MQk79ZsOUlDAWHWrA==
-X-Authority-Analysis: v=2.4 cv=X8lSKHTe c=1 sm=1 tr=0 ts=68bb10f9 b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=BqwlVtyWRyGNvs_enycA:9 cc=ntf
- awl=host:12069
-X-Proofpoint-ORIG-GUID: HXDJ9ygbnRIbqfJjUMWx-91wpIC5VhA_
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Junhui Liu <junhui.liu@pigmoral.tech>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>, Vivian Wang <uwu@dram.page>
+References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
+ <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
+ <20250905153500.GH553991@horms.kernel.org>
+ <0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
+ <20250905160158.GI553991@horms.kernel.org>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20250905160158.GI553991@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:zQCowAAHqRJZEbtoxoHZAA--.36388S2
+X-Coremail-Antispam: 1UD129KBjvJXoWruFW5Ary5JFW7Wr13trW8WFg_yoW8Jr4fpa
+	y8Ka1qyF4Ut347JrWDX397Ar92yFn3JrW3Xrn3WayYgas0yr13t34xtrWjkw1DCrWF9w40
+	va1jqr9FgFW5WFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvvb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
+	c7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
+	IFyTuYvjxUvaZXDUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-Correct a typo in the comment where "PH" was used instead of "PF".
-The function returns the number of resources per PF or 0 if no PFs
-are available.
+On 9/6/25 00:01, Simon Horman wrote:
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On Fri, Sep 05, 2025 at 11:45:29PM +0800, Vivian Wang wrote:
+>
+> ...
+>
+> Hi Vivian,
+>
+>>>> +		status = emac_rx_frame_status(priv, rx_desc);
+>>>> +		if (unlikely(status == RX_FRAME_DISCARD)) {
+>>>> +			ndev->stats.rx_dropped++;
+>>> As per the comment in struct net-device,
+>>> ndev->stats should not be used in modern drivers.
+>>>
+>>> Probably you want to implement NETDEV_PCPU_STAT_TSTATS.
+>>>
+>>> Sorry for not mentioning this in an earlier review of
+>>> stats in this driver.
+>>>
+>> On a closer look, these counters in ndev->stats seems to be redundant
+>> with the hardware-tracked statistics, so maybe I should just not bother
+>> with updating ndev->stats. Does that make sense?
+> For rx/tx packets/bytes I think that makes sense.
+> But what about rx/tx drops?
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index bfeef5b0b99d..aed8b30db2d5 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -774,7 +774,7 @@ static void ixgbe_parse_vf_func_caps(struct ixgbe_hw *hw,
-  * from parsing capabilities and use this to calculate the number of resources
-  * per PF based on the max value passed in.
-  *
-- * Return: the number of resources per PF or 0, if no PH are available.
-+ * Return: the number of resources per PF or 0, if no PFs are available.
-  */
- static u32 ixgbe_get_num_per_func(struct ixgbe_hw *hw, u32 max)
- {
--- 
-2.50.1
+Right... but tstats doesn't have *_dropped. It seems that tx_dropped and
+rx_dropped are considered "slow path" for real devices. It makes sense
+to me that those should be very rare.
+
+So it seems that what I should do is to just track tx_dropped and
+rx_dropped myself in a member in emac_priv and report in the
+ndo_get_stats64 callback, and use the hardware stuff for the rest, as
+implemented now.
+
+Vivian "dramforever" Wang
 
 
