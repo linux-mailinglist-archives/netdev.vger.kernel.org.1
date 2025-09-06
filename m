@@ -1,96 +1,129 @@
-Return-Path: <netdev+bounces-220579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5EBEB46CF2
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 14:41:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EC0EB46D75
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 15:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DE1F583549
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 12:41:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301E317C818
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 13:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53EE29B789;
-	Sat,  6 Sep 2025 12:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7882ED85F;
+	Sat,  6 Sep 2025 12:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQ42NY5Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2141078F
-	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 12:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9442E2EBDCF;
+	Sat,  6 Sep 2025 12:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757162465; cv=none; b=TnUhgw8o1IaYQrtaNhsjxwdKkj97GBtIilEzFOwlQigzxw02SaPzkCqQtpyiVbrYEFF5CQUkRUHqdFBzgtS70HGpPBosluFCkR4nf+hM0tkiqNLbSto0NSEiZVEMJbzLvXUDzRk0BFNBOvPoQvXpdclompBmdnwreIE/P88ZtWE=
+	t=1757163597; cv=none; b=ts9sRZO+xjKbrbxg3yVV3H9lTg7guUTWwKWgQRQxmQDi0UroiCUiOwDcfDNsS+X4JyeX9H4HlaoKfYG8Vq0L2rY/Zw6GmjUaMv+petuZpQDrlLRPjwsmLpGLmlVQU4rdb6F1NmhPfY0n/Ijf7gN6TDazPowMuSLYIHGxAKCIMOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757162465; c=relaxed/simple;
-	bh=U7G7G+aVkZB2v3V/zUCuzgGGvDKqhdtnY8WhOjRRook=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=tAbCyjU++whlohI4/2GdLVXqSiU/fwlgVXK/HIVznl45JGfY5IUx6QTxvVjN6nJPjDx3g7AUw7qPZSK5uqPKeoFnQmz2RGcHNCCPIyCunqAwK6CRLPFoDVowMQQ1XyCYrtpsWEOBT1amT6s5nBqCmpNgeFKx9A4ilX+7YioRAJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3f2b8187ec9so76941865ab.0
-        for <netdev@vger.kernel.org>; Sat, 06 Sep 2025 05:41:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757162463; x=1757767263;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iEKjptd+e9tTMEG8g0kTtT0/no/OlP4s8sHfIK6Y4+Y=;
-        b=HNVBf+MsYPe/e5fR5jwzQCBLZE7Z2DylSo/ZXiDamg/s/4Cn+n3uE9Hm9UdPUnOiGY
-         vzXnvHgC1u9KPhjqvxBalIGdHMjxuLXFB+9vwbuIXMSP4HvcaK6CwZtZcnwMcwaq7u2r
-         5+cQpg+qZpcSo9rdjglGh1awccZ+TqrBobwyl6hLz/CRSHVc5sLWtP/FxtLKzQwViY1c
-         mj9DPohzBRQmD/C0naooOGdpbUTlrXW1ruFxnibYCH2L9v4Z6fgetR1O6dFq12/6bL6T
-         8daHRBLgNiriHs/k1oL0zkJhNOMmYJt8K7WlzExe/pHyRR9snUxHRAnz+UeOQXrcZMVp
-         Y0Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6EJx13F3nOYCd/nNnVbtskTJ5QwunOGoDNWL9+yKrezGAjXRx82mRAXkmXXVQhHQ49Q9bXKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEJ2H/VW0UKtv9hg+HRMmXO/t6I9rkzhkxVqZz7x+xN/6jV9db
-	KjVYQ06NkydRvrVfkWElVDfHKQJLb6/HZoqNxw94fMhOZUeR8LqQFULOvTmMaJRfQT5K6JnURph
-	vdZU+QZpfuNQU0HkkgQRUIbf8UfID4L98s5NL2pWBRcAMo6eVsSpMnY6W8RA=
-X-Google-Smtp-Source: AGHT+IHxNVzyRSZvKDEdGlmnC8rBo6tj0A527j9A7QqwnVmZRh2c1L2jvTp4bM80v+o6jg5YbDExuc8bKDS+cnBSnKi+t5QY9sHX
+	s=arc-20240116; t=1757163597; c=relaxed/simple;
+	bh=dPHHOFQzeKso8XCobbIJUr1GuQ9B1WljENCofqy1yaw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q2koswFrLizRsZqulq+8sAQTWnJSr4Xqouz+cu3fGT7MJ27k4M0Q0HNXsd70y5ro6FKZg3vjQFog9eV9ojnZgEqyRUBHfB3REH6h39qbRqKNMtxQYlIWvvCJDWMpyo/eajuL1ZTGADf3otPewawYPkzayZllAsJBmMGBuXkAq7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQ42NY5Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 653A7C4CEE7;
+	Sat,  6 Sep 2025 12:59:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757163597;
+	bh=dPHHOFQzeKso8XCobbIJUr1GuQ9B1WljENCofqy1yaw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IQ42NY5YOLr866fPj4gplhFU0OKJtYXQK/5LeA0b6dCBzavnIfnD690vR/GlmVRnC
+	 x6eb9GxIoDOQRVtWmXnDGbbS5FHK+NwZsy7bwUV6Jzn4PIBBGnGHLHNAKIehAyiso3
+	 MpH5y7QAedUSEVTkD+HqQA6eT+DoYRAYHpTPuJVUrOQP5aU5y+9enxuyX/Egf+UuJr
+	 oPjqBzejdXTApHYDAyLFhBRQJiTZuuRukAwiBL6vyM0a1TAyaXfsLHPhhNimQZvi1z
+	 dTwV6rh7UZz1yxW2drXenpFAVfgFeFUpFpJyCLXNuY3uo2e3DSHhju52hIjfWmjqaX
+	 d8ZZkrEa6MDrw==
+Message-ID: <83f2156f-83d8-4b41-84a2-64ea0a9908f4@kernel.org>
+Date: Sat, 6 Sep 2025 14:59:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:451a:b0:3fe:f1f4:77b2 with SMTP id
- e9e14a558f8ab-3fef1f4788emr15491265ab.5.1757162463379; Sat, 06 Sep 2025
- 05:41:03 -0700 (PDT)
-Date: Sat, 06 Sep 2025 05:41:03 -0700
-In-Reply-To: <683d677f.a00a0220.d8eae.004b.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68bc2bdf.050a0220.192772.01ac.GAE@google.com>
-Subject: Re: [syzbot] [net?] possible deadlock in __netdev_update_features
-From: syzbot <syzbot+7e0f89fb6cae5d002de0@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, andrew@lunn.ch, davem@davemloft.net, 
-	ecree.xilinx@gmail.com, edumazet@google.com, gal@nvidia.com, horms@kernel.org, 
-	jiri@resnulli.us, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me, shuah@kernel.org, 
-	stfomichev@gmail.com, syzkaller-bugs@googlegroups.com, tariqt@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v2 net-next 5/9] mptcp: snmp: do not use SNMP_MIB_SENTINEL
+ anymore
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Jamie Bainbridge <jamie.bainbridge@gmail.com>,
+ Abhishek Rawal <rawal.abhishek92@gmail.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, MPTCP Linux <mptcp@lists.linux.dev>
+References: <20250905165813.1470708-1-edumazet@google.com>
+ <20250905165813.1470708-6-edumazet@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Content-Language: en-GB, fr-BE
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250905165813.1470708-6-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+Hi Eric,
 
-commit f792709e0baad67224180d73d51c2f090003adde
-Author: Stanislav Fomichev <stfomichev@gmail.com>
-Date:   Fri May 16 23:22:05 2025 +0000
+On 05/09/2025 18:58, Eric Dumazet wrote:
+> Use ARRAY_SIZE(), so that we know the limit at compile time.
 
-    selftests: net: validate team flags propagation
+Thank you for having done this modification in MPTCP as well!
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16a3ba42580000
-start commit:   d69eb204c255 Merge tag 'net-6.17-rc5' of git://git.kernel...
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=15a3ba42580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=11a3ba42580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9c302bcfb26a48af
-dashboard link: https://syzkaller.appspot.com/bug?extid=7e0f89fb6cae5d002de0
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12942962580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16942962580000
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-Reported-by: syzbot+7e0f89fb6cae5d002de0@syzkaller.appspotmail.com
-Fixes: f792709e0baa ("selftests: net: validate team flags propagation")
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
