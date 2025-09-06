@@ -1,190 +1,160 @@
-Return-Path: <netdev+bounces-220618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B452B476DF
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:22:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE3DB476E6
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E40647A55B1
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 19:20:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E02A1B20956
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 19:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3456B288505;
-	Sat,  6 Sep 2025 19:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB756287504;
+	Sat,  6 Sep 2025 19:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PMP6Bquu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pIcqwMkw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DC62550A4;
-	Sat,  6 Sep 2025 19:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36921A76B1;
+	Sat,  6 Sep 2025 19:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757186543; cv=none; b=Gc8ZxyGCQETJqQlq43sEXAMFIuhNk9FjD4kTrFQGg8QnqmlwlMuINgPdkGIjX/6nr7p0zypfbjcU5JUxez2komEWHiCH+lEmSao2xMyTL0tgKJmMwBUR917wc7Lg6ubYILZBY1KpN7mNaT4OOmqWQfY3RyX1F8jAeClIyjznr14=
+	t=1757186980; cv=none; b=kq68AlheaQmgqCGpS/dk5pyvzA12yAKzKhOwECIa0OSESOG/thI/bTy/4UZ3LRXmfYOqPb+5qCH9SMDAeEbZwMJhKhZ6NQ7eNEYQJfMdnm9MdIlBpcefS8BBu8pmyXM9JMUTY66J9jM//fOSFiynRdbagvQl0uGKYclhZvtywtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757186543; c=relaxed/simple;
-	bh=PG93cAu1Xu9wl1cfjEqbuP7XLKHbpHXEiceV7SE9Rww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PjqEGbvoUZGP86CnSeRMXBh4dQkzjGe5jJdTfSnryQ2RHHQgFX2ogm7r/6dsTXPubA9YAwBIWuLCs6DpMg4s/CcjFtpKEm5E6xu20zjYUoePvJMkCm6KebgxU+ZtOEf0RlmE/RLKb3WWzBrWlaDShWG5SJPQXUDENMLf0Z9p8qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PMP6Bquu; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757186541; x=1788722541;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PG93cAu1Xu9wl1cfjEqbuP7XLKHbpHXEiceV7SE9Rww=;
-  b=PMP6BquuEU7aP5pBrG8g1S/uAdqPqJ82g17MEutacbHue82sqYpKuIXi
-   wRVnBntvFNOvFfFUoAlITg7tyIFQ3oourMMTcwvQk/XzZ0e6dah1hJ9tZ
-   VKvyLHXbiX3vD/8eh+JWYnJdOJnRU7Xwof/UEzVfZQQq7WMQwup4CqwbZ
-   CX05Ew0Uhca5YhZsiJrhD1q/lqnNfFA5ro16n2cHe4lKADjo/6469snt1
-   +4Pl3XtykLttCQbbS9zDlhe+6/9BENe1b1gmobSHzmB1Dz1Rht7E+0P2q
-   vPUGEjnQvkGjU6sYbTpsOwveSj1XeROupf87d1PgIE195rYPE0YpwP1mN
-   A==;
-X-CSE-ConnectionGUID: R1MpYRzATiiQQM6nafVB9g==
-X-CSE-MsgGUID: dKHaX/AiSKSYx794eJIoFg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11545"; a="77115273"
-X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
-   d="scan'208";a="77115273"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 12:22:20 -0700
-X-CSE-ConnectionGUID: wWzejtnrRHipVevferClww==
-X-CSE-MsgGUID: e1d9xfwOTeSfjAI16doFWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
-   d="scan'208";a="196090478"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 06 Sep 2025 12:22:17 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uuyUJ-0001l1-0m;
-	Sat, 06 Sep 2025 19:22:15 +0000
-Date: Sun, 7 Sep 2025 03:21:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Kamlesh Gurudasani <kamlesh@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/4] crypto: ti: Add support for AES-CCM in DTHEv2 driver
-Message-ID: <202509070251.7MfOWGUB-lkp@intel.com>
-References: <20250905133504.2348972-8-t-pratham@ti.com>
+	s=arc-20240116; t=1757186980; c=relaxed/simple;
+	bh=oofUon7TKCp2rF2DC7eS4zrof2y9W5dAO3wKX4EvhrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eZ0QAFPoJmMsp3Yi4HUzIHLR6UXbiYQY6JwVjGgba2BqBezqlHDMF/t0elcxNmNPmJCx3IHoBaSQPFWJ1j+Hn7+wrjhzfzk/4075DW9JdW1WGRo59bnwJey1af4PLVGf1Zf12rLmK7DVa2CreQGV6CrCFqMm0IvjC/SyMxU78FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pIcqwMkw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF204C4CEE7;
+	Sat,  6 Sep 2025 19:29:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757186980;
+	bh=oofUon7TKCp2rF2DC7eS4zrof2y9W5dAO3wKX4EvhrM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pIcqwMkw5k9xWSuHn9pDlEmINSW4q4DYjjt2ItSD4v7Yz8NS+it5MtLNlarDproTL
+	 uw1+5iKlQ2Zd5fWR8fvHjkFZB2hy8N2MArY3Zmb9qN4WjkOVQuSP6tWqaACMLNcLOy
+	 KYHtg0muWAuD9cxgjjTFq/zg/Y7g5ZapXHEEqjA3zRW8YL6VnqnUvuCp2BkGLlmdYu
+	 Si4Z6Z6s5MHdErLB6YusEAtXiwOPa1xnlDrXbATmDK8XJwhM0o2NI0ZH97nXUVcKox
+	 awX5AG8E8SnsDyYXr4b/BxpjNLEaecsZOe11AataWHNdgbHMKvJwauyUqPtCc/hzC8
+	 7g2EIM/4bU1+Q==
+Date: Sat, 6 Sep 2025 12:29:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
+ <ast@fiberby.net>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Simon Horman
+ <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 06/11] tools: ynl-gen: don't validate nested
+ array attribute types
+Message-ID: <20250906122938.30566de3@kernel.org>
+In-Reply-To: <0a9a7c41-7deb-4078-8cc9-aee8f8784443@fiberby.net>
+References: <20250904-wg-ynl-prep@fiberby.net>
+	<20250904220156.1006541-6-ast@fiberby.net>
+	<20250905172334.0411e05e@kernel.org>
+	<0a9a7c41-7deb-4078-8cc9-aee8f8784443@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250905133504.2348972-8-t-pratham@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Pratham,
+On Sat, 6 Sep 2025 13:22:01 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
+> > I don't understand, please provide more details.
+> > This is an ArrayNest, right?
+> >=20
+> > [ARRAY-ATTR]
+> >    [ENTRY]
+> >      [MEMBER1]
+> >      [MEMBER2]
+> >    [ENTRY]
+> >      [MEMBER1]
+> >      [MEMBER2]
+> >=20
+> > Which level are you saying doesn't matter?
+> > If entry is a nest it must be a valid nest.
+> > What the comment you're quoting is saying is that the nla_type of ENTRY
+> > doesn't matter. =20
+>=20
+> I will expand this in v2, but the gist of it is that this is part of the
+> "split attribute counting, and later allocating an array to hold them" co=
+de.
+>=20
+> The check that I remove for nested arrays, is an early exit during the
+> counting phase. Later in the allocation and parse phase it validates the
+> nested payload.
+>=20
+> In include/uapi/linux/wireguard.h:
+>  > WGDEVICE_A_PEERS: NLA_NESTED
+>  >   0: NLA_NESTED
+>  >     WGPEER_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
+>  >     [..]
+>  >   0: NLA_NESTED
+>  >     ...
+>  >   ... =20
+>=20
+> The current check requires that the nested type is valid in the nested
+> attribute set, which in this case resolves to WGDEVICE_A_UNSPEC, which is
+> YNL_PT_REJECT, and it takes the early exit and returns YNL_PARSE_CB_ERROR.
 
-kernel test robot noticed the following build warnings:
+I see your point now. We're validating ENTRY as an attribute in the
+parent attribute set, but it's just a meaningless id.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on next-20250905]
-[cannot apply to herbert-crypto-2.6/master linus/master v6.17-rc4]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I think we need more fixing here. The real parsing loop will only
+validate what's _inside_ the [MEMBER]. Which doesn't matter all
+that much to nests, but look at what happens if subtype is a scalar.
+We'll just call ynl_attr_get_u32(), type is never really validate.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/crypto-ti-Add-support-for-AES-XTS-in-DTHEv2-driver/20250905-214245
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20250905133504.2348972-8-t-pratham%40ti.com
-patch subject: [PATCH 4/4] crypto: ti: Add support for AES-CCM in DTHEv2 driver
-config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20250907/202509070251.7MfOWGUB-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250907/202509070251.7MfOWGUB-lkp@intel.com/reproduce)
+I think we need this, and make the codegen feed in the ARRAY-ATTR type
+to validate ENTRY?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509070251.7MfOWGUB-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/crypto/ti/dthev2-aes.c:818:7: warning: variable 'unpadded_cryptlen' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     818 |                 if (!dst) {
-         |                     ^~~~
-   drivers/crypto/ti/dthev2-aes.c:962:6: note: uninitialized use occurs here
-     962 |         if (unpadded_cryptlen % AES_BLOCK_SIZE)
-         |             ^~~~~~~~~~~~~~~~~
-   drivers/crypto/ti/dthev2-aes.c:818:3: note: remove the 'if' if its condition is always false
-     818 |                 if (!dst) {
-         |                 ^~~~~~~~~~~
-     819 |                         ret = -ENOMEM;
-         |                         ~~~~~~~~~~~~~~
-     820 |                         goto aead_prep_dst_err;
-         |                         ~~~~~~~~~~~~~~~~~~~~~~~
-     821 |                 }
-         |                 ~
-   drivers/crypto/ti/dthev2-aes.c:779:32: note: initialize the variable 'unpadded_cryptlen' to silence this warning
-     779 |         unsigned int unpadded_cryptlen;
-         |                                       ^
-         |                                        = 0
->> drivers/crypto/ti/dthev2-aes.c:995:49: warning: result of comparison of constant 2305843009213693951 with expression of type 'unsigned int' is always false [-Wtautological-constant-out-of-range-compare]
-     995 |             (ctx->aes_mode == DTHE_AES_CCM && cryptlen > DTHE_AES_CCM_CRYPT_MAXLEN)) {
-         |                                               ~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~
-   2 warnings generated.
-
-
-vim +995 drivers/crypto/ti/dthev2-aes.c
-
-   973	
-   974	static int dthe_aead_crypt(struct aead_request *req)
-   975	{
-   976		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
-   977		struct dthe_aes_req_ctx *rctx = aead_request_ctx(req);
-   978		struct dthe_data *dev_data = dthe_get_dev(ctx);
-   979		struct crypto_engine *engine;
-   980		unsigned int cryptlen = req->cryptlen;
-   981	
-   982		// In decryption, last authsize bytes are the TAG
-   983		if (!rctx->enc)
-   984			cryptlen -= ctx->authsize;
-   985	
-   986		/* Need to fallback to software in the following cases due to HW restrictions:
-   987		 * - Both AAD and plaintext/ciphertext are zero length
-   988		 * - For AES-GCM, AAD length is more than 2^32 - 1 bytes
-   989		 * - For AES-CCM, AAD length is more than 2^16 - 2^8 bytes
-   990		 * - For AES-CCM, ciphertext length is more than 2^61 - 1 bytes
-   991		 */
-   992		if ((req->assoclen == 0 && cryptlen == 0) ||
-   993		    (ctx->aes_mode == DTHE_AES_GCM && req->assoclen > DTHE_AES_GCM_AAD_MAXLEN) ||
-   994		    (ctx->aes_mode == DTHE_AES_CCM && req->assoclen > DTHE_AES_CCM_AAD_MAXLEN) ||
- > 995		    (ctx->aes_mode == DTHE_AES_CCM && cryptlen > DTHE_AES_CCM_CRYPT_MAXLEN)) {
-   996			struct aead_request *subreq = &rctx->fb_req;
-   997			int ret;
-   998	
-   999			aead_request_set_tfm(subreq, ctx->aead_fb);
-  1000			aead_request_set_callback(subreq, req->base.flags,
-  1001						  req->base.complete, req->base.data);
-  1002			aead_request_set_crypt(subreq, req->src, req->dst,
-  1003					       req->cryptlen, req->iv);
-  1004			aead_request_set_ad(subreq, req->assoclen);
-  1005	
-  1006			ret = rctx->enc ? crypto_aead_encrypt(subreq) :
-  1007				crypto_aead_decrypt(subreq);
-  1008	
-  1009			return ret;
-  1010		}
-  1011	
-  1012		engine = dev_data->engine;
-  1013		return crypto_transfer_aead_request_to_engine(engine, req);
-  1014	}
-  1015	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
+index 2a169c3c0797..e43167398c69 100644
+--- a/tools/net/ynl/lib/ynl.c
++++ b/tools/net/ynl/lib/ynl.c
+@@ -360,15 +360,15 @@ static int ynl_cb_done(const struct nlmsghdr *nlh, st=
+ruct ynl_parse_arg *yarg)
+=20
+ /* Attribute validation */
+=20
+-int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *att=
+r)
++int __ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *a=
+ttr,
++			unsigned int type)
+ {
+ 	const struct ynl_policy_attr *policy;
+-	unsigned int type, len;
+ 	unsigned char *data;
++	unsigned int len;
+=20
+ 	data =3D ynl_attr_data(attr);
+ 	len =3D ynl_attr_data_len(attr);
+-	type =3D ynl_attr_type(attr);
+ 	if (type > yarg->rsp_policy->max_attr) {
+ 		yerr(yarg->ys, YNL_ERROR_INTERNAL,
+ 		     "Internal error, validating unknown attribute");
+@@ -450,6 +450,11 @@ int ynl_attr_validate(struct ynl_parse_arg *yarg, cons=
+t struct nlattr *attr)
+ 	return 0;
+ }
+=20
++int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *att=
+r)
++{
++	return __ynl_attr_validate(yarg, attr, ynl_attr_type(attr));
++}
++
+ int ynl_submsg_failed(struct ynl_parse_arg *yarg, const char *field_name,
+ 		      const char *sel_name)
+ {
 
