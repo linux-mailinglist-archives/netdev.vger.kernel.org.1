@@ -1,63 +1,87 @@
-Return-Path: <netdev+bounces-220568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92835B469AA
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 08:58:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 773D5B469A7
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 08:58:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D88E1CC63A1
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 06:58:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D42C47B7BD3
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 06:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61DF2D0274;
-	Sat,  6 Sep 2025 06:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416EC2C2346;
+	Sat,  6 Sep 2025 06:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TNH2RsmK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IFSh2Efd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334202C324C
-	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 06:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E4C21CFFD
+	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 06:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757141871; cv=none; b=s+KCgg8/AoF1qL3h3MWNxOoc7MAo1Eq6Z1KKV5P85IGAtjK0ClcvvaVOvvaVdsY62GiiFyTdqotZvopXlBMI+zvNn9Y084SSfjVXk+hHa2IvFTbU2eMdfgP6GxEsd7aEaYxzk3XhN455TYNh6CR/8jpuqKW608AA4l2xPuz1bHs=
+	t=1757141869; cv=none; b=fh39WUxoAZhYLtZcFgj123nK81AeAkd68b2gwbXDtNotjQj11Mm80ap4UjSRTnLDgtmr2MENKIx1xVYwrOpHmT5vQ4i9r1dqQCsybxvhKHnCMbtajIiAJVUBOvT23m26RSwx0rJNL0AHUFOq5TkamCeczkTxskPHvH9De2hUmoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757141871; c=relaxed/simple;
-	bh=ZdjKkfJoHiNakSwH8vDlKRd1pmuPHtWQLHwJ3ze4QIM=;
+	s=arc-20240116; t=1757141869; c=relaxed/simple;
+	bh=pNvwgSKVbeXKD3LSnOw6y6WMf26i8ENFj6GcKsQPGIc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N0pjey9dpwNo4wDfn38wXeV5/C5eKz0rC/xPXFz8pIPy2LbqOSmdneBTE0TniOpmcreciJ9atZnw93KP/xCuuF3DJnOigdpGHSe7slNX8jJG/4Jc8XHIrq0x4/lXMoonBgouD7zYxoupUPv4AaFBL7owflsPVYixFF8fhYhP7Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TNH2RsmK; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=cxJBLL2CDPD3AUiMTB0SIb2OQbwUNzwXHUea/Jxb3C4WCcAthTQnSs2BN+UZCCWbwUgDl0SlWMzY7SzJWw2UuuBIkBs1rFSA7hjYbVmsm7NN52KNwUzPyECA50g1k/pXpfrl2B4b3PVDKzLLcwXMOgG056FbOLE8HGzAxV61Vcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IFSh2Efd; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757141869;
+	s=mimecast20190719; t=1757141864;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AMjDlR0sGCSb1S5XkqRhY0gCtJvKgV/eSaD7F6oVPO0=;
-	b=TNH2RsmKgnzQCBCzyRMlSz2yuk10Gp38IAmW4PpmhMn5L+4bTOcXPqNkrDrVPDxZWO4Nwl
-	Izq9xCsb71CKzpiAg9e9vAD6k4k5yWT9P25Pks+h/Ro7cs8rgK5rYfJTE16fr7Y7W62TUg
-	YDIz4620DUM1XciffpRuA0zhguURnKM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-301-DJjOIiObODGWwQ0SudJ6NQ-1; Sat,
- 06 Sep 2025 02:57:46 -0400
-X-MC-Unique: DJjOIiObODGWwQ0SudJ6NQ-1
-X-Mimecast-MFC-AGG-ID: DJjOIiObODGWwQ0SudJ6NQ_1757141864
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9B57119560B2;
-	Sat,  6 Sep 2025 06:57:43 +0000 (UTC)
-Received: from [10.45.224.31] (unknown [10.45.224.31])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 630641955F24;
-	Sat,  6 Sep 2025 06:57:39 +0000 (UTC)
-Message-ID: <2948c2d9-1600-444d-89c9-c129ddfba109@redhat.com>
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CCJs31gS3SmY6gT03ZW9SqmlSjC26seB+xyCx6US3Ag=;
+	b=IFSh2EfdGppfeq4GeY0J0xB4q5d+wOrOayF6sliBVxyG0sBcnqW4rqxOEex1cj20LfDUE8
+	MrcNNxqEG3zmXnDH272aQRj88zOViWoHuQiSxnLVY509ZoAVY3K1KNoLpyvjrSojHXkq/f
+	utwStpE1CxZm84wkN2m4Qd2kzU1WU7s=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-164-ctwHnvTQNbCG1l4eZxueSw-1; Sat, 06 Sep 2025 02:57:43 -0400
+X-MC-Unique: ctwHnvTQNbCG1l4eZxueSw-1
+X-Mimecast-MFC-AGG-ID: ctwHnvTQNbCG1l4eZxueSw_1757141862
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45b99c18484so12069805e9.1
+        for <netdev@vger.kernel.org>; Fri, 05 Sep 2025 23:57:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757141862; x=1757746662;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CCJs31gS3SmY6gT03ZW9SqmlSjC26seB+xyCx6US3Ag=;
+        b=qHDYURyn0xDZXZ22l05S/GkK3lwGvPGWGNqVT4pfXmcBiBXqrzNVDOz/OcYeHJ8AOK
+         n2xpjd80ZZZ/2rOs2VRl0AOqGfEszq8QIE1M5h5hc23pH+7oC5zW/+k2xsLsvEsFraox
+         fxRF0sNkUMDBGmXphbFugDjyMbAfeV9k6JLdFHFd1bTX8ikQGUSqBd/JeOZk9Srh6wTt
+         12DJxb7aUWpmp+7nWxKtztqlImGmith+Z1YQclx8+T3rNFV7Sja4GWpf7kSJtOvueCrE
+         k4+W3n9wxQfYxzjdWerZVHXAnocSHtV9vtilcoQRMhpCH2/3HaCunvvHw87FgyizRuOi
+         D2iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWByVl22aacr2XZWAWRhAfoCyHmajerjk0OWqFkNXP0uRR6o3rO6eQCKXRmfzQn5LWye16tbcI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFBayLa5sNRePSBkoMSOwo9o9HxBYYLbil9dEzf0zZiI/TMBqo
+	zuCrrL6bTIIeWWAbUaXdCsvgc55mxWzsCGzh8WcGla5/gyR6Ty2pcWBiD2p57IoSNOtW2OMPiw3
+	n9yhDo6+fXKuq2rVOiA9Mxpp83ckIMgyrwdlotXpffo00ZmegkciDI0dn7w==
+X-Gm-Gg: ASbGnctHCYhP9SyF6nJbuWCPocm1FUMWixPRpbqQYScLgduuy40JEACpOV6beThigYv
+	UI7OkR89fVTmvkOWGmvAq7D6VCQ2hy8dQrEVkGlQv1wL2pmzntw/N69suBiEu+o51PhvAdT7/7f
+	BfCizz+QDoIgk3deYITBtOfeLpjkFGYVpJAGbzSIifwlosc3qFFkmnvXXHDg4rGkISNFHQuMWcT
+	xbJG7eSGOL6UJUM+JUvxVpTulLnAWNYBoo+HNfeep+jXMLyJqz/CJgMPapIMXW45yabCmxlYSIa
+	KW4tT7NZr1soxPczMOpUZ5wKxhwdIy4gQAXxmCLF1ocIy77QsA65JQDGWpgcsXKge2rAYeJtYY5
+	7yemDNcchS4M0ZVtkGxtiVePPbjRVlRJ0ECDG1JWu2YG4qKkG8/nLjvIN+RiMA9LT2o0=
+X-Received: by 2002:a05:600c:a43:b0:45d:d944:e763 with SMTP id 5b1f17b1804b1-45dddef8abemr11582635e9.33.1757141861920;
+        Fri, 05 Sep 2025 23:57:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG9de71akgKQMTH3Yad6UmnskyHOcTJBFrvjc1jDcnRZYiXZrAsp4/fGMOazHSvHvTFxb0cMA==
+X-Received: by 2002:a05:600c:a43:b0:45d:d944:e763 with SMTP id 5b1f17b1804b1-45dddef8abemr11582145e9.33.1757141861401;
+        Fri, 05 Sep 2025 23:57:41 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f30:de00:8132:f6dc:cba2:9134? (p200300d82f30de008132f6dccba29134.dip0.t-ipconnect.de. [2003:d8:2f30:de00:8132:f6dc:cba2:9134])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e740369f1esm87090f8f.11.2025.09.05.23.57.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Sep 2025 23:57:40 -0700 (PDT)
+Message-ID: <64fe4c61-f9cc-4a5a-9c33-07bd0f089e94@redhat.com>
 Date: Sat, 6 Sep 2025 08:57:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -66,128 +90,197 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/5] dpll: zl3073x: Add low-level flash
- functions
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- Prathosh Satish <Prathosh.Satish@microchip.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
- Petr Oros <poros@redhat.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20250903100900.8470-1-ivecera@redhat.com>
- <20250903100900.8470-3-ivecera@redhat.com>
- <20250905191905.05476586@kernel.org>
+Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-20-david@redhat.com>
+ <5090355d-546a-4d06-99e1-064354d156b5@redhat.com> <20250905230006.GA1776@sol>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20250905191905.05476586@kernel.org>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <20250905230006.GA1776@sol>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-
-
-On 06. 09. 25 4:19 dop., Jakub Kicinski wrote:
-> On Wed,  3 Sep 2025 12:08:57 +0200 Ivan Vecera wrote:
->> +/**
->> + * zl3073x_flash_download_block - Download image block to device memory
->> + * @zldev: zl3073x device structure
->> + * @image: image to be downloaded
->> + * @start: start position (in 32-bit words)
->> + * @size: size to download (in 32-bit words)
->> + * @extack: netlink extack pointer to report errors
->> + *
->> + * Returns 0 in case of success or negative value otherwise.
->> + */
->> +static int
->> +zl3073x_flash_download(struct zl3073x_dev *zldev, const char *component,
->> +		       u32 addr, const void *data, size_t size,
->> +		       struct netlink_ext_ack *extack)
+On 06.09.25 01:00, Eric Biggers wrote:
+> On Fri, Sep 05, 2025 at 08:41:23AM +0200, David Hildenbrand wrote:
+>> On 01.09.25 17:03, David Hildenbrand wrote:
+>>> We can just cleanup the code by calculating the #refs earlier,
+>>> so we can just inline what remains of record_subpages().
+>>>
+>>> Calculate the number of references/pages ahead of times, and record them
+>>> only once all our tests passed.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>    mm/gup.c | 25 ++++++++-----------------
+>>>    1 file changed, 8 insertions(+), 17 deletions(-)
+>>>
+>>> diff --git a/mm/gup.c b/mm/gup.c
+>>> index c10cd969c1a3b..f0f4d1a68e094 100644
+>>> --- a/mm/gup.c
+>>> +++ b/mm/gup.c
+>>> @@ -484,19 +484,6 @@ static inline void mm_set_has_pinned_flag(struct mm_struct *mm)
+>>>    #ifdef CONFIG_MMU
+>>>    #ifdef CONFIG_HAVE_GUP_FAST
+>>> -static int record_subpages(struct page *page, unsigned long sz,
+>>> -			   unsigned long addr, unsigned long end,
+>>> -			   struct page **pages)
+>>> -{
+>>> -	int nr;
+>>> -
+>>> -	page += (addr & (sz - 1)) >> PAGE_SHIFT;
+>>> -	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
+>>> -		pages[nr] = page++;
+>>> -
+>>> -	return nr;
+>>> -}
+>>> -
+>>>    /**
+>>>     * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
+>>>     * @page:  pointer to page to be grabbed
+>>> @@ -2967,8 +2954,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>>>    	if (pmd_special(orig))
+>>>    		return 0;
+>>> -	page = pmd_page(orig);
+>>> -	refs = record_subpages(page, PMD_SIZE, addr, end, pages + *nr);
+>>> +	refs = (end - addr) >> PAGE_SHIFT;
+>>> +	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+>>>    	folio = try_grab_folio_fast(page, refs, flags);
+>>>    	if (!folio)
+>>> @@ -2989,6 +2976,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>>>    	}
+>>>    	*nr += refs;
+>>> +	for (; refs; refs--)
+>>> +		*(pages++) = page++;
+>>>    	folio_set_referenced(folio);
+>>>    	return 1;
+>>>    }
+>>> @@ -3007,8 +2996,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>>>    	if (pud_special(orig))
+>>>    		return 0;
+>>> -	page = pud_page(orig);
+>>> -	refs = record_subpages(page, PUD_SIZE, addr, end, pages + *nr);
+>>> +	refs = (end - addr) >> PAGE_SHIFT;
+>>> +	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+>>>    	folio = try_grab_folio_fast(page, refs, flags);
+>>>    	if (!folio)
+>>> @@ -3030,6 +3019,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>>>    	}
+>>>    	*nr += refs;
+>>> +	for (; refs; refs--)
+>>> +		*(pages++) = page++;
+>>>    	folio_set_referenced(folio);
+>>>    	return 1;
+>>>    }
+>>
+>> Okay, this code is nasty. We should rework this code to just return the nr and receive a the proper
+>> pages pointer, getting rid of the "*nr" parameter.
+>>
+>> For the time being, the following should do the trick:
+>>
+>> commit bfd07c995814354f6b66c5b6a72e96a7aa9fb73b (HEAD -> nth_page)
+>> Author: David Hildenbrand <david@redhat.com>
+>> Date:   Fri Sep 5 08:38:43 2025 +0200
+>>
+>>      fixup: mm/gup: remove record_subpages()
+>>      pages is not adjusted by the caller, but idnexed by existing *nr.
+>>      Signed-off-by: David Hildenbrand <david@redhat.com>
+>>
+>> diff --git a/mm/gup.c b/mm/gup.c
+>> index 010fe56f6e132..22420f2069ee1 100644
+>> --- a/mm/gup.c
+>> +++ b/mm/gup.c
+>> @@ -2981,6 +2981,7 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>>                  return 0;
+>>          }
+>> +       pages += *nr;
+>>          *nr += refs;
+>>          for (; refs; refs--)
+>>                  *(pages++) = page++;
+>> @@ -3024,6 +3025,7 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+>>                  return 0;
+>>          }
+>> +       pages += *nr;
+>>          *nr += refs;
+>>          for (; refs; refs--)
+>>                  *(pages++) = page++;
 > 
-> function name doesn't match kdoc, and "Returns" -> "Return:"
-> 
-> No idea why the kernel-doc script doesn't catch this..
+> Can this get folded in soon?  This bug is causing crashes in AF_ALG too.
 
-Will fix...
+Andrew immediately dropped the original patch, so it's gone from 
+mm-unstable and should be gone from next soon (today?).
 
->> +		rc = zl3073x_write_hwreg(zldev, addr, *(const u32 *)ptr);
-> 
-> you're sure data is 4B aligned? Otherwise get_unaligned()
+-- 
+Cheers
 
-Yes, this should be always aligned but you are right, using
-get_unaligned() here is the safest.
-
->> +		if (time_after(jiffies, timeout)) {
-> 
-> time_after_jiffies() ?
-
-I miss that macros, thanks for pointing out.
-
-Anyway:
-time_after(jiffies,...) -> time_is_before_jiffies(...)
-
-Will use.
-
->> +			if (signal_pending(current)) {
->> +				ZL_FLASH_ERR_MSG(extack,
->> +						 "Flashing interrupted");
->> +				return -EINTR;
->> +			}
-> 
-> Is the flash dual-banked? Normally random signals interrupting flashing
-> is recipe for bricked parts.
-
-The download is safe operation... During this the driver downloads
-block from host memory to device memory (RAM) and it is safe to break
-this operation. (What should not be interrupted is flash itself (device
-memory to internal flash memory).
-
-> A little odd to use "timeout" for periodic check. check_time?
-
-Will rename.
-
->> +	/* Return if no error occurred */
->> +	if (!count)
->> +		return 0;
-> 
-> Did I already accus^W ask you if AI helped you write this ? :D
-> This level of commenting makes me think of code generators :)
-
-:-D no, I didn't really use AI for code generation :-D
-
-As the zl3073x is the first standalone DPLL driver I tried from the
-start to write well commented code :-) But maybe I overdid it a bit :-)
-
-> +	/* Enable host control */
-> +	rc = zl3073x_flash_host_ctrl_enable(zldev);
-> +	if (rc) {
-> +		ZL_FLASH_ERR_MSG(extack, "cannot enable host control");
-> +		goto error;
-> +	}
-> +
-> +	zl3073x_devlink_flash_notify(zldev, "Flash mode enabled", "utility",
-> +				     0, 0);
-> +
-> +	return 0;
-> +
-> +error:
-> +	rc = zl3073x_flash_mode_leave(zldev, extack);
-> +	if (rc)
-> +		ZL_FLASH_ERR_MSG(extack,
-> +				 "failed to switch back to normal mode");
-> +
-> +	return rc;
-> 
-> Should we be overriding rc here if there was an error on entering
-> but we cleanly left? If so that _is_ worth commenting on..
-
-Oops, this is an error, we should not override final rc here... Instead
-of this the driver should make its best to revert back to normal mode.
-
-Will fix this.
-
-Thanks for the review,
-Ivan
+David / dhildenb
 
 
