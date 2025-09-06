@@ -1,202 +1,171 @@
-Return-Path: <netdev+bounces-220626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440D1B4775E
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 23:16:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB94B47776
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 23:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 443E27B2542
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:15:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23AC27C5ECE
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149052957CD;
-	Sat,  6 Sep 2025 21:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A122B23185D;
+	Sat,  6 Sep 2025 21:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I5TTURoZ"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="RjUQB++W";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bgn0NgRK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FFC20296A;
-	Sat,  6 Sep 2025 21:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA13246BB2;
+	Sat,  6 Sep 2025 21:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757193395; cv=none; b=Wd/cTKL+f6ANb0Icp1fz9XCxakad0W4lvKyJsukXqd6gKtf/g9kXTiXO61n9zlzQ2o+dXJkuepm0i9fHm2BP/A3+xbSjyiZGkSCftsCLaKQlpDx2QtSgZGQOjOpbf04yCjN+FiEaF2yOIgMhKrHcFcwBAlUl7KjJLG/uEWyjJ6A=
+	t=1757194268; cv=none; b=RK+PIGr5dFnnNZX1jAWt2lBf5sTEWrjsclqkpmI38J/kT3P+l4KPgiyHEt+B9+PrVXi3HVJ0SqZna9WM33kNGXGkTbv5bLSq9wxhI0rGDwzcLd9au0phqD2Ev4B6JPbfzHj/4jPw6ykG2L/5JafQEBZRmrFHarSRVpIct6Fp/bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757193395; c=relaxed/simple;
-	bh=rBLI7ukQHDWS6AwQcN6I5VytRlnwi7WAZKTS9iyO0tI=;
+	s=arc-20240116; t=1757194268; c=relaxed/simple;
+	bh=B3NDai3EYMJtFUSC5OHF5I2WpdMYx2oKldbYjXl75Eg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mjm33u0E88Fj241AfyoGE4/OHJ1IL9QNlzzTvzdWeWOdNNdfIKHH9RHcwMjuIJU4zH4U2ITuCZTRevZ4/z5nr9OEUqMcJa10+XBY3k0Nw6z4s4qtQXAIL7krJ2IfXgxDwxsfvdsUnSMmegOXfBfM2lKLF6YMlPnpiMT8iXvypfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I5TTURoZ; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757193393; x=1788729393;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rBLI7ukQHDWS6AwQcN6I5VytRlnwi7WAZKTS9iyO0tI=;
-  b=I5TTURoZvLRKKRS2lsIxbGqi0qVvUGVa0Dbi2cuywtDE7okj0lq2stJ3
-   ZRg8kHId1s0YJ6vDMZ8zcA1vL9kgH90vZg3pWLF2YMVfBrutWR9d9pex5
-   H3SF0n1Xwgf8nEYpihJ/tT+Qeysi6TvaE3xm1tn9CBK6iTd/j9rSBej+0
-   xCEAbAIO9C7rFBfIjk3BgwKQM8xSdnFQq8/5LvCPvsP4zXUZV55czu7u0
-   cwsOpynD2tDPWlFnf3YiaqKUV/9mGkNpDMR5HGAFBTcsvqcQoTaeGryca
-   vrYR6L5HI60EMV1Q1yPSlS2+Gg17n2KTy1WKeN2wAQWe1CHM0FB+2gyoO
-   A==;
-X-CSE-ConnectionGUID: opL1HxJ2SrSjf9Dp6Mb97w==
-X-CSE-MsgGUID: jZJZoyUMQfSeD58uBOMCMg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11545"; a="62131850"
-X-IronPort-AV: E=Sophos;i="6.18,245,1751266800"; 
-   d="scan'208";a="62131850"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 14:16:31 -0700
-X-CSE-ConnectionGUID: m/SS9zIhS4m6vaHeaN13bg==
-X-CSE-MsgGUID: iPkamp7WRvKSUK+pal2eOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,245,1751266800"; 
-   d="scan'208";a="172366458"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 06 Sep 2025 14:16:27 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uv0Gm-0001nX-2E;
-	Sat, 06 Sep 2025 21:16:24 +0000
-Date: Sun, 7 Sep 2025 05:15:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Chen-Yu Tsai <wens@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=qZlVcGxwKJqtaqkxoxgWuKxmCsP0tdM/Ne2vRcEo1H18WPFm6MQcTpS0+QW75yJc4Ry6tg8DWJ+qdSEQkJ80Z9yN21nD8wF1v8XLphBZfjKArJh0rYB3gzUGlfjW+W2xzRBERl/JS0ilNKQBaun1nf8YCHUIzpzzEfF/5lCmTcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=RjUQB++W; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bgn0NgRK; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 5F3BB7A01D9;
+	Sat,  6 Sep 2025 17:31:02 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Sat, 06 Sep 2025 17:31:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1757194262; x=
+	1757280662; bh=J5ZHF61t81pa1XZn1pVpiz0llRae/PIVgz4jSy9U4J8=; b=R
+	jUQB++WHMzdQVl4mwYzCqmTAyYikFniioFtsubxhKZPdmnlo8CcJbPDqsj/B3XX4
+	CUFpVnTvDl38a+0EYwnK+rPoczh5cf/iK1EwOwCUr5WBvz3Nv6FPcH00ghIs5jzR
+	3KFIhlB+m8pd7/wuIIQWpz1Zedo5YCc0x3OSwLNtqC8HAaozqdEebO9rsogpSUz/
+	9fradacieFV0E7oup5cKJ7wrtBiGlIXzy/znTESMboC9jCPAZdzDMRLOrcZX/Yzj
+	7gTZaYP0LMyUCM6TPWnSOzWnDRjkP+3M1Mt1yqWLrc37m8n+LnyxXxWBNjdrY0qF
+	klasllETe4FrZGHEHqFwg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757194262; x=1757280662; bh=J5ZHF61t81pa1XZn1pVpiz0llRae/PIVgz4
+	jSy9U4J8=; b=bgn0NgRKJKf5Wy2MDhtNR4YgmRDWK2mg9UzQzBUnqvQgKYj2M4d
+	5QL9K2rg8RVUO0isXOk+23qoxAXZx13bhgpQAHsVjXmcmPG2WpVzzqjFt48G3bRN
+	6f+G6U6yL87XY7APBxejhl36zO0OFlZUUYsNHMfAbCWtOLXZ8QH2wguOUfuSkA80
+	FKS85QsUosEnWja57OYVai5hEAWJXSi+nT7PXh34UskvAL4LKEbWlCj5PTn1m0tt
+	MkoWp4bxV7CseIN18wLBtHl8O/mb5N2vP3/D7y6PKf74pptgVRVbDpk9k5jgp3hx
+	O2egOA8MsB33UmlNN5pKfBQdjA9jI7V99dA==
+X-ME-Sender: <xms:FKi8aLaoW2MUdO7c8m-YMHmRSxeYY-VlK_ByGuzEe_5fmtRsQOExYw>
+    <xme:FKi8aEoMIhBfbm6jYzGGhKT8nS-Xe9nn9ESIJXo64Hma8RmcUffP45tVmVZZS-nY6
+    _NA12u7eFljOoDQ1Wc>
+X-ME-Received: <xmr:FKi8aDZT6pImWUUTBYcVicwkNYgj2e2sU2B7S5gWyVY822aAunWE-qJh69s8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdekiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudekpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtg
+    homhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehjvhesjhhvohhssghurhhghhdrnhgvthdprhgtphhtthhopegrnhgurhgvfi
+    donhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
+    ohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpd
+    hrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghn
+    ihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepjhhirhhisehrvghsnhhulhhlihdruh
+    hs
+X-ME-Proxy: <xmx:FKi8aH4R7-g2a0V3hHdndfGVY3Wl5TuaJuzMWrkzBAf4VzfGe99Hkw>
+    <xmx:FKi8aOQ9xL2SJyrGfPJZnOUTNPg17hVgTZKkLPmEirFsggMNNMr0Wg>
+    <xmx:FKi8aHvxD36T3aPgmvfLx6f40jemsJ5KKViKxUdbYzySUUaQa77ziw>
+    <xmx:FKi8aAYKGUtTq3puDmX9i2XU8AjWnGlhMjAqpkcQOPaAYcOsGUIcmw>
+    <xmx:Fqi8aKKbWZlmitBH4AO07oYnLVDv7e18hWxDRWi0ysHL9Vyt5b52uIWx>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 6 Sep 2025 17:31:00 -0400 (EDT)
+Date: Sat, 6 Sep 2025 23:30:58 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej@kernel.org>,
-	Samuel Holland <samuel@sholland.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH net-next v3 02/10] net: stmmac: Add support for Allwinner
- A523 GMAC200
-Message-ID: <202509070456.CKA8CXUt-lkp@intel.com>
-References: <20250906041333.642483-3-wens@kernel.org>
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv2 net-next 5/5] selftests/net: add offload checking test
+ for virtual interface
+Message-ID: <aLyoEiWnuvQ-5ODz@krikkit>
+References: <20250902072602.361122-1-liuhangbin@gmail.com>
+ <20250902072602.361122-6-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250906041333.642483-3-wens@kernel.org>
+In-Reply-To: <20250902072602.361122-6-liuhangbin@gmail.com>
 
-Hi Chen-Yu,
+2025-09-02, 07:26:02 +0000, Hangbin Liu wrote:
+> diff --git a/tools/testing/selftests/net/vdev_offload.sh b/tools/testing/selftests/net/vdev_offload.sh
+> new file mode 100755
+> index 000000000000..78fc212efd4a
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/vdev_offload.sh
+> @@ -0,0 +1,176 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +# shellcheck disable=SC1091
+> +source lib.sh
+> +
+> +# Set related offload on lower deivces and check if upper devices re-compute
 
-kernel test robot noticed the following build warnings:
+nit: s/deivces/devices/
 
-[auto build test WARNING on net-next/main]
+> +# Some features are fixed on veth interface. Just list here in case we have a
+> +# better way to test in future.
+> +set_offload()
+> +{
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Chen-Yu-Tsai/dt-bindings-net-sun8i-emac-Add-A523-GMAC200-compatible/20250906-121610
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250906041333.642483-3-wens%40kernel.org
-patch subject: [PATCH net-next v3 02/10] net: stmmac: Add support for Allwinner A523 GMAC200
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20250907/202509070456.CKA8CXUt-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250907/202509070456.CKA8CXUt-lkp@intel.com/reproduce)
+[...]
+> +check_xfrm()
+> +{
+> +	local dev=$1
+> +	local src=192.0.2.1
+> +	local dst=192.0.2.2
+> +	local key="0x3132333435363738393031323334353664636261"
+> +
+> +	RET=0
+> +
+> +	ip -n "$ns" xfrm state flush
+> +	ip -n "$ns" xfrm state add proto esp src "$src" dst "$dst" spi 9 \
+> +		mode transport reqid 42 aead "rfc4106(gcm(aes))" "$key" 128 \
+> +		sel src "$src"/24 dst "$dst"/24 offload dev "$dev" dir out
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509070456.CKA8CXUt-lkp@intel.com/
+It's maybe not something you would expect, but this codepath will not
+check that NETIF_F_HW_ESP is set on $dev (you can verify that by
+running "ip xfrm state add ... offload ..." on the same bond+netdevsim
+combination before/after toggling esp-hw-offload on/off for the
+bond). Why not use __check_offload again for this feature?
 
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c: In function 'sun55i_gmac200_set_syscon':
->> drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c:60:89: warning: format '%d' expects argument of type 'int', but argument 5 has type 'long unsigned int' [-Wformat=]
-      60 |                                              "TX clock delay exceeds maximum (%d00ps > %d00ps)\n",
-         |                                                                                        ~^
-         |                                                                                         |
-         |                                                                                         int
-         |                                                                                        %ld
-   drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c:74:89: warning: format '%d' expects argument of type 'int', but argument 5 has type 'long unsigned int' [-Wformat=]
-      74 |                                              "RX clock delay exceeds maximum (%d00ps > %d00ps)\n",
-         |                                                                                        ~^
-         |                                                                                         |
-         |                                                                                         int
-         |                                                                                        %ld
-
-
-vim +60 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
-
-    39	
-    40	static int sun55i_gmac200_set_syscon(struct device *dev,
-    41					     struct plat_stmmacenet_data *plat)
-    42	{
-    43		struct device_node *node = dev->of_node;
-    44		struct regmap *regmap;
-    45		u32 val, reg = 0;
-    46		int ret;
-    47	
-    48		regmap = syscon_regmap_lookup_by_phandle(node, "syscon");
-    49		if (IS_ERR(regmap))
-    50			return dev_err_probe(dev, PTR_ERR(regmap), "Unable to map syscon\n");
-    51	
-    52		if (!of_property_read_u32(node, "tx-internal-delay-ps", &val)) {
-    53			if (val % 100)
-    54				return dev_err_probe(dev, -EINVAL,
-    55						     "tx-delay must be a multiple of 100ps\n");
-    56			val /= 100;
-    57			dev_dbg(dev, "set tx-delay to %x\n", val);
-    58			if (!FIELD_FIT(SYSCON_ETXDC_MASK, val))
-    59				return dev_err_probe(dev, -EINVAL,
-  > 60						     "TX clock delay exceeds maximum (%d00ps > %d00ps)\n",
-    61						     val, FIELD_MAX(SYSCON_ETXDC_MASK));
-    62	
-    63			reg |= FIELD_PREP(SYSCON_ETXDC_MASK, val);
-    64		}
-    65	
-    66		if (!of_property_read_u32(node, "rx-internal-delay-ps", &val)) {
-    67			if (val % 100)
-    68				return dev_err_probe(dev, -EINVAL,
-    69						     "rx-delay must be a multiple of 100ps\n");
-    70			val /= 100;
-    71			dev_dbg(dev, "set rx-delay to %x\n", val);
-    72			if (!FIELD_FIT(SYSCON_ERXDC_MASK, val))
-    73				return dev_err_probe(dev, -EINVAL,
-    74						     "RX clock delay exceeds maximum (%d00ps > %d00ps)\n",
-    75						     val, FIELD_MAX(SYSCON_ERXDC_MASK));
-    76	
-    77			reg |= FIELD_PREP(SYSCON_ERXDC_MASK, val);
-    78		}
-    79	
-    80		switch (plat->mac_interface) {
-    81		case PHY_INTERFACE_MODE_MII:
-    82			/* default */
-    83			break;
-    84		case PHY_INTERFACE_MODE_RGMII:
-    85		case PHY_INTERFACE_MODE_RGMII_ID:
-    86		case PHY_INTERFACE_MODE_RGMII_RXID:
-    87		case PHY_INTERFACE_MODE_RGMII_TXID:
-    88			reg |= SYSCON_EPIT | SYSCON_ETCS_INT_GMII;
-    89			break;
-    90		case PHY_INTERFACE_MODE_RMII:
-    91			reg |= SYSCON_RMII_EN;
-    92			break;
-    93		default:
-    94			return dev_err_probe(dev, -EINVAL, "Unsupported interface mode: %s",
-    95					     phy_modes(plat->mac_interface));
-    96		}
-    97	
-    98		ret = regmap_write(regmap, SYSCON_REG, reg);
-    99		if (ret < 0)
-   100			return dev_err_probe(dev, ret, "Failed to write to syscon\n");
-   101	
-   102		return 0;
-   103	}
-   104	
+> +	# shellcheck disable=SC2034
+> +	ip -n "$ns" xfrm state list | grep -q "crypto offload parameters: dev $dev dir" || RET=1
+> +	log_test "$dev" "xfrm offload"
+> +}
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sabrina
 
