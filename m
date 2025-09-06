@@ -1,95 +1,85 @@
-Return-Path: <netdev+bounces-220524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0240B467A6
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 02:50:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC68B467A9
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 02:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 706CE1C236FF
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:50:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ABBC7C8098
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E973D3594A;
-	Sat,  6 Sep 2025 00:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BC114A0B5;
+	Sat,  6 Sep 2025 00:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gxjil0eg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4dlJ166"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45C9DF49
-	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 00:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69088315D36;
+	Sat,  6 Sep 2025 00:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757119804; cv=none; b=fd1i0bIj1EH4hmdzkaanoOtzHMGXPdlvWk4zE+lpL2CyvMgXiKZM5KszgKYlicupsva/2w0am8lobHM5sd5jBNQ1qANrB53rv/+vzthq2KYX7sZwul+Dl6QLZA16q06ynk7MOhVkYQF2Q2KmfUcbQunXS7MZVoZnJRNN8OZXjro=
+	t=1757120238; cv=none; b=oZbSbF59ssmljn2dgxr/E07Q2UTrpSv9vMdez9FZ0mrGLcmZfC0pMsMqExNsihMX8Tf2X+ze7mNjcaaLnLPku7CPgtWoHNFwIzJZvPqRPgDuy57TyRYuIldIdbxXiELX3LV4r5VmQcuQYke1wEYtyMSlk4dWSolApXrXdqkzesM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757119804; c=relaxed/simple;
-	bh=2JqPSTiL2PqdR5XKddKwDNhxrz7NNw4m6gNC77S3KEk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kp90fgZwpNB8Fv+m2Z300YvHlDOBjDZg9BRaW9xWpcRvH4HZZ29zdzrtw2YWkZNp1FOMjKpH8sSZOHmZ3BXG3I0S1KSujmU/0aN8FnR2/wwAiAcXKr4VH+Ocvr2hwYdUpNQ5tHNJPgRVDVSgcbezbBfO1ma8GwciuxLSyRkMNow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gxjil0eg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C94C4CEF1;
-	Sat,  6 Sep 2025 00:50:02 +0000 (UTC)
+	s=arc-20240116; t=1757120238; c=relaxed/simple;
+	bh=+sxRfhIdsdoZlB5L4S41jEe1jcrgb7fs6x8au4XainE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=moBshDMjdmltVfgvmdKrGxRjTrspC5AZ2wmY67I/xAHl83oNpT7W7JzHscyVqNGZ9bRvxXEafaZicZmquY+nkrZiSK81morK3O6jtBqb87v7j/Nyc7vRbMgs1hUXUTbuzoFtA9LybtOk7lKp4sIj5cbgWB2mwDcrEbGIk7zzlSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4dlJ166; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27C38C4CEF1;
+	Sat,  6 Sep 2025 00:57:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757119802;
-	bh=2JqPSTiL2PqdR5XKddKwDNhxrz7NNw4m6gNC77S3KEk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Gxjil0egx3HZF3i7mnCk6EnlsyS8p3Re+GfC5gxOH8L3VxEsbGSxQwl1M2UMtLrzi
-	 CZPdp3XdpYcYCayWZNg/MDpovQT0h2uK3LbY7oaU0ApkepXLXzzn4mY6Q/qE2ETQvY
-	 912grSlIYOQcCuKuq/DuAwYTyZpEM+SKN1DiL2DDvALXvbrZIfgvoThNewg2OrUDxa
-	 AKywBbYMMzjdPH9z+mTTZttCtlpnkj3DWrT/eXis5ZQist7OnC47GztJfKH6Hi+Ecz
-	 XPaP0gpIfT4ic1nbetoKn5OxdPpgoWYfUwzuVJQMOqu4aUCxOJG/LU1AgDMfzClxLH
-	 wk4mzhcITSb/w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC47383BF69;
-	Sat,  6 Sep 2025 00:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1757120238;
+	bh=+sxRfhIdsdoZlB5L4S41jEe1jcrgb7fs6x8au4XainE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=q4dlJ166c3Mc7w9Hm0YH4+cdNBMm3EF+h/LSb5yMzlx+2HGzmNZigeJ/Ob94eUg2i
+	 +FVKln9eBdMT6lw6Tz8vKND7MoBptqArhWcgy+qfhFPqagpFTchir6P7QaKmzuPKrp
+	 KhEcJda1cRgJAqdWoW6rVITcu+8RNQyd35HaTxAnTzl9atJsxXjBpzM0hxDHfZFn8/
+	 5y8h0fDfvWNQEgRb41skSC0h3JyxNvf3vBOkHhGa0lTfuV23m9oj06sbnNWgY7aDof
+	 3C0KRlxSTubHdeJ6U03jwmBfP3mM7kleLoLTBRUhZkwv9IfFPmzgYIB/MzC6GzXYtb
+	 aqJSz9GAUqn/g==
+Date: Fri, 5 Sep 2025 17:57:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Ido Schimmel
+ <idosch@nvidia.com>, Yong Wang <yongwang@nvidia.com>, Nikolay Aleksandrov
+ <razor@blackwall.org>, Petr Machata <petrm@nvidia.com>, Andy Roulin
+ <aroulin@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Amit Cohen
+ <amcohen@nvidia.com>, Alessandro Zanni <alessandro.zanni87@gmail.com>, Li
+ Shuang <shuali@redhat.com>, Xin Long <lucien.xin@gmail.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: forwarding: Reorder arguments to
+ obey POSIX getopt
+Message-ID: <20250905175716.098114bd@kernel.org>
+In-Reply-To: <20250905173947.3164807-1-mmyangfl@gmail.com>
+References: <20250905173947.3164807-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next] net: phy: fixed_phy: remove link gpio support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175711980675.2732461.3201926665490095310.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Sep 2025 00:50:06 +0000
-References: <75295a9a-e162-432c-ba9f-5d3125078788@gmail.com>
-In-Reply-To: <75295a9a-e162-432c-ba9f-5d3125078788@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, andrew+netdev@lunn.ch,
- pabeni@redhat.com, edumazet@google.com, kuba@kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, f.fainelli@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 4 Sep 2025 08:08:18 +0200 you wrote:
-> The only user of fixed_phy gpio functionality was here:
-> arch/arm/boot/dts/nxp/vf/vf610-zii-dev-rev-b.dts
-> Support for the switch on this board was migrated to phylink
-> (DSA - mv88e6xxx) years ago, so the functionality is unused now.
-> Therefore remove it.
+On Sat,  6 Sep 2025 01:39:41 +0800 David Yang wrote:
+> Quoted from musl wiki:
 > 
-> Note: There is a very small risk that there's out-of-tree users
-> who use link gpio with a switch chip not handled by DSA.
-> However we care about in-tree device trees only.
+>   GNU getopt permutes argv to pull options to the front, ahead of
+>   non-option arguments. musl and the POSIX standard getopt stop
+>   processing options at the first non-option argument with no
+>   permutation.
 > 
-> [...]
+> Thus these scripts stop working on musl since non-option arguments do
+> not always come last. Fix it by reordering arguments.
 
-Here is the summary with links:
-  - [v3,net-next] net: phy: fixed_phy: remove link gpio support
-    https://git.kernel.org/netdev/net-next/c/43a42b85162a
-
-You are awesome, thank you!
+Have you tested this? You seem to be breaking mausezahn.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
