@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-220540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65164B46824
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 03:50:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B482BB46826
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 03:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33D5F5C636E
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 01:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7585B5C63CB
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 01:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420611A0BFD;
-	Sat,  6 Sep 2025 01:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA8B1CEAD6;
+	Sat,  6 Sep 2025 01:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aD0Hr3SL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ofIlQSox"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C2517B425;
-	Sat,  6 Sep 2025 01:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDA71C863B
+	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 01:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757123407; cv=none; b=Rc3M5b98wJ53ykdLaHL98hnI10/KcYQ0M+HMMyM07g4h9b36YPifwgKLwSw2VuXPPRoNUCgo5Sgy0el98mnfGSTUe1r/yxbhXuLJ+YqkyTY8zOXxcJqQzgjXJYqhREVvoUoHVl8BH4Z95REcokVa5GX6sW/R98u8ji2TInXNhv0=
+	t=1757123408; cv=none; b=OYTbbiV+dTNJQu+sa6YTQX217rB9vq3iYki54zx9Qm/QBG05xgYNjtCbP8S9VbxsNQawHI3YEfA1zwHIi8a33M3aNOCt2pQaQyLKdPYuW3XzEiT6C55L2hDGZ9aYyJrkPMqD2OgvJ2AbNjVgqIMLp3Gvioo7ahSXK3FCiOg1yhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757123407; c=relaxed/simple;
-	bh=fYiTdSD4kxkoNV6CEXTLw+kH68SZUecAyQ8SFE4MKeM=;
+	s=arc-20240116; t=1757123408; c=relaxed/simple;
+	bh=kWVzvge+87I9B84weIZKEK/gfqThSa+xLfdC2S0F6ho=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dsMt4Hm7N671Zwbph0Zjsull+aPpqzo7qSDjqOP4ewnPoJuRQum85vMxh+NZuaIE2cftqB7QvdMb8b9BmELJJcbzX1GrD+wVJQ+7euDYbIZJS5G+CK2U6OihJTjxk6ZezHbauvPLtOwfuE29f2qDG6ZMElNA6GC22NWDlqvj8n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aD0Hr3SL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9551BC4CEF1;
-	Sat,  6 Sep 2025 01:50:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MHwi6DWgJFhrYTH6tGCr/qTH7mpbGZbSY6jVHbtLpkzKkluzExskvIbQXi/Y7nffEWWD3gZd6yzgqTJ6AlqhNpstvXOxA8peIwhZMmqwN0UDxMt4K7tRD/8B9EnRMgsq2UDTGZ96EVJzdXjAoXdqinPSDrZcb+GnUtArshGeeDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ofIlQSox; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 156FBC4CEF1;
+	Sat,  6 Sep 2025 01:50:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757123406;
-	bh=fYiTdSD4kxkoNV6CEXTLw+kH68SZUecAyQ8SFE4MKeM=;
+	s=k20201202; t=1757123408;
+	bh=kWVzvge+87I9B84weIZKEK/gfqThSa+xLfdC2S0F6ho=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aD0Hr3SLRBCy+bgiJdHFCaM2FS9ohr34EfObiogBCtHIxcBEXm2WuJ+qscs84uu1M
-	 gWsa5pQBj1dhxphMMCO9xOSd4HcVf8eEBbEBCNx4sECGvvTyDDFQGo7+7VortNoH43
-	 0nWUtHoFqR/AX8VZOFDBWBQDq1hiPytXIPNvNH3Xq4IjFyYfDoTPoqR1RB8uH6BN0S
-	 +1i3x9z2hfm5H1WnMEIfJ2YfS5o4hlgmfu18bJ79gnlpiaVegTLjtVZ472Wm/aqnG1
-	 weGj6VorxTAm3MWaWpclJuulXbVHWtCNKjhUhmwz3IE/Ng1dxFsydYzr2NFYjiZVXG
-	 5pCqpjhf7g/ng==
+	b=ofIlQSox71LmNtKxGjmugZmJ2TNgRtBnC2Ci0dWewM2AAf7B+sX1+SZb7WOs4DGQY
+	 Pb2YAXXoQIPTHtR3Lo1+KwPSQCQ5iSFs8KHA8nGcQcHjYALjFngeDxUVHvSdcAvESU
+	 UhmU+rHb0fsikLPrxuMKElxXGTeQSY7cNBQXBNWZ/D5Pvx3k3sM2M7K3OXFL6DGRPy
+	 nXAoD3ZAc+ONGsySR8tugrq1ek4GuyzxweDgK7kHjp1Ync0VYgWgWGSfM6ehj4fCYM
+	 zEmsiW9i6CfjGz+R64aW/bRQzeSCYwXHJJIgu/PX7Ft3+a77dXZ4nAxR4JOkHQR1vp
+	 Pc0YyuzR09EiQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CE3383BF69;
-	Sat,  6 Sep 2025 01:50:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADB96383BF69;
+	Sat,  6 Sep 2025 01:50:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] sh_eth: PM-related cleanups
+Subject: Re: [PATCH net-next] net: fman: clean up included headers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175712341100.2742584.3421281371078554809.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Sep 2025 01:50:11 +0000
-References: <cover.1756998732.git.geert+renesas@glider.be>
-In-Reply-To: <cover.1756998732.git.geert+renesas@glider.be>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: niklas.soderlund@ragnatech.se, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-sh@vger.kernel.org
+ <175712341224.2742584.774559707859072998.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Sep 2025 01:50:12 +0000
+References: <a6c502bc-1736-4bab-98dc-7e194d490c19@gmail.com>
+In-Reply-To: <a6c502bc-1736-4bab-98dc-7e194d490c19@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: madalin.bucur@nxp.com, sean.anderson@seco.com, andrew+netdev@lunn.ch,
+ linux@armlinux.org.uk, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  4 Sep 2025 17:18:55 +0200 you wrote:
-> Hi all,
+On Thu, 4 Sep 2025 22:26:58 +0200 you wrote:
+> Both headers aren't used in this source code file.
 > 
-> This patch series contains various cleanups related to power management
-> for the Renesas SH Ethernet driver, as used on Renesas SH, ARM32, and
-> ARM64 platforms.
-> 
-> This has been tested on various SoCs (R-Mobile A1, RZ/A1H, RZ/A2M, R-Car
-> H1, R-Car M2-W).
-> 
-> [...]
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/ethernet/freescale/fman/mac.c | 2 --
+>  1 file changed, 2 deletions(-)
 
 Here is the summary with links:
-  - [net-next,1/3] sh_eth: Remove dummy Runtime PM callbacks
-    https://git.kernel.org/netdev/net-next/c/86e6257192c8
-  - [net-next,2/3] sh_eth: Convert to DEFINE_SIMPLE_DEV_PM_OPS()
-    https://git.kernel.org/netdev/net-next/c/3406114a303e
-  - [net-next,3/3] sh_eth: Use async pm_runtime_put()
-    https://git.kernel.org/netdev/net-next/c/ae52c3e846e1
+  - [net-next] net: fman: clean up included headers
+    https://git.kernel.org/netdev/net-next/c/13a94444fbd6
 
 You are awesome, thank you!
 -- 
