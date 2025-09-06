@@ -1,94 +1,95 @@
-Return-Path: <netdev+bounces-220523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57FCB467A2
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 02:44:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0240B467A6
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 02:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A7641C23B09
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:45:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 706CE1C236FF
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 00:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0081415442C;
-	Sat,  6 Sep 2025 00:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E973D3594A;
+	Sat,  6 Sep 2025 00:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFAwc2h1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gxjil0eg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C04A55;
-	Sat,  6 Sep 2025 00:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45C9DF49
+	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 00:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757119492; cv=none; b=CR15/KMT0z6PHS248HoaJFSfTbgvtabMe8+QIPL42O351Z1C2klP7n5b7x+bs2ZtkkUCuky9AgN3C3YwbXKkXXqklSpDQq3Kdy0mM9VZqoaStZ3ToCXk25hCCusIc0wxufy2Ft9KWRRKGjfnnlXtf4j/UfcW86+46diI/bx3kyQ=
+	t=1757119804; cv=none; b=fd1i0bIj1EH4hmdzkaanoOtzHMGXPdlvWk4zE+lpL2CyvMgXiKZM5KszgKYlicupsva/2w0am8lobHM5sd5jBNQ1qANrB53rv/+vzthq2KYX7sZwul+Dl6QLZA16q06ynk7MOhVkYQF2Q2KmfUcbQunXS7MZVoZnJRNN8OZXjro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757119492; c=relaxed/simple;
-	bh=lK+W7jIcDQz4jEABqbetY8xzxzI16JlOdIpsjBqZg+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n5/MswwZArcevAFXKsuOkgmEMpW/ovbEQAP7KOe/Ub+DfThgD0gkns0BjzLeISDV3GJipixxz0fGbIy7x5tW5auDUJE8c8+6hrckzDYz5ubqPFedBIXLUyG8woPhCqeZ78PZGnZDt4xEdemgHf5mgdrB8DR1WJXNjP3p+TwYZuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFAwc2h1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6548C4CEF1;
-	Sat,  6 Sep 2025 00:44:51 +0000 (UTC)
+	s=arc-20240116; t=1757119804; c=relaxed/simple;
+	bh=2JqPSTiL2PqdR5XKddKwDNhxrz7NNw4m6gNC77S3KEk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Kp90fgZwpNB8Fv+m2Z300YvHlDOBjDZg9BRaW9xWpcRvH4HZZ29zdzrtw2YWkZNp1FOMjKpH8sSZOHmZ3BXG3I0S1KSujmU/0aN8FnR2/wwAiAcXKr4VH+Ocvr2hwYdUpNQ5tHNJPgRVDVSgcbezbBfO1ma8GwciuxLSyRkMNow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gxjil0eg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C94C4CEF1;
+	Sat,  6 Sep 2025 00:50:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757119492;
-	bh=lK+W7jIcDQz4jEABqbetY8xzxzI16JlOdIpsjBqZg+U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nFAwc2h1ZCdY+tUw+X2TLRQ57btdxSWvNp3dPrpRQnIFJA0l64+Vy1IQ+J9ZRrcL7
-	 asEbHHzeeX5xqHB97+yp0MCfaZoGi61QBUMHGO7LJ8u7VZAX4CKcOZpagSRRUUHhhl
-	 LCYtcw/IRdnLSOyEWxZ/YnTPAz7sC2JpNMR5ZKQrju5211Xrz5rZxiWWCcsJ3Nx6b/
-	 qvbhqgJuNW7dk7PcyuPtlsZzizYsVjMnw7D/O1XUwb9DlxDPVXZotO/43fH+EYAiO9
-	 Bw9M9KSivHasUnYn0auIoDj8jc/TmUEnS5Am1xJ0Drpo14Uk8RZUSK7hlFbOD8CZmB
-	 pxmaka5uFBiMQ==
-Date: Fri, 5 Sep 2025 17:44:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fort <stanislav.fort@aisle.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, linux-hams@vger.kernel.org,
- linux-kernel@vger.kernel.org, security@kernel.org, Stanislav Fort
- <disclosure@aisle.com>
-Subject: Re: [PATCH net v3] netrom: linearize and validate lengths in
- nr_rx_frame()
-Message-ID: <20250905174450.3953023d@kernel.org>
-In-Reply-To: <20250903181915.6359-1-disclosure@aisle.com>
-References: <20250902112652.26293-1-disclosure@aisle.com>
-	<20250903181915.6359-1-disclosure@aisle.com>
+	s=k20201202; t=1757119802;
+	bh=2JqPSTiL2PqdR5XKddKwDNhxrz7NNw4m6gNC77S3KEk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Gxjil0egx3HZF3i7mnCk6EnlsyS8p3Re+GfC5gxOH8L3VxEsbGSxQwl1M2UMtLrzi
+	 CZPdp3XdpYcYCayWZNg/MDpovQT0h2uK3LbY7oaU0ApkepXLXzzn4mY6Q/qE2ETQvY
+	 912grSlIYOQcCuKuq/DuAwYTyZpEM+SKN1DiL2DDvALXvbrZIfgvoThNewg2OrUDxa
+	 AKywBbYMMzjdPH9z+mTTZttCtlpnkj3DWrT/eXis5ZQist7OnC47GztJfKH6Hi+Ecz
+	 XPaP0gpIfT4ic1nbetoKn5OxdPpgoWYfUwzuVJQMOqu4aUCxOJG/LU1AgDMfzClxLH
+	 wk4mzhcITSb/w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC47383BF69;
+	Sat,  6 Sep 2025 00:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net-next] net: phy: fixed_phy: remove link gpio support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175711980675.2732461.3201926665490095310.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Sep 2025 00:50:06 +0000
+References: <75295a9a-e162-432c-ba9f-5d3125078788@gmail.com>
+In-Reply-To: <75295a9a-e162-432c-ba9f-5d3125078788@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: linux@armlinux.org.uk, andrew@lunn.ch, andrew+netdev@lunn.ch,
+ pabeni@redhat.com, edumazet@google.com, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, f.fainelli@gmail.com
 
-On Wed,  3 Sep 2025 21:19:15 +0300 Stanislav Fort wrote:
-> Linearize skb and add targeted length checks in nr_rx_frame() to avoid out-of-bounds reads and potential use-after-free when processing malformed NET/ROM frames.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 4 Sep 2025 08:08:18 +0200 you wrote:
+> The only user of fixed_phy gpio functionality was here:
+> arch/arm/boot/dts/nxp/vf/vf610-zii-dev-rev-b.dts
+> Support for the switch on this board was migrated to phylink
+> (DSA - mv88e6xxx) years ago, so the functionality is unused now.
+> Therefore remove it.
 > 
-> - Linearize skb and require at least NR_NETWORK_LEN + NR_TRANSPORT_LEN (20 bytes) before reading network/transport fields.
-> - For existing sockets path, ensure NR_CONNACK includes the window byte (>= 21 bytes).
-> - For CONNREQ handling, ensure window (byte 20) and user address (bytes 21-27) are present (>= 28 bytes).
-> - Maintain existing BPQ extension handling:
->   - NR_CONNACK len == 22 implies 1 extra byte (TTL)
->   - NR_CONNREQ len == 37 implies 2 extra bytes (timeout)
+> Note: There is a very small risk that there's out-of-tree users
+> who use link gpio with a switch chip not handled by DSA.
+> However we care about in-tree device trees only.
 > 
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Reported-by: Stanislav Fort <disclosure@aisle.com>
-> Signed-off-by: Stanislav Fort <disclosure@aisle.com>
+> [...]
 
-Thanks for the fix! The commit message needs a bit of touching up..
+Here is the summary with links:
+  - [v3,net-next] net: phy: fixed_phy: remove link gpio support
+    https://git.kernel.org/netdev/net-next/c/43a42b85162a
 
-Please wrap it at 74 chars.
-
-Please add a Fixes tag pointing to the commit which introduced the
-bugs. Quite possibly Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2") in area
-of the code base.
-
-Please remove the Reported-by:, it's implicit that the author discovered
-the bug if no explicit reported-by tag is provided.
-
-Please add the review tag from Eric when reposting.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
