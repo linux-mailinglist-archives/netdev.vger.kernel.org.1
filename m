@@ -1,281 +1,346 @@
-Return-Path: <netdev+bounces-220606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64ED7B47467
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 18:31:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 837A8B47521
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 19:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B0A31605BE
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 16:31:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F066A7B0210
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 17:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345572FA0ED;
-	Sat,  6 Sep 2025 16:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9514241696;
+	Sat,  6 Sep 2025 17:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="WkOheKTz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bE8RFOSa"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011030.outbound.protection.outlook.com [52.101.65.30])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABFA2F83D7;
-	Sat,  6 Sep 2025 16:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757176167; cv=fail; b=ZO6R6Rqjf/N5MfPsDgx7Y2UaNqti3OSxUGnuUIHwVgnlk7nD0Q5Y0+2fU9a8gKv5P0QmYOh+8ArMJ3idel95DKr2FlRczoU05DK1Wu6CKeK6f/HYpP6jE+5YkWW//eY+PLNBhNPBSAx13xoK0xHASBkLQlPue2hU9/6llXBg4eU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757176167; c=relaxed/simple;
-	bh=4roOIwVB4t/QyVRpZ7WhxO58mPofxqAcb5mjO44z5c4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gtPPwDPoHXOOdixWKTu43bQldoBSTLyQIiSxs3kJK7geI57yKsBMIUbAdiRQyKeTMU6E4arNPDQL1j9bLSx3piWH4nHVHIpPmtNH5a6pJrknTUlRTpX1bB7AvFzTwkFN1ahongRucBB6IrPJD9IRdeZ3O5H080rwb+CwrnHkAyI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=WkOheKTz; arc=fail smtp.client-ip=52.101.65.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gkWu66Cr71M5E9I2sKne4wnfKtifZtnUzOJlEWkb1ozxq7VnfzvioIXByJ9qGnN3Goz2IgnGtPVGzFvZBYp+w7gKwjVM5tLyKlJ+CzkPhBo6dsonUcVCiq4rFs9dLInslPDDeqYTEfgfD00tV0nc6hT59dtP/fqPSRVrwgCq15ZpyoIs7jS9AOTlMts/UhEmiRmqC8K9EiSH+sRO4oVPopKN1z0hjx1si7o1joSJUj/KrzoVi0r8j/wgn1C7c/rFrYWxir9HsEBpzFL0D7dOC8LdaAy1LWgYHgMJ/+0PUv48Ry+OWicOriYdtOraXnmIpqaNANGgCU7viQ7bTOk79g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UvkpQev33JM82+voUy94wmxzIg5p1RbiMdjsJAb0Tf0=;
- b=pzVRSA+MhLXITJuY41G2n5Y3VhSpp6wEY0I3BuvtOV+wZAiM24qIWLrSYTLBVma8Mtw91nMvSi2bVtGP2ERazU+ey8JSzYNSiPq5rPFOMRjPG8l/FHojTtMVec2o32g90+zvqnin2Xussp1uwV92dLszPaqm+dtZWo2azyhoz+X7V8xIYmriPVwRp5ZdK1DZzDviIabSlIDiqfv7Sq1+DORhWYhvU5DHVr0a6qlNCxlZI7GaVFLf49cXuAakad78IBbYlbFp4YSgoCIbi8yXZVgIjqQ/vT7+IuILQcwQ5MoAc9WiGp3YfuORZobqkApkxJL8SvmeEo1p+GccRpfA9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.6.101) smtp.rcpttodomain=amazon.com
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UvkpQev33JM82+voUy94wmxzIg5p1RbiMdjsJAb0Tf0=;
- b=WkOheKTzJFg8W5BGAjsu54xNjpmcD01/16FckjEPbM2LzXPEux8n5f2bUunqoR5TSbfOc24OCEMyeeO3EIb7wd/SL81ab4XxHVqGWzMrdx5yMNGD4V8Cv8zVKPct4hhA6IJcMPzDYIMn7YIAaKgFmOdHKPokpc+DqCwoVhZ8aBoZEWzom7G3ex3q8DhFHcH0MYnbcC/TMQG9oT27y2CMa/nFF3+6ifpjxwA9F9hmRU7z7gSvKxjcCLD/jEmt2xIu3T98JjWkLWhV9MF07baD928tpwa+wLTNacMDF8oaPnMidrRU9DEBpNkW7sZLXMnq7vVZ1+VtJpXT2GZW5Z+kZQ==
-Received: from AS4P195CA0035.EURP195.PROD.OUTLOOK.COM (2603:10a6:20b:65a::19)
- by PA1PR07MB10487.eurprd07.prod.outlook.com (2603:10a6:102:4f0::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Sat, 6 Sep
- 2025 16:29:21 +0000
-Received: from AM2PEPF0001C70D.eurprd05.prod.outlook.com
- (2603:10a6:20b:65a:cafe::af) by AS4P195CA0035.outlook.office365.com
- (2603:10a6:20b:65a::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.22 via Frontend Transport; Sat,
- 6 Sep 2025 16:29:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.101)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.6.101 as permitted sender)
- receiver=protection.outlook.com; client-ip=131.228.6.101;
- helo=fr712usmtp1.zeu.alcatel-lucent.com; pr=C
-Received: from fr712usmtp1.zeu.alcatel-lucent.com (131.228.6.101) by
- AM2PEPF0001C70D.mail.protection.outlook.com (10.167.16.201) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.14
- via Frontend Transport; Sat, 6 Sep 2025 16:29:20 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fr712usmtp1.zeu.alcatel-lucent.com (Postfix) with ESMTP id 51D471C002B;
-	Sat,  6 Sep 2025 19:29:19 +0300 (EEST)
-From: chia-yu.chang@nokia-bell-labs.com
-To: pabeni@redhat.com,
-	edumazet@google.com,
-	linux-doc@vger.kernel.org,
-	corbet@lwn.net,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	kuniyu@amazon.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dave.taht@gmail.com,
-	jhs@mojatatu.com,
-	kuba@kernel.org,
-	stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	donald.hunter@gmail.com,
-	ast@fiberby.net,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ij@kernel.org,
-	ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com,
-	ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com,
-	rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v16 net-next 14/14] tcp: accecn: try to fit AccECN option with SACK
-Date: Sat,  6 Sep 2025 18:28:50 +0200
-Message-Id: <20250906162850.73598-15-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250906162850.73598-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250906162850.73598-1-chia-yu.chang@nokia-bell-labs.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83300F510;
+	Sat,  6 Sep 2025 17:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757178192; cv=none; b=iL0IBzoil7hg0NdP15Qpxt2IL753SVNCZ++9eePCdA1tjNn/UH65n5LU4mTbzbywqZfHXOZMZcOkHjPFBbof2ESYELOAOacbhKTQMHTGJ2bNuHe3EOVrCJGCKTeGziAVOhVBh6KyCFrkAAgbkSSYzbMVaIMgJFjrut7h0yyqwKo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757178192; c=relaxed/simple;
+	bh=cnjlGov3rmmTlFwWRM+VBLOvYtGyRStbSa0iflkMYbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gU0s+qHDRsIiZ9DQPedvMNd32ATKzHSY2K2FaVxRoPVWlUOVGvX65SFApAlfxzPcz8CO8hxUufCXLnHAfVe+JVGgKAksX9yjElvXpYkApZVBKAHaNA/nj1mK3NkV99p8wtROSPxAvit4CeNfUXypgTVJNDM+zNncbdP2pLNYdwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bE8RFOSa; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757178191; x=1788714191;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cnjlGov3rmmTlFwWRM+VBLOvYtGyRStbSa0iflkMYbw=;
+  b=bE8RFOSaiLXw+o8VcCgGnQOhpPX7FUIj94vlhc/CXT8mhN7iQBRUOHAO
+   chrkQsUukkZZZm0Ce6AVZGUhjOwSaD1BeCEIEtz5Td2BWJDW/mUl5n0xa
+   +PNAn39x7La73F7Orfxp00IyMJ4G1fQlbTIrBVWkrt9+rx643YJnU0kSm
+   qQyF+1Lf/qAveVbcSJADb0Kn7OdHXjhdzDvvtOY21NHyGPy8Y0ntsmZDn
+   BqgEinu8mXN6U7smlwqElG3VE8lV5F8jiZ4lt17MGZUiy1KZjICdSkCVT
+   L9Os4b+Sku48jHrXiSRRV1SeJXNkVt2DNEET80rgQjH1/1uWi+nVuXVM9
+   A==;
+X-CSE-ConnectionGUID: WXGRfs73SzKdpuZ0fuFw2g==
+X-CSE-MsgGUID: STZbIbBVT9CCvuYlkP3yWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11545"; a="59570734"
+X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
+   d="scan'208";a="59570734"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 10:03:10 -0700
+X-CSE-ConnectionGUID: OiElRqG8QaWDfvCJl6qlBg==
+X-CSE-MsgGUID: lPKYn7a5S7+lonh5AjrDhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
+   d="scan'208";a="172337462"
+Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 06 Sep 2025 10:03:06 -0700
+Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uuwJb-0001fL-1L;
+	Sat, 06 Sep 2025 17:03:03 +0000
+Date: Sun, 7 Sep 2025 01:02:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Kamlesh Gurudasani <kamlesh@ti.com>,
+	Manorit Chawdhry <m-chawdhry@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Praneeth Bajjuri <praneeth@ti.com>,
+	Vishal Mahaveer <vishalm@ti.com>,
+	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] crypto: ti: Add support for AES-GCM in DTHEv2 driver
+Message-ID: <202509070015.xKJCeXKj-lkp@intel.com>
+References: <20250905133504.2348972-7-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM2PEPF0001C70D:EE_|PA1PR07MB10487:EE_
-X-MS-Office365-Filtering-Correlation-Id: 269b12e7-6f5e-4927-88c9-08dded62887b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RG52eVBMR0ZqK0FsLzNkeWlCQXdVeFR1dWpzaTZZTkZVY2lXM3FYR2NzVjJs?=
- =?utf-8?B?MldqZ2M4RUpmK0t3ZzhJSGdwY1o0bWdjT29zc0ozN1J5cEI1b1V3bktCdk1l?=
- =?utf-8?B?aThGWC9LdTZsTEdUWEtJQ1FLOXBTSmZhUUtIUXdCVlhIbnVEcjE5Y2l4ckt5?=
- =?utf-8?B?RnZNbVlZZkxrZkx2THVRancwaDc5MWlhbnQwOHBVbHVlbjlLeVNHR3AyVWJE?=
- =?utf-8?B?TjdidjkvMDJESm9HOGpXT3JVS0RiUEVGRkVwU3lINEVSTTlXMlczMC80aDNq?=
- =?utf-8?B?NGFHMTNaNWhXUVRJNUpPNGp3VjZXK1ZzUm9hdndGZ21WaFMvVzI0Vm02VWVw?=
- =?utf-8?B?QjltQTFZNXcwRzNvenlNM3Z1TXJocWhWdUFhSnVBMFJYN1Uzc3dqNmdVakEv?=
- =?utf-8?B?VXdmRDE4YWpLWXBsWFRGejh1VWFtaXBEOWwwQmRvajBuakRGVEdlUmtXWVll?=
- =?utf-8?B?TWVXNG9qTGl1WUJUVE45M2I4bEluUENERzRSMERlZnFGUUdvYlJnRkJLM25O?=
- =?utf-8?B?Y1MvTll1b1pMNkdCL0hJRVZ4U2didG1mTGVZWDhRb25RQUlOQnRRYzRyZTU2?=
- =?utf-8?B?Ui9tSWdWNEorR3lYbzB2VlNDOExaL0pnS2V2Zy8yQmNEM0VMa0VTQS9Xc1hy?=
- =?utf-8?B?YmJjY2xvaVp2RmY2U2ErT255UkRzeTZwMEVpc2NOZ0dEU1d4ZmtpRmg3ZzYv?=
- =?utf-8?B?Mk5TZWJGNjBYaHcvSVJFRTRxREJudThyWXVKQkpxcWpHWkpDdjk0OVNOUnQ1?=
- =?utf-8?B?dFJ3WVJYZStwOW9tU1oxcW05ZXVZdlZmeWl3VWRJTmlSclNaSVhHZ1cyb2Yw?=
- =?utf-8?B?cW5MSC9TMkJGeHZzRlNhTjJSZ3dJWVdKdDJCK25GTEphS1RzT0ZwZEV2bE5T?=
- =?utf-8?B?SzYrRWpWRU1BeklWRndYblZjS3lDQlZrZXJPdDdHSVBIOVVOMjZuVHhzRDNM?=
- =?utf-8?B?Uy9IV1p6c3RRN1NpMVdOSGVERGd6dWVnbHdDTTFOTnY2MFB5VHhpb09tWEo5?=
- =?utf-8?B?bGE4WW9CYkd5U1FyeFB4R2NuN1NHNktoRG5lOTBlWkN2b2JEeTBFNjFQYXhI?=
- =?utf-8?B?czJENWxIdGZuOG0yWFFKQklkODRUN2VrdjJQVmJodUl4V3NVT25RQzZFL3ZT?=
- =?utf-8?B?c1ltb29RMFIva21HY3dENFZWejBVd2k4TnlrTFlyUXBaQlJ1Z2ZXdHF2OHFS?=
- =?utf-8?B?MjhKV1B3dXEvQ3N1Y0JkQkZXL05vUzNZSzhpQW1Ga0NvWk9vT3JLWmFBdy9I?=
- =?utf-8?B?Z2VCSHVkUC9QbUJ1RkpIb29HT3lZM2ZyZnF4dEZuV1I0cUIwNkZ4TnI2MWE4?=
- =?utf-8?B?M01HdkZGK0lod2Y4Z3pLdEpta2tOS29sK3h0UDFFRC9SaHphT3hpWkdDRXI2?=
- =?utf-8?B?dFkzUjRwb094RGFLV285TUgrL0tyWGRXQzVVVm1WaU56MTlaTkhXTURkQTgy?=
- =?utf-8?B?S0tvamVxMnlMem53cXhMMnZIdkdsSXpLOUdtMzliLzg4eGo0aHg1M3FHNGhQ?=
- =?utf-8?B?SDZ6ZUpHUVhHWFZOYmdOS0NhZlQ5K1pQR29qSGJTaHVoSU9xS1lJU2dJTnh2?=
- =?utf-8?B?cXVZWTFCUHR1ZWlQazl5V2RMa2VvVFcyUXROS1dxVVJrTE5LVTI4UHlhbHd0?=
- =?utf-8?B?bHNVVGZKSU1ka3ZtTkFXcXM5UjRIbGd1TkoyTVBlZVhSOXFuWUZaSDFyN3pI?=
- =?utf-8?B?NWIwOEdKTGtIRi83NUl5WDBJeXhuMHdnRXI4M0FMOGNuRDdQb2p1dXE4cjdI?=
- =?utf-8?B?MGhMazFBZ3dKckVyR0JydmVnbitTVXV2ckxZTWI5MjNlTmthOFhyUGpKUHU5?=
- =?utf-8?B?RlU5RzhZWHkwSU53TFZ3VXdtalhNR2t6aW9qS2NXNG5COVZWb0trak4vcHB3?=
- =?utf-8?B?SlViQ2srcDQyc0tXeW9leVJPSlcxS1J0UlUrV0J5T1dieDVacDIrZjlpUzBI?=
- =?utf-8?B?UkM2RWpkQVNaWEp0Q3RtYTRVSGlpSTFvTGl5bnRydGE2b2JVQkZrUXNpT0tV?=
- =?utf-8?B?MEpDaS9sMDJuSEkxN1BrWHkzaFQyYXdBLzMyTFVmaTZSRmVOZEJxZVplRHF4?=
- =?utf-8?B?N2JxQWFVWkpGSnhjOHdseG16TUtMNVpaZmZVZz09?=
-X-Forefront-Antispam-Report:
-	CIP:131.228.6.101;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr712usmtp1.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2025 16:29:20.8196
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 269b12e7-6f5e-4927-88c9-08dded62887b
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.101];Helo=[fr712usmtp1.zeu.alcatel-lucent.com]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-AM2PEPF0001C70D.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR07MB10487
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905133504.2348972-7-t-pratham@ti.com>
 
-From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Hi Pratham,
 
-As SACK blocks tend to eat all option space when there are
-many holes, it is useful to compromise on sending many SACK
-blocks in every ACK and attempt to fit the AccECN option
-there by reducing the number of SACK blocks. However, it will
-never go below two SACK blocks because of the AccECN option.
+kernel test robot noticed the following build warnings:
 
-As the AccECN option is often not put to every ACK, the space
-hijack is usually only temporary. Depending on the reuqired
-AccECN fields (can be either 3, 2, 1, or 0, cf. Table 5 in
-AccECN spec) and the NOPs used for alignment of other
-TCP options, up to two SACK blocks will be reduced. Please
-find below tables for more details:
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on next-20250905]
+[cannot apply to herbert-crypto-2.6/master linus/master v6.17-rc4]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-+====================+=========================================+
-| Number of | Required | Remaining |  Number of  |    Final    |
-|   SACK    |  AccECN  |  option   |  reduced    |  number of  |
-|  blocks   |  fields  |  spaces   | SACK blocks | SACK blocks |
-+===========+==========+===========+=============+=============+
-|  x (<=2)  |  0 to 3  |    any    |      0      |      x      |
-+-----------+----------+-----------+-------------+-------------+
-|     3     |    0     |    any    |      0      |      3      |
-|     3     |    1     |    <4     |      1      |      2      |
-|     3     |    1     |    >=4    |      0      |      3      |
-|     3     |    2     |    <8     |      1      |      2      |
-|     3     |    2     |    >=8    |      0      |      3      |
-|     3     |    3     |    <12    |      1      |      2      |
-|     3     |    3     |    >=12   |      0      |      3      |
-+-----------+----------+-----------+-------------+-------------+
-|  y (>=4)  |    0     |    any    |      0      |      y      |
-|  y (>=4)  |    1     |    <4     |      1      |     y-1     |
-|  y (>=4)  |    1     |    >=4    |      0      |      y      |
-|  y (>=4)  |    2     |    <8     |      1      |     y-1     |
-|  y (>=4)  |    2     |    >=8    |      0      |      y      |
-|  y (>=4)  |    3     |    <4     |      2      |     y-2     |
-|  y (>=4)  |    3     |    <12    |      1      |     y-1     |
-|  y (>=4)  |    3     |    >=12   |      0      |      y      |
-+===========+==========+===========+=============+=============+
+url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/crypto-ti-Add-support-for-AES-XTS-in-DTHEv2-driver/20250905-214245
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20250905133504.2348972-7-t-pratham%40ti.com
+patch subject: [PATCH 3/4] crypto: ti: Add support for AES-GCM in DTHEv2 driver
+config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20250907/202509070015.xKJCeXKj-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250907/202509070015.xKJCeXKj-lkp@intel.com/reproduce)
 
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Co-developed-by: Ilpo Järvinen <ij@kernel.org>
-Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509070015.xKJCeXKj-lkp@intel.com/
 
----
-v8:
-- Update tcp_options_fit_accecn() to avoid using recursion
----
- net/ipv4/tcp_output.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 65b90f73daa0..388c45859469 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -873,7 +873,9 @@ static int tcp_options_fit_accecn(struct tcp_out_options *opts, int required,
- 				  int remaining)
- {
- 	int size = TCP_ACCECN_MAXSIZE;
-+	int sack_blocks_reduce = 0;
- 	int max_combine_saving;
-+	int rem = remaining;
- 	int align_size;
- 
- 	if (opts->use_synack_ecn_bytes)
-@@ -888,14 +890,31 @@ static int tcp_options_fit_accecn(struct tcp_out_options *opts, int required,
- 		else
- 			align_size = ALIGN_DOWN(size, 4);
- 
--		if (remaining >= align_size) {
-+		if (rem >= align_size) {
- 			size = align_size;
- 			break;
-+		} else if (opts->num_accecn_fields == required &&
-+			   opts->num_sack_blocks > 2 &&
-+			   required > 0) {
-+			/* Try to fit the option by removing one SACK block */
-+			opts->num_sack_blocks--;
-+			sack_blocks_reduce++;
-+			rem = rem + TCPOLEN_SACK_PERBLOCK;
-+
-+			opts->num_accecn_fields = TCP_ACCECN_NUMFIELDS;
-+			size = TCP_ACCECN_MAXSIZE;
-+			continue;
- 		}
- 
- 		opts->num_accecn_fields--;
- 		size -= TCPOLEN_ACCECN_PERFIELD;
- 	}
-+	if (sack_blocks_reduce > 0) {
-+		if (opts->num_accecn_fields >= required)
-+			size -= sack_blocks_reduce * TCPOLEN_SACK_PERBLOCK;
-+		else
-+			opts->num_sack_blocks += sack_blocks_reduce;
-+	}
- 	if (opts->num_accecn_fields < required)
- 		return 0;
- 
+>> drivers/crypto/ti/dthev2-aes.c:787:7: warning: variable 'unpadded_cryptlen' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+     787 |                 if (!dst) {
+         |                     ^~~~
+   drivers/crypto/ti/dthev2-aes.c:927:6: note: uninitialized use occurs here
+     927 |         if (unpadded_cryptlen % AES_BLOCK_SIZE)
+         |             ^~~~~~~~~~~~~~~~~
+   drivers/crypto/ti/dthev2-aes.c:787:3: note: remove the 'if' if its condition is always false
+     787 |                 if (!dst) {
+         |                 ^~~~~~~~~~~
+     788 |                         ret = -ENOMEM;
+         |                         ~~~~~~~~~~~~~~
+     789 |                         goto aead_prep_dst_err;
+         |                         ~~~~~~~~~~~~~~~~~~~~~~~
+     790 |                 }
+         |                 ~
+   drivers/crypto/ti/dthev2-aes.c:748:32: note: initialize the variable 'unpadded_cryptlen' to silence this warning
+     748 |         unsigned int unpadded_cryptlen;
+         |                                       ^
+         |                                        = 0
+   1 warning generated.
+
+
+vim +787 drivers/crypto/ti/dthev2-aes.c
+
+   737	
+   738	static int dthe_aead_run(struct crypto_engine *engine, void *areq)
+   739	{
+   740		struct aead_request *req = container_of(areq, struct aead_request, base);
+   741		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+   742		struct dthe_aes_req_ctx *rctx = aead_request_ctx(req);
+   743		struct dthe_data *dev_data = dthe_get_dev(ctx);
+   744	
+   745		unsigned int cryptlen = req->cryptlen;
+   746		unsigned int assoclen = req->assoclen;
+   747		unsigned int authsize = ctx->authsize;
+   748		unsigned int unpadded_cryptlen;
+   749		struct scatterlist *src = req->src;
+   750		struct scatterlist *dst = req->dst;
+   751	
+   752		int src_nents;
+   753		int dst_nents;
+   754		int src_mapped_nents, dst_mapped_nents;
+   755	
+   756		enum dma_data_direction src_dir, dst_dir;
+   757	
+   758		struct device *tx_dev, *rx_dev;
+   759		struct dma_async_tx_descriptor *desc_in, *desc_out;
+   760	
+   761		int ret;
+   762	
+   763		void __iomem *aes_base_reg = dev_data->regs + DTHE_P_AES_BASE;
+   764	
+   765		u32 aes_irqenable_val = readl_relaxed(aes_base_reg + DTHE_P_AES_IRQENABLE);
+   766		u32 aes_sysconfig_val = readl_relaxed(aes_base_reg + DTHE_P_AES_SYSCONFIG);
+   767	
+   768		aes_sysconfig_val |= DTHE_AES_SYSCONFIG_DMA_DATA_IN_OUT_EN;
+   769		writel_relaxed(aes_sysconfig_val, aes_base_reg + DTHE_P_AES_SYSCONFIG);
+   770	
+   771		aes_irqenable_val |= DTHE_AES_IRQENABLE_EN_ALL;
+   772		writel_relaxed(aes_irqenable_val, aes_base_reg + DTHE_P_AES_IRQENABLE);
+   773	
+   774		/* In decryption, the last authsize bytes are the TAG */
+   775		if (!rctx->enc)
+   776			cryptlen -= authsize;
+   777	
+   778		// Prep src and dst scatterlists
+   779		src = dthe_aead_prep_src(req->src, req->assoclen, cryptlen);
+   780		if (!src) {
+   781			ret = -ENOMEM;
+   782			goto aead_err;
+   783		}
+   784	
+   785		if (cryptlen != 0) {
+   786			dst = dthe_aead_prep_dst(req->dst, req->assoclen, cryptlen);
+ > 787			if (!dst) {
+   788				ret = -ENOMEM;
+   789				goto aead_prep_dst_err;
+   790			}
+   791		}
+   792	
+   793		unpadded_cryptlen = cryptlen;
+   794	
+   795		if (req->assoclen % AES_BLOCK_SIZE)
+   796			assoclen += AES_BLOCK_SIZE - (req->assoclen % AES_BLOCK_SIZE);
+   797		if (cryptlen % AES_BLOCK_SIZE)
+   798			cryptlen += AES_BLOCK_SIZE - (cryptlen % AES_BLOCK_SIZE);
+   799	
+   800		src_nents = sg_nents_for_len(src, assoclen + cryptlen);
+   801		dst_nents = sg_nents_for_len(dst, cryptlen);
+   802	
+   803		// Prep finished
+   804	
+   805		src_dir = DMA_TO_DEVICE;
+   806		dst_dir = DMA_FROM_DEVICE;
+   807	
+   808		tx_dev = dmaengine_get_dma_device(dev_data->dma_aes_tx);
+   809		rx_dev = dmaengine_get_dma_device(dev_data->dma_aes_rx);
+   810	
+   811		src_mapped_nents = dma_map_sg(tx_dev, src, src_nents, src_dir);
+   812		if (src_mapped_nents == 0) {
+   813			ret = -EINVAL;
+   814			goto aead_dma_map_src_err;
+   815		}
+   816	
+   817		desc_out = dmaengine_prep_slave_sg(dev_data->dma_aes_tx, src, src_mapped_nents,
+   818						   DMA_MEM_TO_DEV, DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+   819		if (!desc_out) {
+   820			ret = -EINVAL;
+   821			goto aead_dma_prep_src_err;
+   822		}
+   823	
+   824		desc_out->callback = dthe_aead_dma_in_callback;
+   825		desc_out->callback_param = req;
+   826	
+   827		if (cryptlen != 0) {
+   828			dst_mapped_nents = dma_map_sg(rx_dev, dst, dst_nents, dst_dir);
+   829			if (dst_mapped_nents == 0) {
+   830				ret = -EINVAL;
+   831				goto aead_dma_prep_src_err;
+   832			}
+   833	
+   834			desc_in = dmaengine_prep_slave_sg(dev_data->dma_aes_rx, dst,
+   835							  dst_mapped_nents, DMA_DEV_TO_MEM,
+   836							  DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+   837			if (!desc_in) {
+   838				ret = -EINVAL;
+   839				goto aead_dma_prep_dst_err;
+   840			}
+   841		}
+   842	
+   843		init_completion(&rctx->aes_compl);
+   844	
+   845		/*
+   846		 * HACK: There is an unknown hw issue where if the previous operation had alen = 0 and
+   847		 * plen != 0, the current operation's tag calculation is incorrect in the case where
+   848		 * plen = 0 and alen != 0 currently. This is a workaround for now which somwhow works;
+   849		 * by resetting the context by writing a 1 to the C_LENGTH_0 and AUTH_LENGTH registers.
+   850		 */
+   851		if (cryptlen == 0) {
+   852			writel_relaxed(1, aes_base_reg + DTHE_P_AES_C_LENGTH_0);
+   853			writel_relaxed(1, aes_base_reg + DTHE_P_AES_AUTH_LENGTH);
+   854		}
+   855	
+   856		u32 iv_in[AES_IV_WORDS];
+   857	
+   858		if (req->iv) {
+   859			memcpy(iv_in, req->iv, GCM_AES_IV_SIZE);
+   860		} else {
+   861			iv_in[0] = 0;
+   862			iv_in[1] = 0;
+   863			iv_in[2] = 0;
+   864		}
+   865		iv_in[3] = 0x01000000;
+   866	
+   867		// Clear key2 to reset previous GHASH intermediate data
+   868		for (int i = 0; i < AES_KEYSIZE_256 / sizeof(u32); ++i)
+   869			writel_relaxed(0, aes_base_reg + DTHE_P_AES_KEY2_6 + DTHE_REG_SIZE * i);
+   870	
+   871		dthe_aes_set_ctrl_key(ctx, rctx, iv_in);
+   872	
+   873		writel_relaxed(lower_32_bits(unpadded_cryptlen), aes_base_reg + DTHE_P_AES_C_LENGTH_0);
+   874		writel_relaxed(upper_32_bits(unpadded_cryptlen), aes_base_reg + DTHE_P_AES_C_LENGTH_1);
+   875		writel_relaxed(req->assoclen, aes_base_reg + DTHE_P_AES_AUTH_LENGTH);
+   876	
+   877		if (cryptlen != 0)
+   878			dmaengine_submit(desc_in);
+   879		dmaengine_submit(desc_out);
+   880	
+   881		if (cryptlen != 0)
+   882			dma_async_issue_pending(dev_data->dma_aes_rx);
+   883		dma_async_issue_pending(dev_data->dma_aes_tx);
+   884	
+   885		// Need to do a timeout to ensure mutex gets unlocked if DMA callback fails for any reason
+   886		ret = wait_for_completion_timeout(&rctx->aes_compl, msecs_to_jiffies(DTHE_DMA_TIMEOUT_MS));
+   887		if (!ret) {
+   888			ret = -ETIMEDOUT;
+   889			if (cryptlen != 0)
+   890				dmaengine_terminate_sync(dev_data->dma_aes_rx);
+   891			dmaengine_terminate_sync(dev_data->dma_aes_tx);
+   892	
+   893			for (int i = 0; i < AES_BLOCK_SIZE / sizeof(int); ++i)
+   894				readl_relaxed(aes_base_reg + DTHE_P_AES_DATA_IN_OUT + DTHE_REG_SIZE * i);
+   895		} else {
+   896			ret = 0;
+   897		}
+   898	
+   899		if (cryptlen != 0)
+   900			dma_sync_sg_for_cpu(rx_dev, dst, dst_nents, dst_dir);
+   901		if (rctx->enc) {
+   902			dthe_aead_enc_get_tag(req);
+   903			ret = 0;
+   904		} else {
+   905			ret = dthe_aead_dec_verify_tag(req);
+   906		}
+   907	
+   908	aead_dma_prep_dst_err:
+   909		if (cryptlen != 0)
+   910			dma_unmap_sg(rx_dev, dst, dst_nents, dst_dir);
+   911	aead_dma_prep_src_err:
+   912		dma_unmap_sg(tx_dev, src, src_nents, src_dir);
+   913	
+   914	aead_dma_map_src_err:
+   915		if (unpadded_cryptlen % AES_BLOCK_SIZE && cryptlen != 0)
+   916			kfree(sg_virt(&dst[dst_nents - 1]));
+   917	
+   918		if (cryptlen != 0)
+   919			kfree(dst);
+   920	
+   921	aead_prep_dst_err:
+   922		if (req->assoclen % AES_BLOCK_SIZE) {
+   923			int assoc_nents = sg_nents_for_len(src, req->assoclen);
+   924	
+   925			kfree(sg_virt(&src[assoc_nents]));
+   926		}
+   927		if (unpadded_cryptlen % AES_BLOCK_SIZE)
+   928			kfree(sg_virt(&src[src_nents - 1]));
+   929	
+   930		kfree(src);
+   931	
+   932	aead_err:
+   933		local_bh_disable();
+   934		crypto_finalize_aead_request(dev_data->engine, req, ret);
+   935		local_bh_enable();
+   936		return ret;
+   937	}
+   938	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
