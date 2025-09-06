@@ -1,123 +1,154 @@
-Return-Path: <netdev+bounces-220564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE93FB46950
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 07:37:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83983B4695A
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 07:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A01B65C3A2A
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 05:37:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64E3D1B27C3D
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 05:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6269321D5B3;
-	Sat,  6 Sep 2025 05:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5503327A455;
+	Sat,  6 Sep 2025 05:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="Pc2NVmAH"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="qznqnojg"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C280D4C85;
-	Sat,  6 Sep 2025 05:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CD527B33B
+	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 05:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757137047; cv=none; b=imAE6qiEqoMBaIOYYUgJRBgSMnNmzeD0YFPbKytfpLA7lORHa75CcHUkful5htmOm4g/Z25NmZqsBlkI4OzWSl41qqfV/bWXoyJQtQQUQLRm1em1iVi5xPLvMzoXS2a7GnU2QZ0csuBpJrXd3l2cZ+A9CEpoDJ6SN3/XGjqvJV4=
+	t=1757137977; cv=none; b=WDsK7/BJ9djpUdBykIhfS7o9Iz6R+qU9w/Ntklj68U/NIWqnRjqPs/5FnSL52KMEfuufkp2SXLV0Akg1pVPKE7tk6/TugGpt6Np6K1w8WuMkzxFEJ+1HiZ+rC1EOWVmKcKbQSBySe3GW12bHAPHETWrDoaQ3hkpNl6QB2X5qwio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757137047; c=relaxed/simple;
-	bh=wI0wevMGuuWRJUTVju5J6qPVfzuWW/OeRDSlbWe/Uh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WIAQyWojnGclqHI9U76zImf2yAw7OLUo3uN9Wf7Yw0Ph/V8251g3l5M167e9vcBYl6MUenIr/dh9EB8zoZcfxJqg8hRZ5b8o0fB3fmPoHEFSjQW4Y8bDXTWAkIWyrb8HK+/jmgOSczCNRt70eKc2s1yWGzbuRBFvooAaTWF5mN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=Pc2NVmAH; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 46ADD22FBA;
-	Sat,  6 Sep 2025 07:37:16 +0200 (CEST)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id FNfilUzRkkX6; Sat,  6 Sep 2025 07:37:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1757137032; bh=wI0wevMGuuWRJUTVju5J6qPVfzuWW/OeRDSlbWe/Uh8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Pc2NVmAH3A/h9UswdB5Zwb7wYJRw31J3IXwZrZenSw6QoBmAZjI9ibSO87/kEIUul
-	 iOdnSjO6Z0bsB+GdZ6UoCpWjTiR9pSIrcArMD5vKSJb1p2CZaAT7RkkyBMKBKGE8KC
-	 xd2WxeZRmwFeZ74F+BPLS20j5S3TKMJcRCpw1UWpy59Jy/KwIEbtVXyg0TRskhvAF8
-	 huq5kEpgVs3MUnfIw5rZvp3NMPruOWqRQ/SYYyBgSHweaWEqtoIyXshIvFG7TPdS4O
-	 yeGlodGUv6jA2Kn6l1JlIZOimbrshSbsWBpJ/qGpge5h/cCfshgQNuoaKII4OZ0xeF
-	 xu+8C5lL2LBbQ==
-Date: Sat, 6 Sep 2025 05:36:44 +0000
-From: Yao Zi <ziyao@disroot.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
- contain invalid address
-Message-ID: <aLvIbPfWWNa6TwNv@pie>
-References: <20250904031222.40953-3-ziyao@disroot.org>
- <aLlwv3v8ACha8b-3@shell.armlinux.org.uk>
- <b5fbeb3f-9962-444d-85b3-3b8a11f69266@rock-chips.com>
- <aLlyb6WvoBiBfUx3@shell.armlinux.org.uk>
- <aLly7lJ05xQjqCWn@shell.armlinux.org.uk>
+	s=arc-20240116; t=1757137977; c=relaxed/simple;
+	bh=lLUA1qSoabAKNNYZMXT4CngoOBmpTg5GaPUtd2ta9YA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S15G3/O/szQarVACqnPx27DJ7tJCCDt1zv/Qs3W2k8QNJWIDrh+t32SJdpxYxy0uIpI1SVixVnVx5MplRjsSnZRePy+ZL3tjL3k/JetgkYEv41VbiqhdJADf4qJO+rfnCWHmrzIo/4M6Pn4OPTIz93s2qnCK1cnEivxuvQJ2n9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=qznqnojg; arc=none smtp.client-ip=50.112.246.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1757137974; x=1788673974;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TPc0WkfGfsp6qmcwRcgMulnl8xpARdCh9bvgudyMu7I=;
+  b=qznqnojgOMhW3126OWzJELpOcQfltQPaGv7FPNigZm/ehu6Ett3kBKVJ
+   L5ytOqdBAiZJkjixnq8+xZ1qZvaDAyfBCuQkYzquMbWwUQdAZ07y5rWdR
+   hu1fnskjI4nP/FIDzekoYGdKi1lBgoUqYGmacULTov1YjiUgc8VltgKNW
+   b9H/R2BFnVrOzDy3EWMlXrvc0QTcszdhnxqcYDum6sFrA4yTDHN5W76PE
+   KzDCgSV2+my6Td0LYGmCJ0U78JnfsYLAmWNQNEw1vgaosqd8Oqu7aIb+s
+   14FQA6sDvelfcXon4AWJUIv7zjcfOs1VHp46iRjamDD11hUE1GqVBqIDQ
+   g==;
+X-CSE-ConnectionGUID: 7CPTnwrqRhe41Z9IzYG/jA==
+X-CSE-MsgGUID: sWKtFZUuRcCDpJqakPJj5A==
+X-IronPort-AV: E=Sophos;i="6.18,243,1751241600"; 
+   d="scan'208";a="2404541"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 05:52:52 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:54514]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.13:2525] with esmtp (Farcaster)
+ id ca8fba9b-da9d-409b-984f-2323c7e6d4ed; Sat, 6 Sep 2025 05:52:51 +0000 (UTC)
+X-Farcaster-Flow-ID: ca8fba9b-da9d-409b-984f-2323c7e6d4ed
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Sat, 6 Sep 2025 05:52:50 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.7) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Sat, 6 Sep 2025 05:52:48 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kurt Kanzenbach
+	<kurt@linutronix.de>, <kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
+Subject: [PATCH v1 iwl-net] igc: unregister netdev when igc_led_setup() fails in igc_probe()
+Date: Sat, 6 Sep 2025 14:51:30 +0900
+Message-ID: <20250906055239.29396-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLly7lJ05xQjqCWn@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Thu, Sep 04, 2025 at 12:07:26PM +0100, Russell King (Oracle) wrote:
-> On Thu, Sep 04, 2025 at 12:05:19PM +0100, Russell King (Oracle) wrote:
-> > On Thu, Sep 04, 2025 at 07:03:10PM +0800, Chaoyi Chen wrote:
-> > > 
-> > > On 9/4/2025 6:58 PM, Russell King (Oracle) wrote:
-> > > > On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
-> > > > >   	if (plat->phy_node) {
-> > > > >   		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
-> > > > >   		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
-> > > > > -		/* If it is not integrated_phy, clk_phy is optional */
-> > > > > +		/*
-> > > > > +		 * If it is not integrated_phy, clk_phy is optional. But we must
-> > > > > +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
-> > > > > +		 * the error code could be wrongly taken as an invalid pointer.
-> > > > > +		 */
-> > > > I'm concerned by this. This code is getting the first clock from the DT
-> > > > description of the PHY. We don't know what type of PHY it is, or what
-> > > > the DT description of that PHY might suggest that the first clock would
-> > > > be.
-> > > > 
-> > > > However, we're geting it and setting it to 50MHz. What if the clock is
-> > > > not what we think it is?
-> > > 
-> > > We only set integrated_phy to 50M, which are all known targets. For external PHYs, we do not perform frequency settings.
-> > 
-> > Same question concerning enabling and disabling another device's clock
-> > that the other device should be handling.
-> 
-> Let me be absolutely clear: I consider *everything* that is going on
-> with clk_phy here to be a dirty hack.
-> 
-> Resources used by a device that has its own driver should be managed
-> by _that_ driver alone, not by some other random driver.
+Currently igc_probe() doesn't unregister netdev when igc_led_setup()
+fails, causing BUG_ON() in free_netdev() and then kernel panics. [1]
 
-Agree on this. Should we drop the patch, or fix it up for now to at
-least prevent the oops? Chaoyi, I guess there's no user of the feature
-for now, is it?
+This behavior can be tested using fault-injection framework. I used the
+failslab feature to test the issue. [2]
 
-Best regards,
-Yao Zi
+Call unregister_netdev() when igc_led_setup() fails to avoid the kernel
+panic.
 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+[1]
+ kernel BUG at net/core/dev.c:12047!
+ Oops: invalid opcode: 0000 [#1] SMP NOPTI
+ CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+ RIP: 0010:free_netdev+0x278/0x2b0
+ [...]
+ Call Trace:
+  <TASK>
+  igc_probe+0x370/0x910
+  local_pci_probe+0x3a/0x80
+  pci_device_probe+0xd1/0x200
+ [...]
+
+[2]
+ #!/bin/bash -ex
+
+ FAILSLAB_PATH=/sys/kernel/debug/failslab/
+ DEVICE=0000:00:05.0
+ START_ADDR=$(grep " igc_led_setup" /proc/kallsyms \
+         | awk '{printf("0x%s", $1)}')
+ END_ADDR=$(printf "0x%x" $((START_ADDR + 0x100)))
+
+ echo $START_ADDR > $FAILSLAB_PATH/require-start
+ echo $END_ADDR > $FAILSLAB_PATH/require-end
+ echo 1 > $FAILSLAB_PATH/times
+ echo 100 > $FAILSLAB_PATH/probability
+ echo N > $FAILSLAB_PATH/ignore-gfp-wait
+
+ echo $DEVICE > /sys/bus/pci/drivers/igc/bind
+
+Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index e79b14d50b24..95c415d0917d 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7336,11 +7336,13 @@ static int igc_probe(struct pci_dev *pdev,
+ 	if (IS_ENABLED(CONFIG_IGC_LEDS)) {
+ 		err = igc_led_setup(adapter);
+ 		if (err)
+-			goto err_register;
++			goto err_led_setup;
+ 	}
+ 
+ 	return 0;
+ 
++err_led_setup:
++	unregister_netdev(netdev);
+ err_register:
+ 	igc_release_hw_control(adapter);
+ 	igc_ptp_stop(adapter);
+-- 
+2.48.1
+
 
