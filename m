@@ -1,169 +1,276 @@
-Return-Path: <netdev+bounces-220616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6546B476BF
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:08:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CDF7B476D4
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B620584171
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 19:08:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30A717C3FD3
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 19:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D21285050;
-	Sat,  6 Sep 2025 19:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4E1284B51;
+	Sat,  6 Sep 2025 19:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+mFAiR0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rn5HF3f/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DBF1C84B8;
-	Sat,  6 Sep 2025 19:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057231FBEB6;
+	Sat,  6 Sep 2025 19:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757185676; cv=none; b=qC/gtDcM89xeadWgBVGkHfRCMXJMYu629hDFgp7uFn2hXnH4xm3SJffHsCoZFzKl+HVovmI9Fmma6lVTH3chhqoRZwk2al0bPdWERImAK2VDrLObNRuW3i/p5ZAhNSAEb9vr2t2FpbdxSh4gkMqpkwxOVpZBPcCdOL1D2YOhxRk=
+	t=1757186239; cv=none; b=LboW9F1N9TPHzFmSwGEsoeE+KEykILlJX8t1kN93zB1jo6rdkjAdD/NzNLOCgcjHnwTOiRBI5j7/BnpIHGRc+86t8b85y/CoSPLaPZOXu7AOWUE7jpQObrTg5+erAD//jVxFRa4c+cZDGUD7sPPgoGVInjImMwUQ/u7JIrfcZRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757185676; c=relaxed/simple;
-	bh=gVQxgJDG/hVQtG1HjsZygJpYDl5EUtgtz/PBvFVrOyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=axNzgzVpxewtcePplsFbF/xXdnpWOGhmZw5VM6YqGtzTJUyrmbFRyhz9ts5FIdo09eoWf8fR2olbvBryW7SipWBrVKDLOIR2r5rO3a2LqWq19sE1NQjacpxI2u7U/3Z+yF9vEMmvfJMm0sVZU9UhQT5G9IggvWbG5KF7fiL3N8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+mFAiR0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EB1BC4CEE7;
-	Sat,  6 Sep 2025 19:07:55 +0000 (UTC)
+	s=arc-20240116; t=1757186239; c=relaxed/simple;
+	bh=PIHt9qWHF0uha6ZXEr6wx9P1J0M5MOKU8PM2VawQnRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oGDG2XV7lK316t7UQ/sdAXWySCkZCa7TojFpYGaPSqbVTi01quBvEA9siTNJ6OmTpjQxTAyKiT7aD0Mzlg9v0N7k1GFecrBv2vNKVCzC1jvCqTPXk07r6Eb/CJ9WWZteRtIrj7dAgSCSf+J2wT8IR7lDzN0tiWSAcGvXdrjz9PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rn5HF3f/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F0CC4CEF7;
+	Sat,  6 Sep 2025 19:17:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757185676;
-	bh=gVQxgJDG/hVQtG1HjsZygJpYDl5EUtgtz/PBvFVrOyU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q+mFAiR08SBlMO52nyQV5x8Ckzaq209dYKqIE6BDTNYGo3M7mJTD5DTq7f7tdRNdh
-	 4kGgqnMI5MBeFAAsmP4W4LsYh1UUCVxREseZoKaO724QS262NxkU6LNt/Cm64QWDsN
-	 Ukjk623XcVlXyEURrRa/hJkjyYVrqH5QYqze0b8sBWf7DPdybfB/4UskmIwJXPFQcY
-	 FfQsyS5Dh3N2bWn/AICiDZQuYvU3TwGB1MVmsmtFb+BgXHgtwUgcXgfxzq+9wiYJ/g
-	 RCkVuMdtfNP/q0QeJ1a/DLREycy5IBpXh1eb4AEM3PSSRmbpiwnKIssXMY0U49cBl+
-	 wF23214GL5o9A==
-Date: Sat, 6 Sep 2025 12:07:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
- <ast@fiberby.net>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Simon Horman
- <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 05/11] tools: ynl-gen: define nlattr *array in
- a block scope
-Message-ID: <20250906120754.7b90c718@kernel.org>
-In-Reply-To: <4eda9c57-bde0-43c3-b8a0-3e45f2e672ac@fiberby.net>
-References: <20250904-wg-ynl-prep@fiberby.net>
-	<20250904220156.1006541-5-ast@fiberby.net>
-	<20250905171809.694562c6@kernel.org>
-	<4eda9c57-bde0-43c3-b8a0-3e45f2e672ac@fiberby.net>
+	s=k20201202; t=1757186238;
+	bh=PIHt9qWHF0uha6ZXEr6wx9P1J0M5MOKU8PM2VawQnRo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rn5HF3f/ZySMqQCcl8Gt2sNa034RPGm/Lgah8OwoA2FDrLOSOZqs62KbN+VtSJQO3
+	 Ozk4ih1h0A74mDAgu4WwakXifYAIg/kyY10N2HbH1Ajgagbqh9hws7F8roIvkK2R2E
+	 FH8hwgaOhmPqMeyiOqX161+mz7bj99JXKAqQElNMHaSUe0pCkNk0ZwqzgSCphZXvmt
+	 XiEDH5jAPPfmkjgoFRT74vhWvO9p48K1/PbiaaAMN/mpTsYIoYu47l83IhXJ7fuQc4
+	 hrnPBuP37QFel11vVD3j1Z74C1wjkWPxeOvWeVpfcz4VaeC5vtjpOQScIu1YL9SOU9
+	 sojktmtwhi8wg==
+Date: Sat, 6 Sep 2025 14:17:17 -0500
+From: Rob Herring <robh@kernel.org>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v7 1/3] dt-bindings: net: dsa: yt921x: Add
+ Motorcomm YT921x switch support
+Message-ID: <20250906191717.GA1639859-robh@kernel.org>
+References: <20250905181728.3169479-1-mmyangfl@gmail.com>
+ <20250905181728.3169479-2-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905181728.3169479-2-mmyangfl@gmail.com>
 
-On Sat, 6 Sep 2025 13:13:29 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
-> In patch 4, it is about a variable used by multiple Type classes having
-> presence_type() =3D 'count', which is currently 3 classes:
-> - TypeBinaryScalarArray
-> - TypeMultiAttr
-> - TypeArrayNest (later renamed to TypeIndexedArray)
->=20
-> In patch 5, I move code for a special variable used by one Type class,
-> to be contained within that class. It makes it easier to ensure that the
-> variable is only defined, when used, and vice versa. This comes at the
-> cost of the generated code looking generated.
+On Sat, Sep 06, 2025 at 02:17:21AM +0800, David Yang wrote:
+> The Motorcomm YT921x series is a family of Ethernet switches with up to
+> 8 internal GbE PHYs and up to 2 GMACs.
 
-So you're agreeing?
+A couple of nits below if you spin another version.
 
-> If we should make the generated code look like it was written by humans,
-> then I would move the definition of these local variables into a class
-> method, so `i` can be generated by the generic implementation, and `array`
-> can be implemented in it's class. I will take a stab at this, but it might
-> be too much refactoring for this series, eg. `len` is also defined local
-> to conditional blocks multiple branches in a row.
->=20
-> tools/net/ynl/generated/nl80211-user.c:
-> nl80211_iftype_data_attrs_parse(..) {
->    [..]
->    ynl_attr_for_each_nested(attr, nested) {
->      unsigned int type =3D ynl_attr_type(attr);
->=20
->      if (type =3D=3D NL80211_BAND_IFTYPE_ATTR_IFTYPES) {
->        unsigned int len;
->        [..]
->      } else if (type =3D=3D NL80211_BAND_IFTYPE_ATTR_HE_CAP_MAC) {
->        unsigned int len;
->        [..]
->      [same pattern 8 times, so 11 times in total]
->      } else if (type =3D=3D NL80211_BAND_IFTYPE_ATTR_EHT_CAP_PPE) {
->        unsigned int len;
->        [..]
->      }
->    }
->    return 0;
-> }
+> 
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  .../bindings/net/dsa/motorcomm,yt921x.yaml    | 169 ++++++++++++++++++
+>  1 file changed, 169 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+> new file mode 100644
+> index 000000000000..275f5feb0160
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+> @@ -0,0 +1,169 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dsa/motorcomm,yt921x.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Motorcomm YT921x Ethernet switch family
+> +
+> +maintainers:
+> +  - David Yang <mmyangfl@gmail.com>
+> +
+> +description: |
+> +  The Motorcomm YT921x series is a family of Ethernet switches with up to 8
+> +  internal GbE PHYs and up to 2 GMACs, including:
+> +
+> +    - YT9215S / YT9215RB / YT9215SC: 5 GbE PHYs (Port 0-4) + 2 GMACs (Port 8-9)
+> +    - YT9213NB: 2 GbE PHYs (Port 1/3) + 1 GMAC (Port 9)
+> +    - YT9214NB: 2 GbE PHYs (Port 1/3) + 2 GMACs (Port 8-9)
+> +    - YT9218N: 8 GbE PHYs (Port 0-7)
+> +    - YT9218MB: 8 GbE PHYs (Port 0-7) + 2 GMACs (Port 8-9)
+> +
+> +  Any port can be used as the CPU port.
+> +
+> +properties:
+> +  compatible:
+> +    const: motorcomm,yt9215
+> +
+> +  reg:
+> +    enum: [0x0, 0x1d]
+> +
+> +  reset-gpios:
+> +    maxItems: 1
+> +
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: |
 
-It's pretty easily doable, I already gave up on not calling _attr_get()
-for sub-messages.
+Don't need '|'.
 
-> That looks very generated, I would have `len` defined together with `type=
-`,
-> and a switch statement would also look a lot more natural, but maybe leave
-> the if->switch conversion for the compiler to detect.
+> +      Internal MDIO bus for the internal GbE PHYs. PHYs 0-7 are used for Port
+> +      0-7 respectively.
+> +
+> +  mdio-external:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: |
 
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen=
-_c.py
-index fb7e03805a11..8a1f8a477566 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -243,7 +243,7 @@ from lib import SpecSubMessage, SpecSubMessageFormat
-         raise Exception(f"Attr get not implemented for class type {self.ty=
-pe}")
-=20
-     def attr_get(self, ri, var, first):
--        lines, init_lines, local_vars =3D self._attr_get(ri, var)
-+        lines, init_lines, _ =3D self._attr_get(ri, var)
-         if type(lines) is str:
-             lines =3D [lines]
-         if type(init_lines) is str:
-@@ -251,10 +251,6 @@ from lib import SpecSubMessage, SpecSubMessageFormat
-=20
-         kw =3D 'if' if first else 'else if'
-         ri.cw.block_start(line=3Df"{kw} (type =3D=3D {self.enum_name})")
--        if local_vars:
--            for local in local_vars:
--                ri.cw.p(local)
--            ri.cw.nl()
-=20
-         if not self.is_multi_val():
-             ri.cw.p("if (ynl_attr_validate(yarg, attr))")
-@@ -2101,6 +2097,7 @@ _C_KW =3D {
-             else:
-                 raise Exception(f"Per-op fixed header not supported, yet")
-=20
-+    var_set =3D set()
-     array_nests =3D set()
-     multi_attrs =3D set()
-     needs_parg =3D False
-@@ -2118,6 +2115,13 @@ _C_KW =3D {
-             multi_attrs.add(arg)
-         needs_parg |=3D 'nested-attributes' in aspec
-         needs_parg |=3D 'sub-message' in aspec
-+
-+        try:
-+            _, _, l_vars =3D aspec._attr_get(ri, '')
-+            var_set |=3D set(l_vars) if l_vars else set()
-+        except:
-+            pass  # _attr_get() not implemented by simple types, ignore
-+    local_vars +=3D list(var_set)
-     if array_nests or multi_attrs:
-         local_vars.append('int i;')
-     if needs_parg:
+Don't need '|'.
+
+> +      External MDIO bus to access external components. External PHYs for GMACs
+> +      (Port 8-9) are expected to be connected to the external MDIO bus in
+> +      vendor's reference design, but that is not a hard limitation from the
+> +      chip.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +allOf:
+> +  - $ref: dsa.yaml#/$defs/ethernet-ports
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/gpio/gpio.h>
+> +
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        switch@1d {
+> +            compatible = "motorcomm,yt9215";
+> +            /* default 0x1d, alternate 0x0 */
+> +            reg = <0x1d>;
+> +            reset-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
+> +
+> +            mdio {
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +
+> +                sw_phy0: phy@0 {
+> +                    reg = <0x0>;
+> +                };
+> +
+> +                sw_phy1: phy@1 {
+> +                    reg = <0x1>;
+> +                };
+> +
+> +                sw_phy2: phy@2 {
+> +                    reg = <0x2>;
+> +                };
+> +
+> +                sw_phy3: phy@3 {
+> +                    reg = <0x3>;
+> +                };
+> +
+> +                sw_phy4: phy@4 {
+> +                    reg = <0x4>;
+> +                };
+> +            };
+> +
+> +            mdio-external {
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +
+> +                phy1: phy@b {
+> +                    reg = <0xb>;
+> +                };
+> +            };
+> +
+> +            ports {
+
+ethernet-ports
+
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +
+> +                port@0 {
+
+ethernet-port
+
+> +                    reg = <0>;
+> +                    label = "lan1";
+> +                    phy-mode = "internal";
+> +                    phy-handle = <&sw_phy0>;
+> +                };
+> +
+> +                port@1 {
+> +                    reg = <1>;
+> +                    label = "lan2";
+> +                    phy-mode = "internal";
+> +                    phy-handle = <&sw_phy1>;
+> +                };
+> +
+> +                port@2 {
+> +                    reg = <2>;
+> +                    label = "lan3";
+> +                    phy-mode = "internal";
+> +                    phy-handle = <&sw_phy2>;
+> +                };
+> +
+> +                port@3 {
+> +                    reg = <3>;
+> +                    label = "lan4";
+> +                    phy-mode = "internal";
+> +                    phy-handle = <&sw_phy3>;
+> +                };
+> +
+> +                port@4 {
+> +                    reg = <4>;
+> +                    label = "lan5";
+> +                    phy-mode = "internal";
+> +                    phy-handle = <&sw_phy4>;
+> +                };
+> +
+> +                /* CPU port */
+> +                port@8 {
+> +                    reg = <8>;
+> +                    phy-mode = "sgmii";
+> +                    ethernet = <&eth0>;
+> +
+> +                    fixed-link {
+> +                        speed = <1000>;
+> +                        full-duplex;
+> +                        pause;
+> +                        asym-pause;
+> +                    };
+> +                };
+> +
+> +                /* if external phy is connected to a MAC */
+> +                port@9 {
+> +                    reg = <9>;
+> +                    label = "wan";
+> +                    phy-mode = "rgmii";
+> +                    phy-handle = <&phy1>;
+> +                };
+> +            };
+> +        };
+> +    };
+> -- 
+> 2.50.1
+> 
 
