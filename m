@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-220556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 702D3B468D3
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 06:13:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DFD6B468D0
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 06:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 182DBA4801C
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 04:13:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E5CB177BAA
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 04:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C944260575;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879A825F799;
 	Sat,  6 Sep 2025 04:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGOCCKyv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imNNXESu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A49A25BEF1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C89825BEE8;
 	Sat,  6 Sep 2025 04:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757132022; cv=none; b=MvUymzW6Cfp632MLmKoTdP0nMAZJIafY2sITOjZELd5Uyaw2b9u0K4MFlDOnEOJZMBfE/GDpjNaMCTY9BWG1QerBHIQ3tV6uuJe/iWTV2ZGjncIy9xpWf9onbFW7Oq0pyATZPh3xzt3hzhIzSnArwYnKOyJg05at1N8+VDbGQM0=
+	t=1757132022; cv=none; b=mNzxbijf4Zdb720vlJEVD1Ywv3Xa4n0MbLmKHqwuCuebfqlnur3z2q04jGF+OkdrsQkVHPvtmU5oP/EG4+6mWE2mgKsvzDVnizOkZV9nJo0iCHopZEsjqKbOSB+0cuNJ1kAUg61sbsYUccrhD3SHpnr3Wv3NiFlgYXx/fax4StE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757132022; c=relaxed/simple;
-	bh=e0tQSO9pJI2jVvlvL9W4OBbAj83puHTjG+o0KV+3bdg=;
+	bh=lfdtXInB87tu2kO8lr4PclPJGDu1MGh0UniOZ5ZFUPg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p7kVozkxKcuf/VX/RjRenZoRMoW01BAnxh0Y0aw1S1xZzCPzDkfgEQQyVfkK937O8L9uPlcNknRTDokt+3SczLbtwlO6+GP0/4+3FUgopC/4RjDaI/mSLnO9hZ8nH43XqcZQfDr6qpI1ev2xjDz10VK/n45qk/SMzRXc60II2GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGOCCKyv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA6F5C4CEFA;
+	 MIME-Version; b=Tkk94MQIzjJB+gthy5TUjJ7Jro9EN0w9NXmOU4fB2HIkUbFQG0oEezKzBZWqQ029ZV9WEmX8GmU6j4sf+GEetxwrIvQXku/ASBS3KYcsHEA0mXVQvmBmocIghWeSR/lsInkCU/io7LfXZOqcVKEolzn5+DDgEG4AnbyD0vDqcMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imNNXESu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1FBC4CEE7;
 	Sat,  6 Sep 2025 04:13:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757132022;
-	bh=e0tQSO9pJI2jVvlvL9W4OBbAj83puHTjG+o0KV+3bdg=;
+	s=k20201202; t=1757132021;
+	bh=lfdtXInB87tu2kO8lr4PclPJGDu1MGh0UniOZ5ZFUPg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EGOCCKyvtKQUB2Yp7JXOHuMuYZTKhFou+gUmvaZSudPcnsXWZbxp+Ak58iQAVKgKY
-	 gEYGre0Qtmg2KCOk6IpzBSiGSHy8zltK8m+VEf/e+22/0BXy4/IWWwu5XY5JQwNXpq
-	 F/TaPGQS5uFbXVqzfip1eyjKEZIwE/PsS1Vu+7+0iHOE9/um5naRykJK2bWoscQgNk
-	 PBp1RWgqH3QrFCgXX6qaqu4E0EFMh2KxzbWYWN4PUuAFtYzBrifpq7tIj1tl5lQcR3
-	 T0i2DRm5W/x9oKLgQReyU2clkAzCdJJ+I8I0GNpjcMZTbg1+/NXf8RfGozg4r4B0KW
-	 fK1sFc4mp0xvA==
+	b=imNNXESu02WE1qAyRlqDwx5gn4CSI1yvviY+YPNUpQ7ahq06PBnc0KUIFEHPzTt97
+	 seBu+49//TFDQgIijITmxTikt8UX7UcIrmtQ2y6yyL2jsNtWf3k2FszhN10W9ksFLh
+	 /ODLgEk0QChgcK5zQwcMC3ALVVaIxS5e/GAINLMxOyKobRPoVUOCosyDLVCNiuPEII
+	 zjseB6Esd0jrO+s5yc/9WdnsnVQrqXMoJvzVFMTs3nemYa8nOTsVw7fSUpN+rPhWwk
+	 GaEdE5bvRm8iGQob2+WKph8JzN8xJC7ECVS7lkLndYaaf4TFyv3+YVxy6Kwfvc5Ve+
+	 8uJJp3qJ241gw==
 Received: by wens.tw (Postfix, from userid 1000)
-	id B6DFC5FE60; Sat, 06 Sep 2025 12:13:38 +0800 (CST)
+	id BFAFC5FEB3; Sat, 06 Sep 2025 12:13:38 +0800 (CST)
 From: Chen-Yu Tsai <wens@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -62,9 +62,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Andre Przywara <andre.przywara@arm.com>,
 	Jernej Skrabec <jernej.skrabec@gmail.com>
-Subject: [PATCH net-next v3 03/10] soc: sunxi: sram: add entry for a523
-Date: Sat,  6 Sep 2025 12:13:26 +0800
-Message-Id: <20250906041333.642483-4-wens@kernel.org>
+Subject: [PATCH net-next v3 04/10] soc: sunxi: sram: register regmap as syscon
+Date: Sat,  6 Sep 2025 12:13:27 +0800
+Message-Id: <20250906041333.642483-5-wens@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250906041333.642483-1-wens@kernel.org>
 References: <20250906041333.642483-1-wens@kernel.org>
@@ -78,45 +78,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Chen-Yu Tsai <wens@csie.org>
 
-The A523 has two Ethernet controllers. So in the system controller
-address space, there are two registers for Ethernet clock delays,
-one for each controller.
+If the system controller had a ethernet controller glue layer control
+register, a limited access regmap would be registered and tied to the
+system controller struct device for the ethernet driver to use.
 
-Add a new entry for the A523 system controller that allows access to
-the second register.
+Until now, for the ethernet driver to acquire this regmap, it had to
+do a of_parse_phandle() + find device + dev_get_regmap() sequence.
+Since the syscon framework allows a provider to register a custom
+regmap for its device node, and the ethernet driver already uses
+syscon for one platform, this provides a much more easier way to
+pass the regmap.
+
+Use of_syscon_register_regmap() to register our regmap with the
+syscon framework so that consumers can retrieve it that way.
 
 Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- drivers/soc/sunxi/sunxi_sram.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Changes since v1:
+- Fix check on return value
+- Expand commit message
+---
+ drivers/soc/sunxi/sunxi_sram.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/drivers/soc/sunxi/sunxi_sram.c b/drivers/soc/sunxi/sunxi_sram.c
-index 08e264ea0697..4f8d510b7e1e 100644
+index 4f8d510b7e1e..1837e1b5dce8 100644
 --- a/drivers/soc/sunxi/sunxi_sram.c
 +++ b/drivers/soc/sunxi/sunxi_sram.c
-@@ -320,6 +320,10 @@ static const struct sunxi_sramc_variant sun50i_h616_sramc_variant = {
- 	.has_ths_offset = true,
- };
+@@ -12,6 +12,7 @@
  
-+static const struct sunxi_sramc_variant sun55i_a523_sramc_variant = {
-+	.num_emac_clocks = 2,
-+};
+ #include <linux/debugfs.h>
+ #include <linux/io.h>
++#include <linux/mfd/syscon.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+ #include <linux/of_address.h>
+@@ -377,6 +378,7 @@ static int __init sunxi_sram_probe(struct platform_device *pdev)
+ 	const struct sunxi_sramc_variant *variant;
+ 	struct device *dev = &pdev->dev;
+ 	struct regmap *regmap;
++	int ret;
+ 
+ 	sram_dev = &pdev->dev;
+ 
+@@ -394,6 +396,10 @@ static int __init sunxi_sram_probe(struct platform_device *pdev)
+ 		regmap = devm_regmap_init_mmio(dev, base, &sunxi_sram_regmap_config);
+ 		if (IS_ERR(regmap))
+ 			return PTR_ERR(regmap);
 +
- #define SUNXI_SRAM_THS_OFFSET_REG	0x0
- #define SUNXI_SRAM_EMAC_CLOCK_REG	0x30
- #define SUNXI_SYS_LDO_CTRL_REG		0x150
-@@ -440,6 +444,10 @@ static const struct of_device_id sunxi_sram_dt_match[] = {
- 		.compatible = "allwinner,sun50i-h616-system-control",
- 		.data = &sun50i_h616_sramc_variant,
- 	},
-+	{
-+		.compatible = "allwinner,sun55i-a523-system-control",
-+		.data = &sun55i_a523_sramc_variant,
-+	},
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, sunxi_sram_dt_match);
++		ret = of_syscon_register_regmap(dev->of_node, regmap);
++		if (ret)
++			return ret;
+ 	}
+ 
+ 	of_platform_populate(dev->of_node, NULL, NULL, dev);
 -- 
 2.39.5
 
