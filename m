@@ -1,129 +1,147 @@
-Return-Path: <netdev+bounces-220580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC0EB46D75
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 15:00:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE30AB46D95
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 15:13:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301E317C818
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 13:00:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 719937C676E
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 13:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7882ED85F;
-	Sat,  6 Sep 2025 12:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2042877C7;
+	Sat,  6 Sep 2025 13:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQ42NY5Y"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="OgLxGL9P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9442E2EBDCF;
-	Sat,  6 Sep 2025 12:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B2527FD52;
+	Sat,  6 Sep 2025 13:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757163597; cv=none; b=ts9sRZO+xjKbrbxg3yVV3H9lTg7guUTWwKWgQRQxmQDi0UroiCUiOwDcfDNsS+X4JyeX9H4HlaoKfYG8Vq0L2rY/Zw6GmjUaMv+petuZpQDrlLRPjwsmLpGLmlVQU4rdb6F1NmhPfY0n/Ijf7gN6TDazPowMuSLYIHGxAKCIMOA=
+	t=1757164431; cv=none; b=HPhfgADvxkGlh5g79PEfwpDYu3YMbQ4+YHFOiIvyEBeUQGR60lHyrU7xi9TheM9aDj6bv99+kfSLA9hrE+hSKjUcJwZKlaQ/3FPZ6ejFEdI50s5sbc/5ECEXLmtOekz+Rk+M56FnedCSSApLKP+Re7Qj9obe6HUzxPoH1GeWxbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757163597; c=relaxed/simple;
-	bh=dPHHOFQzeKso8XCobbIJUr1GuQ9B1WljENCofqy1yaw=;
+	s=arc-20240116; t=1757164431; c=relaxed/simple;
+	bh=U6Wn//k2dt+WlP5FxdkKg0o/lsaAgnjgIxpLlAHFjRQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q2koswFrLizRsZqulq+8sAQTWnJSr4Xqouz+cu3fGT7MJ27k4M0Q0HNXsd70y5ro6FKZg3vjQFog9eV9ojnZgEqyRUBHfB3REH6h39qbRqKNMtxQYlIWvvCJDWMpyo/eajuL1ZTGADf3otPewawYPkzayZllAsJBmMGBuXkAq7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQ42NY5Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 653A7C4CEE7;
-	Sat,  6 Sep 2025 12:59:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757163597;
-	bh=dPHHOFQzeKso8XCobbIJUr1GuQ9B1WljENCofqy1yaw=;
+	 In-Reply-To:Content-Type; b=GBxJx2RiFI5eLQY7GK2G662NFAV0W+3Xs+TtKoLJG7nGQL7V0q7mIf3WEeyqCU/sAZrJx1SEsvDuyudg5gaPvwth5eLEXI0Y9tcoIUR2It/4spypMAJGvvHOM75cUmfgxG3Ov0Yl5K585I9NVNfdmUQxAWAKiC0MIleDnrh0ih8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=OgLxGL9P; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1757164418;
+	bh=U6Wn//k2dt+WlP5FxdkKg0o/lsaAgnjgIxpLlAHFjRQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IQ42NY5YOLr866fPj4gplhFU0OKJtYXQK/5LeA0b6dCBzavnIfnD690vR/GlmVRnC
-	 x6eb9GxIoDOQRVtWmXnDGbbS5FHK+NwZsy7bwUV6Jzn4PIBBGnGHLHNAKIehAyiso3
-	 MpH5y7QAedUSEVTkD+HqQA6eT+DoYRAYHpTPuJVUrOQP5aU5y+9enxuyX/Egf+UuJr
-	 oPjqBzejdXTApHYDAyLFhBRQJiTZuuRukAwiBL6vyM0a1TAyaXfsLHPhhNimQZvi1z
-	 dTwV6rh7UZz1yxW2drXenpFAVfgFeFUpFpJyCLXNuY3uo2e3DSHhju52hIjfWmjqaX
-	 d8ZZkrEa6MDrw==
-Message-ID: <83f2156f-83d8-4b41-84a2-64ea0a9908f4@kernel.org>
-Date: Sat, 6 Sep 2025 14:59:50 +0200
+	b=OgLxGL9PmY2hDenIKO9MTOuA3hj3rjjLAE6gjC9/ut3CTDj/0n6d/ADaLV5sS/pre
+	 qdp9FbPirBIExy5Mm6og2meB1/orgHoCFAjd1mkFfN6LpqT5tDkT+pt1SvnX6v4Rr3
+	 S+dUj2BvE4zyk7sJXMzhEK+TNEpx0jSsvlRlZlz1sGzjD4U7Pbw7Lc9JjP0N1JkP6X
+	 aJBoU8dj0tx2HIbz7+5uGBtNJa4Rd/kls/Gn4E9QNFJgn/AewqUzY9R7NJduTXFdld
+	 zISErTvpey3eCskU22l+eQ26xZTtEPZOgNdeKHDXVD3NPo5/0eVwBL78KMSspEUwe4
+	 9UiA8dfLBbK1A==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 5E7046000C;
+	Sat,  6 Sep 2025 13:13:38 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id E9D4C200438;
+	Sat, 06 Sep 2025 13:13:29 +0000 (UTC)
+Message-ID: <4eda9c57-bde0-43c3-b8a0-3e45f2e672ac@fiberby.net>
+Date: Sat, 6 Sep 2025 13:13:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 net-next 5/9] mptcp: snmp: do not use SNMP_MIB_SENTINEL
- anymore
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
- Jamie Bainbridge <jamie.bainbridge@gmail.com>,
- Abhishek Rawal <rawal.abhishek92@gmail.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, MPTCP Linux <mptcp@lists.linux.dev>
-References: <20250905165813.1470708-1-edumazet@google.com>
- <20250905165813.1470708-6-edumazet@google.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Content-Language: en-GB, fr-BE
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250905165813.1470708-6-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 05/11] tools: ynl-gen: define nlattr *array in a
+ block scope
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250904-wg-ynl-prep@fiberby.net>
+ <20250904220156.1006541-5-ast@fiberby.net>
+ <20250905171809.694562c6@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <20250905171809.694562c6@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Eric,
+On 9/6/25 12:18 AM, Jakub Kicinski wrote:
+> On Thu,  4 Sep 2025 22:01:28 +0000 Asbjørn Sloth Tønnesen wrote:
+>> Instead of trying to define "struct nlattr *array;" in the all
+>> the right places, then simply define it in a block scope,
+>> as it's only used here.
+>>
+>> Before this patch it was generated for attribute set _put()
+>> functions, like wireguard_wgpeer_put(), but missing and caused a
+>> compile error for the command function wireguard_set_device().
+>>
+>> $ make -C tools/net/ynl/generated wireguard-user.o
+>> -e      CC wireguard-user.o
+>> wireguard-user.c: In function ‘wireguard_set_device’:
+>> wireguard-user.c:548:9: error: ‘array’ undeclared (first use in ..)
+>>    548 |         array = ynl_attr_nest_start(nlh, WGDEVICE_A_PEERS);
+>>        |         ^~~~~
+> 
+> Dunno about this one. In patch 4 you basically add another instance of
+> the "let's declare local vars at function level" approach. And here
+> you're going the other way. This patch will certainly work, but I felt
+> like I wouldn't have written it this way if I was typing in the parsers
+> by hand.
 
-On 05/09/2025 18:58, Eric Dumazet wrote:
-> Use ARRAY_SIZE(), so that we know the limit at compile time.
+Thanks for the reviews.
 
-Thank you for having done this modification in MPTCP as well!
+In patch 4, it is about a variable used by multiple Type classes having
+presence_type() = 'count', which is currently 3 classes:
+- TypeBinaryScalarArray
+- TypeMultiAttr
+- TypeArrayNest (later renamed to TypeIndexedArray)
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+In patch 5, I move code for a special variable used by one Type class,
+to be contained within that class. It makes it easier to ensure that the
+variable is only defined, when used, and vice versa. This comes at the
+cost of the generated code looking generated.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+If we should make the generated code look like it was written by humans,
+then I would move the definition of these local variables into a class
+method, so `i` can be generated by the generic implementation, and `array`
+can be implemented in it's class. I will take a stab at this, but it might
+be too much refactoring for this series, eg. `len` is also defined local
+to conditional blocks multiple branches in a row.
 
+tools/net/ynl/generated/nl80211-user.c:
+nl80211_iftype_data_attrs_parse(..) {
+   [..]
+   ynl_attr_for_each_nested(attr, nested) {
+     unsigned int type = ynl_attr_type(attr);
+
+     if (type == NL80211_BAND_IFTYPE_ATTR_IFTYPES) {
+       unsigned int len;
+       [..]
+     } else if (type == NL80211_BAND_IFTYPE_ATTR_HE_CAP_MAC) {
+       unsigned int len;
+       [..]
+     [same pattern 8 times, so 11 times in total]
+     } else if (type == NL80211_BAND_IFTYPE_ATTR_EHT_CAP_PPE) {
+       unsigned int len;
+       [..]
+     }
+   }
+   return 0;
+}
+
+(I didn't have to search for this, I saw the pattern in wireguard-user.c,
+looked for it in nl80211-user.c and this was the first `len` usage there.)
+
+That looks very generated, I would have `len` defined together with `type`,
+and a switch statement would also look a lot more natural, but maybe leave
+the if->switch conversion for the compiler to detect.
 
