@@ -1,175 +1,151 @@
-Return-Path: <netdev+bounces-220584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ABD1B46FDD
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 16:05:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE534B46FEC
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 16:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FEC37BD3B9
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 14:03:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 564ED7C5B8D
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 14:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FA01B3937;
-	Sat,  6 Sep 2025 14:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9BD219A7A;
+	Sat,  6 Sep 2025 14:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="SbyR8zN9"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="IibiyyiR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E30D1ADFE4;
-	Sat,  6 Sep 2025 14:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6D11CFBA;
+	Sat,  6 Sep 2025 14:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757167254; cv=none; b=QNdYu5ugdnkB6NZXK925Ef7vDP7qpx60VJx5Zo5bZEOXE5v0xCiYYZz3+6ZQGm/tyQz1njnxNf8F7I09RLoK+5/FVqZ95YcbMuHMLymxW7xvBpy8YDn9Z1dIRfkr6gFUXDfiHzCyFjKhan/+MQUlZZo1uFOJLYWo6y1dTX3UYSc=
+	t=1757168000; cv=none; b=WSQpOpKEmDDOR35eqt40Gsd/0D1dwrPtLlldPTju/xCAOdU5d+bwcnXhH1+O6mPA+sJlkENsQHH7igbU7pwiGEkxC7p67ttaON/GiR/BekE59eREpnUPUQ+qhj+cgglDZplnNd9ae+M301dpoFoIShy8w/j+Q2lCtTJ3t8UJTlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757167254; c=relaxed/simple;
-	bh=+Ya17OzYxOlefHPbeCWX1JoI/dsn59tFRDumYvwwP5I=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=lmPbFnU++AzhXEs8EcSoNYmjzxp8EHuJvplWhj0+ilkCBXd8SculZ6JEWUoktYrU6xHV8PAYRGW2QMtmCtWCViKVoYgnNzYp2JA3ZFAEC193o6Diy3H4B5AHgPtARfM0F68IRfUH6QSwlzKKC3z+YnwXNu8PpnGURSNyF7/myBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cyyself.name; spf=pass smtp.mailfrom=cyyself.name; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=SbyR8zN9; arc=none smtp.client-ip=162.62.57.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cyyself.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyyself.name
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1757166943; bh=pDSqOj9LJo8QYj851dvKtVOYUfOR0D+2E/v7FdJbhbI=;
-	h=From:To:Cc:Subject:Date;
-	b=SbyR8zN9nUTF4QSxQHo6Ewnp056ydUrackxfW58XlYPoYAhCoSiry/Hh6UZamDRMZ
-	 7ZpeEJsLV4kfGQV11HdNrPYGq0b6ZvGhgjLSa1HQOg1dsTpdQcXtF99v/og81MfgYv
-	 LsbQviSFs2+h8Zi3Qw9sgsHlVw78oEwKXNRkjG4E=
-Received: from halo.lan ([240e:379:226f:5400:8647:9ff:fe5b:afa9])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id DE49F4B9; Sat, 06 Sep 2025 21:55:36 +0800
-X-QQ-mid: xmsmtpt1757166936t9f2gq3b8
-Message-ID: <tencent_E71C2F71D9631843941A5DF87204D1B5B509@qq.com>
-X-QQ-XMAILINFO: NDgMZBR9sMmagh4muckCaN++1s12C+dCKaiLD7DgR6R1WRgBi1pheW/NU31spd
-	 1CbHxqfK2DtRovwlHtvU0+nFkrV5aPT76YXo58Wq78LnpV85F9HSGeg5jkdKvg9FQ8pTcXBFCoeo
-	 1DvYkAKZvCNvfXqQpzYjGFWGgvDhtxjtucooNH8ijuad/IkMgUt8TKed9lzBxqAwrA6yJBmnmU5c
-	 hDaF+lEpcfUgIdilra5RC5Xqu6Zi/zZHtFXYwT4vLzVn5hZjEF7+U8eLrh/OCqdjcmJfWb8FrFC4
-	 WnQWFVpstUstsKdrIQzuokQa68W5yGOW1/AbI9mg3xur6kszVolAXuTr2lKtZ3d9USVEsdMBkf00
-	 pfBawfZS2nGCXqQkq7vXPROvgcVmDT3zUtAjviDoi+j6zOpXdK/Ng1l3PPRZJkZp4bDLjszzWhkU
-	 OLbE/acTenuTFen0buXO1mzc7WAr/MkVxvkT+aQa2DG8/GyCzNu2gRfxjuOf0vLw0Hs09b1eTBl0
-	 UB4fIgrD758X/kZqU/m3q7RkuGNjGGC9XkqgHKFISijzhHz6vAbBjHVAgq1pIATFexbxTsV7adUg
-	 RkfmiDkdSa4pD4vDc+uZ/S/vKU53eeT854X/CBRuiOjgHpOKB10go56sCEdrX+dvVbdSfIxN0MNq
-	 JqEn/iWauvowc+xS4g6NyStzUTa+D26fScjChVEd+KMABg6N+lbf4gPh3QnKr30VKJh96+ywYCT8
-	 yA9knGgxlkHjn9BU/Spu8NNUpmw6C0twiuAD8HcSscOUpvtaqGdNLJjl7asKoHiq61tkzAjMaoFr
-	 BjIw7pSiGCDo8jLx8nLxBGzXWXyFcChXCetRzunnwEZJ34V8bsAyeCiwOGfdSGqgEWvP3hkacF9U
-	 jITrrBIu8SY7QoS1EzX4CHPHkxSBpWVD26Y7+M1mVso4HnppQg+QdYEeuxkL46UwQrnjRlZUgdFD
-	 +40aM26S2AEPVW3wbrl9rFtD2At9jf7d1I4itkB9Urw+9RvXqmvaHYF9wV+hJ7wytyR2/ncLXiwQ
-	 qzlNAHj/lZOu7L4H8NApLxWBe7aSw=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: Yangyu Chen <cyy@cyyself.name>
-To: netdev@vger.kernel.org
-Cc: Igor Russkikh <irusskikh@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Yangyu Chen <cyy@cyyself.name>
-Subject: [PATCH] net: atlantic: make RX page order tunable via module param
-Date: Sat,  6 Sep 2025 21:54:34 +0800
-X-OQ-MSGID: <20250906135434.32951-1-cyy@cyyself.name>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1757168000; c=relaxed/simple;
+	bh=SUTg28ZJsRkSXTT3PgjawxQbv7QSVrlXljA/sqN5les=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fNMc5ZOpDCFFQWv0GkMJnSCtUOAu6Bq/9S66tRVwD/sTmgUJ3XDzt9tsnQk1Yi9pGAnxgbkynOdImnxoG36b4VS/lRRzod5pOT+th/hK6QERaLFOwcUsIUhpvRa+uCzXzd3r5Tjl5Yif3cuBydWyR553a6wzKtTxogE4Jz/K9c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=IibiyyiR; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1757167994;
+	bh=SUTg28ZJsRkSXTT3PgjawxQbv7QSVrlXljA/sqN5les=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IibiyyiR36CqAMePCOPEGLevQFe4TV1rnLOTwQc4XOsn988+RmVBF5Upac97jh2AK
+	 OJ4ifamAu3cgvY2fpNBaifPxEJUZHe2bCI2/UH4L2zVyOi9yMyxFCRG/WCw++y4Wiu
+	 /6+0vjg2WhTjt6bCDwCJegj9rQM/B6oIjOW569jTWgYTMOYXMA1tXc9XYHEIkJEk1C
+	 d29e4y5ccZhhIo488E+YV1HSAsTpmh5LFgp61nWlqQxo2TJ/sVpFy79+SK0kAS0syK
+	 P502Zmb1/WbAuLT1u+sSTYs4roXmNHEDiz24xhccECrXoLdVmZVJhO4zCCFOVHwc+X
+	 1Ru5Jx8/yXGtw==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 76DCB6000C;
+	Sat,  6 Sep 2025 14:13:08 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 880A7201BC9;
+	Sat, 06 Sep 2025 14:13:01 +0000 (UTC)
+Message-ID: <6e31a9e0-5450-4b45-a557-2aa08d23c25a@fiberby.net>
+Date: Sat, 6 Sep 2025 14:13:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 02/11] tools: ynl-gen: generate nested array
+ policies
+To: Jacob Keller <jacob.e.keller@intel.com>,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Johannes Berg <johannes.berg@intel.com>
+References: <20250904-wg-ynl-prep@fiberby.net>
+ <20250904220156.1006541-2-ast@fiberby.net>
+ <e24f5baf-7085-4db0-aaad-5318555988b3@intel.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <e24f5baf-7085-4db0-aaad-5318555988b3@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On systems like AMD Strix Halo with Thunderbolt, RX map/unmap operations
-with IOMMU introduce significant performance overhead, making it difficult
-to achieve line rate with 10G NICs even with TCP over MTU 1500. Using
-higher order pages reduces this overhead, so this parameter is now
-configurable.
+CC: Johannes
 
-After applying this patch and setting `rxpageorder=3`, testing with QNAP
-QNA-T310G1S on 10G Ethernet (MTU 1500) using `iperf3 -R` on IPv6 achieved
-9.28Gbps compared to only 2.26Gbps previously.
+On 9/6/25 12:19 AM, Jacob Keller wrote:
+> On 9/4/2025 3:01 PM, Asbjørn Sloth Tønnesen wrote:
+>> This patch adds support for NLA_POLICY_NESTED_ARRAY() policies.
+>>
+>> Example spec (from future wireguard.yaml):
+>> -
+>>    name: wgpeer
+>>    attributes:
+>>      -
+>>        name: allowedips
+>>        type: indexed-array
+>>        sub-type: nest
+>>        nested-attributes: wgallowedip
+>>
+>> yields NLA_POLICY_NESTED_ARRAY(wireguard_wgallowedip_nl_policy).
+>>
+>> This doesn't change any currently generated code, as it isn't
+>> used in any specs currently used for generating code.
+>>
+>> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+>> ---
+> 
+> Is this keyed of off the sub-type? Does you mean that all the existing
+> uses of 'sub-type: nest' don't generate code today? Or that this
+> _attr_policy implementation is not called yet?
 
-Signed-off-by: Yangyu Chen <cyy@cyyself.name>
----
-Should we also consider make default AQ_CFG_RX_PAGEORDER to 3?
+Thanks for the reviews. Yeah, it is a careful wording, because we have
+specs matching it, but there aren't any source files that triggers
+ynl-gen to generate code based on those specs.
 
-Test result showing performance improvement:
-$ sudo insmod drivers/net/ethernet/aquantia/atlantic/atlantic.ko
-$ sudo ip link set enp99s0 up
-$ iperf3 -c fe80::3a63:bbff:fe2e:1a68%enp99s0 -R
-Connecting to host fe80::3a63:bbff:fe2e:1a68%enp99s0, port 5201
-Reverse mode, remote host fe80::3a63:bbff:fe2e:1a68%enp99s0 is sending
-[  5] local fe80::265e:beff:fe6a:4da1 port 39588 connected to fe80::3a63:bbff:fe2e:1a68 port 5201
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec   271 MBytes  2.27 Gbits/sec                  
-[  5]   1.00-2.00   sec   270 MBytes  2.27 Gbits/sec                  
-[  5]   2.00-3.00   sec   268 MBytes  2.25 Gbits/sec                  
-[  5]   3.00-4.00   sec   270 MBytes  2.26 Gbits/sec                  
-[  5]   4.00-5.00   sec   268 MBytes  2.25 Gbits/sec                  
-[  5]   5.00-6.00   sec   269 MBytes  2.26 Gbits/sec                  
-[  5]   6.00-7.00   sec   268 MBytes  2.25 Gbits/sec                  
-[  5]   7.00-8.00   sec   268 MBytes  2.25 Gbits/sec                  
-[  5]   8.00-9.00   sec   268 MBytes  2.25 Gbits/sec                  
-[  5]   9.00-10.00  sec   268 MBytes  2.25 Gbits/sec                  
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate         Retr
-[  5]   0.00-10.00  sec  2.63 GBytes  2.26 Gbits/sec    1            sender
-[  5]   0.00-10.00  sec  2.63 GBytes  2.26 Gbits/sec                  receiver
+Therefore this patch, doesn't result in any code changes when running:
+$ ./tools/net/ynl/ynl-regen.sh -f
 
-iperf Done.
-$ sudo rmmod atlantic
-$ sudo insmod drivers/net/ethernet/aquantia/atlantic/atlantic.ko rxpageorder=3
-$ sudo ip link set enp99s0 up
-$ iperf3 -c fe80::3a63:bbff:fe2e:1a68%enp99s0 -R
-Connecting to host fe80::3a63:bbff:fe2e:1a68%enp99s0, port 5201
-Reverse mode, remote host fe80::3a63:bbff:fe2e:1a68%enp99s0 is sending
-[  5] local fe80::265e:beff:fe6a:4da1 port 43356 connected to fe80::3a63:bbff:fe2e:1a68 port 5201
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   1.00-2.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   2.00-3.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   3.00-4.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   4.00-5.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   5.00-6.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   6.00-7.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   7.00-8.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   8.00-9.00   sec  1.08 GBytes  9.28 Gbits/sec                  
-[  5]   9.00-10.00  sec  1.08 GBytes  9.28 Gbits/sec                  
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate         Retr
-[  5]   0.00-10.00  sec  10.8 GBytes  9.28 Gbits/sec    0            sender
-[  5]   0.00-10.00  sec  10.8 GBytes  9.28 Gbits/sec                  receiver
+Actually ynl-gen generates a fictive "{ .type = NLA_INDEXED_ARRAY, }"
+policy, without this patch, leading to a build failure.
 
-iperf Done.
----
- drivers/net/ethernet/aquantia/atlantic/aq_nic.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> I checked and we have quite a number of uses:
+> 
+>> $ rg 'sub-type: nest'
+>> Documentation/netlink/specs/nlctrl.yaml
+ >> [..]
+>> Documentation/netlink/specs/tc.yaml
+>> [..]
+>> Documentation/netlink/specs/rt-link.yaml
+>> [..]
+>> Documentation/netlink/specs/nl80211.yaml
+>> [..]
 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-index b24eaa5283fa..48f35fbf9a70 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-@@ -40,6 +40,10 @@ static unsigned int aq_itr_rx;
- module_param_named(aq_itr_rx, aq_itr_rx, uint, 0644);
- MODULE_PARM_DESC(aq_itr_rx, "RX interrupt throttle rate");
- 
-+static unsigned int rxpageorder = AQ_CFG_RX_PAGEORDER;
-+module_param_named(rxpageorder, rxpageorder, uint, 0644);
-+MODULE_PARM_DESC(rxpageorder, "RX page order");
-+
- static void aq_nic_update_ndev_stats(struct aq_nic_s *self);
- 
- static void aq_nic_rss_init(struct aq_nic_s *self, unsigned int num_rss_queues)
-@@ -106,7 +110,7 @@ void aq_nic_cfg_start(struct aq_nic_s *self)
- 	cfg->tx_itr = aq_itr_tx;
- 	cfg->rx_itr = aq_itr_rx;
- 
--	cfg->rxpageorder = AQ_CFG_RX_PAGEORDER;
-+	cfg->rxpageorder = rxpageorder;
- 	cfg->is_rss = AQ_CFG_IS_RSS_DEF;
- 	cfg->aq_rss.base_cpu_number = AQ_CFG_RSS_BASE_CPU_NUM_DEF;
- 	cfg->fc.req = AQ_CFG_FC_MODE;
--- 
-2.47.2
+None of those currently have a generated netlink policy.
 
+These are the netlink policies currently generated by ynl-gen:
+$ git grep -h -B1 'YNL-GEN kernel source' | grep '^/\*[^ ]'
+/*      Documentation/netlink/specs/dpll.yaml */
+/*      Documentation/netlink/specs/ovpn.yaml */
+/*      Documentation/netlink/specs/team.yaml */
+/*      Documentation/netlink/specs/lockd.yaml */
+/*      Documentation/netlink/specs/nfsd.yaml */
+/*      Documentation/netlink/specs/netdev.yaml */
+/*      Documentation/netlink/specs/devlink.yaml */
+/*      Documentation/netlink/specs/handshake.yaml */
+/*      Documentation/netlink/specs/fou.yaml */
+/*      Documentation/netlink/specs/mptcp_pm.yaml */
+/*      Documentation/netlink/specs/net_shaper.yaml */
+
+Johannes introduced NLA_NESTED_ARRAY and the NLA_POLICY_NESTED_ARRAY()
+macro in commit 1501d13596b9 for use in nl80211, and it's therefore
+used in net/wireless/nl80211.c, but outside of that the macro is
+only sparsely adopted (only by mac80211_hwsim.c and nf_tables_api.c).
+
+Wireguard adopts the macro in this RFC patch:
+https://lore.kernel.org/netdev/20250904220255.1006675-2-ast@fiberby.net/
 
