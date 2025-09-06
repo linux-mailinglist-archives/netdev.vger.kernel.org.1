@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-220632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EF12B477E5
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 00:01:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB19B477EC
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 00:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1BA7168689
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 22:01:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E28AE3A4394
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 22:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D8C2D238A;
-	Sat,  6 Sep 2025 22:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26CEE2D46D8;
+	Sat,  6 Sep 2025 22:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CksmXieU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aj37+Djp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4844620C038
-	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 22:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5157B26C3BF
+	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 22:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757196105; cv=none; b=n/OKPBkwb6RWIhHMq6+9T+eU2J/f5fm4QpWH5umTQdz3Rx8W4BiC7S9UmUPesqxaMYpsFs/9tpio0LGYFwccwFuLWEflhIBrqt9DXLOS7yH+9EopXZG5JzizQxK2bHyYOxTy0uGy3c3MaxmvHK2zjuThN/0rUm1fdzXDcAQ0xO0=
+	t=1757196155; cv=none; b=a1lU/h0lnMF6X50dbloK/5Amj7R2JQzEhSHqYhyqwK0Y2cMfKHCl24riFMHQWOtgruNgEo8EZ68q2Og5nGO4IxWjGJKWeCNBgKu8YLKvfM5k/9kxYwsJHjMOMvu7Gl4ner5mk8FyCDZRKo16cn+8YLAJ3JZ39eHPQiFGswUN3R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757196105; c=relaxed/simple;
-	bh=mxtOK+i6jjmZaMpMe2m1qAf/biCEIcP9PLvayH0oJn0=;
+	s=arc-20240116; t=1757196155; c=relaxed/simple;
+	bh=hZd8HvCuAwzi0pBfZgvhpNcIfW4nKWA0rmOSZxqtwLk=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nwh0B9IS6E9uT0k7q8eUQp4y0QrTU9suBSo7yqzcBRwfNGsIeQSSffWDVptw/+Q+WpPsVbT/NOku8z2XSf0jWJz1DYiPV7xblwuQXHtSlAfxwZNLv6v0YsPpIonL7tX2NYfH3ryUIQ7HPEC+Pm7YmjcszKbFiKcjtKXZUaj4iqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CksmXieU; arc=none smtp.client-ip=209.85.221.49
+	 In-Reply-To:Content-Type; b=GyxbAKfOpJFjPgws+AAqZMElhDztMC42/xpv2XIswEwlVLSGmYoxkzmtiKgL6Z7yY613FpuauQnQPIAEgS5S/4rlE327+FS114Tr7fJl6cy4Ax9ocCr1iseZs/sVZ+xV3HeuKDSOK+F8WgsLstjKvNp4QqkRkB6cNkFivjDj0a0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Aj37+Djp; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3e014bf8ec1so2281864f8f.1
-        for <netdev@vger.kernel.org>; Sat, 06 Sep 2025 15:01:42 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b9edf4cf6cso2756663f8f.3
+        for <netdev@vger.kernel.org>; Sat, 06 Sep 2025 15:02:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757196101; x=1757800901; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757196152; x=1757800952; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=g2SQWlNvsiaX0k61jmdTkPFs72qDWZnNh6qnY5mnElA=;
-        b=CksmXieUugXguTiV075EohrXfUGTQ9bFyMKo3E8rjtk0ULB9vq3jP3fRd6Gx3ir1a9
-         XpCcJ+aRO7uatGmf7PSpK+luMmh6D4Bs0rm2OyfkJAy52vp1EF/uSh1xAxFGke9OIZoU
-         Arcy+PnVLDEG4gLzz14kTplregfPZ7zVuPBlUjR8WqHfxKXAtzHWn+K4qTMBbI5vcTWo
-         whWbeoyL3Z2Ua6qJgtEtTVXEFfYSeGL7SdLxO7XNosNnMTeQbnCKJBUpQ+eHbQcMY0xq
-         HQEzlMSfvcBdVyRq38IhP+VNq7zuMq3Yjtso3CtevhAPhlmrixEuwDMjZrEOKCHnzz23
-         pmBw==
+        bh=xbJJV3aAuTAvKTafHMaHQsqRWhlfXItSJNwL2JcXl9k=;
+        b=Aj37+Djp3dx2VLWm3tG73uYZbT/w5HIfzH+GbUoTuRrL8KK9TUEta+cYX38WLxAn62
+         EHbO/o8/MSYLPyXp7cNezwp+IoSPo3cCz8xMLAL47diewFN+xZkWrlwDgLQX2rnzjRZr
+         bCwd6EQV206VdcvsHMwgdRzYvvNeFD37EE3DuTGP1IIe73WJ3UQ/AoSIXGLkcg/Zfq6g
+         26+d/Splk3blD0gWW6u9ONgdv612nEV1Dc5EHG1AT+c8AFBrFF4lArS8w2nRA4ZYuCYn
+         SFFQGg12GstUFOthSZrifQtY0yMy81dr/KwyfjZXE8jFnaIb4NvcBHoOGsNv/tIGStQh
+         fPRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757196101; x=1757800901;
+        d=1e100.net; s=20230601; t=1757196152; x=1757800952;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=g2SQWlNvsiaX0k61jmdTkPFs72qDWZnNh6qnY5mnElA=;
-        b=hs8bb3uGddOov9kf2s6c2WFL1x/X/2XPuXVZ3xGh8pso96lC40CxXqaPYdpCvoNPTw
-         6DBtb4CjZ+Zh0I57Jx9vY1/tTy3UNnjwZRKJ57czx7oa8QpPvMASTt/+IScWgcHZgkt8
-         kCtrk+fZ8EIVBWHqKOp4V/cVow1QMzPplubyVej8vDea9MLU7WxKYhksvL6wfUgjNaa1
-         VHF9RALHU7S7GBE9FT9rB+CXjbvsA/PdWVxkpjambeX1ZyPkoHSvHsIBCILkqO3D+Kyr
-         5288r8IVLpqM5xXlLVySO7RKmWiOa0yeorrIAYycJ4IlUKgvLpmQDdIoTJSPX4hvQt7Q
-         eTCg==
-X-Gm-Message-State: AOJu0Yz/KEZ8PdG67z5xEhtE6c9WnwBIyflHqoRQ2bKnIgb/0x08MgBn
-	Md4gFk2WZQRKuH1tF6G/QNxI+VfOg3teLtb5FhqYZ/E/3Tb4HatIVNzR
-X-Gm-Gg: ASbGncvSRecMQC4ShbS8Qyj4pt95rTACqBgAlEQMpDazOT3uTcX4pS/Nz5sBumxI4QX
-	WEOMPZjdG9cGg088N/XB9LiT3nI5gF+VyiARrZ1oPunvXKjGZ9mX/2PFk8aY2iwRh1fW5HyLvKG
-	8aAG0TRIhI4JB6JofW7ZsYa7tkJMntrHflFAOO5wtnpwDxpYHFlBVMhqGQx61VTj98uQIiMwFUG
-	fZ/sYYbCuVkYySrnV3U2N13Kb7s427HnacMpw0uzyXqKEY/vN5l5Oyo6xSmSC6F8zYGxXhqxuIT
-	WbM5Bs/fBSX8RznytU+bAs5zWyZOfpGXUyerEpBAjqR+4SNK7TKFY7htAQtXiF1yGC73ccb7GPO
-	XcUYO4OdBNhA8idfhoEA43gYthM/2PDOAN8hkXu7Am52oR3UbWGfr0dWRKRj4tNum+dX5EWm5gg
-	st7ZrLKgCeKlP3xnCQ3RiG2N60AZQW5+1bpuOq96NBBk0dTmV6blwI9o19WNA=
-X-Google-Smtp-Source: AGHT+IGms9lptp967kEFZEus9UbMXmMqXVJjvVyg3OYhf+Y7IUaxJmqydz+A68lEILhedJkYOZRDKQ==
-X-Received: by 2002:adf:b1d6:0:b0:3e7:451f:3a6b with SMTP id ffacd0b85a97d-3e7451f3e56mr109338f8f.42.1757196101448;
-        Sat, 06 Sep 2025 15:01:41 -0700 (PDT)
+        bh=xbJJV3aAuTAvKTafHMaHQsqRWhlfXItSJNwL2JcXl9k=;
+        b=SEtZql8+LymxbcSBDgroZz5K8atEMgj5xZ7aMoDTz3ldOAueidMbTDLqdv3hFJOk8P
+         lUfIUcmyti5fabJXEQ47Bky3p1xBI1+bL9nTorv4JUkf1epD0VMpJ4HUmeFs8W73UT89
+         UPVAtjMXLw1XbCkLdQIipyiF4M3TSDtWj43ELz03c2mxE5SQP5KxD4iJJbpM2QI7dWvy
+         k5aDEWphLTfoXR2wXJ95ge3ZbcctcKZQB4YboV1BwO3TpPhN3mNGzDKBKWQQvOz9CA3X
+         as6h+jG7Gb0atzLyi6ngb5gXqDL/Ag3Ckhna2U106w3oI+dmTeYCJhVpYoJeaOMZnfVX
+         VHcw==
+X-Gm-Message-State: AOJu0Yy8jmAOHB9Q6/Qxkoi77MqHe/T1tA8/uaZpCPidrS0Sv+GWWg5c
+	X8Hw0Tp2PDfpWmU7KeQOCvGL2m6abmdyitJeVbpwJOKcLBufT8JpPjJU
+X-Gm-Gg: ASbGnctsAKeNR4JFjWIr4xk3gk1il55R3+RAqRMeNFoGiKNOd/j8/tF/t1/ysOk7qYa
+	t9AE7tKH1sB8qIUt/0ov9407cNklhyUneWlvY7rz7+VYJ6/oxzZy0gEafc97+ccosaRiIAnGpC6
+	8bp3S3IS5clzRB3gLdleEPi4haUTxl90WQljKsHz0zm8BBAu+X+i+EsfGK9tYQbbWEOvj1zNH47
+	7J8/kbBSsotoV9Sl1hDIj6zrmMDzd/PapN1GW5khNptb0F+AZTDPBb6COjrXo9VVCQLnXbIfwap
+	kBLs+C4ZLC094y2YGfznkrXH6zssTlnh6OhzbVhCv8Ch1VdwWdKXKcCl4PzhHTEOYfdMML20YS5
+	iq9gkGY3ierG4oUVK+CUFDAWnGRC3ukDnQXXd6bYIRc9IOfERuhATfBQG1yC6eb2TnIwQa8dWJu
+	F7TY8hDQAeSU70VX4W5NPd7A+DGKtOdOmthxpxPr9te2euTUWIr1vLsNqntDIbeLHRtWq1r4xtu
+	wLOtaPy
+X-Google-Smtp-Source: AGHT+IEPVZ+MuoGHcxq5CjR8rZYNjPJi8aDmdnTrY906EeyCBIsPh1EjDcW40dcat6FL3wObGsYk/A==
+X-Received: by 2002:a5d:5d05:0:b0:3e1:da2f:af23 with SMTP id ffacd0b85a97d-3e636d8fb4fmr1623566f8f.9.1757196151420;
+        Sat, 06 Sep 2025 15:02:31 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f2b:f400:f9ef:5bb:5d77:26c7? (p200300ea8f2bf400f9ef05bb5d7726c7.dip0.t-ipconnect.de. [2003:ea:8f2b:f400:f9ef:5bb:5d77:26c7])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3e411219ddfsm6781508f8f.57.2025.09.06.15.01.38
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3e740369f1esm2235129f8f.11.2025.09.06.15.02.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Sep 2025 15:01:40 -0700 (PDT)
-Message-ID: <34434ab0-69ba-4a93-bc7a-944e2cf49852@gmail.com>
-Date: Sun, 7 Sep 2025 00:01:52 +0200
+        Sat, 06 Sep 2025 15:02:31 -0700 (PDT)
+Message-ID: <664782b2-0ace-4bba-b28a-5ced2e35e5c0@gmail.com>
+Date: Sun, 7 Sep 2025 00:02:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +84,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 3/4] net: phy: fixed_phy: add helper fixed_phy_find
+Subject: [PATCH net-next 4/4] net: phy: fixed_phy: remove struct
+ fixed_mdio_bus
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
@@ -139,143 +141,147 @@ In-Reply-To: <e81be066-cc23-4055-aed7-2fbc86da1ff7@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Factor out the functionality to search for a fixed_phy matching an
-address. This improves readability of the code.
+Use two separate static variables instead of the struct, this allows
+to simplify the code.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/fixed_phy.c | 81 +++++++++++++++++++------------------
- 1 file changed, 42 insertions(+), 39 deletions(-)
+ drivers/net/phy/fixed_phy.c | 50 ++++++++++++++-----------------------
+ 1 file changed, 19 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index 35ac29c3e..eae513b70 100644
+index eae513b70..0e1b28f06 100644
 --- a/drivers/net/phy/fixed_phy.c
 +++ b/drivers/net/phy/fixed_phy.c
-@@ -40,42 +40,49 @@ static struct fixed_mdio_bus platform_fmb = {
- 	.phys = LIST_HEAD_INIT(platform_fmb.phys),
+@@ -23,11 +23,6 @@
+ 
+ #include "swphy.h"
+ 
+-struct fixed_mdio_bus {
+-	struct mii_bus *mii_bus;
+-	struct list_head phys;
+-};
+-
+ struct fixed_phy {
+ 	int addr;
+ 	struct phy_device *phydev;
+@@ -36,16 +31,14 @@ struct fixed_phy {
+ 	struct list_head node;
  };
  
--int fixed_phy_change_carrier(struct net_device *dev, bool new_carrier)
-+static struct fixed_phy *fixed_phy_find(int addr)
- {
- 	struct fixed_mdio_bus *fmb = &platform_fmb;
-+	struct fixed_phy *fp;
-+
-+	list_for_each_entry(fp, &fmb->phys, node) {
-+		if (fp->addr == addr)
-+			return fp;
-+	}
-+
-+	return NULL;
-+}
-+
-+int fixed_phy_change_carrier(struct net_device *dev, bool new_carrier)
-+{
- 	struct phy_device *phydev = dev->phydev;
- 	struct fixed_phy *fp;
+-static struct fixed_mdio_bus platform_fmb = {
+-	.phys = LIST_HEAD_INIT(platform_fmb.phys),
+-};
++static struct mii_bus *fmb_mii_bus;
++static LIST_HEAD(fmb_phys);
  
- 	if (!phydev || !phydev->mdio.bus)
- 		return -EINVAL;
- 
--	list_for_each_entry(fp, &fmb->phys, node) {
--		if (fp->addr == phydev->mdio.addr) {
--			fp->status.link = new_carrier;
--			return 0;
--		}
--	}
--	return -EINVAL;
-+	fp = fixed_phy_find(phydev->mdio.addr);
-+	if (!fp)
-+		return -EINVAL;
-+
-+	fp->status.link = new_carrier;
-+
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(fixed_phy_change_carrier);
- 
- static int fixed_mdio_read(struct mii_bus *bus, int phy_addr, int reg_num)
- {
--	struct fixed_mdio_bus *fmb = bus->priv;
- 	struct fixed_phy *fp;
- 
--	list_for_each_entry(fp, &fmb->phys, node) {
--		if (fp->addr == phy_addr) {
--			/* Issue callback if user registered it. */
--			if (fp->link_update)
--				fp->link_update(fp->phydev->attached_dev,
--						&fp->status);
--
--			return swphy_read_reg(reg_num, &fp->status);
--		}
--	}
-+	fp = fixed_phy_find(phy_addr);
-+	if (!fp)
-+		return 0xffff;
- 
--	return 0xFFFF;
-+	if (fp->link_update)
-+		fp->link_update(fp->phydev->attached_dev, &fp->status);
-+
-+	return swphy_read_reg(reg_num, &fp->status);
- }
- 
- static int fixed_mdio_write(struct mii_bus *bus, int phy_addr, int reg_num,
-@@ -93,21 +100,19 @@ int fixed_phy_set_link_update(struct phy_device *phydev,
- 			      int (*link_update)(struct net_device *,
- 						 struct fixed_phy_status *))
+ static struct fixed_phy *fixed_phy_find(int addr)
  {
 -	struct fixed_mdio_bus *fmb = &platform_fmb;
  	struct fixed_phy *fp;
  
- 	if (!phydev || !phydev->mdio.bus)
- 		return -EINVAL;
- 
 -	list_for_each_entry(fp, &fmb->phys, node) {
--		if (fp->addr == phydev->mdio.addr) {
--			fp->link_update = link_update;
--			fp->phydev = phydev;
--			return 0;
--		}
--	}
-+	fp = fixed_phy_find(phydev->mdio.addr);
-+	if (!fp)
-+		return -ENOENT;
-+
-+	fp->link_update = link_update;
-+	fp->phydev = phydev;
++	list_for_each_entry(fp, &fmb_phys, node) {
+ 		if (fp->addr == addr)
+ 			return fp;
+ 	}
+@@ -119,9 +112,8 @@ EXPORT_SYMBOL_GPL(fixed_phy_set_link_update);
+ static int __fixed_phy_add(int phy_addr,
+ 			   const struct fixed_phy_status *status)
+ {
+-	int ret;
+-	struct fixed_mdio_bus *fmb = &platform_fmb;
+ 	struct fixed_phy *fp;
++	int ret;
  
--	return -ENOENT;
-+	return 0;
+ 	ret = swphy_validate_state(status);
+ 	if (ret < 0)
+@@ -134,7 +126,7 @@ static int __fixed_phy_add(int phy_addr,
+ 	fp->addr = phy_addr;
+ 	fp->status = *status;
+ 
+-	list_add_tail(&fp->node, &fmb->phys);
++	list_add_tail(&fp->node, &fmb_phys);
+ 
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(fixed_phy_set_link_update);
- 
-@@ -144,17 +149,15 @@ static DEFINE_IDA(phy_fixed_ida);
- 
- static void fixed_phy_del(int phy_addr)
+@@ -163,12 +155,11 @@ static void fixed_phy_del(int phy_addr)
+ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
+ 				      struct device_node *np)
  {
 -	struct fixed_mdio_bus *fmb = &platform_fmb;
--	struct fixed_phy *fp, *tmp;
-+	struct fixed_phy *fp;
+ 	struct phy_device *phy;
+ 	int phy_addr;
+ 	int ret;
+ 
+-	if (!fmb->mii_bus || fmb->mii_bus->state != MDIOBUS_REGISTERED)
++	if (!fmb_mii_bus || fmb_mii_bus->state != MDIOBUS_REGISTERED)
+ 		return ERR_PTR(-EPROBE_DEFER);
+ 
+ 	/* Get the next available PHY address, up to PHY_MAX_ADDR */
+@@ -182,7 +173,7 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
+ 		return ERR_PTR(ret);
+ 	}
+ 
+-	phy = get_phy_device(fmb->mii_bus, phy_addr, false);
++	phy = get_phy_device(fmb_mii_bus, phy_addr, false);
+ 	if (IS_ERR(phy)) {
+ 		fixed_phy_del(phy_addr);
+ 		return ERR_PTR(-EINVAL);
+@@ -247,41 +238,38 @@ EXPORT_SYMBOL_GPL(fixed_phy_unregister);
+ 
+ static int __init fixed_mdio_bus_init(void)
+ {
+-	struct fixed_mdio_bus *fmb = &platform_fmb;
+ 	int ret;
+ 
+-	fmb->mii_bus = mdiobus_alloc();
+-	if (!fmb->mii_bus)
++	fmb_mii_bus = mdiobus_alloc();
++	if (!fmb_mii_bus)
+ 		return -ENOMEM;
+ 
+-	snprintf(fmb->mii_bus->id, MII_BUS_ID_SIZE, "fixed-0");
+-	fmb->mii_bus->name = "Fixed MDIO Bus";
+-	fmb->mii_bus->priv = fmb;
+-	fmb->mii_bus->read = &fixed_mdio_read;
+-	fmb->mii_bus->write = &fixed_mdio_write;
+-	fmb->mii_bus->phy_mask = ~0;
++	snprintf(fmb_mii_bus->id, MII_BUS_ID_SIZE, "fixed-0");
++	fmb_mii_bus->name = "Fixed MDIO Bus";
++	fmb_mii_bus->read = &fixed_mdio_read;
++	fmb_mii_bus->write = &fixed_mdio_write;
++	fmb_mii_bus->phy_mask = ~0;
+ 
+-	ret = mdiobus_register(fmb->mii_bus);
++	ret = mdiobus_register(fmb_mii_bus);
+ 	if (ret)
+ 		goto err_mdiobus_alloc;
+ 
+ 	return 0;
+ 
+ err_mdiobus_alloc:
+-	mdiobus_free(fmb->mii_bus);
++	mdiobus_free(fmb_mii_bus);
+ 	return ret;
+ }
+ module_init(fixed_mdio_bus_init);
+ 
+ static void __exit fixed_mdio_bus_exit(void)
+ {
+-	struct fixed_mdio_bus *fmb = &platform_fmb;
+ 	struct fixed_phy *fp, *tmp;
+ 
+-	mdiobus_unregister(fmb->mii_bus);
+-	mdiobus_free(fmb->mii_bus);
++	mdiobus_unregister(fmb_mii_bus);
++	mdiobus_free(fmb_mii_bus);
  
 -	list_for_each_entry_safe(fp, tmp, &fmb->phys, node) {
--		if (fp->addr == phy_addr) {
--			list_del(&fp->node);
--			kfree(fp);
--			ida_free(&phy_fixed_ida, phy_addr);
--			return;
--		}
--	}
-+	fp = fixed_phy_find(phy_addr);
-+	if (!fp)
-+		return;
-+
-+	list_del(&fp->node);
-+	kfree(fp);
-+	ida_free(&phy_fixed_ida, phy_addr);
- }
- 
- struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
++	list_for_each_entry_safe(fp, tmp, &fmb_phys, node) {
+ 		list_del(&fp->node);
+ 		kfree(fp);
+ 	}
 -- 
 2.51.0
 
