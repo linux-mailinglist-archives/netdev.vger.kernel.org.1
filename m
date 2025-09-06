@@ -1,200 +1,110 @@
-Return-Path: <netdev+bounces-220620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59E37B47721
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 22:26:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9676CB47742
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 23:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EEA8A055BC
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 20:26:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDDFA3A9FB2
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C242820CE;
-	Sat,  6 Sep 2025 20:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b="cJVc4Zpm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C58B288C08;
+	Sat,  6 Sep 2025 21:10:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3012515853B;
-	Sat,  6 Sep 2025 20:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757190371; cv=pass; b=ryHplZHKfAhGYRC85Sib9H3zy6qCMGkXtmKwXsZF/RtFAKSuJC7NEmwkox5+6oiQU6vN7cHRI178SmQz8WyEZmMMe26eVKzSOslE7ZEmvcwFlBQeniFgN7EzKviULvhkpMavGeMtq3mv4hwT6WKuPBQKIbuW37XXJBZaYm0bt+s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757190371; c=relaxed/simple;
-	bh=Dba0VwlgwTl/0lxoZNPwJbwMeUyMEhy+W9+MLvg4jAs=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D5B131E2D;
+	Sat,  6 Sep 2025 21:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757193005; cv=none; b=Sa2HaC4xfQaXg6DZllZJb73AtOoR00sTXcMeHO/8FveCG7dJMP5ev2zTZVblauOH5fbmKhE9XmptKyp1UvIS7s39DZR8oDXXuhrAJqVaOwodVYmTyCeYLF15Ld2oLqHFk9MSCYeg+4/1JwMyKecwR3UCj3Gl7rvXg9RcEUgz7Ak=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757193005; c=relaxed/simple;
+	bh=aE05Jvob0sDSVbL1cmt0RfJAftXOH5dW1daURhmnGbo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ofVVEnLPfExIK5fpEJtRt5tU7fdrAN2rjPiDAgw9FIqy1cyKYwc6MsvUDh93SJlZFK6ox+hHbHS2CiMqGzTevc/vTBpbKq2fFvTkPAKvzBcanK51nXu1H4uBdwFzRPrBlE31DtT09of94p29jbKn3fh4phM2VrFEUnB+/R/SKGQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b=cJVc4Zpm; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1757190330; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=AIJzMu/ZRJXDGonBMSOiXh0RNaH/kR5wwozxFNW5ko/qSgZ+3JfO5njNY2dHaDp4LRUhilC7Q15M6zJBmrJKy29LIy73sRpBBBPFYKhnkwuBtZMRCu3ZeaVYV2l3XLRIFI9N1Bdx5K8IrJdZybA2T0YiCl9ZLWXk3+rXYOr8hWc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757190330; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=gaueM132UXDRu16dNJaiRHmHlASjwQR0RfI2PxcL64g=; 
-	b=CdVDiyJlzEQixCLxnf9+h6LmfnlzvvqXyXrKmrbl8+aD6pNzwHSv0iZx04Wl61XOvVucl/GGgCZQFG4c9cCOfDIY32CEjEpQD/3qNCrL6//emlX33zOthl/vFfQIeMklMnBIKbSLFiHJ9IB0gAlUT8e2NFvORCJU+Pvm5lCqxUU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sebastian.reichel@collabora.com;
-	dmarc=pass header.from=<sebastian.reichel@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757190330;
-	s=zohomail; d=collabora.com; i=sebastian.reichel@collabora.com;
-	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
-	bh=gaueM132UXDRu16dNJaiRHmHlASjwQR0RfI2PxcL64g=;
-	b=cJVc4ZpmICLZ3Rn0dxvIMumpZwhP+wuCBDR2ZrLy7dhJZXc8vTbhFcTF9V+E4Xmm
-	3dzIfiYaogrkXjsNO+R7zL/LrKY9/kMwY0Lr5wRxbOib7vc8cyQeNs6kVzzjDq3qhKM
-	PTmIIYhIPPCSPdOpHDyKo6OzeHCw0BkgpfeQ0Nz0=
-Received: by mx.zohomail.com with SMTPS id 1757190327049402.40879686448466;
-	Sat, 6 Sep 2025 13:25:27 -0700 (PDT)
-Received: by venus (Postfix, from userid 1000)
-	id A89F6180B18; Sat, 06 Sep 2025 22:25:20 +0200 (CEST)
-Date: Sat, 6 Sep 2025 22:25:20 +0200
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Chaoyi Chen <chaoyi.chen@rock-chips.com>
-Cc: Yao Zi <ziyao@disroot.org>, 
-	"Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonas Karlman <jonas@kwiboo.se>, 
-	David Wu <david.wu@rock-chips.com>, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
- contain invalid address
-Message-ID: <wgau7accvif4pcblnkpppyve4isstvmxyljlojt2yu4cwnyqvf@od4zasgpwdjr>
-References: <20250904031222.40953-3-ziyao@disroot.org>
- <aLlwv3v8ACha8b-3@shell.armlinux.org.uk>
- <b5fbeb3f-9962-444d-85b3-3b8a11f69266@rock-chips.com>
- <aLlyb6WvoBiBfUx3@shell.armlinux.org.uk>
- <aLly7lJ05xQjqCWn@shell.armlinux.org.uk>
- <aLvIbPfWWNa6TwNv@pie>
- <5d691f5b-460e-46cb-9658-9c391058342f@rock-chips.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iwqq47REZf4sO7skk1w8Uc/rhWSULCblMBIHh3g2Bj/oH277ooLKlpUPt2mcZUyC6CxxrlceEs7zFmrWABdyzFkqxX4U3F4j5ekArJLzsWeZnXm+c9x318DWDXxb+hl6ARjn91eFVVzHa8rBYzjSxpa5q26J+xO/t4UoRIi2G1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 9F943604EE; Sat,  6 Sep 2025 23:09:54 +0200 (CEST)
+Date: Sat, 6 Sep 2025 23:09:54 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	bridge@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v14 nf-next 1/3] netfilter: utils: nf_checksum(_partial)
+ correct data!=networkheader
+Message-ID: <aLyjIuGj7BAEAO8B@strlen.de>
+References: <20250708151209.2006140-1-ericwouds@gmail.com>
+ <20250708151209.2006140-2-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="h6lnwepm5yz4el3j"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5d691f5b-460e-46cb-9658-9c391058342f@rock-chips.com>
-X-Zoho-Virus-Status: 1
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-1.4.3/257.176.7
-X-ZohoMailClient: External
+In-Reply-To: <20250708151209.2006140-2-ericwouds@gmail.com>
 
+Eric Woudstra <ericwouds@gmail.com> wrote:
+> In the conntrack hook it may not always be the case that:
+> skb_network_header(skb) == skb->data.
+> 
+> This is problematic when L4 function nf_conntrack_handle_packet()
+> is accessing L3 data. This function uses thoff and ip_hdr()
+> to finds it's data. But it also calculates the checksum.
+> nf_checksum() and nf_checksum_partial() both use lower skb-checksum
+> functions that are based on using skb->data.
+> 
+> When skb_network_header(skb) != skb->data, adjust accordingly,
+> so that the checksum is calculated correctly.
+> 
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>  net/netfilter/utils.c | 20 ++++++++++++++------
+>  1 file changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/netfilter/utils.c b/net/netfilter/utils.c
+> index 008419db815a..9ba822983bc0 100644
+> --- a/net/netfilter/utils.c
+> +++ b/net/netfilter/utils.c
+> @@ -124,16 +124,20 @@ __sum16 nf_checksum(struct sk_buff *skb, unsigned int hook,
+>  		    unsigned int dataoff, u8 protocol,
+>  		    unsigned short family)
+>  {
+> +	unsigned int nhpull = skb_network_header(skb) - skb->data;
 
---h6lnwepm5yz4el3j
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't
- contain invalid address
-MIME-Version: 1.0
+skb_network_offset() ?
 
-Hi,
+And can you add a comment that tells why there is a need
+for pull/push pair despite the dataoff - nhpull argument?
 
-On Sat, Sep 06, 2025 at 02:26:31PM +0800, Chaoyi Chen wrote:
-> On 9/6/2025 1:36 PM, Yao Zi wrote:
->=20
-> > On Thu, Sep 04, 2025 at 12:07:26PM +0100, Russell King (Oracle) wrote:
-> > > On Thu, Sep 04, 2025 at 12:05:19PM +0100, Russell King (Oracle) wrote:
-> > > > On Thu, Sep 04, 2025 at 07:03:10PM +0800, Chaoyi Chen wrote:
-> > > > > On 9/4/2025 6:58 PM, Russell King (Oracle) wrote:
-> > > > > > On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
-> > > > > > >    	if (plat->phy_node) {
-> > > > > > >    		bsp_priv->clk_phy =3D of_clk_get(plat->phy_node, 0);
-> > > > > > >    		ret =3D PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
-> > > > > > > -		/* If it is not integrated_phy, clk_phy is optional */
-> > > > > > > +		/*
-> > > > > > > +		 * If it is not integrated_phy, clk_phy is optional. But w=
-e must
-> > > > > > > +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded=
-, or
-> > > > > > > +		 * the error code could be wrongly taken as an invalid poi=
-nter.
-> > > > > > > +		 */
-> > > > > > I'm concerned by this. This code is getting the first clock fro=
-m the DT
-> > > > > > description of the PHY. We don't know what type of PHY it is, o=
-r what
-> > > > > > the DT description of that PHY might suggest that the first clo=
-ck would
-> > > > > > be.
-> > > > > >=20
-> > > > > > However, we're geting it and setting it to 50MHz. What if the c=
-lock is
-> > > > > > not what we think it is?
-> > > > > We only set integrated_phy to 50M, which are all known targets. F=
-or external PHYs, we do not perform frequency settings.
-> > > > Same question concerning enabling and disabling another device's cl=
-ock
-> > > > that the other device should be handling.
-> > > Let me be absolutely clear: I consider *everything* that is going on
-> > > with clk_phy here to be a dirty hack.
-> > >=20
-> > > Resources used by a device that has its own driver should be managed
-> > > by _that_ driver alone, not by some other random driver.
-> > Agree on this. Should we drop the patch, or fix it up for now to at
-> > least prevent the oops? Chaoyi, I guess there's no user of the feature
-> > for now, is it?
->=20
-> This at least needs fixing. Sorry, I have no idea how to implement
-> this in the PHY.
+> +	DEBUG_NET_WARN_ON_ONCE(!skb_pointer_if_linear(skb, nhpull, 0));
 
-I think the proper fix is to revert da114122b8314 ("net: ethernet:
-stmmac: dwmac-rk: Make the clk_phy could be used for external phy"),
-which has only recently been merged. External PHYs should reference
-their clocks themself instead of the MAC doing it.
+maybe if (DEBUG_NET_WARN ...
+	return 0 ?
 
-Chaoyi Chen: Have a look at the ROCK 4D devicetree:
+> @@ -143,18 +147,22 @@ __sum16 nf_checksum_partial(struct sk_buff *skb, unsigned int hook,
+>  			    unsigned int dataoff, unsigned int len,
+>  			    u8 protocol, unsigned short family)
+>  {
+> +	unsigned int nhpull = skb_network_header(skb) - skb->data;
+>  	__sum16 csum = 0;
+> +	DEBUG_NET_WARN_ON_ONCE(!skb_pointer_if_linear(skb, nhpull, 0));
+> +	__skb_pull(skb, nhpull);
 
-&mdio0 {
-	rgmii_phy0: ethernet-phy@1 {
-		compatible =3D "ethernet-phy-id001c.c916";
-		reg =3D <0x1>;
-		clocks =3D <&cru REFCLKO25M_GMAC0_OUT>;
-		assigned-clocks =3D <&cru REFCLKO25M_GMAC0_OUT>;
-		assigned-clock-rates =3D <25000000>;
-        ...
-    };
-};
-
-The clock is enabled by the RTL8211F PHY driver (check for
-devm_clk_get_optional_enabled in drivers/net/phy/realtek/realtek_main.c),
-as the PHY is the one needing the clock and not the Rockchip MAC. For
-this to work it is important to set the right compatible string, so
-that the kernel can probe the right driver without needing to read the
-identification registers (as that would require the clock to be already
-configured before the driver is being probed).
-
-Greetings,
-
--- Sebastian
-
---h6lnwepm5yz4el3j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmi8mKwACgkQ2O7X88g7
-+ppSnA/+Ms1Z3gR5BjMQO2fm9plU7SLZz3gyjXx/ZSEY3eFXQD1CAWUJxwvs744K
-T+KWiaF3oAMez0hYw2TqEnAg0dr84oUocN20+TBw34vhLes8+el1sHWEggUlIMek
-pnDi7A51K56YtqMhI1sJttSKi2i54oupF8NU861kZtdCQ28YYgwoY6Nd1TkxUXkX
-yajonEzmjcnFZr40V5/VE6QQaG+P+tXwN/tIuRG/9sAVurIzEse8tWYz/vLuL0wf
-QIyJy3OqP4X/HERft8xN0x9NYbEoyw+RfajAAs7/OBER7SGHwViFdTXMNZ6CahHO
-ROn0kIuEWz4DEoy05m7bTlXlYSBYl7RTs52H4GaX6ClP9UV2EHhli/YxfNGt7cQr
-h+lABlRV9wt6RoZJVuoUOlRVgf8d76c/kbKNCV475IJ7luQTF4GXruX+EQDUE45O
-gEpz2hvmwFXg1UhcaPlNNlL7uT3zxALR7tcfEXIZriXOmyL+1+pGGR0fflFkoaSr
-cipZsP/fgzgvZl3pL6ZKjPdm0ygIgfqu3aOpg4AwdLdGG6B+pRMe5uBkvUdaiiKq
-qtEAHlFSX02ZgFgZrTkgsgOlA8x/k49ODMIkY5O12QUVKJy+/9z5QkllvMTb9nJs
-ZOqsndKePDI4p+WkZY+xB4nZsmtZjoYc89PK8MgZ4Tcmqaw9g+E=
-=fhP2
------END PGP SIGNATURE-----
-
---h6lnwepm5yz4el3j--
+Same here, but no need to copy the comment from nf_checksum, its enough
+to say something like "see nf_checksum()".
 
