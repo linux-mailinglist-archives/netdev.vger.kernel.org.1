@@ -1,87 +1,183 @@
-Return-Path: <netdev+bounces-220622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED5C3B4774B
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 23:11:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA8EB47754
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 23:14:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87E247B1647
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:10:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC50F7B095B
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B2928D8ED;
-	Sat,  6 Sep 2025 21:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE8E28D8ED;
+	Sat,  6 Sep 2025 21:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IqraBmk3"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27AC2882CC;
-	Sat,  6 Sep 2025 21:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E511F0E29;
+	Sat,  6 Sep 2025 21:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757193094; cv=none; b=Md9owS+U8ZedlmFCIvmwz46Oqq66gG3BS9hbzv6reTZz20OqQRrLuSh9QNtZkXH+cuGJOzDtARm02u1QkijeVNKVz1dBtFWzSPYwRJjc5yJQF4GBXF6wYgL4R4IrWREgvdjoE0a8drotAyKcZs/ZJ1toS85qLrjdYTLJFAtGNT4=
+	t=1757193237; cv=none; b=R8n0mEoye52miu8UK5E8XJmbRlMyP2yMyC+SQVQdbV3XmEay/Uqy8BH1bmztSdqpyctV7sujJOrUOdPHvCy1x6sSBv3plB1DTlJqzvR46FDBQ8jduyOarLEcRz5k6qqOswnqs5XGPWCQRpHlAepQecRKWH0iSNuibMjDt5nOqM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757193094; c=relaxed/simple;
-	bh=t0a81YL+YyAbNhA4M7BdPfKDM6E50+IcCqUkH8qrTrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fo2yy/rbAhv277zV5ZGAC0n61Jd6JdNpw701pFpkf7nXFtT6ClvxtEewls2SuSizcytoReJGqA0HnqVKOni6fSTHDFaUQ0I64AoEdyiU8Z3XLqW/xVCNQ5LpbTgEtyh+yV+2n/zEH2LokInF8CeS1f/4I0jzGCM6Fy63miykfss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 4DE90604EE; Sat,  6 Sep 2025 23:11:31 +0200 (CEST)
-Date: Sat, 6 Sep 2025 23:11:30 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH v14 nf-next 2/3] netfilter: bridge: Add conntrack double
- vlan and pppoe
-Message-ID: <aLyjgj5CP5KIvUdl@strlen.de>
-References: <20250708151209.2006140-1-ericwouds@gmail.com>
- <20250708151209.2006140-3-ericwouds@gmail.com>
+	s=arc-20240116; t=1757193237; c=relaxed/simple;
+	bh=TqK/LnT6GIzlmT2eW9vnHLMtTddVu0+FeYIwMO/XBJM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CWlH66qU2vPHkNsO8w/Aqzi8o9hmf7NZ5fUIwYJ5H7hsjYXLbbxA4haGHuULkjNHZDx2V3Yqz8dwr4VzKjF1TbFnmQP66Ku/mS4s0PJCa2X73jsFlrBmbAnWRYIzO19ThNt50C97GbwK6vLd5HwE7aT08pgdhAdXS+rQ5yXVPpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IqraBmk3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D464C4CEE7;
+	Sat,  6 Sep 2025 21:13:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757193236;
+	bh=TqK/LnT6GIzlmT2eW9vnHLMtTddVu0+FeYIwMO/XBJM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IqraBmk3+zg9ijEs71rA0kcWWWqnLTuOCB/xt65+otGshO1N8NG2ZMQp+5Cp/142J
+	 aWqtbPLf1DrAj8aRXLMHLRp8mtjO6EcsMGtZE66b7xek2KaMo+2SvTzE+cLyDEYAzy
+	 g0+0a6PdzP1NWPHxDqwKhO0nxNayC24UeZ2mr+rN6lW+sKSk9d/h76/nzDI9HslaQW
+	 JT1d9j3pmJC5t7bQFYwmQUzT2KEanHPZ8M+MkUnqAzI1P+/R0d83WNq0Db+Nf12Dk2
+	 18bkTIH6JTUzV9sKt3kVJ78VlkHqtlOTJbKpWA6qY3F8tR32FY3dsNDr5VsSU0keJx
+	 ZN9JL1z8hz+pA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 1/2] selftests: net: make the dump test less sensitive to mem accounting
+Date: Sat,  6 Sep 2025 14:13:50 -0700
+Message-ID: <20250906211351.3192412-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250708151209.2006140-3-ericwouds@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Eric Woudstra <ericwouds@gmail.com> wrote:
->  	enum ip_conntrack_info ctinfo;
-> +	u32 len, data_len = U32_MAX;
-> +	int ret, offset = 0;
->  	struct nf_conn *ct;
-> -	u32 len;
-> -	int ret;
-> +	__be16 outer_proto;
->  
->  	ct = nf_ct_get(skb, &ctinfo);
->  	if ((ct && !nf_ct_is_template(ct)) ||
->  	    ctinfo == IP_CT_UNTRACKED)
->  		return NF_ACCEPT;
->  
-> +	if (ct && nf_ct_zone_id(nf_ct_zone(ct), CTINFO2DIR(ctinfo)) !=
-> +			NF_CT_DEFAULT_ZONE_ID) {
-> +		switch (skb->protocol) {
-> +		case htons(ETH_P_PPP_SES): {
-> +			struct ppp_hdr {
-> +				struct pppoe_hdr hdr;
-> +				__be16 proto;
-> +			} *ph;
-> +
+Recent changes to make netlink socket memory accounting must
+have broken the implicit assumption of the netlink-dump test
+that we can fit exactly 64 dumps into the socket. Handle the
+failure mode properly, and increase the dump count to 80
+to make sure we still run into the error condition if
+the default buffer size increases in the future.
 
-This function is getting too long, please move this to a helper
-function.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/testing/selftests/net/netlink-dumps.c | 43 ++++++++++++++++-----
+ 1 file changed, 33 insertions(+), 10 deletions(-)
+
+diff --git a/tools/testing/selftests/net/netlink-dumps.c b/tools/testing/selftests/net/netlink-dumps.c
+index 07423f256f96..7618ebe528a4 100644
+--- a/tools/testing/selftests/net/netlink-dumps.c
++++ b/tools/testing/selftests/net/netlink-dumps.c
+@@ -31,9 +31,18 @@ struct ext_ack {
+ 	const char *str;
+ };
+ 
+-/* 0: no done, 1: done found, 2: extack found, -1: error */
+-static int nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
++enum get_ea_ret {
++	ERROR = -1,
++	NO_CTRL = 0,
++	FOUND_DONE,
++	FOUND_ERR,
++	FOUND_EXTACK,
++};
++
++static enum get_ea_ret
++nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
+ {
++	enum get_ea_ret ret = NO_CTRL;
+ 	const struct nlmsghdr *nlh;
+ 	const struct nlattr *attr;
+ 	ssize_t rem;
+@@ -41,15 +50,19 @@ static int nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
+ 	for (rem = n; rem > 0; NLMSG_NEXT(nlh, rem)) {
+ 		nlh = (struct nlmsghdr *)&buf[n - rem];
+ 		if (!NLMSG_OK(nlh, rem))
+-			return -1;
++			return ERROR;
+ 
+-		if (nlh->nlmsg_type != NLMSG_DONE)
++		if (nlh->nlmsg_type == NLMSG_ERROR)
++			ret = FOUND_ERR;
++		else if (nlh->nlmsg_type == NLMSG_DONE)
++			ret = FOUND_DONE;
++		else
+ 			continue;
+ 
+ 		ea->err = -*(int *)NLMSG_DATA(nlh);
+ 
+ 		if (!(nlh->nlmsg_flags & NLM_F_ACK_TLVS))
+-			return 1;
++			return ret;
+ 
+ 		ynl_attr_for_each(attr, nlh, sizeof(int)) {
+ 			switch (ynl_attr_type(attr)) {
+@@ -68,10 +81,10 @@ static int nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
+ 			}
+ 		}
+ 
+-		return 2;
++		return FOUND_EXTACK;
+ 	}
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static const struct {
+@@ -99,9 +112,9 @@ static const struct {
+ TEST(dump_extack)
+ {
+ 	int netlink_sock;
++	int i, cnt, ret;
+ 	char buf[8192];
+ 	int one = 1;
+-	int i, cnt;
+ 	ssize_t n;
+ 
+ 	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+@@ -118,7 +131,7 @@ TEST(dump_extack)
+ 	ASSERT_EQ(n, 0);
+ 
+ 	/* Dump so many times we fill up the buffer */
+-	cnt = 64;
++	cnt = 80;
+ 	for (i = 0; i < cnt; i++) {
+ 		n = send(netlink_sock, &dump_neigh_bad,
+ 			 sizeof(dump_neigh_bad), 0);
+@@ -140,10 +153,20 @@ TEST(dump_extack)
+ 		}
+ 		ASSERT_GE(n, (ssize_t)sizeof(struct nlmsghdr));
+ 
+-		EXPECT_EQ(nl_get_extack(buf, n, &ea), 2);
++		ret = nl_get_extack(buf, n, &ea);
++		/* Once we fill the buffer we'll see one ENOBUFS followed
++		 * by a number of EBUSYs. Then the last recv() will finally
++		 * trigger and complete the dump.
++		 */
++		if (ret == FOUND_ERR && (ea.err == ENOBUFS || ea.err == EBUSY))
++			continue;
++		EXPECT_EQ(ret, FOUND_EXTACK);
++		EXPECT_EQ(ea.err, EINVAL);
+ 		EXPECT_EQ(ea.attr_offs,
+ 			  sizeof(struct nlmsghdr) + sizeof(struct ndmsg));
+ 	}
++	/* Make sure last message was a full DONE+extack */
++	EXPECT_EQ(ret, FOUND_EXTACK);
+ }
+ 
+ static const struct {
+-- 
+2.51.0
+
 
