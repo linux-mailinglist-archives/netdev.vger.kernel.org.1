@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-220550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BFB7B468A7
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 05:35:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F833B468B4
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 05:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02D2E5A787D
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 03:35:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378F45A7C29
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 03:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA513236454;
-	Sat,  6 Sep 2025 03:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D5D221DBD;
+	Sat,  6 Sep 2025 03:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="i///Z8v8"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="KkrT+Agu"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
+Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8E917B425
-	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 03:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8142217F36
+	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 03:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757129747; cv=none; b=e/KLAUrgQv+7LSoShd+AC7azzPKvFDRs8oXUCidFirVxw+0A9dqFMuFTCRXa9M5CqaFu6NDj9gpEKkLOSLtexYk4QhRnc6c2CxzCFXPtuUmt3sWRA6EnbyITYbQxiT/0TYu0/JY7r05eacw8bFsmdIXHIx9QqJ5kCimxiGT3DqY=
+	t=1757130608; cv=none; b=H1hT0q8HdtIzell6g3IVVM0NdWhX2CFHBo0IZ2kWMw0nfuG4VI3M7JH1J28zQ8aiwizMia89x+U/gsWpank5sxsybpNVY83eogQ4g1JdytkOXLj1CpP7KVgzjFy4Wcm675HNxJrn6iuJPUG06NbhFqJa3PSG2B4KpN+v4XVNDq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757129747; c=relaxed/simple;
-	bh=Qc9IcICKp3VlCrjFz8iWF00JWo6Z+oKViAnot+OkE5g=;
+	s=arc-20240116; t=1757130608; c=relaxed/simple;
+	bh=B/7G1iOAWOvs64Z0twQKj+uwkpczUrnOduoIVkvt1qQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IxfUkjjJ/JXbo/AfkqynPDl+KiSL4R9vgxWH5LU49jISDxWZG/KREruXO+gMvLq2gH2yUBXKOo3RhlkZiRNep11N2VtXsNu0LXSdcpSDi6SK+lNDu9/JhLpsKsIquJ/HRrRkfYzTNm0PtBuF+3PKxoK0GAkpKdxrTdxnv8g7eYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=i///Z8v8; arc=none smtp.client-ip=44.245.243.92
+	 MIME-Version:Content-Type; b=EE3zv7ZYylKVb3qXloofy88GiZMqJ4lGpnkgFd3ghyL2oIdOL9KkqGyVY1/EwSX2qiOk7yCwbMSc4yW2M4QVznRAsSAgKH6Kb0vhOa8PTmzHB9nGmdb5Wuf6zJDslj8cjYFmB6j901N0WjJI1wGpj179P75umxwVb/ikXKsTgI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=KkrT+Agu; arc=none smtp.client-ip=52.26.1.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1757129746; x=1788665746;
+  t=1757130606; x=1788666606;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dL5fqxNoJeDm6sYiSxsJrtyx6Y5dwe7xC8CRV6aqGbA=;
-  b=i///Z8v8Vic+gNAxbduy/mlG5RE1i5tE9zHMtt9yHpBVR6Ap12eIzONi
-   kenIBTxlmYPvSBLYB9KzpsNfFoQkwjNaxZY1HValJsYKiSMkOKp+BzMH5
-   bYLCa5pnX3krICvB9uOZpneRfBM1fIFAIm7GIZDHz7KfLCCrxg8M1W++7
-   5Az1Ff+jVWki5AE/snGGA5APAeUCfaDlM8etYGK+e0oWRdCZE075qx6IQ
-   quOLz/3rH3HIiMoJAgYOH7erxxhyWNpxKuPg8cK068tSWUE49T1GLsFNJ
-   GxMSkKrNtDKj9jeVwRrdejjqCcv83kOQzryYOBDwV97WS5ZJtMBs6Q0+X
-   w==;
-X-CSE-ConnectionGUID: 327dLbaDSy+QYAjHWQX7SQ==
-X-CSE-MsgGUID: G3kIWt87QhCXnBQDtPL12A==
-X-IronPort-AV: E=Sophos;i="6.18,221,1751241600"; 
-   d="scan'208";a="2519580"
+  bh=aO8+nEpF99IvHNQjRBfgpFFnyCKBbemhn1G4CvD32TY=;
+  b=KkrT+AguFDZi3eV/y+gtbNwB38rWofzh3OQB+vc0GUHEm/jkVvX2yNe8
+   Z7lkbF9rrOKValL3RvhOl9ySBec4xsxqc7Jyo1Z4aVoDUJMuU9rFm7hDh
+   y8lAsN0Khher+O4ZONvMgH3cJlWwa1zWtcBhQkRg7XXLyaP+u/al2Dnia
+   3DWPpMwH4fRr1wvjziqBFZ6eNWwdP5BSwVwnLhlmB2kayIiESgsCz59IC
+   9aIhtQwzifMBzdvA6FXcLoLakDzU+Jno32TkLCm70GDKAJ/HPFWXFiKw+
+   qpEchZ/tkwczfOhxSNjZr0bFchL4hCgkhAoO098XEy2hUCEUmsdqfBGZ6
+   A==;
+X-CSE-ConnectionGUID: JS+jbI/BQc+4/mnO851DDw==
+X-CSE-MsgGUID: iVXFn2O7T66wRf5aBabymQ==
+X-IronPort-AV: E=Sophos;i="6.18,243,1751241600"; 
+   d="scan'208";a="2523582"
 Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 03:35:43 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:55857]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.142:2525] with esmtp (Farcaster)
- id 8b2ed895-adce-4e34-96b0-0e2f09645238; Sat, 6 Sep 2025 03:35:43 +0000 (UTC)
-X-Farcaster-Flow-ID: 8b2ed895-adce-4e34-96b0-0e2f09645238
+  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 03:50:04 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:56062]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.19:2525] with esmtp (Farcaster)
+ id 114baa6d-9cb5-424e-a946-24af8906c8bc; Sat, 6 Sep 2025 03:50:04 +0000 (UTC)
+X-Farcaster-Flow-ID: 114baa6d-9cb5-424e-a946-24af8906c8bc
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Sat, 6 Sep 2025 03:35:43 +0000
+ Sat, 6 Sep 2025 03:50:04 +0000
 Received: from b0be8375a521.amazon.com (10.37.244.8) by
  EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Sat, 6 Sep 2025 03:35:41 +0000
+ Sat, 6 Sep 2025 03:50:02 +0000
 From: Kohei Enju <enjuk@amazon.com>
-To: <przemyslaw.kitszel@intel.com>
-CC: <aleksandr.loktionov@intel.com>, <andrew+netdev@lunn.ch>,
-	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<enjuk@amazon.com>, <intel-wired-lan@lists.osuosl.org>,
-	<kohei.enju@gmail.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] ixgbe: preserve RSS indirection table across admin down/up
-Date: Sat, 6 Sep 2025 12:35:28 +0900
-Message-ID: <20250906033534.76837-1-enjuk@amazon.com>
+To: <vitaly.lifshits@intel.com>
+CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
+	<intel-wired-lan@lists.osuosl.org>, <kohei.enju@gmail.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH v1 iwl-net] igc: power up PHY before link test
+Date: Sat, 6 Sep 2025 12:49:51 +0900
+Message-ID: <20250906034954.82685-1-enjuk@amazon.com>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <75f4d389-eaff-4d61-880a-ccb05cd55123@intel.com>
-References: <75f4d389-eaff-4d61-880a-ccb05cd55123@intel.com>
+In-Reply-To: <5a80cd22-49d9-4200-80d5-5416a1d78a5f@intel.com>
+References: <5a80cd22-49d9-4200-80d5-5416a1d78a5f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,88 +83,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Fri, 5 Sep 2025 10:53:37 +0200, Przemek Kitszel wrote:
+On Mon, 1 Sep 2025 07:36:21 +0300, Lifshits, Vitaly wrote:
 
-> 
->>>>>> +	if (adapter->last_rss_indices != rss_i ||
->>>>>> +	    adapter->last_reta_entries != reta_entries) {
->>>>>> +		for (i = 0; i < reta_entries; i++)
->>>>>> +			adapter->rss_indir_tbl[i] = i % rss_i;
->>>>> Are you sure rss_i never ever can be a 0?
->>>>> This is the only thing I'm worrying about.
->>>>
->>>> Oops, you're exactly right. Good catch!
->>>>
->>>> I see the original code assigns 0 to rss_indir_tbl[i] when rss_i is
->>> 0,
->>>> like:
->>>>   adapter->rss_indir_tbl[i] = 0;
->>>
->>> Ahh, that's not true, my brain was not working... Sorry for messing
->>> up.
->>> Anyway, in a situation where rss_i == 0, we should handle it somehow
->>> to avoid zero-divisor.
->>>
->>>>
->>>> To handle this with keeping the behavior when rss_i == 0, I'm
->>>> considering Option 1:
->>>>   adapter->rss_indir_tbl[i] = rss_i ? i % rss_i : 0;
->>>>
->>>> Option 2:
->>>>   if (rss_i)
->>>>       for (i = 0; i < reta_entries; i++)
->>>>           adapter->rss_indir_tbl[i] = i % rss_i;
->>>>   else
->>>>       memset(adapter->rss_indir_tbl, 0, reta_entries);
->>>>
->>>> Since this is not in the data path, the overhead of checking rss_i in
->>>> each iteration might be acceptable. Therefore I'd like to adopt the
->>>> option 1 for simplicity.
->>>>
->>>> Do you have any preference or other suggestions?
->> 
->> I lean toward option 2, as the explicit if (rss_i) guard makes the logic clearer and easier to follow.
->> 
->> Handling the simplified case first with:
->> if (unlikely(!rss_i))
->>      memset(adapter->rss_indir_tbl, 0, reta_entries);
->> else
->>      for (i = 0; i < reta_entries; i++)
->>          adapter->rss_indir_tbl[i] = i % rss_i;
->> 
->> Improves readability and separates the edge case from the main logic.
->> 
->> While it's possible to use a ternary expression like adapter->rss_indir_tbl[i] = rss_i ? i % rss_i : 0;,
->> I find the conditional block more maintainable, especially if this logic evolves later.
->> 
->> Regarding unlikely(), unless there's profiling data showing a performance benefit,
->> I'd avoid it here - this isn't in the fast path, and clarity should take precedence.
->> With the best regards Alex
 >
->I would make it even simpler (than if/else paths):
+>> ---
+>>   drivers/net/ethernet/intel/igc/igc_ethtool.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>> 
+>> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+>> index f3e7218ba6f3..ca93629b1d3a 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
+>> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+>> @@ -2094,6 +2094,9 @@ static void igc_ethtool_diag_test(struct net_device *netdev,
+>>   		netdev_info(adapter->netdev, "Offline testing starting");
+>>   		set_bit(__IGC_TESTING, &adapter->state);
+>>   
+>> +		/* power up PHY for link test */
+>> +		igc_power_up_phy_copper(&adapter->hw);
 >
->if (!rss_i)
->	rss_i = 1;
+>I suggest moving this to igc_link_test functionn igc_diags.c as it 
+>relates only to the link test.
+
+Thank you for taking a look, Lifshits.
+
+Now I'm considering changing only offline test path, not including
+online test path.
+This is because I think online test path should not trigger any
+interruption and power down/up PHY may cause disruption.
+
+So, I forgo the online path and my intention for this patch is to power
+up PHY state only in offline test path.
+I think introducing igc_power_up_phy_copper() in igc_link_test()
+needs careful consideration in online test path.
+
 >
->(which looks better than "should be obvious" oneliner, rss_i += !rss_i;)
+>> +
+>>   		/* Link test performed before hardware reset so autoneg doesn't
+>>   		 * interfere with test result
+>>   		 */
 >
-
-Sounds good.
-
-Considering comparing adapter->last_rss_indices and rss_i before
-configuring rss_indir_tbl and saving rss_i to adapter->last_rss_indices
-afterwards, I think I have to do that before the comparison. 
-Is my understanding correct?
-
-+	if (!rss_i)
-+	    rss_i = 1;
-+   
-+	if (adapter->last_rss_indices != rss_i ||
-+	    adapter->last_reta_entries != reta_entries) {
-+		for (i = 0; i < reta_entries; i++)
-+			adapter->rss_indir_tbl[i] = i % rss_i;
-
+>
+>Thank you for this patch.
 
