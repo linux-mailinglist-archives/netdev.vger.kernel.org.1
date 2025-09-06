@@ -1,90 +1,132 @@
-Return-Path: <netdev+bounces-220576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C588BB46B88
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 13:36:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6744CB46CB3
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 14:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D8A11B26CEF
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 11:37:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 510DF188ECA5
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 12:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57CC28642A;
-	Sat,  6 Sep 2025 11:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B01E288C22;
+	Sat,  6 Sep 2025 12:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0aS3Hmnx"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="F0ekrOJO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411AE1F4262;
-	Sat,  6 Sep 2025 11:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCBF266EF1
+	for <netdev@vger.kernel.org>; Sat,  6 Sep 2025 12:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757158593; cv=none; b=qque5uN4GLkhcTtSnnFrdmA7B4w+lUfk1apkskN1UBzkicfOlsOroIFegETJCnrPF4dWZQqJtcUdXEBOkxSE+NEW2KUvQwJXQqsrfDDKCZFve9MBEhgty1RRXKmedROAdtajGYXemjxW7aFN1mhT5qxi86XNMuAi9t2MjNQj+O4=
+	t=1757161190; cv=none; b=pQmnSjd/b5riThaw5RvPvS6FcnJeBAnLnntBYxYCxRYUxrAZ6c5IBtvWw2wMpxoWA61LO0S5Rh4VRkZo2w0m0v6vkGH59HAxP9MTgur0SWoyivMwji0KlJFMe5tKumGB5JelYU+3OE/Q0oceMYrHsHTw+owC2SWncob6gyPxomc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757158593; c=relaxed/simple;
-	bh=uk14O7Fz7KUhWd0Sz/kWIAmHtwPD3Rvd0igyAAMEZO0=;
+	s=arc-20240116; t=1757161190; c=relaxed/simple;
+	bh=XTxpXmyMJCAeish7/ie2ri87UPjko4Ruw1KFZ9eMNBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OyaWNEbUCywTiBc0slJ282jhn0JaEAqhjuHUb/pGiiKB9OEcXEo8890WsianK/SuUSh1n+mpUtnCTOqWlkngkbzYKTU3Bkx7TU5Zza3cq0HNoSz1NCmPRKwCTpS6rNtTMSR72Fev7DBgncAJPwRsDsPNZSr7qZVdapUYHPIyp1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0aS3Hmnx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D48BC4CEE7;
-	Sat,  6 Sep 2025 11:36:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1757158592;
-	bh=uk14O7Fz7KUhWd0Sz/kWIAmHtwPD3Rvd0igyAAMEZO0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=0aS3Hmnx1CryU2e8d8QkOVtY86s28a5CJwX3iD4L/zCnvZ3VRSZioBEsT1D5SGC2n
-	 qlGxzX7lagXQMgx99wPQaX+CwbKjWV9JJmFzHhstRlca5J9tPne/uDFASjxrfCGThb
-	 s7V98zzqhWdiq67ZCxiWvHf4MLO/UF2F4FkmihIA=
-Date: Sat, 6 Sep 2025 13:36:30 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Mukesh Rathor <mrathor@linux.microsoft.com>
-Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
-	linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	jikos@kernel.org, bentiss@kernel.org, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	dmitry.torokhov@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bhelgaas@google.com,
-	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
-	deller@gmx.de, arnd@arndb.de, sgarzare@redhat.com, horms@kernel.org
-Subject: Re: [PATCH v1 2/2] Drivers: hv: Make CONFIG_HYPERV bool
-Message-ID: <2025090621-rumble-cost-2c0d@gregkh>
-References: <20250906010952.2145389-1-mrathor@linux.microsoft.com>
- <20250906010952.2145389-3-mrathor@linux.microsoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=L7lSP3uJbP3cJpdRRmPL0C6WlioZLlK5KE2o5vPIDvkuI7vP8Js/xFDNYUR91ejwaUshztR5clVbNPO8tjj195o17pjye5yEXIpYJ5A6hcrPvGziPHp/sQ7Jb7qsEF0RF1pXuF/Oi8xfy2O0yRduUiI4Q1UELrE/Kbsw72b0SEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=F0ekrOJO; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=0oT5
+	M/pLrYz64ZkEaGOmGt6gTqO8syJPz1VC0H2uTZg=; b=F0ekrOJOPhA0O0PXg2ET
+	hhULEQixBnJpNCi/Eesi8ajJRN4Nvbob5H+DD5mo4IkXEgEGRL9RiXFnaLiY8vfM
+	yAOvw/ku71UFcjUzq0Fcy3q3nKSEOA55VxexBKmWlbX1jwi6xKH/yTbdXSNL8H3q
+	uMWAM6HN92ONbMTPSLbSsaBM104y/x2mqhtbXAlLzO2LoO1Ob7B8zqE1qtKTyxJR
+	Iqa9+dLwadDWsEu/gbNzI7lqD5MiYb93vASVnKDy6KB0gsg9JT9i8UwUG15a0SL0
+	SUnWr34Tc8yrdcdmdwYj8+uPK+Mg4Dm+DLS268LnsufBL/nGT5XUeyJqkFgWuoyV
+	8A==
+Received: (qmail 172328 invoked from network); 6 Sep 2025 14:19:37 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 6 Sep 2025 14:19:37 +0200
+X-UD-Smtp-Session: l3s3148p1@hvnK9yA+wqEujnsz
+Date: Sat, 6 Sep 2025 14:19:37 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v2 0/9] Add PCS support for Renesas RZ/{T2H,N2H}
+ SoCs
+Message-ID: <aLwm2fbi3acKlIgH@ninjato>
+References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tTkumfwPdoFCtLK9"
+Content-Disposition: inline
+In-Reply-To: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+
+
+--tTkumfwPdoFCtLK9
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250906010952.2145389-3-mrathor@linux.microsoft.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 05, 2025 at 06:09:52PM -0700, Mukesh Rathor wrote:
-> With CONFIG_HYPERV and CONFIG_HYPERV_VMBUS separated, change CONFIG_HYPERV
-> to bool from tristate. CONFIG_HYPERV now becomes the core Hyper-V
-> hypervisor support, such as hypercalls, clocks/timers, Confidential
-> Computing setup, PCI passthru, etc. that doesn't involve VMBus or VMBus
-> devices.
 
-But why are you making it so that this can not be a module anymore?  You
-are now forcing ALL Linux distro users to always have this code in their
-system, despite not ever using the feature.  That feels like a waste to
-me.
+> This series aims to add PCS support for the Renesas RZ/T2H and RZ/N2H SoCs
+> These SoCs include a MII converter (MIIC) that converts MII to RMII/RGMII
+> or can be set in pass-through mode for MII similar to the RZ/N1 SoC. The
+> MIIC is used in conjunction with the Ethernet switch (ETHSW) available on
+> these SoCs.
+>=20
+> v1->v2:
+> - Dropped regx in title and description in patch 1/9.
+> - As done for other IPs used T2H compatible as a fallback for N2H.
+> - Renamed pcs-rzt2h-miic.h -> renesas,r9a09g077-pcs-miic.h
+> - Added matrix table in the new header file.
+> - Corrected the resets check for RZ/N1.
+> - Updated the commit message in patch 1/9.
+> - Dropped regx in config description in patch 9/9.
+> - Dropped patch "net: pcs: rzn1-miic: Add PCS validate callback
+>   for RZ/T2H MIIC" is this already taken care in commit 508df2de7b3e
+>   as pointed by Russell King.
 
-What is preventing this from staying as a module?  Why must you always
-have this code loaded at all times for everyone?
+I plan to test this series on RZ/N1D next week, hopefully on Monday.
 
-thanks,
 
-greg k-h
+--tTkumfwPdoFCtLK9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmi8JtUACgkQFA3kzBSg
+Kbaa5g//ZK2Mks61O/bzWONbxucBL3fI+YH9HfA8ISgLaXy43lwLzu5lJqSzZqmj
+dPtLUow4etR0F5mVJJ63d+fAVRbujns0A7SIrSYuXfCmHnjEuGHz6RivUakVex0/
+nj7TtSNroLdfytUJ73Q9phD9IDTk9H1Xs1ItR0fPflpI3LXtGbLF+5Yp11FaRqJx
+6yDsuDSXhNQtPN//y0TWmTVkgiw6LYgX4iniGRspll3QTFVmYqMwT41ZBLWJcB57
+YzWyCZOh3Cm37pjUOnGqpte3sbjeRrgxrmVePIpJ27J833Lbi2nt2mCCTnGap2DY
+1Cig4VEsWPFSeYCj30fJeU6ryw4isEL/kveFqzlMht/dfAbCgA6jV0q7D3uxrumQ
+Bv/854D8WNnvCVxqD3JoY6pRfdXYLKyTYhk9pQni+u52RgAou9y2XXbK6i9YZQdX
+x1Lj5TXDlCNjDw8IX8rzAWIq2FC+fvpr5pveyYBAugJCKQpzayody4IOYc31MOgk
+redviQfHN9X5b2l+LF2bSqGeAgS4aXdQ4OYXWgEwIuecNX+e0apkXaR9AfmreEaa
+hCaRV1OYoYnzjm4h/9ucJ7oWo+CBQ1TxLd/iQVrbH4iMcOI8ovsSNQTEQXoZ3R4c
+rnhndGyxlo54wX1K6bksZiaczB0Bha8vsn3i1B50fHP7GmO/KtQ=
+=k1qC
+-----END PGP SIGNATURE-----
+
+--tTkumfwPdoFCtLK9--
 
