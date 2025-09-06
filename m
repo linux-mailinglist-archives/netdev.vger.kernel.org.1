@@ -1,119 +1,169 @@
-Return-Path: <netdev+bounces-220615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3DFAB47612
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 20:26:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6546B476BF
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 21:08:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93ED9A4108C
-	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 18:26:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B620584171
+	for <lists+netdev@lfdr.de>; Sat,  6 Sep 2025 19:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAAD27467F;
-	Sat,  6 Sep 2025 18:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D21285050;
+	Sat,  6 Sep 2025 19:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BeXSGy8k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+mFAiR0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24970221F12;
-	Sat,  6 Sep 2025 18:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DBF1C84B8;
+	Sat,  6 Sep 2025 19:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757183178; cv=none; b=nbSK945vk1d6EVyuZ7fdlHLj9n3Lc/NsKrBf+XS6N6OT1x9e6+KMD82vxHmNozbbMPDYvCKk1Hi8cOBS84C0Um7IDXEYhy9ouHc7VbilC2JKxAgtpLhLHCND1zJXYRiHHuWohOZvRes+MyRW9GgTsDyZyIYMVl0S1u/z6QZE7pg=
+	t=1757185676; cv=none; b=qC/gtDcM89xeadWgBVGkHfRCMXJMYu629hDFgp7uFn2hXnH4xm3SJffHsCoZFzKl+HVovmI9Fmma6lVTH3chhqoRZwk2al0bPdWERImAK2VDrLObNRuW3i/p5ZAhNSAEb9vr2t2FpbdxSh4gkMqpkwxOVpZBPcCdOL1D2YOhxRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757183178; c=relaxed/simple;
-	bh=LSqfnwRaCxz/qt66MNF+bf0NREQDPnp6VzCH4Zt6gd8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4wy6E+n4BI0iI2a89Xi/lKpS7UWJQE5+tlBAolA3avmkgIUnYT68BsInL1Jeyi9D4SnqaoRfp9/68GPXAOiNSdIycn6hLlFis+5C83gaSYg9KJKxzpGiYPV1EvYjRsGaXyE65f8u6p6pcg1AHK7WSwsXlPTAPU84mcuUI5Rw2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BeXSGy8k; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757183177; x=1788719177;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LSqfnwRaCxz/qt66MNF+bf0NREQDPnp6VzCH4Zt6gd8=;
-  b=BeXSGy8ksJZwv9E7o1GplmFDnbPlqWKzBDQzL4iS6EyNseYykV1Hr7sT
-   Qp4alw+wUmxmqFSgEE3wil+rHpcEwLP5kAlqCuVyLAOFpwwhBiiS6Q4TN
-   J8kTlG2Xu7CE8Q4hRTAwd/tfLNn2JPuswksdaeb4iEuHj3nzqgpbtWw40
-   CLBO8Ji3pexYUapo0pMK8ny/6/RL17HCDiNYupNqIFq67V1Bm6i09Y8oa
-   EPSC8rqBz5h3Ikj52lR7AVwxnD4mfdcbvZVNV3lc84V46vCkAqgxgazLh
-   KZe9iyf68B4Iot72yDIi2dhYA10vgUAVBqyqjZq/RvQDGVSJ9dh3NgZmp
-   A==;
-X-CSE-ConnectionGUID: bYm62msVSWav8iRtxNlMLw==
-X-CSE-MsgGUID: 2GIB7Rz6SR2uKo0lgE4UDw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11545"; a="59199682"
-X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
-   d="scan'208";a="59199682"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 11:26:17 -0700
-X-CSE-ConnectionGUID: x3W0eVxLTsSI2xa8jvDr1Q==
-X-CSE-MsgGUID: swWJ9GldTViBEQSAgLPwsw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
-   d="scan'208";a="172308236"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 06 Sep 2025 11:26:13 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uuxc2-0001jX-1x;
-	Sat, 06 Sep 2025 18:26:10 +0000
-Date: Sun, 7 Sep 2025 02:25:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Halil Pasic <pasic@linux.ibm.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next 1/2] net/smc: make wr buffer count configurable
-Message-ID: <202509070225.pVKkaaCr-lkp@intel.com>
-References: <20250904211254.1057445-2-pasic@linux.ibm.com>
+	s=arc-20240116; t=1757185676; c=relaxed/simple;
+	bh=gVQxgJDG/hVQtG1HjsZygJpYDl5EUtgtz/PBvFVrOyU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=axNzgzVpxewtcePplsFbF/xXdnpWOGhmZw5VM6YqGtzTJUyrmbFRyhz9ts5FIdo09eoWf8fR2olbvBryW7SipWBrVKDLOIR2r5rO3a2LqWq19sE1NQjacpxI2u7U/3Z+yF9vEMmvfJMm0sVZU9UhQT5G9IggvWbG5KF7fiL3N8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+mFAiR0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EB1BC4CEE7;
+	Sat,  6 Sep 2025 19:07:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757185676;
+	bh=gVQxgJDG/hVQtG1HjsZygJpYDl5EUtgtz/PBvFVrOyU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=q+mFAiR08SBlMO52nyQV5x8Ckzaq209dYKqIE6BDTNYGo3M7mJTD5DTq7f7tdRNdh
+	 4kGgqnMI5MBeFAAsmP4W4LsYh1UUCVxREseZoKaO724QS262NxkU6LNt/Cm64QWDsN
+	 Ukjk623XcVlXyEURrRa/hJkjyYVrqH5QYqze0b8sBWf7DPdybfB/4UskmIwJXPFQcY
+	 FfQsyS5Dh3N2bWn/AICiDZQuYvU3TwGB1MVmsmtFb+BgXHgtwUgcXgfxzq+9wiYJ/g
+	 RCkVuMdtfNP/q0QeJ1a/DLREycy5IBpXh1eb4AEM3PSSRmbpiwnKIssXMY0U49cBl+
+	 wF23214GL5o9A==
+Date: Sat, 6 Sep 2025 12:07:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
+ <ast@fiberby.net>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Simon Horman
+ <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 05/11] tools: ynl-gen: define nlattr *array in
+ a block scope
+Message-ID: <20250906120754.7b90c718@kernel.org>
+In-Reply-To: <4eda9c57-bde0-43c3-b8a0-3e45f2e672ac@fiberby.net>
+References: <20250904-wg-ynl-prep@fiberby.net>
+	<20250904220156.1006541-5-ast@fiberby.net>
+	<20250905171809.694562c6@kernel.org>
+	<4eda9c57-bde0-43c3-b8a0-3e45f2e672ac@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250904211254.1057445-2-pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Halil,
+On Sat, 6 Sep 2025 13:13:29 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
+> In patch 4, it is about a variable used by multiple Type classes having
+> presence_type() =3D 'count', which is currently 3 classes:
+> - TypeBinaryScalarArray
+> - TypeMultiAttr
+> - TypeArrayNest (later renamed to TypeIndexedArray)
+>=20
+> In patch 5, I move code for a special variable used by one Type class,
+> to be contained within that class. It makes it easier to ensure that the
+> variable is only defined, when used, and vice versa. This comes at the
+> cost of the generated code looking generated.
 
-kernel test robot noticed the following build errors:
+So you're agreeing?
 
-[auto build test ERROR on 5ef04a7b068cbb828eba226aacb42f880f7924d7]
+> If we should make the generated code look like it was written by humans,
+> then I would move the definition of these local variables into a class
+> method, so `i` can be generated by the generic implementation, and `array`
+> can be implemented in it's class. I will take a stab at this, but it might
+> be too much refactoring for this series, eg. `len` is also defined local
+> to conditional blocks multiple branches in a row.
+>=20
+> tools/net/ynl/generated/nl80211-user.c:
+> nl80211_iftype_data_attrs_parse(..) {
+>    [..]
+>    ynl_attr_for_each_nested(attr, nested) {
+>      unsigned int type =3D ynl_attr_type(attr);
+>=20
+>      if (type =3D=3D NL80211_BAND_IFTYPE_ATTR_IFTYPES) {
+>        unsigned int len;
+>        [..]
+>      } else if (type =3D=3D NL80211_BAND_IFTYPE_ATTR_HE_CAP_MAC) {
+>        unsigned int len;
+>        [..]
+>      [same pattern 8 times, so 11 times in total]
+>      } else if (type =3D=3D NL80211_BAND_IFTYPE_ATTR_EHT_CAP_PPE) {
+>        unsigned int len;
+>        [..]
+>      }
+>    }
+>    return 0;
+> }
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Halil-Pasic/net-smc-make-wr-buffer-count-configurable/20250905-051510
-base:   5ef04a7b068cbb828eba226aacb42f880f7924d7
-patch link:    https://lore.kernel.org/r/20250904211254.1057445-2-pasic%40linux.ibm.com
-patch subject: [PATCH net-next 1/2] net/smc: make wr buffer count configurable
-config: loongarch-randconfig-002-20250906 (https://download.01.org/0day-ci/archive/20250907/202509070225.pVKkaaCr-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250907/202509070225.pVKkaaCr-lkp@intel.com/reproduce)
+It's pretty easily doable, I already gave up on not calling _attr_get()
+for sub-messages.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509070225.pVKkaaCr-lkp@intel.com/
+> That looks very generated, I would have `len` defined together with `type=
+`,
+> and a switch statement would also look a lot more natural, but maybe leave
+> the if->switch conversion for the compiler to detect.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "smc_ib_sysctl_max_send_wr" [net/smc/smc.ko] undefined!
->> ERROR: modpost: "smc_ib_sysctl_max_recv_wr" [net/smc/smc.ko] undefined!
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen=
+_c.py
+index fb7e03805a11..8a1f8a477566 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_c.py
++++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+@@ -243,7 +243,7 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+         raise Exception(f"Attr get not implemented for class type {self.ty=
+pe}")
+=20
+     def attr_get(self, ri, var, first):
+-        lines, init_lines, local_vars =3D self._attr_get(ri, var)
++        lines, init_lines, _ =3D self._attr_get(ri, var)
+         if type(lines) is str:
+             lines =3D [lines]
+         if type(init_lines) is str:
+@@ -251,10 +251,6 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+=20
+         kw =3D 'if' if first else 'else if'
+         ri.cw.block_start(line=3Df"{kw} (type =3D=3D {self.enum_name})")
+-        if local_vars:
+-            for local in local_vars:
+-                ri.cw.p(local)
+-            ri.cw.nl()
+=20
+         if not self.is_multi_val():
+             ri.cw.p("if (ynl_attr_validate(yarg, attr))")
+@@ -2101,6 +2097,7 @@ _C_KW =3D {
+             else:
+                 raise Exception(f"Per-op fixed header not supported, yet")
+=20
++    var_set =3D set()
+     array_nests =3D set()
+     multi_attrs =3D set()
+     needs_parg =3D False
+@@ -2118,6 +2115,13 @@ _C_KW =3D {
+             multi_attrs.add(arg)
+         needs_parg |=3D 'nested-attributes' in aspec
+         needs_parg |=3D 'sub-message' in aspec
++
++        try:
++            _, _, l_vars =3D aspec._attr_get(ri, '')
++            var_set |=3D set(l_vars) if l_vars else set()
++        except:
++            pass  # _attr_get() not implemented by simple types, ignore
++    local_vars +=3D list(var_set)
+     if array_nests or multi_attrs:
+         local_vars.append('int i;')
+     if needs_parg:
 
