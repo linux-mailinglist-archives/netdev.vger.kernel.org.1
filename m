@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-220639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BBEEB47887
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 03:30:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA066B47886
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 03:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F96A201107
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 01:30:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7648A2010DB
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 01:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A85A18DB2A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1506D17A31C;
 	Sun,  7 Sep 2025 01:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bzrCcYt7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ptk8X3Ip"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E07186284
-	for <netdev@vger.kernel.org>; Sun,  7 Sep 2025 01:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E355310957
+	for <netdev@vger.kernel.org>; Sun,  7 Sep 2025 01:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757208616; cv=none; b=N7WlIQruqXGu7phe8U5tgp0q13AkCnIhOrvTK9+38b/Zd0i3TlgNQ2Rl0dKU5vmFQIYC+l3xzl8CisbKem9K7qHSsVp273cOxiWsF9I3nR8FFAGFHthb1bGLhprXfBDqU7IizIc8wdm6Ju5bBK41KpsuEIjZ/y49lMN3yOW8Ewk=
+	t=1757208616; cv=none; b=RiJqI9AOpCeHBzgZwCsWGOqJejg2keomx7HwtEXJ+ZfULABmTpmmdngUHbg4V4dfqXIMosRXP6L6uO2GjmJQlSDmGsoPFbsPGfeEEn8z4euhP1IPFIosWt/aaGZ+jQiilknm/+mwZiJIbHW9SxpYBtrCwoh+cHKccMMa8bRAnYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757208616; c=relaxed/simple;
-	bh=7ZhvTC1+B5Ys8I+6hUx9liKNLXA3bKtQmpvVlm9OQg0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SI6vnwnO7bH2zoI0A51Nzhut/KXSmOTTYiP49smMI1OFRm7xnn8wNb+KnLxf5AkP8ZhapzAQQTpJbm0v8Vk5E8OU33JBIKQnMLVoZjYu19nqhMMTlyJ3ipXVhX47V1MBuFZ+F7J3GYosX/tOXUSNGTcIxjNszT0+k8NrWH69Gyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bzrCcYt7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91C2CC4CEE7;
-	Sun,  7 Sep 2025 01:30:14 +0000 (UTC)
+	bh=EWbUFvMA4MXxX2lK1OzuBkqWJ0ExsqIf4ot/1FqlHoE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RVTnC5fjN7Tp3PWifvGNIGVoQMayCQFXw0hrXT+0jnesI2OeFxXEsdLvMxu1GJLrONq3g0YPqzjjiGKgZn53Y/kj4Q230tUneZrxHLfWzLPp0Or7xAS0GO9qKch8axzCpQSO2rtikCJduD90IKv6t79KCw2wkoE7MflIS9H4FbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ptk8X3Ip; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABB00C4CEF7;
+	Sun,  7 Sep 2025 01:30:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757208614;
-	bh=7ZhvTC1+B5Ys8I+6hUx9liKNLXA3bKtQmpvVlm9OQg0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=bzrCcYt7tU7oPzCysr7uEWj0ElRYR6uYKTc4/9ILUJe+ISDxVLWA1G5Pl4KmINOZ/
-	 08zw9ACUO54WyIcIlnwyKAMK4zf/UDrI+VULSeFgrypd2AnquF+voKa8NravxXa9pR
-	 paQZrBKaGygV9/8Y4c7IuJRbiifWioEQuIHIKZAxlNPcdmUGZazrLtd6AzreLowanC
-	 GGLqR80Yfovwv4aB8jqBER6DVaABYVaBvO67sh+z6XIygUAjEHQREebOWCcDMdV7sV
-	 tuyi+1FC4rkFla/2IXRKkLj6Y+CNsZJ58/hxiVv1R/556Q6cgItNyl49dDF6ZIfOjd
-	 JBwLz3YRAIHng==
+	s=k20201202; t=1757208615;
+	bh=EWbUFvMA4MXxX2lK1OzuBkqWJ0ExsqIf4ot/1FqlHoE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ptk8X3IpbvXaHqkwo6aiaeiJym4C79a+1vTkRukop1DoSJsOwHVCvrM4Do51tkJI9
+	 kwGlBGVE5bCmlxfsHEOqMp+4spAVzjX+jJ/ZiPZY02Ouglmiz9lVTOjU1WNICNb1eP
+	 N5dLfYnDOuaCWmEqq8qKQxFm8pY3TYZTa7x8x7lQozLwR7nfaXKrnVN9sSpuwEcFYF
+	 COhRD0wTk/J9MyZ4zGJpUog2TmajYzX0sH8I4bh/CP+xHQQ7NVNmEyoh5Xhwi7qx3B
+	 uFn9eLYBNQxbmcL8ZvMiVgpUZ8XVHXzA3zymSnWZi3Z988fp7ileK8xymD7mwhMk+d
+	 AsB5FAU7520ZA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,11 +53,15 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH V7 net-next 00/11] *devlink, mlx5: Add new parameters for link management and SRIOV/eSwitch configurations
-Date: Sat,  6 Sep 2025 18:29:42 -0700
-Message-ID: <20250907012953.301746-1-saeed@kernel.org>
+	Simon Horman <horms@kernel.org>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
+	Kamal Heib <kheib@redhat.com>
+Subject: [PATCH V7 net-next 01/11] devlink: Add 'total_vfs' generic device param
+Date: Sat,  6 Sep 2025 18:29:43 -0700
+Message-ID: <20250907012953.301746-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250907012953.301746-1-saeed@kernel.org>
+References: <20250907012953.301746-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,125 +70,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Vlad Dumitrescu <vdumitrescu@nvidia.com>
 
-This patch series introduces several devlink parameters improving device
-configuration capabilities, link management, and SRIOV/eSwitch, by adding
-NV config boot time parameters.
+NICs are typically configured with total_vfs=0, forcing users to rely
+on external tools to enable SR-IOV (a widely used and essential feature).
 
-Userspace(v2): https://lore.kernel.org/netdev/20250704045427.1558605-1-saeed@kernel.org/
+Add total_vfs parameter to devlink for SR-IOV max VF configurability.
+Enables standard kernel tools to manage SR-IOV, addressing the need for
+flexible VF configuration.
 
-v6->v7:
- - Improve Documentation for patch #1 and #2, Jakub/JacobK.
- - Toss "Add 'keep_link_up' generic devlink device param" patch, Jakub.
+Signed-off-by: Vlad Dumitrescu <vdumitrescu@nvidia.com>
+Tested-by: Kamal Heib <kheib@redhat.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ Documentation/networking/devlink/devlink-params.rst | 5 +++++
+ include/net/devlink.h                               | 4 ++++
+ net/devlink/param.c                                 | 5 +++++
+ 3 files changed, 14 insertions(+)
 
-v5->v6:
-  - rebase was required - Simon.
-
-v4->v5:
-  - ./tools/net/ynl/ynl-regen.sh for patch #12
-  - checkpatch issues
-
-v3->v4:
-  - Rebase and adapted to new enum variable typed attributes from Jiri:
-    https://lore.kernel.org/netdev/20250505114513.53370-1-jiri@resnulli.us/
-
-v2->v3:
- - ynl-gen: allow noncontiguous enums, Jakub
- - devlink.yaml: var-attr-type enum, Jakub
-
-v1->v2:
- - Fix ynl-regen issue reported by Simon.
- - Fix smatch "could be null" warning reported by Dan Carpenter
- - Fix double include reported by Kernel test robot
- - Only allow per PF sriov setting - by Jiri
- - Add Reviewed-by Jiri and Tested-by Kamal.
-
-Below is a summary of the key changes:
-
-1) Enable support for devlink port parameters
-
-2) Implement multi attribute devlink param value data, for u32 array
-   type parameters
-
-3) Implement the following parameters:
-
-   3.a) total_vfs Parameter:
-   -------------------------
-
-Adds support for managing the number of VFs (total_vfs) and enabling
-SR-IOV (enable_sriov for mlx5) through devlink. These additions enhance
-user control over virtualization features directly from standard kernel
-interfaces without relying on additional external tools. total_vfs
-functionality is critical for environments that require flexible num VF
-configuration.
-
-   3.b) devlink keep_link_up Parameter:
-   ------------------------------------
-
-Introduces a new devlink parameter 'keep_link_up', allowing devices to
-keep the link active even when the driver is not loaded. This
-functionality is especially useful for maintaining link stability during
-driver upgrades or reboots without dropping connectivity.
-
-   3.c) eSwitch Hairpin per Priority Buffers:
-   ------------------------------------------
-
-Implements new devlink parameters to configure eSwitch hairpin per
-priority buffers. These parameters provide granular control over how
-packets are buffered for IEEE802.1p priorities, offering improved traffic
-management and efficiency for specific priority levels.
-
-   3.d) CQE Compression Type:
-   --------------------------
-
-Introduces a new devlink parameter, cqe_compress_type, to configure the
-rate of CQE compression based on PCIe bus conditions. This setting
-provides a balance between compression efficiency and overall NIC
-performance under different traffic loads.
-
-Detailed examples of usage for each parameter have been included in the
-respective commits.
-
-Thanks,
-Saeed
-
-
-Jiri Pirko (1):
-  devlink: pass struct devlink_port * as arg to devlink_nl_param_fill()
-
-Saeed Mahameed (7):
-  net/mlx5: Implement cqe_compress_type via devlink params
-  devlink: Implement port params registration
-  devlink: Implement get/dump netlink commands for port params
-  devlink: Implement set netlink command for port params
-  devlink: Throw extack messages on param value validation error
-  devlink: Implement devlink param multi attribute nested data values
-  net/mlx5: Implement eSwitch hairpin per prio buffers devlink params
-
-Vlad Dumitrescu (3):
-  devlink: Add 'total_vfs' generic device param
-  net/mlx5: Implement devlink enable_sriov parameter
-  net/mlx5: Implement devlink total_vfs parameter
-
- Documentation/netlink/specs/devlink.yaml      |  25 +-
- .../networking/devlink/devlink-params.rst     |   5 +
- Documentation/networking/devlink/mlx5.rst     |  61 +-
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
- .../net/ethernet/mellanox/mlx5/core/devlink.c |   8 +
- .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +
- .../mellanox/mlx5/core/lib/nv_param.c         | 859 ++++++++++++++++++
- .../mellanox/mlx5/core/lib/nv_param.h         |  14 +
- include/linux/mlx5/driver.h                   |   1 +
- include/net/devlink.h                         |  25 +
- include/uapi/linux/devlink.h                  |   1 +
- net/devlink/netlink_gen.c                     |  25 +-
- net/devlink/param.c                           | 416 +++++++--
- net/devlink/port.c                            |   3 +
- 14 files changed, 1362 insertions(+), 86 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
-
+diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
+index 211b58177e12..c51da4fba7e7 100644
+--- a/Documentation/networking/devlink/devlink-params.rst
++++ b/Documentation/networking/devlink/devlink-params.rst
+@@ -143,3 +143,8 @@ own name.
+    * - ``clock_id``
+      - u64
+      - Clock ID used by the device for registering DPLL devices and pins.
++   * - ``total_vfs``
++     - u32
++     - The max number of Virtual Functions (VFs) exposed by the PF.
++       after reboot/pci reset, 'sriov_totalvfs' entry under the device's sysfs
++       directory will report this value.
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index 5f44e702c25c..8d4362f010e4 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -530,6 +530,7 @@ enum devlink_param_generic_id {
+ 	DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
+ 	DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
+ 	DEVLINK_PARAM_GENERIC_ID_CLOCK_ID,
++	DEVLINK_PARAM_GENERIC_ID_TOTAL_VFS,
+ 
+ 	/* add new param generic ids above here*/
+ 	__DEVLINK_PARAM_GENERIC_ID_MAX,
+@@ -594,6 +595,9 @@ enum devlink_param_generic_id {
+ #define DEVLINK_PARAM_GENERIC_CLOCK_ID_NAME "clock_id"
+ #define DEVLINK_PARAM_GENERIC_CLOCK_ID_TYPE DEVLINK_PARAM_TYPE_U64
+ 
++#define DEVLINK_PARAM_GENERIC_TOTAL_VFS_NAME "total_vfs"
++#define DEVLINK_PARAM_GENERIC_TOTAL_VFS_TYPE DEVLINK_PARAM_TYPE_U32
++
+ #define DEVLINK_PARAM_GENERIC(_id, _cmodes, _get, _set, _validate)	\
+ {									\
+ 	.id = DEVLINK_PARAM_GENERIC_ID_##_id,				\
+diff --git a/net/devlink/param.c b/net/devlink/param.c
+index 41dcc86cfd94..33134940c266 100644
+--- a/net/devlink/param.c
++++ b/net/devlink/param.c
+@@ -102,6 +102,11 @@ static const struct devlink_param devlink_param_generic[] = {
+ 		.name = DEVLINK_PARAM_GENERIC_CLOCK_ID_NAME,
+ 		.type = DEVLINK_PARAM_GENERIC_CLOCK_ID_TYPE,
+ 	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_TOTAL_VFS,
++		.name = DEVLINK_PARAM_GENERIC_TOTAL_VFS_NAME,
++		.type = DEVLINK_PARAM_GENERIC_TOTAL_VFS_TYPE,
++	},
+ };
+ 
+ static int devlink_param_generic_verify(const struct devlink_param *param)
 -- 
 2.51.0
 
