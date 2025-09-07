@@ -1,39 +1,86 @@
-Return-Path: <netdev+bounces-220662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB429B47994
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 10:23:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AFF5B479F3
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 11:07:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5989D3C2AA4
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 08:23:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD7843BE901
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 09:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA13F20CCE4;
-	Sun,  7 Sep 2025 08:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0A721C174;
+	Sun,  7 Sep 2025 09:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bVn7ZmQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CD41E1DE7;
-	Sun,  7 Sep 2025 08:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B58F63B9
+	for <netdev@vger.kernel.org>; Sun,  7 Sep 2025 09:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757233418; cv=none; b=pxI9sjvNbxrUbue3V+LSea8VczdgLdINFpVy0GioKSyqMG8BDUaYlz7uEbWx/B0Perhp/kzQteV2Z9RTXuLbEc/6ktRQqCu6hpmkyvpMSQv3v2zVSVsb+EE4sdYu3cugBDkYlXFNhJzx3QFevRCP7WJyQ4bWgmeYRpAN0rL5i70=
+	t=1757236038; cv=none; b=FP/uUF5SQU8SFFAZvMijoeuj4ORauJOIJQG3/HYxWr7TytBtBqKtH4Ou2tM4xLn1kz1X3BDXE3X+yOsbxepTlfA2XO1tED0AmCgyyGz2WhqlxaEUgCRbALVTqnDdzyXNMSW9ap2bZnhxJHUiPSa7lpQkjqxntj+G3VsFVDPXfDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757233418; c=relaxed/simple;
-	bh=r0eJTebCt3MS2Xw6g6hfJ21wZgUkK/hVYw3MMLUbnxQ=;
+	s=arc-20240116; t=1757236038; c=relaxed/simple;
+	bh=gw40tZl426rQ+++4pHwaYuRU0zQT9m9rSVbBkjMMcPw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QdtVxD332/QQglH984EFE0Y0hiDmOdWQZ+FW2cQA8ayj0WBDG+AGoVlKQGE6zazRzZAfJR+Yst9ZmEx53Hfwc/mq06A3uHcYMB70+B913PReykVZy+VKMaRu4z0EBU+/HiEp58jgOxU97aTDpcmKEO1njKsrvMrjkyHNaA7mBcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.109] (unknown [114.241.87.235])
-	by APP-05 (Coremail) with SMTP id zQCowABX+hPUQL1oMWdTAQ--.2947S2;
-	Sun, 07 Sep 2025 16:22:44 +0800 (CST)
-Message-ID: <fbcc1ec3-7ff6-4891-97e3-9763355326f7@iscas.ac.cn>
-Date: Sun, 7 Sep 2025 16:22:44 +0800
+	 In-Reply-To:Content-Type; b=RXljzKmv7EFu7oH6LF2BykZOg9zj1SfpclDk6nnH7LEN8eA9F9o9rX+pB5NNTGkohepYvXUQV9OSbNTYMnWGfCtlLlFVUWtpdiRYub19jQB4rEuSV5xR33bXoMHWp+/9m9VILe5Ii6aMY8Qx7XzNGhSCVDZidKq5NeR2JfvFU78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bVn7ZmQY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757236035;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yu8rkgDTc/PosSKRpJdtQdj9FaNdWHm11nIU7Iih4yk=;
+	b=bVn7ZmQY2SDFcSZptro7b/EF2z23ctlFbF24Q7+S6Xs3rdLwI+fTgslpdPPEIsvxEVD21/
+	u4MJV7ia45Zu7z94oSkl0Puu2P3sGI//qFoorfrwWuRUZxFSMN9p5NkUxQ1V22jQvXVnr9
+	CS4J2o6M58lq6lhZGEJdRxz2+Zw9F0Q=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-240-cZ6Kax13P1mzdn1fK8sAuA-1; Sun, 07 Sep 2025 05:07:12 -0400
+X-MC-Unique: cZ6Kax13P1mzdn1fK8sAuA-1
+X-Mimecast-MFC-AGG-ID: cZ6Kax13P1mzdn1fK8sAuA_1757236031
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3db4cfcc23eso1683242f8f.3
+        for <netdev@vger.kernel.org>; Sun, 07 Sep 2025 02:07:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757236031; x=1757840831;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yu8rkgDTc/PosSKRpJdtQdj9FaNdWHm11nIU7Iih4yk=;
+        b=tqstMiRFiO1rIUDdFKfQA28QZUi6LsTzfzLWN6I64aha7EsvV0P3rRbFMKPNkplGsR
+         lwm9Pxig1AKUiqQQoa313mgdo/330fxh8+rBUsJPOFXbP+V3SIezxE2kQeHfv0vyjHXC
+         cr33wEAbjeas7CbI9IHzwbrA+mVE/KUnhfIUesYMXb+02pZlUokaU8sch/mWUw/Kx9av
+         wcOjyzKVLiXmnAuzkuVQQczPSA3xi8RmG+PUxdoanIVGJpJ3IU6qkTLKhgyPCe+2Nyzf
+         K1sGryZD+4vcWJKQnS8RoHs3ZVsDKi7DhSLs+W0X/exbcZG1ObRvQD91vNRHPLG+NdwU
+         iTTw==
+X-Forwarded-Encrypted: i=1; AJvYcCU72LfugyyRVZdwNf0mbYQQi5KnYsnHAlu2xiZC537Pe1tw1qUzgi6/Idj0x7GEpaZ2jiNrOvw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD1be1bqzTwgGYV5uCdH1KWSfhMTANilNgUrckEIuPXyBHwKvM
+	LB9NbXyCyLouu+w4hYC/olenw4U+wTbcTzFx2Qc8U/4R1OIQTp8Cmiq5GA0VDX7Ixr7ZiCPTv86
+	McZV2nYmt9m/MghgXuUM+ohm7d6GF1jAi+pnL+QPe+ENgO5J+zz6rmHoVSw==
+X-Gm-Gg: ASbGncuD3sT5jPF0eOCycpGtfI4XWxKVkvhTk0R7SQZ3xCpBGEA7mUVeOv/Bm7gt53k
+	JAV0XEAMD723zFUX6o1B+ANf84uqrNQZA1XlhKWzxyr3HmdeOzhjVYoli90I7CX64KSDZ8EMVLK
+	twj74M05LXgXRHfcmIlh/wYVKz3umUT5g9hhauIAfWIeafCzOqmFf7KNh/1EGk7W1+KTCuLPqO6
+	p01ZcrCSWZXEC1EB+9wbrEsQd4sFTG88jU6Ddp6mbD8bNwSpJBy23Lz3trZ3DX2AJ9dHwwqAMW/
+	UgyWL0NkTp55oFeWSg4qAX2oZwSp3UvD3ZmsPlVGo+M=
+X-Received: by 2002:a05:6000:18a9:b0:3cb:5e64:ae8 with SMTP id ffacd0b85a97d-3e636d8fceamr3922913f8f.11.1757236030739;
+        Sun, 07 Sep 2025 02:07:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGfO68JW1NGSpUdkVAUAJ1tw+Jh6Ta/iYbBbRcoHt8MjGZV3zlBWMzK0eU//tMT6SeIWZ7awg==
+X-Received: by 2002:a05:6000:18a9:b0:3cb:5e64:ae8 with SMTP id ffacd0b85a97d-3e636d8fceamr3922891f8f.11.1757236030331;
+        Sun, 07 Sep 2025 02:07:10 -0700 (PDT)
+Received: from [192.168.68.125] ([147.235.216.242])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45cb687fe4esm169329195e9.23.2025.09.07.02.07.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 07 Sep 2025 02:07:09 -0700 (PDT)
+Message-ID: <adecffa2-19cd-4630-be0d-8c4b597c8181@redhat.com>
+Date: Sun, 7 Sep 2025 12:07:07 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,87 +88,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, Junhui Liu <junhui.liu@pigmoral.tech>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
- Troy Mitchell <troy.mitchell@linux.spacemit.com>, Vivian Wang <uwu@dram.page>
-References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
- <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
- <20250905153500.GH553991@horms.kernel.org>
- <0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
- <20250905160158.GI553991@horms.kernel.org>
- <45053235-3b01-42d8-98aa-042681104d11@iscas.ac.cn>
- <20250905165908.69548ce0@kernel.org>
+Subject: Re: [PATCH net-next,v3,1/2] devlink: Add new "max_mac_per_vf" generic
+ device param
+To: Simon Horman <horms@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org, przemyslawx.patynowski@intel.com,
+ jiri@resnulli.us, netdev@vger.kernel.org, jacob.e.keller@intel.com,
+ aleksandr.loktionov@intel.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com
+References: <20250903214305.57724-1-mheib@redhat.com>
+ <20250905122238.GA553991@horms.kernel.org>
 Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <20250905165908.69548ce0@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:zQCowABX+hPUQL1oMWdTAQ--.2947S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw47JryDGw4rtry5Kw4rKrg_yoW8Gr4rpF
-	WrKFs2kFWvqw4xt3yvv3ykX343t3ZxZ3y5Gryqga47ta45Zryfu3yxKrWIyasrGrWkZ3y0
-	vry5JFyjkFZ8JrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvmb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
-	8E87Iv6xkF7I0E14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
-	MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
-	UI43ZEXa7IUYsSdPUUUUU==
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+From: mohammad heib <mheib@redhat.com>
+In-Reply-To: <20250905122238.GA553991@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 9/6/25 07:59, Jakub Kicinski wrote:
+Hi Simon,
 
-> On Sat, 6 Sep 2025 00:35:37 +0800 Vivian Wang wrote:
->>>> On a closer look, these counters in ndev->stats seems to be redundan=
-t
->>>> with the hardware-tracked statistics, so maybe I should just not bot=
-her
->>>> with updating ndev->stats. Does that make sense? =20
->>> For rx/tx packets/bytes I think that makes sense.
->>> But what about rx/tx drops? =20
->> Right... but tstats doesn't have *_dropped. It seems that tx_dropped a=
-nd
->> rx_dropped are considered "slow path" for real devices. It makes sense=
+This patch set targets the iwl tree because the second patch depends on 
+changes [1] that are already in the tnguy/net-queue.git tree but have 
+not yet reached net/next.
 
->> to me that those should be very rare.
-> Pretty sure Simon meant the per-cpu netdev stats in general.
-> There are three types of them, if you need drops I think you
-> probably want dstats. Take a look.
+[1] e08bca25bd7f ("i40e: improve VF MAC filters accounting")
 
-According to this comment in net/core/dev.c dev_get_stats():
+Thanks,
 
-=C2=A0 =C2=A0 /*
-=C2=A0 =C2=A0 =C2=A0* IPv{4,6} and udp tunnels share common stat helpers =
-and use
-=C2=A0 =C2=A0 =C2=A0* different stat type (NETDEV_PCPU_STAT_TSTATS vs
-=C2=A0 =C2=A0 =C2=A0* NETDEV_PCPU_STAT_DSTATS). Ensure the accounting is =
-consistent.
-=C2=A0 =C2=A0 =C2=A0*/
-
-"dstats" is meant for tunnels. This doesn't look like the right thing to
-use, and no other pcpu_stat_type gives me tx_dropped. Do you think I
-should use dstats anyway?
-
-(And yes the only software-tracked one should be tx_dropped. Since we
-pre-allocate the RX buffers, there is no opportunity to drop on RX in
-software.)
+On 9/5/25 3:22 PM, Simon Horman wrote:
+> On Thu, Sep 04, 2025 at 12:43:04AM +0300, mheib@redhat.com wrote:
+>> From: Mohammad Heib <mheib@redhat.com>
+>>
+>> Add a new device generic parameter to controls the maximum
+>> number of MAC filters allowed per VF.
+>>
+>> For example, to limit a VF to 3 MAC addresses:
+>>   $ devlink dev param set pci/0000:3b:00.0 name max_mac_per_vf \
+>>          value 3 \
+>>          cmode runtime
+>>
+>> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+> 
+> Overall this looks good to me, thanks.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> One point: This patch-set applies cleanly to iwl but not net-next.
+> If it is to be picked up by Tony and go via the iwl tree, then all good
+> on my side. But if it is targeted at net-next then you'll need to
+> rebase and repost.
+> 
+> ...
+> 
 
 
