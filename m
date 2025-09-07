@@ -1,100 +1,133 @@
-Return-Path: <netdev+bounces-220634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFD47B4785D
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 02:23:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A124B4785E
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 02:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE6FC7B4F62
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 00:21:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B45DB3C7AE3
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 00:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968781DA4E;
-	Sun,  7 Sep 2025 00:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0DB34CF9;
+	Sun,  7 Sep 2025 00:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GaONZwU6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1pzyZSa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E8823741;
-	Sun,  7 Sep 2025 00:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93135223;
+	Sun,  7 Sep 2025 00:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757204578; cv=none; b=EsqwkchqNfTOf5H/WMQWzsBG20Tk0SO+rJhDrIDOLWX2M+rfND/EGSEU7fuuv9Ib1T7WyCE0wK2z3shK5JEDEsQJMaY4r4wZU6inuzhX1wvZScwjxaEbyxGAI0/8M7UXWJTOrKSEFujvMW8OxyOpitidO3Fwu4nz66lQhxx3CWk=
+	t=1757206297; cv=none; b=cCFUzB8mel8cgATrBj99nvm1yAnvkCnJTJdh9cTHasjtgC59TR7Sbgwh45JMSIl+8UbVWeraLGREkCFffidhPxiU/F7lfaxHRFyDO5X0Gf/De+tN1dybGVL4hsjdYqvRj7AM4TNlcRdv1UHJUtsQ/Qexe1HPKkVqpk1gn4zbrgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757204578; c=relaxed/simple;
-	bh=aznrg/OGqPa40peqPhI3tP0psk9VK9iCdIlKkG+46vI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GbL7fwntjzLpk6z4wxaxZDF3LwhYzK1bns2DEykgOOMRkKJWGk3QK90nRn7LcBPcv767JxTShlFLMMES4keLU+nOeHhx2EYO6HLkfH73w+TcOwmZmtx2sVyTHBByRJo4Dc702+oAtl6RITXTrS/sfOHl/vIJhrJIEhSSKELvgGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GaONZwU6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48914C4CEE7;
-	Sun,  7 Sep 2025 00:22:57 +0000 (UTC)
+	s=arc-20240116; t=1757206297; c=relaxed/simple;
+	bh=PTrTtM6k2vDgkB71HaQPoI3qKrDGpeD79mECOTUkwTw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Rsf98G8liVbrN+DOUgiY8YLUZcX7VcA1FYj6Gdk+6kJzE32cRYE5NioKQSW2PbZWixujtLVonYghzL5HLJNdSiFo0y8fTj6tJ6Xg7fApBP4cGpicE/kIkdezeVIW0k2wPP2ZiqBF7YRBzrECLrSTZ+5SFA5aFqQDWy89r/TVuFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1pzyZSa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06947C4CEE7;
+	Sun,  7 Sep 2025 00:51:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757204577;
-	bh=aznrg/OGqPa40peqPhI3tP0psk9VK9iCdIlKkG+46vI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GaONZwU6zwuu1VOquhmYsJzWh0CiaIGsHBgSdV1NNSzAMEDYCQy6uxJgAuU9aUSIZ
-	 FfdnMV55JroPPAPL9dhZbjSkUQ8BY7jk63sp5Wd4nLGI3B5fTlAQPZahN87lq51+fP
-	 DPlIrhK2mZGaymUcUTmjTk9HCNM0onA48zGS9pymkcJiiOShwWD4Iy99nbRh4lDdjp
-	 p0GPyYE2UOSJkyzRWzqYWF5zM0BJLbTNVkxccaBT+zGKbgC7CYIUCRHEwaP2Y9x4j+
-	 mDxj5Gygd6FvDOhm2AXxLtW2hPvqolEColzYiGYNTWVnL9osXnie8LyAIg+P/XZGZD
-	 KJEuNphxM9V2Q==
-Date: Sat, 6 Sep 2025 17:22:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Sabrina
- Dubroca <sdubroca@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Simon Horman
- <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Shuah Khan
- <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima
- <kuniyu@google.com>, Ahmed Zaki <ahmed.zaki@intel.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, bridge@lists.linux.dev,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv2 net-next 1/5] net: add a common function to compute
- features from lowers devices
-Message-ID: <20250906172256.1571f8f9@kernel.org>
-In-Reply-To: <20250902072602.361122-2-liuhangbin@gmail.com>
-References: <20250902072602.361122-1-liuhangbin@gmail.com>
-	<20250902072602.361122-2-liuhangbin@gmail.com>
+	s=k20201202; t=1757206297;
+	bh=PTrTtM6k2vDgkB71HaQPoI3qKrDGpeD79mECOTUkwTw=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=L1pzyZSaVyJBHfZobD05Ig+VzdsSvwG5UrpLcr8KbCdLffarSsQs8Ym2l+CdtwH3/
+	 yr4eY2QGymwy1G/7OIP8y+C9potFRAiyv7hR8gCaeyTkobpny1a5VjNqqc3zxghY/w
+	 xhy6UDo1WKwiPIB0y+5XPdJFkGPae60xLrH9/Kr/x8V3Xas2Q8rNhomFNeD/VZV22H
+	 x1kLlRIjyv/LBvMLaGF0/YmCpESq/7uQaunXnqe2ijvSXvWHHodqjPnBBZvtBDOtQn
+	 GZ7eJVUDQs2YvnlZfk8XyzhFWDe95cB0MDt5cjC6knqy+ZqVcmkmQ5K82c6LMqAO1z
+	 1nWwMV2bCtetQ==
+Message-ID: <83191d507b7bc9b0693568c2848319932e6b974e.camel@kernel.org>
+Subject: Re: [PATCH mptcp] mptcp: sockopt: make sync_socket_options
+ propagate SOCK_KEEPOPEN
+From: Geliang Tang <geliang@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>, Krister Johansen
+	 <kjlx@templeofstupid.com>, Mat Martineau <martineau@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>, Florian Westphal
+ <fw@strlen.de>, netdev@vger.kernel.org, 	mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, David Reaver	 <me@davidreaver.com>
+Date: Sun, 07 Sep 2025 08:51:31 +0800
+In-Reply-To: <ab6ff5d8-2ef1-44de-b6db-8174795028a1@kernel.org>
+References: <aLuDmBsgC7wVNV1J@templeofstupid.com>
+	 <ab6ff5d8-2ef1-44de-b6db-8174795028a1@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.56.0-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue,  2 Sep 2025 07:25:58 +0000 Hangbin Liu wrote:
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -5279,6 +5279,25 @@ int __netdev_update_features(struct net_device *dev);
->  void netdev_update_features(struct net_device *dev);
->  void netdev_change_features(struct net_device *dev);
->  
-> +/* netdevice features */
-> +#define VIRTUAL_DEV_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
-> +					 NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
-> +					 NETIF_F_GSO_ENCAP_ALL | \
-> +					 NETIF_F_HIGHDMA | NETIF_F_LRO)
-> +
-> +#define VIRTUAL_DEV_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
-> +					 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE | \
-> +					 NETIF_F_GSO_PARTIAL)
-> +
-> +#define VIRTUAL_DEV_MPLS_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
-> +					 NETIF_F_GSO_SOFTWARE)
-> +
-> +#define VIRTUAL_DEV_XFRM_FEATURES	(NETIF_F_HW_ESP | NETIF_F_HW_ESP_TX_CSUM | \
-> +					 NETIF_F_GSO_ESP)
-> +
-> +#define VIRTUAL_DEV_GSO_PARTIAL_FEATURES (NETIF_F_GSO_ESP)
-> +void netdev_compute_features_from_lowers(struct net_device *dev);
+Hi Matt,
 
-Isn't this what the ALL_FOR_ALL, ONE_FOR_ALL etc. flag sets were
-supposed to also achieve? Please try to move the new code closer
-to those, both in terms of where they are defined and naming...
+On Sat, 2025-09-06 at 15:26 +0200, Matthieu Baerts wrote:
+> Hi Krister,
+> 
+> On 06/09/2025 02:43, Krister Johansen wrote:
+> > Users reported a scenario where MPTCP connections that were
+> > configured
+> > with SO_KEEPALIVE prior to connect would fail to enable their
+> > keepalives
+> > if MTPCP fell back to TCP mode.
+> > 
+> > After investigating, this affects keepalives for any connection
+> > where
+> > sync_socket_options is called on a socket that is in the closed or
+> > listening state.  Joins are handled properly. For connects,
+> > sync_socket_options is called when the socket is still in the
+> > closed
+> > state.  The tcp_set_keepalive() function does not act on sockets
+> > that
+> > are closed or listening, hence keepalive is not immediately
+> > enabled.
+> > Since the SO_KEEPOPEN flag is absent, it is not enabled later in
+> > the
+> > connect sequence via tcp_finish_connect.  Setting the keepalive via
+> > sockopt after connect does work, but would not address any
+> > subsequently
+> > created flows.
+> > 
+> > Fortunately, the fix here is straight-forward: set SOCK_KEEPOPEN on
+> > the
+> > subflow when calling sync_socket_options.
+> > 
+> > The fix was valdidated both by using tcpdump to observe keeplaive
+> > packets not being sent before the fix, and being sent after the
+> > fix.  It
+> > was also possible to observe via ss that the keepalive timer was
+> > not
+> > enabled on these sockets before the fix, but was enabled
+> > afterwards.
+> 
+> 
+> Thank you for the fix! Indeed, the SOCK_KEEPOPEN flag was missing!
+> This
+> patch looks good to me as well:
+> 
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> 
+> 
+> @Netdev Maintainers: please apply this patch in 'net' directly. But I
+> can always re-send it later if preferred.
+
+nit:
+
+I just noticed his patch breaks 'Reverse X-Mas Tree' order in
+sync_socket_options(). If you think any changes are needed, please
+update this when you re-send it.
+
+Thanks,
+-Geliang
+
+> 
+> Cheers,
+> Matt
 
