@@ -1,287 +1,183 @@
-Return-Path: <netdev+bounces-220679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BEE1B47C25
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 18:01:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8AFB47C29
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 18:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CBCA160151
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 16:01:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 209A63B9F36
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 16:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9943E1CDFAC;
-	Sun,  7 Sep 2025 16:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CDF27EFFA;
+	Sun,  7 Sep 2025 16:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ndIbsl8i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8zptFWD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE86125B2
-	for <netdev@vger.kernel.org>; Sun,  7 Sep 2025 16:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A6A189F20;
+	Sun,  7 Sep 2025 16:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757260879; cv=none; b=Cx+Kxf3+H6qM9P44ta2UUNNex8yuUQtlQqPTkVoKeK3tQ2SAYSajVC6NPIktiosmf4cPaoSTbdPbIwJi68Qe4SYP4Cq4OMsh5Qg0P2gba2Y8qonnsq3usx7XsMfl/On/WyYkd6LbznGNvBFqjF3IbjONfPXHyDhYXys0VZj6zAc=
+	t=1757261190; cv=none; b=VU1p9b4NzoYLwMZW5OXQxUCBre4Kb5NLLDLlYVhZUqn6mrg58rtbBSpN0LaWXtVNQdzbVyYpPQd9ITqRCfxOOsqmzFHLxxoLStQkUcYCIQW7LonE48SxqFLb4la4DG8zV0W/il0kUEMQvNXpbSstVGlitBKRJGWZvTAQQHf517g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757260879; c=relaxed/simple;
-	bh=2iH/tmlgtIXVcbg5sIxO5juHiTu9/jGxxy+gkH576Oo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=f5Op5R752ZQHb98SPhrD3WCcve0BKHfz83x1jv4p7PfzegOxpWbEB8YfmHeNUJsCKwwi7+Jd2GaeKx3HeegzFPxTuuk3XXAbcOCu1CC4cSt4X7uIeQN+zuuyo1sDG31Om/PDFD25ESCyhi5DjNe2iv2iO8NhRZqkrDwFGCDgrFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ndIbsl8i; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45de221da9cso3086605e9.0
-        for <netdev@vger.kernel.org>; Sun, 07 Sep 2025 09:01:16 -0700 (PDT)
+	s=arc-20240116; t=1757261190; c=relaxed/simple;
+	bh=Tn4SfrPNvGkARcS/vX/j5g6Pe0o1s1eQKk14XZgX0Kk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NJMj1lUqaRTVPxL4O/Auwqvha7Asl1D6wLrnmLT47MCZao2FhR3OG4FGDeyN2fLXILWLAjFUEC0wF2jsl8LyjX/LBqou5ELsjugOHUNEpR2SUe+q2pRcMrnqabuU48mzlx0ZZsdTMX28nHc6vDVSoaiqKnADIoRPEWvi0RJZ1jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C8zptFWD; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-251ace3e7caso13445495ad.2;
+        Sun, 07 Sep 2025 09:06:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1757260875; x=1757865675; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vg7CHqQNYYzh26+Hh5oDujqwGy19VW95gl4qkCfQ+9o=;
-        b=ndIbsl8irgOlKTtqnxvhy5OKtGVZNhDgzmi9bwlj6boHXjsgKCnyV+cdqc5Upkjlhh
-         /1sQg/nHV70LH9gC+8Y53jCdQQbTp7ZLlXzHojFyMmUmEnD36Cx8ekwrBTGR0mRPxe+p
-         iPH/OEtwW+QdBrYuUfnAERyf582T89yc7k0eN/JqsRElwPGteCFgfq1IeV0tHYBSXg6E
-         /Cs8jrn8h89ZoF5ToPMEHSD64AyW7O4xYwFYwgI91wMVL/cDElYUqs75LVzLt/iG9AHH
-         JmOMKR/P4SpTz7GzAL2oVZqd2EX8u90m/OmGkrUqK4NxwflSVHNPqthU8BfkXjtDbY0/
-         9LgQ==
+        d=gmail.com; s=20230601; t=1757261187; x=1757865987; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=cF6ydpI/LQamKkw+0q8FTGzAStuV08pvQoQCdR+Hn5Q=;
+        b=C8zptFWDV/Zs7j/g722W9I1ZA0PQLSX0nadaNkvPfqMq0Y6yLfOfwLxr31leJ7CXSC
+         Ma6kJF/rw16q88ZmpXHrMNJxRZn3pzjSj6xk7hYGYfm2y4DYnWac6MTapAmpc4YwnHoK
+         0Dg0RKeDMmiea5VIlUmNFtOTPBcgm0cLM++/KcPjxo0y5EKzlc23G/JsbWwqcrPy7u8C
+         A0jMUwgTIznA6AeLQpTzR6lmM0vdPRvUnpwFj29MzsYIfpkp0GjZWW54vBg5LUSAxd63
+         i6nHVwO7fca/pyVucWAEj3MljPmPwFHck2fLkXTUY1y4eyR5DO5YZF4PawxUmpHK5aqs
+         C0ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757260875; x=1757865675;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vg7CHqQNYYzh26+Hh5oDujqwGy19VW95gl4qkCfQ+9o=;
-        b=iCJhUmZBNDPCPpJGv+sQty4/o8uTKygpNev+jV8B0Kp7XMqdwoBuz1z0DpcZ6DKLB7
-         qf/2+4Uvthfr9uE8R2NeDU6c6EvhWi7Mct0I6NhKB0onnL2zl3C1mo47CmVSEfUFRiL2
-         ycKO156scfLCOc8jpxaLJ2fID9P4akI08hzd/kPZxjLwR+MjBa304ztQhf+N79UQrYDy
-         7AXrkzT5kjlZHrhIRPpzf8fIr3mngM/r5yeOAGLgSw4O+Zac7OHnU9PXo9M8xFd55SyT
-         9P3DpNt3c88HwnPwKQKt/Tbg+/n4tBESoHSDGxwR4DDsZueQEUUtZ6VEPNpjuL2AI8Ge
-         cUvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUluVnR8zMI+ZR+3dxshu6dBS/3bheiu0q1YgLNhHvMJLWYLCdwuRg+NxKRPgAQnb3WEdeqshw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxokVxSzonNss1YM8hiYEWLNAxe845jlqtT3rFHeAyDOsEUXf/H
-	OAh5NrRYBE236P6XEZHVDF8n9PTwAN6rW8gjhS5GkKCXzlNTEa1xYmBErY3RgQ/NhG4=
-X-Gm-Gg: ASbGnctfqua6BkFODJuhzg3/yOKY9QVqhJdFgA/1Eunckf4Wc8KWIiL1XB7OOjb4koo
-	7PC6QdCNT4IdrVxhagaHWGiRjOwZXaq54lf4DV16diNW/XA0fcvjzMl6WP+SyuUJECpbQF3E7tj
-	lhxaOB/j71cacdpdEoUHGwiGNUYNDUdsSnuHu0bT94HJef4zhD4ETZJ9oiKOB4WFzqQhWTeAAx4
-	ILfZl2LXvanKaioZOxyasye/jcnyedK2ZMKt6VyCDCWOalx7gv+GEFA0cJxs5IahgiOHp5l5ox5
-	D9ZaF4sAkZHjAdCkwN0aoyIVbKT51aHYEo8OyHc3aiNAu+NWVN/kMjPmkLGJllGUdnVAU+0SZy7
-	bfWkvVfUAyPUhfyBrJSjHBS/Q7B5kE2LF97wd2z1bgEnO9SFaS+N8p949sEUT4iLJFTlq/MSQDd
-	BGw1/zGwj7oA==
-X-Google-Smtp-Source: AGHT+IGn9DppX1oWsqBRvsOrhn+d3X5JdUygKPkoLsD9fVU4imK0p6ui2veZhjeECxYo+CUppl84ZA==
-X-Received: by 2002:a05:600c:1386:b0:45c:b5f7:c6e4 with SMTP id 5b1f17b1804b1-45dddedf9bfmr35637975e9.35.1757260874428;
-        Sun, 07 Sep 2025 09:01:14 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45de45dce11sm27848815e9.10.2025.09.07.09.01.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Sep 2025 09:01:14 -0700 (PDT)
-Date: Sun, 7 Sep 2025 09:01:07 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
- sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
- tonylu@linux.alibaba.com, guwen@linux.alibaba.com
-Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Fw: [Bug 220544] New: AF_SMC deadlock: held by __sock_release,
- smc_release, and __flush_work
-Message-ID: <20250907090107.44a3f68e@hermes.local>
+        d=1e100.net; s=20230601; t=1757261187; x=1757865987;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cF6ydpI/LQamKkw+0q8FTGzAStuV08pvQoQCdR+Hn5Q=;
+        b=ar/6s0xxowz3wWU1Y7C7wGcdnjMFBwkrH5KHgGn5vnXCRjyAsNZUEb0fQFvQ+k+STs
+         9K5p8zwwg6BFpIrIh1cf+K18wAwf0RNje26qznLLRKrKUkJ1ShitSVYvaonRGqqsuo3N
+         FscdEe1FdB0jcu1Urlw0qEk8fcu3efwZ7aVC5/PD6U3jAMQxrvPA6fO9SykVGdr+ZFoE
+         mUdaGzHw+pBgMQeT77LuEEW8iCFdIGj8bL0p3X6t6Xlyvet0wfQWhB+Fvr05ui3VEvGb
+         3AEibA9qPrwQV56pRamZuAf1Ej9YhOpYDwTG5aRPESZeEIkcaIpt/e+TdtIAlg7TFQL9
+         BFSA==
+X-Forwarded-Encrypted: i=1; AJvYcCUOz9QRhPF32oOonrg/WKrmTH1HAhNtp/OfWZ34/SF3mJq7r7iziq+8y1oguTgZboGwmHC6yqWX@vger.kernel.org, AJvYcCWZjxRRD4pjfyaEmv04L1YFEptFQnz1o2OYD1HkJ6ExIU8trarXpE+jZuFc2UiYR6cCS8vZK5AAjrJh@vger.kernel.org, AJvYcCWz5ys31tw0UL9PB7GvDgAi1B/VZUVpMHYF7ea5kUd8gmOwT7aLqRd6I0LpNgvGmxK4/sqykSTzZk83@vger.kernel.org, AJvYcCXXIdezbwZWSrOKF60dGydkmGbCeE1nLKZ5boyL8T+VfKZ2ECytAihD0hLIXktVPXIGh+nEwzEJ/HgkSUL7@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdX20lhuxUiju9cHMKUP7jsRF4zMnYjAIr6+9H26h5s0RMNRCk
+	JPdJgW1RjpnKzFJdd3Wk6eLTJZdHw7OENln7fAtD/FO3bIEzSxF7CMhf
+X-Gm-Gg: ASbGncvPlfPN6ha8sjcCX3PbIOPMcklZgcB3NM1hqF3ex0UR8DGLjlUj3yx2WHaJwgz
+	2kbMOqjePossaD8rPa1La9Ljbl9/9bBmlILNBIaS2HuZIy3IJzP0vFMsbgN7kaEqQ/QxOqjgrQw
+	udpH9esuv7uwT3DizNPjhLj//s5eb5umrAHzCqgv+bVeiVRM36EIYJBHIUotv8aygcvOZQr2wsy
+	0YNE2C7K0WnyVD/puDXFnLWgOlctn2SaZSuWcJEUngn4l8H+InJyfOHgq0ExuanucpCUOenISmV
+	BekMf4Usq/sJ8LL7A1a/IKDtRGzLEOxw8blnbS8yw+1qC0S6Mscm/9Lsx/h/igmdX3aiiWvr7b0
+	aWTFCY8glMcK/mCAdDvTVgUcjWcyu0Cdy670GwfmpbhDQ/I5R/AAcnJ5C9Q5bjwQYZ6kRCo9zSj
+	diUzz91g==
+X-Google-Smtp-Source: AGHT+IHjsbItSLGLTbk4bctSoCf2cP3gRfY6Crj1D3TnpuBrHwZZEdKgevr0cSKXCqjST0G8MrJAKg==
+X-Received: by 2002:a17:902:d588:b0:24c:d322:d587 with SMTP id d9443c01a7336-2516f050176mr69598395ad.26.1757261187190;
+        Sun, 07 Sep 2025 09:06:27 -0700 (PDT)
+Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24ccd655823sm88157995ad.114.2025.09.07.09.06.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 07 Sep 2025 09:06:26 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <4e7a2570-41ec-4179-96b2-f8550181afd9@roeck-us.net>
+Date: Sun, 7 Sep 2025 09:06:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/2] hwmon: (tps23861) add class restrictions and
+ semi-auto mode support
+To: gfuchedgi@gmail.com, Robert Marko <robert.marko@sartura.hr>,
+ Luka Perkov <luka.perkov@sartura.hr>, Jean Delvare <jdelvare@suse.com>,
+ Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: linux-hwmon@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Network Development <netdev@vger.kernel.org>
+References: <20250904-hwmon-tps23861-add-class-restrictions-v3-0-b4e33e6d066c@gmail.com>
+Content-Language: en-US
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ np3900V20aS7eD9K8GTU0TGC1pyz6IVJwIE=
+In-Reply-To: <20250904-hwmon-tps23861-add-class-restrictions-v3-0-b4e33e6d066c@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
++Cc: pse-pd maintainers and netdev mailing list
 
+On 9/4/25 10:33, Gregory Fuchedgi via B4 Relay wrote:
+> This patch series introduces per-port device tree configuration with poe
+> class restrictions. Also adds optional reset/shutdown gpios.
+> 
+> Tested with hw poe tester:
+>   - Auto mode tested with no per-port DT settings as well as explicit port
+>     DT ti,class=4. Tested that no IRQ is required in this case.
+>   - Semi-Auto mode with class restricted to 0, 1, 2 or 3. IRQ required.
+>   - Tested current cut-offs in Semi-Auto mode.
+>   - On/off by default setting tested for both Auto and Semi-Auto modes.
+>   - Tested fully disabling the ports in DT.
+>   - Tested with both reset and ti,ports-shutdown gpios defined, as well as
+>     with reset only, as well as with neither reset nor shutdown.
+> 
+> Signed-off-by: Gregory Fuchedgi <gfuchedgi@gmail.com>
 
-Begin forwarded message:
+This entire series makes me more and more unhappy. It is not the responsibility
+of the hardware monitoring subsystem to control power. The hardware monitoring
+subsystem is for monitoring, not for control.
 
-Date: Sun, 07 Sep 2025 03:42:22 +0000
-From: bugzilla-daemon@kernel.org
-To: stephen@networkplumber.org
-Subject: [Bug 220544] New: AF_SMC deadlock: held by __sock_release, smc_release, and __flush_work
+Please consider adding a driver for this chip to the pse-pd subsystem
+(drivers/net/pse-pd). As it turns out, that subsystem already supports
+tps23881. This is a similar chip which even has a similar register set.
 
+This driver could then be modified to be an auxiliary driver of that driver.
+Alternatively, we could drop this driver entirely since the pse-pd subsystem
+registers the chips it supports as regulator which has its own means to handle
+telemetry.
 
-https://bugzilla.kernel.org/show_bug.cgi?id=220544
+Thanks,
+Guenter
 
-            Bug ID: 220544
-           Summary: AF_SMC deadlock: held by __sock_release, smc_release,
-                    and __flush_work
-           Product: Networking
-           Version: 2.5
-    Kernel Version: 6.12.x
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Other
-          Assignee: stephen@networkplumber.org
-          Reporter: hi@fourdim.xyz
-        Regression: No
-
-Created attachment 308627
-  --> https://bugzilla.kernel.org/attachment.cgi?id=308627&action=edit  
-crash full log and program source code
-
-[ 2499.781797] 
-[ 2499.782400] ======================================================
-[ 2499.784129] WARNING: possible circular locking dependency detected
-[ 2499.785824] 6.12.42 #1 Not tainted
-[ 2499.786843] ------------------------------------------------------
-[ 2499.788589] 1296/22742 is trying to acquire lock:
-[ 2499.789941] ffff88801776ec18
-((work_completion)(&new_smc->smc_listen_work)){+.+.}-{0:0}, at:
-__flush_work+0x514/0xd50
-[ 2499.793080] 
-[ 2499.793080] but task is already holding lock:
-[ 2499.794731] ffff888017768e98 (sk_lock-AF_SMC/1){+.+.}-{0:0}, at:
-smc_release+0x376/0x600
-[ 2499.797004] 
-[ 2499.797004] which lock already depends on the new lock.
-[ 2499.797004] 
-[ 2499.799295] 
-[ 2499.799295] the existing dependency chain (in reverse order) is:
-[ 2499.801365] 
-[ 2499.801365] -> #1 (sk_lock-AF_SMC/1){+.+.}-{0:0}:
-[ 2499.803149]        lock_sock_nested+0x3a/0x100
-[ 2499.804427]        smc_listen_out+0x1ea/0x4c0
-[ 2499.805686]        smc_listen_work+0x4d1/0x5520
-[ 2499.806987]        process_one_work+0x94a/0x1740
-[ 2499.808415]        worker_thread+0x5c4/0xe10
-[ 2499.809650]        kthread+0x2ad/0x360
-[ 2499.810763]        ret_from_fork+0x4e/0x80
-[ 2499.811966]        ret_from_fork_asm+0x1a/0x30
-[ 2499.813324] 
-[ 2499.813324] -> #0
-((work_completion)(&new_smc->smc_listen_work)){+.+.}-{0:0}:
-[ 2499.815691]        __lock_acquire+0x2413/0x4310
-[ 2499.816983]        lock_acquire.part.0+0xff/0x350
-[ 2499.818259]        __flush_work+0x528/0xd50
-[ 2499.819376]        __cancel_work_sync+0x105/0x130
-[ 2499.820689]        smc_clcsock_release+0x61/0xf0
-[ 2499.821958]        __smc_release+0x5c9/0x8a0
-[ 2499.823163]        smc_close_non_accepted+0xd7/0x210
-[ 2499.824602]        smc_close_active+0x535/0x10e0
-[ 2499.825867]        __smc_release+0x643/0x8a0
-[ 2499.827067]        smc_release+0x1f0/0x600
-[ 2499.828197]        __sock_release+0xac/0x260
-[ 2499.829427]        sock_close+0x1c/0x30
-[ 2499.830506]        __fput+0x3f6/0xb40
-[ 2499.831552]        __fput_sync+0x4a/0x60
-[ 2499.832651]        __x64_sys_close+0x86/0x100
-[ 2499.833855]        do_syscall_64+0xbb/0x1d0
-[ 2499.835043]        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[ 2499.836574] 
-[ 2499.836574] other info that might help us debug this:
-[ 2499.836574] 
-[ 2499.838725]  Possible unsafe locking scenario:
-[ 2499.838725] 
-[ 2499.840491]        CPU0                    CPU1
-[ 2499.841748]        ----                    ----
-[ 2499.843036]   lock(sk_lock-AF_SMC/1);
-[ 2499.844110]                               
-lock((work_completion)(&new_smc->smc_listen_work));
-[ 2499.846436]                                lock(sk_lock-AF_SMC/1);
-[ 2499.848134]   lock((work_completion)(&new_smc->smc_listen_work));
-[ 2499.849780] 
-[ 2499.849780]  *** DEADLOCK ***
-[ 2499.849780] 
-[ 2499.851388] 3 locks held by 1296/22742:
-[ 2499.852456]  #0: ffff88801ed58d88 (&sb->s_type->i_mutex_key#12){+.+.}-{3:3},
-at: __sock_release+0x81/0x260
-[ 2499.855185]  #1: ffff888017768e98 (sk_lock-AF_SMC/1){+.+.}-{0:0}, at:
-smc_release+0x376/0x600
-[ 2499.857486]  #2: ffffffff86e9dc00 (rcu_read_lock){....}-{1:2}, at:
-__flush_work+0xff/0xd50
-[ 2499.859710] 
-[ 2499.859710] stack backtrace:
-[ 2499.860913] CPU: 0 UID: 0 PID: 22742 Comm: 1296 Not tainted 6.12.42 #1
-[ 2499.860935] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.15.0-1 04/01/2014
-[ 2499.860944] Call Trace:
-[ 2499.860951]  <TASK>
-[ 2499.860959]  dump_stack_lvl+0xba/0x110
-[ 2499.860983]  print_circular_bug.cold+0x1e8/0x27f
-[ 2499.861041]  check_noncircular+0x30e/0x3c0
-[ 2499.861064]  ? __pfx_check_noncircular+0x10/0x10
-[ 2499.861084]  ? register_lock_class+0xb2/0x12e0
-[ 2499.861112]  ? lockdep_lock+0xb5/0x1b0
-[ 2499.861131]  ? __pfx_lockdep_lock+0x10/0x10
-[ 2499.861151]  __lock_acquire+0x2413/0x4310
-[ 2499.861177]  ? __pfx___lock_acquire+0x10/0x10
-[ 2499.861199]  ? __pfx_mark_lock+0x10/0x10
-[ 2499.861221]  ? __flush_work+0x514/0xd50
-[ 2499.861240]  lock_acquire.part.0+0xff/0x350
-[ 2499.861261]  ? __flush_work+0x514/0xd50
-[ 2499.861280]  ? lock_release+0x209/0x7d0
-[ 2499.861302]  ? __pfx_lock_acquire.part.0+0x10/0x10
-[ 2499.861323]  ? __flush_work+0x514/0xd50
-[ 2499.861342]  ? trace_lock_acquire+0x132/0x1c0
-[ 2499.861360]  ? __flush_work+0x514/0xd50
-[ 2499.861378]  ? lock_acquire+0x31/0xc0
-[ 2499.861398]  ? __flush_work+0x514/0xd50
-[ 2499.861418]  __flush_work+0x528/0xd50
-[ 2499.861436]  ? __flush_work+0x514/0xd50
-[ 2499.861456]  ? __pfx___flush_work+0x10/0x10
-[ 2499.861475]  ? __pfx_sock_def_readable+0x10/0x10
-[ 2499.861497]  ? trace_irq_disable.constprop.0+0xcd/0x110
-[ 2499.861519]  ? __pfx_wq_barrier_func+0x10/0x10
-[ 2499.861548]  ? __pfx___might_resched+0x10/0x10
-[ 2499.861567]  ? __pfx_sock_def_readable+0x10/0x10
-[ 2499.861587]  __cancel_work_sync+0x105/0x130
-[ 2499.861609]  smc_clcsock_release+0x61/0xf0
-[ 2499.861630]  ? __local_bh_enable_ip+0x9b/0x140
-[ 2499.861646]  __smc_release+0x5c9/0x8a0
-[ 2499.861665]  ? lockdep_hardirqs_on_prepare+0x201/0x400
-[ 2499.861688]  ? __pfx_sock_def_readable+0x10/0x10
-[ 2499.861708]  smc_close_non_accepted+0xd7/0x210
-[ 2499.861730]  smc_close_active+0x535/0x10e0
-[ 2499.861753]  __smc_release+0x643/0x8a0
-[ 2499.861772]  ? lockdep_hardirqs_on_prepare+0x25c/0x400
-[ 2499.861795]  smc_release+0x1f0/0x600
-[ 2499.861814]  __sock_release+0xac/0x260
-[ 2499.861840]  ? __pfx_sock_close+0x10/0x10
-[ 2499.861864]  sock_close+0x1c/0x30
-[ 2499.861886]  __fput+0x3f6/0xb40
-[ 2499.861912]  __fput_sync+0x4a/0x60
-[ 2499.861935]  __x64_sys_close+0x86/0x100
-[ 2499.861950]  do_syscall_64+0xbb/0x1d0
-[ 2499.861972]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[ 2499.861992] RIP: 0033:0x7f40854559a0
-[ 2499.862033] Code: 0d 00 00 00 eb b2 e8 0f f8 01 00 66 2e 0f 1f 84 00 00 00
-00 00 0f 1f 44 00 00 80 3d 41 1c 0e 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00
-f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-[ 2499.862049] RSP: 002b:00007ffecd7bbad8 EFLAGS: 00000202 ORIG_RAX:
-0000000000000003
-[ 2499.862065] RAX: ffffffffffffffda RBX: 0000000000000005 RCX:
-00007f40854559a0
-[ 2499.862077] RDX: 0000000000000000 RSI: 000055df79c1fe38 RDI:
-0000000000000005
-[ 2499.862087] RBP: 0000000000000006 R08: 000000000000f800 R09:
-0000000000000073
-[ 2499.862098] R10: 0000000000000000 R11: 0000000000000202 R12:
-00007ffecd7bbb80
-[ 2499.862110] R13: 00007ffecd7bbdb8 R14: 000055df79c21dd8 R15:
-0000000000000000
-[ 2499.862128]  </TASK>
-
-
-Crashes happened on 6.12.34 and 6.12.42.
-Machine info:
-QEMU X86_64
-Linux version 6.12.42(gcc (GCC) 15.1.1 20250729, GNU ld (GNU Binutils) 2.45.0)
-#1 SMP PREEMPT_DYNAMIC Tue Aug 19 21:04:29 EDT 2025
-Command line: console=ttyS0 root=/dev/sda earlyprintk=serial net.ifnames=0
-nokaslr
-infiniband enabled through rxe
-
-Programs and logs that trigger the bug are attached
-
-Usage `cat crash.input | program`
-
--- 
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.
 
