@@ -1,241 +1,127 @@
-Return-Path: <netdev+bounces-220661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E848DB47980
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 10:09:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB429B47994
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 10:23:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B357D1B24E76
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 08:09:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5989D3C2AA4
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 08:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A038214A64;
-	Sun,  7 Sep 2025 08:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ejt9y7y2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA13F20CCE4;
+	Sun,  7 Sep 2025 08:23:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2059.outbound.protection.outlook.com [40.107.237.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792A723CB;
-	Sun,  7 Sep 2025 08:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757232561; cv=fail; b=gV+WzwomLZ73TjxWuWinHGLRv78bzpwCgYw7OCAaXyqlzNLS3G+AVn3uOvomXfzLufPkqgVBKBRPBZVeBnOSA66iHDYtGbKdSb+Y/HXRjdKLSyGfuGMhzNZKa46GxmAUF9iFDPVy5cV4tqIg/PdQb0xuHQbwv513VIbICMLvh6s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757232561; c=relaxed/simple;
-	bh=zJHIxu+rNfnEq8u+7N5BfxPz/k9IuAkIo/0RgYjuiDs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RneGOZGVR6YuAjCEwzniK3aylGHimEsldzDBC0ASykvwgt3L6Bf471xB46F8ZaGplLrFgowWwhcTr98YhlJEXG4ByubUdDb35e2FPaYZV3Mblj3lx8vXk5CTTIxQr4ICglyTHGzzGKfkIJjEUWkk/NOVGkY+9rrtzsJqcS5VkLs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ejt9y7y2; arc=fail smtp.client-ip=40.107.237.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uvJCUx+qMtWITD1ugPbLWj6ETF82DonfVCOrmtEhdhHQfP6h6C130oWMgUE+hd9bXnfF+gmy166EgWg7eTxXwdGB2G9rfSdVG4y3d5Y59WmNZ1nsiJ6rbCOPL0UiXvbiaU+JWwHYygjrOC6O1dRzHhCgeS/X6JG45TTqouJuFnZRz6ymlThvQvOBvAle39UrdCnmgFrAa97Lzix0ickEQ92MfcEmjeZEuqRO681+euVqcXU5NnvgonI0resveiJGkIlfgEKvzFREqt1lMxuAgjAAe0VpyWOmCxKVwJiOT9REETXcGT2cXtHvDiwPui3OH8/2HXkhISUPLWXDqTthEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pwYGEksrr+pb46ipM7s/UH/kfEFN1EVGQ1cLQVRbRtc=;
- b=P+VVWgTlx2WjU1KeMDUNXIvJmQDKgo2zsDskfxmtz2KSXV0ev8AFp5fj0fF7J2yjPS+jE51DXxkJi3LWgLD1iZLZZw0rpjv0qNzaNpgsOGlTDVlcN7y2JLhgZ4/lBzzBbowBtzLd/ejgHHu+1yZCOfmKLHw9apRH++xpcUoci/RoPAK0/zOhBR/kknzzHAsCxLwkx9IgFsM5brd9fUgciWL94CTpx3gL2NlCVEnC+PBHsFeqTKiMbKV55rzoRfqr/Nf/pVldJGSikrq2A7OtVmdaWF/AXi7fzYj4h9AYMmTvWN1H3TiCeRoOUcbLulWQsUgWnzdJIGudI4bTAGly0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pwYGEksrr+pb46ipM7s/UH/kfEFN1EVGQ1cLQVRbRtc=;
- b=ejt9y7y2KQ3RCqURxKV3DPn8ZvGOuTiDgmaKhBMkNQw4qYXK1+1Hk4fLr1VnESypRo0GQCRkfFt/UbSetkzQF/uwnNhGEZtUH5VX9TYGS7Zo0YJ38akTh3G3m6qLspiYurptObuvMtyOVZrXf6xZumfzrSsdyB2GcoTPODvVOgKArWERu2UXzA1EAoGzzA8kk8XN2TxKIY2+/8TDrKcw6ymWCRt7kLhw0bwIWlDve7HG6SH6f1FH24GyG6tdQ/CiG/4xCUgdx1vkF+Nxb820g5xD1hs9W5BTQgGuPi/cEpu3nfkMsqe2aB1vbR3AeNMtFq4kYv1k5Gvpc/TwZpuF+w==
-Received: from SA0PR11CA0158.namprd11.prod.outlook.com (2603:10b6:806:1bb::13)
- by DS0PR12MB8041.namprd12.prod.outlook.com (2603:10b6:8:147::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Sun, 7 Sep
- 2025 08:09:13 +0000
-Received: from SN1PEPF000397B2.namprd05.prod.outlook.com
- (2603:10b6:806:1bb:cafe::97) by SA0PR11CA0158.outlook.office365.com
- (2603:10b6:806:1bb::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.20 via Frontend Transport; Sun,
- 7 Sep 2025 08:09:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF000397B2.mail.protection.outlook.com (10.167.248.56) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9115.13 via Frontend Transport; Sun, 7 Sep 2025 08:09:12 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 7 Sep
- 2025 01:09:02 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 7 Sep
- 2025 01:09:02 -0700
-Received: from fedora.mtl.labs.mlnx (10.127.8.11) by mail.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Sun, 7 Sep 2025 01:08:58 -0700
-From: Carolina Jubran <cjubran@nvidia.com>
-To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, Kory Maincent
-	<kory.maincent@bootlin.com>, Kees Cook <kees@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Carolina Jubran
-	<cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-Subject: [PATCH v2 net] net: dev_ioctl: take ops lock in hwtstamp lower paths
-Date: Sun, 7 Sep 2025 11:08:21 +0300
-Message-ID: <20250907080821.2353388-1-cjubran@nvidia.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CD41E1DE7;
+	Sun,  7 Sep 2025 08:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757233418; cv=none; b=pxI9sjvNbxrUbue3V+LSea8VczdgLdINFpVy0GioKSyqMG8BDUaYlz7uEbWx/B0Perhp/kzQteV2Z9RTXuLbEc/6ktRQqCu6hpmkyvpMSQv3v2zVSVsb+EE4sdYu3cugBDkYlXFNhJzx3QFevRCP7WJyQ4bWgmeYRpAN0rL5i70=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757233418; c=relaxed/simple;
+	bh=r0eJTebCt3MS2Xw6g6hfJ21wZgUkK/hVYw3MMLUbnxQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QdtVxD332/QQglH984EFE0Y0hiDmOdWQZ+FW2cQA8ayj0WBDG+AGoVlKQGE6zazRzZAfJR+Yst9ZmEx53Hfwc/mq06A3uHcYMB70+B913PReykVZy+VKMaRu4z0EBU+/HiEp58jgOxU97aTDpcmKEO1njKsrvMrjkyHNaA7mBcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.109] (unknown [114.241.87.235])
+	by APP-05 (Coremail) with SMTP id zQCowABX+hPUQL1oMWdTAQ--.2947S2;
+	Sun, 07 Sep 2025 16:22:44 +0800 (CST)
+Message-ID: <fbcc1ec3-7ff6-4891-97e3-9763355326f7@iscas.ac.cn>
+Date: Sun, 7 Sep 2025 16:22:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000397B2:EE_|DS0PR12MB8041:EE_
-X-MS-Office365-Filtering-Correlation-Id: b6dda8e9-5c86-4098-6dd3-08ddede5d467
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8bos/ueSVykLYinAuRjN/HpKX/XF/JXV0zgsvwSQsXaWtIa+V0epUCed+6q1?=
- =?us-ascii?Q?XRy9o3Bl9/pFZSRmULwkgJjs2xnB89OptzQSSKelDaUYPSwKxEepUeSboqxC?=
- =?us-ascii?Q?j1cDIhsCFI38bomnAWTDgvQAOg92X2q1lc73JrPOqUeup9vrDDBPNSTEk5ei?=
- =?us-ascii?Q?SPQRK5dITdo6twTxzMVCG1tkwuiDWZuQ8DpLkkMftuTT/6IMPse9uvjeOhsn?=
- =?us-ascii?Q?LTfn+Ry3yip17ppUH0eyljN0DyEfoxvGOZ2xKBtdxiGSYAGG6lsQvUctPRaP?=
- =?us-ascii?Q?k8GY1HEsNLmP6jFvrnDweG6oFEZPY+enIwOH4bKRaH6/Y5L2TvBKIG4oEuwe?=
- =?us-ascii?Q?XFP53MeWe+INNCNx1DA5dJs/ZZap6gAj2ArO9d5oEHJ+ZFJbz8v9Yu4LYAnZ?=
- =?us-ascii?Q?hohV92f7fV3k40AszMzaeTOgiGJUBfQrA5SQNau6KYkjkt7EZ0tSaBKzzFLi?=
- =?us-ascii?Q?1KQ0EyVHwuKEbcHkKN9Asy/o5bXfIUALOpa/iitlQZwEvuZi7ecztgX63pdQ?=
- =?us-ascii?Q?DsGYcuuTf0EvdLJZRNDvu5b40nuwyEa/Yd7GmpqQhaXDugNh+KKa87JDr/zR?=
- =?us-ascii?Q?yMT+b1UZTxyh+99oBkXgd9M3aQCsy7B02hPgWF7P4X8QDel/g6iqRXY6cwxt?=
- =?us-ascii?Q?YlWubHtNgxzsFMI8sIpGDMXlj2E2Bca/Qo3xcHMqIUsTaqYAtHzg8h5p8VVz?=
- =?us-ascii?Q?rEcc8gaJJAOVv/K/80zNJs4zV35jys2BhnyvWOV8Jg8lUV5Z1hSQRAYBOFTk?=
- =?us-ascii?Q?KGecJtKcFphPl4dHyLRzmD8bPWmxuR099zF/Twv4W2GK4TL8jWK9nzYEGCK0?=
- =?us-ascii?Q?8rciVR4aS/k3xJHV4aZBw1IirtXsvcRbw9WMHay9vJ2F9ZBWJMSuRKU1KGJK?=
- =?us-ascii?Q?VpSu+7a2+bhOegvXklrBebdVK7aWmD+mLKjMsLh6b2b4oFqjCsnhieWi9Ffs?=
- =?us-ascii?Q?K/6uOU1P1Z/+zpow0j4mbnkMjUGPQOIxjubSHeQC3/r5krL1fyK0IMRC2kNK?=
- =?us-ascii?Q?+iCakLoqxgSuTf2MQCAZxWwLPLLEW3+e1j5x+jXdOz2qjFnhzJsILplU0Pnw?=
- =?us-ascii?Q?9vrujVUNqr61lq9EGfgzf3wjOKWkN1VXrMPVLettPNv1NXygSbLrGGkR8G7J?=
- =?us-ascii?Q?T7aWqu4Ax82SbVGXvfpuwu3sRo6Ara1/noT0o/BvGPzt9BbH+odyUs4votIf?=
- =?us-ascii?Q?IQIUe812zX2z2nnrueT0WCe9jDE2XE25CKDTZqnd1uC7pvAgdGQEw/I0Piyy?=
- =?us-ascii?Q?46sxuThTPTJUycPV36Lic5IdPuJ+SY8fdympkZfeYE7iOnb8GNC5KeFjid2A?=
- =?us-ascii?Q?/g7ALtGkKBZ6CBq3VqH6kZzix+gR2/CJycE3Tw7Zw5zhefBKR3Y/LPEqpj7Z?=
- =?us-ascii?Q?8zpYedVM2Wah9PumFZSJ1f4A08zdChiMGnDlkdw0pKrj4+COAsS9yqBLkBn2?=
- =?us-ascii?Q?hnafhd4JyUr5/qC6aBnG5s3b0pYVF7Mb2QBAAj1G0LULCBSo0h2jDgVNVW7x?=
- =?us-ascii?Q?3E/lq16ZW2aEDmJIhS/gFTF4w0DZfyM3tw5HsXf2yuytiABdp+dXBAb7xQ?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2025 08:09:12.1907
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6dda8e9-5c86-4098-6dd3-08ddede5d467
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000397B2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8041
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Junhui Liu <junhui.liu@pigmoral.tech>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>, Vivian Wang <uwu@dram.page>
+References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
+ <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
+ <20250905153500.GH553991@horms.kernel.org>
+ <0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
+ <20250905160158.GI553991@horms.kernel.org>
+ <45053235-3b01-42d8-98aa-042681104d11@iscas.ac.cn>
+ <20250905165908.69548ce0@kernel.org>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20250905165908.69548ce0@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-CM-TRANSID:zQCowABX+hPUQL1oMWdTAQ--.2947S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw47JryDGw4rtry5Kw4rKrg_yoW8Gr4rpF
+	WrKFs2kFWvqw4xt3yvv3ykX343t3ZxZ3y5Gryqga47ta45Zryfu3yxKrWIyasrGrWkZ3y0
+	vry5JFyjkFZ8JrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvmb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
+	8E87Iv6xkF7I0E14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
+	MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7IUYsSdPUUUUU==
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-ndo hwtstamp callbacks are expected to run under the per-device ops
-lock. Make the lower get/set paths consistent with the rest of ndo
-invocations.
+On 9/6/25 07:59, Jakub Kicinski wrote:
 
-Kernel log:
-WARNING: CPU: 13 PID: 51364 at ./include/net/netdev_lock.h:70 __netdev_update_features+0x4bd/0xe60
-...
-RIP: 0010:__netdev_update_features+0x4bd/0xe60
-...
-Call Trace:
-<TASK>
-netdev_update_features+0x1f/0x60
-mlx5_hwtstamp_set+0x181/0x290 [mlx5_core]
-mlx5e_hwtstamp_set+0x19/0x30 [mlx5_core]
-dev_set_hwtstamp_phylib+0x9f/0x220
-dev_set_hwtstamp_phylib+0x9f/0x220
-dev_set_hwtstamp+0x13d/0x240
-dev_ioctl+0x12f/0x4b0
-sock_ioctl+0x171/0x370
-__x64_sys_ioctl+0x3f7/0x900
-? __sys_setsockopt+0x69/0xb0
-do_syscall_64+0x6f/0x2e0
-entry_SYSCALL_64_after_hwframe+0x4b/0x53
-...
-</TASK>
-....
----[ end trace 0000000000000000 ]---
+> On Sat, 6 Sep 2025 00:35:37 +0800 Vivian Wang wrote:
+>>>> On a closer look, these counters in ndev->stats seems to be redundan=
+t
+>>>> with the hardware-tracked statistics, so maybe I should just not bot=
+her
+>>>> with updating ndev->stats. Does that make sense? =20
+>>> For rx/tx packets/bytes I think that makes sense.
+>>> But what about rx/tx drops? =20
+>> Right... but tstats doesn't have *_dropped. It seems that tx_dropped a=
+nd
+>> rx_dropped are considered "slow path" for real devices. It makes sense=
 
-Note that the mlx5_hwtstamp_set and mlx5e_hwtstamp_set functions shown
-in the trace come from an in progress patch converting the legacy ioctl
-to ndo_hwtstamp_get/set and are not present in mainline.
+>> to me that those should be very rare.
+> Pretty sure Simon meant the per-cpu netdev stats in general.
+> There are three types of them, if you need drops I think you
+> probably want dstats. Take a look.
 
-Fixes: ffb7ed19ac0a ("net: hold netdev instance lock during ioctl operations")
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+According to this comment in net/core/dev.c dev_get_stats():
 
----
- V2:
-  - Clarify in the commit message that mlx5 functions from the trace
-    are not present in mainline.
-  - Link to V1: https://lore.kernel.org/netdev/20250904182806.2329996-1-cjubran@nvidia.com/
----
- net/core/dev_ioctl.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+=C2=A0 =C2=A0 /*
+=C2=A0 =C2=A0 =C2=A0* IPv{4,6} and udp tunnels share common stat helpers =
+and use
+=C2=A0 =C2=A0 =C2=A0* different stat type (NETDEV_PCPU_STAT_TSTATS vs
+=C2=A0 =C2=A0 =C2=A0* NETDEV_PCPU_STAT_DSTATS). Ensure the accounting is =
+consistent.
+=C2=A0 =C2=A0 =C2=A0*/
 
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index 9c0ad7f4b5d8..ad54b12d4b4c 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -464,8 +464,15 @@ int generic_hwtstamp_get_lower(struct net_device *dev,
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
- 
--	if (ops->ndo_hwtstamp_get)
--		return dev_get_hwtstamp_phylib(dev, kernel_cfg);
-+	if (ops->ndo_hwtstamp_get) {
-+		int err;
-+
-+		netdev_lock_ops(dev);
-+		err = dev_get_hwtstamp_phylib(dev, kernel_cfg);
-+		netdev_unlock_ops(dev);
-+
-+		return err;
-+	}
- 
- 	/* Legacy path: unconverted lower driver */
- 	return generic_hwtstamp_ioctl_lower(dev, SIOCGHWTSTAMP, kernel_cfg);
-@@ -481,8 +488,15 @@ int generic_hwtstamp_set_lower(struct net_device *dev,
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
- 
--	if (ops->ndo_hwtstamp_set)
--		return dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
-+	if (ops->ndo_hwtstamp_set) {
-+		int err;
-+
-+		netdev_lock_ops(dev);
-+		err = dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
-+		netdev_unlock_ops(dev);
-+
-+		return err;
-+	}
- 
- 	/* Legacy path: unconverted lower driver */
- 	return generic_hwtstamp_ioctl_lower(dev, SIOCSHWTSTAMP, kernel_cfg);
--- 
-2.38.1
+"dstats" is meant for tunnels. This doesn't look like the right thing to
+use, and no other pcpu_stat_type gives me tx_dropped. Do you think I
+should use dstats anyway?
+
+(And yes the only software-tracked one should be tx_dropped. Since we
+pre-allocate the RX buffers, there is no opportunity to drop on RX in
+software.)
 
 
