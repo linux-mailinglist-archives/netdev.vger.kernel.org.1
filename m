@@ -1,118 +1,287 @@
-Return-Path: <netdev+bounces-220678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A111CB47C1C
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 17:34:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BEE1B47C25
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 18:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D24B3C21CD
-	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 15:33:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CBCA160151
+	for <lists+netdev@lfdr.de>; Sun,  7 Sep 2025 16:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414942853ED;
-	Sun,  7 Sep 2025 15:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9943E1CDFAC;
+	Sun,  7 Sep 2025 16:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oV1qXewn"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ndIbsl8i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E60627F18B;
-	Sun,  7 Sep 2025 15:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE86125B2
+	for <netdev@vger.kernel.org>; Sun,  7 Sep 2025 16:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757259197; cv=none; b=iebadbIZC3ZZQFZ0fpr+if4ggKBR4bkxQZ9KF13yDtNgzzupqh+fNKDCAqsGu1f06xKVVG0ZKwzFwEiAGZupbl+hQV77duIeewpIW0spKld4IT+CtOvxLHeAy4dpv1psby4ANq8TDRioguvxHQkwE4gCSnFcIBPWwwU/OiwAx1E=
+	t=1757260879; cv=none; b=Cx+Kxf3+H6qM9P44ta2UUNNex8yuUQtlQqPTkVoKeK3tQ2SAYSajVC6NPIktiosmf4cPaoSTbdPbIwJi68Qe4SYP4Cq4OMsh5Qg0P2gba2Y8qonnsq3usx7XsMfl/On/WyYkd6LbznGNvBFqjF3IbjONfPXHyDhYXys0VZj6zAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757259197; c=relaxed/simple;
-	bh=stiQPhak8MOP6pYZdLyutUNcmHegMkQrARaC/Ai+XFA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=e9Kl+YcnFW5BiJOFL+1Q3ODXQMz7OARgSHtoKBFR9KQPMxxKcP7yZ5Klu7f16VetRmzcPIMk9zMwDjWFO/TKYWWxvl+l0uN+AKYUklSrEDo54U/QycB+VAJXThfo27lcx2oZChFSC1G999iqZfcFA+G/jOsrsokttTDHWqPyk1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oV1qXewn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD218C4CEF5;
-	Sun,  7 Sep 2025 15:33:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757259195;
-	bh=stiQPhak8MOP6pYZdLyutUNcmHegMkQrARaC/Ai+XFA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oV1qXewnDKnbIJFTqiUEeQSwC/3McmLPaxozGZiGZS4XPia3fck2g4HagmezLSevB
-	 q0pdBFKlGsmp3PcrO1qLRnwP82jG7KdW9YW5zybjKh9TxrXlkqToYp04fV9gQ5jty2
-	 hlImczw3DAS+vt19Gdj+rw0gbEFo/Ct9/Vs0jMQ+heMMkIq4piSxnDb1k+rFs7ORHp
-	 jXA/pknZpbHxlfpQT4W1nQ4Tns6yb//nYLVPjU7qVKxa7Jf8k6LAhPWzSg1Jyzlw5g
-	 EgtZWsPaVenSSDEF9sjuqGq+cDPcOxw6EPLqr9Fzih/IrG4p5j6cpoUNeGecz1h56c
-	 jEVxvqfJ1U6jw==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Sun, 07 Sep 2025 17:32:44 +0200
-Subject: [PATCH net-next 3/3] selftests: mptcp: join: allow more time to
- send ADD_ADDR
+	s=arc-20240116; t=1757260879; c=relaxed/simple;
+	bh=2iH/tmlgtIXVcbg5sIxO5juHiTu9/jGxxy+gkH576Oo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=f5Op5R752ZQHb98SPhrD3WCcve0BKHfz83x1jv4p7PfzegOxpWbEB8YfmHeNUJsCKwwi7+Jd2GaeKx3HeegzFPxTuuk3XXAbcOCu1CC4cSt4X7uIeQN+zuuyo1sDG31Om/PDFD25ESCyhi5DjNe2iv2iO8NhRZqkrDwFGCDgrFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ndIbsl8i; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45de221da9cso3086605e9.0
+        for <netdev@vger.kernel.org>; Sun, 07 Sep 2025 09:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1757260875; x=1757865675; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vg7CHqQNYYzh26+Hh5oDujqwGy19VW95gl4qkCfQ+9o=;
+        b=ndIbsl8irgOlKTtqnxvhy5OKtGVZNhDgzmi9bwlj6boHXjsgKCnyV+cdqc5Upkjlhh
+         /1sQg/nHV70LH9gC+8Y53jCdQQbTp7ZLlXzHojFyMmUmEnD36Cx8ekwrBTGR0mRPxe+p
+         iPH/OEtwW+QdBrYuUfnAERyf582T89yc7k0eN/JqsRElwPGteCFgfq1IeV0tHYBSXg6E
+         /Cs8jrn8h89ZoF5ToPMEHSD64AyW7O4xYwFYwgI91wMVL/cDElYUqs75LVzLt/iG9AHH
+         JmOMKR/P4SpTz7GzAL2oVZqd2EX8u90m/OmGkrUqK4NxwflSVHNPqthU8BfkXjtDbY0/
+         9LgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757260875; x=1757865675;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vg7CHqQNYYzh26+Hh5oDujqwGy19VW95gl4qkCfQ+9o=;
+        b=iCJhUmZBNDPCPpJGv+sQty4/o8uTKygpNev+jV8B0Kp7XMqdwoBuz1z0DpcZ6DKLB7
+         qf/2+4Uvthfr9uE8R2NeDU6c6EvhWi7Mct0I6NhKB0onnL2zl3C1mo47CmVSEfUFRiL2
+         ycKO156scfLCOc8jpxaLJ2fID9P4akI08hzd/kPZxjLwR+MjBa304ztQhf+N79UQrYDy
+         7AXrkzT5kjlZHrhIRPpzf8fIr3mngM/r5yeOAGLgSw4O+Zac7OHnU9PXo9M8xFd55SyT
+         9P3DpNt3c88HwnPwKQKt/Tbg+/n4tBESoHSDGxwR4DDsZueQEUUtZ6VEPNpjuL2AI8Ge
+         cUvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUluVnR8zMI+ZR+3dxshu6dBS/3bheiu0q1YgLNhHvMJLWYLCdwuRg+NxKRPgAQnb3WEdeqshw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxokVxSzonNss1YM8hiYEWLNAxe845jlqtT3rFHeAyDOsEUXf/H
+	OAh5NrRYBE236P6XEZHVDF8n9PTwAN6rW8gjhS5GkKCXzlNTEa1xYmBErY3RgQ/NhG4=
+X-Gm-Gg: ASbGnctfqua6BkFODJuhzg3/yOKY9QVqhJdFgA/1Eunckf4Wc8KWIiL1XB7OOjb4koo
+	7PC6QdCNT4IdrVxhagaHWGiRjOwZXaq54lf4DV16diNW/XA0fcvjzMl6WP+SyuUJECpbQF3E7tj
+	lhxaOB/j71cacdpdEoUHGwiGNUYNDUdsSnuHu0bT94HJef4zhD4ETZJ9oiKOB4WFzqQhWTeAAx4
+	ILfZl2LXvanKaioZOxyasye/jcnyedK2ZMKt6VyCDCWOalx7gv+GEFA0cJxs5IahgiOHp5l5ox5
+	D9ZaF4sAkZHjAdCkwN0aoyIVbKT51aHYEo8OyHc3aiNAu+NWVN/kMjPmkLGJllGUdnVAU+0SZy7
+	bfWkvVfUAyPUhfyBrJSjHBS/Q7B5kE2LF97wd2z1bgEnO9SFaS+N8p949sEUT4iLJFTlq/MSQDd
+	BGw1/zGwj7oA==
+X-Google-Smtp-Source: AGHT+IGn9DppX1oWsqBRvsOrhn+d3X5JdUygKPkoLsD9fVU4imK0p6ui2veZhjeECxYo+CUppl84ZA==
+X-Received: by 2002:a05:600c:1386:b0:45c:b5f7:c6e4 with SMTP id 5b1f17b1804b1-45dddedf9bfmr35637975e9.35.1757260874428;
+        Sun, 07 Sep 2025 09:01:14 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45de45dce11sm27848815e9.10.2025.09.07.09.01.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Sep 2025 09:01:14 -0700 (PDT)
+Date: Sun, 7 Sep 2025 09:01:07 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
+ sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com
+Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Fw: [Bug 220544] New: AF_SMC deadlock: held by __sock_release,
+ smc_release, and __flush_work
+Message-ID: <20250907090107.44a3f68e@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250907-net-next-mptcp-add_addr-retrans-adapt-v1-3-824cc805772b@kernel.org>
-References: <20250907-net-next-mptcp-add_addr-retrans-adapt-v1-0-824cc805772b@kernel.org>
-In-Reply-To: <20250907-net-next-mptcp-add_addr-retrans-adapt-v1-0-824cc805772b@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1515; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=stiQPhak8MOP6pYZdLyutUNcmHegMkQrARaC/Ai+XFA=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDL2Ll03M+ezbfADr3m8AZMe8TRyNYUadN31K9z+2fpty
- ycOTsVlHaUsDGJcDLJiiizSbZH5M59X8ZZ4+VnAzGFlAhnCwMUpABOxF2ZkWJds57F+s/mG38ma
- 8gxheh2vV6pP7NK++q+Xh0ffKGimCCPDFT0jhRV3OQ4Ua+pqSU1o5jbj3sHp3re59vbylSvEeXy
- YAA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-When many ADD_ADDR need to be sent, it can take some time to send each
-of them, and create new subflows. Some CIs seem to occasionally have
-issues with these tests, especially with "debug" kernels.
 
-Two subtests will now run for a slightly longer time: the last two where
-3 or more ADD_ADDR are sent during the test.
 
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Begin forwarded message:
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index e9e11a9e60fd5374c8a98c3b7159ccbca8053030..b41cebfa1f921ce9ea6a88a908bf6d5e6027b367 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -2268,7 +2268,8 @@ signal_address_tests()
- 		pm_nl_add_endpoint $ns1 10.0.3.1 flags signal
- 		pm_nl_add_endpoint $ns1 10.0.4.1 flags signal
- 		pm_nl_set_limits $ns2 3 3
--		run_tests $ns1 $ns2 10.0.1.1
-+		speed=slow \
-+			run_tests $ns1 $ns2 10.0.1.1
- 		chk_join_nr 3 3 3
- 		chk_add_nr 3 3
- 	fi
-@@ -2280,7 +2281,8 @@ signal_address_tests()
- 		pm_nl_add_endpoint $ns1 10.0.3.1 flags signal
- 		pm_nl_add_endpoint $ns1 10.0.14.1 flags signal
- 		pm_nl_set_limits $ns2 3 3
--		run_tests $ns1 $ns2 10.0.1.1
-+		speed=slow \
-+			run_tests $ns1 $ns2 10.0.1.1
- 		join_syn_tx=3 \
- 			chk_join_nr 1 1 1
- 		chk_add_nr 3 3
+Date: Sun, 07 Sep 2025 03:42:22 +0000
+From: bugzilla-daemon@kernel.org
+To: stephen@networkplumber.org
+Subject: [Bug 220544] New: AF_SMC deadlock: held by __sock_release, smc_release, and __flush_work
+
+
+https://bugzilla.kernel.org/show_bug.cgi?id=220544
+
+            Bug ID: 220544
+           Summary: AF_SMC deadlock: held by __sock_release, smc_release,
+                    and __flush_work
+           Product: Networking
+           Version: 2.5
+    Kernel Version: 6.12.x
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Other
+          Assignee: stephen@networkplumber.org
+          Reporter: hi@fourdim.xyz
+        Regression: No
+
+Created attachment 308627
+  --> https://bugzilla.kernel.org/attachment.cgi?id=308627&action=edit  
+crash full log and program source code
+
+[ 2499.781797] 
+[ 2499.782400] ======================================================
+[ 2499.784129] WARNING: possible circular locking dependency detected
+[ 2499.785824] 6.12.42 #1 Not tainted
+[ 2499.786843] ------------------------------------------------------
+[ 2499.788589] 1296/22742 is trying to acquire lock:
+[ 2499.789941] ffff88801776ec18
+((work_completion)(&new_smc->smc_listen_work)){+.+.}-{0:0}, at:
+__flush_work+0x514/0xd50
+[ 2499.793080] 
+[ 2499.793080] but task is already holding lock:
+[ 2499.794731] ffff888017768e98 (sk_lock-AF_SMC/1){+.+.}-{0:0}, at:
+smc_release+0x376/0x600
+[ 2499.797004] 
+[ 2499.797004] which lock already depends on the new lock.
+[ 2499.797004] 
+[ 2499.799295] 
+[ 2499.799295] the existing dependency chain (in reverse order) is:
+[ 2499.801365] 
+[ 2499.801365] -> #1 (sk_lock-AF_SMC/1){+.+.}-{0:0}:
+[ 2499.803149]        lock_sock_nested+0x3a/0x100
+[ 2499.804427]        smc_listen_out+0x1ea/0x4c0
+[ 2499.805686]        smc_listen_work+0x4d1/0x5520
+[ 2499.806987]        process_one_work+0x94a/0x1740
+[ 2499.808415]        worker_thread+0x5c4/0xe10
+[ 2499.809650]        kthread+0x2ad/0x360
+[ 2499.810763]        ret_from_fork+0x4e/0x80
+[ 2499.811966]        ret_from_fork_asm+0x1a/0x30
+[ 2499.813324] 
+[ 2499.813324] -> #0
+((work_completion)(&new_smc->smc_listen_work)){+.+.}-{0:0}:
+[ 2499.815691]        __lock_acquire+0x2413/0x4310
+[ 2499.816983]        lock_acquire.part.0+0xff/0x350
+[ 2499.818259]        __flush_work+0x528/0xd50
+[ 2499.819376]        __cancel_work_sync+0x105/0x130
+[ 2499.820689]        smc_clcsock_release+0x61/0xf0
+[ 2499.821958]        __smc_release+0x5c9/0x8a0
+[ 2499.823163]        smc_close_non_accepted+0xd7/0x210
+[ 2499.824602]        smc_close_active+0x535/0x10e0
+[ 2499.825867]        __smc_release+0x643/0x8a0
+[ 2499.827067]        smc_release+0x1f0/0x600
+[ 2499.828197]        __sock_release+0xac/0x260
+[ 2499.829427]        sock_close+0x1c/0x30
+[ 2499.830506]        __fput+0x3f6/0xb40
+[ 2499.831552]        __fput_sync+0x4a/0x60
+[ 2499.832651]        __x64_sys_close+0x86/0x100
+[ 2499.833855]        do_syscall_64+0xbb/0x1d0
+[ 2499.835043]        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[ 2499.836574] 
+[ 2499.836574] other info that might help us debug this:
+[ 2499.836574] 
+[ 2499.838725]  Possible unsafe locking scenario:
+[ 2499.838725] 
+[ 2499.840491]        CPU0                    CPU1
+[ 2499.841748]        ----                    ----
+[ 2499.843036]   lock(sk_lock-AF_SMC/1);
+[ 2499.844110]                               
+lock((work_completion)(&new_smc->smc_listen_work));
+[ 2499.846436]                                lock(sk_lock-AF_SMC/1);
+[ 2499.848134]   lock((work_completion)(&new_smc->smc_listen_work));
+[ 2499.849780] 
+[ 2499.849780]  *** DEADLOCK ***
+[ 2499.849780] 
+[ 2499.851388] 3 locks held by 1296/22742:
+[ 2499.852456]  #0: ffff88801ed58d88 (&sb->s_type->i_mutex_key#12){+.+.}-{3:3},
+at: __sock_release+0x81/0x260
+[ 2499.855185]  #1: ffff888017768e98 (sk_lock-AF_SMC/1){+.+.}-{0:0}, at:
+smc_release+0x376/0x600
+[ 2499.857486]  #2: ffffffff86e9dc00 (rcu_read_lock){....}-{1:2}, at:
+__flush_work+0xff/0xd50
+[ 2499.859710] 
+[ 2499.859710] stack backtrace:
+[ 2499.860913] CPU: 0 UID: 0 PID: 22742 Comm: 1296 Not tainted 6.12.42 #1
+[ 2499.860935] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.15.0-1 04/01/2014
+[ 2499.860944] Call Trace:
+[ 2499.860951]  <TASK>
+[ 2499.860959]  dump_stack_lvl+0xba/0x110
+[ 2499.860983]  print_circular_bug.cold+0x1e8/0x27f
+[ 2499.861041]  check_noncircular+0x30e/0x3c0
+[ 2499.861064]  ? __pfx_check_noncircular+0x10/0x10
+[ 2499.861084]  ? register_lock_class+0xb2/0x12e0
+[ 2499.861112]  ? lockdep_lock+0xb5/0x1b0
+[ 2499.861131]  ? __pfx_lockdep_lock+0x10/0x10
+[ 2499.861151]  __lock_acquire+0x2413/0x4310
+[ 2499.861177]  ? __pfx___lock_acquire+0x10/0x10
+[ 2499.861199]  ? __pfx_mark_lock+0x10/0x10
+[ 2499.861221]  ? __flush_work+0x514/0xd50
+[ 2499.861240]  lock_acquire.part.0+0xff/0x350
+[ 2499.861261]  ? __flush_work+0x514/0xd50
+[ 2499.861280]  ? lock_release+0x209/0x7d0
+[ 2499.861302]  ? __pfx_lock_acquire.part.0+0x10/0x10
+[ 2499.861323]  ? __flush_work+0x514/0xd50
+[ 2499.861342]  ? trace_lock_acquire+0x132/0x1c0
+[ 2499.861360]  ? __flush_work+0x514/0xd50
+[ 2499.861378]  ? lock_acquire+0x31/0xc0
+[ 2499.861398]  ? __flush_work+0x514/0xd50
+[ 2499.861418]  __flush_work+0x528/0xd50
+[ 2499.861436]  ? __flush_work+0x514/0xd50
+[ 2499.861456]  ? __pfx___flush_work+0x10/0x10
+[ 2499.861475]  ? __pfx_sock_def_readable+0x10/0x10
+[ 2499.861497]  ? trace_irq_disable.constprop.0+0xcd/0x110
+[ 2499.861519]  ? __pfx_wq_barrier_func+0x10/0x10
+[ 2499.861548]  ? __pfx___might_resched+0x10/0x10
+[ 2499.861567]  ? __pfx_sock_def_readable+0x10/0x10
+[ 2499.861587]  __cancel_work_sync+0x105/0x130
+[ 2499.861609]  smc_clcsock_release+0x61/0xf0
+[ 2499.861630]  ? __local_bh_enable_ip+0x9b/0x140
+[ 2499.861646]  __smc_release+0x5c9/0x8a0
+[ 2499.861665]  ? lockdep_hardirqs_on_prepare+0x201/0x400
+[ 2499.861688]  ? __pfx_sock_def_readable+0x10/0x10
+[ 2499.861708]  smc_close_non_accepted+0xd7/0x210
+[ 2499.861730]  smc_close_active+0x535/0x10e0
+[ 2499.861753]  __smc_release+0x643/0x8a0
+[ 2499.861772]  ? lockdep_hardirqs_on_prepare+0x25c/0x400
+[ 2499.861795]  smc_release+0x1f0/0x600
+[ 2499.861814]  __sock_release+0xac/0x260
+[ 2499.861840]  ? __pfx_sock_close+0x10/0x10
+[ 2499.861864]  sock_close+0x1c/0x30
+[ 2499.861886]  __fput+0x3f6/0xb40
+[ 2499.861912]  __fput_sync+0x4a/0x60
+[ 2499.861935]  __x64_sys_close+0x86/0x100
+[ 2499.861950]  do_syscall_64+0xbb/0x1d0
+[ 2499.861972]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[ 2499.861992] RIP: 0033:0x7f40854559a0
+[ 2499.862033] Code: 0d 00 00 00 eb b2 e8 0f f8 01 00 66 2e 0f 1f 84 00 00 00
+00 00 0f 1f 44 00 00 80 3d 41 1c 0e 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00
+f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+[ 2499.862049] RSP: 002b:00007ffecd7bbad8 EFLAGS: 00000202 ORIG_RAX:
+0000000000000003
+[ 2499.862065] RAX: ffffffffffffffda RBX: 0000000000000005 RCX:
+00007f40854559a0
+[ 2499.862077] RDX: 0000000000000000 RSI: 000055df79c1fe38 RDI:
+0000000000000005
+[ 2499.862087] RBP: 0000000000000006 R08: 000000000000f800 R09:
+0000000000000073
+[ 2499.862098] R10: 0000000000000000 R11: 0000000000000202 R12:
+00007ffecd7bbb80
+[ 2499.862110] R13: 00007ffecd7bbdb8 R14: 000055df79c21dd8 R15:
+0000000000000000
+[ 2499.862128]  </TASK>
+
+
+Crashes happened on 6.12.34 and 6.12.42.
+Machine info:
+QEMU X86_64
+Linux version 6.12.42(gcc (GCC) 15.1.1 20250729, GNU ld (GNU Binutils) 2.45.0)
+#1 SMP PREEMPT_DYNAMIC Tue Aug 19 21:04:29 EDT 2025
+Command line: console=ttyS0 root=/dev/sda earlyprintk=serial net.ifnames=0
+nokaslr
+infiniband enabled through rxe
+
+Programs and logs that trigger the bug are attached
+
+Usage `cat crash.input | program`
 
 -- 
-2.51.0
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.
 
