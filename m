@@ -1,92 +1,82 @@
-Return-Path: <netdev+bounces-220972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4561B49AEB
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:20:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3982CB49AF2
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1AA23B6399
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:20:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D38957B0277
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86E72DA756;
-	Mon,  8 Sep 2025 20:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6402D9EED;
+	Mon,  8 Sep 2025 20:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTXHqS7h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ay5sfv/K"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEE62D9ECD;
-	Mon,  8 Sep 2025 20:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFCE2D7DC8;
+	Mon,  8 Sep 2025 20:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757362759; cv=none; b=QVqDITd+JdtcFsAn2BqDf1qZYn+K2HKwYGQ+Tdd8DxrQmvfQDkvGzhbWaQjZBtom+qoMtCS1sb1oyzW92qidL5JJVCesJwAbUPhdD5b3TYdgq0LFkTTtfXjbjrwnjq7idRGTEZfE9asraTo7/5vEHk9u0Iy2ZKM+1v86oDSW0Jg=
+	t=1757362843; cv=none; b=XHtIRqRzX9nsWi1WVzzKx5yhZeV2ru0VGO2bmQsXrQCfG0AEY9wmLVoLztMbtCMPkyYQ1HYFoc8b/10yIEr8tTWlpCbjNyzvssaS1d1JLDMBRFro/oWHjEoRcqTSh5pqvRIX+/xbyHyog7oUx4O75nA76HduGX0Az3j01P46mCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757362759; c=relaxed/simple;
-	bh=bmj7baRZNqvumNY5NHpR2oWGL0EJxE8zmdop29BhMQQ=;
+	s=arc-20240116; t=1757362843; c=relaxed/simple;
+	bh=3JfEPiTReYJNL9FI/IDG+noi5J0PIaT1KrGz03xK3mo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JU24loyHGqu2aOoOpMH97P9iVdi9skxtAomJ1lb5FRG/5NgAeA4OJeUD3tsreC4ouSII2b2Z/ymo0Wg4gBKuofhE5TOmRq+EUxoRi9YuZuwsHc3GcW8mRjr9rN2A8vkCDzmOX1LfxFNtK/plJrpeHoRXjIGP6pw7o1P9erQq2QU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTXHqS7h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 897E3C4CEF1;
-	Mon,  8 Sep 2025 20:19:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nIGaNtkwuIEKLAwz4rF814xJg9cVtWLt+ufuxkUiG5K/0hyf8zWv0bwQzp5eAND96fZN0LcIPDtmRUpENtn1CVMm9Qp3251EX7Q/URxeAwMjIo31Z+lnYRiDaKsOYjCUGs6euz1Zm//eDrUU86xzLdx1kLaImG5/kbYseRPtFRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ay5sfv/K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2AFC4CEF1;
+	Mon,  8 Sep 2025 20:20:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757362759;
-	bh=bmj7baRZNqvumNY5NHpR2oWGL0EJxE8zmdop29BhMQQ=;
+	s=k20201202; t=1757362843;
+	bh=3JfEPiTReYJNL9FI/IDG+noi5J0PIaT1KrGz03xK3mo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DTXHqS7h+yz+vFVX545ZtDbe4ETk0KETGFu3KDxUMr/ylXeFqu54hmZCNuiVzX8Hc
-	 Xewcg9CZc2iHreLP8EpD+KZVL8m/UzzYywZDISFiSpfdcrtgCCVY3BA3jUWZpK7ZFu
-	 1YDPlG+afsx73hM0Mp+FoYOFw1qvw/BWHFxwjF+Brk6JLEkJ8n2K4qJKyWjcneUYlk
-	 75tv4J0ILR6GI25uvK3Vu/kC35y1Ne0lR8NpduPGAXFEnq1qi48QP8O4oV013OrnXb
-	 4FIszjqRdSbXY7N3bnV65Eb+/jBTptn1+zvKIYlXfVHwom2mcq8lFkuj3Kxu7pKnoz
-	 HwbWze95MSo0w==
-Date: Mon, 8 Sep 2025 13:19:17 -0700
+	b=Ay5sfv/Kpify9UWg3iCN726VZ404UXGzDc50Pe8T7mEaGWy24shClkXsuLuq2ausj
+	 TcswAuShJlXjISqzpsjgKproS0B+/i9G1xwFA+sGICaAuKNozKSz5303IQVyWY6A58
+	 7xWz6myJojXQG8yWArT90SbfzIJKtxRnzSZQCtqavYte/I8bOPN+qL1mSdvtVhCUqt
+	 /L+bzW9RWU8DRj/GYMADqHHXhy+HqP08rAvn3OyQAbh7VcmuXRKlzBbSXn/hqWudNd
+	 hq9UumDtQvoV5s4MeAWSYp/iArJLy6NafisxfPoIqDhVTXzs2YmI0aaEvWV8J9baC1
+	 w79qfuXdrzWuQ==
+Date: Mon, 8 Sep 2025 13:20:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Gal Pressman
- <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>, Nimrod Oren <noren@nvidia.com>, Mark Bloch
- <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 3/3] selftests: drv-net: Relax total BW check in
- devlink_rate_tc_bw.py
-Message-ID: <20250908131917.10785ce0@kernel.org>
-In-Reply-To: <0cd98e25-b387-452b-b1a6-414ab20a4cf3@nvidia.com>
-References: <20250831080641.1828455-1-cjubran@nvidia.com>
-	<20250831080641.1828455-4-cjubran@nvidia.com>
-	<20250902162101.5c78cc88@kernel.org>
-	<20250905153243.6c03e257@kernel.org>
-	<0cd98e25-b387-452b-b1a6-414ab20a4cf3@nvidia.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, nathan@kernel.org,
+ nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
+ llvm@lists.linux.dev
+Subject: Re: [PATCH net-next] page_pool: always add GFP_NOWARN for ATOMIC
+ allocations
+Message-ID: <20250908132041.5ae74626@kernel.org>
+In-Reply-To: <CAHS8izPRupVvCDQr7-GF+-c3yeu83wZWgQth4_ub8bQ0AhQ9_w@mail.gmail.com>
+References: <20250908152123.97829-1-kuba@kernel.org>
+	<CAHS8izPRupVvCDQr7-GF+-c3yeu83wZWgQth4_ub8bQ0AhQ9_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 8 Sep 2025 22:16:29 +0300 Carolina Jubran wrote:
-> However, I=E2=80=99ll also need to extend load.py:
->=20
-> 1. Binding support to ensure traffic flows through the specific VLAN
->  =C2=A0 =C2=A0 interface.
-> 2. Interval-based measurement for iperf3 --json to analyze only the
->  =C2=A0 =C2=A0 stable period.
->=20
-> So my plan is:
->=20
-> 1. Send v2 for net to fix the current test with interval-based
->  =C2=A0 =C2=A0 measurement.
-> 2. Follow up with a patch to extend load.py with reverse/binding/interval
->  =C2=A0 =C2=A0 support and then migrate the test to use it.
->=20
-> Does that sound good to you?
+On Mon, 8 Sep 2025 09:15:07 -0700 Mina Almasry wrote:
+> > +       /* Unconditionally set NOWARN if allocating from the datapath.
+> > +        * Use a single bit from the ATOMIC mask to help compiler optimize.
+> > +        */
+> > +       BUILD_BUG_ON(!(GFP_ATOMIC & __GFP_HIGH));
+> > +       if (gfp & __GFP_HIGH)
+> > +               gfp |= __GFP_NOWARN;
+> > +  
+> 
+> I wonder if pp allocs are ever used for anything other than datapath
+> pages (and if not, we can add __GPF_NOWARN here unconditionally. But
+> this is good too I think.
 
-Sounds too complicated, this is just a stability improvement for a test
-which works on single device, and is not exercised / reported upstream.
-Let's jump straight to step 2.
+datapath == in NAPI context, here. We still want the warning if 
+the allocations fail with GFP_KERNEL, e.g. during ndo_open.
 
