@@ -1,204 +1,199 @@
-Return-Path: <netdev+bounces-220985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AC2CB49BEA
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:28:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA2DB49C56
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4324F7A550B
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:27:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8615C1BC1DAD
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835012E22BE;
-	Mon,  8 Sep 2025 21:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3330C2DECBD;
+	Mon,  8 Sep 2025 21:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEab8R9/"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ijyvcCdI";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Idw82lCi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E66621FF39;
-	Mon,  8 Sep 2025 21:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4760919644B;
+	Mon,  8 Sep 2025 21:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757366883; cv=none; b=UqqRaAPcGjtUzuFXzrtvgQjbA9y/23F3XDHsRaBsc9F3L8d033mUjFRkuwUVupVphjiJoOjP9n3n3wgiSeBZQNQq0JEu5U9n9JL1jzxg76WIYXZ/qKP2UzTud1oCtxtS0ijX9AV7diyvcv04wN+P+s/Xh+CdPJFnP1CVrzvnWWE=
+	t=1757368146; cv=none; b=h9bz93tTk4oE4uu0hMIb8JAje2o4EpHdsIVmQ3AzZWffZd4IOxjh+qxFkwZ16QU6FBPm+Pj+Yjz5rwlxa3nMdJJJBAILXQVw95iW+CARNcmv+2g8HBJVCoNYolFHZJDL1QuGJnexgyD52FcEmneYrOXINaCNnQ5+W14lGw3KmVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757366883; c=relaxed/simple;
-	bh=gDCZvvVNWEMCU3nT1uDyLwDLHgKoibMV4aiujAjJvhU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kJgElTdjlOZpJXpj4uwohBTJfEF0B56qVodRQUz+QKA23EO5MuwJs1bok0Oolj9GZp1j1c4Cw5ccg10TLH1lSLa87KJBdhyQT4PLigJfvh7Py4A7DmdQcCRqsD5AXds3Zl5NxjPtohg5tPYUHrYETNU6squt+NVDbEl033Hd7oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UEab8R9/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3450C4CEF7;
-	Mon,  8 Sep 2025 21:27:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757366882;
-	bh=gDCZvvVNWEMCU3nT1uDyLwDLHgKoibMV4aiujAjJvhU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=UEab8R9/I2NlvC9GuptOXjwWyNik5bnCFfAaT+bUnuhIdp8hm8dbl9uEfbqbgtwOs
-	 DUcb42pDgMcyyX9HOK5cwYHomGfx2vM1HDmVDhk+WGg4mKBCJoDheiAMk42G34YC8O
-	 eGpIWySvhosZV/B41kL/bj8D8Gn2nK1cRE6ciIjN+u4kIlsROyOTS73gqBQ/IbZljZ
-	 zxNt+qBgb3dQz+YXeI0mPwW4yIOfK10DNDDDQqgVTi9NVWswNEWSREJPOuX98l+CtO
-	 g1oPRc7nlMOkd3oUtydwpR19nUsNy0eqhfcROTbLjLyP5AO98QTcxsLkEJlTsXmrHL
-	 C+ptPjrmCfVfg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 08 Sep 2025 23:27:29 +0200
-Subject: [PATCH net 3/3] selftests: mptcp: shellcheck: support v0.11.0
+	s=arc-20240116; t=1757368146; c=relaxed/simple;
+	bh=xZwtgP/SMxO4gXjpndSJj3OnJPcQq5Kzza2m2kq/YC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FwRVzarooIAqydrWxRBQn0BT2GPVFSXTP8893VhmPcoct5IdvMjlXBqXEqsYo9tkKNChMt8pHolwquWFjsn5X8ahuVr9QBnAk0qpiBdO+EvfGw3b6COzN4mMC1O2iTPKQ3hKLe7fzGMSnlPTHGYkDwzE+3kAfEpRGBsre66rGSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ijyvcCdI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Idw82lCi; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id E284A7A00B2;
+	Mon,  8 Sep 2025 17:49:01 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Mon, 08 Sep 2025 17:49:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1757368141; x=
+	1757454541; bh=62PV9PUcHNBx3VeoR1lvE5yI4zsYl4Rz5Cp/8QhlRYU=; b=i
+	jyvcCdI2DydQgkTJZJRTCnVufP7BySkuCwAMRRwJ89vEUSdFr08RzB8QlP/XljID
+	yiXwxnUhEw9G4SCIBUToq8HhIwnj+TXtc/gqSxeasFePP5+zOqBNC9szevVzRH+q
+	mxo8vGL430f9W/4i1uSyMTSRlpxCZlow0MiAaDBxXg3yUOVFMk0WgxA+oPFVzV+2
+	pPvHo963OsYL6frYQXBkuNZh2iD3lC2Z6Bu3mxKojt1pMzhyr1JRPhe39xW0e6sm
+	wOZnudT7hsYiP2CTArKp1pfNXil2T0qitOAjPLrMmgsYP+jBPQRV1Ypcsfljv2ty
+	O/r0nb4JXg5oT15LOeoUQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757368141; x=1757454541; bh=62PV9PUcHNBx3VeoR1lvE5yI4zsYl4Rz5Cp
+	/8QhlRYU=; b=Idw82lCiLKBSUuAl7bxnOKBUKRyVMY5QVJnkZHs6g3w/spwqIgd
+	QaFBPLhAiVYZugtH640jHc6c3zHUgJmjiiZvt4Y8ifJKIFAmxHiJIS95bk5+/5VS
+	T+UogD268hHUAGlTp/DGX2IEUxSVqjfHr0tz5fuSeqI0h4kkQF84h/xNV5SqZRC/
+	e2p6ric5XIUIMNzhfHROUqr8Obt9yC4Zg91DTrnGnrfvOknpYDaW0J4FfLEEicwP
+	UXxLD7CW9BL8iNhrWPOQJRpUwFrjVJVc0a4itmQlQC8lLvoNxeNyZipFxrbZl3z3
+	R0ALNmtla7afgYema2E73TtWA0ChVRXQ6PQ==
+X-ME-Sender: <xms:TU-_aHw62BNmUDVr7nLT1CZpBgtgefnYNMUXyZpAUeOXaxlBHFEwsg>
+    <xme:TU-_aJgBrDa-gpUHa3v8YFu30-nlhNQ9fr-eibpwhcPtMg0fxUOkUMV60rgcHw8l3
+    SBh4fCrxxcac1vEczo>
+X-ME-Received: <xmr:TU-_aGzZ87WENkF6V6HOhZRW3Jejh48TTkWqBJuWXNCDjmqtg-tBzI-_JHIt>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeeihecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudekpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtg
+    homhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehjvhesjhhvohhssghurhhghhdrnhgvthdprhgtphhtthhopegrnhgurhgvfi
+    donhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
+    ohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpd
+    hrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghn
+    ihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepjhhirhhisehrvghsnhhulhhlihdruh
+    hs
+X-ME-Proxy: <xmx:TU-_aHy6WfAoRbt-jr2ZyfjZIOOpQp6jUoRhTPyFoltIs8ou__30gA>
+    <xmx:TU-_aApmKshoaxwGdZ6ziamKjb8tY38LfNW83HZgL56QEWlzQNvFlA>
+    <xmx:TU-_aKktqao7-eJxbfy7gjgcDBNKToUjmdrV7lMuzYruFAVNjWMqlw>
+    <xmx:TU-_aJz90FKSpG6RW7dma-84cBltYyc2rprhYhzGU-3EN03YRF4uJA>
+    <xmx:TU-_aCj90on4DFro_qdziXvCreuezMrZAOd4PNiA9iaSbfIyi1VsPbQ6>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Sep 2025 17:49:00 -0400 (EDT)
+Date: Mon, 8 Sep 2025 23:48:58 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv2 net-next 5/5] selftests/net: add offload checking test
+ for virtual interface
+Message-ID: <aL9PSoTwhn-HFWrH@krikkit>
+References: <20250902072602.361122-1-liuhangbin@gmail.com>
+ <20250902072602.361122-6-liuhangbin@gmail.com>
+ <aLyoEiWnuvQ-5ODz@krikkit>
+ <aL5YamjbZB5gsL30@fedora>
+ <aL6jlYPhsPfDKT8C@krikkit>
+ <aL6soY3gEj-LIovi@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250908-net-mptcp-misc-fixes-6-17-rc5-v1-3-5f2168a66079@kernel.org>
-References: <20250908-net-mptcp-misc-fixes-6-17-rc5-v1-0-5f2168a66079@kernel.org>
-In-Reply-To: <20250908-net-mptcp-misc-fixes-6-17-rc5-v1-0-5f2168a66079@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
- Davide Caratti <dcaratti@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4972; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=gDCZvvVNWEMCU3nT1uDyLwDLHgKoibMV4aiujAjJvhU=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDL2e4Wc7vbjmbjuEffb+Geralk43bI4G44UyC9SZ5dYd
- GylNcuTjlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgIl4nGb4xfw6bvuaFyxWMU7n
- omYfSjVc+7stxEl/336ZHY+v2lluPczw353N3qKedeqUGrW1fx2fz5sobSz7Py7066en9VsW5H6
- oZgAA
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aL6soY3gEj-LIovi@fedora>
 
-This v0.11.0 version introduces SC2329:
+2025-09-08, 10:14:57 +0000, Hangbin Liu wrote:
+> On Mon, Sep 08, 2025 at 11:36:21AM +0200, Sabrina Dubroca wrote:
+> > > The esp-hw-offload is fixed on netdevsim
+> > > 
+> > > # ethtool -k eni0np1 | grep -i esp-hw-offload
+> > > esp-hw-offload: on [fixed]
+> > > 
+> > > There is no way to disable it.
+> > 
+> > I don't think this is intentional. nsim_ipsec_init only adds
+> > NSIM_ESP_FEATURES to ->features but not to ->hw_features, but I think
+> > it was just forgotten. I added a few in 494bd83bb519 ("netdevsim: add
+> > more hw_features"), extending nsim_ipsec_init (and nsim_macsec_init
+> > since I made the same mistake) to also add features to ->hw_features
+> > would make sense to me.
+> 
+> This could be done in another patch.
 
-  Warn when (non-escaping) functions are never invoked.
+If it's not needed for this series, sure.
 
-Except that, similar to SC2317, ShellCheck is currently unable to figure
-out functions that are invoked via trap, or indirectly, when calling
-functions via variables. It is then needed to disable this new SC2329.
 
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/diag.sh          | 2 +-
- tools/testing/selftests/net/mptcp/mptcp_connect.sh | 2 +-
- tools/testing/selftests/net/mptcp/mptcp_join.sh    | 2 +-
- tools/testing/selftests/net/mptcp/mptcp_sockopt.sh | 2 +-
- tools/testing/selftests/net/mptcp/pm_netlink.sh    | 5 +++--
- tools/testing/selftests/net/mptcp/simult_flows.sh  | 2 +-
- tools/testing/selftests/net/mptcp/userspace_pm.sh  | 2 +-
- 7 files changed, 9 insertions(+), 8 deletions(-)
+> > > After we add the netdevsim to bond,
+> > > the bond also shows "esp-hw-offload off" as the flag is inherit
+> > > in dev->hw_enc_features, not dev->features.
+> > 
+> > Did you mean dev->hw_features?
+> 
+> No, the xfrm_features in patch 01 updates dev->hw_enc_features, not
+> dev->hw_features.
 
-diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
-index 7a3cb4c09e450f0ae570015c4724ec268c6dc19f..d847ff1737c30c0eae1cefeb5a83bd3223897707 100755
---- a/tools/testing/selftests/net/mptcp/diag.sh
-+++ b/tools/testing/selftests/net/mptcp/diag.sh
-@@ -28,7 +28,7 @@ flush_pids()
- }
- 
- # This function is used in the cleanup trap
--#shellcheck disable=SC2317
-+#shellcheck disable=SC2317,SC2329
- cleanup()
- {
- 	ip netns pids "${ns}" | xargs --no-run-if-empty kill -SIGKILL &>/dev/null
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index 5e3c56253274a1f938d2ed9986c4290fcea8b96b..c2ab9f7f0d2133559bb18ce884b613d21d1ec5f0 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -134,7 +134,7 @@ ns4=""
- TEST_GROUP=""
- 
- # This function is used in the cleanup trap
--#shellcheck disable=SC2317
-+#shellcheck disable=SC2317,SC2329
- cleanup()
- {
- 	rm -f "$cin_disconnect"
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 82cae37d9c2026cc55466636d53a76f929a03452..7fd555b123b900c135bae5f61da30c21a3110eb3 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -8,7 +8,7 @@
- 
- # ShellCheck incorrectly believes that most of the code here is unreachable
- # because it's invoked by variable name, see how the "tests" array is used
--#shellcheck disable=SC2317
-+#shellcheck disable=SC2317,SC2329
- 
- . "$(dirname "${0}")/mptcp_lib.sh"
- 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-index 418a903c3a4d396bd733bf8b6f68b1447d4d1de3..f01989be6e9b3daeecc5a8f41b37c9a284efef61 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-@@ -95,7 +95,7 @@ init()
- }
- 
- # This function is used in the cleanup trap
--#shellcheck disable=SC2317
-+#shellcheck disable=SC2317,SC2329
- cleanup()
- {
- 	mptcp_lib_ns_exit "${ns1}" "${ns2}" "${ns_sbox}"
-diff --git a/tools/testing/selftests/net/mptcp/pm_netlink.sh b/tools/testing/selftests/net/mptcp/pm_netlink.sh
-index ac7ec6f9402376a34602ef1ca6c4822e8dde0ded..ec6a8758819194f2c53791d76ae68e088f188813 100755
---- a/tools/testing/selftests/net/mptcp/pm_netlink.sh
-+++ b/tools/testing/selftests/net/mptcp/pm_netlink.sh
-@@ -32,7 +32,7 @@ ns1=""
- err=$(mktemp)
- 
- # This function is used in the cleanup trap
--#shellcheck disable=SC2317
-+#shellcheck disable=SC2317,SC2329
- cleanup()
- {
- 	rm -f "${err}"
-@@ -70,8 +70,9 @@ format_endpoints() {
- 	mptcp_lib_pm_nl_format_endpoints "${@}"
- }
- 
-+# This function is invoked indirectly
-+#shellcheck disable=SC2317,SC2329
- get_endpoint() {
--	# shellcheck disable=SC2317 # invoked indirectly
- 	mptcp_lib_pm_nl_get_endpoint "${ns1}" "${@}"
- }
- 
-diff --git a/tools/testing/selftests/net/mptcp/simult_flows.sh b/tools/testing/selftests/net/mptcp/simult_flows.sh
-index 2329c2f8519b7c336e9f90a705dfa7588207a543..1903e8e84a315175e2ffd620dd7b4e94dbf25dfb 100755
---- a/tools/testing/selftests/net/mptcp/simult_flows.sh
-+++ b/tools/testing/selftests/net/mptcp/simult_flows.sh
-@@ -35,7 +35,7 @@ usage() {
- }
- 
- # This function is used in the cleanup trap
--#shellcheck disable=SC2317
-+#shellcheck disable=SC2317,SC2329
- cleanup()
- {
- 	rm -f "$cout" "$sout"
-diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index 333064b0b5ac03ae003417d2070f3c08f94743ed..970c329735ff14f87f0048ba0030dc7edaaa86bc 100755
---- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
-+++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -94,7 +94,7 @@ test_fail()
- }
- 
- # This function is used in the cleanup trap
--#shellcheck disable=SC2317
-+#shellcheck disable=SC2317,SC2329
- cleanup()
- {
- 	print_title "Cleanup"
+Ok. But hw_enc_features is not the reason ethtool shows
+"esp-hw-offload off". This line is:
+
+	bond_dev->hw_features |= BOND_XFRM_FEATURES;
+
+(from bond_setup)
+
+> Do you think if we should update dev->hw_features in the
+> patch?
+
+For dev->hw_features (and dev->features) maybe not, since that depends
+on the upper device's features and implementation. I'm not sure we can
+have a common function without changing the behavior on at least one
+type of device.
+
+But maybe ndo_fix_features could use a common
+netdev_fix_features_from_lowers? bond/team/bridge have very similar
+implementations.
+
+> > > It looks the only way to check if bond dev->hw_enc_features has NETIF_F_HW_ESP
+> > > is try set xfrm offload. As
+> > 
+> > Was this test meant to check hw_enc_features?
+> > 
+> > To check hw_enc_features, I think the only way would be sending GSO
+> > packets, since it's only used in those situations.
+> 
+> Oh.. That would make the test complex. Can we ignore this test first?
+
+Ok for me.
+
+> BTW, I'm a bit lost in the callbacks.gso_segment. e.g.
+> 
+> esp4_gso_segment
+>  - xfrm4_outer_mode_gso_segment
+>    - xfrm4_transport_gso_segment
+>      - ops->callbacks.gso_segment
+> 
+> But who calls esp4_gso_segment? I can't find where the features is assigned.
+
+inet_gso_segment via inet_offloads[] (ESP is a L4 proto like UDP etc).
 
 -- 
-2.51.0
-
+Sabrina
 
