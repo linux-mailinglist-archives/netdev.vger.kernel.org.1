@@ -1,119 +1,111 @@
-Return-Path: <netdev+bounces-220979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ACAFB49B60
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:01:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54DA8B49B83
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF5574434A8
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:01:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A590D16D97E
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8362DCF4D;
-	Mon,  8 Sep 2025 21:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEF52DE6F5;
+	Mon,  8 Sep 2025 21:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="sZBDJtvF"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="IVEOjJEo";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="TptDO3T1"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193A723535C;
-	Mon,  8 Sep 2025 21:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A492DE6ED;
+	Mon,  8 Sep 2025 21:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757365298; cv=none; b=pUp3oWz4JlSfISUoC0V1pck09J3s6UA6kCfg55HNXk2NsLo6YDo4Z6qPUdoDM7OTk7nmn7fOR4RwxmJ4puink8Iyjr4lk8DF6mELfZicU1tBwQtL5550gB5oAtsGzjlUJBw0g+2k9mzXlFYv+mFxLbasDpnUB7tSzclLaJ1huuo=
+	t=1757365582; cv=none; b=MSmp4Uldi4mWxtMechxxwrJXj+2yTu/z0Ccj33PGIJXQH09/Z+RjZ1r1gWjJMAfsWFmykoOO+CjLyf51dV1nfX5czd9OUAqTHWsAh4oTebjt4D3BWlYh3XoVqNd5mmY0N8ojLFe35/PRuIzB0ZGld/RAbWbPDrS1LXegXinGyY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757365298; c=relaxed/simple;
-	bh=Qa3p4r1BGPTbg9JN8Jg7rYA6n7V+dwXJpFgMOWciwh0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nTI5MBZ/GbljLix0oXPUdyl9GW/ws2RLl9u8ePKobhDrRZFNUCCXY3J2ZfS6mD8fjVoFUDUNGTOeFr4vQIdTiVkiCjEYxIWtL2xmWE+hoCQM6+8hw+96cfDKdq9eCrqmmtowRkRuXH3qs2L+ME3Qc+xHvLlgQGFGmqAIJBggKts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=sZBDJtvF; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 3AF8E2119388;
-	Mon,  8 Sep 2025 14:01:35 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3AF8E2119388
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1757365296;
-	bh=8OfRFbMGWhbwHqeXODOj/IPgEc3LWLOaJehvGyq5fVY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sZBDJtvFs9Ofj7nMAu5VU8L0L4nKeDGeNVmFwTGr5mm9ZPuuOp9UCj9Btu+E1vcfa
-	 HB/ifrMcHgdgWOwk/crvaI47rWI+1w94qYyPAZve41oYiMcu+vkaoDgD185Gry75ro
-	 Z7o4crQc3sp24xFFXTYFnxdnQ96IoHTX58i70aM8=
-Message-ID: <d7d7b23f-eaea-2dbc-9c9d-4bee082f6fe7@linux.microsoft.com>
-Date: Mon, 8 Sep 2025 14:01:34 -0700
+	s=arc-20240116; t=1757365582; c=relaxed/simple;
+	bh=skMd7msa/+1SKj63XnhhBq4ol3lcANpfSVnZq7Mzbcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f51PKuNvM9XD1LcsyfCRCnqvBTShO6jS8vuDROGHD4IpzuhQNnoQTRyNAfS5Ky2562XQmcL7KypoesYEf5X8WzvlNAvzyOB5E5e6y0L8ykwG2OI6jlhygu2Y61FJa3mrvLGWw2SMFJRhy9T4F5NgmZCVqNy4lp1N86NxhMoVOvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=IVEOjJEo; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=TptDO3T1; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 6BB0E602C3; Mon,  8 Sep 2025 23:06:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1757365576;
+	bh=10XXWkBGzx4kz8xLsmRTsu71MTe4Hm/S5vyY8l5rJdg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IVEOjJEopylyIxT3wo3yC4QoRtsoyuu6mb/dfzaDNWVCvP1kVJaNqIhWStjtUZehQ
+	 WPNEAp5O23c4p3k+5CY7vrt/PRF5YRl8ffztrAbCEdn17PHVVRVNCPkjcm8oSqACnt
+	 zwaKCsiq3zCy00TOJ/SmLhMAFc5SvsIrkLt6QGRm9M6H/RchMDQ7D+ONNsY2V8PHYP
+	 3w8FQKLLO5guPOnsV+c9r8Ivco1KIy6GB4Fmr3qGQoSqNRXjqGvDKrZKJIKRINl5vq
+	 6SoG4oYYjMWt+kpjtJIIKGRgUcf2mdmXyPQnuQNmSYTs9XhfpZ6cciF2U197sTtAK1
+	 BH+ao4A3QECog==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 1DEB1602C3;
+	Mon,  8 Sep 2025 23:06:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1757365574;
+	bh=10XXWkBGzx4kz8xLsmRTsu71MTe4Hm/S5vyY8l5rJdg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TptDO3T1M5DJ3qdCsnFn5z2+apdieQ6PPcMlI6BV+XzUskl7fGvprQyRINEmSOC6y
+	 XNfVhebUjSe29mvc40hcEzM3Tf45rtMSM2yGckoRgKg+goPDnqNcIjoMNHlLExwvar
+	 VAoyGZ8yvp/s9BQv19wIJ+NAaBcMAuUGWZx9XLTEve7Md7tPh6V54HaDogbqZMKoJQ
+	 7nVLN2L7QlQ3Z7ZSFKwjAvbKW3bq9dMrDAf/RXfq614w1NNerZBOVI/Rys+BxX2Hnu
+	 8MuwMMeYBzjZLkpoqcP+PRl6S7wR6WUE524QXjXSstTQbeAtdUammZr1Omdnd1+bn9
+	 FzndmVGityOaQ==
+Date: Mon, 8 Sep 2025 23:06:11 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 nf-next 3/3] netfilter: nf_flow_table_ip: don't follow
+ fastpath when marked teardown
+Message-ID: <aL9FQ47keDNxygQw@calendula>
+References: <20250617070007.23812-1-ericwouds@gmail.com>
+ <20250617070007.23812-4-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH v1 2/2] Drivers: hv: Make CONFIG_HYPERV bool
-Content-Language: en-US
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
- linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
- maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
- airlied@gmail.com, simona@ffwll.ch, jikos@kernel.org, bentiss@kernel.org,
- kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, dmitry.torokhov@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, bhelgaas@google.com,
- James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
- deller@gmx.de, arnd@arndb.de, sgarzare@redhat.com, horms@kernel.org
-References: <20250906010952.2145389-1-mrathor@linux.microsoft.com>
- <20250906010952.2145389-3-mrathor@linux.microsoft.com>
- <2025090621-rumble-cost-2c0d@gregkh>
-From: Mukesh R <mrathor@linux.microsoft.com>
-In-Reply-To: <2025090621-rumble-cost-2c0d@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250617070007.23812-4-ericwouds@gmail.com>
 
-On 9/6/25 04:36, Greg KH wrote:
-> On Fri, Sep 05, 2025 at 06:09:52PM -0700, Mukesh Rathor wrote:
->> With CONFIG_HYPERV and CONFIG_HYPERV_VMBUS separated, change CONFIG_HYPERV
->> to bool from tristate. CONFIG_HYPERV now becomes the core Hyper-V
->> hypervisor support, such as hypercalls, clocks/timers, Confidential
->> Computing setup, PCI passthru, etc. that doesn't involve VMBus or VMBus
->> devices.
+On Tue, Jun 17, 2025 at 09:00:07AM +0200, Eric Woudstra wrote:
+> When a flow is marked for teardown, because the destination is not valid
+> any more, the software fastpath may still be in effect and traffic is
+> still send to the wrong destination. Change the ip/ipv6 hooks to not use
+> the software fastpath for a flow that is marked to be teared down and let
+> the packet continue along the normal path.
 > 
-> But why are you making it so that this can not be a module anymore?  You
-> are now forcing ALL Linux distro users to always have this code in their
-> system, despite not ever using the feature.  That feels like a waste to
-> me.
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>  net/netfilter/nf_flow_table_ip.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> What is preventing this from staying as a module?  Why must you always
-> have this code loaded at all times for everyone?
+> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+> index 64a12b9668e7..f9bf2b466ca8 100644
+> --- a/net/netfilter/nf_flow_table_ip.c
+> +++ b/net/netfilter/nf_flow_table_ip.c
+> @@ -542,6 +542,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
+>  	dir = tuplehash->tuple.dir;
+>  	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
+>  
+> +	if (test_bit(NF_FLOW_TEARDOWN, &flow->flags))
+> +		return NF_ACCEPT;
 
-This is currently not a module. I assume it was at the beginning. In
-drivers/Makefile today:
-
-obj-$(subst m,y,$(CONFIG_HYPERV))       += hv/
-
-
-More context: CONFIG_HYPERV doesn't really reflect one module. It is
-both for kernel built in code and building of stuff in drivers/hv.
-
-drivers/hv then builds 4 modules:
-
-obj-$(CONFIG_HYPERV)            += hv_vmbus.o
-obj-$(CONFIG_HYPERV_UTILS)      += hv_utils.o
-obj-$(CONFIG_HYPERV_BALLOON)    += hv_balloon.o
-obj-$(CONFIG_MSHV_ROOT)         += mshv_root.o
-
-Notice vmbus is using CONFIG_HYPERV because there is no 
-CONFIG_HYPERV_VMBUS. We are trying to fix that here.
-
-Thanks,
--Mukesh
-
-> thanks,
-> 
-> greg k-h
-
+nf_flow_offload_lookup() already checks for this bit, I don't a
+benefit from this re-check.
 
