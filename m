@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-220891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1355BB495D2
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:44:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64B9FB495DB
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30C8B1C21297
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:44:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B8C93B7EE6
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41CC313265;
-	Mon,  8 Sep 2025 16:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B77B311C37;
+	Mon,  8 Sep 2025 16:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DLocgXu1"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UVWZJiIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061.outbound.protection.outlook.com [40.107.244.61])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2043.outbound.protection.outlook.com [40.107.236.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61E8311599
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 16:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A7F3112B4
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 16:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757349806; cv=fail; b=hFpPDa+Nom6YI1Wz8c58+lBYVV4ZpXWE5BOt3kRXrnCvpPNcnQP90mlm7/j7eshbwwYryg2KwIMZIm/T/0ar9+Y4kIluqwCIuiLDteSz6xbmbZbX8l52RC+HRD4PZyPDJHx75Ezj6sgoOKIvCXkCodTOW4zmyxTOLwhkSFZDrXQ=
+	t=1757349794; cv=fail; b=tgKyksfjajST72JZecKkwFZbc4kmlGKqQT2+jrnrIGGolCRAt+/14DOIfNJiwsEGK8+I/iZvvPaJa4+Q/bEkoZZMwbJtFxKbg9i2F6ha+JcC7sGm9lzSw1Eawt+t9KrUJrI7g91SIOhez/6yf8LWQUjXXOWAjQ0T4f1uDV7FsfY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757349806; c=relaxed/simple;
-	bh=S3XcKTL5WKI1OWjbzwJanid8sNIyESVeK3i0cdzsvio=;
+	s=arc-20240116; t=1757349794; c=relaxed/simple;
+	bh=hez1QZt47g+YLyivWHFbxMWhDOpIOCyINFP/EkmuQuE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=neXy4ZJj0v0TpoH8s0temqLm14sURHX6S+6IPnV1uR5wsgV3zLuptUJB6KNXWP+fDb+yNzGX55Lvg+FB3VR59M0XSUbt8GOsHsXiEQksbmAM84AkTmQEgZX5vfpK0tS+4KfrBQJSYuu0EpwuBpnRqlPhpdj6dxGtFZZKBbM6VrE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DLocgXu1; arc=fail smtp.client-ip=40.107.244.61
+	 MIME-Version:Content-Type; b=eyFl/wzf9w3MHSaNVVNAQv5HYstY6FMUnCwLxbgy5b4nAYPU+llarav4QV/iAOeyHyNdV7W2YNk2c6Dy3NIpFpfwHEENXNTsh1SPyQpsxD/nNZgCPBd2NaQPxT8f8KJE+O4iHYcfYz8rDy/2o4+ZikutLxacraiUGiASv6UQmlI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UVWZJiIW; arc=fail smtp.client-ip=40.107.236.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w8hvJb/gBVayccanlDd6Fvi6VUi8UVpKt8gSd9ONVfcbqoK+jH9aK4+IbypyctcVuaa2n4pwaReYX57grDVyrNb31j1e1+a2O7ieIwE5E1kuX4h70F/b+ELgzhIlD8crFIwjuhGQWUUbKN1Vs42CChl+/rMMh5Z0CxZChTx8O9APXJDqjkKP9kopvqZnNbfO4PqRJL0Sm6FyfseZuaBxkWA2YeYCrT4khfb8zmg7IoIz+u7OHOiXxbOMfOkKKv29MBKdyzgdXIedZqGXEk3sJtT3paNydZ7vulX/uENoZsUDdaAsDKqnvYHRGTvhaVrPam0wtr4NZ7XLqIeDyxKrdw==
+ b=foMJKx8iL0qJPDzFbmP8h0WtutFQubw258bepFy7kLxZqujKSvHFYMfRmVsT+HkBuzd3seKJQYcqXj7vI54hXS7ofaE2zGACn4bXRJ4wKin803vX7hZAs39ZmEbWmGwj5amUpnLK7QX4P7SOJkg35STq0MlsXlAKPsciaHrq2lm+s6iQRCN3FRFmCpRX2omKQUsZzbuecHkgUXZIvnVRemh1Z49hzzjmHNL5xr2+TjNvgvx/2GM2UpHG8dIhIAQPkvw7HoC2PRQkIcf8EsJ8fDwayadSsXV9mVs9/eTP6ZLyRyQf0GQ+QAd/v7x4beQKKq+8D56jS9kyxTrA72jWvw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=54LRcd6CqZ7KgDz6zbUhJn7Ue2yJSz/z7cC/fzl2ido=;
- b=QlM35/PdlT9QWmb0cQgr7iAVL0pJ7JNlDVn12kI9lL3ak9pHKB0MpnfOgM1wbiL9uXq8sbLZ8vo00LCJI+ZmXPj7JEgECmpUNDQLdaO9Rx8R8MKJ6CXJTHSrcmdy9huXBcY/H1mrqnu+V7rAXpPAohSa3BGY7mrOhdY5VxBQXt/kNLdUUJ94nv7QGPbtBupwtb3Wfbz+OHaW9kJ51bkWevl1hzS3CeK1Wo+OTvS3enshH+whuGtf8tKjQeAA1v5WiS2v4mRvBGQQwB5uC3NlcSJRNloHtILg2DYsW8oarbT3Orpj2aqXW0H+UVQ9p1JEQRTcUrkHC4OXgJI6g4U5iA==
+ bh=VMgT4dI0yQ9t+PSjM+ceMUW9rG0TsQY7ief3mz0m8xA=;
+ b=MHlI7QC3jp/dNYp6TUNoa/Ii8zplFDTtM6dijFtDzohXRYiGpld+0pb9qQvxwr8uEL15T/vEtNCwOk/RNSgDOHcxntOeZ2ajJK36je3klunE7+01d6L32z+JRs8+p1KXv9XpIvXJF66AzPaHDYF2rl/1uLNNleXMGdhoS4CJZr9UnckCpcCTvlujxERIrXfb2uBz+ayy6YvoXCyhW2N2D8O5aYm87vSgfhctgBn4ixru+u05u9yvvfVF1x5GUyO2C09ZPHpgUAmCDdufIWviRtCh4naodW7EX/rlF02Ego/b9hP9yXgr+cmIREXosNFkZv+qmJCpsK4eC/WVMOaB5g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=54LRcd6CqZ7KgDz6zbUhJn7Ue2yJSz/z7cC/fzl2ido=;
- b=DLocgXu1MYQVX07CHmuenv3a8OYzRE7kXU8SsuiPZFw+TbnYfNZOmWobVeH2GtExv1/f/O03hhHjQiDJLjOmWlCVgljjrQABQ4/2YvkKg8RmgwfNQJaS3F36PTrdCZ0mEXuQhiTBIZzWXuvR9MUhX0nIfkupHBnYnCfVNEJ95IY/sdy4pWEGuY2BsNoyHyJ95Ugm31wHgsRC/pGE1XgQ9Y4f8rX4/nedcSPuixRPStRpaEEoj0ZvgGKnnhf1u66AZDZS9Wzshz5YY2gc9LwaVRCDN/8WCXXbWiXAt4SKcgPBXzHGq2x25Z++ll3AKB05dgI6T4TlSMMWW+kdJANTFQ==
-Received: from BYAPR03CA0016.namprd03.prod.outlook.com (2603:10b6:a02:a8::29)
- by IA0PPF80FB91A80.namprd12.prod.outlook.com (2603:10b6:20f:fc04::bd5) with
+ bh=VMgT4dI0yQ9t+PSjM+ceMUW9rG0TsQY7ief3mz0m8xA=;
+ b=UVWZJiIW1ThDeNo2X3PHVilMxK7oya/KQ8IByiLikQWdcrT+xSODL6L2F8oLN+BhAtqRhSzeAjE2HV+pmmosuv8NQ1kVlDsEpi+fvERACJARwFp7+xWnkA3p/v1dO61hrMyz2MQTsy4aZdPDQloHq1762c3OIFsfLqOrtwnKJnCTXp/IzTix+/mNIMttVFbqRrnyEacna2YQvoY46wX/V/3zo3x0Qg4Dmnlfkj9y46fsdLuqpb86w9VHuK5PuUugmHKtpRhIFj7H/RjMpRhOvugQky+k45WtVHtfuE5BQQfXhSqSUN4BmleQK1eaACDGRdzTcDJWn99p3Ibz3Q3Rsg==
+Received: from SJ0PR13CA0157.namprd13.prod.outlook.com (2603:10b6:a03:2c7::12)
+ by SA5PPF9BB0D8619.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8d8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Mon, 8 Sep
- 2025 16:43:05 +0000
-Received: from CO1PEPF000044F5.namprd05.prod.outlook.com
- (2603:10b6:a02:a8:cafe::4b) by BYAPR03CA0016.outlook.office365.com
- (2603:10b6:a02:a8::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.22 via Frontend Transport; Mon,
- 8 Sep 2025 16:43:05 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Mon, 8 Sep
+ 2025 16:43:07 +0000
+Received: from CO1PEPF000044F3.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c7:cafe::6b) by SJ0PR13CA0157.outlook.office365.com
+ (2603:10b6:a03:2c7::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.13 via Frontend Transport; Mon,
+ 8 Sep 2025 16:43:07 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,29 +64,29 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.118.232 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.118.232) by
- CO1PEPF000044F5.mail.protection.outlook.com (10.167.241.75) with Microsoft
+ CO1PEPF000044F3.mail.protection.outlook.com (10.167.241.73) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9115.13 via Frontend Transport; Mon, 8 Sep 2025 16:43:05 +0000
+ 15.20.9115.13 via Frontend Transport; Mon, 8 Sep 2025 16:43:07 +0000
 Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
  (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 8 Sep
- 2025 09:42:36 -0700
+ 2025 09:42:38 -0700
 Received: from drhqmail201.nvidia.com (10.126.190.180) by
  drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Mon, 8 Sep 2025 09:42:35 -0700
+ 15.2.1544.14; Mon, 8 Sep 2025 09:42:37 -0700
 Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
  (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Mon, 8 Sep 2025 09:42:35 -0700
+ Transport; Mon, 8 Sep 2025 09:42:36 -0700
 From: Daniel Jurgens <danielj@nvidia.com>
 To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
 	<alex.williamson@redhat.com>, <virtualization@lists.linux.dev>,
 	<pabeni@redhat.com>
 CC: <parav@nvidia.com>, <shshitrit@nvidia.com>, <yohadt@nvidia.com>, "Daniel
- Jurgens" <danielj@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>
-Subject: [PATCH net-next v2 02/11] virtio-pci: Expose object create and destroy API
-Date: Mon, 8 Sep 2025 11:40:37 -0500
-Message-ID: <20250908164046.25051-3-danielj@nvidia.com>
+ Jurgens" <danielj@nvidia.com>
+Subject: [PATCH net-next v2 03/11] virtio_net: Create virtio_net directory
+Date: Mon, 8 Sep 2025 11:40:38 -0500
+Message-ID: <20250908164046.25051-4-danielj@nvidia.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250908164046.25051-1-danielj@nvidia.com>
 References: <20250908164046.25051-1-danielj@nvidia.com>
@@ -101,483 +101,116 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F5:EE_|IA0PPF80FB91A80:EE_
-X-MS-Office365-Filtering-Correlation-Id: 998f8f0f-0acf-48ff-2842-08ddeef6c898
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F3:EE_|SA5PPF9BB0D8619:EE_
+X-MS-Office365-Filtering-Correlation-Id: 725e1dcc-c774-42b3-8bc4-08ddeef6c9d0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?onjdHstoAbBch0zcXX82x1aL+rpCyiWgpLPkRf4QZjA328XbsfTTlj4Ke2Xf?=
- =?us-ascii?Q?8l2q7w/yk8ZhMKEKnx9eU3cjzxf7a+BDqNDw9UNhHzGpnYSs0DP1QLTdoUsZ?=
- =?us-ascii?Q?CveRLme2Oljeac18ri6j8Y45vD9uIwODj51ilG+P2zT+o05Ih5ZUJriRgc3e?=
- =?us-ascii?Q?zDqP58tSD24BwRoWxQsFmYHCWDLYCghgHBAZDzpvY0QGkaf/lc5QaSgIr6yw?=
- =?us-ascii?Q?f35MGve/8rYoW1asg/wITST8Xv08dEDZHykK5MpH9CHpusxdYk6jXvZFF/8e?=
- =?us-ascii?Q?iBR40RsR2YUDYekJ+FkQuOa95Xm29YNGZ1rXhMl0I5K4DcWinuAhjzrCTKuc?=
- =?us-ascii?Q?fHkSOP4S5722q3pSurEBLu8wG6Krdd8a9VqVPU/JXokYMQ0h6ewHJ0wdch6M?=
- =?us-ascii?Q?0jx6zJowfCQ0WHZiAwqGgnv/6WqcIhg9cvJjnACCm2cyWPhd8dEMVU2LfYTR?=
- =?us-ascii?Q?oDmu+gW9YhCnTIR/9mEV7HOtUcupya3UJK1NdZgVxI9PQ1HeHEqGjX/9LkNw?=
- =?us-ascii?Q?KfgSm9nKZHaOUTSYUbrkNcXzvVlUZCmr10Z8Sen3lcH+q0kDgv1GftQUpK0J?=
- =?us-ascii?Q?kiG0pSJsMlpXN7a9tBdy0YBFf5dBynIrD8xQRX2lPc0aFxT0PueUWvVDa5Zp?=
- =?us-ascii?Q?5YDaOdAkz7Ps+51MQmQSwkQH1P4fx67W6rtHrdYoE+SmLRFrWCGXzw0C4K4P?=
- =?us-ascii?Q?+wc6AplrJJodD4XLv0gaOyr1cW4cjdkKT02NWinnym+dkAmoqsJNYYaR/yRv?=
- =?us-ascii?Q?Heo3el756s+U/6huZKTD7Au+MNK++/Ayq7Lq5vceU0IGU+hm92tPTikryejr?=
- =?us-ascii?Q?dzAb6h1i6E6LqeXn5GPHqyfhPUcWYWWNHEzOlYrXNx+fVgXTQtoibvofsLXQ?=
- =?us-ascii?Q?XasiZMw9Qw73SuII8HjbSSPh1iLB4Xh1xHh5mjgsncZ/DQkO+2LeebbAlfpU?=
- =?us-ascii?Q?mmNIQnO7/co16ldspqauCgdQQGBNWgQ0PZ3WnizzLbsutV2U0W3Q1EbWyir+?=
- =?us-ascii?Q?oa3hoj3OSA5Ud6t/RTvAU2sSqZ82t2Oy8eqqHKQOk0tfjLQt16tjywPktk4j?=
- =?us-ascii?Q?XUBeQct7cAmIa5EFoeKDyxEaAQkyIlPUR4WRtlKwFAQkQstbD1Oc9rBPzoFT?=
- =?us-ascii?Q?i1bopyFb7OQa4oTdNoj5XXw6rkFQOD5N7sPfJN48ueKGONV4Aidl97YFupL7?=
- =?us-ascii?Q?fVgbnrrI1t+oHGN5h7OBy8lqAAdTXZX0X0hF5Akxm7ojCFFwzudmnamnADGL?=
- =?us-ascii?Q?6VIZllS0Z3ZH04Hu++DwUHeoZsgho0GC0yyf6ZgG6aPGmeaOHUNZzjoDYZMy?=
- =?us-ascii?Q?Nehr0MihaAK1RST2gunIm+e4G8JaQaTCAfShq9ZZ2f+3e3XdWu9f1cVMrl/M?=
- =?us-ascii?Q?e95JLFYi8HXRlutRYV99Htg4Yr7Cbrk9n37Qf4s0nkZ6srZ/E7/qPaYHW7WK?=
- =?us-ascii?Q?dT+Dw9stG2UzIuZzc434tqqOQ36VDvs4UeXsIJhIQ/yoJOJAzbcCaUjX9NJN?=
- =?us-ascii?Q?MCyrsvz8bb0/bxNe+7NZ6uKeOSApifd8noVC?=
+	=?us-ascii?Q?Oajf5N3zaPIwNuAGUklRi6J6RngDksaE5rjDrW1kTuta3ie2q+QmMtRoIfAk?=
+ =?us-ascii?Q?u50CDwGsx/5U7x610xW4Rcexaw2BwJ1ddd1kOy7/Fif0IUlKNvH7aSujBpvj?=
+ =?us-ascii?Q?BWqHrGlO4LnFfroFJBMntxpMpnG0M9gqfh7jgU6EIIglcc6DgCrpaSUSK6ZZ?=
+ =?us-ascii?Q?tbxsgz8mLc1RpAzyRsScRx9f1Y1YxVTA+x3S6F7yS79RFOxBebHbIUjtWEV1?=
+ =?us-ascii?Q?TnWGX7PJz6v0roW7xBm7eI1426XUsVavbBXFWvJ7txj4TD4L9k0Jz74iNKN2?=
+ =?us-ascii?Q?nfbdH7wSq/2yFhqhIKRi2PBX9/8SuqH4kAf5ZeXG5ZJt4F6JQpeiwy2fwSne?=
+ =?us-ascii?Q?FEnC8IGUsIQm1nPec2fIArf4apZLLfG+WIs0mLaoYd79LiPJdkHKALrIETMg?=
+ =?us-ascii?Q?42YLD9a21Ob7Unnox0dPFy5ut16jYO2JnfI4ViH+HXNefeQNsoY0A+Wc1Tif?=
+ =?us-ascii?Q?5t6GODXc8jmLGGO0+X/9QfnSaAKX5OvRShVJO6wW0psWKAcTfblnJ94NwxsH?=
+ =?us-ascii?Q?zWF/aJCeC6cdWU1PXlJpygy81ZLOsnUlTMMVHeJ2eZx7JZ2kC8zEGrgGvtHl?=
+ =?us-ascii?Q?OLbQbQJUgv4HGc9GPWwCgpM+gO59AqlwYjEmsF4R+KgwHUXvkZwA82jsRL5S?=
+ =?us-ascii?Q?6+JXfpXvE9n4Pa4UVEPiclPincx6DY8v5mYoHU8yrf9N2fQdURrzf0emMx9p?=
+ =?us-ascii?Q?3bU73vxZiaJbZB6yHM+br6oC3NhtqY3UlD5QVC7MbD3ZUE7aqqyL1kIiSSmB?=
+ =?us-ascii?Q?3PasPIjaftqr6W1DuP8iGFXzRoNMPV/at9Y5F/vtOJvz81Jbz09cN8PckopZ?=
+ =?us-ascii?Q?2L2NTgK/lyAkL+eU3EB9rUWn1rj8h5Xt/wyMODBFCJnJbxqYICCJ7LShmt17?=
+ =?us-ascii?Q?w0svO6oKTMvLvSb+2Wfh72Mc5kMyfmIbHcsrVyI34kOZYxVrd9tpS5ZJZKCh?=
+ =?us-ascii?Q?QdrxuPvZxZEKrc2YdIms1oQFuBVHLzEyyYsaWVMij67sSNONmkISb0oX/B9m?=
+ =?us-ascii?Q?h8K8bo14kCfaeteZpob6c8VO4UUUb6Hc/wbbTox7TUjSFlMUL9Qldvsj4yct?=
+ =?us-ascii?Q?S0pRF44bZ4kPMR1Bu8OMHIa43nG/uLPrvrR6YiXoZL0hRMp06s0v7A56p90S?=
+ =?us-ascii?Q?ttICJRktBEf3mUUUyIEaHVXkR1Iuvd0ToT7Lsx0i6t4+sUgEWZERTDGtqIKZ?=
+ =?us-ascii?Q?k7EbbJDwdW7481kXiTIWhTzgUvAiX+1HzQwwjGQqgEon031d06hu6FqOh2bi?=
+ =?us-ascii?Q?tSgqCwZahzEV0HTyPP/BIpqG4WqMgJ00jEyq+DZA3F/+7CD1ynUXUUddZ6w0?=
+ =?us-ascii?Q?K+v6o0qWhdIrbpaKrTbauB1QY2bHcUjJiIxBqycGWMjpOsGwBBI6DxyqpYKA?=
+ =?us-ascii?Q?zYmyvP2sS0UmDEDuiXiaTVouFpOuh1TxB/xqtrSWrZf7YFFLCjXlweXrC9Zw?=
+ =?us-ascii?Q?rvqJ/Np9LBWXKe895C1jzjFnPiIi6nCZvmvdOe4v9/Po8zVTseUBjqOZUmdJ?=
+ =?us-ascii?Q?Zb7WpTPBKf8+v7SGR5kM0G2piMe84F0ef7nk?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 16:43:05.0359
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 16:43:07.0799
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 998f8f0f-0acf-48ff-2842-08ddeef6c898
+X-MS-Exchange-CrossTenant-Network-Message-Id: 725e1dcc-c774-42b3-8bc4-08ddeef6c9d0
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F5.namprd05.prod.outlook.com
+	CO1PEPF000044F3.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPF80FB91A80
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF9BB0D8619
 
-Object create and destroy were implemented specifically for dev parts
-device objects. Create general purpose APIs for use by upper layer
-drivers.
+The flow filter implementaion requires minimal changes to the
+existing virtio_net implementation. It's cleaner to separate it into
+another file. In order to do so, move virtio_net.c into the new
+virtio_net directory, and create a makefile for it. Note the name is
+changed to virtio_net_main.c, so the module can retain the name
+virtio_net.
 
 Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
 Reviewed-by: Parav Pandit <parav@nvidia.com>
 Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
-Reviewed-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/virtio/migrate.c  |   8 +-
- drivers/virtio/virtio.c            |  59 ++++++++++
- drivers/virtio/virtio_pci_modern.c | 175 +++++++++++++++++------------
- include/linux/virtio.h             |   8 ++
- include/linux/virtio_admin.h       |  32 ++++++
- include/linux/virtio_pci_admin.h   |   7 +-
- 6 files changed, 212 insertions(+), 77 deletions(-)
+ MAINTAINERS                                               | 2 +-
+ drivers/net/Makefile                                      | 2 +-
+ drivers/net/virtio_net/Makefile                           | 8 ++++++++
+ .../net/{virtio_net.c => virtio_net/virtio_net_main.c}    | 0
+ 4 files changed, 10 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/virtio_net/Makefile
+ rename drivers/net/{virtio_net.c => virtio_net/virtio_net_main.c} (100%)
 
-diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
-index ba92bb4e9af9..a2aa0e32f593 100644
---- a/drivers/vfio/pci/virtio/migrate.c
-+++ b/drivers/vfio/pci/virtio/migrate.c
-@@ -152,15 +152,15 @@ static int
- virtiovf_pci_alloc_obj_id(struct virtiovf_pci_core_device *virtvdev, u8 type,
- 			  u32 *obj_id)
- {
--	return virtio_pci_admin_obj_create(virtvdev->core_device.pdev,
--					   VIRTIO_RESOURCE_OBJ_DEV_PARTS, type, obj_id);
-+	return virtio_pci_admin_dev_parts_obj_create(virtvdev->core_device.pdev,
-+						     type, obj_id);
- }
- 
- static void
- virtiovf_pci_free_obj_id(struct virtiovf_pci_core_device *virtvdev, u32 obj_id)
- {
--	virtio_pci_admin_obj_destroy(virtvdev->core_device.pdev,
--			VIRTIO_RESOURCE_OBJ_DEV_PARTS, obj_id);
-+	virtio_pci_admin_dev_parts_obj_destroy(virtvdev->core_device.pdev,
-+					       obj_id);
- }
- 
- static struct virtiovf_data_buffer *
-diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-index 6bc268c11100..62233ab4501b 100644
---- a/drivers/virtio/virtio.c
-+++ b/drivers/virtio/virtio.c
-@@ -788,6 +788,65 @@ int virtio_device_cap_set(struct virtio_device *vdev,
- }
- EXPORT_SYMBOL_GPL(virtio_device_cap_set);
- 
-+/**
-+ * virtio_device_object_create - Create an object on a virtio device
-+ * @vdev: the virtio device
-+ * @obj_type: type of object to create
-+ * @obj_id: ID for the new object
-+ * @obj_specific_data: object-specific data for creation
-+ * @obj_specific_data_size: size of the object-specific data in bytes
-+ *
-+ * Creates a new object on the virtio device with the specified type and ID.
-+ * The object may require object-specific data for proper initialization.
-+ *
-+ * Return: 0 on success, -EOPNOTSUPP if the device doesn't support admin
-+ * operations or object creation, or a negative error code on other failures.
-+ */
-+int virtio_device_object_create(struct virtio_device *vdev,
-+				u16 obj_type,
-+				u32 obj_id,
-+				const void *obj_specific_data,
-+				size_t obj_specific_data_size)
-+{
-+	const struct virtio_admin_ops *admin = vdev->admin_ops;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bce96dd254b8..588252363a77 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -26625,7 +26625,7 @@ F:	Documentation/devicetree/bindings/virtio/
+ F:	Documentation/driver-api/virtio/
+ F:	drivers/block/virtio_blk.c
+ F:	drivers/crypto/virtio/
+-F:	drivers/net/virtio_net.c
++F:	drivers/net/virtio_net/
+ F:	drivers/vdpa/
+ F:	drivers/virtio/
+ F:	include/linux/vdpa.h
+diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+index 73bc63ecd65f..cf28992658a6 100644
+--- a/drivers/net/Makefile
++++ b/drivers/net/Makefile
+@@ -33,7 +33,7 @@ obj-$(CONFIG_NET_TEAM) += team/
+ obj-$(CONFIG_TUN) += tun.o
+ obj-$(CONFIG_TAP) += tap.o
+ obj-$(CONFIG_VETH) += veth.o
+-obj-$(CONFIG_VIRTIO_NET) += virtio_net.o
++obj-$(CONFIG_VIRTIO_NET) += virtio_net/
+ obj-$(CONFIG_VXLAN) += vxlan/
+ obj-$(CONFIG_GENEVE) += geneve.o
+ obj-$(CONFIG_BAREUDP) += bareudp.o
+diff --git a/drivers/net/virtio_net/Makefile b/drivers/net/virtio_net/Makefile
+new file mode 100644
+index 000000000000..c0a4725ddd69
+--- /dev/null
++++ b/drivers/net/virtio_net/Makefile
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Makefile for the VirtIO Net driver
++#
 +
-+	if (!admin || !admin->object_create)
-+		return -EOPNOTSUPP;
++obj-$(CONFIG_VIRTIO_NET) += virtio_net.o
 +
-+	/* All users of this interface use the self group with member id 0 */
-+	return admin->object_create(vdev, obj_type, obj_id,
-+				    VIRTIO_ADMIN_GROUP_TYPE_SELF, 0,
-+				    obj_specific_data, obj_specific_data_size);
-+}
-+EXPORT_SYMBOL_GPL(virtio_device_object_create);
-+
-+/**
-+ * virtio_device_object_destroy - Destroy an object on a virtio device
-+ * @vdev: the virtio device
-+ * @obj_type: type of object to destroy
-+ * @obj_id: ID of the object to destroy
-+ *
-+ * Destroys a existing object on the virtio device with the specified type
-+ * and ID.
-+ *
-+ * Return: 0 on success, -EOPNOTSUPP if the device doesn't support admin
-+ * operations or object destruction, or a negative error code on other failures.
-+ */
-+int virtio_device_object_destroy(struct virtio_device *vdev,
-+				 u16 obj_type,
-+				 u32 obj_id)
-+{
-+	const struct virtio_admin_ops *admin = vdev->admin_ops;
-+
-+	if (!admin || !admin->object_destroy)
-+		return -EOPNOTSUPP;
-+
-+	/* All users of this interface use the self group with member id 0 */
-+	return admin->object_destroy(vdev, obj_type, obj_id,
-+				     VIRTIO_ADMIN_GROUP_TYPE_SELF, 0);
-+}
-+EXPORT_SYMBOL_GPL(virtio_device_object_destroy);
-+
- static int virtio_init(void)
- {
- 	BUILD_BUG_ON(offsetof(struct virtio_device, features) !=
-diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-index c8bbd807371d..ef787a6334c8 100644
---- a/drivers/virtio/virtio_pci_modern.c
-+++ b/drivers/virtio/virtio_pci_modern.c
-@@ -967,28 +967,61 @@ int virtio_pci_admin_mode_set(struct pci_dev *pdev, u8 flags)
- }
- EXPORT_SYMBOL_GPL(virtio_pci_admin_mode_set);
- 
--/*
-- * virtio_pci_admin_obj_create - Creates an object for a given type and operation,
-- * following the max objects that can be created for that request.
-- * @pdev: VF pci_dev
-- * @obj_type: Object type
-- * @operation_type: Operation type
-- * @obj_id: Output unique object id
-+static int vp_modern_admin_cmd_obj_create(struct virtio_device *virtio_dev,
-+					  u16 obj_type,
-+					  u32 obj_id,
-+					  u16 group_type,
-+					  u64 group_member_id,
-+					  const void *obj_specific_data,
-+					  size_t obj_specific_data_size)
-+{
-+	size_t data_size = sizeof(struct virtio_admin_cmd_resource_obj_create_data);
-+	struct virtio_admin_cmd_resource_obj_create_data *obj_create_data;
-+	struct virtio_admin_cmd cmd = {};
-+	void *data __free(kfree) = NULL;
-+	struct scatterlist data_sg;
-+
-+	data_size += (obj_specific_data_size);
-+	data = kzalloc(data_size, GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	obj_create_data = data;
-+	obj_create_data->hdr.type = cpu_to_le16(obj_type);
-+	obj_create_data->hdr.id = cpu_to_le32(obj_id);
-+	memcpy(obj_create_data->resource_obj_specific_data, obj_specific_data,
-+	       obj_specific_data_size);
-+	sg_init_one(&data_sg, data, data_size);
-+
-+	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_RESOURCE_OBJ_CREATE);
-+	cmd.group_type = cpu_to_le16(group_type);
-+	cmd.group_member_id = cpu_to_le64(group_member_id);
-+	cmd.data_sg = &data_sg;
-+
-+	return vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-+}
-+
-+/**
-+ * virtio_pci_admin_dev_parts_obj_create - Create a device parts object
-+ * @pdev: VF PCI device
-+ * @operation_type: operation type (GET or SET)
-+ * @obj_id: pointer to store the output unique object ID
-  *
-- * Note: caller must serialize access for the given device.
-- * Returns 0 on success, or negative on failure.
-+ * This function creates a device parts object for the specified VF PCI device.
-+ * The object is associated with the SRIOV group and can be used for GET or SET
-+ * operations. The caller must serialize access for the given device.
-+ *
-+ * Return: 0 on success, -ENODEV if the virtio device is not found,
-+ * -EINVAL if the operation type is invalid, -EOPNOTSUPP if device parts
-+ * objects are not supported, or a negative error code on other failures.
-  */
--int virtio_pci_admin_obj_create(struct pci_dev *pdev, u16 obj_type, u8 operation_type,
--				u32 *obj_id)
-+int virtio_pci_admin_dev_parts_obj_create(struct pci_dev *pdev,
-+					  u8 operation_type,
-+					  u32 *obj_id)
- {
- 	struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
--	u16 data_size = sizeof(struct virtio_admin_cmd_resource_obj_create_data);
--	struct virtio_admin_cmd_resource_obj_create_data *obj_create_data;
- 	struct virtio_resource_obj_dev_parts obj_dev_parts = {};
- 	struct virtio_pci_admin_vq *avq;
--	struct virtio_admin_cmd cmd = {};
--	struct scatterlist data_sg;
--	void *data;
- 	int id = -1;
- 	int vf_id;
- 	int ret;
-@@ -1000,9 +1033,6 @@ int virtio_pci_admin_obj_create(struct pci_dev *pdev, u16 obj_type, u8 operation
- 	if (vf_id < 0)
- 		return vf_id;
- 
--	if (obj_type != VIRTIO_RESOURCE_OBJ_DEV_PARTS)
--		return -EOPNOTSUPP;
--
- 	if (operation_type != VIRTIO_RESOURCE_OBJ_DEV_PARTS_TYPE_GET &&
- 	    operation_type != VIRTIO_RESOURCE_OBJ_DEV_PARTS_TYPE_SET)
- 		return -EINVAL;
-@@ -1016,52 +1046,66 @@ int virtio_pci_admin_obj_create(struct pci_dev *pdev, u16 obj_type, u8 operation
- 	if (id < 0)
- 		return id;
- 
--	*obj_id = id;
--	data_size += sizeof(obj_dev_parts);
--	data = kzalloc(data_size, GFP_KERNEL);
--	if (!data) {
--		ret = -ENOMEM;
--		goto end;
--	}
--
--	obj_create_data = data;
--	obj_create_data->hdr.type = cpu_to_le16(obj_type);
--	obj_create_data->hdr.id = cpu_to_le32(*obj_id);
- 	obj_dev_parts.type = operation_type;
--	memcpy(obj_create_data->resource_obj_specific_data, &obj_dev_parts,
--	       sizeof(obj_dev_parts));
--	sg_init_one(&data_sg, data, data_size);
--	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_RESOURCE_OBJ_CREATE);
--	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
--	cmd.group_member_id = cpu_to_le64(vf_id + 1);
--	cmd.data_sg = &data_sg;
--	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-+	ret = vp_modern_admin_cmd_obj_create(virtio_dev,
-+					     VIRTIO_RESOURCE_OBJ_DEV_PARTS,
-+					     id,
-+					     VIRTIO_ADMIN_GROUP_TYPE_SRIOV,
-+					     vf_id + 1,
-+					     &obj_dev_parts,
-+					     sizeof(obj_dev_parts));
- 
--	kfree(data);
--end:
- 	if (ret)
- 		ida_free(&avq->dev_parts_ida, id);
-+	else
-+		*obj_id = id;
- 
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(virtio_pci_admin_obj_create);
-+EXPORT_SYMBOL_GPL(virtio_pci_admin_dev_parts_obj_create);
- 
--/*
-- * virtio_pci_admin_obj_destroy - Destroys an object of a given type and id
-- * @pdev: VF pci_dev
-- * @obj_type: Object type
-- * @id: Object id
-+static int vp_modern_admin_cmd_obj_destroy(struct virtio_device *virtio_dev,
-+					   u16 obj_type,
-+					   u32 obj_id,
-+					   u16 group_type,
-+					   u64 group_member_id)
-+{
-+	struct virtio_admin_cmd_resource_obj_cmd_hdr *data __free(kfree) = NULL;
-+	struct virtio_admin_cmd cmd = {};
-+	struct scatterlist data_sg;
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	data->type = cpu_to_le16(obj_type);
-+	data->id = cpu_to_le32(obj_id);
-+	sg_init_one(&data_sg, data, sizeof(*data));
-+	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_RESOURCE_OBJ_DESTROY);
-+	cmd.group_type = cpu_to_le16(group_type);
-+	cmd.group_member_id = cpu_to_le64(group_member_id);
-+	cmd.data_sg = &data_sg;
-+
-+	return vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-+}
-+
-+/**
-+ * virtio_pci_admin_dev_parts_obj_destroy - Destroy a device parts object
-+ * @pdev: VF PCI device
-+ * @obj_id: ID of the object to destroy
-  *
-- * Note: caller must serialize access for the given device.
-- * Returns 0 on success, or negative on failure.
-+ * This function destroys a device parts object with the specified ID for the
-+ * given VF PCI device. The object must have been previously created using
-+ * virtio_pci_admin_dev_parts_obj_create(). The caller must serialize access
-+ * for the given device.
-+ *
-+ * Return: 0 on success, -ENODEV if the virtio device is not found,
-+ * or a negative error code on other failures.
-  */
--int virtio_pci_admin_obj_destroy(struct pci_dev *pdev, u16 obj_type, u32 id)
-+int virtio_pci_admin_dev_parts_obj_destroy(struct pci_dev *pdev, u32 obj_id)
- {
- 	struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
--	struct virtio_admin_cmd_resource_obj_cmd_hdr *data;
- 	struct virtio_pci_device *vp_dev;
--	struct virtio_admin_cmd cmd = {};
--	struct scatterlist data_sg;
- 	int vf_id;
- 	int ret;
- 
-@@ -1072,30 +1116,19 @@ int virtio_pci_admin_obj_destroy(struct pci_dev *pdev, u16 obj_type, u32 id)
- 	if (vf_id < 0)
- 		return vf_id;
- 
--	if (obj_type != VIRTIO_RESOURCE_OBJ_DEV_PARTS)
--		return -EINVAL;
--
--	data = kzalloc(sizeof(*data), GFP_KERNEL);
--	if (!data)
--		return -ENOMEM;
--
--	data->type = cpu_to_le16(obj_type);
--	data->id = cpu_to_le32(id);
--	sg_init_one(&data_sg, data, sizeof(*data));
--	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_RESOURCE_OBJ_DESTROY);
--	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
--	cmd.group_member_id = cpu_to_le64(vf_id + 1);
--	cmd.data_sg = &data_sg;
--	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-+	ret = vp_modern_admin_cmd_obj_destroy(virtio_dev,
-+					      VIRTIO_RESOURCE_OBJ_DEV_PARTS,
-+					      obj_id,
-+					      VIRTIO_ADMIN_GROUP_TYPE_SRIOV,
-+					      vf_id + 1);
- 	if (!ret) {
- 		vp_dev = to_vp_device(virtio_dev);
--		ida_free(&vp_dev->admin_vq.dev_parts_ida, id);
-+		ida_free(&vp_dev->admin_vq.dev_parts_ida, obj_id);
- 	}
- 
--	kfree(data);
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(virtio_pci_admin_obj_destroy);
-+EXPORT_SYMBOL_GPL(virtio_pci_admin_dev_parts_obj_destroy);
- 
- /*
-  * virtio_pci_admin_dev_parts_metadata_get - Gets the metadata of the device parts
-@@ -1289,6 +1322,8 @@ static const struct virtio_admin_ops virtio_pci_admin_ops = {
- 	.cap_id_list_query = vp_modern_admin_cap_id_list_query,
- 	.cap_get = vp_modern_admin_cmd_cap_get,
- 	.cap_set = vp_modern_admin_cmd_cap_set,
-+	.object_create = vp_modern_admin_cmd_obj_create,
-+	.object_destroy = vp_modern_admin_cmd_obj_destroy,
- };
- /* the PCI probing function */
- int virtio_pci_modern_probe(struct virtio_pci_device *vp_dev)
-diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index a6e121b6f1f1..651884e3c8c4 100644
---- a/include/linux/virtio.h
-+++ b/include/linux/virtio.h
-@@ -208,6 +208,14 @@ int virtio_device_cap_set(struct virtio_device *vdev,
- 			  u16 id,
- 			  const void *caps,
- 			  size_t cap_size);
-+int virtio_device_object_create(struct virtio_device *virtio_dev,
-+				u16 obj_type,
-+				u32 obj_id,
-+				const void *obj_specific_data,
-+				size_t obj_specific_data_size);
-+int virtio_device_object_destroy(struct virtio_device *virtio_dev,
-+				 u16 obj_type,
-+				 u32 obj_id);
- 
- size_t virtio_max_dma_size(const struct virtio_device *vdev);
- 
-diff --git a/include/linux/virtio_admin.h b/include/linux/virtio_admin.h
-index bbf543d20be4..cc6b82461c9f 100644
---- a/include/linux/virtio_admin.h
-+++ b/include/linux/virtio_admin.h
-@@ -63,6 +63,38 @@ struct virtio_admin_ops {
- 		       u16 id,
- 		       const void *caps,
- 		       size_t cap_size);
-+	/**
-+	 * @object_create: Create a new object of specified type
-+	 * @virtio_dev: The virtio device
-+	 * @obj_type: Type of object to create
-+	 * @obj_id: ID to assign to the created object
-+	 * @group_type: Type of group the object belongs to
-+	 * @group_member_id: Member ID within the group
-+	 * @obj_specific_data: Object-specific data (must be heap allocated)
-+	 * @obj_specific_data_size: Size of the object-specific data
-+	 * Returns: 0 on success, negative error code on failure
-+	 */
-+	int (*object_create)(struct virtio_device *virtio_dev,
-+			     u16 obj_type,
-+			     u32 obj_id,
-+			     u16 group_type,
-+			     u64 group_member_id,
-+			     const void *obj_specific_data,
-+			     size_t obj_specific_data_size);
-+	/**
-+	 * @object_destroy: Destroy an existing object
-+	 * @virtio_dev: The virtio device
-+	 * @obj_type: Type of object to destroy
-+	 * @obj_id: ID of the object to destroy
-+	 * @group_type: Type of group the object belongs to
-+	 * @group_member_id: Member ID within the group
-+	 * Returns: 0 on success, negative error code on failure
-+	 */
-+	int (*object_destroy)(struct virtio_device *virtio_dev,
-+			      u16 obj_type,
-+			      u32 obj_id,
-+			      u16 group_type,
-+			      u64 group_member_id);
- };
- 
- #endif /* _LINUX_VIRTIO_ADMIN_H */
-diff --git a/include/linux/virtio_pci_admin.h b/include/linux/virtio_pci_admin.h
-index dffc92c17ad2..da9b8495bce4 100644
---- a/include/linux/virtio_pci_admin.h
-+++ b/include/linux/virtio_pci_admin.h
-@@ -22,9 +22,10 @@ int virtio_pci_admin_legacy_io_notify_info(struct pci_dev *pdev,
- 
- bool virtio_pci_admin_has_dev_parts(struct pci_dev *pdev);
- int virtio_pci_admin_mode_set(struct pci_dev *pdev, u8 mode);
--int virtio_pci_admin_obj_create(struct pci_dev *pdev, u16 obj_type, u8 operation_type,
--				u32 *obj_id);
--int virtio_pci_admin_obj_destroy(struct pci_dev *pdev, u16 obj_type, u32 id);
-+int virtio_pci_admin_dev_parts_obj_create(struct pci_dev *pdev,
-+					  u8 operation_type,
-+					  u32 *obj_id);
-+int virtio_pci_admin_dev_parts_obj_destroy(struct pci_dev *pdev, u32 obj_id);
- int virtio_pci_admin_dev_parts_metadata_get(struct pci_dev *pdev, u16 obj_type,
- 					    u32 id, u8 metadata_type, u32 *out);
- int virtio_pci_admin_dev_parts_get(struct pci_dev *pdev, u16 obj_type, u32 id,
++virtio_net-objs := virtio_net_main.o
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net/virtio_net_main.c
+similarity index 100%
+rename from drivers/net/virtio_net.c
+rename to drivers/net/virtio_net/virtio_net_main.c
 -- 
 2.50.1
 
