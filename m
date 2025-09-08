@@ -1,79 +1,129 @@
-Return-Path: <netdev+bounces-220841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D833EB4908A
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:58:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A99B4908C
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:59:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99C373A6C36
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:58:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C42340A7F
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA4E309DC5;
-	Mon,  8 Sep 2025 13:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D270230AD14;
+	Mon,  8 Sep 2025 13:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o8+m8Lzx"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="jN8EQCOC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Eeag1BON"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22BC219A89;
-	Mon,  8 Sep 2025 13:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1A7219A89
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 13:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757339921; cv=none; b=njFOZuT2DgRv3ccMF5FNvciWMSzi9P3aw1pJEPjxRn2jbBHq/1sQPkEbUpTmllDaBfw4Dv2p7Kv2uggXpJvaVSdyqQIKqhr6iFR6QGtblq0pYZCTlfV5kPLpaWHJzk+Op7J/3roBv/75HKM/ZXq6TZ+ywWzvAc72lmAHJlbq00k=
+	t=1757339929; cv=none; b=Ng4ALhIOrYv/JGJbq4YRKk09l8J4cxfRcmkcjRPPge7VTRFjq9QxIlhYJzU7vF+GtcfuVQ2OHMvzlZxYXSToKaHlduNIsxE41fRVhk9LFySwt6xbLauNPlHHvb3i8KhSVHAcYsgNtwbBsciqXfGXpge+RNtpuq+mH7l+yYfyiyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757339921; c=relaxed/simple;
-	bh=ayrxFJGRNtBAz45zHsQEUaRKtCll3K3MyfPLaUqjqM8=;
+	s=arc-20240116; t=1757339929; c=relaxed/simple;
+	bh=7T/5Vm2GSLmxS4MfbLT/PrCMRegiAQQR0DbkEMSFG8Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lEwfoaGExv5yCMzUB3vwhJnEhHWZJtz0pBcPTIo39Rg8rGKTQmbnsN7ScTpkHEJabQppIHGUXddbP9uTt0EWhpKseDPH5yUXhvH+cR4/0/FdNarB6oDsIrUtb6CIgDh9uMF9wQ3FBuSv/hf65X05BNIpCGxAWJdB6LRd5oDKffo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o8+m8Lzx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DkoRofTTaJEjiIcOQy7Byjln2nVcU088ET/Oi7Elhy8=; b=o8+m8LzxB84EaByAKWpWJ6ozr8
-	aIegqjL31YTaZHmNteAMEOjr3rFBIrlFNKs4tkoZe1lGWb4Rugrih4h4wCH0uoFbIDdvjkGqouyKo
-	aAjPMe7owJ7D4rtod19xjtqRkKMs0w78+G6naHEVLxCFrb2+hOBHEOpqm/4GB2NfRE5g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uvcO6-007g9S-Bh; Mon, 08 Sep 2025 15:58:30 +0200
-Date: Mon, 8 Sep 2025 15:58:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ic+vMw6rUPHxG+aTDIMqYf258WVHxEdsSBCFHhnxd7Qk0KBWg8Y472GoybGmf2/Vf0C48HF1TQuPhhmlpPKdPdENG0cYbQU18IA+fFOl3uTv7o12zYxHzR5DVoQlLNWATZNekKLch5q7781RBxVMsYcd6kVhIvOE1gy/Rfpmc2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=jN8EQCOC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Eeag1BON; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfout.stl.internal (Postfix) with ESMTP id 30B671D00038;
+	Mon,  8 Sep 2025 09:58:47 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Mon, 08 Sep 2025 09:58:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1757339927; x=
+	1757426327; bh=X1pGXCkc1si8BrIRakIKtaX8JymneSQdxBB8E7bIdcg=; b=j
+	N8EQCOCUC8505D7CGJyXFVJlkpFDcQy0YoXIZa4y9/MGH/XEhp5e7JwXpN+VZYkn
+	zJ9qFkERIlE5EERmhIgEnbEyHyUG/sVG4h73NzdgRWMzvaWZI1b6vPlFdnyUL8zP
+	XgyRyhpu8zQmMkPzXCjyuUY++hT76eW4Wfi/jTbcmtAA3YIrFGQluTYbyOnBDKRr
+	lCY3EEupJLnezp6gqzhqDCTqyJHasXKZkP1MOLqdaMX2lVgQvFx5wJ5J1aNMWtQB
+	YmtnxGnl33No8ysaoGKuQPEtX6fLCx32i25tfMSJ95LH+7RD0zqAIHrM1jsYUe5i
+	MiABUN4big0QupcFovLYQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757339927; x=1757426327; bh=X1pGXCkc1si8BrIRakIKtaX8JymneSQdxBB
+	8E7bIdcg=; b=Eeag1BONRPPs5fiiBfxF8kFmfTDOYugbHnhTav8j6kzuJ+KmC6H
+	BMyh2BbQavF3CaREr8+Gi/gWYxMxg0sY5DK/+tFHLOdpmiQL6FX1/mjhHWRsK7sV
+	Y0xjIA/MPLNDNTgo5eU5IvD7/T+FMDkp8VdmyxOjYei3OM8vwo1M233ISSjslK01
+	CVISBOUKCl4ywek0zDSRRXT9ZEJAVazJeE/og9UcR56mDgHspwgzPVgg/x9lkiIP
+	fq54AWJTCul8Z67d+YZnIgI6+nxdjJJEaP3PqxQlPHjCLFB5brgbJq8yDHuldVac
+	N1tH554a7NV2AkwddM3lc8IdEVC8AVE9N/g==
+X-ME-Sender: <xms:FuG-aPFbCFxe_gasyCsRFBCkV-XosXJcGfudu3NkTci01-9vnLJmUw>
+    <xme:FuG-aMBt0PvguKneGgFZiy8Xf9L7kU7n3NAduFyYoLsbqvDFyGmk_V5gLTDNLwXb7
+    jLKE01UTCw3nuOE3ZY>
+X-ME-Received: <xmr:FuG-aMzA0YkHRVpsQBh5yk7avoGczmSpaC_OJQvcw11I3e27JzUZPQyDDBpk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeejudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddupdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
+    hmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthho
+    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhh
+    grthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjrghmihgvrd
+    gsrghinhgsrhhiughgvgesghhmrghilhdrtghomhdprhgtphhtthhopehrrgifrghlrdgr
+    sghhihhshhgvkhelvdesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvh
+    hgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:FuG-aI6i5Lwyo84JRdNpoL7cWFt7MmMUAgAv8bZWEZHxooQcHss3Wg>
+    <xmx:FuG-aFydMc3iEROrNWuBQ33VxB7KZdCoz7iYtuwTy3lzPQTszWFq8Q>
+    <xmx:FuG-aEfDG5rWySG5-DVBUhIQu5QEblCkjQKqF4WCxE2q7Fyav46dOw>
+    <xmx:FuG-aCBa6eNjl6B89-a9i98zarILYrPo_uczAu0pY_eIK6ceqjmLPw>
+    <xmx:F-G-aP82ARTIEqYGgQsUYD9XKS6rfHT__atfTwcX5ujpJ_mzQfTsiLfu>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Sep 2025 09:58:46 -0400 (EDT)
+Date: Mon, 8 Sep 2025 15:58:45 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: aquantia: delete
- aqr_firmware_read_fingerprint() prototype
-Message-ID: <d793f0ec-d4f6-4375-8329-40c5dea124fc@lunn.ch>
-References: <20250908134313.315406-1-vladimir.oltean@nxp.com>
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Jamie Bainbridge <jamie.bainbridge@gmail.com>,
+	Abhishek Rawal <rawal.abhishek92@gmail.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH v2 net-next 7/9] tls: snmp: do not use SNMP_MIB_SENTINEL
+ anymore
+Message-ID: <aL7hFRpBXmIS2-8k@krikkit>
+References: <20250905165813.1470708-1-edumazet@google.com>
+ <20250905165813.1470708-8-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250908134313.315406-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20250905165813.1470708-8-edumazet@google.com>
 
-On Mon, Sep 08, 2025 at 04:43:13PM +0300, Vladimir Oltean wrote:
-> This is a development artifact of commit a76f26f7a81e ("net: phy:
-> aquantia: support phy-mode = "10g-qxgmii" on NXP SPF-30841 (AQR412C)").
-> This function name isn't used. Instead we have aqr_build_fingerprint()
-> in aquantia_main.c.
+2025-09-05, 16:58:11 +0000, Eric Dumazet wrote:
+> Use ARRAY_SIZE(), so that we know the limit at compile time.
 > 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Cc: Sabrina Dubroca <sd@queasysnail.net>
+> ---
+>  net/tls/tls_proc.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-    Andrew
+-- 
+Sabrina
 
