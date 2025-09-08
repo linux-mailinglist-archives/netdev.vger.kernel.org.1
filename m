@@ -1,288 +1,290 @@
-Return-Path: <netdev+bounces-220904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07BA7B496D6
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:19:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4082B496E4
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:24:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EABB018873EB
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:20:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40270164B46
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4093115B5;
-	Mon,  8 Sep 2025 17:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9656D3101D9;
+	Mon,  8 Sep 2025 17:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C2vV+QMV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15021CEADB
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 17:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15B41E1DE7;
+	Mon,  8 Sep 2025 17:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757351975; cv=none; b=eFsXuoYhMMsH3t//IJRJDxv+h4sI58Z/P+lv5UV5yS3LR3ikMoPssNA0PAEYllOL2qYwmpA4xoKJYwnMyjnk9cpUH95FjasgJjz1tDdt+n8WBUuN8hxeqPQgqHVvnzD/exqyCN1WxF+BEENBV7ss4fIxxuHVYMq/TcK7zHdx9Eo=
+	t=1757352242; cv=none; b=dwqTRsWf0M6zh9+twdlmh8zon3Vgk7sJAUp4feyCG3qUdBD4cT4xoEB4azEz0FWVvU2ppI2iAqacXpiIJT50e+fj1jZ3MBs6VdjwDanUVf2IpeZkeEoDeZP4SEyzODAJLrlKvW1B7B4opBNi2gIv0uSWWaYpwuu1l70WMcbt7q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757351975; c=relaxed/simple;
-	bh=xgPpdpRS5YeqJM2vSt6bfnP09qMLw1kkYAKZN+6WBeo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WYKjy/7gSZhG4Vab6dJhsY5dwtsyjjN1lQZupCLRrdFFQHDvI9crEHK5Oix31V5dfn2zZfOmsUKXEGOD5yGJoqJHcHp17mCKqD0QOFKUTcU+lpF+oCAzrQrRypyXPadll6wjhpnTj+UVC0hqHbjRi5SK7E61Q0aUzxnN78BrEZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3f761116867so122153655ab.3
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 10:19:33 -0700 (PDT)
+	s=arc-20240116; t=1757352242; c=relaxed/simple;
+	bh=qneFfOqnL/55hc/APD1To1k5e3b7xuMXLn1DjS+W9Cc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UT9gIoModkffWt8I4IckHFRuKPVbvL5KmcqrqEKsbPDcSMbaKQtJat3YYfE0/NQfXwuiRI6xinLCnlcfqEjpC7qS+HO61hAmRqTFD/1NytbrNcn29R7u75tDDuqfWLFSokEiICbmMG1ZxTs20OhrA1gJjy7XTagkWeQaH8Va//A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C2vV+QMV; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-71d6059f490so40334467b3.3;
+        Mon, 08 Sep 2025 10:24:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757352240; x=1757957040; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yuKkpzYEiCvO71Ei8abl0SPWjd7LNSODsnz5Kg8MlhA=;
+        b=C2vV+QMVJFDfR8jehzlTm5HJbwVXpDKegkYWvu9e1mKM7Q/VKBMONgRrYUD4vze+je
+         w3S/scGhQcI8TDxSt37Mq8rK2epOK8JNh30Se0eixan5bXfwKmCczcRvTJBZ1lpSL6fJ
+         rNXDgX2jjD3u2j95EbOEIJGBqi5HhC6vA9GswNZwsG4Y1AOVjJXldjC4/E+jftOciRZv
+         Z4dV3SvORoqVE/Y6VrPmS1UxDUEhQk9WC+uOOk339p5NdwHYG3G09Jkswwck0TJmYlRW
+         jSO3rV9a7AlecJRSCm3n4ZHPcfD43ZNQuwLXzV4R6qCr3VWyvXEJWZfBeKP8IcJwswCt
+         fIuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757351973; x=1757956773;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3Leg9cAeI1Aa4vz9zGTp/K9ybu4DKv+4gSxkOFVAjtQ=;
-        b=f2lredb1u9AifJFwfKzLpvhjXZgxbk+6wgzno3/kmb4vUWTBV1FbNqHryf6BoNbHcy
-         qSFsYn4FT/YdzwfL0pOWrJh3ym01v7/jF0V85o2bcVu6076Mq7rssD1+oLa29FfrA/cH
-         l8PzO1Xmef1HcDVWPNZS5ctHaoN9K+VUSKmmNIIqVKcCpVI7UMorAJUwOZvgcXaMJOf/
-         1iiFki8133CVR46rhepMlmzmC30Dea2M6c46gkCp0W2v7gRXhg7lAkVy+tUw8GLVUyxR
-         +x06VQjAHtkEvUm/PNRgDg15GCBMKvvfIg6n7iQQcJja9Y8zwd1KgGGLUaiUuilRnIUj
-         A31w==
-X-Forwarded-Encrypted: i=1; AJvYcCWoWXkwUvr1FDtji7yxplkXiX3gXQgEN5aPWw8DpIDbl4LyMKK1ToWxyg6g0rh+APYPPfzuH1w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxF2ms1d2FIAJ4vQf5VQBmqE56xq3ZV95quzVri/ke9imx1l8Wf
-	55c+9p2w+h+nIf/+JhprE1e6YtWB5b/Zk5xlRKmoXPKFMkAsOd7wkD70yBk8C3kwmnATCVTVYom
-	V2ddSNgOOeksT7uyTMqycx9uQqC/Va40eg4tdmBPkD5zQqcdnPbi+G/6NYHA=
-X-Google-Smtp-Source: AGHT+IHTkIIBanqFC2H6WTUrou5t48+ZFeoSZMY4CSI3hByunRoE2qEKI8hFqQ+6dXkUNEz04jnsUekHe92LnKSS8Qnb09c8/5nG
+        d=1e100.net; s=20230601; t=1757352240; x=1757957040;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yuKkpzYEiCvO71Ei8abl0SPWjd7LNSODsnz5Kg8MlhA=;
+        b=iiBSGKlt+fzG3p+dsL/mAeQ/Y5s5pbg3AXDMZ02Rihgu252I3vZpmTxLCDESXsRrJy
+         tD3gVtiwjWaH/LUNJwzWWr0OPt2tonfD/zr8Rw1J3p8Cv7K86eKXTkNyTMp5+Ow6a9BO
+         0Fc8k3dYwTVumVuzQ4Tvvx1CCtZtEbV2Rgrv2IpNW1JJtKnEjlYJmfUEgb7CbM0IpRSC
+         puhIpi3ooBfv9PSLvSwE0zRT3nIlUzl9dB8o8zQRqsekxLhFV3yau86wh/RTWE9bz92Q
+         o1TQnK08I8KYo5jZjl5Vhw8H/MjlezqIVFc85+y4bZG6dKZwC9FMMpYMMbCKnYOFgaRH
+         exlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0Xyuobl35QzRB7c/c8X+eAHlEceC5anqA4VUH1I62EdDz8CrB4mzsfXrIJ5yMaau25OFuoa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO+XBUcjRXfQhm0ZWEO+CeZLX9ZBra3tWiQBbdtbX0+WW59zxb
+	o5vQC1I1LLZAeojltEgBMbyhaj+J0WYeEd6o37hsJb8L1dg4GnOI2wxImerTnmHB/9d6XNhN4tl
+	/emxZZTOatEkEKRN0JbVcLHOVrNFyuJNFKHEL
+X-Gm-Gg: ASbGncvPQzZc5REC8vw85wBKCD0qFk7+lH4Eu5k/VQWm5NLinvYiQ2dwDnLzDtq1HNX
+	ccMnIFZqiHj5l0hn4fCZBRJ/9QLhu1NbxXyLI3VEahb+tG5xSPgNYi2T6JF48F2qtlrI72cxtN9
+	ssCtGPLWgbDI4KmZ8j7AX7kerFE33NSkKXJhxDNrm4+1V+lVB2Op1U10QpQFzzqTHVFQ2fQsGQa
+	STWMjs=
+X-Google-Smtp-Source: AGHT+IFmcR6kIZTfFFH38Mv50nfyJ8VTSCs13f+os33Iq32qw8+PAHy+dsPhdR+ID+BxjLqjAnctIj1Ev7XrqZSudYk=
+X-Received: by 2002:a05:690c:4444:b0:721:3bd0:d5b4 with SMTP id
+ 00721157ae682-727f652a236mr79006277b3.33.1757352239722; Mon, 08 Sep 2025
+ 10:23:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a69:b0:3ed:eab:439a with SMTP id
- e9e14a558f8ab-3fd82164022mr123234325ab.12.1757351973009; Mon, 08 Sep 2025
- 10:19:33 -0700 (PDT)
-Date: Mon, 08 Sep 2025 10:19:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68bf1024.a70a0220.7a912.02c2.GAE@google.com>
-Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in xfrm_state_find
-From: syzbot <syzbot+e136d86d34b42399a8b1@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20250905173352.3759457-1-ameryhung@gmail.com> <20250905173352.3759457-2-ameryhung@gmail.com>
+ <4hgasq7ibnulieu77b4bryhouggobgousci7z2i3pefv7ofysh@j3qeucyw5wv5>
+In-Reply-To: <4hgasq7ibnulieu77b4bryhouggobgousci7z2i3pefv7ofysh@j3qeucyw5wv5>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 8 Sep 2025 10:23:48 -0700
+X-Gm-Features: Ac12FXxxe1yFTTrTU9YLONLqW1XUVSPH2DSVnCDNx2pozF0qEODf_ma-DU3pwss
+Message-ID: <CAMB2axOoZysP2QtiLF+rYU_RebF140zPN4FjAm3AF1wW8yFLuQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 1/7] net/mlx5e: Fix generating skb from
+ nonlinear xdp_buff
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, kuba@kernel.org, 
+	stfomichev@gmail.com, martin.lau@kernel.org, mohsin.bashr@gmail.com, 
+	noren@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, 
+	maciej.fijalkowski@intel.com, kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Sep 8, 2025 at 7:42=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com>=
+ wrote:
 
-syzbot found the following issue on:
+Resending the reply to the list again as some html stuff accidentally
+got mixed in
 
-HEAD commit:    6ab41fca2e80 Merge tag 'timers-urgent-2025-09-07' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=142f0642580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6d7c422a5f41c669
-dashboard link: https://syzkaller.appspot.com/bug?extid=e136d86d34b42399a8b1
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+>
+> On Fri, Sep 05, 2025 at 10:33:45AM -0700, Amery Hung wrote:
+> > xdp programs can change the layout of an xdp_buff through
+> > bpf_xdp_adjust_tail() and bpf_xdp_adjust_head(). Therefore, the driver
+> > cannot assume the size of the linear data area nor fragments. Fix the
+> > bug in mlx5 by generating skb according to xdp_buff after xdp programs
+> > run.
+> >
+> Shouldn't this patch be a fix for net then?
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Make sense. I will separate the mlx5 patch from this set and target net.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5ab9812c379f/disk-6ab41fca.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5d3df1acc5a7/vmlinux-6ab41fca.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/12541033d833/bzImage-6ab41fca.xz
+>
+> > Currently, when handling multi-buf xdp, the mlx5 driver assumes the
+> > layout of an xdp_buff to be unchanged. That is, the linear data area
+> > continues to be empty and fragments remains the same. This may cause
+> > the driver to generate erroneous skb or triggering a kernel
+> > warning. When an xdp program added linear data through
+> > bpf_xdp_adjust_head(), the linear data will be ignored as
+> > mlx5e_build_linear_skb() builds an skb without linear data and then
+> > pull data from fragments to fill the linear data area. When an xdp
+> > program has shrunk the non-linear data through bpf_xdp_adjust_tail(),
+> > the delta passed to __pskb_pull_tail() may exceed the actual nonlinear
+> > data size and trigger the BUG_ON in it.
+> >
+> > To fix the issue, first record the original number of fragments. If the
+> > number of fragments changes after the xdp program runs, rewind the end
+> > fragment pointer by the difference and recalculate the truesize. Then,
+> > build the skb with linear data area matching the xdp_buff. Finally, onl=
+y
+> > pull data in if there is non-linear data and fill the linear part up to
+> > 256 bytes.
+> >
+> > Fixes: f52ac7028bec ("net/mlx5e: RX, Add XDP multi-buffer support in St=
+riding RQ")
+> Your fix covers both Legacy RQ and Striding RQ. So the tag is only 1/2
+> correct. Normally we have separate patches for each mode.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e136d86d34b42399a8b1@syzkaller.appspotmail.com
+Will split the patch into two.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in xfrm_state_find+0x44cd/0x5400 net/xfrm/xfrm_state.c:1574
-Read of size 1 at addr ffff88806ad62970 by task syz.5.2024/14900
+>
+>
+>
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 38 +++++++++++++++++--
+> >  1 file changed, 35 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
+net/ethernet/mellanox/mlx5/core/en_rx.c
+> > index b8c609d91d11..6b6bb90cf003 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > @@ -1729,6 +1729,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq,=
+ struct mlx5e_wqe_frag_info *wi
+> >       struct mlx5e_wqe_frag_info *head_wi =3D wi;
+> >       u16 rx_headroom =3D rq->buff.headroom;
+> >       struct mlx5e_frag_page *frag_page;
+> > +     u8 nr_frags_free, old_nr_frags;
+> >       struct skb_shared_info *sinfo;
+> >       u32 frag_consumed_bytes;
+> >       struct bpf_prog *prog;
+> > @@ -1772,17 +1773,27 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *r=
+q, struct mlx5e_wqe_frag_info *wi
+> >               wi++;
+> >       }
+> >
+> > +     old_nr_frags =3D sinfo->nr_frags;
+> > +
+> >       prog =3D rcu_dereference(rq->xdp_prog);
+> >       if (prog && mlx5e_xdp_handle(rq, prog, mxbuf)) {
+> >               if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flag=
+s)) {
+> >                       struct mlx5e_wqe_frag_info *pwi;
+> >
+> > +                     wi -=3D old_nr_frags - sinfo->nr_frags;
+> > +
+> >                       for (pwi =3D head_wi; pwi < wi; pwi++)
+> >                               pwi->frag_page->frags++;
+> >               }
+> >               return NULL; /* page/packet was consumed by XDP */
+> >       }
+> >
+> > +     nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
+> > +     if (unlikely(nr_frags_free)) {
+> Even with with a branch prediction hint, is it really worth it?
+>
 
-CPU: 1 UID: 0 PID: 14900 Comm: syz.5.2024 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- xfrm_state_find+0x44cd/0x5400 net/xfrm/xfrm_state.c:1574
- xfrm_tmpl_resolve_one net/xfrm/xfrm_policy.c:2522 [inline]
- xfrm_tmpl_resolve net/xfrm/xfrm_policy.c:2573 [inline]
- xfrm_resolve_and_create_bundle+0x768/0x2f80 net/xfrm/xfrm_policy.c:2871
- xfrm_lookup_with_ifid+0x2a7/0x1a70 net/xfrm/xfrm_policy.c:3205
- xfrm_lookup net/xfrm/xfrm_policy.c:3336 [inline]
- xfrm_lookup_route+0x3c/0x1c0 net/xfrm/xfrm_policy.c:3347
- ip_route_connect include/net/route.h:355 [inline]
- __ip4_datagram_connect+0x9a5/0x1270 net/ipv4/datagram.c:49
- __ip6_datagram_connect+0x9f0/0x1150 net/ipv6/datagram.c:196
- ip6_datagram_connect net/ipv6/datagram.c:279 [inline]
- ip6_datagram_connect_v6_only+0x63/0xa0 net/ipv6/datagram.c:291
- __sys_connect_file net/socket.c:2086 [inline]
- __sys_connect+0x316/0x440 net/socket.c:2105
- __do_sys_connect net/socket.c:2111 [inline]
- __se_sys_connect net/socket.c:2108 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2108
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd80af8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fd80be3f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007fd80b1c6090 RCX: 00007fd80af8ebe9
-RDX: 000000000000001c RSI: 0000200000000040 RDI: 000000000000000d
-RBP: 00007fd80b011e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fd80b1c6128 R14: 00007fd80b1c6090 R15: 00007fd80b2efa28
- </TASK>
+[...]
 
-Allocated by task 12709:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:330 [inline]
- __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:356
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4191 [inline]
- slab_alloc_node mm/slub.c:4240 [inline]
- kmem_cache_alloc_noprof+0x1c1/0x3c0 mm/slub.c:4247
- xfrm_state_alloc+0x24/0x2f0 net/xfrm/xfrm_state.c:733
- xfrm_state_construct net/xfrm/xfrm_user.c:889 [inline]
- xfrm_add_sa+0x17d1/0x4070 net/xfrm/xfrm_user.c:1019
- xfrm_user_rcv_msg+0x7a0/0xab0 net/xfrm/xfrm_user.c:3501
- netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
- xfrm_netlink_rcv+0x79/0x90 net/xfrm/xfrm_user.c:3523
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> > +             wi -=3D nr_frags_free;
+> > +             truesize -=3D nr_frags_free * frag_info->frag_stride;
+> > +     }
+> > +
+> >       skb =3D mlx5e_build_linear_skb(
+> >               rq, mxbuf->xdp.data_hard_start, rq->buff.frame0_sz,
+> >               mxbuf->xdp.data - mxbuf->xdp.data_hard_start,
+> > @@ -2004,6 +2015,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
+q *rq, struct mlx5e_mpw_info *w
+> >       u32 byte_cnt       =3D cqe_bcnt;
+> >       struct skb_shared_info *sinfo;
+> >       unsigned int truesize =3D 0;
+> > +     u32 pg_consumed_bytes;
+> >       struct bpf_prog *prog;
+> >       struct sk_buff *skb;
+> >       u32 linear_frame_sz;
+> > @@ -2057,7 +2069,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
+q *rq, struct mlx5e_mpw_info *w
+> >
+> >       while (byte_cnt) {
+> >               /* Non-linear mode, hence non-XSK, which always uses PAGE=
+_SIZE. */
+> > -             u32 pg_consumed_bytes =3D min_t(u32, PAGE_SIZE - frag_off=
+set, byte_cnt);
+> > +             pg_consumed_bytes =3D min_t(u32, PAGE_SIZE - frag_offset,=
+ byte_cnt);
+> >
+> >               if (test_bit(MLX5E_RQ_STATE_SHAMPO, &rq->state))
+> >                       truesize +=3D pg_consumed_bytes;
+> > @@ -2073,10 +2085,15 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e=
+_rq *rq, struct mlx5e_mpw_info *w
+> >       }
+> >
+> >       if (prog) {
+> > +             u8 nr_frags_free, old_nr_frags =3D sinfo->nr_frags;
+> > +             u32 len;
+> > +
+> >               if (mlx5e_xdp_handle(rq, prog, mxbuf)) {
+> >                       if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, =
+rq->flags)) {
+> >                               struct mlx5e_frag_page *pfp;
+> >
+> > +                             frag_page -=3D old_nr_frags - sinfo->nr_f=
+rags;
+> > +
+> >                               for (pfp =3D head_page; pfp < frag_page; =
+pfp++)
+> >                                       pfp->frags++;
+> >
+> > @@ -2087,9 +2104,22 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_=
+rq *rq, struct mlx5e_mpw_info *w
+> >                       return NULL; /* page/packet was consumed by XDP *=
+/
+> >               }
+> >
+> > +             len =3D mxbuf->xdp.data_end - mxbuf->xdp.data;
+> > +
+> > +             nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
+> > +             if (unlikely(nr_frags_free)) {
+> Same question about the if.
 
-Freed by task 12093:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:243 [inline]
- __kasan_slab_free+0x5b/0x80 mm/kasan/common.c:275
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2422 [inline]
- slab_free mm/slub.c:4695 [inline]
- kmem_cache_free+0x18f/0x400 mm/slub.c:4797
- xfrm_state_free net/xfrm/xfrm_state.c:591 [inline]
- xfrm_state_gc_destroy net/xfrm/xfrm_state.c:618 [inline]
- xfrm_state_gc_task+0x52d/0x6b0 net/xfrm/xfrm_state.c:634
- process_one_work kernel/workqueue.c:3236 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3319
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
- kthread+0x70e/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+I see. I will make the recalculation unconditional.
 
-The buggy address belongs to the object at ffff88806ad62640
- which belongs to the cache xfrm_state of size 928
-The buggy address is located 816 bytes inside of
- freed 928-byte region [ffff88806ad62640, ffff88806ad629e0)
+>
+> > +                     frag_page -=3D nr_frags_free;
+> > +
+> > +                     /* the last frag is always freed first */
+> > +                     truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mp=
+wqe.log_stride_sz));
+> > +                     while (--nr_frags_free)
+> > +                             truesize -=3D nr_frags_free *
+> > +                                         ALIGN(PAGE_SIZE, BIT(rq->mpwq=
+e.log_stride_sz));
+> > +             }
+> > +
+> This doesn't seem correct. It seems to remove too much from truesize
+> when nr_frags_free > 2. I think it should be:
+>
+> truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mpwqe.log_stride_sz)) -
+>             (nr_frags_free - 1) * ALIGN(PAGE_SIZE, BIT(rq->mpwqe.log_stri=
+de_sz));
+>
+> And PAGE_SIZE is aligned to stride size so you can shorted it to:
+>
+> truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mpwqe.log_stride_sz)) -
+>             (nr_frags_free - 1) * PAGE_SIZE;
 
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff88806ad62640 pfn:0x6ad60
-head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801afdf280 dead000000000122 0000000000000000
-raw: ffff88806ad62640 00000000800f000c 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801afdf280 dead000000000122 0000000000000000
-head: ffff88806ad62640 00000000800f000c 00000000f5000000 0000000000000000
-head: 00fff00000000002 ffffea0001ab5801 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000004
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 2, migratetype Unmovable, gfp_mask 0x52820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 7519, tgid 7518 (syz.8.350), ts 330117177647, free_ts 330086232405
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1851
- prep_new_page mm/page_alloc.c:1859 [inline]
- get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3858
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5148
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
- alloc_slab_page mm/slub.c:2492 [inline]
- allocate_slab+0x8a/0x370 mm/slub.c:2660
- new_slab mm/slub.c:2714 [inline]
- ___slab_alloc+0xbeb/0x1420 mm/slub.c:3901
- __slab_alloc mm/slub.c:3992 [inline]
- __slab_alloc_node mm/slub.c:4067 [inline]
- slab_alloc_node mm/slub.c:4228 [inline]
- kmem_cache_alloc_noprof+0x283/0x3c0 mm/slub.c:4247
- xfrm_state_alloc+0x24/0x2f0 net/xfrm/xfrm_state.c:733
- xfrm_state_find+0x37d4/0x5400 net/xfrm/xfrm_state.c:1513
- xfrm_tmpl_resolve_one net/xfrm/xfrm_policy.c:2522 [inline]
- xfrm_tmpl_resolve net/xfrm/xfrm_policy.c:2573 [inline]
- xfrm_resolve_and_create_bundle+0x768/0x2f80 net/xfrm/xfrm_policy.c:2871
- xfrm_bundle_lookup net/xfrm/xfrm_policy.c:3106 [inline]
- xfrm_lookup_with_ifid+0x58a/0x1a70 net/xfrm/xfrm_policy.c:3237
- xfrm_lookup net/xfrm/xfrm_policy.c:3336 [inline]
- xfrm_lookup_route+0x3c/0x1c0 net/xfrm/xfrm_policy.c:3347
- udp_sendmsg+0x142e/0x2170 net/ipv4/udp.c:1450
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x19c/0x270 net/socket.c:729
- ____sys_sendmsg+0x52d/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
-page last free pid 7493 tgid 7486 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1395 [inline]
- __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2895
- stack_depot_save_flags+0x436/0x860 lib/stackdepot.c:727
- kasan_save_stack mm/kasan/common.c:48 [inline]
- kasan_save_track+0x4f/0x80 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:330 [inline]
- __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:356
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4191 [inline]
- slab_alloc_node mm/slub.c:4240 [inline]
- kmem_cache_alloc_node_noprof+0x1bb/0x3c0 mm/slub.c:4292
- kmalloc_reserve+0xbd/0x290 net/core/skbuff.c:578
- __alloc_skb+0x142/0x2d0 net/core/skbuff.c:669
- alloc_skb include/linux/skbuff.h:1336 [inline]
- alloc_uevent_skb+0x7d/0x230 lib/kobject_uevent.c:289
- uevent_net_broadcast_untagged lib/kobject_uevent.c:326 [inline]
- kobject_uevent_net_broadcast+0x2fa/0x560 lib/kobject_uevent.c:410
- kobject_uevent_env+0x55b/0x8c0 lib/kobject_uevent.c:608
- device_del+0x73a/0x8e0 drivers/base/core.c:3896
- device_unregister+0x20/0xc0 drivers/base/core.c:3919
- hci_conn_cleanup net/bluetooth/hci_conn.c:173 [inline]
- hci_conn_del+0xc33/0x11b0 net/bluetooth/hci_conn.c:1211
- hci_abort_conn_sync+0x658/0xe30 net/bluetooth/hci_sync.c:5689
- hci_disconnect_all_sync+0x1b5/0x350 net/bluetooth/hci_sync.c:5712
- hci_suspend_sync+0x3fc/0xc60 net/bluetooth/hci_sync.c:6188
+Sorry that I was being sloppy here. You are correct, and I think you
+probably meant "+" instead of "-".
 
-Memory state around the buggy address:
- ffff88806ad62800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88806ad62880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88806ad62900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                             ^
- ffff88806ad62980: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
- ffff88806ad62a00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mpwqe.log_stride_sz)) +
+             (nr_frags_free - 1) * PAGE_SIZE;
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>
+> Thanks,
+> Dragos
+>
 
