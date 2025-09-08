@@ -1,40 +1,58 @@
-Return-Path: <netdev+bounces-220950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E141DB49A1B
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:39:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D15B49A66
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:56:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFADD1BC36DE
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:40:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0A4B206329
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772262BDC2C;
-	Mon,  8 Sep 2025 19:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3044F2D5A07;
+	Mon,  8 Sep 2025 19:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="WuspcEjl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DDA45945
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 19:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757360384; cv=none; b=PUrn0w3tYyJz+10GJUg+kVy2gS5Q94egbo6AX/nL961ldwxtS1N6+rnCcd/Zwbm4bMgOLQbH7x1HpWmKDSrMOkrblX7c3cek6ihK3SXfyAPpUgNHmLs3ads4skOHKFftGdmBXHsmJW3X9Y/oFp3naoVD6yOvwjdzsVZfyxCCirg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757360384; c=relaxed/simple;
-	bh=nwq7EdaDrQIAG1+EutHBxtyYmZITvPoXd+Si5bF5OAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sWzUM18uBZVyebBQQ98MQ5KCRgZ+5SJDN/CmcEG9p8RO8PsctG+zL9zxJwqxTNxrgjR5JCwqppn+UjDyyWTsXt6WipFdlUBqg3kCf8lnA6IIscHqNNUBr8HH+zUa4AGGWM/x+sdNW+EP2Wr+aV6LlgMnkZJ1a/We4T1lymODWvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.102] (213.87.154.55) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 8 Sep
- 2025 22:39:36 +0300
-Message-ID: <877641ca-aadb-4510-9ed7-cc23cf666653@omp.ru>
-Date: Mon, 8 Sep 2025 22:39:35 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A21D1E231E;
+	Mon,  8 Sep 2025 19:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757361364; cv=pass; b=HiW8rPVPUhv3jc8h7fHLTG3RNp82HmE8E/A9VlS9nwydj7vi3c1qHk6jyKAbcByqf0vCo6yzIxZW1MxBQ9mckQNvee5TLHL9MIH+tcaNPq1c2EZVjocQZOsSoJf+H7wGyggwpUh9CocZqPuubtHC5GVnczP2h+AV/mIwif/2RPA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757361364; c=relaxed/simple;
+	bh=MWpV4A2WRkUfqblRPidOKOMyFxPO/XuuQrBHbl8uMQI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oUxeZUZLouoAhqIhaVJAaz7Pb0Gw1Dslw9ChUD7T+y+XI0WEgU7fRF1IRFSHg4aCRLVLBNkisnIGTh3HcJL1DjnNL6vm+YErA2a8xnASXxcmUJmNy4I4xOd0el2ejuFIVEUdRq2e4RjGebPsTQnGAv00jnzOn+AnU5Z4tFb6Amk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=WuspcEjl; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1757361303; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=mUzmnkI7ls4AvpKk9PkLBBYeCu+pH9kCHwMoKRU9mS8Va3Rk3P1EnjIukFHIQ1sAgt4nQPlbPOXlK83kFmYc2xVS75KjHCPk94ELyPusE++ff8czzuFzys66QYc4l6TbNekfLo+fBNe1sVSwmyurSAX0CZXICiNB/U581LhcNrU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757361303; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=M/VFSbxaoCdLjJSeyTwHsH+gRgpx/aAWpUtZlGe7uGk=; 
+	b=BaZlsaht09RzyFGIw897Zk6xphgJqy43DTSQKT9TkRm0X5MkO3meBCJ4cTbsHdUbbD2SEdI/5kc03gzpBrHIl+mADS6abfJXQtNg+5HPGSQoyur59mlSQ7Ia3ZhxJAtvYUVT99Q1iWwbwHsF4hvHTz/xFr1r9Snnsvu9tXKFPY0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
+	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757361303;
+	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=M/VFSbxaoCdLjJSeyTwHsH+gRgpx/aAWpUtZlGe7uGk=;
+	b=WuspcEjlUBylmJh1B0BghZqg5B6vUEjxtdYtMYSmMk6RsbTPP0bLHXw0NlWAcceJ
+	xsO8L1flgUuEeUGRtXTkjsV0T9f76hnyQvEhLCzhzUA5H4Yt1V6Miux3sq5qAOgM9B+
+	4LA1qn9GmOhsgJZge5/qJBesfNjPEAzNODbFUE/w=
+Received: by mx.zohomail.com with SMTPS id 1757361302113105.67245372545813;
+	Mon, 8 Sep 2025 12:55:02 -0700 (PDT)
+Message-ID: <0b1d77ab-7b39-4764-9f0c-4b4a15aa0e56@collabora.com>
+Date: Mon, 8 Sep 2025 16:54:46 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,117 +60,200 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: stmmac: prevent division by 0 in
- stmmac_init_tstamp_counter()
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	<netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>
-References: <58116e65-1bca-4d87-b165-78989e1aa195@omp.ru>
- <c3183a23-21da-435d-b599-7003ae7ba79b@lunn.ch>
+Subject: Re: [PATCH v1 04/14] net: dt-bindings: Convert Marvell 8897/8997
+ bindings to YAML
+To: Rob Herring <robh@kernel.org>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
+ andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
+ broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
+ conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com,
+ edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com,
+ jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com,
+ krzk+dt@kernel.org, kuba@kernel.org,
+ kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
+ linus.walleij@linaro.org, louisalexis.eyraud@collabora.com,
+ maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
+ mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
+ p.zabel@pengutronix.de, pabeni@redhat.com, sean.wang@kernel.org,
+ simona@ffwll.ch, support.opensource@diasemi.com, tiffany.lin@mediatek.com,
+ tzimmermann@suse.de, yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
+ linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-sound@vger.kernel.org, netdev@vger.kernel.org
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-5-ariel.dalessandro@collabora.com>
+ <CAL_Jsq+K72Kof-Z3q2DSh3FKO64npLF6hDJnqnTzNBUoOoVQFA@mail.gmail.com>
 Content-Language: en-US
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-In-Reply-To: <c3183a23-21da-435d-b599-7003ae7ba79b@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 09/08/2025 18:59:50
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 196103 [Sep 08 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 66 0.3.66
- fc5dda3b6b70d34b3701db39319eece2aeb510fb
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;www.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.154.55
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 09/08/2025 19:03:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 9/8/2025 5:23:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+In-Reply-To: <CAL_Jsq+K72Kof-Z3q2DSh3FKO64npLF6hDJnqnTzNBUoOoVQFA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On 9/8/25 7:47 PM, Andrew Lunn wrote:
+Hi Rob,
 
->> In stmmac_init_tstamp_counter(), the sec_inc variable is initialized to 0,
->> and if stmmac_config_sub_second_increment() fails to set it to some non-0
->> value, the following div_u64() call would cause a kernel oops (because of
->> the divide error exception).  Let's check sec_inc for 0 before dividing by
->> it and just return -EINVAL if so...
+On 8/21/25 11:28 AM, Rob Herring wrote:
+> On Wed, Aug 20, 2025 at 12:15 PM Ariel D'Alessandro
+> <ariel.dalessandro@collabora.com> wrote:
 >>
->> Found by Linux Verification Center (linuxtesting.org) with the Svace static
->> analysis tool.
+>> Convert the existing text-based DT bindings for Marvell 8897/8997
+>> (sd8897/sd8997) bluetooth devices controller to a YAML schema.
 >>
->> Fixes: df103170854e ("net: stmmac: Avoid sometimes uninitialized Clang warnings")
->> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>> While here, bindings for "usb1286,204e" (USB interface) are dropped from
+>> the YAML definition as these are currently documented in file:
 >>
+>> - Documentation/devicetree/bindings/net/btusb.txt
+>>
+>> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
 >> ---
->> The patch is against the master branch of Linus Torvalds' linux.git repo.
+>>   .../bindings/net/marvell,sd8897-bt.yaml       | 91 +++++++++++++++++++
 > 
-> Wrong tree. Please see:
+> This needs to move to net/bluetooth/
+
+Ack.
+
 > 
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-   Well, formerly being a reviewer for the Renesas drivers (before Greg KH
-threw me out of MAINTAINERS last year), I kinda know this! :-)
-   The real problem is that I've lost the ability to pull from git.kernel.org
-(first using git:// protocol and later using https:// as well)... Sometimes
-the ability used to return (along with Facebook/LinkedIn -- which are actually
-blocked in .ru) but that hasn't happened for more than a week now. I can now
-pull from Linus' tree at github. I strongly suspect some interaction between
-the .ru blocking and the Anubis program that is now used on git.kernel.org --
-I've also lost access to lore.kernel.org (sometimes it works -- but not now)
-and also elixir.bootlin.com, both of which seem to use the darn Anubis as
-well... :-(
-
-> This also needs reviewing by somebody who know the STMMAC
-> hardware. There is a comment:
+>>   .../bindings/net/marvell-bt-8xxx.txt          | 83 -----------------
+>>   2 files changed, 91 insertions(+), 83 deletions(-)
+>>   create mode 100644 Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml
+>>   delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml b/Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml
+>> new file mode 100644
+>> index 0000000000000..6539868c08b8a
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml
+>> @@ -0,0 +1,91 @@
+>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/marvell,sd8897-bt.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Marvell 8897/8997 (sd8897/sd8997) bluetooth devices (SDIO)
+>> +
+>> +maintainers:
+>> +  - Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+>> +
 > 
-> 	/* For GMAC3.x, 4.x versions, in "fine adjustement mode" set sub-second
-                                               ^ Look, a typo! :-)
+> Needs a $ref to bluetooth-controller.yaml
 
-> 	 * increment to twice the number of nanoseconds of a clock cycle.
-> 	 * The calculation of the default_addend value by the caller will set it
-> 	 * to mid-range = 2^31 when the remainder of this division is zero,
-> 	 * which will make the accumulator overflow once every 2 ptp_clock
-> 	 * cycles, adding twice the number of nanoseconds of a clock cycle :
-> 	 * 2000000000ULL / ptp_clock.
+Ack.
+
 > 
-> So i'm wondering if the subsecond adjustment is sufficient, the
-> sec_inc might be zero, and rather than returning an error, the
-> hardware just needs programming differently?
+>> +properties:
+>> +  compatible:
+>> +    enum:
+>> +      - marvell,sd8897-bt
+>> +      - marvell,sd8997-bt
+>> +
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  interrupts:
+>> +    maxItems: 1
+>> +
+>> +  marvell,cal-data:
+>> +    $ref: /schemas/types.yaml#/definitions/uint8-array
+>> +    description:
+>> +      Calibration data downloaded to the device during initialization.
+>> +    minItems: 28
+> 
+> Just: maxItems: 28
 
-   Sorry, I don't readily see how the data var in config_sub_second_increment()
-can wrap to 0. I agree that a look of a more knowledgeable person would be good
-though... :-)
+Ack.
 
->     Andrew
+> 
+>> +
+>> +  marvell,wakeup-pin:
+>> +    $ref: /schemas/types.yaml#/definitions/uint16
+>> +    description:
+>> +      Wakeup pin number of the bluetooth chip. Used by firmware to wakeup host
+>> +      system.
+>> +
+>> +  marvell,wakeup-gap-ms:
+> 
+> This unfortunately needs a uint16 type. That will cause a warning
+> which has to be fixed on the dtschema side.
 
-[...]
+Yeah, that's what I thought but wasn't sure on the proper solution. Will 
+fix in v2.
 
-MBR, Sergey
+> 
+>> +    description:
+>> +      Wakeup latency of the host platform. Required by the chip sleep feature.
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +  - interrupts
+>> +
+>> +additionalProperties: false
+>> +
+>> +examples:
+>> +  - |
+>> +    #include <dt-bindings/interrupt-controller/irq.h>
+>> +    #include <dt-bindings/pinctrl/rockchip.h>
+> 
+> Please drop this and just use a number below.
+
+Ack.
+
+> 
+>> +
+>> +    sdio0 {
+>> +        #address-cells = <1>;
+>> +        #size-cells = <0>;
+>> +
+>> +        btmrvl: btmrvl@2 {
+>> +            compatible = "marvell,sd8897-bt";
+>> +            reg = <2>;
+>> +            interrupt-parent = <&gpio4>;
+>> +            interrupts = <RK_PD7 IRQ_TYPE_LEVEL_LOW>;
+>> +            marvell,wakeup-pin = /bits/ 16 <13>;
+>> +            pinctrl-names = "default";
+>> +            pinctrl-0 = <&bt_host_wake_l>;
+>> +        };
+>> +    };
+> 
+> I would drop this example.
+
+Agreed.
+
+> 
+>> +
+>> +    mmc3 {
+> 
+> mmc {
+
+Ack.
+
+> 
+>> +        vmmc-supply = <&wlan_en_reg>;
+>> +        bus-width = <4>;
+>> +        cap-power-off-card;
+>> +        keep-power-in-suspend;
+>> +
+>> +        #address-cells = <1>;
+>> +        #size-cells = <0>;
+>> +
+>> +        bluetooth: bluetooth@2 {
+> 
+> Drop the label.
+
+Ack.
+
+Thanks a lot for your feedback and help!
+Regards,
+
+-- 
+Ariel D'Alessandro
+Software Engineer
+
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
+Registered in England & Wales, no. 5513718
 
 
