@@ -1,169 +1,137 @@
-Return-Path: <netdev+bounces-220769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1563BB488D3
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:43:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF16B48943
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:58:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38B6E1B25027
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:42:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7853E179FF3
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8CF2FCBF9;
-	Mon,  8 Sep 2025 09:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CFE2EDD41;
+	Mon,  8 Sep 2025 09:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0SaDEU85"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wcc1pfoW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB3B2FC01B
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 09:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29372222BF
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 09:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757324440; cv=none; b=X40X4WtC73d1aUSY7mAAILbqv9D0pwENfmOFslXP/qjwbVfC2UkjX2PxzRHyxKxh3do5WD4F+2w/Ys8ozDDXz/q1dpXEOS6HZmwAUO+brDVu3vyuQAO1l45dF8GA1iSUm6i/I+VqICCNtrfHxSRp0zVBGY84Adjq1SD9V9VeJJA=
+	t=1757325536; cv=none; b=NpzdmZeMbLK95lSOcCeXDbkuNWj+d5S0p2OWfveTgX+WDWHAaPZ+n7dEdGX15RcLnVTb+Qu/zuU4cAT7IMY7kCr3UbSX8tq2G7x1d1+8q/ERpQ/aMvSlArCLkFXcepyoBgattdsfS3kxtyG+sp/lXw1ASvkaFk6DZinGVUdQJlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757324440; c=relaxed/simple;
-	bh=t+aVCYfXA+p0hAUl+r/idM6sMNdxYBy4dFyRlU1jIEA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tgNk6Yi5r2igGMcOQvXA6mJBemVfTLrgsTAE0iy3UjuPTH0XOgqRC7yXs/l0zMj3NNNki5ezgGZVuIvyAraOaP53uhuosQKzbL3OVYrX9uSMC56abLjnd+v3w6prNIW48PBrenztnwDQuI1t+DBlppVlOhxIufdP4R60oPEOf94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0SaDEU85; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b340966720so27354981cf.2
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 02:40:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757324437; x=1757929237; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=erhcBr1kcJ+JmJqrcMGs+dfvelpre/iMdOwMlOMIkIk=;
-        b=0SaDEU85s4q88aFrdyk2G7gKEwzF9948jYYxxgyIKKE9GSlPhNWeup05qYWMMektm1
-         BXo+OQ8XUBPGfCIGNSyLyWbVMrIwDoODXrxxYciGJb96L7dtnrdrZ8iDOfNgu/qfK49x
-         KC7tM7pJkO2sHy1N9iKI80DsneDHLFcfrTc7blgncLWXMwgSgSEeZvdgTdm9nFT7WysX
-         ur8nxcDKp7PH/lBzaxF/hXyZ5N0ItYxLfmILqVlecB0qwYlbU9OLccMogDJk4uSK8X0b
-         yQrCjApPLOgFkZuegLSbBKq+QZwwccFUG+dyZdtlV+b3LBFkWdJYnCL1YxbpLWGy8LXa
-         4b0w==
+	s=arc-20240116; t=1757325536; c=relaxed/simple;
+	bh=a6bVpnE3HRsYuWmdgLXEHl1NWYRsqoRCh2FcSf2L0/g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=laKLY4t5HTDpCz0H8mHHz/hnJuP4Pb7zIb9WaFMLXQiZuqH1HYZC/AFKQHGHytg9tZSh0iq4UyNSTIrrxkpVlV++wu1A+eXeIN5LPaKHTjNY1EQT41riNiqrvGstzjdxYO2gMJon5P37+0s3BcNHUYW7UuipoA12XapaKjGeTLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wcc1pfoW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757325533;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AS5TbPMoScatpfJs9X+pTZZBekuU2gBD3oRFuTdu1Fo=;
+	b=Wcc1pfoWHAwrlWECrjy/Sxl6AWd+PuzQkm1e4DDTxthAYJVJw4jQ53HLWhH5BN66fEN5xQ
+	deAQpVNKKaI9jGn+MOwRnBh3lTgxzmxVNPV0UVmtmyOApl3hmbUg0GK2YEtOdOF4lnMPu7
+	XOGOVyF5UWULhPFlns6lW7TZ4dU3qXE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-43-_FNYPi52MKam79-q8FoC6A-1; Mon, 08 Sep 2025 05:58:52 -0400
+X-MC-Unique: _FNYPi52MKam79-q8FoC6A-1
+X-Mimecast-MFC-AGG-ID: _FNYPi52MKam79-q8FoC6A_1757325531
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3e38ae5394aso2329421f8f.3
+        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 02:58:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757324437; x=1757929237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=erhcBr1kcJ+JmJqrcMGs+dfvelpre/iMdOwMlOMIkIk=;
-        b=sKMzQGEFbc8/UqUgVcvwUGeiF67FwzngMauygANbYAgVP1rbF4hxBIczhir0CTDMDl
-         cyBk6qRT07DUJPelrrqkO3UTliq1eY3bbyOkuNfHSmtjn709lt1WyXKQriBbLFPsGcso
-         zhG+LoiTRsILYQDlzkKziqzph0la9JPT9jzEuK4DQ0IL6JO77akTFNrs3R9Ovp3m0FYe
-         n4bZr/WotZLxCxFV1RtL1yL/l1csQWMLclWaxH3+4jSSPMpfVPXdmuff7qNQmBCNfwN9
-         JABY4tp1+Erwx/bj5nwHxJpfIIVGFQKgsrHOF4Ykk9EVICXy8sMX/pyHozyxxkFlCd0O
-         iqRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlkQp9M1AVgV4UwMXimQH2JGSNHdWyv6OMfYOAq2inHZcx7WAJb8HRkLCfeAxQR1YdhY/zI5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmZFZhv437Kl9ggiMgjHJ5Y/kNGjfvBoTbYnoLOUEx52z3dKRZ
-	OQwBn4lPIR6g5kIIZp6A3TOwk2jse59uD+rTyaHyznFxpaHz6kYLVl0XjZxT/C1x7ATi04dpKaG
-	403W3Qe6jDkpKSi/M1SSXRFtCGS0wtJiuO+1FLlHx
-X-Gm-Gg: ASbGncumA1tQUW59thj5xdOChD19JxPE8sLEVYjORqyPtxS3DT7Mxyj/KvE25ZKQeKu
-	AfwGCpZ7ORhdFY43ll4fPHwR5k2IXMPTZiyxzPV+oIZSK6wnxYceNH3o/YgbBFdwyA/yx0z4XjV
-	iYU5RcjpdcqN4EBgbKwkrhi3HDvzSvMt5bX/knJL0Tw3uvTvq+Yr4rrEpP/3Zooi/nlYQecU45I
-	jEQXGGNn0a44Nli94T8UQ1l
-X-Google-Smtp-Source: AGHT+IH1qcux165XgeTJOKRdM2g9mlniLhsoO7eTSJyAbSGCi4jHXwjx9GOnwgxGTG5T20bMMEWW7o7k2xMBN/Lj20k=
-X-Received: by 2002:ac8:7dd1:0:b0:4b3:96a:fda8 with SMTP id
- d75a77b69052e-4b5f834cff6mr66658841cf.17.1757324437178; Mon, 08 Sep 2025
- 02:40:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757325531; x=1757930331;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AS5TbPMoScatpfJs9X+pTZZBekuU2gBD3oRFuTdu1Fo=;
+        b=wir6SmiPpZlxWASxquCKYp236+mcdd5uyA1uyD5OL8upRJm6bUqfzBSaMo3KtFXN40
+         Gt2zANrC2zXsvg8pwDmUg0buOST2WiiL1fAByoolLZOyFU6op52Bwgn6aAWdjIx1QwGX
+         BI01mEewGNKRDlAYxi/KXGHmEVp5x7HGpIbz9TKSGowk+R7bQmLiHQxy+RFKraQljcvc
+         5Z/cWPl4PEMqqDrNmBlP3+rvtBtzgHiGTtk/vpWx9K7nSpEo1Xu6kotnmp5fK5Rw3X82
+         L42dCe51x/gh3NIrmFdi8u8HJMnptYKLwlHleUceIVqXShJHlsoskDsXJh1KciPCgL1z
+         wx6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV/1lcepd56l7mKQYD1lHvKw66jsogAulf1DSlBUW1zigFodFaG1OUB/xtg+rT1EvO7J8xo6Dc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQl7dVnDfR1QuW1Oj4kmgzg+7W7ETIpXUt91UGzJX8oHFvKWj6
+	1fwwdMt0sWfEmLi4evEOteTOuDk81bEFiG2f2Cyc418OvioEv55RqbXco+Cfu0DCgqpAgpGyQ/X
+	cNZ32BjtcJ1KZzcRrbY6yQX0sWOvTnsjxPKdq634+YWBEZ35OwpzUdH4A4Q==
+X-Gm-Gg: ASbGnctWhEd9GcR17pWYCZnb5OfGPeiuWN5ck5ARLFLZNsMhntH6F7ouRhM9sE7RI4o
+	ywm8j/caEOlyBobbFplESLm0iCnJcq2kxIIQtMr81FCJURR3FhhQx70PI1vmquNlUn3kYqweEOv
+	NwpH94UlPOisE7V/87knlFB8Hsj02+jFirdFg2yZTDmXXQUMlNHebuAMmCB5USgAwJCOTHVY5G1
+	OkQwi2gbF3wNcXZyKGEnE8rsm86KFncbFnJhVD4TGzkzs4B2XjaolEdx5z2Dl7pjYAw9wXkkqbh
+	supSkc8dX3Z6ft7PThBtS2IIdIUoeIn9kpE=
+X-Received: by 2002:a05:6000:2285:b0:3db:c7aa:2c19 with SMTP id ffacd0b85a97d-3e6428d7ccbmr5339171f8f.26.1757325531439;
+        Mon, 08 Sep 2025 02:58:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEzqDPXEG9KjjfatQRgfi7m9NqzdpNSgqCOLY881KppF3Xzcuz+JdS4DCAcNL2JTIUUxUGQog==
+X-Received: by 2002:a05:6000:2285:b0:3db:c7aa:2c19 with SMTP id ffacd0b85a97d-3e6428d7ccbmr5339150f8f.26.1757325530995;
+        Mon, 08 Sep 2025 02:58:50 -0700 (PDT)
+Received: from fedora (g3.ign.cz. [91.219.240.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45cb5693921sm240950065e9.0.2025.09.08.02.58.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Sep 2025 02:58:50 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Li Tian <litian@redhat.com>, netdev@vger.kernel.org,
+ linux-hyperv@vger.kernel.org
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Benjamin Poirier <bpoirier@redhat.com>
+Subject: Re: [PATCH net] net/mlx5: Not returning mlx5_link_info table when
+ speed is unknown
+In-Reply-To: <20250908085313.18768-1-litian@redhat.com>
+References: <20250908085313.18768-1-litian@redhat.com>
+Date: Mon, 08 Sep 2025 12:58:49 +0300
+Message-ID: <877by9fep2.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <68bb4160.050a0220.192772.0198.GAE@google.com> <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
- <CANn89iJaY+MJPUJgtowZOPwHaf8ToNVxEyFN9U+Csw9+eB7YHg@mail.gmail.com>
- <c035df1c-abaf-9173-032f-3dd91b296101@huaweicloud.com> <CANn89iKVbTKxgO=_47TU21b6GakhnRuBk2upGviCK0Y1Q2Ar2Q@mail.gmail.com>
- <51adf9cb-619e-9646-36f0-1362828e801e@huaweicloud.com>
-In-Reply-To: <51adf9cb-619e-9646-36f0-1362828e801e@huaweicloud.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 8 Sep 2025 02:40:25 -0700
-X-Gm-Features: Ac12FXwc26OpvX9zU43reFsjsweUwJNkA8yDt2oGLAvJhUo4PxXaORks-CcUgHI
-Message-ID: <CANn89iLhNzYUdtuaz9+ZHvwpbsK6gGfbCWmoic+ACQBVJafBXA@mail.gmail.com>
-Subject: Re: [syzbot] [net?] possible deadlock in inet_shutdown
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: syzbot <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, davem@davemloft.net, 
-	dsahern@kernel.org, horms@kernel.org, kuba@kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ming.lei@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, Sep 8, 2025 at 2:34=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> wr=
-ote:
+Li Tian <litian@redhat.com> writes:
+
+> Because mlx5e_link_mode is sparse e.g. Azure mlx5 reports PTYS 19.
+> Do not return it when speed unless retrieved successfully.
 >
-> Hi,
+> Fixes: 65a5d35571849 ("net/mlx5: Refactor link speed handling with mlx5_link_info struct")
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Li Tian <litian@redhat.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/port.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> =E5=9C=A8 2025/09/08 17:07, Eric Dumazet =E5=86=99=E9=81=93:
-> > On Mon, Sep 8, 2025 at 1:52=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com=
-> wrote:
-> >>
-> >> Hi,
-> >>
-> >> =E5=9C=A8 2025/09/06 17:16, Eric Dumazet =E5=86=99=E9=81=93:
-> >>> On Fri, Sep 5, 2025 at 1:03=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> >>>>
-> >>>> On Fri, Sep 5, 2025 at 1:00=E2=80=AFPM syzbot
-> >>>> <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com> wrote:
-> >>>
-> >>> Note to NBD maintainers : I held about  20 syzbot reports all pointin=
-g
-> >>> to NBD accepting various sockets, I  can release them if needed, if y=
-ou prefer
-> >>> to triage them.
-> >>>
-> >> I'm not NBD maintainer, just trying to understand the deadlock first.
-> >>
-> >> Is this deadlock only possible for some sepecific socket types? Take
-> >> a look at the report here:
-> >>
-> >> Usually issue IO will require the order:
-> >>
-> >> q_usage_counter -> cmd lock -> tx lock -> sk lock
-> >>
-> >
-> > I have not seen the deadlock being reported with normal TCP sockets.
-> >
-> > NBD sets sk->sk_allocation to  GFP_NOIO | __GFP_MEMALLOC;
-> > from __sock_xmit(), and TCP seems to respect this.
-> > .
-> >
->
-> What aboud iscsi and nvme-tcp? and probably other drivers, where
-> sk_allocation is GFP_ATOMIC, do they have similar problem?
->
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/port.c b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+> index 2d7adf7444ba..a69c83da2542 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/port.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+> @@ -1170,7 +1170,11 @@ const struct mlx5_link_info *mlx5_port_ptys2info(struct mlx5_core_dev *mdev,
+>  	mlx5e_port_get_link_mode_info_arr(mdev, &table, &max_size,
+>  					  force_legacy);
+>  	i = find_first_bit(&temp, max_size);
+> -	if (i < max_size)
+> +	/*
+> +	 * mlx5e_link_mode is sparse. Check speed
 
-AFAIK after this fix, iscsi was fine.
+The array is either 'mlx5e_link_mode' or 'mlx5e_ext_link_info' but both
+have holes in them.
 
-commit f4f82c52a0ead5ab363d207d06f81b967d09ffb8
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Fri Sep 15 17:11:11 2023 +0000
+> +	 * is non-zero as indication of a hole.
+> +	 */
+> +	if (i < max_size && table[i].speed)
+>  		return &table[i];
+>  
+>  	return NULL;
 
-    scsi: iscsi_tcp: restrict to TCP sockets
+-- 
+Vitaly
 
-    Nothing prevents iscsi_sw_tcp_conn_bind() to receive file descriptor
-    pointing to non TCP socket (af_unix for example).
-
-    Return -EINVAL if this is attempted, instead of crashing the kernel.
-
-    Fixes: 7ba247138907 ("[SCSI] open-iscsi/linux-iscsi-5 Initiator:
-Initiator code")
-    Signed-off-by: Eric Dumazet <edumazet@google.com>
-    Cc: Lee Duncan <lduncan@suse.com>
-    Cc: Chris Leech <cleech@redhat.com>
-    Cc: Mike Christie <michael.christie@oracle.com>
-    Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
-    Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-    Cc: open-iscsi@googlegroups.com
-    Cc: linux-scsi@vger.kernel.org
-    Reviewed-by: Mike Christie <michael.christie@oracle.com>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
 
