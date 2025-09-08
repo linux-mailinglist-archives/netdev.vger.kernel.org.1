@@ -1,142 +1,148 @@
-Return-Path: <netdev+bounces-220781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE61FB48A3E
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:35:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DAF3B48792
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 10:52:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 897D8167AA5
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 10:35:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D9CB3B18BB
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 08:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D832FA0EE;
-	Mon,  8 Sep 2025 10:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvxBQkPC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEEB2EBB84;
+	Mon,  8 Sep 2025 08:52:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F172F90CE;
-	Mon,  8 Sep 2025 10:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B8627F4F5;
+	Mon,  8 Sep 2025 08:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757327707; cv=none; b=JDb8oZJC4LMBRODCdt0NZgyg6vmkGoW8cVDecs1SBDwSbw3Ck/irV2W8DkQ2yjKxj5FVVAT35FasU4eHLiHi9D5pKVv7+qwGYUc4d/Hvjtlm45o5Cj6f1NF7hlfB58wO/T60cU3uZxr3c6VGZN/+W0EwsDPk+bmSv8D6NULhBZE=
+	t=1757321573; cv=none; b=aDngM0RpRRYrFXyq0TgG+YiQumRoq+97UizsY29XepYE/37UuQtkw3ErI7HrHttMqumyLeFwpUcc8/LT+r41yzG+F8/Pw73fAWWoKXYINqcXOxRm3G9BioWfiKSEnZRXchxGUk0zzJWoN1eqJEGUIpsGnbfHy6qjhbv6V7yB/LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757327707; c=relaxed/simple;
-	bh=P8+azPFD3IlzvZwU774Lp97SpbVybyxPP1U+m1uWN0M=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=UmtkZoy2/NnFfEKxpaVczPtRhgRBoY+kmZ79qH0x9+j/kXPjh8NxgwE4leYSCr4p8qQhvLSaS7e3lmfrODhDxxz/GJBva9VnnvE5z7Ya9GFPz//ksEck1fYJzKg2M6FV0RqKP4ClmbO5hKM/TCA/qEbAVqhSLv4krpgFK+twnLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IvxBQkPC; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45de1084868so6608705e9.2;
-        Mon, 08 Sep 2025 03:35:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757327703; x=1757932503; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5iDY+Vi0EdOqRjdG+5WCOpNIgHMMJTkV6QF3KBvr3ao=;
-        b=IvxBQkPC8fAht8lk3ep+UCv3XIJhHwHavPQAMqkwcEzcqEXa3kjIGBuosXo1+alo5w
-         +EhsZRVayzGDXPSKuhrU58dWH6zEKZgpSjzzTmf50s4xRc1dSq04ZHi3l75YWDYPTWaW
-         KHPHz/OutCGF27d9asVfH6Ev3//USZtMrMmyNwDgY4Mwstl8UXkU5pmBDJHo+ziYqa14
-         wWkEcWtvKzw9k2eg2ag3Y+e8Vl04OywTwFChvT0+4JIxvmR/zlqvN9TtrXD04EIdGjNK
-         B6iHpCP8+X7NRb/mqNFNvCw3zWRSNZK09Nqii0tyjiy0B0L309RTr4tlquXxuU/8+00P
-         zQJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757327703; x=1757932503;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5iDY+Vi0EdOqRjdG+5WCOpNIgHMMJTkV6QF3KBvr3ao=;
-        b=BCdPf6w7hMXbDMnDOUV1D85cUuV58v3INuWEti1TGpfoTfsqcPl+UPqcZLC6rXFOON
-         IqLpujzmJ7/un2NPOv8sDXkx7YlhiO7ko0SJ7NsLEcZ1mfSxOjzCuKRGqR46/832VXAL
-         a5nXvineqJz9QkgH+veq/o6PpYMz80lpLhnHuo4CZdUnZ6Ke4ydt5fC5NuyT53g0KYOc
-         pC1QuIvIPQco9kTvfcpmV2mkqmqNGWzuzbcDtRtIRMllayuAyrtlYc4KiJQPjggCquX9
-         I08St2jVfMchTKj8Bp0lR44LxiF0M2Gu0rzAt1mvriLl1oGKQTFqCAFocX3RZbpuz45D
-         5JVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUq+COoM6+coxeQpgcL737GynBOoVU3Ve1P0HALg6od8FC7gbEYYrLu33jIBCeGThhiCu+Z/7byDyowF2M=@vger.kernel.org, AJvYcCVtXxCdKAES0rqiVExXQ4Gkb+rdECTEapZpuW8Tqpl4wPzn+83wI+Ib1+yrWbck1wHyObVO+SjV@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOJbPKrsLBK1bPbFsasK5R4jadusGJTC1znTnccRDbewdndlYl
-	hSJSNniDcF3ThhRMttxbVuYB7xrF9HJB+FFq/7g3rcy84yQeBxSomUxvxoz8R5lU
-X-Gm-Gg: ASbGncvH7J47S3QUbAx1z34LHpbm73KrnaEDlzZk13etxpEcR9waqe0R39BBQk0CKHk
-	8Vgwef9Euux7OsnPe3bjDn2ihK7EunOtL47LrBk0xvwwawN5hi5bCCja72XCUML3Wz6pdiJv3KQ
-	7HbOmzOcHAcrGcCUWsZmA0nZ2Tvmn0t3n2VfmOwE7oI/+q6Hle7hu8PjO0A/lBHvlwXDc3x/tIJ
-	O3iFtIa/wDg2cp7tjx5Ne5W/xy6AktG9ieV8n67i8Xd5cMfQCZ0z/ZjhbItRMAR1N4WScgfukl8
-	jbiBKejkcSCDZ10MAK9HEFhbUM78b30uJG2uzxDyr++0xUWiYjk1LJn5DBk9LAzgdLsUC9osUtA
-	JusXhaTLKj/I7tjRPFjLfC6DiLCTTS32rHLYpaK/6yMV2Lw==
-X-Google-Smtp-Source: AGHT+IFA1bYE54JJaTFNePXQZmaaRtj5UDlgcqlwzpgBxMXl9p8+4+og96mcgEoXG8/un61iG2AtxQ==
-X-Received: by 2002:a05:600c:1f16:b0:45d:d5c6:482 with SMTP id 5b1f17b1804b1-45dddec845bmr63293325e9.18.1757327703349;
-        Mon, 08 Sep 2025 03:35:03 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:4171:ec50:b666:2385])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45cb5693921sm242509545e9.0.2025.09.08.03.35.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 03:35:02 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
- <ast@fiberby.net>
-Cc: Jacob Keller <jacob.e.keller@intel.com>,  "Jason A. Donenfeld"
- <Jason@zx2c4.com>,  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Andrew Lunn
- <andrew+netdev@lunn.ch>,  wireguard@lists.zx2c4.com,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 10/11] tools: ynl: decode hex input
-In-Reply-To: <bf530a9a-dca8-4df7-b9f2-9f2b3a1d2ce1@fiberby.net>
-Date: Mon, 08 Sep 2025 09:28:26 +0100
-Message-ID: <m21pohwdp1.fsf@gmail.com>
-References: <20250904-wg-ynl-prep@fiberby.net>
-	<20250904220156.1006541-10-ast@fiberby.net> <m2h5xhxjd5.fsf@gmail.com>
-	<410d69e5-d1f8-40e0-84b1-b5d56e0d9366@intel.com>
-	<bf530a9a-dca8-4df7-b9f2-9f2b3a1d2ce1@fiberby.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1757321573; c=relaxed/simple;
+	bh=jBpVsRQ8QZGPbPfImZzqtkhQboLi9nW2oeuNSFlR4yg=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=saU88Sl2TJXqdW7iylntcAMh0u13yAAlDjMM658r+Z2oMR54gYCQT9YJ6XJA6LInxsW7XmJvZDX0ZQG4tR+BacA3rYXYOCPesbLyZv7xecuTKCI4shLcVlIShaf4NDSGYaqub1aDYcLZe6lyfWwA6b0Y+GT0027n/9F+RxJGOIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cL11X30BZzYQvCJ;
+	Mon,  8 Sep 2025 16:52:48 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id E0A941A16C2;
+	Mon,  8 Sep 2025 16:52:46 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgD3QY5cmb5oBT8vBw--.65078S3;
+	Mon, 08 Sep 2025 16:52:46 +0800 (CST)
+Subject: Re: [syzbot] [net?] possible deadlock in inet_shutdown
+To: Eric Dumazet <edumazet@google.com>,
+ syzbot <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com>,
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org,
+ kuba@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ming.lei@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <68bb4160.050a0220.192772.0198.GAE@google.com>
+ <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
+ <CANn89iJaY+MJPUJgtowZOPwHaf8ToNVxEyFN9U+Csw9+eB7YHg@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <c035df1c-abaf-9173-032f-3dd91b296101@huaweicloud.com>
+Date: Mon, 8 Sep 2025 16:52:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CANn89iJaY+MJPUJgtowZOPwHaf8ToNVxEyFN9U+Csw9+eB7YHg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgD3QY5cmb5oBT8vBw--.65078S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF1fAr4fGw15uFyfKw15Jwb_yoW8AFW8pF
+	4UWFWjkr97KFy7XFsavw4ktFs5Awn09a4kK3yUG3sF9rZrCF1fAF1UtFs5ZryUCws3Gr42
+	va15WanakF4xuaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJr
+	UvcSsGvfC2KfnxnUUI43ZEXa7IU1aFAJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
+Hi,
 
-> On 9/6/25 12:27 AM, Jacob Keller wrote:
->> On 9/5/2025 3:51 AM, Donald Hunter wrote:
->>> Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
->>>
->>>> This patch add support for decoding hex input, so
->>>> that binary attributes can be read through --json.
->>>>
->>>> Example (using future wireguard.yaml):
->>>>   $ sudo ./tools/net/ynl/pyynl/cli.py --family wireguard \
->>>>     --do set-device --json '{"ifindex":3,
->>>>       "private-key":"2a ae 6c 35 c9 4f cf <... to 32 bytes>"}'
->>>>
->>>> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
->>>
->>> Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
->>>
->>> FWIW, the hex can include spaces or not when using bytes.fromhex(). When
->>> formatting hex for output, I chose to include spaces, but I don't really
->>> know if that was a good choice or not.
->> I also prefer the spaces for readability.
-> I formatted it with spaces for clarity, even without spaces it was a bit
-> long for one line. Spaces also has the advantage that you don't have to
-> think about endianness.
->
-> Should we define the display hints a bit more in a .rst, or is it OK that
-> they end up being implementation specific for each language library? Do we
-> want them to behave the same in a Rust YNL library, as they do in Python?
+在 2025/09/06 17:16, Eric Dumazet 写道:
+> On Fri, Sep 5, 2025 at 1:03 PM Eric Dumazet <edumazet@google.com> wrote:
+>>
+>> On Fri, Sep 5, 2025 at 1:00 PM syzbot
+>> <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com> wrote:
+> 
+> Note to NBD maintainers : I held about  20 syzbot reports all pointing
+> to NBD accepting various sockets, I  can release them if needed, if you prefer
+> to triage them.
+> 
+I'm not NBD maintainer, just trying to understand the deadlock first.
 
-Yes we should probably extend the existing doc to at least describe some
-of the defacto behaviour.
+Is this deadlock only possible for some sepecific socket types? Take
+a look at the report here:
 
-https://docs.kernel.org/userspace-api/netlink/specs.html#display-hint
+Usually issue IO will require the order:
 
-> BTW: The rest of the key used in the example can be found with this key-g=
-en:
-> $ printf "hello world" | sha1sum
-> [redacted key material]
+q_usage_counter -> cmd lock -> tx lock -> sk lock
+
+Hence the condition is that if the sock_sendmsg() will hold sk lock to
+allocate new memory, and can trigger fs reclaim, and finally issue new
+IO to this nbd?
+
+Thanks,
+Kuai
+
+>>
+>> Question to NBD maintainers.
+>>
+>> What socket types are supposed to be supported by NBD ?
+>>
+>> I was thinking adding a list of supported ones, assuming TCP and
+>> stream unix are the only ones:
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index 6463d0e8d0ce..87b0b78249da 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -1217,6 +1217,14 @@ static struct socket *nbd_get_socket(struct
+>> nbd_device *nbd, unsigned long fd,
+>>          if (!sock)
+>>                  return NULL;
+>>
+>> +       if (!sk_is_tcp(sock->sk) &&
+>> +           !sk_is_stream_unix(sock->sk)) {
+>> +               dev_err(disk_to_dev(nbd->disk), "Unsupported socket:
+>> should be TCP or UNIX.\n");
+>> +               *err = -EINVAL;
+>> +               sockfd_put(sock);
+>> +               return NULL;
+>> +       }
+>> +
+>>          if (sock->ops->shutdown == sock_no_shutdown) {
+>>                  dev_err(disk_to_dev(nbd->disk), "Unsupported socket:
+>> shutdown callout must be supported.\n");
+>>                  *err = -EINVAL;
+> 
+> .
+> 
+
 
