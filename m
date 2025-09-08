@@ -1,290 +1,196 @@
-Return-Path: <netdev+bounces-220905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4082B496E4
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:24:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEBC0B49A53
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:48:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40270164B46
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7664D1790B7
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9656D3101D9;
-	Mon,  8 Sep 2025 17:24:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BAF72D3A66;
+	Mon,  8 Sep 2025 19:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C2vV+QMV"
+	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="fs8fKFq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dog.elm.relay.mailchannels.net (dog.elm.relay.mailchannels.net [23.83.212.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15B41E1DE7;
-	Mon,  8 Sep 2025 17:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757352242; cv=none; b=dwqTRsWf0M6zh9+twdlmh8zon3Vgk7sJAUp4feyCG3qUdBD4cT4xoEB4azEz0FWVvU2ppI2iAqacXpiIJT50e+fj1jZ3MBs6VdjwDanUVf2IpeZkeEoDeZP4SEyzODAJLrlKvW1B7B4opBNi2gIv0uSWWaYpwuu1l70WMcbt7q0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757352242; c=relaxed/simple;
-	bh=qneFfOqnL/55hc/APD1To1k5e3b7xuMXLn1DjS+W9Cc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UT9gIoModkffWt8I4IckHFRuKPVbvL5KmcqrqEKsbPDcSMbaKQtJat3YYfE0/NQfXwuiRI6xinLCnlcfqEjpC7qS+HO61hAmRqTFD/1NytbrNcn29R7u75tDDuqfWLFSokEiICbmMG1ZxTs20OhrA1gJjy7XTagkWeQaH8Va//A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C2vV+QMV; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-71d6059f490so40334467b3.3;
-        Mon, 08 Sep 2025 10:24:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757352240; x=1757957040; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yuKkpzYEiCvO71Ei8abl0SPWjd7LNSODsnz5Kg8MlhA=;
-        b=C2vV+QMVJFDfR8jehzlTm5HJbwVXpDKegkYWvu9e1mKM7Q/VKBMONgRrYUD4vze+je
-         w3S/scGhQcI8TDxSt37Mq8rK2epOK8JNh30Se0eixan5bXfwKmCczcRvTJBZ1lpSL6fJ
-         rNXDgX2jjD3u2j95EbOEIJGBqi5HhC6vA9GswNZwsG4Y1AOVjJXldjC4/E+jftOciRZv
-         Z4dV3SvORoqVE/Y6VrPmS1UxDUEhQk9WC+uOOk339p5NdwHYG3G09Jkswwck0TJmYlRW
-         jSO3rV9a7AlecJRSCm3n4ZHPcfD43ZNQuwLXzV4R6qCr3VWyvXEJWZfBeKP8IcJwswCt
-         fIuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757352240; x=1757957040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yuKkpzYEiCvO71Ei8abl0SPWjd7LNSODsnz5Kg8MlhA=;
-        b=iiBSGKlt+fzG3p+dsL/mAeQ/Y5s5pbg3AXDMZ02Rihgu252I3vZpmTxLCDESXsRrJy
-         tD3gVtiwjWaH/LUNJwzWWr0OPt2tonfD/zr8Rw1J3p8Cv7K86eKXTkNyTMp5+Ow6a9BO
-         0Fc8k3dYwTVumVuzQ4Tvvx1CCtZtEbV2Rgrv2IpNW1JJtKnEjlYJmfUEgb7CbM0IpRSC
-         puhIpi3ooBfv9PSLvSwE0zRT3nIlUzl9dB8o8zQRqsekxLhFV3yau86wh/RTWE9bz92Q
-         o1TQnK08I8KYo5jZjl5Vhw8H/MjlezqIVFc85+y4bZG6dKZwC9FMMpYMMbCKnYOFgaRH
-         exlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX0Xyuobl35QzRB7c/c8X+eAHlEceC5anqA4VUH1I62EdDz8CrB4mzsfXrIJ5yMaau25OFuoa4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzO+XBUcjRXfQhm0ZWEO+CeZLX9ZBra3tWiQBbdtbX0+WW59zxb
-	o5vQC1I1LLZAeojltEgBMbyhaj+J0WYeEd6o37hsJb8L1dg4GnOI2wxImerTnmHB/9d6XNhN4tl
-	/emxZZTOatEkEKRN0JbVcLHOVrNFyuJNFKHEL
-X-Gm-Gg: ASbGncvPQzZc5REC8vw85wBKCD0qFk7+lH4Eu5k/VQWm5NLinvYiQ2dwDnLzDtq1HNX
-	ccMnIFZqiHj5l0hn4fCZBRJ/9QLhu1NbxXyLI3VEahb+tG5xSPgNYi2T6JF48F2qtlrI72cxtN9
-	ssCtGPLWgbDI4KmZ8j7AX7kerFE33NSkKXJhxDNrm4+1V+lVB2Op1U10QpQFzzqTHVFQ2fQsGQa
-	STWMjs=
-X-Google-Smtp-Source: AGHT+IFmcR6kIZTfFFH38Mv50nfyJ8VTSCs13f+os33Iq32qw8+PAHy+dsPhdR+ID+BxjLqjAnctIj1Ev7XrqZSudYk=
-X-Received: by 2002:a05:690c:4444:b0:721:3bd0:d5b4 with SMTP id
- 00721157ae682-727f652a236mr79006277b3.33.1757352239722; Mon, 08 Sep 2025
- 10:23:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F2C2D3754
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 19:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.212.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757360908; cv=pass; b=EItbncwLsmnUkiGpqAIsTnsvBo7t6RVbMTg01NJik05FIQFdVgNMWGtmTwIqGaOVJJSRgeZE1vfDp+RqaGivBQ6npNWNLYHcAnZT0h1gaosrpxR2Y6+u95xNpbSf3OMOeuNf50QdOxmUWrxTuipocLYKfMkh+X4eIaetA4qBblM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757360908; c=relaxed/simple;
+	bh=y+gok38nCHl8fHKbqQb9duk0EFb2ClPsu/Ttl/kBa/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EaXkU7/8tbxTSwPD7MVnSkHJ5+0aN5n5f9AOZtxcbBZCf6Yo4Oq/r5Ve1XqsEqiuW0VxGvR+3zM2cC68rB3pwHfqBddnVJnvszpTY5ZH88xO8S4lF6z9ms3u+QTkXMKJNsb/cEcwbcXfAEW9UHBh0NcsbDx8nWqn9N+g0scVmR8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=fs8fKFq4; arc=pass smtp.client-ip=23.83.212.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 418DE32428B
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 17:25:55 +0000 (UTC)
+Received: from pdx1-sub0-mail-a204.dreamhost.com (100-107-6-26.trex-nlb.outbound.svc.cluster.local [100.107.6.26])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id D7F37323F44
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 17:25:54 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1757352354; a=rsa-sha256;
+	cv=none;
+	b=PqH12wgL/yrCSUjG0slFgQ7/guapK+pOLpNzpvYwQykqJbLBzLM8aK3UZqHPzVe79s4Pf0
+	mFupFP8dcI/MXs79HuzGGESZ+QoNsLsfeLyXezH+A2EzgRpBeb0xSIc9+gGXXnni26SPtj
+	cdbHdzxpRrUuz6nMBe0EbKW++0Wbfxo6gMgdUrL+wU5zpmMzC6g0sjCQpsWdqZmAPjWhPS
+	MM8FD2FSAck4DaI3BHfWCvNzWEwHxUoY71eQ7uJB5YntnNqnQ3i7quFXs8WHnVXZV5//Tx
+	qgUVO2RGKnW6LqJUTVKgotOMaDWZ5pQuIlPq2oe08oVq519+hpQCcdz1Bs/L6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1757352354;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=gwa7Mfpih4MWlxuBxr9prkEft/umFWYN2yjVkeDZXEo=;
+	b=1/mosEVhOfVxzvujmZ46ADb708NHmN1mCTw7jSMIevCHdogYckViTsibr0gnJRmARhVZe8
+	YZNLTYOZ4rDTHEYkFfVMrQozKj1A2mxUwjifNl6AwvwWYmCtzwGmKiqQql5V2sruM3GQJO
+	zsUE/P1fxO+EwpzT+GXkqIb+dh9HiuVFEeaRJC4cGlxLCUQ5H9ALGVDGWeoxogpR7zfYQz
+	CBBqEZ8wSPKbJNbwjWJb1yV7Xr/nJ7fQHkWDgNwPPvznSQae829ZfrsZ0ieMFKAy6hdP5Y
+	qCYWmu5OzMWD0Lu01lB7CZyC+A820Vpd+oQG2Z/g9EcT1UXPJwcqPwRMcBoK/w==
+ARC-Authentication-Results: i=1;
+	rspamd-9968f48fc-22hz2;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MailChannels-Auth-Id: dreamhost
+X-Trouble-Trouble: 06525b114c6a7933_1757352355111_1269835727
+X-MC-Loop-Signature: 1757352355111:2011228360
+X-MC-Ingress-Time: 1757352355111
+Received: from pdx1-sub0-mail-a204.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.107.6.26 (trex/7.1.3);
+	Mon, 08 Sep 2025 17:25:55 +0000
+Received: from kmjvbox.templeofstupid.com (c-73-70-109-47.hsd1.ca.comcast.net [73.70.109.47])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kjlx@templeofstupid.com)
+	by pdx1-sub0-mail-a204.dreamhost.com (Postfix) with ESMTPSA id 4cLDPZ2RNBzmK
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 10:25:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
+	s=dreamhost; t=1757352354;
+	bh=gwa7Mfpih4MWlxuBxr9prkEft/umFWYN2yjVkeDZXEo=;
+	h=Date:From:To:Cc:Subject:Content-Type:Content-Transfer-Encoding;
+	b=fs8fKFq4pLlYJHd322+Pi7ceL1f/Zy3kwJO/Uyl/MO7aXSgBouOyqFCVHflsSPBXT
+	 0C6S1rNp3GmSObk8K7/AwbUGMHkvmYTHtijwFM7fgfrJ1DcQJ36htuI991rugeL7gA
+	 mlImXfNUQxi0L9LR/xiDmHa8RABSebIJmWXzDGj/2eHAYU2YBZTLQqRsecQ0EJK24p
+	 h46HQ7UYpSDka3rc4Bf5udhmbbVqcYbzUZD1gglI9LM8ZdBG+GnLFuTwVcqDhEWTx3
+	 N5o50KuXmVG3rlutqh04o/OC+6m/C6xrbdbVy80TK2FywB0JvBQ9khYz6h64c1fYfM
+	 jLP6IilFxomkA==
+Received: from johansen (uid 1000)
+	(envelope-from kjlx@templeofstupid.com)
+	id e01fb
+	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.13);
+	Mon, 08 Sep 2025 10:25:53 -0700
+Date: Mon, 8 Sep 2025 10:25:53 -0700
+From: Krister Johansen <kjlx@templeofstupid.com>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Geliang Tang <geliang@kernel.org>, Mat Martineau <martineau@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-kernel@vger.kernel.org, David Reaver <me@davidreaver.com>
+Subject: Re: [PATCH mptcp] mptcp: sockopt: make sync_socket_options propagate
+ SOCK_KEEPOPEN
+Message-ID: <aL8RoSniweGJgm3h@templeofstupid.com>
+References: <aLuDmBsgC7wVNV1J@templeofstupid.com>
+ <ab6ff5d8-2ef1-44de-b6db-8174795028a1@kernel.org>
+ <83191d507b7bc9b0693568c2848319932e6b974e.camel@kernel.org>
+ <78d4a7b8-8025-493a-805c-a4c5d26836a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250905173352.3759457-1-ameryhung@gmail.com> <20250905173352.3759457-2-ameryhung@gmail.com>
- <4hgasq7ibnulieu77b4bryhouggobgousci7z2i3pefv7ofysh@j3qeucyw5wv5>
-In-Reply-To: <4hgasq7ibnulieu77b4bryhouggobgousci7z2i3pefv7ofysh@j3qeucyw5wv5>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Mon, 8 Sep 2025 10:23:48 -0700
-X-Gm-Features: Ac12FXxxe1yFTTrTU9YLONLqW1XUVSPH2DSVnCDNx2pozF0qEODf_ma-DU3pwss
-Message-ID: <CAMB2axOoZysP2QtiLF+rYU_RebF140zPN4FjAm3AF1wW8yFLuQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/7] net/mlx5e: Fix generating skb from
- nonlinear xdp_buff
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, kuba@kernel.org, 
-	stfomichev@gmail.com, martin.lau@kernel.org, mohsin.bashr@gmail.com, 
-	noren@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, 
-	maciej.fijalkowski@intel.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <78d4a7b8-8025-493a-805c-a4c5d26836a8@kernel.org>
 
-On Mon, Sep 8, 2025 at 7:42=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com>=
- wrote:
+On Mon, Sep 08, 2025 at 07:13:12PM +0200, Matthieu Baerts wrote:
+> Hi Geliang,
+> 
+> On 07/09/2025 02:51, Geliang Tang wrote:
+> > Hi Matt,
+> > 
+> > On Sat, 2025-09-06 at 15:26 +0200, Matthieu Baerts wrote:
+> >> Hi Krister,
+> >>
+> >> On 06/09/2025 02:43, Krister Johansen wrote:
+> >>> Users reported a scenario where MPTCP connections that were
+> >>> configured
+> >>> with SO_KEEPALIVE prior to connect would fail to enable their
+> >>> keepalives
+> >>> if MTPCP fell back to TCP mode.
+> >>>
+> >>> After investigating, this affects keepalives for any connection
+> >>> where
+> >>> sync_socket_options is called on a socket that is in the closed or
+> >>> listening state.  Joins are handled properly. For connects,
+> >>> sync_socket_options is called when the socket is still in the
+> >>> closed
+> >>> state.  The tcp_set_keepalive() function does not act on sockets
+> >>> that
+> >>> are closed or listening, hence keepalive is not immediately
+> >>> enabled.
+> >>> Since the SO_KEEPOPEN flag is absent, it is not enabled later in
+> >>> the
+> >>> connect sequence via tcp_finish_connect.  Setting the keepalive via
+> >>> sockopt after connect does work, but would not address any
+> >>> subsequently
+> >>> created flows.
+> >>>
+> >>> Fortunately, the fix here is straight-forward: set SOCK_KEEPOPEN on
+> >>> the
+> >>> subflow when calling sync_socket_options.
+> >>>
+> >>> The fix was valdidated both by using tcpdump to observe keeplaive
+> >>> packets not being sent before the fix, and being sent after the
+> >>> fix.  It
+> >>> was also possible to observe via ss that the keepalive timer was
+> >>> not
+> >>> enabled on these sockets before the fix, but was enabled
+> >>> afterwards.
+> >>
+> >>
+> >> Thank you for the fix! Indeed, the SOCK_KEEPOPEN flag was missing!
+> >> This
+> >> patch looks good to me as well:
+> >>
+> >> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> >>
+> >>
+> >> @Netdev Maintainers: please apply this patch in 'net' directly. But I
+> >> can always re-send it later if preferred.
+> > 
+> > nit:
+> > 
+> > I just noticed his patch breaks 'Reverse X-Mas Tree' order in
+> > sync_socket_options(). If you think any changes are needed, please
+> > update this when you re-send it.
+> 
+> Sure, I can do the modification and send it with other fixes we have.
 
-Resending the reply to the list again as some html stuff accidentally
-got mixed in
+Thanks for the reviews, Geliang and Matt.  If you'd like me to fix the
+formatting up and send a v2, I'm happy to do that as well.  Just let me
+know.
 
->
-> On Fri, Sep 05, 2025 at 10:33:45AM -0700, Amery Hung wrote:
-> > xdp programs can change the layout of an xdp_buff through
-> > bpf_xdp_adjust_tail() and bpf_xdp_adjust_head(). Therefore, the driver
-> > cannot assume the size of the linear data area nor fragments. Fix the
-> > bug in mlx5 by generating skb according to xdp_buff after xdp programs
-> > run.
-> >
-> Shouldn't this patch be a fix for net then?
-
-Make sense. I will separate the mlx5 patch from this set and target net.
-
->
-> > Currently, when handling multi-buf xdp, the mlx5 driver assumes the
-> > layout of an xdp_buff to be unchanged. That is, the linear data area
-> > continues to be empty and fragments remains the same. This may cause
-> > the driver to generate erroneous skb or triggering a kernel
-> > warning. When an xdp program added linear data through
-> > bpf_xdp_adjust_head(), the linear data will be ignored as
-> > mlx5e_build_linear_skb() builds an skb without linear data and then
-> > pull data from fragments to fill the linear data area. When an xdp
-> > program has shrunk the non-linear data through bpf_xdp_adjust_tail(),
-> > the delta passed to __pskb_pull_tail() may exceed the actual nonlinear
-> > data size and trigger the BUG_ON in it.
-> >
-> > To fix the issue, first record the original number of fragments. If the
-> > number of fragments changes after the xdp program runs, rewind the end
-> > fragment pointer by the difference and recalculate the truesize. Then,
-> > build the skb with linear data area matching the xdp_buff. Finally, onl=
-y
-> > pull data in if there is non-linear data and fill the linear part up to
-> > 256 bytes.
-> >
-> > Fixes: f52ac7028bec ("net/mlx5e: RX, Add XDP multi-buffer support in St=
-riding RQ")
-> Your fix covers both Legacy RQ and Striding RQ. So the tag is only 1/2
-> correct. Normally we have separate patches for each mode.
-
-Will split the patch into two.
-
->
->
->
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 38 +++++++++++++++++--
-> >  1 file changed, 35 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_rx.c
-> > index b8c609d91d11..6b6bb90cf003 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > @@ -1729,6 +1729,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq,=
- struct mlx5e_wqe_frag_info *wi
-> >       struct mlx5e_wqe_frag_info *head_wi =3D wi;
-> >       u16 rx_headroom =3D rq->buff.headroom;
-> >       struct mlx5e_frag_page *frag_page;
-> > +     u8 nr_frags_free, old_nr_frags;
-> >       struct skb_shared_info *sinfo;
-> >       u32 frag_consumed_bytes;
-> >       struct bpf_prog *prog;
-> > @@ -1772,17 +1773,27 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *r=
-q, struct mlx5e_wqe_frag_info *wi
-> >               wi++;
-> >       }
-> >
-> > +     old_nr_frags =3D sinfo->nr_frags;
-> > +
-> >       prog =3D rcu_dereference(rq->xdp_prog);
-> >       if (prog && mlx5e_xdp_handle(rq, prog, mxbuf)) {
-> >               if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flag=
-s)) {
-> >                       struct mlx5e_wqe_frag_info *pwi;
-> >
-> > +                     wi -=3D old_nr_frags - sinfo->nr_frags;
-> > +
-> >                       for (pwi =3D head_wi; pwi < wi; pwi++)
-> >                               pwi->frag_page->frags++;
-> >               }
-> >               return NULL; /* page/packet was consumed by XDP */
-> >       }
-> >
-> > +     nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
-> > +     if (unlikely(nr_frags_free)) {
-> Even with with a branch prediction hint, is it really worth it?
->
-
-[...]
-
->
-> > +             wi -=3D nr_frags_free;
-> > +             truesize -=3D nr_frags_free * frag_info->frag_stride;
-> > +     }
-> > +
-> >       skb =3D mlx5e_build_linear_skb(
-> >               rq, mxbuf->xdp.data_hard_start, rq->buff.frame0_sz,
-> >               mxbuf->xdp.data - mxbuf->xdp.data_hard_start,
-> > @@ -2004,6 +2015,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
-q *rq, struct mlx5e_mpw_info *w
-> >       u32 byte_cnt       =3D cqe_bcnt;
-> >       struct skb_shared_info *sinfo;
-> >       unsigned int truesize =3D 0;
-> > +     u32 pg_consumed_bytes;
-> >       struct bpf_prog *prog;
-> >       struct sk_buff *skb;
-> >       u32 linear_frame_sz;
-> > @@ -2057,7 +2069,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
-q *rq, struct mlx5e_mpw_info *w
-> >
-> >       while (byte_cnt) {
-> >               /* Non-linear mode, hence non-XSK, which always uses PAGE=
-_SIZE. */
-> > -             u32 pg_consumed_bytes =3D min_t(u32, PAGE_SIZE - frag_off=
-set, byte_cnt);
-> > +             pg_consumed_bytes =3D min_t(u32, PAGE_SIZE - frag_offset,=
- byte_cnt);
-> >
-> >               if (test_bit(MLX5E_RQ_STATE_SHAMPO, &rq->state))
-> >                       truesize +=3D pg_consumed_bytes;
-> > @@ -2073,10 +2085,15 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e=
-_rq *rq, struct mlx5e_mpw_info *w
-> >       }
-> >
-> >       if (prog) {
-> > +             u8 nr_frags_free, old_nr_frags =3D sinfo->nr_frags;
-> > +             u32 len;
-> > +
-> >               if (mlx5e_xdp_handle(rq, prog, mxbuf)) {
-> >                       if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, =
-rq->flags)) {
-> >                               struct mlx5e_frag_page *pfp;
-> >
-> > +                             frag_page -=3D old_nr_frags - sinfo->nr_f=
-rags;
-> > +
-> >                               for (pfp =3D head_page; pfp < frag_page; =
-pfp++)
-> >                                       pfp->frags++;
-> >
-> > @@ -2087,9 +2104,22 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_=
-rq *rq, struct mlx5e_mpw_info *w
-> >                       return NULL; /* page/packet was consumed by XDP *=
-/
-> >               }
-> >
-> > +             len =3D mxbuf->xdp.data_end - mxbuf->xdp.data;
-> > +
-> > +             nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
-> > +             if (unlikely(nr_frags_free)) {
-> Same question about the if.
-
-I see. I will make the recalculation unconditional.
-
->
-> > +                     frag_page -=3D nr_frags_free;
-> > +
-> > +                     /* the last frag is always freed first */
-> > +                     truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mp=
-wqe.log_stride_sz));
-> > +                     while (--nr_frags_free)
-> > +                             truesize -=3D nr_frags_free *
-> > +                                         ALIGN(PAGE_SIZE, BIT(rq->mpwq=
-e.log_stride_sz));
-> > +             }
-> > +
-> This doesn't seem correct. It seems to remove too much from truesize
-> when nr_frags_free > 2. I think it should be:
->
-> truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mpwqe.log_stride_sz)) -
->             (nr_frags_free - 1) * ALIGN(PAGE_SIZE, BIT(rq->mpwqe.log_stri=
-de_sz));
->
-> And PAGE_SIZE is aligned to stride size so you can shorted it to:
->
-> truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mpwqe.log_stride_sz)) -
->             (nr_frags_free - 1) * PAGE_SIZE;
-
-Sorry that I was being sloppy here. You are correct, and I think you
-probably meant "+" instead of "-".
-
-truesize -=3D ALIGN(pg_consumed_bytes, BIT(rq->mpwqe.log_stride_sz)) +
-             (nr_frags_free - 1) * PAGE_SIZE;
-
->
-> Thanks,
-> Dragos
->
+-K
 
