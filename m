@@ -1,221 +1,133 @@
-Return-Path: <netdev+bounces-220926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD69CB497CE
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:02:15 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF8E8B497D9
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:09:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75B184E101E
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:02:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 934E64E2055
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48EB312838;
-	Mon,  8 Sep 2025 18:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C06313E1A;
+	Mon,  8 Sep 2025 18:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FfTaRY1k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2P5/d75"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4AD145B16;
-	Mon,  8 Sep 2025 18:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7DF7FBAC;
+	Mon,  8 Sep 2025 18:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757354530; cv=none; b=cCOvvuriPkRvw87ce02xezzAuOjmRIZ5TH+sl/ZU3C4nMb2Kgrn+SumMVbDZKfuJz/z36SBZRkk8wc3e+lZtcO9ccExqAq94UHnVlJJSuaeA3qZPASTnNQndmkrUUMjVSdHCgMhxxOXvm0fqUApLQf8fp2c7phFXGsA9xA2bJRE=
+	t=1757354979; cv=none; b=AMEq8YNVQQsUJ9QaEncjWVvkCn6CqF9VXExZj6KC1RxUTEgn4qr9ITGMdMw7HIGz35ycfy9CFD9fexVMRX46ObuIFRSMhqU4L/3UtQVe3CgbgMe4/3JZhXMvV535/E7w2dD/9kdnFieoJ5qXpBHLsDfP5fy8Y7FEZ3Seqdgjffk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757354530; c=relaxed/simple;
-	bh=W6Ecx1Pxm6pVnypIcRy7pTj31dzrtQMTFRBCwzDYq4c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PqhO5UFPjCqJc6ifXQ9fNBTOPWIlRfWAVHAOwaDZ5tYxCZieG/IgM9UWFPu9ktJyE1R0p+Ss0BSWELqOte4hJ7QKlV4L6A+DIOcPLF7U2hEFC2Vzr54yGknFmmPw4Dgpp21+KYkF/kEUEVMEr/iQVQX/2na/NZ+Q6R1g7XNU4us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FfTaRY1k; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	s=arc-20240116; t=1757354979; c=relaxed/simple;
+	bh=NuQI4nMA0g0N9BbTVEQpy+JxTD3mg9+9KzSwGSix7cU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eOd9yDgO2LpoWlx92umlM3ZEZJ4TKG7OQrSNDMUD/gl7r0hKTiy3zRkUokCQh6vNZ7T02dzsp+S8nMz6fhpHIUd+o+sKRGs3TsXZte8GSceJxUqZAfQAu94/15NbSRWnPJlUGDPuuxuPtsiNV3Q7PypXaHA9CTJvbOPvZ8FGt9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2P5/d75; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b52196e8464so1923458a12.3;
-        Mon, 08 Sep 2025 11:02:08 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-24cde6c65d1so34309225ad.3;
+        Mon, 08 Sep 2025 11:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757354528; x=1757959328; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oeapqvce2e/YgpDoR/iLFBVYj0LNwbuiMP+6kJLqgg4=;
-        b=FfTaRY1knl1CQIngTI8IMbnHgzrLcmGltZmThPwoxXpxW5prHoOvlLQjCJS80H7EDU
-         pdJYkqkPiq6d5LW3TgYc+SDl1EpdNcPihZoPmxECvrbf5BZMRHU2dPzjlUHpTOnodpfi
-         Oz6b0gMvesyIc5mDXWiMz5srRLhNg79JdRAxcm+N1shgAJ8ujd64lHQGjFBruciALuLS
-         SyxUcYdXqqNi8AyVvG9HgeAacwUOAiZvOMlEykGaYAbujwsT1RUVSyrtH5mpLgfui2IM
-         Ehe3T+Oa9CxcAbD4Pt2k//vldt/7rlxhS6b4m9UTb9gQu68JcaonpYLah7rH8daTrQgI
-         m7dQ==
+        d=gmail.com; s=20230601; t=1757354978; x=1757959778; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RTgXOKpTqqoYfQsbZozKU3x3sBsg6MhNCEyIXZl9xW4=;
+        b=F2P5/d7563rzk8tOjyR7iOGMwybTxV813345uok762tukNF78/gl310yyTgDOs9txT
+         UViLDWMzL5HnOB9rKbW9k8ktA32MURPE4e51grCWmJUuralA4CB+BSScd3FqlbPez2Ur
+         TOM14VC4F46pBbSMz/qe2og+DkBnhVdWY3SBKrd3qRZINJzmu2L9QMONGcMSdjmWR/sb
+         f4o01bBRlnRGZU9NwQVd2MpGR2UUU/GfbokjAlx1re1SdgY9IJO3grAzvaBawXi/FIou
+         lMLgJgBLsLdvcmBLBlhKb+ShDe9sLktu1SrWuk8NrRDxyIlUDt9hvVTo84fnkcR3pRqc
+         qd8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757354528; x=1757959328;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Oeapqvce2e/YgpDoR/iLFBVYj0LNwbuiMP+6kJLqgg4=;
-        b=Yxd5LdBZPb4hkCLlRIL09MWCVjwGMjvXmxyRUPtdOuIpVn/rEFivWw01nqaLPjT23V
-         qop1IkRJUQ3yCMM5VYa+ZRY0ZfEZuFR8pRWP0Elqn+S4S1PZc8bQiR0muLVTu3wVhZRq
-         w3XRKAFBBLE16uYPxyYyqVOSfwe0wIHy6EnMvsouRp260IiFAj1rojtGlyu4+tEvcOWZ
-         UraZjWh8vGoXEQ3aUM/VJPDMs5UpmAgNwWOrD1mgwS6aZK6Iic3o80sQowvPybXRKtQh
-         LbwbBRtqDewLTQFgdO7HhP07MKd0eKZGCod/FpvUz7U9vJAxt03Mw5+5FQwxcjKbrmM7
-         OntA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIXUJK95YrVEcGoTckvGR/6A9KPYek2e4dLvjG1MsaLf90MWBGhl4lGLMekGqWc2Z0+kfgUt3c/mVH@vger.kernel.org, AJvYcCVmRBJwPwQS/j+y7tHY6qNVBLcKUshC9D7AkLCuuGeRUA++BxsU+5dOb4WDHbITG4B2Of6Fd3KOoPR0n5Q=@vger.kernel.org, AJvYcCW3itdqOrM6H3q/PjiZGbIUeIb6sANQjsnyX1lzndBd+l+U/l4NW+iJ0/KoIPFPmAke7MEGPxb4@vger.kernel.org, AJvYcCWMa+rLCM9j2X9lH/nhQoIJeb4eMIiQwa8e15SNNz2BSWZdODF0W/FL8ovxcmyG5etokjkJb6KTT/Fj1jFM@vger.kernel.org, AJvYcCXgV1pYSaIdKubKpTy//0g8CWYzjoB5CYA6+Uk7nEmVXbLls91Hq/34w2h0tJzawzvJF9u1cg1hUxk9@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLLVm5hM4xwgOkdD+FSDSbdtgw/m7tJasfOQ8stMr8e7Kc9NA9
-	7Mmr2xLxR80e7FUygbQg+MFDJrm5ExtxPXzJj0khzIpzANrGVP98LzO4
-X-Gm-Gg: ASbGnctNKS8TrmYC0tGvz6CY0EydtjigaKGYkIOQ0dKe2d0W9XHun4F4kOb2c6CTpfP
-	NJx2TgCb0EtIat2KwJ5P8GxmjKhwsxdjP8CXlnwgcp4yBkJ37MBYI4GlkprIL88tiyh6AZ2LFFi
-	J5F4/DF0mX4UJOQC4jq9+4RlQpvT5jHTdvFIBwiXuwA97ilJhoNpEpTVGlNW2BoZ9L79RTFIx0d
-	yyfWiKtTeqRzpDBCfLT5555R9LUxAT7Z26RrnxUHpkcJhXmtvhXA/dFuygWkveTII+bP6K+81Wz
-	QqV0UD/afFU7vsG6BoXHJk0AERmaNEKa7MZdnclm97AfGc2Lc7A4vKhI6PPO4pHXKEpC6MIVp46
-	JkxYRqJk5NBHJeAd1XYCVHcupxc7PgRIufVQkdXQxsFla3ik5yffjBgx4jylYBnipHO6YgTrNbQ
-	GElsk3C2n+DdWYensw
-X-Google-Smtp-Source: AGHT+IEeU/DB0HOb4fPagqRudZuMsg2x4PoB+G/k1VfzfmYv6JE/beBzNlrrOjMK54ZO08DaRL8UPA==
-X-Received: by 2002:a17:902:ce89:b0:24d:64bc:1495 with SMTP id d9443c01a7336-25172e32f31mr123848925ad.41.1757354527849;
-        Mon, 08 Sep 2025 11:02:07 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24cb28c3110sm133495925ad.120.2025.09.08.11.02.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Sep 2025 11:02:07 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <9e4db8d7-c99f-46f3-9ddb-00b0a9261d86@roeck-us.net>
-Date: Mon, 8 Sep 2025 11:02:05 -0700
+        d=1e100.net; s=20230601; t=1757354978; x=1757959778;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RTgXOKpTqqoYfQsbZozKU3x3sBsg6MhNCEyIXZl9xW4=;
+        b=iDBH+Az0SCPIiJdD0u9Tga6oWLJvYHunqWfzczSJQ157nhY6gAcbBUjL+cNiwK/fOx
+         tDwu1hlgQIZFRETSYgG7lB9gFylMXmZuUWunGfOMjIh/giMKHmexYdwrv5kTg21ceWjA
+         b5wFL2/cgs8TRTEqDEzW9ozOD7vHIqFbNC64RE0aFK9HtCrLyB83KfOPyUoIa+WwsHtT
+         UKj/PDlbpF9vzzPkJKjkv2A0AO6YoEcuEXeGCBPmw7iecp23Kznh2X6iwGu3igiINLCa
+         LMxUJyrp0qlTKXtbumE4uObVrszMUqDLQQO0RnsIyUhQNysmI9nUOk+/KN+/ZvA/oqPk
+         pWTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVHqr+oHPzFCS6IzWWOOTB2aP/OJGoGa5bDC5Ycxs6X37rxhPVeMBnyYD7TizWlJ+ZKKB1Qkpwm@vger.kernel.org, AJvYcCWtrfwBzbKaXRah5kIRtdf634iXYn/bSWSgYjEaKKvUokBluBS6YQ69WCDpfGQmcXN1o9CGAQQEM6esKg==@vger.kernel.org, AJvYcCWvvg13kagMlSy3Yd/Y9ZfCTaziMQnSFkd8N9cINLTWcs5zOSceAKkd8o1ZDMSipJWgvn2bz0v1EA/6iiY=@vger.kernel.org, AJvYcCX8fQEBwlfxXvNP4NUFbHldMk679M4S9p6GoVZ1XIA4Rfe1OJyhdkwiGdz4FkUp/BOxNeUaQbKaXtvGpA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT8thVlD5fh1Qatktjjm927Qn+m9TEAhHbtfjf2mM5nunLBfjN
+	ULJqZm3hFwMKB3Cda0nIltZxSqR0ZplIEzTHD/X1VVSobBIot3g1HrLO
+X-Gm-Gg: ASbGnctNEaghTdeatS7JVoRMU/kuB8A2HuLURa3a/2q8ivkUOmZNTNsZMQjtxBoRTAx
+	C5eg9mR7tUgvXlOvsrpmpGeKtmSlj8Q7R0RKmB+lQuTd/xJLTap3De/jYE3TkMH6m0fsUe54LCo
+	XrxIK3pzQSGJiA8GoVdlLniqSfL4wfQ6RM8ZDEDjAY/jC955g8qqRFbPagK+y0t7pqCPGBu5NkF
+	m6Mq0sFXxVmu7DymV6ImEU73IJFXFS+i9u1EVv+S79Iuo/Xl1kanYhiAe8m8z9ENqz5i7qEdU0g
+	xP1FLJXBTcQFE8pkCanvMzUq5VBwPbrAgRouZjUWHmY6aMEUWlLIRn4WqP6RaTbxVP6RfbC6gkR
+	1IeaNS2oGxD4D1lhL3/Scf+/M6pGaUoQM3vi+pY93+gt1fhiiPtxOuML9VJYebWG5NIHJoAl1NU
+	8oK/u1bwMDSjKQiVSM7QLZeNHtCgW57PGRhjqge4oCV/7pKwo=
+X-Google-Smtp-Source: AGHT+IHUvGdkTF6ftj5zF8+ukk3mhEagKf7AXIJW2UU34v0dDiyGOkNx8+ez0Gtfkca6XYJRXXePLg==
+X-Received: by 2002:a17:903:3d06:b0:258:2476:77db with SMTP id d9443c01a7336-25824767953mr24731155ad.42.1757354977526;
+        Mon, 08 Sep 2025 11:09:37 -0700 (PDT)
+Received: from crl-3.node2.local ([125.63.65.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24b273e4ad5sm172768845ad.25.2025.09.08.11.09.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Sep 2025 11:09:37 -0700 (PDT)
+From: Kriish Sharma <kriish.sharma2006@gmail.com>
+To: alibuda@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com
+Cc: mjambigi@linux.ibm.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	kriish.sharma2006@gmail.com
+Subject: [PATCH] net/smc: replace strncpy with strscpy for ib_name
+Date: Mon,  8 Sep 2025 18:09:13 +0000
+Message-Id: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/2] hwmon: (tps23861) add class restrictions and
- semi-auto mode support
-To: Gregory Fuchedgi <gfuchedgi@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Robert Marko <robert.marko@sartura.hr>,
- Luka Perkov <luka.perkov@sartura.hr>, Jean Delvare <jdelvare@suse.com>,
- Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, linux-hwmon@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>,
- Network Development <netdev@vger.kernel.org>
-References: <20250904-hwmon-tps23861-add-class-restrictions-v3-0-b4e33e6d066c@gmail.com>
- <4e7a2570-41ec-4179-96b2-f8550181afd9@roeck-us.net>
- <aL5g2JtIpupAeoDz@pengutronix.de>
- <CAAcybuvqqKBniV+OtgfCLHJdmZ836FJ3p7ujp3is2B8bxQh4Kw@mail.gmail.com>
-Content-Language: en-US
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- np3900V20aS7eD9K8GTU0TGC1pyz6IVJwIE=
-In-Reply-To: <CAAcybuvqqKBniV+OtgfCLHJdmZ836FJ3p7ujp3is2B8bxQh4Kw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 9/8/25 09:39, Gregory Fuchedgi wrote:
-> On Sun, Sep 7, 2025 at 9:51 PM Oleksij Rempel <o.rempel@pengutronix.de> wrote:
->>
->> On Sun, Sep 07, 2025 at 09:06:25AM -0700, Guenter Roeck wrote:
->>> +Cc: pse-pd maintainers and netdev mailing list
->>>
->>> On 9/4/25 10:33, Gregory Fuchedgi via B4 Relay wrote:
->>>> This patch series introduces per-port device tree configuration with poe
->>>> class restrictions. Also adds optional reset/shutdown gpios.
->>>>
->>>> Tested with hw poe tester:
->>>>    - Auto mode tested with no per-port DT settings as well as explicit port
->>>>      DT ti,class=4. Tested that no IRQ is required in this case.
->>>>    - Semi-Auto mode with class restricted to 0, 1, 2 or 3. IRQ required.
->>>>    - Tested current cut-offs in Semi-Auto mode.
->>>>    - On/off by default setting tested for both Auto and Semi-Auto modes.
->>>>    - Tested fully disabling the ports in DT.
->>>>    - Tested with both reset and ti,ports-shutdown gpios defined, as well as
->>>>      with reset only, as well as with neither reset nor shutdown.
->>>>
->>>> Signed-off-by: Gregory Fuchedgi <gfuchedgi@gmail.com>
->>>
->>> This entire series makes me more and more unhappy. It is not the responsibility
->>> of the hardware monitoring subsystem to control power. The hardware monitoring
->>> subsystem is for monitoring, not for control.
->>>
->>> Please consider adding a driver for this chip to the pse-pd subsystem
->>> (drivers/net/pse-pd). As it turns out, that subsystem already supports
->>> tps23881. This is a similar chip which even has a similar register set.
->>>
->>> This driver could then be modified to be an auxiliary driver of that driver.
->>> Alternatively, we could drop this driver entirely since the pse-pd subsystem
->>> registers the chips it supports as regulator which has its own means to handle
->>> telemetry.
->> Yes, Guenter is right. This driver belongs to the pse-pd framework.
-> No disagreement here in principle. However, the current hwmon driver
-> already implements power control and exposes it via in*_enable sysfs
-> files. I found this a bit odd, but I don't write drivers often.
-> My understanding of Guenter's suggestion is that it would require breaking
-> this userspace API?
-> 
+Replace the deprecated strncpy() with strscpy() for ib_name in
+smc_pnet_add_ib(). The destination buffer should be NUL-terminated and
+does not require any trailing NUL-padding. Since ib_name is a fixed-size
+array, the two-argument form of strscpy() is sufficient and preferred.
 
-If the enable attributes enable power to the ports, that code and functionality
-is simply wrong. It should only enable (or have enabled) power _monitoring_.
-As such, changing that would from my perspective be a bug fix.
+Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+---
+ net/smc/smc_pnet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-And, yes, that slipped my attention when reviewing the original code.
-Sorry to have to say that, but I am not perfect.
-
->  From a quick look at the tps23881 datasheet I can see that it is
-> similar, however, it is quite different in the context of this patch.
-> tps23881 (unlike tps23861) has Port Power Allocation register that can
-> limit poe power class. This register can be set prior to
-> detection/classification. So the extra complexity of an interrupt
-> handler that decides whether to enable the power may not be required.
-> 
-> Perhaps it still makes sense to merge these drivers, but I don't have
-> time or hardware to do it at the moment.
-
-I didn't suggest to merge the tps23881 and tps23861 drivers; I just pointed out
-that they have a similar register set.
-
-The point here is that a hardware monitoring driver should limit itself
-to hardware monitoring. Actual control should, for example, be implemented
-through the regulator or thermal subsystems.
-
-Guenter
+diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+index 76ad29e31d60..b90337f86e83 100644
+--- a/net/smc/smc_pnet.c
++++ b/net/smc/smc_pnet.c
+@@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
+ 		return -ENOMEM;
+ 	new_pe->type = SMC_PNET_IB;
+ 	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
+-	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
++	strscpy(new_pe->ib_name, ib_name);
+ 	new_pe->ib_port = ib_port;
+ 
+ 	new_ibdev = true;
+-- 
+2.34.1
 
 
