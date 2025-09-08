@@ -1,155 +1,173 @@
-Return-Path: <netdev+bounces-220815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 200FCB48DD6
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 14:43:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B8DEB48DF6
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 14:47:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0C03B4E10E2
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:43:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46F8034040C
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503BF2FB0BB;
-	Mon,  8 Sep 2025 12:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mnyZZKH7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D1D30594E;
+	Mon,  8 Sep 2025 12:46:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926B9147C9B;
-	Mon,  8 Sep 2025 12:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755BF301000
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 12:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757335411; cv=none; b=Y26pITfIUqQvYo+2tGDSW5+J1xgEOkmzy7jY3D8FLkcyjkimaZs32nT43FtMt6RGEKoU9469+A9RyIjWzWehjm1OW0xLxD5WwL56OqamLN5EeL9qLVlKCScqowdtdHGnLCAqnebUIfcubq78u8FgjuHUOD4aiWT+mB21l8sdM9s=
+	t=1757335592; cv=none; b=UpTPkyFjJ9z8hjIeH0fv9f9YNNlDXq85GnLgMd6XnF6I7Fo8WdPeIv4qpDjNrgHoMfAXUafWgJNGsM2w4enyKUVrWSpyYcVOCYtYMAMC5KB2tH3MhlqLjRCiTKPMz8vmpq5DIVbURl2i4sGsqWxtPQXGmm4oCgw4Sud06y0QDkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757335411; c=relaxed/simple;
-	bh=hCZzQzXTqDQPsdfkFKi7HNFa74pKEkCdhxSkeUYipyQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sLBY++u2uKz4l6U+1S2g49Iv1R05bXYiX+gr8Uu96DCwyOkPdYEAV4LGBUp6NpQjD1NuC3Sj+BFghrZzGsTD1Usya3ncLG7Q50kZUwhE9jKQx0d8g9vEoLASOO5xgdLsEiZHTQp2ibEjDStxUK6IOdMITpDOOKY67tzII805xtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mnyZZKH7; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45dd5e24d16so28996785e9.3;
-        Mon, 08 Sep 2025 05:43:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757335408; x=1757940208; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+Vg0GNEeuU43g45pQCnqO0Jnldu9YfZ3lQZTRTHWzUE=;
-        b=mnyZZKH7+Yv7vl3R80JstR07HNE/Ssuc8VXWTwnrVZjvjjfObjc0/sWmQVAxZBS5RZ
-         ZZi/0FDjijpbYJVsG+RGQLZXWGSZAVNhd7ioz1WiTrwwxRm2G3tkrGRiT2EQXiE1fSMc
-         gOI3pkyko0a/bUZCr56YWFLIrkn+/02GAJ/M+szxx/Dl6V2wMjAJDtoE21OCUObjiUtU
-         A1DpaGTHTeOvNA6nX4gupOZ8iLzLUGZha0yeeUOp9sJBBem9XpkAdi/h+SHJSek6iQE5
-         KPbveRTSRTTxaX2tDhOTa8KW3vEliiKty8J/jiQvOdKpde+n/4QxmBU24z79Jjb+HXWK
-         uObg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757335408; x=1757940208;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Vg0GNEeuU43g45pQCnqO0Jnldu9YfZ3lQZTRTHWzUE=;
-        b=M1ygHDXDA6twQExkTB2hW10GG3ia4q2v06zmNtX3lUpGtBWUbg0jZZGTnogGBPI55e
-         3cBIg0B8xaug9rnhMhdgyKitnQrIxmA41sp3VTYyS5UrZfKzFKyR78puc5OJABL4vC+E
-         waL0GzCqyhDx7Lecdw68E59lYGLwGPy9lqAtwy5jnR6TCSnGu8dKRoEst+ioEmDmnCro
-         XBmP3UU0bRL7JG6JhN0CUTGQnIxekfjNI7mFK9NYud6Y2MhTrEw7OC7/MAD/yiSH3eRi
-         BI59R62g5OQkIndlZ46kXCXcfK/oQ9W/G2zv1MaqSbpWJnpJLMGjm6hzqkekusftSvXP
-         7tWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVh7NBhFXWtgf1iZMYTFFw2N8n++JjXns8iDqyNx5VK+up0j6tgaD5kfTvEEzqoMTeKrTaQj0g5@vger.kernel.org, AJvYcCVoR8s7JmahdJy+UPDpSauawDhfDvh2YmS+7zjA39YmPMb8O/w/3p5W8OugMnUIfWao+Ye1F0Y6iqPM//w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyja2Hq/G4v1oSozAavFlI2VBYFMo7AoE7ctIx0SR7i1foKuhO8
-	fi6v+ehWWwwbkd7ieb4+PW4tJlam9MJGAH4/CcmHpDLJd0pva6kyUCR0
-X-Gm-Gg: ASbGnctsnGh8lm+XCN9JfnSor0ZsM+b0Pp9jQBo46KyfGPqpkzhvukrFe0M6hAd2Pxp
-	uOH4L1jhRPCHI3SRVJbw8nvc2ThMOb50r9HNePnDA8/1Xd6oV2yY+VTFyHX1VeVPrdeJ7wxo5mq
-	FD2+T5gIV46PR5oRg9chDw1F3z/77y5SPxGP1/NXMdDLsOdlCIAQDlCARrfoa8W9bxB2hYXM7+n
-	l5WAMqLI12/oP18m+2JcVz1s8695eU9VJmcc7ttMYsqze3ebOKlPET1kzDVZTjH5DVjJPs2rcsd
-	x6+kIrmjx0k9qIJ2xx4BM/4byEGeojc1RMfOxbbAGnk08F7hBtZlp50isEK/lGXykWSK1Q2ehKt
-	YvS4Ff0V9KUZRi/QcuQSBhwOK1gqcZxkKUDe0WeWl/v+vZu6KQnNptw==
-X-Google-Smtp-Source: AGHT+IEt6VZ1UvFJW697LTeVzoEhMryjNa7nQmEERcDQ9zZ1SOxfk7VPPhBwquSNBfmWIdnecVE8RQ==
-X-Received: by 2002:a05:600c:3596:b0:45d:d6fc:2509 with SMTP id 5b1f17b1804b1-45dddeb00bfmr81306645e9.6.1757335407547;
-        Mon, 08 Sep 2025 05:43:27 -0700 (PDT)
-Received: from [10.158.36.109] ([72.25.96.17])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b8f2d3c88sm309254095e9.19.2025.09.08.05.43.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Sep 2025 05:43:26 -0700 (PDT)
-Message-ID: <25e5b405-09bf-40ac-8f45-5f3a0bbed8f5@gmail.com>
-Date: Mon, 8 Sep 2025 15:43:25 +0300
+	s=arc-20240116; t=1757335592; c=relaxed/simple;
+	bh=mi701kfGJTKES9vPTw0fIImE98rfwqJb0dwo8H6v2+c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nDr3yRZLqO8w2telMCuXv6qtGIByPhdeC1yOllCbIojo0l/Su+F8PifzwE/H+MTjfa4/tfrny+7Ejwp4EfYcPglfTR5GsrMpFt18dyun0bvsqJCNCD5txJqHzl0YYhoAmHSbSFWBxa4DpFPIebbdf3MgHtBkrSSYc6yDdymAgYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvbG9-0003Rt-F8; Mon, 08 Sep 2025 14:46:13 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvbG7-000Fim-2A;
+	Mon, 08 Sep 2025 14:46:11 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvbG7-0000000CKJA-2QdY;
+	Mon, 08 Sep 2025 14:46:11 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nishanth Menon <nm@ti.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	linux-doc@vger.kernel.org,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Roan van Dijk <roan@protonic.nl>
+Subject: [PATCH net-next v5 0/5] ethtool: introduce PHY MSE diagnostics UAPI and drivers
+Date: Mon,  8 Sep 2025 14:46:05 +0200
+Message-ID: <20250908124610.2937939-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: Not returning mlx5_link_info table when
- speed is unknown
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Li Tian <litian@redhat.com>,
- netdev@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Haiyang Zhang <haiyangz@microsoft.com>,
- Benjamin Poirier <bpoirier@redhat.com>, Carolina Jubran
- <cjubran@nvidia.com>, Shahar Shitrit <shshitrit@nvidia.com>
-References: <20250908085313.18768-1-litian@redhat.com>
- <877by9fep2.fsf@redhat.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <877by9fep2.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+changes v5:
+- add struct phy_mse_snapshot and phy_mse_config to the documentation
+changes v4:
+- remove -ENETDOWN as expected error value for get_mse_config() and
+  get_mse_snapshot()
+- fix htmldocs builds
+- s/__ethtool-a-mse/--ethtool-a-mse
+changes v3:
+- add missing ETHTOOL_A_LINKSTATE_MSE_* yaml changes
+changes v2:
+- rebase on latest net-next
+
+This series introduces a generic kernel-userspace API for retrieving PHY
+Mean Square Error (MSE) diagnostics, together with netlink integration,
+a fast-path reporting hook in LINKSTATE_GET, and initial driver
+implementations for the KSZ9477 and DP83TD510E PHYs.
+
+MSE is defined by the OPEN Alliance "Advanced diagnostic features for
+100BASE-T1 automotive Ethernet PHYs" specification [1] as a measure of
+slicer error rate, typically used internally to derive the Signal
+Quality Indicator (SQI). While SQI is useful as a normalized quality
+index, it hides raw measurement data, varies in scaling and thresholds
+between vendors, and may not indicate certain failure modes - for
+example, cases where autonegotiation would fail even though SQI reports
+a good link. In practice, such scenarios can only be investigated in
+fixed-link mode; here, MSE can provide an empirically estimated value
+indicating conditions under which autonegotiation would not succeed.
+
+Example output with current implementation:
+root@DistroKit:~ ethtool lan1
+Settings for lan1:
+...
+        Speed: 1000Mb/s
+        Duplex: Full
+...
+        Link detected: yes
+        SQI: 5/7
+        MSE: 3/127 (channel: worst)
+
+root@DistroKit:~ ethtool --show-mse lan1
+MSE diagnostics for lan1:
+MSE Configuration:
+        Max Average MSE: 127
+        Refresh Rate: 2000000 ps
+        Symbols per Sample: 250
+        Supported capabilities: average channel-a channel-b channel-c
+                                channel-d worst
+
+MSE Snapshot (Channel: a):
+        Average MSE: 4
+
+MSE Snapshot (Channel: b):
+        Average MSE: 3
+
+MSE Snapshot (Channel: c):
+        Average MSE: 2
+
+MSE Snapshot (Channel: d):
+        Average MSE: 3
+
+[1] https://opensig.org/wp-content/uploads/2024/01/Advanced_PHY_features_for_automotive_Ethernet_V1.0.pdf
 
 
 
-On 08/09/2025 12:58, Vitaly Kuznetsov wrote:
-> Li Tian <litian@redhat.com> writes:
-> 
->> Because mlx5e_link_mode is sparse e.g. Azure mlx5 reports PTYS 19.
->> Do not return it when speed unless retrieved successfully.
->>
->> Fixes: 65a5d35571849 ("net/mlx5: Refactor link speed handling with mlx5_link_info struct")
+Oleksij Rempel (5):
+  ethtool: introduce core UAPI and driver API for PHY MSE diagnostics
+  ethtool: netlink: add ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
+  ethtool: netlink: add lightweight MSE reporting to LINKSTATE_GET
+  net: phy: micrel: add MSE interface support for KSZ9477 family
+  net: phy: dp83td510: add MSE interface support for 10BASE-T1L
 
-++
+ Documentation/netlink/specs/ethtool.yaml      | 175 +++++++++
+ Documentation/networking/ethtool-netlink.rst  |  71 ++++
+ drivers/net/phy/dp83td510.c                   |  44 +++
+ drivers/net/phy/micrel.c                      |  76 ++++
+ include/linux/phy.h                           | 115 ++++++
+ .../uapi/linux/ethtool_netlink_generated.h    |  94 +++++
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/linkstate.c                       |  84 ++++
+ net/ethtool/mse.c                             | 362 ++++++++++++++++++
+ net/ethtool/netlink.c                         |  10 +
+ net/ethtool/netlink.h                         |   2 +
+ 11 files changed, 1034 insertions(+), 1 deletion(-)
+ create mode 100644 net/ethtool/mse.c
 
-Adding author and reviewer of offending patch.
-
->> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Signed-off-by: Li Tian <litian@redhat.com>
->> ---
->>   drivers/net/ethernet/mellanox/mlx5/core/port.c | 6 +++++-
->>   1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/port.c b/drivers/net/ethernet/mellanox/mlx5/core/port.c
->> index 2d7adf7444ba..a69c83da2542 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/port.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/port.c
->> @@ -1170,7 +1170,11 @@ const struct mlx5_link_info *mlx5_port_ptys2info(struct mlx5_core_dev *mdev,
->>   	mlx5e_port_get_link_mode_info_arr(mdev, &table, &max_size,
->>   					  force_legacy);
->>   	i = find_first_bit(&temp, max_size);
->> -	if (i < max_size)
-
-Keep an empty line before comment.
-
->> +	/*
-
-Can have the comment text starting from the first line.
->> +	 * mlx5e_link_mode is sparse. Check speed
-> 
-> The array is either 'mlx5e_link_mode' or 'mlx5e_ext_link_info' but both
-> have holes in them.
-> 
-
-You mean 'mlx5e_link_info' and 'mlx5e_ext_link_info'.
-I wouldn't say they are sparse. They have holes indeed.
-
-
->> +	 * is non-zero as indication of a hole.
->> +	 */
->> +	if (i < max_size && table[i].speed)
->>   		return &table[i];
->>   
->>   	return NULL;
-> 
+--
+2.47.3
 
 
