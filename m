@@ -1,60 +1,57 @@
-Return-Path: <netdev+bounces-220973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3982CB49AF2
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:21:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A12CB49B0B
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:26:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D38957B0277
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:19:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F31873AAE51
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6402D9EED;
-	Mon,  8 Sep 2025 20:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4512D97BC;
+	Mon,  8 Sep 2025 20:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ay5sfv/K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDD6UaPB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFCE2D7DC8;
-	Mon,  8 Sep 2025 20:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEA545945;
+	Mon,  8 Sep 2025 20:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757362843; cv=none; b=XHtIRqRzX9nsWi1WVzzKx5yhZeV2ru0VGO2bmQsXrQCfG0AEY9wmLVoLztMbtCMPkyYQ1HYFoc8b/10yIEr8tTWlpCbjNyzvssaS1d1JLDMBRFro/oWHjEoRcqTSh5pqvRIX+/xbyHyog7oUx4O75nA76HduGX0Az3j01P46mCA=
+	t=1757363177; cv=none; b=EPMOGFFdE7+MlzRh50uNh5E06QtRTDdeVzAJqmmlPi96MRQlGSIJN/1YMbcmsmr8RDBYR7vFLOAFrGvM2QFeaipduUTDsNfvbAvoigu17D/BNS8mVg+Wcs3W0hgeZpeQPz2gtHxnLWRCwQ/6s91D2k8BLwQ1J+uRpN8yyI2Luao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757362843; c=relaxed/simple;
-	bh=3JfEPiTReYJNL9FI/IDG+noi5J0PIaT1KrGz03xK3mo=;
+	s=arc-20240116; t=1757363177; c=relaxed/simple;
+	bh=RTlIU2xCbD8I8E2KxfqW+zB3CNk6WHDCJMHR2w9OKjo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nIGaNtkwuIEKLAwz4rF814xJg9cVtWLt+ufuxkUiG5K/0hyf8zWv0bwQzp5eAND96fZN0LcIPDtmRUpENtn1CVMm9Qp3251EX7Q/URxeAwMjIo31Z+lnYRiDaKsOYjCUGs6euz1Zm//eDrUU86xzLdx1kLaImG5/kbYseRPtFRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ay5sfv/K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2AFC4CEF1;
-	Mon,  8 Sep 2025 20:20:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZiWnKccVZD9GIKGp3bwyEQ8YppZBgiCo9VX1M7FR3npFM4EMiQWE9Q+Q5ZpmbTWfPas/oKBC9tRQFODskAAckQvXYajFvJlo2EpSicwWpiEpgKjAOPCPzmhBLcS3BYrT0GFG8kZFt4LyVjYx7NAYvJdj2xvhwrYiv3WaxKjGd1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDD6UaPB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 572C8C4CEF1;
+	Mon,  8 Sep 2025 20:26:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757362843;
-	bh=3JfEPiTReYJNL9FI/IDG+noi5J0PIaT1KrGz03xK3mo=;
+	s=k20201202; t=1757363176;
+	bh=RTlIU2xCbD8I8E2KxfqW+zB3CNk6WHDCJMHR2w9OKjo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ay5sfv/Kpify9UWg3iCN726VZ404UXGzDc50Pe8T7mEaGWy24shClkXsuLuq2ausj
-	 TcswAuShJlXjISqzpsjgKproS0B+/i9G1xwFA+sGICaAuKNozKSz5303IQVyWY6A58
-	 7xWz6myJojXQG8yWArT90SbfzIJKtxRnzSZQCtqavYte/I8bOPN+qL1mSdvtVhCUqt
-	 /L+bzW9RWU8DRj/GYMADqHHXhy+HqP08rAvn3OyQAbh7VcmuXRKlzBbSXn/hqWudNd
-	 hq9UumDtQvoV5s4MeAWSYp/iArJLy6NafisxfPoIqDhVTXzs2YmI0aaEvWV8J9baC1
-	 w79qfuXdrzWuQ==
-Date: Mon, 8 Sep 2025 13:20:41 -0700
+	b=bDD6UaPBhu/yHDtS7NvKJP1T0QKq12q7id9L1S4qMpVSJHprzwNlVf/oTUBzLu7/e
+	 Flvr++ri/ZYAjLZK5z8vLY7AvogDPLKjzvs3M80SATKNVPqe2nsQT4fwpE9ISaNNuK
+	 /FTukwJhPohg/487WxAaEx4gfSZf5tRuIg63DAd3Y4GXT6XPgoUYlcXt10uvJZSDxA
+	 gvReQha+MHSqAwNMpJUqiM+CZzS9nhuTGwZ7humIGzTiwQFyjfWvlkUVkcg3zP6cVw
+	 PhAyfiJBasbe73fzHe2sLb8umBxs45I+crDlGO2wZPgBq20F43EeaA2HjNz2cDu7Tt
+	 ma9f2vCzJ/uKg==
+Date: Mon, 8 Sep 2025 13:26:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- hawk@kernel.org, ilias.apalodimas@linaro.org, nathan@kernel.org,
- nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
- llvm@lists.linux.dev
-Subject: Re: [PATCH net-next] page_pool: always add GFP_NOWARN for ATOMIC
- allocations
-Message-ID: <20250908132041.5ae74626@kernel.org>
-In-Reply-To: <CAHS8izPRupVvCDQr7-GF+-c3yeu83wZWgQth4_ub8bQ0AhQ9_w@mail.gmail.com>
-References: <20250908152123.97829-1-kuba@kernel.org>
-	<CAHS8izPRupVvCDQr7-GF+-c3yeu83wZWgQth4_ub8bQ0AhQ9_w@mail.gmail.com>
+To: Conley Lee <conleylee@foxmail.com>, vkoul@kernel.org
+Cc: davem@davemloft.net, wens@csie.org, mripard@kernel.org,
+ netdev@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: sun4i-emac: free dma descriptor
+Message-ID: <20250908132615.6a2507ed@kernel.org>
+In-Reply-To: <tencent_D434891410B0717BB0BDCB1434969E6EB50A@qq.com>
+References: <20250904072446.5563130d@kernel.org>
+	<tencent_D434891410B0717BB0BDCB1434969E6EB50A@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,19 +61,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 8 Sep 2025 09:15:07 -0700 Mina Almasry wrote:
-> > +       /* Unconditionally set NOWARN if allocating from the datapath.
-> > +        * Use a single bit from the ATOMIC mask to help compiler optimize.
-> > +        */
-> > +       BUILD_BUG_ON(!(GFP_ATOMIC & __GFP_HIGH));
-> > +       if (gfp & __GFP_HIGH)
-> > +               gfp |= __GFP_NOWARN;
-> > +  
-> 
-> I wonder if pp allocs are ever used for anything other than datapath
-> pages (and if not, we can add __GPF_NOWARN here unconditionally. But
-> this is good too I think.
+On Sun,  7 Sep 2025 19:29:30 +0800 Conley Lee wrote:
+> In the current implementation of the sun4i-emac driver, when using DMA to
+> receive data packets, the descriptor for the current DMA request is not
+> released in the rx_done_callback.
 
-datapath == in NAPI context, here. We still want the warning if 
-the allocations fail with GFP_KERNEL, e.g. during ndo_open.
+I wish you elaborated more on the reuse flag not being set :\
+
+> Fix this by properly releasing the descriptor.
+> 
+> Fixes: 47869e82c8b8 ("sun4i-emac.c: add dma support")
+> Signed-off-by: Conley Lee <conleylee@foxmail.com>
+
+Hi Vinod, could you TAL? Is this fix legit or there's something wrong
+with how the DMA engine API is used on this platform?
+https://lore.kernel.org/all/tencent_D434891410B0717BB0BDCB1434969E6EB50A@qq.com/
 
