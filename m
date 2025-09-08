@@ -1,99 +1,186 @@
-Return-Path: <netdev+bounces-220987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFC99B49C78
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:57:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28E1AB49C9F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C2583A6B5F
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:57:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4B034E3FE7
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A832E339B;
-	Mon,  8 Sep 2025 21:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C6A2DECA3;
+	Mon,  8 Sep 2025 22:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KG8awAPp"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522B71DDC3F;
-	Mon,  8 Sep 2025 21:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4A523B61A;
+	Mon,  8 Sep 2025 22:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757368631; cv=none; b=AHAkAbyAE//a2M/LzMYW3LFqU5/VeTy7PHpHhVnr5bcm5pnL9GQdyfN8p+nfkj38fUHXtH2iqSCgkPRoQQiNA4qETXIvgCU0tz9M7u91l7hxHNH7IQZz5abpwxXv3aMOKLoHv30eJwHuH6EQoxxqmmbPk96qSOQDY3J6j9izO3o=
+	t=1757368935; cv=none; b=JMVSIk7abRjsB97AsNDxpX3TakOT1LOJMnCJcAcmswFHwFzWtPE5X4EgEOW92HKvA8mGYOyvcUnT2jwuAXs+k8RhRQdsg2TIspeiu2/Qb3l/JRxYg1OJ3FDDX9mqssN1KJGZVL3YHmYb0qGMmMY5XQzPEBfqVEkltwoeQ3VIEyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757368631; c=relaxed/simple;
-	bh=fW54aRAXirLB0eQdaAbwHD8trBvXi9bedluXmPGVKIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PLfxUulbRIWRh/OS0yCl5w51DGePDZ96lc6+9RhYXtG3fvXWyZqWCw58827uFzqh/Hru9Je5vPmKNcExSgxPOvXRdYTQji8NUcMHi/Cp0Lo4laZVupqL1tdFxCBYtmFFcVKVKfNtU1mTm12YwaVWZ3GSB5h/7NOivT+Z2jvoun0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id DD1AD601EB; Mon,  8 Sep 2025 23:56:54 +0200 (CEST)
-Date: Mon, 8 Sep 2025 23:56:54 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 nf-next 2/3] netfilter: nf_flow_table_core: teardown
- direct xmit when destination changed
-Message-ID: <aL9RJtdQJr7t5Z_K@strlen.de>
-References: <20250617070007.23812-1-ericwouds@gmail.com>
- <20250617070007.23812-3-ericwouds@gmail.com>
+	s=arc-20240116; t=1757368935; c=relaxed/simple;
+	bh=hhE6RGL+FRpzFdGhBf7AK1KQErFfrcOxy9ye5CpwxNo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XWLJ+tZP4YoTlIDwlVvJ9AA/kpuC/wiU+n4vcJ1QFR6M/8Nm9wB6/piZ5i/7qvzqn0J6pvr1WF/NLtY+Kn2B4fnDvL6+xtDrtlB83iXptlI5PNEzft7vkc345Jubyfeyuyy1NcXkcVG64j0stuRNweaOuNBhDMd7GA0T6ZgF2JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KG8awAPp; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 588HsGjK006469;
+	Mon, 8 Sep 2025 22:02:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=qpbTHU8EIW3qhR3cjrpx1set9Uut6u/PXSeZfaBSi
+	UM=; b=KG8awAPpy/C8y8G7pcV5X4hzRXpOUghByGPU04rmEVwNGpkvEmBFtmduT
+	0HC4ecesu04ME5Gh4+nKfGd11+bGuZc1Zwm1fsQnjy/5yVCkHM0KiTXqheZzB8Xi
+	POcJ8dNBh9mOEbRfkOSkF88yvRA4b8qhfQUqwuMbzaVdOztxftyPubWb+rXJ4wDS
+	tWOg4HhHKw26sZrtUKyFsuBacT0YEsUAg1SJfcnLdWAEpIaP+GezXzkbpgWMi9V7
+	uUclB/POEwa/DO/MyeYgWlFdz4lKLLjoxpX/9FchUoXUrJz8CLPUfPdT2AqqDTcM
+	aNTxUWEhXFtx8hI0ZcTAkEs1wKMZQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwm43j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Sep 2025 22:02:09 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 588LrKxp027864;
+	Mon, 8 Sep 2025 22:02:08 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwm43a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Sep 2025 22:02:08 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 588KC61K011435;
+	Mon, 8 Sep 2025 22:02:07 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 490y9u8b5v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Sep 2025 22:02:07 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 588M24Vk61538686
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Sep 2025 22:02:04 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EDF4F20040;
+	Mon,  8 Sep 2025 22:02:03 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ADBA820043;
+	Mon,  8 Sep 2025 22:02:03 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Sep 2025 22:02:03 +0000 (GMT)
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Subject: [PATCH net-next v2 0/2] net/smc: make wr buffer count configurable 
+Date: Tue,  9 Sep 2025 00:01:48 +0200
+Message-ID: <20250908220150.3329433-1-pasic@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250617070007.23812-3-ericwouds@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZvQu3b2NvW__VhgPLhLqlyl9HpPgnH97
+X-Proofpoint-ORIG-GUID: gtQ_0s5TQzq9r25UlxbXbPysDtje5wda
+X-Authority-Analysis: v=2.4 cv=J52q7BnS c=1 sm=1 tr=0 ts=68bf5261 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=yJojWOMRYYMA:10 a=OPAOpny1AAAA:8 a=vF7HM7XGAAAA:8 a=QyXUC8HyAAAA:8
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=piJGGMyLFvZckxoXyWEA:9
+ a=Vt4qOV5uLRUYeah0QK8L:22 a=bNn2QJc11pDkoTYzAKk6:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyNSBTYWx0ZWRfXxlIICvURjiWB
+ 1Cz96MRYfonkWO8i63gCKHPysWKwCzMbVrW93SYq+Qle4vnGNs5YUxwNCjsbjomitPms7p/TCJd
+ TRdPvmTox6zp4KaCBLPvIOLLOVsQNKVMVCadK0gHjZDp8ioTDtVu84pkWnJ3BZ1qLNxYEg4UORQ
+ 7A0UO92puRlWP61kG38eoSHgRNpBdg0NIpFG1AI8cEZEzYRIoCWNdKP1LlDEgHWOTdqh6E1o0gy
+ x0GjXacKyA7lpL0e2uwBNxPAJt7nwDvITRhr4uj9JnLiQr7uXO6BUqvZqM3CrhVzkThr4chzuU/
+ IM8R//Mue9lOkkowbi5cGuHA/ZTABKIlUmwie197k7fokePIlItP2kMnAAqRBWTFAulq/mP327l
+ CVtsbWxG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-08_06,2025-09-08_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 suspectscore=0 spamscore=0 phishscore=0
+ bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060025
 
-Eric Woudstra <ericwouds@gmail.com> wrote:
-> +static int nf_flow_table_switchdev_event(struct notifier_block *unused,
-> +					 unsigned long event, void *ptr)
-> +{
-> +	struct switchdev_notifier_fdb_info *fdb_info;
-> +	struct nf_flowtable *flowtable;
-> +	struct flow_cleanup_data cud;
-> +
-> +	if (event != SWITCHDEV_FDB_DEL_TO_DEVICE)
-> +		return NOTIFY_DONE;
-> +
-> +	fdb_info = ptr;
-> +	cud.addr = fdb_info->addr;
-> +	cud.vid = fdb_info->vid;
-> +	cud.ifindex = fdb_info->info.dev->ifindex;
-> +
-> +	mutex_lock(&flowtable_lock);
+The current value of SMC_WR_BUF_CNT is 16 which leads to heavy
+contention on the wr_tx_wait workqueue of the SMC-R linkgroup and its
+spinlock when many connections are competing for the work request
+buffers. Currently up to 256 connections per linkgroup are supported.
 
-Please always test your patches with lockdep enabled,
-this doesn't work.  Switchdev notifiers are atomic.
+To make things worse when finally a buffer becomes available and
+smc_wr_tx_put_slot() signals the linkgroup's wr_tx_wait wq, because
+WQ_FLAG_EXCLUSIVE is not used all the waiters get woken up, most of the
+time a single one can proceed, and the rest is contending on the
+spinlock of the wq to go to sleep again.
 
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:575
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 1570, name: kworker/u32:8
-preempt_count: 201, expected: 0
-RCU nest depth: 1, expected: 0
-6 locks held by kworker/u32:8/1570:
- #0: ffff88810032b948 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x8d7/0x1460
- #1: ffffc900021e7ba0 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x912/0x1460
- #2: ffffffff848d1eb0 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0xf8/0x7b0
- #3: ffffffff848de6e8 (rtnl_mutex){+.+.}-{4:4}, at: ops_undo_list+0x270/0x860
- #4: ffff88811f1f8bd8 (&br->hash_lock){+...}-{3:3}, at: br_fdb_delete_by_port+0x3b/0x290
- #5: ffffffff8457a800 (rcu_read_lock){....}-{1:3}, at: atomic_notifier_call_chain+0x27/0x150
-Workqueue: netns cleanup_net
-Call Trace:
- __mutex_lock+0xf5/0x14f0
-  nf_flow_table_switchdev_event+0x104/0x270
- atomic_notifier_call_chain+0xc5/0x150
- br_switchdev_fdb_notify+0x2b2/0x330
-...
+Addressing this by simply bumping SMC_WR_BUF_CNT to 256 was deemed
+risky, because the large-ish physically continuous allocation could fail
+and lead to TCP fall-backs. For reference see this discussion thread on
+"[PATCH net-next] net/smc: increase SMC_WR_BUF_CNT" (in archive
+https://lists.openwall.net/netdev/2024/11/05/186), which concludes with
+the agreement to try to come up with something smarter, which is what
+this series aims for.
+
+Additionally if for some reason it is known that heavy contention is not
+to be expected going with something like 256 work request buffers is
+wasteful. To address these concerns make the number of work requests
+configurable, and introduce a back-off logic with handles -ENOMEM form
+smc_wr_alloc_link_mem() gracefully.
+
+Changelog:
+v2:
+ 1) Fixed https://lore-kernel.gnuweeb.org/linux-doc/202509070225.pVKkaaCr-lkp@intel.com/
+ 2) Inspired by 1) made the sysctls namespaced and moved the backing
+    variables into struct netns_smc 
+ 3) Use tabs instead of spaces for alignment in (Dust Li) 
+ 4) Renamed the sysctls form smcr_max_*_wr to smcr_pref_*_wr (along with
+    the affiliated fields/variables based on the discussion with Dust Li
+    (although maximal is mathematically accurate preferred is more fitting
+    IMHO). Should the community decide tha max was better I can roll
+    this change back very quickly
+ 5) Removed Wenjia's r-b form patch 1 as quite a few things changed
+ 4) Add r-b from Mahanta I forgot to add in v1 (which remains the
+    same moduo rename.
+v1: https://lore.kernel.org/all/20250904211254.1057445-1-pasic@linux.ibm.com/
+
+Halil Pasic (2):
+  net/smc: make wr buffer count configurable
+  net/smc: handle -ENOMEM from smc_wr_alloc_link_mem gracefully
+
+ Documentation/networking/smc-sysctl.rst | 40 +++++++++++++++++++++++++
+ include/net/netns/smc.h                 |  2 ++
+ net/smc/smc_core.c                      | 34 ++++++++++++++-------
+ net/smc/smc_core.h                      |  8 +++++
+ net/smc/smc_ib.c                        |  7 ++---
+ net/smc/smc_llc.c                       |  2 ++
+ net/smc/smc_sysctl.c                    | 22 ++++++++++++++
+ net/smc/smc_sysctl.h                    |  2 ++
+ net/smc/smc_wr.c                        | 32 ++++++++++----------
+ net/smc/smc_wr.h                        |  2 --
+ 10 files changed, 119 insertions(+), 32 deletions(-)
+
+
+base-commit: f3883b1ea5a8f31df4eba1c2cb5196e3a249a09e
+-- 
+2.48.1
+
 
