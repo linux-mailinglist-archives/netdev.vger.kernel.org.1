@@ -1,76 +1,138 @@
-Return-Path: <netdev+bounces-220695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E4C2B482B4
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 04:54:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21243B482D3
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 05:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4EAA7A1C95
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 02:52:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA8553AFB47
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 03:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8188D1D63F0;
-	Mon,  8 Sep 2025 02:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BAC1D7999;
+	Mon,  8 Sep 2025 03:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JRKLiVxM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CTS5h4f0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19FA7263E
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 02:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8572AF0A;
+	Mon,  8 Sep 2025 03:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757300042; cv=none; b=B5SVq2yXA0lixeH85jScqcu4qKdP/neD3cJXUl+OTJrb/uJKnD3pWg3rZL0xvbobTPsntIeojVjxXjWhn8Icya0ciYq2B5vZP8eKvH9RBkGm7vbVTHWQa/prf0/1g/VgPJcGMLnrroTWshH5u/TZakWqu3rCV/A+GBRlxhZ7w8s=
+	t=1757301626; cv=none; b=RGUmq65iRgcn6IL2qxJ1Hcvu6+4DcN1ErgPs773i5yfwuGP53kZgtpbAhaw3KY8il8yLegRg4QLQIWnsKZGMrjn+MpubrAQXc+df1TsHmKGF34OBjj8uDisxz6ax0HFINwzwnR7pJf+S8TcGabV//Q0AiiJYk/qbNiR1EHoFWOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757300042; c=relaxed/simple;
-	bh=P+rDiVO50O0r1hQrLeacuODVxeTPnln6GT1i7li1t4I=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=rNQuGAnbwi5IYyR2FI/EnA0eDesszvkjOW0n8f+X9FW1maRW/OVq6doD9Ax6OUMyJA9vvDOU9Pv9svSwze5j4t0Ljoxs2Gk3QrLJ7X0mwL6v82J4MD6JHppTVLqmIVn+Kh105ftRdGnvyYVxqbkcl46kydAgsPGTXOCaDmSMZMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JRKLiVxM; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <bb45191c-7198-4ce8-9f35-72a784351836@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757300037;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xXFvyrL20K1Mw4r7gL5zjY/c43Vwh4f2zoX6V27jYQA=;
-	b=JRKLiVxMkcTD3I6VvSuXDIGqa+9L4f0cutPtDcQjjjdoH75v3eazX7ihP8SKHRKpgFaflH
-	6ZdjNE6Kr1uM4Aacc6623TqP+46xZfCXW1zcwhNIAiMoawdQoUwqrXOsp56dojaZHRIH+V
-	VkYPGp/sbX5hR82OZmT4D1rQmvAO99Q=
-Date: Mon, 8 Sep 2025 10:53:52 +0800
+	s=arc-20240116; t=1757301626; c=relaxed/simple;
+	bh=EwhzMYqe1Xj2utRfYFtfhVdLaa1Zk8lRWqZlK5EdRBA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MNPrkrEDLAfNpnebEG5iki0nuXsw8qrYbcWKYonYJE/584iHf7T7pVSwa1CutrpnYCf+4ahjahdHnjf8tltg7ZIAqWPi7TxyjiLH4FMy6V+xsPoGV71WkF+HsNfIRMhmkCkB5IjW1t325HScRgm0Ro2NBSeKX58DUi0sIgLDO9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CTS5h4f0; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b47475cf8ecso2584022a12.0;
+        Sun, 07 Sep 2025 20:20:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757301624; x=1757906424; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2nQuprz9+iPOc6Hdx8EJtvsGxwZd1/+5PLT0+hvaev0=;
+        b=CTS5h4f03eU+2ftJMDUA/qy1CIOzGc3FFFEntNUQrEn79/oSBlJ+Co5yn7w9djpuiY
+         JlCFaZA1JboNX+etZbwwTdEm8KleoigIstsd7md4VngmK38pVkvE60YibMakleNvHTfy
+         Rn8wrRXFCljKp71zkMj5JonrWdFwL5fmxusaXDwMKZ1nooxE0G7V83wXdNsq0/iqSS0a
+         gMMWy/lXJpU4jq58+wrYqZGsQewpFe5nSTHGgjEAjyTdKPrGtAHNmWBR3zakjFKTPhD2
+         jOSVBVggYTNjSV5lhiRrqezQGx70A7rNhdI5rUnEXCxyW11/NfCb5mY6Xmq5Ba468sQG
+         srdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757301624; x=1757906424;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2nQuprz9+iPOc6Hdx8EJtvsGxwZd1/+5PLT0+hvaev0=;
+        b=peT17A8mIHZqCx6RK3ZIk6FwUIy73zv9D47fTSAAGHAF4CDlUUjE8wU7y+nPYdv5fX
+         qPXlgigd+sgDwT86HWrUJFfpht3c9nSIrWmAQ2f5Me8h5QwfqQdzl+XMp7gEHtrpYkZX
+         opA4T7YyzS81FChZPhzhmrXYJ0CJginJsVrCx0gPG/Gl3/FuTgs+w8Lj/8aC5legXR+O
+         is0OUaY8TAb30Iwu56mS5ZIBxpW8Iz91SfjqlHVeoOb6utrNn2eMGJlbSz0V3+aHhmnJ
+         tPYUROaAW/KUXSX7AEzsPwgi0szeI9pjdaoWTtu1FRCGVrWxf4GYxFUPj/KowfiTGLBG
+         0tcA==
+X-Forwarded-Encrypted: i=1; AJvYcCXrq+kLA+FcYb4Lee/yRjEPj7SviI+XIIVzQzcYI3pc4k4+KC0Lpnm3fdI1ryCOX6Y4Z/MZt/jDq6NooZCCY2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMBJsl0yttXUdWs194CWx4PZpavzisq/PAc9Hm5+EztkklDpxx
+	5RaivD2x2B2nDKTxjUr2vc6fDk5BtkaVF9J/QIRy2+SCZWk63SodZsre
+X-Gm-Gg: ASbGncu2IBNjsLFuBZK2iPawmhUx/oMYEKxJtadZo+wHlTLuQ2FtKRE+pSYQGfU9LZ1
+	VBEMTnoY8zgBqEGxA2BupVhsb/N5z+gLVATFWlw+7ewz42iSzRAhnTIAqTXOt2jmdXRr6OoAkIB
+	KCtiIoQ4RaFcAoym5xabUNMl4p7NxO4TXRQtaDCIg7togYt9+BvTIl8w63SYZb561+DhI9fXZ+b
+	r1A/UVlhcR57ZgL91enczRkcXZwGV/Xd8r2vMpb7ILjkirv65kufqNku4Z7XUoGVykvTLzpl4js
+	ynRZf+vSUN/XCnn8gQbpgljOhPzc6Ow2WnGd72iPJMqvBQ7tgP+N2boljU6ayukRzLWz5FCfcJT
+	DXMyGrXfDYlyEJAeh5P02hF22jzWWCvkRJVfZHw==
+X-Google-Smtp-Source: AGHT+IEoSQGXZbGinmecOf/ZXQarNjfG39uhHBUMWGfk8LR5uTWXBfvqzZzxScLZFpwuRvqXf2Wc/g==
+X-Received: by 2002:a17:902:f681:b0:250:74b2:a840 with SMTP id d9443c01a7336-25172483a34mr95832515ad.44.1757301624231;
+        Sun, 07 Sep 2025 20:20:24 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24af84de7a4sm176247435ad.7.2025.09.07.20.20.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Sep 2025 20:20:23 -0700 (PDT)
+Date: Mon, 8 Sep 2025 03:20:14 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv2 net-next 1/5] net: add a common function to compute
+ features from lowers devices
+Message-ID: <aL5LbrPejURWELEo@fedora>
+References: <20250902072602.361122-1-liuhangbin@gmail.com>
+ <20250902072602.361122-2-liuhangbin@gmail.com>
+ <aLxymFjpPjckFb2Q@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-To: Igor Russkikh <irusskikh@marvell.com>, netdev@vger.kernel.org,
- Egor Pomozov <epomozov@marvell.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Chen <chen.dylane@linux.dev>
-Subject: [QUESTOIN] Atlantic NIC ntuple feature support
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aLxymFjpPjckFb2Q@krikkit>
 
-Hi maintainers,
+On Sat, Sep 06, 2025 at 07:42:48PM +0200, Sabrina Dubroca wrote:
+> > +	dev->gso_partial_features = gso_partial_features;
+> > +	dev->vlan_features = vlan_features;
+> > +#ifdef CONFIG_XFRM_OFFLOAD
+> > +	dev->hw_enc_features |= xfrm_features;
+> > +#endif
+> 
+> I'm not completely sure we want xfrm_features for upper devices other
+> than bonding [1], but this will get overwritten immediately
+> afterwards:
+> 
+> > +	dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
+> > +				    NETIF_F_HW_VLAN_CTAG_TX |
+> > +				    NETIF_F_HW_VLAN_STAG_TX;
 
-I use kernel 4.18 and backport the feature of ntuple on Atlantic from
-https://github.com/Aquantia/AQtion, and recompile the driver, but it 
-seems not working. And the NIC on my machine is Aquantia Corp. AQC107 
-NBase-T/IEEE 802.3bz Ethernet Controller [AQtion] (rev 02). The 
-corresponding IC chip manual is Marvell AQVC107 Link Status Register.
+Ah.. right. I need more careful when change the order.
 
-I also created an issue on Aquantia github repo
-https://github.com/Aquantia/AQtion/issues/71
+> 
+> 
+> [1] those lines in bond_compute_features were only added alongside
+> bond IPsec offload, see 18cb261afd7b ("bonding: support hardware
+> encryption offload to slaves")
+> 
+> but AFAIU hw_enc_features is only used as a mask over dev->features so
+> it shouldn't be a problem to have xfrm stuff in bridge/team as well
 
-So does it supports ntuple feature on hardware. Thanks!
+In this case I will keep this setting. Putting the feature compute to
+another function will violate our original intention of putting
+the feature compute together as much as possible.
 
--- 
-Best Regards
-Tao Chen
-
+Thanks
+Hangbin
 
