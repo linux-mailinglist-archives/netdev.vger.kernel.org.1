@@ -1,239 +1,828 @@
-Return-Path: <netdev+bounces-220846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982E1B49155
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:26:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45E2B49152
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 399E718913A2
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 14:27:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85196441C14
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 14:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57DF630CD89;
-	Mon,  8 Sep 2025 14:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F87630BBA4;
+	Mon,  8 Sep 2025 14:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AkZAzQ8j"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="S6cRvxGU"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2078.outbound.protection.outlook.com [40.107.92.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E11530C63B;
-	Mon,  8 Sep 2025 14:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757341583; cv=fail; b=rq901QV/Z2m993CarUwSiKaOnpyJ6iVhwSzql8pRnlF7EhlFicdnEOxQbNyrk81cVfjTmw08Tqh8YVTC6ycvfOSTQlFuAZuW3t4WzmL6VaOPOKOB3CJodDks4bKNtPU9kvlaAMDkKs5SwT+lqC/rhfvsRmzbeo0bOIlYS6H6W4U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757341583; c=relaxed/simple;
-	bh=jtn3T58JXYZaLglUEz4i4JJaM6+9ijvd/4ch2hoT+yA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=m03vC56Ka2rW5JsSrLLdQlKCsmQzmP4mn9rJu0fOS/4jBOeD62IHLqlJMlKf+FRPn+ne0n6FKcP87UQqDdQcgqthLEIWtXUXHbDuuD8e1nDIatqt/NO7i9PI/+s3LLaOS6g79LTMBz9F83rc4SFEHevzyIEJ8saHgsNt7MTsXlY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AkZAzQ8j; arc=fail smtp.client-ip=40.107.92.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rvq90kNC0VCTWddM3aGqXQC6Z/uYtHjcz0ejLiDPOXVKpDFtvFHKu29zaB/vWNeckPzHQ7kkxooOTGuU1dtM/wireVuLtCiI7yTuVxmf3RZey6nPb0fZBm6c2BK96B6sowkJGUhfI7m73VpKomgJPiUZpKGlbBATZNNPGXV82RJ5g46FEyXyvNKevHMQwbg+Pe/ilI7SI/VJv1s0P+wxCRCka3WAA4ZE1Y1Sboj4H5Z0R3ClmaGzZzbmYDVQh2Ri70bRNG94ZUSZC6sR6B3zlq4xHeWLV2oe71TZzYrvQ0rkjPrE4anTBWgrQ0tmhhNllFs8jXQmEQ69IEjPR3qmzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6QOirKwxGfxbPohCBGfbG1iTtCQ2Kgspt47vll3rkeY=;
- b=JP5J5pikJ89oLj1PnIgcedZH/V1sbb5awUuE0hl6UKyeJ5iPYyM40my7UFnLxm4Cs1Iji2gG4WvzEhMJ6PJukpEW7Dyd22PVpbQKn3yco/A/JItEScOlGAZZU4r+6sOWgB94HQdAPlG7ML/dvi4EzVDw7mBxMKkrkA6iAgTNi3y2eAV9XWTszMkFXwmbuXgqECr8mN4nok/Y56Jk/kS3MxjoqQGOHFGPuS3tt2vp4cAQ5KWcY+A35gixgHVwzkE/QLKbh88bXxuVqnxAilN+dxeeeNp9xcbkOq3kuTINBzCb2Vez70wzwvvOTSFcbVOTh+t+tgWlJJqeRVbWlxCNVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6QOirKwxGfxbPohCBGfbG1iTtCQ2Kgspt47vll3rkeY=;
- b=AkZAzQ8j6CeJMET3Ee9mRJ4LAtyPe7NvinK2mAa5GpxOs60Svj0rtHXu+T/nWUa61zwIvFB6tr49jcPip/UEau9VCcrsZWKh/hevu+royPYQlcF3BUgsU8yX2weGuuxpnuL5omOpy8Irtlr11mBH0TvIoG2N/ADCvxkCvBVRXf4K4Mh4XukXzPGpBbONb0kZ7w8SbfO1dcsGf9UjRCZlHnUTbTjMpIBPeBJY2GOiACmvmbwIM0AiNpqAkIWvEY79bZUtI7fC/GN401pYyjjA/HUqLvnbMJZyNDcab8N6cqtXWIQ8ptbbsi4+vzgLkLX6pl8hT3pU6IRB4bMenDlQzw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by PH0PR12MB8174.namprd12.prod.outlook.com (2603:10b6:510:298::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Mon, 8 Sep
- 2025 14:26:16 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%6]) with mapi id 15.20.9094.018; Mon, 8 Sep 2025
- 14:26:16 +0000
-Date: Mon, 8 Sep 2025 14:25:48 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Mingrui Cui <mingruic@outlook.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	saeedm@nvidia.com, tariqt@nvidia.com
-Subject: Re: [PATCH] net/mlx5e: Make DEFAULT_FRAG_SIZE relative to page size
-Message-ID: <kv5syvra5hlvswecmzrbgne7ydmj6pf4dhzcoica3fdo6dina6@64w5pvo3lvbt>
-References: <l3st5aik5jtsexq6yng5el5txeif4itbg35kl2ft32zhi3pmef@kn4x6bo4ws7s>
- <MN6PR16MB545062E2EBB54C553CE059CFB70CA@MN6PR16MB5450.namprd16.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MN6PR16MB545062E2EBB54C553CE059CFB70CA@MN6PR16MB5450.namprd16.prod.outlook.com>
-X-ClientProxiedBy: TL2P290CA0027.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::11) To IA1PR12MB9031.namprd12.prod.outlook.com
- (2603:10b6:208:3f9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F211A2EC543
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 14:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757341572; cv=none; b=XV2iXvnmMvi9NetP6A9kg1qAEVdu+uDPs6Hg+87/9O2CGo0t4p395zLT/Pp8mCzo+ZZv1Wtt74vMd2eo+E0EkH4bV9jDWIqCZisJpYgai/RyueTX3C313NaoYvfYcAeWbSVjjrgoprUfXy4IRO0UxA+udk1/ZURR0/CNbTz/wUw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757341572; c=relaxed/simple;
+	bh=uiO2UpPutP4U2xhtt4bRPdJNhvkNSe9/i1A24qDIEKE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZYZXDBjkIpVN+QPTFxm/eQ+TTyNTm4sMP1UCOIji8uvMnxAlzElHW7cOqbf3aRGbx34njD9Z1CIl8x1ItNf85P7+SNQ90h/PVZ0dseoDfosJroHHy73b+9jUoW2cwRw1X62jyyts/wg40LNeGig8mdDrYt787YzJRnmtkxB7TZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=S6cRvxGU; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-76e6cbb991aso3802418b3a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 07:26:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757341568; x=1757946368; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gG5y0JWaZExW9Kw49ULOmq3OoU5C1MkabfOZH89ev0E=;
+        b=S6cRvxGUIADh/HJlQj7tHnT+sFjnKhMnrPWZNtGNt3O6nvEzHFOI0yJTYzk3oIWjet
+         3JIWGVN25ta7baHJhHt1s3qumaOuYNmS5MyF1pJAi1L7THhbNMjSKM0XXpZj7bmiQTRU
+         E+Ozaz1wQuhJHFBpfqcDWZIHk41JojRq2GnhCGk3dt7wkOMuqZP26HPT7Zr639DvHLHZ
+         6N3rUGEUi88TmypPw0BzglDgwf8XOwwoVW1vGJx4Rr2N125EU2haqcuSFXLgMja7RfCd
+         u/bgwLobzwuoD1ULsa2RP6IthW90IZgU5cxaoNvDxTe8Dc9i0viPL5CIbqYZq4hPeRD8
+         CNyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757341568; x=1757946368;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gG5y0JWaZExW9Kw49ULOmq3OoU5C1MkabfOZH89ev0E=;
+        b=xOf9mJo+EM3eHEXnYLtep6ikGxRPhW8F2knx53Ixy7KeAq4d7riuEvrpJwJ7xl0gr7
+         c2oKsAMVPNVjiui7xwKQDCjvtbI/JK+/ppZy+AP4Bok/sqzVrMcDjZ7bQK4hy3YbrSOR
+         aFNtSmqyLVpgdL2FZoCZXE4/qWWb1RccvaZPpk6NUsQZOp/8jt7t2BgGHB20EMHs+3Dn
+         MLdrhs8B2olX14GR6j13aUp7AKZpMH1G8WOK+XvhYaZJ2Y5YKuzdq+iD3pl4VfFU6HdZ
+         pshfGGufKP43PLwBWAPPipwgkjmtD8qz2CiWLriR8JvT5OL6MFLZfyGOyPZM+txaC3cL
+         CZtA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYCI12+ypaq7TrHQUmN2YcZlup9w8pQ1zB85p81Gz8YTCV1eEt2fql/SgnnWhPe9LC8m3eM50=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIq2vj1psFpkhV5ZheXvASUnt5C5hZkUQAaRJXnF06ZK1OS2Lo
+	joI4T8mRf1cff0voWZAZ8F0mDkgkJis4KPGz1QzllOzZ7torQRyIDI3wOYOYYraCwJo=
+X-Gm-Gg: ASbGncskIL35RgQdDIVAfa/Ijhqf9mRC8xTV8J754WJSMxjoeH+ps5+DqynX+Frf1ZL
+	eiagY9Xz4ee3TIrH669ZIJqnh4/25kBJ1c6DnHRVFD6WHSVXyzK5fKiYsQ2sojH7wUWjs52FOr/
+	l0ch2BoD7xlCYRQ+41hRd8kc5aUnWUhOi/a1yLOSLs27ymPyMMR7wksk8a4tXJmj0QWLRnlDUci
+	6CoKjDRySqmpCSrRmlWHcSDuHQZ1sQvy0jQAuZ7dkYrDiR9sdPJ7ccYrevxAocmVFccd+/7T1N9
+	/E8sGQnYKfgV9xPBmHi6rVuSvcsA929p+4W6TLntzX/vTuoBF1o5j1UhpVZBpYDLTELNLFxnUbQ
+	kVBqKwazzLRbd7RAzIxYaBAabtHTSgjk=
+X-Google-Smtp-Source: AGHT+IGtVXiPQYbtrIyC67br/4aJjEKCuC1kX1JGNPV9+GgE4NSF3l+FEmL3ryYHir9cSG247gcaRg==
+X-Received: by 2002:a17:903:2346:b0:24c:c190:2077 with SMTP id d9443c01a7336-25173119212mr122608195ad.38.1757341567867;
+        Mon, 08 Sep 2025 07:26:07 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24ced597370sm99141805ad.128.2025.09.08.07.26.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Sep 2025 07:26:07 -0700 (PDT)
+Message-ID: <e365c294-4c37-4fce-b5af-86bf05480df1@kernel.dk>
+Date: Mon, 8 Sep 2025 08:26:06 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|PH0PR12MB8174:EE_
-X-MS-Office365-Filtering-Correlation-Id: 703dca59-ad83-4942-998d-08ddeee3abb5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?P6WeNLsTiJ7Mesf1q8R2HFjtAJ4PfacCZbBiW+dnMfgCuAQSZH9V5goZ4RlV?=
- =?us-ascii?Q?vveRZbND1O7IHwGgi9xoIkpBhJ5zb8rQXmr7y3p12rxp4hkLK+OcIltxvDLD?=
- =?us-ascii?Q?FGTcrKH1TkNTNXFDS2M0bCxPvBM2hQxWBV6QtvbZiBD9YjVzXVB8q/cWC8yY?=
- =?us-ascii?Q?lMUHw4GNy8i736z5Ii0YFZDoZpvnlrCj2Axy3nKqCqaJp5b/nx6dRAD9nG0R?=
- =?us-ascii?Q?Om7lyoeRcHp3TpcwZJ5RLwYfMtRQ6DPWMTAaIqkzw/32AjDRSkIzEEWqS2bM?=
- =?us-ascii?Q?Xn1Rdcrjd2hsIDS8q0hMegRxhlTu1dNdbAj1ZpRPx9NiPdNuWxSS1cjwodYs?=
- =?us-ascii?Q?8QIubaoVyHPN6ILHZ8iZMNbYsgHbaGSXTA1bjwj4gRR520mdcOfWmV+TwmLg?=
- =?us-ascii?Q?200dcybPCxjXZVrMnrBWLrwak9i4wWhaed1bbNOO2SmGC0v7IyZrvoJEWM2y?=
- =?us-ascii?Q?MUFQBjLa+M9wQXap7fvFtM6f5seZTyz/eDDDgH6O4SbyA8+vfCouY8KLUPJ8?=
- =?us-ascii?Q?O7AboZ7qmDqexJUX/D4iCGLOS7x8Ge2d3B7hfJx/meWrenEDNNott0u1bIpA?=
- =?us-ascii?Q?UDGHxkp6pqxNf3T/opymbGXtW3caB+v4ArxjdqwubcIIp9Ly4yVBmwE9C6aO?=
- =?us-ascii?Q?hIREO6nhF8SjlZX8rXNeeYFpQ3qyEyKAP9SlqN8CWM/wGSso415gzaW/zu8O?=
- =?us-ascii?Q?fl4vuaMHJ4/rs+eJX7k6A/MaHB/+/S1+gih3RO4BYtGYrvWadVyZiXVShdzB?=
- =?us-ascii?Q?zOy9WPNw3wm5tcsXOY5UUxO9Kw973hY47/Midg9xW1s6inYADpIJvcLVOebU?=
- =?us-ascii?Q?X9eJOxsezoXPucVAzPgmHlgubxN8l9WhNUQdMF+Mz9PUkiZIKUUk4XRRqGj0?=
- =?us-ascii?Q?f2zQJKXnys7Cjt1Qm/EDjzgkby9r3yFXwoWRYfFtW7Y3ZeiiMSUyiJhPRYh0?=
- =?us-ascii?Q?hLUeaxz0DHJFROvDPcJxsd3iJjl0+g3JJ9HcMG7d2XK33U4JgoWOIIaZIj7t?=
- =?us-ascii?Q?EYkFxMN0KMucGR2hvEqMOLMcru8/Drh2JiMgRdAojEeNbzbYYisLbW2lwR9W?=
- =?us-ascii?Q?XgujU28btq3E7/7hYvVxjsASnGc9Pwl7Z/+wqVku3Pqt5cUOc+QcjWKIZNFR?=
- =?us-ascii?Q?WNn15LChDlMpjDdYSJ4dUoVOGuMzh4gNM8BkthtO+1dZK0hY+n1MkhMHL765?=
- =?us-ascii?Q?rU/pbl05BkfLZFF2yDbPtV85ZpCF/kkF+ypicNAo6buEm1neV7L7f1z1fe1f?=
- =?us-ascii?Q?gyvH2bWUWmFBTQU3R+MrmbttkI6bVxN6OoBsu1lrmWMLRHPqRiQBGnkM1G1j?=
- =?us-ascii?Q?BZXalvCigHDDNsoC2QzMkviVqMh3PmNnxXmtX9Typm5nfJDVUKLc13/lttxM?=
- =?us-ascii?Q?SmoC99mhpZkuMwDLrpuUFEF7HZ4psdG25RBJdt1qLx1eyuL0D1qxGJxkrvFK?=
- =?us-ascii?Q?Xvfb9iknF4E=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?l2p87ToOHhLPr55K9/cX8BiLAOJxRO9iMYNasw1pTJloqMth/gpnmBFVVcm8?=
- =?us-ascii?Q?o1LLibSNtSdckL8rs9s7bGZBWRqekJIGYQ5UEeFnA6FU7SNLuRqc1FfelVTs?=
- =?us-ascii?Q?VVtjfhiRvhvlhl+GnMpYI0ZN38eLldXJMOOv/jY09Q6V4lOk12fdrUroizk5?=
- =?us-ascii?Q?F5fYKiERGjzDhOVsDgkMmb+pHqGpz3kGXYRYsTNzYtxyAqbAWCBKPq5niKFo?=
- =?us-ascii?Q?6KBlkY/wOOHgsawaOcAzYyY7q+cHGAGQsC9sqUW7vCIiUNIUWxzofvqNyWMR?=
- =?us-ascii?Q?oquN1yxMZyYOdzxDiEwEwWoTK+Ukr3KJdyxVpm9VPFZGyX1s9hiXxlEpz2yE?=
- =?us-ascii?Q?yW3GqC6LJ/2olq7KolF2c8FbePk2n4iezo23JdgPQ9w5Uccd3PaoAeE5HABL?=
- =?us-ascii?Q?ehRRJfELe++jriXGN/CtoAqOSR7pDM6w8ueUFz86auidqbH+dxNW9op09exp?=
- =?us-ascii?Q?Dt7AAiKAjELHoT3AXG0I5YEib+JlaI67y1XNQ8VzB9OIaYgTito81vPQdtv6?=
- =?us-ascii?Q?fwFRzZu/rPp04Xjzrt44L1W/s78ttHB2D44hsPpcyqUf3F/9JACk2OpIpIwD?=
- =?us-ascii?Q?e6McJqFgEELVMKxX2nqlw+mgYF5NsyZmytJKmbUNk+8VieaK+27DexfLy67g?=
- =?us-ascii?Q?obWXMOD6zkuWm3LyllPRWlNgsfiKem5Ij4DrS6RWIf2Mbytu3N+cla+7x2L2?=
- =?us-ascii?Q?251sy+2/CWJLB5zU++RwSIxgLNA3zywO4Eqc1zJVZeY21/b64z8plO0lfhfj?=
- =?us-ascii?Q?cHUbz0LNPxuT4So571krVpmPTBu8df3Nkt8vwhgk1zrS3R8dVjD9ydz1gTwT?=
- =?us-ascii?Q?ExTp8jsH/WMebeZpuXAiEi192qG6ilgPFesToJVNgtsjE7m/7LaMDhk8f2ff?=
- =?us-ascii?Q?4LVgTaX4D5pzI0dW5/3DrcAsXPwKDPwgtAId/Bcmj2VomSZMvTU1ANwT3b4I?=
- =?us-ascii?Q?cpyj9CqZZqVfI5tggLJiSQ+NacAaSHWd1nC+2FW9MhtX3X3k56nyCQpzQinn?=
- =?us-ascii?Q?vF1DoBkqFBsjI4viHI2DdpcNXExzbl9g7XqVwGqqwbWYel8t/H6px547olOx?=
- =?us-ascii?Q?CmqnvGZ2YbUH9m5eBzj/mvbt8j1ge9J8Q186JyjJoDN7ubZvX2Ka9XZpCyJH?=
- =?us-ascii?Q?xOqrK3yOp1Wq3YLv1k/1h8CwRdcBEn+kxo4EpyTwExOgXX0txwa4lqvs4A47?=
- =?us-ascii?Q?NjsoCwnkjqr2Yxrwc/pFVxq+WiZXnXZGPZPrZ+5vz1z1zDCY0dsC6KGovM6w?=
- =?us-ascii?Q?IX/MQZAzLE7h6gPTZ/PbolZzN2PDwbaFJ+ajpjdr42k1ihw3WgTT4/qzkgKc?=
- =?us-ascii?Q?pFbyTc3Y5Ih85w2pMa40w7+vX0r+pSahNQb+owKGddjpBiiDi58MtqGGHwn7?=
- =?us-ascii?Q?S5qhTPwE5fj+6nce/k5lpgEDm7dvNAeT9wnMuQeNWXQf3fwUTvHiwskAGcNc?=
- =?us-ascii?Q?LcbiajYTohimqPCmlzp4EZkurR++C8AIpoDq3TNFvy/sOGaqLvkdrKx1sb5a?=
- =?us-ascii?Q?5MRt7Yu3Boej9wIldviQNqicJbMIDyRLieeNOvhUu6OmjAOvTkU0jCuBzMXj?=
- =?us-ascii?Q?9ZjAD6bJBEhrQVG3qM7H+QAgvP2pLdr68ZpIZkOG?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 703dca59-ad83-4942-998d-08ddeee3abb5
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 14:26:16.5932
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fw8AzZYE8OZXgtSJPW4Dn227oVP8klE+URyUIqMhPXfmWH1UYCBQ+Fpd6pM9QpbdG1dckIwQ+z1K3vYTk/O2aA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8174
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [net?] possible deadlock in inet_shutdown
+To: Eric Dumazet <edumazet@google.com>,
+ syzbot <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com>,
+ Josef Bacik <josef@toxicpanda.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org,
+ kuba@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ming.lei@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com
+References: <68bb4160.050a0220.192772.0198.GAE@google.com>
+ <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 08, 2025 at 09:35:32PM +0800, Mingrui Cui wrote:
-> > On Tue, Sep 02, 2025 at 09:00:16PM +0800, Mingrui Cui wrote:
-> > > When page size is 4K, DEFAULT_FRAG_SIZE of 2048 ensures that with 3
-> > > fragments per WQE, odd-indexed WQEs always share the same page with
-> > > their subsequent WQE. However, this relationship does not hold for page
-> > > sizes larger than 8K. In this case, wqe_index_mask cannot guarantee that
-> > > newly allocated WQEs won't share the same page with old WQEs.
-> > > 
-> > > If the last WQE in a bulk processed by mlx5e_post_rx_wqes() shares a
-> > > page with its subsequent WQE, allocating a page for that WQE will
-> > > overwrite mlx5e_frag_page, preventing the original page from being
-> > > recycled. When the next WQE is processed, the newly allocated page will
-> > > be immediately recycled.
-> > > 
-> > > In the next round, if these two WQEs are handled in the same bulk,
-> > > page_pool_defrag_page() will be called again on the page, causing
-> > > pp_frag_count to become negative.
-> > > 
-> > > Fix this by making DEFAULT_FRAG_SIZE always equal to half of the page
-> > > size.
-> > >
-> > Was there an actual encountered issue or is this a code clarity fix?
-> > 
-> > For 64K page size, linear mode will be used so the constant will not be
-> > used for calculating the frag size.
-> > 
-> > Thanks,
-> > Dragos
+On 9/5/25 2:03 PM, Eric Dumazet wrote:
+> On Fri, Sep 5, 2025 at 1:00 PM syzbot
+> <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com> wrote:
+>>
+>> Hello,
+>>
+>> syzbot found the following issue on:
+>>
+>> HEAD commit:    788bc43d8330 Merge branch 'microchip-lan865x-fix-probing-i..
+>> git tree:       net
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=10fc4e34580000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=9c302bcfb26a48af
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=e1cd6bd8493060bd701d
+>> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=136c41f0580000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13bac242580000
+>>
+>> Downloadable assets:
+>> disk image: https://storage.googleapis.com/syzbot-assets/c958eee3370d/disk-788bc43d.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/615040093399/vmlinux-788bc43d.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/91377e9f5c93/bzImage-788bc43d.xz
+>>
+>> The issue was bisected to:
+>>
+>> commit ffa1e7ada456087c2402b37cd6b2863ced29aff0
+>> Author: Thomas Hellström <thomas.hellstrom@linux.intel.com>
+>> Date:   Tue Mar 18 09:55:48 2025 +0000
+>>
+>>     block: Make request_queue lockdep splats show up earlier
+>>
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1263c1f0580000
+>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1163c1f0580000
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=1663c1f0580000
+>>
+>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>> Reported-by: syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com
+>> Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up earlier")
+>>
+>> block nbd0: Send control failed (result -89)
+>> block nbd0: Request send failed, requeueing
+>> ======================================================
+>> WARNING: possible circular locking dependency detected
+>> syzkaller #0 Not tainted
+>> ------------------------------------------------------
+>> udevd/5878 is trying to acquire lock:
+>> ffff88807ba3eed8 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+>> ffff88807ba3eed8 (sk_lock-AF_INET6){+.+.}-{0:0}, at: inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:905
+>>
+>> but task is already holding lock:
+>> ffff888074e3b470 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_handle_cmd drivers/block/nbd.c:1140 [inline]
+>> ffff888074e3b470 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_queue_rq+0xa66/0xf10 drivers/block/nbd.c:1204
+>>
+>> which lock already depends on the new lock.
+>>
+>>
+>> the existing dependency chain (in reverse order) is:
+>>
+>> -> #6 (&nsock->tx_lock){+.+.}-{4:4}:
+>>        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+>>        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+>>        __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
+>>        nbd_handle_cmd drivers/block/nbd.c:1140 [inline]
+>>        nbd_queue_rq+0x257/0xf10 drivers/block/nbd.c:1204
+>>        blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2120
+>>        __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+>>        blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+>>        __blk_mq_sched_dispatch_requests+0xda4/0x1570 block/blk-mq-sched.c:307
+>>        blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
+>>        blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2358
+>>        blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
+>>        blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2967
+>>        __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1220
+>>        blk_finish_plug block/blk-core.c:1247 [inline]
+>>        __submit_bio+0x2d3/0x5a0 block/blk-core.c:649
+>>        __submit_bio_noacct_mq block/blk-core.c:722 [inline]
+>>        submit_bio_noacct_nocheck+0x4ab/0xb50 block/blk-core.c:751
+>>        submit_bh fs/buffer.c:2829 [inline]
+>>        block_read_full_folio+0x599/0x830 fs/buffer.c:2447
+>>        filemap_read_folio+0x114/0x380 mm/filemap.c:2413
+>>        do_read_cache_folio+0x350/0x590 mm/filemap.c:3957
+>>        read_mapping_folio include/linux/pagemap.h:991 [inline]
+>>        read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
+>>        adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
+>>        check_partition block/partitions/core.c:141 [inline]
+>>        blk_add_partitions block/partitions/core.c:589 [inline]
+>>        bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
+>>        blkdev_get_whole+0x380/0x510 block/bdev.c:748
+>>        bdev_open+0x31e/0xd30 block/bdev.c:957
+>>        blkdev_open+0x3a8/0x510 block/fops.c:691
+>>        do_dentry_open+0x950/0x13f0 fs/open.c:965
+>>        vfs_open+0x3b/0x340 fs/open.c:1095
+>>        do_open fs/namei.c:3887 [inline]
+>>        path_openat+0x2ee5/0x3830 fs/namei.c:4046
+>>        do_filp_open+0x1fa/0x410 fs/namei.c:4073
+>>        do_sys_openat2+0x121/0x1c0 fs/open.c:1435
+>>        do_sys_open fs/open.c:1450 [inline]
+>>        __do_sys_openat fs/open.c:1466 [inline]
+>>        __se_sys_openat fs/open.c:1461 [inline]
+>>        __x64_sys_openat+0x138/0x170 fs/open.c:1461
+>>        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>>        do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> -> #5 (&cmd->lock){+.+.}-{4:4}:
+>>        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+>>        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+>>        __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
+>>        nbd_queue_rq+0xc8/0xf10 drivers/block/nbd.c:1196
+>>        blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2120
+>>        __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+>>        blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+>>        __blk_mq_sched_dispatch_requests+0xda4/0x1570 block/blk-mq-sched.c:307
+>>        blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
+>>        blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2358
+>>        blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
+>>        blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2967
+>>        __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1220
+>>        blk_finish_plug block/blk-core.c:1247 [inline]
+>>        __submit_bio+0x2d3/0x5a0 block/blk-core.c:649
+>>        __submit_bio_noacct_mq block/blk-core.c:722 [inline]
+>>        submit_bio_noacct_nocheck+0x4ab/0xb50 block/blk-core.c:751
+>>        submit_bh fs/buffer.c:2829 [inline]
+>>        block_read_full_folio+0x599/0x830 fs/buffer.c:2447
+>>        filemap_read_folio+0x114/0x380 mm/filemap.c:2413
+>>        do_read_cache_folio+0x350/0x590 mm/filemap.c:3957
+>>        read_mapping_folio include/linux/pagemap.h:991 [inline]
+>>        read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
+>>        adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
+>>        check_partition block/partitions/core.c:141 [inline]
+>>        blk_add_partitions block/partitions/core.c:589 [inline]
+>>        bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
+>>        blkdev_get_whole+0x380/0x510 block/bdev.c:748
+>>        bdev_open+0x31e/0xd30 block/bdev.c:957
+>>        blkdev_open+0x3a8/0x510 block/fops.c:691
+>>        do_dentry_open+0x950/0x13f0 fs/open.c:965
+>>        vfs_open+0x3b/0x340 fs/open.c:1095
+>>        do_open fs/namei.c:3887 [inline]
+>>        path_openat+0x2ee5/0x3830 fs/namei.c:4046
+>>        do_filp_open+0x1fa/0x410 fs/namei.c:4073
+>>        do_sys_openat2+0x121/0x1c0 fs/open.c:1435
+>>        do_sys_open fs/open.c:1450 [inline]
+>>        __do_sys_openat fs/open.c:1466 [inline]
+>>        __se_sys_openat fs/open.c:1461 [inline]
+>>        __x64_sys_openat+0x138/0x170 fs/open.c:1461
+>>        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>>        do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> -> #4 (set->srcu){.+.+}-{0:0}:
+>>        lock_sync+0xba/0x160 kernel/locking/lockdep.c:5916
+>>        srcu_lock_sync include/linux/srcu.h:173 [inline]
+>>        __synchronize_srcu+0x96/0x3a0 kernel/rcu/srcutree.c:1429
+>>        elevator_switch+0x12b/0x640 block/elevator.c:588
+>>        elevator_change+0x2d4/0x450 block/elevator.c:690
+>>        elevator_set_default+0x186/0x260 block/elevator.c:766
+>>        blk_register_queue+0x34e/0x3f0 block/blk-sysfs.c:904
+>>        __add_disk+0x677/0xd50 block/genhd.c:528
+>>        add_disk_fwnode+0xfc/0x480 block/genhd.c:597
+>>        add_disk include/linux/blkdev.h:774 [inline]
+>>        nbd_dev_add+0x717/0xae0 drivers/block/nbd.c:1973
+>>        nbd_init+0x168/0x1f0 drivers/block/nbd.c:2680
+>>        do_one_initcall+0x233/0x820 init/main.c:1269
+>>        do_initcall_level+0x104/0x190 init/main.c:1331
+>>        do_initcalls+0x59/0xa0 init/main.c:1347
+>>        kernel_init_freeable+0x334/0x4b0 init/main.c:1579
+>>        kernel_init+0x1d/0x1d0 init/main.c:1469
+>>        ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+>>        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>>
+>> -> #3 (&q->elevator_lock){+.+.}-{4:4}:
+>>        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+>>        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+>>        __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
+>>        elevator_change+0x19b/0x450 block/elevator.c:688
+>>        elevator_set_none+0x42/0xb0 block/elevator.c:781
+>>        blk_mq_elv_switch_none block/blk-mq.c:5023 [inline]
+>>        __blk_mq_update_nr_hw_queues block/blk-mq.c:5066 [inline]
+>>        blk_mq_update_nr_hw_queues+0x598/0x1aa0 block/blk-mq.c:5124
+>>        nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1478
+>>        nbd_genl_connect+0x135b/0x18f0 drivers/block/nbd.c:2228
+>>        genl_family_rcv_msg_doit+0x212/0x300 net/netlink/genetlink.c:1115
+>>        genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+>>        genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+>>        netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+>>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+>>        netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+>>        netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+>>        netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+>>        sock_sendmsg_nosec net/socket.c:714 [inline]
+>>        __sock_sendmsg+0x219/0x270 net/socket.c:729
+>>        ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+>>        ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+>>        __sys_sendmsg net/socket.c:2700 [inline]
+>>        __do_sys_sendmsg net/socket.c:2705 [inline]
+>>        __se_sys_sendmsg net/socket.c:2703 [inline]
+>>        __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+>>        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>>        do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> -> #2 (&q->q_usage_counter(io)#49){++++}-{0:0}:
+>>        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+>>        blk_alloc_queue+0x538/0x620 block/blk-core.c:461
+>>        blk_mq_alloc_queue block/blk-mq.c:4400 [inline]
+>>        __blk_mq_alloc_disk+0x15c/0x340 block/blk-mq.c:4447
+>>        nbd_dev_add+0x46c/0xae0 drivers/block/nbd.c:1943
+>>        nbd_init+0x168/0x1f0 drivers/block/nbd.c:2680
+>>        do_one_initcall+0x233/0x820 init/main.c:1269
+>>        do_initcall_level+0x104/0x190 init/main.c:1331
+>>        do_initcalls+0x59/0xa0 init/main.c:1347
+>>        kernel_init_freeable+0x334/0x4b0 init/main.c:1579
+>>        kernel_init+0x1d/0x1d0 init/main.c:1469
+>>        ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+>>        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>>
+>> -> #1 (fs_reclaim){+.+.}-{0:0}:
+>>        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+>>        __fs_reclaim_acquire mm/page_alloc.c:4234 [inline]
+>>        fs_reclaim_acquire+0x72/0x100 mm/page_alloc.c:4248
+>>        might_alloc include/linux/sched/mm.h:318 [inline]
+>>        slab_pre_alloc_hook mm/slub.c:4131 [inline]
+>>        slab_alloc_node mm/slub.c:4209 [inline]
+>>        kmem_cache_alloc_node_noprof+0x47/0x3c0 mm/slub.c:4281
+>>        __alloc_skb+0x112/0x2d0 net/core/skbuff.c:659
+>>        alloc_skb include/linux/skbuff.h:1336 [inline]
+>>        __ip6_append_data+0x2c16/0x3f30 net/ipv6/ip6_output.c:1671
+>>        ip6_append_data+0x1c4/0x380 net/ipv6/ip6_output.c:1860
+>>        rawv6_sendmsg+0x127a/0x1820 net/ipv6/raw.c:911
+>>        sock_sendmsg_nosec net/socket.c:714 [inline]
+>>        __sock_sendmsg+0x19c/0x270 net/socket.c:729
+>>        ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+>>        ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+>>        __sys_sendmsg net/socket.c:2700 [inline]
+>>        __do_sys_sendmsg net/socket.c:2705 [inline]
+>>        __se_sys_sendmsg net/socket.c:2703 [inline]
+>>        __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+>>        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>>        do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> -> #0 (sk_lock-AF_INET6){+.+.}-{0:0}:
+>>        check_prev_add kernel/locking/lockdep.c:3165 [inline]
+>>        check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+>>        validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
+>>        __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+>>        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+>>        lock_sock_nested+0x48/0x100 net/core/sock.c:3733
+>>        lock_sock include/net/sock.h:1667 [inline]
+>>        inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:905
+>>        nbd_mark_nsock_dead+0x2e9/0x560 drivers/block/nbd.c:318
+>>        nbd_send_cmd+0x11ec/0x1ba0 drivers/block/nbd.c:799
+>>        nbd_handle_cmd drivers/block/nbd.c:1174 [inline]
+>>        nbd_queue_rq+0xcdb/0xf10 drivers/block/nbd.c:1204
+>>        blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2120
+>>        __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+>>        blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+>>        __blk_mq_sched_dispatch_requests+0xda4/0x1570 block/blk-mq-sched.c:307
+>>        blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
+>>        blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2358
+>>        blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
+>>        blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2967
+>>        __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1220
+>>        blk_finish_plug block/blk-core.c:1247 [inline]
+>>        __submit_bio+0x2d3/0x5a0 block/blk-core.c:649
+>>        __submit_bio_noacct_mq block/blk-core.c:722 [inline]
+>>        submit_bio_noacct_nocheck+0x4ab/0xb50 block/blk-core.c:751
+>>        submit_bh fs/buffer.c:2829 [inline]
+>>        block_read_full_folio+0x599/0x830 fs/buffer.c:2447
+>>        filemap_read_folio+0x114/0x380 mm/filemap.c:2413
+>>        do_read_cache_folio+0x350/0x590 mm/filemap.c:3957
+>>        read_mapping_folio include/linux/pagemap.h:991 [inline]
+>>        read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
+>>        adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
+>>        check_partition block/partitions/core.c:141 [inline]
+>>        blk_add_partitions block/partitions/core.c:589 [inline]
+>>        bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
+>>        blkdev_get_whole+0x380/0x510 block/bdev.c:748
+>>        bdev_open+0x31e/0xd30 block/bdev.c:957
+>>        blkdev_open+0x3a8/0x510 block/fops.c:691
+>>        do_dentry_open+0x950/0x13f0 fs/open.c:965
+>>        vfs_open+0x3b/0x340 fs/open.c:1095
+>>        do_open fs/namei.c:3887 [inline]
+>>        path_openat+0x2ee5/0x3830 fs/namei.c:4046
+>>        do_filp_open+0x1fa/0x410 fs/namei.c:4073
+>>        do_sys_openat2+0x121/0x1c0 fs/open.c:1435
+>>        do_sys_open fs/open.c:1450 [inline]
+>>        __do_sys_openat fs/open.c:1466 [inline]
+>>        __se_sys_openat fs/open.c:1461 [inline]
+>>        __x64_sys_openat+0x138/0x170 fs/open.c:1461
+>>        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>>        do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> other info that might help us debug this:
+>>
+>> Chain exists of:
+>>   sk_lock-AF_INET6 --> &cmd->lock --> &nsock->tx_lock
+>>
+>>  Possible unsafe locking scenario:
+>>
+>>        CPU0                    CPU1
+>>        ----                    ----
+>>   lock(&nsock->tx_lock);
+>>                                lock(&cmd->lock);
+>>                                lock(&nsock->tx_lock);
+>>   lock(sk_lock-AF_INET6);
+>>
+>>  *** DEADLOCK ***
+>>
+>> 4 locks held by udevd/5878:
+>>  #0: ffff8880250f6358 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0xe0/0xd30 block/bdev.c:945
+>>  #1: ffff888142bf5f10 (set->srcu){.+.+}-{0:0}, at: srcu_lock_acquire include/linux/srcu.h:161 [inline]
+>>  #1: ffff888142bf5f10 (set->srcu){.+.+}-{0:0}, at: srcu_read_lock include/linux/srcu.h:253 [inline]
+>>  #1: ffff888142bf5f10 (set->srcu){.+.+}-{0:0}, at: blk_mq_run_hw_queue+0x31f/0x4f0 block/blk-mq.c:2358
+>>  #2: ffff88805a2e0178 (&cmd->lock){+.+.}-{4:4}, at: nbd_queue_rq+0xc8/0xf10 drivers/block/nbd.c:1196
+>>  #3: ffff888074e3b470 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_handle_cmd drivers/block/nbd.c:1140 [inline]
+>>  #3: ffff888074e3b470 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_queue_rq+0xa66/0xf10 drivers/block/nbd.c:1204
+>>
+>> stack backtrace:
+>> CPU: 0 UID: 0 PID: 5878 Comm: udevd Not tainted syzkaller #0 PREEMPT(full)
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+>> Call Trace:
+>>  <TASK>
+>>  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+>>  print_circular_bug+0x2ee/0x310 kernel/locking/lockdep.c:2043
+>>  check_noncircular+0x134/0x160 kernel/locking/lockdep.c:2175
+>>  check_prev_add kernel/locking/lockdep.c:3165 [inline]
+>>  check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+>>  validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
+>>  __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+>>  lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+>>  lock_sock_nested+0x48/0x100 net/core/sock.c:3733
+>>  lock_sock include/net/sock.h:1667 [inline]
+>>  inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:905
+>>  nbd_mark_nsock_dead+0x2e9/0x560 drivers/block/nbd.c:318
+>>  nbd_send_cmd+0x11ec/0x1ba0 drivers/block/nbd.c:799
+>>  nbd_handle_cmd drivers/block/nbd.c:1174 [inline]
+>>  nbd_queue_rq+0xcdb/0xf10 drivers/block/nbd.c:1204
+>>  blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2120
+>>  __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+>>  blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+>>  __blk_mq_sched_dispatch_requests+0xda4/0x1570 block/blk-mq-sched.c:307
+>>  blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
+>>  blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2358
+>>  blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
+>>  blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2967
+>>  __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1220
+>>  blk_finish_plug block/blk-core.c:1247 [inline]
+>>  __submit_bio+0x2d3/0x5a0 block/blk-core.c:649
+>>  __submit_bio_noacct_mq block/blk-core.c:722 [inline]
+>>  submit_bio_noacct_nocheck+0x4ab/0xb50 block/blk-core.c:751
+>>  submit_bh fs/buffer.c:2829 [inline]
+>>  block_read_full_folio+0x599/0x830 fs/buffer.c:2447
+>>  filemap_read_folio+0x114/0x380 mm/filemap.c:2413
+>>  do_read_cache_folio+0x350/0x590 mm/filemap.c:3957
+>>  read_mapping_folio include/linux/pagemap.h:991 [inline]
+>>  read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
+>>  adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
+>>  check_partition block/partitions/core.c:141 [inline]
+>>  blk_add_partitions block/partitions/core.c:589 [inline]
+>>  bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
+>>  blkdev_get_whole+0x380/0x510 block/bdev.c:748
+>>  bdev_open+0x31e/0xd30 block/bdev.c:957
+>>  blkdev_open+0x3a8/0x510 block/fops.c:691
+>>  do_dentry_open+0x950/0x13f0 fs/open.c:965
+>>  vfs_open+0x3b/0x340 fs/open.c:1095
+>>  do_open fs/namei.c:3887 [inline]
+>>  path_openat+0x2ee5/0x3830 fs/namei.c:4046
+>>  do_filp_open+0x1fa/0x410 fs/namei.c:4073
+>>  do_sys_openat2+0x121/0x1c0 fs/open.c:1435
+>>  do_sys_open fs/open.c:1450 [inline]
+>>  __do_sys_openat fs/open.c:1466 [inline]
+>>  __se_sys_openat fs/open.c:1461 [inline]
+>>  __x64_sys_openat+0x138/0x170 fs/open.c:1461
+>>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>>  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>> RIP: 0033:0x7f6d8e8a7407
+>> Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+>> RSP: 002b:00007ffc70a60620 EFLAGS: 00000202 ORIG_RAX: 0000000000000101
+>> RAX: ffffffffffffffda RBX: 00007f6d8f007880 RCX: 00007f6d8e8a7407
+>> RDX: 00000000000a0800 RSI: 000056300ccb64f0 RDI: ffffffffffffff9c
+>> RBP: 000056300cc95910 R08: 0000000000000000 R09: 0000000000000000
+>> R10: 0000000000000000 R11: 0000000000000202 R12: 000056300ccc6350
+>> R13: 000056300cca3190 R14: 0000000000000000 R15: 000056300ccc6350
+>>  </TASK>
+>> I/O error, dev nbd0, sector 2 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 1, async page read
+>> I/O error, dev nbd0, sector 4 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 2, async page read
+>> I/O error, dev nbd0, sector 6 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 3, async page read
+>> I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 0, async page read
+>> I/O error, dev nbd0, sector 2 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 1, async page read
+>> I/O error, dev nbd0, sector 4 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 2, async page read
+>> I/O error, dev nbd0, sector 6 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 3, async page read
+>> I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 0, async page read
+>> I/O error, dev nbd0, sector 2 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd0, logical block 1, async page read
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd0: unable to read RDB block 0
+>>  nbd0: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd0: unable to read RDB block 0
+>>  nbd0: unable to read partition table
+>> block nbd2: Send control failed (result -89)
+>> block nbd2: Request send failed, requeueing
+>> block nbd2: Dead connection, failed to find a fallback
+>> block nbd2: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd2: unable to read RDB block 0
+>>  nbd2: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd2: unable to read RDB block 0
+>>  nbd2: unable to read partition table
+>> block nbd3: Send control failed (result -89)
+>> block nbd3: Request send failed, requeueing
+>> block nbd3: Dead connection, failed to find a fallback
+>> block nbd3: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd3: unable to read RDB block 0
+>>  nbd3: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd3: unable to read RDB block 0
+>>  nbd3: unable to read partition table
+>> block nbd4: Send control failed (result -89)
+>> block nbd4: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd4: unable to read RDB block 0
+>>  nbd4: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd4: unable to read RDB block 0
+>>  nbd4: unable to read partition table
+>> block nbd5: Send control failed (result -89)
+>> block nbd5: Request send failed, requeueing
+>> block nbd5: Dead connection, failed to find a fallback
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd5: unable to read RDB block 0
+>>  nbd5: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd5: unable to read RDB block 0
+>>  nbd5: unable to read partition table
+>> block nbd6: Send control failed (result -89)
+>> block nbd6: Request send failed, requeueing
+>> block nbd6: Dead connection, failed to find a fallback
+>> block nbd6: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd6: unable to read RDB block 0
+>>  nbd6: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd6: unable to read RDB block 0
+>>  nbd6: unable to read partition table
+>> block nbd7: Send control failed (result -89)
+>> block nbd7: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd7: unable to read RDB block 0
+>>  nbd7: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd7: unable to read RDB block 0
+>>  nbd7: unable to read partition table
+>> block nbd8: Send control failed (result -89)
+>> block nbd8: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd8: unable to read RDB block 0
+>>  nbd8: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd8: unable to read RDB block 0
+>>  nbd8: unable to read partition table
+>> block nbd9: Send control failed (result -32)
+>> block nbd9: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd9: unable to read RDB block 0
+>>  nbd9: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd9: unable to read RDB block 0
+>>  nbd9: unable to read partition table
+>> block nbd10: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd10: unable to read RDB block 0
+>>  nbd10: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd10: unable to read RDB block 0
+>>  nbd10: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd11: unable to read RDB block 0
+>>  nbd11: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd11: unable to read RDB block 0
+>>  nbd11: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd12: unable to read RDB block 0
+>>  nbd12: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd12: unable to read RDB block 0
+>>  nbd12: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd13: unable to read RDB block 0
+>>  nbd13: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd13: unable to read RDB block 0
+>>  nbd13: unable to read partition table
+>> nbd_send_cmd: 5 callbacks suppressed
+>> block nbd14: Send control failed (result -89)
+>> nbd_send_cmd: 5 callbacks suppressed
+>> block nbd14: Request send failed, requeueing
+>> block nbd14: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd14: unable to read RDB block 0
+>>  nbd14: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd14: unable to read RDB block 0
+>>  nbd14: unable to read partition table
+>> block nbd15: Send control failed (result -89)
+>> block nbd15: Request send failed, requeueing
+>> block nbd15: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd15: unable to read RDB block 0
+>>  nbd15: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd15: unable to read RDB block 0
+>>  nbd15: unable to read partition table
+>> block nbd16: Send control failed (result -89)
+>> block nbd16: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd16: unable to read RDB block 0
+>>  nbd16: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd16: unable to read RDB block 0
+>>  nbd16: unable to read partition table
+>> block nbd17: Send control failed (result -89)
+>> block nbd17: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd17: unable to read RDB block 0
+>>  nbd17: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd17: unable to read RDB block 0
+>>  nbd17: unable to read partition table
+>> block nbd18: Send control failed (result -89)
+>> block nbd18: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd18: unable to read RDB block 0
+>>  nbd18: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd18: unable to read RDB block 0
+>>  nbd18: unable to read partition table
+>> block nbd19: Send control failed (result -89)
+>> block nbd19: Request send failed, requeueing
+>> block nbd19: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd19: unable to read RDB block 0
+>>  nbd19: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd19: unable to read RDB block 0
+>>  nbd19: unable to read partition table
+>> block nbd20: Send control failed (result -89)
+>> block nbd20: Request send failed, requeueing
+>> block nbd20: Dead connection, failed to find a fallback
+>> blk_print_req_error: 2802 callbacks suppressed
+>> I/O error, dev nbd20, sector 2 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> buffer_io_error: 2802 callbacks suppressed
+>> Buffer I/O error on dev nbd20, logical block 1, async page read
+>> I/O error, dev nbd20, sector 4 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 2, async page read
+>> I/O error, dev nbd20, sector 6 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 3, async page read
+>> I/O error, dev nbd20, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 0, async page read
+>> I/O error, dev nbd20, sector 2 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 1, async page read
+>> I/O error, dev nbd20, sector 4 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 2, async page read
+>> I/O error, dev nbd20, sector 6 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 3, async page read
+>> I/O error, dev nbd20, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 0, async page read
+>> I/O error, dev nbd20, sector 2 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+>> Buffer I/O error on dev nbd20, logical block 1, async page read
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd20: unable to read RDB block 0
+>>  nbd20: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd20: unable to read RDB block 0
+>>  nbd20: unable to read partition table
+>> block nbd21: Send control failed (result -89)
+>> block nbd21: Request send failed, requeueing
+>> block nbd21: Dead connection, failed to find a fallback
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd21: unable to read RDB block 0
+>>  nbd21: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd21: unable to read RDB block 0
+>>  nbd21: unable to read partition table
+>> block nbd22: Send control failed (result -89)
+>> block nbd22: Request send failed, requeueing
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd22: unable to read RDB block 0
+>>  nbd22: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd22: unable to read RDB block 0
+>>  nbd22: unable to read partition table
+>> block nbd23: Send control failed (result -89)
+>> block nbd23: Request send failed, requeueing
+>> block nbd23: Dead connection, failed to find a fallback
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd23: unable to read RDB block 0
+>>  nbd23: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd23: unable to read RDB block 0
+>>  nbd23: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd24: unable to read RDB block 0
+>>  nbd24: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd24: unable to read RDB block 0
+>>  nbd24: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd25: unable to read RDB block 0
+>>  nbd25: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd25: unable to read RDB block 0
+>>  nbd25: unable to read partition table
+>> block nbd26: Dead connection, failed to find a fallback
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd26: unable to read RDB block 0
+>>  nbd26: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd26: unable to read RDB block 0
+>>  nbd26: unable to read partition table
+>> block nbd27: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd27: unable to read RDB block 0
+>>  nbd27: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd27: unable to read RDB block 0
+>>  nbd27: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd28: unable to read RDB block 0
+>>  nbd28: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd28: unable to read RDB block 0
+>>  nbd28: unable to read partition table
+>> block nbd29: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd29: unable to read RDB block 0
+>>  nbd29: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd29: unable to read RDB block 0
+>>  nbd29: unable to read partition table
+>> block nbd30: shutting down sockets
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd30: unable to read RDB block 0
+>>  nbd30: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd30: unable to read RDB block 0
+>>  nbd30: unable to read partition table
+>> ldm_validate_partition_table(): Disk read failed.
+>> Dev nbd31: unable to read RDB block 0
+>>  nbd31: unable to read partition table
+>>
+>>
+>> ---
+>> This report is generated by a bot. It may contain errors.
+>> See https://goo.gl/tpsmEJ for more information about syzbot.
+>> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>>
+>> syzbot will keep track of this issue. See:
+>> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+>>
+>> If the report is already addressed, let syzbot know by replying with:
+>> #syz fix: exact-commit-title
+>>
+>> If you want syzbot to run the reproducer, reply with:
+>> #syz test: git://repo/address.git branch-or-commit-hash
+>> If you attach or paste a git patch, syzbot will apply it before testing.
+>>
+>> If you want to overwrite report's subsystems, reply with:
+>> #syz set subsystems: new-subsystem
+>> (See the list of subsystem names on the web dashboard)
+>>
+>> If the report is a duplicate of another one, reply with:
+>> #syz dup: exact-subject-of-another-report
+>>
+>> If you want to undo deduplication, reply with:
+>> #syz undup
 > 
-> Yes, this was an actual issue we encountered that caused a kernel crash.
+> Question to NBD maintainers.
 > 
-> We found it on a server with a DEC-Alpha like processor, which uses 8KB page
-> size and runs a custom-built kernel. When using a ConnectX-4 Lx MT27710
-> (MCX4121A-ACA_Ax) NIC with the MTU set to 7657 or higher, the kernel would crash
-> during heavy traffic (e.g., iperf test). Here's the kernel log:
+> What socket types are supposed to be supported by NBD ?
 > 
-> WARNING: CPU: 9 PID: 0 at include/net/page_pool/helpers.h:130
-> mlx5e_page_release_fragmented.isra.0+0xdc/0xf0 [mlx5_core]
-> Modules linked in: ib_umad ib_ipoib ib_cm mlx5_ib ib_uverbs ib_core ipv6
-> mlx5_core tls
-> CPU: 9 PID: 0 Comm: swapper/9 Tainted: G        W          6.6.0 #23
->  walk_stackframe+0x0/0x190
->  show_stack+0x70/0x94
->  dump_stack_lvl+0x98/0xd8
->  dump_stack+0x2c/0x48
->  __warn+0x1c8/0x220
->  warn_slowpath_fmt+0x20c/0x230
->  mlx5e_page_release_fragmented.isra.0+0xdc/0xf0 [mlx5_core]
->  mlx5e_free_rx_wqes+0xcc/0x120 [mlx5_core]
->  mlx5e_post_rx_wqes+0x1f4/0x4e0 [mlx5_core]
->  mlx5e_napi_poll+0x1c0/0x8d0 [mlx5_core]
->  __napi_poll+0x58/0x2e0
->  net_rx_action+0x1a8/0x340
->  __do_softirq+0x2b8/0x480
->  irq_exit+0xd4/0x120
->  do_entInt+0x164/0x520
->  entInt+0x114/0x120
->  __idle_end+0x0/0x50
->  default_idle_call+0x64/0x150
->  do_idle+0x10c/0x240
->  cpu_startup_entry+0x70/0x80
->  smp_callin+0x354/0x410
->  __smp_callin+0x3c/0x40
+> I was thinking adding a list of supported ones, assuming TCP and
+> stream unix are the only ones:
 > 
-> Although this was on a custom kernel and processor, I believe this issue is
-> generic to any system using an 8KB page size. Unfortunately, I don't have an
-> Alpha server running a mainline kernel to verify this directly, and most
-> mainstream architectures don't support 8KB page size.
->
-Oh, I see. Thanks for the note. I had issues finding any arch that
-supports 8K page size.
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 6463d0e8d0ce..87b0b78249da 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1217,6 +1217,14 @@ static struct socket *nbd_get_socket(struct
+> nbd_device *nbd, unsigned long fd,
+>         if (!sock)
+>                 return NULL;
+> 
+> +       if (!sk_is_tcp(sock->sk) &&
+> +           !sk_is_stream_unix(sock->sk)) {
+> +               dev_err(disk_to_dev(nbd->disk), "Unsupported socket:
+> should be TCP or UNIX.\n");
+> +               *err = -EINVAL;
+> +               sockfd_put(sock);
+> +               return NULL;
+> +       }
+> +
+>         if (sock->ops->shutdown == sock_no_shutdown) {
+>                 dev_err(disk_to_dev(nbd->disk), "Unsupported socket:
+> shutdown callout must be supported.\n");
+>                 *err = -EINVAL;
 
-The information above would be useful in the commit message as well.
+I think that'd be fine, actually surprised it currently allows other
+types. Guess nobody thought of that before?!
 
-Also, you need a fixes tag for net patches. Probably this one:
-Fixes: 069d11465a80 ("net/mlx5e: RX, Enhance legacy Receive Queue memory scheme")
-
-
-Thanks,
-Dragos
+-- 
+Jens Axboe
 
 
