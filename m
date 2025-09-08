@@ -1,183 +1,177 @@
-Return-Path: <netdev+bounces-220998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A86B49D16
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:49:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86663B49D1D
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2BF84E7377
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:49:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C886443B7D
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A112E92B0;
-	Mon,  8 Sep 2025 22:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6C62EE29F;
+	Mon,  8 Sep 2025 22:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qzV25RQW"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="lTKvbfh/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Bgo11MHD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EEE1EB5CE;
-	Mon,  8 Sep 2025 22:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C0C2DCF4C;
+	Mon,  8 Sep 2025 22:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757371782; cv=none; b=fsDn4p+Sk0vl/ar14XhZ+Kq2GWU/OtzvtQvRrqPSSDGq6lQNwz+QVbcoLvHHd4C4sH5KsO6QpAafU9DdSuorieIvwCS3Bjv2LiDemGwHcEt+rnDIbU7Tbt96d1n+F5zykfvrKqSt9Wacu7ZRKCGE8UhCIfe9OhBl6wyDQ4v7Vhk=
+	t=1757371899; cv=none; b=k0x7jN8EuiTXn3xenG2FUz9jAKmALjDfInulPeSFQxay5cclrCelBPCWB0rL4QBTeE2kAC2JdwuPdX6Dn1fS9WLfXCCP4rNHlIC5TKsHYzNn7lJ8F8K6D5KHRZhok0wfjiJZtzfniib7j6zvdWobiJjixQXk9b42yniKdUfAF4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757371782; c=relaxed/simple;
-	bh=lnwnrrjuGfO0mxaFVDsCYUrjF7eAtqYJcIxxxfw8O5s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lgX9NZA2O7yuCNy9nrHXXqkkg3Iox1K9VBc+eNUzNe3ADiZnNRlscgyzuvt0wPjnhsGyw5BGCIL5oKn53MpCvTKimBIxdC0Rdn0hTNgQksUhZPkBryOSh0kKOw9uUj26Fh3+r8dUxVtamqhaegYPUDhUpfDVIPtpyvs9ne+3jYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qzV25RQW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F26F8C4CEF8;
-	Mon,  8 Sep 2025 22:49:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757371782;
-	bh=lnwnrrjuGfO0mxaFVDsCYUrjF7eAtqYJcIxxxfw8O5s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=qzV25RQW+MgDi/hpupASciblnRwvwak6iSKey3VOtSYLukUwHI7fR+zUx1QST/x2Q
-	 6Em65Qfmn9/B4CzRdBo4+nd087sFEkJ5vfUGT4P2m+dbzUkPa8YxqP7boAFnn7uXt3
-	 gTVEUZiV8K3eTb/9xPfhX4fJK+mAbHPXs5CvfpNnFKONpFSW6Pd59zpCNXJoxekD2F
-	 hHDw5zXZe8hbKbKOu4Tu6MF4LvuhP7Xdr57eX8HWZOJNUeOSx/f5AjqufnoLeTt0UY
-	 Caev8zFMYNQo3OPQSgsaNYEib6Q/FIu7A+t68dAgynSZVLzRLAoaiXJ5mbl91LGTw9
-	 s61gtcduRHBBA==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-62105d21297so7256013a12.0;
-        Mon, 08 Sep 2025 15:49:41 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUaSooCDTOU1zVGzpWGZLPmWlbDTyDInf/52pHzr4TOutLBVsYrIWvv08omtK8M1777NGJSBKO6IY92VPcO@vger.kernel.org, AJvYcCWymyU//5CocjfYWdwKiLuPlnOxqU3z4SMIb8eUmQl9DKnvuJfDLPu5OSxTEDwp+N2Mwz/cblm5Y8o5@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsCfkuE2MDNRTpMGVVLwBimx7E9CZqvY2r3vPSbXbZDf+0rl/z
-	pDV6zr7H0PrgcuDlfvWvGgoxBd3+l/iDpqEp2uH/9tgwVZ4IwbqKKY1gQBRielxAobXjy8Hc1Lx
-	gK8kYWR2bsxRzispl3hfo+1oDWDNWSQ==
-X-Google-Smtp-Source: AGHT+IGHw+8G7L+ArmhFoRRdE1FV4g1i7ErMbY/OfAAY/uLB+PGTF8jRNyhPKgW/7xBDt1d7qcOsXVSoBcTc1Gd368Q=
-X-Received: by 2002:a05:6402:3484:b0:61e:8f70:ee26 with SMTP id
- 4fb4d7f45d1cf-62379b825a1mr8384508a12.38.1757371780463; Mon, 08 Sep 2025
- 15:49:40 -0700 (PDT)
+	s=arc-20240116; t=1757371899; c=relaxed/simple;
+	bh=PUQDiQIr5kBg3FsFnfzGhoYijFmfm6QlTxG4268++SM=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Ts1g7znMyWjdOKYUvhWOOLVBjFp9Zk+0Dax8KI8kfFYDUgpH4moOBnz47WO1rKhJ8SYsKk6A3aPRemLy0LuPtXxkBLVeQNVx8QN0FX1dCBKRds5AUC4OkkgWudutq3kikAoIhI7jVAYGs05BSVR/zy9ly5g7zlhonj4LrTfWCPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=lTKvbfh/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Bgo11MHD; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 7CDF87A0094;
+	Mon,  8 Sep 2025 18:51:35 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Mon, 08 Sep 2025 18:51:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm2; t=1757371895; x=1757458295; bh=hoAxRJyXOMnsB0mKPob0+
+	gpsSszdzYC1XPmYnOTPNu8=; b=lTKvbfh/rEbJcaRvNvV5cPVfhbQ+Ftsx6mxXI
+	yr3TV7x5z27+Fq82JQ60OmGRuNzBycREOftOCVBjhiaKFIavmPK8HomMteLHrZn3
+	Ute922wrtxFrLv1ss2ilBiUK1kYCiis8yYvbEiyeHpYCSiBEwSCB4GBqXWIs/z8e
+	QEdzzDa5mfQy4i14fh1+HOxLEOeHo6pYSPbOos0ZZCrvt84DXRt9nQFa7KhMXdSV
+	2ZEGAIVKUAfpX4uLmchffIezhECooeA9mxuq+yJ4TAi1Ou2ed0BAD3T2weALFtJw
+	4B6jhUVYFBYhMAbNuc6gJyHYikzMr2iyI0b1A0uwcjIqmE1dQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757371895; x=1757458295; bh=hoAxRJyXOMnsB0mKPob0+gpsSszdzYC1XPm
+	YnOTPNu8=; b=Bgo11MHD/rDihzzrzBdiqywQ2AHkGEubc0a38ycs8UTHykIHRHR
+	inW1iIAf0o8fy1BrhsJQob0OS0HTPfR4kIz3Jd87Il/MGSEqR0lKB4+kB0iJDf7U
+	493yo19bhFpvcmachV7TfmMeuMxWcNiOXRlno3i6RO4W9AsQe5IkAJc48R0tjCCo
+	s71/j4z1F19MWp+f9W6lBjnUiHKJFiNwCX/aoTLhXkkax5JaV903bBotjlBLoJJC
+	w9SMVj1siQQgaxqpgltPVLKeuqyk/oR1NfxVlHq6WSm1M6aYAT6SlaTqd6Yw8Fqw
+	AQIWl4Hd+qLc/Re8WziFZrcjXjqL6IdMebQ==
+X-ME-Sender: <xms:9l2_aNQIBrSLEg_WarMTXmgdKXDMNmM0PY5l9f634-nXVWQPgDM0Pw>
+    <xme:9l2_aF9Vu911JZpl9TNDCO4wNgG2i9TVPiVtDQSZNVGbuhdpJBc9l_V3pWTsWyTgn
+    GyFmO5iLLsFe7-zKq0>
+X-ME-Received: <xmr:9l2_aFgePIqfEumtze3tX9TmB2OUNhU0W5hV7MTZ6EMGvm7XfCywjiNvopYV2xj6dUXYGQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeejjecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
+    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeeuffevvddvfedujeefuedugfdtgfdutedtveefieelfffhgffhtdejkefhiedtkeen
+    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggp
+    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmh
+    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhm
+    rghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpd
+    hrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggr
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthht
+    ohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeifihhluggvrhesuh
+    hsrdhisghmrdgtohhm
+X-ME-Proxy: <xmx:9l2_aOY0TfCWiHW1avegdRDIbzE6AsOsvul3x7UBN4MN97btVtNboQ>
+    <xmx:9l2_aC9nHBmEruyz3JyIMWqoI8uhPmxV676KE4CI7p5LjLYOn-v5Kw>
+    <xmx:9l2_aIO_ql0joqj62Qf-WYz4bJpBWOOE0xGqgqtwC_RjYw5KA6U6dQ>
+    <xmx:9l2_aHEOhps-BoKO25NI8cyAcg7N8Q_F2xi6YHameEhy3HkkPm8bIg>
+    <xmx:912_aF6VotxxHt6zBP7DYY9fgzRQJH2f8w7NADfxBK3ghJyhYmeP-3E7>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Sep 2025 18:51:34 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 4CC279FCB4; Mon,  8 Sep 2025 15:51:33 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 49D669FC6F;
+	Mon,  8 Sep 2025 15:51:33 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+    David Wilder <wilder@us.ibm.com>
+Subject: Re: [PATCHv2 1/2] bonding: don't set oif to bond dev when getting NS
+ target destination
+In-reply-to: <20250908062802.392300-1-liuhangbin@gmail.com>
+References: <20250908062802.392300-1-liuhangbin@gmail.com>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Mon, 08 Sep 2025 06:28:01 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250815144736.1438060-1-ivecera@redhat.com> <20250820211350.GA1072343-robh@kernel.org>
- <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com> <CAL_JsqKui29O_8xGBVx9T2e85Dy0onyAp4mGqChSuuwABOhDqA@mail.gmail.com>
- <bc39cdc9-c354-416d-896f-c2b3c3b64858@redhat.com>
-In-Reply-To: <bc39cdc9-c354-416d-896f-c2b3c3b64858@redhat.com>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 8 Sep 2025 17:49:28 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqL5wQ+0Xcdo5T3FTyoa2csQ9aW8ZxxMxVOhRJpzc7fGhA@mail.gmail.com>
-X-Gm-Features: AS18NWAxhYNwJ56vsQfUczkl_R9TNuNktlxc2midcWQWDd56JDmUw5T0m2c6T2w
-Message-ID: <CAL_JsqL5wQ+0Xcdo5T3FTyoa2csQ9aW8ZxxMxVOhRJpzc7fGhA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
- reference property
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com, 
-	Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, 
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2850155.1757371893.1@famine>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Sep 2025 15:51:33 -0700
+Message-ID: <2850156.1757371893@famine>
 
-On Fri, Sep 5, 2025 at 1:50=E2=80=AFAM Ivan Vecera <ivecera@redhat.com> wro=
-te:
->
->
->
-> On 05. 09. 25 12:06 dop., Rob Herring wrote:
-> > On Fri, Aug 29, 2025 at 8:29=E2=80=AFAM Ivan Vecera <ivecera@redhat.com=
-> wrote:
-> >> ...
-> >>
-> >> Do you mean to add a property (e.g. dpll-channel or dpll-device) into
-> >> net/network-class.yaml ? If so, yes, it would be possible, and the way
-> >> I look at it now, it would probably be better. The DPLL driver can
-> >> enumerate all devices across the system that has this specific propert=
-y
-> >> and check its value.
-> >
-> > Yes. Or into ethernet-controller.yaml. Is a DPLL used with wifi,
-> > bluetooth, etc.?
->
-> AFAIK no... ethernet-controller makes sense.
->
-> >>
-> >> See the proposal below...
-> >>
-> >> Thanks,
-> >> Ivan
-> >>
-> >> ---
-> >>    Documentation/devicetree/bindings/dpll/dpll-device.yaml  | 6 ++++++
-> >>    Documentation/devicetree/bindings/net/network-class.yaml | 7 ++++++=
-+
-> >>    2 files changed, 13 insertions(+)
-> >>
-> >> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> >> b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> >> index fb8d7a9a3693f..560351df1bec3 100644
-> >> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> >> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> >> @@ -27,6 +27,12 @@ properties:
-> >>      "#size-cells":
-> >>        const: 0
-> >>
-> >> +  "#dpll-cells":
-> >> +    description: |
-> >> +      Number of cells in a dpll specifier. The cell specifies the ind=
-ex
-> >> +      of the channel within the DPLL device.
-> >> +    const: 1
-> >
-> > If it is 1 for everyone, then you don't need a property for it. The
-> > question is whether it would need to vary. Perhaps some configuration
-> > flags/info might be needed? Connection type or frequency looking at
-> > the existing configuration setting?
->
-> Connection type maybe... What I am trying to do is define a relationship
-> between the network controller and the DPLL device, which together form
-> a single entity from a use-case perspective (e.g., Ethernet uses an
-> external DPLL device either to synchronize the recovered clock or to
-> provide a SyncE signal synchronized with an external 1PPS source).
->
-> Yesterday I was considering the implementation from the DPLL driver's
-> perspective and encountered a problem when the relation is defined from
-> the Ethernet controller's perspective. In that case, it would be
-> necessary to enumerate all devices that contain a =E2=80=9Cdpll=E2=80=9D =
-property whose
-> value references this DPLL device.
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Why is that?
-
+>Unlike IPv4, IPv6 routing strictly requires the source address to be vali=
+d
+>on the outgoing interface. If the NS target is set to a remote VLAN inter=
+face,
+>and the source address is also configured on a VLAN over a bond interface=
+,
+>setting the oif to the bond device will fail to retrieve the correct
+>destination route.
 >
-> This approach seems quite complicated, as it would require searching
-> through all buses, all connected devices, and checking each fwnode for a
-> =E2=80=9Cdpll=E2=80=9D property containing the given reference. I don=E2=
-=80=99t think this would
-> be the right solution.
-
-for_each_node_with_property() provides that. No, it's not efficient,
-but I doubt it needs to be. As you'd only need to do it once.
-
-> I then came across graph bindings and ACPI graph extensions, which are
-> widely used in the media and DRM subsystems to define relations between
-> devices. Would this be an appropriate way to define a binding between an
-> Ethernet controller and a DPLL device?
-
-Usually the graph is used to handle complex chains of devices and how
-the data flows. I'm not sure that applies here.
-
-> If so, what would such a binding roughly look like? I=E2=80=99m not very
-> experienced in this area, so I would appreciate any guidance.
+>Fix this by not setting the oif to the bond device when retrieving the NS
+>target destination. This allows the correct destination device (the VLAN
+>interface) to be determined, so that bond_verify_device_path can return t=
+he
+>proper VLAN tags for sending NS messages.
 >
-> If not, wouldn=E2=80=99t it be better to define the relation from the DPL=
-L
-> device to the network controller, as originally proposed?
+>Reported-by: David Wilder <wilder@us.ibm.com>
+>Closes: https://lore.kernel.org/netdev/aGOKggdfjv0cApTO@fedora/
+>Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
+>Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+>Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-I have no idea really. I would think the DPLL is the provider and an
-ethernet device is the consumer. And if the ethernet device is unused
-(or disabled), then the DPLL connection associated with it is unused.
-If that's the case, then I think the property belongs in the ethernet
-node.
+Acked-by: Jay Vosburgh <jv@jvosburgh.net>
 
-Rob
+>---
+>
+>v2: split the patch into 2 parts, the kernel change and test update (Jay =
+Vosburgh)
+>
+>---
+> drivers/net/bonding/bond_main.c | 1 -
+> 1 file changed, 1 deletion(-)
+>
+>diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+>index 257333c88710..30cf97f4e814 100644
+>--- a/drivers/net/bonding/bond_main.c
+>+++ b/drivers/net/bonding/bond_main.c
+>@@ -3355,7 +3355,6 @@ static void bond_ns_send_all(struct bonding *bond, =
+struct slave *slave)
+> 		/* Find out through which dev should the packet go */
+> 		memset(&fl6, 0, sizeof(struct flowi6));
+> 		fl6.daddr =3D targets[i];
+>-		fl6.flowi6_oif =3D bond->dev->ifindex;
+> =
+
+> 		dst =3D ip6_route_output(dev_net(bond->dev), NULL, &fl6);
+> 		if (dst->error) {
+>-- =
+
+>2.50.1
+>
 
