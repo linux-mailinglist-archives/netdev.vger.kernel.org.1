@@ -1,147 +1,141 @@
-Return-Path: <netdev+bounces-220935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F7FFB497F7
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:12:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91685B49801
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:14:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63464440E80
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96B5E443020
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DB4319840;
-	Mon,  8 Sep 2025 18:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402ED31579B;
+	Mon,  8 Sep 2025 18:12:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQ7y1IxU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YvDMTEzV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3352B3191B4;
-	Mon,  8 Sep 2025 18:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171FF314A7E;
+	Mon,  8 Sep 2025 18:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757355074; cv=none; b=SKYUUjABGfqncUGRrnchJpJ7Odh7Dbwu4mJpSPe3qHZfFj1UkwBkvpfAYP7LH/ZPZ91zNnABE0/Q6LewOyJXfb85yeGUpzU9cp7nM3z4Up3qY8xkJlFhDCnhuQTvf4FxjRzySX2AYb4hNQqc7m8P/yq+D3KKcCwMaFT2aIgJRCA=
+	t=1757355149; cv=none; b=ZBvSvO/xq8nknqAIwVT9v8nZMVkMfrmWSspWRbrH9qijR+KOWsUHwlznE/RdtktvLHfYtJUotrUa9bX2L6iARrfhd0oyF+mN4P3kzMGFX77+HHGFCvUpqbkjNfpfiqcgJKOuIfULsZSqiUXnCODwNMHi7m/gPqMHj1MpKImmJr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757355074; c=relaxed/simple;
-	bh=zJ4rq1A7rDmdHeQfB8ynFE9503F7ovKFxfivFN/5hPw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MTdBgKXtpS9zOVRtuaRBxVuqWwZRJaJXd5UQB4Blp86rWkwFQ/6LDcLNpgMt4QXjwkVqi/cyl/Z+Mg2TWkn5EFPiIhY669oDytsIxU14tMH/GXXPOAgF9WwTYITPLVjULfK67PoD/21g6CQ0zpvV6PSjOYy7wPiNztS4uRlT/D4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQ7y1IxU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5601C4CEFC;
-	Mon,  8 Sep 2025 18:11:13 +0000 (UTC)
+	s=arc-20240116; t=1757355149; c=relaxed/simple;
+	bh=55uqEUrkSEH/g4S8O0Ls9N9ERmewReSvw0qIJ321yHU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=XqD46iAUC7wRs4LIGNvAjyt7FnaH73H6BlPmuPGDH4oMxvsGP4Z5wVtDktPT/F+euEGqzt3it6trKrdPL92wsmJE9IsI43dVmLPhKm2i2sVoPyAfl9/oyuoOId8WcNnriJSXZ3EAl7fflptvmksK1+DQjtTwG6uju5BBFFqMyAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YvDMTEzV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A8F5C4CEF1;
+	Mon,  8 Sep 2025 18:12:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757355073;
-	bh=zJ4rq1A7rDmdHeQfB8ynFE9503F7ovKFxfivFN/5hPw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hQ7y1IxUPVquvYgy5yUlyXqwhJc6iLQCwcSIFcqEjolAZNOyLB6+v3SRR2bxwaYTP
-	 dn0GnEftM+3JCtzI28l+z6EtBy2t2V6M8qGgtDu2XsnUSIndOr5LBM5CrRiHyydBaa
-	 TIg6n5G33v5pQ3tM7uVIf5GiGEXvIbGmX/+3Ece2SGgRMdinljCU6As5Kipc/H9xL7
-	 1/dxb+RAntzX9qc8L12Z5ARFPiZvngI4B9DbAd6h+8DdXN7peM19tvbGyUens0F9KP
-	 21lN9HzQQNf4b6c52XDkRRmKGzgGQpDPabLAx5UYqUM9TZJSga7yj07X5355fSPi98
-	 x8R6mDUh6svYQ==
-Received: by wens.tw (Postfix, from userid 1000)
-	id 68C9B5FFA1; Tue, 09 Sep 2025 02:11:09 +0800 (CST)
-From: Chen-Yu Tsai <wens@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=k20201202; t=1757355148;
+	bh=55uqEUrkSEH/g4S8O0Ls9N9ERmewReSvw0qIJ321yHU=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=YvDMTEzVGTF5aOsROaBtp3Tmo4Glys448tT3SXnuYhwcVCrj85Jj3u/+YXw2Tq5Fe
+	 WWOSvpNdpbzhZKSvjC/LnOK2eO4EyFQ6DbvKqhXldkKzhHPXIYfRS00afuK39tfwok
+	 zlK3iZYaW5S8XvN3V0Az2kAcmAsAz/hdTN9pxIH/UKONDyrn42iEor9GNYk0+Qqeno
+	 uyNq1i3bwhij4DAY3MACsbXLq0wM8Ndn3opjNh6va2d1a+y1/7pNkrRqnAi+0+g1aj
+	 XnR7YTot90CDo3xSLZiWSrP425GVBHaQ9mEpWy8S72iQnZtS7zT5hhYyERZhWyVNjK
+	 9vUKysO8MOSBQ==
+Date: Mon, 8 Sep 2025 20:12:21 +0200 (GMT+02:00)
+From: Matthieu Baerts <matttbe@kernel.org>
+To: Krister Johansen <kjlx@templeofstupid.com>
+Cc: Geliang Tang <geliang@kernel.org>, Mat Martineau <martineau@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej@kernel.org>,
-	Samuel Holland <samuel@sholland.org>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Andre Przywara <andre.przywara@arm.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>
-Subject: [PATCH net-next v4 10/10] arm64: dts: allwinner: t527: orangepi-4a: Enable Ethernet port
-Date: Tue,  9 Sep 2025 02:10:59 +0800
-Message-Id: <20250908181059.1785605-11-wens@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250908181059.1785605-1-wens@kernel.org>
-References: <20250908181059.1785605-1-wens@kernel.org>
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+	David Reaver <me@davidreaver.com>
+Message-ID: <01f13d40-93c4-4147-b10d-f86fd5f79fa5@kernel.org>
+In-Reply-To: <aL8YwEx1dxa93lpR@templeofstupid.com>
+References: <aLuDmBsgC7wVNV1J@templeofstupid.com> <ab6ff5d8-2ef1-44de-b6db-8174795028a1@kernel.org> <83191d507b7bc9b0693568c2848319932e6b974e.camel@kernel.org> <78d4a7b8-8025-493a-805c-a4c5d26836a8@kernel.org> <aL8RoSniweGJgm3h@templeofstupid.com> <23a66a02-7de9-40c5-995d-e701cb192f8b@kernel.org> <aL8WNpl8ExODg20q@templeofstupid.com> <575893ce-11a8-492f-ac8c-5995b3e90c76@kernel.org> <aL8YwEx1dxa93lpR@templeofstupid.com>
+Subject: Re: [PATCH mptcp] mptcp: sockopt: make sync_socket_options
+ propagate SOCK_KEEPOPEN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Correlation-ID: <01f13d40-93c4-4147-b10d-f86fd5f79fa5@kernel.org>
 
-From: Chen-Yu Tsai <wens@csie.org>
+8 Sept 2025 19:56:23 Krister Johansen <kjlx@templeofstupid.com>:
 
-On the Orangepi 4A board, the second Ethernet controller, aka the GMAC200,
-is connected to an external Motorcomm YT8531 PHY. The PHY uses an external
-25MHz crystal, has the SoC's PI15 pin connected to its reset pin, and
-the PI16 pin for its interrupt pin.
+> On Mon, Sep 08, 2025 at 07:51:10PM +0200, Matthieu Baerts wrote:
+>> 8 Sept 2025 19:45:32 Krister Johansen <kjlx@templeofstupid.com>:
+>>
+>>> On Mon, Sep 08, 2025 at 07:31:43PM +0200, Matthieu Baerts wrote:
+>>>> Hi Krister,
+>>>>
+>>>> On 08/09/2025 19:25, Krister Johansen wrote:
+>>>>> On Mon, Sep 08, 2025 at 07:13:12PM +0200, Matthieu Baerts wrote:
+>>>>>> =E2=80=A6
+>>>>>
+>>>>> Thanks for the reviews, Geliang and Matt.=C2=A0 If you'd like me to f=
+ix the
+>>>>> formatting up and send a v2, I'm happy to do that as well.=C2=A0 Just=
+ let me
+>>>>> know.
+>>>>
+>>>> I was going to apply this diff:
+>>>>
+>>>>> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+>>>>> index 13108e9f982b..2abe6f1e9940 100644
+>>>>> --- a/net/mptcp/sockopt.c
+>>>>> +++ b/net/mptcp/sockopt.c
+>>>>> @@ -1532,11 +1532,12 @@ static void sync_socket_options(struct mptcp_=
+sock *msk, struct sock *ssk)
+>>>>> {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 static const unsigned int =
+tx_rx_locks =3D SOCK_RCVBUF_LOCK | SOCK_SNDBUF_LOCK;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct sock *sk =3D (struc=
+t sock *)msk;
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int kaval =3D !!sock_flag(sk, S=
+OCK_KEEPOPEN);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool keep_open;
+>>>>>
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 keep_open =3D sock_flag(sk, SOC=
+K_KEEPOPEN);
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ssk->sk_prot->keepaliv=
+e)
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 ssk->sk_prot->keepalive(ssk, kaval);
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sock_valbool_flag(ssk, SOCK_KEE=
+POPEN, kaval);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 ssk->sk_prot->keepalive(ssk, keep_open);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sock_valbool_flag(ssk, SOCK_KEE=
+POPEN, keep_open);
+>>>>>
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssk->sk_priority =3D sk->s=
+k_priority;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssk->sk_bound_dev_if =3D s=
+k->sk_bound_dev_if;
+>>>>
+>>>> (sock_flag() returns a bool, and 'keep_open' is maybe clearer)
+>>>>
+>>>> But up to you, I really don't mind if you prefer to send the v2 by
+>>>> yourself, just let me know.
+>>>
+>>> Thanks, I'll go ahead and amend as you suggest and then send a v2.
+>>
+>> Great, thanks.
+>>
+>> While at it, please use [PATCH net] as prefix.
+>
+> Thanks, will do.=C2=A0 May I preserve the Reveiwed-By tags from the v1, o=
+r
+> would you like to review again?
 
-Enable it.
+You can preserve it.
 
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
----
-
-Changes since v1:
-- Switch to generic (tx|rx)-internal-delay-ps properties
----
- .../dts/allwinner/sun55i-t527-orangepi-4a.dts | 23 +++++++++++++++++++
- 1 file changed, 23 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts b/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts
-index 38cd8c7e92da..7afd6e57fe86 100644
---- a/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts
-+++ b/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts
-@@ -15,6 +15,7 @@ / {
- 	compatible = "xunlong,orangepi-4a", "allwinner,sun55i-t527";
- 
- 	aliases {
-+		ethernet0 = &gmac1;
- 		serial0 = &uart0;
- 	};
- 
-@@ -95,11 +96,33 @@ &ehci1 {
- 	status = "okay";
- };
- 
-+&gmac1 {
-+	phy-mode = "rgmii-id";
-+	phy-handle = <&ext_rgmii_phy>;
-+	phy-supply = <&reg_cldo4>;
-+
-+	tx-internal-delay-ps = <0>;
-+	rx-internal-delay-ps = <300>;
-+
-+	status = "okay";
-+};
-+
- &gpu {
- 	mali-supply = <&reg_dcdc2>;
- 	status = "okay";
- };
- 
-+&mdio1 {
-+	ext_rgmii_phy: ethernet-phy@1 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <1>;
-+		interrupts-extended = <&pio 8 16 IRQ_TYPE_LEVEL_LOW>; /* PI16 */
-+		reset-gpios = <&pio 8 15 GPIO_ACTIVE_LOW>; /* PI15 */
-+		reset-assert-us = <10000>;
-+		reset-deassert-us = <150000>;
-+	};
-+};
-+
- &mmc0 {
- 	vmmc-supply = <&reg_cldo3>;
- 	cd-gpios = <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* PF6 */
--- 
-2.39.5
-
+Cheers,
+Matt
 
