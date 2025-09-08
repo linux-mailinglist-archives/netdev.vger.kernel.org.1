@@ -1,253 +1,138 @@
-Return-Path: <netdev+bounces-220712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 016ADB484BD
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:03:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FC49B4852E
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83B867A1D1F
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 07:02:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1275617B9C8
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 07:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C32D2E719E;
-	Mon,  8 Sep 2025 07:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1B22E7BD9;
+	Mon,  8 Sep 2025 07:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FFc07t5B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nY/ME0sU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7442E54A1
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 07:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308662E4252;
+	Mon,  8 Sep 2025 07:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757315006; cv=none; b=nNzmm+SgkdSAH6DUhV+DsTSb4Qs53oAYtUc1oJpVun9q79wwNPM94iYrNJ3d9js6r62agUYNQTnR2IPSL8HE1Ph0Qv4aAQE7/s4cgL8PBoY/d95aE8Y4WmOsEA0mXqBBv6uK8pNW3wymUznH6KirmVUH5skj2unC+80WeckfY1s=
+	t=1757316491; cv=none; b=sgRVtEZp2zWQnMK0gt+viUB0VQaUTjcnArr4Lh05Me4Vv+5Ns4cAsDInMcEANi1I8cfVlwM89wITSgEqR9AXq41KasTVfr0MQKhX3NEV5jCvzO8RsHhD4+MIEWRswu1FtBx3kuk8XSVowlM64R+/QIK/R4JBZH06nPbcpQkWBN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757315006; c=relaxed/simple;
-	bh=17UQX824nlbVdC+aYTL514AyIs6q26ZvyaBQ/3ozHsk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QkA1G2OkUI8Pr5LxuO35yyMniZ1uqBiUTg6q6PeH9WhZ5nAgufGqlmqMDWYCFvyg9iQGBNuvXDsMv3Ih+nKieXF3LOBfbZRwIq2yeMbaS84upTJc5/KRS17D6dJe2Cjdi0FuutB61Qt93s5mcPfhqSRo5LQPuT2mFInP5DWVLHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FFc07t5B; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 587MRpJt000749
-	for <netdev@vger.kernel.org>; Mon, 8 Sep 2025 07:03:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	eFkNTr8zzb2XRVtI/ozEIlqL/lrSUHLn6CThYwbEDL4=; b=FFc07t5Bd0XZ2+lz
-	jg9evOPzdBkZ8LbubWd3UuXnCz/MZXPVwboy8cG5qBvlOm9fnG5Uiyg8THGI4yi7
-	d2Y1oNdwm8hWUNZqWIGA3GMHodu6qOQGnNSwd90gHH7I0hpsBZxOBjdEFk7a4MJw
-	mowJLMyTuOaXYSTVZRYAWj76nhPyMja50VhXzVPXMQ7X9glH8Xs+ccPwnYFCgU+f
-	PLdZGHQmZTUKWmEZUreEMA0OUfoVtBibCOKVST4wN2bsPuvHbiGg2VD8Xj2Q+Eni
-	zm/tHrBJXLlfhe3QqyAcFYNOjUpGfQTZoWaNq+yZt1o1kgEkmUBaswrdNYJxWM3V
-	nkiecw==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 490c9j3m62-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 07:03:21 +0000 (GMT)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-24458345f5dso56826395ad.3
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 00:03:21 -0700 (PDT)
+	s=arc-20240116; t=1757316491; c=relaxed/simple;
+	bh=noZjvmTYdYAUmEnWb2zCisPLba1kMmtLcjm0cOVLdpM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JmjEK3cDff0seus1EXSe+r35vhGyIPdjvCV3FDZSxP4P8tt1nQT4rYDWJXcWIrJhLLJ9xAFHlIVPcoSW8Yuc93zRJIF6IVVhFgOYJMZE1BAMGmEQWxRG0N+g16D7k61c9VQA1xZEWLjWjine53HGYD1WGST+jP6IY6ys1CEwPpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nY/ME0sU; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45de2b517a3so9893625e9.3;
+        Mon, 08 Sep 2025 00:28:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757316488; x=1757921288; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ooppLaNI3Qv/svDD0YcDheaWIumHyhFQeMcAO6Dj8J8=;
+        b=nY/ME0sUO3jPSs0+Hq5yzgPaTQPivecwv1D+GfrYz1m6FHhTZ1Vu0+vKQ0u17QdMXK
+         JF2TZ9T5t63Ix5dhuNVIn+bnyU2ytkee3AXbc9xPMxRzrEiWYCnbYMAU/VWutbKEJdBi
+         f+HVCH0yXkdBPmT2vLWi9zai23CYTVmMWQtu48U3modB66jINn/6E6kl0/uh9aapXn+9
+         WBYQgrMu4l/LhpzDoPwU72PegHuZOKOo0BafUml4ZPMz1ghd1vLA5W51O4GMBXo4P0vW
+         bX+giYVJkqKnbxJXcQUeqESEwfn1/kH6CZTbaG0qnh9WKA9pA5dk3N6MeChENBPVeQkJ
+         BtiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757315000; x=1757919800;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1757316488; x=1757921288;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eFkNTr8zzb2XRVtI/ozEIlqL/lrSUHLn6CThYwbEDL4=;
-        b=AsDssXXE9dEwfzm+YjPJ3HtRVqvt+KclkUTpQ5SOmfgjSiF8qGzzhDVLvn87RUNm2p
-         jB6NJG/hOr8FRrgW03pJfi/rkmh33SLrGg/I4J1x8tnG3tMEEu9h7bwiiBHOGYp8AzNc
-         /HsSM8C4fRhSUn0WVDGtRIg+2CrKbtV4HnDdARXmVMKHBqiAvnoVpqozCWimLkF97ySy
-         RwSKd3xVqIDEe5tFV6PzD1zrHYh7/Ro7o9Ue7rgRA1a7E8cwdO/Sm7h3Iwo98e+Z5e5G
-         CbCREW1GmQTA+6BR1oOcCS6TWXwo8FZCbfD6YNVn6Kfj0p5KXtRTQ7x6a4G84TFU+aBA
-         qJYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVvV+xTidGqG6twufsbWo/WjvXHFhg/oCbciKHER0RL0uwRQMVRVGRwqyMMpzo7PtCFBhUX/rg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUOoWPWzdRfWOFHWNLW3JsZ4vpMdoZTi8NmpTAa4jMe0OAd9Fv
-	iHaDPXlpYWIKGIBrM/juEwKwa8/7+XtJpAgCoS4f81bOeW5oAnDqXjzimDaDFwZ1Rp8p5Pw/MFV
-	5MocnJ+9NFHDJf/SuWFaC4FU3DVed6TyCt5ok/gW/FmSyPzeJuMSdl9aKfUk=
-X-Gm-Gg: ASbGncuNRbZcAEI5DBnhRz+QGjSo7HJwR81Xi6D3a/Q5VwgcH3RZHeOusbpVdQm2T22
-	ZYF4h5PT4esOnt/mY3sAETPblYKJ5YevHzzS+eYSQmM1v4s7av0mNQe/rz3n0F4YQlMp8PCXVyZ
-	eC/+Cvul6JQRYOV0BKnXEodueuGzU3c98OrO4gBTs4icoR2l3t7VFnQ9lwruSLtzKH8p+Rr1Jtb
-	sycuINXdQrnvPy7MeI9TGB4blDoBIOhi6oSz9V7wi6+yHIJ1KFaBtj001ujPn/xmElHg68ZKYR/
-	dX73Y5/juGO4pnS19TBP3E4jhsrFzJFdPfEm7ISn316kgJEmhp+2hdsY1vYbsacsJ2TE
-X-Received: by 2002:a17:902:cf4c:b0:24c:7b94:2f53 with SMTP id d9443c01a7336-2516dbf192fmr100673555ad.6.1757315000312;
-        Mon, 08 Sep 2025 00:03:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEHAR6RVUYMHh/34G5+HxwgKEqD/SZwYH4tzTafc/vIO61o6ubhI4u1IV9iY3SgcDS+3f8lLA==
-X-Received: by 2002:a17:902:cf4c:b0:24c:7b94:2f53 with SMTP id d9443c01a7336-2516dbf192fmr100672855ad.6.1757314999648;
-        Mon, 08 Sep 2025 00:03:19 -0700 (PDT)
-Received: from hu-wasimn-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24a92f89809sm238283025ad.2.2025.09.08.00.03.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 00:03:18 -0700 (PDT)
-Date: Mon, 8 Sep 2025 12:33:11 +0530
-From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>, kernel@oss.qualcomm.com,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org, Monish Chunara <quic_mchunara@quicinc.com>
-Subject: Re: [PATCH 2/5] arm64: dts: qcom: lemans: Add SDHC controller and
- SDC pin configuration
-Message-ID: <aL5/r65/WBXx2JHG@hu-wasimn-hyd.qualcomm.com>
-References: <c82d44af-d107-4e84-b5ae-eeb624bc03af@oss.qualcomm.com>
- <aLhssUQa7tvUfu2j@hu-wasimn-hyd.qualcomm.com>
- <tqm4sxoya3hue7mof3uqo4nu2b77ionmxi65ewfxtjouvn5xlt@d6ala2j2msbn>
- <3b691f3a-633c-4a7f-bc38-a9c464d83fe1@oss.qualcomm.com>
- <zofmya5h3yrz7wfcl4gozsmfjdeaixoir3zrk5kqpymbz5mkha@qxhj26jow5eh>
- <57ae28ea-85fd-4f8b-8e74-1efba33f0cd2@oss.qualcomm.com>
- <xausmwmh6ze5374eukv6pcmwe3lv4qun73pcszd3aqgjwm75u6@h3exsqf4dsfv>
- <53aac104-76fb-42b8-9e0d-0e8a3f59b2da@oss.qualcomm.com>
- <zw6o6nxczrzz3dkreq2nuxalbrlv7jmra2hs3pljew7xnbuepo@b6rs47vnnctx>
- <d3e96be4-8c78-4938-8072-abdb0f0e8f05@oss.qualcomm.com>
+        bh=ooppLaNI3Qv/svDD0YcDheaWIumHyhFQeMcAO6Dj8J8=;
+        b=C8LHKNo7+T2iY74h+2fIhveIfQK8i27yWJo6FkkMLdEFGtGkfSSJ2RaGsTXFVb2MDN
+         V9LSCW00bC9CWQ6DvFqURjK1lEMlHDJuAMXqiU0sZnZjQwzBMM2Em3OyLerWNR/yI3sl
+         MePUUlR9ALuhymbH/X6h5Mcy9Esn0XdosIeA7NnizQRoE4eoEHj4LaTUJ4TxAQ3/fsvI
+         PN4jClTDiTgtM+SuGcY22dJ8m3UPgyvVBXiOXVH+BSJonPFD7O4EJONoHGx/25uRkPcM
+         D/KDvHkxc9B2pIKfu/rvaKLOJs25tZMvYdlyLHGGjcJsOWMube9SsXsDddmi6k7Hjisg
+         iorQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaPJM/1BnwSH4XDmNj1vKG3U0MGFCZNk96j64yBNWg3i+5kY/KSH7ej3kk59WJlUJJ7h/9wQvZ54JxqRg=@vger.kernel.org, AJvYcCW1mo9c6zIaSUTtzoVugnqsloohuFDs4DC8sdXYvwHwK9lBNBqZKXduiWE6nutUHEwM2YItsT/jckvipg==@vger.kernel.org, AJvYcCWZemXo2J4GhKEwFhdzAA7B4RHhyh2s1BE8OyGzUQQ9dDKVbaKHC8XodaNu8pRDGIxFHsvJkhvH@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvj/fRxKGaQ0juicNDUDwSHyqSblOpyr3RIzwTvMHK79zeXu1y
+	5rNhtoEVVdcvqWDiJLhuDxm6kThUlFPEnz7KJm7n/03/Zq9szeFEOkLZ
+X-Gm-Gg: ASbGnctgXqTcJ4nQUP0/n5T3q4vecFKtFpYqlgLNE5g3g3WkeqGZxgP83rfoFHPme+S
+	2yZJIcksE0GsXsS/Aw+Yt2yDMDPGqDHXfUa8GLva9moogPUBpAOPx0kD5v/0l23b52l7MV8eDfh
+	99rTpiHHW7xO7YsWXOlIOhE/tQIh95GmOCEUyx3+cUSLMzCujuPxAXgD9sToA5NcRmKe4uJHv5u
+	ZnjQC2gSBtI9Bo+3AEgIykSmAgaTo+1KkHE1z6SU7jIPjSqpw7zR/a84ff/vwZKZicZCXOliR1O
+	OcdHOSFMAoCZWLdL/gTWziUwpPJOGte8I+i9CV4wLO7cHRV3CE8lr+zRX/dj0/tyOhgUk1F2774
+	0z8L7MEpIayEWQ/POaE3znlBpC462s0ThduuUXOJvxjc=
+X-Google-Smtp-Source: AGHT+IGNwsoDc9qSEbYggJ+kfYcDeF4FL1ewm5JaYetSfi5grV0bicWUnv+3Xrds26tI6iMZbJ2TPg==
+X-Received: by 2002:a05:600c:4589:b0:45b:8795:4caa with SMTP id 5b1f17b1804b1-45dddeedbb4mr63465645e9.36.1757316488070;
+        Mon, 08 Sep 2025 00:28:08 -0700 (PDT)
+Received: from [10.158.36.109] ([72.25.96.17])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e740369f1esm6690434f8f.11.2025.09.08.00.28.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Sep 2025 00:28:07 -0700 (PDT)
+Message-ID: <7f9695f0-8753-472a-9e92-585389a6d21e@gmail.com>
+Date: Mon, 8 Sep 2025 10:28:07 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d3e96be4-8c78-4938-8072-abdb0f0e8f05@oss.qualcomm.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyMiBTYWx0ZWRfXypVRSFeyJUe9
- LdmMSexteQ3Xxky743ByprOH+I1hKkTvOuBU61Wx54zhz0B07qGLLpAuCTZ9vKOdKh3apwt5bf6
- F4fo060xzm7/Ks73udCThD9ClPlpau/s2o2l6Ss6Z1lNyhVAswkQfyysvt+VIqj+afE7/8CNl5i
- OOWf79tT6yhIJO8GbVUNC/SM07qqKWe8ErHv5IphReik8yWaRTWGZSCqrd8pc9hs/hf4JfzXZO0
- 7av9jvcPW7t6Csh8x3t+TlXib5kAl+ayyq3oekwPHS/Wt3zjzzXqzEd+OX5o5GAt0SWk3uc+5xW
- M8NgNSwh4f7EeS4vJ5h9qrI+kdNt6rPAPVPQpP+u54HlqOH1g8wzasHfvx5yaE5qcxBId4ufRhA
- H7wBoX1y
-X-Proofpoint-ORIG-GUID: 4tbyN9yqrp24JnmLrY8P3cwSQl3hi-FN
-X-Authority-Analysis: v=2.4 cv=PpOTbxM3 c=1 sm=1 tr=0 ts=68be7fb9 cx=c_pps
- a=cmESyDAEBpBGqyK7t0alAg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
- a=jXrvpXCBLM6H2ZY3dOMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=1OuFwYUASf3TG4hYMiVC:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: 4tbyN9yqrp24JnmLrY8P3cwSQl3hi-FN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-08_02,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 spamscore=0 bulkscore=0 clxscore=1015
- malwarescore=0 adultscore=0 impostorscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060022
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] eth: mlx5: fix double free of flow_table groups on
+ allocation failure
+To: Makar Semyonov <m.semenov@tssltd.ru>, Saeed Mahameed <saeedm@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250904140858.1690639-1-m.semenov@tssltd.ru>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250904140858.1690639-1-m.semenov@tssltd.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Sep 06, 2025 at 10:28:47AM +0200, Konrad Dybcio wrote:
-> On 9/5/25 3:44 PM, Dmitry Baryshkov wrote:
-> > On Fri, Sep 05, 2025 at 02:04:47PM +0200, Konrad Dybcio wrote:
-> >> On 9/5/25 1:45 PM, Dmitry Baryshkov wrote:
-> >>> On Fri, Sep 05, 2025 at 01:14:29PM +0200, Konrad Dybcio wrote:
-> >>>> On 9/4/25 7:32 PM, Dmitry Baryshkov wrote:
-> >>>>> On Thu, Sep 04, 2025 at 04:34:05PM +0200, Konrad Dybcio wrote:
-> >>>>>> On 9/4/25 3:35 PM, Dmitry Baryshkov wrote:
-> >>>>>>> On Wed, Sep 03, 2025 at 09:58:33PM +0530, Wasim Nazir wrote:
-> >>>>>>>> On Wed, Sep 03, 2025 at 06:12:59PM +0200, Konrad Dybcio wrote:
-> >>>>>>>>> On 8/27/25 3:20 AM, Dmitry Baryshkov wrote:
-> >>>>>>>>>> On Tue, Aug 26, 2025 at 11:51:01PM +0530, Wasim Nazir wrote:
-> >>>>>>>>>>> From: Monish Chunara <quic_mchunara@quicinc.com>
-> >>>>>>>>>>>
-> >>>>>>>>>>> Introduce the SDHC v5 controller node for the Lemans platform.
-> >>>>>>>>>>> This controller supports either eMMC or SD-card, but only one
-> >>>>>>>>>>> can be active at a time. SD-card is the preferred configuration
-> >>>>>>>>>>> on Lemans targets, so describe this controller.
-> >>>>>>>>>>>
-> >>>>>>>>>>> Define the SDC interface pins including clk, cmd, and data lines
-> >>>>>>>>>>> to enable proper communication with the SDHC controller.
-> >>>>>>>>>>>
-> >>>>>>>>>>> Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
-> >>>>>>>>>>> Co-developed-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> >>>>>>>>>>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> >>>>>>>>>>> ---
-> >>>>>>>>>>>  arch/arm64/boot/dts/qcom/lemans.dtsi | 70 ++++++++++++++++++++++++++++++++++++
-> >>>>>>>>>>>  1 file changed, 70 insertions(+)
-> >>>>>>>>>>>
-> >>>>>>>>>>> diff --git a/arch/arm64/boot/dts/qcom/lemans.dtsi b/arch/arm64/boot/dts/qcom/lemans.dtsi
-> >>>>>>>>>>> index 99a566b42ef2..a5a3cdba47f3 100644
-> >>>>>>>>>>> --- a/arch/arm64/boot/dts/qcom/lemans.dtsi
-> >>>>>>>>>>> +++ b/arch/arm64/boot/dts/qcom/lemans.dtsi
-> >>>>>>>>>>> @@ -3834,6 +3834,36 @@ apss_tpdm2_out: endpoint {
-> >>>>>>>>>>>  			};
-> >>>>>>>>>>>  		};
-> >>>>>>>>>>>  
-> >>>>>>>>>>> +		sdhc: mmc@87c4000 {
-> >>>>>>>>>>> +			compatible = "qcom,sa8775p-sdhci", "qcom,sdhci-msm-v5";
-> >>>>>>>>>>> +			reg = <0x0 0x087c4000 0x0 0x1000>;
-> >>>>>>>>>>> +
-> >>>>>>>>>>> +			interrupts = <GIC_SPI 383 IRQ_TYPE_LEVEL_HIGH>,
-> >>>>>>>>>>> +				     <GIC_SPI 521 IRQ_TYPE_LEVEL_HIGH>;
-> >>>>>>>>>>> +			interrupt-names = "hc_irq", "pwr_irq";
-> >>>>>>>>>>> +
-> >>>>>>>>>>> +			clocks = <&gcc GCC_SDCC1_AHB_CLK>,
-> >>>>>>>>>>> +				 <&gcc GCC_SDCC1_APPS_CLK>;
-> >>>>>>>>>>> +			clock-names = "iface", "core";
-> >>>>>>>>>>> +
-> >>>>>>>>>>> +			interconnects = <&aggre1_noc MASTER_SDC 0 &mc_virt SLAVE_EBI1 0>,
-> >>>>>>>>>>> +					<&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_SDC1 0>;
-> >>>>>>>>>>> +			interconnect-names = "sdhc-ddr", "cpu-sdhc";
-> >>>>>>>>>>> +
-> >>>>>>>>>>> +			iommus = <&apps_smmu 0x0 0x0>;
-> >>>>>>>>>>> +			dma-coherent;
-> >>>>>>>>>>> +
-> >>>>>>>>>>> +			resets = <&gcc GCC_SDCC1_BCR>;
-> >>>>>>>>>>> +
-> >>>>>>>>>>> +			no-sdio;
-> >>>>>>>>>>> +			no-mmc;
-> >>>>>>>>>>> +			bus-width = <4>;
-> >>>>>>>>>>
-> >>>>>>>>>> This is the board configuration, it should be defined in the EVK DTS.
-> >>>>>>>>>
-> >>>>>>>>> Unless the controller is actually incapable of doing non-SDCards
-> >>>>>>>>>
-> >>>>>>>>> But from the limited information I can find, this one should be able
-> >>>>>>>>> to do both
-> >>>>>>>>>
-> >>>>>>>>
-> >>>>>>>> It’s doable, but the bus width differs when this controller is used for
-> >>>>>>>> eMMC, which is supported on the Mezz board. So, it’s cleaner to define
-> >>>>>>>> only what’s needed for each specific usecase on the board.
-> >>>>>>>
-> >>>>>>> `git grep no-sdio arch/arm64/boot/dts/qcom/` shows that we have those
-> >>>>>>> properties inside the board DT. I don't see a reason to deviate.
-> >>>>>>
-> >>>>>> Just to make sure we're clear
-> >>>>>>
-> >>>>>> I want the author to keep bus-width in SoC dt and move the other
-> >>>>>> properties to the board dt
-> >>>>>
-> >>>>> I think bus-width is also a property of the board. In the end, it's a
-> >>>>> question of schematics whether we route 1 wire or all 4 wires. git-log
-> >>>>> shows that bus-width is being sent in both files (and probalby we should
-> >>>>> sort that out).
-> >>>>
-> >>>> Actually this is the controller capability, so if it can do 8, it should
-> >>>> be 8 and the MMC core will do whatever it pleases (the not-super-sure
-> >>>> docs that I have say 8 for this platform)
-> >>>
-> >>> Isn't it a physical width of the bus between the controller and the slot
-> >>> or eMMC chip?
-> >>
-> >> No, that's matched against reported (sd/mmc) card capabilities IIUC
-> > 
-> > What if both host and the card support 4 bits bus (normal SD card), but
-> > board has only one data wire?
-> 
-> Ohhh, touche.. I assumed it's "smart" like PCIe, but it's (probably)
-> not.
-> 
-> Sorry for the trouble, Wasim. Let's keep 4 for now and get this patch
-> merged.
-> 
 
-Sure Konrad, will move this to EVK DTS and keep it 4.
 
--- 
-Regards,
-Wasim
+On 04/09/2025 17:08, Makar Semyonov wrote:
+> In macsec_fs_rx_create_crypto_table_groups(), when memory allocation for
+> 'in' fails, 'ft->g' is cleared once. However, the function returns
+> a non-zero error which causes macsec_fs_rx_destroy to be called.
+> Inside it, macsec_fs_destroy_flow_table is invoked, which attempts
+> to clear 'ft->g' again, leading to a double free.
+> 
+> This commit fixes the issue by setting 'ft->g' to NULL immediately
+> after the first clearance in macsec_fs_rx_create_crypto_table_groups()
+> to prevent a double free when macsec_fs_destroy_flow_table attempts to
+> free it again.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Makar Semyonov <m.semenov@tssltd.ru>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
+> index 4a078113e292..5e86c277f33a 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
+> @@ -1066,6 +1066,7 @@ static int macsec_fs_rx_create_crypto_table_groups(struct mlx5_macsec_flow_table
+>   	in = kvzalloc(inlen, GFP_KERNEL);
+>   	if (!in) {
+>   		kfree(ft->g);
+> +		ft->g = NULL;
+>   		return -ENOMEM;
+>   	}
+>   
+
+Code and commit message are fine.
+Use "net/mlx5" prefix.
+Please address comments from Markus Elfring.
 
