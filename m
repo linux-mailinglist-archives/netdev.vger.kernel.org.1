@@ -1,122 +1,145 @@
-Return-Path: <netdev+bounces-220923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13F60B4978D
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:50:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E19B4978F
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2CFE441D99
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:50:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB7271BC0483
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FF5310655;
-	Mon,  8 Sep 2025 17:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA460310655;
+	Mon,  8 Sep 2025 17:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IT0pqtWZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F26313C8E8;
-	Mon,  8 Sep 2025 17:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2852FF645;
+	Mon,  8 Sep 2025 17:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757353848; cv=none; b=Q+M+5mlEgni6l6VPs5+G8YUrKZMAU+FmazOwYPRF1q7dGyxtV5Yk18R3LIPmQgADbJRMooRNzNMdQL4Vb0F6am93hXac7TshIj1KCtUL3YCNj3GjnRsqKd8wA7h3mVH32eR7cQ1ABwY/QYGGIX7fIoUS8iU7BS6iySw5DWJzPfk=
+	t=1757353877; cv=none; b=iAuIPt1QnsCksuoc5cdy8UAycpdch7vbdMnvrS2LxZgxug+xlZiLEC0YlQMyvMMCxMH1F1v5oZf5q1pExmBxXWMgfG1kUlA1gpOBb1C0dMcVlSHFEITTBwDWASCLnpjq8c2l+2W/h3UNFAD2dJnstfWJzutAp+wjGwV5DX1NAUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757353848; c=relaxed/simple;
-	bh=5YY088FLsTyhrftmqQfk5sbO8FI4XvIM5JKW8bZMtq4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kzI/FwhJbirm0asXnaMzBatEvZ7EpKn776+0yfQvtrEs39eFVFUhxtgMM4Rc8Bs0Iof02RYRoX69h3MReuM0nr/ADv6HomycKnnTJaMpI28VLq9JjrCNR/tU2UdK41DxHx8QuUT+had8AW7nMYzc6dfg7TIsb7xoAoYF39LK1io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-772301f8ae2so3829365b3a.0;
-        Mon, 08 Sep 2025 10:50:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757353846; x=1757958646;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z3YSAFfQ0v2sBBmNLG7Qti585x+a4A5KEbS76irY4Js=;
-        b=tWlLTcKM97E6UkmIdqM/bLMudF1IG45YCogDgQm18h+m++oUd7/wfPNVmrqYocW+eA
-         9xsXJb2Ak6Hjqs9HItFSEB60bNBTTf96jDh47MPE2gFD7+43tj7EOSlzp3/F141+SCZo
-         3A61DctViGtPnSIQiMJVM+RGjnO6BGnTDVO6yd5EFfHZFpprnOk9srKp9o6p69LzYH8A
-         Mh5vH0uncW/sFUoBge635uySrvGbibhdAA05sus+y7YWfCwU97FuaLlaDdJcbKBOBeJq
-         p7RD8hqiDtDRWcahDeELiKiD5abLVkbojjsfkmQ4bXt57JaJlvZ4k0pl/+GVaRSeDYjW
-         Yp5w==
-X-Forwarded-Encrypted: i=1; AJvYcCWehKh9yj/paA7Yy4MjlC1CZkWJnfnLaS7zAnBfPAOlLhoW2J67vmawlLP2BxjcNhwYW6GxbsbgeCkq75g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx48T5v0nMhbZnK6WKzAr1qwInXGO60S/ptnoOdEfaUriNXbuWw
-	M0NEa+HGtCMCBxUP/DmjZCLIJDhDFGYS0ziMr6ZfL+4z+4EOLN9O4FS39PIc
-X-Gm-Gg: ASbGncvFrFLaeoHk23bJoxkW+H00+HfmpEXXCmabEm1X4nPAgB9IykhcGgAYz2yq3fZ
-	0GLZe2VOIbRUHwC/ri2p9wuFQDlDV5WoNeSRZ8eEVnK3XIRqoHktZM7npHYPpQh+2blFYdVSWYe
-	XJJq94V82KzgEqyQFFdiMiOg/VZyB/ZZRX4EMu5gt9IVArZBuqVwYpvayPzioUCw4+onw8QH08+
-	3+UUWbmq+zlv2ltcALPy9Tz9swH5VXExrDNeOzoeUp+HJ2w5vENY00Kgosq8ttAHcao6Mtb4eqV
-	T8hPtfmSsWAjid3bVIg0d/r+tOLbTdfutGHIi965MU7FHvvkaf8a+HJGtnWPeUTi0LD8OgJqo8O
-	PrIWtNw3BGQ0fY1fOafgBTDuPgbfaEaPeQoe5dTZMZwtxqP8SJkatTSZZ5DTZoS5ffRjdo+jmUC
-	5eGHFe9SyvKFAPXUBWWQ+1fe6eBZcu8vG553JyMRcnEl7Vx/o55VfKQcFR6vTqtEs+ZQNkxvz6t
-	K/F
-X-Google-Smtp-Source: AGHT+IGcxfNb22s3jr7+1Cy+2Q+z7L23H4uk3O3sxYxG7gKcFstVC/6fh4ReASuZxujTamDx3bUf7A==
-X-Received: by 2002:a05:6a20:7f8a:b0:250:300f:2f32 with SMTP id adf61e73a8af0-2534547a71cmr12155131637.45.1757353846344;
-        Mon, 08 Sep 2025 10:50:46 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b4d96829a66sm25333596a12.6.2025.09.08.10.50.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 10:50:45 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	dsahern@kernel.org,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH net-next] net: devmem: expose tcp_recvmsg_locked errors
-Date: Mon,  8 Sep 2025 10:50:45 -0700
-Message-ID: <20250908175045.3422388-1-sdf@fomichev.me>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1757353877; c=relaxed/simple;
+	bh=/68Vf5FmSeABGxyVIZA6ZD2EBfHh21e0TSDOnBtrOIY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=VGBKCQK8DJIp/ffkfs0RMuM2uorBefx1AWdPwo5DyvjXU99+qtOqtuJMvrW24E6e9G834ZHdB0B+rOuaANngQmqwRlPHuhN3FMsBzzoOJTToiYt6tenAqAFy12wYByPYLJLNSFLG+0+6cjF6tg+hzF5fF1rIn32W/SfkRlz93K8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IT0pqtWZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B8D2C4CEF1;
+	Mon,  8 Sep 2025 17:51:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757353877;
+	bh=/68Vf5FmSeABGxyVIZA6ZD2EBfHh21e0TSDOnBtrOIY=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=IT0pqtWZXZrHwPrx13d5+UfrPkFSEvmPcCAmcf1sXnHxp1UswCcmV/FPq0/kKBqi4
+	 mY1r+i9/3dD7cGaJ5fXZrbO9oVQhXho3xjDb60xWpFES9s3W6fIfGzkY04XVM/Lciw
+	 9xtbUoc7gxCKOLTCHzJdpXoRPJYdjgdhQ5bJsXHHTpZp+TU97ucBBXxGnPmH60Hsxo
+	 RZYn3bWiFPsyx9MfIYvLSn4mMmX+O15ry4D6E+iJzfPxFgoLQGBFl11+6oDhIQEz72
+	 GZmNmrQGRd3LIuILi+aiYWF0DTaCvsl9xFBav7eAjqjvuGeBpAABPWTqq4ntGSjzvL
+	 y8MkFqg3mFizQ==
+Date: Mon, 8 Sep 2025 19:51:10 +0200 (GMT+02:00)
+From: Matthieu Baerts <matttbe@kernel.org>
+To: Krister Johansen <kjlx@templeofstupid.com>
+Cc: Geliang Tang <geliang@kernel.org>, Mat Martineau <martineau@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+	David Reaver <me@davidreaver.com>
+Message-ID: <575893ce-11a8-492f-ac8c-5995b3e90c76@kernel.org>
+In-Reply-To: <aL8WNpl8ExODg20q@templeofstupid.com>
+References: <aLuDmBsgC7wVNV1J@templeofstupid.com> <ab6ff5d8-2ef1-44de-b6db-8174795028a1@kernel.org> <83191d507b7bc9b0693568c2848319932e6b974e.camel@kernel.org> <78d4a7b8-8025-493a-805c-a4c5d26836a8@kernel.org> <aL8RoSniweGJgm3h@templeofstupid.com> <23a66a02-7de9-40c5-995d-e701cb192f8b@kernel.org> <aL8WNpl8ExODg20q@templeofstupid.com>
+Subject: Re: [PATCH mptcp] mptcp: sockopt: make sync_socket_options
+ propagate SOCK_KEEPOPEN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Correlation-ID: <575893ce-11a8-492f-ac8c-5995b3e90c76@kernel.org>
 
-tcp_recvmsg_dmabuf can export the following errors:
-- EFAULT when linear copy fails
-- ETOOSMALL when cmsg put fails
-- ENODEV if one of the frags is readable
-- ENOMEM on xarray failures
+8 Sept 2025 19:45:32 Krister Johansen <kjlx@templeofstupid.com>:
 
-But they are all ignored and replaced by EFAULT in the caller
-(tcp_recvmsg_locked). Expose real error to the userspace to
-add more transparency on what specifically fails.
+> On Mon, Sep 08, 2025 at 07:31:43PM +0200, Matthieu Baerts wrote:
+>> Hi Krister,
+>>
+>> On 08/09/2025 19:25, Krister Johansen wrote:
+>>> On Mon, Sep 08, 2025 at 07:13:12PM +0200, Matthieu Baerts wrote:
+>>>> Hi Geliang,
+>>>>
+>>>> On 07/09/2025 02:51, Geliang Tang wrote:
+>>>>> Hi Matt,
+>>>>>
+>>>>> On Sat, 2025-09-06 at 15:26 +0200, Matthieu Baerts wrote:
+>>>>>> =E2=80=A6
+>>>>>
+>>>>> nit:
+>>>>>
+>>>>> I just noticed his patch breaks 'Reverse X-Mas Tree' order in
+>>>>> sync_socket_options(). If you think any changes are needed, please
+>>>>> update this when you re-send it.
+>>>>
+>>>> Sure, I can do the modification and send it with other fixes we have.
+>>>
+>>> Thanks for the reviews, Geliang and Matt.=C2=A0 If you'd like me to fix=
+ the
+>>> formatting up and send a v2, I'm happy to do that as well.=C2=A0 Just l=
+et me
+>>> know.
+>>
+>> I was going to apply this diff:
+>>
+>>> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+>>> index 13108e9f982b..2abe6f1e9940 100644
+>>> --- a/net/mptcp/sockopt.c
+>>> +++ b/net/mptcp/sockopt.c
+>>> @@ -1532,11 +1532,12 @@ static void sync_socket_options(struct mptcp_so=
+ck *msk, struct sock *ssk)
+>>> {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 static const unsigned int tx=
+_rx_locks =3D SOCK_RCVBUF_LOCK | SOCK_SNDBUF_LOCK;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct sock *sk =3D (struct =
+sock *)msk;
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int kaval =3D !!sock_flag(sk, SOC=
+K_KEEPOPEN);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool keep_open;
+>>>
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 keep_open =3D sock_flag(sk, SOCK_=
+KEEPOPEN);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ssk->sk_prot->keepalive)
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 ssk->sk_prot->keepalive(ssk, kaval);
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sock_valbool_flag(ssk, SOCK_KEEPO=
+PEN, kaval);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 ssk->sk_prot->keepalive(ssk, keep_open);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sock_valbool_flag(ssk, SOCK_KEEPO=
+PEN, keep_open);
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssk->sk_priority =3D sk->sk_=
+priority;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssk->sk_bound_dev_if =3D sk-=
+>sk_bound_dev_if;
+>>
+>> (sock_flag() returns a bool, and 'keep_open' is maybe clearer)
+>>
+>> But up to you, I really don't mind if you prefer to send the v2 by
+>> yourself, just let me know.
+>
+> Thanks, I'll go ahead and amend as you suggest and then send a v2.
 
-In non-devmem case (skb_copy_datagram_msg) doing `if (!copied)
-copied=-EFAULT` is ok because skb_copy_datagram_msg can return only EFAULT.
+Great, thanks.
 
-Cc: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- net/ipv4/tcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+While at it, please use [PATCH net] as prefix.
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 588932c3cf1d..c56d53e32c29 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2820,7 +2820,7 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
- 							 used);
- 				if (err <= 0) {
- 					if (!copied)
--						copied = -EFAULT;
-+						copied = err;
- 
- 					break;
- 				}
--- 
-2.51.0
-
+Cheers,
+Matt
 
