@@ -1,101 +1,69 @@
-Return-Path: <netdev+bounces-220927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8E8B497D9
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:09:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42557B497E0
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 934E64E2055
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:09:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 140594E2055
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C06313E1A;
-	Mon,  8 Sep 2025 18:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F358314B88;
+	Mon,  8 Sep 2025 18:11:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2P5/d75"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PjUiOm2a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7DF7FBAC;
-	Mon,  8 Sep 2025 18:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D941C54A9;
+	Mon,  8 Sep 2025 18:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757354979; cv=none; b=AMEq8YNVQQsUJ9QaEncjWVvkCn6CqF9VXExZj6KC1RxUTEgn4qr9ITGMdMw7HIGz35ycfy9CFD9fexVMRX46ObuIFRSMhqU4L/3UtQVe3CgbgMe4/3JZhXMvV535/E7w2dD/9kdnFieoJ5qXpBHLsDfP5fy8Y7FEZ3Seqdgjffk=
+	t=1757355072; cv=none; b=bt09Dk7C3VxxzMIBfxY1z86c2SKqglCuUcl+G+2O++fGG315OpGt0Zc2inFVvO8vfKDoaUYuvcgAVHd81valJTr1WnIqDyPIUOKnFmjVDJnHxccDCPYQsv3jZAsrYPXtSLLJ5ApgWJxBzQI0pCRUTtAaVq0YvUEW00jGhl0TJuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757354979; c=relaxed/simple;
-	bh=NuQI4nMA0g0N9BbTVEQpy+JxTD3mg9+9KzSwGSix7cU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eOd9yDgO2LpoWlx92umlM3ZEZJ4TKG7OQrSNDMUD/gl7r0hKTiy3zRkUokCQh6vNZ7T02dzsp+S8nMz6fhpHIUd+o+sKRGs3TsXZte8GSceJxUqZAfQAu94/15NbSRWnPJlUGDPuuxuPtsiNV3Q7PypXaHA9CTJvbOPvZ8FGt9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2P5/d75; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-24cde6c65d1so34309225ad.3;
-        Mon, 08 Sep 2025 11:09:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757354978; x=1757959778; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RTgXOKpTqqoYfQsbZozKU3x3sBsg6MhNCEyIXZl9xW4=;
-        b=F2P5/d7563rzk8tOjyR7iOGMwybTxV813345uok762tukNF78/gl310yyTgDOs9txT
-         UViLDWMzL5HnOB9rKbW9k8ktA32MURPE4e51grCWmJUuralA4CB+BSScd3FqlbPez2Ur
-         TOM14VC4F46pBbSMz/qe2og+DkBnhVdWY3SBKrd3qRZINJzmu2L9QMONGcMSdjmWR/sb
-         f4o01bBRlnRGZU9NwQVd2MpGR2UUU/GfbokjAlx1re1SdgY9IJO3grAzvaBawXi/FIou
-         lMLgJgBLsLdvcmBLBlhKb+ShDe9sLktu1SrWuk8NrRDxyIlUDt9hvVTo84fnkcR3pRqc
-         qd8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757354978; x=1757959778;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RTgXOKpTqqoYfQsbZozKU3x3sBsg6MhNCEyIXZl9xW4=;
-        b=iDBH+Az0SCPIiJdD0u9Tga6oWLJvYHunqWfzczSJQ157nhY6gAcbBUjL+cNiwK/fOx
-         tDwu1hlgQIZFRETSYgG7lB9gFylMXmZuUWunGfOMjIh/giMKHmexYdwrv5kTg21ceWjA
-         b5wFL2/cgs8TRTEqDEzW9ozOD7vHIqFbNC64RE0aFK9HtCrLyB83KfOPyUoIa+WwsHtT
-         UKj/PDlbpF9vzzPkJKjkv2A0AO6YoEcuEXeGCBPmw7iecp23Kznh2X6iwGu3igiINLCa
-         LMxUJyrp0qlTKXtbumE4uObVrszMUqDLQQO0RnsIyUhQNysmI9nUOk+/KN+/ZvA/oqPk
-         pWTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHqr+oHPzFCS6IzWWOOTB2aP/OJGoGa5bDC5Ycxs6X37rxhPVeMBnyYD7TizWlJ+ZKKB1Qkpwm@vger.kernel.org, AJvYcCWtrfwBzbKaXRah5kIRtdf634iXYn/bSWSgYjEaKKvUokBluBS6YQ69WCDpfGQmcXN1o9CGAQQEM6esKg==@vger.kernel.org, AJvYcCWvvg13kagMlSy3Yd/Y9ZfCTaziMQnSFkd8N9cINLTWcs5zOSceAKkd8o1ZDMSipJWgvn2bz0v1EA/6iiY=@vger.kernel.org, AJvYcCX8fQEBwlfxXvNP4NUFbHldMk679M4S9p6GoVZ1XIA4Rfe1OJyhdkwiGdz4FkUp/BOxNeUaQbKaXtvGpA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT8thVlD5fh1Qatktjjm927Qn+m9TEAhHbtfjf2mM5nunLBfjN
-	ULJqZm3hFwMKB3Cda0nIltZxSqR0ZplIEzTHD/X1VVSobBIot3g1HrLO
-X-Gm-Gg: ASbGnctNEaghTdeatS7JVoRMU/kuB8A2HuLURa3a/2q8ivkUOmZNTNsZMQjtxBoRTAx
-	C5eg9mR7tUgvXlOvsrpmpGeKtmSlj8Q7R0RKmB+lQuTd/xJLTap3De/jYE3TkMH6m0fsUe54LCo
-	XrxIK3pzQSGJiA8GoVdlLniqSfL4wfQ6RM8ZDEDjAY/jC955g8qqRFbPagK+y0t7pqCPGBu5NkF
-	m6Mq0sFXxVmu7DymV6ImEU73IJFXFS+i9u1EVv+S79Iuo/Xl1kanYhiAe8m8z9ENqz5i7qEdU0g
-	xP1FLJXBTcQFE8pkCanvMzUq5VBwPbrAgRouZjUWHmY6aMEUWlLIRn4WqP6RaTbxVP6RfbC6gkR
-	1IeaNS2oGxD4D1lhL3/Scf+/M6pGaUoQM3vi+pY93+gt1fhiiPtxOuML9VJYebWG5NIHJoAl1NU
-	8oK/u1bwMDSjKQiVSM7QLZeNHtCgW57PGRhjqge4oCV/7pKwo=
-X-Google-Smtp-Source: AGHT+IHUvGdkTF6ftj5zF8+ukk3mhEagKf7AXIJW2UU34v0dDiyGOkNx8+ez0Gtfkca6XYJRXXePLg==
-X-Received: by 2002:a17:903:3d06:b0:258:2476:77db with SMTP id d9443c01a7336-25824767953mr24731155ad.42.1757354977526;
-        Mon, 08 Sep 2025 11:09:37 -0700 (PDT)
-Received: from crl-3.node2.local ([125.63.65.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24b273e4ad5sm172768845ad.25.2025.09.08.11.09.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 11:09:37 -0700 (PDT)
-From: Kriish Sharma <kriish.sharma2006@gmail.com>
-To: alibuda@linux.alibaba.com,
-	dust.li@linux.alibaba.com,
-	sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com
-Cc: mjambigi@linux.ibm.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1757355072; c=relaxed/simple;
+	bh=MAMdQhbmM82flEwTwLg9BOOP2ELCiw2qUxgNoGhVtSA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JgFloYOeYPPOgGgHf3x8AymkORRhTg1oNJfpRCNqla2PwhPY+ABNxyXXL+twdfKHVYx9meMvZHaZUt+GUrHh+33frd/NDUmJRykSV603OVIlpDJTBJiCV7optDIW+GIyw0QTx47WFEucQ+fdwvK4PpsQAN34JNTtsnCWdir+gf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PjUiOm2a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA35C4CEF5;
+	Mon,  8 Sep 2025 18:11:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757355071;
+	bh=MAMdQhbmM82flEwTwLg9BOOP2ELCiw2qUxgNoGhVtSA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PjUiOm2a1XukIdafrFe8/83EYwLJWZdlIs73VBcipHOWXSozvMNlw1gz9+1rQfr5k
+	 /t67zoD8RzOsllRan6aspkPUBHxOsXzodL4EtUlasksO0TIVhnmTZlys3Lhs1C8CrE
+	 Xv2ltmFBWWQ+gZPXMLsjgF5KzmYmmfgV/bC7elwPvAYo2n3ITzj293rdLaaZZqMZ+6
+	 6E+RGATr95MivN+9BnMgKWjM4BoiRA8go1e2bSP2lg347TIZfa7ZhczLQm2bPUbpat
+	 qV3HxY1mF6rgNIaZwrej7I0z8xp3Hv6jGEFoFF9valVslGjJI3tBoO/mWPV2elJ3GS
+	 ZiLt7Qo/dtB4g==
+Received: by wens.tw (Postfix, from userid 1000)
+	id DCCB55FE60; Tue, 09 Sep 2025 02:11:08 +0800 (CST)
+From: Chen-Yu Tsai <wens@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej@kernel.org>,
+	Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	kriish.sharma2006@gmail.com
-Subject: [PATCH] net/smc: replace strncpy with strscpy for ib_name
-Date: Mon,  8 Sep 2025 18:09:13 +0000
-Message-Id: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH net-next v4 00/10] net: stmmac: Add support for Allwinner A523 GMAC200
+Date: Tue,  9 Sep 2025 02:10:49 +0800
+Message-Id: <20250908181059.1785605-1-wens@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,30 +72,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replace the deprecated strncpy() with strscpy() for ib_name in
-smc_pnet_add_ib(). The destination buffer should be NUL-terminated and
-does not require any trailing NUL-padding. Since ib_name is a fixed-size
-array, the two-argument form of strscpy() is sufficient and preferred.
+From: Chen-Yu Tsai <wens@csie.org>
 
-Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
----
- net/smc/smc_pnet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi everyone,
 
-diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-index 76ad29e31d60..b90337f86e83 100644
---- a/net/smc/smc_pnet.c
-+++ b/net/smc/smc_pnet.c
-@@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
- 		return -ENOMEM;
- 	new_pe->type = SMC_PNET_IB;
- 	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
--	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
-+	strscpy(new_pe->ib_name, ib_name);
- 	new_pe->ib_port = ib_port;
- 
- 	new_ibdev = true;
+This is v4 of my Allwinner A523 GMAC200 support series.
+
+Changes since v3:
+- driver
+  - Fixed printf format specifier warning
+- Link to v3
+  https://lore.kernel.org/all/20250906041333.642483-1-wens@kernel.org/
+
+Changes since v2:
+- DT binding
+  - Added "select" to avoid matching against all dwmac entries
+- driver
+  - Include "ps" unit in "... must be multiple of ..." error message
+  - Use FIELD_FIT to check if delay value is in range and FIELD_MAX to get
+    the maximum value
+  - Reword error message for delay value exceeding maximum
+  - Drop MASK_TO_VAL
+- Link to v2:
+  https://lore.kernel.org/all/20250813145540.2577789-1-wens@kernel.org/
+
+Changes since v1:
+- Dropped RFT tag
+- Switched to generic (tx|rx)-internal-delay-ps 
+- dwmac-sun55i driver bits
+  - Changed dev_err() + return to dev_err_probe()
+  - Added check of return value from syscon regmap write
+  - Changed driver name to match file name
+- sram driver bits
+  - Fixed check on return value
+  - Expanded commit message
+- dtsi
+  - Fixed typo in tx-queues-config
+- cubie a5e
+  - Add PHY regulator delay
+- Link to v1:
+  https://lore.kernel.org/all/20250701165756.258356-1-wens@kernel.org/
+
+This series adds support for the second Ethernet controller found on the
+Allwinner A523 SoC family. This controller, dubbed GMAC200, is a DWMAC4
+core with an integration layer around it. The integration layer is
+similar to older Allwinner generations, but with an extra memory bus
+gate and separate power domain.
+
+Patch 1 adds a new compatible string combo to the existing Allwinner
+EMAC binding.
+
+Patch 2 adds a new driver for this core and integration combo.
+
+Patch 3 extends the sunxi SRAM driver to allow access to the clock delay
+controls for the second Ethernet controller.
+
+Patch 4 registers the special regmap for the clock delay controls as a
+syscon. This allows the new network driver to use the syscon interface,
+instead of the following dance which the existing dwmac-sun8i driver
+does:
+
+    of_parse_phandle();
+    of_find_device_by_node();
+    dev_get_regmap();
+
+With this change in place we can also drop the above from the
+dwmac-sun8i driver.
+
+Patch 5 adds a device node and pinmux settings for the GMAC200.
+
+Patches 6 and 8 add missing Ethernet PHY reset settings for the
+already enabled controller.
+
+Patches 7, 9, and 10 enable the GMAC200 on three boards. I only
+have the Orangepi 4A, so I am asking for people to help test the
+two other boards. The RX/TX clock delay settings were taken from
+their respective BSPs, though those numbers don't always work, as
+is was the case for the Orangepi 4A.
+
+
+Please have a look and help test on the Avaota A1. I don't expect
+any issues there though, since the PHY is always on, unlike on the
+Cubie A5E.
+
+Patches 1 and 2 should go through net-next, and I will take all the
+other patches through the sunxi tree.
+
+
+Thanks
+ChenYu
+
+
+Chen-Yu Tsai (10):
+  dt-bindings: net: sun8i-emac: Add A523 GMAC200 compatible
+  net: stmmac: Add support for Allwinner A523 GMAC200
+  soc: sunxi: sram: add entry for a523
+  soc: sunxi: sram: register regmap as syscon
+  arm64: dts: allwinner: a523: Add GMAC200 ethernet controller
+  arm64: dts: allwinner: a527: cubie-a5e: Add ethernet PHY reset setting
+  arm64: dts: allwinner: a527: cubie-a5e: Enable second Ethernet port
+  arm64: dts: allwinner: t527: avaota-a1: Add ethernet PHY reset setting
+  arm64: dts: allwinner: t527: avaota-a1: enable second Ethernet port
+  arm64: dts: allwinner: t527: orangepi-4a: Enable Ethernet port
+
+ .../net/allwinner,sun8i-a83t-emac.yaml        |  96 ++++++++++-
+ .../arm64/boot/dts/allwinner/sun55i-a523.dtsi |  55 ++++++
+ .../dts/allwinner/sun55i-a527-cubie-a5e.dts   |  31 +++-
+ .../dts/allwinner/sun55i-t527-avaota-a1.dts   |  29 +++-
+ .../dts/allwinner/sun55i-t527-orangepi-4a.dts |  23 +++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-sun55i.c    | 159 ++++++++++++++++++
+ drivers/soc/sunxi/sunxi_sram.c                |  14 ++
+ 9 files changed, 414 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
+
 -- 
-2.34.1
+2.39.5
 
 
