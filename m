@@ -1,425 +1,244 @@
-Return-Path: <netdev+bounces-220791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AA9DB48AE9
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:02:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25986B48A7B
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F2D474E1740
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:02:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A0093BA95D
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 10:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CDD226D1F;
-	Mon,  8 Sep 2025 11:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212BB188CB1;
+	Mon,  8 Sep 2025 10:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="qIlyWWDS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n2x+hNhl"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD712225415;
-	Mon,  8 Sep 2025 11:01:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757329323; cv=none; b=S4QpWHqQRjcXPatWhL5EBd5FUPDF5+Zwbd5XftST6KaSNR30VfUBSnAGdBdfJHpPPS8F7FBrRgJIMW6Qtr1DmlCyrhtyWwMmrbJVY/vy1BLNBPRyDvwnwj0gBl/ZtAkMVktREv6z0jZjvrfGL2WzbhJTDKrWckV+CfcFFiKzyJM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757329323; c=relaxed/simple;
-	bh=fZqFTPG6CUlhtmvjqcvjm50M1ZGWHUi5eeV9jdi5gXE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XrlQnbqDV+oENWdnVX0iVcidXXcCtlo8pSZrY88qcGV3fmfN3A6Ib88eCQiasx6N3KSyz6e0Dh0GLS4QzPtQ0gYsGGQDVDWpP7Is6DxayhfbgbP7NeHW5rajF2Ui7/LzxYtKQZXAj5qUdcVxd4/QwIOVdUgpLoChHGyN6J4HJjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=qIlyWWDS; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=TW
-	LZemOGq5QEnnAEqQzmvX/rwUuoGqFLalDFRcVQT6s=; b=qIlyWWDSAXfCQnHptv
-	HCbND2fY0ufyZPRuv9nsabM5Nsjmm4NELicLwp6SBCPFYAxYWtB19kXlLA11hxXi
-	p/aEhB+h70EncrDN96MEl18220hg9OdbnFdUeyj/NKlGDNEM3Mp+JGFD3OgRxVez
-	XWJODEiAuT/qYqPl7Kh1FaXAM=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgDnDz_es75oFd0YCQ--.33755S4;
-	Mon, 08 Sep 2025 18:45:56 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: willemdebruijn.kernel@gmail.com,
-	kerneljasonxing@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xin Zhao <jackzxcui1989@163.com>
-Subject: [PATCH net-next v12 2/2] net: af_packet: Use hrtimer to do the retire operation
-Date: Mon,  8 Sep 2025 18:45:49 +0800
-Message-Id: <20250908104549.204412-3-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250908104549.204412-1-jackzxcui1989@163.com>
-References: <20250908104549.204412-1-jackzxcui1989@163.com>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54E37E107
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 10:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757328365; cv=fail; b=kWeU6C+0dm2ccIGYTOcpKQUdjlfvDVR5uaWFwA+AVVlHrUoa7sdu9Z2Y2eA/KzmfT4FzOxWsol7DayZ2kwzXQ9rw109Nc93/SkI+TGSFm/+Rhc76dyY9JW//Pae51hUInPZHmOSFnSU0bPOyz3/YBl5wgVpp0MFxl52d0qjouB0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757328365; c=relaxed/simple;
+	bh=1Tp6EyXDak7kHm7wtY4IOYAX7unB8Hael1zzhcI8rVM=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=npiaFi3gEv/IZtEi2PqCXv3G/WDwbR52vlS/YA0EFxInctuCEF93VYxEcSTRIdJ+ktvJPLntk08LiPlJim06YZ6ZTYGbB1af5AsCxEtACYJtSeDtkJrcs/FQE7N7rotpEz5T+rcZ49u1g6mvKkfEra1SrkufYCni1FN1UEtIIlM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n2x+hNhl; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757328363; x=1788864363;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=1Tp6EyXDak7kHm7wtY4IOYAX7unB8Hael1zzhcI8rVM=;
+  b=n2x+hNhlebvuzltQmCKtPt02i+mcx1YI2H6ZnCabbaVcAciJsIo19lf5
+   ft8yfc8khPSLDClBxPJgACkObqQru+I6TIQXi2AJwLmbJiF0ZKAFCTaLB
+   7NKY7LkuEBLj0EM7hEhlTX01vOPkv6+e3VSuDQlNxpVBJ/XCcL0/22293
+   /Wi3U9wxmqNSN8uT5wCv5QW8V8x7DN65Bqvt648xi28sm2h3h9jy3puaU
+   AEjrXl59K8Pq3ptFROW8JOySUhLDzaOnv5FwFrYfd1sduJLIV6jYtYt9l
+   R1FEg/FRTBuSIhiVBKo3OvWsiiTUPm8je93lAtsJ2yFsgNH30TBQNYPwn
+   Q==;
+X-CSE-ConnectionGUID: bdzJSqlGQfSj1z7xguLRAw==
+X-CSE-MsgGUID: UO6D6LFQRBuFPW6SmbdOTw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11546"; a="69834604"
+X-IronPort-AV: E=Sophos;i="6.18,248,1751266800"; 
+   d="scan'208";a="69834604"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 03:46:01 -0700
+X-CSE-ConnectionGUID: yQOsyn98SDuYgGDjJJsMQA==
+X-CSE-MsgGUID: kGR+1gUpTJOsmq9JQkKRHQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,248,1751266800"; 
+   d="scan'208";a="172879018"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 03:46:01 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 8 Sep 2025 03:46:00 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 8 Sep 2025 03:46:00 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.84)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 8 Sep 2025 03:46:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=B+6ffUt8T1RU+Rqdi8ihancS1Dgr9b68HSJDO9aBadvHV9BrCVLcNB9ATOkVm/8kpcfvUbPhRbGbkTSbnc1TEYTzmJMFMSLXd0BeYGoFuIPPmewq3lEMCkUsUjGV5N7Pj3QvnJpsPyIcpIzMrtancRxCXq/uo11bKlp+9akgNl7Z4t1M5xZ2tEBn9I71d1C3jr1YY2Wwgh00u70oOCZGy6ITgxVhwxhomDYp+pWPbdtdnM5tbZL5/zP3HydzD1tY16nJVxBlOIoX0tVaz0Q/6POniqc55Nus6jzIJYhhxecwcjqztyt3Lygzrvjitw+SR7z1oX3L+c5v/FeOkVrR7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=My2HHep5Bqbw5WAdo+vh/XFZrB/07putkOjfZ1j8KaQ=;
+ b=OI4zoQ3R5+2DbsaCrYFwVi3qD/KveWxycg8sBMKfA8eco6Y8UmqsdEC68lA92lyo4ot29fuzwHo4OoHdWau5RwqcoSFJcvtIXVc8vzuhrXPwVYvLqAdQTVu71OWsg+FdJ3NyKb5YGO/+oUwX/Q7tGY1oG6erl42bd90Pqf4LoYkMhPLfhHCAj0qoClPIWptuUqpo82QX+ULtzVCk6hnPFjrjInjSA2SusCNXJll//9muiC9aWiRkHq45jRmYutfMa6yknk79AD/As+QWGHiNvDsAI6DLkVOLpJV6fFDToRMjj8uyoP46A9mOA0DBtHxHAS72/i9ZKI2FdeOOtT4+Jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by PH7PR11MB6796.namprd11.prod.outlook.com (2603:10b6:510:1ba::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Mon, 8 Sep
+ 2025 10:45:57 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%4]) with mapi id 15.20.9094.018; Mon, 8 Sep 2025
+ 10:45:56 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH net-next] ixgbe: fix typo in function
+ comment for ixgbe_get_num_per_func()
+Thread-Topic: [Intel-wired-lan] [PATCH net-next] ixgbe: fix typo in function
+ comment for ixgbe_get_num_per_func()
+Thread-Index: AQHcHoL2/smGuXvoPUmYb9tmcEVxG7SJHj5Q
+Date: Mon, 8 Sep 2025 10:45:56 +0000
+Message-ID: <IA3PR11MB89863C4EB321285BFF8D4768E50CA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20250905163353.3031910-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250905163353.3031910-1-alok.a.tiwari@oracle.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH7PR11MB6796:EE_
+x-ms-office365-filtering-correlation-id: 4b9efda7-a44e-4cca-d9cd-08ddeec4e422
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|921020|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?mNEzbcCp7AN+fzbUo7xvv0PLA0sTrAXWsx/nkX+0QNIBXPe6RndIU9ZhwaSB?=
+ =?us-ascii?Q?djcba6elrqVtCoAqBtZ8zipEgPriKs2N4q5sWsyA60dCL1R0iIU5NU8bZeMz?=
+ =?us-ascii?Q?0SxMudBPWq3F/yx9CTI7DaqrFSF3uKpYS6MSFnVjQHKAXzHeZ8nDPDXHFQ9e?=
+ =?us-ascii?Q?AEf3Nd3qJoioeRRwqyv6KP3QzU07R8GI5O7xAWALshP0E+LjUjDHT1wYO74F?=
+ =?us-ascii?Q?9KeJuEW6vALhukmcyfYYg7ODIEg6i+JdwBTEjhZFjtJrQFEyeSyc5YszNw1M?=
+ =?us-ascii?Q?K/Hv9VaWI9t+JKUzfy0bpylLu3uFl3B4QhlUyvp72pumAEAGhcrzrwKDErES?=
+ =?us-ascii?Q?fJ+fkbaRDyblEuwriz+V+s2czBw4cxs6SFS+Cup2mjY35lhtE2rJXIK6/mO5?=
+ =?us-ascii?Q?WzKV++l9CjDN9zBSJ0YTR8wpr59fzROfVrM3hnZdDCYlyTer3OhcqzkYMRA4?=
+ =?us-ascii?Q?9fgqq8gmYb3RFLYLPQ8dSw8AnHKmTIfYxuQLzEv04gofa3CDC5zUXqdNewBg?=
+ =?us-ascii?Q?u2I8G0PPAamAnxd2PxrhFv6KCz8U3hkiRD2ilsxjCnPNhhWtCaLPK3fInc0d?=
+ =?us-ascii?Q?FHjIoPT/phTUPcyguk8ra5W7biceoi87hUL9hcp1bMKpAGfwUqvngnX3BQCE?=
+ =?us-ascii?Q?7tviGCQ+4DMUYxQ6IsaVFhtUpe32u7sBzFTa3sLtEVT/1PoLnOGudMyt1KJs?=
+ =?us-ascii?Q?zrXzZAPrER8EVUnt+PoCa9a9rkBDGbscgHonztzChOK3sbBuc0IPyVO1bo5t?=
+ =?us-ascii?Q?89e3OLESlc+DX5GTLYZ39tj8qZxdqKDcletr6hvkqT2ewIrVmGTgzs4Y+z7a?=
+ =?us-ascii?Q?whEddYcFfBmew1naz0tFiEcvnRi/4TqrCHObhFJiH6Gk485tKZnxgQn1RwDp?=
+ =?us-ascii?Q?G2m10krOjFyNClhTDaOODjTNi4M2YzwfwRND5wztVtwt9t/ubp9ljqG+xYc6?=
+ =?us-ascii?Q?IaUNd0S6tzhN3sk5hxG7Af+X1aiRng6bcusu4OqXH0zwPqgmoqHhNNX0WOUs?=
+ =?us-ascii?Q?gjQLQyZ3e+tTnry/ol/aKfk3gmmDjzFy77V/j13W7/A+76BZNMxq5YdXIH+V?=
+ =?us-ascii?Q?RtWU+GwRyHTbSVD29wCqK26RxhVb6Q6/Hj2qKx12qFJXgqfBKS8sRLP32NYw?=
+ =?us-ascii?Q?sQWjYwGBvCdYscsuNOsnlwzIdQg1u7SOEkkDjdVxHZBrY4ZLz53RDcniBM1O?=
+ =?us-ascii?Q?04QXbfiqRcGoCTxUl9hLiux9kbZo7pai+d2DvedooXkwQ2SSCZfAaRf3tyrv?=
+ =?us-ascii?Q?5PbG/WPBF0J3ehNKopWyGvQrTuhjFWFmRnpQDJJPKwPe+gx0VdgY16EAXT34?=
+ =?us-ascii?Q?G62ZyshrCi39kbcBsEq9kk/fisPJ8NzFVY2HVIpuQ+kn462qx1Unze4sysJu?=
+ =?us-ascii?Q?/JM+K9AsLNGEgOGCOcZeh23l82LDFgW5FS1uz6coXuuNRcf93IMSfE2vrlSz?=
+ =?us-ascii?Q?Wfi4Mpc3/Hv6pdFz+77Z3JR7VrkQoWcYEBgZlDfCGmKrvbkLUqwvMjq5h2/C?=
+ =?us-ascii?Q?9o0AOGUPDd6RlSg=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(921020)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ztFXZUuRIx4lPge+oAUwBo/tAQQrxMMBwtz63QJovNJm5qrfZKuPpfsxsU4n?=
+ =?us-ascii?Q?7o8iTJxJ3xmHabM3jaSM/MczmLBIHIXaw1iKpxdUdyaSNcqvx+Io4HvpSFUm?=
+ =?us-ascii?Q?nPbxJzdCLfrC8KvoTa81OD7rqn5QPYm6vcyqCAxQg32m4zOG28lxfMzv59Ek?=
+ =?us-ascii?Q?OU2tTEOsI0mGbdYxqWUUYAo83vfbKvaejOVAfA9WFqgcRT1tWP1kvROiDRtU?=
+ =?us-ascii?Q?eSVbETjRoPYpS2j2nA7zNvAG0aHqVBqEZGUByU78TRUO7kWuxxrBuW4qwFAk?=
+ =?us-ascii?Q?K78zkMtGDcsA6PufvRlk9lzrRl7j9VtoFKAQ4NvET4L6R0wIIyXDhUNigwA/?=
+ =?us-ascii?Q?TfrFzG0mEGrvSOQMuOdu3F4Om7NPkz7qSkk8S4InKl1vZdlseAv2u/jhgJaF?=
+ =?us-ascii?Q?++Bdwgwc4vUTQT+5dzCUYm+bC8yt6cTnxMBK7bPYHERi421eBPDVfhFvQzIz?=
+ =?us-ascii?Q?tAAe55bDT+aN+hpt8x24y2L5EClKlQkBnsvwJuldBnVtHU19fnBftK7bspjP?=
+ =?us-ascii?Q?F29v6WcRyXQVFK9SchLcgOnCE87gK1m41iDQGGSvuvSy/AxiYlruJwL9k5+8?=
+ =?us-ascii?Q?l/bD/Owgg+umYiKV44ADXUsR5LNC0z7lZL+JzNS3mTtK9zgRTLlWnNrH4eQv?=
+ =?us-ascii?Q?pdAM/wJkzyHvAsx76u7a/p+DettZesvE1QYwdzxe5fJlkFXgW+4z9DoDvFA8?=
+ =?us-ascii?Q?HsV8VMvKaijh67yCxsS42/3TeJgKikkaz96j8y2g0biSfdFJpW1AmlWStNt8?=
+ =?us-ascii?Q?1sGJDBGFkqqYZae0DMmhMDcsz3ttU3H4lCpkLvYFqRMMjbzogJKQSD6SoW2g?=
+ =?us-ascii?Q?lc+XYQFVcvS4/gYtWv5Oyz6fXK+KBdAUY1Eez9cqmePjQMTgvSK0xo4z6Dno?=
+ =?us-ascii?Q?3peCdCSTo2iiZFfma22mBxV3aJoLDNpMpaFtYaTr8GraTZ4WtC5J9wIB2Ys9?=
+ =?us-ascii?Q?NL6Wy4ixMRbZVwvS2Yzd8f/ZBPf5MLLvqsgSOU5thKl5CAtZOmi48Nns5dvc?=
+ =?us-ascii?Q?SfLH449d8cTajn4ldwG5mCoL9Mh4CL/FtUlXeg9rnmqhWkn8ATzVZmsx92G+?=
+ =?us-ascii?Q?6YKI2ubaKp91a0m8QL1IDCFYkqKlR+Tn9SsHd6/9JlQ85cNtyv2xYyuz4AWX?=
+ =?us-ascii?Q?Iv9WBzMP119FphR/NVVeX3xkRx9Yz/Fsma+8LEIaO0GUjqO4Tdc57wYfH7qX?=
+ =?us-ascii?Q?jgKo13eTsqknCU8VgRDQpx8zTzT5Qg59bF89pIg4PhelmUUY+j0LHwI0GcoA?=
+ =?us-ascii?Q?O/prrgJModmT8O8KBoeGNpOBQGyIeYm6AP0ot+yQ01ic4FPaYnzHaY0D+vx/?=
+ =?us-ascii?Q?qwcotT5cwjmX5TNGQsMRvkLm2c4PaXHMbIRgTbR50URidGeU+4wh6XWOIl4S?=
+ =?us-ascii?Q?AmKP92af8teO2SbGLbAU4VbE9m6QwEEKMfeRhZkLD5ctjOpiYhZSXY0u8de/?=
+ =?us-ascii?Q?AcsVUYL/rJnmSrLNooZH7XP6iUyEzooqrEAHoacOYW9h60LRziEiqghlddl3?=
+ =?us-ascii?Q?GPgac0kHTfeM0YBsD9mnM9SrxfncPns6QYiF2mURAnK7vBwvokhhOZCL7++w?=
+ =?us-ascii?Q?ViBLmt8UaKJIabsuHTxVSMWGHH6GulI8QRHMr0Z0PhA2LZl4qFqGP4Nusr8Y?=
+ =?us-ascii?Q?rQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgDnDz_es75oFd0YCQ--.33755S4
-X-Coremail-Antispam: 1Uf129KBjvAXoW3Zw48ur1kAFyDArWUuF4xtFb_yoW8GryxGo
-	Z3XrZ8Cr4ktry7A397Cry2kFy7W3yDtr15Jr4F9rWkW3Z0vr15uw1fJay3u3yfuw1Skw1k
-	AFy8Ww1rXF1Dtr1rn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvj4RWNtxDUUUU
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiowrCCmi+scg3ugAAsD
-
-In a system with high real-time requirements, the timeout mechanism of
-ordinary timers with jiffies granularity is insufficient to meet the
-demands for real-time performance. Meanwhile, the optimization of CPU
-usage with af_packet is quite significant. Use hrtimer instead of timer
-to help compensate for the shortcomings in real-time performance.
-In HZ=100 or HZ=250 system, the update of TP_STATUS_USER is not real-time
-enough, with fluctuations reaching over 8ms (on a system with HZ=250).
-This is unacceptable in some high real-time systems that require timely
-processing of network packets. By replacing it with hrtimer, if a timeout
-of 2ms is set, the update of TP_STATUS_USER can be stabilized to within
-3 ms.
-
-Delete delete_blk_timer field, because hrtimer_cancel will check and wait
-until the timer callback return and ensure never enter callback again.
-
-Simplify the logic related to setting timeout, only update the hrtimer
-expire time within the hrtimer callback, no longer update the expire time
-in prb_open_block which is called by tpacket_rcv or timer callback.
-Reasons why NOT update hrtimer in prb_open_block:
-1) It will increase complexity to distinguish the two caller scenario.
-2) hrtimer_cancel and hrtimer_start need to be called if you want to update
-TMO of an already enqueued hrtimer, leading to complex shutdown logic.
-
-One side effect of NOT update hrtimer when called by tpacket_rcv is that
-a newly opened block triggered by tpacket_rcv may be retired earlier than
-expected. On the other hand, if timeout is updated in prb_open_block, the
-frequent reception of network packets that leads to prb_open_block being
-called may cause hrtimer to be removed and enqueued repeatedly.
-
-The retire hrtimer expiration is unconditional and periodic. If there are
-numerous packet sockets on the system, please set an appropriate timeout
-to avoid frequent enqueueing of hrtimers.
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b9efda7-a44e-4cca-d9cd-08ddeec4e422
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Sep 2025 10:45:56.4438
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sO6sJDZb4YHTPVZi/gBSCDBQSkUiA9qO3HmOAQWMY4Dlx/Byq9owFlth3mDQ34DuLEcWP7ETXraO8RtisEPE+gbXxu2HxdodpUhlvoTt/xY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6796
+X-OriginatorOrg: intel.com
 
 
-Reviewed-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Link: https://lore.kernel.org/all/20250831100822.1238795-1-jackzxcui1989@163.com/
-Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
----
-Changes in v12:
-- Add reason why delete delete_blk_timer field in the commit message
-  as suggested by Jason Xing.
-- Add reason why NOT update hrtimer in prb_open_block in the commit message
-  as suggested by Jason Xing.
 
-Changes in v11:
-- structure tpacket_kbdq_core needs a new organization
-  as suggested by Jason Xing.
-- Change the comments of prb_retire_rx_blk_timer_expired and prb_open_block
-  as suggested by Jason Xing.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Alok Tiwari
+> Sent: Friday, September 5, 2025 6:34 PM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
+> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; horms@kernel.org; intel-wired-lan@lists.osuosl.org;
+> netdev@vger.kernel.org
+> Cc: alok.a.tiwari@oracle.com
+> Subject: [Intel-wired-lan] [PATCH net-next] ixgbe: fix typo in
+> function comment for ixgbe_get_num_per_func()
+>=20
+> Correct a typo in the comment where "PH" was used instead of "PF".
+> The function returns the number of resources per PF or 0 if no PFs are
+> available.
+>=20
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> index bfeef5b0b99d..aed8b30db2d5 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> @@ -774,7 +774,7 @@ static void ixgbe_parse_vf_func_caps(struct
+> ixgbe_hw *hw,
+>   * from parsing capabilities and use this to calculate the number of
+> resources
+>   * per PF based on the max value passed in.
+>   *
+> - * Return: the number of resources per PF or 0, if no PH are
+> available.
+> + * Return: the number of resources per PF or 0, if no PFs are
+> available.
+>   */
+>  static u32 ixgbe_get_num_per_func(struct ixgbe_hw *hw, u32 max)  {
+> --
+> 2.50.1
 
-Changes in v9:
-- Remove the function prb_setup_retire_blk_timer and move hrtimer setup and start
-  logic into function init_prb_bdqc
-  as suggested by Willem de Bruijn.
-- Remove 'refresh_timer:' label which is not needed while I change goto logic to
-  if-else implementation.
-
-Changes in v8:
-- Delete delete_blk_timer field, as suggested by Willem de Bruijn,
-  hrtimer_cancel will check and wait until the timer callback return and ensure
-  never enter callback again.
-- Simplify the logic related to setting timeout, as suggestd by Willem de Bruijn.
-  Currently timer callback just restarts itself unconditionally, so delete the
-  'out:' label, do not forward hrtimer in prb_open_block, call hrtimer_forward_now
-  directly and always return HRTIMER_RESTART.
-  The only special case is when prb_open_block is called from tpacket_rcv. That
-  would set the timeout further into the future than the already queued timer.
-  An earlier timeout is not problematic. No need to add complexity to avoid that.
-
-Changes in v7:
-- Only update the hrtimer expire time within the hrtimer callback.
-  When the callback return, without sk_buff_head lock protection, __run_hrtimer will
-  enqueue the timer if return HRTIMER_RESTART. Setting the hrtimer expires while
-  enqueuing a timer may cause chaos in the hrtimer red-black tree.
-
-Changes in v2:
-- Drop the tov_in_msecs field of tpacket_kbdq_core added by the patch
-  as suggested by Willem de Bruijn.
-
-Changes in v1:
-- Do not add another config for the current changes
-  as suggested by Eric Dumazet.
-- Mention the beneficial cases 'HZ=100 or HZ=250' and performance details
-  in the changelog
-  as suggested by Eric Dumazet and Ferenc Fejes.
-- Delete the 'pkc->tov_in_msecs == 0' bounds check which is not necessary
-  as suggested by Willem de Bruijn.
-
----
- net/packet/af_packet.c | 104 +++++++++++------------------------------
- net/packet/diag.c      |   2 +-
- net/packet/internal.h  |  10 ++--
- 3 files changed, 33 insertions(+), 83 deletions(-)
-
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index d4eb4a4fe..f0f8955c0 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -203,8 +203,7 @@ static void prb_retire_current_block(struct tpacket_kbdq_core *,
- static int prb_queue_frozen(struct tpacket_kbdq_core *);
- static void prb_open_block(struct tpacket_kbdq_core *,
- 		struct tpacket_block_desc *);
--static void prb_retire_rx_blk_timer_expired(struct timer_list *);
--static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *);
-+static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *);
- static void prb_fill_rxhash(struct tpacket_kbdq_core *, struct tpacket3_hdr *);
- static void prb_clear_rxhash(struct tpacket_kbdq_core *,
- 		struct tpacket3_hdr *);
-@@ -579,33 +578,13 @@ static __be16 vlan_get_protocol_dgram(const struct sk_buff *skb)
- 	return proto;
- }
- 
--static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
--{
--	timer_delete_sync(&pkc->retire_blk_timer);
--}
--
- static void prb_shutdown_retire_blk_timer(struct packet_sock *po,
- 		struct sk_buff_head *rb_queue)
- {
- 	struct tpacket_kbdq_core *pkc;
- 
- 	pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
--
--	spin_lock_bh(&rb_queue->lock);
--	pkc->delete_blk_timer = 1;
--	spin_unlock_bh(&rb_queue->lock);
--
--	prb_del_retire_blk_timer(pkc);
--}
--
--static void prb_setup_retire_blk_timer(struct packet_sock *po)
--{
--	struct tpacket_kbdq_core *pkc;
--
--	pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
--	timer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
--		    0);
--	pkc->retire_blk_timer.expires = jiffies;
-+	hrtimer_cancel(&pkc->retire_blk_timer);
- }
- 
- static int prb_calc_retire_blk_tmo(struct packet_sock *po,
-@@ -671,53 +650,34 @@ static void init_prb_bdqc(struct packet_sock *po,
- 	p1->version = po->tp_version;
- 	po->stats.stats3.tp_freeze_q_cnt = 0;
- 	if (req_u->req3.tp_retire_blk_tov)
--		p1->retire_blk_tov = req_u->req3.tp_retire_blk_tov;
-+		p1->interval_ktime = ms_to_ktime(req_u->req3.tp_retire_blk_tov);
- 	else
--		p1->retire_blk_tov = prb_calc_retire_blk_tmo(po,
--						req_u->req3.tp_block_size);
--	p1->tov_in_jiffies = msecs_to_jiffies(p1->retire_blk_tov);
-+		p1->interval_ktime = ms_to_ktime(prb_calc_retire_blk_tmo(po,
-+						 req_u->req3.tp_block_size));
- 	p1->blk_sizeof_priv = req_u->req3.tp_sizeof_priv;
- 	rwlock_init(&p1->blk_fill_in_prog_lock);
- 
- 	p1->max_frame_len = p1->kblk_size - BLK_PLUS_PRIV(p1->blk_sizeof_priv);
- 	prb_init_ft_ops(p1, req_u);
--	prb_setup_retire_blk_timer(po);
-+	hrtimer_setup(&p1->retire_blk_timer, prb_retire_rx_blk_timer_expired,
-+		      CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
-+	hrtimer_start(&p1->retire_blk_timer, p1->interval_ktime,
-+		      HRTIMER_MODE_REL_SOFT);
- 	prb_open_block(p1, pbd);
- }
- 
--/*  Do NOT update the last_blk_num first.
-- *  Assumes sk_buff_head lock is held.
-- */
--static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
--{
--	mod_timer(&pkc->retire_blk_timer,
--			jiffies + pkc->tov_in_jiffies);
--}
--
- /*
-- * Timer logic:
-- * 1) We refresh the timer only when we open a block.
-- *    By doing this we don't waste cycles refreshing the timer
-- *	  on packet-by-packet basis.
-- *
-  * With a 1MB block-size, on a 1Gbps line, it will take
-  * i) ~8 ms to fill a block + ii) memcpy etc.
-  * In this cut we are not accounting for the memcpy time.
-  *
-- * So, if the user sets the 'tmo' to 10ms then the timer
-- * will never fire while the block is still getting filled
-- * (which is what we want). However, the user could choose
-- * to close a block early and that's fine.
-- *
-- * But when the timer does fire, we check whether or not to refresh it.
-  * Since the tmo granularity is in msecs, it is not too expensive
-  * to refresh the timer, lets say every '8' msecs.
-  * Either the user can set the 'tmo' or we can derive it based on
-  * a) line-speed and b) block-size.
-  * prb_calc_retire_blk_tmo() calculates the tmo.
-- *
-  */
--static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
-+static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *t)
- {
- 	struct packet_sock *po =
- 		timer_container_of(po, t, rx_ring.prb_bdqc.retire_blk_timer);
-@@ -730,9 +690,6 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
- 	frozen = prb_queue_frozen(pkc);
- 	pbd = GET_CURR_PBLOCK_DESC_FROM_CORE(pkc);
- 
--	if (unlikely(pkc->delete_blk_timer))
--		goto out;
--
- 	/* We only need to plug the race when the block is partially filled.
- 	 * tpacket_rcv:
- 	 *		lock(); increment BLOCK_NUM_PKTS; unlock()
-@@ -749,26 +706,16 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
- 	}
- 
- 	if (!frozen) {
--		if (!BLOCK_NUM_PKTS(pbd)) {
--			/* An empty block. Just refresh the timer. */
--			goto refresh_timer;
-+		if (BLOCK_NUM_PKTS(pbd)) {
-+			/* Not an empty block. Need retire the block. */
-+			prb_retire_current_block(pkc, po, TP_STATUS_BLK_TMO);
-+			prb_dispatch_next_block(pkc, po);
- 		}
--		prb_retire_current_block(pkc, po, TP_STATUS_BLK_TMO);
--		if (!prb_dispatch_next_block(pkc, po))
--			goto refresh_timer;
--		else
--			goto out;
- 	} else {
- 		/* Case 1. Queue was frozen because user-space was
- 		 * lagging behind.
- 		 */
--		if (prb_curr_blk_in_use(pbd)) {
--			/*
--			 * Ok, user-space is still behind.
--			 * So just refresh the timer.
--			 */
--			goto refresh_timer;
--		} else {
-+		if (!prb_curr_blk_in_use(pbd)) {
- 			/* Case 2. queue was frozen,user-space caught up,
- 			 * now the link went idle && the timer fired.
- 			 * We don't have a block to close.So we open this
-@@ -777,15 +724,12 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
- 			 * Thawing/timer-refresh is a side effect.
- 			 */
- 			prb_open_block(pkc, pbd);
--			goto out;
- 		}
- 	}
- 
--refresh_timer:
--	_prb_refresh_rx_retire_blk_timer(pkc);
--
--out:
-+	hrtimer_forward_now(&pkc->retire_blk_timer, pkc->interval_ktime);
- 	spin_unlock(&po->sk.sk_receive_queue.lock);
-+	return HRTIMER_RESTART;
- }
- 
- static void prb_flush_block(struct tpacket_kbdq_core *pkc1,
-@@ -879,11 +823,18 @@ static void prb_thaw_queue(struct tpacket_kbdq_core *pkc)
- }
- 
- /*
-- * Side effect of opening a block:
-+ * prb_open_block is called by tpacket_rcv or timer callback.
-  *
-- * 1) prb_queue is thawed.
-- * 2) retire_blk_timer is refreshed.
-+ * Reasons why NOT update hrtimer in prb_open_block:
-+ * 1) It will increase complexity to distinguish the two caller scenario.
-+ * 2) hrtimer_cancel and hrtimer_start need to be called if you want to update
-+ * TMO of an already enqueued hrtimer, leading to complex shutdown logic.
-  *
-+ * One side effect of NOT update hrtimer when called by tpacket_rcv is that
-+ * a newly opened block triggered by tpacket_rcv may be retired earlier than
-+ * expected. On the other hand, if timeout is updated in prb_open_block, the
-+ * frequent reception of network packets that leads to prb_open_block being
-+ * called may cause hrtimer to be removed and enqueued repeatedly.
-  */
- static void prb_open_block(struct tpacket_kbdq_core *pkc1,
- 	struct tpacket_block_desc *pbd1)
-@@ -917,7 +868,6 @@ static void prb_open_block(struct tpacket_kbdq_core *pkc1,
- 	pkc1->pkblk_end = pkc1->pkblk_start + pkc1->kblk_size;
- 
- 	prb_thaw_queue(pkc1);
--	_prb_refresh_rx_retire_blk_timer(pkc1);
- 
- 	smp_wmb();
- }
-diff --git a/net/packet/diag.c b/net/packet/diag.c
-index 6ce1dcc28..c8f43e0c1 100644
---- a/net/packet/diag.c
-+++ b/net/packet/diag.c
-@@ -83,7 +83,7 @@ static int pdiag_put_ring(struct packet_ring_buffer *ring, int ver, int nl_type,
- 	pdr.pdr_frame_nr = ring->frame_max + 1;
- 
- 	if (ver > TPACKET_V2) {
--		pdr.pdr_retire_tmo = ring->prb_bdqc.retire_blk_tov;
-+		pdr.pdr_retire_tmo = ktime_to_ms(ring->prb_bdqc.interval_ktime);
- 		pdr.pdr_sizeof_priv = ring->prb_bdqc.blk_sizeof_priv;
- 		pdr.pdr_features = ring->prb_bdqc.feature_req_word;
- 	} else {
-diff --git a/net/packet/internal.h b/net/packet/internal.h
-index d367b9f93..b76e645cd 100644
---- a/net/packet/internal.h
-+++ b/net/packet/internal.h
-@@ -20,10 +20,11 @@ struct tpacket_kbdq_core {
- 	unsigned int	feature_req_word;
- 	unsigned int	hdrlen;
- 	unsigned char	reset_pending_on_curr_blk;
--	unsigned char   delete_blk_timer;
- 	unsigned short	kactive_blk_num;
- 	unsigned short	blk_sizeof_priv;
- 
-+	unsigned short  version;
-+
- 	char		*pkblk_start;
- 	char		*pkblk_end;
- 	int		kblk_size;
-@@ -32,6 +33,7 @@ struct tpacket_kbdq_core {
- 	uint64_t	knxt_seq_num;
- 	char		*prev;
- 	char		*nxt_offset;
-+
- 	struct sk_buff	*skb;
- 
- 	rwlock_t	blk_fill_in_prog_lock;
-@@ -39,12 +41,10 @@ struct tpacket_kbdq_core {
- 	/* Default is set to 8ms */
- #define DEFAULT_PRB_RETIRE_TOV	(8)
- 
--	unsigned short  retire_blk_tov;
--	unsigned short  version;
--	unsigned long	tov_in_jiffies;
-+	ktime_t		interval_ktime;
- 
- 	/* timer to retire an outstanding block */
--	struct timer_list retire_blk_timer;
-+	struct hrtimer  retire_blk_timer;
- };
- 
- struct pgv {
--- 
-2.34.1
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
