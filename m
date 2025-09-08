@@ -1,177 +1,322 @@
-Return-Path: <netdev+bounces-220999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86663B49D1D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:51:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 886E0B49D55
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C886443B7D
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:51:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 742C51B240E0
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6C62EE29F;
-	Mon,  8 Sep 2025 22:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EA82EB879;
+	Mon,  8 Sep 2025 23:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="lTKvbfh/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Bgo11MHD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8BPfsY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C0C2DCF4C;
-	Mon,  8 Sep 2025 22:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABDC2EAB7F;
+	Mon,  8 Sep 2025 23:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757371899; cv=none; b=k0x7jN8EuiTXn3xenG2FUz9jAKmALjDfInulPeSFQxay5cclrCelBPCWB0rL4QBTeE2kAC2JdwuPdX6Dn1fS9WLfXCCP4rNHlIC5TKsHYzNn7lJ8F8K6D5KHRZhok0wfjiJZtzfniib7j6zvdWobiJjixQXk9b42yniKdUfAF4o=
+	t=1757373029; cv=none; b=Njb7Aprywk7rjG1RjQ0EGPfJJeaF/fBwOieykg+CoKPZLo7zfmk7/xjouNJaabBQWe/MxzPUp/jc7bM/LudREwrjfP7sGj8beg7JYRMXyrRcxGJsnTuAioXvU9d9y2fb6z55sBfZKZcBpQ0cQFzV2G7OVehCuVY5EaC6hbzhcRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757371899; c=relaxed/simple;
-	bh=PUQDiQIr5kBg3FsFnfzGhoYijFmfm6QlTxG4268++SM=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Ts1g7znMyWjdOKYUvhWOOLVBjFp9Zk+0Dax8KI8kfFYDUgpH4moOBnz47WO1rKhJ8SYsKk6A3aPRemLy0LuPtXxkBLVeQNVx8QN0FX1dCBKRds5AUC4OkkgWudutq3kikAoIhI7jVAYGs05BSVR/zy9ly5g7zlhonj4LrTfWCPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=lTKvbfh/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Bgo11MHD; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 7CDF87A0094;
-	Mon,  8 Sep 2025 18:51:35 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Mon, 08 Sep 2025 18:51:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm2; t=1757371895; x=1757458295; bh=hoAxRJyXOMnsB0mKPob0+
-	gpsSszdzYC1XPmYnOTPNu8=; b=lTKvbfh/rEbJcaRvNvV5cPVfhbQ+Ftsx6mxXI
-	yr3TV7x5z27+Fq82JQ60OmGRuNzBycREOftOCVBjhiaKFIavmPK8HomMteLHrZn3
-	Ute922wrtxFrLv1ss2ilBiUK1kYCiis8yYvbEiyeHpYCSiBEwSCB4GBqXWIs/z8e
-	QEdzzDa5mfQy4i14fh1+HOxLEOeHo6pYSPbOos0ZZCrvt84DXRt9nQFa7KhMXdSV
-	2ZEGAIVKUAfpX4uLmchffIezhECooeA9mxuq+yJ4TAi1Ou2ed0BAD3T2weALFtJw
-	4B6jhUVYFBYhMAbNuc6gJyHYikzMr2iyI0b1A0uwcjIqmE1dQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1757371895; x=1757458295; bh=hoAxRJyXOMnsB0mKPob0+gpsSszdzYC1XPm
-	YnOTPNu8=; b=Bgo11MHD/rDihzzrzBdiqywQ2AHkGEubc0a38ycs8UTHykIHRHR
-	inW1iIAf0o8fy1BrhsJQob0OS0HTPfR4kIz3Jd87Il/MGSEqR0lKB4+kB0iJDf7U
-	493yo19bhFpvcmachV7TfmMeuMxWcNiOXRlno3i6RO4W9AsQe5IkAJc48R0tjCCo
-	s71/j4z1F19MWp+f9W6lBjnUiHKJFiNwCX/aoTLhXkkax5JaV903bBotjlBLoJJC
-	w9SMVj1siQQgaxqpgltPVLKeuqyk/oR1NfxVlHq6WSm1M6aYAT6SlaTqd6Yw8Fqw
-	AQIWl4Hd+qLc/Re8WziFZrcjXjqL6IdMebQ==
-X-ME-Sender: <xms:9l2_aNQIBrSLEg_WarMTXmgdKXDMNmM0PY5l9f634-nXVWQPgDM0Pw>
-    <xme:9l2_aF9Vu911JZpl9TNDCO4wNgG2i9TVPiVtDQSZNVGbuhdpJBc9l_V3pWTsWyTgn
-    GyFmO5iLLsFe7-zKq0>
-X-ME-Received: <xmr:9l2_aFgePIqfEumtze3tX9TmB2OUNhU0W5hV7MTZ6EMGvm7XfCywjiNvopYV2xj6dUXYGQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeejjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeeuffevvddvfedujeefuedugfdtgfdutedtveefieelfffhgffhtdejkefhiedtkeen
-    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggp
-    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhm
-    rghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpd
-    hrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggr
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrgh
-    dprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthht
-    ohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeifihhluggvrhesuh
-    hsrdhisghmrdgtohhm
-X-ME-Proxy: <xmx:9l2_aOY0TfCWiHW1avegdRDIbzE6AsOsvul3x7UBN4MN97btVtNboQ>
-    <xmx:9l2_aC9nHBmEruyz3JyIMWqoI8uhPmxV676KE4CI7p5LjLYOn-v5Kw>
-    <xmx:9l2_aIO_ql0joqj62Qf-WYz4bJpBWOOE0xGqgqtwC_RjYw5KA6U6dQ>
-    <xmx:9l2_aHEOhps-BoKO25NI8cyAcg7N8Q_F2xi6YHameEhy3HkkPm8bIg>
-    <xmx:912_aF6VotxxHt6zBP7DYY9fgzRQJH2f8w7NADfxBK3ghJyhYmeP-3E7>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 8 Sep 2025 18:51:34 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 4CC279FCB4; Mon,  8 Sep 2025 15:51:33 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 49D669FC6F;
-	Mon,  8 Sep 2025 15:51:33 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-    David Wilder <wilder@us.ibm.com>
-Subject: Re: [PATCHv2 1/2] bonding: don't set oif to bond dev when getting NS
- target destination
-In-reply-to: <20250908062802.392300-1-liuhangbin@gmail.com>
-References: <20250908062802.392300-1-liuhangbin@gmail.com>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Mon, 08 Sep 2025 06:28:01 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1757373029; c=relaxed/simple;
+	bh=NnNw5SWuKHtxbuEmmTWFxr04TRVuEUiSQ5bA4kxjGP4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ln8vsa4E4Rfy+ZS8s0+O9Kksd3jRzxSvCqOIoTUxtE3jH3u7A4mbc4RmRoLrw4LPFzHtnxHeZ46kyEpHqZ6GW6sO3MMInvdxiRDJgQsw/8MQxxQsuVSKEsaIJ/TP057MULjKxGdF1DU0wtHk8wPzJbJC+sP2k5RUu4APGHg7I0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8BPfsY2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B38C4CEF1;
+	Mon,  8 Sep 2025 23:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757373029;
+	bh=NnNw5SWuKHtxbuEmmTWFxr04TRVuEUiSQ5bA4kxjGP4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=p8BPfsY2HjY74z3REpiYPGDjO9K+83Gz8RQz3nLLPjoy6x7WalFxjV4i07vsY7s4y
+	 6PLHx09DNRcy+CZ5I3ppY6O732YY1DyjCo/swr0ItGRf8TduM2XzOvlgAoSRZf0soi
+	 jqxjKxRCnnUESvKLGlqcVcu1dElMgWSXFWIZlpe+vQFGQ41YzWL83Fpj6qHu1ZNTJp
+	 oD323/h0Ci6+O8eVUO7KJtaZ2AIimpMp09aBNRmoLdN/WPOIYIu2BjFyz8Cr8+R8Nl
+	 t1GHIEuG4v8G7TkDr/dAWvCcWVK1Kuk3JMZkeha/ZiZ1PaX3biXCHOhrWK0TUkJU0h
+	 WniYEayPWVDrg==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/2] dt-bindings: net: Convert apm,xgene-enet to DT schema
+Date: Mon,  8 Sep 2025 18:10:13 -0500
+Message-ID: <20250908231016.2070305-1-robh@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2850155.1757371893.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Sep 2025 15:51:33 -0700
-Message-ID: <2850156.1757371893@famine>
+Content-Transfer-Encoding: 8bit
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+Convert the APM XGene Ethernet binding to DT schema format.
 
->Unlike IPv4, IPv6 routing strictly requires the source address to be vali=
-d
->on the outgoing interface. If the NS target is set to a remote VLAN inter=
-face,
->and the source address is also configured on a VLAN over a bond interface=
-,
->setting the oif to the bond device will fail to retrieve the correct
->destination route.
->
->Fix this by not setting the oif to the bond device when retrieving the NS
->target destination. This allows the correct destination device (the VLAN
->interface) to be determined, so that bond_verify_device_path can return t=
-he
->proper VLAN tags for sending NS messages.
->
->Reported-by: David Wilder <wilder@us.ibm.com>
->Closes: https://lore.kernel.org/netdev/aGOKggdfjv0cApTO@fedora/
->Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
->Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
->Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Add the missing apm,xgene2-sgenet and apm,xgene2-xgenet compatibles.
+Drop "reg-names" as required. Add support for up to 16 interrupts.
 
-Acked-by: Jay Vosburgh <jv@jvosburgh.net>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+---
+v2:
+ - Fix phy node name in example
+---
+ .../bindings/net/apm,xgene-enet.yaml          | 115 ++++++++++++++++++
+ .../bindings/net/apm-xgene-enet.txt           |  91 --------------
+ MAINTAINERS                                   |   2 +-
+ 3 files changed, 116 insertions(+), 92 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/apm,xgene-enet.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/apm-xgene-enet.txt
 
->---
->
->v2: split the patch into 2 parts, the kernel change and test update (Jay =
-Vosburgh)
->
->---
-> drivers/net/bonding/bond_main.c | 1 -
-> 1 file changed, 1 deletion(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 257333c88710..30cf97f4e814 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -3355,7 +3355,6 @@ static void bond_ns_send_all(struct bonding *bond, =
-struct slave *slave)
-> 		/* Find out through which dev should the packet go */
-> 		memset(&fl6, 0, sizeof(struct flowi6));
-> 		fl6.daddr =3D targets[i];
->-		fl6.flowi6_oif =3D bond->dev->ifindex;
-> =
+diff --git a/Documentation/devicetree/bindings/net/apm,xgene-enet.yaml b/Documentation/devicetree/bindings/net/apm,xgene-enet.yaml
+new file mode 100644
+index 000000000000..1c767ef8fcc5
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/apm,xgene-enet.yaml
+@@ -0,0 +1,115 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/apm,xgene-enet.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: APM X-Gene SoC Ethernet
++
++maintainers:
++  - Iyappan Subramanian <iyappan@os.amperecomputing.com>
++  - Keyur Chudgar <keyur@os.amperecomputing.com>
++  - Quan Nguyen <quan@os.amperecomputing.com>
++
++allOf:
++  - $ref: ethernet-controller.yaml#
++
++properties:
++  compatible:
++    enum:
++      - apm,xgene-enet
++      - apm,xgene1-sgenet
++      - apm,xgene1-xgenet
++      - apm,xgene2-sgenet
++      - apm,xgene2-xgenet
++
++  reg:
++    maxItems: 3
++
++  reg-names:
++    items:
++      - const: enet_csr
++      - const: ring_csr
++      - const: ring_cmd
++
++  clocks:
++    maxItems: 1
++
++  dma-coherent: true
++
++  interrupts:
++    description: An rx and tx completion interrupt pair per queue
++    minItems: 1
++    maxItems: 16
++
++  channel:
++    description: Ethernet to CPU start channel number
++    $ref: /schemas/types.yaml#/definitions/uint32
++
++  port-id:
++    description: Port number
++    $ref: /schemas/types.yaml#/definitions/uint32
++    maximum: 1
++
++  tx-delay:
++    description: Delay value for RGMII bridge TX clock
++    $ref: /schemas/types.yaml#/definitions/uint32
++    maximum: 7
++    default: 4
++
++  rx-delay:
++    description: Delay value for RGMII bridge RX clock
++    $ref: /schemas/types.yaml#/definitions/uint32
++    maximum: 7
++    default: 2
++
++  rxlos-gpios:
++    description: Input GPIO from SFP+ module indicating incoming signal
++    maxItems: 1
++
++  mdio:
++    description: MDIO bus subnode
++    $ref: mdio.yaml#
++    unevaluatedProperties: false
++
++    properties:
++      compatible:
++        const: apm,xgene-mdio
++
++    required:
++      - compatible
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    ethernet@17020000 {
++        compatible = "apm,xgene-enet";
++        reg = <0x17020000 0xd100>,
++              <0x17030000 0x400>,
++              <0x10000000 0x200>;
++        reg-names = "enet_csr", "ring_csr", "ring_cmd";
++        interrupts = <0x0 0x3c 0x4>;
++        channel = <0>;
++        port-id = <0>;
++        clocks = <&menetclk 0>;
++        local-mac-address = [00 01 73 00 00 01];
++        phy-connection-type = "rgmii";
++        phy-handle = <&menetphy>;
++
++        mdio {
++            compatible = "apm,xgene-mdio";
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            menetphy: ethernet-phy@3 {
++                compatible = "ethernet-phy-id001c.c915";
++                reg = <3>;
++            };
++        };
++    };
+diff --git a/Documentation/devicetree/bindings/net/apm-xgene-enet.txt b/Documentation/devicetree/bindings/net/apm-xgene-enet.txt
+deleted file mode 100644
+index f591ab782dbc..000000000000
+--- a/Documentation/devicetree/bindings/net/apm-xgene-enet.txt
++++ /dev/null
+@@ -1,91 +0,0 @@
+-APM X-Gene SoC Ethernet nodes
+-
+-Ethernet nodes are defined to describe on-chip ethernet interfaces in
+-APM X-Gene SoC.
+-
+-Required properties for all the ethernet interfaces:
+-- compatible: Should state binding information from the following list,
+-  - "apm,xgene-enet":    RGMII based 1G interface
+-  - "apm,xgene1-sgenet": SGMII based 1G interface
+-  - "apm,xgene1-xgenet": XFI based 10G interface
+-- reg: Address and length of the register set for the device. It contains the
+-  information of registers in the same order as described by reg-names
+-- reg-names: Should contain the register set names
+-  - "enet_csr": Ethernet control and status register address space
+-  - "ring_csr": Descriptor ring control and status register address space
+-  - "ring_cmd": Descriptor ring command register address space
+-- interrupts: Two interrupt specifiers can be specified.
+-  - First is the Rx interrupt.  This irq is mandatory.
+-  - Second is the Tx completion interrupt.
+-    This is supported only on SGMII based 1GbE and 10GbE interfaces.
+-- channel: Ethernet to CPU, start channel (prefetch buffer) number
+-  - Must map to the first irq and irqs must be sequential
+-- port-id: Port number (0 or 1)
+-- clocks: Reference to the clock entry.
+-- local-mac-address: MAC address assigned to this device
+-- phy-connection-type: Interface type between ethernet device and PHY device
+-
+-Required properties for ethernet interfaces that have external PHY:
+-- phy-handle: Reference to a PHY node connected to this device
+-
+-- mdio: Device tree subnode with the following required properties:
+-  - compatible: Must be "apm,xgene-mdio".
+-  - #address-cells: Must be <1>.
+-  - #size-cells: Must be <0>.
+-
+-  For the phy on the mdio bus, there must be a node with the following fields:
+-  - compatible: PHY identifier.  Please refer ./phy.txt for the format.
+-  - reg: The ID number for the phy.
+-
+-Optional properties:
+-- status: Should be "ok" or "disabled" for enabled/disabled. Default is "ok".
+-- tx-delay: Delay value for RGMII bridge TX clock.
+-	    Valid values are between 0 to 7, that maps to
+-	    417, 717, 1020, 1321, 1611, 1913, 2215, 2514 ps
+-	    Default value is 4, which corresponds to 1611 ps
+-- rx-delay: Delay value for RGMII bridge RX clock.
+-	    Valid values are between 0 to 7, that maps to
+-	    273, 589, 899, 1222, 1480, 1806, 2147, 2464 ps
+-	    Default value is 2, which corresponds to 899 ps
+-- rxlos-gpios: Input gpio from SFP+ module to indicate availability of
+-	       incoming signal.
+-
+-
+-Example:
+-	menetclk: menetclk {
+-		compatible = "apm,xgene-device-clock";
+-		clock-output-names = "menetclk";
+-		status = "ok";
+-	};
+-
+-	menet: ethernet@17020000 {
+-		compatible = "apm,xgene-enet";
+-		status = "disabled";
+-		reg = <0x0 0x17020000 0x0 0xd100>,
+-		      <0x0 0x17030000 0x0 0x400>,
+-		      <0x0 0x10000000 0x0 0x200>;
+-		reg-names = "enet_csr", "ring_csr", "ring_cmd";
+-		interrupts = <0x0 0x3c 0x4>;
+-		port-id = <0>;
+-		clocks = <&menetclk 0>;
+-		local-mac-address = [00 01 73 00 00 01];
+-		phy-connection-type = "rgmii";
+-		phy-handle = <&menetphy>;
+-		mdio {
+-			compatible = "apm,xgene-mdio";
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			menetphy: menetphy@3 {
+-				compatible = "ethernet-phy-id001c.c915";
+-				reg = <0x3>;
+-			};
+-
+-		};
+-	};
+-
+-/* Board-specific peripheral configurations */
+-&menet {
+-	tx-delay = <4>;
+-	rx-delay = <2>;
+-        status = "ok";
+-};
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7352d7dc1318..c2a669258494 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1893,7 +1893,7 @@ M:	Iyappan Subramanian <iyappan@os.amperecomputing.com>
+ M:	Keyur Chudgar <keyur@os.amperecomputing.com>
+ M:	Quan Nguyen <quan@os.amperecomputing.com>
+ S:	Maintained
+-F:	Documentation/devicetree/bindings/net/apm-xgene-enet.txt
++F:	Documentation/devicetree/bindings/net/apm,xgene-enet.yaml
+ F:	Documentation/devicetree/bindings/net/apm-xgene-mdio.txt
+ F:	drivers/net/ethernet/apm/xgene/
+ F:	drivers/net/mdio/mdio-xgene.c
+-- 
+2.50.1
 
-> 		dst =3D ip6_route_output(dev_net(bond->dev), NULL, &fl6);
-> 		if (dst->error) {
->-- =
-
->2.50.1
->
 
