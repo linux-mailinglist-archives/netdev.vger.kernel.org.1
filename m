@@ -1,156 +1,155 @@
-Return-Path: <netdev+bounces-220810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F09B48DAD
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 14:37:01 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 200FCB48DD6
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 14:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADEC31898157
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:37:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0C03B4E10E2
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E5F3002D2;
-	Mon,  8 Sep 2025 12:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503BF2FB0BB;
+	Mon,  8 Sep 2025 12:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mnyZZKH7"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCE52F3C1A;
-	Mon,  8 Sep 2025 12:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926B9147C9B;
+	Mon,  8 Sep 2025 12:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757334993; cv=none; b=pU4M0AmJHG7ITy4cgpl70Ajfv1H3n46hGpZwuEDeWvHb0b6oplgV0DOQt/qg8vl04ht6rN/b+lC4aGjSsQw/m6ev12yqICBwX+X8fV2R7T8t0jNq9jKQKl1MSp7b0lD/wcRLrvGg4rmuRH7Xv2phCLUSG8S2EOdQHdV+dOlrfHw=
+	t=1757335411; cv=none; b=Y26pITfIUqQvYo+2tGDSW5+J1xgEOkmzy7jY3D8FLkcyjkimaZs32nT43FtMt6RGEKoU9469+A9RyIjWzWehjm1OW0xLxD5WwL56OqamLN5EeL9qLVlKCScqowdtdHGnLCAqnebUIfcubq78u8FgjuHUOD4aiWT+mB21l8sdM9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757334993; c=relaxed/simple;
-	bh=5uErrrV3rp6pA/pHEkzJKprTkfL5j3WOFyZrL2Ec1jM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rpbjEUWtlGUmIv/wdilPDsSLrYlWkyvhkPfjhiZ85DK9MH3c1zWkwFLw5Gs5zeqHmn9SjJfrwYG4EjBU6MqaG9irWGkZ4elbaEr2fEkDhdrpxcwtX+SiooCXtWnPWK+ow2m+RKMjYj7bZISJ7Ckz5NsqoL9qxJT9ekTsMIV4cGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [127.0.0.2] (unknown [114.241.87.235])
-	by APP-01 (Coremail) with SMTP id qwCowAAXbqCAzb5oCP2nAQ--.48996S7;
-	Mon, 08 Sep 2025 20:35:14 +0800 (CST)
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Mon, 08 Sep 2025 20:34:29 +0800
-Subject: [PATCH net-next v10 5/5] riscv: dts: spacemit: Add Ethernet
- support for Jupiter
+	s=arc-20240116; t=1757335411; c=relaxed/simple;
+	bh=hCZzQzXTqDQPsdfkFKi7HNFa74pKEkCdhxSkeUYipyQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sLBY++u2uKz4l6U+1S2g49Iv1R05bXYiX+gr8Uu96DCwyOkPdYEAV4LGBUp6NpQjD1NuC3Sj+BFghrZzGsTD1Usya3ncLG7Q50kZUwhE9jKQx0d8g9vEoLASOO5xgdLsEiZHTQp2ibEjDStxUK6IOdMITpDOOKY67tzII805xtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mnyZZKH7; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45dd5e24d16so28996785e9.3;
+        Mon, 08 Sep 2025 05:43:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757335408; x=1757940208; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+Vg0GNEeuU43g45pQCnqO0Jnldu9YfZ3lQZTRTHWzUE=;
+        b=mnyZZKH7+Yv7vl3R80JstR07HNE/Ssuc8VXWTwnrVZjvjjfObjc0/sWmQVAxZBS5RZ
+         ZZi/0FDjijpbYJVsG+RGQLZXWGSZAVNhd7ioz1WiTrwwxRm2G3tkrGRiT2EQXiE1fSMc
+         gOI3pkyko0a/bUZCr56YWFLIrkn+/02GAJ/M+szxx/Dl6V2wMjAJDtoE21OCUObjiUtU
+         A1DpaGTHTeOvNA6nX4gupOZ8iLzLUGZha0yeeUOp9sJBBem9XpkAdi/h+SHJSek6iQE5
+         KPbveRTSRTTxaX2tDhOTa8KW3vEliiKty8J/jiQvOdKpde+n/4QxmBU24z79Jjb+HXWK
+         uObg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757335408; x=1757940208;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Vg0GNEeuU43g45pQCnqO0Jnldu9YfZ3lQZTRTHWzUE=;
+        b=M1ygHDXDA6twQExkTB2hW10GG3ia4q2v06zmNtX3lUpGtBWUbg0jZZGTnogGBPI55e
+         3cBIg0B8xaug9rnhMhdgyKitnQrIxmA41sp3VTYyS5UrZfKzFKyR78puc5OJABL4vC+E
+         waL0GzCqyhDx7Lecdw68E59lYGLwGPy9lqAtwy5jnR6TCSnGu8dKRoEst+ioEmDmnCro
+         XBmP3UU0bRL7JG6JhN0CUTGQnIxekfjNI7mFK9NYud6Y2MhTrEw7OC7/MAD/yiSH3eRi
+         BI59R62g5OQkIndlZ46kXCXcfK/oQ9W/G2zv1MaqSbpWJnpJLMGjm6hzqkekusftSvXP
+         7tWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVh7NBhFXWtgf1iZMYTFFw2N8n++JjXns8iDqyNx5VK+up0j6tgaD5kfTvEEzqoMTeKrTaQj0g5@vger.kernel.org, AJvYcCVoR8s7JmahdJy+UPDpSauawDhfDvh2YmS+7zjA39YmPMb8O/w/3p5W8OugMnUIfWao+Ye1F0Y6iqPM//w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyja2Hq/G4v1oSozAavFlI2VBYFMo7AoE7ctIx0SR7i1foKuhO8
+	fi6v+ehWWwwbkd7ieb4+PW4tJlam9MJGAH4/CcmHpDLJd0pva6kyUCR0
+X-Gm-Gg: ASbGnctsnGh8lm+XCN9JfnSor0ZsM+b0Pp9jQBo46KyfGPqpkzhvukrFe0M6hAd2Pxp
+	uOH4L1jhRPCHI3SRVJbw8nvc2ThMOb50r9HNePnDA8/1Xd6oV2yY+VTFyHX1VeVPrdeJ7wxo5mq
+	FD2+T5gIV46PR5oRg9chDw1F3z/77y5SPxGP1/NXMdDLsOdlCIAQDlCARrfoa8W9bxB2hYXM7+n
+	l5WAMqLI12/oP18m+2JcVz1s8695eU9VJmcc7ttMYsqze3ebOKlPET1kzDVZTjH5DVjJPs2rcsd
+	x6+kIrmjx0k9qIJ2xx4BM/4byEGeojc1RMfOxbbAGnk08F7hBtZlp50isEK/lGXykWSK1Q2ehKt
+	YvS4Ff0V9KUZRi/QcuQSBhwOK1gqcZxkKUDe0WeWl/v+vZu6KQnNptw==
+X-Google-Smtp-Source: AGHT+IEt6VZ1UvFJW697LTeVzoEhMryjNa7nQmEERcDQ9zZ1SOxfk7VPPhBwquSNBfmWIdnecVE8RQ==
+X-Received: by 2002:a05:600c:3596:b0:45d:d6fc:2509 with SMTP id 5b1f17b1804b1-45dddeb00bfmr81306645e9.6.1757335407547;
+        Mon, 08 Sep 2025 05:43:27 -0700 (PDT)
+Received: from [10.158.36.109] ([72.25.96.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b8f2d3c88sm309254095e9.19.2025.09.08.05.43.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Sep 2025 05:43:26 -0700 (PDT)
+Message-ID: <25e5b405-09bf-40ac-8f45-5f3a0bbed8f5@gmail.com>
+Date: Mon, 8 Sep 2025 15:43:25 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5: Not returning mlx5_link_info table when
+ speed is unknown
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, Li Tian <litian@redhat.com>,
+ netdev@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Haiyang Zhang <haiyangz@microsoft.com>,
+ Benjamin Poirier <bpoirier@redhat.com>, Carolina Jubran
+ <cjubran@nvidia.com>, Shahar Shitrit <shshitrit@nvidia.com>
+References: <20250908085313.18768-1-litian@redhat.com>
+ <877by9fep2.fsf@redhat.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <877by9fep2.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250908-net-k1-emac-v10-5-90d807ccd469@iscas.ac.cn>
-References: <20250908-net-k1-emac-v10-0-90d807ccd469@iscas.ac.cn>
-In-Reply-To: <20250908-net-k1-emac-v10-0-90d807ccd469@iscas.ac.cn>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, 
- Vivian Wang <wangruikang@iscas.ac.cn>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-CM-TRANSID:qwCowAAXbqCAzb5oCP2nAQ--.48996S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw43Gw1ftrWfAF43Cr45Jrb_yoW8WFW8pa
-	y3CFsaqFZ7Cr1fKw43Zr9F9F13Ga95GrWkC3y3uF1rJ3yIvFZ0vw1ftw1xtr1DGrW5X34Y
-	vr1IyFyxurnFkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0pRQJ5wUUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-Milk-V Jupiter uses an RGMII PHY for each port and uses GPIO for PHY
-reset.
 
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
-Reviewed-by: Yixun Lan <dlan@gentoo.org>
----
- arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts | 46 +++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
 
-diff --git a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-index 4483192141049caa201c093fb206b6134a064f42..c5933555c06b66f40e61fe2b9c159ba0770c2fa1 100644
---- a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-+++ b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-@@ -20,6 +20,52 @@ chosen {
- 	};
- };
- 
-+&eth0 {
-+	phy-handle = <&rgmii0>;
-+	phy-mode = "rgmii-id";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&gmac0_cfg>;
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <0>;
-+	status = "okay";
-+
-+	mdio-bus {
-+		#address-cells = <0x1>;
-+		#size-cells = <0x0>;
-+
-+		reset-gpios = <&gpio K1_GPIO(110) GPIO_ACTIVE_LOW>;
-+		reset-delay-us = <10000>;
-+		reset-post-delay-us = <100000>;
-+
-+		rgmii0: phy@1 {
-+			reg = <0x1>;
-+		};
-+	};
-+};
-+
-+&eth1 {
-+	phy-handle = <&rgmii1>;
-+	phy-mode = "rgmii-id";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&gmac1_cfg>;
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <250>;
-+	status = "okay";
-+
-+	mdio-bus {
-+		#address-cells = <0x1>;
-+		#size-cells = <0x0>;
-+
-+		reset-gpios = <&gpio K1_GPIO(115) GPIO_ACTIVE_LOW>;
-+		reset-delay-us = <10000>;
-+		reset-post-delay-us = <100000>;
-+
-+		rgmii1: phy@1 {
-+			reg = <0x1>;
-+		};
-+	};
-+};
-+
- &uart0 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&uart0_2_cfg>;
+On 08/09/2025 12:58, Vitaly Kuznetsov wrote:
+> Li Tian <litian@redhat.com> writes:
+> 
+>> Because mlx5e_link_mode is sparse e.g. Azure mlx5 reports PTYS 19.
+>> Do not return it when speed unless retrieved successfully.
+>>
+>> Fixes: 65a5d35571849 ("net/mlx5: Refactor link speed handling with mlx5_link_info struct")
 
--- 
-2.50.1
+++
+
+Adding author and reviewer of offending patch.
+
+>> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Signed-off-by: Li Tian <litian@redhat.com>
+>> ---
+>>   drivers/net/ethernet/mellanox/mlx5/core/port.c | 6 +++++-
+>>   1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/port.c b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+>> index 2d7adf7444ba..a69c83da2542 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/port.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+>> @@ -1170,7 +1170,11 @@ const struct mlx5_link_info *mlx5_port_ptys2info(struct mlx5_core_dev *mdev,
+>>   	mlx5e_port_get_link_mode_info_arr(mdev, &table, &max_size,
+>>   					  force_legacy);
+>>   	i = find_first_bit(&temp, max_size);
+>> -	if (i < max_size)
+
+Keep an empty line before comment.
+
+>> +	/*
+
+Can have the comment text starting from the first line.
+>> +	 * mlx5e_link_mode is sparse. Check speed
+> 
+> The array is either 'mlx5e_link_mode' or 'mlx5e_ext_link_info' but both
+> have holes in them.
+> 
+
+You mean 'mlx5e_link_info' and 'mlx5e_ext_link_info'.
+I wouldn't say they are sparse. They have holes indeed.
+
+
+>> +	 * is non-zero as indication of a hole.
+>> +	 */
+>> +	if (i < max_size && table[i].speed)
+>>   		return &table[i];
+>>   
+>>   	return NULL;
+> 
 
 
