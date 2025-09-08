@@ -1,167 +1,188 @@
-Return-Path: <netdev+bounces-220941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CE21B4980B
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:16:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E46B49834
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CBDE188ECA3
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:15:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62C601689C9
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71744314B7F;
-	Mon,  8 Sep 2025 18:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C593D314B74;
+	Mon,  8 Sep 2025 18:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KulParVi"
+	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="k61XfHHb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cyan.elm.relay.mailchannels.net (cyan.elm.relay.mailchannels.net [23.83.212.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD304313E11
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757355279; cv=none; b=mBA3viEzWyQkjdLUCfCru14Kchh40n4xvGoNI8tPAEB15zMLnqW+dK3602qyRFXRGiYPNSulymqIe8NH6QBUwLPGJCFxaPKEauRyuC2LHj3FlFn8d/wh6NEJEeFx14UdoHNixIZed1vYOdU2tpd/3msxbX8/iTel0L+HL3fDwp0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757355279; c=relaxed/simple;
-	bh=Dd+pgApASQAzgj9X3zonS77Lm1GUV+22MQ9r9kA15iE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ft6QpqF6LA1XkfNfvsxlwredmVdj6X+poRcyKkIYmBwJkU35ElO+Tw4LvVoRHxMOAx4Sd/HkxrAxGyi3MEUWpVAXKdSBr0Rg1Xo2GpQyCxUAeXaHFZsCcVLL4ZhgtFP6NiWOWykqXPYJo3dBBlczjPkdXMICW9HjKv40s3W6UhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KulParVi; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b523fb676efso549962a12.3
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 11:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1757355277; x=1757960077; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aa8ggLlyMVJh/eLNB7/vORTWXIRxgODsZo7MWhmnGSU=;
-        b=KulParViFVt05a2wk3gGZhfcS3CXTQZ3E75p2wuhDJxuOZrKXGjCg+ZbJw07NoqnJY
-         YxM2vkpiO0Cb7BcqPB7AEApIqaEPnwwZZMQczSChnKdv08nC+E8OT1YNF2U+rX2wzffe
-         mXLRqYYe4akc0bFoUNelA3SaTxhqyPAMeiKyzvQuJRqBQH3hM1EN3f3o6JVzTgHjyKwn
-         KIMqj/dZdr/tzG2MufEmnkeBjszB0cdcrtRYBa5SJwJYsJgUI6YTS52zqxIf7Rx4Pbo2
-         SPgD4UJk/1xxtHtw2eot+LpALr5Aq+9HIS8CMEB2kUfKrxz+P1QQkQnf52kW9ztcL4Po
-         hdgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757355277; x=1757960077;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Aa8ggLlyMVJh/eLNB7/vORTWXIRxgODsZo7MWhmnGSU=;
-        b=Na0SChinAvkkAS6FbnaxO9XBVaj8lHg3uvDni7JFsH/Za89OzhoVM9D2PwqDBXwCfp
-         7rBgrWKF+ilTW35G0fNPn4FgYRxGT8DYCTwWMUIXER9xBMA016hz9/d1K8ji/uPS8a9M
-         lw3fYWDlbN/pX/suioVc08q06YStCBQL9EovL/dD6i0Q+4UcVEK1dYT1uWAcOMGBLLj/
-         GDjqy/BbBgeuoS/xXRfMWuFcmFOn6cCtsSAm0OIfGNgsKuE0XXZCJR8r6aU4Zv6d3amr
-         w1rYj3ZNMTqxE3d8xRwPo2fbgwI8JiT+yrhOfLyWuB3PZJzunJFGeFlZmYeNOvPPmUfI
-         59CA==
-X-Forwarded-Encrypted: i=1; AJvYcCXPMum1j+tyNW0BjM5qYGUAHHelLFFYqZ+hb5OfdgMkQm9xRlyWp4rEPYagaTKtg2OaJlOeQXI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBeICLnOGSsDHvef1iyhj4Hi0Tuqcf20m7lGBLrx5UlIZnj9/5
-	Bo41xQreG9PjkzzVukqc+ZQmEGeFf3AeOhlkm10pwnZskneNlBAELZEXGt54dD8RNvcfSua9Rey
-	kKhUYxQT6ypcstF5il8hFUU8SFOzRmQScNdIugcb7+Q==
-X-Gm-Gg: ASbGncse5cQZrzq0sKnmWbUuJ6HP6926M5gHfJWDHpiJkUb+H/bsBGUZINon59V8hNP
-	FFrj4m5QSIP1+5BaAui8m71WKnnDh2n6Pl5H3iIHvPP0eAa17436e8l7KkyXk6CGG5n/hSKm+6j
-	81Rd10sYpuQ8ERWVujI8ZDOIZLpioUNJYdQ+7foHh/MFZQhsUV56hkHtcGJPhBAMWPB4CS5Dt2l
-	tnWXmKkRXk52j8A2mwSaYEBBPwZwvkadXHOilpMwhKJGQgGUnVjxlUEaObn34OJ+OWwUuqtG1OM
-	V/plFcM=
-X-Google-Smtp-Source: AGHT+IErypQRC4wzGQeAuOgUtnwtBi2ya2m51s0FvrrM40iFGJDv512kzAJrOm36DfnNRSDLy6uFdTKbm3aJAXKiWZI=
-X-Received: by 2002:a17:903:19c6:b0:24c:e3d0:c802 with SMTP id
- d9443c01a7336-2516c896521mr127705465ad.1.1757355276936; Mon, 08 Sep 2025
- 11:14:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD7A31AF01
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.212.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757355809; cv=pass; b=CKW2m8ZmO72F2iUBOb4obDHdUprXV62b2V1c/i9dg5YS3o6CqtkUR9rkGjHLGwPDZMGeybi9ROt1cnPFbU0MLSHalecWb/ueYjfxsed/wWNeZTGglsU0J/MBCiSJh63dq8Y822G9c6iMB7iw/sbvVwHc5YyPRa4tkgO7iiAcqBc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757355809; c=relaxed/simple;
+	bh=tJn8wU/FAdYgLMxJPvZZUYUbKifLg26ClGFsuY4bZ6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Pjf4HSdaEvNy8bdE2QYujmiDH0Ot+btwIeWm++O8Mnpu8zit/Jv24igdaoWLSIrB+RHxNQ5F5aNIwk7TNPhN3uVUqjusfKz0fBrJ9wBmix6YcFmLu24WfqE4Z/XtR/apeN/KIzsBuq6Qb9DQi7jKF3XNYMfrspSL7MOVkTWY1AU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=k61XfHHb; arc=pass smtp.client-ip=23.83.212.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 2BD0923DEF
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:16:04 +0000 (UTC)
+Received: from pdx1-sub0-mail-a204.dreamhost.com (100-107-16-138.trex-nlb.outbound.svc.cluster.local [100.107.16.138])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id CE4AD23CCA
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:16:03 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1757355363; a=rsa-sha256;
+	cv=none;
+	b=equJpx4ezgddFUTia9VLF3AJRmN20ugZApRP+aws1bNNlD300ImqVYRuDQyvQZFPlsPaos
+	8LPYUQj6QtKe6wXZD0CuJ89yniRb4BVs7bXRAL4l8oTyY7emsyged3x15zRRLTArRAfiYe
+	LPKzWKykSDsPU1Q1Z9XvvrL8L7zJyOgDUplb8eetVYadCHpkEqFhV4HSYScviblv/bwG8f
+	oGeMOcU+6iNkIGkSdzp8gIyYWbUZ208/p/q7J4j3H6Jv6zK02BcGIRaJX4gszwWL++ae1c
+	uiYCPv3q0hniB9u+31LhQGqeQZc6pZ0nkWSjp2mQ8WEQbIVHwgrQsYw4rUcKzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1757355363;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 dkim-signature; bh=bx4e0pgGb2y8U+QGf21qX2SdVP0uMrcYvKMqsJ4Puj8=;
+	b=5eLy4RnUkjQqBkn4aPZYoU/WQJWywWHbfbhniDlDE92l1FnkWQGktlm9G6HlOzKJHt0Fem
+	TsAeewiEfUctB3xS6YSpHzzceAjJqutjZQHHfuSU8vgufif1Nk+1xwFMZY8xxl9GM35gTQ
+	giKCxJ+xIiIRolEIKaPoCjP2Xxl/M/5jQHfVR2Dv4vWsZR825nDuwEb6QeKBicosvl7qaO
+	kLHyWDEiwBK4BjVcx0Tj+N1Jb8jCRPH38F+w/IR6DwoUYL8/6fhBOTeVh75zuR7FGWETgF
+	QR5GqpEIiXC7N/u4RGRWrHQ0mRHTePKdQLtx87qBOhTFxiwbQLkNXDG6l4170Q==
+ARC-Authentication-Results: i=1;
+	rspamd-9968f48fc-xqc6l;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MailChannels-Auth-Id: dreamhost
+X-Towering-Exultant: 3bd40b761cbdccfb_1757355364051_2213728491
+X-MC-Loop-Signature: 1757355364051:668796617
+X-MC-Ingress-Time: 1757355364051
+Received: from pdx1-sub0-mail-a204.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.107.16.138 (trex/7.1.3);
+	Mon, 08 Sep 2025 18:16:04 +0000
+Received: from kmjvbox.templeofstupid.com (c-73-70-109-47.hsd1.ca.comcast.net [73.70.109.47])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kjlx@templeofstupid.com)
+	by pdx1-sub0-mail-a204.dreamhost.com (Postfix) with ESMTPSA id 4cLFWR1qMHzm8
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 11:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
+	s=dreamhost; t=1757355363;
+	bh=bx4e0pgGb2y8U+QGf21qX2SdVP0uMrcYvKMqsJ4Puj8=;
+	h=Date:From:To:Cc:Subject:Content-Type;
+	b=k61XfHHbtdSc/foF8kmzjrn6KgCH4ZwrjupvX9vwYRJu+Af5y3C92EK6opnGlV7n2
+	 olkWmC4w3ClK0f+Ar7N6jvHOUYjOC4Vdmf0AoFwNaWeJ+eFsPRqnmoFEaAG6IXUiPa
+	 zouHtw532WU3+J1+r9rB0a5TlPd5BpieB19QKBySU/zIO8OgcVaMy7QU6GFS07nVa6
+	 UF55OuyRnS7qcznnACxexXF8Jzx+EYwrZf/PkKsBlOHSpoKzu+LByZetR2WZwuG8lK
+	 xwXmzOLONc/GjtFC2iKKYu8FUALUb67rV2ik0POwr9fR6zeGko3ILVwX35qOlxfD+f
+	 MgVfcxYkHlTHA==
+Received: from johansen (uid 1000)
+	(envelope-from kjlx@templeofstupid.com)
+	id e0263
+	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.13);
+	Mon, 08 Sep 2025 11:16:01 -0700
+Date: Mon, 8 Sep 2025 11:16:01 -0700
+From: Krister Johansen <kjlx@templeofstupid.com>
+To: Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+	David Reaver <me@davidreaver.com>
+Subject: [PATCH net v2] mptcp: sockopt: make sync_socket_options propagate
+ SOCK_KEEPOPEN
+Message-ID: <aL8dYfPZrwedCIh9@templeofstupid.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250907195601.957051083@linuxfoundation.org>
-In-Reply-To: <20250907195601.957051083@linuxfoundation.org>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Mon, 8 Sep 2025 23:44:25 +0530
-X-Gm-Features: AS18NWCueKZLivBwekubKSawy9W-Z7KRPjuA564ID06uBm9Hh6QXYlMBZZtS8_g
-Message-ID: <CA+G9fYsX_CrcywkDJDYBqHijE1d5gBNV=3RF=cUVdVj9BKuFzw@mail.gmail.com>
-Subject: Re: [PATCH 5.10 00/52] 5.10.243-rc1 review
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, patches@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, 
-	akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org, 
-	patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de, 
-	jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, 
-	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, hargar@microsoft.com, 
-	broonie@kernel.org, achill@achill.org, Netdev <netdev@vger.kernel.org>, 
-	Anders Roxell <anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ben Copeland <benjamin.copeland@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Mon, 8 Sept 2025 at 01:38, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> This is the start of the stable review cycle for the 5.10.243 release.
-> There are 52 patches in this series, all will be posted as a response
-> to this one.  If anyone has any issues with these being applied, please
-> let me know.
->
-> Responses should be made by Tue, 09 Sep 2025 19:55:53 +0000.
-> Anything received after that time might be too late.
->
-> The whole patch series can be found in one patch at:
->         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.10.243-rc1.gz
-> or in the git tree and branch at:
->         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.10.y
-> and the diffstat can be found below.
->
-> thanks,
->
-> greg k-h
+Users reported a scenario where MPTCP connections that were configured
+with SO_KEEPALIVE prior to connect would fail to enable their keepalives
+if MTPCP fell back to TCP mode.
 
+After investigating, this affects keepalives for any connection where
+sync_socket_options is called on a socket that is in the closed or
+listening state.  Joins are handled properly. For connects,
+sync_socket_options is called when the socket is still in the closed
+state.  The tcp_set_keepalive() function does not act on sockets that
+are closed or listening, hence keepalive is not immediately enabled.
+Since the SO_KEEPOPEN flag is absent, it is not enabled later in the
+connect sequence via tcp_finish_connect.  Setting the keepalive via
+sockopt after connect does work, but would not address any subsequently
+created flows.
 
-While building Linux stable-rc 5.10.243-rc1 the arm64 allyesconfig
-builds failed.
+Fortunately, the fix here is straight-forward: set SOCK_KEEPOPEN on the
+subflow when calling sync_socket_options.
 
-* arm64, build
-  - gcc-12-allyesconfig
+The fix was valdidated both by using tcpdump to observe keepalive
+packets not being sent before the fix, and being sent after the fix.  It
+was also possible to observe via ss that the keepalive timer was not
+enabled on these sockets before the fix, but was enabled afterwards.
 
-Regression Analysis:
-- New regression? yes
-- Reproducibility? yes
+Fixes: 1b3e7ede1365 ("mptcp: setsockopt: handle SO_KEEPALIVE and SO_PRIORITY")
+Cc: stable@vger.kernel.org
+Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
+Reviewed-by: Geliang Tang <geliang@kernel.org>
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+v2:
+  - Ensure local variable declarations are in reverse-Christmas-tree
+    style.  (Feedback from Geliang Tang)
+  - Use keep_open instead of kaval; make type bool instead of int.
+    (Feedback from Matthieu Baerts)
+---
 
+ net/mptcp/sockopt.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-Build regression: stable-rc 5.10.243-rc1 arm64 allyesconfig
-qede_main.c:204:17: error: field name not in record or union
-initializer
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index 2c267aff95be..2abe6f1e9940 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -1532,13 +1532,12 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
+ {
+ 	static const unsigned int tx_rx_locks = SOCK_RCVBUF_LOCK | SOCK_SNDBUF_LOCK;
+ 	struct sock *sk = (struct sock *)msk;
++	bool keep_open;
+ 
+-	if (ssk->sk_prot->keepalive) {
+-		if (sock_flag(sk, SOCK_KEEPOPEN))
+-			ssk->sk_prot->keepalive(ssk, 1);
+-		else
+-			ssk->sk_prot->keepalive(ssk, 0);
+-	}
++	keep_open = sock_flag(sk, SOCK_KEEPOPEN);
++	if (ssk->sk_prot->keepalive)
++		ssk->sk_prot->keepalive(ssk, keep_open);
++	sock_valbool_flag(ssk, SOCK_KEEPOPEN, keep_open);
+ 
+ 	ssk->sk_priority = sk->sk_priority;
+ 	ssk->sk_bound_dev_if = sk->sk_bound_dev_if;
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+base-commit: 319f7385f22c85618235ab0169b80092fa3c7696
+-- 
+2.43.0
 
-### build log
-drivers/net/ethernet/qlogic/qede/qede_main.c:204:17: error: field name
-not in record or union initializer
-  204 |                 .arfs_filter_op = qede_arfs_filter_op,
-      |                 ^
-
-This was reported on the Linux next-20250428 tag,
-https://lore.kernel.org/all/CA+G9fYs+7-Jut2PM1Z8fXOkBaBuGt0WwTUvU=4cu2O8iQdwUYw@mail.gmail.com/
-
-## Build
-* kernel: 5.10.243-rc1
-* git: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
-* git commit: 910e092353351549f4857c48c68cc154c84305e8
-* git describe: v5.10.241-89-g910e09235335
-* test details:
-https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-5.10.y/build/v5.10.241-89-g910e09235335
-
-## Test Regressions (compared to v5.10.241-35-g4576ee67df7a)
-* arm64, build
-  - gcc-12-allyesconfig
-
-Build log: https://qa-reports.linaro.org/api/testruns/29791464/log_file/
-Build details: https://regressions.linaro.org/lkft/linux-stable-rc-linux-5.10.y/v5.10.241-89-g910e09235335/build/gcc-12-allyesconfig/
-Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32O3Hlq8fZQUSOfU5gyju24xQit/
-Build config: https://storage.tuxsuite.com/public/linaro/lkft/builds/32O3Hlq8fZQUSOfU5gyju24xQit/config
-
---
-Linaro LKFT
-https://lkft.linaro.org
 
