@@ -1,361 +1,284 @@
-Return-Path: <netdev+bounces-220865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CDCAB49457
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:55:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DCEFB4946D
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 336DD188F1A0
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:55:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FF94162DDA
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D2A2F546E;
-	Mon,  8 Sep 2025 15:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A8B30E0D1;
+	Mon,  8 Sep 2025 15:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Zs6Uazwd"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UmtWr8sZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f98.google.com (mail-pj1-f98.google.com [209.85.216.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C380A2E8E11
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 15:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.98
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757346896; cv=none; b=rjSbM95ydEaHNJDlUUvBR0ARCS/AMRUnyxNYQTjMXn2e0DIpEeiZP6oAR2DRbjrJ4jo+UCNj4oJjo1+J21tMrVtmqa4v+gZx4KDWy1Ui3SaNw49S2pG9JNxkAErXj53EjGV1MmXCnrpp2HW8+pM2K2uP9y2YPLeXJKIRDHu9WtY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757346896; c=relaxed/simple;
-	bh=rhtTPXeqjUx/d+E2waaOQ3KLGXlWXpzJB3H2mBI0qJM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pz8EkV54aemnFI7oSkOo31OlSwNykGsLAuVpD9EI6dMzPO8nLhimYMR1DRn5sYkUGX4X43gzKeuhwvuGVWMqApUI8P+RVDXBDjFOCkciHpQOCIFPjj1kcl81xUDnKDGDpvly3gwCEgsfay28Xh677WW4pqdRBT/h0DJt3mfqHLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Zs6Uazwd; arc=none smtp.client-ip=209.85.216.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f98.google.com with SMTP id 98e67ed59e1d1-32b70820360so3517927a91.2
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 08:54:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757346894; x=1757951694;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NRocUMS0GDsW+ct35Z1NB+LIQVu236juAVg0bqfUsYM=;
-        b=fQG/PKsO6lYA6+2noDdmYm/fSnvesJBkERbZmfmfzpAbmslbNV6+zQB9g3Oy0NkSSH
-         ktw9hAfDXxNBIYIuIl33cT47wMWZM4lQowYCmNIDgqow8Y3O1Bfb3wSJrnOgdfXOo102
-         19r+5M7ObBmBiV3FfYUeZaWk7Rh64S010AF7tQXwftyT3QRF2MlZK7YJESfk2KEhPHxg
-         tF9mRTT9xIdfqdk7p2VitSb1XXXvQSQQusGAsIlPIEG5JNPoecEpybYCHdUR7xF4dVQ1
-         BOxepYrSg9UENhq0Ly0cdypUPaDHVX0nfuk6frcoClpeveCI6hV+SvdkQiWA+zXR6nuY
-         i9LA==
-X-Forwarded-Encrypted: i=1; AJvYcCXeBxCCfXuRRCwpBySs5KGhRleswXeyti9maq2c7mXIyD/jrvEQb1rLRAfwml1yAHS0KQ3L1I0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHAbouiJ7ebz9ByavSOWz0GGEE0CZwnBc2VgRarZca/mJ7fxJI
-	6qvsPhmQgixu/iDwdHHpSnMOuLyo8kG9wqCtDTaIVYtjGNcGWRVKY68PXjg/qKFyif+3bPsHCRR
-	i/RA4S6QKx36ttafIwabgVQWbyWgAvWfKUdsqc7c3GXfuOBwwQuknBO7zOjkKNA4AG6Ahlx1LzX
-	LJ8EO78wUmhgkU4wgA+YCOcdeOxQWBIZMUv4OmUGiE1dyIQOXNku6DUrJVReEWcePLpJJr6YoKM
-	JSe0diqEUo/BfTw+c7HCU0T
-X-Gm-Gg: ASbGncv5EIPm2IzvDc/sjptfbk+2YEOzrFWaRJ0fC+Sl0WsINdaY6MFWt6fMcExF/OG
-	Wu6MBApR3Tai/3Y1APv6JdikRRVx1U2xdYsBDAvMkDf0lrLRJz44wHWRngOk5zDNQCuGqEi0CK5
-	WqIaEZBshOgZGo+roldYL4qeYU7nPwYiX/AUEnICw/CYLSWxUxh4sqqOXt5p0/2uIqQLts2Gb4D
-	Vfym0BMuE7EgPRgLvCWTv+wGi8lRNsgDmcwMVn/l/uor2fgupw0CI1wNAGU+hKVJZc62qFMoogb
-	RS6rfGHC5dkhvyCZGFSFNhCrt8eb36MLybbBgtJRIQvjJsbWTfVGbrIy9kD3NwdkMhG2s/FSs7Q
-	ErMD0MiwI34JPAel4DZuhT5c6NKrrjYdxY+xVygP5m8AvJoSiVGU8F9EomF/XbKToiG2jK0sBTI
-	yL6pX6cli/ADSqF0I=
-X-Google-Smtp-Source: AGHT+IGfViXnAV+dz1RE/vCOPN+vwL8GgBLCJKRCZGtNZH7Uh+AG+RACxN8UN8BX4S8RFvrmzIaCMiGdxU3T
-X-Received: by 2002:a17:90b:1812:b0:325:7845:fc52 with SMTP id 98e67ed59e1d1-32d43f7c115mr10798360a91.25.1757346893634;
-        Mon, 08 Sep 2025 08:54:53 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-101.dlp.protect.broadcom.com. [144.49.247.101])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-32b6d064c13sm1319252a91.5.2025.09.08.08.54.53
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Sep 2025 08:54:53 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-329dfdc23d2so4219556a91.1
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 08:54:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1757346891; x=1757951691; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NRocUMS0GDsW+ct35Z1NB+LIQVu236juAVg0bqfUsYM=;
-        b=Zs6Uazwdlkk6hft1+aXyk0l50b+IN7gxksFZMHTkzQDvDkBqQ8x3Y/00S1UHsiZT96
-         SefU6go6qbj8r4gUAsuf0j5sAkScL6Y8WarttTDYubXPpdGWz/28caivl4HJYGKA2Ugc
-         4/ZeL+zbyPpf4i67+g+L2rgLca7hMrdmpkKRA=
-X-Forwarded-Encrypted: i=1; AJvYcCV9uT0oazuTeZp7JLI6SaG8Cg6hP4a3VIiqnk2HJIPe5kQYBvGwpsFcw3solwkMcOHBudnrEOg=@vger.kernel.org
-X-Received: by 2002:a17:90b:4ac9:b0:327:531b:b85c with SMTP id 98e67ed59e1d1-32d43f99cbamr11133166a91.35.1757346891405;
-        Mon, 08 Sep 2025 08:54:51 -0700 (PDT)
-X-Received: by 2002:a17:90b:4ac9:b0:327:531b:b85c with SMTP id
- 98e67ed59e1d1-32d43f99cbamr11133142a91.35.1757346890783; Mon, 08 Sep 2025
- 08:54:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423E02F546E
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 15:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.158.5
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757346932; cv=fail; b=W2i2Jv0BBskd3DAN4WSk6FmS31LTwlnXsJNfp+eXqLdmidmKgDY3/Fm9wz/NMWOVeyiOXCyiVQ9FW8kJXFZJvFCvLIPD6u92zz9/ga/5a5jEvkQWCZZnRZQtWY8yX2zs4mROHGYfMfYX16fVgrUJK4dDpD9eG7G9q8rGpyb8UlM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757346932; c=relaxed/simple;
+	bh=vlpsI0jT+9Ff5bGdYS+gda30ANDpF801Fik0C/iQmX0=;
+	h=From:To:CC:Date:Message-ID:References:In-Reply-To:Content-Type:
+	 MIME-Version:Subject; b=tSlpVHrTss7Ke86iqx7gcwqqLfSxgk2Z2/WISAbE5bBrw319OcOaRwj7tpuhdDX2VgjA1EabE7svUc1vNh3pXAHIvTPCJHNhzEsmZ3z3wEkASQpouwXi78RuazRymkmCcjpABS6YjSgbNJZFCdaTTKh+bfbI8oLYG50IUAewMH8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=pass smtp.mailfrom=us.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UmtWr8sZ; arc=fail smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=us.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 588B1Pgb026821
+	for <netdev@vger.kernel.org>; Mon, 8 Sep 2025 15:55:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=n2JsY5
+	H2M3KKYp92/drrSvxtxNWuqVarNIn6kCSaoUI=; b=UmtWr8sZTEoDR+Vp99xcix
+	3h7eUXzj7b7QTcjCksNnF7WXZEE3bkp4Akb/S0HtcAsjoDhdyvN5a6Q7j/lvwRld
+	TBxM8geuPWc7CQ2zmjO8MW0WTN5ATu78JE6J2wA96H63J7xKN7CBln31qNQhkBPe
+	ugHTpcT6OkUHdZ8aPYaLto9GbwSbbrXsXurdbtxR/yFiJsqOrugg4EPNkk3A6v+r
+	snSYIzxr9psxRjKWZck9q6cSM+xkdypOMZH9YoHScI/nRJyXUIr7ViY8hW4bzPft
+	yX6ygRtVbb4Jt8GYZVwQkcwnhrrAuhPLYOj+SOvt7cVC5uoNOcWWuHDUaqXpUMHQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490bcsjd7k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 15:55:30 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 588Fg6FJ013774
+	for <netdev@vger.kernel.org>; Mon, 8 Sep 2025 15:55:29 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490bcsjd75-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Sep 2025 15:55:29 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 588FqjXC002285;
+	Mon, 8 Sep 2025 15:55:28 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11on2072.outbound.protection.outlook.com [40.107.236.72])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490bcsjd74-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Sep 2025 15:55:28 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zGwXF6HqSy2AlJ1g7mhwTN4wSJ0wiVtAExYaw86qFx29BISfRzalaktWU+bOu916IsXgJqaAGOI1xK+hw9LlSjT9Bh7+6Hp4Qx1d96GgI1Gtd8j5XqeBmQ3VOtot6yVRJKXRNZLNGG1UVOmY6h0Xvs6taDkHeTd2BIUPPbaFDCv4MW76pRHihqto9/CenvKGn6W4ndd3Ia1hufdGKhxBt4HhCoEZthhOkPoY/iLQCFRCHhvNu9nR+n6l4GgVkpuepa33emMUz4/iBXgVUgUtVkVFTU4G3vpe3ZE1mUEO8yoJutbLzB2HaoR2rZcr/Q95bLEeCErZ1N5UseGuaj4A4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XQH/3D/eQGu6fK6EI7DCOh8C81L3rqwpevbBP8/eFak=;
+ b=D6l2QRHOWV7oxGwdx48uJuWMqZi0YrKl0DtyYq0+qyHQXQPKZUJOd7ahZfCfr7OXMgnIIPOBSqgwjAVveB2GGNJ2eQcPOXwCl8g0FvEyocWNEavjZizugRdGBUKI0rzcVAOGLV7TP2D/tsmpcJhZIlQkfIjqe1evFhdfp32SlLpMbycQB0fGkArp/RqczATpkEbKnp5V94Y6kRwxNV5pxg5foK5KqYr7tmF8zdjmnz7Ek39iogUaVT/87xTsIKS/lgVIoApC4nq8FQRFrA2rJYchtHzUcLM+zzR8SwiVQLFaH+SBI750G90jaZFPHuAdNh4/GduhcjAqTKrCo+WaAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=us.ibm.com; dmarc=pass action=none header.from=us.ibm.com;
+ dkim=pass header.d=us.ibm.com; arc=none
+Received: from MW3PR15MB3913.namprd15.prod.outlook.com (2603:10b6:303:42::22)
+ by SN7PR15MB6070.namprd15.prod.outlook.com (2603:10b6:806:2e3::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Mon, 8 Sep
+ 2025 15:55:22 +0000
+Received: from MW3PR15MB3913.namprd15.prod.outlook.com
+ ([fe80::a1f8:4258:a99:3490]) by MW3PR15MB3913.namprd15.prod.outlook.com
+ ([fe80::a1f8:4258:a99:3490%7]) with mapi id 15.20.9094.021; Mon, 8 Sep 2025
+ 15:55:20 +0000
+From: David Wilder <wilder@us.ibm.com>
+To: Hangbin Liu <liuhangbin@gmail.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Thread-Topic: [EXTERNAL] [PATCHv2 1/2] bonding: don't set oif to bond dev when
+ getting NS target destination
+Thread-Index: AQHcIInDnf8WoMqaO0GW3jyZVxkHM7SJb1lh
+Date: Mon, 8 Sep 2025 15:55:20 +0000
+Message-ID:
+ <MW3PR15MB3913C6107F92F772D84C1750FA0CA@MW3PR15MB3913.namprd15.prod.outlook.com>
+References: <20250908062802.392300-1-liuhangbin@gmail.com>
+In-Reply-To: <20250908062802.392300-1-liuhangbin@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW3PR15MB3913:EE_|SN7PR15MB6070:EE_
+x-ms-office365-filtering-correlation-id: 679ac1a2-cff9-4ba3-edb5-08ddeef01d52
+x-ld-processed: fcf67057-50c9-4ad4-98f3-ffca64add9e9,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|10070799003|1800799024|366016|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?ay7XaXz+OgmwNnG9CwSpRZ1wPqUwjSuGklru+g0r+VSa/8ABo+vrW7f7YR?=
+ =?iso-8859-1?Q?C81tTnsYQMaBZLqdkWUENj0E1WOaDi/T64G/AqUISJleNcoAh1sJPueGb8?=
+ =?iso-8859-1?Q?XeZv0Ej9eUCvG/EBga+fOUPZ4cLAaoZcSuBH8ZGnSmw737LyFC+as7IRhu?=
+ =?iso-8859-1?Q?8cNDibzz7ABKkSjhle+JhImpKVHN/J+Uftpy8ELQhF+gBStFvvl5ol6ugJ?=
+ =?iso-8859-1?Q?ut+Cafh3YcUFpAdka6d71dC36LB40wsI+WsCR0qXPvABkhm3xl6KsQuplw?=
+ =?iso-8859-1?Q?n/kdualp1ewfmJRySWfcVzwbypdOHutqsc++tQHvHuxpUpZ71X+4pkEbgB?=
+ =?iso-8859-1?Q?Y/CdN8ylIC/N5/hD7JiQHMzynGRoiNSvLXES0C/YmuYMtiHd+cqCL0xUq+?=
+ =?iso-8859-1?Q?sJe8GyrQcC7UDDJ9fk86wtfdOrVLneonEqHEMlrFzFno3yiURPf5a1kXuY?=
+ =?iso-8859-1?Q?V2Xhj0TBlNvECucKaikMt/H4iI2b7MhNTIRtQ3AmB2C+OXS96x7+6vsiEU?=
+ =?iso-8859-1?Q?fT6oehRXHzHvOn+Sd1YNTt7Cvs8XS61zGaw3tpRFZW0BWym1d6BqbwZFt2?=
+ =?iso-8859-1?Q?R2QuF6S1kXlCqREN2SYqQSNY2BFDuNufkGtC5Vyi4j1s0zFOhRgRknZcMm?=
+ =?iso-8859-1?Q?Yz2X0M38bnZ2RA21/BJVR3sb4/oBZEFJ5OZeh2bllv5YRSUObF46JluZHI?=
+ =?iso-8859-1?Q?iR976UCSFx3HhOXfacxP31X0sAUY6dTbdNRZ3hnACtzW40e90f3H3HnhBN?=
+ =?iso-8859-1?Q?sIs0ZDMdgUwNC1JSqcqhCNJaLCRgcGLwUL66iS+DprQ9mKzzYGJTjjEk5e?=
+ =?iso-8859-1?Q?XHxsq0W7NDRTlKnxw0XRt/0h9u4SUJtJ76JhlPjhjqigjgPCn1+S6pw6Cq?=
+ =?iso-8859-1?Q?A4NUTJQwTa43y3xBBjoa/N2MWjQYf8shdqAZNJSwCn9xlobVxKp/u43lql?=
+ =?iso-8859-1?Q?FC32MIozOMoDI2iBjDSY+2Mk3UBaYFwqj+zyPh3pqYLsAPrD+ouzBJiiy8?=
+ =?iso-8859-1?Q?RZAf22wqHVN77RtuRcDpAsZAPOJ0FnPpn6UAZ3mJu5JwJveufq3z83qpW7?=
+ =?iso-8859-1?Q?SJmxm0UK+sehN87+6SidDAyFYKbo/evAYSnvmYSgCj07tP2VfRcH432eUv?=
+ =?iso-8859-1?Q?Af8CHQuP+5iuaWcQaE5Cr5xnYdEUKm/9uYyIKipn7eWaecw8QRVSmizgEX?=
+ =?iso-8859-1?Q?9HzCNY2g4BtE3RJiBTe+QRcbRFcBV0yoM2hEvhIMdJRsqAvM3Utbk6u3uI?=
+ =?iso-8859-1?Q?7kfQDBky0hQnlRcbp3TZm+nr8Tm0VOCnpUKKcXo3qXAsS7KqZL3bR5brKU?=
+ =?iso-8859-1?Q?N0ZLJSoDWFzYPeKbQbhiJqcF3bPxgTZClc4MwshMvS0GYRIjWlLIw/YWRV?=
+ =?iso-8859-1?Q?QionFygMB/Bs67faY/R2mbSZFfl1aygpBtNE7KOg+ZUtfx8jYisTPwwgJG?=
+ =?iso-8859-1?Q?rzb/LsgNesMKPZddYXkMYo3cP8JWWfSzUGR0WU8YCeern/6lO8F4iNAszW?=
+ =?iso-8859-1?Q?4=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR15MB3913.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?fl/UKineBnkxXoUtSBS2JOF8jVpzzlvUce8isi7jjqt2PS9jpRxQOCuOmM?=
+ =?iso-8859-1?Q?AdOlgBSdurPcJK17p/6AVZB0ImFBS/5nKS1XBDZJVBYxVF07uEQZ3lg1Jz?=
+ =?iso-8859-1?Q?juiKPHRMQZfAVsvKn0OimS180SjYBjSp1xfwoLVmmDDMh0NJdmCrMyc1kp?=
+ =?iso-8859-1?Q?ZCr0C4fomGVY+KTiK0DlcAhx6HMCbwymkwxj/cctabMAXTWyEdE6zTM+6l?=
+ =?iso-8859-1?Q?yRukWYU+tiUqAmSxYTLci9VeVmrHu3bk3nzpMh2f31PDQC4kK4yCJlix78?=
+ =?iso-8859-1?Q?6INW+3xQBMKRWMpwRHtH16YnItvp+aMrKxwTSZS4kdLGiSbcOw5gCrS+Jd?=
+ =?iso-8859-1?Q?OJSBN76kBK83W1L2tE1noZKwCXDYmAig0FboHmoFto71I6Nap4lNRMTIkV?=
+ =?iso-8859-1?Q?bbsxT60I8j9xSOKkH67DFX5tat9JHfjysxAg4bsI7v5vsg7VqTOPaIHv9R?=
+ =?iso-8859-1?Q?B2gZ3cOwVurk7bnSEqNsYMFAQpH1jJaTNqCgiGumwt/1Q7oy804JbXHehj?=
+ =?iso-8859-1?Q?0jQTBbt6ZVj54RllxzUxkczPvokCO9EC4YpHi/vdO2pYqaGlnQoij9f2/c?=
+ =?iso-8859-1?Q?y6GjHCOWgNEpi8ayZf7MZMKVMFAnKADKtYeyCw6lNUWwCm2gWO3qjJMb6I?=
+ =?iso-8859-1?Q?u863SUzYZ2+Yz3168mEWDWFQtP4YC/IvO60fGHZa8IuB9lDWMFJkNvvw/I?=
+ =?iso-8859-1?Q?134o1jIFv63YFOHW3vC6fhPAnUxdcMfSg/Lj06fqmL3QFN6erpy7a5JHFo?=
+ =?iso-8859-1?Q?BJ/1bj+FRoYP+V+cImrhkfIUVEUFxr3aax4DDhlsZgv/alwnk2ShYer1C8?=
+ =?iso-8859-1?Q?Y0YdeqJIAR0FdHbdstVDEJr0VAv/SHzuYcyOq/BliH6smjaQJZH2KqE9mj?=
+ =?iso-8859-1?Q?1FUaqcUKx61zgdR2/8qDkTZYIAE1mgjHj5XfVCG7AUAM9SYfjM4NityidO?=
+ =?iso-8859-1?Q?0WSBu5e5cRI5VPz+0Yfh+Eak98xII4KyAYZkgsp1KvlAFpFyqn/xO0TFLQ?=
+ =?iso-8859-1?Q?bY/QarXRR1bBlbM7yF194ItUAZGWKUxZWfdHPkZF51WdFMQxSLvG7ra/UV?=
+ =?iso-8859-1?Q?gVdPURYpvuOpVeudYO7QGKsn2Z7dtQqHUQ4hFV+UqpTbh7f+nva2UhdGpk?=
+ =?iso-8859-1?Q?UEWbKtGJaL7vFBNo1cC6jzUgsr2QqnI4eQfAM2ERABsUwz6bGnBfA9SHef?=
+ =?iso-8859-1?Q?bBQCA2tqf43DA98kUPQS+WaJRy+mpmJcQprHvlw7xOtXuvQPSgCrpTeWo7?=
+ =?iso-8859-1?Q?rfQitUODNZHJVK9shjaKt8ubx6ORl9AMlxESEHFsoCS6DTsO2KT7d1hSG8?=
+ =?iso-8859-1?Q?lxsp68yoLQZ/TL6BTn4i5n7pTcKk7nq/wIoauJ/puXl4ZhJYOjBMSid1qK?=
+ =?iso-8859-1?Q?CijaAd2RnwH6tz3Ic4BA1uSW5MrJMUe1Ylg3b7c5ASAA8q/TWR0Ei8Wt5Q?=
+ =?iso-8859-1?Q?TBp9p5aHE7Nq+urEgneivdqyivuT8Wvy8Iy06HbyEh6y+B6SJZZGYv76xE?=
+ =?iso-8859-1?Q?FOYThWwAKsoLvUpI0+1uhhpqPRKO/XfXl/z867/nbFN5D+N0JkzLdGNkNI?=
+ =?iso-8859-1?Q?jqq452rucpUsGXHpKmprpbkXa3hcFax0W7HjbKcZdcvLQ1tXQPgpGuex/g?=
+ =?iso-8859-1?Q?IvksJmRiDG8KBs4A07osjaMuLZqEoH+xDoyG9c/BGZt4D3gsGVS+LiqCUA?=
+ =?iso-8859-1?Q?WwPfksp2w50LXHY2cYk=3D?=
+X-OriginatorOrg: us.ibm.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR15MB3913.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 679ac1a2-cff9-4ba3-edb5-08ddeef01d52
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Sep 2025 15:55:20.7640
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: fcf67057-50c9-4ad4-98f3-ffca64add9e9
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RCeogLW8P6nMcwSMn46VbdQfNlEAdId2y7QNkXLAuBG9ttVdAGnEW2Myo/E9q2krfNxP4/QIH/QlfLCUV5JDgw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR15MB6070
+X-Proofpoint-GUID: 1r8PStcFuk8BLRldZ4JNF6P99zU1pZhZ
+X-Proofpoint-ORIG-GUID: v6wRoVxXMSHtnlNawT6q8k3TGGFV5ZJj
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAxMCBTYWx0ZWRfX1OnPHRud/X1R
+ Kbyuniu9+JT+k3HkaNbYQKXBln9q2UI903oZeRkjy6iChD+136yrkHASRXV5SS6Zx5qpnAjZkMM
+ HmnZzahaz7l0jtoCGzYvcmVxsBi6WL5aZJ2zSE6Vg1nfjxkHyLjTardxBeh++fFRcHqQ7Qn6KFJ
+ RNzKRI5ql2A51D81NjmdiQV8yDSxd2fUsY5M+rOfDb49iQR409SBTBmN5Wfbu9iCE1qNLWzAX8v
+ WckREZmw3YPudjEh3jxR6qver8gjSErZk5wn8ZMy7X79bfiNKbQWbBpgFD+8rgeS21x1OcJYwEd
+ regdqfFm5u2Szm7RvEDWFLoPgVTb2l+dQCRPNO9YTBehx0uQeSObPzolCqmLiUB5L+3RvQgp7L5
+ 5ROj2Hoq
+X-Authority-Analysis: v=2.4 cv=SKNCVPvH c=1 sm=1 tr=0 ts=68befc71 cx=c_pps
+ a=iNbKu3seLnfQiesHBt/AFA==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=8nJEP1OIZ-IA:10
+ a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8
+ a=2OjVGFKQAAAA:8 a=0tQDRS-zP3QmMU3WfwsA:9 a=wPNLvfGTeEIA:10
+ a=IYbNqeBGBecwsX3Swn6O:22
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com> <175734586236.468086.14323497345307202416.b4-ty@kernel.org>
-In-Reply-To: <175734586236.468086.14323497345307202416.b4-ty@kernel.org>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 8 Sep 2025 21:24:39 +0530
-X-Gm-Features: Ac12FXx3YEn7C6Xz12Tubv-IWQXGMfwafg6SZ5dYN4z6O413nX6iIKomcnRTTj8
-Message-ID: <CAH-L+nPP+UU_0NQTh_WTNrrJ5t9GraES0x2r=FyvDMW_Wk2tEg@mail.gmail.com>
-Subject: Re: [PATCH rdma-next 00/10] RDMA/bnxt_re: Add receive flow steering support
-To: Leon Romanovsky <leon@kernel.org>
-Cc: jgg@ziepe.ca, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	andrew.gospodarek@broadcom.com, selvin.xavier@broadcom.com, 
-	michael.chan@broadcom.com
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003db014063e4c3522"
+Subject: Re:  [PATCHv2 1/2] bonding: don't set oif to bond dev when getting NS
+ target destination
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-08_05,2025-09-08_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1011 bulkscore=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 adultscore=0 phishscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=2 engine=8.19.0-2507300000 definitions=main-2509060010
 
---0000000000003db014063e4c3522
-Content-Type: multipart/alternative; boundary="0000000000002c41e5063e4c3516"
 
---0000000000002c41e5063e4c3516
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Leon,
 
-It looks like you have merged V1 of the series. I had already pushed a V2
-of the series which fixes an issue in Patch#10.
+________________________________________
+From: Hangbin Liu <liuhangbin@gmail.com>
+Sent: Sunday, September 7, 2025 11:28 PM
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh; Andrew Lunn; David S. Miller; Eric Dumazet; Jakub Kicinsk=
+i; Paolo Abeni; Simon Horman; Shuah Khan; linux-kselftest@vger.kernel.org; =
+Hangbin Liu; David Wilder
+Subject: [EXTERNAL] [PATCHv2 1/2] bonding: don't set oif to bond dev when g=
+etting NS target destination
 
-I can push the changes made in Patch#10 as a follow up patch. Please let me
-know.
 
-On Mon, Sep 8, 2025 at 9:07=E2=80=AFPM Leon Romanovsky <leon@kernel.org> wr=
-ote:
-
+> Unlike IPv4, IPv6 routing strictly requires the source address to be valid
+> on the outgoing interface. If the NS target is set to a remote VLAN inter=
+face,
+> and the source address is also configured on a VLAN over a bond interface,
+> setting the oif to the bond device will fail to retrieve the correct
+> destination route.
 >
-> On Fri, 22 Aug 2025 09:37:51 +0530, Kalesh AP wrote:
-> > The RDMA stack allows for applications to create IB_QPT_RAW_PACKET
-> > QPs, which receive plain Ethernet packets. This patch adds
-> ib_create_flow()
-> > and ib_destroy_flow() support in the bnxt_re driver. For now, only the
-> > sniffer rule is supported to receive all port traffic. This is to suppo=
-rt
-> > tcpdump over the RDMA devices to capture the packets.
-> >
-> > Patch#1 is Ethernet driver change to reserve more stats context to RDMA
-> device.
-> > Patch#2, #3 and #4 are code refactoring changes in preparation for
-> subsequent patches.
-> > Patch#5 adds support for unique GID.
-> > Patch#6 adds support for mirror vnic.
-> > Patch#7 adds support for flow create/destroy.
-> > Patch#8 enables the feature by initializing FW with roce_mirror support=
-.
-> > Patch#9 is to improve the timeout value for the commands by using
-> firmware provided message timeout value.
-> > Patch#10 is another related cleanup patch to remove unnecessary checks.
-> >
-> > [...]
+> Fix this by not setting the oif to the bond device when retrieving the NS
+> target destination. This allows the correct destination device (the VLAN
+> interface) to be determined, so that bond_verify_device_path can return t=
+he
+> proper VLAN tags for sending NS messages.
 >
-> Applied, thanks!
+> Reported-by: David Wilder <wilder@us.ibm.com>
+> Closes: https://lore.kernel.org/netdev/aGOKggdfjv0cApTO@fedora/=20
+> Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
+> Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
 >
-> [01/10] bnxt_en: Enhance stats context reservation logic
->         https://git.kernel.org/rdma/rdma/c/47bd8cafcbf007
-> [02/10] RDMA/bnxt_re: Add data structures for RoCE mirror support
->         https://git.kernel.org/rdma/rdma/c/a99b2425cc6091
-> [03/10] RDMA/bnxt_re: Refactor hw context memory allocation
->         https://git.kernel.org/rdma/rdma/c/877d90abaa9eae
-> [04/10] RDMA/bnxt_re: Refactor stats context memory allocation
->         https://git.kernel.org/rdma/rdma/c/bebe1a1bb1cff3
-> [05/10] RDMA/bnxt_re: Add support for unique GID
->         https://git.kernel.org/rdma/rdma/c/b8f4e7f1a275ba
-> [06/10] RDMA/bnxt_re: Add support for mirror vnic
->         https://git.kernel.org/rdma/rdma/c/c23c893e3a02a5
-> [07/10] RDMA/bnxt_re: Add support for flow create/destroy
->         https://git.kernel.org/rdma/rdma/c/525b4368864c7e
-> [08/10] RDMA/bnxt_re: Initialize fw with roce_mirror support
->         https://git.kernel.org/rdma/rdma/c/d1dde88622b99c
-> [09/10] RDMA/bnxt_re: Use firmware provided message timeout value
->         https://git.kernel.org/rdma/rdma/c/d7fc2e1a321cf7
-> [10/10] RDMA/bnxt_re: Remove unnecessary condition checks
->         https://git.kernel.org/rdma/rdma/c/dfc78ee86d8f50
+> v2: split the patch into 2 parts, the kernel change and test update (Jay =
+Vosburgh)
 >
-> Best regards,
+> ---
+>  drivers/net/bonding/bond_main.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+> index 257333c88710..30cf97f4e814 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -3355,7 +3355,6 @@ static void bond_ns_send_all(struct bonding *bond, =
+struct slave *slave)
+>                 /* Find out through which dev should the packet go */
+>                 memset(&fl6, 0, sizeof(struct flowi6));
+>                 fl6.daddr =3D targets[i];
+> -               fl6.flowi6_oif =3D bond->dev->ifindex;
+>
+>                 dst =3D ip6_route_output(dev_net(bond->dev), NULL, &fl6);
+>                 if (dst->error) {
 > --
-> Leon Romanovsky <leon@kernel.org>
->
->
->
+> 2.50.1
 
---=20
-Regards,
-Kalesh AP
+I verified this solves the issue with a single level of vlan tags.
+Thanks for fixing this.
 
---0000000000002c41e5063e4c3516
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi Leon,<div><br></div><div>It looks like you have merged =
-V1 of the series. I had already pushed a V2 of the series which fixes an is=
-sue in Patch#10.</div><div><br></div><div>I can push the changes made in Pa=
-tch#10 as a follow=C2=A0up patch. Please let me know.</div></div><br><div c=
-lass=3D"gmail_quote gmail_quote_container"><div dir=3D"ltr" class=3D"gmail_=
-attr">On Mon, Sep 8, 2025 at 9:07=E2=80=AFPM Leon Romanovsky &lt;<a href=3D=
-"mailto:leon@kernel.org">leon@kernel.org</a>&gt; wrote:<br></div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px s=
-olid rgb(204,204,204);padding-left:1ex"><br>
-On Fri, 22 Aug 2025 09:37:51 +0530, Kalesh AP wrote:<br>
-&gt; The RDMA stack allows for applications to create IB_QPT_RAW_PACKET<br>
-&gt; QPs, which receive plain Ethernet packets. This patch adds ib_create_f=
-low()<br>
-&gt; and ib_destroy_flow() support in the bnxt_re driver. For now, only the=
-<br>
-&gt; sniffer rule is supported to receive all port traffic. This is to supp=
-ort<br>
-&gt; tcpdump over the RDMA devices to capture the packets.<br>
-&gt; <br>
-&gt; Patch#1 is Ethernet driver change to reserve more stats context to RDM=
-A device.<br>
-&gt; Patch#2, #3 and #4 are code refactoring changes in preparation for sub=
-sequent patches.<br>
-&gt; Patch#5 adds support for unique GID.<br>
-&gt; Patch#6 adds support for mirror vnic.<br>
-&gt; Patch#7 adds support for flow create/destroy.<br>
-&gt; Patch#8 enables the feature by initializing FW with roce_mirror suppor=
-t.<br>
-&gt; Patch#9 is to improve the timeout value for the commands by using firm=
-ware provided message timeout value.<br>
-&gt; Patch#10 is another related cleanup patch to remove unnecessary checks=
-.<br>
-&gt; <br>
-&gt; [...]<br>
-<br>
-Applied, thanks!<br>
-<br>
-[01/10] bnxt_en: Enhance stats context reservation logic<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/4=
-7bd8cafcbf007" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/47bd8cafcbf007</a><br>
-[02/10] RDMA/bnxt_re: Add data structures for RoCE mirror support<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/a=
-99b2425cc6091" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/a99b2425cc6091</a><br>
-[03/10] RDMA/bnxt_re: Refactor hw context memory allocation<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/8=
-77d90abaa9eae" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/877d90abaa9eae</a><br>
-[04/10] RDMA/bnxt_re: Refactor stats context memory allocation<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/b=
-ebe1a1bb1cff3" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/bebe1a1bb1cff3</a><br>
-[05/10] RDMA/bnxt_re: Add support for unique GID<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/b=
-8f4e7f1a275ba" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/b8f4e7f1a275ba</a><br>
-[06/10] RDMA/bnxt_re: Add support for mirror vnic<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/c=
-23c893e3a02a5" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/c23c893e3a02a5</a><br>
-[07/10] RDMA/bnxt_re: Add support for flow create/destroy<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/5=
-25b4368864c7e" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/525b4368864c7e</a><br>
-[08/10] RDMA/bnxt_re: Initialize fw with roce_mirror support<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/d=
-1dde88622b99c" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/d1dde88622b99c</a><br>
-[09/10] RDMA/bnxt_re: Use firmware provided message timeout value<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/d=
-7fc2e1a321cf7" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/d7fc2e1a321cf7</a><br>
-[10/10] RDMA/bnxt_re: Remove unnecessary condition checks<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://git.kernel.org/rdma/rdma/c/d=
-fc78ee86d8f50" rel=3D"noreferrer" target=3D"_blank">https://git.kernel.org/=
-rdma/rdma/c/dfc78ee86d8f50</a><br>
-<br>
-Best regards,<br>
--- <br>
-Leon Romanovsky &lt;<a href=3D"mailto:leon@kernel.org" target=3D"_blank">le=
-on@kernel.org</a>&gt;<br>
-<br>
-<br>
-</blockquote></div><div><br clear=3D"all"></div><div><br></div><span class=
-=3D"gmail_signature_prefix">-- </span><br><div dir=3D"ltr" class=3D"gmail_s=
-ignature"><div dir=3D"ltr">Regards,<div>Kalesh AP</div></div></div>
-
---0000000000002c41e5063e4c3516--
-
---0000000000003db014063e4c3522
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJgMIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcN
-AQkEMSIEIG5YSA5ikMyrxNMlyXU+QeRe9ZOVKrNF37rgX2Z/x2/gMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDkwODE1NTQ1MVowXAYJKoZIhvcNAQkPMU8wTTAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAKN/HyOGTl074z5/R5OysO151gob
-UBEjsX5G2asR//tRFxjsej8MVab21s3DCPRtcwQ+wTc6z0yWS7cHXzzTQuwbHqWTtA5XzaAX3ABD
-UrR03HPCLYC1+VeNrmXN6HU+bfPTWPzD0giUXVm+I9aWSEk0FW7IYKk2APhICDLkvmDXY/7MClru
-QWF/4Cc+CiCJAsZxvkQtWnA60W+d8Q73e8VF8dSlkFAR/vbM/srTqtulbwPCeMT6v515B17wb6a+
-f9pWIuFdRj13ZE6H2L/KBcK6w3W2x1r+CBWZMYzWqgbu8S0ncHSvc+5412DXv1SHzgsUQkYgEOnt
-8IcMm4v/KQI=
---0000000000003db014063e4c3522--
+Tested-by: David Wilder <wilder@us.ibm.com>=
 
