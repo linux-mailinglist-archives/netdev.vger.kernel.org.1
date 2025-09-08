@@ -1,338 +1,114 @@
-Return-Path: <netdev+bounces-220990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85095B49CA7
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:02:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6D2B49CD2
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 413A63A7406
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:02:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 391DF1696E2
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECD52EB840;
-	Mon,  8 Sep 2025 22:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BC22E11CB;
+	Mon,  8 Sep 2025 22:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l8t2XxIA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MdqUYpqG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A042E0B48;
-	Mon,  8 Sep 2025 22:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C28417E0;
+	Mon,  8 Sep 2025 22:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757368937; cv=none; b=UJDMvIvbXuGQbSM0gGyST9ZVQlJtyqP20WwloEL3AfEDmMWPIPxuGsATI6GTE7+ZFgChL2icleZPeWof/ztBVvbpUTrjq/togZ3YxOPZv/DABFp7lLmtnz6Y5TikbjcNYPSZpmfWhAhpzpgSuKJpiYHIWHbzUxxduOzEqurY/KE=
+	t=1757370500; cv=none; b=eR0w8HzqIgL27gd0OV5niTlJwSYYmNEblu1N07NFqN6i44t9pIETvjCn+rzil8rSiyHG9TAP4JKrJ5ROdD8YPePrLq9+vSJIEQPfNiv7d7lPYhwAodCoivX/tpKotwmYquFXEXjkLJeflyMKbpKb1e/yhJWCsoqj+E2Dz8TBtJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757368937; c=relaxed/simple;
-	bh=7NY4au+FVcHrL1Ppuem7gZipZUMhri1geaZszZwCD5Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JVGii+z+82oz3Z/InTQVGKXRpGNP/Je3X8lDJKAbA3Jv3RI/T92O/b+Ai9KOWnxb0k+y4W3ZvNcKvhY0QXOMvYpRu0Wcmi2gIjf0xP+1N62JEwVkiTW7mXvFwlEQdsDtxcLeQe437s4HVSE3pP0N2YF1L7ewTq5AEIaADIz7MKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l8t2XxIA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 588FD4SO027077;
-	Mon, 8 Sep 2025 22:02:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=I7eqHUoxoVp4Ft9D7
-	njwXRV3GwVh95kt1h9dSGvY0zI=; b=l8t2XxIAOHM3HQQg6AbzbM7g1n0gTXLkK
-	jkVxb5FWtINjMyVeresqQMjm5TUU6Qjg9PsSNhkX+mxIRjqGbpe6tSWKh0lGtIOj
-	Bd7qGhKBBZUnHyx3WwwvyMWqWlprK5DFYV1TER3fWuuVoHAryPOGcvhjy+sCamD1
-	zTlr5J46gnkH1YP7rFz0UMmkLvLF+AXpu32zyo7EwxMSUrcU8uLTQAYfXb3FzXVz
-	s3+G2WF8k7d6qxYrTag8E9C+nUBl6mbhAYXHf9yYZDHfaUDRrZ/MgPCXfoa0q79+
-	uSBJdPmVpquEuE5mt17wBBSu2mehctefCcVJD2TACGyImAM/MxKGQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490xycs1x7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Sep 2025 22:02:11 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 588M2BFd027898;
-	Mon, 8 Sep 2025 22:02:11 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490xycs1x2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Sep 2025 22:02:11 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 588M0ZhA017188;
-	Mon, 8 Sep 2025 22:02:10 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4911gm7wn0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Sep 2025 22:02:10 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 588M26O331851136
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Sep 2025 22:02:06 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 758F620040;
-	Mon,  8 Sep 2025 22:02:06 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 30CD42004B;
-	Mon,  8 Sep 2025 22:02:06 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Sep 2025 22:02:06 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Subject: [PATCH net-next v2 2/2] net/smc: handle -ENOMEM from smc_wr_alloc_link_mem gracefully
-Date: Tue,  9 Sep 2025 00:01:50 +0200
-Message-ID: <20250908220150.3329433-3-pasic@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250908220150.3329433-1-pasic@linux.ibm.com>
-References: <20250908220150.3329433-1-pasic@linux.ibm.com>
+	s=arc-20240116; t=1757370500; c=relaxed/simple;
+	bh=m4yQKmO+d3v3uARMNsQcQ6nCmZN/cPeNtIkoOGqQ/Yg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UERIXkiVLCUA2l6QgHVhM2U5N2kTQA521BGKCTl/cXW5v14I11bnLdOY9/JSjaiw98vOW1I68mQ6mXrURHpawxdXvw+lRcmxaONMOXNlAvkhgylCMDCVSgOBzpuREugy1Pn+d0IEsJp8Q2mB4OehL8lH6LP4Sy7AlSCPD+oFSwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MdqUYpqG; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-71d60110772so45525967b3.0;
+        Mon, 08 Sep 2025 15:28:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757370498; x=1757975298; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m4yQKmO+d3v3uARMNsQcQ6nCmZN/cPeNtIkoOGqQ/Yg=;
+        b=MdqUYpqGKD6K9DGYWy5SUDFuQqtEy/bPipX4kxPsufgwg/FTI4hdC0zChPdJJYXx7V
+         LKwjrqlHCUw/DrRTdOuc+zh9PUKaL7aTyBYAkDXXyYbhp4589MQHvOfIf0dmzUdrX8zQ
+         J7UARJNRJLA/5WuFnA0IaFEQ44r9Vkmzsb0CzcOsfpByRkOcmBbW3EBmyqwIBETFglo8
+         2KIbnjAsmMAFRd5o+vj914wiwsbxSk80sbCy3XAh7/jp3VD+FxeW1PUwSdfa8TGXp9HN
+         nIUhqwcMhDOiOYMYOy3NhdnrzfncobSM/WO6vyOGNwEUi0E1mgv6CMAx1X1Scvyfkq2n
+         Jwvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757370498; x=1757975298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m4yQKmO+d3v3uARMNsQcQ6nCmZN/cPeNtIkoOGqQ/Yg=;
+        b=a0ap0t52TvbJMpbgfuik6EvxGA5BT0p2AQigBO9ZUsOoG/pfdNUXvf3XqaBqKeDqdR
+         IGTRXa17s3amCgwy+sz7lwgBj3Ynp+80HCwiIfw9B1sjhKp0CuYzMEawsruegRORAUkQ
+         faIyg87/cOp5vZPzdIFdnZWDKTlkOchzaBwj8vctKSBDUWvUyV+DMaQi8ryfUPmja682
+         by7oqMbW+put1DZSSA+iv2vDnqsnCMqKdY+LEUuuYUKl/ygUPHCzpnS2YHwhuUwiX01w
+         4vMT0lyuCzj3qXBBlbQdY2dQQTrodgby7NAw8hQM8dUYkvWyODymFQNfDg7mZgqLnOa1
+         A0Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCWExz8PlixVi40xdODx08gLv9ENnTe5M3UBEGNJt6DWrrkHXKMTPjk2f/XAZO8JjUzUJ9TuZPw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiKLPHGoRbZLFXUIH6UFhJOCHzSrtyHCyRfr3mMmKHh+vMo5I3
+	mcLKvL0QYc4aNaLuKpUtQKuw1+ETlYtZi2DVslCafjB6QghrN3+E25asPvxO1gE28v//sus19Lb
+	P4ddZ+jACdrZ+YOMjQW8itRFVVf+/QEA=
+X-Gm-Gg: ASbGncsd/xhjaTSld3vxzwif6a8BOsYfb0IsVHj5AEWxyJZdWLilQPvLsXFBa/OXdS4
+	sR2/thf8qWPr/BRHnt+oHpGkxn8dnt9ppBip2qJxC5b7I/vBvXftRPlqWPSJrh7m7d0QTq85BfP
+	tdpFYYl8WuZX52crP+ZxXZkTxvW8Ox4jKLR86fViMP2fWCfApOnWJ2c6tqOmbIKfhrEnqFxn1Y8
+	G+KW4Ej/A1fFQnlnUo=
+X-Google-Smtp-Source: AGHT+IEyXaJaECKXGoaCNZp5YdtfSWlBqqNX+36MeRel19gaqZvr/5W8qHzO5AmXIx6DhodWR99eMU3qvA4054OSino=
+X-Received: by 2002:a05:690c:46c1:b0:719:edff:65a3 with SMTP id
+ 00721157ae682-727f652c203mr73481847b3.29.1757370497946; Mon, 08 Sep 2025
+ 15:28:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: pe98gGZTqXxbY0TJr6moTRohHPiMPIsN
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDIzNSBTYWx0ZWRfX/BuYjfEd5uyz
- EklwP5h/e+wSM2RXbqwOb3b03HstKMHfnuc932avFcsWKL6JwE3m8XUxsnqfWjMufnZJ5SvEpWI
- W2qJMVgxMlj2wyjdq2e6+sOGQM/YMhkrBWcyKHkQt7Ux/KNT8WCocXNYjXrjcwzhW8pUH8YmKVZ
- rqr1ThuQPolJb5HX2aHPa066mFYwYA7HRdx4hbBwslwztYNtb80CYmg97kdMNpNTbEpBYrlMFxY
- cHJFEdZ2/CmiVPrz9Sxnr5nPIrgFEF39Ywl9QWV4k+uu5To+fRjZgK72PJtM4id2Lw17CqfQKX1
- Pd9d5G2qBGdXffAtDYEti6iY4I+x9HkRoW/GYtXLy5OCkgdxSJal5wLvtb7DNheyQBRrUBM4k/c
- RMvcYUzt
-X-Proofpoint-GUID: 8APDllAdHVL77cDITuVXnJbKh-3j4E4p
-X-Authority-Analysis: v=2.4 cv=F59XdrhN c=1 sm=1 tr=0 ts=68bf5263 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=uE9bR6y1tBfQdXGO-kEA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-08_06,2025-09-08_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 suspectscore=0 phishscore=0 clxscore=1015
- impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509060235
+References: <20250905173352.3759457-1-ameryhung@gmail.com> <20250905173352.3759457-4-ameryhung@gmail.com>
+ <54cddbbd-1c0d-467a-af49-bb6484a62f26@linux.dev>
+In-Reply-To: <54cddbbd-1c0d-467a-af49-bb6484a62f26@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 8 Sep 2025 15:28:05 -0700
+X-Gm-Features: Ac12FXxeGt0TQEa2ZLqz3ofugznPj3MR6j0O5O-_zFdoaOprDQZ--x0GvxIwdfs
+Message-ID: <CAMB2axP=fUpeCnKGRCJtqU9cdrtv6M9WDFUMjpmFvEZdj_+g2A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 3/7] bpf: Support pulling non-linear xdp data
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, kuba@kernel.org, 
+	stfomichev@gmail.com, martin.lau@kernel.org, mohsin.bashr@gmail.com, 
+	noren@nvidia.com, dtatulea@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com, 
+	mbloch@nvidia.com, maciej.fijalkowski@intel.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Currently if a -ENOMEM from smc_wr_alloc_link_mem() is handled by
-giving up and going the way of a TCP fallback. This was reasonable
-before the sizes of the allocations there were compile time constants
-and reasonably small. But now those are actually configurable.
+On Mon, Sep 8, 2025 at 12:27=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 9/5/25 10:33 AM, Amery Hung wrote:
+> > An unused argument, flags is reserved for future extension (e.g.,
+> > tossing the data instead of copying it to the linear data area).
+>
+> > +__bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len, u64 flags=
+)
+>
+> I was thinking the flag may be needed to avoid copy. I think we have rece=
+ntly
+> concluded that bpf_xdp_adjust_head can support shrink on multi buf also. =
+If it
+> is the case, it is probably better to keep a similar api as the
+> bpf_skb_pull_data which does not have the flags argument.
+>
 
-So instead of giving up, keep retrying with half of the requested
-size unless we dip below the old static sizes -- then give up!
-
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-Reviewed-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
----
- Documentation/networking/smc-sysctl.rst |  9 ++++---
- net/smc/smc_core.c                      | 34 +++++++++++++++++--------
- net/smc/smc_core.h                      |  2 ++
- net/smc/smc_wr.c                        | 28 ++++++++++----------
- 4 files changed, 46 insertions(+), 27 deletions(-)
-
-diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
-index d533830df28f..846fdea87c84 100644
---- a/Documentation/networking/smc-sysctl.rst
-+++ b/Documentation/networking/smc-sysctl.rst
-@@ -85,9 +85,10 @@ smcr_pref_send_wr - INTEGER
- 
- 	Please be aware that all the buffers need to be allocated as a physically
- 	continuous array in which each element is a single buffer and has the size
--	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
-+	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retrying
-+	with half of the buffer count until it is ether successful or (unlikely)
-+	we dip below the old hard coded value which is 16 where we give up much
- 	like before having this control.
--	this control.
- 
- 	Default: 16
- 
-@@ -104,7 +105,9 @@ smcr_pref_recv_wr - INTEGER
- 
- 	Please be aware that all the buffers need to be allocated as a physically
- 	continuous array in which each element is a single buffer and has the size
--	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
-+	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retrying
-+	with half of the buffer count until it is ether successful or (unlikely)
-+	we dip below the old hard coded value which is 16 where we give up much
- 	like before having this control.
- 
- 	Default: 48
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index 262746e304dd..d55511d79cc2 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -810,6 +810,8 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
- 	lnk->clearing = 0;
- 	lnk->path_mtu = lnk->smcibdev->pattr[lnk->ibport - 1].active_mtu;
- 	lnk->link_id = smcr_next_link_id(lgr);
-+	lnk->pref_send_wr = lgr->pref_send_wr;
-+	lnk->pref_recv_wr = lgr->pref_recv_wr;
- 	lnk->lgr = lgr;
- 	smc_lgr_hold(lgr); /* lgr_put in smcr_link_clear() */
- 	lnk->link_idx = link_idx;
-@@ -836,27 +838,39 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
- 	rc = smc_llc_link_init(lnk);
- 	if (rc)
- 		goto out;
--	rc = smc_wr_alloc_link_mem(lnk);
--	if (rc)
--		goto clear_llc_lnk;
- 	rc = smc_ib_create_protection_domain(lnk);
- 	if (rc)
--		goto free_link_mem;
--	rc = smc_ib_create_queue_pair(lnk);
--	if (rc)
--		goto dealloc_pd;
-+		goto clear_llc_lnk;
-+	do {
-+		rc = smc_ib_create_queue_pair(lnk);
-+		if (rc)
-+			goto dealloc_pd;
-+		rc = smc_wr_alloc_link_mem(lnk);
-+		if (!rc)
-+			break;
-+		else if (rc != -ENOMEM) /* give up */
-+			goto destroy_qp;
-+		/* retry with smaller ... */
-+		lnk->pref_send_wr /= 2;
-+		lnk->pref_recv_wr /= 2;
-+		/* ... unless droping below old SMC_WR_BUF_SIZE */
-+		if (lnk->pref_send_wr < 16 || lnk->pref_recv_wr < 48)
-+			goto destroy_qp;
-+		smc_ib_destroy_queue_pair(lnk);
-+	} while (1);
-+
- 	rc = smc_wr_create_link(lnk);
- 	if (rc)
--		goto destroy_qp;
-+		goto free_link_mem;
- 	lnk->state = SMC_LNK_ACTIVATING;
- 	return 0;
- 
-+free_link_mem:
-+	smc_wr_free_link_mem(lnk);
- destroy_qp:
- 	smc_ib_destroy_queue_pair(lnk);
- dealloc_pd:
- 	smc_ib_dealloc_protection_domain(lnk);
--free_link_mem:
--	smc_wr_free_link_mem(lnk);
- clear_llc_lnk:
- 	smc_llc_link_clear(lnk, false);
- out:
-diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
-index 78d5bcefa1b8..18ba0364ff52 100644
---- a/net/smc/smc_core.h
-+++ b/net/smc/smc_core.h
-@@ -174,6 +174,8 @@ struct smc_link {
- 	struct completion	llc_testlink_resp; /* wait for rx of testlink */
- 	int			llc_testlink_time; /* testlink interval */
- 	atomic_t		conn_cnt; /* connections on this link */
-+	u16			pref_send_wr;
-+	u16			pref_recv_wr;
- };
- 
- /* For now we just allow one parallel link per link group. The SMC protocol
-diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-index 606fe0bec4ef..632d095599ed 100644
---- a/net/smc/smc_wr.c
-+++ b/net/smc/smc_wr.c
-@@ -548,9 +548,9 @@ void smc_wr_remember_qp_attr(struct smc_link *lnk)
- 		    IB_QP_DEST_QPN,
- 		    &init_attr);
- 
--	lnk->wr_tx_cnt = min_t(size_t, lnk->lgr->pref_send_wr,
-+	lnk->wr_tx_cnt = min_t(size_t, lnk->pref_send_wr,
- 			       lnk->qp_attr.cap.max_send_wr);
--	lnk->wr_rx_cnt = min_t(size_t, lnk->lgr->pref_recv_wr,
-+	lnk->wr_rx_cnt = min_t(size_t, lnk->pref_recv_wr,
- 			       lnk->qp_attr.cap.max_recv_wr);
- }
- 
-@@ -742,51 +742,51 @@ int smc_wr_alloc_lgr_mem(struct smc_link_group *lgr)
- int smc_wr_alloc_link_mem(struct smc_link *link)
- {
- 	/* allocate link related memory */
--	link->wr_tx_bufs = kcalloc(link->lgr->pref_send_wr,
-+	link->wr_tx_bufs = kcalloc(link->pref_send_wr,
- 				   SMC_WR_BUF_SIZE, GFP_KERNEL);
- 	if (!link->wr_tx_bufs)
- 		goto no_mem;
--	link->wr_rx_bufs = kcalloc(link->lgr->pref_recv_wr, SMC_WR_BUF_SIZE,
-+	link->wr_rx_bufs = kcalloc(link->pref_recv_wr, SMC_WR_BUF_SIZE,
- 				   GFP_KERNEL);
- 	if (!link->wr_rx_bufs)
- 		goto no_mem_wr_tx_bufs;
--	link->wr_tx_ibs = kcalloc(link->lgr->pref_send_wr,
-+	link->wr_tx_ibs = kcalloc(link->pref_send_wr,
- 				  sizeof(link->wr_tx_ibs[0]), GFP_KERNEL);
- 	if (!link->wr_tx_ibs)
- 		goto no_mem_wr_rx_bufs;
--	link->wr_rx_ibs = kcalloc(link->lgr->pref_recv_wr,
-+	link->wr_rx_ibs = kcalloc(link->pref_recv_wr,
- 				  sizeof(link->wr_rx_ibs[0]),
- 				  GFP_KERNEL);
- 	if (!link->wr_rx_ibs)
- 		goto no_mem_wr_tx_ibs;
--	link->wr_tx_rdmas = kcalloc(link->lgr->pref_send_wr,
-+	link->wr_tx_rdmas = kcalloc(link->pref_send_wr,
- 				    sizeof(link->wr_tx_rdmas[0]),
- 				    GFP_KERNEL);
- 	if (!link->wr_tx_rdmas)
- 		goto no_mem_wr_rx_ibs;
--	link->wr_tx_rdma_sges = kcalloc(link->lgr->pref_send_wr,
-+	link->wr_tx_rdma_sges = kcalloc(link->pref_send_wr,
- 					sizeof(link->wr_tx_rdma_sges[0]),
- 					GFP_KERNEL);
- 	if (!link->wr_tx_rdma_sges)
- 		goto no_mem_wr_tx_rdmas;
--	link->wr_tx_sges = kcalloc(link->lgr->pref_send_wr, sizeof(link->wr_tx_sges[0]),
-+	link->wr_tx_sges = kcalloc(link->pref_send_wr, sizeof(link->wr_tx_sges[0]),
- 				   GFP_KERNEL);
- 	if (!link->wr_tx_sges)
- 		goto no_mem_wr_tx_rdma_sges;
--	link->wr_rx_sges = kcalloc(link->lgr->pref_recv_wr,
-+	link->wr_rx_sges = kcalloc(link->pref_recv_wr,
- 				   sizeof(link->wr_rx_sges[0]) * link->wr_rx_sge_cnt,
- 				   GFP_KERNEL);
- 	if (!link->wr_rx_sges)
- 		goto no_mem_wr_tx_sges;
--	link->wr_tx_mask = bitmap_zalloc(link->lgr->pref_send_wr, GFP_KERNEL);
-+	link->wr_tx_mask = bitmap_zalloc(link->pref_send_wr, GFP_KERNEL);
- 	if (!link->wr_tx_mask)
- 		goto no_mem_wr_rx_sges;
--	link->wr_tx_pends = kcalloc(link->lgr->pref_send_wr,
-+	link->wr_tx_pends = kcalloc(link->pref_send_wr,
- 				    sizeof(link->wr_tx_pends[0]),
- 				    GFP_KERNEL);
- 	if (!link->wr_tx_pends)
- 		goto no_mem_wr_tx_mask;
--	link->wr_tx_compl = kcalloc(link->lgr->pref_send_wr,
-+	link->wr_tx_compl = kcalloc(link->pref_send_wr,
- 				    sizeof(link->wr_tx_compl[0]),
- 				    GFP_KERNEL);
- 	if (!link->wr_tx_compl)
-@@ -907,7 +907,7 @@ int smc_wr_create_link(struct smc_link *lnk)
- 		goto dma_unmap;
- 	}
- 	smc_wr_init_sge(lnk);
--	bitmap_zero(lnk->wr_tx_mask, lnk->lgr->pref_send_wr);
-+	bitmap_zero(lnk->wr_tx_mask, lnk->pref_send_wr);
- 	init_waitqueue_head(&lnk->wr_tx_wait);
- 	rc = percpu_ref_init(&lnk->wr_tx_refs, smcr_wr_tx_refs_free, 0, GFP_KERNEL);
- 	if (rc)
--- 
-2.48.1
-
+Make sense. I will remove flags.
 
