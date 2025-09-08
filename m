@@ -1,140 +1,128 @@
-Return-Path: <netdev+bounces-220751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 902A1B487D5
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:08:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 387BEB48898
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:34:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 307A23B8CA3
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:08:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5851B21D23
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCCC2EA72A;
-	Mon,  8 Sep 2025 09:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="N8qUxz9G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB70211A28;
+	Mon,  8 Sep 2025 09:34:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8532F069E;
-	Mon,  8 Sep 2025 09:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7ED21C186;
+	Mon,  8 Sep 2025 09:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757322514; cv=none; b=m6SL+4ITQ9FKojAOC+g7b/5gZlktTgu4IW3ybWEskscv4C7VB8wxrkimQj1n3v6wJVHRmWVsZncj6s0ZqpLJx8Nzks1eRPhlBtDl0unTrMbQ2eXBvTECwKHZAG81ivG+epWeKyFQJxG2XITNKNaEyMWlD1VgFOmiVXJxozKZD/k=
+	t=1757324078; cv=none; b=KPo5/1XKjSp+v3rLopvJp8teuAGRWTTec/RBfkvSoBsqnEyZopyj6tbUxY0THD4ATrcp5A2CJhHNR4FhruoPGcT5mrM0x9PQnUyRM88bj872pfglf3Kq0CJGa4b7kttF/LKo0CVmjIHZz9P1eAi17iWYKKvr89nC2k1BalavK7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757322514; c=relaxed/simple;
-	bh=MhMgcHHloqdsvpGVS4XMV4EJ/KcTgELqX1VRtRedv10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dZKb7DugkDm0mUgfjdtyFF4SkgKBlvJku65IWirjEYwza+V/vqHRUaUlQWasfiXY75zOjsQV8qb75JWBVbyNqz38VV8PLYAg3XGotaJM05psYyfz6MR7wcJh+sCtYnV6gov8vMInUxQcD5WhqpSajg76C06hVeURpJ0ERcGSNdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=N8qUxz9G; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1757322503;
-	bh=MhMgcHHloqdsvpGVS4XMV4EJ/KcTgELqX1VRtRedv10=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=N8qUxz9GarM32aXEpFClgSN1X9YmPiA2/Cye3eCjKaljfvBxPtLiIRTL2SM0SAjf4
-	 VQdvRKI49OiqfOQ9IAHUsCg3Y4mwaUH61Eyy8qZCH0OeU5xRiPoDSYVIvphO5QCnsu
-	 WIoChJDkzakpAcbjpqctgm0FtGeW/0c/tQsNZlC7cSkOwSvww4M8EBOHGCPr/w5bPo
-	 9XsIaarbsNVskh/KaMCWXvM5jBPQDWatUyAMBPjGJHv0cHtbFSxcAjrc3V0w01Eqg0
-	 Go8a1IztY6bbh2sak9PiIM8uVIDdqoKplkrIB3UrgsSfjr/Nxse0wvCLx0mJJ5mZff
-	 wyKaKmCtOJehQ==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 754826000C;
-	Mon,  8 Sep 2025 09:08:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 4D922200C27;
-	Mon, 08 Sep 2025 09:08:17 +0000 (UTC)
-Message-ID: <f574e4b9-d0ea-46ef-bbed-8f607ab7276f@fiberby.net>
-Date: Mon, 8 Sep 2025 09:08:16 +0000
+	s=arc-20240116; t=1757324078; c=relaxed/simple;
+	bh=YzsJwu4bSe8qpnD0n9Z1JQk+MCIqNJAEcPjaD9JFnJE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=dApmv0316Bd8daQezXFTfDB6x+ACCkKCQRHxwi97s1jVgbmoocM2vwcVRlFVFSIPm9JCxL//WXGB/o3765pIRJ7D1NVTj2MaZRnBFUGCguaLzgYjB1LvSW0BrmAjZuWFrmYTBukyhm69Su2ihZhyFeAv5NmIDJ1RUCxdVjvQ54w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cL1xh3DCXzKHMyt;
+	Mon,  8 Sep 2025 17:34:32 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 884D41A0DCA;
+	Mon,  8 Sep 2025 17:34:32 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgB3wY0mo75oX50yBw--.65125S3;
+	Mon, 08 Sep 2025 17:34:32 +0800 (CST)
+Subject: Re: [syzbot] [net?] possible deadlock in inet_shutdown
+To: Eric Dumazet <edumazet@google.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: syzbot <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com>,
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+ davem@davemloft.net, dsahern@kernel.org, horms@kernel.org, kuba@kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ming.lei@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <68bb4160.050a0220.192772.0198.GAE@google.com>
+ <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
+ <CANn89iJaY+MJPUJgtowZOPwHaf8ToNVxEyFN9U+Csw9+eB7YHg@mail.gmail.com>
+ <c035df1c-abaf-9173-032f-3dd91b296101@huaweicloud.com>
+ <CANn89iKVbTKxgO=_47TU21b6GakhnRuBk2upGviCK0Y1Q2Ar2Q@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <51adf9cb-619e-9646-36f0-1362828e801e@huaweicloud.com>
+Date: Mon, 8 Sep 2025 17:34:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 02/11] tools: ynl-gen: generate nested array
- policies
-To: Johannes Berg <johannes@sipsolutions.net>,
- "Keller, Jacob E" <jacob.e.keller@intel.com>,
- "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "wireguard@lists.zx2c4.com" <wireguard@lists.zx2c4.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20250904-wg-ynl-prep@fiberby.net>
- <20250904220156.1006541-2-ast@fiberby.net>
- <e24f5baf-7085-4db0-aaad-5318555988b3@intel.com>
- <6e31a9e0-5450-4b45-a557-2aa08d23c25a@fiberby.net>
- <c1a4da4cb54c0436d5f67efacf6866b4bc057b3e.camel@sipsolutions.net>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <c1a4da4cb54c0436d5f67efacf6866b4bc057b3e.camel@sipsolutions.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <CANn89iKVbTKxgO=_47TU21b6GakhnRuBk2upGviCK0Y1Q2Ar2Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgB3wY0mo75oX50yBw--.65125S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7XryfKFyruw1ruFWDWr4kWFg_yoWkuwb_Cr
+	48uwn3Ga17Xr13tFsxKrn7Gw1qqasYg34DXwn5Ja4fu3Z3ArWUAF18C3WrZw4rtan7KasI
+	krZ09a1ftFy3KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbSkFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE
+	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6x
+	kF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 9/8/25 7:54 AM, Johannes Berg wrote:
-> On Sat, 2025-09-06 at 14:13 +0000, Asbjørn Sloth Tønnesen wrote:
->> Johannes introduced NLA_NESTED_ARRAY and the NLA_POLICY_NESTED_ARRAY()
->> macro in commit 1501d13596b9 for use in nl80211, and it's therefore
->> used in net/wireless/nl80211.c, but outside of that the macro is
->> only sparsely adopted (only by mac80211_hwsim.c and nf_tables_api.c).
+Hi,
+
+在 2025/09/08 17:07, Eric Dumazet 写道:
+> On Mon, Sep 8, 2025 at 1:52 AM Yu Kuai <yukuai1@huaweicloud.com> wrote:
 >>
->> Wireguard adopts the macro in this RFC patch:
->> https://lore.kernel.org/netdev/20250904220255.1006675-2-ast@fiberby.net/
+>> Hi,
+>>
+>> 在 2025/09/06 17:16, Eric Dumazet 写道:
+>>> On Fri, Sep 5, 2025 at 1:03 PM Eric Dumazet <edumazet@google.com> wrote:
+>>>>
+>>>> On Fri, Sep 5, 2025 at 1:00 PM syzbot
+>>>> <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com> wrote:
+>>>
+>>> Note to NBD maintainers : I held about  20 syzbot reports all pointing
+>>> to NBD accepting various sockets, I  can release them if needed, if you prefer
+>>> to triage them.
+>>>
+>> I'm not NBD maintainer, just trying to understand the deadlock first.
+>>
+>> Is this deadlock only possible for some sepecific socket types? Take
+>> a look at the report here:
+>>
+>> Usually issue IO will require the order:
+>>
+>> q_usage_counter -> cmd lock -> tx lock -> sk lock
+>>
 > 
- > I think the general consensus now is that preference should be towards
- > arrays being expressed by giving the attribute holding the array
- > multiple times, i.e. each occurrence of an attribute holds a single
- > entry of the array:
- >
- > [header][type1:a1][type2:b][type1:a2][type1:a3]
- >
- > resulting in an array
- >
- > [a1, a2, a3] and a separate value "b",
- >
- > rather than a nested array:
- >
- > [header][type1:[1:a1][2:a2][3:a3]][type2:b]
- >
- >
- > Of course if each entry has multiple values, then you'd still need
- > nesting:
- >
- > [header][type1:[subtype1:x1][subtype2:x2]][type1:[subtype1:y1][subtype2:y2]]
- >
- > would be an array
- >
- > [[x1, x2], [y1, y2]].
+> I have not seen the deadlock being reported with normal TCP sockets.
+> 
+> NBD sets sk->sk_allocation to  GFP_NOIO | __GFP_MEMALLOC;
+> from __sock_xmit(), and TCP seems to respect this.
+> .
+> 
 
-Thank you for the consensus write up. Should we prohibit indexed-array with sub-type
-nest for families with a genetlink protocol?
+What aboud iscsi and nvme-tcp? and probably other drivers, where
+sk_allocation is GFP_ATOMIC, do they have similar problem?
 
-It is currently only used in families with a netlink-raw or genetlink-legacy protocol.
+Thanks,
+Kuai
 
-> I can't get rid of the nested array types in nl80211 though, of course.
-
-Wireguard is already in the same boat. It is not using the term, nor the policy,
-but it is doing the validation in the handler through, so it can adopt a
-NLA_POLICY_NESTED_ARRAY() policy, instead of a plain '{ .type = NLA_NESTED }'.
-
-Comments on the protocol in include/uapi/linux/wireguard.h:
- > WGDEVICE_A_PEERS: NLA_NESTED
- >   0: NLA_NESTED
- >     WGPEER_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
- >     [..]
- >   0: NLA_NESTED
- >     ...
- >   ...
-
-Given that, as Jacob pointed out, there are more families with nested arrays in
-their YNL spec, than those using NLA_NESTED_ARRAY, then it appears that there
-are more families already in the boat.
 
