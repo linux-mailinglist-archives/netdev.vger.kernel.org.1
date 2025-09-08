@@ -1,191 +1,119 @@
-Return-Path: <netdev+bounces-220978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D163B49B33
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:47:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ACAFB49B60
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E8A37AD3C7
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:45:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF5574434A8
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DDE2DA76D;
-	Mon,  8 Sep 2025 20:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8362DCF4D;
+	Mon,  8 Sep 2025 21:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="SfRhTp1a"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="sZBDJtvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5902D5437
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 20:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193A723535C;
+	Mon,  8 Sep 2025 21:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757364449; cv=none; b=PvJ66uxUBSPRO2ICvNnAFoFi3weZp+CSVFg392FYLDSItXzGNkd3WpLvLPHO/B9J0P9ah7DC0xh2cOTW/5lRsNYjKuoveqQrmLUjHqgO48hkSxwFLhV2fA1EYXH3FlTBYBA5nWnLsTnqcezRoY9Ycv3qNCssFo6KlgKbLfOogow=
+	t=1757365298; cv=none; b=pUp3oWz4JlSfISUoC0V1pck09J3s6UA6kCfg55HNXk2NsLo6YDo4Z6qPUdoDM7OTk7nmn7fOR4RwxmJ4puink8Iyjr4lk8DF6mELfZicU1tBwQtL5550gB5oAtsGzjlUJBw0g+2k9mzXlFYv+mFxLbasDpnUB7tSzclLaJ1huuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757364449; c=relaxed/simple;
-	bh=YKKxSwyTIBd9mjDB+qKz1REMUGLWEBaGpgrm4p7F3mE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LzOx5p9OeWN3R8pBOxTKq9czHqzyCFCARlV4T+b1v4J18PMGwjcsY2T5KNXogv9l2fYBdF5p6NSTwmsQPOxufur1VeeK9QLXPiQ1oMmBY70wsdOOKXfEdcpftdFaR5ZonY/9jQ79SscPjbMK2K4Ny4a1qM7booHMrLtwsnxLzco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=SfRhTp1a; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-24cde6c65d1so35786875ad.3
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 13:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1757364447; x=1757969247; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iP4tQG17FxLA2u0B9bKbrzzkdZjZOjWIZIzpoM1+rjA=;
-        b=SfRhTp1aWjGGnwudzM5EvCXwKyCAuJXLLzkSQGnXiLKEV+Pjfq1Rl4V47GJSuUmV+V
-         74XKiDVO4QgWRL/bUY+4B5UfD0P5WKmC5pPn5uUKrYRyD0nFg18An+xSQF4XwgZP00I+
-         9KBmTZWaahFdBb7dAjOqdpTdrbysmCx6S2VVTr5rqCOpOlBOUKxA5Gbe3AO5CSM3W4Qt
-         7xv1X7W5aqHITbM7WlJ/JtbMRCh1pAqzVX2FpUPoIBstmPbrMRo7hu/RL3o9/DxxuyP0
-         J4a3y4KrvQVSRn6otixitQGzz8P1AWGKxKlemIFWUeIpvB1c2MC/Wl7Yta2TkHV6D9hw
-         OvfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757364447; x=1757969247;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iP4tQG17FxLA2u0B9bKbrzzkdZjZOjWIZIzpoM1+rjA=;
-        b=FUPOCbPaIx40PXsdXCjEKtP4Jb4PQeNeNeKDbePw+qlcIguE5ay2oF67Ht983/9Dgl
-         PcVl5O6BXRj3lIkEi9yKRo4Bpc15yORjxWz+7i2UURvXEx14iNlhvPe/ZQpc81MiNTk1
-         xiK/Ptemi2dWUNgmPN1rXexTUWhXu/X8p4rBDmLD5mRcS1wJdPyKvflwO4Nn/jNYLb0X
-         bEkm4JmdY+qiVVaSzcQKkfiUIrjWcQaalEfm/auk3Q5ej1qeofDaGB+jzHxGvf3Ilkxz
-         xgIqMT0fmz+d1nXbOP5aJof+sB6DtKn4keyd0HjwZNua2AWEkyTRU64FcbZMFe9F0L4I
-         H9+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWSq9PbgaH3mouPlu60blW1zQv3czdvgxND4g2cY9249r60pqmVDkg8t5JQqIjyNLi/fF4IOc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI9BEWuCkB/dbxfXqWVTf6KIQMcgi+Igd0o+mY9OSiLyWudpxh
-	dvB2wf8ou/kQA2PGc3Xj4oXe0eIteLx32b29P2oHtiAAsr2SYc+9J8HRxkH37Pk5Njk=
-X-Gm-Gg: ASbGnctdAmK93X/mcpvQXWRqHNkGK8CGxmXXpzdLfewWY4q8kUQLyU+OlTHND0a5GMh
-	F8wCXqi4DWdRQWzqO7eFGEQwbG4jezmhNOyobBRX3g4OSl0vCzUtII/I0umIxsKloBr8PKll34E
-	Q8Y1OKLRrzjKUl0/FxB8aD/4bG/hlZ4kwoqFj0g7T2z3YA5GC7C518xFg1KI8UEj2VlHp8I4EVT
-	67dO5GgIVkiR75hnECwsOdh+yGZNCNHJCnkbcQ/TshSgZpmvBE357C85BB4V6J/JScICtmYk5j0
-	v/fznba1Zbokv4ohOi3u+a8cOrKxicKxvQ7KmIVq5I0oiC6GD5v4SzLKl7K/W1WApI6GNXAIZ2y
-	1nUclkUb4qtNjtN0wtwgjpnnlLi5tPPektYo=
-X-Google-Smtp-Source: AGHT+IEFBuInL+DneJcr3VRDS17E6y4PwmSKDTAiiJ6BGt+ppjgTDkzNHMg5bs1Pf238HenN9lXafg==
-X-Received: by 2002:a17:903:2286:b0:24a:f7dc:caa3 with SMTP id d9443c01a7336-251715f33f7mr111877765ad.37.1757364447508;
-        Mon, 08 Sep 2025 13:47:27 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24ccd655823sm119166405ad.114.2025.09.08.13.47.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 13:47:27 -0700 (PDT)
-Date: Mon, 8 Sep 2025 13:47:24 -0700
-From: Calvin Owens <calvin@wbinvd.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
-	david decotigny <decot@googlers.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	asantostc@gmail.com, efault@gmx.de, kernel-team@meta.com,
-	stable@vger.kernel.org, jv@jvosburgh.net
-Subject: Re: [PATCH net v3 1/3] netpoll: fix incorrect refcount handling
- causing incorrect cleanup
-Message-ID: <aL9A3JDyx3TxAzLf@mozart.vkv.me>
-References: <20250905-netconsole_torture-v3-0-875c7febd316@debian.org>
- <20250905-netconsole_torture-v3-1-875c7febd316@debian.org>
+	s=arc-20240116; t=1757365298; c=relaxed/simple;
+	bh=Qa3p4r1BGPTbg9JN8Jg7rYA6n7V+dwXJpFgMOWciwh0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nTI5MBZ/GbljLix0oXPUdyl9GW/ws2RLl9u8ePKobhDrRZFNUCCXY3J2ZfS6mD8fjVoFUDUNGTOeFr4vQIdTiVkiCjEYxIWtL2xmWE+hoCQM6+8hw+96cfDKdq9eCrqmmtowRkRuXH3qs2L+ME3Qc+xHvLlgQGFGmqAIJBggKts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=sZBDJtvF; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 3AF8E2119388;
+	Mon,  8 Sep 2025 14:01:35 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3AF8E2119388
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1757365296;
+	bh=8OfRFbMGWhbwHqeXODOj/IPgEc3LWLOaJehvGyq5fVY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sZBDJtvFs9Ofj7nMAu5VU8L0L4nKeDGeNVmFwTGr5mm9ZPuuOp9UCj9Btu+E1vcfa
+	 HB/ifrMcHgdgWOwk/crvaI47rWI+1w94qYyPAZve41oYiMcu+vkaoDgD185Gry75ro
+	 Z7o4crQc3sp24xFFXTYFnxdnQ96IoHTX58i70aM8=
+Message-ID: <d7d7b23f-eaea-2dbc-9c9d-4bee082f6fe7@linux.microsoft.com>
+Date: Mon, 8 Sep 2025 14:01:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250905-netconsole_torture-v3-1-875c7febd316@debian.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v1 2/2] Drivers: hv: Make CONFIG_HYPERV bool
+Content-Language: en-US
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
+ airlied@gmail.com, simona@ffwll.ch, jikos@kernel.org, bentiss@kernel.org,
+ kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, dmitry.torokhov@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, bhelgaas@google.com,
+ James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+ deller@gmx.de, arnd@arndb.de, sgarzare@redhat.com, horms@kernel.org
+References: <20250906010952.2145389-1-mrathor@linux.microsoft.com>
+ <20250906010952.2145389-3-mrathor@linux.microsoft.com>
+ <2025090621-rumble-cost-2c0d@gregkh>
+From: Mukesh R <mrathor@linux.microsoft.com>
+In-Reply-To: <2025090621-rumble-cost-2c0d@gregkh>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Friday 09/05 at 10:25 -0700, Breno Leitao wrote:
-> commit efa95b01da18 ("netpoll: fix use after free") incorrectly
-> ignored the refcount and prematurely set dev->npinfo to NULL during
-> netpoll cleanup, leading to improper behavior and memory leaks.
+On 9/6/25 04:36, Greg KH wrote:
+> On Fri, Sep 05, 2025 at 06:09:52PM -0700, Mukesh Rathor wrote:
+>> With CONFIG_HYPERV and CONFIG_HYPERV_VMBUS separated, change CONFIG_HYPERV
+>> to bool from tristate. CONFIG_HYPERV now becomes the core Hyper-V
+>> hypervisor support, such as hypercalls, clocks/timers, Confidential
+>> Computing setup, PCI passthru, etc. that doesn't involve VMBus or VMBus
+>> devices.
 > 
-> Scenario causing lack of proper cleanup:
+> But why are you making it so that this can not be a module anymore?  You
+> are now forcing ALL Linux distro users to always have this code in their
+> system, despite not ever using the feature.  That feels like a waste to
+> me.
 > 
-> 1) A netpoll is associated with a NIC (e.g., eth0) and netdev->npinfo is
->    allocated, and refcnt = 1
->    - Keep in mind that npinfo is shared among all netpoll instances. In
->      this case, there is just one.
-> 
-> 2) Another netpoll is also associated with the same NIC and
->    npinfo->refcnt += 1.
->    - Now dev->npinfo->refcnt = 2;
->    - There is just one npinfo associated to the netdev.
-> 
-> 3) When the first netpolls goes to clean up:
->    - The first cleanup succeeds and clears np->dev->npinfo, ignoring
->      refcnt.
->      - It basically calls `RCU_INIT_POINTER(np->dev->npinfo, NULL);`
->    - Set dev->npinfo = NULL, without proper cleanup
->    - No ->ndo_netpoll_cleanup() is either called
-> 
-> 4) Now the second target tries to clean up
->    - The second cleanup fails because np->dev->npinfo is already NULL.
->      * In this case, ops->ndo_netpoll_cleanup() was never called, and
->        the skb pool is not cleaned as well (for the second netpoll
->        instance)
->   - This leaks npinfo and skbpool skbs, which is clearly reported by
->     kmemleak.
-> 
-> Revert commit efa95b01da18 ("netpoll: fix use after free") and adds
-> clarifying comments emphasizing that npinfo cleanup should only happen
-> once the refcount reaches zero, ensuring stable and correct netpoll
-> behavior.
+> What is preventing this from staying as a module?  Why must you always
+> have this code loaded at all times for everyone?
 
-This makes sense to me.
+This is currently not a module. I assume it was at the beginning. In
+drivers/Makefile today:
 
-Just curious, did you try the original OOPS reproducer?
-https://lore.kernel.org/lkml/96b940137a50e5c387687bb4f57de8b0435a653f.1404857349.git.decot@googlers.com/
+obj-$(subst m,y,$(CONFIG_HYPERV))       += hv/
 
-I wonder if there might be a demon lurking in bonding+netpoll that this
-was papering over? Not a reason not to fix the leaks IMO, I'm just
-curious, I don't want to spend time on it if you already did :)
 
-The discussion on v1 isn't enlightening either:
-https://lore.kernel.org/lkml/0f692012238337f2c40893319830ae042523ce18.1404172155.git.decot@googlers.com/
+More context: CONFIG_HYPERV doesn't really reflect one module. It is
+both for kernel built in code and building of stuff in drivers/hv.
+
+drivers/hv then builds 4 modules:
+
+obj-$(CONFIG_HYPERV)            += hv_vmbus.o
+obj-$(CONFIG_HYPERV_UTILS)      += hv_utils.o
+obj-$(CONFIG_HYPERV_BALLOON)    += hv_balloon.o
+obj-$(CONFIG_MSHV_ROOT)         += mshv_root.o
+
+Notice vmbus is using CONFIG_HYPERV because there is no 
+CONFIG_HYPERV_VMBUS. We are trying to fix that here.
 
 Thanks,
-Calvin
+-Mukesh
 
-> Cc: stable@vger.kernel.org
-> Cc: jv@jvosburgh.net
-> Fixes: efa95b01da18 ("netpoll: fix use after free")
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  net/core/netpoll.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> thanks,
 > 
-> diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-> index 5f65b62346d4e..19676cd379640 100644
-> --- a/net/core/netpoll.c
-> +++ b/net/core/netpoll.c
-> @@ -815,6 +815,10 @@ static void __netpoll_cleanup(struct netpoll *np)
->  	if (!npinfo)
->  		return;
->  
-> +	/* At this point, there is a single npinfo instance per netdevice, and
-> +	 * its refcnt tracks how many netpoll structures are linked to it. We
-> +	 * only perform npinfo cleanup when the refcnt decrements to zero.
-> +	 */
->  	if (refcount_dec_and_test(&npinfo->refcnt)) {
->  		const struct net_device_ops *ops;
->  
-> @@ -824,8 +828,7 @@ static void __netpoll_cleanup(struct netpoll *np)
->  
->  		RCU_INIT_POINTER(np->dev->npinfo, NULL);
->  		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
-> -	} else
-> -		RCU_INIT_POINTER(np->dev->npinfo, NULL);
-> +	}
->  
->  	skb_pool_flush(np);
->  }
-> 
-> -- 
-> 2.47.3
-> 
+> greg k-h
+
 
