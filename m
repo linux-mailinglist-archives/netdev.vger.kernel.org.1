@@ -1,58 +1,40 @@
-Return-Path: <netdev+bounces-220945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3380AB49870
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:37:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64687B49889
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B48E77A5F07
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:35:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74B011BC6353
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6DC31B819;
-	Mon,  8 Sep 2025 18:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="UhaQwwTj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5C03112DC;
+	Mon,  8 Sep 2025 18:43:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9FE8314B75;
-	Mon,  8 Sep 2025 18:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757356641; cv=pass; b=dmVOfw1qWmJYRYsVXjpoa7KXUFIq8sD5WGzQwPV2OwHfx38NjjJBQY8t7Wp86NhqGJnqWhCz8daWO7IGNOvNoHdXiO7GjSQejG0AFF6AaOILlc6UduISbYO9IGSZLXv67b3gwKBWqt9pT95BW71SuQS8Gek47EpxB0VzMWBVdrs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757356641; c=relaxed/simple;
-	bh=RnxaE3KiraFUwjH7IqB0XC7621NVji1ZG4b3sg6u+1A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rQwg7khRsyxcxNtRPDP3gvggtePrImH3mIHueRLazi7MmBGVFEzBielGMsjKHMHzsDQLbkj0QLuFkdB7k4cUc8yfGVRpCUp8cWFX5RQ3vHFjW9EyW0PdBz6afLDKHfHbYLuEogWac5QF6rhPNZpNzhE0VzNbAKcYL69AzE2Ixpo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=UhaQwwTj; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1757356580; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=cdVYgURB89dbHupAw4KMy46mfFbhabKB0fbmHFBgRBvBYvTtSQExrU1sKpfkpjcx1w/YUJ8oV4j9+YhGcpEjW7Zwj1jsW1OKgfubHjb4G2koqFAxMLoVYAz8Ccw0+lylg0YO1Htsg+KdPOqoubvi0rri2cAvyirq77JW+Ay5MYc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757356580; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=mqorkaZP8K3w37+KQC5xsu9iciTdS53JJYYC8j1jjZY=; 
-	b=lw0+9hG76wtgGAX2WMoklsJubSvxRXKF08iwS28xRKhrNx1q6Cy5o04wQBEzwFoYCfg3NXiHFcSLuWgyv23G8QKMtYdPesUVladZMLFYZLSp6+nayixftZ6vLJb3H28vG8XCLQdinZhZxABbk/hAEKpPDM5kWMqp0o6B9ah+w94=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
-	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757356580;
-	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=mqorkaZP8K3w37+KQC5xsu9iciTdS53JJYYC8j1jjZY=;
-	b=UhaQwwTja7SFF9hVLfmnIc1Nk3Ao2vojsdkFkQ1NSXggwHTHU8YksUOjnlk+k/dQ
-	Zo810evf7Bf1W1IQVDWhYK4GEiE3z9tw0FTs6kDO5JCJJ8/no4Jni8fjICCwkBC3Oo8
-	n7wmxd995Nc2uwbGBP5jZdIa+Dk2ftPoB1SA5g1U=
-Received: by mx.zohomail.com with SMTPS id 1757356577657388.2831972624366;
-	Mon, 8 Sep 2025 11:36:17 -0700 (PDT)
-Message-ID: <79baaa0a-7cc4-44f0-bf71-38aff550b177@collabora.com>
-Date: Mon, 8 Sep 2025 15:35:58 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B8C2206BB
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757357038; cv=none; b=mOKPZ7XR1cAaCNCJ9heyC5dDj4jjfNfoQfeDkThOZ/NkkpM366jrpemZ1f4cl0vZvereW3QqzdkemQeW8sotlZDtuKttH86WEDo053pyQavqO0OQbHYkyPQqEOqNW8Xk987PpJut2J3zm7ZINLABY3WGQ6ZKgXb8gX+7/mhnZDo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757357038; c=relaxed/simple;
+	bh=bOpPYuwLBxCFGvZOTj03z7u0xur1IgDj+miogLcrdxo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=jbDHkcMylb5WMTDH+HPXdCnFxx9KmdHAef4OcmojIhz3lCL+mk2dFom2WXa9SmMRAE5n12u/ALT1/GJcJzAlCIoDfyFQ6PXGoJ7lOOHhdTIIo3TJsfUBzITtU3G2QOpegehr/gC2/AJy8epPP7AUPXT8wdDTpN6kPfNMGtaCTGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.154.55) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 8 Sep
+ 2025 21:43:49 +0300
+Message-ID: <d5ba9af3-6e61-4206-9eb0-7d3349807d23@omp.ru>
+Date: Mon, 8 Sep 2025 21:43:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,139 +42,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 02/14] media: dt-bindings: Convert MediaTek mt8173-vpu
- bindings to YAML
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
- andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
- broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
- conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com,
- edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com,
- jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com,
- krzk+dt@kernel.org, kuba@kernel.org,
- kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
- linus.walleij@linaro.org, louisalexis.eyraud@collabora.com,
- maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
- mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
- p.zabel@pengutronix.de, pabeni@redhat.com, robh@kernel.org,
- sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com,
- tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com,
- devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
- <20250820171302.324142-3-ariel.dalessandro@collabora.com>
- <20250821-piquant-rapid-bear-8cedc0@kuoka>
+Subject: Re: [PATCH net] net: stmmac: prevent division by 0 in
+ stmmac_init_tstamp_counter()
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, <netdev@vger.kernel.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>
+CC: <linux-arm-kernel@lists.infradead.org>
+References: <58116e65-1bca-4d87-b165-78989e1aa195@omp.ru>
+ <a49cff49-3fe5-417d-8f71-7ec63a68112d@linux.dev>
+ <d92071a9-471e-47f3-8dff-069f9dc6f10c@omp.ru>
 Content-Language: en-US
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-In-Reply-To: <20250821-piquant-rapid-bear-8cedc0@kuoka>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: Open Mobile Platform
+In-Reply-To: <d92071a9-471e-47f3-8dff-069f9dc6f10c@omp.ru>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 09/08/2025 18:17:41
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 196103 [Sep 08 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 66 0.3.66
+ fc5dda3b6b70d34b3701db39319eece2aeb510fb
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.154.55
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/08/2025 18:20:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/8/2025 5:23:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Krzysztof,
+On 9/8/25 9:26 PM, Sergey Shtylyov wrote:
+[...]
 
-On 8/21/25 3:47 AM, Krzysztof Kozlowski wrote:
-> On Wed, Aug 20, 2025 at 02:12:50PM -0300, Ariel D'Alessandro wrote:
->> Convert the existing text-based DT bindings for Mediatek MT8173 Video Processor
->> Unit to a YAML schema.
-> 
-> DT schema, not YAML. Don't say YAML at all, neither here nor in subject.
-
-Ack.
-
-> 
-> Also looks not wrapped...
-
-Ack.
-
-> 
+>>> In stmmac_init_tstamp_counter(), the sec_inc variable is initialized to 0,
+>>> and if stmmac_config_sub_second_increment() fails to set it to some non-0
 >>
->> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
->> ---
->>   .../bindings/media/mediatek,mt8173-vpu.yaml   | 76 +++++++++++++++++++
->>   .../bindings/media/mediatek-vpu.txt           | 31 --------
->>   2 files changed, 76 insertions(+), 31 deletions(-)
->>   create mode 100644 Documentation/devicetree/bindings/media/mediatek,mt8173-vpu.yaml
->>   delete mode 100644 Documentation/devicetree/bindings/media/mediatek-vpu.txt
->>
->> diff --git a/Documentation/devicetree/bindings/media/mediatek,mt8173-vpu.yaml b/Documentation/devicetree/bindings/media/mediatek,mt8173-vpu.yaml
->> new file mode 100644
->> index 0000000000000..44f5d7cc44042
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/media/mediatek,mt8173-vpu.yaml
->> @@ -0,0 +1,76 @@
->> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/media/mediatek,mt8173-vpu.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Mediatek MT8173 Video Processor Unit
->> +
->> +maintainers:
->> +  - Ariel D'Alessandro <ariel.dalessandro@collabora.com>
->> +
->> +description:
->> +  Video Processor Unit is a HW video controller. It controls HW Codec including
->> +  H.264/VP8/VP9 Decode, H.264/VP8 Encode and Image Processor (scale/rotate/color convert).
+>> How that can happen?
 > 
-> Please wrap code according to the preferred limit expressed in Kernel
-> coding style (checkpatch is not a coding style description, but only a
-> tool).  However don't wrap blindly (see Kernel coding style).
-
-Thanks for the comment. Wrapped to 80 column width.
-
+>    Let's see what the commit in my Fixes tag said about the problem it fixed:
 > 
->> +
->> +properties:
->> +  compatible:
->> +    const: mediatek,mt8173-vpu
->> +
->> +  reg:
->> +    minItems: 2
+> ---
+> When building with -Wsometimes-uninitialized, Clang warns:
 > 
-> No, from where do you get such syntax?
-
-IIUC, what you mean is s/minItems/maxItems.
-
+> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:495:3: warning: variable 'ns' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:495:3: warning: variable 'ns' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
+> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:532:3: warning: variable 'ns' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:532:3: warning: variable 'ns' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
+> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:741:3: warning: variable 'sec_inc' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:741:3: warning: variable 'sec_inc' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
 > 
->> +
->> +  reg-names:
->> +    items:
->> +      - const: tcm
->> +      - const: cfg_reg
->> +
->> +  interrupts:
->> +    maxItems: 1
->> +
->> +  clocks:
->> +    maxItems: 1
->> +
->> +  clock-names:
->> +    items:
->> +      - const: main
->> +
->> +  memory-region:
->> +    description:
->> +      phandle to a node describing reserved memory used by VPU
->> +      (see bindings/reserved-memory/reserved-memory.txt)
+> Clang is concerned with the use of stmmac_do_void_callback (which
+> stmmac_get_timestamp and stmmac_config_sub_second_increment wrap),
+> as it may fail to initialize these values if the if condition was ever
+> false (meaning the callbacks don't exist). It's not wrong because the
+> callbacks (get_timestamp and config_sub_second_increment respectively)
+> are the ones that initialize the variables. While it's unlikely that the
+> callbacks are ever going to disappear and make that condition false, we
+> can easily avoid this warning by zero initialize the variables.
+> ---
 > 
-> Drop, redundant description.
+>    I think the original commit was just somewhat incomplete, as (adding 0-
+> initializer into picture) it missed to add checking of sec_inc for 0 before
+> invoking do_div()...
 
-Ack.
+   Oops, it was div_u64()! :-)
 
-Thanks a lot!
-
--- 
-Ariel D'Alessandro
-Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
-Registered in England & Wales, no. 5513718
+MBR, Sergey
 
 
