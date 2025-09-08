@@ -1,156 +1,127 @@
-Return-Path: <netdev+bounces-220698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A500FB48337
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 06:16:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AB2B4836E
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 06:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 254353B092D
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 04:16:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3652F189C7A7
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 04:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A158521D00E;
-	Mon,  8 Sep 2025 04:15:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELhI86dg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF7A221264;
+	Mon,  8 Sep 2025 04:52:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD68621B19D;
-	Mon,  8 Sep 2025 04:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C83221FD4
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 04:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757304950; cv=none; b=MYUtAMHA+hYPvkUhm5NeNouZHXkAeFUq5Lh1tilAAZjHEG4wIbxE+SzzW7L7O52Zw5dA5zkXXDlaHHRWh0rI60yT0FaGqNxsLr1rZrNKFX3tO4BCbGv2tdK5tZpagaP0iiizwYvvOL812SzZ6TladQZ5BI+pP2zMIX4fu3GfxZU=
+	t=1757307140; cv=none; b=S4TZrnmYdKqpB8sliNYGdStNyQ+5yULfkqV7DVS6Pe0R5iS/iRSEeJZi8oaVcfELv9XCU+8RY6lxaq7CV0UdH190gxWqnoVK23iUCqFijA19uhyXDDUS6z6fsP6UlXvFu4ECaiMTV1LjY/11KotEx7dq0Co0TnA+qw8KimsvnHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757304950; c=relaxed/simple;
-	bh=UCdNo4tJLMfRG2ThjczsmLh1pxSCdjn77qJ/oH+Pgh4=;
+	s=arc-20240116; t=1757307140; c=relaxed/simple;
+	bh=vSKC/kmQeqND3A2rQlChRNGe1FptQNXba+tF78DaMzg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SEkOz6TVkWgs4rqKDUO5/DQ+vVHc9+SS1ZxDTFrn9xcGaX+sw9Y/uRmkHX51+7FRrA3BS2dS3oHJC/gPW+AqB3gImEu00D058mTR6psSO8wL40NBFnx8SNbdFCZds7UeThDIh1/xA5lk38JUVwgrujHY654cLdIfh1LIAWH/JbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ELhI86dg; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-329e47dfa3eso3528234a91.1;
-        Sun, 07 Sep 2025 21:15:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757304948; x=1757909748; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9QmVHYdYnytQawmE/GlyC7TmQ4rj+TZYEN+n5OB2Z78=;
-        b=ELhI86dglR9AoiA6jVui4471PNylvXm6g4Yk1O/wM4ZVFdKy59JkZCILoe1ocJYhdF
-         lOplp1AZ8GLIJQqWeIcxGs075oPAvmY9PKwBNJI4Ac06RLRsvvuV3pX8Lu2GqjRGDPkU
-         vRNIb5H+py1mKf+6FbG3/K+E/Y9JvKr1cDnkJqbrv+/kl1jrjY3mSsNXnOioqPiaMGy3
-         fZsDNY98TRnCZZyK+Zu6m9AkkmrpgsFSlG6TWZxSU8K8CoB0kPelBuNj972r7aRGNk6l
-         oXlMR7P/cRG03RWF6IbdrHfiWos+EXhQjb0fBeau+p1wDQDp5jPowHgYiuXcLB/cojfc
-         IPCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757304948; x=1757909748;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9QmVHYdYnytQawmE/GlyC7TmQ4rj+TZYEN+n5OB2Z78=;
-        b=jN17EnIskEy428SMFKEuOurI/MS60jyhZaMUyZ1TilpaL7ReV2EoYOFG/iwHy1ytg3
-         jMiDVHYWywvBcji6QmrdclDB3m3lTFGf7f9RvIXCVAFDNlT3bxrUWyHhKhFuOMmSxE68
-         /PMUY8hFwCvw/hY1RybgRy9kKpKqcW+8vk5cw1j4+Yogtzv6Xs5ufvtgG6hZhogPLMvi
-         kdgsOPzsn6s+Tsk2II5WgIv9yWgrxwbws9eK7Pg4KqbsiHmyBfdDFyf2RFKGdTXHFjCX
-         p0VAYU5Qq6bC/QFIdlNhRD8QtmoOWAYKS6+ASTJI4FpF/fC0gnH7kXEw9B2FJ9t0cLTE
-         DBiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnL6NogU11RzX8uxy/pYseV3BJNA5pWGOx4+hEWdah6uarvwnO748bjRWJM7MXWp41LJMz+C/C953dXP1ni1k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz++licmg5nMjb/DFPpTojnBAWPk2Vp6YedqX71gCRIyXRlcdlc
-	MNfCQRqP5jmvItuOeYL1RFQ117cs0x2ltfW34dsb1dfYzmbcsaty8Yup
-X-Gm-Gg: ASbGncsfKQ/JcxNK61KkZq/XWlyNsjAg4aDI7cuRlmN+gkOucA/vSXJjsreF8KtIAu6
-	cM4aFHQqDbpQZ/juW3FrXVVDzmHm/xU1swjmdMu8cxo+Kq1vy1vZyMJt19alfr7Gpt7yNK+jJAr
-	FH0aWiceOsXU/zO04JHr43eg7Gj4GSEKumNRlbkeXyGzN5i4mFmXdHHgCUKWGQfvS5O18AISiCS
-	tboXp7Ww1pzsGvg6W+A9ZfEmy8mY64Oyid1gE4VqMiK8rlZ0UTXxmLB+8ABJYxaIqdFUgUeClQv
-	IXE+yZwrTOvkHo60xFrwR/crVA4rSLYPVLep5/Ilz3+7nJf/daYt6zCjySpi8o5tBkxc9kQ6BBR
-	7kIXPaFzhwo+doUt2K/RScZZ8cvs=
-X-Google-Smtp-Source: AGHT+IGFie3VQxK6NB2GC5r4dkSoil0H/yHLmWPqvuY/cl1GmZ+3lR6o3zidk2O+qIHaVF5KClDjCA==
-X-Received: by 2002:a17:90b:1646:b0:32b:7475:2aa with SMTP id 98e67ed59e1d1-32d43f9346amr8616078a91.26.1757304947965;
-        Sun, 07 Sep 2025 21:15:47 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-327d93317f0sm29097956a91.6.2025.09.07.21.15.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Sep 2025 21:15:47 -0700 (PDT)
-Date: Mon, 8 Sep 2025 04:15:38 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv2 net-next 5/5] selftests/net: add offload checking test
- for virtual interface
-Message-ID: <aL5YamjbZB5gsL30@fedora>
-References: <20250902072602.361122-1-liuhangbin@gmail.com>
- <20250902072602.361122-6-liuhangbin@gmail.com>
- <aLyoEiWnuvQ-5ODz@krikkit>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fNLRP30MNExhpX7mUGC5RoRcmvdLwtIae8Q7WWOewPddDZpcEXDe1FpzF8S+VadNRGlRS/p5XRDE3Vf9lEwWQcHyYZ5BdLKqM8MWQD6CaRtKvS6gST2kJrh55xd+ommeAVaweWBUqhdqnrKoKtcYkcmGU9qYw1XBgJWEvM0uDEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvTqu-0006ng-7X; Mon, 08 Sep 2025 06:51:40 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvTqq-000Bt9-2g;
+	Mon, 08 Sep 2025 06:51:36 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvTqq-00Bi0F-2A;
+	Mon, 08 Sep 2025 06:51:36 +0200
+Date: Mon, 8 Sep 2025 06:51:36 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: gfuchedgi@gmail.com, Robert Marko <robert.marko@sartura.hr>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Jean Delvare <jdelvare@suse.com>, Jonathan Corbet <corbet@lwn.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-hwmon@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Network Development <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 0/2] hwmon: (tps23861) add class restrictions and
+ semi-auto mode support
+Message-ID: <aL5g2JtIpupAeoDz@pengutronix.de>
+References: <20250904-hwmon-tps23861-add-class-restrictions-v3-0-b4e33e6d066c@gmail.com>
+ <4e7a2570-41ec-4179-96b2-f8550181afd9@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aLyoEiWnuvQ-5ODz@krikkit>
+In-Reply-To: <4e7a2570-41ec-4179-96b2-f8550181afd9@roeck-us.net>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Sat, Sep 06, 2025 at 11:30:58PM +0200, Sabrina Dubroca wrote:
-> > +check_xfrm()
-> > +{
-> > +	local dev=$1
-> > +	local src=192.0.2.1
-> > +	local dst=192.0.2.2
-> > +	local key="0x3132333435363738393031323334353664636261"
-> > +
-> > +	RET=0
-> > +
-> > +	ip -n "$ns" xfrm state flush
-> > +	ip -n "$ns" xfrm state add proto esp src "$src" dst "$dst" spi 9 \
-> > +		mode transport reqid 42 aead "rfc4106(gcm(aes))" "$key" 128 \
-> > +		sel src "$src"/24 dst "$dst"/24 offload dev "$dev" dir out
+On Sun, Sep 07, 2025 at 09:06:25AM -0700, Guenter Roeck wrote:
+> +Cc: pse-pd maintainers and netdev mailing list
 > 
-> It's maybe not something you would expect, but this codepath will not
-> check that NETIF_F_HW_ESP is set on $dev (you can verify that by
-> running "ip xfrm state add ... offload ..." on the same bond+netdevsim
-> combination before/after toggling esp-hw-offload on/off for the
-> bond). Why not use __check_offload again for this feature?
+> On 9/4/25 10:33, Gregory Fuchedgi via B4 Relay wrote:
+> > This patch series introduces per-port device tree configuration with poe
+> > class restrictions. Also adds optional reset/shutdown gpios.
+> > 
+> > Tested with hw poe tester:
+> >   - Auto mode tested with no per-port DT settings as well as explicit port
+> >     DT ti,class=4. Tested that no IRQ is required in this case.
+> >   - Semi-Auto mode with class restricted to 0, 1, 2 or 3. IRQ required.
+> >   - Tested current cut-offs in Semi-Auto mode.
+> >   - On/off by default setting tested for both Auto and Semi-Auto modes.
+> >   - Tested fully disabling the ports in DT.
+> >   - Tested with both reset and ti,ports-shutdown gpios defined, as well as
+> >     with reset only, as well as with neither reset nor shutdown.
+> > 
+> > Signed-off-by: Gregory Fuchedgi <gfuchedgi@gmail.com>
+> 
+> This entire series makes me more and more unhappy. It is not the responsibility
+> of the hardware monitoring subsystem to control power. The hardware monitoring
+> subsystem is for monitoring, not for control.
+> 
+> Please consider adding a driver for this chip to the pse-pd subsystem
+> (drivers/net/pse-pd). As it turns out, that subsystem already supports
+> tps23881. This is a similar chip which even has a similar register set.
+> 
+> This driver could then be modified to be an auxiliary driver of that driver.
+> Alternatively, we could drop this driver entirely since the pse-pd subsystem
+> registers the chips it supports as regulator which has its own means to handle
+> telemetry.
+> 
+> Thanks,
+> Guenter
 
-The esp-hw-offload is fixed on netdevsim
+Yes, Guenter is right. This driver belongs to the pse-pd framework.
 
-# ethtool -k eni0np1 | grep -i esp-hw-offload
-esp-hw-offload: on [fixed]
-
-There is no way to disable it. After we add the netdevsim to bond,
-the bond also shows "esp-hw-offload off" as the flag is inherit
-in dev->hw_enc_features, not dev->features.
-
-It looks the only way to check if bond dev->hw_enc_features has NETIF_F_HW_ESP
-is try set xfrm offload. As
-
-static int xfrm_api_check(struct net_device *dev)
-{
-#ifdef CONFIG_XFRM_OFFLOAD
-        if ((dev->features & NETIF_F_HW_ESP_TX_CSUM) &&
-            !(dev->features & NETIF_F_HW_ESP))
-                return NOTIFY_BAD;
-
-        if ((dev->features & NETIF_F_HW_ESP) &&
-            (!(dev->xfrmdev_ops &&
-               dev->xfrmdev_ops->xdo_dev_state_add &&
-               dev->xfrmdev_ops->xdo_dev_state_delete)))
-                return NOTIFY_BAD;
-
-Please correct me if I made any mistake.
-
-Thanks
-Hangbin
+Best Regards,
+Oleksik
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
