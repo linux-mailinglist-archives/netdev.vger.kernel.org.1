@@ -1,259 +1,154 @@
-Return-Path: <netdev+bounces-220952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D15B49A66
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:56:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30C74B49A6D
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0A4B206329
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:56:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE78C164101
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3044F2D5A07;
-	Mon,  8 Sep 2025 19:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D1F2D595B;
+	Mon,  8 Sep 2025 19:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="WuspcEjl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FIxIwS1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A21D1E231E;
-	Mon,  8 Sep 2025 19:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757361364; cv=pass; b=HiW8rPVPUhv3jc8h7fHLTG3RNp82HmE8E/A9VlS9nwydj7vi3c1qHk6jyKAbcByqf0vCo6yzIxZW1MxBQ9mckQNvee5TLHL9MIH+tcaNPq1c2EZVjocQZOsSoJf+H7wGyggwpUh9CocZqPuubtHC5GVnczP2h+AV/mIwif/2RPA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757361364; c=relaxed/simple;
-	bh=MWpV4A2WRkUfqblRPidOKOMyFxPO/XuuQrBHbl8uMQI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oUxeZUZLouoAhqIhaVJAaz7Pb0Gw1Dslw9ChUD7T+y+XI0WEgU7fRF1IRFSHg4aCRLVLBNkisnIGTh3HcJL1DjnNL6vm+YErA2a8xnASXxcmUJmNy4I4xOd0el2ejuFIVEUdRq2e4RjGebPsTQnGAv00jnzOn+AnU5Z4tFb6Amk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=WuspcEjl; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1757361303; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=mUzmnkI7ls4AvpKk9PkLBBYeCu+pH9kCHwMoKRU9mS8Va3Rk3P1EnjIukFHIQ1sAgt4nQPlbPOXlK83kFmYc2xVS75KjHCPk94ELyPusE++ff8czzuFzys66QYc4l6TbNekfLo+fBNe1sVSwmyurSAX0CZXICiNB/U581LhcNrU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757361303; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=M/VFSbxaoCdLjJSeyTwHsH+gRgpx/aAWpUtZlGe7uGk=; 
-	b=BaZlsaht09RzyFGIw897Zk6xphgJqy43DTSQKT9TkRm0X5MkO3meBCJ4cTbsHdUbbD2SEdI/5kc03gzpBrHIl+mADS6abfJXQtNg+5HPGSQoyur59mlSQ7Ia3ZhxJAtvYUVT99Q1iWwbwHsF4hvHTz/xFr1r9Snnsvu9tXKFPY0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
-	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757361303;
-	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=M/VFSbxaoCdLjJSeyTwHsH+gRgpx/aAWpUtZlGe7uGk=;
-	b=WuspcEjlUBylmJh1B0BghZqg5B6vUEjxtdYtMYSmMk6RsbTPP0bLHXw0NlWAcceJ
-	xsO8L1flgUuEeUGRtXTkjsV0T9f76hnyQvEhLCzhzUA5H4Yt1V6Miux3sq5qAOgM9B+
-	4LA1qn9GmOhsgJZge5/qJBesfNjPEAzNODbFUE/w=
-Received: by mx.zohomail.com with SMTPS id 1757361302113105.67245372545813;
-	Mon, 8 Sep 2025 12:55:02 -0700 (PDT)
-Message-ID: <0b1d77ab-7b39-4764-9f0c-4b4a15aa0e56@collabora.com>
-Date: Mon, 8 Sep 2025 16:54:46 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18AC22698A2;
+	Mon,  8 Sep 2025 19:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757361491; cv=none; b=E/cIPw4IAZJvmnrse6Eky2WLqEZAyJSSSBHDqXX72Bb8p4UtsJFBmwvljKs6uMP2RocSf6WLDDSUdICkV4ZnqbsMxQWQNTFIWjjTwgRZF9LXyEI2H7t5kZhyaWPS4xMawXit4uAlz//GhJMCPWg9VsSrzwuXrwlQXclTHi4Mt7c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757361491; c=relaxed/simple;
+	bh=tH1ImA5bTuWqG9h2H7j9iN13xvN2sIiDfZRqSpLr58A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ENgEr9BAPiBvD8vkYjp0dLbCmmQAr35AYd54D/Lc+t6tTzqVKXcXtSgYsQkUj4qEAiLdn1hfssprxL97lmRpz4ES5JtoeiAfXEu/6nRAchehJElTeMBrk9AvmxCVwtBHOBC2EthiEVJjdMBptfBhC5d+Wrw/ISsUTj/fD6LDpEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FIxIwS1P; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757361491; x=1788897491;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tH1ImA5bTuWqG9h2H7j9iN13xvN2sIiDfZRqSpLr58A=;
+  b=FIxIwS1PMuBC7ZW2pbG+/8CnlOKZiYs5DI5Tcz8OreFEfGtwfBZ89kYZ
+   ctPFegwiVd30xgH4nfvjA5T2AQjqJaQznpbXak56WV5c+3Jb3Dyj/KoMh
+   m1Wakx1aFDTv62xpal+8x78xV3nS3whd54oYmtIMievTBWcBggpr7Q73B
+   ChAmCifpaFbF1yYIWFxKflodFD9VTmd/KoR6PNdLBTQIccSB0toRT4/KH
+   6en1CmKvO6AP7bQ7g42l+UYw8HS2IxcfXjZ/W5ORKP5FjGRtvwPa+sRZK
+   qKCJNwTutcZJEo/tQIcxovtUeiG65EfsuogVV60SLd2d216q0a37ucvNz
+   g==;
+X-CSE-ConnectionGUID: V1Q2Uw+zTCSdcqVCLkywyQ==
+X-CSE-MsgGUID: 62l0vzNSRbKmHIooALxzlw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="77088868"
+X-IronPort-AV: E=Sophos;i="6.18,249,1751266800"; 
+   d="scan'208";a="77088868"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 12:58:10 -0700
+X-CSE-ConnectionGUID: ac0PcofkSkm6c/VhFFd1+g==
+X-CSE-MsgGUID: K7/+LvdpQ9Ki9FW+pUkL1w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,249,1751266800"; 
+   d="scan'208";a="177189709"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa004.jf.intel.com with ESMTP; 08 Sep 2025 12:58:10 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	aleksander.lobakin@intel.com,
+	michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	przemyslaw.kitszel@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	nxne.cnse.osdt.itp.upstreaming@intel.com,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next 00/13][pull request] idpf: add XDP support
+Date: Mon,  8 Sep 2025 12:57:30 -0700
+Message-ID: <20250908195748.1707057-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 04/14] net: dt-bindings: Convert Marvell 8897/8997
- bindings to YAML
-To: Rob Herring <robh@kernel.org>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
- andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
- broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
- conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com,
- edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com,
- jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com,
- krzk+dt@kernel.org, kuba@kernel.org,
- kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
- linus.walleij@linaro.org, louisalexis.eyraud@collabora.com,
- maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
- mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
- p.zabel@pengutronix.de, pabeni@redhat.com, sean.wang@kernel.org,
- simona@ffwll.ch, support.opensource@diasemi.com, tiffany.lin@mediatek.com,
- tzimmermann@suse.de, yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
- linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org
-References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
- <20250820171302.324142-5-ariel.dalessandro@collabora.com>
- <CAL_Jsq+K72Kof-Z3q2DSh3FKO64npLF6hDJnqnTzNBUoOoVQFA@mail.gmail.com>
-Content-Language: en-US
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-In-Reply-To: <CAL_Jsq+K72Kof-Z3q2DSh3FKO64npLF6hDJnqnTzNBUoOoVQFA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 
-Hi Rob,
+Alexander Lobakin says:
 
-On 8/21/25 11:28 AM, Rob Herring wrote:
-> On Wed, Aug 20, 2025 at 12:15 PM Ariel D'Alessandro
-> <ariel.dalessandro@collabora.com> wrote:
->>
->> Convert the existing text-based DT bindings for Marvell 8897/8997
->> (sd8897/sd8997) bluetooth devices controller to a YAML schema.
->>
->> While here, bindings for "usb1286,204e" (USB interface) are dropped from
->> the YAML definition as these are currently documented in file:
->>
->> - Documentation/devicetree/bindings/net/btusb.txt
->>
->> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
->> ---
->>   .../bindings/net/marvell,sd8897-bt.yaml       | 91 +++++++++++++++++++
-> 
-> This needs to move to net/bluetooth/
+Add XDP support (w/o XSk for now) to the idpf driver using the libeth_xdp
+sublib. All possible verdicts, .ndo_xdp_xmit(), multi-buffer etc. are here.
+In general, nothing outstanding comparing to ice, except performance --
+let's say, up to 2x for .ndo_xdp_xmit() on certain platforms and
+scenarios.
+idpf doesn't support VLAN Rx offload, so only the hash hint is
+available for now.
 
-Ack.
+Patches 1-7 are prereqs, without which XDP would either not work at all or
+work slower/worse/...
+---
+IWL: https://lore.kernel.org/intel-wired-lan/20250826155507.2138401-1-aleksander.lobakin@intel.com/
 
-> 
->>   .../bindings/net/marvell-bt-8xxx.txt          | 83 -----------------
->>   2 files changed, 91 insertions(+), 83 deletions(-)
->>   create mode 100644 Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml
->>   delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
->>
->> diff --git a/Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml b/Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml
->> new file mode 100644
->> index 0000000000000..6539868c08b8a
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml
->> @@ -0,0 +1,91 @@
->> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/net/marvell,sd8897-bt.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Marvell 8897/8997 (sd8897/sd8997) bluetooth devices (SDIO)
->> +
->> +maintainers:
->> +  - Ariel D'Alessandro <ariel.dalessandro@collabora.com>
->> +
-> 
-> Needs a $ref to bluetooth-controller.yaml
+The following are changes since commit c6142e1913de563ab772f7b0e4ae78d6de9cc5b1:
+  Merge branch '10g-qxgmii-for-aqr412c-felix-dsa-and-lynx-pcs-driver'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 200GbE
 
-Ack.
+Alexander Lobakin (9):
+  xdp, libeth: make the xdp_init_buff() micro-optimization generic
+  idpf: fix Rx descriptor ready check barrier in splitq
+  idpf: use a saner limit for default number of queues to allocate
+  idpf: link NAPIs to queues
+  idpf: add support for nointerrupt queues
+  idpf: use generic functions to build xdp_buff and skb
+  idpf: add support for XDP on Rx
+  idpf: add support for .ndo_xdp_xmit()
+  idpf: add XDP RSS hash hint
 
-> 
->> +properties:
->> +  compatible:
->> +    enum:
->> +      - marvell,sd8897-bt
->> +      - marvell,sd8997-bt
->> +
->> +  reg:
->> +    maxItems: 1
->> +
->> +  interrupts:
->> +    maxItems: 1
->> +
->> +  marvell,cal-data:
->> +    $ref: /schemas/types.yaml#/definitions/uint8-array
->> +    description:
->> +      Calibration data downloaded to the device during initialization.
->> +    minItems: 28
-> 
-> Just: maxItems: 28
+Michal Kubiak (4):
+  idpf: add 4-byte completion descriptor definition
+  idpf: remove SW marker handling from NAPI
+  idpf: prepare structures to support XDP
+  idpf: implement XDP_SETUP_PROG in ndo_bpf for splitq
 
-Ack.
-
-> 
->> +
->> +  marvell,wakeup-pin:
->> +    $ref: /schemas/types.yaml#/definitions/uint16
->> +    description:
->> +      Wakeup pin number of the bluetooth chip. Used by firmware to wakeup host
->> +      system.
->> +
->> +  marvell,wakeup-gap-ms:
-> 
-> This unfortunately needs a uint16 type. That will cause a warning
-> which has to be fixed on the dtschema side.
-
-Yeah, that's what I thought but wasn't sure on the proper solution. Will 
-fix in v2.
-
-> 
->> +    description:
->> +      Wakeup latency of the host platform. Required by the chip sleep feature.
->> +
->> +required:
->> +  - compatible
->> +  - reg
->> +  - interrupts
->> +
->> +additionalProperties: false
->> +
->> +examples:
->> +  - |
->> +    #include <dt-bindings/interrupt-controller/irq.h>
->> +    #include <dt-bindings/pinctrl/rockchip.h>
-> 
-> Please drop this and just use a number below.
-
-Ack.
-
-> 
->> +
->> +    sdio0 {
->> +        #address-cells = <1>;
->> +        #size-cells = <0>;
->> +
->> +        btmrvl: btmrvl@2 {
->> +            compatible = "marvell,sd8897-bt";
->> +            reg = <2>;
->> +            interrupt-parent = <&gpio4>;
->> +            interrupts = <RK_PD7 IRQ_TYPE_LEVEL_LOW>;
->> +            marvell,wakeup-pin = /bits/ 16 <13>;
->> +            pinctrl-names = "default";
->> +            pinctrl-0 = <&bt_host_wake_l>;
->> +        };
->> +    };
-> 
-> I would drop this example.
-
-Agreed.
-
-> 
->> +
->> +    mmc3 {
-> 
-> mmc {
-
-Ack.
-
-> 
->> +        vmmc-supply = <&wlan_en_reg>;
->> +        bus-width = <4>;
->> +        cap-power-off-card;
->> +        keep-power-in-suspend;
->> +
->> +        #address-cells = <1>;
->> +        #size-cells = <0>;
->> +
->> +        bluetooth: bluetooth@2 {
-> 
-> Drop the label.
-
-Ack.
-
-Thanks a lot for your feedback and help!
-Regards,
+ drivers/net/ethernet/intel/idpf/Kconfig       |   2 +-
+ drivers/net/ethernet/intel/idpf/Makefile      |   2 +
+ drivers/net/ethernet/intel/idpf/idpf.h        |  31 +-
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |  11 +-
+ .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  67 ++-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |   1 +
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   | 110 ++---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 424 ++++++++--------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 140 ++++--
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  11 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 173 ++++---
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   1 -
+ drivers/net/ethernet/intel/idpf/xdp.c         | 454 ++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/xdp.h         | 172 +++++++
+ include/net/libeth/xdp.h                      |  11 +-
+ include/net/xdp.h                             |  28 +-
+ 17 files changed, 1217 insertions(+), 427 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/idpf/xdp.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/xdp.h
 
 -- 
-Ariel D'Alessandro
-Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
-Registered in England & Wales, no. 5513718
+2.47.1
 
 
