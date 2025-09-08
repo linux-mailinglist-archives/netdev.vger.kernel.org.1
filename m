@@ -1,148 +1,138 @@
-Return-Path: <netdev+bounces-220703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09C78B4842B
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 08:27:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8069CB4842C
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 08:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 668FB3B16ED
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 06:26:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434721617F2
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 06:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F27222D7B5;
-	Mon,  8 Sep 2025 06:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55312222B6;
+	Mon,  8 Sep 2025 06:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4qo1JKGK";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pF4zonKh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTjb1j48"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE9F22A817
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 06:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E542F32;
+	Mon,  8 Sep 2025 06:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757312779; cv=none; b=QFvplWjR0l1C+mwEOKSamUbp+iR90B4ChfHKxzaQwDgBZCOGfcc0SWDEEQJTR3EaTVA8bP4CKUU0HQiqEWVaRNr88IVoFnfRfiF5ZWiAH0IQwCF3Ws/ggsXftmjCA4fazSFxn3wbq0CsP3Ibw/BMlygBFmMUHdVnVCZhCMWIYbk=
+	t=1757312895; cv=none; b=XuS/jdIsOKAp8Een79NYWckIC0oZSPOKkITQk2ClLtAU4SSbUne6NxM4lOeVwMiXTAa7TecDM2G5DEr4mlWQnxxUZZJZpRqMpLnqdZtioTMBsYRnxy1aM4Jd1CIm0TTIpx55xVAWYbIn0S+hpsJyvSZ4njWRQHHfzo3qUMPnLEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757312779; c=relaxed/simple;
-	bh=cNeEGO2qeRPk7Y3v4ju+lunlIPdLEF6Me6/Qd6mXzbk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=HY8tyrONqGR4I8hKz8dIZqHJuvhlBqWC0dIhYFRbHjQEgfov4YlFADaJRnsneP7ZtmbLwlfxRtYBJQ5NbFn/EuW3Qiw53lhZGrX/cOV85QA4iC6vXpHyzZbkJ0aHvjKWsF+V4ppzmMqK0daH+Jk8/2vVUmgN0SBYh5FmKbPJ1h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4qo1JKGK; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pF4zonKh; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1757312773;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6bBqlMJnbWGXcmUBtE9PTudTuxx/UefA7GFyXkZGpvA=;
-	b=4qo1JKGKfc4m9J1ccMlKLIidd6d4Ri5vxJjAvTeZabJNXQCmaBEh+REgLXSGSNy5h2mii5
-	tBZW9eRI0zYa5r/i3GvrKZOELCOUzqet5E65QeQ3oRyFK/gfGiIHXfgz7tMGmDhXKV1EW/
-	/2HA95Xf9CVR7MIYU4p+VOpTfFEtX8NXRMX27QHtCR5X4Sha4Q2m7eRA1gjWlt/sgFTQ8H
-	AY0MIG7U9jMyosM/EGYuy37AsSWlfdd+O86/sUP6H2AHRQ22bY5eRKfiwYJzWhzhGMnjnf
-	7/AvtW4qYqsLAhhmewgjsCfi5oZ/PXAqqZJVpdU4DYKny1Jv7oYZx3QagdW81A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1757312773;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6bBqlMJnbWGXcmUBtE9PTudTuxx/UefA7GFyXkZGpvA=;
-	b=pF4zonKhlnCDDbr7IsNBTtEWjdQnqtuoR+n2vFMFv1eZLbY0K7DGdfPuEHE0togKWtbSMT
-	jKzYqlA5ChYh4uDA==
-To: Kohei Enju <enjuk@amazon.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- kohei.enju@gmail.com, Kohei Enju <enjuk@amazon.com>
-Subject: Re: [PATCH v1 iwl-net] igc: unregister netdev when igc_led_setup()
- fails in igc_probe()
-In-Reply-To: <20250906055239.29396-1-enjuk@amazon.com>
-References: <20250906055239.29396-1-enjuk@amazon.com>
-Date: Mon, 08 Sep 2025 08:26:10 +0200
-Message-ID: <87ikht794t.fsf@jax.kurt.home>
+	s=arc-20240116; t=1757312895; c=relaxed/simple;
+	bh=ltGHhRsnNNUL4vfR88eApK9XsH3PP6Rb9TOxCfR95AI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AFfMJTjhIt4gxNsil6CNYBu1POEUByglAU64i5jUieH4lzPIw2UidpNIlbGrDUFScFSNJMbJNCAdqUSewT+mCb9zZ/62ptBh8v6bVLkqr1FhyCmXQnN8lVjhiuKglqszUoNCGm1YRZeEx+l4ijrcPTGuA9T7v6OamZO20acQ4h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTjb1j48; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-32d3e17d95dso1246283a91.3;
+        Sun, 07 Sep 2025 23:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757312893; x=1757917693; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RPBc83npyM3oZ6IcL9QGJfiYXUzPVNexDH9DXNnsPF0=;
+        b=jTjb1j48hnXycaNtBZ/HJTnonueCfkRM3eV7s/eN9TWv6B8PXivpx0gkMI749ZrOg/
+         H4YICqrvGAgQQwrLTnog+of+BACK/PKcSkrjH2mqkBCoOUvTAWsN0ny9KMU9rDpgO7oy
+         DQk4eFd2dBMsZQDUM1F4bWrTzUTnzgkhnTAVgQgim5ZJfzakKzSbU4hj2V9pC/gR+q7C
+         03kch70l5Y9QiW/5enary7NGV8xI3batJ5QYsoqB9MiHjSiyhwirlhOXGAN3Wgq2QBrR
+         dIPEiCJzwKIqSn7YLfMqHxEQkpq2H8HOps48HlxOvhHcpuuWAw/nRH2WvxU0v8mxL613
+         7cGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757312893; x=1757917693;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RPBc83npyM3oZ6IcL9QGJfiYXUzPVNexDH9DXNnsPF0=;
+        b=s3stKCiGLiiAnHAWStECiL95cPYiMrpOGgMTPDk1gIqA5ipq5PaCfNCkic90i1pkve
+         ywWSj6mnTNDu3mpoon35f+IUIWrjEK0/gi45x8WeVOHFe4GNpliIINcVnp7767XKZM4j
+         uxE5vbBpWY9zx+LqfyshGe5VM3WaCY/TQ1WSjfVT5CrfwRUMWf+vUoIL/EhJ4qs49QFk
+         kz2GB+0oUItXbb4s/G1tqD8FerdMmyKtWztt6kLoIt1KNQyD3PDcSfqFujO11WRmnBQy
+         Ejc+xCQdmC8LdWd7POVsUqoNb400EgJzHsIxm1aMBSACYJCcPdhXdjVrRTj8eS/u+wVb
+         hY/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWei8fVuPL9GiNhIKMWDaMyeA+8sosxEqpxkBJ7lAsbGpIDTAWXfhs0a9EgB9M67EOgBK7jhVGZrd5OdeX4AI0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz61p4fmTj1XPqnfIidzF6c5JGjm9fYvMUTIPosqLq8CFTzl3P+
+	9kAc32ndO83T0/NN+QKR47LjPQDgshWuVGq+H/1PCbqLnwv41Iylh+irUeIywn/gmB0=
+X-Gm-Gg: ASbGncsWiBeOJE8NJI2MI/cNwJTOvz/s3Llgg46RMchlfmq95sbAGPOxHDv85Jkok4i
+	IShLF71qx701DgXsrz/JeB8edSM9xVLTa32Bkfckf8CYXM1HR10nD8cL+mrQtJsGdmKhR9AebTs
+	fNtFZ+n5aBwm5G89LvaSshkjyXq9OWFb2AYJGX6FjlaoHzWc5yHpuGXc56Liyov5BZmnrtz8TjR
+	juWPUWgI6TDEIuN7Xie0+Y2wCgMAgrcv9UNR83sSoVyVNNGrA7HjlFI+mPdlI5vCOlBXlhNGqEk
+	q8nkXoyhvvV07YGN4d4rjh/CR04MF7iun+5aiQjzFBV6iV4VAS3O0rd5isqExdMypVRxxLG1xuX
+	hOz1hYotqRXYw2AKtl7uWcfjGFbPa0Gx9+4HIWKpilcht9C2ZcyLW
+X-Google-Smtp-Source: AGHT+IHRigGTvVKHGEqRM0ROOHKESyBE3/7Gz5SURVLP42ZMjdI3RsJVoxtkV7TRC+SmuLwHOLnpaQ==
+X-Received: by 2002:a17:90b:3c08:b0:329:e9da:35dd with SMTP id 98e67ed59e1d1-32d43f77076mr9091997a91.27.1757312892633;
+        Sun, 07 Sep 2025 23:28:12 -0700 (PDT)
+Received: from fedora.redhat.com ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77285bb2614sm13134974b3a.58.2025.09.07.23.28.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Sep 2025 23:28:12 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	David Wilder <wilder@us.ibm.com>
+Subject: [PATCHv2 1/2] bonding: don't set oif to bond dev when getting NS target destination
+Date: Mon,  8 Sep 2025 06:28:01 +0000
+Message-ID: <20250908062802.392300-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
 
---=-=-=
-Content-Type: text/plain
+Unlike IPv4, IPv6 routing strictly requires the source address to be valid
+on the outgoing interface. If the NS target is set to a remote VLAN interface,
+and the source address is also configured on a VLAN over a bond interface,
+setting the oif to the bond device will fail to retrieve the correct
+destination route.
 
-On Sat Sep 06 2025, Kohei Enju wrote:
-> Currently igc_probe() doesn't unregister netdev when igc_led_setup()
-> fails, causing BUG_ON() in free_netdev() and then kernel panics. [1]
->
-> This behavior can be tested using fault-injection framework. I used the
-> failslab feature to test the issue. [2]
->
-> Call unregister_netdev() when igc_led_setup() fails to avoid the kernel
-> panic.
->
-> [1]
->  kernel BUG at net/core/dev.c:12047!
->  Oops: invalid opcode: 0000 [#1] SMP NOPTI
->  CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
->  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->  RIP: 0010:free_netdev+0x278/0x2b0
->  [...]
->  Call Trace:
->   <TASK>
->   igc_probe+0x370/0x910
->   local_pci_probe+0x3a/0x80
->   pci_device_probe+0xd1/0x200
->  [...]
->
-> [2]
->  #!/bin/bash -ex
->
->  FAILSLAB_PATH=/sys/kernel/debug/failslab/
->  DEVICE=0000:00:05.0
->  START_ADDR=$(grep " igc_led_setup" /proc/kallsyms \
->          | awk '{printf("0x%s", $1)}')
->  END_ADDR=$(printf "0x%x" $((START_ADDR + 0x100)))
->
->  echo $START_ADDR > $FAILSLAB_PATH/require-start
->  echo $END_ADDR > $FAILSLAB_PATH/require-end
->  echo 1 > $FAILSLAB_PATH/times
->  echo 100 > $FAILSLAB_PATH/probability
->  echo N > $FAILSLAB_PATH/ignore-gfp-wait
->
->  echo $DEVICE > /sys/bus/pci/drivers/igc/bind
->
-> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+Fix this by not setting the oif to the bond device when retrieving the NS
+target destination. This allows the correct destination device (the VLAN
+interface) to be determined, so that bond_verify_device_path can return the
+proper VLAN tags for sending NS messages.
 
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Reported-by: David Wilder <wilder@us.ibm.com>
+Closes: https://lore.kernel.org/netdev/aGOKggdfjv0cApTO@fedora/
+Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
+Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+v2: split the patch into 2 parts, the kernel change and test update (Jay Vosburgh)
 
------BEGIN PGP SIGNATURE-----
+---
+ drivers/net/bonding/bond_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmi+dwMTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgjOrD/4qyV9TBth01mlwn58WqE8vBfJlONOe
-DEpsPViibjk9BIC5L0H0gtHfGhn7mST2PN8rH6BSlLa5/wXJZjv6Il0go6kkdzEN
-MGeYSZF+JRf2gf6rj35ILThlbN0z9WdM+3ezZqd89v5nXVBZ8PgMLXcsNAZOlPEu
-iChtRaXSYXU8JVqT+AxYje4k90qDXJcXz/j7OtDpw7cV5swdLLiIJ+6rBjzudN9m
-q0hG2mkQPq9zlBScBocrZXOIDvOw1mk1s0h6W1UwnQPDy/0YUJxFdPsea4M99mKn
-WoW5YC4zMkDfXhYdfSVesqRHq1nxM0gv2QiLu11oo3TQYUyzkZHs6360ury7lezf
-pHJHfS0+g2WPzUuLxe6bijAHCv3fHIzsIjpswfezyVcQs+kGUWBOosvPWfuBf4qH
-uzSk6+tlwlGccroAHMaCSFfzgiV91nn/KS9F6Q4cI+0ay+4A7oUcRHHNrvfmk4nK
-eLuznh5E9p8D8IsE0lkAAj/YZsOotLe191bCCVHSEWQLLzDeQQNR8ZcQsBweVifS
-jRklktMfyY5BfpohaOr2wNUb/Q+f4eusSBghHGF6F7AFbPY4s9F6zMzwLAbBkJhh
-LE90hCQfZ2fG4KUxGqoezKplfM1wc16HE+gC+Qluk01QPrkmY2KTcC/OLvtFThQu
-KXwFMmOLdZDBeg==
-=GFLf
------END PGP SIGNATURE-----
---=-=-=--
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 257333c88710..30cf97f4e814 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -3355,7 +3355,6 @@ static void bond_ns_send_all(struct bonding *bond, struct slave *slave)
+ 		/* Find out through which dev should the packet go */
+ 		memset(&fl6, 0, sizeof(struct flowi6));
+ 		fl6.daddr = targets[i];
+-		fl6.flowi6_oif = bond->dev->ifindex;
+ 
+ 		dst = ip6_route_output(dev_net(bond->dev), NULL, &fl6);
+ 		if (dst->error) {
+-- 
+2.50.1
+
 
