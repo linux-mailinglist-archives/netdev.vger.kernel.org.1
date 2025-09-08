@@ -1,548 +1,183 @@
-Return-Path: <netdev+bounces-220997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8146EB49D07
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:38:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A86B49D16
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:49:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 253CE16F4D0
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:38:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2BF84E7377
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938AD2FF153;
-	Mon,  8 Sep 2025 22:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A112E92B0;
+	Mon,  8 Sep 2025 22:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iVZa+Ske"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qzV25RQW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31CB2FF679
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 22:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EEE1EB5CE;
+	Mon,  8 Sep 2025 22:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757371087; cv=none; b=kWWb7pquFzVSg5Gl/FanXPnw9jTp/Ywq5/LsSIX8j68hQ0wDAMM4mAyxBlSchdfrrs0Z6F50xeqRrsym08lAIFQq7do5Xu2mUpkSbU+GUxUQxi17jc4KGsPRhNr2UTwITner10nhTQT7aLKgDA4zmnYuGYmYdjw5w7MZhuWpIms=
+	t=1757371782; cv=none; b=fsDn4p+Sk0vl/ar14XhZ+Kq2GWU/OtzvtQvRrqPSSDGq6lQNwz+QVbcoLvHHd4C4sH5KsO6QpAafU9DdSuorieIvwCS3Bjv2LiDemGwHcEt+rnDIbU7Tbt96d1n+F5zykfvrKqSt9Wacu7ZRKCGE8UhCIfe9OhBl6wyDQ4v7Vhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757371087; c=relaxed/simple;
-	bh=xvN67whfpOhKIwxwIl11JsYnVj0DqrXhAlM3YdZ+s8E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rRkF/lURupvutnpS1m7u7zKZlyRIZFxi4vUnmLLizABkehTCR0XVRpQmJ+HZxHPo+mLtIO/d/9jS7uMdkScyLT/q+jXp+Jr8AeMMZkNcNu+PqkpYDwfPfV0jSMPq/VG+RdCfN3EGb5q/0b+8Grs52LKN9xw9jV9nU+DsJNrJv+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iVZa+Ske; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3234811cab3so5577569a91.3
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 15:38:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757371083; x=1757975883; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E/mgg2O9+HGTiL/F6Nv60Nv7w7MOKCLuTn/jqD9mWPI=;
-        b=iVZa+SkeFYqE8XNd+NlrL+FTC2Ikil+AsrR2xRF4hChu9wfKVMR5h1cg1y+Vjn/Xe6
-         25lC5nL/NdkreGLunezBjrpGdll//tI+jHqsEuLG/CjNjaOrIS63nZGg25ipnaANz8a1
-         QKqSm277wkYnRMsOJfkZojtXlP1NNlwE5/z8UwEAgHtm7gxvsxEQ/uweQlcoS5wrVjKM
-         1xfDgwRecJqGaNLEyAYt2GD/k/whalzZQA4/qTcf32w/+a0RIZ+Cy2ot+FCFwbYMxF0A
-         21mYAsvrZ/vWELuqEgc1gcI4+ZCBbHgIMFJ+9sJzV5Sqf2OiVg170cq9ZTlLyeYHnJEL
-         iZIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757371083; x=1757975883;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E/mgg2O9+HGTiL/F6Nv60Nv7w7MOKCLuTn/jqD9mWPI=;
-        b=rM5NR6quwN016wzppnn6j/4ze1AsIUfR3fXzmIEjDyaxMXiN9at7flcGCFbA/wUZoP
-         fKIhJldb8aBvcCq2DX1BkdiTC5VvGra7E+YJK40A7tkFHlReNo4LoIlT0JNdNedFAacG
-         uLvRhmePSjVSe0NYD91Um55/hxx0Bf+cHrnN/LHsO11LTO2joLhrJDK4X0eE7wf8bU6T
-         yMMM7TWNg6D7igf9lAaFGjiY/L/BugtlKkjgvkzooy2Nw3nkIw2+0lCzYzxaP3BcuSOr
-         mQUusvaQbYoIG4LQkH7H/VMrSZ31HPBdPGFEzTvw26DwgDynPZx9kC34yIkYfp38Em+9
-         ZbeA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEAp2eSg76c4HQF16NDkIwWRCFycK98PynHuoiz+s9JD5XLvGTcnQcfYmOxnF/Kfp06tLXuUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaEC2/aT3T9uqyN8IvfiIo6WchQgUJ4ya5aMNGN7eS3NRmu3Cj
-	VKaxlx8E1WhOXeN0qSNv5m/ptNwTj4Df7EFkCDcuueo0bbO1yneCQ77loPkagK+m3JEi919TUzP
-	MLwLAiw==
-X-Google-Smtp-Source: AGHT+IFB/siW0u9MZMXdgmUr0n+KiJOm7gtwcyncPXiCelJ3yrPxrmqqucGvkdLFXpTngy9W9wkHXcg2bMU=
-X-Received: from pjeb1.prod.google.com ([2002:a17:90a:10c1:b0:32b:b3c4:a304])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d40e:b0:32b:656f:5a5d
- with SMTP id 98e67ed59e1d1-32d43f701admr11064178a91.29.1757371082858; Mon, 08
- Sep 2025 15:38:02 -0700 (PDT)
-Date: Mon,  8 Sep 2025 22:34:39 +0000
-In-Reply-To: <20250908223750.3375376-1-kuniyu@google.com>
+	s=arc-20240116; t=1757371782; c=relaxed/simple;
+	bh=lnwnrrjuGfO0mxaFVDsCYUrjF7eAtqYJcIxxxfw8O5s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lgX9NZA2O7yuCNy9nrHXXqkkg3Iox1K9VBc+eNUzNe3ADiZnNRlscgyzuvt0wPjnhsGyw5BGCIL5oKn53MpCvTKimBIxdC0Rdn0hTNgQksUhZPkBryOSh0kKOw9uUj26Fh3+r8dUxVtamqhaegYPUDhUpfDVIPtpyvs9ne+3jYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qzV25RQW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F26F8C4CEF8;
+	Mon,  8 Sep 2025 22:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757371782;
+	bh=lnwnrrjuGfO0mxaFVDsCYUrjF7eAtqYJcIxxxfw8O5s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qzV25RQW+MgDi/hpupASciblnRwvwak6iSKey3VOtSYLukUwHI7fR+zUx1QST/x2Q
+	 6Em65Qfmn9/B4CzRdBo4+nd087sFEkJ5vfUGT4P2m+dbzUkPa8YxqP7boAFnn7uXt3
+	 gTVEUZiV8K3eTb/9xPfhX4fJK+mAbHPXs5CvfpNnFKONpFSW6Pd59zpCNXJoxekD2F
+	 hHDw5zXZe8hbKbKOu4Tu6MF4LvuhP7Xdr57eX8HWZOJNUeOSx/f5AjqufnoLeTt0UY
+	 Caev8zFMYNQo3OPQSgsaNYEib6Q/FIu7A+t68dAgynSZVLzRLAoaiXJ5mbl91LGTw9
+	 s61gtcduRHBBA==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-62105d21297so7256013a12.0;
+        Mon, 08 Sep 2025 15:49:41 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUaSooCDTOU1zVGzpWGZLPmWlbDTyDInf/52pHzr4TOutLBVsYrIWvv08omtK8M1777NGJSBKO6IY92VPcO@vger.kernel.org, AJvYcCWymyU//5CocjfYWdwKiLuPlnOxqU3z4SMIb8eUmQl9DKnvuJfDLPu5OSxTEDwp+N2Mwz/cblm5Y8o5@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsCfkuE2MDNRTpMGVVLwBimx7E9CZqvY2r3vPSbXbZDf+0rl/z
+	pDV6zr7H0PrgcuDlfvWvGgoxBd3+l/iDpqEp2uH/9tgwVZ4IwbqKKY1gQBRielxAobXjy8Hc1Lx
+	gK8kYWR2bsxRzispl3hfo+1oDWDNWSQ==
+X-Google-Smtp-Source: AGHT+IGHw+8G7L+ArmhFoRRdE1FV4g1i7ErMbY/OfAAY/uLB+PGTF8jRNyhPKgW/7xBDt1d7qcOsXVSoBcTc1Gd368Q=
+X-Received: by 2002:a05:6402:3484:b0:61e:8f70:ee26 with SMTP id
+ 4fb4d7f45d1cf-62379b825a1mr8384508a12.38.1757371780463; Mon, 08 Sep 2025
+ 15:49:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250908223750.3375376-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250908223750.3375376-6-kuniyu@google.com>
-Subject: [PATCH v6 bpf-next/net 5/5] selftest: bpf: Add test for SK_BPF_MEMCG_SOCK_ISOLATED.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+MIME-Version: 1.0
+References: <20250815144736.1438060-1-ivecera@redhat.com> <20250820211350.GA1072343-robh@kernel.org>
+ <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com> <CAL_JsqKui29O_8xGBVx9T2e85Dy0onyAp4mGqChSuuwABOhDqA@mail.gmail.com>
+ <bc39cdc9-c354-416d-896f-c2b3c3b64858@redhat.com>
+In-Reply-To: <bc39cdc9-c354-416d-896f-c2b3c3b64858@redhat.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 8 Sep 2025 17:49:28 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqL5wQ+0Xcdo5T3FTyoa2csQ9aW8ZxxMxVOhRJpzc7fGhA@mail.gmail.com>
+X-Gm-Features: AS18NWAxhYNwJ56vsQfUczkl_R9TNuNktlxc2midcWQWDd56JDmUw5T0m2c6T2w
+Message-ID: <CAL_JsqL5wQ+0Xcdo5T3FTyoa2csQ9aW8ZxxMxVOhRJpzc7fGhA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
+ reference property
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com, 
+	Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, 
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The test does the following for IPv4/IPv6 x TCP/UDP sockets
-with/without SK_BPF_MEMCG_SOCK_ISOLATED.
+On Fri, Sep 5, 2025 at 1:50=E2=80=AFAM Ivan Vecera <ivecera@redhat.com> wro=
+te:
+>
+>
+>
+> On 05. 09. 25 12:06 dop., Rob Herring wrote:
+> > On Fri, Aug 29, 2025 at 8:29=E2=80=AFAM Ivan Vecera <ivecera@redhat.com=
+> wrote:
+> >> ...
+> >>
+> >> Do you mean to add a property (e.g. dpll-channel or dpll-device) into
+> >> net/network-class.yaml ? If so, yes, it would be possible, and the way
+> >> I look at it now, it would probably be better. The DPLL driver can
+> >> enumerate all devices across the system that has this specific propert=
+y
+> >> and check its value.
+> >
+> > Yes. Or into ethernet-controller.yaml. Is a DPLL used with wifi,
+> > bluetooth, etc.?
+>
+> AFAIK no... ethernet-controller makes sense.
+>
+> >>
+> >> See the proposal below...
+> >>
+> >> Thanks,
+> >> Ivan
+> >>
+> >> ---
+> >>    Documentation/devicetree/bindings/dpll/dpll-device.yaml  | 6 ++++++
+> >>    Documentation/devicetree/bindings/net/network-class.yaml | 7 ++++++=
++
+> >>    2 files changed, 13 insertions(+)
+> >>
+> >> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >> b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >> index fb8d7a9a3693f..560351df1bec3 100644
+> >> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >> @@ -27,6 +27,12 @@ properties:
+> >>      "#size-cells":
+> >>        const: 0
+> >>
+> >> +  "#dpll-cells":
+> >> +    description: |
+> >> +      Number of cells in a dpll specifier. The cell specifies the ind=
+ex
+> >> +      of the channel within the DPLL device.
+> >> +    const: 1
+> >
+> > If it is 1 for everyone, then you don't need a property for it. The
+> > question is whether it would need to vary. Perhaps some configuration
+> > flags/info might be needed? Connection type or frequency looking at
+> > the existing configuration setting?
+>
+> Connection type maybe... What I am trying to do is define a relationship
+> between the network controller and the DPLL device, which together form
+> a single entity from a use-case perspective (e.g., Ethernet uses an
+> external DPLL device either to synchronize the recovered clock or to
+> provide a SyncE signal synchronized with an external 1PPS source).
+>
+> Yesterday I was considering the implementation from the DPLL driver's
+> perspective and encountered a problem when the relation is defined from
+> the Ethernet controller's perspective. In that case, it would be
+> necessary to enumerate all devices that contain a =E2=80=9Cdpll=E2=80=9D =
+property whose
+> value references this DPLL device.
 
-  1. Create socket pairs
-  2. Send a bunch of data that requires more than 1024 pages
-  3. Read memory_allocated from sk->sk_prot->memory_allocated and
-     sk->sk_prot->memory_per_cpu_fw_alloc
-  4. Check if unread data is charged to memory_allocated
+Why is that?
 
-If SK_BPF_MEMCG_SOCK_ISOLATED is set, memory_allocated should not
-be changed, but we allow a small error (up to 10 pages) in case
-other processes on the host use some amounts of TCP/UDP memory.
+>
+> This approach seems quite complicated, as it would require searching
+> through all buses, all connected devices, and checking each fwnode for a
+> =E2=80=9Cdpll=E2=80=9D property containing the given reference. I don=E2=
+=80=99t think this would
+> be the right solution.
 
-The amount of allocated pages are buffered to per-cpu variable
-{tcp,udp}_memory_per_cpu_fw_alloc up to +/- net.core.mem_pcpu_rsv
-before reported to {tcp,udp}_memory_allocated.
+for_each_node_with_property() provides that. No, it's not efficient,
+but I doubt it needs to be. As you'd only need to do it once.
 
-At 3., memory_allocated is calculated from the 2 variables twice
-at fentry and fexit of socket create function to check if the per-cpu
-value is drained during calculation.  In that case, 3. is retried.
+> I then came across graph bindings and ACPI graph extensions, which are
+> widely used in the media and DRM subsystems to define relations between
+> devices. Would this be an appropriate way to define a binding between an
+> Ethernet controller and a DPLL device?
 
-We use kern_sync_rcu() for UDP because UDP recv queue is destroyed
-after RCU grace period.
+Usually the graph is used to handle complex chains of devices and how
+the data flows. I'm not sure that applies here.
 
-The test takes ~2s on QEMU (64 CPUs) w/ KVM but takes 6s w/o KVM.
+> If so, what would such a binding roughly look like? I=E2=80=99m not very
+> experienced in this area, so I would appreciate any guidance.
+>
+> If not, wouldn=E2=80=99t it be better to define the relation from the DPL=
+L
+> device to the network controller, as originally proposed?
 
-  # time ./test_progs -t sk_memcg
-  #370/1   sk_memcg/TCP  :OK
-  #370/2   sk_memcg/UDP  :OK
-  #370/3   sk_memcg/TCPv6:OK
-  #370/4   sk_memcg/UDPv6:OK
-  #370     sk_memcg:OK
-  Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+I have no idea really. I would think the DPLL is the provider and an
+ethernet device is the consumer. And if the ethernet device is unused
+(or disabled), then the DPLL connection associated with it is unused.
+If that's the case, then I think the property belongs in the ethernet
+node.
 
-  real	0m1.623s
-  user	0m0.165s
-  sys	0m0.366s
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-v6:
-  * Trace sk_prot->memory_allocated + sk_prot->memory_per_cpu_fw_alloc
-
-v5:
-  * Use kern_sync_rcu()
-  * Double NR_SEND to 128
-
-v4:
-  * Only use inet_create() hook
-  * Test bpf_getsockopt()
-  * Add serial_ prefix
-  * Reduce sleep() and the amount of sent data
----
- .../selftests/bpf/prog_tests/sk_memcg.c       | 236 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/sk_memcg.c  | 146 +++++++++++
- 2 files changed, 382 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sk_memcg.c b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-new file mode 100644
-index 000000000000..c6152240a6b7
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-@@ -0,0 +1,236 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include <test_progs.h>
-+#include "sk_memcg.skel.h"
-+#include "network_helpers.h"
-+
-+#define NR_SOCKETS	64
-+#define NR_SEND		128
-+#define BUF_SINGLE	1024
-+#define BUF_TOTAL	(BUF_SINGLE * NR_SEND)
-+
-+struct test_case {
-+	char name[8];
-+	int family;
-+	int type;
-+	int (*create_sockets)(struct test_case *test_case, int sk[], int len);
-+	long (*get_memory_allocated)(struct test_case *test_case, struct sk_memcg *skel);
-+};
-+
-+static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int server, i;
-+
-+	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+	ASSERT_GE(server, 0, "start_server_str");
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = connect_to_fd(server, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "connect_to_fd"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = accept(server, NULL, NULL);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "accept"))
-+			return sk[i * 2 + 1];
-+	}
-+
-+	close(server);
-+
-+	return 0;
-+}
-+
-+static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int i, err, rcvbuf = BUF_TOTAL;
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "start_server"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = connect_to_fd(sk[i * 2], 0);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "connect_to_fd"))
-+			return sk[i * 2 + 1];
-+
-+		err = connect_fd_to_fd(sk[i * 2], sk[i * 2 + 1], 0);
-+		if (!ASSERT_EQ(err, 0, "connect_fd_to_fd"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2 + 1], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static long get_memory_allocated(struct test_case *test_case,
-+				 bool *activated, bool *stable,
-+				 long *memory_allocated)
-+{
-+	*stable = false;
-+
-+	do {
-+		*activated = true;
-+
-+		/* AF_INET and AF_INET6 share the same memory_allocated.
-+		 * tcp_init_sock() is called by AF_INET and AF_INET6,
-+		 * but udp_lib_init_sock() is inline.
-+		 */
-+		socket(AF_INET, test_case->type, 0);
-+	} while (!*stable);
-+
-+	return *memory_allocated;
-+}
-+
-+static long tcp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
-+{
-+	return get_memory_allocated(test_case,
-+				    &skel->bss->tcp_activated,
-+				    &skel->bss->tcp_stable,
-+				    &skel->bss->tcp_memory_allocated);
-+}
-+
-+static long udp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
-+{
-+	return get_memory_allocated(test_case,
-+				    &skel->bss->udp_activated,
-+				    &skel->bss->udp_stable,
-+				    &skel->bss->udp_memory_allocated);
-+}
-+
-+static int check_isolated(struct test_case *test_case,
-+			  struct sk_memcg *skel, bool isolated)
-+{
-+	char buf[BUF_SINGLE] = {};
-+	long memory_allocated[2];
-+	int sk[NR_SOCKETS] = {};
-+	int err, i, j;
-+
-+	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-+	if (err)
-+		goto close;
-+
-+	memory_allocated[0] = test_case->get_memory_allocated(test_case, skel);
-+
-+	/* allocate pages >= 1024 */
-+	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-+		for (j = 0; j < NR_SEND; j++) {
-+			int bytes = send(sk[i], buf, sizeof(buf), 0);
-+
-+			/* Avoid too noisy logs when something failed. */
-+			if (bytes != sizeof(buf)) {
-+				ASSERT_EQ(bytes, sizeof(buf), "send");
-+				if (bytes < 0) {
-+					err = bytes;
-+					goto close;
-+				}
-+			}
-+		}
-+	}
-+
-+	memory_allocated[1] = test_case->get_memory_allocated(test_case, skel);
-+
-+	if (isolated)
-+		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "isolated");
-+	else
-+		ASSERT_GT(memory_allocated[1], memory_allocated[0] + 1024, "not isolated");
-+
-+close:
-+	for (i = 0; i < ARRAY_SIZE(sk); i++)
-+		close(sk[i]);
-+
-+	if (test_case->type == SOCK_DGRAM) {
-+		/* UDP recv queue is destroyed after RCU grace period.
-+		 * With one kern_sync_rcu(), memory_allocated[0] of the
-+		 * isoalted case often matches with memory_allocated[1]
-+		 * of the preceding non-isolated case.
-+		 */
-+		kern_sync_rcu();
-+		kern_sync_rcu();
-+	}
-+
-+	return err;
-+}
-+
-+void run_test(struct test_case *test_case)
-+{
-+	struct sk_memcg *skel;
-+	int cgroup, err;
-+
-+	skel = sk_memcg__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	skel->bss->nr_cpus = libbpf_num_possible_cpus();
-+
-+	err = sk_memcg__attach(skel);
-+	if (!ASSERT_OK(err, "attach"))
-+		goto destroy_skel;
-+
-+	cgroup = test__join_cgroup("/sk_memcg");
-+	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
-+		goto destroy_skel;
-+
-+	err = check_isolated(test_case, skel, false);
-+	if (!ASSERT_EQ(err, 0, "test_isolated(false)"))
-+		goto close_cgroup;
-+
-+	skel->links.sock_create = bpf_program__attach_cgroup(skel->progs.sock_create, cgroup);
-+	if (!ASSERT_OK_PTR(skel->links.sock_create, "attach_cgroup(sock_create)"))
-+		goto close_cgroup;
-+
-+	err = check_isolated(test_case, skel, true);
-+	ASSERT_EQ(err, 0, "test_isolated(false)");
-+
-+close_cgroup:
-+	close(cgroup);
-+destroy_skel:
-+	sk_memcg__destroy(skel);
-+}
-+
-+struct test_case test_cases[] = {
-+	{
-+		.name = "TCP  ",
-+		.family = AF_INET,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+		.get_memory_allocated = tcp_get_memory_allocated,
-+	},
-+	{
-+		.name = "UDP  ",
-+		.family = AF_INET,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+		.get_memory_allocated = udp_get_memory_allocated,
-+	},
-+	{
-+		.name = "TCPv6",
-+		.family = AF_INET6,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+		.get_memory_allocated = tcp_get_memory_allocated,
-+	},
-+	{
-+		.name = "UDPv6",
-+		.family = AF_INET6,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+		.get_memory_allocated = udp_get_memory_allocated,
-+	},
-+};
-+
-+void serial_test_sk_memcg(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		test__start_subtest(test_cases[i].name);
-+		run_test(&test_cases[i]);
-+	}
-+}
-diff --git a/tools/testing/selftests/bpf/progs/sk_memcg.c b/tools/testing/selftests/bpf/progs/sk_memcg.c
-new file mode 100644
-index 000000000000..cd46d6dfa73c
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/sk_memcg.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+#include <errno.h>
-+
-+extern int tcp_memory_per_cpu_fw_alloc __ksym;
-+extern int udp_memory_per_cpu_fw_alloc __ksym;
-+
-+int nr_cpus;
-+bool tcp_activated, tcp_stable, udp_activated, udp_stable;
-+long tcp_memory_allocated, udp_memory_allocated;
-+static struct sock *tcp_sk_tracing, *udp_sk_tracing;
-+
-+struct sk_prot {
-+	long *memory_allocated;
-+	int *memory_per_cpu_fw_alloc;
-+};
-+
-+static int drain_memory_per_cpu_fw_alloc(__u32 i, struct sk_prot *sk_prot_ctx)
-+{
-+	int *memory_per_cpu_fw_alloc;
-+
-+	memory_per_cpu_fw_alloc = bpf_per_cpu_ptr(sk_prot_ctx->memory_per_cpu_fw_alloc, i);
-+	if (memory_per_cpu_fw_alloc)
-+		*sk_prot_ctx->memory_allocated += *memory_per_cpu_fw_alloc;
-+
-+	return 0;
-+}
-+
-+static long get_memory_allocated(struct sock *_sk, int *memory_per_cpu_fw_alloc)
-+{
-+	struct sock *sk = bpf_core_cast(_sk, struct sock);
-+	struct sk_prot sk_prot_ctx;
-+	long memory_allocated;
-+
-+	/* net_aligned_data.{tcp,udp}_memory_allocated was not available. */
-+	memory_allocated = sk->__sk_common.skc_prot->memory_allocated->counter;
-+
-+	sk_prot_ctx.memory_allocated = &memory_allocated;
-+	sk_prot_ctx.memory_per_cpu_fw_alloc = memory_per_cpu_fw_alloc;
-+
-+	bpf_loop(nr_cpus, drain_memory_per_cpu_fw_alloc, &sk_prot_ctx, 0);
-+
-+	return memory_allocated;
-+}
-+
-+static void fentry_init_sock(struct sock *sk, struct sock **sk_tracing,
-+			     long *memory_allocated, int *memory_per_cpu_fw_alloc,
-+			     bool *activated)
-+{
-+	if (!*activated)
-+		return;
-+
-+	if (__sync_val_compare_and_swap(sk_tracing, NULL, sk))
-+		return;
-+
-+	*activated = false;
-+	*memory_allocated = get_memory_allocated(sk, memory_per_cpu_fw_alloc);
-+}
-+
-+static void fexit_init_sock(struct sock *sk, struct sock **sk_tracing,
-+			    long *memory_allocated, int *memory_per_cpu_fw_alloc,
-+			    bool *stable)
-+{
-+	long new_memory_allocated;
-+
-+	if (sk != *sk_tracing)
-+		return;
-+
-+	new_memory_allocated = get_memory_allocated(sk, memory_per_cpu_fw_alloc);
-+	if (new_memory_allocated == *memory_allocated)
-+		*stable = true;
-+
-+	*sk_tracing = NULL;
-+}
-+
-+SEC("fentry/tcp_init_sock")
-+int BPF_PROG(fentry_tcp_init_sock, struct sock *sk)
-+{
-+	fentry_init_sock(sk, &tcp_sk_tracing,
-+			 &tcp_memory_allocated, &tcp_memory_per_cpu_fw_alloc,
-+			 &tcp_activated);
-+	return 0;
-+}
-+
-+SEC("fexit/tcp_init_sock")
-+int BPF_PROG(fexit_tcp_init_sock, struct sock *sk)
-+{
-+	fexit_init_sock(sk, &tcp_sk_tracing,
-+			&tcp_memory_allocated, &tcp_memory_per_cpu_fw_alloc,
-+			&tcp_stable);
-+	return 0;
-+}
-+
-+SEC("fentry/udp_init_sock")
-+int BPF_PROG(fentry_udp_init_sock, struct sock *sk)
-+{
-+	fentry_init_sock(sk, &udp_sk_tracing,
-+			 &udp_memory_allocated, &udp_memory_per_cpu_fw_alloc,
-+			 &udp_activated);
-+	return 0;
-+}
-+
-+SEC("fexit/udp_init_sock")
-+int BPF_PROG(fexit_udp_init_sock, struct sock *sk)
-+{
-+	fexit_init_sock(sk, &udp_sk_tracing,
-+			&udp_memory_allocated, &udp_memory_per_cpu_fw_alloc,
-+			&udp_stable);
-+	return 0;
-+}
-+
-+SEC("cgroup/sock_create")
-+int sock_create(struct bpf_sock *ctx)
-+{
-+	u32 flags = SK_BPF_MEMCG_SOCK_ISOLATED;
-+	int err;
-+
-+	err = bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+			     &flags, sizeof(flags));
-+	if (err)
-+		goto err;
-+
-+	flags = 0;
-+
-+	err = bpf_getsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+			     &flags, sizeof(flags));
-+	if (err)
-+		goto err;
-+
-+	if (flags != SK_BPF_MEMCG_SOCK_ISOLATED) {
-+		err = -EINVAL;
-+		goto err;
-+	}
-+
-+	return 1;
-+
-+err:
-+	bpf_set_retval(err);
-+	return 0;
-+}
-+
-+char LICENSE[] SEC("license") = "GPL";
--- 
-2.51.0.384.g4c02a37b29-goog
-
+Rob
 
