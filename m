@@ -1,67 +1,72 @@
-Return-Path: <netdev+bounces-221001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 095D0B49D58
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9A3B49D5E
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0EF24E0758
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:10:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1202D1692E6
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 23:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347DB2F9C32;
-	Mon,  8 Sep 2025 23:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB952EB849;
+	Mon,  8 Sep 2025 23:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWQdLabe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gq/0p925"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C842F7475;
-	Mon,  8 Sep 2025 23:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651A42DC35F
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 23:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757373033; cv=none; b=t15qKzAk0U8BljHaTZOtaNPBbMeJU/6LEh7bOHKnTAuwjJHYiTEPFpmcvgcjKmfAmvBLXEa0nsdEDmQ8OJWAkslwfX7VBcnoTTpEfkLnzo1zHCrvKVP58gNN0j/WUItZ0l5Hx33/+vcnghHw1yi1XAGBsXyi9XTTFogzGttAHjs=
+	t=1757373144; cv=none; b=bjqfp/dHAzrsUVC6SPt7Vfc93LErUKHZHT7cttFgangCf8t8fcoOGb7AMAqQdRtwHO2cZ6E7CivsL3b1lFbAdNZyfXmfZXiVpE/snKEogZGTW4xchhIa2Vcw1XUvyTfqn2RN/mUP3PBjKGwAMJNLl63ea2hLZflu5hiwReT5uPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757373033; c=relaxed/simple;
-	bh=kBQ1BZ7kGAdyqiHEixGCUXGg0bBphkU4OibNmwHdc8o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YK2cMFMxqH99CICFFKImtPe3Yeb6Y2J8bGMVDHeC83JDHd1MkKvvsroFljPoF4+po23B1i6sJ/AJieAxmKagjBK0uEv768u2VArzWxvEuD9BsPr1UZDXgvdAqPmvYqgaSjBcwkqyYLVa2WpK58FPzqVT71KM9eHRqpccLz8sJJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWQdLabe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52742C4CEF1;
-	Mon,  8 Sep 2025 23:10:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757373032;
-	bh=kBQ1BZ7kGAdyqiHEixGCUXGg0bBphkU4OibNmwHdc8o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MWQdLabeArdPBJ9WSOqALwoNZ04TAD2VXWhKPbKo0Hua3+P8wg4fQ702RoCExN/3w
-	 peji19GIP7MJqcloBQU/27s7Whh86SQKZ49lFccTPoQeEbidxJIWv7iG/HsRDX+1CF
-	 QWp8U01QtIDzCbFgI7x9fsCyXcu7/V32tFUbc0Q9NelyuBfy6AvLW/47k8JOM/+WdE
-	 GQl9mwPwkpf3SXKC9oCQIpLIyNmLNFJ+1WtU4Ea1DBf8sB7Bs3EpZ+Kk2UW1XeftKa
-	 YyxldUNwd8pDdjXl0/MZrJSDVTGAzkqB0+EnLSD8FR/PlXQ1c7v6AaMYo5UonFEOda
-	 CuAwNltm/RgbQ==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1757373144; c=relaxed/simple;
+	bh=9nmgSPPLNrymEVjhw7GtJe+5fxmGs+dNjRPwK/2kWaE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f3PDafli4NXSXnSvyqUXY94lJf6MlCQYngLuXxIzdN/O53uhtlUeB54uGROgUD7lwnut0vn1fqE2xkPdWd4DQM5BMEd6u5qHrGGvFKpJ0x9cwMl7VNyQECfm8vZzuJeiCF5dVMrKNhxfUoh1LsrDwe2EiK+/SMMoU4QfV1BWIfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gq/0p925; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757373139;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZEeyxK4n4DtiZADtz8JaxMHOcZq9nPWMBuqVrDSVJyI=;
+	b=Gq/0p925I3NoSVKfXkigNLKlpV0kt29xBNw2PQrwKSihJhYzm2oVVKnlHhCsX7+dBnHb0x
+	m9LftbJbeude2BVonbvOYzWO+fiwRxbYy7ScTMp8VfgQa7Ra9Wl4vsZ+c4nzeLAGCOteDY
+	UxJnQDq7GELS98cp8Sg+0JQM8YLFQHM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-cuCe2cQ7OwSX0Ryb9V6AZw-1; Mon,
+ 08 Sep 2025 19:12:16 -0400
+X-MC-Unique: cuCe2cQ7OwSX0Ryb9V6AZw-1
+X-Mimecast-MFC-AGG-ID: cuCe2cQ7OwSX0Ryb9V6AZw_1757373134
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EB99318004D4;
+	Mon,  8 Sep 2025 23:12:13 +0000 (UTC)
+Received: from lima-fedora.redhat.com (unknown [10.2.18.244])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1CB141956095;
+	Mon,  8 Sep 2025 23:12:11 +0000 (UTC)
+From: Kamal Heib <kheib@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Veerasenareddy Burru <vburru@marvell.com>,
+	Sathesh Edara <sedara@marvell.com>,
+	Shinas Rasheed <srasheed@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] dt-bindings: net: Convert APM XGene MDIO to DT schema
-Date: Mon,  8 Sep 2025 18:10:14 -0500
-Message-ID: <20250908231016.2070305-2-robh@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250908231016.2070305-1-robh@kernel.org>
-References: <20250908231016.2070305-1-robh@kernel.org>
+	Kamal Heib <kheib@redhat.com>
+Subject: [PATCH net] net/octep_ep: Validate the VF ID
+Date: Mon,  8 Sep 2025 19:11:58 -0400
+Message-ID: <20250908231158.1333362-1-kheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,137 +74,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Convert the APM XGene MDIO bus binding to DT schema format. It's a
-straight-forward conversion.
+Make sure that the VF ID is valid before trying to access the VF.
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+Fixes: 8a241ef9b9b8 ("octeon_ep: add ndo ops for VFs in PF driver")
+Signed-off-by: Kamal Heib <kheib@redhat.com>
 ---
- .../bindings/net/apm,xgene-mdio-rgmii.yaml    | 54 +++++++++++++++++++
- .../bindings/net/apm-xgene-mdio.txt           | 37 -------------
- MAINTAINERS                                   |  2 +-
- 3 files changed, 55 insertions(+), 38 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/apm,xgene-mdio-rgmii.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/apm-xgene-mdio.txt
+ .../net/ethernet/marvell/octeon_ep/octep_main.c  | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/apm,xgene-mdio-rgmii.yaml b/Documentation/devicetree/bindings/net/apm,xgene-mdio-rgmii.yaml
-new file mode 100644
-index 000000000000..470fb5f7f7b5
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/apm,xgene-mdio-rgmii.yaml
-@@ -0,0 +1,54 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/apm,xgene-mdio-rgmii.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: APM X-Gene SoC MDIO
-+
-+maintainers:
-+  - Iyappan Subramanian <iyappan@os.amperecomputing.com>
-+  - Keyur Chudgar <keyur@os.amperecomputing.com>
-+  - Quan Nguyen <quan@os.amperecomputing.com>
-+
-+allOf:
-+  - $ref: mdio.yaml#
-+
-+properties:
-+  compatible:
-+    enum:
-+      - apm,xgene-mdio-rgmii
-+      - apm,xgene-mdio-xfi
-+
-+  reg:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+unevaluatedProperties: false
-+
-+required:
-+  - compatible
-+  - reg
-+  - clocks
-+
-+examples:
-+  - |
-+    mdio@17020000 {
-+        compatible = "apm,xgene-mdio-rgmii";
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+        reg = <0x17020000 0xd100>;
-+        clocks = <&menetclk 0>;
-+
-+        phy@3 {
-+            reg = <0x3>;
-+        };
-+        phy@4 {
-+            reg = <0x4>;
-+        };
-+        phy@5 {
-+            reg = <0x5>;
-+        };
-+    };
-diff --git a/Documentation/devicetree/bindings/net/apm-xgene-mdio.txt b/Documentation/devicetree/bindings/net/apm-xgene-mdio.txt
-deleted file mode 100644
-index 78722d74cea8..000000000000
---- a/Documentation/devicetree/bindings/net/apm-xgene-mdio.txt
-+++ /dev/null
-@@ -1,37 +0,0 @@
--APM X-Gene SoC MDIO node
--
--MDIO node is defined to describe on-chip MDIO controller.
--
--Required properties:
--	- compatible: Must be "apm,xgene-mdio-rgmii" or "apm,xgene-mdio-xfi"
--	- #address-cells: Must be <1>.
--	- #size-cells: Must be <0>.
--	- reg: Address and length of the register set
--	- clocks: Reference to the clock entry
--
--For the phys on the mdio bus, there must be a node with the following fields:
--	- compatible: PHY identifier.  Please refer ./phy.txt for the format.
--	- reg: The ID number for the phy.
--
--Example:
--
--	mdio: mdio@17020000 {
--		compatible = "apm,xgene-mdio-rgmii";
--		#address-cells = <1>;
--		#size-cells = <0>;
--		reg = <0x0 0x17020000 0x0 0xd100>;
--		clocks = <&menetclk 0>;
--	};
--
--	/* Board-specific peripheral configurations */
--	&mdio {
--		menetphy: phy@3 {
--			reg = <0x3>;
--		};
--		sgenet0phy: phy@4 {
--			reg = <0x4>;
--		};
--		sgenet1phy: phy@5 {
--			reg = <0x5>;
--		};
--	};
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c2a669258494..49edc6989684 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1894,7 +1894,7 @@ M:	Keyur Chudgar <keyur@os.amperecomputing.com>
- M:	Quan Nguyen <quan@os.amperecomputing.com>
- S:	Maintained
- F:	Documentation/devicetree/bindings/net/apm,xgene-enet.yaml
--F:	Documentation/devicetree/bindings/net/apm-xgene-mdio.txt
-+F:	Documentation/devicetree/bindings/net/apm,xgene-mdio-rgmii.yaml
- F:	drivers/net/ethernet/apm/xgene/
- F:	drivers/net/mdio/mdio-xgene.c
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+index 24499bb36c00..eaafbc0a55b1 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+@@ -1124,11 +1124,24 @@ static int octep_set_features(struct net_device *dev, netdev_features_t features
+ 	return err;
+ }
  
++static bool octep_validate_vf(struct octep_device *oct, int vf)
++{
++	if (vf >= CFG_GET_ACTIVE_VFS(oct->conf)) {
++		dev_err(&oct->pdev->dev, "Invalid VF ID %d\n", vf);
++		return false;
++	}
++
++	return true;
++}
++
+ static int octep_get_vf_config(struct net_device *dev, int vf,
+ 			       struct ifla_vf_info *ivi)
+ {
+ 	struct octep_device *oct = netdev_priv(dev);
+ 
++	if (!octep_validate_vf(oct, vf))
++		return -EINVAL;
++
+ 	ivi->vf = vf;
+ 	ether_addr_copy(ivi->mac, oct->vf_info[vf].mac_addr);
+ 	ivi->spoofchk = true;
+@@ -1143,6 +1156,9 @@ static int octep_set_vf_mac(struct net_device *dev, int vf, u8 *mac)
+ 	struct octep_device *oct = netdev_priv(dev);
+ 	int err;
+ 
++	if (!octep_validate_vf(oct, vf))
++		return -EINVAL;
++
+ 	if (!is_valid_ether_addr(mac)) {
+ 		dev_err(&oct->pdev->dev, "Invalid  MAC Address %pM\n", mac);
+ 		return -EADDRNOTAVAIL;
 -- 
-2.50.1
+2.51.0
 
 
