@@ -1,220 +1,207 @@
-Return-Path: <netdev+bounces-220868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF11EB494EA
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:16:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B260B494F8
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:19:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 670ED203105
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:16:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3B2116C9B5
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:19:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47D8213236;
-	Mon,  8 Sep 2025 16:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B992264D9;
+	Mon,  8 Sep 2025 16:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZTVY4mo"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="BzQ4dlPl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013068.outbound.protection.outlook.com [40.107.159.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38450205ABA;
-	Mon,  8 Sep 2025 16:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757348175; cv=none; b=tQFQGQYr+7JAP2Se33FMMdNyWe9E/seTrR3yM+MVAEjusO1AkH/NleSFkk7Q+7CX2NhCRLoLd3CdhuYPkUkvQEaJbWjI4izAUeI03v6LXUchm+ogTmOFDTwq7LIlE1uuWdjs5YnvUr6IweAwj3pfatKOAmGP36rsFWlKTzORXb8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757348175; c=relaxed/simple;
-	bh=py2SL4Lcp1ebRiKpS+febe1mg26X4LV9Gvpzr3MfcFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RlRnChtmXpMyPTb1lVvducmXTskdC02ZGL17RGGJamoR8K9AScoJjB43Us0o9NXq1WZ1Lwec0G7qbud+hL+SS3UE3DPdu0cMWtmCjdOryYC1oUjBgXw3VHlp57+MkF3j2pF+l+vrTdvcZbWrjgEF/mXhtLjB7aITBDj1a293Dxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bZTVY4mo; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e96e1c82b01so3369074276.1;
-        Mon, 08 Sep 2025 09:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757348173; x=1757952973; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0DapaqdkpsmqG8gstJ5wzlYQM9cf+yi+nsrLvokSaDA=;
-        b=bZTVY4moU8RgPWpJMlKq5tJZPzQVDm9MD8pftbou4ha3UQokUonbs+feBbC2I0K49E
-         HocI/Oq+fS6/A9wUYl/3gWS1YZbIdyNaKCT3wn0ULjUKhgEtxZQa+HbzswdBiAhTuyyA
-         PKtJOsir7H/kFgsVn8RFoHiCI48JpJ9xKXubuemHcXpUwWvZbdYegvPEj6kOMIGRXzK3
-         yLlYcXi4RHedo7M2B5HUegY0EnAS+ecuTso8w7BWy3LXSgns/RIZ3uaGihKhni6QbMM4
-         Ip9qjpMguX1/ogulP7SvnbCvUkO8euEGFzrFmGeZL3wpdU+pyeuIQnBFRXw40ny0f9qj
-         qKbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757348173; x=1757952973;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0DapaqdkpsmqG8gstJ5wzlYQM9cf+yi+nsrLvokSaDA=;
-        b=lrhkmkSV+H4PKD0Lz44TWTK1JKCYLJxvI88dPo7/lzujTlNOImgMG0EMvC0xqzy04h
-         X6bxI/rCyf3M7wKwA7s/ys8xr2d6u63ZWt0eWE4FUYQk1QVfiJb80uRa+ErWW3sL0KiI
-         K3wLBKyir7R0bvzzx3Q2pKON1QHj7VEYSEoSWeagKF3vay4AuV4KMof8P4mW8Y5kzLN6
-         nWyrp8HvsFlQjQ8o0XFUOH4+Q2/mAjp9W5wzH3gvAURJhNK0t1rt2M6A1XAxaDJUMVAe
-         6tGzqXCGYDmQEz7GCXawFdM8fXw/hl5LL00T+6WGaG0DlCIsTthmptpPLVHV1cTu5aeC
-         t0rQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUz0XvB+kb67jSPlGxhbL737G7xkxUDr6zB8eT4Ro9EeePv9rcEBEY2R9sob8vaT07C2CGiQ69IOR8gArM=@vger.kernel.org, AJvYcCVSMrdLTWa1nJNDFqEaip6vVVYcQS9AIHiuwBxYVu0JxhMb8qGV08iDJ/RpEEE7KH7aUpWCIDQQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE0Q23UxJzkf5gACSPS5OdSVwua2cCW5gkmlnm2+Rin4eR3DpH
-	E0bCNlQindZxyzPnHI2Va+K2XLbboaHTElZpnSAVvcsai6MGBHoxt0ev
-X-Gm-Gg: ASbGncvXViD500qrEjMgIeQDOAp7EQUBUarGFTR2f8IxaGqJ4HAG3KzdQlQsUA+tBkD
-	pHoYEzsPWYxJmx9r20Ob2OTu87I3wB9RHIKyKgY9eSH/RFKGyyCJLwRPNpAvQb9US1UwJgPqf9n
-	IEapgNh7lJOL0a7xFvQ10XmRaNOgAL7d28xXe6/RVWvTi2roOdlmiXVi8KK5LTNYxHoGbrWAx4P
-	RN4ax+jJOKgmIiLaTX1XzPVEC5M2+A9SsBYF6UTcvnrj0/lhB6t4Q0dasg+DSG4IKBN6P0iXT3+
-	spglWEfJgw5hFw62BbRo5/iypNj/Vcip6qnGeUWSiKqE0XxoDQ/u3qNp9bNJQZcsYBuHV+Npfq0
-	3+b6KqUy0jhn8RmaL13Pda4cIxhhG/tKaR8ZBv6cok9CoZLsLfQOrx9pkXGwsv2VeLLJh
-X-Google-Smtp-Source: AGHT+IE9SzII0RV3oLBhYO8bMjK3ds9EdIM9E+T0eXQi9+L2j3In0oZA7qlVRxPT7WVC3/ENpvQvVA==
-X-Received: by 2002:a05:6902:18d1:b0:e9f:bf6a:3108 with SMTP id 3f1490d57ef6-e9fbf6a3734mr7091066276.45.1757348172938;
-        Mon, 08 Sep 2025 09:16:12 -0700 (PDT)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:74::])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e9fa95fac8esm2265528276.3.2025.09.08.09.16.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 09:16:11 -0700 (PDT)
-Date: Mon, 8 Sep 2025 09:16:10 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Samiullah Khawaja <skhawaja@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A93930CD80;
+	Mon,  8 Sep 2025 16:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757348317; cv=fail; b=Vc2K7bNlbZs1YECmU88PwsmFLdSND67feH+TaNXTiZ8UoN+5cd+ygWntFKTxM1AW9vqCTNvkYkF/+lDK0Zj6/k6bVYv8Yx9O0MB76WtBwdlIVi5V7pYHlt5ZMFKgwWjsExiaR79zPCT1njHXjvorsNvuCFnB0qHz77TomTrj8dk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757348317; c=relaxed/simple;
+	bh=Rd4y8yfCu6ZGttsqbVoxiCg0CQ2PVhxhQ/yW2jIMZBk=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=UCrvfA21S12CgBSQPCKPSI6aWQCTXeN/ABD5x9D5WtJ0fN7Zlwb68HGIh57O200C9VCIy3VCbjOWLEUST4fuK/R+puk2UQKSS95BF5kTUhxH5/4mIcdsm/cSeThi84AcGHQrbhVy3IwYR380nK8MxoNFrsjEM9F4LLaVo0+zkFw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=BzQ4dlPl; arc=fail smtp.client-ip=40.107.159.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=L3GkU2I+uo44ohMO7B+ABmVk23semZFhZaIcl071hOSJcQcw2p+Bbxmz1MAyWoaRYKkz0LJun77xjAo7k9bPXMlsb5S/yhnxLVDbNhu7Gf2kDN8DYcVaO03d+2hnMmapSo+ehyM12Wvn17dUjPaC06y6P2bYgnkc1GH4PInXW0IWl8Gzue8MCPyC7VWCoUl1p5gE5HukoACVxckWfjRyHYtXvDiGIHa7J452Z9IP6s8uJZet5q7ywgxSxE0YZYNvdcNYtogNrR5Xgfby+a2ufsV5NOghTLU+OSKizUtmvGgGBOcUmgFDQwow+J1SwJypx7UxWXhqFYUL0LFsmlWc2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3e96FA9SI6mCI0/NoOimFYKNu3rnlENIu+F70Kkn6EI=;
+ b=F4+4z0ManCNWiaINwnghl0hOfOJacJsGbQesTMr5Hno/9umldsJicXQvSKomUr2MpFo6EQhF6ehOLCqZ4hP8ZRAlDCS83wyY+PuggYqk6LxuYsFxmhlwD/Ny2JfOxLS0TYhpVAqvyoLFSk4PBVvxWoXwFSoeaXvqgp2vs/cE0i3AHI3DNNZdJIjq0w/L18RoX2gSaj0cCWw6vws+bbDARDoa7rZztfJaf8p7Aer5TlFgU3c3ZoTq22ymgJk6kYGjYd+NOxgtiaxl0Qz1ZJtHKK+PDeTbhlcC0/hJi3Wr/n7Ln+awDeeVZxdudx9O7rTn1/TAFYDnb4Lf7+eJCitxPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3e96FA9SI6mCI0/NoOimFYKNu3rnlENIu+F70Kkn6EI=;
+ b=BzQ4dlPlXfDiytEy6bZa3OVhL0d0AsZSYWC+6CGXUnXoAKdO+FNL1vrxm3pVTLs3jhshLJHxpzl6DOd315hLarGqIk0FMSm4KOSkCNzuGYOyg2tgRcvGAGO4MnzNxSuT1OfTyO0zh+b8fkRfUVh2ZJqLuEVOn1d4KSdfk6td2j4QC2SGtn8cqiCPTEDv6GgoHnzv1r38BeWGGiHhRSdxS9AnbgI7b0k59pyIoDB403etr+ybCz43CbMHyuWda7SM4poLrAYCpMZRrVJRtf1u4gFJYa5W4ub5J+w9mRVLG3spn+osByx0zXmlEBtnO1/zeoVOvofY0jBW9ZyAv489GQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
+ by DU2PR04MB8501.eurprd04.prod.outlook.com (2603:10a6:10:2d0::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.12; Mon, 8 Sep
+ 2025 16:18:31 +0000
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::21bf:975e:f24d:1612]) by PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::21bf:975e:f24d:1612%4]) with mapi id 15.20.9115.010; Mon, 8 Sep 2025
+ 16:18:31 +0000
+From: Shenwei Wang <shenwei.wang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 2/2] net: devmem: use niov array for token
- management
-Message-ID: <aL8BSjUbxYvvvZyD@devvm11784.nha0.facebook.com>
-References: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
- <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-2-d946169b5550@meta.com>
- <CAHS8izPrf1b_H_FNu2JtnMVpaD6SwHGvg6bC=Fjd4zfp=-pd6w@mail.gmail.com>
- <aLjaIwkpO64rJtui@devvm11784.nha0.facebook.com>
- <CAHS8izMe+u1pFzX5U_Mvifn3VNY2WGqi_uDvqWdG7RwPKW3z6A@mail.gmail.com>
- <aLtKTwBmogXa48Rj@mini-arch>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Cc: Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-imx@nxp.com
+Subject: [PATCH v6 net-next 0/6] net: fec: add the Jumbo frame support
+Date: Mon,  8 Sep 2025 11:17:49 -0500
+Message-ID: <20250908161755.608704-1-shenwei.wang@nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BY1P220CA0023.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:a03:5c3::11) To PAXPR04MB9185.eurprd04.prod.outlook.com
+ (2603:10a6:102:231::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aLtKTwBmogXa48Rj@mini-arch>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9185:EE_|DU2PR04MB8501:EE_
+X-MS-Office365-Filtering-Correlation-Id: c16903d9-2588-4b76-aefd-08ddeef35a12
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|19092799006|1800799024|52116014|7416014|376014|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?34Gas7c9xY9m/qomgVtbHRESr4L0zPo0DLyaQTJcCQV7NrE+vd+BG0O9cAHA?=
+ =?us-ascii?Q?FdSTT+JU6az1b4ht8e57ltFfrHoUU/7ItqwEzP1x/acvyTjm62Ht3Ik4OimK?=
+ =?us-ascii?Q?jbbCcq0ePlhPysZk+L5p1bCFtbkh/y5aRFHwQiY5oT+5Jc1p9YbU6UXgHtQQ?=
+ =?us-ascii?Q?itWSkBzhc/CX7MZA9wcuYTjjuzRoOmMXpCOex+qkOJVBVuW0ldkPIqsxzS15?=
+ =?us-ascii?Q?kBufkZxD+j8aAqBx7Uu24BwFnBi9hChhH4l7GaM2U07aZew7OCx4v4YHems4?=
+ =?us-ascii?Q?smUvyYNRxK4GGTPIzyhUcoyod5q2kKIJTjNFLdjy/v/o7ZlIC3WwlNsxMY1F?=
+ =?us-ascii?Q?ZgmjI7a9NbWC5vSeh445YoS9QqIGEGGTE9HRoq/6cWn5ZXDjJjCbRhXXSRqd?=
+ =?us-ascii?Q?2OrmARcfcjm3ffy2LTBKHwoqonI5kFSW2Qu1u3OTsNecgRHfX3Hu+MTWLKeh?=
+ =?us-ascii?Q?qUCWfvoYGEiDEiLCFefp+u63tFkfe9c/hkdWCs9Yi3bKLbsVHp+JOf7wrz+L?=
+ =?us-ascii?Q?ENNpxBhtVe1rv126fOaW5wudY/2gIqrj1QibSnaAcoa+UMawYAopmqiSIcZz?=
+ =?us-ascii?Q?8a5pML6gO4f+vR0nVAkAvfgRvIDA/uCzpNsrVqSL2SWQ0QKT0DpLy7i8yaUO?=
+ =?us-ascii?Q?LgiObLLwQhhR9rzNaES0ET+Gxln24GCJB7sysBQiqYfx7RvH8XCoM84QbuHl?=
+ =?us-ascii?Q?kDiSl1CF4H/M/co2wS7gbEF7ZxUXFLkSQJrYJ4HZdo72Nw6HTpSdO6CoUfFj?=
+ =?us-ascii?Q?BmF+iR/qUMo4i/7HrnDMQoYCyPXvpQGnpicayJi5hxkO1RIYYCOnZXB3XADq?=
+ =?us-ascii?Q?JUo+TwHaYbCe5KVawJUKFxlKu3zb8JzsZJ/uWWZ7VV5d598Sxqb+hpWOSZRF?=
+ =?us-ascii?Q?IX0GlLoQfKF9HIdWYskguJI28geC9QZncyqN7Y7NXxoODgO+skxMwX9A3jNf?=
+ =?us-ascii?Q?d562LbeWzWrWwrNYodtyggZ22Zwrs6uaPtcfuVxzXtU1R8gzHm1OK90kzqYs?=
+ =?us-ascii?Q?tfW/mpnbajU0FwsExW2vBoR9mGCrRZ4C4xdGIGihUulsikMTd9siAIQKCU5Z?=
+ =?us-ascii?Q?yJcy+nQ4qE5bAXrmP1h7ZRLScqKxn0KbXDBaW/MDcDr7ODAJ2BgctU/g3K5a?=
+ =?us-ascii?Q?rmRZYUPZkNegHW9xVYUeCEjTvBgBBXxuU246r/MWwGyOAJeh4H7dZACN0yYE?=
+ =?us-ascii?Q?OUTe1/9gbM0EfQROzhBYvQlA0GmdjUS2ljQir3owrk9sDV3UTcIf7nbhZqJq?=
+ =?us-ascii?Q?Wio37cy4jXeqpywBV7Zpcfn2KkY7XflTgFeDxA1rFqXStqjWVMwqAs3027bK?=
+ =?us-ascii?Q?Q+jpsfaC+H2pxUHbVPobwAlj9YXQLGRpzXHavILBwbrabtrCkY3uKfHn0h9t?=
+ =?us-ascii?Q?3ffc0P1Gyf1gkSDBB4AlpMVcHEvTLnl8RCTmp0bn4FyTieKMNmagVzqaL5ZP?=
+ =?us-ascii?Q?olsDwpcGEVRDZkmt10mm4ypK4rDRRRBGLNSPxtpINjTiUz+DVKYmkkeQvrtf?=
+ =?us-ascii?Q?Lgot4MmGlQ7QcKc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(52116014)(7416014)(376014)(921020)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5x2SnhVLCnTYSYhehTpBrJXgMi+I1wPP4JZG++blcCCCuynJJdNoAnd8fGt0?=
+ =?us-ascii?Q?IAxasuBDPonK5mB6NI4poWXAps8+UqbPB7ErLtAH5bJD8jodxD5CROvNaMgE?=
+ =?us-ascii?Q?12sVYZ+sWwZM3Nse/WGrqhuHTnwyk3gbhYvNjkHYwr6IQMGCwIgwV1EkVFXb?=
+ =?us-ascii?Q?auQG+kSBjeYjOB6n85zOmPnm/ViDMiwRoQdUzgruXLTnFOX12iaZJxu84WDd?=
+ =?us-ascii?Q?OCe50Y4157MfgP8a7fU5POADOSy0hKcSt30iF1qC8WHqZEhPARed3feQlRcH?=
+ =?us-ascii?Q?+XPX/wvZe1+hujKYwr7PwCyFw8Pi51l0FNG/4JT7wkM43oDNp/sBrVUfN16B?=
+ =?us-ascii?Q?Dh8RZUjO+TAyutrEzV0uLOqTZDo7Z4RWaQW30s1dUf6f0G9yZ0xCUUuV8yOx?=
+ =?us-ascii?Q?3L7Foc2AKX0ypLn4E2bf1/O6/B8Pa2smTOfzyFLfPUwH7gA3J6tlSxzG7OJ3?=
+ =?us-ascii?Q?T8J100mbW9db3QdA1jpcQ67+RMCWwh6jh5fmj41+vwy9YMv32XGRUSgCtUCu?=
+ =?us-ascii?Q?b+JxYt1Ef5hYr+RIc3OEiMnTrp8gUvZIu+hFaOOUz91Sp3D6/hAlejX0K5FD?=
+ =?us-ascii?Q?nstnpIwU/0JhLpl9P4Z/G2VvMTvdNzg7aeV//7Fu8IgQbmfcbpHLG5gtUDOi?=
+ =?us-ascii?Q?G6N9ooaxhyP8oZLLoBKGO4+Loeb4VQRs56VpUQctc0pXDkhmjUPNJl5eWBUH?=
+ =?us-ascii?Q?ymBZGMaxPjS/PqTlXdvsnJ2373jMLusROYQSYQQ1/o0GWJl9gEZtEhxyAS2s?=
+ =?us-ascii?Q?+hgadzmP1OKNWqWWdWfuebxykXWVKfdrn2NkGTWfBBamuMa6/Cf/xPrllsZh?=
+ =?us-ascii?Q?Zxkpcl0ncKKOpquYBXg9/ifywyNjeRKepXlB8tPtdQHspLnYNMksFSzBdV8d?=
+ =?us-ascii?Q?2oXEVpuYYMsb+sMwxd+CQEOvvG+tZP5BaLI35X0qq6VY+O/kjCavX/VkGkEq?=
+ =?us-ascii?Q?3K41ceMMhgqZlfRL7OwUUrG63MHtwr6LaRR0I8a7y49ljA4fKMYBo+zYoKYq?=
+ =?us-ascii?Q?fbWnU+wrDy7LP+v+tvAOZ069zdrdo7jt7CaLTIZAXFwMy5jY2mGfw8wIjLfM?=
+ =?us-ascii?Q?N70GC7W6CnLiVkMNafQSwoaLAdvXDmOtPg7TWVQ4012r3G2BDNfnVLBElZrF?=
+ =?us-ascii?Q?FAvXsnEWBsUh6LPcKpDrgOSR4kgaLXAIn4SxajPSSSpRLuf2W2hRMCXdUHMN?=
+ =?us-ascii?Q?g8uUOMXXN4CWvOmeVln4xNbSUnFATXF7jQ/l5x1hdfWsKXrYxcFJrdIZqCSF?=
+ =?us-ascii?Q?xZ+1/GltEd4dfLenNqLG9YSO8BB2z/Sm7us8+d0oPZHMJrx8woavz4aViNwz?=
+ =?us-ascii?Q?WMOANbedqcgxuuPFlqQ6v4WK6OaGA3ONKZCU33/WiWImp5gRmLMutdJYlAYH?=
+ =?us-ascii?Q?jVAt43HnOg6VvVEtEag6UmnDPKjZnzcB/4ac+Al9EImTuh4CRd1NeZOzilNV?=
+ =?us-ascii?Q?VHRuhs7KntXlP+5BdpFGIjrqQW8aDVrPvaLojex8PeFocTX5VM24XLJ/thkG?=
+ =?us-ascii?Q?mXGsjn+OJuxsx3k1xg1cMb6oiFp5WpqJBENaZATfOXRdPH2KW7uXkrd20KUg?=
+ =?us-ascii?Q?5oDyl2/SGJO4xl7rJTqRId6k24Z5Sj2GzreL1Q6V?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c16903d9-2588-4b76-aefd-08ddeef35a12
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 16:18:31.5987
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /KJ4cvblteSYMb23knDFUVjfmrVef3mDB0h4Q2+SvcJ11Snlwuw0aOx432QLuPkbMsOHL/C7y0M6Eie/m9HVvA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8501
 
-On Fri, Sep 05, 2025 at 01:38:39PM -0700, Stanislav Fomichev wrote:
-> On 09/05, Mina Almasry wrote:
-> > On Wed, Sep 3, 2025 at 5:15 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
-> > >
-> > > On Wed, Sep 03, 2025 at 01:20:57PM -0700, Mina Almasry wrote:
-> > > > On Tue, Sep 2, 2025 at 2:36 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+Changes in v6:
+ - address the comments from Frank and Jakub.
+ - only allow changing mtu when the adaptor is not running, simplifying
+   the configuration logic.
 
-[...]
+Changes in v5:
+ - move the macro FEC_DRV_RESERVE_SPACE to fec.h
+ - improve the comments for patch #0004
 
-> > > >
-> > > > AFAIU, if you made sk_user_frags an array of (unref, binding) tuples
-> > > > instead of just an array of urefs then you can remove the
-> > > > single-binding restriction.
-> > > >
-> > > > Although, I wonder what happens if the socket receives the netmem at
-> > > > the same index on 2 different dmabufs. At that point I assume the
-> > > > wrong uref gets incremented? :(
-> > > >
-> > >
-> > > Right. We need some bits to differentiate bindings. Here are some ideas
-> > > I've had about this, I wonder what your thoughts are on them:
-> > >
-> > > 1) Encode a subset of bindings and wait for availability if the encoding
-> > > space becomes exhausted. For example, we could encode the binding in 5
-> > > bits for outstanding references across 32 bindings and 27 bits (512 GB)
-> > > of dmabuf. If recvmsg wants to return a reference to a 33rd binding, it
-> > > waits until the user returns enough tokens to release one of the binding
-> > > encoding bits (at which point it could be reused for the new reference).
-> > >
-> > 
-> > This, I think, sounds reasonable. supporting up to 2^5 rx dmabuf
-> > bindings at once and 2^27 max dmabuf size should be fine for us I
-> > think. Although you have to be patient with me, I have to make sure
-> > via tests and code inspection that these new limits will be OK. Also
-> > please understand the risk that even if the changes don't break us,
-> > they may break someone and have to be reverted anyway, although I
-> > think the risk is small.
-> > 
-> > Another suggestion I got from the team is to use a bitmap instead of
-> > an array of atomics. I initially thought this could work, but thinking
-> > about it more, I think that would not work, no? Because it's not 100%
-> > guaranteed that the socket will only get 1 ref on a net_iov. In the
-> > case where the driver fragments the net_iov, multiple difference frags
-> > could point to the same net_iov which means multiple refs. So it seems
-> > we're stuck with an array of atomic_t.
-> > 
+Changes in v4:
+ - configure the MAX_FL according to the MTU value, and correct the
+   comments for patch #3.
+ - in change_mtu function, revert to original setting when buffer
+   allocation fails in patch #4
+ - only enable the FIFO cut-through mode when mtu greater than
+   (PKT_MAXBUF_SIZE - ETH_HLEN - ETH_FCS_LEN)
 
-Yes that is correct, multiple references can occur so the bitmap
-will lose all > 1 references.
+Changes in v3:
+ - modify the OPT_FRAME_SIZE definition and drop the condition logic
+ - address the review comments from Wei Fang
 
-> > > 2) opt into an extended token (dmabuf_token_v2) via sockopts, and add
-> > > the binding ID or other needed information there.
-> > >
-> > 
-> > Eh, I would say this is an overkill? Today the limit of dma-bufs
-> > supported is 2^27 and I think the dmabuf size is technically 2^32 or
-> > something, but I don't know that we need all this flexibility for
-> > devmem tcp. I think adding a breakdown like above may be fine.
-> > 
+Changes in v2:
+ - split the v1 patch per Andrew's feedback.
 
-That's my inclination too.
+Shenwei Wang (6):
+  net: fec: use a member variable for maximum buffer size
+  net: fec: add pagepool_order to support variable page size
+  net: fec: update MAX_FL based on the current MTU
+  net: fec: add rx_frame_size to support configurable RX length
+  net: fec: add change_mtu to support dynamic buffer allocation
+  net: fec: enable the Jumbo frame support for i.MX8QM
 
-> > > > One way or another the single-binding restriction needs to be removed
-> > > > I think. It's regressing a UAPI that currently works.
-> > > >
-> > 
-> > Thinking about this more, if we can't figure out a different way and
-> > have to have a strict 1 socket to 1 dma-buf mapping, that may be
-> > acceptable...
-> > 
-> > ...the best way to do it is actually to do this, I think, would be to
-> > actually make sure the user can't break the mapping via `ethtool -N`.
-> > I.e. when the user tells us to update or delete a flow steering rule
-> > that belongs to a devmem socket, reject the request altogether. At
-> > that point we could we can be sure that the mapping would not change
-> > anyway. Although I don't know how feasible to implement this is.
-> > 
+ drivers/net/ethernet/freescale/fec.h      | 11 +++-
+ drivers/net/ethernet/freescale/fec_main.c | 68 ++++++++++++++++++-----
+ 2 files changed, 63 insertions(+), 16 deletions(-)
 
-I will look at this and see if it is possible, I do think that would be
-nicer for the user.
+--
+2.43.0
 
-> > AFAICT as well AF_XDP is in a similar boat to devmem in this regard.
-> > The AF_XDP docs require flow steering to be configured for the data to
-> > be available in the umem (and I assume, if flow steering is
-> > reconfigured then the data disappears from the umem?). Stan do you
-> > know how this works? If AF_XDP allows the user to break it by
-> > reconfiguring flow steering it may also be reasonable to allow the
-> > user to break a devmem socket as well (although maybe with
-> > clarification in the docs.
-> 
-> For af_xdp, there is a check in xsk_rcv_check (that runs _after_ bpf
-> program that does the redirect exits) and it drops the packet if
-> the packet is redirected to the unxpected queue (not the one that
-> the socket was bound to). And the only way to observe it after the fact
-> is a drop counter on the nic (or, rather, depends on the nic wrt how it
-> accounts it). I remember Willem wanted to remove that restriction,
-> but looks like he never got to it?
-> 
-> tl;dr we don't error out explicitly when the user misconfigures the steering
-> after the fact (or initially) and drop the packet in the data path.
-
-Sounds like a reasonable default if the explicit ethtool rejection isn't
-feasible.
-
-Thanks for the review and comments!
-
-Best,
-Bobby
 
