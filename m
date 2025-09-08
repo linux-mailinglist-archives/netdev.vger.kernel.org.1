@@ -1,135 +1,99 @@
-Return-Path: <netdev+bounces-220796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4157DB48C19
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:27:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D027CB48C6C
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:43:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D043B1986
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:27:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 507024E168F
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15672E2EE4;
-	Mon,  8 Sep 2025 11:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFDB21FF4A;
+	Mon,  8 Sep 2025 11:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T5hkS/I9"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587982EAD0D
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 11:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5681D5150
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 11:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757330801; cv=none; b=cCKlkstsDYeiCGbm9fnE8g+9AiuwK/kgHvHDTr2egO1BKC+3nmgyQuNQ8Zlrn+HOzwkO6SvQ1EmMixQ5nATWx80giJkHmF8XYpT4RYpsLNE3mN2PBgRSGIU2Mh/IEwrkofF22b556QUdwbo76DYWUThpBqlQ4P/5sb8GLCck+dI=
+	t=1757331832; cv=none; b=QQi33bkwllGr+RmeLTiOBcB4OFW4h3lSSVJbRCBbvwDY1t5q4+qwAGogYQXKrJqc+WS3+UKjDFqOXxVk1IEuXx7naY2XXZ/W03p9vgT/QEQDWBSs2JIisCP4k7FZDxxpSY4NmVzNEpR0zkcYZ0/MRiHjK3OPL4TQh2+WkdjUBKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757330801; c=relaxed/simple;
-	bh=c6t4cydIqpleUp8P0JIcZAYejDjGJcodaWPjnrvk1lY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Hjnel3WHchgSjkkK38x1/x97y1hO3SA4ygHsCWtY9bMgfZl8iR0HZQExgPBAzsao2WLSBhNhjiw1yYEycJaHODHtHS0UZmZ3wvzaPwV5tKrJHQo4XZcBSDwEHzFGP06AK46D6A5QnEe/PWi2aET7kwwx4OLbnt/ctPXbz1h3QDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uva0s-000411-Fl; Mon, 08 Sep 2025 13:26:22 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uva0q-000Evp-03;
-	Mon, 08 Sep 2025 13:26:20 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uva0p-0000000CAcM-3sYj;
-	Mon, 08 Sep 2025 13:26:19 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Hubert=20Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
-	stable@vger.kernel.org,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1757331832; c=relaxed/simple;
+	bh=cj3DufsB9KuohV6+o1exFCW2sERmdm38ERn1NLLh3KQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W4AMKFtlGntkOc2dJ+a8niDQxiq9SF9cZX683Z53sRRfIO2W2VUjWanH6N/0l/DTgJbP/39ADAP31cfcCxZNNQWG0BOjikQUzwDTSUnisv8LrQjvqNt8FSc8eD5dq2fooYARSOrK/2y03CQF19nCA7xIkdQveC4kWTr8/0KMjEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T5hkS/I9; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757331830; x=1788867830;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cj3DufsB9KuohV6+o1exFCW2sERmdm38ERn1NLLh3KQ=;
+  b=T5hkS/I9ROc2hp5dXjYXrdbZ1fd9kgjyi91T6WG5vqEh2ewCuBWhaXvt
+   aUdlsla1ZBQ70rAti9g4T6GUb6/b3MsnZJDpJAiYl2LkTbkHxC++LbOPc
+   xKeFXFHzubEKS4vit2FjEGRjvfnzoT6UVNTiuC5vowL/STUGaBedS6iFP
+   Fej5heZsbFFrIwOlQLeBAouZdK5xogV0RGV9EEYUPRfkAMOZzqy4+rnkE
+   S22Xlin9GlHBAfu6n9AkzipAg0gGZuci7xOTrCMWGlcVeB/d+epc1tPxJ
+   D5RULgHQhX2cRU67k1i+NIRCIOCYQ2JJTt8bH3G5DZDivCgClAhWL7gbg
+   w==;
+X-CSE-ConnectionGUID: 9Q/t0psPQKiX0s0uDHK6/Q==
+X-CSE-MsgGUID: vUOrXJS/SP2+ppgYaOfppg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11546"; a="63412830"
+X-IronPort-AV: E=Sophos;i="6.18,248,1751266800"; 
+   d="scan'208";a="63412830"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 04:43:49 -0700
+X-CSE-ConnectionGUID: /1bOsHKHRp+RsY/XapnyjA==
+X-CSE-MsgGUID: x4/7f681QdedMmB6hl5CWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,248,1751266800"; 
+   d="scan'208";a="177126082"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by fmviesa005.fm.intel.com with ESMTP; 08 Sep 2025 04:43:48 -0700
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
 	netdev@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>,
-	Russell King <linux@armlinux.org.uk>,
-	Xu Yang <xu.yang_2@nxp.com>,
-	linux-usb@vger.kernel.org
-Subject: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in PM to avoid MDIO runtime PM wakeups
-Date: Mon,  8 Sep 2025 13:26:19 +0200
-Message-ID: <20250908112619.2900723-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.47.3
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Subject: [PATCH iwl-net v2 0/2] ixgbe: fix aci.lock issues
+Date: Mon,  8 Sep 2025 13:26:27 +0200
+Message-Id: <20250908112629.1938159-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Drop phylink_{suspend,resume}() from ax88772 PM callbacks.
+There are 2 mutex (aci.lock) issues in ixgbe driver:
+1) call trace on load - addressed by the 1st patch
+2) call trace on unload - uncovered by the 1st patch and fixed by the
+   2nd one
 
-MDIO bus accesses have their own runtime-PM handling and will try to
-wake the device if it is suspended. Such wake attempts must not happen
-from PM callbacks while the device PM lock is held. Since phylink
-{sus|re}sume may trigger MDIO, it must not be called in PM context.
+Both issues are highlighted by the commit 337369f8ce9e
+("locking/mutex: Add MUTEX_WARN_ON() into fast path") and appear only
+when CONFIG_DEBUG_MUTEXES flag is set.
 
-No extra phylink PM handling is required for this driver:
-- .ndo_open/.ndo_stop control the phylink start/stop lifecycle.
-- ethtool/phylib entry points run in process context, not PM.
-- phylink MAC ops program the MAC on link changes after resume.
-
-Fixes: e0bffe3e6894 ("net: asix: ax88772: migrate to phylink")
-Reported-by: Hubert Wiśniewski <hubert.wisniewski.25632@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Jedrzej Jagielski (2):
+  ixgbe: initialize aci.lock before it's used
+  ixgbe: destroy aci.lock later within ixgbe_remove path
 ---
- drivers/net/usb/asix_devices.c | 13 -------------
- 1 file changed, 13 deletions(-)
+v2: introduce additional patch in order to fix call trace appearing  after
+applying 1st patch - call trace on reload
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 22 ++++++++++---------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index 792ddda1ad49..1e8f7089f5e8 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -607,15 +607,8 @@ static const struct net_device_ops ax88772_netdev_ops = {
-
- static void ax88772_suspend(struct usbnet *dev)
- {
--	struct asix_common_private *priv = dev->driver_priv;
- 	u16 medium;
-
--	if (netif_running(dev->net)) {
--		rtnl_lock();
--		phylink_suspend(priv->phylink, false);
--		rtnl_unlock();
--	}
--
- 	/* Stop MAC operation */
- 	medium = asix_read_medium_status(dev, 1);
- 	medium &= ~AX_MEDIUM_RE;
-@@ -644,12 +637,6 @@ static void ax88772_resume(struct usbnet *dev)
- 	for (i = 0; i < 3; i++)
- 		if (!priv->reset(dev, 1))
- 			break;
--
--	if (netif_running(dev->net)) {
--		rtnl_lock();
--		phylink_resume(priv->phylink);
--		rtnl_unlock();
--	}
- }
-
- static int asix_resume(struct usb_interface *intf)
---
-2.47.3
+-- 
+2.31.1
 
 
