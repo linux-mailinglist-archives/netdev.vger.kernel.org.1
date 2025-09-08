@@ -1,188 +1,146 @@
-Return-Path: <netdev+bounces-220943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E46B49834
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:23:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7AF9B49840
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:26:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62C601689C9
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:23:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6739E445726
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C593D314B74;
-	Mon,  8 Sep 2025 18:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="k61XfHHb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2419F3A8F7;
+	Mon,  8 Sep 2025 18:26:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cyan.elm.relay.mailchannels.net (cyan.elm.relay.mailchannels.net [23.83.212.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD7A31AF01
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.212.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757355809; cv=pass; b=CKW2m8ZmO72F2iUBOb4obDHdUprXV62b2V1c/i9dg5YS3o6CqtkUR9rkGjHLGwPDZMGeybi9ROt1cnPFbU0MLSHalecWb/ueYjfxsed/wWNeZTGglsU0J/MBCiSJh63dq8Y822G9c6iMB7iw/sbvVwHc5YyPRa4tkgO7iiAcqBc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757355809; c=relaxed/simple;
-	bh=tJn8wU/FAdYgLMxJPvZZUYUbKifLg26ClGFsuY4bZ6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Pjf4HSdaEvNy8bdE2QYujmiDH0Ot+btwIeWm++O8Mnpu8zit/Jv24igdaoWLSIrB+RHxNQ5F5aNIwk7TNPhN3uVUqjusfKz0fBrJ9wBmix6YcFmLu24WfqE4Z/XtR/apeN/KIzsBuq6Qb9DQi7jKF3XNYMfrspSL7MOVkTWY1AU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=k61XfHHb; arc=pass smtp.client-ip=23.83.212.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 2BD0923DEF
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:16:04 +0000 (UTC)
-Received: from pdx1-sub0-mail-a204.dreamhost.com (100-107-16-138.trex-nlb.outbound.svc.cluster.local [100.107.16.138])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id CE4AD23CCA
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:16:03 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1757355363; a=rsa-sha256;
-	cv=none;
-	b=equJpx4ezgddFUTia9VLF3AJRmN20ugZApRP+aws1bNNlD300ImqVYRuDQyvQZFPlsPaos
-	8LPYUQj6QtKe6wXZD0CuJ89yniRb4BVs7bXRAL4l8oTyY7emsyged3x15zRRLTArRAfiYe
-	LPKzWKykSDsPU1Q1Z9XvvrL8L7zJyOgDUplb8eetVYadCHpkEqFhV4HSYScviblv/bwG8f
-	oGeMOcU+6iNkIGkSdzp8gIyYWbUZ208/p/q7J4j3H6Jv6zK02BcGIRaJX4gszwWL++ae1c
-	uiYCPv3q0hniB9u+31LhQGqeQZc6pZ0nkWSjp2mQ8WEQbIVHwgrQsYw4rUcKzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1757355363;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 dkim-signature; bh=bx4e0pgGb2y8U+QGf21qX2SdVP0uMrcYvKMqsJ4Puj8=;
-	b=5eLy4RnUkjQqBkn4aPZYoU/WQJWywWHbfbhniDlDE92l1FnkWQGktlm9G6HlOzKJHt0Fem
-	TsAeewiEfUctB3xS6YSpHzzceAjJqutjZQHHfuSU8vgufif1Nk+1xwFMZY8xxl9GM35gTQ
-	giKCxJ+xIiIRolEIKaPoCjP2Xxl/M/5jQHfVR2Dv4vWsZR825nDuwEb6QeKBicosvl7qaO
-	kLHyWDEiwBK4BjVcx0Tj+N1Jb8jCRPH38F+w/IR6DwoUYL8/6fhBOTeVh75zuR7FGWETgF
-	QR5GqpEIiXC7N/u4RGRWrHQ0mRHTePKdQLtx87qBOhTFxiwbQLkNXDG6l4170Q==
-ARC-Authentication-Results: i=1;
-	rspamd-9968f48fc-xqc6l;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MailChannels-Auth-Id: dreamhost
-X-Towering-Exultant: 3bd40b761cbdccfb_1757355364051_2213728491
-X-MC-Loop-Signature: 1757355364051:668796617
-X-MC-Ingress-Time: 1757355364051
-Received: from pdx1-sub0-mail-a204.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.107.16.138 (trex/7.1.3);
-	Mon, 08 Sep 2025 18:16:04 +0000
-Received: from kmjvbox.templeofstupid.com (c-73-70-109-47.hsd1.ca.comcast.net [73.70.109.47])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kjlx@templeofstupid.com)
-	by pdx1-sub0-mail-a204.dreamhost.com (Postfix) with ESMTPSA id 4cLFWR1qMHzm8
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 11:16:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
-	s=dreamhost; t=1757355363;
-	bh=bx4e0pgGb2y8U+QGf21qX2SdVP0uMrcYvKMqsJ4Puj8=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=k61XfHHbtdSc/foF8kmzjrn6KgCH4ZwrjupvX9vwYRJu+Af5y3C92EK6opnGlV7n2
-	 olkWmC4w3ClK0f+Ar7N6jvHOUYjOC4Vdmf0AoFwNaWeJ+eFsPRqnmoFEaAG6IXUiPa
-	 zouHtw532WU3+J1+r9rB0a5TlPd5BpieB19QKBySU/zIO8OgcVaMy7QU6GFS07nVa6
-	 UF55OuyRnS7qcznnACxexXF8Jzx+EYwrZf/PkKsBlOHSpoKzu+LByZetR2WZwuG8lK
-	 xwXmzOLONc/GjtFC2iKKYu8FUALUb67rV2ik0POwr9fR6zeGko3ILVwX35qOlxfD+f
-	 MgVfcxYkHlTHA==
-Received: from johansen (uid 1000)
-	(envelope-from kjlx@templeofstupid.com)
-	id e0263
-	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.13);
-	Mon, 08 Sep 2025 11:16:01 -0700
-Date: Mon, 8 Sep 2025 11:16:01 -0700
-From: Krister Johansen <kjlx@templeofstupid.com>
-To: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
-	David Reaver <me@davidreaver.com>
-Subject: [PATCH net v2] mptcp: sockopt: make sync_socket_options propagate
- SOCK_KEEPOPEN
-Message-ID: <aL8dYfPZrwedCIh9@templeofstupid.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB33231A574
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 18:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757355986; cv=none; b=EB9oKMXtlhgQSK282QajI1tZxb8Tyo1TTBmBCfIMbJlqJOSaNChyKzEoqPesldZ4zKxISYjDKLeWkwNdJ4lYq5xVmlQzT9hQjNOlHUh8iC2yu64P4zvDiFwcsy1z+jO/ENO/SvI4tGIdNC+clLQ3KMMCxPVZNCX+0uU1/joWokE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757355986; c=relaxed/simple;
+	bh=4rSHlPI/NdYE4xqH2FEgyhnQ0jYzDdhW7186F9AqEIc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=rNGeLDoSrQQxYvh6Nb2QFbDZT6TY2NjFo17/xA/QGEjdXh7UmpC/NN+R3TngTl8TEgKwlocSYBZYTjJoai6ZZ/zp8Y0g01rKLBYUy4k+xr1v7VBC+2iTxA8k8GoSZxFoT1D7jGv9P1sqMbgTo0vcoXXpYTui5DNF5bfj60q0AAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.154.55) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 8 Sep
+ 2025 21:26:11 +0300
+Message-ID: <d92071a9-471e-47f3-8dff-069f9dc6f10c@omp.ru>
+Date: Mon, 8 Sep 2025 21:26:10 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH net] net: stmmac: prevent division by 0 in
+ stmmac_init_tstamp_counter()
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, <netdev@vger.kernel.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>
+CC: <linux-arm-kernel@lists.infradead.org>
+References: <58116e65-1bca-4d87-b165-78989e1aa195@omp.ru>
+ <a49cff49-3fe5-417d-8f71-7ec63a68112d@linux.dev>
+Content-Language: en-US
+Organization: Open Mobile Platform
+In-Reply-To: <a49cff49-3fe5-417d-8f71-7ec63a68112d@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 09/08/2025 18:09:39
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 196103 [Sep 08 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 66 0.3.66
+ fc5dda3b6b70d34b3701db39319eece2aeb510fb
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.154.55 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.154.55 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	www.ispras.ru:7.1.1;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.154.55
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/08/2025 18:14:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/8/2025 5:23:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Users reported a scenario where MPTCP connections that were configured
-with SO_KEEPALIVE prior to connect would fail to enable their keepalives
-if MTPCP fell back to TCP mode.
+Hello!
 
-After investigating, this affects keepalives for any connection where
-sync_socket_options is called on a socket that is in the closed or
-listening state.  Joins are handled properly. For connects,
-sync_socket_options is called when the socket is still in the closed
-state.  The tcp_set_keepalive() function does not act on sockets that
-are closed or listening, hence keepalive is not immediately enabled.
-Since the SO_KEEPOPEN flag is absent, it is not enabled later in the
-connect sequence via tcp_finish_connect.  Setting the keepalive via
-sockopt after connect does work, but would not address any subsequently
-created flows.
+On 9/7/25 8:41 PM, Vadim Fedorenko wrote:
+[...]
+>> In stmmac_init_tstamp_counter(), the sec_inc variable is initialized to 0,
+>> and if stmmac_config_sub_second_increment() fails to set it to some non-0
+> 
+> How that can happen?
 
-Fortunately, the fix here is straight-forward: set SOCK_KEEPOPEN on the
-subflow when calling sync_socket_options.
+   Let's see what the commit in my Fixes tag said about the problem it fixed:
 
-The fix was valdidated both by using tcpdump to observe keepalive
-packets not being sent before the fix, and being sent after the fix.  It
-was also possible to observe via ss that the keepalive timer was not
-enabled on these sockets before the fix, but was enabled afterwards.
-
-Fixes: 1b3e7ede1365 ("mptcp: setsockopt: handle SO_KEEPALIVE and SO_PRIORITY")
-Cc: stable@vger.kernel.org
-Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-v2:
-  - Ensure local variable declarations are in reverse-Christmas-tree
-    style.  (Feedback from Geliang Tang)
-  - Use keep_open instead of kaval; make type bool instead of int.
-    (Feedback from Matthieu Baerts)
+When building with -Wsometimes-uninitialized, Clang warns:
+
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:495:3: warning: variable 'ns' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:495:3: warning: variable 'ns' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:532:3: warning: variable 'ns' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:532:3: warning: variable 'ns' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:741:3: warning: variable 'sec_inc' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:741:3: warning: variable 'sec_inc' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
+
+Clang is concerned with the use of stmmac_do_void_callback (which
+stmmac_get_timestamp and stmmac_config_sub_second_increment wrap),
+as it may fail to initialize these values if the if condition was ever
+false (meaning the callbacks don't exist). It's not wrong because the
+callbacks (get_timestamp and config_sub_second_increment respectively)
+are the ones that initialize the variables. While it's unlikely that the
+callbacks are ever going to disappear and make that condition false, we
+can easily avoid this warning by zero initialize the variables.
 ---
 
- net/mptcp/sockopt.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+   I think the original commit was just somewhat incomplete, as (adding 0-
+initializer into picture) it missed to add checking of sec_inc for 0 before
+invoking do_div()...
 
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 2c267aff95be..2abe6f1e9940 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -1532,13 +1532,12 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
- {
- 	static const unsigned int tx_rx_locks = SOCK_RCVBUF_LOCK | SOCK_SNDBUF_LOCK;
- 	struct sock *sk = (struct sock *)msk;
-+	bool keep_open;
- 
--	if (ssk->sk_prot->keepalive) {
--		if (sock_flag(sk, SOCK_KEEPOPEN))
--			ssk->sk_prot->keepalive(ssk, 1);
--		else
--			ssk->sk_prot->keepalive(ssk, 0);
--	}
-+	keep_open = sock_flag(sk, SOCK_KEEPOPEN);
-+	if (ssk->sk_prot->keepalive)
-+		ssk->sk_prot->keepalive(ssk, keep_open);
-+	sock_valbool_flag(ssk, SOCK_KEEPOPEN, keep_open);
- 
- 	ssk->sk_priority = sk->sk_priority;
- 	ssk->sk_bound_dev_if = sk->sk_bound_dev_if;
+> Do you have real kernel oops log?
 
-base-commit: 319f7385f22c85618235ab0169b80092fa3c7696
--- 
-2.43.0
+   No, this was just flagged by Svace (the static analyzer):
 
+https://www.ispras.ru/en/technologies/svace/
+
+MBR, Sergey
 
