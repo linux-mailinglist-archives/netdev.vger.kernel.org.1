@@ -1,223 +1,283 @@
-Return-Path: <netdev+bounces-220705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37A73B4842F
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 08:28:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C4E6B48439
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 08:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5578D3BA49E
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 06:28:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FE0C1648C5
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 06:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F1D230BF8;
-	Mon,  8 Sep 2025 06:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F022367CC;
+	Mon,  8 Sep 2025 06:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N+OZ3Dp0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BnMgGQJK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589572F32;
-	Mon,  8 Sep 2025 06:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757312899; cv=none; b=sJs3ZQFiRfnNpGA4/A11Syjyngcr/rqxJ8Gq4T11XLKipEWe9EFS4EJfdCJ+Vk3FYDZUnLEthhyIP5oeSGqwFtsNkDmNff/erudrWtVhbawRrKuKUKuPvjGYean1c48SzQTsd46ds9aHN7WuKA1rYnbDIhtPjy1ZqzxqTGWYPwE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757312899; c=relaxed/simple;
-	bh=tKlsEbu9HDOYElRCUsWLC2XzJ6gWjtu9Q3ZfxnPBAIQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KlMgGa3mRfl/CZHaAGa3Sj7UCDwvY20kYNRQxmmVS8ui7hHtudCubvYaIhmEviuDqrxynXeebYofKK0m7yPQZj0ErmeIO+5AwFVGJKjb4OqjXdCu3/CiTvZAIHwxp0rE3ifp54v644NV4P5cLiIrdxF2E76Iz31SAONusfBo3P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N+OZ3Dp0; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7704f3c46ceso3075532b3a.2;
-        Sun, 07 Sep 2025 23:28:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757312897; x=1757917697; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nuOyzTTAq45ExTFXr1bmu2KD09m908J5cNHTTpfNEx8=;
-        b=N+OZ3Dp09E92XM4bMX8+4NUZa7sSwyfBnRWLPn5UpOXPl2wRFb3tAN6v380h8lMuWw
-         ZGskKc0nGW3l5NbnbeoUvlzWlLeX1WiBUPVWjeA3Oe3IsNRyv1KDa454QyXJXgeh92rF
-         oRDfIT8L60NObkhDnxNRNLmMGwGtwRjOz6vf2TqUpAI0Xjtv54/SHlWJHA9DeDTh0Bvg
-         RrHISFu+TijWnMLU3DXzMxk4HQKdaEIey23vdn44mBP2ivU5O7rW8Bhmg+lj6UWGE5jQ
-         mzDIInvy2erOu4iALiAYo9rin0lmznbCVvKVW1kdawpiwITIj8BNpkNFgrLIA1hwBYXe
-         8A5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757312897; x=1757917697;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nuOyzTTAq45ExTFXr1bmu2KD09m908J5cNHTTpfNEx8=;
-        b=hVPXrUiRfB0G8NeBVp4TKrWDeVS1DIv/xN5mBUuZQ43UdOGkzeV674l0uNDOBKcHJJ
-         Q4FdNotp3RhQrQdnciT0DJFtIcdPGSF+e+3xooNTOZlHLHrEUgP1xjunJnazqNfY2HE5
-         oDnA0nJovA+C4uPeFufB0dtAH0x/LDojYMjo+yOw9eiKFb9z8pJwYGn1uUqfZXt8tU55
-         t6IKLlzH6NpS31VY8IbnyVPctCNRfXg1xImAOdc+Wm2zjO2XD8A9J21X3z9TDXguZhOX
-         1u27LqeiQNKFHfkYCQdsTnr8Q16V0iCJi1EXB/ADamqVZYXRpqbOlS4FYkuVtDjWC4jI
-         ZXtw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwlGU/NVGjytMbNLTSW3Wm3WdcCw16R09VaAQ6NBlaRtbo0myy0xKvQLEN7tb/yIzOwzFTE9zdVsGLSZ5rpKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXVMpfPjgdkx2BtR7HyflpzlfG6qy31UBHob21SU/rOO/RL64O
-	kcLQUtluBu3cNqa1IYZ9rPbIwr30h6ZlAIJYSyF6gjx8xOZq1LmmS8VY2L0GqEByilM=
-X-Gm-Gg: ASbGncuX0pGytFyceAFsWGkUxHvWTNzUq4eTdvtvuj1kozZwh+lP21dH4nEWog2dR4X
-	0i3xrLsJiF0+EnFpviulaeMKNyhDpFkUlzLI6LbzCK0p1CYLpFEnZy+i9gLcYs4HfXWPI0h5e3a
-	y1cfivy1ByEqLnE1W/8gpRb0Vgc9oiNtkV7AyBRCFqAmOWIEzo7INPTQhGNzNLCDYeOsUDEwkJx
-	qP1TMVNnmVyC7d9zR+w7xm7Vfp8aD0tKBrloSblvMAmuff4StDFhmYoWSCSxC9BLkDAJtiVdU/E
-	MZfrxA9/6K/Nr0v26ylpm+smrMO1ZrnjIizySf1EIcopqCl2vTsrmocNtUEmII4wGKk/XQaP8Vx
-	fs1wboGG9l76kwePnnQY6wSDpywgB3xYzxbdnaxLkkrRfHEKVsCYu
-X-Google-Smtp-Source: AGHT+IE4xeQtkHamtFSTqnjiblGZaGxYwYBtK1ZMzcVuFng1mIvxG2PgFOeVw0lR1soKh/eU4LuxZQ==
-X-Received: by 2002:a05:6a00:2ea8:b0:772:2fad:ff64 with SMTP id d2e1a72fcca58-7742dce028fmr9670666b3a.8.1757312897363;
-        Sun, 07 Sep 2025 23:28:17 -0700 (PDT)
-Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77285bb2614sm13134974b3a.58.2025.09.07.23.28.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Sep 2025 23:28:16 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 2/2] selftests: bonding: add vlan over bond testing
-Date: Mon,  8 Sep 2025 06:28:02 +0000
-Message-ID: <20250908062802.392300-2-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250908062802.392300-1-liuhangbin@gmail.com>
-References: <20250908062802.392300-1-liuhangbin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662711B87F2
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 06:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757313141; cv=fail; b=LExX8vMEyM4MBqDkmqSYjntL71nbOuD+ipemIa5ZBEVntpyRNpmIsgcrcHY9NUa/ohrz72KcWEzkq5FtUEu0rtUfrbF33BkV7aBh9YLcn9B7ca3wwUNb/dOfAwSTCWhDRi+p5u0hRHQFehGaZQDM8FGgmLyT/B4k58k/k2s4GuI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757313141; c=relaxed/simple;
+	bh=CF6WqsI5WZ3AB7WkK0s0pbspvw9tqPstq1RmyKU6yxU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=k5Qg/7JMeq3GgNIgKbWuzVfDdK3MmEIfUM6+5TVaz7liGrmqmjhbAjlgj2Qv8H5X+RnvrAMH9eCcVcrZXpZ3PupT38gfFV4kLQcCVVwwaj34UMB/mjH3Gedapyyh7sv9YgR2E8F+PF2t2pkK0cHL1GebSYRdWzu/PM0UoWEN0Ts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BnMgGQJK; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757313139; x=1788849139;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CF6WqsI5WZ3AB7WkK0s0pbspvw9tqPstq1RmyKU6yxU=;
+  b=BnMgGQJKlFDiFDqTNVUnfTG+NgS3BxndR/HPguO4nCy0tXZKwi2MTGKY
+   L+pUYG9tiGMiyR7zhIWWGfSgjT4iYHxDEgMfjODJLwdrW06/rbRRQPgel
+   VZaYKE1R22FkdvQ0Yuqaqex1IeDvvF38BxSmczgZn6ZxNamEyO6FVa85U
+   HgDLU6bZtD8xQHJvTc3SQrSKbsG/7RKQA9Sdv9WVkEFXLaWZ7WmlI7idP
+   F7/buI8Fr6Ibn9Q2T0Y9rlBArVntX2EnPVz0ZwULNE0PPz4CVBtiZsKp3
+   PDSNRd8FHifZzMe9tjRn5XJiKk/6YQIRfaz6+1HGuDJGli2UBI4nbZxC2
+   w==;
+X-CSE-ConnectionGUID: 7czCMFTZSTC1l/4f883v/g==
+X-CSE-MsgGUID: L6MLheslQHWbGBymsr3vvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11546"; a="85005575"
+X-IronPort-AV: E=Sophos;i="6.18,247,1751266800"; 
+   d="scan'208";a="85005575"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2025 23:32:19 -0700
+X-CSE-ConnectionGUID: QmkLwYHDTXORNIIX/x1hNA==
+X-CSE-MsgGUID: aMyPBmcqT0m9kVW8ozOiww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,247,1751266800"; 
+   d="scan'208";a="177053337"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2025 23:32:18 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 7 Sep 2025 23:32:18 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Sun, 7 Sep 2025 23:32:18 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.66) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 7 Sep 2025 23:32:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hOK0CLPOJiGPS6vJFBA3Ap1OhCFE0NepKI4BjQZcNqEIz9z/vUWOQqx6+pCGMkU/KpeBfUnuRfClu4FjWKyqGBycNqItJ4o6PQa9sLb6RRhSQMFOR1BKXEHVGSN3fOLw1z4Ngr9dWSq9Od859RxJa2UDwoNurM1/xeZx7Usf0BIYvldG5y5Fnem6Q5sWXWk9L5EksuZYEBWrZuD9cCEWQrmwlKZ5EmUZtrQZ+ee/sBhsbH0dy2FIk/n525fVQ6MFHkD6NKdq5Yqa5r8y1gZNAUs3Lf68hMqj67eBIeTOyldCti7vYyHjKLySwsW5qaEFkoN9eKTtWB5TWspHPsTaEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p7EkIyIyV8ehjeH13/YoBB84rMYqzJmUDmJJPfFxaCg=;
+ b=BjSP29NWWGlWXLeH2GWXIxUdopFFXSMV1RiROu226z9CT7vzOetgcfHVEzcatBgCh4/kTuKZYRYd3zaaqaqGB6kpRabwadA13j5R/d/VIfEtRVpVh8tvrR/PuI47XnKAUrdfnuIMGSv2Dl8eDtB1x66pyIhA9EeWZsGzBYnV+OAmKRKDoqt4M/Fiad1VedTXRTtnFvL555sJ5kw7r9ZT7t6DG0Zo5rjdLZqFBDgBQ3hsQsYu01wmjl++Jf3l5LheUutTvbKqQAZWT9DkeXJTJG21M2fsIFOunR237OcjK4r+lF1BpmxgkVeyfgPq23QUK2zW/XOLazI3nVNc9/YcTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by SN7PR11MB6774.namprd11.prod.outlook.com (2603:10b6:806:265::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.19; Mon, 8 Sep
+ 2025 06:32:14 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%4]) with mapi id 15.20.9094.018; Mon, 8 Sep 2025
+ 06:32:14 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Kohei Enju <enjuk@amazon.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kurt Kanzenbach
+	<kurt@linutronix.de>, "kohei.enju@gmail.com" <kohei.enju@gmail.com>
+Subject: RE: [Intel-wired-lan] [PATCH v1 iwl-net] igc: unregister netdev when
+ igc_led_setup() fails in igc_probe()
+Thread-Topic: [Intel-wired-lan] [PATCH v1 iwl-net] igc: unregister netdev when
+ igc_led_setup() fails in igc_probe()
+Thread-Index: AQHcHvKI78xYAQ7GEU+pmfOF4lxp6bSI1fuA
+Date: Mon, 8 Sep 2025 06:32:14 +0000
+Message-ID: <IA3PR11MB8986101AE87F5B04E5FA8B4CE50CA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20250906055239.29396-1-enjuk@amazon.com>
+In-Reply-To: <20250906055239.29396-1-enjuk@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SN7PR11MB6774:EE_
+x-ms-office365-filtering-correlation-id: e84f53ed-1699-4dba-47e3-08ddeea1731d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?Z3AMyVOmtjHo5dbYJEFmFZrqaCbKITHnAHPUaqsDBC1j1xwD7MqSr8/V5co6?=
+ =?us-ascii?Q?GXKJJfGMYnsycw0tjdxoj/Am62b2+7Va+/1mWI6xhsyVsEPwx2IqpxduERN9?=
+ =?us-ascii?Q?gNAzUt0O0rZX9xCGVDo0VdljCxHy5qLiKwmdMkFQf5TAOBKJZctkVjn5kM3n?=
+ =?us-ascii?Q?mBDHJJOuZuABBxF5VXjFeBFT+zMCptYBTrcTJBnPeaHBCEjgdRmXM/VhGIvc?=
+ =?us-ascii?Q?kjD9iEh+SEvJ2m7hIpcEJvvp2a653FJPIQtYGPyf1bsWBIeiApf0nxLp6GwI?=
+ =?us-ascii?Q?Av3KXHY4ltP7fZoGx4JjDwUsLnl7nOxAQRpVLCn5Cqejqki5hJhNUxoE2Q/7?=
+ =?us-ascii?Q?eLG83TtD8ObxkSn/7GUm1iG8MTaaQfJdSOhtFy/QnWJzUBYzhsErIQ9qeEIj?=
+ =?us-ascii?Q?6WGj2sEh2QAmjrgDgLdWx7/pCkXzb8Y5x6SY1RHsW2uWiNkzVfr66FLbwUNN?=
+ =?us-ascii?Q?GcBjQcJxz0uAb7TUTRppEfhIvi6RJlnN9Al/vOh49d3+9zmW6KNbCXY07VnT?=
+ =?us-ascii?Q?la+hPBYGG1GRo6yUdOjsextaRsygb8UtHHIOaem4fMESboWjCdrvi70EFv7N?=
+ =?us-ascii?Q?NejbReUywM1Uxs8QF6URDC5/rknDg9N74u0UFWhQ/FJ7EseeL/fPjnDcAJUY?=
+ =?us-ascii?Q?m8l0cYwmhjiKvUVYRg1EQVAqM9TBWVG/JQpSj2yBoZ/X6kDQISf+9yU/fk5R?=
+ =?us-ascii?Q?T+c0cwb+px/yKbnZNsZf0nnxk1oSO7MIGqsoZBmfy8oAAOnFEjqwoEYRXlyT?=
+ =?us-ascii?Q?ue2wzSAZ2FXz0sceS3WB+p3H91hX0OBYhPoZBMvenPglyiND2ZLGXA8n0Z1Z?=
+ =?us-ascii?Q?Go5GnvW5oC/vu2Z7fM+PylRjIs8wIZ+H+jIu3i+AbFtEE9Qq2NagSmFcCNYj?=
+ =?us-ascii?Q?iQ8/DNlSwNxIHXBTeKassJkbcHTW6CVLFRAMxg0NpPZbV8cV9TRexLY2CVao?=
+ =?us-ascii?Q?ZvNE7wG8lLpmFH/M2OdrvMPlljhS5XudSi3CQlIii7bu/Ca3SOkkbAvrOMW4?=
+ =?us-ascii?Q?WWZ2XgGajjWmwSPUtjK+BRr24kmwGc4QNmYyvMv+PC2JbItvXsgfsRbsxQhp?=
+ =?us-ascii?Q?FsL6EOxU2beJlCD2t2sf+IgBDCo0x2XomGKGhkWuwMSvz8+FaEM60NyF9D4Z?=
+ =?us-ascii?Q?7BPjuh2mUmENZ7KouHd/TJ2MaaneD6MRMegU+m54tWJ8UPZDF9GAfmQEpFLz?=
+ =?us-ascii?Q?d0Hnb0GVGN/f71dhwvtdvuBdstpe3wpdQnGMdQMgDIc3J5l0Dh8msaYxal4G?=
+ =?us-ascii?Q?A2j6ArV24fl636Mk1PfkipkhF3+pizi3PUZqgnhF2rt3tk3DvIw5I2miDPk0?=
+ =?us-ascii?Q?vWSxa3/Vua6+Yfvxz/KX8lcj4D26d4QTI8CXm3Vr1DHI5mer8f/GAZZzbBa4?=
+ =?us-ascii?Q?dIYXb55mJDnOuq5L4L3+JvgPJISFxcN8VBH9DpGxFuvS9XfdZGdrKO7DS5Rv?=
+ =?us-ascii?Q?10KxCC9K1+/Ryk36YljEsFYaVbpgxPr08iYYT5iw8UhC8MTkknMRSg=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9SOKxRpBVuAcEonSTIe59qvwgYmCV1GJd0dugt3MCaAMnZG1VCz4fuqPsF1o?=
+ =?us-ascii?Q?vDOJPVOFvv8UKQXyR6RQ0H6gXXXroqwFOGzYEuiU0V0oJIRAwP85HPuCVB1/?=
+ =?us-ascii?Q?e60RtyWZxfbW96MKnu9X/w9zmEj7e7x0JON5W73dxLnhTKQfDG8Ud+2QAN7D?=
+ =?us-ascii?Q?2KzQgJDkQAoEzOZAb41qzEU9opTyZDWi1m+6a5nFJzJktP8avr/1FVNkW5V1?=
+ =?us-ascii?Q?5EPW9q0/VvuLarFRKCEraNRNdrkB34WQxTacZQ2wN1W/om0AqPuuqi3Qz0EH?=
+ =?us-ascii?Q?tM9BOhv1iMYuhUGqu+5YHQ0bVsm8j+946oryaDf7wKL8NDdohFA8go8s3vg5?=
+ =?us-ascii?Q?J9jGeHRUIcnuDIH2/5OHH58InAi6ZHTNiGT7qdz/fb4XeI6ZG5UtKFDeyb9X?=
+ =?us-ascii?Q?jBtb4Fpi/aG/loyuKLPyLNmmr7YSVcKXofAtyVhz8XHCR6EWZq/UB2R5fwha?=
+ =?us-ascii?Q?BdliDcbDZja/kCPPQHkz7FsWWxi8xTK+ioHr7IcTy9ZwufSw44Pe68TiooVn?=
+ =?us-ascii?Q?MutBGDhSWVy2Sef49RyLIN2osjn/WSbHkj+rm01liG1z4KQJUr8NSLHJURUN?=
+ =?us-ascii?Q?fjCXswpqMCL90OP5kl9TirKoYsA5IKS5yYu2u7tw2eDpaowtc89tNoy2fYxi?=
+ =?us-ascii?Q?5koB5rRft/4JE3Nhk8Vq1SZMZGTSl3hPINAKnhI7+H04uxNIVsxigcX7Gp0m?=
+ =?us-ascii?Q?a9xcOEoJYSl+eERAPUGljbsSHuSZhIj6+tohdnuN5w3IT9fxF/r485VJrDLY?=
+ =?us-ascii?Q?55YcOFTprq6E+GoH6jpTUu1UIh1ZuCpJBIXiF5XdpezsSgyifsuLK/w042tv?=
+ =?us-ascii?Q?p3zcSIpmWLElYslb/XclDKp9O5ifeQGHpo9ZyiV39hjeQLAlNdlTnYzFSkYA?=
+ =?us-ascii?Q?g25O4/pHjX1lRgFfX0LnQ4+4U3dM7qJsq6X2Bz/m4w5IlzpwfY8JtA7Ig/Z4?=
+ =?us-ascii?Q?ozHjygSBuNMs4l3gorA5GGTrpNDud9KbhPdLNYuBCrZkbWAPF0BS7iFafXmK?=
+ =?us-ascii?Q?IDVnpf72iYh3ML46EEVr5bMl15pjFzvJriziO54k0RzW/g1DCSOTUYomJZ9L?=
+ =?us-ascii?Q?aRWxdFGfPowTB1fkEprXBIxotjSv5sTVbXMkH9sjMTTA+LdpFrBpYX2m7AG/?=
+ =?us-ascii?Q?BJMkr6RTV5TCKkb3eYP/VeQh0ji9wcCJEvP1EJxq1tOFr6hWPn0mq4VLQVEb?=
+ =?us-ascii?Q?eAJTb8m9SJiEg+YwzcGMPrBdpdNh0zOicxH7X75d8h2KeBhOXqwaY34MxYLL?=
+ =?us-ascii?Q?wnWaRiL+eTZHpbm8feo0G6gzJokgEC1Aevl49j/Cvs/ZeCc1Fwk/QfI27hTR?=
+ =?us-ascii?Q?gnVYN6k0cOBVkYTK0myi91K2pecn4hF6Ghk3TYjo+0dWMgIMBILr2hJbeKHS?=
+ =?us-ascii?Q?k59HOlNdXUsVL6qAizLZzZYeu2qYhsJLyR5eB7qrpa9jnOvWi9R/oxjE7TKU?=
+ =?us-ascii?Q?MvrdskhL8vQF3QagtqAlLovai2JBiQWZOV/gAMspBU3bsDm3qPe3Pxm9hERY?=
+ =?us-ascii?Q?rtkgBm6mscjKkQDoKrq1zl3JJ4yzCvzDLI30iJiVAnN0g1mF1sEBTm+F8TmQ?=
+ =?us-ascii?Q?tbLnnefyaWkgHCLDSsZq+gWi7c24k6T5LlFyK7fy38fzNZDA5ywcxB2Go5aI?=
+ =?us-ascii?Q?0A=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e84f53ed-1699-4dba-47e3-08ddeea1731d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Sep 2025 06:32:14.4711
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ujQ9wwUPM/R2T7j4dExRASEg/aggBA3s8FU2pUtBMFGUVRJQ5w3tipIY9IoNuRKm1BtmrsepTGsOom16qRuP/kUWzC/Xgvg0w9TnPEUMyPU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6774
+X-OriginatorOrg: intel.com
 
-Add a vlan over bond testing to make sure arp/ns target works.
-Also change all the configs to mudules.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
 
-v2: split the patch into 2 parts, the kernel change and test update (Jay Vosburgh)
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Kohei Enju
+> Sent: Saturday, September 6, 2025 7:52 AM
+> To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
+> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>; Kurt Kanzenbach <kurt@linutronix.de>;
+> kohei.enju@gmail.com; Kohei Enju <enjuk@amazon.com>
+> Subject: [Intel-wired-lan] [PATCH v1 iwl-net] igc: unregister netdev
+> when igc_led_setup() fails in igc_probe()
+>=20
+> Currently igc_probe() doesn't unregister netdev when igc_led_setup()
+> fails, causing BUG_ON() in free_netdev() and then kernel panics. [1]
+>=20
+> This behavior can be tested using fault-injection framework. I used
+> the failslab feature to test the issue. [2]
+>=20
+> Call unregister_netdev() when igc_led_setup() fails to avoid the
+> kernel panic.
+>=20
+> [1]
+>  kernel BUG at net/core/dev.c:12047!
+>  Oops: invalid opcode: 0000 [#1] SMP NOPTI
+>  CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-
+> enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)  Hardware name:
+> QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2
+> 04/01/2014
+>  RIP: 0010:free_netdev+0x278/0x2b0
+>  [...]
+>  Call Trace:
+>   <TASK>
+>   igc_probe+0x370/0x910
+>   local_pci_probe+0x3a/0x80
+>   pci_device_probe+0xd1/0x200
+>  [...]
+>=20
+> [2]
+>  #!/bin/bash -ex
+>=20
+>  FAILSLAB_PATH=3D/sys/kernel/debug/failslab/
+>  DEVICE=3D0000:00:05.0
+>  START_ADDR=3D$(grep " igc_led_setup" /proc/kallsyms \
+>          | awk '{printf("0x%s", $1)}')
+>  END_ADDR=3D$(printf "0x%x" $((START_ADDR + 0x100)))
+>=20
+>  echo $START_ADDR > $FAILSLAB_PATH/require-start  echo $END_ADDR >
+> $FAILSLAB_PATH/require-end  echo 1 > $FAILSLAB_PATH/times  echo 100 >
+> $FAILSLAB_PATH/probability  echo N > $FAILSLAB_PATH/ignore-gfp-wait
+>=20
+>  echo $DEVICE > /sys/bus/pci/drivers/igc/bind
+>=20
+> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+> ---
+>  drivers/net/ethernet/intel/igc/igc_main.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c
+> b/drivers/net/ethernet/intel/igc/igc_main.c
+> index e79b14d50b24..95c415d0917d 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -7336,11 +7336,13 @@ static int igc_probe(struct pci_dev *pdev,
+>  	if (IS_ENABLED(CONFIG_IGC_LEDS)) {
+>  		err =3D igc_led_setup(adapter);
+>  		if (err)
+> -			goto err_register;
+> +			goto err_led_setup;
+>  	}
+>=20
+>  	return 0;
+>=20
+> +err_led_setup:
+> +	unregister_netdev(netdev);
+>  err_register:
+>  	igc_release_hw_control(adapter);
+>  	igc_ptp_stop(adapter);
+> --
+> 2.48.1
 
----
- .../drivers/net/bonding/bond_options.sh       | 59 +++++++++++++++++++
- .../selftests/drivers/net/bonding/config      | 21 +++----
- 2 files changed, 70 insertions(+), 10 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-index 7bc148889ca7..b3eb8a919c71 100755
---- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-@@ -7,6 +7,7 @@ ALL_TESTS="
- 	prio
- 	arp_validate
- 	num_grat_arp
-+	vlan_over_bond
- "
- 
- lib_dir=$(dirname "$0")
-@@ -376,6 +377,64 @@ num_grat_arp()
- 	done
- }
- 
-+vlan_over_bond_arp()
-+{
-+	local mode="$1"
-+	RET=0
-+
-+	bond_reset "mode $mode arp_interval 100 arp_ip_target 192.0.3.10"
-+	ip -n "${s_ns}" link add bond0.3 link bond0 type vlan id 3
-+	ip -n "${s_ns}" link set bond0.3 up
-+	ip -n "${s_ns}" addr add 192.0.3.1/24 dev bond0.3
-+	ip -n "${s_ns}" addr add 2001:db8::3:1/64 dev bond0.3
-+
-+	slowwait_for_counter 5 5 tc_rule_handle_stats_get \
-+		"dev eth0.3 ingress" 101 ".packets" "-n ${c_ns}" || RET=1
-+	log_test "vlan over bond arp" "$mode"
-+}
-+
-+vlan_over_bond_ns()
-+{
-+	local mode="$1"
-+	RET=0
-+
-+	if skip_ns; then
-+		log_test_skip "vlan_over_bond ns" "$mode"
-+		return 0
-+	fi
-+
-+	bond_reset "mode $mode arp_interval 100 ns_ip6_target 2001:db8::3:10"
-+	ip -n "${s_ns}" link add bond0.3 link bond0 type vlan id 3
-+	ip -n "${s_ns}" link set bond0.3 up
-+	ip -n "${s_ns}" addr add 192.0.3.1/24 dev bond0.3
-+	ip -n "${s_ns}" addr add 2001:db8::3:1/64 dev bond0.3
-+
-+	slowwait_for_counter 5 5 tc_rule_handle_stats_get \
-+		"dev eth0.3 ingress" 102 ".packets" "-n ${c_ns}" || RET=1
-+	log_test "vlan over bond ns" "$mode"
-+}
-+
-+vlan_over_bond()
-+{
-+	# add vlan 3 for client
-+	ip -n "${c_ns}" link add eth0.3 link eth0 type vlan id 3
-+	ip -n "${c_ns}" link set eth0.3 up
-+	ip -n "${c_ns}" addr add 192.0.3.10/24 dev eth0.3
-+	ip -n "${c_ns}" addr add 2001:db8::3:10/64 dev eth0.3
-+
-+	# Add tc rule to check the vlan pkts
-+	tc -n "${c_ns}" qdisc add dev eth0.3 clsact
-+	tc -n "${c_ns}" filter add dev eth0.3 ingress protocol arp \
-+		handle 101 flower skip_hw arp_op request \
-+		arp_sip 192.0.3.1 arp_tip 192.0.3.10 action pass
-+	tc -n "${c_ns}" filter add dev eth0.3 ingress protocol ipv6 \
-+		handle 102 flower skip_hw ip_proto icmpv6 \
-+		type 135 src_ip 2001:db8::3:1 action pass
-+
-+	vlan_over_bond_arp "active-backup"
-+	vlan_over_bond_ns "active-backup"
-+}
-+
- trap cleanup EXIT
- 
- setup_prepare
-diff --git a/tools/testing/selftests/drivers/net/bonding/config b/tools/testing/selftests/drivers/net/bonding/config
-index 4d16a69ffc65..cbd8b2769475 100644
---- a/tools/testing/selftests/drivers/net/bonding/config
-+++ b/tools/testing/selftests/drivers/net/bonding/config
-@@ -1,12 +1,13 @@
--CONFIG_BONDING=y
--CONFIG_BRIDGE=y
--CONFIG_DUMMY=y
-+CONFIG_BONDING=m
-+CONFIG_BRIDGE=m
-+CONFIG_DUMMY=m
- CONFIG_IPV6=y
--CONFIG_MACVLAN=y
--CONFIG_IPVLAN=y
--CONFIG_NET_ACT_GACT=y
--CONFIG_NET_CLS_FLOWER=y
-+CONFIG_MACVLAN=m
-+CONFIG_IPVLAN=m
-+CONFIG_NET_ACT_GACT=m
-+CONFIG_NET_CLS_FLOWER=m
- CONFIG_NET_CLS_MATCHALL=m
--CONFIG_NET_SCH_INGRESS=y
--CONFIG_NLMON=y
--CONFIG_VETH=y
-+CONFIG_NET_SCH_INGRESS=m
-+CONFIG_NLMON=m
-+CONFIG_VETH=m
-+CONFIG_VLAN_8021Q=m
--- 
-2.50.1
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
