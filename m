@@ -1,105 +1,115 @@
-Return-Path: <netdev+bounces-220775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01E0B4899D
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:09:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F55DB489AB
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 12:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B1617A1D5E
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 10:07:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 833D81B2404C
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 10:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5672ED141;
-	Mon,  8 Sep 2025 10:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7422EBDCF;
+	Mon,  8 Sep 2025 10:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i6XAmI5K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMyNksgN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08212222BF
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 10:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655D02192E3;
+	Mon,  8 Sep 2025 10:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757326153; cv=none; b=mfDMe2z5JFfl+spTbecKFa/qyuE/x6kXDbT4/q4jGTTYYcb9F2zVwH8z8Fd/3ZhNOZJtcbcuZoAMOgPmkSW6f40QeooZM86DMmatCZfsQjPN0c7arcCraAoL57qek61X5JHdmjI4OnEQ8VA5sk91pBRTLzCr8Xoi6KoLUA7GApM=
+	t=1757326383; cv=none; b=YnCJo79yKOgbV5514tpEquSYpkrNZnouI2QqmaV9XPH7G8rVSNWiKTk6fPuOS0X4wWGCecFMtvQZkql7qwcGLIMhMVXugaEBQ0pdFg/y+MA7rBhMDjNmmXSH5ivb93NCOmOYYTXZHtJh+d2oS8RtTEnFc0MAmxJZngi+Wa++CM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757326153; c=relaxed/simple;
-	bh=6vXzUx0+1ZzfBqFBrlFHluVd96S1M8OJgxh7q39xvbo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rz1VcwFRYGTpDXivBQWpwYpy342Y2qqBEXnv6gY8dWa2419tUyXX/YvMat1rOqvwNk01BZ92LymN3higbSSs+ZCxY9ufyq2bZo2oZOJGOJbAjRtEbVX0eHkHpVsxfI1fpRbEfieEM39xFhTTWEIzHYeS6e+AWebhM4yNEnCj06U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i6XAmI5K; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <69cc98e9-0110-4e0d-97a2-b874f876f8d8@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757326147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oKIfr3yz0P4omfZ4OHSE2XNuLb3fPnniT0lD857JD4s=;
-	b=i6XAmI5KoOcNSoe7Gy1KsOtjXNpRWO8PO9P4voq8H+m2zMOgNVZoP1aMsKDHad0OPwAWFf
-	Ir6v9BN6Y9zRo3vj5PQGFbf1llf7LTW+0itfX+T4rNuxYt8tjxj0kARe4/f1+CsAk6HTCy
-	2dlBqIZ1wpdjb24aDsg6+si2EVSYqaw=
-Date: Mon, 8 Sep 2025 11:09:02 +0100
+	s=arc-20240116; t=1757326383; c=relaxed/simple;
+	bh=P7Gdx6jHyS2mhrerthEgKNkM8QnFvFV6K6JPItqOAl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZYHOjjskQxBO/hLlPX5QlxbcPy+O5cOkjJrdrB373NQdc2bFTYylsSO39RCDjgmqHn0VwssRDxBMpTHxYWcD1355BZR08pskqMmbYT3uYeO7+gZ8CdOA4aDd2OHmCwmI/Fr46ZwnTedx5N7wIvLeORWfq4Q8DWmk11sNSXR4ZVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMyNksgN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C337CC4CEF1;
+	Mon,  8 Sep 2025 10:12:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757326381;
+	bh=P7Gdx6jHyS2mhrerthEgKNkM8QnFvFV6K6JPItqOAl8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IMyNksgNqwSaz0M8/qJ7RUcdg2+SEgAlXLw9tD5aE2Yektd3dshrDvUpm/ptL3pg9
+	 nGLYOcjGlKPlH5hru8EJ0nezbjomR74/hWQiVeja5fu1KIudPAO3Z5mgv02jd4XK8B
+	 +tAI3eX+weLj18dlWAKsH1U4phxE1ojIZiD+iWNv8baMGcVgdeNAbsHpENNzlztqXR
+	 zgRelmHQ4nIdb7LnoGugUQ93aa6MjoimFEJ40J9L2C2xfe8abBDbe9pjG1cFlCV1fW
+	 rQJLHivQA6b8BcLnAvGKRMR10uQVwB/o84T4oe6mEzoFN6734OJmAx59NYe4POXmE/
+	 aC35kKBsy5gLw==
+Date: Mon, 8 Sep 2025 11:12:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, david decotigny <decot@googlers.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+	calvin@wbinvd.org, kernel-team@meta.com, stable@vger.kernel.org,
+	jv@jvosburgh.net
+Subject: Re: [PATCH net v3 1/3] netpoll: fix incorrect refcount handling
+ causing incorrect cleanup
+Message-ID: <20250908101256.GA2015@horms.kernel.org>
+References: <20250905-netconsole_torture-v3-0-875c7febd316@debian.org>
+ <20250905-netconsole_torture-v3-1-875c7febd316@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: ipv4: Potential null pointer dereference in
- cipso_v4_parsetag_enum
-To: Chen Yufeng <chenyufeng@iie.ac.cn>, paul@paul-moore.com
-Cc: davem@davemloft.net, dsahern@kernel.org, netdev@vger.kernel.org
-References: <20250908080315.174-1-chenyufeng@iie.ac.cn>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250908080315.174-1-chenyufeng@iie.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905-netconsole_torture-v3-1-875c7febd316@debian.org>
 
-On 08/09/2025 09:03, Chen Yufeng wrote:
-> While parsing CIPSO enumerated tags, secattr->flags is set to
-> NETLBL_SECATTR_MLS_CAT even if secattr->attr.mls.cat is NULL.
-> If subsequent code attempts to access secattr->attr.mls.cat,
-> it may lead to a null pointer dereference, causing a system crash.
+On Fri, Sep 05, 2025 at 10:25:07AM -0700, Breno Leitao wrote:
+> commit efa95b01da18 ("netpoll: fix use after free") incorrectly
+> ignored the refcount and prematurely set dev->npinfo to NULL during
+> netpoll cleanup, leading to improper behavior and memory leaks.
 > 
-> To address this issue, we add a check to ensure that before setting
-> the NETLBL_SECATTR_MLS_CAT flag, secattr->attr.mls.cat is not NULL.
+> Scenario causing lack of proper cleanup:
 > 
-> fixed code:
-> ```
-> if (secattr->attr.mls.cat)
->      secattr->flags |= NETLBL_SECATTR_MLS_CAT;
-> ```
+> 1) A netpoll is associated with a NIC (e.g., eth0) and netdev->npinfo is
+>    allocated, and refcnt = 1
+>    - Keep in mind that npinfo is shared among all netpoll instances. In
+>      this case, there is just one.
 > 
-> This patch is similar to eead1c2ea250("netlabel: cope with NULL catmap").
+> 2) Another netpoll is also associated with the same NIC and
+>    npinfo->refcnt += 1.
+>    - Now dev->npinfo->refcnt = 2;
+>    - There is just one npinfo associated to the netdev.
 > 
-> Signed-off-by: Chen Yufeng <chenyufeng@iie.ac.cn>
-> ---
->   net/ipv4/cipso_ipv4.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+> 3) When the first netpolls goes to clean up:
+>    - The first cleanup succeeds and clears np->dev->npinfo, ignoring
+>      refcnt.
+>      - It basically calls `RCU_INIT_POINTER(np->dev->npinfo, NULL);`
+>    - Set dev->npinfo = NULL, without proper cleanup
+>    - No ->ndo_netpoll_cleanup() is either called
 > 
-> diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
-> index 740af8541d2f..2190333d78cb 100644
-> --- a/net/ipv4/cipso_ipv4.c
-> +++ b/net/ipv4/cipso_ipv4.c
-> @@ -1339,8 +1339,8 @@ static int cipso_v4_parsetag_enum(const struct cipso_v4_doi *doi_def,
->   			netlbl_catmap_free(secattr->attr.mls.cat);
->   			return ret_val;
->   		}
-> -
-> -		secattr->flags |= NETLBL_SECATTR_MLS_CAT;
-> +		if (secattr->attr.mls.cat)
-> +			secattr->flags |= NETLBL_SECATTR_MLS_CAT;
->   	}
->   
->   	return 0;
+> 4) Now the second target tries to clean up
+>    - The second cleanup fails because np->dev->npinfo is already NULL.
+>      * In this case, ops->ndo_netpoll_cleanup() was never called, and
+>        the skb pool is not cleaned as well (for the second netpoll
+>        instance)
+>   - This leaks npinfo and skbpool skbs, which is clearly reported by
+>     kmemleak.
+> 
+> Revert commit efa95b01da18 ("netpoll: fix use after free") and adds
+> clarifying comments emphasizing that npinfo cleanup should only happen
+> once the refcount reaches zero, ensuring stable and correct netpoll
+> behavior.
+> 
+> Cc: stable@vger.kernel.org
+> Cc: jv@jvosburgh.net
+> Fixes: efa95b01da18 ("netpoll: fix use after free")
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
