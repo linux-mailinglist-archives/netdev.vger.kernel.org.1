@@ -1,153 +1,81 @@
-Return-Path: <netdev+bounces-220948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6037EB499C3
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:20:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1ABFB499E7
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 21:28:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E6773B7373
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:20:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD86F1BC2C01
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 19:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2112690C0;
-	Mon,  8 Sep 2025 19:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162C927F01D;
+	Mon,  8 Sep 2025 19:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="MDQHe4Dq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E6Guut2t"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9B424A04D;
-	Mon,  8 Sep 2025 19:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757359221; cv=pass; b=aLhlpsQvCcqdw7OGsnbWd4GoL0nTO0ax6qzWZlSei2CRlMiUork4intDIiFjuXOgpga4tfYxysSyNvH8WN6mfdfGeOv4z5yRPJu0hxw6n3XGe+njua5u5pCCfYcpTpRp3EVXEhCHQJRlJcX8+NtULAPMgBOB6Kjb07L+FS/uTrg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757359221; c=relaxed/simple;
-	bh=N4KX4iYjQlsSAC7XbRdcqC2Wav7eEMkfZTLFXxOZ5mk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4094C1A2381
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 19:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757359692; cv=none; b=AOjBaaKB9y9urRAqYQX3g+dmLvMMAwWiG2k19viGNsCysGTXwhcq30z5hPQAvvBrKMjj9xzf2AqI00dFGcKL69kF3IXYibeIP8TeCgjzM/Ih/4AGq01NAisspvCujp12hvWR0NAvRWyDNvrS4PDZDfhbPbkNM0Ole68XwJJ+Zb4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757359692; c=relaxed/simple;
+	bh=j6CFg6JMk/FjRGTJ06rQZUaFLUuCV1sA7BeJ+RLKj4Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TzmWK6mwJVw73OJlutWSvfA+sKtd6hl90Lyh9zXRmfXZub0eQQPuL02ASUhV+yaVrGd8I4BAz/X2mkCHRXmJM3JaByub/pp03cZPumdINsa1pSMcjtszfv4j7+7l/WfFVxps7y5C7iKt6hTkrHyZ3+0yIxBeUg/iESrE1aUHRdQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=MDQHe4Dq; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1757359161; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=SR21xJbjuheCmpRO47GHS8daLjO4bieeiZzmtZ1cpc55VPRfVg548p5JS7agjhBhxNyqLOj4aSq+sv4fBoBAFwinz+AErAYyDnm9dFMD1lYZFLK2nGxh32KU9UBpnwa4JOgAkGhXXZk1Ezt/EytGOrIDKz/fJ1yBYOqSVdPDvEQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757359161; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=WKomwiWRLnM4IVkNJXgsDxoTaoxCuRYCEVpcC0hexTc=; 
-	b=htmAjoNLy5CO05zAuH6G9LKsksKbRORMRlY2ga//3IUV8oR1JzNf+k84WVaUN8L2BLKsKIhlEp5YQ3KZB1vW4nlER4kFzE9gNteCx4wTgatNBcVznKJb5H1OLhHsmd7Rx2SXOPvHQ6Ssw5cfdqXuwJAAJJ/8DSbGxjiAwoM21VE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
-	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757359161;
-	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=WKomwiWRLnM4IVkNJXgsDxoTaoxCuRYCEVpcC0hexTc=;
-	b=MDQHe4Dqfppv+jVMwZnyFuAG2uAH30HHHO82FejqVc2iciJuMenfzAvgyXzq4Uui
-	4cmxT8BC0FYcgwWgEs3oRnI/N4M6nE/u/LHyPhm0wpuYeXoPlqRJqe/erXnbU3QzXJ8
-	v3SChD6qsHNwSMzyTd0ri4Nf8MkPaF09mbhQTE+8=
-Received: by mx.zohomail.com with SMTPS id 175735915950243.97346092425232;
-	Mon, 8 Sep 2025 12:19:19 -0700 (PDT)
-Message-ID: <1cf0b296-adaa-4c80-864c-9b78f09cd3e3@collabora.com>
-Date: Mon, 8 Sep 2025 16:19:03 -0300
+	 In-Reply-To:Content-Type; b=LMbMy7flQWpzK3hmvw0VT+2jEd8DuL1TIMHKIg5nf6DBOiLp59dR11ZN5KvTmooOS0c41O/jvBTp7DXoka3khfAI4Lz+Izui9JFlJ3g5EKKcoyFvOwextzcUSqvNwGvaVB6fVbKDn+MyOhxDFauwpjXgdGTMz5Td2xjBi2qkz4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E6Guut2t; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <54cddbbd-1c0d-467a-af49-bb6484a62f26@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757359677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hYc7idK35SgQs+VEwnHBmuMBPBHhNNcDoxzAnRzN1B8=;
+	b=E6Guut2tPB/ns7zM3S33BAXu7Ed/JuDyePtmd3LUJzTIgCp508bkQGEWbqhta56jEaEoZv
+	tIWer+kva8JyqWFJYBwzc+tqMO1z+8BRFnSXIbLaTmTkXt0E3ABQZnfoFXiYU2QHjI7bCI
+	lA5xA1ZVjMifWgiq4baxcYTFLm2cqM0=
+Date: Mon, 8 Sep 2025 12:27:49 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 03/14] dt-bindings: arm: mediatek: mmsys: Add
- assigned-clocks/rates properties
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
- andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
- broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
- conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com,
- edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com,
- jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com,
- krzk+dt@kernel.org, kuba@kernel.org,
- kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
- linus.walleij@linaro.org, louisalexis.eyraud@collabora.com,
- maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
- mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
- p.zabel@pengutronix.de, pabeni@redhat.com, robh@kernel.org,
- sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com,
- tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com,
- devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
- <20250820171302.324142-4-ariel.dalessandro@collabora.com>
- <20250821-electric-kestrel-of-awe-cb89dc@kuoka>
+Subject: Re: [PATCH bpf-next v2 3/7] bpf: Support pulling non-linear xdp data
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ kuba@kernel.org, stfomichev@gmail.com, martin.lau@kernel.org,
+ mohsin.bashr@gmail.com, noren@nvidia.com, dtatulea@nvidia.com,
+ saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
+ maciej.fijalkowski@intel.com, kernel-team@meta.com
+References: <20250905173352.3759457-1-ameryhung@gmail.com>
+ <20250905173352.3759457-4-ameryhung@gmail.com>
 Content-Language: en-US
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-In-Reply-To: <20250821-electric-kestrel-of-awe-cb89dc@kuoka>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250905173352.3759457-4-ameryhung@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+X-Migadu-Flow: FLOW_OUT
 
-Krzysztof,
+On 9/5/25 10:33 AM, Amery Hung wrote:
+> An unused argument, flags is reserved for future extension (e.g.,
+> tossing the data instead of copying it to the linear data area).
 
-On 8/21/25 3:43 AM, Krzysztof Kozlowski wrote:
-> On Wed, Aug 20, 2025 at 02:12:51PM -0300, Ariel D'Alessandro wrote:
->> Current, the DT bindings for MediaTek mmsys controller is missing the
->> assigned-clocks and assigned-clocks-rates properties. Add these and
-> 
-> No, they do not miss them. I don't understand why you are adding these.
+> +__bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len, u64 flags)
 
-The reason I added these is due to the following check error:
-
-$ make -j$(nproc) CHECK_DTBS=y mediatek/mt8173-elm.dtb
-   DTC [C] arch/arm64/boot/dts/mediatek/mt8173-elm.dtb
-[...]
-arch/arm64/boot/dts/mediatek/mt8173-elm.dtb: syscon@14000000 
-(mediatek,mt8173-mmsys): 'assigned-clock-rates', 'assigned-clocks' do 
-not match any of the regexes: '^pinctrl-[0-9]+$'
-	from schema $id: 
-http://devicetree.org/schemas/arm/mediatek/mediatek,mmsys.yaml#
-
-> 
->> update the example as well.
->>
->> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
->> ---
->>   .../devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml | 9 +++++++++
->>   1 file changed, 9 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml b/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
->> index 3f4262e93c789..d045d366eb8e2 100644
->> --- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
->> +++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
->> @@ -68,6 +68,12 @@ properties:
->>         of the power controller specified by phandle. See
->>         Documentation/devicetree/bindings/power/power-domain.yaml for details.
->>   
->> +  assigned-clocks:
->> +    maxItems: 1
->> +
->> +  assigned-clock-rates:
->> +    maxItems: 1
->> +
-> 
-> Drop both, completely redundant and not actually in the scope of the binding.
-
-Ack. Will fix accordingly in v2 based on the discussion above.
-
-Thanks!
-
--- 
-Ariel D'Alessandro
-Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
-Registered in England & Wales, no. 5513718
+I was thinking the flag may be needed to avoid copy. I think we have recently 
+concluded that bpf_xdp_adjust_head can support shrink on multi buf also. If it 
+is the case, it is probably better to keep a similar api as the 
+bpf_skb_pull_data which does not have the flags argument.
 
 
