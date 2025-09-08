@@ -1,111 +1,152 @@
-Return-Path: <netdev+bounces-220860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC09B493B6
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:38:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23129B4941E
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 839237A66A5
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:36:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6B11BC304F
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF4D30505D;
-	Mon,  8 Sep 2025 15:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FC131158D;
+	Mon,  8 Sep 2025 15:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CtEkztQJ"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="bdF74zlp";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GKiTFO23"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0877D10E0;
-	Mon,  8 Sep 2025 15:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6324930EF99;
+	Mon,  8 Sep 2025 15:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757345866; cv=none; b=jsJh+BJxj63a6ijqB5j2UO0ur++HLeoamf42isH7+j7z0oQf6a9IsBxmkVRN3ZhBeZFEy5Np3VpCTZAgm7rB6bCZPV5snShsaQKkcryXTIbOcP9AfJp02ExwcHFVDdayVmd9t3SjV0CW90w9utcuyZh0dSKJAQfqd9ebjYT3NPQ=
+	t=1757346294; cv=none; b=Lj2akixIeQGoxG6LmWQxjeBYhZ+ry0ZRawJoYmkOJYG97KK8dGYKodGUqbm52/dfo05ohRLa5e1AF6rsInBMTVsm8wAIB4JUNNqJ69t0PsozdEMg2XgPwBw7iP3s5d67quMFOIDzAHPpVmRNHrfcg8MHl28scNUA29rD2Iqondc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757345866; c=relaxed/simple;
-	bh=BixgHBXmN4yCcd3c+/x2OzMY9yovr69fIJhaRBffAmQ=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=LvfTdg+SkeQzIQYCEAKsWGaidNpSRc+wGsNycPDnvoHOCGAz/7L9FkT35qtRZ8wMkM3AC6HhZqIAkNlJfXfEkHgrQ77rTGkHMKqzxVOAoAQw0rF6FzP7VMycDinOgLx7VlFIC87QLR0KpcS6o9jYkFbMlkTCbShnWVnOfvJep8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtEkztQJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28B3EC4CEF1;
-	Mon,  8 Sep 2025 15:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757345865;
-	bh=BixgHBXmN4yCcd3c+/x2OzMY9yovr69fIJhaRBffAmQ=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=CtEkztQJ5vrO9d/3kZJ9JBz9QQf/snmwyyPy2JKvTxMAOsiPx5KfdycWJdLDURFzt
-	 b6hKEhJjUDU4Y8yUqtmiIhhdGXlXtZ/w/g4Mb4Ul5TjCy3kuM+6l2K3TtU5sb3rnZL
-	 xf+oGpD7fAIt46E7NXPrMrJCeZ5/Uxz5+Ctsvi3aApbS7RlmGXI7xCt7Jr1JBfLLO8
-	 ptCFrwftgTmUIRyKBBSHiUTVrlx5+ZyBQAD9w2W/tUocvSQBE7PCjS6332FI5LhkRW
-	 eYPkk1nJsIueTBrsTQEfaT+5ToVbJOUWlzXYmqx6OrxMVP8K+w0Vm/5+XbDuddpP0p
-	 MHI0msXeaUW3g==
-From: Leon Romanovsky <leon@kernel.org>
-To: jgg@ziepe.ca, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
- andrew.gospodarek@broadcom.com, selvin.xavier@broadcom.com, 
- michael.chan@broadcom.com
-In-Reply-To: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
-References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [PATCH rdma-next 00/10] RDMA/bnxt_re: Add receive flow
- steering support
-Message-Id: <175734586236.468086.14323497345307202416.b4-ty@kernel.org>
-Date: Mon, 08 Sep 2025 11:37:42 -0400
+	s=arc-20240116; t=1757346294; c=relaxed/simple;
+	bh=CBb4N00/8fKeWr7PAv+IbtmTlM91IijtzIOlnRqQGxI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pu7EnKIk+iKXbSxsRD5tlATlNcRtkXE5sUJlM7cO+2WTLlJBHjjkp8jVbfDIRK3nT8N5exnsum54gNUxIc7a5/+fPY9/rmiTgcaOJMKBIHEz27qorHyzvLmjUgh0Dv81TeojqWzqgJuIY//tDPZHwUODRTu205cfUiaX+F3CLWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=bdF74zlp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GKiTFO23; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfout.stl.internal (Postfix) with ESMTP id 4B76A1D00075;
+	Mon,  8 Sep 2025 11:44:51 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Mon, 08 Sep 2025 11:44:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm3; t=1757346291; x=1757432691; bh=2o
+	nnzAEtpf+DmvogfHNvOOZZgYbnwdJj+LIkOOafgXI=; b=bdF74zlpALJDQrOrFq
+	v3Sy0l/n+Y7BHvQ3nFNzrqNClCAktfI2RCkVgQ1TDEEgwe0nmnHwqiidNKA2u+D0
+	uiGFMT8NxI713wAvVsq76Oiz+Qfs5MoAA22ZKz5amrj+yGB38TU91yZm4SorIdKU
+	+5dqDrByO756np8DOmPEBKiz6f5wJRSpcEst9cDVHUnocVvM7+R+p35PBpmizNNv
+	aKHXn6CRJpxrJ5m0AwcdiWmHYBbXdvu4xMwQEMimq31joXMKaKojtUmsEWDTJmJW
+	aBYLJ/l1rYvl/tpUSvoonYagDR0KCVd++W6A0RMANELJPoSa9KcBGk/F4PwQ3y3S
+	dJYg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1757346291; x=1757432691; bh=2onnzAEtpf+DmvogfHNvOOZZgYbn
+	wdJj+LIkOOafgXI=; b=GKiTFO23tly6vy2RSYopQLJAQQPluvCdLdZNLrQVUk3J
+	x2Zhgs3ftGWEBnZ5+vZRu4U569WqYa54SWvDNVKfj6H/mxNs/2NRKCKlTqKK/SUY
+	r9mgeYr0Mi8/sKJpqigDUqijsW+2yjkpoqzUjtGj1A98CVX9SZFbboSBW5cAoDQG
+	BWnibZk6he/PdDFyXsmudAdJ5BRgSkdkdLnbP5Loj+b2dBu0kZMEK0cNo/gDQ2zc
+	hrQu625pzEr6CdcA6gUOBqKS4ci32oKmnFBLqnKc2LG8QN8VeINVynLtIU7LF7Pf
+	5hWVgd4+i+tjCAN2OgyM2wR5C4b3FZMEYHiTPubfHQ==
+X-ME-Sender: <xms:8vm-aBsFSds16A4dgAglD7K5O8FMKpr4L88JKifmfDFVAne1fiVO8g>
+    <xme:8vm-aH1Gr3M0x_o0NW91NU4IY9PcWhtMzYFKfP-4Iq69V2CTOBoW8WlJCWoHt_Hri
+    k0FgGiESL6bozf7Sos>
+X-ME-Received: <xmr:8vm-aMHIM_WBPZZeMRDXlhybQso6hXxO0QTwn7_ulAhCFzoPWMxVNeZ0o26jb5OUJyWe6QGHcLAMF7qdkctIDFWm7Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeelfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufffkffogggtgfesthekredtredtjeenucfhrhhomheppfhikhhlrghsucfu
+    npguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrghsse
+    hrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepheduleetteekgffffedu
+    feeuvdejiedvkefhveeifeegffehledtvdevhfefteegnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhunhgu
+    sehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmth
+    hpohhuthdprhgtphhtthhopeihohhshhhihhhirhhordhshhhimhhouggrrdhuhhesrhgv
+    nhgvshgrshdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnh
+    drtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphht
+    thhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrse
+    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+    pdhrtghpthhtoheprhhitghhrghruggtohgthhhrrghnsehgmhgrihhlrdgtohhmpdhrtg
+    hpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    lhhinhhugidqrhgvnhgvshgrshdqshhotgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:8vm-aCtJFvGEIGallmxQaD_fPgI87WOGmwpqpyIMM8rkDuF5uMwuSg>
+    <xmx:8vm-aPrZTyw7eBpA-BreKuZnoGHxPE6ASeyG2dqpKOJi9RcRKKRq0A>
+    <xmx:8vm-aJUtyeMMHaSjxR5k-7n45FfSzlqVN5VFJFQEAQOhYGikIw5PNQ>
+    <xmx:8vm-aH3McFlKu0qSWXIdadUI_uVN1erN3VT8KHmXwZKCIdHGNo7l4w>
+    <xmx:8_m-aL87HkHXLMJfhnrFlkOVvkJ7_9SIr4_5Deq7FbJ-OCMqcRUrsBe0>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Sep 2025 11:44:49 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [PATCH 0/3] net: ethernet: renesas: rcar_gen4_ptp: Simplify register layout
+Date: Mon,  8 Sep 2025 17:44:23 +0200
+Message-ID: <20250908154426.3062861-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-37811
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Hello,
 
-On Fri, 22 Aug 2025 09:37:51 +0530, Kalesh AP wrote:
-> The RDMA stack allows for applications to create IB_QPT_RAW_PACKET
-> QPs, which receive plain Ethernet packets. This patch adds ib_create_flow()
-> and ib_destroy_flow() support in the bnxt_re driver. For now, only the
-> sniffer rule is supported to receive all port traffic. This is to support
-> tcpdump over the RDMA devices to capture the packets.
-> 
-> Patch#1 is Ethernet driver change to reserve more stats context to RDMA device.
-> Patch#2, #3 and #4 are code refactoring changes in preparation for subsequent patches.
-> Patch#5 adds support for unique GID.
-> Patch#6 adds support for mirror vnic.
-> Patch#7 adds support for flow create/destroy.
-> Patch#8 enables the feature by initializing FW with roce_mirror support.
-> Patch#9 is to improve the timeout value for the commands by using firmware provided message timeout value.
-> Patch#10 is another related cleanup patch to remove unnecessary checks.
-> 
-> [...]
+The daughter driver rcar_gen4_ptp used by both rswitch and rtsn where 
+upstreamed with support for possible different memory layouts on 
+different users. With all Gen4 boards upstream no such setup is 
+documented.
 
-Applied, thanks!
+There are other issues related to how the rcar_gen4_ptp driver is shared 
+between multiple useres that needs to be cleaned up. But that will be a 
+larger work. So before that get some simple fixes done.
 
-[01/10] bnxt_en: Enhance stats context reservation logic
-        https://git.kernel.org/rdma/rdma/c/47bd8cafcbf007
-[02/10] RDMA/bnxt_re: Add data structures for RoCE mirror support
-        https://git.kernel.org/rdma/rdma/c/a99b2425cc6091
-[03/10] RDMA/bnxt_re: Refactor hw context memory allocation
-        https://git.kernel.org/rdma/rdma/c/877d90abaa9eae
-[04/10] RDMA/bnxt_re: Refactor stats context memory allocation
-        https://git.kernel.org/rdma/rdma/c/bebe1a1bb1cff3
-[05/10] RDMA/bnxt_re: Add support for unique GID
-        https://git.kernel.org/rdma/rdma/c/b8f4e7f1a275ba
-[06/10] RDMA/bnxt_re: Add support for mirror vnic
-        https://git.kernel.org/rdma/rdma/c/c23c893e3a02a5
-[07/10] RDMA/bnxt_re: Add support for flow create/destroy
-        https://git.kernel.org/rdma/rdma/c/525b4368864c7e
-[08/10] RDMA/bnxt_re: Initialize fw with roce_mirror support
-        https://git.kernel.org/rdma/rdma/c/d1dde88622b99c
-[09/10] RDMA/bnxt_re: Use firmware provided message timeout value
-        https://git.kernel.org/rdma/rdma/c/d7fc2e1a321cf7
-[10/10] RDMA/bnxt_re: Remove unnecessary condition checks
-        https://git.kernel.org/rdma/rdma/c/dfc78ee86d8f50
+Patch 1/3 and 2/3 removes the support to allow different register 
+layouts on different SoCs by looking up offsets at runtime with a much 
+simpler interface. The new interface computes the offsets at compile 
+time.
 
-Best regards,
+While patch 3/3 is a drive-by patch taking a spurs comment and making a 
+lockdep check of it.
+
+There is no intentional functional change in this series just cleaning 
+up in preparation of larger works to follow.
+
+Niklas Söderlund (3):
+  net: ethernet: renesas: rcar_gen4_ptp: Remove different memory layout
+  net: ethernet: renesas: rcar_gen4_ptp: Hide register layout
+  net: ethernet: renesas: rcar_gen4_ptp: Use lockdep to verify internal
+    usage
+
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 76 ++++++++------------
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.h | 33 +--------
+ drivers/net/ethernet/renesas/rswitch_main.c  |  3 +-
+ drivers/net/ethernet/renesas/rtsn.c          |  3 +-
+ 4 files changed, 32 insertions(+), 83 deletions(-)
+
 -- 
-Leon Romanovsky <leon@kernel.org>
+2.51.0
 
 
