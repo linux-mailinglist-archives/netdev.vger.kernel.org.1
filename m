@@ -1,103 +1,111 @@
-Return-Path: <netdev+bounces-220859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EF7B49365
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:30:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDC09B493B6
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 288D07ACF3F
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:28:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 839237A66A5
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBC12F0C78;
-	Mon,  8 Sep 2025 15:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF4D30505D;
+	Mon,  8 Sep 2025 15:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYdlS8X3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CtEkztQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574AC30DD39
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 15:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0877D10E0;
+	Mon,  8 Sep 2025 15:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757345404; cv=none; b=E36WFQnKMS2A0H90m8pf9U/WGi/K5q8GntBHP7dIn2k7sJpjaDezy5bfzF0sHaUHPfpcrwGMxoLfdsb8J/chbjk/RlKBHtzfkiy3xfHYWMhxyZCC90p6ZOTyGB9CG67XWhCTOcyiWamG5tMGcuLUFPifmhZAMbiI1JLuiPP7if4=
+	t=1757345866; cv=none; b=jsJh+BJxj63a6ijqB5j2UO0ur++HLeoamf42isH7+j7z0oQf6a9IsBxmkVRN3ZhBeZFEy5Np3VpCTZAgm7rB6bCZPV5snShsaQKkcryXTIbOcP9AfJp02ExwcHFVDdayVmd9t3SjV0CW90w9utcuyZh0dSKJAQfqd9ebjYT3NPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757345404; c=relaxed/simple;
-	bh=5lSDnLkZ7myVZUZI6n/3qtnzVZzYmSK06DfdI72+tO8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KRms/IJtduTyMCtK1bLkc71L7l+oPco2aBX8zUSSBToHrf4gybsFYHQzhnBNnTTLXbAe6YdE/h4JhiziYzTfg3f9kiIOmvRe42BZXZabkBubSV+j54ARr1TateBxIFoS3rWcOyE2rz5Sc3PBXnRSYDGAfOaZIab8cwGY3XK64dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QYdlS8X3; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-329b760080fso4345120a91.1
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 08:30:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757345403; x=1757950203; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5lSDnLkZ7myVZUZI6n/3qtnzVZzYmSK06DfdI72+tO8=;
-        b=QYdlS8X38XYWzdqAMNyDbxymcmBPxTW1NEH8pM1XXAv2tn3pdlon3IwNZ15mwyMcth
-         O4r9jUvl8LS9Ne8VZn9ycWF5pHggp5xXvT6wUpwq1RrfYQu28rlCNql8E00sBupn7y2X
-         aSXGXJ25J3kiwueAY1NHiNxaxp1vh9qbaOBXZBG7ko9i7rAIC4wz/9H5aPaEHVsatEnx
-         +Cilx3ftSX8CfUk/2yk5zjRn3+PqINAFUYAREaETqflESpf0UHl0aUibbYDalyHQls98
-         u9kXyhKuX87DrMPBqAk1WOX8DUQbK7V6hAFTFnBertd1s4UtE5TErHYxbWAAlqUb3vk8
-         JyHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757345403; x=1757950203;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5lSDnLkZ7myVZUZI6n/3qtnzVZzYmSK06DfdI72+tO8=;
-        b=stNW1qHaJKshCuVdu5uJ00cABmEdXy93VIuVb3u76+prpcDeBfWOONbtvyNgH4rqOM
-         BZTQX/nG0+BNw9naszmoic+GrdEPs6XY5gb3eFsvxpYTYeWczvunUkixu1bhzRpjOYC1
-         V7It5SMQXQsJZGLtoMKxaQdxxSY6HYQlYPZbsnsHAjLIxhR3fk1Ixyx1E7QLcmviP3QC
-         6MTXEp/JTxjuDElISGf5g+mdCCfM8bpAKOslG0LHPydW6AV1SbtfcvmBfulzakv+9mGX
-         Qcx+LN6q6PSWwxcqcluTa8FwKdWBnM54a6EwU+3RZ7BfAKZ5uPlIaBJBBH8c66NnuNeM
-         o9kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXZV0qUeS17ffRyCmnr+L5gFreMR7C9p3PkEzhieGGYrqgrpYFWlPX3b0fFT6rNb6WxfhxOW7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyILGI83A449RqzNUHevlpI23H9kxySurCQkjxvZKsFOi3B9iBY
-	wVmtXVF70OTFS/ghAXopLZzW+E/gNlt5PfgcL8U9L2QhM23EZfbjQBEkPfBo4gtlJbim0tvIn2x
-	TtVr5UkJLs+/+UPCRMN6Xui8uB0EvL4x4fTCf
-X-Gm-Gg: ASbGnctGt4zW5I+moKb0ZgEdnJnsDmnmyMp7IgCxwbguSB8q7DFn+s7EMiApHsZkskA
-	+Xu9v0tTodC/o51/E4gb+Yt12qZMWp+yX02Dqhg9QGgHQHHwBN0ZIWNI0LQSExm1MpzHss8JP1S
-	N+rIFHxElUVcYv6S/yIt/MYdfgh5lBv+pzQCpuZvnkpjYVQa1rD6WsRJYO7B+gyrkNDlCXIWVTz
-	d4fQ3NvRA==
-X-Google-Smtp-Source: AGHT+IG1VchiuCSKQAMQBFpXzSTNr+XcQj06jFeE3Bf8TSY1n+W0rjq+NmhlYELQIm5gC4hGdhgaEmwUa05bBsYsIkg=
-X-Received: by 2002:a17:90b:38d0:b0:32b:d183:facf with SMTP id
- 98e67ed59e1d1-32d43f76ba9mr9282351a91.28.1757345402623; Mon, 08 Sep 2025
- 08:30:02 -0700 (PDT)
+	s=arc-20240116; t=1757345866; c=relaxed/simple;
+	bh=BixgHBXmN4yCcd3c+/x2OzMY9yovr69fIJhaRBffAmQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=LvfTdg+SkeQzIQYCEAKsWGaidNpSRc+wGsNycPDnvoHOCGAz/7L9FkT35qtRZ8wMkM3AC6HhZqIAkNlJfXfEkHgrQ77rTGkHMKqzxVOAoAQw0rF6FzP7VMycDinOgLx7VlFIC87QLR0KpcS6o9jYkFbMlkTCbShnWVnOfvJep8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtEkztQJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28B3EC4CEF1;
+	Mon,  8 Sep 2025 15:37:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757345865;
+	bh=BixgHBXmN4yCcd3c+/x2OzMY9yovr69fIJhaRBffAmQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=CtEkztQJ5vrO9d/3kZJ9JBz9QQf/snmwyyPy2JKvTxMAOsiPx5KfdycWJdLDURFzt
+	 b6hKEhJjUDU4Y8yUqtmiIhhdGXlXtZ/w/g4Mb4Ul5TjCy3kuM+6l2K3TtU5sb3rnZL
+	 xf+oGpD7fAIt46E7NXPrMrJCeZ5/Uxz5+Ctsvi3aApbS7RlmGXI7xCt7Jr1JBfLLO8
+	 ptCFrwftgTmUIRyKBBSHiUTVrlx5+ZyBQAD9w2W/tUocvSQBE7PCjS6332FI5LhkRW
+	 eYPkk1nJsIueTBrsTQEfaT+5ToVbJOUWlzXYmqx6OrxMVP8K+w0Vm/5+XbDuddpP0p
+	 MHI0msXeaUW3g==
+From: Leon Romanovsky <leon@kernel.org>
+To: jgg@ziepe.ca, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+ andrew.gospodarek@broadcom.com, selvin.xavier@broadcom.com, 
+ michael.chan@broadcom.com
+In-Reply-To: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
+References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH rdma-next 00/10] RDMA/bnxt_re: Add receive flow
+ steering support
+Message-Id: <175734586236.468086.14323497345307202416.b4-ty@kernel.org>
+Date: Mon, 08 Sep 2025 11:37:42 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250905165813.1470708-1-edumazet@google.com> <20250905165813.1470708-7-edumazet@google.com>
-In-Reply-To: <20250905165813.1470708-7-edumazet@google.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 8 Sep 2025 11:29:50 -0400
-X-Gm-Features: Ac12FXwujSsEKaLHoJuWiSJw3bG6wsg0eiXssQGs66CFQNtzGWQe0zwB91hZtqI
-Message-ID: <CADvbK_d0QKRr0oyiQPQ5iVvYteEqcb5q-Qr=KDSa81-By7pqug@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 6/9] sctp: snmp: do not use SNMP_MIB_SENTINEL anymore
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Jamie Bainbridge <jamie.bainbridge@gmail.com>, Abhishek Rawal <rawal.abhishek92@gmail.com>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-37811
 
-On Fri, Sep 5, 2025 at 12:58=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Use ARRAY_SIZE(), so that we know the limit at compile time.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> Cc: Xin Long <lucien.xin@gmail.com>
-Acked-by: Xin Long <lucien.xin@gmail.com>
+
+On Fri, 22 Aug 2025 09:37:51 +0530, Kalesh AP wrote:
+> The RDMA stack allows for applications to create IB_QPT_RAW_PACKET
+> QPs, which receive plain Ethernet packets. This patch adds ib_create_flow()
+> and ib_destroy_flow() support in the bnxt_re driver. For now, only the
+> sniffer rule is supported to receive all port traffic. This is to support
+> tcpdump over the RDMA devices to capture the packets.
+> 
+> Patch#1 is Ethernet driver change to reserve more stats context to RDMA device.
+> Patch#2, #3 and #4 are code refactoring changes in preparation for subsequent patches.
+> Patch#5 adds support for unique GID.
+> Patch#6 adds support for mirror vnic.
+> Patch#7 adds support for flow create/destroy.
+> Patch#8 enables the feature by initializing FW with roce_mirror support.
+> Patch#9 is to improve the timeout value for the commands by using firmware provided message timeout value.
+> Patch#10 is another related cleanup patch to remove unnecessary checks.
+> 
+> [...]
+
+Applied, thanks!
+
+[01/10] bnxt_en: Enhance stats context reservation logic
+        https://git.kernel.org/rdma/rdma/c/47bd8cafcbf007
+[02/10] RDMA/bnxt_re: Add data structures for RoCE mirror support
+        https://git.kernel.org/rdma/rdma/c/a99b2425cc6091
+[03/10] RDMA/bnxt_re: Refactor hw context memory allocation
+        https://git.kernel.org/rdma/rdma/c/877d90abaa9eae
+[04/10] RDMA/bnxt_re: Refactor stats context memory allocation
+        https://git.kernel.org/rdma/rdma/c/bebe1a1bb1cff3
+[05/10] RDMA/bnxt_re: Add support for unique GID
+        https://git.kernel.org/rdma/rdma/c/b8f4e7f1a275ba
+[06/10] RDMA/bnxt_re: Add support for mirror vnic
+        https://git.kernel.org/rdma/rdma/c/c23c893e3a02a5
+[07/10] RDMA/bnxt_re: Add support for flow create/destroy
+        https://git.kernel.org/rdma/rdma/c/525b4368864c7e
+[08/10] RDMA/bnxt_re: Initialize fw with roce_mirror support
+        https://git.kernel.org/rdma/rdma/c/d1dde88622b99c
+[09/10] RDMA/bnxt_re: Use firmware provided message timeout value
+        https://git.kernel.org/rdma/rdma/c/d7fc2e1a321cf7
+[10/10] RDMA/bnxt_re: Remove unnecessary condition checks
+        https://git.kernel.org/rdma/rdma/c/dfc78ee86d8f50
+
+Best regards,
+-- 
+Leon Romanovsky <leon@kernel.org>
+
 
