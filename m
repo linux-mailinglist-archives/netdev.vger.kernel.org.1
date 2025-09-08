@@ -1,157 +1,140 @@
-Return-Path: <netdev+bounces-220754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C29EB487DE
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:09:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 902A1B487D5
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 11:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2C76176F38
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:09:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 307A23B8CA3
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 09:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206C12F4A01;
-	Mon,  8 Sep 2025 09:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCCC2EA72A;
+	Mon,  8 Sep 2025 09:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fgy9AHse"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="N8qUxz9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDEF1E1E1E;
-	Mon,  8 Sep 2025 09:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8532F069E;
+	Mon,  8 Sep 2025 09:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757322526; cv=none; b=A2xmYHHZ4pOKvW6c8PZg+CWdd5HJ1ftPj2S1vUoVAq9tmG/Jxvq1VJ1mCfK+P8kOHs0cgaaMOosIydWyUsJKGwJxwlD6U3Hky6d4m4oflGmjw0gq9bHhuxnuVbt4skJxW3WUs8ToQEoBHjr6Smh84WNk8pJePykX4O/tzBkNuvU=
+	t=1757322514; cv=none; b=m6SL+4ITQ9FKojAOC+g7b/5gZlktTgu4IW3ybWEskscv4C7VB8wxrkimQj1n3v6wJVHRmWVsZncj6s0ZqpLJx8Nzks1eRPhlBtDl0unTrMbQ2eXBvTECwKHZAG81ivG+epWeKyFQJxG2XITNKNaEyMWlD1VgFOmiVXJxozKZD/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757322526; c=relaxed/simple;
-	bh=pxCk7XGN3L7r9ZczqLXHX57qOG+ulO27ydJJwfzrxKQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J/uis9g+8QlQyv9e5btPnrxrmDmFednTCNWhGn9RNowxnMflMthfzWG6UN4SwV3G5oq6QuOciQGrg1kxNnQdP47pxLh/sulJbcDq8woZZaHDe8c9t1DOy259RIKPCMOca1yPVuqFnoBaFhxphDVi1wXxsAB5CBK4CkOnB9UPeSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fgy9AHse; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 588986dc071994;
-	Mon, 8 Sep 2025 04:08:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1757322486;
-	bh=WibgegTqo+WJ+bFaRM+5vscvWKwWpKt986Uxz6u8MQQ=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=fgy9AHsekO02wFnSIM8AfzFYvbHCdXufrzVAIH9/VtA69wnE6SKvxLyvKZsIYOUYw
-	 T+ZIFlqFsIvJ2lJmBHvg42HXOqY9DjHl+5MjHkzo5yxMGNH+An5O8HA4kMfDGtS4cr
-	 J6Zmr/ggYy38l+lDG2M0FN2ZDjf9bNTPZHUe1CsI=
-Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 588986043666698
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Mon, 8 Sep 2025 04:08:06 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 8
- Sep 2025 04:08:05 -0500
-Received: from fllvem-mr08.itg.ti.com (10.64.41.88) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Mon, 8 Sep 2025 04:08:05 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllvem-mr08.itg.ti.com (8.18.1/8.18.1) with ESMTP id 588985Eb2298756;
-	Mon, 8 Sep 2025 04:08:05 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 588985f7023054;
-	Mon, 8 Sep 2025 04:08:05 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet
-	<corbet@lwn.net>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        MD Danish Anwar
-	<danishanwar@ti.com>,
-        Mengyuan Lou <mengyuanlou@net-swift.com>,
-        Luo Jie
-	<quic_luoj@quicinc.com>, Fan Gong <gongfan1@huawei.com>,
-        Lei Wei
-	<quic_leiwei@quicinc.com>,
-        Michael Ellerman <mpe@ellerman.id.au>, Lee Trager
-	<lee@trager.us>,
-        Lorenzo Bianconi <lorenzo@kernel.org>,
-        Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>,
-        Geert Uytterhoeven
-	<geert+renesas@glider.be>,
-        Lukas Bulwahn <lukas.bulwahn@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <devicetree@vger.kernel.org>
-Subject: [PATCH net-next v3 7/7] arch: arm64: dts: k3-am64*: Add rpmsg-eth node
-Date: Mon, 8 Sep 2025 14:37:46 +0530
-Message-ID: <20250908090746.862407-8-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250908090746.862407-1-danishanwar@ti.com>
-References: <20250908090746.862407-1-danishanwar@ti.com>
+	s=arc-20240116; t=1757322514; c=relaxed/simple;
+	bh=MhMgcHHloqdsvpGVS4XMV4EJ/KcTgELqX1VRtRedv10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dZKb7DugkDm0mUgfjdtyFF4SkgKBlvJku65IWirjEYwza+V/vqHRUaUlQWasfiXY75zOjsQV8qb75JWBVbyNqz38VV8PLYAg3XGotaJM05psYyfz6MR7wcJh+sCtYnV6gov8vMInUxQcD5WhqpSajg76C06hVeURpJ0ERcGSNdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=N8qUxz9G; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1757322503;
+	bh=MhMgcHHloqdsvpGVS4XMV4EJ/KcTgELqX1VRtRedv10=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=N8qUxz9GarM32aXEpFClgSN1X9YmPiA2/Cye3eCjKaljfvBxPtLiIRTL2SM0SAjf4
+	 VQdvRKI49OiqfOQ9IAHUsCg3Y4mwaUH61Eyy8qZCH0OeU5xRiPoDSYVIvphO5QCnsu
+	 WIoChJDkzakpAcbjpqctgm0FtGeW/0c/tQsNZlC7cSkOwSvww4M8EBOHGCPr/w5bPo
+	 9XsIaarbsNVskh/KaMCWXvM5jBPQDWatUyAMBPjGJHv0cHtbFSxcAjrc3V0w01Eqg0
+	 Go8a1IztY6bbh2sak9PiIM8uVIDdqoKplkrIB3UrgsSfjr/Nxse0wvCLx0mJJ5mZff
+	 wyKaKmCtOJehQ==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 754826000C;
+	Mon,  8 Sep 2025 09:08:22 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 4D922200C27;
+	Mon, 08 Sep 2025 09:08:17 +0000 (UTC)
+Message-ID: <f574e4b9-d0ea-46ef-bbed-8f607ab7276f@fiberby.net>
+Date: Mon, 8 Sep 2025 09:08:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 02/11] tools: ynl-gen: generate nested array
+ policies
+To: Johannes Berg <johannes@sipsolutions.net>,
+ "Keller, Jacob E" <jacob.e.keller@intel.com>,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "wireguard@lists.zx2c4.com" <wireguard@lists.zx2c4.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20250904-wg-ynl-prep@fiberby.net>
+ <20250904220156.1006541-2-ast@fiberby.net>
+ <e24f5baf-7085-4db0-aaad-5318555988b3@intel.com>
+ <6e31a9e0-5450-4b45-a557-2aa08d23c25a@fiberby.net>
+ <c1a4da4cb54c0436d5f67efacf6866b4bc057b3e.camel@sipsolutions.net>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <c1a4da4cb54c0436d5f67efacf6866b4bc057b3e.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Add rpmsg-eth node to main_r5fss0_core0. This node describes the memory
-region to be used for rpmsg ethernet communication. The commit adds
-below changes,
+On 9/8/25 7:54 AM, Johannes Berg wrote:
+> On Sat, 2025-09-06 at 14:13 +0000, Asbjørn Sloth Tønnesen wrote:
+>> Johannes introduced NLA_NESTED_ARRAY and the NLA_POLICY_NESTED_ARRAY()
+>> macro in commit 1501d13596b9 for use in nl80211, and it's therefore
+>> used in net/wireless/nl80211.c, but outside of that the macro is
+>> only sparsely adopted (only by mac80211_hwsim.c and nf_tables_api.c).
+>>
+>> Wireguard adopts the macro in this RFC patch:
+>> https://lore.kernel.org/netdev/20250904220255.1006675-2-ast@fiberby.net/
+> 
+ > I think the general consensus now is that preference should be towards
+ > arrays being expressed by giving the attribute holding the array
+ > multiple times, i.e. each occurrence of an attribute holds a single
+ > entry of the array:
+ >
+ > [header][type1:a1][type2:b][type1:a2][type1:a3]
+ >
+ > resulting in an array
+ >
+ > [a1, a2, a3] and a separate value "b",
+ >
+ > rather than a nested array:
+ >
+ > [header][type1:[1:a1][2:a2][3:a3]][type2:b]
+ >
+ >
+ > Of course if each entry has multiple values, then you'd still need
+ > nesting:
+ >
+ > [header][type1:[subtype1:x1][subtype2:x2]][type1:[subtype1:y1][subtype2:y2]]
+ >
+ > would be an array
+ >
+ > [[x1, x2], [y1, y2]].
 
-- Adding new reserved memory region main_r5fss0_core0_memory_region_shm
-- Adding rpmsg-eth node to main_r5fss0_core0 with memory-region as
-  main_r5fss0_core0_memory_region_shm
+Thank you for the consensus write up. Should we prohibit indexed-array with sub-type
+nest for families with a genetlink protocol?
 
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- arch/arm64/boot/dts/ti/k3-am642-evm.dts | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+It is currently only used in families with a netlink-raw or genetlink-legacy protocol.
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am642-evm.dts b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-index e01866372293..6e8e2c39146b 100644
---- a/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-+++ b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-@@ -61,7 +61,13 @@ main_r5fss0_core0_dma_memory_region: r5f-dma-memory@a0000000 {
- 
- 		main_r5fss0_core0_memory_region: r5f-memory@a0100000 {
- 			compatible = "shared-dma-pool";
--			reg = <0x00 0xa0100000 0x00 0xf00000>;
-+			reg = <0x00 0xa0100000 0x00 0x300000>;
-+			no-map;
-+		};
-+
-+		main_r5fss0_core0_memory_region_shm: r5f-shm-memory@a0400000 {
-+			compatible = "shared-dma-pool";
-+			reg = <0x00 0xa0400000 0x00 0xc00000>;
- 			no-map;
- 		};
- 
-@@ -767,7 +773,8 @@ mbox_m4_0: mbox-m4-0 {
- &main_r5fss0_core0 {
- 	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
- 	memory-region = <&main_r5fss0_core0_dma_memory_region>,
--			<&main_r5fss0_core0_memory_region>;
-+			<&main_r5fss0_core0_memory_region>,
-+			<&main_r5fss0_core0_memory_region_shm>;
- };
- 
- &main_r5fss0_core1 {
--- 
-2.34.1
+> I can't get rid of the nested array types in nl80211 though, of course.
 
+Wireguard is already in the same boat. It is not using the term, nor the policy,
+but it is doing the validation in the handler through, so it can adopt a
+NLA_POLICY_NESTED_ARRAY() policy, instead of a plain '{ .type = NLA_NESTED }'.
+
+Comments on the protocol in include/uapi/linux/wireguard.h:
+ > WGDEVICE_A_PEERS: NLA_NESTED
+ >   0: NLA_NESTED
+ >     WGPEER_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
+ >     [..]
+ >   0: NLA_NESTED
+ >     ...
+ >   ...
+
+Given that, as Jacob pointed out, there are more families with nested arrays in
+their YNL spec, than those using NLA_NESTED_ARRAY, then it appears that there
+are more families already in the boat.
 
