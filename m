@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-220836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263CAB4905E
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:54:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A70FB4907A
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:56:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EC74A4E1BE2
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:54:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2025934663E
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E532264B6;
-	Mon,  8 Sep 2025 13:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAED30CD90;
+	Mon,  8 Sep 2025 13:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="kfDkdVV1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aftFqDWR"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Bfj2Qnt8";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="A5TRi9Uk"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4FB30BF54
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 13:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E914730C63F
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 13:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757339404; cv=none; b=kNlT8ze93P8FNwweeZ8bZGfn46Mz1Fl3TWUNc3Ox7IdCxpVSi70p+KbKGZQtYFXpE+HkGo9jdMmRnZFQqYq2+x0CUzpltPE1toFf0LQX4LAhf1lzoICaru1VBJM5UCFFLxfYjz5g/bSLxuzRZzwiaCaoY4SHGt0mS/nhMT0Kvp8=
+	t=1757339695; cv=none; b=n46PCHbsV4xYdz+xeVLCzmL4Dg4zdFKiSdCKR8S39YoN/6Imfx+n0+gGdSlgNpqformcvRbi0VSmyV79n67vFLa8tP3S9pez8jhiyITx8dGG2+c3Xxqxk60m26UL/lw5E6LmzsCYCsBdUP/nhn6wxwBwTwBWa8lf9d4oEqkw9q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757339404; c=relaxed/simple;
-	bh=eFMMnYbsUf1u6gT3FLeddmTMcT9VPE/X/Gm1NXdc2UE=;
+	s=arc-20240116; t=1757339695; c=relaxed/simple;
+	bh=OJXDNX53MQ8EEN9uYOXtsOCqtHtQZvz3FVAIJwgBgZs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hENtwIqNkVnvTVsuMGqWkUIHdFV7yD07eB0E2vswzhKq+BYSe57Nu6myQlu1HqNSx2FotA2CMJQ4IcpG93IBSlR9hxBlcFr3vXdmfKM3kddNBVE9d+482w7NnIhrrZ3ejEyY9vfcNz620EilLGIq4oP4gDh7bK+3mWi1qcb6RcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=kfDkdVV1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aftFqDWR; arc=none smtp.client-ip=202.12.124.151
+	 Content-Type:Content-Disposition:In-Reply-To; b=qFS1VcGDh4K3X0p5JgcClh1TzFu0oaAVeLvbHrTGYMJ4nSG7Xsz4OkxeSIRfviqMHYMC1IiPkHbnDuecLg6va/euVJOitypoTruGt29fGZieluF0X2/skO7TrgShTVVBBDxwMO70BERKmS7AdBzEjHu2gxWsJLOiKqmym1mBydg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Bfj2Qnt8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=A5TRi9Uk; arc=none smtp.client-ip=202.12.124.153
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id 4CE391D00126;
-	Mon,  8 Sep 2025 09:50:01 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Mon, 08 Sep 2025 09:50:01 -0400
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id C3EFA7A0109;
+	Mon,  8 Sep 2025 09:54:52 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Mon, 08 Sep 2025 09:54:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-type:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1757339401; x=
-	1757425801; bh=XBrFmgmTV+G3VLXPuJCG1oIq1YcmEo++yiylC2+cllY=; b=k
-	fDkdVV1wOQAcN9xbOTnNpgU8NQOiVeM16fw+04mFN8wz4g4MYS6SXPkQ3P3e21DF
-	ny5Z5us8N3N9j1MZ3QxYqwh4DKnFnyzzLLeCei7mLCVrZ6XTsWwxqnUEueZMsFYx
-	QbjOKyjDbWReSsm2QwO1YOLtPCxRt7JB5raYRNBaM5LqQY5hmkuoSSvpVyRZqR6L
-	r6glvUBNwvXRnbGCBnpoJByRTgUoECoGLk7xXotWRNNrUzD6bG1pBimRQNJIWNlR
-	+O9ErvqIYkDNs/Y2Sc2Z6yDo8XUx8H+LdIlxck9RpuHZ4xQvAbpINrJpdhBFaG4J
-	Ht0oexnk9C6TVjNH9osjQ==
+	:reply-to:subject:subject:to:to; s=fm2; t=1757339692; x=
+	1757426092; bh=koMqeES2tH56wcG7rkvF2aRD2nxc6VqC9XQs3LmNwfg=; b=B
+	fj2Qnt8YesAFmoDLrhAD5A6UHmK6unN4Q1+Wu+CzTn+x7OmNUNxqZZf0bKUQFi7u
+	tVAxFkefUKACP2I2uShpo2kPdhoRmYmdpovMLF2yppH+QJWPJv1h5t2laXdE2XON
+	pmTrTvtYUjaZXv2kH8skQ6CmKqq1IXx7nUwrh2YiY9qv66JLjS3VpZ/yMt+NBka+
+	9uP5+PwSIZY9oh7zNeKZYS/jZoa2Cs2odt6IDmHdMR/BQJ4MUKHbyilXsSBwkuFj
+	ZAG9+EVdT9X7k9kOgGVlM62CJ+9mqU1Ql8EXQbC3ycGopJX8Nu9LrK5IMgK8nW0D
+	QhmJNJ4oif5nRgJsP8VuA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-type:content-type:date:date
 	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
 	:message-id:mime-version:references:reply-to:subject:subject:to
 	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1757339401; x=1757425801; bh=XBrFmgmTV+G3VLXPuJCG1oIq1YcmEo++yiy
-	lC2+cllY=; b=aftFqDWRoaMhjLwp0MAHcMv4qsiKq5j0VQNyAzTBlHZ3NdmSPD2
-	FEb4TOxW5+thoa0mLGVg3t0FuWPE5x5QIg4YtElfuMMJXlE5stuuZXp7YosSyK0P
-	HvnHRgYgL7v56LiKVQXarlf1IJ7AAURrjCyHTkupaqNDfb/EmTGPLyiKoluMgYer
-	S3IbREetzCq5aYcYw90zJKsAqpDl1CIqUDVAdTx6VnS+VS+FQ0ie/gHzSIyRPSjA
-	THP0omdRVTDBDzSMYB76gPV4mQX7wNRtmgDtdBkTOVG8wS1ryiRE8WUfLYVIJyoh
-	jJKpCPuTU/peHqeBXanrdgUGZgSdNN2vn7A==
-X-ME-Sender: <xms:CN--aDDEsNiJseIL_Lz_uFqtj5RXB3u2OKoblXX8weJBrv2TfhPz_Q>
-    <xme:CN--aFPhbAME2piS-jffbIvl4xrUGjXcussk5X7J3eJjyfrrOa_L0d--ZI4EciahI
-    LEPnEH3oBIXpwpzaKM>
-X-ME-Received: <xmr:CN--aLCDxSrmyE7-D1dmMozdIolXvJeRhyN5-LUVKmg3S6F_hoILTiSW875b>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeejtdcutefuodetggdotefrod
+	1757339692; x=1757426092; bh=koMqeES2tH56wcG7rkvF2aRD2nxc6VqC9XQ
+	s3LmNwfg=; b=A5TRi9Uka1txd/QeFd0ytFIhLyPUjXQ+uX/DdjB2GWXuPuv2NSc
+	qmcxrefcOJMJ07kHAy+zr57/8zdY7rJP6DNx05wSv0ksEckJLGlXax2HhvBUy6Du
+	oeDxSn8yV2r8qxyyRQM3hULJxYopVHIsvZbM7E4b5oKShV6ortN8FMnWNBWvG3/d
+	B8EGk8lIq1RYtkzDbi78yVAfzCv1CNwliZXfXEHpqi8te3xzHNo0t/piAGL42MLL
+	fJlzl9y1uSpM34zH2nXP7rhZ2hjQmnW6QyBh1GhETaAKhZWDl6+nWQQXMzrJAOaO
+	pn14zmXaYiBeUrYrDEPHVp1AhXNx23xStjA==
+X-ME-Sender: <xms:LOC-aEn9TfvDkNYFpMu_miOce_pGyfn5a9875fEGD0gUktDI9sxJ8Q>
+    <xme:LOC-aPimtlKF_o2Wbg-gKaVRaUA1s5yisMnrN-OqvwvIF2YsRDJ-8NxG43GnsdtNW
+    q2UlXIjDqUXTSfEVPA>
+X-ME-Received: <xmr:LOC-aPHo3H7pDFOY_w-weLW9epSGLTLLsVOmEjQ-5sR3Apiuzl24wxARSmaP>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeejudcutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
     ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
     hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
@@ -80,15 +80,15 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeejtdcutefuodetgg
     gsrghinhgsrhhiughgvgesghhmrghilhdrtghomhdprhgtphhtthhopehrrgifrghlrdgr
     sghhihhshhgvkhelvdesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvh
     hgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:CN--aO4JxwzZSvABBWqHlGNwcv7GNd1xlAZy4uBrEZYAa8i0ZBe4yw>
-    <xmx:CN--aN6FFahpH-TT8zeNh9Z8er7pquXplGKTk8dplFRZR9vUZRvGiw>
-    <xmx:CN--aITc12c7c-ywoYtmxQgBckcXsKQ4kipMJU2VySQYQTsUwX1YKg>
-    <xmx:CN--aN-MKavutAEBOTwWPl-AeKXYfPMCt2IwKK4VXdwayzfF73Q4Zw>
-    <xmx:Cd--aNlev2wfgi1LIiEHc-4WUcnRuMJvYgxnf79IRNXgWHLzoSn9D0ON>
+X-ME-Proxy: <xmx:LOC-aJuMoZUgUDBEybW2i8fWWrGMAtVGUfQBqFu8ZqLOwNdVRREm6g>
+    <xmx:LOC-aIeXArzligoCDNFoQx0QmCjI-Ghorzh0vhzwFTlfVoOnNC_OvA>
+    <xmx:LOC-aHk3crfZJE09_8Ry64DfpvrzYnvMWB7UQuJHvE2GnQ-FYxU1oQ>
+    <xmx:LOC-aDBldo1goZXnsqElBojX79zsogSbjzoGfHZ2FWzb9i3IUxzW6A>
+    <xmx:LOC-aGKKoUdocg-OXNOv-e5-XZIbFQEqD0PXnp9EjiZoM-ba7Dmmcv-s>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 8 Sep 2025 09:50:00 -0400 (EDT)
-Date: Mon, 8 Sep 2025 15:49:58 +0200
+ 8 Sep 2025 09:54:51 -0400 (EDT)
+Date: Mon, 8 Sep 2025 15:54:50 +0200
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -97,11 +97,11 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Jamie Bainbridge <jamie.bainbridge@gmail.com>,
 	Abhishek Rawal <rawal.abhishek92@gmail.com>, netdev@vger.kernel.org,
 	eric.dumazet@gmail.com
-Subject: Re: [PATCH v2 net-next 2/9] ipv6: snmp: do not use SNMP_MIB_SENTINEL
+Subject: Re: [PATCH v2 net-next 4/9] ipv4: snmp: do not use SNMP_MIB_SENTINEL
  anymore
-Message-ID: <aL7fBlyyhiOrg0SU@krikkit>
+Message-ID: <aL7gKh7D4_bDw8XA@krikkit>
 References: <20250905165813.1470708-1-edumazet@google.com>
- <20250905165813.1470708-3-edumazet@google.com>
+ <20250905165813.1470708-5-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,18 +110,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250905165813.1470708-3-edumazet@google.com>
+In-Reply-To: <20250905165813.1470708-5-edumazet@google.com>
 
-2025-09-05, 16:58:06 +0000, Eric Dumazet wrote:
+2025-09-05, 16:58:08 +0000, Eric Dumazet wrote:
 > Use ARRAY_SIZE(), so that we know the limit at compile time.
-> 
-> Following patch needs this preliminary change.
 > 
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  include/net/ip.h | 24 ++++++++++++++++++++++++
->  net/ipv6/proc.c  | 43 ++++++++++++++++++++++++-------------------
->  2 files changed, 48 insertions(+), 19 deletions(-)
+>  net/ipv4/proc.c | 65 +++++++++++++++++++++++++------------------------
+>  1 file changed, 33 insertions(+), 32 deletions(-)
 
 Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
