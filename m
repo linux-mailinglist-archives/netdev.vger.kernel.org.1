@@ -1,169 +1,220 @@
-Return-Path: <netdev+bounces-220867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449E1B494E1
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:15:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF11EB494EA
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:16:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 907637A9712
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:13:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 670ED203105
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837F130DEA7;
-	Mon,  8 Sep 2025 16:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47D8213236;
+	Mon,  8 Sep 2025 16:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LESLrDIp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZTVY4mo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F331FF603
-	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 16:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38450205ABA;
+	Mon,  8 Sep 2025 16:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757348123; cv=none; b=cgAKgcWSD05501ELx2uJChU7V4BwYRRjQ8cok9PIzOWT+MW//pge1BBNIgU1WjsvYbsZ0WRM/xlpyVJQbVGTai6I9+CNx84j+Zd/ceUv5esjhpCXOAaDj0SM0hAfSpPrMqxO5H+mlWtPbLuZNLUh7vsN5xFZ4iDmiOCfTcbL9c8=
+	t=1757348175; cv=none; b=tQFQGQYr+7JAP2Se33FMMdNyWe9E/seTrR3yM+MVAEjusO1AkH/NleSFkk7Q+7CX2NhCRLoLd3CdhuYPkUkvQEaJbWjI4izAUeI03v6LXUchm+ogTmOFDTwq7LIlE1uuWdjs5YnvUr6IweAwj3pfatKOAmGP36rsFWlKTzORXb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757348123; c=relaxed/simple;
-	bh=uNUru7zzYgB2sxMmEWKB29J1/DPZc3utoJ6hlH1gScQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fm5xGqEeuY6YVGQeUjRsIcz7iJb/4nQR6wQW2cYGdGSdGjSU2BD3hcn6PHxqbifucQp9FgtK55apmUrRLiackoZmZhhjlpQTaZ+VRwk8Oo1Bs7NpZHCv7+iPs48JFzyQBEaED4HbOk8cLMH2WJa0ilJXY4jjuLCEyTCn5lbGQQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LESLrDIp; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-55f62f93fdfso11035e87.0
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 09:15:21 -0700 (PDT)
+	s=arc-20240116; t=1757348175; c=relaxed/simple;
+	bh=py2SL4Lcp1ebRiKpS+febe1mg26X4LV9Gvpzr3MfcFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RlRnChtmXpMyPTb1lVvducmXTskdC02ZGL17RGGJamoR8K9AScoJjB43Us0o9NXq1WZ1Lwec0G7qbud+hL+SS3UE3DPdu0cMWtmCjdOryYC1oUjBgXw3VHlp57+MkF3j2pF+l+vrTdvcZbWrjgEF/mXhtLjB7aITBDj1a293Dxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bZTVY4mo; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e96e1c82b01so3369074276.1;
+        Mon, 08 Sep 2025 09:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757348120; x=1757952920; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nNjG+KitGlrkzDIU5rpQqLyG76T9yZIXGSuaiItNQ8Y=;
-        b=LESLrDIpxfQWYVGA/wU6w9ZLUZewdg8JUlLhcOdYWqNFyf1FaQzmTMPX0IAJoxaPkx
-         Te4TJPalAFDI57mKuhdn55uolt7TQR6H2kQfnITd3UCuF3XOUlISZKbHKlayl98SoSMD
-         Fprz7TwrrJkNR0jTo9bGB1UqFXD6xU6jh731vKzIT/DGN5hV95KfFMyp08xnDfX8+wAk
-         CNvl/mpDVSt6dDBNenH4QRN3O+oiy1Q4moVG2JaMLu8GZGIAV/bZs6ahjnR2SZXwMC7C
-         O61PTDtcGVoDuCdLZzse9/4OZ2AzLFLGNbaGpSYeoYrFCjxsSPEgBpBDI4zcZg3Ed6aU
-         rZ5g==
+        d=gmail.com; s=20230601; t=1757348173; x=1757952973; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0DapaqdkpsmqG8gstJ5wzlYQM9cf+yi+nsrLvokSaDA=;
+        b=bZTVY4moU8RgPWpJMlKq5tJZPzQVDm9MD8pftbou4ha3UQokUonbs+feBbC2I0K49E
+         HocI/Oq+fS6/A9wUYl/3gWS1YZbIdyNaKCT3wn0ULjUKhgEtxZQa+HbzswdBiAhTuyyA
+         PKtJOsir7H/kFgsVn8RFoHiCI48JpJ9xKXubuemHcXpUwWvZbdYegvPEj6kOMIGRXzK3
+         yLlYcXi4RHedo7M2B5HUegY0EnAS+ecuTso8w7BWy3LXSgns/RIZ3uaGihKhni6QbMM4
+         Ip9qjpMguX1/ogulP7SvnbCvUkO8euEGFzrFmGeZL3wpdU+pyeuIQnBFRXw40ny0f9qj
+         qKbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757348120; x=1757952920;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nNjG+KitGlrkzDIU5rpQqLyG76T9yZIXGSuaiItNQ8Y=;
-        b=PtxQldzqlhtfRvm3ru3aQINV6zVtc4qrltKn68s4wlBecXlrQxS5MULdhfjU84ajBu
-         qdvAHNoEQu/qp81PmKUAfaqzL35Nwn3hHDu3PGMDdXf7av4XNfN6MOq4VQewwyLf29X9
-         nOsYdMeED2CbB0LLh4m60eM15epIBMNO7Mlpomb/bVxn1kE4fVRwoPvjGdS8cow4kHRZ
-         j+aplLrl2aTxEf9L0Vu6+YTBTspPzf8JjQrugnrI6qaGGvN9C5+6VFMCSIlx4CYac70u
-         6HkZJli1uWF1FmSRKeaJott7dNNOX4nWGa1YLrsbzp573hNYrYafi1kuG7B9S0C/cqHa
-         g+Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCXDNrkrHsiuBP3pUMm4J/ywR6BsOaPrZaGoPS3h2wq5ttSJufZlJ1/YVOPW8THliiv2/2NddmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9VN2cHQbM6srnmwIL2kQuV2OT43DbBI732YGqMY4XQ4fCitcs
-	FDG/9nl8YLkUy6nCeVjqnuwOhDY5b/l433PgFYVqqlSNWlsC9sfcdjyG9ZsIBD6ntdKd7gjPqT8
-	+L/tW5b1jhq9BhuRU9rKZxoUK9LS6V74if1gDNmhbGh813N86b3Hb9CBk/qE=
-X-Gm-Gg: ASbGncspdVdU0ogJVL5d0/1w1fppxDLo6A02KxCEE6HHBmDKJsJPSeq6qnaDGe1tPGk
-	l3lq/gbdPPkowNh7KujHA6qlai5zB7sCzH1vLc96V2n8SIKJcr7tPh/9NMgU05hB5fF0sDMJTNO
-	zX/hsO569/mu8inX3GkVocFxuDlR0KYJR1WwetTD/X1AErGaWjBcbmLEdpZ2bxsaHad4zRmJj5w
-	9//ukIf6mnefE+mHb6p5ixgsw==
-X-Google-Smtp-Source: AGHT+IHCFgf2RdVhu8TYS/rYvOmOVPxQpbxz1eazegKbLqZhwrcdPrTR9V2NoZ6tvq3rImVDtk9v8k9/bM5/xLJZgbQ=
-X-Received: by 2002:a05:6512:15a9:b0:55f:6ac4:c3b2 with SMTP id
- 2adb3069b0e04-5624189cb92mr517813e87.0.1757348119215; Mon, 08 Sep 2025
- 09:15:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757348173; x=1757952973;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0DapaqdkpsmqG8gstJ5wzlYQM9cf+yi+nsrLvokSaDA=;
+        b=lrhkmkSV+H4PKD0Lz44TWTK1JKCYLJxvI88dPo7/lzujTlNOImgMG0EMvC0xqzy04h
+         X6bxI/rCyf3M7wKwA7s/ys8xr2d6u63ZWt0eWE4FUYQk1QVfiJb80uRa+ErWW3sL0KiI
+         K3wLBKyir7R0bvzzx3Q2pKON1QHj7VEYSEoSWeagKF3vay4AuV4KMof8P4mW8Y5kzLN6
+         nWyrp8HvsFlQjQ8o0XFUOH4+Q2/mAjp9W5wzH3gvAURJhNK0t1rt2M6A1XAxaDJUMVAe
+         6tGzqXCGYDmQEz7GCXawFdM8fXw/hl5LL00T+6WGaG0DlCIsTthmptpPLVHV1cTu5aeC
+         t0rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUz0XvB+kb67jSPlGxhbL737G7xkxUDr6zB8eT4Ro9EeePv9rcEBEY2R9sob8vaT07C2CGiQ69IOR8gArM=@vger.kernel.org, AJvYcCVSMrdLTWa1nJNDFqEaip6vVVYcQS9AIHiuwBxYVu0JxhMb8qGV08iDJ/RpEEE7KH7aUpWCIDQQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE0Q23UxJzkf5gACSPS5OdSVwua2cCW5gkmlnm2+Rin4eR3DpH
+	E0bCNlQindZxyzPnHI2Va+K2XLbboaHTElZpnSAVvcsai6MGBHoxt0ev
+X-Gm-Gg: ASbGncvXViD500qrEjMgIeQDOAp7EQUBUarGFTR2f8IxaGqJ4HAG3KzdQlQsUA+tBkD
+	pHoYEzsPWYxJmx9r20Ob2OTu87I3wB9RHIKyKgY9eSH/RFKGyyCJLwRPNpAvQb9US1UwJgPqf9n
+	IEapgNh7lJOL0a7xFvQ10XmRaNOgAL7d28xXe6/RVWvTi2roOdlmiXVi8KK5LTNYxHoGbrWAx4P
+	RN4ax+jJOKgmIiLaTX1XzPVEC5M2+A9SsBYF6UTcvnrj0/lhB6t4Q0dasg+DSG4IKBN6P0iXT3+
+	spglWEfJgw5hFw62BbRo5/iypNj/Vcip6qnGeUWSiKqE0XxoDQ/u3qNp9bNJQZcsYBuHV+Npfq0
+	3+b6KqUy0jhn8RmaL13Pda4cIxhhG/tKaR8ZBv6cok9CoZLsLfQOrx9pkXGwsv2VeLLJh
+X-Google-Smtp-Source: AGHT+IE9SzII0RV3oLBhYO8bMjK3ds9EdIM9E+T0eXQi9+L2j3In0oZA7qlVRxPT7WVC3/ENpvQvVA==
+X-Received: by 2002:a05:6902:18d1:b0:e9f:bf6a:3108 with SMTP id 3f1490d57ef6-e9fbf6a3734mr7091066276.45.1757348172938;
+        Mon, 08 Sep 2025 09:16:12 -0700 (PDT)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:74::])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e9fa95fac8esm2265528276.3.2025.09.08.09.16.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Sep 2025 09:16:11 -0700 (PDT)
+Date: Mon, 8 Sep 2025 09:16:10 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 2/2] net: devmem: use niov array for token
+ management
+Message-ID: <aL8BSjUbxYvvvZyD@devvm11784.nha0.facebook.com>
+References: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
+ <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-2-d946169b5550@meta.com>
+ <CAHS8izPrf1b_H_FNu2JtnMVpaD6SwHGvg6bC=Fjd4zfp=-pd6w@mail.gmail.com>
+ <aLjaIwkpO64rJtui@devvm11784.nha0.facebook.com>
+ <CAHS8izMe+u1pFzX5U_Mvifn3VNY2WGqi_uDvqWdG7RwPKW3z6A@mail.gmail.com>
+ <aLtKTwBmogXa48Rj@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250908152123.97829-1-kuba@kernel.org>
-In-Reply-To: <20250908152123.97829-1-kuba@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 8 Sep 2025 09:15:07 -0700
-X-Gm-Features: Ac12FXxUA5KIQ6gt91UijVuNGZtQcZZQjXWdNtL3h7riklG-58cTNHxzxIEdFLs
-Message-ID: <CAHS8izPRupVvCDQr7-GF+-c3yeu83wZWgQth4_ub8bQ0AhQ9_w@mail.gmail.com>
-Subject: Re: [PATCH net-next] page_pool: always add GFP_NOWARN for ATOMIC allocations
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, nathan@kernel.org, 
-	nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aLtKTwBmogXa48Rj@mini-arch>
 
-On Mon, Sep 8, 2025 at 8:21=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> Driver authors often forget to add GFP_NOWARN for page allocation
-> from the datapath. This is annoying to operators as OOMs are a fact
-> of life, and we pretty much expect network Rx to hit page allocation
-> failures during OOM. Make page pool add GFP_NOWARN for ATOMIC allocations
-> by default.
->
-> Don't compare to GFP_ATOMIC because it's a mask with 2 bits set.
-> We want a single bit so that the compiler can do an unconditional
-> mask and shift. clang builds the condition as:
->
->     1c31: 89 e8                         movl    %ebp, %eax
->     1c33: 83 e0 20                      andl    $0x20, %eax
->     1c36: c1 e0 0d                      shll    $0xd, %eax
->     1c39: 09 e8                         orl     %ebp, %eax
->
-> so there seems to be no need any more to use the old flag multiplication
-> tricks which is less readable. Pick the lowest bit out of GFP_ATOMIC
-> to limit the size of the instructions.
->
-> The specific change which makes me propose this is that bnxt, after
-> commit cd1fafe7da1f ("eth: bnxt: add support rx side device memory TCP"),
-> lost the GFP_NOWARN, again. It used to allocate with page_pool_dev_alloc_=
-*
+On Fri, Sep 05, 2025 at 01:38:39PM -0700, Stanislav Fomichev wrote:
+> On 09/05, Mina Almasry wrote:
+> > On Wed, Sep 3, 2025 at 5:15 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+> > >
+> > > On Wed, Sep 03, 2025 at 01:20:57PM -0700, Mina Almasry wrote:
+> > > > On Tue, Sep 2, 2025 at 2:36 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
 
-BTW, there is a page_pool_dev_alloc_netmems now that also add the
-NOWARN and should have been devmem tcp compatible and maintained same
-behavior I think.
+[...]
 
-> which added the NOWARN unconditionally. While switching to
-> __bnxt_alloc_rx_netmem() authors forgot to add NOWARN in the explicitly
-> specified flags.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: hawk@kernel.org
-> CC: ilias.apalodimas@linaro.org
-> CC: nathan@kernel.org
-> CC: nick.desaulniers+lkml@gmail.com
-> CC: morbo@google.com
-> CC: justinstitt@google.com
-> CC: llvm@lists.linux.dev
-> ---
->  net/core/page_pool.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index ba70569bd4b0..6ffce0e821e4 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -555,6 +555,13 @@ static noinline netmem_ref __page_pool_alloc_netmems=
-_slow(struct page_pool *pool
->         netmem_ref netmem;
->         int i, nr_pages;
->
-> +       /* Unconditionally set NOWARN if allocating from the datapath.
-> +        * Use a single bit from the ATOMIC mask to help compiler optimiz=
-e.
-> +        */
-> +       BUILD_BUG_ON(!(GFP_ATOMIC & __GFP_HIGH));
-> +       if (gfp & __GFP_HIGH)
-> +               gfp |=3D __GFP_NOWARN;
-> +
+> > > >
+> > > > AFAIU, if you made sk_user_frags an array of (unref, binding) tuples
+> > > > instead of just an array of urefs then you can remove the
+> > > > single-binding restriction.
+> > > >
+> > > > Although, I wonder what happens if the socket receives the netmem at
+> > > > the same index on 2 different dmabufs. At that point I assume the
+> > > > wrong uref gets incremented? :(
+> > > >
+> > >
+> > > Right. We need some bits to differentiate bindings. Here are some ideas
+> > > I've had about this, I wonder what your thoughts are on them:
+> > >
+> > > 1) Encode a subset of bindings and wait for availability if the encoding
+> > > space becomes exhausted. For example, we could encode the binding in 5
+> > > bits for outstanding references across 32 bindings and 27 bits (512 GB)
+> > > of dmabuf. If recvmsg wants to return a reference to a 33rd binding, it
+> > > waits until the user returns enough tokens to release one of the binding
+> > > encoding bits (at which point it could be reused for the new reference).
+> > >
+> > 
+> > This, I think, sounds reasonable. supporting up to 2^5 rx dmabuf
+> > bindings at once and 2^27 max dmabuf size should be fine for us I
+> > think. Although you have to be patient with me, I have to make sure
+> > via tests and code inspection that these new limits will be OK. Also
+> > please understand the risk that even if the changes don't break us,
+> > they may break someone and have to be reverted anyway, although I
+> > think the risk is small.
+> > 
+> > Another suggestion I got from the team is to use a bitmap instead of
+> > an array of atomics. I initially thought this could work, but thinking
+> > about it more, I think that would not work, no? Because it's not 100%
+> > guaranteed that the socket will only get 1 ref on a net_iov. In the
+> > case where the driver fragments the net_iov, multiple difference frags
+> > could point to the same net_iov which means multiple refs. So it seems
+> > we're stuck with an array of atomic_t.
+> > 
 
-I wonder if pp allocs are ever used for anything other than datapath
-pages (and if not, we can add __GPF_NOWARN here unconditionally. But
-this is good too I think.
+Yes that is correct, multiple references can occur so the bitmap
+will lose all > 1 references.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+> > > 2) opt into an extended token (dmabuf_token_v2) via sockopts, and add
+> > > the binding ID or other needed information there.
+> > >
+> > 
+> > Eh, I would say this is an overkill? Today the limit of dma-bufs
+> > supported is 2^27 and I think the dmabuf size is technically 2^32 or
+> > something, but I don't know that we need all this flexibility for
+> > devmem tcp. I think adding a breakdown like above may be fine.
+> > 
 
---=20
-Thanks,
-Mina
+That's my inclination too.
+
+> > > > One way or another the single-binding restriction needs to be removed
+> > > > I think. It's regressing a UAPI that currently works.
+> > > >
+> > 
+> > Thinking about this more, if we can't figure out a different way and
+> > have to have a strict 1 socket to 1 dma-buf mapping, that may be
+> > acceptable...
+> > 
+> > ...the best way to do it is actually to do this, I think, would be to
+> > actually make sure the user can't break the mapping via `ethtool -N`.
+> > I.e. when the user tells us to update or delete a flow steering rule
+> > that belongs to a devmem socket, reject the request altogether. At
+> > that point we could we can be sure that the mapping would not change
+> > anyway. Although I don't know how feasible to implement this is.
+> > 
+
+I will look at this and see if it is possible, I do think that would be
+nicer for the user.
+
+> > AFAICT as well AF_XDP is in a similar boat to devmem in this regard.
+> > The AF_XDP docs require flow steering to be configured for the data to
+> > be available in the umem (and I assume, if flow steering is
+> > reconfigured then the data disappears from the umem?). Stan do you
+> > know how this works? If AF_XDP allows the user to break it by
+> > reconfiguring flow steering it may also be reasonable to allow the
+> > user to break a devmem socket as well (although maybe with
+> > clarification in the docs.
+> 
+> For af_xdp, there is a check in xsk_rcv_check (that runs _after_ bpf
+> program that does the redirect exits) and it drops the packet if
+> the packet is redirected to the unxpected queue (not the one that
+> the socket was bound to). And the only way to observe it after the fact
+> is a drop counter on the nic (or, rather, depends on the nic wrt how it
+> accounts it). I remember Willem wanted to remove that restriction,
+> but looks like he never got to it?
+> 
+> tl;dr we don't error out explicitly when the user misconfigures the steering
+> after the fact (or initially) and drop the packet in the data path.
+
+Sounds like a reasonable default if the explicit ethtool rejection isn't
+feasible.
+
+Thanks for the review and comments!
+
+Best,
+Bobby
 
