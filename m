@@ -1,160 +1,99 @@
-Return-Path: <netdev+bounces-220970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A228B49ABB
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:10:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78BB4B49AC1
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 22:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F14B63BB729
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:10:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 340843AB5D5
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 20:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFA42D7DE8;
-	Mon,  8 Sep 2025 20:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6In0G51"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E272D7DED;
+	Mon,  8 Sep 2025 20:12:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B561A9FAC;
-	Mon,  8 Sep 2025 20:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7F51D8A10
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 20:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757362224; cv=none; b=PzsblePurerEzXy+ELGLQknjvQsnbHur8hnw9wMzaIYp29oVH279NL9YpoIu1pgCpdzKZ6/dQ7X3sHc1ka27ZEN2XooCcuT1iH2X5urfLqMydxUPSjquXufa+oxDWDcgUWxV0AY1xjc8C8RMXuYGBiTSZpDvW6Y/DY30JcXpXN8=
+	t=1757362326; cv=none; b=eoBzuDlq/78ic78YBunK8i8l3ZcBMpZeoKiCHaFrSoivitC8s/KDzDgtiw0iAPbpMsB1DFInFoFzzIwdVmL0y48i1f5xL8KOg9aSivFZ2i17XO5jkVTWXG28MOsEwNYGzyo0Q46mvIKGWRLbZJ+0SjB0CjkNFaOE83n7yKyH1Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757362224; c=relaxed/simple;
-	bh=ZgyiEoPgoIUXXdCjAD8svP/xjoH2RVIvO/gTkTSBKac=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hoaGcNL7ApaffEOS9APT4Dev+etg2CGAJNeTwNuD2CdB84dFuCrs/hSbLPyDMOjEUeQamkQYu5/VBYc9JqFcfLT4tLyin5emaiSfBNE0k2OAwi9PYfdACcqjrwDq+1i/Egv6fczUrzTRAQ3OSvjFXKTlMxH1jauJC7LmZhVXevk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6In0G51; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9196EC4CEF1;
-	Mon,  8 Sep 2025 20:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757362223;
-	bh=ZgyiEoPgoIUXXdCjAD8svP/xjoH2RVIvO/gTkTSBKac=;
-	h=From:To:Cc:Subject:Date:From;
-	b=c6In0G51td4A7NVKgWs8XjVMgMeHcg5G+exIREUwuPigwmgb0/6kjd+iSjqmgml2w
-	 69AgCjR5VgGee+umiBz+rID+QazZlqLyvAjvS0tsun6lEwf0kFc+rP7oMQRX7EHpTf
-	 KT6U13KmVpdAWjWtQk4VqUWGKlN1CLiZOQqWYC8/kdtFHawpf8XoS6Zhie6twlKOGG
-	 Aqb9FoUvtRVIV2ATtZ46kQRcui1BjUOwt2wvXw/DzcUjSpCcrzfNnx8XZ684IPDF9E
-	 jbRWWYH4EeuVFfp/HjkdVeHuo/Lm9cIxR9G8tpQNADjuSiSNV5b9FOmd8z3oh+UiX5
-	 b5mEsRe/Ci5gg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>
-Subject: [PATCH net-next v2] selftests: net: run groups from fcnal-test in parallel
-Date: Mon,  8 Sep 2025 13:10:21 -0700
-Message-ID: <20250908201021.270681-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1757362326; c=relaxed/simple;
+	bh=WSIoRV+4dq+La932BdB3eUBY+0kr7L5QrWYY7oF+82w=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=D27eIKVmo8qF63ZBM2MB8JA7w6wOV8Ca/5oY4D6c2uwE9hovzny/Ijd28WtQlqTTzvid1K0i1P+xhZsrK5S9bbKS7lgBvYFJpoLdcjWapjnBvm1tdkTynFfvz4OI2jxDQ7WXhANBXYHdr858qvY5XJ0HxRZEA2VciJidZvj0nxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-40826edb6e1so47648125ab.1
+        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 13:12:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757362324; x=1757967124;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kUVU0Ff8fQ+u+hL7Q5pC0b/mSJVhOT9pIEPHC3xJKiA=;
+        b=mWNR63XrWqfU2rfmGkETcUaEigIDpdEpytOhVPPc+5Rrn79nu1z/0iS39gh/2qpPqb
+         K4YSrJySMinNGdfcPK9PZz+WVKEIShPnIDCuVJ7FYd/X1AEt4I4b2qppzs8U+CU/wBos
+         l/x06W/Vs1pZDld+IRA1rk9+4uJzQVgtGuESX7jLE3eSlZkTkQsaD7+nyyUcs+SW363z
+         9L9lRTU08ons6rMic2F+mtZQfnvBbgcJrbIcXTvfJRR7MlFRi/o2422GC6HzbcU2N0eZ
+         cNXoyVm9EAIt2GWCrG9P0hIKc/pLzZfUy7Hb4avJIawZQ7D73isl6vgzlbeuV5Yth5Tn
+         JebQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXj3oBdIxfj4eti6C8843B9qcHYel1+QAIey9FjR0Buc+JNA/pwG/g5PTRCLRT9u5oqXw3j+0I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyj2Ko6y2N2v7rxEH5Rhj3OR1egD/5UXqH3D4ram7myke5QCGn/
+	GAacS/m1l2F6yLaoWc/+FJ1bB9Hz6sjTZlcO/n98X2yQCCZ6ypjkvcloMppbmKgJKfpAKSRgDBe
+	DW90NraUEpl9v0uQmcbu4Xe6huJei3ewu3VHtvzIuUXtAh2PTNTLTMrZntTo=
+X-Google-Smtp-Source: AGHT+IGVhC7g/XMpsLDsz/IZxR5D5A09ltN1f439U0eM0rM9IOQ0kdLoc8NU3w/85NGnunzKaEklMRswAVaqru7LxbNnoA0qcBEA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1a61:b0:3ec:248b:8760 with SMTP id
+ e9e14a558f8ab-3fd94a13fc3mr140050635ab.18.1757362323770; Mon, 08 Sep 2025
+ 13:12:03 -0700 (PDT)
+Date: Mon, 08 Sep 2025 13:12:03 -0700
+In-Reply-To: <683428c8.a70a0220.29d4a0.0802.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68bf3893.050a0220.192772.0885.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING: suspicious RCU usage in corrupted (3)
+From: syzbot <syzbot+9767c7ed68b95cfa69e6@syzkaller.appspotmail.com>
+To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, charmitro@posteo.net, daniel@iogearbox.net, 
+	davem@davemloft.net, eddyz87@gmail.com, edumazet@google.com, 
+	haoluo@google.com, horms@kernel.org, jiayuan.chen@linux.dev, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, martin.lau@linux.dev, mykolal@fb.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me, shuah@kernel.org, 
+	song@kernel.org, syzkaller-bugs@googlegroups.com, tj@kernel.org, 
+	yangfeng@kylinos.cn, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-fcnal-test.sh takes almost hour and a half to finish.
-The tests are already grouped into ipv4, ipv6 and other.
-Run those groups separately.
+syzbot suspects this issue was fixed by commit:
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2: no changes, previous posting had a trivial Makefile conflict
-v1: https://lore.kernel.org/20250907012116.3315344-2-kuba@kernel.org
----
- tools/testing/selftests/net/Makefile       | 4 +++-
- tools/testing/selftests/net/fcnal-ipv4.sh  | 2 ++
- tools/testing/selftests/net/fcnal-ipv6.sh  | 2 ++
- tools/testing/selftests/net/fcnal-other.sh | 2 ++
- tools/testing/selftests/net/fcnal-test.sh  | 3 +++
- 5 files changed, 12 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/net/fcnal-ipv4.sh
- create mode 100755 tools/testing/selftests/net/fcnal-ipv6.sh
- create mode 100755 tools/testing/selftests/net/fcnal-other.sh
+commit 7f12c33850482521c961c5c15a50ebe9b9a88d1e
+Author: Charalampos Mitrodimas <charmitro@posteo.net>
+Date:   Wed Jun 11 17:20:43 2025 +0000
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 8c860782f9cd..8270f747ffbc 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -8,11 +8,12 @@ CFLAGS += -I../
- 
- TEST_PROGS := run_netsocktests run_afpackettests test_bpf.sh netdevice.sh \
- 	      rtnetlink.sh xfrm_policy.sh
-+TEST_PROGS += fcnal-ipv4.sh fcnal-ipv6.sh fcnal-other.sh
- TEST_PROGS += fib_tests.sh fib-onlink-tests.sh pmtu.sh udpgso.sh ip_defrag.sh
- TEST_PROGS += udpgso_bench.sh fib_rule_tests.sh msg_zerocopy.sh psock_snd.sh
- TEST_PROGS += udpgro_bench.sh udpgro.sh test_vxlan_under_vrf.sh reuseport_addr_any.sh
- TEST_PROGS += test_vxlan_fdb_changelink.sh so_txtime.sh ipv6_flowlabel.sh
--TEST_PROGS += tcp_fastopen_backup_key.sh fcnal-test.sh l2tp.sh traceroute.sh
-+TEST_PROGS += tcp_fastopen_backup_key.sh l2tp.sh traceroute.sh
- TEST_PROGS += fin_ack_lat.sh fib_nexthop_multiprefix.sh fib_nexthops.sh fib_nexthop_nongw.sh
- TEST_PROGS += altnames.sh icmp.sh icmp_redirect.sh ip6_gre_headroom.sh
- TEST_PROGS += route_localnet.sh
-@@ -127,6 +128,7 @@ TEST_GEN_FILES += $(YNL_GEN_FILES)
- TEST_GEN_PROGS += $(YNL_GEN_PROGS)
- 
- TEST_FILES := settings
-+TEST_FILES += fcnal-test.sh
- TEST_FILES += in_netns.sh lib.sh setup_loopback.sh setup_veth.sh
- 
- TEST_GEN_FILES += $(patsubst %.c,%.o,$(wildcard *.bpf.c))
-diff --git a/tools/testing/selftests/net/fcnal-ipv4.sh b/tools/testing/selftests/net/fcnal-ipv4.sh
-new file mode 100755
-index 000000000000..82f9c867c3e8
---- /dev/null
-+++ b/tools/testing/selftests/net/fcnal-ipv4.sh
-@@ -0,0 +1,2 @@
-+#!/bin/sh
-+./fcnal-test.sh -t ipv4
-diff --git a/tools/testing/selftests/net/fcnal-ipv6.sh b/tools/testing/selftests/net/fcnal-ipv6.sh
-new file mode 100755
-index 000000000000..ab1fc7aa3caf
---- /dev/null
-+++ b/tools/testing/selftests/net/fcnal-ipv6.sh
-@@ -0,0 +1,2 @@
-+#!/bin/sh
-+./fcnal-test.sh -t ipv6
-diff --git a/tools/testing/selftests/net/fcnal-other.sh b/tools/testing/selftests/net/fcnal-other.sh
-new file mode 100755
-index 000000000000..a840cf80b32e
---- /dev/null
-+++ b/tools/testing/selftests/net/fcnal-other.sh
-@@ -0,0 +1,2 @@
-+#!/bin/sh
-+./fcnal-test.sh -t other
-diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index 0e3304d37fd0..49d85d267925 100755
---- a/tools/testing/selftests/net/fcnal-test.sh
-+++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -4272,6 +4272,7 @@ EOF
- TESTS_IPV4="ipv4_ping ipv4_tcp ipv4_udp ipv4_bind ipv4_runtime ipv4_netfilter"
- TESTS_IPV6="ipv6_ping ipv6_tcp ipv6_udp ipv6_bind ipv6_runtime ipv6_netfilter"
- TESTS_OTHER="use_cases"
-+# note: each TEST_ group needs a dedicated runner, e.g. fcnal-ipv4.sh
- 
- PAUSE_ON_FAIL=no
- PAUSE=no
-@@ -4302,6 +4303,8 @@ elif [ "$TESTS" = "ipv4" ]; then
- 	TESTS="$TESTS_IPV4"
- elif [ "$TESTS" = "ipv6" ]; then
- 	TESTS="$TESTS_IPV6"
-+elif [ "$TESTS" = "other" ]; then
-+	TESTS="$TESTS_OTHER"
- fi
- 
- check_gen_prog "nettest"
--- 
-2.51.0
+    net, bpf: Fix RCU usage in task_cls_state() for BPF programs
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13745562580000
+start commit:   079e5c56a5c4 bpf: Fix error return value in bpf_copy_from_..
+git tree:       bpf-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c6c517d2f439239
+dashboard link: https://syzkaller.appspot.com/bug?extid=9767c7ed68b95cfa69e6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=114915f4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15566170580000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: net, bpf: Fix RCU usage in task_cls_state() for BPF programs
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
