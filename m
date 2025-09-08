@@ -1,98 +1,109 @@
-Return-Path: <netdev+bounces-220894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1809BB49601
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:48:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE300B49607
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 18:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 759713B9CEE
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:47:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FC083408B0
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 16:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08E0310651;
-	Mon,  8 Sep 2025 16:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B750C30F929;
+	Mon,  8 Sep 2025 16:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aRSmTrDx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XDx42iKz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5760E30CDB4;
-	Mon,  8 Sep 2025 16:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1308530F7F5
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 16:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757350050; cv=none; b=bCkw/s2wDbdyLBWwKxLyOnZd8WLp0ViRO/FRZWyrOH+Inmf2uO8gMaLSG3OsTcjZkEOhyErtzqUZUQeWGJniHwH/pM2pybfvv2+zQAUxo2UYhVz3Py9PzV5AujijSetFlD8efNbr6KcXf4jdQ5pqJnUYd6RZ4jNStFuuOTlxTkU=
+	t=1757350059; cv=none; b=tEAKJXIUu40/I8Q9BCYeTDfuZRkBsPnrS9KWQutBO1lZAFe6xfpFL44D4ljyDMFRzWhkiE4CtrT4AhT76uzrW9x717720MAgfPh+CB1dGgTTwl99tCr+Rke/UUSNQq62Nrx5973IdiTkXAJ1+a7TYzKvOHP0T2H79/qYzAzbz8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757350050; c=relaxed/simple;
-	bh=lHuXjtnGIwA8Zzr3bT7RPQh03xIe4TvMRJ0gk9Qtcas=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HvhJrUz24KhWjmQ08cXpUiopmj4NdsuMP667wXLwhVVPK0k05mh643Jhpr7DdT2c88wDtmX6lsxAeIZojXKElXDJWKyuHzqQEen5k78yhK/VXlfQ9yRTY9/ZZsiBicYlzx0qJT942LSb7Ur5cclI50vTcFwcpQDX8D+iDekYhLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=aRSmTrDx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D15C4CEF7;
-	Mon,  8 Sep 2025 16:47:28 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aRSmTrDx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1757350043;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lHuXjtnGIwA8Zzr3bT7RPQh03xIe4TvMRJ0gk9Qtcas=;
-	b=aRSmTrDxIs6NpeGo93fkReDvlHN1nyKT78wEVvyAxjkAXAC2k2c3mxuz/bJ82L8IZW1yN6
-	pwkX2HXRtMpvSadVNNy+vTEk636HAjXuttfeyulU58v4gROvgN5dbku8+cv8xe9AeoEtRt
-	vJnlgruF24VRNpNpSmzpwMaYauNKy6E=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 51884059 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 8 Sep 2025 16:47:23 +0000 (UTC)
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-74382041c9eso3354814a34.3;
-        Mon, 08 Sep 2025 09:47:22 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU7Pv6YVG7Il5lZNPuFKdPV/ZNth31owx4UkUqYzKhvwZcw/HdKcdTJ8e1HQJSLBka6oWH9bMmomFMm@vger.kernel.org, AJvYcCUOqaYvG5mFXsLXXedQa+gwRe38TOfzwr0BGOcM5aNi7T5uvLIG/AYDllG6P1P/CkcyHl0t4WrQntqOED3h@vger.kernel.org, AJvYcCUigQYViV2GND3DmxJgbv0/kpp7hN2XucT5RTvsIU290xbGLhCrCQqrePRpUgvYBaphjhj72aUzyqrXow==@vger.kernel.org, AJvYcCVJi51fqijkdCF2YA0vAvPR35tRUY5itSeWU0keOGdm+StsUtp76juMOK/fcBwbDbuGr2JH@vger.kernel.org, AJvYcCVMirRgZKwR+bdaHvMMJFGZ985+jekUAe0ChGlJHxgdGaoOFfXzRHcm2xIvO3/Y2mF0BR30gU46jA==@vger.kernel.org, AJvYcCWN3RMpo/RZptUyTpqiam0AEveYrqwi7qyDloDf0JjytbpFdzHIE5ktmF94iAi0LuNUfN5cUCoraOF2rK5czBdi@vger.kernel.org, AJvYcCWiptBKvnbohr2ztuOXCUWOJhi+26Omn+OvyCW5EnqXGuFH1mBl2eAoQIEDv+ndnabc3/tToOu6g6s2Kw==@vger.kernel.org, AJvYcCWqDgHOfdhEr9YjxNlqZ3glhY5p6zS8PDQHcxbabxg4eXkoOTzmeJP/x+L7F8o/ow49oahL+eYz3mFk@vger.kernel.org, AJvYcCXpsnZWMoLrguQns5x81vpEW7ks4lgFtxUVCnB8WHYeLrNvWr76TM++aVDw/T0R6mv8zyNOyC/YIPgXHQ==@vger.kernel.org, AJvYcCXr69qyvZCcDfca7Eo4w+6MzSLcQNn0
- uVOfkqSQmq9VY6cJXsoopTMmn0qiZNAWjsS+BkCGEuX6@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNpSyF4gzzGVujRQez0aqYHzvcoow35dour5xkma1y0Q5HA7HL
-	RfSAA0s90jFehWKpobcdB063kBKReopAJ6B1YxzYjlH2nNVpRVf+La4DMu3FFxMWugaXKQap5oy
-	BQWd0sE0NNefEHFxWpdaP1oc7XCcUmgM=
-X-Google-Smtp-Source: AGHT+IG1lksSpt4e4b7wpOLuoBOgU4CtzIVFITSYKRy7vIMNnTgG60R226zI8so9rVaf/KD14awSBHuCM8l64s4kZfU=
-X-Received: by 2002:a05:6808:2e4b:b0:438:37eb:62b2 with SMTP id
- 5614622812f47-43b29b952ffmr4287499b6e.44.1757350039548; Mon, 08 Sep 2025
- 09:47:19 -0700 (PDT)
+	s=arc-20240116; t=1757350059; c=relaxed/simple;
+	bh=qxoTlAGsqXKcEqIstoWU2Z85GHullqPwm2YL67ncDUw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pxoIfN6OvRmFja/Nm4EVBFI6SZ1BdyS0KwHhtxtBsvs1C1krfQ1t95c2+nheLoqlkMXH6d6F7+0s5EO7Bgbbyrq/bJJlM/A+mGibbnF0OR9pTAAUXV9Pr0o1nyEkJ1Jef+03d+ANSjTHZxJizSuSctpfP15NMkdlHkpaJdjWE5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XDx42iKz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/u5AQIai1HRb95AsGPoewpc6br1Ojaok+gPX0CM2nPk=; b=XDx42iKzbJgFG3SaKLMOrBIAxg
+	tF3l44SeFJoymz52z7ZeoAUiGqJ/PHjQ5zGYCfDA+3ESGhX+X7TPT0Q0HWVmhZxE0/RHYe9RRoWvk
+	txvOed+HKGL1WO2knB5FIYLdzGzAmTAPg0Fa31UH0Cu8yqTMyvTWjtmM39hXUw7hTgbc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uvf1a-007gqz-2I; Mon, 08 Sep 2025 18:47:26 +0200
+Date: Mon, 8 Sep 2025 18:47:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net] net: stmmac: prevent division by 0 in
+ stmmac_init_tstamp_counter()
+Message-ID: <c3183a23-21da-435d-b599-7003ae7ba79b@lunn.ch>
+References: <58116e65-1bca-4d87-b165-78989e1aa195@omp.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250821200701.1329277-1-david@redhat.com> <20250821200701.1329277-6-david@redhat.com>
-In-Reply-To: <20250821200701.1329277-6-david@redhat.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 8 Sep 2025 18:47:08 +0200
-X-Gmail-Original-Message-ID: <CAHmME9pO-g4qUUsbF+XZqcPcwfP3-N7AxR+MX6G73adc2-NAkA@mail.gmail.com>
-X-Gm-Features: AS18NWDayNVnEOpkO7Cmy5o2hUWkz6cio8gfE7ZsOxyaASSZD8l09i-KslFVPvE
-Message-ID: <CAHmME9pO-g4qUUsbF+XZqcPcwfP3-N7AxR+MX6G73adc2-NAkA@mail.gmail.com>
-Subject: Re: [PATCH RFC 05/35] wireguard: selftests: remove
- CONFIG_SPARSEMEM_VMEMMAP=y from qemu kernel config
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Shuah Khan <shuah@kernel.org>, 
-	Alexander Potapenko <glider@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>, 
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org, 
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev, 
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>, 
-	Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com, 
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com, 
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>, 
-	Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>, 
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, 
-	x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58116e65-1bca-4d87-b165-78989e1aa195@omp.ru>
 
-Applied, thanks.
+On Fri, Sep 05, 2025 at 07:06:50PM +0300, Sergey Shtylyov wrote:
+> In stmmac_init_tstamp_counter(), the sec_inc variable is initialized to 0,
+> and if stmmac_config_sub_second_increment() fails to set it to some non-0
+> value, the following div_u64() call would cause a kernel oops (because of
+> the divide error exception).  Let's check sec_inc for 0 before dividing by
+> it and just return -EINVAL if so...
+> 
+> Found by Linux Verification Center (linuxtesting.org) with the Svace static
+> analysis tool.
+> 
+> Fixes: df103170854e ("net: stmmac: Avoid sometimes uninitialized Clang warnings")
+> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> 
+> ---
+> The patch is against the master branch of Linus Torvalds' linux.git repo.
+
+Wrong tree. Please see:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+This also needs reviewing by somebody who know the STMMAC
+hardware. There is a comment:
+
+	/* For GMAC3.x, 4.x versions, in "fine adjustement mode" set sub-second
+	 * increment to twice the number of nanoseconds of a clock cycle.
+	 * The calculation of the default_addend value by the caller will set it
+	 * to mid-range = 2^31 when the remainder of this division is zero,
+	 * which will make the accumulator overflow once every 2 ptp_clock
+	 * cycles, adding twice the number of nanoseconds of a clock cycle :
+	 * 2000000000ULL / ptp_clock.
+
+So i'm wondering if the subsecond adjustment is sufficient, the
+sec_inc might be zero, and rather than returning an error, the
+hardware just needs programming differently?
+
+    Andrew
+
+---
+pw-bot: cr
 
