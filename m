@@ -1,130 +1,130 @@
-Return-Path: <netdev+bounces-220854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79160B492F2
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:20:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3AEB492F8
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 17:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 502B44E1CA7
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:20:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E3154404AC
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0FB30BF4B;
-	Mon,  8 Sep 2025 15:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A1530BF75;
+	Mon,  8 Sep 2025 15:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbxiZ99F"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B9125634;
-	Mon,  8 Sep 2025 15:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB94304BA2;
+	Mon,  8 Sep 2025 15:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757344838; cv=none; b=ccGZZueOmFxsPR8EbDwYUxaIaPzrdEliDf3WONaX46DNIxYfwprBnMTzubRbbWibncS9CpLi8++EpJ3cz/Ilj8V42OyFevqmadp6GB6xfegEaR2qrJD6c2kX/kJw9l9H6GjQYbOg09EDrUk1qZzKwL92xnFnovR9SAx0TH3g5X0=
+	t=1757344887; cv=none; b=oRFjdF536xQIHCbMSXW2AKKrE/JhgPfuYUkCq7QBGZM3BilwAm+rrksD5YxrEH5cm5aqF1ICs27VmWlcpAz3GCCDfvCCCZHuUgAl3VVgEZEDgCTNK0l2ZRMfP7qXT1cs9fRB1+cG6LNbG5WIMcV18PaDLprp9CNuZTub+sfNw1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757344838; c=relaxed/simple;
-	bh=7gu6rErY7yQyZZzp5eHW86wOgE+oDXZBLtrctFta85o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lz/gByEISxDkz5cZtQUx3QUQQF2Tz6yuZTntoVkeIBCyKnQVUfwdeZ0Drw1hLZoYk6DQiPs3TdIOeGksNQ7eIGhYRyKuWR/gU/c+FFqZeR4rvpHtkqGGDW44ttbqG1tME77ddnRGJwO4DzLmxvm3x+ITpL2vXyAz46Q2LHZaMmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C59BB1692;
-	Mon,  8 Sep 2025 08:20:26 -0700 (PDT)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C62D3F63F;
-	Mon,  8 Sep 2025 08:20:32 -0700 (PDT)
-Date: Mon, 8 Sep 2025 16:20:29 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>
-Cc: <admiyo@os.amperecomputing.com>, Jassi Brar <jassisinghbrar@gmail.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>, Robert Moore <robert.moore@intel.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Huisong Li <lihuisong@huawei.com>
-Subject: Re: [PATCH v23 1/2] mailbox/pcc: support mailbox management of the
- shared buffer
-Message-ID: <aL70PVhM-UVi5UrS@bogus>
-References: <20250715001011.90534-1-admiyo@os.amperecomputing.com>
- <20250715001011.90534-2-admiyo@os.amperecomputing.com>
- <20250904-expert-invaluable-moose-eb5b7b@sudeepholla>
- <1ec0cb87-463c-4321-a1c7-05f120c607aa@amperemail.onmicrosoft.com>
+	s=arc-20240116; t=1757344887; c=relaxed/simple;
+	bh=OZYdUZ3F6fjaLvpJvs2wUT3CRDr/Uoo0+nPnQIDx9iM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZTc4nu7Y+HVTGQ5Wmpm/8w/cCpcYwUBLvc735bGIp1NqTM9fqelSINJeiS8YIiHyuMwuC0tcwqCdz+lcGd9HD0GkxLj/iliKQxQSuLMIeyExJbsuQMbKoj+drDz5ft4bM197BTsa9WUFK8nVj9SkotRRlcgBdauO3EK9bvwNytc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mbxiZ99F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19AF4C4CEF1;
+	Mon,  8 Sep 2025 15:21:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757344886;
+	bh=OZYdUZ3F6fjaLvpJvs2wUT3CRDr/Uoo0+nPnQIDx9iM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mbxiZ99FTxf+pUeqyhMhwsLMESmbnzY3faUcsHhPyNut5cmiru8kMA7QOpuY+YtuI
+	 t+DGPuOCYSZ2/Bu/rhP58qrYiIOHyxVv0zNQpuhpOQvlpZJyBAW2M4nSEsdGzWBVOn
+	 tsC1Eeq0R8e3vOI4tPJzS54jfm1InhybiM8yYP2pimQpTBYvIfF09MakZnsJ+e2ZXU
+	 PzRDhiPxPxJ9xa9c2fQpyPFXeDIad3OcxhlGwO0BCpiYpCjzU50scCSYRf7TkTXjlT
+	 RX/6gcAYG5ba8rdS8iPrzuyIynfVZti7xuGWcXez3FBXThjNsG5l23H7WkT5HQ0pZg
+	 +78P/Hw9vnZeg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com,
+	llvm@lists.linux.dev
+Subject: [PATCH net-next] page_pool: always add GFP_NOWARN for ATOMIC allocations
+Date: Mon,  8 Sep 2025 08:21:23 -0700
+Message-ID: <20250908152123.97829-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1ec0cb87-463c-4321-a1c7-05f120c607aa@amperemail.onmicrosoft.com>
 
-On Mon, Sep 08, 2025 at 10:58:55AM -0400, Adam Young wrote:
-> 
-> On 9/4/25 07:00, Sudeep Holla wrote:
-> > On Mon, Jul 14, 2025 at 08:10:07PM -0400,admiyo@os.amperecomputing.com wrote:
-> > > From: Adam Young<admiyo@os.amperecomputing.com>
-> > > 
-> > > Define a new, optional, callback that allows the driver to
-> > > specify how the return data buffer is allocated.  If that callback
-> > > is set,  mailbox/pcc.c is now responsible for reading from and
-> > > writing to the PCC shared buffer.
-> > > 
-> > > This also allows for proper checks of the Commnand complete flag
-> > > between the PCC sender and receiver.
-> > > 
-> > > For Type 4 channels, initialize the command complete flag prior
-> > > to accepting messages.
-> > > 
-> > > Since the mailbox does not know what memory allocation scheme
-> > > to use for response messages, the client now has an optional
-> > > callback that allows it to allocate the buffer for a response
-> > > message.
-> > > 
-> > > When an outbound message is written to the buffer, the mailbox
-> > > checks for the flag indicating the client wants an tx complete
-> > > notification via IRQ.  Upon receipt of the interrupt It will
-> > > pair it with the outgoing message. The expected use is to
-> > > free the kernel memory buffer for the previous outgoing message.
-> > > 
-> > I know this is merged. Based on the discussions here, I may send a revert
-> > to this as I don't think it is correct.
-> 
-> Have you decided what to do?  The MCTP over PCC driver depends on the
-> behavior in this patch. If you do revert, I will need a path forward.
-> 
+Driver authors often forget to add GFP_NOWARN for page allocation
+from the datapath. This is annoying to operators as OOMs are a fact
+of life, and we pretty much expect network Rx to hit page allocation
+failures during OOM. Make page pool add GFP_NOWARN for ATOMIC allocations
+by default.
 
-Sorry not yet. I still need to understand and analyse your last reply.
+Don't compare to GFP_ATOMIC because it's a mask with 2 bits set.
+We want a single bit so that the compiler can do an unconditional
+mask and shift. clang builds the condition as:
 
-> Based on other code review feed back, I need to make an additional change: 
-> the rx_alloc callback function needs to be atomically set, and thus needs to
-> move to the mailbox API.  There it will pair with the prepare transaction
-> function.  It is a small change, but I expect some feedback from the mailbox
-> maintainers.
-> 
-> I know all of the other drivers that use the PCC mailbox currently do direct
-> management of the shared buffer.  I suspect that is the biggest change that
-> is causing you concern.  Are you OK with maintaining a mailbox-managed path
-> to buffer management as well?  I think it will be beneficial to other
-> drivers in the long run.
-> 
+    1c31: 89 e8                        	movl	%ebp, %eax
+    1c33: 83 e0 20                     	andl	$0x20, %eax
+    1c36: c1 e0 0d                     	shll	$0xd, %eax
+    1c39: 09 e8                        	orl	%ebp, %eax
 
-If you are really interesting to consolidating, then move all the buffer
-management into the core. Just don't introduce things that just work on
-your platform and for your use case. You need move all the drivers to this
-new model of accessing the buffers. Otherwise I see no point as it is just
-another churn but in core mailbox PCC driver instead of a client driver
-using PCC. So, I am not OK with the change as is and needs to be reworked
-or reverted. I need sometime to understand your email and requirements.
+so there seems to be no need any more to use the old flag multiplication
+tricks which is less readable. Pick the lowest bit out of GFP_ATOMIC
+to limit the size of the instructions.
 
+The specific change which makes me propose this is that bnxt, after
+commit cd1fafe7da1f ("eth: bnxt: add support rx side device memory TCP"),
+lost the GFP_NOWARN, again. It used to allocate with page_pool_dev_alloc_*
+which added the NOWARN unconditionally. While switching to
+__bnxt_alloc_rx_netmem() authors forgot to add NOWARN in the explicitly
+specified flags.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: hawk@kernel.org
+CC: ilias.apalodimas@linaro.org
+CC: nathan@kernel.org
+CC: nick.desaulniers+lkml@gmail.com
+CC: morbo@google.com
+CC: justinstitt@google.com
+CC: llvm@lists.linux.dev
+---
+ net/core/page_pool.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index ba70569bd4b0..6ffce0e821e4 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -555,6 +555,13 @@ static noinline netmem_ref __page_pool_alloc_netmems_slow(struct page_pool *pool
+ 	netmem_ref netmem;
+ 	int i, nr_pages;
+ 
++	/* Unconditionally set NOWARN if allocating from the datapath.
++	 * Use a single bit from the ATOMIC mask to help compiler optimize.
++	 */
++	BUILD_BUG_ON(!(GFP_ATOMIC & __GFP_HIGH));
++	if (gfp & __GFP_HIGH)
++		gfp |= __GFP_NOWARN;
++
+ 	/* Don't support bulk alloc for high-order pages */
+ 	if (unlikely(pp_order))
+ 		return page_to_netmem(__page_pool_alloc_page_order(pool, gfp));
 -- 
-Regards,
-Sudeep
+2.51.0
+
 
