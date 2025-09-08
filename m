@@ -1,231 +1,212 @@
-Return-Path: <netdev+bounces-220830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-220831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1539BB48FC1
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:36:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75040B48FC7
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 15:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 508F21B276C5
-	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:37:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B728344D9C
+	for <lists+netdev@lfdr.de>; Mon,  8 Sep 2025 13:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D92F30BB86;
-	Mon,  8 Sep 2025 13:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="P75JsP/x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A5230BF70;
+	Mon,  8 Sep 2025 13:36:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04olkn2082.outbound.protection.outlook.com [40.92.47.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8EB30B528;
-	Mon,  8 Sep 2025 13:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.47.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757338592; cv=fail; b=gtQTS82z9KIYhQ+t47QYSstafP4NW/6F7VMnJ8HhYMh9JKDjN3xY1EM2YPPf5OYVe2TPumnqp/QelxNJpkH+kNZgLVmLw5Rp1kJhvRdajzVoBIIWuUTlgufPhhI3TYDy2xtF3Vhpa7RNZareRfhDfI8Yn77xyZtNnJzKE7cFcH8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757338592; c=relaxed/simple;
-	bh=XP5JDPnbBnMibKrc3zVjk4nKk3V9Jj70avHj+if30hs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ldhJXt0UcZo3QosLoprPlF7B8toU39qsifnMAyz7RKaU+clRQjGK/6ZoRGMbcwj5az1cHzRfQEpYvP8V76PfljnrjwFHyWMa/MGH+Gr5gejRvRQr0aE6AyE4/rV+LSzb288InGduugO28dpIuWTtmjYZV9aGjnQZHYAL2kX3Gcs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=P75JsP/x; arc=fail smtp.client-ip=40.92.47.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CcZtrXRJ0ydDWIAxcdAX42MpE2NFbPTVmdO4I9U3xyAF+Fgd/rMIM1Z8d8r9+X8GX7Bq6Vlah+xMuNJHc+fLifmIad8M9DqLoG2TRlmkyRg+3FM6AhXrreWTrRDLKrbSNJzXXWU7kE3BdgdefqWfJBKP2i2fuxbs406vqQqBdWf39sEdOJbql/cCWWu1DOT2IECVHAW3Y0grSMG19eb0fA8yKA4mW0LFRUcu1DBtSPWXnmxPtKSimjKKEFMau4s7YkqKlCzEgMJK9mWSYlRfTzgslh3kMDq80IN1ytuJaOSCvRzV1m/3PpapYGBrFABHSjIjNLKlnFwBmu2+rdrOaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YJMSiOVShnYvX3ZzsOi9WokRjdqJR0ertXqZNG10o/c=;
- b=K/md1n8Y68Y78uRVIcX4QubFvC2EAbHwIUNgztxWeEaT83bkydLiA1znO+0lnjjDwFFfIjGdjd6eEC+R/NALQUfWHjtqxIoiHjnugQrodWTyASfeVJDGOeQFJaBTr16CsRO4heEw9D/QMgOVPp/i6rmTHYSUq9z5HZ6H0XfdqFQN+rHLTpVsRMes0iO+w2Bmee2gdHhhvnSt7CeTk7LOKqyi2h6jERzACBxQDTvuxtV9fzspkTcwfByOQASgnofw7tikNDh833LNhcTdOlqQPOCbecF4ZrznyG2vxKuZxwYoCv9tNqxE9joLNE7XTJJFdIGoTcX5PJdxv/ejWezLBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YJMSiOVShnYvX3ZzsOi9WokRjdqJR0ertXqZNG10o/c=;
- b=P75JsP/xbB7cQVFRATF/H6dmNV8pmJuDLcippMQhJFtEWp8oq2JtND8llj5UbMD95jmMdUI7AsdJH8uTgtxCqn7YPs2g2cSInKXftbZYpravi2qnysv1lpWTNOw3kP+24wbzSJArHtFf43rxUfRt+FsATWufnvhMXtnYEZAydPMHA+I1dreGcdUHB+czf0S8wfc+X6YmND9rhLZY7XzxB67K7urWBuv0wnFMS49lY9uncJ9IUMndb01mjv1Oo4nFw9iLbk0Xk7M+YDle1fKIVQXXjAYeAbqR0fduPqTs+WnuJt/hHDf+Mcq2znKKZDjXcWw/zi75WWR46Mw5X2MfTA==
-Received: from MN6PR16MB5450.namprd16.prod.outlook.com (2603:10b6:208:476::18)
- by DM8PR16MB4421.namprd16.prod.outlook.com (2603:10b6:8:e::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9094.19; Mon, 8 Sep 2025 13:36:28 +0000
-Received: from MN6PR16MB5450.namprd16.prod.outlook.com
- ([fe80::3dfc:2c47:c615:2d68]) by MN6PR16MB5450.namprd16.prod.outlook.com
- ([fe80::3dfc:2c47:c615:2d68%4]) with mapi id 15.20.9094.018; Mon, 8 Sep 2025
- 13:36:28 +0000
-From: Mingrui Cui <mingruic@outlook.com>
-To: dtatulea@nvidia.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	leon@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	mbloch@nvidia.com,
-	mingruic@outlook.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com
-Subject: Re: [PATCH] net/mlx5e: Make DEFAULT_FRAG_SIZE relative to page size
-Date: Mon,  8 Sep 2025 21:35:32 +0800
-Message-ID:
- <MN6PR16MB545062E2EBB54C553CE059CFB70CA@MN6PR16MB5450.namprd16.prod.outlook.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <l3st5aik5jtsexq6yng5el5txeif4itbg35kl2ft32zhi3pmef@kn4x6bo4ws7s>
-References: <l3st5aik5jtsexq6yng5el5txeif4itbg35kl2ft32zhi3pmef@kn4x6bo4ws7s>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI1PR02CA0039.apcprd02.prod.outlook.com
- (2603:1096:4:1f6::9) To MN6PR16MB5450.namprd16.prod.outlook.com
- (2603:10b6:208:476::18)
-X-Microsoft-Original-Message-ID:
- <20250908133532.598761-1-mingruic@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C908F30AD1A
+	for <netdev@vger.kernel.org>; Mon,  8 Sep 2025 13:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757338594; cv=none; b=lay/2UR63HjvsRaX2/RbHwhJUwOIEGLKBWmEHs0xU+EVP91qHzVIPUlVEDGUXUrpc5AH6p1ZTHVt+LfJFzsyHy9jfjYq1sEE+9GMPSCaDNrBscN7E2QrdI4AyL+Wm4BNuz/CUMtLWa5e2Ytnu6AquaC0qow8cqL1R3XswaGinUo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757338594; c=relaxed/simple;
+	bh=WwjFSgide+j0J8+MEM1KQVy1lEu8jTrK1hDVyDW0bww=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qonJ35Z4Eo1PskQFLA4R/1JzApJDHhvZvu7Hh5Y1rSjNvazBrgmSePKxqS15qloWk10oujL71u4F+ua5coZy0m8QZINcUmDGbjbj83Yd/6HcqodRTydqtFP4v56Bmt57Dg7Xxy8P+I/lREnY7rKTt9OjBfWQurQ1EX41FhLdh44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-8877131dec5so343214739f.2
+        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 06:36:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757338591; x=1757943391;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Tz62WV/AVE2GA/H5HhYYG8S1kte75hYZLJm6MRCusx8=;
+        b=V6pC+z+8knry4lhtXKOq5ng6OKpzbn6+3QKa6trSOas+MkCv/EZd4d7iw+EBhVIED1
+         MMsRDCTw3p5bmd8dGVlYUgxdpd7jPCvn5zI8WBchG/Zrj8aixiPDz00Ca/irNUmS9qFF
+         4zC26MGYpS0xZKpoCDwjW0jQGyENWTXvCuiaLNoTKQdaMo4YnUsKGE97f4FWhV7RVkEC
+         LFsTHsOoAg19RJ8UhpncIDkUjwgUvnRY2kqmun3hnn8fC34/xa5ELdcw1dpUuZxBHAzH
+         4aGDiQjcL/ESxxZZhSl5eFC5aZrRbgvqIcTLzs8lyErPfWSIS5vQrbRXSyRGcyXwxrnw
+         Fdkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVpR1z4HSkA4AsTZq61v0d7KQ/CvFwnQqj2A+BZzvG13BAwt9eDZf6GNgFCiTEouhzgAO+AEcI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJfuoy2N71NBKYKrd3OnpuKEDKZxjBLp+Fjv2OOVwMFTXFuI40
+	TABg7Su5yPckPL2gJkdz6ejgsK0rdd3XUVAH5UFyBXTmUyKhf1F8x6O8SOZonJVW31cDrqAVlXf
+	Di4HCclgmLYJYkZ4Dm0VZvXkvkOxFvd+OoiVbas3ZXLTnUxENSDP2oPmIg+g=
+X-Google-Smtp-Source: AGHT+IGGfzTq3QneV+RLtg8/QyXJD91IY25TclMqkc100fjXHn73SB+BU6srBxJY/uMDyhe2nekn3IGCKmswEpQ0t1iS12Po6v4Z
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR16MB5450:EE_|DM8PR16MB4421:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8b38f677-7693-47f5-cc28-08ddeedcb64c
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|8060799015|5072599009|461199028|19110799012|23021999003|15080799012|440099028|40105399003|3412199025|12091999003|3430499032|1710799026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9XixD3sNLLYxF5eNBmY65+lYZf1mG3uu4TFgnSshXIyp+zEmLeGAIHqHkmu+?=
- =?us-ascii?Q?PMShKYnOQOkUWHVbPZ8MS3zwYfcqMeXPUH5zM0v37P1pzR7cWrjLe/JyFP+Z?=
- =?us-ascii?Q?YzBL0NRl7laVgSdqY4l+T2j+4+dJPSfDAre+HVAK1doMNLkg073IjUydYxOa?=
- =?us-ascii?Q?fqJ4vaBouy6Cspd3fY/A1uiMt4vJgmMYxkOJ8SH8qx4ariqEn9GLpi23mFff?=
- =?us-ascii?Q?2hM3u7OYs4I9yPxxTGOAmwoPLdvob5tW8Se92cexL663Zr2kjazijJL6Zt6j?=
- =?us-ascii?Q?VzBP+KCPvmrg5W1Qmh/wflodqMHPvb5Ekrq6EirUrAMAdrDAoitbw+q7EL2M?=
- =?us-ascii?Q?WICqrXZ5OhPuq7jW5G4clAd5QoY/tjxQskUP33e+wcf/ZYUixrqaVoot53+B?=
- =?us-ascii?Q?YfDcfpS6438agy/RR7awVMd9cQq+qQYmudjpf1qnhEEsmS6WSLempJAkNIP1?=
- =?us-ascii?Q?4hrWZMEi8f2Wz+BgEATwS8ZonjEcGxuvyYZahZOaftVAbHslZ7PWDWKtLZdU?=
- =?us-ascii?Q?R6il+Q/HkTruzixjPQ9ZvyvCAY6VjZd8UhoL7FSB6Lt85+eFkUvZq6YSFK0f?=
- =?us-ascii?Q?NI3CFIQD9/trutF9wTXcniPWjtwRXpkHugZeDEjmTZz9cGn2y2CWhxTf4Q8T?=
- =?us-ascii?Q?bNphaAPW8HhxbzoNrWgnwyynPC++NzUN4L6B3WP5SK2q8pp8xjSZOSCUn/al?=
- =?us-ascii?Q?aom/Dv38zYCHGCyn/XKb/06an5NTW9TzoybFv7dPvghlPfFryznn4Ia/2qY6?=
- =?us-ascii?Q?hUrudSHkOWckeor5WGiXGm0JByh1XRcZQePW5g3bDAHe6rBPFEFQkOjSbNFz?=
- =?us-ascii?Q?VeUUdcZ+w3iRgbbWHAAqzNhNoYix1y5+6AWu4V7jF9UVYrNIUFSRUecYJ2Xl?=
- =?us-ascii?Q?pjH7oLb9nSWRwhKWt/JwngIUXxz2fcxEbLnkOYVsx56jnnLobTHQdAee3kY0?=
- =?us-ascii?Q?DSszhMlqb4GAP+mSs6uFgqUxbSHQHCjRsvwQhdsa3zCrvpzg67kFfc2OSbhC?=
- =?us-ascii?Q?LCWI0tBm2v7M8ykAvHZemNA4zDIEjvjiYPOAmBST5KW5gK8NdGjea5Cuxm5s?=
- =?us-ascii?Q?14jNoMv4c7ZWDATR9pKQxqUMORH7uwm1yDfzUp3z65436bUBCbCQkNs97fbT?=
- =?us-ascii?Q?b3UtIQq7pVqMcuyw44p89IxbTAiK8K4HxAqSYIktIY2G4w9GP6pYn7dTzkPn?=
- =?us-ascii?Q?DgXpM3ZGtAZIwf6wzONtCiYbFIHcyqnG6RmyIA=3D=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?5sGUofCGYyF5rlnufFVsOQehWzjF423zPxNNoJtAcUMJ6XtTeBWxolTpKVui?=
- =?us-ascii?Q?lWUlNDfcEhGQTpfjp23k7IgHzIZt6UvH8S4fts6RT2A8ywA23eCfj3WuTAAr?=
- =?us-ascii?Q?uM23eV5ldny7J34FIIiNUa5aaxaGlNiUW5AOqcRRxZf/ZrN9eLVbCTrlFm8X?=
- =?us-ascii?Q?GWwOAuDNi1/M+qTMnfhaBTwhNGXBr6zeiKvgE3tSIJSJVgybMNUgr12va8y6?=
- =?us-ascii?Q?OMe6Hohn382QzG8ijvRIl6xkty536y53hTXIv+noye/W0hCpDfB8TH35Vl6m?=
- =?us-ascii?Q?7pqNt42pgxliIAx77J44GZWxNoyyVI+199WOF8gF84dBE4WV8id3SAZMzt+v?=
- =?us-ascii?Q?H7qnX/j7SwKzUxnl3xQt/6LYO3bGnD8qZKH/Fh9Dqh7sEoNpIC5veBm2ahWk?=
- =?us-ascii?Q?UPdBGr9n5PO2PW8v7eQp6Q7i03YqZYNP+Ej3jaE/FU+84MWVJpgHurflnRI1?=
- =?us-ascii?Q?D5XWLD6ejhIEMSUPN8C5DZot24Tln98Q980uRaqaCdGCw7VbitlYqlFDiTzb?=
- =?us-ascii?Q?bqIdJLjWF8A2/lPapm8alDqntldX1A0ukweE067j3uxLoqvjHe9DWgOaahPF?=
- =?us-ascii?Q?pl7g8AnBvpFi8RO2FaDemeOagvCkcZbiyFVSQVaTQaMteget1psnZP9K6wg1?=
- =?us-ascii?Q?GIvuQQWjcH04ejTNm9ejlRazRxkobngfO1/gAl5nitJmLgdQrNKIL+zWRe8o?=
- =?us-ascii?Q?xl6k5AAkTePNGVL4ANgYNlbajcSWnV/klZsTB5IqVHi0lHtV8Hx9ixRY2vL5?=
- =?us-ascii?Q?/95KvRayCoEqAPvEb1jZbzQ+9CFLyrrPrCm//j2sqpUnrcxb15W0uIIExqe4?=
- =?us-ascii?Q?TCvj1prYThPx4IZaN1TMxTc3j/SfrHH2001gpGLqiTjfCn5496c2ekYfs9Wu?=
- =?us-ascii?Q?fvdnjon8zNhqQBu1E0FljxBwlfhgwAh+LSXF3+E04GuNtCz/xOXbz64MHwUw?=
- =?us-ascii?Q?YS+Ew0+LygjoQgv9uenYfQG9NNCErJzXfCvdqDbjt0JWTzvIFq3WY6TxCuk7?=
- =?us-ascii?Q?ekRBb4VAzWgbX2P8RKW5sb0yvPy7ovgZ28E3q9EJPbb5MIWzc7SyjF0ql1bH?=
- =?us-ascii?Q?qKtFqlKDwcc5gUn0mi0PzMDilLO5fVKd3Sf44wdClFdZFxT4Xw02MkzCIXot?=
- =?us-ascii?Q?pe+pTC+6OIOG3DNrUllJuKq8oHScEIKzTEdXE54QmukQXdsLeWGHStcsgdgc?=
- =?us-ascii?Q?zT1M48ayVdgFJIqeC5zomhpSaZZsYMqtAWFCTo1NQEptVhoPHbGAC3gFfEKZ?=
- =?us-ascii?Q?0V7Qf2OCFB12svaGe8AI9wweX29nSc3tdleS11mnNg=3D=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b38f677-7693-47f5-cc28-08ddeedcb64c
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR16MB5450.namprd16.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 13:36:28.3470
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR16MB4421
+X-Received: by 2002:a05:6e02:228a:b0:408:1ec5:ddd7 with SMTP id
+ e9e14a558f8ab-4081ec5dee5mr42031245ab.20.1757338590807; Mon, 08 Sep 2025
+ 06:36:30 -0700 (PDT)
+Date: Mon, 08 Sep 2025 06:36:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68bedbde.050a0220.192772.087c.GAE@google.com>
+Subject: [syzbot] [net?] [usb?] WARNING: ODEBUG bug in trace_suspend_resume
+From: syzbot <syzbot+51fb5a1c5d4b6056f9f1@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> On Tue, Sep 02, 2025 at 09:00:16PM +0800, Mingrui Cui wrote:
-> > When page size is 4K, DEFAULT_FRAG_SIZE of 2048 ensures that with 3
-> > fragments per WQE, odd-indexed WQEs always share the same page with
-> > their subsequent WQE. However, this relationship does not hold for page
-> > sizes larger than 8K. In this case, wqe_index_mask cannot guarantee that
-> > newly allocated WQEs won't share the same page with old WQEs.
-> > 
-> > If the last WQE in a bulk processed by mlx5e_post_rx_wqes() shares a
-> > page with its subsequent WQE, allocating a page for that WQE will
-> > overwrite mlx5e_frag_page, preventing the original page from being
-> > recycled. When the next WQE is processed, the newly allocated page will
-> > be immediately recycled.
-> > 
-> > In the next round, if these two WQEs are handled in the same bulk,
-> > page_pool_defrag_page() will be called again on the page, causing
-> > pp_frag_count to become negative.
-> > 
-> > Fix this by making DEFAULT_FRAG_SIZE always equal to half of the page
-> > size.
-> >
-> Was there an actual encountered issue or is this a code clarity fix?
-> 
-> For 64K page size, linear mode will be used so the constant will not be
-> used for calculating the frag size.
-> 
-> Thanks,
-> Dragos
+Hello,
 
-Yes, this was an actual issue we encountered that caused a kernel crash.
+syzbot found the following issue on:
 
-We found it on a server with a DEC-Alpha like processor, which uses 8KB page
-size and runs a custom-built kernel. When using a ConnectX-4 Lx MT27710
-(MCX4121A-ACA_Ax) NIC with the MTU set to 7657 or higher, the kernel would crash
-during heavy traffic (e.g., iperf test). Here's the kernel log:
+HEAD commit:    76eeb9b8de98 Linux 6.17-rc5
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=170e587c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1ea9f6450a1c85f2
+dashboard link: https://syzkaller.appspot.com/bug?extid=51fb5a1c5d4b6056f9f1
+compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm
 
-WARNING: CPU: 9 PID: 0 at include/net/page_pool/helpers.h:130
-mlx5e_page_release_fragmented.isra.0+0xdc/0xf0 [mlx5_core]
-Modules linked in: ib_umad ib_ipoib ib_cm mlx5_ib ib_uverbs ib_core ipv6
-mlx5_core tls
-CPU: 9 PID: 0 Comm: swapper/9 Tainted: G        W          6.6.0 #23
- walk_stackframe+0x0/0x190
- show_stack+0x70/0x94
- dump_stack_lvl+0x98/0xd8
- dump_stack+0x2c/0x48
- __warn+0x1c8/0x220
- warn_slowpath_fmt+0x20c/0x230
- mlx5e_page_release_fragmented.isra.0+0xdc/0xf0 [mlx5_core]
- mlx5e_free_rx_wqes+0xcc/0x120 [mlx5_core]
- mlx5e_post_rx_wqes+0x1f4/0x4e0 [mlx5_core]
- mlx5e_napi_poll+0x1c0/0x8d0 [mlx5_core]
- __napi_poll+0x58/0x2e0
- net_rx_action+0x1a8/0x340
- __do_softirq+0x2b8/0x480
- irq_exit+0xd4/0x120
- do_entInt+0x164/0x520
- entInt+0x114/0x120
- __idle_end+0x0/0x50
- default_idle_call+0x64/0x150
- do_idle+0x10c/0x240
- cpu_startup_entry+0x70/0x80
- smp_callin+0x354/0x410
- __smp_callin+0x3c/0x40
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Although this was on a custom kernel and processor, I believe this issue is
-generic to any system using an 8KB page size. Unfortunately, I don't have an
-Alpha server running a mainline kernel to verify this directly, and most
-mainstream architectures don't support 8KB page size.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/98a89b9f34e4/non_bootable_disk-76eeb9b8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3f783b9be048/vmlinux-76eeb9b8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1eaa9296791e/zImage-76eeb9b8.xz
 
-I also tried to modify some conditions in the driver to force it to fall back
-into non-linear mode on an ARMv8 server configured with a 16KB page size, and
-was then able to trigger the same warning and crash. So I suspect this issue
-would also occur on 16KB page size if the NIC can be configured with a larger
-MTU.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+51fb5a1c5d4b6056f9f1@syzkaller.appspotmail.com
 
-Best regards,
-Mingrui Cui
+dm9601 1-1:0.0 eth1: register 'dm9601' at usb-dummy_hcd.0-1, Davicom DM96xx USB 10/100 Ethernet, 6e:f1:98:9e:dd:08
+usb 1-1: USB disconnect, device number 3
+dm9601 1-1:0.0 eth1: unregister 'dm9601' usb-dummy_hcd.0-1, Davicom DM96xx USB 10/100 Ethernet
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 11 at lib/debugobjects.c:612 debug_print_object+0xc4/0xd8 lib/debugobjects.c:612
+ODEBUG: free active (active state 0) object: 83fea804 object type: work_struct hint: usbnet_deferred_kevent+0x0/0x38c drivers/net/usb/usbnet.c:1862
+Modules linked in:
+Kernel panic - not syncing: kernel: panic_on_warn set ...
+CPU: 0 UID: 0 PID: 11 Comm: kworker/0:1 Not tainted syzkaller #0 PREEMPT 
+Hardware name: ARM-Versatile Express
+Workqueue: usb_hub_wq hub_event
+Call trace: 
+[<80201a24>] (dump_backtrace) from [<80201b20>] (show_stack+0x18/0x1c arch/arm/kernel/traps.c:257)
+ r7:00000000 r6:8281f77c r5:00000000 r4:82260afc
+[<80201b08>] (show_stack) from [<8021fbe4>] (__dump_stack lib/dump_stack.c:94 [inline])
+[<80201b08>] (show_stack) from [<8021fbe4>] (dump_stack_lvl+0x54/0x7c lib/dump_stack.c:120)
+[<8021fb90>] (dump_stack_lvl) from [<8021fc24>] (dump_stack+0x18/0x1c lib/dump_stack.c:129)
+ r5:00000000 r4:82a77d18
+[<8021fc0c>] (dump_stack) from [<80202624>] (vpanic+0x10c/0x30c kernel/panic.c:430)
+[<80202518>] (vpanic) from [<80202858>] (trace_suspend_resume+0x0/0xd8 kernel/panic.c:566)
+ r7:808dcb04
+[<80202824>] (panic) from [<80254960>] (check_panic_on_warn kernel/panic.c:323 [inline])
+[<80202824>] (panic) from [<80254960>] (get_taint+0x0/0x1c kernel/panic.c:318)
+ r3:8280c684 r2:00000001 r1:82247518 r0:8224ef94
+[<802548e8>] (check_panic_on_warn) from [<80254ac4>] (__warn+0x80/0x188 kernel/panic.c:837)
+[<80254a44>] (__warn) from [<80254db4>] (warn_slowpath_fmt+0x1e8/0x1f4 kernel/panic.c:872)
+ r8:00000009 r7:822b9fa4 r6:df845a84 r5:83210000 r4:00000000
+[<80254bd0>] (warn_slowpath_fmt) from [<808dcb04>] (debug_print_object+0xc4/0xd8 lib/debugobjects.c:612)
+ r10:00000005 r9:83fea000 r8:81c01e68 r7:822e5578 r6:82ae3d64 r5:df845b2c
+ r4:8280ccb8
+[<808dca40>] (debug_print_object) from [<808de568>] (__debug_check_no_obj_freed lib/debugobjects.c:1099 [inline])
+[<808dca40>] (debug_print_object) from [<808de568>] (debug_check_no_obj_freed+0x25c/0x2a4 lib/debugobjects.c:1129)
+ r8:83feb000 r7:83fea804 r6:00000100 r5:00000003 r4:00000000
+[<808de30c>] (debug_check_no_obj_freed) from [<804ff448>] (slab_free_hook mm/slub.c:2353 [inline])
+[<808de30c>] (debug_check_no_obj_freed) from [<804ff448>] (slab_free mm/slub.c:4695 [inline])
+[<808de30c>] (debug_check_no_obj_freed) from [<804ff448>] (kfree+0x190/0x394 mm/slub.c:4894)
+ r10:00000100 r9:8297e2a0 r8:83fea000 r7:805002d4 r6:83002480 r5:dde88ca0
+ r4:83fea000
+[<804ff2b8>] (kfree) from [<805002d4>] (kvfree+0x2c/0x30 mm/slub.c:5110)
+ r10:00000100 r9:8297e2a0 r8:83fea000 r7:00000000 r6:85cfb6c0 r5:85ce5380
+ r4:83fea000
+[<805002a8>] (kvfree) from [<815c2d70>] (netdev_release+0x2c/0x34 net/core/net-sysfs.c:2250)
+ r5:85ce5380 r4:83fea000
+[<815c2d44>] (netdev_release) from [<80b3d638>] (device_release+0x38/0xa8 drivers/base/core.c:2565)
+ r5:85ce5380 r4:83fea3a0
+[<80b3d600>] (device_release) from [<81a13a90>] (kobject_cleanup lib/kobject.c:689 [inline])
+[<80b3d600>] (device_release) from [<81a13a90>] (kobject_release lib/kobject.c:720 [inline])
+[<80b3d600>] (device_release) from [<81a13a90>] (kref_put include/linux/kref.h:65 [inline])
+[<80b3d600>] (device_release) from [<81a13a90>] (kobject_put+0xa0/0x1f4 lib/kobject.c:737)
+ r5:81d4ebec r4:83fea3a0
+[<81a139f0>] (kobject_put) from [<80b3d884>] (put_device+0x18/0x1c drivers/base/core.c:3797)
+ r7:000000c0 r6:00000000 r5:00000000 r4:83fea000
+[<80b3d86c>] (put_device) from [<815733f0>] (free_netdev+0x190/0x248 net/core/dev.c:12002)
+[<81573260>] (free_netdev) from [<80e326e0>] (usbnet_disconnect+0xb8/0xfc drivers/net/usb/usbnet.c:1673)
+ r7:85c75400 r6:83fea7d4 r5:83fea6c0 r4:00000000
+[<80e32628>] (usbnet_disconnect) from [<80e9ce4c>] (usb_unbind_interface+0x84/0x2bc drivers/usb/core/driver.c:458)
+ r8:85c77c88 r7:85c75474 r6:85c75430 r5:00000000 r4:85c77c00
+[<80e9cdc8>] (usb_unbind_interface) from [<80b45a00>] (device_remove drivers/base/dd.c:571 [inline])
+[<80e9cdc8>] (usb_unbind_interface) from [<80b45a00>] (device_remove+0x64/0x6c drivers/base/dd.c:563)
+ r10:00000100 r9:85c77c88 r8:00000044 r7:85c75474 r6:8297e2a0 r5:00000000
+ r4:85c75430
+[<80b4599c>] (device_remove) from [<80b46ef0>] (__device_release_driver drivers/base/dd.c:1274 [inline])
+[<80b4599c>] (device_remove) from [<80b46ef0>] (device_release_driver_internal+0x18c/0x200 drivers/base/dd.c:1297)
+ r5:00000000 r4:85c75430
+[<80b46d64>] (device_release_driver_internal) from [<80b46f7c>] (device_release_driver+0x18/0x1c drivers/base/dd.c:1320)
+ r9:85c77c88 r8:8335cd40 r7:8335cd38 r6:8335cd0c r5:85c75430 r4:8335cd30
+[<80b46f64>] (device_release_driver) from [<80b45040>] (bus_remove_device+0xcc/0x120 drivers/base/bus.c:579)
+[<80b44f74>] (bus_remove_device) from [<80b3f2d8>] (device_del+0x148/0x38c drivers/base/core.c:3878)
+ r9:85c77c88 r8:83210000 r7:04208060 r6:00000000 r5:85c75430 r4:85c75474
+[<80b3f190>] (device_del) from [<80e9a888>] (usb_disable_device+0xd4/0x1e8 drivers/usb/core/message.c:1418)
+ r10:00000100 r9:00000000 r8:00000000 r7:85c75400 r6:85c77c00 r5:85d09588
+ r4:00000002
+[<80e9a7b4>] (usb_disable_device) from [<80e8f650>] (usb_disconnect+0xec/0x2ac drivers/usb/core/hub.c:2344)
+ r9:84966e00 r8:85c77ccc r7:83f41000 r6:85c77c88 r5:85c77c00 r4:60000013
+[<80e8f564>] (usb_disconnect) from [<80e9264c>] (hub_port_connect drivers/usb/core/hub.c:5406 [inline])
+[<80e8f564>] (usb_disconnect) from [<80e9264c>] (hub_port_connect_change drivers/usb/core/hub.c:5706 [inline])
+[<80e8f564>] (usb_disconnect) from [<80e9264c>] (port_event drivers/usb/core/hub.c:5870 [inline])
+[<80e8f564>] (usb_disconnect) from [<80e9264c>] (hub_event+0x1194/0x1950 drivers/usb/core/hub.c:5952)
+ r10:00000100 r9:83ce2f2c r8:83f40800 r7:85c77c00 r6:83ce2800 r5:00000001
+ r4:00000001
+[<80e914b8>] (hub_event) from [<8027a398>] (process_one_work+0x1b4/0x4f4 kernel/workqueue.c:3236)
+ r10:8335cf70 r9:8326fe05 r8:83210000 r7:dddced40 r6:8326fe00 r5:83ce2f2c
+ r4:830b9600
+[<8027a1e4>] (process_one_work) from [<8027afe0>] (process_scheduled_works kernel/workqueue.c:3319 [inline])
+[<8027a1e4>] (process_one_work) from [<8027afe0>] (worker_thread+0x1fc/0x3d8 kernel/workqueue.c:3400)
+ r10:61c88647 r9:83210000 r8:830b962c r7:82804d40 r6:dddced40 r5:dddced60
+ r4:830b9600
+[<8027ade4>] (worker_thread) from [<80281fcc>] (kthread+0x12c/0x280 kernel/kthread.c:463)
+ r10:00000000 r9:830b9600 r8:8027ade4 r7:df83de60 r6:830b9700 r5:83210000
+ r4:00000001
+[<80281ea0>] (kthread) from [<80200114>] (ret_from_fork+0x14/0x20 arch/arm/kernel/entry-common.S:137)
+Exception stack(0xdf845fb0 to 0xdf845ff8)
+5fa0:                                     00000000 00000000 00000000 00000000
+5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+ r10:00000000 r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:80281ea0
+ r4:830b6a40
+Rebooting in 86400 seconds..
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
