@@ -1,88 +1,80 @@
-Return-Path: <netdev+bounces-221156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1134B4A8FA
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:56:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F7DB4A93C
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:02:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0439C3A4B27
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:56:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFFB71643B4
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20B12D238A;
-	Tue,  9 Sep 2025 09:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA6F31815D;
+	Tue,  9 Sep 2025 10:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="he7uv1AN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hyrqvrah"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B832C235F
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 09:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F58313E3E;
+	Tue,  9 Sep 2025 10:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757411760; cv=none; b=NIopWyg09b0rSkiU1TmbPzuWUrpmJ1Xb9eHTyHFdbtnsKtAqVmUPylFbvj8ZcEL1RehYsBJ7aKhOj2XpNhXiM526/gfK/dCqyVWGDVCAeb48JPOEX42LpuZ7eXeB6jAB1Bscf081N2/E6hT1+zu/vV2SjZOuT86qOSYFFMEGQcU=
+	t=1757412024; cv=none; b=jXWC7cOpLefwMKIvcH9kQywz93SflRLRmqBFD4IDmymIXlTLvzS5PwlJT94FyEEm8J2DnKP99B2D9EuVNGjfqfGwO5k50PWeDiX7E5yQlBMIaN+VYHRbmnjDLhnW5mfyDPKKFMircZ/RIXIB97gAsiPq74KyQWv5c5v8p4lQbAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757411760; c=relaxed/simple;
-	bh=VKk+DfPeoBviWHTSePPOcfSJ1Fx+ahLOMPVb2ffk1QY=;
+	s=arc-20240116; t=1757412024; c=relaxed/simple;
+	bh=sel26hbdubN+palGD2gZ0/eOdFAx9Akb98dFmcE1PVU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pkcd+1U1f31WRiv4id7Bfmh6jRuMQiv0hCuDngMi7gMf2UPWqOCvJ/77xoItiJ2aIC8C8e+GvG7gHQbSQwiFNInmgIXqTKPqc854WQaXyTAqKpRAC8jCSmYltaAvU7PzlRYZaqnsHUOh/ZZdH43tmY4B1lrWzXkFfgELuMuYb60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=he7uv1AN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757411757;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=uuhn5XZ+k/yXfBkz6uI/EJtHiraKm76UcsqU/6SM9xI=;
-	b=he7uv1ANAW01eUnXD+VlJxKPV9Yg/8eHB0FFOy7vX9PsI3RMRddchVeInBeXBfCt+Njqsd
-	mIZlrOJICr129i4mcdn8gv6Kn/R4KeBGOenSyIexiOOP5RkI5uCpfEj1ysuOuesGxJHpra
-	tsdiZBstVMj0VcVmxEbVH6/XjqSqP6k=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-ArX0OzCNPbW2LlsJdkUHpQ-1; Tue, 09 Sep 2025 05:55:55 -0400
-X-MC-Unique: ArX0OzCNPbW2LlsJdkUHpQ-1
-X-Mimecast-MFC-AGG-ID: ArX0OzCNPbW2LlsJdkUHpQ_1757411755
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45cb6d8f42bso52021445e9.2
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 02:55:55 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=hnp/SGCzsadCTKy4Gl/7HW/q8Cw+usBW+jJZcDipRz1eQQiem41duO+dg/SlTi8Tusqoe17YKOcxlZXgMosAbNbUHAWRv/9TxTChV4I708atOMN8YKRqsTi/LrYyl17+j7yZ9PtGU5SCTIYfWTfJ4A5na/YuGA2gOTrktphenSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hyrqvrah; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2445826fd9dso64105425ad.3;
+        Tue, 09 Sep 2025 03:00:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757412023; x=1758016823; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jOx81+m5TMKBCfvFeUd2lc1fUQ8CVG2MRH89iHXYyPo=;
+        b=hyrqvrah7hSvGOqxW563p5/ejvbwhbwGbleoOl/Mc4+KfRDyXhVb02Cp1FfjSBKrJ+
+         oCOTXkhTWM46yWFgGO9fQHzbhZCIAD2kQBRy/ujRaw1+hgf4H8slS5X2K/Pq19DJI/XF
+         GVGiI2lrixdCgKhrZX1Wyi69IUfGmm0A2oQ62ffoQnteBWUEFiL1HHuuGy/kedx9E8Ih
+         eKVaf7C+j63PUikSlX9s3pEbXt5ebbvz1OH8kUG13E3vCP/tIoMc3vm10n/OXE/DdJhO
+         AWugg3O38TVIoo9b0hj/K8Nps1UfhVQdwB6M3BovzOZQta/BsMczGx5K+sV4YbQrZq0I
+         4sOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757411754; x=1758016554;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uuhn5XZ+k/yXfBkz6uI/EJtHiraKm76UcsqU/6SM9xI=;
-        b=e/ORFUwJKBPcZzPNxsOMn0JrZuCX23PDeBRAXqu8Z0O2yeI1lqEZibikP5lAeu+A3G
-         GmczRMzYDoAOR+Bzpy/9bgW+zfWSaETIUT7PwVwlNJmQtQyAqlhKazvwcTwu5JjaF323
-         2dWUx9IjqshXpMertN6/F7351+JYtPXqoPDT8LqITrn4qPlG9SVara7ewiUXTCR5Kg92
-         heOHd0XGnof8k7dTD+78VWn+x3eZ7aGyn1F2u7NNtPNZ5GppX9rXDPgLM2SJwHmqvxgl
-         nlQAWaxCDn/squXFQZ5shoerpZ8fkSSGCydaNfXY4rCAk+rRgHgxPu/gQiqHQTwEBZs0
-         ZqjA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpEaDklerx99pPi4xeu59MKyA+Mql617rOYOU/KxDFXSmXoFSuqyMpHsG0gJrTvESyu/Udvbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMCgR2v5QRD52AIqtvz5dNtIu0s26oulIJt87jMvYjd2GAs5TZ
-	1xrhMVPm/GKx0vDCTPBrXLirCcg/gd9I5EpEK4ccJjvgsHee5zzHRaRx0bv5P8YMi0nLYBwotVI
-	dwWn+2qyPNnQVIL6QkSqp0lEcVPlA0j92qxJ/b/10Z6Dr1Cxh44zbFsuoPQ==
-X-Gm-Gg: ASbGncsl3MuHGVsC9IR0QgFtToZHWBklukil0vcJ3xWZh8Qsl/SB/HvbMBFiCVfTatr
-	huwRBoVcP1xmIzfIryxtzuISH3/PVKZZxhgighUR7I4eAKGN8b4a+OCVz2Z35sD4SN3VpzZXE1r
-	id27wQKRuYew+k/f+WPZtcLX28HYLwSRQaV8aWlZ7m1v01//GcnGc48HOEoOVqVDVY00VXRKfde
-	5VU1pRpfR8SahtP4S8ua/opGCz91dOQR3nzAS1vXk3DNo74LdKBpB3p/R8EoAvOQUneDnA7HQ5Y
-	igEzwih3HVGDqrC85e2VckXu1MnoMD7mOZnF0/quI1RKhHvIhTVsOxEgQhmsWdF77kRTD6SOTJu
-	D/wcjVoW0ihqkWns0DR5v0noeJx6rpfJF0ekxP6ff1EHtTD8sye+iL/JrW9gJLQc/zvc=
-X-Received: by 2002:a05:600c:3510:b0:45b:8366:2a1a with SMTP id 5b1f17b1804b1-45ddde829ebmr106120515e9.11.1757411754444;
-        Tue, 09 Sep 2025 02:55:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFywLrR0DszeWqgd9Y5zxb2+w3HhCmkVKXj/s/GXP5Ci/2ssUudLpQTkEWfsIqoDp37rN0MYw==
-X-Received: by 2002:a05:600c:3510:b0:45b:8366:2a1a with SMTP id 5b1f17b1804b1-45ddde829ebmr106119935e9.11.1757411753943;
-        Tue, 09 Sep 2025 02:55:53 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f23:9c00:d1f6:f7fe:8f14:7e34? (p200300d82f239c00d1f6f7fe8f147e34.dip0.t-ipconnect.de. [2003:d8:2f23:9c00:d1f6:f7fe:8f14:7e34])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45dd296ed51sm228257165e9.3.2025.09.09.02.55.51
+        d=1e100.net; s=20230601; t=1757412023; x=1758016823;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jOx81+m5TMKBCfvFeUd2lc1fUQ8CVG2MRH89iHXYyPo=;
+        b=t6WA3nFtKzV5QIPLYgstwNpun9GtlfOajgjyezXLi6ywiAsggzOoU/YoFi5LcP3ZCq
+         bWzfMlXhkavSvKqUO+r3hg8Hd3x2hN4dI6PS+p0i/XafJ3ZdN2Yn0RdcLPhxt3eifyzJ
+         EBJ9KXBQSyMkQb10Vpy6Fnj3LovWbAHudsJ0Nn5xK1rGaUypACyPQ90CJSVWZRi5/cWs
+         yj+uZDhMYYCrrKuazVlJGfJNWPHf6XjaRFYO1O3uXx035QUs+LO//Af6KQFBOzwpJ/mE
+         icpZWxjHDGfjq0OZCf7MVvy0wmdLWHIh7EZHTzciHlLzMv3/GPKpItedHbap7k8nK7J+
+         PlhA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+wRWaXFITv2qvEvDQhgGbll3rdJRKutjXcD2YfOypynrOnSJZTbtvDiGOUQdN3XM2BfgVDXI8@vger.kernel.org, AJvYcCUfMDYOnDxBVLbGzM0yrIqGJj4yYyQhDwHibpHG+Nz7+LBStwlLzMZZcVAtu+TSBtiMiSKAOFwqRJXkVS7vLSvK@vger.kernel.org, AJvYcCWpSHyLOW2BNUV3cDnG8yMpujCuHrTgqMhDXTJvS9ksYtB9w+6bfQKNNDyfdueHQZfELVVqiDIeF+zZZkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTRNFoDOK391OBaduobUgjj8rPT9Mn7mlIzi4/zv5MfYUuvcgl
+	jDonPPPxQO8TPM3l+A+R7ai212OCwRBwYFbPuML4E4SOY47gI9zao6Ng
+X-Gm-Gg: ASbGncsL6NQDu+8OxUZ5JmAO5+7QtDzAr+ro81fP/g7wOCGPjV9pFuM3nTCID+IonI2
+	n6MYf+cLbDUco8Ku+L+yYKN8aRvSHauUoWY5PO3lSIn40qoubLtZPQ7twStdlx8lZvFfLNmZAAW
+	kXRlcJrKR12pi+4Rh5KazD1dyefMSO+26af+FZzatd0O+chHI2p1JQYZXc9uNUi/gwH4AzFEt3+
+	+QTgTj1MiD27usmjplsOHxLL6m/Ir8HJi5LchT97BIXazpr91KelR/iZyDlz5krKQLkX21bSFZ1
+	eaWbmKnS90sGXIMtC1SEJsbGjMXteOhqUlOYEo1jh7oHm3UCBhJYkU/ksTbOC9eFXlw6lUAftpj
+	4gVXh+nAdAdNbbOLsQJHJHXB4
+X-Google-Smtp-Source: AGHT+IFODb9BV49tp09UgtdQ81xWoNMdmIOHFlia0/7sBhuTUz5mRZhUGLhapz+IyBuFX8A7Wx0f4Q==
+X-Received: by 2002:a17:902:ec8e:b0:24c:d33d:418e with SMTP id d9443c01a7336-2516ef57cdfmr170678475ad.1.1757412022461;
+        Tue, 09 Sep 2025 03:00:22 -0700 (PDT)
+Received: from [10.101.1.72] ([140.124.249.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24ca63c9e71sm161671585ad.95.2025.09.09.03.00.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Sep 2025 02:55:53 -0700 (PDT)
-Message-ID: <6ec933b1-b3f7-41c0-95d8-e518bb87375e@redhat.com>
-Date: Tue, 9 Sep 2025 11:55:51 +0200
+        Tue, 09 Sep 2025 03:00:22 -0700 (PDT)
+Message-ID: <a3d1c5ca-cdce-428d-8c1c-6a1f59e2dd76@gmail.com>
+Date: Tue, 9 Sep 2025 18:00:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,145 +82,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 22/37] mm/cma: refuse handing out non-contiguous page
- ranges
-To: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linuxfoundation.org>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <20250901150359.867252-1-david@redhat.com>
- <20250901150359.867252-23-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH] selftests/net: fix unused return value warnings in ksft.h
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev
+References: <20250906-selftests-net-ksft-v1-1-f1577cea3f68@gmail.com>
+ <20250908182018.28d9ff10@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20250901150359.867252-23-david@redhat.com>
+From: "Nai-Chen(Simone) Cheng" <bleach1827@gmail.com>
+In-Reply-To: <20250908182018.28d9ff10@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 01.09.25 17:03, David Hildenbrand wrote:
-> Let's disallow handing out PFN ranges with non-contiguous pages, so we
-> can remove the nth-page usage in __cma_alloc(), and so any callers don't
-> have to worry about that either when wanting to blindly iterate pages.
-> 
-> This is really only a problem in configs with SPARSEMEM but without
-> SPARSEMEM_VMEMMAP, and only when we would cross memory sections in some
-> cases.
-> 
-> Will this cause harm? Probably not, because it's mostly 32bit that does
-> not support SPARSEMEM_VMEMMAP. If this ever becomes a problem we could
-> look into allocating the memmap for the memory sections spanned by a
-> single CMA region in one go from memblock.
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
+On 2025-09-09 09:20, Jakub Kicinski wrote:
+ > Is it just a GCC warning or rather a combination of GCC and some
+ > misguided glibc decorator to force check the return of read/write?
+ > Naming the compiler versions and the warning flag which enables
+ > this would be useful. We don't see it building with normal warning
+ > level today.
 
-@Andrew, the following fixup on top. I'm still cross-compiling it, but
-at the time you read this mail my cross compiles should have been done.
+Thanks for the review!
 
+I found that the warnings occur under specific build
+conditions that explain why it's not consistently seen:
 
- From cbfa2763e1820b917ce3430f45e5f3a55eb2970f Mon Sep 17 00:00:00 2001
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 9 Sep 2025 05:50:13 -0400
-Subject: [PATCH] fixup: mm/cma: refuse handing out non-contiguous page ranges
+The warning appears when manually cleaning and rebuilding net/lib/:
+   cd tools/testing/selftests/net/lib/
+   make clean && make
 
-Apparently we can have NUMMU configs with SPARSEMEM enabled.
+The warning messages are:
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-  mm/util.c | 2 +-
-  1 file changed, 1 insertion(+), 1 deletion(-)
+ksft.h: In function ‘ksft_ready’:
+ksft.h:27:9: warning: ignoring return value of ‘write’ declared with 
+attribute ‘warn_unused_result’ [-Wunused-result]
 
-diff --git a/mm/util.c b/mm/util.c
-index 248f877f629b6..6c1d64ed02211 100644
---- a/mm/util.c
-+++ b/mm/util.c
-@@ -1306,6 +1306,7 @@ unsigned int folio_pte_batch(struct folio *folio, pte_t *ptep, pte_t pte,
-  {
-  	return folio_pte_batch_flags(folio, NULL, ptep, &pte, max_nr, 0);
-  }
-+#endif /* CONFIG_MMU */
-  
-  #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
-  /**
-@@ -1342,4 +1343,3 @@ bool page_range_contiguous(const struct page *page, unsigned long nr_pages)
-  }
-  EXPORT_SYMBOL(page_range_contiguous);
-  #endif
--#endif /* CONFIG_MMU */
--- 
-2.50.1
+ksft.h: In function ‘ksft_wait’:
+ksft.h:51:9: warning: ignoring return value of ‘read’ declared with 
+attribute ‘warn_unused_result’ [-Wunused-result]
 
+This is triggered by:
+- GCC version: 14.2.0
+- -Wall flag (which includes -Wunused-result)
 
--- 
-Cheers
+During investigation of this unused result warning and following up on 
+the patch by Minh-Quang Bui [1], I also discovered an issue with the 
+selftests build system: running 'make clean' from 
+tools/testing/selftests/ doesn't clean objects in net/lib/ because the 
+clean target doesn't include $(INSTALL_DEPS_TARGET). This explains why 
+net/lib compiled objects persist after cleaning and why the warning only
+appears with manual cleaning of that specific directory.
 
-David / dhildenb
+ > Can you not cast the read() to void directly?
 
+Sure. Direct casting is much cleaner. I haven't noticed it... Thanks for 
+the advice.
+
+Would it be acceptable to:
+1. Send a v2 of this patch with the direct void casting approach and 
+more precise commit message?
+2. Send a separate patch to fix the selftests Makefile clean target to 
+include $(INSTALL_DEPS_TARGET)?
+
+[1] 
+https://lore.kernel.org/all/20250601142914.13379-1-minhquangbui99@gmail.com/
+
+Thanks,
+Nai-Chen Cheng
 
