@@ -1,85 +1,114 @@
-Return-Path: <netdev+bounces-221205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C540EB4FB80
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:41:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 417D0B4FB99
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84041885170
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:42:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F18B54E37D4
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4041F334736;
-	Tue,  9 Sep 2025 12:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D4E32CF97;
+	Tue,  9 Sep 2025 12:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ile70M0m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fM6ZCRil"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677D9334732
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 12:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DC127380C
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 12:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757421713; cv=none; b=p1hCORYQnK/cKlL6LaLhxORRNFzT8S08c0RyZgR98BsMKf49btG5MtBrMVTzo1nBAjOX+um/iyE+zJjIlijHXOifCXn1WDW2wJ811OJCg/SHNeFVXNHAFXFEnZhwpzSmGWT+giJ8nTv0lxnyfXGht6fW27yCJZ6P1tNUPHU3VqU=
+	t=1757422054; cv=none; b=eOfSuXBpguHlOJBFWQVMDn/SdPprYAThdg+vJd0WQHpbI0qhjf/zltFbQWNmlQqdO+/WQvfKdRJWp2Ic1i7nYcfhet+iq2rH8EsRCGCChJ4cF66C5HjSh4AA5Tp52CUqr8PfedGWuGT7+KOwb7Lj/aiZdUWf5bsNpK/rfNcFbTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757421713; c=relaxed/simple;
-	bh=3MiBzhsdL4dafE7452zyti+ngiEllOLG1c1BBv3fe5E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hxtIbFML1nKgMuzsT1B5fQrO9WnrruPap/824aYhsty74JB/IT5cAR48HwcloLsSqK6xzqG59K7wsPDvcuCgepmDwh4yTelr7jY7EnYQISKgQ/cuVH4gR5dF2RZJRE+1E1PGGAtVSk+nsetRng5CzSFPpwt0t2HTKY9oNl+6ULM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ile70M0m; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <769fc59b-c248-40ff-87ba-41a18a8c5ec1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757421709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eNVwcYcMRQa2515eB4UJUkPtT4gHNKDrzy0mKQWPvAs=;
-	b=Ile70M0mf52PIUGjzBw+nrcoW2N4tqvyUqLur6rY21Y4NOTH/Iz2Vz52p7VCrBUD4g0bYe
-	VC2a6N7CpBMlE1xoKD83Swdt7UAZrB1CtMvS47j1fWCUPGsX0jBawiGgqW7VohisdvDAlf
-	Z6YKv7/K1OeT1hbbjSRaCvAm+GjueZg=
-Date: Tue, 9 Sep 2025 13:41:45 +0100
+	s=arc-20240116; t=1757422054; c=relaxed/simple;
+	bh=4zg+qxTuu6Ei5289E/A3LoMNam71kQkMnpwFBL13rV0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C2qNGCnVlfB0IQ36MwiLo0N7Diffnze8zOtv1GZd8o9imEc/9ktiRXKcFh/+Ov4UZOZl9X+5lG4DDEWSFTYSc4ERLgw/g82VlbF8zQTyIjq/eHIB0gB6IRC3bBqrx1HdHgZJ8jiMXd6+ieVbnuoWaS1w0E8gIAXrb0cnRP0THWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fM6ZCRil; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 027DFC4CEF4;
+	Tue,  9 Sep 2025 12:47:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757422054;
+	bh=4zg+qxTuu6Ei5289E/A3LoMNam71kQkMnpwFBL13rV0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fM6ZCRildHxfM26+MPZzFwraQuEX0EW4tKnvoyJ54jydEfQn/WMY2e6eH2BN3r7O8
+	 +utxnbrVuNcFTP4wpMXXd3aEzgKyT1fcHd1Ur6/VXamW7d5jf+plgpeMUQsXE5rt7J
+	 XFGllMVLdm9nB9BJ+CI8dZAflqxefqwL5NzsspCVnjk3Y4SGN3AWLTq8zierYV44YQ
+	 hbKN6TIXtEz0VU3qMQncd+BYF9SYzF3QpqU+cEoErw/sbZn5bDZJKQQk2rRkPOdH9Y
+	 ogjF0NJy+6jUPIduoq3B5GmMe6z5sciWUVTx9/9tEDui9plhCNe91AaC5wt40jAYVs
+	 XUD+fxLghW0JQ==
+Date: Tue, 9 Sep 2025 13:47:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Chen Yufeng <chenyufeng@iie.ac.cn>
+Cc: paul@paul-moore.com, davem@davemloft.net, dsahern@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] net: ipv4: Potential null pointer dereference in
+ cipso_v4_parsetag_enum
+Message-ID: <20250909124730.GE14415@horms.kernel.org>
+References: <20250908080315.174-1-chenyufeng@iie.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v11 2/5] net: rnpgbe: Add n500/n210 chip support
- with BAR2 mapping
-To: Dong Yibo <dong100@mucse.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, gur.stavi@huawei.com,
- maddy@linux.ibm.com, mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
- gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
- Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
- alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
- gustavoars@kernel.org, rdunlap@infradead.org
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250909120906.1781444-1-dong100@mucse.com>
- <20250909120906.1781444-3-dong100@mucse.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250909120906.1781444-3-dong100@mucse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250908080315.174-1-chenyufeng@iie.ac.cn>
 
-On 09/09/2025 13:09, Dong Yibo wrote:
-> Add hardware initialization foundation for MUCSE 1Gbe controller,
-> including:
-> 1. Map PCI BAR2 as hardware register base;
-> 2. Bind PCI device to driver private data (struct mucse) and
->     initialize hardware context (struct mucse_hw);
-> 3. Reserve board-specific init framework via rnpgbe_init_hw.
+On Mon, Sep 08, 2025 at 04:03:15PM +0800, Chen Yufeng wrote:
+> While parsing CIPSO enumerated tags, secattr->flags is set to 
+> NETLBL_SECATTR_MLS_CAT even if secattr->attr.mls.cat is NULL.
+> If subsequent code attempts to access secattr->attr.mls.cat, 
+> it may lead to a null pointer dereference, causing a system crash.
 > 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
+> To address this issue, we add a check to ensure that before setting
+> the NETLBL_SECATTR_MLS_CAT flag, secattr->attr.mls.cat is not NULL.
+> 
+> fixed code:
+> ```
+> if (secattr->attr.mls.cat)
+>     secattr->flags |= NETLBL_SECATTR_MLS_CAT;
+> ```
+> 
+> This patch is similar to eead1c2ea250("netlabel: cope with NULL catmap").
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Nit: the preferred form for this citation is:
+
+commit eead1c2ea250 ("netlabel: cope with NULL catmap")
+
+i.e.
+
+This patch is similar to commit eead1c2ea250 ("netlabel: cope with NULL
+catmap").
+
+> 
+> Signed-off-by: Chen Yufeng <chenyufeng@iie.ac.cn>
+> ---
+>  net/ipv4/cipso_ipv4.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
+> index 740af8541d2f..2190333d78cb 100644
+> --- a/net/ipv4/cipso_ipv4.c
+> +++ b/net/ipv4/cipso_ipv4.c
+> @@ -1339,8 +1339,8 @@ static int cipso_v4_parsetag_enum(const struct cipso_v4_doi *doi_def,
+>  			netlbl_catmap_free(secattr->attr.mls.cat);
+>  			return ret_val;
+>  		}
+> -
+> -		secattr->flags |= NETLBL_SECATTR_MLS_CAT;
+> +		if (secattr->attr.mls.cat)
+> +			secattr->flags |= NETLBL_SECATTR_MLS_CAT;
+>  	}
+>  
+>  	return 0;
+> -- 
+> 2.34.1
+> 
+> 
 
