@@ -1,158 +1,151 @@
-Return-Path: <netdev+bounces-221267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7808CB4FF6D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:30:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC63FB4FF30
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F2D17AA79D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:28:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 134C51888241
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5188D350D45;
-	Tue,  9 Sep 2025 14:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F253F2FF679;
+	Tue,  9 Sep 2025 14:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Scnpnm3X"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kaywNOKr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8861B334733;
-	Tue,  9 Sep 2025 14:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663F52288F7
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 14:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757428212; cv=none; b=TRaQ18frQnvJk80s+xdUk4Qiq0dihhGr8sSVYZO10Dt22iE0pGOSIQ063sB8UxOGSadJYY/ngSIE9qjUyuOS56tMHfj5jITGX3RkU0z367uB/toj0xEs6K9DLLBXYumtrhKCwBRuT/nBFhkk+/w2326q0RTDMw7cKdbXShF5Wts=
+	t=1757427671; cv=none; b=fqM3kHAMeSIFGp3Gvc7wUJkR1oD4ls3CdAmvQGlYsrT7UE0UO/cEM1R6jgxcQAwDqoRpgQxMLdaQHBEOEhrNJVRWArofmvN0UDr3WjezIiwk3idnx2HtCD+69d7HbMN61NTkQIjjEsm/kaY82zeAdpjKsWPlDdCuymaF+MtZxXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757428212; c=relaxed/simple;
-	bh=zSKE0r4dBm07k5h6P8o0obztxBa+v5VK7BzP5HDhd5c=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=BDXn6TDuPcDc+e+GKTY/UBOVzR8V+dePySXplVyWdZvTF7kUNxlHITd8V4xZkwTT3FNpB437aQdrGKiyD6qwTBfBJ5l8VffwKDiOvlKhjmYHOxc1mMU5w4UrT6N39RO4t6v7++cNFdnCNKermTJBjcnfX8pmzZ16hihzmYVi1LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Scnpnm3X; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45de6415102so20264505e9.1;
-        Tue, 09 Sep 2025 07:30:10 -0700 (PDT)
+	s=arc-20240116; t=1757427671; c=relaxed/simple;
+	bh=eFaz1FbjLOe0auzFVwB/pCvwCLOzZfD/UEis1KyqCNA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rGg635X2kMUz3HLi7z5HENsJWyUidXJJp4yHkhO8RKaf9joHQ1df0OpUyhLMmHrbL85f4FF3d7CGrsPzdicZVhYws2VfhLQc8rrFyQw0avZGpgn0KwG2Rjs6T98neBQA96Eb7d/6pBAqwuAqFhpZGWttqSffUCpVEuf6RJctWrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kaywNOKr; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-323267b98a4so5236155a91.1
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 07:21:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757428209; x=1758033009; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ex9qzZ1mjA/DhvzyArS8c+WGxpkWftFnoXjJCl2i/Zc=;
-        b=Scnpnm3X5OYYqGvpdkl+RWwftvmsuX4CxEIhNj3z4WZRDdQIzj+s8xzsma0Hkfg86z
-         mgdksDmScoAvI8beb/mrd7C849+IijH+Xavxg5wJPHbdE9VoFeKLclDH5Yavxn8++Fje
-         U+QQ+NV7G4xIpY9Jx+x8X83hUko58mTYB0JLXP7GYgfyQzO5aAC9BMueJ12LmxukTJMq
-         tZ8HB5Db1WvpsWX4dO7lEkodib6DYSby9IZJiYq+c0I73ppPC0/lQya0yt5JByzyWdRM
-         j0JSfFMoOvSPwnghREtdWhWEfpQOpvxU+qXcq2sAyqb3rQT9jGxgl+MJri5nIOFlQkr1
-         nyYw==
+        d=linaro.org; s=google; t=1757427670; x=1758032470; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8TeFkN7fcGow6PeEF+7elJ3SB1YToe/OnzJcgFoo4gE=;
+        b=kaywNOKrPa+njj05Jt0B53qz1ZYhuhtB+JA+tQ8wTdps17G3HDp6sTuIoQzCpc4JGz
+         R84AEsrpjn49dR+q47Yg6u/i3wCfJ5uHlh8bNQEI/eUqzdu+51Q4xpir5aj44KUysKKX
+         XUET7XsELXWyK1xXXHn3s/PwfxYXL3/C1rfyvPIi5jQtSvB+n7/kS+ugCtkfCZUtcCZx
+         mgI7vN5loo6rcg2Z4ppikoif7KLJr6ctpZM9ZzOlQvw0YcLd1JuziPVWVl9BjpV6rAsY
+         Rv3HPXAurBJjc1+LWD6cDTr4VvlgbUidhCnEfN90gUR5TGSUnK+yOfPhBac/hizwFLtF
+         /LBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757428209; x=1758033009;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ex9qzZ1mjA/DhvzyArS8c+WGxpkWftFnoXjJCl2i/Zc=;
-        b=l9sNwstszd6i2VirXSbc+NGSx7teBvpVitQvcRIbWi8Q0J5Y2DHF23jMLhVA7OUfyg
-         pGbSo8sdrFIAOaWmp10c17tG55S9+BybM0fF6UEkjZUbZTSv/j31tUmk2rsSQ6MZVs/d
-         f7CNovUMzzOpQNnNrgE1wy+VMGnLnJdSN8h6sB/MeQ6eTtfHJmzeOtIlGAmP2GRF1gSG
-         M+e3Vr83PWOyrVlGySZ2n2FNI2ESqU55Zq5JApGlu/9WaVYExBdVJ/Yu2EHRpK3PZP5K
-         HNbzPcvwEO27PuJCyj0BCaaTKbcqtUBLyQU0CMZK50e5CB7c4BBjR9/A2W/Bs7MEc5nq
-         SazQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeEsfmLw3Ju+912Kp6cm2zjQgviAc4n5xUcD0T14mnw5UIDi9A7uN2+AS966PrU63YrMRczQdI+5rpTGs=@vger.kernel.org, AJvYcCXkJa0CdyjSebjtPmSargrsopeK0zf597sAJt9X8ynhKdVCiPgSqwlJxic6xdG2XOLtp4RA4sno@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvP09qgM/KIkwSsuD9x4VNuIIikNoF26qwamWVSIl/wejVWhDk
-	6V0EfPgSnJ5v/Laz9F1Ihd2qsumNW3tqgbd4PlTz+z09A8spxCDWpLIu
-X-Gm-Gg: ASbGncsOb52PQZz6iQqD8ZDTfdalUmVPUL+StIMjHrhvqHIdxJ0nWm5C0+33RWyXQZg
-	pxpmPoW5wBLUePRBYP+YsUOWFXmCiKw0Zk+wLdOau/L6bZRIIhjYRbIZFk9EAdT0AKRVlbNiCMe
-	sUPiInzPkfmH7W4l2u9b9q+HjzpxEmZNq0vei2xhlRe3hIc2lfsLOv/wr8504ZQlrU7oo4Gspku
-	YumWCOGczu5lBQhiJ2peuu3XgeTcViH8CWL1fkgtsseHwRrvL6j0atbmkqLL3RpKRNjTi5NZh6t
-	hLxH/XpdyCnuGtmbLsxub882ePqTu3tF9FKPDYarCbz8zvxCc1VZtMDY4l2H7h115pggxqe9Byo
-	6sSiS7jYxwBXyyk1XaY2Y/MsqeHwbqEcSeg==
-X-Google-Smtp-Source: AGHT+IGqDxb7wpLUVcPbCViO4PP7kh8r4pRgwBQupQTTJEmxvS5ynPjzCM3zyXmfjvVT77lInjJHEQ==
-X-Received: by 2002:a05:600c:3acf:b0:45d:dd9c:4467 with SMTP id 5b1f17b1804b1-45dde86719fmr112427505e9.7.1757428208507;
-        Tue, 09 Sep 2025 07:30:08 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:837:bf58:2f3c:aa2c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7521ca0e9sm3132523f8f.25.2025.09.09.07.30.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 07:30:08 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>,  Heiner Kallweit <hkallweit1@gmail.com>,
-  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>,  Florian Fainelli <f.fainelli@gmail.com>,  Maxime
- Chevallier <maxime.chevallier@bootlin.com>,  Kory Maincent
- <kory.maincent@bootlin.com>,  Lukasz Majewski <lukma@denx.de>,  Jonathan
- Corbet <corbet@lwn.net>,  Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-  Jiri Pirko <jiri@resnulli.us>,  Vladimir Oltean
- <vladimir.oltean@nxp.com>,  Alexei Starovoitov <ast@kernel.org>,  Daniel
- Borkmann <daniel@iogearbox.net>,  Jesper Dangaard Brouer
- <hawk@kernel.org>,  John Fastabend <john.fastabend@gmail.com>,
-  kernel@pengutronix.de,  linux-kernel@vger.kernel.org,
-  netdev@vger.kernel.org,  Russell King <linux@armlinux.org.uk>,
-  Divya.Koppera@microchip.com,  Sabrina Dubroca <sd@queasysnail.net>,
-  Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net-next v4 2/3] net: ynl: add generated kdoc to UAPI
- headers
-In-Reply-To: <20250909072212.3710365-3-o.rempel@pengutronix.de>
-Date: Tue, 09 Sep 2025 15:20:13 +0100
-Message-ID: <m2ms73k8rm.fsf@gmail.com>
-References: <20250909072212.3710365-1-o.rempel@pengutronix.de>
-	<20250909072212.3710365-3-o.rempel@pengutronix.de>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        d=1e100.net; s=20230601; t=1757427670; x=1758032470;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8TeFkN7fcGow6PeEF+7elJ3SB1YToe/OnzJcgFoo4gE=;
+        b=J4lmDfrHawAs6Alimcybrr+659zx1ZInJIZBoDKF4XZ6Hr7t30P06m+AoRPwhKhMNR
+         5U3JMFFZzY8NO+BcWhWKfzDBIRT/a5Tx3I4R5+5Ach7hyCmJps825srwCinNeY+/60lU
+         /5lOiH3/gj1lxDrumFWIGV7RxKtPMCDZI6qkmosoBQx47y1TtjSpEDfkD3HDd2/GcKTX
+         VEv5pBSjosb67vSHe5Jxi5AOKgz+74AsNtpcThuWttR8D8m82pBSyQqgz7lEtSnp/3Cr
+         /Q9Oo+wjjM4MCwautrxW8H1PwX5/GPKCxuFu1tbhGREx/lzScGX/yhajHc79Datms+El
+         BKhg==
+X-Forwarded-Encrypted: i=1; AJvYcCVpb2zXKEUHW+hzGXkv+b+4Vdmepp+PD68AG8e+fmC/rQkpEf1XfBsbO3ILyvimwCRLNYv9aPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4K55CzHfdc0NcpaS4pqs/ft+yQM7mA8Gmy23c700zOjIOuX+1
+	9Upi+adn5lxQ4pNtp2M9rFzCg74LLJZk/+viOiKRsh6e3/24rd1eae7+eN38g4XIGuMzerm0v8G
+	gqRAuVjqBwgu/5Xu3C6GLfGdNSR00ef526ou35sOyow==
+X-Gm-Gg: ASbGncveZyvRD3eHKXb1zMdR9cuxea6CxrkazbhX9dy5cuejFEDU9/mCq/PgZssmK5N
+	OpeU+dIj09+rrjgQiQjtEOVYHHj5DpcsVfpWHkTo7AjdhMsBtSi2uA6bOk8oGysSrRkNZDNnIQw
+	BJNk2UCe/TD1UPvmz+/ajtLZpgViBQvGxipa2jkKO0B6Oe0t3ddEJ+JpUZSp20bCp3C7rbal6OC
+	YGw0Us0gZE4dvq/r9Krddjo8U1zbED59nSABfhcquvx/jR4VoEwnBfKgBkIsZmwH1/nhgNGcJiZ
+	FaMLZKs=
+X-Google-Smtp-Source: AGHT+IHcxqQ3MwYg1e6CBranmjT3hbA3KQEdh9KM+28JVgj+Ob7LBa6ks7tZBX8uSiN8HysQ5OLuhZIp+UzO70D3LVY=
+X-Received: by 2002:a17:90b:5284:b0:327:ba78:e96e with SMTP id
+ 98e67ed59e1d1-32d43f09a68mr14437698a91.13.1757427669481; Tue, 09 Sep 2025
+ 07:21:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20250907195601.957051083@linuxfoundation.org> <CA+G9fYsX_CrcywkDJDYBqHijE1d5gBNV=3RF=cUVdVj9BKuFzw@mail.gmail.com>
+In-Reply-To: <CA+G9fYsX_CrcywkDJDYBqHijE1d5gBNV=3RF=cUVdVj9BKuFzw@mail.gmail.com>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 9 Sep 2025 19:50:57 +0530
+X-Gm-Features: AS18NWCu9Mz3BICbrj4i65CQRhAEXwjomJBkbcBzM4Smm39VCPlu0yA5D9Oglok
+Message-ID: <CA+G9fYvhLSjZ0ir66wDK2FCbdToK9=+r_9d4dfrMA6vuxJErpg@mail.gmail.com>
+Subject: Re: [PATCH 5.10 00/52] 5.10.243-rc1 review
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, patches@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, 
+	akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org, 
+	patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de, 
+	jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, 
+	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, hargar@microsoft.com, 
+	broonie@kernel.org, achill@achill.org, Netdev <netdev@vger.kernel.org>, 
+	Anders Roxell <anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Ben Copeland <benjamin.copeland@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Oleksij Rempel <o.rempel@pengutronix.de> writes:
+On Mon, 8 Sept 2025 at 23:44, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>
+> On Mon, 8 Sept 2025 at 01:38, Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > This is the start of the stable review cycle for the 5.10.243 release.
+> > There are 52 patches in this series, all will be posted as a response
+> > to this one.  If anyone has any issues with these being applied, please
+> > let me know.
+> >
+> > Responses should be made by Tue, 09 Sep 2025 19:55:53 +0000.
+> > Anything received after that time might be too late.
+> >
+> > The whole patch series can be found in one patch at:
+> >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.10.243-rc1.gz
+> > or in the git tree and branch at:
+> >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.10.y
+> > and the diffstat can be found below.
+> >
+> > thanks,
+> >
+> > greg k-h
+>
+>
+> While building Linux stable-rc 5.10.243-rc1 the arm64 allyesconfig
+> builds failed.
+>
+> * arm64, build
+>   - gcc-12-allyesconfig
+>
+> Regression Analysis:
+> - New regression? yes
+> - Reproducibility? yes
+>
+>
+> Build regression: stable-rc 5.10.243-rc1 arm64 allyesconfig
+> qede_main.c:204:17: error: field name not in record or union
+> initializer
+>
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>
+> ### build log
+> drivers/net/ethernet/qlogic/qede/qede_main.c:204:17: error: field name
+> not in record or union initializer
+>   204 |                 .arfs_filter_op = qede_arfs_filter_op,
+>       |                 ^
+>
 
-> diff --git a/include/uapi/linux/if_team.h b/include/uapi/linux/if_team.h
-> index a5c06243a435..22d68c0dad60 100644
-> --- a/include/uapi/linux/if_team.h
-> +++ b/include/uapi/linux/if_team.h
-> @@ -12,6 +12,12 @@
->  #define TEAM_STRING_MAX_LEN			32
->  #define TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME	"change_event"
->  
-> +/*
-> + * The team nested layout of get/set msg looks like [TEAM_ATTR_LIST_OPTION]
-> + * [TEAM_ATTR_ITEM_OPTION] [TEAM_ATTR_OPTION_*], ... [TEAM_ATTR_ITEM_OPTION]
-> + * [TEAM_ATTR_OPTION_*], ... ... [TEAM_ATTR_LIST_PORT] [TEAM_ATTR_ITEM_PORT]
-> + * [TEAM_ATTR_PORT_*], ... [TEAM_ATTR_ITEM_PORT] [TEAM_ATTR_PORT_*], ... ...
-> + */
+Please ignore this allyesconfig build failure for now on 5.15 and 5.10.
+Seems like it is my local builder issue.
 
-That's a really unfortunate result of word wrapping the doc string from
-team.yaml
-
-I wonder if it's possible to recognise literal doc strings, with
-embedded newlines and emit them line by line. That would require adding
-the | symbol to the doc string in team.yaml, like this:
-
-    doc: |
-      The team nested layout of get/set msg looks like
-          [TEAM_ATTR_LIST_OPTION]
-              [TEAM_ATTR_ITEM_OPTION]
-                  [TEAM_ATTR_OPTION_*], ...
-              [TEAM_ATTR_ITEM_OPTION]
-                  [TEAM_ATTR_OPTION_*], ...
-              ...
-          [TEAM_ATTR_LIST_PORT]
-              [TEAM_ATTR_ITEM_PORT]
-                  [TEAM_ATTR_PORT_*], ...
-              [TEAM_ATTR_ITEM_PORT]
-                  [TEAM_ATTR_PORT_*], ...
-              ...
-
-Sure, you might occasionally get some messy line wrapping but I think
-that's better than flowing literal blocks of text.
-
->  enum {
->  	TEAM_ATTR_UNSPEC,
->  	TEAM_ATTR_TEAM_IFINDEX,
-> @@ -30,6 +36,11 @@ enum {
->  	TEAM_ATTR_ITEM_OPTION_MAX = (__TEAM_ATTR_ITEM_OPTION_MAX - 1)
->  };
->  
+- Naresh
 
