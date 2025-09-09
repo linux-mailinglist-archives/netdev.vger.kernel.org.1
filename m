@@ -1,135 +1,96 @@
-Return-Path: <netdev+bounces-221154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 388EFB4A8B0
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:49:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47687B4A8DE
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C7324E4618
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:49:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3C977B31B9
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C5B30F550;
-	Tue,  9 Sep 2025 09:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499203093A7;
+	Tue,  9 Sep 2025 09:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jttF35M4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sVcn1K7t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DBD30F94A;
-	Tue,  9 Sep 2025 09:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F958307AEA;
+	Tue,  9 Sep 2025 09:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757411137; cv=none; b=rPNtMSjVZotAgT5uj+deRtQaBRDmZOM5mxdm0cxPDFbJ+nJ1w6jFHlhP3IHHILUySndXR5kVbvHEp9e8OAjVTlW2Tc2VhyWT+u1pYvVp/zjBeY1fOEuitm+YOwQfywj5Jhfxxn2/oYDwVXq4SHkCzrbFx8JDfxa6tgazbWuVEGM=
+	t=1757411404; cv=none; b=jzVZ/ftASLhgitufLXuFtWMERwuMaUhzx133LOSR5z3Wlop9+8egM96XaPWLm5ittAgjBpK4K6kNh0rVXYodtheohUKnnnz+SdZBymbMS9W3QPnVwtb7c4u9h4B+Cn4QnoiTfNdpVOEQghFZTZda81XRetRsF/UEbTQtH2SyHxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757411137; c=relaxed/simple;
-	bh=QUvP8GINuCzSF7JPaWUyPUnNE7WZ2BGlzy60uTCAee4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C3ndxPEZuZSvcmoN61L/KvVVrWOA+HMVhVHf7Icaem0XIscWJk6T1K2VxdXs8jXo88NTSNKmIwP+qzFGH4adV+5sXl7sMkDIOKBvGzLRbWLWTNB4Re50rUfM294jfLSwgPvG5ULX1WLJ/swYM4cBJpp5vG7l+gMgK/HGdupCX/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jttF35M4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97723C4CEF4;
-	Tue,  9 Sep 2025 09:45:36 +0000 (UTC)
+	s=arc-20240116; t=1757411404; c=relaxed/simple;
+	bh=/EtGdIHS39Iac8fH0acLYR2zMPwIstesB2+6J8P3RI8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qd2TCz/y2lgE0ph4gStRy7AvZGSWEg0ts26pJ7F/ReFNT9KthhwfFZF7qqYTBfyU4A7M5XzMGGckGgJoC3PQnkPXRsPI/uSkxj18oRy2OorpwCf5YadUWYE/HxfphlshKp5v9vD/DUuUQlQ/nCZieZPKNNWh1y333xr0FE+CoI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sVcn1K7t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F79EC4CEF4;
+	Tue,  9 Sep 2025 09:50:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757411137;
-	bh=QUvP8GINuCzSF7JPaWUyPUnNE7WZ2BGlzy60uTCAee4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jttF35M4NSuhz5upmy8/c9ZrRK2u7fT59c1LlHk0Yzx4DWtfMXJAL53GBruztjArX
-	 DCT1hUaEPiv28UP+nP4618fMUegp/l4WQdFigfky2Hlvpc+Vciyc6PTEyxcw0kcGjB
-	 7t38n6GJOzJG/4LPMU0n6HUk9ot3Pmcj0Jwm3iyt7nurt+AC5lqsu7LwtNKoLKLSGE
-	 EwYaF6iGgKDDCz5D2Gp0utYfRj0s4l6dh5l3Cl5ZkZwxhyMQQpXPDDqkr4trE0OYos
-	 hY26oLB2zfrWNh1wlODgIeGGeaXDjiHXr60wxOdrZLIaWjAR1lI6CAuIDX6PPW6Vn0
-	 5plBbpkwoYfTA==
-Date: Tue, 9 Sep 2025 12:45:32 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Liu Jian <liujian56@huawei.com>
-Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
-	sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	guangguan.wang@linux.alibaba.com, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] net/smc: fix one NULL pointer dereference in
- smc_ib_is_sg_need_sync()
-Message-ID: <20250909094532.GD341237@unreal>
-References: <20250828124117.2622624-1-liujian56@huawei.com>
+	s=k20201202; t=1757411402;
+	bh=/EtGdIHS39Iac8fH0acLYR2zMPwIstesB2+6J8P3RI8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=sVcn1K7tUbl8/87lFHnqgElZU1UZyjTLemrjxGr1Q+8zOI9TmAvnwHwK8XkI4Ue9H
+	 7epBMbqeAfv8lOFGQla8QzrDvJO9Yc26DznwDa6fnPfOu3XZA/c49TgF0btfNf7u/R
+	 k7t4mvpLLaOlIokQujGBECWIddU5YjUq7N5m9w8b9tkl3Xm3P6kwENZehxyQKlvwon
+	 4pfFmw8UMdhhdyFvLNm5VXRHNiDSWuqxTM35kbPIUxFLqQokxq3jVK/Gi9lUT1rNTK
+	 gFxsgBtyMv2WqULmpmzSFpplJBxc3ZHHW782yjyWAnIWHZv+xLN2Yenh2Fl94kIYqo
+	 9JnBnnrKNB0Pg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ADF383BF69;
+	Tue,  9 Sep 2025 09:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250828124117.2622624-1-liujian56@huawei.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v6] selftests: net: add test for ipv6
+ fragmentation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175741140600.605175.15205546890528795882.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Sep 2025 09:50:06 +0000
+References: <20250903154925.13481-1-bacs@librecast.net>
+In-Reply-To: <20250903154925.13481-1-bacs@librecast.net>
+To: Brett A C Sheffield <bacs@librecast.net>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
+ gregkh@linuxfoundation.org, horms@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ willemb@google.com
 
-On Thu, Aug 28, 2025 at 08:41:17PM +0800, Liu Jian wrote:
-> BUG: kernel NULL pointer dereference, address: 00000000000002ec
-> PGD 0 P4D 0
-> Oops: Oops: 0000 [#1] SMP PTI
-> CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
-> Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> Workqueue: smc_hs_wq smc_listen_work [smc]
-> RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
-> ...
-> Call Trace:
->  <TASK>
->  smcr_buf_map_link+0x211/0x2a0 [smc]
->  __smc_buf_create+0x522/0x970 [smc]
->  smc_buf_create+0x3a/0x110 [smc]
->  smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
->  ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
->  smc_listen_find_device+0x1dd/0x2b0 [smc]
->  smc_listen_work+0x30f/0x580 [smc]
->  process_one_work+0x18c/0x340
->  worker_thread+0x242/0x360
->  kthread+0xe7/0x220
->  ret_from_fork+0x13a/0x160
->  ret_from_fork_asm+0x1a/0x30
->  </TASK>
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed,  3 Sep 2025 15:46:01 +0000 you wrote:
+> Add selftest for the IPv6 fragmentation regression which affected
+> several stable kernels.
 > 
-> If the software RoCE device is used, ibdev->dma_device is a null pointer.
-> As a result, the problem occurs. Null pointer detection is added to
-> prevent problems.
+> Commit a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to
+> stable without some prerequisite commits.  This caused a regression when
+> sending IPv6 UDP packets by preventing fragmentation and instead
+> returning -1 (EMSGSIZE).
 > 
-> Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
-> ---
-> v1->v2:
-> move the check outside of loop.
->  net/smc/smc_ib.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 53828833a3f7..a42ef3f77b96 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -742,6 +742,9 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
->  	unsigned int i;
->  	bool ret = false;
->  
-> +	if (!lnk->smcibdev->ibdev->dma_device)
-> +		return ret;
+> [...]
 
-Please use ib_uses_virt_dma() function for that.
+Here is the summary with links:
+  - [net-next,v6] selftests: net: add test for ipv6 fragmentation
+    https://git.kernel.org/netdev/net-next/c/aeb8d48ea92e
 
-It is clearly stated in the code:
-  2784 struct ib_device {
-  2785         /* Do not access @dma_device directly from ULP nor from HW drivers. */
-  2786         struct device                *dma_device;     
-
-Thanks
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-> +
->  	/* for now there is just one DMA address */
->  	for_each_sg(buf_slot->sgt[lnk->link_idx].sgl, sg,
->  		    buf_slot->sgt[lnk->link_idx].nents, i) {
-> -- 
-> 2.34.1
-> 
-> 
 
