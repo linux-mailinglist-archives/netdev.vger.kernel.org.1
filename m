@@ -1,250 +1,141 @@
-Return-Path: <netdev+bounces-221108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B043CB4A43A
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:52:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D97E3B4A4EC
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 727BF4E02B1
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:52:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B83444806E
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 08:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC5623C8C7;
-	Tue,  9 Sep 2025 07:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7CB23AB90;
+	Tue,  9 Sep 2025 08:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M0EyHL3g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="POOEaJgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985CB20D4FC
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 07:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EE51EFF8D;
+	Tue,  9 Sep 2025 08:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757404376; cv=none; b=Iwov0k6UQlFIlcNqPIw+ShrdAhpXEtRFqZj5BxI5xrG/cJ6glXncV09cmtO7ujTZ7U3BQp6LIgu+Q2AkAegIYBtACv4knoPqnpJ01XWqyF24/IE2G/NYyx+8t7E+j/dNhPA93NTpJ4F3RkXzgNXrqqS3UdICddpKB1cMDvBjjI4=
+	t=1757405837; cv=none; b=ftVlZ6RezxdLwj4iiTALE6MuzK/IWJjFNv0b0vBAscvgo7U10DdiLmkd+FdgvNeNitH1ldqnckFexF19PRWyzfcFGThoFTHhzyvIHtAM3o0jHA7VSFWoXEzAiqZLPb/TR4OxNQP8Etgq/NNK6+27WFJYGDHAGMkoljIXpvXzHlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757404376; c=relaxed/simple;
-	bh=inPUrZMsfA2VY/R1OZIP0EMwvOmiWnfNcCAy3+3kvw0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HqhJjx31KQY22N24cERTJjqp3eDw/TXHCAc/nTpagMHiLsqJs0iEG/g7jw8aQJsPVXrGM0p52NWKyNABu1cyac1o/lQhVnAuk4L9bfuwDCIOdfbg4XGfKkUo1K7nuq66Y2IiXLXVdAVSDR9wikR+E3Tpv59GPKf+qbSXdMw3NzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=M0EyHL3g; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24457f581aeso47996795ad.0
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 00:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1757404374; x=1758009174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MMOBMpJlH1unyBv3NyBv5FS3WF4ll7Y30j2iPvk3MmY=;
-        b=M0EyHL3gLF+YBlvibUSof1qM9bkiH1mtWbKw9g5U17pYWVE28g2P/3Y+7jm4PXkp8m
-         RM30LA7jyh3SdJLXUAwlnbKWpHfZbNFcifGGc9PvNgMCkG3a4t7h843LUw4e/bT3nAqv
-         k7mKVgjIw/iJiLYWHVY+cdi384EgY2spC4oBH/eIQwAwuDX80HDS+mJLRokrFsP9CorE
-         kIWtJhX89+0wNuaUW0l7IvZblprl1bcW34UxZuKvYUrMzLLon2ZT+jigipzbsc2Nd/BS
-         MNZ6opwPfoD5E46zVBnQ/6wigX/TLVXbIo0Zd9YfrPBSg4lQ330+ujjRkfsVBjkaww+t
-         A36w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757404374; x=1758009174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MMOBMpJlH1unyBv3NyBv5FS3WF4ll7Y30j2iPvk3MmY=;
-        b=vyGjlolZ4ai4p9J+PeszBGfPxIDp9UQ8N2K0INjqNqIaFqpmo6Uqi24dDpLTn2mbYX
-         RcBJ4dmRC9NDIh8MRkD2yv0y92yiGfGShEEQxStBHBO6zMCnfpLNtr730rwtT1w7T8Ze
-         8zu03ArUx8QYzkIIh89C7KKO7ZUQCyvF+aoU3IBDAV52h0WaU8U8f/Pur9XePlFuJnDd
-         3ZS7f6IkNm16Fvv/vfhdAJHvO7ocNqMwZPAU4CyijBssoKD+WYBhbuALDwPmA/yTlRbN
-         5C7DEwpk+FqJGVb+flxe4jPuKeDFKvgQJdaxRA8ykCe/zKO1lFZnL7tHgCbzgcY0YNfC
-         UZBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVOHiP2zXr+rrC1JtLicoNPBiJimGt/W4bmVlbicKBmKknnxQSFbjej8O6GSMpL5/gUOJ0fovE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFpWiDcEUiYyLKhteoHO3dUJGrGwAsyk927lM/2S0Z+pVigrq6
-	SXTr6crMGyfu+tfkEdPx0dbrpZYoMLNHDrhrfNdl3nJ9t6x7SEKD9sM+7WMMJsnNEpGpaa2/mF2
-	Rwfji2H4RyehgU4f8LSiDQb/rcNi6aHjdtwwTh7PeRw==
-X-Gm-Gg: ASbGncsueRjsJZak9fHovulRdIi8wXAR4bT0mkF/3qiGl7Uw2zHCgdVONAyciWYH48a
-	BnXeD28xoHPqzUqD+ElXXEV9rBIzBulAdWGTAkC+sVvPRnS1YyaosS9vLH1Be58xCEdqvkxP/HJ
-	qDYp+u7K2EUCiyIt2hB162XfpiuoppY1dp/ejDc/Yd4CKNjV3PRuH3yJ6eSMFnPugePsyifSCgX
-	DaGWaFekEeIcs8OpgvaqwT01Uu++guffArKKieQIrA/CKHxHG2vZvSE9sL7s/QUuz9qTOI=
-X-Google-Smtp-Source: AGHT+IHKMwwuJuV9mWv+A5szEpOumIuvlZcVWUqldPFr6JIn3jDsrrgM3BJF5KeyNQI945RkqqnfgQuc2lOpuPGqW0g=
-X-Received: by 2002:a17:902:d2c7:b0:24c:e6a6:9e50 with SMTP id
- d9443c01a7336-25174a2e860mr141006125ad.45.1757404373705; Tue, 09 Sep 2025
- 00:52:53 -0700 (PDT)
+	s=arc-20240116; t=1757405837; c=relaxed/simple;
+	bh=aUipS3kMgeo7GLk2uFdvRr6hRbolwvX3LCt7v+k4h+4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VIp7pSO/edxPbZ+Dg3fSKEi9ZfQWNvkqSdmK+BPeXYqfx+ozgVNCP4VzTyb4EHFE4nCXsWnEd6J0EUvuidpmhEGvUatPsWNxwwX6qlbYdoBm+yZxq3y+qiFml6hQxSQDDLaX+s3tINzXz+NXc93X55H4oOOVF7mdPEy1R/ntg7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=POOEaJgs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE6DC4CEF4;
+	Tue,  9 Sep 2025 08:17:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757405835;
+	bh=aUipS3kMgeo7GLk2uFdvRr6hRbolwvX3LCt7v+k4h+4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=POOEaJgsduUADvA5q1LlQQLKbkl92ygv1THhB7+JNKBZlYnoEugikR5Fgn40tXVdD
+	 0tZL6ojACJRfRPly2PTQVNsMS5BOcGwSRdXARY3dV9S80JzYBl74E6ndAizOTDwQXe
+	 ZXsBNRAkW3f/E7A0PfnUrLHj/M7u2hImU9ORA8iJrt2FdagQMGY+b5GFlcfR8cMN6I
+	 a6UPIU4MGU8mWMCFFKnz0NeCSzBz0geQ3nKU6Jj+53OFpNJ1QPW66aUjS9xKF40v7X
+	 UQAQpza+sXc6gkgFw/+o6E60QljvmnoiFxFbhx6kKIGuo5S2WqgKZaHiFzQ9kFdc9g
+	 fYdqunULu1rOQ==
+Date: Tue, 9 Sep 2025 11:17:09 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Cc: jgg@ziepe.ca, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	andrew.gospodarek@broadcom.com, selvin.xavier@broadcom.com,
+	michael.chan@broadcom.com
+Subject: Re: [PATCH rdma-next 00/10] RDMA/bnxt_re: Add receive flow steering
+ support
+Message-ID: <20250909081709.GB341237@unreal>
+References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
+ <175734586236.468086.14323497345307202416.b4-ty@kernel.org>
+ <CAH-L+nPP+UU_0NQTh_WTNrrJ5t9GraES0x2r=FyvDMW_Wk2tEg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250907195600.953058118@linuxfoundation.org>
-In-Reply-To: <20250907195600.953058118@linuxfoundation.org>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 9 Sep 2025 13:22:42 +0530
-X-Gm-Features: AS18NWB51GMfdNxH5F_7y6R9Phs7xYbSJja9zt2vDLfRVbapihqj_C3CM63O-h0
-Message-ID: <CA+G9fYt3xc6DmR+EYZD1cAiBSf0VxH6jqbdf0PK-8uGPivw8ew@mail.gmail.com>
-Subject: Re: [PATCH 5.4 00/45] 5.4.299-rc1 review
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, patches@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, 
-	akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org, 
-	patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de, 
-	jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, 
-	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, hargar@microsoft.com, 
-	broonie@kernel.org, achill@achill.org, Netdev <netdev@vger.kernel.org>, 
-	linux-wireless@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH-L+nPP+UU_0NQTh_WTNrrJ5t9GraES0x2r=FyvDMW_Wk2tEg@mail.gmail.com>
 
-On Mon, 8 Sept 2025 at 01:40, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> This is the start of the stable review cycle for the 5.4.299 release.
-> There are 45 patches in this series, all will be posted as a response
-> to this one.  If anyone has any issues with these being applied, please
-> let me know.
->
-> Responses should be made by Tue, 09 Sep 2025 19:55:53 +0000.
-> Anything received after that time might be too late.
->
-> The whole patch series can be found in one patch at:
->         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-=
-5.4.299-rc1.gz
-> or in the git tree and branch at:
->         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable=
--rc.git linux-5.4.y
-> and the diffstat can be found below.
->
-> thanks,
->
-> greg k-h
+On Mon, Sep 08, 2025 at 09:24:39PM +0530, Kalesh Anakkur Purayil wrote:
+> Hi Leon,
+> 
+> It looks like you have merged V1 of the series. I had already pushed a V2
+> of the series which fixes an issue in Patch#10.
+> 
+> I can push the changes made in Patch#10 as a follow up patch. Please let me
+> know.
+
+No need, I fixed it locally.
+
+Thanks
+
+> 
+> On Mon, Sep 8, 2025 at 9:07 PM Leon Romanovsky <leon@kernel.org> wrote:
+> 
+> >
+> > On Fri, 22 Aug 2025 09:37:51 +0530, Kalesh AP wrote:
+> > > The RDMA stack allows for applications to create IB_QPT_RAW_PACKET
+> > > QPs, which receive plain Ethernet packets. This patch adds
+> > ib_create_flow()
+> > > and ib_destroy_flow() support in the bnxt_re driver. For now, only the
+> > > sniffer rule is supported to receive all port traffic. This is to support
+> > > tcpdump over the RDMA devices to capture the packets.
+> > >
+> > > Patch#1 is Ethernet driver change to reserve more stats context to RDMA
+> > device.
+> > > Patch#2, #3 and #4 are code refactoring changes in preparation for
+> > subsequent patches.
+> > > Patch#5 adds support for unique GID.
+> > > Patch#6 adds support for mirror vnic.
+> > > Patch#7 adds support for flow create/destroy.
+> > > Patch#8 enables the feature by initializing FW with roce_mirror support.
+> > > Patch#9 is to improve the timeout value for the commands by using
+> > firmware provided message timeout value.
+> > > Patch#10 is another related cleanup patch to remove unnecessary checks.
+> > >
+> > > [...]
+> >
+> > Applied, thanks!
+> >
+> > [01/10] bnxt_en: Enhance stats context reservation logic
+> >         https://git.kernel.org/rdma/rdma/c/47bd8cafcbf007
+> > [02/10] RDMA/bnxt_re: Add data structures for RoCE mirror support
+> >         https://git.kernel.org/rdma/rdma/c/a99b2425cc6091
+> > [03/10] RDMA/bnxt_re: Refactor hw context memory allocation
+> >         https://git.kernel.org/rdma/rdma/c/877d90abaa9eae
+> > [04/10] RDMA/bnxt_re: Refactor stats context memory allocation
+> >         https://git.kernel.org/rdma/rdma/c/bebe1a1bb1cff3
+> > [05/10] RDMA/bnxt_re: Add support for unique GID
+> >         https://git.kernel.org/rdma/rdma/c/b8f4e7f1a275ba
+> > [06/10] RDMA/bnxt_re: Add support for mirror vnic
+> >         https://git.kernel.org/rdma/rdma/c/c23c893e3a02a5
+> > [07/10] RDMA/bnxt_re: Add support for flow create/destroy
+> >         https://git.kernel.org/rdma/rdma/c/525b4368864c7e
+> > [08/10] RDMA/bnxt_re: Initialize fw with roce_mirror support
+> >         https://git.kernel.org/rdma/rdma/c/d1dde88622b99c
+> > [09/10] RDMA/bnxt_re: Use firmware provided message timeout value
+> >         https://git.kernel.org/rdma/rdma/c/d7fc2e1a321cf7
+> > [10/10] RDMA/bnxt_re: Remove unnecessary condition checks
+> >         https://git.kernel.org/rdma/rdma/c/dfc78ee86d8f50
+> >
+> > Best regards,
+> > --
+> > Leon Romanovsky <leon@kernel.org>
+> >
+> >
+> >
+> 
+> -- 
+> Regards,
+> Kalesh AP
 
 
-Results from Linaro=E2=80=99s test farm.
-No regressions on arm64, arm, x86_64, and i386.
-
-Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-NOTE:
-Following list of new build warnings noticed on arm build with gcc-12 and c=
-lang.
-
-drivers/net/wireless/marvell/libertas/cfg.c: In function 'lbs_associate':
-include/linux/kernel.h:843:43: warning: comparison of distinct pointer
-types lacks a cast
-  843 |                 (!!(sizeof((typeof(x) *)1 =3D=3D (typeof(y) *)1)))
-      |                                           ^~
-
-drivers/net/wireless/st/cw1200/sta.c:1292:20: warning: comparison of
-distinct pointer types ('typeof (ssidie[1]) *' (aka 'const unsigned
-char *') and 'typeof (32) *' (aka 'int *'))
-[-Wcompare-distinct-pointer-types]
- 1292 |                         join.ssid_len =3D min(ssidie[1],
-IEEE80211_MAX_SSID_LEN);
-      |
-^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-drivers/net/wireless/marvell/libertas/cfg.c:1106:18: warning:
-comparison of distinct pointer types ('typeof (ssid_eid[1]) *' (aka
-'const unsigned char *') and 'typeof (32) *' (aka 'int *'))
-[-Wcompare-distinct-pointer-types]
- 1106 |                 u32 ssid_len =3D min(ssid_eid[1], IEEE80211_MAX_SSI=
-D_LEN);
-      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~
-
-## Build
-* kernel: 5.4.299-rc1
-* git: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-=
-rc.git
-* git commit: f858bf5484295b4f9ee720b49c5348ce54eceae3
-* git describe: v5.4.297-70-gf858bf548429
-* test details:
-https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-5.4.y/build/v5.4.2=
-97-70-gf858bf548429
-
-## Test Regressions (compared to v5.4.297-24-g79c1b3cebd7a)
-
-## Metric Regressions (compared to v5.4.297-24-g79c1b3cebd7a)
-
-## Test Fixes (compared to v5.4.297-24-g79c1b3cebd7a)
-
-## Metric Fixes (compared to v5.4.297-24-g79c1b3cebd7a)
-
-## Test result summary
-total: 39701, pass: 30356, fail: 2171, skip: 7026, xfail: 148
-
-## Build Summary
-* arc: 5 total, 5 passed, 0 failed
-* arm: 131 total, 131 passed, 0 failed
-* arm64: 31 total, 29 passed, 2 failed
-* i386: 18 total, 13 passed, 5 failed
-* mips: 25 total, 25 passed, 0 failed
-* parisc: 3 total, 0 passed, 3 failed
-* powerpc: 26 total, 26 passed, 0 failed
-* riscv: 9 total, 3 passed, 6 failed
-* s390: 6 total, 6 passed, 0 failed
-* sh: 10 total, 10 passed, 0 failed
-* sparc: 6 total, 6 passed, 0 failed
-* x86_64: 27 total, 27 passed, 0 failed
-
-## Test suites summary
-* boot
-* kselftest-arm64
-* kselftest-breakpoints
-* kselftest-capabilities
-* kselftest-clone3
-* kselftest-core
-* kselftest-cpu-hotplug
-* kselftest-exec
-* kselftest-fpu
-* kselftest-futex
-* kselftest-intel_pstate
-* kselftest-kcmp
-* kselftest-membarrier
-* kselftest-mincore
-* kselftest-mqueue
-* kselftest-openat2
-* kselftest-ptrace
-* kselftest-rseq
-* kselftest-rtc
-* kselftest-sigaltstack
-* kselftest-size
-* kselftest-timers
-* kselftest-tmpfs
-* kselftest-tpm2
-* kselftest-user_events
-* kselftest-vDSO
-* kselftest-x86
-* kunit
-* lava
-* libhugetlbfs
-* log-parser-boot
-* log-parser-build-clang
-* log-parser-build-gcc
-* log-parser-test
-* ltp-capability
-* ltp-commands
-* ltp-containers
-* ltp-controllers
-* ltp-crypto
-* ltp-cve
-* ltp-dio
-* ltp-fcntl-locktests
-* ltp-fs
-* ltp-fs_bind
-* ltp-fs_perms_simple
-* ltp-hugetlb
-* ltp-math
-* ltp-mm
-* ltp-nptl
-* ltp-pty
-* ltp-sched
-* ltp-smoke
-* ltp-syscalls
-* ltp-tracing
-* perf
-* rcutorture
-
---
-Linaro LKFT
-https://lkft.linaro.org
 
