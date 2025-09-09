@@ -1,121 +1,114 @@
-Return-Path: <netdev+bounces-221316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12CEEB501E9
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:54:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126D8B501F1
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE8C14E263A
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:54:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C890A4E281A
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112A1275AF2;
-	Tue,  9 Sep 2025 15:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949EE2BE657;
+	Tue,  9 Sep 2025 15:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S9rYV4OX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="G1YABSDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885904AEE2;
-	Tue,  9 Sep 2025 15:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3DE2797B5
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 15:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757433238; cv=none; b=tdHwFnm5cHWrZMYjOcKdU5ZsqFICFL7CHmYD03/Oqv/cWvFg1gBoxhSNJJPkpTo2gDHxEggQR6HbcqwROhynFBo/cdOXe548cx6fAVnjTZZujQblA9ywn7DJLZdXQPBQFZ0HXJnfP1Ny9dLl1eNxr+wc/Xn1xb27oy22ZF0Jzq8=
+	t=1757433265; cv=none; b=T1eTzy78GJRYVh9gGzTZ9cTfd0IIqGk2B2+Iut+4Hzyre97D/WKuX24O1X1iUaoCuzuEIowaN44oUpIHdPyE7VrEk2sUj2ibvgGx3Pk3WS7GA3Pk8QDO+eWTQcnYacXlDN0fZgNWGGX45XK7GLAZDoAGSh5oQiQ2wJfYd7U1g6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757433238; c=relaxed/simple;
-	bh=24Ap9yBlbA18UP/rid/bgzN+Ovy08a7T6qnq9Spfuto=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T6e+JlrwebFXnjiexuyp6n/hBZMRzN6BvoaHgvrNbbQi7VKyA2dyNcji55lH5zvNgRZkxyzcZwwi/Ozd+4oYGXkfYcEasobf/7xZLWywykrXqNNYRQ7Un2OfQCsMNwDRCj1CBgU42nuvVMwcScHxQcIZCllMEvpAtn4KH7Rh5po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S9rYV4OX; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71d5fb5e34cso63141697b3.0;
-        Tue, 09 Sep 2025 08:53:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757433235; x=1758038035; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=24Ap9yBlbA18UP/rid/bgzN+Ovy08a7T6qnq9Spfuto=;
-        b=S9rYV4OXWTd+vTWqHrVtGms4wGuRKev/bhDDmUPDn/Ke+qS27dS0XjDhSBlxvLK5e9
-         fZ0XCn+P7AYuMtQxz2m8yl6x5mOE/EBl1Lzk0Cmwyx0b9AdKrUy/TyoFq95KJAvRE2qK
-         3UVFzsA/cLPWo9gASmIWye7WY5zHK633YKvcbcBzxy/MJIM/N4MLqGOGaPKdAXKfp+MY
-         WapRZlLMZeObIBjL46RGLtNifPld/rrZzDzKFUzk9VALVjcZmKUl82SqBQ0h/oFbSL19
-         dSXFObw19AnMBb6D8CtEOhHYvDFaqtRZLiSzVinWkpFWBFq0jLe65cD1SRu5hFNkfLqC
-         EcQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757433235; x=1758038035;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=24Ap9yBlbA18UP/rid/bgzN+Ovy08a7T6qnq9Spfuto=;
-        b=NUiX/fTgBaXkj/WGLnGeQBCXyjWki1d74Q3QvZSWKc8eaJB2wGxz/MwEn1E1Mv+FHB
-         6kl10x0eydVzV4JvqOwP63y3QlTfbj0lu5MfgarF2fYcp1o2Zd63YHHDmcOONhoRoBYd
-         NrOV7E1pFriEi03szBQIUh6/+W3zASYdcnCE+p132WIgRarVGcMIyTX54UauDOA2W/9Y
-         DA0hlOUnrODd4fNW+l6bBew4WBHQ/FP0PrJ/ebaTfT3rMtO1WFaAsWycpdyO1MPGfY/6
-         U3oPNxd65L7UobvwFRIXkHXqEZgoQfRE5csdQvWZWFamsRKbHC4Ekr//Y48MiY+eX2ZX
-         E0IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGpAFVn7AhZ8B74exC3ICj9gm5N7lEebPTSm/8fBTjdaT/jnJkIeIyb8uzXncBNTNm1y7DNz0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeF9pZ0Kim/7Pi5aEs6+lEF4nDRRbiYRZl2YMV/LxJY3Nql6FD
-	brfkJggOyWR+UdggkAo5LZkePRT6fWdMkY4SahILZqBK1L8W06r1gW1Wxar3kFPbXVo5ek75cqJ
-	TsnpI+FKgjKwEpRHMg1yYxwXBUcBifPU=
-X-Gm-Gg: ASbGncuU8GPECDL4C/1NA7IzKtG2EUQyLdqDbZ4MvKRLgRmyglwyHI4t/VtH0BmyiRk
-	1YLdzxH51UVDowOXgo+6qa3YN0QrShOMOPvzd158O6kJsjQhDi0IRFE97RGGubL+CbJzWcW5tO7
-	evkOeP8qVtC2tY+/wRiISbiwNj5kCyu9tUDve9ughe+c8o4y+2eJ8o8/t7dsJ1Y/Ca8VBkQ5QU+
-	qL2oXw1eygiFIYFDYztizgkD5N21fQBZw==
-X-Google-Smtp-Source: AGHT+IHlCQOYnMwyVYiDM5aI/e4xv9t8cbjkHouyPeuWZ/nZ+oqklmpcbYhzVXL8qFc2PXbUumP5TaVc5LlCeZLefEA=
-X-Received: by 2002:a05:690c:fca:b0:72c:2eaf:1cb1 with SMTP id
- 00721157ae682-72c2eaf3527mr36353197b3.8.1757433234097; Tue, 09 Sep 2025
- 08:53:54 -0700 (PDT)
+	s=arc-20240116; t=1757433265; c=relaxed/simple;
+	bh=h2l9qGEEpHC9CO91It801g5/33lmIey0vJNW8GgjVZ8=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=cLDzCmhY1lAEFjNtG8AxABzC89L6IsxVYww5tLBDTHJO5CdYmBHdcCuJx1WvxSt4MHiqdNjiUf7E+3CvQyt/WnSuTrjDBpOMKo+4UXZaT6bR5FOS6JDUkL80Qr7CWUYzswDcrO2KDylFFBjy8l/oAi5+lnCcVKufYJoCw80zY78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=G1YABSDu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=W2tyPj55H9MQ8kwggHT+s8YzFXmBWHiBW64cPrku9as=; b=G1YABSDuRV/hzOrgl2arLN8vUY
+	r/j8C9Vh55rJVM9plobhjWAe+hL/C74Ha5yQbRPag7NZUsz5HLMv7mqor9nYC9gQoRpN83L4mJFeb
+	AaxqBZtvMPrRQw0UtUgFAAmDgsPLvkSIYBGSRal2XinrY5lPv2HQrublh9VIBTyWILMbQ/Nc3TbX8
+	APLnuHnsC77/bRqBRcA9+18JYxEqbC7CFT82CvV+67RE+YSJ+bSH70YbrIhVR6UNfu9xFPPjWi1Xe
+	oq68lDlRItDqM+jyusCWh+07Pomt17m83WZ/O1dxoDFYq9NJjazMOsnAOg3m+r4MZNjcqC8n/ANq+
+	RjkdUCdA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:49956 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1uw0fg-000000008QV-2BSv;
+	Tue, 09 Sep 2025 16:54:16 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1uw0ff-00000004IQJ-3AMp;
+	Tue, 09 Sep 2025 16:54:15 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: stmmac: dwc-qos: use PHY WoL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825193918.3445531-1-ameryhung@gmail.com> <7695218f-2193-47f8-82ac-fc843a3a56b0@nvidia.com>
- <CAMB2axMk63AAv13q2QREn--ee-SMCwjhtv_iPN8EsrjN1L5EMw@mail.gmail.com> <19e4aad7-c4ab-49a4-9be4-28f464e6789f@nvidia.com>
-In-Reply-To: <19e4aad7-c4ab-49a4-9be4-28f464e6789f@nvidia.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 9 Sep 2025 11:53:41 -0400
-X-Gm-Features: AS18NWDl4hMGNevI6U1vJfuvKsz8jMzfDQaKXxPcRhXL3EJ5_2ghIq_ByCNxyPA
-Message-ID: <CAMB2axOJXqHu3QZNCtCKNM8ScuoQU4SWTHgcYva=+62YUydCHg@mail.gmail.com>
-Subject: Re: [RFC bpf-next v1 0/7] Add kfunc bpf_xdp_pull_data
-To: Nimrod Oren <noren@nvidia.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, kuba@kernel.org, 
-	martin.lau@kernel.org, mohsin.bashr@gmail.com, saeedm@nvidia.com, 
-	tariqt@nvidia.com, mbloch@nvidia.com, maciej.fijalkowski@intel.com, 
-	kernel-team@meta.com, Dragos Tatulea <dtatulea@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1uw0ff-00000004IQJ-3AMp@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 09 Sep 2025 16:54:15 +0100
 
-On Tue, Sep 9, 2025 at 9:21=E2=80=AFAM Nimrod Oren <noren@nvidia.com> wrote=
-:
->
-> On 05/09/2025 1:16, Amery Hung wrote:
-> > On Thu, Aug 28, 2025 at 6:39=E2=80=AFAM Nimrod Oren <noren@nvidia.com> =
-wrote:
-> >> I got a crash when testing this series with the xdp_dummy program from
-> >> tools/testing/selftests/net/lib/. Need to make sure we're not breaking
-> >> compatibility for programs that keep the linear part empty.
-> >
-> > ping.py test ran successfully for me. Is this what you tried but
-> > crashed the kernel?
->
-> Yes, that's odd. Is it possible that the native multibuf case was
-> skipped over because of an older iproute2/libbpf version?
->
-> If it's helpful, I used iproute2-6.16.0 built with libbpf 1.7.0 support.
-> I am able to reproduce the crash by loading multibuf prog directly with:
-> `ip link set dev eth0 mtu 9000 xdp obj
-> tools/testing/selftests/net/lib/xdp_dummy.bpf.o sec xdp.frags`
+Mark Tegra platforms to use PHY's wake-on-Lan capabilities rather than
+the stmmac wake-on-Lan.
 
-I can reproduce it with v2. Will fix it in v3.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+This is the last patch that is needed to WoL on the Jetson Xavier NX
+to be functional - the only patch that hasn't been through netdev
+is the DT patch that's being merged through a different route. Once
+all patches come together (in other words, at the next -rc1), then
+WoL will be functional on this platform.
 
-The bug is that sinfo->flags is also cleared in build_skb(), so later
-xdp_buff_has_frags() will always return false and no data was ever
-pulled into the linear part.
+ drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+index 6c363f9b0ce2..e8539cad4602 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+@@ -261,7 +261,8 @@ static int tegra_eqos_probe(struct platform_device *pdev,
+ 	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+ 	plat_dat->bsp_priv = eqos;
+ 	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE |
+-			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP;
++			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
++			   STMMAC_FLAG_USE_PHY_WOL;
+ 
+ 	return 0;
+ 
+-- 
+2.47.3
+
 
