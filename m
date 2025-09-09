@@ -1,418 +1,148 @@
-Return-Path: <netdev+bounces-221226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10A98B4FD43
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:35:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5442BB4FD69
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 029C3345461
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:33:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E59A4188C494
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7281F346A08;
-	Tue,  9 Sep 2025 13:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA59235336F;
+	Tue,  9 Sep 2025 13:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XmtQs6I2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U1di4U7j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8D93469FB;
-	Tue,  9 Sep 2025 13:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7093451AD
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 13:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757424607; cv=none; b=bB+oHsjGt0HG421CgcbOAZ+3i9SqhDkoicbVDcaw4AuG7IKBo3WrQtwO1BhwQNkwEI/N5HeMgWovGEBIl885YFu51FCUjMyxsECQLqRMKAzolHzKKegeQAqd3CA7q8AzxEcDgDJfIDePUVnWhKqmP8C1B9WHGxqoqGqRAVDalDw=
+	t=1757424768; cv=none; b=CeJsSNbOZFiwN/uDOS2WnEcPcKcFjmAeQi5/bV6Wb/yaALH0vzv9dnR4nAFbKAkMlwU0w2ZYq1NGarRuPk+j4UfHsblJdyMxM1tGyBDjdt9rwd95Itye1JP600qTNNbmeNFZHNDtmDVr3yvWRvxpcNH1mLN2OLcWTovf/Ht+cds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757424607; c=relaxed/simple;
-	bh=HUuseAGox18NVw/+eH/OXN+eVQNGzCFhxG8msFUVayw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QRKgcz8CT1DKko9OtO+5S6MOuJi2YIlp28+1zNqr63tgpK3qRIjzxoEzeUwUFJUmQTjocgCmQm/sTS7KkBeIZ/8hfIjxLA7VrB6oI3r15DNctdHc8fNpoLZIBD9svP+WFDl40wwvxTPE7peQAjoDxN7D14xBB1cybWnXKsFYgfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XmtQs6I2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 624DBC4CEF4;
-	Tue,  9 Sep 2025 13:30:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757424606;
-	bh=HUuseAGox18NVw/+eH/OXN+eVQNGzCFhxG8msFUVayw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XmtQs6I2m1bnkiEYYUGG5bRCXUPEruKycGoZE7u+H1iB6Lmeda/zftlLv+WHYF7be
-	 ef32kOZrGRJ+2YPjO8bbVgokdKcqf+gLp+FG159KgYdUndMa4jlNilpY3fqgz/ReSh
-	 TtEVzP47kMMdYbyzmmMGjKV491NrM6BXPH5JGjnHDE8l8OsumUm7s2Cw29A/lk2AMi
-	 VFXD2X4Z4xuagffoaDaP7+XkHwhOVJGuUA4MtiFn+S143czqDFbLhCm4/p9oElojsx
-	 B8jRZmm2oW1sCCF0nXyhcRlkpntOzpuAz3C+tff1lgiEmguMpx9Ic+CMpak2YPO7mm
-	 okSwldsz7XxWQ==
-Message-ID: <669d9245-ac4b-4d43-aea3-cc30ac5836a4@kernel.org>
-Date: Tue, 9 Sep 2025 15:30:00 +0200
+	s=arc-20240116; t=1757424768; c=relaxed/simple;
+	bh=MY8eAzyDaP5DVy3awWgMxodlcnWPUFKzXBdeLXpV/pc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TcWlFzwNsSACUcxoQUkpWs6Z/bICDYbXVmVk5bfE42s52acGCji9FxWtJ3M68RKc+1zTCMjeDNF/W/E3/PveY9kyGHPCLfzpWghR0ymfU1DKLz1Xrjeg1PphDmTkVkkdyzkFPPqlmSqJkVdYXuclJQCsR65bcMlsYZcvj1uyuhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U1di4U7j; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757424765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4BXqa/2VkY+MYk3taj1l57EoqmZshiIHmHuWstQftUs=;
+	b=U1di4U7jNkqiWrbGMje9tfZ409biW8EVfc2U2xIx2rKT2DxOWydcW0tYNlAUMKLxxWm4hn
+	XpnaYKNhHb7l6AOk8k0zzbxdkRdiH04zPl3kO6Zg+5Ejzjj4KHsh3jME59hBmW9C+W4x4O
+	rXQYv+WtcvhHnzKL70NTcMMiJ2WLcq0=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-633-2iugDZeIPuO7Vf7gf0CKVg-1; Tue,
+ 09 Sep 2025 09:32:42 -0400
+X-MC-Unique: 2iugDZeIPuO7Vf7gf0CKVg-1
+X-Mimecast-MFC-AGG-ID: 2iugDZeIPuO7Vf7gf0CKVg_1757424760
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E93CA19541BD;
+	Tue,  9 Sep 2025 13:32:39 +0000 (UTC)
+Received: from localhost (unknown [10.45.226.196])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EA2163000198;
+	Tue,  9 Sep 2025 13:32:36 +0000 (UTC)
+Date: Tue, 9 Sep 2025 14:32:32 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
+	Mike Christie <mchristi@redhat.com>,
+	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
+	nbd@other.debian.org
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+Message-ID: <20250909132936.GA1460@redhat.com>
+References: <20250909132243.1327024-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: xdp: pass full flags to
- xdp_update_skb_shared_info()
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, sdf@fomichev.me, michael.chan@broadcom.com,
- anthony.l.nguyen@intel.com, marcin.s.wojtas@gmail.com, tariqt@nvidia.com,
- mbloch@nvidia.com, jasowang@redhat.com, bpf@vger.kernel.org,
- aleksander.lobakin@intel.com, pavan.chebbi@broadcom.com,
- przemyslaw.kitszel@intel.com
-References: <20250905221539.2930285-1-kuba@kernel.org>
- <20250905221539.2930285-2-kuba@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250905221539.2930285-2-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250909132243.1327024-1-edumazet@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-
-
-On 06/09/2025 00.15, Jakub Kicinski wrote:
-> xdp_update_skb_shared_info() needs to update skb state which
-> was maintained in xdp_buff / frame. Pass full flags into it,
-> instead of breaking it out bit by bit. We will need to add
-> a bit for unreadable frags (even tho XDP doesn't support
-> those the driver paths may be common), at which point almost
-> all call sites would become:
+On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
+> Recently, syzbot started to abuse NBD with all kinds of sockets.
 > 
->      xdp_update_skb_shared_info(skb, num_frags,
->                                 sinfo->xdp_frags_size,
->                                 MY_PAGE_SIZE * num_frags,
->                                 xdp_buff_is_frag_pfmemalloc(xdp),
->                                 xdp_buff_is_frag_unreadable(xdp));
+> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+> made sure the socket supported a shutdown() method.
 > 
-> Keep a helper for accessing the flags, in case we need to
-> transform them somehow in the future (e.g. to cover up xdp_buff
-> vs xdp_frame differences).
-> 
-> While we are touching call callers - rename the helper to
-> xdp_update_skb_frags_info(), previous name may have implied that
-> it's shinfo that's updated. We are updating flags in struct sk_buff
-> based on frags that got attched.
-typo                      ^^^^^^^
+> Explicitely accept TCP and UNIX stream sockets.
 
-> 
+I'm not clear what the actual problem is, but I will say that libnbd &
+nbdkit (which are another NBD client & server, interoperable with the
+kernel) we support and use NBD over vsock[1].  And we could support
+NBD over pretty much any stream socket (Infiniband?) [2].
 
-I'm fine with the name xdp_update_skb_frags_info().
-But I want to point out that the function *does* also update shinfo.
-The xdp_buff/xdp-frame have a compatible layout for shinfo, except for a
-union with sinfo->destructor_arg, which we need to clear.  This is a
-transition point from XDP to SKB, which is why I think the function name
-change is appropiate.
+[1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
+    https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
+[2] https://libguestfs.org/nbd_connect_socket.3.html
 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+TCP and Unix domain sockets are by far the most widely used, but I
+don't think it's fair to exclude other socket types.
+
+Rich.
+
+> Fixes: cf1b2326b734 ("nbd: verify socket is supported during setup")
+> Reported-by: syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/CANn89iJ+76eE3A_8S_zTpSyW5hvPRn6V57458hCZGY5hbH_bFA@mail.gmail.com/T/#m081036e8747cd7e2626c1da5d78c8b9d1e55b154
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Mike Christie <mchristi@redhat.com>
+> Cc: Richard W.M. Jones <rjones@redhat.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Yu Kuai <yukuai1@huaweicloud.com>
+> Cc: linux-block@vger.kernel.org
+> Cc: nbd@other.debian.org
 > ---
-> v1:
->   - rename skb_flags arg to xdp_flags
-
-Thanks for that. You kept the function name xdp_buff_get_skb_flags(),
-indicating this is "skb_flags".  I don't think it matters much, so to
-avoid bikesheeting I'm just going to ACK this.
-
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
---Jesper
-
->   - rename xdp_update_skb_shared_info() -> xdp_update_skb_frags_info()
-> RFC: https://lore.kernel.org/20250812161528.835855-1-kuba@kernel.org
-> ---
->   include/net/xdp.h                             | 25 +++++++++----------
->   drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  7 +++---
->   drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 15 ++++++-----
->   drivers/net/ethernet/intel/ice/ice_txrx.c     | 15 ++++++-----
->   drivers/net/ethernet/marvell/mvneta.c         |  7 +++---
->   .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 23 ++++++++---------
->   drivers/net/virtio_net.c                      |  7 +++---
->   net/core/xdp.c                                | 21 ++++++++--------
->   8 files changed, 56 insertions(+), 64 deletions(-)
+>  drivers/block/nbd.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index b40f1f96cb11..57189fc21168 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -104,17 +104,16 @@ static __always_inline void xdp_buff_clear_frags_flag(struct xdp_buff *xdp)
->   	xdp->flags &= ~XDP_FLAGS_HAS_FRAGS;
->   }
->   
-> -static __always_inline bool
-> -xdp_buff_is_frag_pfmemalloc(const struct xdp_buff *xdp)
-> -{
-> -	return !!(xdp->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
-> -}
-> -
->   static __always_inline void xdp_buff_set_frag_pfmemalloc(struct xdp_buff *xdp)
->   {
->   	xdp->flags |= XDP_FLAGS_FRAGS_PF_MEMALLOC;
->   }
->   
-> +static __always_inline u32 xdp_buff_get_skb_flags(const struct xdp_buff *xdp)
-> +{
-> +	return xdp->flags;
-> +}
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 6463d0e8d0cef71e73e67fecd16de4dec1c75da7..87b0b78249da3325023949585f4daf40486c9692 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1217,6 +1217,14 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+>  	if (!sock)
+>  		return NULL;
+>  
+> +	if (!sk_is_tcp(sock->sk) &&
+> +	    !sk_is_stream_unix(sock->sk)) {
+> +		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: should be TCP or UNIX.\n");
+> +		*err = -EINVAL;
+> +		sockfd_put(sock);
+> +		return NULL;
+> +	}
 > +
->   static __always_inline void
->   xdp_init_buff(struct xdp_buff *xdp, u32 frame_sz, struct xdp_rxq_info *rxq)
->   {
-> @@ -272,10 +271,10 @@ static __always_inline bool xdp_frame_has_frags(const struct xdp_frame *frame)
->   	return !!(frame->flags & XDP_FLAGS_HAS_FRAGS);
->   }
->   
-> -static __always_inline bool
-> -xdp_frame_is_frag_pfmemalloc(const struct xdp_frame *frame)
-> +static __always_inline u32
-> +xdp_frame_get_skb_flags(const struct xdp_frame *frame)
->   {
-> -	return !!(frame->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
-> +	return frame->flags;
->   }
->   
->   #define XDP_BULK_QUEUE_SIZE	16
-> @@ -312,9 +311,9 @@ static inline void xdp_scrub_frame(struct xdp_frame *frame)
->   }
->   
->   static inline void
-> -xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr_frags,
-> -			   unsigned int size, unsigned int truesize,
-> -			   bool pfmemalloc)
-> +xdp_update_skb_frags_info(struct sk_buff *skb, u8 nr_frags,
-> +			  unsigned int size, unsigned int truesize,
-> +			  u32 xdp_flags)
->   {
->   	struct skb_shared_info *sinfo = skb_shinfo(skb);
->   
-> @@ -328,7 +327,7 @@ xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr_frags,
->   	skb->len += size;
->   	skb->data_len += size;
->   	skb->truesize += truesize;
-> -	skb->pfmemalloc |= pfmemalloc;
-> +	skb->pfmemalloc |= !!(xdp_flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
->   }
->   
->   /* Avoids inlining WARN macro in fast-path */
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-> index 58d579dca3f1..3e77a96e5a3e 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-> @@ -468,9 +468,8 @@ bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb, u8 num_frags,
->   	if (!skb)
->   		return NULL;
->   
-> -	xdp_update_skb_shared_info(skb, num_frags,
-> -				   sinfo->xdp_frags_size,
-> -				   BNXT_RX_PAGE_SIZE * num_frags,
-> -				   xdp_buff_is_frag_pfmemalloc(xdp));
-> +	xdp_update_skb_frags_info(skb, num_frags, sinfo->xdp_frags_size,
-> +				  BNXT_RX_PAGE_SIZE * num_frags,
-> +				  xdp_buff_get_skb_flags(xdp));
->   	return skb;
->   }
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> index 048c33039130..98601c62c592 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> @@ -2151,10 +2151,10 @@ static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
->   		memcpy(&skinfo->frags[skinfo->nr_frags], &sinfo->frags[0],
->   		       sizeof(skb_frag_t) * nr_frags);
->   
-> -		xdp_update_skb_shared_info(skb, skinfo->nr_frags + nr_frags,
-> -					   sinfo->xdp_frags_size,
-> -					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +		xdp_update_skb_frags_info(skb, skinfo->nr_frags + nr_frags,
-> +					  sinfo->xdp_frags_size,
-> +					  nr_frags * xdp->frame_sz,
-> +					  xdp_buff_get_skb_flags(xdp));
->   
->   		/* First buffer has already been processed, so bump ntc */
->   		if (++rx_ring->next_to_clean == rx_ring->count)
-> @@ -2206,10 +2206,9 @@ static struct sk_buff *i40e_build_skb(struct i40e_ring *rx_ring,
->   		skb_metadata_set(skb, metasize);
->   
->   	if (unlikely(xdp_buff_has_frags(xdp))) {
-> -		xdp_update_skb_shared_info(skb, nr_frags,
-> -					   sinfo->xdp_frags_size,
-> -					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +		xdp_update_skb_frags_info(skb, nr_frags, sinfo->xdp_frags_size,
-> +					  nr_frags * xdp->frame_sz,
-> +					  xdp_buff_get_skb_flags(xdp));
->   
->   		i40e_process_rx_buffs(rx_ring, I40E_XDP_PASS, xdp);
->   	} else {
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> index d2871757ec94..107632a71f3c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> @@ -1035,10 +1035,9 @@ ice_build_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
->   		skb_metadata_set(skb, metasize);
->   
->   	if (unlikely(xdp_buff_has_frags(xdp)))
-> -		xdp_update_skb_shared_info(skb, nr_frags,
-> -					   sinfo->xdp_frags_size,
-> -					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +		xdp_update_skb_frags_info(skb, nr_frags, sinfo->xdp_frags_size,
-> +					  nr_frags * xdp->frame_sz,
-> +					  xdp_buff_get_skb_flags(xdp));
->   
->   	return skb;
->   }
-> @@ -1115,10 +1114,10 @@ ice_construct_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
->   		memcpy(&skinfo->frags[skinfo->nr_frags], &sinfo->frags[0],
->   		       sizeof(skb_frag_t) * nr_frags);
->   
-> -		xdp_update_skb_shared_info(skb, skinfo->nr_frags + nr_frags,
-> -					   sinfo->xdp_frags_size,
-> -					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +		xdp_update_skb_frags_info(skb, skinfo->nr_frags + nr_frags,
-> +					  sinfo->xdp_frags_size,
-> +					  nr_frags * xdp->frame_sz,
-> +					  xdp_buff_get_skb_flags(xdp));
->   	}
->   
->   	return skb;
-> diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-> index 476e73e502fe..7351e98d73f4 100644
-> --- a/drivers/net/ethernet/marvell/mvneta.c
-> +++ b/drivers/net/ethernet/marvell/mvneta.c
-> @@ -2416,10 +2416,9 @@ mvneta_swbm_build_skb(struct mvneta_port *pp, struct page_pool *pool,
->   	skb->ip_summed = mvneta_rx_csum(pp, desc_status);
->   
->   	if (unlikely(xdp_buff_has_frags(xdp)))
-> -		xdp_update_skb_shared_info(skb, num_frags,
-> -					   sinfo->xdp_frags_size,
-> -					   num_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +		xdp_update_skb_frags_info(skb, num_frags, sinfo->xdp_frags_size,
-> +					  num_frags * xdp->frame_sz,
-> +					  xdp_buff_get_skb_flags(xdp));
->   
->   	return skb;
->   }
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> index b8c609d91d11..2925ece136c4 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> @@ -1796,10 +1796,9 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, struct mlx5e_wqe_frag_info *wi
->   
->   	if (xdp_buff_has_frags(&mxbuf->xdp)) {
->   		/* sinfo->nr_frags is reset by build_skb, calculate again. */
-> -		xdp_update_skb_shared_info(skb, wi - head_wi - 1,
-> -					   sinfo->xdp_frags_size, truesize,
-> -					   xdp_buff_is_frag_pfmemalloc(
-> -						&mxbuf->xdp));
-> +		xdp_update_skb_frags_info(skb, wi - head_wi - 1,
-> +					  sinfo->xdp_frags_size, truesize,
-> +					  xdp_buff_get_skb_flags(&mxbuf->xdp));
->   
->   		for (struct mlx5e_wqe_frag_info *pwi = head_wi + 1; pwi < wi; pwi++)
->   			pwi->frag_page->frags++;
-> @@ -2105,10 +2104,10 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
->   			struct mlx5e_frag_page *pagep;
->   
->   			/* sinfo->nr_frags is reset by build_skb, calculate again. */
-> -			xdp_update_skb_shared_info(skb, frag_page - head_page,
-> -						   sinfo->xdp_frags_size, truesize,
-> -						   xdp_buff_is_frag_pfmemalloc(
-> -							&mxbuf->xdp));
-> +			xdp_update_skb_frags_info(skb, frag_page - head_page,
-> +						  sinfo->xdp_frags_size,
-> +						  truesize,
-> +						  xdp_buff_get_skb_flags(&mxbuf->xdp));
->   
->   			pagep = head_page;
->   			do
-> @@ -2122,10 +2121,10 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
->   		if (xdp_buff_has_frags(&mxbuf->xdp)) {
->   			struct mlx5e_frag_page *pagep;
->   
-> -			xdp_update_skb_shared_info(skb, sinfo->nr_frags,
-> -						   sinfo->xdp_frags_size, truesize,
-> -						   xdp_buff_is_frag_pfmemalloc(
-> -							&mxbuf->xdp));
-> +			xdp_update_skb_frags_info(skb, sinfo->nr_frags,
-> +						  sinfo->xdp_frags_size,
-> +						  truesize,
-> +						  xdp_buff_get_skb_flags(&mxbuf->xdp));
->   
->   			pagep = frag_page - sinfo->nr_frags;
->   			do
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 975bdc5dab84..06708c9a979e 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2185,10 +2185,9 @@ static struct sk_buff *build_skb_from_xdp_buff(struct net_device *dev,
->   		skb_metadata_set(skb, metasize);
->   
->   	if (unlikely(xdp_buff_has_frags(xdp)))
-> -		xdp_update_skb_shared_info(skb, nr_frags,
-> -					   sinfo->xdp_frags_size,
-> -					   xdp_frags_truesz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +		xdp_update_skb_frags_info(skb, nr_frags, sinfo->xdp_frags_size,
-> +					  xdp_frags_truesz,
-> +					  xdp_buff_get_skb_flags(xdp));
->   
->   	return skb;
->   }
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index 491334b9b8be..9100e160113a 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -663,9 +663,8 @@ struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
->   		u32 tsize;
->   
->   		tsize = sinfo->xdp_frags_truesize ? : nr_frags * xdp->frame_sz;
-> -		xdp_update_skb_shared_info(skb, nr_frags,
-> -					   sinfo->xdp_frags_size, tsize,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +		xdp_update_skb_frags_info(skb, nr_frags, sinfo->xdp_frags_size,
-> +					  tsize, xdp_buff_get_skb_flags(xdp));
->   	}
->   
->   	skb->protocol = eth_type_trans(skb, rxq->dev);
-> @@ -692,7 +691,7 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
->   	struct skb_shared_info *sinfo = skb_shinfo(skb);
->   	const struct skb_shared_info *xinfo;
->   	u32 nr_frags, tsize = 0;
-> -	bool pfmemalloc = false;
-> +	u32 flags = 0;
->   
->   	xinfo = xdp_get_shared_info_from_buff(xdp);
->   	nr_frags = xinfo->nr_frags;
-> @@ -714,11 +713,12 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
->   		__skb_fill_page_desc_noacc(sinfo, i, page, offset, len);
->   
->   		tsize += truesize;
-> -		pfmemalloc |= page_is_pfmemalloc(page);
-> +		if (page_is_pfmemalloc(page))
-> +			flags |= XDP_FLAGS_FRAGS_PF_MEMALLOC;
->   	}
->   
-> -	xdp_update_skb_shared_info(skb, nr_frags, xinfo->xdp_frags_size,
-> -				   tsize, pfmemalloc);
-> +	xdp_update_skb_frags_info(skb, nr_frags, xinfo->xdp_frags_size, tsize,
-> +				  flags);
->   
->   	return true;
->   }
-> @@ -823,10 +823,9 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
->   		skb_metadata_set(skb, xdpf->metasize);
->   
->   	if (unlikely(xdp_frame_has_frags(xdpf)))
-> -		xdp_update_skb_shared_info(skb, nr_frags,
-> -					   sinfo->xdp_frags_size,
-> -					   nr_frags * xdpf->frame_sz,
-> -					   xdp_frame_is_frag_pfmemalloc(xdpf));
-> +		xdp_update_skb_frags_info(skb, nr_frags, sinfo->xdp_frags_size,
-> +					  nr_frags * xdpf->frame_sz,
-> +					  xdp_frame_get_skb_flags(xdpf));
->   
->   	/* Essential SKB info: protocol and skb->dev */
->   	skb->protocol = eth_type_trans(skb, dev);
+>  	if (sock->ops->shutdown == sock_no_shutdown) {
+>  		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown callout must be supported.\n");
+>  		*err = -EINVAL;
+> -- 
+> 2.51.0.384.g4c02a37b29-goog
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
 
 
