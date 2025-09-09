@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-221415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9516B50788
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:56:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 923EAB50790
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A03C24E3137
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:55:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CACC564A38
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F15E3375D0;
-	Tue,  9 Sep 2025 20:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28E83570DD;
+	Tue,  9 Sep 2025 20:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QH96TEDV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKWEbPvB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F741FF5F9;
-	Tue,  9 Sep 2025 20:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B3530215F;
+	Tue,  9 Sep 2025 20:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757451357; cv=none; b=U4B8VUX8JDv+H0/45aYXH3Eyl8+n4/xlMxzfUOfwEDEHaelWeEuGXwD3GwKcDCWfdZxsGg5blIxaX5j8kUOA4SAqmgvWxWso+ypU0Tp2N/El81Jq4XNZXonmZq7pCZkQTTE3j4rUtqT+gsuWKbhc3XCXcl/pjQRBgNVSLisfZUc=
+	t=1757451504; cv=none; b=j2Vhk0M23L75ndwfbCAZojx6YvJjnpJKHcVDKy0JhXP/s+exhIzXzuB0fUzYVoQntI5KJiQc2NOWajD2gOC8zKC9woQDXdJelsXoq62p/K9Dz7G4ZSKhobrwGUSrZ1swhoBXhxq7byUVeFW1S22TEHhkkuBoqTt6pv7exfS0yyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757451357; c=relaxed/simple;
-	bh=6p5J73eIUs+wFjXX8VTD3kV/VgYHijJObwj/6Vt0D1I=;
+	s=arc-20240116; t=1757451504; c=relaxed/simple;
+	bh=d053UT9D7w+A6kL9ac5x+bCv1+lr5wb0p5BL1ocIRSA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kj3aBrJGZ3NGmwIDHBUSStbbzRP9l/niHlbvaT6lgo12+iZhFgHy4jZs0TGy8LSkmRzieiNf+hoU7ZiNuN5Dq+7GubU2sf8Nd6ZIHgESs9l+fTuTuBWD69oYbZsaOxm5K+cxuqlsWylooQeZlGxGoB5isc/ykuTpGgwotsS2akY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QH96TEDV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37299C4CEF4;
-	Tue,  9 Sep 2025 20:55:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WXnfOABX6Z1g2dFdoOlHSaykwHp0+COApiDmdtq9Q6iD4/HMqnTK8d6Oxr0E7cAn8eF8g4aIFh5qg62c97jVU0Wf/UI4e6hY+nnoBdfFwX5u/AyXRjFYXuSBH+upIdrDbIhqMRRZ6Mt+cqfN3wK0vkcXF9UipOtghZ+HyFDkI0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKWEbPvB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 120BBC4CEF4;
+	Tue,  9 Sep 2025 20:58:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757451356;
-	bh=6p5J73eIUs+wFjXX8VTD3kV/VgYHijJObwj/6Vt0D1I=;
+	s=k20201202; t=1757451504;
+	bh=d053UT9D7w+A6kL9ac5x+bCv1+lr5wb0p5BL1ocIRSA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QH96TEDVC7ghNHQurxKv8Rg2iFmu7k5LZmLGo5Ww0sAyGgfsqMTKr+G5YPeyNF/4K
-	 KBRHd+DNvOHj/VVQHOYrjo8PH+P0Vnhc28rVeXxryrr0gLUfX/lf+DQH+3O1UIQBWg
-	 kGlY5bwb9a3GgJeAqzHcwTQqsuD9s+65HrDm9wP00HGYO0CtLhiE1Z/cn82mC8e2rO
-	 dayQWsXaP475onCZbcNkwcowGWGZXBjZrWHVGvGn8qeN1FQ/28l3shJZc1BqIynsng
-	 Asz8JL9mq27Vk8FbDU8B7k6vNx3YlhwvowgjB3G3LCPCR/YIaD3oi2sJS3vdZTUEmw
-	 e58nET7xC8tQA==
-Date: Tue, 9 Sep 2025 13:55:54 -0700
+	b=qKWEbPvB6B5W1I+8ibL1fUgdngRXAB3lydQg2aEHeC7D1Gx+BvdXO0J+NbxR3tqOS
+	 MdUHopDoD4l8MG4EWORwGVqWdLwHZ45uKRLEkmzjaEgdGtTE8XRr5FZz/IPBui06xy
+	 FhylzG3vhyQcoxC/yHt3SYEwvVyOt9V/wjk5/1YcPUiDJ8pnmbhFsGcXHlktA4kjkQ
+	 js6F3J4WblA9GyVzB+VncGdXirTf0U0qdLzKPeb9rqH96uaJlWZjGfC1TjtJ1y3wnW
+	 98RBXYOTZWJ9g5nLrvHu+rbXa9/pPQJnoyOJ9WX4OgNOD36rnWI4Vqhmotd2RDCNA+
+	 LpKOFiHC9rTuQ==
+Date: Tue, 9 Sep 2025 13:58:22 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: "Anwar, Md Danish" <a0501179@ti.com>
 Cc: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
@@ -55,12 +55,12 @@ Cc: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
  <rdunlap@infradead.org>, <vadim.fedorenko@linux.dev>,
  <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
  <linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>
-Subject: Re: [PATCH net-next v11 3/5] net: rnpgbe: Add basic mbx ops support
-Message-ID: <20250909135554.5013bcb0@kernel.org>
-In-Reply-To: <54602bba-3ec1-4cae-b068-e9c215b43773@ti.com>
+Subject: Re: [PATCH net-next v11 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <20250909135822.2ac833fc@kernel.org>
+In-Reply-To: <68fc2f5c-2cbd-41f6-a814-5134ba06b4b5@ti.com>
 References: <20250909120906.1781444-1-dong100@mucse.com>
-	<20250909120906.1781444-4-dong100@mucse.com>
-	<54602bba-3ec1-4cae-b068-e9c215b43773@ti.com>
+	<20250909120906.1781444-5-dong100@mucse.com>
+	<68fc2f5c-2cbd-41f6-a814-5134ba06b4b5@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,14 +70,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 9 Sep 2025 19:52:21 +0530 Anwar, Md Danish wrote:
-> > +	for (i = 0; i < size_in_words; i++)
-> > +		msg[i] = mbx_data_rd32(mbx, MUCSE_MBX_FWPF_SHM + 4 * i);  
+On Tue, 9 Sep 2025 19:59:11 +0530 Anwar, Md Danish wrote:
+> > +int mucse_mbx_sync_fw(struct mucse_hw *hw)
+> > +{
+> > +	int try_cnt = 3;
+> > +	int err;
+> > +
+> > +	do {
+> > +		err = mucse_mbx_get_info(hw);
+> > +		if (err == -ETIMEDOUT)
+> > +			continue;
+> > +		break;
+> > +	} while (try_cnt--);
+> > +
+> > +	return err;
+> > +}  
 > 
-> The array indexing calculation should use multiplication by sizeof(u32)
-> instead of hardcoded 4.
+> There's a logical issue in the code. The loop structure attempts to
+> retry on ETIMEDOUT errors, but the unconditional break statement after
+> the if-check will always exit the loop after the first attempt,
+> regardless of the error. The do-while loop will never actually retry
+> because the break statement is placed outside of the if condition that
+> checks for timeout errors.
 
-Not sure this is really necessary, I'd expect C programmers to intuit 
-that 4 is the number of bytes in u32 here. sizeof(u32) is going to
-overflow 80 char line limit and cause more harm than good.
+The other way around. continue; in a do {} while () look does *not*
+evaluate the condition. So this can loop forever.
 
