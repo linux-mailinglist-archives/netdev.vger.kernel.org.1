@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-221383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F653B505F8
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:15:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9EC6B505FD
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:16:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CFBC7A5649
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:13:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A815161D82
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:16:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD897225415;
-	Tue,  9 Sep 2025 19:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEEB3002C2;
+	Tue,  9 Sep 2025 19:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYZ/mL8Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJ+U1ULC"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203242905
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 19:15:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE162905
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 19:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757445321; cv=none; b=Na3FWNAOcpxfV2f8mrSoPO5iGk2OKVa1cHPeg8g/+w9ukCeq0oa9rNQgEc+g1rM8L/WcrgBji/wFCA+dwLotMVmCCWr5RHtqNkNvq4A1Gn4GilxMXN7cGXIG7ZnYKs3iqzqAt3mUguUN9wdLL5/rmmHHoVs5qiqOSb8B5M7tzwk=
+	t=1757445381; cv=none; b=cmiU35gRgj9XXbpmmIzhrvvbFGXbMFF4oBDmR30A42i2PFkR93zPGvHCkg5jBrLRW3w0mMhpFlVc/BWrRH7K/ZB9B4om94WwZQXdJeVnK24890dFocbYxmixxJvye+RSFTY7sB+HnwZgPhyDuyYI33okVE0i2XLSOSPlkKydg+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757445321; c=relaxed/simple;
-	bh=kP8CuoY3+rEak129gtAvgRHI+/n6vfY8NTbhy6jX6/E=;
+	s=arc-20240116; t=1757445381; c=relaxed/simple;
+	bh=VpKaNCiaNqVwKZHK5suYOtn7ZuVmxbB5Y+dCdPNYVUg=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=o5+NqBWC6O7VmNZlEAz31X5HU1fCExG/77JCuGdKmDe5iObWt/WV+vfJxRrhfVeEsf3SwIa4Pxspf9BJc1kjpfe2QwNVTZwzhvpm2qbRsfoEnrzbxVCatRjIYEAsUhZ/zHOhQE3rl8WEmP6rZ+j2/Ewx50QONQxt/Kf8r+YI8tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYZ/mL8Q; arc=none smtp.client-ip=209.85.221.49
+	 In-Reply-To:Content-Type; b=SMfGU6Y4S6p+wB7u+ciYALW0FYcl9JCwgg8RWe7ZIIYVbA1/scd1JZbia+IBkLuTd80QMIeCpxQiQZHN58wFWOAKwt38y3W+6ocIjRxGfFjBsUaLMEsOr/4qpXwBGIRNMq6OqXt7EMCt6j9w8n1IbNpNMvHWHNNFTxkop1k5WdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RJ+U1ULC; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3c46686d1e6so3917726f8f.3
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 12:15:18 -0700 (PDT)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3db9641b725so6004324f8f.2
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 12:16:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757445317; x=1758050117; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757445379; x=1758050179; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=e/hTG5oXLLEz2EBow4tPo/IFgEpDh4x2jiQHUVPLgE0=;
-        b=iYZ/mL8QYtA/ciWgG7u3FtFl8Pwn4FK0zlPoHnAQanqzUKc7bBupChURU5eBkHnCbe
-         coJfBvKIPzWzuEIQCMfbjcSpcYO3ZfzhTEICxTwBCHECWo6SDA31CgiOAY6eIOmNOpUd
-         sa3F7Vr5MIABkbw5LIyfPxQdeEGoyeZEo0FTteAn3RFMZ2YeJI8wY47H9tupNPSCrDqF
-         cvlyQjoASMCFqT75LXxBWJ1deeZyxQrJjq4vm7EUdwW1wdPLfP8K3XhMgZIk5X7pl9KT
-         8Lpi6FreGhXSNRgKhIPrOAkMaEodUs1orvGC6ah5+3muR+29jJQ3vtTyeO99YVEXta4F
-         kQ4A==
+        bh=yO7DlOJpWu91SQzXkAQcMfK5ynjMJfvT9Oyif5R2yqI=;
+        b=RJ+U1ULCJfnpIewrVeZqwMSywhhwOcVoCOPFDszV2RlH26SX7J6XwcylFA7AgPkbRi
+         E9LrdU+DpOofuMWZx7xj7v8LkVV2iKpOHmF39+RSkylkyVvtPRsKfP1nLaaT4UE/pxn7
+         WXr3lUOLNnRED8QuVdXvmhU2CUZt/zMhLo6ricuu+FZog8Nfwo8BFRmqxtWa4sNwp1HU
+         7AVAcwXfC6qPwZ0nJV2LKPaPfcH06plIFRLgosDQOxqh2VmmI3IfpoqEvVK5v79I0uDh
+         ZpEd/acPBWH/7gEQTgHs02g75aoNP6Mm6io5sXDhsBHgclzDgmN1BCKm3x0LlPGXkQx7
+         SFUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757445317; x=1758050117;
+        d=1e100.net; s=20230601; t=1757445379; x=1758050179;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=e/hTG5oXLLEz2EBow4tPo/IFgEpDh4x2jiQHUVPLgE0=;
-        b=FwfZB9cf6YO4Q0sA/aaZLnwq6ILuA3SYEVNu0E2CZKBxBTE91Ycdi98RhzYugF6D4F
-         /4VZfeMuVsBLwFJMBGuBNjlJaHWogENC9NyF9eR/3lrTJoEhugsu2OclacwkUdvSuRCL
-         Mr1p7vni3X7+wUDIoYkPNxO+RD5SlMN5ZW+0fe4GCivfLAwhS/vl7BWQScDbjFs4Tn6n
-         Zvwif/TP+xrKcboQ5R4GAk8NGNWuZYPeFjkp+gElCuyJsVjqpc1pzbGZKEE44PnjO8PU
-         PiOtxAIP37r9cWueu5b233TIPFe9KfJzbqww42Q/bkjaS7601piHy1UEp+4A3aEwQ8rA
-         7qXQ==
-X-Gm-Message-State: AOJu0YwcP5ijNVRPihauu41LOOdo5c/ix8RsKorIiC5RKWgZCB6wv5ZN
-	kzoWvZNvzcHJtUqMfSgeB7klyUWGUa3CwjlEe9M/2/xO33Vo/Ls5MWGY
-X-Gm-Gg: ASbGnctIPgEtWa3d/Gjiv4pDCaFKOOy0Uzq99t8Rsl5iMugckwsBaC7Kg0UZLZW/f+U
-	PQ95d+w+rlnQYmJsNaO3vLMjMiV5KohvAx3wIvm8Jdq7D5cMLcEiRYEgiDIm6ytn//3Cxop/p6o
-	hwxa1OGoRMsL3DSTLfpUOZCnkqrq/Dwltx0QcjQj50+nEhZNuiV0c+xoyCmVJwrHX12jWSjdCFX
-	st1cyDwZy6QVlv8sBXXalSj6N8GnZ0E+g89DRk9B5TpPrXMPaXo1Zwe/QvhwQO064WOvPvL+4MR
-	mrqFzbdgE6YmkHlcPvv7QIZgrB44yBPuX5VCNwrvUllhmv0ekFi0F5ASBaKaTGbzPIyWlfST0ft
-	e0UxpgTGq4fMZOUroFIKPHZva6ksbmvC08Hkf/bW9Ftm6Sj57w1FFFMga6Q6JsbeEpMDpkYuRPe
-	XWM7C368Ia5AqUH2iNArt0oeSNT59/OZTbfwSuNfmHDIfNI7+n8fmzyUdXje/WzQ==
-X-Google-Smtp-Source: AGHT+IFhHhAFmuwWrmMlSw/Od/yTkjWzwwSJIlD3oMKXHJw43r+HxFTSYydFB+Jf1aA2Bo9YCyQP6g==
-X-Received: by 2002:a05:6000:1acf:b0:3da:37de:a38e with SMTP id ffacd0b85a97d-3e643c19857mr11281716f8f.54.1757445317213;
-        Tue, 09 Sep 2025 12:15:17 -0700 (PDT)
+        bh=yO7DlOJpWu91SQzXkAQcMfK5ynjMJfvT9Oyif5R2yqI=;
+        b=sKWOr3li6NVyiptpnCzZQUhDSrAXbbfBS9xEsSJWjpYtfmrXkKxP5r6ZsMRN2a5Xlo
+         Z6X2nt+LNMPGBAAnu+X/LaTKlszpSKfbLLQBUueM4rSCTkc0s7zJpDFY6aHio0F1NU4U
+         mKYFKpHSSdykQCFEiOD/tWfMDgKrpbiWrvUxf8yDBWsjaLthyI1bsc3pvkbUL4l06zj1
+         tWwQT8eq3mTiNj3Llq99w950UHgBphrGeAVdD/DRnXodcm2jddDsxKavcpOgPybK7JwS
+         /SKl4O/6far6GppzD0/HBPjEqzkTJd5hBCOJN+PZyuoJuMO2Rpcy1dbn5WMavOhnO6Za
+         BdPA==
+X-Gm-Message-State: AOJu0YwLTaGU+a7K80ToB6VyxvBEXnTeFkrzDDq5/3k22Qfs3oiZ/sbq
+	AVGIjE02p6L8AzEN3pe0wlm2iAXeRqAkV3qSbV1hR2QNGBJB7c4y1WUx
+X-Gm-Gg: ASbGncsYTY2qjkkDMSQ/V3iSlsuhkI1dDIIPIsx1X4jUWe4qgVi2ZScBVjy6FsHQ1Xc
+	fmTMA/0nuvOsVNFRD5odXSW7Ri7xzC8IdZ/brS02/VUV7gCNQGcQnUy4NAdy+Kk1HJqmAhu8u4k
+	ACXmsAzyCr1FgElHpsyqxKfX3j6Rcizulnewk2dLNCbWH22ZJYwfLVefg59ETZ1RBUCHYsZNGaB
+	z7qGYBI67RP+IsSnkjNxvXRxFpeXT3VoHt+QYcQ3+OII+gdeAK2MGm2qgZtpU2qVB4GwutnDDPh
+	wrQunrxvXmayLLSQz9rZXYSkzauVV4hWsld/Et640p1cFMv3IRC6pFIsPbpcik4KRROvO8q2OwR
+	FQkx0BcWbnawJEHjrrQrRt3mvl5pM68/1TnH/gaMUFF3gONz+JlUcE+/rjHaaCpeIl9boGe0J0J
+	RO/8cBGtKfy9DdwWyLmCM68FBeDQTA9J0dKkBPQpVaXfDagqEx/Ds9xvR1SmtNz9dBikVHYO1j
+X-Google-Smtp-Source: AGHT+IHerxb6PerSsHC5GxRhvHSlgtC+NXi1VoaBs4uQU3DQSB7ds3iIJwNSHeIienDgRlKgCXMQaw==
+X-Received: by 2002:a05:6000:dc7:b0:3d8:9bf9:7c0b with SMTP id ffacd0b85a97d-3e643555f94mr9685806f8f.47.1757445378381;
+        Tue, 09 Sep 2025 12:16:18 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f16:4400:58f9:791b:ab22:addb? (p200300ea8f16440058f9791bab22addb.dip0.t-ipconnect.de. [2003:ea:8f16:4400:58f9:791b:ab22:addb])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3e7522387acsm3704189f8f.40.2025.09.09.12.15.16
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45dda2021dfsm190169135e9.24.2025.09.09.12.16.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Sep 2025 12:15:16 -0700 (PDT)
-Message-ID: <d2910abd-a20c-49f3-ac1f-ff9274ed75d7@gmail.com>
-Date: Tue, 9 Sep 2025 21:15:35 +0200
+        Tue, 09 Sep 2025 12:16:18 -0700 (PDT)
+Message-ID: <bca6866a-4840-4da0-a735-1a394baadbd8@gmail.com>
+Date: Tue, 9 Sep 2025 21:16:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/2] of: mdio: warn if deprecated fixed-link binding
- is used
+Subject: [PATCH net-next 2/2] net: phylink: warn if deprecated array-style
+ fixed-link binding is used
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Russell King - ARM Linux <linux@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -146,22 +146,23 @@ usage of the deprecated binding is detected.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/mdio/of_mdio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/phy/phylink.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
-index d8ca63ed8..d35e28dbe 100644
---- a/drivers/net/mdio/of_mdio.c
-+++ b/drivers/net/mdio/of_mdio.c
-@@ -447,6 +447,8 @@ int of_phy_register_fixed_link(struct device_node *np)
- 	/* Old binding */
- 	if (of_property_read_u32_array(np, "fixed-link", fixed_link_prop,
- 				       ARRAY_SIZE(fixed_link_prop)) == 0) {
-+		pr_warn_once("%s uses deprecated array-style fixed-link binding!",
-+			     of_node_full_name(np));
- 		status.link = 1;
- 		status.duplex = fixed_link_prop[1];
- 		status.speed  = fixed_link_prop[2];
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index c7f867b36..d3cb52717 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -700,6 +700,9 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+ 			return -EINVAL;
+ 		}
+ 
++		phylink_warn(pl, "%s uses deprecated array-style fixed-link binding!",
++			     fwnode_get_name(fwnode));
++
+ 		ret = fwnode_property_read_u32_array(fwnode, "fixed-link",
+ 						     prop, ARRAY_SIZE(prop));
+ 		if (!ret) {
 -- 
 2.51.0
 
