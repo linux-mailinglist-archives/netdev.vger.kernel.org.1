@@ -1,150 +1,130 @@
-Return-Path: <netdev+bounces-221355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B9DFB503F8
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:08:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA1B1B50438
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6836C18987C7
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:05:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 912227B956C
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:15:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3A031D364;
-	Tue,  9 Sep 2025 17:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B30B341651;
+	Tue,  9 Sep 2025 17:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="YsEuNfd5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZH7rPcrK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F733168FC
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 17:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA043314D5
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 17:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757437248; cv=none; b=GfYTfEZHhORfJtFFaQOROZ4Rt93uSnAkk6R+i48TeSmNY2xB1Y+HVwfUIYpBJ/bHnk9xxEKZs5o9qxUagoXH6e50NQUfdVPCtp8fQJIfxMqdpU54DATnoUnEEAtWkwFv743vkjK2XMXHomujfPAzPQgR5Vf2D02uk3S6EV6ZoOU=
+	t=1757438184; cv=none; b=UmyYoAw+nGkdEqzbqLgIAWbtzHg3+uIvV48rb7ydOlnUXTtnjQhupl1FqVI4vJ5bim016TutRgkCe7B437+Tz/LYH5xzODlUg4OGHcTdebn4gj4SIlcFmv2wo8qYIudhpYsmgkc5TkrX2U/SGnUkoTNFNMEPLAdjGZgn8+mIL50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757437248; c=relaxed/simple;
-	bh=XSIeSj830pAxnCxixhDk0Nl5CbpbAkt71UxFRmTYnKM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tHL9QbnI1SBCLL5uUQ8c1SwdSqJCkRAocqndw/XIKN/oUhbh1b2PIqXYWp6qOr6U3Z3tlI7ktlPhQfeSpOs6RiGMeOkeWTRiQhiXgYAtpY74rOl2MgIr00TN4/9bhKGNVFycEycG6dTV2Ea8/5oB1bcIUjNjyp5akCKppFhKbxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=YsEuNfd5; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b4741e1cde5so641832a12.3
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 10:00:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1757437247; x=1758042047; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wsHf+mfrEqPsUFC8Nq/mEkzd6OpkJSukzvgBl3SUnPY=;
-        b=YsEuNfd5Xl3sQ3UN0RQtd1FviFcyiwTZXD9+8tJmB24+YVYISX/CvcAJm5aueoSqSB
-         H/qH+Ilw4zGOslIcKqluzYXAX9mgKsd5MkLTdmGbMnQyBa12Ye86Zq8XsAWfXS2+m0sx
-         uQC1UfWOXnaZSa/US16Rzp6b60glCvHJEYTe7WUwhFnk/tf1siFVp2RZpPyZbLZNHzF0
-         r4nPQdeCu/A2/U5m5SzWjV0wvXy9QMoJE45Zqy8UnBkO01XJB1JxdKZt+OW3Is+Aj6AK
-         eZAtm3ksKT94HqFv4rGPV9/AOLEex8Y3Bd00Nqereqwykf1IzU97alcJI9YuTbR+35GP
-         rwrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757437247; x=1758042047;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wsHf+mfrEqPsUFC8Nq/mEkzd6OpkJSukzvgBl3SUnPY=;
-        b=DnsOUOQxjQMDnBSHympQHdJ4yJWEzhhFUiI1cmGznjcmmbC4k7zRqlVDdUX8c3gU2P
-         3d30G5wjHn62Lp50+Rwg7otKFkNUXCTX/yxAS62K0qxLgQ2wn2o6oySRNRZN17KN/ycw
-         XZd+5Rkh1Uw9jFG4Rt2Rxa2v2QPUX3vAkyzhtLrEOC90ir9D6imhSi8fp5nfNQjcnixY
-         Zn5DBmXEtNsXML8zB5JfbBp8gI1OcTncllZfBbEJJ+TqsfrIXYYamKsFAY7IcgHu4N7x
-         nRg9zw2noRRXlBnLeVe0Dy4NPjSXxdWZwf/PWeDAghXWTcKWiD5PNOcQmUmYpDJPIIGG
-         aZqg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCUPoReUxEjUI6LLjzYqQtbwoHFKyiOt63Q4CITHyApWzkgLg7NueKsfT5qrhRKdAybrclSao=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNxbeIW79lzx0QzsqGI0HEPLAA+7PXjhOMEwnE9yZdKFov6VmO
-	9vt8cGNqyK0TWrKBYrGdqslwFMicnL0Wy9bNLG8h2QGjQU/ZU/CM+01upXNVv3ChqOU=
-X-Gm-Gg: ASbGncuUh1TLrgNu8dZ7K2LZIYO7BTg68LFbW4mUJsqBC0Sm6a3TfxWDA3N5qEUf9Jy
-	Lr0VL7wxN9lQBrWGWkSFIxNQKRC7Sfq/2Bwvsz/bY1HXTj2CkMGh8f24/slZQErpthrTCtmGMPs
-	3Z2E0f/DXVkrgBp2z1GbVjLCwLr2uXFLDRu/H7cC2HvoBocrtbLoF7RwIddd50aYVtXZx2dRQEq
-	PYYlZEe6O2iRprLs2nfdeRT+iaHMw176uDgrJK5XZovMPeg+mrrSRl+ymOi9E9UesznUMUO4sb0
-	pmQTxmaZEeaDhERzBKfzKN5F3VliHDmvrP8g4N7m8T0Lqoqz2D6P48An9PUqUkYSS+Ah6VeHxg8
-	Af5OA1BjTtiItC0kdX83PgT1Y
-X-Google-Smtp-Source: AGHT+IF3E9uQjdLgpvgZaYRlWuAMi8DPv43HfG9lBWajz8EXFCmchbRVuFfhILqZNgr5NxDQ7IMBUw==
-X-Received: by 2002:a05:6a20:4322:b0:24a:3b34:19cb with SMTP id adf61e73a8af0-2534441f6cdmr11018360637.3.1757437246794;
-        Tue, 09 Sep 2025 10:00:46 -0700 (PDT)
-Received: from t14.. ([104.133.198.228])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b548a6a814esm251733a12.29.2025.09.09.10.00.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 10:00:46 -0700 (PDT)
-From: Jordan Rife <jordan@jrife.io>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jordan Rife <jordan@jrife.io>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Aditi Ghag <aditi.ghag@isovalent.com>
-Subject: [RFC PATCH bpf-next 14/14] bpf, doc: Document map_extra and key prefix filtering for socket hash
-Date: Tue,  9 Sep 2025 10:00:08 -0700
-Message-ID: <20250909170011.239356-15-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250909170011.239356-1-jordan@jrife.io>
-References: <20250909170011.239356-1-jordan@jrife.io>
+	s=arc-20240116; t=1757438184; c=relaxed/simple;
+	bh=1776x5WNuqGQXUdGA1Vx2rw6TH5/YKvwrIJKYIxvYXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=geg2engvjUpxBXcaOvJgG26kIYMDf4rTrAQFv4p+r1/5XUWiEetIPUyqGPU6sEPN2UHeZAdV5V5ZC0nVjJEqpz1pnLckfxQ4z3MpElOJW86c3pJVQFhPEEmKyarha5Cqm/Dxp99ZAiMQcjUqOogbFjjwLQ3SweO7S/26RCh9JMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZH7rPcrK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757438181;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C+QDVhIlXWVQYYj2EpRYmCRki550WcQuDpwFnUZzK9w=;
+	b=ZH7rPcrKVYRQVCvFA1f3KAEMkgvKd7fhF+55cBDv+eksNAqQPPQ3HYNrCMeMT/RnYGquDn
+	+ycrBevoRYg9mlSO33Dgl9ApXpfkUPERnMEoGDDAYlkZ4BhaC//CUuGLP2ba7sgVZEZtSs
+	VglA28rKkCtOs/ivH68vhwjAfqSBd3g=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-8q5rAUrtNUyreY5zjAp-hg-1; Tue,
+ 09 Sep 2025 13:16:18 -0400
+X-MC-Unique: 8q5rAUrtNUyreY5zjAp-hg-1
+X-Mimecast-MFC-AGG-ID: 8q5rAUrtNUyreY5zjAp-hg_1757438177
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CF4A195608E;
+	Tue,  9 Sep 2025 17:16:16 +0000 (UTC)
+Received: from localhost (unknown [10.45.226.196])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E2D5A1800447;
+	Tue,  9 Sep 2025 17:16:14 +0000 (UTC)
+Date: Tue, 9 Sep 2025 18:16:13 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
+	Mike Christie <mchristi@redhat.com>,
+	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
+	nbd@other.debian.org, Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+Message-ID: <20250909171613.GB2390@redhat.com>
+References: <20250909132243.1327024-1-edumazet@google.com>
+ <20250909132936.GA1460@redhat.com>
+ <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
+ <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
+ <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
+ <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
+ <20250909151851.GB1460@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250909151851.GB1460@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add documentation explaining how to use map_extra with
-a BPF_MAP_TYPE_SOCKHASH to control bucketing behavior and how to iterate
-over a specific bucket using a key prefix filter.
+So I was playing with this (see commands at end if you want to try)
+and it turns out that the nbd-client program doesn't support vsock
+anyway.  Of course you could still call the kernel APIs directly to
+set up the socket, but it wouldn't be straightforward.
 
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- Documentation/bpf/bpf_iterators.rst | 11 +++++++++++
- Documentation/bpf/map_sockmap.rst   |  6 ++++++
- 2 files changed, 17 insertions(+)
+nbd-client did support Sockets Direct Protocol (SDP) but support was
+removed in 2023.
 
-diff --git a/Documentation/bpf/bpf_iterators.rst b/Documentation/bpf/bpf_iterators.rst
-index 189e3ec1c6c8..135bf6a6195c 100644
---- a/Documentation/bpf/bpf_iterators.rst
-+++ b/Documentation/bpf/bpf_iterators.rst
-@@ -587,3 +587,14 @@ A BPF task iterator with *pid* includes all tasks (threads) of a process. The
- BPF program receives these tasks one after another. You can specify a BPF task
- iterator with *tid* parameter to include only the tasks that match the given
- *tid*.
-+
-+---------------------------------------------
-+Parametrizing BPF_MAP_TYPE_SOCKHASH Iterators
-+---------------------------------------------
-+
-+An iterator for a ``BPF_MAP_TYPE_SOCKHASH`` can limit results to only sockets
-+whose keys share a common prefix by using a key prefix filter. The key prefix
-+length must match the value of ``map_extra`` if ``map_extra`` is used in the
-+``BPF_MAP_TYPE_SOCKHASH`` definition; otherwise, it must match the map key
-+length. This guarantees that the iterator only visits a single hash bucket,
-+ensuring efficient iteration over a subset of map elements.
-diff --git a/Documentation/bpf/map_sockmap.rst b/Documentation/bpf/map_sockmap.rst
-index 2d630686a00b..505e02c79feb 100644
---- a/Documentation/bpf/map_sockmap.rst
-+++ b/Documentation/bpf/map_sockmap.rst
-@@ -76,6 +76,12 @@ sk_msg_buff *msg``.
- 
- All these helpers will be described in more detail below.
- 
-+Hashing behavior is configurable for ``BPF_MAP_TYPE_SOCKHASH`` using the lower
-+32 bits of ``map_extra``. When provided, ``map_extra`` specifies the number of
-+bytes from a key to use when calculating its bucket hash. This may be used
-+to force keys sharing a common prefix, e.g. an (address, port) tuple, into the
-+same bucket for efficient iteration.
-+
- Usage
- =====
- Kernel BPF
+The userspace tools like nbdinfo (part of libnbd) work fine, but of
+course that's not relevant to the kernel NBD client.
+
+Rich.
+
+
+Commands to test vsock:
+
+  $ virt-builder fedora-42
+
+  $ nbdkit --vsock memory 1G \
+           --run '
+      qemu-system-x86_64 -machine accel=kvm:tcg \
+                         -cpu host -m 4096 \
+                         -drive file=fedora-42.img,format=raw,if=virtio \
+                         -device vhost-vsock-pci,guest-cid=3
+   '
+
+Inside the guest:
+
+  # dnf install nbdinfo
+  # nbdinfo nbd+vsock:///
+  (details of the 1G RAM disk will be shown here)
+
 -- 
-2.43.0
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
 
 
