@@ -1,185 +1,147 @@
-Return-Path: <netdev+bounces-221337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB388B50335
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 18:51:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD6DB4FE05
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C75B21C64601
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:51:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF10E1885523
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C383568E1;
-	Tue,  9 Sep 2025 16:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aCHfg7DH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A0D342C93;
+	Tue,  9 Sep 2025 13:48:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2051.outbound.protection.outlook.com [40.107.212.51])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2559B35336F
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 16:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757436691; cv=fail; b=XVRmL9E93Hxr1BsfJ0FMpJ7Eecz+I9Uwqq9miXPMb7I9YZoubwibyNhW10INQs4ZdNsoUqQpKlEwmf9WJGQDShMyMBoUCjeeCGTRl13ZHEI/lDkDg7Xgtbf2khRZMig5muqLdwP3bd5ZVtDn3NOBWVn/rm3HUbxDGkK8QXkboMI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757436691; c=relaxed/simple;
-	bh=QFamWY4XmckOgmlxW4dxO2Bx+a991ZXa4+AYPvBZB54=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=YWgNCUKEbnkG7zi/adcZ1aKr4kRXGxxRi9zFpPTbxdlj5FREaZ06080S0cT9dgH5KuNmfggbcNcTC+nrW4RXwd8aj0l6AySksInZaicIRiC+Jp1300PN2QlzcVLLDDOB0NZWMXkcSDxq0VaWabVE06n0xbIS8t8PSvwcx7dxBf8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aCHfg7DH; arc=fail smtp.client-ip=40.107.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nO5WDYQdVvh0dd5GGkNh3fpenpREEqz9Lj3YNNepOE7Kt9Mrg2Qi50fk8IqBTt0ltTMMf39stUsJA/NMl1dhdtxY2zz6mgTaKyXvVhHcX4TCEs7jDfr6OC94hdgLBjUA5W1JHBJBqc+IGrMKX7vHuZEJ4fY2zdx79m1ZjVrgrTTXlmmrdDjcfG2JxbWGfpij7styJVV1IupT4cj1s+rdR/tGmbqxnHT6mwoALIFashDQTCIvUSoyxjFYeKT+j+9VHkcxTza2q8ilQIKo2W6rVfTE+Wow7jAcCuskN79d70a21lbgFWnyD4yvpadlWYjbue6wVlVSCiE2Be/JE/NlTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TLqlvEpzHTgOySCmc/qG6kLNqin4M+Cucn7IrXlQZyw=;
- b=Lpk3QBVWdMDWzcqUApUJUZg3OMch0GclCD9AVNhgIRGs7m1Ijl5ZvCIBxiCt19hfdedPT/lo2VjaYA+Egb76yKKqWziTim8b9J0cPjQ75DrxvgS82YPjxbB2QR3obV7tsJJp+Whhxsyc1+ND21VzRnnUhSXLj5/PZNKnpldvsGD6zt7a4FrgIQiD6MIT2eaU2iB4HJBtWj7SBm/rxlXD26IaCjRaPmSY8r3984zNprx7B0bOUT0pkDD+sllz71hpfTwPA5S+COoVj5yD7v/CDzoqSrCz6MP+WZsCothWrrmPE0hY2aVluwKst0cNb4kTbJ4YeGh4WnMRs9owSxHVdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TLqlvEpzHTgOySCmc/qG6kLNqin4M+Cucn7IrXlQZyw=;
- b=aCHfg7DHcPlV0/HWE8cGswFszdz7RXHaELcTHO4NZOr45uz1Td34NY7KwDq6/SnOYRjo5GKk4NTWEnsJPXZRLZIfIJ4O1zqGhMYaJRZ/SE8GoPqcgnzvklu5+VuLa4ARLmJThm7/VE4JemeFdxXMz9188p6QSwPLCEC1oZXc3oKikXTlUzrvmjopF1BKJdrwyDvGdVOOTSL222erGcXSNJJ0M1U9vNeUBSn/hF4BIaK0Uq3JNaV2U8N+pUjpP0LdS/WgLs9O2YEOeh73zSacqPLERKZVW1DB3rwAHc2eMCFSDgIjcOAO6FpDGESTsAYyoJxhAh3AMajQgR1+EPiJ1Q==
-Received: from SJ0PR13CA0023.namprd13.prod.outlook.com (2603:10b6:a03:2c0::28)
- by SA1PR12MB8095.namprd12.prod.outlook.com (2603:10b6:806:33f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Tue, 9 Sep
- 2025 16:51:26 +0000
-Received: from SN1PEPF00036F3C.namprd05.prod.outlook.com
- (2603:10b6:a03:2c0:cafe::ea) by SJ0PR13CA0023.outlook.office365.com
- (2603:10b6:a03:2c0::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.14 via Frontend Transport; Tue,
- 9 Sep 2025 16:51:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF00036F3C.mail.protection.outlook.com (10.167.248.20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9115.13 via Frontend Transport; Tue, 9 Sep 2025 16:51:24 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 9 Sep
- 2025 09:50:53 -0700
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 9 Sep
- 2025 09:50:46 -0700
-References: <cover.1757004393.git.petrm@nvidia.com>
- <8087475009dce360fb68d873b1ed9c80827da302.1757004393.git.petrm@nvidia.com>
- <20250908191550.11beb208@kernel.org>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, Simon Horman <horms@kernel.org>, "Nikolay
- Aleksandrov" <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
-	<bridge@lists.linux.dev>, <mlxsw@nvidia.com>
-Subject: Re: [PATCH net-next 02/10] net: bridge: BROPT_FDB_LOCAL_VLAN_0:
- Look up FDB on VLAN 0 on miss
-Date: Tue, 9 Sep 2025 15:34:19 +0200
-In-Reply-To: <20250908191550.11beb208@kernel.org>
-Message-ID: <87ecsfr2oq.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A220A342C8B
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 13:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757425727; cv=none; b=Tfq0KC31TlufX1TFIi4hYFvS2xiGVpqEbhB+Am26wzp3h9hjjSAyhcZ6krrxTFHlDxUzromDbai2bhABMxNAABTfvMyVVfaiGbwk8+3I4PjkR+NZAyNJBnPBSM08/vrP1uijRuabzbE/liI5AtZlviWiB7md3oTlBwqln76prwc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757425727; c=relaxed/simple;
+	bh=ENZBonPpkHIXZjduXOGlH5Jt3VfTDhsFHwZfOoaLocE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u43CKl5gfwzFip3DGI+DdN/8MPg+zw3w8auoH7aTW6gfcNmXNfoORABAnGOnhK0hABIGvWSgs6ElVPC+Y7J5E6gFxs1UB/x5Zvy6JxnjR4Xoc/zfb65inkSh19cXTCjN41WViQXZ7MGLdE0yqsemkP76haklfwkEDyNGLWSeh9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uvyiC-0002i2-3Y
+	for netdev@vger.kernel.org; Tue, 09 Sep 2025 15:48:44 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uvyiB-000Qkv-2p
+	for netdev@vger.kernel.org;
+	Tue, 09 Sep 2025 15:48:43 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 836FB46A03D
+	for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 13:48:43 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 3BAB046A023;
+	Tue, 09 Sep 2025 13:48:42 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 0e1bf272;
+	Tue, 9 Sep 2025 13:48:41 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/7] pull-request: can 2025-09-09
+Date: Tue,  9 Sep 2025 15:34:53 +0200
+Message-ID: <20250909134840.783785-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3C:EE_|SA1PR12MB8095:EE_
-X-MS-Office365-Filtering-Correlation-Id: 623b37c8-633f-42ac-5c75-08ddefc11ced
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XxZ5U+pd+t5uwfVaVErblnunYtJizPEAJsqIZDH+fpJ6ZPM0KzU0/tn9rmYo?=
- =?us-ascii?Q?nhwKuJo0rFgNcI9LrIgzUxCT7VT4Z6a0Lxd0aC9TQriLn4naOD0P4swPfJWj?=
- =?us-ascii?Q?m21hiR2DtG42DS1a4L93h216xAiZK05LuUbepKx310tjy30Hk3yBpWnf6za6?=
- =?us-ascii?Q?aMCa4eE68JGXLKTJhc0Ss0C2Pg5A6pGplcAKrmSiFwYqKLPNOiJZIIPXcwbD?=
- =?us-ascii?Q?6DD6cZUravpV2FVi67lI6CKE9z7tyUKeO4DX4qUs/M/lDa+mG8/RM0I9aOba?=
- =?us-ascii?Q?Y267MbsgpDn0IwHLoH6plhakLRAqA+IbgbRcnbmMQg2p4Mk6p6F/fU8b4Sip?=
- =?us-ascii?Q?xAVEu2iFDK8HatHXBVV3/kLuRO+MTe/3Q38nsQEElfDgrRdQ8PHePSuh71i4?=
- =?us-ascii?Q?PfnYCXG/6vLGA8gqocfi7hK5dOGOTYlQtGc8wuM6Ckp1K5+0V4hnF92ou594?=
- =?us-ascii?Q?/03JliESJFq2Rvc8P80ZW/uDR+U0zpg3JLVGzbQLe2j5GB4q62m7gR9Cyo7h?=
- =?us-ascii?Q?8/PzSlH4EZXT1pJR1x4Vd48Lwzrs3sBrOefDELm4bCEZum6+XBSbSlX4g3GQ?=
- =?us-ascii?Q?q4x94EOs9uzI3cqQdzVF7BZKwudKjr+XcjgFJG+fVAh9K8zL58Av1VUXq4Kv?=
- =?us-ascii?Q?aOarQPtNjJ8J4EwCADf/nk4jmZl7gpNOJXi31h9Hik2t8LVhlqXm1nJ9veio?=
- =?us-ascii?Q?c47wBbN2IL11U2g9vV566Ea2EJHawEuvcNnHJcB+wzY66Yl9x7QsFCIYS5/x?=
- =?us-ascii?Q?BRh5RK6TUOXoHpZAn4thutncec2C9sc8jwRgtFhP/yMdNNcKho7q8qvxzFNQ?=
- =?us-ascii?Q?3V/s6xmvgjiTj34Q9tIvDbAYKLbw/TmAGiV7ml/jfevArs41nVs7Zlr3dxef?=
- =?us-ascii?Q?gWf4exb7+Fuk94fzJvKTRurs0Ij40pL430s9uvnWGNcAZG2wtPIbii1L4S5I?=
- =?us-ascii?Q?pNZIzCH0K9H1eNwi2XC9ewrBeVnDYFklca2AZYsGDLK2E55aUbgb1TyrhBgL?=
- =?us-ascii?Q?AZ0jnt4XOvii4ENFrAAv3fgPqYx0oXHz2YIbHwrvGCRbNW+hY8m1sC0hDtHU?=
- =?us-ascii?Q?jVLz42h+sJejl8duyuHpDZV8MafxGM1PyDkugkZ3tHe4BXiVXnX03YiiWvAb?=
- =?us-ascii?Q?zvsGEHStInSFBSeDVnrVtrqAi3Q5vkRd51vKu4P5R1Or3MD5H9v8cLbZLAaT?=
- =?us-ascii?Q?I5rZY/OQMGt9CarC9e1WA/lfnQQ7KrO9/l0MGcAO7PRfg86SsZVn2MyXcNqo?=
- =?us-ascii?Q?zVYYuzH0/S1BPW30HSJVIlNQScs5PYG7ktpQ+ZO8OKxfcbaEhO/je1DhuvNd?=
- =?us-ascii?Q?9fWtHpIgPJn8j8iUK/mW2EGBJTI+m/SaKRtI6tsH6aEXbXpHmR07C/Ov5gL6?=
- =?us-ascii?Q?K7khXx0KdiLwp/IxiEqpEEny+MasjFxqZx4pViC1OF5hjXB14ozJEUvZHuz0?=
- =?us-ascii?Q?7mpc9vCv55HAI5ufsqeqMII2HPpXdSEMI3lUsBPUjU+Vbkzw8cXMlLmmvioC?=
- =?us-ascii?Q?MV5TjcQXsNZo3+AkdlEu9WmuWVweNyekxOVj?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2025 16:51:24.7649
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 623b37c8-633f-42ac-5c75-08ddefc11ced
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F3C.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8095
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hello netdev-team,
 
-Jakub Kicinski <kuba@kernel.org> writes:
+this is a pull request of 7 patches for net/main.
 
-> On Thu, 4 Sep 2025 19:07:19 +0200 Petr Machata wrote:
->>  		dst = br_fdb_find_rcu(br, eth_hdr(skb)->h_dest, vid);
->> +		if (unlikely(!dst && vid &&
->> +			     br_opt_get(br, BROPT_FDB_LOCAL_VLAN_0))) {
->
-> What does the assembly look like for this? I wonder if we're not better
-> off with:
->
-> 	unlikely(!dst) && vid && br_opt..
+The 1st patch is by Alex Tran and fixes the Documentation of the
+struct bcm_msg_head.
 
-Well, I don't see much there. A couple basic blocks end up reordered is
-all I can glean out. I looked at GCC tree dumps which are more
-transparent to me, and it's the same exact code in both cases, except
-for variable naming, basic block numbering and branch prediction
-annotations -- kinda obviously.
+Davide Caratti's patch enabled the VCAN driver as a module for the
+Linux self tests.
 
-> Checking dst will be very fast here, and if we missed we're already 
-> on the slow path. So maybe we're better off moving the rest of the
-> condition out of the fast path, too?
+Tetsuo Handa contributes 3 patches that fix various problems in the
+CAN j1939 protocol.
 
-GCC appears to compile unlikely(A && B && C) as unlikely(A) &&
-unlikely(B) && unlikely(C). So it's really much of a muchness -- when we
-annotate just !dst, it's going to assume 50/50 on those latter branches,
-but we don't really care at that point anymore, because the first 90/10
-is going to send us to the slow path. There's a bunch of 50/50 branches
-because of __builtin_constant_p's, but those are optimized away in
-middle-end. In the end it's the same code, just different basic block
-layout decisions.
+Anssi Hannula's patch fixes a potential use-after-free in the
+xilinx_can driver.
 
-So we can do either.
+Geert Uytterhoeven's patch fixes the rcan_can's suspend to RAM on
+R-Car Gen3 using PSCI.
+
+regards,
+Marc
+
+---
+
+The following changes since commit d3b28612bc5500133260aaf36794a0a0c287d61b:
+
+  net: phy: NXP_TJA11XX: Update Kconfig with TJA1102 support (2025-09-08 18:24:19 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.17-20250909
+
+for you to fetch changes up to 74485647e0f97a39417a5d993aaf65e378ca3e13:
+
+  can: rcar_can: rcar_can_resume(): fix s2ram with PSCI (2025-09-09 14:30:15 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.17-20250909
+
+----------------------------------------------------------------
+Alex Tran (1):
+      docs: networking: can: change bcm_msg_head frames member to support flexible array
+
+Anssi Hannula (1):
+      can: xilinx_can: xcan_write_frame(): fix use-after-free of transmitted SKB
+
+Davide Caratti (1):
+      selftests: can: enable CONFIG_CAN_VCAN as a module
+
+Geert Uytterhoeven (1):
+      can: rcar_can: rcar_can_resume(): fix s2ram with PSCI
+
+Tetsuo Handa (3):
+      can: j1939: implement NETDEV_UNREGISTER notification handler
+      can: j1939: j1939_sk_bind(): call j1939_priv_put() immediately when j1939_local_ecu_get() failed
+      can: j1939: j1939_local_ecu_get(): undo increment when j1939_local_ecu_get() fails
+
+ Documentation/networking/can.rst       |  2 +-
+ drivers/net/can/rcar/rcar_can.c        |  8 +-----
+ drivers/net/can/xilinx_can.c           | 16 +++++------
+ net/can/j1939/bus.c                    |  5 +++-
+ net/can/j1939/j1939-priv.h             |  1 +
+ net/can/j1939/main.c                   |  3 ++
+ net/can/j1939/socket.c                 | 52 ++++++++++++++++++++++++++++++++++
+ tools/testing/selftests/net/can/config |  4 +++
+ tools/testing/selftests/net/config     |  3 --
+ 9 files changed, 74 insertions(+), 20 deletions(-)
+ create mode 100644 tools/testing/selftests/net/can/config
+
 
