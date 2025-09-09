@@ -1,95 +1,76 @@
-Return-Path: <netdev+bounces-221474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74480B50950
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:38:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD716B50957
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:46:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E0E0542398
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:38:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4ACE1C20AB2
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125CF288C34;
-	Tue,  9 Sep 2025 23:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DFE285CAF;
+	Tue,  9 Sep 2025 23:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iw79tJQu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZTYzjFWr"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1C5225A24
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 23:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25A7223337;
+	Tue,  9 Sep 2025 23:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757461125; cv=none; b=q4r7xWUugaaWlTN1F11QXaBgsJVWCEBmc5WXUnhrzGB0RDPba8BSbkjMcbUGNzkhRN5x9HWGEbyX6i72aDwifnf+xA98/iUKIkcHwZgjmPtnpqDUyFMnbzFrCVwwOBZ3wrdSHPbNSzEkdBLY4ChLpPjJTUiK248ARKbIn5mx0g4=
+	t=1757461561; cv=none; b=VHwyIZmQO+9QC1zPnADgC8eY36iZP4Hha5bNARu00eiNx9VqTyONteNJFQEuMZd2d3rbqT/zF5T/JBrrV4YfF8eI98FrCY38y1RfncNHyr33lXd2psf6RNpYpYBI1oqGKi2B5/GqLdoRXaMY/er1Thh9BcytxUXRXzQK3MK9ndw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757461125; c=relaxed/simple;
-	bh=tcn0xtfFgnvAM98VZcDnSZTREC2fBxDUrNjd1HrQD3g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fDmHnw6LKugqk06bsLB3kLl10wRYFmXTACLY7i5uWNmQeHn7gWiAYl2NxmnMIybJEAGUT59Y+34urTBTeMDP8u2rLJsR/1xKXffIl/OzwM2jWU9R783Qqso8dlmYaX6z9Y6auVAkVJlKj9vhqgnpnq2GevFkyLAuGDz7+RwavCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iw79tJQu; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5a21bf14-4984-4fc3-bced-4d82e73eb9ac@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757461120;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m3Rof7cQDdL6u7z56AByVFz0inSeR55dGnQF9DWwsi4=;
-	b=iw79tJQu827AxJCAPsEmrZuRzi73D0gdvFLKi5oO+Dj+n4d5tydOY9db9UDDeHzX7tGW9f
-	BWUqCxHgTJyEPmdE1GvHmVzqIhNyHw80oJm/xPWlFn9CePsibIzMk88n9X6A1SSgscO1SC
-	DJPtaEvdL9ea/7P4mKMfyP6mFcf+smQ=
-Date: Wed, 10 Sep 2025 00:38:39 +0100
+	s=arc-20240116; t=1757461561; c=relaxed/simple;
+	bh=7OopFAuQ9uCUpxzXKtKBIkITwWzO1Xn89zHsYdpatlg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ni1F6eH4kgLKrEREhrx8ngs8KCphtSshlT2p6G535NFQRXYHbG3X399oIu2MvGl6TB6pY1IZRtjCh88dBr1p/fLuVEu1ct4A71Q7Xl4ch2L4E1dseg3XPNaJDsKZCtn0Ydnq9blkceiHWRAlxY0/j91mPP5sN30lqF31Xm0NTbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZTYzjFWr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28B65C4CEF4;
+	Tue,  9 Sep 2025 23:46:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757461561;
+	bh=7OopFAuQ9uCUpxzXKtKBIkITwWzO1Xn89zHsYdpatlg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZTYzjFWr1Ii4BKa9rgmif1OpgXi1Nybp9NafkfcLdPZII2IKmlb2Iifm5H8bDCqFP
+	 SIvJQIKVbyK8HXK1Pn8/ZV+CREZTj4oYyptW8CYECbzDueKKxrtjBH1SNtB8ShNrGd
+	 PWQ1XNmShavUXzzgp3Zj2Js5W0Sw3pTZqqPPWcMhElM1o4vPE7eQjHjIsoTr3P+ZYi
+	 Y3Q6OaHvL6UHExOs27xmQWAEUwFOS9dSDW1WiUsXx6EBEg3oQrQXpcSvcDgC5t29LU
+	 EOwG4/Oo/Vr4vNC0K31f8zE+Xxs7r85GRReB34ub2UR0zbKdaEi2eoclLfSv7ihQw2
+	 Rr6ys+jhvQR/w==
+Date: Tue, 9 Sep 2025 16:46:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv2 2/2] selftests: bonding: add vlan over bond testing
+Message-ID: <20250909164600.04aa44c7@kernel.org>
+In-Reply-To: <20250908062802.392300-2-liuhangbin@gmail.com>
+References: <20250908062802.392300-1-liuhangbin@gmail.com>
+	<20250908062802.392300-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 4/4] net: dsa: mv88e6xxx: remove unused support
- for PPS event capture
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>
-References: <aMBLorDdDmIn1gDP@shell.armlinux.org.uk>
- <E1uw0Xp-00000004IOI-1i7v@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <E1uw0Xp-00000004IOI-1i7v@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 09/09/2025 16:46, Russell King (Oracle) wrote:
-> mv88e6352_config_eventcap() is documented as handling both EXTTS and
-> PPS capture modes, but nothing ever calls it for PPS capture. Remove
-> the unused PPS capture mode support.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->   drivers/net/dsa/mv88e6xxx/ptp.c | 21 +++------------------
->   1 file changed, 3 insertions(+), 18 deletions(-)
+On Mon,  8 Sep 2025 06:28:02 +0000 Hangbin Liu wrote:
+> Add a vlan over bond testing to make sure arp/ns target works.
+> Also change all the configs to mudules.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-
-> 
-> @@ -188,20 +185,8 @@ static int mv88e6352_config_eventcap(struct mv88e6xxx_chip *chip, int event,
->   	if (err)
->   		return err;
->   
-> -	if (event == PTP_CLOCK_PPS) {
-> -		cap_config = MV88E6XXX_TAI_EVENT_STATUS_CAP_TRIG;
-
-nit: with this change MV88E6XXX_TAI_EVENT_STATUS_CAP_TRIG becomes unused
-macro.
-
-
+Why are you switching everything to module?
+The series needs to go to net, we should avoid unnecessary cleanups.
+And I think changing the config is unrelated to the selftest so it
+should be a standalone patch in the first place?
+-- 
+pw-bot: cr
 
