@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-221402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF604B5071E
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:32:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5F72B50720
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E74481C234BD
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:33:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 460203A60AA
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22580258EE9;
-	Tue,  9 Sep 2025 20:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD6D3570C2;
+	Tue,  9 Sep 2025 20:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="etzaXcfz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LtY8XwGy"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568B623C506
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 20:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251542E1746;
+	Tue,  9 Sep 2025 20:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757449963; cv=none; b=O8qMoLLZLMy62NAjMC3QKnd8vaITl4ptMZj1QSrSS0k8piexrbAozvYt3CfZKyi9t3QXopz66QdaHRytCFbuOhfpENfnJ0qVVHRaJD0WnFF6KZMwi0sQQVRP8/cIjyLE45gnlXWtZDqPTZUDDgR8pCT95o6OkLByXMNNWeUHFew=
+	t=1757449964; cv=none; b=LFwQMtKKyzRR/yrrP+4i42SlFyqTBSSZ8y25Kcl+opMOQEo7GZYlhaF1vX4oTtlfPtwj+o8eDhw6kh1USzr9YNVJFOU/GXevEOnJMhAcKj06zixHHnmlXWiy+A6AN6ZEdnMxydI3BGfJMZ1i/Mo7SZ9K8zvMLpL+91u41buw7lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757449963; c=relaxed/simple;
-	bh=f4Z7sZJ3Pgb51Rp+WK+mZ/BcK0XnwXWUnPJWIeRtL3k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JHKAVyI9AiGcLLkqiPwihcYUxQ/z6s1JbwZUySX1awHy2zGIc2AF+a9ZA+FXNOr0rHpoXwzTACa3nombaQDU8VS1eRccB6wWdAZ1QdTPcIGim9NeqTv9bK3EM9vZ4zAUITuJMSyr4lAT/Aiiy2bt2PeakvMcwh4254wna4p8QPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=etzaXcfz; arc=none smtp.client-ip=198.175.65.19
+	s=arc-20240116; t=1757449964; c=relaxed/simple;
+	bh=VAI0WXbXUb5x9r3u4rQKLO6ou4RNUkmvBE8iI+zQUTM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QlOlg1koGbVBSc15ZUOXuIzkKzgSKo+/nae+lOjVbYwyNIQ3XSe/pC591P9FiZnLpqeharuj9nPKNAiJRgoUWF2eW3poQ1kw94L3PZt0eVLfThyoAnoCbSQRBQitp5NyqxeuFuqt8GCY3yAsM/bULxSJ52TkceGDb/GPZcF5nOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LtY8XwGy; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757449962; x=1788985962;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=f4Z7sZJ3Pgb51Rp+WK+mZ/BcK0XnwXWUnPJWIeRtL3k=;
-  b=etzaXcfzVioU4srLhB7TcLr+vm02ke4nhpd9oLNjkFVOCtgHGVxRxJqH
-   UcygbcoYabAZFvrTQRTJnVYsVvVEpsFypNrDAyKPBbo5Z1G7XE+RKNH6L
-   yT1MRlzcAwr2jPFJYY9UA7N/WmGRb0jMUyWJIU+D/8J4hK+QqVYioqW7B
-   lihN4CSzDzYnPpogeetVw6i+LUJdneH6u7LX/Ou3Cy8mx8GmSmME5x9Fl
-   CqSDzrJu11wSK3R82DJi+ZksQFKqG6zytftWSOrCNGDSqmJX+nhlFAYmQ
-   eQZDeITFPFZYhAP5F1cTcmpacW05WlyT/6zuPYLD3sXuYg0yR0FMqazXG
-   w==;
-X-CSE-ConnectionGUID: TuSYjKMzQZmQ0h7W0QRSag==
-X-CSE-MsgGUID: a2N/rhHqQbiLkSbhu/5zsg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="59606751"
+  t=1757449963; x=1788985963;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VAI0WXbXUb5x9r3u4rQKLO6ou4RNUkmvBE8iI+zQUTM=;
+  b=LtY8XwGyR0lbhEeqAmMLTu5b7lb0Ssml8NXc18oHPZBPdyLk/c97nBDD
+   uH8nBj41LGv8nKeMqkMrLWZbW35/dvb779Ia8oVJg/M7mvrvyxq+dumRi
+   D/2eMhTXEizFp9CDZLIfhKxvx7c+2jrDtMoxee9EraD0hBeGPVy4/8olV
+   +L4J4VRA70EpOEvuw3P4vOJGPtiASAu7AdcFbrRqmVm47FfUcm4MbTDnD
+   CzmBADDLVBwZZtJJZvbrRla5UIFG2sVske7f8+EGQujQ8r/DCVDkdAMM1
+   r7Q3AZXWXi2R64fFb4Ng3wwFNPWn1InedsSjNxi46FsBgtyfZDTyL6SU/
+   g==;
+X-CSE-ConnectionGUID: HXhtTh7FRVGubFXicgsu9A==
+X-CSE-MsgGUID: 3pjQxB6tQbubOaRIrsL4bg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="59606757"
 X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="59606751"
+   d="scan'208";a="59606757"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 13:32:41 -0700
-X-CSE-ConnectionGUID: VaMIfMXkQr+9neYoE/F1CQ==
-X-CSE-MsgGUID: As/POrrcRSaeOebPNM3DIQ==
+X-CSE-ConnectionGUID: N005NoPbQnSwMNb53EdE4g==
+X-CSE-MsgGUID: Fsb2p+UnQ1K6zj85stz/lg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="173287020"
+   d="scan'208";a="173287025"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa008.jf.intel.com with ESMTP; 09 Sep 2025 13:32:40 -0700
+  by orviesa008.jf.intel.com with ESMTP; 09 Sep 2025 13:32:41 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -64,11 +65,29 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates 2025-09-09 (igb, i40e)
-Date: Tue,  9 Sep 2025 13:32:30 -0700
-Message-ID: <20250909203236.3603960-1-anthony.l.nguyen@intel.com>
+Cc: Tianyu Xu <tianyxu@cisco.com>,
+	anthony.l.nguyen@intel.com,
+	xtydtc@gmail.com,
+	kurt@linutronix.de,
+	sriram.yagnaraman@ericsson.com,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	bpf@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Joe Damato <joe@dama.to>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Rinitha S <sx.rinitha@intel.com>
+Subject: [PATCH net 1/4] igb: Fix NULL pointer dereference in ethtool loopback test
+Date: Tue,  9 Sep 2025 13:32:31 -0700
+Message-ID: <20250909203236.3603960-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250909203236.3603960-1-anthony.l.nguyen@intel.com>
+References: <20250909203236.3603960-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,44 +96,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For igb:
-Tianyu Xu removes passing of, no longer needed, NAPI id to avoid NULL
-pointer dereference on ethtool loopback testing.
+From: Tianyu Xu <tianyxu@cisco.com>
 
-Kohei Enju corrects reporting/testing of link state when interface is
-down.
+The igb driver currently causes a NULL pointer dereference when executing
+the ethtool loopback test. This occurs because there is no associated
+q_vector for the test ring when it is set up, as interrupts are typically
+not added to the test rings.
 
-For i40e:
-Michal Schmidt corrects value being passed to free_irq().
+Since commit 5ef44b3cb43b removed the napi_id assignment in
+__xdp_rxq_info_reg(), there is no longer a need to pass a napi_id to it.
+Therefore, simply use 0 as the last parameter.
 
-Jake sets hardware maximum frame size on probe to ensure
-expected/consistent state.
+Fixes: 2c6196013f84 ("igb: Add AF_XDP zero-copy Rx support")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Joe Damato <joe@dama.to>
+Signed-off-by: Tianyu Xu <tianyxu@cisco.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-The following are changes since commit e3c674db356c4303804b2415e7c2b11776cdd8c3:
-  tunnels: reset the GSO metadata before reusing the skb
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
-
-Jacob Keller (1):
-  i40e: fix Jumbo Frame support after iPXE boot
-
-Kohei Enju (1):
-  igb: fix link test skipping when interface is admin down
-
-Michal Schmidt (1):
-  i40e: fix IRQ freeing in i40e_vsi_request_irq_msix error path
-
-Tianyu Xu (1):
-  igb: Fix NULL pointer dereference in ethtool loopback test
-
- .../net/ethernet/intel/i40e/i40e_adminq_cmd.h |  1 +
- drivers/net/ethernet/intel/i40e/i40e_common.c | 34 +++++++++++++++++++
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 18 ++++++----
- .../net/ethernet/intel/i40e/i40e_prototype.h  |  2 ++
- drivers/net/ethernet/intel/igb/igb_ethtool.c  |  5 +--
- drivers/net/ethernet/intel/igb/igb_main.c     |  3 +-
- 6 files changed, 50 insertions(+), 13 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index a9a7a94ae61e..453deb6d14b3 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -4453,8 +4453,7 @@ int igb_setup_rx_resources(struct igb_ring *rx_ring)
+ 	if (xdp_rxq_info_is_reg(&rx_ring->xdp_rxq))
+ 		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
+ 	res = xdp_rxq_info_reg(&rx_ring->xdp_rxq, rx_ring->netdev,
+-			       rx_ring->queue_index,
+-			       rx_ring->q_vector->napi.napi_id);
++			       rx_ring->queue_index, 0);
+ 	if (res < 0) {
+ 		dev_err(dev, "Failed to register xdp_rxq index %u\n",
+ 			rx_ring->queue_index);
 -- 
 2.47.1
 
