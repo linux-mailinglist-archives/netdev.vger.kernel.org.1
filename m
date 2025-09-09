@@ -1,153 +1,164 @@
-Return-Path: <netdev+bounces-221180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AED36B4AC93
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:45:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2005EB4ACBD
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:49:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CA203A4772
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:44:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D3FF1C24C74
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FC0322C9D;
-	Tue,  9 Sep 2025 11:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XyTwht4j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF59D326D54;
+	Tue,  9 Sep 2025 11:48:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E49321F5F;
-	Tue,  9 Sep 2025 11:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A003322DC2
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 11:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757418235; cv=none; b=aokqRtx/tsDnjo7o4Y7W2TUGxnUAG+DIUZaebYfVXmRr2dGlSGnQiUlVRygUbwkYTY8cF/UNqXVlN+79ZSJ1enddTyzF7AuWr0XT4wDT8Wo0pg4GhlgZO8pOd497Gd2h7pfmDvRfhiGftM3MihkEBIR82AUFMxSrJ4Ly9wQhVi4=
+	t=1757418518; cv=none; b=khKSK/8tyeLwmHQDDV+Ld8DGuF2ThIr+zujqzjidy94cSWo+kiCmvEpNqVsirdU0eX1aLwylamku1kB7iokw7UcRzpB0Y6wIWgLMtAIeANf1455GMvK6OuVmSHcKYliZJJYqggTwF+XqtDIgNL916GasK/1SJrzXcNH1owQ1R1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757418235; c=relaxed/simple;
-	bh=QNLvONbgW7trZwwSydjiOMR0HSL3JfRtasB3XPqBLKs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k6gcvhb+sk8pvj1X1xr4FxasDR+1P5JVpHpqXZum0fWe0X7CtKJnXUsHEzmyvh/orYiwgNjjr+MW+5XiX6Oh3vGFJWMBnCigsXI5bIlc+ZVl9UQJYHjZZzZYuaR7MvAtQD+j7DlLPjU/N5ZMFvq4jjvRKGR2oqo1Kv/UmLw8bEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XyTwht4j; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58979YqT006469;
-	Tue, 9 Sep 2025 11:43:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Lml3iW
-	12NF2VgpHkjOdCj8kMU3oLxxqSLyu+0o8gqms=; b=XyTwht4jnc043GWcPdeIYy
-	Vh705GWKPgW9ySUvtA8oQVqOV12PKmpb7cLjzhysgpnuDA82XnEbIdxkiJ2EInoU
-	J2tz0dGRki95ynnlq8Y3N9QHg+zaTfIgyVBi+qz6xrR1/K33o4o9QLpHJr3Sxylw
-	zzTEK5+Ygq8be4A7zbV0liK0BgqC7ysz2plZyIET9Gs2WOMej4Y6Ni83K5cPbDSp
-	NuZ+Ikt2GaDxp8kDM8emo6T+hP+C2Z1C48Sywk4ioeCuloEdbnDR0MJvlr+m6BfH
-	4pDOhDO9f6HNea5+RJpbDlUZHcjh0aPYu7MKoYUhkH/EMLjvg0Z1KWrT9OzkD9VA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwqe5b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 11:43:46 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 589BdcD0011485;
-	Tue, 9 Sep 2025 11:43:45 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwqe58-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 11:43:45 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 589AGevm010671;
-	Tue, 9 Sep 2025 11:43:44 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4910smttyq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 11:43:44 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 589BhhnU32244272
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Sep 2025 11:43:43 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1EE7658062;
-	Tue,  9 Sep 2025 11:43:43 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 92E8D5805F;
-	Tue,  9 Sep 2025 11:43:37 +0000 (GMT)
-Received: from [9.124.223.138] (unknown [9.124.223.138])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  9 Sep 2025 11:43:37 +0000 (GMT)
-Message-ID: <8bc987c9-a79d-42ec-8279-da8b407cfd2c@linux.ibm.com>
-Date: Tue, 9 Sep 2025 17:13:35 +0530
+	s=arc-20240116; t=1757418518; c=relaxed/simple;
+	bh=043hCoM+AFPSLJebSeLJZ3V5npElSfYglJ1Em1klq2A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P9+KBkGqC4bh9VFmN25RPHbMFB+ddDDrjJyNrx5KLMGF1Rpwb+YVDdPsjGd76eY/p8x8sJmsJ+3EdlzPgiwAgiBcZD9sMEhCkDOlfae9UvXNsz4vIzyiQphyouUrH0JKL/Fa502o9o/faM0DRFSnVlViy6y0B2XCUYrMM5R9eME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uvwph-0003pA-II; Tue, 09 Sep 2025 13:48:21 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uvwpg-000PdL-0t;
+	Tue, 09 Sep 2025 13:48:20 +0200
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id DCC37469E83;
+	Tue, 09 Sep 2025 11:48:19 +0000 (UTC)
+Date: Tue, 9 Sep 2025 13:48:19 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, 
+	Robin van der Gracht <robin@protonic.nl>, kernel@pengutronix.de, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	linux-can@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, Kurt Van Dijck <dev.kurt@vandijck-laurijssen.be>
+Subject: Re: [PATCH] can: j1939: implement NETDEV_UNREGISTER notification
+ handler
+Message-ID: <20250909-eminent-gazelle-from-sirius-57ff0c-mkl@pengutronix.de>
+References: <50055a40-6fd9-468f-8e59-26d1b5b3c23d@I-love.SAKURA.ne.jp>
+ <aKg9mTaSxzBVpTVI@pengutronix.de>
+ <bb595640-0597-4d18-a9e1-f6eb8e6bb50e@I-love.SAKURA.ne.jp>
+ <c1e50f41-da30-4cea-859c-05db0ab8040b@I-love.SAKURA.ne.jp>
+ <ac9db9a4-6c30-416e-8b94-96e6559d55b2@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: Remove unused argument from 2 SMC functions
-To: dust.li@linux.alibaba.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        alibuda@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com
-Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20250909071145.2440407-1-mjambigi@linux.ibm.com>
- <aMAR8q4mc3Lhkovw@linux.alibaba.com>
-Content-Language: en-US
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-In-Reply-To: <aMAR8q4mc3Lhkovw@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hfDtMNXjC-T2ES5I-R_ZBNUNwm_cHNJk
-X-Proofpoint-ORIG-GUID: AC5zxmqGdM_n3FSj-CHGFsemWrCJsj6W
-X-Authority-Analysis: v=2.4 cv=J52q7BnS c=1 sm=1 tr=0 ts=68c012f2 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=SRrdq9N9AAAA:8
- a=_RSJUljnWL9c-VqT1lEA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyNSBTYWx0ZWRfXy78r1bCWJJ8y
- v2lG8Zri2tkMKjM0oV6iZ16dV+SADJTa/ZfH5nYKe7lTx8WtWVAk2teaUqZImn4SsYFJJCZ0Zhk
- s6Hgvv4SXRaw8yBIz7Ba1hEE54OVqt+KaM/cZVezjDV5GwbiBF6gFdyzrSQ2b4iSixMPWHEOISq
- pRyQzEXlskqzew8Oikt8HF3WtLtjIBQcPbDNzWASmsfuRFSb990VaRtVtvMcw+cqm6kkOgt/I7v
- ZHIZoeX/BZd6TdVhl0hS9UBTN3WS47CxxM8xUgJ+yX3aC4yAD8NAFMDMsQ8+934SS89GKe3ZUs/
- vKqX0WCc4exvBesnqgMkDPosKfzclK9ZqmslwNJtsXQkAKBSJJjpRUcnNa5tT+2af44rdVd1m1B
- 2qR6EeML
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-09_01,2025-09-08_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1015 suspectscore=0 spamscore=0 phishscore=0
- bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060025
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nix5qo54czp344ou"
+Content-Disposition: inline
+In-Reply-To: <ac9db9a4-6c30-416e-8b94-96e6559d55b2@I-love.SAKURA.ne.jp>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 09/09/25 5:09 pm, Dust Li wrote:
-> On 2025-09-09 09:11:45, Mahanta Jambigi wrote:
->> The smc argument is not used in both smc_connect_ism_vlan_setup() &
->> smc_connect_ism_vlan_cleanup(). Hence removing it.
->>
->> Fixes: 413498440e30 net/smc: add SMC-D support in af_smc
-> 
-> The standard format for the Fixes tag requires the title to be enclosed
-> in parentheses.
 
-I missed this. Let me fix it in next version.
+--nix5qo54czp344ou
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] can: j1939: implement NETDEV_UNREGISTER notification
+ handler
+MIME-Version: 1.0
 
-> 
-> But I don't think this is a bugfix.
+On 25.08.2025 23:07:24, Tetsuo Handa wrote:
+> syzbot is reporting
+>=20
+>   unregister_netdevice: waiting for vcan0 to become free. Usage count =3D=
+ 2
+>=20
+> problem, for j1939 protocol did not have NETDEV_UNREGISTER notification
+> handler for undoing changes made by j1939_sk_bind().
+>=20
+> Commit 25fe97cb7620 ("can: j1939: move j1939_priv_put() into sk_destruct
+> callback") expects that a call to j1939_priv_put() can be unconditionally
+> delayed until j1939_sk_sock_destruct() is called. But we need to call
+> j1939_priv_put() against an extra ref held by j1939_sk_bind() call
+> (as a part of undoing changes made by j1939_sk_bind()) as soon as
+> NETDEV_UNREGISTER notification fires (i.e. before j1939_sk_sock_destruct()
+> is called via j1939_sk_release()). Otherwise, the extra ref on "struct
+> j1939_priv" held by j1939_sk_bind() call prevents "struct net_device" from
+> dropping the usage count to 1; making it impossible for
+> unregister_netdevice() to continue.
+>=20
+> Reported-by: syzbot <syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.co=
+m>
+> Closes: https://syzkaller.appspot.com/bug?extid=3D881d65229ca4f9ae8c84
+> Tested-by: syzbot <syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com>
+> Fixes: 9d71dd0c7009 ("can: add support of SAE J1939 protocol")
+> Fixes: 25fe97cb7620 ("can: j1939: move j1939_priv_put() into sk_destruct =
+callback")
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-Yeah, its more of a clean up code. Should I use net-next? How should I
-got about this.
+Applied to linux-can.
 
-> 
-> 
->> Signed-off-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
->> Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
-> 
-> Besides,
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> 
-> Best regards,
-> Dust
+> --- a/net/can/j1939/socket.c
+> +++ b/net/can/j1939/socket.c
+> @@ -1303,6 +1303,55 @@ void j1939_sk_netdev_event_netdown(struct j1939_pr=
+iv *priv)
+>  	read_unlock_bh(&priv->j1939_socks_lock);
+>  }
+> =20
+> +void j1939_sk_netdev_event_unregister(struct j1939_priv *priv)
+> +{
+> +	struct sock *sk;
+> +	struct j1939_sock *jsk;
+> +	bool wait_rcu =3D false;
+> +
+> + rescan: /* The caller is holding a ref on this "priv" via j1939_priv_ge=
+t_by_ndev(). */
+   ^^
 
+I've removed the space while applying the patch.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--nix5qo54czp344ou
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjAFAAACgkQDHRl3/mQ
+kZxAUwf9FZ+BFFz8LaPIT5LOqADuG61A3eMvYR/9mfoxOEHypL9Sbre540OgeWRT
+kq9d7iL6g4rvLINaM+4KOJJ+jEQyuJE3lCFKLP9fDrtVODELzlx3lX7gOyJEKRNE
+R0g2ERmhYMJqzgnZpRwt4Pof/I6sYM0fTDugN2PxIF7i2RwXC+qw1jq7q4fzxgHE
+A0wAeXujBgpBdoaaNcwLhsVDgm2l860F0yN8Crii0UlXL0CY9frsHKF0uRQTyHl6
+jEbXFW9UWk4RlUjTrK4+Qx/DDjD+cgpNgAnENZKGpP+mFvpfsdqEeGfbw/kRsym7
+9+DJPH/rTIZdfLyiAniwW/IOqyzxTA==
+=akSg
+-----END PGP SIGNATURE-----
+
+--nix5qo54czp344ou--
 
