@@ -1,141 +1,148 @@
-Return-Path: <netdev+bounces-221109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D97E3B4A4EC
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:17:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DFD2B4A4FA
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:19:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B83444806E
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 08:17:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 044A67A8EB6
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 08:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7CB23AB90;
-	Tue,  9 Sep 2025 08:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B7523D7EC;
+	Tue,  9 Sep 2025 08:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="POOEaJgs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C1Ay7rIM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EE51EFF8D;
-	Tue,  9 Sep 2025 08:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF967181CFA;
+	Tue,  9 Sep 2025 08:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757405837; cv=none; b=ftVlZ6RezxdLwj4iiTALE6MuzK/IWJjFNv0b0vBAscvgo7U10DdiLmkd+FdgvNeNitH1ldqnckFexF19PRWyzfcFGThoFTHhzyvIHtAM3o0jHA7VSFWoXEzAiqZLPb/TR4OxNQP8Etgq/NNK6+27WFJYGDHAGMkoljIXpvXzHlQ=
+	t=1757405947; cv=none; b=N2fFeMJqQVtmBGg3gjeH9dN1ztKnXZTXwHOI/+zfYbqCyN24cgo/DVULwOqVLMu0aglUrllktvYHq6bRmDWujbqUp2bq87cQOdmuSrHk9rR9PpM3AEv1l/raNfj7+0mUeWUNXZj8h1vWzuXuY5prilKQ2XdpsO2AjTTNK9y009o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757405837; c=relaxed/simple;
-	bh=aUipS3kMgeo7GLk2uFdvRr6hRbolwvX3LCt7v+k4h+4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VIp7pSO/edxPbZ+Dg3fSKEi9ZfQWNvkqSdmK+BPeXYqfx+ozgVNCP4VzTyb4EHFE4nCXsWnEd6J0EUvuidpmhEGvUatPsWNxwwX6qlbYdoBm+yZxq3y+qiFml6hQxSQDDLaX+s3tINzXz+NXc93X55H4oOOVF7mdPEy1R/ntg7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=POOEaJgs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE6DC4CEF4;
-	Tue,  9 Sep 2025 08:17:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757405835;
-	bh=aUipS3kMgeo7GLk2uFdvRr6hRbolwvX3LCt7v+k4h+4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=POOEaJgsduUADvA5q1LlQQLKbkl92ygv1THhB7+JNKBZlYnoEugikR5Fgn40tXVdD
-	 0tZL6ojACJRfRPly2PTQVNsMS5BOcGwSRdXARY3dV9S80JzYBl74E6ndAizOTDwQXe
-	 ZXsBNRAkW3f/E7A0PfnUrLHj/M7u2hImU9ORA8iJrt2FdagQMGY+b5GFlcfR8cMN6I
-	 a6UPIU4MGU8mWMCFFKnz0NeCSzBz0geQ3nKU6Jj+53OFpNJ1QPW66aUjS9xKF40v7X
-	 UQAQpza+sXc6gkgFw/+o6E60QljvmnoiFxFbhx6kKIGuo5S2WqgKZaHiFzQ9kFdc9g
-	 fYdqunULu1rOQ==
-Date: Tue, 9 Sep 2025 11:17:09 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Cc: jgg@ziepe.ca, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	andrew.gospodarek@broadcom.com, selvin.xavier@broadcom.com,
-	michael.chan@broadcom.com
-Subject: Re: [PATCH rdma-next 00/10] RDMA/bnxt_re: Add receive flow steering
- support
-Message-ID: <20250909081709.GB341237@unreal>
-References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
- <175734586236.468086.14323497345307202416.b4-ty@kernel.org>
- <CAH-L+nPP+UU_0NQTh_WTNrrJ5t9GraES0x2r=FyvDMW_Wk2tEg@mail.gmail.com>
+	s=arc-20240116; t=1757405947; c=relaxed/simple;
+	bh=UOs1D2zaTKzVNvaXvVUug3+A+pozaCT5dX8It7FgCbE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i2ZXfbhQCfIeiRIC9fX7H6BhI2f92OLkm+N7imV+Vg4iEEC8yX7ujQJAHdkuurIArAgRks0KBH0Reudch9LmEiuZMhiNth0S4zWucIUMIuA0gmp+DenL2lc0p0hHcYVr4GB36PWSIwCTQZnsiUReXHKlQAs/rksPMX7Vi4gRlYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C1Ay7rIM; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b4fb8d3a2dbso3313147a12.3;
+        Tue, 09 Sep 2025 01:19:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757405945; x=1758010745; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UQCVIQ4ZNeoL3O3c1h4pVx8WIYjn5htIpwze/ZKsILQ=;
+        b=C1Ay7rIMLIvw69cNSsR6wSGtENMRUuz9uJtyXfjUl3irRocRF7Aztk9970jSECrx7A
+         3QgcZ59aTfcgJyPCvtjjt8uGG+Zl7QI3nX5ypxLnHuHsLfSUUsShZkk94tS29VnDgZoX
+         e+k3zifv72h6qTHdnzUJ1HAjA9tSBqYJhOyEVBl+W01zhxyw9qERTFXjre9Jtxarcco1
+         DK5Q13hlJBPdelYviSK2BuLNvFXNxQd/5VnEcffQwybCwSP5GC7GcfIrA1INNwA4XTLX
+         U7Xh4dKG7ygbuj9qQcTpA7JQshw2szckE4uWuR8gXserbH/5EMlK04t6ALYxk4Kz21WI
+         Jp4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757405945; x=1758010745;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UQCVIQ4ZNeoL3O3c1h4pVx8WIYjn5htIpwze/ZKsILQ=;
+        b=iGzRMgcr5pDAGCsWXYcbY7R2U7aFYwfwYSR+644FqVMr+QJqaLRb4AaOpm8q2etyx6
+         FIQhc0oe3ThuLCu56djH+NkcyU0kfy0IH7eOC39dvUObpMHWUuymUVEhhxxbCWfiWRQ/
+         f2U/XQxWod6sW9a3cVUDcDvwgC9dvj7QaGgweL6EFCGn7bpcfJkAW/3eusM9Fs8i4ZpO
+         MchAI2+o7PXt0hqcvu1exrMa4bsbRTa1r/kiECyqWS9J498rHM7pdEvRhgsPavTkpfhz
+         pDLXM+iToi2qSrTYfeoG/k3D9f7carACUrYWUbhvamyY/Auj4r8FgG0CuuV/MeLpdVs4
+         vtgA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOUkFQhU4jjtobu7wKKQpaXtZiGvUBwyLdS+mt+Cf04cdjGQhtLxlf/2Atxi5u8ce79yS26L/2QuYu37/mdbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0rC/NttlDhJiSn45nqVPdhXR528LfGq5VZB3bktotMWJCb1jK
+	9uCac12iMJJPNnGH734burQr7I2A5BgERFrXsL7t1r2qwavyqhMQs/yBZ69uwsdHBgQ=
+X-Gm-Gg: ASbGncssYjcVzUe/vwbqSuYZBOKUL42lNXhf5iGb2lXHkFXEREU3x2G/ye/cU8oe6Nd
+	FpvvH6yE8t9e6EbShDsGkR+CJHxxahlcHMeVDXhvWWR/+I3xsvwvF2TvAY/owdpUJGx8PNpSRKC
+	6FRgH6IfqG0IW/a5R87LWKGbEMW4EqUSusK3zlgAB97DxUu+NdEbCUDZe8uvoCHgNKKEMs7GBTr
+	PtqvWNKdybZcrOUw1jJ76IEiRXWlPefKNDvarAxZnxhz7y9jELZZKDDGostSmFJyHSXiN0GBinC
+	gl/H6xfx+9Zn32v9rj+zF9G7UNGaAx95xMdvVl+pG2Qlz0lsJU4Qy7sfuakSw7nZbDmqOwNZF88
+	p3AQFS5DYVgU/pBMVwYnd06v72+fs2VQBzwGajFu5sQq212Dv6vL6
+X-Google-Smtp-Source: AGHT+IHOwAF6ey8JXaYopBWq9/Uhe7RT1srRJ5PBZryhDlCcrPMiCboRAz+KtxEzy/adPCaSbItKSw==
+X-Received: by 2002:a17:903:b8b:b0:246:620:a0b9 with SMTP id d9443c01a7336-25176729c6fmr119760875ad.61.1757405944709;
+        Tue, 09 Sep 2025 01:19:04 -0700 (PDT)
+Received: from fedora.redhat.com ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24c7ecd9cafsm174370575ad.83.2025.09.09.01.18.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Sep 2025 01:19:04 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sdubroca@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 0/5] net: common feature compute for upper interface
+Date: Tue,  9 Sep 2025 08:18:47 +0000
+Message-ID: <20250909081853.398190-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH-L+nPP+UU_0NQTh_WTNrrJ5t9GraES0x2r=FyvDMW_Wk2tEg@mail.gmail.com>
 
-On Mon, Sep 08, 2025 at 09:24:39PM +0530, Kalesh Anakkur Purayil wrote:
-> Hi Leon,
-> 
-> It looks like you have merged V1 of the series. I had already pushed a V2
-> of the series which fixes an issue in Patch#10.
-> 
-> I can push the changes made in Patch#10 as a follow up patch. Please let me
-> know.
+Some high-level virtual drivers need to compute features from their
+lower devices, but each currently has its own implementation and may
+miss some feature computations. This patch set introduces a common function
+to compute features for such devices.
 
-No need, I fixed it locally.
+Currently, bonding, team, and bridge have been updated to use the new
+helper.
 
-Thanks
+v3:
+a) fix hw_enc_features asign order (Sabrina Dubroca)
+b) set virtual dev feature defination in netdev_features.h (Jakub Kicinski)
+c) remove unneeded err in team_del_slave (Stanislav Fomichev)
+d) remove NETIF_F_HW_ESP test as it needs to be test with GSO pkts (Sabrina Dubroca)
 
-> 
-> On Mon, Sep 8, 2025 at 9:07 PM Leon Romanovsky <leon@kernel.org> wrote:
-> 
-> >
-> > On Fri, 22 Aug 2025 09:37:51 +0530, Kalesh AP wrote:
-> > > The RDMA stack allows for applications to create IB_QPT_RAW_PACKET
-> > > QPs, which receive plain Ethernet packets. This patch adds
-> > ib_create_flow()
-> > > and ib_destroy_flow() support in the bnxt_re driver. For now, only the
-> > > sniffer rule is supported to receive all port traffic. This is to support
-> > > tcpdump over the RDMA devices to capture the packets.
-> > >
-> > > Patch#1 is Ethernet driver change to reserve more stats context to RDMA
-> > device.
-> > > Patch#2, #3 and #4 are code refactoring changes in preparation for
-> > subsequent patches.
-> > > Patch#5 adds support for unique GID.
-> > > Patch#6 adds support for mirror vnic.
-> > > Patch#7 adds support for flow create/destroy.
-> > > Patch#8 enables the feature by initializing FW with roce_mirror support.
-> > > Patch#9 is to improve the timeout value for the commands by using
-> > firmware provided message timeout value.
-> > > Patch#10 is another related cleanup patch to remove unnecessary checks.
-> > >
-> > > [...]
-> >
-> > Applied, thanks!
-> >
-> > [01/10] bnxt_en: Enhance stats context reservation logic
-> >         https://git.kernel.org/rdma/rdma/c/47bd8cafcbf007
-> > [02/10] RDMA/bnxt_re: Add data structures for RoCE mirror support
-> >         https://git.kernel.org/rdma/rdma/c/a99b2425cc6091
-> > [03/10] RDMA/bnxt_re: Refactor hw context memory allocation
-> >         https://git.kernel.org/rdma/rdma/c/877d90abaa9eae
-> > [04/10] RDMA/bnxt_re: Refactor stats context memory allocation
-> >         https://git.kernel.org/rdma/rdma/c/bebe1a1bb1cff3
-> > [05/10] RDMA/bnxt_re: Add support for unique GID
-> >         https://git.kernel.org/rdma/rdma/c/b8f4e7f1a275ba
-> > [06/10] RDMA/bnxt_re: Add support for mirror vnic
-> >         https://git.kernel.org/rdma/rdma/c/c23c893e3a02a5
-> > [07/10] RDMA/bnxt_re: Add support for flow create/destroy
-> >         https://git.kernel.org/rdma/rdma/c/525b4368864c7e
-> > [08/10] RDMA/bnxt_re: Initialize fw with roce_mirror support
-> >         https://git.kernel.org/rdma/rdma/c/d1dde88622b99c
-> > [09/10] RDMA/bnxt_re: Use firmware provided message timeout value
-> >         https://git.kernel.org/rdma/rdma/c/d7fc2e1a321cf7
-> > [10/10] RDMA/bnxt_re: Remove unnecessary condition checks
-> >         https://git.kernel.org/rdma/rdma/c/dfc78ee86d8f50
-> >
-> > Best regards,
-> > --
-> > Leon Romanovsky <leon@kernel.org>
-> >
-> >
-> >
-> 
-> -- 
-> Regards,
-> Kalesh AP
+v2:
+a) remove hard_header_len setting. I will set needed_headroom for bond/team
+   in a separate patch as bridge has it's own ways. (Ido Schimmel)
+b) Add test file to Makefile, set RET=0 to a proper location. (Ido Schimmel)
 
+Hangbin Liu (5):
+  net: add a common function to compute features from lowers devices
+  bonding: use common function to compute the features
+  team: use common function to compute the features
+  net: bridge: use common function to compute the features
+  selftests/net: add offload checking test for virtual interface
+
+ drivers/net/bonding/bond_main.c             |  99 +-------------
+ drivers/net/team/team_core.c                |  78 +----------
+ include/linux/netdev_features.h             |  18 +++
+ include/linux/netdevice.h                   |   1 +
+ net/bridge/br_if.c                          |  22 +---
+ net/core/dev.c                              |  76 +++++++++++
+ tools/testing/selftests/net/Makefile        |   1 +
+ tools/testing/selftests/net/config          |   1 +
+ tools/testing/selftests/net/vdev_offload.sh | 137 ++++++++++++++++++++
+ 9 files changed, 246 insertions(+), 187 deletions(-)
+ create mode 100755 tools/testing/selftests/net/vdev_offload.sh
+
+-- 
+2.50.1
 
 
