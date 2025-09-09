@@ -1,80 +1,96 @@
-Return-Path: <netdev+bounces-221444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4873EB50832
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:31:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93E2B50837
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CF2C1C226B9
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA5F71C630C8
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1603724679E;
-	Tue,  9 Sep 2025 21:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F432512F1;
+	Tue,  9 Sep 2025 21:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IMAfRLR6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3pLC60s"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9536F24169D;
-	Tue,  9 Sep 2025 21:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB0324EA9D;
+	Tue,  9 Sep 2025 21:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757453499; cv=none; b=tuV18KNATZ2Sy9gcsbAqTufHN44vGw8S5cORENY6gXadfc3QOGgPtoqyMT8n3pY3feMKatmghTKQMoR78MQbd4hKiSWHtu6YejHQLy15kBg8ZiqrKSlWjKnocmy6gI6avcQ7n0VChdfonhifIp3rgzaWB53QrwFbNiSfKv3waOc=
+	t=1757453579; cv=none; b=bverBrX9CxtVM1VcAUt9u7oPPsfXB0jcguokBwxOpDl4CJw3L9xWjcQTBdPA1I3JayvH5lArXhf2YpKdPNyyvKiCbWK3Pd3lQSYZTlA+3Jn6vTu2vNYfNo/AYyrlp7sDcT4Loq8J0di+EBl8GpXz002O5TrR22SeGsh/qbYQJwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757453499; c=relaxed/simple;
-	bh=/JTfYqqLUxISlJK7dn0vUWCxTKB6MQbM0XgscKTtVTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m26T/Vv/0Waj5sVB59VXCfcppbqevaUbXK+u2YRewJlqDXv8JvprNzqCeFDVXQr1PofnTJRL38LfAe6ns+JVUd4s5hr9Z1ePfRcp6EZhRZEMITybgqSePfLsReu+MX2u/qYxR+Bj2QKjLxqeuGGy+jK2yW+2A+Y3S/inn9IIXrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IMAfRLR6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=foiadcst+S3Y92KPZcC1u8rOc23oVP5IHFtiOAQaB1s=; b=IMAfRLR6YBvE2D13Xa6TiCsqUL
-	B5hY2Rd2RTIoi1ImhTAIAPsSvHy9IxMF7jBroKpk40aCNwWOTR1cLm4kjrkTCNQ6F25aVa+sMD67r
-	a8xnRVi69qDB6P4yhCzY0hlK0muAO08cdRWymHyM+tPBBKYDGkeOfzHx4OYiQM9tLi3o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uw5w2-007rYT-QM; Tue, 09 Sep 2025 23:31:30 +0200
-Date: Tue, 9 Sep 2025 23:31:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 3/3] net: phy: broadcom: Convert to
- PHY_ID_MATCH_MODEL macro
-Message-ID: <a40d1160-6980-4972-88d9-bdaf629fdb40@lunn.ch>
-References: <20250909202818.26479-1-ansuelsmth@gmail.com>
- <20250909202818.26479-3-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1757453579; c=relaxed/simple;
+	bh=21lhlUmkr0Bx5L+PohyX4S47cPMRfDplBXFD4mWmKUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=arPOBRaL3u+VxTsh1hU+jn0b9WuJ/GW7aaBCjVz9g688nlX2gdTWHnzobeIKJcOVXSQ7Fbs6I6TZAyv8FbodFf+GaYCl1zwqmNhf8lcmgOQeyAK1uc3lRfxHgn0zJi9gRD3HTltryPoig+YsVIk2wf65SVPv2iwf76mmLXAAgXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3pLC60s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DF48C4CEF4;
+	Tue,  9 Sep 2025 21:32:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757453578;
+	bh=21lhlUmkr0Bx5L+PohyX4S47cPMRfDplBXFD4mWmKUg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O3pLC60sHOiSJDSsTP6Jk3penu5RDG/7ItDW3IJnEcmNBZ22S2ohf9XpJUlyw/NdN
+	 sAMFPRMq2QxTTAeT/o3hcssH99xCT/LvQyBCjMLEtNexuIOaS/GqCTyMC8QMt8vTGm
+	 Er27sYy+rKozyLd+PVos0IZutYXaRLi/pIJCXxtag5bKNs3wx/WrMS5p1L+uWfchRl
+	 t4EXeNtwJL3n/ISoSU8mfbvjzm8U8Td8/5mTj2Ol+lrbz60jE3Hmy2yMzVb7Qv2hv4
+	 VEPhsXKxkpd5+vJMih4TjrtEK8SCxbqnbgwNs0VHWtJMIVbXMdXJK6SQpirEPhW9hP
+	 oWxceysH9RWVw==
+Date: Tue, 9 Sep 2025 14:32:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Florian
+ Fainelli <f.fainelli@gmail.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Kory Maincent <kory.maincent@bootlin.com>,
+ Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>, Donald
+ Hunter <donald.hunter@gmail.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Jiri Pirko <jiri@resnulli.us>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Russell King
+ <linux@armlinux.org.uk>, Divya.Koppera@microchip.com, Sabrina Dubroca
+ <sd@queasysnail.net>, Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v4 0/3] Documentation and ynl: add flow control
+Message-ID: <20250909143256.24178247@kernel.org>
+In-Reply-To: <20250909072212.3710365-1-o.rempel@pengutronix.de>
+References: <20250909072212.3710365-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250909202818.26479-3-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 09, 2025 at 10:28:12PM +0200, Christian Marangi wrote:
-> Convert the pattern phy_id phy_id_mask to the generic PHY_ID_MATCH_MODEL
-> macro to drop hardcoding magic mask.
+On Tue,  9 Sep 2025 09:22:09 +0200 Oleksij Rempel wrote:
+> This series improves kernel documentation around Ethernet flow control
+> and enhances the ynl tooling to generate kernel-doc comments for
+> attribute enums.
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Patch 1 extends the ynl generator to emit kdoc for enums based on YAML
+> attribute documentation.
+> Patch 2 regenerates all affected UAPI headers (dpll, ethtool, team,
+> net_shaper, netdev, ovpn) so that attribute enums now carry kernel-doc.
+> Patch 3 adds a new flow_control.rst document and annotates the ethtool
+> pause/pause-stat YAML definitions, relying on the kdoc generation
+> support from the earlier patches.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+The reason we don't render the kdoc today is that I thought it's far
+more useful to focus on the direct ReST generation. I think some of 
+the docs are not rendered, and other may be garbled, but the main
+structure of the documentation works quite well:
 
-    Andrew
+  https://docs.kernel.org/next/netlink/specs/dpll.html
+
+Could you spell out the motivation for this change a little more?
 
