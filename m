@@ -1,110 +1,109 @@
-Return-Path: <netdev+bounces-221039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144FAB49EDE
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:54:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBF34B49EE2
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:54:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC59F7A2FFE
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:52:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8E00188784F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:55:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBC123AB98;
-	Tue,  9 Sep 2025 01:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F2323B607;
+	Tue,  9 Sep 2025 01:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GgfGFxGO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pa4H41bq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA26870830;
-	Tue,  9 Sep 2025 01:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2D823ABA9;
+	Tue,  9 Sep 2025 01:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757382857; cv=none; b=nnvOGiy8AEAyHKzlNW/1TY9fcm1XuXM9F5ZhM9TXbT8G+9b++LfYK0BpwqylAzbK2MvGZUxecXkac7rmgVj3NzjXaaJnXahhWfGKSWKy3C+zHJpiQVi8mQQ8MRjE8jvt+9kcR5Kv28tTVlK3eioJ1/f6EgFYGl74Ww4Ti0zRvNU=
+	t=1757382890; cv=none; b=CXSpbEpxpjERG7OKPdmENCbAFaY69jXoyfaTiVGognri9uD2PXClpq7LrNJx5IUugP4ol9MI1LvB1lWWD8GwRtKCUjf0MC15nMhrw6PVbxNRaX2Y8EkI1Te+KY1OQUWMHq+ArAyy4CgfSySuCCPxJmWfsJAsz0hYTB9btK1UzbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757382857; c=relaxed/simple;
-	bh=DUV0VbC0IispzH18xs6mxDQDf2FUPLvedX7XB0qlw/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LBuad6tGJZOAa60BgIr5hYxGzLIR0KrYZ8AY3SQsuW1c8fPw2v0FTlzRRPjz9EVrpAiD3ZRCNCsIBH9RFHeYKeckEQnBhbqdArBQH7NgTlAkAjWKwiH7O1eyDaiKu7usYYT20esPYFkdCx/8Grvl+w6IFjPoC5NuQcGwIjcD2Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GgfGFxGO; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1757382850; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=BHNzWY7LLHrhrHNzpP3tvkmBTEprGJ4zhMbAFa1FifU=;
-	b=GgfGFxGOdFGw7xMdZrF/A/KI+F002hANbr2IFcOIAfHu9qsa9gJrOA1zt7siERvSByQgYN8g0Bu3PQGO4Cy95z/rdCaR5USLH3/QDp1JW/8+fwqjQj3RDqW0yucjMWQjS814K1aWDeSUb1bvNgY0tEqZojse9oF8pRnne6AAWgU=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Wnbr8Bw_1757382849 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 09 Sep 2025 09:54:09 +0800
-Date: Tue, 9 Sep 2025 09:54:09 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Julian Ruess <julianr@linux.ibm.com>,
-	Aswin Karuvally <aswin@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next 03/14] net/dibs: Create net/dibs
-Message-ID: <aL-IwWQN7ZUNdjky@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250905145428.1962105-1-wintera@linux.ibm.com>
- <20250905145428.1962105-4-wintera@linux.ibm.com>
+	s=arc-20240116; t=1757382890; c=relaxed/simple;
+	bh=eEWE839hB51pgDwSW7DeefwIoPMWaGYXGak7Af9RxlQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MH5RavWrVuYsO7V7PaZMNZ+7W8dpIGVXIO43nnIJ5xj+vFjkDt/Xl57M0KJE2psS37EBAEh8P78d+Gq+zTvxNCfOku0a22vyn+TpWA8Iw23BdGVBTExoj9RrpWkOdx6TOChd/LFKwxWsyNhmzl4oOq1ttbIdMJh/O15Mb7BRURk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pa4H41bq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C85BC4CEF1;
+	Tue,  9 Sep 2025 01:54:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757382889;
+	bh=eEWE839hB51pgDwSW7DeefwIoPMWaGYXGak7Af9RxlQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pa4H41bqxoum4kjDcCCMcrVZz9AVUaBZkoIgNqK8cFooDShnyX26niENC6x4KKRDi
+	 d+B3r06KiyWi/uk4S6jnOGTToPo72wBUQNPGrK46vlIRrfqXe8+oWl3DcG5AWhXUOe
+	 Ot+MBTWe0LR5seLXAeRgaA5aiTYJoGYF12jzwp7Xk2iiOCmtCA/8Qly/UfXQ9Psm9R
+	 CIn+DbLPVEsZk0zPPfyBFqT1BrDODTsyW0zQHRZnvkCpGnoP9vASf1pznOWwizAblQ
+	 JKoiPEQQCmlHz04SFc7A7l+akj+2JpKQr5Dzmb3GzmfVnkFgJQ8rYCXQ1Tr6Al9FPE
+	 HN5ABjVSHRpow==
+Date: Mon, 8 Sep 2025 18:54:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ stfomichev@gmail.com, martin.lau@kernel.org, mohsin.bashr@gmail.com,
+ noren@nvidia.com, dtatulea@nvidia.com, saeedm@nvidia.com,
+ tariqt@nvidia.com, mbloch@nvidia.com, maciej.fijalkowski@intel.com,
+ kernel-team@meta.com
+Subject: Re: [PATCH bpf-next v2 3/7] bpf: Support pulling non-linear xdp
+ data
+Message-ID: <20250908185447.233963c5@kernel.org>
+In-Reply-To: <20250905173352.3759457-4-ameryhung@gmail.com>
+References: <20250905173352.3759457-1-ameryhung@gmail.com>
+	<20250905173352.3759457-4-ameryhung@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250905145428.1962105-4-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2025-09-05 16:54:16, Alexandra Winter wrote:
->Create an 'DIBS' shim layer that will provide generic functionality and
->declarations for dibs device drivers and dibs clients.
->
->Following patches will add functionality.
->
->Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
->---
-> MAINTAINERS          |  7 +++++++
-> include/linux/dibs.h | 42 ++++++++++++++++++++++++++++++++++++++++++
-> net/Kconfig          |  1 +
-> net/Makefile         |  1 +
-> net/dibs/Kconfig     | 12 ++++++++++++
-> net/dibs/Makefile    |  7 +++++++
-> net/dibs/dibs_main.c | 37 +++++++++++++++++++++++++++++++++++++
-> 7 files changed, 107 insertions(+)
-> create mode 100644 include/linux/dibs.h
-> create mode 100644 net/dibs/Kconfig
-> create mode 100644 net/dibs/Makefile
-> create mode 100644 net/dibs/dibs_main.c
+On Fri,  5 Sep 2025 10:33:47 -0700 Amery Hung wrote:
+> + * Direct packet access allows reading and writing linear XDP data through
+> + * packet pointers (i.e., &xdp_md->data + offsets). 
 
-I recall we previously discussed the issue of which directory to place
-it in, and I don't have any strong preference regarding this. However,
-I'm not sure whether we reached an agreement on this point. In my
-opinion, placing it under the drivers/ directory seems more reasonable.
-But if net/ is OK, that works for me too.
+Add:
+ The amount of data which ends up in the linear part of the xdp_buf
+ depends on the NIC and its configuration. 
 
-Best regards,
-Dust
+> When an eBPF program wants
+> + * to directly access data that may be in the non-linear area, call this kfunc
+                         ^^^^
+          maybe s/data/headers
 
+> + * to make sure the data is available in the linear area.
+
+Should we add a mention here of the copy helpers and dynptr for
+accessing data without pulling?
+
+> + * This kfunc can also be used with bpf_xdp_adjust_head() to decapsulate
+> + * headers in the non-linear data area.
+> + *
+> + * A call to this kfunc is susceptible to change the underlying packet buffer.
+
+Maybe:
+ A call to this kfunc will modify the buffer geometry.
+
+> + * Therefore, at load time, all checks on pointers previously done by the
+> + * verifier are invalidated and must be performed again, if the kfunc is used
+> + * in combination with direct packet access.
+
+>	void *data_end = xdp->data + len;
+
+nit: I think the code would be easier to follow if we renamed this 
+to "new_end"?
+
+
+Larger note: I wonder if we should support "shifting the buffer down"
+if there's insufficient tailroom. XDP has rather copious headroom,
+but tailroom may be pretty tight, and it may depend on the length of
+the headers. So if there's not enough tailroom but there's enough
+headroom -- should we try to memmove the existing headers?
 
