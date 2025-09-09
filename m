@@ -1,118 +1,140 @@
-Return-Path: <netdev+bounces-221083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B48A7B4A34C
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:17:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 828FBB4A35D
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC4AC1768A4
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:17:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33ACB16F600
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BCD30507E;
-	Tue,  9 Sep 2025 07:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DA82FB083;
+	Tue,  9 Sep 2025 07:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mRI7PeqQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D579E239E70
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 07:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BF41F63CD
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 07:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757402264; cv=none; b=tmqqh52/BhScdJ1bq9Y3HIXnAysCQ840QL5gSYANkoZB8G6PswP3tFeMe/9i64GmZ9E9uFlQl0N4FmlZr8XKsliUPzRh5dPFigWWyHC/ryPU1GxSV3G5xB5dSZSt64dphEuBqqdTSs/voQc6hoyaQPkdihroVMVWqUbu0eaCvxo=
+	t=1757402469; cv=none; b=QnzlaW8aTXChH+OjfUys4o6+l7xMF5VpkeNq/OXHXW2RJXKN2GwLnQE96HB/Jz3QH2FvuS8ZDGehiIzMulHKB633whzT782ZddJwIHby/2s4JZP032QVaMaPJWQgA+vm9BS36p14yVg0Q5HEPHrKg/aVoeLucOlZdpVa9jhQ3jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757402264; c=relaxed/simple;
-	bh=xcbuBAIcV7PYG4iVvgt6Hx4JudC8RwH/H+Q+eNBFY44=;
+	s=arc-20240116; t=1757402469; c=relaxed/simple;
+	bh=l/oHFH5O7AnE6sbgdZUujNb200efan9ns/uLVdN/5d4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LlT5yvftkx5Zh+ie46EMe1XEMq1BXPyLdrDbUn+CL7JesPoT8U8xdS7G44BUhJY0jqoaWFz1ThX8IlaLeOg5BlivbVqEAVx1TuKipQn9SW7GmMIJgFOdL0y8mGOR3zhZZoPhEqpwd9rfXqKXIi+NdWlfuNFEKSm6sFIULycREUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uvsbO-0003x4-SX; Tue, 09 Sep 2025 09:17:18 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uvsbN-000Nkg-0l;
-	Tue, 09 Sep 2025 09:17:17 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uvsbN-00DwzJ-0J;
-	Tue, 09 Sep 2025 09:17:17 +0200
-Date: Tue, 9 Sep 2025 09:17:17 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ov+divzrc1lpUNdUVqdluOC9cFRvhJ8iBn1QY7ZOSmfx+tj2FXOuTcgABFsvYs2P0WCYzcZ1fT2H2ZS9mifRBGQBwqfQe2twlKrouUPuqE0J/6DA17QaEvvF8cpLQhkVMwbVTwbVoItVpwsbsvNJH0s/88hueo7cKiwmzbA2E18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mRI7PeqQ; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757402467; x=1788938467;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=l/oHFH5O7AnE6sbgdZUujNb200efan9ns/uLVdN/5d4=;
+  b=mRI7PeqQDtxOkZ9lAGYy2H9a+28B2wfs5Z0JizQxsVzbNUI8VaXqY6AT
+   kF69D6YuFf7m4Uykruwo8NiewcUzRIqYcE3eOp74bA8lo1tneWQA6sB1g
+   WRwdWovOqqziw+jh3UIcHm+gRKZeNAASc6KixEpX+9p/bx/NDFPEwkHJj
+   Rek5+mKarLrrQNXnGRRBRCYMrYMjqiTEABafBjIXISUCBhjUBvzyFP/tn
+   dNUBpxDpyJx8QDTSaFpq04BylHqlcZLcxWdbhRXuabiVx7mPYDxLd0Pg8
+   7wrFzH2vXaVg/HCtPdY9mrQRA8sUQQWu9JxSQ4N0zmClk8kimwg578xyK
+   Q==;
+X-CSE-ConnectionGUID: RRGu4t3WRZ+8gUSRP1cr7w==
+X-CSE-MsgGUID: DBcQJV5mQCmTC4ERzPVMPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="85123086"
+X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
+   d="scan'208";a="85123086"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 00:21:07 -0700
+X-CSE-ConnectionGUID: CvOgCLcYRK6GS51k5W7i1A==
+X-CSE-MsgGUID: lbdUcEOzTSOr1TV7tXsu1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
+   d="scan'208";a="178212677"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 00:21:00 -0700
+Date: Tue, 9 Sep 2025 09:19:23 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Kamal Heib <kheib@redhat.com>
+Cc: netdev@vger.kernel.org, Veerasenareddy Burru <vburru@marvell.com>,
+	Sathesh Edara <sedara@marvell.com>,
+	Shinas Rasheed <srasheed@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>,
-	Russell King <linux@armlinux.org.uk>, Xu Yang <xu.yang_2@nxp.com>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
- PM to avoid MDIO runtime PM wakeups
-Message-ID: <aL_UfST0Q3HrSEtM@pengutronix.de>
-References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
- <DCNKVCWI6VEQ.30M6YA786ZIX2@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net/octep_ep: Validate the VF ID
+Message-ID: <aL/U+yTe08B4Qa2i@mev-dev.igk.intel.com>
+References: <20250908231158.1333362-1-kheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DCNKVCWI6VEQ.30M6YA786ZIX2@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20250908231158.1333362-1-kheib@redhat.com>
 
-On Mon, Sep 08, 2025 at 07:00:09PM +0200, Hubert Wiśniewski wrote:
-> On Mon Sep 8, 2025 at 1:26 PM CEST, Oleksij Rempel wrote:
-> > Drop phylink_{suspend,resume}() from ax88772 PM callbacks.
-> >
-> > MDIO bus accesses have their own runtime-PM handling and will try to
-> > wake the device if it is suspended. Such wake attempts must not happen
-> > from PM callbacks while the device PM lock is held. Since phylink
-> > {sus|re}sume may trigger MDIO, it must not be called in PM context.
-> >
-> > No extra phylink PM handling is required for this driver:
-> > - .ndo_open/.ndo_stop control the phylink start/stop lifecycle.
-> > - ethtool/phylib entry points run in process context, not PM.
-> > - phylink MAC ops program the MAC on link changes after resume.
+On Mon, Sep 08, 2025 at 07:11:58PM -0400, Kamal Heib wrote:
+> Make sure that the VF ID is valid before trying to access the VF.
 > 
-> Thanks for the patch! Applied to v6.17-rc5, it fixes the problem for me.
+> Fixes: 8a241ef9b9b8 ("octeon_ep: add ndo ops for VFs in PF driver")
+> Signed-off-by: Kamal Heib <kheib@redhat.com>
+> ---
+>  .../net/ethernet/marvell/octeon_ep/octep_main.c  | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
-> Tested-by: Hubert Wiśniewski <hubert.wisniewski.25632@gmail.com>
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> index 24499bb36c00..eaafbc0a55b1 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> @@ -1124,11 +1124,24 @@ static int octep_set_features(struct net_device *dev, netdev_features_t features
+>  	return err;
+>  }
+>  
+> +static bool octep_validate_vf(struct octep_device *oct, int vf)
+nit, looks like octep_is_vf_valid() fits better here.
 
-Thank you for testing!
+> +{
+> +	if (vf >= CFG_GET_ACTIVE_VFS(oct->conf)) {
+> +		dev_err(&oct->pdev->dev, "Invalid VF ID %d\n", vf);
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  static int octep_get_vf_config(struct net_device *dev, int vf,
+>  			       struct ifla_vf_info *ivi)
+>  {
+>  	struct octep_device *oct = netdev_priv(dev);
+>  
+> +	if (!octep_validate_vf(oct, vf))
+> +		return -EINVAL;
+> +
+>  	ivi->vf = vf;
+>  	ether_addr_copy(ivi->mac, oct->vf_info[vf].mac_addr);
+>  	ivi->spoofchk = true;
+> @@ -1143,6 +1156,9 @@ static int octep_set_vf_mac(struct net_device *dev, int vf, u8 *mac)
+>  	struct octep_device *oct = netdev_priv(dev);
+>  	int err;
+>  
+> +	if (!octep_validate_vf(oct, vf))
+> +		return -EINVAL;
+> +
+>  	if (!is_valid_ether_addr(mac)) {
+>  		dev_err(&oct->pdev->dev, "Invalid  MAC Address %pM\n", mac);
+>  		return -EADDRNOTAVAIL;
 
-> > Fixes: e0bffe3e6894 ("net: asix: ax88772: migrate to phylink")
-> 
-> It does, but v5.15 (including v5.15.191 LTS) is affected as well, from
-> 4a2c7217cd5a ("net: usb: asix: ax88772: manage PHY PM from MAC"). I think
-> it could also use a patch, but I won't insist.
+Make sense, you can add reproduction steps and what happens when the ID
+is incorrect, but it is up to you.
 
-Ack, I'll try do address it later.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> -- 
+> 2.51.0
 
