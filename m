@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-221417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D476B50799
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:00:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E743B5079B
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:01:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 289E23AE351
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:00:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD126443CD3
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEEB303A21;
-	Tue,  9 Sep 2025 21:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE0D1C3C11;
+	Tue,  9 Sep 2025 21:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="us8/WfQw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qE3O6GK8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFAB3019D6
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 21:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF31212CDA5
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 21:01:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757451610; cv=none; b=HBlvbk8cmGfi/uOdws0dwKM+LTFh82YI9q2/6Xskzj7Ecy807DZaLE9a07gOIGKQPgAqAztjIqMapQs9jX3R8Diqez5PJG0CjD+hD7N/qSiSUYsdzlwgYSkVsOdUOr6f+/GgTRMAxzQo4rCK2G9KW3k8Ro3IADFQy4MedGl6uPA=
+	t=1757451675; cv=none; b=mhL9Y7DwMQysXY8jO+9q7Saekbxfx4V4blJrppeEaoG5lL/UYFwptSr0D8jnKIjOhx2szd0Ru4r2Q+NY/9XT/lWlLCuDF8Wu41nM7ZAelmt8sXPbVDyEovx83G79P5FHPovZ5q71P5Y7TlFXaKPVJdFvl9ZcqpZyAfJNDaXk1JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757451610; c=relaxed/simple;
-	bh=Zg5V41kOGMssaiy2ogiz4Rm3NyjYr7Q8Go5BnrR5lpU=;
+	s=arc-20240116; t=1757451675; c=relaxed/simple;
+	bh=D2ZdgPsjqexsJh1SrE79RnfKNE7yxCfkIb/D0ea9eWQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XaRLug9jlBkQ7oVb9idxD3RGrgzBTZulHM7Zjqm6B/KI6iCqJ6Nh7ptwFBn2/3f48sT2akhIFm/v/llQguE4y4Utvi+LwKtcR6EDgpxMA3LQeTkw2owgXuDnns11YElGJiNDAxEzzvGEsmeUn0wtjpdcVt9KnvknuFg7UA1j6p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=us8/WfQw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B256C4CEFC;
-	Tue,  9 Sep 2025 21:00:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kW3hymtqVrxaJesieBizvxljHAoThFp/hQz/5bW1XH8b/5BS3pfTL4VhA4q6PY7ppwk8P1aGc8oarUXe2Zuaw5oZe/dbP5bDEoiuhq33MiN+GTxaPePH6W4OMNAoZ0l+Cdz5DV+4yFs73Zae/EBtxplsUb3w9GTOn91dUVRrtlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qE3O6GK8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03305C4CEF4;
+	Tue,  9 Sep 2025 21:01:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757451610;
-	bh=Zg5V41kOGMssaiy2ogiz4Rm3NyjYr7Q8Go5BnrR5lpU=;
+	s=k20201202; t=1757451674;
+	bh=D2ZdgPsjqexsJh1SrE79RnfKNE7yxCfkIb/D0ea9eWQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=us8/WfQwp9elB1IpOrQYUu3th0ChhtICXnbsg4+3xfU1SsVVB2sZhhAo2xqF9pvIv
-	 D6BvwgtHyAO7foMnpk6aAb4rzlywIMSmUeF/hFbnL+oacL8HR2iolUwXo4g1Cw/o8w
-	 lS3HaKCPRr/I9Rs53Fk5iDI94q/3C6z6tUFAom2yJtVXzPLh4V5J89eiFyG0FiF7aB
-	 pR6qAmmEYcCtGvgaN95q229YhmNM2AE1o+Y0o0uWTP+WPqSvM+eoqdCGOT4TDyEwL5
-	 e98mGMQfG9gwCYa9j+UF2KQo4IAll0K4hhCOOyVZvJEGPYrO4Ki9jJjWbDyF/BHu/A
-	 YTE2Hir0t4ikg==
-Date: Tue, 9 Sep 2025 14:00:09 -0700
+	b=qE3O6GK8Guko/hIu/kRCiByeRoXiQebzHVo3ecwXLm/Lk188ePCG3Z6VcwLcs/2q7
+	 RI5DNhukyl5gaYHQw3p6wSHpXmAAv7Qjy+mmFc5gapUByweVHHY/F84G8sPB0474k/
+	 RvPx1UgzNXoX/BbH9jwMnG7Bl5P+49eaRiOBN+Gn0ksF5SAtL6Fet0CT04sSRLUjO4
+	 gWLDb8ix6KBzudjrtDI1SaEEVSlrGv0CqHEHaDXZJz0duUTG0Feovbs4Jqb++9EQNW
+	 6o5yCmZ9b9ELL8kdsE9GWaNq22Kl7Un81xk2UWltgMHFMfQeO4HPE0luW+rZJ0unk6
+	 rYEKQc5itkb6g==
+Date: Tue, 9 Sep 2025 14:01:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Russell King <rmk+kernel@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Marcin Wojtas
@@ -51,10 +51,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
  <pabeni@redhat.com>
 Subject: Re: [PATCH net-next] net: mvneta: add support for hardware
  timestamps
-Message-ID: <20250909140009.33a1ea82@kernel.org>
-In-Reply-To: <aMBTKTz6Oi0bzI6B@shell.armlinux.org.uk>
+Message-ID: <20250909140113.3977f8ba@kernel.org>
+In-Reply-To: <E1uw0ID-00000004I6z-2ivB@rmk-PC.armlinux.org.uk>
 References: <E1uw0ID-00000004I6z-2ivB@rmk-PC.armlinux.org.uk>
-	<aMBTKTz6Oi0bzI6B@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,10 +63,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 9 Sep 2025 17:17:45 +0100 Russell King (Oracle) wrote:
-> If a driver has skb_tx_timestmap() added, should the driver also
-> fill in the ethtool .get_ts_info() method, presumably with
-> ethtool_op_get_ts_info() ?
+On Tue, 09 Sep 2025 16:30:01 +0100 Russell King wrote:
+> +		/* FIXME: This is not really the true transmit point, since
+> +		 * we batch up several before hitting the hardware, but is
+> +		 * the best we can do without more complexity to walk the
+> +		 * packets in the pending section of the transmit queue.
+> +		 */
 
-Yes.
+That's true for all SW/driver timestamps I know of. 
+No objection to keeping the comment, just a FWIW.
 
