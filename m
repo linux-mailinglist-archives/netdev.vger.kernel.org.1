@@ -1,179 +1,394 @@
-Return-Path: <netdev+bounces-221165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7490AB4AA8D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:26:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82BAAB4AAA9
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 443B1343DAE
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:26:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7154A3A3D7A
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCACB24111D;
-	Tue,  9 Sep 2025 10:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249872D23A9;
+	Tue,  9 Sep 2025 10:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hA/XYDpq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYGsI7Qe"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2070.outbound.protection.outlook.com [40.107.93.70])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480BF2D23A9;
-	Tue,  9 Sep 2025 10:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757413565; cv=fail; b=kDbs7O1/lE/SfuxCTWUheCiLkNE6DUytGtAi5HcseGl8uiY7RYK/fBCIRIHDMdEYELSrgIrzCyRslbAIk2sEN3EeEklCX2TeQFRv3yq5nvbDpNT3pP45bTW/0dp5kiuIbUTpiCpmmleeht8Kda3mZxW75OimsQiZw5tF27Cvu8E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757413565; c=relaxed/simple;
-	bh=I86jUwdAG9lp7ibP1PhD76sbxS4P0YjfgvbtdZIPNU4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l/FNYrWcbMg9HLRJOdzRlk2hi2mgK2o0Rg8Dw9EkTEZge7ae17gGr2V02FWq9ogg7gbavcpMEkEZEA+kqRmRzm/NhfRyAkEv4rtRCPl5eYa1c81z4RgzqFGA1emp0SeDQGu2cdkWVzX2VsUA/KS1Cidg6sVPEOan++PoDlcEjH8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hA/XYDpq; arc=fail smtp.client-ip=40.107.93.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R2Um2VTfQ8593OxnIDzBZtMhruyNZ01lKf7Itrpo/p3C2an3+u7EuRIuV/mtAN6T4wtqOXtmCnOwY7oSdfmiEGIXiHIsRTJod8dSIr6+SMHKaI0N3HWp21KIH3wrdr0OyAjRpZaLwc1svOcgm3NsKmEBWzApeng9suNx3WRrQuTelBHSTUbLZuaobGXYfKcbZbgrT8SsqLrO1XUuKFYitcK2wbr8YL/BcMAPMi3cZ/9jDYMPVTDZ0PIBhq/Ov50ShbYYQvRAG07Kfyt6Tj5SK+AppPPto6rMP9m7/HyaPa7hDnkUrCkX0D3CIlnCTcHZRMKFZsk+m0kPDjG5d8zDww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4iRQdi5F9EQssE3XAk5Llf/z+4x6iiF9iWMSaAslX7E=;
- b=cT7LSimJZ0ZcN6/dkxdiCwMtI6WneM+BI6JGmH/yWr+p4+dlwU4moX/BxmYofc9eGHynZoqfDdDsblzXjMqxaRXNCu6U1qHlZVQakE/iek4caNPJRxBHMYatsE2VJQzXEBwv7VgsrFRtKSOonGP+Fd8znK1+hIKQfYNArclVIJal/loPBaLzpG59Cfaq1nXQIXhvo/HBWbTOGkUYQ/Euy0s+0E4IzqCA7SF2kvoVr8AnYEcWZMWKqHOGO7oNVd8lbIzNGR2JqKUrG0TwuWrLL4mlOOZLCN6qgABxDiuegpC9toF4UwtvEXBigahHG51/fjbZVgoff8JUAOZDBYx84g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4iRQdi5F9EQssE3XAk5Llf/z+4x6iiF9iWMSaAslX7E=;
- b=hA/XYDpqNcAYN7BwfI5yO/h76IDkR9+HolhmYp8PjwVpFNeznG7kHzmB6lMlwTu9i6y60MEKl7kln7UpaygXDwSi9dYj61cpnGncRPQ5R6nAgxSmjCtLvD/Jf7Lg4CZi49HBqbECsavtYQ1PLA470iNzuVI4YBs/eMxduUMoJoqMQ8BYZ0Mt1e2CTdObqsaeYk15rOwnTfnvS4grFHe232TAQ2JT90isNBYiXowOTocLgQ2+aFxEzTLNxfqLwfBWV7zvNQfPMrtcidtWLph+0zuSh5uqG8URlvzGA6o3hPS6fn+sJ0aglqObqAfT7NfyxZ7O0DAarzIdxOyk8qXSKg==
-Received: from CH2PR18CA0044.namprd18.prod.outlook.com (2603:10b6:610:55::24)
- by PH7PR12MB7113.namprd12.prod.outlook.com (2603:10b6:510:1ec::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.13; Tue, 9 Sep
- 2025 10:26:01 +0000
-Received: from CH3PEPF00000018.namprd21.prod.outlook.com
- (2603:10b6:610:55:cafe::20) by CH2PR18CA0044.outlook.office365.com
- (2603:10b6:610:55::24) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.15 via Frontend Transport; Tue,
- 9 Sep 2025 10:26:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- CH3PEPF00000018.mail.protection.outlook.com (10.167.244.123) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.0 via Frontend Transport; Tue, 9 Sep 2025 10:26:00 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 9 Sep
- 2025 03:24:48 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 9 Sep 2025 03:24:48 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Tue, 9 Sep 2025 03:24:45 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [pull-request] mlx5-next updates 2025-09-09
-Date: Tue, 9 Sep 2025 13:24:20 +0300
-Message-ID: <1757413460-539097-1-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161A1288C96
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 10:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757413797; cv=none; b=YP+KWA8RsD09/dB3IFjUbkhuxK76TtX90PARMh7q86jkay7l3O57Z7jSnZwYO2PMxrpBIp+QV5u7tCIyZB61qN5RywcI0sm31dZbKd8nNibAO4GB1Zz6f5AOtmm2Fh8fAjwAaRRL27ip2TlLLwct4DletoDnMGfDfJItGfdjdTg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757413797; c=relaxed/simple;
+	bh=s0OejQYdKQNyH/Yt6kaxVGE1PCqvhOmGeszv+dWI55k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jB7QageNatj6IY0sPyRrnu8QC7MtiyuhHVFsUsSMG86Hu+TqebNWw3FAEpissdUM2uT+9GEJ1DRXdmxZDNwerk1v2S9qtsN7ClnQ+mOaANSXYQDI5ZR3vtoCMSAzt9zROwRzgiJW3iFgQ3BNJ58iiB8DIJGQ4DFA+tUEgau33fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DYGsI7Qe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757413793;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cVE/nujTFy1bBg1Rtkn8WDLnbAicgDtiwRIzEX2j50c=;
+	b=DYGsI7Qe9laDEnSf6wqjiRY/jkDaaA7f2wRK3AJYT5CxRKxX1HRJuuKzGtr97jVWE/FoMF
+	7F0fH/62Opb+4Q7FqqIKQQ2UDaj/AyWtTrLignmvu6COejjj6Uz/9TadjyI7V7+Mfsz+Co
+	Z6/QkLtfFHNRNQMXX3CeiJeaZAmggcU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-270-aSIxztMiNPKytx_La9fthQ-1; Tue, 09 Sep 2025 06:29:51 -0400
+X-MC-Unique: aSIxztMiNPKytx_La9fthQ-1
+X-Mimecast-MFC-AGG-ID: aSIxztMiNPKytx_La9fthQ_1757413789
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3e50783dda8so1823902f8f.2
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 03:29:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757413789; x=1758018589;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cVE/nujTFy1bBg1Rtkn8WDLnbAicgDtiwRIzEX2j50c=;
+        b=QAa7klC9Ru9t4vtNqdo8Zim+caen4Vnvb6I1jNr7AfCJcBfQAGdvSMaQf6XHq/pPBp
+         wDvCUfJ4SvYrqq/mmkK0l4pUUr0jSrMJlg5rlS1jWTTxigkb29WqznLpcnzSDO9JJWyK
+         ej3QcxrC8AQP0S+IPLHnVFn8zKfYt+p55a8HjawuhVNkau5AO8PKRoMuDTjv8AQlHfVI
+         uxkppXylPzsBoYiViwZKpEJhkCwanbQnwOVgi6WDkALj4KndBKDkNp27kn18V+kqdf7y
+         /PkluQQ2daAtT37Z40/oOQQ0c13AO1xwqB2jo3OdCilL/xXQh9N4gVMGcxP+4EaB8Fx2
+         qOZg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3hge0iiUpCJZQrluCql31dXzVyFdnhFNs0wgOGgUmsb1tQvmLYnp9WhxCGxNg2199jPNxTzI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT9EtnKoG4p5xzCjbz4fu7zk6R1P479m0GlmXLpJZrUjPq4G9L
+	6IQZlfCTWUQB34M5F0BVh3rt89rnpO4OoCM9MDUNfKgWopBp0V3oYmuzxkghJgIgH/Jw9XPU7wB
+	jOk0g4BTLIvSwvUhpZPSvmVf4ymHegXFjyrnEW3h4gEic5nVG3IrKhdXA1Q==
+X-Gm-Gg: ASbGncs0TfitW3HNG7OGzvMoUePd847GC2tKd11bBqeOgGtSFa/px1hyn0m0NroBF6j
+	Rixw51pEkD7ycNgg2H9SComf7xS8DmdxtJl79UkL7yAs7lzcaSDOaeACnl1xGBrRgJQwF5EmvOU
+	qoOTuNDM7/4b9GfRNQMOT1zOU/lQGYZSREG80vuUqLV1wvlLDRrSga6txR4L1vTsHtXq3bUBHiA
+	TcLuMxveKZEVqBGHP+R4nTNfWALq0JIQL8d69Qp1jqPDlyJxvVfORkEN9lZgnnLQfd7elvlJv5N
+	BNuiWn9BeSB1NFhiFh3dgbxU0Q/08Jy/sKI/byHQDSzGSixoqBeyWAjDSrGJl7AeqzVVrDMvLME
+	u3Xe3dLxQN6Y=
+X-Received: by 2002:a5d:4e92:0:b0:3e6:6d09:d305 with SMTP id ffacd0b85a97d-3e66d09d4d2mr7014142f8f.11.1757413788912;
+        Tue, 09 Sep 2025 03:29:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHP5Q0kY8rtQ9ZF4fgFAKSU1R6H1Z7EJ9PBH7s0runEyy6esY/4vmV7z4kUvmtDCGD02YbYcg==
+X-Received: by 2002:a5d:4e92:0:b0:3e6:6d09:d305 with SMTP id ffacd0b85a97d-3e66d09d4d2mr7014126f8f.11.1757413788448;
+        Tue, 09 Sep 2025 03:29:48 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e75224ee03sm2078736f8f.61.2025.09.09.03.29.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Sep 2025 03:29:47 -0700 (PDT)
+Message-ID: <00b9012f-6bd5-47b7-a174-524f91ba944d@redhat.com>
+Date: Tue, 9 Sep 2025 12:29:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000018:EE_|PH7PR12MB7113:EE_
-X-MS-Office365-Filtering-Correlation-Id: 291a86af-44bf-4f06-5359-08ddef8b45ce
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?aWCAmrUb06sta2BpF9aUmYlPuNzoXHooTQC85rDdwd+KTCmTIrVZQwUV1ugp?=
- =?us-ascii?Q?Vca4HsRIrImas3C2ATujA6EcgjVV5cb2JpkxaqwuZdjOkx595ZQU8m+AaJLZ?=
- =?us-ascii?Q?nHvO/8IGURIN6tpz0boNpfhujyrMh8IwL1yhW5ljEzDc/S3OKgwywq4RETs1?=
- =?us-ascii?Q?+hrJfgxUYGQ3mz0Sh+h+gYvutekHSodMOxGajCA0zt4xKBQ6EwfLR732GgZ/?=
- =?us-ascii?Q?xLssbChl47fzBqKNCT0rbWkXcX9Fa2FrXkpCgKpTGwkhDXS+A4rgeKhLHqhb?=
- =?us-ascii?Q?0pYKbtwBJlYIsXM0qp47pxPBfhOcAcsL7V+Qv9eYt5xV6IYBMFkzXkX7L3ih?=
- =?us-ascii?Q?YvlYhclehjFAwx7WqUfZgA9HDUtlCFGYA0IBA7UcQqpigQN6Nhu6IEm/SQDP?=
- =?us-ascii?Q?xaNnWpVXgMhn4V70wGmibfZxTvMocUHxq2eLXxSY+DdZT+Rh8gcRn9Vp3BnZ?=
- =?us-ascii?Q?2s4ALRWLmp2ta3e1E/oC/xk7d4EvEOCxs0YPrBK/YfHNy89iyEANcr9JWVfN?=
- =?us-ascii?Q?aer3Sd77vPmRZa5Ersq9cMrDpylm1qwetT2B8NGFAhGU8wXJa5DlL4SVF4RO?=
- =?us-ascii?Q?4zvQMu0QCSPK84rZW0JduoQoRw0fBVtbZNzaQQeXaOL2duao61x0SqmMwA8U?=
- =?us-ascii?Q?Ssf3RR6KZ5hsPar1vEkKf9pp/MQQCetSOtfkQPP18xC8lfKlEjvn61QKP9Kp?=
- =?us-ascii?Q?QmmH5gndLJTaFN97B9TlA6n8eHkeVVpd53a6CEO5+gRyPd9HkUnZ+yLo3+zy?=
- =?us-ascii?Q?7D0M8MtwTizdkW+aovY6C0sfWW/ivkzC2KxkBOx1L/+oHqErT/+5dHNCqIJb?=
- =?us-ascii?Q?LpLRvTGBQ7+Tlpyj2Om+W7ss6B6ijxGvkcDftecwr5FuEnEyTQncDSby02vl?=
- =?us-ascii?Q?UAoJsgpYRlsWSIdDOIXj3K3dL93s9ALy81BLMJ7snuHGxo2kFNh/FNY0Ildv?=
- =?us-ascii?Q?/8SHolFDEQqvNyOk5BnEhkU4aSiVPqQkWnPPPnH93q90CTWbPdSGXK1RdJ7i?=
- =?us-ascii?Q?uuh4aK45xpXHV0b3PlwZ/rQHh837s1JSWLdSD0wKlVpzABLU9pQ890vnjbUm?=
- =?us-ascii?Q?MhdnVuArI+2E7qFN+tLhAXgZpghP/gwIHzrttsyN6O73Z5GQiBs09hBgNYdz?=
- =?us-ascii?Q?hn2XZ8IxJzJBE6nQ4pouB/qI1xH0uWFwYal+j1jbQRCw9WaIM10+zgYit4jm?=
- =?us-ascii?Q?o5Rfhp2C7LIKCRCDsfK0s02bj4Nydkoz7N7oCCKsrzK6GMBUFAAy6YWLB0Tw?=
- =?us-ascii?Q?2E8L89L/SwWgGj8lihDZChw2RGrfHHZ48AUNj3CFN/6REs/Mn2vGMhCsfXNE?=
- =?us-ascii?Q?FqtWoUylQdMzUzXd8tBOOpDLzI/gIOH/kpvBqUlf0HaBBxyAFC5nBn2PZ4Rv?=
- =?us-ascii?Q?G4UBJelXQX0rzYOCPN3K4MSYeF7VMCR4G3xyOy/uDnQOH7dC4twkUKJTojJk?=
- =?us-ascii?Q?AaMj/k7DG5spJCHdsQpZEZXuTydzGhRTt9y6X6YmNUeCsLYdfiIDw+Z2CFG/?=
- =?us-ascii?Q?Cu83k8K7pCRAJEE5cRXSxL+M1jvJmSmPW8Sl?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2025 10:26:00.5973
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 291a86af-44bf-4f06-5359-08ddef8b45ce
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000018.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7113
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] eea: Add basic driver framework for Alibaba
+ Elastic Ethernet Adaptor
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Dust Li <dust.li@linux.alibaba.com>
+References: <20250904011839.71183-1-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250904011839.71183-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 9/4/25 3:18 AM, Xuan Zhuo wrote:
+> Add a driver framework for EEA that will be available in the future.
+> 
+> This driver is currently quite minimal, implementing only fundamental
+> core functionalities. Key features include: I/O queue management via
+> adminq, basic PCI-layer operations, and essential RX/TX data
+> communication capabilities. It also supports the creation,
+> initialization, and management of network devices (netdev). Furthermore,
+> the ring structures for both I/O queues and adminq have been abstracted
+> into a simple, unified, and reusable library implementation,
+> facilitating future extension and maintenance.
+> 
+> This commit is indeed quite large, but further splitting it would not be
+> meaningful. Historically, many similar drivers have been introduced with
+> commits of similar size and scope, so we chose not to invest excessive
+> effort into finer-grained splitting.
+> 
+> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  MAINTAINERS                                   |   8 +
+>  drivers/net/ethernet/Kconfig                  |   1 +
+>  drivers/net/ethernet/Makefile                 |   1 +
+>  drivers/net/ethernet/alibaba/Kconfig          |  29 +
+>  drivers/net/ethernet/alibaba/Makefile         |   5 +
+>  drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+>  drivers/net/ethernet/alibaba/eea/eea_adminq.c | 452 ++++++++++
+>  drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
+>  drivers/net/ethernet/alibaba/eea/eea_desc.h   | 155 ++++
+>  .../net/ethernet/alibaba/eea/eea_ethtool.c    | 310 +++++++
+>  .../net/ethernet/alibaba/eea/eea_ethtool.h    |  51 ++
+>  drivers/net/ethernet/alibaba/eea/eea_net.c    | 587 +++++++++++++
+>  drivers/net/ethernet/alibaba/eea/eea_net.h    | 196 +++++
+>  drivers/net/ethernet/alibaba/eea/eea_pci.c    | 574 +++++++++++++
+>  drivers/net/ethernet/alibaba/eea/eea_pci.h    |  67 ++
+>  drivers/net/ethernet/alibaba/eea/eea_ring.c   | 267 ++++++
+>  drivers/net/ethernet/alibaba/eea/eea_ring.h   |  89 ++
+>  drivers/net/ethernet/alibaba/eea/eea_rx.c     | 784 ++++++++++++++++++
+>  drivers/net/ethernet/alibaba/eea/eea_tx.c     | 412 +++++++++
+>  19 files changed, 4067 insertions(+)
 
-The following pull-request contains a common mlx5 update
-patch for your *net-next* tree.
-Please pull and let me know of any problem.
+This is way too much for a single patch, and makes reviews very hard.
+Please split it in a patch series - i.e. basic infra, tx path, rx path,
+ethtool.
 
-Regards,
-Tariq
+[...]
+> +int eea_adminq_destroy_q(struct eea_net *enet, u32 qidx, int num)
+> +{
+> +	struct device *dev = enet->edev->dma_dev;
+> +	dma_addr_t dma_addr;
+> +	__le16 *buf;
+> +	u32 size;
+> +	int i;
+> +
+> +	if (qidx == 0 && num == -1)
+> +		return eea_adminq_exec(enet, EEA_AQ_CMD_QUEUE_DESTROY_ALL,
+> +				       NULL, 0, NULL, 0);
+> +
+> +	size = sizeof(__le16) * num;
+> +	buf = dma_alloc_coherent(dev, size, &dma_addr, GFP_KERNEL);
 
-----------------------------------------------------------------
-The following changes since commit 04a3134f88a4bd03001a3093144819523cfca99e:
+Destruction requiring allocation is problematic, i.e. it will fail under
+memory pressure leaving the device in an inconsistent status, possibly
+unrecoverable.
 
-  net/mlx5: Add PSP capabilities structures and bits (2025-09-02 23:08:13 -0700)
+You could instead always allocate the memory needed here at create_q() time.
 
-are available in the Git repository at:
+[...]
+> +static int eea_set_ringparam(struct net_device *netdev,
+> +			     struct ethtool_ringparam *ring,
+> +			     struct kernel_ethtool_ringparam *kernel_ring,
+> +			     struct netlink_ext_ack *extack)
+> +{
+> +	struct eea_net *enet = netdev_priv(netdev);
+> +	struct eea_net_tmp tmp = {};
+> +	bool need_update = false;
+> +	struct eea_net_cfg *cfg;
+> +	bool sh;
+> +
+> +	enet_mk_tmp(enet, &tmp);
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git tags/mlx5-rs-fec-ifc
+The above helper name and struct name are quite confusing. Does it copy
+the current device status? possibly a more verbose name would help.
 
-for you to fetch changes up to ff97bc38be343e4530e2f140b40cbdce2e09152f:
+[...]
+> +static int eea_set_channels(struct net_device *netdev,
+> +			    struct ethtool_channels *channels)
+> +{
+> +	struct eea_net *enet = netdev_priv(netdev);
+> +	u16 queue_pairs = channels->combined_count;
+> +	struct eea_net_tmp tmp = {};
+> +	struct eea_net_cfg *cfg;
+> +
+> +	enet_mk_tmp(enet, &tmp);
+> +
+> +	cfg = &tmp.cfg;
+> +
+> +	if (channels->rx_count || channels->tx_count || channels->other_count)
+> +		return -EINVAL;
+> +
+> +	if (queue_pairs > enet->cfg_hw.rx_ring_num || queue_pairs == 0)
+> +		return -EINVAL;
+> +
+> +	if (queue_pairs == enet->cfg.rx_ring_num &&
+> +	    queue_pairs == enet->cfg.tx_ring_num)
+> +		return 0;
+> +
+> +	cfg->rx_ring_num = queue_pairs;
+> +	cfg->tx_ring_num = queue_pairs;
+> +
+> +	return eea_reset_hw_resources(enet, &tmp);
 
-  net/mlx5: Add RS FEC histogram infrastructure (2025-09-09 04:18:19 -0400)
+The above implies that eea_reset_hw_resources() should/must not make any
+change to the device when/if failing.
 
-----------------------------------------------------------------
-Carolina Jubran (1):
-      net/mlx5: Add RS FEC histogram infrastructure
+> +/* stop rx napi, stop tx queue. */
+> +static int eea_stop_rxtx(struct net_device *netdev)
+> +{
+> +	struct eea_net *enet = netdev_priv(netdev);
+> +	int i;
+> +
+> +	netif_tx_disable(netdev);
+> +
+> +	for (i = 0; i < enet->cfg.rx_ring_num; i++)
+> +		enet_rx_stop(enet->rx[i]);
+> +
+> +	netif_carrier_off(netdev);
+> +
+> +	return 0;
 
- include/linux/mlx5/device.h   |  1 +
- include/linux/mlx5/driver.h   |  1 +
- include/linux/mlx5/mlx5_ifc.h | 29 +++++++++++++++++++++++++++++
- 3 files changed, 31 insertions(+)
+Never fails and the return code is apparently ignored. It should be a
+void functon.
+
+> +}
+> +
+> +static int eea_start_rxtx(struct net_device *netdev)
+> +{
+> +	struct eea_net *enet = netdev_priv(netdev);
+> +	int i, err;
+> +
+> +	err = netif_set_real_num_rx_queues(netdev, enet->cfg.rx_ring_num);
+> +	if (err)
+> +		return err;
+> +
+> +	err = netif_set_real_num_tx_queues(netdev, enet->cfg.tx_ring_num);
+> +	if (err)
+> +		return err;
+
+You could/should use: netif_set_real_num_queues()
+
+
+> +
+> +	for (i = 0; i < enet->cfg.rx_ring_num; i++) {
+> +		err = enet_rx_start(enet->rx[i]);
+
+The above can never fail, you should avoid checking it's value and it
+should return void
+
+[...]
+> +/* resources: ring, buffers, irq */
+> +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_tmp *tmp)
+> +{
+> +	struct eea_net_tmp _tmp = {};
+> +	int err;
+> +
+> +	if (!tmp) {
+> +		enet_mk_tmp(enet, &_tmp);
+> +		tmp = &_tmp;
+> +	}
+> +
+> +	if (!netif_running(enet->netdev)) {
+> +		enet->cfg = tmp->cfg;
+> +		return 0;
+> +	}
+> +
+> +	err = eea_alloc_rxtx_q_mem(tmp);
+> +	if (err) {
+> +		netdev_warn(enet->netdev,
+> +			    "eea reset: alloc q failed. stop reset. err %d\n",
+> +			    err);
+> +		return err;
+> +	}
+> +
+> +	eea_netdev_stop(enet->netdev);
+> +
+> +	enet_bind_new_q_and_cfg(enet, tmp);
+> +
+> +	err = eea_active_ring_and_irq(enet);
+> +	if (err) {
+> +		netdev_warn(enet->netdev,
+> +			    "eea reset: active new ring and irq failed. err %d\n",
+> +			    err);
+> +		goto err;
+> +	}
+> +
+> +	err = eea_start_rxtx(enet->netdev);
+> +	if (err)
+> +		netdev_warn(enet->netdev,
+> +			    "eea reset: start queue failed. err %d\n", err);
+> +
+
+Here you should try harder to avoid any NIC changes in case of failure.
+i.e. you could activate and start only the new queues, and destroy the
+to-be-deleted one only after successful real queues update.
+
+[...]
+> +static int eea_netdev_init_features(struct net_device *netdev,
+> +				    struct eea_net *enet,
+> +				    struct eea_device *edev)
+> +{
+> +	struct eea_aq_cfg *cfg __free(kfree) = NULL;
+> +	int err;
+> +	u32 mtu;
+> +
+> +	cfg = kmalloc(sizeof(*cfg), GFP_KERNEL);
+> +
+> +	err = eea_adminq_query_cfg(enet, cfg);
+> +
+> +	if (err)
+> +		return err;
+> +
+> +	eea_update_cfg(enet, edev, cfg);
+> +
+> +	netdev->priv_flags |= IFF_UNICAST_FLT;
+> +	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+> +
+> +	netdev->hw_features |= NETIF_F_HW_CSUM;
+> +	netdev->hw_features |= NETIF_F_GRO_HW;
+> +	netdev->hw_features |= NETIF_F_SG;
+> +	netdev->hw_features |= NETIF_F_TSO;
+> +	netdev->hw_features |= NETIF_F_TSO_ECN;
+> +	netdev->hw_features |= NETIF_F_TSO6;
+> +
+> +	netdev->features |= NETIF_F_HIGHDMA;
+> +	netdev->features |= NETIF_F_HW_CSUM;
+> +	netdev->features |= NETIF_F_SG;
+> +	netdev->features |= NETIF_F_GSO_ROBUST;
+> +	netdev->features |= netdev->hw_features & NETIF_F_ALL_TSO;
+> +	netdev->features |= NETIF_F_RXCSUM;
+> +	netdev->features |= NETIF_F_GRO_HW;
+
+I guess you could also enable partial_features for some tunnels?
+
+[...]
+> +static int eea_fill_desc_from_skb(const struct sk_buff *skb,
+> +				  struct ering *ering,
+> +				  struct eea_tx_desc *desc)
+> +{
+> +	if (skb_is_gso(skb)) {
+> +		struct skb_shared_info *sinfo = skb_shinfo(skb);
+> +
+> +		desc->gso_size = cpu_to_le16(sinfo->gso_size);
+> +		if (sinfo->gso_type & SKB_GSO_TCPV4)
+> +			desc->gso_type = EEA_TX_GSO_TCPV4;
+> +
+> +		else if (sinfo->gso_type & SKB_GSO_TCPV6)
+> +			desc->gso_type = EEA_TX_GSO_TCPV6;
+> +
+> +		else if (sinfo->gso_type & SKB_GSO_UDP_L4)
+> +			desc->gso_type = EEA_TX_GSO_UDP_L4;
+
+The device does not expose NETIF_F_GSO_UDP_L4, this branch should never
+be reached. Either expose the feature or drop this branch.
+
+[...]
+> +netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
+> +{
+> +	const struct skb_shared_info *shinfo = skb_shinfo(skb);
+> +	struct eea_net *enet = netdev_priv(netdev);
+> +	int qnum = skb_get_queue_mapping(skb);
+> +	struct enet_tx *tx = &enet->tx[qnum];
+> +	struct netdev_queue *txq;
+> +	int err;
+> +
+> +	txq = netdev_get_tx_queue(netdev, qnum);
+> +
+> +	if (eea_tx_stop(tx, txq, shinfo->nr_frags + 1)) {
+
+Any special reason to avoid using netif_txq_maybe_stop() here?
+
+/P
+
 
