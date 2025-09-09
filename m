@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-221147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03A56B4A7F2
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:32:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F57B4A827
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29B5177F5F
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:31:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB82F1BC1464
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE4F2C2361;
-	Tue,  9 Sep 2025 09:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F982D0283;
+	Tue,  9 Sep 2025 09:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaX04Jt+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g6CQuOTf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90EE2C21F8
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 09:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2838E2C374B;
+	Tue,  9 Sep 2025 09:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757409800; cv=none; b=p3bqRWydX2tSWcswxEhifDGSvZX/Hz8zc5wWj7hyrPD7pTWgq35XO5E2COhcmOGjicP57YEiWc02fy5Np58IuAmahp2kwLov0Q9unwaRWvmBfQ6m8xg7SiFScxtVPMj2131xmfoQQwsETupeuXjmTrGJ+kOmEIIkbNATZqsQCeQ=
+	t=1757409886; cv=none; b=DhX4mAFzMZIYapxI4nqP1pa0ZMUEDk0AdrY0A2avypTyjLP/rZFDN6cWFjnbczK+knRp5OZ94+01yb6GZSaWrlCX6NiEjVYBxnRLtZiC7WtlVJG9VpsOy48NC/ZIHC9NN8EhncDapnc5n60EnJuYkAgY8KHua4kG/ALmGb9Q64Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757409800; c=relaxed/simple;
-	bh=ZtUxTF7SCvaPXz0xumFUnj3btwu5AIXrNfPfcFNSuwI=;
+	s=arc-20240116; t=1757409886; c=relaxed/simple;
+	bh=crP1HHzUmFBEyI7U2LL0UP+sAsNP6hV3Iu/cO7wIU6k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H1njeFCfBcHimRjBbLXbxLT0aaghpYK0t+k3o4PtQyAEJw1Xbz3DuGRIvA+Rb9JD7TOW4nZdoe6fzR6J2cCxB1Oj9MZ/TPU0EasK3Tb/swiIQKf4+SU6pbLyisO8AbdIKyqGx2CUGN1CW7HVt5+j8Pz2RxQz4L9iEX+hNjGFZkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaX04Jt+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4FDC4CEF4;
-	Tue,  9 Sep 2025 09:23:19 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=cUeVhleac7EBI6DGKQdw1anjzCYnoPECunPZiwEksKtgzHBjKRUPLaK5qTRL4iKUHQrt88m34+J2hrn4P0tdeIUvSKOC8sFQw3i/ruWkaWVwV74Ll0/rqrrBCvwWpxjnR+m2vyIhkQXDtCc/2JAar1SsioQRh1OFSZtD0GnnzBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g6CQuOTf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10D47C4CEF4;
+	Tue,  9 Sep 2025 09:24:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757409800;
-	bh=ZtUxTF7SCvaPXz0xumFUnj3btwu5AIXrNfPfcFNSuwI=;
+	s=k20201202; t=1757409885;
+	bh=crP1HHzUmFBEyI7U2LL0UP+sAsNP6hV3Iu/cO7wIU6k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VaX04Jt+J51CC6pAvNqoreavF+jJY0bcE85qLx/uLu82eA8nFWG06+a81SK1Z9K5o
-	 /BIabv5okFswTXAlRWKK8q4qEVx56WPDxz4VI/UuEbBEJBcPn5J5JmS0ryPivls6yr
-	 AJ58WSEEnFHGlQhXfRXs/ekAIY5V9ByUiCzWRX4BVnn848DmruLtYOdffh1RRTAlqg
-	 I42IxFd5t1gSy+f9hxSf+yiWPo+FA3ZCi8b5WHdsEFfFzaGmyhhTSXm2MgrJxabueO
-	 lA9ki6arWAsoIRM410o4A5kT21YgTLLl0Fu3Wp1Y2J4JB2G0MVJ9c6nsiClVlXtn9i
-	 1mmjHSeYeZuiQ==
-Date: Tue, 9 Sep 2025 12:23:15 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Zhu Yanjun <yanjun.zhu@linux.dev>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Xiumei Mu <xmu@redhat.com>
-Subject: Re: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
-Message-ID: <20250909092315.GC341237@unreal>
-References: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
+	b=g6CQuOTfKtoiQ/KZtU1Hkxb8kmHFq43k7C2LU67Tc9yTDEP2/rb4MD2cjYuRBQxrW
+	 bBrhW3nEpYsiCYgq2JAuk1zUDH50a3mOn2LSYSd6KWatvJuiLjQ7AcXgoaira4tkLN
+	 0b5czq7VkMnnf+NCqde3FNb11pT3Bn5kv7zlbHiW7D/A7ZuMANH43M6Lv13zX48yIT
+	 tqfuCSj2wI8gAMLc48mbgAjD1Y+LzXL1UnxrS1r+U1ceN6U/PeQdCIwFpbN9ocp3OW
+	 2Hjlcenw2uRke3iW50LYNy1o+zUr8Qr+RoFd8wAl+O3kScdsIXKPmX9V5S0tOh4eRB
+	 c4r8EeWfG0sSw==
+Date: Tue, 9 Sep 2025 10:24:41 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: net: speed up pmtu.sh by avoiding
+ unnecessary cleanup
+Message-ID: <20250909092441.GG2015@horms.kernel.org>
+References: <20250906214535.3204785-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,88 +59,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
+In-Reply-To: <20250906214535.3204785-1-kuba@kernel.org>
 
-On Mon, Aug 25, 2025 at 02:50:23PM +0200, Sabrina Dubroca wrote:
-> Xiumei reported a regression in IPsec offload tests over xfrmi, where
-> IPv6 over IPv4 tunnels are no longer offloaded after commit
-> cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
-> implementation").
-
-What does it mean "tunnels not offloaded"? xdo_dev_offload_ok()
-participates in data path and influences packet processing itself,
-but not if tunnel offloaded or not.
-
-Also what type of "offload" are you talking? Crypto or packet?
-
+On Sat, Sep 06, 2025 at 02:45:35PM -0700, Jakub Kicinski wrote:
+> The pmtu test takes nearly an hour when run on a debug kernel
+> (10min on a normal kernel, so the debug slow down is quite significant).
+> NIPA tries to ensure all results are delivered by a certain deadline
+> so this prevents it from retrying the test in case of a flake.
 > 
-> Commit cc18f482e8b6 added a generic version of existing checks
-> attempting to prevent packets with IPv4 options or IPv6 extension
-> headers from being sent to HW that doesn't support offloading such
-> packets. The check mistakenly uses x->props.family (the outer family)
-> to determine the inner packet's family and verify if
-> options/extensions are present.
-
-This is how ALL implementations did, so I'm not agree with claimed Fixes
-tag (it it not important).
-
+> Looks like one of the slowest operations in the test is calling out
+> to ./openvswitch/ovs-dpctl.py to remove potential leftover OvS interfaces.
+> Check whether the interfaces exist in the first place in sysfs,
+> since it can be done directly in bash it is very fast.
 > 
-> In the case of IPv6 over IPv4, the check compares some of the traffic
-> class bits to the expected no-options ihl value (5). The original
-> check was introduced in commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add
-> Innova IPSec offload TX data path"), and then duplicated in the other
-> drivers. Before commit cc18f482e8b6, the loose check (ihl > 5) passed
-> because those traffic class bits were not set to a value that
-> triggered the no-offload codepath. Packets with options/extension
-> headers that should have been handled in SW went through the offload
-> path, and were likely dropped by the NIC or incorrectly
-> processed.
-
-The latter is more correct, so it raises question against which
-in-kernel driver were these xfrmi tests performed?
-
-
-> Since commit cc18f482e8b6, the check is now strict (ihl !=
-> 5), and in a basic setup (no traffic class configured), all packets go
-> through the no-offload codepath.
+> This should save us around 20-30% of the test runtime.
 > 
-> The commits that introduced the incorrect family checks in each driver
-> are:
-> 2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
-> 8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
-> 859a497fe80c ("nfp: implement xfrm callbacks and expose ipsec offload feature to upper layer")
-> 32188be805d0 ("cn10k-ipsec: Allow ipsec crypto offload for skb with SA")
-> [ixgbe/ixgbevf commits are ignored, as that HW does not support tunnel
-> mode, thus no cross-family setups are possible]
-> 
-> Fixes: cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback implementation")
-> Reported-by: Xiumei Mu <xmu@redhat.com>
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> ---
->  net/xfrm/xfrm_device.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> index c7a1f080d2de..44b9de6e4e77 100644
-> --- a/net/xfrm/xfrm_device.c
-> +++ b/net/xfrm/xfrm_device.c
-> @@ -438,7 +438,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
->  
->  	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
->  			    x->props.mode == XFRM_MODE_TUNNEL;
-> -	switch (x->props.family) {
-> +	switch (x->inner_mode.family) {
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Will it work for transport mode too? We are taking this path both for
-tunnel and transport modes.
+It would be interesting to know why this is so slow.
+But I agree that avoiding unnecessary work is a good approach
+if it is slow. And that appears to be the case.
 
-Thanks
-
->  	case AF_INET:
->  		/* Check for IPv4 options */
->  		if (ip_hdr(skb)->ihl != 5)
-> -- 
-> 2.50.0
-> 
-> 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
