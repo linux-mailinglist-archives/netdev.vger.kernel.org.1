@@ -1,128 +1,116 @@
-Return-Path: <netdev+bounces-221220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF01B4FCAA
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:22:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6A1EB4FCB0
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D7A71BC77ED
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:23:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87F1C16AF7F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA6E33EAF1;
-	Tue,  9 Sep 2025 13:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1976130DD01;
+	Tue,  9 Sep 2025 13:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XGQ1gNTm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUA5Vdgf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCE430DD01
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 13:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2EF21FF39
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 13:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757424174; cv=none; b=OWGaHWbRgNo53s1Oycs/q4tS+zOIUjw8fwV9/uZj5NzPEy57kjrzIP6bVamGO7p5A7AmZF5zycKySpeca1NgpgF/jPU9sK7fWC6+0qJsSjeucbgejFYwUg/ycIAE4GI7Xv/C6LxUl1JVUdCyntv4/4vFcKd2bwZtTWLXOUeVVzY=
+	t=1757424222; cv=none; b=lYU8ZjCuPLP5skj7his0mlzjGg1voIxqA9HvNbqyLRJy7W/vqTLHpHOHclEn27YV0FtGtjvAuDB1QYq04XruIVLLkMt8wmZacr+DYfdTL6caMYNN20XqDG7VeA9X6Pc/N2DaQra7rSjewXh5YwVQILkcjoYvl2dsNiSATk3Llgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757424174; c=relaxed/simple;
-	bh=kAoIWg0eouVwlZINqB9hM9ZgDWPys75E8dPDrrUOVRI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bcc7fXKgxBda+cDQI48i2HW26bT32qIZi+lQNVuRSzhE+ZE6CF55sAneX25Oj/nBWTC7Ifxi7AdFUK0eEn8AFgN7DDANF7UuFmIW5pLhWARcDSumw8Qwe3yhWVIvcu6McTbXrOo6UAxGfFAZXpWgYMpMVltz17Wf713In3ymSLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XGQ1gNTm; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b5e5f80723so121450741cf.1
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 06:22:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757424172; x=1758028972; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uchVPC5V5AnCU++0LQSE31dfyzhx8FL2wjNsKVYAXlI=;
-        b=XGQ1gNTmJSgz5hjFPrtuVBGnqeKdf1jj/8mf/pZNeqdhyJkwTnWjQEnqraShpxMxti
-         CU6WcZm1JHOrnR3D0MTiTAriv9nU1GeFNJDODjehxQNuzMwpevMhw0Zff5VURVLXM2dv
-         5c9LKOSP1QfwHX9DgylFmNR5nYunILLJaANmrr387Lb84helrD1k3uK3NszUBAzT8oWT
-         qKKRIVELjQXlqwK64Md4qW9tjMuYBGZUrd3U9HyBJ73/uXZo8phM1oMkN8p7bxDVylka
-         tU9ldJnU9FbIaYZdYylBhFCA8xad0mdklE4HKWvs02u1Ls3WkAGFj/YH1pYERjm9UJkJ
-         2rHw==
+	s=arc-20240116; t=1757424222; c=relaxed/simple;
+	bh=98DC4HCuoz5CgwoSAEnSBvQ2aXZh8I2kr3Xii4wbUfE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GbIJ3S9pCoBRewoHC1q346xj+t7BBkIjuxHoc9SRli/ZMhhO6XPn5qdhSrxYUbz13PdxO0jx3llwTCybS/H+1kg3RabpzzO1j9r21qkV/8GwMkuTkjQ41KWRxnR/MpdgHzRSpYgNxvA1B0TQcl3iPiQlo2tUE7nfXcJ0Y05HjH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gUA5Vdgf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757424219;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FJpdbNvyL+Z18OtxBUxsceBDgPB6QJ9laM/iWa3uyTM=;
+	b=gUA5Vdgfbmk/PsJfBlPf+maGhO9GrhorhGilb8m8M9QPMM3fSeKNvsJnU+RIZvg2EhnTsr
+	diCGpP3vqM0ZzUMzxi5YBb+QXGdBR7Tau8KKDuOahtcID/qm80RdQTSkUCpLyc0l9LxpnD
+	8rn+QqUA4c6Uoe9ycwViL0yJtgl2OIs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-410-26LrVnhtOvu4oEteY1Vhiw-1; Tue, 09 Sep 2025 09:23:38 -0400
+X-MC-Unique: 26LrVnhtOvu4oEteY1Vhiw-1
+X-Mimecast-MFC-AGG-ID: 26LrVnhtOvu4oEteY1Vhiw_1757424217
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45dd9a66c3fso9566855e9.1
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 06:23:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757424172; x=1758028972;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uchVPC5V5AnCU++0LQSE31dfyzhx8FL2wjNsKVYAXlI=;
-        b=Zv6Y9ClI1ypEjCuuT6eUYC/b11WTB/6tWuHAixtLXkjyC/87qlPuLdEhEJl5u39Q8M
-         If/2lHpoZgoBzoVLlPMI2ntkxQ0uwrG2ety9zc3nb8pD1vaIeGX0neaRVMsYiCK8Iy6R
-         wvKkQ+lL+9X8wBcUv3VV8qYFb/uIOjde+1wymP9VsgNyz9nADcq/rzcx4oUH7wOCmsZK
-         wdqsa9BI+FSqRZGXIsM7L8itQGTpqoDrdnFOz6tyUa6/7CU84Y2SzJbuN9Jz69fBBwNu
-         mjXi1WNeIAkmGsz1jXIH/H7WzRH1eIxbltMLrKnpDSkElIMPvd4deSusSi3zndhXzjsO
-         CUuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZpzICSBBGr7Rn0ntgxGrosTFuFeUZzBGDJ8hRZteE7L6jbUe/m0kcZgF7a6lwAfLEHgfsopw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPNG25X08XZkX3ldC22bUwYe2hdkOu7010GnKD3KpiS/kbsn+u
-	2LsYry/2X/Hfb3qBrWS//Pv8zjW52xEYjYr+vEkLieXJuVFJkcJsQAwXCc+DpjZN/cq4jmPiT5D
-	80XHgqHoBmXr08A==
-X-Google-Smtp-Source: AGHT+IGYpVQiEzn9QHE1zn1hAW5xwDjdaQLoTNKxPgWkv7gyao/+uTsXb3LQmW5bD0GeIq3wlXcgPuI+F3/c5w==
-X-Received: from qtz5.prod.google.com ([2002:ac8:5945:0:b0:4b0:a157:1d5b])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:4b14:b0:4b0:da5c:de57 with SMTP id d75a77b69052e-4b5f844d1fbmr103893091cf.54.1757424171653;
- Tue, 09 Sep 2025 06:22:51 -0700 (PDT)
-Date: Tue,  9 Sep 2025 13:22:43 +0000
+        d=1e100.net; s=20230601; t=1757424217; x=1758029017;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FJpdbNvyL+Z18OtxBUxsceBDgPB6QJ9laM/iWa3uyTM=;
+        b=jN5y9q6p7sJ+VxxnTn0Ulfxy/MAm854IH63Pk8t57ejTsk1a0KaJXnHcAb3SQSGLya
+         oUMG6g4O7LBVHBlm+Z3mEZO8sKFiwEiZYQfZHVdMCHx1nnswqOVjqnCKtRPGPhQlqyUT
+         +FECJf3x6AS+DVs0/zNhsxbUKZslQNrlWYK8aTtT1tq9CO/DXUgCtigWCIveK/ybKX6x
+         mlEHLqictmiOA3kU2Bz9S3qdj0N1oHteViyYeLaQ0c2W+UiJ0Z9Xqwhy+X1QL9enb9Yb
+         94ZtDJpq7KYA/yJT2+HR/eMGO6SBSE/0jhmWRLbfNsTPoE3yPkC/gjs75KYySjLnIsqY
+         f51Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXf/Wn/2P9sDYq6WqGQV/Yba0lu84ZqFKdpLc5ZJkY1iaLz7/pdVZWq7UUArTVD1R0CC3Fzmn8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVHherJZZ+xshmbrWLFOrRrpHd40Gx3DvZpOXC+CRJdMiwj9rP
+	wo+i78Hx4f6gHNTMEWwT5ra+Zqwm3lFq++HbfCUJ7PZdrd8q1jHigZEDl9vvxLQ5vW6Tgp6us5Z
+	EEBdJRGy4eNir/WjvbT32aw1oQDIl6A1BjTus7hbnE/1H6hLaTJB+xruC4g==
+X-Gm-Gg: ASbGncv2zcf8RlplWEbTkMWI3WdB0lt2iLdYPbllQyKGxx3q1bBF6jnHir29ndIxpoo
+	TAtzYSI9kjzAJHGSqYDNIJC/TlpT6U1zHYVHGUDG1bQiq8TBsmEhOAeQLaySsbBkpi2HzRSLbFX
+	SEZZjuvqY8EVDEwcxsAFhl9ELP/5Vyat++PKSoAyPAzHZzqh5fgA3SFPNgdntg48HBNBK1SmEnc
+	WN2wD4dzCn1tP7jVcobLRsjreXCaksJHxPqgpOoUEy/3jWulC6AbOtSuTXC1P5T7nYRbb5CN5OC
+	qSD8z1PPRJAhwcY3LI5c+41gBgjd1ZSFyRFUUn8DxNIU2NYeY5535IjM4i4wqODBsQCs/qMkGHQ
+	npAxUxe0CI/o=
+X-Received: by 2002:a05:600c:4453:b0:45b:9c37:6c92 with SMTP id 5b1f17b1804b1-45dddef02f7mr112976925e9.31.1757424216743;
+        Tue, 09 Sep 2025 06:23:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGHzLBbzzAcsotmseUpx3KCNv9WVvoz0FeEFM1JEBmpO4AzKKO5+O18bWhe1dW9n+AkeRacWQ==
+X-Received: by 2002:a05:600c:4453:b0:45b:9c37:6c92 with SMTP id 5b1f17b1804b1-45dddef02f7mr112976645e9.31.1757424216377;
+        Tue, 09 Sep 2025 06:23:36 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7521ca20dsm2915616f8f.21.2025.09.09.06.23.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Sep 2025 06:23:35 -0700 (PDT)
+Message-ID: <8c0b5b0a-60ee-4ed4-b439-11d5c106ac6e@redhat.com>
+Date: Tue, 9 Sep 2025 15:23:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250909132243.1327024-1-edumazet@google.com>
-Subject: [PATCH] nbd: restrict sockets to TCP and UDP
-From: Eric Dumazet <edumazet@google.com>
-To: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, 
-	Mike Christie <mchristi@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, 
-	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org, nbd@other.debian.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/7] bonding: Adding extra_len field to struct
+ bond_opt_value.
+To: David Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org
+Cc: jv@jvosburgh.net, pradeeps@linux.vnet.ibm.com, pradeep@us.ibm.com,
+ i.maximets@ovn.org, amorenoz@redhat.com, haliu@redhat.com
+References: <20250714225533.1490032-1-wilder@us.ibm.com>
+ <20250714225533.1490032-3-wilder@us.ibm.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250714225533.1490032-3-wilder@us.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Recently, syzbot started to abuse NBD with all kinds of sockets.
+On 7/15/25 12:54 AM, David Wilder wrote:
+> Used to record the size of the extra array.
+> 
+> __bond_opt_init() is updated to set extra_len.
+> BOND_OPT_EXTRA_MAXLEN is increased from 16 to 64.
 
-Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
-made sure the socket supported a shutdown() method.
+Why 64? AFAICS it will still not allow fitting BOND_MAX_ARP_TARGETS in a
+single buffer, and later code will try to do that.
 
-Explicitely accept TCP and UNIX stream sockets.
-
-Fixes: cf1b2326b734 ("nbd: verify socket is supported during setup")
-Reported-by: syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/CANn89iJ+76eE3A_8S_zTpSyW5hvPRn6V57458hCZGY5hbH_bFA@mail.gmail.com/T/#m081036e8747cd7e2626c1da5d78c8b9d1e55b154
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Mike Christie <mchristi@redhat.com>
-Cc: Richard W.M. Jones <rjones@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org
-Cc: nbd@other.debian.org
----
- drivers/block/nbd.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 6463d0e8d0cef71e73e67fecd16de4dec1c75da7..87b0b78249da3325023949585f4daf40486c9692 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1217,6 +1217,14 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
- 	if (!sock)
- 		return NULL;
- 
-+	if (!sk_is_tcp(sock->sk) &&
-+	    !sk_is_stream_unix(sock->sk)) {
-+		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: should be TCP or UNIX.\n");
-+		*err = -EINVAL;
-+		sockfd_put(sock);
-+		return NULL;
-+	}
-+
- 	if (sock->ops->shutdown == sock_no_shutdown) {
- 		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown callout must be supported.\n");
- 		*err = -EINVAL;
--- 
-2.51.0.384.g4c02a37b29-goog
+/P
 
 
