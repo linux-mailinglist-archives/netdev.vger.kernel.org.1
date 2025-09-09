@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-221219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 215D5B4FC61
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:22:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A41A8B4FC5F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2C861BC775C
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15AC04E3542
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 13:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914C5340D9A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C1033EB15;
 	Tue,  9 Sep 2025 13:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="x00Engyz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X0uCXBfu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9593218D0
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 13:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87493314DD
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 13:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757424127; cv=none; b=H2NN7gFv/E6kfdB9sU1xRdG3AWrlK7f8BfngGOvZqTipn4fqI1KlgjN+yYzCmpWHAE5SOVauLBFNum2TOg4Tqm7fxcqtEEpu1kjC45cbFCKz2Ceh19f9lY7AHpIpca/IUSERuI42DE754YcMXI968YhE4KBU9eM/Bj2rHGjhijY=
+	t=1757424127; cv=none; b=E8apaHixTLk+MAlZH1XmpUR7lie5eDcpH7TRCvSgab7RfbamnvlT9iNWOVss2dARljfNFPgJcGMimTMP5Jc85LBXc50J47b8RtSR7u4mQiGt2LEwPgeWZEZ//IoZGDu8P+isotRF7dhctVSaMepFZzyIjdGIz/xLvbZEeNFW9Rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757424127; c=relaxed/simple;
-	bh=nTklphbKec1dqeg91ig+HC41qiYgIMM8IRMQcK4cZJ4=;
+	bh=7xqOWbgXAQaae9DvfPkMPl6ylq2M33CxQ64JN2py/Fo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CnYk1i3CaQG9krZm+iWp/94f/zPDwMnjrdiJfu+4gF5c+k11t6tsk4D2jdXaDms2+8LK0dfz5RNIzcqSNVwNw1F5RhKNQHLi9NvCjW8nVFWrjpsl1EH59EGaq7Kgx1xbkVn6eH3ulbYjG98vsZPSpVmh+Yo8EbMlZ5xEoouRk44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=x00Engyz; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=n0phF4X3CMpss+fZpqyLZHdQQ17lkBQLCR4kL2osis1yE5xSpYdTRTEAjFZ8bnm6zuC29KYJ1Bj4iNqV+81CFWm0GcV1d5I82PfuVsA5+FLYxLYWRW+uyofIvU3mmBXuqIf1tG40ll0GA0WaS0bSi9EAXJLi7X4mQ1rOMMv4fIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X0uCXBfu; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 30728C6B39E;
-	Tue,  9 Sep 2025 13:21:46 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 287F41A0DB8
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 13:22:03 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D9E7D60630;
-	Tue,  9 Sep 2025 13:22:01 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 08454102F27F2;
-	Tue,  9 Sep 2025 15:22:00 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 031D060630;
+	Tue,  9 Sep 2025 13:22:03 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B8938102F2866;
+	Tue,  9 Sep 2025 15:22:01 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1757424121; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1757424122; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=Jgxw2vjes+YPCoBh3+f4yiXw6JgQQ3m2MdCmEakuFeo=;
-	b=x00EngyzjawEDroEo35gEIRYINhMH5la0uRynqeF8Nxgnv6h6Y0EDwcs1LQXuf00sgzoG8
-	/eDvqRHv8I8gTlEjS/0ip5jwStv3ZeOwXXL3SI+jZylIlR1yyGPK54kgZexbO4JNIP2CdG
-	hTSbbd2xPv7pIcE20ZkDdYeTxYnYDCJCx6dvH9yrdGto+OtzUK8hr8ynmJSLS9QndGGCtU
-	VshpOjxGVAvgHd+qRGMgklyi6WOeOB3lyDnL7iMIo1388vWA4LnykyW8Ru/8Uka8Yhgo6M
-	P9cQHxkmGbJc8jQVHR2aDQgsjkOcL4gN6O4d+KAW0byzFQ8nQfH5wdHeZY60lA==
+	bh=d6yHu1Zo2Af8EQvH90HguxdR9ywvNLEkskg877xwcfw=;
+	b=X0uCXBfueODgPPnZoRB/rjxObwPzPB9CT8JTtR2q4+hloERUnpGEqBw8N5IkYofs/l/dwD
+	Y/+j5irGJsHzue9rr12L1zIEgRrzYEPeU09PKpTFaqyXa9OiDVjYa98ZJ1wD1BC8+dnU39
+	uc+08T7g06Ryac4zjz7+i+4B8EhjQdnCEDuit58nNOvn+V9NGwGm7rr/IOIounX/iHDan3
+	TarM//C1aC4ZEBkSGBOcx50AWdbeAzlew6D5kbMCzWIpHJ8kIB7DQJaJzD/8yhaLL5a2A3
+	nVSSl7/L2Yxl2bObqjH1bWCFI3a/W72Enb3vIn3DuXyyZcb89317+VACZOnvlA==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 09 Sep 2025 15:21:42 +0200
-Subject: [PATCH iproute2-next 1/2] scripts: Add uapi header import script
+Date: Tue, 09 Sep 2025 15:21:43 +0200
+Subject: [PATCH iproute2-next 2/2] Update kernel headers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
+Message-Id: <20250909-feature_uapi_import-v1-2-50269539ff8a@bootlin.com>
 References: <20250909-feature_uapi_import-v1-0-50269539ff8a@bootlin.com>
 In-Reply-To: <20250909-feature_uapi_import-v1-0-50269539ff8a@bootlin.com>
 To: David Ahern <dsahern@gmail.com>
@@ -68,91 +68,53 @@ Cc: netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 X-Mailer: b4 0.15-dev-8cb71
 X-Last-TLS-Session-Version: TLSv1.3
 
-Add a script to automate importing Linux UAPI headers from kernel source.
-The script handles dependency resolution and creates a commit with proper
-attribution, similar to the ethtool project approach.
-
-Usage:
-    $ LINUX_GIT="$LINUX_PATH" iproute2-import-uapi [commit]
+Update kernel headers to commit:
+	aeb8d48ea92e: ("selftests: net: add test for ipv6 fragmentation")
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- scripts/iproute2-import-uapi | 67 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+ include/uapi/linux/devlink.h | 2 ++
+ include/uapi/linux/if_link.h | 1 +
+ include/uapi/linux/stddef.h  | 1 -
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/iproute2-import-uapi b/scripts/iproute2-import-uapi
-new file mode 100755
-index 00000000..505ab25a
---- /dev/null
-+++ b/scripts/iproute2-import-uapi
-@@ -0,0 +1,67 @@
-+#!/bin/bash -e
-+#
-+# iproute2-import-uapi [commit]
-+#
-+# Imports sanitized copies of kernel uapi headers from <commit> (can be
-+# a commit id, a tag or a branch name). If the argument is omitted,
-+# commit currently checked out in the kernel repository is used.
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index a89df2a7..bcd5fde1 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -636,6 +636,8 @@ enum devlink_attr {
+ 
+ 	DEVLINK_ATTR_RATE_TC_BWS,		/* nested */
+ 
++	DEVLINK_ATTR_HEALTH_REPORTER_BURST_PERIOD,	/* u64 */
 +
-+sn="${0##*/}"
-+export ARCH="x86_64"
-+mkopt="-j$(nproc)" || mkopt=''
-+
-+if [ ! -d "$LINUX_GIT" ]; then
-+    echo "${sn}: please set LINUX_GIT to the location of kernel git" >&2
-+    exit 1
-+fi
-+
-+pushd "$LINUX_GIT"
-+if [ -n "$1" ]; then
-+    git checkout "$1"
-+fi
-+desc=$(git describe --exact-match 2>/dev/null \
-+       || git show -s --abbrev=12 --pretty='%h: ("%s")')
-+kobj=$(mktemp -d)
-+make $mkopt O="$kobj" allmodconfig
-+make $mkopt O="$kobj" prepare
-+make $mkopt O="$kobj" INSTALL_HDR_PATH="${kobj}/hdr" headers_install
-+popd
-+
-+pushd include/uapi
-+find . -type f -name '*.h' -exec cp -v "${kobj}/hdr/include/{}" {} \;
-+
-+go_on=true
-+while $go_on; do
-+    go_on=false
-+    while read f; do
-+        if [ "${f#asm/}" != "$f" ]; then
-+            # skip architecture dependent asm/ headers
-+            continue
-+        fi
-+        if [ -f "$f" ]; then
-+            # already present
-+            continue
-+        fi
-+	if [ ! -f "${kobj}/hdr/include/${f}" ]; then
-+            # not a kernel header
-+            continue
-+        fi
-+        echo "+ add $f"
-+        go_on=true
-+        mkdir -p "${f%/*}"
-+        cp "${kobj}/hdr/include/${f}" "${f}"
-+    done < <(
-+        find . -type f -name '*.[ch]' -exec sed -nre '\_^[[:blank:]]*#include[[:blank:]]<.+>_ { s_^[[:blank:]]*#include[[:blank:]]<([^>]*)>.*$_\1_ ; p }' {} \; \
-+            | LC_ALL=C sort -u
-+    )
-+done
-+popd
-+rm -rf "$kobj"
-+
-+git add include/uapi
-+git commit -s -F - <<EOT
-+Update kernel headers
-+
-+Update kernel headers to commit:
-+	${desc}
-+EOT
+ 	/* Add new attributes above here, update the spec in
+ 	 * Documentation/netlink/specs/devlink.yaml and re-generate
+ 	 * net/devlink/netlink_gen.c.
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index b450757c..8c460dc3 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1562,6 +1562,7 @@ enum {
+ 	IFLA_BOND_SLAVE_AD_ACTOR_OPER_PORT_STATE,
+ 	IFLA_BOND_SLAVE_AD_PARTNER_OPER_PORT_STATE,
+ 	IFLA_BOND_SLAVE_PRIO,
++	IFLA_BOND_SLAVE_ACTOR_PORT_PRIO,
+ 	__IFLA_BOND_SLAVE_MAX,
+ };
+ 
+diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
+index e1fcfcf3..48ee4438 100644
+--- a/include/uapi/linux/stddef.h
++++ b/include/uapi/linux/stddef.h
+@@ -3,7 +3,6 @@
+ #define _LINUX_STDDEF_H
+ 
+ 
+-
+ #ifndef __always_inline
+ #define __always_inline __inline__
+ #endif
 
 -- 
 2.43.0
