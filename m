@@ -1,170 +1,132 @@
-Return-Path: <netdev+bounces-221384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9EC6B505FD
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:16:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C463FB50650
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A815161D82
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:16:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69B444E657A
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEEB3002C2;
-	Tue,  9 Sep 2025 19:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8436835AACA;
+	Tue,  9 Sep 2025 19:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJ+U1ULC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCRYHtlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE162905
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 19:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016483570C5;
+	Tue,  9 Sep 2025 19:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757445381; cv=none; b=cmiU35gRgj9XXbpmmIzhrvvbFGXbMFF4oBDmR30A42i2PFkR93zPGvHCkg5jBrLRW3w0mMhpFlVc/BWrRH7K/ZB9B4om94WwZQXdJeVnK24890dFocbYxmixxJvye+RSFTY7sB+HnwZgPhyDuyYI33okVE0i2XLSOSPlkKydg+Y=
+	t=1757445665; cv=none; b=Ol8te0lxGiehS+Z0WYtS6YjjIPQKmp6CIplHVB52d9RQ/IiYVr/OcfeD+90G69qg2MrC4q5DmaxpRQL7DaikoawjWm8F5UlxglueX9hRzYBNyGQXZO8oAIBY5tG4knkdxRPW/pWkB5/GU8ie/XvsvcZmBWCx5inoZLGvpSQCH3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757445381; c=relaxed/simple;
-	bh=VpKaNCiaNqVwKZHK5suYOtn7ZuVmxbB5Y+dCdPNYVUg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=SMfGU6Y4S6p+wB7u+ciYALW0FYcl9JCwgg8RWe7ZIIYVbA1/scd1JZbia+IBkLuTd80QMIeCpxQiQZHN58wFWOAKwt38y3W+6ocIjRxGfFjBsUaLMEsOr/4qpXwBGIRNMq6OqXt7EMCt6j9w8n1IbNpNMvHWHNNFTxkop1k5WdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RJ+U1ULC; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1757445665; c=relaxed/simple;
+	bh=PBaWCw1yzNsutBu+o233AHDRCu7w/AA2teJPBgfek08=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VjyYrM07hLmmMBsM9HiVfA48r5XepM9R6/YeZ339xWDE8qaqfmOUGn5j6St4KFDeCT0E3WuzvwCr8h5L8lGB5e5XpNn4yhbl40W9uvx/QPU3+DpgugtsDXqnb6d9/+Y4/hdxYVVS+ymr5bQdlT8Q5KuzLDGYdq1b9EQpgfgNBUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCRYHtlD; arc=none smtp.client-ip=209.85.128.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3db9641b725so6004324f8f.2
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 12:16:20 -0700 (PDT)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-71d603acc23so48177367b3.1;
+        Tue, 09 Sep 2025 12:21:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757445379; x=1758050179; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yO7DlOJpWu91SQzXkAQcMfK5ynjMJfvT9Oyif5R2yqI=;
-        b=RJ+U1ULCJfnpIewrVeZqwMSywhhwOcVoCOPFDszV2RlH26SX7J6XwcylFA7AgPkbRi
-         E9LrdU+DpOofuMWZx7xj7v8LkVV2iKpOHmF39+RSkylkyVvtPRsKfP1nLaaT4UE/pxn7
-         WXr3lUOLNnRED8QuVdXvmhU2CUZt/zMhLo6ricuu+FZog8Nfwo8BFRmqxtWa4sNwp1HU
-         7AVAcwXfC6qPwZ0nJV2LKPaPfcH06plIFRLgosDQOxqh2VmmI3IfpoqEvVK5v79I0uDh
-         ZpEd/acPBWH/7gEQTgHs02g75aoNP6Mm6io5sXDhsBHgclzDgmN1BCKm3x0LlPGXkQx7
-         SFUQ==
+        d=gmail.com; s=20230601; t=1757445661; x=1758050461; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PBaWCw1yzNsutBu+o233AHDRCu7w/AA2teJPBgfek08=;
+        b=gCRYHtlDs/PO3fVLrvN5OcHsmWSIknJebhG8ONe+IU4WcLy+r6cqrmFYKqn0Zn4j30
+         bOtnhdMQxSoZQNdZh0M4NRS1qYcXdmzPwbaZFv/YzhLYPZBGWA09BV6F92mDVprlbJ9d
+         6tu7V2yinT2Njy5I/EttYLtclFY7PyuMhx+IwYZP1JrIE4S1Y0kKHmGOMRmbgQjuj8rI
+         6MMKKBNF3WLnOJnysIL9WPcNTKeELY1PVcIzJJVc2yjOj3YKVv1aIPZ16AwQdtjnjyIX
+         swBOXPoSeVxJGgn5aR3rwgGhQCmsRhGxid/RKaI1mCG/naMD06BePNialzrGoQtrZ78U
+         KdFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757445379; x=1758050179;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yO7DlOJpWu91SQzXkAQcMfK5ynjMJfvT9Oyif5R2yqI=;
-        b=sKWOr3li6NVyiptpnCzZQUhDSrAXbbfBS9xEsSJWjpYtfmrXkKxP5r6ZsMRN2a5Xlo
-         Z6X2nt+LNMPGBAAnu+X/LaTKlszpSKfbLLQBUueM4rSCTkc0s7zJpDFY6aHio0F1NU4U
-         mKYFKpHSSdykQCFEiOD/tWfMDgKrpbiWrvUxf8yDBWsjaLthyI1bsc3pvkbUL4l06zj1
-         tWwQT8eq3mTiNj3Llq99w950UHgBphrGeAVdD/DRnXodcm2jddDsxKavcpOgPybK7JwS
-         /SKl4O/6far6GppzD0/HBPjEqzkTJd5hBCOJN+PZyuoJuMO2Rpcy1dbn5WMavOhnO6Za
-         BdPA==
-X-Gm-Message-State: AOJu0YwLTaGU+a7K80ToB6VyxvBEXnTeFkrzDDq5/3k22Qfs3oiZ/sbq
-	AVGIjE02p6L8AzEN3pe0wlm2iAXeRqAkV3qSbV1hR2QNGBJB7c4y1WUx
-X-Gm-Gg: ASbGncsYTY2qjkkDMSQ/V3iSlsuhkI1dDIIPIsx1X4jUWe4qgVi2ZScBVjy6FsHQ1Xc
-	fmTMA/0nuvOsVNFRD5odXSW7Ri7xzC8IdZ/brS02/VUV7gCNQGcQnUy4NAdy+Kk1HJqmAhu8u4k
-	ACXmsAzyCr1FgElHpsyqxKfX3j6Rcizulnewk2dLNCbWH22ZJYwfLVefg59ETZ1RBUCHYsZNGaB
-	z7qGYBI67RP+IsSnkjNxvXRxFpeXT3VoHt+QYcQ3+OII+gdeAK2MGm2qgZtpU2qVB4GwutnDDPh
-	wrQunrxvXmayLLSQz9rZXYSkzauVV4hWsld/Et640p1cFMv3IRC6pFIsPbpcik4KRROvO8q2OwR
-	FQkx0BcWbnawJEHjrrQrRt3mvl5pM68/1TnH/gaMUFF3gONz+JlUcE+/rjHaaCpeIl9boGe0J0J
-	RO/8cBGtKfy9DdwWyLmCM68FBeDQTA9J0dKkBPQpVaXfDagqEx/Ds9xvR1SmtNz9dBikVHYO1j
-X-Google-Smtp-Source: AGHT+IHerxb6PerSsHC5GxRhvHSlgtC+NXi1VoaBs4uQU3DQSB7ds3iIJwNSHeIienDgRlKgCXMQaw==
-X-Received: by 2002:a05:6000:dc7:b0:3d8:9bf9:7c0b with SMTP id ffacd0b85a97d-3e643555f94mr9685806f8f.47.1757445378381;
-        Tue, 09 Sep 2025 12:16:18 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f16:4400:58f9:791b:ab22:addb? (p200300ea8f16440058f9791bab22addb.dip0.t-ipconnect.de. [2003:ea:8f16:4400:58f9:791b:ab22:addb])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45dda2021dfsm190169135e9.24.2025.09.09.12.16.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Sep 2025 12:16:18 -0700 (PDT)
-Message-ID: <bca6866a-4840-4da0-a735-1a394baadbd8@gmail.com>
-Date: Tue, 9 Sep 2025 21:16:36 +0200
+        d=1e100.net; s=20230601; t=1757445661; x=1758050461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PBaWCw1yzNsutBu+o233AHDRCu7w/AA2teJPBgfek08=;
+        b=sDp+JuG2LNzcnsNma9c/GuijAMlpZ1t40WQmZcBAqLWbQDm8YDSvh6+YfTl1hSI0AF
+         xljQVwhVkFCRV9+a/4jpiKP5YMR8QaRaR/tKYUzCIi+ukhJei0pgWIz1XZgQfo5h3V4/
+         3iv27vzs4lGatmI4M1CGc8DxgUKZ2Fyuww53RC4gKbOavuJlMigDwwhRdJVzBTsJ4osf
+         r/jaZa0qM1lBw8NF67xNGkq0ngzfqUPEgLd1TkD1lofxUwFWknVo/av3nhhRj1iyMg1a
+         p6lOEk0U+JM2x+PeJIB62cr+J/qx3b1yuJXo4V9+Uhd9tN9xd2k1LpmaVkTyK9Gx2ypH
+         lvQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaEpFmOPKTOLyBB7rNtpdFQtpkR/WorrmY5B3fD/csH2S7stWgmR82rPQFsm/iJVfnflWnV4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVY8+4OXPT4nMAQl1elbpmZIovEe0YrrXxMZFycHTMDBAaRelG
+	r7HpRkwVpRSyP8OXK8/WCp5w/rcKr5yR6nf52PoQzDvyep0DQ2N+v/Fu8lPBMX12MIOIYl3wSec
+	vRl95XklqIhJ4iWs8fd2lzEk/KR/gF3Q=
+X-Gm-Gg: ASbGncuXMWz1+ho77bRA2NFXX0t7V+MJRRbl9RB1904R1otWx3LJEosDFoA/t2FFeYm
+	i2UGBB1Lrp0AAasvYz2llHtwn2Qu3AzDLR7jXMY6scXJ6z8UgEbT6ZvacZ+zbBesT5jmgK06fMi
+	cmT5gXS6iZ7VvawfH4kUFD9RXuGxMiJWOepcY3yZ9/MpF/gxB1ny56aYsoDcXlTMYaflBTYztOz
+	jIxmfXaLerTTY648f3ibGJaAAD/79gqxA==
+X-Google-Smtp-Source: AGHT+IGrJ0pqWmM3h2TfRH5DiQcU5gjHiJZCcKOmB4gBkSun6Wjs7kS0s4HyzyuxPcE1JIBFIWnmy6kSLzpiaUE/iP8=
+X-Received: by 2002:a05:690c:4b83:b0:719:f1b0:5c29 with SMTP id
+ 00721157ae682-727f27db7bemr103452427b3.3.1757445660862; Tue, 09 Sep 2025
+ 12:21:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/2] net: phylink: warn if deprecated array-style
- fixed-link binding is used
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <964df2db-082b-4977-b4c9-fbdcfc902f9e@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <964df2db-082b-4977-b4c9-fbdcfc902f9e@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250825193918.3445531-1-ameryhung@gmail.com> <7695218f-2193-47f8-82ac-fc843a3a56b0@nvidia.com>
+ <CAMB2axMk63AAv13q2QREn--ee-SMCwjhtv_iPN8EsrjN1L5EMw@mail.gmail.com>
+ <19e4aad7-c4ab-49a4-9be4-28f464e6789f@nvidia.com> <CAMB2axOJXqHu3QZNCtCKNM8ScuoQU4SWTHgcYva=+62YUydCHg@mail.gmail.com>
+In-Reply-To: <CAMB2axOJXqHu3QZNCtCKNM8ScuoQU4SWTHgcYva=+62YUydCHg@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 9 Sep 2025 15:20:48 -0400
+X-Gm-Features: Ac12FXxjrdZn7nfSzcymFT69uHuWWML_scQjPb83KOptvoHcQ8U7i_2g52NGVic
+Message-ID: <CAMB2axNOd=SvDkyjcgadJ0ZaC0HNSjeEJd11nYOaZNbm1PfUdA@mail.gmail.com>
+Subject: Re: [RFC bpf-next v1 0/7] Add kfunc bpf_xdp_pull_data
+To: Nimrod Oren <noren@nvidia.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, kuba@kernel.org, 
+	martin.lau@kernel.org, mohsin.bashr@gmail.com, saeedm@nvidia.com, 
+	tariqt@nvidia.com, mbloch@nvidia.com, maciej.fijalkowski@intel.com, 
+	kernel-team@meta.com, Dragos Tatulea <dtatulea@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The array-style fixed-link binding has been marked deprecated for more
-than 10 yrs, but still there's a number of users. Print a warning when
-usage of the deprecated binding is detected.
+On Tue, Sep 9, 2025 at 11:53=E2=80=AFAM Amery Hung <ameryhung@gmail.com> wr=
+ote:
+>
+> On Tue, Sep 9, 2025 at 9:21=E2=80=AFAM Nimrod Oren <noren@nvidia.com> wro=
+te:
+> >
+> > On 05/09/2025 1:16, Amery Hung wrote:
+> > > On Thu, Aug 28, 2025 at 6:39=E2=80=AFAM Nimrod Oren <noren@nvidia.com=
+> wrote:
+> > >> I got a crash when testing this series with the xdp_dummy program fr=
+om
+> > >> tools/testing/selftests/net/lib/. Need to make sure we're not breaki=
+ng
+> > >> compatibility for programs that keep the linear part empty.
+> > >
+> > > ping.py test ran successfully for me. Is this what you tried but
+> > > crashed the kernel?
+> >
+> > Yes, that's odd. Is it possible that the native multibuf case was
+> > skipped over because of an older iproute2/libbpf version?
+> >
+> > If it's helpful, I used iproute2-6.16.0 built with libbpf 1.7.0 support=
+.
+> > I am able to reproduce the crash by loading multibuf prog directly with=
+:
+> > `ip link set dev eth0 mtu 9000 xdp obj
+> > tools/testing/selftests/net/lib/xdp_dummy.bpf.o sec xdp.frags`
+>
+> I can reproduce it with v2. Will fix it in v3.
+>
+> The bug is that sinfo->flags is also cleared in build_skb(), so later
+> xdp_buff_has_frags() will always return false and no data was ever
+> pulled into the linear part.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/phylink.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index c7f867b36..d3cb52717 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -700,6 +700,9 @@ static int phylink_parse_fixedlink(struct phylink *pl,
- 			return -EINVAL;
- 		}
- 
-+		phylink_warn(pl, "%s uses deprecated array-style fixed-link binding!",
-+			     fwnode_get_name(fwnode));
-+
- 		ret = fwnode_property_read_u32_array(fwnode, "fixed-link",
- 						     prop, ARRAY_SIZE(prop));
- 		if (!ret) {
--- 
-2.51.0
-
-
+Correcting myself. It is sinfo->xdp_frags_size being cleared in
+xdp_update_skb_shared_info().
 
