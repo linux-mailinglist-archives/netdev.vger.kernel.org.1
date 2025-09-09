@@ -1,102 +1,126 @@
-Return-Path: <netdev+bounces-221119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49FF9B4A599
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:40:33 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49B7AB4A5A0
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:41:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61F8A188FC2E
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 08:40:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 351DE4E2668
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 08:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AA1253351;
-	Tue,  9 Sep 2025 08:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3619B24EF76;
+	Tue,  9 Sep 2025 08:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lh3LvbTw"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n9nlN2sw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C66824EF76;
-	Tue,  9 Sep 2025 08:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C01812CDA5;
+	Tue,  9 Sep 2025 08:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757407206; cv=none; b=mgXvmlBYTAoMBB39sTWUgAENGWU3e/k2xl1Oe9knNN2ZWbMuWp60X4jUJZUVfE9v1K5cVD1XnMBpcsyPSHSZMOA0+l0ZGLhDw1KKmQSqCS1ClkNdpft006Ght6tRBLU8GlipyBUkFg2JIli1p6UWYuxInyeMIngoDYSfE7HzQsM=
+	t=1757407268; cv=none; b=P9QUlTXxnDyoyXTki0LM+/q+mWtr4iJco34zEoQnPhpoQUtPXJb54aORm/tmTAOgJcLGcZSkUoKsteyHtpdOvNBNFriTVTHdShB/dH4YaTuEIm/1/DhOcv7a8UMahzC3fi0q+Jkg5wca3fdPnrqAsDL09kyIHwha7J5YljmBUvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757407206; c=relaxed/simple;
-	bh=0SXPnVWGEx+NQgbCUVyYI/dp+J4/4AoHcZZOFxntKrU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rftrm9NFaeJI71f1+DjvWEaGg0Np/dyUTTZqQGAtQAKFKCdO/LBcGkjTfj67nIUHUr/F7d8p3EIMVOnizyzQ7EkxccMze9B/4OjzxW3CG6+yMUVFQXLjUrZBYceQ9HAs7uk823iphWM6sgrIO6fudkk5OUlKl7Z3jVlEdir+Izs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lh3LvbTw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E82C4CEF4;
-	Tue,  9 Sep 2025 08:40:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757407206;
-	bh=0SXPnVWGEx+NQgbCUVyYI/dp+J4/4AoHcZZOFxntKrU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Lh3LvbTwEkRxA1/pCm4VkVFiVEdEzYngpt4yAGJToMByizLq3Bgxm0UB4K6cFP92P
-	 Z3eU4jB7XdqrlIYI4yKzt0OAGbCPxAaOIrFIVIyZ5Am0uIb8iW3ngOAyUGGXXnYIjF
-	 T+qu52GMx69QIrc5NSXgbKLmatM2Fubd9n6R55RW3xYr/QcwVgaS8HqZDgoJJvgyJE
-	 53DorZyziGbfO0LOc+8j/DD2wsIoe/hyUEGGEbjYWdPCeO5ARisfQgWZWnN3QmHYEm
-	 Ps13f3BwhZgFTgrsi4eiAZ6yeC6y513ar3DV13I2xGKHtXgWnlTd6XJgg1DQjMqBw2
-	 UZn8980N8UiBw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC8F383BF69;
-	Tue,  9 Sep 2025 08:40:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1757407268; c=relaxed/simple;
+	bh=uGMEncP4lHGM2Qp/+McTsbe9kY1ggJx8acYpyzupD0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MM8hrTjBxOgz+JybQUR8pdQO4LhTsY+2i7R08hQ5oKtyaVXFXFHdnm8V/vgqkfRe3/8gwFRXYJWh7cHkCxzu6vGQT5lq2CdccSemIvl8jlpk5bc9Wzwg+gJyc+6sKsXZ5CGtmaKyD5G5UOBrJ1ubaBg9JCT469V48iGyxdUGXak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n9nlN2sw; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id D1B927A0186;
+	Tue,  9 Sep 2025 04:41:04 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Tue, 09 Sep 2025 04:41:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757407264; x=1757493664; bh=gi7Pj5E1v28dezpa9bz0Nq1rTfOXCLwcpi8
+	93ag3yOI=; b=n9nlN2swWRzimk73YF2KLuCISCz0MUY3PJbPNGLMOPWATPhYRUZ
+	86lGBKEAlSP9qRpuXZCgm8Itvl1eeObaecoxpDK7FORPEMW9WguHTNJ69XVZFW2R
+	/hRdkc4D+MQ7Y5+J7fAK7l1KW9DaSe+tD99VjTl0EnxTabWXvlP+Ehyb36Fh0vfw
+	zFU8Sdrv9wXE58aeeiRGu8yXlCAUGFY3UqWz9UPNxUT/FMg0rBF6RCeK4fuW9rlQ
+	mokJt/P63U2mgK8SfcvsyY4RAiTpIWxdSLrMYLK947E+IUdDwEnZFI+oHW/POHsR
+	Dqwo3H1/vfMDjT7JUxqy0SxZn2epjQg8vqg==
+X-ME-Sender: <xms:IOi_aBl_krOwA77Dbn9_S-BlrAAYpnJWAeuY_wC_4Y-5flVftP5z2A>
+    <xme:IOi_aLyYx4CWMsxGciuAwd2obIbbqKBb52CfqBYU09l6tM3DBU8YbSXwnPzcIxU-W
+    Opcx8OTiwFCTuo>
+X-ME-Received: <xmr:IOi_aDtjLzEdgdUX9SEjal-abm3A2yfx_G7dy9hEqu3tZqO-TVu2sIUVnI6ZFhoaPSKRFcVvrsXWzRkj4llrxNM1FCEH7A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduleeliecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
+    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
+    hnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeghfen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughosh
+    gthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtohepihdrmhgrgihimhgvthhssehovhhnrdhorhhgpdhrtghpth
+    htohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggr
+    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesgh
+    hoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsth
+    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:IOi_aFGym4lRSDvwMpvdy1mli_8Yc6qRh1hfyG1zZuNrAnRzQoKo4Q>
+    <xmx:IOi_aB6CvXBBS2g3BOyqlb_E2WFvFdXRm7QXRgDqFVF7Z6HhMq3_uw>
+    <xmx:IOi_aGxl6lWQ8U_GlYGM3trwAe1F1tDN7F4-jw8qt1TdvuE7f5Xpjw>
+    <xmx:IOi_aH2WLwd1kqHKna2KhdJw8NNnK0ZTp8SQ_ihc03_L6Wvus6amcg>
+    <xmx:IOi_aBNzIqSAVbXQFpnG7AoFvbHyjvd1Nq8SbrHhCbzvBRbrT4EtBTGj>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 9 Sep 2025 04:41:03 -0400 (EDT)
+Date: Tue, 9 Sep 2025 11:41:01 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, dev@openvswitch.org,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Aaron Conole <aconole@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [PATCH net 1/2] net: dst_metadata: fix IP_DF bit not extracted
+ from tunnel headers
+Message-ID: <aL_oHVTjm6zw9AJO@shredder>
+References: <20250905133105.3940420-1-i.maximets@ovn.org>
+ <20250905133105.3940420-2-i.maximets@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2 0/3] Support exposing raw cycle counters in
- PTP
- and mlx5
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175740720950.574960.2387950388692390401.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Sep 2025 08:40:09 +0000
-References: <1755008228-88881-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1755008228-88881-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, richardcochran@gmail.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, gal@nvidia.com, tglx@linutronix.de,
- cjubran@nvidia.com, vladimir.oltean@nxp.com, dtatulea@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905133105.3940420-2-i.maximets@ovn.org>
 
-Hello:
+On Fri, Sep 05, 2025 at 03:30:55PM +0200, Ilya Maximets wrote:
+> @@ -220,9 +221,15 @@ static inline struct metadata_dst *ip_tun_rx_dst(struct sk_buff *skb,
+>  						 int md_size)
+>  {
+>  	const struct iphdr *iph = ip_hdr(skb);
+> +	struct metadata_dst *tun_dst;
+> +
+> +	tun_dst = __ip_tun_set_dst(iph->saddr, iph->daddr, iph->tos, iph->ttl,
+> +				   0, flags, tunnel_id, md_size);
+>  
+> -	return __ip_tun_set_dst(iph->saddr, iph->daddr, iph->tos, iph->ttl,
+> -				0, flags, tunnel_id, md_size);
+> +	if (iph->frag_off & htons(IP_DF))
+> +		__set_bit(IP_TUNNEL_DONT_FRAGMENT_BIT,
+> +			  tun_dst->u.tun_info.key.tun_flags);
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Shouldn't you check that tun_dst isn't NULL?
 
-On Tue, 12 Aug 2025 17:17:05 +0300 you wrote:
-> Hi,
-> 
-> This series by Carolina adds support in ptp and usage in mlx5 for
-> exposing the raw free-running cycle counter of PTP hardware clocks.
-> 
-> This is V2. Find previous one here:
-> https://lore.kernel.org/all/1752556533-39218-1-git-send-email-tariqt@nvidia.com/
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,V2,1/3] ptp: Add ioctl commands to expose raw cycle counter values
-    https://git.kernel.org/netdev/net-next/c/faf23f54d366
-  - [net-next,V2,2/3] net/mlx5: Extract MTCTR register read logic into helper function
-    https://git.kernel.org/netdev/net-next/c/96c345c3c54c
-  - [net-next,V2,3/3] net/mlx5: Support getcyclesx and getcrosscycles
-    https://git.kernel.org/netdev/net-next/c/a3fb485505ca
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> +	return tun_dst;
+>  }
 
