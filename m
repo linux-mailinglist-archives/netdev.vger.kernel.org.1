@@ -1,101 +1,164 @@
-Return-Path: <netdev+bounces-221058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F4B3B4A000
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 05:24:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46F01B49FA5
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 05:03:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF84B4E6276
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:24:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 538F01B25A88
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C32F265CA7;
-	Tue,  9 Sep 2025 03:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vYiYVXiU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5D324A063;
+	Tue,  9 Sep 2025 03:03:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7494D515;
-	Tue,  9 Sep 2025 03:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E654315A;
+	Tue,  9 Sep 2025 03:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757388239; cv=none; b=UtDpKlazvwj1kXdbkNy5g2nSWkAqBsVLqxoBXC1zPmD/hS/AoMeSz1rApSBRDWhaa7SltqW4QVNgY8kN5KE45QJfGYdE9rj6IoiMUMisfAKfkVq+b/uDcxFEOwKN1WJ9vyqCOPv8d2DS5+I0w6pbCInDGn5Nh4HWUeegbBWtobQ=
+	t=1757387010; cv=none; b=Dv4DUQnS8/46l9HmFauirr+Yklkiav4GL0tv0ICLW+u3NAyptDA/anmc7ZJ6LW7myjNAJAhaGftAW1RPe5FZ0N3mz1jgSb5F81XBC/k9PqpWu99WxJM0Lvahz6VLP/oocEHFN1GUinZDUHCqswU6ae+OECVUxrD310Vvc6yFp3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757388239; c=relaxed/simple;
-	bh=pswCMpx2vTdQ1c7alrFPSg51STxY+Ef9ucqfFUYaqWM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mJvG8+w6clZn7VleWoo5u/ESOpbqX9gboYLWj87svO1KoXoTek3vH6Puw5LGhh5ABtecpdSss84EXSBLTCT9rYGfEO+ZpBQc+4qIy0/b4zSjpLmOe1yrDL1EfU2f/rfpqle2JtDkQ2HT5f0BkCJA7Ujz5T0xNyaffOuKPIEX9pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vYiYVXiU; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1757388233; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=3kUMao3FvCL6I7A/UN7ip7pd2M3nqoLuRCUIBR3cW0E=;
-	b=vYiYVXiUUKMEcjfFwUFjDK7FBk4xB1mNoYoXrMlv552rBDl2ILnOaaTF+jO3JDpchH3wGss0rnBdQROPwHJy1gUlL1YzdvSWyim70qcOV2BhRZmLRd/d+YZeI6sWq8aC5r+DHTmMOl6lF/st4d/TkRkC2SU0okJlPyUQCf7cqWU=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Wnc7Yfp_1757388232 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 09 Sep 2025 11:23:52 +0800
-Date: Tue, 9 Sep 2025 11:23:52 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Kriish Sharma <kriish.sharma2006@gmail.com>, alibuda@linux.alibaba.com,
-	sidraya@linux.ibm.com, wenjia@linux.ibm.com
-Cc: mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH] net/smc: replace strncpy with strscpy for ib_name
-Message-ID: <aL-dyGTIUuwK_R8_@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
+	s=arc-20240116; t=1757387010; c=relaxed/simple;
+	bh=5Br/JtHWpm9N8F9/75f4idwkCmmdDe/0q5sbqqZBaW4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=C6HPs/WHfpDcZGwNE/gZle3PtfYFpj3uWdugFNeTOtOFAJFs3GhOth7xGiSfLH2dto3NjeMZjvZJqPnrTRRpmaMreiPciU1HqVPxVVehBpOTv6m3WD/gVsTxstusE/DQoMTfiGHry8rEhHyhiVHejK7qOsRnH+Gg+ELGkjA3WQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cLT7n1ybPz2TTKD;
+	Tue,  9 Sep 2025 10:59:49 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8FB85180043;
+	Tue,  9 Sep 2025 11:03:03 +0800 (CST)
+Received: from huawei.com (10.50.159.234) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 9 Sep
+ 2025 11:03:02 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <gregkh@linuxfoundation.org>, <jirislaby@kernel.org>,
+	<npitre@baylibre.com>, <simona@ffwll.ch>, <deller@gmx.de>,
+	<soci@c64.rulez.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <linux-fbdev@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [report] BUG: KASAN: slab-out-of-bounds in soft_cursor+0x454/0xa30
+Date: Tue, 9 Sep 2025 11:24:43 +0800
+Message-ID: <20250909032443.196506-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On 2025-09-08 18:09:13, Kriish Sharma wrote:
->Replace the deprecated strncpy() with strscpy() for ib_name in
->smc_pnet_add_ib(). The destination buffer should be NUL-terminated and
->does not require any trailing NUL-padding. Since ib_name is a fixed-size
->array, the two-argument form of strscpy() is sufficient and preferred.
->
->Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+Hello, my local syzkaller report a KASAN slab-out-of-bounds issue:
 
-I think d250f14f5f0754ce2d05d9c0ce778e4a51f488b0 has already done the
-same thing.
+ ==================================================================
+ BUG: KASAN: slab-out-of-bounds in soft_cursor+0x454/0xa30
+ Read of size 128 at addr ffff88810f53d000 by task test/674
 
-Best regards,
-Dust
+ CPU: 1 UID: 0 PID: 674 Comm: test Not tainted 6.17.0-rc4+ #272 PREEMPT(none)
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0xab/0xe0
+  print_address_description.constprop.0+0x2c/0x3d0
+  print_report+0xb4/0x270
+  kasan_report+0xb8/0xf0
+  kasan_check_range+0x39/0x1c0
+  __asan_memcpy+0x24/0x60
+  soft_cursor+0x454/0xa30
+  ccw_cursor+0x1715/0x1ce0
+  fbcon_cursor+0x410/0x5f0
+  hide_cursor+0x8b/0x230
+  redraw_screen+0x5c7/0x740
+  vc_do_resize+0xcdd/0xe90
+  fbcon_do_set_font+0x45d/0x940
+  fbcon_set_font+0x83b/0x980
+  con_font_op+0x805/0xa10
+  vt_k_ioctl+0x2f9/0xb00
+  vt_ioctl+0x14a/0x1870
+  tty_ioctl+0x6d0/0x1610
+  __x64_sys_ioctl+0x194/0x210
+  do_syscall_64+0x5f/0x2d0
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  </TASK>
 
+ Allocated by task 613:
+  kasan_save_stack+0x24/0x50
+  kasan_save_track+0x14/0x30
+  __kasan_kmalloc+0x7f/0x90
+  __kmalloc_noprof+0x1f5/0x510
+  fbcon_rotate_font+0x440/0xee0
+  fbcon_switch+0x751/0x1480
+  redraw_screen+0x2b6/0x740
+  vc_do_resize+0xcdd/0xe90
+  fbcon_modechanged+0x333/0x6d0
+  fbcon_set_all_vcs+0x1e0/0x3c0
+  rotate_all_store+0x2e4/0x370
+  dev_attr_store+0x5c/0x90
+  sysfs_kf_write+0x1db/0x270
+  kernfs_fop_write_iter+0x365/0x510
+  vfs_write+0xa5e/0xd70
+  ksys_write+0x129/0x240
+  do_syscall_64+0x5f/0x2d0
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
->---
-> net/smc/smc_pnet.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
->index 76ad29e31d60..b90337f86e83 100644
->--- a/net/smc/smc_pnet.c
->+++ b/net/smc/smc_pnet.c
->@@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
-> 		return -ENOMEM;
-> 	new_pe->type = SMC_PNET_IB;
-> 	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
->-	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
->+	strscpy(new_pe->ib_name, ib_name);
-> 	new_pe->ib_port = ib_port;
-> 
-> 	new_ibdev = true;
->-- 
->2.34.1
+This issue can be reproduced by:
+ echo 3 > /sys/devices/virtual/graphics/fbcon/rotate_all
+ ioctl(fd, KDFONTOP, &font_op); // set bigger width or height
+
+When exec KD_FONT_OP_SET cmd, function fbcon_do_set_font() update
+vc->vc_font.width/height, but visit the old ops->fontbuffer in
+ccw_cursor(), which will be updated in fbcon_rotate_font() later.
+
+fbcon_set_font
+    fbcon_do_set_font
+        // update vc->vc_font.width/height
+        vc->vc_font.width = w;
+        vc->vc_font.height = h;
+        vc_do_resize
+            redraw_screen
+                // ops->fontbuffer is old, but width/height is new
+                hide_cursor
+                    ccw_cursor
+                        src = ops->fontbuffer + (...*vc->vc_font.width));
+                // update ops->fontbuffer
+                fbcon_switch
+                    fbcon_rotate_font
+                        ops->fontbuffer = kmalloc_array(len, d_cellsize);
+
+I am not sure below code is ok to fix this issue, although it can prevent
+the KASAN report.
+
+diff --git a/drivers/tty/vt/vt.c b/drivers/tty/vt/vt.c
+index 62049ceb34de..12dc2fa30417 100644
+--- a/drivers/tty/vt/vt.c
++++ b/drivers/tty/vt/vt.c
+@@ -953,7 +953,6 @@  void redraw_screen(struct vc_data *vc, int is_switch)
+ 		if (tty0dev)
+ 			sysfs_notify(&tty0dev->kobj, NULL, "active");
+ 	} else {
+-		hide_cursor(vc);
+ 		redraw = 1;
+ 	}
+ 
+@@ -964,6 +963,8 @@  void redraw_screen(struct vc_data *vc, int is_switch)
+ 		set_origin(vc);
+ 		update = vc->vc_sw->con_switch(vc);
+ 		set_palette(vc);
++		if (!is_switch)
++			hide_cursor(vc);
+ 		/*
+ 		 * If console changed from mono<->color, the best we can do
+ 		 * is to clear the buffer attributes. As it currently stands,
 
