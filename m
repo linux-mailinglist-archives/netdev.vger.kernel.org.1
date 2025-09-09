@@ -1,149 +1,145 @@
-Return-Path: <netdev+bounces-221146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88C9B4A7DA
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:30:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03A56B4A7F2
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A36D163030
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29B5177F5F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70BB28726B;
-	Tue,  9 Sep 2025 09:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE4F2C2361;
+	Tue,  9 Sep 2025 09:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WKwPSCRv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaX04Jt+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9782853F1;
-	Tue,  9 Sep 2025 09:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90EE2C21F8
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 09:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757409667; cv=none; b=BbHU9JSYkXXnHA+eNUjK7X7AQe/CmTwW5m/8ORIBCDqojsXQqZkDSzZDLDrJEBVvvk8XQ71wskTqtJSUmlu11Vm2QTyWdNkd/go8/lRkEGOZ/5GOsv7tDK/X2T975HMr+uEd7eM5zRC0R8jo0BQ6R5CyMLsd5tUytcXTqIYOopE=
+	t=1757409800; cv=none; b=p3bqRWydX2tSWcswxEhifDGSvZX/Hz8zc5wWj7hyrPD7pTWgq35XO5E2COhcmOGjicP57YEiWc02fy5Np58IuAmahp2kwLov0Q9unwaRWvmBfQ6m8xg7SiFScxtVPMj2131xmfoQQwsETupeuXjmTrGJ+kOmEIIkbNATZqsQCeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757409667; c=relaxed/simple;
-	bh=WuzPPifEQj9HHVMmiWcrGA+eJ4Bw5fBh6CnZszj0M4k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a53kbGS0JVCT4UaRCHfGnCUlDGikaYJvVnM2WHVil1r27HeEsl3Qgt4lFwrjoLOP/eVXubJCIzi+0+z4acMrKbe88/x/ZiHQdREcW7YljdSwN+873IlXMODl4FYCpLWq5r6e2Fc9geD9VY62I/GKIDEYutCmS32vvYWQo5Fj0ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WKwPSCRv; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b04163fe08dso913476466b.3;
-        Tue, 09 Sep 2025 02:21:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757409664; x=1758014464; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I2plwHTeZpARhSkuJ9Y2jpaZ80nzRFMhPMwl83KVZn8=;
-        b=WKwPSCRv4qhpYn/3vXKFrZmHEm6+ORjQdXir1t8onbs04N/E1ba+AcBNJAltF0DyTL
-         Lcm1Cc11zbslHK6NKJhkZhYUmByZSw16jMCQFzk5GFiV3gWe/TSD7zhjUSUmGuY820bZ
-         XWxS3V9H251ZY234PmjXpYXkj3wAGXCcqE51s1qte9QL58L5HAObrwjCUUnPbZnw7JHR
-         dh1qfSin9OKw1ssbbPSI2IBalGVpPi64SH2+B93nthzBZI6v8ps331ijPbCqXxhPu0eE
-         v9xeAUj0Ocvqmn9dSZnbey6bQhvG/9lI+2d4oOMhRQfhIOcGFvW/uscCCmhFbPnrISrL
-         sqvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757409664; x=1758014464;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I2plwHTeZpARhSkuJ9Y2jpaZ80nzRFMhPMwl83KVZn8=;
-        b=H74Ebm86H9Egi3klsmJcBi1uaHySZw76XlsRJiCsxJNqCBiUrmN80rlj8wRaw8KQGA
-         EhwMeGu57F2RsYbfsamrY4IvgVBXxgX36ayODdFg6Jb3rBDHolF2QP58bIPiargctL46
-         Uxvh5LoaJo+skUhMpCWMZO/7aIAEp2zTdygnyiXKh7+rz3P2SXLfSgwDUNF8gALn7jUg
-         9xnWnnyv3NEPtGmcoeT4gEf3Es67fKfPxS52+N2XN9TQK8ffB5FSD2bc315kxr0otgLa
-         BMQITVZ0ts0TmBKeTjeIsQmGY71xkPquUUarEqwy/jPgrboURdgbB+KsZ3E7Rb6uaBlh
-         29nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6a719hXgVB7Q8eVzp8i/ptSh/PgCbNpTuK2zlSkyhEmEQb4epUz276f4J5i+oy0benmy2TWw=@vger.kernel.org, AJvYcCV98jLeyiBnOOTbKoQ3Vn1o3C16VCzXdWPq/p8x4jTQfVUaSWZCw4MJrngHDsOobvISnnTDrG577PTYGpeAxT23@vger.kernel.org
-X-Gm-Message-State: AOJu0YyM+CgWKNOLJl7rEGLF58H3BwClm9TDdRy0FDKbAM3qLOsIZWhY
-	ImsUd0lxZm8k4ga9/PofRDrkWMO/bKw4DnoGry9AubZjZOmcTtIEWHVu
-X-Gm-Gg: ASbGnctByiYw+jsAxulK2YBAyTpOMOKvtAqF0KO9dK1rlTQLHccTIbZF2IhP+Sy8B7O
-	I8wWxWpa15HeEFqA5eaFR3iT56LE7goE7IBQk4xfUtBDdbya5gYYuOILXivBDyVytx2S8HbepAX
-	KREZCU3YZj6TnSy2prjdLPO5TA3sIgBQJk7R8ySOYGpnU7MuRSGuqPOXl3ALjUuSerb5ShFI/BR
-	SoqRP+auYo86f3lnPL8fU6AunjNplWOZy1U1yOYDMJYkB4F0RAjLFrHPDKW27h1uvCpa9LDBriG
-	dJmLrPpsCdLHE+/LAA7MHzbz+o2KQ3/amqVxkCjAy0jnbg5sHXmnjYZQTzJuCSoLvTmoup95kOc
-	hzTOl9k+rCTB3HoEsC8sWrf2oypt+dUuLF6GmJFsNFY33dHSjhp7s31AStocOaQ2poP/hXNpX5I
-	oyWbT2QfoVfeGwdzjpC1avylDF1RWcWOXCalYxD5fqD449BVOgUmje51qgglvVCsTeQrhb69gDL
-	hDYaYHtZi0yuNl6HJnX2J1+Aczmk5EunxfQESbOY24=
-X-Google-Smtp-Source: AGHT+IGS/aJ996YKDZSFeqCFIy50lExzH/QqxhiTSTzJ51+0XLvp+rrAxwtXLJPKmlt+0wvatIZOCg==
-X-Received: by 2002:a17:907:1c8c:b0:afe:ed71:80aa with SMTP id a640c23a62f3a-b04b16d6406mr1209586266b.57.1757409664029;
-        Tue, 09 Sep 2025 02:21:04 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62bfe99ffcbsm904264a12.3.2025.09.09.02.21.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Sep 2025 02:21:03 -0700 (PDT)
-Message-ID: <5334812c-37cb-42fa-9d53-402cf3d63786@gmail.com>
-Date: Tue, 9 Sep 2025 11:21:02 +0200
+	s=arc-20240116; t=1757409800; c=relaxed/simple;
+	bh=ZtUxTF7SCvaPXz0xumFUnj3btwu5AIXrNfPfcFNSuwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H1njeFCfBcHimRjBbLXbxLT0aaghpYK0t+k3o4PtQyAEJw1Xbz3DuGRIvA+Rb9JD7TOW4nZdoe6fzR6J2cCxB1Oj9MZ/TPU0EasK3Tb/swiIQKf4+SU6pbLyisO8AbdIKyqGx2CUGN1CW7HVt5+j8Pz2RxQz4L9iEX+hNjGFZkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaX04Jt+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4FDC4CEF4;
+	Tue,  9 Sep 2025 09:23:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757409800;
+	bh=ZtUxTF7SCvaPXz0xumFUnj3btwu5AIXrNfPfcFNSuwI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VaX04Jt+J51CC6pAvNqoreavF+jJY0bcE85qLx/uLu82eA8nFWG06+a81SK1Z9K5o
+	 /BIabv5okFswTXAlRWKK8q4qEVx56WPDxz4VI/UuEbBEJBcPn5J5JmS0ryPivls6yr
+	 AJ58WSEEnFHGlQhXfRXs/ekAIY5V9ByUiCzWRX4BVnn848DmruLtYOdffh1RRTAlqg
+	 I42IxFd5t1gSy+f9hxSf+yiWPo+FA3ZCi8b5WHdsEFfFzaGmyhhTSXm2MgrJxabueO
+	 lA9ki6arWAsoIRM410o4A5kT21YgTLLl0Fu3Wp1Y2J4JB2G0MVJ9c6nsiClVlXtn9i
+	 1mmjHSeYeZuiQ==
+Date: Tue, 9 Sep 2025 12:23:15 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Zhu Yanjun <yanjun.zhu@linux.dev>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Xiumei Mu <xmu@redhat.com>
+Subject: Re: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
+Message-ID: <20250909092315.GC341237@unreal>
+References: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 nf-next 3/3] netfilter: nft_chain_filter: Add bridge
- double vlan and pppoe
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- bridge@lists.linux.dev, netdev@vger.kernel.org
-References: <20250708151209.2006140-1-ericwouds@gmail.com>
- <20250708151209.2006140-4-ericwouds@gmail.com> <aLykN7EjcAzImNiT@strlen.de>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <aLykN7EjcAzImNiT@strlen.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
 
+On Mon, Aug 25, 2025 at 02:50:23PM +0200, Sabrina Dubroca wrote:
+> Xiumei reported a regression in IPsec offload tests over xfrmi, where
+> IPv6 over IPv4 tunnels are no longer offloaded after commit
+> cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
+> implementation").
 
+What does it mean "tunnels not offloaded"? xdo_dev_offload_ok()
+participates in data path and influences packet processing itself,
+but not if tunnel offloaded or not.
 
-On 9/6/25 11:14 PM, Florian Westphal wrote:
-> Eric Woudstra <ericwouds@gmail.com> wrote:
->> +	__be16 outer_proto, proto = 0;
->>  	struct nft_pktinfo pkt;
->> +	int ret, offset = 0;
->>  
->>  	nft_set_pktinfo(&pkt, skb, state);
->>  
->>  	switch (eth_hdr(skb)->h_proto) {
->> +	case htons(ETH_P_PPP_SES): {
->> +		struct ppp_hdr {
->> +			struct pppoe_hdr hdr;
->> +			__be16 proto;
->> +		} *ph;
+Also what type of "offload" are you talking? Crypto or packet?
+
 > 
-> Maybe add nft_set_bridge_pktinfo() and place this
-> entire switch/case there?
+> Commit cc18f482e8b6 added a generic version of existing checks
+> attempting to prevent packets with IPv4 options or IPv6 extension
+> headers from being sent to HW that doesn't support offloading such
+> packets. The check mistakenly uses x->props.family (the outer family)
+> to determine the inner packet's family and verify if
+> options/extensions are present.
+
+This is how ALL implementations did, so I'm not agree with claimed Fixes
+tag (it it not important).
+
 > 
+> In the case of IPv6 over IPv4, the check compares some of the traffic
+> class bits to the expected no-options ihl value (5). The original
+> check was introduced in commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add
+> Innova IPSec offload TX data path"), and then duplicated in the other
+> drivers. Before commit cc18f482e8b6, the loose check (ihl > 5) passed
+> because those traffic class bits were not set to a value that
+> triggered the no-offload codepath. Packets with options/extension
+> headers that should have been handled in SW went through the offload
+> path, and were likely dropped by the NIC or incorrectly
+> processed.
 
-Ok. At the end of nft_do_chain_bridge() I've added (after removing
-skb->protocol munging):
+The latter is more correct, so it raises question against which
+in-kernel driver were these xfrmi tests performed?
 
-	if (offset && ret == NF_ACCEPT)
-		skb_reset_network_header(skb);
 
-To reset the network header, only when it had been changed.
-
-Do you want this helper to return the offset, so it can be used here?
-Or do you think it is more clean to always reset the network header like so:
-
-	if (ret == NF_ACCEPT)
-		skb_reset_network_header(skb);
-
-(Same question for nf_ct_bridge_pre())
-
->> +		skb_set_network_header(skb, offset);
+> Since commit cc18f482e8b6, the check is now strict (ihl !=
+> 5), and in a basic setup (no traffic class configured), all packets go
+> through the no-offload codepath.
 > 
-> I assume thats because the network header still points to
-> the ethernet header at this stage?
+> The commits that introduced the incorrect family checks in each driver
+> are:
+> 2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
+> 8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
+> 859a497fe80c ("nfp: implement xfrm callbacks and expose ipsec offload feature to upper layer")
+> 32188be805d0 ("cn10k-ipsec: Allow ipsec crypto offload for skb with SA")
+> [ixgbe/ixgbevf commits are ignored, as that HW does not support tunnel
+> mode, thus no cross-family setups are possible]
+> 
+> Fixes: cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback implementation")
+> Reported-by: Xiumei Mu <xmu@redhat.com>
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> ---
+>  net/xfrm/xfrm_device.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> index c7a1f080d2de..44b9de6e4e77 100644
+> --- a/net/xfrm/xfrm_device.c
+> +++ b/net/xfrm/xfrm_device.c
+> @@ -438,7 +438,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
+>  
+>  	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
+>  			    x->props.mode == XFRM_MODE_TUNNEL;
+> -	switch (x->props.family) {
+> +	switch (x->inner_mode.family) {
 
-That is correct.
+Will it work for transport mode too? We are taking this path both for
+tunnel and transport modes.
 
+Thanks
+
+>  	case AF_INET:
+>  		/* Check for IPv4 options */
+>  		if (ip_hdr(skb)->ihl != 5)
+> -- 
+> 2.50.0
+> 
+> 
 
