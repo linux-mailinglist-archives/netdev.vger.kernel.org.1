@@ -1,184 +1,183 @@
-Return-Path: <netdev+bounces-221030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D9AB49EA5
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:23:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE61B49EAA
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:28:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FE4C7B2329
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:21:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B516B44326C
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F5B209F43;
-	Tue,  9 Sep 2025 01:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA05D20013A;
+	Tue,  9 Sep 2025 01:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Is/jeUlP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/9Y4851"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D8D16DC28;
-	Tue,  9 Sep 2025 01:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275811B4236;
+	Tue,  9 Sep 2025 01:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757380987; cv=none; b=dc3Vk0T9MCmAHFuOf2d+9GkIrPB8XK2TaMv9HsG5UPYlpkurDqR5UrIfDZswBBmY5qOOTTor36KgC0Ebd/xtA3V2MOq4qMf20bghcenebHVk+5onE+Sf1yaazowiUYNtgEQABKGFDEDb+3/CoumCP4c6T8PtOJer71wc+nVptyI=
+	t=1757381280; cv=none; b=jEQeopMvIarmfgDqAHmiO9B9PMLH/mGz0rN/kdTzBh+XHvF13sdEi3W/z4gK4RZBbYSUenLS/dFlRXRWUvkgnNxw50tslelzNXFc0J5HYQQEquAXxvKqXcWcJWszL5xZyDZpPDQllSRT3r0omD+eLqWloF8/5d6i4O1tQz3E7pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757380987; c=relaxed/simple;
-	bh=+Suf3UYL1FEYqrtEdRrLdPX55+LxnXEf18p8fqNUYqo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ttmgnCyY7k+W4q58+Bw+XYpi1bVbaX/B6zRuOK1qKqKwA+hYhyMMoREHuTXJImh43Ri176FpAplDKNpXtZ809fBdl4BPyZ5XW1GVVOjlCndvrXlyaqvmZTM8r/lBqE4t1vhDslGzWeBN1v28N6NSykacitaB6PVWFDK8Dm5rzh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Is/jeUlP; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1757380981; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=xA2Ejw8sW8Ofk5QY6h87367f6vzr1rTStNEScUBbL98=;
-	b=Is/jeUlPQCjThmyHaJHkSbMrMF10wWmdyesywFmj8n8Dapc4jEKcpng2/HQfOEe+y+58zByof03mDffmjKu3W5Lm286VUOr7o8py5BospLjW0w0pbgQNwaTD2hh1ygVp85WXAcW0/Bz01l9hpRkVV7rIIvOxkrdyiBrqSeWoipQ=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WnbokwK_1757380980 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 09 Sep 2025 09:23:00 +0800
-Date: Tue, 9 Sep 2025 09:23:00 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1757381280; c=relaxed/simple;
+	bh=B5ZFMkGjmY+vIrXnKhTW9Lh6m3Wku/o+F3qXKFeoB8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=THRbhZnUPMfenFs0K5C76iMHKlCB3AAj8JWmKtXVfBL7sP8DZZ9Yyx+oQJ4YJrR/hTK5jPSV+Q/qFVktZbiD8KTvCsuA28H8pff682ujVDNf57EbjVICnAoiy7xR0YOeiHK4wRqWrf9uhQr05omjjx7kxFSGM7/cfGEJf/1MJUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/9Y4851; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-24b21006804so53895875ad.3;
+        Mon, 08 Sep 2025 18:27:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757381278; x=1757986078; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zVL5RQzUcb9PU/O16qoWzzj4q/7jnz1L2B/aT6TsKSE=;
+        b=G/9Y4851kFEjbRrdrcIPcCXeUhuyTvXY/3qB69njJLtRdZ0rwqSSvv9H0Y0M7ELA2X
+         moX66wW65p5t2ferm/GHXcAiVtmUX7TnehazS8j1kHILXaR9COThIcCQHFt1pE/l79IJ
+         o8j1vOqbz57utOOCfga5MjCEn7xr6Ela8eEuXPLSRnnLrQNIytuD/0gfH2QzAI/en6Nh
+         SnV543dla5L8OSzbusonUNnxqZcmmpHYFCmFiIaQKmqfpqe5gRSVUneL9x8vd+ZuLofc
+         08cRNcnvsM0ifJHjEEsMMvEcYqGpjBRFmvyP8RaS6OlKkvpynINmaFp1rK7LE9R45AEh
+         9WNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757381278; x=1757986078;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zVL5RQzUcb9PU/O16qoWzzj4q/7jnz1L2B/aT6TsKSE=;
+        b=BlUTUzUb/MZhqrJvisokYta7Ye8+QB5d8d01y2Sw+QBHGzOr3RIm3azGAlR137RT3a
+         Q92BbRoA6JxpVjIw+wCxKQZhHCkEHBHBe2GhTx7MrAFEVp7TsxI1PA+LhjpTOZqSUrAC
+         84b/amhMvyuoBG7kK+Qi7pOz3zP7a/0eFFw0AfOg/3KrRlRuOV5gif4EBZ6UmQQfp691
+         KK3GpVHhGJZtKWnbMhxsk57mJ04kfD2uCxJyhAYxBwsW6oCeekM8OV+DQPlDlUv/V+Y4
+         uLnM62gvS0q3etPm7fTlmurxLDfhEi5i5UoHtuAhnV0eJo3HWXiwUJq3tYSSvNElpMEE
+         cB8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVGsdUe8jTlCIMe4gal1CLJjPaPk49Ymmv037BqMwTg+Aj7tpb87z5vaOQ3CTC4hryeljVQKGxo@vger.kernel.org, AJvYcCVODhKnnI+lzFVGF+qew7PCPIZU17Fd8VYemHfJXQdEPW9DWFR9K5Qwv+fsWoDCDnu26UzDojHsmE9fuN4=@vger.kernel.org, AJvYcCXa2hq+w93xnfMcpvHTNzr+tz/xNev6VGXjlhafi8iGNOskPaY5q/xD5z2Lx+r6sY9AXFObf8e8uP/2@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz46YzdUXkfUo5z2+OebWanSJgHKZ7XxYG8zR+YLkfHlnHgo2wT
+	gTdL8PAV66H0Mb3XQvbAYwgZEmxl6VkRBs9XEVEJkl7vQHJWIj8Rfdpl
+X-Gm-Gg: ASbGncvA9ouBfVE/cIlpAljZpwoUGSVgHq2ggqbhT5uU+nD4RjeOI7eQRnYdFFiB945
+	NWM03dhTQUly96918+rKYdzGTAtD2gERkJQJphS5P0nWZVBuuRn4QZ1/r1PjiNtyonqJThhcnnr
+	HN6mjHKJxFjvAcZVY3mupBbgB2PgzAAt5BniERsgNb3nNA3NRTefY/BGAJYv8l9Y6uGXgk9Hus/
+	UDoaY2P1q95uDcAb96nqxHJ7M/SwJFLSRCrAU+/cYG9TcOOox91UL6tzbq98qAoYOfIeV29DB8Z
+	yRCL9o72AvNOBhY47EAEElZS2FVD6+1fX6esKyhGgxvJPeXhpmm7L8Z7KQEFs8KCC9sBQCNkHUQ
+	ZJ1PJ4G05U+jitN2Lgi7tBZvm
+X-Google-Smtp-Source: AGHT+IEPtuO7DboDqC0Z65bSwRCzFJptOMP2db+sMR313mW4hzlCUzZaKdQapUJHP8Ppi+kuvjZ4AQ==
+X-Received: by 2002:a17:902:8342:b0:24c:a22d:4c34 with SMTP id d9443c01a7336-25174373ed5mr90647735ad.41.1757381278329;
+        Mon, 08 Sep 2025 18:27:58 -0700 (PDT)
+Received: from gmail.com ([223.166.84.15])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24b1f7492d8sm182020375ad.129.2025.09.08.18.27.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Sep 2025 18:27:57 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Julian Ruess <julianr@linux.ibm.com>,
-	Aswin Karuvally <aswin@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next 01/14] net/smc: Remove error handling of
- unregister_dmb()
-Message-ID: <aL-BdPSnQTPUy5rc@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250905145428.1962105-1-wintera@linux.ibm.com>
- <20250905145428.1962105-2-wintera@linux.ibm.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Felix Fietkau <nbd@nbd.name>
+Subject: [RFC PATCH net-next v2] ppp: enable TX scatter-gather
+Date: Tue,  9 Sep 2025 09:27:42 +0800
+Message-ID: <20250909012742.424771-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250905145428.1962105-2-wintera@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On 2025-09-05 16:54:14, Alexandra Winter wrote:
->smcd_buf_free() calls smc_ism_unregister_dmb(lgr->smcd, buf_desc) and
->then unconditionally frees buf_desc.
->
->Remove the cleaning up of fields of buf_desc in
->smc_ism_unregister_dmb(), because it is not helpful.
->
->This removes the only usage of ISM_ERROR from the smc module. So move it
->to drivers/s390/net/ism.h.
->
->Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
->Reviewed-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+When chan->direct_xmit is true, and no compressors are in use, PPP
+prepends its header to a skb, and calls dev_queue_xmit directly. In this
+mode the skb does not need to be linearized.
+Enable NETIF_F_SG and NETIF_F_FRAGLIST, and add .ndo_fix_features()
+callback to conditionally disable them if a linear skb is required.
+This is required to support PPPoE GSO.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+RFC v2:
+ Dynamically update netdev features with ndo_fix_features() callback.
+ Link to RFC v1: https://lore.kernel.org/netdev/20250904021328.24329-1-dqfext@gmail.com/
 
-Best regards,
-Dust
+ drivers/net/ppp/ppp_generic.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
->---
-> drivers/s390/net/ism.h |  1 +
-> include/net/smc.h      |  2 --
-> net/smc/smc_ism.c      | 14 +++++---------
-> net/smc/smc_ism.h      |  3 ++-
-> 4 files changed, 8 insertions(+), 12 deletions(-)
->
->diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
->index 047fa6101555..b5b03db52fce 100644
->--- a/drivers/s390/net/ism.h
->+++ b/drivers/s390/net/ism.h
->@@ -10,6 +10,7 @@
-> #include <asm/pci_insn.h>
-> 
-> #define UTIL_STR_LEN	16
->+#define ISM_ERROR	0xFFFF
-> 
-> /*
->  * Do not use the first word of the DMB bits to ensure 8 byte aligned access.
->diff --git a/include/net/smc.h b/include/net/smc.h
->index db84e4e35080..a9c023dd1380 100644
->--- a/include/net/smc.h
->+++ b/include/net/smc.h
->@@ -44,8 +44,6 @@ struct smcd_dmb {
-> 
-> #define ISM_RESERVED_VLANID	0x1FFF
-> 
->-#define ISM_ERROR	0xFFFF
->-
-> struct smcd_dev;
-> 
-> struct smcd_gid {
->diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
->index a58ffb7a0610..fca01b95b65a 100644
->--- a/net/smc/smc_ism.c
->+++ b/net/smc/smc_ism.c
->@@ -205,13 +205,13 @@ int smc_ism_put_vlan(struct smcd_dev *smcd, unsigned short vlanid)
-> 	return rc;
-> }
-> 
->-int smc_ism_unregister_dmb(struct smcd_dev *smcd, struct smc_buf_desc *dmb_desc)
->+void smc_ism_unregister_dmb(struct smcd_dev *smcd,
->+			    struct smc_buf_desc *dmb_desc)
-> {
-> 	struct smcd_dmb dmb;
->-	int rc = 0;
-> 
-> 	if (!dmb_desc->dma_addr)
->-		return rc;
->+		return;
-> 
-> 	memset(&dmb, 0, sizeof(dmb));
-> 	dmb.dmb_tok = dmb_desc->token;
->@@ -219,13 +219,9 @@ int smc_ism_unregister_dmb(struct smcd_dev *smcd, struct smc_buf_desc *dmb_desc)
-> 	dmb.cpu_addr = dmb_desc->cpu_addr;
-> 	dmb.dma_addr = dmb_desc->dma_addr;
-> 	dmb.dmb_len = dmb_desc->len;
->-	rc = smcd->ops->unregister_dmb(smcd, &dmb);
->-	if (!rc || rc == ISM_ERROR) {
->-		dmb_desc->cpu_addr = NULL;
->-		dmb_desc->dma_addr = 0;
->-	}
->+	smcd->ops->unregister_dmb(smcd, &dmb);
-> 
->-	return rc;
->+	return;
-> }
-> 
-> int smc_ism_register_dmb(struct smc_link_group *lgr, int dmb_len,
->diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
->index 6763133dd8d0..765aa8fae6fa 100644
->--- a/net/smc/smc_ism.h
->+++ b/net/smc/smc_ism.h
->@@ -47,7 +47,8 @@ int smc_ism_get_vlan(struct smcd_dev *dev, unsigned short vlan_id);
-> int smc_ism_put_vlan(struct smcd_dev *dev, unsigned short vlan_id);
-> int smc_ism_register_dmb(struct smc_link_group *lgr, int buf_size,
-> 			 struct smc_buf_desc *dmb_desc);
->-int smc_ism_unregister_dmb(struct smcd_dev *dev, struct smc_buf_desc *dmb_desc);
->+void smc_ism_unregister_dmb(struct smcd_dev *dev,
->+			    struct smc_buf_desc *dmb_desc);
-> bool smc_ism_support_dmb_nocopy(struct smcd_dev *smcd);
-> int smc_ism_attach_dmb(struct smcd_dev *dev, u64 token,
-> 		       struct smc_buf_desc *dmb_desc);
->-- 
->2.48.1
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index f9f0f16c41d1..22e17f8fb61f 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -835,6 +835,10 @@ static long ppp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ 		ppp_unlock(ppp);
+ 		if (cflags & SC_CCP_OPEN)
+ 			ppp_ccp_closed(ppp);
++
++		rtnl_lock();
++		netdev_update_features(ppp->dev);
++		rtnl_unlock();
+ 		err = 0;
+ 		break;
+ 
+@@ -1545,6 +1549,22 @@ ppp_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats64)
+ 	dev_fetch_sw_netstats(stats64, dev->tstats);
+ }
+ 
++static netdev_features_t
++ppp_fix_features(struct net_device *dev, netdev_features_t features)
++{
++	struct ppp *ppp = netdev_priv(dev);
++
++	ppp_lock(ppp);
++	/* Allow SG/FRAGLIST only when we have direct-xmit, and no compression
++	 * path that wants a linear skb.
++	 */
++	if (!(dev->priv_flags & IFF_NO_QUEUE) ||
++	    (ppp->flags & (SC_COMP_TCP | SC_CCP_OPEN | SC_CCP_UP)))
++		features &= ~(NETIF_F_SG | NETIF_F_FRAGLIST);
++	ppp_unlock(ppp);
++	return features;
++}
++
+ static int ppp_dev_init(struct net_device *dev)
+ {
+ 	struct ppp *ppp;
+@@ -1619,6 +1639,7 @@ static const struct net_device_ops ppp_netdev_ops = {
+ 	.ndo_start_xmit  = ppp_start_xmit,
+ 	.ndo_siocdevprivate = ppp_net_siocdevprivate,
+ 	.ndo_get_stats64 = ppp_get_stats64,
++	.ndo_fix_features = ppp_fix_features,
+ 	.ndo_fill_forward_path = ppp_fill_forward_path,
+ };
+ 
+@@ -1641,6 +1662,8 @@ static void ppp_setup(struct net_device *dev)
+ 	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
+ 	dev->priv_destructor = ppp_dev_priv_destructor;
+ 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
++	dev->hw_features = NETIF_F_SG | NETIF_F_FRAGLIST;
++	dev->features = dev->hw_features;
+ 	netif_keep_dst(dev);
+ }
+ 
+@@ -3537,6 +3560,12 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 	spin_unlock(&pch->upl);
+  out:
+ 	mutex_unlock(&pn->all_ppp_mutex);
++	if (ret == 0) {
++		rtnl_lock();
++		netdev_update_features(ppp->dev);
++		rtnl_unlock();
++	}
++
+ 	return ret;
+ }
+ 
+-- 
+2.43.0
+
 
