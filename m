@@ -1,256 +1,207 @@
-Return-Path: <netdev+bounces-221406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DDCDB50723
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C6FB5075B
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBBB1543A1C
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:33:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 311104E0A96
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA95C35E4E8;
-	Tue,  9 Sep 2025 20:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14084305979;
+	Tue,  9 Sep 2025 20:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kghs9GRh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YABzo4v9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9743570DD
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 20:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344763009D2
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 20:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757449966; cv=none; b=r+qjatTPw0l5jcDUCT3PGwZRXpI4oeVgLQtR3PR/1KLbo8Ot5O0ct0vSzMY3cmsIXsTW71h97MvjDzyG3zTz3Cd66/SAHDCTOVxGwQ8BUFPxPllL7LT28gq5c/dHuxB28e/WJysaw4eovdbqfXhA4w6ZD8YOKSocPLm+v1CuXAI=
+	t=1757450799; cv=none; b=Ve2S3aFkyV+j02YdDbjNV56hfgWd91M0EpD8jwabjreQpIb/G+Z6nvtrVs1mENMJr/9Leha94bz/kIAVqfYbCMtYv7s/cbvGsoPfinm0a/fzoScxjz8T7thSED2wojaCd39d/fYv89XBA4u/f5gUqiqo2lloXGmlfMbwHWDV9Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757449966; c=relaxed/simple;
-	bh=KC/PG6sNqGXoDLp/VWvOaaiur+hAsPtzX8TQQ3P2Qns=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IPZaQyOszjjr6h8geBpqHYvzB6k0u8OBuzaKN+uZ66nrhc3dmBq9mSX69RmVk9ZhqKNOge8I0wmOp5N+7PxwikwuM0yklgg53s7mzAPse6r09h95+XMiENb/X3pKxXtT5M1IlXPpFnOCPYbRV1F0z6yKPoTsoMbt5v/I4YZNa+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kghs9GRh; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757449965; x=1788985965;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KC/PG6sNqGXoDLp/VWvOaaiur+hAsPtzX8TQQ3P2Qns=;
-  b=kghs9GRht7bCP0MPFVYpGbYl9K21iIBQJlvnOyuaeztGIAluD/crT825
-   9cvDqacwH5H0s6YB1Q6sx02DLbw9UTb4PnUZ4gv1zCSVl3dGa6GtOYg0h
-   wvQSRuM9cAbhjxznEMQzzwDcDs50tDzYLQi8XgySJnawjSjFG7LznbbPn
-   rt+nq7lWBVHP38O/LQmxx6Y7NLirPBrmvs0fcD8IzY0bk0tDUtIDtTgxB
-   MXhu5N+bOqKQEOSV4GXclrsurjZ6G/eePT7WB6j0J1dGGbPuc7ysaKWjJ
-   A7KaLPDQcOUpnsA77MUAb1JvcE6YJSkJxXTwe5KzFj8lQtA0j7j8nr81Z
-   Q==;
-X-CSE-ConnectionGUID: Z96dsJT2TMKTdEof+oh7pQ==
-X-CSE-MsgGUID: 4KjbcE0hS0Kb21IePq+5mA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="59606788"
-X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="59606788"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 13:32:42 -0700
-X-CSE-ConnectionGUID: cqAgr93+SAGUi6ILHF1oew==
-X-CSE-MsgGUID: Q64B+affSZC/7KVvDg6x3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="173287038"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa008.jf.intel.com with ESMTP; 09 Sep 2025 13:32:41 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net 4/4] i40e: fix Jumbo Frame support after iPXE boot
-Date: Tue,  9 Sep 2025 13:32:34 -0700
-Message-ID: <20250909203236.3603960-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250909203236.3603960-1-anthony.l.nguyen@intel.com>
-References: <20250909203236.3603960-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1757450799; c=relaxed/simple;
+	bh=Fct3e4B6A6ZR1i/d0po8drRvWEtKD8QIsPSJI8uf17A=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VYi/WWTTcwHDSImTGWzsTrmLAze0CNOFKdCSJ669CmE5LJVFQj06YtlGPdp0/WNb71haGut51eprP4kBl4NRgdB8vi5yhj/xGVVoPHjHk/2WJYYEy9QdWu8ISjhb+UoK4KwXFHhHoWRvJB+VH0sANa3FWK6F8AeIt9xYm3Ua53k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YABzo4v9; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24ca417fb41so70756225ad.1
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 13:46:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757450796; x=1758055596; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1lvZ1o30VYBTsa6ogSGZDG7Gv6CnhJma3tgeQqrmyfc=;
+        b=YABzo4v9cO8fy33ueWodrnsvbBq/pR4rGUEQH4zz5YHRoj7x+jEP5oSU3mW8r0qkRA
+         VT++il4H8lCiOlwnZPj1KRb/B2yZmiTmtST6m8/tU22hZvkSPuRDa1YTeF1lB9XxNsuY
+         U8+Jl9WomXfaMHOUUqyJyZrtmBm64OpDFUoMOcUQDox37yilABm6Vgsjxph1l9R5t2lK
+         YzNsraQXa4zcYiBuh9brmIjwbRrt9BS4zpuuydkbdSIxORjGu3G8eQKsQYZC6mZ/2y6n
+         wfTZMk5K9WJ3nDR4ZycL8gLxTcBbHkW5+a9LunFbfs9gMpqytdPPTjPI1l0YQyH9WaK+
+         r6Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757450796; x=1758055596;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1lvZ1o30VYBTsa6ogSGZDG7Gv6CnhJma3tgeQqrmyfc=;
+        b=Cf2D2z5+pzMVl0EQGdSeWFQ59od51E/RA+XUY1xM4iKEe1ufDnhsQiXi2Z9luxOpDO
+         hT0qSgrJnmS32HOApWyScwnaWQUgCC/shRYW5B2EmdfQ/m3ComFOquuLaQV5vIhpvEEY
+         8WxUw+v/3RjzCIXQISEKGdAoUfqJTZL81Ux0GotHZBUBphVmnknMff5+M51vMi8m/DYt
+         jBjwRAkOZMGvAnfZzq8CU+b1IpNob05cKM1Ia+Kwdg6HIIqJDDj9nBjatsw0Gs/1honW
+         6UwBkLse16C1CCwwTX99lpkA5tHOYInDHpH44KgvyYvN8aGzobbKXLNquuwmXf7CEd7K
+         9qzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4KgXB94RlXWpgVj1Xp+1K+svKoNPvIhXhXp+CX1ZnbIAdvFCSe+KVcplrC8iQpD8D5YBz3M0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQMP9oU1kjn7HYldLcw0QOhj+jDo1AKnlhMgGd+v6IsQVg3RXr
+	80MfrZpLnDNF/nymEyJh+T3nYHyYyqQo3Qezh0gUEG7R1rym7RPnDGIK0PXGrH+b3QFPsljt4HZ
+	0G9kg1g==
+X-Google-Smtp-Source: AGHT+IHJWpCbproYlIy0hWLsQ9DM7XbYS5ndVs6oC3FnBSa72bBmwQxAbv2ImylNXstMVut5vWZ8nKYnfMk=
+X-Received: from pjbnd14.prod.google.com ([2002:a17:90b:4cce:b0:31f:3227:1724])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1ce:b0:24c:ba67:95
+ with SMTP id d9443c01a7336-2516f04ed3bmr138281735ad.9.1757450796500; Tue, 09
+ Sep 2025 13:46:36 -0700 (PDT)
+Date: Tue,  9 Sep 2025 20:45:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250909204632.3994767-1-kuniyu@google.com>
+Subject: [PATCH v7 bpf-next/net 0/6] bpf: Allow decoupling memcg from sk->sk_prot->memory_allocated.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
+Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+Some protocols (e.g., TCP, UDP) have their own memory accounting for
+socket buffers and charge memory to global per-protocol counters such
+as /proc/net/ipv4/tcp_mem.
 
-The i40e hardware has multiple hardware settings which define the Maximum
-Frame Size (MFS) of the physical port. The firmware has an AdminQ command
-(0x0603) to configure the MFS, but the i40e Linux driver never issues this
-command.
+If the socket has sk->sk_memcg this memory is also charged to the memcg
+as sock in memory.stat.
 
-In most cases this is no problem, as the NVM default value has the device
-configured for its maximum value of 9728. Unfortunately, recent versions of
-the iPXE intelxl driver now issue the 0x0603 Set Mac Config command,
-modifying the MFS and reducing it from its default value of 9728.
+We do not need to pay costs for two orthogonal memory accounting
+mechanisms.
 
-This occurred as part of iPXE commit 6871a7de705b ("[intelxl] Use admin
-queue to set port MAC address and maximum frame size"), a prerequisite
-change for supporting the E800 series hardware in iPXE. Both the E700 and
-E800 firmware support the AdminQ command, and the iPXE code shares much of
-the logic between the two device drivers.
+This series allows decoupling memcg from the global memory accounting
+(memcg + tcp_mem -> memcg) if socket is configured as such by sysctl
+or BPF prog.
 
-The ice E800 Linux driver already issues the 0x0603 Set Mac Config command
-early during probe, and is thus unaffected by the iPXE change.
 
-Since commit 3a2c6ced90e1 ("i40e: Add a check to see if MFS is set"), the
-i40e driver does check the I40E_PRTGL_SAH register, but it only logs a
-warning message if its value is below the 9728 default. This register also
-only covers received packets and not transmitted packets. A warning can
-inform system administrators, but does not correct the issue. No
-interactions from userspace cause the driver to write to PRTGL_SAH or issue
-the 0x0603 AdminQ command. Only a GLOBR reset will restore the value to its
-default value. There is no obvious method to trigger a GLOBR reset from
-user space.
+Overview of the series:
 
-To fix this, introduce the i40e_aq_set_mac_config() function, similar to
-the one from the ice driver. Call this during early probe to ensure that
-the device configuration matches driver expectation. Unlike E800, the E700
-firmware also has a bit to control whether the MAC should append CRC data.
-It is on by default, but setting a 0 to this bit would disable CRC. The
-i40e implementation must set this bit to ensure CRC will be appended by the
-MAC.
+  patch 1 & 2 prepare for decoupling memcg from sk_prot->memory_allocated
+    based on the SK_MEMCG_EXCLUSIVE flag
+  patch 3 introduces net.core.memcg_exclusive sysctl
+  patch 4 & 5 supports flagging SK_MEMCG_EXCLUSIVE via bpf_setsockopt()
+  patch 6 is selftest
 
-In addition to the AQ command, instead of just checking the I40E_PRTGL_SAH
-register, update its value to the 9728 default and write it back. This
-ensures that the hardware is in the expected state, regardless of whether
-the iPXE (or any other early boot driver) has modified this state.
 
-This is a better user experience, as we now fix the issues with larger MTU
-instead of merely warning. It also aligns with the way the ice E800 series
-driver works.
+Changes:
+  v7:
+    * Rename s/ISOLATED/EXCLUSIVE/
+    * Add patch 3 (net.core.memcg_exclusive sysctl)
+    * Reorder the core patch 2 before sysctl + bpf changes
+    * Patch 6
+      * Add test for sysctl
 
-A final note: The Fixes tag provided here is not strictly accurate. The
-issue occurs as a result of an external entity (the iPXE intelxl driver),
-and this is not a regression specifically caused by the mentioned change.
-However, I believe the original change to just warn about PRTGL_SAH being
-too low was an insufficient fix.
+  v6: https://lore.kernel.org/netdev/20250908223750.3375376-1-kuniyu@google.com/
+    * Patch 4
+      * Update commit message
+    * Patch 5
+      * Trace sk_prot->memory_allocated + sk_prot->memory_per_cpu_fw_alloc
 
-Fixes: 3a2c6ced90e1 ("i40e: Add a check to see if MFS is set")
-Link: https://github.com/ipxe/ipxe/commit/6871a7de705b6f6a4046f0d19da9bcd689c3bc8e
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../net/ethernet/intel/i40e/i40e_adminq_cmd.h |  1 +
- drivers/net/ethernet/intel/i40e/i40e_common.c | 34 +++++++++++++++++++
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 16 +++++----
- .../net/ethernet/intel/i40e/i40e_prototype.h  |  2 ++
- 4 files changed, 47 insertions(+), 6 deletions(-)
+  v5: https://lore.kernel.org/netdev/20250903190238.2511885-1-kuniyu@google.com/
+    * Patch 2
+      * Rename new variants to bpf_sock_create_{get,set}sockopt()
+    * Patch 3
+      * Limit getsockopt() to BPF_CGROUP_INET_SOCK_CREATE
+    * Patch 5
+      * Use kern_sync_rcu()
+      * Double NR_SEND to 128
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-index 76d872b91a38..cc02a85ad42b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-@@ -1561,6 +1561,7 @@ I40E_CHECK_CMD_LENGTH(i40e_aq_set_phy_config);
- struct i40e_aq_set_mac_config {
- 	__le16	max_frame_size;
- 	u8	params;
-+#define I40E_AQ_SET_MAC_CONFIG_CRC_EN	BIT(2)
- 	u8	tx_timer_priority; /* bitmap */
- 	__le16	tx_timer_value;
- 	__le16	fc_refresh_threshold;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
-index 270e7e8cf9cf..59f5c1e810eb 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_common.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
-@@ -1189,6 +1189,40 @@ int i40e_set_fc(struct i40e_hw *hw, u8 *aq_failures,
- 	return status;
- }
- 
-+/**
-+ * i40e_aq_set_mac_config - Configure MAC settings
-+ * @hw: pointer to the hw struct
-+ * @max_frame_size: Maximum Frame Size to be supported by the port
-+ * @cmd_details: pointer to command details structure or NULL
-+ *
-+ * Set MAC configuration (0x0603). Note that max_frame_size must be greater
-+ * than zero.
-+ *
-+ * Return: 0 on success, or a negative error code on failure.
-+ */
-+int i40e_aq_set_mac_config(struct i40e_hw *hw, u16 max_frame_size,
-+			   struct i40e_asq_cmd_details *cmd_details)
-+{
-+	struct i40e_aq_set_mac_config *cmd;
-+	struct libie_aq_desc desc;
-+
-+	cmd = libie_aq_raw(&desc);
-+
-+	if (max_frame_size == 0)
-+		return -EINVAL;
-+
-+	i40e_fill_default_direct_cmd_desc(&desc, i40e_aqc_opc_set_mac_config);
-+
-+	cmd->max_frame_size = cpu_to_le16(max_frame_size);
-+	cmd->params = I40E_AQ_SET_MAC_CONFIG_CRC_EN;
-+
-+#define I40E_AQ_SET_MAC_CONFIG_FC_DEFAULT_THRESHOLD	0x7FFF
-+	cmd->fc_refresh_threshold =
-+		cpu_to_le16(I40E_AQ_SET_MAC_CONFIG_FC_DEFAULT_THRESHOLD);
-+
-+	return i40e_asq_send_command(hw, &desc, NULL, 0, cmd_details);
-+}
-+
- /**
-  * i40e_aq_clear_pxe_mode
-  * @hw: pointer to the hw struct
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index dd21d93d39dd..b14019d44b58 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -16045,13 +16045,17 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		dev_dbg(&pf->pdev->dev, "get supported phy types ret =  %pe last_status =  %s\n",
- 			ERR_PTR(err), libie_aq_str(pf->hw.aq.asq_last_status));
- 
--	/* make sure the MFS hasn't been set lower than the default */
- #define MAX_FRAME_SIZE_DEFAULT 0x2600
--	val = FIELD_GET(I40E_PRTGL_SAH_MFS_MASK,
--			rd32(&pf->hw, I40E_PRTGL_SAH));
--	if (val < MAX_FRAME_SIZE_DEFAULT)
--		dev_warn(&pdev->dev, "MFS for port %x (%d) has been set below the default (%d)\n",
--			 pf->hw.port, val, MAX_FRAME_SIZE_DEFAULT);
-+
-+	err = i40e_aq_set_mac_config(hw, MAX_FRAME_SIZE_DEFAULT, NULL);
-+	if (err)
-+		dev_warn(&pdev->dev, "set mac config ret = %pe last_status = %s\n",
-+			 ERR_PTR(err), libie_aq_str(pf->hw.aq.asq_last_status));
-+
-+	/* Make sure the MFS is set to the expected value */
-+	val = rd32(hw, I40E_PRTGL_SAH);
-+	FIELD_MODIFY(I40E_PRTGL_SAH_MFS_MASK, &val, MAX_FRAME_SIZE_DEFAULT);
-+	wr32(hw, I40E_PRTGL_SAH, val);
- 
- 	/* Add a filter to drop all Flow control frames from any VSI from being
- 	 * transmitted. By doing so we stop a malicious VF from sending out
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-index aef5de53ce3b..26bb7bffe361 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-@@ -98,6 +98,8 @@ int i40e_aq_set_mac_loopback(struct i40e_hw *hw,
- 			     struct i40e_asq_cmd_details *cmd_details);
- int i40e_aq_set_phy_int_mask(struct i40e_hw *hw, u16 mask,
- 			     struct i40e_asq_cmd_details *cmd_details);
-+int i40e_aq_set_mac_config(struct i40e_hw *hw, u16 max_frame_size,
-+			   struct i40e_asq_cmd_details *cmd_details);
- int i40e_aq_clear_pxe_mode(struct i40e_hw *hw,
- 			   struct i40e_asq_cmd_details *cmd_details);
- int i40e_aq_set_link_restart_an(struct i40e_hw *hw,
+  v4: https://lore.kernel.org/netdev/20250829010026.347440-1-kuniyu@google.com/
+    * Patch 2
+      * Use __bpf_setsockopt() instead of _bpf_setsockopt()
+      * Add getsockopt() for a cgroup with multiple bpf progs running
+    * Patch 3
+      * Only allow inet_create() to set flags
+      * Inherit flags from listener to child in sk_clone_lock()
+      * Support clearing flags
+    * Patch 5
+      * Only use inet_create() hook
+      * Test bpf_getsockopt()
+      * Add serial_ prefix
+      * Reduce sleep() and the amount of sent data
+
+  v3: https://lore.kernel.org/netdev/20250826183940.3310118-1-kuniyu@google.com/
+    * Drop patches for accept() hook
+    * Patch 1
+      * Merge if blocks
+    * Patch2
+      * Drop bpf_func_proto for accept()
+    * Patch 3
+      * Allow flagging without sk->sk_memcg
+      * Inherit SK_BPF_MEMCG_SOCK_ISOLATED in __inet_accept()
+
+  v2: https://lore.kernel.org/bpf/20250825204158.2414402-1-kuniyu@google.com/
+    * Patch 2
+      * Define BPF_CGROUP_RUN_PROG_INET_SOCK_ACCEPT() when CONFIG_CGROUP_BPF=n
+    * Patch 5
+      * Make 2 new bpf_func_proto static
+    * Patch 6
+      * s/mem_cgroup_sk_set_flag/mem_cgroup_sk_set_flags/ when CONFIG_MEMCG=n
+      * Use finer CONFIG_CGROUP_BPF instead of CONFIG_BPF_SYSCALL for ifdef
+
+  v1: https://lore.kernel.org/netdev/20250822221846.744252-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (6):
+  tcp: Save lock_sock() for memcg in inet_csk_accept().
+  net-memcg: Allow decoupling memcg from global protocol memory
+    accounting.
+  net-memcg: Introduce net.core.memcg_exclusive sysctl.
+  bpf: Support bpf_setsockopt() for BPF_CGROUP_INET_SOCK_CREATE.
+  bpf: Introduce SK_BPF_MEMCG_FLAGS and SK_BPF_MEMCG_EXCLUSIVE.
+  selftest: bpf: Add test for SK_MEMCG_EXCLUSIVE.
+
+ Documentation/admin-guide/sysctl/net.rst      |   9 +
+ include/net/netns/core.h                      |   3 +
+ include/net/proto_memory.h                    |  15 +-
+ include/net/sock.h                            |  47 +++-
+ include/net/tcp.h                             |  10 +-
+ include/uapi/linux/bpf.h                      |   6 +
+ mm/memcontrol.c                               |  13 +-
+ net/core/filter.c                             |  82 ++++++
+ net/core/sock.c                               |  65 +++--
+ net/core/sysctl_net_core.c                    |  11 +
+ net/ipv4/af_inet.c                            |  37 +++
+ net/ipv4/inet_connection_sock.c               |  26 +-
+ net/ipv4/tcp.c                                |   3 +-
+ net/ipv4/tcp_output.c                         |  10 +-
+ net/mptcp/protocol.c                          |   3 +-
+ net/tls/tls_device.c                          |   4 +-
+ tools/include/uapi/linux/bpf.h                |   6 +
+ .../selftests/bpf/prog_tests/sk_memcg.c       | 261 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/sk_memcg.c  | 146 ++++++++++
+ 19 files changed, 699 insertions(+), 58 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
+
 -- 
-2.47.1
+2.51.0.384.g4c02a37b29-goog
 
 
