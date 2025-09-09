@@ -1,219 +1,168 @@
-Return-Path: <netdev+bounces-221060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A43B4A014
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 05:35:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3549AB4A025
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 05:42:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3A76C4E154B
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:35:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 268F01B22ED8
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535CA2701C3;
-	Tue,  9 Sep 2025 03:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45752741CB;
+	Tue,  9 Sep 2025 03:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LXwEx3PV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WV6ru+sT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B540A246782;
-	Tue,  9 Sep 2025 03:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2710C5223;
+	Tue,  9 Sep 2025 03:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757388898; cv=none; b=kBstfqaas2W7Z3Pr8TKSB+1CYzGj6Hx/R5TwNFlytcBDsSiQ9TD48vS1mpCjjSflVZvpyO0O0OUs4c+SlvML55BKEha/xlqrIdKVDyhnRSzuHWyFDwGz0X0m9xW4jN6DZbwoA3aFfjMUZNYOTFzQuwkEynufFginJr4ZeUtAiSs=
+	t=1757389352; cv=none; b=DPhTpvHeLPEoheuTkYGJU4k6PjIVscK5X6iVcqUJm3nQ/Hx1IRLyNbmeGvfLMf7lQjeavottdjutQkAvpPM7tsOBkE+I3LHWxgW73pGysoIFG151esP5izZr4pcAyOvkCQt98B6NdW7/PMBA3ckbQpTjhxm/nH5Vnb15aksbfFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757388898; c=relaxed/simple;
-	bh=orjSvwB7+hYUTKHAwQIDI/zbkxH7nvrr/dl1kUuPBK8=;
+	s=arc-20240116; t=1757389352; c=relaxed/simple;
+	bh=1Ae+/fwtT4ZRD9qxLS/6YMdSm81I36JERH8lzddxHxQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kfHUMRJonOM6UlX5vK9LmLiL2SvKcviE137p/KX2wNbr1Jaajmzkk03UgmfCxD0a0AlEXiJMzihD7rK4GACQtuS0c02s169/TrE1NkE1oS2eovwHNCgJVhgd9xDOkEGv5jl0WDHb6AoVKe9TQlp5ANcDDSlTYyIStk+dJwKqy/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LXwEx3PV; arc=none smtp.client-ip=209.85.210.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=PleEs+qkOMW/adlIAYVPbof4FGS/6Qz2EFYoWmP+inhQ7QQMKdrRlsm99Vo5a7IlDrOovl46lYlDx+tdVSSJBws/F9nGcUf7bf6Cfey3s/Jnnd9Ve+UOl4lKqga63ZW4QnRU/6H2a9T5xPfL53taH95lzO4tlYcW0BThy7xmGAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WV6ru+sT; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76e2ea933b7so4574757b3a.1;
-        Mon, 08 Sep 2025 20:34:56 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7722bcb989aso3865085b3a.1;
+        Mon, 08 Sep 2025 20:42:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757388896; x=1757993696; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Y93QCEvHzdhBiLz070Y0aTFkqAkpWfOndtebv8x55Y0=;
-        b=LXwEx3PVeQMxp56ILA/4qwmA8FrJTtJqpnRzzNLW63F9nVS0Uuc4paYe9/OoUZoOAN
-         F1ntfLvb6/hcW8A+9FtHqCG9esus1rZ1NJF8Yp/FXLIDl8t0Jmys7Xw7xfaujZrChjUo
-         JEec4mQkV1E+o+vDuS/hbuu3gfMKM10pYkZLnSxToFrXTUXWuvZvb9assfq5O8D1Sv77
-         U1skVudHfFQNNob8/bpXK6CGG2XSzY5hGWhXGW29yRBIU7wa3JEhjw8dvtqf/i7w3E+7
-         dJtUVlthicozY+pj2p3MIBpKlHOz9ukGc2VLRnXPgw4MAd5+58IZ/N8oFuQlXi+nBFpp
-         f6Kw==
+        d=gmail.com; s=20230601; t=1757389350; x=1757994150; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q6gDEZcRLnpHqXbC6n8kz3kbBR3GWvcpJzuoB2qUxys=;
+        b=WV6ru+sT2ppAAVXeTX2J1uRzs6Nh8S0InRFRumjRcGEGZflGyCNiecEmqn7pbH+kRH
+         SL8sdMOq3dnQ6UplwJjUV8mIIJn4FsaE7nimNwnH0vkYpr8Zi4P53t0NAA1Bds6f+JWZ
+         IY9AJoDjoYl55CPJl4f9Wf8Yamu7jTBO0M7/+vwhHvrpwu9a1alNZ6T05nazto3cm3ld
+         uuYYPxhereecXvqC6wB/YEuZCUJg4liFGu820SHtehP4O9zaGEU/K8nQ7Tk6KYjNLojS
+         vonUtrpIC+iE1HRyMPjC8SIycTCbQ1xDvWF9U6+e+Mp+LCtUChfYWPaGXUYoUdBRU1q0
+         5Ubw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757388896; x=1757993696;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y93QCEvHzdhBiLz070Y0aTFkqAkpWfOndtebv8x55Y0=;
-        b=iUYvY4wR5YHa16mEsVlP/+IP7dQfLvUvJs/94V52aUgkjVumkm6t371d373TIfsP9P
-         7TNtOzMhQ3b5f9RTsqSv/Hm4Tsv/EoukoAPv2eIhScUVHybn9E60KiH3Z0PfyPERwiFc
-         BSMAdRsMl5U05OOvni+oE+y/FOyyOVDL8Bl6wK19TDJaRavnZoL89A0Ezq5u5kH6km3n
-         R8gDk5qCz7zj16eprAq7E+3614WGnvgA+fsTtCwKWC52y6kU3rN8cnvptXHlVqdsftYQ
-         6JSiraPVIPVDMOuemUoMSN6v/ODlcCqZxhqrAxVPyqTPo3W8GX/2RQBwuyAFKlPPgYV+
-         ajsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVadJwFvGd3IITsokKutUaE9G9iKL0rEjQRbFf8Sy0NaBrT50Os74lD07+FuUPIl3J7wtpZf+hM8yCZUzj0VvM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQnYU7OOnROcApd4Q1XZRwhaf1a4QLa9t/f7AuX+Jqxox3nDHv
-	amwyUqmMwN30r5Sr3CwY+cwT8ClYUMS1E7yuG4SYajwmV3WoRQWkwDNzDvEfwwc0Va0=
-X-Gm-Gg: ASbGncuB43g83wOygQHtqzlxNJdPrn8dcK0kwIMn1Xoe3kwgABbl3HhHEgu5Dfs+odt
-	3Ryhhq1No8kTr/DcG7+ls0JLtqCEwAGShviRTbd0EYajJ5xrPuHot7sWtGEidHeXIhCYjKLOixZ
-	MEFkOdK9Qq/W3VaTeeiAn/8j5GybGioZ1Z5mGZgQ/77S3rENmvc0+sT/ZpFlPsT3tm7qXwB7tkq
-	VjyBMhReJrScWqj0WnmESKCrNyFSOXtxE7z6uct3OJjvlYxtjS6XlKHo/9Ba190zzvfxqAA4syi
-	BcpPF4O93GaxZBdh4eRjDHv+zE2jmat3lbwU/Me/U4f8iNxBNdJ+qkYx7rl8PHJOOOqUzFmnsIX
-	J8uFQF+2EbUeoJiDk3Q7BcN52zIM=
-X-Google-Smtp-Source: AGHT+IFWAxS7GwuQtDUJHjXYB714zrawjzVF4GAUe9Ho5fpPBIC8TOyzVIQWHR9c78UtLyb3yYKjcg==
-X-Received: by 2002:a05:6a00:7605:b0:772:2d49:4eb5 with SMTP id d2e1a72fcca58-7741bf5b1f2mr15716590b3a.14.1757388895968;
-        Mon, 08 Sep 2025 20:34:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757389350; x=1757994150;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q6gDEZcRLnpHqXbC6n8kz3kbBR3GWvcpJzuoB2qUxys=;
+        b=iW3XZ3f8lMm29nQWvWtIwjVHaLWRvllF5snM+zMQxnKZgZxj6cSIjouY3BOz4/HM/0
+         PBjHV10VI0dkdSbhPqYADE4zENdxAETQRsdGuS3O+Wq9Ly/Hizh6ai5q11vKFiDtyXHc
+         HPTOy3DFxlgrAWHG8i/Ql/Gz+XwHDXMOsqV4/mR3wq9pmPGm0+tTU+CXBlsQUGoALNpe
+         p23UH3F0JPVP7Oich3dUHFdb4wixuFHpobebj8lLhPzNy24anNoJx3SzravULCnIXV9o
+         OLpUr4xyd7usCYP1mqzGrHjQdkCxZDnkyikF0ArgfMNXoToh1HVHfS2A+sBxJgFOzYMl
+         YLsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUC/kX9+fVDWyc3AiKHONozaitvW/rLgpxJkKRaVUP8AMDF9NVyCAe2mtoWeQ04AF2xi4Pcv4n3JOxPfxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaTw0gNe3fUuGKp/fnDKsyFphwhl8e5g+I2gPlzWLTfoSzJO7d
+	ZmKgpmFEZguB+3gSh1xbQemBjiRnUK/vtCVLuV81U+fx4U3RgvsIbFUu
+X-Gm-Gg: ASbGnctyWbf/T6Axsg9Xz+EzLm4Vmfl86Gzh5pY2IDLSO3GrgG9/GO3z31wcyShTRvD
+	CwteOz190SUgJnB+qcUDtHNnQWZw3ZAj0nJwJM++D42Og15BuOb7+ed+Z/Ke454eY7pYUwcX3ba
+	ca8lvQ+wtVqNGWhyykp3XIGwMCXIbtJRlpp3wCKQl9bEomLxv0zApUSIjLXb83NPMNaUbIqK/Wm
+	wwgMr2iRORLRyrmld1Wu9f768KFbLL1Qtg7gTA1LvXwgSf4Vzb5K3DdnNLxXcOKffswP+nHwpin
+	m+d74eZtgbd3RfbsbDTYqxhJLCHttoq790jpGifWRW06xI5m8R5EdgBDZcmJQ+KdezLM2dnn0Pp
+	0EABO0SAVStlX/30Ni7BBLiLeM5o=
+X-Google-Smtp-Source: AGHT+IGpNtQ90UEAqdOAHKUHUHSzPdBdgK9BK63YBM6Puv1cPEB5nPvMP/kewWqqgro0ciHWm/i/Mw==
+X-Received: by 2002:a05:6a00:138b:b0:772:553:934b with SMTP id d2e1a72fcca58-7742de6a675mr14150966b3a.31.1757389350248;
+        Mon, 08 Sep 2025 20:42:30 -0700 (PDT)
 Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774660e5b5csm461701b3a.7.2025.09.08.20.34.51
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774662eced7sm473126b3a.91.2025.09.08.20.42.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 20:34:55 -0700 (PDT)
-Date: Tue, 9 Sep 2025 03:34:48 +0000
+        Mon, 08 Sep 2025 20:42:29 -0700 (PDT)
+Date: Tue, 9 Sep 2025 03:42:22 +0000
 From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org, Qiuling Ren <qren@redhat.com>
-Subject: Re: [PATCH net 1/2] bonding: set random address only when slaves
- already exist
-Message-ID: <aL-gWAFWPAKuNoUi@fedora>
-References: <20250820091009.393785-1-liuhangbin@gmail.com>
- <1546564.1755908490@famine>
- <aKvhk8Cq3ZdWeH_7@fedora>
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	Liang Li <liali@redhat.com>
+Subject: Re: [PATCHv2 net] bonding: fix multicast MAC address synchronization
+Message-ID: <aL-iHkMmHKrnAeoW@fedora>
+References: <20250805080936.39830-1-liuhangbin@gmail.com>
+ <83bef808-8f50-4aaa-912e-6ccdb072918f@redhat.com>
+ <aJwO3vcLipougMid@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aKvhk8Cq3ZdWeH_7@fedora>
+In-Reply-To: <aJwO3vcLipougMid@fedora>
 
 Hi Jay,
+On Wed, Aug 13, 2025 at 04:04:54AM +0000, Hangbin Liu wrote:
+> On Tue, Aug 12, 2025 at 10:42:22AM +0200, Paolo Abeni wrote:
+> > On 8/5/25 10:09 AM, Hangbin Liu wrote:
+> > > There is a corner case where the NS (Neighbor Solicitation) target is set to
+> > > an invalid or unreachable address. In such cases, all the slave links are
+> > > marked as down and set to *backup*. This causes the bond to add multicast MAC
+> > > addresses to all slaves. The ARP monitor then cycles through each slave to
+> > > probe them, temporarily marking as *active*.
+> > > 
+> > > Later, if the NS target is changed or cleared during this probe cycle, the
+> > > *active* slave will fail to remove its NS multicast address because
+> > > bond_slave_ns_maddrs_del() only removes addresses from backup slaves.
+> > > This leaves stale multicast MACs on the interface.
+> > > 
+> > > To fix this, we move the NS multicast MAC address handling into
+> > > bond_set_slave_state(), so every slave state transition consistently
+> > > adds/removes NS multicast addresses as needed.
+> > > 
+> > > We also ensure this logic is only active when arp_interval is configured,
+> > > to prevent misconfiguration or accidental behavior in unsupported modes.
+> > 
+> > As noted by Jay in the previous revision, moving the handling into
+> > bond_set_slave_state() could possibly impact a lot of scenarios, and
+> > it's not obvious to me that restricting to arp_interval != 0 would be
+> > sufficient.
+> 
+> I understand your concern. The bond_set_slave_state() function is called by:
+>   - bond_set_slave_inactive_flags
+>   - bond_set_slave_tx_disabled_flags
+>   - bond_set_slave_active_flags
+> 
+> These functions are mainly invoked via bond_change_active_slave, bond_enslave,
+> bond_ab_arp_commit, and bond_miimon_commit.
+> 
+> To avoid misconfiguration, in slave_can_set_ns_maddr() I tried to limit
+> changes to the backup slave when operating in active-backup mode with
+> arp_interval enabled. I also ensured that the multicast address is only
+> modified when the NS target is set.
+> 
+> > 
+> > I'm wondering if the issue could/should instead addressed explicitly
+> > handling the mac swap for the active slave at NS target change time. WDYT?
+> 
+> The problem is that bond_hw_addr_swap() is only called in bond_ab_arp_commit()
+> during ARP monitoring, while the bond sets active/inactive flags in
+> bond_ab_arp_probe(). These operations are called partially.
+> 
+> bond_activebackup_arp_mon
+>  - bond_ab_arp_commit
+>    - bond_select_active_slave
+>      - bond_change_active_slave
+>        - bond_hw_addr_swap
+>  - bond_ab_arp_probe
+>    - bond_set_slave_{active/inactive}_flags
+> 
+> On the other hand, we need to set the multicast address on the *temporary*
+> active interface to ensure we can receive the replied NA message. The MAC
+> swap only happens when the *actual* active interface is chosen.
+> 
+> This is why I chose to place the multicast address configuration in
+> bond_set_slave_state().
 
-On Mon, Aug 25, 2025 at 04:07:55AM +0000, Hangbin Liu wrote:
-> On Fri, Aug 22, 2025 at 05:21:30PM -0700, Jay Vosburgh wrote:
-> > Hangbin Liu <liuhangbin@gmail.com> wrote:
-> > 
-> > >Commit 5c3bf6cba791 ("bonding: assign random address if device address is
-> > >same as bond") fixed an issue where, after releasing the first slave and
-> > >re-adding it to the bond with fail_over_mac=follow, both the active and
-> > >backup slaves could end up with duplicate MAC addresses. To avoid this,
-> > >the new slave was assigned a random address.
-> > >
-> > >However, if this happens when adding the very first slave, the bond’s
-> > >hardware address is set to match the slave’s. Later, during the
-> > >fail_over_mac=follow check, the slave’s MAC is randomized because it
-> > >naturally matches the bond, which is incorrect.
-> > 
-> > 	The description here seems confusing to me; what does "this"
-> > refer to?  I don't understand the sequence of events that lead to the
-> > issue being fixed here.
-> > 
-> > 	I wonder if there's another bug somewhere, since nominally when
-> > releasing the last interface in the bond, __bond_release_one() should
-> > randomize the bond's MAC address, so it shouldn't match when adding (or
-> > re-adding ?) the first interface to the bond.
-> > 
-> 
-> Sorry I didn't make it clear. A easy reproducer would describe the issue. e.g.
-> (omit the lo interface)
-> 
-> [root@virtme-ng net]# ip link add type veth
-> [root@virtme-ng net]# ip link add bond0 type bond mode 1 miimon 100 fail_over_mac 2
-> [root@virtme-ng net]# ip link show
-> 3: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff
-> 4: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether 82:a8:52:f4:81:4e brd ff:ff:ff:ff:ff:ff
-> 5: bond0: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether 92:5d:9c:47:e7:53 brd ff:ff:ff:ff:ff:ff
-> [root@virtme-ng net]# ip link set veth0 master bond0
-> [root@virtme-ng net]# ip link show
-> 3: veth0@veth1: <NO-CARRIER,BROADCAST,MULTICAST,SLAVE,UP,M-DOWN> mtu 1500 qdisc noqueue master bond0 state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
->     link/ether 4e:b5:4a:b4:03:18 brd ff:ff:ff:ff:ff:ff
-> 4: veth1@veth0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether 82:a8:52:f4:81:4e brd ff:ff:ff:ff:ff:ff
-> 5: bond0: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether 02:0a:04:c2:d6:21 brd ff:ff:ff:ff:ff:ff
-> 
-> Here we can see the veth0's mac address is randomized. The reason is in
-> function bond_enslave(), we set the bond mac address to the same as slave's
-> if it's the first one.
-> 
->         /* If this is the first slave, then we need to set the master's hardware
->          * address to be the same as the slave's.
->          */
->         if (!bond_has_slaves(bond) &&
->             bond->dev->addr_assign_type == NET_ADDR_RANDOM) {
->                 res = bond_set_dev_addr(bond->dev, slave_dev);
->                 if (res)
->                         goto err_undo_flags;
->         }
-> 
-> And later
-> 
->        } else if (bond->params.fail_over_mac == BOND_FOM_FOLLOW &&
->                    BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
->                    memcmp(slave_dev->dev_addr, bond_dev->dev_addr, bond_dev->addr_len) == 0) {
->                 /* Set slave to random address to avoid duplicate mac
->                  * address in later fail over.
->                  */
->                 eth_random_addr(ss.__data);
->         } else {
-> 
-> Here we check the bond and slave's mac address, which would be the same
-> definitely, which cause the first slave's mac got changed.
-
-Any comments for this?
+Do you have any comments?
 
 Thanks
 Hangbin
-
-> 
-> > 
-> > >The issue is normally hidden since the first slave usually becomes the
-> > >active one, which restores the bond's MAC address. However, if another
-> > >slave is selected as the initial active interface, the issue becomes visible.
-> > >
-> > >Fix this by assigning a random address only when slaves already exist in
-> > >the bond.
-> > >
-> > >Fixes: 5c3bf6cba791 ("bonding: assign random address if device address is same as bond")
-> > >Reported-by: Qiuling Ren <qren@redhat.com>
-> > >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > >---
-> > > drivers/net/bonding/bond_main.c | 1 +
-> > > 1 file changed, 1 insertion(+)
-> > >
-> > >diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> > >index 257333c88710..8832bc9f107b 100644
-> > >--- a/drivers/net/bonding/bond_main.c
-> > >+++ b/drivers/net/bonding/bond_main.c
-> > >@@ -2132,6 +2132,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
-> > > 		memcpy(ss.__data, bond_dev->dev_addr, bond_dev->addr_len);
-> > > 	} else if (bond->params.fail_over_mac == BOND_FOM_FOLLOW &&
-> > > 		   BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
-> > >+		   bond_has_slaves(bond) &&
-> > > 		   memcmp(slave_dev->dev_addr, bond_dev->dev_addr, bond_dev->addr_len) == 0) {
-> > > 		/* Set slave to random address to avoid duplicate mac
-> > > 		 * address in later fail over.
-> > >-- 
-> > >2.50.1
-> > >
-> > 
-> > ---
-> > 	-Jay Vosburgh, jv@jvosburgh.net
-> > 
 
