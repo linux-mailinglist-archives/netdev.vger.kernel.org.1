@@ -1,60 +1,75 @@
-Return-Path: <netdev+bounces-221319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79DC0B50241
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 18:16:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D510B50245
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 18:16:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3F43BE988
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:15:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE2D81C60735
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C212F350D52;
-	Tue,  9 Sep 2025 16:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC4134F490;
+	Tue,  9 Sep 2025 16:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZyAsOxYQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TNBQ2ujQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DA1352066;
-	Tue,  9 Sep 2025 16:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C363451B6;
+	Tue,  9 Sep 2025 16:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757434530; cv=none; b=ieS62G62nQw3Z1BGAMz3vdUqMqhxkcxT5rn/9V9gAKPmJOQWc5dElT2v1cB4szlkdGfRgmNqMBWWCjE4RmAf+dyxFD363H8yBbb2Ikfy1khzaFM0N17SX1A4tgZjsGZbz1INr41W3bdkVwlXdNouG/ZWREqm+2bLx0EhEGeNyQg=
+	t=1757434556; cv=none; b=JXiexaevLkK3kSHPvGyc6asDswe/YTL+Pe+kbRla2ZfZG7rH+rZkY6x7b+yvTekhc3Rqc6UUSaCTl/M2Q2vTR0fr2UFDAQ1aO44p2iAbjn89VE7BqcpMWRf5ArHHZOStu78Vov0x4uRjR0oe4m3rD4hX6wKAyXnvOz1PRbzaoFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757434530; c=relaxed/simple;
-	bh=RorEK3O6/RGxuCSl8FL3e05A6VzWmRbt9LXl7Ut6ios=;
+	s=arc-20240116; t=1757434556; c=relaxed/simple;
+	bh=3JFS7qi/WCdnUSTSsAZiAZWQwu8b4HEGLmE7L2yCBWY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a16DWMhqUPHp8mCwN7r2KVDzydadLBL7ah068XZR84+dZXRLXvqhNVevcge6jNVO2VXcCxuh7T3Doi2xOkKHyWvToMb8BS6qCQ3gM8LPmNhkxrhu5JfRnNVwPKYm0AAK0sDAC/EwiXDxIVpqOWJ8W4xwblxedT4U4U1D8h9HkUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZyAsOxYQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=d0dwwpU1Qlk6W/MV9O8vOzG5HrwlT2N/gNRXS0VisPQ=; b=ZyAsOxYQf43Wp1nJZyMBUJqfxg
-	rxMZqNJl5h7iarHJRhbhjh7dF6v+nhskTUBg0MCmPHrsRMfpX4LFMkrIDbR4HX6vZqGN8mCC3g8ee
-	cdKGyzWWL5DQlVJLID/EaTaaBeu7fzpeLoZ3PO5djJFHRGBPBTW5I+8EtP+NmG5d8/rU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uw106-007ov6-1j; Tue, 09 Sep 2025 18:15:22 +0200
-Date: Tue, 9 Sep 2025 18:15:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=taeLAgz2qBoDAT8RtYn6ttzqY6BHvE8MINgQHb/2zjRknQCKg/2oyKRaP9mOL05D3ZpdVmbUDqnX7jbG4UBWksnqi5fCHGCHa18nBLQ1uFiAj6Kv0L2/ApquUNKdTjdSUobh8HKAksllTBRUVLNy6hyg44wOsppIVRqtInVgFKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TNBQ2ujQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C884FC4CEF4;
+	Tue,  9 Sep 2025 16:15:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757434556;
+	bh=3JFS7qi/WCdnUSTSsAZiAZWQwu8b4HEGLmE7L2yCBWY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TNBQ2ujQO7daaI51CSxSqryEWfCnP8QIQ6ZJ8Q6nOBNjh3MfsR1I4Ho8NbNrwtL7h
+	 B5rCaUjqyrDzGVjo1+r5SfzSpXg2LDLp6GLicEPf2LdN23akLMMdL6cJT15RCCdb6P
+	 5GjNUeMEeActlZVS6zzpj21MNi4H1rWYfHaC8E2QdYNbS8c/uDDlV/lPJ6uzQi6o2Z
+	 zg0TzKH+u5IAUQYxbmkel2UOdoWn6etcS33xqX0L3OLtwTkZXeb9uXxq9wTXJSiyoz
+	 wOrdovN+CGvAfAwIKWy13kkjzOqCeWQjJnOvoTxEanxov+XptqWrmctmatAxrZWQOt
+	 qaS7DM9b+e22g==
+Date: Tue, 9 Sep 2025 17:15:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] geneve: Avoid -Wflex-array-member-not-at-end
- warning
-Message-ID: <feff0872-567c-48fc-b7e4-c7d11a782c64@lunn.ch>
-References: <aMBK78xT2fUnpwE5@kspp>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+	Vivian Wang <uwu@dram.page>
+Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <20250909161549.GC20205@horms.kernel.org>
+References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
+ <20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
+ <20250905153500.GH553991@horms.kernel.org>
+ <0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
+ <20250905160158.GI553991@horms.kernel.org>
+ <45053235-3b01-42d8-98aa-042681104d11@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,24 +78,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aMBK78xT2fUnpwE5@kspp>
+In-Reply-To: <45053235-3b01-42d8-98aa-042681104d11@iscas.ac.cn>
 
-On Tue, Sep 09, 2025 at 05:42:39PM +0200, Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
+On Sat, Sep 06, 2025 at 12:35:37AM +0800, Vivian Wang wrote:
+> On 9/6/25 00:01, Simon Horman wrote:
 > 
-> Move the conflicting declaration to the end of the corresponding
-> structure. Notice that `struct ip_tunnel_info` is a flexible
-> structure, this is a structure that contains a flexible-array
-> member.
+> > On Fri, Sep 05, 2025 at 11:45:29PM +0800, Vivian Wang wrote:
+> >
+> > ...
+> >
+> > Hi Vivian,
+> >
+> >>>> +		status = emac_rx_frame_status(priv, rx_desc);
+> >>>> +		if (unlikely(status == RX_FRAME_DISCARD)) {
+> >>>> +			ndev->stats.rx_dropped++;
+> >>> As per the comment in struct net-device,
+> >>> ndev->stats should not be used in modern drivers.
+> >>>
+> >>> Probably you want to implement NETDEV_PCPU_STAT_TSTATS.
+> >>>
+> >>> Sorry for not mentioning this in an earlier review of
+> >>> stats in this driver.
+> >>>
+> >> On a closer look, these counters in ndev->stats seems to be redundant
+> >> with the hardware-tracked statistics, so maybe I should just not bother
+> >> with updating ndev->stats. Does that make sense?
+> > For rx/tx packets/bytes I think that makes sense.
+> > But what about rx/tx drops?
 > 
-> Fix the following warning:
+> Right... but tstats doesn't have *_dropped. It seems that tx_dropped and
+> rx_dropped are considered "slow path" for real devices. It makes sense
+> to me that those should be very rare.
 > 
-> drivers/net/geneve.c:56:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> So it seems that what I should do is to just track tx_dropped and
+> rx_dropped myself in a member in emac_priv and report in the
+> ndo_get_stats64 callback, and use the hardware stuff for the rest, as
+> implemented now.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Thanks, that makes sense to me.
 
