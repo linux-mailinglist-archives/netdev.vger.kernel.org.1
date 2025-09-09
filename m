@@ -1,102 +1,149 @@
-Return-Path: <netdev+bounces-221145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C513B4A80D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:34:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A88C9B4A7DA
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E241D3B2899
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:29:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A36D163030
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F99B284B3B;
-	Tue,  9 Sep 2025 09:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70BB28726B;
+	Tue,  9 Sep 2025 09:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojklGqLn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WKwPSCRv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE75278772;
-	Tue,  9 Sep 2025 09:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9782853F1;
+	Tue,  9 Sep 2025 09:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757409606; cv=none; b=PMC1IogAq1Wf4kj9ytHPkDbfDm4rniUJCGQM6zInU5IzjV1hQJEjdn0VhnbVpcYs1yEQFllss735cI34yAuQFH9SHHf9EVrAaU+vApV27YevZBxXYHJefoiQ49otdFvJgDFHgkhjtP4DGKQhNj5rR+P5VlbPhwUXAHJ/SXOg/fg=
+	t=1757409667; cv=none; b=BbHU9JSYkXXnHA+eNUjK7X7AQe/CmTwW5m/8ORIBCDqojsXQqZkDSzZDLDrJEBVvvk8XQ71wskTqtJSUmlu11Vm2QTyWdNkd/go8/lRkEGOZ/5GOsv7tDK/X2T975HMr+uEd7eM5zRC0R8jo0BQ6R5CyMLsd5tUytcXTqIYOopE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757409606; c=relaxed/simple;
-	bh=WfssuOqMXQC41TqaU9sewZ6QWPeMMfn7YgAYo5COuLg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NP5jq0/EzK3mnj31E4CUokfBmSh+obmCAbh9UtNVI25kuefzcH1aufUy5LiwUqsnhRkmhCOiMLuo/QGXmGwGZnOf/4Lq8IVLqN6kG6QMPwTg7l9ETVW6d06QKMfq8okhaxHtQ4xa7q2k9jBaV+iNQh9lwezLKAIkEeVWiFsL05k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojklGqLn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F306C4CEFA;
-	Tue,  9 Sep 2025 09:20:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757409606;
-	bh=WfssuOqMXQC41TqaU9sewZ6QWPeMMfn7YgAYo5COuLg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ojklGqLnOKtld3Vibv2Ryw/OuaXWvtntd8XJaCf9ubGxvRuofsDscF+CFuO8johc5
-	 OCu/CiTShbbHqgeTt2MK2Ke/QqLIZ2BeQXPdDrdStWgXUtcj9eswhGJBrUVOOS9bQg
-	 4alYG1/VyrJ+9y5jeXYKolIw6wd7m+QjOPxTtk7vtpDJcnyy0sD0cUL5viesfbt1Pj
-	 nvjomj3kxysy7O20WAFEOMJaNA4ZPqOLDVmyi7OUz7IlOA9nNMOaANZiQIS1gm0/wB
-	 8OWco3T3I2Tuyh1wWYPfYJ/eTJtl/kTEOMMCW3mJV+Vc/vhBM8m2bxB7QvWinlaTY9
-	 qr2By2ghM41Mw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD37383BF69;
-	Tue,  9 Sep 2025 09:20:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1757409667; c=relaxed/simple;
+	bh=WuzPPifEQj9HHVMmiWcrGA+eJ4Bw5fBh6CnZszj0M4k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a53kbGS0JVCT4UaRCHfGnCUlDGikaYJvVnM2WHVil1r27HeEsl3Qgt4lFwrjoLOP/eVXubJCIzi+0+z4acMrKbe88/x/ZiHQdREcW7YljdSwN+873IlXMODl4FYCpLWq5r6e2Fc9geD9VY62I/GKIDEYutCmS32vvYWQo5Fj0ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WKwPSCRv; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b04163fe08dso913476466b.3;
+        Tue, 09 Sep 2025 02:21:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757409664; x=1758014464; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I2plwHTeZpARhSkuJ9Y2jpaZ80nzRFMhPMwl83KVZn8=;
+        b=WKwPSCRv4qhpYn/3vXKFrZmHEm6+ORjQdXir1t8onbs04N/E1ba+AcBNJAltF0DyTL
+         Lcm1Cc11zbslHK6NKJhkZhYUmByZSw16jMCQFzk5GFiV3gWe/TSD7zhjUSUmGuY820bZ
+         XWxS3V9H251ZY234PmjXpYXkj3wAGXCcqE51s1qte9QL58L5HAObrwjCUUnPbZnw7JHR
+         dh1qfSin9OKw1ssbbPSI2IBalGVpPi64SH2+B93nthzBZI6v8ps331ijPbCqXxhPu0eE
+         v9xeAUj0Ocvqmn9dSZnbey6bQhvG/9lI+2d4oOMhRQfhIOcGFvW/uscCCmhFbPnrISrL
+         sqvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757409664; x=1758014464;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I2plwHTeZpARhSkuJ9Y2jpaZ80nzRFMhPMwl83KVZn8=;
+        b=H74Ebm86H9Egi3klsmJcBi1uaHySZw76XlsRJiCsxJNqCBiUrmN80rlj8wRaw8KQGA
+         EhwMeGu57F2RsYbfsamrY4IvgVBXxgX36ayODdFg6Jb3rBDHolF2QP58bIPiargctL46
+         Uxvh5LoaJo+skUhMpCWMZO/7aIAEp2zTdygnyiXKh7+rz3P2SXLfSgwDUNF8gALn7jUg
+         9xnWnnyv3NEPtGmcoeT4gEf3Es67fKfPxS52+N2XN9TQK8ffB5FSD2bc315kxr0otgLa
+         BMQITVZ0ts0TmBKeTjeIsQmGY71xkPquUUarEqwy/jPgrboURdgbB+KsZ3E7Rb6uaBlh
+         29nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6a719hXgVB7Q8eVzp8i/ptSh/PgCbNpTuK2zlSkyhEmEQb4epUz276f4J5i+oy0benmy2TWw=@vger.kernel.org, AJvYcCV98jLeyiBnOOTbKoQ3Vn1o3C16VCzXdWPq/p8x4jTQfVUaSWZCw4MJrngHDsOobvISnnTDrG577PTYGpeAxT23@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM+CgWKNOLJl7rEGLF58H3BwClm9TDdRy0FDKbAM3qLOsIZWhY
+	ImsUd0lxZm8k4ga9/PofRDrkWMO/bKw4DnoGry9AubZjZOmcTtIEWHVu
+X-Gm-Gg: ASbGnctByiYw+jsAxulK2YBAyTpOMOKvtAqF0KO9dK1rlTQLHccTIbZF2IhP+Sy8B7O
+	I8wWxWpa15HeEFqA5eaFR3iT56LE7goE7IBQk4xfUtBDdbya5gYYuOILXivBDyVytx2S8HbepAX
+	KREZCU3YZj6TnSy2prjdLPO5TA3sIgBQJk7R8ySOYGpnU7MuRSGuqPOXl3ALjUuSerb5ShFI/BR
+	SoqRP+auYo86f3lnPL8fU6AunjNplWOZy1U1yOYDMJYkB4F0RAjLFrHPDKW27h1uvCpa9LDBriG
+	dJmLrPpsCdLHE+/LAA7MHzbz+o2KQ3/amqVxkCjAy0jnbg5sHXmnjYZQTzJuCSoLvTmoup95kOc
+	hzTOl9k+rCTB3HoEsC8sWrf2oypt+dUuLF6GmJFsNFY33dHSjhp7s31AStocOaQ2poP/hXNpX5I
+	oyWbT2QfoVfeGwdzjpC1avylDF1RWcWOXCalYxD5fqD449BVOgUmje51qgglvVCsTeQrhb69gDL
+	hDYaYHtZi0yuNl6HJnX2J1+Aczmk5EunxfQESbOY24=
+X-Google-Smtp-Source: AGHT+IGS/aJ996YKDZSFeqCFIy50lExzH/QqxhiTSTzJ51+0XLvp+rrAxwtXLJPKmlt+0wvatIZOCg==
+X-Received: by 2002:a17:907:1c8c:b0:afe:ed71:80aa with SMTP id a640c23a62f3a-b04b16d6406mr1209586266b.57.1757409664029;
+        Tue, 09 Sep 2025 02:21:04 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62bfe99ffcbsm904264a12.3.2025.09.09.02.21.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Sep 2025 02:21:03 -0700 (PDT)
+Message-ID: <5334812c-37cb-42fa-9d53-402cf3d63786@gmail.com>
+Date: Tue, 9 Sep 2025 11:21:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv5 net-next 0/3] bonding: support aggregator selection
- based on
- port priority
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175740960963.593749.1942861170014079998.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Sep 2025 09:20:09 +0000
-References: <20250902064501.360822-1-liuhangbin@gmail.com>
-In-Reply-To: <20250902064501.360822-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, corbet@lwn.net, petrm@nvidia.com,
- amcohen@nvidia.com, vladimir.oltean@nxp.com, stephen@networkplumber.org,
- dsahern@gmail.com, jonas.gorski@gmail.com, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 nf-next 3/3] netfilter: nft_chain_filter: Add bridge
+ double vlan and pppoe
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+ bridge@lists.linux.dev, netdev@vger.kernel.org
+References: <20250708151209.2006140-1-ericwouds@gmail.com>
+ <20250708151209.2006140-4-ericwouds@gmail.com> <aLykN7EjcAzImNiT@strlen.de>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <aLykN7EjcAzImNiT@strlen.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue,  2 Sep 2025 06:44:58 +0000 you wrote:
-> This patchset introduces a new per-port bonding option: `ad_actor_port_prio`.
+On 9/6/25 11:14 PM, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+>> +	__be16 outer_proto, proto = 0;
+>>  	struct nft_pktinfo pkt;
+>> +	int ret, offset = 0;
+>>  
+>>  	nft_set_pktinfo(&pkt, skb, state);
+>>  
+>>  	switch (eth_hdr(skb)->h_proto) {
+>> +	case htons(ETH_P_PPP_SES): {
+>> +		struct ppp_hdr {
+>> +			struct pppoe_hdr hdr;
+>> +			__be16 proto;
+>> +		} *ph;
 > 
-> It allows users to configure the actor's port priority, which can then be used
-> by the bonding driver for aggregator selection based on port priority.
+> Maybe add nft_set_bridge_pktinfo() and place this
+> entire switch/case there?
 > 
-> This provides finer control over LACP aggregator choice, especially in setups
-> with multiple eligible aggregators over 2 switches.
+
+Ok. At the end of nft_do_chain_bridge() I've added (after removing
+skb->protocol munging):
+
+	if (offset && ret == NF_ACCEPT)
+		skb_reset_network_header(skb);
+
+To reset the network header, only when it had been changed.
+
+Do you want this helper to return the offset, so it can be used here?
+Or do you think it is more clean to always reset the network header like so:
+
+	if (ret == NF_ACCEPT)
+		skb_reset_network_header(skb);
+
+(Same question for nf_ct_bridge_pre())
+
+>> +		skb_set_network_header(skb, offset);
 > 
-> [...]
+> I assume thats because the network header still points to
+> the ethernet header at this stage?
 
-Here is the summary with links:
-  - [PATCHv5,net-next,1/3] bonding: add support for per-port LACP actor priority
-    https://git.kernel.org/netdev/net-next/c/6b6dc81ee7e8
-  - [PATCHv5,net-next,2/3] bonding: support aggregator selection based on port priority
-    https://git.kernel.org/netdev/net-next/c/e5a6643435fa
-  - [PATCHv5,net-next,3/3] selftests: bonding: add test for LACP actor port priority
-    https://git.kernel.org/netdev/net-next/c/c2377f1763e9
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+That is correct.
 
 
