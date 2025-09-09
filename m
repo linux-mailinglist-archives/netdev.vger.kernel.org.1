@@ -1,230 +1,150 @@
-Return-Path: <netdev+bounces-221063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63BB9B4A077
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 06:00:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3E0B4A096
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 06:21:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0BA154E2118
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 04:00:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A56733A5B88
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 04:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0A226F2BE;
-	Tue,  9 Sep 2025 04:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB422E0B73;
+	Tue,  9 Sep 2025 04:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="L6SNCqxG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FpqBSn5h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5348418A93F
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 04:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7522C3257;
+	Tue,  9 Sep 2025 04:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757390437; cv=none; b=Z02drf8omrRulya/MxrEjRu52i+3v2EEdR0275KIfrD1sv9AWpY9cQcelsh1TQlVxPDxG3z572bcGA8UW7imx/GConkYRd5eYm6ENGrC/5UAg18sp085TB7aU1oVn1DGiyBeQhfv+0kOfLR6OpoGbYPO/m0p34m8nU/Oj4EpwAQ=
+	t=1757391711; cv=none; b=o9BHxd0N7qbvRfzNjc4Nk0TGgeLSW+DsyXKiRjjP4dBob7X3GkTYPy80Wa7dtKsW0b2ngbF8lp6ykkdqLthCXYwm/W8aHSMLE7akBf02YbxpjvByEx4En8f55+bIjE1WAOyCsraawPZQ4aYifpS5n1963q3agjGkguvT+4z/Gr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757390437; c=relaxed/simple;
-	bh=a1R6e/eD5AKWKndDSOC5/NWMXsZxuSjGOBmgQN214us=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lstCC8rLe7vyi8GetJBCLn5or7dy165FpGHot+JpSvW3MA1gH3elFF5VxrrHT4RNwX9yjCDfXXMm/vUmKlcdT2Rte9Mrla9lIL8Rj0NhR5C2Iu+B7mAm4lmcI/j0+U79dBNBc4hCb4UHvUY4/x+PnclfOs757lEjBKbaS0sULIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=L6SNCqxG; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55ce508d4d6so4819968e87.0
-        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 21:00:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openai.com; s=google; t=1757390433; x=1757995233; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hIztJIte7NdpqukioNjNPUTSRBW0pY7dvHNre0HHf6E=;
-        b=L6SNCqxGEit3t8JwC4vVjHuGs80b55AStYVKNPImVGDy1jenNk9C1O0C5jqNjm5+0J
-         qtV5bpZJrUDiOfu1PNzjVuET2mjVu1MgYdSRU410gAH/MQObPIMS8V38DhFkbWHk1bYP
-         W1+aRStVbhYVW7BV6DA/1fRWQ5Vzg9EiaCXiM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757390433; x=1757995233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hIztJIte7NdpqukioNjNPUTSRBW0pY7dvHNre0HHf6E=;
-        b=FIAu/Y9rhhvgXwEcXAd8Q8xSq8swDUckz4zBgeWA9kWluTIqxP3BAZh7KmSPWrNnq9
-         TUmB20RHvIHYV2iOLQ7y1dz27409ron7JSRlLv0+rsyU1TsOPLhcQpICXOcWXC0b0jq2
-         KIj8mQfVVs2HOnozNCANuYjODrSBNjjt+n767gvPFNR1fv/R8Cto6g7C+bmJIHCsnxIs
-         p2MAQr9+MnoM2+JSDlNeg4HfCclzm9vVpTKC1Qp8kNiQ0vdzxu1fLuIoaiecgmxNFgvq
-         SUkNI5VtxgclULyoHP3Cl2UHFamyKKYvyEHfykQtqSSn6mQ9xAlexwQSBdShuwfe9EDV
-         ieUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBnHlO2VAo+XaVQKYw1c8iuSWMDjGGMITavvffxPGxnEeCtwM4yGpJQ8BPr+DbUXIj7C6Lr4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxz/KMt6qCiQZlGsGoR0TTmnqdWaBB2LmlO3yWX9EfTmlDfO5yP
-	QL3QYvsK6gKa0iQH9aunqifp0KAy8YlFWD9qMPF+f1FjrAt8LGRMjsZYY82BTZPzpbh7QEhWtce
-	XBH2ZWyTFoLeVPhXFIdHJjncpLW6SILeEEK4Lr0vAww==
-X-Gm-Gg: ASbGncv4YXCAmbL1TXJADtbSwdjZVRDhpB+bMXqJT3n8dBOYrsd+cFdr0SOSdSV37y5
-	86hST8ZzYPUSzCvTWwOcKSMNn+Cz/7D9VVzLtXbJmtMGEq9PqSHLTXnBVnTsicRxcQ9YIBdezU/
-	4sYdmDk8KKUmNGMNbgjFkXoEPCbsMXt+x96BWC5+jhIbPcJciLEk14vc9UmdWXYrswGmDNuvXxl
-	EhIdj6oH+TGStqTXi99xxHq3WrY4D2hEQExpQ9q1A9cgI1k2/Qn
-X-Google-Smtp-Source: AGHT+IGtQx4CGX2QbOtOVxGuLDCpXQnpz2q0tz/oZMYlySYpi7BY05WVNIjTDJSPhxKHQBwEHlTuPHlRoGHoV98hKec=
-X-Received: by 2002:a05:6512:3d08:b0:560:956e:43a5 with SMTP id
- 2adb3069b0e04-5625f817d1bmr3345206e87.9.1757390433342; Mon, 08 Sep 2025
- 21:00:33 -0700 (PDT)
+	s=arc-20240116; t=1757391711; c=relaxed/simple;
+	bh=u2eWVDfOjZ/eUZU18XVmgcF0dNk+tPxSOkUryUdg0+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TJc/8j7Xt/vNXHjIhCOzBNZ445I534pPOPVa6oACJTObRAbcarLzfebm344pmC4d3vAfDbW8u30VEFIqlzHjEd5kBVoeqhnhbirjjBO9McMJ6FvsatEaH8t1VFhLH1a1OVkrN9YlNv+Oxs11R3/cY7qti+TKrwDR7YyOHs6m8Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FpqBSn5h; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757391709; x=1788927709;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=u2eWVDfOjZ/eUZU18XVmgcF0dNk+tPxSOkUryUdg0+k=;
+  b=FpqBSn5hwkPZVYmI5XKFDCmp73o8rH4ztJbkJocgi5N6BxV8HxmoeK5s
+   fzYqFTppRp9i2EZNGEWkFXFHWkLVKqsK0TA2Raja8YkTWDVBfNwMrl8+Q
+   YiLyYRwhXjb4db1Y7LHG7XkhkjFHy6k+XuMlowbX0SCA7W00W4dEY9A+9
+   LZwdc+cdH10ljKjAKjeiqdFH5vCqe1bcjhotQ/TsBHlR2sLVbZ3Gnc/HX
+   zPIWciPZRUWr4KN71k0zC47RALvpPTngls6mZxuHQNlj1fLFa3EYXQ/7B
+   La4Y5XA5rq1fw88XbEuQYJOXn7YDnUuX3DKOUqvNVWmEaXTiyQ2VdjE61
+   Q==;
+X-CSE-ConnectionGUID: 3egONS/oTpWYkpyTIBFt2w==
+X-CSE-MsgGUID: ySm2J2+cSKu48PKxqPaNog==
+X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="69920328"
+X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
+   d="scan'208";a="69920328"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 21:21:49 -0700
+X-CSE-ConnectionGUID: rCcz4ynoSY2VL8BqXW/FiQ==
+X-CSE-MsgGUID: 2PP/FEzCTmSJGEBnXH18aw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
+   d="scan'208";a="196622451"
+Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 08 Sep 2025 21:21:44 -0700
+Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uvprR-0004Qf-1j;
+	Tue, 09 Sep 2025 04:21:41 +0000
+Date: Tue, 9 Sep 2025 12:20:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vivian Wang <wangruikang@iscas.ac.cn>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>
+Subject: Re: [PATCH net-next v10 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <202509091137.JnioPegN-lkp@intel.com>
+References: <20250908-net-k1-emac-v10-2-90d807ccd469@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-0-ea492f7b11ac@openai.com>
- <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-2-ea492f7b11ac@openai.com>
- <CAMB2axO4ySD2Lo9xzkkYdUqL2tHPcO02-h2HZiWT993wsU3NtA@mail.gmail.com>
-In-Reply-To: <CAMB2axO4ySD2Lo9xzkkYdUqL2tHPcO02-h2HZiWT993wsU3NtA@mail.gmail.com>
-From: Christoph Paasch <cpaasch@openai.com>
-Date: Mon, 8 Sep 2025 21:00:22 -0700
-X-Gm-Features: AS18NWA2xP8aOi_uzpaJaO-H50O6SLEh5xWnRqrw4G1Ukcbhxnaro2KuLYyNLYM
-Message-ID: <CADg4-L92GbxSXaqg1KuoGxt2c_yC=gbmKywVPvcAjHY_7v2H1g@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 2/2] net/mlx5: Avoid copying payload to the
- skb's linear part
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250908-net-k1-emac-v10-2-90d807ccd469@iscas.ac.cn>
 
-On Thu, Sep 4, 2025 at 4:30=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
-te:
->
-> On Thu, Sep 4, 2025 at 3:57=E2=80=AFPM Christoph Paasch via B4 Relay
-> <devnull+cpaasch.openai.com@kernel.org> wrote:
-> >
-> > From: Christoph Paasch <cpaasch@openai.com>
-> >
-> > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
-> > bytes from the page-pool to the skb's linear part. Those 256 bytes
-> > include part of the payload.
-> >
-> > When attempting to do GRO in skb_gro_receive, if headlen > data_offset
-> > (and skb->head_frag is not set), we end up aggregating packets in the
-> > frag_list.
-> >
-> > This is of course not good when we are CPU-limited. Also causes a worse
-> > skb->len/truesize ratio,...
-> >
-> > So, let's avoid copying parts of the payload to the linear part. We use
-> > eth_get_headlen() to parse the headers and compute the length of the
-> > protocol headers, which will be used to copy the relevant bits ot the
-> > skb's linear part.
-> >
-> > We still allocate MLX5E_RX_MAX_HEAD for the skb so that if the networki=
-ng
-> > stack needs to call pskb_may_pull() later on, we don't need to realloca=
-te
-> > memory.
-> >
-> > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NIC an=
-d
-> > LRO enabled):
-> >
-> > BEFORE:
-> > =3D=3D=3D=3D=3D=3D=3D
-> > (netserver pinned to core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.01    32547.82
-> >
-> > (netserver pinned to adjacent core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    52531.67
-> >
-> > AFTER:
-> > =3D=3D=3D=3D=3D=3D
-> > (netserver pinned to core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    52896.06
-> >
-> > (netserver pinned to adjacent core receiving interrupts)
-> >  $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    85094.90
-> >
-> > Additional tests across a larger range of parameters w/ and w/o LRO, w/
-> > and w/o IPv6-encapsulation, different MTUs (1500, 4096, 9000), differen=
-t
-> > TCP read/write-sizes as well as UDP benchmarks, all have shown equal or
-> > better performance with this patch.
-> >
-> > Reviewed-by: Eric Dumazet <edumazet@google.com>
-> > Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
-> > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> > ---
-> >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_rx.c
-> > index 8bedbda522808cbabc8e62ae91a8c25d66725ebb..0ac31c7fb64cd60720d390d=
-e45a5b6b453ed0a3f 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > @@ -2047,6 +2047,8 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
-q *rq, struct mlx5e_mpw_info *w
-> >                 dma_sync_single_for_cpu(rq->pdev, addr + head_offset, h=
-eadlen,
-> >                                         rq->buff.map_dir);
-> >
-> > +               headlen =3D eth_get_headlen(rq->netdev, head_addr, head=
-len);
-> > +
-> >                 frag_offset +=3D headlen;
-> >                 byte_cnt -=3D headlen;
-> >                 linear_hr =3D skb_headroom(skb);
-> > @@ -2123,6 +2125,9 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
-q *rq, struct mlx5e_mpw_info *w
-> >                                 pagep->frags++;
-> >                         while (++pagep < frag_page);
-> >                 }
-> > +
-> > +               headlen =3D eth_get_headlen(rq->netdev, mxbuf->xdp.data=
-, headlen);
-> > +
->
-> The size of mxbuf->xdp.data is most likely not headlen here.
->
-> The driver currently generates a xdp_buff with empty linear data, pass
-> it to the xdp program and assumes the layout If the xdp program does
-> not change the layout of the xdp_buff through bpf_xdp_adjust_head() or
-> bpf_xdp_adjust_tail(). The assumption is not correct and I am working
-> on a fix. But, if we keep that assumption for now, mxbuf->xdp.data
-> will not contain any headers or payload. The thing that you try to do
-> probably should be:
->
->         skb_frag_t *frag =3D &sinfo->frags[0];
->
->         headlen =3D eth_get_headlen(rq->netdev, skb_frag_address(frag),
-> skb_frag_size(frag));
+Hi Vivian,
 
-Ok, I think I understand what you mean! Thanks for taking the time to expla=
-in!
+kernel test robot noticed the following build warnings:
 
-I will do some tests on my side to make sure I get it right.
+[auto build test WARNING on 062b3e4a1f880f104a8d4b90b767788786aa7b78]
 
-As your change goes to net and mine to netnext, I can wait until yours
-is in the tree so that there aren't any conflicts that need to be
-taken care of.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vivian-Wang/dt-bindings-net-Add-support-for-SpacemiT-K1/20250908-203917
+base:   062b3e4a1f880f104a8d4b90b767788786aa7b78
+patch link:    https://lore.kernel.org/r/20250908-net-k1-emac-v10-2-90d807ccd469%40iscas.ac.cn
+patch subject: [PATCH net-next v10 2/5] net: spacemit: Add K1 Ethernet MAC
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20250909/202509091137.JnioPegN-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250909/202509091137.JnioPegN-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509091137.JnioPegN-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In function 'emac_get_stat_tx_dropped',
+       inlined from 'emac_get_stats64' at drivers/net/ethernet/spacemit/k1_emac.c:1234:24:
+>> drivers/net/ethernet/spacemit/k1_emac.c:1218:24: warning: 'result' is used uninitialized [-Wuninitialized]
+    1218 |                 result += READ_ONCE(per_cpu(*priv->stat_tx_dropped, cpu));
+         |                        ^~
+   drivers/net/ethernet/spacemit/k1_emac.c: In function 'emac_get_stats64':
+   drivers/net/ethernet/spacemit/k1_emac.c:1214:13: note: 'result' was declared here
+    1214 |         u64 result;
+         |             ^~~~~~
 
 
-Christoph
+vim +/result +1218 drivers/net/ethernet/spacemit/k1_emac.c
 
->
->
->
-> >                 __pskb_pull_tail(skb, headlen);
-> >         } else {
-> >                 if (xdp_buff_has_frags(&mxbuf->xdp)) {
-> >
-> > --
-> > 2.50.1
-> >
-> >
+  1211	
+  1212	static u64 emac_get_stat_tx_dropped(struct emac_priv *priv)
+  1213	{
+  1214		u64 result;
+  1215		int cpu;
+  1216	
+  1217		for_each_possible_cpu(cpu) {
+> 1218			result += READ_ONCE(per_cpu(*priv->stat_tx_dropped, cpu));
+  1219		}
+  1220	
+  1221		return result;
+  1222	}
+  1223	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
