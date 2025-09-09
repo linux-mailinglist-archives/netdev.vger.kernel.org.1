@@ -1,577 +1,233 @@
-Return-Path: <netdev+bounces-221413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8D86B50768
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:48:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5723FB50783
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:54:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C25F9562348
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:47:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 531301C638D3
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA5B3680BB;
-	Tue,  9 Sep 2025 20:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675A82FF147;
+	Tue,  9 Sep 2025 20:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xe09Ix++"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="HUJd2sdZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G/y6dxIJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A003629B9
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 20:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA5D1FF5F9
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 20:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757450808; cv=none; b=ftIl1KGTekffXEYolZb1eqMZsVCrH1AqJn7JxE9r9fHlJIbedURqzIYCAsY5uTP+AAviCAlH9ZZ61oRx7dAfHoIny0IRpN77aQKfMhY3KkOec5RpToaJW9Wv1Oshk6ixMN6YMP6DhTKX37a6ZFM58wXYuR4l/VF7e5g78D97yh0=
+	t=1757451247; cv=none; b=IxCV+wB5ECO2k48yMb+xK+J/tiKNJ5oml4tMIywI/jkQWqUMtC/eVtIVxM4r7jRviit/sGzAhgnu8GEs/yG30eLpas9bgvng1WN3bXt66yft7JWqrhPaKi783ozcIuKKFrRKy1NU7ruTBd1g9ChypQV8aoofLNNLDArV9hRSEFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757450808; c=relaxed/simple;
-	bh=vqzui2Qbkzfyscs97+IV8sFUBxNwQva8+AbXFzQEoaw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BLT3wEAth/3O/B8UazarbvxAJ2poHYV3166yn8pAet9O26rM5yvv3y3/td0T5blLaG+pwIXZehIjt3UnEIZD/buPAjLpiuiWtsKwdlpcmEI9Kx7fzh8RNzFsBj45PsKTQFrJtZ8JM6wPuJ7ZH0x2T9vB4c6XGapumrBrDUlN1kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xe09Ix++; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7741ef59d18so3971690b3a.3
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 13:46:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757450805; x=1758055605; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X3PTsfcBxw7TKhkYKuGNFYFEru9GAacjAsoZSDDO6EY=;
-        b=xe09Ix++VnAkfyWU/P/7uoPH080281CYEA1LKglKYrXIbt0RTIao2g42XR8ybwHgNx
-         h/9t7Ng/AWoQFPjo4673RKgxbZkE7lM18G94d/vVddWIF7RkV2tVvX4/dXB9FoC9PolH
-         AwX42V5GvxEwocd53O+TUpNIFCF5tW+TTKxDuHZjEqF/oYOQ2fppnvCjCrhVhIu7XiVA
-         NQhIGLPknB/41nWY2v9SCZCXh0zkc6tQA5cNxnWLGTQruS+eFFm+/lwVpxnojsgdmK1D
-         M+usxgE/CjekpsnNi7+wT0p7Isw3X+MKxcwpwexCjRyei7VjjHCwTweGBpO3MOZwkj0s
-         AmtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757450805; x=1758055605;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X3PTsfcBxw7TKhkYKuGNFYFEru9GAacjAsoZSDDO6EY=;
-        b=KX0Un6RdJoQjuPwjtF4CEyTAA7bNcCNfykBo/dMD3frAlXa2ujQKKoathx3+25wY8m
-         IfUGFpDYsggGdtR4+dPXPcN7Y3A6FyTHu2TSo64bC5opJ6Vjt+dx7TYidKyAiu4k5y/A
-         V6UjGLnByEadY/FR0QmwhC6/25zavz/VyCMJTX6+DwofYrceaag1SpphnBZ48zR1owRd
-         /jfdAL+BCKkxC3kXmKgjfFHnhZYGWKchf35f3M/1txA1kl6hpaZr52Ed7O+j0PnC5vDr
-         GXcVAIDCFEUL2JkfUIL9wnNr2ixkVOdFoiwEVY59efMsV2ihaEWpSa3OE6z0ivPAgTYq
-         qHWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBzeJhC9WVNgYFCU0Mzsz6zyBL+nQGLPBl9Py0nUi0KCETwOmOjkkJNF8QYMrBkzXOQJAujf0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrwTMrKewU04RC85I//N7rYzsoiQQC+ajaGk065bcXxPLMq1N8
-	jgxZx0Xg2E3E3gABMfzHj9EFJqAv/rnOspRMXnFsNZBH1kAuUpQPA0qmxFABT1Fbe0hdMZ+JfHr
-	7uTBkaA==
-X-Google-Smtp-Source: AGHT+IHUA9L7hcCfcRPzsS3Z3ngL5yWvwljM/GbqMuMk97cyJQA7YMJLvMTOxZQdZen0lmIeC3Z2wCoiWPM=
-X-Received: from pfwz3.prod.google.com ([2002:a05:6a00:1d83:b0:772:2981:e786])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a08:b0:252:9bf:ad80
- with SMTP id adf61e73a8af0-2534519d129mr19624434637.54.1757450805573; Tue, 09
- Sep 2025 13:46:45 -0700 (PDT)
-Date: Tue,  9 Sep 2025 20:45:36 +0000
-In-Reply-To: <20250909204632.3994767-1-kuniyu@google.com>
+	s=arc-20240116; t=1757451247; c=relaxed/simple;
+	bh=INH63zfUFEswtQLTU3zqWfwQq/O30z8B1DER2xpYZII=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=gI+/OHWoC/TjqO7COu/cnvbTRpaNt2+UHdIjVXW7v8dr60sK+xW81vpsx11CjUQd0X8VEjmOExTJXfHN3V5H4P1aTVfzPj6W3rP0dIsinO44SrkpaVQUT/KL4Sg3HsSWrKS4tvm5sFmHF1YD29MFegDwGrjJddMp+vnT2ISljug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=HUJd2sdZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G/y6dxIJ; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id A743E14000B5;
+	Tue,  9 Sep 2025 16:54:04 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Tue, 09 Sep 2025 16:54:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm2; t=1757451244; x=1757537644; bh=tzK2ssom96X4oV3km6+R4
+	O28lO5vF6izmA7MP8BMFqQ=; b=HUJd2sdZB8yLmbbyPGw0iuxPUI+kZhM65+oof
+	M6/ZnzYq3TWXl3yBP7cenR0OwEWRUWObDJiHGx6Z4shcjyEvkubnXwfjo+4b0Cxb
+	WvVI8BXydaX+WMBSsB8cvseAH7FKoorXoo9KiVDWNiVvSGVDExpODTaWgkRRPqBF
+	Ihs3Z4xSjzkuzKulXw0HE3fKfGIA6B6GlMGhikPx8RgYQGyc0YLbONGSVLO4Qdch
+	Z39fiqnGc/wG7fNN/hxIZVHT7uYSyL9OK4MmOac+2pghGbM3WgCN0eP2Mx4Cv4sS
+	aa1p04U6cYnmnMRR5+IdVWIeLDz1Vzo7xvGIs+1WVg2hFqEoQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757451244; x=1757537644; bh=tzK2ssom96X4oV3km6+R4O28lO5vF6izmA7
+	MP8BMFqQ=; b=G/y6dxIJG7jn0TO+RhA6eNDeIqXksvrSic6ZwmlxIyT1AglMeQC
+	V2nv2Zuqa1CZZd81+c4wp2ZlDJn6zJi+pZNLqjvUeDH/Fd9LRo/alZ6i05HA32Cc
+	1lesh+4uSVAkj0Q3YyWmSBXd79MahgfZG1UbuTh4tM0jRdnoO70L+gmKYy80Uf+k
+	7QKCQzUFYFEoFdgM5MQqsa4UOUswNbgT5C79YaViiajy9VxFpAI4mIncC26U1xVU
+	dVkZqoG4z1h2DiKblw6ReLgKVuCls2+Rk+QasDQ/BrXb7qcah9unQdXQB12WXzFk
+	6pt2XcV8unwLQ9iZ2g8JjuiGkJmBPR2DiBw==
+X-ME-Sender: <xms:7JPAaAfMGJt940UrKwE0r9gkOmRIcTu2vYlPN42YcrWGUBUHpYof6w>
+    <xme:7JPAaOH7NXAISWC3cOqnc9v_S1-7xcddMevkX0EFyYYBYuz28ZvCQH0h8KWbsifS3
+    -c6WPPIZ3raVvb-QY4>
+X-ME-Received: <xmr:7JPAaOh_f2itewNNSj_z8W9ml8xQWL_wfn2_hrpNwGJlsfP4ZHVFy1EH_TUylptFnN9DkQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvudegvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
+    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteefffen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
+    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpth
+    htohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphhrrgguvggvphhs
+    sehlihhnuhigrdhvnhgvthdrihgsmhdrtghomhdprhgtphhtthhopehsthgvphhhvghnse
+    hnvghtfihorhhkphhluhhmsggvrhdrohhrghdprhgtphhtthhopehirdhmrgigihhmvght
+    shesohhvnhdrohhrghdprhgtphhtthhopegrmhhorhgvnhhoiiesrhgvughhrghtrdgtoh
+    hmpdhrtghpthhtohephhgrlhhiuhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepphhr
+    rgguvggvphesuhhsrdhisghmrdgtohhmpdhrtghpthhtohepfihilhguvghrsehushdrih
+    gsmhdrtghomh
+X-ME-Proxy: <xmx:7JPAaK1QReJ3KlEy6otU0lVPsbZs_azGfD-LZbDSYwyVXak1fYHRfQ>
+    <xmx:7JPAaBcBzMuLj3CJeLV8WcsK1_d4Elhy44BgjUGld-n1c0wzyl8kmA>
+    <xmx:7JPAaAxeuTTG5tZyf3PVvYbvcii3Muj7fa-eQT84NMqpPAdFmn9w7Q>
+    <xmx:7JPAaJxpBl9kI_EsW7WqMmcYhkg9LIr3mV27T1G5ldby53x7XxrxDw>
+    <xmx:7JPAaKev9tOCKsLPONtqr4kL6D6EtH4u2sSNnSdHWsGhbeM1t4qYiwPh>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 9 Sep 2025 16:54:03 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 78B119FCB4; Tue,  9 Sep 2025 13:54:02 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 755C29FC62;
+	Tue,  9 Sep 2025 13:54:02 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+cc: David Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org,
+    pradeeps@linux.vnet.ibm.com, pradeep@us.ibm.com, i.maximets@ovn.org,
+    amorenoz@redhat.com, haliu@redhat.com, stephen@networkplumber.org,
+    horms@kernel.org
+Subject: Re: [PATCH net-next v10 5/7] bonding: Update to bond_arp_send_all()
+ to use supplied vlan tags
+In-reply-to: <2c0f972a-2393-4554-a76b-3ac425fed42b@blackwall.org>
+References: <20250904221956.779098-1-wilder@us.ibm.com>
+ <20250904221956.779098-6-wilder@us.ibm.com>
+ <2c0f972a-2393-4554-a76b-3ac425fed42b@blackwall.org>
+Comments: In-reply-to Nikolay Aleksandrov <razor@blackwall.org>
+   message dated "Tue, 09 Sep 2025 21:55:35 +0300."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250909204632.3994767-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250909204632.3994767-7-kuniyu@google.com>
-Subject: [PATCH v7 bpf-next/net 6/6] selftest: bpf: Add test for SK_MEMCG_EXCLUSIVE.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2921169.1757451242.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 09 Sep 2025 13:54:02 -0700
+Message-ID: <2921170.1757451242@famine>
 
-The test does the following for IPv4/IPv6 x TCP/UDP sockets
-with/without SK_MEMCG_EXCLUSIVE, which can be turned on by
-net.core.memcg_exclusive or bpf_setsockopt(SK_BPF_MEMCG_EXCLUSIVE).
+Nikolay Aleksandrov <razor@blackwall.org> wrote:
 
-  1. Create socket pairs
-  2. Send a bunch of data that requires more than 1024 pages
-  3. Read memory_allocated from sk->sk_prot->memory_allocated and
-     sk->sk_prot->memory_per_cpu_fw_alloc
-  4. Check if unread data is charged to memory_allocated
+>On 9/5/25 01:18, David Wilder wrote:
+>> bond_arp_send_all() will pass the vlan tags supplied by
+>> the user to bond_arp_send(). If vlan tags have not been
+>> supplied the vlans in the path to the target will be
+>> discovered by bond_verify_device_path(). The discovered
+>> vlan tags are then saved to be used on future calls to
+>> bond_arp_send().
+>> bond_uninit() is also updated to free vlan tags when a
+>> bond is destroyed.
+>> Signed-off-by: David Wilder <wilder@us.ibm.com>
+>> ---
+>>   drivers/net/bonding/bond_main.c | 22 +++++++++++++---------
+>>   1 file changed, 13 insertions(+), 9 deletions(-)
+>> diff --git a/drivers/net/bonding/bond_main.c
+>> b/drivers/net/bonding/bond_main.c
+>> index 7548119ca0f3..7288f8a5f1a5 100644
+>> --- a/drivers/net/bonding/bond_main.c
+>> +++ b/drivers/net/bonding/bond_main.c
+>> @@ -3063,18 +3063,19 @@ struct bond_vlan_tag *bond_verify_device_path(s=
+truct net_device *start_dev,
+>>     static void bond_arp_send_all(struct bonding *bond, struct slave
+>> *slave)
+>>   {
+>> -	struct rtable *rt;
+>> -	struct bond_vlan_tag *tags;
+>>   	struct bond_arp_target *targets =3D bond->params.arp_targets;
+>> +	char pbuf[BOND_OPTION_STRING_MAX_SIZE];
+>> +	struct bond_vlan_tag *tags;
+>>   	__be32 target_ip, addr;
+>> +	struct rtable *rt;
+>>   	int i;
+>>     	for (i =3D 0; i < BOND_MAX_ARP_TARGETS && targets[i].target_ip; i+=
++)
+>> {
+>>   		target_ip =3D targets[i].target_ip;
+>>   		tags =3D targets[i].tags;
+>>   -		slave_dbg(bond->dev, slave->dev, "%s: target %pI4\n",
+>> -			  __func__, &target_ip);
+>> +		slave_dbg(bond->dev, slave->dev, "%s: target %s\n", __func__,
+>> +			  bond_arp_target_to_string(&targets[i], pbuf, sizeof(pbuf)));
+>>     		/* Find out through which dev should the packet go */
+>>   		rt =3D ip_route_output(dev_net(bond->dev), target_ip, 0, 0, 0,
+>> @@ -3096,9 +3097,13 @@ static void bond_arp_send_all(struct bonding *bo=
+nd, struct slave *slave)
+>>   		if (rt->dst.dev =3D=3D bond->dev)
+>>   			goto found;
+>>   -		rcu_read_lock();
+>> -		tags =3D bond_verify_device_path(bond->dev, rt->dst.dev, 0);
+>> -		rcu_read_unlock();
+>> +		if (!tags) {
+>> +			rcu_read_lock();
+>> +			tags =3D bond_verify_device_path(bond->dev, rt->dst.dev, 0);
+>> +			/* cache the tags */
+>> +			targets[i].tags =3D tags;
+>> +			rcu_read_unlock();
+>
+>Surely you must be joking. You cannot overwrite the tags pointer without =
+any synchronization.
 
-If SK_MEMCG_EXCLUSIVE is set, memory_allocated should not be
-changed, but we allow a small error (up to 10 pages) in case
-other processes on the host use some amounts of TCP/UDP memory.
+	Agreed, I think this will race with at least bond_fill_info,
+_bond_options_arp_ip_target_set, and bond_option_arp_ip_target_rem.
 
-The amount of allocated pages are buffered to per-cpu variable
-{tcp,udp}_memory_per_cpu_fw_alloc up to +/- net.core.mem_pcpu_rsv
-before reported to {tcp,udp}_memory_allocated.
+	Also, pretending for the moment that the above isn't an issue,
+does this cache handle changes in real time?  I.e., if the VLAN above
+the bond is replumbed without dismantling the bond, will the above
+notice and do the right thing?
 
-At 3., memory_allocated is calculated from the 2 variables twice
-at fentry and fexit of socket create function to check if the per-cpu
-value is drained during calculation.  In that case, 3. is retried.
+	The current code checks the device path on every call, and I
+don't see how it's feasible to skip that.
 
-We use kern_sync_rcu() for UDP because UDP recv queue is destroyed
-after RCU grace period.
+	Separately, a random thought while looking at the code, I feel
+like there ought to be a way to replace the GFP_ATOMIC memory allocation
+in bond_verify_device_path with storage local to its caller (since it's
+always immediately freed), but that's probably not something to get into
+for this patch set.
 
-The test takes ~2s on QEMU (64 CPUs) w/ KVM but takes 6s w/o KVM.
+	-J
 
-  # time ./test_progs -t sk_memcg
-  #370/1   sk_memcg/TCP  :OK
-  #370/2   sk_memcg/UDP  :OK
-  #370/3   sk_memcg/TCPv6:OK
-  #370/4   sk_memcg/UDPv6:OK
-  #370     sk_memcg:OK
-  Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
+>> +		}
+>>     		if (!IS_ERR_OR_NULL(tags))
+>>   			goto found;
+>> @@ -3114,7 +3119,6 @@ static void bond_arp_send_all(struct bonding *bon=
+d, struct slave *slave)
+>>   		addr =3D bond_confirm_addr(rt->dst.dev, target_ip, 0);
+>>   		ip_rt_put(rt);
+>>   		bond_arp_send(slave, ARPOP_REQUEST, target_ip, addr, tags);
+>> -		kfree(tags);
+>>   	}
+>>   }
+>>   @@ -6047,6 +6051,7 @@ static void bond_uninit(struct net_device
+>> *bond_dev)
+>>   	bond_for_each_slave(bond, slave, iter)
+>>   		__bond_release_one(bond_dev, slave->dev, true, true);
+>>   	netdev_info(bond_dev, "Released all slaves\n");
+>> +	bond_free_vlan_tags(bond->params.arp_targets);
+>>     #ifdef CONFIG_XFRM_OFFLOAD
+>>   	mutex_destroy(&bond->ipsec_lock);
+>> @@ -6633,7 +6638,6 @@ static void __exit bonding_exit(void)
+>>     	bond_netlink_fini();
+>>   	unregister_pernet_subsys(&bond_net_ops);
+>> -
+>>   	bond_destroy_debugfs();
+>>     #ifdef CONFIG_NET_POLL_CONTROLLER
+>
 
-  real	0m1.623s
-  user	0m0.165s
-  sys	0m0.366s
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v7:
-  * Add test for sysctl
-
-v6:
-  * Trace sk_prot->memory_allocated + sk_prot->memory_per_cpu_fw_alloc
-
-v5:
-  * Use kern_sync_rcu()
-  * Double NR_SEND to 128
-
-v4:
-  * Only use inet_create() hook
-  * Test bpf_getsockopt()
-  * Add serial_ prefix
-  * Reduce sleep() and the amount of sent data
----
- .../selftests/bpf/prog_tests/sk_memcg.c       | 261 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/sk_memcg.c  | 146 ++++++++++
- 2 files changed, 407 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sk_memcg.c b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-new file mode 100644
-index 000000000000..777fb81e9365
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-@@ -0,0 +1,261 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include <test_progs.h>
-+#include "sk_memcg.skel.h"
-+#include "network_helpers.h"
-+
-+#define NR_SOCKETS	64
-+#define NR_SEND		128
-+#define BUF_SINGLE	1024
-+#define BUF_TOTAL	(BUF_SINGLE * NR_SEND)
-+
-+struct test_case {
-+	char name[8];
-+	int family;
-+	int type;
-+	int (*create_sockets)(struct test_case *test_case, int sk[], int len);
-+	long (*get_memory_allocated)(struct test_case *test_case, struct sk_memcg *skel);
-+};
-+
-+static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int server, i;
-+
-+	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+	ASSERT_GE(server, 0, "start_server_str");
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = connect_to_fd(server, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "connect_to_fd"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = accept(server, NULL, NULL);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "accept"))
-+			return sk[i * 2 + 1];
-+	}
-+
-+	close(server);
-+
-+	return 0;
-+}
-+
-+static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int i, err, rcvbuf = BUF_TOTAL;
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "start_server"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = connect_to_fd(sk[i * 2], 0);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "connect_to_fd"))
-+			return sk[i * 2 + 1];
-+
-+		err = connect_fd_to_fd(sk[i * 2], sk[i * 2 + 1], 0);
-+		if (!ASSERT_EQ(err, 0, "connect_fd_to_fd"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2 + 1], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static long get_memory_allocated(struct test_case *test_case,
-+				 bool *activated, bool *stable,
-+				 long *memory_allocated)
-+{
-+	*stable = false;
-+
-+	do {
-+		*activated = true;
-+
-+		/* AF_INET and AF_INET6 share the same memory_allocated.
-+		 * tcp_init_sock() is called by AF_INET and AF_INET6,
-+		 * but udp_lib_init_sock() is inline.
-+		 */
-+		socket(AF_INET, test_case->type, 0);
-+	} while (!*stable);
-+
-+	return *memory_allocated;
-+}
-+
-+static long tcp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
-+{
-+	return get_memory_allocated(test_case,
-+				    &skel->bss->tcp_activated,
-+				    &skel->bss->tcp_stable,
-+				    &skel->bss->tcp_memory_allocated);
-+}
-+
-+static long udp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
-+{
-+	return get_memory_allocated(test_case,
-+				    &skel->bss->udp_activated,
-+				    &skel->bss->udp_stable,
-+				    &skel->bss->udp_memory_allocated);
-+}
-+
-+static int check_exclusive(struct test_case *test_case,
-+			   struct sk_memcg *skel, bool exclusive)
-+{
-+	char buf[BUF_SINGLE] = {};
-+	long memory_allocated[2];
-+	int sk[NR_SOCKETS] = {};
-+	int err, i, j;
-+
-+	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-+	if (err)
-+		goto close;
-+
-+	memory_allocated[0] = test_case->get_memory_allocated(test_case, skel);
-+
-+	/* allocate pages >= 1024 */
-+	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-+		for (j = 0; j < NR_SEND; j++) {
-+			int bytes = send(sk[i], buf, sizeof(buf), 0);
-+
-+			/* Avoid too noisy logs when something failed. */
-+			if (bytes != sizeof(buf)) {
-+				ASSERT_EQ(bytes, sizeof(buf), "send");
-+				if (bytes < 0) {
-+					err = bytes;
-+					goto close;
-+				}
-+			}
-+		}
-+	}
-+
-+	memory_allocated[1] = test_case->get_memory_allocated(test_case, skel);
-+
-+	if (exclusive)
-+		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "exclusive");
-+	else
-+		ASSERT_GT(memory_allocated[1], memory_allocated[0] + 1024, "not exclusive");
-+
-+close:
-+	for (i = 0; i < ARRAY_SIZE(sk); i++)
-+		close(sk[i]);
-+
-+	if (test_case->type == SOCK_DGRAM) {
-+		/* UDP recv queue is destroyed after RCU grace period.
-+		 * With one kern_sync_rcu(), memory_allocated[0] of the
-+		 * isoalted case often matches with memory_allocated[1]
-+		 * of the preceding non-exclusive case.
-+		 */
-+		kern_sync_rcu();
-+		kern_sync_rcu();
-+	}
-+
-+	return err;
-+}
-+
-+void run_test(struct test_case *test_case)
-+{
-+	struct nstoken *nstoken;
-+	struct sk_memcg *skel;
-+	int cgroup, err;
-+
-+	skel = sk_memcg__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	skel->bss->nr_cpus = libbpf_num_possible_cpus();
-+
-+	err = sk_memcg__attach(skel);
-+	if (!ASSERT_OK(err, "attach"))
-+		goto destroy_skel;
-+
-+	cgroup = test__join_cgroup("/sk_memcg");
-+	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
-+		goto destroy_skel;
-+
-+	err = make_netns("sk_memcg");
-+	if (!ASSERT_EQ(err, 0, "make_netns"))
-+		goto close_cgroup;
-+
-+	nstoken = open_netns("sk_memcg");
-+	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
-+		goto remove_netns;
-+
-+	err = check_exclusive(test_case, skel, false);
-+	if (!ASSERT_EQ(err, 0, "test_exclusive(false)"))
-+		goto close_netns;
-+
-+	err = write_sysctl("/proc/sys/net/core/memcg_exclusive", "1");
-+	if (!ASSERT_EQ(err, 0, "write_sysctl(1)"))
-+		goto close_netns;
-+
-+	err = check_exclusive(test_case, skel, true);
-+	if (!ASSERT_EQ(err, 0, "test_exclusive(true by sysctl)"))
-+		goto close_netns;
-+
-+	err = write_sysctl("/proc/sys/net/core/memcg_exclusive", "0");
-+	if (!ASSERT_EQ(err, 0, "write_sysctl(0)"))
-+		goto close_netns;
-+
-+	skel->links.sock_create = bpf_program__attach_cgroup(skel->progs.sock_create, cgroup);
-+	if (!ASSERT_OK_PTR(skel->links.sock_create, "attach_cgroup(sock_create)"))
-+		goto close_netns;
-+
-+	err = check_exclusive(test_case, skel, true);
-+	ASSERT_EQ(err, 0, "test_exclusive(true by bpf)");
-+
-+close_netns:
-+	close_netns(nstoken);
-+remove_netns:
-+	remove_netns("sk_memcg");
-+close_cgroup:
-+	close(cgroup);
-+destroy_skel:
-+	sk_memcg__destroy(skel);
-+}
-+
-+struct test_case test_cases[] = {
-+	{
-+		.name = "TCP  ",
-+		.family = AF_INET,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+		.get_memory_allocated = tcp_get_memory_allocated,
-+	},
-+	{
-+		.name = "UDP  ",
-+		.family = AF_INET,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+		.get_memory_allocated = udp_get_memory_allocated,
-+	},
-+	{
-+		.name = "TCPv6",
-+		.family = AF_INET6,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+		.get_memory_allocated = tcp_get_memory_allocated,
-+	},
-+	{
-+		.name = "UDPv6",
-+		.family = AF_INET6,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+		.get_memory_allocated = udp_get_memory_allocated,
-+	},
-+};
-+
-+void serial_test_sk_memcg(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		test__start_subtest(test_cases[i].name);
-+		run_test(&test_cases[i]);
-+	}
-+}
-diff --git a/tools/testing/selftests/bpf/progs/sk_memcg.c b/tools/testing/selftests/bpf/progs/sk_memcg.c
-new file mode 100644
-index 000000000000..6b1a928a0c90
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/sk_memcg.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+#include <errno.h>
-+
-+extern int tcp_memory_per_cpu_fw_alloc __ksym;
-+extern int udp_memory_per_cpu_fw_alloc __ksym;
-+
-+int nr_cpus;
-+bool tcp_activated, tcp_stable, udp_activated, udp_stable;
-+long tcp_memory_allocated, udp_memory_allocated;
-+static struct sock *tcp_sk_tracing, *udp_sk_tracing;
-+
-+struct sk_prot {
-+	long *memory_allocated;
-+	int *memory_per_cpu_fw_alloc;
-+};
-+
-+static int drain_memory_per_cpu_fw_alloc(__u32 i, struct sk_prot *sk_prot_ctx)
-+{
-+	int *memory_per_cpu_fw_alloc;
-+
-+	memory_per_cpu_fw_alloc = bpf_per_cpu_ptr(sk_prot_ctx->memory_per_cpu_fw_alloc, i);
-+	if (memory_per_cpu_fw_alloc)
-+		*sk_prot_ctx->memory_allocated += *memory_per_cpu_fw_alloc;
-+
-+	return 0;
-+}
-+
-+static long get_memory_allocated(struct sock *_sk, int *memory_per_cpu_fw_alloc)
-+{
-+	struct sock *sk = bpf_core_cast(_sk, struct sock);
-+	struct sk_prot sk_prot_ctx;
-+	long memory_allocated;
-+
-+	/* net_aligned_data.{tcp,udp}_memory_allocated was not available. */
-+	memory_allocated = sk->__sk_common.skc_prot->memory_allocated->counter;
-+
-+	sk_prot_ctx.memory_allocated = &memory_allocated;
-+	sk_prot_ctx.memory_per_cpu_fw_alloc = memory_per_cpu_fw_alloc;
-+
-+	bpf_loop(nr_cpus, drain_memory_per_cpu_fw_alloc, &sk_prot_ctx, 0);
-+
-+	return memory_allocated;
-+}
-+
-+static void fentry_init_sock(struct sock *sk, struct sock **sk_tracing,
-+			     long *memory_allocated, int *memory_per_cpu_fw_alloc,
-+			     bool *activated)
-+{
-+	if (!*activated)
-+		return;
-+
-+	if (__sync_val_compare_and_swap(sk_tracing, NULL, sk))
-+		return;
-+
-+	*activated = false;
-+	*memory_allocated = get_memory_allocated(sk, memory_per_cpu_fw_alloc);
-+}
-+
-+static void fexit_init_sock(struct sock *sk, struct sock **sk_tracing,
-+			    long *memory_allocated, int *memory_per_cpu_fw_alloc,
-+			    bool *stable)
-+{
-+	long new_memory_allocated;
-+
-+	if (sk != *sk_tracing)
-+		return;
-+
-+	new_memory_allocated = get_memory_allocated(sk, memory_per_cpu_fw_alloc);
-+	if (new_memory_allocated == *memory_allocated)
-+		*stable = true;
-+
-+	*sk_tracing = NULL;
-+}
-+
-+SEC("fentry/tcp_init_sock")
-+int BPF_PROG(fentry_tcp_init_sock, struct sock *sk)
-+{
-+	fentry_init_sock(sk, &tcp_sk_tracing,
-+			 &tcp_memory_allocated, &tcp_memory_per_cpu_fw_alloc,
-+			 &tcp_activated);
-+	return 0;
-+}
-+
-+SEC("fexit/tcp_init_sock")
-+int BPF_PROG(fexit_tcp_init_sock, struct sock *sk)
-+{
-+	fexit_init_sock(sk, &tcp_sk_tracing,
-+			&tcp_memory_allocated, &tcp_memory_per_cpu_fw_alloc,
-+			&tcp_stable);
-+	return 0;
-+}
-+
-+SEC("fentry/udp_init_sock")
-+int BPF_PROG(fentry_udp_init_sock, struct sock *sk)
-+{
-+	fentry_init_sock(sk, &udp_sk_tracing,
-+			 &udp_memory_allocated, &udp_memory_per_cpu_fw_alloc,
-+			 &udp_activated);
-+	return 0;
-+}
-+
-+SEC("fexit/udp_init_sock")
-+int BPF_PROG(fexit_udp_init_sock, struct sock *sk)
-+{
-+	fexit_init_sock(sk, &udp_sk_tracing,
-+			&udp_memory_allocated, &udp_memory_per_cpu_fw_alloc,
-+			&udp_stable);
-+	return 0;
-+}
-+
-+SEC("cgroup/sock_create")
-+int sock_create(struct bpf_sock *ctx)
-+{
-+	u32 flags = SK_BPF_MEMCG_EXCLUSIVE;
-+	int err;
-+
-+	err = bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+			     &flags, sizeof(flags));
-+	if (err)
-+		goto err;
-+
-+	flags = 0;
-+
-+	err = bpf_getsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+			     &flags, sizeof(flags));
-+	if (err)
-+		goto err;
-+
-+	if (flags != SK_BPF_MEMCG_EXCLUSIVE) {
-+		err = -EINVAL;
-+		goto err;
-+	}
-+
-+	return 1;
-+
-+err:
-+	bpf_set_retval(err);
-+	return 0;
-+}
-+
-+char LICENSE[] SEC("license") = "GPL";
--- 
-2.51.0.384.g4c02a37b29-goog
-
+	-Jay Vosburgh, jv@jvosburgh.net
 
