@@ -1,73 +1,58 @@
-Return-Path: <netdev+bounces-221004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB2CB49E0D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 02:34:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6530CB49E22
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 02:43:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBF243B017A
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:34:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7ADD71BC5A80
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6741F5413;
-	Tue,  9 Sep 2025 00:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA9B1F875A;
+	Tue,  9 Sep 2025 00:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhlXHeuQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O36T0wMM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95D81F12E0;
-	Tue,  9 Sep 2025 00:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B187F1E9906;
+	Tue,  9 Sep 2025 00:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757378047; cv=none; b=gmf0kJJrwI03r74vpjvxcQSyexVIGosLIPmFDGe1iWYZAMzNjxeMgIwV2ErhXhSF33rS8L5pIPCbWrroymO4xHIW9BO4D4JkX5yj7DEtQP+L8EiIx80mWfN9tUOr12Vv71Zdsdv0huz9EwgQvANIrVDX/zhrhuDwd8eURpr6eWE=
+	t=1757378612; cv=none; b=JMKlcvfLjzq9nTg2AvEC8mzN7ADbvqMRrFdcVo48vucrjZsvIfQnxjImmFhU9Zm0h3mYBFJ+/4d3TvbrMMt4uAWBV72dUHBf/p4b+W6TwgMBomCUOYburukitFLVRlxFq5HJwlg94bH6DXA9ukF/lXC3Ado3CE9w34uqbwqQxv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757378047; c=relaxed/simple;
-	bh=kIlv7QbzYjMgSwCBteRli8sNX4QzCCtBptBcgT5oOPY=;
+	s=arc-20240116; t=1757378612; c=relaxed/simple;
+	bh=WHbr101hR4anFn40YWww/ka9V7Y3W5JIZ/oD1doygy8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bo3SzonhBQdLmRcWlgrFK2hpSHYF9SYeqWGMdeyRI3hqWbqAIyXvowLY1XwqBAZdA5vAAbWnszr7JeuDkHn18OTqLLdMfwe080ANADVdYMkiyQzlaW95N+/1LTEIcXGyOoYSQTBv7UQXXcUB3OSdNPlO7ELkqwhWshxBiHSZcBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhlXHeuQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76D48C4CEF1;
-	Tue,  9 Sep 2025 00:34:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tV74AXurtyvXWVNzxXt3LvqlRMHzIyUfiWTmDy7D4LtePqDk3tkMJ2baO4n4kFcBjAtFQU2hhE6qTZL24oS7JBmP41uov0UXcaHylTFoKZ8CT2FSV0gHdm7NY9QOXejn257e5EgRB/yHSjVM3w6YC4SwM4NRScyHtl5dCBKt/qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O36T0wMM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 038E7C4CEF1;
+	Tue,  9 Sep 2025 00:43:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757378047;
-	bh=kIlv7QbzYjMgSwCBteRli8sNX4QzCCtBptBcgT5oOPY=;
+	s=k20201202; t=1757378612;
+	bh=WHbr101hR4anFn40YWww/ka9V7Y3W5JIZ/oD1doygy8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OhlXHeuQg/FbLmSazvb/q+WT5wZq0bM/SbOFD0i9lLCn5AjwlpMg4hSG57YM1QTpE
-	 EDNivgEg9GxQNuAae4aNPp/l2oI5inaOXK3c7ktYmAeYQaweAvTxtPcHNnGWi/BtWL
-	 4a68szBvMjRlKjemWt4JONgSNgSf62Z8SQvrl/YTKourv7S3ryguvWISptRNrfLq6U
-	 YW0ZUYif/g+X2Ltxx4F8RxgjBSwujkjhwIemWoLxh8lLPvE3upk5ylgc3IBzk1nLqm
-	 4fMFRh2STmgQZppQOhCcI4EMvvDXrufDso0gKJ4IuNtoKZTFhZlO8+t/NmUObEsi8s
-	 2gIuU7LYZlV5A==
-Date: Mon, 8 Sep 2025 17:34:05 -0700
+	b=O36T0wMMSn/CeaA+wKMiDyHwPg6FlYnUnZzYzPyoyh2TFzjdawe+om5fR+zZSZ5f7
+	 VfEmni2nlq1c1vuSCHvJuSE0jcs63YA9XQJHw2ZKyvw038UNzCk8SgMuYFDZY6e87X
+	 g0PaJltDgF4K2WioakIO54M3BtfSb7QErOkmzVvNmjH6Cmzp8rPEEtzvk3QpWJg1n8
+	 AzQvSLUP/bR9O4MZY2wviOJ5XSUj9T6RosguIWi0OeOpCwf42VPPXHtgKRINUA7RTW
+	 cSDiLLJE7DGXhZIpbpkARJXxdGmY2HMFJK5Dy+PmDX29uTu07VGsqkzSIlWZlNsOr1
+	 cmTa71pzgkKiw==
+Date: Mon, 8 Sep 2025 17:43:31 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Vadim
- Fedorenko <vadim.fedorenko@linux.dev>, Junhui Liu
- <junhui.liu@pigmoral.tech>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, Troy Mitchell
- <troy.mitchell@linux.spacemit.com>, Vivian Wang <uwu@dram.page>
-Subject: Re: [PATCH net-next v9 2/5] net: spacemit: Add K1 Ethernet MAC
-Message-ID: <20250908173405.08aec56d@kernel.org>
-In-Reply-To: <fbcc1ec3-7ff6-4891-97e3-9763355326f7@iscas.ac.cn>
-References: <20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn>
-	<20250905-net-k1-emac-v9-2-f1649b98a19c@iscas.ac.cn>
-	<20250905153500.GH553991@horms.kernel.org>
-	<0605f176-5cdb-4f5b-9a6b-afa139c96732@iscas.ac.cn>
-	<20250905160158.GI553991@horms.kernel.org>
-	<45053235-3b01-42d8-98aa-042681104d11@iscas.ac.cn>
-	<20250905165908.69548ce0@kernel.org>
-	<fbcc1ec3-7ff6-4891-97e3-9763355326f7@iscas.ac.cn>
+To: Bernard Pidoux <bernard.f6bvp@gmail.com>
+Cc: stanislav.fort@aisle.com, davem@davemloft.net, disclosure@aisle.com,
+ edumazet@google.com, horms@kernel.org, linux-hams@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ security@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v4] netrom: linearize and validate lengths in
+ nr_rx_frame()
+Message-ID: <20250908174331.47d895a0@kernel.org>
+In-Reply-To: <FDBA9F48-A844-4E65-A8B1-6FB660754342@gmail.com>
+References: <FDBA9F48-A844-4E65-A8B1-6FB660754342@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,10 +62,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 7 Sep 2025 16:22:44 +0800 Vivian Wang wrote:
-> "dstats" is meant for tunnels. This doesn't look like the right thing to
-> use, and no other pcpu_stat_type gives me tx_dropped. Do you think I
-> should use dstats anyway?
+On Sun, 7 Sep 2025 16:32:03 +0200 Bernard Pidoux wrote:
+> While applying netrom PATCH net v4
+> patch says that 
+> it is malformed on line 12.
 
-You can use dstats
+FWIW the version I received is completely mangled. There's a leading
+space before each +. You can try B4 relay if your mail server is giving
+you grief.
 
