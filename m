@@ -1,123 +1,89 @@
-Return-Path: <netdev+bounces-221182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D159B4AD0E
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:00:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B9E8B4AD16
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:01:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E683346ED3
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:00:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7388F7AB2C0
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478043277B8;
-	Tue,  9 Sep 2025 12:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EA02F83C5;
+	Tue,  9 Sep 2025 12:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dk8njxJ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D673322A31
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 12:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B588C280A5F;
+	Tue,  9 Sep 2025 12:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757419203; cv=none; b=KjRuTh8gKj+8J65b6pqUTduIUJa9J1pCydCc+UNqfha4Jj8U9AR2HNkP0vV87VmwG1pmq0SDJ4DRh7M10ilSP5YXRTcDSs2KC/PpPe4T+VV0rGoYFmkCtO0Q+z9PBIupNI5MeDiDZ3irTcbXytdgSxg8j9j4UMpy4z4+0Qm9vjk=
+	t=1757419262; cv=none; b=jlq+7IyZLnaRsmZJvQdTyOPa280zsn9huPkcBdW9iCg0TqSA0q/BPwP1KutT7bcpYapT8LR2CBFeGzb+riGkk9/8FBBrGt8gZDjgPK1MB9Pwm0ftoMIyzCKKpFLyBUGKNOaUWh9A+PhQcwOe7cT4ihQC63wDS/T7EsG2W8Lh05g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757419203; c=relaxed/simple;
-	bh=cv+uZlUT6vEvScvKtWqrhd9kTWqLzZTRw1OQFiJEWmA=;
+	s=arc-20240116; t=1757419262; c=relaxed/simple;
+	bh=1YJDWyOoueVjPjVtWTFDm9WtnwBeyicuWvBo9FBMBZo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p47y1alBC0gn+8j/sRgj4fh26LNojEfNkMxrYjDmQT+iF5R8y7PpGrgNpbC8UOp1ETq91UNdJv1RvFM89bEO2COpFbRIwtPsp1DaCSDPgQUErSpcOg28iIYxEhKVasneaJIHlXCrT0Pot3I7WGlEMJUIq9scelu7OneLj4LnftI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uvx0p-0005xh-TM; Tue, 09 Sep 2025 13:59:51 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uvx0p-000Pef-0A;
-	Tue, 09 Sep 2025 13:59:51 +0200
-Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 9C2A3469EA3;
-	Tue, 09 Sep 2025 11:59:50 +0000 (UTC)
-Date: Tue, 9 Sep 2025 13:59:50 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Alex Tran <alex.t.tran@gmail.com>
-Cc: socketcan@hartkopp.net, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] docs: networking: can: change bcm_msg_head frames
- member to support flexible array
-Message-ID: <20250909-fancy-practical-labrador-360abc-mkl@pengutronix.de>
-References: <20250904031709.1426895-1-alex.t.tran@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=btfh+DWzvSzRcEPRbG6xHLhE8V138AWIvQOvVso4kdj3sKao10lAPKpLXeRFF0ITx3ggrw6r+Xuz4+T0h7GqQdlNjUCbqCAMuvyjHJp5li6sDUWpcGnCdTTp1EAN82EkSjzAUk7ApAzpIPEQ1Xgwp/WSVNmoukkn0+ZR1g9OVwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dk8njxJ8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35D37C4CEFA;
+	Tue,  9 Sep 2025 12:00:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757419262;
+	bh=1YJDWyOoueVjPjVtWTFDm9WtnwBeyicuWvBo9FBMBZo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dk8njxJ8/I1tPVVmDVYzxmEWyC4xaoQ3ApzpN9Sayx+jsdv0ZgmPx+zeaBhI4G+zY
+	 HxZDqHOLqYLeI7/Wabp8Z8rmb+0LTvld7czaykKwnSrzfrpf7+mtD4ttxIw7FzxOv3
+	 l4MDkUAUlelh3TTCy6vD6/RH58ff89t7RzuLO32XaSpSxNZzKDVc5Z9DziOM965Y/k
+	 lPJD84kY53LdQ/8nesvQzkbtA2jMynFKsdsP0D754gQiH5JdFwc9T/ybfGsRHm9kiz
+	 Z4M9jzXUGDBujucJ5hOrXaPqZKGmgF6PlyO8jX6xhA8Ql/KuL3QyEY1ehiQ0xQJRxE
+	 1/Z1mKoXM/2Wg==
+Date: Tue, 9 Sep 2025 13:00:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next 1/2] net/mlx5e: Make PCIe congestion event
+ thresholds configurable
+Message-ID: <20250909120056.GA14415@horms.kernel.org>
+References: <1757237976-531416-1-git-send-email-tariqt@nvidia.com>
+ <1757237976-531416-2-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ybaodxp5l6dt5ozv"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250904031709.1426895-1-alex.t.tran@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <1757237976-531416-2-git-send-email-tariqt@nvidia.com>
 
+On Sun, Sep 07, 2025 at 12:39:35PM +0300, Tariq Toukan wrote:
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+> 
+> Add devlink driverinit parameters for configuring the thresholds for
+> PCIe congestion events. These parameters are registered only when the
+> firmware supports this feature.
+> 
+> Update the mlx5 devlink docs as well on these new params.
+> 
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
---ybaodxp5l6dt5ozv
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1] docs: networking: can: change bcm_msg_head frames
- member to support flexible array
-MIME-Version: 1.0
+Thanks,
 
-On 03.09.2025 20:17:09, Alex Tran wrote:
-> The documentation of the 'bcm_msg_head' struct does not match how
-> it is defined in 'bcm.h'. Changed the frames member to a flexible array,
-> matching the definition in the header file.
->=20
-> See commit 94dfc73e7cf4 ("treewide: uapi: Replace zero-length arrays with
-> flexible-array members")
->=20
-> Bug 217783 <https://bugzilla.kernel.org/show_bug.cgi?id=3D217783>
->=20
-> Signed-off-by: Alex Tran <alex.t.tran@gmail.com>
+Nice to see devlink coverage growing.
 
-Applied to linux-can.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ybaodxp5l6dt5ozv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjAFrMACgkQDHRl3/mQ
-kZwMVQgAhkVtHUkjTmnDC/Eo55aUQlbKqkygE2QbunJu2Bjgumo2AanbdTabE8jH
-FQAdzb9TfmAdwkS+pDMp5MEvzzD2ywPFSWptvv4Y5jqgywhf/poiKRiQDtVsB0+4
-qy1mSJX8MlBzyY4UE4UuGpNytm3LsLSbiu9BeHmvi9ioYIkmtDqcXUb0/khhpJo0
-VrgSXHwGvfNb2HW5eX4ghIYRxPt9+nFP1e3qI6MENbb0xdAPxreJPPgSGMcu9A4B
-L68OmLU9kpOshcGmAXr6sGfRgyDcnK7Qy2HkGy37HP0IRsEd72OXaE3ES1Zps4FA
-zRxmpBlzuGRBEmdryt/Uk/SxOeyATQ==
-=0Pxt
------END PGP SIGNATURE-----
-
---ybaodxp5l6dt5ozv--
+Reviewed-by: Simon Horman <horms@kernel.org>
 
