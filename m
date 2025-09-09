@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-221082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC3B6B4A331
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:14:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B48A7B4A34C
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E10C1726CA
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:14:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC4AC1768A4
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45097305969;
-	Tue,  9 Sep 2025 07:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyuPtYAw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BCD30507E;
+	Tue,  9 Sep 2025 07:17:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115831F63CD;
-	Tue,  9 Sep 2025 07:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D579E239E70
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 07:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757402084; cv=none; b=Jb/yYGwtqB/oNIQ18LTgvjYepBcLFdLmRhhgk+rB5HLDhM4bbEyfYY2juNsvgcFtppePELW4VXCehaiO6A6mx30DNcPb7b8m7bsik1JT/Rl88UzAr6AUtphSNWRtHWbpkL3k1dW80tQwCRT+vo5WhtWeK3GRexHFpiIY9XoraAU=
+	t=1757402264; cv=none; b=tmqqh52/BhScdJ1bq9Y3HIXnAysCQ840QL5gSYANkoZB8G6PswP3tFeMe/9i64GmZ9E9uFlQl0N4FmlZr8XKsliUPzRh5dPFigWWyHC/ryPU1GxSV3G5xB5dSZSt64dphEuBqqdTSs/voQc6hoyaQPkdihroVMVWqUbu0eaCvxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757402084; c=relaxed/simple;
-	bh=9eG5fnaSGiqXsw4eiPV/yIEg2n0/EzNdL6QuKQ4J0G4=;
+	s=arc-20240116; t=1757402264; c=relaxed/simple;
+	bh=xcbuBAIcV7PYG4iVvgt6Hx4JudC8RwH/H+Q+eNBFY44=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W1pwnwpWSTTsWC7rpYMcaxRkLsYBMZZZiKzUi6csczrlkM5FaBH8tA6vXtZvnPR4nWp6ltRE09M2tp7xYAkefVTpVWJOuUcLqd3LPObswFtbIXtOzZewkBqG7K31fGUkve5tjJz0RcVPgjsUYJIYf6OWnYqURxrqeB1No2GOqvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyuPtYAw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0328C4CEF4;
-	Tue,  9 Sep 2025 07:14:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757402083;
-	bh=9eG5fnaSGiqXsw4eiPV/yIEg2n0/EzNdL6QuKQ4J0G4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PyuPtYAwzhNuKU4CSjN/l5NrjK4jQlq9+Gd6w3rSIGppeuJ0CPZX6VeWqDtHL4h65
-	 RPH4fFhyVl7Dh0ieAdIQZbCjO5GMIckLfwxIZrzUVa9RdVZB3IOQkZFrdEbMdvmobG
-	 GZOgJb3ByAtgslNt9n6hMSayDcghNkFv9NbfbDyA1ePzq4ZqnsZ4dqiGdQ1tpArVy8
-	 PfdTXAuLyA6+jiPGJG6XjNEmrkQpwBiBILIhyYjhVhaTgRTWiUKGI9AJ/H7NbjLHB9
-	 MdhAX5tTLBe9r/FHQBAHLTl6KgqZH1IZTlhwM4hgonvAzGZDXtuuK+sBNZjRXi3hiD
-	 VS+HP22zctCDA==
-Date: Tue, 9 Sep 2025 09:14:41 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: net: renesas,rzv2h-gbeth:
- Document Renesas RZ/T2H and RZ/N2H SoCs
-Message-ID: <20250909-charming-tuscan-mouse-abc1e0@kuoka>
-References: <20250908105901.3198975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250908105901.3198975-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LlT5yvftkx5Zh+ie46EMe1XEMq1BXPyLdrDbUn+CL7JesPoT8U8xdS7G44BUhJY0jqoaWFz1ThX8IlaLeOg5BlivbVqEAVx1TuKipQn9SW7GmMIJgFOdL0y8mGOR3zhZZoPhEqpwd9rfXqKXIi+NdWlfuNFEKSm6sFIULycREUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvsbO-0003x4-SX; Tue, 09 Sep 2025 09:17:18 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvsbN-000Nkg-0l;
+	Tue, 09 Sep 2025 09:17:17 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uvsbN-00DwzJ-0J;
+	Tue, 09 Sep 2025 09:17:17 +0200
+Date: Tue, 9 Sep 2025 09:17:17 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	stable@vger.kernel.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Lukas Wunner <lukas@wunner.de>,
+	Russell King <linux@armlinux.org.uk>, Xu Yang <xu.yang_2@nxp.com>,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
+ PM to avoid MDIO runtime PM wakeups
+Message-ID: <aL_UfST0Q3HrSEtM@pengutronix.de>
+References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
+ <DCNKVCWI6VEQ.30M6YA786ZIX2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,40 +69,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250908105901.3198975-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DCNKVCWI6VEQ.30M6YA786ZIX2@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Sep 08, 2025 at 11:58:59AM +0100, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Mon, Sep 08, 2025 at 07:00:09PM +0200, Hubert Wiśniewski wrote:
+> On Mon Sep 8, 2025 at 1:26 PM CEST, Oleksij Rempel wrote:
+> > Drop phylink_{suspend,resume}() from ax88772 PM callbacks.
+> >
+> > MDIO bus accesses have their own runtime-PM handling and will try to
+> > wake the device if it is suspended. Such wake attempts must not happen
+> > from PM callbacks while the device PM lock is held. Since phylink
+> > {sus|re}sume may trigger MDIO, it must not be called in PM context.
+> >
+> > No extra phylink PM handling is required for this driver:
+> > - .ndo_open/.ndo_stop control the phylink start/stop lifecycle.
+> > - ethtool/phylib entry points run in process context, not PM.
+> > - phylink MAC ops program the MAC on link changes after resume.
 > 
-> Add device tree binding support for the Gigabit Ethernet MAC (GMAC) IP
-> on Renesas RZ/T2H and RZ/N2H SoCs. While these SoCs use the same
-> Synopsys DesignWare MAC version 5.20 as RZ/V2H, they are synthesized
-> with different hardware configurations.
+> Thanks for the patch! Applied to v6.17-rc5, it fixes the problem for me.
 > 
-> Add new compatible strings "renesas,r9a09g077-gbeth" for RZ/T2H and
-> "renesas,r9a09g087-gbeth" for RZ/N2H, with the latter using RZ/T2H as
-> fallback since they share identical GMAC IP.
-> 
-> Update the schema to handle hardware differences between SoC variants.
-> RZ/T2H requires only 3 clocks compared to 7 on RZ/V2H, supports 8 RX/TX
-> queue pairs instead of 4, and needs 2 reset controls with reset-names
-> property versus a single unnamed reset. RZ/T2H also has the split header
-> feature enabled which is disabled on RZ/V2H.
-> 
-> Add support for an optional pcs-handle property to connect the GMAC to
-> the MIIC PCS converter on RZ/T2H. Use conditional schema validation to
-> enforce the correct clock, reset, and interrupt configurations per SoC
-> variant.
-> 
-> Extend the base snps,dwmac.yaml schema to accommodate the increased
-> interrupt count, supporting up to 19 interrupts and extending the
-> rx-queue and tx-queue interrupt name patterns to cover queues 0-7.
-> 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Tested-by: Hubert Wiśniewski <hubert.wisniewski.25632@gmail.com>
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Thank you for testing!
 
-Best regards,
-Krzysztof
+> > Fixes: e0bffe3e6894 ("net: asix: ax88772: migrate to phylink")
+> 
+> It does, but v5.15 (including v5.15.191 LTS) is affected as well, from
+> 4a2c7217cd5a ("net: usb: asix: ax88772: manage PHY PM from MAC"). I think
+> it could also use a patch, but I won't insist.
 
+Ack, I'll try do address it later.
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
