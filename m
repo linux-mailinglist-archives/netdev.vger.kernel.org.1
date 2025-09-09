@@ -1,143 +1,230 @@
-Return-Path: <netdev+bounces-221062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE9D3B4A06F
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 05:58:19 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BB9B4A077
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 06:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E7B31B264E0
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:58:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0BA154E2118
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 04:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827502DCBE2;
-	Tue,  9 Sep 2025 03:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0A226F2BE;
+	Tue,  9 Sep 2025 04:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="W+sGbsYs"
+	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="L6SNCqxG"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED05426F2BE;
-	Tue,  9 Sep 2025 03:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5348418A93F
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 04:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757390259; cv=none; b=D8fE1eOQOOWegv9Nf55GKy+1UyMRd8LoCKzyr0Q+VNDpS6D9B0+qkOkNgBP3zfO0WhpDBJohQFnhBilYfSLqPlzu01S9tkT0nX7RCZ+2sN3xuXgJzSasKvgSwRmIONh+bOdCjsMEmc/PipHTzuibtQdiWCJioUAXGxO/3navKUY=
+	t=1757390437; cv=none; b=Z02drf8omrRulya/MxrEjRu52i+3v2EEdR0275KIfrD1sv9AWpY9cQcelsh1TQlVxPDxG3z572bcGA8UW7imx/GConkYRd5eYm6ENGrC/5UAg18sp085TB7aU1oVn1DGiyBeQhfv+0kOfLR6OpoGbYPO/m0p34m8nU/Oj4EpwAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757390259; c=relaxed/simple;
-	bh=BNJgYDcqZUv7Fqxk1JnB4446WUyPE6iu0uKhE5nbFdo=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=FXll+rErbzFoU7vJrMYMgKM/UAA3d3iJWV4/Rvrjzhl5cwyw76nh42HfNZmAPSgyz4BbUSeurXwJwrRS9OWMEnvMQROWtegaJ9IWyBAKnUwC3F6/2nL+f/nh13epwyju/E8aGuNUb1RwAsJnLTjU9kqVkNzCt2NBdPabUg7MPJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=W+sGbsYs; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1127)
-	id 7C33221199D2; Mon,  8 Sep 2025 20:57:37 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7C33221199D2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1757390257;
-	bh=pr/GDTJTxmpsBp6NK0FZ1QXNX62XoPBETUfz4jeiPWc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=W+sGbsYsqbwADbpd/aHOMIBSsFuO6WR5HwcHBpLR4dh+kehKlO0wR3Jde2Ve6YeEz
-	 MJSLJKMpWc31KRftfOHL6FFUhNUXdpN/nNMO5zLicpNOFQuUWHXsIIfgPCac0R5Bro
-	 e95I2acMOG8vyK+6eavrS03du1n1oT41/9cWwPLY=
-From: Saurabh Sengar <ssengar@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shradhagupta@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: ssengar@microsoft.com,
-	stable@vger.kernel.org,
-	Saurabh Sengar <ssengar@linux.microsoft.com>
-Subject: [PATCH net v2] net: mana: Remove redundant netdev_lock_ops_to_full() calls
-Date: Mon,  8 Sep 2025 20:57:33 -0700
-Message-Id: <1757390253-6891-1-git-send-email-ssengar@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1757390437; c=relaxed/simple;
+	bh=a1R6e/eD5AKWKndDSOC5/NWMXsZxuSjGOBmgQN214us=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lstCC8rLe7vyi8GetJBCLn5or7dy165FpGHot+JpSvW3MA1gH3elFF5VxrrHT4RNwX9yjCDfXXMm/vUmKlcdT2Rte9Mrla9lIL8Rj0NhR5C2Iu+B7mAm4lmcI/j0+U79dBNBc4hCb4UHvUY4/x+PnclfOs757lEjBKbaS0sULIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=L6SNCqxG; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55ce508d4d6so4819968e87.0
+        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 21:00:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openai.com; s=google; t=1757390433; x=1757995233; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hIztJIte7NdpqukioNjNPUTSRBW0pY7dvHNre0HHf6E=;
+        b=L6SNCqxGEit3t8JwC4vVjHuGs80b55AStYVKNPImVGDy1jenNk9C1O0C5jqNjm5+0J
+         qtV5bpZJrUDiOfu1PNzjVuET2mjVu1MgYdSRU410gAH/MQObPIMS8V38DhFkbWHk1bYP
+         W1+aRStVbhYVW7BV6DA/1fRWQ5Vzg9EiaCXiM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757390433; x=1757995233;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hIztJIte7NdpqukioNjNPUTSRBW0pY7dvHNre0HHf6E=;
+        b=FIAu/Y9rhhvgXwEcXAd8Q8xSq8swDUckz4zBgeWA9kWluTIqxP3BAZh7KmSPWrNnq9
+         TUmB20RHvIHYV2iOLQ7y1dz27409ron7JSRlLv0+rsyU1TsOPLhcQpICXOcWXC0b0jq2
+         KIj8mQfVVs2HOnozNCANuYjODrSBNjjt+n767gvPFNR1fv/R8Cto6g7C+bmJIHCsnxIs
+         p2MAQr9+MnoM2+JSDlNeg4HfCclzm9vVpTKC1Qp8kNiQ0vdzxu1fLuIoaiecgmxNFgvq
+         SUkNI5VtxgclULyoHP3Cl2UHFamyKKYvyEHfykQtqSSn6mQ9xAlexwQSBdShuwfe9EDV
+         ieUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBnHlO2VAo+XaVQKYw1c8iuSWMDjGGMITavvffxPGxnEeCtwM4yGpJQ8BPr+DbUXIj7C6Lr4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz/KMt6qCiQZlGsGoR0TTmnqdWaBB2LmlO3yWX9EfTmlDfO5yP
+	QL3QYvsK6gKa0iQH9aunqifp0KAy8YlFWD9qMPF+f1FjrAt8LGRMjsZYY82BTZPzpbh7QEhWtce
+	XBH2ZWyTFoLeVPhXFIdHJjncpLW6SILeEEK4Lr0vAww==
+X-Gm-Gg: ASbGncv4YXCAmbL1TXJADtbSwdjZVRDhpB+bMXqJT3n8dBOYrsd+cFdr0SOSdSV37y5
+	86hST8ZzYPUSzCvTWwOcKSMNn+Cz/7D9VVzLtXbJmtMGEq9PqSHLTXnBVnTsicRxcQ9YIBdezU/
+	4sYdmDk8KKUmNGMNbgjFkXoEPCbsMXt+x96BWC5+jhIbPcJciLEk14vc9UmdWXYrswGmDNuvXxl
+	EhIdj6oH+TGStqTXi99xxHq3WrY4D2hEQExpQ9q1A9cgI1k2/Qn
+X-Google-Smtp-Source: AGHT+IGtQx4CGX2QbOtOVxGuLDCpXQnpz2q0tz/oZMYlySYpi7BY05WVNIjTDJSPhxKHQBwEHlTuPHlRoGHoV98hKec=
+X-Received: by 2002:a05:6512:3d08:b0:560:956e:43a5 with SMTP id
+ 2adb3069b0e04-5625f817d1bmr3345206e87.9.1757390433342; Mon, 08 Sep 2025
+ 21:00:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-0-ea492f7b11ac@openai.com>
+ <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-2-ea492f7b11ac@openai.com>
+ <CAMB2axO4ySD2Lo9xzkkYdUqL2tHPcO02-h2HZiWT993wsU3NtA@mail.gmail.com>
+In-Reply-To: <CAMB2axO4ySD2Lo9xzkkYdUqL2tHPcO02-h2HZiWT993wsU3NtA@mail.gmail.com>
+From: Christoph Paasch <cpaasch@openai.com>
+Date: Mon, 8 Sep 2025 21:00:22 -0700
+X-Gm-Features: AS18NWA2xP8aOi_uzpaJaO-H50O6SLEh5xWnRqrw4G1Ukcbhxnaro2KuLYyNLYM
+Message-ID: <CADg4-L92GbxSXaqg1KuoGxt2c_yC=gbmKywVPvcAjHY_7v2H1g@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/2] net/mlx5: Avoid copying payload to the
+ skb's linear part
+To: Amery Hung <ameryhung@gmail.com>
+Cc: Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-NET_SHAPER is always selected for MANA driver. When NET_SHAPER is enabled,
-netdev_lock_ops_to_full() reduces effectively to only an assert for lock,
-which is always held in the path when NET_SHAPER is enabled.
+On Thu, Sep 4, 2025 at 4:30=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
+te:
+>
+> On Thu, Sep 4, 2025 at 3:57=E2=80=AFPM Christoph Paasch via B4 Relay
+> <devnull+cpaasch.openai.com@kernel.org> wrote:
+> >
+> > From: Christoph Paasch <cpaasch@openai.com>
+> >
+> > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
+> > bytes from the page-pool to the skb's linear part. Those 256 bytes
+> > include part of the payload.
+> >
+> > When attempting to do GRO in skb_gro_receive, if headlen > data_offset
+> > (and skb->head_frag is not set), we end up aggregating packets in the
+> > frag_list.
+> >
+> > This is of course not good when we are CPU-limited. Also causes a worse
+> > skb->len/truesize ratio,...
+> >
+> > So, let's avoid copying parts of the payload to the linear part. We use
+> > eth_get_headlen() to parse the headers and compute the length of the
+> > protocol headers, which will be used to copy the relevant bits ot the
+> > skb's linear part.
+> >
+> > We still allocate MLX5E_RX_MAX_HEAD for the skb so that if the networki=
+ng
+> > stack needs to call pskb_may_pull() later on, we don't need to realloca=
+te
+> > memory.
+> >
+> > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NIC an=
+d
+> > LRO enabled):
+> >
+> > BEFORE:
+> > =3D=3D=3D=3D=3D=3D=3D
+> > (netserver pinned to core receiving interrupts)
+> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> >  87380  16384 262144    60.01    32547.82
+> >
+> > (netserver pinned to adjacent core receiving interrupts)
+> > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
+> >  87380  16384 262144    60.00    52531.67
+> >
+> > AFTER:
+> > =3D=3D=3D=3D=3D=3D
+> > (netserver pinned to core receiving interrupts)
+> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> >  87380  16384 262144    60.00    52896.06
+> >
+> > (netserver pinned to adjacent core receiving interrupts)
+> >  $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
+> >  87380  16384 262144    60.00    85094.90
+> >
+> > Additional tests across a larger range of parameters w/ and w/o LRO, w/
+> > and w/o IPv6-encapsulation, different MTUs (1500, 4096, 9000), differen=
+t
+> > TCP read/write-sizes as well as UDP benchmarks, all have shown equal or
+> > better performance with this patch.
+> >
+> > Reviewed-by: Eric Dumazet <edumazet@google.com>
+> > Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
+> > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+> > ---
+> >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
+net/ethernet/mellanox/mlx5/core/en_rx.c
+> > index 8bedbda522808cbabc8e62ae91a8c25d66725ebb..0ac31c7fb64cd60720d390d=
+e45a5b6b453ed0a3f 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > @@ -2047,6 +2047,8 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
+q *rq, struct mlx5e_mpw_info *w
+> >                 dma_sync_single_for_cpu(rq->pdev, addr + head_offset, h=
+eadlen,
+> >                                         rq->buff.map_dir);
+> >
+> > +               headlen =3D eth_get_headlen(rq->netdev, head_addr, head=
+len);
+> > +
+> >                 frag_offset +=3D headlen;
+> >                 byte_cnt -=3D headlen;
+> >                 linear_hr =3D skb_headroom(skb);
+> > @@ -2123,6 +2125,9 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
+q *rq, struct mlx5e_mpw_info *w
+> >                                 pagep->frags++;
+> >                         while (++pagep < frag_page);
+> >                 }
+> > +
+> > +               headlen =3D eth_get_headlen(rq->netdev, mxbuf->xdp.data=
+, headlen);
+> > +
+>
+> The size of mxbuf->xdp.data is most likely not headlen here.
+>
+> The driver currently generates a xdp_buff with empty linear data, pass
+> it to the xdp program and assumes the layout If the xdp program does
+> not change the layout of the xdp_buff through bpf_xdp_adjust_head() or
+> bpf_xdp_adjust_tail(). The assumption is not correct and I am working
+> on a fix. But, if we keep that assumption for now, mxbuf->xdp.data
+> will not contain any headers or payload. The thing that you try to do
+> probably should be:
+>
+>         skb_frag_t *frag =3D &sinfo->frags[0];
+>
+>         headlen =3D eth_get_headlen(rq->netdev, skb_frag_address(frag),
+> skb_frag_size(frag));
 
-Remove the redundant netdev_lock_ops_to_full() call.
+Ok, I think I understand what you mean! Thanks for taking the time to expla=
+in!
 
-Signed-off-by: Saurabh Sengar <ssengar@linux.microsoft.com>
----
-[v2] - removed Fixes tag and stable CC
+I will do some tests on my side to make sure I get it right.
 
- drivers/net/ethernet/microsoft/mana/mana_en.c | 10 ----------
- 1 file changed, 10 deletions(-)
+As your change goes to net and mine to netnext, I can wait until yours
+is in the tree so that there aren't any conflicts that need to be
+taken care of.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 550843e2164b..f0dbf4e82e0b 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2100,10 +2100,8 @@ static void mana_destroy_txq(struct mana_port_context *apc)
- 		napi = &apc->tx_qp[i].tx_cq.napi;
- 		if (apc->tx_qp[i].txq.napi_initialized) {
- 			napi_synchronize(napi);
--			netdev_lock_ops_to_full(napi->dev);
- 			napi_disable_locked(napi);
- 			netif_napi_del_locked(napi);
--			netdev_unlock_full_to_ops(napi->dev);
- 			apc->tx_qp[i].txq.napi_initialized = false;
- 		}
- 		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
-@@ -2256,10 +2254,8 @@ static int mana_create_txq(struct mana_port_context *apc,
- 		mana_create_txq_debugfs(apc, i);
- 
- 		set_bit(NAPI_STATE_NO_BUSY_POLL, &cq->napi.state);
--		netdev_lock_ops_to_full(net);
- 		netif_napi_add_locked(net, &cq->napi, mana_poll);
- 		napi_enable_locked(&cq->napi);
--		netdev_unlock_full_to_ops(net);
- 		txq->napi_initialized = true;
- 
- 		mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
-@@ -2295,10 +2291,8 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
- 	if (napi_initialized) {
- 		napi_synchronize(napi);
- 
--		netdev_lock_ops_to_full(napi->dev);
- 		napi_disable_locked(napi);
- 		netif_napi_del_locked(napi);
--		netdev_unlock_full_to_ops(napi->dev);
- 	}
- 	xdp_rxq_info_unreg(&rxq->xdp_rxq);
- 
-@@ -2549,18 +2543,14 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
- 
- 	gc->cq_table[cq->gdma_id] = cq->gdma_cq;
- 
--	netdev_lock_ops_to_full(ndev);
- 	netif_napi_add_weight_locked(ndev, &cq->napi, mana_poll, 1);
--	netdev_unlock_full_to_ops(ndev);
- 
- 	WARN_ON(xdp_rxq_info_reg(&rxq->xdp_rxq, ndev, rxq_idx,
- 				 cq->napi.napi_id));
- 	WARN_ON(xdp_rxq_info_reg_mem_model(&rxq->xdp_rxq, MEM_TYPE_PAGE_POOL,
- 					   rxq->page_pool));
- 
--	netdev_lock_ops_to_full(ndev);
- 	napi_enable_locked(&cq->napi);
--	netdev_unlock_full_to_ops(ndev);
- 
- 	mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
- out:
--- 
-2.43.0
 
+Christoph
+
+>
+>
+>
+> >                 __pskb_pull_tail(skb, headlen);
+> >         } else {
+> >                 if (xdp_buff_has_frags(&mxbuf->xdp)) {
+> >
+> > --
+> > 2.50.1
+> >
+> >
 
