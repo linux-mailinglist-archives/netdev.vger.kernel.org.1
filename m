@@ -1,66 +1,60 @@
-Return-Path: <netdev+bounces-221416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923EAB50790
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:58:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D476B50799
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CACC564A38
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:58:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 289E23AE351
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28E83570DD;
-	Tue,  9 Sep 2025 20:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEEB303A21;
+	Tue,  9 Sep 2025 21:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKWEbPvB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="us8/WfQw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B3530215F;
-	Tue,  9 Sep 2025 20:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFAB3019D6
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 21:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757451504; cv=none; b=j2Vhk0M23L75ndwfbCAZojx6YvJjnpJKHcVDKy0JhXP/s+exhIzXzuB0fUzYVoQntI5KJiQc2NOWajD2gOC8zKC9woQDXdJelsXoq62p/K9Dz7G4ZSKhobrwGUSrZ1swhoBXhxq7byUVeFW1S22TEHhkkuBoqTt6pv7exfS0yyI=
+	t=1757451610; cv=none; b=HBlvbk8cmGfi/uOdws0dwKM+LTFh82YI9q2/6Xskzj7Ecy807DZaLE9a07gOIGKQPgAqAztjIqMapQs9jX3R8Diqez5PJG0CjD+hD7N/qSiSUYsdzlwgYSkVsOdUOr6f+/GgTRMAxzQo4rCK2G9KW3k8Ro3IADFQy4MedGl6uPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757451504; c=relaxed/simple;
-	bh=d053UT9D7w+A6kL9ac5x+bCv1+lr5wb0p5BL1ocIRSA=;
+	s=arc-20240116; t=1757451610; c=relaxed/simple;
+	bh=Zg5V41kOGMssaiy2ogiz4Rm3NyjYr7Q8Go5BnrR5lpU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WXnfOABX6Z1g2dFdoOlHSaykwHp0+COApiDmdtq9Q6iD4/HMqnTK8d6Oxr0E7cAn8eF8g4aIFh5qg62c97jVU0Wf/UI4e6hY+nnoBdfFwX5u/AyXRjFYXuSBH+upIdrDbIhqMRRZ6Mt+cqfN3wK0vkcXF9UipOtghZ+HyFDkI0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKWEbPvB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 120BBC4CEF4;
-	Tue,  9 Sep 2025 20:58:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XaRLug9jlBkQ7oVb9idxD3RGrgzBTZulHM7Zjqm6B/KI6iCqJ6Nh7ptwFBn2/3f48sT2akhIFm/v/llQguE4y4Utvi+LwKtcR6EDgpxMA3LQeTkw2owgXuDnns11YElGJiNDAxEzzvGEsmeUn0wtjpdcVt9KnvknuFg7UA1j6p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=us8/WfQw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B256C4CEFC;
+	Tue,  9 Sep 2025 21:00:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757451504;
-	bh=d053UT9D7w+A6kL9ac5x+bCv1+lr5wb0p5BL1ocIRSA=;
+	s=k20201202; t=1757451610;
+	bh=Zg5V41kOGMssaiy2ogiz4Rm3NyjYr7Q8Go5BnrR5lpU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qKWEbPvB6B5W1I+8ibL1fUgdngRXAB3lydQg2aEHeC7D1Gx+BvdXO0J+NbxR3tqOS
-	 MdUHopDoD4l8MG4EWORwGVqWdLwHZ45uKRLEkmzjaEgdGtTE8XRr5FZz/IPBui06xy
-	 FhylzG3vhyQcoxC/yHt3SYEwvVyOt9V/wjk5/1YcPUiDJ8pnmbhFsGcXHlktA4kjkQ
-	 js6F3J4WblA9GyVzB+VncGdXirTf0U0qdLzKPeb9rqH96uaJlWZjGfC1TjtJ1y3wnW
-	 98RBXYOTZWJ9g5nLrvHu+rbXa9/pPQJnoyOJ9WX4OgNOD36rnWI4Vqhmotd2RDCNA+
-	 LpKOFiHC9rTuQ==
-Date: Tue, 9 Sep 2025 13:58:22 -0700
+	b=us8/WfQwp9elB1IpOrQYUu3th0ChhtICXnbsg4+3xfU1SsVVB2sZhhAo2xqF9pvIv
+	 D6BvwgtHyAO7foMnpk6aAb4rzlywIMSmUeF/hFbnL+oacL8HR2iolUwXo4g1Cw/o8w
+	 lS3HaKCPRr/I9Rs53Fk5iDI94q/3C6z6tUFAom2yJtVXzPLh4V5J89eiFyG0FiF7aB
+	 pR6qAmmEYcCtGvgaN95q229YhmNM2AE1o+Y0o0uWTP+WPqSvM+eoqdCGOT4TDyEwL5
+	 e98mGMQfG9gwCYa9j+UF2KQo4IAll0K4hhCOOyVZvJEGPYrO4Ki9jJjWbDyF/BHu/A
+	 YTE2Hir0t4ikg==
+Date: Tue, 9 Sep 2025 14:00:09 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Anwar, Md Danish" <a0501179@ti.com>
-Cc: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <horms@kernel.org>, <corbet@lwn.net>, <gur.stavi@huawei.com>,
- <maddy@linux.ibm.com>, <mpe@ellerman.id.au>, <danishanwar@ti.com>,
- <lee@trager.us>, <gongfan1@huawei.com>, <lorenzo@kernel.org>,
- <geert+renesas@glider.be>, <Parthiban.Veerasooran@microchip.com>,
- <lukas.bulwahn@redhat.com>, <alexanderduyck@fb.com>,
- <richardcochran@gmail.com>, <kees@kernel.org>, <gustavoars@kernel.org>,
- <rdunlap@infradead.org>, <vadim.fedorenko@linux.dev>,
- <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>
-Subject: Re: [PATCH net-next v11 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <20250909135822.2ac833fc@kernel.org>
-In-Reply-To: <68fc2f5c-2cbd-41f6-a814-5134ba06b4b5@ti.com>
-References: <20250909120906.1781444-1-dong100@mucse.com>
-	<20250909120906.1781444-5-dong100@mucse.com>
-	<68fc2f5c-2cbd-41f6-a814-5134ba06b4b5@ti.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Marcin Wojtas
+ <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: mvneta: add support for hardware
+ timestamps
+Message-ID: <20250909140009.33a1ea82@kernel.org>
+In-Reply-To: <aMBTKTz6Oi0bzI6B@shell.armlinux.org.uk>
+References: <E1uw0ID-00000004I6z-2ivB@rmk-PC.armlinux.org.uk>
+	<aMBTKTz6Oi0bzI6B@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,29 +64,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 9 Sep 2025 19:59:11 +0530 Anwar, Md Danish wrote:
-> > +int mucse_mbx_sync_fw(struct mucse_hw *hw)
-> > +{
-> > +	int try_cnt = 3;
-> > +	int err;
-> > +
-> > +	do {
-> > +		err = mucse_mbx_get_info(hw);
-> > +		if (err == -ETIMEDOUT)
-> > +			continue;
-> > +		break;
-> > +	} while (try_cnt--);
-> > +
-> > +	return err;
-> > +}  
-> 
-> There's a logical issue in the code. The loop structure attempts to
-> retry on ETIMEDOUT errors, but the unconditional break statement after
-> the if-check will always exit the loop after the first attempt,
-> regardless of the error. The do-while loop will never actually retry
-> because the break statement is placed outside of the if condition that
-> checks for timeout errors.
+On Tue, 9 Sep 2025 17:17:45 +0100 Russell King (Oracle) wrote:
+> If a driver has skb_tx_timestmap() added, should the driver also
+> fill in the ethtool .get_ts_info() method, presumably with
+> ethtool_op_get_ts_info() ?
 
-The other way around. continue; in a do {} while () look does *not*
-evaluate the condition. So this can loop forever.
+Yes.
 
