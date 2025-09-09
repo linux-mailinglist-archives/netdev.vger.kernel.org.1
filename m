@@ -1,146 +1,127 @@
-Return-Path: <netdev+bounces-221163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038CEB4AA4F
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:21:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57B7CB4AA78
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 723EF17C0FE
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:20:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C359188D987
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5943C31A07D;
-	Tue,  9 Sep 2025 10:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4873307ADA;
+	Tue,  9 Sep 2025 10:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="dr9Fl88t"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DNWJNJWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8270F312805
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 10:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666A0298CCF;
+	Tue,  9 Sep 2025 10:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757413185; cv=none; b=g357GBoseSEaf+tT/wRSzdsBLFuecz3I4iJPgu8G0pb9R8Tjjb+YpxgNskwTKX1vug9xWfkDYFLAiHcQwMyeo+n+WmoSfY81Bp4zX3eIZbe9eBkF/CsPRgJUQVeG30WyBndHtt9GtxzcQ7vYm/Oe32r5YWeg2XGo2ufQeq3AZAU=
+	t=1757413427; cv=none; b=p5hAHgfo+mGoQ18o7ssS+7yqaZEanPqTfgk3NQxXOs9jvX/Bn99tsmeeXhCBSOh5vZMti2cABs3s+nb80K7c2VQH5Ylj3snTgptg0dZNJeqyeH09GGEKkKQOqZp6aXH+B5avelneAfQr/nWD+cqAmML4AjyDbiyjsFGt43gFxm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757413185; c=relaxed/simple;
-	bh=LH9K9rHh5Lg8l41iu3U0msyFwQbyezH6Y8MW0jdv+Xs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Aha7NauY2lhRdWAK6shmESS+cSep6UaAoSIHsQ0FBb3F++TUBlXnpGxcZ7x6yb3aSSFsKk0MIqzJgy6v0YW6TkikZsNEhA3ykQbj2NOj5ilEkbe2prXZ3xeb6mUhrc6rL7Ku7unev2gMnRNa3ElBdoaip6aupfPfBjy2beqxZIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=dr9Fl88t; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-560880bb751so5441640e87.3
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 03:19:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1757413181; x=1758017981; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ULW63TGOLMnn1ghgDwwFUv5dysPY5E+bfANPuLSHOWc=;
-        b=dr9Fl88tcTeQIJGbqOKcodqv5CaphKlWh0ptmX0+T8mkyhkbod0ntk+OD2Kfl884uU
-         FLo83DsLMtmepIEzudNDbGde0v/FpK1mHNnUb+byyzFAesAcAVVqFwCDXinLzfrsmq1V
-         qVAvlkihUQFSyriRRRGzFB1meqbKprkvcE/rpP05HUuNW0hqxWt1bUNCOBvFMGhVaxGl
-         2S+VbNNGXEuLRoK9vaCDqI0QRYYDANy48fIp5JFS6e/ugrgId+9eDASZ5TWN+HdC4P/A
-         bj97JzzbaMw3yZKIJlHAsvaVcn2hCmNGuB7GNn75E6Cjh3wMbIWDxebrtFiC7RQw6tgS
-         ALeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757413181; x=1758017981;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ULW63TGOLMnn1ghgDwwFUv5dysPY5E+bfANPuLSHOWc=;
-        b=mcpBXft1RSTjphHmMBaPgN7d/L6cdVBUk7iuhXM+itgTiKRw9qwVpbb0TLN3i5+Qvy
-         OfiiVQq/lwoOyz3C7pyghHm6BgJ04vDBKo6RHekSpVD3JC1ef00IkJBlu4YynHvnL5/o
-         3KfWTRfnpnzgE5SQfpoD4OUdyh74fvrlcEg7YjpUDf3id2bFKHRwA3GLkUEIJBBpVovA
-         eQsX93KQzCAW1E1sTa/sinDzuGGPsuOpaC4M2egscZNsqBD2l+1LOfv2Ur2tiOv6AXFy
-         9VvtDn15ejTGE3bwqQc/xASF5qdW4jFnQ2bYJVzSVXgCSl+bOa3tdSNcYT5WlNYmdCxn
-         O6TQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUwdsMXp1zBG1iJNFbnOhp0dMS7oYXIRdOgEEb9W8+zR15gWNbr1n1x/G/BuSDVaWSKJtueWHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXVgADZ4Vps625N63piwCUVZ1ZO+eT+32XKJFaegk66+RDs9UZ
-	OMq8s5E+EJAwKhP7LqfYp5LaNQ3AdGeFlu1PYx9qKHjZRh/5h94xwKgjcNKNSBTHEwQ=
-X-Gm-Gg: ASbGncv1Yom13e1EIL/D7A9HsQHcKV6v/hfg9YIgyCf92H5AID6bHxg0zRPoS2FKe0P
-	HvEGTZLe7dc9IFu6LTFpRy4fVsRVsb8Xnf74Y+6MMs11pXvELQlRcx7UwkQn3pKc3iC+7fU1fhG
-	WsZuxyiqlbo8jIITsLdnyXSHuNek3x7R0G0lQskv/F/OtIcoAWe7VSXz5cIm7SWwzevq2Ejgs+7
-	bs3uegL5pUeEqTEwQKIMyUAyruE5uX/KsA41CChkjt1Nq667reV0zoKKUw59E13rAzyZTz8htx/
-	QpdiHqXnRZuLnwsRca39oUYRhWZLn/i+66cIXuhpldNmcsTG4pmvrHLp+nSY/sJldNEi7belVwI
-	ymu2QfzjiExtCBwV82VjHmJoYqmKIApxa9GUQwis7bXCY14D1qlo+Zy0RTAMFfLPTNb29dEsWRU
-	jSJw==
-X-Google-Smtp-Source: AGHT+IG3EcGP7NPzd87Mekp4gaYSXJ55pGHRJ3IARub8bMA9kj0YQ3jp3UoRnC3Iliyf0hEf0ofDKg==
-X-Received: by 2002:a05:6512:2c94:b0:55f:5d1f:2451 with SMTP id 2adb3069b0e04-562603a2846mr2996076e87.2.1757413181376;
-        Tue, 09 Sep 2025 03:19:41 -0700 (PDT)
-Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5681853c59dsm412425e87.113.2025.09.09.03.19.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Sep 2025 03:19:40 -0700 (PDT)
-Message-ID: <0f3402bc-4b9b-4e8e-83c1-7fe78d278614@blackwall.org>
-Date: Tue, 9 Sep 2025 13:19:38 +0300
+	s=arc-20240116; t=1757413427; c=relaxed/simple;
+	bh=11+X7VTSOjv3vZy6h82lZuVsJGyhHKouWgVJe3jMT68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c1YB+i+vAQRbzH9GI6t9LWCPkc9ATWmLF8zA5ZFR3lNEwukxtWlrDQUJ/D57xf0DLoAsDwAWV6UTgh9WWuNRPyBUoNs/se6ZTsJA0dtCxzdS3pDkM/fhJiyEJpVxlHGiMPjWiZoUCT8WV2ov/dwgdQsYAxDPHJz2hRupA7wVhpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DNWJNJWl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE41C4CEF5;
+	Tue,  9 Sep 2025 10:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1757413427;
+	bh=11+X7VTSOjv3vZy6h82lZuVsJGyhHKouWgVJe3jMT68=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DNWJNJWlfUmJris+JwfAW7HLJHBXzseahbm/LnxtMtp6X2izkj7Y+78iZ/qe2jOuO
+	 mWBX5iQzJfhJR7r4sdH+fKqKxdNz0ZPVB4bQpefa+C5LgZh/MVTtCmVBmNCC3Vx2PF
+	 ot2xfZEXY97fRqTyAUmMv3UAWHRxV5QvfRJ5LNSg=
+Date: Tue, 9 Sep 2025 12:23:43 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: stable@vger.kernel.org, patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+	akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org,
+	patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de,
+	jonathanh@nvidia.com, f.fainelli@gmail.com,
+	sudipm.mukherjee@gmail.com, srw@sladewatkins.net, rwarsow@gmx.de,
+	conor@kernel.org, hargar@microsoft.com, broonie@kernel.org,
+	achill@achill.org, Netdev <netdev@vger.kernel.org>,
+	linux-wireless@vger.kernel.org
+Subject: Re: [PATCH 5.4 00/45] 5.4.299-rc1 review
+Message-ID: <2025090919-tantrum-everyone-f593@gregkh>
+References: <20250907195600.953058118@linuxfoundation.org>
+ <CA+G9fYt3xc6DmR+EYZD1cAiBSf0VxH6jqbdf0PK-8uGPivw8ew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] vxlan: Make vxlan_fdb_find_uc() more robust
- against NPDs
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, petrm@nvidia.com
-References: <20250908075141.125087-1-idosch@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250908075141.125087-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+G9fYt3xc6DmR+EYZD1cAiBSf0VxH6jqbdf0PK-8uGPivw8ew@mail.gmail.com>
 
-On 9/8/25 10:51, Ido Schimmel wrote:
-> first_remote_rcu() can return NULL if the FDB entry points to an FDB
-> nexthop group instead of a remote destination. However, unlike other
-> users of first_remote_rcu(), NPD cannot currently happen in
-> vxlan_fdb_find_uc() as it is only invoked by one driver which vetoes the
-> creation of FDB nexthops.
+On Tue, Sep 09, 2025 at 01:22:42PM +0530, Naresh Kamboju wrote:
+> On Mon, 8 Sept 2025 at 01:40, Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > This is the start of the stable review cycle for the 5.4.299 release.
+> > There are 45 patches in this series, all will be posted as a response
+> > to this one.  If anyone has any issues with these being applied, please
+> > let me know.
+> >
+> > Responses should be made by Tue, 09 Sep 2025 19:55:53 +0000.
+> > Anything received after that time might be too late.
+> >
+> > The whole patch series can be found in one patch at:
+> >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.4.299-rc1.gz
+> > or in the git tree and branch at:
+> >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.4.y
+> > and the diffstat can be found below.
+> >
+> > thanks,
+> >
+> > greg k-h
 > 
-> Make the function more robust by making sure the remote destination is
-> only dereferenced if it is not NULL.
 > 
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->   drivers/net/vxlan/vxlan_core.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
+> Results from Linaro’s test farm.
+> No regressions on arm64, arm, x86_64, and i386.
 > 
-> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-> index dab864bc733c..a5c55e7e4d79 100644
-> --- a/drivers/net/vxlan/vxlan_core.c
-> +++ b/drivers/net/vxlan/vxlan_core.c
-> @@ -446,7 +446,7 @@ int vxlan_fdb_find_uc(struct net_device *dev, const u8 *mac, __be32 vni,
->   {
->   	struct vxlan_dev *vxlan = netdev_priv(dev);
->   	u8 eth_addr[ETH_ALEN + 2] = { 0 };
-> -	struct vxlan_rdst *rdst;
-> +	struct vxlan_rdst *rdst = NULL;
->   	struct vxlan_fdb *f;
->   	int rc = 0;
->   
-> @@ -459,12 +459,13 @@ int vxlan_fdb_find_uc(struct net_device *dev, const u8 *mac, __be32 vni,
->   	rcu_read_lock();
->   
->   	f = vxlan_find_mac_rcu(vxlan, eth_addr, vni);
-> -	if (!f) {
-> +	if (f)
-> +		rdst = first_remote_rcu(f);
-> +	if (!rdst) {
->   		rc = -ENOENT;
->   		goto out;
->   	}
->   
-> -	rdst = first_remote_rcu(f);
->   	vxlan_fdb_switchdev_notifier_info(vxlan, f, rdst, NULL, fdb_info);
->   
->   out:
+> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> 
+> NOTE:
+> Following list of new build warnings noticed on arm build with gcc-12 and clang.
+> 
+> drivers/net/wireless/marvell/libertas/cfg.c: In function 'lbs_associate':
+> include/linux/kernel.h:843:43: warning: comparison of distinct pointer
+> types lacks a cast
+>   843 |                 (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+>       |                                           ^~
+> 
+> drivers/net/wireless/st/cw1200/sta.c:1292:20: warning: comparison of
+> distinct pointer types ('typeof (ssidie[1]) *' (aka 'const unsigned
+> char *') and 'typeof (32) *' (aka 'int *'))
+> [-Wcompare-distinct-pointer-types]
+>  1292 |                         join.ssid_len = min(ssidie[1],
+> IEEE80211_MAX_SSID_LEN);
+>       |
+> ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> drivers/net/wireless/marvell/libertas/cfg.c:1106:18: warning:
+> comparison of distinct pointer types ('typeof (ssid_eid[1]) *' (aka
+> 'const unsigned char *') and 'typeof (32) *' (aka 'int *'))
+> [-Wcompare-distinct-pointer-types]
+>  1106 |                 u32 ssid_len = min(ssid_eid[1], IEEE80211_MAX_SSID_LEN);
+>       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Not much I can do about this one, as the call to min() is correct.  It's
+a type-check issue :(
 
+thanks,
+
+greg k-h
 
