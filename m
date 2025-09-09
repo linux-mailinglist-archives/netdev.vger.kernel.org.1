@@ -1,349 +1,221 @@
-Return-Path: <netdev+bounces-221449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332CDB50867
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:57:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F34DB50888
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 00:00:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 284481BC3159
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 21:58:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D92223AA4EF
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9722627EC;
-	Tue,  9 Sep 2025 21:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115CD264602;
+	Tue,  9 Sep 2025 22:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lQwt2Wmz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U7gXYCJW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14EA253F05
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 21:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.156.1
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757455068; cv=fail; b=av5u338EebRqUnVB7j4gL1wqqu1mVnw9/7zr95FcIZ7eUsnzihG00VRYhA/NLJhv5GuorJbcPiNcEREPUwU5q7lSmEvx7to2BpiTCTd7bAyIldgLFAMZ5d+qGGFN8zy/1FatZAGrAXMBWekgh71R5TBQfro3HM1RvhaXTLLRFsM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757455068; c=relaxed/simple;
-	bh=Kf1hNMA8zI+K4Pt6tIUrST9TcpKWpdqT2s6yvSTqwRw=;
-	h=From:To:CC:Date:Message-ID:References:In-Reply-To:Content-Type:
-	 MIME-Version:Subject; b=D9GvBLHpdmdXXBGUUV3gSRJAl2PwgWJ4cQoUU8a4GD6zLvANU9+FP4VeG65YSTBhYjEBSM+YO6w39BU5HYEwDxhhymCLaxMU+XD0vvHfinNnvscuPMK9AgLE2lh7NzYn4eXURhJlEn8XHnj2g8ZsouOGXXGu1wqX3YMz6wTI+6U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=pass smtp.mailfrom=us.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lQwt2Wmz; arc=fail smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=us.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 589Fgkdt012159;
-	Tue, 9 Sep 2025 21:57:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=JmmY8H
-	mgV51uyJcbQTNOhD30s/hGWbHnzJYfbOiP870=; b=lQwt2WmzMGCKdPNKmwoV0v
-	gjKEhZFDNAPUcLjNBc3w9MCvCBTb7wxWpvrKltNvKsH3NjRr9mRWvIdUw11l0NNA
-	NMwbNXTX3nq3jY8wudZcvzQXQM5i7Fh5B6pCYcUCoSL1gasnvFkK8oPkF0pBF4wG
-	LWqjVMElpPOKFCxhU8N+Fw3vtQY+9xttQEyKtd+dKRsoerSweuF7sXrrCPaMrPVY
-	cCAA8jfz3eKFnBEQSl8ADhLvM3XoBIZVJSiEH3Cy2eZIF/yMzoPXTjtvKnFtfEM+
-	19fO4y7nWDNyrCFKuicYL8fvha756f9OP2aKloFo4vDVxjZfhdjdClHaGGy6dxmQ
-	==
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11on2058.outbound.protection.outlook.com [40.107.223.58])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490xycyc7u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 21:57:27 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=U6u69LNrJnGiFxTISrlE24x9ap3SazXwbfvSWpcTnO41FkfhK3cYDyryXKctIWgvt9St8dzrCtgGLpD4ia9Ih0PkB3eIdt5yda1v/Er4ly3sgIgNLs+n7luXJG2YGww1rsAaWyrOu0oMcp3OmHfdlQfA+eWuXCIO/dMqMlb96ZN0FvPX/R1y1GOMr1cLTVBDBEon/dCZ1ofTaveIEf9EBHPeriA+cHUtotftbm/PrGxpu8j7o2dBfPQ2oZbdqP5hYwyqH+EZEsIJWmq4g/EevsuwfmiXU8G/7Y40EVje0dbC+w3VCJectlr9l8AQLU48z8+lHWH2BBwM90hU+g+mYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JmmY8HmgV51uyJcbQTNOhD30s/hGWbHnzJYfbOiP870=;
- b=d+JYCMeFv2AqFaeyvcTd+2MYnOnDWXT005Q6KiTwEdYjHuTEa1EESgC6zZcX0N4T6KW4urKZ4vYzou/6UoU5okqSK/Arv0X5N+r9Li/h0e13ZgD2kEae5U19vyPDxtWx2yYoSSbUkrLWxHT0PISQd1Y34yj2JxhzEeMJfhCBHnwTAmpCL0tjDSL3Wb+c6yX1Z1kHDq0xrNAFLsiXJNAWfTvIhsrLhJPjoRyDHzLjHRdn3NLVS/ec/Q8w/argcoi49NYP9EWS4iNfyM8J8lGbbvhJH/8GVG/LBx2qSOFi6J/sdgZfgrnH5dBcBj7B0S4BBzVB3zA2IA6Mo6NU6JN8aw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=us.ibm.com; dmarc=pass action=none header.from=us.ibm.com;
- dkim=pass header.d=us.ibm.com; arc=none
-Received: from MW3PR15MB3913.namprd15.prod.outlook.com (2603:10b6:303:42::22)
- by BL1PPF69EB7281D.namprd15.prod.outlook.com (2603:10b6:20f:fc04::e27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Tue, 9 Sep
- 2025 21:57:24 +0000
-Received: from MW3PR15MB3913.namprd15.prod.outlook.com
- ([fe80::a1f8:4258:a99:3490]) by MW3PR15MB3913.namprd15.prod.outlook.com
- ([fe80::a1f8:4258:a99:3490%7]) with mapi id 15.20.9094.021; Tue, 9 Sep 2025
- 21:57:24 +0000
-From: David Wilder <wilder@us.ibm.com>
-To: Jay Vosburgh <jv@jvosburgh.net>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Nikolay Aleksandrov <razor@blackwall.org>,
-        "pradeeps@linux.vnet.ibm.com"
-	<pradeeps@linux.vnet.ibm.com>,
-        Pradeep Satyanarayana <pradeep@us.ibm.com>,
-        "i.maximets@ovn.org" <i.maximets@ovn.org>,
-        Adrian Moreno Zapata
-	<amorenoz@redhat.com>,
-        Hangbin Liu <haliu@redhat.com>,
-        "stephen@networkplumber.org" <stephen@networkplumber.org>,
-        "horms@kernel.org"
-	<horms@kernel.org>
-Thread-Topic: [EXTERNAL] Re: [PATCH net-next v10 5/7] bonding: Update to
- bond_arp_send_all() to use supplied vlan tags
-Thread-Index: AQHcHeoTd/w3FJfDVUK7Sfp8Rl7C8bSLOtGAgAAhGQCAAAQlAIAAAbns
-Date: Tue, 9 Sep 2025 21:57:24 +0000
-Message-ID:
- <MW3PR15MB3913ABFC23FA77CD46B61A4AFA0FA@MW3PR15MB3913.namprd15.prod.outlook.com>
-References: <20250904221956.779098-1-wilder@us.ibm.com>
- <20250904221956.779098-6-wilder@us.ibm.com>
- <2c0f972a-2393-4554-a76b-3ac425fed42b@blackwall.org>
- <2921170.1757451242@famine> <2921828.1757452132@famine>
-In-Reply-To: <2921828.1757452132@famine>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW3PR15MB3913:EE_|BL1PPF69EB7281D:EE_
-x-ms-office365-filtering-correlation-id: 4cfd8d7d-ff7d-4650-3796-08ddefebdc2a
-x-ld-processed: fcf67057-50c9-4ad4-98f3-ffca64add9e9,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|10070799003|38070700021;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?ChVueoDkKBx2k4L7m0vN8IpbMUEBxMXHYYOz2tjRInEapyn2i7VATEFjX/?=
- =?iso-8859-1?Q?3B2CavbULVg+U9UWRVJQcgoB2TlJZq1N4EDwgZhNsXKom8A86RIMfYlyrl?=
- =?iso-8859-1?Q?Dr8X1qvupNE4KSDDdgirL2Er5048n74nVSQcJGF1IjrTApPefkVC+S0hCw?=
- =?iso-8859-1?Q?VKXN7PFDPAfbKEoxwVGPQ90oMza+JtuM4s31oLVGRqILOYKG4AO8GunlwK?=
- =?iso-8859-1?Q?4hHQcXw6tZIeWS4QUvfMO0UMdEBAd72hXHKTDgHiP4gKASdddzjpU2N9qz?=
- =?iso-8859-1?Q?V6Rgl6gD/4xDxvWCmIxM1Sz+YIPR3shuZclTLDuh/hHnhHYhF2JRAIT3Fz?=
- =?iso-8859-1?Q?Qe6CtdO16d8RzcpA4fnknrbV0vOkeFK4NXs5kj15dbV2SU/nd7wy8E/XEV?=
- =?iso-8859-1?Q?MvrmheJmFJSyrWPd+D81b4eCTCWq6TDct+/cJ97rEZTc85KzrF7xWe+xFG?=
- =?iso-8859-1?Q?Y5Rea3RSncGlnWwTCxO/tmBzMAJlQM8Hbigo06unHG2sFitMTXjw1V/BLY?=
- =?iso-8859-1?Q?M3oqUjEIlFpqL6B1O0svfgMwhT0di4ah+YAHPoSbO9p1BU9/1QI2ayl9mm?=
- =?iso-8859-1?Q?uNiCW3Lx12ZhvxSqE8IIByCCDCBme4TaKcrezWjM1Qn0mfw5StntIRrcvf?=
- =?iso-8859-1?Q?8UOWT2nKDL1zx8hFxJ7MnEZGG7c/LI6QpZiM6fDY/Usxy81RvKkob3SKFJ?=
- =?iso-8859-1?Q?AbDMttRT7qGflpUvRN6oMybPKWDLUwAuPoF29i2PLzsOJG0tjU4I8zLTsi?=
- =?iso-8859-1?Q?ZFXx6T2ojE9L5nxfWs3jcAu11g3FEqkxNaJ6xPf5WDNUwvn35r7nwEgVd/?=
- =?iso-8859-1?Q?QJVzgySf5PqycCuury15pnlbOcs7zQbSB+NVVpRy1Ya33mAc6A/LNAxhXI?=
- =?iso-8859-1?Q?YGfngt38Yoq5t20ZDuuItDhlba23uxm48BOQ5iDHU9h4PvxdkJJmm9YqOc?=
- =?iso-8859-1?Q?ZXOFXNkiB36XydRwDfEcGgk1aSJItVNudvpdz1Ra5ZANnf7aG4oATUNRmp?=
- =?iso-8859-1?Q?4SaofGzTKGQvAuRHUIqOdFvB/hHczQIv+fQWDAsXjEsuf4npylBlgX31qo?=
- =?iso-8859-1?Q?LVjhfaNUCZz7Lf06bEuMFP0UGoPyI2hoWxqa2f0mCQ8IbFubD7cml3mJO0?=
- =?iso-8859-1?Q?Scq13UrBv3b6od6UzJUhwyJMbNl71S7AEf1oRPAjUi15P50dlCKlHZrKDi?=
- =?iso-8859-1?Q?J/SMAgk63nBBKzz7jInRlLmxIdIJ+6odtbppFj4NZX9LkayDVQe3pn8aHM?=
- =?iso-8859-1?Q?i2Qu/H7fGDNxzF8lIEbfRmakubhK/+cFPEDC6szMIGasxXWCScMNTIQenA?=
- =?iso-8859-1?Q?OnZFrzvAtscmDysWPkP7o9xBxiiGOZDM2dNDkgcRwfvA+R/1CGhu+oz0PI?=
- =?iso-8859-1?Q?kMcaK+D0FvuunX6cuw/vH9+WVAep4zI339jvSDzJYbljEGk9gh1LEpqyjq?=
- =?iso-8859-1?Q?0tB9PS19A03ZYdj+exPTIorpUC+TSOOfWBEjBjlcXv9fgxw1tTtQCcbMmL?=
- =?iso-8859-1?Q?Rwx1ijxyqWFehpKfMCcAyam8CLVSyOWzGHzaJjgPBpqw=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR15MB3913.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(10070799003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?NjoqSKrD7hLKzW7Dcln0k4+GwlqQL3Pwzr0TVgpl1sFt+S8Mb4teslWTky?=
- =?iso-8859-1?Q?l7gQBNPElYLKl2sYBtq341MpNde7HuPY9xqcZm+Sl12Bhw8n/izAnRfRTE?=
- =?iso-8859-1?Q?RQKL1BhNgyrkoG6Q/vwoX7Zlg8v9Putdyd2f/KCtPOpvlwpFcRfNYiQ+Td?=
- =?iso-8859-1?Q?BT4mtVjlIaNdMKFbFD2OurogOglvtzyEpv+jSzU+efNB+fTsk6G/TI4kl7?=
- =?iso-8859-1?Q?FUsA+UQ4REKq+a+1akqERWDHkF5lI6BSqKlyGjeury2WEIJBuvyOc1UUz8?=
- =?iso-8859-1?Q?dfD/An6c2epeOSJDgJMuoebh8uL6XzJ3uFO7e4Ol1n2nASSDBX4w0pR6z3?=
- =?iso-8859-1?Q?4eOn0wuu5c5XsBqQN5U/XTNl44Yq+PF2wl7/kXkw92sq6RCZl6t46b9X7R?=
- =?iso-8859-1?Q?CxqASVhphj9Vc61HpEPhnj87LuNmDAXgsrql+r/UpDclePXg1kjtOPly/Q?=
- =?iso-8859-1?Q?MwdY0ZFArBmMKDFR7XnZo8yX+1hjPAa/7nxf0/VVCPlafE00urZbnU854h?=
- =?iso-8859-1?Q?Haja0IKYJrYTArfdquSkpYhCova/o2RDnaxukmCDfmw/oVUOnFZcCn4Q4t?=
- =?iso-8859-1?Q?c83u4LGmgzgtHFBnsO7Fun/5b/pPVL7tkQYyFT+mwYuRt3TOuMCmA+5+L2?=
- =?iso-8859-1?Q?rIF0Sgd7sN8MT9pNdf2mVOB3fCD/f+zovZjv0/hrGNdhK9qEL0xlojGM/I?=
- =?iso-8859-1?Q?EpuMmhZiS8Sm+PuDgbB/AwyebWn1bCgaKfCV/qiVwZXwF84wtNcdu1vATA?=
- =?iso-8859-1?Q?+jp1f1SGY++E69nhRdKK2+dNbIFSCQliy2+j8P7MHcWlk4hTGvsfOhcfET?=
- =?iso-8859-1?Q?lFKXKE5QOlveQUnydeuKYpGfs2qH2ardpLPrOUplMTEIVlrQs2pHzvPIWv?=
- =?iso-8859-1?Q?d4WT31eF4nPUGYgA4iHlqVRymAZqRZ59gqZtllaE8HVQlcBuY+kaLFpROs?=
- =?iso-8859-1?Q?grJZ5xkIdg2wS2QxF/MM4EPVBCqx81yvfYX9iAytvOzpH0m4ojii7Vk9FD?=
- =?iso-8859-1?Q?rEl6wZwxfH6u+WHF6SE4YMxvCeigHrgReYILo0h0U2HNQ78vq4LwmSKyEh?=
- =?iso-8859-1?Q?eL0nt/k8Scxpi3kDYaSfT2xTZi4au2xmiuPpwWycM3hhbW0M7mmDHxz/OH?=
- =?iso-8859-1?Q?o9OJOgxLKzbag1t000EZur6Bj2FgtSintxyyFsn7bJmKwHTh0aHUsdhVpl?=
- =?iso-8859-1?Q?iLa2cMcvagBcmrrdo2q++vkVe5u0zm5P5iS+uG4J5Tec9N+OqAc7BJjzK4?=
- =?iso-8859-1?Q?gpxFw7wfp5Vp2wuktn4EyHxvN70JQ3TFVj6nr1N7x5MV0Id46KjCERWaGp?=
- =?iso-8859-1?Q?a5bxtq5Ea1Z7tL9V79kYeVjB//mUWdfNZSrEEOBky9egfml6lx0eyoRpDp?=
- =?iso-8859-1?Q?BXsi6OyPxZ6J8745A8t5L1986tCiXoDod7/LFB7BUXuarLHw6QM8SjCouh?=
- =?iso-8859-1?Q?qbStmntDoIWmaoF9EKNan0ndNuEQVqgdkISU16a8cuLD1tr61z013ST2UT?=
- =?iso-8859-1?Q?ta60u6hRZ6P/fvkZhnj1elwr0+YnQXLr7enrJuUFauryGtGkcmBy1hatKT?=
- =?iso-8859-1?Q?298jN6iOtoCRY+8Qdz7/po6duN75J6wywP6+HpXMgeTypLofi0qy5+RDRZ?=
- =?iso-8859-1?Q?84ODSwnFnqNve37CHt+OSkKdVW1HBq+nBVmVA/Vbmly9sH3LPQvHZ2zRGK?=
- =?iso-8859-1?Q?Yc1cxfTyN+j87+6wp44=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF198244665;
+	Tue,  9 Sep 2025 22:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757455210; cv=none; b=Seq0pPr4LUY4nYp/TbD4uFdeF8JGZFCGp4bq1so//ki9CfCuo0qwUekZ2Dm++X6ZuwXdHRp2zSJPpZZvINT8/+cxsbBTuxGGtAzMr3yvdz2IX+zmPTPw8PHXKvDPW5ADAbeHTgCCXdS6C8z5CqhyKY3g9dkJ0oqVFOc9RrKcI2I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757455210; c=relaxed/simple;
+	bh=3MEHUK/+TcOWsAEbKAhaeb7droOEVMg1d8lQHuKDljY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=H68aFdZzSkdmQ0MvffGz2Vm8ndyuO/dJ3OC190juTSFwfrHrtdbOTY3XerYh8w1rcFuiVh/KRIC4E4BkYxRswerftNc002D2OKWAKrUCAzPWLL3xI8VBLYmiMVPMgT+i1UG5f8ycDZf5HfpEzxyS+wITdQO90bA+QTzSlhqZjqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U7gXYCJW; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757455209; x=1788991209;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=3MEHUK/+TcOWsAEbKAhaeb7droOEVMg1d8lQHuKDljY=;
+  b=U7gXYCJW/B3nowEnMyP7tbUuhUJemqtYNjY2ZJ1r50N4FFALWcvc/Vwm
+   /bm90zYUX4N3sk7R5Xl3LFGkMgZ7rvn6RI8Ugxv7m87fzTDyQkrvjpPxw
+   NuymSP/4UuLNPIYPE4iXCvq6RgkaWiZHHLNDsFPJu/Cp6EAWOTBYxrjI4
+   g4ehNoZzo3zlgV57ubRhkdxa1EiUnHSmZk0uLh+NuG9g+NnMRTRx1FzxJ
+   pL4m3G/VqvqcKDG8CVC+g469nrGV/0Gre8E0rt5gztUp+urupj8edz/Ut
+   BEfZAJxzR+y33k9/HaSWhSVlbaIgcKMWLEAcrVDq1XjQ6G6npQWwGAUbC
+   w==;
+X-CSE-ConnectionGUID: ZymuJ1TrQ+a85k4q1+fwfA==
+X-CSE-MsgGUID: gGxzLhBCRNa2AzHt8t1bpA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="63584609"
+X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
+   d="scan'208";a="63584609"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 15:00:07 -0700
+X-CSE-ConnectionGUID: vQSzBUM+RkCBUdEKy7pqxQ==
+X-CSE-MsgGUID: idV5QM8zSBa4OiHDcFgJCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
+   d="scan'208";a="172780949"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 15:00:07 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH RFC net-next 0/7] ice: implement live migration driver for
+ E800 series hardware
+Date: Tue, 09 Sep 2025 14:57:49 -0700
+Message-Id: <20250909-e810-live-migration-jk-migration-tlv-v1-0-4d1dc641e31f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: us.ibm.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR15MB3913.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4cfd8d7d-ff7d-4650-3796-08ddefebdc2a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2025 21:57:24.6256
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: fcf67057-50c9-4ad4-98f3-ffca64add9e9
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uttCm5kwZ9DOIxja0aqXpXq/57muFb/KUyzJOD8m99vMqlJABKGzbRfWtTHbpPY2k2foRLzaL8yelMCDAJNFhA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PPF69EB7281D
-X-Proofpoint-ORIG-GUID: 296vNl-ZBx0dSlpYyx9kP322U_x_s96v
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDIzNSBTYWx0ZWRfX7L248NboNT2E
- VAqxAvyId9ZGQ83v4djKF03JdQ9bppOc7EfnmhGIvVRFxKcw5+ePaMMBP+g6Z3R8AwGoG2EOcOv
- RG1PMXK11O6B1IeUadmcLpXfPLmaI7Onh4vpU5CdUkwuwTYmoGrbsB1OBwLqxrFabElScgKVe4L
- W03q7fVY2c34iIyz+gwbvngzUl3vBF+weMd6hP7I5S6CP6bX/xeW73ujaJXj786MUXlfn/tyKnR
- K+iP5x7Z4uS6dJuPYQ/dkUPul57nDMdA8aFYAZcvANuDvNYLv0a53JeLGIAPjxwM7jJTDFaz8TD
- PKVoVqmfoyFeJZtDcbxSUUOqgTdz3e1cd/uzmr2Qx66zuDqsuwUbR5aCSrAHjpjT2vytocIlRtG
- h/YXWQ7c
-X-Proofpoint-GUID: 296vNl-ZBx0dSlpYyx9kP322U_x_s96v
-X-Authority-Analysis: v=2.4 cv=F59XdrhN c=1 sm=1 tr=0 ts=68c0a2c7 cx=c_pps
- a=YI3xlNmR6zTlXLRhjlhBkQ==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=br0wEIb2B_8_S_Ky:21 a=xqWC_Br6kY4A:10
- a=8nJEP1OIZ-IA:10 a=yJojWOMRYYMA:10 a=2OjVGFKQAAAA:8 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=P8mRVJMrAAAA:8 a=jZVsG21pAAAA:8 a=vr0dFHqqAAAA:8
- a=-mu6OIGoLKCnK-Nqn0sA:9 a=wPNLvfGTeEIA:10 a=IYbNqeBGBecwsX3Swn6O:22
- a=Vc1QvrjMcIoGonisw6Ob:22 a=3Sh2lD0sZASs_lUdrUhf:22 a=P4ufCv4SAa-DfooDzxyN:22
-Subject: RE: [PATCH net-next v10 5/7] bonding: Update to bond_arp_send_all()
- to use supplied vlan tags
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-09_03,2025-09-08_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 suspectscore=0 phishscore=0 clxscore=1015
- impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509060235
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAN6iwGgC/43PwU7DMAwG4FeZcibITuLRckJC4gG4Ig4ldbZA1
+ 6I2ioamvjteLq16qnL6I+v77ZuaeIw8qefDTY2c4xSHXgI+HJQ/N/2JdWwlKwOGAC1orhB0FzP
+ rSzyNTZJ5/f2zCqnL2lrP5LFFsE4J9TtyiNdS86He317vfz0n3fM1qU8J5zilYfwra2QsY6XRg
+ d3XmFGDdkTUYO2Qq+ol9om7Rz9cSkE2KxTdTtQIWtU1Ah19Y9uwRe2CytuJWkFly1C5RkzELeo
+ W9Ah7N3WChpoCQgjeAG9RWtAazE6U7ucTtJYsfBl6WqPzPP8DioNkqj0CAAA=
+X-Change-ID: 20250130-e810-live-migration-jk-migration-tlv-33ce5c1d1034
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+ Alex Williamson <alex.williamson@redhat.com>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, 
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
+ Kevin Tian <kevin.tian@intel.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-hardening@vger.kernel.org, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+X-Mailer: b4 0.15-dev-c61db
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5432;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=3MEHUK/+TcOWsAEbKAhaeb7droOEVMg1d8lQHuKDljY=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhowDi1NceL0Y0+7P1pF9/TywhfPx6qIH6668nuMjtWVW3
+ tm/T2qrOkpZGMS4GGTFFFkUHEJWXjeeEKb1xlkOZg4rE8gQBi5OAZgIix3DP7WG+wFT18vm95wJ
+ FvroycMmaOA4d/mc57s7zJ0yl90PjmH4H6OxebvWPqEac5vFDPOqftw+7Fp5oFj619oT6o08RRW
+ P2QE=
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-=0A=
-=0A=
-=0A=
-________________________________________=0A=
-From: Jay Vosburgh <jv@jvosburgh.net>=0A=
-Sent: Tuesday, September 9, 2025 2:08 PM=0A=
-To: netdev@vger.kernel.org=0A=
-Cc: Nikolay Aleksandrov; David Wilder; pradeeps@linux.vnet.ibm.com; Pradeep=
- Satyanarayana; i.maximets@ovn.org; Adrian Moreno Zapata; Hangbin Liu; step=
-hen@networkplumber.org; horms@kernel.org=0A=
-Subject: [EXTERNAL] Re: [PATCH net-next v10 5/7] bonding: Update to bond_ar=
-p_send_all() to use supplied vlan tags=0A=
-=0A=
->Jay Vosburgh <jv@jvosburgh.net> wrote:=0A=
->=0A=
->>Nikolay Aleksandrov <razor@blackwall.org> wrote:=0A=
->>=0A=
->>>On 9/5/25 01:18, David Wilder wrote:=0A=
->>>> bond_arp_send_all() will pass the vlan tags supplied by=0A=
->>>> the user to bond_arp_send(). If vlan tags have not been=0A=
->>>> supplied the vlans in the path to the target will be=0A=
->>>> discovered by bond_verify_device_path(). The discovered=0A=
->>>> vlan tags are then saved to be used on future calls to=0A=
->>>> bond_arp_send().=0A=
->>>> bond_uninit() is also updated to free vlan tags when a=0A=
->>>> bond is destroyed.=0A=
->>>> Signed-off-by: David Wilder <wilder@us.ibm.com>=0A=
->>>> ---=0A=
->>>>   drivers/net/bonding/bond_main.c | 22 +++++++++++++---------=0A=
->>>>   1 file changed, 13 insertions(+), 9 deletions(-)=0A=
->>>> diff --git a/drivers/net/bonding/bond_main.c=0A=
->>>> b/drivers/net/bonding/bond_main.c=0A=
->>>> index 7548119ca0f3..7288f8a5f1a5 100644=0A=
->>>> --- a/drivers/net/bonding/bond_main.c=0A=
->>>> +++ b/drivers/net/bonding/bond_main.c=0A=
->>>> @@ -3063,18 +3063,19 @@ struct bond_vlan_tag *bond_verify_device_path(=
-struct net_device *start_dev,=0A=
->>>>     static void bond_arp_send_all(struct bonding *bond, struct slave=
-=0A=
->>>> *slave)=0A=
->>>>   {=0A=
->>>> -   struct rtable *rt;=0A=
->>>> -   struct bond_vlan_tag *tags;=0A=
->>>>     struct bond_arp_target *targets =3D bond->params.arp_targets;=0A=
->>>> +   char pbuf[BOND_OPTION_STRING_MAX_SIZE];=0A=
->>>> +   struct bond_vlan_tag *tags;=0A=
->>>>     __be32 target_ip, addr;=0A=
->>>> +   struct rtable *rt;=0A=
->>>>     int i;=0A=
->>>>             for (i =3D 0; i < BOND_MAX_ARP_TARGETS && targets[i].targe=
-t_ip; i++)=0A=
->>>> {=0A=
->>>>             target_ip =3D targets[i].target_ip;=0A=
->>>>             tags =3D targets[i].tags;=0A=
->>>>   -         slave_dbg(bond->dev, slave->dev, "%s: target %pI4\n",=0A=
->>>> -                     __func__, &target_ip);=0A=
->>>> +           slave_dbg(bond->dev, slave->dev, "%s: target %s\n", __func=
-__,=0A=
->>>> +                     bond_arp_target_to_string(&targets[i], pbuf, siz=
-eof(pbuf)));=0A=
->>>>                     /* Find out through which dev should the packet go=
- */=0A=
->>>>             rt =3D ip_route_output(dev_net(bond->dev), target_ip, 0, 0=
-, 0,=0A=
->>>> @@ -3096,9 +3097,13 @@ static void bond_arp_send_all(struct bonding *b=
-ond, struct slave *slave)=0A=
->>>>             if (rt->dst.dev =3D=3D bond->dev)=0A=
->>>>                     goto found;=0A=
->>>>   -         rcu_read_lock();=0A=
->>>> -           tags =3D bond_verify_device_path(bond->dev, rt->dst.dev, 0=
-);=0A=
->>>> -           rcu_read_unlock();=0A=
->>>> +           if (!tags) {=0A=
->>>> +                   rcu_read_lock();=0A=
->>>> +                   tags =3D bond_verify_device_path(bond->dev, rt->ds=
-t.dev, 0);=0A=
->>>> +                   /* cache the tags */=0A=
->>>> +                   targets[i].tags =3D tags;=0A=
->>>> +                   rcu_read_unlock();=0A=
->>>=0A=
->>>Surely you must be joking. You cannot overwrite the tags pointer without=
- any synchronization.=0A=
->>=0A=
->>       Agreed, I think this will race with at least bond_fill_info,=0A=
->>_bond_options_arp_ip_target_set, and bond_option_arp_ip_target_rem.=0A=
->>=0A=
->>       Also, pretending for the moment that the above isn't an issue,=0A=
->>does this cache handle changes in real time?  I.e., if the VLAN above=0A=
->>the bond is replumbed without dismantling the bond, will the above=0A=
->>notice and do the right thing?=0A=
->>=0A=
->>       The current code checks the device path on every call, and I=0A=
->>don't see how it's feasible to skip that.=0A=
->=0A=
->        Ok, thinking this through a little more... the point of the=0A=
->patch set is to permit the user to supply the tags via option setting=0A=
->for cases that bond_verify_device_path can't figure things out.  So the=0A=
->tags stashed as part of the bond (i.e., provided as option settings from=
-=0A=
->user space) should only be changable from user space.=0A=
->=0A=
->        So, I think the way it'll have to work is, if user space=0A=
->provided tags then use them, otherwise call bond_verify_device_path and=0A=
->use whatever it says, but throw that away after each pass.=0A=
-=0A=
-Agreed. Sounds like caching the dynamic tags was a bad idea.  I did not ima=
-gine the=0A=
-vlan to a path could change, if that is a concern then simply removing=0A=
-the caching of the tags (and freeing any non-user supplied tags later) rest=
-ores=0A=
-the original behavior.=0A=
-=0A=
--                  /* cache the tags */=0A=
--                   targets[i].tags =3D tags;=0A=
-=0A=
-=0A=
->=0A=
->        If user space provided tags and then replumbs things, then it'll=
-=0A=
->be on user space to update the tags, as the option is essentially=0A=
->overriding the automatic lookup provided by bond_verify_device_path.=0A=
->=0A=
->        If the tags stashed in the bond configuration can only be=0A=
->changed via user space option settings, I think that can be done safely=0A=
->in an RCU manner (as netlink always operates with RTNL held, if memory=0A=
->serves).=0A=
-=0A=
-Agreed, I was depending the existing RTNL lock to protect configurations=0A=
-changes from the user space.=0A=
->=0A=
->        -J=0A=
-=0A=
--David Wilder=
+This series implements the QEMU/KVM live migration support for the ice E800
+series hardware. It is a long-overdue followup to the version from Yahui
+back in 2023. That version itself is an evolution of the original v1
+protocol from some years before that.
+
+This version is a significant rework and complete replaces the
+virtchnl message based approach with one based on the PF serializing state
+via a custom Type-Length-Value format.
+
+This solution significantly reduces the impact a VF can have on the payload
+size, as the size is no longer based directly on messages sent by the VF.
+It also ensures that other data such as host-based RSS and MSI-X is sent,
+which previously was ignored since there were no equivalent virtchnl
+messages.
+
+Finally, replay can now be ordered to safely restore Tx and Rx queues
+without needing hacks to the virtchnl initialization flows, and the driver
+now only holds migration data for a short limited time while suspending,
+rather than requiring we save every virtchnl message the VF sends for the
+life time of the VF.
+
+To test this, I used QEMU/KVM:
+
+  echo 2 >/sys/class/net/enp175s0f0np0/device/sriov_numvfs
+
+  echo "0000:af:01.0" >/sys/bus/pci/drivers/iavf/unbind
+  echo "0000:af:01.1" >/sys/bus/pci/drivers/iavf/unbind
+
+  modprobe ice_vfio_pci
+
+  echo "8086 1889" >/sys/bus/pci/drivers/ice-vfio-pci/new_id
+
+I've tested with QEMU using the "enable-migration=on" and
+"x-pre-copy-dirty-page-tracking=off" settings, as we do not currently
+support dirty page tracking.
+
+The initial host QEMU instance is launched as usual, while the target QEMU
+instance is launched with the -incoming tcp:localhost:4444 option.
+
+To initiate migration you can issue the migration command from the QEMU
+console:
+
+  migrate tcp:localhost:4444
+
+I've tested with and without traffic, and I tried to cover a wide variety
+of VF settings and configuration.
+
+REVIEWER NOTES AND REQUESTS:
+
+  I am sending this as RFC to the netdev and VFIO mailing lists, as I am
+  uncertain what the preferred path for merging is. I am also awaiting
+  testing from Intel's virtualization team.
+
+  I've managed to reduce the overall patch series size as much as possible
+  by sending many of the cleanups ahead of time. These have finally all
+  merged into net-next.
+
+  This work is based on the original live migration patches from Yahui.
+  However, the ice driver implementation is entirely rewritten. The VFIO
+  driver code is still primarily Yahui's, with some minor alterations and
+  cleanups applied.
+
+  I decided to separate the deferred reset logic in the VFIO driver to its
+  own patch, and am open to alternative suggestions for resolving this
+  potential deadlock. I saw a similar deferred logic in other drivers. I
+  have thus far not come up with a better solution.
+
+  The biggest remaining gap on the ice driver side is that I don't have a
+  good idea how to best plan for future VF enhancements. Currently, all the
+  existing configuration and features now work. However, a future feature
+  might require new migration data, and I don't have a good idea how to
+  make the driver safely disable such features until they're supported
+  within the migration.
+
+  The TLV format does allow for extension, (both with a full version field
+  and with passing the set of known TLVs). However, the driver likely could
+  use some sort of infrastructure so that new VF virtchnl commands or
+  features get blocked by default until they are confirmed to work with
+  migration. Suggestions on how best to implement that are welcome.
+
+Link: https://lore.kernel.org/netdev/20231121025111.257597-1-yahui.cao@intel.com/
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Jacob Keller (7):
+      ice: add basic skeleton and TLV framework for live migration support
+      ice: implement device suspension for live migration
+      ice: add migration TLV for basic VF information
+      ice: add migration TLVs for queue and interrupt state
+      ice: add remaining migration TLVs
+      ice-vfio-pci: add ice VFIO PCI live migration driver
+      ice-vfio-pci: implement PCI .reset_done handling
+
+ drivers/net/ethernet/intel/ice/ice.h               |    2 +
+ drivers/net/ethernet/intel/ice/ice_hw_autogen.h    |    8 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h        |    2 +
+ .../net/ethernet/intel/ice/virt/migration_tlv.h    |  495 +++++
+ include/linux/net/intel/ice_migration.h            |   49 +
+ drivers/net/ethernet/intel/ice/ice_main.c          |   16 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c        |    3 +
+ drivers/net/ethernet/intel/ice/virt/migration.c    | 2147 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/virt/queues.c       |   21 +
+ drivers/vfio/pci/ice/main.c                        |  764 +++++++
+ MAINTAINERS                                        |    7 +
+ drivers/net/ethernet/intel/ice/Makefile            |    1 +
+ drivers/vfio/pci/Kconfig                           |    2 +
+ drivers/vfio/pci/Makefile                          |    2 +
+ drivers/vfio/pci/ice/Kconfig                       |    8 +
+ drivers/vfio/pci/ice/Makefile                      |    4 +
+ 16 files changed, 3531 insertions(+)
+---
+base-commit: 3b4296f5893d3a4e19edfc3800cb79381095e55f
+change-id: 20250130-e810-live-migration-jk-migration-tlv-33ce5c1d1034
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
+
 
