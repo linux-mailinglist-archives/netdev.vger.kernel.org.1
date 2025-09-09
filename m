@@ -1,174 +1,181 @@
-Return-Path: <netdev+bounces-221080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C592CB4A2B5
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 08:57:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6C9B4A328
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23B777B366B
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 06:55:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 245D31BC70D9
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29FA530504D;
-	Tue,  9 Sep 2025 06:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0501B305954;
+	Tue,  9 Sep 2025 07:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/sGI9JU"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sGnEDM2O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1309433AC;
-	Tue,  9 Sep 2025 06:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E41235044;
+	Tue,  9 Sep 2025 07:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757401010; cv=none; b=OXF/lMcnynISePwOCGCHWnO1dFyGGiIHB4e5r/byfwslW1OHogF7dFqpb6kaX271dmx2ZsBfLjCTC8pw5h7+zsHie1TwYWbBRSxZOnPVs++ZxOpGhtJwmegoHcH44YyRaT/NgHkx+YgwcWSAt3nvxy7ZTD37ZzmabenlRs1FDRU=
+	t=1757401933; cv=none; b=r7DNIF+dGTG95zkFu1gLxXW55XEGqlY2V7Nvfsfust9r4h4Cj/lYztNbtDaLo0OWRfKspdQnKQj+IrDBl10SZ8yhUdLdsotZKZAxQa+/IEqWtqMb6hrjGtV8+FwjrLqP73e5j4Nm0TuYxyTwsg3weB9/v8U6iNuOyts6sVhIeF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757401010; c=relaxed/simple;
-	bh=hnJH5C3OpaIIK3hyzpIrwMipqvYJj91l3eSueWTRe3s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SCe5Q4JHInX9oOuRQhyBjS6isFbreNSAwUDG5dTgAnsf+nRIK93RyLHa2vJLMQNgWchT+UbkXbIHpAuFLxS/hQXSzVaEIx6uWx7MFd+aPqB/vqFSsaTkw8PbYv4Kc3ryO3V5b5ROnuTZ9BUUdgPSkPHooR/DNbnMOOKAwJxFA9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/sGI9JU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C98C9C4CEF4;
-	Tue,  9 Sep 2025 06:56:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757401009;
-	bh=hnJH5C3OpaIIK3hyzpIrwMipqvYJj91l3eSueWTRe3s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=j/sGI9JUba8PwIvD4rCNzEu+QAKX8Iv4Xl4p68eunJTs6le9RRqKzV0NLQWEyb3JB
-	 6HS+b30VURdI5feCaMKv9FGS7Uxx7k+njIcFs3UzNzBEDBBK5ukn1DcMTGKkOUGSE0
-	 sPpsDQmpRYgm2XdtcxOdSbB3A4AJWKfGMEIUCV6sGdGp5ZUTiabe8XxZOvjbhqqIgh
-	 soz8b4qJiIfEMSyR0Jw00FF+k3rMdHHMiXB/gU72EqMEgRwD0GNXYfToeB6ztgPtiM
-	 QnwjTtlIFgVA2W9FjZ+VekMVaO9J2Dcd+9KSPcyzcuXL5SMkmvYvriTE0Pg0IDU2lB
-	 dCCZMu3Jq8pUw==
-Message-ID: <f199fc0b-20c0-4c22-b0ed-c508514b60c6@kernel.org>
-Date: Tue, 9 Sep 2025 08:56:36 +0200
+	s=arc-20240116; t=1757401933; c=relaxed/simple;
+	bh=KVlFynD/KZmkbHRpxXJbCvEPT7and5zJ2SZIwAzXdvo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xcri4HhnBvtJL1mxYnIublMt+7bHmbbMK0spTOchGccQSHn4Ry1xnY61yz9JB7KkguMM1cnVp5JQtBVKGsWtZ+Uj28HOTQ+pg2kPM5BmiGeCEhqcVIh886X9yfSDja9nHjoCJIQvnzj2Pb2uhQdd1DLK0HcPEC1Um4ytJ9TGJhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sGnEDM2O; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 588IKo7a030930;
+	Tue, 9 Sep 2025 07:12:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=vWUCdWdACL6jj/zlMERgKPOhY36Zq28tXZGn/gKQK
+	SU=; b=sGnEDM2OPA9a0v0Y3XrMFTL3fEyhyjslSkyhJ780yR3GfFOtviSd6RYH1
+	eE2ZQe0ApImNCLQnGDwcZ3CZltePzniMAflEkHuyB+lcRyZdoYxhrpwPwKx7LCUv
+	Rrp/vvANPukmIh4+g5AbpG03ZW1rVSA3LDx4EFhOD6Tp73ffhlOO7QQKf+aFboDh
+	jODkPI6KO4UBK5lIqutaLmQa8CC1GN/Lzein1z+ZXPjN1CQMKYLx3YbGLh82Is43
+	RjwQugtByllRRdZZ74WGKQLK67J+4BUUyJdFJRoWZmfDVolaqGU7HY9QvJ46fVJK
+	MvTHS/hheRYA3atMPx4J4Frc5r25w==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490xyctycs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Sep 2025 07:12:03 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5897BoPo015898;
+	Tue, 9 Sep 2025 07:12:03 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490xyctyck-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Sep 2025 07:12:03 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5895LjcB020499;
+	Tue, 9 Sep 2025 07:12:02 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 490yp0t0fc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Sep 2025 07:12:01 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5897BvaU56689130
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 9 Sep 2025 07:11:58 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF3C720043;
+	Tue,  9 Sep 2025 07:11:57 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BD1AE20040;
+	Tue,  9 Sep 2025 07:11:57 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue,  9 Sep 2025 07:11:57 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 56341)
+	id 8D31FE1089; Tue, 09 Sep 2025 09:11:57 +0200 (CEST)
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, alibuda@linux.alibaba.com,
+        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com
+Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>
+Subject: [PATCH net] net/smc: Remove unused argument from 2 SMC functions
+Date: Tue,  9 Sep 2025 09:11:45 +0200
+Message-ID: <20250909071145.2440407-1-mjambigi@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 13/14] dt-bindings: input/touchscreen: Convert MELFAS
- MIP4 Touchscreen to YAML
-To: Linus Walleij <linus.walleij@linaro.org>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Ariel D'Alessandro <ariel.dalessandro@collabora.com>, airlied@gmail.com,
- amergnat@baylibre.com, andrew+netdev@lunn.ch, andrew-ct.chen@mediatek.com,
- angelogioacchino.delregno@collabora.com, broonie@kernel.org,
- chunkuang.hu@kernel.org, ck.hu@mediatek.com, conor+dt@kernel.org,
- davem@davemloft.net, edumazet@google.com, flora.fu@mediatek.com,
- houlong.wei@mediatek.com, jeesw@melfas.com, jmassot@collabora.com,
- kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org,
- kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
- louisalexis.eyraud@collabora.com, maarten.lankhorst@linux.intel.com,
- matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com,
- mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com,
- robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch,
- support.opensource@diasemi.com, tiffany.lin@mediatek.com,
- tzimmermann@suse.de, yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
- linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org
-References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
- <20250820171302.324142-14-ariel.dalessandro@collabora.com>
- <CACRpkdbpKqKyebADj0xPFq3g0biPh-vm4d6C3sd8r0URyfyYRg@mail.gmail.com>
- <caguo7ud4dapb4yupeq2x4ocwoh4dt5nedwjsyuqsaratugcgz@ozajhsqwfzq6>
- <CACRpkdZRHQ6vuchN8x8d0uPCVMPPHOdBVWiUhzFJNs2paHGbYw@mail.gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <CACRpkdZRHQ6vuchN8x8d0uPCVMPPHOdBVWiUhzFJNs2paHGbYw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: A5nJGg-45huZa9MfKbYiaY44eWRAo0NA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDIzNSBTYWx0ZWRfX8m+VdLur9tS9
+ EuV5nNj7P72F9gdEsxpPXgUv5AT7w7Qm1JTDXxAtg3S5+9ddoPbdfCw2+0lnxKPT7nyqSv7xRaz
+ NultpRVmsIfIFlqXTr8ABOhINZ2oA8k0puhw57NkIi07KpVWzY7krNmqyCF+Qs68mlxKI6MaKr8
+ yell8j6Oew+E3Uy32VC7kntyTTQy3dGJ88VPc+yEIxmW/jvcBuX+4c/+3tJfiFSVg+H/arYfR7B
+ TOvJ/ICm+47/YaNsnnT/ycaA9jD0G46yBiwAh3phQGkzcFawgXkDGMNkmW/WTZPDWSUWi16R6Or
+ 1fHMUWCYAWilx+KbCUWB1u+hzoSkk1FNex7DayFjgnuDP92TXS2IrVLk8OUG17D7GeTlQRFYIe6
+ IH3UB9/k
+X-Proofpoint-GUID: iWqDC6xXS4FtD670A2NIjIFe28u1Oj8N
+X-Authority-Analysis: v=2.4 cv=F59XdrhN c=1 sm=1 tr=0 ts=68bfd343 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=jK4AapCLPKrqRyuMZfEA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-08_06,2025-09-08_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 suspectscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2509060235
 
-On 05/09/2025 13:33, Linus Walleij wrote:
-> On Fri, Sep 5, 2025 at 12:02 PM Dmitry Torokhov
-> <dmitry.torokhov@gmail.com> wrote:
->> On Thu, Aug 21, 2025 at 01:56:24PM +0200, Linus Walleij wrote:
->>> Hi Ariel,
->>>
->>> thanks for your patch!
->>>
->>> On Wed, Aug 20, 2025 at 7:17 PM Ariel D'Alessandro
->>> <ariel.dalessandro@collabora.com> wrote:
->>>
->>>> +  ce-gpios:
->>>> +    description: GPIO connected to the CE (chip enable) pin of the chip
->>>> +    maxItems: 1
->>>
->>> Mention that this should always have the flag GPIO_ACTIVE_HIGH
->>> as this is required by the hardware.
->>>
->>> Unfortunately we have no YAML syntax for enforcing flags :/
->>
->> Theoretically there can be an inverter on the line, so from the AP point
->> of view the line is active low while from the peripheral POV the pin is
->> active high...
-> 
-> Yes, I think someone even proposed adding inverters to the
-> device tree and was nixed.
+The smc argument is not used in both smc_connect_ism_vlan_setup() &
+smc_connect_ism_vlan_cleanup(). Hence removing it.
 
-It's not about DT, it's about board design - you can (almost?) always
-invert the logical signal, so this should match what hardware requires
-plus any inverter on the board.
+Fixes: 413498440e30 net/smc: add SMC-D support in af_smc
+Signed-off-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
+---
+ net/smc/af_smc.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 66033afd168a..1ea54c09b3ac 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -1096,8 +1096,7 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
+ }
+ 
+ /* Check for VLAN ID and register it on ISM device just for CLC handshake */
+-static int smc_connect_ism_vlan_setup(struct smc_sock *smc,
+-				      struct smc_init_info *ini)
++static int smc_connect_ism_vlan_setup(struct smc_init_info *ini)
+ {
+ 	if (ini->vlan_id && smc_ism_get_vlan(ini->ism_dev[0], ini->vlan_id))
+ 		return SMC_CLC_DECL_ISMVLANERR;
+@@ -1112,7 +1111,7 @@ static int smc_find_proposal_devices(struct smc_sock *smc,
+ 	/* check if there is an ism device available */
+ 	if (!(ini->smcd_version & SMC_V1) ||
+ 	    smc_find_ism_device(smc, ini) ||
+-	    smc_connect_ism_vlan_setup(smc, ini))
++	    smc_connect_ism_vlan_setup(ini))
+ 		ini->smcd_version &= ~SMC_V1;
+ 	/* else ISM V1 is supported for this connection */
+ 
+@@ -1157,8 +1156,7 @@ static int smc_find_proposal_devices(struct smc_sock *smc,
+ /* cleanup temporary VLAN ID registration used for CLC handshake. If ISM is
+  * used, the VLAN ID will be registered again during the connection setup.
+  */
+-static int smc_connect_ism_vlan_cleanup(struct smc_sock *smc,
+-					struct smc_init_info *ini)
++static int smc_connect_ism_vlan_cleanup(struct smc_init_info *ini)
+ {
+ 	if (!smcd_indicated(ini->smc_type_v1))
+ 		return 0;
+@@ -1581,13 +1579,13 @@ static int __smc_connect(struct smc_sock *smc)
+ 		goto vlan_cleanup;
+ 
+ 	SMC_STAT_CLNT_SUCC_INC(sock_net(smc->clcsock->sk), aclc);
+-	smc_connect_ism_vlan_cleanup(smc, ini);
++	smc_connect_ism_vlan_cleanup(ini);
+ 	kfree(buf);
+ 	kfree(ini);
+ 	return 0;
+ 
+ vlan_cleanup:
+-	smc_connect_ism_vlan_cleanup(smc, ini);
++	smc_connect_ism_vlan_cleanup(ini);
+ 	kfree(buf);
+ fallback:
+ 	kfree(ini);
+-- 
+2.48.1
 
-> 
-> It's a matter of phrasing I would say:
-> 
-> "Mention that this should nominally have the flag GPIO_ACTIVE_HIGH
-
-No, please do not, it is wrong. If hardware requires active high, then
-just say this is active high. But the actual GPIO flag depends on the
-board design if signal is inverted.
-
-
-Best regards,
-Krzysztof
 
