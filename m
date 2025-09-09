@@ -1,115 +1,132 @@
-Return-Path: <netdev+bounces-221358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEA98B504A2
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:46:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49219B504A5
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 19:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8907D163BB9
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:46:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09BC73B5D0C
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CFD3314DC;
-	Tue,  9 Sep 2025 17:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE3D31C587;
+	Tue,  9 Sep 2025 17:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XR8HvAUp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JLKZtB7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFDC24BCF5;
-	Tue,  9 Sep 2025 17:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4474F17A300
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 17:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757439986; cv=none; b=LFhJflPg1XBUIKvFsyvidaLzBWDuqdYkHlesQeoyb5DCuf59JpT2bR9Y25ZePSyJs5xqY6AcD2eGlNHggQPaGQDyizu6sSWmOpXRO53195RosXNm5UFH5JmhaSVs/vDuhwaaLPZabjx0kjtbtD5pgvoeOpNhB4pVnbNeNDF4c80=
+	t=1757440066; cv=none; b=ld+aEp5n6vqIiwhZtmK2nobBVPEg80fX0tz5BSRUmd3zkTGV1OyHwnuHgAhm1cCMsBgQqBwhAqBvTm7U1jeTrtfUzSH8/3iY55794oWusiP0sz/Idy0lYI2Q+x2BfuHZUeN4xJSizpeqjRgjz9o8McZq+bTEh5Pn9nBgmgRL/3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757439986; c=relaxed/simple;
-	bh=v9xXxmxDXQYkaEAJAX0BRW6tnDjxk8gf8Bml2n9XIwU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iaE2ad41yZCrR1YIijHGfjf01AESzACq8W6pN/qS/g6W6b1hdWRAHjKtJPwtRgOkOrTpzAAO6q3ldMa1lj8VIxL5sdeDjtmAe1X/hkM+iCpVmuxjkbWSlSudgPztaulB4MKwqCEdh5DLJUgOU6eWFnijjvOw692GuXVsr+VFGww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XR8HvAUp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EA78C4CEF4;
-	Tue,  9 Sep 2025 17:46:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757439985;
-	bh=v9xXxmxDXQYkaEAJAX0BRW6tnDjxk8gf8Bml2n9XIwU=;
-	h=From:Date:Subject:To:Cc:From;
-	b=XR8HvAUpgEDsG9LXQ9uxZ8OQ1r9prbNDn2ztFSkEc4KFfBw74wAJ0pIePPg2qQN0s
-	 woZ5IeJG+LZdriZ3t7J9Zu1QdTYLTigVXU8eFLHY6VLIH0ykTRVmWmfZzKGifp6LoI
-	 iUyfo8zAksWUHtmusejt/nfOaTgiDr/mOjbcWOzhJsAuLbpkOAGf5v3lzzahdlQv5z
-	 wR+29EBCUIVHbMTWSYGY+MKB2ogQ1ZjGvMcUACxlCwwhHvKjy3cbTY2alOtKArrH+d
-	 C3kaMd24u3y60Q9cBBT6dCQb4ewFCwDkvBEmTRV3GJ0zye0zlpxMXyIj4btuao8Dx7
-	 Yu38G9ikfwHLQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 09 Sep 2025 19:46:09 +0200
-Subject: [PATCH net-next] doc: mptcp: fix Netlink specs link
+	s=arc-20240116; t=1757440066; c=relaxed/simple;
+	bh=Mj/3qD80kpBpCdG432x6WzYa9daR72pLSMUczhnpzGk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oNxtUcPBtpb1QUZK1j0lTJLqCEaSC2jKkV3gtI1hc2P87fsZpcQPyDmmkCIXKoiZxJ7COYW0myZwsd2/+MnUjwTPMCpxgC/iXHa0zUK/B5PGq9gMK5Ih3k6q66FxCoahOQO+JC2IDbCI7Pauq3HAdVb6e0qiZ4iGzTdrsE/nGF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JLKZtB7a; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e8d870d3-fec8-4e1d-a54e-3ced427bf55b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757440060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eYfq2OcNr1565up+43sEyltVeF93Ja3jqCk+Ftve/6E=;
+	b=JLKZtB7aMPzldGwjJhQingJa5WAH+hv+uAddSnW7zLsQR2S1t75hSa0o4RsRbz5DqUZeri
+	EyJlH4QeDnQsk32B0WUAlEr3KLMtIaiYT9hAKAoMsG7duoiUEex4CMvQcf8EqlEGfz/mAA
+	42Q7aBoFhTIMUTGJMMNov4UfhWZ9Z6o=
+Date: Tue, 9 Sep 2025 10:47:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
+To: Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>, Xiumei Mu <xmu@redhat.com>
+References: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Yanjun.Zhu" <yanjun.zhu@linux.dev>
+In-Reply-To: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250909-net-next-mptcp-pm-link-v1-1-0f1c4b8439c6@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAOBnwGgC/zWMQQqAIBAAvxJ7bsGUsPpKdAjbaqlMVCII/54EH
- eYwh5kHAnmmAF3xgKeLA582S1UWYNbRLoQ8ZQcpZC1a0aKlmLkjHi4ah+7Ane2GlW5qpScj1aw
- gx87TzPc37uFvYEjpBUW7yF9yAAAA
-X-Change-ID: 20250909-net-next-mptcp-pm-link-178537dc23f3
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Kory Maincent <kory.maincent@bootlin.com>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1558; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=v9xXxmxDXQYkaEAJAX0BRW6tnDjxk8gf8Bml2n9XIwU=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIOpL/jilp9PqFN5nsLa5Jtyk+1y3PyzJf3HDzuHl60K
- uzBysAzHaUsDGJcDLJiiizSbZH5M59X8ZZ4+VnAzGFlAhnCwMUpABOZ6M7wP/lFn8YUI4sHpe//
- R9v/PqNgd7GOm+106o9Xc+/c7dbZk8/wP/PwzON7Sn/266yfOGvX2envjxkw3wheeS2GdeqlW/+
- zJrEBAA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-Migadu-Flow: FLOW_OUT
 
-The Netlink specs RST files are no longer generated inside the source
-tree.
 
-In other words, the path to mptcp_pm.rst has changed, and needs to be
-updated to the new location.
+On 8/25/25 5:50 AM, Sabrina Dubroca wrote:
+> Xiumei reported a regression in IPsec offload tests over xfrmi, where
+> IPv6 over IPv4 tunnels are no longer offloaded after commit
+> cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
+> implementation").
+>
+> Commit cc18f482e8b6 added a generic version of existing checks
+> attempting to prevent packets with IPv4 options or IPv6 extension
+> headers from being sent to HW that doesn't support offloading such
+> packets. The check mistakenly uses x->props.family (the outer family)
+> to determine the inner packet's family and verify if
+> options/extensions are present.
+>
+> In the case of IPv6 over IPv4, the check compares some of the traffic
+> class bits to the expected no-options ihl value (5). The original
+> check was introduced in commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add
+> Innova IPSec offload TX data path"), and then duplicated in the other
+> drivers. Before commit cc18f482e8b6, the loose check (ihl > 5) passed
+> because those traffic class bits were not set to a value that
+> triggered the no-offload codepath. Packets with options/extension
+> headers that should have been handled in SW went through the offload
+> path, and were likely dropped by the NIC or incorrectly
+> processed. Since commit cc18f482e8b6, the check is now strict (ihl !=
+> 5), and in a basic setup (no traffic class configured), all packets go
+> through the no-offload codepath.
+>
+> The commits that introduced the incorrect family checks in each driver
+> are:
+> 2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
+> 8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
+> 859a497fe80c ("nfp: implement xfrm callbacks and expose ipsec offload feature to upper layer")
+> 32188be805d0 ("cn10k-ipsec: Allow ipsec crypto offload for skb with SA")
+> [ixgbe/ixgbevf commits are ignored, as that HW does not support tunnel
+> mode, thus no cross-family setups are possible]
+>
+> Fixes: cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback implementation")
+> Reported-by: Xiumei Mu <xmu@redhat.com>
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Fixes: 1ce4da3dd99e ("docs: use parser_yaml extension to handle Netlink specs")
-Reported-by: Kory Maincent <kory.maincent@bootlin.com>
-Closes: https://lore.kernel.org/20250828185037.07873d04@kmaincent-XPS-13-7390
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- Documentation/networking/mptcp.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks. I applied this commit and made tests in my local hosts. I can 
+confirm that ipv6 over ipv4 packets can be offloaded into HW. About 
+replacing props with inner_mode, I am fine with it.
 
-diff --git a/Documentation/networking/mptcp.rst b/Documentation/networking/mptcp.rst
-index 17f2bab611644727e19c3969fa08fa974c702d92..fdc7bfd5d5c5f7a6be089e23fb3d97da294e4c88 100644
---- a/Documentation/networking/mptcp.rst
-+++ b/Documentation/networking/mptcp.rst
-@@ -66,7 +66,7 @@ same rules are applied for all the connections (see: ``ip mptcp``) ; and the
- userspace one (type ``1``), controlled by a userspace daemon (i.e. `mptcpd
- <https://mptcpd.mptcp.dev/>`_) where different rules can be applied for each
- connection. The path managers can be controlled via a Netlink API; see
--netlink_spec/mptcp_pm.rst.
-+../netlink/specs/mptcp_pm.rst.
- 
- To be able to use multiple IP addresses on a host to create multiple *subflows*
- (paths), the default in-kernel MPTCP path-manager needs to know which IP
+Thus,
 
----
-base-commit: 3b4296f5893d3a4e19edfc3800cb79381095e55f
-change-id: 20250909-net-next-mptcp-pm-link-178537dc23f3
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
 
-Best regards,
--- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Zhu Yanjun
 
+> ---
+>   net/xfrm/xfrm_device.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> index c7a1f080d2de..44b9de6e4e77 100644
+> --- a/net/xfrm/xfrm_device.c
+> +++ b/net/xfrm/xfrm_device.c
+> @@ -438,7 +438,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
+>   
+>   	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
+>   			    x->props.mode == XFRM_MODE_TUNNEL;
+> -	switch (x->props.family) {
+> +	switch (x->inner_mode.family) {
+>   	case AF_INET:
+>   		/* Check for IPv4 options */
+>   		if (ip_hdr(skb)->ihl != 5)
 
