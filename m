@@ -1,201 +1,146 @@
-Return-Path: <netdev+bounces-221162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09390B4AA44
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:20:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 038CEB4AA4F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:21:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15A3D16EF68
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 723EF17C0FE
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 10:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652B22EBB8C;
-	Tue,  9 Sep 2025 10:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5943C31A07D;
+	Tue,  9 Sep 2025 10:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YfrHPNLB"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="dr9Fl88t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0CD219A7A;
-	Tue,  9 Sep 2025 10:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8270F312805
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 10:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757413144; cv=none; b=E+s+odI7+mQfBbFSR/pExah9xapZGNcEnKwxQqs+QmdG44PZ3j4cI3QErY4x5dDT9VgxhwaepxRxnHiqlYP65Q88DgBwYTvtal2wpx1/5NuQAbEnQ9xfHAGO4c5LHKXPHlIWhyyxfOcyCY/nMVC3yQLNrrYxvj5lbqz8NSvFDtY=
+	t=1757413185; cv=none; b=g357GBoseSEaf+tT/wRSzdsBLFuecz3I4iJPgu8G0pb9R8Tjjb+YpxgNskwTKX1vug9xWfkDYFLAiHcQwMyeo+n+WmoSfY81Bp4zX3eIZbe9eBkF/CsPRgJUQVeG30WyBndHtt9GtxzcQ7vYm/Oe32r5YWeg2XGo2ufQeq3AZAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757413144; c=relaxed/simple;
-	bh=NWOEu18B+foxaU60ODchsyiVUXQtXS2hXD0XBYzA0yw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wc9apHU4sMBkg2Xpme1/uelxZqWLcIQdNVFiV1TC9cMlUwhzNcZChIIAQaHjDqcfQi2K8179m+85CmTOmlZBAGWA3kxC8T4PTUppxs6Zj43wB1qNAv4PdpkioJuFMZWJ2dFGSgBfWhr94rI6NIPJDSyXbzRUbM/pnuyd0FpkWL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YfrHPNLB; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5890Lf9x011307;
-	Tue, 9 Sep 2025 10:18:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=o2nQEF
-	sqMXsSZn1MR5zX/hHpl0yOesXiOxhC6JXsvJ0=; b=YfrHPNLBzAYj3w4Mbfl2PS
-	GOnfUa8GcaK/bMbs8D9K8xZ7pZaF+nERCHXzi8OT2NI6vRHiLhy9iX3KoRoToxHf
-	AD+JVzRnsYp60LQ/SDJ+j+oYV+hB0eC9h6CkC994S0hWMmVxkyc3nkhA3m4Hcwk9
-	fYLlYfke/NUQt4zrRNLP2/iVPCqbwZEbVEWoZrUCkbOCzXnlBR56WkiaGxj6PYVW
-	sKzHAlOM73sxN8jxyujgyAeaYVraWuDedWdytS8pXUkd5NfKJ1iVUwj69rDQc5f7
-	bZsPP7YHuZ/D2OatHq+vUikbdBP1+9qAWXXJSs+fjfx6wO6IRW1A21gXCHNtRpoQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490bcsptxs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 10:18:58 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 589AHfan024446;
-	Tue, 9 Sep 2025 10:18:57 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490bcsptxp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 10:18:57 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5899NqXK020492;
-	Tue, 9 Sep 2025 10:18:57 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 490yp0tr7p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 10:18:57 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 589AIrlJ34013882
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Sep 2025 10:18:53 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1B06B2006E;
-	Tue,  9 Sep 2025 10:18:53 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5BE372006C;
-	Tue,  9 Sep 2025 10:18:52 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.111.23.69])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue,  9 Sep 2025 10:18:52 +0000 (GMT)
-Date: Tue, 9 Sep 2025 12:18:50 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Dust Li <dust.li@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon
- Horman <horms@kernel.org>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Sidraya
- Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v2 1/2] net/smc: make wr buffer count
- configurable
-Message-ID: <20250909121850.2635894a.pasic@linux.ibm.com>
-In-Reply-To: <aL-YYoYRsFiajiPW@linux.alibaba.com>
-References: <20250908220150.3329433-1-pasic@linux.ibm.com>
-	<20250908220150.3329433-2-pasic@linux.ibm.com>
-	<aL-YYoYRsFiajiPW@linux.alibaba.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1757413185; c=relaxed/simple;
+	bh=LH9K9rHh5Lg8l41iu3U0msyFwQbyezH6Y8MW0jdv+Xs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Aha7NauY2lhRdWAK6shmESS+cSep6UaAoSIHsQ0FBb3F++TUBlXnpGxcZ7x6yb3aSSFsKk0MIqzJgy6v0YW6TkikZsNEhA3ykQbj2NOj5ilEkbe2prXZ3xeb6mUhrc6rL7Ku7unev2gMnRNa3ElBdoaip6aupfPfBjy2beqxZIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=dr9Fl88t; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-560880bb751so5441640e87.3
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 03:19:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1757413181; x=1758017981; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ULW63TGOLMnn1ghgDwwFUv5dysPY5E+bfANPuLSHOWc=;
+        b=dr9Fl88tcTeQIJGbqOKcodqv5CaphKlWh0ptmX0+T8mkyhkbod0ntk+OD2Kfl884uU
+         FLo83DsLMtmepIEzudNDbGde0v/FpK1mHNnUb+byyzFAesAcAVVqFwCDXinLzfrsmq1V
+         qVAvlkihUQFSyriRRRGzFB1meqbKprkvcE/rpP05HUuNW0hqxWt1bUNCOBvFMGhVaxGl
+         2S+VbNNGXEuLRoK9vaCDqI0QRYYDANy48fIp5JFS6e/ugrgId+9eDASZ5TWN+HdC4P/A
+         bj97JzzbaMw3yZKIJlHAsvaVcn2hCmNGuB7GNn75E6Cjh3wMbIWDxebrtFiC7RQw6tgS
+         ALeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757413181; x=1758017981;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ULW63TGOLMnn1ghgDwwFUv5dysPY5E+bfANPuLSHOWc=;
+        b=mcpBXft1RSTjphHmMBaPgN7d/L6cdVBUk7iuhXM+itgTiKRw9qwVpbb0TLN3i5+Qvy
+         OfiiVQq/lwoOyz3C7pyghHm6BgJ04vDBKo6RHekSpVD3JC1ef00IkJBlu4YynHvnL5/o
+         3KfWTRfnpnzgE5SQfpoD4OUdyh74fvrlcEg7YjpUDf3id2bFKHRwA3GLkUEIJBBpVovA
+         eQsX93KQzCAW1E1sTa/sinDzuGGPsuOpaC4M2egscZNsqBD2l+1LOfv2Ur2tiOv6AXFy
+         9VvtDn15ejTGE3bwqQc/xASF5qdW4jFnQ2bYJVzSVXgCSl+bOa3tdSNcYT5WlNYmdCxn
+         O6TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwdsMXp1zBG1iJNFbnOhp0dMS7oYXIRdOgEEb9W8+zR15gWNbr1n1x/G/BuSDVaWSKJtueWHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXVgADZ4Vps625N63piwCUVZ1ZO+eT+32XKJFaegk66+RDs9UZ
+	OMq8s5E+EJAwKhP7LqfYp5LaNQ3AdGeFlu1PYx9qKHjZRh/5h94xwKgjcNKNSBTHEwQ=
+X-Gm-Gg: ASbGncv1Yom13e1EIL/D7A9HsQHcKV6v/hfg9YIgyCf92H5AID6bHxg0zRPoS2FKe0P
+	HvEGTZLe7dc9IFu6LTFpRy4fVsRVsb8Xnf74Y+6MMs11pXvELQlRcx7UwkQn3pKc3iC+7fU1fhG
+	WsZuxyiqlbo8jIITsLdnyXSHuNek3x7R0G0lQskv/F/OtIcoAWe7VSXz5cIm7SWwzevq2Ejgs+7
+	bs3uegL5pUeEqTEwQKIMyUAyruE5uX/KsA41CChkjt1Nq667reV0zoKKUw59E13rAzyZTz8htx/
+	QpdiHqXnRZuLnwsRca39oUYRhWZLn/i+66cIXuhpldNmcsTG4pmvrHLp+nSY/sJldNEi7belVwI
+	ymu2QfzjiExtCBwV82VjHmJoYqmKIApxa9GUQwis7bXCY14D1qlo+Zy0RTAMFfLPTNb29dEsWRU
+	jSJw==
+X-Google-Smtp-Source: AGHT+IG3EcGP7NPzd87Mekp4gaYSXJ55pGHRJ3IARub8bMA9kj0YQ3jp3UoRnC3Iliyf0hEf0ofDKg==
+X-Received: by 2002:a05:6512:2c94:b0:55f:5d1f:2451 with SMTP id 2adb3069b0e04-562603a2846mr2996076e87.2.1757413181376;
+        Tue, 09 Sep 2025 03:19:41 -0700 (PDT)
+Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5681853c59dsm412425e87.113.2025.09.09.03.19.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Sep 2025 03:19:40 -0700 (PDT)
+Message-ID: <0f3402bc-4b9b-4e8e-83c1-7fe78d278614@blackwall.org>
+Date: Tue, 9 Sep 2025 13:19:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAxMCBTYWx0ZWRfXxeWmgkEAGi/D
- SxGF3ya44SyJJrQUdNkgCofOTXWHrwaCViXubHVn/69Z53lJumdAjq3CCM/ykAQF4BN5NxIBBlf
- KOzO7HmB7PVWNAUKb4azcarSKjGoU4yhr0q90t2HXXMqgX1OoWeqi06+XCKvz9qT0mNYeoZi3G5
- rOkBescYPpoBIMoejs4CY7tP56MaBLKLDL03549msbuI2JKSMzAgKb+/lCRSOSVYcnqevqVs/m9
- 0jpvIkIRCh4x/5wg3FaB+jE8o+Hv0HVM9P79YmuE4zZr9BEOQRN/hnBpWLjA9iz59irKEBFA+lZ
- mpsLHonI6Tm3moUx7aBpFVdG80whMgMhpzTLDPRAmH0fVHBTTUqR+UmlRXyETOxdohmLnjKWP38
- fi3kv6WT
-X-Authority-Analysis: v=2.4 cv=SKNCVPvH c=1 sm=1 tr=0 ts=68bfff12 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=SRrdq9N9AAAA:8 a=yba5Uwut08PlTq8H50kA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: 0U49OlBsC8IZnhxJiIXafk6oEFThXR0F
-X-Proofpoint-ORIG-GUID: NGqJhiHEEpz3BjjobnLk_onfjMoTwbps
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-08_06,2025-09-08_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 priorityscore=1501 bulkscore=0 malwarescore=0
- adultscore=0 suspectscore=0 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060010
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] vxlan: Make vxlan_fdb_find_uc() more robust
+ against NPDs
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, petrm@nvidia.com
+References: <20250908075141.125087-1-idosch@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250908075141.125087-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 9 Sep 2025 11:00:50 +0800
-Dust Li <dust.li@linux.alibaba.com> wrote:
-
-> On 2025-09-09 00:01:49, Halil Pasic wrote:
-> >Think SMC_WR_BUF_CNT_SEND := SMC_WR_BUF_CNT used in send context and
-> >SMC_WR_BUF_CNT_RECV := 3 * SMC_WR_BUF_CNT used in recv context. Those
-> >get replaced with lgr->pref_send_wr and lgr->max_recv_wr respective.  
-
-Yes it is just in the commit message, I messed up the search and replace
-in the commit message. :(
-
->                             ^                       ^
->                             better to use the same prefix
+On 9/8/25 10:51, Ido Schimmel wrote:
+> first_remote_rcu() can return NULL if the FDB entry points to an FDB
+> nexthop group instead of a remote destination. However, unlike other
+> users of first_remote_rcu(), NPD cannot currently happen in
+> vxlan_fdb_find_uc() as it is only invoked by one driver which vetoes the
+> creation of FDB nexthops.
 > 
-> I personally prefer max_send_wr/max_recv_wr.
+> Make the function more robust by making sure the remote destination is
+> only dereferenced if it is not NULL.
 > 
-
-Will go back to that then for v3
-
-> >
-> >While at it let us also remove a confusing comment that is either not
-> >about the context in which it resides (describing
-> >qp_attr.cap.pref_send_wr and qp_attr.cap.max_recv_wr) or not applicable  
->                 ^
-> I haven't found pref_send_wr in qp_attr.cap
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   drivers/net/vxlan/vxlan_core.c | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
 > 
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index dab864bc733c..a5c55e7e4d79 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -446,7 +446,7 @@ int vxlan_fdb_find_uc(struct net_device *dev, const u8 *mac, __be32 vni,
+>   {
+>   	struct vxlan_dev *vxlan = netdev_priv(dev);
+>   	u8 eth_addr[ETH_ALEN + 2] = { 0 };
+> -	struct vxlan_rdst *rdst;
+> +	struct vxlan_rdst *rdst = NULL;
+>   	struct vxlan_fdb *f;
+>   	int rc = 0;
+>   
+> @@ -459,12 +459,13 @@ int vxlan_fdb_find_uc(struct net_device *dev, const u8 *mac, __be32 vni,
+>   	rcu_read_lock();
+>   
+>   	f = vxlan_find_mac_rcu(vxlan, eth_addr, vni);
+> -	if (!f) {
+> +	if (f)
+> +		rdst = first_remote_rcu(f);
+> +	if (!rdst) {
+>   		rc = -ENOENT;
+>   		goto out;
+>   	}
+>   
+> -	rdst = first_remote_rcu(f);
+>   	vxlan_fdb_switchdev_notifier_info(vxlan, f, rdst, NULL, fdb_info);
+>   
+>   out:
 
-Again search and replace. Sorry!
-
-[..]
-> >+
-> >+	Please be aware that all the buffers need to be allocated as a physically
-> >+	continuous array in which each element is a single buffer and has the size
-> >+	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
-> >+	like before having this control.
-> >+	this control.  
-> 
-> The final 'this control' looks unwanted.
- 
-
-You are right
-
-[..]
-> > 
-> >@@ -741,50 +742,51 @@ int smc_wr_alloc_lgr_mem(struct smc_link_group *lgr)
-> > int smc_wr_alloc_link_mem(struct smc_link *link)
-> > {
-> > 	/* allocate link related memory */
-> >-	link->wr_tx_bufs = kcalloc(SMC_WR_BUF_CNT, SMC_WR_BUF_SIZE, GFP_KERNEL);
-> >+	link->wr_tx_bufs = kcalloc(link->lgr->pref_send_wr,
-> >+				   SMC_WR_BUF_SIZE, GFP_KERNEL);
-> > 	if (!link->wr_tx_bufs)
-> > 		goto no_mem;
-> >-	link->wr_rx_bufs = kcalloc(SMC_WR_BUF_CNT * 3, link->wr_rx_buflen,
-> >+	link->wr_rx_bufs = kcalloc(link->lgr->pref_recv_wr, SMC_WR_BUF_SIZE,
-> > 				   GFP_KERNEL);  
-
-
-I will have to do some digging, let's assume for now that it is my
-mistake. Unfortunately I won't be able to revisit this before next
-Wednesday.
-
-Thank you for your review!
-
-Regards,
-Halil
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
