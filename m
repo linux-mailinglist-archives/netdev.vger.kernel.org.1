@@ -1,110 +1,196 @@
-Return-Path: <netdev+bounces-221304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6C7FB50179
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:36:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29F9B5019F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 289653BE972
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:35:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 331F57BED6F
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7757122154B;
-	Tue,  9 Sep 2025 15:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC95352FE8;
+	Tue,  9 Sep 2025 15:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="F6KmLplR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z+nXkTF9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31A82BB17
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 15:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA89E352096
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 15:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757431811; cv=none; b=FmYBTrP1AdqGE7jaInt5aNB7KbNJ8q5azsRt5eOH8ZWoo4+64wTYg+FGB6W8+egh03cwqOcNoezyHak8d+/UHSP4R822+1x+C2UagTm8wlWyoo3NIC3Qyb484ZkEDTSeafCmBFeclrDN20j5xI/xnkPNdLJaEpRSXG0Mx66dmP4=
+	t=1757432021; cv=none; b=CpMA5j43dpOVzYYCdU//AFMbVFuJyKWn+moVKJMK0xNvimeznHcRbv+3b6R5qOVpWH6w8C0yDhJ1u+GD/HybZrNMhGZnzPBn3EpSFyEqbwMhfY0HDHU2IKDe6gs1tz5Z9+Y+W6ZgjU6ddlehGqLsiMHqBMTEGlBIYsmzdsgcdDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757431811; c=relaxed/simple;
-	bh=NTL5ej3JWPeHzuZa73WqFQIhay6exkyqe6D2KBonqQM=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=kpLA8s3CwCryfm6ypBKsB8gW8XkHkvirffX+HXyIR1XUJ33ETkCxkijSu6MqSUU0kfzRsDAAKyhzWJgz49v9TH8jLg204qIdul9bXH64P2ZdhvliPwYsYfQM4At2jV1AgH7bvIsm/1NSP5UQ7IWcNQYM1vvvU67DiYdawAFvLfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=F6KmLplR; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=oAiRTznlFC7vYErTIqTAhemmI7/08xCjg69zADmhAg4=; b=F6KmLplRAg3hdeRbnVi7YGEX7r
-	gMzAjLubPLZYtA5BWRoYxaG88C27EzyY5bcYXDaKiywyuFSNKAECFOyYrDqGJAYVeFjuTH2jHC56F
-	PcBg/na5NskAZ5u4eDbQLZioejyvggCJnjoI9reAJ7JhxL46jv3UjRv3coqIQX9+eYn3oxNmqkUd6
-	yqWw04pfi7HOQ0ZFZRWqIJRpSJufAS8cdFW1JLs6pctlN4THiIqj1zFUJTxWBgHtJJBRaVjIKTLbI
-	/yXiH69wvBHq/Z4Tk6vJ8pW5G2zW6sBbVNEuMN92Kkd6uD5xMz5SN7SkA1qK6CbFZdLRw+e0mvVhl
-	PV97j8Ag==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53872 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uw0IE-000000008Jm-1a80;
-	Tue, 09 Sep 2025 16:30:02 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uw0ID-00000004I6z-2ivB;
-	Tue, 09 Sep 2025 16:30:01 +0100
-From: Russell King <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: mvneta: add support for hardware timestamps
+	s=arc-20240116; t=1757432021; c=relaxed/simple;
+	bh=eXqcsEVT0O/GOfA/Ca74pae233qQpT8kMZ1DFItem6g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LW4M439EruPUAOZWmIagyPIJpyr33saeuoq9TO5keLA4sHrhuK9P815k7B1b3ozqJ34O33hVVakRlfspxTf9ygZhXhG5K9kdM3n0sbZfR73XLmLTGSRRKyW3ZzQCcmY50fS/cdTAMmVlBAiV/6nYkEzcooDUvETuOnVREF6gR5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z+nXkTF9; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b3d3f6360cso59114151cf.0
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 08:33:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757432019; x=1758036819; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LH53MCx6ogN1k+/cTYDbkLwp7+QCPYAr+PyETboPxPU=;
+        b=Z+nXkTF9JfnULQd3XbzxXlfRdTzzgDr49lrdpLuq3FXi+I/MaDoS4jQRaHR6rOOQhF
+         B/3pLnFn9bjNO1++zCzgpyqUfunnQ07fMWf37xR7NueFFIvkF8T6AyvbM8opEwlS5JYW
+         kftTpR7HzlG04ODQ9DSDefG6P1JtarUJ7noZfTTsRAT+2cyAFzKhTqtrWkC246XJVNDK
+         2lbhqkoG7F7JofQnoDh4ZAXllkj5suioJJJgj4lQ+kCnZy78NO7ZhbLTAYWxzNXIljS0
+         CJDlBsbb5hEYXEBsBz2pMD3UgpBP++xQ+cDVAKmfcuauQ9+AYTYweAyb1aCkekZ3oPTJ
+         corg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757432019; x=1758036819;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LH53MCx6ogN1k+/cTYDbkLwp7+QCPYAr+PyETboPxPU=;
+        b=ltuu+sykgb3BMftob0viFT5ktfGXDecuOv+uYOh5iEVgOfsFecDCrAUbpq9O2OGsnx
+         9SzglknLytEHIKG6F9O1C49QCyb1xdcoo6IAMXAVB44oyfjsnMwgpWE5iIswmMlZAgAT
+         XytXNEoT6bpQYIqp12Q+AA40Dl4J6T/AOnD7sXLrXDHhgB5wzwFU3empHhQPIvUE6tIi
+         4p62IojgM/pHEYyDBBtfNMHS1bnhqhxjyvBAjlF993Nfjby91Zx6/gyMIwR0BJRDNdVO
+         3prPZDJuttFSa1GsQShyskpBxZ/74+22z1SI96konmxtM58C0Myhu6Mfk/jCcBj7l/j+
+         JmJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYhq/7ME0VB0vU0yoXT9cHxDybwM2GceIxJksC5IpNDuf9yDORCdCTBrHq+5Km7iabLe2U3II=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP4FzIKPFtUj4hGuQM5UhjaG92wHrPV2fK9eptyHs1fMzkEOav
+	MqFk5QxeY+WS6XpGISH37T+MW61VT/sWQMHFzFwOhng9YLAPS1gvawYOS3rGNkAV8xY/IoLoM3w
+	6VWe7LEN88vBTFRREU930Cmj3RWnOk8ffJEoPkaQ2
+X-Gm-Gg: ASbGncsq6IhNWFFUeBk2vVrGfuiKnEqRTpMYfE/eSpfxlmDCLFcQYwI+dIfLTPAaYu4
+	U6L+RJYJVA/Z8DE30OCywjazP9cVDxczajJCN7CuhInkyAFSTeEnLl525VQuNSTXODSHsAc67IU
+	7FMDvrrssMXf7UXUoPT3i3tUAXlwCBirj1ARas/c/4u5NB78Jzky20NrydDFt8F1iUL5QESuy1s
+	R1RBZTG4yk8SG9pffU4bSx0hDLR+Ig2t2zzwxU9uhnTBYCCIkEEnZXBodA=
+X-Google-Smtp-Source: AGHT+IEBSJFGC5HE816C89rHJ7brsZIZ78JEBVc19MhZewWuyBdDU+KpX7j08rvkOLFoUtfGNDkZcsKLsSZemorc0Ok=
+X-Received: by 2002:a05:622a:1887:b0:4b5:ea94:d715 with SMTP id
+ d75a77b69052e-4b5f8390522mr114936061cf.1.1757432018215; Tue, 09 Sep 2025
+ 08:33:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uw0ID-00000004I6z-2ivB@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 09 Sep 2025 16:30:01 +0100
+References: <20250909132243.1327024-1-edumazet@google.com> <20250909132936.GA1460@redhat.com>
+ <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
+ <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
+ <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk> <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
+ <20250909151851.GB1460@redhat.com>
+In-Reply-To: <20250909151851.GB1460@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 9 Sep 2025 08:33:27 -0700
+X-Gm-Features: Ac12FXwmsBi8N5rZnVovo52dil5DJvY7h1QqJGILCkzQ81ibk4sKlJtshywQWDc
+Message-ID: <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Eric Dumazet <eric.dumazet@gmail.com>, 
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, 
+	Mike Christie <mchristi@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>, 
+	linux-block@vger.kernel.org, nbd@other.debian.org, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for hardware timestamps in (e.g.) the PHY by calling
-skb_tx_timestamp() as close as reasonably possible to the point that
-the hardware is instructed to send the queued packets.
+On Tue, Sep 9, 2025 at 8:19=E2=80=AFAM Richard W.M. Jones <rjones@redhat.co=
+m> wrote:
+>
+> On Tue, Sep 09, 2025 at 07:47:09AM -0700, Eric Dumazet wrote:
+> > On Tue, Sep 9, 2025 at 7:37=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wro=
+te:
+> > >
+> > > On 9/9/25 8:35 AM, Eric Dumazet wrote:
+> > > > On Tue, Sep 9, 2025 at 7:04=E2=80=AFAM Eric Dumazet <edumazet@googl=
+e.com> wrote:
+> > > >>
+> > > >> On Tue, Sep 9, 2025 at 6:32=E2=80=AFAM Richard W.M. Jones <rjones@=
+redhat.com> wrote:
+> > > >>>
+> > > >>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
+> > > >>>> Recently, syzbot started to abuse NBD with all kinds of sockets.
+> > > >>>>
+> > > >>>> Commit cf1b2326b734 ("nbd: verify socket is supported during set=
+up")
+> > > >>>> made sure the socket supported a shutdown() method.
+> > > >>>>
+> > > >>>> Explicitely accept TCP and UNIX stream sockets.
+> > > >>>
+> > > >>> I'm not clear what the actual problem is, but I will say that lib=
+nbd &
+> > > >>> nbdkit (which are another NBD client & server, interoperable with=
+ the
+> > > >>> kernel) we support and use NBD over vsock[1].  And we could suppo=
+rt
+> > > >>> NBD over pretty much any stream socket (Infiniband?) [2].
+> > > >>>
+> > > >>> [1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
+> > > >>>     https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
+> > > >>> [2] https://libguestfs.org/nbd_connect_socket.3.html
+> > > >>>
+> > > >>> TCP and Unix domain sockets are by far the most widely used, but =
+I
+> > > >>> don't think it's fair to exclude other socket types.
+> > > >>
+> > > >> If we have known and supported socket types, please send a patch t=
+o add them.
+> > > >>
+> > > >> I asked the question last week and got nothing about vsock or othe=
+r types.
+> > > >>
+> > > >> https://lore.kernel.org/netdev/CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A=
+12+ndzBcQs_kZoBA@mail.gmail.com/
+> > > >>
+> > > >> For sure, we do not want datagram sockets, RAW, netlink, and many =
+others.
+> > > >
+> > > > BTW vsock will probably fire lockdep warnings, I see GFP_KERNEL
+> > > > being used in net/vmw_vsock/virtio_transport.c
+>
+> CC-ing Stefan & Stefano.  Myself, I'm only using libnbd
+> (ie. userspace) over vsock, not the kernel client.
+>
+> > > > So you will have to fix this.
+> > >
+> > > Rather than play whack-a-mole with this, would it make sense to mark =
+as
+> > > socket as "writeback/reclaim" safe and base the nbd decision on that =
+rather
+> > > than attempt to maintain some allow/deny list of sockets?
+> >
+> > Even if a socket type was writeback/reclaim safe, probably NBD would no=
+t support
+> > arbitrary socket type, like netlink, af_packet, or af_netrom.
+> >
+> > An allow list seems safer to me, with commits with a clear owner.
+> >
+> > If future syzbot reports are triggered, the bisection will point to
+> > these commits.
+>
+> From the outside it seems really odd to hard code a list of "good"
+> socket types into each kernel client that can open a socket.  Normally
+> if you wanted to restrict socket types wouldn't you do that through
+> something more flexible like nftables?
 
-Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/marvell/mvneta.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+nftables is user policy.
 
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index 476e73e502fe..5f4e28085640 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -2985,6 +2985,13 @@ static netdev_tx_t mvneta_tx(struct sk_buff *skb, struct net_device *dev)
- 		if (txq->count >= txq->tx_stop_threshold)
- 			netif_tx_stop_queue(nq);
- 
-+		/* FIXME: This is not really the true transmit point, since
-+		 * we batch up several before hitting the hardware, but is
-+		 * the best we can do without more complexity to walk the
-+		 * packets in the pending section of the transmit queue.
-+		 */
-+		skb_tx_timestamp(skb);
-+
- 		if (!netdev_xmit_more() || netif_xmit_stopped(nq) ||
- 		    txq->pending + frags > MVNETA_TXQ_DEC_SENT_MASK)
- 			mvneta_txq_pend_desc_add(pp, txq, frags);
--- 
-2.47.3
+We need a kernel that will not crash, even if nftables is not
+compiled/loaded/used .
 
+
+>
+> Rich.
+>
+> --
+> Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+> Read my programming and virtualization blog: http://rwmj.wordpress.com
+> virt-p2v converts physical machines to virtual machines.  Boot with a
+> live CD or over the network (PXE) and turn machines into KVM guests.
+> http://libguestfs.org/virt-v2v
+>
 
