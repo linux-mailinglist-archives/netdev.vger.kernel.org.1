@@ -1,159 +1,173 @@
-Return-Path: <netdev+bounces-221089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E1AAB4A37A
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:28:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2953FB4A39D
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28594170395
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:28:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA7854E6F29
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 07:34:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E974301020;
-	Tue,  9 Sep 2025 07:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FbXv+VWH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41F4307ADA;
+	Tue,  9 Sep 2025 07:33:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8191F30A4;
-	Tue,  9 Sep 2025 07:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC46B2DA753;
+	Tue,  9 Sep 2025 07:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757402889; cv=none; b=s/5eMN+EUQQXJPh/SJwoQqPcFrj5lPsbcLAW/iQcgAb5r0CQD0kNLPYuaMXKeUSxJiG3DNzyEQru74LabfXcCxOyArFQQsI0addpDfrp8wCXHxLubopmYyxDACH6BKpE3vJ1fvYgCvES6rXPzHrdDbkHynTJCXb3fuBIV0DDCRI=
+	t=1757403232; cv=none; b=LYF4yPT+hStPFjTKE/9P0w30facw8X+kxb+C9Q5C/RM1Z34gopcuOzrxuESsh5o6spHM2DJXp5rpPzgFv85PzOGq86NSJdJbe1GAVR7EURp/1NgsAO3UbYBu8sq9r3OBOH5V86WrxShDkMMjeEeh0zE0XCXNGFhlFMdwWnguLNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757402889; c=relaxed/simple;
-	bh=7tq0rB+OZeVxR4LDFj8Sj+bBipz9tCBGT0YCkItiXVA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eo3mxQ80Nebyp9mRkmnF5p0VAEez6EQFsDqVT+VSm0mG9djHMcKVq4XTrg55v7HQPgdbzSMy8ZWMQD7/LHRnY7tXgw0MBUi18lA8tdMxl8cC8umEnOFBO21zFAlP+u55tmsHnTErB9k9cQongWsHuqznVTrZ3X4fx9vwuBzZM+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FbXv+VWH; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 588IrUS1010489;
-	Tue, 9 Sep 2025 07:28:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=y4y1j6
-	YJGJnGlcF7FRxfmm3ZmcpNf9zRc3jdNS2kGVs=; b=FbXv+VWHWS3D6L8vAT0Cy3
-	jBX3RYLVjFMlaz3LlvYmApqVpw0uvpo8O1QdDn1wfdBNWiOm30RO5dbEB0Yn+BIB
-	+jpYTKmGJCw3jxwbx0q+dYVOT1bnMiEDmTVJXxEBL42jGQ/vIF4osrJuujYNzlsK
-	ocZoC2kduDQSXP/pR2Y86PKUMYBABwqp3T1LIjJeFWaanJ9R2EWkuK1FhVFbuxWw
-	mPHc+wjjSxSYnA+S6liTbrptZxnQrUXvs1herEE9UtA4G7D0ZNzrEew6CPfRqgfy
-	22/0KzBVSxEM3BrvGKP39ElwGO4tPZGlrniuySvorXdxmI74cfar8W9YF5fmwaBg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490ukebcva-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 07:28:00 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5897N3n3009527;
-	Tue, 9 Sep 2025 07:28:00 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490ukebcv8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 07:28:00 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5896CaWp007895;
-	Tue, 9 Sep 2025 07:27:59 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49109phxhp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 07:27:59 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5897RtOI39977318
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Sep 2025 07:27:55 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 79EE920043;
-	Tue,  9 Sep 2025 07:27:55 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 19D5C2004B;
-	Tue,  9 Sep 2025 07:27:55 +0000 (GMT)
-Received: from [9.152.224.94] (unknown [9.152.224.94])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  9 Sep 2025 07:27:55 +0000 (GMT)
-Message-ID: <9ae41752-0e49-441a-8032-55673d19e0c2@linux.ibm.com>
-Date: Tue, 9 Sep 2025 09:27:54 +0200
+	s=arc-20240116; t=1757403232; c=relaxed/simple;
+	bh=s5WDRABbopl64JiQZLMuXdSfEZhS/v30YCdeutDBtx8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YZP9W/rAdZ+PNRQNt87VN9z5yeGE9HyZkFZym9UwWpErYr8hVucz9cSAw4lm5LJRbyhzZnSQ2fgUZh3pgB4oSkE9nFL1rdKIg/nGrz+VbTDwAmzg1Bm15ZyOskN46AlKS+h39aYHm4DBLgw89xF4A2w5ef6T4JHcZKxf3Y9N0y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cLb884cZtz2TTD5;
+	Tue,  9 Sep 2025 15:30:32 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 29C88180043;
+	Tue,  9 Sep 2025 15:33:47 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 9 Sep 2025 15:33:45 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
+	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>, Meny Yossefi
+	<meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>, Lee Trager
+	<lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Suman Ghosh <sumang@marvell.com>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH net-next v05 00/14] net: hinic3: Add a driver for Huawei 3rd gen NIC - sw and hw initialization
+Date: Tue, 9 Sep 2025 15:33:25 +0800
+Message-ID: <cover.1757401320.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 13/14] net/dibs: Move data path to dibs layer
-To: dust.li@linux.alibaba.com, "D. Wythe" <alibuda@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Julian Ruess <julianr@linux.ibm.com>,
-        Aswin Karuvally <aswin@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250905145428.1962105-1-wintera@linux.ibm.com>
- <20250905145428.1962105-14-wintera@linux.ibm.com>
- <aL-QJr0pBCZmXhf0@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <aL-QJr0pBCZmXhf0@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDE5NSBTYWx0ZWRfXwQX9qfY5I4nR
- L59TT6rZlpKoGDf1UUgUw/vb8fw1tHxxdH8A0kg+LiLzlTICt4Qhk+L7Vd7VOO+OKUzJz3ADy/n
- 845csZ6DHQ4BrFb4pzlJ61YJEHCMHO/IT9GEssRyqTCGNxn84weisWmE8buH0hefulY3xH45RCN
- uKD6OmnS+2mS5byBOyKhW1t/WfPVbsUPG5ATIL5jPsGAPZrEVDi0fvFH9AYqRuMN853RxjXBA3x
- gimO1k1VvLMEvcfH6pf1VARns3lYoTMHA93z+rsq7KYiSTaQKa3TN+ZeFxrMPitO77u2tsRLOBr
- WNaZ7EK4hP6g8Whc0gewYitxRmBjyUMt7c3Ba9dhfgDdWFpnOZbOyKikB5TfWQ7B+eQnyUIiPq1
- opQ05U3d
-X-Proofpoint-ORIG-GUID: aVTBe4bCCOl-h4-ugl3UkUYP1qZdQLIX
-X-Proofpoint-GUID: ve5zoNlqBZ5_w0by38-wbLZ6jBJ9D4Hy
-X-Authority-Analysis: v=2.4 cv=StCQ6OO0 c=1 sm=1 tr=0 ts=68bfd700 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=6b5ucB2XjEZivXb5_SsA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-08_06,2025-09-08_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 bulkscore=0 clxscore=1015 adultscore=0
- suspectscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060195
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
+
+This is [3/3] part of hinic3 Ethernet driver initial submission.
+With this patch hinic3 becomes a functional Ethernet driver.
+
+The driver parts contained in this patch:
+Memory allocation and initialization of the driver structures.
+Management interfaces initialization.
+HW capabilities probing, initialization and setup using management
+interfaces.
+Net device open/stop implementation and data queues initialization.
+Register VID:DID in PCI id_table.
+Fix netif_queue_set_napi usage.
+
+Changes:
+
+PATCH 03 V01: https://lore.kernel.org/netdev/cover.1756195078.git.zhuyikai1@h-partners.com
+
+PATCH 03 V02: https://lore.kernel.org/netdev/cover.1756378721.git.zhuyikai1@h-partners.com
+* Remove extra memset 0 after kzalloc (Vadim Fedorenko)
+* Remove another init function in hinic3_init_hwdev/hwif/nic_io (Vadim Fedorenko)
+* Create a new separate patch of fixing code style (Vadim Fedorenko)
+* Use bitmap_free instead of kfree (ALOK TIWARI)
+* Add prefix "hinic3" to non-static functions and parse_* functions (Vadim Fedorenko)
+* Init func_tbl_cfg to {} (Vadim Fedorenko)
+* Extract endianess improvement from queue pair resource initialization (Vadim Fedorenko)
+* Use kmalloc_array before overwrite rss_hkey on the very next line (Vadim Fedorenko)
+* Remove extra key copy about hinic3_rss_set_hash_key (Vadim Fedorenko)
+* Use netdev_rss_key_fill instead of static rss hash key for safety (Eric Dumazet)
+
+PATCH 03 V03: https://lore.kernel.org/netdev/cover.1756524443.git.zhuyikai1@h-partners.com
+* Modify get_hwif_attr function for improving readability (Vadim Fedorenko)
+* Add HINIC3_PCIE_LINK_DOWN errorcode to init_hwif_attr error handling (Vadim Fedorenko)
+
+PATCH 03 V04: https://lore.kernel.org/netdev/cover.1757057860.git.zhuyikai1@h-partners.com
+* Use pci_enable_msix_range instead of pci_alloc_irq_vectors (Jakub Kicinski)
+* Move defensive codes to place that they are set/loaded (Jakub Kicinski)
+* Code format fixes: remove empty lines between error handling path (Jakub Kicinski)
+* Remove redundant waiting sleep in hinic3_rx_tx_flush (Jakub Kicinski)
+* Use ethtool_rxfh_indir_default for standalizing codes (Jakub Kicinski)
+* Use netif_get_num_default_rss_queues instead of driver-local logic (Jakub Kicinski)
+* Use netif_set_real_num_queues to set both TX and RX queues (Jakub Kicinski)
+
+PATCH 03 V05:
+* Merge comm_cmd_clear_doorbell & comm_cmd_clear_resource (Vadim Fedorenko)
+* Merge hinic3_enable/disable_doorbell to hinic3_toggle_doorbel (Vadim Fedorenko)
+* Update hinic3_Nic_io initialization commit message (Vadim Fedorenko)
+
+Fan Gong (14):
+  hinic3: HW initialization
+  hinic3: HW management interfaces
+  hinic3: HW common function initialization
+  hinic3: HW capability initialization
+  hinic3: Command Queue flush interfaces
+  hinic3: Nic_io initialization
+  hinic3: Queue pair endianness improvements
+  hinic3: Queue pair resource initialization
+  hinic3: Queue pair context initialization
+  hinic3: Tx & Rx configuration
+  hinic3: Add Rss function
+  hinic3: Add port management
+  hinic3: Fix missing napi->dev in netif_queue_set_napi
+  hinic3: Fix code style (Missing a blank line before return)
+
+ drivers/net/ethernet/huawei/hinic3/Makefile   |   2 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    | 168 ++++
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |   4 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 361 ++++++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  21 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 115 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c | 541 ++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  | 269 ++++++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |   2 +-
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   |   9 +-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  |   8 +-
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.c  |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |   2 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 119 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 425 ++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 152 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  20 +
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   5 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    | 870 +++++++++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    |  39 +-
+ .../huawei/hinic3/hinic3_pci_id_tbl.h         |   9 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 336 +++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  14 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 226 ++++-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  38 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 184 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |  30 +-
+ 28 files changed, 3920 insertions(+), 86 deletions(-)
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_pci_id_tbl.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.h
 
 
+base-commit: b1c92cdf5af3198e8fbc1345a80e2a1dff386c02
+-- 
+2.43.0
 
-On 09.09.25 04:25, Dust Li wrote:
->> diff --git a/net/smc/Makefile b/net/smc/Makefile
->> index 96ccfdf246df..0e754cbc38f9 100644
->> --- a/net/smc/Makefile
->> +++ b/net/smc/Makefile
->> @@ -6,4 +6,3 @@ smc-y := af_smc.o smc_pnet.o smc_ib.o smc_clc.o smc_core.o smc_wr.o smc_llc.o
->> smc-y += smc_cdc.o smc_tx.o smc_rx.o smc_close.o smc_ism.o smc_netlink.o smc_stats.o
->> smc-y += smc_tracepoint.o smc_inet.o
->> smc-$(CONFIG_SYSCTL) += smc_sysctl.o
->> -smc-y += smc_loopback.o
-> Why not remove smc_loopback.* as well ?
-> 
-> Best regards,
-> Dust
-
-
-Great catch!
--> will be corrected in next version.
 
