@@ -1,151 +1,350 @@
-Return-Path: <netdev+bounces-221262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC63FB4FF30
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:21:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EC9EB4FF44
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:23:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 134C51888241
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:21:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39AE61C20CFC
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F253F2FF679;
-	Tue,  9 Sep 2025 14:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E7734AAF4;
+	Tue,  9 Sep 2025 14:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kaywNOKr"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="CkVOYSqb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663F52288F7
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 14:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C51346A19;
+	Tue,  9 Sep 2025 14:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757427671; cv=none; b=fqM3kHAMeSIFGp3Gvc7wUJkR1oD4ls3CdAmvQGlYsrT7UE0UO/cEM1R6jgxcQAwDqoRpgQxMLdaQHBEOEhrNJVRWArofmvN0UDr3WjezIiwk3idnx2HtCD+69d7HbMN61NTkQIjjEsm/kaY82zeAdpjKsWPlDdCuymaF+MtZxXI=
+	t=1757427819; cv=none; b=gbil1tmyLoLIhqDK2DdokzRru3vLsYWbRiTey3938ycALPBdkKd3Iyx7vX54Fbyj4W9gQYAKMua+r7XqbRVdzF/P4HVu4hAzAtyTVrx2p6B3gVVHapCIqUcaZmsJT4kfHxNY+jSTjDTtvfYqB+NcscGSaH2wp2aXccptQWt8qoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757427671; c=relaxed/simple;
-	bh=eFaz1FbjLOe0auzFVwB/pCvwCLOzZfD/UEis1KyqCNA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rGg635X2kMUz3HLi7z5HENsJWyUidXJJp4yHkhO8RKaf9joHQ1df0OpUyhLMmHrbL85f4FF3d7CGrsPzdicZVhYws2VfhLQc8rrFyQw0avZGpgn0KwG2Rjs6T98neBQA96Eb7d/6pBAqwuAqFhpZGWttqSffUCpVEuf6RJctWrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kaywNOKr; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-323267b98a4so5236155a91.1
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 07:21:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1757427670; x=1758032470; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8TeFkN7fcGow6PeEF+7elJ3SB1YToe/OnzJcgFoo4gE=;
-        b=kaywNOKrPa+njj05Jt0B53qz1ZYhuhtB+JA+tQ8wTdps17G3HDp6sTuIoQzCpc4JGz
-         R84AEsrpjn49dR+q47Yg6u/i3wCfJ5uHlh8bNQEI/eUqzdu+51Q4xpir5aj44KUysKKX
-         XUET7XsELXWyK1xXXHn3s/PwfxYXL3/C1rfyvPIi5jQtSvB+n7/kS+ugCtkfCZUtcCZx
-         mgI7vN5loo6rcg2Z4ppikoif7KLJr6ctpZM9ZzOlQvw0YcLd1JuziPVWVl9BjpV6rAsY
-         Rv3HPXAurBJjc1+LWD6cDTr4VvlgbUidhCnEfN90gUR5TGSUnK+yOfPhBac/hizwFLtF
-         /LBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757427670; x=1758032470;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8TeFkN7fcGow6PeEF+7elJ3SB1YToe/OnzJcgFoo4gE=;
-        b=J4lmDfrHawAs6Alimcybrr+659zx1ZInJIZBoDKF4XZ6Hr7t30P06m+AoRPwhKhMNR
-         5U3JMFFZzY8NO+BcWhWKfzDBIRT/a5Tx3I4R5+5Ach7hyCmJps825srwCinNeY+/60lU
-         /5lOiH3/gj1lxDrumFWIGV7RxKtPMCDZI6qkmosoBQx47y1TtjSpEDfkD3HDd2/GcKTX
-         VEv5pBSjosb67vSHe5Jxi5AOKgz+74AsNtpcThuWttR8D8m82pBSyQqgz7lEtSnp/3Cr
-         /Q9Oo+wjjM4MCwautrxW8H1PwX5/GPKCxuFu1tbhGREx/lzScGX/yhajHc79Datms+El
-         BKhg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpb2zXKEUHW+hzGXkv+b+4Vdmepp+PD68AG8e+fmC/rQkpEf1XfBsbO3ILyvimwCRLNYv9aPI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4K55CzHfdc0NcpaS4pqs/ft+yQM7mA8Gmy23c700zOjIOuX+1
-	9Upi+adn5lxQ4pNtp2M9rFzCg74LLJZk/+viOiKRsh6e3/24rd1eae7+eN38g4XIGuMzerm0v8G
-	gqRAuVjqBwgu/5Xu3C6GLfGdNSR00ef526ou35sOyow==
-X-Gm-Gg: ASbGncveZyvRD3eHKXb1zMdR9cuxea6CxrkazbhX9dy5cuejFEDU9/mCq/PgZssmK5N
-	OpeU+dIj09+rrjgQiQjtEOVYHHj5DpcsVfpWHkTo7AjdhMsBtSi2uA6bOk8oGysSrRkNZDNnIQw
-	BJNk2UCe/TD1UPvmz+/ajtLZpgViBQvGxipa2jkKO0B6Oe0t3ddEJ+JpUZSp20bCp3C7rbal6OC
-	YGw0Us0gZE4dvq/r9Krddjo8U1zbED59nSABfhcquvx/jR4VoEwnBfKgBkIsZmwH1/nhgNGcJiZ
-	FaMLZKs=
-X-Google-Smtp-Source: AGHT+IHcxqQ3MwYg1e6CBranmjT3hbA3KQEdh9KM+28JVgj+Ob7LBa6ks7tZBX8uSiN8HysQ5OLuhZIp+UzO70D3LVY=
-X-Received: by 2002:a17:90b:5284:b0:327:ba78:e96e with SMTP id
- 98e67ed59e1d1-32d43f09a68mr14437698a91.13.1757427669481; Tue, 09 Sep 2025
- 07:21:09 -0700 (PDT)
+	s=arc-20240116; t=1757427819; c=relaxed/simple;
+	bh=l8m/snQEYqONbXpHtup7kHAtv1F0u1xttQFSmMjBlIo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cAfecFy2jocf+slPF2up17PlP8Xv12oh/I7454OvB2xOmMUaen8AHXYCEQyldokFSngKTCl8acpIAcZ9WvdR9Zb5Xn6OD5SepNEZDlGkdYYdxa6dgAIW5dBYAni87kpYtPxCg1cX2vaCismiNZITIVO2LbdQbPhzIp+rD6DI09s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CkVOYSqb; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 589EMW4R4042795;
+	Tue, 9 Sep 2025 09:22:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1757427752;
+	bh=4+epmNqy1Eq8OIbrXco3iQgqzbgQ2IoiiAgqsfr9Uyw=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=CkVOYSqbUgFVJS9RsqJvz8KxSb83fxTBBRV3XvSx1VAVyE65HnXHP1LwZNd2BjaGp
+	 ZaEjxXjeN/d3OyT1vTF0aVcoiLAESpnoNs9vBKSL3E04GWGjIUNTTVWqmo/P8XZ7oh
+	 eZB+ZKz9D/A801t/0PzVL2ZGFdIR+oPNC8WFrANo=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 589EMWge3210850
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Tue, 9 Sep 2025 09:22:32 -0500
+Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 9
+ Sep 2025 09:22:32 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Tue, 9 Sep 2025 09:22:31 -0500
+Received: from [10.249.130.74] ([10.249.130.74])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 589EMM1D2460231;
+	Tue, 9 Sep 2025 09:22:23 -0500
+Message-ID: <54602bba-3ec1-4cae-b068-e9c215b43773@ti.com>
+Date: Tue, 9 Sep 2025 19:52:21 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250907195601.957051083@linuxfoundation.org> <CA+G9fYsX_CrcywkDJDYBqHijE1d5gBNV=3RF=cUVdVj9BKuFzw@mail.gmail.com>
-In-Reply-To: <CA+G9fYsX_CrcywkDJDYBqHijE1d5gBNV=3RF=cUVdVj9BKuFzw@mail.gmail.com>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 9 Sep 2025 19:50:57 +0530
-X-Gm-Features: AS18NWCu9Mz3BICbrj4i65CQRhAEXwjomJBkbcBzM4Smm39VCPlu0yA5D9Oglok
-Message-ID: <CA+G9fYvhLSjZ0ir66wDK2FCbdToK9=+r_9d4dfrMA6vuxJErpg@mail.gmail.com>
-Subject: Re: [PATCH 5.10 00/52] 5.10.243-rc1 review
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, patches@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, 
-	akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org, 
-	patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de, 
-	jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, 
-	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, hargar@microsoft.com, 
-	broonie@kernel.org, achill@achill.org, Netdev <netdev@vger.kernel.org>, 
-	Anders Roxell <anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ben Copeland <benjamin.copeland@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 3/5] net: rnpgbe: Add basic mbx ops support
+To: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
+        <gur.stavi@huawei.com>, <maddy@linux.ibm.com>, <mpe@ellerman.id.au>,
+        <danishanwar@ti.com>, <lee@trager.us>, <gongfan1@huawei.com>,
+        <lorenzo@kernel.org>, <geert+renesas@glider.be>,
+        <Parthiban.Veerasooran@microchip.com>, <lukas.bulwahn@redhat.com>,
+        <alexanderduyck@fb.com>, <richardcochran@gmail.com>, <kees@kernel.org>,
+        <gustavoars@kernel.org>, <rdunlap@infradead.org>,
+        <vadim.fedorenko@linux.dev>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>
+References: <20250909120906.1781444-1-dong100@mucse.com>
+ <20250909120906.1781444-4-dong100@mucse.com>
+Content-Language: en-US
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <20250909120906.1781444-4-dong100@mucse.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Mon, 8 Sept 2025 at 23:44, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
->
-> On Mon, 8 Sept 2025 at 01:38, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
-> > This is the start of the stable review cycle for the 5.10.243 release.
-> > There are 52 patches in this series, all will be posted as a response
-> > to this one.  If anyone has any issues with these being applied, please
-> > let me know.
-> >
-> > Responses should be made by Tue, 09 Sep 2025 19:55:53 +0000.
-> > Anything received after that time might be too late.
-> >
-> > The whole patch series can be found in one patch at:
-> >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.10.243-rc1.gz
-> > or in the git tree and branch at:
-> >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.10.y
-> > and the diffstat can be found below.
-> >
-> > thanks,
-> >
-> > greg k-h
->
->
-> While building Linux stable-rc 5.10.243-rc1 the arm64 allyesconfig
-> builds failed.
->
-> * arm64, build
->   - gcc-12-allyesconfig
->
-> Regression Analysis:
-> - New regression? yes
-> - Reproducibility? yes
->
->
-> Build regression: stable-rc 5.10.243-rc1 arm64 allyesconfig
-> qede_main.c:204:17: error: field name not in record or union
-> initializer
->
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
->
-> ### build log
-> drivers/net/ethernet/qlogic/qede/qede_main.c:204:17: error: field name
-> not in record or union initializer
->   204 |                 .arfs_filter_op = qede_arfs_filter_op,
->       |                 ^
->
 
-Please ignore this allyesconfig build failure for now on 5.15 and 5.10.
-Seems like it is my local builder issue.
 
-- Naresh
+On 9/9/2025 5:39 PM, Dong Yibo wrote:
+> Add fundamental mailbox (MBX) communication operations between PF (Physical
+> Function) and firmware for n500/n210 chips
+> 
+> Signed-off-by: Dong Yibo <dong100@mucse.com>
+> ---
+>  drivers/net/ethernet/mucse/rnpgbe/Makefile    |   4 +-
+>  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  25 ++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  70 +++
+>  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   7 +
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |   5 +
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 425 ++++++++++++++++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  20 +
+>  7 files changed, 555 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+> 
+> diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> index 9df536f0d04c..5fc878ada4b1 100644
+> --- a/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> +++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> @@ -5,4 +5,6 @@
+>  #
+
+[ ... ]
+
+> +
+> +/**
+> + * rnpgbe_init_hw - Setup hw info according to board_type
+> + * @hw: hw information structure
+> + * @board_type: board type
+> + *
+> + * rnpgbe_init_hw initializes all hw data
+> + *
+> + * Return: 0 on success, negative errno on failure
+> + **/
+> +int rnpgbe_init_hw(struct mucse_hw *hw, int board_type)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +
+> +	mbx->pf2fw_mbx_ctrl = MUCSE_GBE_PFFW_MBX_CTRL_OFFSET;
+> +	mbx->fwpf_mbx_mask = MUCSE_GBE_FWPF_MBX_MASK_OFFSET;
+> +
+> +	switch (board_type) {
+> +	case board_n500:
+> +		rnpgbe_init_n500(hw);
+> +	break;
+> +	case board_n210:
+> +		rnpgbe_init_n210(hw);
+> +	break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+
+The indentation of this switch block seems off to me.
+
+As per the coding guidlines
+https://www.kernel.org/doc/html/v4.14/process/coding-style.html#indentation
+
+Break statements should be at the same indentation level as the case
+code. The current indentation has the "break" statements at the same
+level as the case labels, which is inconsistent.
+
+This should be like,
+
+	switch (board_type) {
+	case board_n500:
+		rnpgbe_init_n500(hw);
+		break;
+	case board_n210:
+		rnpgbe_init_n210(hw);
+		break;
+	default:
+		return -EINVAL;
+	}
+
+> +	/* init_params with mbx base */
+> +	mucse_init_mbx_params_pf(hw);
+> +
+> +	return 0;
+> +}
+
+[ ... ]
+
+> +/**
+> + * mucse_read_mbx_pf - Read a message from the mailbox
+> + * @hw: pointer to the HW structure
+> + * @msg: the message buffer
+> + * @size: length of buffer
+> + *
+> + * This function copies a message from the mailbox buffer to the caller's
+> + * memory buffer. The presumption is that the caller knows that there was
+> + * a message due to a fw request so no polling for message is needed.
+> + *
+> + * Return: 0 on success, negative errno on failure
+> + **/
+> +static int mucse_read_mbx_pf(struct mucse_hw *hw, u32 *msg, u16 size)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	int size_in_words = size / 4;
+> +	int ret;
+> +	int i;
+> +
+> +	ret = mucse_obtain_mbx_lock_pf(hw);
+> +	if (ret)
+> +		return ret;
+> +
+> +	for (i = 0; i < size_in_words; i++)
+> +		msg[i] = mbx_data_rd32(mbx, MUCSE_MBX_FWPF_SHM + 4 * i);
+
+The array indexing calculation should use multiplication by sizeof(u32)
+instead of hardcoded 4.
+
+> +	/* Hw needs write data_reg at last */
+> +	mbx_data_wr32(mbx, MUCSE_MBX_FWPF_SHM, 0);
+> +	/* flush reqs as we have read this request data */
+> +	hw->mbx.fw_req = mucse_mbx_get_fwreq(mbx);
+> +	mucse_mbx_inc_pf_ack(hw);
+> +	mucse_release_mbx_lock_pf(hw, false);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * mucse_check_for_msg_pf - Check to see if the fw has sent mail
+> + * @hw: pointer to the HW structure
+> + *
+> + * Return: 0 if the fw has set the Status bit or else -EIO
+> + **/
+> +static int mucse_check_for_msg_pf(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	u16 fw_req;
+> +
+> +	fw_req = mucse_mbx_get_fwreq(mbx);
+> +	/* chip's register is reset to 0 when rc send reset
+> +	 * mbx command. This causes 'fw_req != hw->mbx.fw_req'
+> +	 * be TRUE before fw really reply. Driver must wait fw reset
+> +	 * done reply before using chip, we must check no-zero.
+> +	 **/
+> +	if (fw_req != 0 && fw_req != hw->mbx.fw_req) {
+> +		hw->mbx.stats.reqs++;
+> +		return 0;
+> +	}
+> +
+> +	return -EIO;
+> +}
+> +
+> +/**
+> + * mucse_poll_for_msg - Wait for message notification
+> + * @hw: pointer to the HW structure
+> + *
+> + * Return: 0 on success, negative errno on failure
+> + **/
+> +static int mucse_poll_for_msg(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	int count = mbx->timeout_cnt;
+> +	int val;
+> +
+> +	return read_poll_timeout(mucse_check_for_msg_pf,
+> +				 val, !val, mbx->usec_delay,
+> +				 count * mbx->usec_delay,
+> +				 false, hw);
+> +}
+> +
+> +/**
+> + * mucse_poll_and_read_mbx - Wait for message notification and receive message
+> + * @hw: pointer to the HW structure
+> + * @msg: the message buffer
+> + * @size: length of buffer
+> + *
+> + * Return: 0 if it successfully received a message notification and
+> + * copied it into the receive buffer
+> + **/
+> +int mucse_poll_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
+> +{
+> +	int ret;
+> +
+> +	ret = mucse_poll_for_msg(hw);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return mucse_read_mbx_pf(hw, msg, size);
+> +}
+> +
+> +/**
+> + * mucse_mbx_get_fwack - Read fw ack from reg
+> + * @mbx: pointer to the MBX structure
+> + *
+> + * Return: the fwack value
+> + **/
+> +static u16 mucse_mbx_get_fwack(struct mucse_mbx_info *mbx)
+> +{
+> +	u32 val = mbx_data_rd32(mbx, MUCSE_MBX_FW2PF_CNT);
+> +
+> +	return FIELD_GET(GENMASK_U32(31, 16), val);
+> +}
+> +
+> +/**
+> + * mucse_mbx_inc_pf_req - Increase req
+> + * @hw: pointer to the HW structure
+> + *
+> + * mucse_mbx_inc_pf_req read pf_req from hw, then write
+> + * new value back after increase
+> + **/
+> +static void mucse_mbx_inc_pf_req(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	u16 req;
+> +	u32 val;
+> +
+> +	val = mbx_data_rd32(mbx, MUCSE_MBX_PF2FW_CNT);
+> +	req = FIELD_GET(GENMASK_U32(15, 0), val);
+> +	req++;
+> +	val &= ~GENMASK_U32(15, 0);
+> +	val |= FIELD_PREP(GENMASK_U32(15, 0), req);
+> +	mbx_data_wr32(mbx, MUCSE_MBX_PF2FW_CNT, val);
+> +	hw->mbx.stats.msgs_tx++;
+> +}
+> +
+> +/**
+> + * mucse_write_mbx_pf - Place a message in the mailbox
+> + * @hw: pointer to the HW structure
+> + * @msg: the message buffer
+> + * @size: length of buffer
+> + *
+> + * This function maybe used in an irq handler.
+> + *
+> + * Return: 0 if it successfully copied message into the buffer
+> + **/
+> +static int mucse_write_mbx_pf(struct mucse_hw *hw, u32 *msg, u16 size)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	int size_in_words = size / 4;
+> +	int ret;
+> +	int i;
+> +
+> +	ret = mucse_obtain_mbx_lock_pf(hw);
+> +	if (ret)
+> +		return ret;
+> +
+> +	for (i = 0; i < size_in_words; i++)
+> +		mbx_data_wr32(mbx, MUCSE_MBX_FWPF_SHM + i * 4, msg[i]);
+
+Same issue as above - should use sizeof(u32) instead of hardcoded 4 for
+portability.
+
+> +
+> +	/* flush acks as we are overwriting the message buffer */
+> +	hw->mbx.fw_ack = mucse_mbx_get_fwack(mbx);
+
+
+-- 
+Thanks and Regards,
+Md Danish Anwar
+
 
