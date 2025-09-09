@@ -1,158 +1,241 @@
-Return-Path: <netdev+bounces-221277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 188EDB4FFEB
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:47:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC9DB50072
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 16:59:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035631C24E66
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:47:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C76791C63149
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:59:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B04C21323C;
-	Tue,  9 Sep 2025 14:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FEC7350D42;
+	Tue,  9 Sep 2025 14:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K77XlKGr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YEDbZ1yh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B1218A921
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 14:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854B72D12EF
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 14:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757429246; cv=none; b=J5coJRrpzrTmVDbfTSdBSYynMtdLeyeXL3y+juDL1BT50Fbxz5yJlAZIIk97fiuMBf1yFD2ql7OjMvDO/HWskyZVRq248wfs7XyMzEwXK0bK9wxq4pIRxtgASfmGbjYV/7qSu2UzPuvahvfuxrwSZ3CVaIZhwcX+6fJCtqiYF4M=
+	t=1757429950; cv=none; b=RTJYAw9OEQq2p1JBg17IJ0oSysmhi7PGstJ3ut26UaqQ7GxliSSykZ6V0W/kcmCVPw51G6otxgLj36twH5s4g4v/Zre6LjPMWMwQgRXzglls8E0QrLmj9yVn4KdDJkZrHzkznN7WzmWZkLTdLXE3lW3IZq+ljklLuJjw+vdJdfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757429246; c=relaxed/simple;
-	bh=na0qcNvQJYZarjhYVsaDNm+DNueOfC1mq9L1wdwqIWs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iND67NiDnpOdLuM+v1hnGObm72XT6fkHcDfx501zqVcAgt8kKEk//9sp+EnS6geIu1wV5M2RnqZsKRPwv2q5nuB3WLI1fRXzxOIUHikc/X+tZVE2lRJC0E4+zLH3whz2l5CPwDYpguI695IXBZdMNFqwc7wTnSQGaL/BJl2P6Ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K77XlKGr; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4b38d47fa9dso50269891cf.0
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 07:47:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757429243; x=1758034043; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vIPTmtHCDrJgBeBgHlzsCibUN0YnxA4RCxNX1u5+HrA=;
-        b=K77XlKGrJ9+ZRVxgSYlht55aLZoGcK0RmfEgbd5sF7KEg4DbwaUq8QmD3uBFel6gkQ
-         AYwM8czCzwGvtM5+ZBY8JSOBDHX1Lo6n8NN6/2wXj4JdkFaNZPE24sSP9+XxBltFPwDv
-         SSUbItY/QfF8CxcG27azsk6kOJyYj/e64KeBX+fh37BB6GMRlbAlVqc/o/84Erryngs6
-         p+gQpRzvfpwQnemp+Xv8Gg4CFwtF9221peX/yALyP5RkVX3cBjcSLb7AmHju6PpnVnkc
-         FA76j8wz7l884NOmDjEjK97jlPRnbDcEvtNso0XOzKBtU/covLzibeMCqu9j5jeiMRzB
-         SykA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757429243; x=1758034043;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vIPTmtHCDrJgBeBgHlzsCibUN0YnxA4RCxNX1u5+HrA=;
-        b=lhw9GgF4wSTwU6C7Y50hodJEe/w/0ZYWVoCf/eDhMNlP9yGTFhTjfZFNd+qGC779fk
-         kjYP++70E2uLIYW7P9y6xSLKVIFEVl8qxLPhtu7lEMug+IrZt06wUUta2Frmd34CINnd
-         L7Au0kfV57cJvEmZYGFWCy2LKQvuk2Z2O8MluqIIq/pxlACMiAhLhpcEiX8U/66a9cO4
-         JXLbnpqlsjn9/zHRZKugOUz/uVsh78oVL6u3pwTUS9mCEV+FV3EwpAdp7OQ9w66wUzrt
-         EqDoTBIJ0VtNO+MSeuEgFUkuZN40kTysGUkCc1c+c+8Cl4Oc4USyPCApQTttrkm9EetD
-         3xhg==
-X-Forwarded-Encrypted: i=1; AJvYcCU01S21V69e0vkvK51l9J1y7Nf8HBuQlLCkZsiA27G6Vh6Sat8c/AZziWpD41PFArqsClJ+jx8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0SQ+sSPljZDsDf5pDBIqWRaQg1x0lAMZPQR+ii8jzgEWUsk1m
-	Ienqp0MjiOBGd/9nu7dS4eGa8gpAI9yDIGVkNa0UizvXicsgsq2YACeWWDPEKPldGM/GDyE0TPk
-	oXzqGIlLxL5ZsKVBbPPcmNgwNVruuyV5S+8syCY94
-X-Gm-Gg: ASbGncvGHlP2CrwiWg8X894fk2l66j4X3HQ4kSX+2ol+IM27OLFClC/aoy/Sixt709d
-	F0J9TO3a4HWvuXoJBF1nCEltmX9e/nYib2KKRPJs8qtqtM9HNvPIlymDSUSc86pQ+PtIWtQ0yOA
-	5lgpu1YL47I2lqC0gqS0kdflfj81xG2quTMgu6iqUuut2xOUYFX2aLaMhgqlol7aFE1Q92ARmI8
-	cZjehbSK0IaVPO8AQZjfExxiNlFgi9YGIhZD9iIV7Re4vJcXsQhp4D9E8g=
-X-Google-Smtp-Source: AGHT+IHNkl4F/jlHneGYF/DVcUMGaWB8Yx5qk0wUjgE1GPGbrefbzEWPV3RJqRwpMoeMSkvolvqz8buuDcIXFrAO/fU=
-X-Received: by 2002:a05:622a:28a:b0:4b5:e600:3d4f with SMTP id
- d75a77b69052e-4b5f844d163mr132837011cf.41.1757429242916; Tue, 09 Sep 2025
- 07:47:22 -0700 (PDT)
+	s=arc-20240116; t=1757429950; c=relaxed/simple;
+	bh=kmgv9xqGS7OTGFpOzGWNFBB80NfoLzlhJ5EdO2cDkXI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PQMksSfP7QvHTfuuhd/lH8Rz9Cq1gAqiP6Hw5dXXXgYAVC4IMOWOl2eUyjPCAx2uWl3iM6miO0QmZyApC2bp1dYTovb4Lng2phjIZRtnbMjFFTkmXbEkGigAY3FZ0s430Ed5cnGhIWJ8DcuezNNzRtVpetOUbZfzbWEkkB2l8Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YEDbZ1yh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757429947;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4dV2yfJTsR1DPUk73L2OuUXIAcYJU7bx4iuUy8FDIgM=;
+	b=YEDbZ1yhxnNjeZaWIzix3rtDAD06GjTDY8HRSO3Oi5iUv0KT0rSXocNQIHG75T9DRGIcc4
+	xBupd6W9svfejF9Cf4wEFfBVCyCWFnOr3n3sJJ6cLfglwNs+mMkYm/S+tGUQIsOsgcPEGi
+	bJX6xgvdur8NSfX1xq+lHb1FxMr5EU4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-65-0eYToXeKMvGR-lT7DB6z6Q-1; Tue,
+ 09 Sep 2025 10:59:04 -0400
+X-MC-Unique: 0eYToXeKMvGR-lT7DB6z6Q-1
+X-Mimecast-MFC-AGG-ID: 0eYToXeKMvGR-lT7DB6z6Q_1757429942
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2815B18005A2;
+	Tue,  9 Sep 2025 14:59:02 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.88.137])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CE1D1956095;
+	Tue,  9 Sep 2025 14:58:58 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org,
+  dev@openvswitch.org,  Eelco Chaudron <echaudro@redhat.com>,  Shuah Khan
+ <shuah@kernel.org>,  Jamal Hadi Salim <jhs@mojatatu.com>,  Davide Caratti
+ <dcaratti@redhat.com>
+Subject: Re: [PATCH net 2/2] selftests: openvswitch: add a simple test for
+ tunnel metadata
+In-Reply-To: <20250905133105.3940420-3-i.maximets@ovn.org> (Ilya Maximets's
+	message of "Fri, 5 Sep 2025 15:30:56 +0200")
+References: <20250905133105.3940420-1-i.maximets@ovn.org>
+	<20250905133105.3940420-3-i.maximets@ovn.org>
+Date: Tue, 09 Sep 2025 10:58:56 -0400
+Message-ID: <f7tqzwfhdu7.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250909132243.1327024-1-edumazet@google.com> <20250909132936.GA1460@redhat.com>
- <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
- <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com> <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
-In-Reply-To: <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Sep 2025 07:47:09 -0700
-X-Gm-Features: Ac12FXzNtkWC68OEJylvLMh65_Zd3JlyhYqvJ9DDcC2NpONUi_gkcjAG5cZuFt8
-Message-ID: <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
-Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, Josef Bacik <josef@toxicpanda.com>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <eric.dumazet@gmail.com>, 
-	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, 
-	Mike Christie <mchristi@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>, 
-	linux-block@vger.kernel.org, nbd@other.debian.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue, Sep 9, 2025 at 7:37=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
+Ilya Maximets <i.maximets@ovn.org> writes:
+
+> This test ensures that upon receiving decapsulated packets from a
+> tunnel interface in openvswitch, the tunnel metadata fields are
+> properly populated.  This partially covers interoperability of the
+> kernel tunnel ports and openvswitch tunnels (LWT) and parsing and
+> formatting of the tunnel metadata fields of the openvswitch netlink
+> uAPI.  Doing so, this test also ensures that fields and flags are
+> properly extracted during decapsulation by the tunnel core code,
+> serving as a regression test for the previously fixed issue with the
+> DF bit not being extracted from the outer IP header.
 >
-> On 9/9/25 8:35 AM, Eric Dumazet wrote:
-> > On Tue, Sep 9, 2025 at 7:04=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >>
-> >> On Tue, Sep 9, 2025 at 6:32=E2=80=AFAM Richard W.M. Jones <rjones@redh=
-at.com> wrote:
-> >>>
-> >>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
-> >>>> Recently, syzbot started to abuse NBD with all kinds of sockets.
-> >>>>
-> >>>> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
-> >>>> made sure the socket supported a shutdown() method.
-> >>>>
-> >>>> Explicitely accept TCP and UNIX stream sockets.
-> >>>
-> >>> I'm not clear what the actual problem is, but I will say that libnbd =
-&
-> >>> nbdkit (which are another NBD client & server, interoperable with the
-> >>> kernel) we support and use NBD over vsock[1].  And we could support
-> >>> NBD over pretty much any stream socket (Infiniband?) [2].
-> >>>
-> >>> [1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
-> >>>     https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
-> >>> [2] https://libguestfs.org/nbd_connect_socket.3.html
-> >>>
-> >>> TCP and Unix domain sockets are by far the most widely used, but I
-> >>> don't think it's fair to exclude other socket types.
-> >>
-> >> If we have known and supported socket types, please send a patch to ad=
-d them.
-> >>
-> >> I asked the question last week and got nothing about vsock or other ty=
-pes.
-> >>
-> >> https://lore.kernel.org/netdev/CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+n=
-dzBcQs_kZoBA@mail.gmail.com/
-> >>
-> >> For sure, we do not want datagram sockets, RAW, netlink, and many othe=
-rs.
-> >
-> > BTW vsock will probably fire lockdep warnings, I see GFP_KERNEL being u=
-sed
-> > in net/vmw_vsock/virtio_transport.c
-> >
-> > So you will have to fix this.
+> The ovs-dpctl.py script already supports all that is necessary for
+> the tunnel ports for this test, so we only need to adjust the
+> ovs_add_if() function to pass the '-t' port type argument in order
+> to be able to create tunnel ports in the openvswitch datapath.
 >
-> Rather than play whack-a-mole with this, would it make sense to mark as
-> socket as "writeback/reclaim" safe and base the nbd decision on that rath=
-er
-> than attempt to maintain some allow/deny list of sockets?
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+> ---
 
-Even if a socket type was writeback/reclaim safe, probably NBD would not su=
-pport
-arbitrary socket type, like netlink, af_packet, or af_netrom.
+Thanks for the test case - it looks good to me.  One thing I think would
+be a useful future enhancement for us is to add json output so that we
+can use something like 'jq' to parse the upcall output.  At the moment,
+the grep will work, but doesn't let us change anything.  But that is
+work for a future patch.
 
-An allow list seems safer to me, with commits with a clear owner.
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
-If future syzbot reports are triggered, the bisection will point to
-these commits.
+>  .../selftests/net/openvswitch/openvswitch.sh  | 88 +++++++++++++++++--
+>  1 file changed, 81 insertions(+), 7 deletions(-)
+>
+> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> index 3c8d3455d8e7..b327d3061ed5 100755
+> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> @@ -25,6 +25,7 @@ tests="
+>  	nat_related_v4				ip4-nat-related: ICMP related matches work with SNAT
+>  	netlink_checks				ovsnl: validate netlink attrs and settings
+>  	upcall_interfaces			ovs: test the upcall interfaces
+> +	tunnel_metadata				ovs: test extraction of tunnel metadata
+>  	drop_reason				drop: test drop reasons are emitted
+>  	psample					psample: Sampling packets with psample"
+>  
+> @@ -113,13 +114,13 @@ ovs_add_dp () {
+>  }
+>  
+>  ovs_add_if () {
+> -	info "Adding IF to DP: br:$2 if:$3"
+> -	if [ "$4" != "-u" ]; then
+> -		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py add-if "$2" "$3" \
+> -		    || return 1
+> +	info "Adding IF to DP: br:$3 if:$4 ($2)"
+> +	if [ "$5" != "-u" ]; then
+> +		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py add-if \
+> +		    -t "$2" "$3" "$4" || return 1
+>  	else
+>  		python3 $ovs_base/ovs-dpctl.py add-if \
+> -		    -u "$2" "$3" >$ovs_dir/$3.out 2>$ovs_dir/$3.err &
+> +		    -u -t "$2" "$3" "$4" >$ovs_dir/$4.out 2>$ovs_dir/$4.err &
+>  		pid=$!
+>  		on_exit "ovs_sbx $1 kill -TERM $pid 2>/dev/null"
+>  	fi
+> @@ -166,9 +167,9 @@ ovs_add_netns_and_veths () {
+>  	fi
+>  
+>  	if [ "$7" != "-u" ]; then
+> -		ovs_add_if "$1" "$2" "$4" || return 1
+> +		ovs_add_if "$1" "netdev" "$2" "$4" || return 1
+>  	else
+> -		ovs_add_if "$1" "$2" "$4" -u || return 1
+> +		ovs_add_if "$1" "netdev" "$2" "$4" -u || return 1
+>  	fi
+>  
+>  	if [ $TRACING -eq 1 ]; then
+> @@ -756,6 +757,79 @@ test_upcall_interfaces() {
+>  	return 0
+>  }
+>  
+> +ovs_add_kernel_tunnel() {
+> +	local sbxname=$1; shift
+> +	local ns=$1; shift
+> +	local tnl_type=$1; shift
+> +	local name=$1; shift
+> +	local addr=$1; shift
+> +
+> +	info "setting up kernel ${tnl_type} tunnel ${name}"
+> +	ovs_sbx "${sbxname}" ip -netns ${ns} link add dev ${name} type ${tnl_type} $* || return 1
+> +	on_exit "ovs_sbx ${sbxname} ip -netns ${ns} link del ${name} >/dev/null 2>&1"
+> +	ovs_sbx "${sbxname}" ip -netns ${ns} addr add dev ${name} ${addr} || return 1
+> +	ovs_sbx "${sbxname}" ip -netns ${ns} link set dev ${name} mtu 1450 up || return 1
+> +}
+> +
+> +test_tunnel_metadata() {
+> +	which arping >/dev/null 2>&1 || return $ksft_skip
+> +
+> +	sbxname="test_tunnel_metadata"
+> +	sbx_add "${sbxname}" || return 1
+> +
+> +	info "setting up new DP"
+> +	ovs_add_dp "${sbxname}" tdp0 -V 2:1 || return 1
+> +
+> +	ovs_add_netns_and_veths "${sbxname}" tdp0 tns left0 l0 \
+> +		172.31.110.1/24 || return 1
+> +
+> +	info "removing veth interface from openvswitch and setting IP"
+> +	ovs_del_if "${sbxname}" tdp0 left0 || return 1
+> +	ovs_sbx "${sbxname}" ip addr add 172.31.110.2/24 dev left0 || return 1
+> +	ovs_sbx "${sbxname}" ip link set left0 up || return 1
+> +
+> +	info "setting up tunnel port in openvswitch"
+> +	ovs_add_if "${sbxname}" "vxlan" tdp0 ovs-vxlan0 -u || return 1
+> +	on_exit "ovs_sbx ${sbxname} ip link del ovs-vxlan0"
+> +	ovs_wait ip link show ovs-vxlan0 &>/dev/null || return 1
+> +	ovs_sbx "${sbxname}" ip link set ovs-vxlan0 up || return 1
+> +
+> +	configs=$(echo '
+> +	    1 172.31.221.1/24 1155332 32   set   udpcsum flags\(df\|csum\)
+> +	    2 172.31.222.1/24 1234567 45   set noudpcsum flags\(df\)
+> +	    3 172.31.223.1/24 1020304 23 unset   udpcsum flags\(csum\)
+> +	    4 172.31.224.1/24 1357986 15 unset noudpcsum' | sed '/^$/d')
+> +
+> +	while read -r i addr id ttl df csum flags; do
+> +		ovs_add_kernel_tunnel "${sbxname}" tns vxlan vxlan${i} ${addr} \
+> +			remote 172.31.110.2 id ${id} dstport 4789 \
+> +			ttl ${ttl} df ${df} ${csum} || return 1
+> +	done <<< "${configs}"
+> +
+> +	ovs_wait grep -q 'listening on upcall packet handler' \
+> +		${ovs_dir}/ovs-vxlan0.out || return 1
+> +
+> +	info "sending arping"
+> +	for i in 1 2 3 4; do
+> +		ovs_sbx "${sbxname}" ip netns exec tns \
+> +			arping -I vxlan${i} 172.31.22${i}.2 -c 1 \
+> +			>${ovs_dir}/arping.stdout 2>${ovs_dir}/arping.stderr
+> +	done
+> +
+> +	info "checking that received decapsulated packets carry correct metadata"
+> +	while read -r i addr id ttl df csum flags; do
+> +		arp_hdr="arp\\(sip=172.31.22${i}.1,tip=172.31.22${i}.2,op=1,sha="
+> +		addrs="src=172.31.110.1,dst=172.31.110.2"
+> +		ports="tp_src=[0-9]*,tp_dst=4789"
+> +		tnl_md="tunnel\\(tun_id=${id},${addrs},ttl=${ttl},${ports},${flags}\\)"
+> +
+> +		ovs_sbx "${sbxname}" grep -qE "MISS upcall.*${tnl_md}.*${arp_hdr}" \
+> +			${ovs_dir}/ovs-vxlan0.out || return 1
+> +	done <<< "${configs}"
+> +
+> +	return 0
+> +}
+> +
+>  run_test() {
+>  	(
+>  	tname="$1"
+
 
