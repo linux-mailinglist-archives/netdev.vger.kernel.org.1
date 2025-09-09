@@ -1,268 +1,171 @@
-Return-Path: <netdev+bounces-221457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B971B508A7
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 00:02:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC1AB508BC
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 00:11:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B793564662
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:02:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C0A41C63BE3
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 22:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CD32848A0;
-	Tue,  9 Sep 2025 22:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0617E265CC8;
+	Tue,  9 Sep 2025 22:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="URq2Fxdk"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="kY6PTagr";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="P2CDarXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112672773D8;
-	Tue,  9 Sep 2025 22:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB10526563B;
+	Tue,  9 Sep 2025 22:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757455218; cv=none; b=fcAfqmzywMD4X9q8cpogsVU5vWbIkOr2GlJiaFxjNtAzOuRe5biZ5h5fCynBVhqCUcKWgMD3qf8UeI9LOIKryoGP2N1e0Q82G2HRxQe0Z5BKaT5KRyJriV7o0YUJEWdUmsque98J7LubMlPZn2a4Him/abbUnoH0C0R6psHqNBg=
+	t=1757455882; cv=none; b=VUWa6HXIvlSfy0DOYqBaVuO2TYRtygc4gF1aSqMt3Cvl566qWCLfbRP8mKzsP7DTbnPXotGPNksy7MLyo9TiZtJges3QxSkyHJndpz19aOGJxAsGPwHC1GD+zdYiiDwMiwRkOsARykE7YKaK5W4hudqPaVntjcB32lXpefm1nw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757455218; c=relaxed/simple;
-	bh=J0wPZupB+Xsv5pSL6FaS6vYM6IU4qCEKiECUNs+CFV8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UmGmIVoWEepLO5+ufkP+4gr3G9SyNlExbh8Lr1dSWqziuxGCnfxJ62o018ty+P2yUvEFxbmsPzji4I55zzeKLskbnNw2vpVmXuECK287i+rGi8XGD2P3YjA2kRuumE96rlaBAYKIjpTI2eSJ3r7IzVcX7fkKeV6wXpwvKsPVYoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=URq2Fxdk; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757455216; x=1788991216;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=J0wPZupB+Xsv5pSL6FaS6vYM6IU4qCEKiECUNs+CFV8=;
-  b=URq2FxdkmtCq+yCguz2LNwoGaIeDzNW4KutB+2/bpYgJlJhTIDv91C5i
-   Okdw/HnY7c1AA6QtOlQFBuQoJ50s2DZs0CeZ8PNouIlYz/RqKOIshgUw5
-   bFYdMU5Ek0zVms0iPVMbn/YTzVPuedFJl35rNh3QjuT5GMIsqfPgcWEwA
-   ZydXe0bfrNxzlwWkMuNNBtPF7mwdFYdmXLaKkiYcP75wtuNbimtRLs+34
-   QSIz/2RFjtVRNaFwYXNX08UVM+Y5YrYixGUFkoyFI2Rcauo+cNub1o3IO
-   IztcViUG2xvvrXfBjtqaAJjdnbuGJ0xGeW0oesopQ76zBtOfgsTtaVwQD
-   g==;
-X-CSE-ConnectionGUID: rbSETMh3RkyskaPdPpAaCg==
-X-CSE-MsgGUID: je0gPVssQ+Ku9Ey8uAy3Tw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="63584676"
-X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="63584676"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 15:00:09 -0700
-X-CSE-ConnectionGUID: HNmsrvI3SqKaxlf3KYSRpQ==
-X-CSE-MsgGUID: 79gh8YjbTLSpo0j/yzml+w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="172780974"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 15:00:08 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Tue, 09 Sep 2025 14:57:56 -0700
-Subject: [PATCH RFC net-next 7/7] ice-vfio-pci: implement PCI .reset_done
- handling
+	s=arc-20240116; t=1757455882; c=relaxed/simple;
+	bh=AFFnAfzTRI3AFCuZ7KttlUOS8jFAymW/E8Tho7dKWOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FhmwTIruzrCLugF2+LaubQLMx0qfevfTQdz9JOJq8c3QYMAW+61gsA9ksiGc56JwczQeEqoO+6wPG0aj4Tiu/33JWODnI4Id6q43aJGZVzujEi8nx5ZFCTRKiLcRjiPa87YsbT2mwrpKK/yFrW4LIARCwGjoH+/fOOX8568OYDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=kY6PTagr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=P2CDarXW; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id C1686140000E;
+	Tue,  9 Sep 2025 18:11:18 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Tue, 09 Sep 2025 18:11:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1757455878; x=
+	1757542278; bh=vPzVhUzuxDxCy6rfXqpS+yYCdkswFPAm+UOp/km7akg=; b=k
+	Y6PTagr7y6f4+O6eVVO0tHOMPqCntmlp08u5lYiA4wkzsi2Qp0iVXw3unj61Jpz6
+	459RuyMQV5n8UvYM8uE+g4qw6K0TFVQa9e0g+aOW9NsOZJrCfvvU2zAmEIXh+6xh
+	HC55JwWV/qeXPKYmjnj5/8GLxxlPIneL8xbAYbqteQSNtjUF1rxc4aBjtcqPYAdf
+	gvKbDf9JJKQX70gsdEH36hFuWBJB2Gl1MnawbuMgK+bmNgB6UY3S/bvt2w7EfdKg
+	u7AIptbLruEKRHUV5PDg1Gmc7+qQ3YUxsqr2pxTzS0MGPogzbsw9sdkBN7Fk/Lw+
+	qgaXKs2VgA+XiigdN0WVw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757455878; x=1757542278; bh=vPzVhUzuxDxCy6rfXqpS+yYCdkswFPAm+UO
+	p/km7akg=; b=P2CDarXWlcPVWmFClLsxU8o7ENNDbD/CdEH2BzBSj9y3iuqwHN1
+	AJysntJ2y7GhXNNB2D/c2XItfHkZhSV7aT0RVFci9uqbd3Hc8QMh3BS6FCEofDyH
+	OzoRadJNBTcCtI2ABGeOc1d0hrD+/qengDiFdPRM9CmPVCkmW/z5Fp4XtdhNLlsD
+	/wgw2cHwwrdNizQEdPnB1AhoKE7bII02r2w3mKOzB36sHKqLYGoVnAAl9QDgM1HT
+	Qqu9AokUeVqhb8vaCcq5RcSvLH0YRvEYtQPjHwmswdUN/olfsVdLfN8pHDbj2XoH
+	j4xMwXam4xELBkRMcpkpuZi+ymiSe/Rz2ag==
+X-ME-Sender: <xms:BqbAaLaANP4g-IEWgRoNHQH_Dy3TUMEymQdA8pevJ4GUzCzlSeROUA>
+    <xme:BqbAaL9Nzay9wu1X8xCSFWlAmSMy5zEJmaPtN59BmXmgRu4id92fuI3Y4u5tFhV6b
+    bEslW-vjXOpJjqGMrI>
+X-ME-Received: <xmr:BqbAaESbI824YQWsbjEyMOFUuSMJa5KDZykUHalJ77whf_f_jY3tj98MjrEH>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvudehjecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdtredttd
+    dtjeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshih
+    shhnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhephffggeeivedthffgudffveeghe
+    egvedvteetvedvieffuddvleeuueegueeggeehnecuffhomhgrihhnpehshiiikhgrlhhl
+    vghrrdgrphhpshhpohhtrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgt
+    phhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehsughfsehfohhmih
+    gthhgvvhdrmhgvpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtth
+    hopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpd
+    hrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthho
+    pehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehshiiisghothdojegvtdhfkeelfhgsiegtrggvhegutddtvdguvgdtsehshiiikhgr
+    lhhlvghrrdgrphhpshhpohhtmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:BqbAaNds_uOd53E_J15ZGFq1kMsucWSRtpUFET1eaGZrSLFmi2Tqwg>
+    <xmx:BqbAaOSCxqGvU3cp2lWdw7-liYvFPddgYpBbiveG6avm5gPMPPCfwQ>
+    <xmx:BqbAaBJrbPmMTT1qS2lRQL-rpb2WyAvtmbQhqVqv33sRZpk3Ddh0Sw>
+    <xmx:BqbAaDI69sQSFCV1l8vERm4d9RkdBKB1ieYuI3J3it9K-wAt6V53iA>
+    <xmx:BqbAaIhgq1CSNv27_U8YE9sGwie6eQBpFjYAw1r_-rwxK82OijXyw-gu>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 9 Sep 2025 18:11:17 -0400 (EDT)
+Date: Wed, 10 Sep 2025 00:11:15 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org,
+	syzbot+7e0f89fb6cae5d002de0@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] macsec: sync features on RTM_NEWLINK
+Message-ID: <aMCmA0kz7EMG2uCw@krikkit>
+References: <20250908173614.3358264-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250909-e810-live-migration-jk-migration-tlv-v1-7-4d1dc641e31f@intel.com>
-References: <20250909-e810-live-migration-jk-migration-tlv-v1-0-4d1dc641e31f@intel.com>
-In-Reply-To: <20250909-e810-live-migration-jk-migration-tlv-v1-0-4d1dc641e31f@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
- Alex Williamson <alex.williamson@redhat.com>, 
- Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, 
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
- Kevin Tian <kevin.tian@intel.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- kvm@vger.kernel.org, linux-hardening@vger.kernel.org, 
- Jacob Keller <jacob.e.keller@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-X-Mailer: b4 0.15-dev-c61db
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6535;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=J0wPZupB+Xsv5pSL6FaS6vYM6IU4qCEKiECUNs+CFV8=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhowDi9Oc9l7cG7r7jd8j8xgrg+3CfcsaPnhv3DqJc7r7z
- oL80LXXOkpZGMS4GGTFFFkUHEJWXjeeEKb1xlkOZg4rE8gQBi5OAZjIvYeMDJcYun+8sgx+58h2
- 21lMLuaosZZXb36F35mIWWcXb4/iu8nIsMPz/pObfbdq4/WrO6/su6UT6hkY1P9YTX7O44a0/zd
- S2AA=
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250908173614.3358264-1-sdf@fomichev.me>
 
-Add an implementation callback for the PCI .reset_done handler to enable
-cleanup after a PCI reset. This function has one rather nasty locking
-complexity due to the way the various locks interact.
+2025-09-08, 10:36:14 -0700, Stanislav Fomichev wrote:
+> Syzkaller managed to lock the lower device via ETHTOOL_SFEATURES:
+> 
+>  netdev_lock include/linux/netdevice.h:2761 [inline]
+>  netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+>  netdev_sync_lower_features net/core/dev.c:10649 [inline]
+>  __netdev_update_features+0xcb1/0x1be0 net/core/dev.c:10819
+>  netdev_update_features+0x6d/0xe0 net/core/dev.c:10876
+>  macsec_notify+0x2f5/0x660 drivers/net/macsec.c:4533
+>  notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
+>  call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+>  call_netdevice_notifiers net/core/dev.c:2281 [inline]
+>  netdev_features_change+0x85/0xc0 net/core/dev.c:1570
+>  __dev_ethtool net/ethtool/ioctl.c:3469 [inline]
+>  dev_ethtool+0x1536/0x19b0 net/ethtool/ioctl.c:3502
+>  dev_ioctl+0x392/0x1150 net/core/dev_ioctl.c:759
+> 
+> It happens because lower features are out of sync with the upper:
+> 
+>   __dev_ethtool (real_dev)
+>     netdev_lock_ops(real_dev)
+>     ETHTOOL_SFEATURES
+>       __netdev_features_change
+>         netdev_sync_upper_features
+>           disable LRO on the lower
+>     if (old_features != dev->features)
+>       netdev_features_change
+>         fires NETDEV_FEAT_CHANGE
+> 	macsec_notify
+> 	  NETDEV_FEAT_CHANGE
+> 	    netdev_update_features (for each macsec dev)
+> 	      netdev_sync_lower_features
+> 	        if (upper_features != lower_features)
+> 	          netdev_lock_ops(lower) # lower == real_dev
+> 		  stuck
+> 		  ...
+> 
+>     netdev_unlock_ops(real_dev)
+> 
+> Per commit af5f54b0ef9e ("net: Lock lower level devices when updating
+> features"), we elide the lock/unlock when the upper and lower features
+> are synced. Makes sure the lower (real_dev) has proper features after
+> the macsec link has been created. This makes sure we never hit the
+> situation where we need to sync upper flags to the lower.
+> 
+> Reported-by: syzbot+7e0f89fb6cae5d002de0@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=7e0f89fb6cae5d002de0
+> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  drivers/net/macsec.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-The VFIO layer holds the mm_lock across a reset, and a naive implementation
-which just takes the state mutex would trigger a simple ABBA deadlock
-between the state_mutex and the mm_lock.
+Thanks for the detailed explanation of the problem.
 
-To avoid this, allow deferring handling cleanup after a PCI reset until the
-current thread holding the state_mutex exits.
-
-This is done through adding a reset_lock spinlock and a needs_reset
-boolean. All flows which previously simply released the state_mutex now
-call a specialized ice_vfio_pci_state_mutex_unlock() handler.
-
-This handler acquires the reset_lock, and checks if a reset was deferred.
-If so, the reset_lock is released, cleanup is handled, then the reset_lock
-is reacquired  and the thread loops to check for another deferred reset.
-Eventually the needs_reset is false, and the function exits by releasing
-the state_mutex and then the deferred reset_lock.
-
-The actual reset_done implementation acquires the reset lock, sets
-needs_reset to true, then uses try_lock to acquire the state mutex. If
-it fails to acquire the state mutex, this means another thread is handling
-business and will perform the deferred reset cleanup as part of unlocking
-the state mutex. Finally, if the reset_done does acquire the state mutex,
-it simply unlocks using the ice_vfio_pci_state_mutex_unlock helper which
-will immediately handle the "deferred" reset.
-
-This is complicated, but is similar to code in other VFIO migration drivers
-including the mlx5 driver and logic in the virtiovf migration code.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/vfio/pci/ice/main.c | 69 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 67 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vfio/pci/ice/main.c b/drivers/vfio/pci/ice/main.c
-index 161053ba383c..17865fab02ce 100644
---- a/drivers/vfio/pci/ice/main.c
-+++ b/drivers/vfio/pci/ice/main.c
-@@ -36,17 +36,21 @@ struct ice_vfio_pci_migration_file {
-  * @core_device: The core device being operated on
-  * @mig_info: Migration information
-  * @state_mutex: mutex protecting the migration state
-+ * @reset_lock: spinlock protecting the reset_done flow
-  * @resuming_migf: Migration file containing data for the resuming VF
-  * @saving_migf: Migration file used to store data from saving VF
-  * @mig_state: the current migration state of the device
-+ * @needs_reset: if true, reset is required at next unlock of state_mutex
-  */
- struct ice_vfio_pci_device {
- 	struct vfio_pci_core_device core_device;
- 	struct vfio_device_migration_info mig_info;
- 	struct mutex state_mutex;
-+	spinlock_t reset_lock;
- 	struct ice_vfio_pci_migration_file *resuming_migf;
- 	struct ice_vfio_pci_migration_file *saving_migf;
- 	enum vfio_device_mig_state mig_state;
-+	bool needs_reset:1;
- };
- 
- #define to_ice_vdev(dev) \
-@@ -154,6 +158,65 @@ static void ice_vfio_pci_disable_fds(struct ice_vfio_pci_device *ice_vdev)
- 	}
- }
- 
-+/**
-+ * ice_vfio_pci_state_mutex_unlock - Unlock state_mutex
-+ * @mutex: pointer to the ice-vfio-pci state_mutex
-+ *
-+ * ice_vfio_pci_reset_done may defer a reset in the event it fails to acquire
-+ * the state_mutex. This is necessary in order to avoid an unconditional
-+ * acquire of the state_mutex that could lead to ABBA lock inversion issues
-+ * with the mm lock.
-+ *
-+ * This function is called to unlock the state_mutex, but ensures that any
-+ * deferred reset is handled prior to unlocking. It uses the reset_lock to
-+ * check if any reset has been deferred.
-+ */
-+static void ice_vfio_pci_state_mutex_unlock(struct mutex *mutex)
-+{
-+	struct ice_vfio_pci_device *ice_vdev =
-+		container_of(mutex, struct ice_vfio_pci_device,
-+			     state_mutex);
-+
-+again:
-+	spin_lock(&ice_vdev->reset_lock);
-+	if (ice_vdev->needs_reset) {
-+		ice_vdev->needs_reset = false;
-+		spin_unlock(&ice_vdev->reset_lock);
-+		ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+		ice_vfio_pci_disable_fds(ice_vdev);
-+		goto again;
-+	}
-+	/* The state_mutex must be unlocked before the reset_lock, otherwise
-+	 * a new deferred reset could occur inbetween. Such a reset then be
-+	 * deferred until the next state_mutex critical section.
-+	 */
-+	mutex_unlock(&ice_vdev->state_mutex);
-+	spin_unlock(&ice_vdev->reset_lock);
-+}
-+
-+/**
-+ * ice_vfio_pci_reset_done - Handle or defer PCI reset
-+ * @pdev: The PCI device structure
-+ *
-+ * As the higher VFIO layers are holding locks across reset and using those
-+ * same locks with the mm_lock we need to prevent ABBA deadlock with the
-+ * state_mutex and mm_lock. In case the state_mutex was taken already we defer
-+ * the cleanup work to the unlock flow of the other running context.
-+ */
-+static void ice_vfio_pci_reset_done(struct pci_dev *pdev)
-+{
-+	struct ice_vfio_pci_device *ice_vdev = dev_get_drvdata(&pdev->dev);
-+
-+	spin_lock(&ice_vdev->reset_lock);
-+	ice_vdev->needs_reset = true;
-+	if (!mutex_trylock(&ice_vdev->state_mutex)) {
-+		spin_unlock(&ice_vdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&ice_vdev->reset_lock);
-+	ice_vfio_pci_state_mutex_unlock(&ice_vdev->state_mutex);
-+}
-+
- /**
-  * ice_vfio_pci_open_device - VFIO .open_device callback
-  * @vdev: the VFIO device to open
-@@ -526,7 +589,7 @@ ice_vfio_pci_set_device_state(struct vfio_device *vdev,
- 		}
- 	}
- 
--	mutex_unlock(&ice_vdev->state_mutex);
-+	ice_vfio_pci_state_mutex_unlock(&ice_vdev->state_mutex);
- 
- 	return res;
- }
-@@ -547,7 +610,7 @@ static int ice_vfio_pci_get_device_state(struct vfio_device *vdev,
- 
- 	*curr_state = ice_vdev->mig_state;
- 
--	mutex_unlock(&ice_vdev->state_mutex);
-+	ice_vfio_pci_state_mutex_unlock(&ice_vdev->state_mutex);
- 
- 	return 0;
- }
-@@ -583,6 +646,7 @@ static int ice_vfio_pci_core_init_dev(struct vfio_device *vdev)
- 	struct ice_vfio_pci_device *ice_vdev = to_ice_vdev(vdev);
- 
- 	mutex_init(&ice_vdev->state_mutex);
-+	spin_lock_init(&ice_vdev->reset_lock);
- 
- 	vdev->migration_flags =
- 		VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P;
-@@ -681,6 +745,7 @@ static const struct pci_device_id ice_vfio_pci_table[] = {
- MODULE_DEVICE_TABLE(pci, ice_vfio_pci_table);
- 
- static const struct pci_error_handlers ice_vfio_pci_core_err_handlers = {
-+	.reset_done = ice_vfio_pci_reset_done,
- 	.error_detected = vfio_pci_core_aer_err_detected,
- };
- 
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
 -- 
-2.51.0.rc1.197.g6d975e95c9d7
-
+Sabrina
 
