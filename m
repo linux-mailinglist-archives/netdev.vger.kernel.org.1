@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-221015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2220B49E40
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 02:46:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 796C9B49E46
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 02:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DA00189467D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:46:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 271124E00CA
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91A52550AD;
-	Tue,  9 Sep 2025 00:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDBF258EC2;
+	Tue,  9 Sep 2025 00:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5YZJQxS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/3TWMiv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF2624BCE8;
-	Tue,  9 Sep 2025 00:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BC62561A7;
+	Tue,  9 Sep 2025 00:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757378655; cv=none; b=tqJBX0rLiGNAN+KvTcE15JedvG/XoC332pdKMIj/ax/a+a5qudSgdFv+LpAUAx7n2mpk6K4M4XX4gQkzrG4Ih3lRcpV85CKJh3fouGMT+Bq70nnKzg3liJkCaOm44YEgj48wr+NjJBf7gWdWa72WcMVzqCGtHj+gtGwni3uB4b4=
+	t=1757378657; cv=none; b=jAb7Jxt82Pj2RcHOcXYTy+SwEt4w9b+DYS+S8N5Q+jj7a7Jj3gdbFtvbFYQlqJJHIJY8w9HsSLKkA7eL2maJ1BR2kfSFVZ0K03m6JQR36HbaYVXzNr3GGo09jK9gFLsYl0cbhmVDNuEcgInCclFJmJ0YGxBb8lMEcEmxBAgkh8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757378655; c=relaxed/simple;
-	bh=cR+i0j2nFSKam+gq7FWSsr5apx+a/lZwZMhEZIsHfcA=;
+	s=arc-20240116; t=1757378657; c=relaxed/simple;
+	bh=9PfEz4Fv9vbiKjA86FHBPrpc5Qev48VdLD6vnlFqEWY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JypzRkSLQ3yV4xkTWL0jI4Jv0gi8zm6l7L4H51LAOTEk4yiEMgFZH8zLgxBXJm5bEV5Pg+0Y+h/GHnD4sfp6AerqRcTUl2X/M/r6A9162t/9fzz6BI07mFSarkMBSP8ufaibXdZLj6PFzkNLMpfCRIxKVU2eiSX7Gnmb6izAhLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d5YZJQxS; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version; b=XW3Ux7Gxq6ctIJlsvj3lmQFyy9OfSyJjEeQ9aJcJfk9h1LBmUbIMHf8lY0RWiN8O62N+yaIsmdLMQJtgcX4twJqnieGx3qsqHlny424aVtR2zIbNFikr38sMkNq2yq2dnnERTIjv7CID9P0VpkuUb+g4/GQRzmatVoGoK9kF5Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y/3TWMiv; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45dde353b47so11039255e9.3;
-        Mon, 08 Sep 2025 17:44:13 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3dae49b117bso4371521f8f.1;
+        Mon, 08 Sep 2025 17:44:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757378652; x=1757983452; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757378654; x=1757983454; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HxXWRqnFqGYPd1tnhNthT3WKgGhl9VmDbyQfQ/+snwM=;
-        b=d5YZJQxSr/VqpHN4uzIuzoOYUZSqrf7+ew+0vrysePE66aJzLPZMRH+j0ISNJ+xC8d
-         THnQa761uCiDH9O2OtXUsY+1KKVD/4dIpj4ZXZA+FGAdzSTCbo0Gjulq2CiTkyCX/AOr
-         /LxS33XPafNMBqVVxWIzALVOPDWYf3s8srXoPJsLlxsC+Usf62EEB89AYqWeYbQtyJNK
-         8GmbSUSSNujzteoNX3Ad8t7xangNq7VikmExAOy8HBo0zDBVydS208g2DAusTGOYWDe2
-         zqi4tSD7yLjc/nVzqDjGQXs2dF9JfVMWYBXng7UGqJ6XMd2fE0+ftSxCXdlEJkLyyC8u
-         5I9A==
+        bh=PuU6T+eoD1QuN+NeWoko591lM5GIskHpuTQRyHxrkMk=;
+        b=Y/3TWMivO/appUsW/8AUmP44XYVZ8e/3n8zsPxemfPZfQjawwmmJjk5F37rYa8GWgU
+         Y/p8ok3R6lshYmrfLKGkNQKN+cbi4+vBrKmOoxYXodI1kpq8849nlNhdKBWRm2oz1Pia
+         kE4x2iYPbmoWnizq5DchjxUmmWePh24S+zmQhoGHpkkRx/hTDhRRbfaTTUmdPuRsNSFu
+         GiomMuy1l4ZgJe9u8FUA/GBM1+bdqTLZbdfe/xQXR63l5Emb0tykAaGXQYNDRqrPzr3D
+         5V7g96sfwhvtKcJEnDkCSwR68Zr0Vdjcl5APNZ+002DtukMFpHiw+xW18BgCmvU0D9Ae
+         r6XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757378652; x=1757983452;
+        d=1e100.net; s=20230601; t=1757378654; x=1757983454;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HxXWRqnFqGYPd1tnhNthT3WKgGhl9VmDbyQfQ/+snwM=;
-        b=uTNGWoXbJ6wpaVkmHxZUeuxVG3tGqjw0YF4m5tWvfzhONG99EFGBE3yfyHyu2s3/KU
-         RfDJxfh2GelyzfWgGDrMyONDQL6EG0nlGIolhG2M7E0EyWgIkzua5xRfWB1XtBkdcS6S
-         5hB6bqodgrODjJY8kqZsya+JhRpq2VWWwCUo9ShfYbc1Vtpq+2F8s3rEg6A0r4BxrloO
-         9LnRzaVOPNI7gwHJJibyhV9uXdQA0A5ILWgBkKz8e9iGFSv5XeVGYT6o8ItLbaO8UZaC
-         QyfZZtCTCw1uTTk4MJ0te9yoew8p0JcNSi4TS+2I/oUby7RJd63JUymUif8ASJFQyhg/
-         PhKg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHlJc/6Gx8LfB7Ts4NBHiayisb5XUZA4bvfMh9G1nZUtibUVxhNd/dM03kwFyYGkZPBZso4Q3Bz8SsAJsN@vger.kernel.org, AJvYcCUyLKqnnLBjFAO2lgPWiZ2/xg0K9TY+K9fplBzSRtfyOHqcZgBlsP4UPRqYqu4O5NJ1Jo87v4Nu@vger.kernel.org, AJvYcCXFAoZTaceW9ntpOa5Ct4t9AvpWRcqo7xt02xLvqcC28MFXD+3c8F+QpaJ+cNSm0SbRZkk7vaV/AVsq@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCZ1GKa3qOtV26In97XWz/dOy8RUbXxoGDcX2vj0hQ7pCvi7sk
-	mm2t3Q4Va3sWMK6NoetXrb7lWs6wF8ZChzQY4SArg0q9Ax02rvMCTrDH
-X-Gm-Gg: ASbGncvL7DB2xsIR8DmaK88vhMV8dvUUnRhWfEkSF2hgdNoYFaSoeXqVyO7FIYBTOc3
-	T1HRL5DJJgTDatFtTj7Y+kKkNWmiv8f4LkxLzvilqC0cmXlzqfqaZPC8KIoGu5e9RFVFhNa0kVb
-	6tFVxah7cFhHCsQrtcj4F1cOvHHDtGLUgB4P1Uyj0HsVRN7OQyYW5JRI9JswObcdl9IMuSUyuSO
-	tpZenLMl+fqq0PJq97a4U+Z3amrEDstjvAxMjwiAumu/6+U++yE1eC9CF38q07L8IxXK+TAUn8Q
-	GIQuFOygJ84L13cDNFo+quJsIlOq9KrJ1EhVG8iNtUsutZtuzn0RpxsvotwvQm2dajoM/PJOzop
-	nEoKl2X2/nPPYpimwcSRvExQJs7T9LYuAGfbP4PEkg9g1n/pllOm171evIe1mP4p341e70kjy8d
-	r8+DgVmg==
-X-Google-Smtp-Source: AGHT+IE2PbebWviQZhrJVIzRPMIFwfn7sDOAOGBDcrXAjk85O6+L3RpYW9/enKFosoJvEOtR+9h4ng==
-X-Received: by 2002:a05:600c:34c5:b0:45b:72a9:28b0 with SMTP id 5b1f17b1804b1-45ddded6d3amr91744265e9.28.1757378651959;
-        Mon, 08 Sep 2025 17:44:11 -0700 (PDT)
+        bh=PuU6T+eoD1QuN+NeWoko591lM5GIskHpuTQRyHxrkMk=;
+        b=A6Qi8c3ZgF/5nirog3Zk6ZrYF1ZKXFtnCOFIJvaS5bAPlrxAG/kNi8Vxv4B6LwOdTf
+         Fc6Nf6Kfii38agD77yZCsByYlDafdXRxod0iHs6EJAYwIUXqrKSb+KFwx2iugj52W6pB
+         05+mm4nIzxL5QykjDMia9nX0ztckc+e9NqpE2LSntWjlCgWBiYL9VPjUCEpGDBtQAnur
+         bcjewHbtpLCsBHVsMRssKfvd/E4+yMhOCQImAvi9et28K/snqtZt/rQ0UdgBPGQY818V
+         OzAqxx886esP610awdxY6tAIkEoNlZU5X5c363gdryI9Fdu6ZFGcr3poqw3tEX3GrpvJ
+         CJgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEgAaJX4aPMOqkP/QbNAZtJsWtaRnuMCjwrzpQPOx7KKj3YG4uLA4phA9abmDaJKx3XRht2frZFaJe@vger.kernel.org, AJvYcCUQBvHwg5pNB4KpJUYa867RTw2nqWoHdvF5IxDz0JtAvWgC9uypJhPFjQtCw7aD9L3QODdI/Qk99tAbLuNN@vger.kernel.org, AJvYcCV6/3aJLCjNbOd3ZYySHiyo+qqTfuvNgmXxvEBD6NuN1vQWfUgVUkg3d7KUZlUuJkv1Fons8gnl@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpEdi0a4nG3yp3xi7R0j38LRsCoiEd5tTwnbU/1Z9J9PiJjDPY
+	M7Uf26b62ZKffrJv0g1scENu//IMGUrWcFadJjE5aCbILgj2bpj5pPkO
+X-Gm-Gg: ASbGncsu1zgEdvi+CoOiC6oNRpEcJFCPPCfGlmaTVmKNTY7RrMVw3y3AdtlAtR4g8jK
+	DY0BYbsqR3nyE1ht8xaDWSDituIpdjL9hyQiRDHNWJ4DmC9OjUmWWfC2oRGvLRzqmym+PBO/Dr5
+	2Lkq4vgCzjDQ/Vzazhe8VKKuFSyf+iOTPknhRAsXURk0rbvLiPdMFoIHHW6+5u2WEOukEch4ZWN
+	zTDVYB2D+4FpdXm2ACkFn97Om8zbUmILyVM6JbGq8O2arKJAQSYJq1pWClNdnwNHH860qDcfHhZ
+	zvhMYF9lwbtLYasvtny7OetoOndvRiQfwBmx3fhlLh/jklq7C7sY9Gi3XRIXaEVMfjcvpaluPdd
+	LlgjOAyZQVVkxmj0/J/DXcTi7WcPdcdbdeFx4ok7xgvXTW/POVNxHM1LUmwKPwx+T48stjTw=
+X-Google-Smtp-Source: AGHT+IEcjcQHjuQxUzlPqCSGlAyA3Eba4g3hsWQufa/B2NEkUpIYPSPr3POj1KKYPpGs4Pe3LVCzHA==
+X-Received: by 2002:a05:6000:1a8d:b0:3e4:5717:3684 with SMTP id ffacd0b85a97d-3e6462581a2mr9317938f8f.40.1757378654321;
+        Mon, 08 Sep 2025 17:44:14 -0700 (PDT)
 Received: from Ansuel-XPS24 (host-95-249-236-54.retail.telecomitalia.it. [95.249.236.54])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45decf8759esm13526385e9.23.2025.09.08.17.44.09
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45decf8759esm13526385e9.23.2025.09.08.17.44.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 17:44:11 -0700 (PDT)
+        Mon, 08 Sep 2025 17:44:13 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Lee Jones <lee@kernel.org>,
@@ -101,9 +100,9 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v16 09/10] MAINTAINERS: add myself as maintainer for AN8855
-Date: Tue,  9 Sep 2025 02:43:40 +0200
-Message-ID: <20250909004343.18790-10-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v16 10/10] net: dsa: tag_mtk: add comments about Airoha usage of this TAG
+Date: Tue,  9 Sep 2025 02:43:41 +0200
+Message-ID: <20250909004343.18790-11-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250909004343.18790-1-ansuelsmth@gmail.com>
 References: <20250909004343.18790-1-ansuelsmth@gmail.com>
@@ -115,41 +114,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add myself as maintainer for AN8855 DSA driver and all the related
-subdriver (mfd, mdio, phy, nvmem)
+Add comments about difference between Airoha AN8855 and Mediatek tag
+bitmap.
+
+Airoha AN88555 doesn't support controlling SA learning and Leaky VLAN
+from tag. Although these bits are not used (and even not defined for
+Leaky VLAN), it's worth to add comments for these difference to prevent
+any kind of regression in the future if ever these bits will be used.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- MAINTAINERS | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ net/dsa/tag_mtk.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b81595e9ea95..818fe884fb0a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -740,6 +740,22 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
- F:	drivers/net/ethernet/airoha/
+diff --git a/net/dsa/tag_mtk.c b/net/dsa/tag_mtk.c
+index b670e3c53e91..ac3f956abe39 100644
+--- a/net/dsa/tag_mtk.c
++++ b/net/dsa/tag_mtk.c
+@@ -18,6 +18,9 @@
+ #define MTK_HDR_XMIT_TAGGED_TPID_88A8	2
+ #define MTK_HDR_RECV_SOURCE_PORT_MASK	GENMASK(2, 0)
+ #define MTK_HDR_XMIT_DP_BIT_MASK	GENMASK(5, 0)
++/* AN8855 doesn't support SA_DIS and Leaky VLAN
++ * control in tag as these bits doesn't exist.
++ */
+ #define MTK_HDR_XMIT_SA_DIS		BIT(6)
  
-+AIROHA AN8855 DSA DRIVER
-+M:	Christian Marangi <ansuelsmth@gmail.com>
-+L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
-+L:	linux-mediatek@lists.infradead.org (moderated for non-subscribers)
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/mfd/airoha,an8855.yaml
-+F:	Documentation/devicetree/bindings/net/airoha,an8855-phy.yaml
-+F:	Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
-+F:	Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
-+F:	drivers/mfd/airoha-an8855.c
-+F:	drivers/net/dsa/an8855.c
-+F:	drivers/net/dsa/an8855.h
-+F:	drivers/net/phy/air_an8855.c
-+F:	drivers/nvmem/an8855-efuse.c
-+
- AIROHA PCIE PHY DRIVER
- M:	Lorenzo Bianconi <lorenzo@kernel.org>
- L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+ static struct sk_buff *mtk_tag_xmit(struct sk_buff *skb,
 -- 
 2.51.0
 
