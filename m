@@ -1,90 +1,111 @@
-Return-Path: <netdev+bounces-221021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8851B49E69
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:00:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C8CBB49E74
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:01:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C47B7AA35D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 00:58:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17BCF3A77AF
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336FC2236E9;
-	Tue,  9 Sep 2025 01:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B352B21B9F6;
+	Tue,  9 Sep 2025 01:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5cLXug7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U2cA1Iwt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB5322259F
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 01:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413591EEA49
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 01:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757379610; cv=none; b=jRQjR7ZvYlpR8pbbTrqSQ9xLq21DA90aqGtV29OyYWX8y0bJvujK3Xg9RZR2k1np/oNvNGppKmGHftQ3x5kFO+XzDfnMONKAv+/1NWR5nQiAN5QYlqH5pwpM2bICmOVYVmqQZx7ZeiLEeRrwZw75LNhJZakxWBY8z3SnrEQjmiQ=
+	t=1757379707; cv=none; b=JKEy2wuHLSF1ZxlmUIxJm/9W++46UhEQcU7Mcy2f9LJcq4EYO3xv6VRscasOTVeuuNFm4h+ZGlSzShVR9o07Pd8CdD2aONBVkrnz3jfGIn5aezjOeUlxXbWhM9jVXvTQfoYciQFK9u/teP/ZwN+suXkAapFjpGgAmnhOChzwmJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757379610; c=relaxed/simple;
-	bh=YgyrdoMHq5oFkuv/AjXSurvOvAY0tejaeK9rC4DQEGk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dCllFkCnP2VYN+RwRUWlywR+R+C5cqUIt+jGUFScOUCgVzvDf0WbiY/Zjp059GQB/68/zPqFESLBUBNgwznhB1F8kx4mGcrSlVcy/r2be9AgbTilQ5YO/Ytn0AkNb42drgU6dXboyKU5eTJEq8U6PWT7KBe0cm/l+4T9FeSxCK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5cLXug7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9212BC4CEF8;
-	Tue,  9 Sep 2025 01:00:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757379609;
-	bh=YgyrdoMHq5oFkuv/AjXSurvOvAY0tejaeK9rC4DQEGk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=A5cLXug7G1ui5Vpr/Y52Of6c+k+pU9a6veMYbI/fAeK1fitnpbb3roHgSYehzPCGe
-	 6rppVpG2P4Obz1OG4rKn2zoyMJrbp9A+t9VU/kHZgAftvYXB9yGSBO3nOqB3bLP3H6
-	 TgnOf+ZWeZMuuyhGkmFZWIAvs42x/W8bKDE5d3FrJh/qhe9IQ+iwsLdfO1U7GgcJl2
-	 0N5CVyTHRo0NRCGyXEJuVoOrQOGLcZpfGJLwvdFTQfR9V59zJo/ajakQfD/PNP7a2W
-	 GexNdCHkjniJJMsEZd6hiIYlX15x1jZ7eXBHt4MFe2sxsYRQljVk2wSyIRf+N5oiFz
-	 7casIyduxlOIQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34B47383BF69;
-	Tue,  9 Sep 2025 01:00:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1757379707; c=relaxed/simple;
+	bh=D8q4oz+5nQ+UM/w4vLFgmI8FUHgj0o4Jl+WMAS3scsA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EULJdi/C0mETwFK/vQm95/x6JkV6/XfNlnJhNMpdl4RA43rDAZIzpgAOlt7ROuTF6EjgJ4n6CU5O7OppXyCsBayes9BBW9G4g4ijB6cruQ1bL4L6f/QEAB0x7uouhtvyTbQz5dgjXQxIdeyXhVklGJ2Nu2DnhNupp29f78hxL2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U2cA1Iwt; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-251fc032d1fso28455065ad.3
+        for <netdev@vger.kernel.org>; Mon, 08 Sep 2025 18:01:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757379705; x=1757984505; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D8q4oz+5nQ+UM/w4vLFgmI8FUHgj0o4Jl+WMAS3scsA=;
+        b=U2cA1Iwt+7QWVVP6lkooMkFChrTRKqwBLENAXXCFpdVdF+HPz+BidLqv9BuPSkuBB7
+         8xq/dx5PudU+CO8AQIX5et7mEK1JuH6TdoOpM6WwqvoRARYmnGgQPczDD4JVYZ72+BxP
+         DwUjB/Y9mnJCgYMS4KShI0RJn9nEnEgmwcW8kixHfn65n5M9w1RWKXCmjY9TTeHAGjC2
+         Wsytud8gxv23mNow+wggSCxqbOSg3TwJV3SSPOX2GxGtai+jdKPa+o89m3buUYChj4bK
+         Toxne8hYW7MADPThAOOuCAMdVtkqf/JDDcQwgCC+18ejrLO7jT8BNTtNC52sCdgL9A9M
+         197w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757379705; x=1757984505;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D8q4oz+5nQ+UM/w4vLFgmI8FUHgj0o4Jl+WMAS3scsA=;
+        b=OHgMkYR0ySncAo8ESuqX7HEXWzsycr+KX6geaX+x9CaTbuiuSefEyG01Ne/RH2Jz4X
+         P0AA4l3m0AtNMp7fVnHiUnXOYey1zcc979mhuXSSN9c5ELBerHgJ7u+X3MRP+PJkFuHg
+         cCyybhTO7rrokslzv0MszSQ4Jl2KlzWuphKUZtpCx99sHPU1qTUqh1r7qOdut8TWQKuw
+         DIVIIT+Aal5yLqzq/zN5xWGYjA/+N3Bk3GtPdVriChkToC4WaT0qri1vq5ryHE8Up5v4
+         ToKUZVOWUOXq6yFgH2mDkzZH4HlXiBtnHgBX30xZ5W8q20Ihob8in1IOOQMqNzPulzn0
+         vp6A==
+X-Forwarded-Encrypted: i=1; AJvYcCX6JP7DvgdHRVPM+2pNMljAYBOt3h4ZdSTvRPi4bY9K85Di9VDG2Gl6jBkjveVoqHhkg+aE0AA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYylrQVa4rx0e5ElpOTV6xszCUVZ4hvI5tYPwCLOwohY+BkVwx
+	iEHsCzWGANIioW2OxZuFHE7kri+jGiVHi5chZAu4NmLEiQxqipZY1+F1lq20XQaD0YDJInV+Fuv
+	eiSz4EtfPls0I3Nr3q1jHgwWF3digMGH1g66kGHJk
+X-Gm-Gg: ASbGnctCw5Dc5oFVwWJ3BhLVVw0xfDwQuPGqkoPqpnLefqJD1Jn/smi1AclR1eVNSS5
+	F2kmpQiD3CoyYxudJPNtbWqk/TcHYhGDUnJPpdJJhAhDyFs3hx0Amc3oU2MNJxKqaUmqsyszWCm
+	dqNRZDDsBl5wyKvkiz9UkfMqFals4yTY5cpfjYT1rEktgT88XNUPnoNQhXV5JG0OLhF5RerTEjm
+	RXTOzAFgn0aKZZNexnTmZe4xuWEXHs3upaB4m4a
+X-Google-Smtp-Source: AGHT+IGbfF85Gb8yUX1S5kLrlaqHX4+uOflDbv+3FPsdm9s3A4fbVGZGXb/apYzXp9uLCO3LRWcHy0W8tfE+64q709c=
+X-Received: by 2002:a17:903:ac5:b0:240:6aad:1c43 with SMTP id
+ d9443c01a7336-25172578d86mr126852905ad.48.1757379705302; Mon, 08 Sep 2025
+ 18:01:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: mctp: fix typo in comment
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175737961299.101810.11808569413824366025.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Sep 2025 01:00:12 +0000
-References: <20250905165006.3032472-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250905165006.3032472-1-alok.a.tiwari@oracle.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org
+References: <20250908223750.3375376-1-kuniyu@google.com> <hlxtpscuxjjzgsiom4yh6r7zj4vpiuibqod7mkvceqzabhqeba@zsybr6aadn3c>
+ <CAAVpQUC1tm+rYE07_5ur+x8eh0x7RZ2sR1PGHG9oRhdeAGBdrQ@mail.gmail.com> <r2lh33nhc5pyx7crfahdeijd5vdq74abcmrbqkls2zwnih76fk@opua7takczmc>
+In-Reply-To: <r2lh33nhc5pyx7crfahdeijd5vdq74abcmrbqkls2zwnih76fk@opua7takczmc>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 8 Sep 2025 18:01:34 -0700
+X-Gm-Features: Ac12FXzmOHLKUGla1DBqQy8MItu9iGPqcKsPVwmymYI-Zh_kp_tuOXZOHFq_XaE
+Message-ID: <CAAVpQUDBF8_GEuhrQBHaTkAAFX0C=zwnjifmyMnRkMDAyWDdbg@mail.gmail.com>
+Subject: Re: [PATCH v6 bpf-next/net 0/5] bpf: Allow decoupling memcg from sk->sk_prot->memory_allocated.
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, Sep 8, 2025 at 6:00=E2=80=AFPM Shakeel Butt <shakeel.butt@linux.dev=
+> wrote:
+>
+> On Mon, Sep 08, 2025 at 05:55:37PM -0700, Kuniyuki Iwashima wrote:
+> > Maybe _EXCLUSIVE would be a bit clearer ?
+> >
+> > net.core.memcg_exclusive (sysctl)
+> > SK_BPF_MEMCG_EXCLUSIVE
+>
+> Let's go with the exclusive one.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  5 Sep 2025 09:50:03 -0700 you wrote:
-> Correct a typo in af_mctp.c: "fist" -> "first".
-> 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-> ---
->  net/mctp/af_mctp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Here is the summary with links:
-  - [net-next] net: mctp: fix typo in comment
-    https://git.kernel.org/netdev/net-next/c/bd64723327e3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks, will use it.
 
