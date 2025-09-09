@@ -1,97 +1,115 @@
-Return-Path: <netdev+bounces-221037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71576B49EB9
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:30:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FA4B49ED7
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 03:47:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14247443EDA
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:30:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5167816328E
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 01:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A125A225409;
-	Tue,  9 Sep 2025 01:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+R6dEIz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3FB209F5A;
+	Tue,  9 Sep 2025 01:47:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730A8211499;
-	Tue,  9 Sep 2025 01:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E59B1A9F87
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 01:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757381435; cv=none; b=P7EFEIFUQDWwH2A4/AAP4EZLWAFxugK2Jzrr+gLqioxpBJ+pNN+81kTREr21/XogUCphARF8pFHr+SAjgIDn5QT7743+2q/dwpAQIqSwKLR6c4+nxb2rAbOF8GgTAWSml/PXtKTkmYzbZckAkaKBLlNG1foQiDRZLeBNCpep7S8=
+	t=1757382424; cv=none; b=CQtUL8HrlcIxvvux7nMf5sxFeERfWINKYCD7OugdUkB9/7HTKHXczDFq2QE8JqiXAbxQ7EU7U3B36/t7TmFMbeilc6J2ZPbf+BNKbG6HckLTN/eo+WsyubJLPGY6xt5ETJbskezfKjA+ZmT6ktA8luuUwaCMLAVTBbqW8qoJHj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757381435; c=relaxed/simple;
-	bh=g59nEI9rKVm3g34j4uFi3DXaOMima9O+BE+j4HH4QPU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BUg25wPwKSQ9GPIbJLIQA8+R5T7GsXp+UxUVB9A42ecCjIcLWbiw4thFVqja/EeFoIezLdPLNzSK+hnGZiwP1FvVGPlVbv3f5LhIn5dskndRUyqEazidCXQHTQTJJIS5gFDoEBIuMTn8WSNQIRMCI0WOiEcn4gFMLJwpmt4PS08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+R6dEIz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D73C4CEF1;
-	Tue,  9 Sep 2025 01:30:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757381435;
-	bh=g59nEI9rKVm3g34j4uFi3DXaOMima9O+BE+j4HH4QPU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l+R6dEIzS5bkBR42oF1Uj+OMANFVBhv1MI58ZBnupxGlNG4BMtFycVz4CgKB0C+hA
-	 +goRtlrG6eAKsN2eZ75LNZHQw4JnViVzPAxoEKI8G6WySuh85f3MQx7jNN2TlEUUxb
-	 eJGMGIhwKVMI3O3dV5Mgb2+Rb9i6qx6dlQTgI7mIk6EtXi4NKhy6U9KZHLCC9f0bqO
-	 AFkre/ReN+hfQUYFUC5QV7QGiZQYOMRFKa5GnooY4EG3+sYRgpeY9ydNHGAhPWXZ53
-	 vXKKXLTuzSz8uHJ+6H2bpjcGbO6SvzBcRBS+CyuOGdpRyirLjDTnA0OFLRxF2U4hMZ
-	 L6s8JoQOzYYKg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCC6383BF69;
-	Tue,  9 Sep 2025 01:30:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1757382424; c=relaxed/simple;
+	bh=kcnNEa04aDqlYIaE+UqNOuE22W/D8JqOvrf8nfL7M9Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=l1ugQuzPfu2cJcANHIwIxwQX2DqCZELZqTg9HtXGbMEDYm6isLqTNI5l/tiSGBFcMeLEOjGVQRN1mR0pKMAhsuyMHBZwdIQ0MLInRfMn8DbAsfujLSOa6mXjmhvC7EtFzCxrPcG2RZYTj3NTWe5V9VulLdFCRt3TlLI+qse4LCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4cLRS06790z24j7J;
+	Tue,  9 Sep 2025 09:43:44 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9C7661A0188;
+	Tue,  9 Sep 2025 09:46:58 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 9 Sep 2025 09:46:57 +0800
+Message-ID: <fe8e9969-76dd-4fc0-9da8-13656a870fb2@huawei.com>
+Date: Tue, 9 Sep 2025 09:46:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] vxlan: Make vxlan_fdb_find_uc() more robust
+ against NPDs
+To: Ido Schimmel <idosch@nvidia.com>, <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <andrew+netdev@lunn.ch>, <razor@blackwall.org>,
+	<petrm@nvidia.com>
+References: <20250908075141.125087-1-idosch@nvidia.com>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <20250908075141.125087-1-idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] rds: ib: Remove unused extern definition
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175738143824.108077.16911055038125503100.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Sep 2025 01:30:38 +0000
-References: <20250905101958.4028647-1-haakon.bugge@oracle.com>
-In-Reply-To: <20250905101958.4028647-1-haakon.bugge@oracle.com>
-To: =?utf-8?q?H=C3=A5kon_Bugge_=3Chaakon=2Ebugge=40oracle=2Ecom=3E?=@codeaurora.org
-Cc: allison.henderson@oracle.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-kernel@vger.kernel.org
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+在 2025/9/8 15:51, Ido Schimmel 写道:
+> first_remote_rcu() can return NULL if the FDB entry points to an FDB
+> nexthop group instead of a remote destination. However, unlike other
+> users of first_remote_rcu(), NPD cannot currently happen in
+> vxlan_fdb_find_uc() as it is only invoked by one driver which vetoes the
+> creation of FDB nexthops.
+>
+> Make the function more robust by making sure the remote destination is
+> only dereferenced if it is not NULL.
+>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   drivers/net/vxlan/vxlan_core.c | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index dab864bc733c..a5c55e7e4d79 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -446,7 +446,7 @@ int vxlan_fdb_find_uc(struct net_device *dev, const u8 *mac, __be32 vni,
+>   {
+>   	struct vxlan_dev *vxlan = netdev_priv(dev);
+>   	u8 eth_addr[ETH_ALEN + 2] = { 0 };
+> -	struct vxlan_rdst *rdst;
+> +	struct vxlan_rdst *rdst = NULL;
+>   	struct vxlan_fdb *f;
+>   	int rc = 0;
+>   
+> @@ -459,12 +459,13 @@ int vxlan_fdb_find_uc(struct net_device *dev, const u8 *mac, __be32 vni,
+>   	rcu_read_lock();
+>   
+>   	f = vxlan_find_mac_rcu(vxlan, eth_addr, vni);
+> -	if (!f) {
+> +	if (f)
+> +		rdst = first_remote_rcu(f);
+> +	if (!rdst) {
+>   		rc = -ENOENT;
+>   		goto out;
+>   	}
+>   
+> -	rdst = first_remote_rcu(f);
+>   	vxlan_fdb_switchdev_notifier_info(vxlan, f, rdst, NULL, fdb_info);
+>   
+>   out:
 
-On Fri,  5 Sep 2025 12:19:57 +0200 you wrote:
-> In the old days, RDS used FMR (Fast Memory Registration) to register
-> IB MRs to be used by RDMA. A newer and better verbs based
-> registration/de-registration method called FRWR (Fast Registration
-> Work Request) was added to RDS by commit 1659185fb4d0 ("RDS: IB:
-> Support Fastreg MR (FRMR) memory registration mode") in 2016.
-> 
-> Detection and enablement of FRWR was done in commit 2cb2912d6563
-> ("RDS: IB: add Fastreg MR (FRMR) detection support"). But said commit
-> added an extern bool prefer_frmr, which was not used by said commit -
-> nor used by later commits. Hence, remove it.
-> 
-> [...]
 
-Here is the summary with links:
-  - [net-next,v4] rds: ib: Remove unused extern definition
-    https://git.kernel.org/netdev/net-next/c/9f0730b063b4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Wang Liang <wangliang74@huawei.com>
 
 
