@@ -1,168 +1,131 @@
-Return-Path: <netdev+bounces-221306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC0B8B50198
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:40:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B651FB501C9
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DED516DE3D
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:40:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 717E7B6009C
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A616133CE93;
-	Tue,  9 Sep 2025 15:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C228126E6F0;
+	Tue,  9 Sep 2025 15:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="qzHM0172"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zjt8/Bgl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C185932CF7C;
-	Tue,  9 Sep 2025 15:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DAB265614
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 15:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757432328; cv=none; b=LDIdSA49uc5daO7ZMsQb+FhRiN3JD05Vu+bbXA67mgL7UhRCV0/N4LcWK+3di0lC+hgNppeYrYSTTmQ1Gr/pKY28AsJKLiT6HY2CebhFa8jtrvz4tFNAxc8wTkcxXRofSvPpJlMkpQ+WEYw2igHuLgUaUimUeD6RSfSpR1WfgmA=
+	t=1757432464; cv=none; b=f9kRq3bDit8CKyKCV47mV9ANeo00TiLG3x/DiwY6wx7T73x4LNGbYAhnVDiiWM32P+xYoFu5vli+E8IXFK63iH98b/pPiZwwGJeKgnMSFLHrBndpqV9+k5ZyjtfviLjMgqc5f/H1WI6qMGh9A7kyzNCo2IYcKeoa5jzNi34QfCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757432328; c=relaxed/simple;
-	bh=RAlsBwrMVc4mr9bqVlEkt0nwdmS1ROjRJD7r8ZvR60I=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:References:
-	 From:Cc:In-Reply-To; b=tYcaIuYaYerd9eqC5+RQsV4wY+8o3PTjL6GTgQTZvNdgI46523LGZEp3dVPl66Tt3lHiBahUnyHD7ZpRuexjufQT/w00ZwIEvMv24Nf0HxpKTumCByvX7GxKXxPzfo6lOoh6sNvWGvvfBZ1uSnGbEN+1qo4XbXPocI2OwjFCf9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=qzHM0172; arc=none smtp.client-ip=212.27.42.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
-Received: from [44.168.19.11] (unknown [86.195.82.193])
-	(Authenticated sender: bernard.pidoux@free.fr)
-	by smtp4-g21.free.fr (Postfix) with ESMTPSA id A027519F5C2;
-	Tue,  9 Sep 2025 17:38:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
-	s=smtp-20201208; t=1757432318;
-	bh=RAlsBwrMVc4mr9bqVlEkt0nwdmS1ROjRJD7r8ZvR60I=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=qzHM01722BI6JbHeJ1/3Zf5N4UAWNuhgpHNW82P+6yki2Q7qXJmHJwaFDdZwUaJ4O
-	 mKfp36cGxv91byJepZYY49w61mtr2s+1mA2sL/bC2J60H9L7bpWuRxogmk9m0cMOPE
-	 hqQN71ij4iyuVtjvs4NK27tApaeUto5rHIA5iU1Q7r39ao2pA/lF8P5T3gyTaeBZZN
-	 nmea/E2HOnSGjWpYWwKs/yU6gFfbj8IJZcPRS+W0ggqwdcAaDYOpLLQ67kUkSSKNeA
-	 REN5Q9KK0XZzD5I+y4l8XxKWlbrKdGMn+X/6Aog+QW1RzRMrnygJyTK6mNqUBqVJ6m
-	 d5KneRW1vwhWw==
-Content-Type: multipart/mixed; boundary="------------BFkYMDOTwEs82WuKU6RKQpL0"
-Message-ID: <e949c529-947f-4206-9b03-bf6d812abbf2@free.fr>
-Date: Tue, 9 Sep 2025 17:38:32 +0200
+	s=arc-20240116; t=1757432464; c=relaxed/simple;
+	bh=G/cKNxwQ9kE5DUoigzhBtkAZWj+vGuzCuAI2e96JlpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ehKepj+B/LcDa2aXD5Ta7XS2O+cWMpFg/hxNLI1NV1j680r1xrWCzf92XSsRSg2bruZ0MqZaI6qU6k3A76Voe4EHHsEK60aE0CJ8kqTKDaka2sgZjYczaAjqBGTcQyJ/8QDFhksfPWsZlAzvx978JI8Xmtf2q5n8MDcjDdJqJMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zjt8/Bgl; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UwNbTAExdKAs/sWkcEddQzbT3ea/Pxg+z4IDg8N4mK0=; b=zjt8/BglDrrImQdJ/ldsmx2fHs
+	TdAjyGBjFsRqDRPLsND7Vwcd9x7sh9ZrfO2TkVho/GYCuxXZ2ZlyRnFPl5yUenpMaF4HN0Yf+b/HM
+	CHVUfSRhPQiut9KGQnfAN8lUXXRpkMtWXR6xvNCcdtLyjQCQ9ZBI9mAvcNmXfi5n18JM3ZawBqXP1
+	GWaQmrkLotZPul6hK6G7GvQiBQ8gCvLuZyn5lyBuS1QQFXtrk4hEcdPfEBsw6uH9yPBNpjkGKYyaj
+	m9bSDg2lCJehzSo0u0+zGAEseEccJ3fOKjWryBn7akVlC0Kjp2lDx3yuyXB9IXVYNMaqLA6Mg0X8y
+	UXtfNO6Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51316)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uw0So-000000008Ml-0BbG;
+	Tue, 09 Sep 2025 16:40:58 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uw0Sl-000000000XU-2diA;
+	Tue, 09 Sep 2025 16:40:55 +0100
+Date: Tue, 9 Sep 2025 16:40:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: [Query] ethtool cumbersome timestamping options
+Message-ID: <aMBKh2sqDwkRY04y@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH] [AX25] fix lack of /proc/net/ax25 labels header
-To: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>,
- "David S . Miller" <davem@davemloft.net>
-References: <E3ABD638-BF7B-4837-8534-F73A1BB7CEB3@gmail.com>
-Content-Language: en-US
-From: Bernard Pidoux <bernard.pidoux@free.fr>
-Cc: David Ranch <dranch@trinnet.net>, Lee Woldanski <ve7fet@tparc.org>,
- Eric Dumazet <edumazet@google.com>
-In-Reply-To: <E3ABD638-BF7B-4837-8534-F73A1BB7CEB3@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-This is a multi-part message in MIME format.
---------------BFkYMDOTwEs82WuKU6RKQpL0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+While spending some time with PTP stuff, specifically my Marvell PTP
+library, and getting mv88e6xxx converted to it, etc, I was trying
+out the timestamping related ethtool options:
 
+        ethtool [ FLAGS ] -T|--show-time-stamping DEVNAME       Show time stamping capabilities
+                [ index N qualifier precise|approx ]
+        ethtool [ FLAGS ] --get-hwtimestamp-cfg DEVNAME Get selected hardware time stamping
+        ethtool [ FLAGS ] --set-hwtimestamp-cfg DEVNAME Select hardware time stamping
+                [ index N qualifier precise|approx ]
 
-[PATCH]  [AX25] fix lack of /proc/net/ax25 labels header
+and I'm finding them particularly cumbersome and irritating to use.
 
-/pro/net/ax25 never had a chance to be displayed in easily
-understandable format.
+Typing:
 
-First reason was the absence of labels header, second reason was
-pourly formated proc/net/ax25 lines.
+  ethtool -T eth0 index 0 qualifier precise
 
-Actually ax25_info_start() did not return SEQ_START_TOKEN and there was 
-no test for displaying header in ax25_info_show().
+or
 
-Another reason for lack of readability was poorly formatted 
-/proc/net/ax25 as shown:
+  ethtool -T eth0 index 1 qualifier precise
 
-00000000fb21b658 ax0 F6BVP-12 * 0 0 0 0 0 10 0 3 0 300 0 0 0 10 5 2 256 
-0 0 14949
+is quite annoying, especially when the man page states:
 
-The proposed patch initializes SEQ_START_TOKEN in ax25_list_start and 
-add a test for first time displaying header in ax25_info_show().
+           qualifier precise|approx
+                  Qualifier of the ptp hardware clock. Mainly "precise" the de‐
+                  fault one is for IEEE 1588 quality and "approx" is  for  NICs
+                  DMA point.
 
-In addition this patch provides a better formated display of /proc/net/
-ax25 aka /proc/net/nr or /proc/net/rose
+Note "the default one". That implies if it isn't given, this is what
+will be used if it isn't specified, but this isn't so, you have to
+type the whole "qualifier precise" thing out each and every time.
+So, it isn't a default at all.
 
-magic            dev src_addr  dest_addr digi1     digi2 .. st vs vr va 
-    t1     t2      t3     idle    n2   rtt window  paclen Snd-Q Rcv-Q  inode
-0000000040471056 ax0 F6BVP-13  F6BVP-9   -         -         3  5  4  5 
-   0/03   0/3   189/300   0/0    0/10    1   2      256    *     *     *
-000000002f11c115 ax0 F6BVP-13  F6BVP-11  -         -         3  5  4  5 
-   0/06   0/3   155/300   0/0    0/10    3   2      256    *     *     *
-00000000c534288b ax0 F6BVP-12  *         -         -         0  0  0  0 
-   0/10   0/3     0/300   0/0    0/10    5   2      256    0     0     50994
+Either the man page needs to be fixed, or ethtool needs to actually
+default to the value stated in the man page.
 
+Alternatively, in this age of AI, I'd suggest changing the -- options
+for timestamping to be:
 
-Signed-off-by: Bernard Pidoux <Bernard.pidoux@free.fr>
+ethtool --please-would-you-be-so-kind-as-to-change-the-timestamping-device-to
+...
 
+and
 
+ethtool --please-show-me-the-current-timestamping-device-information
 
---------------BFkYMDOTwEs82WuKU6RKQpL0
-Content-Type: text/plain; charset=UTF-8; name="af_ax25.patch"
-Content-Disposition: attachment; filename="af_ax25.patch"
-Content-Transfer-Encoding: base64
+and similar, because with AI giving the commands to be executed, it
+no longer matters how verbose command options are today. :D (I
+suspect there will be some who will have a humour failure with that
+suggestion...)
 
-ZGlmZiAtLWdpdCBhL25ldC9heDI1L2FmX2F4MjUuYyBiL25ldC9heDI1L2FmX2F4MjUuYw0K
-aW5kZXggNmVmOGIyYS4uMWUyZjkyNCAxMDA2NDQNCi0tLSBhL25ldC9heDI1L2FmX2F4MjUu
-Yw0KKysrIGIvbmV0L2F4MjUvYWZfYXgyNS5jDQpAQCAtMTkzMyw2ICsxOTMzLDEwIEBAIHN0
-YXRpYyB2b2lkICpheDI1X2luZm9fc3RhcnQoc3RydWN0IHNlcV9maWxlICpzZXEsIGxvZmZf
-dCAqcG9zKQ0KIAlfX2FjcXVpcmVzKGF4MjVfbGlzdF9sb2NrKQ0KIHsNCiAJc3Bpbl9sb2Nr
-X2JoKCZheDI1X2xpc3RfbG9jayk7DQorDQorCWlmICgqcG9zID09IDApDQorCQlyZXR1cm4g
-U0VRX1NUQVJUX1RPS0VOOw0KKw0KIAlyZXR1cm4gc2VxX2hsaXN0X3N0YXJ0KCZheDI1X2xp
-c3QsICpwb3MpOw0KIH0NCiANCkBAIC0xOTU2LDIzICsxOTYwLDM1IEBAIHN0YXRpYyBpbnQg
-YXgyNV9pbmZvX3Nob3coc3RydWN0IHNlcV9maWxlICpzZXEsIHZvaWQgKnYpDQogDQogCS8q
-DQogCSAqIE5ldyBmb3JtYXQ6DQotCSAqIG1hZ2ljIGRldiBzcmNfYWRkciBkZXN0X2FkZHIs
-ZGlnaTEsZGlnaTIsLi4gc3QgdnMgdnIgdmEgdDEgdDEgdDIgdDIgdDMgdDMgaWRsZSBpZGxl
-IG4yIG4yIHJ0dCB3aW5kb3cgcGFjbGVuIFNuZC1RIFJjdi1RIGlub2RlDQorCSAqIG1hZ2lj
-IGRldiBzcmNfYWRkciBkZXN0X2FkZHIsZGlnaTEsZGlnaTIsLi4gc3QgdnMgdnIgdmEgdDEv
-dDEgdDIvdDIgdDMvdDMgaWRsZS9pZGxlIG4yL24yIHJ0dCB3aW5kb3cgcGFjbGVuIFNuZC1R
-IFJjdi1RIGlub2RlDQogCSAqLw0KIA0KLQlzZXFfcHJpbnRmKHNlcSwgIiVwICVzICVzJXMg
-IiwNCisJaWYgKHYgPT0gU0VRX1NUQVJUX1RPS0VOKQ0KKwkJc2VxX3ByaW50ZihzZXEsDQor
-CQkJICJtYWdpYyAgICAgICAgICAgIGRldiBzcmNfYWRkciAgZGVzdF9hZGRyIGRpZ2kxICAg
-ICBcDQorZGlnaTIgLi4gc3QgdnMgdnIgdmEgICAgIHQxICAgICB0MiAgICAgIHQzICAgICBp
-ZGxlICAgIG4yICAgcnR0IFwNCit3aW5kb3cgIHBhY2xlbiBTbmQtUSBSY3YtUSAgaW5vZGVc
-biIpOw0KKwllbHNlIHsNCisJCXNlcV9wcmludGYoc2VxLCAiJXAgJXMgJS05cyVzIiwNCiAJ
-CSAgIGF4MjUsDQogCQkgICBheDI1LT5heDI1X2RldiA9PSBOVUxMPyAiPz8/IiA6IGF4MjUt
-PmF4MjVfZGV2LT5kZXYtPm5hbWUsDQogCQkgICBheDJhc2MoYnVmLCAmYXgyNS0+c291cmNl
-X2FkZHIpLA0KLQkJICAgYXgyNS0+aWFtZGlnaT8gIioiOiIiKTsNCi0Jc2VxX3ByaW50Zihz
-ZXEsICIlcyIsIGF4MmFzYyhidWYsICZheDI1LT5kZXN0X2FkZHIpKTsNCisJCSAgIGF4MjUt
-PmlhbWRpZ2k/ICIqIjoiICIpOw0KKwkJc2VxX3ByaW50ZihzZXEsICIlLTlzIiwgYXgyYXNj
-KGJ1ZiwgJmF4MjUtPmRlc3RfYWRkcikpOw0KIA0KLQlmb3IgKGs9MDsgKGF4MjUtPmRpZ2lw
-ZWF0ICE9IE5VTEwpICYmIChrIDwgYXgyNS0+ZGlnaXBlYXQtPm5kaWdpKTsgaysrKSB7DQot
-CQlzZXFfcHJpbnRmKHNlcSwgIiwlcyVzIiwNCi0JCQkgICBheDJhc2MoYnVmLCAmYXgyNS0+
-ZGlnaXBlYXQtPmNhbGxzW2tdKSwNCi0JCQkgICBheDI1LT5kaWdpcGVhdC0+cmVwZWF0ZWRb
-a10/ICIqIjoiIik7DQotCX0NCisJCWlmIChheDI1LT5kaWdpcGVhdCA9PSBOVUxMKSB7DQor
-CQkJc3RyY3B5KGJ1ZiwiLSIpOw0KKwkJCXNlcV9wcmludGYoc2VxLCAiICUtOXMgJS05cyAi
-LCBidWYsYnVmKTsNCisJCX0NCisJCWVsc2Ugew0KKwkJCWZvciAoaz0wOyBrIDwgYXgyNS0+
-ZGlnaXBlYXQtPm5kaWdpOyBrKyspIHsNCisJCQkJc2VxX3ByaW50ZihzZXEsICIlLTlzJXMi
-LA0KKwkJCQlheDJhc2MoYnVmLCAmYXgyNS0+ZGlnaXBlYXQtPmNhbGxzW2tdKSwNCisJCQkJ
-YXgyNS0+ZGlnaXBlYXQtPnJlcGVhdGVkW2tdPyAiKiI6IiAiKTsNCisJCQl9DQorCQl9DQog
-DQotCXNlcV9wcmludGYoc2VxLCAiICVkICVkICVkICVkICVsdSAlbHUgJWx1ICVsdSAlbHUg
-JWx1ICVsdSAlbHUgJWQgJWQgJWx1ICVkICVkIiwNCisJCXNlcV9wcmludGYoc2VxLCAiJWQg
-ICVkICAlZCAgJWQgICAlMmx1LyUwMmx1ICAgJWx1LyVsdSAgICUzbHUvJWx1ICAgJWx1LyVs
-dSAgICUyZC8lMmQgICUzbHUgJTNkICAgICAgJTNkIiwNCiAJCSAgIGF4MjUtPnN0YXRlLA0K
-IAkJICAgYXgyNS0+dnMsIGF4MjUtPnZyLCBheDI1LT52YSwNCiAJCSAgIGF4MjVfZGlzcGxh
-eV90aW1lcigmYXgyNS0+dDF0aW1lcikgLyBIWiwgYXgyNS0+dDEgLyBIWiwNCkBAIC0xOTg1
-LDEzICsyMDAxLDEzIEBAIHN0YXRpYyBpbnQgYXgyNV9pbmZvX3Nob3coc3RydWN0IHNlcV9m
-aWxlICpzZXEsIHZvaWQgKnYpDQogCQkgICBheDI1LT53aW5kb3csDQogCQkgICBheDI1LT5w
-YWNsZW4pOw0KIA0KLQlpZiAoYXgyNS0+c2sgIT0gTlVMTCkgew0KLQkJc2VxX3ByaW50Zihz
-ZXEsICIgJWQgJWQgJWx1XG4iLA0KKwkJaWYgKGF4MjUtPnNrICE9IE5VTEwpIHsNCisJCQlz
-ZXFfcHJpbnRmKHNlcSwgIiAgICAlLTNkICAgJS0zZCAgICVsdVxuIiwNCiAJCQkgICBza193
-bWVtX2FsbG9jX2dldChheDI1LT5zayksDQogCQkJICAgc2tfcm1lbV9hbGxvY19nZXQoYXgy
-NS0+c2spLA0KIAkJCSAgIHNvY2tfaV9pbm8oYXgyNS0+c2spKTsNCi0JfSBlbHNlIHsNCi0J
-CXNlcV9wdXRzKHNlcSwgIiAqICogKlxuIik7DQorCQl9IGVsc2UNCisJCQlzZXFfcHV0cyhz
-ZXEsICIgICAgKiAgICAgKiAgICAgKlxuIik7DQogCX0NCiAJcmV0dXJuIDA7DQogfQ0K
+Thanks.
 
---------------BFkYMDOTwEs82WuKU6RKQpL0--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
