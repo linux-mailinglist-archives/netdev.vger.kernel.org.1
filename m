@@ -1,98 +1,167 @@
-Return-Path: <netdev+bounces-221137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C950B4A78F
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:24:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21EB7B4A7FB
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 11:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81F7F16E687
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:23:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3A783B0292
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 09:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01045305972;
-	Tue,  9 Sep 2025 09:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="huvR+DMX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE7231196F;
+	Tue,  9 Sep 2025 09:16:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1BA304980;
-	Tue,  9 Sep 2025 09:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BAA3115A2;
+	Tue,  9 Sep 2025 09:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757409354; cv=none; b=md/fE3oacnBPeciPOpSIuoLHe3UP1+ADlkqSCpBKwqHfAuHEomNqZhf9rVYipXEg6VCJChUfzOgUgwAMjCLaOxpMrGzyY+7Y3Yq5mKyFMKnF6FOlMXDOsOungNbQyemg1XFrOrLaFtQxRfVYvoNTxQpRW0SsbIxAF3x5RFx/D1I=
+	t=1757409382; cv=none; b=LNQuuDlYhdfsB3nu3Qq6cgFjZHX3Iro8d5wzs8+DOmOKU930EMZsch9l8d8HHz3IBVaRIgOvKKzSmoeaYY3ituvyujOZhtn0x/QrD3cmsk7zD03VwgN8iIA/Ee4ttwtuqTFPyx2BDWNqHGVo20CytZABf6QWKZVddIs9EeX+7A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757409354; c=relaxed/simple;
-	bh=KEUSLfMMWB84n7xGRN2SjgOotEQ+TRM8VUQ+2PeCgJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jTSpHtp8yTgVB4vkGK2xmCpU+bCrk/pldrahBT8lk5zgzCxZmUF9iya8KLlDxTbBCEVt/oaTisvsZfeXF40ElXCA+Xht1rY/orM8Gc6Y18/nJY0f6WEHxzwEBv3XwUabU8CCF2KVJLEweCY4x5UXBZ8jGgz8rP3zhc2JitOFHts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=huvR+DMX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92FB3C4CEF5;
-	Tue,  9 Sep 2025 09:15:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757409354;
-	bh=KEUSLfMMWB84n7xGRN2SjgOotEQ+TRM8VUQ+2PeCgJw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=huvR+DMX/VdgIqdU+01Zkr09A/ol3h1HFuMavOqpA4amye8tc/KoxhrDtl0kM5OFk
-	 fNv3dTw2WWLU0BBvrOgy74OSva0JjyE4cOXsqn/KfRa8L0BChj0um/pli9OcSRKBC7
-	 D5NQEA0utsrwkvWnrWaitCLquTHZkbxFM285zH/cKQVb1vl0n/1GR50ITM7422erS3
-	 LjgBFOZen8H/WE8Ers9scHzBVCm0wzU2Wt7JSZL95CF4phNVFQfhE60WV1rSqJZIrS
-	 UG0FKsBV0vMUbgH9LbzZW6nnJ2mNkuvhS8fl2JGYjOIMrnl81H4ic0PAKl1Btw7r8h
-	 Eu8EEJbTTv/ww==
-Date: Tue, 9 Sep 2025 10:15:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yangyu Chen <cyy@cyyself.name>
-Cc: netdev@vger.kernel.org, Igor Russkikh <irusskikh@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: atlantic: make RX page order tunable via module
- param
-Message-ID: <20250909091550.GA13871@horms.kernel.org>
-References: <tencent_E71C2F71D9631843941A5DF87204D1B5B509@qq.com>
- <20250909091313.GF2015@horms.kernel.org>
+	s=arc-20240116; t=1757409382; c=relaxed/simple;
+	bh=KhNe5EohkIJJ/ORZD64COqm6Rpner7HoEznaf9Hkt4g=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=g6gQMmNA4Km3J5naCeH6rjj6f49IPVfDFqtvkbop6+A8sPcybZV1YZ9ewFPLCw5zWI6H2gXOL/82Yd1tGT+mSLW1rCaw6P/wq6UPuMassD6T203LMf4U0wwkF2JcHircU4QTlYvjqNSSjdhvQuQLqy6ZbAsNH37oaaLkiFwjdiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cLdV96KrvzYQv4V;
+	Tue,  9 Sep 2025 17:16:17 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 603261A1EF0;
+	Tue,  9 Sep 2025 17:16:16 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCX4o5f8L9oUeWjBw--.25902S3;
+	Tue, 09 Sep 2025 17:16:16 +0800 (CST)
+Subject: Re: [syzbot] [net?] possible deadlock in inet_shutdown
+To: Eric Dumazet <edumazet@google.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: syzbot <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com>,
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+ davem@davemloft.net, dsahern@kernel.org, horms@kernel.org, kuba@kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ming.lei@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <68bb4160.050a0220.192772.0198.GAE@google.com>
+ <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
+ <CANn89iJaY+MJPUJgtowZOPwHaf8ToNVxEyFN9U+Csw9+eB7YHg@mail.gmail.com>
+ <c035df1c-abaf-9173-032f-3dd91b296101@huaweicloud.com>
+ <CANn89iKVbTKxgO=_47TU21b6GakhnRuBk2upGviCK0Y1Q2Ar2Q@mail.gmail.com>
+ <51adf9cb-619e-9646-36f0-1362828e801e@huaweicloud.com>
+ <CANn89iLhNzYUdtuaz9+ZHvwpbsK6gGfbCWmoic+ACQBVJafBXA@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5b3daf68-7657-a96c-9322-43e5ed917174@huaweicloud.com>
+Date: Tue, 9 Sep 2025 17:16:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250909091313.GF2015@horms.kernel.org>
+In-Reply-To: <CANn89iLhNzYUdtuaz9+ZHvwpbsK6gGfbCWmoic+ACQBVJafBXA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCX4o5f8L9oUeWjBw--.25902S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFykKr4rXw47JFWDWr1UGFg_yoW5JFW3pF
+	48Gayj9rs7JFW8C3s2qw4jkryUtrZ3Ga4aqFyDKr13uF9FyFn5Xr17Kan8WFWUWr4kCw1a
+	va1Yqas29r13Aw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjTRKE_MDUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, Sep 09, 2025 at 10:13:17AM +0100, Simon Horman wrote:
-> On Sat, Sep 06, 2025 at 09:54:34PM +0800, Yangyu Chen wrote:
+Hi,
 
-...
-
-> > diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> > index b24eaa5283fa..48f35fbf9a70 100644
-> > --- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> > +++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> > @@ -40,6 +40,10 @@ static unsigned int aq_itr_rx;
-> >  module_param_named(aq_itr_rx, aq_itr_rx, uint, 0644);
-> >  MODULE_PARM_DESC(aq_itr_rx, "RX interrupt throttle rate");
-> >  
-> > +static unsigned int rxpageorder = AQ_CFG_RX_PAGEORDER;
-> > +module_param_named(rxpageorder, rxpageorder, uint, 0644);
-> > +MODULE_PARM_DESC(rxpageorder, "RX page order");
-> > +
+在 2025/09/08 17:40, Eric Dumazet 写道:
+> On Mon, Sep 8, 2025 at 2:34 AM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>
+>> Hi,
+>>
+>> 在 2025/09/08 17:07, Eric Dumazet 写道:
+>>> On Mon, Sep 8, 2025 at 1:52 AM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>>>
+>>>> Hi,
+>>>>
+>>>> 在 2025/09/06 17:16, Eric Dumazet 写道:
+>>>>> On Fri, Sep 5, 2025 at 1:03 PM Eric Dumazet <edumazet@google.com> wrote:
+>>>>>>
+>>>>>> On Fri, Sep 5, 2025 at 1:00 PM syzbot
+>>>>>> <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com> wrote:
+>>>>>
+>>>>> Note to NBD maintainers : I held about  20 syzbot reports all pointing
+>>>>> to NBD accepting various sockets, I  can release them if needed, if you prefer
+>>>>> to triage them.
+>>>>>
+>>>> I'm not NBD maintainer, just trying to understand the deadlock first.
+>>>>
+>>>> Is this deadlock only possible for some sepecific socket types? Take
+>>>> a look at the report here:
+>>>>
+>>>> Usually issue IO will require the order:
+>>>>
+>>>> q_usage_counter -> cmd lock -> tx lock -> sk lock
+>>>>
+>>>
+>>> I have not seen the deadlock being reported with normal TCP sockets.
+>>>
+>>> NBD sets sk->sk_allocation to  GFP_NOIO | __GFP_MEMALLOC;
+>>> from __sock_xmit(), and TCP seems to respect this.
+>>> .
+>>>
+>>
+>> What aboud iscsi and nvme-tcp? and probably other drivers, where
+>> sk_allocation is GFP_ATOMIC, do they have similar problem?
+>>
 > 
-> Unfortunately adding new module parameters to networking drivers
-> is strongly discouraged. Can we find another way to address the problem
-> described in your cover: e.g.
+> AFAIK after this fix, iscsi was fine.
 > 
-> 1. Changing the fixed value
-> 2. Somehow making the value auto detected
-> 3. Some other mechanism to allow the user to configure the value, e.g. devlink
+> commit f4f82c52a0ead5ab363d207d06f81b967d09ffb8
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Fri Sep 15 17:11:11 2023 +0000
 > 
-> ...
+>      scsi: iscsi_tcp: restrict to TCP sockets
+> 
+>      Nothing prevents iscsi_sw_tcp_conn_bind() to receive file descriptor
+>      pointing to non TCP socket (af_unix for example).
+> 
+>      Return -EINVAL if this is attempted, instead of crashing the kernel.
+> 
+>      Fixes: 7ba247138907 ("[SCSI] open-iscsi/linux-iscsi-5 Initiator:
+> Initiator code")
+>      Signed-off-by: Eric Dumazet <edumazet@google.com>
+>      Cc: Lee Duncan <lduncan@suse.com>
+>      Cc: Chris Leech <cleech@redhat.com>
+>      Cc: Mike Christie <michael.christie@oracle.com>
+>      Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
+>      Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+>      Cc: open-iscsi@googlegroups.com
+>      Cc: linux-scsi@vger.kernel.org
+>      Reviewed-by: Mike Christie <michael.christie@oracle.com>
+>      Signed-off-by: David S. Miller <davem@davemloft.net>
+> .
+> 
 
-Oops. I now see that Andrew and Jakub already responded.
-And my comment doesn't add much. Sorry about that.
+Yes, now I also agree similiar fix in nbd make sense. Perhaps can you
+cook a patch?
+
+Thanks,
+Kuai
+
 
