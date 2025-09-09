@@ -1,149 +1,126 @@
-Return-Path: <netdev+bounces-221362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CFEB504D1
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:04:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B08A6B504D2
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 20:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35ECD16845B
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 18:04:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E86747A3BCA
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 18:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C67322A33;
-	Tue,  9 Sep 2025 18:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF77352080;
+	Tue,  9 Sep 2025 18:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="oN6Uv685"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gi/Q5WSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9EF316911
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 18:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E4122FE02
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 18:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757441060; cv=none; b=tEnbbdHfkSK0rbZ+oONs5LgCvM/Nl8LpYstiWyF7eCZJ24ifPxJcbLwH9aPj2UtGbm5tMWMP+kzaD09hLhChu78NAaTNFN/xCZ0PLA/IyXaf4kk9DaACSLSnz7/absYkUQIUfLf8yUufwyjBTMRE5IbKpdvcKQ+pfBg62HCrF9I=
+	t=1757441127; cv=none; b=osE/iM/oFPxnDiyPVCzbt97KBAM1T0gz257PsptfrWwjpyb+5EeSMac6fE2DudzJtmJ22RTMfZ0XSaYg4AvX862/YdIOfBccgFta8L7wE8uQqUoTO7HFClqOL+/OqcQ8tYNP6Aq92gSlLgnODBMnCnwjEQ8mNpdzQxhbzVAr07Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757441060; c=relaxed/simple;
-	bh=t3ogoGwsEbOcnF5MtnKBQx4qwSAUc3CpJnoXYCI6bn0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H657Ps0tOcvPUIw6zYOorUOZbIoaEV+hzewxRMHCjO6lwzIED3EbbACJAW12b5yBeKcDxKIK0PJtM/QiVfwz1qYhYQniaFj1gAZvZgpLx2G+0/cvq/YRmPe8sQBInUoF9f4UVf2P5R/2tnBI22aH2N/JgBcRhnkyiWmIuNB4uYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=oN6Uv685; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-55f6ad5146eso5547424e87.0
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 11:04:18 -0700 (PDT)
+	s=arc-20240116; t=1757441127; c=relaxed/simple;
+	bh=KQnBKWiKGDvpyRUHkX9MClcceIL7m2tOELzThwhZocI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JgbjeIXiEbTBC1uMytQSNNoEXRNXMpsIzowx+PNMyux3abI/vewsu3tRxoMHi0/7WRL/RFtdX4ZDVTpggcbs9v9u0We1yzKiS4+M2comQfinPopOSrOA/2kAkAtYEYOURfnqibiYryLt9cEN5gQxGFgwyuneCtWjRiHVZ9dbh8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gi/Q5WSM; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-55f62f93fdfso1015e87.0
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 11:05:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1757441056; x=1758045856; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1mWafMalxy8wlFhvbjLhYh9NfOkuAzkFOgJG++XNgQE=;
-        b=oN6Uv685UPfB8gWZE8GzBLT2aFISIiVbAkync7DzbQvYrugqDJ3FI/H/IFiajRXwNW
-         qGu0ffuFAaCldV5+JqFttec4BWOWr57lGT3vowbke/yPngSpzj0YfZ+uFwFVjYqNZCPL
-         TciRtZyPo4tIbW5cj4O5Sp12YJ+FIS4kLYlK79H94P6dW+45Ni+RWtLTc+ieOxNP7MSU
-         KO5nDJuH68QNJAgVhHr6kKT2LzYx3JJX6PRzoOa1rPBjJsp9xBLRhgp83r3bqTouOu78
-         u8b4i/9cQQ8difebaBtRxM2h7qDvzrGGB7UMRQnA6wA2TBCXlHFTA5wgY0+jyQ6/h8vp
-         XXHg==
+        d=google.com; s=20230601; t=1757441124; x=1758045924; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2JzUzLkWPMiRqdMU2PWQrLrGvNPVrl2fkDBIgw67gME=;
+        b=Gi/Q5WSMrC0wCOEp3QRMImuW9buVdiKy1KIsbhQKRIdjt5tu4Ze8/0KL1GcUM9ufNg
+         PHivylWrP9aDsM42FKV3PuF29oJo45fG2zbbsWAiV0plKT3M0zo78sf1zFEM/dS8D9CK
+         R6t+qohtbetx9LLIJ1JFlI7hm0ykgKyp2dArMknK8Xm7LMdA7ykpp4cuSLFJ3VIlZgOq
+         nIQ9xxy/bzwub4SBfbB3kx5rIvtefef5Nhrz9r74MkQe+qfolrkiGxoOze60pRbI+Q8W
+         37/X2SS6Dug3WSKpkCtqhh9yQVZnGjMkrX1LNauNcdN62RAzycgppRYD6YIqJlEUySTt
+         +5hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757441056; x=1758045856;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1mWafMalxy8wlFhvbjLhYh9NfOkuAzkFOgJG++XNgQE=;
-        b=MnEq8xgf0sKIBs9ALaPaJaLyKSSGehYEPdh07modfuHtYlMeTgZSDppg6uTJU92s4L
-         PdJK+SB5D6jvQLeqILHxcOZgSG9YZCcMjP/yofcGv9XSiV9EbCRN1FWtzoCFAhX129tI
-         c6ndQs+PJGCah7IP4zQ/QydMA9CaFYoYnKq551AcVaxswkE456vujeKmT83nhWNE+kht
-         4o2+Woyoqcs7xtsgaf2jDwTIyqEvP8k2Ea2iJ8C+BMgewRRMK9mR/bjDVdcF61g3vhar
-         yR5YY8C+YNdKf2fzAnC86tbfE9wnk6gB7rVRfhrbvZzSTHf5l6P1tfyozEehh1DIeGR3
-         Vazw==
-X-Forwarded-Encrypted: i=1; AJvYcCUO8ErRZgK0Vu6srDS3I1SdCbmKBHf6Pi3pK0tEEFL3scpsHkRjWMCPUMEughhABwVd15hlZjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYd74loIZca+WSki3wKGgpkg3Y71VThyzgvWIUIWJSHYUCeg+B
-	nGCTFgrsPhIdTRr2/Qi+Xarva9PhyiGbgIp3suL5lRFLNzFVKKpDNcgAtIBePr43UyfRvBZPVSE
-	QpA3oAXU=
-X-Gm-Gg: ASbGncvLuf1iaiL+B9t5fLCdME3CrzFjT/3w0Y23PAeBINgu3dol8ngqqO0IGmtcWF2
-	42uzUsuMOcTcQdWLrhSktMfo1z7Ink9XrrXTU1tk1JpibJR93xOBb5hAAUicXi6DPPUURc3T1wg
-	OxBD49wt8ErqLfrEwDAi4NI3IHIzqXdPyJ+C4Pr9DU/XnC6pOrPNQl6BdLtPYJKEAkaWxss7/p3
-	BlzsfnIy9sMCugRIE+OwuIDrUH/CuHLMD3upkDwbGlyRYAwxGVMoVacQPv4/21mBZl4vpw4mDiz
-	K72UAJ45iuL/KGIXIJXxzYFf2v7w79WylGH/IQuG/W2eHTrcKjcGkV/Up34ogSBIfa0jlmZyuLJ
-	7XH5mkPOfwLNhwJHu94iLOy0CpoXg/2noLPO7SQxmwyaP2ZKPmnVZoMhCr8EVyUugLfINnuFsXT
-	hJrw==
-X-Google-Smtp-Source: AGHT+IFLKXXysXcQom38PnJvRWBySHQ8xWVUiuVQVjh30YG9bS3tYptEZfDy/BNujJBJFXXkYttkCg==
-X-Received: by 2002:a05:651c:b09:b0:336:e15a:25da with SMTP id 38308e7fff4ca-33b5f38f065mr37952451fa.39.1757441056073;
-        Tue, 09 Sep 2025 11:04:16 -0700 (PDT)
-Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-337f4c4ffd5sm39016961fa.14.2025.09.09.11.04.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Sep 2025 11:04:15 -0700 (PDT)
-Message-ID: <e9291d48-dcf9-405b-8246-1f44544c2e6e@blackwall.org>
-Date: Tue, 9 Sep 2025 21:04:13 +0300
+        d=1e100.net; s=20230601; t=1757441124; x=1758045924;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2JzUzLkWPMiRqdMU2PWQrLrGvNPVrl2fkDBIgw67gME=;
+        b=puXmPnNuV3B/G6Db657mmeMAtgoAciVTss35MyaSpawUMkrEzw7jVeU14aBCvT+t8I
+         BH2uTIDLWmmZoTiCO6/oVzkyDoDnho/y8Nx9LpGypsbPzlcRUAiejCXVdXgRDDLxH80Y
+         f5ib4KzAQieFFWAWWU/mCTjbXHSaK0ucrv+l9fREc2nP4p8nl+eycOU8lFS5v1oCqszJ
+         16QglBQjMk0Mz/0b3VhcMZxBkHKymmDumeiOcpJSR5sDFI/zlMTkX0jpI1ih0jOmtVsO
+         kukRD5Zgc+eKSr4DcVQsyqHbr8d8TNSOH2lrvpJiTpdOHa3AlwkDhdXPs6PeLHCe2Kau
+         sjRw==
+X-Forwarded-Encrypted: i=1; AJvYcCV0F2q69Y7siJJDZPseo6z2iBdk5umzvhUQMg+nn+YUi7nqXo3c9Qp/XrhCrldwP1Xg+e8a+Vc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDYVH29djZtUMfjjF5AJKJ1N6umkETs1oOrT3GMciB1hiB7Fuz
+	STi2FWkHVcxsh5WzWEaZupD7nAssq3NFwYMlaczUDhyyd5plcA2vmQHw+1Q11LTCdzN72UOwK8z
+	ypWRAgAQ3ZdRWSQWJGc3t2jTXGt2eLypy6JnO8XKEFzRorEYrp+98yWgE
+X-Gm-Gg: ASbGncuRferKde67h6xlSWGK6jz3dNdqpOgae3KrDQl6IYvBzcGthu0Fp114+mGF2Nl
+	2gpAtK8FbVCen9nqZpMAlJ5o71wLCgT0UBAKyR4vBNZJbru74QuFRZqQsjLBwhGMi5VkPeso3oH
+	ASGA+gYqDA8A/igChWxFuvT/ev0HOHct4VE5KwAMJfyKGr8CxSM9NiTFm25eMpaP02HrkWmVaxH
+	ddes5qOjDu7WMBLph5dxdJvew==
+X-Google-Smtp-Source: AGHT+IEq0HRTqN70vCk22jYNZP5mnjKPrWVQCw7vun9YsLjMMwNy0CqRt92AN65UbMbFM9LD4XcQLKRKwceU6IW3cTI=
+X-Received: by 2002:a05:6512:428a:b0:560:8398:e9a5 with SMTP id
+ 2adb3069b0e04-56aed65b73dmr20459e87.2.1757441123492; Tue, 09 Sep 2025
+ 11:05:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 0/7] bonding: Extend arp_ip_target format to
- allow for a list of vlan tags.
-To: David Wilder <wilder@us.ibm.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "jv@jvosburgh.net" <jv@jvosburgh.net>,
- "pradeeps@linux.vnet.ibm.com" <pradeeps@linux.vnet.ibm.com>,
- Pradeep Satyanarayana <pradeep@us.ibm.com>,
- "i.maximets@ovn.org" <i.maximets@ovn.org>,
- Adrian Moreno Zapata <amorenoz@redhat.com>, Hangbin Liu <haliu@redhat.com>,
- "stephen@networkplumber.org" <stephen@networkplumber.org>,
- "horms@kernel.org" <horms@kernel.org>
-References: <20250904221956.779098-1-wilder@us.ibm.com>
- <9a0ed3dd-d190-4d89-9756-9b36976665c8@blackwall.org>
- <MW3PR15MB39136CC2656428F35D2CFD6BFA0FA@MW3PR15MB3913.namprd15.prod.outlook.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <MW3PR15MB39136CC2656428F35D2CFD6BFA0FA@MW3PR15MB3913.namprd15.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250908175045.3422388-1-sdf@fomichev.me> <7726e657-585c-42d3-aff2-c991eed42361@kernel.org>
+In-Reply-To: <7726e657-585c-42d3-aff2-c991eed42361@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 9 Sep 2025 11:05:11 -0700
+X-Gm-Features: Ac12FXwbOdbzcbK_hUaTNFAZfeytFY_q3maZDk1PEYKLZ5mfBs3ETGGpJ5DRyzw
+Message-ID: <CAHS8izOSONfHk2pOYpoRxHNGvp3i6Lg3+FBsjZuRz6NAOOkrxw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: devmem: expose tcp_recvmsg_locked errors
+To: David Ahern <dsahern@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ncardwell@google.com, 
+	kuniyu@google.com, horms@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/9/25 20:55, David Wilder wrote:
-> 
-> 
-> 
-> ________________________________________
-> From: Nikolay Aleksandrov <razor@blackwall.org>
-> Sent: Tuesday, September 9, 2025 6:54 AM
-> To: David Wilder; netdev@vger.kernel.org
-> Cc: jv@jvosburgh.net; pradeeps@linux.vnet.ibm.com; Pradeep Satyanarayana; i.maximets@ovn.org; Adrian Moreno Zapata; Hangbin Liu; stephen@networkplumber.org; horms@kernel.org
-> Subject: [EXTERNAL] Re: [PATCH net-next v10 0/7] bonding: Extend arp_ip_target format to allow for a list of vlan tags.
-> 
->> On 9/5/25 01:18, David Wilder wrote:
->>> Changes since V4:
->>> 1)Dropped changes to proc and sysfs APIs to bonding.  These APIs
->>> do not need to be updated to support new functionality.  Netlink
->>> and iproute2 have been updated to do the right thing, but the
->>> other APIs are more or less frozen in the past.
->>>
->>
->> I'm sorry I'm late (v10) to the party, but I keep wondering:
->> Why keep extending sysfs support? It is supposed to be deprecated and most
->> of this set adds changes around bond sysfs option handling to parse a new format.
->>
->> IMHO this new extension should be available through netlink only, that is much
->> simpler, less error-prone and doesn't require string parsing. At worst sysfs
->> should only show the values properly.
->>
->> Cheers,
->> Nik
-> 
-> Hi Nic
-> Thanks for the reviewing my patches..
-> I did originally extend the sysfs to support the extension, but dropped that support.
-> The only remaining change related to sysfs  keeps the original support working with out
-> the new extension.
-> 
-> 
+On Mon, Sep 8, 2025 at 1:44=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
+>
+> On 9/8/25 11:50 AM, Stanislav Fomichev wrote:
+> > tcp_recvmsg_dmabuf can export the following errors:
+> > - EFAULT when linear copy fails
+> > - ETOOSMALL when cmsg put fails
+> > - ENODEV if one of the frags is readable
+> > - ENOMEM on xarray failures
+> >
+> > But they are all ignored and replaced by EFAULT in the caller
+> > (tcp_recvmsg_locked). Expose real error to the userspace to
+> > add more transparency on what specifically fails.
+> >
+> > In non-devmem case (skb_copy_datagram_msg) doing `if (!copied)
+> > copied=3D-EFAULT` is ok because skb_copy_datagram_msg can return only E=
+FAULT.
+> >
+> > Cc: Mina Almasry <almasrymina@google.com>
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> > ---
+> >  net/ipv4/tcp.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+>
+>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+>
 
-Ohhh my bad, I need better glasses. :) I read the cover letter and saw the new format, missed
-the part where sysfs was dropped. Sorry for the noise!
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-I do have one comment, but I'll add that to the respective patch.
+--=20
+Thanks,
+Mina
 
