@@ -1,96 +1,79 @@
-Return-Path: <netdev+bounces-221469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9994CB5093F
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:30:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51A97B50941
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C3D13A3B19
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:30:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BAA61B21E5C
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9185287502;
-	Tue,  9 Sep 2025 23:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033D327F4D5;
+	Tue,  9 Sep 2025 23:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYxyEDCM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="O7c7gQdN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9024B265614;
-	Tue,  9 Sep 2025 23:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E63D23D7DD
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 23:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757460603; cv=none; b=CEoa7cIyT6J/x1VLxOCjTAG7ODWr0uJQivnC07SbR0GYJw2ZoMWt07ffVKBuToRnYJ79xBfihEcQdNjyXRtILepEbKm6rR/HjixeQ1xBNQ+ZSO9WG1sJgNDEw9dcM0FC9Qmj7vtF/MDlau7nkuITOYG5UyHld789oX5GRsLGSa8=
+	t=1757460721; cv=none; b=RhOBNfu0sY56kgnxt9b82ArtYwiKwLPibGgR4X9Px1M6s13gqDNDwEEMqFw5E6+r49ZHRTMiVbesS18h3lm97nN2eYdgWdbjimUjrwqnvIBn4SrhrJnm1BtCWoy2GzsqP5uJilXu4QkUNGhoRwc/su1hpEts9bc/gaAIsWC6yzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757460603; c=relaxed/simple;
-	bh=4/MGIuFybo9yf04oPalxaEqnWmAnznYLG84Ew5PiGnk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WsVhvaR+onA4LbM85/eLr04eXdZa9oSEOI9FngN3SA9055h9eVtGTCTAz+jKolX4h5ZcfiwmJ85umoOS4YWu3Sw4ZoxoRyviniIwfJDZZ8WaH4/EESwISr9knmkNZnrO8HReGSFk/05dlR2ZAU4+KlnT52PNWSVhFH/QFZj0Ygg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYxyEDCM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F622C4CEF4;
-	Tue,  9 Sep 2025 23:30:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757460603;
-	bh=4/MGIuFybo9yf04oPalxaEqnWmAnznYLG84Ew5PiGnk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TYxyEDCMCCNJrnDflShIo3rZn17tIV4mq2Ds07O+gnFSZBlAfhSCHy5aqAYN/SFRn
-	 3+CfJzJY1wEonp1DS6xshdEcYbx67LOL14uGpFJ5u1bad98RRVy52QU0OPgVC9Uj3a
-	 iUStTbNuAbapd8cNQuppKtWg/Oi6Ri6AY0g865YfVvpOHetlvJfuBS9lN3NmXRQqVb
-	 Fu6uYPPBxMclu/yN6n9uQYF4t/yOtWhmRXtzquVeOpzJDKfzwilXAkKpnDweCSDARh
-	 wHypWBISN1vdGAJr/u634FvWg8oiKanF7cWbyateFACZ9TL8ikpItAW+MnVlZ9x4+8
-	 x2+pVSq2eCGeA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B57383BF69;
-	Tue,  9 Sep 2025 23:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1757460721; c=relaxed/simple;
+	bh=gQ19h5eDMgwU+NMksfusYpv6ql3bFQJJJLXK1NwVHsQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MIbntHef4OZdJENFq0NoczvX4oFtBy8BfcaXhtnkvWUCtdXoMAYGRnpPA/qALXnttiwQMU3IWEvD0l8BBnEIGeWo8XbbAmR5zheQyN8r3H/AiOcccjOzg5soFeusCzxB0h9FYI/8foPL7Pw4Q6/pAuNLcDINsxq3V3PPLAzqHtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=O7c7gQdN; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7319fea0-8f3f-408d-abb9-f0217939d8c7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757460715;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GTbGJ1tuE98dk/9HnOtWeyR4tHqkPUzRmsmmB3OyYag=;
+	b=O7c7gQdNyxXMAK0Ti9dLtaUr5Xe/lmg0YcZ7llOVhJSDFXf9wNLv9HP/KVBLMi6v+PZuV9
+	yG5Sdbjzt6F1YOBAOPi4bk/6Z3WLYQmHymm/tazLaHQ/b/Ic2rGJEY8vHA/jtxSU1GqGio
+	1OkLk7TocKoVNS0TmHhbIHXoPT2PQyk=
+Date: Wed, 10 Sep 2025 00:31:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: net: speed up pmtu.sh by avoiding
- unnecessary cleanup
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175746060628.846036.1509076796270513891.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Sep 2025 23:30:06 +0000
-References: <20250906214535.3204785-1-kuba@kernel.org>
-In-Reply-To: <20250906214535.3204785-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] net: dsa: mv88e6xxx: remove
+ mv88e6250_ptp_ops
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>
+References: <aMBLorDdDmIn1gDP@shell.armlinux.org.uk>
+ <E1uw0Xa-00000004IO0-0Etl@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <E1uw0Xa-00000004IO0-0Etl@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat,  6 Sep 2025 14:45:35 -0700 you wrote:
-> The pmtu test takes nearly an hour when run on a debug kernel
-> (10min on a normal kernel, so the debug slow down is quite significant).
-> NIPA tries to ensure all results are delivered by a certain deadline
-> so this prevents it from retrying the test in case of a flake.
+On 09/09/2025 16:45, Russell King (Oracle) wrote:
+> mv88e6250_ptp_ops and mv88e6352_ptp_ops are identical since commit
+> 7e3c18097a70 ("net: dsa: mv88e6xxx: read cycle counter period from
+> hardware"). Remove the unnecessary duplication.
 > 
-> Looks like one of the slowest operations in the test is calling out
-> to ./openvswitch/ovs-dpctl.py to remove potential leftover OvS interfaces.
-> Check whether the interfaces exist in the first place in sysfs,
-> since it can be done directly in bash it is very fast.
-> 
-> [...]
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Here is the summary with links:
-  - [net-next] selftests: net: speed up pmtu.sh by avoiding unnecessary cleanup
-    https://git.kernel.org/netdev/net-next/c/1c0353a6df82
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
