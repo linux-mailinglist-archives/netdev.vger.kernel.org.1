@@ -1,163 +1,209 @@
-Return-Path: <netdev+bounces-221207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01F88B4FBC4
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:51:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2FD0B4FBCC
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1710188C816
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:50:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43F6B5408CF
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4FF73314A4;
-	Tue,  9 Sep 2025 12:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB3533A03D;
+	Tue,  9 Sep 2025 12:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gCjdrW6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CAF33CEAE;
-	Tue,  9 Sep 2025 12:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84000338F2F
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 12:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757422208; cv=none; b=gI44aV1iH70HQM5Nof730zKXLtwzUsplZkqeJIU0hXtXWxRAb1sozpALZlKA3t3JPeySeHBTd4PzcFIdr7ycOlkjsQySvYTvOhbDwriOXXXQ0TGHWy+zouP8cV3ytYIdWlmCRtWoJxd3SH7+rK1k0b0sQG3hdyYCFFvsOUjjxTo=
+	t=1757422272; cv=none; b=TmJ4mUcEJGRhwNCXpN8h2iDqQpSpm+GTCWsIj1PUu8SayQCAekHHmCyy/SlPAP0wZNOJHGpwfL4QPKbK0o7ijyTRm4ieq3io098EM9j/0K7yZCYcgkQqU/ekZqNgfI25q9rgYBJykTq39CKWUz/1ogYB2hPde2xiM431WwQRETk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757422208; c=relaxed/simple;
-	bh=PuVjVHV1wc9pYl8GdTdV3JGTO6HWYNhQHMq2EYi4iJ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LIWpKr3ecn78U3Uw2S9EniTuXF+pf9NeKRq2GZKzHFcjeoX4PL9+XrPKPCb0Y24588B2Jr9t36hSmBCvC3h1Tjqyv3iDVBzszbPlnUZJOCfVggagqCp2EMvwivXGq4aHcU6cUF3DxEg8/pEUcv1/lwVsLtLYdthVkDfDeuPZcmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b00a9989633so172200266b.0;
-        Tue, 09 Sep 2025 05:50:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757422205; x=1758027005;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PL5W7r7SW+5I44FlF/G9YaBRML8VYNr4bNZkUgMqIaA=;
-        b=OHxkZGRvBOI7Kz/dyyFtyhCH/OZLAg5XULST6Se8Ox7BYqqOj+yrpUFBBnJVt+K4K5
-         TID3RB2ggCRi6azvidc0Ns5XoRjDvaS/BaB+6uiB5lY5ARYkxWjSURvzTWW0AbdoudUr
-         3Ne9zq4f7/Ww9veWBt5FswwpanZRXSdR3YNL6QlYvcmxuv++6hhkdURT82tPpLilBLld
-         BYBY8mgz+AM3iDzJ2it7VJS0fdZhcp/qCsnWZfWVIjfzb6vDZ4ZnLzFeKLAQs9fUip4o
-         txhL8LdbE/KlHz7QAZ3cPm2mVkzmb1kD+ZKPTChfo4vMN5BKEvSeUkXmFkBe/GwZC8CJ
-         WSuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhY9jHNaHIyn1JZQqYkI4cKkw+EVKYf76nINxSEse265gAI45rm6tsN0fXg1lZOyz7OaMY69notxjmu/Y=@vger.kernel.org, AJvYcCW0o/MBESfSQpc2ByLYK3BiT2FQcAV4pq5mhn9VutRCYFuCwoyVMEt3+Ep/mWHgXpl7Nv3c9hxh@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaAQWNCb2mzpvLf4Epf1XZ9WgUTUh+OopisuI8w6lvmJCFbh6a
-	dUywrr3u8iIrn9DmS312fQh1z2h4pv+SfzFYvaqUF3bDVZYMpdKhRiFD
-X-Gm-Gg: ASbGncv6nbOnD5npl1ql8uj+0qimhsxtMTgzIs9jAmf+ObexqlmknZB1/pCi1NCeAi0
-	PJi5L6qxRuNFRHy+e3O2kM87Y5Bn42NdRV6JA6uyuL5iFdkp/bgB3PScQMTU2yvmyzYIazP+0JA
-	z+EV7/0YJSXeSQHJBb6bnmnt2VQkKk5CBSiOpRMfrwaFOn+dXVC8t4smobKvKm+Jcim3iyGDBww
-	Ka2AEJ/N6jp/mIyrLDXwt3bWsgZd2So9UErpPVDZRaVnZGruc2foFMOUGzAJVGZHiAhfVKWcVW/
-	tzk3dowk/soMHQ+X2HxC7Knt21PPxYJE9A0WxZNC0P7usE+Vpdl4+bDemMZ6shso68BHHSvri+O
-	n0Ea47P2LuDGYNA==
-X-Google-Smtp-Source: AGHT+IFt/HhYIRfjMPYRAmI2pRuNGPplO0iIBQjsLKZgH0ZZ5p6msexYhicjU4gVciMaUBH61p47eg==
-X-Received: by 2002:a17:907:a088:b0:b04:3cd2:265b with SMTP id a640c23a62f3a-b04b1dd47b0mr1190898466b.5.1757422204798;
-        Tue, 09 Sep 2025 05:50:04 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:72::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0413ee67a3sm2273063466b.24.2025.09.09.05.50.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 05:50:04 -0700 (PDT)
-Date: Tue, 9 Sep 2025 05:50:01 -0700
-From: Breno Leitao <leitao@debian.org>
-To: John Ogness <john.ogness@linutronix.de>
-Cc: Mike Galbraith <efault@gmx.de>, Simon Horman <horms@kernel.org>, 
-	kuba@kernel.org, calvin@wbinvd.org, Pavel Begunkov <asml.silence@gmail.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>, 
-	netdev@vger.kernel.org, boqun.feng@gmail.com
-Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-Message-ID: <trqtt6vhf6gp7euwljvbbmvf76m4nrgcoi3wu3hb5higzsfyaa@udmgv5lwahn4>
-References: <hyc64wbklq2mv77ydzfxcqdigsl33leyvebvf264n42m2f3iq5@qgn5lljc4m5y>
- <b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt>
- <4c4ed7b836828d966bc5bf6ef4d800389ba65e77.camel@gmx.de>
- <otlru5nr3g2npwplvwf4vcpozgx3kbpfstl7aav6rqz2zltvcf@famr4hqkwhuv>
- <d1679c5809ffdc82e4546c1d7366452d9e8433f0.camel@gmx.de>
- <7a2b44c9e95673829f6660cc74caf0f1c2c0cffe.camel@gmx.de>
- <tx2ry3uwlgqenvz4fsy2hugdiq36jrtshwyo4a2jpxufeypesi@uceeo7ykvd6w>
- <5b509b1370d42fd0cc109fc8914272be6dcfcd54.camel@gmx.de>
- <tgp5ddd2xdcvmkrhsyf2r6iav5a6ksvxk66xdw6ghur5g5ggee@cuz2o53younx>
- <84a539f4kf.fsf@jogness.linutronix.de>
+	s=arc-20240116; t=1757422272; c=relaxed/simple;
+	bh=p+uwnARHKaKFvBz9T0sBrH6GYywgAZuWie5pxf8XDMw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dMTvWT0e+QWr1jEAMmYONsTaLzEIH+DtT7lGd57aS5YMkm/apnP7Aq8x5akG5E+8ehkiUWtyqQuwF5tvTb807BUAlBgcBoqsJuq1iN+NwAd17iRy/B+2OK+nTZ7MU+vkSt53YZJITL1RUj5n6Ue65MdI9PnovgtogBQVm9oCQhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gCjdrW6o; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757422268;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R2jnI7fNqw0lRQ0MgQ9fxhCAaCw81b8Cvio1UiytAs8=;
+	b=gCjdrW6oiOqcW47IaJASXgee1nXKH1M5i2OlQioIKXp79wXBGktcdfxxZ6Zjx/FaopteJU
+	Hy0qMrNKsSoA5g74z9pf3BmtBd+kF07+5ozMYP/Y+yX8dQ1kj0hdivSYy698Hu1t3PtdUo
+	k/jmCYRw1N0zN8NsO8FVeIJZshOY748=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-582-WvhWlA-wNr28CHrF0BW4lg-1; Tue,
+ 09 Sep 2025 08:51:05 -0400
+X-MC-Unique: WvhWlA-wNr28CHrF0BW4lg-1
+X-Mimecast-MFC-AGG-ID: WvhWlA-wNr28CHrF0BW4lg_1757422263
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 479B419560AB;
+	Tue,  9 Sep 2025 12:51:03 +0000 (UTC)
+Received: from [10.43.2.187] (unknown [10.43.2.187])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BFA7E1800447;
+	Tue,  9 Sep 2025 12:50:59 +0000 (UTC)
+Message-ID: <4dc015f7-63ad-4b44-8565-795648332ada@redhat.com>
+Date: Tue, 9 Sep 2025 14:50:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <84a539f4kf.fsf@jogness.linutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
+ reference property
+To: Rob Herring <robh@kernel.org>
+Cc: netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com,
+ Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20250815144736.1438060-1-ivecera@redhat.com>
+ <20250820211350.GA1072343-robh@kernel.org>
+ <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com>
+ <CAL_JsqKui29O_8xGBVx9T2e85Dy0onyAp4mGqChSuuwABOhDqA@mail.gmail.com>
+ <bc39cdc9-c354-416d-896f-c2b3c3b64858@redhat.com>
+ <CAL_JsqL5wQ+0Xcdo5T3FTyoa2csQ9aW8ZxxMxVOhRJpzc7fGhA@mail.gmail.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <CAL_JsqL5wQ+0Xcdo5T3FTyoa2csQ9aW8ZxxMxVOhRJpzc7fGhA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hello John,
-
-On Fri, Sep 05, 2025 at 02:54:32PM +0206, John Ogness wrote:
-
-> >> The bigger issue for the nbcon patch would seem to be the seemingly
-> >> required .write_atomic leading to landing here with disabled IRQs.
+On 09. 09. 25 12:49 dop., Rob Herring wrote:
+> On Fri, Sep 5, 2025 at 1:50 AM Ivan Vecera <ivecera@redhat.com> wrote:
+>>
+>>
+>>
+>> On 05. 09. 25 12:06 dop., Rob Herring wrote:
+>>> On Fri, Aug 29, 2025 at 8:29 AM Ivan Vecera <ivecera@redhat.com> wrote:
+>>>> ...
+>>>>
+>>>> Do you mean to add a property (e.g. dpll-channel or dpll-device) into
+>>>> net/network-class.yaml ? If so, yes, it would be possible, and the way
+>>>> I look at it now, it would probably be better. The DPLL driver can
+>>>> enumerate all devices across the system that has this specific property
+>>>> and check its value.
+>>>
+>>> Yes. Or into ethernet-controller.yaml. Is a DPLL used with wifi,
+>>> bluetooth, etc.?
+>>
+>> AFAIK no... ethernet-controller makes sense.
+>>
+>>>>
+>>>> See the proposal below...
+>>>>
+>>>> Thanks,
+>>>> Ivan
+>>>>
+>>>> ---
+>>>>     Documentation/devicetree/bindings/dpll/dpll-device.yaml  | 6 ++++++
+>>>>     Documentation/devicetree/bindings/net/network-class.yaml | 7 +++++++
+>>>>     2 files changed, 13 insertions(+)
+>>>>
+>>>> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>>>> b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>>>> index fb8d7a9a3693f..560351df1bec3 100644
+>>>> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>>>> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>>>> @@ -27,6 +27,12 @@ properties:
+>>>>       "#size-cells":
+>>>>         const: 0
+>>>>
+>>>> +  "#dpll-cells":
+>>>> +    description: |
+>>>> +      Number of cells in a dpll specifier. The cell specifies the index
+>>>> +      of the channel within the DPLL device.
+>>>> +    const: 1
+>>>
+>>> If it is 1 for everyone, then you don't need a property for it. The
+>>> question is whether it would need to vary. Perhaps some configuration
+>>> flags/info might be needed? Connection type or frequency looking at
+>>> the existing configuration setting?
+>>
+>> Connection type maybe... What I am trying to do is define a relationship
+>> between the network controller and the DPLL device, which together form
+>> a single entity from a use-case perspective (e.g., Ethernet uses an
+>> external DPLL device either to synchronize the recovered clock or to
+>> provide a SyncE signal synchronized with an external 1PPS source).
+>>
+>> Yesterday I was considering the implementation from the DPLL driver's
+>> perspective and encountered a problem when the relation is defined from
+>> the Ethernet controller's perspective. In that case, it would be
+>> necessary to enumerate all devices that contain a “dpll” property whose
+>> value references this DPLL device.
 > 
-> Using spin_lock_irqsave()/spin_unlock_irqrestore() within the
-> ->device_lock() and ->device->unlock() callbacks is fine.
+> Why is that?
 
-But it is not fine for netpoll, given that netpoll calls the network TX
-path, that in some cases, tries to get a IRQ-unsafe locks, such as
-&fq->lock. This is the current issue reported in this thread.
+Because the DPLL driver has to find a mac-address of the ethernet
+controller to generate clock identity that is used for DPLL device
+registration.
 
-In other words, netconsole/netpoll cannot call the TX path with IRQ
-disabled for some devices, due to some driver's TX path using IRQ unsafe
-locks.
-
-> > 1) Decouple the SKB pool from netpoll and move it into netconsole
-> >
-> >   * This makes netconsole behave like any other netpoll user,
-> >     interacting with netpoll by sending SKBs.
-> > 	* The SKB population logic would then reside in netconsole, where it
-> > 	  logically belongs.
-> >
-> >   * Enable NBCONS in netconsole, guarded by NETCONSOLE_NBCON
-> > 	* In normal .write_atomic() mode, messages should be queued in
-> > 	  a workqueue.
+>>
+>> This approach seems quite complicated, as it would require searching
+>> through all buses, all connected devices, and checking each fwnode for a
+>> “dpll” property containing the given reference. I don’t think this would
+>> be the right solution.
 > 
-> This is the wrong approach. It cannot be expected that the workqueue is
-> functional during panic. ->write_atomic() needs to be able to write
-> directly, most likely using pre-allocated SKBs and pre-setup dedicated
-> network queues.
+> for_each_node_with_property() provides that. No, it's not efficient,
+> but I doubt it needs to be. As you'd only need to do it once.
 
-Netpoll has pre-allocated SKBs and, although not the primary way
-of allocating it, it can easily be set up to do so.
+Yes, for_each_node_with_property() could be used but only for OF case. I
+would like to use firmware type agnostic interface to cover also ACPI
+systems where the zl3073x driver is/will be used.
 
-The problem happens later, when netpoll calls netdev_start_xmit(), which
-calls ops->ndo_start_xmit(skb, dev), which might have some IRQ unsafe
-locks (depending on the sub system).
+I'm not aware of similar functionality for fwnode... is it an option
+to write FW type agnostic macro for_each_fwnode_with_property() that
+would cover OF, ACPI, software_node...?
 
-To summarize the problem:
+>> I then came across graph bindings and ACPI graph extensions, which are
+>> widely used in the media and DRM subsystems to define relations between
+>> devices. Would this be an appropriate way to define a binding between an
+>> Ethernet controller and a DPLL device?
+> 
+> Usually the graph is used to handle complex chains of devices and how
+> the data flows. I'm not sure that applies here.
 
-1) netpoll calls .ndo_start_xmit() with IRQ disabled, which causes the
-lockdep problem reported in this thread. (current code)
+Agree.
 
-2) moving netconsole to use NBCON will help in the thread context, given
-that .write_thread() doesn't need to have IRQ disabled. (This requires
-rework of netconsole target_list_lock)
+>> If so, what would such a binding roughly look like? I’m not very
+>> experienced in this area, so I would appreciate any guidance.
+>>
+>> If not, wouldn’t it be better to define the relation from the DPLL
+>> device to the network controller, as originally proposed?
+> 
+> I have no idea really. I would think the DPLL is the provider and an
+> ethernet device is the consumer. And if the ethernet device is unused
+> (or disabled), then the DPLL connection associated with it is unused.
+> If that's the case, then I think the property belongs in the ethernet
+> node.
 
-3) In the atomic context, there is no easy solution so far. The options
-are not good, but, I will list them here for the sake of getting things
-clear:
+ From this point of view, this is true. DPLL is signal provider and
+ethernet controller its consumer. Or in other words the PHC in the NIC
+is driven by this DPLL OR the DPLL drives the PHC in this NIC.
+It depends on point of view.
 
-  a) Defer the msg as proposed initially.
-    Pro: If the machine is not crashing, it should simply work (?!)
-    Cons: It cannot be expected that the workqueue is functional during panic, thus
-          the messages might be lost
-   
-  b) Send the message anyway (and hope for the best)
-    Cons: Netpoll will continue to call IRQ unsafe locks from IRQ safe
-          context (lockdep will continue to be unhappy)
-    Pro: This is how it works today already, so, it is not making the problem worse.
-         In fact, it is narrowing the problem to only .write_atomic().
+Thanks,
+Ivan
 
-  c) Not implementing .write_atomic
-    Cons: we lose the most important messages of the boot.
-
-  c) Any other option I am not seeing?
-
-Thanks for the insights,
---breno
 
