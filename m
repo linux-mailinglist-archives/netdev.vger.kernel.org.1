@@ -1,196 +1,168 @@
-Return-Path: <netdev+bounces-221305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29F9B5019F
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:40:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0B8B50198
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 17:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 331F57BED6F
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:35:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DED516DE3D
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 15:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC95352FE8;
-	Tue,  9 Sep 2025 15:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A616133CE93;
+	Tue,  9 Sep 2025 15:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z+nXkTF9"
+	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="qzHM0172"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA89E352096
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 15:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C185932CF7C;
+	Tue,  9 Sep 2025 15:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757432021; cv=none; b=CpMA5j43dpOVzYYCdU//AFMbVFuJyKWn+moVKJMK0xNvimeznHcRbv+3b6R5qOVpWH6w8C0yDhJ1u+GD/HybZrNMhGZnzPBn3EpSFyEqbwMhfY0HDHU2IKDe6gs1tz5Z9+Y+W6ZgjU6ddlehGqLsiMHqBMTEGlBIYsmzdsgcdDU=
+	t=1757432328; cv=none; b=LDIdSA49uc5daO7ZMsQb+FhRiN3JD05Vu+bbXA67mgL7UhRCV0/N4LcWK+3di0lC+hgNppeYrYSTTmQ1Gr/pKY28AsJKLiT6HY2CebhFa8jtrvz4tFNAxc8wTkcxXRofSvPpJlMkpQ+WEYw2igHuLgUaUimUeD6RSfSpR1WfgmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757432021; c=relaxed/simple;
-	bh=eXqcsEVT0O/GOfA/Ca74pae233qQpT8kMZ1DFItem6g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LW4M439EruPUAOZWmIagyPIJpyr33saeuoq9TO5keLA4sHrhuK9P815k7B1b3ozqJ34O33hVVakRlfspxTf9ygZhXhG5K9kdM3n0sbZfR73XLmLTGSRRKyW3ZzQCcmY50fS/cdTAMmVlBAiV/6nYkEzcooDUvETuOnVREF6gR5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z+nXkTF9; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b3d3f6360cso59114151cf.0
-        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 08:33:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757432019; x=1758036819; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LH53MCx6ogN1k+/cTYDbkLwp7+QCPYAr+PyETboPxPU=;
-        b=Z+nXkTF9JfnULQd3XbzxXlfRdTzzgDr49lrdpLuq3FXi+I/MaDoS4jQRaHR6rOOQhF
-         B/3pLnFn9bjNO1++zCzgpyqUfunnQ07fMWf37xR7NueFFIvkF8T6AyvbM8opEwlS5JYW
-         kftTpR7HzlG04ODQ9DSDefG6P1JtarUJ7noZfTTsRAT+2cyAFzKhTqtrWkC246XJVNDK
-         2lbhqkoG7F7JofQnoDh4ZAXllkj5suioJJJgj4lQ+kCnZy78NO7ZhbLTAYWxzNXIljS0
-         CJDlBsbb5hEYXEBsBz2pMD3UgpBP++xQ+cDVAKmfcuauQ9+AYTYweAyb1aCkekZ3oPTJ
-         corg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757432019; x=1758036819;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LH53MCx6ogN1k+/cTYDbkLwp7+QCPYAr+PyETboPxPU=;
-        b=ltuu+sykgb3BMftob0viFT5ktfGXDecuOv+uYOh5iEVgOfsFecDCrAUbpq9O2OGsnx
-         9SzglknLytEHIKG6F9O1C49QCyb1xdcoo6IAMXAVB44oyfjsnMwgpWE5iIswmMlZAgAT
-         XytXNEoT6bpQYIqp12Q+AA40Dl4J6T/AOnD7sXLrXDHhgB5wzwFU3empHhQPIvUE6tIi
-         4p62IojgM/pHEYyDBBtfNMHS1bnhqhxjyvBAjlF993Nfjby91Zx6/gyMIwR0BJRDNdVO
-         3prPZDJuttFSa1GsQShyskpBxZ/74+22z1SI96konmxtM58C0Myhu6Mfk/jCcBj7l/j+
-         JmJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUYhq/7ME0VB0vU0yoXT9cHxDybwM2GceIxJksC5IpNDuf9yDORCdCTBrHq+5Km7iabLe2U3II=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP4FzIKPFtUj4hGuQM5UhjaG92wHrPV2fK9eptyHs1fMzkEOav
-	MqFk5QxeY+WS6XpGISH37T+MW61VT/sWQMHFzFwOhng9YLAPS1gvawYOS3rGNkAV8xY/IoLoM3w
-	6VWe7LEN88vBTFRREU930Cmj3RWnOk8ffJEoPkaQ2
-X-Gm-Gg: ASbGncsq6IhNWFFUeBk2vVrGfuiKnEqRTpMYfE/eSpfxlmDCLFcQYwI+dIfLTPAaYu4
-	U6L+RJYJVA/Z8DE30OCywjazP9cVDxczajJCN7CuhInkyAFSTeEnLl525VQuNSTXODSHsAc67IU
-	7FMDvrrssMXf7UXUoPT3i3tUAXlwCBirj1ARas/c/4u5NB78Jzky20NrydDFt8F1iUL5QESuy1s
-	R1RBZTG4yk8SG9pffU4bSx0hDLR+Ig2t2zzwxU9uhnTBYCCIkEEnZXBodA=
-X-Google-Smtp-Source: AGHT+IEBSJFGC5HE816C89rHJ7brsZIZ78JEBVc19MhZewWuyBdDU+KpX7j08rvkOLFoUtfGNDkZcsKLsSZemorc0Ok=
-X-Received: by 2002:a05:622a:1887:b0:4b5:ea94:d715 with SMTP id
- d75a77b69052e-4b5f8390522mr114936061cf.1.1757432018215; Tue, 09 Sep 2025
- 08:33:38 -0700 (PDT)
+	s=arc-20240116; t=1757432328; c=relaxed/simple;
+	bh=RAlsBwrMVc4mr9bqVlEkt0nwdmS1ROjRJD7r8ZvR60I=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:References:
+	 From:Cc:In-Reply-To; b=tYcaIuYaYerd9eqC5+RQsV4wY+8o3PTjL6GTgQTZvNdgI46523LGZEp3dVPl66Tt3lHiBahUnyHD7ZpRuexjufQT/w00ZwIEvMv24Nf0HxpKTumCByvX7GxKXxPzfo6lOoh6sNvWGvvfBZ1uSnGbEN+1qo4XbXPocI2OwjFCf9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=qzHM0172; arc=none smtp.client-ip=212.27.42.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
+Received: from [44.168.19.11] (unknown [86.195.82.193])
+	(Authenticated sender: bernard.pidoux@free.fr)
+	by smtp4-g21.free.fr (Postfix) with ESMTPSA id A027519F5C2;
+	Tue,  9 Sep 2025 17:38:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+	s=smtp-20201208; t=1757432318;
+	bh=RAlsBwrMVc4mr9bqVlEkt0nwdmS1ROjRJD7r8ZvR60I=;
+	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
+	b=qzHM01722BI6JbHeJ1/3Zf5N4UAWNuhgpHNW82P+6yki2Q7qXJmHJwaFDdZwUaJ4O
+	 mKfp36cGxv91byJepZYY49w61mtr2s+1mA2sL/bC2J60H9L7bpWuRxogmk9m0cMOPE
+	 hqQN71ij4iyuVtjvs4NK27tApaeUto5rHIA5iU1Q7r39ao2pA/lF8P5T3gyTaeBZZN
+	 nmea/E2HOnSGjWpYWwKs/yU6gFfbj8IJZcPRS+W0ggqwdcAaDYOpLLQ67kUkSSKNeA
+	 REN5Q9KK0XZzD5I+y4l8XxKWlbrKdGMn+X/6Aog+QW1RzRMrnygJyTK6mNqUBqVJ6m
+	 d5KneRW1vwhWw==
+Content-Type: multipart/mixed; boundary="------------BFkYMDOTwEs82WuKU6RKQpL0"
+Message-ID: <e949c529-947f-4206-9b03-bf6d812abbf2@free.fr>
+Date: Tue, 9 Sep 2025 17:38:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250909132243.1327024-1-edumazet@google.com> <20250909132936.GA1460@redhat.com>
- <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
- <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
- <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk> <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
- <20250909151851.GB1460@redhat.com>
-In-Reply-To: <20250909151851.GB1460@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Sep 2025 08:33:27 -0700
-X-Gm-Features: Ac12FXwmsBi8N5rZnVovo52dil5DJvY7h1QqJGILCkzQ81ibk4sKlJtshywQWDc
-Message-ID: <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
-Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <eric.dumazet@gmail.com>, 
-	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, 
-	Mike Christie <mchristi@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>, 
-	linux-block@vger.kernel.org, nbd@other.debian.org, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] [AX25] fix lack of /proc/net/ax25 labels header
+To: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+ "David S . Miller" <davem@davemloft.net>
+References: <E3ABD638-BF7B-4837-8534-F73A1BB7CEB3@gmail.com>
+Content-Language: en-US
+From: Bernard Pidoux <bernard.pidoux@free.fr>
+Cc: David Ranch <dranch@trinnet.net>, Lee Woldanski <ve7fet@tparc.org>,
+ Eric Dumazet <edumazet@google.com>
+In-Reply-To: <E3ABD638-BF7B-4837-8534-F73A1BB7CEB3@gmail.com>
 
-On Tue, Sep 9, 2025 at 8:19=E2=80=AFAM Richard W.M. Jones <rjones@redhat.co=
-m> wrote:
->
-> On Tue, Sep 09, 2025 at 07:47:09AM -0700, Eric Dumazet wrote:
-> > On Tue, Sep 9, 2025 at 7:37=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wro=
-te:
-> > >
-> > > On 9/9/25 8:35 AM, Eric Dumazet wrote:
-> > > > On Tue, Sep 9, 2025 at 7:04=E2=80=AFAM Eric Dumazet <edumazet@googl=
-e.com> wrote:
-> > > >>
-> > > >> On Tue, Sep 9, 2025 at 6:32=E2=80=AFAM Richard W.M. Jones <rjones@=
-redhat.com> wrote:
-> > > >>>
-> > > >>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
-> > > >>>> Recently, syzbot started to abuse NBD with all kinds of sockets.
-> > > >>>>
-> > > >>>> Commit cf1b2326b734 ("nbd: verify socket is supported during set=
-up")
-> > > >>>> made sure the socket supported a shutdown() method.
-> > > >>>>
-> > > >>>> Explicitely accept TCP and UNIX stream sockets.
-> > > >>>
-> > > >>> I'm not clear what the actual problem is, but I will say that lib=
-nbd &
-> > > >>> nbdkit (which are another NBD client & server, interoperable with=
- the
-> > > >>> kernel) we support and use NBD over vsock[1].  And we could suppo=
-rt
-> > > >>> NBD over pretty much any stream socket (Infiniband?) [2].
-> > > >>>
-> > > >>> [1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
-> > > >>>     https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
-> > > >>> [2] https://libguestfs.org/nbd_connect_socket.3.html
-> > > >>>
-> > > >>> TCP and Unix domain sockets are by far the most widely used, but =
-I
-> > > >>> don't think it's fair to exclude other socket types.
-> > > >>
-> > > >> If we have known and supported socket types, please send a patch t=
-o add them.
-> > > >>
-> > > >> I asked the question last week and got nothing about vsock or othe=
-r types.
-> > > >>
-> > > >> https://lore.kernel.org/netdev/CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A=
-12+ndzBcQs_kZoBA@mail.gmail.com/
-> > > >>
-> > > >> For sure, we do not want datagram sockets, RAW, netlink, and many =
-others.
-> > > >
-> > > > BTW vsock will probably fire lockdep warnings, I see GFP_KERNEL
-> > > > being used in net/vmw_vsock/virtio_transport.c
->
-> CC-ing Stefan & Stefano.  Myself, I'm only using libnbd
-> (ie. userspace) over vsock, not the kernel client.
->
-> > > > So you will have to fix this.
-> > >
-> > > Rather than play whack-a-mole with this, would it make sense to mark =
-as
-> > > socket as "writeback/reclaim" safe and base the nbd decision on that =
-rather
-> > > than attempt to maintain some allow/deny list of sockets?
-> >
-> > Even if a socket type was writeback/reclaim safe, probably NBD would no=
-t support
-> > arbitrary socket type, like netlink, af_packet, or af_netrom.
-> >
-> > An allow list seems safer to me, with commits with a clear owner.
-> >
-> > If future syzbot reports are triggered, the bisection will point to
-> > these commits.
->
-> From the outside it seems really odd to hard code a list of "good"
-> socket types into each kernel client that can open a socket.  Normally
-> if you wanted to restrict socket types wouldn't you do that through
-> something more flexible like nftables?
-
-nftables is user policy.
-
-We need a kernel that will not crash, even if nftables is not
-compiled/loaded/used .
+This is a multi-part message in MIME format.
+--------------BFkYMDOTwEs82WuKU6RKQpL0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
->
-> Rich.
->
-> --
-> Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-> Read my programming and virtualization blog: http://rwmj.wordpress.com
-> virt-p2v converts physical machines to virtual machines.  Boot with a
-> live CD or over the network (PXE) and turn machines into KVM guests.
-> http://libguestfs.org/virt-v2v
->
+[PATCH]  [AX25] fix lack of /proc/net/ax25 labels header
+
+/pro/net/ax25 never had a chance to be displayed in easily
+understandable format.
+
+First reason was the absence of labels header, second reason was
+pourly formated proc/net/ax25 lines.
+
+Actually ax25_info_start() did not return SEQ_START_TOKEN and there was 
+no test for displaying header in ax25_info_show().
+
+Another reason for lack of readability was poorly formatted 
+/proc/net/ax25 as shown:
+
+00000000fb21b658 ax0 F6BVP-12 * 0 0 0 0 0 10 0 3 0 300 0 0 0 10 5 2 256 
+0 0 14949
+
+The proposed patch initializes SEQ_START_TOKEN in ax25_list_start and 
+add a test for first time displaying header in ax25_info_show().
+
+In addition this patch provides a better formated display of /proc/net/
+ax25 aka /proc/net/nr or /proc/net/rose
+
+magic            dev src_addr  dest_addr digi1     digi2 .. st vs vr va 
+    t1     t2      t3     idle    n2   rtt window  paclen Snd-Q Rcv-Q  inode
+0000000040471056 ax0 F6BVP-13  F6BVP-9   -         -         3  5  4  5 
+   0/03   0/3   189/300   0/0    0/10    1   2      256    *     *     *
+000000002f11c115 ax0 F6BVP-13  F6BVP-11  -         -         3  5  4  5 
+   0/06   0/3   155/300   0/0    0/10    3   2      256    *     *     *
+00000000c534288b ax0 F6BVP-12  *         -         -         0  0  0  0 
+   0/10   0/3     0/300   0/0    0/10    5   2      256    0     0     50994
+
+
+Signed-off-by: Bernard Pidoux <Bernard.pidoux@free.fr>
+
+
+
+--------------BFkYMDOTwEs82WuKU6RKQpL0
+Content-Type: text/plain; charset=UTF-8; name="af_ax25.patch"
+Content-Disposition: attachment; filename="af_ax25.patch"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL25ldC9heDI1L2FmX2F4MjUuYyBiL25ldC9heDI1L2FmX2F4MjUuYw0K
+aW5kZXggNmVmOGIyYS4uMWUyZjkyNCAxMDA2NDQNCi0tLSBhL25ldC9heDI1L2FmX2F4MjUu
+Yw0KKysrIGIvbmV0L2F4MjUvYWZfYXgyNS5jDQpAQCAtMTkzMyw2ICsxOTMzLDEwIEBAIHN0
+YXRpYyB2b2lkICpheDI1X2luZm9fc3RhcnQoc3RydWN0IHNlcV9maWxlICpzZXEsIGxvZmZf
+dCAqcG9zKQ0KIAlfX2FjcXVpcmVzKGF4MjVfbGlzdF9sb2NrKQ0KIHsNCiAJc3Bpbl9sb2Nr
+X2JoKCZheDI1X2xpc3RfbG9jayk7DQorDQorCWlmICgqcG9zID09IDApDQorCQlyZXR1cm4g
+U0VRX1NUQVJUX1RPS0VOOw0KKw0KIAlyZXR1cm4gc2VxX2hsaXN0X3N0YXJ0KCZheDI1X2xp
+c3QsICpwb3MpOw0KIH0NCiANCkBAIC0xOTU2LDIzICsxOTYwLDM1IEBAIHN0YXRpYyBpbnQg
+YXgyNV9pbmZvX3Nob3coc3RydWN0IHNlcV9maWxlICpzZXEsIHZvaWQgKnYpDQogDQogCS8q
+DQogCSAqIE5ldyBmb3JtYXQ6DQotCSAqIG1hZ2ljIGRldiBzcmNfYWRkciBkZXN0X2FkZHIs
+ZGlnaTEsZGlnaTIsLi4gc3QgdnMgdnIgdmEgdDEgdDEgdDIgdDIgdDMgdDMgaWRsZSBpZGxl
+IG4yIG4yIHJ0dCB3aW5kb3cgcGFjbGVuIFNuZC1RIFJjdi1RIGlub2RlDQorCSAqIG1hZ2lj
+IGRldiBzcmNfYWRkciBkZXN0X2FkZHIsZGlnaTEsZGlnaTIsLi4gc3QgdnMgdnIgdmEgdDEv
+dDEgdDIvdDIgdDMvdDMgaWRsZS9pZGxlIG4yL24yIHJ0dCB3aW5kb3cgcGFjbGVuIFNuZC1R
+IFJjdi1RIGlub2RlDQogCSAqLw0KIA0KLQlzZXFfcHJpbnRmKHNlcSwgIiVwICVzICVzJXMg
+IiwNCisJaWYgKHYgPT0gU0VRX1NUQVJUX1RPS0VOKQ0KKwkJc2VxX3ByaW50ZihzZXEsDQor
+CQkJICJtYWdpYyAgICAgICAgICAgIGRldiBzcmNfYWRkciAgZGVzdF9hZGRyIGRpZ2kxICAg
+ICBcDQorZGlnaTIgLi4gc3QgdnMgdnIgdmEgICAgIHQxICAgICB0MiAgICAgIHQzICAgICBp
+ZGxlICAgIG4yICAgcnR0IFwNCit3aW5kb3cgIHBhY2xlbiBTbmQtUSBSY3YtUSAgaW5vZGVc
+biIpOw0KKwllbHNlIHsNCisJCXNlcV9wcmludGYoc2VxLCAiJXAgJXMgJS05cyVzIiwNCiAJ
+CSAgIGF4MjUsDQogCQkgICBheDI1LT5heDI1X2RldiA9PSBOVUxMPyAiPz8/IiA6IGF4MjUt
+PmF4MjVfZGV2LT5kZXYtPm5hbWUsDQogCQkgICBheDJhc2MoYnVmLCAmYXgyNS0+c291cmNl
+X2FkZHIpLA0KLQkJICAgYXgyNS0+aWFtZGlnaT8gIioiOiIiKTsNCi0Jc2VxX3ByaW50Zihz
+ZXEsICIlcyIsIGF4MmFzYyhidWYsICZheDI1LT5kZXN0X2FkZHIpKTsNCisJCSAgIGF4MjUt
+PmlhbWRpZ2k/ICIqIjoiICIpOw0KKwkJc2VxX3ByaW50ZihzZXEsICIlLTlzIiwgYXgyYXNj
+KGJ1ZiwgJmF4MjUtPmRlc3RfYWRkcikpOw0KIA0KLQlmb3IgKGs9MDsgKGF4MjUtPmRpZ2lw
+ZWF0ICE9IE5VTEwpICYmIChrIDwgYXgyNS0+ZGlnaXBlYXQtPm5kaWdpKTsgaysrKSB7DQot
+CQlzZXFfcHJpbnRmKHNlcSwgIiwlcyVzIiwNCi0JCQkgICBheDJhc2MoYnVmLCAmYXgyNS0+
+ZGlnaXBlYXQtPmNhbGxzW2tdKSwNCi0JCQkgICBheDI1LT5kaWdpcGVhdC0+cmVwZWF0ZWRb
+a10/ICIqIjoiIik7DQotCX0NCisJCWlmIChheDI1LT5kaWdpcGVhdCA9PSBOVUxMKSB7DQor
+CQkJc3RyY3B5KGJ1ZiwiLSIpOw0KKwkJCXNlcV9wcmludGYoc2VxLCAiICUtOXMgJS05cyAi
+LCBidWYsYnVmKTsNCisJCX0NCisJCWVsc2Ugew0KKwkJCWZvciAoaz0wOyBrIDwgYXgyNS0+
+ZGlnaXBlYXQtPm5kaWdpOyBrKyspIHsNCisJCQkJc2VxX3ByaW50ZihzZXEsICIlLTlzJXMi
+LA0KKwkJCQlheDJhc2MoYnVmLCAmYXgyNS0+ZGlnaXBlYXQtPmNhbGxzW2tdKSwNCisJCQkJ
+YXgyNS0+ZGlnaXBlYXQtPnJlcGVhdGVkW2tdPyAiKiI6IiAiKTsNCisJCQl9DQorCQl9DQog
+DQotCXNlcV9wcmludGYoc2VxLCAiICVkICVkICVkICVkICVsdSAlbHUgJWx1ICVsdSAlbHUg
+JWx1ICVsdSAlbHUgJWQgJWQgJWx1ICVkICVkIiwNCisJCXNlcV9wcmludGYoc2VxLCAiJWQg
+ICVkICAlZCAgJWQgICAlMmx1LyUwMmx1ICAgJWx1LyVsdSAgICUzbHUvJWx1ICAgJWx1LyVs
+dSAgICUyZC8lMmQgICUzbHUgJTNkICAgICAgJTNkIiwNCiAJCSAgIGF4MjUtPnN0YXRlLA0K
+IAkJICAgYXgyNS0+dnMsIGF4MjUtPnZyLCBheDI1LT52YSwNCiAJCSAgIGF4MjVfZGlzcGxh
+eV90aW1lcigmYXgyNS0+dDF0aW1lcikgLyBIWiwgYXgyNS0+dDEgLyBIWiwNCkBAIC0xOTg1
+LDEzICsyMDAxLDEzIEBAIHN0YXRpYyBpbnQgYXgyNV9pbmZvX3Nob3coc3RydWN0IHNlcV9m
+aWxlICpzZXEsIHZvaWQgKnYpDQogCQkgICBheDI1LT53aW5kb3csDQogCQkgICBheDI1LT5w
+YWNsZW4pOw0KIA0KLQlpZiAoYXgyNS0+c2sgIT0gTlVMTCkgew0KLQkJc2VxX3ByaW50Zihz
+ZXEsICIgJWQgJWQgJWx1XG4iLA0KKwkJaWYgKGF4MjUtPnNrICE9IE5VTEwpIHsNCisJCQlz
+ZXFfcHJpbnRmKHNlcSwgIiAgICAlLTNkICAgJS0zZCAgICVsdVxuIiwNCiAJCQkgICBza193
+bWVtX2FsbG9jX2dldChheDI1LT5zayksDQogCQkJICAgc2tfcm1lbV9hbGxvY19nZXQoYXgy
+NS0+c2spLA0KIAkJCSAgIHNvY2tfaV9pbm8oYXgyNS0+c2spKTsNCi0JfSBlbHNlIHsNCi0J
+CXNlcV9wdXRzKHNlcSwgIiAqICogKlxuIik7DQorCQl9IGVsc2UNCisJCQlzZXFfcHV0cyhz
+ZXEsICIgICAgKiAgICAgKiAgICAgKlxuIik7DQogCX0NCiAJcmV0dXJuIDA7DQogfQ0K
+
+--------------BFkYMDOTwEs82WuKU6RKQpL0--
 
