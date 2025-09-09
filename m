@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-221194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8964AB4FA08
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:13:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 405CAB4FA12
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 14:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3F45189C7D0
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:14:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D1521895A28
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 12:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F6F334399;
-	Tue,  9 Sep 2025 12:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFD232CF66;
+	Tue,  9 Sep 2025 12:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBnaipz2"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="IvE7sjg6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611ED309EE5;
-	Tue,  9 Sep 2025 12:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA0F320CA6;
+	Tue,  9 Sep 2025 12:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757420023; cv=none; b=jDwjr9R+IirIU51fTO+KiRd8JXBue/R4d9pi4QGSAuyVSI9NawbOYmNphvXU0Np0V2kWGC4D5H8vXaCs8v0KoMvlxHscedWfnsGoZ9LDSPRq7wC/E19e+fdhBN6ITC8wvlYmKJfs6+K3I99JuI7FeZVmcCgevaegcuBFg172Akc=
+	t=1757420070; cv=none; b=skOyqGgyH87cYAPSdnkCSpZuad1FbbzX0F+wacXHZJo0Eu1b2hED4R34RMr9pmY9eSNRxp604T7LNSQJk8TJ8gc56nPDfNl00SJhnfQuTcJlqFMPnvFjYxZ+U9Fmiz76Y6wd3EeDTTNUaPWiqhpOSM2CkddILNsTCHouA7OgtNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757420023; c=relaxed/simple;
-	bh=R8IBEgyyfdC4LwzwmPwd7zIkX1SnWTZM2uMbSQnjzwM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=akP9lZStcLYzznumOfDYOockoa2e9+V0/b57/eOij4zmIuSsNMs0UYAWjdNOBobnF/h0sQLo6tyag8P7MQDEYrQ34AOjlRW5RdwU/uPN/I1CBuj2cGd8CgcSRcuQcaNv4z1EMUVRg/EsCVRif0dhr1aS+7MfILXF+NP0Js6arKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBnaipz2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35132C4CEF4;
-	Tue,  9 Sep 2025 12:13:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757420022;
-	bh=R8IBEgyyfdC4LwzwmPwd7zIkX1SnWTZM2uMbSQnjzwM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=cBnaipz2LRSWHlYEn0e52S3XLyiB6lXu6/LeAGDw65qGwxiXR8F+oOBTLmlQ2A4jF
-	 8XTTP+HDqJ8D7514Jb1PS6OJdLWxz3CtxtbhbU50QmRBMQz/lOiGaw8XfRcQ+mRcVz
-	 3gBIHu95PULkdI49gRhxVX64xonatNwmF5vmZyfml1gHE14h/6qVf6Lv3PRD4m65ca
-	 C/54C4NCmHW3clOLH8CrhRJ4xbufciXFxWz5wgi8ETt7/Tc/VhvhH88hnk6V6ItS3M
-	 38poAUb+EysM1CDvCtNW6Jsxh1RuGuhHHV/GPnpvnFnjfjK+htAOy7hgZJjodfOz7e
-	 uDtMT7gBwwbCA==
-Date: Tue, 9 Sep 2025 14:13:35 +0200
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v2][next] Bluetooth: Avoid a couple dozen
- -Wflex-array-member-not-at-end warnings
-Message-ID: <aMAZ7wIeT1sDZ4_V@kspp>
+	s=arc-20240116; t=1757420070; c=relaxed/simple;
+	bh=OB63mIo4zdSMWKbh2EcQLPe3oSRYB9H/CMW5Vw3qz4I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZcyL0JrvAihgt1aje4htzD1A9p7W+G1A9KlBuqqa+yvZHLkYo/C5Pc6d3Q0auhQDwVGzHAl3Nc9eX3gevqreEKDjF+VqMNzhjoaYRoxJ/zclp6LFHlNZS8bPijO7lar+vMIliMBW62OwiYNxTWcSUktxknIVt5lim9E3/g2wdbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=IvE7sjg6; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1757420064; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=YQGx5IQ4PPAyFAVoz8cJdR94oARhHl805b2sz6A9J0c=;
+	b=IvE7sjg6sLU2jnyon+WWP/jp1b838NP4yPsFM21ye5seJZjFBJTKUdM5bWs3JoY9I1adIbtCQltFscjqDjDb03wt3s8gagFjDlz7l3eSJ+FcqjEZcBjqvIAoZq71XNM8RlirfFAaqb434Tq+iEKAeOxPmkUHMl1adCr+DVp0KYM=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Wne8cK2_1757420063 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 09 Sep 2025 20:14:24 +0800
+Date: Tue, 9 Sep 2025 20:14:23 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Mahanta Jambigi <mjambigi@linux.ibm.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alibuda@linux.alibaba.com, sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com
+Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net] net/smc: Remove unused argument from 2 SMC functions
+Message-ID: <aMAaH7oQz-FM96sv@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250909071145.2440407-1-mjambigi@linux.ibm.com>
+ <aMAR8q4mc3Lhkovw@linux.alibaba.com>
+ <8bc987c9-a79d-42ec-8279-da8b407cfd2c@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,71 +62,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <8bc987c9-a79d-42ec-8279-da8b407cfd2c@linux.ibm.com>
 
--Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-getting ready to enable it, globally.
+On 2025-09-09 17:13:35, Mahanta Jambigi wrote:
+>On 09/09/25 5:09 pm, Dust Li wrote:
+>> On 2025-09-09 09:11:45, Mahanta Jambigi wrote:
+>>> The smc argument is not used in both smc_connect_ism_vlan_setup() &
+>>> smc_connect_ism_vlan_cleanup(). Hence removing it.
+>>>
+>>> Fixes: 413498440e30 net/smc: add SMC-D support in af_smc
+>> 
+>> The standard format for the Fixes tag requires the title to be enclosed
+>> in parentheses.
+>
+>I missed this. Let me fix it in next version.
+>
+>> 
+>> But I don't think this is a bugfix.
+>
+>Yeah, its more of a clean up code. Should I use net-next? How should I
+>got about this.
 
-Use the __struct_group() helper to fix 31 instances of the following
-type of warnings:
+Yes, I think it should remove the Fixes tag and go to net-next.
 
-30 net/bluetooth/mgmt_config.c:16:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-1 net/bluetooth/mgmt_config.c:22:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
-Changes in v2:
- - Use __struct_group() instead of TRAILING_OVERLAP().
-
-v1:
- - Link: https://lore.kernel.org/linux-hardening/aLSCu8U62Hve7Dau@kspp/
-
- include/net/bluetooth/mgmt.h | 9 +++++++--
- net/bluetooth/mgmt_config.c  | 4 ++--
- 2 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 3575cd16049a..74edea06985b 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -53,10 +53,15 @@ struct mgmt_hdr {
- } __packed;
- 
- struct mgmt_tlv {
--	__le16 type;
--	__u8   length;
-+	/* New members MUST be added within the __struct_group() macro below. */
-+	__struct_group(mgmt_tlv_hdr, __hdr, __packed,
-+		__le16 type;
-+		__u8   length;
-+	);
- 	__u8   value[];
- } __packed;
-+static_assert(offsetof(struct mgmt_tlv, value) == sizeof(struct mgmt_tlv_hdr),
-+	      "struct member likely outside of __struct_group()");
- 
- struct mgmt_addr_info {
- 	bdaddr_t	bdaddr;
-diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-index 6ef701c27da4..c4063d200c0a 100644
---- a/net/bluetooth/mgmt_config.c
-+++ b/net/bluetooth/mgmt_config.c
-@@ -13,13 +13,13 @@
- 
- #define HDEV_PARAM_U16(_param_name_) \
- 	struct {\
--		struct mgmt_tlv entry; \
-+		struct mgmt_tlv_hdr entry; \
- 		__le16 value; \
- 	} __packed _param_name_
- 
- #define HDEV_PARAM_U8(_param_name_) \
- 	struct {\
--		struct mgmt_tlv entry; \
-+		struct mgmt_tlv_hdr entry; \
- 		__u8 value; \
- 	} __packed _param_name_
- 
--- 
-2.43.0
+Best regards,
+Dust
 
 
