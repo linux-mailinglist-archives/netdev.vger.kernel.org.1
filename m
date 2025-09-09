@@ -1,87 +1,79 @@
-Return-Path: <netdev+bounces-221472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADF5FB50943
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:33:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35CDB50948
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 631A0541112
-	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:33:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40E88681AD6
+	for <lists+netdev@lfdr.de>; Tue,  9 Sep 2025 23:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239DA287515;
-	Tue,  9 Sep 2025 23:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8748F2882AF;
+	Tue,  9 Sep 2025 23:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uq+4oSgF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KVRepvSx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72E128726B
-	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 23:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB15A2B9B9
+	for <netdev@vger.kernel.org>; Tue,  9 Sep 2025 23:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757460784; cv=none; b=MnVw5sL7uWcZ/79vnDwLGBEhr3UgZ5/DG+sbd5VZFQp1wHeQXOG4m7IzYbiFKNoouxkZQtOmHLAAuvghzEeieZQDgHJyhRz3OSFZfPLGoOUN95GK9DwIGsiZDk0UKzwKC90RD5ufqf/HeCQaHrrLPIJdV5TQhyndkFTvSc2HppA=
+	t=1757460834; cv=none; b=cD4C6zsQ1dT51eDnsKeKGA7mbDgDUzXOSNi/5lm+2CBK2wA4aYsRbOwelMTTy1FAJ3zl2r7wjUdB2mcJxDi2t1PMbd5Nif0TiOVyJM6+BPM8HFkNVdgjmRTNvQJVY7IDMldVItwSYGyZzF4sstEgOEL+QobQA/BG1ntDe3Gr8h0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757460784; c=relaxed/simple;
-	bh=4UKFJl1cPbs1SFTPgxONkfgxzCJLRGsIr01LnYJcHmw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mlZK6Ms63Ckbw2+9VVD6KYzghAkaWJ+qAoI8Z19VS1lCmD3XeRV5JLcbARLXbD2MP/1ACSzkAHon65EEKuLFfE1Lv9M6m+TCrJJ712Sb7Vr2OqFr5A3ZpIA5dxAfDoJXzFHB5ruMC3oo/LvLFqA9YBpploXhCCkt/S3Dqsqd12c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uq+4oSgF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AE46C4CEF4;
-	Tue,  9 Sep 2025 23:33:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757460783;
-	bh=4UKFJl1cPbs1SFTPgxONkfgxzCJLRGsIr01LnYJcHmw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uq+4oSgF0OYlKge8r0q5ITxYXyMxPMmQyU6lffeSVZ+Sccwbri8tLsC9681LjMAMZ
-	 hKPGvhZc/YzLnRbKyBHts8+wZa2USrzHCf/h9iG8j81/w7t+BnAdCUluF4EDhjLSA6
-	 D4Fooc3n5V3tE4RbjkXCjuicx9xqUPf8V4J2ND3deSAUVvjXGj/2c8ar1v4yeL945P
-	 5kFjXNBBi7T3VEsscpU5YUTfTp0J9s8U3pVUgLh58CD+wLoZ59GSCcbZ4PpS8AD9x/
-	 NQpAu5+TY3jAfaO2pL0rB2Q/Of8dRyKRNpGQ87Bw3sS6ch/HaYZ5SJ56FaZ7A4PGDZ
-	 TnW2ITr31SyUw==
-Date: Tue, 9 Sep 2025 16:33:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Kory Maincent <kory.maincent@bootlin.com>, Alexandra Winter
- <wintera@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Paolo Abeni
- <pabeni@redhat.com>, Shannon Nelson <sln@onemain.com>, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH net] net: ethtool: fix wrong type used in struct
- kernel_ethtool_ts_info
-Message-ID: <20250909163302.7e03d232@kernel.org>
-In-Reply-To: <E1uvMEK-00000003Amd-2pWR@rmk-PC.armlinux.org.uk>
-References: <E1uvMEK-00000003Amd-2pWR@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1757460834; c=relaxed/simple;
+	bh=E6ZD1H6QAYh+Iw5LjP8zTuXu8SZFsHhAJJPeeCME+lw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eQoT+TihPBsOur9bnSOTpyihP1gorcSYUIlWVjP5yziVc/Q1GjdM5Uq8bvzdSAJmSYI1cAELVigSWDTaMZXaC8zI+VIt7lYvsYE6Tdbo/b4OxXNcsjYS5rW9BfaYTI2+cPoql67oSHo/uunnfUQIEVZdvlYlkhRvpKNPWpE8yJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KVRepvSx; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b2f3d2f8-1a0b-4c58-8861-229c0bb06f5b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757460829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R/Hvh+2vOtj/jFkFOnAU5o4Gre5byeUjDZdrAy6Cbx0=;
+	b=KVRepvSxvygZvkS5LOVWrMwveQuKLNw5b0+iWzemli2bwXsVitAoEJzYZa8099a0Vs/BKL
+	lD4TuQe3U3S1ygJXJCp3SGcQ6qlAH52FiNMFe1Y8/9LpCWXypvAIyjqlGXrQxOXQeDujgd
+	byOlJs0I4NvhGqB2Owkl/BEbxmaUtIY=
+Date: Wed, 10 Sep 2025 00:33:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net-next 3/4] net: dsa: mv88e6xxx: remove
+ chip->evcap_config
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>
+References: <aMBLorDdDmIn1gDP@shell.armlinux.org.uk>
+ <E1uw0Xk-00000004IOC-1EJd@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <E1uw0Xk-00000004IOC-1EJd@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, 07 Sep 2025 21:43:20 +0100 Russell King (Oracle) wrote:
-> In C, enumerated types do not have a defined size, apart from being
-> compatible with one of the standard types. This allows an ABI /
-> compiler to choose the type of an enum depending on the values it
-> needs to store, and storing larger values in it can lead to undefined
-> behaviour.
+On 09/09/2025 16:46, Russell King (Oracle) wrote:
+> evcap_config is only read and written in mv88e6352_config_eventcap(),
+> so it makes little sense to store it in the global chip struct. Make
+> it a local variable instead.
 > 
-> The tx_type and rx_filters members of struct kernel_ethtool_ts_info
-> are defined as enumerated types, but are bit arrays, where each bit
-> is defined by the enumerated type. This means they typically store
-> values in excess of the maximum value of the enumerated type, in
-> fact (1 << max_value) and thus must not be declared using the
-> enumated type.
-> 
-> Fix both of these to use u32, as per the corresponding __u32 UAPI type.
-> 
-> Fixes: 2111375b85ad ("net: Add struct kernel_ethtool_ts_info")
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Do you feel strongly about this being a fix? (I can adjust when
-applying FWIW). It's clearly not great but I don't think storing
-a mask of enum values cause functional problems.
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
