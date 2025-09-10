@@ -1,170 +1,148 @@
-Return-Path: <netdev+bounces-221602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E237CB511E7
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:57:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01B27B51132
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:27:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FC44563631
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:57:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A31FA1610FE
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF2D311C1B;
-	Wed, 10 Sep 2025 08:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083B430F54C;
+	Wed, 10 Sep 2025 08:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eoqKSXG1"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371C1311952;
-	Wed, 10 Sep 2025 08:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C206A2C11CB;
+	Wed, 10 Sep 2025 08:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757494649; cv=none; b=i8r8Fh8G8EjGgINfte6THCrMQM8JM12nB5OZI0wAfFXivfJVoQ0thxgLxLrcQDWoKnn8SF/Y9Bh61XG6EQh1QP+AgydPU8AQum0woeynEio1cXx/0eX/90p2sDUXAk5nTbsh7X9ED5NP5N44IOWRhYMhVpoRJsqCGFqs18JC3eo=
+	t=1757492872; cv=none; b=FgBoWTwfeL+qUMmPnzw7Dh9UHONJQE28QPv8pjwr9UJPlCuiQGrK2O7w10xTWoyMZXGox31mDZSYLt0EG9CZ9O49qBMbHfCDAX7FlQMiVjbFnd5JkNIMMKQX5QfUtvHaNoE/UByMXxjtdMZ6cHc+us8NqHSgX1Uyy2qLrzynKQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757494649; c=relaxed/simple;
-	bh=UyTKr/gRlDYEGxckMgklqxwcPAl9u7MPrPxBjUXQOW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cn0AOIEwZb4xvhsHu/BeNy5zLh4ne8/LO2mAwn2gbcuAWad5kIJGdBnw5nA0G6OOJRGNPMoK9qOe8JjDP8HCFal+76/bp4tSHxxFhxFKObzVoBW7R0x2P4lYJPjgceIba/MAEPgbQMVrUDKLTtWsnZkyo28KDAmEiCJ53fA2/Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.98.2)
-	(envelope-from <joerg@jo-so.de>)
-	id 1uwG5X-00000006hFm-0ZHo;
-	Wed, 10 Sep 2025 10:21:59 +0200
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98.2)
-	(envelope-from <joerg@jo-so.de>)
-	id 1uwG5W-00000000Okw-2Jme;
-	Wed, 10 Sep 2025 10:21:58 +0200
-Date: Wed, 10 Sep 2025 10:21:58 +0200
-From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
-To: Yibo Dong <dong100@mucse.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "Anwar, Md Danish" <a0501179@ti.com>, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	horms@kernel.org, corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com, 
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com, 
-	lorenzo@kernel.org, geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com, 
-	lukas.bulwahn@redhat.com, alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org, 
-	gustavoars@kernel.org, rdunlap@infradead.org, vadim.fedorenko@linux.dev, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v11 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <vfarjsi3uf55kb5uj25stnjriemyvra7gomxmtik3jowsp24n5@k44vc2gdmyaf>
-References: <20250909120906.1781444-1-dong100@mucse.com>
- <20250909120906.1781444-5-dong100@mucse.com>
- <68fc2f5c-2cbd-41f6-a814-5134ba06b4b5@ti.com>
- <20250909135822.2ac833fc@kernel.org>
- <00A30C785FE598BA+20250910060821.GB1832711@nic-Precision-5820-Tower>
+	s=arc-20240116; t=1757492872; c=relaxed/simple;
+	bh=Jn3IN7T2ibSeH1qEfh+8dD2heAvbWrgUf8A3kjq+o8s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bcEiZ2IpH810sptrbIWb94LKyJlDebHz99XgPYBmXZjUUfNrBKv60uFjJmzLIc5kNQcgC+kELMLAu5mbPUiJXtG75mcMcywDjQSdNxOMsl//sE7q6tYkWiXAsws8RsziTzD+EA3sxLQfNqRqZ+6f3pxxGEZwa90tNHgVN6PMXv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eoqKSXG1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A019C4CEF0;
+	Wed, 10 Sep 2025 08:27:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757492872;
+	bh=Jn3IN7T2ibSeH1qEfh+8dD2heAvbWrgUf8A3kjq+o8s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eoqKSXG1NFiQZvwJ08l76u8K77C7dwsDjo0A2Y+LYZZpO24VrRutl1WCVVhs0Q2un
+	 I4IMxyX5Sui3u2D/0dzzHC0uRdo9z1U4qSVeLzBBo8nY6Fh2VYB0K/x6jt699v9R8t
+	 6d5f1AZ+I6f6uzOvWLCxrv25DHXCFSMsyOsX25dO2CIVxU3T/3cAuuqWBhrnJurM4y
+	 cbt5wdVmqPbwKlcDTd4nmmjaSO4CvtiQO+6hN6MqIigzMu8PjhBUHjVx6EngDNdscG
+	 9pI+OM62HnyzHLQ2D6Cn6V0vE5pRkKihtwEwD92l4RgofPOZno22s5tsDGjt5OzD+S
+	 YG4XxzCYZxzPQ==
+Message-ID: <704358b3-22c9-42d2-b7d7-08f435b2991f@kernel.org>
+Date: Wed, 10 Sep 2025 10:27:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ave2a22qe2b7h3wz"
-Content-Disposition: inline
-In-Reply-To: <00A30C785FE598BA+20250910060821.GB1832711@nic-Precision-5820-Tower>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net 1/3] netlink: specs: mptcp: fix if-idx attribute type
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Davide Caratti <dcaratti@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20250908-net-mptcp-misc-fixes-6-17-rc5-v1-0-5f2168a66079@kernel.org>
+ <20250908-net-mptcp-misc-fixes-6-17-rc5-v1-1-5f2168a66079@kernel.org>
+ <m2plc0ui9z.fsf@gmail.com> <8f0bc70f-1657-4938-88e8-532ffb7c1a12@kernel.org>
+ <20250909184221.02b070b0@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Content-Language: en-GB, fr-BE
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250909184221.02b070b0@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hi Jakub,
+
+On 10/09/2025 03:42, Jakub Kicinski wrote:
+> On Tue, 9 Sep 2025 11:08:46 +0200 Matthieu Baerts wrote:
+>>> Note that mptcp_pm_parse_entry has this, which should maybe be fixed at
+>>> the same time:
+>>>
+>>> 	u32 val = nla_get_s32(tb[MPTCP_PM_ADDR_ATTR_IF_IDX]);  
+>>
+>> Good catch!
+> 
+> indeed!
+> 
+>> This should be fixed in a dedicated patch, because this fixes commit:
+>> ef0da3b8a2f1 ("mptcp: move address attribute into mptcp_addr_info"), a
+>> different commit than the one being fixed here.
+> 
+> int = u32 is unlikely to cause issues AFAIU. We recently applied 
+> a bunch of such fixes to net-next. I think this can also go to -next.
+
+Good point, in our tree, I will queue this patch for -next:
 
 
---ave2a22qe2b7h3wz
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v11 4/5] net: rnpgbe: Add basic mbx_fw support
-MIME-Version: 1.0
+https://lore.kernel.org/20250909-mptcp-pm-user-c-flag-v2-1-a6f9542481c5@kernel.org
 
-Yibo Dong schrieb am Mi 10. Sep, 14:08 (+0800):
-> On Tue, Sep 09, 2025 at 01:58:22PM -0700, Jakub Kicinski wrote:
-> > On Tue, 9 Sep 2025 19:59:11 +0530 Anwar, Md Danish wrote:
-> > > > +int mucse_mbx_sync_fw(struct mucse_hw *hw)
-> > > > +{
-> > > > +	int try_cnt =3D 3;
-> > > > +	int err;
-> > > > +
-> > > > +	do {
-> > > > +		err =3D mucse_mbx_get_info(hw);
-> > > > +		if (err =3D=3D -ETIMEDOUT)
-> > > > +			continue;
-> > > > +		break;
-> > > > +	} while (try_cnt--);
-> > > > +
-> > > > +	return err;
-> > > > +} =20
-> > >=20
-> > > There's a logical issue in the code. The loop structure attempts to
-> > > retry on ETIMEDOUT errors, but the unconditional break statement after
-> > > the if-check will always exit the loop after the first attempt,
-> > > regardless of the error. The do-while loop will never actually retry
-> > > because the break statement is placed outside of the if condition that
-> > > checks for timeout errors.
-> >=20
->=20
-> What is expected is 'retry on ETIMEDOUT' and 'no retry others'.=20
-> https://lore.kernel.org/netdev/a066746c-2f12-4e70-b63a-7996392a9132@lunn.=
-ch/
->=20
-> > The other way around. continue; in a do {} while () look does *not*
-> > evaluate the condition. So this can loop forever.
-> >=20
->=20
-> Maybe I can update like this ?
->=20
-> int mucse_mbx_sync_fw(struct mucse_hw *hw)
-> {
-> 	int try_cnt =3D 3;
-> 	int err;
->=20
-> 	do {
-> 		err =3D mucse_mbx_get_info(hw);
-> 		if (err !=3D -ETIMEDOUT)
-> 			break;
-> 		/* only retry with ETIMEDOUT, others just return */
-> 	} while (try_cnt--);
->=20
-> 	return err;
-> } =20
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-How about something like this?
-
-int mucse_mbx_sync_fw(struct mucse_hw *hw)
-{
-	for (int try =3D 3; try; --try) {
-		int err =3D mucse_mbx_get_info(hw);
-		if (err !=3D -ETIMEDOUT)
-			return err;
-	}
-
-	return ETIMEDOUT;
-}
-
-
-My 2cent.
-
-Regards J=C3=B6rg
-
---=20
-=E2=80=9EEs wurden und werden zu viele sprachlose B=C3=BCcher gedruckt, nac=
-h deren
-schon fl=C3=BCchtiger Lekt=C3=BCre man all die B=C3=A4ume um Vergebung bitt=
-en m=C3=B6chte,
-die f=C3=BCr den Schund ihr Leben lassen mussten.=E2=80=9C (Michael J=C3=BC=
-rgs,
-                      Seichtgebiete =E2=80=93 Warum wir hemmungslos verbl=
-=C3=B6den)
-
---ave2a22qe2b7h3wz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCaME1JAAKCRB9LJoj0a6j
-dWHfAP9MpwXSbDkmn0L3EBxXklRTyGo9dD4BVrhkdXrXtYNrXgD/f0quVJJNn+Zo
-2d4EZ+ulmakNhpMKJUdjDi8P1IHNG6c=
-=3Gfd
------END PGP SIGNATURE-----
-
---ave2a22qe2b7h3wz--
 
