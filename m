@@ -1,113 +1,191 @@
-Return-Path: <netdev+bounces-221680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F071FB51906
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:12:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73892B5192C
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52D071881E47
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 14:12:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3872A1C248B8
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 14:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F93322552;
-	Wed, 10 Sep 2025 14:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67FBC324B14;
+	Wed, 10 Sep 2025 14:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KWjtR1fK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2BB1A76D4;
-	Wed, 10 Sep 2025 14:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23108238C0A;
+	Wed, 10 Sep 2025 14:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757513529; cv=none; b=DKlp6BrCpe7z08YDXL5B113ueRj/Wdqz19qYY2oEzbFITWpW18B4Sp1d9tVRhewOaXxggTStG1hEl9IKpzfoSbA7dFElgjVTDVqRmox+tZAfpYxTwwj+xg4/E7cW7XrPy1y81vMDAF2cujSlxjUZyeyUsT9gzRJ62zz1Tf7uPSk=
+	t=1757514094; cv=none; b=da45aaiteergA9E8pb02RMBtj3c9tSzIWYlFL2022/y4689yLB5qzgMaKtxAPhR/jN1EjaujjEnv4qovoiTqwx2L0WkACcKzcvd+C+YZol3KYT8lWSUSkASefpPThvGLb3tPSfAvDahdEIL54oKWkzj47IlCYaIyIS+bVLRReb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757513529; c=relaxed/simple;
-	bh=BuH07/Cum8ilWq7fktbOKN73y+hgVGVExicH3rzWbsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CKJ6rLd9qJEBLYCQn3iOP8BXQkLnAVrclQKd3TyTZMQr03I08GVk/nQEe0YtMAS0cgYcYRbpL7zv3baPOd6o/1JDpvUMu2qN6OldVhbuDztmNWQ1Kkesh3e/8uYI0y4lBdSK+jgPcMepidTT0km10CyoBswCDRXdtArwff3SjP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b0418f6fc27so1137565066b.3;
-        Wed, 10 Sep 2025 07:12:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757513526; x=1758118326;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zeRS2yB/lYI/APOxiGv1ZbIrveAk9ANoUQjTZkTU2z0=;
-        b=YbfXI7/rv1/ynIW/7Ab1LCiOQSmmaqXmDb3YpjJILODJN6r7uoTjRONFW8vjwiJ661
-         cEbcmdeT7tnu3bQmjs076QHm5HU4g0+5yP3lw4j1Vpn7aCLO4t/0kN8DSsMHfO1V2fq1
-         PZFu+YOQ9OYfd6kkr/aZEZ5xhUhduT589ZXZCRDM3ZUS3J4c78lRiiVNR5dmZTDUyQDf
-         cUVh6KNecGoN+rcw23WJSuLTQJtwCxjau45wWv8uUNyMdF01rhouaNL78Hbq+v0rumIU
-         8nS6+2iWojLzKKF+TA5vXPsLIqnsB5pSR1oxmVZI32BgQZGyTpiYVnPcgGUh7nHhvjDv
-         seNw==
-X-Forwarded-Encrypted: i=1; AJvYcCUaOM5ZtLl4m9z6gj0R+hHar4QG/r3Jvf74wvYGsj1ow+UgFs3GbSoGyBxCBepny5sL3wKo4u7n@vger.kernel.org, AJvYcCVP4t3GM8GPgampVqOfSwp6rH/czsozFUpgphgnhqh1wNRLPej4mVHNZ4bA7f82ULY1CUnsaDWN/75FDZ4=@vger.kernel.org, AJvYcCVYYhniQwhvQOo5Vgm8uD+qDGX/fygN40onQJhvNvDQXzsJd2RlzI/Zgtqy7Apxzu3RAlwfaBdb5WGBM37vTItJ@vger.kernel.org, AJvYcCXukpDQQp6M5fceZg8RiGaQaWHudmSANk2FsnZVbyUXYafD6qPIMt0xUhbA8w/pTuQTfz9mJyeI@vger.kernel.org
-X-Gm-Message-State: AOJu0YwETpuPK2zOqz2w1MiWxiCzmpCWCO+IunMLA+sp86NO/zsykoK1
-	eRKiQ1TcewJOyyYtK6QU7L+yOLdE9vLV4E9Vjk4A7GUdmukpENvkEXaX
-X-Gm-Gg: ASbGncuKXGE6PQcAU+YXCxXpXopWZROX5Hp9wl5xZMf4f0D+zjRzBzoge8fU6/I1b+3
-	1cV68DZJlPNAezeCrcmFdP/j7RQBJSzVlTCkfDHPZzYWNf0Z0LKpnEfpEITEl3hxLQVhruESJXY
-	wV+PAUsgiwp3UK1PMBZW9HODNT8GG7P9kVpCsXp7h533XsgFkviXHLVOfO9VQWyF/ZWtSwpyXzo
-	4LF8FAr3E0NGoGH7U6IToSYYacOKG4QPnokqsXYoVyEriFZGhs9ZUk+VL+0ZPtM4eWQ0vdf+Znf
-	7ElXzt0fTfkxtnTK2tIpfNYr81O0pRIH+N8yzi+XS/k6k8l3QYEXFU2Yyjb3cxevNdX4xR6e1Tm
-	A3+CVycGg030Keg==
-X-Google-Smtp-Source: AGHT+IFmFSyfrWgMwdgHc71VO7KWawXXU+herwPNHRT2RcvmhjfTOzg1KJW7L0A2P6w4UTRGZBMcfg==
-X-Received: by 2002:a17:907:3c91:b0:af9:76cd:d836 with SMTP id a640c23a62f3a-b04b1458c7fmr1486696466b.13.1757513526255;
-        Wed, 10 Sep 2025 07:12:06 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:70::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b078334c317sm171503566b.63.2025.09.10.07.12.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 07:12:05 -0700 (PDT)
-Date: Wed, 10 Sep 2025 07:12:03 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Calvin Owens <calvin@wbinvd.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	david decotigny <decot@googlers.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, kernel-team@meta.com, 
-	stable@vger.kernel.org, jv@jvosburgh.net
-Subject: Re: [PATCH net v3 1/3] netpoll: fix incorrect refcount handling
- causing incorrect cleanup
-Message-ID: <jibftqm5ihdgazmk3p5gsjhlc536itqaq7r5uag5fuiqtth6cp@abihzyykh4gy>
-References: <20250905-netconsole_torture-v3-0-875c7febd316@debian.org>
- <20250905-netconsole_torture-v3-1-875c7febd316@debian.org>
- <aL9A3JDyx3TxAzLf@mozart.vkv.me>
- <20250908182958.23dc4ba0@kernel.org>
- <kmvkrqkkrbfctpramlchpwqikg2x3btb3debshabqctt7azu2j@tv4ziqd4gldh>
- <20250909161625.470d2835@kernel.org>
+	s=arc-20240116; t=1757514094; c=relaxed/simple;
+	bh=wlwwpmCHOkMFq8CRg6C3epU/9mVJzj7n97KyC/xLjSM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fBNTkdsM15x3SlgTSeRVNN+R1DqXymFGuNERuahDFwheBTqaSGF69naNdFVpjdIPgoJyXB3mY0BNrPdSWSaQSKqT+pgfJdfyqiZ1WjzzRPegUM3nFEX46rsHXcmBdxwH3XSP26FtmOBggd3snc2QSmuVPULu5OVDrm9yZpemYFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KWjtR1fK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A610CC4CEEB;
+	Wed, 10 Sep 2025 14:21:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757514093;
+	bh=wlwwpmCHOkMFq8CRg6C3epU/9mVJzj7n97KyC/xLjSM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KWjtR1fKTnq1Zpnr1v3nujpytOtS2zSXRxEATD6htva1LA/eBAryUmMSKs0M0xGaS
+	 VRg76BTlwurInrXhKzJqMVRn+fRPUVE9r6oC9E8BAz7VRDtaaDBOnze8vzD5rrCR1f
+	 usEq/Pvcyd8nshiN7dOTBrtY2+JKH9pIsVBgKMTutiV+TmJgUoRSMH8+HNFPNr+h5X
+	 MOQnwGMmyI37lEkjeishIGV6cZwp6wQvmTTD8g35ZcgsFnCeHTptjSGupSQstBY4Hv
+	 u6bzDbyDNNex0oc61S44MyxQIL7riVXR5FgMXSwS5gtqNELzbGf0Bf1GgkM5bfIMWA
+	 AF5+NNjzLBdWQ==
+Message-ID: <a37db87d-c3b1-4ce4-bec0-4f496dc209b5@kernel.org>
+Date: Wed, 10 Sep 2025 16:21:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250909161625.470d2835@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 07/14] dt-bindings: display: mediatek,ufoe: Add
+ mediatek,gce-client-reg property
+To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
+ andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
+ broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
+ conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com,
+ edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com,
+ jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com,
+ krzk+dt@kernel.org, kuba@kernel.org,
+ kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
+ linus.walleij@linaro.org, louisalexis.eyraud@collabora.com,
+ maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
+ mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
+ p.zabel@pengutronix.de, pabeni@redhat.com, robh@kernel.org,
+ sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com,
+ tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com,
+ devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-8-ariel.dalessandro@collabora.com>
+ <20250821-wandering-vermilion-pigeon-b8c9f0@kuoka>
+ <28049fe0-0ae7-4b40-9f95-1513e317547f@collabora.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <28049fe0-0ae7-4b40-9f95-1513e317547f@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 09, 2025 at 04:16:25PM -0700, Jakub Kicinski wrote:
-> On Tue, 9 Sep 2025 13:17:27 -0700 Breno Leitao wrote:
-> > On Mon, Sep 08, 2025 at 06:29:58PM -0700, Jakub Kicinski wrote:
-> > > On Mon, 8 Sep 2025 13:47:24 -0700 Calvin Owens wrote:  
-> > > > I wonder if there might be a demon lurking in bonding+netpoll that this
-> > > > was papering over? Not a reason not to fix the leaks IMO, I'm just
-> > > > curious, I don't want to spend time on it if you already did :)  
-> > > 
-> > > +1, I also feel like it'd be good to have some bonding tests in place
-> > > when we're removing a hack added specifically for bonding.  
-> > 
-> > Do you prefer to have a separated bonding selftest, or, is it better to
-> > add some bond operations in the torture selftest?
+On 10/09/2025 16:04, Ariel D'Alessandro wrote:
+> Krzysztof,
 > 
-> Normal test is preferable, given the flakiness rate and patch volume
-> I'm a bit scared of randomized testing as part of CI.
+> On 8/21/25 3:50 AM, Krzysztof Kozlowski wrote:
+>> On Wed, Aug 20, 2025 at 02:12:55PM -0300, Ariel D'Alessandro wrote:
+>>> Current, the DT bindings for Mediatek UFOe (Unified Frame Optimization
+>>> engine) is missing the mediatek,gce-client-reg property. Add it and
+>>
+>> Why is it missing? If the binding is complete, it cannot be missing...
+> 
+> Due to the following error:
+> 
+> $ make -j$(nproc) CHECK_DTBS=y mediatek/mt8173-elm.dtb
+>    SCHEMA  Documentation/devicetree/bindings/processed-schema.json
+>    DTC [C] arch/arm64/boot/dts/mediatek/mt8173-elm.dtb
+> [...]
+> arch/arm64/boot/dts/mediatek/mt8173-elm.dtb: ufoe@1401a000 
+> (mediatek,mt8173-disp-ufoe): 'mediatek,gce-client-reg' does not match 
+> any of the regexes: '^pinctrl-[0-9]+$'
+> 	from schema $id: 
+> http://devicetree.org/schemas/display/mediatek/mediatek,ufoe.yaml#
 
-Ok, I will create a selftest to cover the netpoll part of bonding, as
-soon as my understanding is good enough. I don't think it will be quick,
-but, it is on my hi-pri todo list.
+So there are users of it? Then please explain that.
 
-Do you want to have the selftest done before merging this patch, or, can
-they go in parallel?
+> 
+>>
+>>> update the example as well.
+>>>
+>>> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+>>> ---
+>>>   .../bindings/display/mediatek/mediatek,ufoe.yaml      | 11 +++++++++++
+>>>   1 file changed, 11 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/display/mediatek/mediatek,ufoe.yaml b/Documentation/devicetree/bindings/display/mediatek/mediatek,ufoe.yaml
+>>> index 61a5e22effbf2..ecb4c0359fec3 100644
+>>> --- a/Documentation/devicetree/bindings/display/mediatek/mediatek,ufoe.yaml
+>>> +++ b/Documentation/devicetree/bindings/display/mediatek/mediatek,ufoe.yaml
+>>> @@ -64,6 +64,14 @@ properties:
+>>>         - port@0
+>>>         - port@1
+>>>   
+>>> +  mediatek,gce-client-reg:
+>>> +    description: The register of client driver can be configured by gce with
+>>> +      4 arguments defined in this property, such as phandle of gce, subsys id,
+>>> +      register offset and size. Each GCE subsys id is mapping to a client
+>>
+>> Don't explain what DT syntax is. We all know, so that's completely
+>> redundant description. Explain the purpose. Explain Arguments with sechema - items.
+> 
+> Although I agree with your suggestions, this is exactly how the rest of 
+> the Mediatek DT bindings describe this node. This patch is based on the 
+> other +20 files, which describe the node in the same way.
+
+
+Last time I tried to fix something for Mediatek display I got
+condescending and useless review from Collabora, so I won't be bothering
+with fixing these bindings to make your job easier. I don't care, you
+can thank someone inside. Therefore other poor bindings are not a valid
+excuse for this patch not being correct.
+
+Best regards,
+Krzysztof
 
