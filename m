@@ -1,69 +1,60 @@
-Return-Path: <netdev+bounces-221613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EE7B51354
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:57:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42E2DB51361
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17ADC188EC31
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:58:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC123A9EEE
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05966314A9E;
-	Wed, 10 Sep 2025 09:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B09219A7D;
+	Wed, 10 Sep 2025 10:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RwzL2ROA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j0ArAIPW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A06B25771;
-	Wed, 10 Sep 2025 09:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5960931D361;
+	Wed, 10 Sep 2025 10:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757498261; cv=none; b=a0syVUwYacLkoIb6FbcQrIkSgO/cLB3dfwZMDX7XexCCgs2gdbG7APvnwTL/TsHPatDNOxjbDmaPLjWUjQlJwI1eNbcAoQe4GdRhy4tcSPw3D9TwscVcCknfDjdN9zCvuO0zZQp/3bkOvD1LwX7fukC0lIQqN4cSYTUALyHXbos=
+	t=1757498466; cv=none; b=Bk+vO1qsbIEE3j8EMTdRCFVkDYBdttnO9IgFo6GjkEj0nD2YFbc9SIo/IMlObFkGXCczpi1lE+vtov6XO89sqdYyE1j54oyRFIqUKl9vsg47EF8dE8sixUo5ACKz49e4kk1fitjVHQ4uqI8yI2phQ0OujvimQb8YGXEHfJcskNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757498261; c=relaxed/simple;
-	bh=P4ej+3A+Iyp7JyhajhEF8Z9mZpG0Xa99HNWlv60xFn8=;
+	s=arc-20240116; t=1757498466; c=relaxed/simple;
+	bh=G54EZvV6TYh/6aRiLS/VHoanwwYRL6VCM+nMKElEI20=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hJxtw1RKTZdcnWfLh8i/bBgLv+r03lrffHGz6hDpeBFviYItwFiuJBeD3jlchzs4oDxoxFP6hjk9SVc9fU8/U3QAGAOUoXaUGFmIWGY8OC4a/yButEbLkegMGnl3cviqU/cwTxsU6rvkKEwsnGOEUTKILrsLy/DdpBMGC/Apta4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RwzL2ROA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=601O/6NcYDYFYDwAkPHaLCrx7FThiMsVN77zsHJHI+Y=; b=RwzL2ROA7UH4SVTDFFso/hDqL/
-	qUHoKyZMWQqXSQc7e1N0J0Txq2JpYlE2SJb4ritw1hY0dWv02Ps4PQGLBZ+FqvuzJ2sU4X37If4qe
-	XN9ry3zmulz+nr4Rg9c67dWvQbHxwPq6IMDfLErdEtREn8hwN74cK5mELqEyE02I+ou4ATvKRdozE
-	OWrTDWJ3+4LLo4fIndnKcg4Av3paa4QC+PDXr47UBx/0oPvO2S6+woTLrWBCK0n2mVMe5PW4WDtRm
-	EK8MJHZ3rBbY6qvor5BeaXBj0E03bUYtKjJ48L74poC6qlGJYE6owAIMFxRGPxPyvMbqFq4Efa40W
-	b/Ozoq2g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49204)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uwHa2-000000001TW-1eF8;
-	Wed, 10 Sep 2025 10:57:34 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uwHa0-000000001If-1O1n;
-	Wed, 10 Sep 2025 10:57:32 +0100
-Date: Wed, 10 Sep 2025 10:57:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: yicongsrfy@163.com
-Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	hkallweit1@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, yicong@kylinos.cn
-Subject: Re: [PATCH] net: phy: avoid config_init failure on unattached PHY
- during resume
-Message-ID: <aMFLjHDH71fTwLwj@shell.armlinux.org.uk>
-References: <20250910091703.3575924-1-yicongsrfy@163.com>
- <20250910093100.3578130-1-yicongsrfy@163.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BHFWDcql/xNyXSH8EZgQ1hF0A9azztCfH/0aCnqyDj+N4Qgt3Fz6eUnkcwkkkFaY8q+V40SFrqBOynayr3fnxLeuJKeUJRfDK4wmdLII+VDM4MxqhWfKDfV8aPEtdSQsbGm9BFz1wy43fVXQqeBHiY4jnOzKtQd8kQK1+CK6NPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j0ArAIPW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D25CC4CEF0;
+	Wed, 10 Sep 2025 10:01:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757498465;
+	bh=G54EZvV6TYh/6aRiLS/VHoanwwYRL6VCM+nMKElEI20=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j0ArAIPWssOq42cLhTYSaTOOEJ3f4TBdM/d8YerpuWgBriQtXuyvU+81knfjxYXt5
+	 NV1+P14kcqIt+EbTzbRGCUbdEM/UHfatAA2R5KTwKqiapdE1S25UYnLqPh7ObG7Lgv
+	 YeDAqGlHqMjJ7uhjLZU4hA1VFYuuIYBwwYRkkjN8rUoURyeU8StIcihBmdnXggdn1A
+	 sAug9yL8h/isBavawkJzfdFyz5tY01zNuSYyK+Nw3NzLC61UPM89My7GuKULLmoVte
+	 cVgTrHOnuIjWrK16Yok8x6ljiChFtIx+9pPfoP2Lnvy+XrJSa0QGT6mV886AjC6Ehz
+	 o3ai+1/N+usZw==
+Date: Wed, 10 Sep 2025 13:01:00 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Kriish Sharma <kriish.sharma2006@gmail.com>
+Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
+	sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH] net/smc: replace strncpy with strscpy for ib_name
+Message-ID: <20250910100100.GM341237@unreal>
+References: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,29 +63,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250910093100.3578130-1-yicongsrfy@163.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
 
-On Wed, Sep 10, 2025 at 05:31:00PM +0800, yicongsrfy@163.com wrote:
-> One more point: in the suspend flow as shown below:
-> `mdio_bus_phy_suspend`
->     => `mdio_bus_phy_may_suspend`
-> there is also a check whether `phydev->attached_dev` is NULL.
+On Mon, Sep 08, 2025 at 06:09:13PM +0000, Kriish Sharma wrote:
+> Replace the deprecated strncpy() with strscpy() for ib_name in
+> smc_pnet_add_ib(). The destination buffer should be NUL-terminated and
+> does not require any trailing NUL-padding. Since ib_name is a fixed-size
+> array, the two-argument form of strscpy() is sufficient and preferred.
+> 
+> Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+> ---
+>  net/smc/smc_pnet.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+> index 76ad29e31d60..b90337f86e83 100644
+> --- a/net/smc/smc_pnet.c
+> +++ b/net/smc/smc_pnet.c
+> @@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
+>  		return -ENOMEM;
+>  	new_pe->type = SMC_PNET_IB;
+>  	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
+> -	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
+> +	strscpy(new_pe->ib_name, ib_name);
 
-Yes, it checks, but only to bypass checking for things that are
-dependent on whether a netdev exists. It doesn't _stop_ a netdev-less
-PHY being suspended. What you're proposing _stops_ a netdev-less PHY
-being resumed. You are proposing to break stuff.
+It is worth to mention that caching ib_name is wrong as IB/core provides
+IB device rename functionality.
 
-> Therefore, my idea is to make this modification to maintain consistency in the logic.
+Thanks
 
-No, it's making inconsistency. mdio_bus_phy_resume() will only resume a
-PHY that has previously been suspended by mdio_bus_phy_suspend(). See
-the phydev->suspended_by_mdio_bus flag.
-
-Fix the motorcomm driver.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>  	new_pe->ib_port = ib_port;
+>  
+>  	new_ibdev = true;
+> -- 
+> 2.34.1
+> 
+> 
 
