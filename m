@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-221581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C102B510A9
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B9CB510AA
 	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCCB53A1184
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:10:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 034B81B264B5
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18B8311977;
-	Wed, 10 Sep 2025 08:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7353F312827;
+	Wed, 10 Sep 2025 08:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="sZwtAMB5"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="f0pf2R4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D739630F548
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E704311C05
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757491674; cv=none; b=JIwxLWVufHr4ZqG1O9tZfKdjo1kSz67FZDV6SAxLVm3rH/G2T1PxSdP63PwRZemvgsz3TqAz+cQqE11x02FOTkmxilyeXyOwlmRUJxDFqNbwfTnjLwAQ1xH1l41ll7Fke9NbxRNd7gt/Bxw7YKppvQq7P/pkWHDKiGeO0RNtqVE=
+	t=1757491677; cv=none; b=uEbXngI73QCw0z2HriTgggb0tWZw48zf2bD0gqNfuzjkQ3pjAIUHZMUPBW0h5R/wy47JWsXdc0FfTxY/hv6EPNNH7LD26wKuVzUJhStuGUn5KDiKf2c/uLFFpBOW2c9Y0yhDzv/7+vtWUk2Wd5eQ8DFbm77LSZfbVOPGHf7GyBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757491674; c=relaxed/simple;
-	bh=ibsEYvxohb5mD1I4yEmeNl07uAKjfZzWOmtVL8aBmCc=;
+	s=arc-20240116; t=1757491677; c=relaxed/simple;
+	bh=fwsfkO/edNU0K9G/U0ffbwq3ATl5oZ4mal9F1JcWMmk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rB7cx26m80ILWXTk2fp+OO72euCDkvungnluHrh8PQKO3/o0LHUhkr04gYLH3sNMen6jA2wM9tz+WDQkaPmV5L80GvzI/12SVGMLh50/SmaB5Ov9fKUJCX4r2qoGps09beb71DmBJ8V1IdznqYahW2r+ZE2S8kwMXHdnsd0v4Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=sZwtAMB5; arc=none smtp.client-ip=209.85.128.46
+	 In-Reply-To:To:Cc; b=O337fY6hbAhfBjjtZxnUdllHWqrLpgeJpvhC8RVrVdMyViRz/n1CiLwhd/9jaXqxQ5cKUPSh10X814hu1nk/edOMFralxA1WbNmU57F8OssKKUU+U+z/eLIdDE2Q+/yiWVNMOIqadDUniZdUFyN+YT3/z/fla+azvHC8RhiY00U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=f0pf2R4c; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-45dec601cd3so19547475e9.2
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:07:52 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45cb6428c46so61006595e9.1
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:07:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1757491671; x=1758096471; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1757491673; x=1758096473; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Z1sCvmiZl6CYI7nEwas+vkP3919eSylK4ly9/aS+CfQ=;
-        b=sZwtAMB5lhZGl7/VJtCW0tGfOh3e8KBO1Xhps2+EMLNCIjuzkdmUXGkcFJh4PzL8rv
-         +qvvMFmc78NOyWqEBVE7J4jen/hUStq82Nhy39Lnb/D49ATktYtkrXFQlcpgh5+l1kK3
-         +8yO9TxcIG+LXk4BOYc7X3lhd85li803j38Tl00T+HK8Ma+9PAaKUF/Xw4UYhBVZ6/Yp
-         qbU/E3VyKkKyauOLjaS1uouwJhwZBZWp4UfoJsNO+OMJKNLLtFCJdJkqINwFvaxr+Ax/
-         xejp9LixsiFl4CABE5XG5lKPO5IeGMbtvsMOuyOsCXmPdYP7/tQrW8WL8xqI8DUeHS2J
-         zmfQ==
+        bh=pG70VB/2THcHEf1bbNlRsLCEdjUZ295qJspYMOYZW5c=;
+        b=f0pf2R4cDjwGxM7o7+PN8nqd6iXaga0AC5gG25lOvNf5ENNCenTKpn1eykQqTNg0Kg
+         BSaHyDd7NnEw8YfB+H3Nu4uv5NQ1XV/d3Zj0TT4RpqODF1JaewX6K8R5OnxtLUO/b9u7
+         r/VbE6BVvF73dKJcXraFSnHi+/0YFOpHz5nYCuCbKpU+nFITKI4+Qrw1yxmy0reX4+S5
+         Ia+3DSmubWWzxck+DfcF08v1Z4uESaIiRqFqLkrQtRvtvW98ufrqc7g0zSIiWV1qngwS
+         ZEFnmYmLspnKAvDrURBXP2QPzjz8z1l8TW0MaKBXeCzkIf+qrhRfzkVAtmHmXk4vFcej
+         xYlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757491671; x=1758096471;
+        d=1e100.net; s=20230601; t=1757491673; x=1758096473;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z1sCvmiZl6CYI7nEwas+vkP3919eSylK4ly9/aS+CfQ=;
-        b=JB7c4HwohRZS6bwt+2YwYgS1aHE1sH2aX4HO19MUjXckibkw2dLlqIKcRVb6t2yRJP
-         FJxAbLVDCoJbnh9DLJawbQYH/BoV9sbtbkxYuPJEpxU2MEudukBfIwa5PxckY5/a0BJb
-         glIbUMwrs4pLUxL07vvopQgXFg+Ltdx6SG4BODL/RLCmCDOGl3S+WCCIE+qpgwcrxBGT
-         7oFD16qmlyQD0fxiI8rRpqcIIM7cD4AwcV1B6p81x6Pelqudo8a1R9DirOdmpqVIDkoH
-         WkAhwgJQ8JdJm9zNs0l47/mtwAq41+BeQ7zgxeM04jaI4bq5LEmFE08EI9ggdS5kAZyt
-         D8XA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOPyndY2XNJnwRXvWKU9Z0Xhpbjyw/webBXkXrCZnc0koQwh7CVp1cnTXCNPZlqWXyLwc9P5w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypltyFSIDE7DoUdsFRKWqs4wTLAc6pyCiObtGHkJj5c85kg9bk
-	0HzkiteFJY87GVN9Y2tvod9ZLZPsZ7K7h9SdbOcwiEFz/ryRHyuV7U+waVB6aZqk5Lc=
-X-Gm-Gg: ASbGncuAGChat4GIo2TVlHrORfQsenIOCOrsM5+DQePPtDZMs9fUyeiVR1HPVZgR1v5
-	i34YZpoxrcuDFXHCLPEAwEJwa8JhhjOlO+aPW/Znd3uP7sOzPqBFhEUhx0nvO4kAyrHfKt6/sO8
-	DmKAfocc/L6mxMr4rEHUmw9SNKlMzwDvLlgCOV8whDdbmKQwwhyxCFke98fC98QNBja6jirRJIc
-	udea7LsCIBDTzElPvPwWR3Hp5InAFV0yfpqVHFZwwjTigwMehIKmR1cxPGRZz0OUTU5Qiag46s3
-	IPpNgTncX9QqQXYPakeqyQk1l4f+f0JbnUSuScxORsge5OrELfJvvuJFN1bei3tIc1dc5I+GfSj
-	OiQmjeCoSAcOW95DjWg==
-X-Google-Smtp-Source: AGHT+IGcJm1mXQDl/cArlppVSaTq7H4cXV1oKCtm0I7gPOnxwJ8/RibyfCM5aVWWqsaeO31u/dWC2Q==
-X-Received: by 2002:a05:600c:1ca0:b0:45b:8352:4475 with SMTP id 5b1f17b1804b1-45dddf02148mr141677935e9.36.1757491671063;
-        Wed, 10 Sep 2025 01:07:51 -0700 (PDT)
+        bh=pG70VB/2THcHEf1bbNlRsLCEdjUZ295qJspYMOYZW5c=;
+        b=ZztjcFy0aMw/l4wmjqRcdcHu7gH19+1c+jnbLrxHZHjQDQ7Ps4mGP7HrbAhX2GSIqX
+         rYFp5Go8TC5dYa50mUetC4odr1DN78RxIdM6Ra6jduFfV/UnNq3N8csfuNDotRxxxqav
+         SMRu+l6cJmzSeR0JmaYGDWVgknaWSrTDCNc9N6T/s1ENN4ItVaOXky2kg+i466/Js/Kr
+         g1taVnPblnrMTNvcx/O8N6HMyKph83Whtpq2H9heig9M0+WAHO9oNBf6Tvix29Bpg2gO
+         kX24Gc1MJT2yohWPNE8ZicQXc4iFmWiLe91pSEhf+Nur13v+oscLKmaVM6uIw66u4j0L
+         t6+A==
+X-Forwarded-Encrypted: i=1; AJvYcCW+DR8TvFqRoEVPnjP6K1pd4QANJAG5eDgHrGpVXR4alhsvg8229aFWBIukWqUJbBvy/4mQ/zg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQbcQRfmVieIGVD2COl4tkTirlqaWmNvVhV2DccOjFEBC8wX5H
+	c+rxlG82el6mRKag+Vp3pYlsP03L5WP8crx3KrXmh1FxbFMhKQbljHtAqo4P+BYG9pU=
+X-Gm-Gg: ASbGncvBdib1+PbIeExwdd1zmUGE2vbr5fIN86NfaqEK7BzkLAoxJ+T/gqA04UEkshA
+	8HB7FqdypsFPVprVtm+1iTKbhpTtO52uTWnkxhzeEr/rWZgZMzSRWL4/OsiVLTM3zZPhRmZHj1I
+	zurJK554rPoLEl1D4/NbM3n8pT2iqV9eRWzHqvggTbGUC8rRwB1fKwXR4tvyVv8rRPvlPG4MgjM
+	y6GXSqR/AfSavkkjP8Gc040OYkq/pQAAadPHZOJW9duehvjRO6SOe5jJK7LVSeec8OktYIWUVIM
+	VVz+7QsYEtoRbOrK5iIEdA7sLcMqyN4vbT2gi5WmHhr4rRFdFQCw/dhJnM5YVuycHSl2Gjfw24w
+	9tO2wj/XU07S6nKDFQU3I2TJn2bbN
+X-Google-Smtp-Source: AGHT+IFjyHooIgPzsIu5mjEBNXpXbM4EqzCxFwgK0R45SY2NiW1XrpvBRtE5XdvWfXqw4HoOsFUisQ==
+X-Received: by 2002:a05:600c:6305:b0:45d:5c71:76a9 with SMTP id 5b1f17b1804b1-45ddded7652mr141100805e9.24.1757491673453;
+        Wed, 10 Sep 2025 01:07:53 -0700 (PDT)
 Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:3936:709a:82c4:3e38])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45df8247cc6sm17813605e9.12.2025.09.10.01.07.48
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45df8247cc6sm17813605e9.12.2025.09.10.01.07.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 01:07:49 -0700 (PDT)
+        Wed, 10 Sep 2025 01:07:52 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 10 Sep 2025 10:07:40 +0200
-Subject: [PATCH 3/9] net: stmmac: qcom-ethqos: use generic device
- properties
+Date: Wed, 10 Sep 2025 10:07:41 +0200
+Subject: [PATCH 4/9] net: stmmac: qcom-ethqos: improve typing in devres
+ callback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250910-qcom-sa8255p-emac-v1-3-32a79cf1e668@linaro.org>
+Message-Id: <20250910-qcom-sa8255p-emac-v1-4-32a79cf1e668@linaro.org>
 References: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
 In-Reply-To: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
 To: Bjorn Andersson <andersson@kernel.org>, 
@@ -106,92 +106,50 @@ Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, 
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2902;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1037;
  i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=wKpcSDQ9j5gn7fqOrffdxHVw4IYX35svrsS9hhVY/uU=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBowTHNyzW1urCJGaZW5gke5O8FSvQ7UnCqZZ8Cj
- PtMPh+GTVyJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCaMExzQAKCRARpy6gFHHX
- cijUEADYjksEkSI3XXPioMcFqFig+ma4t/+cw3XI6Nn8GUS2nhn1HpaO+L3aLWDlpp5xJROdTMv
- qhOiiiZmMvYyeWo9afPRxaDGdjv3fWICRI45x8VoZ/AzPLw4dI5he37GOpfjJ0A2Zin7NKz4RGm
- ywo/NHT79dS+3SvYysaFfL2z/UmW53HGqDG+/UKgL8MivzfgATeROpRpgrHuX30yTqzka9IqDz6
- oP6WqPREVulYKjwg9Y9vD4IraHpFP998xKBmvNbTmIzDGwsV5nSrr0pKdUTJGGt43S9WfI0M14A
- 4XvEpZHXEfTv/4QAhz4I/Dr4fuIm5E7yr23MUHOvoChMnkg2QQQIIe/X57J97l4TGYcqcxWODGP
- lEu+ENy9jJONFai4j31aIgckTvTvZ1JbtYKvnkJ/f9cZBYTitZhswBMrFR6xHWqo7bWsWkViCco
- WF+2GsWPRIa2etHizQNLIOw8014zf8qu+czN7Ukj6F3lpuDL3J7yO160HpBpbpNbYFAkXNTm1ur
- bmxcK9UenqvbBpw/k86NlsSSKBSkYYT0MT3X6O3DbHGyu1ZZeBXMLKOThxl2zLamrAbQUH0Ur60
- kbRzFya8F/XeR7LLjBf2Md2r6FJlrQ3W3oBUDyKhgza92D0gllCwL84XdPcfFKVGyuRoK9hTnzA
- M/OfCOjqiEY8BkQ==
+ bh=XKd4Dvzw0ejsOil4omJOz8oD8d0/SZudynnYpUwSWG4=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBowTHNFd6+XtHbiUlr0CBiyUr3sDo3TcopvUbxA
+ Cez11/GZEiJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCaMExzQAKCRARpy6gFHHX
+ crSCD/sHgzl01Xm7vNRAaVRSRvpCpLopzb9hsEChofm4FjfDYUIcvTtJaJuDjU3XhHdNDwZV9Zu
+ Jvj61hgts5CXRzx2EblTpQ/3DuiqYeDUlYoRNrKZ+bFnX5AXAVq/TA2zOzyXsWrNbUAaV1gNLOz
+ VTz+PAVZGKpiWFDBpYusQE8juIR6bh0tEB17WWbbhZV6l0uK2fFCvllZG1nNk3SqJ5qG36efTPj
+ /6VjOG1kimbc6GRwk5dLbYporMJimuedb5ycfMKxPqv+u3sJ1GTEbnxQDx9BxF/u562rsqfxazv
+ mXGxtvtw56tQ3NaUCvLlWl5uxCMVhqV+jt0c8yiUxhssWPP6jK9r06eAybsTAVxChagDzakxs01
+ n65RPiOgqoEuSqlYQpchL/l6Vjst4EKT/9xb/qi3pqlJTpBqcSyxiri6drcKDGaxihhe8w8gmMs
+ sYLzxlL/oqpOYFfhL0aeFEA1WTGBYIeYQwsezafFr0CpNawRbrT5V8AuBRhSVZkNelEuFmYE9SI
+ oAXG5zUxUzYb6LOW9qQ/LhFF6/plZCYbBsZP4cWXfzas3rXBaTecTfEcRctYXDXFmc596Gy3CTw
+ eDYk7Xqxz1uDVEZOr5HoOdY/3M6E7CBtmpvBdIIMuVmWW43k8aLvjHK8ZWqdpWkIQ7ijqwOkMFM
+ DCJTB/f1x5kcYUw==
 X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-In order to drop the dependency on CONFIG_OF, convert all device property
-getters from OF-specific to generic device properties and stop pulling
-in any linux/of.h symbols.
+It's bad practice to just directly pass void pointers to functions which
+expect concrete types. Make it more clear what type ethqos_clks_config()
+expects.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/Kconfig             | 2 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 9 ++++-----
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 67fa879b1e521ef6d7bd2a8db30d812301eb4cf7..beeca52d4d0f0795d27a2cc35be44d1d4e7d45d2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -125,7 +125,7 @@ config DWMAC_MESON
- config DWMAC_QCOM_ETHQOS
- 	tristate "Qualcomm ETHQOS support"
- 	default ARCH_QCOM
--	depends on OF && (ARCH_QCOM || COMPILE_TEST)
-+	depends on ARCH_QCOM || COMPILE_TEST
- 	help
- 	  Support for the Qualcomm ETHQOS core.
- 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index d8fd4d8f6ced76cbe198f3d3443084daee151b04..aa4715bc0b3e7ebb8534f6456c29991d2ab3f917 100644
+index aa4715bc0b3e7ebb8534f6456c29991d2ab3f917..0381026af0fd8baaefa767f7e0ef33efe41b0aa4 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -1,8 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0
- // Copyright (c) 2018-19, Linaro Limited
+@@ -742,7 +742,9 @@ static int ethqos_clks_config(void *priv, bool enabled)
  
-+#include <linux/mod_devicetable.h>
- #include <linux/module.h>
--#include <linux/of.h>
- #include <linux/of_net.h>
- #include <linux/platform_device.h>
- #include <linux/phy.h>
-@@ -764,7 +764,6 @@ static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
- 
- static int qcom_ethqos_probe(struct platform_device *pdev)
+ static void ethqos_clks_disable(void *data)
  {
--	struct device_node *np = pdev->dev.of_node;
- 	const struct ethqos_emac_driver_data *data;
- 	struct plat_stmmacenet_data *plat_dat;
- 	struct stmmac_resources stmmac_res;
-@@ -815,7 +814,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+-	ethqos_clks_config(data, false);
++	struct qcom_ethqos *ethqos = data;
++
++	ethqos_clks_config(ethqos, false);
+ }
  
- 	ethqos->mac_base = stmmac_res.addr;
- 
--	data = of_device_get_match_data(dev);
-+	data = device_get_match_data(dev);
- 	ethqos->por = data->por;
- 	ethqos->num_por = data->num_por;
- 	ethqos->rgmii_config_loopback_en = data->rgmii_config_loopback_en;
-@@ -852,9 +851,9 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	if (ethqos->has_emac_ge_3)
- 		plat_dat->dwmac4_addrs = &data->dwmac4_addrs;
- 	plat_dat->pmt = 1;
--	if (of_property_read_bool(np, "snps,tso"))
-+	if (device_property_present(dev, "snps,tso"))
- 		plat_dat->flags |= STMMAC_FLAG_TSO_EN;
--	if (of_device_is_compatible(np, "qcom,qcs404-ethqos"))
-+	if (device_is_compatible(dev, "qcom,qcs404-ethqos"))
- 		plat_dat->flags |= STMMAC_FLAG_RX_CLK_RUNS_IN_LPI;
- 	if (data->has_integrated_pcs)
- 		plat_dat->flags |= STMMAC_FLAG_HAS_INTEGRATED_PCS;
+ static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
 
 -- 
 2.48.1
