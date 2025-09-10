@@ -1,161 +1,126 @@
-Return-Path: <netdev+bounces-221813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 282E3B51EFA
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:31:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DE21B51F00
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:32:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60AD5188C6EC
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:31:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8371E178346
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6912D311950;
-	Wed, 10 Sep 2025 17:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F09324B02;
+	Wed, 10 Sep 2025 17:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eOpL4Lfk"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="QmEk60qS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93772366
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 17:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DAC31D738;
+	Wed, 10 Sep 2025 17:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757525491; cv=none; b=DxrMElklGBvbgnX47N0GhDPi8L55MPfXgTY7LdWz7tKBfuChQ2hFavSBhvx+WrMTJNg2KyVaXFipRReViuA6ffvKIeZs9oUYIYYooUUqyQH2MFkurnjE/lyztvIng3Cih4aA/ngoh69Yz26YidcWmxVabOWNAcCEmaf8iocYQUk=
+	t=1757525527; cv=none; b=RIO/DfL1yrXYfj//oCqgq3l1hDnbUwPkuTOtZODrK3Bec1X3qv1rNItTFyP9w93CPhafme51uXPFM3kfHSmJAUqGzCK2RdurR53SHqpUMGAmgyY6QafTf9jn5nrSClz7WqhXiUySBw0uGJoMIiBQsV/TI4+cCitgHMckPMwowhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757525491; c=relaxed/simple;
-	bh=T42WLsYUag3i4x76FdcxddwpCrpFK4jtgY9tzWa7sDQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J3P50+Nuh/o3gy8Er+lz4tAoGpFwUNYi7+nvK6sbTtE29jQ2/Jog9k3I44FeDk3ETwYHjny0Bz0EcQCNpMrWZ5dVZympqC1MkYX6bblJIzgb+5NaBhvo7H/hiq/pxZXNiC+4pUa+s178WNOJRK7yGpxrMPDxlQ7bWYNqitbpJYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eOpL4Lfk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757525488;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y4DBrNtiTrUiFvnKqXZbU34j/Yix0O34EDnkigeP54A=;
-	b=eOpL4LfkX2qEGxDHdfogjBJopbzRNdqE0or0cpLtf8vd5p9Tov2Ewz5RDPXm1eQ/IQQ5lg
-	ZPV94nMqnrj6K+8g+vBrD2F8y0iBtwQJP7+hMmN3smjRlkIMOh5w8Q3McmmZ1ivdiSsaXl
-	kFzWVS43KOzKuX5taJ5Uql+W23PvVb8=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-12-F2ttI1oxPJquUvy_WeqVng-1; Wed,
- 10 Sep 2025 13:31:26 -0400
-X-MC-Unique: F2ttI1oxPJquUvy_WeqVng-1
-X-Mimecast-MFC-AGG-ID: F2ttI1oxPJquUvy_WeqVng_1757525485
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 70E6619541B2;
-	Wed, 10 Sep 2025 17:31:24 +0000 (UTC)
-Received: from [10.45.225.144] (unknown [10.45.225.144])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 935291956095;
-	Wed, 10 Sep 2025 17:31:20 +0000 (UTC)
-Message-ID: <4277866b-67e9-4d75-a7e4-9296b898fbcb@redhat.com>
-Date: Wed, 10 Sep 2025 19:31:19 +0200
+	s=arc-20240116; t=1757525527; c=relaxed/simple;
+	bh=yuKQ0lR26nVX8L5krMe10RNzdx00wJz/Brrp083carQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=euYvMmGxH3tOV0Y0OWxfopA7ZJOnrM0HH9LPVt49bs9UCVnhJyXNUDDtRuDOKt5LOLf+EICeZftrt3+LZkMFqIvbi8POjNzLWFvNEBCpEBaEgrANKcS66b7K0+iI5m4yC+2EjYCIT2QK+YkbEYoGiF1zlG2WaN943JrYrn9nM1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=QmEk60qS; arc=none smtp.client-ip=52.28.197.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1757525525; x=1789061525;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qEzZnMkfHtDYjGZWSxfigRLQrGxze7DhIG2nwdyJImk=;
+  b=QmEk60qS5FogFKjvP2Xu98G2CH8YQ9PxSMPGjY5KlBr6uir4yQX4zn6B
+   gGqAESb8RZCBHcoj10IxiD5GCuzcPWl1suH52Y3tD759zEuG3rLf7PcPu
+   VeQYEElM5CzXqM/oQ2rZPNFwObmabM3lUbLxrdIVYgfA1XiOFbEJiyDqX
+   WbqjWuACoySiAP4I56s6vZxg3st6SHAZdji0kEnizTWvs8iT24p0u6fmv
+   K0ahDgy+4lidPMZcZ/W9M7iqazXjFTuBoBNfjLNAz2zZ/1Jp19Bl22ZLD
+   pEC2w9XIQDGkeECpRk7V569sa0NbUBIFHwssfhz0HMyYVe+Y9hGwbivyh
+   Q==;
+X-CSE-ConnectionGUID: Lc2tOsb3TWq+ntSm2bVkIg==
+X-CSE-MsgGUID: q9x5CrNLRy2f7iQB9yZp/g==
+X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
+   d="scan'208";a="1819311"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 17:31:54 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:11338]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.31.196:2525] with esmtp (Farcaster)
+ id ab7880e5-12d4-449e-bd34-c2b22e1c2731; Wed, 10 Sep 2025 17:31:54 +0000 (UTC)
+X-Farcaster-Flow-ID: ab7880e5-12d4-449e-bd34-c2b22e1c2731
+Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Wed, 10 Sep 2025 17:31:53 +0000
+Received: from dev-dsk-farbere-1a-46ecabed.eu-west-1.amazon.com
+ (172.19.116.181) by EX19D018EUA004.ant.amazon.com (10.252.50.85) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Wed, 10 Sep 2025
+ 17:31:50 +0000
+From: Eliav Farber <farbere@amazon.com>
+To: <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <vitaly.lifshits@intel.com>,
+	<gregkh@linuxfoundation.org>, <post@mikaelkw.online>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <farbere@amazon.com>, <jonnyc@amazon.com>
+Subject: [PATCH 5.10.y] e1000e: fix EEPROM length types for overflow checks
+Date: Wed, 10 Sep 2025 17:31:38 +0000
+Message-ID: <20250910173138.8307-1-farbere@amazon.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] dpll: zl3073x: Allow to use custom phase measure
- averaging factor
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20250910103221.347108-1-ivecera@redhat.com>
- <acfc8c63-4434-4738-84a9-00360e70c773@lunn.ch>
- <0817610a-e3dd-427e-b0ad-c2d503bb8a4f@redhat.com>
- <10886c5f-1265-46ec-8caa-41bde6888905@lunn.ch>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <10886c5f-1265-46ec-8caa-41bde6888905@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
+ EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
+Fix a compilation failure when warnings are treated as errors:
 
+drivers/net/ethernet/intel/e1000e/ethtool.c: In function ‘e1000_set_eeprom’:
+./include/linux/overflow.h:71:15: error: comparison of distinct pointer types lacks a cast [-Werror]
+   71 |  (void) (&__a == __d);   \
+      |               ^~
+drivers/net/ethernet/intel/e1000e/ethtool.c:582:6: note: in expansion of macro ‘check_add_overflow’
+  582 |  if (check_add_overflow(eeprom->offset, eeprom->len, &total_len) ||
+      |      ^~~~~~~~~~~~~~~~~~
 
-On 10. 09. 25 7:06 odp., Andrew Lunn wrote:
-> On Wed, Sep 10, 2025 at 06:50:47PM +0200, Ivan Vecera wrote:
->> On 10. 09. 25 6:13 odp., Andrew Lunn wrote:
->>> On Wed, Sep 10, 2025 at 12:32:21PM +0200, Ivan Vecera wrote:
->>>> The DPLL phase measurement block uses an exponential moving average,
->>>> calculated using the following equation:
->>>>
->>>>                          2^N - 1                1
->>>> curr_avg = prev_avg * --------- + new_val * -----
->>>>                            2^N                 2^N
->>>>
->>>> Where curr_avg is phase offset reported by the firmware to the driver,
->>>> prev_avg is previous averaged value and new_val is currently measured
->>>> value for particular reference.
->>>>
->>>> New measurements are taken approximately 40 Hz or at the frequency of
->>>> the reference (whichever is lower).
->>>>
->>>> The driver currently uses the averaging factor N=2 which prioritizes
->>>> a fast response time to track dynamic changes in the phase. But for
->>>> applications requiring a very stable and precise reading of the average
->>>> phase offset, and where rapid changes are not expected, a higher factor
->>>> would be appropriate.
->>>>
->>>> Add devlink device parameter phase_offset_avg_factor to allow a user
->>>> set tune the averaging factor via devlink interface.
->>>>
->>>> Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
->>>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->>>> ---
->>>>    Documentation/networking/devlink/zl3073x.rst |  4 ++
->>>>    drivers/dpll/zl3073x/core.c                  |  6 +-
->>>>    drivers/dpll/zl3073x/core.h                  |  8 ++-
->>>>    drivers/dpll/zl3073x/devlink.c               | 67 ++++++++++++++++++++
->>>>    4 files changed, 82 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/Documentation/networking/devlink/zl3073x.rst b/Documentation/networking/devlink/zl3073x.rst
->>>> index 4b6cfaf386433..ddd159e39e616 100644
->>>> --- a/Documentation/networking/devlink/zl3073x.rst
->>>> +++ b/Documentation/networking/devlink/zl3073x.rst
->>>> @@ -20,6 +20,10 @@ Parameters
->>>>         - driverinit
->>>>         - Set the clock ID that is used by the driver for registering DPLL devices
->>>>           and pins.
->>>> +   * - ``phase_offset_avg_factor``
->>>> +     - runtime
->>>> +     - Set the factor for the exponential moving average used by DPLL phase
->>>> +       measurement block. The value has to be in range <0, 15>.
->>>
->>> Maybe put the text in the commit message here as well?
->>
->> Do you mean to put the equation and details from commit message here?
->> This is pretty long.
-> 
-> So what if it is long? At the moment, it is hiding in the commit
-> message. It is not easy to find, you effectively need to be a kernel
-> developer to find it. If it is in the documentation of the device, it
-> will be much easier to find and understand what this knob actually
-> does.
-> 
+To fix this, change total_len and max_len from size_t to u32 in
+e1000_set_eeprom().
+The check_add_overflow() helper requires that the first two operands
+and the pointer to the result (third operand) all have the same type.
+On 64-bit builds, using size_t caused a mismatch with the u32 fields
+eeprom->offset and eeprom->len, leading to type check failures.
 
-Agree. I will describe it in more detail in the documentation.
-+ optimization proposed by Vadim.
+Fixes: ce8829d3d44b ("e1000e: fix heap overflow in e1000_set_eeprom")
+Signed-off-by: Eliav Farber <farbere@amazon.com>
+---
+ drivers/net/ethernet/intel/e1000e/ethtool.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for the review.
-
-Ivan
-
+diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
+index 4aca854783e2..584378291f3f 100644
+--- a/drivers/net/ethernet/intel/e1000e/ethtool.c
++++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
+@@ -559,7 +559,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
+ {
+ 	struct e1000_adapter *adapter = netdev_priv(netdev);
+ 	struct e1000_hw *hw = &adapter->hw;
+-	size_t total_len, max_len;
++	u32 total_len, max_len;
+ 	u16 *eeprom_buff;
+ 	int ret_val = 0;
+ 	int first_word;
+-- 
+2.47.3
 
 
