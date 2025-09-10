@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-221800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67704B51E48
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C1EB51E5F
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:56:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 039A4445939
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:51:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 092A53BA3C0
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2D727602F;
-	Wed, 10 Sep 2025 16:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M6Juxuny"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CB028C006;
+	Wed, 10 Sep 2025 16:55:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61475272814
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 16:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044D9289E13
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 16:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757523069; cv=none; b=CpFR8WlajTwxTshqJ86b9cgQV1kY99tNevFaOckRAtm+u7BZk3AMd22oIu2JWiSHYbkH3Ug57DKNmDP6PBBIOLxLAq3QXXJQubN2NR3U4iCqIxQ42vNTNLs6AXoPB2JroZLvXpYTBKQuEjUuWx5Gu6sTkKOtnP5V7r804Qm+Gxs=
+	t=1757523334; cv=none; b=en5LrGpcmnPv0xEVgCKPdabDZ1BaPODd2jwH7+4fVzwf3GXUnHZ4DDxJpwHNyV7Z4ulIyJtBAtI2+28LeOKUMQBKWRvPHMfXCH8rkqSh7KuAJ2IKDfmDikUdYp2Vzp//JhUtst4U6OGjJuzcv//U10ILr2vnOdBRG+rc4sylxAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757523069; c=relaxed/simple;
-	bh=h3/FAOSRRVmznFBcQ4npGgTTtGHAFrZyox46Q/dAY2s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KN5kLpbiLKtRmB++4/RMFGLhTiZXDEbixE8M4+Q2NO4p3jDXzuLpknS6ooaZG9bYFzbvR5URHD1fDQQV7Lcqk7jqhu37kv6NY48mEEiamEWi1NY9VuE9rKzQ0bjTsxCKFKUpTEU4EltKW+zIIwOSabqHCI9ByGQl1tDhTH924Uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M6Juxuny; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757523066;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IQKT4ZzpNa/yKWGTVArTDPi3S7egIlUSjK6QBqA8Noc=;
-	b=M6JuxunyGwdfJNF/E2dHAQo7KsF6Fya4DP5Te/ktFYWOx9yqc+3tgOv5yq5zrP9Qo/q6jm
-	xRphB8sDo/yWcP+xzf10WsRLTqazyBr3LSt789wH5cfO4JEWocr8IvcJeZuD0adDMA2Cou
-	tRJQacTLJVUhVblVn8mUC+zD34RpbzM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-454-tD-GeKuiO0mEr3n384YwTQ-1; Wed,
- 10 Sep 2025 12:51:02 -0400
-X-MC-Unique: tD-GeKuiO0mEr3n384YwTQ-1
-X-Mimecast-MFC-AGG-ID: tD-GeKuiO0mEr3n384YwTQ_1757523059
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2F5C5180048E;
-	Wed, 10 Sep 2025 16:50:59 +0000 (UTC)
-Received: from [10.45.225.144] (unknown [10.45.225.144])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4DC7B180035E;
-	Wed, 10 Sep 2025 16:50:53 +0000 (UTC)
-Message-ID: <0817610a-e3dd-427e-b0ad-c2d503bb8a4f@redhat.com>
-Date: Wed, 10 Sep 2025 18:50:47 +0200
+	s=arc-20240116; t=1757523334; c=relaxed/simple;
+	bh=+MiE311kfFW//2eHcz0hVWh71Y6hSvVa+hpJe44h5QE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDIyKJKHIQKd9WgOBJsLPH5fbeeRW+Sj6e954zus0fNdOelktroySM3MBbJob24OCnuaVseopPG8sNsfdxvAkhuU8I7hmtH5l7OcBXr67d/Qy4XIYnSsDpvLDEtoBdv94fdPJaSMezeyn0tN9COLI6bGujw8Rgu87IxWDqR2c2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1uwO6K-00081C-BQ; Wed, 10 Sep 2025 18:55:20 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1uwO6J-000ceW-0G;
+	Wed, 10 Sep 2025 18:55:19 +0200
+Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1uwO6I-00GJtR-2w;
+	Wed, 10 Sep 2025 18:55:18 +0200
+Date: Wed, 10 Sep 2025 18:55:18 +0200
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Mark Brown <broonie@kernel.org>, Jonas Rebmann <jre@pengutronix.de>,
+	Andrew Lunn <andrew@lunn.ch>, imx@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>, linux-sound@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	Shengjiu Wang <shengjiu.wang@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: nxp,sja1105: Add reset-gpios
+ property
+Message-ID: <20250910165518.bzpz5to5dtwe2z6x@pengutronix.de>
+References: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
+ <20250910-imx8mp-prt8ml-v1-1-fd04aed15670@pengutronix.de>
+ <20250910125611.wmyw2b4jjtxlhsqw@skbuf>
+ <20250910143044.jfq5fsv2rlsrr5ku@pengutronix.de>
+ <20250910144328.do6t5ilfeclm2xa4@skbuf>
+ <693c3d1e-a65b-47ea-9b21-ce1d4a772066@sirena.org.uk>
+ <20250910153454.ibh6w7ntxraqvftb@skbuf>
+ <20250910155359.tqole7726sapvgzr@pengutronix.de>
+ <20250910164231.cnrexx4ds3cdg6lu@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] dpll: zl3073x: Allow to use custom phase measure
- averaging factor
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20250910103221.347108-1-ivecera@redhat.com>
- <acfc8c63-4434-4738-84a9-00360e70c773@lunn.ch>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <acfc8c63-4434-4738-84a9-00360e70c773@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250910164231.cnrexx4ds3cdg6lu@skbuf>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 10. 09. 25 6:13 odp., Andrew Lunn wrote:
-> On Wed, Sep 10, 2025 at 12:32:21PM +0200, Ivan Vecera wrote:
->> The DPLL phase measurement block uses an exponential moving average,
->> calculated using the following equation:
->>
->>                         2^N - 1                1
->> curr_avg = prev_avg * --------- + new_val * -----
->>                           2^N                 2^N
->>
->> Where curr_avg is phase offset reported by the firmware to the driver,
->> prev_avg is previous averaged value and new_val is currently measured
->> value for particular reference.
->>
->> New measurements are taken approximately 40 Hz or at the frequency of
->> the reference (whichever is lower).
->>
->> The driver currently uses the averaging factor N=2 which prioritizes
->> a fast response time to track dynamic changes in the phase. But for
->> applications requiring a very stable and precise reading of the average
->> phase offset, and where rapid changes are not expected, a higher factor
->> would be appropriate.
->>
->> Add devlink device parameter phase_offset_avg_factor to allow a user
->> set tune the averaging factor via devlink interface.
->>
->> Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> ---
->>   Documentation/networking/devlink/zl3073x.rst |  4 ++
->>   drivers/dpll/zl3073x/core.c                  |  6 +-
->>   drivers/dpll/zl3073x/core.h                  |  8 ++-
->>   drivers/dpll/zl3073x/devlink.c               | 67 ++++++++++++++++++++
->>   4 files changed, 82 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/networking/devlink/zl3073x.rst b/Documentation/networking/devlink/zl3073x.rst
->> index 4b6cfaf386433..ddd159e39e616 100644
->> --- a/Documentation/networking/devlink/zl3073x.rst
->> +++ b/Documentation/networking/devlink/zl3073x.rst
->> @@ -20,6 +20,10 @@ Parameters
->>        - driverinit
->>        - Set the clock ID that is used by the driver for registering DPLL devices
->>          and pins.
->> +   * - ``phase_offset_avg_factor``
->> +     - runtime
->> +     - Set the factor for the exponential moving average used by DPLL phase
->> +       measurement block. The value has to be in range <0, 15>.
+On 25-09-10, Vladimir Oltean wrote:
+> On Wed, Sep 10, 2025 at 05:53:59PM +0200, Marco Felsch wrote:
+> > IMHO silently removing the support will break designs for sure and
+> > should never be done. As said, imagine that the firmware will handle the
+> > supplies and the driver only needs to release the reset. If you silently
+> > remove the support, the device will be kept in reset-state. In field
+> > firmware updates are seldom, so you break your device by updating to a
+> > new kernel.
+> > 
+> > One could argue that the driver supported it but there was no dt-binding
+> > yet, so it was a hidden/unstable feature but I don't know the policy.
 > 
-> Maybe put the text in the commit message here as well?
+> Ok, I didn't think about, or meet, the case where Linux is required by
+> previous boot stages to deassert the reset. It is the first time you are
+> explicitly saying this, though.
+> 
+> So we can keep and document the 'reset-gpios' support, but we need to
+> explicitly point out that if present, it does not supplant the need to
+> ensure the proper POR sequence as per AH1704.
 
-Do you mean to put the equation and details from commit message here?
-This is pretty long.
+We could do that but I think that no one should assume that the driver
+ensures this due to the missing power-supply and clock support. But this
+goes to the DT maintainers. IMHO we shouldn't mention any document
+within the binding, maybe within the commit message, since those
+documents may get removed.
 
-Ivan
-
+Regards,
+  Marco
 
