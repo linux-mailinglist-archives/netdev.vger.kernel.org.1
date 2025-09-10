@@ -1,200 +1,157 @@
-Return-Path: <netdev+bounces-221763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB06B51CBA
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:00:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D962B51CE7
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:04:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE0601C82DBF
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:00:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31701A02CE7
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B574632BF46;
-	Wed, 10 Sep 2025 16:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7707335BB7;
+	Wed, 10 Sep 2025 16:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cgUmFl8F"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="NNi7LZBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDA730FC39
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 15:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757520001; cv=none; b=MxUW+dYcSeQBXt+14amwJ/4MVJMW85OxkxLXJVWMXzg3DsbO5oz0Zqkm8fOfkB86X5SYr1Ly9p3pLGHMFew+VDS1nokkGXNu1yb2myBzQxoN6t8iQDbyPjKKA7mMhxAzAD+ZsoFAzDnczI0+iHH0rDwAIpcOvVMkQS9o9KbrpC0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757520001; c=relaxed/simple;
-	bh=3DNsJ0kUCOxp3DJEANhhxdD39H7uqItAYoS9GzBOQrY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pBgZTdzqhsL36FUtBaqpcmJLAlqC5D+ef53tvpYKJkcpmu+JeQOsIaymbmHuqX8OyilgQsxT821rV7/SOv6/qPTDB0spRPaRr+AwX+0XRnHCJurokfgQl69vgEoXwTSsHxKmBjzj3ZxKlk6DsA5u2hHz/arMhVWvUV9tF1POCTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cgUmFl8F; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b4c53892a56so6290330a12.2
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757519999; x=1758124799; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hQsYbUCPH+TWyI0Bl3IG/T9WYND8kzghnp2qrB7wPv8=;
-        b=cgUmFl8F1IvWsyO+YI/FhLDJunA/UMbjq6jIbncg5izRDh0Mi68ayPaS1QH+j92oDY
-         +nntq3Ba5EyoPnx3ebmAuT/7YGxlXlCgqjeyKuhN38YeZeBAzwk9Z5ZZkaf4iVgQOkSf
-         XYlbtAQ7sLpZbSxhLePkMDMvf5FxU6q1Bs+fAly4o99PJY7iIdFaUnM/FUwh6xSpvWnL
-         IBH6rjLmsnQo/UTyimjtu0Ies8nQKoYEySqk8puJU5nFYeEErb9vYyl1nEZvkJJAnElP
-         cgHOVXWxp8BVlOMmmPvIonX07Oyylli4mXyn7jPkpyD8ttTAWe1oz53XQjmCCydgom5a
-         3XeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757519999; x=1758124799;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hQsYbUCPH+TWyI0Bl3IG/T9WYND8kzghnp2qrB7wPv8=;
-        b=wGKlkWzGaDHV+prp6dbJKLZYMCebNw2Eugn61KJmhpACtoqWUgaPW7PyCo/odMG4XE
-         0APYbrF9EBRIVRAG1menLzgsAFg3TwUNtbNYqP0XczdUU35KCYsiA+odWhxi9BFZGmJg
-         Y9yayo4siBnjex7qVut9bjGwMmyQCN7NgvIJGUSE2ua4FdzTkBTVoz0DuYjxLZOR2NWH
-         n7/oCpVc0rTqQuot+D0L20HUbuzq1e140PtedLfo1AY9L8XEn9adxajWVqbAT/+RitxV
-         56kJUs0fG4OLDdg7sJPkqaYi5GiG5/cQuiU7rm60BNG4qv7VHIDVVsqiEtY0rNCvABFK
-         uM1g==
-X-Forwarded-Encrypted: i=1; AJvYcCVao2E1OMPvPWmrvS2jtzPnj8S+W7NF2x48N+xIyECDRK33qyTKs9y4GQttGXtHzGuIRu9le2E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzGOifJm/jnE8crFKMibRftFh52FrEAGcVspwQg4rDaGIO/DJe
-	65pTB8piUDhw1FpS61+5VqL1pPyUmkuhKqYn/8NH6J6FoLsmIHJI3bkHr0aALO+aUKADfNpI+Lk
-	zFLKFGgYvOF33ytHB98kjVJexuitNNeEGmTFX28JY
-X-Gm-Gg: ASbGncv4Zaf36ci9YNvg0z5s/YLAwxpVSK7xgIbQgz/iu+ZRsk+SkcCdCXB/02lwcFm
-	XZowaJOJnrWt/JLqplnYEFTnEfY4BS972FxKzpDlzTed6u/Lna2blqYAeCIoEKz+OBEHYyKoE+Z
-	byOJbgTxMc3fnTjMqo1618cfsIa9S6gv15VemV3otTZOV5hs9kKK1kWYa4Aip46aV8s6mKj09s4
-	MgidtD1Zcu0/tUPXdXpjiUEDh1zAXpvHr3eRXidCbPCGJhBVav8AGwwTA==
-X-Google-Smtp-Source: AGHT+IHxWzDGOBmD4lYcKcTBEMz+Y/U4NW70DiT1xvfpe6LQ9dZF3t9varpKfzrKh+SHkrYjfEC1zJ/ekPCXvf4TnOs=
-X-Received: by 2002:a17:903:46cb:b0:24d:f9f:de8f with SMTP id
- d9443c01a7336-2516fbdcc8amr243402455ad.17.1757519999058; Wed, 10 Sep 2025
- 08:59:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14EE321F3B;
+	Wed, 10 Sep 2025 16:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757520152; cv=pass; b=pniU4QJiKCp8YIL5pb8RETbUPaYx7fRMNxoEqfBfoKR2wtKWkPb9l4w5daxJt3j9vjBEMtG+438KbVCbGZwSyclJ/dGP7Tpt94SxCRXirJwX5iVfd9/N1pOg5HMArQczlZcwDe28w+zmtXzb3NBZLZySvrYoFeRrtNOv6VuFuUw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757520152; c=relaxed/simple;
+	bh=VBGasfSXDfmNknPuWb239zD2FB/oTXbNwUswyjyWCcg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u00B4tX+ycayT6qOVnzzWHlPE89lIJ3vBQyvYIcsNw3IpaIV8AZ4hlMWPCmdVaW5fXpJ2u60sD+n46/ae1OADd4+apSnJnpgvT0IFUvqfc+yC/Hzz/gC8HFDjTKd9R6xs3i403vvVjVrItj3sO+w5H2WPuir0j8NqtrxeYKABFI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=NNi7LZBV; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1757520086; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=R5DDqmabhsADtMQCa2PEdFT6F6wXS9UD/gGmpLywYcPrMKfhq88xNdBkGb8waBzjsKLkauIkTZ7z1RrkRmx77yxGkMbmt4pn6EQY273AbNRYhBkKrWQsQCCodV5fCFt+Cj1jRCQZhj/po422gXn04MM32CEJaiiCea5eXeOEiD0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757520086; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=VwPPYJTQ/XXwyamtgAxlZ1NzteBcBgnI+IIDSuPw/fU=; 
+	b=R1Oct9/K0pgrsE6ekil11c92iYphWLbg1NfznTSVdecOiUThXFJD1HAwSAGsj1jCTP4WnUmmCJzdJmNTcxwzCvtPBuwMVx9tq3arn6K65HuQ6uowbNLYIFAbsWPnMc5xk99S9/1Prfjkr5wM34P6crUTigUGLLtUVHH32uXx5Zw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
+	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757520085;
+	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=VwPPYJTQ/XXwyamtgAxlZ1NzteBcBgnI+IIDSuPw/fU=;
+	b=NNi7LZBVPN/l/xAW+MYrNHuVhd3P5biETVJMrjrMGhoO7Szh7a/eXWCGKVyejaWg
+	AUU46rWM9rcHy4fqDfkLmO5jQ3oCB1ppq9L7YS+VbG/zh9hiHS+HkbgMig99r/4Z2TX
+	wYz1HTF4q2uewOLrLqy2+D5+3paLJyIyf7EEXJJk=
+Received: by mx.zohomail.com with SMTPS id 1757520082828908.8305273727573;
+	Wed, 10 Sep 2025 09:01:22 -0700 (PDT)
+Message-ID: <7523752e-eb7b-4211-84f2-33916c39ee2b@collabora.com>
+Date: Wed, 10 Sep 2025 13:01:07 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250909232623.4151337-1-kuniyu@google.com> <a29689e0-cabc-4fdb-a030-443f0ccfb468@linux.dev>
- <CAAVpQUDeaiGUdxGQHSMRU3=zwJy7a0hMWXjoRkfdYPqaZLU09Q@mail.gmail.com> <effcf89d-925a-4bf6-9c6c-39a9b6731409@linux.dev>
-In-Reply-To: <effcf89d-925a-4bf6-9c6c-39a9b6731409@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 10 Sep 2025 08:59:46 -0700
-X-Gm-Features: Ac12FXzir08fghnZsZResbK59XEExlsCjOH6FkCZViQ7TUm_ZgO_CqtCgK8V34I
-Message-ID: <CAAVpQUDPDr83HOQQTDR4DuGeeAFyQ-G_6E=TwyZNN5MnaBHSqQ@mail.gmail.com>
-Subject: Re: [PATCH v1 bpf] tcp_bpf: Call sk_msg_free() when
- tcp_bpf_send_verdict() fails to allocate psock->cork.
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	syzbot+4cabd1d2fa917a456db8@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 13/14] dt-bindings: input/touchscreen: Convert MELFAS
+ MIP4 Touchscreen to YAML
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
+ andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
+ broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
+ conor+dt@kernel.org, davem@davemloft.net, edumazet@google.com,
+ flora.fu@mediatek.com, houlong.wei@mediatek.com, jeesw@melfas.com,
+ jmassot@collabora.com, kernel@collabora.com, krzk+dt@kernel.org,
+ kuba@kernel.org, kyrie.wu@mediatek.corp-partner.google.com,
+ lgirdwood@gmail.com, louisalexis.eyraud@collabora.com,
+ maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
+ mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
+ p.zabel@pengutronix.de, pabeni@redhat.com, robh@kernel.org,
+ sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com,
+ tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com,
+ devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-14-ariel.dalessandro@collabora.com>
+ <CACRpkdbpKqKyebADj0xPFq3g0biPh-vm4d6C3sd8r0URyfyYRg@mail.gmail.com>
+ <caguo7ud4dapb4yupeq2x4ocwoh4dt5nedwjsyuqsaratugcgz@ozajhsqwfzq6>
+ <CACRpkdZRHQ6vuchN8x8d0uPCVMPPHOdBVWiUhzFJNs2paHGbYw@mail.gmail.com>
+ <f199fc0b-20c0-4c22-b0ed-c508514b60c6@kernel.org>
+Content-Language: en-US
+From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+In-Reply-To: <f199fc0b-20c0-4c22-b0ed-c508514b60c6@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Wed, Sep 10, 2025 at 7:05=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 9/9/25 11:56 PM, Kuniyuki Iwashima wrote:
-> > On Tue, Sep 9, 2025 at 10:15=E2=80=AFPM Martin KaFai Lau <martin.lau@li=
-nux.dev> wrote:
-> >>
-> >> On 9/9/25 4:26 PM, Kuniyuki Iwashima wrote:
-> >>> syzbot reported the splat below. [0]
-> >>>
-> >>> The repro does the following:
-> >>>
-> >>>     1. Load a sk_msg prog that calls bpf_msg_cork_bytes(msg, cork_byt=
-es)
-> >>>     2. Attach the prog to a SOCKMAP
-> >>>     3. Add a socket to the SOCKMAP
-> >>>     4. Activate fault injection
-> >>>     5. Send data less than cork_bytes
-> >>>
-> >>> At 5., the data is carried over to the next sendmsg() as it is
-> >>> smaller than the cork_bytes specified by bpf_msg_cork_bytes().
-> >>>
-> >>> Then, tcp_bpf_send_verdict() tries to allocate psock->cork to hold
-> >>> the data, but this fails silently due to fault injection + __GFP_NOWA=
-RN.
-> >>>
-> >>> If the allocation fails, we need to revert the sk->sk_forward_alloc
-> >>> change done by sk_msg_alloc().
-> >>>
-> >>> Let's call sk_msg_free() when tcp_bpf_send_verdict fails to allocate
-> >>> psock->cork.
-> >>>
-> >>> [0]:
-> >>> WARNING: net/ipv4/af_inet.c:156 at inet_sock_destruct+0x623/0x730 net=
-/ipv4/af_inet.c:156, CPU#1: syz-executor/5983
-> >>> Modules linked in:
-> >>> CPU: 1 UID: 0 PID: 5983 Comm: syz-executor Not tainted syzkaller #0 P=
-REEMPT(full)
-> >>> Hardware name: Google Google Compute Engine/Google Compute Engine, BI=
-OS Google 07/12/2025
-> >>> RIP: 0010:inet_sock_destruct+0x623/0x730 net/ipv4/af_inet.c:156
-> >>> Code: 0f 0b 90 e9 62 fe ff ff e8 7a db b5 f7 90 0f 0b 90 e9 95 fe ff =
-ff e8 6c db b5 f7 90 0f 0b 90 e9 bb fe ff ff e8 5e db b5 f7 90 <0f> 0b 90 e=
-9 e1 fe ff ff 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 9f fc
-> >>> RSP: 0018:ffffc90000a08b48 EFLAGS: 00010246
-> >>> RAX: ffffffff8a09d0b2 RBX: dffffc0000000000 RCX: ffff888024a23c80
-> >>> RDX: 0000000000000100 RSI: 0000000000000fff RDI: 0000000000000000
-> >>> RBP: 0000000000000fff R08: ffff88807e07c627 R09: 1ffff1100fc0f8c4
-> >>> R10: dffffc0000000000 R11: ffffed100fc0f8c5 R12: ffff88807e07c380
-> >>> R13: dffffc0000000000 R14: ffff88807e07c60c R15: 1ffff1100fc0f872
-> >>> FS:  00005555604c4500(0000) GS:ffff888125af1000(0000) knlGS:000000000=
-0000000
-> >>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>> CR2: 00005555604df5c8 CR3: 0000000032b06000 CR4: 00000000003526f0
-> >>> Call Trace:
-> >>>    <IRQ>
-> >>>    __sk_destruct+0x86/0x660 net/core/sock.c:2339
-> >>>    rcu_do_batch kernel/rcu/tree.c:2605 [inline]
-> >>>    rcu_core+0xca8/0x1770 kernel/rcu/tree.c:2861
-> >>>    handle_softirqs+0x286/0x870 kernel/softirq.c:579
-> >>>    __do_softirq kernel/softirq.c:613 [inline]
-> >>>    invoke_softirq kernel/softirq.c:453 [inline]
-> >>>    __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
-> >>>    irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
-> >>>    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052=
- [inline]
-> >>>    sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:=
-1052
-> >>>    </IRQ>
-> >>>
-> >>> Fixes: 4f738adba30a ("bpf: create tcp_bpf_ulp allowing BPF to monitor=
- socket TX/RX data")
-> >>> Reported-by: syzbot+4cabd1d2fa917a456db8@syzkaller.appspotmail.com
-> >>> Closes: https://lore.kernel.org/netdev/68c0b6b5.050a0220.3c6139.0013.=
-GAE@google.com/
-> >>> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> >>> ---
-> >>>    net/ipv4/tcp_bpf.c | 4 +++-
-> >>>    1 file changed, 3 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-> >>> index ba581785adb4..ee6a371e65a4 100644
-> >>> --- a/net/ipv4/tcp_bpf.c
-> >>> +++ b/net/ipv4/tcp_bpf.c
-> >>> @@ -408,8 +408,10 @@ static int tcp_bpf_send_verdict(struct sock *sk,=
- struct sk_psock *psock,
-> >>>                if (!psock->cork) {
-> >>>                        psock->cork =3D kzalloc(sizeof(*psock->cork),
-> >>>                                              GFP_ATOMIC | __GFP_NOWAR=
-N);
-> >>> -                     if (!psock->cork)
-> >>> +                     if (!psock->cork) {
-> >>> +                             sk_msg_free(sk, msg);
-> >>
-> >> Nothing has been corked yet, does it need to update the "*copied":
-> >>
-> >>                                  *copied -=3D sk_msg_free(sk, msg);
-> >
-> > Oh exactly, or simply *copied =3D 0 ?
->
-> Make sense. I made the change and updated the commit message for this fix=
- also.
-> Applied. Thanks.
+Krzysztof, all,
 
-Thank you Martin!
+On 9/9/25 3:56 AM, Krzysztof Kozlowski wrote:
+> On 05/09/2025 13:33, Linus Walleij wrote:
+>> On Fri, Sep 5, 2025 at 12:02 PM Dmitry Torokhov
+>> <dmitry.torokhov@gmail.com> wrote:
+>>> On Thu, Aug 21, 2025 at 01:56:24PM +0200, Linus Walleij wrote:
+>>>> Hi Ariel,
+>>>>
+>>>> thanks for your patch!
+>>>>
+>>>> On Wed, Aug 20, 2025 at 7:17 PM Ariel D'Alessandro
+>>>> <ariel.dalessandro@collabora.com> wrote:
+>>>>
+>>>>> +  ce-gpios:
+>>>>> +    description: GPIO connected to the CE (chip enable) pin of the chip
+>>>>> +    maxItems: 1
+>>>>
+>>>> Mention that this should always have the flag GPIO_ACTIVE_HIGH
+>>>> as this is required by the hardware.
+>>>>
+>>>> Unfortunately we have no YAML syntax for enforcing flags :/
+>>>
+>>> Theoretically there can be an inverter on the line, so from the AP point
+>>> of view the line is active low while from the peripheral POV the pin is
+>>> active high...
+>>
+>> Yes, I think someone even proposed adding inverters to the
+>> device tree and was nixed.
+> 
+> It's not about DT, it's about board design - you can (almost?) always
+> invert the logical signal, so this should match what hardware requires
+> plus any inverter on the board.
+> 
+> 
+>>
+>> It's a matter of phrasing I would say:
+>>
+>> "Mention that this should nominally have the flag GPIO_ACTIVE_HIGH
+> 
+> No, please do not, it is wrong. If hardware requires active high, then
+> just say this is active high. But the actual GPIO flag depends on the
+> board design if signal is inverted.
+
+After the discussion from this thread, will mark it a "active high" in 
+the property description for v2.
+
+Thanks,
+
+-- 
+Ariel D'Alessandro
+Software Engineer
+
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
+Registered in England & Wales, no. 5513718
+
 
