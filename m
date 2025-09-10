@@ -1,92 +1,97 @@
-Return-Path: <netdev+bounces-221512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76958B50AFF
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 04:26:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FE3EB50B06
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 04:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3222C3A61AD
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:26:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B453B5295
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7457723BD1D;
-	Wed, 10 Sep 2025 02:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18DC724113D;
+	Wed, 10 Sep 2025 02:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0ddagmg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMu73/Jx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F5123CB;
-	Wed, 10 Sep 2025 02:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97A119D8AC;
+	Wed, 10 Sep 2025 02:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757471168; cv=none; b=PBwokfRUQVso+P7PVmahzrCv4nYsk86v+Rc09WGD1voRTnhwVw1f25+M0z3277d2XhPrrKRkI1C3zyJwyYfgIuOEVQuYljSPqkPmgc3HJkHaVW60x9490xxIJBhW8gewFwx9pW0n19LDNgWamGvVMUdD5FNUPsOmqsmR5TYI+sw=
+	t=1757471411; cv=none; b=TAW5BXxr+eFUhKpJimoB1jBnI4KnA3U164lFqCMxV8v8SlSZDn/UqfnhPox9/KsoOOepNw1jVXLbEERjFkIU/wFAuINfKJDApKplcARDsJPmzwzlw+SHiStSpn6G72p0NrfHGrterNGVrrLGQKz5yxMyLXeCYYI5ff4RZ9oA4Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757471168; c=relaxed/simple;
-	bh=GxnvKUwX85agoJjvtTRn54fBAg9vLT1ovfRjs92Ns70=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JcAJzX+mi5V68YSZr0//eiGkuc50XRi/9xIaQgW3X1VeeIoD0rzcyXUpuxWkst5PMcxKyl+hH6pW6V2ujv8K+1ZBglgXwFew/DrPlL2kePvj1jTPT/uhxZg06UXF93QQHtPLscvWTlH6Kw+cckhU3mycFEAk2vY0a3SL1Tz2wYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0ddagmg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E83EC4CEF4;
-	Wed, 10 Sep 2025 02:26:07 +0000 (UTC)
+	s=arc-20240116; t=1757471411; c=relaxed/simple;
+	bh=f42uKL7muikKt8i17Y8V5ypDbGKRVNJBBDLHVh1JR9I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=q0m42r5VaS7217Ci50ZgtLcGvpxfaxj1OHDzQV+WodOjtnTgEDhozrQ9O+tGn7bgNKWlcF45pTCDPEYjnVrmoSVpzq8yZUhqkDH43XGhb7lW0W4bQnYinLYNOimjSyahxVOO5RME/YFHk3/oYT5hirdN05FHLEMm/AaMU9gwtoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMu73/Jx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA26C4CEF4;
+	Wed, 10 Sep 2025 02:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757471167;
-	bh=GxnvKUwX85agoJjvtTRn54fBAg9vLT1ovfRjs92Ns70=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L0ddagmgy+s8s3JEjKCyJ863LKjBOg5sgNP7YOQoffwnWXQX0m6CwbVMkzb/jV4Do
-	 TIw2hrkJVbY0DJwY/VEScJVb59rTQ2c8C3zcqakcTv75WIMiYv6n+rRGJlRARg16FH
-	 /4SbfzXXM42O64SCsOnqsycNGrp/K+AeU+9R/ATKanUjywqr4kAxAdM5glxZUAHczC
-	 eWUb6YbbWxCwEPw7g/cqTgrM4ip3U58uepqYw04YI2AnC/r0UpEVR2G4ecFs8LUanM
-	 nkr7F4Xf1/8W/YGUhmILOEJtjtKY7hMgQUNCVFTlRD2z7tF6R8v7K/MBQj+KWLlQuL
-	 O4f5Wx2Ca2D3g==
-Date: Tue, 9 Sep 2025 19:26:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv2 2/2] selftests: bonding: add vlan over bond testing
-Message-ID: <20250909192606.6ac53aa4@kernel.org>
-In-Reply-To: <aMDciKMGjr-_sW6E@fedora>
-References: <20250908062802.392300-1-liuhangbin@gmail.com>
-	<20250908062802.392300-2-liuhangbin@gmail.com>
-	<20250909164600.04aa44c7@kernel.org>
-	<aMDciKMGjr-_sW6E@fedora>
+	s=k20201202; t=1757471410;
+	bh=f42uKL7muikKt8i17Y8V5ypDbGKRVNJBBDLHVh1JR9I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cMu73/JxUcG3Jj+kQUky5EGbd6w/hyeq/bN23bo4ob36njCw/CIInxXJXAm4IJgLT
+	 /EvvLiyZbjCCoUod8GDP/4HVc9Mm/70vNVC84hzo/Z6+VjzAbcKwSeekruI1/JcTpP
+	 NNKmYRI91whSB7042OytkQaBkCe4UMry/W1wWYpt7zB2A3PeX2F0D80Re6IFNnQBvi
+	 jF+YdkmIHya1OaiQUjSJZh5Ocvm+8VefM67e5vXntPtUvlhRN9GnKIN+BjuLRsU3vZ
+	 MYtPH7LdDvzQSg6gjTxM/qNdFSo6JyOOa7UeE+sDusk3qQ+JjvbZeSE4/kGug5BUsu
+	 E/t77xYwh9spw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFA8383BF69;
+	Wed, 10 Sep 2025 02:30:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/2] net/mlx5e: Add pcie congestion event extras
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175747141350.881840.9602387660242823143.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Sep 2025 02:30:13 +0000
+References: <1757237976-531416-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1757237976-531416-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, corbet@lwn.net, jiri@resnulli.us,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ dtatulea@nvidia.com
 
-On Wed, 10 Sep 2025 02:03:52 +0000 Hangbin Liu wrote:
-> On Tue, Sep 09, 2025 at 04:46:00PM -0700, Jakub Kicinski wrote:
-> > On Mon,  8 Sep 2025 06:28:02 +0000 Hangbin Liu wrote:  
-> > > Add a vlan over bond testing to make sure arp/ns target works.
-> > > Also change all the configs to mudules.  
-> > 
-> > Why are you switching everything to module?
-> > The series needs to go to net, we should avoid unnecessary cleanups.
-> > And I think changing the config is unrelated to the selftest so it
-> > should be a standalone patch in the first place?  
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 7 Sep 2025 12:39:34 +0300 you wrote:
+> Hi,
 > 
-> On my local testing, there will be a lot default interfaces if all modules
-> build in. This could make the test environment more clean.
-> But it's just my preference.
+> This small series by Dragos covers gaps requested in the initial pcie
+> congestion series [1]:
+> - Make pcie congestion thresholds configurable via devlink.
+> - Add a counter for stale pcie congestion events.
+> 
+> [...]
 
-No strong opinion on my side. Your point is fair. On the other hand
-sometimes dealing with modules is tricky (especially with vng when
-building kernel with O=build/). But not sure how much we should care
-about shortcomings of tooling which can be fixed. It's okay for our CI.
+Here is the summary with links:
+  - [net-next,1/2] net/mlx5e: Make PCIe congestion event thresholds configurable
+    https://git.kernel.org/netdev/net-next/c/f4053490a6f6
+  - [net-next,2/2] net/mlx5e: Add stale counter for PCIe congestion events
+    https://git.kernel.org/netdev/net-next/c/cdc492746e3f
 
-> As you said, we can do it with a stand alone
-> patch. I will re-post and drop the config update.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Yup! For net we should avoid it.
+
 
