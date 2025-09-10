@@ -1,132 +1,168 @@
-Return-Path: <netdev+bounces-221855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77BF0B5225D
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:37:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B28AB52266
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:41:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D6834672C6
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:37:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39EBC1C85912
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270AC2EF67A;
-	Wed, 10 Sep 2025 20:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466012F1FEA;
+	Wed, 10 Sep 2025 20:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cxM3JIWa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQLy6yPe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A253B23B607
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6645F1D8DFB;
+	Wed, 10 Sep 2025 20:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757536640; cv=none; b=PUOLBMB6EzoVclSt5gKLQ/9UAUNtKJoT/Q06Mzi6ut93BHo2lGsPDYgYlUkHBl0S22tE/R0+ZISZEPR7qe+Ed/IZi4hcz+TI/+ZrzpF0fpK6GUSBtCVhpHpX0DFDv2887LU1XNdf1p8UlXl35KTc1b0xc+Y6XCt1DwjJkY4+TMs=
+	t=1757536900; cv=none; b=bimTcCczJMhldVZw9V6Qb/KoD/jRUP6slH1/05H14ol3zEhxeBJawEvcWOxcZqNZ+qNDONkINLOpYEuuGBH4tc1E9KGK8e7F1Ojk36GF9p8IEoCZgaPAX3t+cQ17PNIIgX9rdMCttMRY/tY9eCtt5ZtM4xpxTLe1HBRRCBwuWWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757536640; c=relaxed/simple;
-	bh=2BNuiEEYZAYKMxOPW5Czlvqb0Ows/NIzukJVzjuaim4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ri6l05Wryji1U9PIy7S7FmZv+amTmDbYrVEtOLgh4yTValUw1NjXBginwhPX03LKRVp/pcHCZuwangyLuBzG1TsZ66n/lOmOMB3eZMA5SFBMEJVQb0eEVQOYS32ObfalhIJXpx1iNm0uwlrLHXd58PKUUcZU60x0RneAo0zlCq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cxM3JIWa; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4f86568434so30830a12.2
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:37:18 -0700 (PDT)
+	s=arc-20240116; t=1757536900; c=relaxed/simple;
+	bh=0oagLe8fOnXISlWeTa/kfm/g6uzMEFeSXwJhXsqFDUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kAiyY4r/wTvoL9dnf2lib1U0cAUb1rDXUrHQIH8SY0mFiZW73cS3l4efB/DV7zFi2ec25R1dbS9+WGQ/9ypCowZA+CyCbbxAErI6SXJtGlnwn+I27pHnL7xCXdBWZEibQe3FVfiZHiSAF5tpk8nU6QOqEwoqG2BagD85U5Dv1eI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQLy6yPe; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-45b9c35bc0aso191885e9.2;
+        Wed, 10 Sep 2025 13:41:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757536638; x=1758141438; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yzT78MV+zKBndimmlnrpRxYkl/EJq6HboGh6m7gKU/I=;
-        b=cxM3JIWafFwumE8SGapoSTc3Sbky6pphFIqD/wj7HIGFBfQFAPRCTP2Wjl2ffdNwKb
-         SZYkWjI7LDmwcP4pPDM6NLeIDy4noWUX3WToVYb+hcTCFPlmFu92dPMpdjgmLx5Krp+Z
-         NrFpgQLCN6U74sNixc4Q0BbZJtBdTHnk6HtqtIBcPUA5r8Ui7Pwn+9KTCbSk+wU58wnW
-         lY52qYlcFVhM+cFaJA8wtp+HxR5x6xRL1wm+QlnaXFINAaqxiZMnopfEZDyGLERQaZ2p
-         0dnXANiyZjZXNULYgkUkZEBrZGbg6ODdP5c6i0Rs/XYhHXj3o5aO8r5vIM0CRDCGl32V
-         z/5w==
+        d=gmail.com; s=20230601; t=1757536897; x=1758141697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=onEVVy/te+kVlImFH7TVFonDeLnTecLrkLYITcBmYWk=;
+        b=TQLy6yPe85DCGnmGSxG+3SNaR2sDRpaKMXWpYm4nQIl9tfwL2RFcLeZZog2yrbULs8
+         iNyLmjD9wRl48uNqcM1C8F/D4eqvOetl/d2xu1fA1BNplmzHVHAaJAZZ9TpPH7wbkCPI
+         bml9Vts9IdbhgSLqEqLZ7ac5r3wt71SRs4n7W/eN6I1lalckqYAnseIZF7l1xDGa7t4U
+         YVYp28oohFr6mAr7bxAKrLLf+SBCRTxLydYlChbcG0GgF0Sa3PPvrXI1ViWFvlVHgMls
+         0r6eBJp5IyZ8lQy4BznJqMx/QksSFmyFnipr2FTqLIQclFxor2xOJcJThXq1gAezQRx/
+         Rv1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757536638; x=1758141438;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yzT78MV+zKBndimmlnrpRxYkl/EJq6HboGh6m7gKU/I=;
-        b=ZBBsVKgmjRcEK22P9toS93WOX1Pe48pE032LKuT7xWt9prXb+zJ9hsuH0S8A1SBXZU
-         GY7UjoAJ7Z5A2emqP/YSwOOoqyteqM2/obikHfcKKaFfNIVL3CFAVGddKP+2KTNBvquw
-         nnu8BUtIoPVia1sChHaTQaGeGHlFD3/BXes4Tv/xmBGUMyKEKgS44+W05ilCvG/kvT69
-         Wy55MzT6O3RFuUN672e71xGmG4Xb8yeLUTBfGgceycwNfyrj7fl8zA/mz3U7IEde7Bzg
-         s+8qMvRkoNHy1g+L2RhdbSDKP3s/JH1HPs8M3R5lJmMi9lk/nZ9P5CwX7RPjoZWuAwc0
-         5SEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbMQKDB+C9Z9tIImSpHMy9d/Q+WxjivOTKP59pS1tZwPNmkVR0JrPy4RKT9x3EL+jBQr/W3oE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzS4EI8TxXZbcsPJGuUp3eIDwQfeaOgX1iil0vlMuI10+mCcWK9
-	4or/r3i7D9he8p5+6mEHIFJRagTJSWi9y+ghB1eBHuJ8Jxyq4gzi4W5CjRJ3SoOIK2LnFuRw3m5
-	tdeUrwJHHVQSoUQ==
-X-Google-Smtp-Source: AGHT+IH8ebV8iH+3MOFITA7O3MGaCT9396cwf2zt0/OyqhqmGiOk1gqNp3i9qD1L7zZ2Vmza2fQRm4vp+6duEw==
-X-Received: from pgbcu7.prod.google.com ([2002:a05:6a02:2187:b0:b4c:39d9:a0c3])
- (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6300:218d:b0:246:3a6:3e51 with SMTP id adf61e73a8af0-25346facb32mr24460194637.58.1757536637851;
- Wed, 10 Sep 2025 13:37:17 -0700 (PDT)
-Date: Wed, 10 Sep 2025 20:37:16 +0000
+        d=1e100.net; s=20230601; t=1757536897; x=1758141697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=onEVVy/te+kVlImFH7TVFonDeLnTecLrkLYITcBmYWk=;
+        b=LmJ4XW9QZ1x2zH+R3G2+zhyV8Tkwz+/ViETWD0xUfWLatno3q1yGfg8ZH8CI4yL4/s
+         Sh7K8+LyrKrzIh/UE1H5OGFKlYf5yGWDhOssmslFdZq9a96cSYQzykF5jjsGc2jAkzZA
+         L9lC/G7ONWsKiqGwZsGXMu5qFgWR8dnHigwdLY2k2B7Bsyjd3LvLlBcvnpQdVxDSuIWv
+         3KxjUwTdui5rxV4HAWLF0FYuTXxvrbL06d1PH9axbLBH9xIS/gICf7yan3UkJZ4P8Dr0
+         CAaRoDEe9ZZzzyy2B8+OmZfeRTr9BAQ0GGke6uY0GQXLa0tJwVT9O+thY2WBpYriUqQM
+         Z/jA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/MRzKUkTTYWKLzdfeLGmay8/0M0JJCkjS9iCVc6Xq+/Q5fbdUwafahn58fXb4P8AV1aTPdYOWrUiHq+gN@vger.kernel.org, AJvYcCVPF1EPcwSz5rBXi3yXNua6dZWhZ4L+zRRdbPsqO6FrmiBZTaVRr5Lt0/cQNM/c0vNBytixEFF6@vger.kernel.org, AJvYcCVo8Lxvw63MWE8d1EoNvv6wlNGB/kAmvekMDiI2uHqXTifqCxexhJwhn9HGVKXVSypG5OXbQ2Rr5bGj@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAtmDr/iEWB0YvGUpGYiz6vEXRYigG2Aif0/2dEFyLHo8JyC6b
+	mq4vEgq5f0DHmFKsCEMEz8WYLBoXUzDW7wFVeRisTykvrsg+GDFA7Arc
+X-Gm-Gg: ASbGnctkf2DzlYcde/KeeiLGQB8X9Gn7Y4NkODVZKmIpfyLN4NJKQXIUuoOijqXWNwH
+	0mtnXIoaQ6e5/Lx4DyUDQzwPEaBOyr0jWzJ6fwekHs7A6vdV5fkPpRxtBzw5bx5LR9XyDDBYmAD
+	6+CAc8nHiFZPd9YYqsrjhDkSaf+8dIEu3b8zGZ4NweymcYLWFO2vkXOdypi9nuFAZeWgKN7mExj
+	+6Jw132UgveCcAA4J5YLOjg3+MpIM5ELpv117vilPo0X8LHQQ4bfTKpqjoUOyq1NmpE+5/j5dni
+	xd3CFNn52jFGaYwKfC4HOSL8k4aD71T2slngUassdk5vouZKuJcTPi70LQJWHmZpyyckBg8Yx/H
+	fNFVXhX2RPNTNKz0mIS981isjhix6kD4Mqy6RApa6VaQc0n0=
+X-Google-Smtp-Source: AGHT+IH0FrdKxhb/OfkMmU6nPKsme3pPVultPw48KOkIWOb5cvaoD/X9ldikvmsGnulePcw+v1BObw==
+X-Received: by 2002:a05:600c:1c1b:b0:45d:e6b6:55fe with SMTP id 5b1f17b1804b1-45ded9fb96bmr70479505e9.34.1757536896503;
+        Wed, 10 Sep 2025 13:41:36 -0700 (PDT)
+Received: from iku.Home ([2a06:5906:61b:2d00:ee64:b92b:f8fd:6cd8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0157d68esm320085e9.6.2025.09.10.13.41.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 13:41:35 -0700 (PDT)
+From: Prabhakar <prabhakar.csengg@gmail.com>
+X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>
+Cc: linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Prabhakar <prabhakar.csengg@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH net-next v3 0/9] Add PCS support for Renesas RZ/{T2H,N2H} SoCs
+Date: Wed, 10 Sep 2025 21:41:21 +0100
+Message-ID: <20250910204132.319975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250910203716.1016546-1-skhawaja@google.com>
-Subject: [PATCH net] net: Use NAPI_* in test_bit when stopping napi kthread
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: willemb@google.com, netdev@vger.kernel.org, skhawaja@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-napi_stop_kthread waits for the NAPI_STATE_SCHED_THREADED to be unset
-before stopping the kthread. But it uses test_bit with the
-NAPIF_STATE_SCHED_THREADED and that might stop the kthread early before
-the flag is unset.
+From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Use the NAPI_* variant of the NAPI state bits in test_bit instead.
+Hi All,
 
-Tested:
- ./tools/testing/selftests/net/nl_netdev.py
- TAP version 13
- 1..7
- ok 1 nl_netdev.empty_check
- ok 2 nl_netdev.lo_check
- ok 3 nl_netdev.page_pool_check
- ok 4 nl_netdev.napi_list_check
- ok 5 nl_netdev.dev_set_threaded
- ok 6 nl_netdev.napi_set_threaded
- ok 7 nl_netdev.nsim_rxq_reset_down
- # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
+This series aims to add PCS support for the Renesas RZ/T2H and RZ/N2H SoCs
+These SoCs include a MII converter (MIIC) that converts MII to RMII/RGMII
+or can be set in pass-through mode for MII similar to the RZ/N1 SoC. The
+MIIC is used in conjunction with the Ethernet switch (ETHSW) available on
+these SoCs.
 
- ./tools/testing/selftests/drivers/net/napi_threaded.py
- TAP version 13
- 1..2
- ok 1 napi_threaded.change_num_queues
- ok 2 napi_threaded.enable_dev_threaded_disable_napi_threaded
- # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
+v2->v3:
+- Moved reset handling from probe to a separate function
+  miic_reset_control_init() to avoid checkpatch warnings.
+- Added a comment about replacing with FIELD_PREP().
+- Dropped inlining of miic_unlock_regs().
+- Dropped inlining of miic_lock_regs().
+- Fixed checkpatch warning to fit within 80 columns.
+- Added Tested-by tag from Wolfram.
+- Added Reviewed-by tag from Andrew.
 
-Fixes: 689883de94dd ("net: stop napi kthreads when THREADED napi is disabled")
-Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+v1->v2:
+- Dropped regx in title and description in patch 1/9.
+- As done for other IPs used T2H compatible as a fallback for N2H.
+- Renamed pcs-rzt2h-miic.h -> renesas,r9a09g077-pcs-miic.h
+- Added matrix table in the new header file.
+- Corrected the resets check for RZ/N1.
+- Updated the commit message in patch 1/9.
+- Dropped regx in config description in patch 9/9.
+- Dropped patch "net: pcs: rzn1-miic: Add PCS validate callback
+  for RZ/T2H MIIC" is this already taken care in commit 508df2de7b3e
+  as pointed by Russell King.
 
----
- net/core/dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
+Prabhakar
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 93a25d87b86b..8d49b2198d07 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6965,7 +6965,7 @@ static void napi_stop_kthread(struct napi_struct *napi)
- 	 * the kthread.
- 	 */
- 	while (true) {
--		if (!test_bit(NAPIF_STATE_SCHED_THREADED, &napi->state))
-+		if (!test_bit(NAPI_STATE_SCHED_THREADED, &napi->state))
- 			break;
- 
- 		msleep(20);
+Lad Prabhakar (9):
+  dt-bindings: net: pcs: renesas,rzn1-miic: Add RZ/T2H and RZ/N2H
+    support
+  net: pcs: rzn1-miic: Drop trailing comma from of_device_id table
+  net: pcs: rzn1-miic: Add missing include files
+  net: pcs: rzn1-miic: Move configuration data to SoC-specific struct
+  net: pcs: rzn1-miic: move port range handling into SoC data
+  net: pcs: rzn1-miic: Make switch mode mask SoC-specific
+  net: pcs: rzn1-miic: Add support to handle resets
+  net: pcs: rzn1-miic: Add per-SoC control for MIIC register unlock/lock
+  net: pcs: rzn1-miic: Add RZ/T2H MIIC support
+
+ .../bindings/net/pcs/renesas,rzn1-miic.yaml   | 177 +++++++---
+ drivers/net/pcs/Kconfig                       |  11 +-
+ drivers/net/pcs/pcs-rzn1-miic.c               | 317 +++++++++++++++---
+ .../net/renesas,r9a09g077-pcs-miic.h          |  36 ++
+ 4 files changed, 440 insertions(+), 101 deletions(-)
+ create mode 100644 include/dt-bindings/net/renesas,r9a09g077-pcs-miic.h
+
 -- 
-2.51.0.384.g4c02a37b29-goog
+2.51.0
 
 
