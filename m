@@ -1,200 +1,132 @@
-Return-Path: <netdev+bounces-221854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F366B521B1
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:23:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77BF0B5225D
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:37:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2D18582BB9
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:23:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D6834672C6
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46732EF649;
-	Wed, 10 Sep 2025 20:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270AC2EF67A;
+	Wed, 10 Sep 2025 20:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="FaVafSnw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cxM3JIWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEF12459DC;
-	Wed, 10 Sep 2025 20:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A253B23B607
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757535776; cv=none; b=nk8ejiLnH+O/qFjrtyBE2bYe4dJhDTffhHaZ/NQKV59ID3T3oZ9ybxATI7wu1URNfdp/1xaSpB6eRddJvoXZ3vekl4ieT9BMPYv2Xfklb36Ai8fgqpPQrEhNTDB/cn9d1ADWU9PRtSaLZ5uwOvFR3HNHwB6E+9tQVu/Ma7IizVs=
+	t=1757536640; cv=none; b=PUOLBMB6EzoVclSt5gKLQ/9UAUNtKJoT/Q06Mzi6ut93BHo2lGsPDYgYlUkHBl0S22tE/R0+ZISZEPR7qe+Ed/IZi4hcz+TI/+ZrzpF0fpK6GUSBtCVhpHpX0DFDv2887LU1XNdf1p8UlXl35KTc1b0xc+Y6XCt1DwjJkY4+TMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757535776; c=relaxed/simple;
-	bh=YwO4gMk2mnlMzohuneCtT2WGU12Kui0FL8bRdjGl9hg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NiuWgVuDynKA0gqKO0KKaM4QCupHZ0wAhEtL0UsvbY1g5djRJV3N8vBWxNgWbCxpTI3hVjR0HFa1ZlD9cWJdyNIW1WKG2lbmJZrBlMpdx2E6pVyZOAw8rjdy5RIedtC/ATvG3oj9wtLIYyuCV7QeS8Elbgie2HhMIVqSzfxZVz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=FaVafSnw; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [192.168.178.143] (p5dc883a3.dip0.t-ipconnect.de [93.200.131.163])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 58AKMmqA009423
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 10 Sep 2025 22:22:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1757535769;
-	bh=YwO4gMk2mnlMzohuneCtT2WGU12Kui0FL8bRdjGl9hg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=FaVafSnw8qOG0/JKXegDUcD4QkFqElFRSK7CBcF3cpFiqxRWzXe2V9ydLznh+ZtEn
-	 qL+3u1YvG+eV3pyGQ+3lrGtODn6NsL+30ltjZWbzV3BuN1glvMcYKAuWJnTRlfFqZv
-	 9qCV/AmOvM39dgeLa+VqqZCIMsM/P/0AN9wZdVMA=
-Message-ID: <2ce87e4c-43f4-4931-846b-10ddff4a64dc@tu-dortmund.de>
-Date: Wed, 10 Sep 2025 22:22:48 +0200
+	s=arc-20240116; t=1757536640; c=relaxed/simple;
+	bh=2BNuiEEYZAYKMxOPW5Czlvqb0Ows/NIzukJVzjuaim4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ri6l05Wryji1U9PIy7S7FmZv+amTmDbYrVEtOLgh4yTValUw1NjXBginwhPX03LKRVp/pcHCZuwangyLuBzG1TsZ66n/lOmOMB3eZMA5SFBMEJVQb0eEVQOYS32ObfalhIJXpx1iNm0uwlrLHXd58PKUUcZU60x0RneAo0zlCq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cxM3JIWa; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4f86568434so30830a12.2
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:37:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757536638; x=1758141438; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yzT78MV+zKBndimmlnrpRxYkl/EJq6HboGh6m7gKU/I=;
+        b=cxM3JIWafFwumE8SGapoSTc3Sbky6pphFIqD/wj7HIGFBfQFAPRCTP2Wjl2ffdNwKb
+         SZYkWjI7LDmwcP4pPDM6NLeIDy4noWUX3WToVYb+hcTCFPlmFu92dPMpdjgmLx5Krp+Z
+         NrFpgQLCN6U74sNixc4Q0BbZJtBdTHnk6HtqtIBcPUA5r8Ui7Pwn+9KTCbSk+wU58wnW
+         lY52qYlcFVhM+cFaJA8wtp+HxR5x6xRL1wm+QlnaXFINAaqxiZMnopfEZDyGLERQaZ2p
+         0dnXANiyZjZXNULYgkUkZEBrZGbg6ODdP5c6i0Rs/XYhHXj3o5aO8r5vIM0CRDCGl32V
+         z/5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757536638; x=1758141438;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yzT78MV+zKBndimmlnrpRxYkl/EJq6HboGh6m7gKU/I=;
+        b=ZBBsVKgmjRcEK22P9toS93WOX1Pe48pE032LKuT7xWt9prXb+zJ9hsuH0S8A1SBXZU
+         GY7UjoAJ7Z5A2emqP/YSwOOoqyteqM2/obikHfcKKaFfNIVL3CFAVGddKP+2KTNBvquw
+         nnu8BUtIoPVia1sChHaTQaGeGHlFD3/BXes4Tv/xmBGUMyKEKgS44+W05ilCvG/kvT69
+         Wy55MzT6O3RFuUN672e71xGmG4Xb8yeLUTBfGgceycwNfyrj7fl8zA/mz3U7IEde7Bzg
+         s+8qMvRkoNHy1g+L2RhdbSDKP3s/JH1HPs8M3R5lJmMi9lk/nZ9P5CwX7RPjoZWuAwc0
+         5SEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbMQKDB+C9Z9tIImSpHMy9d/Q+WxjivOTKP59pS1tZwPNmkVR0JrPy4RKT9x3EL+jBQr/W3oE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS4EI8TxXZbcsPJGuUp3eIDwQfeaOgX1iil0vlMuI10+mCcWK9
+	4or/r3i7D9he8p5+6mEHIFJRagTJSWi9y+ghB1eBHuJ8Jxyq4gzi4W5CjRJ3SoOIK2LnFuRw3m5
+	tdeUrwJHHVQSoUQ==
+X-Google-Smtp-Source: AGHT+IH8ebV8iH+3MOFITA7O3MGaCT9396cwf2zt0/OyqhqmGiOk1gqNp3i9qD1L7zZ2Vmza2fQRm4vp+6duEw==
+X-Received: from pgbcu7.prod.google.com ([2002:a05:6a02:2187:b0:b4c:39d9:a0c3])
+ (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6300:218d:b0:246:3a6:3e51 with SMTP id adf61e73a8af0-25346facb32mr24460194637.58.1757536637851;
+ Wed, 10 Sep 2025 13:37:17 -0700 (PDT)
+Date: Wed, 10 Sep 2025 20:37:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH 4/4] netdev queue flow control for vhost_net
-To: Jason Wang <jasowang@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: mst@redhat.com, eperezma@redhat.com, stephen@networkplumber.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>
-References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
- <20250902080957.47265-5-simon.schippers@tu-dortmund.de>
- <willemdebruijn.kernel.251eacee11eca@gmail.com>
- <CACGkMEshZGJfh+Og_xrPeZYoWkBAcvqW8e93_DCr7ix4oOaP8Q@mail.gmail.com>
- <willemdebruijn.kernel.372e97487ad8b@gmail.com>
- <CACGkMEtv+TKu+yBc_+WQsUj3UKqrRPvOVMGFDr7mB3zPHsW=wQ@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEtv+TKu+yBc_+WQsUj3UKqrRPvOVMGFDr7mB3zPHsW=wQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250910203716.1016546-1-skhawaja@google.com>
+Subject: [PATCH net] net: Use NAPI_* in test_bit when stopping napi kthread
+From: Samiullah Khawaja <skhawaja@google.com>
+To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: willemb@google.com, netdev@vger.kernel.org, skhawaja@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Jason Wang wrote:
-> On Wed, Sep 3, 2025 at 9:52 PM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
->>
->> Jason Wang wrote:
->>> On Wed, Sep 3, 2025 at 5:31 AM Willem de Bruijn
->>> <willemdebruijn.kernel@gmail.com> wrote:
->>>>
->>>> Simon Schippers wrote:
->>>>> Stopping the queue is done in tun_net_xmit.
->>>>>
->>>>> Waking the queue is done by calling one of the helpers,
->>>>> tun_wake_netdev_queue and tap_wake_netdev_queue. For that, in
->>>>> get_wake_netdev_queue, the correct method is determined and saved in the
->>>>> function pointer wake_netdev_queue of the vhost_net_virtqueue. Then, each
->>>>> time after consuming a batch in vhost_net_buf_produce, wake_netdev_queue
->>>>> is called.
->>>>>
->>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>> ---
->>>>>  drivers/net/tap.c      |  6 ++++++
->>>>>  drivers/net/tun.c      |  6 ++++++
->>>>>  drivers/vhost/net.c    | 34 ++++++++++++++++++++++++++++------
->>>>>  include/linux/if_tap.h |  2 ++
->>>>>  include/linux/if_tun.h |  3 +++
->>>>>  5 files changed, 45 insertions(+), 6 deletions(-)
->>>>>
->>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
->>>>> index 4d874672bcd7..0bad9e3d59af 100644
->>>>> --- a/drivers/net/tap.c
->>>>> +++ b/drivers/net/tap.c
->>>>> @@ -1198,6 +1198,12 @@ struct socket *tap_get_socket(struct file *file)
->>>>>  }
->>>>>  EXPORT_SYMBOL_GPL(tap_get_socket);
->>>>>
->>>>> +void tap_wake_netdev_queue(struct file *file)
->>>>> +{
->>>>> +     wake_netdev_queue(file->private_data);
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(tap_wake_netdev_queue);
->>>>> +
->>>>>  struct ptr_ring *tap_get_ptr_ring(struct file *file)
->>>>>  {
->>>>>       struct tap_queue *q;
->>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>>>> index 735498e221d8..e85589b596ac 100644
->>>>> --- a/drivers/net/tun.c
->>>>> +++ b/drivers/net/tun.c
->>>>> @@ -3739,6 +3739,12 @@ struct socket *tun_get_socket(struct file *file)
->>>>>  }
->>>>>  EXPORT_SYMBOL_GPL(tun_get_socket);
->>>>>
->>>>> +void tun_wake_netdev_queue(struct file *file)
->>>>> +{
->>>>> +     wake_netdev_queue(file->private_data);
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(tun_wake_netdev_queue);
->>>>
->>>> Having multiple functions with the same name is tad annoying from a
->>>> cscape PoV, better to call the internal functions
->>>> __tun_wake_netdev_queue, etc.
->>>>
->>>>> +
->>>>>  struct ptr_ring *tun_get_tx_ring(struct file *file)
->>>>>  {
->>>>>       struct tun_file *tfile;
->>>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>>>> index 6edac0c1ba9b..e837d3a334f1 100644
->>>>> --- a/drivers/vhost/net.c
->>>>> +++ b/drivers/vhost/net.c
->>>>> @@ -130,6 +130,7 @@ struct vhost_net_virtqueue {
->>>>>       struct vhost_net_buf rxq;
->>>>>       /* Batched XDP buffs */
->>>>>       struct xdp_buff *xdp;
->>>>> +     void (*wake_netdev_queue)(struct file *f);
->>>>
->>>> Indirect function calls are expensive post spectre. Probably
->>>> preferable to just have a branch.
->>>>
->>>> A branch in `file->f_op != &tun_fops` would be expensive still as it
->>>> may touch a cold cacheline.
->>>>
->>>> How about adding a bit in struct ptr_ring itself. Pahole shows plenty
->>>> of holes. Jason, WDYT?
->>>>
->>>
->>> I'm not sure I get the idea, did you mean a bit for classifying TUN
->>> and TAP? If this is, I'm not sure it's a good idea as ptr_ring should
->>> have no knowledge of its user.
->>
->> That is what I meant.
->>
->>> Consider there were still indirect calls to sock->ops, maybe we can
->>> start from the branch.
->>
->> What do you mean?
->>
->> Tangential: if indirect calls really are needed in a hot path, e.g.,
->> to maintain this isolation of ptr_ring from its users, then
->> INDIRECT_CALL wrappers can be used to avoid the cost.
->>
->> That too effectively breaks the isolation between caller and callee.
->> But only for the most important N callers that are listed in the
->> INDIRECT_CALL_? wrapper.
-> 
-> Yes, I mean we can try to store the flag for example vhost_virtqueue struct.
-> 
-> Thanks
-> 
+napi_stop_kthread waits for the NAPI_STATE_SCHED_THREADED to be unset
+before stopping the kthread. But it uses test_bit with the
+NAPIF_STATE_SCHED_THREADED and that might stop the kthread early before
+the flag is unset.
 
-I would just save the flag in the vhost_virtqueue struct as:
+Use the NAPI_* variant of the NAPI state bits in test_bit instead.
 
-enum if_type {IF_NONE = 0, TUN, TAP} type;
+Tested:
+ ./tools/testing/selftests/net/nl_netdev.py
+ TAP version 13
+ 1..7
+ ok 1 nl_netdev.empty_check
+ ok 2 nl_netdev.lo_check
+ ok 3 nl_netdev.page_pool_check
+ ok 4 nl_netdev.napi_list_check
+ ok 5 nl_netdev.dev_set_threaded
+ ok 6 nl_netdev.napi_set_threaded
+ ok 7 nl_netdev.nsim_rxq_reset_down
+ # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Is this how you would implement it?
+ ./tools/testing/selftests/drivers/net/napi_threaded.py
+ TAP version 13
+ 1..2
+ ok 1 napi_threaded.change_num_queues
+ ok 2 napi_threaded.enable_dev_threaded_disable_napi_threaded
+ # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
 
+Fixes: 689883de94dd ("net: stop napi kthreads when THREADED napi is disabled")
+Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 
-Apart from that, I found that vhost_net would eventually not wake anymore.
-This results in a dead interface. I rewrote my implementation to tackle
-this issue apart from the other requested changes. I will test it, run
-pktgen benchmarks, and then post a v5, but this will probably take me more
-time.
+---
+ net/core/dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks!
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 93a25d87b86b..8d49b2198d07 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6965,7 +6965,7 @@ static void napi_stop_kthread(struct napi_struct *napi)
+ 	 * the kthread.
+ 	 */
+ 	while (true) {
+-		if (!test_bit(NAPIF_STATE_SCHED_THREADED, &napi->state))
++		if (!test_bit(NAPI_STATE_SCHED_THREADED, &napi->state))
+ 			break;
+ 
+ 		msleep(20);
+-- 
+2.51.0.384.g4c02a37b29-goog
+
 
