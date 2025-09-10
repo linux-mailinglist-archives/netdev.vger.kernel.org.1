@@ -1,81 +1,62 @@
-Return-Path: <netdev+bounces-221604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B94B5123C
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:15:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83EC9B51246
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB9533BB601
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:15:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2346C465EF9
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716742571BD;
-	Wed, 10 Sep 2025 09:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7434B312812;
+	Wed, 10 Sep 2025 09:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="EKkE1gUL"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Wh8Yimpd"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAED627453
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 09:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D032877E9;
+	Wed, 10 Sep 2025 09:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757495748; cv=none; b=ImM+ASV7lATLnFxVZUs6c+AdIqLc3qEtY7J09qJz3EdwKs2Ayg6lDq/gONaHqdg0SJUM+ez6KK6nOgnT4Aj5qrASGJshyqEMjwYGYivMd31BfHI07jU0VZV8sLzinvDT9Zn3Goxyv+8eQWO0BXsBhPl1I9Suf5zQlh5nqcQfQZw=
+	t=1757495877; cv=none; b=kSsdz1RFPVLmXs+AwEVNvIW8UQ9nGyeyX0/lCDH0xF7zbX7iaA91DFCbSN9CDPh902kBQDsmyZTvN4whxp4SRTHx1nCakBt2f2RAVVgq5gMR/q1t440hPn75LgFr5XLBVML1HNH7wQOfueU7c1CpUgI/Uz/aMKZJ3/oeFbPU/hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757495748; c=relaxed/simple;
-	bh=FgUmNcKkTadLnkgxquHJqKdkFvyESZK0/ysiYkDaymw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oQa0lTdSDAAgCbcl9lS2Qh5bTGFJmsuJYB+1qml8sU/4tNL8NhS1fnPV14hv7xDrbcL/7MIaQhAVvQlCnYX2wDLTZfI742BHGC4q3RC+S63gChffm9KFzhQy99CB3bzhqpQ/EoqOIdKi1jlhyOx63edumkfX3EQhqL330WJLu5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=EKkE1gUL; arc=none smtp.client-ip=52.26.1.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1757495746; x=1789031746;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cxwgbzB+J6Da8bnPc7iRAfrv9EegcpSX9fIqrctUExo=;
-  b=EKkE1gULGRgaqD1ohhjGYHjTrPdmOY+5iBV/8h0wR3Dk70wsiyV+Q3xe
-   G4C/BrkMU08DKSQusNimRSno5Ejvi6dips9BSh6xgBJxKQivC45OrwNFQ
-   wSbd+eXoajZZFgKr0eXWsou80e6LUtdzBdZcQBDwO/hqNIyNkrvsyM3i4
-   Ga2ZBo9E20iYUuBWxhC+hINuxrVGLenm9WU3pNIsKSQ/JYoRFVOf1VJSA
-   HiFj152+xXp7m632SsAlkGUboXq6Utdye2PSGx7oNUuXZ1V0wEm0URCz5
-   ECDmVEgScESzVw/HsLH+QEOmfu0InpErrTr1YvVC9CcgxCV3AftV/8M0g
-   Q==;
-X-CSE-ConnectionGUID: pzWfVioZRL+hiEPa1AikyQ==
-X-CSE-MsgGUID: Ccsl+rumQKe/qGtw97kiNA==
-X-IronPort-AV: E=Sophos;i="6.18,253,1751241600"; 
-   d="scan'208";a="2752247"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 09:15:42 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:54368]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.90:2525] with esmtp (Farcaster)
- id 3b4f621e-84c4-486a-a0fa-91d03b04897d; Wed, 10 Sep 2025 09:15:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 3b4f621e-84c4-486a-a0fa-91d03b04897d
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 09:15:42 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.7) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 09:15:39 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <kurt@linutronix.de>
-CC: <aleksandr.loktionov@intel.com>, <andrew+netdev@lunn.ch>,
-	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<enjuk@amazon.com>, <intel-wired-lan@lists.osuosl.org>,
-	<kohei.enju@gmail.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<vitaly.lifshits@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] igc: unregister netdev when igc_led_setup() fails in igc_probe()
-Date: Wed, 10 Sep 2025 18:15:21 +0900
-Message-ID: <20250910091532.27951-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <87cy7yk7ma.fsf@jax.kurt.home>
-References: <87cy7yk7ma.fsf@jax.kurt.home>
+	s=arc-20240116; t=1757495877; c=relaxed/simple;
+	bh=GGcoW1rHPYKDVIpMVNnDGCuNsRgAHDhGZ6iQD3KEJQM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=b12J0e9OyGLQBizPK1J9J3iGxpyPPqM2A8jbZZbK7vM4kVGBgGzqnKAuH4choW3luGqnZjsI+kXUj+5DQqELsqpImlLVc/7AjLZ0ucN4G2AChvOg9UC5qJ1IY8sNf2NnSvMwvq/2Ad/KKLJloCEDJNcOhCQjvwST4r0KbW4DTig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Wh8Yimpd; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=kW
+	sJsKi4N76Tmx+Lu2+X5uhhEh4alrr77qi//eZRpHk=; b=Wh8YimpdbYux2bZ0Tm
+	WiH6rPacfglByyrkNxLAiLObV0VMg8PC+2FP2WgEiy6sBzh/6BqSnR5YHy/Z6yKS
+	urXYQwcFkNLjmdElYBMNrT4vgDwyXQK/60fdiC+/zBenz3vTa3A7afk/EFb7jtMH
+	izbshVITI8VxHHqjJN8TkZhtc=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDHL4wPQsFoNSDgAA--.35458S2;
+	Wed, 10 Sep 2025 17:17:04 +0800 (CST)
+From: yicongsrfy@163.com
+To: linux@armlinux.org.uk
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	yicong@kylinos.cn
+Subject: Re: [PATCH] net: phy: avoid config_init failure on unattached PHY during resume
+Date: Wed, 10 Sep 2025 17:17:03 +0800
+Message-Id: <20250910091703.3575924-1-yicongsrfy@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <aMEzv50VmUb2eUMQ@shell.armlinux.org.uk>
+References: <aMEzv50VmUb2eUMQ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,101 +64,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-CM-TRANSID:_____wDHL4wPQsFoNSDgAA--.35458S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7uryUJr4xGw43KFy8Gr1Utrb_yoW8Kry5pr
+	WxXas5ur1vqF1kGrs7A3y8Ja4jvwsIvrW3J3sxKr98CFy5uF9Y939Fqr43ZFW5Crs8Ca47
+	ZF4jqayUArZruaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U7wIgUUUUU=
+X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/1tbiUATE22jBPCm76wAAsn
 
-On Wed, 10 Sep 2025 10:57:17 +0200, Kurt Kanzenbach wrote:
-
->On Wed Sep 10 2025, Kohei Enju wrote:
->> + Aleksandr
->>
->> On Wed, 10 Sep 2025 10:28:17 +0300, Lifshits, Vitaly wrote:
->>
->>>On 9/8/2025 9:26 AM, Kurt Kanzenbach wrote:
->>>> On Sat Sep 06 2025, Kohei Enju wrote:
->>>>> Currently igc_probe() doesn't unregister netdev when igc_led_setup()
->>>>> fails, causing BUG_ON() in free_netdev() and then kernel panics. [1]
->>>>>
->>>>> This behavior can be tested using fault-injection framework. I used the
->>>>> failslab feature to test the issue. [2]
->>>>>
->>>>> Call unregister_netdev() when igc_led_setup() fails to avoid the kernel
->>>>> panic.
->>>>>
->>>>> [1]
->>>>>   kernel BUG at net/core/dev.c:12047!
->>>>>   Oops: invalid opcode: 0000 [#1] SMP NOPTI
->>>>>   CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
->>>>>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->>>>>   RIP: 0010:free_netdev+0x278/0x2b0
->>>>>   [...]
->>>>>   Call Trace:
->>>>>    <TASK>
->>>>>    igc_probe+0x370/0x910
->>>>>    local_pci_probe+0x3a/0x80
->>>>>    pci_device_probe+0xd1/0x200
->>>>>   [...]
->>>>>
->>>>> [2]
->>>>>   #!/bin/bash -ex
->>>>>
->>>>>   FAILSLAB_PATH=/sys/kernel/debug/failslab/
->>>>>   DEVICE=0000:00:05.0
->>>>>   START_ADDR=$(grep " igc_led_setup" /proc/kallsyms \
->>>>>           | awk '{printf("0x%s", $1)}')
->>>>>   END_ADDR=$(printf "0x%x" $((START_ADDR + 0x100)))
->>>>>
->>>>>   echo $START_ADDR > $FAILSLAB_PATH/require-start
->>>>>   echo $END_ADDR > $FAILSLAB_PATH/require-end
->>>>>   echo 1 > $FAILSLAB_PATH/times
->>>>>   echo 100 > $FAILSLAB_PATH/probability
->>>>>   echo N > $FAILSLAB_PATH/ignore-gfp-wait
->>>>>
->>>>>   echo $DEVICE > /sys/bus/pci/drivers/igc/bind
->>>>>
->>>>> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
->>>>> Signed-off-by: Kohei Enju <enjuk@amazon.com>
->>>> 
->>>> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
->>>
->>>Thank you for the patch and for identifying this issue!
->>>
->>>I was wondering whether we could avoid failing the probe in cases where 
->>>igc_led_setup fails. It seems to me that a failure in the LED class 
->>>functionality shouldn't prevent the device's core functionality from 
->>>working properly.
->>
->> Indeed, that also makes sense.
->>
->> The behavior that igc_probe() succeeds even if igc_led_setup() fails
->> also seems good to me, as long as notifying users that igc's led
->> functionality is not available.
+On Wed, 10 Sep 2025 09:15:59 +0100, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 >
->SGTM. The LED code is nice to have, but not mandatory at all. The device
->has sane LED defaults.
-
-Thank you for clarification.
-I'll do like that in v2.
-
+> On Wed, Sep 10, 2025 at 10:58:26AM +0800, yicongsrfy@163.com wrote:
+> > From: Yi Cong <yicong@kylinos.cn>
+> >
+> > When resuming a PHY device that is not attached to a MAC (i.e.
+> > phydev->attached_dev is NULL), mdio_bus_phy_resume() may call into
+> > phy_init_hw() -> phydev->drv->config_init(), which can return -EOPNOTSUPP
+> > (-95) if the driver does not support initialization in this state.
+> >
+> > This results in log messages like:
+> > [ 1905.106209] YT8531S Gigabit Ethernet xxxxmac_mii_bus-XXXX:00:01:
+> > PM: dpm_run_callback(): mdio_bus_phy_resume+0x0/0x180 [libphy] returns -95
+> > [ 1905.106232] YT8531S Gigabit Ethernet xxxxmac_mii_bus-XXXX:00:01:
+> > PM: failed to resume: error -95
+> >
+> > In practice, only one PHY on the bus (e.g. XXXX:00:00) is typically
+> > attached to a MAC interface; others (like XXXX:00:01) are probed but
+> > not used, making such resume attempts unnecessary and misleading.
+> >
+> > Add an early return in mdio_bus_phy_resume() when !phydev->attached_dev,
+> > to prevent unneeded hardware initialization and avoids false error reports.
 >
->>
->>>
->>> From what I understand, errors in this function are not due to hardware 
->>>malfunctions. Therefore, I suggest we remove the error propagation.
->>>
->>>Alternatively, if feasible, we could consider reordering the function 
->>>calls so that the LED class setup occurs before the netdev registration.
->>>
->>
->> I don't disagree with you, but I would like to hear Kurt and Aleksandr's
->> opinion. Do you have any preference or suggestions?
+> PHYs are allowed to be attached without a net device. Your PHY
+> driver needs to cope with this condition.
 >
->See above.
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
-Got it :)
+Thank you for the reply!
 
->
->Thanks,
->Kurt
+My thought is, if a PHY device hasn't been attached to a net_device,
+is it still necessary to go through the resume procedure?
+
+My issue context is as follows:
+After entering `mdio_bus_phy_resume`, the call flow proceeds to:
+`phy_init_hw()`
+    => `phydev->drv->config_init`
+        => `yt8521_config_init`
+
+Then, because `phydev->interface != PHY_INTERFACE_MODE_SGMII`, it attempts
+to enter `ytphy_rgmii_clk_delay_config` to configure the RGMII tx/rx delay.
+However, since this PHY device is not associated with any GMAC and is not
+connected via an RGMII interface, the function returns `-EOPNOTSUPP`.
+
+Of course, I could submit a fix patch to `motorcomm.c` to terminate
+`config_init` early. But as I mentioned at the beginning, when a PHY
+device hasn't been attached, do we really need to let it go through
+the entire resume process?
+
 
