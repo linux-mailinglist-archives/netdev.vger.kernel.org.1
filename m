@@ -1,200 +1,151 @@
-Return-Path: <netdev+bounces-221668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2652B517E0
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:28:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BBAAB517F0
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D1CC7B2319
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:26:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 727637BA380
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E782773D1;
-	Wed, 10 Sep 2025 13:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57364306B33;
+	Wed, 10 Sep 2025 13:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="M/jHAVD7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FzPp3qhs"
 X-Original-To: netdev@vger.kernel.org
-Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3564E268C40;
-	Wed, 10 Sep 2025 13:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E415315765
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757510875; cv=none; b=DHpoZNY9E4Rjql30bKQuSIPldtuT0FqotCZkNskhn+R7YdYjIQ8Q4zLSmA++pgnn+24rKypB13xZHHTpecisMuSEfd0Gg/owIAIfb5kJNV/7CmrNN6BmSYbfD8+x47rAIqYzLBL7xart2CXuZn/kCSquoilraSAyt+qibgMLp8Y=
+	t=1757511022; cv=none; b=Ns8vueyYqO5SB2tSzHiTURziLPX+GHxOF1jih5bEfeLLtPuyr933z3r2RJfUD0P2FtZXytC3g1qDArKpkUOuVrszq5C2e9sUd3WZaNP+UUTo71VjqSG6s0NefUDQUQ2qNXTlceuhs1sWKE0R9zYWAYDJKMIkAVbHFPbbJjPJduA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757510875; c=relaxed/simple;
-	bh=awfqlwgX53oTfwO/7YoHdRBa/b4NGg0ONjLzDMT4ALM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hwVmXUxtqCSPCAPcFmRBOduPVSyGPUNocp9Vs2enNn5Sc/QGwb5Rna486w3UUOv8oyEHYyNyxFOVwBwMULWn36plCopI4bYC5ZgiVf/8vxEWizs/wALUPUr06SqzCVQt9fLWwzJMySE7Ygl9XYBKCIMz8rE4iEYIajHywxBJpRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=M/jHAVD7; arc=none smtp.client-ip=52.28.197.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1757510873; x=1789046873;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=z1WAYwpOpbJQ/3/VG+2lCAd7vFoMsWcm2ALJ0pZZzE4=;
-  b=M/jHAVD7CextNxyYkSTXFhZ0K1Q4/CtTIYPQBk6WCzDBeTnPzZC8RGDN
-   0xFGqLleL96kHle35FVYcJXAt9NyV64wWGIB9yhXOmvcTIJMXDji1QY3z
-   nASuzf/luu0C2bXawfNzvperbkpC19eqyQM/T17ibhX42jBVHvwkWQZLG
-   9YQ4ZIiZlC23+K+/DpF3khccDMhAUOAQwlmMzJ+ARyCrzuSj1toLskdNC
-   AWwJK7b03NrmarnWlTU0WLTqgAiw1uucrXW0wQSxXOmrQ7NgqogTsNguZ
-   sBNDTCeK97eZe3AJACkMqO6rWdkrCgLGYEkBeor7tKBlbrE5ONztVxCoL
-   g==;
-X-CSE-ConnectionGUID: 8ejaJJDzS6iA9c6ltpiPzQ==
-X-CSE-MsgGUID: iE3QeQJWSWeG9I5/1J1sxw==
-X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
-   d="scan'208";a="1803234"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 13:27:43 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:25030]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.27.161:2525] with esmtp (Farcaster)
- id 1c71d657-dc03-4976-8228-6efcdd5e4dcb; Wed, 10 Sep 2025 13:27:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 1c71d657-dc03-4976-8228-6efcdd5e4dcb
-Received: from EX19D008EUC003.ant.amazon.com (10.252.51.205) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 13:27:42 +0000
-Received: from EX19D008EUC001.ant.amazon.com (10.252.51.165) by
- EX19D008EUC003.ant.amazon.com (10.252.51.205) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 13:27:42 +0000
-Received: from EX19D008EUC001.ant.amazon.com ([fe80::9611:c62b:a7ba:aee1]) by
- EX19D008EUC001.ant.amazon.com ([fe80::9611:c62b:a7ba:aee1%3]) with mapi id
- 15.02.2562.020; Wed, 10 Sep 2025 13:27:42 +0000
-From: "Heyne, Maximilian" <mheyne@amazon.de>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-CC: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, Thomas Dreibholz <dreibh@simula.no>, Mat Martineau
-	<martineau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Mat Martineau
-	<mathew.j.martineau@linux.intel.com>, Matthieu Baerts
-	<matthieu.baerts@tessares.net>, "David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5.10] mptcp: pm: kernel: flush: do not reset ADD_ADDR
- limit
-Thread-Topic: [PATCH 5.10] mptcp: pm: kernel: flush: do not reset ADD_ADDR
- limit
-Thread-Index: AQHcIlavWY5piCY3ZUO2RAwcaloAJw==
-Date: Wed, 10 Sep 2025 13:27:42 +0000
-Message-ID: <20250910-odium-dab-8683f6e2@mheyne-amazon>
-References: <20250910-nicety-alert-0e004251@mheyne-amazon>
- <a71b84b1-3dcd-442f-ba22-ca2f3ef90fa7@hartkopp.net>
-In-Reply-To: <a71b84b1-3dcd-442f-ba22-ca2f3ef90fa7@hartkopp.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <BCE17F2F4E22FB4EB92B1874C1D09640@amazon.com>
+	s=arc-20240116; t=1757511022; c=relaxed/simple;
+	bh=6x+Vpsnc+xkOPq71Wuxf8fF0DuLDPVUnbFe36/ataco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZbNghCuTN/V0E4JH8te3HXFdbWKVP2K5/q0QE1nS/UaTsk7LnbMHr1JWKW9OJi9NBszUUMVlQfKq4Rz5N+FKZVKspwmMLEmvnxvpWz68NyOyZqYWhIx5Im1lsWWdFARFmta0ZU4tf6IO/3p9clCKmq9YLSfZoB8dJPINw8rjYto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FzPp3qhs; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757511019;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AcLbP4DZN3vOin6ohkFEHicNsZylVtQfBbadWvWw0qU=;
+	b=FzPp3qhsrMwDJeaHkRM4+DQ6mWx8SXJse2KS7Ip5qt5RF1sSpxsp9ptDfRKeaJPye89Yel
+	QXZOcf1In4WtUmaDztp+XrovZYES/c5FHF5m84cbLEKmIAfV9sVtPLQC2uqyFjyWBMmRZN
+	EzXOHpTxmLkPkJa4M0yP/yDewIPnqP0=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-600-Qco1AUOeNTKTj_Gg18lhGQ-1; Wed,
+ 10 Sep 2025 09:30:16 -0400
+X-MC-Unique: Qco1AUOeNTKTj_Gg18lhGQ-1
+X-Mimecast-MFC-AGG-ID: Qco1AUOeNTKTj_Gg18lhGQ_1757511013
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE6E01800590;
+	Wed, 10 Sep 2025 13:30:11 +0000 (UTC)
+Received: from [10.45.225.144] (unknown [10.45.225.144])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0EC3D1800579;
+	Wed, 10 Sep 2025 13:30:07 +0000 (UTC)
+Message-ID: <b9be10d5-16de-4ad5-80eb-df28c5b5ae29@redhat.com>
+Date: Wed, 10 Sep 2025 15:30:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Sep 10, 2025 at 02:33:28PM +0200, Oliver Hartkopp wrote:
-> Hi Max,
-> =
-
-> I'm not responsible for net/mptcp/pm_netlink.c nor can I be found in git
-> blame of that file.
-> =
-
-> Why did you send this patch to me and having all the relevant persons in =
-CC?
-
-Hi Oliver,
-
-I don't see your email address in the CC list of my patch. Did you get
-this mail via some list maybe? To be explicit, I have used the following
-command to send the mail:
-  =
-
-  git send-email --cc-cmd "./scripts/get_maintainer.pl --norolestats 0001-m=
-ptcp-pm-kernel-flush-do-not-reset-ADD_ADDR-limit.patch" 0001-mptcp-pm-kerne=
-l-flush-do-not-reset-ADD_ADDR-limit.patch
-
-This uses the get_maintainer.pl from the 5.10 tree though.
-
-Regards,
-Maximilian
-
-> =
-
-> Best regards,
-> Oliver
-> =
-
-> On 10.09.25 11:28, Heyne, Maximilian wrote:
-> > From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-> > =
-
-> > commit 68fc0f4b0d25692940cdc85c68e366cae63e1757 upstream.
-> > =
-
-> > A flush of the MPTCP endpoints should not affect the MPTCP limits. In
-> > other words, 'ip mptcp endpoint flush' should not change 'ip mptcp
-> > limits'.
-> > =
-
-> > But it was the case: the MPTCP_PM_ATTR_RCV_ADD_ADDRS (add_addr_accepted)
-> > limit was reset by accident. Removing the reset of this counter during a
-> > flush fixes this issue.
-> > =
-
-> > Fixes: 01cacb00b35c ("mptcp: add netlink-based PM")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: Thomas Dreibholz <dreibh@simula.no>
-> > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/579
-> > Reviewed-by: Mat Martineau <martineau@kernel.org>
-> > Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> > Link: https://patch.msgid.link/20250815-net-mptcp-misc-fixes-6-17-rc2-v=
-1-2-521fe9957892@kernel.org
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > [adjusted patch by removing WRITE_ONCE to take into account the missing
-> >   commit 72603d207d59 ("mptcp: use WRITE_ONCE for the pernet *_max")]
-> > Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
-> > ---
-> > For some reason only the corresponding selftest patch was backported and
-> > it's now failing on 5.10 kernels. I tested that with this patch the
-> > selftest is succeeding again.
-> > ---
-> >   net/mptcp/pm_netlink.c | 1 -
-> >   1 file changed, 1 deletion(-)
-> > =
-
-> > diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-> > index 32379fc706cac..c31a1dc69f835 100644
-> > --- a/net/mptcp/pm_netlink.c
-> > +++ b/net/mptcp/pm_netlink.c
-> > @@ -869,7 +869,6 @@ static void __flush_addrs(struct pm_nl_pernet *pern=
-et)
-> >   static void __reset_counters(struct pm_nl_pernet *pernet)
-> >   {
-> >   	pernet->add_addr_signal_max =3D 0;
-> > -	pernet->add_addr_accept_max =3D 0;
-> >   	pernet->local_addr_max =3D 0;
-> >   	pernet->addrs =3D 0;
-> >   }
-> =
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] dpll: zl3073x: Allow to use custom phase measure
+ averaging factor
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20250910103221.347108-1-ivecera@redhat.com>
+ <5ca46c45-96c3-4ad8-b00a-2494ae12d88b@linux.dev>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <5ca46c45-96c3-4ad8-b00a-2494ae12d88b@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
 
 
+On 10. 09. 25 2:34 odp., Vadim Fedorenko wrote:
+> On 10.09.2025 11:32, Ivan Vecera wrote:
+>> The DPLL phase measurement block uses an exponential moving average,
+>> calculated using the following equation:
+>>
+>>                         2^N - 1                1
+>> curr_avg = prev_avg * --------- + new_val * -----
+>>                           2^N                 2^N
+>>
+>> Where curr_avg is phase offset reported by the firmware to the driver,
+>> prev_avg is previous averaged value and new_val is currently measured
+>> value for particular reference.
+>>
+>> New measurements are taken approximately 40 Hz or at the frequency of
+>> the reference (whichever is lower).
+>>
+>> The driver currently uses the averaging factor N=2 which prioritizes
+>> a fast response time to track dynamic changes in the phase. But for
+>> applications requiring a very stable and precise reading of the average
+>> phase offset, and where rapid changes are not expected, a higher factor
+>> would be appropriate.
+>>
+>> Add devlink device parameter phase_offset_avg_factor to allow a user
+>> set tune the averaging factor via devlink interface.
+>>
+>> Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> 
+> [...]
+> 
+>> +static int
+>> +zl3073x_devlink_param_phase_avg_factor_set(struct devlink *devlink, 
+>> u32 id,
+>> +                       struct devlink_param_gset_ctx *ctx,
+>> +                       struct netlink_ext_ack *extack)
+>> +{
+>> +    struct zl3073x_dev *zldev = devlink_priv(devlink);
+>> +    u8 avg_factor, dpll_meas_ctrl;
+>> +    int rc;
+>> +
+>> +    /* Read DPLL phase measurement control register */
+>> +    rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MEAS_CTRL, &dpll_meas_ctrl);
+>> +    if (rc)
+>> +        return rc;
+>> +
+>> +    /* Convert requested factor to register value */
+>> +    if (ctx->val.vu8 < 15)
+>> +        avg_factor = ctx->val.vu8 + 1;
+>> +    else
+>> +        avg_factor = 0;
+>> +
+> 
+> This looks like avg_factor = (ctx->val.vu8 + 1) & 0x0f;
+> The same logic can be applied for get() function assuming we are aware of
+> unsigned roll-over...
 
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
+Yes, I know about this trick but I wanted to use more readable code and
+leave potential optimization to the compiler.
+
+Ivan
 
 
