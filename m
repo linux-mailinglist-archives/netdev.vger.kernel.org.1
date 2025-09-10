@@ -1,61 +1,98 @@
-Return-Path: <netdev+bounces-221559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 276BBB50DE1
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:11:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A32FB50DF4
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50CD91C22A20
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 06:11:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85E3D1C26366
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 06:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FB92D3EF2;
-	Wed, 10 Sep 2025 06:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A9F2DF3D1;
+	Wed, 10 Sep 2025 06:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="e3A9FrUX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22602D0C9D;
-	Wed, 10 Sep 2025 06:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569BF22259D;
+	Wed, 10 Sep 2025 06:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757484661; cv=none; b=Bo3Qz9J9V1HjM4i/MEOOB1ZpikSb8yr7h8A0pkPE2MDFbf7tiY9yt1hxOdaJez7IiLqyq8WVB2gXZJu8fzSMkWA4w+DaIJ9iBbNBVC1OipA0vhs4j+vcN/1Ugfmg5+bKGc6WsdA8kvqpBfO7AZoToh/4FVCttUJyT0Vw5VlnvPc=
+	t=1757485205; cv=none; b=VAu7tcPnoiXPe07GmYZh+fHAqVDphRKcY/WHUo/vnBqDe5Ng2GO9Ep8WGyoNxQcltDi9MpWr48zl+85R9X2sKWLcyL+ZFbdaOhjYAeiUaAoc38As1B4Xeo5UVAAEwGzVby5GFbmNlpYjLZn7XMozI6XW+9bIZP310XQJHq6MDGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757484661; c=relaxed/simple;
-	bh=vLKFy2bSOWoxpwLlB07v+Qhq+xNOhw97GihfrFoqGuA=;
+	s=arc-20240116; t=1757485205; c=relaxed/simple;
+	bh=GNr5fSQdvX6LdqB/W1EZ8Bb6oXPTAA6ZnpCtLjpI0F4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CN+25e+LHXvkXEUS5muTgzW4EK96nOnVCXN3jeKGguycgHmxvWSYxy1B7a94VFUo5fcn43hlhuPrRd40xc7txQVrqCigvKKr+x5M+AEAcFHrMqCd9sK0VARL1499GhsOaUeZ2SsQL0pUGOT1RbpN9cSTYOaWmuRkNcHZ4nsHbvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz6t1757484625t00d54c16
-X-QQ-Originating-IP: ZzG+RN8Eyp/Q7pmL/4XIv6a9IoJoZLK6jHje2BlQTtU=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 10 Sep 2025 14:10:23 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8687577365072623023
-Date: Wed, 10 Sep 2025 14:10:23 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: "Anwar, Md Danish" <a0501179@ti.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org,
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v11 5/5] net: rnpgbe: Add register_netdev
-Message-ID: <45285D515B6FB8C9+20250910061023.GC1832711@nic-Precision-5820-Tower>
-References: <20250909120906.1781444-1-dong100@mucse.com>
- <20250909120906.1781444-6-dong100@mucse.com>
- <548eb7e2-ebde-464e-9467-7086e9448181@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KGEbV4IYVNsf5UHnC8B3al9O747UbP5QoNn/HgRxjwnsTitLRahkIFWi8skJjFpM5BCY6WeRvVeeNWMhAOmyNMcxYxKQ2Z+pb5FOcecei/2dhNHYsiICy5A6reuu9gIPIUxbml3o0w8Kln8RLeFqqML8cOtm5a2OLS2sZTOmWYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=e3A9FrUX; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id D14877A0226;
+	Wed, 10 Sep 2025 02:20:01 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Wed, 10 Sep 2025 02:20:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757485201; x=1757571601; bh=olvJU0Qy+Cu3De8cG+SQ0iQ+feuXB8WHAz5
+	1Z2X5bxs=; b=e3A9FrUXfqCYN+Z1VXm1vmK8p1g31UUM+gOpvbK8X4vL1WJbOnZ
+	ZuyiKrP5shMmqqm8fviRgSod8O5FCkoMi7UqkfQ21fm1tSYLpXPepJK782qEdMjP
+	XCRVQfn/ZHHsg51CgPEsamm1/oEDRkdPvLn9CFx9uoW9sPXeCCB/QftmDvoEAfnV
+	crk+8/3FK8dgHVAeqUAQ5+QX61kDIGxpFviboBW3/phFHXhOHVRqLTZYIfstCSWb
+	uUmOMS2BPTHbYlplCrV1dlzqIu9nw456cYeJf0qSc88VlMSnbU339Z5N5T6ICxA1
+	pDNITfGyCjrwJ4efy99LbkL4nCFmBWh8y2A==
+X-ME-Sender: <xms:kBjBaBfnR2EAOSwulVIjvh1JNRdwP0Sbr9mmSNtYyg9Bxu0o8YmtYQ>
+    <xme:kBjBaOITm5T2x3sXdfGjQP87pQcShU44V0Ohk9FkpYB_ukHSfEorsCgSjXbhwfJJq
+    ImGAWYFbeYS0gA>
+X-ME-Received: <xmr:kBjBaGn25h3RLlXChcYVX-C0WGGnL9X0rpdMZYGrV6qZzEXG-tmjXMOY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdehhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
+    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
+    hnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeghfen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughosh
+    gthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtohepihdrmhgrgihimhgvthhssehovhhnrdhorhhgpdhrtghpth
+    htohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggr
+    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesgh
+    hoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsth
+    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:kBjBaOewaNQh3bOjkY4Lxlco38ywE736U85fc0wme3K30rbGddbbxw>
+    <xmx:kBjBaPyrCD3R8H9890vLqp3aI_sufil0HV264vKQhSsm1bnsV3hMcw>
+    <xmx:kBjBaPKsMPYC-f3cKh0_TTLdZ_dGXLihPjLY8n111UxbCbHL2fsalQ>
+    <xmx:kBjBaItu5oxZQLmd5rkC3nAvF_0T_PZiIG7VnG5jlMscnvEmY7ovGg>
+    <xmx:kRjBaLF9L6GpgRy7DDEtIbSTDS3LbPtjx795p_gjUTZ27zA09BU3i09g>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Sep 2025 02:20:00 -0400 (EDT)
+Date: Wed, 10 Sep 2025 09:19:58 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, dev@openvswitch.org,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Aaron Conole <aconole@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [PATCH net v2 1/2] net: dst_metadata: fix IP_DF bit not
+ extracted from tunnel headers
+Message-ID: <aMEYjvSNvxfD7iJz@shredder>
+References: <20250909165440.229890-1-i.maximets@ovn.org>
+ <20250909165440.229890-2-i.maximets@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,73 +101,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <548eb7e2-ebde-464e-9467-7086e9448181@ti.com>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NYg8s5M+0PzcgFZySDfo5zqR+ceRyyJscFAoC84PIuBUW3EwlC8DtsDY
-	dNrw6+2gqW99LTt3+Q4OMKd9BiAv2S/E/+wgh1KbrnmQEfCfdrDaN7reIqdM7kkkEwTWF7i
-	ErufNvy3z9uaWzqTLmUgMEZ+PS6x/h12C3u2EGXn3sy4BDzX4AcdEedJWhYCsXt/GUlzYjY
-	H/5udv/3wD10T0Ic6BPh9HmiyXVU6iJUyVNFmdiYH5SNdVwtdNR6H4mZtHNwFeLn4kYFSF8
-	MnYGSPiWfViAlWIeHZsI6oxA7bpmxzAUSlERrO3TjHLQAtT9LSQctt6oeQ2kccV8+pQ/NMX
-	oMvhoJGXIYlaqkFuPmhd3cvZvR4RlqvQyoLguqPjUpJvID3UVs5+Bai7icST25AnPIOcNIw
-	24HSLWz0UfRMofG0iZ42YTjB82ZjwuHD4MwEQaFr0UpuNwq9BJoIzchCj7YchdG3J4BTf9M
-	vnxmKpEF2umyXKzY3z88yKhHAomOPjoBcVR+B7Ec2DZuz8SAp8FERQDhxENqZWAd1s/JuWC
-	mwSeWHFReXOjdGDMpHhFbkWTOXHoRfl2J6ZPLR4Q1N1znqNDLLM8ULesAUd1ebT/DeLPtW9
-	KsOGGwtLTu0/Datnk66NaGian+vPiOUBvHITr1AAqGPZ1OQCdEMwM08i/v3o5LTdVg7pJbF
-	WBi9Buj0e7FAwxqtA4IHHLkNf0H/WlaYAKK1g8p2qD8vX/vR577MAW9Pemn+ir7fvLWo2Op
-	asA86MebNzzZQLbxrbKVCLBmBKmak3fLfmoPJdwt3zO7Tdrt3xv51VOwLJn1RU9g2j5UhLT
-	mQhFsgOPabFk/XP5LtJZvxCFMJ0CDNcnOi6FTf4fNTXtXRiB4MwDMOIrwHnEaHSTadbHcSp
-	okZ83iKkb1/96VZPtGy3K1YvOAIA9DX/UBEW/jOXquoMOBURjqU1c/oDS45jD797LDubM6z
-	7bjZGWRt5QLWS7u0mH4k9/q+zGy1m8zgrQr8xFhnqb2lCsighsPo29mZ7DNkgfCPZZcFNsY
-	DAYoCu+AvbbKcNpM2erQWQvQud3zZ/p5YnCil0WaPbhvZ3Vfcj9FG0u5X7M2odNEqqH/3fV
-	w==
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <20250909165440.229890-2-i.maximets@ovn.org>
 
-On Tue, Sep 09, 2025 at 08:01:33PM +0530, Anwar, Md Danish wrote:
-> On 9/9/2025 5:39 PM, Dong Yibo wrote:
-> > Complete the network device (netdev) registration flow for Mucse Gbe
-> > Ethernet chips, including:
-> > 1. Hardware state initialization:
-> >    - Send powerup notification to firmware (via echo_fw_status)
-> >    - Sync with firmware
-> >    - Reset hardware
-> > 2. MAC address handling:
-> >    - Retrieve permanent MAC from firmware (via mucse_mbx_get_macaddr)
-> >    - Fallback to random valid MAC (eth_random_addr) if not valid mac
-> >      from Fw
-> > 
-> > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> > ---
+On Tue, Sep 09, 2025 at 06:54:15PM +0200, Ilya Maximets wrote:
+> Both OVS and TC flower allow extracting and matching on the DF bit of
+> the outer IP header via OVS_TUNNEL_KEY_ATTR_DONT_FRAGMENT in the
+> OVS_KEY_ATTR_TUNNEL and TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT in
+> the TCA_FLOWER_KEY_ENC_FLAGS respectively.  Flow dissector extracts
+> this information as FLOW_DIS_F_TUNNEL_DONT_FRAGMENT from the tunnel
+> info key.
 > 
-> > +/**
-> > + * rnpgbe_xmit_frame - Send a skb to driver
-> > + * @skb: skb structure to be sent
-> > + * @netdev: network interface device structure
-> > + *
-> > + * Return: NETDEV_TX_OK or NETDEV_TX_BUSY
-> > + **/
-> > +static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
-> > +				     struct net_device *netdev)
-> > +{
-> > +	dev_kfree_skb_any(skb);
-> > +	netdev->stats.tx_dropped++;
-> > +	return NETDEV_TX_OK;
-> > +}
+> However, the IP_TUNNEL_DONT_FRAGMENT_BIT in the tunnel key is never
+> actually set, because the tunneling code doesn't actually extract it
+> from the IP header.  OAM and CRIT_OPT are extracted by the tunnel
+> implementation code, same code also sets the KEY flag, if present.
+> UDP tunnel core takes care of setting the CSUM flag if the checksum
+> is present in the UDP header, but the DONT_FRAGMENT is not handled at
+> any layer.
 > 
-> The function comment says it returns NETDEV_TX_OK or NETDEV_TX_BUSY, but
-> it only returns NETDEV_TX_OK.
+> Fix that by checking the bit and setting the corresponding flag while
+> populating the tunnel info in the IP layer where it belongs.
 > 
+> Not using __assign_bit as we don't really need to clear the bit in a
+> just initialized field.  It also doesn't seem like using __assign_bit
+> will make the code look better.
 > 
+> Clearly, users didn't rely on this functionality for anything very
+> important until now.  The reason why this doesn't break OVS logic is
+> that it only matches on what kernel previously parsed out and if kernel
+> consistently reports this bit as zero, OVS will only match on it to be
+> zero, which sort of works.  But it is still a bug that the uAPI reports
+> and allows matching on the field that is not actually checked in the
+> packet.  And this is causing misleading -df reporting in OVS datapath
+> flows, while the tunnel traffic actually has the bit set in most cases.
+> 
+> This may also cause issues if a hardware properly implements support
+> for tunnel flag matching as it will disagree with the implementation
+> in a software path of TC flower.
+> 
+> Fixes: 7d5437c709de ("openvswitch: Add tunneling interface.")
+> Fixes: 1d17568e74de ("net/sched: cls_flower: add support for matching tunnel control flags")
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 
-Got it, I will fix it, and also check other functions.
-
-> -- 
-> Thanks and Regards,
-> Md Danish Anwar
-> 
-> 
-
-Thanks for your feedback.
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
