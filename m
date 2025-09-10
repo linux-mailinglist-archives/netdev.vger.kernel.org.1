@@ -1,61 +1,50 @@
-Return-Path: <netdev+bounces-221499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF60BB50A55
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:37:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67DE0B50A58
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA00C7B8CEF
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:35:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69F8A3A189B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57EC2080C1;
-	Wed, 10 Sep 2025 01:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A30620C47C;
+	Wed, 10 Sep 2025 01:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aADjG6yj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJicyHIg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90830207A32
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7114420487E;
+	Wed, 10 Sep 2025 01:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757468222; cv=none; b=qDKbY5fhA/Egr/Fi13Y8gIQr/hSRAUnXaSLe+p5jOTa5VsvriBVRHzVCL7Q14hWxORQRA4o/Xpqkx142Ld+t3IptdxQBiHPK1z2W2UdP/j9L5vNooAGtMd0ct2a0FK5C3NxWUtHjPDCrhrH5STdOFWya78O3fVv6anOYrIE1z/s=
+	t=1757468404; cv=none; b=O/AVcVeH/p/XdKs9iEh2ClSlu2RtxJde2+vOufYHmV23zS8LidilihN1vrHW2TA5dqoB3MCKEW0L4SihbwHDAwQf9U1EdgQ6msSyh4h7zZy9hF7dDzvjepQqUjoe5MXRc2RsQOoEimi1fxWcEd/1tgrgbQbPAYX1pCKMJvli+Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757468222; c=relaxed/simple;
-	bh=rhCUZlon729NwzkrwsV8gA6wQWsxOT+vNnkGWVfM/Qg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KuHF/gbcXQHuZ0XNTxlpFQjnFONYS9ug3N3ZC2rxxaLyi3yjFzqoYoVWy7aGERToCuxywxoj8hRvSuVYGPjP8b9JWFRH03lfvS/SQhLQ7VOza83WQAreGEBi/Y5u3RPbf0zBivAqjqIpiuf+0zbpcdZGueYUw3XGmgGpY3/sStI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=aADjG6yj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B26E8C4CEF7;
-	Wed, 10 Sep 2025 01:37:00 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aADjG6yj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1757468220;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z9zDYuKHgCGDYOquNh4yrSt1LZUhG378TCi5rGFKwyM=;
-	b=aADjG6yjJc0Md19FSwlG7mLJ90FCAnWJZFzYHVsVVo7YEBv31xmMDl9GbygXx1u/nhjG8s
-	puyc9AwalNFPjs1cy0JadcxN2vryCrz3dnGdsRrkhuz4Ce5/Yf7DMM+3zjSjhDitIUm8Sw
-	JVaLeaBJJJUTipdkr+2+3k8xJuIAdik=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 991b62a1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 10 Sep 2025 01:36:59 +0000 (UTC)
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net 4/4] wireguard: selftests: select CONFIG_IP_NF_IPTABLES_LEGACY
-Date: Wed, 10 Sep 2025 03:36:44 +0200
-Message-ID: <20250910013644.4153708-5-Jason@zx2c4.com>
-In-Reply-To: <20250910013644.4153708-1-Jason@zx2c4.com>
-References: <20250910013644.4153708-1-Jason@zx2c4.com>
+	s=arc-20240116; t=1757468404; c=relaxed/simple;
+	bh=v5RKLxiBynoVi6YHdwIwMbyIhGK9zRCHCKwCKgcyLBc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Cv0lGLRRJz9/fwZWOR9B9tfr1U+VFz0hSBgLpVEKAnYDYzB4DmyohMlaK6DYM2IDlG02qH+FKkn3cxUn5UCP05JLMXMbNsFm/fOyZ7JcQ8cFtw1QoTmOGGiKzlyy4uIQIK6pTPoCZW/gMpEUM9zwMPZMDaKGj0ksMCK7kFpkx0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJicyHIg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D834C4CEF4;
+	Wed, 10 Sep 2025 01:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757468403;
+	bh=v5RKLxiBynoVi6YHdwIwMbyIhGK9zRCHCKwCKgcyLBc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lJicyHIgE1VEBdLPXGqTcGrgvNT983p19IN922VESnzdjtsFEX8JVFSJnKDVRpN9I
+	 5YUlFEtdDiwFdnKW14KTb5rYpMKZQY8svFysf9WRfWhYpybpow5BWdQhRgZJnVIv7s
+	 +cAJackXcBje0P5AnVg2H9HQtq31t2Wvauvk29JPhpQXeKeundC6I0OqFlsQAUuO+F
+	 KYrqP0tKCUkqdD+UFRRFAOdxM7/oBL5TPu4vJTQGjS6AMtsh4LUU8zbkXa33gr9NDK
+	 a5keWuhTL46qzBTh4rLFVhKkcPG+JrQ1P6GY8DoN5uRsLQ6I2ks7u4YpC5ZEZoUM+O
+	 zpQofX/adDGzQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B67383BF69;
+	Wed, 10 Sep 2025 01:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,34 +52,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] macsec: sync features on RTM_NEWLINK
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175746840625.869185.11263601603353258984.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Sep 2025 01:40:06 +0000
+References: <20250908173614.3358264-1-sdf@fomichev.me>
+In-Reply-To: <20250908173614.3358264-1-sdf@fomichev.me>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, sd@queasysnail.net,
+ andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
+ syzbot+7e0f89fb6cae5d002de0@syzkaller.appspotmail.com
 
-This is required on recent kernels, where it is now off by default.
-While we're here, fix some stray =m's that were supposed to be =y.
+Hello:
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- tools/testing/selftests/wireguard/qemu/kernel.config | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/tools/testing/selftests/wireguard/qemu/kernel.config b/tools/testing/selftests/wireguard/qemu/kernel.config
-index 1149289f4b30..936b18be07cf 100644
---- a/tools/testing/selftests/wireguard/qemu/kernel.config
-+++ b/tools/testing/selftests/wireguard/qemu/kernel.config
-@@ -20,9 +20,10 @@ CONFIG_NETFILTER_XTABLES_LEGACY=y
- CONFIG_NETFILTER_XT_NAT=y
- CONFIG_NETFILTER_XT_MATCH_LENGTH=y
- CONFIG_NETFILTER_XT_MARK=y
--CONFIG_NETFILTER_XT_TARGET_MASQUERADE=m
--CONFIG_IP_NF_TARGET_REJECT=m
--CONFIG_IP6_NF_TARGET_REJECT=m
-+CONFIG_NETFILTER_XT_TARGET_MASQUERADE=y
-+CONFIG_IP_NF_TARGET_REJECT=y
-+CONFIG_IP6_NF_TARGET_REJECT=y
-+CONFIG_IP_NF_IPTABLES_LEGACY=y
- CONFIG_IP_NF_IPTABLES=y
- CONFIG_IP_NF_FILTER=y
- CONFIG_IP_NF_MANGLE=y
+On Mon,  8 Sep 2025 10:36:14 -0700 you wrote:
+> Syzkaller managed to lock the lower device via ETHTOOL_SFEATURES:
+> 
+>  netdev_lock include/linux/netdevice.h:2761 [inline]
+>  netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+>  netdev_sync_lower_features net/core/dev.c:10649 [inline]
+>  __netdev_update_features+0xcb1/0x1be0 net/core/dev.c:10819
+>  netdev_update_features+0x6d/0xe0 net/core/dev.c:10876
+>  macsec_notify+0x2f5/0x660 drivers/net/macsec.c:4533
+>  notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
+>  call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+>  call_netdevice_notifiers net/core/dev.c:2281 [inline]
+>  netdev_features_change+0x85/0xc0 net/core/dev.c:1570
+>  __dev_ethtool net/ethtool/ioctl.c:3469 [inline]
+>  dev_ethtool+0x1536/0x19b0 net/ethtool/ioctl.c:3502
+>  dev_ioctl+0x392/0x1150 net/core/dev_ioctl.c:759
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] macsec: sync features on RTM_NEWLINK
+    https://git.kernel.org/netdev/net/c/0f82c3ba66c6
+
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
