@@ -1,150 +1,147 @@
-Return-Path: <netdev+bounces-221772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61CC8B51D54
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:17:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21D9BB51DAA
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 41A104E3751
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:17:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFDBB568050
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B15C338F55;
-	Wed, 10 Sep 2025 16:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eo/cER+n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9970322DD4;
+	Wed, 10 Sep 2025 16:29:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C7033769E;
-	Wed, 10 Sep 2025 16:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B385335BB9
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 16:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757521004; cv=none; b=uhel+9aKLf5p6dUjUAbUuxm/s4yxF3I1rrEgwiXS6M1StaKNPaIQ8MAw8Nj5pypx1plaAGTuHRFPiXIAt+okT+D4RfYdVp4C1pJ8yFylD0pe6qFnaVCRZb08UFygQ62MagS+Vphd9Ho74Qrbyw+ulgwb05Q9DyxZTKjnLkBWI9o=
+	t=1757521756; cv=none; b=SX9k5h42muCpsVrTXr+sES+r/drC4rthVFrwZnsIn+MFgidJF9ogvYuAQRAYEyQ8f+krm0CF11z/f5Pt+ztLKaiWsYBtZywZ4xFO1hshStMbR9rMTirEz0IOhJSTsdgmNGJ87g9nEmAxRXdthbnldbhipVlhaUD3+8dumrIQ9oM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757521004; c=relaxed/simple;
-	bh=NVFM3neR7N0A2HmQoK+ROHkmwptFlxIoqcQa9WgQUMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U+v0wlSyL7RsWm4Stg0Shij8nRFBtENEU0cfUGoIPlosd6vHhmpnv6s2p29x5VEUDdKhbTEprj3dy/Bt3Bz7SUvPX0yp0v9AubDm5oXrosNfz/6VZCAJDjd4kx0VUUy9YgNH0/TWUtnWQuD74warXIY/qLyAsoaCm0H2dyzY0ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eo/cER+n; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-76e4fc419a9so5823439b3a.0;
-        Wed, 10 Sep 2025 09:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757521002; x=1758125802; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JB5WUshzKYeKBoYX6JQ+1Pxk+oTXaSsiBLCl8BznXVo=;
-        b=Eo/cER+n3jygBbPbgSvY+hWayAi+QVounCoxBA/Beczp8VxmD+R5EVPwsJBNk992S3
-         Y3qGtDAm8ZK5jHszjk8YygyyIZETKFC9EdbSTXE0vnL0ASsZyTlfn6bmfYFh6FdJhpGV
-         ggg6SFoXOq8XBpghgSNgEl2T2JZzVT4ctZzux/YL5845YMyjHhXBK4Lrsr0Dg2V+YHVf
-         Q8267gKWD/IhFWzkf+u/J7MPTK7lchuHi2NgD4PCaJ5X9aYveLKzXFuhTTBgDofI/UVZ
-         u7xb6w721WlXhnR1+s1+J5YsXnAEzXGHM46Ciu3Rki++VrccuSxOKvhIQXDRHxw8uQHk
-         TAqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757521002; x=1758125802;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JB5WUshzKYeKBoYX6JQ+1Pxk+oTXaSsiBLCl8BznXVo=;
-        b=VqL7aMrC8fVMAF8ZdlH9t6CjtOPGqRzREtqEiB6j1uFpz+0g0WpAEWVrCcmLp2Enh2
-         e4LAv5O6NCuYdQXHlJHb/fHhqXhgKiNTXSD7xb6coo048BOV5Nx2+qVLNoUa1+3+d0R+
-         lo9ALW1U8jnFzOndNvL1C+z/RasqM1cYBnA83F20026jqQYcfcKjxywq4tdpTuKRL1sY
-         Kzug7zpxLaMtbw7rm8w/tlAaCl9GAl/uPlUFjeN52kgr/gYM1+9umv8heuqh8j8Sm9LK
-         +NMf2zrM3bxuRbFJgvN5kTxNtLkwG3gvuE+9kPnhkWvWh7F69tBs7Yo7hmYuk7kjQP5f
-         UQTA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/yII+9e3002EkpEXYYVBzLszZ+bvZut8100rEomw4dnB1POoUHb4glu1poqsProCwfwzOhuHCUwsuz7bR@vger.kernel.org, AJvYcCUznDVscwyL6NONsVtWE/gAEghxQDTckLLFg8h0yt26rvCMGsVOvB4jz8Cko8RRgf6HeWw=@vger.kernel.org, AJvYcCV0cwWke8/FNVDg0ruN1qm+oAUKk+7MZKd7Zxd2TRWF2XxBCdEHV3/2CaTRWaV+GdsiZY6MBnXpTddQ@vger.kernel.org, AJvYcCVWgqOxjZHw5oHCsHg23i0oxaBNwXPAykzXSIfkerfMxHmlLJk4Vy5tyCsruC5kGGmjTGHzlkofCrAnXA==@vger.kernel.org, AJvYcCW3yYoVfe17+AHeoYXvh4BllagSUKkGlJa5snwFoFgNsBVlfjFeipeImz3lr9M/aGXCGXqcoZVx@vger.kernel.org
-X-Gm-Message-State: AOJu0YwES8YfXGQ4IjpQ1IVERrGcApFMG+qYMms2h8SuEymnlx2OX8PR
-	eb5TrL17lJKrnMooDrnTxsVNwjYufX7Oy5EbClu3VOnDkJ+TqFEAKok=
-X-Gm-Gg: ASbGnct0PkWmvpzV3weMbHapnADMGBOYbs4/zdX2sdoEhKEoAlpUqpttCCueSlghx1v
-	j+rB3N2kchu1OCiBroimAyGVg8JUI2hODM6uLZfiabLqvZpY14A2/rqgx6A13adKPRrG4a0AG++
-	NSnvqTEGlaCwm5mYpeda5yeh04XFygNH2DQDNSQceHjgcWeChMlmLRcW5tfvJCdYQtxTAjZH+fu
-	E3686VljGE8ja6Zq/1ZYHUtJ9MvujIf1GORpX9ZlqHHiEC0N/WiHmYG6ubRxNtpAi2TMHltHR2C
-	aNHnW+hz7X73411rjLxkNjrUDbosy8OtsLNV50D1K9dV0qOh/b/dni6SwJPWW2T3Awt1Ph9+1VZ
-	m5UTeXLOJ3JD8KGxj/WuHk+CTehUsp5r98+899nGHo5wQkk7BMDiXuNGDa2xv5kDIgkjQNcYN0k
-	AZnJyZbGMx4JDB/qmP8+lDbNbjHq9Nwx4XQ3dL1xfc4Kcgj0l47T9EFgA5olZInTru8btgHCLjG
-	kibs1Hsm2mGaZY=
-X-Google-Smtp-Source: AGHT+IHqLINn057ngCZaw/jpWSqhs/u7NZ2CDFe0dasDSVTaVkcAUe46x0lZQDpoIcwp7hoWMZQPvg==
-X-Received: by 2002:a17:903:2b05:b0:24e:81d2:cfe2 with SMTP id d9443c01a7336-2516f04ffeamr229403285ad.7.1757521001758;
-        Wed, 10 Sep 2025 09:16:41 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-25a2742590csm32206725ad.8.2025.09.10.09.16.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 09:16:41 -0700 (PDT)
-Date: Wed, 10 Sep 2025 09:16:40 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next 10/10] net/mlx5e: Use the 'num_doorbells'
- devlink param
-Message-ID: <aMGkaDoZpmOWUA_L@mini-arch>
-References: <1757499891-596641-1-git-send-email-tariqt@nvidia.com>
- <1757499891-596641-11-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1757521756; c=relaxed/simple;
+	bh=punXH83Uoa6wgRv5ThkDRV+PlzR4TOXKfmV4AG+OZS4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EzDD9DS/Cxehn1OUz+cJia9XXFzoSc2fTFVN4jR6J90XF7syDRRNF9Gi56CxEV2aAIFTteCwVJt21UWlJ/I2Yi+Ah4pX8RBjvAZ5AHaC8ZMse9qtIi0xIkUbIYPs9JZe6HTmDFQKxDpIifTRBVLwC3m/VyJLVWVXyqgmfnkWPhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uwNh2-0004nt-G2
+	for netdev@vger.kernel.org; Wed, 10 Sep 2025 18:29:12 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uwNh2-000cUu-0o
+	for netdev@vger.kernel.org;
+	Wed, 10 Sep 2025 18:29:12 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id E3FBF46B1DF
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 16:29:11 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id AC1F746B1C3;
+	Wed, 10 Sep 2025 16:29:10 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 720f3d7d;
+	Wed, 10 Sep 2025 16:29:09 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/7] pull-request: can 2025-09-10
+Date: Wed, 10 Sep 2025 18:20:20 +0200
+Message-ID: <20250910162907.948454-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1757499891-596641-11-git-send-email-tariqt@nvidia.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 09/10, Tariq Toukan wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
-> 
-> Use the new devlink param to control how many doorbells mlx5e devices
-> allocate and use. The maximum number of doorbells configurable is capped
-> to the maximum number of channels. This only applies to the Ethernet
-> part, the RDMA devices using mlx5 manage their own doorbells.
-> 
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  Documentation/networking/devlink/mlx5.rst     |  8 ++++++
->  .../net/ethernet/mellanox/mlx5/core/devlink.c | 26 +++++++++++++++++++
->  .../ethernet/mellanox/mlx5/core/en_common.c   | 15 ++++++++++-
->  3 files changed, 48 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-> index 60cc9fedf1ef..0650462b3eae 100644
-> --- a/Documentation/networking/devlink/mlx5.rst
-> +++ b/Documentation/networking/devlink/mlx5.rst
-> @@ -45,6 +45,14 @@ Parameters
->       - The range is between 1 and a device-specific max.
->       - Applies to each physical function (PF) independently, if the device
->         supports it. Otherwise, it applies symmetrically to all PFs.
-> +   * - ``num_doorbells``
-> +     - driverinit
-> +     - This controls the number of channel doorbells used by the netdev. In all
-> +       cases, an additional doorbell is allocated and used for non-channel
-> +       communication (e.g. for PTP, HWS, etc.). Supported values are:
-> +       - 0: No channel-specific doorbells, use the global one for everything.
-> +       - [1, max_num_channels]: Spread netdev channels equally across these
-> +         doorbells.
+Hello netdev-team,
 
-Do you have any guidance on this number? Why would the user want
-`num_doorbells < num_doorbells` vs `num_doorbells == num_channels`?
+this is a pull request of 7 patches for net/main, it supersedes
+linux-can-fixes-for-6.17-20250909.
 
-IOW, why not allocate the same number of doorbells as the number of
-channels and do it unconditionally without devlink param? Are extra
-doorbells causing any overhead in the non-contended case?
+The 1st patch is by Alex Tran and fixes the Documentation of the
+struct bcm_msg_head.
+
+Davide Caratti's patch enabled the VCAN driver as a module for the
+Linux self tests.
+
+Tetsuo Handa contributes 3 patches that fix various problems in the
+CAN j1939 protocol.
+
+Anssi Hannula's patch fixes a potential use-after-free in the
+xilinx_can driver.
+
+Geert Uytterhoeven's patch fixes the rcan_can's suspend to RAM on
+R-Car Gen3 using PSCI.
+
+regards,
+Marc
+
+---
+
+The following changes since commit d3b28612bc5500133260aaf36794a0a0c287d61b:
+
+  net: phy: NXP_TJA11XX: Update Kconfig with TJA1102 support (2025-09-08 18:24:19 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.17-20250910
+
+for you to fetch changes up to 5c793afa07da6d2d4595f6c73a2a543a471bb055:
+
+  can: rcar_can: rcar_can_resume(): fix s2ram with PSCI (2025-09-10 17:12:05 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.17-20250910
+
+----------------------------------------------------------------
+Alex Tran (1):
+      docs: networking: can: change bcm_msg_head frames member to support flexible array
+
+Anssi Hannula (1):
+      can: xilinx_can: xcan_write_frame(): fix use-after-free of transmitted SKB
+
+Davide Caratti (1):
+      selftests: can: enable CONFIG_CAN_VCAN as a module
+
+Geert Uytterhoeven (1):
+      can: rcar_can: rcar_can_resume(): fix s2ram with PSCI
+
+Tetsuo Handa (3):
+      can: j1939: implement NETDEV_UNREGISTER notification handler
+      can: j1939: j1939_sk_bind(): call j1939_priv_put() immediately when j1939_local_ecu_get() failed
+      can: j1939: j1939_local_ecu_get(): undo increment when j1939_local_ecu_get() fails
+
+ Documentation/networking/can.rst       |  2 +-
+ drivers/net/can/rcar/rcar_can.c        |  8 +-----
+ drivers/net/can/xilinx_can.c           | 16 +++++------
+ net/can/j1939/bus.c                    |  5 +++-
+ net/can/j1939/j1939-priv.h             |  1 +
+ net/can/j1939/main.c                   |  3 ++
+ net/can/j1939/socket.c                 | 52 ++++++++++++++++++++++++++++++++++
+ tools/testing/selftests/net/can/config |  3 ++
+ 8 files changed, 73 insertions(+), 17 deletions(-)
+ create mode 100644 tools/testing/selftests/net/can/config
+
 
