@@ -1,177 +1,130 @@
-Return-Path: <netdev+bounces-221673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2060DB5184C
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:51:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29847B51884
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE171BC0EF7
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEA563B1614
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE1C212578;
-	Wed, 10 Sep 2025 13:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64ADC320A3C;
+	Wed, 10 Sep 2025 13:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZ9O1Wet"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6093F31D382
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF430289358
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757512298; cv=none; b=a/z4kLVJHISa5BAL+PSrLkdOVot44wa+XovvrBqmTU/dMOn62LKwpZaKDGmZNsCQwTJn73oahTEO/8j3rhDux5hapBKnEnotAuvrm1qERLBNINUgYy4AN+PWcgyh8qwmsLfPG5Na+ppjQ28MOjczg48xtTPIanTbMHJA8R9mTHY=
+	t=1757512724; cv=none; b=mcWGkJ1z+0uw3OdSoV+J5xTAotYmLnkCjn0CPVunUw7rQqWmgHsk6ErAQTfzAUvcUwvxU1rk6n+LNyd43weWbPMcOPSNeYGYxxToJOIDTcPj0BR9nq27WZOCo/1kz6AEF8r5jJxYyYbxxiZmvyJQqiDnWLFqPg2E0c5IM2REnSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757512298; c=relaxed/simple;
-	bh=JRi/9Q8PE5ujQHXV5wCsGiZzCx0IdffGhZDc/DTGW3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VZSinWEy1n+ojyHWjp4C1gSRoBiSmQbnm4K3rBbmPNIPZbEPizWQQWrVntMK8y9yrv7IAOytA2kh4iJpWAj64VkIe75Lxm5sm7Hbf1Na3WVkMA1L2RFWgATJ8Gk+YOTjtCpk8pYen8sFob4Kqzu1JlCc4t9WmLJiBDw2/k4mmss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.205] (p5dc55aad.dip0.t-ipconnect.de [93.197.90.173])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 957A761E64852;
-	Wed, 10 Sep 2025 15:50:34 +0200 (CEST)
-Message-ID: <5d0627e4-4289-486b-80bb-a6cdc085e149@molgen.mpg.de>
-Date: Wed, 10 Sep 2025 15:50:32 +0200
+	s=arc-20240116; t=1757512724; c=relaxed/simple;
+	bh=7pyaKb+vpz6MYYu9Wb3Mz6zu46mjkpzSexjm9dUiAbo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qLIXa5Eh1eeeTpxHHRedDGWlTS/62oDKujkpiebG6OZRHi09lTfaCLF4eQfPwWpRaI0BAef0Hp8Xo/Rq4eZWKNAcf9YHknuGOBG6IBeuvVyfvm6ZF1ecJMx8/jcCpvYR+J1P/WRM+p/AbdtewtPl85AUe53HvezwwVzDQZ5u/PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZ9O1Wet; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4b350971a2eso139501cf.1
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 06:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757512721; x=1758117521; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7pyaKb+vpz6MYYu9Wb3Mz6zu46mjkpzSexjm9dUiAbo=;
+        b=xZ9O1WetADTIph4EJb6iMvpuCwc4WmZrYrdSsc82tWNsxqmyeoSfICqULL4LcxBNHU
+         wDCbrgln1K5jQncR0UO650d8O0ki9I3cB9+POkbCW0SM0vy+EfQaoRKu1GbTDsO7iI3/
+         g2/nLBYrvwR5gVJ5WLLQo25S+DlxHV5jpzvSyR/UYxw3oXg0Ri9Bts69YGFSnX5d2jvS
+         zKvqjOJHnaIrRyNeOYIItDVVg5tHioH3rJisJBntHej975/rHQ+TngijREGs1w5wvA0n
+         fWDaI4gCZStLgHt8jNkKk0CijWuEtFls0DinJvo0X1SGnnou5O0pOb+65caGAPfa2lHo
+         f7aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757512721; x=1758117521;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7pyaKb+vpz6MYYu9Wb3Mz6zu46mjkpzSexjm9dUiAbo=;
+        b=iZwjqlIjIUHRgBdGn7vH21BrAfWqpDm4c4V4gj/HyGDb6xodQn/Lv8Z/xK8dGeny8N
+         rXeoKctrTlGsNqxdtaEt+DbdGwSG+P1f8OGmcGD5DuoR3GMsBfkQW3e/enNTpO8ftUqc
+         fGvdl4bhzCzg6XxCnjj2CQMVm8iY4iZxT+iAxoWKGfD0HL0l+4/RYRbJN8M+dHR7Thki
+         FYscdjTik1f+apl3M4++fIzyO++l3HaQOSOoLTkIW9Z22DybiJoprA8sTdT8TptpiO+u
+         F6dD36D1GsVHvXt0oSktwQrvSGTaVq7t5VinPjJQL5r99x+/pVDKYamWywBRkg2xIJOg
+         Xumg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOQI5TBoO9M5tNyy9jcy92SykZAaBbr1E73lxKtjgZrFPUmZZAs/kbkjdhbUIX6cfJjncNYQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcXFHQbdSWM67uCb+z0J1U6qaOZtVRWk2zqzlinOsF3YWxpBPf
+	H4y/yBk38c1/+/NnuuWqowVWbsR7RANfjJDqQCB92KA80Aaap7RUjbYC3a61wCapnP3Wx+2PMdv
+	aDjRsryBxtD0GYApmA0jMQ9RH9oKx5ymDA/lj0oPY
+X-Gm-Gg: ASbGncuR8aNzu4LqUpP6zILr2gqPiyayrMX7Gm2wlWAgmbqgpQKe8rzVHedjst+P/1B
+	eAv7jlxZXx8kOJ+zkuhxap4AUl95IJ0Ir/orVgza8F4fWtleTV1JTVg1911EViRUY9K844HbnwD
+	Y0LmjS0xU/d+6PIxGH7RFPyvU7HTl1ovW2RM57iGEjv2SaKaSNpDjVoPCtZyqA7JGEqEaFjykBq
+	GSde1zNna889OCvDa1s8yFZzrLkZWqTrcjHW3BA1x7LHxNLanvkTT5dFA==
+X-Google-Smtp-Source: AGHT+IFVQ83MLxSAeQdO7dDnCHCBL84jtvyAAC2tYVK/CnqMCjU8ayOqVjHHbE3JLv+qSYLoTgVKF2doj+mz0CDkcOk=
+X-Received: by 2002:a05:622a:4cb:b0:4b3:1d1:fddd with SMTP id
+ d75a77b69052e-4b62525eee4mr5533231cf.18.1757512721181; Wed, 10 Sep 2025
+ 06:58:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-net] igc: don't fail igc_probe()
- on LED setup error
-To: Kohei Enju <enjuk@amazon.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Kurt Kanzenbach <kurt@linutronix.de>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Vitaly Lifshits <vitaly.lifshits@intel.com>, kohei.enju@gmail.com
-References: <20250910134745.17124-1-enjuk@amazon.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250910134745.17124-1-enjuk@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <DU0PR07MB91623D4146367CDEABC5E381F80EA@DU0PR07MB9162.eurprd07.prod.outlook.com>
+ <CANn89iKy+jvfifGQX8EBomWmhzQnn7j7q39uqd23NX0vvk1nFQ@mail.gmail.com>
+In-Reply-To: <CANn89iKy+jvfifGQX8EBomWmhzQnn7j7q39uqd23NX0vvk1nFQ@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Wed, 10 Sep 2025 09:58:24 -0400
+X-Gm-Features: AS18NWBJuv3lhsWoa1Fjk8Z1vbrmV-UOwKjiWnlMeOHVGaysEBNT9lzulHqJkCU
+Message-ID: <CADVnQykpRGLzri3nDu9dJmXNUBqz-Q0YsqY-B_r4Pj0VOg44ZA@mail.gmail.com>
+Subject: Re: TCP connection/socket gets stuck - Customer requests are dropped
+ with SocketTimeoutException
+To: Eric Dumazet <edumazet@google.com>
+Cc: Ramakant Badolia <Ramakant.Badolia@tomtom.com>, "kuniyu@google.com" <kuniyu@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Ozan Sengul <Ozan.Sengul@tomtom.com>, 
+	Raja Sekhar Pula Venkata <RAJASEKHAR.PULAVENKATA@tomtom.com>, 
+	Jean-Christophe Duberga <Jean-Christophe.Duberga@tomtom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Kohei,
+On Wed, Sep 10, 2025 at 6:16=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Sep 10, 2025 at 1:49=E2=80=AFAM Ramakant Badolia
+> <Ramakant.Badolia@tomtom.com> wrote:
+> >
+> > Hi Linux TCP Maintainers,
+> >
+> > I am writing to get insight on this bug report - https://bugzilla.kerne=
+l.org/show_bug.cgi?id=3D219221
+> > Unfortunately, we at TomTom have also been stuck with this issue for th=
+e last two months and our customer requests are getting dropped intermitten=
+tly several times a day.
+> >
+> > Currently we are using Linux version 5.14.0-570.37.1.el9_6.x86_64 which=
+ is causing this issue.
+> >
+> > As reported in https://bugzilla.kernel.org/show_bug.cgi?id=3D219221, we=
+ don't have possibility to rollback to previous working version.
+> >
+> > I want to check if you acknowledged this bug and what solution was prov=
+ided? Which version should we switch to in order to have this fixed?
+> >
+>
+> No idea. This might be a question for Redhat support ?
+>
+> I do not think you shared a pcap with us ?
 
+Looks like the bug report at
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219221 posted a working
+and non-working ("not working TCP connection PCAP file"
+non-working_tcp_packets.pcap) pcap file, though there was only a text
+update for the working case.
 
-Thank you for your patch.
-
-Am 10.09.25 um 15:47 schrieb Kohei Enju:
-> When igc_led_setup() fails, igc_probe() fails and triggers kernel panic
-> in free_netdev() since unregister_netdev() is not called. [1]
-> This behavior can be tested using fault-injection framework, especially
-> the failslab feature. [2]
-> 
-> Since LED support is not mandatory, treat LED setup failures as
-> non-fatal and continue probe with a warning message, consequently
-> avoiding the kernel panic.
-> 
-> [1]
->   kernel BUG at net/core/dev.c:12047!
->   Oops: invalid opcode: 0000 [#1] SMP NOPTI
->   CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->   RIP: 0010:free_netdev+0x278/0x2b0
->   [...]
->   Call Trace:
->    <TASK>
->    igc_probe+0x370/0x910
->    local_pci_probe+0x3a/0x80
->    pci_device_probe+0xd1/0x200
->   [...]
-> 
-> [2]
->   #!/bin/bash -ex
-> 
->   FAILSLAB_PATH=/sys/kernel/debug/failslab/
->   DEVICE=0000:00:05.0
->   START_ADDR=$(grep " igc_led_setup" /proc/kallsyms \
->           | awk '{printf("0x%s", $1)}')
->   END_ADDR=$(printf "0x%x" $((START_ADDR + 0x100)))
-> 
->   echo $START_ADDR > $FAILSLAB_PATH/require-start
->   echo $END_ADDR > $FAILSLAB_PATH/require-end
->   echo 1 > $FAILSLAB_PATH/times
->   echo 100 > $FAILSLAB_PATH/probability
->   echo N > $FAILSLAB_PATH/ignore-gfp-wait
-> 
->   echo $DEVICE > /sys/bus/pci/drivers/igc/bind
-
-Sweet!
-
-> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
-> ---
-> Changes:
->    v1->v2:
->      - don't fail probe when led setup fails
->      - rephrase subject and commit message
->    v1: https://lore.kernel.org/intel-wired-lan/20250906055239.29396-1-enjuk@amazon.com/
-> ---
->   drivers/net/ethernet/intel/igc/igc.h      |  1 +
->   drivers/net/ethernet/intel/igc/igc_main.c | 12 +++++++++---
->   2 files changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-> index 266bfcf2a28f..a427f05814c1 100644
-> --- a/drivers/net/ethernet/intel/igc/igc.h
-> +++ b/drivers/net/ethernet/intel/igc/igc.h
-> @@ -345,6 +345,7 @@ struct igc_adapter {
->   	/* LEDs */
->   	struct mutex led_mutex;
->   	struct igc_led_classdev *leds;
-> +	bool leds_available;
->   };
->   
->   void igc_up(struct igc_adapter *adapter);
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index e79b14d50b24..728d7ca5338b 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -7335,8 +7335,14 @@ static int igc_probe(struct pci_dev *pdev,
->   
->   	if (IS_ENABLED(CONFIG_IGC_LEDS)) {
->   		err = igc_led_setup(adapter);
-> -		if (err)
-> -			goto err_register;
-> +		if (err) {
-> +			netdev_warn_once(netdev,
-> +					 "LED init failed (%d); continuing without LED support\n",
-> +					 err);
-> +			adapter->leds_available = false;
-> +		} else {
-> +			adapter->leds_available = true;
-> +		}
->   	}
->   
->   	return 0;
-> @@ -7392,7 +7398,7 @@ static void igc_remove(struct pci_dev *pdev)
->   	cancel_work_sync(&adapter->watchdog_task);
->   	hrtimer_cancel(&adapter->hrtimer);
->   
-> -	if (IS_ENABLED(CONFIG_IGC_LEDS))
-> +	if (IS_ENABLED(CONFIG_IGC_LEDS) && adapter->leds_available)
->   		igc_led_free(adapter);
->   
->   	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+neal
 
