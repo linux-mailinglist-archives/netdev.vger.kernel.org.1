@@ -1,126 +1,288 @@
-Return-Path: <netdev+bounces-221814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE21B51F00
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:32:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D64F3B51F12
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:36:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8371E178346
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:32:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9F931B261B1
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F09324B02;
-	Wed, 10 Sep 2025 17:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8314232A3E7;
+	Wed, 10 Sep 2025 17:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="QmEk60qS"
+	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="A4WR/c/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DAC31D738;
-	Wed, 10 Sep 2025 17:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F49E22422A
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 17:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757525527; cv=none; b=RIO/DfL1yrXYfj//oCqgq3l1hDnbUwPkuTOtZODrK3Bec1X3qv1rNItTFyP9w93CPhafme51uXPFM3kfHSmJAUqGzCK2RdurR53SHqpUMGAmgyY6QafTf9jn5nrSClz7WqhXiUySBw0uGJoMIiBQsV/TI4+cCitgHMckPMwowhA=
+	t=1757525812; cv=none; b=LMJiGe1JXNXB+nb2JnLkWcTgkOwLRCgYfm+8pYXuH2JPdLiayGH8AQhQL6VKMELqz8S+1nNBzmMs0lKA27vs4g6GaogvTCYusiWUWdBn63pt44Bkzg/ZwMqUwDevaIL7RNpI+uGyZ9JGAOEWXkw637JEqO/QtjZGLbpd4+tb6os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757525527; c=relaxed/simple;
-	bh=yuKQ0lR26nVX8L5krMe10RNzdx00wJz/Brrp083carQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=euYvMmGxH3tOV0Y0OWxfopA7ZJOnrM0HH9LPVt49bs9UCVnhJyXNUDDtRuDOKt5LOLf+EICeZftrt3+LZkMFqIvbi8POjNzLWFvNEBCpEBaEgrANKcS66b7K0+iI5m4yC+2EjYCIT2QK+YkbEYoGiF1zlG2WaN943JrYrn9nM1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=QmEk60qS; arc=none smtp.client-ip=52.28.197.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1757525812; c=relaxed/simple;
+	bh=LLQZmVzNV815aKaKxBWvuCiW/5PiZ8Fj7HtxZEXVcEo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qdmgys756POzKkOQzvWiWw57ErZKSChoMX5IQhNNQ/cjV8yQAFJgAsZTCEI4WO1HQqObWk5sKmRAdguSJpzP07NE49I9VV+vhcppYo2DGp1WHLF4xpdbqbFU4wJetjtVcGYkqJAf9uoBKCddE1G2sZKk6CvKJmcgqx2elWcGvjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=A4WR/c/E; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-56088927dcbso8725414e87.3
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 10:36:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1757525525; x=1789061525;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=qEzZnMkfHtDYjGZWSxfigRLQrGxze7DhIG2nwdyJImk=;
-  b=QmEk60qS5FogFKjvP2Xu98G2CH8YQ9PxSMPGjY5KlBr6uir4yQX4zn6B
-   gGqAESb8RZCBHcoj10IxiD5GCuzcPWl1suH52Y3tD759zEuG3rLf7PcPu
-   VeQYEElM5CzXqM/oQ2rZPNFwObmabM3lUbLxrdIVYgfA1XiOFbEJiyDqX
-   WbqjWuACoySiAP4I56s6vZxg3st6SHAZdji0kEnizTWvs8iT24p0u6fmv
-   K0ahDgy+4lidPMZcZ/W9M7iqazXjFTuBoBNfjLNAz2zZ/1Jp19Bl22ZLD
-   pEC2w9XIQDGkeECpRk7V569sa0NbUBIFHwssfhz0HMyYVe+Y9hGwbivyh
-   Q==;
-X-CSE-ConnectionGUID: Lc2tOsb3TWq+ntSm2bVkIg==
-X-CSE-MsgGUID: q9x5CrNLRy2f7iQB9yZp/g==
-X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
-   d="scan'208";a="1819311"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 17:31:54 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:11338]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.31.196:2525] with esmtp (Farcaster)
- id ab7880e5-12d4-449e-bd34-c2b22e1c2731; Wed, 10 Sep 2025 17:31:54 +0000 (UTC)
-X-Farcaster-Flow-ID: ab7880e5-12d4-449e-bd34-c2b22e1c2731
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 17:31:53 +0000
-Received: from dev-dsk-farbere-1a-46ecabed.eu-west-1.amazon.com
- (172.19.116.181) by EX19D018EUA004.ant.amazon.com (10.252.50.85) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Wed, 10 Sep 2025
- 17:31:50 +0000
-From: Eliav Farber <farbere@amazon.com>
-To: <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <vitaly.lifshits@intel.com>,
-	<gregkh@linuxfoundation.org>, <post@mikaelkw.online>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <farbere@amazon.com>, <jonnyc@amazon.com>
-Subject: [PATCH 5.10.y] e1000e: fix EEPROM length types for overflow checks
-Date: Wed, 10 Sep 2025 17:31:38 +0000
-Message-ID: <20250910173138.8307-1-farbere@amazon.com>
-X-Mailer: git-send-email 2.47.3
+        d=openai.com; s=google; t=1757525809; x=1758130609; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EZgp1Av0IrI1VbVe6ba4FsK2/2iO2cWo8lh5Kh0scDw=;
+        b=A4WR/c/EChqmEShGYtxkVNFumw3/tLB0aB2Cfo61E0qfHLlVO3ksYoBAmSmJhgmIqm
+         ovMtjwfTHxd1YqJqIYUZ67/QwMCAQ8C8EnWgvmmsLxR0AU5tOGGic0rxHpnE2FMKm436
+         24DkIvuOuDtsqFp8JJ1oQ5fXbrAGFfINQjjoE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757525809; x=1758130609;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EZgp1Av0IrI1VbVe6ba4FsK2/2iO2cWo8lh5Kh0scDw=;
+        b=pBmdwWFHv98GTuLPi2Q2J+1RLNMW2rSNrHAqC3PMKQt+EpccAHbw8IYF3Tlf6cSZ5q
+         ZltvqLPgM9UOFYSk1ZcPQMsQ1dwDr5TZoar6nXq3x+JIAdbFpXNBRwNvsRnxkvArNw2e
+         27djvdBOHblEzoL2YZHSw0EVY2HFbgHkyaIlqGNPpo3dMwlG7NzlMQyLGlL1glYrqW0v
+         ClETMeb+Przy86R3F/KqL2tjlGvjOfTjFessgrgHHqINrehwnUq2CETQfZdGgvC1QfRg
+         Ondx5FX7tCCkd4T+FlzCWB0M3Lw4UwnjqmG+SEsiWelB6f0oYldO5HOOLi3fBvrOqmu8
+         xwDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVX8n35bNW7oA4zLU7uSTXiZmqfHXgag2z3gPz/fwVYIGiw7Jouo/woqoRujCYJ14HXQNBcBtg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdNHo7tA1qnHV20qRGKy2qUCQ3MKBtLGnDAEUy2fyGrmKa9EsE
+	h600dDJVaiiu4G8Xp5vcZiGIDBBo0PwmlM8hgtFL8KkSBJ+hrYWVh+n6J3n2KSljKMh+pOAhAKy
+	8FYaEYxqxMZ02vjL2qpaQGM8DjHjr7HJM2qezJSrFLg==
+X-Gm-Gg: ASbGnctHUILi+HTUOGuCRVs/KJkM33qzFzaCduiEmeON7n7snGis8AqysSmOTAhsG9Z
+	I/d65qZU3RwYIaGVpfWYhGoGd8+/Yih+tawnjEQVv9bU/jL46r2OtXbijpjS9ZEFemV9U+jPH0Y
+	uI+TE+xT+NBloGEzLTTyeBBthpI5CnP0knOQRT5n+fQgj8BOHYSbuCoSdsdHWYXsJ51JI/AW1y8
+	3uvoOoz70rqu+4BlPhziup4QqEs4BmvJgxz5vTkOwiMLmi49WCgDG8pkA4EbmG9gg==
+X-Google-Smtp-Source: AGHT+IEYro1yLA2HJ0lSiLmsgZxDRscIjl9YnGbe8L+zsVFBmVtUnfEiensqayS3z+8kLd1Sw+behbmHKEwjxXxcVAw=
+X-Received: by 2002:a05:6512:118b:b0:55f:6c72:b70d with SMTP id
+ 2adb3069b0e04-56261bc60fcmr5252641e87.48.1757525808710; Wed, 10 Sep 2025
+ 10:36:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-0-ea492f7b11ac@openai.com>
+ <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-2-ea492f7b11ac@openai.com>
+ <CAMB2axO4ySD2Lo9xzkkYdUqL2tHPcO02-h2HZiWT993wsU3NtA@mail.gmail.com>
+ <CADg4-L92GbxSXaqg1KuoGxt2c_yC=gbmKywVPvcAjHY_7v2H1g@mail.gmail.com>
+ <CADg4-L8dLtzPL-x8o1HAHrbQ2fQ0MxB3Gm68HVj9Jp3-YunwrA@mail.gmail.com> <CAMB2axO3d9Wr64RRxYQd8rg5QVxt5MO=ZzRtJG8njeDYNBW-tw@mail.gmail.com>
+In-Reply-To: <CAMB2axO3d9Wr64RRxYQd8rg5QVxt5MO=ZzRtJG8njeDYNBW-tw@mail.gmail.com>
+From: Christoph Paasch <cpaasch@openai.com>
+Date: Wed, 10 Sep 2025 10:36:36 -0700
+X-Gm-Features: AS18NWBuzj_9J7VCJmWMWuMIdt3c4bav1a2rRfaZyb5Rl8dB5QA7U4C5abrPeKI
+Message-ID: <CADg4-L8a-FbB4A_dttfQXYuvOdnEcrYOYi4fG_7KBBWfaLL_ag@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/2] net/mlx5: Avoid copying payload to the
+ skb's linear part
+To: Amery Hung <ameryhung@gmail.com>
+Cc: Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
- EX19D018EUA004.ant.amazon.com (10.252.50.85)
+Content-Transfer-Encoding: quoted-printable
 
-Fix a compilation failure when warnings are treated as errors:
+On Tue, Sep 9, 2025 at 8:17=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
+te:
+>
+> On Tue, Sep 9, 2025 at 11:18=E2=80=AFAM Christoph Paasch <cpaasch@openai.=
+com> wrote:
+> >
+> > On Mon, Sep 8, 2025 at 9:00=E2=80=AFPM Christoph Paasch <cpaasch@openai=
+.com> wrote:
+> > >
+> > > On Thu, Sep 4, 2025 at 4:30=E2=80=AFPM Amery Hung <ameryhung@gmail.co=
+m> wrote:
+> > > >
+> > > > On Thu, Sep 4, 2025 at 3:57=E2=80=AFPM Christoph Paasch via B4 Rela=
+y
+> > > > <devnull+cpaasch.openai.com@kernel.org> wrote:
+> > > > >
+> > > > > From: Christoph Paasch <cpaasch@openai.com>
+> > > > >
+> > > > > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (25=
+6)
+> > > > > bytes from the page-pool to the skb's linear part. Those 256 byte=
+s
+> > > > > include part of the payload.
+> > > > >
+> > > > > When attempting to do GRO in skb_gro_receive, if headlen > data_o=
+ffset
+> > > > > (and skb->head_frag is not set), we end up aggregating packets in=
+ the
+> > > > > frag_list.
+> > > > >
+> > > > > This is of course not good when we are CPU-limited. Also causes a=
+ worse
+> > > > > skb->len/truesize ratio,...
+> > > > >
+> > > > > So, let's avoid copying parts of the payload to the linear part. =
+We use
+> > > > > eth_get_headlen() to parse the headers and compute the length of =
+the
+> > > > > protocol headers, which will be used to copy the relevant bits ot=
+ the
+> > > > > skb's linear part.
+> > > > >
+> > > > > We still allocate MLX5E_RX_MAX_HEAD for the skb so that if the ne=
+tworking
+> > > > > stack needs to call pskb_may_pull() later on, we don't need to re=
+allocate
+> > > > > memory.
+> > > > >
+> > > > > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 =
+NIC and
+> > > > > LRO enabled):
+> > > > >
+> > > > > BEFORE:
+> > > > > =3D=3D=3D=3D=3D=3D=3D
+> > > > > (netserver pinned to core receiving interrupts)
+> > > > > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> > > > >  87380  16384 262144    60.01    32547.82
+> > > > >
+> > > > > (netserver pinned to adjacent core receiving interrupts)
+> > > > > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
+> > > > >  87380  16384 262144    60.00    52531.67
+> > > > >
+> > > > > AFTER:
+> > > > > =3D=3D=3D=3D=3D=3D
+> > > > > (netserver pinned to core receiving interrupts)
+> > > > > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
+> > > > >  87380  16384 262144    60.00    52896.06
+> > > > >
+> > > > > (netserver pinned to adjacent core receiving interrupts)
+> > > > >  $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256=
+K
+> > > > >  87380  16384 262144    60.00    85094.90
+> > > > >
+> > > > > Additional tests across a larger range of parameters w/ and w/o L=
+RO, w/
+> > > > > and w/o IPv6-encapsulation, different MTUs (1500, 4096, 9000), di=
+fferent
+> > > > > TCP read/write-sizes as well as UDP benchmarks, all have shown eq=
+ual or
+> > > > > better performance with this patch.
+> > > > >
+> > > > > Reviewed-by: Eric Dumazet <edumazet@google.com>
+> > > > > Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
+> > > > > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+> > > > > ---
+> > > > >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 5 +++++
+> > > > >  1 file changed, 5 insertions(+)
+> > > > >
+> > > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/dr=
+ivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > > index 8bedbda522808cbabc8e62ae91a8c25d66725ebb..0ac31c7fb64cd6072=
+0d390de45a5b6b453ed0a3f 100644
+> > > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> > > > > @@ -2047,6 +2047,8 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct m=
+lx5e_rq *rq, struct mlx5e_mpw_info *w
+> > > > >                 dma_sync_single_for_cpu(rq->pdev, addr + head_off=
+set, headlen,
+> > > > >                                         rq->buff.map_dir);
+> > > > >
+> > > > > +               headlen =3D eth_get_headlen(rq->netdev, head_addr=
+, headlen);
+> > > > > +
+> > > > >                 frag_offset +=3D headlen;
+> > > > >                 byte_cnt -=3D headlen;
+> > > > >                 linear_hr =3D skb_headroom(skb);
+> > > > > @@ -2123,6 +2125,9 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct m=
+lx5e_rq *rq, struct mlx5e_mpw_info *w
+> > > > >                                 pagep->frags++;
+> > > > >                         while (++pagep < frag_page);
+> > > > >                 }
+> > > > > +
+> > > > > +               headlen =3D eth_get_headlen(rq->netdev, mxbuf->xd=
+p.data, headlen);
+> > > > > +
+> > > >
+> > > > The size of mxbuf->xdp.data is most likely not headlen here.
+> > > >
+> > > > The driver currently generates a xdp_buff with empty linear data, p=
+ass
+> > > > it to the xdp program and assumes the layout If the xdp program doe=
+s
+> > > > not change the layout of the xdp_buff through bpf_xdp_adjust_head()=
+ or
+> > > > bpf_xdp_adjust_tail(). The assumption is not correct and I am worki=
+ng
+> > > > on a fix. But, if we keep that assumption for now, mxbuf->xdp.data
+> > > > will not contain any headers or payload. The thing that you try to =
+do
+> > > > probably should be:
+> > > >
+> > > >         skb_frag_t *frag =3D &sinfo->frags[0];
+> > > >
+> > > >         headlen =3D eth_get_headlen(rq->netdev, skb_frag_address(fr=
+ag),
+> > > > skb_frag_size(frag));
+> >
+> > So, when I look at the headlen I get, it is correct (even with my old
+> > code using mxbuf->xdp.data).
+> >
+> > To make sure I test the right thing, which scenario would
+> > mxbuf->xdp.data not contain any headers or payload ? What do I need to
+> > do to reproduce that ?
+>
+> A quick look at the code, could it be that
+> skb_flow_dissect_flow_keys_basic() returns false so that
+> eth_get_headlen() always returns sizeof(*eth)?
 
-drivers/net/ethernet/intel/e1000e/ethtool.c: In function ‘e1000_set_eeprom’:
-./include/linux/overflow.h:71:15: error: comparison of distinct pointer types lacks a cast [-Werror]
-   71 |  (void) (&__a == __d);   \
-      |               ^~
-drivers/net/ethernet/intel/e1000e/ethtool.c:582:6: note: in expansion of macro ‘check_add_overflow’
-  582 |  if (check_add_overflow(eeprom->offset, eeprom->len, &total_len) ||
-      |      ^~~~~~~~~~~~~~~~~~
+No, the headlen values were correct (meaning, it was the actual length
+of the headers):
 
-To fix this, change total_len and max_len from size_t to u32 in
-e1000_set_eeprom().
-The check_add_overflow() helper requires that the first two operands
-and the pointer to the result (third operand) all have the same type.
-On 64-bit builds, using size_t caused a mismatch with the u32 fields
-eeprom->offset and eeprom->len, leading to type check failures.
+This is TCP-traffic with a simple print after eth_get_headlen:
+[130982.311088] mlx5e_skb_from_cqe_mpwrq_nonlinear xdp headlen is 86
 
-Fixes: ce8829d3d44b ("e1000e: fix heap overflow in e1000_set_eeprom")
-Signed-off-by: Eliav Farber <farbere@amazon.com>
----
- drivers/net/ethernet/intel/e1000e/ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So, eth_get_headlen was able to correctly parse things.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index 4aca854783e2..584378291f3f 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -559,7 +559,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
- {
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
- 	struct e1000_hw *hw = &adapter->hw;
--	size_t total_len, max_len;
-+	u32 total_len, max_len;
- 	u16 *eeprom_buff;
- 	int ret_val = 0;
- 	int first_word;
--- 
-2.47.3
+My xdp-program is as simple as possible:
+SEC("xdp.frags")
+int xdp_pass_prog(struct xdp_md *ctx)
+{
+    return XDP_PASS;
+}
 
+
+> The linear part
+> contains nothing meaning before __psk_pull_tail(), so it is possible
+> for skb_flow_dissect_flow_keys_basic() to fail.
+>
+> >
+> > Thanks,
+> > Christoph
+> >
+> > >
+> > > Ok, I think I understand what you mean! Thanks for taking the time to=
+ explain!
+> > >
+> > > I will do some tests on my side to make sure I get it right.
+> > >
+> > > As your change goes to net and mine to netnext, I can wait until your=
+s
+> > > is in the tree so that there aren't any conflicts that need to be
+> > > taken care of.
+>
+> Will Copy you in the mlx5 non-linear xdp fixing patchset.
+
+Thx!
+
+
+Christoph
 
