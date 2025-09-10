@@ -1,67 +1,63 @@
-Return-Path: <netdev+bounces-221817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A918FB51F95
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:59:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3D46B51FAA
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE598A0175C
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:59:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D14597B127F
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D96E33769C;
-	Wed, 10 Sep 2025 17:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7183375AB;
+	Wed, 10 Sep 2025 18:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aH+6MLhC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IkwCLKSF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C180335BD0;
-	Wed, 10 Sep 2025 17:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666C6313526;
+	Wed, 10 Sep 2025 18:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757527140; cv=none; b=hDLhzEaSQ2iFqWg9t6FG0EM4M7yqvvntJz6uUeJtpT97aYHP4VTMU9bcCJqTj6KClPR7CoQTL4/C0UDpZaJujmh4fnDIWAu6x4CxXVxCNkx+A6F3RRjVVle/uNHx80IbkZINACNjxmtsFU5xR3mYgxRYgpJ94b0xtjUzKMqPPgA=
+	t=1757527499; cv=none; b=t8/mV7Xamzqtgywu7qq5aF3+pYBb26ps3iFhrZNoyy+Xd/4KT/a0JeSfwsSwv8aQvHTeJHJKNi45BWWaHU0rgl3H1WiCq7CcB14KnLVgNWvjwudsiaCIWd8oSMoSnRDcv7JwjEkY2Wk1b0M7nmCVIvxsLz9k0+4Gein0AB+0QvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757527140; c=relaxed/simple;
-	bh=3OB/1/72wpDUqru7+1lTnbYAH1kOUgOBvd4nyep3M+c=;
+	s=arc-20240116; t=1757527499; c=relaxed/simple;
+	bh=UU8Zai8Oyugg4pSPBAAJXMcwSEAmFB98dKoF7Ro/rMY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tQxZfkUiMEGaPA6Lk3ptbSi2emN9FITCbmmUEZ8h1A5U3yUe/+qsaAu8/P55lhaaeVuSJPk6IlFIOmnJzOR4r2JL8nlv+0Ik++iid38sjMr3j/iBBqJwTaqxsGug+S3tZ4XZIcCOG2ygUtWpgn/KvZwPuUJyZtyDSYUSSDt9W9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aH+6MLhC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22DE8C4CEF0;
-	Wed, 10 Sep 2025 17:58:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=b0bCvJqSGAvlHAuFONS+6va4sbdFaMaC5C/4O2UcP1ix14cHLobzUe01hkr6KyrjlXr33l/piWZKbodyGKPKDzj2zwQUCWpTS/T1U5gkt0dcKFZyB2XiToqoSAc2DcUkoWE/9jGzeCmpqOp8alCGgH/L4Gg47doqoJPU31FISxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IkwCLKSF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 672F6C4CEEB;
+	Wed, 10 Sep 2025 18:04:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757527139;
-	bh=3OB/1/72wpDUqru7+1lTnbYAH1kOUgOBvd4nyep3M+c=;
+	s=k20201202; t=1757527498;
+	bh=UU8Zai8Oyugg4pSPBAAJXMcwSEAmFB98dKoF7Ro/rMY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aH+6MLhCiTLp+wcLENeAQnSaoWiN6EoIINKbn2FryQMIC5MHBxTg9XsVpuG+y7GzA
-	 oWI28v9zBjfAbjTne2el34PVx8v0MupyesTwYeZhTKwGvzTssG+BHPLKJkdRz+C3U/
-	 17LlR6pb1vKaDF3AVshE2WgLu5fJ8ec/z/zPbLyrCLYunvpwo9JkWXYZsg1Fuim65x
-	 AwLBuwwjUKLmaIKnuA3SN/rze55snN8nHAl3/0S4u8KCiTAGxtMnwg5qyxN70CQnBw
-	 cksIUSCtjCeCDlSY1AVCLLhvKip61op49hcNAVI1VWu8qhvkF8S8gMec1MdWss1SZC
-	 WdQlY6CasUVsA==
-Date: Wed, 10 Sep 2025 10:58:58 -0700
+	b=IkwCLKSFsBEYiTlUBKXzqtB8ooF+qiwxplmHZNiDWdgQWZtk0LEgOABQvpo8WJep8
+	 TJvybq0NOQIUmiRttgbW+0FSOwXaWy8FAgEi71MacOX0kruOfHm1AHYnca+EZk3jvM
+	 X/pOXLf5c4iv6KOGFw6kP88mbd3xpJZr3xqFyjVqGTua32tGGpyG+Aer3IQ2sUB+qQ
+	 USj3NlAq1iM0+kga+cZpxcbIdkxH7pLick1bCZa5N/6xRwnZgYaS8CLEzjaKVBPY6u
+	 E0oA20EtsJAPhGWt2DFL2O/tbAL1cnnohgEum6ucduDbxD8WCtC6W6ySglbkSHFt1m
+	 +C6dNI85d11ZA==
+Date: Wed, 10 Sep 2025 11:04:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Calvin Owens <calvin@wbinvd.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Simon Horman <horms@kernel.org>, david decotigny
- <decot@googlers.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
- kernel-team@meta.com, stable@vger.kernel.org, jv@jvosburgh.net
-Subject: Re: [PATCH net v3 1/3] netpoll: fix incorrect refcount handling
- causing incorrect cleanup
-Message-ID: <20250910105858.083ca8df@kernel.org>
-In-Reply-To: <jibftqm5ihdgazmk3p5gsjhlc536itqaq7r5uag5fuiqtth6cp@abihzyykh4gy>
-References: <20250905-netconsole_torture-v3-0-875c7febd316@debian.org>
-	<20250905-netconsole_torture-v3-1-875c7febd316@debian.org>
-	<aL9A3JDyx3TxAzLf@mozart.vkv.me>
-	<20250908182958.23dc4ba0@kernel.org>
-	<kmvkrqkkrbfctpramlchpwqikg2x3btb3debshabqctt7azu2j@tv4ziqd4gldh>
-	<20250909161625.470d2835@kernel.org>
-	<jibftqm5ihdgazmk3p5gsjhlc536itqaq7r5uag5fuiqtth6cp@abihzyykh4gy>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ stfomichev@gmail.com, martin.lau@kernel.org, mohsin.bashr@gmail.com,
+ noren@nvidia.com, dtatulea@nvidia.com, saeedm@nvidia.com,
+ tariqt@nvidia.com, mbloch@nvidia.com, maciej.fijalkowski@intel.com,
+ kernel-team@meta.com
+Subject: Re: [PATCH bpf-next v2 3/7] bpf: Support pulling non-linear xdp
+ data
+Message-ID: <20250910110457.152b0460@kernel.org>
+In-Reply-To: <CAMB2axPLuQ75_JSqkR43-UVBUi9Yj7juHFLCkDvSLPL445SZew@mail.gmail.com>
+References: <20250905173352.3759457-1-ameryhung@gmail.com>
+	<20250905173352.3759457-4-ameryhung@gmail.com>
+	<20250908185447.233963c5@kernel.org>
+	<CAMB2axPLuQ75_JSqkR43-UVBUi9Yj7juHFLCkDvSLPL445SZew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,33 +67,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Sep 2025 07:12:03 -0700 Breno Leitao wrote:
-> On Tue, Sep 09, 2025 at 04:16:25PM -0700, Jakub Kicinski wrote:
-> > On Tue, 9 Sep 2025 13:17:27 -0700 Breno Leitao wrote:  
-> > > On Mon, Sep 08, 2025 at 06:29:58PM -0700, Jakub Kicinski wrote:  
-> > > > On Mon, 8 Sep 2025 13:47:24 -0700 Calvin Owens wrote:    
-> > > > > I wonder if there might be a demon lurking in bonding+netpoll that this
-> > > > > was papering over? Not a reason not to fix the leaks IMO, I'm just
-> > > > > curious, I don't want to spend time on it if you already did :)    
-> > > > 
-> > > > +1, I also feel like it'd be good to have some bonding tests in place
-> > > > when we're removing a hack added specifically for bonding.    
-> > > 
-> > > Do you prefer to have a separated bonding selftest, or, is it better to
-> > > add some bond operations in the torture selftest?  
-> > 
-> > Normal test is preferable, given the flakiness rate and patch volume
-> > I'm a bit scared of randomized testing as part of CI.  
+On Wed, 10 Sep 2025 11:17:52 -0400 Amery Hung wrote:
+> > Larger note: I wonder if we should support "shifting the buffer down"
+> > if there's insufficient tailroom. XDP has rather copious headroom,
+> > but tailroom may be pretty tight, and it may depend on the length of
+> > the headers. So if there's not enough tailroom but there's enough
+> > headroom -- should we try to memmove the existing headers?  
 > 
-> Ok, I will create a selftest to cover the netpoll part of bonding, as
-> soon as my understanding is good enough. I don't think it will be quick,
-> but, it is on my hi-pri todo list.
+> I think it should. If users want to reserve space for metadata, they
+> can check the headroom before pulling data.
 > 
-> Do you want to have the selftest done before merging this patch, or, can
-> they go in parallel?
+> If the kfunc does not do memmove(), users are still able to do so in
+> XDP programs through bpf_xdp_adjust_head() and memmove(), but it feels
+> less easy to use IMO.
 
-I said "it'd be good to have some bonding tests in place when we're
-removing a hack added specifically for bonding."
-"In place" means part of CI when we're merging this fix.
-Please read emails more carefully.
+Actually, I don't think adjust_head() would even work. The program can
+adjust head and memmove() the header, but there's no way to "punch out"
+the end of the head buffer. We can only grow and shrink start of packet
+and end of packet. After adjust_head + memmove in the prog buffer would
+look something like:
+
+  _ _ _ _ __________ _____ _ _ _ _      ________
+   hroom |  headers | old | troom      |  frag0 |
+  - - - - ---------- ----- - - - -      --------
+
+and the program has no way to "free" the "old" to let pull grab data
+from frag0 in its place...
+
+skb pull helper can allocate a completely fresh buffer, but IDK if
+drivers are ready to have the head buffer swapped under their feet.
+So I think that best we can do is have the pull() helper aromatically
+memmove the headers.
 
