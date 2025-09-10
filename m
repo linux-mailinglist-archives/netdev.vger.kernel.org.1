@@ -1,152 +1,149 @@
-Return-Path: <netdev+bounces-221851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B05DB52172
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 21:50:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADEACB5217D
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 21:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C3407A6954
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:49:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B38131B26BBC
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C1826B75C;
-	Wed, 10 Sep 2025 19:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Y2cimDcU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841392E040B;
+	Wed, 10 Sep 2025 19:59:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C129C2DBF5B
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 19:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D172A29B8E0
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 19:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757533853; cv=none; b=PEBohgekXsZXOqfUYt/xy25CjUW8qPJiSeztRD2XGDtrk9QQikcrxoFRZlsYBIhKN1HYSlYepeREPemSqBGwTvHDVEaWDE14Rfjysl56iDjbMXLftNoxuM8pBKbRIJhWfq4edjxyTVrDMk35cPJHGoecuhZrp9O4GasV6knSWFs=
+	t=1757534377; cv=none; b=iKoMnoe/gK7g+ZlfGFeAR21S2ip7DCz+w+pJ5O/qx8Ym5NeS8cO4u4JkUieg7sbY5dMtiT+p8qlETToxIc5p5yWirwOeuq0fxG5c6XfOUjw1L026cb65bWX8qKYjCWH+HD7xbXzPOQfNxMek3vGrRfyYAQDMSscrrvO0WUwXeEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757533853; c=relaxed/simple;
-	bh=cXtG1Ihht7jXBzzURMLt8xqVtyvQ0BjnJbfbN1jlXAM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kDF/DRK7Ctkwd5ipHYwwOYxovqUvNlpExClUsWqTOiqAsHT4tamXBfBC63T0z+P2adnSxYh8P7B3AUzWVZhJ39LgfFq1lCWSMq463xXf61InYnTkeIgoQcIAScuhIhdI75B6UKDRiPa1IjuW1KUsmU+KXNehg2TiH6cth4q1OHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Y2cimDcU; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58AGfk0Z009842;
-	Wed, 10 Sep 2025 19:50:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=+nPHluCtmPz/tz4X5ZgEnL99tvHjz
-	Ls1kb1DDghsUVA=; b=Y2cimDcUm6G33n1Ixew26pkQLMlze0NFK4COqwaGlIjRL
-	WSfpD6esnSxzcIniMh3tprwewIEKiKLMwgjpOCRpV00vvMwDtu9TLsIGnbbadBLP
-	tSCn+m42AfL7LglAgKZTNBbpaFbasUcoyDjxkp5f6tJ98EN0C+s/q5EWSPDbseCI
-	CU1SKVDJf7ylR0Gp2/Px6IGqRvPHJon7EZUDdScbFw0g/38l9dEwrTvPD2t19lqr
-	Xffp0YRehbsZsTeIWG5XPYMcxBcbjWRpRE6lVZ4cYURb4EYi0YBqPd2ecY7su5+i
-	wufA6/QBg4l0SswO5eEiSTLHQpiZMk+8MiZ1Vs6EA==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4922shvtfc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Sep 2025 19:50:37 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58AIn0uQ038749;
-	Wed, 10 Sep 2025 19:50:35 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 490bdbfs76-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Sep 2025 19:50:35 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58AJoYYT017128;
-	Wed, 10 Sep 2025 19:50:34 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 490bdbfs6a-1;
-	Wed, 10 Sep 2025 19:50:34 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH v3 net-next] udp_tunnel: use netdev_warn() instead of netdev_WARN()
-Date: Wed, 10 Sep 2025 12:50:26 -0700
-Message-ID: <20250910195031.3784748-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1757534377; c=relaxed/simple;
+	bh=L+P5yZZfaz2UZ/A+ieU33ytsnNjJDuKZ4CYymzgFooE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jy6DKSih0ehtvw9wnaO3YEivu99et+JRVONrHUm+3uyqYp9wTyF27GMaVyAO4c4GR8pnnMyN83zppWO3EKvLIP2/syq/SQCfkb0meMLhynofXtrXZdCVDVT5MsAcSaURc8bPbu+aq3wLylugW0AiBL8a4OWOjjwArbkr2CW3sG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b04679375f6so1272165366b.2
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 12:59:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757534374; x=1758139174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vSyW+bCKM+mTcYP257eKxq8oqjrK37Brx0AQ56rh9CU=;
+        b=cbC8AYSEUL0CAyWm1N4g7rMXJ4bn+xeNsCT4plLYm9/GOCcK3IXz5w39DTj34A0tJ/
+         a0KzJnDFg5x7Mmwacfw1Lby3yM4qM5BLU7l2AEMV97M1rH7LgpvLDyXzMwds81+/XqRB
+         mHg9ZoJoFtw5nmjvSkS9329Y6BauaOizUAJQMTIBfIkIn9dG17AJpduLhRL3GrH0HRoa
+         FEPjR89pmMAJwwVDU694bGHlHFcv305jKvrvo4mCkN2xDjRx/zqx/U9aT7ZlkKhtEcp8
+         DkZH5e25deYbHgFbj4mol3S88ohm4MCUlPfKCQ07L4McFUQRiNuObzy9DOEZ2GaJahco
+         KroQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBQokjLAy9VYA+rvCNV9sXBnk6OFQvmGZDtnXBeNCEVTpov61op2CFIrOgYB9iVv6Qu2nt+CU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydKCQtGIVUVKf5m9EDK3LivPU2bJwYgf/3dC5Wq3ZM0LF23nvr
+	CD58vFbpyJ9ka4ZPtGsaSLyrzWKmI4dXLEmdJpIJ4T5nvYXU5JWzljbR
+X-Gm-Gg: ASbGnctxw4KwLcprQSUA3fg6xl7a6zgNCI4WAX0mpitGzPCq3IW1nACZgjOVA/Q4o29
+	KiITAHDu7qpMUHgP2HzXBRlohtliFZHtbyFUf6blFtaLd+stPFzmmc737qvpTqTcqETNJ6T2IOC
+	cex5kuRQjVwRjoqVqynfqqHdYvmm2FYUDEakQdxY7Y7DtGEmb2UmOMO/j3s2N9O1SpnSlLG/qgr
+	nQ3vcCtpmDZC1/s23A+t4XwyJfT7XG1hpuBKcZdoHe26FI0UEw4oifOXIPtfl/6viB6WNcmiXXK
+	SuvDOqjXzyitGGRaskx4k8z38Gxqr3qO05oTMO68OxmBrM2jwA/9SLTiBoLLMmxbVyBWCMIBqxs
+	1vRssv8KEUzMoFQ==
+X-Google-Smtp-Source: AGHT+IHnlnmQF7cjCqFq5bXs72wG6wVY2EzGivBZpZmg4onT8Pw3/dnwNDVwAAeyGz4vDiDC7oXEUw==
+X-Received: by 2002:a17:907:3c92:b0:b04:706a:bcfc with SMTP id a640c23a62f3a-b04b1547768mr1642728966b.33.1757534373934;
+        Wed, 10 Sep 2025 12:59:33 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:43::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0783047d98sm227097666b.22.2025.09.10.12.59.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 12:59:33 -0700 (PDT)
+Date: Wed, 10 Sep 2025 12:59:31 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Andre Carvalho <asantostc@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 5/5] selftests: netconsole: validate target
+ reactivation
+Message-ID: <yj3q6gy5uxz5vosqxpmq7a24qpiu6zihj6gqgi6w7lnyekhqxk@silweslakkev>
+References: <20250909-netcons-retrigger-v1-0-3aea904926cf@gmail.com>
+ <20250909-netcons-retrigger-v1-5-3aea904926cf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-10_04,2025-09-10_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 suspectscore=0
- mlxlogscore=999 adultscore=0 spamscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
- definitions=main-2509100184
-X-Authority-Analysis: v=2.4 cv=esTfzppX c=1 sm=1 tr=0 ts=68c1d68d b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=szbEjYlwAJ6rEAnA0VQA:9
- cc=ntf awl=host:12083
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA4MDE2NSBTYWx0ZWRfX8TGuKX4mYd/L
- TYRIGbfXhpbNGHoFa6WnOcSvCqunDmkVpO0kKkPcN5iASB1zBmFQ2iaZiFtWXzdqw2PhbDohTrl
- QHOiSRtYEmFaQtKLOcQpNddFnK7If9ZbLabCzNy1voqbbo2wkvGzU5IWyhJx+ejZwBdbQ2VX5m9
- zczRs/y90ev7V7Eb8B1YctFre7EFxu7mjo8PQhcD5grVvW+irLdxJsitQpetszNEpbMNnQdzaNn
- UzAsCjfW7r8aTvY+UwtRBo/u6kbBtlgMlPRrYv+8whp75sAKrVWG1rlFc0317ufO9qH7tAn69/H
- UF4CYNSIvdx9cwBXqKAKwzCOYrMgyVglwUK3haXL0qQXaI+JxV6XM1fMsaIrIRyb4Q9O7D1WG7K
- 4UwSzTXnbk7vAFj4QAh9yIkV1LFsrg==
-X-Proofpoint-GUID: HhTM1OVbpukVelqOEvQ0O9yjmUFCd1tw
-X-Proofpoint-ORIG-GUID: HhTM1OVbpukVelqOEvQ0O9yjmUFCd1tw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250909-netcons-retrigger-v1-5-3aea904926cf@gmail.com>
 
-netdev_WARN() uses WARN/WARN_ON to print a backtrace along with
-file and line information. In this case, udp_tunnel_nic_register()
-returning an error is just a failed operation, not a kernel bug.
+On Tue, Sep 09, 2025 at 10:12:16PM +0100, Andre Carvalho wrote:
+> diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+> index 984ece05f7f92e836592107ba4c692da6d8ce1b3..f47c4d57f7b4ce82b0b59bee4c87a9660819675e 100644
+> --- a/tools/testing/selftests/drivers/net/Makefile
+> +++ b/tools/testing/selftests/drivers/net/Makefile
+> @@ -17,6 +17,7 @@ TEST_PROGS := \
+>  	netcons_fragmented_msg.sh \
+>  	netcons_overflow.sh \
+>  	netcons_sysdata.sh \
+> +	netcons_resume.sh \
 
-udp_tunnel_nic_register() can fail in two ways:
-1. "-EINVAL":
-Invalid or inconsistent udp_tunnel_nic_info provided by the driver
-(e.g. set_port without a matching unset_port, missing sync_table,
-first table with zero entries). These paths already trigger an
-internal WARN_ON(), so misuse is caught and logged with a backtrace.
+we try to keep these tests alphabetically ordered.
 
-2. "-ENOMEM":
-Memory allocation failure (kzalloc() or udp_tunnel_nic_alloc()).
-This is a normal runtime error and not a kernel bug.
+>  	netpoll_basic.py \
+>  	ping.py \
+>  	queues.py \
+> diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+> index 8e1085e896472d5c87ec8b236240878a5b2d00d2..ba7c865b1be3b60f53ea548aba269059ca74aee6 100644
+> --- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+> +++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+> @@ -350,6 +350,29 @@ function check_netconsole_module() {
+>  	fi
+>  }
+>  
+> +function wait_target_state() {
+> +	local TARGET=${1}
+> +	local STATE=${2}
+> +	local FILENAME="${NETCONS_CONFIGFS}"/"${TARGET}"/"enabled"
+> +
+> +	if [ "${STATE}" == "enabled" ]
+> +	then
+> +		ENABLED=1
+> +	else
+> +		ENABLED=0
+> +	fi
+> +
+> +	if [ ! -f "$FILENAME" ]; then
+> +		echo "FAIL: Target does not exist." >&2
+> +		exit "${ksft_fail}"
+> +	fi
+> +
+> +	slowwait 2 sh -c 'test -n "$(grep '"'${ENABLED}'"' '"'${FILENAME}'"')"' || {
 
-Since the -EINVAL paths already warn internally(use WARN()), and
--ENOMEM is a routine failure, the notifier should not escalate
-with netdev_WARN(). A plain netdev_warn() is sufficient to
-report the error.
+shellcheck is not very happy with this line:
 
-Replace netdev_WARN() with netdev_warn() accordingly.
+https://netdev.bots.linux.dev/static/nipa/1000727/14224835/shellcheck/stderr
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-v2 -> v3 
-added Reviewed-by Simon
-Rephrase commit message after Jakub comment and added more context
-for removing netdev_WARN wrt udp_tunnel_nic_register
-https://lore.kernel.org/all/20250908182809.3e5a9fdf@kernel.org/
-v1 -> v2
-Modified commit message as discuss with Simon.
-https://lore.kernel.org/all/20250903195717.2614214-1-alok.a.tiwari@oracle.com/
----
- net/ipv4/udp_tunnel_nic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/tools/testing/selftests/drivers/net/netcons_resume.sh b/tools/testing/selftests/drivers/net/netcons_resume.sh
+> new file mode 100755
+> index 0000000000000000000000000000000000000000..7e8ea74821fffdac8be0c3db2f1aa7953b4d5bd5
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/netcons_resume.sh
+> @@ -0,0 +1,68 @@
+> +#!/usr/bin/env bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +# This test validates that netconsole is able to resume a target that was
+> +# deactivated when its interface was removed.
+> +#
+> +# The test configures a netconsole dynamic target and then removes netdevsim
+> +# module to cause the interface to disappear. The test veries that the target
 
-diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-index ff66db48453c..944b3cf25468 100644
---- a/net/ipv4/udp_tunnel_nic.c
-+++ b/net/ipv4/udp_tunnel_nic.c
-@@ -930,7 +930,7 @@ udp_tunnel_nic_netdevice_event(struct notifier_block *unused,
- 
- 		err = udp_tunnel_nic_register(dev);
- 		if (err)
--			netdev_WARN(dev, "failed to register for UDP tunnel offloads: %d", err);
-+			netdev_warn(dev, "failed to register for UDP tunnel offloads: %d", err);
- 		return notifier_from_errno(err);
- 	}
- 	/* All other events will need the udp_tunnel_nic state */
--- 
-2.50.1
+nit: s/veries/verifies/
+
 
 
