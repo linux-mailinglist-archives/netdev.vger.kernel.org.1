@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-221819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 995EEB52034
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:23:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C818B5203D
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7B3117F501
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:23:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDB6B5639C0
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5114127605C;
-	Wed, 10 Sep 2025 18:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456D627605C;
+	Wed, 10 Sep 2025 18:26:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A52B26F2B2
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 18:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C28A26FA77;
+	Wed, 10 Sep 2025 18:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757528596; cv=none; b=En4oJB0RBy45DT8GZL2zWhajdZ46AmuiB5NCs9SsxAA4/+4Aq1oDqeVZ/fwzn348FHW6WztLouv1Ko5wXUc04bMmZJQqljLV2VYlH/9xIyd/Sw1pu0k5zE+Yk0ZrvJ5I3Rx5J9otvt/uKXkQpPlfvGin0vPNVIVuRmgtaQ/Kf4Y=
+	t=1757528813; cv=none; b=sRZN+xXnm/DD4jRzm6GVSaajm31Xc9AZ28nfg7kqWMUmSr8HnDMVbqmXQ26NEMqjyoMoyzLt2od26q5cDJYUOYuHitDtSJWlb0gFL/aiOoW0Rmxy9DjeRj4oV0CHNaDQ0S1Xe3MnVIS2L+h+dN296j6I9Hy1XCnb9FX1oXpu+Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757528596; c=relaxed/simple;
-	bh=RbZB2QdvXdQC93hIZTWCMHxfBgllHO53876Due/cfHA=;
+	s=arc-20240116; t=1757528813; c=relaxed/simple;
+	bh=0Ge/+WkbgCMPVI7iSrjIo+poccgp1KWRGwl578L0+Ek=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MyVLzINOuVrt952VpY7B7EyVihdP6cG1vDkneyT8lOBZfeSdHutq8jblSs7SNLg2gcD5E47PfrgPJvByM0xgSpcGIcDtnI5BxuyGQAhRrbF7fNxKVwCNfmegXopAStKWsun9WpF+womOdDpJSib11/XmbVO4mccCtfjAnm4vheQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=HXpJVzs6TExxkiAQOdEVsGSywI1dsmoVoTXEC/D1R7E63tDIiMahDn+8JetIncpUJF9V3cZw1GABfxojWVCE0KhTeXOK9+72Q1ThuK/cpIXSwBccOLm3Y0oDAQwz51Tnibrs4/G2Rzo3LR8Pp7rW4jnYgbsmOk9amxWS++VR4rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b0449b1b56eso1054098866b.1
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 11:23:13 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b0787fa12e2so187624766b.2;
+        Wed, 10 Sep 2025 11:26:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757528592; x=1758133392;
+        d=1e100.net; s=20230601; t=1757528809; x=1758133609;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hmFXFgSBxNTUpOGRx+AfdRKGmjlssb6jAEn00Lu8FBY=;
-        b=LbPZH9OE3957MvwLS1os0XagwHn6CPyS6NmCb9RHLyNmsjoml5Qq8JrCkjqrZ2A7AD
-         woq5EKTRnqGvEPRGomAF1Yw8PLYG+rtVFnS+odEsFAiBzPAg2rNmDSn2tJNy4qZGBC3i
-         CD1s8gCzaHcvXF/XskcSTSGhCpqQ2EFUzV6K3PSbyY5iqJfkJdwTdrlvZFOjo3gdC1l1
-         Dlvr1f8+1molMaQmrBN92qpQjq7MLlNi2P/Xj31ys2Wal2QBQFFGRx5Vp423uHKKqBC5
-         FhKVFdUHllut92qXu8Cp+J0iIIQf/Myul1eGtefvUyW5PMSH6KmCj9mxSfXBAM05loM1
-         4Sew==
-X-Forwarded-Encrypted: i=1; AJvYcCWBVRJbEeuckkzNRa4xJXpdmz3NFOOKy8uDNHJBjlMCiWPcMqriqZMN8QgZNhG9SRMGUBT7pW0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3hNGcDjKBcAof5cc902IconkEILBT0djI1+DePdSQBGvQSlWZ
-	3x1vKj3FBN9u2kI5np7ImkeRYimaKN6JAtTx71akQik1NOSzHZQN58Vz
-X-Gm-Gg: ASbGncvb58U8OtEucX4AQ8OmNvT7HyZm1pIJzr1Cd5kQnqSyM9j7fe6vr3TX0Zganhh
-	W6GEAmA8lVvq0fnMAJKF5mJzpFqvYnysF57ofov5P0BaDY7VxLtSATgOrGbPK9AhvD2FjG8N5A7
-	YFAYWTbIROBx2B678dw+0r+Z0f3pJ+jrr4iEuRSqfJV7qZL5WeXeNCwqVBiYr1awS0oE/sNfNTe
-	59Ln6eNP85SGs7zdvm6P9RPImzRK5JrWaYuzp053/6Kbbu9xtEs2z/tbEd12wVIkn1IpKsSf3QJ
-	82YE3ypVdLKoq8ANn3jxeV+DlLR2jhLP53aS8FIvY9ObUU8Retjf8xtPMEjrH78fa/5cOSj1CPa
-	KtEo9z5eKNF28
-X-Google-Smtp-Source: AGHT+IHbHsFjicTmkBhhDK0SwLgSuiGScEUPM0kKkIXxZFZUbT4mc+5rRFWNh8O7jTHDdbNFXbzBJQ==
-X-Received: by 2002:a17:907:1c26:b0:b07:892d:6769 with SMTP id a640c23a62f3a-b07892d67d9mr319644166b.2.1757528591432;
-        Wed, 10 Sep 2025 11:23:11 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:8::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07830aa7cesm205651866b.30.2025.09.10.11.23.10
+        bh=oSBAzl6wD76Cva3WaSt7fUWLozpvyd1a3tCiUh/Kyy0=;
+        b=HTq4aDToj+53uYb2bLFcaEX2AG6Eod+UXVdVV+iCaSlokLoj9TnNu9ocDaUBnhMiMG
+         x7JHkqUOuB/MqsKhR6CyacxZ4dqYiy43bG1VpZnTjqV1RIDe4mpb9QwTFnh0hzfEs5Zd
+         BxDxfKgcUI1xRjJZl7tzw7tAfF22mimb3ApOi6Gxe24Jk60qdqRmmDVgNPM96wxnYMn+
+         8ZJ7qwoPKBGpyZQEzuBAZnyVDivVEIn5EFz3A7AacjgsPOgb3wceW0A+XVhOKwoAmhwW
+         fA1j0qVy4U09SC8x3fmepkHVeJwtxr/bNy3PWk5enfG9OL7M/oIcKQ7NiCk6TQq4TI1j
+         Owhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjruEQCVOvLQHK1LJf9SizBXqWtzNOg0xez6r/CkSm0lnCitFhUUYjSH6hp5eooHg2nGBZwsKAKT4d3ZE=@vger.kernel.org, AJvYcCXKMDxhyMzK1YWSBFhRp+VowkqdTqFKLJowG7HSKx1hJbyzTzTSPw/5Nch4cCDac/SMFpfvSQ68@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG7kGPdYcG5icMrIMpndm4E3LGOnjmIRqmrVP9H9RVQZs1kmij
+	Rdp9/Q9W/EPlpYWDRG3dAep9hb4+TcbL+kEX5Z2HicUteMwFkA5d8MaZ
+X-Gm-Gg: ASbGnct3hyTu5Yr9gocAqo2DqO5Z8e55yIOmu/Yes4MVM/HVs4vMI9flkltqK0xaJwA
+	JmULCMJY3CHjDqfJt4FrGuCQWdYEr8GQdPM5N5Zbmbnsz+r1Cmm7h+KXipREvWJEHyqyS279Z9e
+	FFCbNdHFyF+JZ8VCrO2lfEx7GbYz/h+BGDo0/pCBUOnHhywqK7kJZ6FnMQCIMcnBYYdkal+jVMI
+	T5Rd8ru5yYCtNsQQ/9epolYmUWKF4o0rhcHa/Tq4SaNaSsuTxCb1y3vKEd2y4ujs6j2HBADvioe
+	+Uf8kHizBoAHwvbXWz5kp57gCoW5xqP72h76db9Ez8JU+oVMHh/s2Kof1mPOn2WekLIpi/vYSj0
+	GZ5aMtIE10wpn
+X-Google-Smtp-Source: AGHT+IHaelywRYzfmS3mcSI3Y9aqq1KnoB/1WFY1xOOEPVUlPhva7fHs7yFHqmDm9leJZZJaLXIHow==
+X-Received: by 2002:a17:906:fd8a:b0:afe:85d5:a318 with SMTP id a640c23a62f3a-b04b1666d66mr1568401066b.36.1757528808541;
+        Wed, 10 Sep 2025 11:26:48 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62e9f161470sm40970a12.35.2025.09.10.11.26.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 11:23:10 -0700 (PDT)
-Date: Wed, 10 Sep 2025 11:23:08 -0700
+        Wed, 10 Sep 2025 11:26:48 -0700 (PDT)
+Date: Wed, 10 Sep 2025 11:26:45 -0700
 From: Breno Leitao <leitao@debian.org>
-To: John Ogness <john.ogness@linutronix.de>
-Cc: Mike Galbraith <efault@gmx.de>, Simon Horman <horms@kernel.org>, 
-	kuba@kernel.org, calvin@wbinvd.org, Pavel Begunkov <asml.silence@gmail.com>, 
+To: Petr Mladek <pmladek@suse.com>
+Cc: John Ogness <john.ogness@linutronix.de>, 
+	Mike Galbraith <efault@gmx.de>, Simon Horman <horms@kernel.org>, kuba@kernel.org, 
+	calvin@wbinvd.org, Pavel Begunkov <asml.silence@gmail.com>, 
 	Johannes Berg <johannes@sipsolutions.net>, paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>, 
-	netdev@vger.kernel.org, boqun.feng@gmail.com, Petr Mladek <pmladek@suse.com>, 
+	netdev@vger.kernel.org, boqun.feng@gmail.com, 
 	Sergey Senozhatsky <senozhatsky@chromium.org>, Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-Message-ID: <cbvfyefqdyy6py2fswqp3licm3ynrsmc3jclgnbubp72elmai7@kwvks5yhkybc>
-References: <4c4ed7b836828d966bc5bf6ef4d800389ba65e77.camel@gmx.de>
- <otlru5nr3g2npwplvwf4vcpozgx3kbpfstl7aav6rqz2zltvcf@famr4hqkwhuv>
+Message-ID: <oc46gdpmmlly5o44obvmoatfqo5bhpgv7pabpvb6sjuqioymcg@gjsma3ghoz35>
+References: <otlru5nr3g2npwplvwf4vcpozgx3kbpfstl7aav6rqz2zltvcf@famr4hqkwhuv>
  <d1679c5809ffdc82e4546c1d7366452d9e8433f0.camel@gmx.de>
  <7a2b44c9e95673829f6660cc74caf0f1c2c0cffe.camel@gmx.de>
  <tx2ry3uwlgqenvz4fsy2hugdiq36jrtshwyo4a2jpxufeypesi@uceeo7ykvd6w>
@@ -79,6 +79,7 @@ References: <4c4ed7b836828d966bc5bf6ef4d800389ba65e77.camel@gmx.de>
  <84a539f4kf.fsf@jogness.linutronix.de>
  <trqtt6vhf6gp7euwljvbbmvf76m4nrgcoi3wu3hb5higzsfyaa@udmgv5lwahn4>
  <847by65wfj.fsf@jogness.linutronix.de>
+ <aMGVa5kGLQBvTRB9@pathway.suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,79 +88,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <847by65wfj.fsf@jogness.linutronix.de>
+In-Reply-To: <aMGVa5kGLQBvTRB9@pathway.suse.cz>
 
-On Wed, Sep 10, 2025 at 02:28:40PM +0206, John Ogness wrote:
-> On 2025-09-09, Breno Leitao <leitao@debian.org> wrote:
-> >   b) Send the message anyway (and hope for the best)
-> >     Cons: Netpoll will continue to call IRQ unsafe locks from IRQ safe
-> >           context (lockdep will continue to be unhappy)
-> >     Pro: This is how it works today already, so, it is not making the problem worse.
-> >          In fact, it is narrowing the problem to only .write_atomic().
+On Wed, Sep 10, 2025 at 05:12:43PM +0200, Petr Mladek wrote:
+> On Wed 2025-09-10 14:28:40, John Ogness wrote:
+
+> > @pmladek: We could introduce a new console flag (NBCON_ATOMIC_UNSAFE) so
+> > that the callback is only used by nbcon_atomic_flush_unsafe().
 > 
-> Two concerns here:
+> This might be an acceptable compromise. It would try to emit messages
+> only at the very end of panic() as the last desperate attempt.
 > 
-> 1. ->write_atomic() is also used during normal operation
+> Just to be sure, what do you mean with unsafe?
 > 
-> 2. It is expected that ->write_atomic() callbacks are implemented
->    safely. The other nbcon citizens are doing this. Having an nbcon
->    driver with an unsafe ->write_atomic() puts all nbcon drivers at risk
->    of not functioning during panic.
-> 
-> This could be combined with (a) so that ->write_atomic() implements its
-> own deferred queue of messages to print and only when
-> @legacy_allow_panic_sync is true, will it try to send immediately and
-> hope for the best. @legacy_allow_panic_sync is set after all nbcon
-> drivers have had a chance to flush their buffers safely and then the
-> kernel starts to allow less safe drivers to flush.
-> 
-> Although I would prefer the NBCON_ATOMIC_UNSAFE approach instead.
+>     + taking IRQ unsafe locks?
 
-Agree. That seems a more straight forward solution for drivers, and it
-is clearly a solution that would help netconsole case.
-
-> >   c) Not implementing .write_atomic
-> >     Cons: we lose the most important messages of the boot.
-> >
-> >   Any other option I am not seeing?
-> 
-> d) Not implementing ->write_atomic() and instead implement a kmsg_dumper
->    for netconsole. This registers a callback that is called during
->    panic.
-> 
->    Con: The kmsg_dumper interface has nothing to do with consoles, so it
->         would require some effort coordinating with the console drivers.
-
-I am looking at kmsg_dumper interface, and it doesn't have the buffers
-that need to be dumper.
-
-So, if I understand corect, my kmsg_dumper callback needs to handle loop
-into the messages buffer and print the remaining messages, right?
-
-In other words, do I need to track what messages were sent in
-netconsole, and then iterate in the kmsgs buffer 
-to find messages that hasn't been sent, and send from there?
-
->    Pro: There is absolute freedom for the dumper to implement its own
->         panic-only solution to get messages out.
-
-What about calls to .write_atomic() calls that are not called during
-panic? Will those be lost in this approach?
-
-> e) Involve support from the underlying network drivers to implement true
->    atomic sending. Thomas Gleixner talked [0] very briefly about how
->    this could be implemented for netconsole during the 2022
->    proof-of-concept presentation of the nbcon API.
-> 
->    Cons: It most likely requires new API callbacks for the network
->          drivers to implement hardware-specific solutions. Many (most?)
->          drivers would not be able to support it.
-> 
->    Pro: True reliable atomic printing via network.
-
-That would make more sense, but, it seems deciding about it is above my
-pay grade. :-)
-
-Thanks for helping us with this issue,
---breno
+Taking IRQ unsafe locks is the major issue we have in netconsole today.
+Basically the drivers can implement IRQ unsafe locks in their
+.ndo_start_xmit() callback, and in some cases those are IRQ unsafe,
+which doesn't match with .write_atomic(), which expect all the inner
+locks to be IRQ safe.
 
