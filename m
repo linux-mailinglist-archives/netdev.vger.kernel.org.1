@@ -1,480 +1,105 @@
-Return-Path: <netdev+bounces-221587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B2FB510DA
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:15:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2A7B510F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:17:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACB62174BFA
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:12:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E53B61C200F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1843148D2;
-	Wed, 10 Sep 2025 08:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F81430DD0F;
+	Wed, 10 Sep 2025 08:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Ht8muMr6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pMyHq+Gb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5FE314B73
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E052D0C78;
+	Wed, 10 Sep 2025 08:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757491692; cv=none; b=cZD1Rb4KjCdayUnf/04EcDJ3ISkBQAEjPkNYNPA6ZMQDQLPFevtHLEJM9bP9y7IlTd7kjlj7Srbbz8Jzjpe7v4TU04EdDjg7vzbxYWuA+/JXv2rzbjV/KB9E1i1LYVyHiw27wnJRPC/nJsUHLe+OKbYagyPd8XFFzf3rtwTv/KA=
+	t=1757492182; cv=none; b=YDlko3MCOv1W47lh+6TG/NJ6f8UOfxdZjvxK34ZrLWWC6OguBcAcT5d8rSQ4DDqliMmKQbyxXCRckYHV7Hem1moWV7/agmSBMF2XSYCpCByGAkrP9CACeHHyugHWqsBNpmyysNnoqYp0boGV0T4dXPWrEFS2XzTB1s6zpsGu3xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757491692; c=relaxed/simple;
-	bh=oWXfa3SvJwwCEKqzllHDlbCszXa1p/f/sbqZPJo4AjM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lz/XsfiqSB+XZeS03ecdKwljjzw/s9w9xn7esODLX/lnj8jBiXiN+i4RWnjM3Oe9ldxY8Xt3n2UzenXL22skxpXH8ww5XsIhVsyiUDtyonmNPhG+RtQqinITPNcysEOi4jBoS72V0OXvV2qJ0DliZ2vvhZfWUrm1YKSAsyH1I1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Ht8muMr6; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45dd5e24d16so47008335e9.3
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:08:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1757491688; x=1758096488; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TVw9UEkU6CM7T/P7hDMj+CzXogm3wRYsQn+ddAlTT/k=;
-        b=Ht8muMr6bxXWi2/TQxbRKLxYxV5d0qZ+Ul3zt3erJOGkXfQLUaOLd20mYYxYtlFdSU
-         ihL9tWSxiysYEUElVln6W1hEehFAP5YECmox1aFE3IO357eVepaB/k0yi54QbSiY8a2d
-         6VE9h/ehHynrbdlxjRVNGdmDBGIsVqZaVGBZ2JpGR8ypoRdDUXRJ1myW1Lzri+OwoyCG
-         j9TLQ+jEyWcI2VSwkSHpJ5eihrg/C+oWKMo599Il6xbuAXP17knm6KSXuoeAZzBZUKP8
-         mHp3WMIrpL/H9RHbxvCB8vfvwNl0zC9WJSqU5HYN4UnrktDnEjJjL8fHvhOCIFeHfSFh
-         CrzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757491688; x=1758096488;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TVw9UEkU6CM7T/P7hDMj+CzXogm3wRYsQn+ddAlTT/k=;
-        b=p+NXts2xXi1AALntSnOeU6wljAzBQ146Z0L7iiB/UGkSzLYtkrAZ4rST7C27a2FR+C
-         zVPWqk4JyMBsnFsYnAHmBU7zNrPso6Q1oEGzJaXnTiOIHaIEd4731WWy18rynJdRtfIv
-         lC/R2dh1HvQRf60OvgXv1htwNRvC7iQZZtRz8YCUH3SEooXkzmlNnZbzFgS6lH3S2WJd
-         N/TA7kED0wF6orSf3GzS+vE/H24EMbxRX+qFFlQhLxCLPsv9kGhP+er1K0c4mIBc+DI0
-         0CDVbnPoKXoFg4f89K+AoY03zZZ63RNGpm6ibj/3ErZ75/uhUn/6g1LxWoJFHKxZZJZd
-         d0NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWOvKWhqIOdd1D4F5bnbltMK8Z3Iq/34Q5D8YCCVeTd5pMlUAxXhan0aMGOvaYIPpcuH9W4cb0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxB6xRm9Qmcl3UBQk0ntRJEPxkme/3Ohb+Rs+T7hJakE/Nug/P
-	+24VBHi5hEzSyTz/VjpxjeOHHGihAOPCSJinbdkAPFvuxCdZaRWXOVU7EQblL3wbqHQ=
-X-Gm-Gg: ASbGncvWcaCXN4x9qUzQ4BMxwmDehN/AHO927thpdqjNzA57NQ5/FCmtU/YclcVpdpF
-	9QzGSNMXGeoLdnuNC7KPook9R+ETOwCpWKJGoyk6n2uHIotDVI7zbnTYxXot8eZWoSU9lu0aqS4
-	YPffzcWil73hA19LHWVsekzImavK+9nBYPMNzAzjxDZ9gJ/qVPO82BGhMoy3IUl9AzpVoiLHGGi
-	IsaPx1zAr5Ysa3HYTIxA6AQHc/yjsjKkLD8xT4M0g7zXgBljfYHUTzFcBfcZZWLaQGnsZ95zJ3F
-	vdNo/2OauC/XV/sxDcN4kD8gwAE11+uFm6qi4t/kkw3u4uhy6T7RRs82+xRBziJPaprf/WTz6O9
-	hE5yH0suPSZdiOLY17yDX16+/Jijl
-X-Google-Smtp-Source: AGHT+IG56XJwGZpZ4GrwEXPPYhCBa6sqkrTUyBxMNLpvWbgdc36pNT5Jlm5ghMOSQ92DQFQleNNYHw==
-X-Received: by 2002:a05:600c:350a:b0:45d:dbf4:8880 with SMTP id 5b1f17b1804b1-45dddef7b71mr122974055e9.27.1757491688342;
-        Wed, 10 Sep 2025 01:08:08 -0700 (PDT)
-Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:3936:709a:82c4:3e38])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45df8247cc6sm17813605e9.12.2025.09.10.01.08.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 01:08:05 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 10 Sep 2025 10:07:46 +0200
-Subject: [PATCH 9/9] net: stmmac: qcom-ethqos: add support for sa8255p
+	s=arc-20240116; t=1757492182; c=relaxed/simple;
+	bh=VXvpfErYuphEm8gkywzlYT1m2RlswIgPxzQfgxnan3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X7exxvFWn3Bu7PsEIMNtvDmq6UZk/a0lCknIcz6fHgHMLf5lSy8+twrPPcgNHrCxOB1NsylF9fctzzXGWDaKaccW9uD3gUYkUG0jB5sonlrOJV8TEMrkAkRxZyoLfPhLBDXW+brmvsHDqpMCUc0GnPTjTBmtxDJjIIRzeBBJST8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pMyHq+Gb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1L8uPeYANNO4SmuzyyPj4qmYwusIcBdWqyA0DwPuArM=; b=pMyHq+GbnzCEfZITkR7QEbkxzV
+	xob6ep8BmPVw09lorfzGJK3SPPRMCe+fLGwhd5a/4cwD138XPWqoGZ0bNZXkySj3i6tQs5NGJOObG
+	yYIcM5VotmF/CTDs/ikm1JLr84Eg++g3zjOthBpevO8Rhqks+YDIplDF2VWQS9YJdVjvuqtYYb7zX
+	KYhozppFRiUUaRre8l7gCwajOVRhZRGImyVpwmF9TgMSkACJdl6M+AjYDbSeI9mi8iJtY6O1qg6Vl
+	3+K6JNbzhISqSIHKuUDCzHpnt5rdhiZXUowOQQ3szuFcSsMHPsX4ylN9WM1W5EpoV8xJ8Fd+jedCd
+	oToqvKVA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49442)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uwFzq-000000001Ko-41AY;
+	Wed, 10 Sep 2025 09:16:07 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uwFzj-000000001FR-3wf1;
+	Wed, 10 Sep 2025 09:15:59 +0100
+Date: Wed, 10 Sep 2025 09:15:59 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: yicongsrfy@163.com
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yicong@kylinos.cn
+Subject: Re: [PATCH] net: phy: avoid config_init failure on unattached PHY
+ during resume
+Message-ID: <aMEzv50VmUb2eUMQ@shell.armlinux.org.uk>
+References: <20250910025826.3484607-1-yicongsrfy@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250910-qcom-sa8255p-emac-v1-9-32a79cf1e668@linaro.org>
-References: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
-In-Reply-To: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
-To: Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
- Jose Abreu <joabreu@synopsys.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, 
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11041;
- i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=LTwoONxJf6sm0sg7eKQaSo0lKsmMiPsYLDmqFKmz5Bc=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBowTHOVfIA1Wwhqxc+2Pag26471J1TJM+1FKP0n
- XKraEnGk+qJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCaMExzgAKCRARpy6gFHHX
- ckj2D/9L8Z7yDBDgU+bsZvWM1EWHrRTZ7XgOJyKsWZ9i4EN8YqUnfe+Qz1ydQA6L6niDqqgSLca
- j9gpRn0pMsn8P7HKO3LRvEeltVHYFOo+NPyCBZvvaL4tl+pT9GTYYTsHeNhh74pyWzfaBSAEycp
- fMmBb19nHJpLKqKvKU4E5wie8flibPuwjuLDnKboUV6snLuBSRB7/aN5yTdWwCqMcTu24nkySwJ
- MGqrfaCD8pUKfUcbfy2cADMepZDeoXa8jP/nLdGyRf09cjtGQfgMKJ3CADdZolb6Ul6Rfod/QYN
- kF+XmFjZ7o1qRR9dOMQ2k5NUDcNuOdhmpXAihqpgcZR23FWqFskaoQV6BGeXDuzy6Lb4jrHNKw4
- EnaaRaEMocSIrfIe+L0aIpnK7vTh5+rgrknlsgKUO3oGBAxb8v3yWW43gXuNUnHrbHKV0eLRYUF
- 8M9+5rC0ccDSf4aNUD975R1tS3cRlJAAVGuisa1Utwuo3DDUX6ZX5U1so4BlUY6suxM8+fJyWcR
- 6Cqn/cQb6HFJO3rJ7+IDymVA/ZEfEJymEnbFXqUXoFGFJWT/W9COhfMubiSVFjPBZC2O06gGbdF
- h7lC9wpcYuIBZLbUtEof0XKYzbRBOT/2m9ozroGmt8hWvdCWvwycJwDdycr2znSAUX7FeOQ1jIA
- qeazTiTh0oJm0aA==
-X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
- fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250910025826.3484607-1-yicongsrfy@163.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Wed, Sep 10, 2025 at 10:58:26AM +0800, yicongsrfy@163.com wrote:
+> From: Yi Cong <yicong@kylinos.cn>
+> 
+> When resuming a PHY device that is not attached to a MAC (i.e.
+> phydev->attached_dev is NULL), mdio_bus_phy_resume() may call into
+> phy_init_hw() -> phydev->drv->config_init(), which can return -EOPNOTSUPP
+> (-95) if the driver does not support initialization in this state.
+> 
+> This results in log messages like:
+> [ 1905.106209] YT8531S Gigabit Ethernet xxxxmac_mii_bus-XXXX:00:01:
+> PM: dpm_run_callback(): mdio_bus_phy_resume+0x0/0x180 [libphy] returns -95
+> [ 1905.106232] YT8531S Gigabit Ethernet xxxxmac_mii_bus-XXXX:00:01:
+> PM: failed to resume: error -95
+> 
+> In practice, only one PHY on the bus (e.g. XXXX:00:00) is typically
+> attached to a MAC interface; others (like XXXX:00:01) are probed but
+> not used, making such resume attempts unnecessary and misleading.
+> 
+> Add an early return in mdio_bus_phy_resume() when !phydev->attached_dev,
+> to prevent unneeded hardware initialization and avoids false error reports.
 
-Extend the driver to support a new model - sa8255p. Unlike the
-previously supported variants, this one's power management is done in
-the firmware using SCMI. This is modeled in linux using power domains so
-add support for them.
-
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
----
- .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 231 ++++++++++++++++++---
- 1 file changed, 201 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 2a6136a663268ed40f99b47c9f0694f30053b94a..e1620d724e18dd824ae9615dfef122836e5140fd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -7,6 +7,8 @@
- #include <linux/platform_device.h>
- #include <linux/phy.h>
- #include <linux/phy/phy.h>
-+#include <linux/pm_opp.h>
-+#include <linux/pm_domain.h>
- 
- #include "stmmac.h"
- #include "stmmac_platform.h"
-@@ -85,6 +87,13 @@
- 
- #define SGMII_10M_RX_CLK_DVDR			0x31
- 
-+enum ethqos_pd_selector {
-+	ETHQOS_PD_CORE = 0,
-+	ETHQOS_PD_MDIO,
-+	ETHQOS_PD_SERDES,
-+	ETHQOS_NUM_PDS,
-+};
-+
- struct ethqos_emac_por {
- 	unsigned int offset;
- 	unsigned int value;
-@@ -103,6 +112,9 @@ struct ethqos_emac_driver_data {
- 
- struct ethqos_emac_pm_data {
- 	const char *link_clk_name;
-+	bool use_domains;
-+	struct dev_pm_domain_attach_data pd;
-+	unsigned int clk_ptp_rate;
- };
- 
- struct ethqos_emac_match_data {
-@@ -116,13 +128,20 @@ struct ethqos_emac_pm_ctx {
- 	struct phy *serdes_phy;
- };
- 
-+struct ethqos_emac_pd_ctx {
-+	struct dev_pm_domain_list *pd_list;
-+};
-+
- struct qcom_ethqos {
- 	struct platform_device *pdev;
- 	void __iomem *rgmii_base;
- 	void __iomem *mac_base;
- 	int (*configure_func)(struct qcom_ethqos *ethqos, int speed);
- 
--	struct ethqos_emac_pm_ctx pm;
-+	union {
-+		struct ethqos_emac_pm_ctx pm;
-+		struct ethqos_emac_pd_ctx pd;
-+	};
- 	phy_interface_t phy_mode;
- 	int serdes_speed;
- 	int (*set_serdes_speed)(struct qcom_ethqos *ethqos);
-@@ -336,6 +355,25 @@ static const struct ethqos_emac_match_data emac_sa8775p_data = {
- 	.pm_data = &emac_sa8775p_pm_data,
- };
- 
-+static const char * const emac_sa8255p_pd_names[] = {
-+	"power_core", "power_mdio", "perf_serdes"
-+};
-+
-+static const struct ethqos_emac_pm_data emac_sa8255p_pm_data = {
-+	.pd = {
-+		.pd_flags = PD_FLAG_NO_DEV_LINK,
-+		.pd_names = emac_sa8255p_pd_names,
-+		.num_pd_names = ETHQOS_NUM_PDS,
-+	},
-+	.use_domains = true,
-+	.clk_ptp_rate = 230400000,
-+};
-+
-+static const struct ethqos_emac_match_data emac_sa8255p_data = {
-+	.drv_data = &emac_v4_0_0_data,
-+	.pm_data = &emac_sa8255p_pm_data,
-+};
-+
- static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
- {
- 	struct device *dev = &ethqos->pdev->dev;
-@@ -417,6 +455,28 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
- 	return 0;
- }
- 
-+static int qcom_ethqos_domain_on(struct qcom_ethqos *ethqos,
-+				 enum ethqos_pd_selector sel)
-+{
-+	struct device *dev = ethqos->pd.pd_list->pd_devs[sel];
-+	int ret;
-+
-+	ret = pm_runtime_resume_and_get(dev);
-+	if (ret < 0)
-+		dev_err(&ethqos->pdev->dev,
-+			"Failed to enable the power domain for %s\n",
-+			dev_name(dev));
-+	return ret;
-+}
-+
-+static void qcom_ethqos_domain_off(struct qcom_ethqos *ethqos,
-+				   enum ethqos_pd_selector sel)
-+{
-+	struct device *dev = ethqos->pd.pd_list->pd_devs[sel];
-+
-+	pm_runtime_put_sync(dev);
-+}
-+
- static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
- {
- 	struct device *dev = &ethqos->pdev->dev;
-@@ -652,6 +712,13 @@ static int ethqos_set_serdes_speed_phy(struct qcom_ethqos *ethqos)
- 	return phy_set_speed(ethqos->pm.serdes_phy, ethqos->serdes_speed);
- }
- 
-+static int ethqos_set_serdes_speed_pd(struct qcom_ethqos *ethqos)
-+{
-+	struct device *dev = ethqos->pd.pd_list->pd_devs[ETHQOS_PD_SERDES];
-+
-+	return dev_pm_opp_set_level(dev, ethqos->serdes_speed);
-+}
-+
- static void ethqos_set_serdes_speed(struct qcom_ethqos *ethqos, int speed)
- {
- 	if (ethqos->serdes_speed != speed) {
-@@ -753,6 +820,27 @@ static void qcom_ethqos_serdes_powerdown(struct net_device *ndev, void *priv)
- 	phy_exit(ethqos->pm.serdes_phy);
- }
- 
-+static int qcom_ethqos_pd_serdes_powerup(struct net_device *ndev, void *priv)
-+{
-+	struct qcom_ethqos *ethqos = priv;
-+	struct device *dev = ethqos->pd.pd_list->pd_devs[ETHQOS_PD_SERDES];
-+	int ret;
-+
-+	ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_SERDES);
-+	if (ret < 0)
-+		return ret;
-+
-+	return dev_pm_opp_set_level(dev, ethqos->serdes_speed);
-+}
-+
-+static void qcom_ethqos_pd_serdes_powerdown(struct net_device *ndev, void *priv)
-+{
-+	struct qcom_ethqos *ethqos = priv;
-+
-+	/* TODO set level */
-+	qcom_ethqos_domain_off(ethqos, ETHQOS_PD_SERDES);
-+}
-+
- static int ethqos_clks_config(void *priv, bool enabled)
- {
- 	struct qcom_ethqos *ethqos = priv;
-@@ -785,6 +873,61 @@ static void ethqos_clks_disable(void *data)
- 	ethqos_clks_config(ethqos, false);
- }
- 
-+static int ethqos_pd_clks_config(void *priv, bool enabled)
-+{
-+	struct qcom_ethqos *ethqos = priv;
-+	int ret = 0;
-+
-+	if (enabled) {
-+		ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_MDIO);
-+		if (ret < 0) {
-+			dev_err(&ethqos->pdev->dev,
-+				"Failed to enable the MDIO power domain\n");
-+			return ret;
-+		}
-+
-+		ethqos_set_func_clk_en(ethqos);
-+	} else {
-+		qcom_ethqos_domain_off(ethqos, ETHQOS_PD_MDIO);
-+	}
-+
-+	return ret;
-+}
-+
-+static int qcom_ethqos_pd_init(struct platform_device *pdev, void *priv)
-+{
-+	struct qcom_ethqos *ethqos = priv;
-+	int ret;
-+
-+	/*
-+	 * Enable functional clock to prevent DMA reset after timeout due
-+	 * to no PHY clock being enabled after the hardware block has been
-+	 * power cycled. The actual configuration will be adjusted once
-+	 * ethqos_fix_mac_speed() is called.
-+	 */
-+	ethqos_set_func_clk_en(ethqos);
-+
-+	ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_CORE);
-+	if (ret)
-+		return ret;
-+
-+	ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_MDIO);
-+	if (ret) {
-+		qcom_ethqos_domain_off(ethqos, ETHQOS_PD_CORE);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void qcom_ethqos_pd_exit(struct platform_device *pdev, void *data)
-+{
-+	struct qcom_ethqos *ethqos = data;
-+
-+	qcom_ethqos_domain_off(ethqos, ETHQOS_PD_MDIO);
-+	qcom_ethqos_domain_off(ethqos, ETHQOS_PD_CORE);
-+}
-+
- static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
- {
- 	struct plat_stmmacenet_data *plat_dat = priv->plat;
-@@ -825,8 +968,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 				     "dt configuration failed\n");
- 	}
- 
--	plat_dat->clks_config = ethqos_clks_config;
--
- 	ethqos = devm_kzalloc(dev, sizeof(*ethqos), GFP_KERNEL);
- 	if (!ethqos)
- 		return -ENOMEM;
-@@ -868,34 +1009,68 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	ethqos->rgmii_config_loopback_en = drv_data->rgmii_config_loopback_en;
- 	ethqos->has_emac_ge_3 = drv_data->has_emac_ge_3;
- 	ethqos->needs_sgmii_loopback = drv_data->needs_sgmii_loopback;
--
--	ethqos->pm.link_clk = devm_clk_get(dev, clk_name);
--	if (IS_ERR(ethqos->pm.link_clk))
--		return dev_err_probe(dev, PTR_ERR(ethqos->pm.link_clk),
--				     "Failed to get link_clk\n");
--
--	ret = ethqos_clks_config(ethqos, true);
--	if (ret)
--		return ret;
--
--	ret = devm_add_action_or_reset(dev, ethqos_clks_disable, ethqos);
--	if (ret)
--		return ret;
--
--	ethqos->pm.serdes_phy = devm_phy_optional_get(dev, "serdes");
--	if (IS_ERR(ethqos->pm.serdes_phy))
--		return dev_err_probe(dev, PTR_ERR(ethqos->pm.serdes_phy),
--				     "Failed to get serdes phy\n");
--
--	ethqos->set_serdes_speed = ethqos_set_serdes_speed_phy;
- 	ethqos->serdes_speed = SPEED_1000;
--	ethqos_update_link_clk(ethqos, SPEED_1000);
-+
-+	if (pm_data && pm_data->use_domains) {
-+		ethqos->set_serdes_speed = ethqos_set_serdes_speed_pd;
-+
-+		ret = devm_pm_domain_attach_list(dev, &pm_data->pd,
-+						 &ethqos->pd.pd_list);
-+		if (ret < 0)
-+			return dev_err_probe(dev, ret, "Failed to attach power domains\n");
-+
-+		plat_dat->clks_config = ethqos_pd_clks_config;
-+		plat_dat->serdes_powerup = qcom_ethqos_pd_serdes_powerup;
-+		plat_dat->serdes_powerdown = qcom_ethqos_pd_serdes_powerdown;
-+		plat_dat->exit = qcom_ethqos_pd_exit;
-+		plat_dat->init = qcom_ethqos_pd_init;
-+		plat_dat->clk_ptp_rate = pm_data->clk_ptp_rate;
-+
-+		ret = qcom_ethqos_pd_init(pdev, ethqos);
-+		if (ret)
-+			return ret;
-+
-+		ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_SERDES);
-+		if (ret)
-+			return dev_err_probe(dev, ret,
-+					     "Failed to enable the serdes power domain\n");
-+	} else {
-+		ethqos->set_serdes_speed = ethqos_set_serdes_speed_phy;
-+
-+		ethqos->pm.link_clk = devm_clk_get(dev, clk_name);
-+		if (IS_ERR(ethqos->pm.link_clk))
-+			return dev_err_probe(dev, PTR_ERR(ethqos->pm.link_clk),
-+					     "Failed to get link_clk\n");
-+
-+		ret = ethqos_clks_config(ethqos, true);
-+		if (ret)
-+			return ret;
-+
-+		ret = devm_add_action_or_reset(dev, ethqos_clks_disable, ethqos);
-+		if (ret)
-+			return ret;
-+
-+		ethqos->pm.serdes_phy = devm_phy_optional_get(dev, "serdes");
-+		if (IS_ERR(ethqos->pm.serdes_phy))
-+			return dev_err_probe(dev, PTR_ERR(ethqos->pm.serdes_phy),
-+					     "Failed to get serdes phy\n");
-+
-+		ethqos_update_link_clk(ethqos, SPEED_1000);
-+
-+		plat_dat->clks_config = ethqos_clks_config;
-+		plat_dat->ptp_clk_freq_config = ethqos_ptp_clk_freq_config;
-+
-+		if (ethqos->pm.serdes_phy) {
-+			plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
-+			plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
-+		}
-+	}
-+
- 	ethqos_set_func_clk_en(ethqos);
- 
- 	plat_dat->bsp_priv = ethqos;
- 	plat_dat->fix_mac_speed = ethqos_fix_mac_speed;
- 	plat_dat->dump_debug_regs = rgmii_dump;
--	plat_dat->ptp_clk_freq_config = ethqos_ptp_clk_freq_config;
- 	plat_dat->has_gmac4 = 1;
- 	if (ethqos->has_emac_ge_3)
- 		plat_dat->dwmac4_addrs = &drv_data->dwmac4_addrs;
-@@ -909,11 +1084,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	if (drv_data->dma_addr_width)
- 		plat_dat->host_dma_width = drv_data->dma_addr_width;
- 
--	if (ethqos->pm.serdes_phy) {
--		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
--		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
--	}
--
- 	/* Enable TSO on queue0 and enable TBS on rest of the queues */
- 	for (i = 1; i < plat_dat->tx_queues_to_use; i++)
- 		plat_dat->tx_queues_cfg[i].tbs_en = 1;
-@@ -923,6 +1093,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 
- static const struct of_device_id qcom_ethqos_match[] = {
- 	{ .compatible = "qcom,qcs404-ethqos", .data = &emac_qcs404_data},
-+	{ .compatible = "qcom,sa8255p-ethqos", .data = &emac_sa8255p_data},
- 	{ .compatible = "qcom,sa8775p-ethqos", .data = &emac_sa8775p_data},
- 	{ .compatible = "qcom,sc8280xp-ethqos", .data = &emac_sc8280xp_data},
- 	{ .compatible = "qcom,sm8150-ethqos", .data = &emac_sm8150_data},
+PHYs are allowed to be attached without a net device. Your PHY
+driver needs to cope with this condition.
 
 -- 
-2.48.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
