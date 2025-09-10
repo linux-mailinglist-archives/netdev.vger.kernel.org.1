@@ -1,122 +1,116 @@
-Return-Path: <netdev+bounces-221882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 786BFB5245E
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:02:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07BACB52463
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:06:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30F4658267A
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 23:02:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3786F7ADAB9
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 23:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB07B2550AD;
-	Wed, 10 Sep 2025 23:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415012E7BB2;
+	Wed, 10 Sep 2025 23:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ehZy0YEK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mzATNfxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C62B1FF1B4;
-	Wed, 10 Sep 2025 23:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF953282F5
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 23:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757545331; cv=none; b=WdplIssKdA2UQ/ddAnMMazfzpgIQQ3NnDuXrJPXs0ccfxbY9HYcA4fOXQUJMFe9yMTDyFwKRSKzvDyXlAA4kSzje1b0XWWrKEK34SF1kiAGTbkyPj227O6+uTZxT5euDgQqBHiza0SQEg5wSCy8NwHSsnCOMcnVSLiutX0rH//8=
+	t=1757545548; cv=none; b=SFT8Kx8Tsv8q+nF8Q9jIF43oiJEsEB58eg//BV4HpsH6KZKmVaXaui9eLRs0VbFK1IIAFMY35F/MOfAxtSCwyLxS/Hzk8xj8VBhmBXvLhyObZ/ddlzd0Se5l4DeCUieRgcXGe3wdrPzRAStNnaJV1DPHiiTOZ6DlztX/TE1GIRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757545331; c=relaxed/simple;
-	bh=fXw0sOIXO190DVV0LITaCvmeQ5uPLWDO3uc8erLTZ4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ampzn1MXdjHF0kU9NRRPTTijop8SvIehK1Vme4jos5JD76YDSAbdqu/Q8TG3yk4sXE8AEZgLJE1J04PEqCFFLi4BOWXIgC8I1nyJpn5Chuc4kY573z/muAiigDrfANc4rAcVGuOOQgPVeKIjsTbkuyqvHy9qGRXv7X6Ue1+6AQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ehZy0YEK; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=XfBP9bG2tl0NXE5ziSY+fRi8/aEFKp1uutR7MpEd4G0=; b=ehZy0YEK3SoZWMNLnS8hKW++R6
-	pi9lEWn+q4alBozXX1FaURdClBIU4Z5Ux1mM46qU7Q+NYXL5Pj+sl0js1xL/1xetnjETmOEYWD/Qf
-	qodDqbNGiam30JDn0x1DQu2TwRw+I9IKEfiIKyRHGjHYxiu6TEjJkch4izOOutaDK6F768vBcrBjz
-	yK88UxY5COOJzzRn/yty70Dmj2AEHm469DSqzf5nDtUAh9/R6XDv6vF0ITiNv8+zXSebv/nhZnUan
-	I5xsrDBuQxLw/zChwYSGWrbK7fLtYxo6bpFvE8h48p9mNX4RfK1tlpIqZgBm7wRRKrKx4/4ZNOJ5B
-	C7KeTHFw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56228)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uwTpC-000000002E4-1Vz1;
-	Thu, 11 Sep 2025 00:02:02 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uwTp7-000000001lV-0Zix;
-	Thu, 11 Sep 2025 00:01:57 +0100
-Date: Thu, 11 Sep 2025 00:01:56 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [Linux-stm32] [PATCH net-next 08/11] net: stmmac: rename
- stmmac_init_ptp()
-Message-ID: <aMIDZE0mLHAa5pdr@shell.armlinux.org.uk>
-References: <aMBaCga5UAXT03Bi@shell.armlinux.org.uk>
- <E1uw1Vk-00000004MCX-38Zs@rmk-PC.armlinux.org.uk>
- <94e20b19-eb89-43c1-9a7c-3a529c60be8b@foss.st.com>
+	s=arc-20240116; t=1757545548; c=relaxed/simple;
+	bh=Wh2fJ2cjdltqtn47C6CJDjjCLq8HT0b+xI/kjb3f8XU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GMJWbT6U6Wi5sBViVtlvJX+T4ZavOHYebsLenTPcjwCJofRKkEiNOX+aqGlukNBnrAmmsVPQhkV0eZP8oTsbuJDQDurHCz3ketNL0VsQlrMWj5zMnDRRhFIzJR0Q/8GnpnG2LQ1oREUZe+Kq/SK/04Ocki6BJH7GOIURbh3Jrfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mzATNfxo; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-24eb713b2dfso722415ad.0
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 16:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757545546; x=1758150346; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wh2fJ2cjdltqtn47C6CJDjjCLq8HT0b+xI/kjb3f8XU=;
+        b=mzATNfxojQYZoyPpge7j1lPM/fH45rsPlhQ4vYUpl0+4war4e3FeqCmVDVsO5zYD7g
+         iOhJNlVM+74wg4dn9ya/z3f+enhNfQmlwdGssjwr0I6CUDrDpYkoaueaOxJcHfmSxifl
+         sqXvc0H1V98/L3pDnM3zzpAM0fEsjea+8q3XP06PbCnUkMLEPxmSn8J9G9XMK8J80R9D
+         khP+QmbfHBkGgQgu5h2tZdfrum+lyAWgvzuAJ9WZNhvAKAFQksdHvhgCN98OEfdKsKpk
+         mFBR9SMb2A2/1E8cdnU5B72DUDIV9OynDRNH02QrSXGFZkmZoLvsckasynSWUH1/cI9u
+         QC3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757545546; x=1758150346;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wh2fJ2cjdltqtn47C6CJDjjCLq8HT0b+xI/kjb3f8XU=;
+        b=EbwEcWR2cmnHHQwnyFGLt84iG6S+It0LjKk+XyqkB5r95UO3mHYn5mhGu9iwy8qwRT
+         S97X37IoOHn8cb8GFvHqf0LW7IUmO/KqulGPAW3UYRV+b8B7asbXyLuPZNHBsey5w+e/
+         GwaVcT3rROmqBnWOK0mz4amB9nKgRqjSxL8dLhvvQgGO6mrbWjeGXVgwnBfuFGsz7jmi
+         PIfF3PNi4T1L3tlDc47UD6UtLibJVFSa9Qst9rP8J4cX657qKo0GFA0SEFku3amAvcYi
+         7tjA2tiJogYD0q7BAqwcNWddxVrRwfZH9oBjj3EdekwyoN8i+n8nxbjOKLmtHX+vi5yb
+         F4fA==
+X-Forwarded-Encrypted: i=1; AJvYcCXJdKGiWnXgM/66iUKEozBEe4hTGoHizXPbdJck0rG755fC69LhEj8AVLIffQmscszN2QBIWFY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeYEcxd6zrBSPkEgIPsgRUUS8uMGVsSDE3LSQ7DZDRt327EZ/j
+	I8H4a1M21FZcKbMO8uh5slpz6mGqQpXgDVPzR3nhTFltWA0r7G0AvecGrlT/KQXS2uA5kGKX4Oq
+	R2aynM4+jURL3+O8FDczqdERiTlRO1bPLqzIknMBT
+X-Gm-Gg: ASbGncvgxV0JrLFCyzEVCUjLSIfM0toaWeB4LkUtBIDUhPttCcXwAYRot0iqqqVlhfS
+	cFCKXO2m98E5liXYYEYRvvtGWk8xq5BbkRVq1zgDW3HLooVAuXVoC/7jpwux6bR4QOVyGKGHO+0
+	5pus0Tu3Ce+PIMeXFC3uuURZb/47FNEXF3sRUy9KZiQSskKloBpKSd3kD4adDYpUUDoXJOT/ub/
+	DCbnaFwJbFehLdoMGZmwWmtQfeixTDZtne9ezMEqnBlvTRUnd76xiNV4w==
+X-Google-Smtp-Source: AGHT+IEe+LLbtw5rYh3KvV9EyohzugJwjSjzWRmOdtoQmLIZPPz2Nv13k5h7XtNu4rO6IgDRG4vg4yrAsEHgSC/WThM=
+X-Received: by 2002:a17:903:4b03:b0:250:ea89:9e0f with SMTP id
+ d9443c01a7336-25172483c20mr228183175ad.46.1757545545866; Wed, 10 Sep 2025
+ 16:05:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <94e20b19-eb89-43c1-9a7c-3a529c60be8b@foss.st.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250909121942.1202585-1-edumazet@google.com>
+In-Reply-To: <20250909121942.1202585-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 10 Sep 2025 16:05:34 -0700
+X-Gm-Features: Ac12FXw5sWHgS9BY508CpyGhzdeECbaNcbFq-uHDKOhrw8eZdlLrEomuAXaVDw8
+Message-ID: <CAAVpQUDCKzHT3kqzsUOoi9iNx8edHEWzJqbwgjnuBu3GbAzxNQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: use NUMA drop counters for softnet_data.dropped
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 10, 2025 at 04:42:18PM +0200, Gatien CHEVALLIER wrote:
-> 
-> 
-> On 9/9/25 18:48, Russell King (Oracle) wrote:
-> > In preparation to cleaning up the (re-)initialisation of timestamping,
-> > rename the existing stmmac_init_ptp() to stmmac_init_timestamping()
-> > which better reflects its functionality.
-> > 
-> 
-> I agree it's mostly about time stamping but if the ptp_clk_freq_config()
-> ops is implemented, then it's not only about timestamping. Wasn't it
-> fine as is?
+On Tue, Sep 9, 2025 at 5:19=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> Hosts under DOS attack can suffer from false sharing
+> in enqueue_to_backlog() : atomic_inc(&sd->dropped).
+>
+> This is because sd->dropped can be touched from many cpus,
+> possibly residing on different NUMA nodes.
+>
+> Generalize the sk_drop_counters infrastucture
+> added in commit c51613fa276f ("net: add sk->sk_drop_counters")
+> and use it to replace softnet_data.dropped
+> with NUMA friendly softnet_data.drop_counters.
+>
+> This adds 64 bytes per cpu, maybe more in the future
+> if we increase the number of counters (currently 2)
+> per 'struct numa_drop_counters'.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-No, if you look at the history, various bits of PTP initialisation
-have had to be moved out of stmmac_init_ptp() due to various problems,
-and this includes initialisation of the TAI timekeeping block block
-(or what we call ptp_clock in the kernel.) It's become less about
-initialising the entire PTP subsystem, more about just the time-
-stamping part.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-So, the rename is justified, even though there's still bits in there
-that need to be re-architected.
-
-However, continuing to call it "init_ptp" when it doesn't initialise
-all of PTP, especially as the patches after this adds another function
-that _does_ to the full initialisation just doesn't make sense - in
-fact, it becomes down-right confusing.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks!
 
