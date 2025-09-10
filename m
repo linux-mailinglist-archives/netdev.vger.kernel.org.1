@@ -1,64 +1,59 @@
-Return-Path: <netdev+bounces-221498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49CEBB50A52
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:37:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF60BB50A55
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0665A444C94
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:37:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA00C7B8CEF
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B1520FAB2;
-	Wed, 10 Sep 2025 01:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57EC2080C1;
+	Wed, 10 Sep 2025 01:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ki0HJvCC"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aADjG6yj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8244202F9C
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90830207A32
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757468219; cv=none; b=F2NfdOfmjTakqDwApKqGFHPzq/82S/bptXoWfEGf5/SPq/xPvUzgkGkTxwIEMlbATclaUk0kkyD3PxRY0n4Y5TVdxi7rtm7OLNDR7MDy8BmeGqYVH9Wx5t3iuvMIG+YuBwn3DcY4DlcqTqVjb7LzSzCCPRaDD0vgiefpSbnOOq0=
+	t=1757468222; cv=none; b=qDKbY5fhA/Egr/Fi13Y8gIQr/hSRAUnXaSLe+p5jOTa5VsvriBVRHzVCL7Q14hWxORQRA4o/Xpqkx142Ld+t3IptdxQBiHPK1z2W2UdP/j9L5vNooAGtMd0ct2a0FK5C3NxWUtHjPDCrhrH5STdOFWya78O3fVv6anOYrIE1z/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757468219; c=relaxed/simple;
-	bh=rj7l7V80ao0F2PnyiG/lfSGBjy2npI9NkUIbDzbxWag=;
+	s=arc-20240116; t=1757468222; c=relaxed/simple;
+	bh=rhCUZlon729NwzkrwsV8gA6wQWsxOT+vNnkGWVfM/Qg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dvI48qGYS31uV6UYuTWnoVJsIzhpHeZaSrKwokOhO+rJtG/7mFDsMyT/dKH45slag5ryY6nBMpW2DXoQB9AI9Lof0JDwI13W9o1Yr3VN6A0RvYePQMMt0mEdUQByliYAHyOGppL5qrJAqzB3UTHDEx2msisBosgdJx0Uwq4O8Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=ki0HJvCC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0313C4CEF4;
-	Wed, 10 Sep 2025 01:36:58 +0000 (UTC)
+	 MIME-Version; b=KuHF/gbcXQHuZ0XNTxlpFQjnFONYS9ug3N3ZC2rxxaLyi3yjFzqoYoVWy7aGERToCuxywxoj8hRvSuVYGPjP8b9JWFRH03lfvS/SQhLQ7VOza83WQAreGEBi/Y5u3RPbf0zBivAqjqIpiuf+0zbpcdZGueYUw3XGmgGpY3/sStI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=aADjG6yj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B26E8C4CEF7;
+	Wed, 10 Sep 2025 01:37:00 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ki0HJvCC"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aADjG6yj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1757468217;
+	t=1757468220;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nYU8P/pCPZCG3Cv6WvuHtUVPNbBA4flHbfP1WHmHsyI=;
-	b=ki0HJvCCD2A0OKDlEkazpx88rcPigHR0YGo1sPGKOPqUZhNeZb7KO+/yX9P/nvu6ke1Xnn
-	77Xw4f/e0koeJ8diwSu/lSdeex4LwynTSV7MZGPyQRdce+Gf4WvDXkPbLsm97woKD5DB2w
-	Ke9Ibb2csk+9F/gn+EJw14JeoSQZJLk=
+	bh=Z9zDYuKHgCGDYOquNh4yrSt1LZUhG378TCi5rGFKwyM=;
+	b=aADjG6yjJc0Md19FSwlG7mLJ90FCAnWJZFzYHVsVVo7YEBv31xmMDl9GbygXx1u/nhjG8s
+	puyc9AwalNFPjs1cy0JadcxN2vryCrz3dnGdsRrkhuz4Ce5/Yf7DMM+3zjSjhDitIUm8Sw
+	JVaLeaBJJJUTipdkr+2+3k8xJuIAdik=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b3a5a300 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 10 Sep 2025 01:36:57 +0000 (UTC)
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 991b62a1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 10 Sep 2025 01:36:59 +0000 (UTC)
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Cc: David Hildenbrand <david@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net 3/4] wireguard: selftests: remove CONFIG_SPARSEMEM_VMEMMAP=y from qemu kernel config
-Date: Wed, 10 Sep 2025 03:36:43 +0200
-Message-ID: <20250910013644.4153708-4-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH net 4/4] wireguard: selftests: select CONFIG_IP_NF_IPTABLES_LEGACY
+Date: Wed, 10 Sep 2025 03:36:44 +0200
+Message-ID: <20250910013644.4153708-5-Jason@zx2c4.com>
 In-Reply-To: <20250910013644.4153708-1-Jason@zx2c4.com>
 References: <20250910013644.4153708-1-Jason@zx2c4.com>
 Precedence: bulk
@@ -69,35 +64,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: David Hildenbrand <david@redhat.com>
+This is required on recent kernels, where it is now off by default.
+While we're here, fix some stray =m's that were supposed to be =y.
 
-It's no longer user-selectable (and the default was already "y"), so
-let's just drop it.
-
-It was never really relevant to the wireguard selftests either way.
-
-Cc: Shuah Khan <shuah@kernel.org>
-Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
-Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- tools/testing/selftests/wireguard/qemu/kernel.config | 1 -
- 1 file changed, 1 deletion(-)
+ tools/testing/selftests/wireguard/qemu/kernel.config | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/tools/testing/selftests/wireguard/qemu/kernel.config b/tools/testing/selftests/wireguard/qemu/kernel.config
-index 0a5381717e9f..1149289f4b30 100644
+index 1149289f4b30..936b18be07cf 100644
 --- a/tools/testing/selftests/wireguard/qemu/kernel.config
 +++ b/tools/testing/selftests/wireguard/qemu/kernel.config
-@@ -48,7 +48,6 @@ CONFIG_JUMP_LABEL=y
- CONFIG_FUTEX=y
- CONFIG_SHMEM=y
- CONFIG_SLUB=y
--CONFIG_SPARSEMEM_VMEMMAP=y
- CONFIG_SMP=y
- CONFIG_SCHED_SMT=y
- CONFIG_SCHED_MC=y
+@@ -20,9 +20,10 @@ CONFIG_NETFILTER_XTABLES_LEGACY=y
+ CONFIG_NETFILTER_XT_NAT=y
+ CONFIG_NETFILTER_XT_MATCH_LENGTH=y
+ CONFIG_NETFILTER_XT_MARK=y
+-CONFIG_NETFILTER_XT_TARGET_MASQUERADE=m
+-CONFIG_IP_NF_TARGET_REJECT=m
+-CONFIG_IP6_NF_TARGET_REJECT=m
++CONFIG_NETFILTER_XT_TARGET_MASQUERADE=y
++CONFIG_IP_NF_TARGET_REJECT=y
++CONFIG_IP6_NF_TARGET_REJECT=y
++CONFIG_IP_NF_IPTABLES_LEGACY=y
+ CONFIG_IP_NF_IPTABLES=y
+ CONFIG_IP_NF_FILTER=y
+ CONFIG_IP_NF_MANGLE=y
 -- 
 2.51.0
 
