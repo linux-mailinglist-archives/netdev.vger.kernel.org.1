@@ -1,254 +1,92 @@
-Return-Path: <netdev+bounces-221511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8F79B50AF9
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 04:22:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76958B50AFF
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 04:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A505F1BC719A
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:22:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3222C3A61AD
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:26:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A7A23B63F;
-	Wed, 10 Sep 2025 02:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7457723BD1D;
+	Wed, 10 Sep 2025 02:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fQxScFZM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0ddagmg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7243815E5D4;
-	Wed, 10 Sep 2025 02:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F5123CB;
+	Wed, 10 Sep 2025 02:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757470954; cv=none; b=apeIf/1sZDxenY/06RlqiMz7DGnKPcLvjEvjqAmuKhmgUBqq5rwRs1iCqXVpoIJZaW9pKQwDFzm/kc7r82iEuqpOl9OPFVBc533/ReZfHQtiGOwkYylxNdxHkdJHEpg9J2fXfLZJtndRtIlwaF3Cs0hA4erN3bsnJ5fxbUcdPFo=
+	t=1757471168; cv=none; b=PBwokfRUQVso+P7PVmahzrCv4nYsk86v+Rc09WGD1voRTnhwVw1f25+M0z3277d2XhPrrKRkI1C3zyJwyYfgIuOEVQuYljSPqkPmgc3HJkHaVW60x9490xxIJBhW8gewFwx9pW0n19LDNgWamGvVMUdD5FNUPsOmqsmR5TYI+sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757470954; c=relaxed/simple;
-	bh=oWlqndBd3eq4k+3ghnP4AOom/bFf4tXLD4z+QR1ca4o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KWOS5Q4HYodnmFrLO1cylmDQa/sPZDQYflOz/kfEJRq6z/J0D1TmdSgpAwZUcf3xj9jcJqdVBzWd8m9DkrelsBjO7irQTSpsq86I+HhyoxTCVvKUnvGbAd0mEMbHWs7TzQ147NZYQHGsp54WeJne0nc85xwc8ajz3YYOXbLqpLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fQxScFZM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFFFDC4CEF4;
-	Wed, 10 Sep 2025 02:22:31 +0000 (UTC)
+	s=arc-20240116; t=1757471168; c=relaxed/simple;
+	bh=GxnvKUwX85agoJjvtTRn54fBAg9vLT1ovfRjs92Ns70=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JcAJzX+mi5V68YSZr0//eiGkuc50XRi/9xIaQgW3X1VeeIoD0rzcyXUpuxWkst5PMcxKyl+hH6pW6V2ujv8K+1ZBglgXwFew/DrPlL2kePvj1jTPT/uhxZg06UXF93QQHtPLscvWTlH6Kw+cckhU3mycFEAk2vY0a3SL1Tz2wYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0ddagmg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E83EC4CEF4;
+	Wed, 10 Sep 2025 02:26:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757470952;
-	bh=oWlqndBd3eq4k+3ghnP4AOom/bFf4tXLD4z+QR1ca4o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fQxScFZMdOBLa3xHO6K22mBmbwmsx3oPkoU+o85x9RyqQziu16MlTeR8NTPBNM4bG
-	 W1x/PEx8BWo+PJB9oSS7l5WD+NbswC8bv7KasFvlkgPsvMOOhyP54e0h8D97ShEf9f
-	 +0V8m5zbdbCL33CT5osJinQ6zV8lrjs7kiVul4tSdj+j8V6pEjuoxZBmdi0XtAy6MX
-	 6s3g33HrDbaq5k862b9kZlug+CQouoB92Qm5WtkmJOuHWiNoc5zw0Xc6t3OySodd7j
-	 MYsNJU2AC1OG2O8gtn0qcOPy0W64oldeZM+ssA5MF5Qo6G9CfKZzCALwR6W3ZJ5pSl
-	 Pl4A7et32MwMA==
-Date: Tue, 9 Sep 2025 21:22:30 -0500
-From: Rob Herring <robh@kernel.org>
-To: Chen-Yu Tsai <wens@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej@kernel.org>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH net-next v4 01/10] dt-bindings: net: sun8i-emac: Add A523
- GMAC200 compatible
-Message-ID: <20250910022230.GA3646514-robh@kernel.org>
-References: <20250908181059.1785605-1-wens@kernel.org>
- <20250908181059.1785605-2-wens@kernel.org>
+	s=k20201202; t=1757471167;
+	bh=GxnvKUwX85agoJjvtTRn54fBAg9vLT1ovfRjs92Ns70=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=L0ddagmgy+s8s3JEjKCyJ863LKjBOg5sgNP7YOQoffwnWXQX0m6CwbVMkzb/jV4Do
+	 TIw2hrkJVbY0DJwY/VEScJVb59rTQ2c8C3zcqakcTv75WIMiYv6n+rRGJlRARg16FH
+	 /4SbfzXXM42O64SCsOnqsycNGrp/K+AeU+9R/ATKanUjywqr4kAxAdM5glxZUAHczC
+	 eWUb6YbbWxCwEPw7g/cqTgrM4ip3U58uepqYw04YI2AnC/r0UpEVR2G4ecFs8LUanM
+	 nkr7F4Xf1/8W/YGUhmILOEJtjtKY7hMgQUNCVFTlRD2z7tF6R8v7K/MBQj+KWLlQuL
+	 O4f5Wx2Ca2D3g==
+Date: Tue, 9 Sep 2025 19:26:06 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv2 2/2] selftests: bonding: add vlan over bond testing
+Message-ID: <20250909192606.6ac53aa4@kernel.org>
+In-Reply-To: <aMDciKMGjr-_sW6E@fedora>
+References: <20250908062802.392300-1-liuhangbin@gmail.com>
+	<20250908062802.392300-2-liuhangbin@gmail.com>
+	<20250909164600.04aa44c7@kernel.org>
+	<aMDciKMGjr-_sW6E@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250908181059.1785605-2-wens@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 09, 2025 at 02:10:50AM +0800, Chen-Yu Tsai wrote:
-> From: Chen-Yu Tsai <wens@csie.org>
+On Wed, 10 Sep 2025 02:03:52 +0000 Hangbin Liu wrote:
+> On Tue, Sep 09, 2025 at 04:46:00PM -0700, Jakub Kicinski wrote:
+> > On Mon,  8 Sep 2025 06:28:02 +0000 Hangbin Liu wrote:  
+> > > Add a vlan over bond testing to make sure arp/ns target works.
+> > > Also change all the configs to mudules.  
+> > 
+> > Why are you switching everything to module?
+> > The series needs to go to net, we should avoid unnecessary cleanups.
+> > And I think changing the config is unrelated to the selftest so it
+> > should be a standalone patch in the first place?  
 > 
-> The Allwinner A523 SoC family has a second Ethernet controller, called
-> the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
-> numbering. This controller, according to BSP sources, is fully
-> compatible with a slightly newer version of the Synopsys DWMAC core.
-> The glue layer around the controller is the same as found around older
-> DWMAC cores on Allwinner SoCs. The only slight difference is that since
-> this is the second controller on the SoC, the register for the clock
-> delay controls is at a different offset. Last, the integration includes
-> a dedicated clock gate for the memory bus and the whole thing is put in
-> a separately controllable power domain.
-> 
-> Add a compatible string entry for it, and work in the requirements for
-> a second clock and a power domain.
-> 
-> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
-> ---
-> Changes since v2:
-> - Added "select" to avoid matching against all dwmac entries
-> Changes since v1:
-> - Switch to generic (tx|rx)-internal-delay-ps properties
-> ---
->  .../net/allwinner,sun8i-a83t-emac.yaml        | 96 ++++++++++++++++++-
->  1 file changed, 94 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-> index 2ac709a4c472..9d205c5d93ca 100644
-> --- a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-> +++ b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-> @@ -10,6 +10,21 @@ maintainers:
->    - Chen-Yu Tsai <wens@csie.org>
->    - Maxime Ripard <mripard@kernel.org>
->  
-> +# We need a select here so we don't match all nodes with 'snps,dwmac'
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - allwinner,sun8i-a83t-emac
-> +          - allwinner,sun8i-h3-emac
-> +          - allwinner,sun8i-r40-gmac
-> +          - allwinner,sun8i-v3s-emac
-> +          - allwinner,sun50i-a64-emac
-> +          - allwinner,sun55i-a523-gmac200
-> +  required:
-> +    - compatible
-> +
->  properties:
->    compatible:
->      oneOf:
-> @@ -26,6 +41,9 @@ properties:
->                - allwinner,sun50i-h616-emac0
->                - allwinner,sun55i-a523-gmac0
->            - const: allwinner,sun50i-a64-emac
-> +      - items:
-> +          - const: allwinner,sun55i-a523-gmac200
-> +          - const: snps,dwmac-4.20a
->  
->    reg:
->      maxItems: 1
-> @@ -37,14 +55,19 @@ properties:
->      const: macirq
->  
->    clocks:
-> -    maxItems: 1
-> +    minItems: 1
-> +    maxItems: 2
->  
->    clock-names:
-> -    const: stmmaceth
-> +    minItems: 1
-> +    maxItems: 2
+> On my local testing, there will be a lot default interfaces if all modules
+> build in. This could make the test environment more clean.
+> But it's just my preference.
 
-minItems: 1
-items:
-  - const: stmmaceth
-  - const: mbus
+No strong opinion on my side. Your point is fair. On the other hand
+sometimes dealing with modules is tricky (especially with vng when
+building kernel with O=build/). But not sure how much we should care
+about shortcomings of tooling which can be fixed. It's okay for our CI.
 
->  
->    phy-supply:
->      description: PHY regulator
->  
-> +  power-domains:
-> +    maxItems: 1
-> +
->    syscon:
->      $ref: /schemas/types.yaml#/definitions/phandle
->      description:
-> @@ -191,6 +214,45 @@ allOf:
->              - mdio-parent-bus
->              - mdio@1
->  
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: allwinner,sun55i-a523-gmac200
-> +    then:
-> +      properties:
-> +        clocks:
-> +          minItems: 2
-> +        clock-names:
-> +          items:
-> +            - const: stmmaceth
-> +            - const: mbus
+> As you said, we can do it with a stand alone
+> patch. I will re-post and drop the config update.
 
-Just 'minItems: 2' here.
-
-> +        tx-internal-delay-ps:
-> +          default: 0
-> +          minimum: 0
-> +          maximum: 700
-> +          multipleOf: 100
-> +          description:
-> +            External RGMII PHY TX clock delay chain value in ps.
-> +        rx-internal-delay-ps:
-> +          default: 0
-> +          minimum: 0
-> +          maximum: 3100
-> +          multipleOf: 100
-> +          description:
-> +            External RGMII PHY TX clock delay chain value in ps.
-> +      required:
-> +        - power-domains
-> +    else:
-> +      properties:
-> +        clocks:
-> +          maxItems: 1
-> +        clock-names:
-> +          items:
-> +            - const: stmmaceth
-
-maxItems: 1
-
-> +        power-domains: false
-> +
-> +
->  unevaluatedProperties: false
->  
->  examples:
-> @@ -323,4 +385,34 @@ examples:
->          };
->      };
->  
-> +  - |
-> +    ethernet@4510000 {
-> +        compatible = "allwinner,sun55i-a523-gmac200",
-> +                     "snps,dwmac-4.20a";
-> +        reg = <0x04510000 0x10000>;
-> +        clocks = <&ccu 117>, <&ccu 79>;
-> +        clock-names = "stmmaceth", "mbus";
-> +        resets = <&ccu 43>;
-> +        reset-names = "stmmaceth";
-> +        interrupts = <0 47 4>;
-> +        interrupt-names = "macirq";
-> +        pinctrl-names = "default";
-> +        pinctrl-0 = <&rgmii1_pins>;
-> +        power-domains = <&pck600 4>;
-> +        syscon = <&syscon>;
-> +        phy-handle = <&ext_rgmii_phy_1>;
-> +        phy-mode = "rgmii-id";
-> +        snps,fixed-burst;
-> +        snps,axi-config = <&gmac1_stmmac_axi_setup>;
-> +
-> +        mdio {
-> +            compatible = "snps,dwmac-mdio";
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            ext_rgmii_phy_1: ethernet-phy@1 {
-> +                reg = <1>;
-> +            };
-> +        };
-> +    };
->  ...
-> -- 
-> 2.39.5
-> 
+Yup! For net we should avoid it.
 
