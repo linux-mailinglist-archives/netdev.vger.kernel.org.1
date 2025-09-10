@@ -1,168 +1,227 @@
-Return-Path: <netdev+bounces-221736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 604ECB51B77
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:24:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40A3BB51BA5
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62F5018834F9
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:22:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A0371888400
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06043311C38;
-	Wed, 10 Sep 2025 15:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5EB25A659;
+	Wed, 10 Sep 2025 15:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="S7i1w4vq";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dXtyLJvO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PbrcSsIu"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726BE1B425C
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 15:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2904117736
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 15:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757517744; cv=none; b=kaQTNX/HavmpN4bZVzgomgiuh5fTZ1OSuawftvZ/etmUUqfbNFDaSgNJJDzkH0vhlsssPgmh+xoqMywwp3gnPSsikElX/sPX7aNXMw92UnTZQYs1cL2AJd6WPtzn2a7JgX5FHO3Bws2AGm5AzfIlIzrZrnJ1/gsKLNYl7jAD1hM=
+	t=1757518275; cv=none; b=Fcfc3aNlYS5FAzmQDnePUG/PiLsq4W+/CFg4R1ZQsGtI40DPoyrI5zMrwK1R7lC8FyX3sNINb3UiGeBYYtZoCQGfZCN0nQN6l7NGqWDl3OLhxHE6fa6BUeFeIiedtJPKbu9C2dHzLZD/bfiPQVdIgqY0OYBubeBNIMFEdIe5oXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757517744; c=relaxed/simple;
-	bh=ItPO/WxV8QBvBc2GR5va+RgVzppMNQcBc/Maz83EDB0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ib57pYC4D0SVi59t8b6fct73R0Bycu7MHG6Kc4kFormhLV37t/VfQ6Bmim3HgIai+NYanIrgcbFPhd4bZJog/WvboRoXpO1p052lNuyBJPuxJkPnDsCjKH/qtVL9dy2PgBqKSFjV0h2SJiAlBRzuu1Hb+QJhXl2+zt9KXf9bHco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=S7i1w4vq; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dXtyLJvO; arc=none smtp.client-ip=202.12.124.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id 4C2C81D00238;
-	Wed, 10 Sep 2025 11:22:18 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Wed, 10 Sep 2025 11:22:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm2; t=1757517738; x=1757604138; bh=Ib8gmmQ7sH
-	s8Tjit90kgoChYF+0C6tb0FiVRW/H64xs=; b=S7i1w4vqZDy5mlDSZ8iwtG3nky
-	7z5uTU3LGZyLdeaCg/MUs+TNRPQeYq2jBWOtWlzVsKeeFQ1Rc4SibezTKCia8gBd
-	vi3D/rCk/nKisRX12RGUi3954Xv+L/41/ylJda3YN1bG5oQvCNQSmCTCEMWbrUyu
-	77IsQeGN3bEdVrbw/jOAoYb/O1rXjnyIDj2Wu2pusdbd+L/MwVisdvSeGApuW5mh
-	55FgRtZtcDm8nL5MFmC4du8QEItIjV8yJ76Hc/uU+sTjj8WoNrggw2Y2tN7giWIs
-	9X89ksVlA1VtVNVEXAcTc73H9I+0AlGxJQgQvMl6mpZHHliOfWI/9O6AMCLA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1757517738; x=1757604138; bh=Ib8gmmQ7sHs8Tjit90kgoChYF+0C6tb0FiV
-	RW/H64xs=; b=dXtyLJvOtF34QkZDY9535B4LterxkOLF4oMHdK8UaRXVXYl0MDd
-	h4kv4/r+6VcztRDvvCcwMk+IujzAwRtSQClqVA77q4JQBuFZpP6yyf6QlRVes5na
-	oWOcAu/IFf4pUB5EOHG7Nd5ohrbZKlm3Fr3OBPxZu/uj9pQ2XsERsm6Rh6yvZPVj
-	XtWDzhoQwa5kZs3M14QgTNzyFzWN6r9TCcLCC6urZiaiTfoy6CSrDTLDpX8VLv3o
-	gS/kzEWDciiaUkCHbnKhoQ2LM4TFc+a835rfs2qn37ZPcRRwjL8iEwlJRP2O74ZG
-	d9g+HJCW5J9B9ZXrIH9EmYoChGQ9USbRjdA==
-X-ME-Sender: <xms:qZfBaLfP9oH-r9PPZOflNjurPse4aqDBlinJSl7rKkjd_I9N1KyvOw>
-    <xme:qZfBaJo1LIymmCPtbaZwcKGbwKDNGjcz9DMN8r7fKIdSGUCD2XER2EquiRWka0n3A
-    jYfoLjeSS7nHXtrHDA>
-X-ME-Received: <xmr:qZfBaE-e4EAfFAR_6AOSK9l45IDUY2MbpjhznSxL4l_yp0HmfGQBJNzfwP2K>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeeifecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefurggsrhhinhgrucff
-    uhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrghtth
-    gvrhhnpeejtdeugfffkeejfeehkeeiiedvjeehvdduffevfeetueffheegteetvdfhffev
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsug
-    esqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepiedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhrtghpthhtohep
-    shhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgtohhmpdhrtghpthhtoh
-    epgihmuhesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhgvohhnrhhosehnvhhiughi
-    rgdrtghomhdprhgtphhtthhopeihrghnjhhunhdriihhuheslhhinhhugidruggvvh
-X-ME-Proxy: <xmx:qZfBaNcwKEdmjNuDol-my6HUIeTjKKU5mRGuxDXyNi1rlUi2KDmINA>
-    <xmx:qZfBaGIUYm8H2CRZzSAH3J71-ZqGe1KYuqUc_SeWcPfHTd4Z1P1qFA>
-    <xmx:qZfBaFgwc19pyBuEqZS01eSYZQpHdDSFAsCrQkP9hpTow_Rn64htmw>
-    <xmx:qZfBaMSpaAFHAlleLnCBwdM4_RNEWJKqOLR5uMWwdvTvtwhaQr7S7A>
-    <xmx:qpfBaFyrzB1eNYHKINPScMAJ4npYQq44N0lHZFnQzs6e0sk6MeC2Sf4G>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 10 Sep 2025 11:22:17 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Xiumei Mu <xmu@redhat.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: [PATCH ipsec v2] xfrm: fix offloading of cross-family tunnels
-Date: Wed, 10 Sep 2025 17:22:13 +0200
-Message-ID: <c4b61b2da197f2ef3742afec3f8866c5ab8e9051.1757516819.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1757518275; c=relaxed/simple;
+	bh=jc2/UzEiHHii7qwYws85Ns4EPsygWxg33Jjz8SvEiiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iOioRhqGZabZNumBQ7B5rNs5xwCkk5Ph8kr3SpduNJyfbmiP13fo/V3cansUDU9QiBYY7x/SoIiKJXjb+NFUBtyJ45jUnLHySkf6K83eRmAQgCBR85/sVeCGcxXKCIsendHlZ0tLzh1lowlSY9IN32hTaZv7yLJ0Sd1GX5KPRGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PbrcSsIu; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-32c54c31ed9so4282455a91.3
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:31:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757518273; x=1758123073; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aslT2dP/KbCqLz9yRRveBsORSsjyA/aQ8k1L0oN8zws=;
+        b=PbrcSsIuoYXNvNnkA8TMAiRC+U+K0vOeEVILZLZN1owUvd1zgZyNK/tO9mu/zDPnUo
+         OdRC41SUOaE4hE6nhVnQzFfJjr8dyqXZ3TktA1I0YUlBXbbKZHUsNrhWkpPWMFq9yGeT
+         QBZ0O4wy3goLWrL0lZPyT49UraPYUGs3ydzJRZw5gIxt+LU02ocOqXt4Jj3JcMUrqhoO
+         ZZ4rklPgyNM3gWLnh9H/PfVKdgHzJI5lMQLclUCxZs4VT3ZWhQd5imVjQueeZsf3xcL6
+         NFW+u2MDg+7a1460J27Fh4/OhVF7gWQtNdKujv8w1QWzuaUOD3ZrJctSjYNF/iUXJGJp
+         PjHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757518273; x=1758123073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aslT2dP/KbCqLz9yRRveBsORSsjyA/aQ8k1L0oN8zws=;
+        b=kl7z/cxB5apE/v7eM0YFpxZaGVchbgFX3TLopyHxW3R8ONLw4wnwwt/K9gYjTTkF+K
+         NQiAR5GmshFap/53hHd7YOC2+sf0rFjmOIZh7KLWK06wjNAV3ek63J9GfOsFRB3hxIis
+         DtVjbLvuLfaz4gogmJKcmcfBsIiVw5zL3dniA6W1CGRtTDqEhfpw9gDTLXjZbBz2M4lC
+         AagMKj1liBr0iYQxL87NpglWg0IcBRsONGj5MKBl6MIkpXU1ea/YcurFen03/j0qKeHE
+         4aFdc3qOFE5sVbbWahp/Oshdq5Twr6SflMrcYNsaAvHi5nDIqj6FmspP7cvM8HGkzL1T
+         7NfA==
+X-Gm-Message-State: AOJu0Yy8piq8olz+SxTjUtgMx/w7KEP/AwidL0k+IX82XptGeygL76Qr
+	xNBDJF0tkp/5n9oTKjY6swN+Ug1m5MgjvCqlsiKtcIZ+MAnhKClBsag=
+X-Gm-Gg: ASbGncv6VuhkLFiR++MsmOEq5JsZ+D9d7/SdKy0ZVEgaHxSSo+rLCPaLHrlQpErt9kg
+	EbfvnVAMM5pWkyZChmA658hZTfFzEmGGZUWMwa+BscgzIzc/PEFp+KBWJsRlpB5ZI8K5Cabb4AO
+	UEhO2xw3mxGrHiHzRrYcoK29nKlP24PJeiEOY9iH2ZABce3auF2ZVNgSg+Xu67PtFJ3Ct+1bcAl
+	H0+nd6IpM8bq34jo9GsjxmSlG4bUTrXOG1lnxMvXJBuTQIQdwSLfeuuJP8cBIocW63/UWkbP2PA
+	OQca0ymlOCNdvPBmAuIZNwFVthQzz82YUaWd/kCWDgsgjKsdb5vNhxK/ag4x4SDkZe/6MMGJJnH
+	miQ4zwxoKSvuvsQU0+22O/+areSAppTVJnHz9JX24bZjj9bped+Ar5SGDku1RrBOGVx39f5D1bp
+	UVDnw2mJCGGvN2eh66whDa5Gv5DEsvVu5wlvBW02zVZASx8LGms5+fEvK1cSOc7Il1MZvR+Mhoo
+	8H3
+X-Google-Smtp-Source: AGHT+IFJAsN22RzEZGX9qXHrJTseEBNmURBALNvMji0DSxk8mi2vxAkq0iZRnzEUXZZujDM5omoPXg==
+X-Received: by 2002:a17:90b:1fc7:b0:321:38a:229a with SMTP id 98e67ed59e1d1-32d43ef084fmr19911611a91.7.1757518272964;
+        Wed, 10 Sep 2025 08:31:12 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-775f6b42023sm2592143b3a.87.2025.09.10.08.31.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 08:31:12 -0700 (PDT)
+Date: Wed, 10 Sep 2025 08:31:12 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sdubroca@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv3 net-next 3/5] team: use common function to compute the
+ features
+Message-ID: <aMGZwEnJ943Rwf-Q@mini-arch>
+References: <20250909081853.398190-1-liuhangbin@gmail.com>
+ <20250909081853.398190-4-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250909081853.398190-4-liuhangbin@gmail.com>
 
-Xiumei reported a regression in IPsec offload tests over xfrmi, where
-the traffic for IPv6 over IPv4 tunnels is processed in SW instead of
-going through crypto offload, after commit
-cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
-implementation").
+On 09/09, Hangbin Liu wrote:
+> Use the new helper netdev_compute_features_from_lowers() to compute the
+> team device features. This helper performs both the feature computation
+> and the netdev_change_features() call.
+> 
+> Note that such change replace the lower layer traversing currently done
+> using team->port_list with netdev_for_each_lower_dev(). Such change is
+> safe as `port_list` contains exactly the same elements as
+> `team->dev->adj_list.lower` and the helper is always invoked under the
+> RTNL lock.
+> 
+> With this change, the explicit netdev_change_features() in
+> team_add_slave() can be safely removed, as team_port_add()
+> already takes care of the notification via
+> netdev_compute_features_from_lowers(), and same thing for team_del_slave()
+> 
+> This also fixes missing computations for MPLS, XFRM, and TSO/GSO partial
+> features.
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  drivers/net/team/team_core.c | 78 +++---------------------------------
+>  1 file changed, 5 insertions(+), 73 deletions(-)
+> 
+> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+> index 17f07eb0ee52..c5fbe392fc62 100644
+> --- a/drivers/net/team/team_core.c
+> +++ b/drivers/net/team/team_core.c
+> @@ -982,63 +982,6 @@ static void team_port_disable(struct team *team,
+>  	team_lower_state_changed(port);
+>  }
+>  
+> -#define TEAM_VLAN_FEATURES (NETIF_F_HW_CSUM | NETIF_F_SG | \
+> -			    NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
+> -			    NETIF_F_HIGHDMA | NETIF_F_LRO | \
+> -			    NETIF_F_GSO_ENCAP_ALL)
+> -
+> -#define TEAM_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> -				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE)
+> -
+> -static void __team_compute_features(struct team *team)
+> -{
+> -	struct team_port *port;
+> -	netdev_features_t vlan_features = TEAM_VLAN_FEATURES;
+> -	netdev_features_t enc_features  = TEAM_ENC_FEATURES;
+> -	unsigned short max_hard_header_len = ETH_HLEN;
+> -	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
+> -					IFF_XMIT_DST_RELEASE_PERM;
+> -
+> -	rcu_read_lock();
+> -	if (list_empty(&team->port_list))
+> -		goto done;
+> -
+> -	vlan_features = netdev_base_features(vlan_features);
+> -	enc_features = netdev_base_features(enc_features);
+> -
+> -	list_for_each_entry_rcu(port, &team->port_list, list) {
+> -		vlan_features = netdev_increment_features(vlan_features,
+> -					port->dev->vlan_features,
+> -					TEAM_VLAN_FEATURES);
+> -		enc_features =
+> -			netdev_increment_features(enc_features,
+> -						  port->dev->hw_enc_features,
+> -						  TEAM_ENC_FEATURES);
+> -
+> -		dst_release_flag &= port->dev->priv_flags;
+> -		if (port->dev->hard_header_len > max_hard_header_len)
+> -			max_hard_header_len = port->dev->hard_header_len;
+> -	}
+> -done:
+> -	rcu_read_unlock();
+> -
+> -	team->dev->vlan_features = vlan_features;
+> -	team->dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
+> -				     NETIF_F_HW_VLAN_CTAG_TX |
+> -				     NETIF_F_HW_VLAN_STAG_TX;
+> -	team->dev->hard_header_len = max_hard_header_len;
+> -
+> -	team->dev->priv_flags &= ~IFF_XMIT_DST_RELEASE;
+> -	if (dst_release_flag == (IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM))
+> -		team->dev->priv_flags |= IFF_XMIT_DST_RELEASE;
+> -}
+> -
+> -static void team_compute_features(struct team *team)
+> -{
+> -	__team_compute_features(team);
+> -	netdev_change_features(team->dev);
+> -}
+> -
+>  static int team_port_enter(struct team *team, struct team_port *port)
+>  {
+>  	int err = 0;
+> @@ -1300,7 +1243,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+>  	port->index = -1;
+>  	list_add_tail_rcu(&port->list, &team->port_list);
+>  	team_port_enable(team, port);
+> -	__team_compute_features(team);
+> +	netdev_compute_features_from_lowers(team->dev);
+>  	__team_port_change_port_added(port, !!netif_oper_up(port_dev));
+>  	__team_options_change_check(team);
+>  
+> @@ -1382,7 +1325,7 @@ static int team_port_del(struct team *team, struct net_device *port_dev)
+>  	dev_set_mtu(port_dev, port->orig.mtu);
+>  	kfree_rcu(port, rcu);
+>  	netdev_info(dev, "Port device %s removed\n", portname);
+> -	__team_compute_features(team);
+> +	netdev_compute_features_from_lowers(team->dev);
+>  
+>  	return 0;
+>  }
+> @@ -1976,27 +1919,16 @@ static int team_add_slave(struct net_device *dev, struct net_device *port_dev,
+>  
+>  	err = team_port_add(team, port_dev, extack);
+>  
+> -	if (!err)
+> -		netdev_change_features(dev);
+> -
+>  	return err;
 
-Commit cc18f482e8b6 added a generic version of existing checks
-attempting to prevent packets with IPv4 options or IPv6 extension
-headers from being sent to HW that doesn't support offloading such
-packets. The check mistakenly uses x->props.family (the outer family)
-to determine the inner packet's family and verify if
-options/extensions are present.
-
-In the case of IPv6 over IPv4, the check compares some of the traffic
-class bits to the expected no-options ihl value (5). The original
-check was introduced in commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add
-Innova IPSec offload TX data path"), and then duplicated in the other
-drivers. Before commit cc18f482e8b6, the loose check (ihl > 5) passed
-because those traffic class bits were not set to a value that
-triggered the no-offload codepath. Packets with options/extension
-headers that should have been handled in SW went through the offload
-path, and were likely dropped by the NIC or incorrectly
-processed. Since commit cc18f482e8b6, the check is now strict (ihl !=
-5), and in a basic setup (no traffic class configured), all packets go
-through the no-offload codepath.
-
-The commits that introduced the incorrect family checks in each driver
-are:
-2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
-8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
-859a497fe80c ("nfp: implement xfrm callbacks and expose ipsec offload feature to upper layer")
-32188be805d0 ("cn10k-ipsec: Allow ipsec crypto offload for skb with SA")
-[ixgbe/ixgbevf commits are ignored, as that HW does not support tunnel
-mode, thus no cross-family setups are possible]
-
-Fixes: cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback implementation")
-Reported-by: Xiumei Mu <xmu@redhat.com>
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
----
- net/xfrm/xfrm_device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-v2: reword the commit message a bit (Leon)
-    no change to the patch, preserved the Reviewed-by tags from v1
-
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index c7a1f080d2de..44b9de6e4e77 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -438,7 +438,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
- 
- 	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
- 			    x->props.mode == XFRM_MODE_TUNNEL;
--	switch (x->props.family) {
-+	switch (x->inner_mode.family) {
- 	case AF_INET:
- 		/* Check for IPv4 options */
- 		if (ip_hdr(skb)->ihl != 5)
--- 
-2.51.0
-
+do the same `return team_port_add` here as you do in team_del_slave?
 
