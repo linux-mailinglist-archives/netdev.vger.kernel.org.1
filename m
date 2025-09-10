@@ -1,131 +1,150 @@
-Return-Path: <netdev+bounces-221774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041CCB51D65
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:20:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61CC8B51D54
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5EC8567E51
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:18:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 41A104E3751
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46220335BBB;
-	Wed, 10 Sep 2025 16:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B15C338F55;
+	Wed, 10 Sep 2025 16:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="qPmH3VJY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eo/cER+n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB43335BBC;
-	Wed, 10 Sep 2025 16:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C7033769E;
+	Wed, 10 Sep 2025 16:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757521017; cv=none; b=YMQJEwWtNcnMHRRHB+AV1z8K0/ZtIYkYmoBoHIeqW2CeqJ4IRsIYiabJWL8S2/SMqjzq9TqUs+9iUxgpRVVta+m/XAvCqxjh6IFWr3JJSUf37+MBpGo1b2R9XG/d/Zm8F1fjc4xzKEX+YrboQLU/sA6iKiwldjPqXKFInQtrPK8=
+	t=1757521004; cv=none; b=uhel+9aKLf5p6dUjUAbUuxm/s4yxF3I1rrEgwiXS6M1StaKNPaIQ8MAw8Nj5pypx1plaAGTuHRFPiXIAt+okT+D4RfYdVp4C1pJ8yFylD0pe6qFnaVCRZb08UFygQ62MagS+Vphd9Ho74Qrbyw+ulgwb05Q9DyxZTKjnLkBWI9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757521017; c=relaxed/simple;
-	bh=4nq8DRBsVSBsAblqH/EyOXPCcAMalYSbOuE50hkeaK4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Hs229lNivUFYmJL2IVIfZJRLa0gTwlJHdD+gfOiRbxv0Uz8MFvVFVPWf4CdtjPOhzf7gMFfKHu0KinUBluF15ZRRxulNOAEHZHLzbsZlPEab0r1aM8CIlAbjEJkymoPtfa3hoC7J1jIAm6jWiBqzjhv79Yck9Nq02jmdJTdOJio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=qPmH3VJY; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id D7C4A1A0D55;
-	Wed, 10 Sep 2025 16:16:53 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C6713606D4;
-	Wed, 10 Sep 2025 16:16:53 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3B1E6102F28EA;
-	Wed, 10 Sep 2025 18:16:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1757521007; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=LXdNFB9s1KI4qT/Zy8uuZBXtEbtV6EJNZuxTcSFMG8U=;
-	b=qPmH3VJYltK62LYVdoa2NjIMGklmTfGDAvEDUum//CZyZ8bTHTC3KiWqJjZJWhdDrmRPoq
-	aLvu/EbyObDesJOfz7pjes1Bz2y0pKs6ujaPSAbIz0fd3p2rBjGwZ8oPw16jKzBK1cFtZC
-	kMK3I35Jwr5pH3hE2lemyiFiHIGkqfkxAe8fhOkhn3w8wajf9M5hm12WIWrE5T7Y5O6IWA
-	Ak9q8WsHFWaidb5Soh7sQIkHby0EhjVYRbx7ljuEvZIC7Ste0FQEcq59l1btlZCFY5X738
-	66AaroBfnZhOmoxhouXmV56wm7X2+SQQaHtEyX1+2m5e2UvYpGC0x9d/3htMgA==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Wed, 10 Sep 2025 18:15:34 +0200
-Subject: [PATCH net v5 5/5] net: macb: avoid dealing with endianness in
- macb_set_hwaddr()
+	s=arc-20240116; t=1757521004; c=relaxed/simple;
+	bh=NVFM3neR7N0A2HmQoK+ROHkmwptFlxIoqcQa9WgQUMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U+v0wlSyL7RsWm4Stg0Shij8nRFBtENEU0cfUGoIPlosd6vHhmpnv6s2p29x5VEUDdKhbTEprj3dy/Bt3Bz7SUvPX0yp0v9AubDm5oXrosNfz/6VZCAJDjd4kx0VUUy9YgNH0/TWUtnWQuD74warXIY/qLyAsoaCm0H2dyzY0ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eo/cER+n; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-76e4fc419a9so5823439b3a.0;
+        Wed, 10 Sep 2025 09:16:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757521002; x=1758125802; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JB5WUshzKYeKBoYX6JQ+1Pxk+oTXaSsiBLCl8BznXVo=;
+        b=Eo/cER+n3jygBbPbgSvY+hWayAi+QVounCoxBA/Beczp8VxmD+R5EVPwsJBNk992S3
+         Y3qGtDAm8ZK5jHszjk8YygyyIZETKFC9EdbSTXE0vnL0ASsZyTlfn6bmfYFh6FdJhpGV
+         ggg6SFoXOq8XBpghgSNgEl2T2JZzVT4ctZzux/YL5845YMyjHhXBK4Lrsr0Dg2V+YHVf
+         Q8267gKWD/IhFWzkf+u/J7MPTK7lchuHi2NgD4PCaJ5X9aYveLKzXFuhTTBgDofI/UVZ
+         u7xb6w721WlXhnR1+s1+J5YsXnAEzXGHM46Ciu3Rki++VrccuSxOKvhIQXDRHxw8uQHk
+         TAqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757521002; x=1758125802;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JB5WUshzKYeKBoYX6JQ+1Pxk+oTXaSsiBLCl8BznXVo=;
+        b=VqL7aMrC8fVMAF8ZdlH9t6CjtOPGqRzREtqEiB6j1uFpz+0g0WpAEWVrCcmLp2Enh2
+         e4LAv5O6NCuYdQXHlJHb/fHhqXhgKiNTXSD7xb6coo048BOV5Nx2+qVLNoUa1+3+d0R+
+         lo9ALW1U8jnFzOndNvL1C+z/RasqM1cYBnA83F20026jqQYcfcKjxywq4tdpTuKRL1sY
+         Kzug7zpxLaMtbw7rm8w/tlAaCl9GAl/uPlUFjeN52kgr/gYM1+9umv8heuqh8j8Sm9LK
+         +NMf2zrM3bxuRbFJgvN5kTxNtLkwG3gvuE+9kPnhkWvWh7F69tBs7Yo7hmYuk7kjQP5f
+         UQTA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/yII+9e3002EkpEXYYVBzLszZ+bvZut8100rEomw4dnB1POoUHb4glu1poqsProCwfwzOhuHCUwsuz7bR@vger.kernel.org, AJvYcCUznDVscwyL6NONsVtWE/gAEghxQDTckLLFg8h0yt26rvCMGsVOvB4jz8Cko8RRgf6HeWw=@vger.kernel.org, AJvYcCV0cwWke8/FNVDg0ruN1qm+oAUKk+7MZKd7Zxd2TRWF2XxBCdEHV3/2CaTRWaV+GdsiZY6MBnXpTddQ@vger.kernel.org, AJvYcCVWgqOxjZHw5oHCsHg23i0oxaBNwXPAykzXSIfkerfMxHmlLJk4Vy5tyCsruC5kGGmjTGHzlkofCrAnXA==@vger.kernel.org, AJvYcCW3yYoVfe17+AHeoYXvh4BllagSUKkGlJa5snwFoFgNsBVlfjFeipeImz3lr9M/aGXCGXqcoZVx@vger.kernel.org
+X-Gm-Message-State: AOJu0YwES8YfXGQ4IjpQ1IVERrGcApFMG+qYMms2h8SuEymnlx2OX8PR
+	eb5TrL17lJKrnMooDrnTxsVNwjYufX7Oy5EbClu3VOnDkJ+TqFEAKok=
+X-Gm-Gg: ASbGnct0PkWmvpzV3weMbHapnADMGBOYbs4/zdX2sdoEhKEoAlpUqpttCCueSlghx1v
+	j+rB3N2kchu1OCiBroimAyGVg8JUI2hODM6uLZfiabLqvZpY14A2/rqgx6A13adKPRrG4a0AG++
+	NSnvqTEGlaCwm5mYpeda5yeh04XFygNH2DQDNSQceHjgcWeChMlmLRcW5tfvJCdYQtxTAjZH+fu
+	E3686VljGE8ja6Zq/1ZYHUtJ9MvujIf1GORpX9ZlqHHiEC0N/WiHmYG6ubRxNtpAi2TMHltHR2C
+	aNHnW+hz7X73411rjLxkNjrUDbosy8OtsLNV50D1K9dV0qOh/b/dni6SwJPWW2T3Awt1Ph9+1VZ
+	m5UTeXLOJ3JD8KGxj/WuHk+CTehUsp5r98+899nGHo5wQkk7BMDiXuNGDa2xv5kDIgkjQNcYN0k
+	AZnJyZbGMx4JDB/qmP8+lDbNbjHq9Nwx4XQ3dL1xfc4Kcgj0l47T9EFgA5olZInTru8btgHCLjG
+	kibs1Hsm2mGaZY=
+X-Google-Smtp-Source: AGHT+IHqLINn057ngCZaw/jpWSqhs/u7NZ2CDFe0dasDSVTaVkcAUe46x0lZQDpoIcwp7hoWMZQPvg==
+X-Received: by 2002:a17:903:2b05:b0:24e:81d2:cfe2 with SMTP id d9443c01a7336-2516f04ffeamr229403285ad.7.1757521001758;
+        Wed, 10 Sep 2025 09:16:41 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-25a2742590csm32206725ad.8.2025.09.10.09.16.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 09:16:41 -0700 (PDT)
+Date: Wed, 10 Sep 2025 09:16:40 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 10/10] net/mlx5e: Use the 'num_doorbells'
+ devlink param
+Message-ID: <aMGkaDoZpmOWUA_L@mini-arch>
+References: <1757499891-596641-1-git-send-email-tariqt@nvidia.com>
+ <1757499891-596641-11-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250910-macb-fixes-v5-5-f413a3601ce4@bootlin.com>
-References: <20250910-macb-fixes-v5-0-f413a3601ce4@bootlin.com>
-In-Reply-To: <20250910-macb-fixes-v5-0-f413a3601ce4@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Geert Uytterhoeven <geert@linux-m68k.org>, 
- Harini Katakam <harini.katakam@xilinx.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
- Sean Anderson <sean.anderson@linux.dev>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1757499891-596641-11-git-send-email-tariqt@nvidia.com>
 
-bp->dev->dev_addr is of type `unsigned char *`. Casting it to a u32
-pointer and dereferencing implies dealing manually with endianness,
-which is error-prone.
+On 09/10, Tariq Toukan wrote:
+> From: Cosmin Ratiu <cratiu@nvidia.com>
+> 
+> Use the new devlink param to control how many doorbells mlx5e devices
+> allocate and use. The maximum number of doorbells configurable is capped
+> to the maximum number of channels. This only applies to the Ethernet
+> part, the RDMA devices using mlx5 manage their own doorbells.
+> 
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  Documentation/networking/devlink/mlx5.rst     |  8 ++++++
+>  .../net/ethernet/mellanox/mlx5/core/devlink.c | 26 +++++++++++++++++++
+>  .../ethernet/mellanox/mlx5/core/en_common.c   | 15 ++++++++++-
+>  3 files changed, 48 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
+> index 60cc9fedf1ef..0650462b3eae 100644
+> --- a/Documentation/networking/devlink/mlx5.rst
+> +++ b/Documentation/networking/devlink/mlx5.rst
+> @@ -45,6 +45,14 @@ Parameters
+>       - The range is between 1 and a device-specific max.
+>       - Applies to each physical function (PF) independently, if the device
+>         supports it. Otherwise, it applies symmetrically to all PFs.
+> +   * - ``num_doorbells``
+> +     - driverinit
+> +     - This controls the number of channel doorbells used by the netdev. In all
+> +       cases, an additional doorbell is allocated and used for non-channel
+> +       communication (e.g. for PTP, HWS, etc.). Supported values are:
+> +       - 0: No channel-specific doorbells, use the global one for everything.
+> +       - [1, max_num_channels]: Spread netdev channels equally across these
+> +         doorbells.
 
-Replace by calls to get_unaligned_le32|le16() helpers.
+Do you have any guidance on this number? Why would the user want
+`num_doorbells < num_doorbells` vs `num_doorbells == num_channels`?
 
-This was found using sparse:
-   ⟩ make C=2 drivers/net/ethernet/cadence/macb_main.o
-   warning: incorrect type in assignment (different base types)
-      expected unsigned int [usertype] bottom
-      got restricted __le32 [usertype]
-   warning: incorrect type in assignment (different base types)
-      expected unsigned short [usertype] top
-      got restricted __le16 [usertype]
-   ...
-
-Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index fc082a7a5a313be3d58a008533c3815cb1b1639a..c16d60048185b4cb473ddfcf4633fa2f6dea20cc 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -271,12 +271,10 @@ static bool hw_is_gem(void __iomem *addr, bool native_io)
- 
- static void macb_set_hwaddr(struct macb *bp)
- {
--	u32 bottom;
--	u16 top;
-+	u32 bottom = get_unaligned_le32(bp->dev->dev_addr);
-+	u16 top = get_unaligned_le16(bp->dev->dev_addr + 4);
- 
--	bottom = cpu_to_le32(*((u32 *)bp->dev->dev_addr));
- 	macb_or_gem_writel(bp, SA1B, bottom);
--	top = cpu_to_le16(*((u16 *)(bp->dev->dev_addr + 4)));
- 	macb_or_gem_writel(bp, SA1T, top);
- 
- 	if (gem_has_ptp(bp)) {
-
--- 
-2.51.0
-
+IOW, why not allocate the same number of doorbells as the number of
+channels and do it unconditionally without devlink param? Are extra
+doorbells causing any overhead in the non-contended case?
 
