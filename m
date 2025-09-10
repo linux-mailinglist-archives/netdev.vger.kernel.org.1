@@ -1,99 +1,77 @@
-Return-Path: <netdev+bounces-221758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D1FB51C72
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:52:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 840C7B51C90
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:55:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256811611D1
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:52:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C013188B190
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A980F327A21;
-	Wed, 10 Sep 2025 15:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Y1GBgcaB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C26331AF2C;
+	Wed, 10 Sep 2025 15:54:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA4324113D
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 15:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0819E32CF8E
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 15:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757519522; cv=none; b=Zbv0WvhEOXEWuJcp+KOrB3V2qRPEwOVXn/Io80z/HWV40ovYJZKaPmW0eJ77n8I5lwsmVz8A5O4b1q17mQROuQaF5M4ZppJPSxenmjcVCTLScEQKBOU9aftREjFCtHzd/GAF6HlTkfsMNxS9wWGbQLZgpKn/ruzvVbt9Ljs95ws=
+	t=1757519656; cv=none; b=MDeIaZtTq5x1EkxeUKncpsxwvqBJX7Ij3AhgVhTVAuXC9qQXI4e5Kl92nYYDp5kR0sFHILIlWjbX5rKXGVtGL5xwVA+eZt0x8tOsIoh6QrF0T+BusErn9iv+p2xbHL1sAPYoOTmvtWWHejMcJ0SMHKP+riaLw5HC6kM/QUX7b1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757519522; c=relaxed/simple;
-	bh=mvncor3HI+W9A/gmILLwXoL0QG8/oktXJxYei8rUIPY=;
+	s=arc-20240116; t=1757519656; c=relaxed/simple;
+	bh=C1AjRx7KnjXXSlctsl/aH4GowViazJTD/uAewQRTZB4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lF/f8KDLYk3k7H3XzNtxDhBN+0wEL0N9rbIGMISq1Qxr0VPiSavam1jkp+AG+oMBirNGw5ttV4+4sBY/9OFOJ+WK9LYl8QgN02652ZdIxDmNCf4eG4fjSDmQjfxuP2UNnXyUzgvpWG8X/aBwe0N+frWHhfOXYBufb42kjorIqeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Y1GBgcaB; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-61d3d622a2bso1324490a12.0
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1757519519; x=1758124319; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xXqCK+svVlBuAMsr5p4huDSfMQXIvsA6yKXWJhLo+iU=;
-        b=Y1GBgcaBhHBdzdjHWdJctGakxSRj+kMJI1Ps1TNkTxlqvMP0fXGLokw5tygfBg2zTx
-         tmhelTbKHBV7xR/aECg9Bzy8FsW/PZIxKg363P0UANJBeNjHwpAF70ncVUWP94HmExuX
-         XvAPy1lprQBoVhkroDfV982PSsEGbwXmGx3A9/2KP7nDVsDuf2jtJuHgQTMBcwWGuwtJ
-         bRk6bSrBGrGET4dD/uiU9x8AiQRajepM2eGBPSelrE8okrBu6Y6n8GU9I0/jNQ6J21Rb
-         q13LX7H92PCwTGLYlNB9Psn3ihJkMO0X4AW9yzZGc9e1/2zDeSoQQHU2WLpEZiYpt43i
-         Qsuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757519519; x=1758124319;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xXqCK+svVlBuAMsr5p4huDSfMQXIvsA6yKXWJhLo+iU=;
-        b=cbEBOQ3KxcIAU8uSA1Gx8XMlh0kRdOD6jAPw6Av8Jg+D3WAmU5+A/JdpxL+IdYD/zJ
-         ZIm8d27e7hxZ16GsZBpmutJhmRdqJz3k8MuhER+f9fmeuXzCtAJCx6O1sNs55fnW7tjr
-         3XYXXeReTREx8W9EtzRu4j62l1lghu2zYmc/l3XBmRqH8SxEcsPVfjM1FgbHvsJgvcrF
-         xCxG/IrOdO/Z0CEYBPbOtdd7bOVyWMovJrLEwC14No1vSUIo9FNZ2txUaRMB7ud0ncI6
-         PbmZVozFZlCfnFwnUHCB7PLggQRzwmP0EMZuo5q23EPLOxs5/6RYj0ASELgG3L3WTeXc
-         Pl6A==
-X-Forwarded-Encrypted: i=1; AJvYcCWgobSgffxuB+TnEyDP4W3c0uV0zjA9iFb40l7lvI05817T6NZRviODKiWQ75ebYEz+a9iOlYU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgCjhSLawL+ZJmewaHqQg6xP08VJcU54qUrEokPULWll4iRUGX
-	4a4tPPPZokB05Sq+bZyaFSkv5aoBaPqT4oJSnXQXeGWaR6NmR6cH6KYToJ9Eryw+77s=
-X-Gm-Gg: ASbGncskOJ0K95PuVltyM9XMHz47ASeOAxUC0B2z5MQg+TDzQPI8PyYUxOK3SouaObi
-	MQPvPglOIxllHVdEZQTWsVcPeH0hgAxP5iKk6nmBrwphuEp1qEFCwsks7CuMjfKi/8+HBtsSCid
-	FU1rlnn4cd9qhwlFEWWROou9xQdorq9NLeQv4Df1zzBpNLGrivpytvNVGuQ+iLrQheJK6sXQJxt
-	gys/4GRcqjSQFfXnpZr87hIO0R6h1PnO0yHT8EZ4RkRmakHN+lqY/H6n7PRGmtiadzvK162zOc7
-	5AnAT+iukD5e4ANGlX0w2vPoxU/pAzDKn3Us6tDiP3d3ksdzRln+bnE/vlVjRy7DFVCwYkOyVQP
-	u9lbFM4hXC018p0XnqFkfNHzF1V5/HlvM4zrG
-X-Google-Smtp-Source: AGHT+IFE9TusuMunCFfr6wNayngNXse/YHX3kwzAYccUed2qnbY4WVC4DPlKEEAXxnWfgkh/JZJ6bw==
-X-Received: by 2002:a17:907:7faa:b0:b04:5d56:d838 with SMTP id a640c23a62f3a-b07a648315amr9092266b.20.1757519518832;
-        Wed, 10 Sep 2025 08:51:58 -0700 (PDT)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62c018f6a7esm3543294a12.42.2025.09.10.08.51.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 08:51:58 -0700 (PDT)
-Date: Wed, 10 Sep 2025 17:51:56 +0200
-From: Petr Mladek <pmladek@suse.com>
-To: Calvin Owens <calvin@wbinvd.org>
-Cc: John Ogness <john.ogness@linutronix.de>,
-	Breno Leitao <leitao@debian.org>, Mike Galbraith <efault@gmx.de>,
-	Simon Horman <horms@kernel.org>, kuba@kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>, paulmck@kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
-	boqun.feng@gmail.com
-Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-Message-ID: <aMGenGUNcBbRUUf9@pathway.suse.cz>
-References: <b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt>
- <4c4ed7b836828d966bc5bf6ef4d800389ba65e77.camel@gmx.de>
- <otlru5nr3g2npwplvwf4vcpozgx3kbpfstl7aav6rqz2zltvcf@famr4hqkwhuv>
- <d1679c5809ffdc82e4546c1d7366452d9e8433f0.camel@gmx.de>
- <7a2b44c9e95673829f6660cc74caf0f1c2c0cffe.camel@gmx.de>
- <tx2ry3uwlgqenvz4fsy2hugdiq36jrtshwyo4a2jpxufeypesi@uceeo7ykvd6w>
- <5b509b1370d42fd0cc109fc8914272be6dcfcd54.camel@gmx.de>
- <tgp5ddd2xdcvmkrhsyf2r6iav5a6ksvxk66xdw6ghur5g5ggee@cuz2o53younx>
- <84a539f4kf.fsf@jogness.linutronix.de>
- <aL88Gb6R5M3zhMTb@mozart.vkv.me>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bv/YptQUh8up4SLbY0qZzbRUOyOeakRSzZEOqaxODYOBuSxh/GeGEPurpyHP4lUvqg+sqyaxZVP6xlvoIoMuq1cbWw5A/Fl/WlDkxXHwhYrqWKFs/ybNSZgFAifWFUBOqETTgUiH74pFgTQc7XBLIfC6W2NPEOWSvPmrgrd97zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1uwN8y-0008U5-Ku; Wed, 10 Sep 2025 17:54:00 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1uwN8x-000cAf-1T;
+	Wed, 10 Sep 2025 17:53:59 +0200
+Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1uwN8x-00GJ0O-0v;
+	Wed, 10 Sep 2025 17:53:59 +0200
+Date: Wed, 10 Sep 2025 17:53:59 +0200
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Mark Brown <broonie@kernel.org>, Jonas Rebmann <jre@pengutronix.de>,
+	Andrew Lunn <andrew@lunn.ch>, imx@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>, linux-sound@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	Shengjiu Wang <shengjiu.wang@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: nxp,sja1105: Add reset-gpios
+ property
+Message-ID: <20250910155359.tqole7726sapvgzr@pengutronix.de>
+References: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
+ <20250910-imx8mp-prt8ml-v1-1-fd04aed15670@pengutronix.de>
+ <20250910125611.wmyw2b4jjtxlhsqw@skbuf>
+ <20250910143044.jfq5fsv2rlsrr5ku@pengutronix.de>
+ <20250910144328.do6t5ilfeclm2xa4@skbuf>
+ <693c3d1e-a65b-47ea-9b21-ce1d4a772066@sirena.org.uk>
+ <20250910153454.ibh6w7ntxraqvftb@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,90 +80,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aL88Gb6R5M3zhMTb@mozart.vkv.me>
+In-Reply-To: <20250910153454.ibh6w7ntxraqvftb@skbuf>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon 2025-09-08 13:27:05, Calvin Owens wrote:
-> On Friday 09/05 at 14:54 +0206, John Ogness wrote:
-> > <snip>
-> >
-> > NBCON is meant to deprecate @oops_in_progress. However, it is true that
-> > consoles not implementing ->write_atomic() will never print panic
-> > output.
+On 25-09-10, Vladimir Oltean wrote:
+> On Wed, Sep 10, 2025 at 04:09:05PM +0100, Mark Brown wrote:
+> > > And if you plan to do that from the GPIO function of your SoC, the SoC
+> > > might be busy doing other stuff, like booting, and no one might be
+> > > driving the RST_N voltage to a defined state.
+> > 
+> > I suspect you're reading too much into the datasheet there.  I suspect
+> > that what it's trying to say is that the reset signal only works with
+> > stable power and clocks, that it must be held low for the 5us while
+> > those conditions hold and that you have to do at least one cold reset
+> > after power on.  The above wording is pretty common in datasheets and I
+> > know in a bunch of cases it was carried forward kind of blindly rather
+> > than looking at the actual device requirements.
 > 
-> Below is a silly little testcase that makes it more convenient to test
-> if crashes are getting out in a few canned cases, in case anyone else
-> finds it useful.
+> No, it doesn't say that, and I had discussions with the application
+> engineering team for this chip about this :-/
 > 
-> Testing this on 6.17-rc5 on a Pi 4b, I don't get any netconsole output
-> at all for any crash case over wifi, so that already doesn't work. All
-> the cases currently work over ethernet.
-
-I like this test module. IMHO, it would make sense to get it upstream.
-What do you think?
-
-Some comments below.
-
-> ----8<----
-> From: Calvin Owens <calvin@wbinvd.org>
-> Subject: [PATCH] Quick and dirty testcase for netconsole (and other consoles)
+> I can't comment on anything extrapolated outside of the SJA1105/SJA1110.
 > 
-> Signed-off-by: Calvin Owens <calvin@wbinvd.org>
-> ---
->  drivers/tty/Kconfig     |   9 ++
->  drivers/tty/Makefile    |   1 +
->  drivers/tty/crashtest.c | 178 ++++++++++++++++++++++++++++++++++++++++
+> > > It really depends on a lot of factors including the reset timing and
+> > > supply voltage distribution of the PCB, but RST_N has essentially 2
+> > > purposes. One is ensuring proper POR sequencing, the other is cold
+> > > resetting at runtime. You can do the latter over SPI with identical
+> > > outcome, which leaves proper POR sequencing, which is not best served by
+> > > a GPIO in my experience.
+> > 
+> > I'm not sure not including the signal in the DT bindings is going to
+> > influence board designers much either way TBH.
+> 
+> Either way, something has to nudge at least the software developer
+> towards finding and reading the vendor's relevant documentation.
+> 
+> In that sense, 'reset-gpios' is misleading to say the least, because
+> everyone sees a reset GPIO and has the human tendency to think there
+> isn't anything more to be known about it (like I also did).
+> 
+> To be clear, I'm saying that supporting 'reset-gpios' in this driver was
+> a mistake, at least in the form where its supplies and clocks aren't
+> also under control. I'm not sure it's a mistake that we need to document,
+> and if we do, there need to be a lot more disclaimers. Also, I'm pretty
+> sure nothing will break if driver support for it is simply removed.
 
-I would put it into lib/test_crash.c. It is similar to
-the existing lib/test_lockup.c
+IMHO silently removing the support will break designs for sure and
+should never be done. As said, imagine that the firmware will handle the
+supplies and the driver only needs to release the reset. If you silently
+remove the support, the device will be kept in reset-state. In field
+firmware updates are seldom, so you break your device by updating to a
+new kernel.
 
-> --- /dev/null
-> +++ b/drivers/tty/crashtest.c
-> @@ -0,0 +1,178 @@
-[...]
-> +
-> +static ssize_t __crash(void)
-> +{
-> +	pr_emerg("BANG!\n");
-> +	*(volatile unsigned char *)NULL = '!';
-> +	return -ENOSYS;
+One could argue that the driver supported it but there was no dt-binding
+yet, so it was a hidden/unstable feature but I don't know the policy.
 
-I would use similar trick as SysRq-c and call panic() directly,
-see sysrq_handle_crash(). Something like:
-
-static void __crash(const char *context)
-{
-	panic(Triggered crash in context: %s\n");
-}
-
-> +}
-> +
-> +static void __crash_irq_work(struct irq_work *work)
-> +{
-> +	__crash();
-
-and call it like:
-
-	__crash("irq");
-
-> +}
-> +
-> +static int __init setup_crashtest(void)
-> +{
-> +	INIT_WORK(&bh_crash_work, __crash_bh_work);
-> +	init_irq_work(&irq_crash_work, __crash_irq_work);
-> +	crashtest_dentry = debugfs_create_file("crashtest", 0600, NULL, NULL,
-> +					       &crashtest_fops);
-
-Match it with the module name: test_crash.
-
-Maybe, do "sed -e s/crashtest/test_crash/g".
-
-> +	if (IS_ERR(crashtest_dentry))
-> +		return PTR_ERR(crashtest_dentry);
-> +
-> +	return 0;
-> +}
-
-Best Regards,
-Petr
+Regards,
+  Marco
 
