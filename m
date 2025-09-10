@@ -1,114 +1,142 @@
-Return-Path: <netdev+bounces-221557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19BAEB50D9F
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:01:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8860FB50DD8
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 438241882F18
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 06:01:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FBA1545CE5
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 06:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901F0303A07;
-	Wed, 10 Sep 2025 06:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jy6xy7XY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A89303A1A;
+	Wed, 10 Sep 2025 06:08:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CEF3019C1
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 06:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411F22E0914;
+	Wed, 10 Sep 2025 06:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757484075; cv=none; b=UMn0QT+g6cq/UOwj612avFcsPJNLV54DKK41dieQe4kPgM0efkcQQMtvb9PuGA8Z3PH2hs9QtoTSjMoHD+wutamxVa/2KC/r0GQfk9Z8H2kN+XMz9HX68pbEEx/Byvf+gKtZM1GAiKsyWm4ZgqE68zKYl8a2zqIBr3g+W3JBYqA=
+	t=1757484535; cv=none; b=pDZC3J8aJoS+jn/tlFp7P03vW3DrZ4MFBIY4owgPAtnVl8SU2Jl2wjameckBGM0Qv1wjy/6yTON6xBAfF/QO4UnEvNBrPFHiZ6dWQhwAYc1HOuhxwmhDX+uLA0SMHl7/bQ01C10AUZS5S/4YG2Zmu1owLdRUE3xLUvCx/J4Xe+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757484075; c=relaxed/simple;
-	bh=grZ8xIw2oQRi1EBEOlVcofDCDFihthbxv3v/v65+s3w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NGqsey/5kounT0Ztwro1P/VzYuM0PC3pCmdYh7dyLWJBItdh6VxFvww6OEZ6htmVgBZiNUgy/6y2pcuFP983A4N/TeL5dSKKEQ7IKRKL6k0lYx/Il6MG6ppwpqfoFgDQ9iaPFZalenxiN8rvs9Dvyy5twSYgT1JvvPgKv+lcj2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jy6xy7XY; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757484074; x=1789020074;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=grZ8xIw2oQRi1EBEOlVcofDCDFihthbxv3v/v65+s3w=;
-  b=jy6xy7XYbqSjcscW1MNnV/T1cXPSxhNIs2zjA7xQ12m4q4JpwyEnPMIj
-   ome9H1PjrHt7JdqyYiVUgJGqSJxJ6Qgz5lZndyEyk+DSEct3hspM4AHGy
-   4cl/oNd2Wwokjj0MxDEV3JfW2F7PFEptFRW6sOG6DbYrB2+tUIIGp0XHS
-   X6xr/OiGjIDMYHqQ1qzW0r60w5+e5HYVTGzx5yhfdDlftHEqFBEp2Iie7
-   H+2R1jupPvpAHunx6sWo7d9P26DdJyulCgqOyIaeLnZht4wqLEUdg0Dcb
-   TAGRDDjvPn0UA/RCyL47khq3NQjrgIJXr7ln49VQ/arx+sYK3ao3x4TAy
-   A==;
-X-CSE-ConnectionGUID: Y1KsQTbaSHerMvPIZsSjuA==
-X-CSE-MsgGUID: yNoR9PI4QM6ddgc/F4drEA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="70474134"
-X-IronPort-AV: E=Sophos;i="6.18,253,1751266800"; 
-   d="scan'208";a="70474134"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 23:01:14 -0700
-X-CSE-ConnectionGUID: ZP8buqKkTbuXwhpefTcIuA==
-X-CSE-MsgGUID: MFBcrFZKSbat0SbSseOGAw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,253,1751266800"; 
-   d="scan'208";a="204058044"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa002.jf.intel.com with ESMTP; 09 Sep 2025 23:01:10 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: [PATCH iwl-next v1] ixgbevf: fix proper type for error code in ixgbevf_resume()
-Date: Wed, 10 Sep 2025 06:01:08 +0000
-Message-ID: <20250910060108.126427-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1757484535; c=relaxed/simple;
+	bh=KMmBva1L6oq1petJzWJQavLDOtTPnQ9KGpbg3rqed/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JTCQlqpc/0rT6zlyd8mIFELa6D/ILdvZX8I9jWRifEAMEPpQ7rO1HWxPL2LSYuQleiWF4Mx29X3cMJaheowBqGiIw5aa1Ls+1vi6rofpVfVYCADyOHR9DsxFQLaRmObl11anKjI3QzAmLDtoi6Rtrw7xayT7E6lVTpQNy2xpHP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpgz10t1757484503t08168aa3
+X-QQ-Originating-IP: Ew+8s+LzfA5OwEiNafRW2h3+9QZEiFMDofzR3uikl44=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 10 Sep 2025 14:08:21 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 17856896380155524991
+Date: Wed, 10 Sep 2025 14:08:21 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Anwar, Md Danish" <a0501179@ti.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, corbet@lwn.net, gur.stavi@huawei.com,
+	maddy@linux.ibm.com, mpe@ellerman.id.au, danishanwar@ti.com,
+	lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org,
+	geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com,
+	lukas.bulwahn@redhat.com, alexanderduyck@fb.com,
+	richardcochran@gmail.com, kees@kernel.org, gustavoars@kernel.org,
+	rdunlap@infradead.org, vadim.fedorenko@linux.dev,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v11 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <00A30C785FE598BA+20250910060821.GB1832711@nic-Precision-5820-Tower>
+References: <20250909120906.1781444-1-dong100@mucse.com>
+ <20250909120906.1781444-5-dong100@mucse.com>
+ <68fc2f5c-2cbd-41f6-a814-5134ba06b4b5@ti.com>
+ <20250909135822.2ac833fc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250909135822.2ac833fc@kernel.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OQhZ3T0tjf0acGQGaFWgRYFVszEd/j3r0eNAa8ufDCFs+62rEjcOnnS8
+	CS6MWBlYQqpnKSLipZyIZ2uklLro6YOj52omPiQtGXuxjyT4w14hCGDBI6ii94TXJoBL3TT
+	HN+OvVQRVT+/BRmpixIZ+BLzq4O/KHrE7tSE6nyz1mx4tes9fW7575l7AcoAJjQrIOizucL
+	/qomM2YEflJmdEq3gQapPDaCPKTMDlghmJ4+pIYdnAoEA+6/LbtEOUIWP+784/366MwdtG/
+	uHE1Z34b6r2pVgtvacjdo4YT50HbFcQAHSc/6nlnc5e1H9ywVwqH3QwWdrB7zN6XDRSjLGT
+	GEF6hOtcbMRZ75vp9A8lD0s310sNib+3sIEhfoBEiE2VHr/ubCGjv6RwHNs5ebFZWtIb8rs
+	sWVBvSPS4vAxyssS9fCNNBOGPykq6QWgenkvkkV5hV7kSztwy8/Gagp2cT0BlYgbP2CoNjZ
+	tyWOPnXjRIxDiHjXMrgJjOkDFsbdC5Ji3GbNQrLknNFy6Fb3eQUBo2t9EG7EEL5EcWQujtR
+	2IbRyPXtom1gjxQ2Ojf0PbHG0AlhObCmXRhG2/VRV9pnRyrv1ciBAmt/zqX56Qn55/e0aUD
+	HA09wjOwL0qEVkpiP2HlMgmHrOeVD9AEw0kS1boQmaS9elarBhaV2D0XavJGHZ3Ix1NyxRt
+	WqDDhqal0VF0lo3f+vRWFRPyizXYk2GQB+dvMtXGGpLVsQu3Oz05nOJqEsGBTXG8Bcpcl6J
+	5veAbcwrCWX+nj5EO04oZRSD1ZV4osHcp+/ayoC26hroq1jZ8TdAsyvUH2NRfkLQz1oZhau
+	qP02PbEvIAHxaVvV/+xUx4S18crMaBW2yLUqAuh/PoQ7zj09/ZTRroCoVDCgMSVStH1NK92
+	24//R+TOlY9UL0iWcm2yXecdWY4fSkAu5RAMIQ5r/ybSLnLoYchVpYT3kmjw2+bnt8Ggxch
+	mpzceVHW0a1C28feA53DCDjh5fcR6c2Ahe39RLBewQpswOmgGx/469jXdiVl7CtPU8aGcaC
+	8jLxYls9geT1feQiLQ+Fc5d6FNMsIWLXK37yirEcUhWFciUCYP34Yl0vZ7IGjTc82DJxtF1
+	J84txDg7zFx
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
-The variable 'err' in ixgbevf_resume() is used to store the return value
-of different functions, which return an int. Currently, 'err' is
-declared as u32, which is semantically incorrect and misleading.
+On Tue, Sep 09, 2025 at 01:58:22PM -0700, Jakub Kicinski wrote:
+> On Tue, 9 Sep 2025 19:59:11 +0530 Anwar, Md Danish wrote:
+> > > +int mucse_mbx_sync_fw(struct mucse_hw *hw)
+> > > +{
+> > > +	int try_cnt = 3;
+> > > +	int err;
+> > > +
+> > > +	do {
+> > > +		err = mucse_mbx_get_info(hw);
+> > > +		if (err == -ETIMEDOUT)
+> > > +			continue;
+> > > +		break;
+> > > +	} while (try_cnt--);
+> > > +
+> > > +	return err;
+> > > +}  
+> > 
+> > There's a logical issue in the code. The loop structure attempts to
+> > retry on ETIMEDOUT errors, but the unconditional break statement after
+> > the if-check will always exit the loop after the first attempt,
+> > regardless of the error. The do-while loop will never actually retry
+> > because the break statement is placed outside of the if condition that
+> > checks for timeout errors.
+> 
 
-In the Linux kernel, u32 is typically reserved for fixed-width data
-used in hardware interfaces or protocol structures. Using it for a
-generic error code may confuse reviewers or developers into thinking
-the value is hardware-related or size-constrained.
+What is expected is 'retry on ETIMEDOUT' and 'no retry others'. 
+https://lore.kernel.org/netdev/a066746c-2f12-4e70-b63a-7996392a9132@lunn.ch/
 
-Replace u32 with int to reflect the actual usage and improve code
-clarity and semantic correctness.
+> The other way around. continue; in a do {} while () look does *not*
+> evaluate the condition. So this can loop forever.
+> 
 
-No functional change.
+Maybe I can update like this ?
 
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+int mucse_mbx_sync_fw(struct mucse_hw *hw)
+{
+	int try_cnt = 3;
+	int err;
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 535d0f7..28e2564 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -4323,7 +4323,7 @@ static int ixgbevf_resume(struct device *dev_d)
- 	struct pci_dev *pdev = to_pci_dev(dev_d);
- 	struct net_device *netdev = pci_get_drvdata(pdev);
- 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
--	u32 err;
-+	int err;
- 
- 	adapter->hw.hw_addr = adapter->io_addr;
- 	smp_mb__before_atomic();
--- 
-2.49.0
+	do {
+		err = mucse_mbx_get_info(hw);
+		if (err != -ETIMEDOUT)
+			break;
+		/* only retry with ETIMEDOUT, others just return */
+	} while (try_cnt--);
+
+	return err;
+}  
+
+Thanks for your feedback.
 
 
