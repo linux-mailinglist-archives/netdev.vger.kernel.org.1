@@ -1,185 +1,120 @@
-Return-Path: <netdev+bounces-221600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81111B511A1
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:40:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3022B5135C
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 042AF3B179D
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 967EF3B4913
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A725E2BF3CF;
-	Wed, 10 Sep 2025 08:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA27314A78;
+	Wed, 10 Sep 2025 09:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJwZbD9s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YygIbnNF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B3D24A058
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1782571D8;
+	Wed, 10 Sep 2025 09:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757493632; cv=none; b=iMeYKfSHfCsbAX5C6hwY2lWN0KmH+F5xRczCQBKmXpCFvQRjObfahjHCC5cGdT738EMru5Qpnx5F/uJJnX0n8Su1BT1LyBo34Z3IkvPvdp2gRb1EuLPIpTV58o+b5I6CelDvmmkyEKk4TS3xc1cpyDksLuRglLu+u3Fp2TVuLiE=
+	t=1757498342; cv=none; b=uocB1AxjnvXMc4Bm/oD9jSPpQnkz4wgweEZaQTn/Rsctk6WrHeJoEKz35Gzd0rMgu0GmqFF4H3g470BvOuuvPYc0j/eAOJr4xnOjlCaxLkOKtIST7TNzJMCkljZWpkITHBRJXcw+pIuu/1gwRnwyWacEPk1TCfffrhzCEZlh+GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757493632; c=relaxed/simple;
-	bh=dqzOebhYtBEm/9mdnkeCrdoukRPVSibFUQqAe+v50KI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fcLVOMe0bICu9b4e3wntRb0UXxNanCwTDSWKbSZBU5b6j6c3u60Kohl0XVTSlVphiIOIRmuqluLvEi/dTjXTGNtloA6XGp2Q6qa/pl25HwzPr/fnszdCEyWMwu5WgGZ/TiQlxIRcj0e62I+yy9mm9PqPkNzwMNSwWd7CrKE7g8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJwZbD9s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C16AC4CEFC;
-	Wed, 10 Sep 2025 08:40:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757493632;
-	bh=dqzOebhYtBEm/9mdnkeCrdoukRPVSibFUQqAe+v50KI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jJwZbD9s5jPqDoV20gcRFE8VgiUyMTNnpIzA8VzK9PeLYi6swB+uA5AvsLuWl3cjl
-	 zAbVMq1U9Fpbi1NoDAFH8GfOkmtr/1h3Zj+rztysJOLnTnYcWt6Fxugb5opetD+h0d
-	 TppZ9/UKqLDmXF9kA9bWAwYdsG0eFJJMoDz1gS4ezMWOpITnrA8wzIqtSnOsUG48Ur
-	 DrpmTAbVNodfFYlrX6wabrCV/s/jspNAKU5L/eVzbqRvxIaiqOgbd2BIUTrx8HLzHX
-	 CG0WyKtLWC7Tt6pMzuVCv09oa/Z77dAgoJox8YG2Q4rnjTJErRmGAmo1LqSNDTu6Tv
-	 voRynZYLezNxA==
-Date: Wed, 10 Sep 2025 11:40:27 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Zhu Yanjun <yanjun.zhu@linux.dev>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Xiumei Mu <xmu@redhat.com>
-Subject: Re: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
-Message-ID: <20250910084027.GL341237@unreal>
-References: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
- <20250909092315.GC341237@unreal>
- <aMByADrbXBAXzIJr@krikkit>
- <20250910054550.GI341237@unreal>
- <aMExEjj3I4ahnMHc@krikkit>
+	s=arc-20240116; t=1757498342; c=relaxed/simple;
+	bh=BCXjFIv5eUOEWTgnUI3HxkUvkh3QdFBmS5Rfy5izgT8=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=Q/Z6WmjyD+w5uc3SSnc+VFhev2Tbf7vQU0lP0Da0/XfulclGMZMBLXw58SbKesRXuNx08fI4w9UiVQRaXY7K59V7v81FmXA4NNDTdaa+31msoidLaHw95U2Xn0njLp8Zskh90Bo8OIINSZ0rozSsERkX4exxkMfKnqsc7fu7z4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YygIbnNF; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3db9641b725so6549886f8f.2;
+        Wed, 10 Sep 2025 02:59:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757498339; x=1758103139; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dcj8LHmCHhhzaPZqNxD2R+CK+UNale4qQvJ5EcHfdLQ=;
+        b=YygIbnNFmug24FErkWblhqTHNHIaFW8M3plnP94wPu4Auo4T5lrlhQ4j7v19AmZEyH
+         N7+P/xfFkhxf1JxtrgX3Sx83icojpu0A8ndeaxOMFHKHeo31Bxkw32vmV2Cv8TQwubpV
+         do43EKLXdE9HSaxacIUJV+xPYk1MYBoXXjLkLnh9hFxmU2cbBrtWPfNvS6yppeDDOOep
+         dLoivbxjs1zTRk1yR5YGzIyVYdTwk2uYtCM3aRBFEmYlbTlrgoA8A1YsuEf0QB0rKcpG
+         kQGUG+Q/9Cr4/m67oTLwD/DNO2GV4Ydt6rqNq319WtIn9mlqx1Qo/akKq0JPC9TXf069
+         YOlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757498339; x=1758103139;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dcj8LHmCHhhzaPZqNxD2R+CK+UNale4qQvJ5EcHfdLQ=;
+        b=YhtkzNc2PchHRUCMrssY/Yqt4Snayn5uMzpFEUnz15C1KS3B0r5Mji36uSkLvtzM08
+         fFLdq4nhzTeXN45cJWSWk29wUdm4VAjA7il3VOCkv/kc3k8QvglqovVbyqrU2Xk9Nqzr
+         +kRO3MnW8+MI0aCLOnZGGRexlz4Wehnt/obkrgYWwp2IOxs0Yerii+3OzTNTPz20J3qa
+         ntWfYxkQ8prigiEfe9k4bRe24lhFHN5mW3+BB91UJpWFBt34KWfToiOIxsALmBla2R8B
+         dATfzmKpxUXqfeVa4j/3Fwzvef2cOWL9BXBxJzs0k6a0HzYEg0gCMgJhG9tlSIgIrq6p
+         S1zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUVfWBNcwfWTR/KNoPYnLcEJAG1qe5+92RXz1a5qs2ZC72iq6adKs+yRYLS3UZGSBeoQZeHWcnc@vger.kernel.org, AJvYcCVTaq8unD0H99zcfEdbK+FqvNDcp3bfKEHzeiTRv7YkHRiFloui4KjDddzSbkRhpLzvrI7TjRzKY9UpRAo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyML7lTurmJCqlE8114KWt4xP0SIFRBY4HoqZpYNI1l+9+nr4V7
+	1AOp+ouv8saEwOZ36olRae6F2XcxNb0OfXfWHptzaLbUa33K+cBwTmBC2ET6d2QRELg=
+X-Gm-Gg: ASbGncsr7PR3Yr6JFCO2f257gV2lXnIM46BPvm5iZvqQ9WrhdbEDRkJxLGeUSa7E3yt
+	HyMyS4y+uh7Pl7vMKHKYym/tfaYmXRW8eKV5MGZJ/ppCIbcT3tFxhjEOKfEauK36WMnAzIh2+VP
+	yg5ggHBx9baMNgSFjZdnzS6zYq51pdZIx0UpKg8/gE8ljT9B4e93cZX1U9FtcP1l9FxCOop1eEp
+	xph8iGSmgKxN61JE2eJ20rzrX2BfgXTOe3o35wAIvvWQjX3JLeDw8AjJ/uJYFLC19/ldHJ7utDB
+	vXcB0xJKNutWNmwmb7qn5XiKZttWqwaoxOmOzEXHfckLWx9JTa7C5SIZ9RaNU1ewGGrug8dUp0w
+	l0m/j9XvyD8OauY0lEMH1zK5K58shRCvWweFdAmq7Fv7l
+X-Google-Smtp-Source: AGHT+IG1OsKW3uGvrvidR1V/OAfvfZahPy53s3qyGN1V32wVeDsT3Sd+YD+xtJm/ziSYOMAV7t2fTw==
+X-Received: by 2002:a5d:5847:0:b0:3e3:921b:65a2 with SMTP id ffacd0b85a97d-3e643556501mr9986581f8f.50.1757498338540;
+        Wed, 10 Sep 2025 02:58:58 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7521ca2aesm6390950f8f.26.2025.09.10.02.58.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 02:58:58 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
+ <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/8] tools: ynl: fix errors reported by Ruff
+In-Reply-To: <20250909-net-next-ynl-ruff-v1-0-238c2bccdd99@kernel.org>
+Date: Wed, 10 Sep 2025 09:53:11 +0100
+Message-ID: <m2wm66y9hk.fsf@gmail.com>
+References: <20250909-net-next-ynl-ruff-v1-0-238c2bccdd99@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMExEjj3I4ahnMHc@krikkit>
+Content-Type: text/plain
 
-On Wed, Sep 10, 2025 at 10:04:34AM +0200, Sabrina Dubroca wrote:
-> 2025-09-10, 08:45:50 +0300, Leon Romanovsky wrote:
-> > On Tue, Sep 09, 2025 at 08:29:20PM +0200, Sabrina Dubroca wrote:
-> > > 2025-09-09, 12:23:15 +0300, Leon Romanovsky wrote:
-> > > > On Mon, Aug 25, 2025 at 02:50:23PM +0200, Sabrina Dubroca wrote:
-> > > > > Xiumei reported a regression in IPsec offload tests over xfrmi, where
-> > > > > IPv6 over IPv4 tunnels are no longer offloaded after commit
-> > > > > cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
-> > > > > implementation").
-> > > > 
-> > > > What does it mean "tunnels not offloaded"?
-> > > 
-> > > Offload is no longer performed for those tunnels, or for packets going
-> > > through those tunnels if we want to be pedantic.
-> > > 
-> > > > xdo_dev_offload_ok()
-> > > > participates in data path and influences packet processing itself,
-> > > > but not if tunnel offloaded or not.
-> > > 
-> > > If for you "tunnel is offloaded" means "xdo_dev_state_add is called",
-> > > then yes.
-> > 
-> > Yes, "offloaded" means that we created HW objects.
-> 
-> For me "offloaded" can mean either the xfrm state or the packets
-> depending on context, and I don't think there's a strict definition,
-> but whatever.
-> 
-> Xiumei reported a regression in IPsec offload tests over xfrmi, where
-> the traffic for IPv6 over IPv4 tunnels is processed in SW instead of
-> going through crypto offload, after commit [...].
-> 
-> It's getting too verbose IMO, but does that work for you?
+"Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
 
-Yes, it is perfectly fine.
+> When looking at the YNL code to add a new feature, my text editor
+> automatically executed 'ruff check', and found out at least one
+> interesting error: one variable was used while not being defined.
+>
+> I then decided to fix this error, and all the other ones reported by
+> Ruff. After this series, 'ruff check' reports no more errors with
+> version 0.12.12.
+>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+> Matthieu Baerts (NGI0) (8):
+>       tools: ynl: fix undefined variable name
+>       tools: ynl: avoid bare except
+>       tools: ynl: remove assigned but never used variable
+>       tools: ynl: remove f-string without any placeholders
+>       tools: ynl: remove unused imports
+>       tools: ynl: remove unnecessary semicolons
+>       tools: ynl: use 'cond is None'
+>       tools: ynl: check for membership with 'not in'
 
-> 
-> 
-> For the subject, are you ok with the current one? It's hard to fit
-> more details into such a short space.
+The series looks good to me, thanks for the fixes.
 
-Leave subject as is, you describe issue well enough in the commit
-message.
-
-> 
-> > > > Also what type of "offload" are you talking? Crypto or packet?
-> > > 
-> > > Crypto offload, but I don't think packet offload would behave
-> > > differently here.
-> > 
-> > It will, at least in the latest code, we have an extra check before
-> > passing packet to HW.
-> > 
-> >   765         if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
-> >   766                 if (!xfrm_dev_offload_ok(skb, x)) {
-> >   767                         XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-> >   768                         kfree_skb(skb);
-> >   769                         return -EHOSTUNREACH;
-> >   770                 }
-> 
-> So it looks like packet offload is also affected. We get to
-> xfrm_dev_offload_ok, it does the wrong check, and the packets will get
-> dropped instead of being sent through SW crypto. Am I misreading this?
-
-There is no fallback in packet offload, so dropping packet which can't
-be handled by HW is right thing to do. I agree that we shouldn't fail
-here.
-
-> 
-> 
-> > > > > Commit cc18f482e8b6 added a generic version of existing checks
-> > > > > attempting to prevent packets with IPv4 options or IPv6 extension
-> > > > > headers from being sent to HW that doesn't support offloading such
-> > > > > packets. The check mistakenly uses x->props.family (the outer family)
-> > > > > to determine the inner packet's family and verify if
-> > > > > options/extensions are present.
-> > > > 
-> > > > This is how ALL implementations did, so I'm not agree with claimed Fixes
-> > > > tag (it it not important).
-> > > 
-> > > Well, prior to your commit, offload seemed to work on mlx5 as I
-> > > describe just after this.
-> > 
-> > It worked by chance, not by design :)
-> 
-> Sure.
-> 
-> [...]
-> > > > The latter is more correct, so it raises question against which
-> > > > in-kernel driver were these xfrmi tests performed?
-> > > 
-> > > mlx5
-> > 
-> > It is artifact.
-> 
-> Sorry, I'm not sure what you mean here.
-
-I'm saying that "works" depends on FW and HW revision.
-
-> 
-> [...]
-> > > > Will it work for transport mode too? We are taking this path both for
-> > > > tunnel and transport modes.
-> > > 
-> > > Yes, if you look at __xfrm_init_state, inner_mode will always be set
-> > > to whatever family is "inside".
-> > 
-> > I believe that you need to rephrase commit message around meaning of "offloaded"
-> > but the change looks ok to me.
-> > 
-> > Thanks,
-> > Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Thanks. I'll send a v2 when we agree on the wording, to avoid
-> resending multiple times.
-> 
-> -- 
-> Sabrina
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
