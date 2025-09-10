@@ -1,112 +1,159 @@
-Return-Path: <netdev+bounces-221644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB31B5160B
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:46:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB19AB51624
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A2CA1896806
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:46:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7432564609
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4259725C804;
-	Wed, 10 Sep 2025 11:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A9A2D6605;
+	Wed, 10 Sep 2025 11:55:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A375A4A1E;
-	Wed, 10 Sep 2025 11:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077F427F017
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 11:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757504768; cv=none; b=W+YN1CjOLmgOKT05nvK9CaouV4ldHvHgeSXDiS4e8J0nY64xnzsv6jOhX4lqLkqco2ekilA6SVUjisHu/pJseU8B019VKHGwkqkHmc9pZNOrREOcuuywjuBjntP1QBIqID7TwzNJNDnYtR05gFxqRRU21LGtRQ82D28m5dNFTjc=
+	t=1757505309; cv=none; b=abHJEMazpdz6ZwsyVBF5MWi4B7KX9TkAb/SKxazJmQ/hLfh6y6nzBBHE+ABqG7jUQGsvQ5Y8LoKg67TYQSxtzI6/RXPIPtj1zyykb0rYJsfAyI86QEhzWzlfZE8B75ZV51bvvCWhDEUa6MBJ++eV0AKPLjXCeDo0s4d2lPp1hsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757504768; c=relaxed/simple;
-	bh=csbSsmLBj0sHJc2hAiyDX/dsXK2thMnxMp9Kx8Jufj8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pFaPXk9ayaxW2fOcEwjltXZl0/7KlHiTnv5oQmbWZOzESxmhkqRITaevN6oKzS6pMKu4dAxk092Hco8uaFh+a6WBMPIwb35kRC8Gl/uyOJo7/nR6s9fle5fAmIsI9c4WfxGO8iSDo+lvig1POhl/OWJ/TWathc1XI+lR9bwxILw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5449dd423a6so1360759e0c.2;
-        Wed, 10 Sep 2025 04:46:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757504765; x=1758109565;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Otf/DIZB6w1m1iGxzWRiPBWA4CBmeOJ6zsbyVxKZOlM=;
-        b=TrJ1pab2XvA3yq342cnte5DlyWoyBtSJiR0Mxxu86ocFjRSrPKr/fZsolGajDn17eV
-         g95k/pSfplgvnjImi3YK7B+fP8LE/t+a/QFy2kdseDWRXnQP3RYaTM256RZMGjV7Gkzd
-         HhLoY3/7WcW+/5Z12brGvJ9EIX71tuq8B/83guay/E6sS/JABstDlYqPmX82EMI1I6FK
-         CnP40jYBXas0Lxph0HTjrOZ+qkreyp9ajDiGxHubbce2OJ8WNG9+ASWdD4kyLH4/A9J+
-         xFtPgqKR/4742SsgzOKaWsJV6qcExUlsBjfjaL1HZ4RlYV/eiTH2fZtltqC34D8AzPn0
-         hUFw==
-X-Forwarded-Encrypted: i=1; AJvYcCVH64MchpC3+sCMD7D1UYD5elc5oOfuZoakKVj62u7ftdLJzSzxr6RBGRzqY8jwVV0m/ySoxPKP@vger.kernel.org, AJvYcCW7cjPNLBMQOmIG0TIQXdAFPEmcEWjFFFqZmB/yWcTV+WqHSFubZRusNRUMBcpGXEEfrrfy4bAu8pmAOECp6T2LeA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOPq0YSknF2BzW/dhb1ZQUpMdWOMRd8VQzVDo66odwxDuPU7J7
-	6v8oYWnlnV6OGvgu1hUYZdwT9QPV1hzOAE3r+LF4BVeHFpsOhaSE1EsE34LAoaNf
-X-Gm-Gg: ASbGncv/0DBivjgMZ8UmrVK7MBqwSokptLWRO+KDfbF1ALu/Or/nEHKmG1M/SlllSby
-	M52+Ev0WivUuvjbVlOo3A46sHofuM2L91WPWIrjGU8mzkCCJA0HsqiIHDwJiymHet7u4zvMXqTH
-	rtLGyEdDG8JyFt0eQiE12yN5BFhtjnCmPVM0dkOxsP0bB8GqITdtxZO/6042us30pwzP1vb670D
-	LCymOlponhfpUkzV98AJj8RG4Oazkw/VRbdfT3/k7jMOXS6HdvFZBUugBZ9B4ZsVnl5uNQskBle
-	t30XrUZ816Ame0mjOt3eK1DzGmWqrkfWvYfYAUh6M642pm8NnpOKPt8ORpzfbwShpcwPtvoV/pZ
-	J3UhF3WJ2DzfVS81ymDW/cA+4u39nAttcFsBvqlZli416uHEWnNC7Hqc/sdGZ
-X-Google-Smtp-Source: AGHT+IHAYPTklF6gr6yfEM/+4LaKI+PqD5Y9W0u7RJn8VcIYBC02vsXKuaLb5D1F1gLfo6HvKsdXeQ==
-X-Received: by 2002:a05:6122:2017:b0:530:7747:80a7 with SMTP id 71dfb90a1353d-5472c3d1686mr4476032e0c.9.1757504765237;
-        Wed, 10 Sep 2025 04:46:05 -0700 (PDT)
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com. [209.85.217.43])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-544a1f09810sm12174788e0c.22.2025.09.10.04.46.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Sep 2025 04:46:04 -0700 (PDT)
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-51d14932f27so2775455137.2;
-        Wed, 10 Sep 2025 04:46:04 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVQtPmxB/RJZJEusfqwZFcrX2Pz7KvVtSbPlVRShN+LKvU5tsDY89gyJy96lkRoBHtfYXgEoFZx@vger.kernel.org, AJvYcCXZKB0WQLbqPqJZgS+1FwoxvYD4Ll+4zArnoT49BU61S/7CNIDuCQb3toFBDuMQe8Byr3vWZ3uCIf+PK60QVAIcig==@vger.kernel.org
-X-Received: by 2002:a05:6102:8092:b0:52a:4903:95af with SMTP id
- ada2fe7eead31-53d21db5d83mr3960316137.19.1757504764716; Wed, 10 Sep 2025
- 04:46:04 -0700 (PDT)
+	s=arc-20240116; t=1757505309; c=relaxed/simple;
+	bh=FIxh4HV8ajYloHRuoo7IEkLUt2ilb1sz89928uRH6mw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sO4l1I1skAX/cN+GFoJDrmr+nQgx3FT8nvAq739IPr4wVe6ilui5G7nlLuqpSzqygQTuoNOyNxeDOgMfgJLE8e7jvzX60DTnzwKRU28TMr6RhoMjptynHExgvB9Vi5cfTYT++gcq011F24qF4aLyYGNNeoqin3ZCKcF9ByZyXyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uwJPc-0005jR-9P; Wed, 10 Sep 2025 13:54:56 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uwJPb-000aG6-09;
+	Wed, 10 Sep 2025 13:54:55 +0200
+Received: from pengutronix.de (glittertind.blackshift.org [116.203.23.228])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id A919746AE4C;
+	Wed, 10 Sep 2025 11:54:54 +0000 (UTC)
+Date: Wed, 10 Sep 2025 13:54:54 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org, 
+	kernel@pengutronix.de, Vincent Mailhol <mailhol@kernel.org>
+Subject: Re: [PATCH net 2/7] selftests: can: enable CONFIG_CAN_VCAN as a
+ module
+Message-ID: <20250910-imported-intelligent-magpie-fb5302-mkl@pengutronix.de>
+References: <20250909134840.783785-1-mkl@pengutronix.de>
+ <20250909134840.783785-3-mkl@pengutronix.de>
+ <00a9d5cc-5ca2-4eef-b50a-81681292760a@ovn.org>
+ <aMEq1-IZmzUH9ytu@dcaratti.users.ipa.redhat.com>
+ <aME2mCZRagWbhhiG@dcaratti.users.ipa.redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250909085849.3808169-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20250909085849.3808169-1-niklas.soderlund+renesas@ragnatech.se>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 10 Sep 2025 13:45:53 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUUxFRr4SxOcxgQtF-PCNgRWXL6Pn+js_-C5kLLiv_AgA@mail.gmail.com>
-X-Gm-Features: AS18NWDKhfuji0BVjEqXwRGAXXaG8PrhgUk_1ZX1R2g5T3AOJ2MZy5GlABb9zEE
-Message-ID: <CAMuHMdUUxFRr4SxOcxgQtF-PCNgRWXL6Pn+js_-C5kLLiv_AgA@mail.gmail.com>
-Subject: Re: [net-next] net: sh_eth: Disable WoL if system can not suspend
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ffo7pr4ivbg3gljm"
+Content-Disposition: inline
+In-Reply-To: <aME2mCZRagWbhhiG@dcaratti.users.ipa.redhat.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--ffo7pr4ivbg3gljm
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net 2/7] selftests: can: enable CONFIG_CAN_VCAN as a
+ module
+MIME-Version: 1.0
 
-On Tue, 9 Sept 2025 at 18:21, Niklas S=C3=B6derlund
-<niklas.soderlund+renesas@ragnatech.se> wrote:
-> The MAC can't facilitate WoL if the system can't go to sleep. Gate the
-> WoL support callbacks in ethtool at compile time using CONFIG_PM_SLEEP.
->
-> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
-se>
+On 10.09.2025 10:28:08, Davide Caratti wrote:
+> hi,
+>=20
+> On Wed, Sep 10, 2025 at 09:37:59AM +0200, Davide Caratti wrote:
+> > > ...
+> > > # 4.13 [+0.00] # Exception| lib.py.utils.CmdExitFailure: Command fail=
+ed:
+> > >         ['ip', '-netns', 'rhsbrszn', 'link', 'add', 'foo', 'type', 'v=
+xcan']
+> > > # 4.14 [+0.00] # Exception| STDERR: b'Error: Unknown device type.\n'
+> > >=20
+> >=20
+> > > Best regards, Ilya Maximets.
+> >=20
+> > thanks for spotting this, I was testing the patch with:
+> >=20
+> >  # vng --kconfig
+> >  # yes | make kselftest-merge
+> >  # grep ^CONFIG_CAN .config
+> >=20
+> > Then it's probably safer to drop the first hunk - or restore to v1
+> >=20
+> > https://lore.kernel.org/linux-can/fdab0848a377969142f5ff9aea79c4e357a72=
+474.1755276597.git.dcaratti@redhat.com/
+>=20
+> And I see that the build [1] is doing:
+>=20
+>   CLEAN   scripts
+>   CLEAN   include/config include/generated arch/x86/include/generated .co=
+nfig .config.old .version Module.symvers
+> > TREE CMD: vng -v -b -f tools/testing/selftests/net/config -f tools/test=
+ing/selftests/net/af_unix/config
+>   HOSTCC  scripts/basic/fixdep
+>   HOSTCC  scripts/kconfig/conf.o
+>=20
+> [1] https://netdev-3.bots.linux.dev/vmksft-net/results/291401/build/stdou=
+t=20
+>=20
+> while the enablement of CONFIG_CAN_VCAN is still necessary, the contents =
+of selftests/net/config need to be preserved.
+> @Jakub,  @Marc, we can drop this patch from the series and I will respin =
+to linux-can ? or you can adjust things in other ways?
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+You can send me a new or an incremental patch (which I'll squash into
+the original one). Then I'll send a new PR.
 
-Gr{oetje,eeting}s,
-
-                        Geert
+regards,
+Marc
 
 --=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+--ffo7pr4ivbg3gljm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjBZwsACgkQDHRl3/mQ
+kZyIigf9HpmqSq+5Iucbtgwx1bdPQ+n7+mXz8v1SL+bZfWkRtlxmmhyiVqw5E4Bb
+2GKeh7sb0FN9CwZdsLvt95aloKc1lr8XvlE5NVN5155zWS9MfXOIVlcsZRDCBhs4
+GYZbqXHG0qJC0e/Jl4EcijjIFX0c4Kayw/TyClJ9dPLhrbgqHRbM+Qx7OvBiLoj1
+uq2lAbDrPjbKkQlHd+YPkKeCcXOD4ZcnGfRnIQQ07HEVdR9ffLoRaG8ZGvDn3YMW
+DXmZdDpQ9aZb/h6BjZ8SVbXf+Rp+nmOJoRuham1SoSi2m5elWOA7dpTDLTk45ZaC
+mmDc/ZwT9VSwS2IV9YK5GT2ZRr2g4A==
+=Sriy
+-----END PGP SIGNATURE-----
+
+--ffo7pr4ivbg3gljm--
 
