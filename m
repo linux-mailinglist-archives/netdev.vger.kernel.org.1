@@ -1,160 +1,112 @@
-Return-Path: <netdev+bounces-221794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B693B51DF2
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:39:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B09BB51DF5
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F35E1C27730
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:40:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA7A6178934
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066C8272807;
-	Wed, 10 Sep 2025 16:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC37A2741B5;
+	Wed, 10 Sep 2025 16:39:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOuc/Kis"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RHS/O7Wp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569AB27145C;
-	Wed, 10 Sep 2025 16:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF1D271451
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 16:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757522362; cv=none; b=fajh1LpAwIMpdSZ7VKciBqXNj0/OBf1rr13l9aB09WCszPvcbuShnhLkR4Vs9zCvL23dFCd1LVgSNHCpUbtC4uqDbvZQVUK4lLmqqVBicqx98+sSG8R+xOtrgljVMksWXRbz/wuYiP5EVw2hoHNDwJHieEddEmNB2JWyEmgk51o=
+	t=1757522390; cv=none; b=gNNZUdUY37Y4TZ10k4lppWCy3Y1kg4dau87GbnfKYJSCsoPufZVzlvbOIwlNgWX3kDbkO6i0TFgHlUo9NOmFVp71c2NZuU4KuavgYn+K/R3QYZrygf45aBpUTMjrt7UnAHLJlKQyOghvaMGE9PsN0NA3abGCjIFjakecP+QI7LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757522362; c=relaxed/simple;
-	bh=DXaPB6O+MVeURgWOrbQJY23u3LqvdV53/UiDoA5wWxQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RVJnLtEnL2/FKn4hQNa+fEwlIeJfZ7FX+F5D0YJXKkB+M2orQhUEsRSmaCi0gwurrG1xWr3D7MpgyiO8TEFnI8whwPE6Op/dsvlx0NVZ+5F+gwaUnSCPGJCleuSBRMdQg9YfOd1/r1KAHJug/zh3LdKwLTKAAAemI9Bh8rjXVeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fOuc/Kis; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e9e137d69aaso3472317276.0;
-        Wed, 10 Sep 2025 09:39:20 -0700 (PDT)
+	s=arc-20240116; t=1757522390; c=relaxed/simple;
+	bh=hbjFWc/M1u0JtUeGDfraCyEfZ1LuYrMt6ic+SN3g7Vs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tVvSAWZyRqYUc8M2BLim/f+14qLZWs5I1iwWNDRRuWyZgyDcI1xpDls+ds1t0u9g1otclLJxPQuds83DhHWyU1OxNhK5iNGlKBAbn9qH7lNpkOoLiDm6iM3pVOe9613YcBhkhQpzDVweTPKQp4Ga9L28Tctrv1AXf43fiH7dbgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=RHS/O7Wp; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3f663c571e2so63124555ab.0
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 09:39:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757522360; x=1758127160; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pMR//KJUsKqo+LqzcLScfp4rayMNNk9xWONBV1O4fLI=;
-        b=fOuc/Kis3MlPUfEkm/GgdBAK/CMUTVHc4RZk+04Ob9zSMKOVq9pE19RJfS0Es2kOfE
-         qCsf9WXbvXYuK4q+K9HuAfuhMGw95tpaCaJkFBTlzBdJp0wZKEKFNI6eTwd05vVcvqH5
-         35zdhY+6ILwZAjDzJnW24Q9acwUIiveg57DMv7c2f2fqtsqr/ZWd1ORiCVy5X/kGi3bG
-         HPmSNiNv6gYfgZEdE1LLC1/PDrAmAXQ6QibwBlYTfMIj/g9RYYn4G7bgumjBYwT+drwJ
-         EuvweOnogAxgniKHiZ2zOP55fhRIkj+Jw2Twd0byqz9mwv/YiZMQyQike7PeuH4SJaWG
-         +EHw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757522387; x=1758127187; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/+f5haOvY7V5aJLRvqMe+OKgyMJap2D1kg9AHRnXBFo=;
+        b=RHS/O7WpW2bKu3dkD3GuvUB5YTGA6gb7LyRfu04M+JBfGeQSuhkT/9v/nk/R+dCoyX
+         mZsi1sKflT/XdZwHcNBieE1AylK3Qix8qUwrzhYZBj750TLxjVeOdcOWZXYvcj2GenBj
+         MSoClkJ/PsF+80kRfPRItEj7Tm8QePGqSzJ+QsmXJFA9doy+ahyquicL0MG8caYp2OlB
+         12byJ3aQN9mNWsdieeNi/AazOX86gv6oqRz8IP9rkgCUTTxmZp3BM2oUxPZN3vW0lahe
+         xvDFzSbVRTFzXeitmxBk2z2OUGa+MHihFvw3YurqqUNqs94s3BNYsz99KAOAQOFDWNFA
+         OV0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757522360; x=1758127160;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pMR//KJUsKqo+LqzcLScfp4rayMNNk9xWONBV1O4fLI=;
-        b=lX9uTBKG/cNNQEWoXENl/3iRmgCOStkT6dkQw2J0hWEhLDlkmokXlfS6TJrHuePFJ7
-         Agg6/uf1idBHNnasxiwnO156Gm33D2OLWFRi0iP+ddNsvRY4rEIE4qDpSBIIDq6waLHc
-         BpumQA/b86j6mDsh+uNUA7m+O2tApe5zt7ASAtiqxmHnLcnJPYyTs6BJEi75Cg2XAnl+
-         VB3Qa6JqF2ny0MtCw19FgK/Nt+v7YdoQIITcCWGSCEELTCNLTkoHBR8rMTn4K/ZoZ4jG
-         kkgDmEElgyj3EB+ZAKW1kWTMhVlzKEIvLn2hzaJXnKl5xiBZkKQkt6HTe+tOlUErqvsd
-         tIpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVptrGeFKyqorH15/u0Qcl/TILHhcFcYdeL+q8LlAcqiIaLFQIFKJxRSHyI08hxhf/lnlA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSK7CBi9upDtiXBVSBHxSjyNk9gr1Q8nVoTZ0dLXaFFUKRUkXC
-	qt1D47uiUCyMxMQv8x1eytTfIRwQl6h8P8EpWrh/AnpFaQpn9Cjl95ICCiSGSM4DYOj1ksiwdg7
-	7y/uoiTWa3oPZMa1TbsCEr/ucuWhwYl0=
-X-Gm-Gg: ASbGnctZDpPt2Yi3Csx9wI+yvAQXYUXu0thio6z4fo+8ovgtBWEopFzesr7f8bB5ZEY
-	t2Lq/njwK04+i5CKH+kVJoceFUYifu/VMbzgMVL5Hw1sBZtbUBO2cVzdw1XOwCO4lgddqE+idrL
-	S4mLg391guaOHi9MNriXWvtTVLnmi+WxAeD1N7X24mYE+cJG7nzGqpUSK8VQMzFPXw456FjHbD+
-	e4D3cPzI9c2n+CTNHVR
-X-Google-Smtp-Source: AGHT+IF0OCe3TTI7tEajUuAo/UE9GLq//PAYAMIeiVBcCF0WYiNZGdSd489Cr5MKvf0tWhyJdEeOSVytA1wNkt8HGQ8=
-X-Received: by 2002:a05:6902:2b0a:b0:ea3:c0f8:99c4 with SMTP id
- 3f1490d57ef6-ea3c0f89bcfmr2445705276.13.1757522359600; Wed, 10 Sep 2025
- 09:39:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757522387; x=1758127187;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/+f5haOvY7V5aJLRvqMe+OKgyMJap2D1kg9AHRnXBFo=;
+        b=Q37vgVJCCHwQv4YXAOwBWYHxPw7OJQsH2q0Q8kATX5tRZ8mE4BP+5z72xbPakfFf3O
+         yBV/UAYJx7ld0l5ZsfWux/Dm5VzFuWwHpLigyXqOwoNy4cVR5PQUZKs/EQia/5f4zPDl
+         bqc6NCUmTT8DtYLKcmBk56KgPkmOSKO4i+qh5nOKWqr13U9CTJIAu9uR9gxfS9YXHfe/
+         zjyvE1ISB0o1or3iUXLLdb/7+/IsR+QiLzhccSv6lyj/gxtdd72K0kE++FpGIEY/Kii5
+         /hTdzk/ECfHEpZfGOQaZxZWNKDzDqqYzQjm4qxoS0082217tan6NwzEhw6xhbW5i7rQa
+         zwQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVomqzl5FJ0KFO1MxFKDawU1oVbqzwYStXgr+WfHwQGwNRSfQD6dLLAy7QucFkWzZZdrzSchmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlUB5XKuQNxJmY9Q4ILbSuPYkMIpkrG0JZgpBYRTkJNG3cPdKF
+	N/fHawEzTP74+JEO4m5hX8TlpcjjqUbbd0guRN4Yy+UUs0KjldKCrXnM/ghKnAZEW9Q=
+X-Gm-Gg: ASbGnctPPnwOcqdIkFw21VjsDtCnH11HVuteqPahuUa4PeP7c7CQ1Wq42JAdFnrcMBx
+	QGXH+jJ0k7Rh07S1Mw1vTXXpAj0txYc5HRIbyb8hnCSHSleT1z+/gUYPQ4STXA/Wc3pk5DvxdK8
+	sK76RocPWPNpYOkmF0vbzeudjQMVv4SvavXvLHdj4iM5e8IGMw8HhVWRabSRyHLuADTWmRdlInm
+	xqi+fuePNa0Uoclc5iXPkPSmqNc/q5lwTZ2LWslB5bsCBqBB6PzSj+U6cXAnj0KYMpLHMZgXyt8
+	Rby9QS4psC52kTzrMsDOx6+PXCWp8vGDtU553ws7JQCBGO/kI2Mooz4qZ4RE75fU+V5MGGHrrjE
+	bMDKtT/JP9MLknxa52n0=
+X-Google-Smtp-Source: AGHT+IEb5WYlYRXj9KAGrUB6b6ycfigzKegEaHb0jkZarvr/Z/Q5oCi/e4o3PHKyP6WP+mXNVGSbxw==
+X-Received: by 2002:a05:6e02:1a69:b0:3fd:1d2e:2e5f with SMTP id e9e14a558f8ab-3fd86264465mr231635655ab.21.1757522387509;
+        Wed, 10 Sep 2025 09:39:47 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-417c8f03f9csm8607825ab.43.2025.09.10.09.39.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Sep 2025 09:39:47 -0700 (PDT)
+Message-ID: <a2d770aa-737b-43f5-8d1e-0c139c09dc0c@kernel.dk>
+Date: Wed, 10 Sep 2025 10:39:45 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250910034103.650342-1-ameryhung@gmail.com> <20250910034103.650342-2-ameryhung@gmail.com>
- <x4b26sfgbwuxodwbkk5gl5ohczmalycr3qxo2xwctiygzvvydh@fu26veserybx>
-In-Reply-To: <x4b26sfgbwuxodwbkk5gl5ohczmalycr3qxo2xwctiygzvvydh@fu26veserybx>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 10 Sep 2025 12:39:07 -0400
-X-Gm-Features: AS18NWDLF7H93l9nGXTXsP90-kXw9gkY55g31JI9JQPD-5DIg_KFduJJqpyXQgg
-Message-ID: <CAMB2axO1oKWCq8X+XKdC0BOw5AvwpWbJYWJ2A4bo_cgRmvzEVw@mail.gmail.com>
-Subject: Re: [PATCH net v1 1/2] net/mlx5e: RX, Fix generating skb from
- non-linear xdp_buff for legacy RQ
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, kuba@kernel.org, 
-	martin.lau@kernel.org, noren@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com, 
-	mbloch@nvidia.com, cpaasch@openai.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/32] block: use extensible_ioctl_valid()
+To: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org
+Cc: Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>,
+ Mike Yuan <me@yhndnzj.com>, =?UTF-8?Q?Zbigniew_J=C4=99drzejewski-Szmek?=
+ <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>,
+ Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Tejun Heo <tj@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+ linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, netdev@vger.kernel.org
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-3-4dd56e7359d8@kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <20250910-work-namespace-v1-3-4dd56e7359d8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 10, 2025 at 12:24=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
-m> wrote:
->
-> On Tue, Sep 09, 2025 at 08:41:02PM -0700, Amery Hung wrote:
-> > XDP programs can release xdp_buff fragments when calling
-> > bpf_xdp_adjust_tail(). The driver currently assumes the number of
-> > fragments to be unchanged and may generate skb with wrong truesize or
-> > containing invalid frags. Fix the bug by generating skb according to
-> > xdp_buff after the XDP program runs.
-> >
-> > Fixes: ea5d49bdae8b ("net/mlx5e: Add XDP multi buffer support to the no=
-n-linear legacy RQ")
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_rx.c
-> > index b8c609d91d11..1d3eacfd0325 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > @@ -1729,6 +1729,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq,=
- struct mlx5e_wqe_frag_info *wi
-> >       struct mlx5e_wqe_frag_info *head_wi =3D wi;
-> >       u16 rx_headroom =3D rq->buff.headroom;
-> >       struct mlx5e_frag_page *frag_page;
-> > +     u8 nr_frags_free, old_nr_frags;
-> >       struct skb_shared_info *sinfo;
-> >       u32 frag_consumed_bytes;
-> >       struct bpf_prog *prog;
-> > @@ -1772,17 +1773,25 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *r=
-q, struct mlx5e_wqe_frag_info *wi
-> >               wi++;
-> >       }
-> >
-> > +     old_nr_frags =3D sinfo->nr_frags;
-> > +
-> >       prog =3D rcu_dereference(rq->xdp_prog);
-> >       if (prog && mlx5e_xdp_handle(rq, prog, mxbuf)) {
-> >               if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flag=
-s)) {
-> >                       struct mlx5e_wqe_frag_info *pwi;
-> >
-> > +                     wi -=3D old_nr_frags - sinfo->nr_frags;
-> > +
-> >                       for (pwi =3D head_wi; pwi < wi; pwi++)
-> >                               pwi->frag_page->frags++;
-> >               }
-> >               return NULL; /* page/packet was consumed by XDP */
-> >       }
-> >
-> > +     nr_frags_free =3D old_nr_frags - sinfo->nr_frags;
-> Just double checking that my understanding is correct:
-> bpf_xdp_adjust_tail() can increase the tail only up to fragment limit,
-> right? So this operation can always be >=3D 0.
->
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-Right, AFAIK bpf programs cannot add fragments to xdp_buff.
-
-> If yes:
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
->
-> Thanks,
-> Dragos
+-- 
+Jens Axboe
 
