@@ -1,171 +1,155 @@
-Return-Path: <netdev+bounces-221607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F71B5126E
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:25:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09155B5127B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:29:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BF374870F6
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:25:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C10F7B0FE9
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DACD3128DA;
-	Wed, 10 Sep 2025 09:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2FD313555;
+	Wed, 10 Sep 2025 09:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="gJ1JyjkB"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="ZhxPSqLj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+Received: from fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.72.182.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03E030E825
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 09:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B18A313544;
+	Wed, 10 Sep 2025 09:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.72.182.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757496351; cv=none; b=bfdNxR46V0+SV3NPPxZowiP7Yoa12qZvoTYGuZDIz4G5OoJVGrnvPBeW9BwYtaRxs1glxVMHMoJT0vcmMpo22JxvfK/030TVoh2ljHaTAwMA8Jox82HIXB/6t0pdjysmevBvlpXOOqyFTFz723dRn2YMV4mGdJZB48FT2ugyrvE=
+	t=1757496532; cv=none; b=ZE50O22Y3pZ657K3qQ9V327ZPZ2pgb1D0wbebPx0vpw4jvMtBn0Nmc8SgmX7wqajaUnJJxPtD1V1i0CN9gtOKXtrgmEjmkv2ec4w3qB3pTLLbvUzs95P5UK9ejltKZaUcR93TTzeSiqf9tjoXbFjvcHS5ww7C+7lJXzwWJH6HBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757496351; c=relaxed/simple;
-	bh=HNILZtt0hwwuxNVL/jW9PoH0yqkXYiFDFS+0lRZCWTg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h0rSXGKmjxv0DGxvBvPbq+qjmgV81k3E0fRd1nODqteb0c1s+ZcFOj0NTm6ui3DDPnWmqnpYhkJQze6wU2hrYeLnyd1KcBswitZSJeEWHb25LGGa+zNQYhAa8OFSCmCd08867nOuCUl9iFskCu0xHS8t5czeZzXR3sAKJ+cxsVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=gJ1JyjkB; arc=none smtp.client-ip=35.155.198.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1757496532; c=relaxed/simple;
+	bh=8M1NClmvgIt+dhiZcZXDzCJ1AB1iwZ1egz2MFeaVKyw=;
+	h=From:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=QTUeqEE+xCD3eEvy0ovmbGp+KNRKgdBGoS3V/GnqlpgLSBqo3N9B+YpsMfjCq98Su63QDSJzWg4Nw21Mxk/v6EJVhVolFJERS3lXn5mMFCO3lrReAYT9UoHTTlAd62jKrzt6GpUFQrgTLZG9h8d3Koey004vwPqMgXtSH4joPvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=ZhxPSqLj; arc=none smtp.client-ip=3.72.182.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1757496349; x=1789032349;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dsgebjoGUOrCSMEDwcajyXGY4GIsEupdqnjHKO74RKk=;
-  b=gJ1JyjkB3vJCRsFPEh40HJJoOGmlsXUiJtx9gClUTGn3lfMKl38L9flB
-   HJ0lLKss+X0u3HtuVqNgfOn8Lr+8tbm94hDJWi20mKTB+riLYj/V2yMBh
-   wnDSkQ/VIew9d49OZiDdmaPHaQie1o0jKmzbA8eCOGvG40ECklXaPcuMY
-   9j9L+0ldyJLFliyQsWb7EWWKerw0EifPu8gZ9kvfNcHTTmCh1tdJhxzGM
-   R4T+s75aPj4oIk1zVCG7U7zDpAEerT4NDiagKLcDNLpfIFG48lHaXRs7h
-   jnh6djh1bWq1wVWbCUO6PRjjRVfGRN9oLR06ZIfVGsuhjhwfbSSQ3GxU8
-   Q==;
-X-CSE-ConnectionGUID: Kw7qBZ6ZTAamd1guporJ+A==
-X-CSE-MsgGUID: kmInTI60TJ2s0uunu3OY5w==
-X-IronPort-AV: E=Sophos;i="6.18,253,1751241600"; 
-   d="scan'208";a="2633235"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 09:25:47 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:43888]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.164:2525] with esmtp (Farcaster)
- id ea498177-17d9-4ab8-bc5d-400dc2e76433; Wed, 10 Sep 2025 09:25:47 +0000 (UTC)
-X-Farcaster-Flow-ID: ea498177-17d9-4ab8-bc5d-400dc2e76433
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1757496529; x=1789032529;
+  h=from:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UYBeIk1Sgl6VARFAnYk+1Npq0eTLyrVghsS0KiRYD80=;
+  b=ZhxPSqLjvcFSH7Nn25m6NEGkNESDX6JV2WbMCqIW7JBpVf88V6t6ypTu
+   cpxL9Q3Mpm3xH48feges+VAZ8Iw12VjVxhcRiLJxR3T9z3c/ireBMTVKa
+   BiOEL4xESeMyhlx580sNNcSfw+dQaVOIEkta9K2eKpmgBgIQ4eQIpX5FH
+   Ny7DDE2HRtkjiVOuxZ3rlWLTk6XrGb4FaaS2pQujxalWnWll8y9JalupK
+   nAPj1vpgkOwCXqNj0qGsO+au9OLYtamHOMVssjNw9WHn6Jwm6zZopGfVm
+   Pn9Z8YbYhirV1Gtb5kIO5GwmW9WQoTneIoWmoardngyEPsO9w8xzCM41F
+   A==;
+X-CSE-ConnectionGUID: u/IpeAocSuWjQ6qjoMuysA==
+X-CSE-MsgGUID: s0vP7LJQR2CHqKOPqmdAug==
+X-IronPort-AV: E=Sophos;i="6.18,214,1751241600"; 
+   d="scan'208";a="1890739"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 09:28:38 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:14793]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.16.14:2525] with esmtp (Farcaster)
+ id 2040ec64-2b97-42f5-bda1-4ba39ea8b2d5; Wed, 10 Sep 2025 09:28:38 +0000 (UTC)
+X-Farcaster-Flow-ID: 2040ec64-2b97-42f5-bda1-4ba39ea8b2d5
+Received: from EX19D008EUC003.ant.amazon.com (10.252.51.205) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 09:25:47 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.7) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ Wed, 10 Sep 2025 09:28:38 +0000
+Received: from EX19D008EUC001.ant.amazon.com (10.252.51.165) by
+ EX19D008EUC003.ant.amazon.com (10.252.51.205) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 09:25:44 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <aleksandr.loktionov@intel.com>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kohei.enju@gmail.com>,
-	<kuba@kernel.org>, <kurt@linutronix.de>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<vitaly.lifshits@intel.com>
-Subject: Re: RE: [Intel-wired-lan] [PATCH v1 iwl-net] igc: unregister netdev when igc_led_setup() fails in igc_probe()
-Date: Wed, 10 Sep 2025 18:25:08 +0900
-Message-ID: <20250910092537.30823-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <IA3PR11MB8986C779F51731B60D07BEB7E50EA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB8986C779F51731B60D07BEB7E50EA@IA3PR11MB8986.namprd11.prod.outlook.com>
+ Wed, 10 Sep 2025 09:28:37 +0000
+Received: from EX19D008EUC001.ant.amazon.com ([fe80::9611:c62b:a7ba:aee1]) by
+ EX19D008EUC001.ant.amazon.com ([fe80::9611:c62b:a7ba:aee1%3]) with mapi id
+ 15.02.2562.020; Wed, 10 Sep 2025 09:28:37 +0000
+From: "Heyne, Maximilian" <mheyne@amazon.de>
+CC: "Heyne, Maximilian" <mheyne@amazon.de>, "Matthieu Baerts (NGI0)"
+	<matttbe@kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Thomas Dreibholz <dreibh@simula.no>, Mat Martineau <martineau@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Mat Martineau
+	<mathew.j.martineau@linux.intel.com>, Matthieu Baerts
+	<matthieu.baerts@tessares.net>, "David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "mptcp@lists.01.org" <mptcp@lists.01.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH 5.10] mptcp: pm: kernel: flush: do not reset ADD_ADDR limit
+Thread-Topic: [PATCH 5.10] mptcp: pm: kernel: flush: do not reset ADD_ADDR
+ limit
+Thread-Index: AQHcIjVJBuGE8H44G0WWr6MpfYiLLg==
+Date: Wed, 10 Sep 2025 09:28:37 +0000
+Message-ID: <20250910-nicety-alert-0e004251@mheyne-amazon>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 10 Sep 2025 09:02:51 +0000, Loktionov, Aleksandr wrote:
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 
-[...]
->> >>
->> >> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
->> >
->> >Thank you for the patch and for identifying this issue!
->> >
->> >I was wondering whether we could avoid failing the probe in cases
->> where
->> >igc_led_setup fails. It seems to me that a failure in the LED class
->> >functionality shouldn't prevent the device's core functionality from
->> >working properly.
->> 
->> Indeed, that also makes sense.
->> 
->> The behavior that igc_probe() succeeds even if igc_led_setup() fails
->> also seems good to me, as long as notifying users that igc's led
->> functionality is not available.
->> 
->> >
->> > From what I understand, errors in this function are not due to
->> hardware
->> >malfunctions. Therefore, I suggest we remove the error propagation.
->> >
->> >Alternatively, if feasible, we could consider reordering the function
->> >calls so that the LED class setup occurs before the netdev
->> registration.
->> >
->> 
->> I don't disagree with you, but I would like to hear Kurt and
->> Aleksandr's
->> opinion. Do you have any preference or suggestions?
->> 
->> I'll revise and work on v2 if needed.
->> Thanks!
->
->Just in case /*I'm Alex*/ here are my 2cents:
->  I’d treat LED setup as best‑effort and not fail probe if it errors.
->Warn once, mark LEDs unavailable, and continue. That keeps datapath
->up and avoids tricky probe unwind. If we still want to fail on LED errors,
->then either (a) fix the unwind (unregister_netdev et al.) or (b) move LED setup before register_netdev().
+commit 68fc0f4b0d25692940cdc85c68e366cae63e1757 upstream.
 
-Got it, thank you for your opinion :)
+A flush of the MPTCP endpoints should not affect the MPTCP limits. In
+other words, 'ip mptcp endpoint flush' should not change 'ip mptcp
+limits'.
 
->
->  If LED labels depend on the netdev name, it’s fine to run LED setup after register_netdev().
->Since errors are non‑fatal, there’s no unwind complexity.
->
->Keep igc_led_setup() returning an error for internal visibility, but don’t propagate it as probe failure:
->err = igc_led_setup(adapter);
->if (err) {
->    netdev_warn_once(netdev,
->                     "LED init failed (%d); continuing without LED support\n",
->                     err);
->    adapter->leds_available = false;
->} else {
->    adapter->leds_available = true;
->}
->
->In remove()/error paths, guard teardown:
->if (adapter->leds_available)
->    igc_led_teardown(adapter);
+But it was the case: the MPTCP_PM_ATTR_RCV_ADD_ADDRS (add_addr_accepted)
+limit was reset by accident. Removing the reset of this counter during a
+flush fixes this issue.
 
-I would like to adopt this approach, where we don't propagate led's
-failure and manage its status using flag like leds_available.
+Fixes: 01cacb00b35c ("mptcp: add netlink-based PM")
+Cc: stable@vger.kernel.org
+Reported-by: Thomas Dreibholz <dreibh@simula.no>
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/579
+Reviewed-by: Mat Martineau <martineau@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Link: https://patch.msgid.link/20250815-net-mptcp-misc-fixes-6-17-rc2-v1-2-=
+521fe9957892@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[adjusted patch by removing WRITE_ONCE to take into account the missing
+ commit 72603d207d59 ("mptcp: use WRITE_ONCE for the pernet *_max")]
+Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+---
+For some reason only the corresponding selftest patch was backported and
+it's now failing on 5.10 kernels. I tested that with this patch the
+selftest is succeeding again.
+---
+ net/mptcp/pm_netlink.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-I'll send v2 shortly.
+diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+index 32379fc706cac..c31a1dc69f835 100644
+--- a/net/mptcp/pm_netlink.c
++++ b/net/mptcp/pm_netlink.c
+@@ -869,7 +869,6 @@ static void __flush_addrs(struct pm_nl_pernet *pernet)
+ static void __reset_counters(struct pm_nl_pernet *pernet)
+ {
+ 	pernet->add_addr_signal_max =3D 0;
+-	pernet->add_addr_accept_max =3D 0;
+ 	pernet->local_addr_max =3D 0;
+ 	pernet->addrs =3D 0;
+ }
+-- =
 
->
->Keep current order but fully unwind on error:
->err = igc_led_setup(adapter);
->if (err) {
->    unregister_netdev(netdev);
->    /* del NAPI, free queues, etc. in reverse order */
->    err = -E...;
->    goto err_free;
->}
->
->With the best regards
->Alex
+2.47.3
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
 
