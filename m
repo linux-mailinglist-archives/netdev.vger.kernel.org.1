@@ -1,280 +1,171 @@
-Return-Path: <netdev+bounces-221865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40141B5228F
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:44:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE63AB5229B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:44:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A70F583DC0
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A9BFA012BD
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10A430AACC;
-	Wed, 10 Sep 2025 20:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BD4E2F39CD;
+	Wed, 10 Sep 2025 20:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQjjS77/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwCxs8U9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207F5306494
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3B01D8DFB
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757536911; cv=none; b=HCa80jsOHBvWlSOGrVYGm/F3tV1lDoBl6gsYlgCO7WVU8ViWHa9iYZ4P8asaJ+7iH4JvO6VqQhC6jLxEzNXaosU2QxSMLNT/SRLxXLaRrC1CVPFzSwhYKtVqjSmVO4OXoWSW7gZeTDWspgHJhHXKSb2ve/oZ2BIMykqJCbjswgA=
+	t=1757536951; cv=none; b=C51Cldkujs45w5LFl2RF9/lo4OHTvTY2CqGRdAnyCS1hQdrOUljaK2KDkWaCDACPv1HoxcMXgdiW2cYVzmAIX2XycwKUzjNwBvcqjzdMHsi/dXR1ThCqCQIZwprvHMaH77nQC4BBtyaGU693WaSN678igjjXKLqCQmZJ/emFWm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757536911; c=relaxed/simple;
-	bh=llYEKR9ZsQCFnMi48dM1Js47Rbaf1JKFBze2trZI1y0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cbn+yHlI0QUv4375NQ8gfpkoaIry1i1cDaIo0Zru8xpH4w5BZukgL2O5599azKcd7OjPtHHmlxvezaJTAGYyE1SDbfAyrth5/tDkT9FyHhEIzLQ/Sa31dMiZNcdpbt+9ErZgP7/gRj//IOwZ5YOCYvvu4jF9qmrLHQAUkYk8Y5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQjjS77/; arc=none smtp.client-ip=209.85.221.48
+	s=arc-20240116; t=1757536951; c=relaxed/simple;
+	bh=oyJu2nN/xlXaarw9dTZYDbo/e4tV1ZLgvVrPJMG6WwU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=tNUWQUDm4Ocd3yLj4mq+kLU4VSyk1+OwUf5O0Nc90L2nPPvHQ41a9rMd5pmdy+hzExVUraguBxP6rj1/IH2fJAzb9E7UxmN/tE7eLyzAbPvRWSDx9Dp3WzB3X7QRy+B+s/FsBo6JTlDX5fTLHsfA0l4RuPrPuxC/xklFl3NmuHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwCxs8U9; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3c46686d1e6so27094f8f.3
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:41:48 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45dcff2f313so282305e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:42:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757536907; x=1758141707; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3FHTZRydesHvIXXhzlLwXfJdC1zrWRzHVjiGEebmFrg=;
-        b=iQjjS77/YpOurYBP4UYx2wDmKedhsCTQvyJbum1WQi33+Se23EoTud3ubl2VJ3fJmE
-         ofl6xtvl/desp17hIWbuFuLlGuahuPr44cuCX/VQWG3ImCXPmkAJB5mG9ISJlkbbEx/k
-         1DEBnFFIc4aUDOFiCtvEQ9JjkqA62AL9hUB9pTQYrZTuDmZuDq1vQTeVPpwDngagJPwf
-         vVJMbRNsbXKj6of0B5Q1dcFuY8twVXHTvHlphqBje2OVAo5iKIJP86x4QvtEzUVGTWEB
-         sKRmfKsz97Xo8iCDjyrIOt4rmu1k9S/3zs7QSTZSof2fesRrocn+kxIgyFtCz0hONykC
-         NYcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757536907; x=1758141707;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1757536948; x=1758141748; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3FHTZRydesHvIXXhzlLwXfJdC1zrWRzHVjiGEebmFrg=;
-        b=wNBSvfIF3SNjoS9Ova6j6qGtoew1ahpHctQFMtQ8rAj6K2GSVlx36wih+bdqFKcdkg
-         nj8Ivcjq/ZLlqt5HIraA+b1ve9sRR6mrpBezeI1B8yH+KPnHLYDlQPyaX/xMIDllvDJO
-         mHKkkTYkzfCYxMfIF8w8RgUTVQE7aiGbiDHtKcmmIGXxXem+jeaPuZmjOezNudDUuIZi
-         PJ7+Tv1q40DJ7H56J1TWyjEXp8N8IVLoey2nagNRw9levuYrPak0DBBb4/xnEK5YCYul
-         YtRYHreBWv0NP1AlKK4IPsqb4o2m0uL83HA4PsFBE5C55Z5bjtzeSyObj+clbVnyRXKJ
-         iIwg==
-X-Forwarded-Encrypted: i=1; AJvYcCX7CFHv01KfEfkRGegHpQp+gXfMrDZmEcd0Ks+yTbt3RZ45oswBVaKxwiqV/xein+sj5Xo1BHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsW11+KUymoH9sUdfTZcaTOB1jU09Zh9e2EQKDmSYLBugCK4HP
-	8wHtGJ9hAySI/7qz7yQXFPYm5+Q1oaTFGbBuNcDdcise+YPjs1wNLvTq
-X-Gm-Gg: ASbGncssDiM/q1gYjVwAG4CDVp1HvHNhQuCzCEZZflkmP/KHZYpY9iHreBQ5SlSitxT
-	jDB5/+gCFPXOW2EuelvSpluCVJVvFXhqNFu5nb7Si9wMOhpBPjuYQQunucmlwJMP1HKWTrZ9J8H
-	9u+k2lCDnGvacJY/CZAodGXQF3xqhdnQ5D3l1+xQyp5BRQQ0fvKySaLir/zRefcZBTDcwVeW+o5
-	nLBSe1FB81Zcn7oCMD2uvZgLtLAeFIp6GOmzPzkhXrHnkf6ecr6qet9IjJ0krHbq40U4/SqIQpp
-	uWjp+ws5mwVrLtMCxBFIgutBVXpFK3F8Mr9sO1d6LprMhGFzEyZWZ8HJ0Z/5NG0qTxWBjBJ18qb
-	baI9NDL+PLc2FuJFM4m6wCOULjleKGucG70rqwaDOe6wgzAg=
-X-Google-Smtp-Source: AGHT+IGbpCneuFgKariSapKev3xYB10Cgl8j+/UcwQVOYSv/8nDk4BOfl8jeZtgRapP8sGugb4Kc/Q==
-X-Received: by 2002:a05:6000:40ca:b0:3e2:a7d0:add3 with SMTP id ffacd0b85a97d-3e636d900cdmr14105621f8f.11.1757536907147;
-        Wed, 10 Sep 2025 13:41:47 -0700 (PDT)
-Received: from iku.Home ([2a06:5906:61b:2d00:ee64:b92b:f8fd:6cd8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0157d68esm320085e9.6.2025.09.10.13.41.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 13:41:46 -0700 (PDT)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>
-Cc: linux-renesas-soc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next v3 9/9] net: pcs: rzn1-miic: Add RZ/T2H MIIC support
-Date: Wed, 10 Sep 2025 21:41:30 +0100
-Message-ID: <20250910204132.319975-10-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250910204132.319975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20250910204132.319975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+        bh=/HkySa4Q/fxAkgOvb8psNvQCS3dKjRiHe5bDfTbwB5Q=;
+        b=YwCxs8U9eBV6yUqfyXEz0EsRwVW9GEJPX8+xsyKUnyMKtKON89/RUlX80Mo+lgfG4w
+         2Dr0sfVYwW8U/6erD//Z8k60j7VK657jGa4gxh1lZBdiqJ4SSwIEhou1KVL3QqmXZj/X
+         WkRnf4fb5y80ZLs/DNmtyE2XtDPDVzxDcT/k6Wlowk1PAVRM8zRTwbK5mIRNiSpfx+4i
+         Lf30677OevNTKcLqSm3DBz0IFXSzLupOjHKDXn7QXRO0f7Tb0+ZoEGH7ttaX00LYKAMm
+         JXlQrjd7eQZa+MG8utiUC+unQwXl3ESTzlG9zhgLtqPRsd4freoTAhtOhZiW/98I3IWJ
+         HQBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757536948; x=1758141748;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HkySa4Q/fxAkgOvb8psNvQCS3dKjRiHe5bDfTbwB5Q=;
+        b=KMr/HAIw2WYAnjQgVjvrwZvHG2T1OKMFSKoWNLG3z7c1uJJ5erf2NFhiQsz+TdGmqo
+         OOx1Oua3kK0MMlsNUVkQmuJ9cOIAL0HMny9VCsziT75BRvszGscFZ3O8su7aJT74qFSx
+         bwQyAMzS/4ey87tNZ2N/rxjFWNKPoAMk/oSUzFKDT54GeFz2R3ALgfzQi/1U3aMwNAS0
+         CWrmnYvIu0JdJKd2YNtFA+bccKT4lAHiCBbpYJ167Y/fXsUHVWONROgFojXn5wl4OITa
+         jSeYm78pXImGSvw8fv6x8WQwVs/xB1DKh9NwZENOwNu3PwFWhoM1TsCY+SidI+/DyU+L
+         fioQ==
+X-Gm-Message-State: AOJu0YzRbD3ew/YFpIGgH67bp6U6n8MCPLqnYW23qO1zr3hjISBbDhC+
+	7N62io9B0rfrLSzuTCr9YRmUERrZL+8gjQOPH+v5ofc+zDNeu5B5BSRf
+X-Gm-Gg: ASbGncurvtFHPecIXPOgUdOqWVXO67825WQyasBD5sakXtc3k0sjwA324hWNSHACg16
+	ST36G9T7Y6hzJLNdsisAAbIDHSPj2gmf1090+dn63+2ac9hj9K007SFAkhXs/ePDewAPm/AEKWO
+	rtlQtyHHFRNBHG+HBBVj+7bLWlSuNGEQbVo3VU+QP6CwrObqopjWs14r3gO+EhL2GK+VnvXNmKB
+	kfvclGPfGyMstVMPxWsAdZ06QdqyEr3lF/W1bZ23fxRlT3qkVrwtnCdCZVePM316Zz0+GbslaCw
+	TLviEdDRu2AjpxV5VC2zTyLhLtu656VwoldAL2O9+DcSeX2BK2ZJddAVsusnXvi0ffhHrUrcQHO
+	5vm1L3ht0c/n3Ej4pQ8x6kxsYztv/ta6qNYhwuZqlGY470rt1HgF6LYK6Xx6YUcIt0sXL1d935O
+	OHH5SfFt7++5/05rl2WPR5mZUznm5ExaAqF88YNWT2VUTaweE6TJK7aBsp/tL4KQ==
+X-Google-Smtp-Source: AGHT+IHHQGyB2CkeZT4Z960ybCvwlnGOb7qmRPV8uViXjFIhcaBzYL3WkV2sxarZ3WUwUVEoimeAiQ==
+X-Received: by 2002:a05:600c:630e:b0:458:bd31:2c27 with SMTP id 5b1f17b1804b1-45dddee9c7fmr139723455e9.23.1757536947478;
+        Wed, 10 Sep 2025 13:42:27 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f22:bd00:fcb7:a9b6:f3d0:8b88? (p200300ea8f22bd00fcb7a9b6f3d08b88.dip0.t-ipconnect.de. [2003:ea:8f22:bd00:fcb7:a9b6:f3d0:8b88])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3e7521bfd08sm8062056f8f.4.2025.09.10.13.42.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Sep 2025 13:42:27 -0700 (PDT)
+Message-ID: <8729170d-cf39-48d9-aabc-c9aa4acda070@gmail.com>
+Date: Wed, 10 Sep 2025 22:42:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: fixed_phy: remove two function stubs
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Remove stubs for fixed_phy_set_link_update() and
+fixed_phy_change_carrier() because all callers
+(actually just one per function) select config
+symbol FIXED_PHY.
 
-Add support for the Renesas RZ/T2H MIIC by defining SoC-specific
-modctrl match tables, register map, and string representations
-for converters and ports.
-
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Tested-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
-v2->v3:
-- Dropped inlining of miic_lock_regs().
-- Added Tested-by tag.
+ include/linux/phy_fixed.h | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-v1->v2:
-- Dropped regx in config description.
-- Used "renesas,r9a09g077-miic" as compatible for RZ/T2H.
----
- drivers/net/pcs/Kconfig         | 11 +++--
- drivers/net/pcs/pcs-rzn1-miic.c | 82 +++++++++++++++++++++++++++++++++
- 2 files changed, 88 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
-index f6aa437473de..76dbc11d9575 100644
---- a/drivers/net/pcs/Kconfig
-+++ b/drivers/net/pcs/Kconfig
-@@ -26,11 +26,12 @@ config PCS_MTK_LYNXI
- 	  which is part of MediaTek's SoC and Ethernet switch ICs.
- 
- config PCS_RZN1_MIIC
--	tristate "Renesas RZ/N1 MII converter"
--	depends on OF && (ARCH_RZN1 || COMPILE_TEST)
-+	tristate "Renesas RZ/N1, RZ/N2H, RZ/T2H MII converter"
-+	depends on OF
-+	depends on ARCH_RZN1 || ARCH_R9A09G077 || ARCH_R9A09G087 || COMPILE_TEST
- 	help
--	  This module provides a driver for the MII converter that is available
--	  on RZ/N1 SoCs. This PCS converts MII to RMII/RGMII or can be set in
--	  pass-through mode for MII.
-+	  This module provides a driver for the MII converter available on
-+	  Renesas RZ/N1, RZ/N2H, and RZ/T2H SoCs. This PCS converts MII to
-+	  RMII/RGMII, or can be set in pass-through mode for MII.
- 
- endmenu
-diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
-index ef10994d8c11..885f17c32643 100644
---- a/drivers/net/pcs/pcs-rzn1-miic.c
-+++ b/drivers/net/pcs/pcs-rzn1-miic.c
-@@ -21,6 +21,7 @@
- #include <linux/reset.h>
- #include <linux/slab.h>
- #include <dt-bindings/net/pcs-rzn1-miic.h>
-+#include <dt-bindings/net/renesas,r9a09g077-pcs-miic.h>
- 
- #define MIIC_PRCMD			0x0
- #define MIIC_ESID_CODE			0x4
-@@ -125,6 +126,57 @@ static const char * const index_to_string[] = {
- 	"CONV5",
- };
- 
-+static struct modctrl_match rzt2h_modctrl_match_table[] = {
-+	{0x0, {ETHSS_GMAC0_PORT, ETHSS_ETHSW_PORT0, ETHSS_ETHSW_PORT1,
-+	       ETHSS_ETHSW_PORT2, ETHSS_GMAC1_PORT}},
-+
-+	{0x1, {MIIC_MODCTRL_CONF_NONE, ETHSS_ESC_PORT0, ETHSS_ESC_PORT1,
-+	       ETHSS_GMAC2_PORT, ETHSS_GMAC1_PORT}},
-+
-+	{0x2, {ETHSS_GMAC0_PORT, ETHSS_ESC_PORT0, ETHSS_ESC_PORT1,
-+		ETHSS_ETHSW_PORT2, ETHSS_GMAC1_PORT}},
-+
-+	{0x3, {MIIC_MODCTRL_CONF_NONE, ETHSS_ESC_PORT0, ETHSS_ESC_PORT1,
-+	       ETHSS_ESC_PORT2, ETHSS_GMAC1_PORT}},
-+
-+	{0x4, {ETHSS_GMAC0_PORT, ETHSS_ETHSW_PORT0, ETHSS_ESC_PORT1,
-+	       ETHSS_ESC_PORT2, ETHSS_GMAC1_PORT}},
-+
-+	{0x5, {ETHSS_GMAC0_PORT, ETHSS_ETHSW_PORT0, ETHSS_ESC_PORT1,
-+	       ETHSS_ETHSW_PORT2, ETHSS_GMAC1_PORT}},
-+
-+	{0x6, {ETHSS_GMAC0_PORT, ETHSS_ETHSW_PORT0, ETHSS_ETHSW_PORT1,
-+	       ETHSS_GMAC2_PORT, ETHSS_GMAC1_PORT}},
-+
-+	{0x7, {MIIC_MODCTRL_CONF_NONE, ETHSS_GMAC0_PORT, ETHSS_GMAC1_PORT,
-+		ETHSS_GMAC2_PORT, MIIC_MODCTRL_CONF_NONE}}
-+};
-+
-+static const char * const rzt2h_conf_to_string[] = {
-+	[ETHSS_GMAC0_PORT]	= "GMAC0_PORT",
-+	[ETHSS_GMAC1_PORT]	= "GMAC1_PORT",
-+	[ETHSS_GMAC2_PORT]	= "GMAC2_PORT",
-+	[ETHSS_ESC_PORT0]	= "ETHERCAT_PORT0",
-+	[ETHSS_ESC_PORT1]	= "ETHERCAT_PORT1",
-+	[ETHSS_ESC_PORT2]	= "ETHERCAT_PORT2",
-+	[ETHSS_ETHSW_PORT0]	= "SWITCH_PORT0",
-+	[ETHSS_ETHSW_PORT1]	= "SWITCH_PORT1",
-+	[ETHSS_ETHSW_PORT2]	= "SWITCH_PORT2",
-+};
-+
-+static const char * const rzt2h_index_to_string[] = {
-+	"SWITCH_PORTIN",
-+	"CONV0",
-+	"CONV1",
-+	"CONV2",
-+	"CONV3",
-+};
-+
-+static const char * const rzt2h_reset_ids[] = {
-+	"rst",
-+	"crst",
-+};
-+
- /**
-  * struct miic - MII converter structure
-  * @base: base address of the MII converter
-@@ -204,11 +256,24 @@ static void miic_unlock_regs(struct miic *miic)
- 	writel(0x0001, miic->base + MIIC_PRCMD);
- }
- 
-+static void miic_lock_regs(struct miic *miic)
-+{
-+	/* Protect register writes */
-+	writel(0x0000, miic->base + MIIC_PRCMD);
-+}
-+
- static void miic_reg_writel_unlocked(struct miic *miic, int offset, u32 value)
+diff --git a/include/linux/phy_fixed.h b/include/linux/phy_fixed.h
+index 6227a1bde..d17ff750c 100644
+--- a/include/linux/phy_fixed.h
++++ b/include/linux/phy_fixed.h
+@@ -37,16 +37,6 @@ fixed_phy_register(const struct fixed_phy_status *status,
+ static inline void fixed_phy_unregister(struct phy_device *phydev)
  {
- 	writel(value, miic->base + offset);
  }
+-static inline int fixed_phy_set_link_update(struct phy_device *phydev,
+-			int (*link_update)(struct net_device *,
+-					   struct fixed_phy_status *))
+-{
+-	return -ENODEV;
+-}
+-static inline int fixed_phy_change_carrier(struct net_device *dev, bool new_carrier)
+-{
+-	return -EINVAL;
+-}
+ #endif /* CONFIG_FIXED_PHY */
  
-+static void miic_reg_writel_locked(struct miic *miic, int offset, u32 value)
-+{
-+	miic_unlock_regs(miic);
-+	writel(value, miic->base + offset);
-+	miic_lock_regs(miic);
-+}
-+
- static void miic_reg_writel(struct miic *miic, int offset, u32 value)
- {
- 	miic->of_data->miic_write(miic, offset, value);
-@@ -666,7 +731,24 @@ static struct miic_of_data rzn1_miic_of_data = {
- 	.miic_write = miic_reg_writel_unlocked,
- };
- 
-+static struct miic_of_data rzt2h_miic_of_data = {
-+	.match_table = rzt2h_modctrl_match_table,
-+	.match_table_count = ARRAY_SIZE(rzt2h_modctrl_match_table),
-+	.conf_conv_count = 5,
-+	.conf_to_string = rzt2h_conf_to_string,
-+	.conf_to_string_count = ARRAY_SIZE(rzt2h_conf_to_string),
-+	.index_to_string = rzt2h_index_to_string,
-+	.index_to_string_count = ARRAY_SIZE(rzt2h_index_to_string),
-+	.miic_port_start = 0,
-+	.miic_port_max = 4,
-+	.sw_mode_mask = GENMASK(2, 0),
-+	.reset_ids = rzt2h_reset_ids,
-+	.reset_count = ARRAY_SIZE(rzt2h_reset_ids),
-+	.miic_write = miic_reg_writel_locked,
-+};
-+
- static const struct of_device_id miic_of_mtable[] = {
-+	{ .compatible = "renesas,r9a09g077-miic", .data = &rzt2h_miic_of_data },
- 	{ .compatible = "renesas,rzn1-miic", .data = &rzn1_miic_of_data },
- 	{ /* sentinel */ }
- };
+ #endif /* __PHY_FIXED_H */
 -- 
 2.51.0
 
