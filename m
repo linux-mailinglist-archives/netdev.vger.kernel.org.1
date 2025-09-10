@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-221488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B385B50A22
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:15:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D889B50A2B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99DDF1BC806F
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE3B2563989
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8941E32B7;
-	Wed, 10 Sep 2025 01:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748511EB5E1;
+	Wed, 10 Sep 2025 01:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u4/lJImw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWPk3uTx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37841487E9;
-	Wed, 10 Sep 2025 01:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4804928EB;
+	Wed, 10 Sep 2025 01:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757466950; cv=none; b=IgapzV5/JIceHc36nPpcuXGhzyPOTHcm5IKSIOnV8n5yAf+EoXqqsUGng+Iw4aR7NQuUv4bgRFOYG2RNHYqzPY2bXifIoCacvVeWrmg2yFaJBkFmugMe5MCn2e3wUyWHA2GgwdS9KbmrW0VmiM6GxVQilacR0yO6Y3fe/g/+wXc=
+	t=1757467402; cv=none; b=I+H8mKY+4xsINi4RyjKgPP845Lfd0OfbQJ6RHf6u5xESgr3y7k0a6ZITx7NptPGINdMFHnSoLwtvjsI6aV/el625ohJen4FCKAJqobLZH6thjTz9Gbsr2F0nx1PAHDCxhC56d6jX7AF9SL8Y63sQwE0dfVKG68rJ6nMUHdYYA+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757466950; c=relaxed/simple;
-	bh=cxlh3AJ76sbpWmAnYRTyLTELgkVNAiDa1hROV3mBUWc=;
+	s=arc-20240116; t=1757467402; c=relaxed/simple;
+	bh=o0vciZAdTN6hRxPd/8cva0H8noNZQH8GL+sl7Ryf34w=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jk71l30EkX9VVabmuo6AGVq/6eT2EUVa3iw60EMm1wT4KVImzOLjwYOU85BCapp0Beo4n9LnUtCc2nKNxOtfFQmNDM56jtdNQuU/IUf0K+208UZPOsXD6SMKHhMo86HBOyOZ+sp6U0wpkKCI91epsuTK9+H1aMz800xDhh3XDHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u4/lJImw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C6C6C4CEF4;
-	Wed, 10 Sep 2025 01:15:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RtA9buKU/Ag0qEUM+mDbuT6mTVRM/eCflgUUuQ0RQLGd11K3wk+D8ef3BqNpVsa+3wwgFpGEM64W1HvI0oWSEuv7HsmhOmrNT+IuIoKKSNijZPszIo70IheJqSa6+rVD68oxYEkQOt7joTQHizyAfKHxBFJL1ABg7k4TdqTQwh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWPk3uTx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45157C4CEF4;
+	Wed, 10 Sep 2025 01:23:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757466949;
-	bh=cxlh3AJ76sbpWmAnYRTyLTELgkVNAiDa1hROV3mBUWc=;
+	s=k20201202; t=1757467400;
+	bh=o0vciZAdTN6hRxPd/8cva0H8noNZQH8GL+sl7Ryf34w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u4/lJImwhptY4sOT6NZoJ7bqQ4r1Ni8t3xFkLQ8PRTKy4+1dlGVEaou9KHTDVbIDj
-	 F8SjFUNFDgYpOhAg9e1moGt/eKSoAbaDo/GeiBXPx3EWyDTcb7GZ3jMfEkn60WMQMB
-	 AGW8hDkoqyVVi2S0vBemcUkZSEidafBQibN1ffg4XI+UlZkq9Smm1J9Ce9MQHlGwOj
-	 lMPEaF/3TEOTuKpIsqLjzNtyujkP3zW5AK/w9p9KhYE+7f3fJQDxtaUEaJVUTtYoc3
-	 cTqbvSdYrv2h5bunigBwd4MZbcu7uGk5qUy/qVF1F6+F5uRn84h1zYPcQ0RB0dWFCz
-	 kr1Y41UEIIk+w==
-Date: Tue, 9 Sep 2025 18:15:47 -0700
+	b=cWPk3uTxD2nsGcFORxKr3KINSeD5//ES9AWvBN8+vGtNE2CKsFF6EsJj8bhDGgE7P
+	 2lBWVNE/uqhvkk0MA3OJvf0yduIdNnOxL6ejMdIV42GTLW/7Mo5RfSMo6LQfNvwTya
+	 Qqf5TcB8bWo4C3iKiV9fGN5WEk7E/AsUDA8eP4gMGFbMvEiZnH5Nt/la5xAztriQA+
+	 TaRJhr72rB1ekwkAfjRgayKol5jVW0XWumhAIMnlh/KyorxiTq82diivZOfgR+/U5u
+	 KyJT6wT4aPrx8q5PVNCQxhiXBl4RipHu9qDCSjFEjaL1Vl1xwa7I+0p3Vlkg7UFMaF
+	 1mY9cmC8mB5FA==
+Date: Tue, 9 Sep 2025 18:23:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?5p2O5YWL5pav?= <conleylee@foxmail.com>
-Cc: vkoul@kernel.org, davem@davemloft.net, wens@csie.org,
- mripard@kernel.org, netdev@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: sun4i-emac: free dma descriptor
-Message-ID: <20250909181547.0782840f@kernel.org>
-In-Reply-To: <tencent_0DDFF70B944AC1B7CE9AC20A22D8DA3C4609@qq.com>
-References: <20250904072446.5563130d@kernel.org>
-	<tencent_D434891410B0717BB0BDCB1434969E6EB50A@qq.com>
-	<20250908132615.6a2507ed@kernel.org>
-	<tencent_0DDFF70B944AC1B7CE9AC20A22D8DA3C4609@qq.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Jianbo Liu
+ <jianbol@nvidia.com>
+Subject: Re: [PATCH net 2/3] net/mlx5e: Prevent entering switchdev mode with
+ inconsistent netns
+Message-ID: <20250909182319.6bfa8511@kernel.org>
+In-Reply-To: <1757326026-536849-3-git-send-email-tariqt@nvidia.com>
+References: <1757326026-536849-1-git-send-email-tariqt@nvidia.com>
+	<1757326026-536849-3-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 9 Sep 2025 14:36:42 +0800 =E6=9D=8E=E5=85=8B=E6=96=AF wrote:
-> Thank you for the suggestion. I've reviewed the documentation, and
-> setting the reuse flag while reusing descriptors might be a good
-> optimization. I'll make the changes and run some tests. If everything
-> works well, I'll submit a new patch.
+On Mon, 8 Sep 2025 13:07:05 +0300 Tariq Toukan wrote:
+> If the PF's netns has been moved and differs from the devlink's netns,
+> enabling switchdev mode would create an invalid state where
+> representors and PF exist in different namespaces.
+> 
+> To prevent this inconsistent configuration,
 
-To be clear if you're saying the driver is buggy and can crash right
-now we need to fix it first and then optimize it later, as separate
-commits. So that LTS kernels can backport the fix.
-
-The questions I'm asking are because I don't understand whether the
-upstream kernel is buggy and how exactly..
+Could you explain clearly what is the problem with having different
+netdevs in different namespaces? From networking perspective it really
+doesn't matter.
+-- 
+pw-bot: cr
 
