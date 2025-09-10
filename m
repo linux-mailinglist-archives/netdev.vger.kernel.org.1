@@ -1,120 +1,190 @@
-Return-Path: <netdev+bounces-221614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3022B5135C
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:59:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA378B511E3
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:57:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 967EF3B4913
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:59:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 517784616D5
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA27314A78;
-	Wed, 10 Sep 2025 09:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D71C2BE02B;
+	Wed, 10 Sep 2025 08:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YygIbnNF"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aN12IBeL";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WFCvfnlz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1782571D8;
-	Wed, 10 Sep 2025 09:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA2631D39A
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757498342; cv=none; b=uocB1AxjnvXMc4Bm/oD9jSPpQnkz4wgweEZaQTn/Rsctk6WrHeJoEKz35Gzd0rMgu0GmqFF4H3g470BvOuuvPYc0j/eAOJr4xnOjlCaxLkOKtIST7TNzJMCkljZWpkITHBRJXcw+pIuu/1gwRnwyWacEPk1TCfffrhzCEZlh+GQ=
+	t=1757494642; cv=none; b=V4b7SHDECLDjTuHTAFBIJqu/4c4p1+UrBL7CKaEG2n7hyTvkQLwCJkCeDZGjwyp+uP9Fpd22MIf8SgDmzlW2fvFIf0CVt4l/nxoI6V+JKdpdC1nqro9/7BmxDEQiwl1ak7g94AVydMxicb529S0xxZ95O4Z7Ze1YRMQGAZZUOGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757498342; c=relaxed/simple;
-	bh=BCXjFIv5eUOEWTgnUI3HxkUvkh3QdFBmS5Rfy5izgT8=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Q/Z6WmjyD+w5uc3SSnc+VFhev2Tbf7vQU0lP0Da0/XfulclGMZMBLXw58SbKesRXuNx08fI4w9UiVQRaXY7K59V7v81FmXA4NNDTdaa+31msoidLaHw95U2Xn0njLp8Zskh90Bo8OIINSZ0rozSsERkX4exxkMfKnqsc7fu7z4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YygIbnNF; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3db9641b725so6549886f8f.2;
-        Wed, 10 Sep 2025 02:59:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757498339; x=1758103139; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dcj8LHmCHhhzaPZqNxD2R+CK+UNale4qQvJ5EcHfdLQ=;
-        b=YygIbnNFmug24FErkWblhqTHNHIaFW8M3plnP94wPu4Auo4T5lrlhQ4j7v19AmZEyH
-         N7+P/xfFkhxf1JxtrgX3Sx83icojpu0A8ndeaxOMFHKHeo31Bxkw32vmV2Cv8TQwubpV
-         do43EKLXdE9HSaxacIUJV+xPYk1MYBoXXjLkLnh9hFxmU2cbBrtWPfNvS6yppeDDOOep
-         dLoivbxjs1zTRk1yR5YGzIyVYdTwk2uYtCM3aRBFEmYlbTlrgoA8A1YsuEf0QB0rKcpG
-         kQGUG+Q/9Cr4/m67oTLwD/DNO2GV4Ydt6rqNq319WtIn9mlqx1Qo/akKq0JPC9TXf069
-         YOlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757498339; x=1758103139;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dcj8LHmCHhhzaPZqNxD2R+CK+UNale4qQvJ5EcHfdLQ=;
-        b=YhtkzNc2PchHRUCMrssY/Yqt4Snayn5uMzpFEUnz15C1KS3B0r5Mji36uSkLvtzM08
-         fFLdq4nhzTeXN45cJWSWk29wUdm4VAjA7il3VOCkv/kc3k8QvglqovVbyqrU2Xk9Nqzr
-         +kRO3MnW8+MI0aCLOnZGGRexlz4Wehnt/obkrgYWwp2IOxs0Yerii+3OzTNTPz20J3qa
-         ntWfYxkQ8prigiEfe9k4bRe24lhFHN5mW3+BB91UJpWFBt34KWfToiOIxsALmBla2R8B
-         dATfzmKpxUXqfeVa4j/3Fwzvef2cOWL9BXBxJzs0k6a0HzYEg0gCMgJhG9tlSIgIrq6p
-         S1zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVfWBNcwfWTR/KNoPYnLcEJAG1qe5+92RXz1a5qs2ZC72iq6adKs+yRYLS3UZGSBeoQZeHWcnc@vger.kernel.org, AJvYcCVTaq8unD0H99zcfEdbK+FqvNDcp3bfKEHzeiTRv7YkHRiFloui4KjDddzSbkRhpLzvrI7TjRzKY9UpRAo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyML7lTurmJCqlE8114KWt4xP0SIFRBY4HoqZpYNI1l+9+nr4V7
-	1AOp+ouv8saEwOZ36olRae6F2XcxNb0OfXfWHptzaLbUa33K+cBwTmBC2ET6d2QRELg=
-X-Gm-Gg: ASbGncsr7PR3Yr6JFCO2f257gV2lXnIM46BPvm5iZvqQ9WrhdbEDRkJxLGeUSa7E3yt
-	HyMyS4y+uh7Pl7vMKHKYym/tfaYmXRW8eKV5MGZJ/ppCIbcT3tFxhjEOKfEauK36WMnAzIh2+VP
-	yg5ggHBx9baMNgSFjZdnzS6zYq51pdZIx0UpKg8/gE8ljT9B4e93cZX1U9FtcP1l9FxCOop1eEp
-	xph8iGSmgKxN61JE2eJ20rzrX2BfgXTOe3o35wAIvvWQjX3JLeDw8AjJ/uJYFLC19/ldHJ7utDB
-	vXcB0xJKNutWNmwmb7qn5XiKZttWqwaoxOmOzEXHfckLWx9JTa7C5SIZ9RaNU1ewGGrug8dUp0w
-	l0m/j9XvyD8OauY0lEMH1zK5K58shRCvWweFdAmq7Fv7l
-X-Google-Smtp-Source: AGHT+IG1OsKW3uGvrvidR1V/OAfvfZahPy53s3qyGN1V32wVeDsT3Sd+YD+xtJm/ziSYOMAV7t2fTw==
-X-Received: by 2002:a5d:5847:0:b0:3e3:921b:65a2 with SMTP id ffacd0b85a97d-3e643556501mr9986581f8f.50.1757498338540;
-        Wed, 10 Sep 2025 02:58:58 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7521ca2aesm6390950f8f.26.2025.09.10.02.58.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 02:58:58 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/8] tools: ynl: fix errors reported by Ruff
-In-Reply-To: <20250909-net-next-ynl-ruff-v1-0-238c2bccdd99@kernel.org>
-Date: Wed, 10 Sep 2025 09:53:11 +0100
-Message-ID: <m2wm66y9hk.fsf@gmail.com>
-References: <20250909-net-next-ynl-ruff-v1-0-238c2bccdd99@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1757494642; c=relaxed/simple;
+	bh=n6HktFMvXlEZfA1HoDdBO9d4w2msy3IhJMr13Fd8rE0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=l0SxQlodaNPONm5HHzx2frjjk4QgR/U1mI8S8ID74VFTdRdGHpGrEyr5cnoLSGSHCUTULwHirbrc8ALi+WpmBd8nl2We0rgYhKdyrZGYes1HVRfc4lua72iE2cAZPyI8mJ64GXyR0iYLMcbIJh7rTmjXSJFsb2ir/Yj2DR8Fqu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aN12IBeL; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WFCvfnlz; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1757494638;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pc/v+5JWAGJNdou9DYjUduiOh9htdW77VarGrhFdsfU=;
+	b=aN12IBeLmQo21aQlVNThc1EpUhg4L6W6cmFgCOYjrLiqDxPjUtGrkon8xZNAPN8MEXAy7R
+	lD2oKJgqBLLBRiL5MXb31XQ0yuZgcg8qbddr9eXJi2P6vmR237Ur85UXXjuNlf8HFq6JPX
+	n3ca4ktYKETDtKQb6LnFoFN90APMWGEQe5USGhq5seuKSaYWoH7StFVBhgFPmmpmRfRlJu
+	x5Jg7iyjQv5jHLQYD84yBiDn4NVhr4U0UWVjzkKihnxsh+0dZYZkYlAnElAtpEwJ8C6uPi
+	NUTlravFNK/cbpbvtoV67XhBWkDmiAXwSgliq+NNNiS9Q8U7UOhfXdGB9m7n0w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1757494638;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pc/v+5JWAGJNdou9DYjUduiOh9htdW77VarGrhFdsfU=;
+	b=WFCvfnlzo33gNofzRk7Wi34l4vbkWKvQU4gIuAvAiaGKiRKxYd14v0T5F3nbVz0xR4LYCT
+	W5PIyc3HMkDYMOBw==
+To: Kohei Enju <enjuk@amazon.com>, vitaly.lifshits@intel.com
+Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net,
+ edumazet@google.com, enjuk@amazon.com, intel-wired-lan@lists.osuosl.org,
+ kohei.enju@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, przemyslaw.kitszel@intel.com,
+ aleksandr.loktionov@intel.com
+Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] igc: unregister netdev
+ when igc_led_setup() fails in igc_probe()
+In-Reply-To: <20250910075231.99838-1-enjuk@amazon.com>
+References: <15453ddf-0854-4be6-9eed-017ef79d3c77@intel.com>
+ <20250910075231.99838-1-enjuk@amazon.com>
+Date: Wed, 10 Sep 2025 10:57:17 +0200
+Message-ID: <87cy7yk7ma.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
 Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-"Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
-
-> When looking at the YNL code to add a new feature, my text editor
-> automatically executed 'ruff check', and found out at least one
-> interesting error: one variable was used while not being defined.
+On Wed Sep 10 2025, Kohei Enju wrote:
+> + Aleksandr
 >
-> I then decided to fix this error, and all the other ones reported by
-> Ruff. After this series, 'ruff check' reports no more errors with
-> version 0.12.12.
+> On Wed, 10 Sep 2025 10:28:17 +0300, Lifshits, Vitaly wrote:
 >
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
-> Matthieu Baerts (NGI0) (8):
->       tools: ynl: fix undefined variable name
->       tools: ynl: avoid bare except
->       tools: ynl: remove assigned but never used variable
->       tools: ynl: remove f-string without any placeholders
->       tools: ynl: remove unused imports
->       tools: ynl: remove unnecessary semicolons
->       tools: ynl: use 'cond is None'
->       tools: ynl: check for membership with 'not in'
+>>On 9/8/2025 9:26 AM, Kurt Kanzenbach wrote:
+>>> On Sat Sep 06 2025, Kohei Enju wrote:
+>>>> Currently igc_probe() doesn't unregister netdev when igc_led_setup()
+>>>> fails, causing BUG_ON() in free_netdev() and then kernel panics. [1]
+>>>>
+>>>> This behavior can be tested using fault-injection framework. I used the
+>>>> failslab feature to test the issue. [2]
+>>>>
+>>>> Call unregister_netdev() when igc_led_setup() fails to avoid the kernel
+>>>> panic.
+>>>>
+>>>> [1]
+>>>>   kernel BUG at net/core/dev.c:12047!
+>>>>   Oops: invalid opcode: 0000 [#1] SMP NOPTI
+>>>>   CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-=
+enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
+>>>>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debi=
+an-1.16.3-2 04/01/2014
+>>>>   RIP: 0010:free_netdev+0x278/0x2b0
+>>>>   [...]
+>>>>   Call Trace:
+>>>>    <TASK>
+>>>>    igc_probe+0x370/0x910
+>>>>    local_pci_probe+0x3a/0x80
+>>>>    pci_device_probe+0xd1/0x200
+>>>>   [...]
+>>>>
+>>>> [2]
+>>>>   #!/bin/bash -ex
+>>>>
+>>>>   FAILSLAB_PATH=3D/sys/kernel/debug/failslab/
+>>>>   DEVICE=3D0000:00:05.0
+>>>>   START_ADDR=3D$(grep " igc_led_setup" /proc/kallsyms \
+>>>>           | awk '{printf("0x%s", $1)}')
+>>>>   END_ADDR=3D$(printf "0x%x" $((START_ADDR + 0x100)))
+>>>>
+>>>>   echo $START_ADDR > $FAILSLAB_PATH/require-start
+>>>>   echo $END_ADDR > $FAILSLAB_PATH/require-end
+>>>>   echo 1 > $FAILSLAB_PATH/times
+>>>>   echo 100 > $FAILSLAB_PATH/probability
+>>>>   echo N > $FAILSLAB_PATH/ignore-gfp-wait
+>>>>
+>>>>   echo $DEVICE > /sys/bus/pci/drivers/igc/bind
+>>>>
+>>>> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+>>>> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+>>>=20
+>>> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+>>
+>>Thank you for the patch and for identifying this issue!
+>>
+>>I was wondering whether we could avoid failing the probe in cases where=20
+>>igc_led_setup fails. It seems to me that a failure in the LED class=20
+>>functionality shouldn't prevent the device's core functionality from=20
+>>working properly.
+>
+> Indeed, that also makes sense.
+>
+> The behavior that igc_probe() succeeds even if igc_led_setup() fails
+> also seems good to me, as long as notifying users that igc's led
+> functionality is not available.
 
-The series looks good to me, thanks for the fixes.
+SGTM. The LED code is nice to have, but not mandatory at all. The device
+has sane LED defaults.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+>
+>>
+>> From what I understand, errors in this function are not due to hardware=
+=20
+>>malfunctions. Therefore, I suggest we remove the error propagation.
+>>
+>>Alternatively, if feasible, we could consider reordering the function=20
+>>calls so that the LED class setup occurs before the netdev registration.
+>>
+>
+> I don't disagree with you, but I would like to hear Kurt and Aleksandr's
+> opinion. Do you have any preference or suggestions?
+
+See above.
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmjBPW0THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgmfSEACerOjOXk+2Y8gvMjauZVEXuS1cMIaM
+Ej18mKnpkGLjVUjPdBNzXM3G3PcE4XZnl191D3QBpAHnopTaf9dRdSS0WjeNa1sY
+QlXkINq9DF+rNZmca3vGIyEv+DHHl+/r9APfWJKBE82gpg/+3tjbip18NIVQfes3
+kCQQiyFJfiLVTXSsZzQnF3/JQLjuahgM3ysXzq+jEPLq25A5IOma+cksRFi2nW5d
+uM4D4ArgTvX5eVP3Q2bQLJvoaqUd2pkdywquIKcboSMuKiSmVz3CQFUuZooiV6kq
+1qbwsqyo694SUgMCTN/gwvGTPuyjEHOOiXQs6lgR/4ba/3AHUv9ncQsJZYd0+p/k
+hDKypy7/JhV0HUjvOLqwFV8BvPqYwK21D6IFogbO4kYqzwx5++CL0JJHvDweP9Q0
+6une76DEbGMgUG3KJBMBv5w6oszPsH1PwBSLzPE7Lh+Q41hOleJjy9UOB2jzxqpb
+Fp0TYZ4619VNCppChwGzo9BA9fbfkIXiW+rw6mKXTUHFXckrVRvlwVP8ixVwlvto
+CHzPoOeCKcBYeN5g6rrEkfiQn4lMQwVROyY33nJbK/ycY3qGYmRR/v0TMTZ4R8O2
+SV4PYIDP8ul3VK+Cf55+LN0VrDM4Po1H9vgPgCcOPTh/LL329z1T1u3RQgG+BBac
+jAEsDZ20sajB8Q==
+=qkE/
+-----END PGP SIGNATURE-----
+--=-=-=--
 
