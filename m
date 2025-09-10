@@ -1,143 +1,148 @@
-Return-Path: <netdev+bounces-221729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287CDB51B1B
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:12:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE1B1B51B18
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 568DFB6463A
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:02:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B98B174086
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF212D0602;
-	Wed, 10 Sep 2025 15:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97A62BE7AD;
+	Wed, 10 Sep 2025 15:09:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="jQPxB1FV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qjg1XiVy"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE3F1E8320;
-	Wed, 10 Sep 2025 15:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757516625; cv=pass; b=NPfXtVQzPpNAND/qnb2sYWnfgJxaVq+Xu+kd4OQzb2AYYWpM29AjqwXC01jA7tcdpmIzJqPYzeLm2A1JEshjP1WYSeeifPusncKZFcDZN1KGpW/wMmz/qcFBRyHJBeodSTe3OCTZSFHl4ZzJUVQjSldJsO/8nMBxbgn2h/IuLcs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757516625; c=relaxed/simple;
-	bh=Xw+/4WyQm5ISX5P9Xq6fcVT5Ub7wAv4zcJxXCMGhux8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZljhatN7/RgSYxQajzCZRsJUsJqrucA5+VPQ6nIDKSg2+jA0AbtQ6x7DNfseez4lEH6uL4X0wteJGKWLmmLAKCVKByJbxn1Xsm5UL22uVAc/4FMn0ZCctW0gQqcnNGSy1L8htmfgnwVYH8QZF4bKGWWwEAFaZmX6abJGxdG28cU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=jQPxB1FV; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1757516557; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=OjGcbwHQ7qFc4F9AAkVwIzKWD5HRtNcVph5abNLqKUYPGk4w1ePjBCj0tz7hti9MHbxdOhEYELdQk/ziPXJHC2RDGoKpa9/5V5AU76oYgTS7M4uFLMI+DKOBXicgR2t+7eQlayb2lIUGu7Thpeqbqbt6dIgRH5W5B/PtH+5r7iQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757516557; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=QfGtFkV2BjKT/6QYgO3xE9sPr0RNHiuBKm13evHqiAQ=; 
-	b=LOEC3tcunob47lit5X+QQ9cxlFjZCpyRGy0IBEJP/2ah/bJ6nUgxS8poFqqzD1B/vLwVrqQVOYrF+0STYNRWbvQfXdnIeWb9becwEvVf8U6HrNC2fD1GBVkDCe8oB8ETdatHQJqPnph74AncKieCSksqeFj/wxL2bVtsipVvcOM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
-	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757516557;
-	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=QfGtFkV2BjKT/6QYgO3xE9sPr0RNHiuBKm13evHqiAQ=;
-	b=jQPxB1FVZqyhfX615s1wyOYg+A9wixZAqzUKYwPAYzueo/S9dJFzf0F2jcR21D0D
-	Scy1nrNCr6VGsY3IM6pc3R62vRrVdqtj1AgrtdZQRCsDrWeQgb1iGdpx2unAltp3b8y
-	RazFXuHMg1VK5VGe5MWq7DkXjZp4cPizww9OdPxk=
-Received: by mx.zohomail.com with SMTPS id 1757516554744986.7207805498508;
-	Wed, 10 Sep 2025 08:02:34 -0700 (PDT)
-Message-ID: <6ebef7d1-69b3-4f40-85ba-3c15653eba8e@collabora.com>
-Date: Wed, 10 Sep 2025 12:02:22 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25DF1E8320;
+	Wed, 10 Sep 2025 15:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757516956; cv=none; b=N/Vx0PlWppFLjwW7AHqVSxO6fKyg4EOuynA72UU47bWf+BfUtfMXbtry0KEBEt04n/7EAtHnS/EmnOnpHn7c4pybekYRz+mi0AaGE7GePjc9bxRegx7b6JW67xWY7FjaNRm5mbnKchFFaKPvfQVFBHl+Y6RiS33HpWe5+vtR6O0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757516956; c=relaxed/simple;
+	bh=ydn2xtFjAjaReC6GWq0B2HXB/HbN5g3KL/JJeEAI6Tw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ceXk+qiI241Ii3O3ZXcf01m7LgVyjno62DpIlXTHpHa/f9XAuR842iuTvtR3u4mYU0Po3/cf8uaQ117mI++HWlFc3ITDg5kC2qXms08rJ8AQL1jILym4Kqyt8u1PIJ6FAcQtDUkQsDbHNahTHrSe2SbRTFE6/Xhp1vRJ/OQfZQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qjg1XiVy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A96D0C4CEEB;
+	Wed, 10 Sep 2025 15:09:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757516954;
+	bh=ydn2xtFjAjaReC6GWq0B2HXB/HbN5g3KL/JJeEAI6Tw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qjg1XiVygkBuHfd07CGmzSo/BBZXDsGklMV0teiRj9Z8OCLNdQBIS6DOn6KlS5iAF
+	 YrMK97cedrPJ+ls5/8RGkg+kMzekHGsJoZNal3m+g9MMIkxKeJCvlEuwD0AajJyVyT
+	 nVVgaq8HdtMZ+kaQYTmwo3o7W9/lsWczG/Jd/89uasTo+qK3R3qYNi0zjmm9+qfnp7
+	 HcznSK765Tg/LeGyQZKu/6bqp01nzTsg/hgsCaQGwpqGFES+HIlh/jP+1pUnvj7WM5
+	 m04NWxyYbHAfuG2S1vrxIHSpSmqrlq0m6PDAL10LSWZJdGlwSDWmjA5B2zlSh5ye+y
+	 90Ey/7zxBol8w==
+Date: Wed, 10 Sep 2025 16:09:05 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Marco Felsch <m.felsch@pengutronix.de>,
+	Jonas Rebmann <jre@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+	imx@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>, linux-sound@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	Shengjiu Wang <shengjiu.wang@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: nxp,sja1105: Add reset-gpios
+ property
+Message-ID: <693c3d1e-a65b-47ea-9b21-ce1d4a772066@sirena.org.uk>
+References: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
+ <20250910-imx8mp-prt8ml-v1-1-fd04aed15670@pengutronix.de>
+ <20250910125611.wmyw2b4jjtxlhsqw@skbuf>
+ <20250910143044.jfq5fsv2rlsrr5ku@pengutronix.de>
+ <20250910144328.do6t5ilfeclm2xa4@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 14/14] dt-bindings: media: mediatek,jpeg: Fix jpeg
- encoder/decoder ranges
-To: Rob Herring <robh@kernel.org>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
- andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
- broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
- conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com,
- edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com,
- jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com,
- krzk+dt@kernel.org, kuba@kernel.org,
- kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
- linus.walleij@linaro.org, louisalexis.eyraud@collabora.com,
- maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
- mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
- p.zabel@pengutronix.de, pabeni@redhat.com, sean.wang@kernel.org,
- simona@ffwll.ch, support.opensource@diasemi.com, tiffany.lin@mediatek.com,
- tzimmermann@suse.de, yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
- linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org
-References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
- <20250820171302.324142-15-ariel.dalessandro@collabora.com>
- <20250820185508.GA273751-robh@kernel.org>
-Content-Language: en-US
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-In-Reply-To: <20250820185508.GA273751-robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="7Lh4wxWc22jPqJvF"
+Content-Disposition: inline
+In-Reply-To: <20250910144328.do6t5ilfeclm2xa4@skbuf>
+X-Cookie: I think my career is ruined!
 
-Rob,
 
-On 8/20/25 3:55 PM, Rob Herring wrote:
-> On Wed, Aug 20, 2025 at 02:13:02PM -0300, Ariel D'Alessandro wrote:
->> Commit 14176e94bb35d ("arm64: dts: mediatek: mt8195: Fix ranges for jpeg
-> 
-> That commit is not in any upstream tree.
+--7Lh4wxWc22jPqJvF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Ugh, indeed. Dropping this patch.
+On Wed, Sep 10, 2025 at 05:43:28PM +0300, Vladimir Oltean wrote:
+> On Wed, Sep 10, 2025 at 04:30:44PM +0200, Marco Felsch wrote:
 
-> 
->> enc/decoder nodes") redefined jpeg encoder/decoder children node ranges.
->> Update the related device tree binding yaml definition to match
->> mediatek/mt8195.dtsi, as this is currently the only one using it.
->>
->> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
->> ---
->>   .../media/mediatek,mt8195-jpegdec.yaml        | 31 ++++++++++---------
->>   .../media/mediatek,mt8195-jpegenc.yaml        | 15 ++++-----
->>   2 files changed, 24 insertions(+), 22 deletions(-)
->>
->> diff --git a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
->> index e5448c60e3eb5..b1f3df258dc87 100644
->> --- a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
->> +++ b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
->> @@ -36,7 +36,7 @@ properties:
->>   
->>   # Required child node:
->>   patternProperties:
->> -  "^jpgdec@[0-9a-f]+$":
->> +  "^jpgdec@[0-9],[0-9a-f]+$":
-> 
-> This is wrong unless 0-9 is a separate, distinct address (like a chip
-> select #).
+> > Can you please elaborate a bit more? I was curious and checked the
+> > AH1704, it says:
 
-Ack.
+> > "The RST_N signal must be kept low for at least 5 us after all power
+> > supplies and reference clock signals become stable."
 
-Thanks for the feedback.
-Regards,
+> > This is very common, so the driver only needs to ensure that the pin was
+> > pulled low for at least 5us but not exact 5us.
 
--- 
-Ariel D'Alessandro
-Software Engineer
+> The statement says that during power-up, when the supply voltages and
+> clocks rise in order to become within spec, the reset signal must be
+> held low. This requirement lasts for up to 5 us more after the other
+> signals are in spec.
 
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
-Registered in England & Wales, no. 5513718
+...
 
+> I said that _while the supplies and clocks aren't in spec and 5 us after
+> they become in spec_, RST_N has to be kept low.
+
+> And if you plan to do that from the GPIO function of your SoC, the SoC
+> might be busy doing other stuff, like booting, and no one might be
+> driving the RST_N voltage to a defined state.
+
+I suspect you're reading too much into the datasheet there.  I suspect
+that what it's trying to say is that the reset signal only works with
+stable power and clocks, that it must be held low for the 5us while
+those conditions hold and that you have to do at least one cold reset
+after power on.  The above wording is pretty common in datasheets and I
+know in a bunch of cases it was carried forward kind of blindly rather
+than looking at the actual device requirements.
+
+> It really depends on a lot of factors including the reset timing and
+> supply voltage distribution of the PCB, but RST_N has essentially 2
+> purposes. One is ensuring proper POR sequencing, the other is cold
+> resetting at runtime. You can do the latter over SPI with identical
+> outcome, which leaves proper POR sequencing, which is not best served by
+> a GPIO in my experience.
+
+I'm not sure not including the signal in the DT bindings is going to
+influence board designers much either way TBH.
+
+--7Lh4wxWc22jPqJvF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjBlJEACgkQJNaLcl1U
+h9DAVQf/bV9pJbE/mcsitFrWvPTWQA9z8+bhcyfQvq0Gkx7sHsDEmqtDTZwoRHt0
+l9vaWvTC9naNGIpZ12Qi03nJGcQlGzXAnoWmccXlXwBn6MvMPFBlMsgKNyz+gTNz
+catYyQNIJN6FIQm9deSbtUx8L7B7pe+4SAPw86OtEJZnnehm2O41+jzb4tEyUCKP
+WkmYb5kn9Lvn6zHZb/7b1B7s8wSq+6Ztn1Bveyiu+qdA82H6K+Arwau1Dx3eVffA
+JFfvrMeyRcB5Uw075C0YvBBtvaJycYewBMYMp4rIPrN6L8LzDXyvIxDo2bKOsy7m
+YY6fHqSe2ib/4su6ne2AZDPFBN2Qew==
+=Xxyx
+-----END PGP SIGNATURE-----
+
+--7Lh4wxWc22jPqJvF--
 
