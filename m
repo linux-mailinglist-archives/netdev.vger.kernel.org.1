@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-221771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8499B51D51
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:17:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D44FB51D63
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DE4E3BE1D7
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:17:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18D1A173DFA
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82721337699;
-	Wed, 10 Sep 2025 16:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B7033CE8A;
+	Wed, 10 Sep 2025 16:16:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RZN5P6ce"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sbsa6cNf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE4A3375C2;
-	Wed, 10 Sep 2025 16:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299273376A3;
+	Wed, 10 Sep 2025 16:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757521002; cv=none; b=ZXD5sGqfBJGmG+JLmlJ+9fU/dzr5aYP+RrOA7C7B75RN0GwQUmJPAbItp3gUPd0Fpe6qfkL6NVtCrPAvqLjLbedV5b4tfkhsSjzB1bERz2Zvo21hSFFQrhcFeNfZHtjfbvbR5KvweaS1f09L6Wv0o0O5apvSXrwXrNnkQVyDN7M=
+	t=1757521005; cv=none; b=pOHF5DWkPm+84M3KlBWObidn3WhXwRCk7pUBa/4cQuLr3kVJP5aGa67mGWegRrjK6zTKdJoW+0BGlQT0+MeOnzpHD2H01iLA23cn2enqkKeTQ098yScBPQSjs1nclty3l8W9DnvMZhVOfRB7SSHpDBfOf0gTXHcuVgSvAwS5GV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757521002; c=relaxed/simple;
-	bh=BeobAv07xjOjICoXgtgNMpxQ/3t9JQQYycP5qPziRLc=;
+	s=arc-20240116; t=1757521005; c=relaxed/simple;
+	bh=cAG4P4/fGEfPCrbBFPw8+oF3biefjVuSP/JkdO9TtMg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EFJygzlwqmGb8XvStn3fTPdxWks/SInmvItItdK/Sf+3jy8XCZlQ9u3Z5jdGS0Oe35v5FYjzUsiSdnpSBa0tm0f1jdTHNlt5mU3CHaWSHaPv5FSkWlTXdrjIWYTipHnzIQJnUbCHBR2wFZw6Sv6BAIR7y7VtAHm+gJLOCuxMgu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RZN5P6ce; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=I4btij9Vqr9a9y6ttY31+eTvL1mT4Fm6Is4dzYixzk/CCJhSjUFEuvVVYw6KYBst72juxjby4ibGvv0dU6+QNfDAyUlMY0/WoenstBIMQwlMcjmq9/U5SgxVKbfzcBmiLnlcmIl0LMGl90oLAKJ7YhIiVCOBSho7hlw4zZno2ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sbsa6cNf; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id BA4FC4E40BBC;
-	Wed, 10 Sep 2025 16:16:38 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id A7166C6B38C;
+	Wed, 10 Sep 2025 16:16:25 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id AB15D606D4;
-	Wed, 10 Sep 2025 16:16:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A8BC0102F28A8;
-	Wed, 10 Sep 2025 18:16:34 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 766CE606D4;
+	Wed, 10 Sep 2025 16:16:41 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 97FA9102F28F3;
+	Wed, 10 Sep 2025 18:16:37 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1757520997; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1757520999; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=brKOdnCK4c79eJgxsJqiOYDIVJbIJn3tEsmqO4UvEPQ=;
-	b=RZN5P6ceUy23JZd0SwqAYEZJe9ol0o1dLImJ2kAFd3unpcUX6rdZrMgJ5ABPLxXcc9Fqar
-	lYMewixIcRO8NHXv3UrdBwM1BTpoMc/BGD/rC0wozyepfzZb5Xbz2xVXNSmS5Yz5EBZFnd
-	L7aYK+MtbQlxc5LdpsEhhcXzXv+YW1NlLlG6dS0As6Aj3JNPRLNvoW0RDAeGWeCs6cIR8H
-	ZQ1lgANiZI7NoiK55xbaMHg1XX4AbnmGwnGp7zLw/pdq4LLO81G7srU0+uGcipnpDEDprS
-	dmFfbQEoHbe6Ua4bG4z6WWqvLBm1s8aszAqtJ6sPcGiLLIHlMAAHhbP2nQNw9A==
+	bh=oMWyc4KCjaYuFjPAmTfCSPaCrCpIfWNEPyjtZueqdro=;
+	b=Sbsa6cNffE58RlgGBZ0jIEwF5lbWbkw5ZPpa5bkln+ZahGyHnHYmef4YVlL3YROlaVxvr1
+	iOVZVS0fRolkeAogoTlRjXTlR1aOwOm9EDkmRS1zkv0AnPF78DSoDYyGmYZPYCKr4k8fpm
+	Y//5nCYhS+dj0b4TDrFHpBAMzDPyjMJaJq+IhVO0NsldJINuKCLGStMRsDDyxqAxtkzKrJ
+	FaULjBpFkqG8lAhQ6TP2JnW0Xo09gpua6TFgTggSsYLc/WStyknvgD4CaWOuz6KuvoI2Ur
+	Dsm2K88YHDuCf8xunbb350MIUM9A5U4zBRJBKf1TIiH3MBHjqWO5YFBnDYAIBw==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Wed, 10 Sep 2025 18:15:32 +0200
-Subject: [PATCH net v5 3/5] net: macb: move ring size computation to
- functions
+Date: Wed, 10 Sep 2025 18:15:33 +0200
+Subject: [PATCH net v5 4/5] net: macb: single dma_alloc_coherent() for DMA
+ descriptors
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250910-macb-fixes-v5-3-f413a3601ce4@bootlin.com>
+Message-Id: <20250910-macb-fixes-v5-4-f413a3601ce4@bootlin.com>
 References: <20250910-macb-fixes-v5-0-f413a3601ce4@bootlin.com>
 In-Reply-To: <20250910-macb-fixes-v5-0-f413a3601ce4@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -78,102 +78,176 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, 
  Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
  Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
+ Sean Anderson <sean.anderson@linux.dev>
 X-Mailer: b4 0.14.2
 X-Last-TLS-Session-Version: TLSv1.3
 
-The tx/rx ring size calculation is somewhat complex and partially hidden
-behind a macro. Move that out of the {RX,TX}_RING_BYTES() macros and
-macb_{alloc,free}_consistent() functions into neat separate functions.
+Move from 2*NUM_QUEUES dma_alloc_coherent() for DMA descriptor rings to
+2 calls overall.
 
-In macb_free_consistent(), we drop the size variable and directly call
-the size helpers in the arguments list. In macb_alloc_consistent(), we
-keep the size variable that is used by netdev_dbg() calls.
+Issue is with how all queues share the same register for configuring the
+upper 32-bits of Tx/Rx descriptor rings. Taking Tx, notice how TBQPH
+does *not* depend on the queue index:
 
+	#define GEM_TBQP(hw_q)		(0x0440 + ((hw_q) << 2))
+	#define GEM_TBQPH(hw_q)		(0x04C8)
+
+	queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
+	#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+	if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+		queue_writel(queue, TBQPH, upper_32_bits(queue->tx_ring_dma));
+	#endif
+
+To maximise our chances of getting valid DMA addresses, we do a single
+dma_alloc_coherent() across queues. This improves the odds because
+alloc_pages() guarantees natural alignment. Other codepaths (IOMMU or
+dev/arch dma_map_ops) don't give high enough guarantees
+(even page-aligned isn't enough).
+
+Two consideration:
+
+ - dma_alloc_coherent() gives us page alignment. Here we remove this
+   constraint meaning each queue's ring won't be page-aligned anymore.
+
+ - This can save some tiny amounts of memory. Fewer allocations means
+   (1) less overhead (constant cost per alloc) and (2) less wasted bytes
+   due to alignment constraints.
+
+   Example for (2): 4 queues, default ring size (512), 64-bit DMA
+   descriptors, 16K pages:
+    - Before: 8 allocs of 8K, each rounded to 16K => 64K wasted.
+    - After:  2 allocs of 32K => 0K wasted.
+
+Fixes: 02c958dd3446 ("net/macb: add TX multiqueue support for gem")
+Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
 Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+Tested-by: Nicolas Ferre <nicolas.ferre@microchip.com> # on sam9x75
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 80 ++++++++++++++++----------------
+ 1 file changed, 41 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 3e634049dadf14d371eac68448f80b111f228dfd..73840808ea801b35a64a296dedc3a91e6e1f9f51 100644
+index 73840808ea801b35a64a296dedc3a91e6e1f9f51..fc082a7a5a313be3d58a008533c3815cb1b1639a 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -51,14 +51,10 @@ struct sifive_fu540_macb_mgmt {
- #define DEFAULT_RX_RING_SIZE	512 /* must be power of 2 */
- #define MIN_RX_RING_SIZE	64
- #define MAX_RX_RING_SIZE	8192
--#define RX_RING_BYTES(bp)	(macb_dma_desc_get_size(bp)	\
--				 * (bp)->rx_ring_size)
+@@ -2478,32 +2478,30 @@ static unsigned int macb_rx_ring_size_per_queue(struct macb *bp)
  
- #define DEFAULT_TX_RING_SIZE	512 /* must be power of 2 */
- #define MIN_TX_RING_SIZE	64
- #define MAX_TX_RING_SIZE	4096
--#define TX_RING_BYTES(bp)	(macb_dma_desc_get_size(bp)	\
--				 * (bp)->tx_ring_size)
+ static void macb_free_consistent(struct macb *bp)
+ {
++	struct device *dev = &bp->pdev->dev;
+ 	struct macb_queue *queue;
+ 	unsigned int q;
++	size_t size;
  
- /* level of occupied TX descriptors under which we wake up TX process */
- #define MACB_TX_WAKEUP_THRESH(bp)	(3 * (bp)->tx_ring_size / 4)
-@@ -2470,11 +2466,20 @@ static void macb_free_rx_buffers(struct macb *bp)
+ 	if (bp->rx_ring_tieoff) {
+-		dma_free_coherent(&bp->pdev->dev, macb_dma_desc_get_size(bp),
++		dma_free_coherent(dev, macb_dma_desc_get_size(bp),
+ 				  bp->rx_ring_tieoff, bp->rx_ring_tieoff_dma);
+ 		bp->rx_ring_tieoff = NULL;
+ 	}
+ 
+ 	bp->macbgem_ops.mog_free_rx_buffers(bp);
+ 
++	size = bp->num_queues * macb_tx_ring_size_per_queue(bp);
++	dma_free_coherent(dev, size, bp->queues[0].tx_ring, bp->queues[0].tx_ring_dma);
++
++	size = bp->num_queues * macb_rx_ring_size_per_queue(bp);
++	dma_free_coherent(dev, size, bp->queues[0].rx_ring, bp->queues[0].rx_ring_dma);
++
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+ 		kfree(queue->tx_skb);
+ 		queue->tx_skb = NULL;
+-		if (queue->tx_ring) {
+-			dma_free_coherent(&bp->pdev->dev,
+-					  macb_tx_ring_size_per_queue(bp),
+-					  queue->tx_ring, queue->tx_ring_dma);
+-			queue->tx_ring = NULL;
+-		}
+-		if (queue->rx_ring) {
+-			dma_free_coherent(&bp->pdev->dev,
+-					  macb_rx_ring_size_per_queue(bp),
+-					  queue->rx_ring, queue->rx_ring_dma);
+-			queue->rx_ring = NULL;
+-		}
++		queue->tx_ring = NULL;
++		queue->rx_ring = NULL;
  	}
  }
  
-+static unsigned int macb_tx_ring_size_per_queue(struct macb *bp)
-+{
-+	return macb_dma_desc_get_size(bp) * bp->tx_ring_size + bp->tx_bd_rd_prefetch;
-+}
-+
-+static unsigned int macb_rx_ring_size_per_queue(struct macb *bp)
-+{
-+	return macb_dma_desc_get_size(bp) * bp->rx_ring_size + bp->rx_bd_rd_prefetch;
-+}
-+
- static void macb_free_consistent(struct macb *bp)
+@@ -2545,41 +2543,45 @@ static int macb_alloc_rx_buffers(struct macb *bp)
+ 
+ static int macb_alloc_consistent(struct macb *bp)
  {
++	struct device *dev = &bp->pdev->dev;
++	dma_addr_t tx_dma, rx_dma;
  	struct macb_queue *queue;
  	unsigned int q;
+-	u32 upper;
 -	int size;
- 
- 	if (bp->rx_ring_tieoff) {
- 		dma_free_coherent(&bp->pdev->dev, macb_dma_desc_get_size(bp),
-@@ -2488,14 +2493,14 @@ static void macb_free_consistent(struct macb *bp)
- 		kfree(queue->tx_skb);
- 		queue->tx_skb = NULL;
- 		if (queue->tx_ring) {
--			size = TX_RING_BYTES(bp) + bp->tx_bd_rd_prefetch;
--			dma_free_coherent(&bp->pdev->dev, size,
-+			dma_free_coherent(&bp->pdev->dev,
-+					  macb_tx_ring_size_per_queue(bp),
- 					  queue->tx_ring, queue->tx_ring_dma);
- 			queue->tx_ring = NULL;
- 		}
- 		if (queue->rx_ring) {
--			size = RX_RING_BYTES(bp) + bp->rx_bd_rd_prefetch;
--			dma_free_coherent(&bp->pdev->dev, size,
-+			dma_free_coherent(&bp->pdev->dev,
-+					  macb_rx_ring_size_per_queue(bp),
- 					  queue->rx_ring, queue->rx_ring_dma);
- 			queue->rx_ring = NULL;
- 		}
-@@ -2546,7 +2551,7 @@ static int macb_alloc_consistent(struct macb *bp)
- 	int size;
++	void *tx, *rx;
++	size_t size;
++
++	/*
++	 * Upper 32-bits of Tx/Rx DMA descriptor for each queues much match!
++	 * We cannot enforce this guarantee, the best we can do is do a single
++	 * allocation and hope it will land into alloc_pages() that guarantees
++	 * natural alignment of physical addresses.
++	 */
++
++	size = bp->num_queues * macb_tx_ring_size_per_queue(bp);
++	tx = dma_alloc_coherent(dev, size, &tx_dma, GFP_KERNEL);
++	if (!tx || upper_32_bits(tx_dma) != upper_32_bits(tx_dma + size - 1))
++		goto out_err;
++	netdev_dbg(bp->dev, "Allocated %zu bytes for %u TX rings at %08lx (mapped %p)\n",
++		   size, bp->num_queues, (unsigned long)tx_dma, tx);
++
++	size = bp->num_queues * macb_rx_ring_size_per_queue(bp);
++	rx = dma_alloc_coherent(dev, size, &rx_dma, GFP_KERNEL);
++	if (!rx || upper_32_bits(rx_dma) != upper_32_bits(rx_dma + size - 1))
++		goto out_err;
++	netdev_dbg(bp->dev, "Allocated %zu bytes for %u RX rings at %08lx (mapped %p)\n",
++		   size, bp->num_queues, (unsigned long)rx_dma, rx);
  
  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
--		size = TX_RING_BYTES(bp) + bp->tx_bd_rd_prefetch;
-+		size = macb_tx_ring_size_per_queue(bp);
- 		queue->tx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
- 						    &queue->tx_ring_dma,
- 						    GFP_KERNEL);
-@@ -2564,7 +2569,7 @@ static int macb_alloc_consistent(struct macb *bp)
+-		size = macb_tx_ring_size_per_queue(bp);
+-		queue->tx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
+-						    &queue->tx_ring_dma,
+-						    GFP_KERNEL);
+-		upper = upper_32_bits(queue->tx_ring_dma);
+-		if (!queue->tx_ring ||
+-		    upper != upper_32_bits(bp->queues[0].tx_ring_dma))
+-			goto out_err;
+-		netdev_dbg(bp->dev,
+-			   "Allocated TX ring for queue %u of %d bytes at %08lx (mapped %p)\n",
+-			   q, size, (unsigned long)queue->tx_ring_dma,
+-			   queue->tx_ring);
++		queue->tx_ring = tx + macb_tx_ring_size_per_queue(bp) * q;
++		queue->tx_ring_dma = tx_dma + macb_tx_ring_size_per_queue(bp) * q;
++
++		queue->rx_ring = rx + macb_rx_ring_size_per_queue(bp) * q;
++		queue->rx_ring_dma = rx_dma + macb_rx_ring_size_per_queue(bp) * q;
+ 
+ 		size = bp->tx_ring_size * sizeof(struct macb_tx_skb);
+ 		queue->tx_skb = kmalloc(size, GFP_KERNEL);
  		if (!queue->tx_skb)
  			goto out_err;
- 
--		size = RX_RING_BYTES(bp) + bp->rx_bd_rd_prefetch;
-+		size = macb_rx_ring_size_per_queue(bp);
- 		queue->rx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
- 						    &queue->rx_ring_dma,
- 						    GFP_KERNEL);
+-
+-		size = macb_rx_ring_size_per_queue(bp);
+-		queue->rx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
+-						    &queue->rx_ring_dma,
+-						    GFP_KERNEL);
+-		upper = upper_32_bits(queue->rx_ring_dma);
+-		if (!queue->rx_ring ||
+-		    upper != upper_32_bits(bp->queues[0].rx_ring_dma))
+-			goto out_err;
+-		netdev_dbg(bp->dev,
+-			   "Allocated RX ring of %d bytes at %08lx (mapped %p)\n",
+-			   size, (unsigned long)queue->rx_ring_dma, queue->rx_ring);
+ 	}
+ 	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
+ 		goto out_err;
 
 -- 
 2.51.0
