@@ -1,143 +1,181 @@
-Return-Path: <netdev+bounces-221760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840C7B51C90
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:55:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F33F0B51C96
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C013188B190
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:54:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 113F218823EB
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C26331AF2C;
-	Wed, 10 Sep 2025 15:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3CB32CF8D;
+	Wed, 10 Sep 2025 15:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LZpfVRhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0819E32CF8E
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 15:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B33327A19
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 15:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757519656; cv=none; b=MDeIaZtTq5x1EkxeUKncpsxwvqBJX7Ij3AhgVhTVAuXC9qQXI4e5Kl92nYYDp5kR0sFHILIlWjbX5rKXGVtGL5xwVA+eZt0x8tOsIoh6QrF0T+BusErn9iv+p2xbHL1sAPYoOTmvtWWHejMcJ0SMHKP+riaLw5HC6kM/QUX7b1Y=
+	t=1757519759; cv=none; b=I9OLyGPHX15A4tMQx6HxLKM9bttPYSBwjVPyF7e2vKoVd7O44g+1SosnVCE+UXwU2Xkf5vb8t57gWpsMoqirJG4O7FyKLxR0AxQKLprUWOeTZhJne0Uz4EbnfGWOMG6Uo0lalYvxKtx+yXPxq+uVW3PtpJzetueZUumS+e3pTNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757519656; c=relaxed/simple;
-	bh=C1AjRx7KnjXXSlctsl/aH4GowViazJTD/uAewQRTZB4=;
+	s=arc-20240116; t=1757519759; c=relaxed/simple;
+	bh=JbkGbKmGymGSLLsdUZaBOo51FNEi13jYTbdjLpf1unA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bv/YptQUh8up4SLbY0qZzbRUOyOeakRSzZEOqaxODYOBuSxh/GeGEPurpyHP4lUvqg+sqyaxZVP6xlvoIoMuq1cbWw5A/Fl/WlDkxXHwhYrqWKFs/ybNSZgFAifWFUBOqETTgUiH74pFgTQc7XBLIfC6W2NPEOWSvPmrgrd97zI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1uwN8y-0008U5-Ku; Wed, 10 Sep 2025 17:54:00 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1uwN8x-000cAf-1T;
-	Wed, 10 Sep 2025 17:53:59 +0200
-Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1uwN8x-00GJ0O-0v;
-	Wed, 10 Sep 2025 17:53:59 +0200
-Date: Wed, 10 Sep 2025 17:53:59 +0200
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Mark Brown <broonie@kernel.org>, Jonas Rebmann <jre@pengutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>, imx@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>, linux-sound@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	Shengjiu Wang <shengjiu.wang@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: nxp,sja1105: Add reset-gpios
- property
-Message-ID: <20250910155359.tqole7726sapvgzr@pengutronix.de>
-References: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
- <20250910-imx8mp-prt8ml-v1-1-fd04aed15670@pengutronix.de>
- <20250910125611.wmyw2b4jjtxlhsqw@skbuf>
- <20250910143044.jfq5fsv2rlsrr5ku@pengutronix.de>
- <20250910144328.do6t5ilfeclm2xa4@skbuf>
- <693c3d1e-a65b-47ea-9b21-ce1d4a772066@sirena.org.uk>
- <20250910153454.ibh6w7ntxraqvftb@skbuf>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PCaHHEDczJW8xTwXnJoJD4kaxlUrzw7lwxZXzBIAxK3qCZBa+zAciLmtm3CRpO3J/6KCiUWWLcKRlyK6T0hgr3IEQopZwJkPcu3PSDw3txu/P3xDidDn7gyCYRXJJWZt35E9W/yTWGXJSalK0ZB0PeGlYyjpCFAnzghEnRe2XBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LZpfVRhf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757519756;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7RAbP5UJcO2BtVVPAKVuEh/4gKQck7zOlT1pd89BKDw=;
+	b=LZpfVRhf+TQDh6yiv16sYtGmEJnkDGT1RnqhUlSuUG0ifVhxBXLFX47Wu6qQosiJ4CKudj
+	c2uQsUSJprvsQOMI8uq2xOeMv35nrBIKwoEBHq+Hq7+uDCAMUspUN+pG6eC9h6V6dxMSdu
+	M4pRYcrj60tB5HblmvuFiyMouohq81c=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-660-FHHhVv2PNG-lPxRKlydMvg-1; Wed, 10 Sep 2025 11:55:52 -0400
+X-MC-Unique: FHHhVv2PNG-lPxRKlydMvg-1
+X-Mimecast-MFC-AGG-ID: FHHhVv2PNG-lPxRKlydMvg_1757519752
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b04206e3d7eso70256266b.1
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:55:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757519751; x=1758124551;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7RAbP5UJcO2BtVVPAKVuEh/4gKQck7zOlT1pd89BKDw=;
+        b=N/zKqJVGzgW1+4S9xr+3mLlD5fR3yiMI8sxl1md9tc67Dxxwbf2CT8rRaZD7rN8qh1
+         AIEBCh4D/Xfqi1LdE3jHnBe2dztT1TnLXUXcsacXUriWrzSIQXa9StfZqF7JsLnIHNCM
+         xvld1wllkwb4seDDXq8upfH1gYyV4v5j1MAc/xthsuuY5LU7rP1L3yv+Mnn3ZgI3Fo8W
+         tPaIy3pS6GGgLE0NAH1eX4rZy1lsVo8iHmaI7V+PHurR6p+sy1Vvs09/mkdBcH+DPIdv
+         5QQidYsaymukStyjW88pM9iEXVPjoX7uxc+/oMAvx9yCw7PZ38B4j6LrnySjt/Md0aWF
+         495Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV+JtTeqreZ9RuETMKiH4ZbRpuf6nveJXETBNEJkt9a5Q7Klm2a3oW4mlk0lJUGconVhNX8UVo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPZO36u/KBTppdwJtRjTVBgrvenYoGW2WoqiKfFm01IqL3itTe
+	e4gov2spwjvbfxsXSlB08qDfves5QbAy4pqY5paRn7KHb7XuE4TjJCQi/agCJBLtZSCkIMF6sDu
+	CiGmP8haV0aXdyXMRvDpywsc0Uutq8vQlnMIPwxkZTsGl4Nv+JPnhch5XlA==
+X-Gm-Gg: ASbGncseHp2xLHONvLNheDve8re3rE0ucW+L1KNf6MknKLPrrbOV1yvU0qYlkoOpxJ9
+	s0uWgqb1Ihr5nhxqcIo3jBLK1G+iiLiRUuZ+E+QBpSP+xFmnBjTZgE+Tp1S5oILl9t423PoQyZR
+	PHEM2s0Fq6H4TD4JEM+zh+fVSWfZVCwmXHCjCZT/Y7bNuT9a/EiFl43mi/5xttDEpypCycvbh9M
+	VKC9LCtdcmpcIVYc7CIEglDhYCDgpLC+0tHVNqRoz8meKt1fZfyWf9C6G9ok4n4wbX201tgfmAD
+	8FlfBzbzsIYRambYfoIGM4OMftR9kyjEBb7pVOqIIveyk+7GAd4PCy2bH5JXSy5gUpnA/9nzm+a
+	97xW38dL2ns+0wTmK
+X-Received: by 2002:a17:907:6d20:b0:af9:70f0:62e3 with SMTP id a640c23a62f3a-b07a648ed52mr11274166b.15.1757519751560;
+        Wed, 10 Sep 2025 08:55:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE4scsY5n/QsLA6mG0sjvrsfoCoD0h3ZgLanYsu42CsuN5gQm2fBKl3Hy6FexJBMaEtSlxTnw==
+X-Received: by 2002:a17:907:6d20:b0:af9:70f0:62e3 with SMTP id a640c23a62f3a-b07a648ed52mr11271166b.15.1757519751033;
+        Wed, 10 Sep 2025 08:55:51 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-185-93.business.telecomitalia.it. [87.12.185.93])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b078334dd71sm180635766b.61.2025.09.10.08.55.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 08:55:50 -0700 (PDT)
+Date: Wed, 10 Sep 2025 17:55:45 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Josef Bacik <josef@toxicpanda.com>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>, 
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, Mike Christie <mchristi@redhat.com>, 
+	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org, nbd@other.debian.org, 
+	Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+Message-ID: <p43lkbkmsgnztlfbnrebsnnlkdvz4lt53vmnenoarejg6lhivz@cbia5lxat73k>
+References: <20250909132243.1327024-1-edumazet@google.com>
+ <20250909132936.GA1460@redhat.com>
+ <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
+ <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
+ <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
+ <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
+ <20250909151851.GB1460@redhat.com>
+ <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250910153454.ibh6w7ntxraqvftb@skbuf>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
 
-On 25-09-10, Vladimir Oltean wrote:
-> On Wed, Sep 10, 2025 at 04:09:05PM +0100, Mark Brown wrote:
-> > > And if you plan to do that from the GPIO function of your SoC, the SoC
-> > > might be busy doing other stuff, like booting, and no one might be
-> > > driving the RST_N voltage to a defined state.
-> > 
-> > I suspect you're reading too much into the datasheet there.  I suspect
-> > that what it's trying to say is that the reset signal only works with
-> > stable power and clocks, that it must be held low for the 5us while
-> > those conditions hold and that you have to do at least one cold reset
-> > after power on.  The above wording is pretty common in datasheets and I
-> > know in a bunch of cases it was carried forward kind of blindly rather
-> > than looking at the actual device requirements.
-> 
-> No, it doesn't say that, and I had discussions with the application
-> engineering team for this chip about this :-/
-> 
-> I can't comment on anything extrapolated outside of the SJA1105/SJA1110.
-> 
-> > > It really depends on a lot of factors including the reset timing and
-> > > supply voltage distribution of the PCB, but RST_N has essentially 2
-> > > purposes. One is ensuring proper POR sequencing, the other is cold
-> > > resetting at runtime. You can do the latter over SPI with identical
-> > > outcome, which leaves proper POR sequencing, which is not best served by
-> > > a GPIO in my experience.
-> > 
-> > I'm not sure not including the signal in the DT bindings is going to
-> > influence board designers much either way TBH.
-> 
-> Either way, something has to nudge at least the software developer
-> towards finding and reading the vendor's relevant documentation.
-> 
-> In that sense, 'reset-gpios' is misleading to say the least, because
-> everyone sees a reset GPIO and has the human tendency to think there
-> isn't anything more to be known about it (like I also did).
-> 
-> To be clear, I'm saying that supporting 'reset-gpios' in this driver was
-> a mistake, at least in the form where its supplies and clocks aren't
-> also under control. I'm not sure it's a mistake that we need to document,
-> and if we do, there need to be a lot more disclaimers. Also, I'm pretty
-> sure nothing will break if driver support for it is simply removed.
+On Tue, Sep 09, 2025 at 08:33:27AM -0700, Eric Dumazet wrote:
+>On Tue, Sep 9, 2025 at 8:19 AM Richard W.M. Jones <rjones@redhat.com> wrote:
+>>
+>> On Tue, Sep 09, 2025 at 07:47:09AM -0700, Eric Dumazet wrote:
+>> > On Tue, Sep 9, 2025 at 7:37 AM Jens Axboe <axboe@kernel.dk> wrote:
+>> > >
+>> > > On 9/9/25 8:35 AM, Eric Dumazet wrote:
+>> > > > On Tue, Sep 9, 2025 at 7:04 AM Eric Dumazet <edumazet@google.com> wrote:
+>> > > >>
+>> > > >> On Tue, Sep 9, 2025 at 6:32 AM Richard W.M. Jones <rjones@redhat.com> wrote:
+>> > > >>>
+>> > > >>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
+>> > > >>>> Recently, syzbot started to abuse NBD with all kinds of sockets.
+>> > > >>>>
+>> > > >>>> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+>> > > >>>> made sure the socket supported a shutdown() method.
+>> > > >>>>
+>> > > >>>> Explicitely accept TCP and UNIX stream sockets.
+>> > > >>>
+>> > > >>> I'm not clear what the actual problem is, but I will say that libnbd &
+>> > > >>> nbdkit (which are another NBD client & server, interoperable with the
+>> > > >>> kernel) we support and use NBD over vsock[1].  And we could support
+>> > > >>> NBD over pretty much any stream socket (Infiniband?) [2].
+>> > > >>>
+>> > > >>> [1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
+>> > > >>>     https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
+>> > > >>> [2] https://libguestfs.org/nbd_connect_socket.3.html
+>> > > >>>
+>> > > >>> TCP and Unix domain sockets are by far the most widely used, but I
+>> > > >>> don't think it's fair to exclude other socket types.
+>> > > >>
+>> > > >> If we have known and supported socket types, please send a patch to add them.
+>> > > >>
+>> > > >> I asked the question last week and got nothing about vsock or other types.
+>> > > >>
+>> > > >> https://lore.kernel.org/netdev/CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com/
+>> > > >>
+>> > > >> For sure, we do not want datagram sockets, RAW, netlink, and many others.
+>> > > >
+>> > > > BTW vsock will probably fire lockdep warnings, I see GFP_KERNEL
+>> > > > being used in net/vmw_vsock/virtio_transport.c
+>>
+>> CC-ing Stefan & Stefano.  Myself, I'm only using libnbd
+>> (ie. userspace) over vsock, not the kernel client.
 
-IMHO silently removing the support will break designs for sure and
-should never be done. As said, imagine that the firmware will handle the
-supplies and the driver only needs to release the reset. If you silently
-remove the support, the device will be kept in reset-state. In field
-firmware updates are seldom, so you break your device by updating to a
-new kernel.
+Thanks Rich for cceing me!
 
-One could argue that the driver supported it but there was no dt-binding
-yet, so it was a hidden/unstable feature but I don't know the policy.
+>>
+>> > > > So you will have to fix this.
 
-Regards,
-  Marco
+How we should fix that?
+
+IIUC GFP_KERNEL in virtio_transport.c is used only by workqueue's 
+functions, but we have GFP_ATOMIC in the fast path that can be called 
+when the user is sending a packet.
+
+This is basically the driver for the virtio-vsock device that can 
+allocates extra buffers to be exposed to the device.
+In this case the allocation can happen in virtqueue_add_sgs() for virtio 
+indirect buffer, that IIRC virtio-vsock is not using currently (but we 
+don't know in the future).
+
+In any case, we use GFP_KERNEL also in virtio_transport_common.c to 
+allocate the sk_buff, so that should be the same issue.
+
+Thanks,
+Stefano
+
 
