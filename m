@@ -1,155 +1,170 @@
-Return-Path: <netdev+bounces-221589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2857AB5110E
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:22:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E237CB511E7
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4772216C596
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:20:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FC44563631
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1DD2D12ED;
-	Wed, 10 Sep 2025 08:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5dMNMS1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF2D311C1B;
+	Wed, 10 Sep 2025 08:57:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C155D2DE1E6
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371C1311952;
+	Wed, 10 Sep 2025 08:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757492424; cv=none; b=Sa/r0z5wG1/6Cux/ajL9UZwrapHhxiuAXo4khPlB7px9tU9HCWCHLTvKPAHOhAbVlBv1rEhe9iLLmybbKYEO8Ls51ebRXebM+8A7jsaDTuet1Fbl17rzRex36lYDler6KqE1aOor65IXiWvyLV7FQPZauy8WXbPTcx4N0fAtcm4=
+	t=1757494649; cv=none; b=i8r8Fh8G8EjGgINfte6THCrMQM8JM12nB5OZI0wAfFXivfJVoQ0thxgLxLrcQDWoKnn8SF/Y9Bh61XG6EQh1QP+AgydPU8AQum0woeynEio1cXx/0eX/90p2sDUXAk5nTbsh7X9ED5NP5N44IOWRhYMhVpoRJsqCGFqs18JC3eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757492424; c=relaxed/simple;
-	bh=PAz3im+y19NDT+YMJxSBDJens7K9RovOUhC6XNb8bys=;
+	s=arc-20240116; t=1757494649; c=relaxed/simple;
+	bh=UyTKr/gRlDYEGxckMgklqxwcPAl9u7MPrPxBjUXQOW4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=chvJGN37hxMvtH/4gaNRmVAXVWB/A6rYvvY3ZtFQsOQk7K5gEuLTBHugZhiXsVQS/1LfUT9t7lFNGXJCPPNBnkZvuw7XY+6uUd8Gy8YGpRFQdtvUznL4FnnrBezPHEh7gS4sxc7KEdrZsSuMiU3O3f9JJu13Vn5dRviw6PiuA1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E5dMNMS1; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b0419ea6241so70733266b.3
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:20:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757492421; x=1758097221; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/L/ZiHIMyXmxKkiSLCWK4pWAdvwcf6C/7sfjkt+r2Zs=;
-        b=E5dMNMS1V1mwGjFvwsOC7Q8EV2jIm4VGtmzMbgcvbUemkURSwAeqRTwVt67gc0P/yr
-         PCpDNgjzQVSs8/RC+aK1EW5mqFLIoxlxbYQdbK7CRihE9A950SQBxA2CP3r7q1L5CcBA
-         sVLX1gb7jUV8IPjP4UA/OxuLuCLHKLk04K5wYR29AeW+MThz+obX3mhO2bInHhCUMBRl
-         JkA4fkMTgaIm3Jwt1tdqv91epv+TcYjH37Ig9eDhUo15P6XW2MR3zdAo3j2gsoCqeuDW
-         cZRq5wn1TLtvl4vCSRI2eiXrw9tkhGs6Z79jc0e8DqNTQp2QNBgqI3F4ymSLM+xn+AAX
-         E+gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757492421; x=1758097221;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/L/ZiHIMyXmxKkiSLCWK4pWAdvwcf6C/7sfjkt+r2Zs=;
-        b=rBNbubqROEn+9dxrRLeQkyH5inAy59ohgI3Ld8oG4fe4eFj2nbVjHg6wMMePfCYTHI
-         LBO8SvsoX/LUVBEDVe9skLVnTHX5l3khWaqkyuNcwJVg0agmarOwkXTd77bqS1miDglx
-         QrR+6Gfiob7w3zbc2CxvyvOcUH1IaNTql9m2lZVVOtkE4phbEpbkFv2aiOW3563e73gc
-         xEqU/qGyUsWZgVzbtz7UzI7DqnpSaPzzuaXAymOyJEyKdRQmp9gxlajHPtKpNXXVBS0D
-         VizB/MoBBnoVDmFoKF+1m885VwacNXPgCObYyACfzyF9Te2NdrVJLMY+D8d4X3KTXYI/
-         ppgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUg6LoK0BYPi92ABHNV6H+gCJSdXQHbQGv+bSHsgXDQzpt3HpoVJAfcmngXlosXX2IIq+kFq0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCM1H8BTCfaTcSAJGBUenEZXCVyroNozDrytw66Jo6GWzaN77C
-	0hKreYKnE4dNQhlEoL3jBqoUNeT+Uuo9f5/tQUW5W7GCddx3sjxcuoan
-X-Gm-Gg: ASbGncts1Ekd9fcgb7tZeMCc+xfUiOFKRuFU+X1Eb1PGFvnlgpknsWqVIoz/F5llidk
-	sGNSrmlhe2g68pJHTsWICK2iBk3y1jEHFPx/xG1iRyQ+37P9IaxxiwsoiZWp51pq8X4nJpWEHke
-	RDDiqAwC7dU1Lo52zIpfnQWyJAdN+vFhh9hc4jH2GGG3vwL9NyjVvT/x1U6tq/4kS3E1nY4TQEr
-	RnVfQ4I0LMQ7PzZAIpfZTiLJ4Cg0DbiEtSKTEG9L2t1x3bdB29eJK8WEbrDIiDM8lKWM7q7Ckby
-	6TvjVdITLGF3VQp7u9cEdLt83v58r1yvM8NIhLk1WoS4LbrgmBzklUMxDU8bhXDFirEdQv3qrQe
-	xbuCEDYVGNobbDSQNBPHX1DiFqg==
-X-Google-Smtp-Source: AGHT+IEZ6Y8m9czCHfXyGir/VeA90+bvrcMtK66llF0DDBp7AdUVUAE+7FZ2p8xLZJOlSOvaso7zZw==
-X-Received: by 2002:a17:907:9718:b0:afe:b131:1820 with SMTP id a640c23a62f3a-b04b155985emr758644266b.6.1757492420788;
-        Wed, 10 Sep 2025 01:20:20 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:6669:35e7:fc93:9b1c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07833ffa91sm122826066b.91.2025.09.10.01.20.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 01:20:20 -0700 (PDT)
-Date: Wed, 10 Sep 2025 11:20:17 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Simon Horman <horms@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v16 10/10] net: dsa: tag_mtk: add comments about
- Airoha usage of this TAG
-Message-ID: <20250910082017.hjlq3664xvg5qjub@skbuf>
-References: <20250909004343.18790-1-ansuelsmth@gmail.com>
- <20250909004343.18790-1-ansuelsmth@gmail.com>
- <20250909004343.18790-11-ansuelsmth@gmail.com>
- <20250909004343.18790-11-ansuelsmth@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cn0AOIEwZb4xvhsHu/BeNy5zLh4ne8/LO2mAwn2gbcuAWad5kIJGdBnw5nA0G6OOJRGNPMoK9qOe8JjDP8HCFal+76/bp4tSHxxFhxFKObzVoBW7R0x2P4lYJPjgceIba/MAEPgbQMVrUDKLTtWsnZkyo28KDAmEiCJ53fA2/Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
+Received: from mail-relay (helo=jo-so.de)
+	by s1.jo-so.de with local-bsmtp (Exim 4.98.2)
+	(envelope-from <joerg@jo-so.de>)
+	id 1uwG5X-00000006hFm-0ZHo;
+	Wed, 10 Sep 2025 10:21:59 +0200
+Received: from joerg by zenbook.jo-so.de with local (Exim 4.98.2)
+	(envelope-from <joerg@jo-so.de>)
+	id 1uwG5W-00000000Okw-2Jme;
+	Wed, 10 Sep 2025 10:21:58 +0200
+Date: Wed, 10 Sep 2025 10:21:58 +0200
+From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
+To: Yibo Dong <dong100@mucse.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "Anwar, Md Danish" <a0501179@ti.com>, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	horms@kernel.org, corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com, 
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com, 
+	lorenzo@kernel.org, geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com, 
+	lukas.bulwahn@redhat.com, alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org, 
+	gustavoars@kernel.org, rdunlap@infradead.org, vadim.fedorenko@linux.dev, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v11 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <vfarjsi3uf55kb5uj25stnjriemyvra7gomxmtik3jowsp24n5@k44vc2gdmyaf>
+References: <20250909120906.1781444-1-dong100@mucse.com>
+ <20250909120906.1781444-5-dong100@mucse.com>
+ <68fc2f5c-2cbd-41f6-a814-5134ba06b4b5@ti.com>
+ <20250909135822.2ac833fc@kernel.org>
+ <00A30C785FE598BA+20250910060821.GB1832711@nic-Precision-5820-Tower>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ave2a22qe2b7h3wz"
 Content-Disposition: inline
-In-Reply-To: <20250909004343.18790-11-ansuelsmth@gmail.com>
- <20250909004343.18790-11-ansuelsmth@gmail.com>
+In-Reply-To: <00A30C785FE598BA+20250910060821.GB1832711@nic-Precision-5820-Tower>
 
-On Tue, Sep 09, 2025 at 02:43:41AM +0200, Christian Marangi wrote:
-> Add comments about difference between Airoha AN8855 and Mediatek tag
-> bitmap.
-> 
-> Airoha AN88555 doesn't support controlling SA learning and Leaky VLAN
 
-Is there an extra 5 in AN88555?
+--ave2a22qe2b7h3wz
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v11 4/5] net: rnpgbe: Add basic mbx_fw support
+MIME-Version: 1.0
 
-> from tag. Although these bits are not used (and even not defined for
-> Leaky VLAN), it's worth to add comments for these difference to prevent
-> any kind of regression in the future if ever these bits will be used.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  net/dsa/tag_mtk.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/dsa/tag_mtk.c b/net/dsa/tag_mtk.c
-> index b670e3c53e91..ac3f956abe39 100644
-> --- a/net/dsa/tag_mtk.c
-> +++ b/net/dsa/tag_mtk.c
-> @@ -18,6 +18,9 @@
->  #define MTK_HDR_XMIT_TAGGED_TPID_88A8	2
->  #define MTK_HDR_RECV_SOURCE_PORT_MASK	GENMASK(2, 0)
->  #define MTK_HDR_XMIT_DP_BIT_MASK	GENMASK(5, 0)
-> +/* AN8855 doesn't support SA_DIS and Leaky VLAN
-> + * control in tag as these bits doesn't exist.
-> + */
+Yibo Dong schrieb am Mi 10. Sep, 14:08 (+0800):
+> On Tue, Sep 09, 2025 at 01:58:22PM -0700, Jakub Kicinski wrote:
+> > On Tue, 9 Sep 2025 19:59:11 +0530 Anwar, Md Danish wrote:
+> > > > +int mucse_mbx_sync_fw(struct mucse_hw *hw)
+> > > > +{
+> > > > +	int try_cnt =3D 3;
+> > > > +	int err;
+> > > > +
+> > > > +	do {
+> > > > +		err =3D mucse_mbx_get_info(hw);
+> > > > +		if (err =3D=3D -ETIMEDOUT)
+> > > > +			continue;
+> > > > +		break;
+> > > > +	} while (try_cnt--);
+> > > > +
+> > > > +	return err;
+> > > > +} =20
+> > >=20
+> > > There's a logical issue in the code. The loop structure attempts to
+> > > retry on ETIMEDOUT errors, but the unconditional break statement after
+> > > the if-check will always exit the loop after the first attempt,
+> > > regardless of the error. The do-while loop will never actually retry
+> > > because the break statement is placed outside of the if condition that
+> > > checks for timeout errors.
+> >=20
+>=20
+> What is expected is 'retry on ETIMEDOUT' and 'no retry others'.=20
+> https://lore.kernel.org/netdev/a066746c-2f12-4e70-b63a-7996392a9132@lunn.=
+ch/
+>=20
+> > The other way around. continue; in a do {} while () look does *not*
+> > evaluate the condition. So this can loop forever.
+> >=20
+>=20
+> Maybe I can update like this ?
+>=20
+> int mucse_mbx_sync_fw(struct mucse_hw *hw)
+> {
+> 	int try_cnt =3D 3;
+> 	int err;
+>=20
+> 	do {
+> 		err =3D mucse_mbx_get_info(hw);
+> 		if (err !=3D -ETIMEDOUT)
+> 			break;
+> 		/* only retry with ETIMEDOUT, others just return */
+> 	} while (try_cnt--);
+>=20
+> 	return err;
+> } =20
 
-I think it would be good to present the AN8855 tag using a different
-string, so that libpcap knows it shouldn't decode these bits. The code
-can be reused for now.
+How about something like this?
 
->  #define MTK_HDR_XMIT_SA_DIS		BIT(6)
->  
->  static struct sk_buff *mtk_tag_xmit(struct sk_buff *skb,
-> -- 
-> 2.51.0
-> 
+int mucse_mbx_sync_fw(struct mucse_hw *hw)
+{
+	for (int try =3D 3; try; --try) {
+		int err =3D mucse_mbx_get_info(hw);
+		if (err !=3D -ETIMEDOUT)
+			return err;
+	}
 
+	return ETIMEDOUT;
+}
+
+
+My 2cent.
+
+Regards J=C3=B6rg
+
+--=20
+=E2=80=9EEs wurden und werden zu viele sprachlose B=C3=BCcher gedruckt, nac=
+h deren
+schon fl=C3=BCchtiger Lekt=C3=BCre man all die B=C3=A4ume um Vergebung bitt=
+en m=C3=B6chte,
+die f=C3=BCr den Schund ihr Leben lassen mussten.=E2=80=9C (Michael J=C3=BC=
+rgs,
+                      Seichtgebiete =E2=80=93 Warum wir hemmungslos verbl=
+=C3=B6den)
+
+--ave2a22qe2b7h3wz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCaME1JAAKCRB9LJoj0a6j
+dWHfAP9MpwXSbDkmn0L3EBxXklRTyGo9dD4BVrhkdXrXtYNrXgD/f0quVJJNn+Zo
+2d4EZ+ulmakNhpMKJUdjDi8P1IHNG6c=
+=3Gfd
+-----END PGP SIGNATURE-----
+
+--ave2a22qe2b7h3wz--
 
