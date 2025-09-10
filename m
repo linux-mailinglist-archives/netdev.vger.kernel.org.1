@@ -1,127 +1,234 @@
-Return-Path: <netdev+bounces-221682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51D6B5193B
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:23:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 014C6B51969
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80DD616C8CB
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 14:23:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACA767BD1D2
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 14:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADBC324B02;
-	Wed, 10 Sep 2025 14:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8076B32A3F2;
+	Wed, 10 Sep 2025 14:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qoy49RH8"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Q8n65ogE";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hlM66NJL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64941D8E01;
-	Wed, 10 Sep 2025 14:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE315326D5D;
+	Wed, 10 Sep 2025 14:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757514212; cv=none; b=kHvIwAk/I7ZIAPrlJwIEa5pMlP2xkpu+ftkCpYkDrfyd2l8zSANzwm1AKjO+YA+Fw9G5LWAWYTFnG34Zc1XtUB7VcdLRQmnfexdB6jqmz/tnz6tsBw1DR0UNs5XvTLSHDs0uYNvLn0qc63v0QPuYEO1MCKLWk41P4QAflaCdD60=
+	t=1757514583; cv=none; b=diauaq2gdTYDuTRTT27MaL5vYVIHR5Fz0ZkHJOv+k+LewY1oSFh/LM3c+GlY8+W5DUFy0871xholxdcOxIbwDZtkcs5I88KZ2RFvas7++aHJ7iedenYZCWmsq3eNKDLuZl5o+Rpb2LnU+geIgOQhLJWE0/XzylbNEWS2HWwpoPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757514212; c=relaxed/simple;
-	bh=1bFVZOPAI0hpsGdDGYL11liyhNF/ieQ0EbbfFC6fLJM=;
+	s=arc-20240116; t=1757514583; c=relaxed/simple;
+	bh=cnhOwN9VcUf2Rz3l2C247ElIZrWqheCGQnJMuTwAZzA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GyLcCb/o0qltiLK3dBI/u83j1SQz52Zr3Mujrgz2o/fZhj+Ha9wbHBilbRRR+crodb+vFcZ07G73QLtsehlroea3Rl52huGBGhHTcd0sduY7Lnp8HFdfSvSg+OneRMygRFO71WjweUksarYyaqq3VMzK4Ej1o/DFOdVQdLbeYQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qoy49RH8; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757514211; x=1789050211;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1bFVZOPAI0hpsGdDGYL11liyhNF/ieQ0EbbfFC6fLJM=;
-  b=Qoy49RH8X7Ltcqkb7EZIi+sYsPK0qYTparYg2TgfL5aXVnvL/dCaFq1j
-   iShhfnnNWY494dvGXOijRjtFXubDaHxTz0yTcVx0C32tQwPpV2bZd0Zub
-   2ms5eZiaGb3lrNfIZlcEXuTO3zjTC3sTSkNJHDMpOgQQUX/EmA9G1UGM0
-   h1hGYseZhdT5+r6YLti3OOsw0wNPlZvuFjCUy7vXKErgTkoYbXoiByYsg
-   4StIwhsv/NskdSHu/gDEjg1WG9QJokVOtx6mtcr2v06m//9nL88Rw269d
-   M4uR6rsRRBTogsrGE6sVKwZjkjCzgXHRSVqK6XAMMHM30/Dqv0A1vYDPD
-   A==;
-X-CSE-ConnectionGUID: O5OpgW+KTPKPBNKioNcm0A==
-X-CSE-MsgGUID: ua3ILOlIS9SGOkmgPzhh8A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11549"; a="59968069"
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="59968069"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 07:23:30 -0700
-X-CSE-ConnectionGUID: yuIR36rGStyOjEIQAy0eQg==
-X-CSE-MsgGUID: mTqMvtgbSNaNQOkbLpYDHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="173003238"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 10 Sep 2025 07:23:24 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uwLjF-00060l-20;
-	Wed, 10 Sep 2025 14:23:21 +0000
-Date: Wed, 10 Sep 2025 22:22:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: MD Danish Anwar <danishanwar@ti.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=gOAZ4p28IwDK2dPi0E1qfxmbLKW9Cut6S37mYckBjmCvo1dywbjyTy25mC98i9wD5qvEn8/vELa/hlq0J49W4Npm0/GIiOozOrpHzJ8V+HUNWlU/xqsTHYrCCEvYcShkEfqlL6/5R2psd4LA8OTt9B7cu8yji0BL7GLetzHYzJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Q8n65ogE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hlM66NJL; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 820CB7A00BD;
+	Wed, 10 Sep 2025 10:29:39 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Wed, 10 Sep 2025 10:29:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1757514579; x=
+	1757600979; bh=biJc7z4/7ue8YKkVq7n3iWeGn8gkGXy/6MAB1eB6pa8=; b=Q
+	8n65ogEuz8cbOZVNXReIB442lNFc7eRgJpIE2LSxfp9pxE30QZNRZyc48S0DPyFQ
+	gWngSklMIR4GC05VtkrK4JAbhay8CtOso1yxk2REvy2fLx5jSNCEJdErDyyjLxdv
+	YXkQBkirscuW8z0P+cSJjkdoVS4VFQ7rlZJ3i1Zkm1OIW3rcLMF/tU42n8qN6n7h
+	8mmk8caCRSkAVK8I646JPP00xg77u4ccFl6NPFhNgWZ2db/PqJHL9Qo4348q6WI2
+	zBAlfPwcXQHxITuYH9msMzk+gEZ1JQZCsMXKn9TGSYO9rVuMzHLWD1IfoRACedwy
+	bzDtgcpw5UJEEB+yOAIqQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757514579; x=1757600979; bh=biJc7z4/7ue8YKkVq7n3iWeGn8gkGXy/6MA
+	B1eB6pa8=; b=hlM66NJLn5F8F64eNUMPtO13I8/bQh8jbdPW98EB/xQ7lJBpoX4
+	efvYZRilnMXTgfAQ8cbZPPC+Cg7YW0gZH95ao3RPsF/IjVWzqEG+0anoOTUVJSKX
+	FFmDhidAM2737QafQYzUT5KB+OdvZ0+GlFXnNhT9x152wADmOPcB1oI0xojIzY2q
+	FVZ8fRTZSH54NmcRg0Q4lpAgJzVkEqD5PfewztkyvFFNPBpVRNxiiORolBGVk/6X
+	rkoCWgi53wXG9eXOYOwS0uvEKhmT292qordbLMNiE70FVl00sbzLhvqMrFNiHgF/
+	8y8PX0WkmX6NbAnIWZEAc8VDAGD5R0hhgzg==
+X-ME-Sender: <xms:UYvBaC3fRrQVO1eX3q7oyueCtIlyVVAFyjECSd2cBRej1JDL3uE6Aw>
+    <xme:UYvBaLp90UcqFUHK5x1rZ0HJMHxbjbEJZK4ScPoXRfcjU19fpMF0ewXXUaG-bu7Xz
+    ZBR2FVodbguB-6pQ6I>
+X-ME-Received: <xmr:UYvBaMkBgxP5JjkYf1l8T_foxSwWEcrOnGDFdNAytkJ_jg9uV4AkumFvKv3U>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeehfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdortddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeejkeelveelkeefgfeuheevjeeukedvhedvueegvdekleeghfelgeeiveff
+    tdeuudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudelpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehiughoshgthhesnhhvihguihgrrdgtohhmpd
+    hrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohep
+    nhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhvsehjvh
+    hoshgsuhhrghhhrdhnvghtpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhu
+    nhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtg
+    hpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgs
+    rgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtg
+    homh
+X-ME-Proxy: <xmx:UYvBaNSqnaeHxD7nDX8qawpgjxj9iZckjlyiQG1F-pMkUD4U87hDrw>
+    <xmx:UYvBaGBswn3frJRVReoRQ4F-csrWfp2-iz_wqL138AZLT4AkOzQ5Cw>
+    <xmx:UYvBaFpZBXy1qSPN7zkyZ1L0d39s06UOOigHfbyJnRLHFvSuHgNLug>
+    <xmx:UYvBaMi-V4S7Dwbn3HOYBG_Pq3qOtzkPZePajoXfKwfmxjMR0TdL1A>
+    <xmx:U4vBaId6acKZWK9-pf-OCW1eTYX1z4EZA6CvGhi6LvLbqVLl0vPH9Knr>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Sep 2025 10:29:37 -0400 (EDT)
+Date: Wed, 10 Sep 2025 16:29:35 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Luo Jie <quic_luoj@quicinc.com>, Fan Gong <gongfan1@huawei.com>,
-	Lei Wei <quic_leiwei@quicinc.com>,
-	Michael Ellerman <mpe@ellerman.id.au>, Lee Trager <lee@trager.us>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/7] net: rpmsg-eth: Add basic rpmsg skeleton
-Message-ID: <202509102238.mlNKX2KI-lkp@intel.com>
-References: <20250908090746.862407-3-danishanwar@ti.com>
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] net: add a common function to compute
+ features from lowers devices
+Message-ID: <aMGLTzACsKLRIsVb@krikkit>
+References: <20250829095430.443891-1-liuhangbin@gmail.com>
+ <20250829095430.443891-2-liuhangbin@gmail.com>
+ <aLRr1W3jKRDYsRSq@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250908090746.862407-3-danishanwar@ti.com>
+In-Reply-To: <aLRr1W3jKRDYsRSq@shredder>
 
-Hi MD,
+2025-08-31, 18:35:49 +0300, Ido Schimmel wrote:
+> On Fri, Aug 29, 2025 at 09:54:26AM +0000, Hangbin Liu wrote:
+> > Some high level virtual drivers need to compute features from lower
+> > devices. But each has their own implementations and may lost some
+> > feature compute. Let's use one common function to compute features
+> > for kinds of these devices.
+> > 
+> > The new helper uses the current bond implementation as the reference
+> > one, as the latter already handles all the relevant aspects: netdev
+> > features, TSO limits and dst retention.
+> > 
+> > Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > ---
+> >  include/linux/netdevice.h | 19 ++++++++++
+> >  net/core/dev.c            | 79 +++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 98 insertions(+)
+> > 
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index f3a3b761abfb..42742a47f2c6 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -5279,6 +5279,25 @@ int __netdev_update_features(struct net_device *dev);
+> >  void netdev_update_features(struct net_device *dev);
+> >  void netdev_change_features(struct net_device *dev);
+> >  
+> > +/* netdevice features */
+> > +#define VIRTUAL_DEV_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> > +					 NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
+> > +					 NETIF_F_GSO_ENCAP_ALL | \
+> > +					 NETIF_F_HIGHDMA | NETIF_F_LRO)
+> > +
+> > +#define VIRTUAL_DEV_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> > +					 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE | \
+> > +					 NETIF_F_GSO_PARTIAL)
+> > +
+> > +#define VIRTUAL_DEV_MPLS_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> > +					 NETIF_F_GSO_SOFTWARE)
+> > +
+> > +#define VIRTUAL_DEV_XFRM_FEATURES	(NETIF_F_HW_ESP | NETIF_F_HW_ESP_TX_CSUM | \
+> > +					 NETIF_F_GSO_ESP)
+> > +
+> > +#define VIRTUAL_DEV_GSO_PARTIAL_FEATURES (NETIF_F_GSO_ESP)
+> > +void netdev_compute_features_from_lowers(struct net_device *dev);
+> > +
+> >  void netif_stacked_transfer_operstate(const struct net_device *rootdev,
+> >  					struct net_device *dev);
+> >  
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index 1d1650d9ecff..fcad2a9f6b65 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -12577,6 +12577,85 @@ netdev_features_t netdev_increment_features(netdev_features_t all,
+> >  }
+> >  EXPORT_SYMBOL(netdev_increment_features);
+> >  
+> > +/**
+> > + *	netdev_compute_features_from_lowers - compute feature from lowers
+> > + *	@dev: the upper device
+> > + *
+> > + *	Recompute the upper device's feature based on all lower devices.
+> > + */
+> > +void netdev_compute_features_from_lowers(struct net_device *dev)
+> > +{
+> > +	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
+> > +	netdev_features_t gso_partial_features = VIRTUAL_DEV_GSO_PARTIAL_FEATURES;
+> > +#ifdef CONFIG_XFRM_OFFLOAD
+> > +	netdev_features_t xfrm_features  = VIRTUAL_DEV_XFRM_FEATURES;
+>                                        ^ double space (in other places as well)
+> 
+> > +#endif
+> > +	netdev_features_t mpls_features  = VIRTUAL_DEV_MPLS_FEATURES;
+> > +	netdev_features_t vlan_features = VIRTUAL_DEV_VLAN_FEATURES;
+> > +	netdev_features_t enc_features  = VIRTUAL_DEV_ENC_FEATURES;
+> > +	unsigned short max_hard_header_len = ETH_HLEN;
 
-kernel test robot noticed the following build errors:
+Going back to this discussion about hard_header_len:
 
-[auto build test ERROR on 16c610162d1f1c332209de1c91ffb09b659bb65d]
+> hard_header_len is not really a feature, so does not sound like it
+> belongs here. I'm pretty sure it's not needed at all.
+> 
+> It was added to the bond driver in 2006 by commit 54ef31371407 ("[PATCH]
+> bonding: Handle large hard_header_len") citing panics with gianfar on
+> xmit. In 2009 commit 93c1285c5d92 ("gianfar: reallocate skb when
+> headroom is not enough for fcb") fixed the gianfar driver to stop
+> assuming that it has enough room to push its custom header. Further,
+> commit bee9e58c9e98 ("gianfar:don't add FCB length to hard_header_len")
+> from 2012 fixed this driver to use needed_headroom instead of
+> hard_header_len.
+> 
+> The team driver is also adjusting hard_header_len according to the lower
+> devices, but it most likely copied it from the bond driver. On the other
+> hand, the bridge driver does not mess with hard_header_len and no
+> problems were reported there (that I know of).
+> 
+> Might be a good idea to remove this hard_header_len logic from bond and
+> team and instead set their needed_headroom according to the lower device
+> with the highest needed_headroom. Paolo added similar logic in bridge
+> and ovs but the use case is a bit different there.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/MD-Danish-Anwar/net-rpmsg-eth-Add-Documentation-for-RPMSG-ETH-Driver/20250908-171329
-base:   16c610162d1f1c332209de1c91ffb09b659bb65d
-patch link:    https://lore.kernel.org/r/20250908090746.862407-3-danishanwar%40ti.com
-patch subject: [PATCH net-next v3 2/7] net: rpmsg-eth: Add basic rpmsg skeleton
-config: x86_64-randconfig-r132-20250910 (https://download.01.org/0day-ci/archive/20250910/202509102238.mlNKX2KI-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250910/202509102238.mlNKX2KI-lkp@intel.com/reproduce)
+I'm not convinced removing adapting hard_header_len on bond/team is
+correct, even with old and broken drivers getting fixed years
+ago. hard_header_len will be used on the TX path (for some devices
+like bridge/macvlan via dev_forward_skb() and similar helpers, for IP
+tunnels setting their MTU, and via LL_RESERVED_SPACE).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509102238.mlNKX2KI-lkp@intel.com/
-
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "rproc_get_by_child" [drivers/net/ethernet/rpmsg_eth.ko] undefined!
+So I think we should keep setting hard_header_len to the largest of
+all lowers.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sabrina
 
