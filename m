@@ -1,114 +1,91 @@
-Return-Path: <netdev+bounces-221765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A04AB51CEC
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:05:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8EC6B51D33
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E98AA02BB2
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:04:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53CF8A03B1A
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A768B322A1A;
-	Wed, 10 Sep 2025 16:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953A3335BA2;
+	Wed, 10 Sep 2025 16:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="La6wrW4K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2cziucY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9913A263C8C;
-	Wed, 10 Sep 2025 16:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1D83314BC;
+	Wed, 10 Sep 2025 16:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757520285; cv=none; b=b9htC0qDt4HuQ87T+XgDjj8utSjUczgjpVnO89h6GD8AxwUW/0k3Ap50F1CNgBXQnGdhBLNXlc6wVN/DYVOC9EgDYNW/hqRWE134peoixeBTJs7kqetqm7Ev8eIyUhMOBbSmywy72aajsFJe8PX98SjJBQDNP8CXzxnJ5lZ6CEg=
+	t=1757520638; cv=none; b=gxXi/rIR49fXmlDoKjCK0bh/2dvoxf0l8HVvb2OTjD8iqC5obKKzrzf9hM2JyudQiTffkWd/PdRZh0mle7PsyoNre7Kj5u81YlJe9/3++PXwM9CMp6Rf04Uar5uxYCcou7W7gN8Y0prwNs0z0oMLgTX+g/PQdqzj4X4atxg2Wro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757520285; c=relaxed/simple;
-	bh=ARBFhfPQE1yTd6Bep5x+KYhOhNUB93VDBinqM4X+PBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GUkD2rfJDvx2OuEM0o9IXlH9D8sYXSkeGfhCBXMv1Wldj+/dLy2Ef7s+nePRJ8a45wXeVfffqHV34RmiTeWr3FzYFN7W9C0c3h35/8vJEnS+t1gql7TKpFSvEGAHh9ySAO1RtikMYYbeZztc5f2+L7qU8HXE7W+z/g+qUJdxHy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=La6wrW4K; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KlHv0+GrHV1hBNSj6BJKLSwams6/gKxyprG2p5gwuN8=; b=La6wrW4KHul4jfO4rtbU8hD01X
-	FcZppvUr5TlhkRKeJber2yMH0LVsSwhRAKwz+bhLWoEMEg0OIAjMwJ7FC5Ow/BYVscoA22vdPHydt
-	Jot1v/kCWKxpJ0qC5GzmEy1GXrSPjmz8c8Sh1AOlk431WwjvNSYPJU6caRZ7GOnck1Eo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uwNJ6-007y3p-Ip; Wed, 10 Sep 2025 18:04:28 +0200
-Date: Wed, 10 Sep 2025 18:04:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH 2/9] dt-bindings: net: qcom: document the ethqos device
- for SCMI-based systems
-Message-ID: <24cd127d-1be7-42f4-a2ec-697c5e7554db@lunn.ch>
-References: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
- <20250910-qcom-sa8255p-emac-v1-2-32a79cf1e668@linaro.org>
+	s=arc-20240116; t=1757520638; c=relaxed/simple;
+	bh=SuHO9tUa2OF0OUV6fs2hnkWnqH3DjUqS7DcINbUCcT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qCd5t17Up1LYfMBrgzKycP2faEGAYMRF/LM2y2SIxHtotMcxbRxjHItYzWG9foWMrjqi4G73S93zk0RIPL1eqfZ+rmOHmJDuVO+j9z5JpQ22iEs97qmN+lgKs76IE2Mjed15qEjrz2QdD2h6gwYP58mS5F8FtJJcz0S/goz1CA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2cziucY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84DC2C4CEEB;
+	Wed, 10 Sep 2025 16:10:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757520638;
+	bh=SuHO9tUa2OF0OUV6fs2hnkWnqH3DjUqS7DcINbUCcT4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r2cziucYHfube3BjQlaYNvlVr34dxKCenN+Mpzq8EIm1zENyj+tz56NRqoigXQ8vf
+	 /jcV5dJQqrN9XPMKFAw6Spm6hNzrsCjeUxNgWcNrdKJdPsov6kZmK7Yw2Z6ZJS72na
+	 ob+ZPfl4hkKMyAuDnzFmNpqPsbuNiGOIGyQFNQT/sBU+Bbw91IWTFYokvmwNYSvUEo
+	 M8vfybJy+58nFcqcj64vm3Qm99XgU+y613S2EggvP40NOdDbSeEiOqo8HPLj+Zo63A
+	 avP9ruRF4RghKknOMMsbVSL3B/PjwYERYa5AFZxFZxa9P9GrUUDxIuOVrHIYrxHMzp
+	 37fwWf+spb/qg==
+Date: Wed, 10 Sep 2025 09:10:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ kernel-team@meta.com
+Subject: Re: [PATCH net-next 4/7] net: ethtool: add get_rx_ring_count
+ callback to optimize RX ring queries
+Message-ID: <20250910091036.3054eb94@kernel.org>
+In-Reply-To: <20250909-gxrings-v1-4-634282f06a54@debian.org>
+References: <20250909-gxrings-v1-0-634282f06a54@debian.org>
+	<20250909-gxrings-v1-4-634282f06a54@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250910-qcom-sa8255p-emac-v1-2-32a79cf1e668@linaro.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +    ethernet: ethernet@7a80000 {
-> +        compatible = "qcom,sa8255p-ethqos";
-> +        reg = <0x23040000 0x10000>,
-> +              <0x23056000 0x100>;
-> +        reg-names = "stmmaceth", "rgmii";
-> +
-> +        iommus = <&apps_smmu 0x120 0x7>;
-> +
-> +        interrupts = <GIC_SPI 946 IRQ_TYPE_LEVEL_HIGH>,
-> +                     <GIC_SPI 782 IRQ_TYPE_LEVEL_HIGH>;
-> +        interrupt-names = "macirq", "sfty";
-> +
-> +        dma-coherent;
-> +
-> +        snps,tso;
-> +        snps,pbl = <32>;
-> +        rx-fifo-depth = <16384>;
-> +        tx-fifo-depth = <16384>;
-> +
-> +        phy-handle = <&sgmii_phy1>;
-> +        phy-mode = "2500base-x";
+On Tue, 09 Sep 2025 13:24:02 -0700 Breno Leitao wrote:
+> +static int get_num_rxrings(struct net_device *dev)
 
-Nitpicking: It is clearly not an SGMII PHY if it support
-2500BaseX. You might want to give the node a better name.
+ethtool_get_rx_ring_count()
 
-> +        snps,mtl-rx-config = <&mtl_rx_setup1>;
-> +        snps,mtl-tx-config = <&mtl_tx_setup1>;
-> +        snps,ps-speed = <1000>;
+> +{
+> +	const struct ethtool_ops *ops = dev->ethtool_ops;
+> +	struct ethtool_rxnfc rx_rings;
 
-Since this MAC can do 2.5G, is 1000 correct here?
+You need to initialize this..
 
-      Andrew
+> +	int ret;
+> +
+> +	if (ops->get_rx_ring_count)
+> +		return ops->get_rx_ring_count(dev);
+> +
+> +	ret = ops->get_rxnfc(dev, &rx_rings, NULL);
+> +	if (ret < 0)
+> +		return ret;
+-- 
+pw-bot: cr
 
