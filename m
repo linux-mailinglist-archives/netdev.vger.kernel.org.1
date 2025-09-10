@@ -1,116 +1,146 @@
-Return-Path: <netdev+bounces-221638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5239B514CE
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:06:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A45EBB51527
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 989901703B3
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:06:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B9B44453EA
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9147F319851;
-	Wed, 10 Sep 2025 11:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HuPgdsxv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EB43191BF;
+	Wed, 10 Sep 2025 11:12:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6CF314A99;
-	Wed, 10 Sep 2025 11:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1EB31D37D;
+	Wed, 10 Sep 2025 11:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757502371; cv=none; b=XpuG2rzyeuOocBRHZJChI50jB2NSkclHJZf5sS2LA1kZz/vUc6FR3QLBBMjEvJkzjRgL6caAJ6HpCQjqncW14DvBLUJSBeLsdlBVfeFgeNYvHSbpZmT1p6oIanqYM5KLprSLOqcMf39MFoa3RFvCJW5i619+ggN5TM6PgNQvg8o=
+	t=1757502746; cv=none; b=YrX/HXrPpIZ62iAhgyuPoklXzNPWwhUS5fql6N2cenlx5QiS3w3sjic7iO4tqrRW6/R3XpExLIoq22E9jDN/K9e1hDZetknVgz196gh37SFfpxE/UFNAWOw06dzL4ZCLNrRBXOuNDBS94Wj7DeOpy7/hCMNx9GQjvcok5Oyz7Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757502371; c=relaxed/simple;
-	bh=Fxptr2qexEblRNttIxD7S3z3TKAgwwVEg+pPWRBq01A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CaUpxOO1YWB+X6sVnCCmpjqdFxN39+ZC0X/S74JyM3mRtu9O0JjpH5G+Xa7daEr90NqBiSusuE5zr52pVeInDn4cQqpXXeE/ifknT7b3UEXCM8ingZuoDdBPwQ98x9/9bCyybF56Uiz4ryuDKpY2+fkYIS5V6stLHJ4ZhdF4uVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HuPgdsxv; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757502370; x=1789038370;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Fxptr2qexEblRNttIxD7S3z3TKAgwwVEg+pPWRBq01A=;
-  b=HuPgdsxvwYVeRgWXgVU15jWE+Y1bLzxxBERawXZvk9rt1bDrTQEBhCcp
-   GYEb0uP1yM8L9vU1kP45jjkdzZ0UVjEcY5frmJK0gIBfuVIDl2CWwqG35
-   G49KCQj2Fi94klootOgG7OVzbx82latk4xc2EH9dmWZHx4WFxOU2OKNMJ
-   ZiZxhUZsQCYdy4SOrdGZeLn65H1mqfrsfWr+PJWPqJgdoTy66T1b8qHvv
-   eJ/hqRXCsZaA64qtpmzbVHwGoGO1LRGAuzllpOj7Qb64f4ayYF23RUEuC
-   wdpOnnVyHkOmhMg7I7YlJUiLMGYSmeJ5eDfInxdBWu7BGyPsyNG7/6jXg
-   Q==;
-X-CSE-ConnectionGUID: AjP1+qe+TMG9mwqh3VnR7Q==
-X-CSE-MsgGUID: eMl+r7fmTpWTkxTiJlzwew==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="63437200"
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="63437200"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 04:06:09 -0700
-X-CSE-ConnectionGUID: xUB8gn45TLq9bHG9qWK/Dw==
-X-CSE-MsgGUID: S7dTMi/zQGS8UXVg1xZs/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="173276811"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 10 Sep 2025 04:06:06 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uwIeJ-0005rT-21;
-	Wed, 10 Sep 2025 11:06:03 +0000
-Date: Wed, 10 Sep 2025 19:05:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andre Carvalho <asantostc@gmail.com>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Andre Carvalho <asantostc@gmail.com>
-Subject: Re: [PATCH net-next 4/5] netconsole: resume previously deactivated
- target
-Message-ID: <202509101818.wKicbxgJ-lkp@intel.com>
-References: <20250909-netcons-retrigger-v1-4-3aea904926cf@gmail.com>
+	s=arc-20240116; t=1757502746; c=relaxed/simple;
+	bh=PKr2I9o/Z0nYzv3hFWpk9gwnN/cFKToG0e7J+kAIrtw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B8reEHPhl3b9K1F3ewsngskuaBdEYTjbEVa6zX1k5yEHYSifX1mXDw/+2Rrhb0JiG3gEe6t1/fM3dTeW/WD06keUqc9RGh5LX1/16+mX9dFbuExNxUNXocL86EVs0h2FkyxHImIMf6DpBrvLR7awZfpRDKPKoIsLQaNVqIPVBrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.205] (p5dc55aad.dip0.t-ipconnect.de [93.197.90.173])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 988B260213CBB;
+	Wed, 10 Sep 2025 13:11:53 +0200 (CEST)
+Message-ID: <bbf020fc-4567-4c12-8400-5077ae2a7718@molgen.mpg.de>
+Date: Wed, 10 Sep 2025 13:11:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250909-netcons-retrigger-v1-4-3aea904926cf@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2][next] Bluetooth: Avoid a couple dozen
+ -Wflex-array-member-not-at-end warnings
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <aMAZ7wIeT1sDZ4_V@kspp>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <aMAZ7wIeT1sDZ4_V@kspp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Andre,
+Dear Gustavo,
 
-kernel test robot noticed the following build warnings:
 
-[auto build test WARNING on 3b4296f5893d3a4e19edfc3800cb79381095e55f]
+Thank you for your patch.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andre-Carvalho/netconsole-add-target_state-enum/20250910-051601
-base:   3b4296f5893d3a4e19edfc3800cb79381095e55f
-patch link:    https://lore.kernel.org/r/20250909-netcons-retrigger-v1-4-3aea904926cf%40gmail.com
-patch subject: [PATCH net-next 4/5] netconsole: resume previously deactivated target
-config: i386-randconfig-014-20250910 (https://download.01.org/0day-ci/archive/20250910/202509101818.wKicbxgJ-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250910/202509101818.wKicbxgJ-lkp@intel.com/reproduce)
+Am 09.09.25 um 14:13 schrieb Gustavo A. R. Silva:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
+> 
+> Use the __struct_group() helper to fix 31 instances of the following
+> type of warnings:
+> 
+> 30 net/bluetooth/mgmt_config.c:16:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 1 net/bluetooth/mgmt_config.c:22:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509101818.wKicbxgJ-lkp@intel.com/
+You could add an explanation, why the macro `__struct_group()` defined 
+in `include/uapi/linux/stddef.h` fixes this, and why it is preferred 
+over `TRAILING_OVERLAP()`. Also, the two underscores would suggest to 
+me, it’s some kind of internal implementation.
 
-All warnings (new ones prefixed by >>):
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+> Changes in v2:
+>   - Use __struct_group() instead of TRAILING_OVERLAP().
+> 
+> v1:
+>   - Link: https://lore.kernel.org/linux-hardening/aLSCu8U62Hve7Dau@kspp/
+> 
+>   include/net/bluetooth/mgmt.h | 9 +++++++--
+>   net/bluetooth/mgmt_config.c  | 4 ++--
+>   2 files changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 3575cd16049a..74edea06985b 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -53,10 +53,15 @@ struct mgmt_hdr {
+>   } __packed;
+>   
+>   struct mgmt_tlv {
+> -	__le16 type;
+> -	__u8   length;
+> +	/* New members MUST be added within the __struct_group() macro below. */
+> +	__struct_group(mgmt_tlv_hdr, __hdr, __packed,
+> +		__le16 type;
+> +		__u8   length;
+> +	);
+>   	__u8   value[];
+>   } __packed;
+> +static_assert(offsetof(struct mgmt_tlv, value) == sizeof(struct mgmt_tlv_hdr),
+> +	      "struct member likely outside of __struct_group()");
+>   
+>   struct mgmt_addr_info {
+>   	bdaddr_t	bdaddr;
+> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+> index 6ef701c27da4..c4063d200c0a 100644
+> --- a/net/bluetooth/mgmt_config.c
+> +++ b/net/bluetooth/mgmt_config.c
+> @@ -13,13 +13,13 @@
+>   
+>   #define HDEV_PARAM_U16(_param_name_) \
+>   	struct {\
+> -		struct mgmt_tlv entry; \
+> +		struct mgmt_tlv_hdr entry; \
+>   		__le16 value; \
+>   	} __packed _param_name_
+>   
+>   #define HDEV_PARAM_U8(_param_name_) \
+>   	struct {\
+> -		struct mgmt_tlv entry; \
+> +		struct mgmt_tlv_hdr entry; \
+>   		__u8 value; \
+>   	} __packed _param_name_
+>   
 
->> Warning: drivers/net/netconsole.c:177 struct member 'resume_wq' not described in 'netconsole_target'
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Kind regards,
+
+Paul
 
