@@ -1,190 +1,186 @@
-Return-Path: <netdev+bounces-221671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A0BB5182E
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:44:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4804CB51843
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 839FE17E954
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:44:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F421A4850E5
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E32320382;
-	Wed, 10 Sep 2025 13:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F521FE471;
+	Wed, 10 Sep 2025 13:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="YANOrVFy"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="a3KFutJ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C6131E0E5
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4389F1F4C8E
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757511835; cv=none; b=NQxbEE5iuEFft7Sf3ynVOOOShWz0IPWRoV73OKOR7RBqPqXewcxozGiwfs0yLz8eEn0et22CiwiCn5zsE2FfcFbWpZn7g0/7UMjRvf3wojL10uf43w/OdvQL4kRLMwdBXk8Eb9gukYHTv6YCigvvivoP6pbsawY/Yk/pwn+uI3o=
+	t=1757512083; cv=none; b=HlNXe7/QdMA7lSbtH3NHykrFcHu+Rjva/kYR6wVBwFXPYYdAINmC1ts9o5yRJYaesyLrUPFq3/zuoLn1DZAooSDgiawhHgMRmTDjt6oeq5dvnDQ6CFliZhM/ST4n+WIsjQdja5F5pq9ixxRhkmN5QONwig1fyFbBUmYu7OTrg2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757511835; c=relaxed/simple;
-	bh=geyyEYjk1K6ztSTDk78aVJVN3bfFFO7mnbJHVuJmCv0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O1apN68XKCdz3pstBu61rqD8jGIqtwo5QkXbyG5dz6iKLwnts/w9Dvdb2jmSIqzAipubf/7JD/95HZ5KRduusqXmhif3Y27TyNZM7YauB09oFq7d/Fj4pzyMzueUzGgox2NCHFpwKM68Dojm/plysLR0aMmsD/LKEpCZMYzw91U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=YANOrVFy; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-336bbcebca9so52605671fa.1
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 06:43:52 -0700 (PDT)
+	s=arc-20240116; t=1757512083; c=relaxed/simple;
+	bh=nr8M8a6g5CaFAzQQ+lJBCqlHyJLDpC8uDsB/HZin1Sc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Jv2YYMwnBng+xHUdfOTYB8bHejwsIDQLyUY4nwAHg7nkeHb8Re0GoyHTSgao4l7NFUPFho1Ad/1YipAcDGxuvH4jAo368315Z5uP9pQN0v8c4hMj3e4ZHT+DYl8XhAr8tL86N1mLc+gaHPis91Hsid/fSVNdvY/5qXJtxuZtS7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=a3KFutJ2; arc=none smtp.client-ip=52.12.53.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1757511831; x=1758116631; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KYusx74gMgivYw43mzCgiUQelBrscv4e9WlUdU22ggg=;
-        b=YANOrVFyFccA1JYWsWJbTWW/GzUPp2wituaBGlY/cQFANxiYpX2YQzm5AtuuKPBZWG
-         ruA3Rze3+tjNKS4MuOg8ctXb0Ncp8+zW1hlJ9pL+1KQ5T/9T7Sha17FpiCIP7btqHzOE
-         UiiBUczdbzwcK5NF6ZX8s/h2Goz2hznUDfTDEKmpFTGn9iqi+qXJZW+Gv0C/4hFD8j0J
-         cikR+XdDEiOwcDmwyJupwUAna2MQSuit2jUVZPmYbdnPwQ1dLT1W/s6mMJ6Km7e2zVo3
-         I9WMzb3L5jMZ+X502hsxWSj6ZADlmySD33MmZ5i4mRRdbEE3S/xFDzYlegq7Cz9USrDi
-         aGxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757511831; x=1758116631;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KYusx74gMgivYw43mzCgiUQelBrscv4e9WlUdU22ggg=;
-        b=Fc69nzApHvOGZ5MDhjT1dIDz9yQK2FWn5UkrSVFIqofSgM7iJkY0I0SN06GEkKukm9
-         cHDljrUZC/dud4Qo/zVMGhT4Bq7nhbyYjVb3Gnz9TSVDjZNTKeQMHRLqfrOg85NMjKwX
-         8vKwZ6lmZWNg7UoMMGW5sznym93XuKKYicO2kjcgysn2a8FJ8EIBm+fyK/kAGJz/9A/+
-         AtHg9zEg5dVxZuPcxRhEonKcNFbgjo/EYbXd805rhAClQDAKPxo++M0vCx89MF97xI1R
-         vSUf5Nfv7iELnFTexD7AGXmgXX/O+l0lYaxpDzCLacYdOpTwHKoVvn7nGwAEP5LRKWFC
-         RAlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXV/K0chNA0VpPkzRvdql8qzaaaPVfNWiWOTolyjSqNVTNGt79Iisd6O3cdCugdzyXe9BoOyZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmH2tneLyTwSTUVat/h1gzu+FIvFx7ja7R3XICtIs+Jx+XH4I8
-	m4F0JRuu4PsE8b2/fBB2PzjsMfUn3K2ogiCZB2RefYrB0cLC80r1k/4bLk4VG3ISxD5cFT4fd4g
-	jQBfMg7ahIhQdRe/rRMK31rAmJp7hOrzAwKsXnmdPDQ==
-X-Gm-Gg: ASbGncsA2BcMCx4rpzUtrL5q8NIDiAmd2b5KqzADtFaLng84n6/P0QLcvXioqGfEU40
-	Mji8em204olkmfQ0rjUc31pRu21jNolTbc520Ldt81NEOit8mS/1D3o2yZjvZgxhGiQrzpjAWsP
-	QYLmmKHuxdVLhfmFdtzecoa4QekVCrc8+qd+Et58RzwsxpW5LczauUlGxbVWbkcWYcGFI75kxlP
-	6vnfD/oiNsXHJOCkPfkLT3V+2P7yGZVW9q0SAw=
-X-Google-Smtp-Source: AGHT+IFm09bgx/eETS+zxh47Y2IF1gRYf9rbRYIHHMrehDx0L8qn2Ht4Uw5vNEiZ6L2mWS3ck3SpU2dCp6qBpa01PJo=
-X-Received: by 2002:a2e:be0e:0:b0:337:f57a:6844 with SMTP id
- 38308e7fff4ca-33b5a3fdaa8mr43894421fa.43.1757511830680; Wed, 10 Sep 2025
- 06:43:50 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1757512082; x=1789048082;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=b1cDcSCHKidkZ5wZeJxogM3bIZ9krxn7Su27EUt2U3I=;
+  b=a3KFutJ294ef0P7F+rmXsZVZXNt8mVju1S9sG2xw/RjiGNzoC7Ng6bji
+   5cUwE+Y2NV1WJlZYx8LAh+6B9JRIcQxqWwWdRmuXU0QCk9vR1Rp9UABDq
+   lN18To2N/hQVKAarpMh350T/l0fYrGcKHjZs/q0zZ2IlLGczt+R7XBW6a
+   ApP9+V51e+sgr4De55hZbjVi7vnY/RBoDModaZFmo99PDqPlX1MDT6/fh
+   GVkoSf/khtv7qe67KkqJ96dxH0QMyMRQXOlfd4gKfwd3CuBtCkHp9cSB9
+   d4O5bkgFBXjl22OtL+WYYsqkLOjnJ0o7ez2zMC2tthii6PYCcJQ1AQgbm
+   w==;
+X-CSE-ConnectionGUID: htCyvmWPTNKmDziyvaaSvQ==
+X-CSE-MsgGUID: KWLFG62NQ7C3codHrOF9Ew==
+X-IronPort-AV: E=Sophos;i="6.18,254,1751241600"; 
+   d="scan'208";a="2647375"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 13:48:00 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:54588]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.38:2525] with esmtp (Farcaster)
+ id 17dd31af-939e-40d6-a056-1a053d6ea001; Wed, 10 Sep 2025 13:47:59 +0000 (UTC)
+X-Farcaster-Flow-ID: 17dd31af-939e-40d6-a056-1a053d6ea001
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Wed, 10 Sep 2025 13:47:59 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.8) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Wed, 10 Sep 2025 13:47:57 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kurt Kanzenbach
+	<kurt@linutronix.de>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>, <kohei.enju@gmail.com>, "Kohei
+ Enju" <enjuk@amazon.com>
+Subject: [PATCH v2 iwl-net] igc: don't fail igc_probe() on LED setup error
+Date: Wed, 10 Sep 2025 22:47:21 +0900
+Message-ID: <20250910134745.17124-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
- <20250910-qcom-sa8255p-emac-v1-2-32a79cf1e668@linaro.org> <175751081352.3667912.274641295097354228.robh@kernel.org>
-In-Reply-To: <175751081352.3667912.274641295097354228.robh@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 10 Sep 2025 15:43:38 +0200
-X-Gm-Features: Ac12FXyZX2mI5u5h6corBWI5JwEw3xwlMcAzjYN5jnXKYMZIVsaIzZH2ILMwq1U
-Message-ID: <CAMRc=Mfom=QpqTrTSc_NEbKScOi1bLdVDO7kJ0+UQW9ydvdKjQ@mail.gmail.com>
-Subject: Re: [PATCH 2/9] dt-bindings: net: qcom: document the ethqos device
- for SCMI-based systems
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, Eric Dumazet <edumazet@google.com>, 
-	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Vinod Koul <vkoul@kernel.org>, Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org, 
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Conor Dooley <conor+dt@kernel.org>, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-msm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Wed, Sep 10, 2025 at 3:38=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org>=
- wrote:
->
->
-> On Wed, 10 Sep 2025 10:07:39 +0200, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > Describe the firmware-managed variant of the QCom DesignWare MAC. As th=
-e
-> > properties here differ a lot from the HLOS-managed variant, lets put it
-> > in a separate file.
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> >  .../devicetree/bindings/net/qcom,ethqos-scmi.yaml  | 101 +++++++++++++=
-++++++++
-> >  .../devicetree/bindings/net/snps,dwmac.yaml        |   4 +-
-> >  MAINTAINERS                                        |   1 +
-> >  3 files changed, 105 insertions(+), 1 deletion(-)
-> >
->
-> My bot found errors running 'make dt_binding_check' on your patch:
->
-> yamllint warnings/errors:
->
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
-et/renesas,rzn1-gmac.example.dtb: ethernet@44000000 (renesas,r9a06g032-gmac=
-): power-domains: [[4294967295]] is too short
->         from schema $id: http://devicetree.org/schemas/net/renesas,rzn1-g=
-mac.yaml#
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
-et/renesas,rzn1-gmac.example.dtb: ethernet@44000000 (renesas,r9a06g032-gmac=
-): Unevaluated properties are not allowed ('clock-names', 'clocks', 'interr=
-upt-names', 'interrupts', 'phy-mode', 'power-domains', 'reg', 'rx-fifo-dept=
-h', 'snps,multicast-filter-bins', 'snps,perfect-filter-entries', 'tx-fifo-d=
-epth' were unexpected)
->         from schema $id: http://devicetree.org/schemas/net/renesas,rzn1-g=
-mac.yaml#
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
-et/renesas,rzn1-gmac.example.dtb: ethernet@44000000 (renesas,r9a06g032-gmac=
-): power-domains: [[4294967295]] is too short
->         from schema $id: http://devicetree.org/schemas/net/snps,dwmac.yam=
-l#
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
-et/mediatek-dwmac.example.dtb: ethernet@1101c000 (mediatek,mt2712-gmac): po=
-wer-domains: [[4294967295, 4]] is too short
->         from schema $id: http://devicetree.org/schemas/net/mediatek-dwmac=
-.yaml#
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
-et/mediatek-dwmac.example.dtb: ethernet@1101c000 (mediatek,mt2712-gmac): Un=
-evaluated properties are not allowed ('mac-address', 'phy-mode', 'reg', 'sn=
-ps,reset-delays-us', 'snps,reset-gpio', 'snps,rxpbl', 'snps,txpbl' were une=
-xpected)
->         from schema $id: http://devicetree.org/schemas/net/mediatek-dwmac=
-.yaml#
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
-et/mediatek-dwmac.example.dtb: ethernet@1101c000 (mediatek,mt2712-gmac): po=
-wer-domains: [[4294967295, 4]] is too short
->         from schema $id: http://devicetree.org/schemas/net/snps,dwmac.yam=
-l#
->
+When igc_led_setup() fails, igc_probe() fails and triggers kernel panic
+in free_netdev() since unregister_netdev() is not called. [1]
+This behavior can be tested using fault-injection framework, especially
+the failslab feature. [2]
 
-These seem to be a false-positives triggered by modifying the
-high-level snps.dwmac.yaml file?
+Since LED support is not mandatory, treat LED setup failures as
+non-fatal and continue probe with a warning message, consequently
+avoiding the kernel panic.
 
-Bart
+[1]
+ kernel BUG at net/core/dev.c:12047!
+ Oops: invalid opcode: 0000 [#1] SMP NOPTI
+ CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+ RIP: 0010:free_netdev+0x278/0x2b0
+ [...]
+ Call Trace:
+  <TASK>
+  igc_probe+0x370/0x910
+  local_pci_probe+0x3a/0x80
+  pci_device_probe+0xd1/0x200
+ [...]
 
-> doc reference errors (make refcheckdocs):
->
-> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/202509=
-10-qcom-sa8255p-emac-v1-2-32a79cf1e668@linaro.org
->
-> The base for the series is generally the latest rc1. A different dependen=
-cy
-> should be noted in *this* patch.
->
-> If you already ran 'make dt_binding_check' and didn't see the above
-> error(s), then make sure 'yamllint' is installed and dt-schema is up to
-> date:
->
-> pip3 install dtschema --upgrade
->
-> Please check and re-submit after running the above command yourself. Note
-> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-> your schema. However, it must be unset to test all examples with your sch=
-ema.
->
+[2]
+ #!/bin/bash -ex
+
+ FAILSLAB_PATH=/sys/kernel/debug/failslab/
+ DEVICE=0000:00:05.0
+ START_ADDR=$(grep " igc_led_setup" /proc/kallsyms \
+         | awk '{printf("0x%s", $1)}')
+ END_ADDR=$(printf "0x%x" $((START_ADDR + 0x100)))
+
+ echo $START_ADDR > $FAILSLAB_PATH/require-start
+ echo $END_ADDR > $FAILSLAB_PATH/require-end
+ echo 1 > $FAILSLAB_PATH/times
+ echo 100 > $FAILSLAB_PATH/probability
+ echo N > $FAILSLAB_PATH/ignore-gfp-wait
+
+ echo $DEVICE > /sys/bus/pci/drivers/igc/bind
+
+Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+Changes:
+  v1->v2:
+    - don't fail probe when led setup fails
+    - rephrase subject and commit message
+  v1: https://lore.kernel.org/intel-wired-lan/20250906055239.29396-1-enjuk@amazon.com/
+---
+ drivers/net/ethernet/intel/igc/igc.h      |  1 +
+ drivers/net/ethernet/intel/igc/igc_main.c | 12 +++++++++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 266bfcf2a28f..a427f05814c1 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -345,6 +345,7 @@ struct igc_adapter {
+ 	/* LEDs */
+ 	struct mutex led_mutex;
+ 	struct igc_led_classdev *leds;
++	bool leds_available;
+ };
+ 
+ void igc_up(struct igc_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index e79b14d50b24..728d7ca5338b 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7335,8 +7335,14 @@ static int igc_probe(struct pci_dev *pdev,
+ 
+ 	if (IS_ENABLED(CONFIG_IGC_LEDS)) {
+ 		err = igc_led_setup(adapter);
+-		if (err)
+-			goto err_register;
++		if (err) {
++			netdev_warn_once(netdev,
++					 "LED init failed (%d); continuing without LED support\n",
++					 err);
++			adapter->leds_available = false;
++		} else {
++			adapter->leds_available = true;
++		}
+ 	}
+ 
+ 	return 0;
+@@ -7392,7 +7398,7 @@ static void igc_remove(struct pci_dev *pdev)
+ 	cancel_work_sync(&adapter->watchdog_task);
+ 	hrtimer_cancel(&adapter->hrtimer);
+ 
+-	if (IS_ENABLED(CONFIG_IGC_LEDS))
++	if (IS_ENABLED(CONFIG_IGC_LEDS) && adapter->leds_available)
+ 		igc_led_free(adapter);
+ 
+ 	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
+-- 
+2.48.1
+
 
