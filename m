@@ -1,117 +1,214 @@
-Return-Path: <netdev+bounces-221485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5945B509ED
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:37:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA8D1B509F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 926494E2F5A
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 00:37:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 614353B778B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 00:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB7E19D88F;
-	Wed, 10 Sep 2025 00:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A2D19F11E;
+	Wed, 10 Sep 2025 00:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bndbfUHz"
+	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="PAZaoO8F"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59EA175D53
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 00:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BD319D8AC
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 00:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757464668; cv=none; b=GObG5WbQRbmzsoM0kMapeDnqSUnkhJE2hcyFWsvACxwVVU+3quDXnhxI6I2lm0aqeV9DcUscZ612NK3e2M7rmFzWrTBA9qrWJydQkY3ATrpQfxWHQXHKTuW3QI2kFU84pA86kz9MvNvVXHFSnLpmJ7dLZGCCdJ9NaPrVMWFsk9s=
+	t=1757464812; cv=none; b=mK7QhrriH2CPHShe/Nf1ZE8+IpAd5nAQVQzBmbz3eGll1Joi6k6LFE0qCmf7/Kve/SscKdX5at9HKWb+pX6JXvWfP3/563DZRUW+sArM7tgDMLO9vr5gOg7GEK3lFotywKAjZaqJ5muuq9f7CMZGC1jJ5o4szSmqUsUyrYno4/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757464668; c=relaxed/simple;
-	bh=kvsxtl4eteYff9YEkkuUEDpv+2mnjQVnVcZI8Rc1GrY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UCNGjavH4vbvU9TSR8q6T73OrkaDxKJgVXE1oeUHKTJnQJWoXt2PWC/AhRqpRAD/7nXKONeu9QJjH+/dOYHldXHa6xxj0G7WiTkSoxvZBdBNhulJeX59I3p+lVZl0J98SKMmOfTiQV4vGxh/EGHRq1dYFgSENOrJQMmPMkvDkTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bndbfUHz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757464665;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mzYOGafRS64y0cq1Xm2ekzKR94eCodioB25haeoJkRo=;
-	b=bndbfUHz0uQ+Vw8sqvXPh3tAtVHxWwmpZAB/IRcg1uoeEZLtWRe2R7MqnVUzHZsgU8AZ+d
-	64Q05WFYvM7gM2W3kqqShmcykL01SxOGljsyWyroI3BfeSKwut5JALBwOC3RP7owGb9Wh9
-	toynW87duplWYfioP+MxZnC012vsZxU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-SQ1u5hJEMZyb_nWtX2AqRg-1; Tue,
- 09 Sep 2025 20:37:42 -0400
-X-MC-Unique: SQ1u5hJEMZyb_nWtX2AqRg-1
-X-Mimecast-MFC-AGG-ID: SQ1u5hJEMZyb_nWtX2AqRg_1757464661
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17F60180057A;
-	Wed, 10 Sep 2025 00:37:41 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.72.112.29])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E2D7F3002D2A;
-	Wed, 10 Sep 2025 00:37:34 +0000 (UTC)
-From: Li Tian <litian@redhat.com>
-To: netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Benjamin Poirier <bpoirier@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Shahar Shitrit <shshitrit@nvidia.com>
-Subject: [PATCH net v2] net/mlx5: Not returning mlx5_link_info table when speed is unknown
-Date: Wed, 10 Sep 2025 08:37:32 +0800
-Message-ID: <20250910003732.5973-1-litian@redhat.com>
+	s=arc-20240116; t=1757464812; c=relaxed/simple;
+	bh=7Cb5u7jncLcFhLiVnCTY8Y1qEYzK9rvuSJcpTxKvSS4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lfwtSUBcHay3LXbEAcflwyCKQVa9nWzbBf/pusDNbeq1i16OJd3DlrGUAO73PYVMdDft/+OgHmmBw/hzSPgpiWaDI8Gav3sz9m+fYXLufaeW/oumGv5n/1R4k0nKArRvC9kmzkCeRwyYF5m6GrETYMfcV+neeVPJ/2NKpIageeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=PAZaoO8F; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-77246079bc9so7350326b3a.3
+        for <netdev@vger.kernel.org>; Tue, 09 Sep 2025 17:40:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=wbinvd.org; s=wbinvd; t=1757464810; x=1758069610; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mss6uQGd55J5igKePLGZ8MRE87EtXTRkrLicTbCnVC4=;
+        b=PAZaoO8FupiaKyCAO3ep6QLCS18VoZoPvPU4IDivyLi5JRj9EpIuCMS5oqA5+eonqm
+         KziMxJHUdNK/1HWzcnC/I9pEnijpkOa1iYPhfZdTjppte+BYNeN3n5i3xLOwNcPCXGJ4
+         FBJyeeKZzblSHiMZSjbZzn8nHVwFFVRE0O/93d0jOhCPD/UsnaEP8Wekyg8EfDPIBzht
+         JzLifi2EVWvm228Dnp0A57Ad08oFm6/q76Y5ALef+VhqVRz7SFt1CrCMR6bu7RWfiTzz
+         xc7jeEgV/DcffCX36LbTfd7HiPBpPcBWHlmauFZj0dLky9LUEnaYC3OFWBrX6+bbx7nS
+         G8bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757464810; x=1758069610;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mss6uQGd55J5igKePLGZ8MRE87EtXTRkrLicTbCnVC4=;
+        b=GKgayTvmd7rc3zs8oLk9ZHxSBZrUAowkir2cskHF/QAaCPXZMTRyMYNvrKkTol8HB2
+         sq9HRq2xdomKZOgR579tKvCMPwu6xSwypIQtWnJyqanfnqHS3nRljjYj1iSWPLQdOwaU
+         BFb5iyokqmqYoLCaiEfLBSQ6LcGILmr/jM1L/GffywVrfD03etR2gyB1EJpvMYtSB2Ot
+         sCjVi8Rljn82za0QLjBHM/OY7GbFPjBMnzXIz9QZl4GCHtSCFdIgZc45OuGUfGegCckY
+         l0Fv3r+pd+9jLgetDOIsbwyowryeZQ54flfaY4dwsAF+hZoh7+1pX5Fdg53PKPbBiJjP
+         TT5g==
+X-Forwarded-Encrypted: i=1; AJvYcCXoxqRrBeQi516OgTCcU5SEaUUOwBx1p28Xbnhn6AnfPnnAFPiAvP+bXGkZd6IaIeYOrL4MHGY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLKg5kcM1/0qXyLo/ljmQX5kE5Kr+EYblHWh9eth3+YgiiTN6l
+	Ka15YdkgNNjVkRy0UxMz9LvfuNkzt53ctODJQy0Fd6H4yppYTRSbXzOG7X/wGmJtels=
+X-Gm-Gg: ASbGncunwvZqKgP0KEdYd2QtAUPyWjmpQa6CknVgJSEyGqpV+6sq4ObW0L/nQmC35kH
+	ZpPk3kvtmpgM0Sse56AwJtL8P/haPGj98lP2lIVr3kJMZup8Dh/guKMKaqgTUeFvzZWKpRao41G
+	iKjt0/ZxoVom1Q03wbpZSagMbmIWk3yx8jnOop4h5EssbR6qECp+WpsvWl4p+Olf3bhTRSDnkoI
+	eFxztVO989SahKLVNFpXJeA1P5ye6tjeK2Pyk+TXvQu3Cp71wT4rQrxAmTA2/gNG+oT8zlv07sj
+	ZbEQVKANGyr0HmhxEnezU4dZEd47mh6tSPf8frLcKfLNGWfDwszUnjzkeKY0xLvJMhrnK1jB44V
+	irU20sa8jmKpu2WUm2IqRjHl9
+X-Google-Smtp-Source: AGHT+IHSK5EEmR6TBrosEOEhDl6rDkA2E4ZqWIoCbjjkEo/IjzID4OBobJs2anobHQNRGAw2j2+pcA==
+X-Received: by 2002:a05:6a00:928c:b0:772:337e:3090 with SMTP id d2e1a72fcca58-7742ddaddf2mr18533500b3a.4.1757464810474;
+        Tue, 09 Sep 2025 17:40:10 -0700 (PDT)
+Received: from mozart.vkv.me ([192.184.167.117])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774660e67cbsm3247520b3a.6.2025.09.09.17.40.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Sep 2025 17:40:09 -0700 (PDT)
+Date: Tue, 9 Sep 2025 17:40:06 -0700
+From: Calvin Owens <calvin@wbinvd.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	david decotigny <decot@googlers.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	asantostc@gmail.com, efault@gmx.de, kernel-team@meta.com,
+	stable@vger.kernel.org, jv@jvosburgh.net
+Subject: Re: [PATCH net v3 1/3] netpoll: fix incorrect refcount handling
+ causing incorrect cleanup
+Message-ID: <aMDI5hY0BH2iSkdt@mozart.vkv.me>
+References: <20250905-netconsole_torture-v3-0-875c7febd316@debian.org>
+ <20250905-netconsole_torture-v3-1-875c7febd316@debian.org>
+ <aL9A3JDyx3TxAzLf@mozart.vkv.me>
+ <frxhoevr2fd4rdkhiix4z2agnqaglf4ho2rj6p6ncjwmseplg7@gknjhh23px4o>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <frxhoevr2fd4rdkhiix4z2agnqaglf4ho2rj6p6ncjwmseplg7@gknjhh23px4o>
 
-Because mlx5e_link_info and mlx5e_ext_link_info have holes
-e.g. Azure mlx5 reports PTYS 19. Do not return it unless speed
-is retrieved successfully.
+On Tuesday 09/09 at 07:05 -0700, Breno Leitao wrote:
+> On Mon, Sep 08, 2025 at 01:47:24PM -0700, Calvin Owens wrote:
+> > On Friday 09/05 at 10:25 -0700, Breno Leitao wrote:
+> > > commit efa95b01da18 ("netpoll: fix use after free") incorrectly
+> > > ignored the refcount and prematurely set dev->npinfo to NULL during
+> > > netpoll cleanup, leading to improper behavior and memory leaks.
+> > > 
+> > > Scenario causing lack of proper cleanup:
+> > > 
+> > > 1) A netpoll is associated with a NIC (e.g., eth0) and netdev->npinfo is
+> > >    allocated, and refcnt = 1
+> > >    - Keep in mind that npinfo is shared among all netpoll instances. In
+> > >      this case, there is just one.
+> > > 
+> > > 2) Another netpoll is also associated with the same NIC and
+> > >    npinfo->refcnt += 1.
+> > >    - Now dev->npinfo->refcnt = 2;
+> > >    - There is just one npinfo associated to the netdev.
+> > > 
+> > > 3) When the first netpolls goes to clean up:
+> > >    - The first cleanup succeeds and clears np->dev->npinfo, ignoring
+> > >      refcnt.
+> > >      - It basically calls `RCU_INIT_POINTER(np->dev->npinfo, NULL);`
+> > >    - Set dev->npinfo = NULL, without proper cleanup
+> > >    - No ->ndo_netpoll_cleanup() is either called
+> > > 
+> > > 4) Now the second target tries to clean up
+> > >    - The second cleanup fails because np->dev->npinfo is already NULL.
+> > >      * In this case, ops->ndo_netpoll_cleanup() was never called, and
+> > >        the skb pool is not cleaned as well (for the second netpoll
+> > >        instance)
+> > >   - This leaks npinfo and skbpool skbs, which is clearly reported by
+> > >     kmemleak.
+> > > 
+> > > Revert commit efa95b01da18 ("netpoll: fix use after free") and adds
+> > > clarifying comments emphasizing that npinfo cleanup should only happen
+> > > once the refcount reaches zero, ensuring stable and correct netpoll
+> > > behavior.
+> > 
+> > This makes sense to me.
+> > 
+> > Just curious, did you try the original OOPS reproducer?
+> > https://lore.kernel.org/lkml/96b940137a50e5c387687bb4f57de8b0435a653f.1404857349.git.decot@googlers.com/
+> 
+> Yes, but I have not been able to reproduce the problem at all.
+> I've have tested it using netdevsim, and here is a quick log of what I
+> run:
 
-Fixes: 65a5d35571849 ("net/mlx5: Refactor link speed handling with mlx5_link_info struct")
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Li Tian <litian@redhat.com>
----
-v2:
- - Fix indentation and spacing only.
-v1: https://lore.kernel.org/netdev/20250908085313.18768-1-litian@redhat.com
----
- drivers/net/ethernet/mellanox/mlx5/core/port.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Nice, thanks for clarifying.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/port.c b/drivers/net/ethernet/mellanox/mlx5/core/port.c
-index 2d7adf7444ba..aa9f2b0a77d3 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/port.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/port.c
-@@ -1170,7 +1170,11 @@ const struct mlx5_link_info *mlx5_port_ptys2info(struct mlx5_core_dev *mdev,
- 	mlx5e_port_get_link_mode_info_arr(mdev, &table, &max_size,
- 					  force_legacy);
- 	i = find_first_bit(&temp, max_size);
--	if (i < max_size)
-+
-+	/* mlx5e_link_info has holes. Check speed
-+	 * is not zero as indication of one.
-+	 */
-+	if (i < max_size && table[i].speed)
- 		return &table[i];
- 
- 	return NULL;
--- 
-2.50.0
+I also tried reverting a few commits like [1] around the time that smell
+vaguely related, on top of your fix, but the repro still never triggers
+anything for me either. I was using virtio interfaces in KVM.
 
+The world may never know :)
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=69b0216ac255
+
+> 	+ modprobe netconsole
+> 	+ modprobe bonding mode=4
+> 	[   86.540950] Warning: miimon must be specified, otherwise bonding will not detect link failure, speed and duplex which are essential for 802.3ad operation
+> 	[   86.541617] Forcing miimon to 100msec
+> 	[   86.541893] MII link monitoring set to 100 ms
+> 	+ echo +bond0
+> 	[   86.547802] bonding: bond0 is being created...
+> 	+ ifconfig bond0 192.168.56.3 up
+> 	+ mkdir /sys/kernel/config/netconsole/blah
+> 	+ echo 0
+> 	[   86.614772] netconsole: network logging has already stopped
+> 	./run.sh: line 19: echo: write error: Invalid argument
+> 	+ echo bond0
+> 	+ echo 192.168.56.42
+> 	+ echo 1
+> 	[   86.622318] netconsole: netconsole: local port 6665
+> 	[   86.622550] netconsole: netconsole: local IPv4 address 0.0.0.0
+> 	[   86.622819] netconsole: netconsole: interface name 'bond0'
+> 	[   86.623038] netconsole: netconsole: local ethernet address '00:00:00:00:00:00'
+> 	[   86.623466] netconsole: netconsole: remote port 6666
+> 	[   86.623675] netconsole: netconsole: remote IPv4 address 192.168.56.42
+> 	[   86.623924] netconsole: netconsole: remote ethernet address ff:ff:ff:ff:ff:ff
+> 	[   86.624264] netpoll: netconsole: local IP 192.168.56.3
+> 	[   86.643174] netconsole: network logging started
+> 	+ ifenslave bond0 eth1
+> 	[   86.659899] bond0: (slave eth1): Enslaving as a backup interface with a down link
+> 	+ ifenslave bond0 eth2
+> 	[   86.687630] bond0: (slave eth2): Enslaving as a backup interface with a down link
+> 	+ sleep 3
+> 	+ ifenslave -d bond0 eth1
+> 	[   89.735701] bond0: (slave eth1): Releasing backup interface
+> 	[   89.737239] bond0: (slave eth1): the permanent HWaddr of slave - 06:44:84:94:87:c7 - is still in use by bond - set the HWaddr of slave to a different address to avoid conflicts
+> 	+ sleep 1
+> 	+ echo -bond0
+> 	[   90.798676] bonding: bond0 is being deleted...
+> 	[   90.815595] netconsole: network logging stopped on interface bond0 as it unregistered
+> 	[   90.816416] bond0 (unregistering): (slave eth2): Releasing backup interface
+> 	[   90.863054] bond0 (unregistering): Released all slaves
+> 	+ ls -lR /
+> 	+ tail -30
+> 	<snip>
+> 
+> 	+ echo +bond0
+> 	./run.sh: line 39: /sys/class/net/bonding_masters: Permission denied
+
+I don't get -EACCES here like you seem to, but nothing interesting
+happens either.
+
+> 	+ ifconfig bond0 192.168.56.3 up
+> 	SIOCSIFADDR: No such device
+> 	bond0: ERROR while getting interface flags: No such device
+> 	bond0: ERROR while
 
