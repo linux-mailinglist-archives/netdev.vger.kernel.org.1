@@ -1,167 +1,212 @@
-Return-Path: <netdev+bounces-221576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E793B51001
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:52:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D6CB5108B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 990541B27F8B
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 07:53:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26803188BFFF
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314AF30BBA3;
-	Wed, 10 Sep 2025 07:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825FB3101D2;
+	Wed, 10 Sep 2025 08:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="VDUFdc0B"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="h/1Yi5gi";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="a2CHyEMs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495FC30B515
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 07:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699043101BD
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757490766; cv=none; b=XGwL2gAPQFfwdhJIPMjhRvW5c6/uDYfvohmeYIQ8zqqrO8Bupyuw6nx3sg4EGpVr696BugCqHgHJno7dLkC0Z/Rj+y7ylXztX/ebfToBEPeheCbG1Yg4pAl455XP8UleD6q6IoVrSqSRvYkrKxiTvqC2lKRdm4I6hJfDtz9nXeI=
+	t=1757491481; cv=none; b=HAAlskDNiaJTh8euAEiljWoiffN6kyrk+2L1aWv/iF7zYqu0WsvbUJ2MvVECmBkJC5A0v72tYHlyRI6b2P/sE3RHm+mMK2nORs3pmmKXn7Ux+2bIiq6htAM386np1wesYvLfW7w6kPcwSEwgw/W0nlMrorwGUoWjx5m1x36uA6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757490766; c=relaxed/simple;
-	bh=zbOHJqLZvHKjLopsCCjvRogVo+7v0qkQVDpNZrB8/2o=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O5dYCh2gikSMTVdE5fVxWP02ykHRDvVdYOw13AhAG3RO6JFZt00hNj3ERCzPX9HcuPtJiJrxPL2WL8q0w+cIeM9LGi4zE7vAgM2/ginlLBWbZ+G4bKkKfo+lLYVsu4q9xoM4BdaGSFX4foAklRejd4tlm6N+gaocpTl9o8CFw60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=VDUFdc0B; arc=none smtp.client-ip=52.34.181.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1757490764; x=1789026764;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=l7AN4NiHt1iHGYTPx66OzebOiDnEDFMIJX2hPqOwVDM=;
-  b=VDUFdc0BF0A+SvYz+h+VCFjSh9LqsNjHssCFuZlhaH4vGN/m+g6XlVAp
-   bOynMzJYS+cDgoxCJWO1tHylg8LpregFDDvm/lLGhLELoC++fgv72o01C
-   DEXwhjINj+O78Uk+D8dE24PFLYQU62lVjjaSB1wk4186O7Tfxk3l5NtFn
-   jMks77F6RMnGZvPnNtxg3089rJEUqfwWoar7gNHGu39qN5+W81szZ0y1o
-   I5WtwzA7QDnypq3OOaRJv+QFrC4oZnspAS+dhXi9v0pBPtdpiXWq53zHc
-   GBN5/lLW9YgppbXn//croL7ZwpdgdLFRkYMuydf2GZzK1JEtD97g+4VhW
-   g==;
-X-CSE-ConnectionGUID: RJzxr5h8QpyzBfm2z9+sUw==
-X-CSE-MsgGUID: xB2k0nbKTEqNgD6oPH0r5w==
-X-IronPort-AV: E=Sophos;i="6.18,253,1751241600"; 
-   d="scan'208";a="2747700"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 07:52:41 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:54227]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.180:2525] with esmtp (Farcaster)
- id df5c196c-d8fb-41fe-8806-ce668abd1f59; Wed, 10 Sep 2025 07:52:41 +0000 (UTC)
-X-Farcaster-Flow-ID: df5c196c-d8fb-41fe-8806-ce668abd1f59
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 07:52:41 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.7) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 10 Sep 2025 07:52:39 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <vitaly.lifshits@intel.com>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kohei.enju@gmail.com>,
-	<kuba@kernel.org>, <kurt@linutronix.de>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<aleksandr.loktionov@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] igc: unregister netdev when igc_led_setup() fails in igc_probe()
-Date: Wed, 10 Sep 2025 16:52:23 +0900
-Message-ID: <20250910075231.99838-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <15453ddf-0854-4be6-9eed-017ef79d3c77@intel.com>
-References: <15453ddf-0854-4be6-9eed-017ef79d3c77@intel.com>
+	s=arc-20240116; t=1757491481; c=relaxed/simple;
+	bh=SzS6s0TiVK8P0u+1VgtJ0YGJaCwrnr/RS29JY2Jxwb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bnsbzqMP4F1sizd4AB8Q+j5yzSJ8C3fWS2SGaJirqlR1vwyO3pkSYRhMoICU34sOmRlrcn9YHxX0Y5SvaCSVJn7dSQ+dKhHvx3ZFq6qM78UqclcB3v+kTmzxyD0i7dSk0dbgcqTSJHm2UWdALBTGEbl00qickTkKYOkheZU8MJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=h/1Yi5gi; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=a2CHyEMs; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 4400D7A015A;
+	Wed, 10 Sep 2025 04:04:37 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Wed, 10 Sep 2025 04:04:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1757491477; x=
+	1757577877; bh=KPqIKASzb3R90pIcczJi8m7zL8fcliR4BZNaV0KFaww=; b=h
+	/1Yi5gilwyPV7urQwUv0PXFT0D1KAiT1u3J6mupdtkRyp5engeCOSP0i4Bk+nbtV
+	CDHtw+hb0PN6TropMLL0Q31rU42p1jm/eK0rVRTkxxLWascG3tg8N70mt3hAA3wF
+	Lc6FWyjx5Oc/0BE6zN+XLr77LBP7ghFt2kVTsSHsS8RpvgKqH5SLuR1RqWHYYgbm
+	WPowJ8vlGmIHCfgjMWvhivhk9pAhBeT1ugPkpC78Uv15UDRlmejZTHFmmsA5fJKU
+	N+EnAxuZF+0GoYLF5G5Ng1L7aV4xq5tr8oFoQZcOwZdXKskYbAOiBZAuUPu9G2iq
+	P8apQnJL0XQ4ipk+PzIHg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757491477; x=1757577877; bh=KPqIKASzb3R90pIcczJi8m7zL8fcliR4BZN
+	aV0KFaww=; b=a2CHyEMs0decW8g29xwcPsodY52Yob119TCPFmehJOPDBOaYoNk
+	WQFt31l38slg82n7xE5dWgMhGaA2H/Qqfx3QFT5vbT1RbBZy7iz4L8Avlt3QIH42
+	xqi6kEB4huOOAeLRkO+WS4z5znIYM08JQLq+1WBx98wMFpZ9K9maWosi4YKkFBvD
+	muzpM32TPfvHH3IkLC6oII7xSu8OAwnBktkjH1cW4q4EZyq3JMURto3dtOrXKPkC
+	xhklAy6GCrHxLjrgkKLpcnoTag/iKpvh3zA/H5vPaHwz7S5aAWvC4uyuyN/gbbJ8
+	0Y+eDOrWwZVVfPbcVY2Owl/z/raw7BbSn/Q==
+X-ME-Sender: <xms:FDHBaHvDTSwvdDOJT82AC-IeJj8YVqLM5GQ5qcsOIflHFZSURIc2cw>
+    <xme:FDHBaD9QMz3RnqVZw8VPpsDGqmGc4VTBDzAeb-4AESqMTHf05PzaxQd7W311IbaAx
+    NZRV_CXHBOlQhqDW48>
+X-ME-Received: <xmr:FDHBaBPvpkrgOZSY9UPOeBI5g2EF79tB9ZG1Kv4N35SmTkWPkyJ2wljTAVW->
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdejiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohephedpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopeih
+    rghnjhhunhdriihhuheslhhinhhugidruggvvhdprhgtphhtthhopehsthgvfhhfvghnrd
+    hklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopeigmhhusehrvggu
+    hhgrthdrtghomh
+X-ME-Proxy: <xmx:FDHBaBGaeNhB6A30PsH5EOgDVNS2sOacguYKqmVz6zCgQISk5j1n3Q>
+    <xmx:FDHBaPQ4bU_9-HNAOP3vkgkWnc9eS3Yb57yW0TQWcAgv3Yq0eKXWNQ>
+    <xmx:FDHBaOu_1WGJ8OktgmvP4GYpgVv7TnhyXJsGThO0nFdVv1XW3-BO4w>
+    <xmx:FDHBaHIahWB5gbuPBzigDzVJETCR-NmgGR8la5PChx5I7noszAHTCw>
+    <xmx:FTHBaP5rbo6-B2ER7OkRpOkfTgkRNxMjAfHJXkkfuRQk__AW5mG2j29U>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Sep 2025 04:04:36 -0400 (EDT)
+Date: Wed, 10 Sep 2025 10:04:34 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org, Zhu Yanjun <yanjun.zhu@linux.dev>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Xiumei Mu <xmu@redhat.com>
+Subject: Re: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
+Message-ID: <aMExEjj3I4ahnMHc@krikkit>
+References: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
+ <20250909092315.GC341237@unreal>
+ <aMByADrbXBAXzIJr@krikkit>
+ <20250910054550.GI341237@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250910054550.GI341237@unreal>
 
-+ Aleksandr
+2025-09-10, 08:45:50 +0300, Leon Romanovsky wrote:
+> On Tue, Sep 09, 2025 at 08:29:20PM +0200, Sabrina Dubroca wrote:
+> > 2025-09-09, 12:23:15 +0300, Leon Romanovsky wrote:
+> > > On Mon, Aug 25, 2025 at 02:50:23PM +0200, Sabrina Dubroca wrote:
+> > > > Xiumei reported a regression in IPsec offload tests over xfrmi, where
+> > > > IPv6 over IPv4 tunnels are no longer offloaded after commit
+> > > > cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
+> > > > implementation").
+> > > 
+> > > What does it mean "tunnels not offloaded"?
+> > 
+> > Offload is no longer performed for those tunnels, or for packets going
+> > through those tunnels if we want to be pedantic.
+> > 
+> > > xdo_dev_offload_ok()
+> > > participates in data path and influences packet processing itself,
+> > > but not if tunnel offloaded or not.
+> > 
+> > If for you "tunnel is offloaded" means "xdo_dev_state_add is called",
+> > then yes.
+> 
+> Yes, "offloaded" means that we created HW objects.
 
-On Wed, 10 Sep 2025 10:28:17 +0300, Lifshits, Vitaly wrote:
+For me "offloaded" can mean either the xfrm state or the packets
+depending on context, and I don't think there's a strict definition,
+but whatever.
 
->On 9/8/2025 9:26 AM, Kurt Kanzenbach wrote:
->> On Sat Sep 06 2025, Kohei Enju wrote:
->>> Currently igc_probe() doesn't unregister netdev when igc_led_setup()
->>> fails, causing BUG_ON() in free_netdev() and then kernel panics. [1]
->>>
->>> This behavior can be tested using fault-injection framework. I used the
->>> failslab feature to test the issue. [2]
->>>
->>> Call unregister_netdev() when igc_led_setup() fails to avoid the kernel
->>> panic.
->>>
->>> [1]
->>>   kernel BUG at net/core/dev.c:12047!
->>>   Oops: invalid opcode: 0000 [#1] SMP NOPTI
->>>   CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
->>>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->>>   RIP: 0010:free_netdev+0x278/0x2b0
->>>   [...]
->>>   Call Trace:
->>>    <TASK>
->>>    igc_probe+0x370/0x910
->>>    local_pci_probe+0x3a/0x80
->>>    pci_device_probe+0xd1/0x200
->>>   [...]
->>>
->>> [2]
->>>   #!/bin/bash -ex
->>>
->>>   FAILSLAB_PATH=/sys/kernel/debug/failslab/
->>>   DEVICE=0000:00:05.0
->>>   START_ADDR=$(grep " igc_led_setup" /proc/kallsyms \
->>>           | awk '{printf("0x%s", $1)}')
->>>   END_ADDR=$(printf "0x%x" $((START_ADDR + 0x100)))
->>>
->>>   echo $START_ADDR > $FAILSLAB_PATH/require-start
->>>   echo $END_ADDR > $FAILSLAB_PATH/require-end
->>>   echo 1 > $FAILSLAB_PATH/times
->>>   echo 100 > $FAILSLAB_PATH/probability
->>>   echo N > $FAILSLAB_PATH/ignore-gfp-wait
->>>
->>>   echo $DEVICE > /sys/bus/pci/drivers/igc/bind
->>>
->>> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
->>> Signed-off-by: Kohei Enju <enjuk@amazon.com>
->> 
->> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
->
->Thank you for the patch and for identifying this issue!
->
->I was wondering whether we could avoid failing the probe in cases where 
->igc_led_setup fails. It seems to me that a failure in the LED class 
->functionality shouldn't prevent the device's core functionality from 
->working properly.
+Xiumei reported a regression in IPsec offload tests over xfrmi, where
+the traffic for IPv6 over IPv4 tunnels is processed in SW instead of
+going through crypto offload, after commit [...].
 
-Indeed, that also makes sense.
+It's getting too verbose IMO, but does that work for you?
 
-The behavior that igc_probe() succeeds even if igc_led_setup() fails
-also seems good to me, as long as notifying users that igc's led
-functionality is not available.
 
->
-> From what I understand, errors in this function are not due to hardware 
->malfunctions. Therefore, I suggest we remove the error propagation.
->
->Alternatively, if feasible, we could consider reordering the function 
->calls so that the LED class setup occurs before the netdev registration.
->
+For the subject, are you ok with the current one? It's hard to fit
+more details into such a short space.
 
-I don't disagree with you, but I would like to hear Kurt and Aleksandr's
-opinion. Do you have any preference or suggestions?
+> > > Also what type of "offload" are you talking? Crypto or packet?
+> > 
+> > Crypto offload, but I don't think packet offload would behave
+> > differently here.
+> 
+> It will, at least in the latest code, we have an extra check before
+> passing packet to HW.
+> 
+>   765         if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
+>   766                 if (!xfrm_dev_offload_ok(skb, x)) {
+>   767                         XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
+>   768                         kfree_skb(skb);
+>   769                         return -EHOSTUNREACH;
+>   770                 }
 
-I'll revise and work on v2 if needed.
-Thanks!
+So it looks like packet offload is also affected. We get to
+xfrm_dev_offload_ok, it does the wrong check, and the packets will get
+dropped instead of being sent through SW crypto. Am I misreading this?
+
+
+> > > > Commit cc18f482e8b6 added a generic version of existing checks
+> > > > attempting to prevent packets with IPv4 options or IPv6 extension
+> > > > headers from being sent to HW that doesn't support offloading such
+> > > > packets. The check mistakenly uses x->props.family (the outer family)
+> > > > to determine the inner packet's family and verify if
+> > > > options/extensions are present.
+> > > 
+> > > This is how ALL implementations did, so I'm not agree with claimed Fixes
+> > > tag (it it not important).
+> > 
+> > Well, prior to your commit, offload seemed to work on mlx5 as I
+> > describe just after this.
+> 
+> It worked by chance, not by design :)
+
+Sure.
+
+[...]
+> > > The latter is more correct, so it raises question against which
+> > > in-kernel driver were these xfrmi tests performed?
+> > 
+> > mlx5
+> 
+> It is artifact.
+
+Sorry, I'm not sure what you mean here.
+
+[...]
+> > > Will it work for transport mode too? We are taking this path both for
+> > > tunnel and transport modes.
+> > 
+> > Yes, if you look at __xfrm_init_state, inner_mode will always be set
+> > to whatever family is "inside".
+> 
+> I believe that you need to rephrase commit message around meaning of "offloaded"
+> but the change looks ok to me.
+> 
+> Thanks,
+> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+
+Thanks. I'll send a v2 when we agree on the wording, to avoid
+resending multiple times.
+
+-- 
+Sabrina
 
