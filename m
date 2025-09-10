@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-221885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04FB6B52473
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:09:11 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7789B52484
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BEE91C8289A
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 23:09:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6BEA04E1D6C
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 23:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA4C311C1F;
-	Wed, 10 Sep 2025 23:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801EC32A816;
+	Wed, 10 Sep 2025 23:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="HltxTKhi"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="LWCYqDZl"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A8630FF36;
-	Wed, 10 Sep 2025 23:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4313B317702;
+	Wed, 10 Sep 2025 23:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757545741; cv=none; b=DMvAOOJTqAmgJrk5eaQYSrPR7gE+9CQK2WWcIdMWhXoT0MJx2OukyLPdVkNrH9lcniG7vDNkZ2a5DkaaBlitayU6THEfUcFqBonheao7Nf88DXIrsY0wZ9Q7MefJL3TcD8pYObKCE6Ojtp4ayQQeaw+xS+oDL5KyzreWfUvxbxY=
+	t=1757545746; cv=none; b=GpH21UpaDXIzm3OitsByZxmhZ3ycb7WTatnGFbvwxdvRuX4VPKPH7SLd2WfykPNnO/P2gPtLx6PdGI3pZqfFXxViLk2mpB48aRiU/jfNNvjZFInrqjpco2nITexkSvzvDLCrQLEZqHdYq7THoXtjqWE/+IIIcL0FNu1+CeRVox0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757545741; c=relaxed/simple;
-	bh=nmFUdln7rWayXOvm+tCjXRJq0z3FgFYUv+rQXSS1YKI=;
+	s=arc-20240116; t=1757545746; c=relaxed/simple;
+	bh=9YMEML/2cAF/dYFs5UWYG9j95tdvfBp0b58/5bdDpPo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PvOtya7ANAo9ZyMnn5btkaVWMAKuWDd+0kudNgHAA1M+NK5ytYsGYcb9FjVAra6hsX+NEf/eNnVfHORrjLymqEh23T2J7CsNqH767R9QiSKvmt6vjBDVsKAalmZMp+M9Z0ZzGXU8MBmmaErd53XcPnD82mf3Uz3CK6Ae0YPfzQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=HltxTKhi; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=sQ0FqRth3KwQi2xQLekO55CV6HT9KsX7mQks2aZrYvsOGcI5NahQ4/Hbks2nNQaPILhx9aw19kSnYgR6Dpukh2x3kFm0/HqO7R5+5SORHM/+iJ7oy63FewjOjyoit0uwfoymhmcHSezLijkrM20MDjTdwxbh4U+17fQsHDOyFSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=LWCYqDZl; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1757545730;
-	bh=nmFUdln7rWayXOvm+tCjXRJq0z3FgFYUv+rQXSS1YKI=;
+	s=202008; t=1757545731;
+	bh=9YMEML/2cAF/dYFs5UWYG9j95tdvfBp0b58/5bdDpPo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HltxTKhiOHnCSUfdLrTG0iql13BAsPaDviXRRjJeOvWgY0+fo21zV1lKcSz2gEXNL
-	 L1FC5zrJ8EISxDPPjVrprNtiWuZaGH+2kl9PSTZt+vCj8QpgQiRX6QsVbRQ4iZA8KZ
-	 g6uI2QCbYkiOI3atxij7Wnul56VLVU6cGkmxReUsofKV4jy+CeR2gMaKLPoLekwKkK
-	 5Vl3ihDFfXTiE+Lc/bhpFBTLcgl2orys1DvV0XVlPDmCOEOJxywPjSV/5+7w2i6ZGX
-	 KqFdn6b3y0ewBDHrc7XyDXsyhjGNLe6TNW0RO+TvLO5rAHp8hy+Pku72gThVtot2Ty
-	 lzZIp2a/SfYSQ==
+	b=LWCYqDZlxeZ1RYVDqKTrcp2TOseJUtrLdk/brH+iTTmlvJkr4ivvSNGy7r5A/22hA
+	 A6yJqVxBmaguVaHjY2LNXfpHkpawZWXUHes17bcT39zMU5Hl1VOcu6ourEVa7M8sxh
+	 nlL6OaABOOsufOkY6xf8YzFJYzjBM88eW+EyUK821kAg/JqikFVRuQZoK1N1wdVxpS
+	 LPb/Bm468DOCsu8Z4c3jwghh1gDXOXJVQIeAJQBEImss1OSt76vZ7xYFPsyDQgp9p2
+	 FmY3SfVpqn4cLDYaOmvc2NdGMCX3IKlgGr0R6x8NiMokk1sQRojL9MDrizOWZpP91N
+	 bH7aqG2Fe/bkQ==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 3DB566000C;
-	Wed, 10 Sep 2025 23:08:49 +0000 (UTC)
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 40FA360078;
+	Wed, 10 Sep 2025 23:08:50 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id F351E203A9B; Wed, 10 Sep 2025 23:08:42 +0000 (UTC)
+	id 09DAD2044FF; Wed, 10 Sep 2025 23:08:43 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -61,9 +61,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	wireguard@lists.zx2c4.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 05/12] tools: ynl-gen: add CodeWriter.p_lines() helper
-Date: Wed, 10 Sep 2025 23:08:27 +0000
-Message-ID: <20250910230841.384545-6-ast@fiberby.net>
+Subject: [PATCH net-next v2 06/12] tools: ynl-gen: deduplicate fixed_header handling
+Date: Wed, 10 Sep 2025 23:08:28 +0000
+Message-ID: <20250910230841.384545-7-ast@fiberby.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250910230841.384545-1-ast@fiberby.net>
 References: <20250910230841.384545-1-ast@fiberby.net>
@@ -76,103 +76,122 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add a helper for writing an array of lines, and convert
-all the existing loops doing that, to use the new helper.
+Fixed headers are handled nearly identical in print_dump(),
+print_req() and put_req_nested(), generalize them and use a
+common function to generate them.
 
-This is a trivial patch with no behavioural changes intended,
-there are no changes to the generated code.
+This only causes cosmetic changes to tc_netem_attrs_put() in
+tc-user.c.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 39 ++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 6441d5a31391..18c6ed0044b9 100755
+index 18c6ed0044b9..f149c68ae84e 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -181,8 +181,7 @@ class Type(SpecAttr):
- 
-     def free(self, ri, var, ref):
-         lines = self._free_lines(ri, var, ref)
--        for line in lines:
--            ri.cw.p(line)
-+        ri.cw.p_lines(lines)
- 
-     def arg_member(self, ri):
-         member = self._complex_member_type(ri)
-@@ -268,13 +267,9 @@ class Type(SpecAttr):
-             if self.presence_type() == 'present':
-                 ri.cw.p(f"{var}->_present.{self.c_name} = 1;")
- 
--        if init_lines:
--            ri.cw.nl()
--            for line in init_lines:
--                ri.cw.p(line)
-+        ri.cw.p_lines(init_lines, nl_before=True)
- 
--        for line in lines:
--            ri.cw.p(line)
-+        ri.cw.p_lines(lines)
-         ri.cw.block_end()
-         return True
- 
-@@ -1789,8 +1784,7 @@ class CodeWriter:
-         self.block_start()
-         self.write_func_lvar(local_vars=local_vars)
- 
--        for line in body:
+@@ -1829,7 +1829,10 @@ class CodeWriter:
+         if lines and nl_before:
+             self.nl()
+         for line in lines or []:
 -            self.p(line)
-+        self.p_lines(body)
-         self.block_end()
++            if line == '':
++                self.nl()
++            else:
++                self.p(line)
  
-     def writes_defines(self, defines):
-@@ -1831,6 +1825,12 @@ class CodeWriter:
-             self.p('#ifdef ' + config_option)
-         self._ifdef_block = config_option
- 
-+    def p_lines(self, lines, nl_before=False):
-+        if lines and nl_before:
-+            self.nl()
-+        for line in lines or []:
-+            self.p(line)
-+
  
  scalars = {'u8', 'u16', 'u32', 'u64', 's8', 's16', 's32', 's64', 'uint', 'sint'}
+@@ -1922,6 +1925,15 @@ def type_name(ri, direction, deref=False):
+     return f"struct {op_prefix(ri, direction, deref=deref)}"
  
-@@ -2088,8 +2088,7 @@ def put_req_nested(ri, struct):
-     ri.cw.block_start()
-     ri.cw.write_func_lvar(local_vars)
  
--    for line in init_lines:
--        ri.cw.p(line)
-+    ri.cw.p_lines(init_lines)
++def prepare_fixed_header(var, local_vars, init_lines):
++    local_vars += ['size_t hdr_len;',
++                   'void *hdr;']
++    init_lines += [f'hdr_len = sizeof({var}->_hdr);',
++                   'hdr = ynl_nlmsg_put_extra_header(nlh, hdr_len);',
++                   f'memcpy(hdr, &{var}->_hdr, hdr_len);',
++                   '']
++
++
+ def print_prototype(ri, direction, terminate=True, doc=None):
+     suffix = ';' if terminate else ''
  
-     for _, arg in struct.member_list():
-         arg.attr_put(ri, "obj")
-@@ -2150,8 +2149,7 @@ def _multi_parse(ri, struct, init_lines, local_vars):
-     ri.cw.block_start()
-     ri.cw.write_func_lvar(local_vars)
+@@ -2077,10 +2089,7 @@ def put_req_nested(ri, struct):
+         local_vars.append('struct nlattr *nest;')
+         init_lines.append("nest = ynl_attr_nest_start(nlh, attr_type);")
+     if struct.fixed_header:
+-        local_vars.append('void *hdr;')
+-        struct_sz = f'sizeof({struct.fixed_header})'
+-        init_lines.append(f"hdr = ynl_nlmsg_put_extra_header(nlh, {struct_sz});")
+-        init_lines.append(f"memcpy(hdr, &obj->_hdr, {struct_sz});")
++        prepare_fixed_header('obj', local_vars, init_lines)
  
--    for line in init_lines:
--        ri.cw.p(line)
-+    ri.cw.p_lines(init_lines)
+     local_vars += put_local_vars(struct)
+ 
+@@ -2349,6 +2358,7 @@ def print_req(ri):
+     ret_ok = '0'
+     ret_err = '-1'
+     direction = "request"
++    init_lines = []
+     local_vars = ['struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };',
+                   'struct nlmsghdr *nlh;',
+                   'int err;']
+@@ -2359,8 +2369,7 @@ def print_req(ri):
+         local_vars += [f'{type_name(ri, rdir(direction))} *rsp;']
+ 
+     if ri.struct["request"].fixed_header:
+-        local_vars += ['size_t hdr_len;',
+-                       'void *hdr;']
++        prepare_fixed_header('req', local_vars, init_lines)
+ 
+     local_vars += put_local_vars(ri.struct["request"])
+ 
+@@ -2379,11 +2388,7 @@ def print_req(ri):
+         ri.cw.p(f"yrs.yarg.rsp_policy = &{ri.struct['reply'].render_name}_nest;")
      ri.cw.nl()
  
-     for arg in struct.inherited:
-@@ -2280,10 +2278,8 @@ def parse_rsp_submsg(ri, struct):
+-    if ri.struct['request'].fixed_header:
+-        ri.cw.p("hdr_len = sizeof(req->_hdr);")
+-        ri.cw.p("hdr = ynl_nlmsg_put_extra_header(nlh, hdr_len);")
+-        ri.cw.p("memcpy(hdr, &req->_hdr, hdr_len);")
+-        ri.cw.nl()
++    ri.cw.p_lines(init_lines)
  
-         ri.cw.block_start(line=f'{kw} (!strcmp(sel, "{name}"))')
-         get_lines, init_lines, _ = arg._attr_get(ri, var)
--        for line in init_lines or []:
--            ri.cw.p(line)
--        for line in get_lines:
--            ri.cw.p(line)
-+        ri.cw.p_lines(init_lines)
-+        ri.cw.p_lines(get_lines)
-         if arg.presence_type() == 'present':
-             ri.cw.p(f"{var}->_present.{arg.c_name} = 1;")
-         ri.cw.block_end()
+     for _, attr in ri.struct["request"].member_list():
+         attr.attr_put(ri, "req")
+@@ -2421,13 +2426,13 @@ def print_dump(ri):
+     direction = "request"
+     print_prototype(ri, direction, terminate=False)
+     ri.cw.block_start()
++    init_lines = []
+     local_vars = ['struct ynl_dump_state yds = {};',
+                   'struct nlmsghdr *nlh;',
+                   'int err;']
+ 
+     if ri.struct['request'].fixed_header:
+-        local_vars += ['size_t hdr_len;',
+-                       'void *hdr;']
++        prepare_fixed_header('req', local_vars, init_lines)
+ 
+     if "request" in ri.op[ri.op_mode]:
+         local_vars += put_local_vars(ri.struct["request"])
+@@ -2449,11 +2454,7 @@ def print_dump(ri):
+     else:
+         ri.cw.p(f"nlh = ynl_gemsg_start_dump(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);")
+ 
+-    if ri.struct['request'].fixed_header:
+-        ri.cw.p("hdr_len = sizeof(req->_hdr);")
+-        ri.cw.p("hdr = ynl_nlmsg_put_extra_header(nlh, hdr_len);")
+-        ri.cw.p("memcpy(hdr, &req->_hdr, hdr_len);")
+-        ri.cw.nl()
++    ri.cw.p_lines(init_lines)
+ 
+     if "request" in ri.op[ri.op_mode]:
+         ri.cw.p(f"ys->req_policy = &{ri.struct['request'].render_name}_nest;")
 -- 
 2.51.0
 
