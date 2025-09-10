@@ -1,288 +1,257 @@
-Return-Path: <netdev+bounces-221815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D64F3B51F12
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:36:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 701F5B51F2A
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 19:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9F931B261B1
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:37:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15491446307
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8314232A3E7;
-	Wed, 10 Sep 2025 17:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E75131D395;
+	Wed, 10 Sep 2025 17:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="A4WR/c/E"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="XxxRC21a";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="J07JS454"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F49E22422A
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 17:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C5F3093C6;
+	Wed, 10 Sep 2025 17:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757525812; cv=none; b=LMJiGe1JXNXB+nb2JnLkWcTgkOwLRCgYfm+8pYXuH2JPdLiayGH8AQhQL6VKMELqz8S+1nNBzmMs0lKA27vs4g6GaogvTCYusiWUWdBn63pt44Bkzg/ZwMqUwDevaIL7RNpI+uGyZ9JGAOEWXkw637JEqO/QtjZGLbpd4+tb6os=
+	t=1757526116; cv=none; b=foW0hYsN7Lb371w0uoo8MmIm7YkkACgkNSRn/4DcI2gKlSPGUgdP+R5cFnw9fVAPhthJ46g7+YoBrxyJmhJEmk6aGhzxrFucNue/Du+7DOar+O3JqJpv1tBPv0Bc6JLR9JyLCrUFp70TZYKqr37o4JtHkEKXA9w8EfpJ1dGiHiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757525812; c=relaxed/simple;
-	bh=LLQZmVzNV815aKaKxBWvuCiW/5PiZ8Fj7HtxZEXVcEo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qdmgys756POzKkOQzvWiWw57ErZKSChoMX5IQhNNQ/cjV8yQAFJgAsZTCEI4WO1HQqObWk5sKmRAdguSJpzP07NE49I9VV+vhcppYo2DGp1WHLF4xpdbqbFU4wJetjtVcGYkqJAf9uoBKCddE1G2sZKk6CvKJmcgqx2elWcGvjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=A4WR/c/E; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-56088927dcbso8725414e87.3
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 10:36:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openai.com; s=google; t=1757525809; x=1758130609; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EZgp1Av0IrI1VbVe6ba4FsK2/2iO2cWo8lh5Kh0scDw=;
-        b=A4WR/c/EChqmEShGYtxkVNFumw3/tLB0aB2Cfo61E0qfHLlVO3ksYoBAmSmJhgmIqm
-         ovMtjwfTHxd1YqJqIYUZ67/QwMCAQ8C8EnWgvmmsLxR0AU5tOGGic0rxHpnE2FMKm436
-         24DkIvuOuDtsqFp8JJ1oQ5fXbrAGFfINQjjoE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757525809; x=1758130609;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EZgp1Av0IrI1VbVe6ba4FsK2/2iO2cWo8lh5Kh0scDw=;
-        b=pBmdwWFHv98GTuLPi2Q2J+1RLNMW2rSNrHAqC3PMKQt+EpccAHbw8IYF3Tlf6cSZ5q
-         ZltvqLPgM9UOFYSk1ZcPQMsQ1dwDr5TZoar6nXq3x+JIAdbFpXNBRwNvsRnxkvArNw2e
-         27djvdBOHblEzoL2YZHSw0EVY2HFbgHkyaIlqGNPpo3dMwlG7NzlMQyLGlL1glYrqW0v
-         ClETMeb+Przy86R3F/KqL2tjlGvjOfTjFessgrgHHqINrehwnUq2CETQfZdGgvC1QfRg
-         Ondx5FX7tCCkd4T+FlzCWB0M3Lw4UwnjqmG+SEsiWelB6f0oYldO5HOOLi3fBvrOqmu8
-         xwDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVX8n35bNW7oA4zLU7uSTXiZmqfHXgag2z3gPz/fwVYIGiw7Jouo/woqoRujCYJ14HXQNBcBtg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdNHo7tA1qnHV20qRGKy2qUCQ3MKBtLGnDAEUy2fyGrmKa9EsE
-	h600dDJVaiiu4G8Xp5vcZiGIDBBo0PwmlM8hgtFL8KkSBJ+hrYWVh+n6J3n2KSljKMh+pOAhAKy
-	8FYaEYxqxMZ02vjL2qpaQGM8DjHjr7HJM2qezJSrFLg==
-X-Gm-Gg: ASbGnctHUILi+HTUOGuCRVs/KJkM33qzFzaCduiEmeON7n7snGis8AqysSmOTAhsG9Z
-	I/d65qZU3RwYIaGVpfWYhGoGd8+/Yih+tawnjEQVv9bU/jL46r2OtXbijpjS9ZEFemV9U+jPH0Y
-	uI+TE+xT+NBloGEzLTTyeBBthpI5CnP0knOQRT5n+fQgj8BOHYSbuCoSdsdHWYXsJ51JI/AW1y8
-	3uvoOoz70rqu+4BlPhziup4QqEs4BmvJgxz5vTkOwiMLmi49WCgDG8pkA4EbmG9gg==
-X-Google-Smtp-Source: AGHT+IEYro1yLA2HJ0lSiLmsgZxDRscIjl9YnGbe8L+zsVFBmVtUnfEiensqayS3z+8kLd1Sw+behbmHKEwjxXxcVAw=
-X-Received: by 2002:a05:6512:118b:b0:55f:6c72:b70d with SMTP id
- 2adb3069b0e04-56261bc60fcmr5252641e87.48.1757525808710; Wed, 10 Sep 2025
- 10:36:48 -0700 (PDT)
+	s=arc-20240116; t=1757526116; c=relaxed/simple;
+	bh=EcRQS91DKWoFV3mlE03+07yZ7own3/7HQnA7suLWa0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JimYUAdl68eEHLVf+B9lMs68RppJJyMRWs8/cX9sXD5plGHgu28dCH0+GnKObdoGhthhQSjyPSW3dSS2FxgHzRX3EcJ8ElQfhOV1VljDKljnLQmEv+muP2Q3Q+Bk6sOGU8Upld+1NMIVj1bn2PRU6osxmiQuM2CejRKaz48Qwb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=XxxRC21a; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=J07JS454; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id E822E1D00052;
+	Wed, 10 Sep 2025 13:41:51 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 10 Sep 2025 13:41:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1757526111; x=
+	1757612511; bh=AYwCDJAGLKrZF2XJ4TDx7GwNytvuxA9/1ofvDfGbl3s=; b=X
+	xxRC21a/FVDH6QKrI9lUIy4p8hvMIojCIAJhI2A9U1Nsxh+YCBd5T//TRZa89KLc
+	8hc2t1ixVEYZR+rcUNDz8k3dLl0oASZciW3+Fr5cJMwiLYDhyNta3HoK/lbKC7vf
+	dZNCop8zOXjvpZmd02mFKXgc27+lI4D2qn8bcfobCM9NnmicX7sQ7RiZLbNkJZb+
+	l5QErZMN4sSt93tzOeufZCAjd2u2ZLmWuHM2BYgFIv52GCyohUZEOvFK+i0s/dfp
+	SCr7ELZwPPIwGY8ty+08A51LAAsaf6Qa3oyoscxx1TtaW6DgqLe4MVCNjQRyeUP2
+	V9v9JSWj5plFSWgTpSu1Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1757526111; x=1757612511; bh=AYwCDJAGLKrZF2XJ4TDx7GwNytvuxA9/1of
+	vDfGbl3s=; b=J07JS454exXAD7skxff9boHaFiaWS7K6qPpUTuqeWWDqVmPBwEo
+	hhNqA6T08JCY85O6ClEEs8S1bR1yAkP1+RaOXsZ1Hzmr7KEg/HfBOOxrfFcnm/My
+	47T31Nfk1RW48K4hf22DRCLA64IJBnSFO1IQep+r6yWcAzU90BE/E4cUXWMafI+5
+	pexMPp6YymkGPLcmUcWsBeaFjadVQuYMXvi+4g/ahpkCl8UOLLusDFPUmy1fMfmx
+	Eby1vHhZ8Ktb+VAuq42pNoNz+Mi4aQV0V5YPGz7coXwGqC/5NXd69BpnJWbq1kUm
+	SYgfIqp0oVj29WedUWC06PXRemoC/BOMpnA==
+X-ME-Sender: <xms:XrjBaI_1ZlE6lvBDZks54Qme07cxdzUuwCVjP1SVmOTsRGU_CsmquA>
+    <xme:XrjBaHQR76Ci3eBqsfmVQwZFq_wtj37EyAA5sM-deeEy6Ce2hc80unm20b_0QuYv8
+    uSyAxklVKYThIyDUQs>
+X-ME-Received: <xmr:XrjBaPsDTBPtQ_b3iq-P7dX5l0-t3O7l4S-uoqpTNSdKla50-HMYvu4JnfwO>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeelvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudelpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehiughoshgthhesnhhvihguihgrrdgtohhmpd
+    hrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohep
+    nhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhvsehjvh
+    hoshgsuhhrghhhrdhnvghtpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhu
+    nhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtg
+    hpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgs
+    rgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtg
+    homh
+X-ME-Proxy: <xmx:XrjBaB6GRIrZlaMlAtKwhWRVOEOyfVghGJJrHz6RMEKet2EMcoovRQ>
+    <xmx:XrjBaOJGCjwrlFPBaSUmvBCRiHIMX-ygg4KBAtYOTPcCgxKrC6tKPQ>
+    <xmx:XrjBaLQuxjr7d3dQObaAorPPB_IEZaHq23tzL6zuXnBTpV42i-kKbA>
+    <xmx:XrjBaBpyGbfx7u3UJ2n-JP-izkKfOTCl0_pA39QpnubMHVEB8FQz1Q>
+    <xmx:X7jBaDNw2NQtmZtzBad5Kj6W4mwhWeFm7_XCtzhpSs9ZB3_vpcDokoxc>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Sep 2025 13:41:49 -0400 (EDT)
+Date: Wed, 10 Sep 2025 19:41:47 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] net: add a common function to compute
+ features from lowers devices
+Message-ID: <aMG4W9xUGxjLAVys@krikkit>
+References: <20250829095430.443891-1-liuhangbin@gmail.com>
+ <20250829095430.443891-2-liuhangbin@gmail.com>
+ <aLRr1W3jKRDYsRSq@shredder>
+ <aMGLTzACsKLRIsVb@krikkit>
+ <aMGwcyKTvmz5StN1@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-0-ea492f7b11ac@openai.com>
- <20250904-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v5-2-ea492f7b11ac@openai.com>
- <CAMB2axO4ySD2Lo9xzkkYdUqL2tHPcO02-h2HZiWT993wsU3NtA@mail.gmail.com>
- <CADg4-L92GbxSXaqg1KuoGxt2c_yC=gbmKywVPvcAjHY_7v2H1g@mail.gmail.com>
- <CADg4-L8dLtzPL-x8o1HAHrbQ2fQ0MxB3Gm68HVj9Jp3-YunwrA@mail.gmail.com> <CAMB2axO3d9Wr64RRxYQd8rg5QVxt5MO=ZzRtJG8njeDYNBW-tw@mail.gmail.com>
-In-Reply-To: <CAMB2axO3d9Wr64RRxYQd8rg5QVxt5MO=ZzRtJG8njeDYNBW-tw@mail.gmail.com>
-From: Christoph Paasch <cpaasch@openai.com>
-Date: Wed, 10 Sep 2025 10:36:36 -0700
-X-Gm-Features: AS18NWBuzj_9J7VCJmWMWuMIdt3c4bav1a2rRfaZyb5Rl8dB5QA7U4C5abrPeKI
-Message-ID: <CADg4-L8a-FbB4A_dttfQXYuvOdnEcrYOYi4fG_7KBBWfaLL_ag@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 2/2] net/mlx5: Avoid copying payload to the
- skb's linear part
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aMGwcyKTvmz5StN1@shredder>
 
-On Tue, Sep 9, 2025 at 8:17=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
-te:
->
-> On Tue, Sep 9, 2025 at 11:18=E2=80=AFAM Christoph Paasch <cpaasch@openai.=
-com> wrote:
-> >
-> > On Mon, Sep 8, 2025 at 9:00=E2=80=AFPM Christoph Paasch <cpaasch@openai=
-.com> wrote:
-> > >
-> > > On Thu, Sep 4, 2025 at 4:30=E2=80=AFPM Amery Hung <ameryhung@gmail.co=
-m> wrote:
-> > > >
-> > > > On Thu, Sep 4, 2025 at 3:57=E2=80=AFPM Christoph Paasch via B4 Rela=
-y
-> > > > <devnull+cpaasch.openai.com@kernel.org> wrote:
-> > > > >
-> > > > > From: Christoph Paasch <cpaasch@openai.com>
-> > > > >
-> > > > > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (25=
-6)
-> > > > > bytes from the page-pool to the skb's linear part. Those 256 byte=
-s
-> > > > > include part of the payload.
-> > > > >
-> > > > > When attempting to do GRO in skb_gro_receive, if headlen > data_o=
-ffset
-> > > > > (and skb->head_frag is not set), we end up aggregating packets in=
- the
-> > > > > frag_list.
-> > > > >
-> > > > > This is of course not good when we are CPU-limited. Also causes a=
- worse
-> > > > > skb->len/truesize ratio,...
-> > > > >
-> > > > > So, let's avoid copying parts of the payload to the linear part. =
-We use
-> > > > > eth_get_headlen() to parse the headers and compute the length of =
-the
-> > > > > protocol headers, which will be used to copy the relevant bits ot=
- the
-> > > > > skb's linear part.
-> > > > >
-> > > > > We still allocate MLX5E_RX_MAX_HEAD for the skb so that if the ne=
-tworking
-> > > > > stack needs to call pskb_may_pull() later on, we don't need to re=
-allocate
-> > > > > memory.
-> > > > >
-> > > > > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 =
-NIC and
-> > > > > LRO enabled):
-> > > > >
-> > > > > BEFORE:
-> > > > > =3D=3D=3D=3D=3D=3D=3D
-> > > > > (netserver pinned to core receiving interrupts)
-> > > > > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> > > > >  87380  16384 262144    60.01    32547.82
-> > > > >
-> > > > > (netserver pinned to adjacent core receiving interrupts)
-> > > > > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
-> > > > >  87380  16384 262144    60.00    52531.67
-> > > > >
-> > > > > AFTER:
-> > > > > =3D=3D=3D=3D=3D=3D
-> > > > > (netserver pinned to core receiving interrupts)
-> > > > > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> > > > >  87380  16384 262144    60.00    52896.06
-> > > > >
-> > > > > (netserver pinned to adjacent core receiving interrupts)
-> > > > >  $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256=
-K
-> > > > >  87380  16384 262144    60.00    85094.90
-> > > > >
-> > > > > Additional tests across a larger range of parameters w/ and w/o L=
-RO, w/
-> > > > > and w/o IPv6-encapsulation, different MTUs (1500, 4096, 9000), di=
-fferent
-> > > > > TCP read/write-sizes as well as UDP benchmarks, all have shown eq=
-ual or
-> > > > > better performance with this patch.
-> > > > >
-> > > > > Reviewed-by: Eric Dumazet <edumazet@google.com>
-> > > > > Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
-> > > > > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> > > > > ---
-> > > > >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 5 +++++
-> > > > >  1 file changed, 5 insertions(+)
-> > > > >
-> > > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/dr=
-ivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > > > index 8bedbda522808cbabc8e62ae91a8c25d66725ebb..0ac31c7fb64cd6072=
-0d390de45a5b6b453ed0a3f 100644
-> > > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > > > @@ -2047,6 +2047,8 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct m=
-lx5e_rq *rq, struct mlx5e_mpw_info *w
-> > > > >                 dma_sync_single_for_cpu(rq->pdev, addr + head_off=
-set, headlen,
-> > > > >                                         rq->buff.map_dir);
-> > > > >
-> > > > > +               headlen =3D eth_get_headlen(rq->netdev, head_addr=
-, headlen);
-> > > > > +
-> > > > >                 frag_offset +=3D headlen;
-> > > > >                 byte_cnt -=3D headlen;
-> > > > >                 linear_hr =3D skb_headroom(skb);
-> > > > > @@ -2123,6 +2125,9 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct m=
-lx5e_rq *rq, struct mlx5e_mpw_info *w
-> > > > >                                 pagep->frags++;
-> > > > >                         while (++pagep < frag_page);
-> > > > >                 }
-> > > > > +
-> > > > > +               headlen =3D eth_get_headlen(rq->netdev, mxbuf->xd=
-p.data, headlen);
-> > > > > +
-> > > >
-> > > > The size of mxbuf->xdp.data is most likely not headlen here.
-> > > >
-> > > > The driver currently generates a xdp_buff with empty linear data, p=
-ass
-> > > > it to the xdp program and assumes the layout If the xdp program doe=
-s
-> > > > not change the layout of the xdp_buff through bpf_xdp_adjust_head()=
- or
-> > > > bpf_xdp_adjust_tail(). The assumption is not correct and I am worki=
-ng
-> > > > on a fix. But, if we keep that assumption for now, mxbuf->xdp.data
-> > > > will not contain any headers or payload. The thing that you try to =
-do
-> > > > probably should be:
-> > > >
-> > > >         skb_frag_t *frag =3D &sinfo->frags[0];
-> > > >
-> > > >         headlen =3D eth_get_headlen(rq->netdev, skb_frag_address(fr=
-ag),
-> > > > skb_frag_size(frag));
-> >
-> > So, when I look at the headlen I get, it is correct (even with my old
-> > code using mxbuf->xdp.data).
-> >
-> > To make sure I test the right thing, which scenario would
-> > mxbuf->xdp.data not contain any headers or payload ? What do I need to
-> > do to reproduce that ?
->
-> A quick look at the code, could it be that
-> skb_flow_dissect_flow_keys_basic() returns false so that
-> eth_get_headlen() always returns sizeof(*eth)?
+2025-09-10, 20:08:03 +0300, Ido Schimmel wrote:
+> On Wed, Sep 10, 2025 at 04:29:35PM +0200, Sabrina Dubroca wrote:
+> > 2025-08-31, 18:35:49 +0300, Ido Schimmel wrote:
+> > > On Fri, Aug 29, 2025 at 09:54:26AM +0000, Hangbin Liu wrote:
+> > > > Some high level virtual drivers need to compute features from lower
+> > > > devices. But each has their own implementations and may lost some
+> > > > feature compute. Let's use one common function to compute features
+> > > > for kinds of these devices.
+> > > > 
+> > > > The new helper uses the current bond implementation as the reference
+> > > > one, as the latter already handles all the relevant aspects: netdev
+> > > > features, TSO limits and dst retention.
+> > > > 
+> > > > Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> > > > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > > > ---
+> > > >  include/linux/netdevice.h | 19 ++++++++++
+> > > >  net/core/dev.c            | 79 +++++++++++++++++++++++++++++++++++++++
+> > > >  2 files changed, 98 insertions(+)
+> > > > 
+> > > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > > > index f3a3b761abfb..42742a47f2c6 100644
+> > > > --- a/include/linux/netdevice.h
+> > > > +++ b/include/linux/netdevice.h
+> > > > @@ -5279,6 +5279,25 @@ int __netdev_update_features(struct net_device *dev);
+> > > >  void netdev_update_features(struct net_device *dev);
+> > > >  void netdev_change_features(struct net_device *dev);
+> > > >  
+> > > > +/* netdevice features */
+> > > > +#define VIRTUAL_DEV_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> > > > +					 NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
+> > > > +					 NETIF_F_GSO_ENCAP_ALL | \
+> > > > +					 NETIF_F_HIGHDMA | NETIF_F_LRO)
+> > > > +
+> > > > +#define VIRTUAL_DEV_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> > > > +					 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE | \
+> > > > +					 NETIF_F_GSO_PARTIAL)
+> > > > +
+> > > > +#define VIRTUAL_DEV_MPLS_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> > > > +					 NETIF_F_GSO_SOFTWARE)
+> > > > +
+> > > > +#define VIRTUAL_DEV_XFRM_FEATURES	(NETIF_F_HW_ESP | NETIF_F_HW_ESP_TX_CSUM | \
+> > > > +					 NETIF_F_GSO_ESP)
+> > > > +
+> > > > +#define VIRTUAL_DEV_GSO_PARTIAL_FEATURES (NETIF_F_GSO_ESP)
+> > > > +void netdev_compute_features_from_lowers(struct net_device *dev);
+> > > > +
+> > > >  void netif_stacked_transfer_operstate(const struct net_device *rootdev,
+> > > >  					struct net_device *dev);
+> > > >  
+> > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > index 1d1650d9ecff..fcad2a9f6b65 100644
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -12577,6 +12577,85 @@ netdev_features_t netdev_increment_features(netdev_features_t all,
+> > > >  }
+> > > >  EXPORT_SYMBOL(netdev_increment_features);
+> > > >  
+> > > > +/**
+> > > > + *	netdev_compute_features_from_lowers - compute feature from lowers
+> > > > + *	@dev: the upper device
+> > > > + *
+> > > > + *	Recompute the upper device's feature based on all lower devices.
+> > > > + */
+> > > > +void netdev_compute_features_from_lowers(struct net_device *dev)
+> > > > +{
+> > > > +	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
+> > > > +	netdev_features_t gso_partial_features = VIRTUAL_DEV_GSO_PARTIAL_FEATURES;
+> > > > +#ifdef CONFIG_XFRM_OFFLOAD
+> > > > +	netdev_features_t xfrm_features  = VIRTUAL_DEV_XFRM_FEATURES;
+> > >                                        ^ double space (in other places as well)
+> > > 
+> > > > +#endif
+> > > > +	netdev_features_t mpls_features  = VIRTUAL_DEV_MPLS_FEATURES;
+> > > > +	netdev_features_t vlan_features = VIRTUAL_DEV_VLAN_FEATURES;
+> > > > +	netdev_features_t enc_features  = VIRTUAL_DEV_ENC_FEATURES;
+> > > > +	unsigned short max_hard_header_len = ETH_HLEN;
+> > 
+> > Going back to this discussion about hard_header_len:
+> > 
+> > > hard_header_len is not really a feature, so does not sound like it
+> > > belongs here. I'm pretty sure it's not needed at all.
+> > > 
+> > > It was added to the bond driver in 2006 by commit 54ef31371407 ("[PATCH]
+> > > bonding: Handle large hard_header_len") citing panics with gianfar on
+> > > xmit. In 2009 commit 93c1285c5d92 ("gianfar: reallocate skb when
+> > > headroom is not enough for fcb") fixed the gianfar driver to stop
+> > > assuming that it has enough room to push its custom header. Further,
+> > > commit bee9e58c9e98 ("gianfar:don't add FCB length to hard_header_len")
+> > > from 2012 fixed this driver to use needed_headroom instead of
+> > > hard_header_len.
+> > > 
+> > > The team driver is also adjusting hard_header_len according to the lower
+> > > devices, but it most likely copied it from the bond driver. On the other
+> > > hand, the bridge driver does not mess with hard_header_len and no
+> > > problems were reported there (that I know of).
+> > > 
+> > > Might be a good idea to remove this hard_header_len logic from bond and
+> > > team and instead set their needed_headroom according to the lower device
+> > > with the highest needed_headroom. Paolo added similar logic in bridge
+> > > and ovs but the use case is a bit different there.
+> > 
+> > I'm not convinced removing adapting hard_header_len on bond/team is
+> > correct, even with old and broken drivers getting fixed years
+> > ago. hard_header_len will be used on the TX path (for some devices
+> > like bridge/macvlan via dev_forward_skb() and similar helpers, for IP
+> > tunnels setting their MTU, and via LL_RESERVED_SPACE).
+> > 
+> > So I think we should keep setting hard_header_len to the largest of
+> > all lowers.
+> 
+> It is not clear to me why we are setting hard_header_len to the largest
+> of all lowers and not needed_headroom. While bond/team allow
+> non-Ethernet lowers (unlike bridge, which is also adjusted to use this
+> helper), they do verify that all the lower devices are of the same type.
+> Shouldn't devices of the same type have the same hardware header length?
 
-No, the headlen values were correct (meaning, it was the actual length
-of the headers):
+At least not with VLANs. Both basic ethernet and vlan devices are
+ARPHRD_ETHER, but the hard_header_len of the vlan device will be
+larger if we're not offloading:
 
-This is TCP-traffic with a simple print after eth_get_headlen:
-[130982.311088] mlx5e_skb_from_cqe_mpwrq_nonlinear xdp headlen is 86
-
-So, eth_get_headlen was able to correctly parse things.
-
-My xdp-program is as simple as possible:
-SEC("xdp.frags")
-int xdp_pass_prog(struct xdp_md *ctx)
-{
-    return XDP_PASS;
-}
+    dev->hard_header_len = real_dev->hard_header_len + VLAN_HLEN;
 
 
-> The linear part
-> contains nothing meaning before __psk_pull_tail(), so it is possible
-> for skb_flow_dissect_flow_keys_basic() to fail.
->
-> >
-> > Thanks,
-> > Christoph
-> >
-> > >
-> > > Ok, I think I understand what you mean! Thanks for taking the time to=
- explain!
-> > >
-> > > I will do some tests on my side to make sure I get it right.
-> > >
-> > > As your change goes to net and mine to netnext, I can wait until your=
-s
-> > > is in the tree so that there aren't any conflicts that need to be
-> > > taken care of.
->
-> Will Copy you in the mlx5 non-linear xdp fixing patchset.
+> On the other hand, needed_headroom can and does vary between devices of
+> the same type.
 
-Thx!
+I'm not saying anything about needed_headroom. It sounds like it
+should be updated as well.
 
-
-Christoph
+-- 
+Sabrina
 
