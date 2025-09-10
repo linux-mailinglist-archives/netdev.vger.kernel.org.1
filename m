@@ -1,154 +1,190 @@
-Return-Path: <netdev+bounces-221552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3A6B50D0C
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 07:15:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F832B50D86
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 07:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 500361C2704C
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 05:16:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BBD87AD9FC
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 05:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3173725A350;
-	Wed, 10 Sep 2025 05:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EEA631D392;
+	Wed, 10 Sep 2025 05:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BZ9QXmZJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOJWUusm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8953431D39F
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 05:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0CE31D370
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 05:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757481347; cv=none; b=EC9M3BxzF2JGkXpoKXi0LwZWa6HQVK9Cd2VN0dOXTu2nx3TvG8a7MgvPjvmvmHyR/0RcrY8k9qssqhH29cmxzLjvhFVDXGqiYQw+EV8pFcSA4bhHOL0LYbS1FjUKmglmDGSyCHRE3vlROZq5zEzUD++0onqcNY/uRdkwBZ1+hZI=
+	t=1757483156; cv=none; b=fOVOmgyycfsxx0WsHTy9BptO71xNxXogIh4Nne4i5lC6XhUTBnhZ+2a80gNvRx5U+XkKlGPor5HvlsciSWcqgNNxkbxuzoMnPGidHbABXs9a7X5vKT15U5bVqNT209PpGCMadocVc2a8qnphsm5sV4I+L8K6SvsWZaExEFdbOhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757481347; c=relaxed/simple;
-	bh=s3pg7UyNfKWHgmE20zYNwMxjapyp73QbUHBrcGNUhA4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uUJpXhJAAMsPjRr4Dd1w76/m5+OACYYKSGFvfpkHcy3MxjUV8H+4mZtzHBJpS2gmnFvANZCzmQ+pnzCTEz1G1Hja7FRx0evd95kAiCJLKd6h4zpbWmPCkQ4sF/okyfG6zs/Oo7HRkCzV+EpIRKSGOA8AyYNt0JJUIt0VZWJcipk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BZ9QXmZJ; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a29689e0-cabc-4fdb-a030-443f0ccfb468@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757481342;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I4kIPGvCkyCNRQ7MQfHXdmZOt8slBwBvSdHTOyW6NXs=;
-	b=BZ9QXmZJxapXz7eXpIQpNic75a15WDzhsNUajPo3VO8oDChcS3baWuPjY9f7bkvoh/88Of
-	7T7wHuOdZVZNNno1cH/gVXDF9Ji/hId6Iomxw0jS6WwEvTLUImuYU/l8rya7HeDWAhNnI1
-	FXvmmpnmx8hPrSORcUkdyfYvBNB5r94=
-Date: Tue, 9 Sep 2025 22:15:37 -0700
+	s=arc-20240116; t=1757483156; c=relaxed/simple;
+	bh=E8gJl/om+W0uBuTkpIgR4ZV5rfta8591Zse7Xvhnn1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=flOrARzFwQNhab9nFz2N4rtdUN42utJuBFDLzfSkXWXJR7sUU6TZ7O0aUS1o6Hgd1c+xhqNR+7S3EyOzM7abrALGXykYmVSl6d3upV57d6WgAoXl+z3Y6MmBsXb2xtou2nYTZKMCn6PggnTHyUTrKoMUwprWAP2R1XHFVzNKC6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOJWUusm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93A59C4CEF0;
+	Wed, 10 Sep 2025 05:45:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757483156;
+	bh=E8gJl/om+W0uBuTkpIgR4ZV5rfta8591Zse7Xvhnn1o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oOJWUusmg5+HlP8TEJr7ZnopxQ9ID/ZEJp/3dfno/O7jridG2ik3jCap2gJECTqh3
+	 QhV1W6sY5AgNZIIbEkSfUsa+OAPEhEBoJfPJBNB81n3Km/k3TpnSn0SE71ptI4i4jl
+	 gD1eccJ46FjH2kEC8kworZ8f1ekn6mrkI4PCbX/HEW/59lpfobo7Z/0YRkfPAdmlUs
+	 52gfLnReKMF7Y4uNBLomOZ9t3Xu+qGY26cAxaK2KGW6D3N7mLOvv/h+G0gMGizAnkO
+	 8dj5ahxAqtoBvVIDtnnE5fh9gmEDUZERJEst3xDbrnQEPLBgREB08od1eano6MWr3E
+	 vY9V6zb+ULVYw==
+Date: Wed, 10 Sep 2025 08:45:50 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Zhu Yanjun <yanjun.zhu@linux.dev>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Xiumei Mu <xmu@redhat.com>
+Subject: Re: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
+Message-ID: <20250910054550.GI341237@unreal>
+References: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
+ <20250909092315.GC341237@unreal>
+ <aMByADrbXBAXzIJr@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 bpf] tcp_bpf: Call sk_msg_free() when
- tcp_bpf_send_verdict() fails to allocate psock->cork.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, syzbot+4cabd1d2fa917a456db8@syzkaller.appspotmail.com
-References: <20250909232623.4151337-1-kuniyu@google.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250909232623.4151337-1-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMByADrbXBAXzIJr@krikkit>
 
-On 9/9/25 4:26 PM, Kuniyuki Iwashima wrote:
-> syzbot reported the splat below. [0]
+On Tue, Sep 09, 2025 at 08:29:20PM +0200, Sabrina Dubroca wrote:
+> 2025-09-09, 12:23:15 +0300, Leon Romanovsky wrote:
+> > On Mon, Aug 25, 2025 at 02:50:23PM +0200, Sabrina Dubroca wrote:
+> > > Xiumei reported a regression in IPsec offload tests over xfrmi, where
+> > > IPv6 over IPv4 tunnels are no longer offloaded after commit
+> > > cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
+> > > implementation").
+> > 
+> > What does it mean "tunnels not offloaded"?
 > 
-> The repro does the following:
+> Offload is no longer performed for those tunnels, or for packets going
+> through those tunnels if we want to be pedantic.
 > 
->    1. Load a sk_msg prog that calls bpf_msg_cork_bytes(msg, cork_bytes)
->    2. Attach the prog to a SOCKMAP
->    3. Add a socket to the SOCKMAP
->    4. Activate fault injection
->    5. Send data less than cork_bytes
+> > xdo_dev_offload_ok()
+> > participates in data path and influences packet processing itself,
+> > but not if tunnel offloaded or not.
 > 
-> At 5., the data is carried over to the next sendmsg() as it is
-> smaller than the cork_bytes specified by bpf_msg_cork_bytes().
-> 
-> Then, tcp_bpf_send_verdict() tries to allocate psock->cork to hold
-> the data, but this fails silently due to fault injection + __GFP_NOWARN.
-> 
-> If the allocation fails, we need to revert the sk->sk_forward_alloc
-> change done by sk_msg_alloc().
-> 
-> Let's call sk_msg_free() when tcp_bpf_send_verdict fails to allocate
-> psock->cork.
-> 
-> [0]:
-> WARNING: net/ipv4/af_inet.c:156 at inet_sock_destruct+0x623/0x730 net/ipv4/af_inet.c:156, CPU#1: syz-executor/5983
-> Modules linked in:
-> CPU: 1 UID: 0 PID: 5983 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full)
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-> RIP: 0010:inet_sock_destruct+0x623/0x730 net/ipv4/af_inet.c:156
-> Code: 0f 0b 90 e9 62 fe ff ff e8 7a db b5 f7 90 0f 0b 90 e9 95 fe ff ff e8 6c db b5 f7 90 0f 0b 90 e9 bb fe ff ff e8 5e db b5 f7 90 <0f> 0b 90 e9 e1 fe ff ff 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 9f fc
-> RSP: 0018:ffffc90000a08b48 EFLAGS: 00010246
-> RAX: ffffffff8a09d0b2 RBX: dffffc0000000000 RCX: ffff888024a23c80
-> RDX: 0000000000000100 RSI: 0000000000000fff RDI: 0000000000000000
-> RBP: 0000000000000fff R08: ffff88807e07c627 R09: 1ffff1100fc0f8c4
-> R10: dffffc0000000000 R11: ffffed100fc0f8c5 R12: ffff88807e07c380
-> R13: dffffc0000000000 R14: ffff88807e07c60c R15: 1ffff1100fc0f872
-> FS:  00005555604c4500(0000) GS:ffff888125af1000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00005555604df5c8 CR3: 0000000032b06000 CR4: 00000000003526f0
-> Call Trace:
->   <IRQ>
->   __sk_destruct+0x86/0x660 net/core/sock.c:2339
->   rcu_do_batch kernel/rcu/tree.c:2605 [inline]
->   rcu_core+0xca8/0x1770 kernel/rcu/tree.c:2861
->   handle_softirqs+0x286/0x870 kernel/softirq.c:579
->   __do_softirq kernel/softirq.c:613 [inline]
->   invoke_softirq kernel/softirq.c:453 [inline]
->   __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
->   irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
->   instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [inline]
->   sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1052
->   </IRQ>
-> 
-> Fixes: 4f738adba30a ("bpf: create tcp_bpf_ulp allowing BPF to monitor socket TX/RX data")
-> Reported-by: syzbot+4cabd1d2fa917a456db8@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/68c0b6b5.050a0220.3c6139.0013.GAE@google.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->   net/ipv4/tcp_bpf.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-> index ba581785adb4..ee6a371e65a4 100644
-> --- a/net/ipv4/tcp_bpf.c
-> +++ b/net/ipv4/tcp_bpf.c
-> @@ -408,8 +408,10 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->   		if (!psock->cork) {
->   			psock->cork = kzalloc(sizeof(*psock->cork),
->   					      GFP_ATOMIC | __GFP_NOWARN);
-> -			if (!psock->cork)
-> +			if (!psock->cork) {
-> +				sk_msg_free(sk, msg);
+> If for you "tunnel is offloaded" means "xdo_dev_state_add is called",
+> then yes.
 
-Nothing has been corked yet, does it need to update the "*copied":
+Yes, "offloaded" means that we created HW objects.
 
-				*copied -= sk_msg_free(sk, msg);
+> 
+> 
+> > Also what type of "offload" are you talking? Crypto or packet?
+> 
+> Crypto offload, but I don't think packet offload would behave
+> differently here.
 
+It will, at least in the latest code, we have an extra check before
+passing packet to HW.
 
->   				return -ENOMEM;
-> +			}
->   		}
->   		memcpy(psock->cork, msg, sizeof(*msg));
->   		return 0;
+  765         if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
+  766                 if (!xfrm_dev_offload_ok(skb, x)) {
+  767                         XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
+  768                         kfree_skb(skb);
+  769                         return -EHOSTUNREACH;
+  770                 }
 
+> 
+> > > Commit cc18f482e8b6 added a generic version of existing checks
+> > > attempting to prevent packets with IPv4 options or IPv6 extension
+> > > headers from being sent to HW that doesn't support offloading such
+> > > packets. The check mistakenly uses x->props.family (the outer family)
+> > > to determine the inner packet's family and verify if
+> > > options/extensions are present.
+> > 
+> > This is how ALL implementations did, so I'm not agree with claimed Fixes
+> > tag (it it not important).
+> 
+> Well, prior to your commit, offload seemed to work on mlx5 as I
+> describe just after this.
 
+It worked by chance, not by design :)
+
+> 
+> But yes, I opted for a Fixes tag more aimed at stable backports with
+> additional references to the commits. I don't mind putting all the
+> Fixes tags for each driver as well (except ixgbe/ixgbevf since it's
+> transport-only so not affected by this, as I wrote in the commit).
+
+No problem, like I wrote, it is not important.
+
+> 
+> > > In the case of IPv6 over IPv4, the check compares some of the traffic
+> > > class bits to the expected no-options ihl value (5). The original
+> > > check was introduced in commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add
+> > > Innova IPSec offload TX data path"), and then duplicated in the other
+> > > drivers. Before commit cc18f482e8b6, the loose check (ihl > 5) passed
+> > > because those traffic class bits were not set to a value that
+> > > triggered the no-offload codepath. Packets with options/extension
+> > > headers that should have been handled in SW went through the offload
+> > > path, and were likely dropped by the NIC or incorrectly
+> > > processed.
+> > 
+> > The latter is more correct, so it raises question against which
+> > in-kernel driver were these xfrmi tests performed?
+> 
+> mlx5
+
+It is artifact.
+
+> 
+> > > Since commit cc18f482e8b6, the check is now strict (ihl !=
+> > > 5), and in a basic setup (no traffic class configured), all packets go
+> > > through the no-offload codepath.
+> > > 
+> > > The commits that introduced the incorrect family checks in each driver
+> > > are:
+> > > 2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
+> > > 8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
+> > > 859a497fe80c ("nfp: implement xfrm callbacks and expose ipsec offload feature to upper layer")
+> > > 32188be805d0 ("cn10k-ipsec: Allow ipsec crypto offload for skb with SA")
+> > > [ixgbe/ixgbevf commits are ignored, as that HW does not support tunnel
+> > > mode, thus no cross-family setups are possible]
+> > > 
+> > > Fixes: cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback implementation")
+> > > Reported-by: Xiumei Mu <xmu@redhat.com>
+> > > Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> > > ---
+> > >  net/xfrm/xfrm_device.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> > > index c7a1f080d2de..44b9de6e4e77 100644
+> > > --- a/net/xfrm/xfrm_device.c
+> > > +++ b/net/xfrm/xfrm_device.c
+> > > @@ -438,7 +438,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
+> > >  
+> > >  	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
+> > >  			    x->props.mode == XFRM_MODE_TUNNEL;
+> > > -	switch (x->props.family) {
+> > > +	switch (x->inner_mode.family) {
+> > 
+> > Will it work for transport mode too? We are taking this path both for
+> > tunnel and transport modes.
+> 
+> Yes, if you look at __xfrm_init_state, inner_mode will always be set
+> to whatever family is "inside".
+
+I believe that you need to rephrase commit message around meaning of "offloaded"
+but the change looks ok to me.
+
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
