@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-221503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274A7B50A78
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:50:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6327DB50A79
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 976131C61B3B
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:50:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD3FE566088
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECBC2248A3;
-	Wed, 10 Sep 2025 01:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA3A226D1E;
+	Wed, 10 Sep 2025 01:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ew8GiYGx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERPEx6gW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4007221F06;
-	Wed, 10 Sep 2025 01:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E742264BD;
+	Wed, 10 Sep 2025 01:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757469007; cv=none; b=RueCJot3XurEbVhWq3ADvyQsMdm42U3iQq7FMGSrICEWtZZu5jVZuLpi8hfwu2+oCPw9tKBn76lMlOrIhgM6QHib8V4FuFlO8PNxRbAmt/5XUQyKx5Krh+Gwrns1fiN71XGy2Q+te3zAaw8Muynt06hi9sFGrQQ5fTkpO+Y19sg=
+	t=1757469008; cv=none; b=no5zcPKloI4EtOQJf9kC5X+13Cmih+o2/MCWeUQfR/mONIZRowB/hxyGe7e784ULQNzacet/G57nwrtJVFgRefIQvlbdIQdhRlLZ4/r8wH2/ISUBoc/WAGjiQa5oyf7Xd/qHoYGQ/e3JWTDvjRYZVMEri2F89AAEuurK5DwVc5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757469007; c=relaxed/simple;
-	bh=xcMbxq68mHjENi1WkmjxOX64pUgX31sPw0jQSLLPWnk=;
+	s=arc-20240116; t=1757469008; c=relaxed/simple;
+	bh=31ynHaSExIvuDjwFnZXBu1eJN+TxHwjKcZZvJ6vRyiw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UHFaKJ9lQSVfmiAF+odFyQncvPJTLOHq4+stoevak3mgi6JBrN2TB9RK+cdI1YsjxyM6hMTJn7YvySaKdNjLPYmwbQHJPDYH5IY1SU0IwBZQLUQG9hOfre3A0rau2AfvxKqL464fA1HM2Qd+6wJqRRauk4C12GSII/h5ZZ7w6lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ew8GiYGx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26609C4CEF4;
-	Wed, 10 Sep 2025 01:50:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iVUffFC9UYpkr7hXsfCCEeSc4rmikwBrXdCgpMlxP1llJgIjMc0WRUxmbaW0aW7/kkGgCRq8Q+iaByOiiNCPaoKKDCnPU1q7Hqd6ztFp/I1BpI4VfvX1CdEFffBnjseDZk6xAhkan2j8/94y0BqQPjBFaFVbUFaow+z5S0t24QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ERPEx6gW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B44BC4CEF4;
+	Wed, 10 Sep 2025 01:50:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757469007;
-	bh=xcMbxq68mHjENi1WkmjxOX64pUgX31sPw0jQSLLPWnk=;
+	s=k20201202; t=1757469008;
+	bh=31ynHaSExIvuDjwFnZXBu1eJN+TxHwjKcZZvJ6vRyiw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ew8GiYGxM68JfRi4OnQe9RK68QnJcAsEXY5WkTZh9gw3RrL4uhAPYQ8GGWUiksEdG
-	 W8jxuHyZ8sYdShYrkRxAF55Wnv3LS8ThqrgY+yNUbkRT9R668fY1AH1H1wMaFyYG0+
-	 PLD27Vyv99Mu07msxN3EEop12wBCLixH0A7diQgmoXyHoIgN7GMhTo1hvqF1CPEVhu
-	 qKkGXKRJ2EvzeIINg5ZS3wTzf9kTpaS1BEDNgwdRqff5IF/mWd/kx6NSUcvBK+JTIb
-	 AdbBY+s8cgj9sSFrgEfjskLgsuAUmPiWnaGau/oTG8p5g0XDHXt8m55BdNE2wQvZWC
-	 lMKBSoDUKitUw==
+	b=ERPEx6gWeL3OsSIDwqsS85e9D0L2BOG2I8nnz8It68KBzFjRKlIx7+37//AxqCphC
+	 5LJbO/3lmVaBYHEG7Bb5vV+aP82/3W6DJE7uYtQpPtk+IC4owCuSCVXUfY+QTB+S20
+	 XZsgmB6kB0ak5RI+cX9vAEIHh7wYcIC/RKpZWqJWdLQxHdHcWIw2RrRQBAPsnDMQBf
+	 hj7M2LMpAsdTmf96RV/jLIhIxC/CrhSsKYDDKOA6zz6xJDttvyBrSiYlw+YT+1d0qv
+	 dyFHbJdGi47h3yRt+j8l/rV+2xf6XtE9F5p5EOMKD+G9WoQhDK5iDYcUzWqEHdKh3d
+	 LM58qe8WA/gEQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D03383BF69;
-	Wed, 10 Sep 2025 01:50:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE05C383BF69;
+	Wed, 10 Sep 2025 01:50:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] mptcp: misc fixes for v6.17-rc6
+Subject: Re: [PATCH net v2] mptcp: sockopt: make sync_socket_options propagate
+ SOCK_KEEPOPEN
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175746901031.871782.6846414902696606931.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Sep 2025 01:50:10 +0000
-References: 
- <20250908-net-mptcp-misc-fixes-6-17-rc5-v1-0-5f2168a66079@kernel.org>
-In-Reply-To: 
- <20250908-net-mptcp-misc-fixes-6-17-rc5-v1-0-5f2168a66079@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- donald.hunter@gmail.com, dcaratti@redhat.com, corbet@lwn.net,
- shuah@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, stable@vger.kernel.org
+ <175746901150.871782.13982454785645572183.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Sep 2025 01:50:11 +0000
+References: <aL8dYfPZrwedCIh9@templeofstupid.com>
+In-Reply-To: <aL8dYfPZrwedCIh9@templeofstupid.com>
+To: Krister Johansen <kjlx@templeofstupid.com>
+Cc: matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, fw@strlen.de, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kernel@vger.kernel.org, me@davidreaver.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 08 Sep 2025 23:27:26 +0200 you wrote:
-> Here are various unrelated fixes:
+On Mon, 8 Sep 2025 11:16:01 -0700 you wrote:
+> Users reported a scenario where MPTCP connections that were configured
+> with SO_KEEPALIVE prior to connect would fail to enable their keepalives
+> if MTPCP fell back to TCP mode.
 > 
-> - Patch 1: Fix a wrong attribute type in the MPTCP Netlink specs. A fix
->   for v6.7.
-> 
-> - Patch 2: Avoid mentioning a deprecated MPTCP sysctl knob in the doc. A
->   fix for v6.15.
+> After investigating, this affects keepalives for any connection where
+> sync_socket_options is called on a socket that is in the closed or
+> listening state.  Joins are handled properly. For connects,
+> sync_socket_options is called when the socket is still in the closed
+> state.  The tcp_set_keepalive() function does not act on sockets that
+> are closed or listening, hence keepalive is not immediately enabled.
+> Since the SO_KEEPOPEN flag is absent, it is not enabled later in the
+> connect sequence via tcp_finish_connect.  Setting the keepalive via
+> sockopt after connect does work, but would not address any subsequently
+> created flows.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] netlink: specs: mptcp: fix if-idx attribute type
-    https://git.kernel.org/netdev/net/c/7094b84863e5
-  - [net,2/3] doc: mptcp: net.mptcp.pm_type is deprecated
-    https://git.kernel.org/netdev/net/c/6f021e95d082
-  - [net,3/3] selftests: mptcp: shellcheck: support v0.11.0
-    https://git.kernel.org/netdev/net/c/ef1bd93b3b92
+  - [net,v2] mptcp: sockopt: make sync_socket_options propagate SOCK_KEEPOPEN
+    https://git.kernel.org/netdev/net/c/648de37416b3
 
 You are awesome, thank you!
 -- 
