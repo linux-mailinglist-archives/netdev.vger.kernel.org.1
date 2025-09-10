@@ -1,64 +1,59 @@
-Return-Path: <netdev+bounces-221480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A791B50976
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:01:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8627B50980
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E42F64E57D1
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 00:00:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E6D55E5DF4
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 00:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C315817BA1;
-	Wed, 10 Sep 2025 00:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5002146B5;
+	Wed, 10 Sep 2025 00:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IjytF97B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MlRqfTHH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D9410F2;
-	Wed, 10 Sep 2025 00:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BC910F2;
+	Wed, 10 Sep 2025 00:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757462455; cv=none; b=UXi51F/GevHJyFIH0CaeSzOxARlDIiGfyfbZ58yU625l+VBRGvfhQ/uSEYHrSvaTLFsRZlN6f5apwuTewB62ui9ZiY3QrlTodIh+arzI5V+JMcKWxVq/cXQgY77KdeldTr1e0qQ+Z7AQ3b+uOF/Tws+eqA3ljJ+yM2QQTG4uWqQ=
+	t=1757462605; cv=none; b=nmnfME0rzDnRWmrtJEV8zd4C7YJl1O4ENOqPW5luOEir1tayanRxEjVwA/0LN2/NzWVFK1otbzip7tQPmCTA6sWAk9aqj+MC9jzuuAnOC/UV7oJ7sGof6CAoATTw8FoiNqVPiTa9ev6b8rNthDBAfDSvqevHpjrj2qBxa0nVe6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757462455; c=relaxed/simple;
-	bh=T2dGmfcpRuIkRrBuxpENztq7/EZdH7TQujjC93PJ6QE=;
+	s=arc-20240116; t=1757462605; c=relaxed/simple;
+	bh=GwntTzkwKFk0XVbU9OiZglFwS+VRzCQQ+Oc2UE4ksQk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N/Vs4wjjj1vXfPYMMsonbDZZZ4O6DO29KgN7Ug63LGSbYd7wuaH1MFFleaftpeLEe59lc13g2wK3vXHgngItaS6NI0gOvaS+E4746tTsf+2Re4oXN6vFc3IB5lG6t6HirADDzyndPn2AOLbkZSuIfYSl+nyYyPzBKY/CQcKxKfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IjytF97B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AE71C4CEF4;
-	Wed, 10 Sep 2025 00:00:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tdWebEkOOCGGwhOWcYIxCyohTUxdoYE2HlDW0tuYtguAd1rWMWCSIueIeF1l46ObpUnKjx2B3eW3VHg5WGGnCL2sE67ADtrdPBZCK+2LJ6CnYSyM1nZB54BcJ5a59DJ8OeZqNvxynLTMiALYt4/8+jYVnq13ixNwVwuROaLTDak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MlRqfTHH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38536C4CEF7;
+	Wed, 10 Sep 2025 00:03:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757462455;
-	bh=T2dGmfcpRuIkRrBuxpENztq7/EZdH7TQujjC93PJ6QE=;
+	s=k20201202; t=1757462604;
+	bh=GwntTzkwKFk0XVbU9OiZglFwS+VRzCQQ+Oc2UE4ksQk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IjytF97Bm/junWGLsaJGRm7N7a1ss+vOqbNOdUeBW33UOC9nQ3UCbonEnmHXfub5R
-	 SHaIpl76ToxXITmlOiDtcGPL9J22APDEg9Jqds/XUXpsmqw6O4GZv8hSZD478rqNrL
-	 MBws5ul6dC414m9nt9tJcyKVELQssOkWTZty8gWLQTZQINQKsvD/Ya7u1uKjEPg6fh
-	 fHysyXy45HqxeK3ONvXXtvfgetI/vYsJ78XyzuBUgvV/Zi1Zpn2FrNf+I7/pJDMSgD
-	 JbJhHx84Mbnu221gqBW09oiDdn84Hw5IAWFW1ssJa2uLfyMAOKkg0PbKd/fako07pK
-	 7qmMYUjq1QKpA==
-Date: Tue, 9 Sep 2025 17:00:53 -0700
+	b=MlRqfTHH/HUqsRZAyCyEBOdxepdRZ8F8GfsKfrfytw2zttbPOBN5gSM8WmbecrqRY
+	 29yIQP8aeh48qTyUfluDBC/d9KOjWG4wgEoPCelWMC0zAh6IBJTkS89lSnkxOpag7a
+	 fAQHZKBAIj293O5X+hx3FQrB48UJ6WOP8si8hqFLOqPTT3ug24OMbsA4M/zCElvWxG
+	 M93fuA7oIdRjhvSFXUOiZNJwzJWOxBe5Oe6GgHXrfqSdmHAHVLPjSNTfS50xje3y3W
+	 ndQIIYxEDUSkmAJSTpZmY/d0b8elE7xWpQ45JfTyxWxubPdjwxY41h67OujItm8pzF
+	 Iv74k22+X2MCQ==
+Date: Tue, 9 Sep 2025 17:03:23 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Clark Wang
- <xiaoning.wang@nxp.com>, Stanislav Fomichev <sdf@fomichev.me>,
- imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-imx@nxp.com, Andrew Lunn <andrew@lunn.ch>, Frank Li
- <frank.li@nxp.com>
-Subject: Re: [PATCH v6 net-next 1/6] net: fec: use a member variable for
- maximum buffer size
-Message-ID: <20250909170053.6d0eb1b7@kernel.org>
-In-Reply-To: <20250908161755.608704-2-shenwei.wang@nxp.com>
-References: <20250908161755.608704-1-shenwei.wang@nxp.com>
-	<20250908161755.608704-2-shenwei.wang@nxp.com>
+To: David Ahern <dsahern@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests: net: replace sleeps in
+ fcnal-test with waits
+Message-ID: <20250909170323.5b0dbcc0@kernel.org>
+In-Reply-To: <263f7204-6f5b-4bbc-8c05-222cdb04fb15@kernel.org>
+References: <20250908200949.270433-1-kuba@kernel.org>
+	<20250909153346.4fa8c369@kernel.org>
+	<263f7204-6f5b-4bbc-8c05-222cdb04fb15@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,25 +63,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  8 Sep 2025 11:17:50 -0500 Shenwei Wang wrote:
-> -#define	OPT_FRAME_SIZE	(PKT_MAXBUF_SIZE << 16)
-> -#else
-> -#define	OPT_FRAME_SIZE	0
-> +#define	OPT_ARCH_HAS_MAX_FL
->  #endif
+On Tue, 9 Sep 2025 16:59:28 -0600 David Ahern wrote:
+> > This makes some ping tests fail.
+> > 
+> > https://netdev-3.bots.linux.dev/vmksft-net/results/289602/129-fcnal-other-sh/stdout
+> > https://netdev-3.bots.linux.dev/vmksft-net/results/289602/128-fcnal-ipv6-sh/stdout
+> > 
+> > I only tested with debug kernels, but the non-debug get upset.
+> > I'll resend just the wait_local_port_listen changes. If the change
+> > gets more complex it's probably good to separate them out in the first
+> > place.  
+> 
+> That is surprising to me. I will take look tomorrow.
 
-> +#ifdef OPT_ARCH_HAS_MAX_FL
-> +	rcntl |= fep->max_buf_size << 16;
-> +#endif
-
-We try to avoid ifdefs inside C functions, they make compilation
-coverage harder. Could you define OPT_ARCH_HAS_MAX_FL to 0 or 1
-depending on the platform, and then use:
-
-	if (OPT_ARCH_HAS_MAX_FL)
-		rcntl |= fep->max_buf_size << 16;
-
-The compiler will eliminate the condition if it's a constant,
-but its slightly easier to read and lets the compiler see the code
-regardless of the arch.
+Thanks! FWIW I repro'd one with "pause on fail" enabled and trying 
+to ping manually also wasn't working. Something odd.
 
