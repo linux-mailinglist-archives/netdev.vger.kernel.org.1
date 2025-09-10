@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-221491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00B1B50A40
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:30:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E24AB50A43
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 03:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14C81189470E
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:30:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C05E7B6EC2
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 01:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043B41F4297;
-	Wed, 10 Sep 2025 01:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E6F1DE2BF;
+	Wed, 10 Sep 2025 01:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIJH+jl6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H5hDLAuS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08451D5174;
-	Wed, 10 Sep 2025 01:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA0517B50A
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757467803; cv=none; b=TdHFiA2g8JwLEb4cCE2IQizou2RBGLPhn2omG9hyh9AG4n8AZRqOLPGEsZl8W3My46uCPn75GQWIBC8OsMeWfABd8lRhvyBEjsrXxk+tkFVpGNbHFCSfNLYeudRpM+gKEsvZS9lLt57TpZLMsFhh2NOs6piagHMp6Vhh5i8gwPQ=
+	t=1757467813; cv=none; b=DfE4XDqO7omIFH8u2wXNgbf/0YHyNEyAdSbweK59VIG+xwPpzdhNHe6/v5EbbELQMbD3qH3u1V49xp7Jt/KMLQwybCdHBWDm+sRlh3iBLuEIUQ0yXN964a5lL+KKo5lybgYq4ZHzLUFf0wcsGF40VaTekABSm5nlm0I4VNo4ig4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757467803; c=relaxed/simple;
-	bh=fMzUZ89rUIrB3BdUFoSRAOSzYorBCqeFF+aJ+HQat84=;
+	s=arc-20240116; t=1757467813; c=relaxed/simple;
+	bh=+2UTKQ0DPeez/v+5qTrw+oetedJXSvGiHUxMhbNF4PI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TqsH9e33j167HelfwTGJ96eczsG9x2oqnyCTaGmG13tjavatonCoPhaa4cSNzZq+1rKH7RbTQkgZw0stSSnoSB/R0e3DQfjwFtvJzcwKSzcVUImbbwhaMrmvCQJQI0ECgiDnjis1r3JuV34LI0C5JYgLKGYvw3zZhmR49m8IxpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FIJH+jl6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63043C4CEF4;
-	Wed, 10 Sep 2025 01:30:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ftHfkTL/mowOVBpuUvRNR809beeo16nHVFpmVg7E17HtquKo75deC74QdsNe/W8aaJmb/Mc/tLuXu6j04aKR//+XPPYx5BJ5GnOO2qs34ybyao27+6Ij1bnS+knpf1jDcLnq9W1XYPo8AjK6UMgjczViOHg+eMslE8d5dcjc9Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H5hDLAuS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58955C4CEF4;
+	Wed, 10 Sep 2025 01:30:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757467803;
-	bh=fMzUZ89rUIrB3BdUFoSRAOSzYorBCqeFF+aJ+HQat84=;
+	s=k20201202; t=1757467813;
+	bh=+2UTKQ0DPeez/v+5qTrw+oetedJXSvGiHUxMhbNF4PI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FIJH+jl63Sz0OwwkPHIQI7XYV1UB11zkmfiKz4S5tm8dzyWnFVXhh8YJQ866GEtQ5
-	 oVXer4P+9Mc48t/bBkfu9NT1MhpuXHK9LKOUsblQkTdn8+KNCDMlyM4fdWqnKf2YfD
-	 jmmlhxg2b1sb+ous78+K+RD1Zhvmdd8dGNdwdazx4J2tX5Qw6auF891aSd+XT9iyfg
-	 e5v9b/ks0hB1I71/zo1wyYwBw3MgsSwT9UfP2KjHNfFM8SgqbOrmchjQl++nFLZqyh
-	 Hl3pDD4nu/yL6Kcz66UgZVZsSipktH0nw1nZJ0U6SCUez7HuZqbaAUTDgJlik+vhGH
-	 6hYY3ZJ03865A==
+	b=H5hDLAuSTZM9Spqet+b2q+sM/GOLV8Kfvm2Te81joTvpE3N3W955e0g0fqVnggVq6
+	 9x8hjeVAR5loLYNfmSfzrePsfgbziHrAOQbrlPq16q1IRpy+5WgTX5XdAdBrJ6o1PH
+	 zmmVFvgc+y7RpwAyunYyCsJSLhvsTjTGhSBbadmoVhqQ09gzCZzXuHHoMYO65GPWLg
+	 c7Ns7Selpu/kx5m304+ystnuwvYy0d5AXH15PwNcMlc+6jw95gLFkcU3smb57FqiVC
+	 PvoIQz4f9P2LwhgachiZB4k9B2R9uSBWysBpoizrNC+S0Bpnx6KvC3m8YN5H0OGbGF
+	 UamEELOwF6beQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE4BB383BF69;
-	Wed, 10 Sep 2025 01:30:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEC7383BF69;
+	Wed, 10 Sep 2025 01:30:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,58 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] net: dev_ioctl: take ops lock in hwtstamp lower
- paths
+Subject: Re: [PATCH net-next 0/4] net: phy: fixed_phy: improvements
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175746780652.866782.7996733446987433045.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Sep 2025 01:30:06 +0000
-References: <20250907080821.2353388-1-cjubran@nvidia.com>
-In-Reply-To: <20250907080821.2353388-1-cjubran@nvidia.com>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, kuniyu@google.com,
- kory.maincent@bootlin.com, kees@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cratiu@nvidia.com, dtatulea@nvidia.com
+ <175746781623.866782.2553216760639444994.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Sep 2025 01:30:16 +0000
+References: <e81be066-cc23-4055-aed7-2fbc86da1ff7@gmail.com>
+In-Reply-To: <e81be066-cc23-4055-aed7-2fbc86da1ff7@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, linux@armlinux.org.uk,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 7 Sep 2025 11:08:21 +0300 you wrote:
-> ndo hwtstamp callbacks are expected to run under the per-device ops
-> lock. Make the lower get/set paths consistent with the rest of ndo
-> invocations.
+On Sat, 6 Sep 2025 23:59:18 +0200 you wrote:
+> This series contains a number of improvements.
+> No functional change intended.
 > 
-> Kernel log:
-> WARNING: CPU: 13 PID: 51364 at ./include/net/netdev_lock.h:70 __netdev_update_features+0x4bd/0xe60
-> ...
-> RIP: 0010:__netdev_update_features+0x4bd/0xe60
-> ...
-> Call Trace:
-> <TASK>
-> netdev_update_features+0x1f/0x60
-> mlx5_hwtstamp_set+0x181/0x290 [mlx5_core]
-> mlx5e_hwtstamp_set+0x19/0x30 [mlx5_core]
-> dev_set_hwtstamp_phylib+0x9f/0x220
-> dev_set_hwtstamp_phylib+0x9f/0x220
-> dev_set_hwtstamp+0x13d/0x240
-> dev_ioctl+0x12f/0x4b0
-> sock_ioctl+0x171/0x370
-> __x64_sys_ioctl+0x3f7/0x900
-> ? __sys_setsockopt+0x69/0xb0
-> do_syscall_64+0x6f/0x2e0
-> entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> ...
-> </TASK>
-> ....
+> Heiner Kallweit (4):
+>   net: phy: fixed_phy: remove unused interrupt support
+>   net: phy: fixed_phy: remove member no_carrier from struct fixed_phy
+>   net: phy: fixed_phy: add helper fixed_phy_find
+>   net: phy: fixed_phy: remove struct fixed_mdio_bus
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] net: dev_ioctl: take ops lock in hwtstamp lower paths
-    https://git.kernel.org/netdev/net/c/686cab5a18e4
+  - [net-next,1/4] net: phy: fixed_phy: remove unused interrupt support
+    https://git.kernel.org/netdev/net-next/c/fecf7087f0a3
+  - [net-next,2/4] net: phy: fixed_phy: remove member no_carrier from struct fixed_phy
+    https://git.kernel.org/netdev/net-next/c/0625b3bfbb7f
+  - [net-next,3/4] net: phy: fixed_phy: add helper fixed_phy_find
+    https://git.kernel.org/netdev/net-next/c/f8db55c8eb8e
+  - [net-next,4/4] net: phy: fixed_phy: remove struct fixed_mdio_bus
+    https://git.kernel.org/netdev/net-next/c/298382557935
 
 You are awesome, thank you!
 -- 
