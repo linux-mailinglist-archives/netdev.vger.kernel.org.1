@@ -1,119 +1,181 @@
-Return-Path: <netdev+bounces-221767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DAB7B51D45
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:16:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D1C0B51D47
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 18:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE1481743F1
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:13:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 387E3189734B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 16:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B5D3314B5;
-	Wed, 10 Sep 2025 16:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E9125B687;
+	Wed, 10 Sep 2025 16:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Sddu5nOv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gyr2TIz7"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E460261B81;
-	Wed, 10 Sep 2025 16:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22402246796
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 16:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757520814; cv=none; b=UoEosDpREwt5oiMtwHF5feYYGgj99VOPI4lbZW3BxlHRJI0HFfGe5EHQE0gdh69A8l/RgPJKttYi+g/bi3sWOiiX2qheaCdyQngPqGQfwyhq7i33X+ls9ralU/nH7kt5xudV36Qbv75CjaHmQ8oL8LRMUWJlagBUnIp+xJPSGxw=
+	t=1757520989; cv=none; b=MNTivuOefN9+DtaYAd+lLk8T663EJPs5bGGylAcypCsFU4Wr3mYZNqduEu+kTFB83qwQoHWm4CuxNYf2bmZtRIW8B6I3bWNSOjlZ7o6pxWEEtk/Hg1KLCbi+UMIWGBwq1pfpzTIRraH0W653v3Q6vTcnbxONUJIMYxQ/qoKQrN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757520814; c=relaxed/simple;
-	bh=MV39y2Xl/uahnxe2dsMAhx/+KnRqygZKLmJRmVcf5Kk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZrW0JD9DGeVxy213ovKuTI72OLQYJWQ8VcQGTk0I92s+1ft87ww5rZ3JZywhvVRhryYvjM9FDECbaAKSDf0jVhiXZtltA2S4KJGBD6bTaN1loPv/MK3TqcMugP0W3S2Tht1LYhy3h5CwCAl/kF3cdIMai744bq77C7RwcRlQhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Sddu5nOv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xLlQAdX9EKuLPni5mv0BQWTJbO5P/J2GkEBcV1lVcTo=; b=Sddu5nOv/xqB0VhycUgjA123tZ
-	I01vOGUkrQizRG48DnnMXA51nL1l4Lo2uEQNvoq8w5S0YEMJ/qYsEUKmOlxPohBF8l2WkoWgMX01E
-	tbz1hmFpmE3PQTnyfJ4m1Asd2aLUNcLfkS6yHNCMBe7bg8+Lnxd0YfpiFFerkBturacI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uwNRh-007y94-Op; Wed, 10 Sep 2025 18:13:21 +0200
-Date: Wed, 10 Sep 2025 18:13:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] dpll: zl3073x: Allow to use custom phase
- measure averaging factor
-Message-ID: <acfc8c63-4434-4738-84a9-00360e70c773@lunn.ch>
-References: <20250910103221.347108-1-ivecera@redhat.com>
+	s=arc-20240116; t=1757520989; c=relaxed/simple;
+	bh=MErv7ofNJvs2O2HyYXqdJGh01YPQd2InhldhO81ZjVI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=knuB3vLBJu1jSbv1wkH2jKupxXSvW06EGaV3E8A80THgVL3b61SZSdV0DYvmvT1yQe4W4YA2kH/V0Cq6PoWKX0rCH39H+NV5+a+HmMvfbGd18VP319nnC3N8jlAK9G/mqCcESNR5Me3pkjcTEoOKbpqTndDXOCKIu07Wgr0OZgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gyr2TIz7; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 24B8B4E40BB5;
+	Wed, 10 Sep 2025 16:16:24 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 11643606D4;
+	Wed, 10 Sep 2025 16:16:24 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7BC49102F28EB;
+	Wed, 10 Sep 2025 18:15:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1757520982; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=E0APalsRu/zy6XFrd8Z66ktVEZmFwpkka305wRfKLmY=;
+	b=gyr2TIz7PJf5tUr1jy8ZxhE8/qurylPahZ3BUp+dI5+7B3FC//K/B7fflvrcCuYcN66q2+
+	upMK0YCNAWowIB//uiyWZ7de/gg0EgtTwtGDQnesJaYbMZAn6Qd6K5nMvVMsS5b4EaVn94
+	wbFqUspV9n+gDvTuT1Z1kjpBz7adunhrCjxCydGrMbQ5jJxybFiax5cbvuTnVeQTjxTkU9
+	fJX502c091Dax5uIAJT4FNwjOZ3n9ra3XFIy1XJPc0zu2uefTmZYe5zh2v/18USEPtR5oZ
+	OT0pFJd9UnLiKSgBh6kJ/mLON/XMv7ZbFLw9JJ1kHWa9YOT4P8rTeoVNXz8Paw==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net v5 0/5] net: macb: various fixes
+Date: Wed, 10 Sep 2025 18:15:29 +0200
+Message-Id: <20250910-macb-fixes-v5-0-f413a3601ce4@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250910103221.347108-1-ivecera@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIACGkwWgC/22NSw7CIBRFt9K8sRi+tjhyH8ZBiw9LYsFAQzQNe
+ 5cwsonD+zn3bpAwOkxw7jaImF1ywVehDh2YefQPJO5eNXDKFR3oQJbRTMS6NyaC3KqeImNcMqj
+ AK2ILav8KHle4VXN2aQ3x0w6yaNG/rSwIJXSwzJpJsV7byxTC+nT+aMLShrL8gTndwbLCXBiht
+ eSaneQeLqV8AaP8UfLoAAAA
+X-Change-ID: 20250808-macb-fixes-e2f570e11241
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Geert Uytterhoeven <geert@linux-m68k.org>, 
+ Harini Katakam <harini.katakam@xilinx.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+ Sean Anderson <sean.anderson@linux.dev>
+X-Mailer: b4 0.14.2
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Sep 10, 2025 at 12:32:21PM +0200, Ivan Vecera wrote:
-> The DPLL phase measurement block uses an exponential moving average,
-> calculated using the following equation:
-> 
->                        2^N - 1                1
-> curr_avg = prev_avg * --------- + new_val * -----
->                          2^N                 2^N
-> 
-> Where curr_avg is phase offset reported by the firmware to the driver,
-> prev_avg is previous averaged value and new_val is currently measured
-> value for particular reference.
-> 
-> New measurements are taken approximately 40 Hz or at the frequency of
-> the reference (whichever is lower).
-> 
-> The driver currently uses the averaging factor N=2 which prioritizes
-> a fast response time to track dynamic changes in the phase. But for
-> applications requiring a very stable and precise reading of the average
-> phase offset, and where rapid changes are not expected, a higher factor
-> would be appropriate.
-> 
-> Add devlink device parameter phase_offset_avg_factor to allow a user
-> set tune the averaging factor via devlink interface.
-> 
-> Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->  Documentation/networking/devlink/zl3073x.rst |  4 ++
->  drivers/dpll/zl3073x/core.c                  |  6 +-
->  drivers/dpll/zl3073x/core.h                  |  8 ++-
->  drivers/dpll/zl3073x/devlink.c               | 67 ++++++++++++++++++++
->  4 files changed, 82 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/networking/devlink/zl3073x.rst b/Documentation/networking/devlink/zl3073x.rst
-> index 4b6cfaf386433..ddd159e39e616 100644
-> --- a/Documentation/networking/devlink/zl3073x.rst
-> +++ b/Documentation/networking/devlink/zl3073x.rst
-> @@ -20,6 +20,10 @@ Parameters
->       - driverinit
->       - Set the clock ID that is used by the driver for registering DPLL devices
->         and pins.
-> +   * - ``phase_offset_avg_factor``
-> +     - runtime
-> +     - Set the factor for the exponential moving average used by DPLL phase
-> +       measurement block. The value has to be in range <0, 15>.
+Fix a few disparate topics in MACB:
 
-Maybe put the text in the commit message here as well?
+[PATCH net v5 0/5] net: macb: various fixes
+[PATCH net v5 1/5] dt-bindings: net: cdns,macb: allow tsu_clk without tx_clk
+[PATCH net v5 2/5] net: macb: remove illusion about TBQPH/RBQPH being per-queue
+[PATCH net v5 3/5] net: macb: move ring size computation to functions
+[PATCH net v5 4/5] net: macb: single dma_alloc_coherent() for DMA descriptors
+[PATCH net v5 5/5] net: macb: avoid dealing with endianness in macb_set_hwaddr()
 
-      Andrew
+Patch 3/5 is a rework that simplifies patch 4/5. It is the only non-fix.
+
+Pending series on MACB are: (1) many cleanup patches and (2) patches for
+EyeQ5 support. Those will be sent targeting net-next/main once this
+series lands there, aiming to minimise merge conflicts. Old version of
+those patches are visible in the V2 revision [0].
+
+Thanks,
+Have a nice day,
+Théo
+
+[0]: https://lore.kernel.org/lkml/20250627-macb-v2-0-ff8207d0bb77@bootlin.com/
+
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+---
+Changes in v5:
+- Fix hwaddr endianness patch following comment by Russell [2].
+  [2]: https://lore.kernel.org/lkml/DCKQTNSCJD5Q.BKVVU59U0MU@bootlin.com/
+- Take 4 Acked-by: Nicolas Ferre.
+- Take Tested-by: Nicolas Ferre.
+- Link to v4: https://lore.kernel.org/r/20250820-macb-fixes-v4-0-23c399429164@bootlin.com
+
+Changes in v4:
+- Drop 11 patches that are only cleanups. That includes the
+  RBOF/skb_reserve() patch that, after discussion with Sean [1], has
+  had its Fixes trailer dropped. "move ring size computation to
+  functions" is the only non-fix patch that is kept, as it is depended
+  upon by further patches. Dropped patches:
+    dt-bindings: net: cdns,macb: sort compatibles
+    net: macb: match skb_reserve(skb, NET_IP_ALIGN) with HW alignment
+    net: macb: use BIT() macro for capability definitions
+    net: macb: remove gap in MACB_CAPS_* flags
+    net: macb: Remove local variables clk_init and init in macb_probe()
+    net: macb: drop macb_config NULL checking
+    net: macb: simplify macb_dma_desc_get_size()
+    net: macb: simplify macb_adj_dma_desc_idx()
+    net: macb: move bp->hw_dma_cap flags to bp->caps
+    net: macb: introduce DMA descriptor helpers (is 64bit? is PTP?)
+    net: macb: sort #includes
+  [1]: https://lore.kernel.org/lkml/d4bead1c-697a-46d8-ba9c-64292fccb19f@linux.dev/
+- Wrap code to 80 chars.
+- Link to v3: https://lore.kernel.org/r/20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com
+
+Changes in v3:
+- Cover letter: drop addresses that reject emails:
+  cyrille.pitchen@atmel.com
+  hskinnemoen@atmel.com
+  jeff@garzik.org
+  rafalo@cadence.com
+- dt-bindings: Take 2x Reviewed-by Krzysztof.
+- dt-bindings: add Fixes trailer to "allow tsu_clk without tx_clk"
+  patch, to highlight we are not introducing new behavior.
+- Reorder commits; move fixes first followed by cleanup patches.
+- Drop all EyeQ5 related commits.
+- New commit: "remove gap in MACB_CAPS_* flags".
+- New commit: "move ring size computation to functions".
+- New commit: "move bp->hw_dma_cap flags to bp->caps".
+- Rename introduced helpers macb_dma_is_64b() to macb_dma64() and,
+  macb_dma_is_ptp() to macb_dma_ptp().
+- Rename MACB_CAPS_RSC_CAPABLE -> MACB_CAPS_RSC.
+- Fix commit message typos: "maxime" -> "maximise", etc.
+- Take 7x Reviewed-by: Sean Anderson.
+- Add details to some commit messages.
+- Link to v2: https://lore.kernel.org/r/20250627-macb-v2-0-ff8207d0bb77@bootlin.com
+
+---
+Théo Lebrun (5):
+      dt-bindings: net: cdns,macb: allow tsu_clk without tx_clk
+      net: macb: remove illusion about TBQPH/RBQPH being per-queue
+      net: macb: move ring size computation to functions
+      net: macb: single dma_alloc_coherent() for DMA descriptors
+      net: macb: avoid dealing with endianness in macb_set_hwaddr()
+
+ .../devicetree/bindings/net/cdns,macb.yaml         |   2 +-
+ drivers/net/ethernet/cadence/macb.h                |   4 -
+ drivers/net/ethernet/cadence/macb_main.c           | 140 ++++++++++-----------
+ 3 files changed, 69 insertions(+), 77 deletions(-)
+---
+base-commit: 03605e0fae3948824b613bfb31bcf420b89c89c7
+change-id: 20250808-macb-fixes-e2f570e11241
+
+Best regards,
+-- 
+Théo Lebrun <theo.lebrun@bootlin.com>
+
 
