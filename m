@@ -1,119 +1,120 @@
-Return-Path: <netdev+bounces-221658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C868FB51735
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 14:47:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B85B5173F
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 14:50:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E96D91BC149D
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:47:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E41C34681F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15826315D59;
-	Wed, 10 Sep 2025 12:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58FB2DCF51;
+	Wed, 10 Sep 2025 12:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AXdWRiC5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IDMDnpcq"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F44311971
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 12:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5394226D1F
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 12:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757508429; cv=none; b=nj2rPcuey0QvzvwPY4WWrqzXZbpbwDeNhqOc/OnY9uycmphNoIZQ7q82FjZn07pSPDL3PuGwswnlyPmOa6NSUz9IGC6ZkvwJrrOjNkwT1HyiQNxJKOjvTXOfOnO/o8SGqbkkGsDI20TJ7S6NKBLWjLRM8P8xnjbKeQEifXfCu7s=
+	t=1757508653; cv=none; b=GCNgiAaD69eZHI4BHuQ8F9vO2gc4EwrS3qPxk9dRF+AAYrq3l+aZ2lOA5sAGLb9ddDjfoSG8dR9+UGziPeJcuB7nccKu998WqhW3rag+0I57FwzDVmx9O/w9hgkxUMNOx0Bb3usUXpqXknL1qwicsNRO/Tb6B4OZtFk7U/i/Rgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757508429; c=relaxed/simple;
-	bh=3Sa4IjoWHAD2sMCCd8xjvjwc5FJ9+WS1ZXKgSE44sME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kC8mDbaOEDSm5KgAC3fCmCoedE0ePrnVJ030D8ENVO1TTnovYFys9W8IQWKQCM9TD0+XX41835sWCbdIWlFtu0x6VOEnNKumH7u4FmOeA8fpRrXR8QHDzV1bgzVWWvu3NEO/emH3Z0H3T1D2dDuCfmS5LiadqG7NhpuCbsQakWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=AXdWRiC5; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1757508653; c=relaxed/simple;
+	bh=grTq8KxRMg3coiWEIWyramJs9nx7gmzXTsUJmAJjaFI=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=IU9NwFG4c5y74urzUOCKgZvHs5eUxI4yYlQUQfihljYfQh8ozUAi9u0n96bSIS0VEVwO2uzaOSMxe/wRbSoOGp22mFF710PXDsRNxHGnQsDWwxmhFN6Bpcqb2HcBmFEMLFPdXLJdK4tvjWJP6BtxgLXxUo39UQRGE6L6K+fXtbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IDMDnpcq; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HHU0n2ytUZeOyG9gBmJyegmTh9z7Ah2Y4C81Ht+L6Ms=; b=AXdWRiC59Mc4mYO+gpZRTaPjIp
-	S1Lxohf9UgqdS7FjTPgL3syfJfiPl8d5+rX2gYZlI9XrBacV+lCEIxiRxIBsLy7RkDkDEBsv3JlMf
-	7DpWDz0RMdjl5z3x5OCE49eG/Bm+Al+atute8c2znK5+XEyUX/IAtR/yanXyj2Cs+NSJJMiL+aKBr
-	WlsSaqGq3kUBQmvhg3u1Ga774V6a+EdMRE1E5jipyzWvcAguESx4pUYtAbvrK/aXrEpZNPo2jU5xe
-	Ej/MTEfiWi4YB09kAbR76oA2bf7yWgEQ1ToBR6YvQUoTn420/EZ6d4Bfhrt7qT+PxaFjj3CSrtX+D
-	BzmMn9KA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57174)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rnV6PVfecQWdaEN3bABGCOl8s59kCgMUps2w8sfp+hU=; b=IDMDnpcqu/UZwSv6tqyO7KmYJT
+	JzTNafyHFkyqLSgHRAzmn9Omk10EuCK0c638HkfZ/NubnhAZd6p+icNi8BjiaWHEXjqskAK1hl+2B
+	vpVPLeivq68YRTfJDtBI8ucHeVslyoNo2TWPlMDUfPukrwuHcEoExRMSwqkYaeeHiFOweSngVhTYo
+	IxsyIBD7dxcE6kLXqGjISoMChfdqh+wrHGO/cmSqlwaFmlGhW9fFHt4Rgu+NnGUpmZReyQJQnneR3
+	6RNnWCtCjseBWo3AirCr18YrBI5desLm5/Ey+pH1p9VVxRmlwbElidg8yTE/QCOSU5Sz/3Ou/jZTY
+	iiRzaAUQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55448 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uwKDy-000000001cz-3NZR;
-	Wed, 10 Sep 2025 13:46:58 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uwKDv-000000001PN-3Hbw;
-	Wed, 10 Sep 2025 13:46:55 +0100
-Date: Wed, 10 Sep 2025 13:46:55 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1uwKHf-000000001dF-2UGS;
+	Wed, 10 Sep 2025 13:50:47 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1uwKHe-00000004glk-3nkJ;
+	Wed, 10 Sep 2025 13:50:46 +0100
+From: Russell King <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Shannon Nelson <sln@onemain.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net] net: ethtool: fix wrong type used in struct
- kernel_ethtool_ts_info
-Message-ID: <aMFzP6GFj1jVO6Qs@shell.armlinux.org.uk>
-References: <E1uvMEK-00000003Amd-2pWR@rmk-PC.armlinux.org.uk>
- <20250909163302.7e03d232@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2] net: mvneta: add support for hardware timestamps
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250909163302.7e03d232@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1uwKHe-00000004glk-3nkJ@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 10 Sep 2025 13:50:46 +0100
 
-On Tue, Sep 09, 2025 at 04:33:02PM -0700, Jakub Kicinski wrote:
-> On Sun, 07 Sep 2025 21:43:20 +0100 Russell King (Oracle) wrote:
-> > In C, enumerated types do not have a defined size, apart from being
-> > compatible with one of the standard types. This allows an ABI /
-> > compiler to choose the type of an enum depending on the values it
-> > needs to store, and storing larger values in it can lead to undefined
-> > behaviour.
-> > 
-> > The tx_type and rx_filters members of struct kernel_ethtool_ts_info
-> > are defined as enumerated types, but are bit arrays, where each bit
-> > is defined by the enumerated type. This means they typically store
-> > values in excess of the maximum value of the enumerated type, in
-> > fact (1 << max_value) and thus must not be declared using the
-> > enumated type.
-> > 
-> > Fix both of these to use u32, as per the corresponding __u32 UAPI type.
-> > 
-> > Fixes: 2111375b85ad ("net: Add struct kernel_ethtool_ts_info")
-> 
-> Do you feel strongly about this being a fix? (I can adjust when
-> applying FWIW). It's clearly not great but I don't think storing
-> a mask of enum values cause functional problems.
+Add support for hardware timestamps in (e.g.) the PHY by calling
+skb_tx_timestamp() as close as reasonably possible to the point that
+the hardware is instructed to send the queued packets.
 
-Whether or not it causes problems depends whether we have any compilers
-that are used for the kernel which select the size of an enum type
-based on the value.
+Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+---
+v2: add ethtool_op_get_ts_info(), remove FIXME from comment.
 
-From what I recall, when EABI for ARM was being talked about, that
-compiler behaviour was certainly on the table. I opposed it - and
-we ended up with arm-linux and arm-none variants of EABI. Whether
-there's still a difference today, I'm not sure.
+ drivers/net/ethernet/marvell/mvneta.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Even without Fixes: I think you'll find that the stable autosel bot
-will still pick this change up... it uses "AI".
-
+diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
+index 476e73e502fe..01eedc3e54d9 100644
+--- a/drivers/net/ethernet/marvell/mvneta.c
++++ b/drivers/net/ethernet/marvell/mvneta.c
+@@ -2985,6 +2985,13 @@ static netdev_tx_t mvneta_tx(struct sk_buff *skb, struct net_device *dev)
+ 		if (txq->count >= txq->tx_stop_threshold)
+ 			netif_tx_stop_queue(nq);
+ 
++		/* This is not really the true transmit point, since we batch
++		 * up several before hitting the hardware, but is the best we
++		 * can do without more complexity to walk the packets in the
++		 * pending section of the transmit queue.
++		 */
++		skb_tx_timestamp(skb);
++
+ 		if (!netdev_xmit_more() || netif_xmit_stopped(nq) ||
+ 		    txq->pending + frags > MVNETA_TXQ_DEC_SENT_MASK)
+ 			mvneta_txq_pend_desc_add(pp, txq, frags);
+@@ -5357,6 +5364,7 @@ static const struct ethtool_ops mvneta_eth_tool_ops = {
+ 	.set_link_ksettings = mvneta_ethtool_set_link_ksettings,
+ 	.get_wol        = mvneta_ethtool_get_wol,
+ 	.set_wol        = mvneta_ethtool_set_wol,
++	.get_ts_info	= ethtool_op_get_ts_info,
+ 	.get_eee	= mvneta_ethtool_get_eee,
+ 	.set_eee	= mvneta_ethtool_set_eee,
+ };
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.3
+
 
