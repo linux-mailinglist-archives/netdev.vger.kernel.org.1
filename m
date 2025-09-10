@@ -1,212 +1,164 @@
-Return-Path: <netdev+bounces-221577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D6CB5108B
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:08:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57081B510B5
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:11:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26803188BFFF
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:09:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E1C57BDEE6
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 08:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825FB3101D2;
-	Wed, 10 Sep 2025 08:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710A330E0ED;
+	Wed, 10 Sep 2025 08:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="h/1Yi5gi";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="a2CHyEMs"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="MYjZItM1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699043101BD
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F19330DD1B
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 08:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757491481; cv=none; b=HAAlskDNiaJTh8euAEiljWoiffN6kyrk+2L1aWv/iF7zYqu0WsvbUJ2MvVECmBkJC5A0v72tYHlyRI6b2P/sE3RHm+mMK2nORs3pmmKXn7Ux+2bIiq6htAM386np1wesYvLfW7w6kPcwSEwgw/W0nlMrorwGUoWjx5m1x36uA6w=
+	t=1757491668; cv=none; b=e8runqlC/803My12BSZvUxyZkGQFqJ0Y7+QESGOiJg/gW9+PBJYAJTAgisbCtV5zS+VHGpSCd9p88YdJpLeijER/2GoLLVGF5wPuxp2y5rXeQ2JUhO6ItJ6bFDtl4GngcdSdu17NGM8E4KELKZymRx38uZPu6UkmY7TgxK0ub8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757491481; c=relaxed/simple;
-	bh=SzS6s0TiVK8P0u+1VgtJ0YGJaCwrnr/RS29JY2Jxwb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bnsbzqMP4F1sizd4AB8Q+j5yzSJ8C3fWS2SGaJirqlR1vwyO3pkSYRhMoICU34sOmRlrcn9YHxX0Y5SvaCSVJn7dSQ+dKhHvx3ZFq6qM78UqclcB3v+kTmzxyD0i7dSk0dbgcqTSJHm2UWdALBTGEbl00qickTkKYOkheZU8MJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=h/1Yi5gi; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=a2CHyEMs; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4400D7A015A;
-	Wed, 10 Sep 2025 04:04:37 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Wed, 10 Sep 2025 04:04:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1757491477; x=
-	1757577877; bh=KPqIKASzb3R90pIcczJi8m7zL8fcliR4BZNaV0KFaww=; b=h
-	/1Yi5gilwyPV7urQwUv0PXFT0D1KAiT1u3J6mupdtkRyp5engeCOSP0i4Bk+nbtV
-	CDHtw+hb0PN6TropMLL0Q31rU42p1jm/eK0rVRTkxxLWascG3tg8N70mt3hAA3wF
-	Lc6FWyjx5Oc/0BE6zN+XLr77LBP7ghFt2kVTsSHsS8RpvgKqH5SLuR1RqWHYYgbm
-	WPowJ8vlGmIHCfgjMWvhivhk9pAhBeT1ugPkpC78Uv15UDRlmejZTHFmmsA5fJKU
-	N+EnAxuZF+0GoYLF5G5Ng1L7aV4xq5tr8oFoQZcOwZdXKskYbAOiBZAuUPu9G2iq
-	P8apQnJL0XQ4ipk+PzIHg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1757491477; x=1757577877; bh=KPqIKASzb3R90pIcczJi8m7zL8fcliR4BZN
-	aV0KFaww=; b=a2CHyEMs0decW8g29xwcPsodY52Yob119TCPFmehJOPDBOaYoNk
-	WQFt31l38slg82n7xE5dWgMhGaA2H/Qqfx3QFT5vbT1RbBZy7iz4L8Avlt3QIH42
-	xqi6kEB4huOOAeLRkO+WS4z5znIYM08JQLq+1WBx98wMFpZ9K9maWosi4YKkFBvD
-	muzpM32TPfvHH3IkLC6oII7xSu8OAwnBktkjH1cW4q4EZyq3JMURto3dtOrXKPkC
-	xhklAy6GCrHxLjrgkKLpcnoTag/iKpvh3zA/H5vPaHwz7S5aAWvC4uyuyN/gbbJ8
-	0Y+eDOrWwZVVfPbcVY2Owl/z/raw7BbSn/Q==
-X-ME-Sender: <xms:FDHBaHvDTSwvdDOJT82AC-IeJj8YVqLM5GQ5qcsOIflHFZSURIc2cw>
-    <xme:FDHBaD9QMz3RnqVZw8VPpsDGqmGc4VTBDzAeb-4AESqMTHf05PzaxQd7W311IbaAx
-    NZRV_CXHBOlQhqDW48>
-X-ME-Received: <xmr:FDHBaBPvpkrgOZSY9UPOeBI5g2EF79tB9ZG1Kv4N35SmTkWPkyJ2wljTAVW->
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdejiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohephedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopeih
-    rghnjhhunhdriihhuheslhhinhhugidruggvvhdprhgtphhtthhopehsthgvfhhfvghnrd
-    hklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopeigmhhusehrvggu
-    hhgrthdrtghomh
-X-ME-Proxy: <xmx:FDHBaBGaeNhB6A30PsH5EOgDVNS2sOacguYKqmVz6zCgQISk5j1n3Q>
-    <xmx:FDHBaPQ4bU_9-HNAOP3vkgkWnc9eS3Yb57yW0TQWcAgv3Yq0eKXWNQ>
-    <xmx:FDHBaOu_1WGJ8OktgmvP4GYpgVv7TnhyXJsGThO0nFdVv1XW3-BO4w>
-    <xmx:FDHBaHIahWB5gbuPBzigDzVJETCR-NmgGR8la5PChx5I7noszAHTCw>
-    <xmx:FTHBaP5rbo6-B2ER7OkRpOkfTgkRNxMjAfHJXkkfuRQk__AW5mG2j29U>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 10 Sep 2025 04:04:36 -0400 (EDT)
-Date: Wed, 10 Sep 2025 10:04:34 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, Zhu Yanjun <yanjun.zhu@linux.dev>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Xiumei Mu <xmu@redhat.com>
-Subject: Re: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
-Message-ID: <aMExEjj3I4ahnMHc@krikkit>
-References: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
- <20250909092315.GC341237@unreal>
- <aMByADrbXBAXzIJr@krikkit>
- <20250910054550.GI341237@unreal>
+	s=arc-20240116; t=1757491668; c=relaxed/simple;
+	bh=dSk6AGhrmnQiBMVkm4iUfkoi5uR3VSQpSwlqk/H1gAg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ADbUE6MwDTL+uo6DY+PbF4F9ZUbPBlolAiYdPBvGlRy/pzwUdZaEH8ZF6qRA4pbfITMXcKoKeliTQ/WDdBT0rhE+/n+7lcRPTUWD5NZE3wwBVpyND01TaCFpXwbpVK9rbV/ol9v1BPQiC4nK7BNmNPX7mrZmTwAcJCmniTdPKy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=MYjZItM1; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45dec026c78so20819925e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 01:07:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1757491665; x=1758096465; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZVm/deDTR4I7zgxqPdQwaIpbJb7N4tc5cNwrlaMAz50=;
+        b=MYjZItM1610egb3sO7XF3i80Uwwhjm8rwfUOAl8r0+VH/TvAcS6fPd3dp7ibEKU7sk
+         J3fRfRCO8Vw1akMF1ouq7CQAQhOQY1QWGifHGSb6Hc+//5938Id8AM+k+CNNOM3Za2Qw
+         25tJRbipfv9nI/YJyQmn2Buooc+2cKQazuCj/7MKpHaixda4+fce7mF9ef6oeWX2VS6l
+         BKQuCbl1o40ZZLD08v9AOO+a336SHed2rbZX+HcH7shkplTixv/bUpkTbaSeUA91fl14
+         lTTQ5Iq2vt8DrZQyVd6s+ECXTLml+fI5YmeC2DNHRGCzrMTAMGiqcmIqsCVeIzMPLKiO
+         c/jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757491665; x=1758096465;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZVm/deDTR4I7zgxqPdQwaIpbJb7N4tc5cNwrlaMAz50=;
+        b=d2mN+AxhA11mYBI72bePynx7UvJUN0gMzXk1S5hEsA2bc5CEaBqpdXh4d83efwkrwE
+         9v/kZCEdC+bzfQyU8NHZ9J5/CjAVi1MhJPCcc1c7IwaZBcbiHfaVIerNLxN8xtZAa0Md
+         3koWF7V7fZSmvauOns8IwrHklBRTVjnw5fXxCljrrK0d4q9BlNUyoHaaqI0Uq68DC8da
+         wbd9yjcSGv6rCa81p8TuWEPWaAgLhMk5JCH406QJDgLzwxNisW1RZURO/KBpUku0D6Ot
+         zlJ7ITa7Cd1TcbxJUTydy7eEDOInc+QRlSrDRT/rde8poxIRKxZwv+r5G4uVVNbmuATl
+         LOvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKomK766pUQ51fznMlYl+9NhuQjXqnXw0khMvhtKdrBQEuN9GIDh6dJTKoWzBlryGIcZFtcxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYp09uM4/Ih+sFRil8+TheHBSOLSK1gZ+DvjNEjCRapIh60z2Q
+	LtMgq6ljUjRPAh97a/yct/A51jJVfIQc5Hi5ugy/vTcJlkwF+O48pxp63PDN3caHKA0=
+X-Gm-Gg: ASbGnctErIUwKGq2K94V3T4DGvw1KgwGg7E+2ZO3FXRnAvF0U0jcljywroabIxpW2UN
+	Ky19o9AJ5PfQlUPaL5MQ7ZTxeVZGrtKeYzkNYyX4ntpoGvEYN86fxOleMUK2rcsjj4zASa5SlpG
+	It6WJ9WuSMKOvN3JQvtayxtJ0P4cJyO7lVAjlkookykQ8+rs3BgeJBwnZAeafPuqDzdJrSV4dxE
+	kQblNgIEQC6JG5PY3LIpWHG+bKINrf2le91ey+XH9LP3DrtTiUHZSHdNEp3KhecD0oC7+vOsiSu
+	bQdZ9LJpDH7BgjhbBiO/zKgweuPPRnU/yemkKDdjOY71KG8y1DtqKVAMXvcDBilw/hVvB8dM4cj
+	yAH0y2+gEURHOhbCKO6vtpstJ1V6S
+X-Google-Smtp-Source: AGHT+IFBs8UXGxgkaSg80fNb2XLa7R8prdLQ6TRj1KMntX+P6s5LJFVMk2sAxSEGFFCGhjD2XvI0jw==
+X-Received: by 2002:a05:600c:5493:b0:45d:98be:ee9e with SMTP id 5b1f17b1804b1-45ddde6a3f0mr115055345e9.1.1757491663893;
+        Wed, 10 Sep 2025 01:07:43 -0700 (PDT)
+Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:3936:709a:82c4:3e38])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45df8247cc6sm17813605e9.12.2025.09.10.01.07.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 01:07:43 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: [PATCH 0/9] net: stmmac: qcom-ethqos: add support for SCMI power
+ domains
+Date: Wed, 10 Sep 2025 10:07:37 +0200
+Message-Id: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250910054550.GI341237@unreal>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMkxwWgC/x3MMQqAMAxA0auUzAZqNCpeRRxKjZpBrS2IIN7d4
+ viG/x9IElUS9OaBKJcmPfaMsjDgV7cvgjplA1li29oaT39smFxHzAFlcx67urFUsfNcEuQuRJn
+ 1/p/D+L4fffhoTmMAAAA=
+X-Change-ID: 20250704-qcom-sa8255p-emac-8460235ac512
+To: Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+ Jose Abreu <joabreu@synopsys.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1820;
+ i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
+ bh=dSk6AGhrmnQiBMVkm4iUfkoi5uR3VSQpSwlqk/H1gAg=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBowTHMa0WXc9aZw47LWizXetwGI4lOfCYN4Ubg/
+ S0JYjTkmO2JAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCaMExzAAKCRARpy6gFHHX
+ cuN7EACjo0XR4wFpMDKfJ5JkLwH6gCaoqJ2aZHjkmrd16YbueY63wBPoyxG9WXQv0Pf1CaStyXl
+ EgOiXcb0+VDPxR3B91vaK9IMbRiGNPYTMQdKA4yfwEsQE5v4Zkad+jyKkw/LKTklVjgk7SLWsCF
+ GdZDPsOv3Ql1EjwsdolRyF+lV1G97YwOrgnh5I8Xcpdj5FZ7cdPyaG0jX2D0mAjUHLn5qQjeuaY
+ LF1eOrWKp+jEO7c72nmCpUYiSoOYfms0RZf0ehpTDsivB6ZjRpE3ovGKQc818SKermDhNho1jhk
+ J0up1Qexbsfn2ijnAtEPz6n01wuFc6kr24DVj4bwvM+X1GwezbR3Ta86Pb5T7CQdkiSCOUwhZX/
+ c73JWNRheNuYte3uRpGaDwLHAKPfZfMAMIUFXN5yGUUCQbCcIYEu1DQbgv/SPE8sef+5v9zE1xN
+ lngurd+guGXjCYXBBp2iLx6LL2WDHR5oe6FmXMbwo/3J4/+790ec4uy/xAPpVJiGZ26dnu8MNd3
+ PrJgMyP8CUQLYrX6pDmy2ZcoXy0B2DR1cVZBsN+nFarBqZpwS/8F6dO2UkWhs5tun5ukzTs77mY
+ j+/QSI9gT93gh018RqOXMK8DG+UWcl6UZ7cK69n4R/hqhgpU1szBSSzLSDOco8Hxfi8He9Lvjzb
+ TCgZ4/r96lqxrVQ==
+X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
+ fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
-2025-09-10, 08:45:50 +0300, Leon Romanovsky wrote:
-> On Tue, Sep 09, 2025 at 08:29:20PM +0200, Sabrina Dubroca wrote:
-> > 2025-09-09, 12:23:15 +0300, Leon Romanovsky wrote:
-> > > On Mon, Aug 25, 2025 at 02:50:23PM +0200, Sabrina Dubroca wrote:
-> > > > Xiumei reported a regression in IPsec offload tests over xfrmi, where
-> > > > IPv6 over IPv4 tunnels are no longer offloaded after commit
-> > > > cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
-> > > > implementation").
-> > > 
-> > > What does it mean "tunnels not offloaded"?
-> > 
-> > Offload is no longer performed for those tunnels, or for packets going
-> > through those tunnels if we want to be pedantic.
-> > 
-> > > xdo_dev_offload_ok()
-> > > participates in data path and influences packet processing itself,
-> > > but not if tunnel offloaded or not.
-> > 
-> > If for you "tunnel is offloaded" means "xdo_dev_state_add is called",
-> > then yes.
-> 
-> Yes, "offloaded" means that we created HW objects.
+Add support for the firmware-managed variant of the DesignWare MAC on
+the sa8255p platform. This series contains new DT bindings, new DTS
+nodes and driver changes required to support the MAC in the STMMAC
+driver.
 
-For me "offloaded" can mean either the xfrm state or the packets
-depending on context, and I don't think there's a strict definition,
-but whatever.
+It also reorganizes the ethqos code quite a bit to make the introduction
+of power domains into the driver a bit easier on the eye.
 
-Xiumei reported a regression in IPsec offload tests over xfrmi, where
-the traffic for IPv6 over IPv4 tunnels is processed in SW instead of
-going through crypto offload, after commit [...].
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+---
+Bartosz Golaszewski (9):
+      arm64: dts: qcom: sa8255: add ethernet nodes
+      dt-bindings: net: qcom: document the ethqos device for SCMI-based systems
+      net: stmmac: qcom-ethqos: use generic device properties
+      net: stmmac: qcom-ethqos: improve typing in devres callback
+      net: stmmac: qcom-ethqos: wrap emac driver data in additional structure
+      net: stmmac: qcom-ethqos: split power management fields into a separate structure
+      net: stmmac: qcom-ethqos: split power management context into a separate struct
+      net: stmmac: qcom-ethqos: define a callback for setting the serdes speed
+      net: stmmac: qcom-ethqos: add support for sa8255p
 
-It's getting too verbose IMO, but does that work for you?
+ .../devicetree/bindings/net/qcom,ethqos-scmi.yaml  | 101 ++++++
+ .../devicetree/bindings/net/snps,dwmac.yaml        |   4 +-
+ MAINTAINERS                                        |   1 +
+ arch/arm64/boot/dts/qcom/sa8255p-ride.dts          | 201 ++++++++++++
+ arch/arm64/boot/dts/qcom/sa8255p.dtsi              |  44 +++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |   2 +-
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 345 +++++++++++++++++----
+ 7 files changed, 633 insertions(+), 65 deletions(-)
+---
+base-commit: b6a291a76ecaef3b49d8a9760865abb3d8480dff
+change-id: 20250704-qcom-sa8255p-emac-8460235ac512
 
-
-For the subject, are you ok with the current one? It's hard to fit
-more details into such a short space.
-
-> > > Also what type of "offload" are you talking? Crypto or packet?
-> > 
-> > Crypto offload, but I don't think packet offload would behave
-> > differently here.
-> 
-> It will, at least in the latest code, we have an extra check before
-> passing packet to HW.
-> 
->   765         if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
->   766                 if (!xfrm_dev_offload_ok(skb, x)) {
->   767                         XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
->   768                         kfree_skb(skb);
->   769                         return -EHOSTUNREACH;
->   770                 }
-
-So it looks like packet offload is also affected. We get to
-xfrm_dev_offload_ok, it does the wrong check, and the packets will get
-dropped instead of being sent through SW crypto. Am I misreading this?
-
-
-> > > > Commit cc18f482e8b6 added a generic version of existing checks
-> > > > attempting to prevent packets with IPv4 options or IPv6 extension
-> > > > headers from being sent to HW that doesn't support offloading such
-> > > > packets. The check mistakenly uses x->props.family (the outer family)
-> > > > to determine the inner packet's family and verify if
-> > > > options/extensions are present.
-> > > 
-> > > This is how ALL implementations did, so I'm not agree with claimed Fixes
-> > > tag (it it not important).
-> > 
-> > Well, prior to your commit, offload seemed to work on mlx5 as I
-> > describe just after this.
-> 
-> It worked by chance, not by design :)
-
-Sure.
-
-[...]
-> > > The latter is more correct, so it raises question against which
-> > > in-kernel driver were these xfrmi tests performed?
-> > 
-> > mlx5
-> 
-> It is artifact.
-
-Sorry, I'm not sure what you mean here.
-
-[...]
-> > > Will it work for transport mode too? We are taking this path both for
-> > > tunnel and transport modes.
-> > 
-> > Yes, if you look at __xfrm_init_state, inner_mode will always be set
-> > to whatever family is "inside".
-> 
-> I believe that you need to rephrase commit message around meaning of "offloaded"
-> but the change looks ok to me.
-> 
-> Thanks,
-> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-
-Thanks. I'll send a v2 when we agree on the wording, to avoid
-resending multiple times.
-
+Best regards,
 -- 
-Sabrina
+Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
 
