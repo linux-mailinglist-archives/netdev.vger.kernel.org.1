@@ -1,135 +1,128 @@
-Return-Path: <netdev+bounces-221887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7CDB52477
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:09:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA93B5248D
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA5801C82813
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 23:09:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9798817BD65
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 23:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9156631327D;
-	Wed, 10 Sep 2025 23:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E37630F959;
+	Wed, 10 Sep 2025 23:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="uidoNNm4"
+	dkim=pass (2048-bit key) header.d=motorola.com header.i=@motorola.com header.b="S1WX82rf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from mx0b-00823401.pphosted.com (mx0b-00823401.pphosted.com [148.163.152.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BC730FF3F;
-	Wed, 10 Sep 2025 23:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BC1307482;
+	Wed, 10 Sep 2025 23:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757545742; cv=none; b=ZPlihRRhY/v/DUrnBrv6SGbZ73UqvnSfm/dYVnEzul9intfIz8CzPYwzU8+tA8DUKiAm8aKKSGXfNHwoUpEdA0FyrCPSRMPrIraUQ8p8ToWCt77tJVK2LlNMAqjyc23lhfK/whBGYJaBY5LeJ0gCx1KtA45eSp+ka/oGDR/BONg=
+	t=1757545948; cv=none; b=Pg8hlVr5P7N8MvrGQlcR8pwsnQS3XECE0L2/xd5UlVNyBeVMiFaXs+mRSuYoett5vFmmrQULLlDyeqi1XbYtnpohzDHD2qdV9G37O3U0awYtS/30lI3G91Lp+9oZPSDopyjsWGrUOe3ahhHQecfk50ROsGz3Jovnaw10KY6jbJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757545742; c=relaxed/simple;
-	bh=mHCxHMaMTlUNc8yNdBlBwvuCNIWstdK/GS0nKVCzvbM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tIBsgJ/YXd3XTi8JXOrf68ogLjIrWrOsYV+PdJ6VdUtySqypfQ6T1s6ZNfv6+hR4N2bDNvkbNu/Ug+mOW9qsNj/l1tcWeI03ZYE+isJwK5acuIE9DhXskbzF8+kYSlBZp3FnbGjRgsaCHY+VdxdoX7a+IM1Oqqe6ME1gVu82iNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=uidoNNm4; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1757545730;
-	bh=mHCxHMaMTlUNc8yNdBlBwvuCNIWstdK/GS0nKVCzvbM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uidoNNm48j4rEEdkjJMfaKXIcU2W5eWc8JlPd1inHIZAEeBg9e33lXkR0p8KsI9gw
-	 YpIvfri0nB/UXDskxgy897Ao39UtgpKXvb2LuU6ruAtmyfEZpcejVXVQ3l9jryoSxl
-	 jWbV5FjHCzAXPL/ngfcdtlACoar+nChkt6kYYgVktCTbomNRdt1RyXcpZGrjTsv9RC
-	 HTmqp+H58yJO+PClPNBPvX+9FoqEJQg2hjn/1XDk8rj9twWhgmXPdoOm4WCaa7QiAA
-	 w4KNhZUPOxNMpjkRie75wkok/k/3wwt5XS4dqyLD+U7CfQzXq8nPazfKQcPjAVBA4n
-	 sz9VMGz9tTpQw==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 7E7746012E;
-	Wed, 10 Sep 2025 23:08:50 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id 44AB02051E5; Wed, 10 Sep 2025 23:08:43 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 12/12] tools: ynl: add ipv4-or-v6 display hint
-Date: Wed, 10 Sep 2025 23:08:34 +0000
-Message-ID: <20250910230841.384545-13-ast@fiberby.net>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250910230841.384545-1-ast@fiberby.net>
-References: <20250910230841.384545-1-ast@fiberby.net>
+	s=arc-20240116; t=1757545948; c=relaxed/simple;
+	bh=n4wDrOJ4+8oFO0FiTxRck8gYC+w4YduRB2nz7ydN4nA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lKIsxjzzc7G8dlJ/VkS4YRP23QujN2GIBtN0cBSq8nlonllsmX4w7cVi0TZJgGcafftawNKhrliB9Y1kVAWtlnDqEQQg51Op2aqdHMLQFNjD1ufCyF6rPsf2VoRbKluVVpb2mkIP52C5CbOB2PsTNo7TX+uXQkwiLqB9HVHRrIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motorola.com; spf=pass smtp.mailfrom=motorola.com; dkim=pass (2048-bit key) header.d=motorola.com header.i=@motorola.com header.b=S1WX82rf; arc=none smtp.client-ip=148.163.152.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motorola.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motorola.com
+Received: from pps.filterd (m0355089.ppops.net [127.0.0.1])
+	by mx0b-00823401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58AK6HoS028264;
+	Wed, 10 Sep 2025 23:12:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=motorola.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=DKIM202306; bh=GXNaxpXDaecg9dpDLtfpg+r
+	/GJho9RVlZ4wvwX45vgc=; b=S1WX82rfW4pJyOqg3v75OrJyQCYGx39H1oajtFx
+	bj2+KOjp03MU+HDvIK/kfhhFL2YjTjoGdwmyhA8/dRYDQ9lRgPsTaPqT6R9kVrzJ
+	KJwEQBk0OQsIhqSBtBXNhN/9mXlVaEwesV2Bqt0youupLVzTSbI1pGXXPVNo5QPw
+	uQdWU67M4OqNYqEyfSHoQHm7mZWnimUpRKphqM5cVL3thLpWuePtsXG/O3n+f3O8
+	tN95MpvpAuJGevgZ6von5jNJFxkow2wJT/40uAk8cEQ7uuiFSTmbwMMfCwbLp7f6
+	l5kqVLiTBsi7mfW6d2WGGiKojufUeJpszq7Mll3ebIBEozA==
+Received: from iadlppfpol1.lenovo.com ([104.232.228.80])
+	by mx0b-00823401.pphosted.com (PPS) with ESMTPS id 4911gntc5g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Sep 2025 23:12:10 +0000 (GMT)
+Received: from va32lmmrp01.lenovo.com (unknown [10.62.177.113])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by iadlppfpol1.lenovo.com (Postfix) with ESMTPS id 4cMbzy5xTcz8fkFk;
+	Wed, 10 Sep 2025 23:11:58 +0000 (UTC)
+Received: from ilclbld243.mot.com (ilclbld243.mot.com [100.64.22.29])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: mbland@motorola.com)
+	by va32lmmrp01.lenovo.com (Postfix) with ESMTPSA id 4cMc0B2ZPPz2VZ2P;
+	Wed, 10 Sep 2025 23:12:10 +0000 (UTC)
+Date: Wed, 10 Sep 2025 18:12:05 -0500
+From: Maxwell Bland <mbland@motorola.com>
+To: Stephen Smalley <stephen.smalley.work@gmail.com>
+Cc: selinux@vger.kernel.org, paul@paul-moore.com, omosnace@redhat.com,
+        netdev@vger.kernel.org, horms@kernel.org
+Subject: Re: [PATCH v7 01/42] selinux: restore passing of selinux_state
+Message-ID: <6cfe4uqtic6ga3ch463zflke2wp5hobd7j3r5ctyp4puwbjiet@xgi6jfi7au3c>
+References: <20250814132637.1659-1-stephen.smalley.work@gmail.com>
+ <20250814132637.1659-2-stephen.smalley.work@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250814132637.1659-2-stephen.smalley.work@gmail.com>
+X-Proofpoint-ORIG-GUID: Rk-9LfFivE9bjSa7rOblwI5ZwUx0Iwa6
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA3MDAyNSBTYWx0ZWRfXwcL4ZLpVtQYJ
+ 75dNL7n24GUcUHHLVEXdiak9vtn4EfNO4CJzE2zqsJrW+iFZAJLlu/yRIOMeoNslBof3BLSdI3j
+ oVATMio3vaMdYsJQ7pOCq78+FIL/8YQD0EoyHwnA+DevcuIZzMvHlT3lFbn8vCGPoPUYpjh0N7V
+ eIHsflLngxANIcLrCDgFS0ysfjcOVhmdwQcyqbcM2ylbUyIKI5BwVOzqPORJwMCSHnxF26ba6Ta
+ TEOWAIOF8ZVeVZzeWmoFrknsSf4JL3mbIjCVciOGgqLEtBAIZmPQh8bduiJO2UZduxjonpas2aB
+ sSywaptmkfv8zpKBm+Ulhpgdp9nI0WR5vQ/wINzYlsR/tWqyq18sPEUYd5H2K0AMiHzFDOI2z0B
+ P9nVZlHS
+X-Authority-Analysis: v=2.4 cv=bopMBFai c=1 sm=1 tr=0 ts=68c205cb cx=c_pps
+ a=LMRlKrtnqgVLeY6h3uZyow==:117 a=LMRlKrtnqgVLeY6h3uZyow==:17
+ a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=45E8AWlfMGMlSf_upCYA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: Rk-9LfFivE9bjSa7rOblwI5ZwUx0Iwa6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-10_04,2025-09-10_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 suspectscore=0 clxscore=1011 bulkscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 phishscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509070025
 
-The attribute WGALLOWEDIP_A_IPADDR can contain either an IPv4
-or an IPv6 address depending on WGALLOWEDIP_A_FAMILY, however
-in practice it is enough to look at the attribute length.
+On Thu, Aug 14, 2025 at 09:25:52AM -0400, Stephen Smalley wrote:
+> This reverts commit e67b79850fcc4eb5 ("selinux: stop passing selinux_state
+> pointers and their offspring"). This change is necessary in order to
+> support SELinux namespaces.
+> 
 
-This patch implements an ipv4-or-v6 display hint, that can
-deal with this kind of attribute.
+FYI, thank you for this new commit. Some "fuel for the fire":
 
-It only implements this display hint for genetlink-legacy, it
-can be added to other protocol variants if needed, but we don't
-want to encourage it's use.
+Turns out, e67b79850fcc4eb5 makes it hard to enforce immutability on the
+SELinux state / AVC cache from EL2, because the compiler likes to put
+them on the same page, leading to having the hypervisor track spinlock
+management issues, just to ensure the core selinux state remains
+unmodified. 
 
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/netlink/genetlink-legacy.yaml | 2 +-
- tools/net/ynl/pyynl/lib/ynl.py              | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+In the past (pre-2023/e67b79850fcc4eb5), it was possible to set the avc
+cache onto a separate page from the other critical selinux_state data
+during early boot, and it looks like this *may* restore that.
 
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index b29d62eefa16..66fb8653a344 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -154,7 +154,7 @@ properties:
-                   Optional format indicator that is intended only for choosing
-                   the right formatting mechanism when displaying values of this
-                   type.
--                enum: [ hex, mac, fddi, ipv4, ipv6, uuid ]
-+                enum: [ hex, mac, fddi, ipv4, ipv6, ipv4-or-v6, uuid ]
-               struct:
-                 description: Name of the nested struct type.
-                 type: string
-diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
-index 50f4889e721b..4f2c8126d6e9 100644
---- a/tools/net/ynl/pyynl/lib/ynl.py
-+++ b/tools/net/ynl/pyynl/lib/ynl.py
-@@ -957,7 +957,7 @@ class YnlFamily(SpecFamily):
-                 formatted = hex(raw)
-             else:
-                 formatted = bytes.hex(raw, ' ')
--        elif display_hint in [ 'ipv4', 'ipv6' ]:
-+        elif display_hint in [ 'ipv4', 'ipv6', 'ipv4-or-v6' ]:
-             formatted = format(ipaddress.ip_address(raw))
-         elif display_hint == 'uuid':
-             formatted = str(uuid.UUID(bytes=raw))
-@@ -966,7 +966,7 @@ class YnlFamily(SpecFamily):
-         return formatted
- 
-     def _from_string(self, string, attr_spec):
--        if attr_spec.display_hint in ['ipv4', 'ipv6']:
-+        if attr_spec.display_hint in ['ipv4', 'ipv6', 'ipv4-or-v6']:
-             ip = ipaddress.ip_address(string)
-             if attr_spec['type'] == 'binary':
-                 raw = ip.packed
--- 
-2.51.0
+As you likely know, the issue is without EL2 enforcement of immutability
+on the selinux_state page it is possible to just flip the enforcing bit
+via EL1 write-gadget. It may also be possible to address this whole
+issue using ARM MTE or something else.
 
+Regards,
+Maxwell Bland
 
