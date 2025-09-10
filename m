@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-221513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE3EB50B06
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 04:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDBBFB50B09
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 04:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B453B5295
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:30:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41D6B5E506B
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 02:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18DC724113D;
-	Wed, 10 Sep 2025 02:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F48246770;
+	Wed, 10 Sep 2025 02:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMu73/Jx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YrN7nsbk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97A119D8AC;
-	Wed, 10 Sep 2025 02:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F406119D8AC
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 02:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757471411; cv=none; b=TAW5BXxr+eFUhKpJimoB1jBnI4KnA3U164lFqCMxV8v8SlSZDn/UqfnhPox9/KsoOOepNw1jVXLbEERjFkIU/wFAuINfKJDApKplcARDsJPmzwzlw+SHiStSpn6G72p0NrfHGrterNGVrrLGQKz5yxMyLXeCYYI5ff4RZ9oA4Kg=
+	t=1757471414; cv=none; b=CG2XFAeI/5ayhZkcm5lRaDqHZCLsLtvC89h68mdmydGwERNUUNBwBaQU8luh4AcJKJ16VR8CAQnfR8Zf/ERg9V4ailJj5G4GFe2aZiU4nYPILgDmdwe7ISM0BkYLDEu4zfUEEtCLpG6uAezvpOAqxQ///jadqTd6xBPmtsVfFjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757471411; c=relaxed/simple;
-	bh=f42uKL7muikKt8i17Y8V5ypDbGKRVNJBBDLHVh1JR9I=;
+	s=arc-20240116; t=1757471414; c=relaxed/simple;
+	bh=mY1dl4lrfNpL/PvXdAqeUc6vQMTZEdbD1dBR+0SXwUU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q0m42r5VaS7217Ci50ZgtLcGvpxfaxj1OHDzQV+WodOjtnTgEDhozrQ9O+tGn7bgNKWlcF45pTCDPEYjnVrmoSVpzq8yZUhqkDH43XGhb7lW0W4bQnYinLYNOimjSyahxVOO5RME/YFHk3/oYT5hirdN05FHLEMm/AaMU9gwtoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMu73/Jx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA26C4CEF4;
-	Wed, 10 Sep 2025 02:30:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=SWkxVZd3Uw+GVOfwgi49mgjHst38HdLGV8m1H7SY1Teuw7gPGdAgKTOqPhAclRwX99anBE9QkNZLRKIwwKl9wPZZZC2DiSJMboHiTVNxEfsE0300O+Oa9ydpIIK3oFGcXJO+tiUlzYn2XomWtQNU4z4ev78mrIQWR7Nr56dDT3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YrN7nsbk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96054C4CEF4;
+	Wed, 10 Sep 2025 02:30:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757471410;
-	bh=f42uKL7muikKt8i17Y8V5ypDbGKRVNJBBDLHVh1JR9I=;
+	s=k20201202; t=1757471411;
+	bh=mY1dl4lrfNpL/PvXdAqeUc6vQMTZEdbD1dBR+0SXwUU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cMu73/JxUcG3Jj+kQUky5EGbd6w/hyeq/bN23bo4ob36njCw/CIInxXJXAm4IJgLT
-	 /EvvLiyZbjCCoUod8GDP/4HVc9Mm/70vNVC84hzo/Z6+VjzAbcKwSeekruI1/JcTpP
-	 NNKmYRI91whSB7042OytkQaBkCe4UMry/W1wWYpt7zB2A3PeX2F0D80Re6IFNnQBvi
-	 jF+YdkmIHya1OaiQUjSJZh5Ocvm+8VefM67e5vXntPtUvlhRN9GnKIN+BjuLRsU3vZ
-	 MYtPH7LdDvzQSg6gjTxM/qNdFSo6JyOOa7UeE+sDusk3qQ+JjvbZeSE4/kGug5BUsu
-	 E/t77xYwh9spw==
+	b=YrN7nsbkGdZ0n/9ZKkFVNenF9YH71scaawXlx++uDLZggTsvY319NXRDQqwBBLehZ
+	 MYoX1IafdAWqginMnX/a53m6Yq3/bAZNbkT4d/KbNDqzvmURIXswmAI/2s2jDiW7+p
+	 rofP1UmbbIBd/cNeCiPAk+/9+gYfxQLav6uzQklnOpWfqvwl97tdnKaV8PXIdNmG3z
+	 uaNBPD708xX1U79YeDDQuONOiMqngzMWdjErSr0vqXLPoeSUN7qXXmOFiFqXUJdjlL
+	 BHuOYkm94EniKfbae8fNDDfv2+SVUS7dS43Ler4ED1DpKSVXjpUZwbaWwoUJ7mYfGq
+	 E8uyBTOTARaQw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFA8383BF69;
-	Wed, 10 Sep 2025 02:30:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB118383BF69;
+	Wed, 10 Sep 2025 02:30:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net/mlx5e: Add pcie congestion event extras
+Subject: Re: [PATCH V7 net-next 00/11] *devlink,
+ mlx5: Add new parameters for link management and SRIOV/eSwitch configurations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175747141350.881840.9602387660242823143.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Sep 2025 02:30:13 +0000
-References: <1757237976-531416-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1757237976-531416-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, corbet@lwn.net, jiri@resnulli.us,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- dtatulea@nvidia.com
+ <175747141474.881840.5527273005477069780.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Sep 2025 02:30:14 +0000
+References: <20250907012953.301746-1-saeed@kernel.org>
+In-Reply-To: <20250907012953.301746-1-saeed@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
+ tariqt@nvidia.com, gal@nvidia.com, leonro@nvidia.com, jiri@nvidia.com,
+ jacob.e.keller@intel.com, horms@kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 7 Sep 2025 12:39:34 +0300 you wrote:
-> Hi,
+On Sat,  6 Sep 2025 18:29:42 -0700 you wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
 > 
-> This small series by Dragos covers gaps requested in the initial pcie
-> congestion series [1]:
-> - Make pcie congestion thresholds configurable via devlink.
-> - Add a counter for stale pcie congestion events.
+> This patch series introduces several devlink parameters improving device
+> configuration capabilities, link management, and SRIOV/eSwitch, by adding
+> NV config boot time parameters.
+> 
+> Userspace(v2): https://lore.kernel.org/netdev/20250704045427.1558605-1-saeed@kernel.org/
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net/mlx5e: Make PCIe congestion event thresholds configurable
-    https://git.kernel.org/netdev/net-next/c/f4053490a6f6
-  - [net-next,2/2] net/mlx5e: Add stale counter for PCIe congestion events
-    https://git.kernel.org/netdev/net-next/c/cdc492746e3f
+  - [V7,net-next,01/11] devlink: Add 'total_vfs' generic device param
+    https://git.kernel.org/netdev/net-next/c/ce0b015e2619
+  - [V7,net-next,02/11] net/mlx5: Implement cqe_compress_type via devlink params
+    https://git.kernel.org/netdev/net-next/c/bf2da4799fdb
+  - [V7,net-next,03/11] net/mlx5: Implement devlink enable_sriov parameter
+    https://git.kernel.org/netdev/net-next/c/95a0af146dff
+  - [V7,net-next,04/11] net/mlx5: Implement devlink total_vfs parameter
+    https://git.kernel.org/netdev/net-next/c/a4c49611cf4f
+  - [V7,net-next,05/11] devlink: pass struct devlink_port * as arg to devlink_nl_param_fill()
+    (no matching commit)
+  - [V7,net-next,06/11] devlink: Implement port params registration
+    (no matching commit)
+  - [V7,net-next,07/11] devlink: Implement get/dump netlink commands for port params
+    (no matching commit)
+  - [V7,net-next,08/11] devlink: Implement set netlink command for port params
+    (no matching commit)
+  - [V7,net-next,09/11] devlink: Throw extack messages on param value validation error
+    (no matching commit)
+  - [V7,net-next,10/11] devlink: Implement devlink param multi attribute nested data values
+    (no matching commit)
+  - [V7,net-next,11/11] net/mlx5: Implement eSwitch hairpin per prio buffers devlink params
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
