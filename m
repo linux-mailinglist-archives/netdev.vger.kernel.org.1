@@ -1,165 +1,92 @@
-Return-Path: <netdev+bounces-221733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 020D6B51B5A
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:21:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 294C7B51B50
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 17:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C05A01889FA7
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:18:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A8407A91BC
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 15:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296C225394C;
-	Wed, 10 Sep 2025 15:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4707C25A2CD;
+	Wed, 10 Sep 2025 15:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMCYO9e5"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="25I3jwM5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="T/Jhi00Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87107242D90;
-	Wed, 10 Sep 2025 15:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A192571B8;
+	Wed, 10 Sep 2025 15:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757517486; cv=none; b=NJL8cSGi83j7HrhqKIVQ0EKTIa+kXhxSLzIgJ39wy2V7RlvBAPFdY9ERdoBHfSovSBY9O3SSYJfQvQSl3FsXL87wFI8Pnc2nv/V28OaPeHppqcAlsZ0onaDvaYu5W5k2dYJSp1Qo6MtOc3jfXGQ4QJxZBNzFlYZrtHX4DHB8RwA=
+	t=1757517541; cv=none; b=D66gYkfQv+v3ZlnPe4QMwPRLpF+v/Y9DELqN6ZHd01HQz/p7dTGLVLNhETcby8VfBzwMtOxGbKaFDv8H0t9Lh8xOuBp+8Ppp4VgzaKeeasKpOakklIcpdligfy+XO07sJmwU/M1+Ut8H/CKIpGpMRRuIszWCTY1c7uhClSuShek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757517486; c=relaxed/simple;
-	bh=n99NKkGTyEVeHAKSsHfQQz5coCbmYxeKuDsw+hhBKeA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zq9EOZP0kyJpewGOEj1KWQGxFtenfcQyRLXmgDlFTD8iix59e7RSObfz0/b9tDRITvYWgxXkuD+rz1SCuyTwnbw7iKqWaRCajgJhrXGDUA7lYdYrtCUWwvFF1GFkb/JvbgTUxhHJ9XksBDM9cwqGi3JcjmqQGaVNAlVsjjArhyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMCYO9e5; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e96e5535fcdso730905276.1;
-        Wed, 10 Sep 2025 08:18:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757517483; x=1758122283; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xo1yWEdATZVFTADz4excqEyjl+zDvTHVv7mv+uaLl38=;
-        b=HMCYO9e5QiKzK2R1HnObOz4WOdaxbMinm49xMwB6vsQt+eaP1K0gAtgAHRuUX4vKF/
-         0fwzWIg21kle4HEmFvfRKWgC2UgvKEy35+3lHAkbyiFtAoC9p/DiVP9xtQ4vDdGEZwLz
-         hU/UQQjo8KiMW5WXPTHB16Se0JuVr8GJm6zGF96ZpP4vmuNSmYLne8YSL+/QNaoSGPvD
-         zkWdyPKHL4PtTQlAMibfHp3GuXY1HyLegoc8ahk1ueZlHwJ4XMLof7hmldOtSNbO6wog
-         XRBuVNMe6VPRfriBIKXDwhG1IgYbA9DNv/DpnLVKpLwHJPooa0KXXUwseihF1gHN/Nlg
-         wnIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757517483; x=1758122283;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xo1yWEdATZVFTADz4excqEyjl+zDvTHVv7mv+uaLl38=;
-        b=cjtZ/zArKuf96MTSRLgaTRABzPL4DYkM2fxD1wGsJ0TycNTc7/Qs3kziFsJsdZ3tJt
-         lJXA/vw5whBSdB5om1dPAFBcBdNehwWi6QoM9qvKdwrEoR2qlXa3q6wDu1RAzzq8SCaR
-         2DxM6NnXEuSFn7jtU4jQ9nLS4q3XnCoMZqlDQPNBHRCRzYJ+MZiJtLakup96qd/595HI
-         cZIfFCt7wIZA4YT0e5ahUF8VoBHkfBaEaqHkFu/rtNMUYOYJ+XgKbrw5rFE3F38uqZwa
-         1iV4Gb8MxDEC6HfT+Or4ZYa9FmwPSeez/raQsKbsT0OldDBm6bG5aoROWQWVBBTst9nR
-         g9nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX+SrXiScE7YV2wBw7cAnjSlrrTgBPMkTkKLhHwPYlx4AdSTyvChAEh86lHP+Qz4H3lbUp8N14=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGvAzahxobTgl50GIWCAMDOpm0TBgXsE+vyTDQYsdzre1IjveK
-	Y4xKWH0Hr8K9cZdTSWNP5XJF+nxsiFJKgdhjwS0ZJity/K7pyhSvxdcSDKekfMJ5hqdy1J68yUm
-	y2qVjWgg+bLJnRkiywtZp2Szep6xWifw=
-X-Gm-Gg: ASbGncvxPQCqWD8CM/anh9o4xOY9J8Jvk04lZCpyam6Myid2eLaILxmYmuWQq+eHHY3
-	AifG25tZmdBJp443KRa7j+Edx7Rj4qTZyXNxKo8Xd4t/0OSEqnjNXr23fwr93oDVwPum/MXvJC1
-	0oGjFwApgeB2NdtYYgM6ddcuQnHYrKhIYNMUP54qS+1ekrEojgKEwVe/Ctq+M7y/kqRMN0skcwQ
-	EAGAcaM6kkGB9anOj5L
-X-Google-Smtp-Source: AGHT+IGRXpMfmwAthuGy12r1VMqQT5ZinA1PNrct1mT496MNCGM2QaFfJVnePJuzyhV/DBGM0zT1ChqnR8khbbFFHN0=
-X-Received: by 2002:a05:690e:1596:10b0:614:1efe:db2c with SMTP id
- 956f58d0204a3-6141efedda6mr10155140d50.11.1757517483075; Wed, 10 Sep 2025
- 08:18:03 -0700 (PDT)
+	s=arc-20240116; t=1757517541; c=relaxed/simple;
+	bh=hQMOysMfMqdcPXGlHHCUUYKFgmuPBJqSNTrJZkKd9xY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hZdluzuVzGVwevB3r3KLMf54hckdechJpnadYO+fDiJp6KkKxHmcJGO0pB6KKNAOLHOAx+wWUxNsWlqJmDawnmArbv394MgqDNhtS+JjG392LciRx6IgBXCZlMdZT0LJwuP7j4tsTUFSeHJP1RbB671wKS0eDWFRD7GzZpd/Si8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=25I3jwM5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=T/Jhi00Q; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1757517537;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hQMOysMfMqdcPXGlHHCUUYKFgmuPBJqSNTrJZkKd9xY=;
+	b=25I3jwM5cfQlIQWQHxw4tpKR/Nj1FPyQtLwKkSvCIcAtbpu3ZHPEKa/L5fa9qOMR9MyqVK
+	CtGSPsiROp6dHjVbLwC1mcosWodip5WCYSbANiqq4Nq4nO6/3cfY4kVSFfolEL6jHHDKe8
+	UZrRI2kooMqCcFfYDGp9yVfZNvQQr5s2JASn4bRO3hyg1J1DOkuDGApnQhD1dcOXMoWvyG
+	dQu4VjSg4j0iaKLEuTzg+rqiiZLxPPoiMxPvZySul1Y0yIoksF4DBjrVe3nlwEvI6eo8GS
+	XyvehR1SgFLnUfv5VcGIaQSnqvQaHuYJbL75nLsICV5reOrH6ZIq8vRp5pct3A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1757517537;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hQMOysMfMqdcPXGlHHCUUYKFgmuPBJqSNTrJZkKd9xY=;
+	b=T/Jhi00QXPPS0wEES91LpaUbQNQXfYGsRYv5gd8iZYjQz1AzmfP7BzsVrZUwhcWMctsVaY
+	/8J4zvl2IvOujKBA==
+To: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Amir
+ Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org
+Cc: Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>,
+ Mike Yuan <me@yhndnzj.com>, Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?=
+ <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, Daan De
+ Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Michal
+ =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Eric Dumazet
+ <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+ linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, netdev@vger.kernel.org, Christian Brauner
+ <brauner@kernel.org>
+Subject: Re: [PATCH 11/32] time: use ns_common_init()
+In-Reply-To: <20250910-work-namespace-v1-11-4dd56e7359d8@kernel.org>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-11-4dd56e7359d8@kernel.org>
+Date: Wed, 10 Sep 2025 17:18:56 +0200
+Message-ID: <87348utjxb.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250905173352.3759457-1-ameryhung@gmail.com> <20250905173352.3759457-4-ameryhung@gmail.com>
- <20250908185447.233963c5@kernel.org>
-In-Reply-To: <20250908185447.233963c5@kernel.org>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 10 Sep 2025 11:17:52 -0400
-X-Gm-Features: Ac12FXyWABZLW4U92OpBSZvyNrzlIm9ZsRB52UCQENiK4ZBc3FauiVlbPjdo4rs
-Message-ID: <CAMB2axPLuQ75_JSqkR43-UVBUi9Yj7juHFLCkDvSLPL445SZew@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 3/7] bpf: Support pulling non-linear xdp data
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, stfomichev@gmail.com, 
-	martin.lau@kernel.org, mohsin.bashr@gmail.com, noren@nvidia.com, 
-	dtatulea@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, 
-	maciej.fijalkowski@intel.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, Sep 8, 2025 at 9:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri,  5 Sep 2025 10:33:47 -0700 Amery Hung wrote:
-> > + * Direct packet access allows reading and writing linear XDP data thr=
-ough
-> > + * packet pointers (i.e., &xdp_md->data + offsets).
->
-> Add:
->  The amount of data which ends up in the linear part of the xdp_buf
->  depends on the NIC and its configuration.
+On Wed, Sep 10 2025 at 16:36, Christian Brauner wrote:
 
-[...]
+> Don't cargo-cult the same thing over and over.
+>
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
->
-> > When an eBPF program wants
-> > + * to directly access data that may be in the non-linear area, call th=
-is kfunc
->                          ^^^^
->           maybe s/data/headers
->
-> > + * to make sure the data is available in the linear area.
->
-> Should we add a mention here of the copy helpers and dynptr for
-> accessing data without pulling?
-
-[...]
-
->
-> > + * This kfunc can also be used with bpf_xdp_adjust_head() to decapsula=
-te
-> > + * headers in the non-linear data area.
-> > + *
-> > + * A call to this kfunc is susceptible to change the underlying packet=
- buffer.
->
-> Maybe:
->  A call to this kfunc will modify the buffer geometry.
-
-Will improve the comment based on the suggestions. Thanks!
-
->
-> > + * Therefore, at load time, all checks on pointers previously done by =
-the
-> > + * verifier are invalidated and must be performed again, if the kfunc =
-is used
-> > + * in combination with direct packet access.
->
-> >       void *data_end =3D xdp->data + len;
->
-> nit: I think the code would be easier to follow if we renamed this
-> to "new_end"?
-
-I was following the common pattern in other XDP kfuncs, but can change
-it for readability.
-
->
->
-> Larger note: I wonder if we should support "shifting the buffer down"
-> if there's insufficient tailroom. XDP has rather copious headroom,
-> but tailroom may be pretty tight, and it may depend on the length of
-> the headers. So if there's not enough tailroom but there's enough
-> headroom -- should we try to memmove the existing headers?
-
-I think it should. If users want to reserve space for metadata, they
-can check the headroom before pulling data.
-
-If the kfunc does not do memmove(), users are still able to do so in
-XDP programs through bpf_xdp_adjust_head() and memmove(), but it feels
-less easy to use IMO.
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 
