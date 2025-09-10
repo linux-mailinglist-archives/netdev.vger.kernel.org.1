@@ -1,142 +1,324 @@
-Return-Path: <netdev+bounces-221618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91DA4B513B8
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:19:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03673B513C3
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:22:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBDB01C26E78
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:19:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27C903B2904
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28F231690A;
-	Wed, 10 Sep 2025 10:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="IuaQ81rh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B19314B81;
+	Wed, 10 Sep 2025 10:22:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593CF22154B
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 10:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5182B3081BB
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 10:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757499510; cv=none; b=sYYGxlY1OsIt6PoWOln+5EfnAxur+TcvvJTtZkb2IKEj1VHEwOdIRZY1vt6HnnWfL1ytxs0XRoRNtJmVsv8NOSmUYXqMOrHSH2eaFf0rWzI/Z8P4oLVR04GU2xVDbPmFrOYrDUzPF5XH4Rd7tJjhV+DFfdVEFgcQEqvjliVnQfQ=
+	t=1757499741; cv=none; b=DTH+PdbnXC19ttLQXdRGP80eo+vJ4Ja2Wkgc05PwSSS+Co2TN8fxUykzB2NFCeOL5mxV3UqSfQA3Ottojm0ixX58XyfuOQf7GR1EiEpGaA8i8FzJ2aikGxe73VOsWx4CchqZmGBqxspxA6wZVaaenYYsj78yynUMof17gAtvJsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757499510; c=relaxed/simple;
-	bh=pUSy8i4pFmy/zmoPlHaRlnvRxhJ+o6yafXGacXCrSR0=;
+	s=arc-20240116; t=1757499741; c=relaxed/simple;
+	bh=gCrhSKTKnrQGcLPzm5DuCFymX8YOrCHheQo2jue2Yb4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mXjeTntbt0q2pF9OU0Eb1OTYLg0J3a9hYhzZuB+4NM8aceJ9fKAD0B/CxL5UK4kKpwHLyj6A/610xBYnjAPKNVcrT/BNL8w5Fi9aNOhYIFgC2zntg/8Tbi6jUiVjpFQC2D8ZHujFrzqBZyR/QawCdIYUbcb9J3/a+i41hb8Mz0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=IuaQ81rh; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=CJ+M
-	D8YzeVsq/xpythvaTyAC3To5rI+Xi9AsTN9btYs=; b=IuaQ81rh38h2Hl5RmHHZ
-	HreEBySZKc64Tx3kWScdd4W+X1gxzg4yX7ltplUwcpdet6/Zo/PrN0BZN+liaLtw
-	yHTFYVWZ3dL9KbRWQC2Hpn/Tr1Z1hT3CtK6aszZDsQ6KZhcmnVgHfMjLTjGeCJQa
-	Xjum2EGZvlYQMXcw4WwM7d1Shb/K/kOpTKSe65301aecgeGDvwZo5TUxQ0QhSw/f
-	pwyqbTt21um0+Cn5/acCnayOTgOHS1q6vJVKrKMcDrbOxG9r7rncgcwyu61ybrtM
-	5cp6TqGi6wt5BHNISeWa3J6NJxAl+GRf8zF6AshyknBKbsWa9NkiUEW2LlB+2tlL
-	qg==
-Received: (qmail 560856 invoked from network); 10 Sep 2025 12:18:17 +0200
-Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 10 Sep 2025 12:18:17 +0200
-X-UD-Smtp-Session: l3s3148p1@9BtAvW8+QJ8ujnuV
-Date: Wed, 10 Sep 2025 12:18:17 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=o2GlCbpVoVrbXSONTHkCXGhYE5KDBIFLCG7aJnjAAQ7bvRMAF8vrg380qRTlsUazH25SVFbzSrd1/LBQXgLMZ13M2f0h/T7L4bOJmSa5wIO1YF9BQy4ARmEl9UecT41mwzsnd03cyFgA+EeXGy6XVy9kMAOvbNsuk6RPpwawTLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uwHxn-000523-Em; Wed, 10 Sep 2025 12:22:07 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uwHxj-000Zhz-2x;
+	Wed, 10 Sep 2025 12:22:03 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uwHxj-00GE50-2Q;
+	Wed, 10 Sep 2025 12:22:03 +0200
+Date: Wed, 10 Sep 2025 12:22:03 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v2 0/9] Add PCS support for Renesas RZ/{T2H,N2H}
- SoCs
-Message-ID: <aMFQaQhn2So3T_oi@ninjato>
-References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <aLwm2fbi3acKlIgH@ninjato>
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v12 00/18] net: phy: Introduce PHY ports
+ representation
+Message-ID: <aMFRSz9K5AkrwtMb@pengutronix.de>
+References: <20250909152617.119554-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tJk4KSjWRS5EPtob"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aLwm2fbi3acKlIgH@ninjato>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250909152617.119554-1-maxime.chevallier@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hi Maxime,
 
---tJk4KSjWRS5EPtob
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I tested this series on top of net-next against lan78xx. No visible
+regressions for existing setup:
+Tested-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-On Sat, Sep 06, 2025 at 02:19:37PM +0200, Wolfram Sang wrote:
->=20
-> > This series aims to add PCS support for the Renesas RZ/T2H and RZ/N2H S=
-oCs
-> > These SoCs include a MII converter (MIIC) that converts MII to RMII/RGM=
-II
-> > or can be set in pass-through mode for MII similar to the RZ/N1 SoC. The
-> > MIIC is used in conjunction with the Ethernet switch (ETHSW) available =
-on
-> > these SoCs.
-> >=20
-> > v1->v2:
-> > - Dropped regx in title and description in patch 1/9.
-> > - As done for other IPs used T2H compatible as a fallback for N2H.
-> > - Renamed pcs-rzt2h-miic.h -> renesas,r9a09g077-pcs-miic.h
-> > - Added matrix table in the new header file.
-> > - Corrected the resets check for RZ/N1.
-> > - Updated the commit message in patch 1/9.
-> > - Dropped regx in config description in patch 9/9.
-> > - Dropped patch "net: pcs: rzn1-miic: Add PCS validate callback
-> >   for RZ/T2H MIIC" is this already taken care in commit 508df2de7b3e
-> >   as pointed by Russell King.
->=20
-> I plan to test this series on RZ/N1D next week, hopefully on Monday.
+On Tue, Sep 09, 2025 at 05:25:56PM +0200, Maxime Chevallier wrote:
+> Hi everyone,
+> 
+> Here is a V12 for the phy_port work, aiming at representing the
+> connectors and outputs of PHY devices.
+> 
+> Last round was 16 patches, and now 18, if needed I can split some
+> patches out such as the 2 phylink ones.
+> 
+> this V12 address the SFP interface selection for PHY driver SFPs, as
+> commented by Russell on v10.
+> 
+> This and Rob's review on the dp83822 patch are the only changes.
+> 
+> As a remainder, a few important notes :
+> 
+>  - This is only a first phase. It instantiates the port, and leverage
+>    that to make the MAC <-> PHY <-> SFP usecase simpler.
+> 
+>  - Next phase will deal with controlling the port state, as well as the
+>    netlink uAPI for that.
+> 
+>  - The end-goal is to enable support for complex port MUX. This
+>    preliminary work focuses on PHY-driven ports, but this will be
+>    extended to support muxing at the MII level (Multi-phy, or compo PHY
+>    + SFP as found on Turris Omnia for example).
+> 
+>  - The naming is definitely not set in stone. I named that "phy_port",
+>    but this may convey the false sense that this is phylib-specific.
+>    Even the word "port" is not that great, as it already has several
+>    different meanings in the net world (switch port, devlink port,
+>    etc.). I used the term "connector" in the binding.
+> 
+> A bit of history on that work :
+> 
+> The end goal that I personnaly want to achieve is :
+> 
+>             + PHY - RJ45
+>             | 
+>  MAC - MUX -+ PHY - RJ45
+> 
+> After many discussions here on netdev@, but also at netdevconf[1] and
+> LPC[2], there appears to be several analoguous designs that exist out
+> there.
+> 
+> [1] : https://netdevconf.info/0x17/sessions/talk/improving-multi-phy-and-multi-port-interfaces.html
+> [2] : https://lpc.events/event/18/contributions/1964/ (video isn't the
+> right one)
+> 
+> Take the MAchiatobin, it has 2 interfaces that looks like this :
+> 
+>  MAC - PHY -+ RJ45
+>             |
+> 	    + SFP - Whatever the module does
+> 
+> Now, looking at the Turris Omnia, we have :
+> 
+> 
+>  MAC - MUX -+ PHY - RJ45
+>             |
+> 	    + SFP - Whatever the module does
+> 
+> We can find more example of this kind of designs, the common part is
+> that we expose multiple front-facing media ports. This is what this
+> current work aims at supporting. As of right now, it does'nt add any
+> support for muxing, but this will come later on.
+> 
+> This first phase focuses on phy-driven ports only, but there are already
+> quite some challenges already. For one, we can't really autodetect how
+> many ports are sitting behind a PHY. That's why this series introduces a
+> new binding. Describing ports in DT should however be a last-resort
+> thing when we need to clear some ambiguity about the PHY media-side.
+> 
+> The only use-cases that we have today for multi-port PHYs are combo PHYs
+> that drive both a Copper port and an SFP (the Macchiatobin case). This
+> in itself is challenging and this series only addresses part of this
+> support, by registering a phy_port for the PHY <-> SFP connection. The
+> SFP module should in the end be considered as a port as well, but that's
+> not yet the case.
+> 
+> However, because now PHYs can register phy_ports for every media-side
+> interface they have, they can register the capabilities of their ports,
+> which allows making the PHY-driver SFP case much more generic.
+> 
+> Let me know what you think, I'm all in for discussions :)
+> 
+> Regards,
+> 
+> Changes in V12:
+>  - Moved some of phylink's internal helpers to phy_caps for reuse in
+>    phylib
+>  - Fixed SFP interface selection
+>  - Added Rob's review and changes in patch 6
+> 
+> Changes in V11:
+>  - The ti,fiber-mode property was deprecated in favor of the
+>    ethernet-connector binding
+>  - The .attach_port was split into an MDI and an MII version
+>  - I added the warning back in the AR8031 PHY driver
+>  - There is now an init-time check on the number of lanes associated to
+>    every linkmode, making sure the number of lanes is above or equal to
+>    the minimum required
+>  - Various typos were fixed all around
+>  - We no longer use sfp_select_interface() for SFP interface validation
+> 
+> Changes in V10:
+>  - Rebase on net-next
+>  - Fix a typo reported by Köry
+>  - Aggregate all reviews
+>  - Fix the conflict on the qcom driver
+> 
+> Changes in V9:
+>  - Removed maxItems and items from the connector binding
+>  - Fixed a typo in the binding
+> 
+> Changes in V8:
+>  - Added maxItems on the connector media binding
+>  - Made sure we parse a single medium
+>  - Added a missing bitwise macro
+> 
+> Changes in V7:
+>  - Move ethtool_medium_get_supported to phy_caps
+>  - support combo-ports, each with a given set of supported modes
+>  - Introduce the notion of 'not-described' ports
+> 
+> Changes in V6:
+> 
+>  - Fixed kdoc on patch 3
+>  - Addressed a missing port-ops registration for the Marvell 88x2222
+>    driver
+>  - Addressed a warning reported by Simon on the DP83822 when building
+>    without CONFIG_OF_MDIO
+> 
+> Changes in V5 :
+> 
+>  - renamed the bindings to use the term "connector" instead of "port"
+>  - Rebased, and fixed some issues reported on the 83822 driver
+>  - Use phy_caps
+> 
+> Changes in V4 :
+> 
+>  - Introduced a kernel doc
+>  - Reworked the mediums definitions in patch 2
+>  - QCA807x now uses the generic SFP support
+>  - Fixed some implementation bugs to build the support list based on the
+>    interfaces supported on a port
+> 
+> V11:https://lore.kernel.org/netdev/20250814135832.174911-1-maxime.chevallier@bootlin.com/
+> V10: https://lore.kernel.org/netdev/20250722121623.609732-1-maxime.chevallier@bootlin.com/
+> V9: https://lore.kernel.org/netdev/20250717073020.154010-1-maxime.chevallier@bootlin.com/
+> V8: https://lore.kernel.org/netdev/20250710134533.596123-1-maxime.chevallier@bootlin.com/
+> v7: https://lore.kernel.org/netdev/20250630143315.250879-1-maxime.chevallier@bootlin.com/
+> V6: https://lore.kernel.org/netdev/20250507135331.76021-1-maxime.chevallier@bootlin.com/
+> V5: https://lore.kernel.org/netdev/20250425141511.182537-1-maxime.chevallier@bootlin.com/
+> V4: https://lore.kernel.org/netdev/20250213101606.1154014-1-maxime.chevallier@bootlin.com/
+> V3: https://lore.kernel.org/netdev/20250207223634.600218-1-maxime.chevallier@bootlin.com/
+> RFC V2: https://lore.kernel.org/netdev/20250122174252.82730-1-maxime.chevallier@bootlin.com/
+> RFC V1: https://lore.kernel.org/netdev/20241220201506.2791940-1-maxime.chevallier@bootlin.com/
+> 
+> Maxime
+> 
+> Maxime Chevallier (18):
+>   dt-bindings: net: Introduce the ethernet-connector description
+>   net: ethtool: common: Indicate that BaseT works on up to 4 lanes
+>   net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
+>   net: phy: Introduce PHY ports representation
+>   net: phy: dp83822: Add support for phy_port representation
+>   dt-bindings: net: dp83822: Deprecate ti,fiber-mode
+>   net: phy: Create a phy_port for PHY-driven SFPs
+>   net: phylink: Move phylink_interface_max_speed to phy_caps
+>   net: phylink: Move sfp interface selection and filtering to phy_caps
+>   net: phy: Introduce generic SFP handling for PHY drivers
+>   net: phy: marvell-88x2222: Support SFP through phy_port interface
+>   net: phy: marvell: Support SFP through phy_port interface
+>   net: phy: marvell10g: Support SFP through phy_port
+>   net: phy: at803x: Support SFP through phy_port interface
+>   net: phy: qca807x: Support SFP through phy_port interface
+>   net: phy: Only rely on phy_port for PHY-driven SFP
+>   net: phy: dp83822: Add SFP support through the phy_port interface
+>   Documentation: networking: Document the phy_port infrastructure
+> 
+>  .../bindings/net/ethernet-connector.yaml      |  45 +++
+>  .../devicetree/bindings/net/ethernet-phy.yaml |  18 +
+>  .../devicetree/bindings/net/ti,dp83822.yaml   |  10 +-
+>  Documentation/networking/index.rst            |   1 +
+>  Documentation/networking/phy-port.rst         | 111 ++++++
+>  MAINTAINERS                                   |   3 +
+>  drivers/net/phy/Makefile                      |   2 +-
+>  drivers/net/phy/dp83822.c                     |  79 +++--
+>  drivers/net/phy/marvell-88x2222.c             |  95 ++---
+>  drivers/net/phy/marvell.c                     |  94 ++---
+>  drivers/net/phy/marvell10g.c                  |  54 +--
+>  drivers/net/phy/phy-caps.h                    |  12 +
+>  drivers/net/phy/phy-core.c                    |   6 +
+>  drivers/net/phy/phy_caps.c                    | 216 +++++++++++
+>  drivers/net/phy/phy_device.c                  | 334 +++++++++++++++++-
+>  drivers/net/phy/phy_port.c                    | 194 ++++++++++
+>  drivers/net/phy/phylink.c                     | 157 +-------
+>  drivers/net/phy/qcom/at803x.c                 |  78 ++--
+>  drivers/net/phy/qcom/qca807x.c                |  73 ++--
+>  include/linux/ethtool.h                       |  44 ++-
+>  include/linux/phy.h                           |  63 +++-
+>  include/linux/phy_port.h                      |  99 ++++++
+>  include/uapi/linux/ethtool.h                  |  20 ++
+>  net/ethtool/common.c                          | 267 ++++++++------
+>  24 files changed, 1541 insertions(+), 534 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
+>  create mode 100644 Documentation/networking/phy-port.rst
+>  create mode 100644 drivers/net/phy/phy_port.c
+>  create mode 100644 include/linux/phy_port.h
+> 
+> -- 
+> 2.49.0
+> 
+> 
+> 
 
-No regressions found when using the 5 ethernet ports on the RZ/N1D
-board. For this series:
-
-Tested-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-
-
---tJk4KSjWRS5EPtob
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmjBUGUACgkQFA3kzBSg
-KbbzQRAAjVPcydjLGZs63Ha5mu3EK9/MgZpkIQZRY6lbCXwg/dTSQ/7Hy/pgOKW6
-y/r5g6yBPLQ8KiEYovrZ9Y8aHI6tXSJuRzsQ48M5Tp4EzsJm+tGv4epWqdKAa60x
-ZGpI8vytpoDOk1DlGZqQn9lyWdlHGZWcqgap9X/DRUGv10y5UEZQyrbPgr+I1QO9
-agcr1KnKytg4pgZdgmD2TA3iN8uVYsKOfH6sS2SCBNlLhjZkH9zX+pgSyWmQ54BZ
-9tqKqo3aTmk5XjEl4zaS6rcmE9zZOQ3KPjH7fCzNc9Wxzx9eYg/Pg4tLKrFv45aE
-cH9ZSvPx2aIrEqNhCQsJjpA8RLd7fCH/Xzii+F840BSsNtZxbjdxSwxTfx0KMcJi
-fuMEtKgwVU5txq3/EHdbk4v59FbN1DBNIkf895jpdv9oc1uINMV4HC2PX1kzue0M
-fsWuHtI/4O6AGRw9ZjsI2+d69sCBWL0cFtsl9sgiVVO+NzI3oI3NRSwvBexoYG7z
-jVb09ngzJdaV+Ho1xXGHQYxfbPxSV27zNjW5V0UlyUB9lhZlVPtuNp3vFyWHjoN3
-ITnCNp7KmKgzJzWT9eMvlZV2tL0SGtCAZHOMlBuxVgjs4L5FtZqo6JYPiiIXZcJV
-NOHc04NgbeicnQ8ONcp9ayCkoJ2rlak7KQlwjhyByYxTT+UxGJU=
-=AHfh
------END PGP SIGNATURE-----
-
---tJk4KSjWRS5EPtob--
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
