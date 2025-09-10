@@ -1,171 +1,182 @@
-Return-Path: <netdev+bounces-221867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19ACBB522F9
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:52:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25BA3B5230D
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 22:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D20BF583A11
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:52:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D7EA80C72
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 20:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FBB307AEA;
-	Wed, 10 Sep 2025 20:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cG+6dqf1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF022D2386;
+	Wed, 10 Sep 2025 20:53:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A408306480
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F0F24BBF0
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757537348; cv=none; b=jTMvCl7oXgF9SSpvXCz87X6weSmdj9W+JLKAH8LfwtkJTv+T2bsHFxPrS0v1YL2Z9DQ9lIcmsBXQHIfnWLe0XbpndvQIw1vHWZepdBf4vvPblG4l/i8/6VfJEYHftCubKs05YFrrJrjmjB/dsPOMRs6dGGvvQ4ZRaGXUI62UMOY=
+	t=1757537608; cv=none; b=A9qp45j3O/FDnxrfkDiVbskw8/So1IKd15cE6uQEx/DoHrV1MjxMkC1FfdfYw49ivGWWmHgTDbhuDMsKN1Bs7EqXaAj8ve5oM8jUZXaqhgbRaJJfd00kGjV6U6d/PLaNRmL7W4AsabJSew+T/XfRTW3T5CSk6S0viUsnB9jP44A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757537348; c=relaxed/simple;
-	bh=WtcGnhGSlqX1dPRofkZYf6H49sJDwaITH4VnJPQAxlY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s2dffnZPRasFS3h8z3PyeopoYMzwbLkpQbq9ZzjBPvqLlEFVIihoWZs3PceqscE2Ptsvw1HHbhvbEShxzOyxRMEuOSAFSEAIBWx6YDEL80M1rRRoH06paIzDKgxMJX2k4JUPrF2CCsOPAIbdM8AeAZB/O7S12+XSi6C28w3jTqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cG+6dqf1; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757537346; x=1789073346;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WtcGnhGSlqX1dPRofkZYf6H49sJDwaITH4VnJPQAxlY=;
-  b=cG+6dqf1W8BNn+UMZ9yR4OXm40GTfTP0RDIW++DET8EwdOccFdu/6rw4
-   htwrjAvFZOntzRptmn/YSbBy7IUxNU9ZlusfafLeCn72qqm6+64JcLH3o
-   6sVIG54cqap2vLp097HWTIoIz20iMmC94BIYN221lMizo9naUJiFTMzFA
-   tabfIFZ7Csrfhpqq2STPQ3f+XIDwrm4pEwfBckeX2fHIlSJzSkfHNuvq5
-   ienmGNRqgDQFgsXapl4qkrNf/0j9IYH+ipatuUNfvuJ87+PTEDPZAvRax
-   hwVMtrTJwddwQinpUPP53TnOCvwgg0eScc2qLg9dcuY4I7xh+0LKhqvJ5
-   g==;
-X-CSE-ConnectionGUID: nO0hnguzSPOd8ZNTer8msg==
-X-CSE-MsgGUID: 8YFdBt1kS2WFBzvfntr+9A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="59807502"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="59807502"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 13:49:05 -0700
-X-CSE-ConnectionGUID: 8g6kfFo3QeKOlWx6LJzulQ==
-X-CSE-MsgGUID: JuRMgH9WTI6tqmwLpGnPFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,255,1751266800"; 
-   d="scan'208";a="173573317"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 10 Sep 2025 13:49:02 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uwRkS-0006HD-03;
-	Wed, 10 Sep 2025 20:49:00 +0000
-Date: Thu, 11 Sep 2025 04:48:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Carolina Jubran <cjubran@nvidia.com>
-Cc: oe-kbuild-all@lists.linux.dev, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] ethtool: add FEC bins histogramm report
-Message-ID: <202509110407.uPUiJk7j-lkp@intel.com>
-References: <20250909184216.1524669-2-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1757537608; c=relaxed/simple;
+	bh=z+SSr5e4raDynlSrCzw4DbMZwm/elGSHp/acpNaX/IA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=EerWZ9nKVMUN2WHPGCajBtOy9k/gFS+L94N+ujP6KdwemOkySFe51I9OUMjPjtvUjvSS+zknr4AWtudh7mFbOq+JtnqbZhTd63ATib5GhQO+6Y+t/SUh1xX3aVOX/IrCk9oYOIqWD2BxC0SpeNKilyd8WP8LOq7P5K9pot8IOrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3fb2a3ca471so143505ab.3
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 13:53:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757537605; x=1758142405;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ORHDDrKhvA3/qUkPzDVcq1X/g8kCw2zy04ZymDlu2HE=;
+        b=eHCWl/KHUZpZWX2a0j+C7KpWu1LJsVuX0ItmfryilIkK6LpJbF+D1msJHoe5k+vXPb
+         EzQsDgn3hBDNAbr+0KtbIVwV2O0/jrKYAAbjU00g6T0dOHJtq9/K/HiCJGhfywVFVyRh
+         qkr7mL5mQrC1X1EYq8UOE74kV61SDzBbmyASpTrzYxTlNv+k+b5e7sqmK+eS5eovC7y2
+         /ve/jeUTNYAeePuPEmzgC9K7bURjlKJmLr7Ncd9ZkVX/8VY9gk/+A8D7Xocs+eotERUr
+         nDpSs1kRG5WldhZVbM3zYCAOacOIeTbU1V8dd4Cvss4ffI+oifvWeAhFJLH7YpUItep+
+         QZoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVMf7IGtATIhj/ThqN3lJfjfxujGB/WqsM6SFF3/ZGMsfnkFexWcq30CF64E0WPEeZk8FV5UCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6igAQW5bCNzdx2GFUxi2ZW4a6XrXaTTMt63y19GD2J52GH4J7
+	ShuuR79kzWayudcygEdpmfU3qtIzenbuy7qLyYmYFsQmVinK14y4TTwXEY+hSXyVxddeYoA85iL
+	PbSSNatWY2qj99/fNf7J5rMD+3b1yMkC42f87JDW7ft+Cn4LDE4qIxYpZNZg=
+X-Google-Smtp-Source: AGHT+IELNcieJyO3PScSY3ls43ocO856dpwKju7gM2D1Vty+fwi/cTBoqQMfNRZ1V0PBBKdy5zAPf22QzDDN/RUdRFlpuS0plJbP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250909184216.1524669-2-vadim.fedorenko@linux.dev>
+X-Received: by 2002:a92:ca46:0:b0:410:cae9:a07c with SMTP id
+ e9e14a558f8ab-410cae9a261mr93638345ab.5.1757537605114; Wed, 10 Sep 2025
+ 13:53:25 -0700 (PDT)
+Date: Wed, 10 Sep 2025 13:53:25 -0700
+In-Reply-To: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68c1e545.050a0220.3c6139.002b.GAE@google.com>
+Subject: [syzbot ci] Re: ns: support file handles
+From: syzbot ci <syzbot+cic2a3475eff9e1ea7@syzkaller.appspotmail.com>
+To: amir73il@gmail.com, axboe@kernel.dk, brauner@kernel.org, 
+	cgroups@vger.kernel.org, chuck.lever@oracle.com, cyphar@cyphar.com, 
+	daan.j.demeyer@gmail.com, edumazet@google.com, hannes@cmpxchg.org, 
+	horms@kernel.org, jack@suse.cz, jlayton@kernel.org, josef@toxicpanda.com, 
+	kuba@kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, me@yhndnzj.com, mkoutny@suse.com, 
+	mzxreary@0pointer.de, netdev@vger.kernel.org, pabeni@redhat.com, 
+	tj@kernel.org, viro@zeniv.linux.org.uk, zbyszek@in.waw.pl
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Vadim,
+syzbot ci has tested the following series
 
-kernel test robot noticed the following build errors:
+[v1] ns: support file handles
+https://lore.kernel.org/all/20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org
+* [PATCH 01/32] pidfs: validate extensible ioctls
+* [PATCH 02/32] nsfs: validate extensible ioctls
+* [PATCH 03/32] block: use extensible_ioctl_valid()
+* [PATCH 04/32] ns: move to_ns_common() to ns_common.h
+* [PATCH 05/32] nsfs: add nsfs.h header
+* [PATCH 06/32] ns: uniformly initialize ns_common
+* [PATCH 07/32] mnt: use ns_common_init()
+* [PATCH 08/32] ipc: use ns_common_init()
+* [PATCH 09/32] cgroup: use ns_common_init()
+* [PATCH 10/32] pid: use ns_common_init()
+* [PATCH 11/32] time: use ns_common_init()
+* [PATCH 12/32] uts: use ns_common_init()
+* [PATCH 13/32] user: use ns_common_init()
+* [PATCH 14/32] net: use ns_common_init()
+* [PATCH 15/32] ns: remove ns_alloc_inum()
+* [PATCH 16/32] nstree: make iterator generic
+* [PATCH 17/32] mnt: support iterator
+* [PATCH 18/32] cgroup: support iterator
+* [PATCH 19/32] ipc: support iterator
+* [PATCH 20/32] net: support iterator
+* [PATCH 21/32] pid: support iterator
+* [PATCH 22/32] time: support iterator
+* [PATCH 23/32] userns: support iterator
+* [PATCH 24/32] uts: support iterator
+* [PATCH 25/32] ns: add to_<type>_ns() to respective headers
+* [PATCH 26/32] nsfs: add current_in_namespace()
+* [PATCH 27/32] nsfs: support file handles
+* [PATCH 28/32] nsfs: support exhaustive file handles
+* [PATCH 29/32] nsfs: add missing id retrieval support
+* [PATCH 30/32] tools: update nsfs.h uapi header
+* [PATCH 31/32] selftests/namespaces: add identifier selftests
+* [PATCH 32/32] selftests/namespaces: add file handle selftests
 
-[auto build test ERROR on net-next/main]
+and found the following issue:
+WARNING in copy_net_ns
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/ethtool-add-FEC-bins-histogramm-report/20250910-025057
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250909184216.1524669-2-vadim.fedorenko%40linux.dev
-patch subject: [PATCH net-next 1/4] ethtool: add FEC bins histogramm report
-config: openrisc-allyesconfig (https://download.01.org/0day-ci/archive/20250911/202509110407.uPUiJk7j-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250911/202509110407.uPUiJk7j-lkp@intel.com/reproduce)
+Full report is available here:
+https://ci.syzbot.org/series/bc3dfd83-98cc-488c-b046-f849c79a6a41
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509110407.uPUiJk7j-lkp@intel.com/
+***
 
-All errors (new ones prefixed by >>):
+WARNING in copy_net_ns
 
->> drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c:1842:43: error: initialization of 'void (*)(struct net_device *, struct ethtool_fec_stats *, struct ethtool_fec_hist *)' from incompatible pointer type 'void (*)(struct net_device *, struct ethtool_fec_stats *)' [-Wincompatible-pointer-types]
-    1842 |         .get_fec_stats                  = fbnic_get_fec_stats,
-         |                                           ^~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c:1842:43: note: (near initialization for 'fbnic_ethtool_ops.get_fec_stats')
-   drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c:1661:1: note: 'fbnic_get_fec_stats' declared here
-    1661 | fbnic_get_fec_stats(struct net_device *netdev,
-         | ^~~~~~~~~~~~~~~~~~~
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      deb105f49879dd50d595f7f55207d6e74dec34e6
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/a560fd28-b788-4442-a7c8-10c6240b4dbf/config
+syz repro: https://ci.syzbot.org/findings/18e91b10-567e-4cae-a279-8a5f2f2cde80/syz_repro
+
+------------[ cut here ]------------
+ida_free called for id=1326 which is not allocated.
+WARNING: CPU: 0 PID: 6146 at lib/idr.c:592 ida_free+0x280/0x310 lib/idr.c:592
+Modules linked in:
+CPU: 0 UID: 0 PID: 6146 Comm: syz.1.60 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:ida_free+0x280/0x310 lib/idr.c:592
+Code: 00 00 00 00 fc ff df 48 8b 5c 24 10 48 8b 7c 24 40 48 89 de e8 d1 8a 0c 00 90 48 c7 c7 80 ee ba 8c 44 89 fe e8 11 87 12 f6 90 <0f> 0b 90 90 eb 34 e8 95 02 4f f6 49 bd 00 00 00 00 00 fc ff df eb
+RSP: 0018:ffffc9000302fba0 EFLAGS: 00010246
+RAX: c838d58ce4bb0000 RBX: 0000000000000a06 RCX: ffff88801eac0000
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: ffffc9000302fca0 R08: ffff88804b024293 R09: 1ffff11009604852
+R10: dffffc0000000000 R11: ffffed1009604853 R12: 1ffff92000605f78
+R13: dffffc0000000000 R14: ffff888026c1fd00 R15: 000000000000052e
+FS:  00007f6d7aab16c0(0000) GS:ffff8880b8613000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000004000 CR3: 000000002726e000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ copy_net_ns+0x37a/0x510 net/core/net_namespace.c:593
+ create_new_namespaces+0x3f3/0x720 kernel/nsproxy.c:110
+ unshare_nsproxy_namespaces+0x11c/0x170 kernel/nsproxy.c:218
+ ksys_unshare+0x4c8/0x8c0 kernel/fork.c:3127
+ __do_sys_unshare kernel/fork.c:3198 [inline]
+ __se_sys_unshare kernel/fork.c:3196 [inline]
+ __x64_sys_unshare+0x38/0x50 kernel/fork.c:3196
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6d79b8eba9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6d7aab1038 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
+RAX: ffffffffffffffda RBX: 00007f6d79dd5fa0 RCX: 00007f6d79b8eba9
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000062040200
+RBP: 00007f6d79c11e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6d79dd6038 R14: 00007f6d79dd5fa0 R15: 00007ffd5ab830f8
+ </TASK>
 
 
-vim +1842 drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+***
 
-6913e873e7b2e4 Mohsin Bashir   2025-06-10  1805  
-bd2557a554a0d6 Mohsin Bashir   2024-09-02  1806  static const struct ethtool_ops fbnic_ethtool_ops = {
-f7d4c21667cc1a Jakub Kicinski  2025-06-24  1807  	.supported_coalesce_params	= ETHTOOL_COALESCE_USECS |
-7b5b7a597fbc19 Mohsin Bashir   2025-02-17  1808  					  ETHTOOL_COALESCE_RX_MAX_FRAMES,
-2b30fc01a6c788 Mohsin Bashir   2025-08-13  1809  	.supported_ring_params		= ETHTOOL_RING_USE_TCP_DATA_SPLIT |
-2b30fc01a6c788 Mohsin Bashir   2025-08-13  1810  					  ETHTOOL_RING_USE_HDS_THRS,
-260676ebb1f3b1 Daniel Zahka    2025-02-06  1811  	.rxfh_max_num_contexts		= FBNIC_RPC_RSS_TBL_COUNT,
-bd2557a554a0d6 Mohsin Bashir   2024-09-02  1812  	.get_drvinfo			= fbnic_get_drvinfo,
-3d12862b216d39 Mohsin Bashir   2024-11-12  1813  	.get_regs_len			= fbnic_get_regs_len,
-3d12862b216d39 Mohsin Bashir   2024-11-12  1814  	.get_regs			= fbnic_get_regs,
-fb9a3bb7f7f23b Alexander Duyck 2025-06-18  1815  	.get_link			= ethtool_op_get_link,
-7b5b7a597fbc19 Mohsin Bashir   2025-02-17  1816  	.get_coalesce			= fbnic_get_coalesce,
-7b5b7a597fbc19 Mohsin Bashir   2025-02-17  1817  	.set_coalesce			= fbnic_set_coalesce,
-6cbf18a05c0609 Jakub Kicinski  2025-03-06  1818  	.get_ringparam			= fbnic_get_ringparam,
-6cbf18a05c0609 Jakub Kicinski  2025-03-06  1819  	.set_ringparam			= fbnic_set_ringparam,
-e9faf4db5f2612 Mohsin Bashir   2025-08-25  1820  	.get_pause_stats		= fbnic_get_pause_stats,
-eb4c27edb4d8db Alexander Duyck 2025-06-18  1821  	.get_pauseparam			= fbnic_phylink_get_pauseparam,
-eb4c27edb4d8db Alexander Duyck 2025-06-18  1822  	.set_pauseparam			= fbnic_phylink_set_pauseparam,
-79da2aaa08ee99 Sanman Pradhan  2024-11-14  1823  	.get_strings			= fbnic_get_strings,
-79da2aaa08ee99 Sanman Pradhan  2024-11-14  1824  	.get_ethtool_stats		= fbnic_get_ethtool_stats,
-79da2aaa08ee99 Sanman Pradhan  2024-11-14  1825  	.get_sset_count			= fbnic_get_sset_count,
-7cb06a6a777cf5 Alexander Duyck 2024-12-19  1826  	.get_rxnfc			= fbnic_get_rxnfc,
-c23a1461bfee0a Alexander Duyck 2024-12-19  1827  	.set_rxnfc			= fbnic_set_rxnfc,
-7cb06a6a777cf5 Alexander Duyck 2024-12-19  1828  	.get_rxfh_key_size		= fbnic_get_rxfh_key_size,
-7cb06a6a777cf5 Alexander Duyck 2024-12-19  1829  	.get_rxfh_indir_size		= fbnic_get_rxfh_indir_size,
-7cb06a6a777cf5 Alexander Duyck 2024-12-19  1830  	.get_rxfh			= fbnic_get_rxfh,
-31ab733e999edb Alexander Duyck 2024-12-19  1831  	.set_rxfh			= fbnic_set_rxfh,
-2a34007ba9773e Jakub Kicinski  2025-06-11  1832  	.get_rxfh_fields		= fbnic_get_rss_hash_opts,
-2a34007ba9773e Jakub Kicinski  2025-06-11  1833  	.set_rxfh_fields		= fbnic_set_rss_hash_opts,
-260676ebb1f3b1 Daniel Zahka    2025-02-06  1834  	.create_rxfh_context		= fbnic_create_rxfh_context,
-260676ebb1f3b1 Daniel Zahka    2025-02-06  1835  	.modify_rxfh_context		= fbnic_modify_rxfh_context,
-260676ebb1f3b1 Daniel Zahka    2025-02-06  1836  	.remove_rxfh_context		= fbnic_remove_rxfh_context,
-3a481cc72673b2 Jakub Kicinski  2024-12-19  1837  	.get_channels			= fbnic_get_channels,
-3a481cc72673b2 Jakub Kicinski  2024-12-19  1838  	.set_channels			= fbnic_set_channels,
-be65bfc957eb70 Vadim Fedorenko 2024-10-08  1839  	.get_ts_info			= fbnic_get_ts_info,
-96f358f75d1a4e Vadim Fedorenko 2024-10-08  1840  	.get_ts_stats			= fbnic_get_ts_stats,
-fb9a3bb7f7f23b Alexander Duyck 2025-06-18  1841  	.get_link_ksettings		= fbnic_phylink_ethtool_ksettings_get,
-33c493791bc058 Mohsin Bashir   2025-08-25 @1842  	.get_fec_stats			= fbnic_get_fec_stats,
-fb9a3bb7f7f23b Alexander Duyck 2025-06-18  1843  	.get_fecparam			= fbnic_phylink_get_fecparam,
-33c493791bc058 Mohsin Bashir   2025-08-25  1844  	.get_eth_phy_stats		= fbnic_get_eth_phy_stats,
-4eb7f20bcf0614 Mohsin Bashir   2024-09-02  1845  	.get_eth_mac_stats		= fbnic_get_eth_mac_stats,
-6913e873e7b2e4 Mohsin Bashir   2025-06-10  1846  	.get_eth_ctrl_stats		= fbnic_get_eth_ctrl_stats,
-6913e873e7b2e4 Mohsin Bashir   2025-06-10  1847  	.get_rmon_stats			= fbnic_get_rmon_stats,
-bd2557a554a0d6 Mohsin Bashir   2024-09-02  1848  };
-bd2557a554a0d6 Mohsin Bashir   2024-09-02  1849  
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
