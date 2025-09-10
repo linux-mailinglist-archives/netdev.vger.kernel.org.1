@@ -1,92 +1,59 @@
-Return-Path: <netdev+bounces-221646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB71B51640
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 13:58:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F6EAB51694
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 14:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3880F17F749
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 11:58:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89BFA1C27FBC
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454F428725B;
-	Wed, 10 Sep 2025 11:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D2727AC21;
+	Wed, 10 Sep 2025 12:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T0OAgWT2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmXcCjLh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAC6245031;
-	Wed, 10 Sep 2025 11:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5452B9B9;
+	Wed, 10 Sep 2025 12:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757505499; cv=none; b=Lqt60MO3l3+PHh3egtCxIQIsLJfURrtIaQaFkyhTepF4pcCK4cgORXu/dr//1g10ttk4x8XDXOY3+zj0pfLChL3X3tfLpRVj6kqUrdetlxF2Vv8yccZ6BqucapFdZB8fl+lUV3C6JwJb2pTri8rN2Cjxq7huvlw8OVqoQ1nA3p8=
+	t=1757506403; cv=none; b=PAgz7EdXCN7AfP+2x6nLqaU3rhTBPXWFY8bqalPL6yr7nL0AGcQlr0yqcGfR+OWy4bU2ClzN2KoXLk2dRVPDyp8wfSfoYkAW5MqTYYVeGgz8AmeGVrVEC+mi9BmtxbcKITgVkPnrgybRM7o4Ws65Gh8N3yZgcoEnt3Ll7oFjhQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757505499; c=relaxed/simple;
-	bh=YgHoSlMyGCwyBPFYKxKiq0pYJf9NvlcVUq+xwRtrf+A=;
+	s=arc-20240116; t=1757506403; c=relaxed/simple;
+	bh=f3KbczFHpmwYU58la1F5EYlpqZP5oVM2bUX9Zue5rLg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o3dKk5eBeewHuIkhOuHlt7hceeJmr6qOHAmW62ishS8QlcPFoPRuGsqZUYWAZk5DmxQdDFzAqZUK1SPMD4trL1KUOp2W2P/0jije1pMDDJVsVuiQQNNMP9A0YWIk3fMg17sF3QIocdO2K46ysJzL3y1q3YbHs/uo2JctFHO8pW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T0OAgWT2; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757505497; x=1789041497;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YgHoSlMyGCwyBPFYKxKiq0pYJf9NvlcVUq+xwRtrf+A=;
-  b=T0OAgWT2AL/hoKfqv5/oLH6WCUNCMiMLn7XW96OQWgxobdOb5UtL36+z
-   CNXacYawLAlL0lgxnlTcVyKMxwQxVxTErD6aVS2nBrBTxdq3nEL1GhIRa
-   RL7NSAsW9rID1TZAixao1CYxfp57PRs4TtHAbqFyyoT/BkrFzYgajtBhJ
-   Ad8x5I09kllYFXg0yBwqnEwkSw1oQgc1SsTkhDH9ge5a9LqwWvKikOMVA
-   CHWk7hSPMAzLooBPySvisdlmkA2ng4tFf37sdVFLl689FpgQMN7bLF4BJ
-   TZQoQshcCDJOyLMqAFTMAzc/bn55mn3N0ytol4qXabgNdlWRvPncGa7Ch
-   Q==;
-X-CSE-ConnectionGUID: 24rspeXyRDqlMEiGNndBdA==
-X-CSE-MsgGUID: BBK3fxuLQy6wCE9teVD9Zg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="70911868"
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="70911868"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 04:58:15 -0700
-X-CSE-ConnectionGUID: cQXzNYOUQDyxOUWUNGJnrQ==
-X-CSE-MsgGUID: mP/ModIiRNmkZaym8tqETw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="197042998"
-Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 10 Sep 2025 04:58:11 -0700
-Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uwJSi-0005tf-1K;
-	Wed, 10 Sep 2025 11:58:08 +0000
-Date: Wed, 10 Sep 2025 19:57:39 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v7 bpf-next/net 3/6] net-memcg: Introduce
- net.core.memcg_exclusive sysctl.
-Message-ID: <202509101912.ROjtP2uL-lkp@intel.com>
-References: <20250909204632.3994767-4-kuniyu@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=U9c4DGCxD/QqcxQ3tsp+0HNvg1wLgQ+meg2t2brut//Jp/1Q9tKstR4bJOdy7Hiq3VumIALKWyzaeFYiU0/gjKhPVZIZxDRIGGRxDqurLPmkZYDq2D4tQ1tWSpYq1n0zzNURw75mx3WBxPpo78qO3GfxgJgihFpm5qGMKyl1zKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmXcCjLh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 154B7C4CEF0;
+	Wed, 10 Sep 2025 12:13:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757506402;
+	bh=f3KbczFHpmwYU58la1F5EYlpqZP5oVM2bUX9Zue5rLg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EmXcCjLhq0PdiWqVXY25K8xURhXjqT6ThC7ByoWfW9BUsJvEKmXdaJN/+p1i+dpqo
+	 G6LeN42SXsZXbxWsa5j1I4aTv3w51AlJjisfB/cnpAvJPdMRfAcDV0li/ABwsdwkwi
+	 MougOHqDkAb+2xpLPsY+rX6clRWMi4QeMaInPDmHm3lacgAQ5vHkN+A9rVocef4SZ4
+	 h6NwMNQVH0UNLZto/rw9P83A74HSjnx+DiOaTYL9nMDR/KzWjbmsgK7N48ll8SlJ1u
+	 wdYvYUxZuyskqinghPjli5mpoag/3+3rMvddqjj/WwieOY6Fcec11GrRhD3LOjYFs6
+	 aSHjKVsPsl2ug==
+Date: Wed, 10 Sep 2025 15:13:17 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Tatyana Nikolova <tatyana.e.nikolova@intel.com>, jiri@resnulli.us,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+	Jakub Kicinski <kuba@kernel.org>, Mohammad Heib <mheib@redhat.com>
+Subject: Re: [iwl-next] ice, irdma: Add rdma_qp_limits_sel devlink parameter
+ for irdma
+Message-ID: <20250910121317.GQ341237@unreal>
+References: <20250904195719.371-1-tatyana.e.nikolova@intel.com>
+ <20250909122051.GF341237@unreal>
+ <33d327a0-72d3-4775-8842-6c4ceaff41e2@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,35 +62,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250909204632.3994767-4-kuniyu@google.com>
+In-Reply-To: <33d327a0-72d3-4775-8842-6c4ceaff41e2@intel.com>
 
-Hi Kuniyuki,
+On Wed, Sep 10, 2025 at 09:41:14AM +0200, Przemek Kitszel wrote:
+> On 9/9/25 14:20, Leon Romanovsky wrote:
+> > On Thu, Sep 04, 2025 at 02:57:19PM -0500, Tatyana Nikolova wrote:
+> > > Add a devlink parameter to switch between different QP resource profiles
+> > > (max number of QPs) supported by irdma for Intel Ethernet 800 devices. The
+> > > rdma_qp_limits_sel is translated into an index in the rsrc_limits_table to
+> > > select a power of two number between 1 and 256 for max supported QPs (1K-256K).
+> > > To reduce the irdma memory footprint, set the rdma_qp_limits_sel default value
+> > > to 1 (max 1K QPs).
+> > > 
+> > > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > > Signed-off-by: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+> > > ---
+> > > Since the changes to irdma are minor, this is targeted to iwl-next/net-next.
+> > 
+> > <...>
+> > 
+> > >   #define DEVLINK_LOCAL_FWD_DISABLED_STR "disabled"
+> > >   #define DEVLINK_LOCAL_FWD_ENABLED_STR "enabled"
+> > >   #define DEVLINK_LOCAL_FWD_PRIORITIZED_STR "prioritized"
+> > > @@ -1621,6 +1723,7 @@ enum ice_param_id {
+> > >   	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+> > >   	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
+> > >   	ICE_DEVLINK_PARAM_ID_LOCAL_FWD,
+> > > +	ICE_DEVLINK_PARAM_ID_RDMA_QP_LIMITS_SEL,
+> > >   };
+> > 
+> > I was under impression that driver-specific devlink knobs are not
+> > allowed. Was this limitation changed for Intel?
+> 
+> I'm not aware of such limitation.
 
-kernel test robot noticed the following build errors:
+It is possible that my impression was wrong.
 
-[auto build test ERROR on bpf-next/net]
+> It's always better to have generic params, but some knobs are not likely
+> to be reused; anyway it would be easy to convert into generic.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Save-lock_sock-for-memcg-in-inet_csk_accept/20250910-044928
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git net
-patch link:    https://lore.kernel.org/r/20250909204632.3994767-4-kuniyu%40google.com
-patch subject: [PATCH v7 bpf-next/net 3/6] net-memcg: Introduce net.core.memcg_exclusive sysctl.
-config: um-randconfig-001-20250910 (https://download.01.org/0day-ci/archive/20250910/202509101912.ROjtP2uL-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 7fb1dc08d2f025aad5777bb779dfac1197e9ef87)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250910/202509101912.ROjtP2uL-lkp@intel.com/reproduce)
+Unlikely, you will need to keep old parameter and new at the same time
+for backward compatibility reasons.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509101912.ROjtP2uL-lkp@intel.com/
+> 
+> To have this particular param more generic-ready, we have converted from
+> our internal format (values were 0...7, mapped into some powers of two)
+> to what one could imagine other drivers would like to add at some point
+> (perhaps multiplying the user-provided value by 1K is unnecessarily
+> complicating adoption for small NICs, IDK?).
+> 
+> Do you believe this should be switched to generic now (instead of when
+> there is a future user)?
+> What about a name (this should be kept forever)?
 
-All errors (new ones prefixed by >>):
+mlx5 has .log_max_qp in mlx5_profile which looks similar to what you are
+proposing here, so RDMA_QP_LIMITS sounds fine to me.
 
-   /usr/bin/ld: warning: .tmp_vmlinux1 has a LOAD segment with RWX permissions
-   /usr/bin/ld: mm/memcontrol.o: in function `mem_cgroup_sk_set':
->> memcontrol.c:(.text+0xa1e0): undefined reference to `init_net'
-   clang: error: linker command failed with exit code 1 (use -v to see invocation)
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> side note:
+> We are also going to add yet another param, now used only by intel, but
+> we do so as a generic one: "max number of MAC addrs for VF in i40e", see
+> https://lore.kernel.org/intel-wired-lan/20250907100454.193420-1-mheib@redhat.com/T/#t
+> 
+> 
+> > 
+> > Thanks
+> 
 
