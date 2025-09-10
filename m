@@ -1,129 +1,143 @@
-Return-Path: <netdev+bounces-221570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E13B50EBD
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:08:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 444EAB50F0F
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 09:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22F364E0ACE
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 07:08:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8272F7ADB30
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 07:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE093019A3;
-	Wed, 10 Sep 2025 07:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6884530C347;
+	Wed, 10 Sep 2025 07:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUzrr3Yw"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F93C26B779
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 07:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BED83081B7;
+	Wed, 10 Sep 2025 07:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757488127; cv=none; b=tPWJ1Bx4OanZn9EK1vvBppj9sd2qNRev8W/gLrTIFlQzrboXJPHQhbL+xTt9sFwwzCyNShYIYHMQz4TSjg9N5h/PHFmZxRdzPPHspwHlql063Th64HV3zVYS0fIwjD5l/OMEmHmgjCULE6A0KRFWrZ5COsSnIJ5O23zBTSqFCE8=
+	t=1757488507; cv=none; b=Rel8RJfnP5mRFkz7Oad1ozy1ikbuFXdj5lG6xEMf2xxLlnc49+OLo1fAW0Nl0CN6wgp9XU7cLeDtWTDZ7u3ln7TZmrsTFp/+yK6ySwNR0ZojqGldmjmGYYhTdEbIDozd54qLOyPYU+88w8CVqqonzTIHSh6XEVUfLXz8lgmy2BE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757488127; c=relaxed/simple;
-	bh=VDXJRMatLsnf9a6GY+1Kzd46i4ImKZ+ZX2nboEeBDuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hcg7CWokvU2pZ3I1+aVlaPM4+XT43uumMOSLK0icCvgLJclJ655NrZsGaDA1hel2qg0u5/XdK3RIWlYMIyUJNLRDA7yF1fJ4EhkBl2T8XAfItE5gXX/uUgv+x/mPhHBBQKNU94c3aYVoED0xzORS4FYjMVtmNkHEMlOV9Ci7l0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uwEwW-0006YP-9Z; Wed, 10 Sep 2025 09:08:36 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uwEwU-000YJv-2i;
-	Wed, 10 Sep 2025 09:08:34 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uwEwU-00G9DX-2C;
-	Wed, 10 Sep 2025 09:08:34 +0200
-Date: Wed, 10 Sep 2025 09:08:34 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] net: phy: clear EEE runtime state in
- PHY_HALTED/PHY_ERROR
-Message-ID: <aMEj8vjJY4h6kYbN@pengutronix.de>
-References: <20250909131248.4148301-1-o.rempel@pengutronix.de>
- <5078fdbe-b8ac-430a-ab5d-9fa2d493c7da@lunn.ch>
+	s=arc-20240116; t=1757488507; c=relaxed/simple;
+	bh=sM6630zadGmQZqR1u8pau40s9sWY4wkiWmZiLgUunsg=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=byCrnNvtrhnFgUa1MulwnrhRGyyc0MSRuE2LzfndWZgqnHVktOZev/K694opvUWPZTx3oHhng+hJ0UdMaQbszpWCr5xyAmEy/lg0eSph7Mhd3bw2qkwF2KDz9qT2UX9Gs++luYxJE4JJDyRSDsbOcyB5sxJB3wLpH/4KhcBx48o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hUzrr3Yw; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3da4c14a5f9so148115f8f.0;
+        Wed, 10 Sep 2025 00:15:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757488504; x=1758093304; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7rviqFC6fi/TZM3n7DN7u+8LmUKozVvS35AUpDZHHJY=;
+        b=hUzrr3YwUjsBbWShwt0VG07p52gI39toWLH0MvwePJBgt2yn8Py2yjg7XLbWuPYx4E
+         V5JQh7vYDllJQkXNSMbmPf8Ip+AI0OCGu1git6EXibrEr6RSrDeGDRPjU74WaphUK6C9
+         U2KfEL7mzoFr/p4HUFmp0yf4u90EbYVOlP5v6yK80DCoR2N3QDlc+4PE8VWKect5iv25
+         /nUsmAOKUX8d46GoO2RM7I/cuQR4unXTuudiFYI/wD9f9XzwjA52WzXMstOEth75x2yS
+         HEOriFzm7JJcBC4pJENpK6QOYW1LcQhRHbgtnSsWp1+QX/kfD8kSOfJER/T8NsXUkIq9
+         dI9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757488504; x=1758093304;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7rviqFC6fi/TZM3n7DN7u+8LmUKozVvS35AUpDZHHJY=;
+        b=b6YnU3cl76A2IrLeDXh1ntlvEMKcfPye+TxEY5TBYTCbeBOX8tbWYcf7AVUi8M7bu9
+         Bhs2NQSJazwyTU+vQl8ZmTUL47ZLKXhx1Tat/2MguK4dopjeurNe4CgzA33bceSZWIbz
+         DIZ1L1APkebi/wyYgKJ1HuS/n1AAWQiMI/rxMMa90rB8XnY8G/19Q5/VJlTe6QgJuK6p
+         lXdoIEItrbqClCVI4gZccOcFx4NZz4qi5voZYImzlHHbci8UVtMhMTYRdU0imyleQq5t
+         MswazMIs82U01reaTkfJv5SVpsYdX3QLGDNcjYfLd5WD51L0bQDxHylKLMABE73HbGQo
+         l20A==
+X-Forwarded-Encrypted: i=1; AJvYcCUdY6raaDMhXYSkODyf9j6T8RvPccLJucMm+y8SmPgtSDjTQNRDrsP1btyfHYc9N07mBI55F8Gz8MF3@vger.kernel.org, AJvYcCXpCd0RSgPYMc2+ZcJ+cst7AvAOy/6g1QMLQImT8IW0k1R9JdBNs0ShW31M0aYSje2duU3vP1yehUhDpKn5@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGvU+MDLGBtQAZTZd5Gw0k/IXlS1JBQGIyZumzgD0IOaLcGE7h
+	J68vYJ9/dFYBxLedNEZrCWao/89RAvPFN7EPymHhW73vuZkE2fXgCs1T
+X-Gm-Gg: ASbGncu9tngGoRClh3s2v9vTX1jLApVRcjSBxsQw55UVD53MOEaj4KbWcfEk/obx/cG
+	MUvu4OFcougnKRZamDPO1aR3jgLQIjVYz73D+oABylqhcBlZh0OA7KVcIP6h8/K/e7g/5AQR3pL
+	hOkaGy+7CnOQnVxqpHR3FkbQRJ3pUEm8TSKJ+pF0LKgZZirVIbjYrnRFEfEiypCewRH0sDLm49r
+	F27mhO3Vct7gL+hQpA+VnSBPvOI1UzptQS9nTYScOKE5/u7H4VvIRLq66JHk7Hl3rp695vCqHA5
+	i6jxxwnbOPLEMN3hYE+PNyGtQRYbfe5fm18q0Wh37igXfNECrDnmlaEzN53WF95qlD3K3aTCVSr
+	sCd3l4WNPi8fXCggCLShb9R8fHeRy+tDAJYRfDCOR+WZ+d1RKDE/NaTLtcvSqyc0OvFk98HU9z4
+	XucLh34wKFgF2ZXdA=
+X-Google-Smtp-Source: AGHT+IFG+idW3YLhpTGmVPGFSEnkJNW+nzVsFTThsQbfnIgS3JeXNSm3rp7SBWpMcUqM9FIU0yiuDw==
+X-Received: by 2002:a05:6000:288a:b0:3df:22a3:d240 with SMTP id ffacd0b85a97d-3e2ffd7fe96mr14642158f8f.4.1757488503299;
+        Wed, 10 Sep 2025 00:15:03 -0700 (PDT)
+Received: from Ansuel-XPS. (host-95-249-236-54.retail.telecomitalia.it. [95.249.236.54])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45df8259524sm15913775e9.21.2025.09.10.00.15.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 00:15:02 -0700 (PDT)
+Message-ID: <68c12576.050a0220.37714e.38b3@mx.google.com>
+X-Google-Original-Message-ID: <aMElcbso_bBVXRcR@Ansuel-XPS.>
+Date: Wed, 10 Sep 2025 09:14:57 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: netdev@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
+	linux-kernel@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Lee Jones <lee@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Wang <sean.wang@mediatek.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [net-next PATCH v16 02/10] dt-bindings: net: dsa: Document
+ support for Airoha AN8855 DSA Switch
+References: <20250909004343.18790-1-ansuelsmth@gmail.com>
+ <20250909004343.18790-3-ansuelsmth@gmail.com>
+ <175747155888.3660326.7601418632786886363.robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5078fdbe-b8ac-430a-ab5d-9fa2d493c7da@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <175747155888.3660326.7601418632786886363.robh@kernel.org>
 
-On Tue, Sep 09, 2025 at 03:58:32PM +0200, Andrew Lunn wrote:
-> On Tue, Sep 09, 2025 at 03:12:48PM +0200, Oleksij Rempel wrote:
-> > Clear EEE runtime flags when the PHY transitions to HALTED or ERROR
-> > and the state machine drops the link. This avoids stale EEE state being
-> > reported via ethtool after the PHY is stopped or hits an error.
+On Tue, Sep 09, 2025 at 09:32:39PM -0500, Rob Herring (Arm) wrote:
 > 
-> One obvious question, why is EEE special? We have other state in
-> phydev which is not valid when the link is down. Are we setting speed
-> and duplex to UNKNOWN? lp_advertising, mdix, master_slave_state?
+> On Tue, 09 Sep 2025 02:43:33 +0200, Christian Marangi wrote:
+> > Document support for Airoha AN8855 5-port Gigabit Switch.
+> > 
+> > It does expose the 5 Internal PHYs on the MDIO bus and each port
+> > can access the Switch register space by configurting the PHY page.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >  .../net/dsa/airoha,an8855-switch.yaml         | 86 +++++++++++++++++++
+> >  1 file changed, 86 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
+> > 
 > 
-> So while i agree it is nice not to show stale EEE state, maybe we
-> should not be showing any stale state and this patch needs extending?
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> 
 
-I decided to send the first step patch for the agreed subset (EEE
-flags), so it can be merged faster.
+Hi Rob,
 
-As a follow-up I would propose a separate patch which clears additional
-link-resolved state when the PHY enters HALTED, for example:
+I'm about to send new revision of this but the nvmem DT patch got merged
+in his owm branch so it won't be included in this series, hence the BOT
+will totally complain on the MFD patch.
 
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1552,6 +1552,16 @@ static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
-                }
-                break;
-        case PHY_HALTED:
-+               if (phydev->link) {
-+                       if (phydev->autoneg == AUTONEG_ENABLE) {
-+                               phydev->speed = SPEED_UNKNOWN;
-+                               phydev->duplex = DUPLEX_UNKNOWN;
-+                       }
-+                       if (phydev->master_slave_state != MASTER_SLAVE_STATE_UNSUPPORTED)
-+                               phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
-+                       phydev->mdix = ETH_TP_MDI_INVALID;
-+                       linkmode_zero(phydev->lp_advertising);
-+               }
-        case PHY_ERROR:
-                if (phydev->link) {
-                        phydev->link = 0;
+Any hint on what tag to include to the patch to make the bot include
+that patch from the external branch?
 
-Would this approach be acceptable, or do you see hidden issues with clearing
-these extra fields?
-
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
