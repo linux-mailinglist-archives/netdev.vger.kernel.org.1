@@ -1,132 +1,142 @@
-Return-Path: <netdev+bounces-221617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10FF7B513A3
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:16:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DA4B513B8
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 12:19:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2E4E1889C85
-	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:16:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBDB01C26E78
+	for <lists+netdev@lfdr.de>; Wed, 10 Sep 2025 10:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEFC242D7B;
-	Wed, 10 Sep 2025 10:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28F231690A;
+	Wed, 10 Sep 2025 10:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vvyC8Crl"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="IuaQ81rh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FF9522F
-	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 10:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593CF22154B
+	for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 10:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757499375; cv=none; b=gYufycl9lgyW61F4DAvaAeo7FgTkOhFJYdvS2yKhPCtzffNtWvBGy/szfyoBQ+nPAKVxl35jAhhy2Irb9LkItm8Vr8GXe0SBQCytG44KVsWqvR1zNA9uDUgiSPNcuPvBMV/ismsuJjflHlNj433KRIKOiUxu+UYwtHTrpdD83J0=
+	t=1757499510; cv=none; b=sYYGxlY1OsIt6PoWOln+5EfnAxur+TcvvJTtZkb2IKEj1VHEwOdIRZY1vt6HnnWfL1ytxs0XRoRNtJmVsv8NOSmUYXqMOrHSH2eaFf0rWzI/Z8P4oLVR04GU2xVDbPmFrOYrDUzPF5XH4Rd7tJjhV+DFfdVEFgcQEqvjliVnQfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757499375; c=relaxed/simple;
-	bh=kb7vKOojxxGWsHeQkcm6xWQORB5xje5KWUsDsvD2T8s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=csps0eObkAhmpiJL99hDoBlqokzBDJ2hUEcIrmxmdEM34scTRdOGeoLf65K6Ip8Ae8jGSNUEVkyy9qBRWd+omPDmljXzTLq9wKFddJBvZ9u/bnowH2d+vSUvxvVUH3UJcIMzShM32bnCQZNEFJv+BKkUOjwuvwR/t0iDir8Yasc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vvyC8Crl; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4b5ed9d7e96so4527121cf.0
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 03:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757499373; x=1758104173; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kb7vKOojxxGWsHeQkcm6xWQORB5xje5KWUsDsvD2T8s=;
-        b=vvyC8CrlOMFoX01xgFgnVj4ck+fFkKETK9xr2tEI6oT0JriR9dB+eFZLQrAIAX/6Mv
-         GRPxIhxCX55IbiNlsH8a8ZIErMoA6M1NUWEqdvPuvC+8zFC/Ypa2jMoclw3UfGRA/+Hm
-         1Nv93yz6inSTC9Qvqy2M5xRH5svKULEMbxHyaeTIvALo7S5kUsNVOK5KqPr7o17XAe50
-         zZONv5UIsq2kKqIHlpC3Jyw0Ktls4QfGpasnjTuViyWXGhDd9GNNde+u+p+FbAEcjdxw
-         GonugmdqNx8ggT8BNnpd9ffRwCqJgm7Fa33+Zz4+v2pJGn1d4xn8Lorye+3L2P3pTbZl
-         WaMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757499373; x=1758104173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kb7vKOojxxGWsHeQkcm6xWQORB5xje5KWUsDsvD2T8s=;
-        b=w12j0HxUhF9Jy/JXAV7HF5SHvGRy1GMQLUHlAHoAY/+I7i2wA9Y1dZySRqgpXGEB23
-         dJ2SQsqH8vQWmgTPpxeVYupKG9MF7DJ3sJEII5KEP0Gs+conW3NMufXilZl+tAEe9Pmp
-         kTcP7g6z6/Vzc7q55Gxj0g6XKT4jsuYWMGhhMFKydqZry0/zPLGQ4a8y7ZbAUIybCVW7
-         J8yXbrw2cJ++vaHGUPvOehOmkIGBNLfomhxLLrEUeYDC81tGXfUZKEar/Z9rrmQ1hqn1
-         VOcr7rZ4dRpitVzPCzzI1o396H0Zyehdjb2gdZXFDZtHwlMR77AN/i4rD3JkMGWdHK3n
-         At4w==
-X-Forwarded-Encrypted: i=1; AJvYcCWGIPRvke1pk1x1o/359jrXtmzodp1v6i20QyzltaPBLBfVWGypdfl/HlBiSbbvYWIdfzeOdbE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yznb1/jqso/bQ0IMYFehQUJRIh4LwZySDXLyINu+ZCJUcY1V6dT
-	+fCCSnMB0LF/3UjnbdN3NBU9s2DGUwq/lGYybBLk4tTrUe+ApXakJJy5ZaXAjc0Yrxot8VC3sMp
-	e3CeSQXHpIOCHfTMqwZtUmSQSFYrx5haGYDX0Eq/HSjooo9wuH1L0P0og
-X-Gm-Gg: ASbGncvy+kIxOLk5mvZ5nB8kaF9lotMy4ou63ILw2ijOflAMuSXL8WJDFmcL5HYUQDT
-	ZHlbRygSa/WF+WHQ5V5je7eTSbSPeHsjiOmtprMQ7BesV9CH+9ZlyKPTk3QIY9ZVu9cYqAwuix8
-	8NnZfWQU18uEq1omoe8SlZvuM8m2BeKnJs9eZATx/scSK4FavBfN6yz3zzQlTzpSuDiSFJL2MOo
-	sUhAtR+jtYhT5/B2b/k/aiQ5Q471puao+Q=
-X-Google-Smtp-Source: AGHT+IH1OTBf4ex6AupVqKl3LEDyp5+AYZQHxuptjMpumk6G61pi0WnLzbpdjWtaEe59MxWslLAVcGyidtWsBAK057w=
-X-Received: by 2002:a05:622a:593:b0:4b4:8ea6:b989 with SMTP id
- d75a77b69052e-4b5e7cd607dmr227030211cf.2.1757499372444; Wed, 10 Sep 2025
- 03:16:12 -0700 (PDT)
+	s=arc-20240116; t=1757499510; c=relaxed/simple;
+	bh=pUSy8i4pFmy/zmoPlHaRlnvRxhJ+o6yafXGacXCrSR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mXjeTntbt0q2pF9OU0Eb1OTYLg0J3a9hYhzZuB+4NM8aceJ9fKAD0B/CxL5UK4kKpwHLyj6A/610xBYnjAPKNVcrT/BNL8w5Fi9aNOhYIFgC2zntg/8Tbi6jUiVjpFQC2D8ZHujFrzqBZyR/QawCdIYUbcb9J3/a+i41hb8Mz0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=IuaQ81rh; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=CJ+M
+	D8YzeVsq/xpythvaTyAC3To5rI+Xi9AsTN9btYs=; b=IuaQ81rh38h2Hl5RmHHZ
+	HreEBySZKc64Tx3kWScdd4W+X1gxzg4yX7ltplUwcpdet6/Zo/PrN0BZN+liaLtw
+	yHTFYVWZ3dL9KbRWQC2Hpn/Tr1Z1hT3CtK6aszZDsQ6KZhcmnVgHfMjLTjGeCJQa
+	Xjum2EGZvlYQMXcw4WwM7d1Shb/K/kOpTKSe65301aecgeGDvwZo5TUxQ0QhSw/f
+	pwyqbTt21um0+Cn5/acCnayOTgOHS1q6vJVKrKMcDrbOxG9r7rncgcwyu61ybrtM
+	5cp6TqGi6wt5BHNISeWa3J6NJxAl+GRf8zF6AshyknBKbsWa9NkiUEW2LlB+2tlL
+	qg==
+Received: (qmail 560856 invoked from network); 10 Sep 2025 12:18:17 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 10 Sep 2025 12:18:17 +0200
+X-UD-Smtp-Session: l3s3148p1@9BtAvW8+QJ8ujnuV
+Date: Wed, 10 Sep 2025 12:18:17 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v2 0/9] Add PCS support for Renesas RZ/{T2H,N2H}
+ SoCs
+Message-ID: <aMFQaQhn2So3T_oi@ninjato>
+References: <20250904114204.4148520-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <aLwm2fbi3acKlIgH@ninjato>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <DU0PR07MB91623D4146367CDEABC5E381F80EA@DU0PR07MB9162.eurprd07.prod.outlook.com>
-In-Reply-To: <DU0PR07MB91623D4146367CDEABC5E381F80EA@DU0PR07MB9162.eurprd07.prod.outlook.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 10 Sep 2025 03:16:01 -0700
-X-Gm-Features: Ac12FXxJ4NOa44EGpH7C4--CH6ky-ulSu-6BaeXZ7OO145U9Zwkrpg65p73sLio
-Message-ID: <CANn89iKy+jvfifGQX8EBomWmhzQnn7j7q39uqd23NX0vvk1nFQ@mail.gmail.com>
-Subject: Re: TCP connection/socket gets stuck - Customer requests are dropped
- with SocketTimeoutException
-To: Ramakant Badolia <Ramakant.Badolia@tomtom.com>
-Cc: "ncardwell@google.com" <ncardwell@google.com>, "kuniyu@google.com" <kuniyu@google.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Ozan Sengul <Ozan.Sengul@tomtom.com>, 
-	Raja Sekhar Pula Venkata <RAJASEKHAR.PULAVENKATA@tomtom.com>, 
-	Jean-Christophe Duberga <Jean-Christophe.Duberga@tomtom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tJk4KSjWRS5EPtob"
+Content-Disposition: inline
+In-Reply-To: <aLwm2fbi3acKlIgH@ninjato>
+
+
+--tJk4KSjWRS5EPtob
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 10, 2025 at 1:49=E2=80=AFAM Ramakant Badolia
-<Ramakant.Badolia@tomtom.com> wrote:
->
-> Hi Linux TCP Maintainers,
->
-> I am writing to get insight on this bug report - https://bugzilla.kernel.=
-org/show_bug.cgi?id=3D219221
-> Unfortunately, we at TomTom have also been stuck with this issue for the =
-last two months and our customer requests are getting dropped intermittentl=
-y several times a day.
->
-> Currently we are using Linux version 5.14.0-570.37.1.el9_6.x86_64 which i=
-s causing this issue.
->
-> As reported in https://bugzilla.kernel.org/show_bug.cgi?id=3D219221, we d=
-on't have possibility to rollback to previous working version.
->
-> I want to check if you acknowledged this bug and what solution was provid=
-ed? Which version should we switch to in order to have this fixed?
->
+On Sat, Sep 06, 2025 at 02:19:37PM +0200, Wolfram Sang wrote:
+>=20
+> > This series aims to add PCS support for the Renesas RZ/T2H and RZ/N2H S=
+oCs
+> > These SoCs include a MII converter (MIIC) that converts MII to RMII/RGM=
+II
+> > or can be set in pass-through mode for MII similar to the RZ/N1 SoC. The
+> > MIIC is used in conjunction with the Ethernet switch (ETHSW) available =
+on
+> > these SoCs.
+> >=20
+> > v1->v2:
+> > - Dropped regx in title and description in patch 1/9.
+> > - As done for other IPs used T2H compatible as a fallback for N2H.
+> > - Renamed pcs-rzt2h-miic.h -> renesas,r9a09g077-pcs-miic.h
+> > - Added matrix table in the new header file.
+> > - Corrected the resets check for RZ/N1.
+> > - Updated the commit message in patch 1/9.
+> > - Dropped regx in config description in patch 9/9.
+> > - Dropped patch "net: pcs: rzn1-miic: Add PCS validate callback
+> >   for RZ/T2H MIIC" is this already taken care in commit 508df2de7b3e
+> >   as pointed by Russell King.
+>=20
+> I plan to test this series on RZ/N1D next week, hopefully on Monday.
 
-No idea. This might be a question for Redhat support ?
+No regressions found when using the 5 ethernet ports on the RZ/N1D
+board. For this series:
 
-I do not think you shared a pcap with us ?
-
-Make sure to not force too small SO_RCVBUF values, because too small
-values are not very well supported.
-
-Even if we 'fixed' linux, performance would be extremely bad.
-
-This is a random guess, based on the known 'issues' some folks have
-with 'TCP stack'
+Tested-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
 
-> Best Regards,
-> Ramakant Badolia / Engineer IV - Software / PU Traffic and Travel Informa=
-tion (TTI) / Perseus Team / +49 (0) 1793792612 mobile / ramakant.badolia@to=
-mtom.com / www.tomtom.com
+--tJk4KSjWRS5EPtob
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmjBUGUACgkQFA3kzBSg
+KbbzQRAAjVPcydjLGZs63Ha5mu3EK9/MgZpkIQZRY6lbCXwg/dTSQ/7Hy/pgOKW6
+y/r5g6yBPLQ8KiEYovrZ9Y8aHI6tXSJuRzsQ48M5Tp4EzsJm+tGv4epWqdKAa60x
+ZGpI8vytpoDOk1DlGZqQn9lyWdlHGZWcqgap9X/DRUGv10y5UEZQyrbPgr+I1QO9
+agcr1KnKytg4pgZdgmD2TA3iN8uVYsKOfH6sS2SCBNlLhjZkH9zX+pgSyWmQ54BZ
+9tqKqo3aTmk5XjEl4zaS6rcmE9zZOQ3KPjH7fCzNc9Wxzx9eYg/Pg4tLKrFv45aE
+cH9ZSvPx2aIrEqNhCQsJjpA8RLd7fCH/Xzii+F840BSsNtZxbjdxSwxTfx0KMcJi
+fuMEtKgwVU5txq3/EHdbk4v59FbN1DBNIkf895jpdv9oc1uINMV4HC2PX1kzue0M
+fsWuHtI/4O6AGRw9ZjsI2+d69sCBWL0cFtsl9sgiVVO+NzI3oI3NRSwvBexoYG7z
+jVb09ngzJdaV+Ho1xXGHQYxfbPxSV27zNjW5V0UlyUB9lhZlVPtuNp3vFyWHjoN3
+ITnCNp7KmKgzJzWT9eMvlZV2tL0SGtCAZHOMlBuxVgjs4L5FtZqo6JYPiiIXZcJV
+NOHc04NgbeicnQ8ONcp9ayCkoJ2rlak7KQlwjhyByYxTT+UxGJU=
+=AHfh
+-----END PGP SIGNATURE-----
+
+--tJk4KSjWRS5EPtob--
 
