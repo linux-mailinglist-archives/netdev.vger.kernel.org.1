@@ -1,130 +1,79 @@
-Return-Path: <netdev+bounces-222105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 433A9B531F0
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:19:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A54B53201
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:23:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 897E8189AD38
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:19:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 089EE16D905
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C6D320A1B;
-	Thu, 11 Sep 2025 12:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D94320CCF;
+	Thu, 11 Sep 2025 12:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NP89TnGH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iUtj1fUd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523DA30EF88;
-	Thu, 11 Sep 2025 12:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198FF320A3D;
+	Thu, 11 Sep 2025 12:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757593174; cv=none; b=KIhWV4NIL6zUNXhO/MWlPsalkXUx6GWPMSNjQ4cSXCX3sd0s0IEXzxLV6Whj21hXHiEMlx26Hf6HvU8qIp/uaKZtV/f/FIvdokiCLEB0pRLO12noyt3PmOi1Dr5IViPytHxyT9pKxOX3+KltmlWkENvj3LUbovCkXd9EJEJE1xg=
+	t=1757593392; cv=none; b=ud5PYkuFfYhkTplwgamKrWOWP75oEYA0TBxlxw61VRRWWIFOZBLLseZEfboi9w3KeaCywFycr56tsqbbGH5rbRAGJS/+JRj1BOQOA7FCJf6fDfDRT42gZPZf+rmHGk7CR3YT2LojCxYjJn9wz16ajPP4NMXlzl6yK0/BHOsMomU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757593174; c=relaxed/simple;
-	bh=lWtR/Gen2p00VdXWiJ+YA+dkVfXa9jO+BioMxIij8wo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A5WvNilzsx/5UtUrVLM2lklaDo9UHZXuGwK7a26BnJX1JE7x7QNlZuz2gM9FqsbCn7AQgqqwiyaPMNALElsRVuSe51v578N9Vk+D4CGQde0jeb4eZwH9Z6SWGeV3Hw2vtz07GrP5dkDmmv2tEjCdwY6FOgQEbU+XzNWmA+qBiC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NP89TnGH; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b4d4881897cso437413a12.0;
-        Thu, 11 Sep 2025 05:19:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757593172; x=1758197972; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lWtR/Gen2p00VdXWiJ+YA+dkVfXa9jO+BioMxIij8wo=;
-        b=NP89TnGHAHovDQQW/cr0S8rV0HOy6XU6lONd9YtiJDh8HT3xBkFBep4taV6y/nW5I5
-         gz0gf1ViOJ3QyCGcxXAZTQ8xmXNeKa4AH9XH0AwIUUUj7+ETZqBP4IUdhVtLDvLJkJoz
-         b0AIQzOyVNLGHIyIkupTHGuChuAawTynT2RfxJXITNX7ENVy/0nvcbnfNhWSaDfxiVCV
-         w7OfkUAgOI4APGrgCSZZJqlrquqchQu8vdaohMZqlhaFFNo/fEafKqCn938BgHgI19iH
-         Cd/xEWVzZpNyAI2ncKtgJ7MMuLcpAluoce8FVzz8meRmXpTFZMYNROTYKRVM0ZHxtWuE
-         U6wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757593172; x=1758197972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lWtR/Gen2p00VdXWiJ+YA+dkVfXa9jO+BioMxIij8wo=;
-        b=Kv8qMeh5UBuso5kv7VnFEB25uuTqKMzBxBi8yWC4Pe52Ns0QSFXKMLr09tt+P3qVzD
-         nEwRp6RHuLpaEHGo5cRLackHeCb7G4NCiNcnWKVsxAd3sRroIQqUQeMikIRDZZkewGue
-         RQ8ih/JFuF5VD1M9Wad/vmjvI9YxY0JzE97ojQT3dSITZsGBtqEiq4wz18/2gvByOtlh
-         ah/j9pCYc+2MF8HleiWSpH+jfNDm/L9TN+1WrCEIXxW29IC2zbl0XippI8jchC2ks7RC
-         CQ5PvYAk8Fs3QlYzgCtGGyxP1w8U6B9Dbmfoz2ZldUwqy6Y+qVAd6TuoWdwQIl/5+lZE
-         mI1w==
-X-Forwarded-Encrypted: i=1; AJvYcCX/YJesqB9GY+RYhPxu3vFS4x85FCbmTw0ae9jJOAAmT7U4J5k96jNqQ8Ii0lgMbqiF4vsuFUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8qCG5pAYlXLhPF2+6L5YeH+RW6sX3csALNSqjW2c8Xt6jSNK6
-	I95l4yW+U9r3g+gxfqKlkfnzbU5rtDUqKcSXMR0xdOyKV/WvYNXnLpN8ssRvCK026TiE7cpKSdI
-	ULtFdDXvw8kA3XHcJHNpXH1bYoYPjPU/DJMKS
-X-Gm-Gg: ASbGncuDvpsEkdZXcOsOH5d4mFNeHDtVtupJuqbMybP4P6XQ3Nui3Nj5/5mI6rjtqGR
-	7CoggeYrJwzryFU6Fqxgr96WuRqWtpBPcKlw0wsva4e5qYIv8TWOxmJpWLHf6MO1J5k2GyKX37p
-	gssXb6vLcw2pftEfhChBKOMwqaBd5if62eFYISgfW3Wa1O3mIMUSuvW0pjmV4gUz1MU5z9EfRDE
-	D8c+4jm74EdU0UpaA==
-X-Google-Smtp-Source: AGHT+IGGuy1wVQlXKaUW3Yopk59LkHeJDzt8DEdVaN1TIufpl9eGokUpZNY3LXPrK0xJWZNsrIqtCk0NFuNS+NwRklk=
-X-Received: by 2002:a17:90b:3c85:b0:32d:dd7c:c3d8 with SMTP id
- 98e67ed59e1d1-32ddd7cc580mr1008395a91.25.1757593172462; Thu, 11 Sep 2025
- 05:19:32 -0700 (PDT)
+	s=arc-20240116; t=1757593392; c=relaxed/simple;
+	bh=R9YWyIzRE57e5iQ58DP3D1Bv44q/n3swKiLnk0qOFow=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aObcC0ver6etms8Aa5L9K8iFO/6ZL+52kUeAEqnnbuWrzDMNU3JAk3Epf71ZNIg7lNrJxfg45+Vntzedotvl1BSoXUaatMp2anUuAicn34KbtSD2SgfDQIWK10uBhSOyRR7qzEhZyZhtzLFFxTSzRu16UsueoVY66dZcZxvxsdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iUtj1fUd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Q/+TRdQQOjc8EYjaftE572NI2az6P7CG9X/fSzKljMY=; b=iUtj1fUdZYQfwG87ZFcRTVjPmu
+	pHHb7ps3QUmjzxqAUTyLpEa6bpn7lChUvw87X3534prp9QRaZIxyBq/ugdacwFslMYUYQryvTGxu1
+	uDL2ZYimDjFMfyQAYmthvKZMxE3HTeIyyOVTzy2J+6huwpf4UIxBljKVd7r7YuB0bqdQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uwgKF-0084ha-UU; Thu, 11 Sep 2025 14:22:55 +0200
+Date: Thu, 11 Sep 2025 14:22:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] net: phy: clear EEE runtime state in
+ PHY_HALTED/PHY_ERROR
+Message-ID: <b76c7f70-73b1-4d80-9e44-6305fcf0d09d@lunn.ch>
+References: <20250909131248.4148301-1-o.rempel@pengutronix.de>
+ <5078fdbe-b8ac-430a-ab5d-9fa2d493c7da@lunn.ch>
+ <aMEj8vjJY4h6kYbN@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250814132637.1659-1-stephen.smalley.work@gmail.com>
- <20250814132637.1659-2-stephen.smalley.work@gmail.com> <6cfe4uqtic6ga3ch463zflke2wp5hobd7j3r5ctyp4puwbjiet@xgi6jfi7au3c>
-In-Reply-To: <6cfe4uqtic6ga3ch463zflke2wp5hobd7j3r5ctyp4puwbjiet@xgi6jfi7au3c>
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-Date: Thu, 11 Sep 2025 08:19:20 -0400
-X-Gm-Features: Ac12FXwAiovuXwx5vA7Sdc_GZCzODjR2jcx4RP-81Fp_mXyPLTv4mjF9qkeI-BA
-Message-ID: <CAEjxPJ4FYD2zyOCiUSnOzf7eP5_aN0d86=R7scwUueyCMQzF-A@mail.gmail.com>
-Subject: Re: [PATCH v7 01/42] selinux: restore passing of selinux_state
-To: Maxwell Bland <mbland@motorola.com>
-Cc: selinux@vger.kernel.org, paul@paul-moore.com, omosnace@redhat.com, 
-	netdev@vger.kernel.org, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMEj8vjJY4h6kYbN@pengutronix.de>
 
-On Wed, Sep 10, 2025 at 7:12=E2=80=AFPM Maxwell Bland <mbland@motorola.com>=
- wrote:
->
-> On Thu, Aug 14, 2025 at 09:25:52AM -0400, Stephen Smalley wrote:
-> > This reverts commit e67b79850fcc4eb5 ("selinux: stop passing selinux_st=
-ate
-> > pointers and their offspring"). This change is necessary in order to
-> > support SELinux namespaces.
-> >
->
-> FYI, thank you for this new commit. Some "fuel for the fire":
->
-> Turns out, e67b79850fcc4eb5 makes it hard to enforce immutability on the
-> SELinux state / AVC cache from EL2, because the compiler likes to put
-> them on the same page, leading to having the hypervisor track spinlock
-> management issues, just to ensure the core selinux state remains
-> unmodified.
->
-> In the past (pre-2023/e67b79850fcc4eb5), it was possible to set the avc
-> cache onto a separate page from the other critical selinux_state data
-> during early boot, and it looks like this *may* restore that.
->
-> As you likely know, the issue is without EL2 enforcement of immutability
-> on the selinux_state page it is possible to just flip the enforcing bit
-> via EL1 write-gadget. It may also be possible to address this whole
-> issue using ARM MTE or something else.
+> As a follow-up I would propose a separate patch which clears additional
+> link-resolved state when the PHY enters HALTED, for example:
 
-The reason for e67b79850fcc4eb5 ("selinux: stop passing selinux_state
-pointers and their offspring") was that Linus was unhappy with the
-extra argument passing throughout the SELinux functions for the global
-selinux_state.
-Until/unless we merge my SELinux namespace series (of which this is
-merely the first in the series), we don't have a compelling reason to
-restore the passing of the selinux_state.
-That said, placing selinux_state on a separate page from the AVC cache
-should be doable via a separate patch independent of the SELinux
-namespace series itself, so you could always submit a patch to do
-exactly that.
+This is good. Maybe mention in the commit message there will be a
+follow up for other state variables.
+
+Thanks
+	Andrew
 
