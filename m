@@ -1,115 +1,176 @@
-Return-Path: <netdev+bounces-222014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511E6B52B23
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:05:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63901B52BA6
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 663BC1C20F68
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:06:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 111813ABE59
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28B72D3723;
-	Thu, 11 Sep 2025 08:05:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF882E1C61;
+	Thu, 11 Sep 2025 08:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eykry1+l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="yg9H/dvZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002322D29D0;
-	Thu, 11 Sep 2025 08:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53022E0922;
+	Thu, 11 Sep 2025 08:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757577933; cv=none; b=bEpMPTtqiqWsR18jeQr4g3LqeOzgZgwkoNBXOvFCXFajNuoWvM90bf8D0Kmv0BcmqiIOfGtPEljmN/kI/ET5nlpRqiSFOuT5quTxeS2b3ARCWrt58wgRsdoBfMMPx0kz2X+CVrXSXfkRazYkVHjH+rRcl01BPokMi9L5JHZnFuc=
+	t=1757579407; cv=none; b=fmvYAWFZEi0eOfIh09X7pj/1MXHqXuq0O+0w0sL/a2D2ZWNvGCaPebhBCIRLx+4BmIcrbjQh9VSdhC8vytT2e+rmL6zp/NoSVetVfGS4Qwsfk6j+1ztrrgqB72tbIgDzsiYMMTgTsgw4IfDEDH7hVdMn7hvwFPAt7yKQEjYUP6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757577933; c=relaxed/simple;
-	bh=kyEZTSyTVT22OnQt8GD5B8uSiBJmJtF2ytLQyJXbi8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XilmAt33CHtOjwjtwdBpOtPpUpylg/oI1k5Pe5G2WPSGteog7SdNkJa5fmuPOJWpqooYXfzIZTlpKXilRVxd3mTkjxiOsJqUCZW2hm2R00vqa+uHqtbsQ26ydKXwtJqjAPM1+l8aW4tngygyU8jmDIeHdhEBm85tZ8YdWkZEWlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eykry1+l; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45b9814efbcso9320595e9.0;
-        Thu, 11 Sep 2025 01:05:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757577930; x=1758182730; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WILfbNWCo4ARUml9R1JlxJoUwAPnqw4NB8gmHT/M6qY=;
-        b=eykry1+lrwbI2HbdlCpkQjGooFfiE0WiogxB8hulMIk3iR6AIXJ47uJeDFPIMDDv8i
-         E0zYnmLAzWAsDHyKii855aL4GtMzdJ8cULUp3+QGK6lNyf9E1b+p9fPoL5I2O8mTaqeI
-         ehTOho0xJyjwU744DtAdzxIh5dtS7d7ehO0jtEwf/JPUbKOBqRq/lNzprXEXij4pxzqM
-         aiLGY7I3oAGEPCm0otDJWIuoA+H9nFQAtCKD1rtrhqAKbn9QY12hxdl52TzGGl6uXYId
-         jDX4zNB56QPi5umdlwRvGVW5zvtAZRNR8nFcZpPH6MiOk9JRh9uyi1nsFAmx6xLBnKPO
-         zvkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757577930; x=1758182730;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WILfbNWCo4ARUml9R1JlxJoUwAPnqw4NB8gmHT/M6qY=;
-        b=w5lzcfPaZt5GFt/Fd2UTkYpUd26ZXSg+lISm66XNvFFk5QSLOSVNZDmiMb3CZcaezE
-         wQCyGiK4VjIBFf1UK5rmw1LStXQ8UaFhOA4oyBlfLfAfLFBptoewkD0PKAFtX2U8yTdh
-         wV0L5MXdjsgR4el54lHmDNL+aw0vKDKw+UNZBGHDO0OqWKI3hJ0Jlm+PYzwWKffhIjvQ
-         m8K8A/rHnggfhYt4IAz2gu5FzYpHuCGY0OYP7ZerJXbFBq+fBQZ43nCjVoO206KlURW4
-         wFJIWcIzDJZRqL+S/WKpMaoYYq1/1ij7s/lEIZjDJCdWu6tpjWEs8HbuKh+/FvVrLYGq
-         g7QA==
-X-Forwarded-Encrypted: i=1; AJvYcCW08nSJCo+tms9l/I4KqLAHEzNSkjpjT/swecsKNE/4tEPTPbeUf6gx62oY4OC+k8AagFDnvmY0@vger.kernel.org, AJvYcCWcqeK8xuNmI8zWVAPLIT+46tQJo2hCaAvhT5PXx+P1btdkndfiuIGgxZcBx0PmcFYhzLm3cvvN5wYkIXM=@vger.kernel.org, AJvYcCX7iuY4UItFIrAZAyaXuWMZggJusjJvVf8fXOGT++AIojhor7lo/Hcj5D9kaRptIitfzeawbP87uMmk41rvtUx4@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiJgU6+EhH8yurMHHWv+4gyXLnpKyKE2/MSAn4G184f4VR/j9r
-	aGombQ5WZPWjZtN5LHunp2/kyJUn1GcopHoEUrQt6Mjvyn5CYQ06o4Nc
-X-Gm-Gg: ASbGncu0vr2vKw1Azub2n9QBMozypaZdQTvpOuGy3w/OJVwvpg9qbu/t60cKRoqrVuk
-	8/S8AyWsx6WaB7+HoPFloPMH4XHaO5M0UwOKg0nan3W3ipxHURoiiXHL9uiWb7fuvYDpyMVwdPY
-	2Q1TkexKIuzA/uHPSbR5BXXP/5KmStMcdOy7/wKTxJId3eYoiJJZmzmwxmqTDFKA1D5VTF8XZMn
-	PCNnKAdJyVjDIN0WDCH4rKTDuYFcsR0v3GFx0VhO6NjLCVShGVnajWd6jOP1M4cu48NpdL4kHzk
-	GfeIXQXWNSMDoC9k4Pv8eD0qx5EzVg6W7ZaPOqe7GaCsPiA3C1FyAbeWwF5jUn2rg/t2BpLBhH7
-	KzzK1Q3se3q8azPbYQwo=
-X-Google-Smtp-Source: AGHT+IGgAGUcNXjgllFkYVY1TZbEoX/w4+CCWy19jehwdaJkLLJthfSn7prFns29wdUb+u9szALQ7Q==
-X-Received: by 2002:a05:600c:c0cd:b0:45c:b5c3:ea37 with SMTP id 5b1f17b1804b1-45dfd5e3d97mr17699455e9.11.1757577930042;
-        Thu, 11 Sep 2025 01:05:30 -0700 (PDT)
-Received: from archlinux ([143.58.192.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0152ffc1sm9246035e9.3.2025.09.11.01.05.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 01:05:29 -0700 (PDT)
-Date: Thu, 11 Sep 2025 09:05:27 +0100
-From: Andre Carvalho <asantostc@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 4/5] netconsole: resume previously deactivated
- target
-Message-ID: <nvbscfpi75on4pkv5niyzxkheobyxqofju7lr5a6kfywssgedj@tn4cgo4zj3qc>
-References: <20250909-netcons-retrigger-v1-0-3aea904926cf@gmail.com>
- <20250909-netcons-retrigger-v1-4-3aea904926cf@gmail.com>
- <jcvsmfivr27bchhk2t2lt2l35ixjs2adaos6hqwfydpulq7gxm@5aprxim4vvoa>
+	s=arc-20240116; t=1757579407; c=relaxed/simple;
+	bh=6yQW0ml2hneuegSu/DND2ZHAHnDbMIQgiFkYLrD8ZzY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=TFWbiZM69Y1ag4E2gPINE18MvypTyblSBbiiootDadJFP8l4i6HyX/fZYdQ0BpR16GBKXw918fK9vVdlwqRtQn+pb7frYmlNxRagAOKt2rBf6pXKoqWD0e62azrMSf81pln4lOV3UEwPXWcL+n3FNur3JqiDrCwTyOdpYMgxLGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=yg9H/dvZ; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=3X9+A0P0F92W8xd1mm/wdAzjQD7bN49SA+/OJzzCmm4=; b=yg9H/dvZuy+suCTZ203CdRADS7
+	nNXV+ibyvDbulq170sSwsMU8++kmF/wux1Q5JpPvos3Ant6WGGswNDj9aslDfRfJsKO0B8TM6gWTE
+	PaYSbEw+R25eXbHqUitRQ6mUsmfsl89NaJkf9F0sKnxM9SCGsbS6ftGp8nwgUJZTnDla4+wI/iXUk
+	pQWFiiUN9RyvXuHp3a5XKYhPdUuJ5qZTmlKihwZMU9tpPbe46RvjKzr/rDlPYGXTHxJ0mupfiyKoV
+	etE7LkMzSBDcA3tzaSX4pJ19FmYyT7sboWO0MrXhD474LW4O7edyl0xL+xNej0n0gLMKJxTazG2Y9
+	6+nZE4Kw==;
+Received: from [122.175.9.182] (port=33004 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1uwcPk-000000015ts-2XgD;
+	Thu, 11 Sep 2025 04:12:21 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 526AB1781F05;
+	Thu, 11 Sep 2025 13:42:14 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 2754D17840BC;
+	Thu, 11 Sep 2025 13:42:14 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id N5Rg2jz0nb_G; Thu, 11 Sep 2025 13:42:14 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id C74831781F05;
+	Thu, 11 Sep 2025 13:42:13 +0530 (IST)
+Date: Thu, 11 Sep 2025 13:42:13 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: kuba <kuba@kernel.org>
+Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	pabeni <pabeni@redhat.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	ssantosh <ssantosh@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	m-malladi <m-malladi@ti.com>, s hauer <s.hauer@pengutronix.de>, 
+	afd <afd@ti.com>, 
+	michal swiatkowski <michal.swiatkowski@linux.intel.com>, 
+	jacob e keller <jacob.e.keller@intel.com>, horms <horms@kernel.org>, 
+	johan <johan@kernel.org>, ALOK TIWARI <alok.a.tiwari@oracle.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, s-anna <s-anna@ti.com>, 
+	glaroque <glaroque@baylibre.com>, 
+	saikrishnag <saikrishnag@marvell.com>, 
+	kory maincent <kory.maincent@bootlin.com>, 
+	diogo ivo <diogo.ivo@siemens.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	basharath <basharath@couthit.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <1472700459.335961.1757578333581.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20250908133019.44602174@kernel.org>
+References: <20250904101729.693330-1-parvathi@couthit.com> <20250905183151.6a0d832a@kernel.org> <974157264.314549.1757343020136.JavaMail.zimbra@couthit.local> <20250908133019.44602174@kernel.org>
+Subject: Re: [PATCH net-next v15 0/5] PRU-ICSSM Ethernet Driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <jcvsmfivr27bchhk2t2lt2l35ixjs2adaos6hqwfydpulq7gxm@5aprxim4vvoa>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
+Thread-Topic: PRU-ICSSM Ethernet Driver
+Thread-Index: /Xec1/3639+TyIC3wc37Kq4oOeNPjg==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Wed, Sep 10, 2025 at 12:50:07PM -0700, Breno Leitao wrote:
-> > +		if (nt->state == STATE_DEACTIVATED && event == NETDEV_UP)  {
-> > +			if (!strncmp(nt->np.dev_name, dev->name, IFNAMSIZ))
+Hi,
+
+> On Mon, 8 Sep 2025 20:20:20 +0530 (IST) Parvathi Pudi wrote:
+>> > On Thu,  4 Sep 2025 15:45:37 +0530 Parvathi Pudi wrote:
+>> >> The Programmable Real-Time Unit Industrial Communication Sub-system (PRU-ICSS)
+>> >> is available on the TI SOCs in two flavors: Gigabit ICSS (ICSSG) and the older
+>> >> Megabit ICSS (ICSSM).
+>> > 
+>> > Looks like the new code is not covered by the existing MAINTAINERS
+>> > entries. Who is expected to be maintaining the new driver?
+>> > Please consult:
+>> > https://docs.kernel.org/next/maintainer/feature-and-driver-maintainers.html
+>> 
+>> We will update the MAINTAINERS information in a separate patch to
+>> this series and share the next version soon.
 > 
-> Don't you need to check for dev_mac here as well?
+> I wasn't asking if you can update the MAINTAINERS, I was asking what
+> you will update it with. Since that's still not clear I'm dropping
+> the series from pw, please repost with the MAINTAINERS entry included.
 
-I believe so. Will fix that and try to cover this case on the selftest too.
+The new entry for the ICSSM Ethernet driver will be added immediately
+after the existing ICSSG driver section.
 
-> > +				schedule_work(&nt->resume_wq);
-> 
-> I would prefer to have the enablement done inline here, instead of
-> scheduling a task.
+We will update the MAINTAINERS file with the change shown below.
 
-That makes sense. I believe I'll need an alternative to netpoll_setup that can be 
-called with rtnl already held. I'll attempt to do this for v2.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b81595e9ea95..c7f04ff96cf0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -25320,6 +25320,18 @@ S:     Maintained
+ F:     Documentation/devicetree/bindings/net/ti,icss*.yaml
+ F:     drivers/net/ethernet/ti/icssg/*
 
-Thanks for the review!
++TI ICSSM ETHERNET DRIVER (ICSSM)
++M:     MD Danish Anwar <danishanwar@ti.com>
++M:     Parvathi Pudi <parvathi@couthit.com>
++R:     Roger Quadros <rogerq@kernel.org>
++R:     Mohan Reddy Putluru <pmohan@couthit.com>
++L:     linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
++L:     netdev@vger.kernel.org
++S:     Maintained
++F:     Documentation/devicetree/bindings/net/ti,icssm*.yaml
++F:     Documentation/devicetree/bindings/net/ti,pruss-ecap.yaml
++F:     drivers/net/ethernet/ti/icssm/*
++
+ TI J721E CSI2RX DRIVER
+ M:     Jai Luthra <jai.luthra@linux.dev>
+ L:     linux-media@vger.kernel.org
+--
+
+
+Thanks and Regards,
+Parvathi.
 
