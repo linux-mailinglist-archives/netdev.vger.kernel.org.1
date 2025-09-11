@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-222228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8915BB539C8
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:59:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB105B539CA
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:59:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 239EA4822F8
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:59:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90A0B3BD74E
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E0235FC35;
-	Thu, 11 Sep 2025 16:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A1B35E4E0;
+	Thu, 11 Sep 2025 16:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZmEsSBUe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aKZd0UQw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4799235FC29;
-	Thu, 11 Sep 2025 16:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D6E1DB15F
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 16:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757609954; cv=none; b=IMw0Zo51rWMxDs8ICkRu/xVHmPq5PQBR56HofRkE5VmSy3clyRSkiTqmMNC/mliw76PGmO+ssfzDiJccJXQQmq8qPnEn4kQRLHTB9BOQE20pOmJrAH8mGTeUamQGC/AOfuEjVZoLWHI1n0Smnypq7aV6VWEQH2Gt3cALr1m0KHA=
+	t=1757609989; cv=none; b=a9BMQteCdoM5OUbsC4TGp4OwOwI5pcra3ROV8WL9gi04OaH6jyMr4Up/V5DYoCpOZmxBrstLE2TDNpZ+k6PibXXEsYGYZBPT5XDaBSZUY//YxyeMefRR3KCg7xfCpa6JFv7zeMGelch4q3789w+epWDZ9tBo+REv88/fmKs+GoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757609954; c=relaxed/simple;
-	bh=Xlc6koJ0vm41M4SAUwgaUOtl1XLT+vpjoBqnu6zMYUM=;
+	s=arc-20240116; t=1757609989; c=relaxed/simple;
+	bh=U7lJXsFXmzIz29TkAgpeCxS4BaB5iQ4a7LrHxfGcG9g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CZcORU9wxM6NW7Lhf7LR+11qUKZGHhcxu/z4u9HIb7UivLyb+w6ybda/V0WQ8g0WKKrdWe61vPZ8iBxVJK56TQt+y1F96pnU4zXf/z5UXaS0qWgwM8ujtrW8baDgLhnKx/DRDleX4EnJBP1L6aH1Yengc+FNW4OSS6fpZ+CcjUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZmEsSBUe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E585FC4CEF5;
-	Thu, 11 Sep 2025 16:59:11 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=eF3VzVwpFKCzwfTGm4yc4hZmieezT8GXlkOvn6VL1bweh66Ut6P1qdujcFgk3MCLCydXfSmnUcBgTIaC2hdpP0gcU+B1hOomUk1sb+ct9veskscsDdi5enwodt21+ZlY5VZVG3UOUPmYsTVdsKYGcr9z33jJ5RhKnbIrH5iIvrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aKZd0UQw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C43BDC4CEF0;
+	Thu, 11 Sep 2025 16:59:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757609954;
-	bh=Xlc6koJ0vm41M4SAUwgaUOtl1XLT+vpjoBqnu6zMYUM=;
+	s=k20201202; t=1757609989;
+	bh=U7lJXsFXmzIz29TkAgpeCxS4BaB5iQ4a7LrHxfGcG9g=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZmEsSBUe46oKNFLs1zZshCDORSXi/vmIA/olocQ/bs1EL0jdPhHubpF9/o5rsmBiQ
-	 qcAMn0p6sYL3ASP57egXTeRsBLyv5tXq8CaQ63dmYuSRhmcO+8UfEhahaJ9iN20Zgn
-	 yY7EvHXs4XrNDI4p13gRncZLx/bGnHw/rmm/18FRpOWtlqUXQDELkz6Q5afLcl7UnE
-	 UfVHJyp5DHvPh3Rk26y+2UMb0zSFm6/gDRB7dh+MtqA/AehTkAGeqv1Kn16ztaHU6c
-	 b52mxvx24QaDyqGlYtp7W/lm/hg+3NLy0zxA1leuOfHbIB6rzuGqFDWNqWZPk3hENk
-	 xlB2sGAM2fLHg==
-Message-ID: <a1f55940-7115-4650-835c-2f1138c5eaa4@kernel.org>
-Date: Thu, 11 Sep 2025 18:59:08 +0200
+	b=aKZd0UQwccHeBDJ04YR/MKZhxicE3iTcGn1WiLekskL2mD5Cwxg0XUG/5CVDtJnhX
+	 jpY5+wHgiGBOaisjAKBiKYU22xJs4y/u4i1eel40FtnUBmGD7cMYVY3hImFhFooMxl
+	 dBw6iOrpqgXR2iKqVdCJlEhP/bECpPIqtxsKstauduXtzPeoBkSKztQfEe7/CuUFI2
+	 6NgVXdTDlJvXV8zoODTpJJM5JAAZJWoFBwGg0t/uF8e1XXl5VnEF4FBvA5a0cFDDp1
+	 o/jt4Ge2qpBwflQiaw5T0TvnTDSrKGcsLzP8a9hSniObRw6QtrupKTRrA3J8ZoP0yN
+	 XcuY2Z2Ma0JUg==
+Message-ID: <e38edeb6-ef11-4dc9-b768-4ac90ee524ab@kernel.org>
+Date: Thu, 11 Sep 2025 18:59:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,16 +50,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] tools: ynl: rst: display attribute-set doc
+Subject: Re: [PATCH v1 net 8/8] mptcp: Use sk_dst_dev_rcu() in
+ mptcp_active_enable().
 Content-Language: en-GB, fr-BE
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-doc@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250910-net-next-ynl-attr-doc-rst-v1-1-0bbc77816174@kernel.org>
- <m2v7lpuv2w.fsf@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20250911030620.1284754-1-kuniyu@google.com>
+ <20250911030620.1284754-9-kuniyu@google.com>
+ <e4e2a47d-f653-43a3-86ab-f958264449ad@kernel.org>
+ <CAAVpQUAvDQdodvheTKmRE6HiaBLHELpyc3jfbHPvxFiJ7jE9mg@mail.gmail.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -105,63 +108,38 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <m2v7lpuv2w.fsf@gmail.com>
+In-Reply-To: <CAAVpQUAvDQdodvheTKmRE6HiaBLHELpyc3jfbHPvxFiJ7jE9mg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Donald,
-
-On 11/09/2025 12:44, Donald Hunter wrote:
-> "Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
-> 
->> Some attribute-set have a documentation (doc:), but it was not displayed
->> in the RST / HTML version. Such field can be found in ethtool, netdev,
->> tcp_metrics and team YAML files.
+On 11/09/2025 18:58, Kuniyuki Iwashima wrote:
+> On Thu, Sep 11, 2025 at 1:48 AM Matthieu Baerts <matttbe@kernel.org> wrote:
 >>
->> Only the 'name' and 'attributes' fields from an 'attribute-set' section
->> were parsed. Now the content of the 'doc' field, if available, is added
->> as a new paragraph before listing each attribute. This is similar to
->> what is done when parsing the 'operations'.
+>> Hi Kuniyuki,
+>>
+>> On 11/09/2025 05:05, Kuniyuki Iwashima wrote:
+>>> mptcp_active_enable() is called from subflow_finish_connect(),
+>>> which is icsk->icsk_af_ops->sk_rx_dst_set() and it's not always
+>>> under RCU.
+>>>
+>>> Using sk_dst_get(sk)->dev could trigger UAF.
+>>>
+>>> Also, mptcp_active_enable() forgot dst_release().
+>>
+>> Oops! Good catch!
+>>
+>>> Let's use sk_dst_dev_rcu().
+>>
+>> Thank you! The patch looks good to me, but I also read Eric's replies.
+>>
+>> If the patches are sent to net-next, will they still have the 'Fixes'
+>> tag? If not (but I guess they will), could we have at least have a
+>> dedicated patch to add the missing 'dst_release()' please?
 > 
-> This fix looks good, but exposes the same issue with the team
-> attribute-set in team.yaml.
+> Sure, I'll split the patch into two and keep Fixes: for the
+> dst_release() one.
 
-Good catch! I forgot to check why the output was like that before
-sending this patch.
-
-> The following patch is sufficient to generate output that sphinx doesn't
-> mangle:
-> 
-> diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
-> index cf02d47d12a4..fae40835386c 100644
-> --- a/Documentation/netlink/specs/team.yaml
-> +++ b/Documentation/netlink/specs/team.yaml
-> @@ -25,7 +25,7 @@ definitions:
->  attribute-sets:
->    -
->      name: team
-> -    doc:
-> +    doc: |
->        The team nested layout of get/set msg looks like
->            [TEAM_ATTR_LIST_OPTION]
->                [TEAM_ATTR_ITEM_OPTION]
-Yes, that's enough to avoid the mangled output in .rst and .html files.
-
-Do you plan to send this patch, or do you prefer if I send it? As part
-of another series or do you prefer a v2?
-
-Note that a few .yaml files have the doc definition starting at the next
-line, but without this '|' at the end. It looks strange to me to have
-the string defined at the next line like that. I was thinking about
-sending patches containing modifications created by the following
-command, but I see that this way of writing the string value is valid in
-YAML.
-
-  $ git grep -l "doc:$" -- Documentation/netlink/specs | \
-        xargs sed -i 's/doc:$/doc: |/g'
-
-Except the one with "team", the other ones don't have their output
-mangled. So such modifications are probably not needed for the other ones.
+Great, thank you!
 
 Cheers,
 Matt
