@@ -1,125 +1,110 @@
-Return-Path: <netdev+bounces-222022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C59B52BFA
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:39:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D21B52C27
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1244817C31F
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:39:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 698A216F3AF
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAD32E283A;
-	Thu, 11 Sep 2025 08:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DD52E610B;
+	Thu, 11 Sep 2025 08:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9agry21"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vNKQj+MK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33162580E4
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 08:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DA8293B73;
+	Thu, 11 Sep 2025 08:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757579985; cv=none; b=pydt+HMeE6q3M0cKprS2V3+xqHai2mv+ql1UeHRd5ipYU85mh2aIFRoAqc4kz4FO16um6i+lbimxDzhqXBIMG+reWGugDeKTylKwrFuR3ywY4YqVLAGAxXhBBB9Bp7pBx+D/EcdjPCofEqhafZ72MtUThCYGWMdVhHwj4msgZmc=
+	t=1757580380; cv=none; b=NdX6u4702E7s1yiSzAMAmA8Uu8O13NFkORfHJLQEeazm+ABIVTgCkZIjDOPfqT+W1JQxPXc2oFoAMJyeYqTO9AJNlktnWKo77+BHVM8frCndUhapnXGAQe7/nednAmUiLDEOh+xp1ZJuKqK22TY0/2CjRAFqZmboPziP/sl9ioI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757579985; c=relaxed/simple;
-	bh=5fLQKzUBk6RyhfaKfLwu7XTN1/mvrV+n4NQwIOYScvA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=halPv0Qg6h7lmXKwY+VuQiePJOEeO5AkjGieCys6wNYenwJCNMnk2fDYxwhhIs0ZLuwMLeJ0nnRnj1WcSCQZJDw5P+bga+d+J0VFOTaAZXUOqBR+Pk6nMEOYnazyL6y+y/UBydHmeya0ifgWR08rpgH6I14tD8WzzPmvXHZqc0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D9agry21; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757579982;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ltet1DEkl+6/W/mA/mh0wSx+0fdNt6OLAsr0v/vtsws=;
-	b=D9agry21rsLb5H6MMgLr/H8o6H6rTaAPFYnCKJNHOFpCuSfd4X0x6zVRA2SlM1dH0EzhQ3
-	ekjmXC3B8Qbi8Tz+8KGcxs4nsuLha8GpqUdwwk5Kb4Wtj3hc0Jor0KHSrs6oK9qpXH3SGw
-	WgFJEI7UUY0yjZa7cPnTF6W1rRj9ikI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-227-FeEWFSl8NouHcdLWEaKw2g-1; Thu, 11 Sep 2025 04:39:41 -0400
-X-MC-Unique: FeEWFSl8NouHcdLWEaKw2g-1
-X-Mimecast-MFC-AGG-ID: FeEWFSl8NouHcdLWEaKw2g_1757579980
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45cb604427fso2751655e9.1
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 01:39:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757579980; x=1758184780;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ltet1DEkl+6/W/mA/mh0wSx+0fdNt6OLAsr0v/vtsws=;
-        b=ASa1SjFx0kIcDa9Lb8ozNkwcPT9Bo+bnJ/Q4pOcNWSRMXWvqYjlrySzX4X7l8NSgWV
-         9KC86uNTnEixHZY0yPGslM2w68l5uv1JLIOOVmkQB3Tp4hzgRBwgWcv6HnPvdn36leQy
-         tyj7WSYWfelGyTmeozJs1wXMVxCtI0pWTFJj8DacUAp2mpomfbQzpeRh1Gbz0JWjvLGj
-         Xz3Lc0mDqaLY18RIR5SUBw+wXyqEY0l8j2ztBOzfWM2g3pA+bPgT32wcZmSmVFhloi8U
-         +xB84Th8nYDRphnsLR5vUhqM7LnKOxhz2jhZslPEVKtIGL7IJwdoUzjq7ZQjK4/VW50I
-         pUVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ9zjpyRZvhCfVXcx+pRuomZaECMt7dR5Nikg7LJ2GjSn0qd/w3gEKJHDWWSyMcvZ6EG3gVmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfNn7eBFOfZaMmvIs9DA3/9pXiJtHz3u+wHW3QPihIfD1A3RQb
-	qGZRjFaWHyBPiKtaVRy3usBXDKYI3dO0ByywjiHZCxxFhpm7BT9lI2wYZ1/RBbAqM9dnzlW+K+U
-	1Gq2OWAiLC/nDSHkuNUTT6MrYSfHU9bmIzaKj+DALzzocdNKPYeG6qhEcEQ==
-X-Gm-Gg: ASbGnct23Ua3frgs41uaDDV17mQg7HnRr4oTGESiiuLSTO9XrlCNM1pjhLd27reWKjq
-	2pDP6scMzaIYlZF08Ba/wxWpP5KZpRfrf/Le3sus5NeL3zLb8GGvnYQ1IxaXBJ9JWMS2j4jErAY
-	bViPv3gW1wwjbos6UkiYtEoTbrV+p6c7N3tEP2SDhxBgz7Jw5iPwa5DfQevkWf0pQTp/w90CFsO
-	JwZ0Sc5g/MDQeWQSwN9RGfu9jR2t+Lr2XVoq/6x/eT6VjN5YGI1v+URfGjuGOrpGc418S9B2r8u
-	1wLQBeXRJ+VHN7Id4VvnaXOQmEeLTyyWjOiaXYTwhVA=
-X-Received: by 2002:a05:6000:1ace:b0:3e7:610b:85f6 with SMTP id ffacd0b85a97d-3e7610b8754mr1087216f8f.39.1757579980044;
-        Thu, 11 Sep 2025 01:39:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEKiL19RoayeKzPbOlZN/BIKP343mirP4w1v2R1K9mBR+ow5apdnT52wvVT2ZVXAZtbgB7Mhw==
-X-Received: by 2002:a05:6000:1ace:b0:3e7:610b:85f6 with SMTP id ffacd0b85a97d-3e7610b8754mr1087200f8f.39.1757579979640;
-        Thu, 11 Sep 2025 01:39:39 -0700 (PDT)
-Received: from [192.168.0.115] ([216.128.11.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e760776badsm1589169f8f.5.2025.09.11.01.39.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Sep 2025 01:39:38 -0700 (PDT)
-Message-ID: <8f52c5b8-bd8a-44b8-812c-4f30d50f63ff@redhat.com>
-Date: Thu, 11 Sep 2025 10:39:37 +0200
+	s=arc-20240116; t=1757580380; c=relaxed/simple;
+	bh=8Ym8Woe5hOM4hKQJ3h72aXmX/3Bn6+fBeFRICNNUriU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ip7Uw9JDujS5PFMdJW5cKMJlYR7EKRw/UFftljF1ZTupw1f6ZS9Yg82Szabb6pqMwbTm4bfaXummcNGP2xP55OkCXF1uGzfbbrXs4jaVt1x5fOTkCJu7vAw5NtUHmgGezPAf7KH7iVr9Ok8DomCqsXKqf594KqNbZFWu64Ph/dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vNKQj+MK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 036C2C4CEF1;
+	Thu, 11 Sep 2025 08:46:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757580379;
+	bh=8Ym8Woe5hOM4hKQJ3h72aXmX/3Bn6+fBeFRICNNUriU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vNKQj+MK6MwyfQZyz8HLmtdJMtrihNwJB8IJcJER62Z0upJkVALyYVyg/EmzMo3Qv
+	 LKrgFDBrxI7WF7P7641MCl/BCVewQOfkTV2tu2Ta/B2/tErQnzE4oBuAYQNcG7AB1v
+	 iscmbPGOuQZdZAHOq8v9l17HWsDu+ra93FdsKYhfF3n4JDwKVCaHzCsdIu/6rq+r+A
+	 30XXUL2Fo69ziqWdfFEmB1Mbw6+/MRfSH1wNzuM7yu/89/UWy7sEci+rD7Es/fsOzJ
+	 LpSi2sN8UMvmYx9xLjc1HucW2G755MN7KNte4DAMNXbLtzxA7EBVGLMA+2UBZeXQ5S
+	 JP9arkaqAzbzQ==
+Date: Thu, 11 Sep 2025 10:46:11 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 14/32] net: use ns_common_init()
+Message-ID: <20250911-unqualifiziert-widmen-03b0c271aa69@brauner>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-14-4dd56e7359d8@kernel.org>
+ <vgfnpdvwiji7bbg7yb5fbymp6f6q5f66rywkjyrxtdejdgoi37@ghpon5czjtkm>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v2 1/4] ethtool: add FEC bins
- histogramm report
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
- Donald Hunter <donald.hunter@gmail.com>, Carolina Jubran <cjubran@nvidia.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-References: <20250910221111.1527502-1-vadim.fedorenko@linux.dev>
- <20250910221111.1527502-2-vadim.fedorenko@linux.dev>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250910221111.1527502-2-vadim.fedorenko@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <vgfnpdvwiji7bbg7yb5fbymp6f6q5f66rywkjyrxtdejdgoi37@ghpon5czjtkm>
 
-On 9/11/25 12:11 AM, Vadim Fedorenko wrote:
-> IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
-> clarifies it a bit further. Implement reporting interface through as
-> addition to FEC stats available in ethtool.
+On Wed, Sep 10, 2025 at 05:57:52PM +0200, Jan Kara wrote:
+> On Wed 10-09-25 16:36:59, Christian Brauner wrote:
+> > Don't cargo-cult the same thing over and over.
+> > 
+> > Signed-off-by: Christian Brauner <brauner@kernel.org>
 > 
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> One comment below.
+> 
+> > @@ -812,17 +828,14 @@ static void net_ns_net_debugfs(struct net *net)
+> >  
+> >  static __net_init int net_ns_net_init(struct net *net)
+> >  {
+> > -#ifdef CONFIG_NET_NS
+> > -	net->ns.ops = &netns_operations;
+> > -#endif
+> > -	net->ns.inum = PROC_NET_INIT_INO;
+> > -	if (net != &init_net) {
+> > -		int ret = ns_alloc_inum(&net->ns);
+> > -		if (ret)
+> > -			return ret;
+> > -	}
+> > +	int ret = 0;
+> > +
+> > +	if (net == &init_net)
+> > +		net->ns.inum = PROC_NET_INIT_INO;
+> > +	else
+> > +		ret = proc_alloc_inum(&to_ns_common(net)->inum);
+> >  	net_ns_net_debugfs(net);
+> 
+> Here you're calling net_ns_net_debugfs() even if proc_alloc_inum() failed
+> which looks like a bug to me...
 
-Not really a review, but this is apparently causing self tests failures:
+Yes, good catch!
 
-https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/292661/5-stats-py/stdout
-
-and ynl build errors:
-
-https://netdev.bots.linux.dev/static/nipa/1001130/ynl/stderr
-
-/P
-
+Fyi, I have been out properly sick this week and that's why I haven't
+been very active on-list. I hope to be back in a more functional state
+tomorrow and will process the backlog.
 
