@@ -1,135 +1,157 @@
-Return-Path: <netdev+bounces-222245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7B68B53A99
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:45:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09541B53AF0
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:59:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4863E7AA006
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:44:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80ABFAA712C
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460071EBA14;
-	Thu, 11 Sep 2025 17:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBB4362985;
+	Thu, 11 Sep 2025 17:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0dhZWErX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sj6ChNil"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD6941A8F
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 17:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B7D362998
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 17:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757612736; cv=none; b=FgZX98m2YQ2ZoujIIdKbokR0mIpB2h6doTKo1TqdYfJPMTUsfRoPs5eLNJhXvEEbf6xl2A8CkpHXpNOyxGTTtrebhbiZwy9AqWwXhVXZjFEzbElVL6AQVYyWohWJip9ON95mVjzDtQuRlr4p4LGe3rvNGj9LyXGsgaW0j8CGnug=
+	t=1757613489; cv=none; b=lxl9gvorGV3kjxkg9mWH+gHMSEpiF56mjdh6w+S8wj6lNXNzFR9hAhkZyttQJ+9yTSg17QUb0/qCUuKywV4quWQb+NZ5HMVsCKyMGwoxEhPzYAuFW1u/51tiWz66jXUTNhp9D93e5xfGz9iIsOhBnbtKaZvf/RIh14ZgmeULy9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757612736; c=relaxed/simple;
-	bh=/nHpAWqYD2tKnha6x0XreH89BIrbfc21iMX6BLcP+FI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gxj6+BrkDIcSE6ATgrIRdAV7fJ/APliOOKPeE1oySuBnTdgqTcp68NKaUBK8LNaua2HiKvWtjbfDxb4r3jgmZeIoJUk7M44qWzzkhWtNJ+2W8DR9K5MlXtGFQrqntfus8/Qd1NQpoleut8haOAsgMT5fhqaQRm3Z+d01COOaAfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0dhZWErX; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-24b21006804so11074295ad.3
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:45:34 -0700 (PDT)
+	s=arc-20240116; t=1757613489; c=relaxed/simple;
+	bh=Pm9Apo4QHpXic38DAH5OGxtr6ou8VcwBJFVP53wjRfE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KhSBR4hTxRskpWxeAGxGtnp9bikCcEcQwM6tpzscEBm7RET8D1GywglCMTH+9/UawTai0VdLNotuJh/+/WNVgvXrYzFL+iWjhtkHkS7GDXCZC/XQ+p1JZ0WsnPd1oQROjvM53snL9P8aVlKWpKRS27Ewb5gYbwgF7B6jGQ0A4JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sj6ChNil; arc=none smtp.client-ip=209.85.210.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-7725147ec88so631672b3a.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:58:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757612734; x=1758217534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1757613487; x=1758218287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bIDXrbSC6UOck2vb5ofWkAL7Y5qvL0omsEwcHkXaHLY=;
-        b=0dhZWErXrJLmAOzuiVGM9yWI298wBYVstVACmzKc/pqnslK+bZgWBoI/6D+jhfepT3
-         oql+NAI4nk4A/ik4Mgw6VTWavBftISS/Tm26MpAvsM8+yEcBcuQinToLpsrjtzogWE7D
-         KcHk/RlVrKOQC0vTTsO24O9kpFAZ4YP9/E8GbSCnORKucf8XK7vpOAR2k8IsZhEAw8j9
-         P77Yubec3ih9qpaSIryCqwIExPVC+/wxP6LbyovgecJ7nQChjxb5MD1jUO9L+8UkZ9mk
-         crJ0uQYHWds7zDpjMBzOG/y5ea7dSNeSr709A/1S0JtkfPt5kKC8bI/FyprXd8hqJXkk
-         7SSg==
+        bh=Iw7YUMOBfQ9U5b9jGNBg6dyHxPq4WQMdK/IHZCbdPrk=;
+        b=Sj6ChNil8uV1gQtJZ2ETvPGy1/VD3BKPBiojbm18ihfQvKgS1H5LcakMRcVpL4+XH5
+         5uCVGRZsb78ENUdItmK1X4zj9L33Kq6hcKFq3Oz2QUZoYcpRjDBGP2hBBNqZpB26OqQn
+         Nb+7iBnZeegBpFpzxITyiasNYDKwUjyfeL1aIFTCVW1YMg7HEu0tNGcPpcTFXyECOINO
+         Ia/3LZU7Q6Jj8qAXCm6jDNu0Zlk+SayC5FUNsJBOh8RmC6JMappuY6em2ydJ+B4QDbqf
+         AaqPhi0leb5LKyCw+KCrDzQGwnJ/vaeqa54Ae4+LFVCroYtBo4YFvEKLBUzUYUOs/CyM
+         7fVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757612734; x=1758217534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1757613487; x=1758218287;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bIDXrbSC6UOck2vb5ofWkAL7Y5qvL0omsEwcHkXaHLY=;
-        b=Hbs6lTblrhTdCzqGYLvuL74bcDom7PzwoCv7MfmTxPMqBuc02Qzg9L5Ea/gF8DVt9l
-         1Suhuov99O4N4eWgLePg+jA1udM3gpTvziLsMH9m3CpI3Urr9M2tqAxUkMc1FT9FTDXz
-         jiGoZaOZoF/4r0lsNVbGg5Pjon18+WryhLeM6IgHaphlFdyiHvumra1QOD7KKuYgfy+l
-         GhaDf5Qic6fA4hOt1oarYT4t7clB5BxrLZUOb28o8FOcnnw0S7cnNYImeurvqFp/Fxqm
-         fg/il+W+qZKhl7rmaXDByK+Y6B37JuGQvrF7oAmWh6h1t5JGRZDAO8pYigpEp61SwgZm
-         Inxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZrnlP4veXNv/AIPum4NVKNuZHfsuC+XJ2M6SX5tJPG2q7PzNwj9lNiHDbWl8KoKf3zwH9apw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6EwEMnKqXIQtqEpI3txKI3mNRRSIdTwI2HmqgBuXXnhTahMTW
-	5Kw5nYMI8uCOKvH5hLo+NyaHXNNjZhPc6Q+4GzxuppInFGyNnio/ZQWuIYQDnok6eRy19TQPVF/
-	Ber4Mjro7xgMe6iWPUQqZqeh3vZaloIFh8wZX4Mae
-X-Gm-Gg: ASbGncvYkRG63dIayYwAqXB5RCjylygPxrOD7ZEljAMJR/eUh2w4aoH0nK8i+1T2UvY
-	/g0M46ktvrkstMow7rauA+G9Tx/TFaazdBfzs3kVedVVAD5ip6n6l2mBiesICmaeNPCLHtiD19/
-	UEZ/Dv0tJwPfkI4k1GaQCvP5lhgrWYRSqlBU5dyFB71UDS56T9fr6yCxxRJi5qcJXba9zROI8sO
-	sjABhRB2G0/6PC3/S8xwmvxShIXL/a8EjViF1zEaD8Y/PFgfK5RrlMCnQ==
-X-Google-Smtp-Source: AGHT+IHIn8C6lOWdI+zJlJd7pZkkHxpa2w2Svm/nZBtc24pdPe9O1TKt0+/2OUZjF7yD9ol7AbWe92PUv8sPtUKxc60=
-X-Received: by 2002:a17:902:ce92:b0:24e:81d2:cfe2 with SMTP id
- d9443c01a7336-25d23e11172mr3242085ad.7.1757612733782; Thu, 11 Sep 2025
- 10:45:33 -0700 (PDT)
+        bh=Iw7YUMOBfQ9U5b9jGNBg6dyHxPq4WQMdK/IHZCbdPrk=;
+        b=AIIfeMS1Uc5EMOl1u1ltPHNEtMKrMaXcai7a/BmyqwEzw2cM7HlcyResvDJnKAQiVY
+         QTtwjxPatrW+Df1LI96n+jLWmXXlx6rXiy5WW1u0CmR0p82mUXuK8rpCdLMqmFSfChdJ
+         EEigh7sOmkyNrL5RykOWFthnZrkFcehrW5Mix+tMNxygTKwCmdeCYGpFdUvpdxOcU0Th
+         kxGqNCNBYeUKOpLqzTwVipBfisc2xhtSWY4sKwdjTeUhoyODb26RErQ0o0w3ZewskioJ
+         ryQTv7wG6tAI/tgL+daObDkBwjwGLD+B7OoYdwAI495nh9Ucvb17QtHxm365Wb1VUO5t
+         bgOw==
+X-Forwarded-Encrypted: i=1; AJvYcCWUaL3IeSDDmp8mnE1QGlL/TN7OCA1yVWnCDtxiHp1c6JwvWc6S5kABpUEyf3b8txJKgGA1IMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOeaiQY5olD2EKGGMnFLAs8a2s7rcWTgpTfDBtBQ3gd1LCUHrV
+	att1ozxUg9Mj3OAnIAil2Y4UuR/p0f0vHiPA0awzn8EgyKQoFvEMh8xW
+X-Gm-Gg: ASbGncuxdnxzwwfMVivpksemhPLu9qwSZeUcQzvVuQmQENR4F1XcjhKkizxeG8hMVGs
+	IhaOjPo8GS42FdWl0QCpNW5u9HOsqCpL3X0sbX4aFebL2PUy8h0WNc8LDfMHjUIosV8HXR5b3I6
+	xTyRR0xBNj4deGCu1blwMGmMnXgwScO/yyx1MEv73L/ZvTO+zfEC5UFdPYwaqO0AR9RmCTvCDQ6
+	ptKekkmqAWvTyLSsO4j3Q1sl6IJhwGstzQnfnmG3SD7cABh68PIa5DjTjvsXztjLHGHz2yKk4HT
+	/f88itv4FQ9xsdI/xhkAgHt5lAMaLB1K0OVX00aPR8Uy4GKFhQAhY4RJaRZudnpl1CAUJ6zdNte
+	Lhx7jrqK4BMkYHU1JCvoPYZs3mwwQox21KZZTPfggmR8QmWncBdrD71I=
+X-Google-Smtp-Source: AGHT+IG77yXU5YlLI1tFffiCTEQpvWi9veG5l2RgvVH0S57Unqa0HNc8Ibh+Grt38fgXKTYeu86E+Q==
+X-Received: by 2002:a05:6a21:3394:b0:243:d1bd:fbac with SMTP id adf61e73a8af0-2602820cf69mr266598637.7.1757613486523;
+        Thu, 11 Sep 2025 10:58:06 -0700 (PDT)
+Received: from LAPTOP-PN4ROLEJ.localdomain ([223.112.146.162])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77607b34254sm2731524b3a.75.2025.09.11.10.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 10:58:06 -0700 (PDT)
+From: Slavin Liu <slavin452@gmail.com>
+To: Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>
+Cc: Slavin Liu <slavin452@gmail.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	lvs-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4] ipvs: Defer ip_vs_ftp unregister during netns cleanup
+Date: Fri, 12 Sep 2025 01:57:59 +0800
+Message-Id: <20250911175759.474-1-slavin452@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250911144020.479-1-slavin452@gmail.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911030620.1284754-1-kuniyu@google.com> <20250911030620.1284754-7-kuniyu@google.com>
- <CANn89iJnOZ-bYc9bAPSphiCX4vwy4af2r_QvF1ukVXF7DyA4Kw@mail.gmail.com>
- <CAAVpQUA3cnUz5=2AYQ_6Od_jmHUjS0Cd20NhdzfDxB1GptfsQg@mail.gmail.com>
- <CANn89i+dyhqbd0wDS+-hRDWXExBvic4ETm1uaM2y1G9H4s69Tg@mail.gmail.com>
- <CAAVpQUDgfLp3Ca8M0Z-Q1Jf00ufDsJJQCcSASTGBJkKTOGMO9A@mail.gmail.com> <CANn89i+hNzxZMgHXHsqZs7XaMcxQKyXK-aM43uqrS5Yj-iZNKQ@mail.gmail.com>
-In-Reply-To: <CANn89i+hNzxZMgHXHsqZs7XaMcxQKyXK-aM43uqrS5Yj-iZNKQ@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 11 Sep 2025 10:45:22 -0700
-X-Gm-Features: Ac12FXyT-QxoGLnfkIDS9Y7109un6vOjKZoOHa_cNKmvcu6_JpfPTga1o0Zxr40
-Message-ID: <CAAVpQUDe3uStevAzpQ0nreUrJRGgJYY9wF1-k=JT49jL2K8oTA@mail.gmail.com>
-Subject: Re: [PATCH v1 net 6/8] tcp: Use sk_dst_dev_rcu() in tcp_fastopen_active_disable_ofo_check().
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 11, 2025 at 10:35=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Thu, Sep 11, 2025 at 10:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google=
-.com> wrote:
-> >
-> > On Thu, Sep 11, 2025 at 10:07=E2=80=AFAM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > >
-> > > On Thu, Sep 11, 2025 at 9:53=E2=80=AFAM Kuniyuki Iwashima <kuniyu@goo=
-gle.com> wrote:
-> > >
-> > > >
-> > > > Sorry, I missed this one.  I'll drop this patch and send the
-> > > > series to net-next.
-> > > >
-> > >
-> > > No problem.
-> > >
-> > > Main reason for us to use net-next is that adding lockdep can bring n=
-ew issues,
-> > > thus we have more time to polish patches before hitting more users.
-> > >
-> > > We also can iterate faster, not having to wait one week for net fan i=
-n.
-> >
-> > Thank you for explaining the reason.  That makes sense.
-> >
-> > Then should we keep or drop Fixes: tag ?  At least it will not land
-> > on the mainline and thus stable until the next merge window.
->
-> Fixes: tags are fine.
->
-> I usually do not add them for all patches, because I know that
-> everything will be
-> backported anyway because of dependencies.
+On the netns cleanup path, __ip_vs_ftp_exit() may unregister ip_vs_ftp
+before connections with valid cp->app pointers are flushed, leading to a
+use-after-free.
 
-Thanks for clarification.  I'll keep them this time.
+Fix this by introducing a global `exiting_module` flag, set to true in
+ip_vs_ftp_exit() before unregistering the pernet subsystem. In
+__ip_vs_ftp_exit(), skip ip_vs_ftp unregister if called during netns
+cleanup (when module_removing is false) and defer it to
+__ip_vs_cleanup_batch(), which unregisters all apps after all connections
+are flushed. If called during module exit, unregister ip_vs_ftp
+immediately.
+
+Fixes: 61b1ab4583e2 ("IPVS: netns, add basic init per netns.")
+Suggested-by: Julian Anastasov <ja@ssi.bg>
+Signed-off-by: Slavin Liu <slavin452@gmail.com>
+---
+ net/netfilter/ipvs/ip_vs_ftp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_ftp.c b/net/netfilter/ipvs/ip_vs_ftp.c
+index d8a284999544..206c6700e200 100644
+--- a/net/netfilter/ipvs/ip_vs_ftp.c
++++ b/net/netfilter/ipvs/ip_vs_ftp.c
+@@ -53,6 +53,7 @@ enum {
+ 	IP_VS_FTP_EPSV,
+ };
+ 
++static bool exiting_module;
+ /*
+  * List of ports (up to IP_VS_APP_MAX_PORTS) to be handled by helper
+  * First port is set to the default port.
+@@ -605,7 +606,7 @@ static void __ip_vs_ftp_exit(struct net *net)
+ {
+ 	struct netns_ipvs *ipvs = net_ipvs(net);
+ 
+-	if (!ipvs)
++	if (!ipvs || !exiting_module)
+ 		return;
+ 
+ 	unregister_ip_vs_app(ipvs, &ip_vs_ftp);
+@@ -627,6 +628,7 @@ static int __init ip_vs_ftp_init(void)
+  */
+ static void __exit ip_vs_ftp_exit(void)
+ {
++	exiting_module = true;
+ 	unregister_pernet_subsys(&ip_vs_ftp_ops);
+ 	/* rcu_barrier() is called by netns */
+ }
+-- 
+2.34.1
+
 
