@@ -1,73 +1,89 @@
-Return-Path: <netdev+bounces-221971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63FCEB52784
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 06:24:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08277B5282A
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 07:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE5F16809D1
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 04:24:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2664A1BC6A6B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 05:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89DD22836C;
-	Thu, 11 Sep 2025 04:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A2323E23C;
+	Thu, 11 Sep 2025 05:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oHjNQSFi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YP33kpdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03508213E9C
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 04:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5CC23C50F
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 05:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757564656; cv=none; b=qpuFVSi+6HQNZAuG5jUssddS0Si9vAAATHEvKsXW1GtsWkofmGmt4+jN+AaBqxUsxHodRyTqlC7C+9/3a6cWo4imbwYaf2s9nQ6RyHKQXGozLjWSleutHTttpVNFRmEv/loAVvihu1tJtGB47vzoW75lwAA0vhnnAFBMv34BpoI=
+	t=1757568928; cv=none; b=SvK91tI1LldimXHlbfHa8D54sArqzz9eoQe0I1ainUH/yBB+EpAoMREcsGYAGG2BiRsEFuSeyMuxNGSoJha6vgYBxTCvZzN97iMEuZNynvcG79uBM5O5kSc42MMpv4Pc5ndsA46FHM7h6a1TWroukCKhFphlyxtPJQfFjrbACiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757564656; c=relaxed/simple;
-	bh=BgsI+AiTgfuafUWQSmOXvl140yZFuftVvl6XyP6jhLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QOAMY6xZHwSOQGoYxKzQrF8Zu4ApOe8PwNEW1RNMF0CDTkzz4e4CI0JHgKh+bwEwbXs3Mz/gINXakw35kmGKyd+5Elgdbx4lbwvcybBUyz4u7uL2iv1YCRjgrknNUEz1OsP43f4AG42DsZMAabJa+KOO2YGENB1oQiK3AZrE9h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=oHjNQSFi; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58ALg1u5028229;
-	Thu, 11 Sep 2025 04:24:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=VPrRpoQ6P9XY9W9QON18itiKr5n0O
-	FgBjk5mBHV1+tY=; b=oHjNQSFi/ReRqQT483YJJX55PELvEWPJnJMnjAYCAGqJR
-	8W1yLchs6SUTcRUuAYOZtM1i//6N3e/IyBNOAVindixzRwXjxwt2WLYN5IitL4wg
-	HgThgMEIZYchlHAx0CFy9F1l7ofPJad881NdIZGC7Tis74/klQLVbrZCghwOP/+x
-	bOlbQ7ZkWCbOGKnpPCf37FLP+aAuVN6+snghg+9oXztFEPN+xVzo6pU34eiQenyr
-	6r1BjJh6eoc4cNjEoudr4hQBkllRF9RayHOv1PkNRm26y/O81kLYT6mk2j7iT16P
-	Y75YEZBCkWxyU9ruqGDo8FxyxryI8JyzineKHevzQ==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4922965g68-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Sep 2025 04:24:01 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58B4IdOa032848;
-	Thu, 11 Sep 2025 04:23:55 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 490bdcvfdu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Sep 2025 04:23:55 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58B4NsFt000763;
-	Thu, 11 Sep 2025 04:23:54 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 490bdcvfdf-1;
-	Thu, 11 Sep 2025 04:23:54 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: shannon.nelson@amd.com, brett.creeley@amd.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH net] ionic: use int type for err in ionic_get_module_eeprom_by_page
-Date: Wed, 10 Sep 2025 21:23:41 -0700
-Message-ID: <20250911042351.3833648-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1757568928; c=relaxed/simple;
+	bh=6DrPjUxSOEgm8/e5jYNWy8+QPMe1YsQxP4QOcSqpuc8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pgV+yrSYuN5CGwnwFwjN8hT2SytYmxxU2kGRYWrKTh8mZPCO/jPP6e25RSTrgagDAA9zDP7o6pFc5QYiK0me1MalhWWCiFvxTo74aMubsiDbtiH4yL5Wr9NbAJ6T6C21eSA3iPQUwaXJtNzphIVKVRjYh9m5qBNJUDfeRM+BXNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YP33kpdB; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b4f9d61e7deso254663a12.2
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 22:35:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757568927; x=1758173727; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=suFQLgQPBBm2YGkpmXAdEyvaJ71aivqrwO9lscWhiYI=;
+        b=YP33kpdBOoVX3HaN3OPchqgz6UDDO5OGDYj6TqK2ZSLRCw+6e/iGFQf8GPwP3y9Y3Q
+         e77YkmTyPzyW2goUOUvLfi8qSfclp/X5YL12qYjmkTNWGDZmq6GxzEqG+dcwBNga+Uqo
+         5LXTeyh9pEVSuFJ/82pWtP0oFZY0TU6kAhqfj82PypGPIvDNZlTFQEw7ZSxHB6d+28aF
+         uvTYsq7iC4OOkEYJvcXDPRV9Xa2NMzrBgCLaHLlSoClRfW8sU/NFGZjR4buAJKOTQ4yV
+         aN7t4srm1CjWMGskQOXIxsrSgm+sU90+9s2BuKUm/KukIya/C+q4k8oCyAeiiTPMXtqA
+         qFTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757568927; x=1758173727;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=suFQLgQPBBm2YGkpmXAdEyvaJ71aivqrwO9lscWhiYI=;
+        b=M62qpHW8mISaocTr6JrjZIQAlDF4DIWZSnENlJFckUtl4zpRx+WR/N27ZCKMo9Zmko
+         dBjfFVlHq84E+DzNErPz+LW2WwDuB/tgmR6XTschEcfm5iBLb0EEKTsRii6v6eNGZ29c
+         UDpVrf9fJWHceAv1ZpPStcbgzWn30wktA2zgPcLcI/N5zsA3XrpgQ0xgt1OTGaxVYzMD
+         6laUk1TT8p+SWwYrD9urdhqeqH7IJrhGxfpD1BDwcXcp6OlTeRfsqT9MmL3HjdNd1Ird
+         b8kioa7l9wsupkJxAs5OMGAH2Qi2VzJjB0HjA8IYPwwBsidq4LjDgjDQYVNd/5h/TMn8
+         gLyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWZhk3kIu+Rmc9xwjq4X9Jm0PBM9UoWZcOHYEnfycEBQxpkJILtoYerLYBdDQ0oBOrj8vQSBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtdTexhkZurBcoqJwx+6xi/ud7CY1yEPKuqTpaKkH/2B5WHxAp
+	ahd3NXGH0Z7rvZK0k2n6Qsah4Orbo9otwXjgm6J66jR13PygO22YRCm2
+X-Gm-Gg: ASbGncvOtlOeJHDgdMqjsC906Q3qYy+zzNbDvDWvn08EEX3G1fToNkm8LsDQYgKaZ3s
+	btWZ3L9Hp2uuga0l5kx9c04yGoY4coDyUn6y/HiWoXOY1HDoDxaqRxJLKDQmbf8d2nVaNBrMNR4
+	IPqJz8jjK60cbkp8gMo1CPyyKTFK3HxjBv6Q4RZv1rmuYGDx93HMJXrVuHWdlSE4U4LKX1wVq4A
+	BTttYfbPZSvyuTdkSe7v6Lx3r83cEBiS49w71pVs2Oka16K1GfyzUz25Y9Nm+EuJl6kAoImJ2d1
+	ViWqIs8/+D0uIOoYjgdwa6rFvc0R/yLFcxxE3MziaD3J2Eb9x7WD0BvQ8UCd0oYICaDxeROgTgp
+	5h4rQFZjECLw0OWR0XoL6POb4zcnq6EgscwM/k5UdTffkijXn+poSodsR
+X-Google-Smtp-Source: AGHT+IHT5xn38H3fMN6Zaoo229Z03xpz5XUH4md1BuPQ5jXuX3HCubak/42RqKopAPQHAbDo2VxkTQ==
+X-Received: by 2002:a17:90b:1d4f:b0:32b:4c71:f40a with SMTP id 98e67ed59e1d1-32d43f7df43mr22634192a91.24.1757568926662;
+        Wed, 10 Sep 2025 22:35:26 -0700 (PDT)
+Received: from mythos-cloud ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32dd98e7621sm618953a91.22.2025.09.10.22.35.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 22:35:26 -0700 (PDT)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Yeounsu Moon <yyyynoom@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: natsemi: fix `rx_dropped` double accounting on `netif_rx()` failure
+Date: Thu, 11 Sep 2025 14:33:06 +0900
+Message-ID: <20250911053310.15966-2-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,53 +91,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-10_04,2025-09-10_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 phishscore=0
- bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
- definitions=main-2509110036
-X-Proofpoint-GUID: 1V9B5QZbCyE1yqfFojy9KfpKnAEiCoiM
-X-Authority-Analysis: v=2.4 cv=CPEqXQrD c=1 sm=1 tr=0 ts=68c24ee1 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=aYG9vCOGyGdZPDYcLycA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA4MDE1OSBTYWx0ZWRfX21sEBRD/CXcY
- 4Y4L5Sg9w3h5WWVLbBYh+5zhH468Q6zs2icQyTono+JwFVL0TIL1rs+eNlL6INdhR0oxaYAXVvj
- AV91cHCOsvNcOPu0V5Z//N/eKsrkmy4qEIQFFFG9wFCf+Q/fiDqVa5L9FG9Cp9sqRBlnvXAv1At
- r/7hsrJpR5IfjUn05oMzb1JeezUFftWgFoqZOGgx2mbi3zhFJKPcP0b2gZIs8/gFENbTDjOf9NF
- YwJONhFITbIKTtxykVS5lp8cZGZWTf/BBtTeoKGilNfhP8h+nyeE1uLJhO++U9LXJqFQP0B6jg7
- AtXdoyE2XvPi2jHy17zLRB5KumuajNORkOK8S4voy2bDuFimE4hITDHNdvI91oyiOOviTC/Ju3d
- FFn5uT1o
-X-Proofpoint-ORIG-GUID: 1V9B5QZbCyE1yqfFojy9KfpKnAEiCoiM
 
-The variable 'err' is declared as u32, but it is used to store
-negative error codes such as -EINVAL.
+`netif_rx()` already increments `rx_dropped` core stat when it fails.
+The driver was also updating `ndev->stats.rx_dropped` in the same path.
+Since both are reported together via `ip -s -s` command, this resulted
+in drops being counted twice in user-visible stats.
 
-Changing the type of 'err' to int ensures proper representation of
-negative error codes and aligns with standard kernel error handling
-conventions.
+Keep the driver update on `skb_put()` failure, but skip it after
+`netif_rx()` errors.
 
-Fixes: c51ab838f532 ("ionic: extend the QSFP module sprom for more pages")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
 ---
- drivers/net/ethernet/pensando/ionic/ionic_ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/natsemi/ns83820.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-index 92f30ff2d631..c3f9835446e2 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-@@ -978,7 +978,7 @@ static int ionic_get_module_eeprom_by_page(struct net_device *netdev,
- {
- 	struct ionic_lif *lif = netdev_priv(netdev);
- 	struct ionic_dev *idev = &lif->ionic->idev;
--	u32 err = -EINVAL;
-+	int err = -EINVAL;
- 	u8 *src;
+diff --git a/drivers/net/ethernet/natsemi/ns83820.c b/drivers/net/ethernet/natsemi/ns83820.c
+index 56d5464222d9..cdbf82affa7b 100644
+--- a/drivers/net/ethernet/natsemi/ns83820.c
++++ b/drivers/net/ethernet/natsemi/ns83820.c
+@@ -820,7 +820,7 @@ static void rx_irq(struct net_device *ndev)
+ 	struct ns83820 *dev = PRIV(ndev);
+ 	struct rx_info *info = &dev->rx_info;
+ 	unsigned next_rx;
+-	int rx_rc, len;
++	int len;
+ 	u32 cmdsts;
+ 	__le32 *desc;
+ 	unsigned long flags;
+@@ -881,8 +881,10 @@ static void rx_irq(struct net_device *ndev)
+ 		if (likely(CMDSTS_OK & cmdsts)) {
+ #endif
+ 			skb_put(skb, len);
+-			if (unlikely(!skb))
++			if (unlikely(!skb)) {
++				ndev->stats.rx_dropped++;
+ 				goto netdev_mangle_me_harder_failed;
++			}
+ 			if (cmdsts & CMDSTS_DEST_MULTI)
+ 				ndev->stats.multicast++;
+ 			ndev->stats.rx_packets++;
+@@ -901,15 +903,12 @@ static void rx_irq(struct net_device *ndev)
+ 				__vlan_hwaccel_put_tag(skb, htons(ETH_P_IPV6), tag);
+ 			}
+ #endif
+-			rx_rc = netif_rx(skb);
+-			if (NET_RX_DROP == rx_rc) {
+-netdev_mangle_me_harder_failed:
+-				ndev->stats.rx_dropped++;
+-			}
++			netif_rx(skb);
+ 		} else {
+ 			dev_kfree_skb_irq(skb);
+ 		}
  
- 	if (!page_data->length)
++netdev_mangle_me_harder_failed:
+ 		nr++;
+ 		next_rx = info->next_rx;
+ 		desc = info->descs + (DESC_SIZE * next_rx);
 -- 
-2.50.1
+2.51.0
 
 
