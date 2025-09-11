@@ -1,190 +1,125 @@
-Return-Path: <netdev+bounces-222021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E32B52BEB
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:38:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53C59B52BFA
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A7A9179868
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:38:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1244817C31F
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0DE2E543E;
-	Thu, 11 Sep 2025 08:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAD32E283A;
+	Thu, 11 Sep 2025 08:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HxB+5Eau"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9agry21"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A515D2E2852;
-	Thu, 11 Sep 2025 08:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33162580E4
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 08:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757579898; cv=none; b=RIQQI3MvZkL7xOh4WfaPPVcwNlFNozsud19ZPawwo7WtYm0aFlSAjdWzHWg5gqQZf8hZc5kRZ548OX9fbarUkhBbXU2Jt+tiQtwjSZn7RR+I+snVKh4hDpwD/b8RO8eYR/TYNb2YycAJoVcFtDwA0ULpgWDhBLSaFD1NlGqjmIE=
+	t=1757579985; cv=none; b=pydt+HMeE6q3M0cKprS2V3+xqHai2mv+ql1UeHRd5ipYU85mh2aIFRoAqc4kz4FO16um6i+lbimxDzhqXBIMG+reWGugDeKTylKwrFuR3ywY4YqVLAGAxXhBBB9Bp7pBx+D/EcdjPCofEqhafZ72MtUThCYGWMdVhHwj4msgZmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757579898; c=relaxed/simple;
-	bh=3Ta+U8bDmn+TLd+5gSYW6szMLbfTk9DlYnED0UXkvx8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=m3PLrCSCeFd1QVxiceobsAabDI5LGG/KAVZ9GshKomaLtH3IjvFn/55aP0gHIN12tsnFqK/xeHRyZBRmvaYNd4EQyz6ZtHdBkzOJTOquCVT8hGEnH5lKuJXXQSah6CCDJDAG2Qi4fJE/6XXaoDDw4YcljI1Re/7s5XDd0/MJaQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HxB+5Eau; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 78EDEC4CEF7;
-	Thu, 11 Sep 2025 08:38:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757579898;
-	bh=3Ta+U8bDmn+TLd+5gSYW6szMLbfTk9DlYnED0UXkvx8=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=HxB+5EauNEn0j+nE4dMAuReoUaw83Uxlh6GEV/G3pDSy8ueRVuWt32zgJ+3Hzykwm
-	 sQDCUjkQ6mxmbINjejWClrBrDVh/uskw1GwFSd7Lwd0AKJqPGSmkbxZoEU3oKMtqgI
-	 NI2aLkgJzZ5zT1mxS7d6omOjF4km0EiKJovYBoOvfcnwWXBIqaq/lAL11wu1/fm9Iy
-	 jxgVoHsUHvh4eAhKsMcXlpKhAUFyCZz34r7PP9m3/pZUcZdRDT0WEhwWmCm+StS6+k
-	 a8VisZ5k/kzbNPN1mDKgCCPYQx3EtrpY2jHDed4bzvvpVGOxEptCM3jXq0F5x2Y/yb
-	 lvhiq6cp94B0A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 711A1CA1016;
-	Thu, 11 Sep 2025 08:38:18 +0000 (UTC)
-From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Date: Thu, 11 Sep 2025 16:38:16 +0800
-Subject: [PATCH net-next] net: stmmac: est: Drop frames causing HLBS error
+	s=arc-20240116; t=1757579985; c=relaxed/simple;
+	bh=5fLQKzUBk6RyhfaKfLwu7XTN1/mvrV+n4NQwIOYScvA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=halPv0Qg6h7lmXKwY+VuQiePJOEeO5AkjGieCys6wNYenwJCNMnk2fDYxwhhIs0ZLuwMLeJ0nnRnj1WcSCQZJDw5P+bga+d+J0VFOTaAZXUOqBR+Pk6nMEOYnazyL6y+y/UBydHmeya0ifgWR08rpgH6I14tD8WzzPmvXHZqc0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D9agry21; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757579982;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ltet1DEkl+6/W/mA/mh0wSx+0fdNt6OLAsr0v/vtsws=;
+	b=D9agry21rsLb5H6MMgLr/H8o6H6rTaAPFYnCKJNHOFpCuSfd4X0x6zVRA2SlM1dH0EzhQ3
+	ekjmXC3B8Qbi8Tz+8KGcxs4nsuLha8GpqUdwwk5Kb4Wtj3hc0Jor0KHSrs6oK9qpXH3SGw
+	WgFJEI7UUY0yjZa7cPnTF6W1rRj9ikI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-227-FeEWFSl8NouHcdLWEaKw2g-1; Thu, 11 Sep 2025 04:39:41 -0400
+X-MC-Unique: FeEWFSl8NouHcdLWEaKw2g-1
+X-Mimecast-MFC-AGG-ID: FeEWFSl8NouHcdLWEaKw2g_1757579980
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45cb604427fso2751655e9.1
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 01:39:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757579980; x=1758184780;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ltet1DEkl+6/W/mA/mh0wSx+0fdNt6OLAsr0v/vtsws=;
+        b=ASa1SjFx0kIcDa9Lb8ozNkwcPT9Bo+bnJ/Q4pOcNWSRMXWvqYjlrySzX4X7l8NSgWV
+         9KC86uNTnEixHZY0yPGslM2w68l5uv1JLIOOVmkQB3Tp4hzgRBwgWcv6HnPvdn36leQy
+         tyj7WSYWfelGyTmeozJs1wXMVxCtI0pWTFJj8DacUAp2mpomfbQzpeRh1Gbz0JWjvLGj
+         Xz3Lc0mDqaLY18RIR5SUBw+wXyqEY0l8j2ztBOzfWM2g3pA+bPgT32wcZmSmVFhloi8U
+         +xB84Th8nYDRphnsLR5vUhqM7LnKOxhz2jhZslPEVKtIGL7IJwdoUzjq7ZQjK4/VW50I
+         pUVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ9zjpyRZvhCfVXcx+pRuomZaECMt7dR5Nikg7LJ2GjSn0qd/w3gEKJHDWWSyMcvZ6EG3gVmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfNn7eBFOfZaMmvIs9DA3/9pXiJtHz3u+wHW3QPihIfD1A3RQb
+	qGZRjFaWHyBPiKtaVRy3usBXDKYI3dO0ByywjiHZCxxFhpm7BT9lI2wYZ1/RBbAqM9dnzlW+K+U
+	1Gq2OWAiLC/nDSHkuNUTT6MrYSfHU9bmIzaKj+DALzzocdNKPYeG6qhEcEQ==
+X-Gm-Gg: ASbGnct23Ua3frgs41uaDDV17mQg7HnRr4oTGESiiuLSTO9XrlCNM1pjhLd27reWKjq
+	2pDP6scMzaIYlZF08Ba/wxWpP5KZpRfrf/Le3sus5NeL3zLb8GGvnYQ1IxaXBJ9JWMS2j4jErAY
+	bViPv3gW1wwjbos6UkiYtEoTbrV+p6c7N3tEP2SDhxBgz7Jw5iPwa5DfQevkWf0pQTp/w90CFsO
+	JwZ0Sc5g/MDQeWQSwN9RGfu9jR2t+Lr2XVoq/6x/eT6VjN5YGI1v+URfGjuGOrpGc418S9B2r8u
+	1wLQBeXRJ+VHN7Id4VvnaXOQmEeLTyyWjOiaXYTwhVA=
+X-Received: by 2002:a05:6000:1ace:b0:3e7:610b:85f6 with SMTP id ffacd0b85a97d-3e7610b8754mr1087216f8f.39.1757579980044;
+        Thu, 11 Sep 2025 01:39:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEKiL19RoayeKzPbOlZN/BIKP343mirP4w1v2R1K9mBR+ow5apdnT52wvVT2ZVXAZtbgB7Mhw==
+X-Received: by 2002:a05:6000:1ace:b0:3e7:610b:85f6 with SMTP id ffacd0b85a97d-3e7610b8754mr1087200f8f.39.1757579979640;
+        Thu, 11 Sep 2025 01:39:39 -0700 (PDT)
+Received: from [192.168.0.115] ([216.128.11.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e760776badsm1589169f8f.5.2025.09.11.01.39.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Sep 2025 01:39:38 -0700 (PDT)
+Message-ID: <8f52c5b8-bd8a-44b8-812c-4f30d50f63ff@redhat.com>
+Date: Thu, 11 Sep 2025 10:39:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next v2 1/4] ethtool: add FEC bins
+ histogramm report
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+ Donald Hunter <donald.hunter@gmail.com>, Carolina Jubran <cjubran@nvidia.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20250910221111.1527502-1-vadim.fedorenko@linux.dev>
+ <20250910221111.1527502-2-vadim.fedorenko@linux.dev>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250910221111.1527502-2-vadim.fedorenko@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250911-hlbs_2-v1-1-cb655e8995b7@altera.com>
-X-B4-Tracking: v=1; b=H4sIAHeKwmgC/x3MQQqAIBBA0avErBPUEqqrRETlmANhoRKCePek5
- YPPzxDQEwaYmgweXwp0uwrRNnDYzZ3ISFeD5FLxUQhmrz2skimjtcJ+6AyXUOPHo6H0j2ZwGJn
- DFGEp5QMVeEEKYgAAAA==
-X-Change-ID: 20250911-hlbs_2-5fdd5e483f02
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Rohan G Thomas <rohan.g.thomas@altera.com>, 
- Matthew Gerlach <matthew.gerlach@altera.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1757579897; l=4389;
- i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=rzzc5ust1FUYLSTdUDlYDXeMTa9SqQgjaI1YarHG5WM=;
- b=ZMgyKAlpBN4cQqypdUTAVHzpXbtiOTB7N1s66ZtuclJIHZ6WivlbvTwuXWfz4CPtQUFdlXgez
- rlqVE8DCNOPDuKsQXxAs6WkTpax/SeJICQ6fbDQB53RbMNDHpToKHeL
-X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
- pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
-X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
- with auth_id=494
-X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reply-To: rohan.g.thomas@altera.com
 
-From: Rohan G Thomas <rohan.g.thomas@altera.com>
+On 9/11/25 12:11 AM, Vadim Fedorenko wrote:
+> IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
+> clarifies it a bit further. Implement reporting interface through as
+> addition to FEC stats available in ethtool.
+> 
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-Drop those frames causing HLBS error to avoid HLBS interrupt
-flooding and netdev watchdog timeouts due to blocked packets.
-Also add HLBS frame drops to taprio stats.
+Not really a review, but this is apparently causing self tests failures:
 
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
----
- drivers/net/ethernet/stmicro/stmmac/common.h     | 1 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_est.c | 7 ++++++-
- drivers/net/ethernet/stmicro/stmmac/stmmac_est.h | 1 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c  | 7 +++++--
- 4 files changed, 13 insertions(+), 3 deletions(-)
+https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/292661/5-stats-py/stdout
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index eaa1f2e1c5a53b297b014a8218bf8f3db5beb4de..8f34c9ad457f07553206841223fd38e55208d5ab 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -228,6 +228,7 @@ struct stmmac_extra_stats {
- 	unsigned long mtl_est_btrlm;
- 	unsigned long max_sdu_txq_drop[MTL_MAX_TX_QUEUES];
- 	unsigned long mtl_est_txq_hlbf[MTL_MAX_TX_QUEUES];
-+	unsigned long mtl_est_txq_hlbs[MTL_MAX_TX_QUEUES];
- 	/* per queue statistics */
- 	struct stmmac_txq_stats txq_stats[MTL_MAX_TX_QUEUES];
- 	struct stmmac_rxq_stats rxq_stats[MTL_MAX_RX_QUEUES];
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
-index ac6f2e3a3fcd2f9ae21913845282ff015cd2f7ec..385431a3336b731547df49621098586b741cae85 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
-@@ -63,7 +63,7 @@ static int est_configure(struct stmmac_priv *priv, struct stmmac_est *cfg,
- 			 EST_GMAC5_PTOV_SHIFT;
- 	}
- 	if (cfg->enable)
--		ctrl |= EST_EEST | EST_SSWL;
-+		ctrl |= EST_EEST | EST_SSWL | EST_DFBS;
- 	else
- 		ctrl &= ~EST_EEST;
- 
-@@ -109,6 +109,11 @@ static void est_irq_status(struct stmmac_priv *priv, struct net_device *dev,
- 
- 		x->mtl_est_hlbs++;
- 
-+		for (i = 0; i < txqcnt; i++) {
-+			if (value & BIT(i))
-+				x->mtl_est_txq_hlbs[i]++;
-+		}
-+
- 		/* Clear Interrupt */
- 		writel(value, est_addr + EST_SCH_ERR);
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
-index d247fa383a6e44a5a8371dd491eab5b1c99cd1f2..f70221c9c84afe6bce62782c7847a8005e469dd7 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
-@@ -16,6 +16,7 @@
- #define EST_XGMAC_PTOV_MUL		9
- #define EST_SSWL			BIT(1)
- #define EST_EEST			BIT(0)
-+#define EST_DFBS			BIT(5)
- 
- #define EST_STATUS			0x00000008
- #define EST_GMAC5_BTRL			GENMASK(11, 8)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 694d6ee1438197bd4434af6e9b78f022e94ff98f..97e89a604abd7a01bb8e904c38f10716e0a911c1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -1080,6 +1080,7 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
- 		for (i = 0; i < priv->plat->tx_queues_to_use; i++) {
- 			priv->xstats.max_sdu_txq_drop[i] = 0;
- 			priv->xstats.mtl_est_txq_hlbf[i] = 0;
-+			priv->xstats.mtl_est_txq_hlbs[i] = 0;
- 		}
- 		mutex_unlock(&priv->est_lock);
- 	}
-@@ -1097,7 +1098,8 @@ static void tc_taprio_stats(struct stmmac_priv *priv,
- 
- 	for (i = 0; i < priv->plat->tx_queues_to_use; i++)
- 		window_drops += priv->xstats.max_sdu_txq_drop[i] +
--				priv->xstats.mtl_est_txq_hlbf[i];
-+				priv->xstats.mtl_est_txq_hlbf[i] +
-+				priv->xstats.mtl_est_txq_hlbs[i];
- 	qopt->stats.window_drops = window_drops;
- 
- 	/* Transmission overrun doesn't happen for stmmac, hence always 0 */
-@@ -1111,7 +1113,8 @@ static void tc_taprio_queue_stats(struct stmmac_priv *priv,
- 	int queue = qopt->queue_stats.queue;
- 
- 	q_stats->stats.window_drops = priv->xstats.max_sdu_txq_drop[queue] +
--				      priv->xstats.mtl_est_txq_hlbf[queue];
-+				      priv->xstats.mtl_est_txq_hlbf[queue] +
-+				      priv->xstats.mtl_est_txq_hlbs[queue];
- 
- 	/* Transmission overrun doesn't happen for stmmac, hence always 0 */
- 	q_stats->stats.tx_overruns = 0;
+and ynl build errors:
 
----
-base-commit: 1f24a240974589ce42f70502ccb3ff3f5189d69a
-change-id: 20250911-hlbs_2-5fdd5e483f02
+https://netdev.bots.linux.dev/static/nipa/1001130/ynl/stderr
 
-Best regards,
--- 
-Rohan G Thomas <rohan.g.thomas@altera.com>
-
+/P
 
 
