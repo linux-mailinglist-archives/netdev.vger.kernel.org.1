@@ -1,116 +1,140 @@
-Return-Path: <netdev+bounces-222018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542F3B52BA3
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:29:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5313B52BE6
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AE721C83591
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:29:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 878363A67B9
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA56B2E267E;
-	Thu, 11 Sep 2025 08:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6BF2E2F1F;
+	Thu, 11 Sep 2025 08:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="onzkfL6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8AB2E1C44
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 08:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8CE2E283A;
+	Thu, 11 Sep 2025 08:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757579360; cv=none; b=jDCEUlXfu+XftZcgg5a1fTxY4HFAvDpy7W/mjFBlx5j+Cl1H+NcILcdPrXPTa5ndJ9u+6+h8/Wykcn+2JwNh6zZGwgOREadFIxIOgOf6M1OCE1MPkBFaLpiGD4UOqXqleaVylWxyTrW/nawxUvjLGvyaq3Q9nxqGea/s2VMWLSQ=
+	t=1757579842; cv=none; b=FtrsK2R115sCsPiu2rx649zJ2b5g6Qsbot4lOKgeenWjLUtKBhyU6RBeZDGOdBVflkQZkWVF2z9qLZOLqasrBH6FmeDFXqp+fRqjGOS090ydHTkpn4W+UYgNHAc/V6BX959z2HjN5xZMrbYmTv4GLrGfxXoZYrwfdduM8n/1z6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757579360; c=relaxed/simple;
-	bh=cectbzOwSX7/raq+3N3bfK5CjRa4tK2nFA3zl8Ny/eg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=e98MnjEYcFeNINT2wtfo+54KdHgbqxClRZpfNKuxRhRwFAZjZb47uWudAtzOgPR1KHGSKtkipx8ykj+aVzXunUd/IlZoAEbLGra2hLYzR+X/jty18SC6YApJOexD/5m2koqjhQcazdVkbpDbO/AZ49M50X07aTw2+fLOaRkO550=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <jre@pengutronix.de>)
-	id 1uwcfy-0004dq-5J; Thu, 11 Sep 2025 10:29:06 +0200
-From: Jonas Rebmann <jre@pengutronix.de>
-Date: Thu, 11 Sep 2025 10:29:03 +0200
-Subject: [PATCH v2] net: phy: micrel: Update Kconfig help text
+	s=arc-20240116; t=1757579842; c=relaxed/simple;
+	bh=XslGsUoupOrtKg0lfUcpg0DWyp4IyzJwG6qK2UD+EvA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dbW6m0th6SUQWYGa6ebtXyyJliODSoqZLTFzohCj8VeaWDqqUggZTs0IG9EWh7vUWBuNcH27I5fU9wnxm9NGIIISeKJc8GN7g4ruEGeCqSBi3waGtOVo4bx9v82oy9NyAiVyvsfyBO2bUB7jzfl8wN1nbi83DE3uVlczAVET0EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=onzkfL6g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10E4BC4CEF1;
+	Thu, 11 Sep 2025 08:37:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1757579842;
+	bh=XslGsUoupOrtKg0lfUcpg0DWyp4IyzJwG6qK2UD+EvA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=onzkfL6g4ORhBQHe5opjlNM4i/9UWLfnOlBcbo6tco7YIiVmFxoBXNzNlvZouFfhM
+	 cElFlnyK2WOHyP/Tf/ViME1lb6m2jIPpF/8y22493TMwBHxZgTFlKq13ZFrf/U3bjr
+	 gnlCTs9l2sHTZEsaoiT4R7IZ2Tdp9+IXckb1vcuY=
+Date: Thu, 11 Sep 2025 10:37:19 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: "Farber, Eliav" <farbere@amazon.com>
+Cc: "jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"vitaly.lifshits@intel.com" <vitaly.lifshits@intel.com>,
+	"post@mikaelkw.online" <post@mikaelkw.online>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Chocron, Jonathan" <jonnyc@amazon.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH 5.10.y] e1000e: fix EEPROM length types for overflow
+ checks
+Message-ID: <2025091122-obsolete-earthen-8c9b@gregkh>
+References: <20250910173138.8307-1-farbere@amazon.com>
+ <2025091131-tractor-almost-6987@gregkh>
+ <f524c24888924a999c3bb90de0099b78@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250911-micrel-kconfig-v2-1-e8f295059050@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAE6IwmgC/13MQQ6CMBCF4auQWVszjBZSV9zDsBAYYKK2pEWCI
- b27lcSNy/8l79sgsBcOcMk28LxIEGdT0CGDdrzZgZV0qYGQNBrU6imt54e6t872MihsTElFWZw
- 0F5BOk+de1h281qlHCbPz791f8u/6o8w/teQqV0QdnpvGIGqqJrbDa/bOynrsGOoY4wcFQPSCs
- QAAAA==
-X-Change-ID: 20250905-micrel-kconfig-0b97267635e6
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jonas Rebmann <jre@pengutronix.de>
-X-Mailer: b4 0.15-dev-7abec
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1543; i=jre@pengutronix.de;
- h=from:subject:message-id; bh=cectbzOwSX7/raq+3N3bfK5CjRa4tK2nFA3zl8Ny/eg=;
- b=owGbwMvMwCV2ZcYT3onnbjcwnlZLYsg41BFw/lrh1YxDPBXvs1rFb6z1UpsS+dRGek/9vZrFp
- z+qm7e6d5SyMIhxMciKKbLEqskpCBn7XzertIuFmcPKBDKEgYtTACZyLp/hf/znq8q3vC3q+ZZc
- OJpiHpISduxWFMcMa5GmHN+Io07XAxkZDoUUPeRanhPQNuXNL0sdoZuK/JZd1Sk/+qwdbF/ytv9
- lBgA=
-X-Developer-Key: i=jre@pengutronix.de; a=openpgp;
- fpr=0B7B750D5D3CD21B3B130DE8B61515E135CD49B5
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:1101:1d::ac
-X-SA-Exim-Mail-From: jre@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f524c24888924a999c3bb90de0099b78@amazon.com>
 
-This driver by now supports 17 different Microchip (formerly known as
-Micrel) chips: KSZ9021, KSZ9031, KSZ9131, KSZ8001, KS8737, KSZ8021,
-KSZ8031, KSZ8041, KSZ8051, KSZ8061, KSZ8081, KSZ8873MLL, KSZ886X,
-KSZ9477, LAN8814, LAN8804 and LAN8841.
+On Thu, Sep 11, 2025 at 06:13:33AM +0000, Farber, Eliav wrote:
+> > On Wed, Sep 10, 2025 at 05:31:38PM +0000, Eliav Farber wrote:
+> >> Fix a compilation failure when warnings are treated as errors:
+> >>
+> >> drivers/net/ethernet/intel/e1000e/ethtool.c: In function ‘e1000_set_eeprom’:
+> >> ./include/linux/overflow.h:71:15: error: comparison of distinct pointer types lacks a cast [-Werror]
+> >>    71 |  (void) (&__a == __d);   \
+> >>       |               ^~
+> >> drivers/net/ethernet/intel/e1000e/ethtool.c:582:6: note: in expansion of macro ‘check_add_overflow’
+> >>   582 |  if (check_add_overflow(eeprom->offset, eeprom->len, &total_len) ||
+> >>       |      ^~~~~~~~~~~~~~~~~~
+> >>
+> >> To fix this, change total_len and max_len from size_t to u32 in 
+> >> e1000_set_eeprom().
+> >> The check_add_overflow() helper requires that the first two operands 
+> >> and the pointer to the result (third operand) all have the same type.
+> >> On 64-bit builds, using size_t caused a mismatch with the u32 fields
+> >> eeprom->offset and eeprom->len, leading to type check failures.
+> >>
+> >> Fixes: ce8829d3d44b ("e1000e: fix heap overflow in e1000_set_eeprom")
+> >> Signed-off-by: Eliav Farber <farbere@amazon.com>
+> >> ---
+> >>  drivers/net/ethernet/intel/e1000e/ethtool.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c 
+> >> b/drivers/net/ethernet/intel/e1000e/ethtool.c
+> >> index 4aca854783e2..584378291f3f 100644
+> >> --- a/drivers/net/ethernet/intel/e1000e/ethtool.c
+> >> +++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
+> >> @@ -559,7 +559,7 @@ static int e1000_set_eeprom(struct net_device 
+> >> *netdev,  {
+> >>       struct e1000_adapter *adapter = netdev_priv(netdev);
+> >>       struct e1000_hw *hw = &adapter->hw;
+> >> -     size_t total_len, max_len;
+> >> +     u32 total_len, max_len;
+> >>       u16 *eeprom_buff;
+> >>       int ret_val = 0;
+> >>       int first_word;
+> >> --
+> >> 2.47.3
+> >>
+> >
+> > Why is this not needed in Linus's tree?
+> Kernel 5.10.243 enforces the same type, but this enforcement is
+> absent from 5.15.192 and later:
+> /*
+>  * For simplicity and code hygiene, the fallback code below insists on
+>  * a, b and *d having the same type (similar to the min() and max()
+>  * macros), whereas gcc's type-generic overflow checkers accept
+>  * different types. Hence we don't just make check_add_overflow an
+>  * alias for __builtin_add_overflow, but add type checks similar to
+>  * below.
+>  */
+> #define check_add_overflow(a, b, d) __must_check_overflow(({	\
 
-Support for the VSC8201 was removed in commit 51f932c4870f ("micrel phy
-driver - updated(1)")
+Yeah, the min() build warning mess is slowly propagating back to older
+kernels over time as we take these types of fixes backwards.  I count 3
+such new warnings in the new 5.10 release, not just this single one.
 
-Update the help text to reflect that, list families instead of models to
-ease future maintenance.
+Overall, how about fixing this up so it doesn't happen anymore by
+backporting the min() logic instead?  That should solve this build
+warning, and keep it from happening again in the future?  I did that for
+newer kernel branches, but never got around to it for these.
 
-Signed-off-by: Jonas Rebmann <jre@pengutronix.de>
----
-Changes in v2:
-- Don't capitalize "micrel" in commit message (Thanks, Jakub)
-- Name chip families with the common xxx-placeholders (Thanks, Jakub)
-- Be a bit more specific as to which families
-- Link to v1: https://lore.kernel.org/r/20250909-micrel-kconfig-v1-1-22d04bb90052@pengutronix.de
----
- drivers/net/phy/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+thanks,
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index a7fb1d7cae94..e543eef36d98 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -298,7 +298,7 @@ config MICREL_PHY
- 	depends on PTP_1588_CLOCK_OPTIONAL
- 	select PHY_PACKAGE
- 	help
--	  Supports the KSZ9021, VSC8201, KS8001 PHYs.
-+	  Supports the KSZ8xxx, KSZ9xxx, and LAN88xx families of Micrel/Microchip PHYs.
- 
- config MICROCHIP_T1S_PHY
- 	tristate "Microchip 10BASE-T1S Ethernet PHYs"
-
----
-base-commit: 16c610162d1f1c332209de1c91ffb09b659bb65d
-change-id: 20250905-micrel-kconfig-0b97267635e6
-
-Best regards,
---  
-Jonas Rebmann <jre@pengutronix.de>
-
+greg k-h
 
