@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-222292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F9E7B53CDC
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 22:06:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD99B53CD8
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 22:05:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5032D1CC68E5
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:06:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91C36487E49
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614462727E0;
-	Thu, 11 Sep 2025 20:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B2A263C8F;
+	Thu, 11 Sep 2025 20:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="EyrPqhWg"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="rR6tl7ON"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105CB1E1E1C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039191DBB13;
 	Thu, 11 Sep 2025 20:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757621134; cv=none; b=bmVjeBvIAJi7CW5RgucH6B1tvC28qroHSdj61rAF0oS4kYcbptRH5Hu3IeRSsIIbh48pCD7WHnWeYndRt7llL101AQ5hXF/XA/I062+AVStLlaGmP+dRkYnxVDCIoyx4Y3plX1+vmBUAgf1CFErpo4+0MKapGteiiuH1E5HMBPk=
+	t=1757621133; cv=none; b=MUplM2dN4YwXAHaYgCX/Bedd/ntY9KcqdtxvbrUVJFv83TzGM2XEqG9uYqsVp8bZlblsEKWeL8rIt406fy6LF9wTuva/4ZxOvFJAr3rlnIWzyWQxt51lDXCmIJkquqCT3YUV0+6yWWnfs0CdvfUWZAjmkuW+ykq0dZoNvhJFjio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757621134; c=relaxed/simple;
-	bh=QmKA1EaeZnLUYZFxoQZW+o4tE5dP97c0rSfG3Wrs1k8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JzrXz0TwLtrtkN/1+N3640O/adBYxAuL+AHgNVlfSkVY6jBHUAAz2mB5lm9pzwKPlSg+bx9JTQ7H/19BJm6Bd0d9/02ysSQ+njuhY4GFyBc865VrI0dvWu/1mteEG/lczw8uT72/PTniDwtfycuON9PPSJQ14F6hVrK7za2xOHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=EyrPqhWg; arc=none smtp.client-ip=193.104.135.124
+	s=arc-20240116; t=1757621133; c=relaxed/simple;
+	bh=pnz1Z9RsFEA/w79qMxEPA9j3gcVp4d2qUkVblwMqsWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KqA5aVBHDLuIBXLjqoJFl/CrqfSXztDu1vSSBobXCDklkmlBq2Srat5JYvvK2aDfroncvMXVcsJCWVdjYhHTF/8L55geecRuUie+5hvpJKkFuurxBlCQDSarMcoTQok92BOe7ZtYKWwdq2gFrlnml9OTahwSQKMZ1tJqcpx3IOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=rR6tl7ON; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1757621127;
-	bh=QmKA1EaeZnLUYZFxoQZW+o4tE5dP97c0rSfG3Wrs1k8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EyrPqhWgz6Xi5fI+L9X+zRloxLMXvFd7JFYxQiEt9VW7c21g7lYtVSG6rcamU4KDm
-	 wC1LX9MhdK0s2yZLVYyRZrBrwqqsMLBIte2ETFRtWan242Zc5NcAb4ZNme1eYcO4zw
-	 ffZJZty8tE2XgVd+NUOFypL7PBV1bYQ53H1zrv9xCGo5k3GO4ZwAmbcTEYw7+h4b63
-	 ij0yDx0Jt9peLPvzXRCPYws63TLF5V/cxO6rgrdP15RSZgay/JHoSolQ3Gv7vv4mtc
-	 kmbyoJjpMvdojjR+By88cj2qm+5nfXxidE5ORAE1YhBTuzxPYWj09iyiIci+KhrS0T
-	 BJSuX65DqIRXQ==
+	bh=pnz1Z9RsFEA/w79qMxEPA9j3gcVp4d2qUkVblwMqsWk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rR6tl7ON3KGjavAVSATs4mNIhcvrOV+Pox69ZgQCXF5PJmFZMrLRJBKHyfSaBjN7G
+	 +/FyJSwlHeDeQkp2eO7zztFZUoOJCPpNpmpLW3EM6MfuPyW9VvASCl7wwrNNfLXuO0
+	 fDUTrlX1jgFA/I5/qA+VuLGzueY3WZjaH1e+8Oj1NoBJrE2vBAbJkB7WnKNcag0XTR
+	 JfOVw/OuNGpqU4O3aXqVgbNN2lOfjXDVTy1Z5i0oKTokHoWyIVK08i/xsyFsBOyMQI
+	 eNJkCfkRFAMXo944xdNKq7GCVt66ZJYcrqm6U/9tfxORTRSC1gCRbrG1pvKTbgtQg+
+	 kXh861lb2dmJQ==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id EF3986012E;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 885EC6000C;
 	Thu, 11 Sep 2025 20:05:26 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id D033A202855; Thu, 11 Sep 2025 20:05:20 +0000 (UTC)
+	id D7098202A89; Thu, 11 Sep 2025 20:05:20 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -59,10 +60,12 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	wireguard@lists.zx2c4.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 00/13] tools: ynl: prepare for wireguard
-Date: Thu, 11 Sep 2025 20:04:53 +0000
-Message-ID: <20250911200508.79341-1-ast@fiberby.net>
+Subject: [PATCH net-next v3 01/13] tools: ynl-gen: allow overriding name-prefix for constants
+Date: Thu, 11 Sep 2025 20:04:54 +0000
+Message-ID: <20250911200508.79341-2-ast@fiberby.net>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250911200508.79341-1-ast@fiberby.net>
+References: <20250911200508.79341-1-ast@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,54 +75,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This series contains the last batch of YNL changes to support
-the wireguard YNL conversion.
+Allow using custom name-prefix with constants,
+just like it is for enum and flags declarations.
 
-The wireguard changes, to be applied on top of this series,
-has been posted as an RFC series here:
-  https://lore.kernel.org/netdev/20250904-wg-ynl-rfc@fiberby.net/
+This is needed for generating WG_KEY_LEN in
+include/uapi/linux/wireguard.h from a spec.
 
+Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
-v3:
-- Rebased on top of new net-next, after Matthieu's cleanup.
-- Added a Reviewed-by (thanks Donald).
-- Added the parsing local vars cleanup as patch 7
-- In patch 4, change to use set() for deduplication.
-- In patch 8, declare __ynl_attr_validate() as static.
-v2: https://lore.kernel.org/netdev/20250910230841.384545-1-ast@fiberby.net/
-- Added Reviewed-by's to unchanged patches. Thanks to all reviewers.
-- Patch 4, refactors local variables for .attr_put() callers, and
-  replaces the old patch 4 and 5.
-- Patch 5 and 6 are new, and reduces the differences between the 3
-  .attr_put() callers, so it might be easier to keep them in sync.
-- Patch 7, now validates the nested payload (thanks Jakub).
-- Patch 8, now renames more variables (thanks Jakub),
-- Patch 10, got a dead line removed (thanks Donald).
-- Patch 11, revised hex input to support macsec (suggested by Sabrina).
-v1: https://lore.kernel.org/netdev/20250904-wg-ynl-prep@fiberby.net/
+ tools/net/ynl/pyynl/ynl_gen_c.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Asbjørn Sloth Tønnesen (13):
-  tools: ynl-gen: allow overriding name-prefix for constants
-  tools: ynl-gen: generate nested array policies
-  tools: ynl-gen: add sub-type check
-  tools: ynl-gen: refactor local vars for .attr_put() callers
-  tools: ynl-gen: add CodeWriter.p_lines() helper
-  tools: ynl-gen: deduplicate fixed_header handling
-  tools: ynl-gen: avoid repetitive variables definitions
-  tools: ynl-gen: only validate nested array payload
-  tools: ynl-gen: rename TypeArrayNest to TypeIndexedArray
-  tools: ynl: move nest packing to a helper function
-  tools: ynl: encode indexed-arrays
-  tools: ynl: decode hex input
-  tools: ynl: add ipv4-or-v6 display hint
-
- Documentation/netlink/genetlink-legacy.yaml |   2 +-
- tools/net/ynl/lib/ynl-priv.h                |   2 +
- tools/net/ynl/lib/ynl.c                     |  17 +-
- tools/net/ynl/pyynl/lib/ynl.py              |  38 ++++-
- tools/net/ynl/pyynl/ynl_gen_c.py            | 164 +++++++++++---------
- 5 files changed, 140 insertions(+), 83 deletions(-)
-
+diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
+index 101d8ba9626f..c8b15569ecc1 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_c.py
++++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+@@ -3208,8 +3208,9 @@ def render_uapi(family, cw):
+             cw.block_end(line=';')
+             cw.nl()
+         elif const['type'] == 'const':
++            name_pfx = const.get('name-prefix', f"{family.ident_name}-")
+             defines.append([c_upper(family.get('c-define-name',
+-                                               f"{family.ident_name}-{const['name']}")),
++                                               f"{name_pfx}{const['name']}")),
+                             const['value']])
+ 
+     if defines:
 -- 
 2.51.0
 
