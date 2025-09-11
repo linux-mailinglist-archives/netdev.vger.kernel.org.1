@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-221991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E17B528D2
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:34:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F192B528E0
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16A7A5614F3
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 06:34:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 200A23A912F
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 06:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDB822ACF3;
-	Thu, 11 Sep 2025 06:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD2A26A0DB;
+	Thu, 11 Sep 2025 06:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtGtopIa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gTBKAsJ6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380A8221F0C
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA31E25A631
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757572448; cv=none; b=ToNJaM61bB6w9H3uKP6N+nazYhViUcQ//8DCEGFzfzrtK2hBdHZXvB3Djp5k1lOZ9OTHnJ2xKAHOxGkz05sOVP46Dqr2LWExdKCkIJZI2kNssHDQxr4g21IqvTxvn45uSGzkXFQm3nT31W/si3TETtBq6MZQY70RKEatPDCBPIU=
+	t=1757572497; cv=none; b=LGt/zuxdQdTp+vDUaO4NOsEsflnYCz+xHB0fyL4KzlIJhexjKwwjdPaQZ0Vs8qKNvj0BnxZniFITSKv8QNXax2FpEQ4i02vNucYwjOM9v7Pt5k6fIdQ+QQydvD8WxKNaDNyopJ504LuLZXPRfEAOGR0VRFGUxeiVxC5x/lYcwM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757572448; c=relaxed/simple;
-	bh=cwmtAQaLlHA9W/SrU3Ha+9/AwGscupQvuQVU/wvkCeU=;
+	s=arc-20240116; t=1757572497; c=relaxed/simple;
+	bh=72FOsRmNcOKp4PS2OQtIDxPskrVJHqdiuc+ZzXlQDAE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fFhuDtJFFNLxk3sYwvVRvbhCTKRYguL2+syY2gk4SS33lrtquTZ2mTMa8bEIoMSnp4ojBoxmrvmskYlV4hzgI6xzbBCowTax8LaDobeKvW4exVl9abQUNOl7bPfBdcT35hlpGwYTOpIDEDlOeRkeMBcC9dT4T27qAURjVE3/+HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtGtopIa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83289C4CEF1;
-	Thu, 11 Sep 2025 06:34:05 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=D0MxFMKS6oKVaBXW/MFcD5iGsZ4OgPCViT7efO5f3HSpg0/5LtCi09QkJ6aAbmuD8iBWaGGvcroXUWlwej5YVCCIzrVMx9JdefOVvpWYtTdxB1fpsxekTsFZtQZk9cJMt8IQDF/gvSzi/ZDMUb2/pQJiszfjg4LtBVAII+CyKMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gTBKAsJ6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 412F8C4CEF1;
+	Thu, 11 Sep 2025 06:34:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757572447;
-	bh=cwmtAQaLlHA9W/SrU3Ha+9/AwGscupQvuQVU/wvkCeU=;
+	s=k20201202; t=1757572496;
+	bh=72FOsRmNcOKp4PS2OQtIDxPskrVJHqdiuc+ZzXlQDAE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WtGtopIa+PvpjWdmHFshvE9KsR/br2JTWJYgHj35IAUM9+zikDD8elwJTh/5Mr9ws
-	 EEeVSQ0eX8jZ+T3pUSLZlMCPenrspI9rQfhBbceCmGzuK2xR6QqgXAWk0Nnh81nmE2
-	 dcEfOJeQMBi06/ATl8J4MuqacGlld5eIuR/LQnTS1kk/bIbiFIZzxWYSSqniPodOX2
-	 v17CPLqn5BX1mgRqzEAcI26szPBg5bMMf3dN6bFiBmm6WEO/C8N0l1373xOmETOy/R
-	 ykBO69Ya1ED4RoHbvxJu8/sujb9NLt6+TfDl27m8fy1Kty0M/qz+6tzvBbFxKu3Dpc
-	 ElaTtJ/f5OOFg==
-Message-ID: <b7c6da2e-5ae5-497b-977b-b232793172a9@kernel.org>
-Date: Thu, 11 Sep 2025 08:34:03 +0200
+	b=gTBKAsJ6wyrGX3F3iFWzfVsw2BFwGwEyYXLXj42sBi3yB/fxsIevux3W1W+/CrxPo
+	 Fq61kX2USHqiHwPu+ytr5jKNEN22sYy7oVJQxqKzqmyZC4bDlVPYb/1dC+wByMAqCd
+	 c6mCUd0UUw1rEzLl0gRYhYD9J8lHwBC14yIExy8cZZ+8hlx9td8spvDWlyQIIaJxCQ
+	 +y5t1u4t06j/PCdifW6JLlJA6npD+0SInEeQ12yUPY0OlXSvQ7mIGPbvjTTxZJV6h1
+	 ytuLBlQQ+0aAwnuje7PU7DxepUtyMfb3o574gbFTBpb98AT35UVw5Ia5/h7z9ccqAm
+	 AaCkv1Fd8xBKg==
+Message-ID: <51e11917-e9c7-4708-a80f-f369874d2ed3@kernel.org>
+Date: Thu, 11 Sep 2025 08:34:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] of: mdio: warn if deprecated fixed-link
- binding is used
+Subject: Re: [PATCH net-next 2/2] net: phylink: warn if deprecated array-style
+ fixed-link binding is used
 To: Heiner Kallweit <hkallweit1@gmail.com>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -59,7 +59,7 @@ To: Heiner Kallweit <hkallweit1@gmail.com>,
  Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 References: <964df2db-082b-4977-b4c9-fbdcfc902f9e@gmail.com>
- <d2910abd-a20c-49f3-ac1f-ff9274ed75d7@gmail.com>
+ <bca6866a-4840-4da0-a735-1a394baadbd8@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -105,33 +105,33 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <d2910abd-a20c-49f3-ac1f-ff9274ed75d7@gmail.com>
+In-Reply-To: <bca6866a-4840-4da0-a735-1a394baadbd8@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 09/09/2025 21:15, Heiner Kallweit wrote:
+On 09/09/2025 21:16, Heiner Kallweit wrote:
 > The array-style fixed-link binding has been marked deprecated for more
 > than 10 yrs, but still there's a number of users. Print a warning when
 > usage of the deprecated binding is detected.
 > 
 > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > ---
->  drivers/net/mdio/of_mdio.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/net/phy/phylink.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
-> index d8ca63ed8..d35e28dbe 100644
-> --- a/drivers/net/mdio/of_mdio.c
-> +++ b/drivers/net/mdio/of_mdio.c
-> @@ -447,6 +447,8 @@ int of_phy_register_fixed_link(struct device_node *np)
->  	/* Old binding */
->  	if (of_property_read_u32_array(np, "fixed-link", fixed_link_prop,
->  				       ARRAY_SIZE(fixed_link_prop)) == 0) {
-> +		pr_warn_once("%s uses deprecated array-style fixed-link binding!",
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index c7f867b36..d3cb52717 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -700,6 +700,9 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+>  			return -EINVAL;
+>  		}
+>  
+> +		phylink_warn(pl, "%s uses deprecated array-style fixed-link binding!",
+> +			     fwnode_get_name(fwnode));
+Similar comment as for patch #1 - this seems to be going to printk, so
+use proper % format for fwnodes (I think there is as well such).
 
-Please use proper % format specifier for nodes. See printk-formats.
-
-> +			     of_node_full_name(np));
 Best regards,
 Krzysztof
 
