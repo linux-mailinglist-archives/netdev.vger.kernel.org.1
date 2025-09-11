@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-222112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D201DB53261
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:35:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB49B53273
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAA7D7B8017
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:33:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DEFA165186
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00F7322528;
-	Thu, 11 Sep 2025 12:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DE1321F40;
+	Thu, 11 Sep 2025 12:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkdZcT7j"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="InVXk5tU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC32A3218DE
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 12:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BEB31D362;
+	Thu, 11 Sep 2025 12:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757594096; cv=none; b=shDurrQeq2KDusuAPug6M4AheD+77QlcAW0qQn86j2ybN1ZmBLYGpXE0bsP6HwgmuGiZcrmkt63WAx8YouOfjH7Jnk1r4PYXy6sF/FTbJhnmNI98a4Cbepy1uao2QqO4kM84bcHHRxZqVC0l66JFGJA/zPhv0X0mKWEYXnpkWSE=
+	t=1757594323; cv=none; b=tP+8iu9aO+qJC250SJHFWMXaWH+ItI7VOpqiPMAIwaf7+Yb3CTecr47ZtxeHYzkaHiBts4J1ZZ6OLuqKRALS2p3GB8vQzakPOjVznh2n5PnU5rms32m18D7g84kD76FnQrZSJuLAsacCp0S95UqTIgosw7M8MUhzdANuuVcaDQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757594096; c=relaxed/simple;
-	bh=skHi/yYt3vq5RuwKXxRdTHdLDH8mNuEdbyXsWZ2FjW4=;
+	s=arc-20240116; t=1757594323; c=relaxed/simple;
+	bh=3hbK9wf2+mxCowDDtmc5Ops79VGnUo1EqG4EIVO6VFc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OoV3XMkacaIb+tnzyfoI+JKHGURLGjyFTF165xvwrfQHCXZCtaOxM8oqQKUCWa6LUzwWgRWcf8pfuhXM3Aar/SDQyae+CBBpq1ECWS7WSPxvvsojFe9EHP9v6Yn7BZDXzJLppOoXrh1mM1GD+XUF0wC1+ZZxqmo834c7fwBoIME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkdZcT7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97DB2C4CEF0;
-	Thu, 11 Sep 2025 12:34:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757594096;
-	bh=skHi/yYt3vq5RuwKXxRdTHdLDH8mNuEdbyXsWZ2FjW4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nkdZcT7j+BHbC8cfixmh8vn8O/Skx1cSs8sQZwF6reUi0YsqmyHtVYBnZJYQ4yrxy
-	 9JEkm4fE8HEJMwFyggrqPVZNd5lcs8L0vYiAABsnHIJyvWnAKKMMSQ6H2GNYkiprN6
-	 RGlYXVPfhV+HOOsw5Wd6UJD8vaUasm5z99hBboRc4d4RHXKYf/rBkJHnJJVJYGIGUf
-	 +JPfbDQ5yTgTG4fIEai4IpVBXv5x0m/x9aZCHRGWoEUo4Mu9pUqOrDhEV6FfgMKgRX
-	 A14fBykX2a65hI7cYtQx3LwhVYgLKDyA0nFB5roa3XneVdMOFDW4O1utsTUmGmQeCq
-	 eR7RU6KTc8W/Q==
-Date: Thu, 11 Sep 2025 13:34:52 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] ipv6: udp: fix typos in comments
-Message-ID: <20250911123452.GK30363@horms.kernel.org>
-References: <20250909122611.3711859-1-alok.a.tiwari@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jbcXh1506DpziVPa54VCbv54juFZNeX32myGSh2//UTNuwwoRs7d7Ms+UWU+GgSfgCKGoDigqeYsuY3C4IVqAwPhUYtY1pgafCzRk8rwop0HaDEbOtXbtf5FcryvnmVbbiEqwa5p4R5BhUfRofnCFcWaewuKz3lr5iIQnJARFUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=InVXk5tU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Uez8W5u/gbkeD8LK5BeMMMrUWwpOmn67Ekut9N1X2AY=; b=InVXk5tUMol00XxMVVnl/6yzM+
+	h+7kLVi6/C8v+326tvaYONoPE86kKtqpzbQvFncjVfuBY4j6VD83r53GV/3uejNBCAn6738Vmh0Mn
+	FigGoq77bYScFtze/coslyp3C1pBjMLDBqRKszZ+tfthYJtzP3FRmYsPKSvI1MvoIEA0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uwgZL-0084p5-TM; Thu, 11 Sep 2025 14:38:31 +0200
+Date: Thu, 11 Sep 2025 14:38:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jonas Rebmann <jre@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: phy: micrel: Update Kconfig help text
+Message-ID: <74a34c78-fed8-4438-9a9e-027d4a4762a7@lunn.ch>
+References: <20250911-micrel-kconfig-v2-1-e8f295059050@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,23 +62,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250909122611.3711859-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250911-micrel-kconfig-v2-1-e8f295059050@pengutronix.de>
 
-On Tue, Sep 09, 2025 at 05:26:07AM -0700, Alok Tiwari wrote:
-> Correct typos in ipv6/udp.c comments:
-> "execeeds" -> "exceeds"
-> "tacking care" -> "taking care"
-> "measureable" -> "measurable"
+On Thu, Sep 11, 2025 at 10:29:03AM +0200, Jonas Rebmann wrote:
+> This driver by now supports 17 different Microchip (formerly known as
+> Micrel) chips: KSZ9021, KSZ9031, KSZ9131, KSZ8001, KS8737, KSZ8021,
+> KSZ8031, KSZ8041, KSZ8051, KSZ8061, KSZ8081, KSZ8873MLL, KSZ886X,
+> KSZ9477, LAN8814, LAN8804 and LAN8841.
 > 
-> No functional changes.
+> Support for the VSC8201 was removed in commit 51f932c4870f ("micrel phy
+> driver - updated(1)")
 > 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> Update the help text to reflect that, list families instead of models to
+> ease future maintenance.
+> 
+> Signed-off-by: Jonas Rebmann <jre@pengutronix.de>
 > ---
-> v1 -> v2 
-> added "measureable" -> "measurable"
+> Changes in v2:
+> - Don't capitalize "micrel" in commit message (Thanks, Jakub)
+> - Name chip families with the common xxx-placeholders (Thanks, Jakub)
+> - Be a bit more specific as to which families
+> - Link to v1: https://lore.kernel.org/r/20250909-micrel-kconfig-v1-1-22d04bb90052@pengutronix.de
+> ---
+>  drivers/net/phy/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index a7fb1d7cae94..e543eef36d98 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -298,7 +298,7 @@ config MICREL_PHY
+>  	depends on PTP_1588_CLOCK_OPTIONAL
+>  	select PHY_PACKAGE
+>  	help
+> -	  Supports the KSZ9021, VSC8201, KS8001 PHYs.
+> +	  Supports the KSZ8xxx, KSZ9xxx, and LAN88xx families of Micrel/Microchip PHYs.
 
-Thanks for the update.
-And sorry for the slow response.
+Much better, thanks.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> Best regards,
+> --  
+> Jonas Rebmann <jre@pengutronix.de>
+
+It is a bit unusual to see a signature, git send-email, or b4 send
+would not do that. But patch(1) should be able to figure this out.
+
+For future reference, the Subject line should have the tree inside the
+[].
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
+
 
