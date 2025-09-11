@@ -1,138 +1,86 @@
-Return-Path: <netdev+bounces-222026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84E4CB52C5E
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:58:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF779B52C64
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A1B33ADD93
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:58:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04FD57AB41D
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2892E6CBB;
-	Thu, 11 Sep 2025 08:58:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172F92E6CD9;
+	Thu, 11 Sep 2025 08:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LWPQrx41"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d7X39oPG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3294C329F09;
-	Thu, 11 Sep 2025 08:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16AC2E6CBB;
+	Thu, 11 Sep 2025 08:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757581113; cv=none; b=mKwtkw7/nZlIfpTDBu3pBFetC2epcIVEIXx4wp3MuLHIvGfPzjtuyqJOlIz2PkkOaJfe/BzsE/vof7s4jnqJFVKeh98Nd1tN7kKNqObjolliUlPIjb/LepNIu4/BgXbQaE3ePvVhvvCd5hn1iUSCwqa8NTJfIzzbKFcNyeoEI+Q=
+	t=1757581198; cv=none; b=qsvfk3RMjsvbFVaQpfRsNNFyZ/NmXOnj9p0tx8qZhP+6slgmPPV02SFQ0/SrPdizI41xA6pZCZWhMO9+xeV4HmWVXyOFbRmoNq7iCKJmQmEEbl4aONyZn1iXcQ35AqBKfNJ3ZCaIo/UB80J1L9dQKLKN2k4ywfGJGLFQXlWU3RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757581113; c=relaxed/simple;
-	bh=GD1F5c/GfNTnWRPnAjonwQ5ZTjazKOg/tPdnxdK9PSo=;
+	s=arc-20240116; t=1757581198; c=relaxed/simple;
+	bh=di3tOqn8KDjRSNmUzjcZz5ibzOySkfRcW/PH6lItTeg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=csqqK7Kdfgc5YiLbXzB7NboTiI4FNdeviNlJO21unqEm9bIyxyLo2dUhywGDzHKGezJn/ATEXLQ4nm8hZLnpujKKjGUclAqHIT0GrIBFmXg019X78VOSEGLiPR5zBKrlu7Xk8ZpnU6EiV86sZePyc+/8JAfi5YJUiHJwPT/5wRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LWPQrx41; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tPLuj/xTIdlTADyQSmFwiDNGb2wswqT9CA7Ixd8e3JM=; b=LWPQrx41+Rmfg6soc8oQ3DEebT
-	bVi4OQPrsC+xG5p3CX+gQM//aAIc3Fnm7CMBogIaJolTkGVZpz2Pq+qCDdf6M9oASVduVjkTUMkDE
-	tkqEKyQ4V0gmgNaLeX5b14pHDON4ar7eA4rlZSv0JkApnRdB5RIlEZRTj0D0s5cD2x/NFYbAvbAd3
-	szZLZ1NVhaUdbLgJFt8OgaW3ECtv6UMA3JqySsjpdMqATN+8kKmDE9peKt/5dsZ6xXNmv93m5GeTg
-	Hih91SSLoTQ4FYfTqr7bzcGsNJaSWHwmiZmVpQp+ElZ58lMPYeUOq0qVfZWAd/s5KzzoiEdSdGda8
-	T5s8PQkA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55362)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uwd89-000000002hN-1Tq6;
-	Thu, 11 Sep 2025 09:58:13 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uwd84-000000002Db-3VMI;
-	Thu, 11 Sep 2025 09:58:08 +0100
-Date: Thu, 11 Sep 2025 09:58:08 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH 2/9] dt-bindings: net: qcom: document the ethqos device
- for SCMI-based systems
-Message-ID: <aMKPIFmOS1riOajH@shell.armlinux.org.uk>
-References: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
- <20250910-qcom-sa8255p-emac-v1-2-32a79cf1e668@linaro.org>
- <24cd127d-1be7-42f4-a2ec-697c5e7554db@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rmc7/+7WB5MB/9q/Sshafgbu6iUGcIg1YKyP0+RBF6Mb5qsqSRKbF9aIQbqb6bN5rbZuqwVC4v2nPLFnxc5Sxig47d8X5anFs/zmkCmnIfvlFrTM55dswBS4Xyp5SIHsrTEczpAmy8FeOyd0l2M/qElkJiSLz9fB6K9j5/zwpa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7X39oPG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DE82C4CEF0;
+	Thu, 11 Sep 2025 08:59:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757581197;
+	bh=di3tOqn8KDjRSNmUzjcZz5ibzOySkfRcW/PH6lItTeg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d7X39oPGOFriWKB/puO3tXJcs5u3pQmXfNPNNI8u5ge2mMCrfGBsH2Rh7NKcXunnn
+	 ObfoQli7du9d2GcWiz3ksJ57w7LGYFGJuZEsrqz1lxF9fFztZFpwweu8GBTjFMKdWd
+	 zkPbcElNMpHhcq3l0yKWfScfPTbVH2XNqm8qoZmuCWitfZdeAa/oZeWsoXXdZlx9mu
+	 S5M+MpRqQMTueSmR81hl4/YoijM9bnmlnmtRyzMgTXGtJCEvBAcQyUyWmzxy6VanGx
+	 iQETccGAWvBynljLCuzzzQgxgMZHVVp4JjtBQabjYy+linbjJ4XAqaGypJIvHsXRJw
+	 rzS47xbNu5qTQ==
+Date: Thu, 11 Sep 2025 10:59:49 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 32/32] selftests/namespaces: add file handle selftests
+Message-ID: <20250911-vorurteil-gemacht-c62d1349fc33@brauner>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-32-4dd56e7359d8@kernel.org>
+ <f65cf3ae-069d-4ade-9fc9-03f01c7e1649@acm.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <24cd127d-1be7-42f4-a2ec-697c5e7554db@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <f65cf3ae-069d-4ade-9fc9-03f01c7e1649@acm.org>
 
-On Wed, Sep 10, 2025 at 06:04:28PM +0200, Andrew Lunn wrote:
-> > +    ethernet: ethernet@7a80000 {
-> > +        compatible = "qcom,sa8255p-ethqos";
-> > +        reg = <0x23040000 0x10000>,
-> > +              <0x23056000 0x100>;
-> > +        reg-names = "stmmaceth", "rgmii";
-> > +
-> > +        iommus = <&apps_smmu 0x120 0x7>;
-> > +
-> > +        interrupts = <GIC_SPI 946 IRQ_TYPE_LEVEL_HIGH>,
-> > +                     <GIC_SPI 782 IRQ_TYPE_LEVEL_HIGH>;
-> > +        interrupt-names = "macirq", "sfty";
-> > +
-> > +        dma-coherent;
-> > +
-> > +        snps,tso;
-> > +        snps,pbl = <32>;
-> > +        rx-fifo-depth = <16384>;
-> > +        tx-fifo-depth = <16384>;
-> > +
-> > +        phy-handle = <&sgmii_phy1>;
-> > +        phy-mode = "2500base-x";
+On Wed, Sep 10, 2025 at 02:46:21PM -0700, Bart Van Assche wrote:
+> On 9/10/25 7:37 AM, Christian Brauner wrote:
+> > +	snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/net");
+> > +	ns_fd = open(ns_path, O_RDONLY);
 > 
-> Nitpicking: It is clearly not an SGMII PHY if it support
-> 2500BaseX. You might want to give the node a better name.
-> 
-> > +        snps,mtl-rx-config = <&mtl_rx_setup1>;
-> > +        snps,mtl-tx-config = <&mtl_tx_setup1>;
-> > +        snps,ps-speed = <1000>;
-> 
-> Since this MAC can do 2.5G, is 1000 correct here?
+> Here and also in TEST(nsfs_uts_handle), ns_path is not modified. Does
+> this mean that "/proc/self/ns/net" can be stored in a static const char
+> array and also that the snprintf() call can be left out? In case I would
+> have missed the reason why the path is copied, how about using
+> asprintf() or strdup() instead of snprintf()?
 
-The driver only accepts 10, 100 and 1000 here. Not sure if that's
-documented in the binding.
-
-Also, does snps,ps-speed need to be set if we're not immitating a PHY
-with the PCS? My understanding is that snps,ps-speed is only relevant
-in that circumstance. (I suspect many DTS get this wrong.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Yep, that can just be a static string. Thanks.
 
