@@ -1,261 +1,115 @@
-Return-Path: <netdev+bounces-222333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF41BB53E2C
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 23:56:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2FBAB53E66
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 00:00:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5A077A916E
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 21:54:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F8735C00BC
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 22:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0266E29D272;
-	Thu, 11 Sep 2025 21:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652D22E2DF2;
+	Thu, 11 Sep 2025 21:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="WgXaX624"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="TQXmQ0mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF961957FC;
-	Thu, 11 Sep 2025 21:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365E02E2DDD
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 21:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757627768; cv=none; b=t9GRT+iwHZQuhLS9Wl4wT7AX5jejPEaPMD7dzkeY4PZkQYuoihaMdRTme2UHy1IYNFXc10U8FIW5FglhTCFTJlFnvIFs30PoZ1bCGUdyd3xPT5nrrAzqoeQ+C03TYW7ZtTVAvY+HlyyJLsu7wbqu2mWV5zWuie87m98sW3f7CDs=
+	t=1757627999; cv=none; b=LO253HLH1PmAajPLOXV+jxVbZg1QubhWp7iAu2JOAUoce6umT5YksBaTtlY7rMj9j/55wsNU0UklftKYPsrk8QRy9b+wtbVVzLJGRdxpjouCYOfho0bo3DiyMynw4jAzdCBQPKusSzrkuBQEr+cfEpRkRCaztbXlaRde5xgqWis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757627768; c=relaxed/simple;
-	bh=n9wAHM5lPDOPUmR7VKGS6+mcXMpPy0ZPrz0jS//RKBI=;
+	s=arc-20240116; t=1757627999; c=relaxed/simple;
+	bh=1i/bSFJPS3rb5WZHFKhK8/2T5hPyRzAgE9ElrMASisc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M1EqsDurn0kfV4PDCQtwVxgUf6wgPcVJkkbNxTnaLGS9lPTg4/W4xD/HWIq10zR6khHzTODXlfvcI9oZIBWc2jzmpLobqOGlQz5FDkMfkaqT9fIa9hGn3ulb+hEzB0ktVbPs/tXIgmOEziMj53U9WGTSKH/EpvtfT1+GNYuvbxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=WgXaX624; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4cNBFm4pRxz9tNF;
-	Thu, 11 Sep 2025 23:55:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1757627756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OYxotd5wxGpHXgDa/b3MTB+aIwsC4SQo134x/Z4fbgc=;
-	b=WgXaX624JAxBLgd6VZnAzr8kfZvrMtM3OricE3FD7BtH9w1kz4yRWvEJMDTvaH2w3z6Vei
-	de4n3QjJrLtF/NUYX+fU26RXy7n1qebR7rWB0/hNBq7W3HrIxwWhKyw7hTWJmKsnKJj/lH
-	81ZdtljeZ+nYychNBbHs6P4EGh7UMp+LRhtloCF63waSjhfSpfXVLwvqxPzDnR++NI9BM7
-	kRyr11gNVFuHxY+PbJ5YG9EgeYytOyoLw5gx0cuaa5QnXGKCItD9G7ZDprxi6dn0PcdV8l
-	Y/C/gMUkOQr5AEUX25JTl7fzE7bH5+URNAJAMkyI34oAQYYXcIJU0mhAVdxI7Q==
-Date: Thu, 11 Sep 2025 23:55:47 +0200
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
- <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Vladimir Oltean
- <vladimir.oltean@nxp.com>
-Subject: Re: [net-next v19 4/7] net: mtip: Add net_device_ops functions to
- the L2 switch driver
-Message-ID: <20250911235547.477460e4@wsk>
-In-Reply-To: <20250910172251.072a8d36@kernel.org>
-References: <20250824220736.1760482-1-lukasz.majewski@mailbox.org>
-	<20250824220736.1760482-5-lukasz.majewski@mailbox.org>
-	<20250827082512.438fd68a@kernel.org>
-	<20250907183854.06771a13@wsk>
-	<20250908180535.4a6490bf@kernel.org>
-	<20250910231552.13a5d963@wsk>
-	<20250910172251.072a8d36@kernel.org>
-Organization: mailbox.org
+	 MIME-Version:Content-Type; b=r7GnQBoPE8gA0kL/p4I0AlhKqE0iqfUU6H35ofoWgjl0W4WexhVbNC1NagYZp1MidNPUilU9a4CW/f09v5l+y9Cy8rGqJ6ABrpKIbomtB8DpyGdYNX+S27mXbNBe/+p3OULy7Sp/MAwX+BXxKsBPeM0u8JK6ZhRxkc0EMyDCprE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=TQXmQ0mz; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-80aaf37b0e5so144459385a.3
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 14:59:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1757627996; x=1758232796; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PKeR5+cTeruy4t5ASGpY5RgikGZdd88OkrN7PAVzq5g=;
+        b=TQXmQ0mzK4X6qKC5Tp0T8WdreMUIEnYhHVjEAtIla/1sYWZVCmyCCopwrnsH4Ze4m0
+         mZxDgjUx/9wASRpmogiwEgLQ2zPpuYNWV2FrBowa+/MLpXd4l2irmoCj9LJzs46iok3Y
+         Y4U7G0idFw7Xko9tSIBfB7t88ep45SGwHWiijOetkP/2iSZuFpkmCokIAk0ZSwajF0gE
+         Kf5rHS4+ZlMZp502g+Vwzpb+qYCX6KewEFzlPyvAgdGcKPogeHXzTknUkXrMTOgLVtqb
+         KTKtvkc9ru1xbljvU7DHOzn/aNCF7U+897yNv88e153s6hg2gRAiC/Eg7lfnkBlY55fm
+         aW5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757627996; x=1758232796;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PKeR5+cTeruy4t5ASGpY5RgikGZdd88OkrN7PAVzq5g=;
+        b=ZHr12aO+1wnQUo2EZVIBv9EW8ocsK+Au3G2xIQytC0dJAIp0ElUvL1pL/9CVkSE5PE
+         YLttKhVrGGXFHboBJ8TBAx735zY7TBN0a+pgQ0UiLDPuQNhWx7aCqsG1gdTQzE6/FbG4
+         11cs3MD8jQUxkg57HDpT+uuL/JoCgCZPFrsjE8baxE2T8UVx8KIJ3p+UXFM65DqKtXsN
+         mviCZ4+O/Fhj3l1/2EjLU8pUIXOu5+MuXRHaQNgAH6Qx948l01XCMlTb4na6GbiQyRBU
+         YFJK3TrgT3qcY323Gf9m3o+UyAiDrJ7c+0TBGYLzht1hVU2Rn/MhShPM4rWAtFVVo3jo
+         47yQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWV/BGOBZIPaScfHaVBhgYgNdqneIwBCMVhSS98UlaUvrlzrKssj/BrqYgZ1EEKNNxWrJOXWjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywiu70ckCGsTKMH1+wOqK84G5T+VqrHIOW12pR+7DoucnbyYs7C
+	7TdEIldARuyejuxqmLddY2zINXsQ33et9qpz6uACcwsAR+9FBPsgPhCI5+9juq+uWSbypBoD297
+	7TR7k
+X-Gm-Gg: ASbGncsF9u/EUBY+12nKY2YbpV6WOX30ZJpPJep2MiWGoggfT89iqT1DPoo+nETjaQT
+	fNqZ8bNowP5jIcPmVrfOGbQFUN5oheVuMliEZxCNlb09v6lA9m+dLKqKch+RdFqaDTgVyul6MpP
+	0I3pxpZCc0fR/OIv5l0hF73gQAL7XbViB9yDgU1wtD+7Eq7gLi6umwbxxu+oA2BIL1I4k1KLsic
+	rIJTIWTaCnVmB7NXdcTYV551ONzto6WFqfkMg8EEhDVs1u6Zp0Tqoaz2uVSI5zVK8DFUQghuzpF
+	lrk5qBDCqkRDaKvASlSNh9O2thJsCigKfs90z98FmrjxZdgHJasFMsi4a33bIP35lwn4drxCsW0
+	31j/uiq92TERCiu5YCBFiuwDgXqp9wm62ybSTuv6r9WPsZO/lIspQw2KRtKlIGPXrOWKHEWC+3E
+	DkDOsx4QmTgg==
+X-Google-Smtp-Source: AGHT+IGuTJRYgWqacSXXn6XcUEJLhMpbc/YveMsA+Ug+55aI7fdn+aKca4zDurA/rHsyI89cU8Xc2Q==
+X-Received: by 2002:a05:620a:a203:b0:800:e534:ea6c with SMTP id af79cd13be357-82400c2387dmr111951885a.77.1757627995947;
+        Thu, 11 Sep 2025 14:59:55 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-820c8bb8fb5sm166246585a.12.2025.09.11.14.59.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 14:59:55 -0700 (PDT)
+Date: Thu, 11 Sep 2025 14:59:52 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH iproute2-next 1/2] scripts: Add uapi header import
+ script
+Message-ID: <20250911145952.4b9db523@hermes.local>
+In-Reply-To: <20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
+References: <20250909-feature_uapi_import-v1-0-50269539ff8a@bootlin.com>
+	<20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-META: m5n6r7w5b9m9aofnwhgwpk1hacaixifp
-X-MBO-RS-ID: 4a733e75a4d374f700e
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On Tue, 09 Sep 2025 15:21:42 +0200
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-> On Wed, 10 Sep 2025 23:15:52 +0200 =C5=81ukasz Majewski wrote:
-> > > > I do use skb =3D buld_skb() which, "builds" the SKB around the
-> > > > memory page (from pool).
-> > > >=20
-> > > > Then, I "pass" this data (and swap it) to upper layer of the
-> > > > network stack.
-> > > >=20
-> > > > The same approach is used in the fec_main.c driver:
-> > > > https://elixir.bootlin.com/linux/v6.17-rc3/source/drivers/net/ether=
-net/freescale/fec_main.c#L1853
-> > > >     =20
-> > >=20
-> > > I probably cut out too much context. I think I was quoting from
-> > > Tx, indeed on Rx this is not an issue.   =20
-> >=20
-> > Ok. No adjustments needed then. Good :) =20
->=20
-> No, you were talking about build_skb() which is Rx.
-> This is the patch that adds Tx. Tx is wrong.
+> Add a script to automate importing Linux UAPI headers from kernel source.
+> The script handles dependency resolution and creates a commit with proper
+> attribution, similar to the ethtool project approach.
+> 
+> Usage:
+>     $ LINUX_GIT="$LINUX_PATH" iproute2-import-uapi [commit]
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-The same approach is taken in fec_main.c (@ fec_enet_txq_submit_skb()
-function).
-
-> You can't modify the skb unless you call skb_cow().
-> Or just copy the data out to your local buffer.
-
-In the mtip_start_xmit_port() I do assign the address to skb->data to
-bufaddr pointer.
-
-If alignment is wrong the we copy it to bounce buffer.
-Then we do swap the buffer if needed.
-
-Last step is to dma map this memory and assign the pointer to the
-descriptor for L2 switch transmission.
-
->=20
-> > > > You may have port =3D=3D 1 || port =3D=3D 2 when you receive packet=
- from
-> > > > ingres ports.
-> > > > You may also have port =3D=3D 0xFF when you first time encounter
-> > > > the SA on the port and port =3D=3D 0 when you send/receive data
-> > > > from the "host" interface.
-> > > >=20
-> > > > When port 1/2 is "detected" then the net dev for this particular
-> > > > port is used. In other cases the one for NAPI is used (which is
-> > > > one of those two - please see comment above).
-> > > >=20
-> > > > This was the approach from original NXP (Freescale) driver. It
-> > > > in some way prevents from "starvation" from net devices when L2
-> > > > switch is disabled and I need to provide port separation.
-> > > >=20
-> > > > (port separation in fact is achieved by programming L2 switch
-> > > > registers and is realized in HW).     =20
-> > >=20
-> > > But what if we have mixed traffic from port 1 and 2?
-> > > Does the current code correctly Rx the packets from port 1 on the
-> > > netdev from port 1 and packets from port 2 on the netdev from
-> > > port 2?   =20
-> >=20
-> > Yes, it does.
-> >=20
-> > In the mtip_rx_napi() you have call to mtip_switch_rx() which
-> > accepts pointer to port variable.
-> >=20
-> > It sets it according to the information provided by the switch IP
-> > block HW and also adjust the skb's ndev.
-> >=20
-> > I'm just wondering if the snippet from mtip_rx_napi():
-> > -------8<--------
-> > if ((port =3D=3D 1 || port =3D=3D 2) && fep->ndev[port - 1]
-> > 	mtip_switch_tx(fep->ndev[port - 1]);
-> > else
-> > 	mtip_switch_tx(napi->dev); =20
-> > ------->8--------   =20
-> >=20
-> > could be replaced just with mtip_switch_tx(napi->dev);
-> > as TX via napi->dev shall be forward to both ports if required.
-> >=20
-> > I will check if this can be done in such a way. =20
->=20
-> Not napi->dev. You have to attribute sent packets to the right netdev.
-
-And then we do have some issue to solve. To be more specific -
-fec_main.c to avoid starvation just from fec_enet_rx_napi() calls
-fec_enet_tx() with only one net device (which it supports).
-
-I wanted to mimic such behaviour with L2 switch driver (at
-mtip_rx_napi()), but then the question - which network device (from
-available two) shall be assigned?
-
-The net device passed to mtip_switch_tx() is only relevant for
-"housekeeping/statistical data" as in fact we just provide another
-descriptor to the HW to be sent.
-
-Maybe I shall extract the net device pointer from the skb structure?
-
->=20
-> > > > As I said - we do have only ONE queue, which corresponds to
-> > > > uDMA0 when the switch is enabled. This single queue is
-> > > > responsible for handling transmission for both ports (this is
-> > > > how the HW is designed).     =20
-> > >=20
-> > > Right but kernel has two SW queues.   =20
-> >=20
-> > You mean a separate SW queues for each devices? This is not
-> > supported in the MTIP L2 switch driver. Maybe such high level SW
-> > queues management is available in the upper layers? =20
->=20
-> Not possible, each netdev has it's own private qdisc tree.
-
-Please correct me if I'm wrong, but aren't packets from those queues
-end up with calling ->ndo_start_xmit() function?
-
->=20
-> > > Which can be independently
-> > > stopped.   =20
-> >=20
-> > It supports separate RX and TX HW queues (i.e. ring buffers for
-> > descriptors) for the uDMA0 when switch is enabled.
-> >=20
-> > When you want to send data (no matter from which lan[01] device) the
-> > same mtip_start_xmit() is called, the HW TX descriptor is setup and
-> > is passed via uDMA0 to L2 switch IP block.
-> >=20
-> > For next TX transmission (even from different port) we assign
-> > another descriptor from the ring buffer.
-> >  =20
-> > > So my concerns is that for example port 1 is very busy so
-> > > the queue is full of packets for port 1, port 1's netdev's queue
-> > > gets stopped. Then port 2 tries to Tx, queue is shared, and is
-> > > full, so netdev 2's SW queue is also stopped. Then we complete
-> > > the packets, because packets were for port 1 we wake the queue
-> > > for port 1. But port 2 also got stopped, even tho it never put a
-> > > packet on the ring..=20
-> >=20
-> > As fair as I can tell - both ports call mtip_start_xmit(), their
-> > data is serialized to the TX queue (via descriptors).
-> >=20
-> > Queued descriptors are sent always at some point (or overridden if
-> > critical error encountered).
-> >  =20
-> > > Long story short I think you need to always stop and start queues
-> > > from both netdevs.. There's just 2 so not too bad of a hack.   =20
-> >=20
-> > Maybe there are some peculiarities in for example bridge code (or
-> > upper network stack layers in general), but I think, that I don't
-> > need any extra "queue" management for TX code of MTIP L2 switch. =20
->=20
-> I think I explained this enough times. Next version is v20.
-> If it's not significantly better than this one, I'm going to have=20
-> to ask you to stop posting this driver.
-
-I don't know how to reply to this comment, really.=20
-
-I've spent many hours of my spare time to upstream this driver.
-I'm just disappointed (and maybe I will not say more because of high
-level of my frustration).
+I will continue to use my script which works off of headers processed
+by "make headers_install"
 
 
 
-
-Could you point me to the driver example which provides such queues
-management for switchdev driver? Just to show what you expect from me.
-
-One example.
-
-
---=20
-Best regards,
-
-=C5=81ukasz Majewski
 
