@@ -1,105 +1,114 @@
-Return-Path: <netdev+bounces-221958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCDE9B526BC
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 04:57:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0254B526D8
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 05:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EAC41B27902
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 02:58:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 906373BB2A1
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576CB2236E8;
-	Thu, 11 Sep 2025 02:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3E11C84DC;
+	Thu, 11 Sep 2025 03:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="WlYgDmVJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b5QxP2xV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1B933D8;
-	Thu, 11 Sep 2025 02:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43AF19C54B
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757559464; cv=none; b=GmOre5Nhjw8mq6brkBvMbf8FJJEr9QxLfCLdaGcS5zebQf8EiXDfuJubpipK+rHK0LS9w/7TbJPq0PLXb0le7MtW5wBRkLJgFd9RYcChPIdpQ/XJw6M9IUnoqupTMWtpANFdqICXaB8IjJV02/fDKfIryQdz+gGcGSZ9WB9Nwf4=
+	t=1757559990; cv=none; b=RIKYGGkJ9cHHPaCjwqnPwSL3biNtoHbwc/xd94dbvoA95PIcVRRXMXZpmYxYEadyibRKEmPu2x8CSV6hbv3jn3EJfgwP2Ljhi6AP8F9boiTBDFe0+xLbqwtwsNFv+KVbhZkhZNfVP1n/NJ2fz/Rfj6s41+zSfXsae7uhEM04tr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757559464; c=relaxed/simple;
-	bh=IWC4gv/+MV4wQpmWIljhamgnPDMr1J6qUiVNr3movps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ezER38L+eZeh/jSlbjFwNy5QA1mFeI2fDAoe0ouB7HgVh1W3anz8sjSO6qLwaEfnLcvet8gOTglJaZ5GeESIX0uQy2iAYX2VszwtdNZWo7npH8uurkbWx8gAHP9/P9OW7cyoWutHmSRqNXjg1EPORKBS1/mJSzL0I7m4fVdmzAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=WlYgDmVJ; arc=none smtp.client-ip=220.197.32.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=Date:From:To:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=Raijf0pxSNsl3FesVHkWVDpo58+B3Fa1eBdInzF1Pzo=;
-	b=WlYgDmVJKeOz2HCf2T+/k5D8y+gVK/8GI5wnA3CJUtFKLCw3FKtT0HQ+SMWNbN
-	r1wUJRj7/OCzAdF3qFfo7/QL143fSqZlCBNUoLAN0RUyGDl9hrO6ejStoJN9kwpN
-	2v5r3juk1e+SmN/7wYQu30AYMQ0qkRkmT26/xaXEquwfs=
-Received: from dragon (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id Mc8vCgAHe3scOsJocw1PBA--.47548S3;
-	Thu, 11 Sep 2025 10:55:27 +0800 (CST)
-Date: Thu, 11 Sep 2025 10:55:24 +0800
-From: Shawn Guo <shawnguo2@yeah.net>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Joy Zou <joy.zou@nxp.com>,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
-	festevam@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	frieder.schrempf@kontron.de, primoz.fiser@norik.com,
-	othacehe@gnu.org, Markus.Niebel@ew.tq-group.com,
-	alexander.stein@ew.tq-group.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com,
-	netdev@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH v10 0/6] Add i.MX91 platform support
-Message-ID: <aMI6HNACh3y1UWhW@dragon>
-References: <20250901103632.3409896-1-joy.zou@nxp.com>
- <175694281723.1237656.10367505965534451710.git-patchwork-notify@kernel.org>
- <aMI0PJtHJyPom68X@dragon>
- <aMI1ljdUkC3qxGU9@lizhi-Precision-Tower-5810>
+	s=arc-20240116; t=1757559990; c=relaxed/simple;
+	bh=4lrIP2oIT2KQMLPlYoqy4xiumHfWOaeZsBrg602rDxw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Wc/NUii8SKYD7gJy/vstWebnk+Jwxnw9bGFCqDNaExQgNtWx8GHJkjrtV2Sj8vqfy1Q4gmnhrqsXmrehp316X/E8odmCDGhVyoEoAXUQ47+2CpHN+dCK8qkf2Ef1a6cnazBkT83WMQs3UCq2RBK8qOcxgaGQuWYAFvT3nJeA7g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b5QxP2xV; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b47630f9aa7so201008a12.1
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:06:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757559988; x=1758164788; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CMNcUzlFWQ1JYPUFpxY4C/RjKhz5EYBknYsBxEqkRj8=;
+        b=b5QxP2xV/uCzs5kQHUT/qEI+1tVRnOJobzLNFgmY6TLmxzUWdrq9ZObsZ5ttAbhANd
+         OOMTumTthgXFODK0e4vjlf7/fpz0JpnNTKmCXrjfIXSRhyZQsr8OscJd53bOSMnoOa9K
+         j/r9Hws4PptI+cw7Vfo/9Tq+v2bcNvqp2yNKseeaTkzuljGZc5vsB51X7LA50tQDTWTN
+         Ph+nCNsO6CU5B5yfH7F3gR7XxtELXrSeELcGO3c346EWbRWj6X9b0VcZBfYKmVGGxkuA
+         /Yho+XhoQM0ZUcaJn3tBbNCzSfbfU0hR36hoUtIDRdiJPr+9hteJW52cfGZoiWkNuIJj
+         i66A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757559988; x=1758164788;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CMNcUzlFWQ1JYPUFpxY4C/RjKhz5EYBknYsBxEqkRj8=;
+        b=cDPBqv0uWdS1DDzo6faX1UxjiohyD6MNNF3PfNmnY38efNXaM8SYkVwNQZchxoDXBG
+         7OGXGbfbaXHbwqZrUN+IdPotRNGLB7RkeFP4H0qsK3TfXC4SDaWstJ0qdtfQCUOaKnIX
+         RBxMVF7H3lO76sr3meTFXcGddezzhbjfevAy/NLKu3Z/ahiUhyG4H0ZKrN4/rucJnHS9
+         jFmhQBjgIFELjF5f1eegPl/9w8t81TJQO/xWxe86N66vYX3M6gF0e7+w3DTSb13Oa1c+
+         FN87G17kPbm8e0IrFueKDAij5oCbHhrrGP9D5hqyjnPnRo1y22dicJ594ju809iLbptA
+         77ag==
+X-Forwarded-Encrypted: i=1; AJvYcCW5lag5QvL+96UQsbn5R1jjsmvcCf3KI06Q6nBeMUefe/6tbBfMQNaoM/2hxnjpa6zwdm+7bys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlA7t3c68amDyIhg7OL2Y9KH7YXbUp9z4sNRENMTMOhsk4bjK6
+	zDEvtfL3VGrr3Yg4ajlqB8bF3jek0TbUfoN/+LrgtM4BzBt+RF7eRNIqkSuRv+Hu/3vFgftmlb+
+	haQ+0KA==
+X-Google-Smtp-Source: AGHT+IGhYThxtMqANI2ALRL3OuTWD/0qISYYhVSXBNbra3EipiRnOZ0qMh47FtuKL40zJV3d8D8aJqLqUBo=
+X-Received: from pjbsx7.prod.google.com ([2002:a17:90b:2cc7:b0:329:815c:ea84])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:72a3:b0:243:c36f:6a71
+ with SMTP id adf61e73a8af0-2533d226078mr26077683637.21.1757559987975; Wed, 10
+ Sep 2025 20:06:27 -0700 (PDT)
+Date: Thu, 11 Sep 2025 03:05:28 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMI1ljdUkC3qxGU9@lizhi-Precision-Tower-5810>
-X-CM-TRANSID:Mc8vCgAHe3scOsJocw1PBA--.47548S3
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Jw1DAFWDKryUWw18Wr18uFg_yoWxAwbEvF
-	4UZw4kCws8GF4UK3Wktrn3AwnYya47Xa4xXr1UWw43Z3Z5ArWkXFWFgFWkJFn5KFWkJFna
-	yr9IqrWq9rWa9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8S1v3UUUUU==
-X-CM-SenderInfo: pvkd40hjxrjqh1hdxhhqhw/1tbiCwXFZWjCG0lVNgAAs1
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250911030620.1284754-1-kuniyu@google.com>
+Subject: [PATCH v1 net 0/8] net: Fix UAF of sk_dst_get(sk)->dev.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Sep 10, 2025 at 10:36:06PM -0400, Frank Li wrote:
-> On Thu, Sep 11, 2025 at 10:30:20AM +0800, Shawn Guo wrote:
-> > On Wed, Sep 03, 2025 at 11:40:17PM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
-> > > Hello:
-> > >
-> > > This series was applied to netdev/net-next.git (main)
-> > > by Jakub Kicinski <kuba@kernel.org>:
-> >
-> > Jakub,
-> >
-> > Can you stop applying DTS changes via net tree?
-> 
-> shawn:
-> 	Suppose Jaku only pick patch 6.
-> 
->         - [v10,6/6] net: stmmac: imx: add i.MX91 support
->           https://git.kernel.org/netdev/net-next/c/59aec9138f30
-> 
-> other patches is "(no matching commit)"
+syzbot caught use-after-free of sk_dst_get(sk)->dev,
+which was not fetched under RCU nor RTNL. [0]
 
-Ah, sorry for missing that!  Thanks for pointing it out, Frank!
+Patch 1 adds 2 helpers to fetch __sk_dst_get(sk)->dev safely
+Patch 2 ~ 8 fix UAF in smc, tcp, ktls, mptcp
 
-Shawn
+[0]: https://lore.kernel.org/netdev/68c237c7.050a0220.3c6139.0036.GAE@google.com/
+
+
+Kuniyuki Iwashima (8):
+  net: Add sk_dst_dev_rcu() and sk_dst_dev_get().
+  smc: Fix use-after-free in __pnet_find_base_ndev().
+  smc: Use sk_dst_dev_rcu() in in smc_clc_prfx_set().
+  smc: Use sk_dst_dev_rcu() in smc_clc_prfx_match().
+  smc: Use sk_dst_dev_rcu() in smc_vlan_by_tcpsk().
+  tcp: Use sk_dst_dev_rcu() in tcp_fastopen_active_disable_ofo_check().
+  tls: Use sk_dst_dev_rcu() in get_netdev_for_sock().
+  mptcp: Use sk_dst_dev_rcu() in mptcp_active_enable().
+
+ include/net/sock.h      | 19 +++++++++++++
+ net/ipv4/tcp_fastopen.c |  7 ++---
+ net/mptcp/ctrl.c        |  7 +++--
+ net/smc/smc_clc.c       | 63 ++++++++++++++++++++---------------------
+ net/smc/smc_core.c      | 25 +++++++---------
+ net/smc/smc_pnet.c      | 35 ++++++++---------------
+ net/tls/tls_device.c    | 16 +++++------
+ 7 files changed, 88 insertions(+), 84 deletions(-)
+
+-- 
+2.51.0.384.g4c02a37b29-goog
 
 
