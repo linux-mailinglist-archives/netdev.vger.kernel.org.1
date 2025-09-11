@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-222098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5C4BB530F8
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:40:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813D7B530EA
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:39:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00AE6A07B26
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:39:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13683566440
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B6C32252A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AE0321F40;
 	Thu, 11 Sep 2025 11:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="hOfDKkMm"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="csaVuRTW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACEF321456;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540AF321442;
 	Thu, 11 Sep 2025 11:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757590631; cv=none; b=pYIXerUg4XVfONQPlwFDrT0+N6Br6Bj73LkuceC83iWqBHh3SGOdvzRpA+oc5ssFulUjoBQLSywRMDiRzWdgie1jgp6LrEPtM5LZWN6rKkUy0UklAKqtbJfrF01f5hTJteM8Ys6Uyc59Y1jmXPK6uQGHD9JkvboXG78bjqtUziY=
+	t=1757590631; cv=none; b=bmAsKvTNjm7bELpuPflnDZJXTJ5PGArfI8S4tiAlGVYBOD3am5pRHFqH08fWlWWsRuQkh83jDhmhD/CXw5dHLTtawKokTiZtg8TYDCiZUeFWqbZ28SykzPtxXOoHEZicZg7dJOBuQhQohg+5pfSvyDHMFrMbsbJMxP0N4CYF8xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757590631; c=relaxed/simple;
-	bh=f19zsr4kaltVZz4tiXmXoetEm2f2Hxlavoo5DtHjrPM=;
+	bh=uCqh6weCbxxwSYUyrSLOci8g9ps7pnde7H7nW1y6vTI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r52JFribMlw0SdS/T1b3i1IBV2/tmG9GV8bXWDD1KGc1Fz+juPJgw3OaNfS5huEiWgtCQ/9QO5MY/pvWdYGjoBXr8rcGXccSeJtLrEj8mEzeK/nz0CFDHJht7oy4+Ub1wAFqzg9zT12tDkDn+7jMH7EzEdekP9al4oRfxRjFofw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=hOfDKkMm; arc=none smtp.client-ip=198.47.23.235
+	 MIME-Version:Content-Type; b=LEZPSdLHHa+q08l2rKx0PbgdNx1yuuAMIfl59R4y2Y4zfPkrBFIyFRfWIY/2D+jtnEe88EXmiHN4mIqEN+HgtRqBLhODA+N6MQs+AyViPiOmGgKtkEX34/GEPdRPKfc+RYEacOS5u/6Nokb0yY+CfZxLFj7TqXqI/DDoHK2uyGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=csaVuRTW; arc=none smtp.client-ip=198.47.23.235
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58BBaUED793666;
-	Thu, 11 Sep 2025 06:36:30 -0500
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58BBaWZ0793678;
+	Thu, 11 Sep 2025 06:36:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1757590590;
-	bh=78saqbBV7l7amg+T7GZYrtVBXo8ffvbG+RF5wZUGKuQ=;
+	s=ti-com-17Q1; t=1757590592;
+	bh=zRsIr23BIzgLzTmL8Py68DcXdNh7zzWEy6t51VP+4LQ=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=hOfDKkMmxr580oGsCMt4qLsxC/JdOJSSOH6HAXjmH4wLKLlMk/EhVPMVUgwjQAovq
-	 Ju1gdfKhxfgyemDxuACApHGu8RoKrW/C/8qTj0UqA4oUdIXZ3NuEEyg5jKr5m312wl
-	 RSpA7jo9VlnvcIQfC8En1GqcVEJZs7PAuF+2BLD8=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58BBaURW1027202
+	b=csaVuRTWANMjTWvJzA+8pI34HZcinEHvdvvHBq/vPXeimK0ExgheZbJ59jgLUQuha
+	 CiSgL0fBWumCz/N0hclO5oyHkHipU4+gqZC5cgeJuk3jMJGiR0oN9QHoK8dorJQzvA
+	 NaVcgiwywP8HPeQLU/wowrmJrcrZwOnNtUEDo8R8=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58BBaWPC1027214
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 11 Sep 2025 06:36:30 -0500
-Received: from DLEE211.ent.ti.com (157.170.170.113) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+	Thu, 11 Sep 2025 06:36:32 -0500
+Received: from DLEE200.ent.ti.com (157.170.170.75) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 11
- Sep 2025 06:36:30 -0500
-Received: from fllvem-mr08.itg.ti.com (10.64.41.88) by DLEE211.ent.ti.com
- (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
+ Sep 2025 06:36:32 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE200.ent.ti.com
+ (157.170.170.75) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Thu, 11 Sep 2025 06:36:30 -0500
+ Transport; Thu, 11 Sep 2025 06:36:32 -0500
 Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllvem-mr08.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58BBaUha1015163;
-	Thu, 11 Sep 2025 06:36:30 -0500
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58BBaWWU1766328;
+	Thu, 11 Sep 2025 06:36:32 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 58BBaTgj032087;
-	Thu, 11 Sep 2025 06:36:29 -0500
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 58BBaVFh032092;
+	Thu, 11 Sep 2025 06:36:31 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet
@@ -92,9 +92,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
         <devicetree@vger.kernel.org>
-Subject: [PATCH net-next v4 6/7] MAINTAINERS: Add entry for RPMSG Ethernet driver
-Date: Thu, 11 Sep 2025 17:06:11 +0530
-Message-ID: <20250911113612.2598643-7-danishanwar@ti.com>
+Subject: [PATCH net-next v4 7/7] arch: arm64: dts: k3-am64*: Add shared memory region
+Date: Thu, 11 Sep 2025 17:06:12 +0530
+Message-ID: <20250911113612.2598643-8-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250911113612.2598643-1-danishanwar@ti.com>
 References: <20250911113612.2598643-1-danishanwar@ti.com>
@@ -108,31 +108,43 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Add an entry to MAINTAINERS file for the rpmsg_eth driver with
-appropriate maintainer information and mailing list.
+Reserve a shared memory region for rpmsg eth communication and add it to
+the remote proc device `main_r5fss0_core0`.
 
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/boot/dts/ti/k3-am642-evm.dts | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e3907f0c1243..9fd0f6a602d0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22001,6 +22001,12 @@ L:	linux-remoteproc@vger.kernel.org
- S:	Maintained
- F:	drivers/tty/rpmsg_tty.c
+diff --git a/arch/arm64/boot/dts/ti/k3-am642-evm.dts b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
+index e01866372293..6e8e2c39146b 100644
+--- a/arch/arm64/boot/dts/ti/k3-am642-evm.dts
++++ b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
+@@ -61,7 +61,13 @@ main_r5fss0_core0_dma_memory_region: r5f-dma-memory@a0000000 {
  
-+RPMSG ETHERNET DRIVER
-+M:	MD Danish Anwar <danishanwar@ti.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/rpmsg_eth*
+ 		main_r5fss0_core0_memory_region: r5f-memory@a0100000 {
+ 			compatible = "shared-dma-pool";
+-			reg = <0x00 0xa0100000 0x00 0xf00000>;
++			reg = <0x00 0xa0100000 0x00 0x300000>;
++			no-map;
++		};
 +
- RTASE ETHERNET DRIVER
- M:	Justin Lai <justinlai0215@realtek.com>
- M:	Larry Chiu <larry.chiu@realtek.com>
++		main_r5fss0_core0_memory_region_shm: r5f-shm-memory@a0400000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0xa0400000 0x00 0xc00000>;
+ 			no-map;
+ 		};
+ 
+@@ -767,7 +773,8 @@ mbox_m4_0: mbox-m4-0 {
+ &main_r5fss0_core0 {
+ 	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
+ 	memory-region = <&main_r5fss0_core0_dma_memory_region>,
+-			<&main_r5fss0_core0_memory_region>;
++			<&main_r5fss0_core0_memory_region>,
++			<&main_r5fss0_core0_memory_region_shm>;
+ };
+ 
+ &main_r5fss0_core1 {
 -- 
 2.34.1
 
