@@ -1,134 +1,109 @@
-Return-Path: <netdev+bounces-222301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59FF7B53CEC
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 22:08:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDFB1B53CF7
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 22:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D714AA035D9
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:07:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AE351BC3519
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE43280A2F;
-	Thu, 11 Sep 2025 20:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB4B257820;
+	Thu, 11 Sep 2025 20:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Ckqf8y3/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WV+zpExR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75B927602A;
-	Thu, 11 Sep 2025 20:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284101D9A54
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 20:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757621137; cv=none; b=ZQRVSOn2tkHB48hm8QQMTmIYr8AeY/7y9GZnURN6tjIzTdz53/LYvV4tPvN555R8FqcxnhHr0ngR3fD2yM23QPWYaky6mruJU8wYVBnLrT4gh+6Eg38CpG3MHUYk2jvgrH0cBdhTP2kyC3RBO5S53+Bh1GDgSfx8+QBLBmykl3o=
+	t=1757621588; cv=none; b=qTjzO/AZ76WAEO4zc4rNxMcOvxZnbPZzKq7XUR4H68xUKM+K/VBEZtf54nS5oVOsewCQSR3TPEZFWi8ox5qnCgiWm0/NPcTfAB36yUTstok38/DuXatuEaW7/+u2QhWSHbF+sifMhEEf8kGNIUT9qTirX/mZjmyCitDxIpbeqxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757621137; c=relaxed/simple;
-	bh=M8RZw0PcAr23td7B4SWZsTm8GfTk/HQcBuK2/+z1TOk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jHTrDvhxQrmnn/ZtoeW91vu2eGQ/t4ouQHF1dBqmw7DRYbj8t+iukIFI0Ykj0kQ5yB2Rw3xYeGDMDtPOLLhht1OIhsKtFPo0N8hSh3tUtYiOm3aL9R+SGqTfVyMklgr/WgEDE7x20AKgolk+QlnVojRjOcWqqKsOs0wpG/dgQac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Ckqf8y3/; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1757621127;
-	bh=M8RZw0PcAr23td7B4SWZsTm8GfTk/HQcBuK2/+z1TOk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ckqf8y3/AzjVvxnZC2k9ly4RI51ZQ712aXjBCfSJ1VWDwgQ6rwgd/eYNnJFOKinFf
-	 4kzX0y7z5ebvlRob3JLsiSN4EB9s/YIYoa7rAcH8yZtYxpZ7W2EZbcsyBR7kHR5ar4
-	 R01PXD+xvbgd0pAhIIPCSTPk0vZMchw95XuL9HUU9lXYJtSy9aOxrzFIt0i4I5EB6g
-	 i+vM068jPRcJbP1Q8XaYbNY43x7LFUxC85WmJixa7oLMvnbvIeYMz8uWZA01Lf5ey3
-	 mGMC69ouOTPYidd/N/e2G0KOK0gsjHZ3ZAGo63kyNjaCM0u9m/F6OOaQ0QvKGoyQfP
-	 89APPZycwQAFw==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 96AED601B9;
-	Thu, 11 Sep 2025 20:05:27 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id 5964120573E; Thu, 11 Sep 2025 20:05:21 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1757621588; c=relaxed/simple;
+	bh=Qomg2fTuFrBLofmYVnGyH+3Pp3BjHNsUM3GjkCM/M+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uc/niV3cTl52r64awBbkDyNI8gdKRBWm/idh/9aKBAGWtKY+nbLKftidku2m1b/bPNJLLikXMr6Dylcbs4RUIlFRzNqu++fgUZqHsbMTiJvMzafUo5tZPl+dnybVYRkNMU8XxWxLAIwrkYw1SD0RV7b4jDFmxXCifeXAxJllEyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WV+zpExR; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QQso3Fy1ouhk1usuIYDLXldUdK7jwDc1j95UUviMUVU=; b=WV+zpExRq82avfi1DW3/0FdUaj
+	eONagadz68iYPwq2CvTIbhMB6G/3Rxek+o7C5Yk/UCxJnobPLfbiKpIwPOTfD2zK1abMYV3+EYUyW
+	Hnr88qKgruvqXmxpi/naGQ9aUaTDbzmc4GJY4pHJNMxYqMhOzBcQCfQ3uhZd25O0/8CKbkRQwosHH
+	7ic/QWKpH9vhnzvKxeQeKP6aW9eH60hXa/7Nomd5PsCbfo867grjkWd/hnNfVxXdgW3hgKuWH2uXo
+	1gbG/MZmvPlninsr97Q8U+04haqaxbpxzBh8ubKd0E5hN2ToOYdr8YeLDo3eI5VvtfT9BX8hL7DRB
+	PbG0s1QQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58514)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uwnf7-000000003YC-2yYj;
+	Thu, 11 Sep 2025 21:12:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uwnf5-000000002em-1NvA;
+	Thu, 11 Sep 2025 21:12:55 +0100
+Date: Thu, 11 Sep 2025 21:12:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 13/13] tools: ynl: add ipv4-or-v6 display hint
-Date: Thu, 11 Sep 2025 20:05:06 +0000
-Message-ID: <20250911200508.79341-14-ast@fiberby.net>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250911200508.79341-1-ast@fiberby.net>
-References: <20250911200508.79341-1-ast@fiberby.net>
+	David Miller <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 2/2] net: phylink: warn if deprecated
+ array-style fixed-link binding is used
+Message-ID: <aMMtR-Rxv4ZIHqUE@shell.armlinux.org.uk>
+References: <f45308fd-635a-458b-97f6-41e0dc276bfb@gmail.com>
+ <3b6ea0f8-6cd2-4a57-92ab-707b71b33992@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3b6ea0f8-6cd2-4a57-92ab-707b71b33992@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The attribute WGALLOWEDIP_A_IPADDR can contain either an IPv4
-or an IPv6 address depending on WGALLOWEDIP_A_FAMILY, however
-in practice it is enough to look at the attribute length.
+On Thu, Sep 11, 2025 at 09:20:48PM +0200, Heiner Kallweit wrote:
+> The array-style fixed-link binding has been marked deprecated for more
+> than 10 yrs, but still there's a number of users. Print a warning when
+> usage of the deprecated binding is detected.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+> v2:
+> - use %pfw printk specifier
+> ---
+>  drivers/net/phy/phylink.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 1988b7d20..0524dcc1b 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -702,6 +702,9 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+>  			return -EINVAL;
+>  		}
+>  
+> +		phylink_warn(pl, "%pfw uses deprecated array-style fixed-link binding!",
 
-This patch implements an ipv4-or-v6 display hint, that can
-deal with this kind of attribute.
+\n at the end of a kernel message string is normal.
 
-It only implements this display hint for genetlink-legacy, it
-can be added to other protocol variants if needed, but we don't
-want to encourage it's use.
-
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/netlink/genetlink-legacy.yaml | 2 +-
- tools/net/ynl/pyynl/lib/ynl.py              | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index b29d62eefa16..66fb8653a344 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -154,7 +154,7 @@ properties:
-                   Optional format indicator that is intended only for choosing
-                   the right formatting mechanism when displaying values of this
-                   type.
--                enum: [ hex, mac, fddi, ipv4, ipv6, uuid ]
-+                enum: [ hex, mac, fddi, ipv4, ipv6, ipv4-or-v6, uuid ]
-               struct:
-                 description: Name of the nested struct type.
-                 type: string
-diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
-index 707753e371e2..62383c70ebb9 100644
---- a/tools/net/ynl/pyynl/lib/ynl.py
-+++ b/tools/net/ynl/pyynl/lib/ynl.py
-@@ -956,7 +956,7 @@ class YnlFamily(SpecFamily):
-                 formatted = hex(raw)
-             else:
-                 formatted = bytes.hex(raw, ' ')
--        elif display_hint in [ 'ipv4', 'ipv6' ]:
-+        elif display_hint in [ 'ipv4', 'ipv6', 'ipv4-or-v6' ]:
-             formatted = format(ipaddress.ip_address(raw))
-         elif display_hint == 'uuid':
-             formatted = str(uuid.UUID(bytes=raw))
-@@ -965,7 +965,7 @@ class YnlFamily(SpecFamily):
-         return formatted
- 
-     def _from_string(self, string, attr_spec):
--        if attr_spec.display_hint in ['ipv4', 'ipv6']:
-+        if attr_spec.display_hint in ['ipv4', 'ipv6', 'ipv4-or-v6']:
-             ip = ipaddress.ip_address(string)
-             if attr_spec['type'] == 'binary':
-                 raw = ip.packed
 -- 
-2.51.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
