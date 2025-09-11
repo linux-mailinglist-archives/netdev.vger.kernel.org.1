@@ -1,175 +1,87 @@
-Return-Path: <netdev+bounces-222180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1DAB535E3
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:40:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E9E5B535E6
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AABD3B4F13
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:39:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 443AD173760
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A816533EB0D;
-	Thu, 11 Sep 2025 14:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C56434166B;
+	Thu, 11 Sep 2025 14:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F1uwPbDX"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07BC33CEAA;
-	Thu, 11 Sep 2025 14:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E86341668
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 14:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757601528; cv=none; b=svAPMBgHi0rNF0L4fLclxOk+w2jRkfGSAvCWyX3YkYbwhXEea74U02GizYrV20+6JRk0en30EZv9YZu0HG7ky/PdSrU6W83XBMoQFnwud711P19ZTwKgBI8jrn+nJyWdten77lUwvDCqXIO/MGXYiGaB5Vlb1AFPzM6kWwTqS7Y=
+	t=1757601511; cv=none; b=e7b1v+EtYGOM10THTLuGkS2yiWxJVLaBSKdvV9xq2++QQimKkiN7zPQSRuUkLFtbltl229f99m9GCrWr92lBz7vpTsttV/2YGAlYkxYgH1pxHGAI51t5jcdbrxu5v5yExOBHHo5tfWTwX2bZz5687ITw6VxvBJ5FbWavVIW7WFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757601528; c=relaxed/simple;
-	bh=/NyPCYHf27bdEQpt/sqcbHlzPL7BJBilJAsPHqcFe9U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nY8997G+b0y5x0rV7DUkqoQHp4jEKwiKM2w+fSvcfz0By5eWjnq1Zi3huCW3p1uhK4c8ylNApf9EImroUi16vLqxCxG8nae2N3ebxBaEfqOciItBsbKNeL1CiDcrz5UpbnMiqMtFHaS7OA/w8tD6oD4jyusc6wSUeuiYTSlISU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 896F960326; Thu, 11 Sep 2025 16:38:45 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net-next 5/5] netfilter: nf_reject: don't reply to icmp error messages
-Date: Thu, 11 Sep 2025 16:38:19 +0200
-Message-ID: <20250911143819.14753-6-fw@strlen.de>
-X-Mailer: git-send-email 2.49.1
-In-Reply-To: <20250911143819.14753-1-fw@strlen.de>
-References: <20250911143819.14753-1-fw@strlen.de>
+	s=arc-20240116; t=1757601511; c=relaxed/simple;
+	bh=0aMBCWuZxegRTdBEVWfVFqr2DQag4E3Yte4YgTlkMGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c+jyueGfGJrhN8ZzW9WUmJji7jNgU9pDNQHtxCKIAM09bdQQSs6fkMjjhBH799zrcHLgHAltfjGEWXZrNfboaAJjncki/nnZ8zrMDIGKNgYkerfTNvhUoWRrEo276Y1U12uQtaoXgTHWt7kAuG5PGsDkpwM4NWvOb18OqUgO6YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F1uwPbDX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4A4DC4CEF8;
+	Thu, 11 Sep 2025 14:38:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757601511;
+	bh=0aMBCWuZxegRTdBEVWfVFqr2DQag4E3Yte4YgTlkMGQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=F1uwPbDX0debbPFztyhfnqUlnR58W02DO73xViz6y9m6cKqfGpFhEz+1hsktMlhUB
+	 y6RtIm3lUzF5ru1rN75B6Jx3PftNUVykGktQGmC4xpw4vn5vJQ5+IIq7iSy+uHog2s
+	 l2qLSmnFsFrgLa6Sn5nAgR7mchZXBlmR0odCRNKdhkrQHbvOZhu3XzRDvbxm9M+vcV
+	 u5U7OzUesl+OC0x1k9+Sb/rz9gBaYXiA45t+8Pms26ZkYjE5XITmCoN5Y+RHEbtJnf
+	 yHkNtxzFwXlpsBJTDSXdaDvswFdaTgQh4hXOZlFKFCj2/lsckfGmLXsQ7swnxmGYVk
+	 OcR4grBJJ9QWg==
+Date: Thu, 11 Sep 2025 07:38:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, willemb@google.com,
+ netdev@vger.kernel.org, mkarsten@uwaterloo.ca
+Subject: Re: [PATCH net] net: Use NAPI_* in test_bit when stopping napi
+ kthread
+Message-ID: <20250911073829.5f1bb612@kernel.org>
+In-Reply-To: <CAAywjhQZ=4hYaCrO6Uue+cfB4xyyPDMbRTtucEQ4vvxozqxKEQ@mail.gmail.com>
+References: <20250910203716.1016546-1-skhawaja@google.com>
+	<20250911064021.026ad6f2@kernel.org>
+	<CAAywjhTkX3N5CY8+DCEu-DD_0y+Ts0SEkkVphKam1vScMRWdgA@mail.gmail.com>
+	<CAAywjhQZ=4hYaCrO6Uue+cfB4xyyPDMbRTtucEQ4vvxozqxKEQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-tcp reject code won't reply to a tcp reset.
+On Thu, 11 Sep 2025 07:31:11 -0700 Samiullah Khawaja wrote:
+> > > Is this basically addressing the bug that Martin run into?  
+> > Not really. That one was because the busy polling bit remained set
+> > during kthread stop. Basically in this function when we unset
+> > STATE_THREADED, we also needed to unset STATE_THREADED_BUSY_POLL.
+> >
+> > @@ -7000,7 +7002,8 @@ static void napi_stop_kthread(struct napi_struct *napi)
+> >                  */
+> >                 if ((val & NAPIF_STATE_SCHED_THREADED) ||
+> >                     !(val & NAPIF_STATE_SCHED)) {
+> > -                       new = val & (~NAPIF_STATE_THREADED);
+> > +                       new = val & (~(NAPIF_STATE_THREADED |
+> > +                                      NAPIF_STATE_THREADED_BUSY_POLL));
+> >  
+> Just to add to my last email: I did find this test_bit issue while
+> working on the fix for that other problem.
 
-But the icmp reject 'netdev' family versions will reply to icmp
-dst-unreach errors, unlike icmp_send() and icmp6_send() which are used
-by the inet family implementation (and internally by the REJECT target).
-
-Check for the icmp(6) type and do not respond if its an unreachable error.
-
-Without this, something like 'ip protocol icmp reject', when used
-in a netdev chain attached to 'lo', cause a packet loop.
-
-Same for two hosts that both use such a rule: each error packet
-will be replied to.
-
-Such situation persist until the (bogus) rule is amended to ratelimit or
-checks the icmp type before the reject statement.
-
-As the inet versions don't do this make the netdev ones follow along.
-
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/ipv4/netfilter/nf_reject_ipv4.c | 25 ++++++++++++++++++++++++
- net/ipv6/netfilter/nf_reject_ipv6.c | 30 +++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
-
-diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
-index 05631abe3f0d..fae4aa4a5f09 100644
---- a/net/ipv4/netfilter/nf_reject_ipv4.c
-+++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-@@ -80,6 +80,27 @@ struct sk_buff *nf_reject_skb_v4_tcp_reset(struct net *net,
- }
- EXPORT_SYMBOL_GPL(nf_reject_skb_v4_tcp_reset);
- 
-+static bool nf_skb_is_icmp_unreach(const struct sk_buff *skb)
-+{
-+	const struct iphdr *iph = ip_hdr(skb);
-+	u8 *tp, _type;
-+	int thoff;
-+
-+	if (iph->protocol != IPPROTO_ICMP)
-+		return false;
-+
-+	thoff = skb_network_offset(skb) + sizeof(*iph);
-+
-+	tp = skb_header_pointer(skb,
-+				thoff + offsetof(struct icmphdr, type),
-+				sizeof(_type), &_type);
-+
-+	if (!tp)
-+		return false;
-+
-+	return *tp == ICMP_DEST_UNREACH;
-+}
-+
- struct sk_buff *nf_reject_skb_v4_unreach(struct net *net,
- 					 struct sk_buff *oldskb,
- 					 const struct net_device *dev,
-@@ -100,6 +121,10 @@ struct sk_buff *nf_reject_skb_v4_unreach(struct net *net,
- 	if (ip_hdr(oldskb)->frag_off & htons(IP_OFFSET))
- 		return NULL;
- 
-+	/* don't reply to ICMP_DEST_UNREACH with ICMP_DEST_UNREACH. */
-+	if (nf_skb_is_icmp_unreach(oldskb))
-+		return NULL;
-+
- 	/* RFC says return as much as we can without exceeding 576 bytes. */
- 	len = min_t(unsigned int, 536, oldskb->len);
- 
-diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
-index 6b022449f867..ef5b7e85cffa 100644
---- a/net/ipv6/netfilter/nf_reject_ipv6.c
-+++ b/net/ipv6/netfilter/nf_reject_ipv6.c
-@@ -104,6 +104,32 @@ struct sk_buff *nf_reject_skb_v6_tcp_reset(struct net *net,
- }
- EXPORT_SYMBOL_GPL(nf_reject_skb_v6_tcp_reset);
- 
-+static bool nf_skb_is_icmp6_unreach(const struct sk_buff *skb)
-+{
-+	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
-+	u8 proto = ip6h->nexthdr;
-+	u8 _type, *tp;
-+	int thoff;
-+	__be16 fo;
-+
-+	thoff = ipv6_skip_exthdr(skb, ((u8 *)(ip6h + 1) - skb->data), &proto, &fo);
-+
-+	if (thoff < 0 || thoff >= skb->len || fo != 0)
-+		return false;
-+
-+	if (proto != IPPROTO_ICMPV6)
-+		return false;
-+
-+	tp = skb_header_pointer(skb,
-+				thoff + offsetof(struct icmp6hdr, icmp6_type),
-+				sizeof(_type), &_type);
-+
-+	if (!tp)
-+		return false;
-+
-+	return *tp == ICMPV6_DEST_UNREACH;
-+}
-+
- struct sk_buff *nf_reject_skb_v6_unreach(struct net *net,
- 					 struct sk_buff *oldskb,
- 					 const struct net_device *dev,
-@@ -117,6 +143,10 @@ struct sk_buff *nf_reject_skb_v6_unreach(struct net *net,
- 	if (!nf_reject_ip6hdr_validate(oldskb))
- 		return NULL;
- 
-+	/* Don't reply to ICMPV6_DEST_UNREACH with ICMPV6_DEST_UNREACH */
-+	if (nf_skb_is_icmp6_unreach(oldskb))
-+		return NULL;
-+
- 	/* Include "As much of invoking packet as possible without the ICMPv6
- 	 * packet exceeding the minimum IPv6 MTU" in the ICMP payload.
- 	 */
--- 
-2.49.1
-
+I see, makes sense. I was curious whether your previous posting would
+work with just this fix. I guess we'll wait until next week 'cause
+this fix didn't make it to today's PR in time :(
 
