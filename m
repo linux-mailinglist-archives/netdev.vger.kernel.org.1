@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-221916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBCE6B52586
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:10:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449C7B52588
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83B883AB488
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:10:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8FA77A9B0B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881651EE02F;
-	Thu, 11 Sep 2025 01:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B030B1FF7D7;
+	Thu, 11 Sep 2025 01:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YQZra/eV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCeuypGW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6F31E8331;
-	Thu, 11 Sep 2025 01:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832681F4C96;
+	Thu, 11 Sep 2025 01:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757553007; cv=none; b=Y+zBqZ3PgiCLBlTD5rnf4sQoIZxCN+LvSlY9uQZDVTOi3eKyHicn47lcckQWI1tQI/gu4bGmiRZJzGmyJcA+9yEEUE6M+3xnUbRl+NqJU7cKEzSbG5+vQkSwLU82F6sWPvSlENuX8rbyJeT+fvhxUPF2QbKQW3bxq+zDFqaazUw=
+	t=1757553008; cv=none; b=cM5UTS83BjGaL5vgMZHkQ8JOOwNCshGB+ecQ6hmDq6AE3XyGGQU8YjsfE7e80AstL3zmxP9F1yUKPrC7o+2GPOwHCNuUn49cmZmIErPUIXXAffsmaLYfzKuSEKgrtrKk4r+HPaZZh+u0gqmG0YJ204H5zqcfnM9WPDsiTim7ktM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757553007; c=relaxed/simple;
-	bh=UJA9kHmEb7gX4ePCVJq0ikYNPPKrSZSwiQk2jS7FKd8=;
+	s=arc-20240116; t=1757553008; c=relaxed/simple;
+	bh=V4nGwzar9W2uZ4Zi61zmtfPYn7W6HDmHIiOf7NBU/MI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U2pMUVH2m3hF/C2P95ak66zXyyvb6bwjW1EDt4enk0iUxp7YuuirXQ8IPMZBph1x+9rqOuahLSbIGjkGBoy3Jqj49M4tMKb5yTMHWJykzChITitDZuDBc5AZYBHga2Z+FHrL9Mgl0yIYLCVRo5GwKDONO9yrVSAQXEvS6Jbe2Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YQZra/eV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6B0EC4CEEB;
-	Thu, 11 Sep 2025 01:10:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=tdxa8rnwnCmmt8+sgNgyNmDfIEVxKf4tMSStksqGOz+AtIYQ5EzF+wi4jwT/ksXQ8PJ6JDeqE24Q4unEeCikuGOUnSdBii3XcjzHasR0a7f7JifwUPfg5KBvNaW03M7rWhxpI9ZQjt9PYa9p+iFDsErfNrgucB61ZIkXQWRzJb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XCeuypGW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58F04C4CEEB;
+	Thu, 11 Sep 2025 01:10:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757553006;
-	bh=UJA9kHmEb7gX4ePCVJq0ikYNPPKrSZSwiQk2jS7FKd8=;
+	s=k20201202; t=1757553008;
+	bh=V4nGwzar9W2uZ4Zi61zmtfPYn7W6HDmHIiOf7NBU/MI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YQZra/eVckrApaTOSwd7l1745QYzD00PHf6ebLDqRDKaMuXERtIHgzeKE/NqzkC3R
-	 jX0dNCxSKNjPtua3sAQZ1+EtJptvROlgMmFqaBoeDVKmDtVqdU4eUzBrn8uFN/Ce8u
-	 +wKLCOXiligz6dHevc2IQPDOuFfdIVuMd3S2G88WTSucq9zfAi3xZisg+GsPVuUMfA
-	 fh6ikyDU5RPBswXAahk0DyOUDneboZFZaxkgtlyb3IyVnAi5J5lx1hKZ+FuVY6eSU0
-	 HpO4x81Qt8jQTZloS0jPPh+FHZHVQhjLRScS1wchLCSSTC+eJGLHzIMQSx90KP1T1n
-	 OI+23XZpT5r6A==
+	b=XCeuypGWY2z0Rcm5Xv4YtQotlGZEa8DpGYTLqAbnVU1gSBUMeZlKUV8o8SW51SJLI
+	 bGVE2MTnh0YDB5qDUqTL9FPsEOfwN+IswKge+1Chd+NN3OxNdCbM+oL2pck84GXhQ9
+	 RAR2Aa54+uMEhjm55enSMC89Lz+7tAXuq595PUgxbpFkPP1T7+ChCT3FsBWuBkVmoh
+	 ckDZwAxbuBklSt1aN3CoiCcBqpLugRDEd2qgHkfjdRkxVPf0Sk5uV0298oAJuuK6KG
+	 NjnAxcrlEXEtNTdkueOf4dhw74eyLLDWoV5bXa9oy9BFqzq2whL9q/NDcBfkDOMnTC
+	 Zrsh1a9iSlpig==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEA4383BF69;
-	Thu, 11 Sep 2025 01:10:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D8C383BF69;
+	Thu, 11 Sep 2025 01:10:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next] net: sh_eth: Disable WoL if system can not suspend
+Subject: Re: [PATCH v3] net: mana: Remove redundant netdev_lock_ops_to_full()
+ calls
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175755300958.1617124.14583721373188480783.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Sep 2025 01:10:09 +0000
-References: <20250909085849.3808169-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20250909085849.3808169-1-niklas.soderlund+renesas@ragnatech.se>
-To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
-	=?utf-8?q?se=3E?=@codeaurora.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
+ <175755301100.1617124.990028016646889423.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Sep 2025 01:10:11 +0000
+References: <1757393830-20837-1-git-send-email-ssengar@linux.microsoft.com>
+In-Reply-To: <1757393830-20837-1-git-send-email-ssengar@linux.microsoft.com>
+To: Saurabh Sengar <ssengar@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shradhagupta@linux.microsoft.com, ernis@linux.microsoft.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ssengar@microsoft.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  9 Sep 2025 10:58:49 +0200 you wrote:
-> The MAC can't facilitate WoL if the system can't go to sleep. Gate the
-> WoL support callbacks in ethtool at compile time using CONFIG_PM_SLEEP.
+On Mon,  8 Sep 2025 21:57:10 -0700 you wrote:
+> NET_SHAPER is always selected for MANA driver. When NET_SHAPER is enabled,
+> netdev_lock_ops_to_full() reduces effectively to only an assert for lock,
+> which is always held in the path when NET_SHAPER is enabled.
 > 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> ---
-> Hi,
+> Remove the redundant netdev_lock_ops_to_full() call.
+> 
+> Signed-off-by: Saurabh Sengar <ssengar@linux.microsoft.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: sh_eth: Disable WoL if system can not suspend
-    https://git.kernel.org/netdev/net-next/c/9c02ea544ac3
+  - [v3] net: mana: Remove redundant netdev_lock_ops_to_full() calls
+    https://git.kernel.org/netdev/net-next/c/38611e5adae3
 
 You are awesome, thank you!
 -- 
