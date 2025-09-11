@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-222048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B786B52EA9
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:37:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B768B52EAD
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:37:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12E9858003C
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:36:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86E4718878A5
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977C73115BC;
-	Thu, 11 Sep 2025 10:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1F32D2386;
+	Thu, 11 Sep 2025 10:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NiCS0//c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G/SMOWFm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146ED20FAA4
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928EE23ABAF
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757586981; cv=none; b=lLswgE+RhRECcUmP5NB7fFi07s2O+z9AofpzL0wE/ldenEHSPaUt/StuNb5vAqDOHlKXRN16xNcbZuNOdqo9/8wZsk9XO8gVKO4eyLpK4AJbroTk7D4cofZHgYSCr6AHeuLCImLWBCt32AezxfygT2nmKWWQketlfK61D0p/fHc=
+	t=1757587057; cv=none; b=IF8Y3p81md1ZlO0+WIcNE88O2AE7LxoSuefYGL1dQPsYSrjK0d/vdHV5VvaSt9e8PBRITdmHV9iv1OrzluwUmqBkwGxMyQPA092P0xJsp9zHtQSKSr98NHTQrmpIkY1KfPdJN3/Ys1HNE4k3vutmEAskD+abkh/hRoQr0VWGkeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757586981; c=relaxed/simple;
-	bh=fzU09DMCAq3+s6xAcPw9iQSsM2DMfpbhX8B7RMRaHmc=;
+	s=arc-20240116; t=1757587057; c=relaxed/simple;
+	bh=gBJAhqvEHPrcQ7AuGOAnRt88ljqyRo1HkemhDWzHqMk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cA9sJhnUeJZEilj3gF09ka4CYn2xi9jTQLflt9cVa7GoNH9QAG8ouLG/tYDr19lOfpzPGdZ/Hy84+8k8q568Fi8aovE8wWhL9YpIDAMTuoxG6+AfUKR7oScGf+rXcxDqPhcZ9fvo/7b6NcnPnWIThd5foZ0Vpo+Ozo8FvfSEekk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NiCS0//c; arc=none smtp.client-ip=209.85.222.180
+	 To:Cc:Content-Type; b=RTrClAbd10emlAGj1I/wdZ5Y4XZf2wlcSwp4GGLEtFW1Ke+DQLzqp9F5eYMAVLgV8N77/bvF9bB28kfl91FLJHJqugF67ifnhRXd6XpYqA3n43TTNw06FGJGroIPpPpu0fxyM/Bqf8UGRn90kfcGho8iWboM/Wn3NtvPEyxuGMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G/SMOWFm; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8116af074e2so48243385a.0
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:36:18 -0700 (PDT)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b5f79aa443so5220441cf.1
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:37:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757586978; x=1758191778; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757587053; x=1758191853; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gIp65c74emW84B2YnB6/i2/DDD4Hn+llC22C9hRiCnk=;
-        b=NiCS0//cSD0FrocGwKmaptnuhyVu+xdGCjs7S41OVTIIIVnZ0ISxW/VHKQ71EGMwpY
-         0Q3RkgOaPwXrnh/ywwA8douNZwBVnTfp3zMH0pV/jIVwBGu/OzJTW2qQKXAvrz04ZV6H
-         6HubEQF3Wpt5a2Sqh/+lKXYyavdvqYRUkJuQ8ZrqGlZAp/RmetqYfprBI1M0UKsn7FkR
-         k6R3W7S2mVe7e185GenMupvOZmtUrZXG1LJCGujqHx0QMX1twaB3qE/06s39IhB6Yhc4
-         ca25L/CY0OfcyP4JyoxOWSZTOTbCDu12yhFJoZ4wPQt/Fh9MlpQpLAnkiXXfK34r6B6t
-         6Utg==
+        bh=gBJAhqvEHPrcQ7AuGOAnRt88ljqyRo1HkemhDWzHqMk=;
+        b=G/SMOWFm7C0PlMXZdxkgFZD+AsTFtUjBh6xfVFkGJWtS3gcJJAGefDTAw6+YdzOVxz
+         ykyPFnG8F7V418YTJ0XwEbJ6uy+0SGAgyNr+6TzT4ZwVij62NP7cPStiL/gXwnV1c7Hk
+         3ORrsOwdD756dR0d3xG5GPpFwOIgk8glcOJIb8nuFA+KoxrFHL+qORzQ8pECyf0KtDs6
+         G1yJS2orINxkLoLfC0ZcQJ/zgd9pZE/pz2A9Zq4iAGpSUWz2rrNLP7DrpxhklRiNnEQL
+         RuuSdz2tvKb7pvQdMPoQof5vdIqzPTnCmN67X8cAB71mMJkJ1EGDXENSQwCNRu7H/vfd
+         aM+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757586978; x=1758191778;
+        d=1e100.net; s=20230601; t=1757587053; x=1758191853;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gIp65c74emW84B2YnB6/i2/DDD4Hn+llC22C9hRiCnk=;
-        b=fx6WqGisK8tU6h+OsxVcY2GkZthkkCJHKjg8e6hL46dhElQbSp/tWc7NckLN06ttXJ
-         W7bYdpLN1AmKPJej47EwNPKB6icb0tw/Ou8cauGCf2xNHdDp44cGiO5RPEwXNBUCu23H
-         R/1uFv9FSB1i5K/nWZ12DFP/3A1fAGK7fR9NhSrK1ejtWEerXYSPylVpQf6rre4SCtY/
-         03p1YAmuV+qLU5SiqVMBB0YP7g142Jd1cXEYZNe8SHMj3G0mVMxq79SqcnhRxP4TS28d
-         XRGazq1SCT4o/rj2eIIEZBXRjpUsnwGuBeg1fzIv+qDzhRngV/1fTDkXInAncyllBtni
-         8Dxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNv4To+Q+zdxHKeKh3W5cS4W/EBkyevO9/Q2vKAEwopu2nvmiP+79PIIM+va36TWJ7tOYuG6M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvOsBcK/BIW50IAdcPCBWq7uTvmS1kKOVbDcf5wPDoVbgM1ZXR
-	nBs+rF5uIlG+yUdal7aoKQhNQ36MK1rZnkzFj6AKI2Bru5dhnswEogmHPvbZOHhmafP+sHnONxL
-	PnXzEwJ7Ry/GIeZqDqcgUNOFkX0Ptpzb9ylst5XSY
-X-Gm-Gg: ASbGnctQXZXF7p92OoET545brWMDLLiDl28KiPQhUDc7z9lJjOt6XaghuS8JwZVoJd1
-	PDJPv9/Bj+SSuqMXx3e62h3y9parQWPnP1vtUdRqvuB7xXSZoSefCrIpeJiEZ9eevCNayGoNpCV
-	S5Nj/GWm8cPRV1sXTecfuLpkaNWk8lPTmpb5Jp2oytNtsSKq/kvvA2L6jpc+93nrgICNlJrCoMF
-	JGakhH/iMfKEw==
-X-Google-Smtp-Source: AGHT+IHkeK8FRTt1/uOZZvt19SPsFH61ba3vv8ohKTWkwH3zfvM5AA5iGlKW7xE0TOEjkPaubARP4koKOEFkohcuvOU=
-X-Received: by 2002:a05:620a:2985:b0:7fd:6709:f08d with SMTP id
- af79cd13be357-813c70b42a3mr1975265785a.81.1757586977361; Thu, 11 Sep 2025
- 03:36:17 -0700 (PDT)
+        bh=gBJAhqvEHPrcQ7AuGOAnRt88ljqyRo1HkemhDWzHqMk=;
+        b=FXqRyQj+ru4J7lvaoJhLVSQVzVN07/CCXvVAa1Ex9yumUAHr758sPuihFrAEvQQk4Q
+         m/WGPjroBtPBeZhKoP6wt6/t40EwL0vbWFim7jZxp8z+LHSfQLS4GEj9D351deK/mwmj
+         TpdJyAvUKSR3bOGJWZx2D6xKPEfKyopcETOiyjzxvOa1hGbv6Kd94ntqe5zOrOALBQiR
+         YZ/GXD5aFRMMZV2n7Nar3g1eQEqqAH5cZ73anEwpk7nZjz90s8ihyYbDSyOdBKlYfzXl
+         5sG3SjhjrmaPKBq/Z2QUD8D9uEHxWI4XJ6dC5cXfl1XCyj4PU2kdABmbG+buUk2x9Jw3
+         cSvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbcRijXJKBBMITxum29h/OfPMqJ+wpPI7qaz3v6bqQK0wmozCsylqcF1eL1PdlQ6wwyeILB8E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAsMKbN5XOsjD0ivxw6WjPMZNJZx8MYLl0q7MkPy+GaWeJr/UJ
+	eV7mS6ZvsFqv69rE886ooVXT0cMuZw7NpNRPXMQOlohtVCB8aN/2Ekid7kPVAnfG4ajAldE/9Kd
+	j0hmq/zTare62fSi55WU0TcjsoNPZ0avgJLMkeIg3
+X-Gm-Gg: ASbGncsi13DVJwTGKn+LYdOJj78aB31z/iH9cr0LsX2XLKAJe8uZEt1RpHoba3n3Ycd
+	B6E9ib0jE/x5HU/7wtpvOCIm2E3Dj1lsoG9QN1LiQJQb2gk8kO5oYn7HL81iUDDPTekOTXr7z7z
+	afQjunY0mCrTctzZ8RyuHGYskYrlVIGelaSGBEflXGbQhgw4Vnr63vEjb3UNqB0OdF3svDnO+U0
+	GixV6HgYBGOoA==
+X-Google-Smtp-Source: AGHT+IGIfwTrAX+eEwWNUP+gqA0VWd7OCs6gHhATUwsNn4thDtgWH+7/hdJD/+ZIYnscPVsLZtgwRe3URHJuJj1RLH4=
+X-Received: by 2002:ac8:588d:0:b0:4b4:9590:e08a with SMTP id
+ d75a77b69052e-4b5f848fd2fmr189486841cf.67.1757587052957; Thu, 11 Sep 2025
+ 03:37:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250908173408.79715-1-chia-yu.chang@nokia-bell-labs.com> <20250908173408.79715-13-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250908173408.79715-13-chia-yu.chang@nokia-bell-labs.com>
+References: <20250908173408.79715-1-chia-yu.chang@nokia-bell-labs.com> <20250908173408.79715-14-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20250908173408.79715-14-chia-yu.chang@nokia-bell-labs.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 11 Sep 2025 03:36:05 -0700
-X-Gm-Features: Ac12FXy6oEMGb8kpdEpmCoxkyIVYHYpg1RYuIGBFn_nQMm1knd9KsxNR4ndbi6g
-Message-ID: <CANn89iJcyWE_SxM+sHWM_Es8KibOQpfs+HUTD0G+bnHr3WQn-A@mail.gmail.com>
-Subject: Re: [PATCH v17 net-next 12/14] tcp: accecn: AccECN option failure handling
+Date: Thu, 11 Sep 2025 03:37:20 -0700
+X-Gm-Features: Ac12FXwkEN44-LdnfGfkXsCmivrlKxkPkl7EsRk6tBWM_mjIrqCCXjB3OREkXDo
+Message-ID: <CANn89iKaM5HbOT2wU_qSaSxzyLRfRKz6Y3+AXq9ZmQhWjftMWQ@mail.gmail.com>
+Subject: Re: [PATCH v17 net-next 13/14] tcp: accecn: AccECN option ceb/cep and
+ ACE field multi-wrap heuristics
 To: chia-yu.chang@nokia-bell-labs.com
 Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net, 
 	horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org, 
@@ -100,46 +101,20 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Sep 8, 2025 at 10:34=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
  wrote:
 >
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
 >
-> AccECN option may fail in various way, handle these:
-> - Attempt to negotiate the use of AccECN on the 1st retransmitted SYN
->         - From the 2nd retransmitted SYN, stop AccECN negotiation
-> - Remove option from SYN/ACK rexmits to handle blackholes
-> - If no option arrives in SYN/ACK, assume Option is not usable
->         - If an option arrives later, re-enabled
-> - If option is zeroed, disable AccECN option processing
+> The AccECN option ceb/cep heuristic algorithm is from AccECN spec
+> Appendix A.2.2 to mitigate against false ACE field overflows. Armed
+> with ceb delta from option, delivered bytes, and delivered packets it
+> is possible to estimate how many times ACE field wrapped.
 >
-> This patch use existing padding bits in tcp_request_sock and
-> holes in tcp_sock without increasing the size.
+> This calculation is necessary only if more than one wrap is possible.
+> Without SACK, delivered bytes and packets are not always trustworthy in
+> which case TCP falls back to the simpler no-or-all wraps ceb algorithm.
 >
 > Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
 > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-
-...
-
-> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-> index 53e0e85b52be..00604b7f2f3f 100644
-> --- a/include/uapi/linux/tcp.h
-> +++ b/include/uapi/linux/tcp.h
-> @@ -316,6 +316,8 @@ struct tcp_info {
->                                          * in milliseconds, including any
->                                          * unfinished recovery.
->                                          */
-> +       __u16   tcpi_accecn_fail_mode;
-> +       __u16   tcpi_accecn_opt_seen;
-
-We never add fields in the middle of tcp_info , even in a patch series.
-
-Some people might miss this rule in the future, by looking at a patch
-doing this,
-and repeating the mistake...
-
-
->         __u32   tcpi_received_ce;    /* # of CE marks received */
->         __u32   tcpi_delivered_e1_bytes;  /* Accurate ECN byte counters *=
-/
->         __u32   tcpi_delivered_e0_bytes;
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
