@@ -1,157 +1,96 @@
-Return-Path: <netdev+bounces-222088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E78F4B53006
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:21:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB889B52EE3
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:46:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 095ED1883EEF
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:21:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C63051B26EB9
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92CE3148B8;
-	Thu, 11 Sep 2025 11:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE781DED77;
+	Thu, 11 Sep 2025 10:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BY5usAHu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Y+CwFyLr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125A03126BC
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 11:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957C3288DB
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757589655; cv=none; b=QO1qwQyFY1N9eclK7UnOOOMMzsHIzv0pMQ5vek3ADQsc5VSdBMwJVnJiysSTmfAoTOeeAtqba/k9zbkwFKSIkFIvgBXKMGC+OOijl9SWD/8RDj6Fln61TkrguCT3xFjgu6WkZC9orn74ViMRMCm+aMtLQxa/VX1Susnj00hYuWM=
+	t=1757587570; cv=none; b=fgL9tyAx1FrbpIXZbxpXLrUr6hiAsDaD3CyQZvS9mgvhICdCFAKzOdQnMqR0EOw/0wAJpxHItVWwbOHWo4YlQLm9UZxczYMAOA3TXQEjOzx/1L+O4Qw/LeBOSQjonTrES14irGxKp2Taf3u6icHG2/zD1FbIFzk/HQXVJ0eULFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757589655; c=relaxed/simple;
-	bh=H8yk+xrqMoi1BmiRtNvzwsuYwehWP27jlscfOOwW9g0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=CcS8qDitGRKpZKsZA7tD7MuHw0ptRjLIH+3ZgQwvQh3b3l6vJX3vx5jiDi8rF1K+yzvlYMM4HZc+QfCV7sjVYMgub1lGzKMFmaeP8S0E/KU8bZHq7c21yBVos27vsXnOKorfKlqQocn2SHx8Lig3aQKItZEPYl3sTzHep8CgqkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BY5usAHu; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45cb6428c46so7572895e9.1
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 04:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757589652; x=1758194452; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=h2HQS+cQinE0HErUF+RK2/CMrXAUaYTUSDi0hoQyZeM=;
-        b=BY5usAHuL0pcxURLrYzKIpLS9bohcNiHdFZGsM/RAQJaGFnRX2PgBX/kQRB5VeygMT
-         2/EKGTXw6usiTZnn8ISx8WWdmHJDCXZKnia4D9r+l8uVdSqH0AgtQ3wgFBbpB0zBUCND
-         j1D5sUOWavyIDoYKtWUEPeXT8BHs9A0UjnH1XSdlouQxV1JM6+b4BRjv+4XGWE2RWf6h
-         Yn7DyUgbZe7ypeUI3lna7zBODaeZW5gBi6qr+YoJ+n5vPnBGNS0M28PHzzTVRjC+CbHg
-         pm2S/cL/3LmOy+4tSpPiGtzCEWgZacwHeEJt+kzooMj6SV4eWbQokBeVI0ZIrHFSUYfs
-         hgiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757589652; x=1758194452;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h2HQS+cQinE0HErUF+RK2/CMrXAUaYTUSDi0hoQyZeM=;
-        b=cA9DFpn/SNGIOcL5fmqhXhARd9W8wUOnRMaBYcww9Kj2PJ2X7TfHA6gnLk+F91auDq
-         XQKUQUjT8lkMhDgxoEr/Agpju9nhsRJZnjzuYlsZlDNLcKX+Ghx+ScPMq71607eXgIUQ
-         DmtgPxtHnarW53gWGIB5ZFgL55ohpnyWiBRgvpE1XkBoQAQ4Bqi6WCei7WVvSO4RYZZP
-         lkDFTEhZm90HtXVSFxOhH5tSFfH7p7/urJqbCN016vl9v2BNoToj6xJsiCIcbhOSmyLM
-         ltUJtEkqgNG0efGdoJ7kz0yUCnxdjSqQTviEQLkXdRKk7gDwfgZC9fFQttLWP4RxbdUa
-         JkaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWM7VbMszGVVB72yaMz9gNvTRojJXoUof+AA8GXemDHvv965hafz7hKCUUwascYZf5eedzX+iI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn86qxiOsjQSa59NeYu6ng0nGToFjhnvjLbWwEeDRwDEHdgWBs
-	vL0PIELDZwkyeHXCbioq5f/DCz5JYM3uAzmyzfzKG8z6g05ZlJk0FB+3
-X-Gm-Gg: ASbGncsYENV9qGrOnLqVqGUja7t8h0bK25CjBlQ/qxgmqMrVNnBU6LcwUFnzRMwNn+Y
-	eN5qiczWrbczp5d+pSqZuQEHYYG4k1Mub8d8+Z2EqqgDeoP+d2keoCMiCQax7undtWBdafY+a29
-	u/wtH0CG1keC7nVCCb7+Wet4kBFDUXUlvOdX+mp2VsrxP1IASvMYb9zJIZCwPhaZyFBIy734cED
-	xNKrrKsbMCIjCztxWWfXX3njB4ap2jqS9bD6g/selO06m38ZRc4q0TEfZRFLxUqImWtr4ji3brT
-	twxA6k259zwpzQSZZxlvs9gPONqwl//nRyIu682vxxjCp89TO21sjtywzwV8KXLZzxgb2JpI4gj
-	zevLTUc4jHlO0Xlmqlzv8z65PXwjSFqEs/HZl9/I=
-X-Google-Smtp-Source: AGHT+IGo+F4NUZA5jrtFJZ3gols7D7bXthNGq85BXY2ZGDeIz6G8pf+puXsiQ9wTfeZ6/fjO6sDA+Q==
-X-Received: by 2002:a5d:64e7:0:b0:3da:e7d7:f1ec with SMTP id ffacd0b85a97d-3e646257889mr15832414f8f.32.1757589651961;
-        Thu, 11 Sep 2025 04:20:51 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e760786ceasm2152003f8f.16.2025.09.11.04.20.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 04:20:51 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,  Jakub Kicinski <kuba@kernel.org>,
-  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Simon Horman
- <horms@kernel.org>,  linux-doc@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] tools: ynl: rst: display attribute-set doc
-In-Reply-To: <20250910-net-next-ynl-attr-doc-rst-v1-1-0bbc77816174@kernel.org>
-Date: Thu, 11 Sep 2025 11:44:55 +0100
-Message-ID: <m2v7lpuv2w.fsf@gmail.com>
-References: <20250910-net-next-ynl-attr-doc-rst-v1-1-0bbc77816174@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1757587570; c=relaxed/simple;
+	bh=NL64vX0D3up+otsPGbGAYfyEVyLGlVBHwEZCYPCkbsU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=klQMIzqhkD6QlYGEv4O1/ekMu+PBmHr1TCaKyYVBckqlkyB2u10nwhHWJKBy0oDB7mvAl2Jc5cF3G76Iyy+bohZvyrN5zzrbiIcfyzP4mPGfqcQJt7IwFhAoHCaCIXiOCsPpyTH3C3MGK1Ek7cDnCqSpD7tRc4yl9rls0VYqqtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Y+CwFyLr; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hf/mDYxEsjx164N97i5P7Au6KHHEfORnhAPs8S6ufw0=; b=Y+CwFyLrzYErHDTI/iUrw6AK0+
+	Nhtc5WtijOPQjakvwN3iBCrA3cVnhStQ9s7mKOAt0NZliLqZ5NUwkkgqFChPmq4WPRDks7g1LDrCO
+	hpC9LpMtIGXEYt2OCCOMZbpJ5AvdyT9MVTItQwid50Pdp0gU3iv8jYrkhTVMTBid/MoU2jtwrXzRA
+	BBDDVbMRaGfLt6d7cF+1QEEWMqxyp7yAhTYM58q2o+UxLvKmlD2oH0OOT81UpQQ64GcqMDJmGd8AZ
+	TD5ppNL3d7zM/+4D0Fh4H+OD/cgawK5XGqWJZBDBO/w4Ec5cyHhWPIKO0vFMGLdiwf5KrR2EAdRZi
+	U8/VoScg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47016)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uweoQ-000000002pA-21xc;
+	Thu, 11 Sep 2025 11:45:58 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uweoN-000000002I5-3ae5;
+	Thu, 11 Sep 2025 11:45:55 +0100
+Date: Thu, 11 Sep 2025 11:45:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: [PATCH net-next v2 0/4] net: dsa: mv88e6xxx: remove redundant
+ ptp/timestamping code
+Message-ID: <aMKoYyN18FHFCa1q@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-"Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
+Hi,
 
-> Some attribute-set have a documentation (doc:), but it was not displayed
-> in the RST / HTML version. Such field can be found in ethtool, netdev,
-> tcp_metrics and team YAML files.
->
-> Only the 'name' and 'attributes' fields from an 'attribute-set' section
-> were parsed. Now the content of the 'doc' field, if available, is added
-> as a new paragraph before listing each attribute. This is similar to
-> what is done when parsing the 'operations'.
+mv88e6xxx as accumulated some unused data structures and code over the
+years. This series removes it and simplifies the code. See the patches
+for each change.
 
-This fix looks good, but exposes the same issue with the team
-attribute-set in team.yaml.
+v2: fix evap_config typo, remove MV88E6XXX_TAI_EVENT_STATUS_CAP_TRIG
+definitio
 
-The following patch is sufficient to generate output that sphinx doesn't
-mangle:
+ drivers/net/dsa/mv88e6xxx/chip.c |  2 +-
+ drivers/net/dsa/mv88e6xxx/chip.h |  2 --
+ drivers/net/dsa/mv88e6xxx/ptp.c  | 55 ++++++----------------------------------
+ drivers/net/dsa/mv88e6xxx/ptp.h  |  3 --
+ 4 files changed, 9 insertions(+), 53 deletions(-)
 
-diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
-index cf02d47d12a4..fae40835386c 100644
---- a/Documentation/netlink/specs/team.yaml
-+++ b/Documentation/netlink/specs/team.yaml
-@@ -25,7 +25,7 @@ definitions:
- attribute-sets:
-   -
-     name: team
--    doc:
-+    doc: |
-       The team nested layout of get/set msg looks like
-           [TEAM_ATTR_LIST_OPTION]
-               [TEAM_ATTR_ITEM_OPTION]
-
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
-> Note: this patch can be applied without conflicts on top of net-next and
-> docs-next. To be honest, it is not clear to me who is responsible for
-> applying it :)
-> ---
->  tools/net/ynl/pyynl/lib/doc_generator.py | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/tools/net/ynl/pyynl/lib/doc_generator.py b/tools/net/ynl/pyynl/lib/doc_generator.py
-> index 403abf1a2edaac6936d0e9db0623cd3e07aaad8e..3a16b8eb01ca0cf61a5983d3bd6a866e04c75844 100644
-> --- a/tools/net/ynl/pyynl/lib/doc_generator.py
-> +++ b/tools/net/ynl/pyynl/lib/doc_generator.py
-> @@ -289,6 +289,10 @@ class YnlDocGenerator:
->          for entry in entries:
->              lines.append(self.fmt.rst_section(namespace, 'attribute-set',
->                                                entry["name"]))
-> +
-> +            if "doc" in entry:
-> +                lines.append(self.fmt.rst_paragraph(entry["doc"], 0) + "\n")
-> +
->              for attr in entry["attributes"]:
->                  if LINE_STR in attr:
->                      lines.append(self.fmt.rst_lineno(attr[LINE_STR]))
->
-> ---
-> base-commit: deb105f49879dd50d595f7f55207d6e74dec34e6
-> change-id: 20250910-net-next-ynl-attr-doc-rst-b61532634245
->
-> Best regards,
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
