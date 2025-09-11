@@ -1,330 +1,205 @@
-Return-Path: <netdev+bounces-222059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B21FB52EED
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:47:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5D0B52EFD
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:53:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 560AEA024BF
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:47:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E7084883C4
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBA830F54A;
-	Thu, 11 Sep 2025 10:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BBE2D7DD4;
+	Thu, 11 Sep 2025 10:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrLoymcv"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TIUk3XSD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2170A26E71F
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757587671; cv=none; b=lf8Alse8wufWHzY+mXBMyYuoVCUBXf8eCDKKeo7K3Poo3Xc4/1a0Z7ZXnoXY4pM7khNWULKMrup07BSjgJJherZOEPxe5BFNhW0rmtDyNfVYKXpJlXN8YIYHwjxfISn0vqOFlyYVTan6OHpgSbhpG3cthrMpw/4YqhI6zUO8COQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757587671; c=relaxed/simple;
-	bh=llKb4ipHcHyfqkAIQL5U+jOFXKk13xNneyFOZxJYqDY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nF1tjIfPhxnESjU3Uvcy67JpSHceNsqiznSXBSwMgWoDiP/qCFS0sxO+rqmb+qtMsBWNgT4enjdYTcjD0iO+++jdXkBSKEwx3VV7GhuOjLRFqOifHR7cuQUN5mFW1RbIe7hvGsIgZvyDxWqtsw5MUx0icHfus5OLXZwyaqNA0ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrLoymcv; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-72e565bf2feso4277837b3.3
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:47:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757587668; x=1758192468; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qn4R1pbzgofD6MTxiACftWXcks9s8P2JUQtoZ0XEQag=;
-        b=DrLoymcv9KBKqtm3ton997wsJMl7WuuXR1iZUpi+pDwFdVdqJT0M6pLkV1PTG2jaGH
-         wD9ymzNj7fAe2zjfTk6LjF5AdLUexG+XhdmtnuAYgPCaHevvs6PweHV4XnTWHYHHA/LZ
-         vL8TBHilCq5U0mF78Qid3pa/HlTt1jQ6HS1+rIFPBgmotqRD+0LluA/L3oft0E8By6f8
-         7e5a4Imsio2CpDNcMHesyRjXWYVBv+vCNHrXhbR+ugGyW2wWO5+akeGlQjZtQws3l9uv
-         y3SHSoWxk3OQzj2HXIUd6CbOW4xffogT+U1TDP+a2Vi3M3Pjg55ROeqbxjrNDqm49SHg
-         80QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757587668; x=1758192468;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qn4R1pbzgofD6MTxiACftWXcks9s8P2JUQtoZ0XEQag=;
-        b=p6PfA+AENoVt2kuZeGpEQ1K1gp4SAVLebEWNXnC/JQJRPBF9ixn34kQQ0OtYeKEYz4
-         5yslEdNIOA/dFvOP6V8CE2Gt5FTaW8+Q4UIeUfe1cCzFYlnMThtmP/NomjSOXxcNIWtG
-         6Zj3K7WkpE9Xpz1lMGjE7iPFixJK1hix5hYVlpt8uDWKDLnx+SbM2+L4qJk6+7WHjEI5
-         SnesTnpmhVmyNsFlXe9gUd9SdMqz64p1VZ16QMBP0eAQGIzCNkrsuRvEwkm3ufRS73YM
-         CEGSkbb9z0uf5oujjIipLjcD25kW5jdiyfgrpk62ZsQdg1XBZ0HY0dNlRGzlqo1RBwsn
-         xQGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVtvM+U2SSm45C1D5r7MUrW+R7yD9RJphmLwrPOHPivW1fcdyGFbZ0Fbz0KB4Pg1MZmsKWqatc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+LTnmbGm0LQlzeHzXjyOMKC0kMsw2T1teUIMYqLVsr7Kk+4Ih
-	8y7dR2A/8pXOTytprtBI6vgwG611tt1pOpqaqs0n9/QoH91IMXEHu30jccbwk2d85PRmm/uWNjI
-	apHLNKLPFYUYZnNwBgYYofUCwPqWuwyg=
-X-Gm-Gg: ASbGnct1OXoYvkAHLQbhrrfbphH+Da07l6SOJOtYkrQsGAnUx8utlrJdJa3o1yp1pXs
-	F/LkNpB7tVJ5c1YIo+u+HvRxVHl4YkVG9NE2dwdJuavNncCKiS+Cq6wyaiAoXeFn8Sv4xpTa4Rv
-	N8vjfkmQReEKIY0lmRZ+xyTrRR+81nVwFuMiqykWgdxpHYKpJF/g0CIiwAu1dbffD4bL5ALEwbp
-	n7vzlr0olRw34aO1iqiNCoAwsjWahhfTv95Rw0gBLmxVaIpgPmM
-X-Google-Smtp-Source: AGHT+IF2eGTYJAKVreu091MVH3moUSvTghJyuC0dRIIVCC2sh+snH/czvNQpCqcspY1v7mXB/0XTLNiU8L7M5ftwMpY=
-X-Received: by 2002:a05:690c:450e:b0:721:1649:b041 with SMTP id
- 00721157ae682-727f2dbf5e4mr180137607b3.2.1757587667843; Thu, 11 Sep 2025
- 03:47:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9FC1A9FA0;
+	Thu, 11 Sep 2025 10:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757588027; cv=fail; b=RBhkjBW/r1qqdLyL2AYH6E+3A65797/geNkfS444q/hJHb1UFHYWbsOUNJJsDoRlaHOJDxvTXOb1BvcklmpdU+Sy+g1B4skoSCz4Fbfsvt0lWr94cPlwhTGzF+skOPwh3PVJ2ioghRms27whTBRvEzQQOP+5weWNeLv6+p7mGTA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757588027; c=relaxed/simple;
+	bh=vi8ln8rS9/04Uv7lQN26wnkZ332v9CjshN2FOa9S6bw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=idGzlc+wwQJaRl7huuJXeabh2e92ZhsUqHiuYlhFQFs0ONWzSPlljsgSWMCJSa2pFCzOzRR8uHkXXutriI+OOCDcvXTXAjZVD6jxJUUlRD8FcxysFhLm9ErzLM5hWWSH0OxC7VlooI+6JCfTYu1UIbXNrNfGCiI1vcGWAS1ArJs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TIUk3XSD; arc=fail smtp.client-ip=40.107.220.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=clRoZYXDKjqxhOwx5AN6jlQ8epeCOyobhMQlvuIr9LK4uT+9iXGqZDese5RyShLNG5AXKCTRAbz5QUwN+V0m7HfWDOEEXqYMSUbO42JblZ9X6eOM3u9ha5H2di25L61QiWtDl+4iwuDQoY3aVVgh9tIZyOXNrcG7q4yCXKx/xyDK4IaF/hswIVK2lVzsoCThkk0oeA0wdlhY9zv+IzrcExz8jZIvIOsqB4IBE1Bs7Ok+vgSkNxD6h6JSwEmT/8Mjc8DSILA2FQb1sqlwiXrcuGnVPtDBRbCjiBSqTlu/V+rJmBsUI5ZzmjuQj2owfHzj+tKN7pz7N3EHsGbM5X9yYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vi8ln8rS9/04Uv7lQN26wnkZ332v9CjshN2FOa9S6bw=;
+ b=B6Ci0RFGp12iv+RsaHlvtiCV4ItV4xTSXpo5QVN3KsX8Y0V2DA1boVJGYNupcugibvBwPQoypPcToVHtlkIQgAQ1tJRCYSZnQRQ3cVaY4pA2gYmEzjkbtV1Uetg1PrBzJIy8F9DbjJs9VT803gvpoex9JrS8/ppmijiCLzT0xtFaur71rY6bmgk3Xu9lJhMUbh7pzMkcqunb4BWljAXM+VJ6ivYr/aZmyPlFA+n270umPWDbHwUXMhZXtdSyJE9PPuvoVtMvDkWQc3/qYNCErv4GN94fro9KLdDZlLNqvZKQ9R5BNFaez7H/R0LuEjOcRYAnGxeBPlbVqVVXScuQrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vi8ln8rS9/04Uv7lQN26wnkZ332v9CjshN2FOa9S6bw=;
+ b=TIUk3XSDSnqNk1Z/BnglxgIWFAfiWkkOpOLuFTO9y3KZ9mXpoY39grkeyfiTulAVW/WXoaOxrn494G+xmUox30JJU3ZkNfEiMATbrKBs6T8jC+EpuWKioofoTmPgHcyLkhrbWOZyEigj5IHxFav0WuvV10Xm1VHqQ13skpyc5uoxd+KfPa9X9d1xYerAcuV6ZmamobphWn7g6QFMyFuCQhgrsWNY9E+HVCjyLqAZl+gVmViKuD6qG1mu2PX+CKjWnB6/Ua2X+cF4Q9DP6UwjHx9ZATkDgfQ3B+LmneOe3Iv55iwYoLfvDyFbc2Sra8DS01S3/VSpZj8VmCi97rHIFw==
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com (2603:10b6:806:25b::19)
+ by DM3PPFCA3BFC2BF.namprd11.prod.outlook.com (2603:10b6:f:fc00::f4c) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Thu, 11 Sep
+ 2025 10:53:41 +0000
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::84fa:e267:e389:fa9]) by SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::84fa:e267:e389:fa9%5]) with mapi id 15.20.9094.021; Thu, 11 Sep 2025
+ 10:53:41 +0000
+From: <Parthiban.Veerasooran@microchip.com>
+To: <bastien.curutchet@bootlin.com>, <Woojung.Huh@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>, <marex@denx.de>
+CC: <thomas.petazzoni@bootlin.com>, <miquel.raynal@bootlin.com>,
+	<pascal.eberhard@se.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: configure strap pins
+ during reset
+Thread-Topic: [PATCH net-next 2/2] net: dsa: microchip: configure strap pins
+ during reset
+Thread-Index: AQHcImSfxkeqKajulkWkTfxGEb781rSNz+EA
+Date: Thu, 11 Sep 2025 10:53:41 +0000
+Message-ID: <7361bf07-892b-406f-aca5-c53a7d876ac4@microchip.com>
+References: <20250910-ksz-strap-pins-v1-0-6308bb2e139e@bootlin.com>
+ <20250910-ksz-strap-pins-v1-2-6308bb2e139e@bootlin.com>
+In-Reply-To: <20250910-ksz-strap-pins-v1-2-6308bb2e139e@bootlin.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB8278:EE_|DM3PPFCA3BFC2BF:EE_
+x-ms-office365-filtering-correlation-id: 0e7ffddd-fe26-43c7-c512-08ddf121785d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?NXdlVmRqajJmODRPSDlGalRFQ0NxZ1V6blpOSzJjTXdWdDFtTGR5ZEc1S0RI?=
+ =?utf-8?B?Q1hBNE12OVRkcEgyZm9KTEY5TVB0SnAwd0xVYkdpZllaUkorbmNnNjFZbjJ6?=
+ =?utf-8?B?a28rYjVIU0hMZVBJMUVLWnd4dzErc2lJVVNxd084ZFpSaHUwMzB2YWN2MFdB?=
+ =?utf-8?B?eUcweGNQRXhFc1FpVW1PQlRHWjRyakxEaUd6a2VzdkdVOFlZVmZWSDVCOFhD?=
+ =?utf-8?B?NHZManFMWUExT1E5WlpobWFkTUlOVTI1WjFoeTdkTWhSSnNKY0dEaFVzclJz?=
+ =?utf-8?B?Z1V0a0U1MFc4bDNHZXhLdGJUWWdxTkFQNlN0andBbnFERW9sUFJJL05LVDlC?=
+ =?utf-8?B?MW1rSlhsZFZNZ2RXSFpsV0lsaTBwOEF5RURCS1dPajl2empBNTkwb2xuVlU2?=
+ =?utf-8?B?SUpvczhDdlBwdVh2OVh4WWtFSFY1VExpbEthek5hTFhXWlgwNnVuL2RkL3pE?=
+ =?utf-8?B?aUFBZVEzbzZXWjlkTCtXN1R0cXl0aDdabzVjUERqVDRPRmVCbUJSNDIyeEty?=
+ =?utf-8?B?MmgweXk3a1NoTDhtZnlyRWtxL3dHcnVPQXNTV2VMaWNqZHNTdzN2N0d3Sk1D?=
+ =?utf-8?B?R3JKNHIzM2t5S1Viajdtd245aVZjZ1k2UnlsUlpwVHhBR2ZPbEdaZmxvM0Ny?=
+ =?utf-8?B?Wkp0SVlZY2hVdXdRWWd0NmpZMlE3eVBoa2dCQWhURHhvb3lJbkhsUThwQWN2?=
+ =?utf-8?B?ZFBtOHBlaVJnWldRK3ZBL2N4YkZwcGtQbnRXc1BaNkYvT2xRQmgzWGZLQ2JS?=
+ =?utf-8?B?S0NuclVIaGdRRmpkanZzeFZUakNMRFRReGV1V3VNQ2o0N2lxSUNZaHZFSnBH?=
+ =?utf-8?B?UXEwd0o2dTVLT2xvOHpkZVNBOGQzUFc3VUJEMmpjMjczMUlndzZnWnJjMTQ2?=
+ =?utf-8?B?dzlDSUJ5cmZaaVlaNmprQk9TMzBSTjBic1dBazJQKzlGdVpzb0FqTzBBY1hh?=
+ =?utf-8?B?ZDdwVEE0cVMyRWNhaUcybzdNOXBMcVZoY25KRittU0plUlM4T1hjZVZOa1ZE?=
+ =?utf-8?B?MlV5RVZXRnd2UlV5M1JZUm40cWc1eXM0RCtIdE05QTMyOWNBNXg4TGRSd25h?=
+ =?utf-8?B?Si9VTFRuSEpEelhpNjVPbi9CcFlrL2dzRnE2eGlDNDIvbnJHcys4cUtyRXdN?=
+ =?utf-8?B?QldvVkx5RTVGd3VwTldxQ1dJWFBGMXVVb0lCaG9yRVVIMG0wTEtkMG1KUlpU?=
+ =?utf-8?B?eUpMUUk4aVg5a0F5L2NlcDhXMUNEL2VlVllDQktGRXRlWXlKaXozMFBYMGdE?=
+ =?utf-8?B?b0dMVFcxMGhDZlFsZEpLa1FZbzR2UzEvMjZUVStza0luZGpkb3VCQ3FXR214?=
+ =?utf-8?B?QTd5RlowSm8vUU0zWEdBZGVBR1B4NjZ1Yjg1MmpKdDBJSVFXUU05MGo4bjBJ?=
+ =?utf-8?B?cTE0dDNaVjVZejl5ZW5CS1VhTG1OVWN0eWxJTWplZjRXdE1oRkVPajFqQzF2?=
+ =?utf-8?B?Yld1V0lydFlXRy9pUDJPTTRtVzBNZjNGMXRyd1A0d0lnNHhVdndqeWk5QkFQ?=
+ =?utf-8?B?MnZkUG40TW5TWFY3bGJWM2tiYmpsc0dJZk1ONXJXTzg3N1cyN3MwOTVFN25Q?=
+ =?utf-8?B?UGh4SlQxS1NNcmhhcGt3QUYxTXQvYkcwdENYaWxlQ2Q2TUsvL0VFNkh5dkRG?=
+ =?utf-8?B?Rm54QkZuL1ROOEtZbEhRS252bmk0RGxvVXY5ZWJDNGFZeUlCa2JqdGQrUlNF?=
+ =?utf-8?B?VTQ5T3JyS0d6Q0Y4U1RkcmNoQ2plRk01QktWUTNFV2loRFdmaEtoc3pFOEE4?=
+ =?utf-8?B?VFdzN0xNQXN5SjhGZmZNc0c2eVhlS2xFYU1BNWYyTDdQaVdWQmppL0s0UU85?=
+ =?utf-8?B?dlA2eFdXZkdTd0NORGNUNkIwOGlmd0JEVWI0blpHSXpSWWJReGRUS0ZoNHAr?=
+ =?utf-8?B?ck5OMERVTWZHMmU4eUMrc0xrVjFtQjhxZW5YTlZselI0VDczRm0rSnFMbmJo?=
+ =?utf-8?B?SWJkTXNVcnR4YnJKRUZaWFBjUy84WUNiUmdjSWJadDFQQXlIYzZiYStGaDM2?=
+ =?utf-8?Q?JBQXpnVpfBHE75ke5+LREWr34w9uLU=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB8278.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?UXlQSTJPeHhCazRBU0ZVRklZbW16OEYwS0tWcjJOTmJyQmZXbTNCR0pyMGJk?=
+ =?utf-8?B?QW80UG9nM3FhbmZZV2F4RitXY0Z1NFN4REovc0tkbkUxaTg1a1pCdTUrSjV2?=
+ =?utf-8?B?UGQyc09CbGZtcXVBcGF4dXAxaDJ4bHlzTzF3U1NNb29mR1gzT21tcjl6Tm5C?=
+ =?utf-8?B?K1NTS0I4RmNmbU5UWUJRdlNGTHVUZkd3V21kOHZhdk9DNVVqK2duak5RQ2pi?=
+ =?utf-8?B?YXRORzRGdUljMVJxckZTVG5DdWxIM0NOMFluTXlFbkRmN0d5UE11WFU2NEtN?=
+ =?utf-8?B?K1FmM3I4OG81K2o3MW5wWmYrMzRXajNDT0QzcGJNbjgzM0wxU0o5Mm8zMVRi?=
+ =?utf-8?B?QnpuckpFeCt2Z3l3Y3JRSEdla25GUG5BdUFaOVVST1RHbDY5cHZRVTRQVDVM?=
+ =?utf-8?B?aWdGNHVyaFlBejZsVU9CQ3lTT0hOU1FLaVZCY1hYbHJ5WW5Rd2gvWVBEUHEr?=
+ =?utf-8?B?dUcxRWRFTGlkdFovUzNpZ2hobnNsaEtqTXlDU3VHeE1abGQvM245ZW5tR1Aw?=
+ =?utf-8?B?b1FBaTd5aCtWR3lPRUcwc3JieWNEVUs2bkdjdm9wZ0JPODBKVEc0c3BBUUN0?=
+ =?utf-8?B?eGx0WUxKS2xBcExCTTkyUkpGOHRHVjN1czJCSHY4L3cxd2p2OGRJendVSHlH?=
+ =?utf-8?B?dHpLN2Zab2dYRW1rNnFUa3FWS2Z3UkFrTnFNNmQ2K3hTTkFvbUhEejQ1NXA4?=
+ =?utf-8?B?cFliUzIxdTVnQ2xsVWhFTGRyOHJDK3h6cGNMdjFtWmxQZ1A1RUxZbi9aMWRZ?=
+ =?utf-8?B?N0pJTkhmRkpmak1xOWwyNmE4UmNTUzdqMUdtR2xQY25FTDFoYWw0ZC9kaCt4?=
+ =?utf-8?B?UHE1RGYzMnpNRnVndmV5SEg3Q0FsVEx0R1VFY3VLUGhsTDVoeWF1ZzNYakxL?=
+ =?utf-8?B?aHZKZlpOUDNYMlNtNVdDRlVGUVkvQnMyVitLTmxPYmJib1d0VjZwQ3B4amFl?=
+ =?utf-8?B?eHAxYitRQ1VqYTB3M3ViclBHV3ZnaUZ4a0w5QnBGbzVCU0pSU1dlSTNvWm5o?=
+ =?utf-8?B?UWVwYzhjKzdQWFlKMkxzV2lkVzNEM21QemcrQzhIWHBjWmMzZWFMRVR6ODMw?=
+ =?utf-8?B?eTNXMmZVTnRPbXEzRmpNS3RZTHJyL2hvVHpCN3pVVGJPMUI2TzVYMjBaV2Mx?=
+ =?utf-8?B?ckNobWcxZG9LV3RzL1pvbGh1U1V2Y1MySHNJc0cxYTJlOURuZ3hHR3BSZnBa?=
+ =?utf-8?B?cUkxKzRhZWFGUExIano4clRlUUdXUFRlTkRXTzNtYlphaExTSGhFVC9SSkRT?=
+ =?utf-8?B?MzVUeGdCTEdaMVJyeWoza3BnMWFyZHNxSkVIVE1HdWp0ekJLS2pzWUxiRURQ?=
+ =?utf-8?B?MWVZbGdid1pKaUpsVHRaalY2TzIxTkxJT2xyV2p4aU5wK1ZaUWVKYzNTY0Qz?=
+ =?utf-8?B?TnBDR1RRbG5GQXNBQkN5emM1U2crZlRiNjIzdEE2NFc4K0VSN2ZkMTNuOXFi?=
+ =?utf-8?B?aGlBNU5qVHFJT05Mc2k0M29VRmRYNE1CUzhvbWZUYXRXWmh6YmxOUjI2eVhy?=
+ =?utf-8?B?MXV5VXhrVVRmT0N1eTNBK1plOTFoSGdibjlQbjNXaWllTHNkZGVLS0VweU5L?=
+ =?utf-8?B?dG5sUEttbHgvWjFJV05OaEtsa1JEZkw3dy90MWR3ZHhhVUR1SWxHQ1JmUVJG?=
+ =?utf-8?B?R3pMVkNxbnpXaUZ0a2c5a1J3c1NLcnJyTk9LaDZxSzRVY2ViNlVxYm9lS21H?=
+ =?utf-8?B?eUQzVGdNdm5HK2p3VjhSY2hqUzE2cnRleFE5aHpacnBiWE5CSDZOVG5Yem5L?=
+ =?utf-8?B?SWVMSm14dHZlanRrSGdKVDBDcnhFcDVYWEFtaTNiallmT2FjVHEwV0F2Zi95?=
+ =?utf-8?B?YTlTdTVNcVZ3cXl0Y3piZkQ5S3NWeGRFbmZXUW5uT0Q1cGhMdnpYWU9Lemdv?=
+ =?utf-8?B?b1pmbnpwZDdTK2ZqU0d4RnZGOFBEVk9xdXJDa280YWt6Rmp3ODE1ZHladU9I?=
+ =?utf-8?B?UTJUOCtFa09qMnIvWjNkanV5dDFxTlVZOHMwYlRZUmp2Y3dnckFyOFg2ajNP?=
+ =?utf-8?B?K0h4MVlRNUQ5bWQvbjlUMUZQa05zdmhrMVFReXdLcHNDVytzM3dmdmhkMVlT?=
+ =?utf-8?B?UWFoUUc2cXI3enc0RGF5OHlFM0xnNEY1UUhRRjVxZ3kvYllMTEFhTVJEWlhx?=
+ =?utf-8?B?NlZ5OTN4elB4UFBFdVpqai9BVDdQWCtrM0VUM0hDeXpxeUxMemR6S0hnSm9E?=
+ =?utf-8?B?R3c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E96766CA0A18D84EA63D9DE44D9F0167@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250904015048.1801451-1-a0282524688@gmail.com> <20250911100043.GH9224@google.com>
-In-Reply-To: <20250911100043.GH9224@google.com>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Thu, 11 Sep 2025 18:47:36 +0800
-X-Gm-Features: AS18NWAGX3WtCQoVZDVAI9xUo0zmugnI0RXp3sT2snc3J7PbhZfKY4UJ-0j4Eb0
-Message-ID: <CAOoeyxU+ZrMsRMpn2oTGy4aCHgDwu_CNJYXJ5cjokS7tt8XuGQ@mail.gmail.com>
-Subject: Re: [PATCH RESEND v14 0/7] Add Nuvoton NCT6694 MFD drivers
-To: Lee Jones <lee@kernel.org>
-Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
-	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB8278.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0e7ffddd-fe26-43c7-c512-08ddf121785d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2025 10:53:41.1582
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HPa/l78NLH8A4FkIKieZ+zVp+DZBLTCn+4w1k2DfgO9DJYyab+i+CxGUxZzjV2HrIGcRIik6zXEPd2zeFCcY7sDyQ0dJZF7J/I4fstbvN3XWuJ0NoKFTTPakg01zVTyJ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPFCA3BFC2BF
 
-Dear Lee,
-
-Thanks for your feedback.
-
-The series applies and builds cleanly on my local tree based on commit
-8f5ae30d69d7 (v6.17-rc1).
-My branch currently looks like this:
-
-1ba54e97c6fe (HEAD -> mfd_v14_v6.17-rc1) rtc: Add Nuvoton NCT6694 RTC suppo=
-rt
-6a71b8c05f1f hwmon: Add Nuvoton NCT6694 HWMON support
-bf0b59ad47d3 watchdog: Add Nuvoton NCT6694 WDT support
-36a8e58f7368 can: Add Nuvoton NCT6694 CANFD support
-8cf61471f368 i2c: Add Nuvoton NCT6694 I2C support
-f0d3b273fd93 gpio: Add Nuvoton NCT6694 GPIO support
-e86e2fb37ed7 mfd: Add core driver for Nuvoton NCT6694
-8f5ae30d69d7 (tag: v6.17-rc1) Linux 6.17-rc1
-
-
-To be absolutely sure there is no mismatch, I will rebase onto the
-same tag once more, rebuild, re-test the kernel, and then RESEND the
-series.
-
-Please let me know if you are applying on a different base tree or if
-there are other prerequisites I might have missed.
-
-Thanks again for your review and your time.
-
-
-Best regards,
-Ming
-
-Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B49=E6=9C=8811=E6=97=A5 =E9=
-=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=886:00=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> On Thu, 04 Sep 2025, a0282524688@gmail.com wrote:
->
-> > From: Ming Yu <a0282524688@gmail.com>
-> >
-> > This patch series introduces support for Nuvoton NCT6694, a peripheral
-> > expander based on USB interface. It models the chip as an MFD driver
-> > (1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
-> > WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
-> >
-> > The MFD driver implements USB device functionality to issue
-> > custom-define USB bulk pipe packets for NCT6694. Each child device can
-> > use the USB functions nct6694_read_msg() and nct6694_write_msg() to iss=
-ue
-> > a command. They can also request interrupt that will be called when the
-> > USB device receives its interrupt pipe.
-> >
-> > The following introduces the custom-define USB transactions:
-> >         nct6694_read_msg - Send bulk-out pipe to write request packet
-> >                            Receive bulk-in pipe to read response packet
-> >                            Receive bulk-in pipe to read data packet
-> >
-> >         nct6694_write_msg - Send bulk-out pipe to write request packet
-> >                             Send bulk-out pipe to write data packet
-> >                             Receive bulk-in pipe to read response packe=
-t
-> >                             Receive bulk-in pipe to read data packet
-> >
-> > Changes since version 13:
-> > - Update to guard(spinlock_irqsave)() in nct6694.c
-> > - Add struct i2c_adapter_quirks in i2c-nct6694.c
-> > - Rebased on top of v6.17-rc1 as requested
->
-> I thought you were going to rebase this onto v6.17-rc1?
->
-> It still does not apply.
->
-> > Changes since version 12:
-> > - Implement IDA in MFD driver to handle per-device IDs
-> > - Use spinlock to replace irq mutex lock
-> > - Use same email address in the signature
-> >
-> > Changes since version 11:
-> > - Use platform_device's id to replace IDA
-> > - Modify the irq_domain_add_simple() to irq_domain_create_simple() in
-> >   nct6694.c
-> > - Update struct data_bittiming_params related part in nct6694_canfd.c
-> > - Fix the typo in the header in nct6694-hwmon.c
-> >
-> > Changes since version 10:
-> > - Add change log for each patch
-> > - Fix mfd_cell to MFD_CELL_NAME() in nct6694.c
-> > - Implement IDA to allocate id in gpio-nct6694.c, i2c-nct6694.c,
-> >   nct6694_canfd.c and nct6694_wdt.c
-> > - Add header <linux/bitfield.h> in nct6694_canfd.c
-> > - Add support to config tdc in nct6694_canfd.c
-> > - Add module parameters to configure WDT's timeout and pretimeout value
-> >   in nct6694_wdt.c
-> >
-> > Changes since version 9:
-> > - Add devm_add_action_or_reset() to dispose irq mapping
-> > - Add KernelDoc to exported functions in nct6694.c
-> >
-> > Changes since version 8:
-> > - Modify the signed-off-by with my work address
-> > - Rename all MFD cell names to "nct6694-xxx"
-> > - Add irq_dispose_mapping() in the error handling path and in the remov=
-e
-> >   function
-> > - Fix some comments in nct6694.c and in nct6694.h
-> > - Add module parameters to configure I2C's baudrate in i2c-nct6694.c
-> > - Rename all function names nct6694_can_xxx to nct6694_canfd_xxx in
-> >   nct6694_canfd.c
-> > - Fix nct6694_canfd_handle_state_change() in nct6694_canfd.c
-> > - Fix nct6694_canfd_start() to configure NBTP and DBTP in nct6694_canfd=
-.c
-> > - Add can_set_static_ctrlmode() in nct6694_canfd.c
-> >
-> > Changes since version 7:
-> > - Add error handling for devm_mutex_init()
-> > - Modify the name of the child devices CAN1 and CAN2 to CAN0 and CAN1.
-> > - Fix multiline comments to net-dev style in nct6694_canfd.c
-> >
-> > Changes since version 6:
-> > - Fix nct6694_can_handle_state_change() in nct6694_canfd.c
-> > - Fix warnings in nct6694_canfd.c
-> > - Move the nct6694_can_priv's bec to the end in nct6694_canfd.c
-> > - Fix warning in nct6694_wdt.c
-> > - Fix temp_hyst's data type to signed variable in nct6694-hwmon.c
-> >
-> > Changes since version 5:
-> > - Modify the module name and the driver name consistently
-> > - Fix mfd_cell to MFD_CELL_NAME() and MFD_CELL_BASIC()
-> > - Drop unnecessary macros in nct6694.c
-> > - Update private data and drop mutex in nct6694_canfd.c
-> > - Fix nct6694_can_handle_state_change() in nct6694_canfd.c
-> >
-> > Changes since version 4:
-> > - Modify arguments in read/write function to a pointer to cmd_header
-> > - Modify all callers that call the read/write function
-> > - Move the nct6694_canfd.c to drivers/net/can/usb/
-> > - Fix the missing rx offload function in nct6694_canfd.c
-> > - Fix warngings in nct6694-hwmon.c
-> >
-> > Changes since version 3:
-> > - Modify array buffer to structure for each drivers
-> > - Fix defines and comments for each drivers
-> > - Add header <linux/bits.h> and use BIT macro in nct6694.c and
-> >   gpio-nct6694.c
-> > - Modify mutex_init() to devm_mutex_init()
-> > - Add rx-offload helper in nct6694_canfd.c
-> > - Drop watchdog_init_timeout() in nct6694_wdt.c
-> > - Modify the division method to DIV_ROUND_CLOSEST() in nct6694-hwmon.c
-> > - Drop private mutex and use rtc core lock in rtc-nct6694.c
-> > - Modify device_set_wakeup_capable() to device_init_wakeup() in
-> >   rtc-nct6694.c
-> >
-> > Changes since version 2:
-> > - Add MODULE_ALIAS() for each child driver
-> > - Modify gpio line names be a local variable in gpio-nct6694.c
-> > - Drop unnecessary platform_get_drvdata() in gpio-nct6694.c
-> > - Rename each command in nct6694_canfd.c
-> > - Modify each function name consistently in nct6694_canfd.c
-> > - Modify the pretimeout validation procedure in nct6694_wdt.c
-> > - Fix warnings in nct6694-hwmon.c
-> >
-> > Changes since version 1:
-> > - Implement IRQ domain to handle IRQ demux in nct6694.c
-> > - Modify USB_DEVICE to USB_DEVICE_AND_INTERFACE_INFO API in nct6694.c
-> > - Add each driver's command structure
-> > - Fix USB functions in nct6694.c
-> > - Fix platform driver registration in each child driver
-> > - Sort each driver's header files alphabetically
-> > - Drop unnecessary header in gpio-nct6694.c
-> > - Add gpio line names in gpio-nct6694.c
-> > - Fix errors and warnings in nct6694_canfd.c
-> > - Fix TX-flow control in nct6694_canfd.c
-> > - Fix warnings in nct6694_wdt.c
-> > - Drop unnecessary logs in nct6694_wdt.c
-> > - Modify start() function to setup device in nct6694_wdt.c
-> > - Add voltage sensors functionality in nct6694-hwmon.c
-> > - Add temperature sensors functionality in nct6694-hwmon.c
-> > - Fix overwrite error return values in nct6694-hwmon.c
-> > - Add write value limitation for each write() function in nct6694-hwmon=
-.c
-> > - Drop unnecessary logs in rtc-nct6694.c
-> > - Fix overwrite error return values in rtc-nct6694.c
-> > - Modify to use dev_err_probe API in rtc-nct6694.c
-> >
-> >
-> > Ming Yu (7):
-> >   mfd: Add core driver for Nuvoton NCT6694
-> >   gpio: Add Nuvoton NCT6694 GPIO support
-> >   i2c: Add Nuvoton NCT6694 I2C support
-> >   can: Add Nuvoton NCT6694 CANFD support
-> >   watchdog: Add Nuvoton NCT6694 WDT support
-> >   hwmon: Add Nuvoton NCT6694 HWMON support
-> >   rtc: Add Nuvoton NCT6694 RTC support
-> >
-> >  MAINTAINERS                         |  12 +
-> >  drivers/gpio/Kconfig                |  12 +
-> >  drivers/gpio/Makefile               |   1 +
-> >  drivers/gpio/gpio-nct6694.c         | 499 +++++++++++++++
-> >  drivers/hwmon/Kconfig               |  10 +
-> >  drivers/hwmon/Makefile              |   1 +
-> >  drivers/hwmon/nct6694-hwmon.c       | 949 ++++++++++++++++++++++++++++
-> >  drivers/i2c/busses/Kconfig          |  10 +
-> >  drivers/i2c/busses/Makefile         |   1 +
-> >  drivers/i2c/busses/i2c-nct6694.c    | 196 ++++++
-> >  drivers/mfd/Kconfig                 |  15 +
-> >  drivers/mfd/Makefile                |   2 +
-> >  drivers/mfd/nct6694.c               | 388 ++++++++++++
-> >  drivers/net/can/usb/Kconfig         |  11 +
-> >  drivers/net/can/usb/Makefile        |   1 +
-> >  drivers/net/can/usb/nct6694_canfd.c | 832 ++++++++++++++++++++++++
-> >  drivers/rtc/Kconfig                 |  10 +
-> >  drivers/rtc/Makefile                |   1 +
-> >  drivers/rtc/rtc-nct6694.c           | 297 +++++++++
-> >  drivers/watchdog/Kconfig            |  11 +
-> >  drivers/watchdog/Makefile           |   1 +
-> >  drivers/watchdog/nct6694_wdt.c      | 307 +++++++++
-> >  include/linux/mfd/nct6694.h         | 102 +++
-> >  23 files changed, 3669 insertions(+)
-> >  create mode 100644 drivers/gpio/gpio-nct6694.c
-> >  create mode 100644 drivers/hwmon/nct6694-hwmon.c
-> >  create mode 100644 drivers/i2c/busses/i2c-nct6694.c
-> >  create mode 100644 drivers/mfd/nct6694.c
-> >  create mode 100644 drivers/net/can/usb/nct6694_canfd.c
-> >  create mode 100644 drivers/rtc/rtc-nct6694.c
-> >  create mode 100644 drivers/watchdog/nct6694_wdt.c
-> >  create mode 100644 include/linux/mfd/nct6694.h
-> >
-> > --
-> > 2.34.1
-> >
->
-> --
-> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+SGksDQoNCk9uIDEwLzA5LzI1IDg6MjUgcG0sIEJhc3RpZW4gQ3VydXRjaGV0IHdyb3RlOg0KPiBk
+aWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3pfY29tbW9uLmMgYi9kcml2
+ZXJzL25ldC9kc2EvbWljcm9jaGlwL2tzel9jb21tb24uYw0KPiBpbmRleCA3MjkyYmZlMmY3Y2Fj
+M2EwZDg4YmI1MTMzOWNjMjg3ZjU2Y2ExZDFmLi4wYWIyMDFhM2MzMzZiOTliYTkyZDg3YzAwM2Jh
+NDhmN2Y4MmEwOThhIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL25ldC9kc2EvbWljcm9jaGlwL2tz
+el9jb21tb24uYw0KPiArKysgYi9kcml2ZXJzL25ldC9kc2EvbWljcm9jaGlwL2tzel9jb21tb24u
+Yw0KPiBAQCAtMjMsNiArMjMsNyBAQA0KPiAgICNpbmNsdWRlIDxsaW51eC9vZl9tZGlvLmg+DQo+
+ICAgI2luY2x1ZGUgPGxpbnV4L29mX25ldC5oPg0KPiAgICNpbmNsdWRlIDxsaW51eC9taWNyZWxf
+cGh5Lmg+DQo+ICsjaW5jbHVkZSA8bGludXgvcGluY3RybC9jb25zdW1lci5oPg0KPiAgICNpbmNs
+dWRlIDxuZXQvZHNhLmg+DQo+ICAgI2luY2x1ZGUgPG5ldC9pZWVlODAyMXEuaD4NCj4gICAjaW5j
+bHVkZSA8bmV0L3BrdF9jbHMuaD4NCj4gQEAgLTUzMzgsNiArNTMzOSw0NCBAQCBzdGF0aWMgaW50
+IGtzel9wYXJzZV9kcml2ZV9zdHJlbmd0aChzdHJ1Y3Qga3N6X2RldmljZSAqZGV2KQ0KPiAgICAg
+ICAgICByZXR1cm4gMDsNCj4gICB9DQo+IA0KPiArc3RhdGljIGludCBrc3pfY29uZmlndXJlX3N0
+cmFwKHN0cnVjdCBrc3pfZGV2aWNlICpkZXYpDQo+ICt7DQo+ICsgICAgICAgc3RydWN0IHBpbmN0
+cmxfc3RhdGUgKnN0YXRlID0gTlVMTDsNCkkgZG9uJ3QgdGhpbmsgeW91IG5lZWQgdG8gaW5pdGlh
+bGl6ZSBoZXJlLg0KPiArICAgICAgIHN0cnVjdCBwaW5jdHJsICpwaW5jdHJsOw0KPiArICAgICAg
+IGludCByZXQ7DQo+ICsNCg0KQmVzdCByZWdhcmRzLA0KUGFydGhpYmFuIFYNCg==
 
