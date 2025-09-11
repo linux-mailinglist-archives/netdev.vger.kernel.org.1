@@ -1,155 +1,159 @@
-Return-Path: <netdev+bounces-222182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8744B535F3
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:42:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ED9DB535F9
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:43:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF95D188184D
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:40:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C10B188CC64
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03F1341ABE;
-	Thu, 11 Sep 2025 14:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3C6338F4E;
+	Thu, 11 Sep 2025 14:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="r769PxGr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NVXKW70I"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86865338F4E;
-	Thu, 11 Sep 2025 14:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0E4214A8B;
+	Thu, 11 Sep 2025 14:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757601576; cv=none; b=XUwv8XhzSY5n0HpFgVHAb0ioeP76xvXhFRgDG8+wcwEUU/eXRRfoKrLLEA/lK31cq6btypbTBb9kLAMAlZMcQ3ANiivAID79hjUmHl9P7c4dRevcbL0O1EZSNYpImIEupUBkY1eamisHn34oeHQm+omPDeTadhYfQCrOk88k/0g=
+	t=1757601667; cv=none; b=ruWV/mGwK/4yjnhM5N9wtAHzfTD9PLBNIjpceGBVeFJBBpOmfW7tm94uEHLJKNlcfn6VTx+5lZ6tnrP2AyZ0NYLYndiUxUYE500oHE+1vq05kR/fciXo4VOYtH1RMWyFY45A3UUZ3diWkecXJitcBkt4uQjeBswBiRdv7iyn2oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757601576; c=relaxed/simple;
-	bh=mPhRSz02axb+92Rdqq5SC3Csl0OIf9zO1JftDdB061w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jkGSlMZLOtvijB+G//aDrUSikX1YOvwDkC6Fst/Mlyzv7UN4xNIIqrdnA1+Pzx/vpFu0hOwUSSAElj/yPTLVEsqqg5D9MbSJide/dXJXXwsxOGtNzXUr+AD5Su7PRJ+sDjnuPv5PmSsnpgr3WF14/TcF6DN3xZ/hfn3V83yaKLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=r769PxGr; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=VeF93NLQYati3cJU4QRm7yhxeHlkMwFBcqHspj8dzm8=; b=r769PxGraMr7edBlBl3w5COYwA
-	PgRQDWnmRPr6Rc/G9jnT0MqljaRIo4oiEVXWAnq5xce8kTKUu01qlJkKIElfQWRK8kL2LQpNltRZv
-	WHSfXSUDk4liMET5ouUHb935XWjHX1b7Dd+jcF+W0o/kIHx9Bv/X/h3a7SLCrVieDy1p/fcrz8JrG
-	PBD8RWUG6yunwi9moF6PZyJqtw9CZafMEmEKo8t79S0DSrG6IhfgLfE6IxQIVzVylMTlqcPpUaOw4
-	dAMI1l0zwKh+xOYTRW3gJbcVOJjV9gzaVc+G97ADOQ2uBErKFpXt8XJHoDB/D1Rtps70N6TGl9Q+p
-	Z+hTrM2w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55722)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uwiSK-000000003Cw-3C4A;
-	Thu, 11 Sep 2025 15:39:24 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uwiSG-000000002QC-2K8T;
-	Thu, 11 Sep 2025 15:39:20 +0100
-Date: Thu, 11 Sep 2025 15:39:20 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1757601667; c=relaxed/simple;
+	bh=0k9K5Z0+Nwwz0NRSWVtjlErXcniZ4G8o1OcRaDrpy4A=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Q5NypE6nD0PRlX/hvDQEq/upd2QEpQXL3jxAB80S+W5L6mWmHxhBJWFEhrm143G3hGc+b+yntLPKSo/zOeseKnnUsbgEFd5L/XIdRPbIrL68m+U4cSUVR6MwNaNXxs3ffcLTnN0rZx9Wm2Jcx3c6NTgNfO4GTl6uSX8F63A0iOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NVXKW70I; arc=none smtp.client-ip=209.85.210.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-772679eb358so712752b3a.1;
+        Thu, 11 Sep 2025 07:41:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757601666; x=1758206466; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yyBSb1K+ID+ZIw5PFaCdNQifUNTYtrcbftSQOft9yWU=;
+        b=NVXKW70IdTSkTDqEXP9xvVLQMPDp4BKMtWVWimT5dmo6vk3gkWFGCGVbKpleGQS8CI
+         4REJwFVDzUyUnchhCVtkeE1UQZxckPzQ6ViuHqV9D60s70TscroCyikbTWkto1EMNI/s
+         ZsjfZi1NGsjLL/43qfudVwm1UkswHn/UF8aJoaxjFgabflm8LgKx0HT6kXYx94UCvURg
+         emkWC6b44korFiO54TkgSRojZSBu5nHyRYUdTvuzEwS5iPlTbjd4ImVC2IYBjDPjOZpK
+         JDe/pIoTIq6N7bT8CqyvbHitHLJlnE+g6nw+OQLg/l2XuaJPAOIwT3RXPAVEgfDLLn43
+         kDBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757601666; x=1758206466;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yyBSb1K+ID+ZIw5PFaCdNQifUNTYtrcbftSQOft9yWU=;
+        b=YN0jTorNOdQoYT13bY5JFdI/qWaL36+J66HqfAxwd6nrWPlO1UuKuo32ILduA0mnqr
+         jO+AvKZZbf1XoPhSlkMZcD0KP/NgFQzYxbD2K2N5czOOW1elDxBWXn8u0mVXTrZIVkSX
+         EzZ7mPHAl5QkS7me5NPDZi3C1nBZcgwaP3vXy2Q3he4gpAdNkHMHu681VnyJOKwLBwWz
+         OjQ/qF8gU+g2koh9VT31M22wySbz74y2fhA1OVA28RAqEPIylkH5WF9u93mJkzZDspYp
+         /jbjCTv+whj/Hyn9VdfjLnddZXlCLNV8yhAlQB4OEF7w5u8I1UEOpl0tCGFm0JVEmwJW
+         Nr4g==
+X-Forwarded-Encrypted: i=1; AJvYcCUhlNZT1f07ahQg9FJ5A3/n8YAPuv7uenaqqS2Ync7wHkQiGKBYNeAeKOzgpx4zYOnFSgzhNSE3s6waIOwroDDD@vger.kernel.org, AJvYcCWdt0fFpZZ76oMHg6o1MiklrvHGDnmbuAr+8JhbZRg75rZ/y3bJF1a5VjETQvQaNpQR653fy0jFYBtM@vger.kernel.org, AJvYcCX1x2Y9j+0vnwHusWy6NBrzR59waMOSgUo5vknweWGOahUEAkuqKdMU+nI3F+XxzzBJrSZC88/q+wwuF0k=@vger.kernel.org, AJvYcCXtHPZMIK1YgOwPSgW2wJiZQK45xWfGGv/RrshCeRiGmLs/w085yBLK2og3iT2Pezf6zbVwuAl6@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYxChl2dHbG13jpfZE4LFkb2wDPR94wUnFyCtjKKIC2ns5bTLX
+	l+1F+NfTIiqBNRiNrQMHmua4VVi4AiGnal34MK3Qd+U+VoIfxeeJvGMu
+X-Gm-Gg: ASbGncs0SF88BNH0dfrYkcHCdm9sXOMzgrw1RzeGQjWx2iJDu1JdzYlUAKRuCkOrbox
+	ytPXrLaO/7mZBYSEq3MkixPVaTmhoUy8WcYHhPNT91K5oabAYbdfmQKMnLJdO7Z82I0DLaUmc86
+	26EpSPDq8uZi8f2qoQt+koLV/yO5va6NmZU2LCZZ2Min2iNmQ5V1W8yopLzjvq4WyjVgwuOh9uu
+	UYbi+W5DXgu7OzrMQQZ5XdEVyYtJecInOcYOVKllCihfNq7AKU168tWXiz/RSfACnAKqxCJk6Vc
+	tpqywg1d/qb3sXLmW+PF7Kiso6QspXl0QkFTCnK8xgQ1Kp3SFzF0gNey3Qe0asELrD33TyfEtSM
+	CJClArW2FTI9FkHwJZsMG01i7VPVC2hIKBKUq+Gd6m3h2c4m1Bu5xJg==
+X-Google-Smtp-Source: AGHT+IF9eyJd8b0T+uwEAz0byGH03qdVJNvPLIp965+c17AGC9jU6i6mh2I8DUh/ICkQsmhTp7I9eA==
+X-Received: by 2002:a05:6a00:889:b0:772:45ee:9bb6 with SMTP id d2e1a72fcca58-7742dccdc8bmr23098620b3a.9.1757601665601;
+        Thu, 11 Sep 2025 07:41:05 -0700 (PDT)
+Received: from LAPTOP-PN4ROLEJ.localdomain ([58.215.202.202])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77607a47abfsm2370442b3a.32.2025.09.11.07.40.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 07:41:05 -0700 (PDT)
+From: Slavin Liu <slavin452@gmail.com>
+To: Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>
+Cc: Slavin Liu <slavin452@gmail.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>, Xu Yang <xu.yang_2@nxp.com>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
- PM to avoid MDIO runtime PM wakeups
-Message-ID: <aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
-References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
- <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
- <b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	lvs-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH v3] ipvs: Defer ip_vs_ftp unregister during netns cleanup
+Date: Thu, 11 Sep 2025 22:40:20 +0800
+Message-Id: <20250911144020.479-1-slavin452@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250909212113.481-1-slavin452@gmail.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Sep 11, 2025 at 03:58:50PM +0200, Marek Szyprowski wrote:
-> On 08.09.2025 13:26, Oleksij Rempel wrote:
-> > Drop phylink_{suspend,resume}() from ax88772 PM callbacks.
-> >
-> > MDIO bus accesses have their own runtime-PM handling and will try to
-> > wake the device if it is suspended. Such wake attempts must not happen
-> > from PM callbacks while the device PM lock is held. Since phylink
-> > {sus|re}sume may trigger MDIO, it must not be called in PM context.
-> >
-> > No extra phylink PM handling is required for this driver:
-> > - .ndo_open/.ndo_stop control the phylink start/stop lifecycle.
-> > - ethtool/phylib entry points run in process context, not PM.
-> > - phylink MAC ops program the MAC on link changes after resume.
-> >
-> > Fixes: e0bffe3e6894 ("net: asix: ax88772: migrate to phylink")
-> > Reported-by: Hubert Wiśniewski <hubert.wisniewski.25632@gmail.com>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> > ---
-> 
-> This patch landed in today's linux-next as commit 5537a4679403 ("net: 
-> usb: asix: ax88772: drop phylink use in PM to avoid MDIO runtime PM 
-> wakeups"). In my tests I found that it breaks operation of asix ethernet 
-> usb dongle after system suspend-resume cycle. The ethernet device is 
-> still present in the system, but it is completely dysfunctional. Here is 
-> the log:
-> 
-> root@target:~# time rtcwake -s10 -mmem
-> rtcwake: wakeup from "mem" using /dev/rtc0 at Thu Sep 11 13:02:23 2025
-> PM: suspend entry (deep)
-> Filesystems sync: 0.002 seconds
-> Freezing user space processes
-> Freezing user space processes completed (elapsed 0.003 seconds)
-> OOM killer disabled.
-> Freezing remaining freezable tasks
-> Freezing remaining freezable tasks completed (elapsed 0.024 seconds)
-> ...
-> usb usb1: root hub lost power or was reset
-> ...
-> usb usb2: root hub lost power or was reset
-> xhci-hcd xhci-hcd.7.auto: xHC error in resume, USBSTS 0x401, Reinit
-> usb usb3: root hub lost power or was reset
-> usb usb4: root hub lost power or was reset
-> asix 2-1:1.0 eth0: Failed to write reg index 0x0000: -113
-> asix 2-1:1.0 eth0: Failed to enable software MII access
-> asix 2-1:1.0 eth0: Failed to read reg index 0x0000: -113
-> asix 2-1:1.0 eth0: Failed to write reg index 0x0000: -113
-> asix 2-1:1.0 eth0: Failed to enable software MII access
-> ... (the above error repeated many times)
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 9 at drivers/net/phy/phy.c:1346 
-> _phy_state_machine+0x158/0x2d0
-> phy_check_link_status+0x0/0x140: returned: -110
+On the netns cleanup path, __ip_vs_ftp_exit() may unregister ip_vs_ftp
+before connections with valid cp->app pointers are flushed, leading to a
+use-after-free.
 
-I'm not surprised. I'm guessing phylib is using polled mode, and
-removing the suspend/resume handling likely means that it's at the
-mercy of the timings of the phylib state machine running (which is
-what is complaining here) vs the MDIO bus being available for use.
+Fix this by introducing a global `module_removing` flag, set to true in
+ip_vs_ftp_exit() before unregistering the pernet subsystem. In
+__ip_vs_ftp_exit(), skip ip_vs_ftp unregister if called during netns
+cleanup (when module_removing is false) and defer it to
+__ip_vs_cleanup_batch(), which unregisters all apps after all connections
+are flushed. If called during module exit, unregister ip_vs_ftp
+immediately.
 
-Given that this happens, I'm convinced that the original patch is
-the wrong approach. The driver needs the phylink suspend/resume
-calls to shutdown and restart phylib polling, and the resume call
-needs to be placed in such a location that the MDIO bus is already
-accessible.
+Fixes: 61b1ab4583e2 ("IPVS: netns, add basic init per netns.")
+Suggested-by: Julian Anastasov <ja@ssi.bg>
+Signed-off-by: Slavin Liu <slavin452@gmail.com>
+---
+ net/netfilter/ipvs/ip_vs_ftp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/net/netfilter/ipvs/ip_vs_ftp.c b/net/netfilter/ipvs/ip_vs_ftp.c
+index d8a284999544..4db58c42ff9a 100644
+--- a/net/netfilter/ipvs/ip_vs_ftp.c
++++ b/net/netfilter/ipvs/ip_vs_ftp.c
+@@ -53,6 +53,7 @@ enum {
+ 	IP_VS_FTP_EPSV,
+ };
+ 
++static bool module_exiting;
+ /*
+  * List of ports (up to IP_VS_APP_MAX_PORTS) to be handled by helper
+  * First port is set to the default port.
+@@ -605,7 +606,7 @@ static void __ip_vs_ftp_exit(struct net *net)
+ {
+ 	struct netns_ipvs *ipvs = net_ipvs(net);
+ 
+-	if (!ipvs)
++	if (!ipvs || !module_exiting)
+ 		return;
+ 
+ 	unregister_ip_vs_app(ipvs, &ip_vs_ftp);
+@@ -627,7 +628,9 @@ static int __init ip_vs_ftp_init(void)
+  */
+ static void __exit ip_vs_ftp_exit(void)
+ {
++	module_exiting = true;
+ 	unregister_pernet_subsys(&ip_vs_ftp_ops);
++	module_exiting = false;
+ 	/* rcu_barrier() is called by netns */
+ }
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
