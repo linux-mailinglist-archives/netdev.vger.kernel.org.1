@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-222016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45920B52B82
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:23:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D53B52B84
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:23:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F38B9562682
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:23:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7D3F1B2722D
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE8E2DF153;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B272DF157;
 	Thu, 11 Sep 2025 08:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CQxyzVZf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyfXX21p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47322DECCC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C479C2DF121;
 	Thu, 11 Sep 2025 08:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757579009; cv=none; b=ObivgLmsEJafgSit2CvWmhTBA7mX1iT/BXwn+9pGN4UsMfegOQjhvs2C1gPK2zRCUHj0QBKbIAKAFp4vrDMgW3t4viJWm4MwtEQ1AOU45HRkwSrKmuuYa3ssnyVNCcQTLA1AawBXBO+qT9n3tBYq6gH0AODgWpSoSgyDatzYeos=
+	t=1757579009; cv=none; b=iEtMyQsI/0m3NDsBy5ziB/7LD/VRjersRqpK1xa6+azholMZUNiijk60xIvRmSV8FMpRl8HCsQEF4ZSHlYUyVy2Q3gFyvZqC6iNHYycgr/wUUNX3VkzT6RJkPzlhTq7h0rqflWbAPkrYnhesgFjlrLXOzn66L1tuZ+5g40+2jXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757579009; c=relaxed/simple;
-	bh=/v0yrpBEJQ0D28G9+YyT6cosJyEdCGkLKC3aD1BtsjQ=;
+	bh=ypoWEn4gEmwpXn2cEWB0XS0dYLbndFFpNSdqJXTOW4Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VwCG/hUxmKbX/p58/E7Om3nsufC5DRtKUJ+yJFZXRmfukGaRs3LfkJz9QFzOBUH4LqDjL5S7fuRgBa5swVxOLDYnc6x0omJhvA5BGpGHrKubAyVWZKy/wHwZcWjecnsyZTtVy9SvunT3vqaz2T/g+W6mWFsBp/mrPoJ/WYCwPd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQxyzVZf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 67236C4CEF7;
+	 In-Reply-To:To:Cc; b=qnvQKxbD66G9rXDmtL/wX396biul/GOjPubvw7uy0W1+5w8qqEGuKZeHmpD/fAm6raDgrjZb8/lxhYqB+LobDgTHNzNdZLM8Ph2A8wXwwT73qztGJXLV7kFWlJdgl6GNnKUEQ8yAAY1hB2wgNv1iqVOT7OXdF9hFjF1o3nIAcm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LyfXX21p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 752B9C4CEF5;
 	Thu, 11 Sep 2025 08:23:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1757579009;
-	bh=/v0yrpBEJQ0D28G9+YyT6cosJyEdCGkLKC3aD1BtsjQ=;
+	bh=ypoWEn4gEmwpXn2cEWB0XS0dYLbndFFpNSdqJXTOW4Q=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=CQxyzVZfqH+P8zdM82GRHXbD8rE+lYTjiUXu+VMzpsklXBR9fuIyHyWn95aOHeij+
-	 KRbHJHTH1k7NCMiEZ0DPX6Oy84HwmVwMu+cvW5iGVfZz3l7vuW/EK/sift3aM/85FS
-	 nQ8m3gzMIZ1e29VOW8+pIln+g9i03WkXc+d+z0wRvrMgRz/VC7RloIXEYvmQI9gmGs
-	 /1EZuYKLIdxqaNNj3hGFk3tJqo6+/nsxiI7JZJ87zRdNlE4AZnCWTKRK97n1nFszT3
-	 VQhv+/NRP4yPq1vH9CtgsHsaONBPTjPjEDU5Zjk9XVs+qwBAWqe9cW5yD2qIBmM0nc
-	 lKsJ5rUKSOZow==
+	b=LyfXX21pQXJ8sPOmu/nEoHgenMeHVbEWPnevO04aNHJfFWHVHQYCllOtTDzBE+vZe
+	 sv9BVRDORO/daHD/fSfiXPoqv31NG2VGPRIMMWD5npOm+0zYRXY1J9orIrJAam3ZKp
+	 VjmoMdl0Jfn44UOfCi+2YVwt489tNkN8wDkn4puRG8xi84YFMHDfXz1eV1GIZ7OFIc
+	 Pt2t4BYxWLut0BdJq3ut/sMzhOZdceL9unHevQN+b4fmv/Jgs8Dob2SR80f3YJFDPi
+	 d8npjehLvZR92R6W1ijcUITRR+bARkntqnsZIzzvcVZ9vSk8ULjKH4ubyAieKwczPG
+	 KV3WOQi+ChMcQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54666CAC587;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 669FECAC592;
 	Thu, 11 Sep 2025 08:23:29 +0000 (UTC)
 From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Date: Thu, 11 Sep 2025 16:22:59 +0800
-Subject: [PATCH net 1/2] net: stmmac: est: Fix GCL bounds checks
+Date: Thu, 11 Sep 2025 16:23:00 +0800
+Subject: [PATCH net 2/2] net: stmmac: Consider Tx VLAN offload tag length
+ for maxSDU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250911-qbv-fixes-v1-1-e81e9597cf1f@altera.com>
+Message-Id: <20250911-qbv-fixes-v1-2-e81e9597cf1f@altera.com>
 References: <20250911-qbv-fixes-v1-0-e81e9597cf1f@altera.com>
 In-Reply-To: <20250911-qbv-fixes-v1-0-e81e9597cf1f@altera.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -70,11 +71,11 @@ Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  Rohan G Thomas <rohan.g.thomas@altera.com>, 
  Matthew Gerlach <matthew.gerlach@altera.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1757579008; l=1329;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1757579008; l=2479;
  i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=08KV5iTtWBP58r0AMyc5QP0+5U8/3Bb20vU2hpRSVqk=;
- b=RKVL8L4shTtsE0yMWktLB7UBTuTa5UWJgk5bAXN9GwEGjDkZuaPg7txbFStG1fwxJBY0LIErS
- eYMjClFcT76BBd+UOuHoOQAlvwTtkpfhVFDcJ60tcbGH5COJq7AZ5kT
+ bh=eTWmL606f3oYOV0qUeKRaPXnGZ0t6qItbR3wWeC6D1c=;
+ b=EDvj8phpndTc3hNkoyw7M0iVbCa4P7nqQt6SJ1KQa45vJvvOkJC8WbBXDlreFnKXxieSCVo3x
+ kfKcEo9wqWYB19X/Va7sRFb63+luJvaYFcmDC06AF0n9burngz9EWNu
 X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
  pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
 X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
@@ -84,38 +85,67 @@ Reply-To: rohan.g.thomas@altera.com
 
 From: Rohan G Thomas <rohan.g.thomas@intel.com>
 
-Fix the bounds checks for the hw supported maximum GCL entry
-count and gate interval time.
+On hardware with Tx VLAN offload enabled, add the VLAN tag
+length to the skb length before checking the Qbv maxSDU.
+Add 4 bytes for 802.1Q an add 8 bytes for 802.1AD tagging.
 
-Fixes: b60189e0392f ("net: stmmac: Integrate EST with TAPRIO scheduler API")
+Fixes: c5c3e1bfc9e0 ("net: stmmac: Offload queueMaxSDU from tc-taprio")
 Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
 Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 25 ++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 694d6ee1438197bd4434af6e9b78f022e94ff98f..89d094abb6be5c993c81901e3f79a6b03f310511 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -981,7 +981,7 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
- 	if (qopt->cmd == TAPRIO_CMD_DESTROY)
- 		goto disable;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 419cb49ee5a25519a60a84bae6bcdb0be655384e..c487ce95436c2a1f502f96d00afab6270d77c0bb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4531,6 +4531,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	bool has_vlan, set_ic;
+ 	int entry, first_tx;
+ 	dma_addr_t des;
++	u32 sdu_len;
  
--	if (qopt->num_entries >= dep)
-+	if (qopt->num_entries > dep)
- 		return -EINVAL;
- 	if (!qopt->cycle_time)
- 		return -ERANGE;
-@@ -1012,7 +1012,7 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
- 		s64 delta_ns = qopt->entries[i].interval;
- 		u32 gates = qopt->entries[i].gate_mask;
+ 	tx_q = &priv->dma_conf.tx_queue[queue];
+ 	txq_stats = &priv->xstats.txq_stats[queue];
+@@ -4547,13 +4548,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			return stmmac_tso_xmit(skb, dev);
+ 	}
  
--		if (delta_ns > GENMASK(wid, 0))
-+		if (delta_ns >= BIT(wid))
- 			return -ERANGE;
- 		if (gates > GENMASK(31 - wid, 0))
- 			return -ERANGE;
+-	if (priv->est && priv->est->enable &&
+-	    priv->est->max_sdu[queue] &&
+-	    skb->len > priv->est->max_sdu[queue]){
+-		priv->xstats.max_sdu_txq_drop[queue]++;
+-		goto max_sdu_err;
+-	}
+-
+ 	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 1)) {
+ 		if (!netif_tx_queue_stopped(netdev_get_tx_queue(dev, queue))) {
+ 			netif_tx_stop_queue(netdev_get_tx_queue(priv->dev,
+@@ -4569,6 +4563,23 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	/* Check if VLAN can be inserted by HW */
+ 	has_vlan = stmmac_vlan_insert(priv, skb, tx_q);
+ 
++	sdu_len = skb->len;
++	if (has_vlan) {
++		/* Add VLAN tag length to sdu length in case of txvlan offload */
++		if (priv->dev->features & NETIF_F_HW_VLAN_CTAG_TX)
++			sdu_len += VLAN_HLEN;
++		if (skb->vlan_proto == htons(ETH_P_8021AD) &&
++		    priv->dev->features & NETIF_F_HW_VLAN_STAG_TX)
++			sdu_len += VLAN_HLEN;
++	}
++
++	if (priv->est && priv->est->enable &&
++	    priv->est->max_sdu[queue] &&
++	    sdu_len > priv->est->max_sdu[queue]) {
++		priv->xstats.max_sdu_txq_drop[queue]++;
++		goto max_sdu_err;
++	}
++
+ 	entry = tx_q->cur_tx;
+ 	first_entry = entry;
+ 	WARN_ON(tx_q->tx_skbuff[first_entry]);
 
 -- 
 2.25.1
