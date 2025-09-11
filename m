@@ -1,119 +1,128 @@
-Return-Path: <netdev+bounces-222255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18790B53B46
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:18:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D81DB53B50
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A41A1CC33D3
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:18:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B713B487516
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F6D3570B6;
-	Thu, 11 Sep 2025 18:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF68335A2BE;
+	Thu, 11 Sep 2025 18:21:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QLfIzDYC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y1VT2MDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534FF21C17D
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 18:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19EE32A802
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 18:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757614690; cv=none; b=Bao2QMI85MgGkgcI6EZ+JLN3MfhekfqRCdnVfVrTU1f+rqG2YUj0XTD9paRo2Ghwr5jsxRKAtWaWZBsl3j1oGZTH7zQxwq3Cug9rAP7Ap4vBHsAuEv3M8/PuQqYuH9ADC2oeBvqE/pOkwPc4cen4c+o9rFIZc6F/jJvf1b8J46E=
+	t=1757614900; cv=none; b=ZMxfTU3ZzJ5k/+FaiLPnyj7BnQFR1AOxA2vFeq2n1i4CqYgfzSAHPiaNF8JSrOS7kdZPe/olkJcNVBN/0AWq3Ka+2l7d3XQF7mCFHnlCsk6YREJJqJBRQb2E57VPGFrYRBy3t7aHpGJKh/tQh4bPIS3ow0uTubwefuh9pAYmUZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757614690; c=relaxed/simple;
-	bh=clA8GqiEaZLpxSps/Zg9+uXbFOxSOUyl+6EIrGzL37g=;
+	s=arc-20240116; t=1757614900; c=relaxed/simple;
+	bh=Jd+yBImYmRBiHzv3m5PabL2jPVEDNQq+gQDaCuyIRFo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SiJP2fXkdRQWGddupsbVTJ+mGKKd6Ht6SkHRxNxvXM29h78aKDvMfkW55GL9Mt0UnSSDWcXbCWwKKTc2aTOOvaZX8GhP8qp2wb3TzcOW2R6X4g0EbioE71HyzUhBdhubPrYgJifgQTQIWVjJ42XqFAl5gCTy2WuiLF18/r8K2PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QLfIzDYC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03109C4CEF5
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 18:18:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757614690;
-	bh=clA8GqiEaZLpxSps/Zg9+uXbFOxSOUyl+6EIrGzL37g=;
-	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
-	b=QLfIzDYCHc0/UNmTxImRu5nZHNoGCtg5/JZmaRjEOnoKDCf3RLPNrxMTvHsBDzTqp
-	 BVCYw0Yf15yTITpxUrhGNq6uiB8uIpZnuUBoIHTYQ3k8VgYxIvT/gZ0UW5aCS96Zv4
-	 lKHsAsgVa7Hh8yO8oKxyekmV1cK1niIt6gZzgYU9tWbIpevjl2fUF5UxWBqiXMbrxP
-	 CGpCtxfmeQIOi6F6Nl6sIeBYPwRID+E1Ya2Embdk8AaFxaLylcLD46Me15Re57e6xI
-	 WIjC79qlRk/xHIzDFsKMHDNsH5eU5uStSYF9Zn3YHMBOjfzrKRkRo0D97+JMF/k1xG
-	 BByAcFeZ22png==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-336b071e7e5so8614651fa.1
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 11:18:09 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVajMAcAl1PUaSNh2g4D6ZXGTDgNqq4L2emFtjGMfH/lIgPwsGtS/MVv0KzwMObewI+3j/jntk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGURtuH2QtQ24IzWL5nsCRsFzypQuUkbslN3gjCRoFtHuxx3Lk
-	Dp6jQvQM/0LmbI1fLkFpWkVYt/PKd7hvkZlFcvIc1YuRxf1n9ZQUtmc3TgdX+OZuC/acg0ikChM
-	UmUunSiBlkQUHSJZKdgwKYJj/KLKNSBU=
-X-Google-Smtp-Source: AGHT+IFNhBqlOYMX7VhHL/3/WsyBugQCqv4OR+B6SohRHQQkUzEv33t/qS3NjuPROvGHTdFWqUdjtxSUm5WWLxfziaM=
-X-Received: by 2002:a05:651c:4386:20b0:338:1ce5:4034 with SMTP id
- 38308e7fff4ca-3513d96a5femr123181fa.32.1757614688354; Thu, 11 Sep 2025
- 11:18:08 -0700 (PDT)
+	 To:Cc:Content-Type; b=uq1mQ4liDqe3QOSKTutXnj+J8WzNjm6d7EV1o/K4S5qozVe/vVtCy6lEcIBdm7teWZAqbNNTXDLhzO6dOTDh4ZiU6oo3JAdD7MbEym1wOnDibclfrWCOUDrk+5JS8aLxWDAJx8yXUi5xOat+J/QU1VF/osZ7Y3fJQ2hHVVL1/FA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y1VT2MDp; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-560885b40e2so1203e87.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 11:21:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757614897; x=1758219697; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Me627Z5tFRIjdXPyBuK6dP+9xV8RNbhF9jJs439CQW0=;
+        b=Y1VT2MDpN3+vJoypPL5+w0xOq+GhK/IAz68BtVuPz0UKuddXSuoS5uRg63aRPaRevw
+         Rz3x29mHjm9hW8751FkvQOpEodSdz/jJnh2E2xhdi+8z+DYsV8rS3igeDTCpnjWoYSDp
+         0QejVQVaBzZz3VlGyle585ZOV8P01EeG/Cnk/nx/tKOI5SOLVvmClh/f+NsaH+Mt+9R/
+         abCPICGw/bDpGQOOfNVRb1g/BrgDIICQBDZV5xe+KH3DHHhJpC8Ae2CB+v+D1KbqJbX+
+         uXZ5+atMqaat0ygagmt196woUME4W3JfGwAvB/KYX1a2SiPB1FZr/h9PM1RNLsq7lcVZ
+         CT/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757614897; x=1758219697;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Me627Z5tFRIjdXPyBuK6dP+9xV8RNbhF9jJs439CQW0=;
+        b=s0d8FKLEz2uo9jobr9b1xkWgLdkxm1LsCvsdZ5y6w7HygWpLlfIso8wOw17su65F0w
+         JkJQpJZBSz0Rk05Lc+lmBy+SyuoM91BIwTYFv2cfMu3OXLKWnELw3Zw76rA4/VILWA8U
+         UNIiXl8mpndKQxrks8GOBl08WFgthF+Sq4+PTBeVGDeki580HBfRZbQPeLc8rzsZ71Li
+         TKuzRgoMXpJ1zqzY5ouEnDLrLjN0vBPWvdtmyNOXULkw0n4eN6E7Cmkc9FecYIszjOxG
+         YZBiHoGPa5kvGTcNkdMxbkH4EN7knLZafuYef7ClYyRrtrlCLeDmajRPrvvDQP1teaEs
+         6P9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVhlIKtDcAmevUrK+z68vWqCotVc/8CPDc+eV6/iZaVWjysE9qCD7iy0njO/6TvwO9OJmruCV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzsZPDvJYtiYZq/OctcLK1/HS3fU60r7pOtd3+BUIehZVfs+Bz
+	KFaGwQwa0Oql4svBC6sKVkh1m/zfg6Udg3TQEgAGN5FhaFJJ/E5Ym2Uh6YdbcR/dsIxx4StzbyP
+	ZwEq7B3tsGmoj/nAWHUGpzqormnyGn5N0hjXao7Vx
+X-Gm-Gg: ASbGnctnCYrjTfIHeBZRur/ee7jpYvFlISVhG6I+j5hw14e51b2VleZx0EJkTygHvqm
+	3SVccNJX1ATKMR9ouTI6NVY9DluM1ufdNf+Wrinujqrfnfe6pLWqnmavFyZrR0XCqQkdpKdxvII
+	nOkcUja5PDi/NMqM49WjySpx3zObUHYkv2UUkXoHZ2WXn9WFWcxq69VkzDVN9+7YoC5GBEj+7Th
+	mf9dbaxLSqM2inAYwddQH+R4acZd9QQk0TcaCSxwnG5okhUrWGbooQ=
+X-Google-Smtp-Source: AGHT+IHHliBGfbHylygVzksb7a+0fT63+QPDYN2pfiTQHYKdZKJlxke6/Q66YsWbEXxii3rtonP041JiTf4sxs1EYhs=
+X-Received: by 2002:a05:6512:108c:b0:542:6b39:1d57 with SMTP id
+ 2adb3069b0e04-56b3d403120mr647519e87.3.1757614896510; Thu, 11 Sep 2025
+ 11:21:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250908181059.1785605-1-wens@kernel.org> <20250908181059.1785605-3-wens@kernel.org>
- <aMMQSR7yYBQkY4CI@shell.armlinux.org.uk>
-In-Reply-To: <aMMQSR7yYBQkY4CI@shell.armlinux.org.uk>
-Reply-To: wens@kernel.org
-From: Chen-Yu Tsai <wens@kernel.org>
-Date: Fri, 12 Sep 2025 02:17:55 +0800
-X-Gmail-Original-Message-ID: <CAGb2v64n_eMBiUaT1S=V6v4Bqv5hLP8vP3=20sp4w4Fxh7RcOQ@mail.gmail.com>
-X-Gm-Features: Ac12FXyLWsyObIH64arQzyilGb9hj5BcnDeSxUoNsS-pX-JbEZMJGsbKHCxIoyA
-Message-ID: <CAGb2v64n_eMBiUaT1S=V6v4Bqv5hLP8vP3=20sp4w4Fxh7RcOQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 02/10] net: stmmac: Add support for Allwinner
- A523 GMAC200
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Andre Przywara <andre.przywara@arm.com>
+References: <20250911144327.1630532-1-kuba@kernel.org>
+In-Reply-To: <20250911144327.1630532-1-kuba@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 11 Sep 2025 11:21:24 -0700
+X-Gm-Features: Ac12FXyFPo7XyGsAWGFghU6c8_EUB3u70sLxG1wSVRjNUdKgII4yZGLxSxNbPm4
+Message-ID: <CAHS8izNHRmcuw=Ya4UC_QdtyJ_z_vYiHEWKRk1f6gQ5hdwXODw@mail.gmail.com>
+Subject: Re: [PATCH net-next] eth: fbnic: support devmem Tx
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me, 
+	alexanderduyck@fb.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 12, 2025 at 2:09=E2=80=AFAM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
+On Thu, Sep 11, 2025 at 7:43=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Hi,
+> Support devmem Tx. We already use skb_frag_dma_map(), we just need
+> to make sure we don't try to unmap the frags. Check if frag is
+> unreadable and mark the ring entry.
 >
-> I drafted this but never sent it and can't remember why, but it's
-> relevant for v5 that you recently posted. Same concern with v5.
+>   # ./tools/testing/selftests/drivers/net/hw/devmem.py
+>   TAP version 13
+>   1..3
+>   ok 1 devmem.check_rx
+>   ok 2 devmem.check_tx
+>   ok 3 devmem.check_tx_chunks
+>   # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
 >
-> On Tue, Sep 09, 2025 at 02:10:51AM +0800, Chen-Yu Tsai wrote:
-> > +     switch (plat->mac_interface) {
-> > +     case PHY_INTERFACE_MODE_MII:
-> > +             /* default */
-> > +             break;
-> > +     case PHY_INTERFACE_MODE_RGMII:
-> > +     case PHY_INTERFACE_MODE_RGMII_ID:
-> > +     case PHY_INTERFACE_MODE_RGMII_RXID:
-> > +     case PHY_INTERFACE_MODE_RGMII_TXID:
-> > +             reg |=3D SYSCON_EPIT | SYSCON_ETCS_INT_GMII;
-> > +             break;
-> > +     case PHY_INTERFACE_MODE_RMII:
-> > +             reg |=3D SYSCON_RMII_EN;
-> > +             break;
-> > +     default:
-> > +             return dev_err_probe(dev, -EINVAL, "Unsupported interface=
- mode: %s",
-> > +                                  phy_modes(plat->mac_interface));
->
-> I'm guessing that there's no way that plat->phy_interface !=3D
-> plat->mac_interface on this platform? If so, please use
-> plat->phy_interface here.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Makes sense. Looking at stmmac_platform.c, for us mac_interface only comes
-from phy_interface.
+For most of the netmem stuff we've tried as much as possible to keep
+the complexity and type casts out of the driver and in core. I was
+hoping the driver can avoid mem-type checking and special handling. In
+the case of the tx path, the helpers provided are
+netmem_dma_unmap_addr_set & netmem_dma_unmap_page_attrs. If you can
+use them, great, or if you can improve them so that we don't have to
+have per-driver special handling I think that would be good too.
 
-I'll wait a day before sending yet another version.
+It seems in your driver you have a special  way to grab fields via
+FIELD_GET and that's why you can't use the common helpers.
 
-ChenYu
+But this approach is fine too assuming you're ok with a bit extra
+complexity and mem-type checks in the driver, so
+
+Acked-by: Mina Almasry <almasrymina@google.com>
+
+--=20
+Thanks,
+Mina
 
