@@ -1,155 +1,109 @@
-Return-Path: <netdev+bounces-222051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8A4B52EBE
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:39:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F714B52EC5
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB14E188C731
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:39:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71C9C188C5E9
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C3430E857;
-	Thu, 11 Sep 2025 10:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEBE30E857;
+	Thu, 11 Sep 2025 10:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G/vy/uXH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vyv1yZYW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AD830C354
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E98347D0;
+	Thu, 11 Sep 2025 10:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757587169; cv=none; b=HcxEC+2scYXKVElgbUzLHAx1+xHIbm4ePwGTT2cyGl4YK+QXFGk9LiKYUCrq7p9JaiqlK81kduEUALGmnTXHO8lb5YpTgz+7z5Rph0FrO7MWoCat0ice9ukIinf4eW0WiCpLMU5eUtPYs24szHP5p2SyCQRzUombK5mlK7ZscFc=
+	t=1757587218; cv=none; b=FotQFamDoDGlt1CEY1tbCUk2neWnZvVt+skrpTygONPf1lcVk9EKWPKjRICWsR7qgjBDW0BfpRzqY+bZujJ/+aqJ66ZBgeXD5ag4sjcxpXKlX75tBY45ZpVt6KqahVbNXme+vaR1jxOcN0Jpe8uw9IrhOkU+XJcaCH5JLjGFRMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757587169; c=relaxed/simple;
-	bh=i3K4Fxf7hfpTZXUakuir9VBvWZAWa30Q3SjDrMBWzpw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m2lveYK23RHfjlo6HGPAUGMWJDKl6PR+GycJ9q+YXCrc3pj73co7mRMD4FerOLhLDuxni1AtgyvCtRhVqlZ/HWHRFKjPr5DlDwh9yFObv4U3g4WF0swjR3Gmst6NGTWquf4Do/U9D3OgtuS6jGP/e7J2tNwjh5PdL7VdLixQz3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G/vy/uXH; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-80a6937c99bso51730485a.2
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:39:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757587167; x=1758191967; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n/5NZRakXMPSefxzoUTWOFF7jXrb0Qk67PQkNmcLMfM=;
-        b=G/vy/uXH4hHaInZrUtcu+gbfF2UZyccQx4XnA3wTYLPdasbltn7qXFSemjaE8ktMAa
-         TeWwTnYowdTL3bHAjQ8IlQJmJl8R+4HKZgVnQNCl4VBz0j7FAdZtNkMYOTFZyagPJmII
-         mxzM4xeJ/OA8vH4kq6taAJaboA08DoDCA09qxRFP4/WpS/ibDfDYKtrC1MZLWVeTLajV
-         1YMRyBRe1TIUYzz3mReZALnmrUdiWDCX/zcZbK87z2J/exJDSOGk9ouZSux9etq21L9K
-         pwKow4u2vwEgcuB697KarH8VZcWnv8LVW0WqRkYv4W0wSkUKGd3dvQPC0m1NSHNZdETo
-         JY8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757587167; x=1758191967;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n/5NZRakXMPSefxzoUTWOFF7jXrb0Qk67PQkNmcLMfM=;
-        b=VmL7e/0ND0oeJ3FSg/YONSswQdkoR5oFItSlzKTeo+tzx40+zZftgDSoqTNXombN6Z
-         wgNP9mqJ5bsO49tugT9RHIBUyYySDSYTxmt2JeqgUGOQTN1No+8nHIRmJ0U1F5c9sWPV
-         fEshvCFmdSZe0J59F6yNZqw78ppyXU0MU1XqMZlriF74HDfZb8q/79v73zSeICEdPo+e
-         uMfQudxUfJWfr6F0ADRNu1lreBBJTcl3t9TVfzPABn1X/MOxkLBCO4MvQIcCWlcWmwOd
-         iIbVu12hm8cVHdr4HWrtAWYNwgukULwIfhNmLXAK6nrkhXm1wXOYLOySS8ERJmIJEFLK
-         aa4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXFk9PdqcLDa1LKYDQFW7iC2VDJvSIW7fsYvTfDdHbYawE/Otk3vdfziIlIDXyOFUzwC+zcYvs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfHmTsRlwbIEIQHErP2+bAE22lrkCW8jMq4Do6BxAptajIbRuW
-	YIIOgGsOiCduj4eKA53jarA8ETsYpcYH2PcYXujdXGsB2OLBW3mVvd1Wy3ZrJyD623iB9qJ/Pra
-	leMFN3PQ0MOuegtYAMHHQ2rjPAMuktrcB14VezNrf
-X-Gm-Gg: ASbGncuEmdoaCjiqX3yhccscefsBZg3e59qAWAwktfJcaAyfDmiZaHq9R5qlpnL0q3F
-	GDZDZ6axmfnzTzDodpewsBNNBWaMIAnsVYp6NXxUDFvNEeVMSfk6Vwyu5A+Um63eXHD0siWv0Pz
-	17ngvIGYrHbLPJa1vzUy9TaAoLo6iQV2o+Bj8A5C8qFVOOVwOGG908eywqSm1D/GNIyZ5+dRhmr
-	yF2WiOtdnMDjyHmAnTrlnnZ
-X-Google-Smtp-Source: AGHT+IF13RHUxixDCnJaQJD5HYKG53fEjs1UREQfhmAQiVkkh3Z8KzpXFO+znykAoH6YQe4Wu+wBZD5IVHQdxauw0gI=
-X-Received: by 2002:a05:620a:191a:b0:812:693c:bce4 with SMTP id
- af79cd13be357-813c596ff46mr2299523985a.39.1757587166519; Thu, 11 Sep 2025
- 03:39:26 -0700 (PDT)
+	s=arc-20240116; t=1757587218; c=relaxed/simple;
+	bh=DSwfIJcSOSje4IBVKHZjFv3VaQjvUea9jb38VYwJEHc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=W7wgktgKRp3sJCdHJ/LRBjBUYzNDFaJy2Sqdbr0EN5hTaVsI1/E7uQ2eBZpkRxZJ8+C/yY9x22BpNuwGtdwMsgu6HwckXcNH/0STKLS42QoG/47a7RoIwQZKgYyG3j6kdd3SRTncjOdxlqamXoH0kRKq57btme/jcWUHeaAungQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vyv1yZYW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAEE5C4CEF0;
+	Thu, 11 Sep 2025 10:40:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757587214;
+	bh=DSwfIJcSOSje4IBVKHZjFv3VaQjvUea9jb38VYwJEHc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Vyv1yZYWqxEDIR6J2SPA8DRpqdmtEUw0L1VOflOXY8PGoJ26Sa6IJ0nXWO9O7M0bM
+	 N/rMv7ZbczON5C3LRxWHrQamdk886jp52sVCi8FK2luCn+8JNpV3MCEiT6uvr0Y+pm
+	 TCDQLZLc5ueGovDskV9pobW8uRVQXJ791jtNCy5grqStq8hyIaXkz/QmcnqOqKia9N
+	 aR8OyYWqug6CknoqOHu8upGnJV+GQ5/BMXihnuvkCA8Yf2g1Z2CVJBXEb0Csjls3o5
+	 fyDGE4/XXPxD1FGeFnak9VZYteitmWW9czMS3VokhH6xpyaMQbbyGwTRdHRp+viFfn
+	 CZT1RkuOm892g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE3C383BF69;
+	Thu, 11 Sep 2025 10:40:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250908173408.79715-1-chia-yu.chang@nokia-bell-labs.com> <20250908173408.79715-15-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250908173408.79715-15-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 11 Sep 2025 03:39:14 -0700
-X-Gm-Features: Ac12FXwjNGPxnTzV9uOkde1KbfezAZ4pzyFGGkehM4wIScw1o9g0Jk-pKtQTlfw
-Message-ID: <CANn89iJzdnwtJcEwdyAzNF206bYzmHKqNGoBF7G2pR101ZWS+Q@mail.gmail.com>
-Subject: Re: [PATCH v17 net-next 14/14] tcp: accecn: try to fit AccECN option
- with SACK
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net, 
-	horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
-	kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch, 
-	donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/8] ipv4: icmp: Fix source IP derivation in
+ presence of VRFs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175758721750.2121362.2938390570083622671.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Sep 2025 10:40:17 +0000
+References: <20250908073238.119240-1-idosch@nvidia.com>
+In-Reply-To: <20250908073238.119240-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
+ paul@paul-moore.com, dsahern@kernel.org, petrm@nvidia.com,
+ linux-security-module@vger.kernel.org
 
-On Mon, Sep 8, 2025 at 10:34=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
- wrote:
->
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
-> As SACK blocks tend to eat all option space when there are
-> many holes, it is useful to compromise on sending many SACK
-> blocks in every ACK and attempt to fit the AccECN option
-> there by reducing the number of SACK blocks. However, it will
-> never go below two SACK blocks because of the AccECN option.
->
-> As the AccECN option is often not put to every ACK, the space
-> hijack is usually only temporary. Depending on the reuqired
-> AccECN fields (can be either 3, 2, 1, or 0, cf. Table 5 in
-> AccECN spec) and the NOPs used for alignment of other
-> TCP options, up to two SACK blocks will be reduced. Please
-> find below tables for more details:
->
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> | Number of | Required | Remaining |  Number of  |    Final    |
-> |   SACK    |  AccECN  |  option   |  reduced    |  number of  |
-> |  blocks   |  fields  |  spaces   | SACK blocks | SACK blocks |
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> |  x (<=3D2)  |  0 to 3  |    any    |      0      |      x      |
-> +-----------+----------+-----------+-------------+-------------+
-> |     3     |    0     |    any    |      0      |      3      |
-> |     3     |    1     |    <4     |      1      |      2      |
-> |     3     |    1     |    >=3D4    |      0      |      3      |
-> |     3     |    2     |    <8     |      1      |      2      |
-> |     3     |    2     |    >=3D8    |      0      |      3      |
-> |     3     |    3     |    <12    |      1      |      2      |
-> |     3     |    3     |    >=3D12   |      0      |      3      |
-> +-----------+----------+-----------+-------------+-------------+
-> |  y (>=3D4)  |    0     |    any    |      0      |      y      |
-> |  y (>=3D4)  |    1     |    <4     |      1      |     y-1     |
-> |  y (>=3D4)  |    1     |    >=3D4    |      0      |      y      |
-> |  y (>=3D4)  |    2     |    <8     |      1      |     y-1     |
-> |  y (>=3D4)  |    2     |    >=3D8    |      0      |      y      |
-> |  y (>=3D4)  |    3     |    <4     |      2      |     y-2     |
-> |  y (>=3D4)  |    3     |    <12    |      1      |     y-1     |
-> |  y (>=3D4)  |    3     |    >=3D12   |      0      |      y      |
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
->
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> Co-developed-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
-> Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+Hello:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 8 Sep 2025 10:32:30 +0300 you wrote:
+> Align IPv4 with IPv6 and in the presence of VRFs generate ICMP error
+> messages with a source IP that is derived from the receiving interface
+> and not from its VRF master. This is especially important when the error
+> messages are "Time Exceeded" messages as it means that utilities like
+> traceroute will show an incorrect packet path.
+> 
+> Patches #1-#2 are preparations.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/8] ipv4: cipso: Simplify IP options handling in cipso_v4_error()
+    https://git.kernel.org/netdev/net-next/c/cda276bcb9a5
+  - [net-next,v2,2/8] ipv4: icmp: Pass IPv4 control block structure as an argument to __icmp_send()
+    https://git.kernel.org/netdev/net-next/c/0d3c4a441686
+  - [net-next,v2,3/8] ipv4: icmp: Fix source IP derivation in presence of VRFs
+    https://git.kernel.org/netdev/net-next/c/4a8c416602d9
+  - [net-next,v2,4/8] selftests: traceroute: Return correct value on failure
+    https://git.kernel.org/netdev/net-next/c/c068ba9d3ded
+  - [net-next,v2,5/8] selftests: traceroute: Use require_command()
+    https://git.kernel.org/netdev/net-next/c/47efbac9b768
+  - [net-next,v2,6/8] selftests: traceroute: Reword comment
+    https://git.kernel.org/netdev/net-next/c/5c9c78224fc3
+  - [net-next,v2,7/8] selftests: traceroute: Test traceroute with different source IPs
+    https://git.kernel.org/netdev/net-next/c/2e6428100b16
+  - [net-next,v2,8/8] selftests: traceroute: Add VRF tests
+    https://git.kernel.org/netdev/net-next/c/f7240999deb4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
