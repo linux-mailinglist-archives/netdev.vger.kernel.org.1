@@ -1,135 +1,75 @@
-Return-Path: <netdev+bounces-221948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62D4B5266C
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 04:26:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9170AB5266F
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 04:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72332445935
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 02:26:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CBCF445931
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 02:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A78020FAB2;
-	Thu, 11 Sep 2025 02:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B99120F08C;
+	Thu, 11 Sep 2025 02:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="hSq6lLVQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPOQD+p9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDB8433B3;
-	Thu, 11 Sep 2025 02:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D0D433B3
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 02:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757557610; cv=none; b=RalspUi6xTPtEI6U0OIV9Szea3CN0NlfMOI86HO+dBOsNhWy7L7yyBsqNU2sOu1i0XnjHRvQbiSw0FPJ93vyLZlJzDAYFsLm2+20I1tt7wwUxDXSPnpTqHMZhnmfslrKauck1/2SsxsmdJMKJbZF6uRyEGODSaNplbAzeW4qbXs=
+	t=1757557620; cv=none; b=TZ66bJbupu1yPdMqj9J/HxtOXaMscB5PP2QaG9TkYIx4PvfmfaXVmf2cug4x3BF1lY7B7LImx4SS1XgoohN0H7HyUs22A3nUTMTyLK8RMwqhXkxTTBeHMm5XJPpGIUydpzLvtHIjKYs5ch2j7dBmUNpujC1n1KSypem6RSie5eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757557610; c=relaxed/simple;
-	bh=e55PCbyJhrqtW0NBVs1hfcsdUXUvirzdArJTiCyvhWk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=SPNt2Ri57uPqt6fzKV29aacDdt/HGealS35XTlAxK03sjSm1Lwh887iYB35/QWNDSBg8hDrIbDzfjZklJXeiHVoMdc8muRhz8i+jkp906nlQhA+C0C4YwA1uNbQGHB/ACF8AKDoGeTI8qzevqNSn90NTAwGm0gXB0Rv8GzAC3lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=hSq6lLVQ; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1757557605;
-	bh=0A6URhdlqs4pP9qVP7HRkSbprGrlPkR5AfXD+T7ESEQ=;
-	h=Date:From:To:Cc:Subject:From;
-	b=hSq6lLVQ7AR5vUSQlTfoHaCuSfRB58mZ9V4WWSZQmfjE1uJVZwT/kcD+CJunSRxlM
-	 S9FAx3nyuLqpfVadw55aEImr4Ov9WUSnDaZswm9xBI0J/Se+oNtUHsS5+C8hUV52I5
-	 dULI420vHg2XDTC/tvFTPyU7B4scH+GA+oXkZ4gla6J5d1KgmhB+To7i1hwJM9EalV
-	 S3x+Poj4mNo8uAVz0qO5dA2+ipIEDWjol8nS+2e8VrApz5YxMTcIvmLaINVQ/oXTvP
-	 FnNz3OdSVEiW0SwMXOd6Km9TNgutaISL/6TtyeE6uB73BTfvoHm1eJdFztDN0hljul
-	 QnZ/WZSjzGGRQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cMhJj3dFGz4wB0;
-	Thu, 11 Sep 2025 12:26:44 +1000 (AEST)
-Date: Thu, 11 Sep 2025 12:26:44 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, Leon
- Romanovsky <leonro@nvidia.com>
-Cc: Abhijit Gangurde <abhijit.gangurde@amd.com>, Allen Hubbe
- <allen.hubbe@amd.com>, Lei Wei <quic_leiwei@quicinc.com>, Leon Romanovsky
- <leon@kernel.org>, Luo Jie <quic_luoj@quicinc.com>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the rdma tree
-Message-ID: <20250911122644.40124ffe@canb.auug.org.au>
+	s=arc-20240116; t=1757557620; c=relaxed/simple;
+	bh=9SXtoheFb2qMc3X5oT8Cd74I5HXrK0lvY5Xw3TrxIAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p5fVbUeAirE1eoDD3jNv6xaIJEvfsfKUdHNZCQgT74Y6/Aeel+om0D8LFPCOfE9NYJp3hT+HCVzELwAkR/i3DOdi/tEFQLvtdGDc9u6+tZuQmULBBIhEKTWe1yA/7tXlnaikUSjxnxMiuymXkN9v8whqwDR8wK6BRwDFVD+JUgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPOQD+p9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7673DC4CEEB;
+	Thu, 11 Sep 2025 02:26:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757557619;
+	bh=9SXtoheFb2qMc3X5oT8Cd74I5HXrK0lvY5Xw3TrxIAs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HPOQD+p9baXGuasEAr/rTt4XtQ8/jv7lg+iCC/DBnCnh5aMzkSnrGb+GKg7e97PY0
+	 vPKUgiWKGqPz4t+RXPukOeBhXG6wOEppdMw6XACeedsgTfkjgYbfpz6NNkrX5S8XdN
+	 D0F1knBXRwCIA3A/+mGZ1gQWChbILoyQplgJ7CEm0sUzXYNW4g++EbyavG8XteHBwY
+	 fle6UV2MMsie4gcRE0tSWE7LeUvf+uq6ZBclmazu8I+zDhInqSIGSrycGDAnsRyDJZ
+	 iIwgj5DOiSfRnDZfSK/+oBWaq2QxCFbEe16bjJ5TDzAHMoqyB2h7qeqLEYR3DgjUeQ
+	 DPWauK7b4nvMQ==
+Date: Wed, 10 Sep 2025 19:26:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kamal Heib <kheib@redhat.com>
+Cc: netdev@vger.kernel.org, Veerasenareddy Burru <vburru@marvell.com>,
+ Sathesh Edara <sedara@marvell.com>, Shinas Rasheed <srasheed@marvell.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH net v2] octeon_ep: Validate the VF ID
+Message-ID: <20250910192658.55383c60@kernel.org>
+In-Reply-To: <20250909131020.1397422-1-kheib@redhat.com>
+References: <20250909131020.1397422-1-kheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/no9PiYLtEvLL6LWjSC5zsG9";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/no9PiYLtEvLL6LWjSC5zsG9
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi all,
+On Tue,  9 Sep 2025 09:10:20 -0400 Kamal Heib wrote:
+> +static bool octep_is_vf_valid(struct octep_device *oct, int vf)
+> +{
+> +	if (vf >= CFG_GET_ACTIVE_VFS(oct->conf)) {
+> +		dev_err(&oct->pdev->dev, "Invalid VF ID %d\n", vf);
+> +		return false;
 
-Today's linux-next merge of the net-next tree got a conflict in:
-
-  Documentation/networking/device_drivers/ethernet/index.rst
-
-between commit:
-
-  ff8862c9c609 ("RDMA/ionic: Add Makefile/Kconfig to kernel build environme=
-nt")
-
-from the rdma tree and commit:
-
-  6b9f301985a3 ("docs: networking: Add PPE driver documentation for Qualcom=
-m IPQ9574 SoC")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc Documentation/networking/device_drivers/ethernet/index.rst
-index 1fabfe02eb12,0b0a3eef6aae..000000000000
---- a/Documentation/networking/device_drivers/ethernet/index.rst
-+++ b/Documentation/networking/device_drivers/ethernet/index.rst
-@@@ -50,7 -50,7 +50,8 @@@ Contents
-     neterion/s2io
-     netronome/nfp
-     pensando/ionic
- +   pensando/ionic_rdma
-+    qualcomm/ppe/ppe
-     smsc/smc9
-     stmicro/stmmac
-     ti/cpsw
-
---Sig_/no9PiYLtEvLL6LWjSC5zsG9
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmjCM2QACgkQAVBC80lX
-0Gyj8ggAnL3ThRIvQx9UDbN5NRYmqztyz41D8eOfNOOTlFNBaZvOFnQz70aO0A6X
-KYDxNUHsvIb13hX4Q1DHGQkw8kJBjWGUbYi30BYSWT+GPEwncfDFz3fsgKJRKoSS
-SeOVO/IHFEcmh4wJWoGHdaqZ2o/tG3oVghABDV92rCeUIxOHvHjCUwYV3wxaYFar
-B5BXsQz2ApMkxRfBSLbzwcoDqBdTGCU1qE8NN0RnjBS18izNTkqQzrRcFU2o72YA
-zdUBEriE4+X2bdNIiJoa9IGCnMAWuDUGha1d4cGTfL6c0rtcVROEjjJnoIokmpAe
-Vy5CAggwDX6t3LVkkkFvCVvbgWMlpw==
-=Wwlu
------END PGP SIGNATURE-----
-
---Sig_/no9PiYLtEvLL6LWjSC5zsG9--
+perhaps a nit, but why did you choose dev_err() over netdev_err()?
+The incoming handle is a netdev.
+-- 
+pw-bot: cr
 
