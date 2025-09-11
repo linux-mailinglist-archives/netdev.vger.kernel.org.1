@@ -1,109 +1,141 @@
-Return-Path: <netdev+bounces-222122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DB39B53324
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:05:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C952B53338
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:09:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDB323AA7E4
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:05:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46EEA5A4C42
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E62321F4D;
-	Thu, 11 Sep 2025 13:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F260C2E8E17;
+	Thu, 11 Sep 2025 13:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IpLaEWgh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BY2aB+hs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235CD314A97;
-	Thu, 11 Sep 2025 13:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381DE376F1
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 13:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757595920; cv=none; b=tztCmS0krYBq9t7cdVJGD3dp1tQJElgCgbpFIcPHj3/+hIBoJxfQcgQAptOY61OBQzOncPSH/CEdqr6O71h4FDPgtpeoHwlvYD2SwsrXCiHO5mR8d6ETABrgR7qGGBE2/q5UZPSLkx6NrAwCsS+KMWym1759Z3eZromu8llwehA=
+	t=1757596137; cv=none; b=rYi1Xla3ogAk5ieKurj5sWD6QceMCB+moKo++RHA6eROhg6TAohIZP+/Lz2sSaAICgeUZLCcIe3e7wbdFWStGeI4ex5z5LTRsj5kLt9FhfrVM10xVbV41R2CK5lqVjfzeYNjEXpanAOgPGAJhWaIBjSuucKw60mEUse9EoEsq28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757595920; c=relaxed/simple;
-	bh=3cTu3t1kABFgYDURDBVW7RvACYUtHwzvTu1HQFQwBrE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DcVnJrQFgoY0Du1o33xwXAOPw6W+bLWbHXghQ6JqeUmDF9lXzJd9rS2LXEaR4rQ0ofoSbjjAIqXy8ZKnZMuK9lnN7PW6kwQXbEuJVIgegX4PR0FRQQ0PmRx6Zz9TVX5AkCcQ8HxVIolTxKLWXQ5lqFciuzQ6uWZjaIvo0TUmDY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IpLaEWgh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E26CC4CEF7;
-	Thu, 11 Sep 2025 13:05:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757595919;
-	bh=3cTu3t1kABFgYDURDBVW7RvACYUtHwzvTu1HQFQwBrE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IpLaEWghBa5tYMxCDG0sjjg4V/u3gIB5GXvKS0QT+rYChZqB/iW30acZpzJ16tDhN
-	 6bPsToGoA15Qk39Wj4KtZBN1J7438fQNLDVueFH7TQ78kwKlLjdyQDXqlYWt6aeCfv
-	 YecrLMEM4j062LMtihWQ7MCSdN/CzonOyBg0j2RG3CZUvgFhLgJhHYE7J1vlbAD4on
-	 zk2x3sS6JLkz+nWyyHyGgp4Ho+O8r/u21CwaUqTYTQf7rhkSLmlhjF9dQ8FfVsBziN
-	 NHrGjOKn6AJb7wQeLgrp7623OIDdui++gANvZqO26Lt8gO2J7/Q0MOuTzTKPyx7UKz
-	 ZXnlDSBzMOCUg==
-Message-ID: <7ea8e560-89f6-4f3a-97a6-cf70c1d3d0d0@kernel.org>
-Date: Thu, 11 Sep 2025 15:05:14 +0200
+	s=arc-20240116; t=1757596137; c=relaxed/simple;
+	bh=6tu2GgRecX6mADSNiyvsCz3mmOGNrk1CUTa+72aUpfI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dFvJH3YgZNzl7BeZHBI1YT7RqwyZw2rDxAG29sM5sXntodHHwrr4/5P5Gos77FLck7r7AUnRt+amUUasK/hFGtBnaFrIi+RZQyrnBkR9/Eva67Fw2hfA8W68B+c/yfy/rmXH7UaTN61UpYx/oYP3h79U0UAsooT1jmV8TGKrrFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BY2aB+hs; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6228de280a4so1205515a12.2
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:08:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757596134; x=1758200934; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NYfwO6IxQ0zU5483Ah3qwMr68UquIj+n1A2JlvNeSS8=;
+        b=BY2aB+hsRNgDPDfOR20w0/PWsaPbF7EN7Ak7Cn7a4XnbI7+JySAW0J0RrbmaiTQxKI
+         bZqOkF/e7GAel/2O8NUPhcPey7rCTebBRnWHFzf1ajEJPJ/ajJURY0ko9FJ+62j2iiVK
+         /ow/jbkI6a0WTe5NtgtO9QgVLHGVDnhUlTxrZDiMUkhViwPFAwXBg5vF6ahodHcBgOCt
+         VTJsCEsqk9F4RGoQ69iTSGZIXFby3gOmdciVujcXpavNp7lCqqIAkmE2M6AsVvEmHYLk
+         H/PTdVH9YMUCDcwD63iqy9vsy9XCSaYaH02OF6dDpvS77fWXT8nw5tjDVds0/EYhGzpm
+         ZFIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757596134; x=1758200934;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NYfwO6IxQ0zU5483Ah3qwMr68UquIj+n1A2JlvNeSS8=;
+        b=KDOiTLI1MS2I1fg0K/q9hNWwSxke0Et0SGBIMVRVQJJfJYNvcjn1pX7PB9n6doVOJ5
+         cOmotmsCkHWQGdcbB5efctDRag+t/vyLNv6xmc0RuDNwwhzPUuD+RhfF8b4xuT1PITvt
+         CY1rUbH29RNtJ+jbJQJgXdPKHzAWiLLj7mv3LT7DIAMygM39xXUjZTM8nV6Qdb79QzZv
+         Gnr/J7Eakr1hcjook75bNDkx5nQ9KmBBsLFecyub2vrgRL3IEpDdvZCLfIKRNtfi/EvC
+         hBcT/94HjalCZMYrf7EHoY6OC0qF8dqUIJf78fw6AHUu7JjMoMEY3mXvSNydy6M/+6Il
+         3N+g==
+X-Forwarded-Encrypted: i=1; AJvYcCU9+ErulRHqLkOdUgmdjhJKkVfAcdY76dmA2iz8D2YUiEpP1UeYe2uY9pIhf5crXz+fSh35Xpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDe+nUQKrioADwioXCkDx15E6eCzW763OKjji4iDsRNTzN0auY
+	1/juvPKJ/rqSc5ST0mcMdOtVsgtSQd+66RqY7I1BrtbeaZhQ0hNUhvn/
+X-Gm-Gg: ASbGnctRdqLjq5FtXAG2gUBnujQfmyAZkM2vYZ8tkWBW4xr6DGPU0pmRkxTt9xgBW7A
+	Be2J0jI1whZEjWisRbCIlo7Vy95IyC7To9l4Ot1H0h83hJN/TCD7F3cOb+93pX2tM89HbrdLzhc
+	kK81d96vjG7hxHFPmiUiiPJXuCzkWJyjeOxTtfUSMbnLjMF6WT9bjGp2G8yfJzXW7KP98atccq1
+	0t9eL7LJkfv1pAhoOeCVXsb9qG/z5DSjEQR9eeBZ/gNupD6jT9YlXGQlladdNKukdR0TIvto12t
+	jyb/N1HGir2wy2lZ384FIme+uRud1hEsqQ13ZyzYugr6381A5qvSV7Z+qxy7YsDuyQ6WryGMyXX
+	1y/1Ne1tO3gOMxzha+bVag96gJABc6l6VeSdtBrU7NeLiIlhjB98sxpP47GS32l4GUaKGWH56OU
+	lg6DTwug==
+X-Google-Smtp-Source: AGHT+IF1qK2NqhfPfnYI/pqLXo5VsNdOwjXB+8puBwtknztnJSi9VTru+UFZzNb+Q3zjKSsNmXtj+Q==
+X-Received: by 2002:a05:6402:27d1:b0:627:9d08:97a6 with SMTP id 4fb4d7f45d1cf-6279d089899mr13990549a12.18.1757596134332;
+        Thu, 11 Sep 2025 06:08:54 -0700 (PDT)
+Received: from Ansuel-XPS24 (host-95-249-236-54.retail.telecomitalia.it. [95.249.236.54])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-62ec33f3b16sm1133038a12.24.2025.09.11.06.08.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 06:08:53 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 1/3] net: phy: introduce phy_id_compare_model() PHY ID helper
+Date: Thu, 11 Sep 2025 15:08:31 +0200
+Message-ID: <20250911130840.23569-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] page_pool: always add GFP_NOWARN for ATOMIC
- allocations
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, ilias.apalodimas@linaro.org,
- nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com,
- justinstitt@google.com, llvm@lists.linux.dev, Linux-MM <linux-mm@kvack.org>
-References: <20250908152123.97829-1-kuba@kernel.org>
- <20250910175240.72c56e86@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250910175240.72c56e86@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Similar to phy_id_compare_vendor(), introduce the equivalent
+phy_id_compare_model() helper for the generic PHY ID Model mask.
 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+Changes v2:
+- Add review tag
+- Fix copy-paste error in vendor_mask -> model_mask
 
-On 11/09/2025 02.52, Jakub Kicinski wrote:
-> On Mon,  8 Sep 2025 08:21:23 -0700 Jakub Kicinski wrote:
->> Driver authors often forget to add GFP_NOWARN for page allocation
->> from the datapath. This is annoying to operators as OOMs are a fact
->> of life, and we pretty much expect network Rx to hit page allocation
->> failures during OOM. Make page pool add GFP_NOWARN for ATOMIC allocations
->> by default.
-> 
-> Hi Jesper! Are you okay with this? [2] It's not a lot of instructions and
-> it's in the _slow() function, anyway. 
+ include/linux/phy.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-For this "_slow()" function I don't worry about the performance.
-The optimization you did seems a bit premature... did you run the
-page_pool benchmark to see if it is worth it?
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 04553419adc3..6f3b25cb7f4e 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -1308,6 +1308,19 @@ static inline bool phy_id_compare_vendor(u32 id, u32 vendor_mask)
+ 	return phy_id_compare(id, vendor_mask, PHY_ID_MATCH_VENDOR_MASK);
+ }
+ 
++/**
++ * phy_id_compare_model - compare @id with @model mask
++ * @id: PHY ID
++ * @model_mask: PHY Model mask
++ *
++ * Return: true if the bits from @id match @model using the
++ *	   generic PHY Model mask.
++ */
++static inline bool phy_id_compare_model(u32 id, u32 model_mask)
++{
++	return phy_id_compare(id, model_mask, PHY_ID_MATCH_MODEL_MASK);
++}
++
+ /**
+  * phydev_id_compare - compare @id with the PHY's Clause 22 ID
+  * @phydev: the PHY device
+-- 
+2.51.0
 
-> TBH I wrote the patch to fix the
-> driver (again) first but when writing the commit message I realized my
-> explanation why we can't fix this in the core was sounding like BS :$
-
-It feels slightly strange to fix drivers misuse of the API in the core,
-but again I'm not going to nack it, as it might be easier for us as
-maintainers as it is hard to catch all cases during driver review.
-
-All driver are suppose to use page_pool_dev_alloc[1] as it sets
-(GFP_ATOMIC | __GFP_NOWARN).  Or page_pool_dev_alloc_netmems().
-
-  [1] https://elixir.bootlin.com/linux/v6.16.6/source/include/net/
-page_pool/helpers.h#L175-L179
-
-The reason I added page_pool_dev_alloc() is because all driver used to
-call a function named dev_alloc_page(), that also sets the appropriate
-GFP flags.  So, I simple piggybacked on that design decision (which I
-don't know whom came up with). Thus, I'm open to change.  Maybe DaveM
-can remember/explain why "dev_alloc" was a requirement.
-
-I'll let it be up to you,
---Jesper
-
-[2] https://lore.kernel.org/all/20250908152123.97829-1-kuba@kernel.org/
 
