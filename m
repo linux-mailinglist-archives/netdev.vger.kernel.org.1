@@ -1,380 +1,218 @@
-Return-Path: <netdev+bounces-221969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC517B5276A
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 05:49:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFDC3B5276D
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 05:51:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8257AA0060C
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:49:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE08C1893D6D
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADEF23D7FB;
-	Thu, 11 Sep 2025 03:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022C11DED57;
+	Thu, 11 Sep 2025 03:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="XghQlNvj"
+	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="Q0hmFeu3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE28C226165
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EB7329F20
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757562541; cv=none; b=WFHQLi8pva+4IEsaXD0nKmsLx7lIz+fG4qBXzCVO/ocv03SaAb2LDsMOz1//xRBsrG+LkUHC75Ti2kwQQkLIlsC2lvwdt8gIqORpwiKTvUG64vKH5SJypfjp1DkwTBU0+Zx4qv1duWcP0RZNtRj+b3w0hnam5yYGcIiZooLzSxk=
+	t=1757562663; cv=none; b=qhiiL1VsXVKb7B3FKbGvRHD9V+yKxpfZk7bda4hycYkiO+eMqYk9CZRnSi/q/5cbkfPU/SCkg+D4pzdDZlvsScQnLCOyoJCuceIFEEXo7mCIDVfCFORLQP28u53OF19vS20xHpebsLtq9LEHd6ioe0vdCl5jooXnuugdbHKR18s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757562541; c=relaxed/simple;
-	bh=vaqhmjYuJa8FnmKBFM+xfprZ1opCDsIvIx2kmEnfcKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=livP++HY7bcSFjmShhdnqYo9/A7AYecU92v+XPeOYc8fn5XdTCZyw3JqEv55BITRtd9XnZLUjguro8zU2Uhz/HOaWwyN4n+NrjHt44o9tS/WTT6MswiP+rGNx8nli5X9X7ovzze1i5Bqjm0voAV9DojAbjlScJm0IlC0p8qkpAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=XghQlNvj; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1757562663; c=relaxed/simple;
+	bh=2RcHG+dlQGVwbg6GzMHZ0y6v4f+pMpDvxJxaGiOU+vc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bfjRp4X1hoTRTtirBg2bJtRUa26mIFGo+cg0GzesO3DQu4RLHNREPX7E4oreiJlIp5yiKTMiy7/BHid8/tplXKBH0+AVC/ywruEw3dgjr+hZUkPAP4BzavqmftJCqZa/LxhYSVDK20uQZk86mIGqCAVoqzsf8QvZQb+r/7fyO8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=Q0hmFeu3; arc=none smtp.client-ip=209.85.221.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=allelesecurity.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3277c603b83so147678a91.2
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:48:59 -0700 (PDT)
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-54492cc6eb1so157842e0c.2
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:51:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=allelesecurity.com; s=google; t=1757562539; x=1758167339; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UN5jIb4+ERpPOs5ItKoedMNqKnz41tpYSoUnnc/bxAI=;
-        b=XghQlNvj5WgA/0okLcy/gpnAYdUQZg240fbTbSfzwCGaB2SuI/W2kF1/5TE7CnFgV1
-         HUaoOx1CjvNCs5OjjhIUxPdwDQxgWjjODQUNJK9PPXu1VV7+Y/pQ80Nge4NvKSIsZlLc
-         RMMrxFhgaYYw2AOfBOCUGdKl6Inu3pDfoOBqg=
+        d=allelesecurity.com; s=google; t=1757562661; x=1758167461; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0nAf35lgEeNHk0pFcYY7Z+5jX+myRGy2RThi3a4BoAY=;
+        b=Q0hmFeu30mlZlF5kaN4POHlklfwx6UPONaHv0Dg1Z/m93Q1EiPEXqHeCYWUnE0tEw0
+         cO5e36mGzwsE8Wf3dFqLCGuQ/7F6V+W/2ByQn+XfRFzUHWlQdSqprBlyCyql8PkEeo71
+         YipHeH74szPVnf9z66+A44iT9gWhPtbT0DBNo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757562539; x=1758167339;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UN5jIb4+ERpPOs5ItKoedMNqKnz41tpYSoUnnc/bxAI=;
-        b=rHUtBdsXcwh+En1UWNS/j9oPSBMffc7yD7d3U4RyvIUSk5kGtdmOee1LCPe6sUUAbk
-         HwijYUmmfrMJuxkMcLzNHRF4XR8Era/8y8S0OHDaAjVd7NlmxdKLF1IUcvbh1gdlxeHu
-         KwE99z3IwJAPYPPXHvedMAj6OsTPajJaBk+zthDY0D/UWsi9xJlK058P7/NmbWiecHSj
-         IfHbHv5LlOdneSiIOcQe2l0+q9RbM0JnQmdZmJRfdfbMprrqu7yqLV1fQo9gcP+d2HNf
-         Tqg/PB7xM/tUlb9pvkMxVH1Y1IymkxidiNyYxdSmAWt9otnMOH3t9tVKL7I14sakewQo
-         SQvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXecJq0l+yysKGtdQuYmhjHy9nx+3d7oCEGoC4z0+luGy13TWuQ/okVF6isj7XyNmSLPsgjQuY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTUdzgKwCRpuOWrzAroPGSaN7WtLz96Jc5mAL45rdpdqrxJ71d
-	2WeY61R9G7nyzFxpDz+tE+JU41CeLQA/vY49mnisr9gixGi5goqAeg+Gbf5EbTUwHDA=
-X-Gm-Gg: ASbGncv39Su1c5qX6LZZ3xma6HxGY8LHuvZdralBwuBP6O6lFOThSgQeSARaj0oRVlm
-	A/VM9XQezcOI7gMxWnkGBjTpkioEIrAQPWYNoYxz+bmtT9ckt20XsnIUVrwH5moEK0clYhlD7rk
-	RjFsajrEzFccpKnp3PUNzfybo08FjZi2FfXbAMSSuICf54SuxGE0wXyIb5KqHmRwL0r4udlpLX9
-	jTQAaQfsg9IqNlaiewi3TboMLVx23ZxRvxGB1fTBnLXSmeJgAc/8vwIDo7rZ8S9Es78lPsOomJo
-	6UlDn+qEypv64dQSCB4Gcpg/rHKefWRMwa4mDySSdM1Z7P2ZjyMrFOi3Y6IzGcZV0P97rkzb3bu
-	xrYb5qRTZBlu+WFEdeFlmxo1XEm9035eaZNStehu5hsy2FbhnF0BPNxN10P6bBPwLJAez
-X-Google-Smtp-Source: AGHT+IGFis96LLHrCzd5HAV/O1bcCF903alPFEbkR7YbnMs6hbWRbHhHi6lj9RRfvxTMX3t4WNbkZg==
-X-Received: by 2002:a17:90b:224c:b0:32b:6cf2:a2cf with SMTP id 98e67ed59e1d1-32d43f00752mr22711785a91.14.1757562538893;
-        Wed, 10 Sep 2025 20:48:58 -0700 (PDT)
-Received: from fedoraserver42research ([179.105.152.82])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32dd61ea9e5sm871339a91.4.2025.09.10.20.48.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 20:48:58 -0700 (PDT)
-From: Anderson Nascimento <anderson@allelesecurity.com>
-To: edumazet@google.com,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Anderson Nascimento <anderson@allelesecurity.com>
-Subject: [PATCH v2] net/tcp: Fix a NULL pointer dereference when using TCP-AO with TCP_REPAIR.
-Date: Thu, 11 Sep 2025 00:43:38 -0300
-Message-ID: <20250911034337.43331-2-anderson@allelesecurity.com>
-X-Mailer: git-send-email 2.51.0
+        d=1e100.net; s=20230601; t=1757562661; x=1758167461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0nAf35lgEeNHk0pFcYY7Z+5jX+myRGy2RThi3a4BoAY=;
+        b=B44gqFAmre5Z7GLDPR7PiUj98hVoS06fJPBmrOfhiXCjz2TYYurLR5TpoRingRUNXk
+         7lc1W1kn5spX+KSYc96Nz5jq578jNpeaLja4Xs6hAIs2Gz+Os0miMOeWExSwvrqw3+06
+         ErisJnX5M5j2cEyK+XZzLdgr5vKsV0DrKvxMKIO9p743hPIldLswsmAvBJyciD3zxymP
+         RFD7++EKwMZPb7rCE8JiRZuAM+BynXldh3bSlXtFVg3+hKv/6aXlvPQ3HqVpRFpzLSBg
+         b/D1jRwabaQkFRx2pGrrrLowsC7cFonuEsesJothA1MqENOvOzllkNHkU/3gXlo4oaUv
+         F2bg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9NjsnJD8oymIvV0bQTReXnjNnywaPmDln4MwQ77bK8gN+5fuk7wRp/FvL+Josg15im1/p80w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF6PGa5rA3DT/jJ9JPGKAQ1V1x9Bieki1Ys17K4pFawyI2rbWD
+	5DN8prgrhBmgDcXdEJJbw8eaEZeIzx91boxfFMYJpYucyfbVjabD2zb9S2Vzzjfj86cok/1/YO+
+	ZFd6e/otOPKLkvVGW2bJtGe/CHh71JR6oBlOKmS+AWQ==
+X-Gm-Gg: ASbGncssfk89X6qUCVhUfm8eqQ1X5SbizGlxPxnceofk78ZGislQPPkTeO/xQe7N4FO
+	W+ABHR9hv8wfuALbSo25ScmazOqlYvjaYIEDsvKdSEZafb9rgMKgUlXylAYZEEjvNlf6hOM8z2j
+	R/4pnS5ceWdpC0M08ymA5WPeI4LlnZ/EMoP6pGH0u0IpZ8dFCkUZM9on+1TUivTsy0IFRs0K7tW
+	3Z8YcJ8ZHqcvEF/0aQ=
+X-Google-Smtp-Source: AGHT+IGHun0vVb26aSGszaq5vpKB5269fFzVk3tC6QLTOPElaHpL6CUcxq4cIh78YFRDkfNyXNaFND89eU6utQrkufM=
+X-Received: by 2002:a05:6122:3283:b0:529:2644:8c with SMTP id
+ 71dfb90a1353d-5472abed77fmr6424919e0c.8.1757562661081; Wed, 10 Sep 2025
+ 20:51:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250911013052.2233-1-anderson@allelesecurity.com> <CAAVpQUBoCPervZLc+-bWF5+hXX8yj0SwUcU3MiUQ514xi-F6uA@mail.gmail.com>
+In-Reply-To: <CAAVpQUBoCPervZLc+-bWF5+hXX8yj0SwUcU3MiUQ514xi-F6uA@mail.gmail.com>
+From: Anderson Nascimento <anderson@allelesecurity.com>
+Date: Thu, 11 Sep 2025 00:50:50 -0300
+X-Gm-Features: Ac12FXxSrpVTS8iqDHK0LxpGmeT4PsaB3--Ah4QKHJGyv6OjeGVbSGH2Y6r5wyE
+Message-ID: <CAPhRvky96rzK1-fwtyv-59ao2YtNOBWmH2+tozcm052Q8e-nOA@mail.gmail.com>
+Subject: Re: [PATCH] net/tcp: Fix a NULL pointer dereference when using TCP-AO
+ with TCP_REPAIR.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A NULL pointer dereference can occur in tcp_ao_finish_connect() during a
-connect() system call on a socket with a TCP-AO key added and TCP_REPAIR
+On Wed, Sep 10, 2025 at 11:44=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
+>
+> On Wed, Sep 10, 2025 at 6:32=E2=80=AFPM Anderson Nascimento
+> <anderson@allelesecurity.com> wrote:
+> >
+> > A NULL pointer dereference can occur in tcp_ao_finish_connect() during =
+a connect() system call on a socket with a TCP-AO key added and TCP_REPAIR =
 enabled.
+>
+> Thanks for the patch, the change looks good.
+>
+> Could you wrap the description at 75 columns ?
+>
+> See this doc for other guidelines:
+> https://www.kernel.org/doc/html/latest/process/submitting-patches.html#th=
+e-canonical-patch-format
+>
+>
 
-The function is called with skb being NULL and attempts to dereference it
-on tcp_hdr(skb)->seq without a prior skb validation.
+Thank you, Kuniyuki. I have just sent a v2 with the changes you
+suggested. I hope it's fine now.
 
-Fix this by checking if skb is NULL before dereferencing it. If skb is 
-not NULL, the ao->risn is set to tcp_hdr(skb)->seq. If skb is NULL,
-ao->risn is set to 0 to keep compatibility with calls made from
-tcp_rcv_synsent_state_process().
+> >
+> > The function is called with skb being NULL and attempts to dereference =
+it on tcp_hdr(skb)->seq without a prior skb validation.
+> >
+> > Fix this by checking if skb is NULL before dereferencing it. If skb is =
+not NULL, the ao->risn is set to tcp_hdr(skb)->seq to keep compatibility wi=
+th the call made from tcp_rcv_synsent_state_process(). If skb is NULL, ao->=
+risn is set to 0.
+> >
+> > The commentary is taken from bpf_skops_established(), which is also cal=
+led in the same flow. Unlike the function being patched, bpf_skops_establis=
+hed() validates the skb before dereferencing it.
+> >
+> > int main(void){
+> >         struct sockaddr_in sockaddr;
+> >         struct tcp_ao_add tcp_ao;
+> >         int sk;
+> >         int one =3D 1;
+> >
+> >         memset(&sockaddr,'\0',sizeof(sockaddr));
+> >         memset(&tcp_ao,'\0',sizeof(tcp_ao));
+> >
+> >         sk =3D socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+> >
+> >         sockaddr.sin_family =3D AF_INET;
+> >
+> >         memcpy(tcp_ao.alg_name,"cmac(aes128)",12);
+> >         memcpy(tcp_ao.key,"ABCDEFGHABCDEFGH",16);
+> >         tcp_ao.keylen =3D 16;
+> >
+> >         memcpy(&tcp_ao.addr,&sockaddr,sizeof(sockaddr));
+> >
+> >         setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tcp_ao, sizeof(tcp=
+_ao));
+> >         setsockopt(sk, IPPROTO_TCP, TCP_REPAIR, &one, sizeof(one));
+> >
+> >         sockaddr.sin_family =3D AF_INET;
+> >         sockaddr.sin_port =3D htobe16(123);
+> >
+> >         inet_aton("127.0.0.1", &sockaddr.sin_addr);
+> >
+> >         connect(sk,(struct sockaddr *)&sockaddr,sizeof(sockaddr));
+> >
+> > return 0;
+> > }
+> >
+> > $ gcc tcp-ao-nullptr.c -o tcp-ao-nullptr -Wall
+> > $ unshare -Urn
+> > # ip addr add 127.0.0.1 dev lo
+> > # ./tcp-ao-nullptr
+> >
+> > [   72.414850] BUG: kernel NULL pointer dereference, address: 000000000=
+00000b6
+> > [   72.414863] #PF: supervisor read access in kernel mode
+> > [   72.414869] #PF: error_code(0x0000) - not-present page
+> > [   72.414873] PGD 116af4067 P4D 116af4067 PUD 117043067 PMD 0
+> > [   72.414880] Oops: Oops: 0000 [#1] SMP NOPTI
+> > [   72.414887] CPU: 2 UID: 1000 PID: 1558 Comm: tcp-ao-nullptr Not tain=
+ted 6.16.3-200.fc42.x86_64 #1 PREEMPT(lazy)
+> > [   72.414896] Hardware name: VMware, Inc. VMware Virtual Platform/440B=
+X Desktop Reference Platform, BIOS 6.00 11/12/2020
+> > [   72.414905] RIP: 0010:tcp_ao_finish_connect+0x19/0x60
+>
+> Full decoded stack trace without timestamps would be nicer.
+>
+> How to decode stack trace:
+> cat trace.txt | ./scripts/decode_stacktrace.sh vmlinux
+>
+> >
+> > Fixes: 7c2ffaf ("net/tcp: Calculate TCP-AO traffic keys")
+> > Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
+> > ---
+> >  net/ipv4/tcp_ao.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+> > index bbb8d5f0eae7..abe913de8652 100644
+> > --- a/net/ipv4/tcp_ao.c
+> > +++ b/net/ipv4/tcp_ao.c
+> > @@ -1178,7 +1178,11 @@ void tcp_ao_finish_connect(struct sock *sk, stru=
+ct sk_buff *skb)
+> >         if (!ao)
+> >                 return;
+> >
+> > -       WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
+> > +       /* sk with TCP_REPAIR_ON does not have skb in tcp_finish_connec=
+t */
+> > +       if (skb)
+> > +               WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
+> > +       else
+> > +               WRITE_ONCE(ao->risn, 0);
+> >         ao->rcv_sne =3D 0;
+> >
+> >         hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_=
+held(sk))
+> > --
+> > 2.51.0
+> >
 
-int main(void){
-        struct sockaddr_in sockaddr;
-        struct tcp_ao_add tcp_ao;
-        int sk;
-        int one = 1;
 
-        memset(&sockaddr,'\0',sizeof(sockaddr));
-        memset(&tcp_ao,'\0',sizeof(tcp_ao));
 
-        sk = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-        sockaddr.sin_family = AF_INET;
-
-        memcpy(tcp_ao.alg_name,"cmac(aes128)",12);
-        memcpy(tcp_ao.key,"ABCDEFGHABCDEFGH",16);
-        tcp_ao.keylen = 16;
-
-        memcpy(&tcp_ao.addr,&sockaddr,sizeof(sockaddr));
-
-        setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tcp_ao,
-	sizeof(tcp_ao));
-        setsockopt(sk, IPPROTO_TCP, TCP_REPAIR, &one, sizeof(one));
-
-        sockaddr.sin_family = AF_INET;
-        sockaddr.sin_port = htobe16(123);
-
-        inet_aton("127.0.0.1", &sockaddr.sin_addr);
-
-        connect(sk,(struct sockaddr *)&sockaddr,sizeof(sockaddr));
-
-return 0;
-}
-
-$ gcc tcp-ao-nullptr.c -o tcp-ao-nullptr -Wall
-$ unshare -Urn
-# ip addr add 127.0.0.1 dev lo
-# ./tcp-ao-nullptr
-
-BUG: kernel NULL pointer dereference, address: 00000000000000b6
-PGD 1f648d067 P4D 1f648d067 PUD 1982e8067 PMD 0
-Oops: Oops: 0000 [#1] SMP NOPTI
-Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop
-Reference Platform, BIOS 6.00 11/12/2020
-RIP: 0010:tcp_ao_finish_connect (net/ipv4/tcp_ao.c:1182)
-Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 0f 1f
- 44 00 00 41 54 55 53 48 8b af 00 09 00 00 48 85 ed 74 3e <0f> b7 86 b6 00
- 00 00 48 8b 96 c8 00 00 00 49 89 fc 8b 44 02 04 c7
-All code
-========
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	90                   	nop
-   f:	90                   	nop
-  10:	90                   	nop
-  11:	66 0f 1f 00          	nopw   (%rax)
-  15:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
-  1a:	41 54                	push   %r12
-  1c:	55                   	push   %rbp
-  1d:	53                   	push   %rbx
-  1e:	48 8b af 00 09 00 00 	mov    0x900(%rdi),%rbp
-  25:	48 85 ed             	test   %rbp,%rbp
-  28:	74 3e                	je     0x68
-  2a:*	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
-<-- trapping instruction
-  31:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
-  38:	49 89 fc             	mov    %rdi,%r12
-  3b:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
-  3f:	c7                   	.byte 0xc7
-
-Code starting with the faulting instruction
-===========================================
-   0:	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
-   7:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
-   e:	49 89 fc             	mov    %rdi,%r12
-  11:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
-  15:	c7                   	.byte 0xc7
-RSP: 0018:ffffcf7a858f3a50 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff8e51e8150000 RCX: 0000000000000002
-RDX: ffffcf7a858f3a1f RSI: 0000000000000000 RDI: ffff8e51e8150000
-RBP: ffff8e51c1509e80 R08: ffff8e51e81506bc R09: 0000000000000001
-R10: 0000000000000000 R11: ffff8e51e8150000 R12: 0000000000000000
-R13: ffff8e51c7019680 R14: ffff8e51d20d1cc0 R15: ffff8e51e8150000
-FS:  00007faa5e4dc740(0000) GS:ffff8e533e55f000(0000) knlGS:00000000000000
-00
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000000000b6 CR3: 000000016d3e0003 CR4: 00000000003706f0
-Call Trace:
-<TASK>
-tcp_finish_connect (net/ipv4/tcp_input.c:6267)
-tcp_connect (net/ipv4/tcp_output.c:4141)
-tcp_v4_connect (net/ipv4/tcp_ipv4.c:345 (discriminator 1))
-__inet_stream_connect (net/ipv4/af_inet.c:677)
-? release_sock (./include/linux/list.h:373 (discriminator 2) ./include/
-linux/wait.h:127 (discriminator 2) net/core/sock.c:3733 (discriminator 2))
- inet_stream_connect (net/ipv4/af_inet.c:749)
-__sys_connect (./include/linux/file.h:62 (discriminator 1) ./include/linux
-/file.h:83 (discriminator 1) net/socket.c:2095 (discriminator 1))
-__x64_sys_connect (net/socket.c:2111 (discriminator 1) net/socket.c:2108
-(discriminator 1) net/socket.c:2108 (discriminator 1))
-do_syscall_64 (arch/x86/entry/syscall_64.c:63 (discriminator 1) arch/x86/
-entry/syscall_64.c:94 (discriminator 1))
-? do_read_fault (mm/memory.c:5565)
-? handle_pte_fault (mm/memory.c:6047)
-? do_fault (mm/memory.c:5707)
-? __handle_mm_fault (mm/memory.c:5963 mm/memory.c:6131)
-? count_memcg_events (mm/memcontrol.c:839 (discriminator 4))
-? handle_mm_fault (mm/memory.c:6237 mm/memory.c:6390)
-? do_user_addr_fault (arch/x86/mm/fault.c:1337)
-? clear_bhb_loop (arch/x86/entry/entry_64.S:1548)
-? clear_bhb_loop (arch/x86/entry/entry_64.S:1548)
-? clear_bhb_loop (arch/x86/entry/entry_64.S:1548)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-RIP: 0033:0x7faa5e54d77e
-Code: 4d 89 d8 e8 d4 bc 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83
- f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39
- 83 fa 08 75 e7 e8 13 ff ff ff 0f 1f 00 f3 0f 1e fa
-All code
-========
-   0:	4d 89 d8             	mov    %r11,%r8
-   3:	e8 d4 bc 00 00       	call   0xbcdc
-   8:	4c 8b 5d f8          	mov    -0x8(%rbp),%r11
-   c:	41 8b 93 08 03 00 00 	mov    0x308(%r11),%edx
-  13:	59                   	pop    %rcx
-  14:	5e                   	pop    %rsi
-  15:	48 83 f8 fc          	cmp    $0xfffffffffffffffc,%rax
-  19:	74 11                	je     0x2c
-  1b:	c9                   	leave
-  1c:	c3                   	ret
-  1d:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
-  24:	48 8b 45 10          	mov    0x10(%rbp),%rax
-  28:	0f 05                	syscall
-  2a:*	c9                   	leave		<-- trapping instruction
-  2b:	c3                   	ret
-  2c:	83 e2 39             	and    $0x39,%edx
-  2f:	83 fa 08             	cmp    $0x8,%edx
-  32:	75 e7                	jne    0x1b
-  34:	e8 13 ff ff ff       	call   0xffffffffffffff4c
-  39:	0f 1f 00             	nopl   (%rax)
-  3c:	f3 0f 1e fa          	endbr64
-
-Code starting with the faulting instruction
-===========================================
-   0:	c9                   	leave
-   1:	c3                   	ret
-   2:	83 e2 39             	and    $0x39,%edx
-   5:	83 fa 08             	cmp    $0x8,%edx
-   8:	75 e7                	jne    0xfffffffffffffff1
-   a:	e8 13 ff ff ff       	call   0xffffffffffffff22
-   f:	0f 1f 00             	nopl   (%rax)
-  12:	f3 0f 1e fa          	endbr64
-RSP: 002b:00007ffc0e35e350 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007faa5e54d77e
-RDX: 0000000000000010 RSI: 00007ffc0e35e4e0 RDI: 0000000000000003
-RBP: 00007ffc0e35e360 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffc0e35e628
-R13: 0000000000000001 R14: 00007faa5e717000 R15: 0000000000402e00
-</TASK>
-Modules linked in: rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
-nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct
-nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables
-qrtr intel_rapl_msr intel_rapl_common intel_uncore_frequency_common
-intel_pmc_core pmt_telemetry pmt_class intel_pmc_ssram_telemetry
-intel_vsec rapl vmw_balloon pktcdvd i2c_piix4 i2c_smbus joydev loop
-nfnetlink vsock_loopback vmw_vsock_virtio_transport_common
-vmw_vsock_vmci_transport vsock zram vmw_vmci lz4hc_compress lz4_compress
-xfs polyval_clmulni ghash_clmulni_intel sha512_ssse3 sha1_ssse3 vmwgfx
-drm_ttm_helper vmxnet3 nvme nvme_tcp ata_generic ttm nvme_fabrics
-pata_acpi nvme_core nvme_keyring nvme_auth serio_raw sunrpc be2iscsi bnx2i
- cnic uio cxgb4i cxgb4 tls cxgb3i cxgb3 mdio libcxgbi libcxgb qla4xxx
-iscsi_boot_sysfs iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi
-scsi_dh_rdac scsi_dh_emc scsi_dh_alua fuse i2c_dev dm_multipath
-CR2: 00000000000000b6
----[ end trace 0000000000000000 ]---
-RIP: 0010:tcp_ao_finish_connect (net/ipv4/tcp_ao.c:1182)
-Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 0f 1f
- 44 00 00 41 54 55 53 48 8b af 00 09 00 00 48 85 ed 74 3e <0f> b7 86 b6 00
- 00 00 48 8b 96 c8 00 00 00 49 89 fc 8b 44 02 04 c7
-All code
-========
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	90                   	nop
-   f:	90                   	nop
-  10:	90                   	nop
-  11:	66 0f 1f 00          	nopw   (%rax)
-  15:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
-  1a:	41 54                	push   %r12
-  1c:	55                   	push   %rbp
-  1d:	53                   	push   %rbx
-  1e:	48 8b af 00 09 00 00 	mov    0x900(%rdi),%rbp
-  25:	48 85 ed             	test   %rbp,%rbp
-  28:	74 3e                	je     0x68
-  2a:*	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
-<-- trapping instruction
-  31:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
-  38:	49 89 fc             	mov    %rdi,%r12
-  3b:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
-  3f:	c7                   	.byte 0xc7
-
-Code starting with the faulting instruction
-===========================================
-   0:	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
-   7:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
-   e:	49 89 fc             	mov    %rdi,%r12
-  11:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
-  15:	c7                   	.byte 0xc7
-RSP: 0018:ffffcf7a858f3a50 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff8e51e8150000 RCX: 0000000000000002
-RDX: ffffcf7a858f3a1f RSI: 0000000000000000 RDI: ffff8e51e8150000
-RBP: ffff8e51c1509e80 R08: ffff8e51e81506bc R09: 0000000000000001
-R10: 0000000000000000 R11: ffff8e51e8150000 R12: 0000000000000000
-R13: ffff8e51c7019680 R14: ffff8e51d20d1cc0 R15: ffff8e51e8150000
-FS:  00007faa5e4dc740(0000) GS:ffff8e533e55f000(0000) knlGS:0000000000000
-000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000000000b6 CR3: 000000016d3e0003 CR4: 00000000003706f0
-note: tcp-ao-nullptr[41065] exited with irqs disabled
-
-Fixes: 7c2ffaf ("net/tcp: Calculate TCP-AO traffic keys")
-Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
----
-Changes in v2:
-- Wrap the description at 75 columns
-- Add full decoded stack trace
-- Link to v1: https://lore.kernel.org/all/20250911013052.2233-1-anderson@allelesecurity.com/
-
- net/ipv4/tcp_ao.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index bbb8d5f0eae7..abe913de8652 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -1178,7 +1178,11 @@ void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb)
- 	if (!ao)
- 		return;
- 
--	WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
-+	/* sk with TCP_REPAIR_ON does not have skb in tcp_finish_connect */
-+	if (skb)
-+		WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
-+	else
-+		WRITE_ONCE(ao->risn, 0);
- 	ao->rcv_sne = 0;
- 
- 	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
--- 
-2.51.0
-
+--=20
+Anderson Nascimento
+Allele Security Intelligence
+https://www.allelesecurity.com
 
