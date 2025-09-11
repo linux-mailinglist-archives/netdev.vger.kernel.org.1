@@ -1,110 +1,139 @@
-Return-Path: <netdev+bounces-222023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D21B52C27
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:47:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CAC4B52C2B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 698A216F3AF
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:46:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7876B188DF99
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DD52E610B;
-	Thu, 11 Sep 2025 08:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FD82DAFC9;
+	Thu, 11 Sep 2025 08:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vNKQj+MK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ujaSiOSX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DA8293B73;
-	Thu, 11 Sep 2025 08:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1F82BE632
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 08:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757580380; cv=none; b=NdX6u4702E7s1yiSzAMAmA8Uu8O13NFkORfHJLQEeazm+ABIVTgCkZIjDOPfqT+W1JQxPXc2oFoAMJyeYqTO9AJNlktnWKo77+BHVM8frCndUhapnXGAQe7/nednAmUiLDEOh+xp1ZJuKqK22TY0/2CjRAFqZmboPziP/sl9ioI=
+	t=1757580506; cv=none; b=PJUeY9CDIJaJBomJsCCt8WRIoL4hfTgD4BJvPFkQXKgFyxODd0tIGItOn+o8MJRSu1q+C/4EKbDAL4h6/qYZZjuMgh8cGf5kkcLdYXYaiZy7jgWUSM/FSOcarSCnmMltqIBva0jMMSLmY6nZwpW2xJNo7H+KOZHJTc40K/iF0i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757580380; c=relaxed/simple;
-	bh=8Ym8Woe5hOM4hKQJ3h72aXmX/3Bn6+fBeFRICNNUriU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ip7Uw9JDujS5PFMdJW5cKMJlYR7EKRw/UFftljF1ZTupw1f6ZS9Yg82Szabb6pqMwbTm4bfaXummcNGP2xP55OkCXF1uGzfbbrXs4jaVt1x5fOTkCJu7vAw5NtUHmgGezPAf7KH7iVr9Ok8DomCqsXKqf594KqNbZFWu64Ph/dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vNKQj+MK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 036C2C4CEF1;
-	Thu, 11 Sep 2025 08:46:13 +0000 (UTC)
+	s=arc-20240116; t=1757580506; c=relaxed/simple;
+	bh=hJe47ZsCJ+inVcONL5mxSK9Ov6O+tuCZbTakNYy4cEs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IJYtMuF2H/fxeqbu4XLFEj14pdq/Mm5Yk5Spg6sw45dstLfRrmCTRVVCsCQG8RCUNXxrdLlKUd0w8nN0WKO63GglUOrVaTB1JobZ+6KvXmITkW5di+cAHeLS85BrONALGMdgLd8Jlf8JRLDrnozgoGL/jkgV+m5f7k+5+Spoo/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ujaSiOSX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E959C4CEF0;
+	Thu, 11 Sep 2025 08:48:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757580379;
-	bh=8Ym8Woe5hOM4hKQJ3h72aXmX/3Bn6+fBeFRICNNUriU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vNKQj+MK6MwyfQZyz8HLmtdJMtrihNwJB8IJcJER62Z0upJkVALyYVyg/EmzMo3Qv
-	 LKrgFDBrxI7WF7P7641MCl/BCVewQOfkTV2tu2Ta/B2/tErQnzE4oBuAYQNcG7AB1v
-	 iscmbPGOuQZdZAHOq8v9l17HWsDu+ra93FdsKYhfF3n4JDwKVCaHzCsdIu/6rq+r+A
-	 30XXUL2Fo69ziqWdfFEmB1Mbw6+/MRfSH1wNzuM7yu/89/UWy7sEci+rD7Es/fsOzJ
-	 LpSi2sN8UMvmYx9xLjc1HucW2G755MN7KNte4DAMNXbLtzxA7EBVGLMA+2UBZeXQ5S
-	 JP9arkaqAzbzQ==
-Date: Thu, 11 Sep 2025 10:46:11 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 14/32] net: use ns_common_init()
-Message-ID: <20250911-unqualifiziert-widmen-03b0c271aa69@brauner>
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-14-4dd56e7359d8@kernel.org>
- <vgfnpdvwiji7bbg7yb5fbymp6f6q5f66rywkjyrxtdejdgoi37@ghpon5czjtkm>
+	s=k20201202; t=1757580506;
+	bh=hJe47ZsCJ+inVcONL5mxSK9Ov6O+tuCZbTakNYy4cEs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ujaSiOSXBzrEqqZlVO9stmBcdQDc8Q0zlYkbEU10tj+FFf5dLqVlqnGmXT4GZ+1s3
+	 Ybo8+Gs+57M5bjXXlL1W2aEfF+Ps6SDBnHGlQ5ujamSNgNhNHNEEjUl7++xaGfK0vW
+	 p5JxRvvA2sLNfor699rBAhOz/8UvyQ54tyjfcr5UOWAGJxmtZS5DfstM9gk23xY5VD
+	 Rt3Vz4kYHxPN8lUv/MOpbpM/0d2udZHWU1GcTTF4MF3+e3P4raRbmP0owyepoe9tRa
+	 u088h0J2CKhyI5C0YKKQvCObo+YqGKiwFt0Wf1lX0/vnXsJ1gqM3/EapkEeSnMkfaK
+	 2IcbU+19HnK4w==
+Message-ID: <e4e2a47d-f653-43a3-86ab-f958264449ad@kernel.org>
+Date: Thu, 11 Sep 2025 10:48:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <vgfnpdvwiji7bbg7yb5fbymp6f6q5f66rywkjyrxtdejdgoi37@ghpon5czjtkm>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v1 net 8/8] mptcp: Use sk_dst_dev_rcu() in
+ mptcp_active_enable().
+Content-Language: en-GB, fr-BE
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20250911030620.1284754-1-kuniyu@google.com>
+ <20250911030620.1284754-9-kuniyu@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250911030620.1284754-9-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 10, 2025 at 05:57:52PM +0200, Jan Kara wrote:
-> On Wed 10-09-25 16:36:59, Christian Brauner wrote:
-> > Don't cargo-cult the same thing over and over.
-> > 
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> 
-> One comment below.
-> 
-> > @@ -812,17 +828,14 @@ static void net_ns_net_debugfs(struct net *net)
-> >  
-> >  static __net_init int net_ns_net_init(struct net *net)
-> >  {
-> > -#ifdef CONFIG_NET_NS
-> > -	net->ns.ops = &netns_operations;
-> > -#endif
-> > -	net->ns.inum = PROC_NET_INIT_INO;
-> > -	if (net != &init_net) {
-> > -		int ret = ns_alloc_inum(&net->ns);
-> > -		if (ret)
-> > -			return ret;
-> > -	}
-> > +	int ret = 0;
-> > +
-> > +	if (net == &init_net)
-> > +		net->ns.inum = PROC_NET_INIT_INO;
-> > +	else
-> > +		ret = proc_alloc_inum(&to_ns_common(net)->inum);
-> >  	net_ns_net_debugfs(net);
-> 
-> Here you're calling net_ns_net_debugfs() even if proc_alloc_inum() failed
-> which looks like a bug to me...
+Hi Kuniyuki,
 
-Yes, good catch!
+On 11/09/2025 05:05, Kuniyuki Iwashima wrote:
+> mptcp_active_enable() is called from subflow_finish_connect(),
+> which is icsk->icsk_af_ops->sk_rx_dst_set() and it's not always
+> under RCU.
+> 
+> Using sk_dst_get(sk)->dev could trigger UAF.
+> 
+> Also, mptcp_active_enable() forgot dst_release().
 
-Fyi, I have been out properly sick this week and that's why I haven't
-been very active on-list. I hope to be back in a more functional state
-tomorrow and will process the backlog.
+Oops! Good catch!
+
+> Let's use sk_dst_dev_rcu().
+
+Thank you! The patch looks good to me, but I also read Eric's replies.
+
+If the patches are sent to net-next, will they still have the 'Fixes'
+tag? If not (but I guess they will), could we have at least have a
+dedicated patch to add the missing 'dst_release()' please?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
