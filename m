@@ -1,64 +1,55 @@
-Return-Path: <netdev+bounces-222219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A8CB5398E
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:44:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF146B5399A
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEF38169868
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:44:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F143AA160B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A993570CB;
-	Thu, 11 Sep 2025 16:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBDF321F33;
+	Thu, 11 Sep 2025 16:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="evlfnTsm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7tuczm8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E3A340DB3
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 16:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0721DD525;
+	Thu, 11 Sep 2025 16:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757609062; cv=none; b=HBvCr0c7lVtdhgGZQi4QAtmcQRmfYq34eLR6xtiEpOx6Hzxsbbk9BL//9uK8ztdqWhMuNCwUhI10IlCg/dBK3X0YvrVvOQoakTakQ/3wnMVuIMSSu26CsPgy5INNGTlYdlTTR9oFGQjvFjWnSy420x/K0zOsa5lo8bj5QQxOxf8=
+	t=1757609347; cv=none; b=IQ+E4V94CuvRVAZVR3uBxUt8iKJLMd+dUY8EDEixxR86cDLLRK+11PxDI4SF169w1wdwuYFRLdcmpscqKpUlJ0iRjO+xQ6UmMitd/0WRFEpdlAAzAJlJNIS7ZZZy9JUC9DO8nFGc+gv8B+H2U2tEdN4+Yk2AW3PdpFCLMlGNjZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757609062; c=relaxed/simple;
-	bh=HzCWVh953toMMhvu/kS53y5Ai1jkmoHBkHDrjiJCh/s=;
+	s=arc-20240116; t=1757609347; c=relaxed/simple;
+	bh=Q1uHQmxAk66/ZAaxdRDpPqN1BaLmGqSSyv09DI0J98k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HfHp4RE3rumScGczlKrxvPx5V/muFr1pAJl/BXtnFki04W75zn8IVC0rdI3CpHIRkXdHFbLacpu1xbqyzi//0er2nLTRqdLhgFuFjDxjmj7geIaS5sbsaNTW9pPiHAq1nRGLX6sjKchMRB8KPejz934SyVzIeOph1r9BIQCiRH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=evlfnTsm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4/r5vOb6rjLtRXsHgB8Dbz9QOXS5afFABjBGVjI4Kj4=; b=evlfnTsmedZkEUJm4MvM7tUald
-	WbxEhvvYREe5cvBeWqVM/GoFMN0t/xlXqF/rW8XBgsjxQgDhhhZt27GNfDfewJczKLERMhyXBDQc6
-	h1t66z5pvLz+meqeJS5qQ6kMkXxGpxEI0o0XDdfEPX3HWea7YagCeeSizbEZeyfCMj/E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uwkP1-0086vD-9N; Thu, 11 Sep 2025 18:44:07 +0200
-Date: Thu, 11 Sep 2025 18:44:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/2] net: phylink: warn if deprecated
- array-style fixed-link binding is used
-Message-ID: <815dcbff-ab08-4b92-acf4-6e28a230e1bf@lunn.ch>
-References: <964df2db-082b-4977-b4c9-fbdcfc902f9e@gmail.com>
- <bca6866a-4840-4da0-a735-1a394baadbd8@gmail.com>
- <51e11917-e9c7-4708-a80f-f369874d2ed3@kernel.org>
- <bb41943c-991a-46bc-a0de-e2f3f1295dc4@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QQezWoZwrfFV/iSeNtKy+p6cFom9FxOHgqXgWVznzaK1eLlA61sylY/GUhV80j9Yzx5dH+7V+ulVsNgSPPxSN/a+xiQ+nyICdteLGHn+unmuy067c6g/3l15i06VPd2VwMQ0TS4s0ap1wLPAZi4vAygns4UQ1/VFUE+2sD87vvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7tuczm8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19233C4CEF9;
+	Thu, 11 Sep 2025 16:49:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757609346;
+	bh=Q1uHQmxAk66/ZAaxdRDpPqN1BaLmGqSSyv09DI0J98k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C7tuczm8V70F2KH/6PZihaaSlG3roAjrclY6+Y6cBgt437WUozeQQB0H2/5GrEKGI
+	 MkbwH9Z8esQrC1NEA5jJZQJu9KXuQa7+IEZcbrK1AmKqMhH6XnC8KZaPdTvkFS23n+
+	 VAFvzPSwdPC5xnxV6wj6Oc9rbr3NTLDxrznK+8v/93FblGPmdEHp1T4KUdIlsGw9GT
+	 ao6C35dS7ugdCEN5AOB4Q4SAF4ESQ0PhQIE2bz9oK6WHZF0Y5rsKww5cGHR5enMtpG
+	 F2ICoR1JVEUyf9ou/8wNOEqMQspWNoys8WI57S2+ao5aNOeKvb6fyia5m8qu7v3KOG
+	 SCMzCayegJD7Q==
+Date: Thu, 11 Sep 2025 17:49:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, kuba@kernel.org,
+	linux-kselftest@vger.kernel.org, shuah@kernel.org
+Subject: Re: [PATCH net-next 1/2] selftests: Disable dad for ipv6 in
+ fcnal-test.sh
+Message-ID: <20250911164903.GM30363@horms.kernel.org>
+References: <20250910025828.38900-1-dsahern@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,40 +58,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bb41943c-991a-46bc-a0de-e2f3f1295dc4@gmail.com>
+In-Reply-To: <20250910025828.38900-1-dsahern@kernel.org>
 
-On Thu, Sep 11, 2025 at 06:28:03PM +0200, Heiner Kallweit wrote:
-> On 9/11/2025 8:34 AM, Krzysztof Kozlowski wrote:
-> > On 09/09/2025 21:16, Heiner Kallweit wrote:
-> >> The array-style fixed-link binding has been marked deprecated for more
-> >> than 10 yrs, but still there's a number of users. Print a warning when
-> >> usage of the deprecated binding is detected.
-> >>
-> >> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> >> ---
-> >>  drivers/net/phy/phylink.c | 3 +++
-> >>  1 file changed, 3 insertions(+)
-> >>
-> >> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> >> index c7f867b36..d3cb52717 100644
-> >> --- a/drivers/net/phy/phylink.c
-> >> +++ b/drivers/net/phy/phylink.c
-> >> @@ -700,6 +700,9 @@ static int phylink_parse_fixedlink(struct phylink *pl,
-> >>  			return -EINVAL;
-> >>  		}
-> >>  
-> >> +		phylink_warn(pl, "%s uses deprecated array-style fixed-link binding!",
-> >> +			     fwnode_get_name(fwnode));
-> > Similar comment as for patch #1 - this seems to be going to printk, so
-> > use proper % format for fwnodes (I think there is as well such).
-> > 
-> At least here no format for fwnodes is mentioned.
-> https://www.kernel.org/doc/Documentation/printk-formats.txt
+On Tue, Sep 09, 2025 at 08:58:27PM -0600, David Ahern wrote:
+> Constrained test environment; duplicate address detection is not needed
+> and causes races so disable it.
+> 
+> Signed-off-by: David Ahern <dsahern@kernel.org>
 
-I could be reading it wrong, but:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-https://elixir.bootlin.com/linux/v6.16.6/source/lib/vsprintf.c#L2432
-https://elixir.bootlin.com/linux/v6.16.6/source/lib/vsprintf.c#L2522
-
-	Andrew
 
