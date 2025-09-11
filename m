@@ -1,316 +1,196 @@
-Return-Path: <netdev+bounces-222036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941DDB52D32
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:26:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA21BB52D4A
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CC2917F22D
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 09:26:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18691188B506
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 09:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9581B2EA473;
-	Thu, 11 Sep 2025 09:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE59C2D6608;
+	Thu, 11 Sep 2025 09:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="THHGlCXu"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="BN8DNZeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2117.outbound.protection.outlook.com [40.107.255.117])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8C222126D;
-	Thu, 11 Sep 2025 09:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.117
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757582799; cv=fail; b=X3vw5xupiG+XjLy0IZ6JKNbWTIBK/F9vAT9Ru32CINP+4uCFlEIGB4blXgozkxmxTi2+di/OpxqwxnmdeKK0wFmhknxoWWqG16zXxLQhyCD/nB31jJ/VF2cXWVLgQJmd1jSlfzIfBI6hCuMGHpHNzYzxd1XM83LJPJ46CufM5Ss=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757582799; c=relaxed/simple;
-	bh=F1mojV1QRje5qK4gtwMlZK6B4ewfsktQR4HhPq0xMLk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ulCgpMhpZ4GSUBUD1FWke+GS0sxgYwI2JvUfNIOJ43teNXoaeSL2pmtl47pEg+O90Px0dyfCztbsrrDemGA/R0FlGjAmgwhe6i6sey3Z9d69eWE2/soiCzRnLO9ENyJFdOD0EmYkjFrXvHfL5s+M4vM45E0yXMP3VThcAoZMRhw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=THHGlCXu; arc=fail smtp.client-ip=40.107.255.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zVqiE8qodyznrED14QiOexcCgbUz90kslW4vxybxF0H0OCY4A4mRV68tnUDmAcipUiOHVEwOYc82WMnrXRW4kDXkg89hyzq4BdCC/dkGeuxmyIk06Di+/Qh8+Or9cx09FABAYU4b1C01g5EEluz+mqxVoXHqNiWXM6Ujf0Ddj6abBb1SncEOzgRHEFJmvITJVOsboCz+g1FYZIaG44Sc0kOj8b+YyR+/Bd5OyNBJJz5Rd7DcrAUCxZqrjqu2qIGn1wefArYcbU4rozzfHRA2nxcQJXaw5zddH2FTY4UfRgWIJ9EWJnbYTrFvtNs43Hi9vahZ2atUirsbiV7ONeWSng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TBK23OXsywbgw4hVPUHA5LcDKuySojQzSE8m3JGbyWo=;
- b=MdcQzeTSVW9lz095en1Z1eLFHBfeNDRqyEJW/hZ+MaqfCWTSEU+TQH/We2v7DYo/JJFUWIY5nvE+k33CgOOqG3EMw5KUTkeIf19z+Bl7eSanROHhAp7VQKPYRxkQnDyPLoxM8lP+tgcEBl2p689n5IADwnMR28yNuvPBkMb7jX0hwzchk1HQvoiABPVtxZ8ZdnLyRuh5wZnQlfU9zwHqXnZOPtL5eiDhBWvW6EdLbg0IUfkIC+06GvYRUt9ByD03cHb5jw9A/t9m5cdwA0sonVWieHOLhfdZdyQfDU4YxBPUhMfQ2iOA3yQnrxA5ybcIuFexRWIDsCElmFSgY8HuFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TBK23OXsywbgw4hVPUHA5LcDKuySojQzSE8m3JGbyWo=;
- b=THHGlCXuSMHLnGrxypQ6yWrgIzlZPIYT7B6SXRlDMomSS6ZF58as7JLQLmnDts7Di7IaXx+kWQSziD/WIMIHCEU0dG4qe9dwhrbOqT1ch7wwbD8eS/C840p6aP6053o7zzH1pbKq8R8joQa3+oY30EY3iGSHKdFmRxjp6qkRdpc=
-Received: from OSQP153MB1330.APCP153.PROD.OUTLOOK.COM (2603:1096:604:372::16)
- by TYZP153MB0692.APCP153.PROD.OUTLOOK.COM (2603:1096:400:25e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.15; Thu, 11 Sep
- 2025 09:26:31 +0000
-Received: from OSQP153MB1330.APCP153.PROD.OUTLOOK.COM
- ([fe80::2b00:49bb:7d41:c2dc]) by OSQP153MB1330.APCP153.PROD.OUTLOOK.COM
- ([fe80::2b00:49bb:7d41:c2dc%6]) with mapi id 15.20.9115.010; Thu, 11 Sep 2025
- 09:26:30 +0000
-From: Meetakshi Setiya <msetiya@microsoft.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>, Linux Kernel Mailing List
-	<linux-kernel@vger.kernel.org>, Linux Documentation
-	<linux-doc@vger.kernel.org>, Linux DAMON <damon@lists.linux.dev>, Linux
- Memory Management List <linux-mm@kvack.org>, Linux Power Management
-	<linux-pm@vger.kernel.org>, Linux Block Devices
-	<linux-block@vger.kernel.org>, Linux BPF <bpf@vger.kernel.org>, Linux Kernel
- Workflows <workflows@vger.kernel.org>, Linux KASAN
-	<kasan-dev@googlegroups.com>, Linux Devicetree <devicetree@vger.kernel.org>,
-	Linux fsverity <fsverity@lists.linux.dev>, Linux MTD
-	<linux-mtd@lists.infradead.org>, Linux DRI Development
-	<dri-devel@lists.freedesktop.org>, Linux Kernel Build System
-	<linux-kbuild@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>,
-	Linux Sound <linux-sound@vger.kernel.org>
-CC: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Jonathan Corbet
-	<corbet@lwn.net>, SeongJae Park <sj@kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, Lorenzo
- Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett"
-	<Liam.Howlett@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport
-	<rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko
-	<mhocko@suse.com>, Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy"
-	<gautham.shenoy@amd.com>, Mario Limonciello <mario.limonciello@amd.com>,
-	Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray
-	<dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe
- Perches <joe@perches.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Alexander Potapenko <glider@google.com>, Andrey Konovalov
-	<andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Vincenzo Frascino
-	<vincenzo.frascino@arm.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Eric
- Biggers <ebiggers@kernel.org>, "tytso@mit.edu" <tytso@mit.edu>, Richard
- Weinberger <richard@nod.at>, Zhihao Cheng <chengzhihao1@huawei.com>, Maarten
- Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
-	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
-	<airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Nathan Chancellor
-	<nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, Ingo Molnar
-	<mingo@redhat.com>, Will Deacon <will@kernel.org>, Boqun Feng
-	<boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski
-	<akiyano@amazon.com>, David Arinzon <darinzon@amazon.com>, Saeed Bishara
-	<saeedb@amazon.com>, Andrew Lunn <andrew@lunn.ch>, Alexandru Ciobotaru
-	<alcioa@amazon.com>, The AWS Nitro Enclaves Team
-	<aws-nitro-enclaves-devel@amazon.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	Ranganath V N <vnranganath.20@gmail.com>, Steven French
-	<Steven.French@microsoft.com>, Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Bart Van Assche <bvanassche@acm.org>,
-	=?iso-8859-1?Q?Thomas_Wei=DFschuh?= <linux@weissschuh.net>, Masahiro Yamada
-	<masahiroy@kernel.org>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Jani Nikula <jani.nikula@intel.com>
-Subject: Re: [EXTERNAL] [PATCH v2 10/13] Documentation: smb: smbdirect:
- Convert KSMBD docs link
-Thread-Topic: [EXTERNAL] [PATCH v2 10/13] Documentation: smb: smbdirect:
- Convert KSMBD docs link
-Thread-Index: AQHcIf3l00Mre1nk0UWLjBtxz9dfZLSNt5un
-Date: Thu, 11 Sep 2025 09:26:30 +0000
-Message-ID:
- <OSQP153MB133044C12B6FFB86DF108725BF09A@OSQP153MB1330.APCP153.PROD.OUTLOOK.COM>
-References: <20250910024328.17911-1-bagasdotme@gmail.com>
- <20250910024328.17911-11-bagasdotme@gmail.com>
-In-Reply-To: <20250910024328.17911-11-bagasdotme@gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-09-11T09:26:29.396Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=1;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: OSQP153MB1330:EE_|TYZP153MB0692:EE_
-x-ms-office365-filtering-correlation-id: 3ed9e36f-e82c-4f44-c11d-08ddf1154a8b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|10070799003|366016|376014|7416014|921020|38070700021;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?mBGWFTSdoxNR/lbkIR4Da4kAYHa7ahZ6YLFDpVQrpGkWnct1CUpv6frV9F?=
- =?iso-8859-1?Q?YefFV1I20zaV7aTiNolrmYyUTiO7QB0TC/yBs9DHs+PG/LUsjYw9ip83i7?=
- =?iso-8859-1?Q?EEqcpIEWT8MM2coNRzuzYEcqMgeNgJoADT1kuG5OMOxI1c7zLJpJnrUsGz?=
- =?iso-8859-1?Q?ORPLPnPmdKwKdhy9QVkf30jDeVaM5ZQXOA5BJ+PXHeu7cYLC7i6Sdpijx1?=
- =?iso-8859-1?Q?qVK8Q5A3K4k2vEaxdkwws1wYnBkSjJ8m7SNdkPMhXlPAAu2HZa3QSZx67z?=
- =?iso-8859-1?Q?3Bq0As8R1ropE86mEAoA0+iUBLxxSaNCnChCTWP7H24WPUIlAMkH6KLGZ7?=
- =?iso-8859-1?Q?bDIyNqFJ6oMD/MzMDCt8IW/Qlshf9HBqgszA6vvVUsA5ujLnYmfXiA7RxS?=
- =?iso-8859-1?Q?tpSgc38qmp8Yf797+C2yfkuermU8H+ThlDEXnJ5EckFLGnB/ZHpqz+e7Aa?=
- =?iso-8859-1?Q?A8vM20s0yMgcqf9CbsNYpvVcsY5qqp7+EsUK6ea3xcxRYOhmqgXD3M5yvS?=
- =?iso-8859-1?Q?CZl2hQrRnzybM8dTMwxZyhqf8ScNC3r8fbC4PvXqFIRcsbsDeA+dM3uufo?=
- =?iso-8859-1?Q?xG6IclfbR/wcptNl55AFOtqWFy/rpETPm7Kg0Ndf9klt1KUGSDnE1Ukp2b?=
- =?iso-8859-1?Q?0mIMFRD1+wjIS+quDiqG/nAe2vQQFDV7DVWRxi3FG60leUAujbLIZ5mmzl?=
- =?iso-8859-1?Q?Mo3hdvWsHOKdytIkmPhD6JK/4Z65aQmmqVoyVONcMRLQ/kOZ2ng4fPc3un?=
- =?iso-8859-1?Q?MfmimQ3WorMOHs5FYbdPLCpTT5oVILsdd/XVorFdjPgZYUSFwJE/IyC0ZZ?=
- =?iso-8859-1?Q?LwkPMJPAoOt5edepJxpsrnjW/wLkuo+63/yBwvpeE3u6ajkuGrNOMkaNpn?=
- =?iso-8859-1?Q?p47gG/91oxU13IiyAwKhMEziA0NYKLShdRM1BmJ3Mnt9HRW2uxztU1+dAb?=
- =?iso-8859-1?Q?z3JkHj2xNZitl16GYp3MWkET0pgqg6GDDjwrisTyBWPdU3xqov5NDxrkkE?=
- =?iso-8859-1?Q?9DxiZPXKNxrFpCv92Kgw3A0UVjjVxEV+ztwilOQyUeSYXYeHLJkH13hlpE?=
- =?iso-8859-1?Q?yvsDjHz4lIFTPiDWqDLkZLAz5VMZ/h06zRS7p+cDaY08K/8bm5Vudz7rYo?=
- =?iso-8859-1?Q?pC5SABvJqX8GTzUNq5pNN9cYbtCCOkvZsunoyPiFfmj7c2eyHr+Q+NV44j?=
- =?iso-8859-1?Q?kBkw7jh0whjzxzLrbUmI4CD2Kp9CEFZ2xIJ4kQoI0riWZ74GyvB11Yy3bd?=
- =?iso-8859-1?Q?VKiJD+9c/J8eGG1T/s4LjlO1kYpW2sEjQhtgd/UFkS0UOo5qPa6Gj1Xz0C?=
- =?iso-8859-1?Q?4wQ9/GvQN3ru8ws+yc1TUZsuRKX2byIiYTkfG9lZ+9f/KDYyEjtO8C1nY6?=
- =?iso-8859-1?Q?TtD3A5GBQhIEAxGjdsy4Yr8aO3d6jd/RqYr3X8iDZzknixGduJaHyndJvj?=
- =?iso-8859-1?Q?a+WRo4EiikWBXt2IkSQVLWkGiT32phDB0AlaOJdH02UPcZDr9xTDZU1WKh?=
- =?iso-8859-1?Q?Y2mozr2vdoxTb/li2MnmOG?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OSQP153MB1330.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(10070799003)(366016)(376014)(7416014)(921020)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?j4kHAkDUeD6Kepjp54gD2pRReXc3fZLHne+imB/QQoWmrH60eLudcMJ2+1?=
- =?iso-8859-1?Q?hEi4BUaLwtassZEuzaizG6Zr1att6tPtPudpYVWYrMe9OvjevKC1MPmS/d?=
- =?iso-8859-1?Q?dKyhPvAYh5NIHgoVCVBuNK5ffRCD61c+u86quLp63raBxmrfk7/zWjzAn7?=
- =?iso-8859-1?Q?1/JAE5NiCV4YOt8Bh/IE0oSfVeD4GJrKY9AGvW7zsoeWPEaA+PUzTzcFWP?=
- =?iso-8859-1?Q?GIZURXawycmjsXaXLipx1NWz5yL9zlmjh17egPbviAg1nHFLuPt75xaos3?=
- =?iso-8859-1?Q?Kx7eXhA5cOzV60Xl3KJvEenbxFQe6VhB9lo6frZv52S0qFQqF7zZypfREq?=
- =?iso-8859-1?Q?yyONhdDxAphIasOqe4hd4xtgqYDWs25+0fSQHqlYqFXeUvZD69IDJhgCsj?=
- =?iso-8859-1?Q?LCyZfiyyqZofo94QPVDJHKkHcB0H+IBLzEN55qCmT1sKThaaxWnK49A8lW?=
- =?iso-8859-1?Q?FgiQad8xVs13fAIGiF4HMOV46AjkjHwZ5DuznCzR99yUs4Uj51YbwwDx+5?=
- =?iso-8859-1?Q?SyVcwYoEzBu6aIfSpICH32C2dQI1DMZtzz1sTi3A0XMilUKm96ACIajnLN?=
- =?iso-8859-1?Q?OmAmJNSRdufr2LK8gJEIRRtlyJHU0ljSs2IwBSGeSplmJZAv2qCixFm78L?=
- =?iso-8859-1?Q?k7DDRh8myW8cCSRRwpmFkmfiQG6o1e8NlFOljR5S2dQaXaQtNTGyNm1EWa?=
- =?iso-8859-1?Q?V+2oy4M1QSAdKdyAG6A4scQCOPJA7tAdQzmPmZOTgtnOBn0cU+PFRwSIBY?=
- =?iso-8859-1?Q?WtZOTUO7WbX2r8Iy0XbJ/sBMQnmCm9iu40EOQrDGTPBRJCWRWVKk1hhpqE?=
- =?iso-8859-1?Q?0cULcOpjftDD8Gdx5Bc7OdDxQgKG8SZmIev+rU4q83Hv6rsELEtUupEEW0?=
- =?iso-8859-1?Q?IP66mjE2MFiTU4Ux9VyFUEg9msyiI1WG9JJxRNJJ9OZuox6ejVurSJBL/k?=
- =?iso-8859-1?Q?4CxWn44FMqdHHMGsZPw8pQQCQL7scobgIISBjImAvp1CyWHvSPE1nQWtGO?=
- =?iso-8859-1?Q?kG4RrCl8TO9VItEOhdAG0GbJTJuiw7xu/DA220cXhKHz7lzkZCgkWbuEeR?=
- =?iso-8859-1?Q?2wbS9JHNdthL1RjVa6Pd1jQ/Pkv1QIvcTXhq5HzK9QhiKe8MfVp0+TauJb?=
- =?iso-8859-1?Q?aXr/f2FncE8Zndf0bPTB8qqhKpW0ow/o5Ln7MQdLWrlybVx2UJcN6U7doM?=
- =?iso-8859-1?Q?z9ShcgL+KCt6U5Qgnqklw6AOiwwTJoXSiirIP/w8AfH+XTWTOx1+CivlI1?=
- =?iso-8859-1?Q?gQyfvDtb0BLZ8B8zEw0+XWqtrl9EjStuULlLYgnTCjUVFIKTYTQ1M1vyhl?=
- =?iso-8859-1?Q?Ufi9RHy6c0QTPKAB4B75qCsdNNTHY0p+xtpiDt6jRxeYupf7boep0jvrb7?=
- =?iso-8859-1?Q?xQLhSVa8OLV0TQzzmDQdO4+sAHvEFZ4cpiw6egt5Wpt94JWroS8pNQJVvg?=
- =?iso-8859-1?Q?ISfbBgmOTFUbvz6ydDY3WqjgL1DIG8oP45KWiVyww+hOZcOQ4+u0s49Roo?=
- =?iso-8859-1?Q?bLU6EzLRJeSkCOvNLtuRbt25B4f5SPXgZgFZsCML2q3cuXDpx31FFlEgqn?=
- =?iso-8859-1?Q?CjafVAwQM/cPx18NRnGmSrcIFHY//TeBh4NGMesYHG3FOc96sUW0ILj8qK?=
- =?iso-8859-1?Q?1CBMihiV0Xoxw=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450C02DFA2B
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 09:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757583011; cv=none; b=ayvW/uJtVsC6V4xfa1IVxN9QpG4UJyRjRSpmazCfhYQM0ubqkBYcBy7oROwrVNpAr2vtSUBpM0eiIUhx7CBB91dN2NdKenr6MDPdR6i7JshAm0sKN3Mq0PP1O0AY05wFFTMEOSRJGX+5uL21jhccM/KND5IoAzbKQh5uyaFTJVo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757583011; c=relaxed/simple;
+	bh=9gYtag9MLEOCAGI7tG4fC8gYTxz7HysnYeVHwJfhGyQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UYpPLCkiaA52dDedmxFTOyB6orb7REqrQShLlaVWUnIfL5aW8TRGLuDnOvWuglkk+0FIdYRJZBFGplxg9gxG3OQ8dDDCahQyujMrtyExj1buR/yN8yNEeTXCHc2RXKjpR9aLxmW/4tciaA64GuxjwxiMpvObuSuT14ZyOMgu0yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=BN8DNZeu; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58B4kGXN019107
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 09:30:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	4zEnPzFVE8t3bC1R9rCg0zuwA6Ldkx+mgUvoY3rTxV0=; b=BN8DNZeu+8SuM/Zt
+	ubyblklFV4TBsBtcvSlCa3YYL/fKjTtbAxMGIY5EGTx98snDFeQEvNV1uv+fr6U6
+	pE7DVv6JRC2n/LgbwTInJ+92NMjiuXmneW+76eFUXw9ogHh4ZxtJ5HK8x4mps8bh
+	z/Eq8BX0gkk/M9GHq/c7nuswTXXPKJLyREDUlChhXfgfDzEwz66IP6M5Odndo1n4
+	IUws9MYf/twsG1VPSMRdjczq2R0TijdGzDMTsS0L+ni+YF/8JI6riJ5Xc2mj4QIn
+	fvotVWT3gBJJ9nI96oy7ujVnaRFK5z+zValRjkgZmEccmDDM3+jWm62mUOfjSP49
+	XoKbKA==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 493qphrtm1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 09:30:08 +0000 (GMT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-726ac3f253dso1909896d6.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 02:30:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757583008; x=1758187808;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4zEnPzFVE8t3bC1R9rCg0zuwA6Ldkx+mgUvoY3rTxV0=;
+        b=S4r7efMXwl5W2eDiw6JURbGSSpY+IPAcy1iyAOTyq1ahHY5CNv1k+pR5I5zwRnaIzN
+         h4JyWctiddFwpePPDwIo9s1HO3w6IxggBQnhYyRKiGLTmmc6icUcx2aegL50EJO/gqo5
+         zEtegISCExJoAFYj124B4syQaYpgRYQYGOdGaYzcfb8+D5ZqsFIcnXkuohSDp1U/mPOb
+         B9+a/FJpViUOGime4wwhkDplrdS5kNXsuIWOHiw4m3RARXBfOgqf8rq2C7X4NZgozaWI
+         YpfJ3RvsJ6HMpz4M4YCCYCG/Cun4qg+jDDxIc6Arw9XXBM+OENW1ogXx4Aqbi/vtWEqs
+         KpPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSxoaf+jgTbyo2Ctp2WZAkrw+uDAqD2ShND3FGH3y3JMf2X2uyJ6jdmDhwNxZ7Qpz6zS4R+y8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoppnvNFsji0EXE8UGBqWPix8CQ/kiNpo/UtU0qZzd8Nx9v1Vs
+	DKMuBKiEslp3y78tH7DfXol2v4b1zoQ7qve1pl5lCWpGqYnqW36UjgjEP3R9haTxSx3xioH6F+q
+	eBW3/dnSQztUw3qeX7lRx5ZCq6NEgbctaPxmLn/+yPXZF3TKMoX4fxHJ4gb8=
+X-Gm-Gg: ASbGncv+3HRuri2AbwkdWzbqqJTMcXajpIBo8ltKclrVjJSODBwcjQ8fp5Q57JHPVvF
+	1bnluHXyrDY0xJssygg+IuqdCYE0Y9cJCkS/FtNv05INWgqfifDFUPzKETLYxFp7Jc41gydw/zl
+	/H70BrA690WGGRIBMwudYK7NxATCNaTvjV/NaCnCIM6p1hLWVatOEaocoCk/dtIWq9ZIdQ1O77I
+	zEd/yV3PaH6y3drfSvFd5kuFzAGz4omAV32icnRXDQbSHMEahogKUsnDVzJh7ekuQwfAhbetgGQ
+	1+Ittg0dJuaZu+9pTBXVnF2nvwknO7AR+wEVv2uHVSt2qBnKe25X1/7Hp5dsPAYRE5SmO1lq6TL
+	jAOOmTKOlS9yF6V0xCb0hNQ==
+X-Received: by 2002:a05:622a:190f:b0:4b5:f4c0:5fd with SMTP id d75a77b69052e-4b5f8531717mr137696111cf.8.1757583007535;
+        Thu, 11 Sep 2025 02:30:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFVS5MMc+bsMDXcW/LDyPpJzdvX7Md47Pa7qu67qrv0jvmEfxL8qsY01l4Lv89+nv+0uNmnfQ==
+X-Received: by 2002:a05:622a:190f:b0:4b5:f4c0:5fd with SMTP id d75a77b69052e-4b5f8531717mr137695811cf.8.1757583006940;
+        Thu, 11 Sep 2025 02:30:06 -0700 (PDT)
+Received: from [192.168.149.223] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b31287a9sm91470866b.41.2025.09.11.02.30.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Sep 2025 02:30:06 -0700 (PDT)
+Message-ID: <96f7cd40-e5ef-461b-9dc5-44e23bdb4bfd@oss.qualcomm.com>
+Date: Thu, 11 Sep 2025 11:30:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: OSQP153MB1330.APCP153.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ed9e36f-e82c-4f44-c11d-08ddf1154a8b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2025 09:26:30.3194
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: U/Q8DJoatsv2sSbzzxhnTu+diP/JdGZvQa8EpnmBnmF4xCP5rfCXyVfhnTj1QLr+6Ma0IZQMVGeQWUBCJlsc0g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZP153MB0692
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/9] dt-bindings: net: qcom: document the ethqos device
+ for SCMI-based systems
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Rob Herring <robh@kernel.org>,
+        Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
+        Andrew Lunn <andrew+netdev@lunn.ch>, Vinod Koul <vkoul@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
+        Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jakub Kicinski
+ <kuba@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-msm@vger.kernel.org
+References: <20250910-qcom-sa8255p-emac-v1-0-32a79cf1e668@linaro.org>
+ <20250910-qcom-sa8255p-emac-v1-2-32a79cf1e668@linaro.org>
+ <175751081352.3667912.274641295097354228.robh@kernel.org>
+ <CAMRc=Mfom=QpqTrTSc_NEbKScOi1bLdVDO7kJ0+UQW9ydvdKjQ@mail.gmail.com>
+ <20250910143618.GA4072335-robh@kernel.org>
+ <CAMRc=McKF1O4KmB=LVX=gTvAmKjBC3oAM3BhTkk77U_MXuMJAA@mail.gmail.com>
+ <b83a59f9-16ae-4835-b185-d5209d70a0f6@oss.qualcomm.com>
+ <CAMRc=Md83STGFYya5eu4j33=SQ+D6upcP-7fnBwKo2dPdTtX+g@mail.gmail.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <CAMRc=Md83STGFYya5eu4j33=SQ+D6upcP-7fnBwKo2dPdTtX+g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=aPDwqa9m c=1 sm=1 tr=0 ts=68c296a0 cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8
+ a=KKAkSRfTAAAA:8 a=QdYl_KjyuFFhde6HtdwA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=1HOtulTD9v-eNWfpl4qZ:22 a=cvBusfyB2V15izCimMoJ:22
+X-Proofpoint-GUID: 0soF5t1xEPDe0irjug42s7hPm74bpVre
+X-Proofpoint-ORIG-GUID: 0soF5t1xEPDe0irjug42s7hPm74bpVre
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTExMDA0MCBTYWx0ZWRfX5TysRIvlgKvZ
+ T1kAGgw6uJgkCPCO6mgaUZrhW/KQPSLJP//ivWyO8GnfVvKem1UFLDpTLiDU6/bsx1rdOH1QVmG
+ v2e9WKf7hhMNbS4rSslmQz+4vdrVNWXLCeXAoWJUOmdhKDnZLhm37c6tWd0LYfcf7R6tiUplpJO
+ w6ydUO0uT2QuRhpSQcH1T2S5JEBe+bL2PBzA1+Jl5gYGiX4FbiNXpw0wfNQucvMn4dPR1c2ctg7
+ I6EgsgQgBj7u4jFgAj07vouPzXnuvU4aZPe+Dbq6pEkT4JqahOn7R0oXkBfLphXBGKWzSMerH0K
+ P+X9XUMWntbhsE5Mgkim11oRHz7b453eLXSTWHnVWj7BjhSZRzIsWiy+je+EdSzCQZXoyalSTVr
+ S/gSgIwr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-10_04,2025-09-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 phishscore=0 impostorscore=0 malwarescore=0 bulkscore=0
+ clxscore=1015 spamscore=0 suspectscore=0 adultscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2509110040
 
-Reviewed-by: Meetakshi Setiya <msetiya@microsoft.com>
+On 9/11/25 11:22 AM, Bartosz Golaszewski wrote:
+> On Thu, Sep 11, 2025 at 10:53 AM Konrad Dybcio
+> <konrad.dybcio@oss.qualcomm.com> wrote:
+>>
+>> On 9/10/25 4:42 PM, Bartosz Golaszewski wrote:
+>>> On Wed, Sep 10, 2025 at 4:36 PM Rob Herring <robh@kernel.org> wrote:
+>>>>
+>>>> On Wed, Sep 10, 2025 at 03:43:38PM +0200, Bartosz Golaszewski wrote:
+>>>>> On Wed, Sep 10, 2025 at 3:38 PM Rob Herring (Arm) <robh@kernel.org> wrote:
+>>>>>>
+>>>>>>
+>>>>>> On Wed, 10 Sep 2025 10:07:39 +0200, Bartosz Golaszewski wrote:
+>>>>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>>>
+>>>>>>> Describe the firmware-managed variant of the QCom DesignWare MAC. As the
+>>>>>>> properties here differ a lot from the HLOS-managed variant, lets put it
+>>>>>>> in a separate file.
+>>>>>>>
+>>>>>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>>> ---
+>>
+>> [...]
+>>
+>>>>> These seem to be a false-positives triggered by modifying the
+>>>>> high-level snps.dwmac.yaml file?
+>>>>
+>>>> No. You just made 3 power-domains required for everyone.
+>>>>
+>>>
+>>> With a maxItems: 3?
+>>
+>> In the common definition:
+>>
+>> minItems: n
+>> maxItems: 3
+>>
+> 
+> Just to make it clear: if I have a maxItems but no minItems, does this
+> make maxItems effectively work as a strict-number-of-items?
 
-Thanks
-Meetakshi
+Yes
 
-________________________________________
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-Sent: 10 September 2025 08:13
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>; Linux Documen=
-tation <linux-doc@vger.kernel.org>; Linux DAMON <damon@lists.linux.dev>; Li=
-nux Memory Management List <linux-mm@kvack.org>; Linux Power Management <li=
-nux-pm@vger.kernel.org>; Linux Block Devices <linux-block@vger.kernel.org>;=
- Linux BPF <bpf@vger.kernel.org>; Linux Kernel Workflows <workflows@vger.ke=
-rnel.org>; Linux KASAN <kasan-dev@googlegroups.com>; Linux Devicetree <devi=
-cetree@vger.kernel.org>; Linux fsverity <fsverity@lists.linux.dev>; Linux M=
-TD <linux-mtd@lists.infradead.org>; Linux DRI Development <dri-devel@lists.=
-freedesktop.org>; Linux Kernel Build System <linux-kbuild@vger.kernel.org>;=
- Linux Networking <netdev@vger.kernel.org>; Linux Sound <linux-sound@vger.k=
-ernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>; Borislav Petkov <bp@alien8.de>; P=
-eter Zijlstra <peterz@infradead.org>; Josh Poimboeuf <jpoimboe@kernel.org>;=
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>; Jonathan Corbet <corbet@l=
-wn.net>; SeongJae Park <sj@kernel.org>; Andrew Morton <akpm@linux-foundatio=
-n.org>; David Hildenbrand <david@redhat.com>; Lorenzo Stoakes <lorenzo.stoa=
-kes@oracle.com>; Liam R. Howlett <Liam.Howlett@oracle.com>; Vlastimil Babka=
- <vbabka@suse.cz>; Mike Rapoport <rppt@kernel.org>; Suren Baghdasaryan <sur=
-enb@google.com>; Michal Hocko <mhocko@suse.com>; Huang Rui <ray.huang@amd.c=
-om>; Gautham R. Shenoy <gautham.shenoy@amd.com>; Mario Limonciello <mario.l=
-imonciello@amd.com>; Perry Yuan <perry.yuan@amd.com>; Jens Axboe <axboe@ker=
-nel.dk>; Alexei Starovoitov <ast@kernel.org>; Daniel Borkmann <daniel@iogea=
-rbox.net>; Andrii Nakryiko <andrii@kernel.org>; Martin KaFai Lau <martin.la=
-u@linux.dev>; Eduard Zingerman <eddyz87@gmail.com>; Song Liu <song@kernel.o=
-rg>; Yonghong Song <yonghong.song@linux.dev>; John Fastabend <john.fastaben=
-d@gmail.com>; KP Singh <kpsingh@kernel.org>; Stanislav Fomichev <sdf@fomich=
-ev.me>; Hao Luo <haoluo@google.com>; Jiri Olsa <jolsa@kernel.org>; Dwaipaya=
-n Ray <dwaipayanray1@gmail.com>; Lukas Bulwahn <lukas.bulwahn@gmail.com>; J=
-oe Perches <joe@perches.com>; Andrey Ryabinin <ryabinin.a.a@gmail.com>; Ale=
-xander Potapenko <glider@google.com>; Andrey Konovalov <andreyknvl@gmail.co=
-m>; Dmitry Vyukov <dvyukov@google.com>; Vincenzo Frascino <vincenzo.frascin=
-o@arm.com>; Rob Herring <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@ker=
-nel.org>; Conor Dooley <conor+dt@kernel.org>; Eric Biggers <ebiggers@kernel=
-.org>; tytso@mit.edu <tytso@mit.edu>; Richard Weinberger <richard@nod.at>; =
-Zhihao Cheng <chengzhihao1@huawei.com>; Maarten Lankhorst <maarten.lankhors=
-t@linux.intel.com>; Maxime Ripard <mripard@kernel.org>; Thomas Zimmermann <=
-tzimmermann@suse.de>; David Airlie <airlied@gmail.com>; Simona Vetter <simo=
-na@ffwll.ch>; Nathan Chancellor <nathan@kernel.org>; Nicolas Schier <nicola=
-s.schier@linux.dev>; Ingo Molnar <mingo@redhat.com>; Will Deacon <will@kern=
-el.org>; Boqun Feng <boqun.feng@gmail.com>; Waiman Long <longman@redhat.com=
->; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com=
->; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simon=
- Horman <horms@kernel.org>; Shay Agroskin <shayagr@amazon.com>; Arthur Kiya=
-novski <akiyano@amazon.com>; David Arinzon <darinzon@amazon.com>; Saeed Bis=
-hara <saeedb@amazon.com>; Andrew Lunn <andrew@lunn.ch>; Alexandru Ciobotaru=
- <alcioa@amazon.com>; The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel=
-@amazon.com>; Jesper Dangaard Brouer <hawk@kernel.org>; Bagas Sanjaya <baga=
-sdotme@gmail.com>; Laurent Pinchart <laurent.pinchart@ideasonboard.com>; Ra=
-nganath V N <vnranganath.20@gmail.com>; Steven French <Steven.French@micros=
-oft.com>; Meetakshi Setiya <msetiya@microsoft.com>; Greg Kroah-Hartman <gre=
-gkh@linuxfoundation.org>; Martin K. Petersen <martin.petersen@oracle.com>; =
-Bart Van Assche <bvanassche@acm.org>; Thomas Wei=DFschuh <linux@weissschuh.=
-net>; Masahiro Yamada <masahiroy@kernel.org>; Mauro Carvalho Chehab <mcheha=
-b+huawei@kernel.org>; Jani Nikula <jani.nikula@intel.com>
-Subject: [EXTERNAL] [PATCH v2 10/13] Documentation: smb: smbdirect: Convert=
- KSMBD docs link
-
-Convert KSMBD docs link to internal link.
-
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Documentation/filesystems/smb/smbdirect.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/filesystems/smb/smbdirect.rst b/Documentation/fi=
-lesystems/smb/smbdirect.rst
-index ca6927c0b2c084..6258de919511fa 100644
---- a/Documentation/filesystems/smb/smbdirect.rst
-+++ b/Documentation/filesystems/smb/smbdirect.rst
-@@ -76,8 +76,8 @@ Installation
- Setup and Usage
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
--- Set up and start a KSMBD server as described in the `KSMBD documentation
--  <https://www.kernel.org/doc/Documentation/filesystems/smb/ksmbd.rst>`_.
-+- Set up and start a KSMBD server as described in the :doc:`KSMBD document=
-ation
-+  <ksmbd>`.
-   Also add the "server multi channel support =3D yes" parameter to ksmbd.c=
-onf.
-
- - On the client, mount the share with `rdma` mount option to use SMB Direc=
-t
---
-An old man doll... just what I always wanted! - Clara
+Konrad
 
