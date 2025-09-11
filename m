@@ -1,166 +1,115 @@
-Return-Path: <netdev+bounces-222185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 962A5B53600
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:43:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C382B5360B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3292D7AFA88
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:42:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E1A11881EAE
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730AC33769B;
-	Thu, 11 Sep 2025 14:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296B731AF25;
+	Thu, 11 Sep 2025 14:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekGDjM5K"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sQpF3d/z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E31C313543
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 14:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130122BAF4;
+	Thu, 11 Sep 2025 14:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757601814; cv=none; b=hwukUi9aCns+iVGQ7HzbLoS1sIyT2iQXXtj14fA8x451Cqot3gLuthO29iZFMotuRgf0XQcQ0fwFyr1WNvWHwIZ3aGCA2D4ciCdn7i/Dkhs/W63O5KC2fHreVs11NArD6cD0sf8oLp0jlGlw0I3FLjJhGvD00qVuoZpeGXr2OCc=
+	t=1757601872; cv=none; b=QrG47DPk7TlHuGfX11MAm6UzyeELMRC9xV1ux6Icu1IY0WFxBv6uTpV8Enx62g0+njAI+QUMHwLOg2lkJyUz4sqVJ7fHLDtWDiNc0sDUZciAhXsAqY5tVUxNbouumoP6xAmExcspTKvxylfR6f476/ak4hCaMXVymxzeM6HeyKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757601814; c=relaxed/simple;
-	bh=5joYKHJyn+/bG1/2W2XI6/SUAwVGFDnecK7PJm4GL2o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y06qAsAb1HXzm7i05YCVZu8thTkbmZkveRPyWuetbSYJ1rwxLbaCkuuKAKQwhSdRVf1SP7jhXKt1tFneQbJvilin65wQ2u/BVl5oOM681s6COTAHZtxqf8oofec9SydobJgQmCxPfDBnyrNY96ZK6XmEb9vmUjcHmwrNP9Btmy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekGDjM5K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A78BC4CEF0;
-	Thu, 11 Sep 2025 14:43:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757601813;
-	bh=5joYKHJyn+/bG1/2W2XI6/SUAwVGFDnecK7PJm4GL2o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ekGDjM5KMruPggDPYPauMwagAzORyFmcF1RCRfdmqpp7uFY6Q2X89RoRgfwkV+kSe
-	 YZRiFIi0AtKeyyNcj8OjTls/pwlRP9IklQTqXIaCAFDfQB20BFO0+syc4Yhdr9Bd60
-	 Ca+x6duxBGRGx6rLN6ylKfcSSs537dEkwyiMOAzreihxwI3RqqLflZe63XNNo0cr9f
-	 Wsl7+0uniNtlXuO+obIN9r4K4JCXezG/LuMO9tlKJUvYoVlH0vRHrNA/nN9w0wUkOz
-	 KmaAQQ5Fbq6Dwav2XFV2qCZbJuh24OpUl82DuHbvo4x3HbKMTZy83Mjfn7Cwo5LSsl
-	 pHJOVMkMFwJ1A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	almasrymina@google.com,
-	alexanderduyck@fb.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] eth: fbnic: support devmem Tx
-Date: Thu, 11 Sep 2025 07:43:27 -0700
-Message-ID: <20250911144327.1630532-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1757601872; c=relaxed/simple;
+	bh=m3ajYNmfet3CdR3EZgfsuom2tyz84b+auKpeWzRrHTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j4CSQi1zTW0AjIL27IhaGkXVksRkzUeH1KfNZc8y1I8qMjrgQCjERJuOxfQaI3ASJ4J5QrZrnrVc5vnJ5UmXo82muafQCotEOXbG88lErlFUcZya+nWLeu8xb6jCeRkCGK7X/dMHDTJ9LZHXk/ZpTg37la5v4opfGJVNa+u8X6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sQpF3d/z; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=X471W6C5BJj+29v84eIqNLNrrNpVlRO4QaYvcFi48zE=; b=sQpF3d/z1GhHDsLdbG/bw/wEgu
+	3mVTMTS+Ablfa3ymbUs2jnkxJvB3GfJFmDtxD8gobIGumsD4ZSBhlxsHZU6AxQeQW9wMbi1SWEESH
+	vs7N0PKwIHO84viHz6oQ9OixJpRRgWYZKDcY3g0trVR1Nd59Foi0Sgs2Q+eFDUTLFUik=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uwiX2-00862T-QQ; Thu, 11 Sep 2025 16:44:16 +0200
+Date: Thu, 11 Sep 2025 16:44:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, michal.simek@amd.com,
+	radhey.shyam.pandey@amd.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, harini.katakam@amd.com
+Subject: Re: [PATCH net-next 2/2] net: xilinx: axienet: Add inline comment
+ for stats_lock mutex definition
+Message-ID: <633175ac-97c8-42d0-8f3b-767e89aa4132@lunn.ch>
+References: <20250911072815.3119843-1-suraj.gupta2@amd.com>
+ <20250911072815.3119843-3-suraj.gupta2@amd.com>
+ <0dc424bf-c19b-4eeb-82db-88bff4f85d46@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0dc424bf-c19b-4eeb-82db-88bff4f85d46@linux.dev>
 
-Support devmem Tx. We already use skb_frag_dma_map(), we just need
-to make sure we don't try to unmap the frags. Check if frag is
-unreadable and mark the ring entry.
+On Thu, Sep 11, 2025 at 10:35:22AM -0400, Sean Anderson wrote:
+> On 9/11/25 03:28, Suraj Gupta wrote:
+> > Add inline comment to document the purpose of the stats_lock mutex in
+> > the axienet_local structure. This mutex protects the hw_stats_seqcount
+> > sequence counter used for hardware statistics synchronization.
+> > 
+> > Fixes checkpatch warning:
+> > CHECK: struct mutex definition without comment
+> > 
+> > Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> > ---
+> >  drivers/net/ethernet/xilinx/xilinx_axienet.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> > index 5ff742103beb..99b9c27bbd60 100644
+> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> > @@ -598,7 +598,7 @@ struct axienet_local {
+> >  
+> >  	u64 hw_stat_base[STAT_COUNT];
+> >  	u32 hw_last_counter[STAT_COUNT];
+> > -	seqcount_mutex_t hw_stats_seqcount;
+> > +	seqcount_mutex_t hw_stats_seqcount; /* Lock for hardware statistics */
+> >  	struct mutex stats_lock;
+> >  	struct delayed_work stats_work;
+> >  	bool reset_in_progress;
+> 
+> NAK. This is already documented in the kernel-doc comment.
 
-  # ./tools/testing/selftests/drivers/net/hw/devmem.py
-  TAP version 13
-  1..3
-  ok 1 devmem.check_rx
-  ok 2 devmem.check_tx
-  ok 3 devmem.check_tx_chunks
-  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+Agreed. checkpatch is just a guide, it does get things wrong, and we
+don't insist it is 100% clean.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+And the existing comment is much more specific:
+
+   Sequence counter for @hw_stat_base, @hw_last_counter,
+   and @reset_in_progress.
+
+This makes it clear exactly what it should protect, and what it does
+not protect.
+
+    Andrew
+
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c |  1 +
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c   | 14 +++++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index dd35de301870..d12b4cad84a5 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -712,6 +712,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 	netdev->netdev_ops = &fbnic_netdev_ops;
- 	netdev->stat_ops = &fbnic_stat_ops;
- 	netdev->queue_mgmt_ops = &fbnic_queue_mgmt_ops;
-+	netdev->netmem_tx = true;
- 
- 	fbnic_set_ethtool_ops(netdev);
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index ac555e045e34..286ad628a557 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -37,6 +37,8 @@ struct fbnic_xmit_cb {
- 
- #define FBNIC_XMIT_CB(__skb) ((struct fbnic_xmit_cb *)((__skb)->cb))
- 
-+#define FBNIC_XMIT_NOUNMAP	(void *)1
-+
- static u32 __iomem *fbnic_ring_csr_base(const struct fbnic_ring *ring)
- {
- 	unsigned long csr_base = (unsigned long)ring->doorbell;
-@@ -315,6 +317,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- 	unsigned int tail = ring->tail, first;
- 	unsigned int size, data_len;
- 	skb_frag_t *frag;
-+	bool is_net_iov;
- 	dma_addr_t dma;
- 	__le64 *twd;
- 
-@@ -330,6 +333,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- 	if (size > FIELD_MAX(FBNIC_TWD_LEN_MASK))
- 		goto dma_error;
- 
-+	is_net_iov = false;
- 	dma = dma_map_single(dev, skb->data, size, DMA_TO_DEVICE);
- 
- 	for (frag = &skb_shinfo(skb)->frags[0];; frag++) {
-@@ -342,6 +346,8 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- 				   FIELD_PREP(FBNIC_TWD_LEN_MASK, size) |
- 				   FIELD_PREP(FBNIC_TWD_TYPE_MASK,
- 					      FBNIC_TWD_TYPE_AL));
-+		if (is_net_iov)
-+			ring->tx_buf[tail] = FBNIC_XMIT_NOUNMAP;
- 
- 		tail++;
- 		tail &= ring->size_mask;
-@@ -355,6 +361,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- 		if (size > FIELD_MAX(FBNIC_TWD_LEN_MASK))
- 			goto dma_error;
- 
-+		is_net_iov = skb_frag_is_net_iov(frag);
- 		dma = skb_frag_dma_map(dev, frag, 0, size, DMA_TO_DEVICE);
- 	}
- 
-@@ -387,6 +394,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- 	while (tail != first) {
- 		tail--;
- 		tail &= ring->size_mask;
-+		ring->tx_buf[tail] = NULL;
- 		twd = &ring->desc[tail];
- 		if (tail == first)
- 			fbnic_unmap_single_twd(dev, twd);
-@@ -574,7 +582,11 @@ static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
- 		desc_cnt--;
- 
- 		while (desc_cnt--) {
--			fbnic_unmap_page_twd(nv->dev, &ring->desc[head]);
-+			if (ring->tx_buf[head] != FBNIC_XMIT_NOUNMAP)
-+				fbnic_unmap_page_twd(nv->dev,
-+						     &ring->desc[head]);
-+			else
-+				ring->tx_buf[head] = NULL;
- 			head++;
- 			head &= ring->size_mask;
- 		}
--- 
-2.51.0
-
+pw-bot: cr
 
