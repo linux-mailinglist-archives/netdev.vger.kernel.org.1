@@ -1,79 +1,103 @@
-Return-Path: <netdev+bounces-222353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE31B53F3E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:50:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC5CB53F4E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:56:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 492914812A4
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 23:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBDA2A05729
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 23:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64DE82E03EE;
-	Thu, 11 Sep 2025 23:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C837626B942;
+	Thu, 11 Sep 2025 23:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r3hnysdg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loreQqMe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D72E2D73BD;
-	Thu, 11 Sep 2025 23:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F14426A0A7;
+	Thu, 11 Sep 2025 23:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757634612; cv=none; b=b3+DpQ9HRXmHj1JqlJHRANLE03ataJRzNxqApGeJNvuFtDi4oGWlmOK6Br8qCqIj3Rw6Sj2iOHlfEAzslcYo889Npu+H3JthTL0fThIj+zveVDlGO3ca2OpXAoYb7cIzR9l2SKtLo0exdQKjo/Dz/Ac/VZCEf5P56xLQL86mAjQ=
+	t=1757634982; cv=none; b=uBvOLtEOv3jSd99pULG/CHuXZHk248uc/yq5Hper6SP6LTxXGtE5U9W1pUOFy1nSez4MFRW4NJ/IJJX9lwXM++CqWH55MWA+O4piFz8VKy5eA59zrQyetmFb/l4QUsQHfWpExxladD+UnKbmh1kfG5gQWTARpAXb55vSaPnPpi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757634612; c=relaxed/simple;
-	bh=tzxMAvkGMKFlfP/9W/qKzkJcEbGCB6dgQ+x6p6zTgfo=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=nIOQe9mu2rAgUC1ygJUjVtihINgR6VfOemDPvG0igY4eSHUVE9G/Njhy22JK4PInDMXuon5Ojg4Rm9Tffjy2P5y9f21K3xvJ3Eow19JEsQGVzF6P4rmgM/Xm4c6IkNOTQkQVXqfxKC7IQpWozAM6hgG3NtL2v31OC0IcL46Pa74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r3hnysdg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A7C1C4CEF0;
-	Thu, 11 Sep 2025 23:50:12 +0000 (UTC)
+	s=arc-20240116; t=1757634982; c=relaxed/simple;
+	bh=KvYjeYboHFWJWtv+WVJpkFkNTuVtS5MQR5jhgNcuTiY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MUEvoDTKQGnC6sGwtALxhtKvF8L/ZIIHAVDbv7R/gKNI5/oP7MLnvU6Dg/DTQd9iszaLDEbeUloUENWtTtM8QnepzpAnyu/Gh4BaZVgND8QME37kxAa+IWrN3mqetM3QPEkhBvLnBCFwZQ9sn+UCXNasWGzWM+NM9zQkGAk2nH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=loreQqMe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA24EC4CEF0;
+	Thu, 11 Sep 2025 23:56:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757634612;
-	bh=tzxMAvkGMKFlfP/9W/qKzkJcEbGCB6dgQ+x6p6zTgfo=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=r3hnysdgRLfAJVbys6ARHHjr/nNnZvNqm8uFojim5V0hl3FQyLBgZti3J/RtFCXYh
-	 F6UfMAn4K7ymCzIxnjhZu7h0Qv4sYKzNOjBGplUzdA6dej7lNBeC2reD1J91WC7cwM
-	 SjoIMBKQrqR5lneuF7Nf0gyoLkB1YaQSRUmc3EH8KqAZROkZZqDxxpho4Ex7rwx4Ti
-	 xLA/0eYKNyXWPviNIoV27g1vTpN+VoVeBymjn8/X9PPwShRxHoScCv1AP1NiZRbgCG
-	 Bmfcn2D8KNOlMvLXn27UTAL0sy1AXcOQbRerjzBLxFcCNvDSkm6nHUmkiMqCRn40QM
-	 j6//TzBqHmJmw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB04C383BF69;
-	Thu, 11 Sep 2025 23:50:15 +0000 (UTC)
-Subject: Re: [GIT PULL v2] Networking for v6.17-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250911150655.60220-1-pabeni@redhat.com>
-References: <20250911150655.60220-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250911150655.60220-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc6
-X-PR-Tracked-Commit-Id: 63a796558bc22ec699e4193d5c75534757ddf2e6
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: db87bd2ad1f736c2f7ab231f9b40c885934f6b2c
-Message-Id: <175763461495.2348395.2857191452728656428.pr-tracker-bot@kernel.org>
-Date: Thu, 11 Sep 2025 23:50:14 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=k20201202; t=1757634982;
+	bh=KvYjeYboHFWJWtv+WVJpkFkNTuVtS5MQR5jhgNcuTiY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=loreQqMeR6bYdQMcAeEZgvvCWWgG7LReaKaHEWjjywup5hT1YW4AL9BP6BYalM/jE
+	 Z/hG/h8V3skj9H5dSqJt2SSjFypvT7ra+kjxrHbmYdlVmbpRb4w4Z76PjFE+bCI6SX
+	 a1rdIKqBVXCiXhocnwHDtIjB28b0rXrOnpSY1GlBOzIbG7L72HoHyJlv+g+j3JAW1c
+	 NG2hlEBP5sF86NXuLxh6ToNCz3MUVJo7+hG6jL8PSMVa17KZ/4VDortn/XEKDJ9846
+	 0Hhmbuyah/nD1UwG06yreKf91SmxKFylGvbsoT6E5Cz9rA2KnYC8SE5nEOLaWyGkXy
+	 Ynj1KTC3B+wJw==
+Date: Thu, 11 Sep 2025 16:56:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [GIT PULL] wireless-next-2025-09-11
+Message-ID: <20250911165621.027ee3be@kernel.org>
+In-Reply-To: <2da9103af3f341f05bc8c42e4425ec15231498e5.camel@sipsolutions.net>
+References: <20250911100854.20445-3-johannes@sipsolutions.net>
+	<2da9103af3f341f05bc8c42e4425ec15231498e5.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Thu, 11 Sep 2025 17:06:55 +0200:
+On Thu, 11 Sep 2025 19:01:39 +0200 Johannes Berg wrote:
+> On Thu, 2025-09-11 at 12:08 +0200, Johannes Berg wrote:
+> > Please pull and let us know if there's any problem. =20
+>=20
+> Speaking of problems ... we've kept adding Link: tags. If you're going
+> to insist we remove them then please just say so explicitly, reject this
+> pull request as well if you like, and save everyone the discussion.
+>=20
+> I do truly believe Linus to be wrong on this: assuming a patch has no
+> need for any identification/correlation whatsoever before it goes into
+> his (or a feeder) tree (and gets a stable sha1) is akin to assuming it
+> has no life before it actually ends up there, which I think is
+> completely out of touch with reality. But he does ultimately get to
+> reject pull requests, so...
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc6
+Let's see, IMHO links to patch.msgid.link are unambiguously purely to
+the posting, not any discussion. I'm planning to try to hack something
+up in our patchwork scripts to try to skip applying them when thread is
+completely bare, but my next two weekends are quite busy. I'd say
+steady as she goes for now..
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/db87bd2ad1f736c2f7ab231f9b40c885934f6b2c
+> Maybe I should make the links go to patchwork, because there you have
+> the CI results ... maybe that could be construed as useful information
+> in the "Linus sense" (phrased that way because to me the mailing list
+> posting is already useful information)?
 
-Thank you!
+Maybe. I find ML more useful, but do very occasionally want to look=20
+at pw. As long as one has the message-id it's not hard to find the pw
+entry. I'd recommend against changing the linking to pw. My guess is
+that would only lead to increases hostility :)
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+My personal opinion is that pw-bot already knows the message-id to
+commit hash mapping. I was asking K to expose this as some REST
+endpoint so that we can trivially script the conversions. But he
+suggested (not without sense) that patchwork should serve as our DB,
+not 100 random disparate services. One day the netdev foundation will
+clear all the organizational hurdles and the PW work will happen :D
+
+
+unrelated - the wireless PR was already pulled, pw-bot did not respond
+=F0=9F=A4=B7=EF=B8=8F
 
