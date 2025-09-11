@@ -1,96 +1,110 @@
-Return-Path: <netdev+bounces-222172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2939FB535D1
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:39:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDAEBB535CB
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC06F1CC4A79
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:38:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AD9EAA4F91
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4CC33EB16;
-	Thu, 11 Sep 2025 14:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375E434164E;
+	Thu, 11 Sep 2025 14:37:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NaFkYOP4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="poEx3AVu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8540D3376B3;
-	Thu, 11 Sep 2025 14:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DEB189906;
+	Thu, 11 Sep 2025 14:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757601392; cv=none; b=QqmmMULWST15FQ2bk+zHvs13OzWxkeaDK2ZwM5nUEv5hRa7XCS4rkAFb6iB1pexMxCjrJFODCPV5catQOWRE7F/CqxEa3DtoNES2SVECuKdUrIX1cSc2nVXl6EMnJ5125j4JGABL6ZMXQXhUO6K0uYOLMK8TBd19Ai2e3wCX4MQ=
+	t=1757601436; cv=none; b=qR6i1SKnIxD5uUs5lB2wpp95uqRQ275NIrE2Rx4v0lR01yzczfuu3TDDkYujU4yJOWnvpBy/2qChlKTJPLcJYreYoCCq4plgWbCfZARqvKmXDzSD8Uh2d7zBnV/vtsUL6YKNGYp7QJyc6uKvoTIz6bcg3oNnrpWvanhqmXdrNqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757601392; c=relaxed/simple;
-	bh=xmwE7Dd3BUl4FfFfkILXOnu6GtYmwpiyNr7Jy+EZ2oQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jCLxhWTRQylvemHlB9rxtDF5tEhYlnBLb73dOWpkj7NhNAdrYBuCxXkZX9x6br6O0IzSpAzION79BlRx2wuYdHc8e6WSGjm8qchFnxD704cv0QK0UiFs99eAwf0QwQib/xkGglkj9BfhOKA8JYTthQonbwJFadKs6EHEr/X/GP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NaFkYOP4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A12B5C4CEF0;
-	Thu, 11 Sep 2025 14:36:31 +0000 (UTC)
+	s=arc-20240116; t=1757601436; c=relaxed/simple;
+	bh=1uq3j5GPcDQePdt4YoD1jR895AQejZTyfOLzC81OMs0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fq51Y7utL0VCpiVe++8KsTm3IC+hnWh+/LRKMZ7j8/eZp0ai4Le2N9yTt/ydIX4EQ/nuLmB9/xUd4D+n1c3ELxs+HwJ377O0fdJFTKwXInnd/55aQYbKwM7lr/FAwjjtj0PeI0drEzIo/WJrrN419G+CVAh3zFQVlL3JSmVg4qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=poEx3AVu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C23FBC4CEF0;
+	Thu, 11 Sep 2025 14:37:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757601392;
-	bh=xmwE7Dd3BUl4FfFfkILXOnu6GtYmwpiyNr7Jy+EZ2oQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NaFkYOP4lP4otQm6RHM9IPoLQW55MnIzhxxRrdtHCErFJ7RT5CKT5pX+QCwsTW8iG
-	 K/FQNLVPKBwte1CuNpMA3PF/vhHHDa5jnVE9v/bbmUBtn8k+TNY5dxue3QWQ+WL4n3
-	 pLnXp99/4OBJ0XHsXKkhYstxoF/uGqlB772S9nRJ5/jn9GSp1vQwvnVvVv+kG05ceT
-	 PMVoDlcdD8jx3pLoXG21JwDu7uXOkdzYY3hSaPGOKkBZu8ahDTA5lI74q7xAsmNF9X
-	 KH/KuKzXfcsU6zRVAs/3eMcMrkEjelhO9jxXWkGan2tipU5bJ2XN5SpBHgiF0vfZrz
-	 HEcAxG5NHCg8A==
-Date: Thu, 11 Sep 2025 07:36:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Gal Pressman
- <gal@nvidia.com>, linux-rdma@vger.kernel.org, Alexei Lazar
- <alazar@nvidia.com>
-Subject: Re: [PATCH net V2 10/11] net/mlx5e: Update and set Xon/Xoff upon
- port speed set
-Message-ID: <20250911073630.14cd6764@kernel.org>
-In-Reply-To: <fdd4a537-8fa3-42ae-bfab-80c0dc32a7c2@nvidia.com>
-References: <20250825143435.598584-1-mbloch@nvidia.com>
-	<20250825143435.598584-11-mbloch@nvidia.com>
-	<20250910170011.70528106@kernel.org>
-	<20250911064732.2234b9fb@kernel.org>
-	<fdd4a537-8fa3-42ae-bfab-80c0dc32a7c2@nvidia.com>
+	s=k20201202; t=1757601433;
+	bh=1uq3j5GPcDQePdt4YoD1jR895AQejZTyfOLzC81OMs0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=poEx3AVukISUDuuoOMtMsnSAs1SQT+F2uLTaYOHF4r9RFtr7aE/0aW43XZL0R3mXe
+	 fYEp9v0FUb0LCkuk4SvqQ/PoPO9rVnw1799b0CzgIpc29qR+cglMq/hwhyDqAuYrAI
+	 PzTFASlK5cJKfcsKu5pkQSPAaTNNZv1IOGf+uE+zika+GoMKEfYEwR9YVTDUHBWpkW
+	 V976XgpLzNcasNt6ohIUUvuF44PYCQlxMVImFMuNYYNZvTiamdrynAdzRM4bRvtDxg
+	 l60kqKL25Vu8MAchG+h3z6MvklCdiexV5rdRolRgjM9avaIHoFhJDOqFggIhQv8YcA
+	 jh7okJEY3wgRg==
+Date: Thu, 11 Sep 2025 15:37:06 +0100
+From: Lee Jones <lee@kernel.org>
+To: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
+	andi.shyti@kernel.org, mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	a0282524688@gmail.com
+Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH RESEND v14 0/7] Add Nuvoton NCT6694 MFD drivers
+Message-ID: <20250911143706.GL9224@google.com>
+References: <20250825092403.3301266-1-a0282524688@gmail.com>
+ <175760120875.1552180.9512711135722714327.b4-ty@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <175760120875.1552180.9512711135722714327.b4-ty@kernel.org>
 
-On Thu, 11 Sep 2025 17:25:22 +0300 Mark Bloch wrote:
-> On 11/09/2025 16:47, Jakub Kicinski wrote:
-> > On Wed, 10 Sep 2025 17:00:11 -0700 Jakub Kicinski wrote:  
-> >> Hi, this is breaking dual host CX7 w/ 28.45.1300 (but I think most
-> >> older FW versions, too). Looks like the host is not receiving any
-> >> mcast (ping within a subnet doesn't work because the host receives
-> >> no ndisc), and most traffic slows down to a trickle.
-> >> Lost of rx_prio0_buf_discard increments.
-> >>
-> >> Please TAL ASAP, this change went to LTS last week.  
+On Thu, 11 Sep 2025, Lee Jones wrote:
+
+> On Mon, 25 Aug 2025 17:23:56 +0800, a0282524688@gmail.com wrote:
+> > From: Ming Yu <a0282524688@gmail.com>
 > > 
-> > Any news on this? I heard that it also breaks DCB/QoS configuration
-> > on 6.12.45 LTS.  
+> > This patch series introduces support for Nuvoton NCT6694, a peripheral
+> > expander based on USB interface. It models the chip as an MFD driver
+> > (1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
+> > WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
+> > 
+> > [...]
 > 
-> We are looking into this, once we have anything I'll update.
-> Just to make sure, reverting this is one commit solves the
-> issue you are seeing?
+> Applied, thanks!
+> 
+> [1/7] mfd: Add core driver for Nuvoton NCT6694
+>       commit: 8c13787893fde313190b7dc844a24114dcc172a2
+> [2/7] gpio: Add Nuvoton NCT6694 GPIO support
+>       (no commit info)
+> [3/7] i2c: Add Nuvoton NCT6694 I2C support
+>       (no commit info)
+> [4/7] can: Add Nuvoton NCT6694 CANFD support
+>       (no commit info)
+> [5/7] watchdog: Add Nuvoton NCT6694 WDT support
+>       (no commit info)
+> [6/7] hwmon: Add Nuvoton NCT6694 HWMON support
+>       (no commit info)
+> [7/7] rtc: Add Nuvoton NCT6694 RTC support
+>       (no commit info)
 
-It did for me, but Daniel (who is working on the PSP series)
-mentioned that he had reverted all three to get net-next working:
+I have no idea what this is about!
 
-  net/mlx5e: Set local Xoff after FW update
-  net/mlx5e: Update and set Xon/Xoff upon port speed set
-  net/mlx5e: Update and set Xon/Xoff upon MTU set
+Looks like b4 just had some kind of breakdown!
+
+To be clear, none of these have been applied.
+
+-- 
+Lee Jones [李琼斯]
 
