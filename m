@@ -1,164 +1,149 @@
-Return-Path: <netdev+bounces-222128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44CE6B53365
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:15:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E76EB5337F
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:19:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3FEA1CC07F8
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:15:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C334D585AAB
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6721322DAC;
-	Thu, 11 Sep 2025 13:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CEA326D4C;
+	Thu, 11 Sep 2025 13:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="spibFGlQ"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="c8jmXGwL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB20322DC5
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 13:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4818321F24
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 13:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757596504; cv=none; b=eu1ku9L7VvKf3Bby/VSrlkqMXtIlxK9AI2OutcpL+66Ynwh4GFyvNjPUwmEZppRyEnXR40AgdCRH4L0LO8aXz8pzz6aqJ5nTpU9gQETEI0aSKp2hSnrm0d5YUDncrPzMK60jA9HCpbwx0cmq0GIonKciWn6C5kupCPVmkBJgdhk=
+	t=1757596772; cv=none; b=pvehh6BSEJmZ1VMugxLrrshlLhVvrvDBI9xED6j2COcScI9EjgOAfCTPDXEDZXOeIvGbFkOescpyNBq9veH622JTPNAiRv7LoOLERGjip9h18biqPGMMqchEKt2y6IfiLb+FqnPbUKkFVpjKuFFA6/4IhTt9/xJ4t32zIZE4+2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757596504; c=relaxed/simple;
-	bh=x1Ibz1Ro2+nP+d06nbtfG9UfdciPBYtybc/DZr0g6OQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s3OwTxz4xpUKV6zOWx7jKQdzkrecExB7rZW3T7v4ndBiMGLhY70Xdvv6wCxH/J+5rTDSWqOz7hNsS32ZaEA0Ghx+rlukANZb4zfSh6OnytbBW6bUl1n+qEKfXEZ43Fuu1BhdSrnqL44jbbSoIoIW5+e/E1qiP1kRUbdAu2lD9rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=spibFGlQ; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4b5e4fc9b4fso6614121cf.2
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:15:02 -0700 (PDT)
+	s=arc-20240116; t=1757596772; c=relaxed/simple;
+	bh=0bqSOryJEQ/X3+/vSnEr3yI4I9N6P79OuHfoWbsAg2w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fjXMf/RwmqJdiD0QChuESFIPqKU/qwmmGmDmCxPAqK1veaYTyTKcEFVCSL0IsNuqUQg3Yb/VJXLI2siXfrOq7jxE6hA/N81wgpixSR2K2qgrX0U8tw4XD93Xusms+D00q/J7JwMDS9tjcCQpQxcZuWsLOV7pyzmKxVzGdESMDXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=c8jmXGwL; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45decc9e83dso4286015e9.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:19:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757596502; x=1758201302; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1757596768; x=1758201568; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m89lThiGHpcn4DUoXeNLI6soHQXzWM/QJgRk2t7Qa7M=;
-        b=spibFGlQ16o8UipR6OnZfXW9NpIg+mkvTyfX89ZyRn4J9jjq1itbq/VV4DHIflPd/X
-         M16qYNzYXa+dLd80GT/FluOFS4mue4iynZnWL7HoAsIbjGg4mAenh1hf1hc1/tmji5Em
-         KrdD8/VainiB2U8WAnZ+A/OQhRasWRCBTYPBHrg+X38CV8z5tNiHB0eBDiCzU8yrUNvx
-         8p0ar8MvL5Ev5Fh/mWb5ym+TBb8n1I72uNXe95uByrdHb3+xfSLuhTlwbhHzzUKxcD/a
-         yahuT7+8qZet65bvg/5ktTsz72DLJtm2Tq2YTkybmyq5X5invgoXOF+O55fU+nEwaUdM
-         ibuQ==
+        bh=RoTjGjEf5o3PoFa4Kwu5lnAnxIVCW5Ws6ti5lef2kWA=;
+        b=c8jmXGwL0xzs8zb1abu5BzxzKey4ymBXTIgFJY6lILtF7HJoSnsCppAwVXMQzT1Rgf
+         q5h+RWO7Js5D5A00RsievlHEpipbAxWilWlz2EwZjwvlmNUzd4fTYgHfLZN1dirubq4T
+         s29hz5+7yMIWoFkZ1ODYKMTvXdzzxP5xZTwMCFEjl2Axguux2v/t/Xaql41wm9e7blvh
+         XyGIWXvWtmP1rHuc3eJ44TF7YT89LLPJy2l/BOiDdrcJBRtpsiDF5gQOLOgUNQ6q2lcT
+         HPTz57/oWzzwG1sAhtm6ZV5mMYVg0Vyk1yFu199Gkkc51wnrc5ZDvwsUI5lAbLruS8wJ
+         luow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757596502; x=1758201302;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1757596768; x=1758201568;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m89lThiGHpcn4DUoXeNLI6soHQXzWM/QJgRk2t7Qa7M=;
-        b=VN/1CG7Gzpmys6JxAbV1oZEfA/EgLPkl3LZpgHztjh/iiY0KATtnxDt+QRlfAnkQ0g
-         L7pglUFLhHmt20X8JL7/XxfNf6XpfeEt1vB3CoVdM/hXYr3mX5LFLTGR1hA7bAIStjiq
-         uO0+0rdMrzJ4cOxaj3CuPAAiJbyQhXYNN8RX7hW9+H6poeYbHa5jQv836QMgSk0+xq95
-         TlGO00EmHh8/WqcRvPbkeTon3ysuwNRUab3xuQZMECuFcPSuSskufxYz/GEfTesCVLtr
-         5l/73ZhrtyXIi+dUVZ3i6uhXD21yla3O9S6T6Gfv7WV2C82JwH8AOgjnd4PK8fvi0bQA
-         h0iA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3wLITJsx9CfyeiWNT3ak7iU3Sy4b/IfBwSAcQoPwosKPht0G6foWjngCg004AMBAaqoAqoOw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqdHg/2PmXqqa+KcdkDY/95B6gSEcnyowWo6Z1EtDxz1TpS+qj
-	k5T98vQ5kBoBbpVIZ1S8EvnJTLVNz9EdoBex0q+By0Z2SLtMQxIyP9lfqfp2SrCdJ7TKBcpT4wa
-	NlsxnMJ2fLsg0ha6y5EKOO/W3gDvH3G1Y6Y/KXGGV
-X-Gm-Gg: ASbGnctx6S0MOcVEi1uxp8vVFG0b8ui6vpmAFIVTvNvCDkx/Dn0HA+WIq7xCZXdfIqy
-	rgum0ZU+RMp4whlZJV55Km+tlexvYRPSh29i0s+sQnEa8xDJzak836lSYiWyS1VRzMJNtUIghSA
-	LORbYEVut+5QemnPJcUDp4YgYPNAxfSEUuPnPTeUIW52TDjp79liMGJodVcR1w4AWz9uzuSPiIK
-	o3xlfiaSpk4ytpePclGS2el
-X-Google-Smtp-Source: AGHT+IGIFHagHDSkEorcDOmHFA0hr15/XcJBaSlOhnPlKEK6spa+aRn1vk32LO8prgZjy2sfuW+qceEq4tHAHByM7ls=
-X-Received: by 2002:a05:622a:55:b0:4b2:8ac5:25a3 with SMTP id
- d75a77b69052e-4b5f84b5754mr252983901cf.76.1757596500594; Thu, 11 Sep 2025
- 06:15:00 -0700 (PDT)
+        bh=RoTjGjEf5o3PoFa4Kwu5lnAnxIVCW5Ws6ti5lef2kWA=;
+        b=ImXNRKnCXqjf8Ksbfb6TAmtKaziQHOEkFRGkWrj5ImLL5h4V80iRmR4wyZGCiYNDVP
+         +Bg/38A8RYsJdZHy+cPUnfCQTyLmHs6rRA+SFAPLNglTBUhWrso7J51f/FtmS5Yq6sDC
+         sOOvL/ZNRFgaJZ/890YhOjEO6PBFCSCp+Wg5WYA756k6X7/7QLt7IzUTCsWorj1g4jJx
+         HAZLdn1Avm9iHswNeon/Pj/JtrtsNlCuPaQQhsU88NAp1Lrik4s8aEh2arUcBJqunQht
+         UdKjU32B64b+WA428NPvsmbsPVz5Udckjos5Moo/5Eyg5tRrdJmHq5Ijffb2KHBW8dUc
+         bI9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUY3huFUEwIs3my9DYWIm+eDhpsCmzd67CJb18z22QLgvYO+36PMWwjrOSo4koa2gbrQeE1+0w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHt2F7fHk+sgrn1JOCVckrZcCaSG5Fdcj+60yKk6WXZTj8IQs1
+	CEJqkS2yRo5AlXZU4qiKZyZt/cEklCJi8q6Js6/X74SoG22QakpT+dNbZSeYLjSxDy8=
+X-Gm-Gg: ASbGncvUUTp9X+Buwa5hCmOdGNXV6yJj8QCJ/iC3r/aliq3WSa3p9Dao7f3lQHqkdHk
+	aIAAqIfmALT7qzVdG4vsoh8zcvGHkULvHj+V/OOFKutlVChtpB3jJVk6ucxrA3/jyG+Z+sW1tC5
+	DpZKXv3AUKQfuqZKE6Oy7R+Z4zy1MDpwVGzwppqhOooRl95KIU7tdfFPgPnQgFYg16UWPCOVXjr
+	Ru0Lgs1Z5qznfX1ZE54a+OwYz7HjMWsrqYkXab162hEGpgpvOrT57nF9nioE3TeXLn1qGEWZLeH
+	/JlzY5q3U+EclQOW6Cum/C7e23jhLjFZ4fIdwUI1ku28tpVdAFo73udGvs2NS2qjqcX9L3SKx8B
+	dUbTnkP1baf2Upn+z0pnWw+s=
+X-Google-Smtp-Source: AGHT+IH8nHuk3NSLqjFY2vj/PBH77XKaFOpHdcKlyadMrh/8ELLpleuBiAgM8Qj5GJ3//zqteimh3g==
+X-Received: by 2002:a05:6000:2886:b0:3e2:e079:ab32 with SMTP id ffacd0b85a97d-3e642309dc7mr17268671f8f.7.1757596767963;
+        Thu, 11 Sep 2025 06:19:27 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:3e84:ca5d:e1de:73b8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7607870c4sm2483656f8f.22.2025.09.11.06.19.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 06:19:26 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Ulf Hansson <ulf.hansson@linaro.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	kernel@oss.qualcomm.com,
+	linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	Monish Chunara <quic_mchunara@quicinc.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>,
+	Nirmesh Kumar Singh <quic_nkumarsi@quicinc.com>,
+	Sushrut Shree Trivedi <quic_sushruts@quicinc.com>,
+	Vikash Garodia <quic_vgarodia@quicinc.com>,
+	Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>,
+	Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>,
+	Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>
+Subject: Re: (subset) [PATCH v4 00/14] arm64: dts: qcom: lemans-evk: Extend board support for additional peripherals
+Date: Thu, 11 Sep 2025 15:19:25 +0200
+Message-ID: <175759676089.37240.12221834042390731955.b4-ty@linaro.org>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250908-lemans-evk-bu-v4-0-5c319c696a7d@oss.qualcomm.com>
+References: <20250908-lemans-evk-bu-v4-0-5c319c696a7d@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911034337.43331-2-anderson@allelesecurity.com>
-In-Reply-To: <20250911034337.43331-2-anderson@allelesecurity.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 11 Sep 2025 06:14:49 -0700
-X-Gm-Features: Ac12FXyGkA7EfDNm73LKWj5ZRtRA_sD8e4Ox-VzRGuY9LKyWNf3W4me3uIIm1UU
-Message-ID: <CANn89iKUKof727RDZkbfA-Q3pbV0U-pTH19L-kSvhhhtkKYGTA@mail.gmail.com>
-Subject: Re: [PATCH v2] net/tcp: Fix a NULL pointer dereference when using
- TCP-AO with TCP_REPAIR.
-To: Anderson Nascimento <anderson@allelesecurity.com>, Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: ncardwell@google.com, kuniyu@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 10, 2025 at 8:49=E2=80=AFPM Anderson Nascimento
-<anderson@allelesecurity.com> wrote:
->
-> A NULL pointer dereference can occur in tcp_ao_finish_connect() during a
-> connect() system call on a socket with a TCP-AO key added and TCP_REPAIR
-> enabled.
->
-> The function is called with skb being NULL and attempts to dereference it
-> on tcp_hdr(skb)->seq without a prior skb validation.
->
-> Fix this by checking if skb is NULL before dereferencing it. If skb is
-> not NULL, the ao->risn is set to tcp_hdr(skb)->seq. If skb is NULL,
-> ao->risn is set to 0 to keep compatibility with calls made from
-> tcp_rcv_synsent_state_process().
->
-> int main(void){
->         struct sockaddr_in sockaddr;
->         struct tcp_ao_add tcp_ao;
->         int sk;
->         int one =3D 1;
->
->         memset(&sockaddr,'\0',sizeof(sockaddr));
->         memset(&tcp_ao,'\0',sizeof(tcp_ao));
->
->         sk =3D socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
->
->         sockaddr.sin_family =3D AF_INET;
->
->         memcpy(tcp_ao.alg_name,"cmac(aes128)",12);
->         memcpy(tcp_ao.key,"ABCDEFGHABCDEFGH",16);
->         tcp_ao.keylen =3D 16;
->
->         memcpy(&tcp_ao.addr,&sockaddr,sizeof(sockaddr));
->
->         setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tcp_ao,
->         sizeof(tcp_ao));
->         setsockopt(sk, IPPROTO_TCP, TCP_REPAIR, &one, sizeof(one));
->
->         sockaddr.sin_family =3D AF_INET;
->         sockaddr.sin_port =3D htobe16(123);
->
->         inet_aton("127.0.0.1", &sockaddr.sin_addr);
->
->         connect(sk,(struct sockaddr *)&sockaddr,sizeof(sockaddr));
->
-> return 0;
-> }
->
-> $ gcc tcp-ao-nullptr.c -o tcp-ao-nullptr -Wall
-> $ unshare -Urn
-> # ip addr add 127.0.0.1 dev lo
-> # ./tcp-ao-nullptr
->
-> BUG: kernel NULL pointer dereference, address: 00000000000000b6
->
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-CC Dmitry Safonov <0x7f454c46@gmail.com>
 
-<cut many useless details>
+On Mon, 08 Sep 2025 13:49:50 +0530, Wasim Nazir wrote:
+> This series extend support for additional peripherals on the Qualcomm
+> Lemans EVK board to enhance overall hardware functionality.
+> 
+> It includes:
+>   - New peripherals like:
+>     - I2C based devices like GPIO I/O expander and EEPROM.
+>     - GPI (Generic Peripheral Interface) DMA controllers and QUPv3 controllers
+>       for peripheral communication.
+>     - PCIe HW with required regulators and PHYs.
+>     - Remoteproc subsystems for supported DSPs.
+>     - Iris video codec.
+>     - First USB controller in device mode.
+>     - SD card support on SDHC v5.
+>     - Qca8081 2.5G Ethernet PHY.
+>   - Audio change [1] to support capture and playback on I2S.
+> 
+> [...]
 
-Really I do not think you need to include the crash in the changelog.
+Applied, thanks!
 
-Just mentioning a possible NULL deref should be enough, it seems
-obvious skb can be NULL here
-now you mention it.
+[05/14] dt-bindings: eeprom: at24: Add compatible for Giantec GT24C256C
+        https://git.kernel.org/brgl/linux/c/c7ec58c39b0252e6635dde55e5c708132ab25cfc
 
-Real question is : can a TCP-AO socket be fully checkpointed/restored
-with TCP_REPAIR ?
-
-If not, we should just reject the attempt much earlier, and add needed
-socket options to support it in the future if there is interest.
+Best regards,
+-- 
+Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
