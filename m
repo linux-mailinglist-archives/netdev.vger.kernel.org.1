@@ -1,223 +1,228 @@
-Return-Path: <netdev+bounces-222204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 533DBB5376E
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:19:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 836D6B53801
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE6137BAED8
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:18:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 360365A4103
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2EF369338;
-	Thu, 11 Sep 2025 15:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BD7345752;
+	Thu, 11 Sep 2025 15:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="H9jOcS9S"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LVdOkP5e"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968E33570D9;
-	Thu, 11 Sep 2025 15:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE9D20FA9C;
+	Thu, 11 Sep 2025 15:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757603768; cv=pass; b=IFs3LHMEYprVkz9Tt50hKjYdx5J+Qqu+PAcHFAgrQyZpFw8MFCKii//qspsN4dYx+oDxm5vWX9eXzaEN4rho84bYUHeIEALEb8+4kzM4ibI9Zf5hpkI0ylMJdC1HWtXrdZx2kjfm4GM3QdGY31MiCZ12KPOy1CocIwmjkA6EwLo=
+	t=1757605274; cv=fail; b=kiN7GF60UmeMaPpctiq+dIK8o2tGb15ec1Fdt622hO4Ty3dJiGZwivZwoZ1QrEciBToptkpWF68ZKahMgTNLwRPHjclzJ/1BvLk8gN9bSZg2h284LEGD91xZnxG9+GRLZQwdu9ZJBtN+QDh2kbi/PnCL52546FjPu+w9/+icnS8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757603768; c=relaxed/simple;
-	bh=8m+L9EuCiB2kd+H+6i0/olJjoUQfOiV+U9l4XmnkecM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O8sxg1crDxLfeTODI7/MG9tYdLYJB3ntOFIhUQprfx1HA4pST7FZa2dfnbahKqJNxdVLNgn84cS2zqLp7dkWob3keICLP3iTjCvqgn9WZEsz7nScVfzlFX0yyAsV7a2MXHrXPFrVmFqHodDba/WSM+x0H3SVfe3P9kdDaJAOQAA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=H9jOcS9S; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1757603713; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=XdFivKCZ1zSV2DL8A2apCZSVhyGEctH5ibbsN5jnFp92ih8VPPHUt1cYWhfClmon7J3wdT8XMj835fnw3QSHdTqDIxOx9aCzGLYJA3MrC1PM35mhAw9g4XRSaMvjWn0Ebda4XdnOLXWLtITXwA+ZSUO3MG9s0cd845vDoG9CAYo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757603713; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=5GbnEMgGDcefdIhwqbOGABlaP4C+kCbcjuGMBFPW0FU=; 
-	b=AJrDS76FnZIW0jLOYXGptiWpzTsBY+npeA8L7BwDefMBU9NbrNHLq5zshxQ6M9UrIsvXqA9LyHtkTCul0qwIFQh2RuSjtHZnC0VBqs5hohXvNancIOHVZC2uroKOXNJxEcmbfsCm1bodh69SN+uOvAnD+aTfYV6zKMe8pJ4GNiI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
-	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757603713;
-	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=5GbnEMgGDcefdIhwqbOGABlaP4C+kCbcjuGMBFPW0FU=;
-	b=H9jOcS9Sf+b45wYgJY5wui9mLzHAFv/8dEF8qzkXIwmkNeLdBo+3737VQFbvZ329
-	cmuyy3V5VCxxklt+8rkDs/4GE0lvqHaocm3GFfgriUVQNIxO+SuJiePrxoKtuMAXu3C
-	ptx0CFAAXKTJtBC4k5JxeWR+Itv5KV3s+U4F5ous=
-Received: by mx.zohomail.com with SMTPS id 1757603711035627.8749849505076;
-	Thu, 11 Sep 2025 08:15:11 -0700 (PDT)
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-To: airlied@gmail.com,
-	amergnat@baylibre.com,
-	andrew+netdev@lunn.ch,
-	andrew-ct.chen@mediatek.com,
-	angelogioacchino.delregno@collabora.com,
-	ariel.dalessandro@collabora.com,
-	broonie@kernel.org,
-	chunkuang.hu@kernel.org,
-	conor+dt@kernel.org,
-	davem@davemloft.net,
-	dmitry.torokhov@gmail.com,
-	edumazet@google.com,
-	flora.fu@mediatek.com,
-	heiko@sntech.de,
-	houlong.wei@mediatek.com,
-	jeesw@melfas.com,
-	kernel@collabora.com,
-	krzk+dt@kernel.org,
-	kuba@kernel.org,
-	lgirdwood@gmail.com,
-	linus.walleij@linaro.org,
-	louisalexis.eyraud@collabora.com,
-	luiz.dentz@gmail.com,
-	maarten.lankhorst@linux.intel.com,
-	marcel@holtmann.org,
-	matthias.bgg@gmail.com,
-	mchehab@kernel.org,
-	minghsiu.tsai@mediatek.com,
-	mripard@kernel.org,
-	p.zabel@pengutronix.de,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	sean.wang@kernel.org,
-	simona@ffwll.ch,
-	support.opensource@diasemi.com,
-	tiffany.lin@mediatek.com,
-	tzimmermann@suse.de,
-	yunfei.dong@mediatek.com
-Cc: devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-input@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-sound@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 12/12] dt-bindings: input: Convert MELFAS MIP4 Touchscreen to DT schema
-Date: Thu, 11 Sep 2025 12:10:01 -0300
-Message-ID: <20250911151001.108744-13-ariel.dalessandro@collabora.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
-References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+	s=arc-20240116; t=1757605274; c=relaxed/simple;
+	bh=5VuiKf7uePYlLDouK/jnTDbHJ9r3O7RBP6vsfDpi2bk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=g4SjeO4lLLMWqnF2GazgnXZ2tUV6mIN7e4AWgEkfP+AE8L6H+kK05rgmqFTypPUjqYXqxzpiX1Ia0BhVQsOA2ig05qnaPZl/nGVif/21HyqGmel9P7BY/L8hgGKgfouY4I9fy493rHRgKbw33YepHdCVFERfCccnTpH5WumNvwM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LVdOkP5e; arc=fail smtp.client-ip=40.107.237.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hdK3xjycymp6FF2LcZGUm7DEAZJAIAEOvFH1b9xjmegyJI9bVpe+UyiKHSTviVjtMIagMjsoprKAQIFxLdTP04lO/OSE4vbE5Iw8wAeSiX32jInqXOlWuY/OEX4l/dhej0A25tf8Kq+tzNsi4iPQdWWECmWhGCj7/7QKeKTbyGoe4XeocE8LCL0RUIqzQCoVQGqsAxrO8iO+sKyxwnGmpOn919/jhhCX7q0LtRd7by50qF7Ka8FrSluXJEve5K9305dJqDsc1VsZmuKQDYHl4OAjIxrHT5RjpqrO/5M6L5rMuy9BZnlRPWRs4c15TVNOCrq65fIvsQ4hdqspl08HBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f/dzKFu5pmjAxFlzqXJLKewgA12KlzEgFjQwFQ8tSR8=;
+ b=G3qESmR9R9lHnRkjZx28oDvehRqmxEzJ27+cHzrjt5OtkXWhrFfPh+RdKm4DOc9hZivxsuJhVDwa48YHeT7dHoi6R/+D71CbwS9eRf3p+lskhv2Lrp3CSsfia6zoRGTmmqb6i2Lwp2k4PfXWlolCDjGBqpTKsUxVsAi6B1CexVF5jVUfM18FPou9wb2wW5kVZnyYoDurGpI5BbCHqLGJML9Q5fyx4QsXw+emm0QAuMoarX1ZRAlC20a72D4KAQwFOh2n5fVqwzac0P8/i+Of/TSaHAKwnZR/JhLRoT+kyV5Iy2c8A171ypfcY7EXqueFItwFb9cUHLofmMDfU+TgWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f/dzKFu5pmjAxFlzqXJLKewgA12KlzEgFjQwFQ8tSR8=;
+ b=LVdOkP5eo6BMp0E/7XDJy8SIFAgEOs4q6vq42xZ2PdbOtQn1DfTJWqYkIg7YGg1piR43WrkTT/UtPZG+8ZihDEIcJ8OaXEnpOzcXfI2GBfNn5gQ3MkuW/gjdBQ3ZjyZaLI9f0D7f1OcKUAKvfanYBUqoL2VwW/vuRfMiVj2iijQ=
+Received: from MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15)
+ by PH7PR12MB6979.namprd12.prod.outlook.com (2603:10b6:510:1b9::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Thu, 11 Sep
+ 2025 15:41:06 +0000
+Received: from MN0PR12MB5953.namprd12.prod.outlook.com
+ ([fe80::6798:13c6:d7ba:e01c]) by MN0PR12MB5953.namprd12.prod.outlook.com
+ ([fe80::6798:13c6:d7ba:e01c%6]) with mapi id 15.20.9094.021; Thu, 11 Sep 2025
+ 15:41:06 +0000
+From: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
+To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Simek, Michal"
+	<michal.simek@amd.com>, "sean.anderson@linux.dev" <sean.anderson@linux.dev>,
+	"horms@kernel.org" <horms@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Katakam, Harini" <harini.katakam@amd.com>
+Subject: RE: [PATCH net-next 1/2] net: xilinx: axienet: Fix kernel-doc warning
+ for axienet_free_tx_chain return value
+Thread-Topic: [PATCH net-next 1/2] net: xilinx: axienet: Fix kernel-doc
+ warning for axienet_free_tx_chain return value
+Thread-Index: AQHcIu3ACEM8+K2X/UGMrGFnoxpALLSOHqhg
+Date: Thu, 11 Sep 2025 15:41:06 +0000
+Message-ID:
+ <MN0PR12MB59534339999B93E3C8D25E90B709A@MN0PR12MB5953.namprd12.prod.outlook.com>
+References: <20250911072815.3119843-1-suraj.gupta2@amd.com>
+ <20250911072815.3119843-2-suraj.gupta2@amd.com>
+In-Reply-To: <20250911072815.3119843-2-suraj.gupta2@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f265efc6-e181-49d6-80f4-fae95cf838a0_Enabled=True;MSIP_Label_f265efc6-e181-49d6-80f4-fae95cf838a0_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_f265efc6-e181-49d6-80f4-fae95cf838a0_SetDate=2025-09-11T15:39:37.0000000Z;MSIP_Label_f265efc6-e181-49d6-80f4-fae95cf838a0_Name=Open
+ Source;MSIP_Label_f265efc6-e181-49d6-80f4-fae95cf838a0_ContentBits=3;MSIP_Label_f265efc6-e181-49d6-80f4-fae95cf838a0_Method=Privileged
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR12MB5953:EE_|PH7PR12MB6979:EE_
+x-ms-office365-filtering-correlation-id: f29b3066-2115-4f9c-9e1f-08ddf1499f91
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|1800799024|366016|376014|7053199007|38070700021|921020;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?awEixjLY2IxIeHVMt8GBrrAoK1Z14N7aOa2vNpfSHC22bV4n0iqIgR7HqdQ0?=
+ =?us-ascii?Q?TNdhHWWl5YgQeFcIPKuNeuGoqkvuKxeVCbtpueKEbOPdN8kuW3AWbmhvqa/W?=
+ =?us-ascii?Q?mOGsAl/gxj2SannDgjsGh5iTde1/0tIk8bknJK4hE3g/QnCpz01Yaeuo8PDG?=
+ =?us-ascii?Q?W9QK9Nq5NrbxPtXXPockwIA6ilUZfdpsjPkbR7IIQNGUGJ0mJr4JMXshL4g3?=
+ =?us-ascii?Q?gdm6o4UJSKFdBPciDyoCDhgym1MXJISoTOjQN9daAzXOYP4qb6L2IvJOZ2BL?=
+ =?us-ascii?Q?7S7Cdk0BWkMucGzgYMTQ5fYZpJH+JTDielQALhgJXhJsR4LRu/dVSqGp9bTj?=
+ =?us-ascii?Q?ObIYkO9Eb6rsXs1pnJ4Bmu3eT9im2KpF88xpjdHpO2mhj3gGKkXvZdGHigWv?=
+ =?us-ascii?Q?+qahwHS1NVIUexw1kJTXB2lbqGBBLOQCD6q3jsykU2rlwranJGuNHHrFmHCJ?=
+ =?us-ascii?Q?84E+Po8Y9mwNXvjD8JbCzvohwtr9kZDovD8xRt4oS7LMtK4uHWNnt4f7mp7D?=
+ =?us-ascii?Q?NyqLuaaoCm4UGY3jGpv++nVWX2k9CmsmpSW1POQh1/tVd7YB/AnLGS7U/dSh?=
+ =?us-ascii?Q?Gh1RSuPX8RqYYtvjeOL7P9yUMMphSbY5SsZUt4D7itB5XZyUHkfeCzBTa3V8?=
+ =?us-ascii?Q?GnsYUsUulIzwwhRlzkfMoDDQImxYtYQZ+5ANSApAFrmSbb8XjGcDXnUS/RIL?=
+ =?us-ascii?Q?+NWsMBchk/jLmT5Lql+XZHU6RLcrtZEpXGMQ142rMBbJ6KqAn+VsGTaDlK2R?=
+ =?us-ascii?Q?yr1k0tSt2wHhMr3zMG9AEW+H9LwKnFGXApJ9VC1RKfX4p/8jLEHWqwrB5Pyi?=
+ =?us-ascii?Q?x3SEU4TFkrJKNC9clTCSWbHUFv4o4m1uM1jcuLsNhiREzK82Jl0lXy956aWN?=
+ =?us-ascii?Q?OwqjuW5+hRJ45aYh2wRzRq0WOXpwlPUbV7+DPOuFnYL+hkb8gt+pHkwcM//5?=
+ =?us-ascii?Q?5L8O0m4f1z1QPxTNcIRgh2XUZS1yd2V3OW5JtHbFHrS80rLnIJYnctpiBGpk?=
+ =?us-ascii?Q?5IAty7eJDoPHRomqHCN67X95GTOnAu8h3B0qwpQS8UuBr+Hm5kJSoV28u9cm?=
+ =?us-ascii?Q?L3/aaMz2elLqxAGGR0j5iv4zD8fuV+qYNn6kpsJMt+GguQ/Sx15DAgbI/tLT?=
+ =?us-ascii?Q?H7+DBNaYkt8w1bDtcTWK22pv5rGvi7Zv+WB7IJu3suSePEhrIJpxXkETn1js?=
+ =?us-ascii?Q?hBi0f8cDxrgCyofzpEj1xeELROY10hkAs/736cfSYeEDdmFOiqJiklCJMnNh?=
+ =?us-ascii?Q?EfAJgdUolESpH4Be7xl5rWmO5Q/x896IO3aUzJ4THUF4LIihGYhsAVsMPgMh?=
+ =?us-ascii?Q?Xo2N/KU2jXILkEy/uVIaiJfw7PK5zcaC+cILgGUCDVnP916AbnElGxf5sgwm?=
+ =?us-ascii?Q?le2UI9+uzHrkpiOAGnQFSf+ExB8wWIGVzHywOCOdVnj2d6QMcfOveR6ksReZ?=
+ =?us-ascii?Q?D38P2F3AoIolUKdsVI8/gPpNJkxQPQLMYLm/SeOnK34UEBSckX5tMvV9fdrS?=
+ =?us-ascii?Q?zKKeUVgId9TL1nw=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5953.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014)(7053199007)(38070700021)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?+idUZuHSXpDbZ+vYsU6L0og4Q2G/wio0WrlUAru1twC1B6lr+NRACVJNXCjt?=
+ =?us-ascii?Q?YyyfHVqceiAo3O8YCtIoTLtoS0p77FGBKQ/RF4DdDgRujv9Ig5bsWOffxLrw?=
+ =?us-ascii?Q?vDdRwF+3A/m4EQYckhZvZ70Y0+ShmL1bCbw6p/GODTxaQ4Q4EwUrMau7pk2W?=
+ =?us-ascii?Q?HQI08X6l/0rJ5A30VHC/Z6uqg2wfLC7rrCovQYlHzAgLYjZUe20yIMus/RVW?=
+ =?us-ascii?Q?rWEDl7v35RfnYLYrvG1ElFe6fKZYyhHVY9dXNMq0VNK+vYd//QiNb2TVyyNB?=
+ =?us-ascii?Q?h2iMiVzFUIk+F5co7uP+epmW7PD9X59QFzc2ssepbyQ1PxVQtHIeyySEAweH?=
+ =?us-ascii?Q?ZE0QepkGUjDPwi34Fg8bkVDA6wv6zXIDlm3rb1Sn5/xo7cJ+lQ5AgqabDQGT?=
+ =?us-ascii?Q?f8jSy/GLfVUbNo2CMq8XuZwUNBFy69oLZhNEj3yHK/gvNH33F1M8SrVGdShg?=
+ =?us-ascii?Q?oVvP0OxsEpQj3zcVt+i3iickQWC+AIrFduH8m+u3BKFCNSP7IYM5p04y9Xtf?=
+ =?us-ascii?Q?3ViaTv1WIM0swu9CeDyke0KLd2y/WPfNAs7SFHhPTNvC9TDHkxOCerXsjVik?=
+ =?us-ascii?Q?8vP63lnvp7y/2oYMz+iO79doteLyORaMSKCZkBwMyws4Y3bzBckzbTCBYlsH?=
+ =?us-ascii?Q?oyoNxRSIC7rbxePTUsSUBaM7hCu61A6vULHmNYcRjKTjsvX7KsRYFGXoytJr?=
+ =?us-ascii?Q?Jiqc9ZmrSJYC7Aqn+gNi7RuXGdAbmpwVzg+Y9Q1CrsvBxFE+ZUG0l1X30nyN?=
+ =?us-ascii?Q?T4cx/dq8lpZkiClQSdT9/blMoIGA9VRDnbx3f34bkwjP5AywP2UXB7fGx857?=
+ =?us-ascii?Q?N9ypJdLfVLuxw5fc0pwLR+CrfbUi3+Rn7DVnHKck9jti4hOrn7NZFH2zwwC8?=
+ =?us-ascii?Q?asarbmIEt8eRp4h6Lb2p1NyGwd+IkKptWkjojNc1qJwyx6YYAIG0jOMgeXyT?=
+ =?us-ascii?Q?DEfy5Lqkk9WC1YBJBHvS34j7LgWQ2M3vSWKb0XBbTbuDwOOqeKe3K77l2+5J?=
+ =?us-ascii?Q?0YtREXExh0SGRQMt46R5ewdhLdKzLCZs4bZGdHhATjBTLKTXU4+Lw6fqvZIP?=
+ =?us-ascii?Q?em9Ug1EtWx2ueiz8f3awy2Ei2UXK89nIbGTaN4xlsA4SQlU/UW3RwTgk3VNF?=
+ =?us-ascii?Q?id4fG/8/SEnlmUaIhEhcpgALBFPuDGhf+2orx6askHm6swOvjebwRUG/6g2E?=
+ =?us-ascii?Q?RR1Ne9JT2SNzXMnODDYVOguWK6nHMkYKBT9LQ2LxGfexeq1JrInn/TfjMJBK?=
+ =?us-ascii?Q?1cuAhjNkeGBtzDRGsZSDsMmoLoN9qblvNKSbKHvyqX292NT8khP9wafd145v?=
+ =?us-ascii?Q?fiU0fWG31prd3P2osaatTW6/jf696DF0U1g3NYgAgYbL+7huJrUZ62u7K5rH?=
+ =?us-ascii?Q?cWP7ItTfjcsUMwDMoPJYPcKheFAqkZPlEIpH9uH/y4J6udWEse2ZqPWjah1j?=
+ =?us-ascii?Q?x6o+ZfoZWEGCqJFeks4YewF5eCIzyPyhGEMpYwfDgaHnoad8LXOn2j93ouci?=
+ =?us-ascii?Q?sTq9S9ugW81CrsduVd3CwjB5mSUWfe4J+NTfblrcTbqvewYDhZZcmdmResAW?=
+ =?us-ascii?Q?X033LHRpKweHDdYk03w=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5953.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f29b3066-2115-4f9c-9e1f-08ddf1499f91
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2025 15:41:06.8185
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Bf7evDC5Z8yKx5xnl8VzT3k81NhE88hnpamhqGxHu/23rt/8sLWNYf2Jm59r3uZ/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6979
 
-Convert the existing text-based DT bindings for MELFAS MIP4 Touchscreen
-controller to a DT schema.
+[Public]
 
-Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
----
- .../input/touchscreen/melfas,mip4_ts.yaml     | 56 +++++++++++++++++++
- .../input/touchscreen/melfas_mip4.txt         | 20 -------
- 2 files changed, 56 insertions(+), 20 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/input/touchscreen/melfas,mip4_ts.yaml
- delete mode 100644 Documentation/devicetree/bindings/input/touchscreen/melfas_mip4.txt
+> -----Original Message-----
+> From: Suraj Gupta <suraj.gupta2@amd.com>
+> Sent: Thursday, September 11, 2025 12:58 PM
+> To: andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; Simek, Michal <michal.simek@amd.com>;
+> sean.anderson@linux.dev; Pandey, Radhey Shyam
+> <radhey.shyam.pandey@amd.com>; horms@kernel.org
+> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
+> kernel@vger.kernel.org; Katakam, Harini <harini.katakam@amd.com>
+> Subject: [PATCH net-next 1/2] net: xilinx: axienet: Fix kernel-doc warnin=
+g for
+> axienet_free_tx_chain return value
+>
+> Add proper "Return:" section in axienet_free_tx_chain() description.
+> The return value description was present in the function description but =
+not in the
+> standardized format.
+> Move the return value description from the main description to a separate=
+ "Return:"
+> section to follow Linux kernel documentation standards.
+>
+> Fixes below kernel-doc warning:
+> warning: No description found for return value of 'axienet_free_tx_chain'
+>
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
 
-diff --git a/Documentation/devicetree/bindings/input/touchscreen/melfas,mip4_ts.yaml b/Documentation/devicetree/bindings/input/touchscreen/melfas,mip4_ts.yaml
-new file mode 100644
-index 0000000000000..314be65c56caa
---- /dev/null
-+++ b/Documentation/devicetree/bindings/input/touchscreen/melfas,mip4_ts.yaml
-@@ -0,0 +1,56 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/input/touchscreen/melfas,mip4_ts.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: MELFAS MIP4 Touchscreen
-+
-+maintainers:
-+  - Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-+
-+properties:
-+  compatible:
-+    const: melfas,mip4_ts
-+
-+  reg:
-+    description: I2C address of the chip (0x48 or 0x34)
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  ce-gpios:
-+    description:
-+      GPIO connected to the CE (chip enable) pin of the chip (active high)
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    i2c {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        touchscreen@34 {
-+            compatible = "melfas,mip4_ts";
-+            reg = <0x34>;
-+
-+            interrupts-extended = <&tlmm 13 IRQ_TYPE_EDGE_FALLING>;
-+            ce-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>;
-+
-+            pinctrl-0 = <&touchscreen_default>;
-+            pinctrl-names = "default";
-+        };
-+    };
-+
-+...
-diff --git a/Documentation/devicetree/bindings/input/touchscreen/melfas_mip4.txt b/Documentation/devicetree/bindings/input/touchscreen/melfas_mip4.txt
-deleted file mode 100644
-index b2ab5498e5190..0000000000000
---- a/Documentation/devicetree/bindings/input/touchscreen/melfas_mip4.txt
-+++ /dev/null
-@@ -1,20 +0,0 @@
--* MELFAS MIP4 Touchscreen
--
--Required properties:
--- compatible: must be "melfas,mip4_ts"
--- reg: I2C slave address of the chip (0x48 or 0x34)
--- interrupts: interrupt to which the chip is connected
--
--Optional properties:
--- ce-gpios: GPIO connected to the CE (chip enable) pin of the chip
--
--Example:
--	i2c@00000000 {
--		touchscreen: melfas_mip4@48 {
--			compatible = "melfas,mip4_ts";
--			reg = <0x48>;
--			interrupt-parent = <&gpio>;
--			interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
--			ce-gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
--		};
--	};
--- 
-2.50.1
+Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Thanks!
+> ---
+>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index ec6d47dc984a..0cf776153508 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -773,7 +773,8 @@ static int axienet_device_reset(struct net_device *nd=
+ev)
+>   *
+>   * Would either be called after a successful transmit operation, or afte=
+r
+>   * there was an error when setting up the chain.
+> - * Returns the number of packets handled.
+> + *
+> + * Return: The number of packets handled.
+>   */
+>  static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
+>                                int nr_bds, bool force, u32 *sizep, int bu=
+dget)
+> --
+> 2.25.1
 
 
