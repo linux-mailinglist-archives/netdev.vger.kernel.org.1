@@ -1,111 +1,138 @@
-Return-Path: <netdev+bounces-222143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C23B53404
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:41:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FB2B5341D
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B21394E01E6
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:41:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E513B61CE5
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2349C338F5E;
-	Thu, 11 Sep 2025 13:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0075032F749;
+	Thu, 11 Sep 2025 13:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I729FcCZ"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="NsRlRzli"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A64338F55
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 13:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757598023; cv=none; b=XK/B8tckdputmlsJ6WiduJYR+SfV/AVvODU8Qgo7MolgvTNQFnbqJJyF/z6N5iJ3VkfpoLuK8dgDWSLqR8CwvWIMrofZOvhDbOdZBsKIeKKippk4eGwlkX98ayN2KlNh6YDNP2Vv1oNN8BX8acU9RztVWI2ZKK3lGrjIGU6/NvA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757598023; c=relaxed/simple;
-	bh=k+AwP+Z8KbyaIwb8eKGCi8qnaBoAmcTFFD/Bl1o8oXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Oz9l4oaXqGbAvryIgbQcH+giDpmUGdhw/Pm9Q04nNpEtJXnA8yi2TXaLJB1lB4UxDFZmzcxZqW5mAZLvX+AGk61YUaA9jiAK5TxMgfUPE8+9yYkXDfRr+VLxN/XsUPE6ISNBeghu1BRy9g9OIFVQYv5VpzCrPoMndBmkvIY4xcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I729FcCZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 358E3C4CEF1;
-	Thu, 11 Sep 2025 13:40:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757598022;
-	bh=k+AwP+Z8KbyaIwb8eKGCi8qnaBoAmcTFFD/Bl1o8oXc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I729FcCZr+AQnf88UgBcPJOKQ5AdAJNWVkIJHwBKgS+MbKp8V7UEHmxU38ztyrtoH
-	 aB9OOtFsyAMgAD6dK7KlTSkMVWZfnn2S92KjuXPnbBAKwQMJdEp0bN3mRCUlR0HIUH
-	 NuxRJnk5nwZXfsl52rs/9DPYc6yDZyiEo/L0JLzyUxE/fWFv3k0s2pwVdg4VXwHiCB
-	 PEbiZpVtrAtI6Qjcow5pCB4LKDHsLtm3oWcjoioYhHJdWZwufJ5pd9PRguEsjA4YMF
-	 6JOOYe2bJLjR9ki6I2wudX4Q0/WF8PNcAh4+So++V/sZ97KRwZRAkzrLknD7OSnoBm
-	 QUpp7RPYLwqNw==
-Date: Thu, 11 Sep 2025 06:40:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: "David S . Miller " <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, willemb@google.com,
- netdev@vger.kernel.org, mkarsten@uwaterloo.ca
-Subject: Re: [PATCH net] net: Use NAPI_* in test_bit when stopping napi
- kthread
-Message-ID: <20250911064021.026ad6f2@kernel.org>
-In-Reply-To: <20250910203716.1016546-1-skhawaja@google.com>
-References: <20250910203716.1016546-1-skhawaja@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD42C32CF87;
+	Thu, 11 Sep 2025 13:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757598125; cv=pass; b=O7S7Ls6tDoSkl/0IzZOUjn5TDtk4mWkVnOx/Pxh/V8ieknVDFpEdoIqBKyimAhTheEJAbliKFRkR70kqvsh+gqVqz19/Cb/o3gasNqFFW35ZaLVjU+PT+ZxH9QFMh95eMkvCNrVWDBR7EMGrFny3yCImNCf/tz3XlQ3i3H5W+5c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757598125; c=relaxed/simple;
+	bh=+j7wH6J9TwHPLevUCUsfv49hVVIfmnnJ50vL4o03eGs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g0NQbJJa1PT1tE3smNzd6Aj6LIXqEGnI6zLKCb3QguR6IkOinaKLdQsgYv4M3GNOfIvJGWzIDj5A+C5yzlaeNkM1VcGDZFyONDqSbkoG8MXGGvX9n6Lq1YCtEHVHggIV6TRMuBaXW21ckdvvDEqZn9gd+7QAoPKKC9ch+qO96RI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=NsRlRzli; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1757598055; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Wd4WA6Er9cB9s6Hkt5aT6OBU5Qo5bfiy5l1P+Xa+5VFE3pcj0EYC1irYclVw44xfA/LGEE1P3H5NoyDRj8g5aYL5DO6LFfOSdTi8Xo68/Y7PYyTuxxfNdOv2I+XK48iy/vJy4GjAsgOcqTkVjb0ACFfdnqJgaw2FRauP6e/Vqb0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757598055; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=akxgWnU52qi2aW5V4nycRXC1MA1p0XXtUX8b0SkdlHI=; 
+	b=LfUX1aQVAVFdHj8+y0//AJhf1fsHBn+VlpRO4LG22OXZv6/dMLXEYKunDdZoe364LrK8PnREgYhBB/fWBvWDinro5SWb85l1HU8gYCD9V+RoB8cvwAKdJEOq+hDpLHGB00DB6JJkrLd/THhPkaxSJdT3eQR6r8MibvY/ip2bat8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
+	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757598055;
+	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=akxgWnU52qi2aW5V4nycRXC1MA1p0XXtUX8b0SkdlHI=;
+	b=NsRlRzlifXvTvvkDhLOg2YrB9VbwSR8DvKqJVdp8u4HzCFR5KM3LbVsfzq9vFNLv
+	HWBTS+duRr9SPP50E7s5ev8uzaDXlk5sQhS7q0jMxjng1FJa7tsWMU7IDEw8Cg44Nka
+	20rr30YjpaoW+uxdoNzBf0ZcDiNq8aysDR0/skEo=
+Received: by mx.zohomail.com with SMTPS id 1757598052583569.5590919976829;
+	Thu, 11 Sep 2025 06:40:52 -0700 (PDT)
+Message-ID: <c473c6ff-856a-4950-9c75-7bace41886ca@collabora.com>
+Date: Thu, 11 Sep 2025 10:40:36 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 03/14] dt-bindings: arm: mediatek: mmsys: Add
+ assigned-clocks/rates properties
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
+ andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
+ broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com,
+ conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com,
+ edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com,
+ jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com,
+ krzk+dt@kernel.org, kuba@kernel.org,
+ kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com,
+ linus.walleij@linaro.org, louisalexis.eyraud@collabora.com,
+ maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com,
+ mchehab@kernel.org, minghsiu.tsai@mediatek.com, mripard@kernel.org,
+ p.zabel@pengutronix.de, pabeni@redhat.com, robh@kernel.org,
+ sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com,
+ tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com,
+ devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-4-ariel.dalessandro@collabora.com>
+ <20250821-electric-kestrel-of-awe-cb89dc@kuoka>
+ <1cf0b296-adaa-4c80-864c-9b78f09cd3e3@collabora.com>
+ <898bf39e-1b34-40e9-bdfa-ec4eca1c3f7d@kernel.org>
+Content-Language: en-US
+From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+In-Reply-To: <898bf39e-1b34-40e9-bdfa-ec4eca1c3f7d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-On Wed, 10 Sep 2025 20:37:16 +0000 Samiullah Khawaja wrote:
-> napi_stop_kthread waits for the NAPI_STATE_SCHED_THREADED to be unset
-> before stopping the kthread. But it uses test_bit with the
-> NAPIF_STATE_SCHED_THREADED and that might stop the kthread early before
-> the flag is unset.
-> 
-> Use the NAPI_* variant of the NAPI state bits in test_bit instead.
-> 
-> Tested:
->  ./tools/testing/selftests/net/nl_netdev.py
->  TAP version 13
->  1..7
->  ok 1 nl_netdev.empty_check
->  ok 2 nl_netdev.lo_check
->  ok 3 nl_netdev.page_pool_check
->  ok 4 nl_netdev.napi_list_check
->  ok 5 nl_netdev.dev_set_threaded
->  ok 6 nl_netdev.napi_set_threaded
->  ok 7 nl_netdev.nsim_rxq_reset_down
->  # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 
->  ./tools/testing/selftests/drivers/net/napi_threaded.py
->  TAP version 13
->  1..2
->  ok 1 napi_threaded.change_num_queues
->  ok 2 napi_threaded.enable_dev_threaded_disable_napi_threaded
->  # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 
-> Fixes: 689883de94dd ("net: stop napi kthreads when THREADED napi is disabled")
-> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+Krzysztof,
 
-Is this basically addressing the bug that Martin run into?
+On 9/9/25 3:29 AM, Krzysztof Kozlowski wrote:
+> On 08/09/2025 21:19, Ariel D'Alessandro wrote:
+>> Krzysztof,
+>>
+>> On 8/21/25 3:43 AM, Krzysztof Kozlowski wrote:
+>>> On Wed, Aug 20, 2025 at 02:12:51PM -0300, Ariel D'Alessandro wrote:
+>>>> Current, the DT bindings for MediaTek mmsys controller is missing the
+>>>> assigned-clocks and assigned-clocks-rates properties. Add these and
+>>>
+>>> No, they do not miss them. I don't understand why you are adding these.
+>>
+>> The reason I added these is due to the following check error:
+>>
+>> $ make -j$(nproc) CHECK_DTBS=y mediatek/mt8173-elm.dtb
+>>     DTC [C] arch/arm64/boot/dts/mediatek/mt8173-elm.dtb
+>> [...]
+>> arch/arm64/boot/dts/mediatek/mt8173-elm.dtb: syscon@14000000
+>> (mediatek,mt8173-mmsys): 'assigned-clock-rates', 'assigned-clocks' do
+>> not match any of the regexes: '^pinctrl-[0-9]+$'
+>> 	from schema $id:
+>> http://devicetree.org/schemas/arm/mediatek/mediatek,mmsys.yaml#
+> 
+> This is looking like missing clocks or other unevaluated property by the
+> binding.
 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 93a25d87b86b..8d49b2198d07 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -6965,7 +6965,7 @@ static void napi_stop_kthread(struct napi_struct *napi)
->  	 * the kthread.
->  	 */
->  	while (true) {
-> -		if (!test_bit(NAPIF_STATE_SCHED_THREADED, &napi->state))
-> +		if (!test_bit(NAPI_STATE_SCHED_THREADED, &napi->state))
->  			break;
->  
->  		msleep(20);
+Agreed, the rate assignment has to be moved in other DT nodes, it's not 
+a binding issue.
+
+Thanks,
+
+-- 
+Ariel D'Alessandro
+Software Engineer
+
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
+Registered in England & Wales, no. 5513718
 
 
