@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-222240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28174B53A84
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:40:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F706B53A8B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:41:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A63A116CCFD
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:40:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 009FBAA7508
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F29F362072;
-	Thu, 11 Sep 2025 17:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4585A3680B4;
+	Thu, 11 Sep 2025 17:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nunsRqjt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnlmQ4PE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324B335A2B4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181D7368087;
 	Thu, 11 Sep 2025 17:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757612436; cv=none; b=gK9mYC+bGg5pZLz7uMVeEEt+N0ozHq6bC29SEIlhvuHeZxXxTLy/l8sh3PXcMylZR85boYZrulwOQW+B1+mRBuIMmE67tlz70JmAhyP/tUcj619XRebfhhrV6y9oyOhUPxS+b1G1E101Yi/tmmtyU1dZOSmRgdxQ1fIeTqEuqO0=
+	t=1757612437; cv=none; b=bWI0za6mvoClnVwmFQj7BN5GmJTRsbidL9iXlsb4R9dUSP1E1KZ673afsH2+DTjTZWzxrsueLzOBp96L4dR3wZJi6phs+dCGoo3KNAUXjuqOgK8b7GZNoUfJP82e8MDvyZ3Omkes21Q44c2Zumx4cSbYK2wYPA5Cd2KatVsuBT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757612436; c=relaxed/simple;
-	bh=YUfJQuKeoyvq69CqM4HMv+h2j8i7bzCRaIDADuqZWZs=;
+	s=arc-20240116; t=1757612437; c=relaxed/simple;
+	bh=k8chtkdd/C7iCwiNiHHjJu/kaYcxaJejVp0B1FUTyf8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R/1UWBtQULUTRY3sXJNOxoBROpaM1/divyC8bVu/CF1DUjB+4a0b/k4qwwysRRSt4Tl9Iam7Mrr294T+o2L1B0b3I6QEYyCDEzvmdcgV0cR6Jy9NzSWoWO88lXD2rWisliQJG0L5OM3rYNXh8qalTenJ+Yv1jCbqbut08pnUCuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nunsRqjt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A68CFC4CEF8;
+	 MIME-Version; b=jLICspaKQwBsMWxzjdg2K7J2L7gr0B5UUysVoXyH7FyPZwse03qt8Tluono4mEBgoZxq9ERq4GBagCGKugLoCVsyNLcX8QIIQGEozAI7wCvjgFCkQGpRK8PkX/8mRHsTIdoApIj0sEC+aWA0z+lUenXF7e0v9QtiGR/PB08SA+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnlmQ4PE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E5CDC4CEF0;
 	Thu, 11 Sep 2025 17:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757612435;
-	bh=YUfJQuKeoyvq69CqM4HMv+h2j8i7bzCRaIDADuqZWZs=;
+	s=k20201202; t=1757612436;
+	bh=k8chtkdd/C7iCwiNiHHjJu/kaYcxaJejVp0B1FUTyf8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nunsRqjtB6Cr5GbzCUfCp4JmE43Nz4DEl1w5xjOtLZ/hYSviNN7+cEFSauRyINuNe
-	 2+m5g/0mQf8cHsDAGVG3dyHx5EBzXCs/SS7Cl1tjVPdnJoeNoZ+P2Ls7tILJHydf8k
-	 WEgRbQ8q9ivKl581ZDijZ2njJI76Pp3/TWJVIBdkvbxfoJM7Kf3+BkuvxeNOpPJrNK
-	 fzLOnB2nA0/+c+8YqAnrSKoGr4taVI5Qt6TrsW7h+W81iYm+mnnI01+HEPc6SoQMEg
-	 nA5js7n7Rdm4pJaFjFXbR8FiOH+tSWxCv+LM32LsEbS/0bT12G5iMvZGSuz9CxgS/l
-	 QzOW5ziyzimzA==
+	b=bnlmQ4PEdrqWJ7MpKjo32ttNPRvTr+yBVPyZzvBrZW2kBxsBs9XVurVNZVNsK/dPo
+	 ilOkcmKHe6Ey2cIQsC3nBP3D9+XvUPRgeLUkrKxAPBsEZneqrOXcZF63vWlt5Y/XQB
+	 kILrkdwpsFQnM7LGkXcDr4w1f2sPGStKv7MVhixXu8sLYnb00aSheN/cAxSMQha3/p
+	 lGxcQUz2aSXc3MpWvqfyJOg84rtpRBV7vWWJjwtxYrXwIx+lNqX5NYOJEQ4r6eGkg/
+	 DqRJ3iGWnc+n3S0LJn1DG8AP28HQerJqwZl4MViexm0MOUTFCLERViMxGxDTYViKFW
+	 /Aiq3EdAwJImA==
 Received: by wens.tw (Postfix, from userid 1000)
-	id 1CA865FE35; Fri, 12 Sep 2025 01:40:33 +0800 (CST)
+	id 2C5FC5FE52; Fri, 12 Sep 2025 01:40:33 +0800 (CST)
 From: Chen-Yu Tsai <wens@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,10 +60,11 @@ Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH net-next v5 2/6] net: stmmac: Add support for Allwinner A523 GMAC200
-Date: Fri, 12 Sep 2025 01:40:28 +0800
-Message-Id: <20250911174032.3147192-3-wens@kernel.org>
+	Andre Przywara <andre.przywara@arm.com>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>
+Subject: [PATCH net-next v5 3/6] arm64: dts: allwinner: a523: Add GMAC200 ethernet controller
+Date: Fri, 12 Sep 2025 01:40:29 +0800
+Message-Id: <20250911174032.3147192-4-wens@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250911174032.3147192-1-wens@kernel.org>
 References: <20250911174032.3147192-1-wens@kernel.org>
@@ -77,243 +78,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Chen-Yu Tsai <wens@csie.org>
 
-The Allwinner A523 SoC family has a second Ethernet controller, called
-the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
-numbering. This controller, according to BSP sources, is fully
-compatible with a slightly newer version of the Synopsys DWMAC core.
-The glue layer around the controller is the same as found around older
-DWMAC cores on Allwinner SoCs. The only slight difference is that since
-this is the second controller on the SoC, the register for the clock
-delay controls is at a different offset. Last, the integration includes
-a dedicated clock gate for the memory bus and the whole thing is put in
-a separately controllable power domain.
+The A523 SoC family has a second ethernet controller, called the
+GMAC200. It is not exposed on all the SoCs in the family.
 
-Add a new driver for this hardware supporting the integration layer.
+Add a device node for it. All the hardware specific settings are from
+the vendor BSP.
 
+Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
-Changes since v3:
-- Fixed printf format specifier warning
-
-Changes since v2 (all suggested by Russell King):
-- Include "ps" unit in "... must be multiple of ..." error message
-- Use FIELD_FIT to check if delay value is in range and FIELD_MAX to get
-  the maximum value
-- Reword error message for delay value exceeding maximum
-- Drop MASK_TO_VAL
 
 Changes since v1:
-- Switch to generic (tx|rx)-internal-delay-ps properties
-- Change dev_err() + return to dev_err_probe()
-- Check return value from syscon regmap write
-- Change driver name to match file name
+- Fixed typo in tx-queues-config
 ---
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-sun55i.c    | 159 ++++++++++++++++++
- 3 files changed, 172 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
+ .../arm64/boot/dts/allwinner/sun55i-a523.dtsi | 55 +++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 67fa879b1e52..38ce9a0cfb5b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -263,6 +263,18 @@ config DWMAC_SUN8I
- 	  stmmac device driver. This driver is used for H3/A83T/A64
- 	  EMAC ethernet controller.
+diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+index 6b6f2296bdff..449bcafbddcd 100644
+--- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+@@ -180,6 +180,16 @@ rgmii0_pins: rgmii0-pins {
+ 				bias-disable;
+ 			};
  
-+config DWMAC_SUN55I
-+	tristate "Allwinner sun55i GMAC200 support"
-+	default ARCH_SUNXI
-+	depends on OF && (ARCH_SUNXI || COMPILE_TEST)
-+	select MDIO_BUS_MUX
-+	help
-+	  Support for Allwinner A523/T527 GMAC200 ethernet controllers.
++			rgmii1_pins: rgmii1-pins {
++				pins = "PJ0", "PJ1", "PJ2", "PJ3", "PJ4",
++				       "PJ5", "PJ6", "PJ7", "PJ8", "PJ9",
++				       "PJ11", "PJ12", "PJ13", "PJ14", "PJ15";
++				allwinner,pinmux = <5>;
++				function = "gmac1";
++				drive-strength = <40>;
++				bias-disable;
++			};
 +
-+	  This selects Allwinner SoC glue layer support for the
-+	  stmmac device driver. This driver is used for A523/T527
-+	  GMAC200 ethernet controller.
+ 			uart0_pb_pins: uart0-pb-pins {
+ 				pins = "PB9", "PB10";
+ 				allwinner,pinmux = <2>;
+@@ -601,6 +611,51 @@ mdio0: mdio {
+ 			};
+ 		};
+ 
++		gmac1: ethernet@4510000 {
++			compatible = "allwinner,sun55i-a523-gmac200",
++				     "snps,dwmac-4.20a";
++			reg = <0x04510000 0x10000>;
++			clocks = <&ccu CLK_BUS_EMAC1>, <&ccu CLK_MBUS_EMAC1>;
++			clock-names = "stmmaceth", "mbus";
++			resets = <&ccu RST_BUS_EMAC1>;
++			reset-names = "stmmaceth";
++			interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq";
++			pinctrl-names = "default";
++			pinctrl-0 = <&rgmii1_pins>;
++			power-domains = <&pck600 PD_VO1>;
++			syscon = <&syscon>;
++			snps,fixed-burst;
++			snps,axi-config = <&gmac1_stmmac_axi_setup>;
++			snps,mtl-rx-config = <&gmac1_mtl_rx_setup>;
++			snps,mtl-tx-config = <&gmac1_mtl_tx_setup>;
++			status = "disabled";
 +
- config DWMAC_THEAD
- 	tristate "T-HEAD dwmac support"
- 	depends on OF && (ARCH_THEAD || COMPILE_TEST)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index b591d93f8503..51e068e26ce4 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -31,6 +31,7 @@ obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
- obj-$(CONFIG_DWMAC_STM32)	+= dwmac-stm32.o
- obj-$(CONFIG_DWMAC_SUNXI)	+= dwmac-sunxi.o
- obj-$(CONFIG_DWMAC_SUN8I)	+= dwmac-sun8i.o
-+obj-$(CONFIG_DWMAC_SUN55I)	+= dwmac-sun55i.o
- obj-$(CONFIG_DWMAC_THEAD)	+= dwmac-thead.o
- obj-$(CONFIG_DWMAC_DWC_QOS_ETH)	+= dwmac-dwc-qos-eth.o
- obj-$(CONFIG_DWMAC_INTEL_PLAT)	+= dwmac-intel-plat.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
-new file mode 100644
-index 000000000000..b34da76ac344
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
-@@ -0,0 +1,159 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * dwmac-sun55i.c - Allwinner sun55i GMAC200 specific glue layer
-+ *
-+ * Copyright (C) 2025 Chen-Yu Tsai <wens@csie.org>
-+ *
-+ * syscon parts taken from dwmac-sun8i.c, which is
-+ *
-+ * Copyright (C) 2017 Corentin Labbe <clabbe.montjoie@gmail.com>
-+ */
++			mdio1: mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
 +
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
-+#include <linux/mfd/syscon.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/phy.h>
-+#include <linux/platform_device.h>
-+#include <linux/regmap.h>
-+#include <linux/regulator/consumer.h>
-+#include <linux/stmmac.h>
++			gmac1_mtl_rx_setup: rx-queues-config {
++				snps,rx-queues-to-use = <1>;
 +
-+#include "stmmac.h"
-+#include "stmmac_platform.h"
++				queue0 {};
++			};
 +
-+#define SYSCON_REG		0x34
++			gmac1_stmmac_axi_setup: stmmac-axi-config {
++				snps,wr_osr_lmt = <0xf>;
++				snps,rd_osr_lmt = <0xf>;
++				snps,blen = <256 128 64 32 16 8 4>;
++			};
 +
-+/* RMII specific bits */
-+#define SYSCON_RMII_EN		BIT(13) /* 1: enable RMII (overrides EPIT) */
-+/* Generic system control EMAC_CLK bits */
-+#define SYSCON_ETXDC_MASK		GENMASK(12, 10)
-+#define SYSCON_ERXDC_MASK		GENMASK(9, 5)
-+/* EMAC PHY Interface Type */
-+#define SYSCON_EPIT			BIT(2) /* 1: RGMII, 0: MII */
-+#define SYSCON_ETCS_MASK		GENMASK(1, 0)
-+#define SYSCON_ETCS_MII		0x0
-+#define SYSCON_ETCS_EXT_GMII	0x1
-+#define SYSCON_ETCS_INT_GMII	0x2
++			gmac1_mtl_tx_setup: tx-queues-config {
++				snps,tx-queues-to-use = <1>;
 +
-+static int sun55i_gmac200_set_syscon(struct device *dev,
-+				     struct plat_stmmacenet_data *plat)
-+{
-+	struct device_node *node = dev->of_node;
-+	struct regmap *regmap;
-+	u32 val, reg = 0;
-+	int ret;
++				queue0 {};
++			};
++		};
 +
-+	regmap = syscon_regmap_lookup_by_phandle(node, "syscon");
-+	if (IS_ERR(regmap))
-+		return dev_err_probe(dev, PTR_ERR(regmap), "Unable to map syscon\n");
-+
-+	if (!of_property_read_u32(node, "tx-internal-delay-ps", &val)) {
-+		if (val % 100)
-+			return dev_err_probe(dev, -EINVAL,
-+					     "tx-delay must be a multiple of 100ps\n");
-+		val /= 100;
-+		dev_dbg(dev, "set tx-delay to %x\n", val);
-+		if (!FIELD_FIT(SYSCON_ETXDC_MASK, val))
-+			return dev_err_probe(dev, -EINVAL,
-+					     "TX clock delay exceeds maximum (%u00ps > %lu00ps)\n",
-+					     val, FIELD_MAX(SYSCON_ETXDC_MASK));
-+
-+		reg |= FIELD_PREP(SYSCON_ETXDC_MASK, val);
-+	}
-+
-+	if (!of_property_read_u32(node, "rx-internal-delay-ps", &val)) {
-+		if (val % 100)
-+			return dev_err_probe(dev, -EINVAL,
-+					     "rx-delay must be a multiple of 100ps\n");
-+		val /= 100;
-+		dev_dbg(dev, "set rx-delay to %x\n", val);
-+		if (!FIELD_FIT(SYSCON_ERXDC_MASK, val))
-+			return dev_err_probe(dev, -EINVAL,
-+					     "RX clock delay exceeds maximum (%u00ps > %lu00ps)\n",
-+					     val, FIELD_MAX(SYSCON_ERXDC_MASK));
-+
-+		reg |= FIELD_PREP(SYSCON_ERXDC_MASK, val);
-+	}
-+
-+	switch (plat->mac_interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		/* default */
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		reg |= SYSCON_EPIT | SYSCON_ETCS_INT_GMII;
-+		break;
-+	case PHY_INTERFACE_MODE_RMII:
-+		reg |= SYSCON_RMII_EN;
-+		break;
-+	default:
-+		return dev_err_probe(dev, -EINVAL, "Unsupported interface mode: %s",
-+				     phy_modes(plat->mac_interface));
-+	}
-+
-+	ret = regmap_write(regmap, SYSCON_REG, reg);
-+	if (ret < 0)
-+		return dev_err_probe(dev, ret, "Failed to write to syscon\n");
-+
-+	return 0;
-+}
-+
-+static int sun55i_gmac200_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat_dat;
-+	struct stmmac_resources stmmac_res;
-+	struct device *dev = &pdev->dev;
-+	struct clk *clk;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return ret;
-+
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat_dat))
-+		return PTR_ERR(plat_dat);
-+
-+	/* BSP disables it */
-+	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE;
-+	plat_dat->host_dma_width = 32;
-+
-+	ret = sun55i_gmac200_set_syscon(dev, plat_dat);
-+	if (ret)
-+		return ret;
-+
-+	clk = devm_clk_get_enabled(dev, "mbus");
-+	if (IS_ERR(clk))
-+		return dev_err_probe(dev, PTR_ERR(clk),
-+				     "Failed to get or enable MBUS clock\n");
-+
-+	ret = devm_regulator_get_enable_optional(dev, "phy");
-+	if (ret)
-+		return dev_err_probe(dev, ret, "Failed to get or enable PHY supply\n");
-+
-+	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-+}
-+
-+static const struct of_device_id sun55i_gmac200_match[] = {
-+	{ .compatible = "allwinner,sun55i-a523-gmac200" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, sun55i_gmac200_match);
-+
-+static struct platform_driver sun55i_gmac200_driver = {
-+	.probe  = sun55i_gmac200_probe,
-+	.driver = {
-+		.name           = "dwmac-sun55i",
-+		.pm		= &stmmac_pltfr_pm_ops,
-+		.of_match_table = sun55i_gmac200_match,
-+	},
-+};
-+module_platform_driver(sun55i_gmac200_driver);
-+
-+MODULE_AUTHOR("Chen-Yu Tsai <wens@csie.org>");
-+MODULE_DESCRIPTION("Allwinner sun55i GMAC200 specific glue layer");
-+MODULE_LICENSE("GPL");
+ 		ppu: power-controller@7001400 {
+ 			compatible = "allwinner,sun55i-a523-ppu";
+ 			reg = <0x07001400 0x400>;
 -- 
 2.39.5
 
