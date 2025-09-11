@@ -1,198 +1,115 @@
-Return-Path: <netdev+bounces-222013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 226ACB52B27
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:06:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 511E6B52B23
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 10:05:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 251A7B6062C
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:03:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 663BC1C20F68
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74C62D594F;
-	Thu, 11 Sep 2025 08:04:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28B72D3723;
+	Thu, 11 Sep 2025 08:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xzYSFwwk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eykry1+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015E82BDC01;
-	Thu, 11 Sep 2025 08:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002322D29D0;
+	Thu, 11 Sep 2025 08:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757577861; cv=none; b=sPd5OS4dFYyauz0ichUOxU4FuFVQsSee6jv/eNXF72p54UEQhkpP+QTsWNzGmSkvSg3LkwaUDGDt6KFEpps3MJH3z6mOHyZYadpopskvudvN34RRUGCgREY0y6SVdBOe4U2Une6nIL+f5QWLtRsSAxXfYEZ8wBnYjntIxb/OQuI=
+	t=1757577933; cv=none; b=bEpMPTtqiqWsR18jeQr4g3LqeOzgZgwkoNBXOvFCXFajNuoWvM90bf8D0Kmv0BcmqiIOfGtPEljmN/kI/ET5nlpRqiSFOuT5quTxeS2b3ARCWrt58wgRsdoBfMMPx0kz2X+CVrXSXfkRazYkVHjH+rRcl01BPokMi9L5JHZnFuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757577861; c=relaxed/simple;
-	bh=wel+RQMd/D0rIIzoZJ0pNSXaqgxpgXmD2e20QHrSRYw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DynvlSwlqphFinFe7I4cJalqAdABVhF1AYexTWbhZhALTxTgLNWQ1MMvCVvnOLWPFFEyTMczaUKNG4ntEhrYBEDc0y76RvMC34SS0+Hdy3IvVjB9clFM6wlNRv55Qj3RPOtpUdoW/AD7LiMcioiW8DDk4lID+KxkjM7YQv7Npro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xzYSFwwk; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 34EC94E40C9C;
-	Thu, 11 Sep 2025 08:04:18 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 006D4606BB;
-	Thu, 11 Sep 2025 08:04:18 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9E1B8102F28ED;
-	Thu, 11 Sep 2025 10:04:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1757577856; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=DZGt3QLwJ9N71a9DCxu/GWZRlIPdeB9auBfTQxCKJG4=;
-	b=xzYSFwwkxAWb8XscvM7u98ioGJL0xDga1pmOx0T9nLMF0pNno67AEMgVGWgpTLeRJRXGye
-	OepoelxKsa9Pdk72ubBxung9cUGTAmRfBTDHJRQD8wJU7bNzTo5yPNmYu4biGl9RK2oM6H
-	SRKoqURim92TUohmwxP30oADP9perHg+TS81tr0tk6q8Ele65W+BeHMAlFUf2rTswvj2pp
-	HR7r0/2DKOL0eZbka7tGuf3z4Awc/ISo4GGgkfGffug2ycZ42c29PjGYuqhE0geCm6VfhB
-	BvegShwaQzZgwQKbW4wEnrdDoyCwfDDLo8L/cmmJbozgEt3ptGxPpVeI0w10og==
-Message-ID: <9c543fa2-1ac1-463b-bb1d-f89be61f7ece@bootlin.com>
-Date: Thu, 11 Sep 2025 10:04:00 +0200
+	s=arc-20240116; t=1757577933; c=relaxed/simple;
+	bh=kyEZTSyTVT22OnQt8GD5B8uSiBJmJtF2ytLQyJXbi8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XilmAt33CHtOjwjtwdBpOtPpUpylg/oI1k5Pe5G2WPSGteog7SdNkJa5fmuPOJWpqooYXfzIZTlpKXilRVxd3mTkjxiOsJqUCZW2hm2R00vqa+uHqtbsQ26ydKXwtJqjAPM1+l8aW4tngygyU8jmDIeHdhEBm85tZ8YdWkZEWlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eykry1+l; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45b9814efbcso9320595e9.0;
+        Thu, 11 Sep 2025 01:05:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757577930; x=1758182730; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WILfbNWCo4ARUml9R1JlxJoUwAPnqw4NB8gmHT/M6qY=;
+        b=eykry1+lrwbI2HbdlCpkQjGooFfiE0WiogxB8hulMIk3iR6AIXJ47uJeDFPIMDDv8i
+         E0zYnmLAzWAsDHyKii855aL4GtMzdJ8cULUp3+QGK6lNyf9E1b+p9fPoL5I2O8mTaqeI
+         ehTOho0xJyjwU744DtAdzxIh5dtS7d7ehO0jtEwf/JPUbKOBqRq/lNzprXEXij4pxzqM
+         aiLGY7I3oAGEPCm0otDJWIuoA+H9nFQAtCKD1rtrhqAKbn9QY12hxdl52TzGGl6uXYId
+         jDX4zNB56QPi5umdlwRvGVW5zvtAZRNR8nFcZpPH6MiOk9JRh9uyi1nsFAmx6xLBnKPO
+         zvkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757577930; x=1758182730;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WILfbNWCo4ARUml9R1JlxJoUwAPnqw4NB8gmHT/M6qY=;
+        b=w5lzcfPaZt5GFt/Fd2UTkYpUd26ZXSg+lISm66XNvFFk5QSLOSVNZDmiMb3CZcaezE
+         wQCyGiK4VjIBFf1UK5rmw1LStXQ8UaFhOA4oyBlfLfAfLFBptoewkD0PKAFtX2U8yTdh
+         wV0L5MXdjsgR4el54lHmDNL+aw0vKDKw+UNZBGHDO0OqWKI3hJ0Jlm+PYzwWKffhIjvQ
+         m8K8A/rHnggfhYt4IAz2gu5FzYpHuCGY0OYP7ZerJXbFBq+fBQZ43nCjVoO206KlURW4
+         wFJIWcIzDJZRqL+S/WKpMaoYYq1/1ij7s/lEIZjDJCdWu6tpjWEs8HbuKh+/FvVrLYGq
+         g7QA==
+X-Forwarded-Encrypted: i=1; AJvYcCW08nSJCo+tms9l/I4KqLAHEzNSkjpjT/swecsKNE/4tEPTPbeUf6gx62oY4OC+k8AagFDnvmY0@vger.kernel.org, AJvYcCWcqeK8xuNmI8zWVAPLIT+46tQJo2hCaAvhT5PXx+P1btdkndfiuIGgxZcBx0PmcFYhzLm3cvvN5wYkIXM=@vger.kernel.org, AJvYcCX7iuY4UItFIrAZAyaXuWMZggJusjJvVf8fXOGT++AIojhor7lo/Hcj5D9kaRptIitfzeawbP87uMmk41rvtUx4@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiJgU6+EhH8yurMHHWv+4gyXLnpKyKE2/MSAn4G184f4VR/j9r
+	aGombQ5WZPWjZtN5LHunp2/kyJUn1GcopHoEUrQt6Mjvyn5CYQ06o4Nc
+X-Gm-Gg: ASbGncu0vr2vKw1Azub2n9QBMozypaZdQTvpOuGy3w/OJVwvpg9qbu/t60cKRoqrVuk
+	8/S8AyWsx6WaB7+HoPFloPMH4XHaO5M0UwOKg0nan3W3ipxHURoiiXHL9uiWb7fuvYDpyMVwdPY
+	2Q1TkexKIuzA/uHPSbR5BXXP/5KmStMcdOy7/wKTxJId3eYoiJJZmzmwxmqTDFKA1D5VTF8XZMn
+	PCNnKAdJyVjDIN0WDCH4rKTDuYFcsR0v3GFx0VhO6NjLCVShGVnajWd6jOP1M4cu48NpdL4kHzk
+	GfeIXQXWNSMDoC9k4Pv8eD0qx5EzVg6W7ZaPOqe7GaCsPiA3C1FyAbeWwF5jUn2rg/t2BpLBhH7
+	KzzK1Q3se3q8azPbYQwo=
+X-Google-Smtp-Source: AGHT+IGgAGUcNXjgllFkYVY1TZbEoX/w4+CCWy19jehwdaJkLLJthfSn7prFns29wdUb+u9szALQ7Q==
+X-Received: by 2002:a05:600c:c0cd:b0:45c:b5c3:ea37 with SMTP id 5b1f17b1804b1-45dfd5e3d97mr17699455e9.11.1757577930042;
+        Thu, 11 Sep 2025 01:05:30 -0700 (PDT)
+Received: from archlinux ([143.58.192.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0152ffc1sm9246035e9.3.2025.09.11.01.05.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 01:05:29 -0700 (PDT)
+Date: Thu, 11 Sep 2025 09:05:27 +0100
+From: Andre Carvalho <asantostc@gmail.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 4/5] netconsole: resume previously deactivated
+ target
+Message-ID: <nvbscfpi75on4pkv5niyzxkheobyxqofju7lr5a6kfywssgedj@tn4cgo4zj3qc>
+References: <20250909-netcons-retrigger-v1-0-3aea904926cf@gmail.com>
+ <20250909-netcons-retrigger-v1-4-3aea904926cf@gmail.com>
+ <jcvsmfivr27bchhk2t2lt2l35ixjs2adaos6hqwfydpulq7gxm@5aprxim4vvoa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: configure strap pins
- during reset
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
- Pascal Eberhard <pascal.eberhard@se.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250910-ksz-strap-pins-v1-0-6308bb2e139e@bootlin.com>
- <20250910-ksz-strap-pins-v1-2-6308bb2e139e@bootlin.com>
- <14114502-f087-4d3b-a91e-cff0dfe59045@lunn.ch>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <14114502-f087-4d3b-a91e-cff0dfe59045@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <jcvsmfivr27bchhk2t2lt2l35ixjs2adaos6hqwfydpulq7gxm@5aprxim4vvoa>
 
-Hi Andrew,
-
-On 9/10/25 6:46 PM, Andrew Lunn wrote:
->> Support the KSZ8463's strap configuration that enforces SPI as
->> communication bus, since it is the only bus supported by the driver.
+On Wed, Sep 10, 2025 at 12:50:07PM -0700, Breno Leitao wrote:
+> > +		if (nt->state == STATE_DEACTIVATED && event == NETDEV_UP)  {
+> > +			if (!strncmp(nt->np.dev_name, dev->name, IFNAMSIZ))
 > 
-> So this is the key sentence for this patchset, which should of been in
-> patch 0/X. You have a chicken/egg problem. You cannot talk to the
-> switch to put it into SPI mode because you cannot talk to the switch
-> using SPI.
-> 
-> The current patch descriptions, and the patches themselves don't make
-> this clear. They just vaguely mention configuration via strapping.
-> 
+> Don't you need to check for dev_mac here as well?
 
-Indeed, that wasn't clear, sorry. My intention was to keep it somewhat 
-'generic', since other KSZ switches also use strap configurations. I 
-thought the DT property could be re-used by others to enforce different 
-kinds of strap configurations.
+I believe so. Will fix that and try to cover this case on the selftest too.
 
-But I agree with you, it's probably better to have something KSZ8463 
-specific.
-
->> +static int ksz_configure_strap(struct ksz_device *dev)
+> > +				schedule_work(&nt->resume_wq);
 > 
-> Please make it clear this function straps the switch for SPI. If
-> somebody does add support for I2C, they need to understand that...
-> 
->> +{
->> +	struct pinctrl_state *state = NULL;
->> +	struct pinctrl *pinctrl;
->> +	int ret;
->> +
->> +	if (of_device_is_compatible(dev->dev->of_node, "microchip,ksz8463")) {
-> 
-> I would not hide this here. Please move this if into
-> ksz_switch_register(). I also think this function should have the
-> ksz8463 prefix, since how you strap other devices might differ. So
-> ksz8463_configure_straps_spi() ?
-> 
+> I would prefer to have the enablement done inline here, instead of
+> scheduling a task.
 
-Ack.
+That makes sense. I believe I'll need an alternative to netpoll_setup that can be 
+called with rtnl already held. I'll attempt to do this for v2.
 
->> +		struct gpio_desc *rxd0;
->> +		struct gpio_desc *rxd1;
->> +
->> +		rxd0 = devm_gpiod_get_index_optional(dev->dev, "strap", 0, GPIOD_OUT_LOW);
->> +		if (IS_ERR(rxd0))
->> +			return PTR_ERR(rxd0);
->> +
->> +		rxd1 = devm_gpiod_get_index_optional(dev->dev, "strap", 1, GPIOD_OUT_HIGH);
->> +		if (IS_ERR(rxd1))
->> +			return PTR_ERR(rxd1);
->> +
->> +		/* If at least one strap definition is missing we don't do anything */
->> +		if (!rxd0 || !rxd1)
->> +			return 0;
-> 
-> I would say, if you have one, not two, the DT blob is broken, and you
-> should return -EINVAL.
-> 
-
-Ack.
-
->> +
->> +		pinctrl = devm_pinctrl_get(dev->dev);
->> +		if (IS_ERR(pinctrl))
->> +			return PTR_ERR(pinctrl);
->> +
->> +		state = pinctrl_lookup_state(pinctrl, "reset");
->> +		if (IS_ERR(state))
->> +			return PTR_ERR(state);
->> +
->> +		ret = pinctrl_select_state(pinctrl, state);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>   int ksz_switch_register(struct ksz_device *dev)
->>   {
->>   	const struct ksz_chip_data *info;
->> @@ -5353,10 +5392,18 @@ int ksz_switch_register(struct ksz_device *dev)
->>   		return PTR_ERR(dev->reset_gpio);
->>   
->>   	if (dev->reset_gpio) {
->> +		ret = ksz_configure_strap(dev);
->> +		if (ret)
->> +			return ret;
->> +
->>   		gpiod_set_value_cansleep(dev->reset_gpio, 1);
->>   		usleep_range(10000, 12000);
->>   		gpiod_set_value_cansleep(dev->reset_gpio, 0);
->>   		msleep(100);
->> +
->> +		ret = pinctrl_select_default_state(dev->dev);
->> +		if (ret)
->> +			return ret;
-> 
-> This does not look symmetrical. Maybe put the
-> pinctrl_select_default_state() inside a function called
-> ksz8463_release_straps_spi()?
-> 
->
-
-Ack.
-
-Best regards,
--- 
-Bastien Curutchet, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Thanks for the review!
 
