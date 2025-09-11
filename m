@@ -1,207 +1,219 @@
-Return-Path: <netdev+bounces-221956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F428B526A3
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 04:44:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1147B526A6
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 04:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2804F480EDD
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 02:44:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CCBC5833D4
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 02:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8FC222157E;
-	Thu, 11 Sep 2025 02:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XVIJFv55"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A1822157E;
+	Thu, 11 Sep 2025 02:45:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB8D2135CE
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 02:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD161A704B
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 02:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757558671; cv=none; b=VDGDY7xTche7Ev6DgDPUf7JFOaYaBza76Q84xexbD23aJ0ldy2BSBGslXXm1Nohxn7buTs5zzds9u+47NbfonsH24BrCZPf68K8ktrzM+aUjYrotwPGhnrbnwQ2cqDfDeEB2d8Ghke7yYq/Zxg+ifEvx+qdVfb1GjDS13dXz3B8=
+	t=1757558730; cv=none; b=TRuTHGpLVEn9QyU23D6c6SUaWmpHM+EEFQsqWjarnlh2ECFUUJ5kT+7LfO6ha8pTaOiVVpOhc9D9/pisUZ+7Ct69XOxebrQNhpphlk3TjVZ5Zkt9RwdQM25QI5XRjA6yURwSsFbhy1RML6LjUD7T81DdbHq3DCHNJvrfYC3SxgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757558671; c=relaxed/simple;
-	bh=RH/lKNWxB+jYL9Tts/+toOUQozWus/JszyD4wS05wgY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rjdPyhvugUXOeoSvAA6uOYo7DlpzAFg533h46woVppU5tmWMTKMTj1lhqmBq1balgjI5Z3MUeG4CJ+ix6BNs97uc3g42JGYad0YkZ213DnCwelkIuzvQJYW1i4qCfpXKIOy37qfg93f91fxZtgBM5b2I6sdjogHcODiFm17lHfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XVIJFv55; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b4c1fc383eeso197745a12.1
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 19:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757558669; x=1758163469; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rbwrj9MCxkMdgb4OFtqE5AwLZMYq2qhd8B6juxSX8l8=;
-        b=XVIJFv551C429ayZ1emor3JSE2hrYLwLSfUS98VacfoqUuCvmUQeJfXFeSrNfMPnGL
-         DbUgOSPqNnF8qEIU9a9yELa+w9DXbSQltb45p+7xc9rrtM18Q1N8Jfq6orjkmPPJ/jZf
-         2DerwLgVi/ZGH3bebzZpxEXcaqXU/0zBUKPlbu9nAr5RIk71mdoECxRnfJVHG7y2OyLR
-         SEtXfU9L11w4iZkxVJnjCldsAG918j23rNEGC5Q6ID7FUMgXJVORh3mo6w7AmEX5Jg1B
-         xCrxsPgA8XuNZv7UneE6Jbxye8E2khCfTrtVGXdYwM8cPG5CsUZu/BcX68Swb9jEqHGO
-         YR7Q==
+	s=arc-20240116; t=1757558730; c=relaxed/simple;
+	bh=Kx4XKGUt0cm1Kh3AJGbJzGLZru5R153AUrWHkFQIcn4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=DbnzEslgB7jcRDnhF9ZPqoLTcQsQr6BQlJ3Dac8Fn1cqEU060pxOUKqnG8qcn0R9ebPy0a0N6Z7eraeiXApW6Utzc1zJT4OdTWbhAOlnTsEVCZrr3zLb8f7Oucmsl8aHirB/801k5IbDAyQBmU7rNQHBemktwLSiISmd4TeeNPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-40826edb6e1so8139845ab.1
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 19:45:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757558669; x=1758163469;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rbwrj9MCxkMdgb4OFtqE5AwLZMYq2qhd8B6juxSX8l8=;
-        b=OB8WCJugjm1YiCV2bKk9Qp5QgNOP29jRhfGpsX0rtBbCrcWyZQlixM4ZNc7nl56ZWt
-         4T0y5SDupBy7lJ+zZWnEQs1OV4F0nr0Erd9vZGwanEr2+xcJqaySnN+m++GzlK+vCcRs
-         WcCP/DmMEs2oGnZpkP5avPmAerH+0S4J87PbTLTC/zt+kutbsBrvUHOJFLe3IySZujg+
-         st5XJe/GyUgDaAJjtlQxFKZDtxSnRo/qv7Ieo/aOKbJ5+fcuIIKQly35/mt1sP9Ggm9n
-         uxpNxRi3icwn5iKh6qHqgPrh123SEZN1jKGlVt560RWuXXc2v59NqE5436FMIVrz/Xdg
-         qEkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1udA6KZA1ohBXVYApkn0kJzmyNUGPHxt8O52tk+c7GQUabuUVqVIIiY9tQhn+Z22u6SCeB2I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqhB0zATyLm0Kl7rGWaaBmjmonaxZYRcnyo7sfZdo/eflUP7r5
-	mo07QHOfZC+rPAP3U9MjTxZKWG6Sv/i5EtaOFuq08uQfcPmG+HBYUe+6UsRHUXkUC8wYLcz9AQB
-	5rwMcGUM7vlZBdXBQVXjFdHpJ4FBHWHLSkxsgWVod
-X-Gm-Gg: ASbGncs7a1P2FNMdEJcdfKXcyor3IMvkGImTn+047N3Ui5ZgUNqwa17c7btAE/AD+Fr
-	T1bfR5nTOqczC8nU4xbw9Z7JA4XOGx7UDYXbxzcQlEucGudCFGx/5wObawjzhULjWszedO9oTXZ
-	HAO24mVa1Sxj4RZak/sQzH2Ljjm1C690Jsn/euiT12INx6pyc2YqhMC1TCQEw7BYoyGY3ZiqcBz
-	yEzElugxeV0lSrwQ6OVimtlwTdZphAcRPz2EFrBi8hWhMEcyZ27imKW9A==
-X-Google-Smtp-Source: AGHT+IHrKxy9g6rBS4o6e1tYQEA5wZNBsvI3ufN2vHAn6MqDAkniz9SsxcxDERH5dE5CRS5+X3a0rZ33jBsa8xcSqkk=
-X-Received: by 2002:a17:903:38cf:b0:245:f7f3:6760 with SMTP id
- d9443c01a7336-25175f72ac4mr219280335ad.55.1757558668973; Wed, 10 Sep 2025
- 19:44:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757558728; x=1758163528;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6CEC/hDrL0RYvcCVpYbKdGS2Fgqi1L5qHrsPvYtgkC0=;
+        b=rMnWdnOs/wMPw+a9J3nVbj3f5Q9dc551tXIIV/0jq3irvMrj8RQfN8toeK6vEnOya2
+         dANcEGwpRYBvw6aBzkYosyEYxMy8iIEA1KrHdbfUEJotP7cP+0//rMp5fytzBg+PZ0gz
+         EId0QcnB8H2UuEUyYx9epUEokh1/hUkr+NIiVc+WKi6tFGOCGbPAJ/DFTi0riSHjDIwp
+         SuGJsNsNM9Q+77CYaWyp+r8dX2my+KVZmB33XPAjglbJnOqlb86ABVh87HJsQ4j7DoVE
+         qC9BL2MYCJe2puKeHwVDnLB11VyuPG3OYF0rSeSPkIoS5tCgw3km7LKwJtaHONMLxnUj
+         lAqA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNzwghpw8HBMriV/3/3BN2gLD2MkFuXSMjSos1ND4tABRArPAkrHwkPwqCX/UKRpZyVLVA+P4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdFu+xUnwzbCdMcHCme0gGSHyCqeUgsX4Yq2Czbbi+oJT7vH/L
+	UEx7dXrK+p1SLNqf+35mobsCa5peCMx8/A9KJ8ex/yU2o9rnVQjybE63+VRW157uldEEur+lxfP
+	fddKD0diJqe/750P9knMO8Z2u1Ud6KvNVXCGrJG5QMrLiDIBsnsPVUIz+7mQ=
+X-Google-Smtp-Source: AGHT+IEp9oIOa2JvRV2TLv6zUHy7G0oti8Rg0SIvm5ulajf2zyYlJIzCreGeUJ7yrZ8VcX/JNL9SFj1VpBgcXhcs0CAO1BgxR0uG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911013052.2233-1-anderson@allelesecurity.com>
-In-Reply-To: <20250911013052.2233-1-anderson@allelesecurity.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 10 Sep 2025 19:44:17 -0700
-X-Gm-Features: Ac12FXxfHhvQkAVyEXp7XmpClh4AmHOVNOOZbMkwFinVGbnJRgZPSR36H3GxaYg
-Message-ID: <CAAVpQUBoCPervZLc+-bWF5+hXX8yj0SwUcU3MiUQ514xi-F6uA@mail.gmail.com>
-Subject: Re: [PATCH] net/tcp: Fix a NULL pointer dereference when using TCP-AO
- with TCP_REPAIR.
-To: Anderson Nascimento <anderson@allelesecurity.com>
-Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6e02:12c3:b0:409:5da6:c72b with SMTP id
+ e9e14a558f8ab-4095da6c7cfmr208270705ab.4.1757558727883; Wed, 10 Sep 2025
+ 19:45:27 -0700 (PDT)
+Date: Wed, 10 Sep 2025 19:45:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68c237c7.050a0220.3c6139.0036.GAE@google.com>
+Subject: [syzbot] [smc?] KASAN: use-after-free Read in __pnet_find_base_ndev
+From: syzbot <syzbot+ea28e9d85be2f327b6c6@syzkaller.appspotmail.com>
+To: alibuda@linux.alibaba.com, davem@davemloft.net, dust.li@linux.alibaba.com, 
+	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sidraya@linux.ibm.com, syzkaller-bugs@googlegroups.com, 
+	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 10, 2025 at 6:32=E2=80=AFPM Anderson Nascimento
-<anderson@allelesecurity.com> wrote:
->
-> A NULL pointer dereference can occur in tcp_ao_finish_connect() during a =
-connect() system call on a socket with a TCP-AO key added and TCP_REPAIR en=
-abled.
+Hello,
 
-Thanks for the patch, the change looks good.
+syzbot found the following issue on:
 
-Could you wrap the description at 75 columns ?
+HEAD commit:    e0d1c55501d3 net: phy: fix phy_uses_state_machine()
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=10287562580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9c302bcfb26a48af
+dashboard link: https://syzkaller.appspot.com/bug?extid=ea28e9d85be2f327b6c6
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-See this doc for other guidelines:
-https://www.kernel.org/doc/html/latest/process/submitting-patches.html#the-=
-canonical-patch-format
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6163bf409a9b/disk-e0d1c555.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6d13a8029999/vmlinux-e0d1c555.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/41adcb613128/bzImage-e0d1c555.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ea28e9d85be2f327b6c6@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: use-after-free in __pnet_find_base_ndev+0x1b1/0x1c0 net/smc/smc_pnet.c:926
+Read of size 1 at addr ffff888036bac33a by task syz.0.3632/18609
+
+CPU: 1 UID: 0 PID: 18609 Comm: syz.0.3632 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ __pnet_find_base_ndev+0x1b1/0x1c0 net/smc/smc_pnet.c:926
+ pnet_find_base_ndev net/smc/smc_pnet.c:946 [inline]
+ smc_pnet_find_ism_by_pnetid net/smc/smc_pnet.c:1103 [inline]
+ smc_pnet_find_ism_resource+0xef/0x390 net/smc/smc_pnet.c:1154
+ smc_find_ism_device net/smc/af_smc.c:1030 [inline]
+ smc_find_proposal_devices net/smc/af_smc.c:1115 [inline]
+ __smc_connect+0x372/0x1890 net/smc/af_smc.c:1545
+ smc_connect+0x877/0xd90 net/smc/af_smc.c:1715
+ __sys_connect_file net/socket.c:2086 [inline]
+ __sys_connect+0x313/0x440 net/socket.c:2105
+ __do_sys_connect net/socket.c:2111 [inline]
+ __se_sys_connect net/socket.c:2108 [inline]
+ __x64_sys_connect+0x7a/0x90 net/socket.c:2108
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f47cbf8eba9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f47ccdb1038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 00007f47cc1d5fa0 RCX: 00007f47cbf8eba9
+RDX: 0000000000000010 RSI: 0000200000000280 RDI: 000000000000000b
+RBP: 00007f47cc011e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f47cc1d6038 R14: 00007f47cc1d5fa0 R15: 00007ffc512f8aa8
+ </TASK>
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888036bacd00 pfn:0x36bac
+flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000000000 ffffea0001243d08 ffff8880b863fdc0 0000000000000000
+raw: ffff888036bacd00 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as freed
+page last allocated via order 2, migratetype Unmovable, gfp_mask 0x446dc0(GFP_KERNEL_ACCOUNT|__GFP_ZERO|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_COMP), pid 16741, tgid 16741 (syz-executor), ts 343313197788, free_ts 380670750466
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1851
+ prep_new_page mm/page_alloc.c:1859 [inline]
+ get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3858
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5148
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
+ ___kmalloc_large_node+0x5f/0x1b0 mm/slub.c:4317
+ __kmalloc_large_node_noprof+0x18/0x90 mm/slub.c:4348
+ __do_kmalloc_node mm/slub.c:4364 [inline]
+ __kvmalloc_node_noprof+0x6d/0x5f0 mm/slub.c:5067
+ alloc_netdev_mqs+0xa3/0x11b0 net/core/dev.c:11812
+ tun_set_iff+0x532/0xef0 drivers/net/tun.c:2775
+ __tun_chr_ioctl+0x788/0x1df0 drivers/net/tun.c:3085
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:598 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:584
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+page last free pid 18610 tgid 18608 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1395 [inline]
+ __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2895
+ free_large_kmalloc+0x13a/0x1f0 mm/slub.c:4820
+ device_release+0x99/0x1c0 drivers/base/core.c:-1
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x22b/0x480 lib/kobject.c:737
+ netdev_run_todo+0xd2e/0xea0 net/core/dev.c:11513
+ rtnl_unlock net/core/rtnetlink.c:157 [inline]
+ rtnl_net_unlock include/linux/rtnetlink.h:135 [inline]
+ rtnl_dellink+0x537/0x710 net/core/rtnetlink.c:3563
+ rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6946
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:729
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmsg net/socket.c:2700 [inline]
+ __do_sys_sendmsg net/socket.c:2705 [inline]
+ __se_sys_sendmsg net/socket.c:2703 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff888036bac200: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888036bac280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff888036bac300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                        ^
+ ffff888036bac380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888036bac400: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
 
 
->
-> The function is called with skb being NULL and attempts to dereference it=
- on tcp_hdr(skb)->seq without a prior skb validation.
->
-> Fix this by checking if skb is NULL before dereferencing it. If skb is no=
-t NULL, the ao->risn is set to tcp_hdr(skb)->seq to keep compatibility with=
- the call made from tcp_rcv_synsent_state_process(). If skb is NULL, ao->ri=
-sn is set to 0.
->
-> The commentary is taken from bpf_skops_established(), which is also calle=
-d in the same flow. Unlike the function being patched, bpf_skops_establishe=
-d() validates the skb before dereferencing it.
->
-> int main(void){
->         struct sockaddr_in sockaddr;
->         struct tcp_ao_add tcp_ao;
->         int sk;
->         int one =3D 1;
->
->         memset(&sockaddr,'\0',sizeof(sockaddr));
->         memset(&tcp_ao,'\0',sizeof(tcp_ao));
->
->         sk =3D socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
->
->         sockaddr.sin_family =3D AF_INET;
->
->         memcpy(tcp_ao.alg_name,"cmac(aes128)",12);
->         memcpy(tcp_ao.key,"ABCDEFGHABCDEFGH",16);
->         tcp_ao.keylen =3D 16;
->
->         memcpy(&tcp_ao.addr,&sockaddr,sizeof(sockaddr));
->
->         setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tcp_ao, sizeof(tcp_a=
-o));
->         setsockopt(sk, IPPROTO_TCP, TCP_REPAIR, &one, sizeof(one));
->
->         sockaddr.sin_family =3D AF_INET;
->         sockaddr.sin_port =3D htobe16(123);
->
->         inet_aton("127.0.0.1", &sockaddr.sin_addr);
->
->         connect(sk,(struct sockaddr *)&sockaddr,sizeof(sockaddr));
->
-> return 0;
-> }
->
-> $ gcc tcp-ao-nullptr.c -o tcp-ao-nullptr -Wall
-> $ unshare -Urn
-> # ip addr add 127.0.0.1 dev lo
-> # ./tcp-ao-nullptr
->
-> [   72.414850] BUG: kernel NULL pointer dereference, address: 00000000000=
-000b6
-> [   72.414863] #PF: supervisor read access in kernel mode
-> [   72.414869] #PF: error_code(0x0000) - not-present page
-> [   72.414873] PGD 116af4067 P4D 116af4067 PUD 117043067 PMD 0
-> [   72.414880] Oops: Oops: 0000 [#1] SMP NOPTI
-> [   72.414887] CPU: 2 UID: 1000 PID: 1558 Comm: tcp-ao-nullptr Not tainte=
-d 6.16.3-200.fc42.x86_64 #1 PREEMPT(lazy)
-> [   72.414896] Hardware name: VMware, Inc. VMware Virtual Platform/440BX =
-Desktop Reference Platform, BIOS 6.00 11/12/2020
-> [   72.414905] RIP: 0010:tcp_ao_finish_connect+0x19/0x60
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Full decoded stack trace without timestamps would be nicer.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-How to decode stack trace:
-cat trace.txt | ./scripts/decode_stacktrace.sh vmlinux
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
->
-> Fixes: 7c2ffaf ("net/tcp: Calculate TCP-AO traffic keys")
-> Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
-> ---
->  net/ipv4/tcp_ao.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-> index bbb8d5f0eae7..abe913de8652 100644
-> --- a/net/ipv4/tcp_ao.c
-> +++ b/net/ipv4/tcp_ao.c
-> @@ -1178,7 +1178,11 @@ void tcp_ao_finish_connect(struct sock *sk, struct=
- sk_buff *skb)
->         if (!ao)
->                 return;
->
-> -       WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
-> +       /* sk with TCP_REPAIR_ON does not have skb in tcp_finish_connect =
-*/
-> +       if (skb)
-> +               WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
-> +       else
-> +               WRITE_ONCE(ao->risn, 0);
->         ao->rcv_sne =3D 0;
->
->         hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_he=
-ld(sk))
-> --
-> 2.51.0
->
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
