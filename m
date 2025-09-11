@@ -1,254 +1,359 @@
-Return-Path: <netdev+bounces-221993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEFCDB5290A
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:39:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A2AB52921
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:41:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91D101BC0A39
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 06:39:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 820D3467544
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 06:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A0B262FE7;
-	Thu, 11 Sep 2025 06:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B7A25D202;
+	Thu, 11 Sep 2025 06:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZJ6c2oif"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B3s4dszW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2085.outbound.protection.outlook.com [40.107.92.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604D825D202
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA4E238C04;
+	Thu, 11 Sep 2025 06:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.85
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757572587; cv=fail; b=sWz1Hunn5DagOm+UU5m2+8oWv7DTRj2YFXsHduws0+zhFT2urTL9GzQq321PnWLAIcJfTp2cyXUQvww1wScMiDOnDC7DfSJhqB4UR2PBplvx4wbIMhNajeFdX1N7RfZUkoCzRdnQDPeQ8slfURbSy+5QrlPYBDLlOkVBG53qkDc=
+	t=1757572914; cv=fail; b=iY8FtN1ZFbnBbZUtTcf8zg3HpkUkpjzQRnpAn20EkZbguMfeXUvDhKMC+mulU9NsgFC98NcEbXiyyOuCgbFUQ/PUTPvmIB1fwUjGiyxlM5ZZGgWzKaMESAr19nxuHYrx8RfV6l95n4/+9HE+qru35zPdVLsc7kjm5ufkYZNJWgE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757572587; c=relaxed/simple;
-	bh=SEHMsXeMKNgic+D+sN2vomu6n8jay8w7ymPXEEAc6v0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=U3h9ODdCooyRcvIG91t6dkqx0XrFaeEQXDtUHxP2i0W0cD7guqB+BjeeKq4bozc9ey4+97GqdXBUKPgFkwZ9FTJaXUyjNyGGcUXHSoiZ7/9Gt2a3KNQ6/qVwuokaaskFJprRnFk+8/wn1r4qSV5O4/fht2AMcZYAsX0yWcIaeVA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZJ6c2oif; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757572585; x=1789108585;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=SEHMsXeMKNgic+D+sN2vomu6n8jay8w7ymPXEEAc6v0=;
-  b=ZJ6c2oif5hWSOryg+eUymmoRZr0hD8thSDgiCA97jP712vgbh86ZEWF1
-   HuvLQrRRIpw8+SOi/5TOnro7Av1prnuc3Rt91Pp0/DNrXKSaMhbdQZ4Cq
-   MwJMU8onbOb643LxRYbkVXOjqnK4NTF2ZqxlkZpvBH5LAgjSriquSnd4z
-   1GBv/IBI9ytbNOzSEJAMUW7VfRYC8EoHt66GX6EoXWiaH4zOo+35H/4m+
-   +7SMBQ93DWkUgEVBIZ2YlDjdti9m6j1+NFS2jFjMBcDEH1Wj0t86vzAf0
-   lqENS34q5ksgP9taHCqIQV0JObVm0T2tTw0Iw/QHWfOeflTAkHV3xa263
-   w==;
-X-CSE-ConnectionGUID: b9k1EOoNS3m9YUMTyqE+qg==
-X-CSE-MsgGUID: KBkKimHdR66AbO0O5/dZtA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63723657"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="63723657"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 23:36:22 -0700
-X-CSE-ConnectionGUID: HQJA6jmyRKSa6Aix+e2wbA==
-X-CSE-MsgGUID: 7yshb7v5Rs+pEMfbcCwRIw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,256,1751266800"; 
-   d="scan'208";a="178808759"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 23:36:22 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 10 Sep 2025 23:36:21 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Wed, 10 Sep 2025 23:36:21 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.50)
- by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 10 Sep 2025 23:36:21 -0700
+	s=arc-20240116; t=1757572914; c=relaxed/simple;
+	bh=8zE80gE2QDXPV+RFLZZ2f5hmnGO4ah2O+xRh+4W84BM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MCFAR7ePH6vB5XY9bWnqFWjUShJzhz9SXWLwcxHBDNdeUiCgU7W1c5/eGwVzoAVRReIJFoteQmOhUPGybHEEWjA/YkKR1uKMyy661j9tF5epJjn9Ch6i2nfrr2diCCV2NtPIT+XhHk79uzviCwcDF3tS4klDiFeP9u5LNqW4Uog=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B3s4dszW; arc=fail smtp.client-ip=40.107.92.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kmuxt2uqGpHshBxrvlYkUKyRhPIxIuJt/Rce0rLgxoQImf8mdGhViujFNzNLCMS7kdvowyWBOTv4hQxiH5thw757IgsTf6vo5euxvVfexuHPknOGbpRef9N7bcUOn8/uvoPdkOR9ABe33S/Drb4XesyNTofSYXJRRybh5ZgykhZ58lo+ZRIUcne0P44MwwkcjpUmymkggm+CY5A73wc4zLBHLi14U2oEGMevKK9zOkH/1naJhIpmJotl/W9LjFNXU6pZWtXwiShhvqlbRdljC6FFAyOKDraiayHu00BaQ4xbO89MA2yNQMnyutxb86x7cm4Bn0AEndR3dDa3VXXFOA==
+ b=P+RuDSkCpDkqZI5HUe9i/5a5jeulpd5FaPRcTPyAKDe34bpvy6FSA4Unr061oPXUrznoRfJq7nxV+Nxu42+14a583Df3yGnZaop//B69/WCSAQd04lGmQx3fr7TzEZD3Du08Nw7xcC0DyvKn92MxMNFDKXYD2Knt9xTQAuBWxUCXFE3xQ4oPFCEITcXftwkccNR7YszKDECv7xaWDjCGunvJhhw1y/1ibQQFT8V9zYB9WK8Ds7gx1vaTgOVivZWDPWBRWZIJF2m5r/xe4JXaSsl1TYAiP0DnZZO1Nbd+08SvgS76DNKrCmrAhQpa8/OaG906jf3pN3HscfgV9MhNjw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6BUcDRgZjYn9X0WULxUO1F1Y19T6QrnsGV4dRUhT4yE=;
- b=voOewWq7A08QnxfMfyvAhPTdbcPPYTSpc9NtEW79jLso4KWAwWw9BnRtEKzpxl3khWiGg1DqYAKZtaQq3ntGdgQU5Q3+/FhM4z9kd2S0S8e2tRulJF4LiU6a+dKN6pETyYHT3bgH7rHW2Hxor6FKFcwKQYExPV24gG2h1Hj8pH0J/x+04BK6BIpdObUqCplEiZ9Y3YAfYvSMTvkhFyMF15MqqtBnfCG4comiIdRebvPchg3YwEjLE7pqKsXH7oU5rGO44LXEJPQN7nBpnq+yD16g++6FfykvzHOODxmOtBvrt4Nyw6gKV0yH4c2TL1nZM+3h6uhZlIYAwPugZk8yew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by DS0PR11MB7507.namprd11.prod.outlook.com (2603:10b6:8:150::10) with
+ bh=S/Shp80bejjYz9e58eCG5iIa6fRHFwnSVkx8erAortM=;
+ b=OUjRfABDpmM4CnnlVXIgSd34WOiMy/wzbTDsxJ+mlyB/DOlSRQsa/QQLjTjpN89vhJXdYar04+iuyuj+T9E/4I2q1dDXadhjxOh9RLn+M2qrNTKUTpyxOS84KbwOls7ZagGIkc6fa1GggS2C9dMWr7N8js5qIx/X4PZ/zsp8gaIzHkUgPflBCewpulIZ9mf2KughbGf2IKSfpB5U0blJ3J//vP+tk0pzBOc594d4BovjcrUvc1qPU4fVvdtqjs6OlDRPErdqNRgmaI4hhzYKUIlwh3AmGoLyko+5yaD7ZnDju86kRPHj7ptieStMVwaUoiSbqfYDK/4zTYKbHdi7BA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S/Shp80bejjYz9e58eCG5iIa6fRHFwnSVkx8erAortM=;
+ b=B3s4dszWlzFc1ZJjtW1vCv3NLR6vD8sdOeU2F4c9mbjr8ZqmG67XUv3pdEUgok2tIntNqtIG3NLny6y37DrEPrYomu7G+z0+I4D9/bN0PXoNT1WhSXNTYA/mf41rk5fUELiLbf6ZbBUDiPLMHTEAW/55DmqO/rco4w2Cc9hCYUEbeaGVghcvyMPM0T4qi0oPI0bVtbWNjRVMd92jihJp5bLLLcbDl7qLL+Jg9NcKc9wJPLn+mo/dQfzDn/xLqu3mtV01OqAeNMvlwuiNi8o4FHQ9eYiBtDtYa9HC1eKxFAvK1vxFP3ifcHAnyQMlAAAxGK7/rcY7zY8YXy17qjMhCA==
+Received: from MW4P223CA0018.NAMP223.PROD.OUTLOOK.COM (2603:10b6:303:80::23)
+ by CYXPR12MB9425.namprd12.prod.outlook.com (2603:10b6:930:dc::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Thu, 11 Sep
- 2025 06:36:19 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%4]) with mapi id 15.20.9094.021; Thu, 11 Sep 2025
- 06:36:18 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Kohei Enju <enjuk@amazon.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kurt Kanzenbach
-	<kurt@linutronix.de>, "Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
-	"kohei.enju@gmail.com" <kohei.enju@gmail.com>
-Subject: RE: [PATCH v2 iwl-net] igc: don't fail igc_probe() on LED setup error
-Thread-Topic: [PATCH v2 iwl-net] igc: don't fail igc_probe() on LED setup
- error
-Thread-Index: AQHcIlmOEhM9RUZOb0i6DbdkbMTSfrSNh4qA
-Date: Thu, 11 Sep 2025 06:36:18 +0000
-Message-ID: <IA3PR11MB8986D670D2CD4C1543515308E509A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20250910134745.17124-1-enjuk@amazon.com>
-In-Reply-To: <20250910134745.17124-1-enjuk@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DS0PR11MB7507:EE_
-x-ms-office365-filtering-correlation-id: 11301a11-030d-4c13-06ad-08ddf0fd8408
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?UXasWvR+MkMmTCKFt/KiKpjoyw58qGBErh7qyoME6fza1z4PBP2L8ySi8qko?=
- =?us-ascii?Q?pfjlfK5XFlhg3Vj1++WiYjFH2w0MIshjNnedTwyspBViHT8XBuFIyg+fmnIo?=
- =?us-ascii?Q?5rZF0V16kSK45x8PmwgnTn+bgaMkr+H4q/nM5H/LrmAARnqAYeaBn2qq78Jz?=
- =?us-ascii?Q?NDGby8j5ct7S8zrXbtMGBt3eUHdghzlloG2CJkl3eqzWw96A4y/4G7oEjz5c?=
- =?us-ascii?Q?0rWZeQFBQDX/nNAC4WwJrQOESpNd9GD7AY+oNvWHMJVNdRqHQWDCOD0afvhC?=
- =?us-ascii?Q?sPB0TOqLl36CdGor62s7/BYMXjsLk+HydlCT21H2hwpVdcR1hZ2Rbm5ZdOTg?=
- =?us-ascii?Q?bE5gVhbli3qnIJw2WYDuuEmkK4AAVhTJygk5mYEIJncBLZDOi5+zX3gOLpXG?=
- =?us-ascii?Q?DLRaxnu92P9czEUCgWEJcImaBq4gKQa8Vo35tiIneZHxCx4xlEpDweny4cvu?=
- =?us-ascii?Q?5p75B791BDe2PtH2+URhLOxQMZ/e5xAFbUj8jnRnv3Exmyrre0URSZkiZeTL?=
- =?us-ascii?Q?Y9KTDdt6kLOQBFRSi0YfCRptbXOTbFvwuZtsM9l8n3ZIYTFbUsYuRVClydkm?=
- =?us-ascii?Q?yLucLjY7wqAVSnV33fV/TaAOZsvRxFJKeWTJfn/F7MCWHT6H7sddsbiFvF5m?=
- =?us-ascii?Q?CyHTGxu/1k9LbjMnGQGyiEzJmSVAhBm5mnXQ/T3iuDHOUj2ss9AC/qdhJSJ8?=
- =?us-ascii?Q?fn563UOUavu444mPDz/hWZov2G4aJJZT6iO0uwEyC2Ev1biegzezpbWDlagZ?=
- =?us-ascii?Q?lrJGNOvcvs7ADykWOhwPGKHgumoooTdund/BJMfzbrvs1Pbhb2jd0Hnu8pIB?=
- =?us-ascii?Q?HaPCqFyg19fOU+0WHu7Nm7LeJk+JovWAkWh7wAw2dQ3EphItghWQ+urVgfke?=
- =?us-ascii?Q?LSF0nT3pEXjpU2eLyjn9bbPLXI5MfOzx+i/PuMBAolYKL1ZOE+vHGNVe236k?=
- =?us-ascii?Q?g9zSpaxS3ptAl751C7EEDKY4Qkwr1yC8wpBF75khrbxWRwZzF3QTfhoIQDjZ?=
- =?us-ascii?Q?Nk7dIJrbHsAg/vGkVHnVsKbpJtjWDLJjkwBXulXyTM7pDPl/O58Wodct/OK6?=
- =?us-ascii?Q?tZDAc39dJCXXWWjIQMj5N902HXgGJw67gY2L4PHjQw6p5NxSrkaLMoCqIPmE?=
- =?us-ascii?Q?Iw2PWhqJnJuq50U9i2SivTBtt853qtYmf2hY4ihw1UeVu+u7OeJMaLJbU1iU?=
- =?us-ascii?Q?R439UfLn5YVgWpcqVUeEoACoSENQ1IiUYfvywaRgtezlnw3EU+d8l4ERomcn?=
- =?us-ascii?Q?KKdZX66V8XG2TY6T4EFcwYg6YTpK46h5dgjKyZca2KzYi44YZ1W2Wvl3egQT?=
- =?us-ascii?Q?mnohBUV3vIecWbUZSltLbCmwyrAlZ7fs8UoreRYHUfb94mBJ2+RCfkffxqmd?=
- =?us-ascii?Q?HtRizFWqippo9OJR2fjLk7OaxgGW5RyCfO4QmaMRNrA0GLH41rGDbojJrUNc?=
- =?us-ascii?Q?fs3FEhC92wU=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?SSKAXl2YVoFojhKbtTv0BkR1uUUDUquyuUvCu7mOy9YGyYS9E+crjzdmr6ad?=
- =?us-ascii?Q?GsBJrysz+kN5k1B5y9Rjiuj+i3F4g9ONKYNzgWa2HSOzTwt4BW29Awh5sSt5?=
- =?us-ascii?Q?P3zy+VCsy3ArZQ6Oa1Y59IM4P7iL9v4D17ZOhardwR9/1kvMRf2/yhcKqv4A?=
- =?us-ascii?Q?9MeoWssRnkXzFnLyLvtUl+U8pWmeGkN2lWd+hBUbB4oCXhK9AMcuymEWYsNa?=
- =?us-ascii?Q?Y1m/+hMXKcehlx81zzusrvOi1SgLxyfew7VvCtXb8S02HlRhWJRfZVG2GODe?=
- =?us-ascii?Q?aeCU1WPtcv3YKMki24EIU1h+6qNj83uTUEnRfEPtjT6L8WJG8mexh2a4ho2t?=
- =?us-ascii?Q?QT4lOcuBoi15H7v3ipeSs7cLFUfQqkRaIjRmKa7Cyjt8aOfOsLUtmIdQyh1Z?=
- =?us-ascii?Q?dDfsRN1jd/RgDc2Zjp+MLz1ZqIqvN5lxH4JLFVd6zzVgJ0ODKqGvTOUp7/8D?=
- =?us-ascii?Q?Dvkn3M5nA8E37kPt78kXgeDn0Gq74GMwBg4H+HhXKVw2KBZYnwQv3utoVZ99?=
- =?us-ascii?Q?FNf4D9U6TFfpjDe+NmBuLZKCYW8dzHXIWXN+eJJ2f6JidVw77wOwhQ282EXX?=
- =?us-ascii?Q?eIQI6U7Bwxb08yGSRSInFx/qJAKdJ3AKFHsxActDO8gfzATPx1FxnHYBPeyN?=
- =?us-ascii?Q?cbS6GMANs7a+VLnK7fhRxT4VC1c1PPhzgzTkz4jyjPyqfSS5UrBaut+eXHdg?=
- =?us-ascii?Q?So4td1yAkCFyjkgjhVTUNaqbhuM0j2XXIPOdlIEGzibjWY2le0toGqvK5yN6?=
- =?us-ascii?Q?kQsADKImPMf2FIueTFBOISjxfGYRPAbnMBz7LLeOF3S0iR/USx+B9m4u/ySK?=
- =?us-ascii?Q?Klwx+NLyvRGbK9itJS3nxE/pMKrE8Trf6QE54xxdgkuOO9giXVmC0geeOtuC?=
- =?us-ascii?Q?RRRmWQT/CEOBcmgi6qWpOrrwi5cWjwo1zus3SW06WyLYKZfyGztBXzyiHLz3?=
- =?us-ascii?Q?uZWGqWS4ww4OWk429KitlwEHMK8u7P3JeSC7pJ+MvfROayHY1wXTldAalWB/?=
- =?us-ascii?Q?PJUqJsIW8YMKDhls5noGOJbujwDJxPu6NOUOb2bf8kea5zYW8WSwf8kvB1fY?=
- =?us-ascii?Q?aGYA3fgE2znzRErfmJIETjR+d4amRPncLfLW9tKAZ10hjFMqbzZUt2RQcNxk?=
- =?us-ascii?Q?CNkX158q8F4xVfwnuNJNnFIhDZc8hDfYhZ7BrEs9PFIVIgo3hgBFnOmRmIEi?=
- =?us-ascii?Q?QiCkxlJmOo1Ek1fyI6TFQ1mG8XWjC8LTbGhFiHnpSRVXKa4uKhMM+c95aY78?=
- =?us-ascii?Q?FRYDhynp4b0liJRxToY2DjXU2rfjGkARfTFdm8AHya7FE7v28U/K8tzaH9PL?=
- =?us-ascii?Q?vR/NPNnbCrz6B4uT/7tpj0t3Qx/rsqgqsmLL58ZwJQeTFutkrddZ8QSyhIqx?=
- =?us-ascii?Q?N7nzDjB/DJR9GFPmcG3R3c0CG8g77+mg2x7Vz11XxFzus8ecQMG0vm7vtBUb?=
- =?us-ascii?Q?aj165VrnSPa9RlwAIO1yOSwCXvblug5D7sFo25DXQZFJHgOCw7OtxSPJxEv1?=
- =?us-ascii?Q?eigAcKYPBCmCNt6s2Ic1kIYQl1E5mq2VsXt1EQbSLBDM9ZUD01UxoouuEG3V?=
- =?us-ascii?Q?0QIfbo44l+Fxy9JbrjP4Lt8aEMt+StT70iJihsBMZceW92vKNRxbb77zyz4c?=
- =?us-ascii?Q?VA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 2025 06:41:46 +0000
+Received: from CO1PEPF000042AE.namprd03.prod.outlook.com
+ (2603:10b6:303:80:cafe::31) by MW4P223CA0018.outlook.office365.com
+ (2603:10b6:303:80::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.15 via Frontend Transport; Thu,
+ 11 Sep 2025 06:41:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000042AE.mail.protection.outlook.com (10.167.243.43) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9115.13 via Frontend Transport; Thu, 11 Sep 2025 06:41:46 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 10 Sep
+ 2025 23:41:30 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 10 Sep
+ 2025 23:41:29 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 10
+ Sep 2025 23:41:24 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+	<leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Michael Guralnik
+	<michaelgur@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Patrisious Haddad
+	<phaddad@nvidia.com>
+Subject: [PATCH net-next] net/mlx5: Improve write-combining test reliability for ARM64 Grace CPUs
+Date: Thu, 11 Sep 2025 09:41:13 +0300
+Message-ID: <1757572873-602396-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11301a11-030d-4c13-06ad-08ddf0fd8408
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2025 06:36:18.8727
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042AE:EE_|CYXPR12MB9425:EE_
+X-MS-Office365-Filtering-Correlation-Id: bde19f74-97dd-4e0d-e619-08ddf0fe4760
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?uFp7kOVUDdzgaivrBVFjvXUDyeuDPKi3vvgZot7KI7JqL6BeyDPDx0c14eTv?=
+ =?us-ascii?Q?BpDNJRHAO4SC3VzYkytWCUkqgBJB0Qjfq/dFGikqkeXc1IAkLkSZ2ZoZCmud?=
+ =?us-ascii?Q?+MOAQDE01n+xpbz41vuzARZo6FW/tt9MGvMcptt2mMo4xQsc4dbSMaYLE+Pd?=
+ =?us-ascii?Q?Mp9WuKSPq4Etvj+OqJXRqKG3M5A3nyysdh7BGGa8mRU+2O6Nt4axqUkTeVJN?=
+ =?us-ascii?Q?ouD9DZO5eK3FipapsrB3jRBOpfYw0LOi1d7x4DpG08VAKD3H/5JPxww6QR9q?=
+ =?us-ascii?Q?TSU3svPH6ufDv13mzDi7L9EDfgkSYtpgQ45kBrGgz9+MTLmDEl7lym5rv5yF?=
+ =?us-ascii?Q?Y2olKCsXr5t4Sn4L6lb+Y2bMoSXdccGEF7qB6g1czEY9rxWVG6AsZ7iS+uNX?=
+ =?us-ascii?Q?r36p9dSMoLhosWwYirwqh0bKgw4bZj8snZW7r2pEyYD0aA0WC0LSKJ9fpbCV?=
+ =?us-ascii?Q?G2bnDhDqEHT/WY7aIlV2S4947xrbAFb/CRVxYVy7wW/HqynjTNaFMC5PffAh?=
+ =?us-ascii?Q?bPnvJUwzKbvxNWYIAPeSYc/wXdffmooMCdafFpi/2XGMofrNmErYFZ65Znhv?=
+ =?us-ascii?Q?MjbgDRVmtNFKMfUalZYRAaY7nLo7QEJsHnBOv6p88nIJdVfYrtz9Oud/YOub?=
+ =?us-ascii?Q?PhRFRT5BQ613YbuUBED0+KihUT2/pMzU8yeKN9HwU5qhj6IyaKDr1madk/3H?=
+ =?us-ascii?Q?APrX/sPr4fb+8e3XYVrhIZCrgF213GodL+HDqFkKImFIIzW436OrlTxm/Fri?=
+ =?us-ascii?Q?KIUBzOqreYw9933rU3ci/GoQcsVoCoCplnILZYKUh3JgNIFJzd45ahPC77P1?=
+ =?us-ascii?Q?5IZ3jAcnCuTEv2xt/UDSzaRlYZNaSU1GG8RayBegKHf1Yo1IVzPyKP5PXm16?=
+ =?us-ascii?Q?dQr6eS8JDwk6cz2LjEYtDjudUYcR2lHLG0/4QGSiIWrx2ptE4GyyhCE5uBnh?=
+ =?us-ascii?Q?fDlsJYARzc7Dn+up6TTVuA80A29QrjlbxsKo2/n4iJL3ZIgNOrPJTlZhOUNY?=
+ =?us-ascii?Q?lTJw+gVs2ccEOylWFeTlWQYsjoB/Jx10j1vRUkmD3cea9wZTTy3sEZrifgmt?=
+ =?us-ascii?Q?0uFiLHngjgHqo1HJnbi5BX3k5UCoHUBNWikvHWeflhEFaTcp/A1IeV9O0TLz?=
+ =?us-ascii?Q?3gSIuozPyMyME/MDckRZDWP2X6xHTQ+0biME7+KtBpygVYSJod2ki5z/KHZE?=
+ =?us-ascii?Q?l6d+7jV5Yp9oj47y9wM1KU92V5sGBesr/oc20jmpQ16NMKRuIxJB4kNkmBuV?=
+ =?us-ascii?Q?fchwR7gcYNW4jVEvOxlL/Q6BJjuHqeqP3ee5mWPoTU3Afa/SLVrmKcah7r3t?=
+ =?us-ascii?Q?i18rrMUU13F7JIhuxXBBYpXGNQwB6mbb5p/rotoIlk3J9Tn1huwWQeYNNmF0?=
+ =?us-ascii?Q?Fjmde/rB6xEFHsDcud+N3QY71Mi9xbRlCP6HJna235NWi2lVdroxwh39LUUP?=
+ =?us-ascii?Q?pgGdewSOJInNsUl5ebUW4bRuN399RGT/h1/4yN38ae5xL3sTbLFmZWUoe57N?=
+ =?us-ascii?Q?Zqsvsh/XZ89lFcj5GQl21hoDV6Cm2l9ximtKcyMAuPdYes+EGT6wAXzItw?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2025 06:41:46.5389
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lxflvLBEC5Z0N3CyAcuz2hAu1toip/vKkIIN/zZPJBt+gRyAX+7XIuuLbrNPNJfjzPTLFKHk9z9oVqi4BHoadF9kRrjV15e3PqKQIa7skec=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7507
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bde19f74-97dd-4e0d-e619-08ddf0fe4760
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042AE.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9425
 
+From: Patrisious Haddad <phaddad@nvidia.com>
 
+Write combining is an optimization feature in CPUs that is frequently
+used by modern devices to generate 32 or 64 byte TLPs at the PCIe level.
+These large TLPs allow certain optimizations in the driver to HW
+communication that improve performance. As WC is unpredictable and
+optional the HW designs all tolerate cases where combining doesn't
+happen and simply experience a performance degradation.
 
-> -----Original Message-----
-> From: Kohei Enju <enjuk@amazon.com>
-> Sent: Wednesday, September 10, 2025 3:47 PM
-> To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
-> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> Abeni <pabeni@redhat.com>; Kurt Kanzenbach <kurt@linutronix.de>;
-> Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; Lifshits, Vitaly
-> <vitaly.lifshits@intel.com>; kohei.enju@gmail.com; Kohei Enju
-> <enjuk@amazon.com>
-> Subject: [PATCH v2 iwl-net] igc: don't fail igc_probe() on LED setup
-> error
->=20
+Unfortunately many virtualization environments on all architectures have
+done things that completely disable WC inside the VM with no generic way
+to detect this. For example WC was fully blocked in ARM64 KVM until
+commit 8c47ce3e1d2c ("KVM: arm64: Set io memory s2 pte as normalnc for
+vfio pci device").
 
-...
+Trying to use WC when it is known not to work has a measurable
+performance cost (~5%). Long ago mlx5 developed an boot time algorithm
+to test if WC is available or not by using unique mlx5 HW features to
+measure how many large TLPs the device is receiving. The SW generates a
+large number of combining opportunities and if any succeed then WC is
+declared working.
 
->=20
->  FAILSLAB_PATH=3D/sys/kernel/debug/failslab/
->  DEVICE=3D0000:00:05.0
->  START_ADDR=3D$(grep " igc_led_setup" /proc/kallsyms \
->          | awk '{printf("0x%s", $1)}')
->  END_ADDR=3D$(printf "0x%x" $((START_ADDR + 0x100)))
->=20
->  echo $START_ADDR > $FAILSLAB_PATH/require-start
->  echo $END_ADDR > $FAILSLAB_PATH/require-end
->  echo 1 > $FAILSLAB_PATH/times
->  echo 100 > $FAILSLAB_PATH/probability
->  echo N > $FAILSLAB_PATH/ignore-gfp-wait
->=20
->  echo $DEVICE > /sys/bus/pci/drivers/igc/bind
->=20
-Using fault-injection test using failslab - excellent!
+In mlx5 the WC optimization feature is never used by the kernel except
+for the boot time test. The WC is only used by userspace in rdma-core.
 
-> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
-> ---
-> Changes:
->   v1->v2:
->     - don't fail probe when led setup fails
->     - rephrase subject and commit message
->   v1: https://lore.kernel.org/intel-wired-lan/20250906055239.29396-1-
-> enjuk@amazon.com/
-> ---
+Sadly modern ARM CPUs, especially NVIDIA Grace, have a combining
+implementation that is very unreliable compared to pretty much
+everything prior. This is being fixed architecturally in new CPUs with a
+new ST64B instruction, but current shipping devices suffer this problem.
 
-...
+Unreliable means the SW can present thousands of combining opportunities
+and the HW will not combine for any of them, which creates a performance
+degradation, and critically fails the mlx5 boot test. However, the CPU
+is very sensitive to the instruction sequence used, with the better
+options being sufficiently good that the performance loss from the
+unreliable CPU is not measurable.
 
-=20
->  	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
-> --
-> 2.48.1
+Broadly there are several options, from worst to best:
+1) A C loop doing a u64 memcpy.
+   This was used prior to commit ef302283ddfc
+   ("IB/mlx5: Use __iowrite64_copy() for write combining stores")
+   and failed almost all the time on Grace CPUs.
 
+2) ARM64 assembly with consecutive 8 byte stores. This was implemented
+   as an arch-generic __iowriteXX_copy() family of functions suitable
+   for performance use in drivers for WC. commit ead79118dae6
+   ("arm64/io: Provide a WC friendly __iowriteXX_copy()") provided the
+   ARM implementation.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+3) ARM64 assembly with consecutive 16 byte stores. This was rejected
+   from kernel use over fears of virtualization failures. Common ARM
+   VMMs will crash if STP is used against emulated memory.
+
+4) A single NEON store instruction. Userspace has used this option for a
+   very long time, it performs well.
+
+5) For future silicon the new ST64B instruction is guaranteed to
+   generate a 64 byte TLP 100% of the time
+
+The past upgrade from #1 to #2 was thought to be sufficient to solve
+this problem. However, more testing on more systems shows that #3 is
+still problematic at a low frequency and the kernel test fails.
+
+Thus, make the mlx5 use the same instructions as userspace during the
+boot time WC self test. This way the WC test matches the userspace and
+will properly detect the ability of HW to support the WC workload that
+userspace will generate. While #4 still has imperfect combining
+performance, it is substantially better than #2, and does actually give
+a performance win to applications. Self-test failures with #2 are like
+3/10 boots, on some systems, #4 has never seen a boot failure.
+
+There is no real general use case for a NEON based WC flow in the
+kernel. This is not suitable for any performance path work as getting
+into/out of a NEON context is fairly expensive compared to the gain of
+WC. Future CPUs are going to fix this issue by using an new ARM
+instruction and __iowriteXX_copy() will be updated to use that
+automatically, probably using the ALTERNATES mechanism.
+
+Since this problem is constrained to mlx5's unique situation of needing
+a non-performance code path to duplicate what mlx5 userspace is doing as
+a matter of self-testing, implement it as a one line inline assembly in
+the driver directly.
+
+Lastly, this was concluded from the discussion with ARM maintainers
+which confirms that this is the best approach for the solution:
+https://lore.kernel.org/r/aHqN_hpJl84T1Usi@arm.com
+
+Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
+Reviewed-by: Michael Guralnik <michaelgur@nvidia.com>
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |  6 +++++
+ .../mlx5/core/lib/wc_neon_iowrite64_copy.c    | 14 +++++++++++
+ .../mlx5/core/lib/wc_neon_iowrite64_copy.h    | 12 ++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/wc.c  | 24 +++++++++++++++++--
+ 4 files changed, 54 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+index d77696f46eb5..06d0eb190816 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+@@ -176,3 +176,9 @@ mlx5_core-$(CONFIG_PCIE_TPH) += lib/st.o
+ 
+ obj-$(CONFIG_MLX5_DPLL) += mlx5_dpll.o
+ mlx5_dpll-y :=	dpll.o
++
++#
++# NEON WC specific for mlx5
++#
++mlx5_core-$(CONFIG_KERNEL_MODE_NEON) += lib/wc_neon_iowrite64_copy.o
++FLAGS_lib/wc_neon_iowrite64_copy.o += $(CC_FLAGS_FPU)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c
+new file mode 100644
+index 000000000000..8c07d2040607
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c
+@@ -0,0 +1,14 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#include "lib/wc_neon_iowrite64_copy.h"
++
++void mlx5_wc_neon_iowrite64_copy(void __iomem *to, const void *from)
++{
++	asm volatile
++	("ld1 {v0.16b, v1.16b, v2.16b, v3.16b}, [%0]\n\t"
++	"st1 {v0.16b, v1.16b, v2.16b, v3.16b}, [%1]"
++	:
++	: "r"(from), "r"(to)
++	: "memory", "v0", "v1", "v2", "v3");
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h
+new file mode 100644
+index 000000000000..ff2a2e263190
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#ifndef __MLX5_LIB_WC_NEON_H__
++#define __MLX5_LIB_WC_NEON_H__
++
++/* Executes a 64 byte copy between the two provided pointers via ARM neon
++ * instruction.
++ */
++void mlx5_wc_neon_iowrite64_copy(void __iomem *to, const void *from);
++
++#endif /* __MLX5_LIB_WC_NEON_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/wc.c b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
+index 2f0316616fa4..44c2ac953ea2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/wc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
+@@ -7,6 +7,11 @@
+ #include "mlx5_core.h"
+ #include "wq.h"
+ 
++#ifdef CONFIG_KERNEL_MODE_NEON
++#include "lib/wc_neon_iowrite64_copy.h"
++#include <asm/neon.h>
++#endif
++
+ #define TEST_WC_NUM_WQES 255
+ #define TEST_WC_LOG_CQ_SZ (order_base_2(TEST_WC_NUM_WQES))
+ #define TEST_WC_SQ_LOG_WQ_SZ TEST_WC_LOG_CQ_SZ
+@@ -249,6 +254,22 @@ static int mlx5_wc_create_sq(struct mlx5_core_dev *mdev, struct mlx5_wc_sq *sq)
+ 	return err;
+ }
+ 
++static void mlx5_iowrite64_copy(struct mlx5_wc_sq *sq, __be32 mmio_wqe[16],
++				size_t mmio_wqe_size)
++{
++#ifdef CONFIG_KERNEL_MODE_NEON
++	if (cpu_has_neon()) {
++		kernel_neon_begin();
++		mlx5_wc_neon_iowrite64_copy(sq->bfreg.map + sq->bfreg.offset,
++					    mmio_wqe);
++		kernel_neon_end();
++		return;
++	}
++#endif
++	__iowrite64_copy(sq->bfreg.map + sq->bfreg.offset, mmio_wqe,
++			 mmio_wqe_size / 8);
++}
++
+ static void mlx5_wc_destroy_sq(struct mlx5_wc_sq *sq)
+ {
+ 	mlx5_core_destroy_sq(sq->cq.mdev, sq->sqn);
+@@ -288,8 +309,7 @@ static void mlx5_wc_post_nop(struct mlx5_wc_sq *sq, bool signaled)
+ 	 */
+ 	wmb();
+ 
+-	__iowrite64_copy(sq->bfreg.map + sq->bfreg.offset, mmio_wqe,
+-			 sizeof(mmio_wqe) / 8);
++	mlx5_iowrite64_copy(sq, mmio_wqe, sizeof(mmio_wqe));
+ 
+ 	sq->bfreg.offset ^= buf_size;
+ }
+
+base-commit: 1f24a240974589ce42f70502ccb3ff3f5189d69a
+-- 
+2.31.1
+
 
