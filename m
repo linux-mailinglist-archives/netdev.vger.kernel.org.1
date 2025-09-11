@@ -1,95 +1,99 @@
-Return-Path: <netdev+bounces-222130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C426B53387
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:20:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1596CB53395
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50F9D7BDBAD
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:18:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FB671899801
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97A2322DCA;
-	Thu, 11 Sep 2025 13:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92E3326D5D;
+	Thu, 11 Sep 2025 13:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=thingy.jp header.i=@thingy.jp header.b="igDt690k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CaDSz7w6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59F02E8DE8
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 13:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654103112D9;
+	Thu, 11 Sep 2025 13:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757596828; cv=none; b=F4r3ReyILBADFEeK4RwJ8gAjLagrOdOYy1DeMQv14DPcWudF5aQEWc0YnhfSAvxoQrr8jZ7dCwGd+WscAbetPkuQKtkdvv7P11nCs+Kjv5ELgGRr2yEOIoVgqzazckb8vaaDO5fU8wjWE+1Bh1Efdk3Bt8NY10cU+dkclllLV98=
+	t=1757597046; cv=none; b=loYPLPpnuNvREl+9gErmsUTS3whONwYxJB0Va6HvlPMglI0BKY4+uZDeuFpHb/buknACzX5yrick5TVjbladxrr5ILL/8q/iNtoo7ocp7x/3SPR2rVrG5wrigbHXaP63nQrsWigmtO0RNXjV5TdvUwWQffximr0VOF/P+sRRFUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757596828; c=relaxed/simple;
-	bh=O5VXtAOP/OmIhTsuzJDvPX+XiTm+lHL4PKa8YEVkr/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cy1AsPAT+Dl0xpnln81dFykdhhdD79cAC+57F8kIgT8e413zwI9ORUr+A4dxeorVR2g2CCSvk0TqeD8mrGLQGQ3cdHbDzuSGEkMYm3DHQcs6+yluHbgw1TOwmuTGbxvp07hc5wDgP+JVM8uvfVFhf0ZWBMdzn/M+nBDnx5uNmxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thingy.jp; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=thingy.jp header.i=@thingy.jp header.b=igDt690k; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thingy.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-32dd4fa054bso606180a91.1
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:20:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=thingy.jp; s=google; t=1757596826; x=1758201626; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=O5VXtAOP/OmIhTsuzJDvPX+XiTm+lHL4PKa8YEVkr/s=;
-        b=igDt690kF/o23uuWt9s3pSRwfzAOMeyiG2Dt9dDkmYpEFPS2hKWEK/6mDs8tYnG9Ii
-         3SvTnc8Wem4NflwGycWNz96PqdS4ePjQy7qQLNf0hDQt6nAhsNYT0fY62tbDoiPYb8Rq
-         WCPE6BGs8ldNs3Ad+U8qkdF4PBKJbnwRBgPgU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757596826; x=1758201626;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O5VXtAOP/OmIhTsuzJDvPX+XiTm+lHL4PKa8YEVkr/s=;
-        b=hMH3dMvk2vR3tGzecACWS3pkLJ1YYAaYcw+leW5Jrn9Jor/yFLNGIPt4ohJWGUOf3H
-         lpyLtU5qRpDmP9mHwRM0dEtg5tlEVHEWsBNL1AYIt7kPyr7nxyfRni8GoX+IHENUfdGt
-         INxe45PhoEwr+QqVw+CxIo75tYrlQyi148s7TbnNlFZ02kLgSW61suD5vu7U+DHcWeiF
-         9iYaP9rGoLjj6H4urqivmhXjJ3usD0gEshGZ8k9tQn19Oxn6Vm2mwAK3hZUzn+rcT7No
-         S7J2p1ib4UMxyYYJlzfp0Ntbd0pfJGxBEm2vosBhwCASZn2pc+BUR2hfUen5wG5zu4xO
-         G1nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGY5YtnuupPIPjNWZLgYdab2Qoy5Jy4llyCPmmJpR08ASDdbyNzlGf3DUnVSA/Mis+CuFBlQo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwV2+y04LTrM2gLXt2qWf4qY+Ial8KRCNzc7jQUgEcWJxihoGM
-	NN7QWBuehEj7YZ6zZNWJOqSCP5h5YMnP9JiZ3eGtHEHL/bQafIl+ztIVAxGhbXt8fsmzUjXTHq8
-	Il1qm73wCvSSQ6trZO9S/OnDYXsd2hdeImxgIJfsolg==
-X-Gm-Gg: ASbGnctWTlzp4Ves8hphSrk74I9tO9PLys/gdAh5DAQKHUt0UQ3lLn2BO/b1+bNC6rv
-	CE3UU1fFDSEZd0cL9sqtTSPJbbdlRh+pGMwApXxoQgquvXH+N5TPrEE3FnufVung622Z16y4aR6
-	JAotnGOuEGxQqSgQ7I9rmOqtxKSPKfKPRoIoKx0z6zF7sc/9UfzZJ2lC4nVBAl/DP4yM17opY44
-	ECOFc5C3pADeMChut2K
-X-Google-Smtp-Source: AGHT+IHd5xyJNz01wwrpJhDl98T45ztJd8ELgxgaEy7iQhcAjFMhM3czPP8zaiJ5J9c40XxE1kOBKaWdJoKiiAcymxU=
-X-Received: by 2002:a17:90b:2e51:b0:32d:a37c:4e31 with SMTP id
- 98e67ed59e1d1-32dd1ee82fbmr3766136a91.17.1757596826023; Thu, 11 Sep 2025
- 06:20:26 -0700 (PDT)
+	s=arc-20240116; t=1757597046; c=relaxed/simple;
+	bh=ReBPBkxXd+EypkUBHcKbC5D48dqv14ID4CKpjTXEUa4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qVG3GUuNgJ3qAl8Zb+HzCko0OaVI2hah5guCxCTNFzoPL9vNeapZuYGBTpD4kmXEM/60MeH44MKoCHaSfoIx9QKCKSDk9k8S//JxGkIPnCXQ4MFZucSi/cTeZ6L4WWiNZB1wKFOZbPtyF2st1SpOGaBr2XJvqrT4g4b7ECQfZAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CaDSz7w6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2804AC4CEF0;
+	Thu, 11 Sep 2025 13:24:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757597046;
+	bh=ReBPBkxXd+EypkUBHcKbC5D48dqv14ID4CKpjTXEUa4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CaDSz7w62JVQ9qph9vkiqPWEkMdO9ksAVmIJj6NNKrNQhtpY77er7EdYsXNaC3Gw7
+	 Or7QidGxUnAo4jA+WYPKEG0esydorOwwWQZMNuyXSKReLFJbk9OUJjmMX1h8WrZaCC
+	 kdugKwZrxFmyMFGRCijvIsDKthcvmqU6FbjU7TfoPRV/fEKPknX6eThWyBYYYCmWGy
+	 NnptvyWq2o2frDJrRPJalmbwzPlpzkUokxPIWhCQK0WY4lfqfYh6AH5G/p/N9YIJYF
+	 TZ4WZwjrZBDTfKUguTN6o6JgjeEoNWh5YbaKNSRXQFbXRrQSUX+E1cGz+mssdgJDSF
+	 6ZLuO0WOJbW1Q==
+Date: Thu, 11 Sep 2025 06:24:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: Shawn Guo <shawnguo2@yeah.net>, Frank Li <Frank.li@nxp.com>, Joy Zou
+ <joy.zou@nxp.com>, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
+ kernel@pengutronix.de, festevam@gmail.com, richardcochran@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ frieder.schrempf@kontron.de, primoz.fiser@norik.com, othacehe@gnu.org,
+ Markus.Niebel@ew.tq-group.com, alexander.stein@ew.tq-group.com,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux@ew.tq-group.com, netdev@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH v10 0/6] Add i.MX91 platform support
+Message-ID: <20250911062404.1d2c98f6@kernel.org>
+In-Reply-To: <aMI6HNACh3y1UWhW@dragon>
+References: <20250901103632.3409896-1-joy.zou@nxp.com>
+	<175694281723.1237656.10367505965534451710.git-patchwork-notify@kernel.org>
+	<aMI0PJtHJyPom68X@dragon>
+	<aMI1ljdUkC3qxGU9@lizhi-Precision-Tower-5810>
+	<aMI6HNACh3y1UWhW@dragon>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250907064349.3427600-1-daniel@thingy.jp> <20250909181322.04dc2fed@kernel.org>
-In-Reply-To: <20250909181322.04dc2fed@kernel.org>
-From: Daniel Palmer <daniel@thingy.jp>
-Date: Thu, 11 Sep 2025 22:20:11 +0900
-X-Gm-Features: Ac12FXxQ70xmDrhK5rD-Edf9LkLgt_jI1IVW96Rk2Cd3DVeZZ2SdNbJQT5z7MVc
-Message-ID: <CAFr9PXkYyyCQqHt_-75GM_uup3bSvxDgjDc0-O0t=j3UY_JN6g@mail.gmail.com>
-Subject: Re: [PATCH] eth: 8139too: Make 8139TOO_PIO depend on !NO_IOPORT_MAP
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On Thu, 11 Sep 2025 10:55:24 +0800 Shawn Guo wrote:
+> > > Can you stop applying DTS changes via net tree?  
+> > 
+> > shawn:
+> > 	Suppose Jaku only pick patch 6.
+> > 
+> >         - [v10,6/6] net: stmmac: imx: add i.MX91 support
+> >           https://git.kernel.org/netdev/net-next/c/59aec9138f30
+> > 
+> > other patches is "(no matching commit)"  
+> 
+> Ah, sorry for missing that!  Thanks for pointing it out, Frank!
 
-On Wed, 10 Sept 2025 at 10:13, Jakub Kicinski <kuba@kernel.org> wrote:
-> Any idea if this is a regression, or the driver would have never worked
-> on your platform / config?
+The output is a little confusing.
 
-I don't think this is a regression. I think the PIO mode would have
-never worked.
-Without that option the driver probes correctly.
+Konstantin, would it be possible to add (part) to the subject of the
+patchwork bot reply when only some patches were applied? I've seen
+other people's bots do this. Something like:
+
+ Re: (part) $subject
+
+? Maybe there are other ideas how to express that just part of the
+series was applied, no real preference.
 
