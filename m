@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-221935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB45CB52600
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EF85B52602
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39DFAA0053F
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:48:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72BE0A002E8
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23ED3253B4C;
-	Thu, 11 Sep 2025 01:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE52C257453;
+	Thu, 11 Sep 2025 01:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKft3t4j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Knexkpa6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D34021CC4B
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 01:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD45E253B40
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 01:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757555276; cv=none; b=HxXzUoE4yYoqkdJ6Qbnz8/2Y2AnLQB9mBi6nYgVAN4yiJPQk8wmM/n8nEp1xJWVOB6x987ge+PTnuDOauwpK08Urytlhr8py7wLjsQDbpukUcc9LybCHVZWg5Dg7uo1+CPDydBQ+EAQic9ckGkIUVcf+HwP783sWo5oEB2gWPq8=
+	t=1757555277; cv=none; b=CJvbvS6LDb0htcxAFLBH4pGLlJCOz9RmgxKKSIMKzXPanQ9Pf6eUDNLwQvB7kOjneALalf6hhaTS2ft3QiLCwXeEvflsgesV6V0YlsozJbIS6HudMHwID04VDp2Z46FVE3S5HmR8mCtlxw4BjNsErFqWXu/iGv0BgZz1HLii5s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757555276; c=relaxed/simple;
-	bh=2AFIwmU8FSYYIhlxMB6VkOuMgvDm95ic7bhTckFrNko=;
+	s=arc-20240116; t=1757555277; c=relaxed/simple;
+	bh=NBbWB/tztbe41YFzMEBnb8GSYnmoCcPJq4qmUpwJcRc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OfznzldncktuAXmwYDuU3w7cGVx+VL3ENMaECy54YlBPAU7+g0HYPwAd+tgtBcvEo7CC98ZMVYwlJnYLaqvIYWjig7kE2CtmXYP8BlkGVoSCC934in36vHwzPK8TZ/eS6vhOGKPfSU4wE03yBnbWzcjNaJmHPCv5b68wWPYF/F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKft3t4j; arc=none smtp.client-ip=209.85.128.182
+	 MIME-Version; b=WkwmItMTr3RKNoDMaMY1YKxxq+idGVvfUgXpeHwgw/38OwiyM+q6dcr+D8/Evz2IB889IXCxZUw067AWblX/5CMTuXGw/ZOqsJi8JebaBJDR9TdBaKJmi7S7jFk0TypCIMIQJ7xMHb36F5hTmNjPftaOiGVgw+1j5mqrqUUWlho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Knexkpa6; arc=none smtp.client-ip=74.125.224.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-72267c05111so1851857b3.2
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 18:47:54 -0700 (PDT)
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-61381743635so78001d50.1
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 18:47:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757555273; x=1758160073; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757555274; x=1758160074; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=euYPHbO3IfGpmle4Iw4Hxb9thWUKXY+ytnj3U1MAOTo=;
-        b=eKft3t4jxoMXsw6PTy99OIDbwlo+KEb0iO0OJWo216tFxDwQPlgc9tJA31LlXVceL3
-         1ahb5X33StxUGJcOQG8EFEPyeOd6evwo/sZ+9Ppx2OMCm0ssxZiwM0pKntIe/x6F7NMf
-         caRpYHijQXPSQ1Sw8MRqm2WE2mokJtnJZAcO4jb5J80AM9ZHLyqwyXhALn8i/maDk97p
-         q2R43sVAPDLH4wuY2gqArZZJpuZ94BL79/8uGaiLGFEYbYtBClPSkGzblaTV0gUEZ+aJ
-         botnIqozft9R7ZrJcshXuhA9l+9zfxidAOSbDIeboZvXbgftLHSLy1tXIEeRJBAiFrG8
-         nklA==
+        bh=u3Zmh81j9DmT/W69x4I8M5alJ+a8UHczRxlFb3KycXE=;
+        b=Knexkpa6cwJ7MbSIRcpeT5ydPIbePsc9RN5MbBRMu6IYuLfNrg1KphkC9WXE/Cq2xc
+         ztGCc76E7cDJqXfJq5j159Rhq/gPzFvV+dW45iA5P3Q219upzovfGSwVRb7cwOdqFpgv
+         gXuaEdyiV/INdhp4VYOfkvhDoyUUIGJJJdMUtvFyi8h7f8gjlsSchzKSf321F2PEvmOY
+         6k7iHRPYL4sf1UJ0kpFYofPLNnQVpw2KCJIehK85lNYu4ALKEBh2n8vGgVkkUT2ZQ1Jk
+         1wKZY1h9jEmHqEcf5kYVN1etzwiYF0elslvxir351H3a1iy+T4t0nUvNzqKCGQmcZ4A9
+         RIzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757555273; x=1758160073;
+        d=1e100.net; s=20230601; t=1757555274; x=1758160074;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=euYPHbO3IfGpmle4Iw4Hxb9thWUKXY+ytnj3U1MAOTo=;
-        b=XdyNEn7/c7sEjHhTFTF0m8q6E48G+7Z09eUZCpNcl7ZsQgrU013jykhg+gTsfyblw5
-         TKCJubcrkTnkGxHxGhVNk323Ri+Qw8xq04icG46RgMg/qaK31Fzmzj5cRX59eMMGPrZ0
-         dsvQ59gYA59GUgFUJrZGRPW8jI+eFPRjBhI4rPdZIG4nP0a/68pXKG2wei+zNH61RX12
-         lgH94d6pQobZBI9ZdY0zr8hgPr+O/aoiYLX38cS9LaE5alavtjB/Vz8quNZQnNiRobLf
-         o7BZHoMdX7NIo/6s0gOscPciwVPfEsag/AnlKg8CgwRoW+L63UFG9ei7DNmxEModrtW4
-         vRRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVicc2xtea5CiuY8j0CEioX5yV89w6y45LkCEG3XFXrL1aZbpnJapeU6qvpErasuF618rHd8lY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7T6QZgbmvXTr4PrsipJdWQA1+9+yl4oevwhwDZiBLU4oPjra0
-	G1ERJJYYcqyf173jgb9u4pH26cr91xUQUEVJT54vaQaLZIjL64fEQSeD
-X-Gm-Gg: ASbGncsypSf9eSgzZeZwf9aYssGQk7ZMJC6Uy2dEXm2paWjdFPTe9WALH5jyIIbMozU
-	x8fEFyvfuRCA55TuN6EPJwsktBm5CjVGQ1tuKx/ylKmz1eeNN+MOYmwylhpsqJ0AcB51+HdLn7i
-	jOa6AtYkCRO/aEDZulyfNCy3n09GfxuZvnrcK3L2zcWwuWJ481TNQ1U17Sbi+PqcDxiZ4+z74vV
-	iZI2ZseM4huRfu3+El1NN+ZIVck4FDKGFTZUXCPARVtE+gpMGiXdT8MmYcx/s4GJIZ9eXELN7bd
-	4d8TtKskbslGFiOdrY8yuKMt0RhNyaSmQmPoH88GWEuPXTC8IT2JrdaPWWpbxsTTtzfJAouJ8KW
-	oYAhanqnZBVykr2Ct0qQE/0DBGTwXllI=
-X-Google-Smtp-Source: AGHT+IHA2l6wh89UWNn4WqgzSk9/eBVBTSwSH8ZbQHHza6mSbsbuwyPTTilVe0XVdKn+tiboFtYY/w==
-X-Received: by 2002:a05:690c:368e:b0:722:7d35:e08d with SMTP id 00721157ae682-727f2dbf41amr192022117b3.10.1757555273236;
-        Wed, 10 Sep 2025 18:47:53 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:42::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6247cbed5bdsm99413d50.1.2025.09.10.18.47.52
+        bh=u3Zmh81j9DmT/W69x4I8M5alJ+a8UHczRxlFb3KycXE=;
+        b=b32pG+KCm/hrUQSE1ejrVjIZEVAZZx+GIrPPHr1L0c8/0FIV4fR7abeEPtNIccaa/v
+         Yi0VxW89k3TwVQy/NytHS4w/lcOP0GvpCnwPLOadXTTx/PP2zn1T3Fr5i9ltPc2TnJcl
+         6Zc0dradzyqmjbSRTYZYlJSKzOWSP+VxbMvh7+OkOq3rmjYuZnBGOB/BZmkkHX0/ootL
+         UHkcSBdS7RUatgqshgWI4xbxcSMHoThC5kUSyZJoO2FBQq4WFp9z+J322QH3dgV9KXax
+         t4UjNTSGA0t6veOLareVVcVBsHrjVQQDEs6/ZkcGJZ60arTm8EvyDDNO+vhDgIu2RxE2
+         P1rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXThLGUVBCVhVSL1u6lcLNeRXhRhp1BHkEfPn8LeJ3k3vHZEImLZ3dFBOIq87YeHOTOWez5sK4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/E6dZikbbqPhzsFwIalupayTSrYIwFhcX/b5Ld1V9J4WEovOZ
+	3KwFVUlt+j8cbLG86wpT1IwB+RloCyD1G5T8/Eg/XNrPPk1GAMXBXgeL
+X-Gm-Gg: ASbGncv8qans90XxXSK68ufe6NPYgOX1iZFNuifurjDtVXXFCz+cZ0IZFCsy9jy5JAo
+	xaX7k2NfMJkF+wSRqK7XGJ/wOJMUQDMaWlBKQIVnkUgmLA6Jim0OWNktzv9yRHOT35WGN8MuD7j
+	UyYx9IkAwBJJBdJpokkVV78ZDrDrJVXXkmTuoGLD48JSAbOEGCAQvicWdDhVoMT7G6E6xpvoIcd
+	sBMpzdyR0si+kLbQQAupzT/fT8PiPAX2T//rbscUuMOmHF30PoCgl2jWSTwD3TKfgxJ1gSVGpLz
+	wlY6isOcI304FXLzbbA98JdDgd/2Ivw6dRXVcNFC+RY883eiQQhaQ2w8ccyWreGeGZTilWmfuub
+	z5TV9QK6+H3ZoEgdmOOJi1dTHmRcoVXJdWq+pv/W6qg==
+X-Google-Smtp-Source: AGHT+IG0lyE6Dd+TFgnxmaVNL9OomyiYlcnswHQvdJos00mGQBrJ7VjmAdRQF24cMEI5qQR1XkSOkw==
+X-Received: by 2002:a05:690e:160a:b0:5fc:53ab:a49c with SMTP id 956f58d0204a3-610235dc9d5mr11533438d50.11.1757555274475;
+        Wed, 10 Sep 2025 18:47:54 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:55::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-72f79a8d1c7sm303277b3.66.2025.09.10.18.47.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 18:47:52 -0700 (PDT)
+        Wed, 10 Sep 2025 18:47:53 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -101,9 +101,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Kiran Kella <kiran.kella@broadcom.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v11 10/19] psp: track generations of device key
-Date: Wed, 10 Sep 2025 18:47:18 -0700
-Message-ID: <20250911014735.118695-11-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v11 11/19] net/mlx5e: Support PSP offload functionality
+Date: Wed, 10 Sep 2025 18:47:19 -0700
+Message-ID: <20250911014735.118695-12-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250911014735.118695-1-daniel.zahka@gmail.com>
 References: <20250911014735.118695-1-daniel.zahka@gmail.com>
@@ -115,186 +115,391 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+From: Raed Salem <raeds@nvidia.com>
 
-There is a (somewhat theoretical in absence of multi-host support)
-possibility that another entity will rotate the key and we won't
-know. This may lead to accepting packets with matching SPI but
-which used different crypto keys than we expected.
+Add PSP offload related structs, layouts, and enumerations. Implement
+.set_config and .rx_spi_alloc PSP device operations. Driver does not
+need to make use of the .set_config operation. Stub .assoc_add and
+.assoc_del PSP operations.
 
-The PSP Architecture specification mentions that an implementation
-should track device key generation when device keys are managed by the
-NIC. Some PSP implementations may opt to include this key generation
-state in decryption metadata each time a device key is used to decrypt
-a packet. If that is the case, that key generation counter can also be
-used when policy checking a decrypted skb against a psp_assoc. This is
-an optional feature that is not explicitly part of the PSP spec, but
-can provide additional security in the case where an attacker may have
-the ability to force key rotations faster than rekeying can occur.
+Introduce the MLX5_EN_PSP configuration option for enabling PSP offload
+support on mlx5 devices.
 
-Since we're tracking "key generations" more explicitly now,
-maintain different lists for associations from different generations.
-This way we can catch stale associations (the user space should
-listen to rotation notifications and change the keys).
-
-Drivers can "opt out" of generation tracking by setting
-the generation value to 0.
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Raed Salem <raeds@nvidia.com>
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
 
 Notes:
+    v11:
+    - check psp_crypto_offload cap in mlx5_is_psp_device()
+    v7:
+    - use flexible array declaration instead of 0-length array declaration
+      in struct mlx5_ifc_psp_gen_spi_out_bits
+    v4:
+    - remove unneeded psp.c/psp.h files
+    - remove unneeded struct psp_key_spi usage
     v1:
-    - https://lore.kernel.org/netdev/20240510030435.120935-9-kuba@kernel.org/
+    - https://lore.kernel.org/netdev/20240510030435.120935-10-kuba@kernel.org/
 
- include/net/psp/types.h | 10 ++++++++++
- net/psp/psp.h           |  1 +
- net/psp/psp_main.c      |  6 +++++-
- net/psp/psp_nl.c        | 10 ++++++++++
- net/psp/psp_sock.c      | 16 ++++++++++++++++
- 5 files changed, 42 insertions(+), 1 deletion(-)
+ .../net/ethernet/mellanox/mlx5/core/Kconfig   |  11 ++
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   3 +
+ .../ethernet/mellanox/mlx5/core/en/params.c   |   4 +-
+ .../mellanox/mlx5/core/en_accel/psp.c         | 168 ++++++++++++++++++
+ .../mellanox/mlx5/core/en_accel/psp.h         |  43 +++++
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   9 +
+ 7 files changed, 239 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
 
-diff --git a/include/net/psp/types.h b/include/net/psp/types.h
-index f93ad0e6c04f..ec218747ced0 100644
---- a/include/net/psp/types.h
-+++ b/include/net/psp/types.h
-@@ -50,8 +50,12 @@ struct psp_dev_config {
-  * @lock:	instance lock, protects all fields
-  * @refcnt:	reference count for the instance
-  * @id:		instance id
-+ * @generation:	current generation of the device key
-  * @config:	current device configuration
-  * @active_assocs:	list of registered associations
-+ * @prev_assocs:	associations which use old (but still usable)
-+ *			device key
-+ * @stale_assocs:	associations which use a rotated out key
-  *
-  * @rcu:	RCU head for freeing the structure
-  */
-@@ -67,13 +71,19 @@ struct psp_dev {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
+index 8ef2ac2060ba..3c3e84100d5a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
+@@ -207,3 +207,14 @@ config MLX5_DPLL
+ 	help
+ 	  DPLL support in Mellanox Technologies ConnectX NICs.
  
- 	u32 id;
- 
-+	u8 generation;
++config MLX5_EN_PSP
++	bool "Mellanox Technologies support for PSP cryptography-offload acceleration"
++	depends on INET_PSP
++	depends on MLX5_CORE_EN
++	default y
++	help
++	  mlx5 device offload support for Google PSP Security Protocol offload.
++	  Adds support for PSP encryption offload and for SPI and key generation
++	  interfaces to PSP Stack which supports PSP crypto offload.
 +
- 	struct psp_dev_config config;
++	  If unsure, say Y.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+index d77696f46eb5..04395806255d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+@@ -112,6 +112,8 @@ mlx5_core-$(CONFIG_MLX5_EN_TLS) += en_accel/ktls_stats.o \
+ 				   en_accel/fs_tcp.o en_accel/ktls.o en_accel/ktls_txrx.o \
+ 				   en_accel/ktls_tx.o en_accel/ktls_rx.o
  
- 	struct list_head active_assocs;
-+	struct list_head prev_assocs;
-+	struct list_head stale_assocs;
- 
- 	struct rcu_head rcu;
- };
- 
-+#define PSP_GEN_VALID_MASK	0x7f
++mlx5_core-$(CONFIG_MLX5_EN_PSP) += en_accel/psp.o
 +
- /**
-  * struct psp_dev_caps - PSP device capabilities
-  */
-diff --git a/net/psp/psp.h b/net/psp/psp.h
-index defd3e3fd5e7..0f34e1a23fdd 100644
---- a/net/psp/psp.h
-+++ b/net/psp/psp.h
-@@ -27,6 +27,7 @@ int psp_sock_assoc_set_rx(struct sock *sk, struct psp_assoc *pas,
- int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
- 			  u32 version, struct psp_key_parsed *key,
- 			  struct netlink_ext_ack *extack);
-+void psp_assocs_key_rotated(struct psp_dev *psd);
+ #
+ # SW Steering
+ #
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 0dd3bc0f4caa..32e7b791dd6a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -936,6 +936,9 @@ struct mlx5e_priv {
+ #ifdef CONFIG_MLX5_EN_IPSEC
+ 	struct mlx5e_ipsec        *ipsec;
+ #endif
++#ifdef CONFIG_MLX5_EN_PSP
++	struct mlx5e_psp          *psp;
++#endif
+ #ifdef CONFIG_MLX5_EN_TLS
+ 	struct mlx5e_tls          *tls;
+ #endif
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+index 3cca06a74cf9..9975a9d8945b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+@@ -6,6 +6,7 @@
+ #include "en/port.h"
+ #include "en_accel/en_accel.h"
+ #include "en_accel/ipsec.h"
++#include "en_accel/psp.h"
+ #include <linux/dim.h>
+ #include <net/page_pool/types.h>
+ #include <net/xdp_sock_drv.h>
+@@ -1003,7 +1004,8 @@ void mlx5e_build_sq_param(struct mlx5_core_dev *mdev,
+ 	bool allow_swp;
  
- static inline void psp_dev_get(struct psp_dev *psd)
- {
-diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index a1ae3c8920c3..98ad8c85b58e 100644
---- a/net/psp/psp_main.c
-+++ b/net/psp/psp_main.c
-@@ -72,6 +72,8 @@ psp_dev_create(struct net_device *netdev,
- 
- 	mutex_init(&psd->lock);
- 	INIT_LIST_HEAD(&psd->active_assocs);
-+	INIT_LIST_HEAD(&psd->prev_assocs);
-+	INIT_LIST_HEAD(&psd->stale_assocs);
- 	refcount_set(&psd->refcnt, 1);
- 
- 	mutex_lock(&psp_devs_lock);
-@@ -125,7 +127,9 @@ void psp_dev_unregister(struct psp_dev *psd)
- 	xa_store(&psp_devs, psd->id, NULL, GFP_KERNEL);
- 	mutex_unlock(&psp_devs_lock);
- 
--	list_for_each_entry_safe(pas, next, &psd->active_assocs, assocs_list)
-+	list_splice_init(&psd->active_assocs, &psd->prev_assocs);
-+	list_splice_init(&psd->prev_assocs, &psd->stale_assocs);
-+	list_for_each_entry_safe(pas, next, &psd->stale_assocs, assocs_list)
- 		psp_dev_tx_key_del(psd, pas);
- 
- 	rcu_assign_pointer(psd->main_netdev->psp_dev, NULL);
-diff --git a/net/psp/psp_nl.c b/net/psp/psp_nl.c
-index 1b1d08fce637..8aaca62744c3 100644
---- a/net/psp/psp_nl.c
-+++ b/net/psp/psp_nl.c
-@@ -230,6 +230,7 @@ int psp_nl_key_rotate_doit(struct sk_buff *skb, struct genl_info *info)
- 	struct psp_dev *psd = info->user_ptr[0];
- 	struct genl_info ntf_info;
- 	struct sk_buff *ntf, *rsp;
-+	u8 prev_gen;
- 	int err;
- 
- 	rsp = psp_nl_reply_new(info);
-@@ -249,10 +250,19 @@ int psp_nl_key_rotate_doit(struct sk_buff *skb, struct genl_info *info)
- 		goto err_free_ntf;
- 	}
- 
-+	/* suggest the next gen number, driver can override */
-+	prev_gen = psd->generation;
-+	psd->generation = (prev_gen + 1) & PSP_GEN_VALID_MASK;
+ 	allow_swp = mlx5_geneve_tx_allowed(mdev) ||
+-		    (mlx5_ipsec_device_caps(mdev) & MLX5_IPSEC_CAP_CRYPTO);
++		    (mlx5_ipsec_device_caps(mdev) & MLX5_IPSEC_CAP_CRYPTO) ||
++		    mlx5_is_psp_device(mdev);
+ 	mlx5e_build_sq_param_common(mdev, param);
+ 	MLX5_SET(wq, wq, log_wq_sz, params->log_sq_size);
+ 	MLX5_SET(sqc, sqc, allow_swp, allow_swp);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
+new file mode 100644
+index 000000000000..87eba63451a3
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
+@@ -0,0 +1,168 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++#include <linux/mlx5/device.h>
++#include <net/psp.h>
++#include <linux/psp.h>
++#include "mlx5_core.h"
++#include "psp.h"
++#include "lib/crypto.h"
++#include "en_accel/psp.h"
 +
- 	err = psd->ops->key_rotate(psd, info->extack);
- 	if (err)
- 		goto err_free_ntf;
- 
-+	WARN_ON_ONCE((psd->generation && psd->generation == prev_gen) ||
-+		     psd->generation & ~PSP_GEN_VALID_MASK);
-+
-+	psp_assocs_key_rotated(psd);
-+
- 	nlmsg_end(ntf, (struct nlmsghdr *)ntf->data);
- 	genlmsg_multicast_netns(&psp_nl_family, dev_net(psd->main_netdev), ntf,
- 				0, PSP_NLGRP_USE, GFP_KERNEL);
-diff --git a/net/psp/psp_sock.c b/net/psp/psp_sock.c
-index 10e1fda30aa0..afa966c6b69d 100644
---- a/net/psp/psp_sock.c
-+++ b/net/psp/psp_sock.c
-@@ -60,6 +60,7 @@ struct psp_assoc *psp_assoc_create(struct psp_dev *psd)
- 
- 	pas->psd = psd;
- 	pas->dev_id = psd->id;
-+	pas->generation = psd->generation;
- 	psp_dev_get(psd);
- 	refcount_set(&pas->refcnt, 1);
- 
-@@ -248,6 +249,21 @@ int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
- 	return err;
- }
- 
-+void psp_assocs_key_rotated(struct psp_dev *psd)
++static int
++mlx5e_psp_set_config(struct psp_dev *psd, struct psp_dev_config *conf,
++		     struct netlink_ext_ack *extack)
 +{
-+	struct psp_assoc *pas, *next;
-+
-+	/* Mark the stale associations as invalid, they will no longer
-+	 * be able to Rx any traffic.
-+	 */
-+	list_for_each_entry_safe(pas, next, &psd->prev_assocs, assocs_list)
-+		pas->generation |= ~PSP_GEN_VALID_MASK;
-+	list_splice_init(&psd->prev_assocs, &psd->stale_assocs);
-+	list_splice_init(&psd->active_assocs, &psd->prev_assocs);
-+
-+	/* TODO: we should inform the sockets that got shut down */
++	return 0; /* TODO: this should actually do things to the device */
 +}
 +
- void psp_twsk_init(struct inet_timewait_sock *tw, const struct sock *sk)
++static int
++mlx5e_psp_generate_key_spi(struct mlx5_core_dev *mdev,
++			   enum mlx5_psp_gen_spi_in_key_size keysz,
++			   unsigned int keysz_bytes,
++			   struct psp_key_parsed *key)
++{
++	u32 out[MLX5_ST_SZ_DW(psp_gen_spi_out) + MLX5_ST_SZ_DW(key_spi)] = {};
++	u32 in[MLX5_ST_SZ_DW(psp_gen_spi_in)] = {};
++	void *outkey;
++	int err;
++
++	WARN_ON_ONCE(keysz_bytes > PSP_MAX_KEY);
++
++	MLX5_SET(psp_gen_spi_in, in, opcode, MLX5_CMD_OP_PSP_GEN_SPI);
++	MLX5_SET(psp_gen_spi_in, in, key_size, keysz);
++	MLX5_SET(psp_gen_spi_in, in, num_of_spi, 1);
++	err = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (err)
++		return err;
++
++	outkey = MLX5_ADDR_OF(psp_gen_spi_out, out, key_spi);
++	key->spi = cpu_to_be32(MLX5_GET(key_spi, outkey, spi));
++	memcpy(key->key, MLX5_ADDR_OF(key_spi, outkey, key) + 32 - keysz_bytes,
++	       keysz_bytes);
++
++	return 0;
++}
++
++static int
++mlx5e_psp_rx_spi_alloc(struct psp_dev *psd, u32 version,
++		       struct psp_key_parsed *assoc,
++		       struct netlink_ext_ack *extack)
++{
++	struct mlx5e_priv *priv = netdev_priv(psd->main_netdev);
++	enum mlx5_psp_gen_spi_in_key_size keysz;
++	u8 keysz_bytes;
++
++	switch (version) {
++	case PSP_VERSION_HDR0_AES_GCM_128:
++		keysz = MLX5_PSP_GEN_SPI_IN_KEY_SIZE_128;
++		keysz_bytes = 16;
++		break;
++	case PSP_VERSION_HDR0_AES_GCM_256:
++		keysz = MLX5_PSP_GEN_SPI_IN_KEY_SIZE_256;
++		keysz_bytes = 32;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return mlx5e_psp_generate_key_spi(priv->mdev, keysz, keysz_bytes, assoc);
++}
++
++static int mlx5e_psp_assoc_add(struct psp_dev *psd, struct psp_assoc *pas,
++			       struct netlink_ext_ack *extack)
++{
++	struct mlx5e_priv *priv = netdev_priv(psd->main_netdev);
++
++	mlx5_core_dbg(priv->mdev, "PSP assoc add: rx: %u, tx: %u\n",
++		      be32_to_cpu(pas->rx.spi), be32_to_cpu(pas->tx.spi));
++
++	return -EINVAL;
++}
++
++static void mlx5e_psp_assoc_del(struct psp_dev *psd, struct psp_assoc *pas)
++{
++}
++
++static struct psp_dev_ops mlx5_psp_ops = {
++	.set_config   = mlx5e_psp_set_config,
++	.rx_spi_alloc = mlx5e_psp_rx_spi_alloc,
++	.tx_key_add   = mlx5e_psp_assoc_add,
++	.tx_key_del   = mlx5e_psp_assoc_del,
++};
++
++void mlx5e_psp_unregister(struct mlx5e_priv *priv)
++{
++	if (!priv->psp || !priv->psp->psp)
++		return;
++
++	psp_dev_unregister(priv->psp->psp);
++}
++
++void mlx5e_psp_register(struct mlx5e_priv *priv)
++{
++	/* FW Caps missing */
++	if (!priv->psp)
++		return;
++
++	priv->psp->caps.assoc_drv_spc = sizeof(u32);
++	priv->psp->caps.versions = 1 << PSP_VERSION_HDR0_AES_GCM_128;
++	if (MLX5_CAP_PSP(priv->mdev, psp_crypto_esp_aes_gcm_256_encrypt) &&
++	    MLX5_CAP_PSP(priv->mdev, psp_crypto_esp_aes_gcm_256_decrypt))
++		priv->psp->caps.versions |= 1 << PSP_VERSION_HDR0_AES_GCM_256;
++
++	priv->psp->psp = psp_dev_create(priv->netdev, &mlx5_psp_ops,
++					&priv->psp->caps, NULL);
++	if (IS_ERR(priv->psp->psp))
++		mlx5_core_err(priv->mdev, "PSP failed to register due to %pe\n",
++			      priv->psp->psp);
++}
++
++int mlx5e_psp_init(struct mlx5e_priv *priv)
++{
++	struct mlx5_core_dev *mdev = priv->mdev;
++	struct mlx5e_psp *psp;
++
++	if (!mlx5_is_psp_device(mdev)) {
++		mlx5_core_dbg(mdev, "PSP offload not supported\n");
++		return -EOPNOTSUPP;
++	}
++
++	if (!MLX5_CAP_ETH(mdev, swp)) {
++		mlx5_core_dbg(mdev, "SWP not supported\n");
++		return -EOPNOTSUPP;
++	}
++
++	if (!MLX5_CAP_ETH(mdev, swp_csum)) {
++		mlx5_core_dbg(mdev, "SWP checksum not supported\n");
++		return -EOPNOTSUPP;
++	}
++
++	if (!MLX5_CAP_ETH(mdev, swp_csum_l4_partial)) {
++		mlx5_core_dbg(mdev, "SWP L4 partial checksum not supported\n");
++		return -EOPNOTSUPP;
++	}
++
++	if (!MLX5_CAP_ETH(mdev, swp_lso)) {
++		mlx5_core_dbg(mdev, "PSP LSO not supported\n");
++		return -EOPNOTSUPP;
++	}
++
++	psp = kzalloc(sizeof(*psp), GFP_KERNEL);
++	if (!psp)
++		return -ENOMEM;
++
++	priv->psp = psp;
++	mlx5_core_dbg(priv->mdev, "PSP attached to netdevice\n");
++	return 0;
++}
++
++void mlx5e_psp_cleanup(struct mlx5e_priv *priv)
++{
++	struct mlx5e_psp *psp = priv->psp;
++
++	if (!psp)
++		return;
++
++	priv->psp = NULL;
++	kfree(psp);
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
+new file mode 100644
+index 000000000000..40dbdb3e5d73
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#ifndef __MLX5E_ACCEL_PSP_H__
++#define __MLX5E_ACCEL_PSP_H__
++#if IS_ENABLED(CONFIG_MLX5_EN_PSP)
++#include <net/psp/types.h>
++#include "en.h"
++
++struct mlx5e_psp {
++	struct psp_dev *psp;
++	struct psp_dev_caps caps;
++};
++
++static inline bool mlx5_is_psp_device(struct mlx5_core_dev *mdev)
++{
++	if (!MLX5_CAP_GEN(mdev, psp))
++		return false;
++
++	if (!MLX5_CAP_PSP(mdev, psp_crypto_offload) ||
++	    !MLX5_CAP_PSP(mdev, psp_crypto_esp_aes_gcm_128_encrypt) ||
++	    !MLX5_CAP_PSP(mdev, psp_crypto_esp_aes_gcm_128_decrypt))
++		return false;
++
++	return true;
++}
++
++void mlx5e_psp_register(struct mlx5e_priv *priv);
++void mlx5e_psp_unregister(struct mlx5e_priv *priv);
++int mlx5e_psp_init(struct mlx5e_priv *priv);
++void mlx5e_psp_cleanup(struct mlx5e_priv *priv);
++#else
++static inline bool mlx5_is_psp_device(struct mlx5_core_dev *mdev)
++{
++	return false;
++}
++
++static inline void mlx5e_psp_register(struct mlx5e_priv *priv) { }
++static inline void mlx5e_psp_unregister(struct mlx5e_priv *priv) { }
++static inline int mlx5e_psp_init(struct mlx5e_priv *priv) { return 0; }
++static inline void mlx5e_psp_cleanup(struct mlx5e_priv *priv) { }
++#endif /* CONFIG_MLX5_EN_PSP */
++#endif /* __MLX5E_ACCEL_PSP_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 714cce595692..e44cdea5e2b3 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -53,6 +53,7 @@
+ #include "en_tc.h"
+ #include "en_rep.h"
+ #include "en_accel/ipsec.h"
++#include "en_accel/psp.h"
+ #include "en_accel/macsec.h"
+ #include "en_accel/en_accel.h"
+ #include "en_accel/ktls.h"
+@@ -5904,6 +5905,7 @@ static int mlx5e_nic_init(struct mlx5_core_dev *mdev,
+ 	if (take_rtnl)
+ 		rtnl_lock();
+ 
++	mlx5e_psp_register(priv);
+ 	/* update XDP supported features */
+ 	mlx5e_set_xdp_feature(netdev);
+ 
+@@ -5916,6 +5918,7 @@ static int mlx5e_nic_init(struct mlx5_core_dev *mdev,
+ static void mlx5e_nic_cleanup(struct mlx5e_priv *priv)
  {
- 	struct psp_assoc *pas = psp_sk_assoc(sk);
+ 	mlx5e_health_destroy_reporters(priv);
++	mlx5e_psp_unregister(priv);
+ 	mlx5e_ktls_cleanup(priv);
+ 	mlx5e_fs_cleanup(priv->fs);
+ 	debugfs_remove_recursive(priv->dfs_root);
+@@ -6043,6 +6046,10 @@ static void mlx5e_nic_enable(struct mlx5e_priv *priv)
+ 	if (err)
+ 		mlx5_core_err(mdev, "MACsec initialization failed, %d\n", err);
+ 
++	err = mlx5e_psp_init(priv);
++	if (err)
++		mlx5_core_err(mdev, "PSP initialization failed, %d\n", err);
++
+ 	/* Marking the link as currently not needed by the Driver */
+ 	if (!netif_running(netdev))
+ 		mlx5e_modify_admin_state(mdev, MLX5_PORT_DOWN);
+@@ -6106,6 +6113,7 @@ static void mlx5e_nic_disable(struct mlx5e_priv *priv)
+ 	mlx5e_disable_async_events(priv);
+ 	mlx5_lag_remove_netdev(mdev, priv->netdev);
+ 	mlx5_vxlan_reset_to_default(mdev->vxlan);
++	mlx5e_psp_cleanup(priv);
+ 	mlx5e_macsec_cleanup(priv);
+ 	mlx5e_ipsec_cleanup(priv);
+ }
+@@ -6764,6 +6772,7 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
+ 	 * is already unregistered before changing to NIC profile.
+ 	 */
+ 	if (priv->netdev->reg_state == NETREG_REGISTERED) {
++		mlx5e_psp_unregister(priv);
+ 		unregister_netdev(priv->netdev);
+ 		_mlx5e_suspend(adev, false);
+ 	} else {
 -- 
 2.47.3
 
