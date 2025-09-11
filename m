@@ -1,112 +1,107 @@
-Return-Path: <netdev+bounces-222271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DEFCB53C6A
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 21:38:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89D8AB53C86
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 21:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8AFB1C28E44
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924481623D3
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FDC371E80;
-	Thu, 11 Sep 2025 19:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E638D3191C8;
+	Thu, 11 Sep 2025 19:48:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FvE4UjzK"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aV2gdokC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f97.google.com (mail-ot1-f97.google.com [209.85.210.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213E12609C5
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 19:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AA32676E6;
+	Thu, 11 Sep 2025 19:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757619371; cv=none; b=Pvan+WYCNMZy6eFqfQF/UREscSbRYDNq/bH/jCeva9CIEdZqWwSbYxluRJFzHrf2OMsWsodCNptxo/GkDqcwkBk/qVLbW8e/4USTdlXaf56bhPwD61TlOQydo+VAAhpYz0YCwoGYdC49K7OefowKWpBUoi55kNc+7iG3iuuxG2g=
+	t=1757620125; cv=none; b=PtBrE4g02NZUNy82j76Ryzf1xg4gukwokGC7T/Va6hp4JvE2krxb8F04IezQy16CB+w4PYHbVBpBbv3MVl86GG3b8s+XHPAI+M+HcKWzFI53pf9BL9TYccb5MtrooZLz+xT5Y+fKkV9ORflblyjTSXp7DPofLZctw2QKnSnNCMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757619371; c=relaxed/simple;
-	bh=H47kWFXeU/Bf37lFucsdW/pwUP5WUtJQ/rAuZcVM+gc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j+puVSJx/PJeNf7GKKg+brLq77nsawFONSQygO2Gqk2K8BT7C4tBAk014EpO/0tFERQKBLbMs4LPb7oI3BucIfGw9IfRKjg74dBFc8IHripXfYH5oj5IlMhvTx1IuyZuKL4oSND/QAOftcrwpx2v0TR7rptE6d8LrXCxjIglclA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FvE4UjzK; arc=none smtp.client-ip=209.85.210.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f97.google.com with SMTP id 46e09a7af769-7459d088020so613267a34.3
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 12:36:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757619368; x=1758224168;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sTPL5m0GxQ20xOMbbuVJofP5tqnkn2QrQrV3Ig7xHfk=;
-        b=nesdOFJUmtU9QVE+svvww13pSiX/EEJ8AS5eiMn+0zlJBdaoObfmpWLtAvq9JVJImm
-         /0O+SAie5Yga5qu/Fapwl4SZjSV6C9gDm9wbVJIxBkO+AT+uShgCLxAUtRwtTayKJz+p
-         pBLpyIo/poXjZtmiT0NE5LjLIGAUCTvzTd72uL3aw6IvPlHdwpGRzz2SjO6LzW1LGIsi
-         WB9Lf69F3uoIDeMbeDIZkBSHPnHBea8EZMUaqwLozWmBULfA3+DKBilzWuMO2h+5s3xR
-         p0jg9pocTY28bD3+/VpheBiM2dgk1cWqwfwiK0eY7c1gr3CZN94PFgJ6M5CoHwoR29Hy
-         cm+w==
-X-Gm-Message-State: AOJu0YyOYZtGKjMHCkRMXGJLp9n/PNR0mknZCBlT1KGj4Zmm6johP5Tl
-	SowGcgck6v0fr0aLBr5XGsNrwNF5nsowGz7aQ/+rOHWFq5mQiWsnpRtq8E1REury0sH/q+PFoY/
-	WKNWPp/8t2CdA9BkP5U7ZzdH3sZFvpS1ggQF8ZnVFbbW/fnn/foaO2rLzZ+Iq3diTockFCp/ziU
-	jVG4DJusVk+licJ/DMu97IRZUYWDO2R36uELMPsxiDicjmhIQ93/rRygDpt4xvwdHAfmpmi4gAa
-	uQlDbl7tClCKKhejebh
-X-Gm-Gg: ASbGnctq5+IvtJrr+gnZzYUAfnEVQzWKmQTKIyP0JvFEmHx9IpVz3CDNO1V34h6eaZl
-	njbmMAOQqThbhhcyyRRqOD2r7O/xFlU2ZoEd/eQShZCl3lx9/lqacyX3KWxL3+xlyDbfvMcHcGJ
-	vSNN76C3eljMXDCHk8qXUUpRZGRmu2V8GHBm0GJ39YiMUnsDLVimA/4XiK94KbV1lanoNyjFhDp
-	A3aTmT9Is39ztlnjdY3yGXnnV4nPF2bIJEuhThs2FubVqmEnGf2eRVnGTWDitA7k4h0XfhvsfMn
-	uWQzVd8dqMFqJqUSz8ntENq2KLk82EdY7p0u8ipvC08ELy0pkdrs19epqlRIGDjvRe6/qsUNV3r
-	3xUJSx18brSoeMqurbNuQ1YQK/DVcwD84CyUVLpd/lcHsBDUZu3MHwv+Zq+Cv2PUpVyeyfykyMW
-	m5V2YIdDa0
-X-Google-Smtp-Source: AGHT+IFS0bArckNCVSe+xWkJsRGQ/WknsrUCy2sZwouvxlUQaFxSp21FOUJabfdsZBQCiUg3OOdzADjNSJ4R
-X-Received: by 2002:a05:6870:a546:b0:30b:85e1:d3d3 with SMTP id 586e51a60fabf-32e572f126emr170173fac.32.1757619368125;
-        Thu, 11 Sep 2025 12:36:08 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-32d327379basm241744fac.5.2025.09.11.12.36.07
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Sep 2025 12:36:08 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-24b2b347073so13003575ad.1
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 12:36:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1757619366; x=1758224166; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sTPL5m0GxQ20xOMbbuVJofP5tqnkn2QrQrV3Ig7xHfk=;
-        b=FvE4UjzKrhKwZ/3za8F3YW1HWJoEHKN+i868a0vz5H8S2viwEUjo0cK1Z4CJCYYyxx
-         AvTt4GtuYYHz5NkGmvgJoQ02fiMiRTtyab3klDjBIt0R56fJsy5zg/rLnP1r1g1RPcVX
-         poNFBfpzPO9GggQjqtITo/j43mPPgaIrAnNFw=
-X-Received: by 2002:a17:902:c947:b0:24c:bc02:78a4 with SMTP id d9443c01a7336-25d2509875emr5886735ad.24.1757619366438;
-        Thu, 11 Sep 2025 12:36:06 -0700 (PDT)
-X-Received: by 2002:a17:902:c947:b0:24c:bc02:78a4 with SMTP id d9443c01a7336-25d2509875emr5886505ad.24.1757619365986;
-        Thu, 11 Sep 2025 12:36:05 -0700 (PDT)
-Received: from hyd-csg-thor2-h1-server2.dhcp.broadcom.net ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3ad3404csm25839285ad.113.2025.09.11.12.36.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 12:36:05 -0700 (PDT)
-From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: [v7, net-next 10/10] bng_en: Configure default VNIC
-Date: Fri, 12 Sep 2025 01:05:05 +0530
-Message-ID: <20250911193505.24068-11-bhargava.marreddy@broadcom.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250911193505.24068-1-bhargava.marreddy@broadcom.com>
-References: <20250911193505.24068-1-bhargava.marreddy@broadcom.com>
+	s=arc-20240116; t=1757620125; c=relaxed/simple;
+	bh=zlc1CfvUCVKHyqijo1PhGhYpw6271i8dBA+/OaSZT6I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cpEqyoZBnbKO4C5nLWHloGSnXd1f9+uXF08TNSBO/9h+8cCbvuKxyMq1kDpj2oSd7jUUQeWLVDFFOWLvSm4uGxpB785SVeNgFAIUGt7GRoMKClVYb641eTNkd6uq9LGwFZIUnAmVQ/9y1Oq6WOKDH97LLe+U9JVKyBHwidUbCbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aV2gdokC; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58BHVSVU030930;
+	Thu, 11 Sep 2025 19:48:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=er2C1seonyk5TZRDuh2BpJ+JDMS9v+a8srVOgvdAN
+	t0=; b=aV2gdokCyPEmqWgSxYFsCaBURtr7jq/3nFxxd5aAgrmOBm+2ema0rHgiM
+	kXN+JvJ3K7Knw8Iu4mhCSuxRTgMNZoj36q+2vey+TrPAHeb8kixpystXs88DHFQP
+	7JVR1kF9oTqPOdmthmAZnaZVKyrRkSwkNl6e6zdaiZC2sqVAIc0d/ZcWpgzurF7M
+	/n1ckHozOVb+Fx5YRv3xMEgmKWOpX1CLNzktqfsEVSJ/gV28CD7B1hpI3sMRpFy5
+	5M+1gsDzMNbpAmfJlLLK2sv7G2yZlCBG2zFvgYqLTlUWyDZaH/6LJkz4JfGFr4nG
+	Emuk6b90r2XbX6GH8jNyL9Xcl+5lA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490xydbu95-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Sep 2025 19:48:33 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58BJmWRr015615;
+	Thu, 11 Sep 2025 19:48:32 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490xydbu8x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Sep 2025 19:48:32 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58BI2kFp017181;
+	Thu, 11 Sep 2025 19:48:31 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4911gmqa4g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Sep 2025 19:48:31 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58BJmSGF48628100
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Sep 2025 19:48:28 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F02022004D;
+	Thu, 11 Sep 2025 19:48:27 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CE79920040;
+	Thu, 11 Sep 2025 19:48:27 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 11 Sep 2025 19:48:27 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id A1108E1089; Thu, 11 Sep 2025 21:48:27 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Julian Ruess <julianr@linux.ibm.com>,
+        Aswin Karuvally <aswin@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Konstantin Shkolnyy <kshk@linux.ibm.com>
+Subject: [PATCH net-next v2 00/14] dibs - Direct Internal Buffer Sharing
+Date: Thu, 11 Sep 2025 21:48:13 +0200
+Message-ID: <20250911194827.844125-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -114,490 +109,216 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: aRUYOkngFbHfUaxA8MnOWamVTS5v7I2z
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDIzNSBTYWx0ZWRfX8UWiwK7c0iQp
+ oN0oPiMkdl2PMnX6KcYFyWfrpQUaBC+BAZSkPPzSHHNZxJHD9wEzMQhS1llfmEmyW1olftiixLd
+ NuzgGSgbH53LAsCCRQ56SG+8WBCq8tNgjqQ+UCGs+4QVsIzAejHBzyVpC1HqSm/sUURW8Oo+Sp7
+ 85bUxL6WheFDu39wHBMmvYOd3Zc0CzBkhRE5LDlvK5A7tCbc/FSHMzP1Z1I/8HmORQg6v9YKCye
+ rfUGQEyxMOqPjP43KCAQ80UqGlP9X3Id1yiZ2EerFmG1aas6RYI8YjtRRPW4y04FJHxJ8TTFohF
+ Hidpoqk4wdqTKHPN0Mhbia8nQ4vHjalsogzM4ZIihJXPqO7Feu92aa0efMuZ/Gz/GBOWCjFXBdT
+ X1s7EfHo
+X-Proofpoint-GUID: s2AWPeo5QM4Yz-hxMUIx6l19TqN74k36
+X-Authority-Analysis: v=2.4 cv=F59XdrhN c=1 sm=1 tr=0 ts=68c32791 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=yJojWOMRYYMA:10 a=3nI6nj7hAAAA:8 a=VwQbUJbxAAAA:8 a=SRrdq9N9AAAA:8
+ a=mkMtH7XpAAAA:8 a=VnNF1IyMAAAA:8 a=QyXUC8HyAAAA:8 a=RkOrkl1-BjnOTL04EN0A:9
+ a=bb6nGAbfQKYA:10 a=PUQwBqpy_9XipHPXVRm3:22 a=I9Slk6e--tAXHahELIuT:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-11_03,2025-09-11_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 suspectscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2509060235
 
-Add functions to add a filter to the VNIC to configure unicast
-addresses. Also, add multicast, broadcast, and promiscuous settings
-to the default VNIC.
+This series introduces a generic abstraction of existing components like:
+- the s390 specific ISM device (Internal Shared Memory),
+- the SMC-D loopback mechanism (Shared Memory Communication - Direct)
+- the client interface of the SMC-D module to the transport devices
+This generic shim layer can be extended with more devices, more clients and
+more features in the future.
 
-Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+This layer is called 'dibs' for Direct Internal Buffer Sharing based on the
+common scheme that these mechanisms enable controlled sharing of memory
+buffers within some containing entity such as a hypervisor or a Linux
+instance.
+
+Benefits:
+- Cleaner separation of ISM and SMC-D functionality
+- simpler and less module dependencies
+- Clear interface definition.
+- Extendable for future devices and clients.
+
+An overview was given at the Netdev 0x19 conference, recordings and slides
+are available [1].
+
+Background / Status quo:
+------------------------
+Currently s390 hardware provides virtual PCI ISM devices (Internal Shared
+Memory). Their driver is in drivers/s390/net/ism_drv.c. The main user is
+SMC-D (net/smc). The ism driver offers a client interface so other
+users/protocols can also use them, but it is still heavily intermingled
+with the smc code. Namely, the ism module cannot be used without the smc
+module, which feels artificial.
+
+There is ongoing work to extend the ISM concept of shared buffers that can
+be accessed directly by another instance on the same hardware: [2] proposed
+a loopback interface (ism_lo), that can be used on non-s390 architectures
+(e.g. between containers or to test SMC-D). A minimal implementation went
+upstream with [3]: ism_lo currently is a part of the smc protocol and
+rather hidden.
+
+[4] proposed a virtio definition of ism (ism_virtio) that can be used
+between kvm guests.
+
+We will shortly send an RFC for an dibs client that uses dibs as transport
+for TTY.
+
+Concept:
+--------
+Create a shim layer in net/dibs that contains common definitions and code
+for all dibs devices and all dibs clients. Any device or client module only
+needs to depend on this dibs layer module and any device or client code
+only needs to include the definitions in include/linux/dibs.h.
+
+The name dibs was chosen to clearly distinguish it from the existing s390
+ism devices. And to emphasize that it is not about sharing whole memory
+regions with anybody, but dedicating single buffers for another system.
+
+Implementation:
+---------------
+The end result of this series is: A dibs shim layer with
+- One dibs client: smc-d
+- Two dibs device drivers: ism and dibs-loopback
+- Everything prepared to add more clients and more device drivers.
+
+Patches 1-2 contain some issues that were found along the way. They make
+sense on their own, but also enable a better structured dibs series.
+
+There are three components that exist today:
+a) smc module (especially SMC-D functionality, which is an ism client today)
+b) ism device driver (supports multiple ism clients today)
+c) smc-loopback (integrated with smc today)
+In order to preserve existing functionality at each step, these are not
+moved to dibs layer by component, instead:
+- the dibs layer is established in parallel to existing code [patches 3-6]
+- then some service functions are moved to the dibs layer [patches 7-12]
+- the actual data movement is moved to the dibs layer [patch 13]
+- and last event handling is moved to the dibs layer [patch 14]
+
+Future:
+-------
+Items that are not part of this patchset but can be added later:
+- dynamically add or remove dibs_loopback. That will be allow for simple
+  testing of add_dev()/del_dev()
+- handle_irq(): Call clients without interrupt context. e.g using
+  threaded interrupts. I left this for a follow-on, because it includes
+  conceptual changes for the smcd receive code.
+- Any improvements of locking scopes. I mainly moved some of the the
+  existing locks to dibs layer. I have the feeling there is room for
+  improvements.
+- The device drivers should not loop through the client array
+- dibs_dev_op.*_dmb() functions reveal unnecessary details of the
+  internal dmb struct to the clients
+- Check whether client calls to dibs_dev_ops should be replaced by
+  interface functions that provide additional value
+- Check whether device driver calls to dibs_client_ops should be replaced
+  by interface functions that provide additional value.
+
+Link: [1] https://netdevconf.info/0x19/sessions/talk/communication-via-internal-shared-memory-ism-time-to-open-up.html
+Link: [2] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+Link: [3] https://lore.kernel.org/linux-kernel//20240428060738.60843-1-guwen@linux.alibaba.com/
+Link: [4] https://groups.oasis-open.org/communities/community-home/digestviewer/viewthread?GroupId=3973&MessageKey=c060ecf9-ea1a-49a2-9827-c92f0e6447b2&CommunityKey=2f26be99-3aa1-48f6-93a5-018dce262226&hlmlt=VT
+
 ---
- .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |  72 +++++
- .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   4 +
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 270 ++++++++++++++++++
- .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  40 +++
- 4 files changed, 386 insertions(+)
+Changes in v2:
+- More fixes of transient scope of IS_ENABLED(CONFIG_ISM) [7,13] (patchwork)
+- Delete obsolete net/smc/smc_loopback.* files [13] (Dust Li)
+- Fix transient usage of supports_v2() after rebase on top of
+  091d019adce0 ("net/smc: remove unused function smc_lo_supports_v2") [7]
+- Fix CC according to get_maintainer.pl (patchwork)
+- Place dibs level code in drivers/dibs/ instead of net/dibs/ (Dust Li, Julian Ruess)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-index ae780939828..198f49b40db 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-@@ -854,6 +854,78 @@ void bnge_hwrm_update_rss_hash_cfg(struct bnge_net *bn)
- 	bnge_hwrm_req_drop(bd, req);
- }
+Changes in v1:
+- Don't change __init in smc_core_init() (was [1]) (Dust Li)
+- Split off log message improvements from this series (was [2,5]) (Dust Li)
+- Fix arch/s390/[debug_]defconfig [4,6,7,14]
+- Helptext of dibs/Kconfig [3,6]
+- include linux/slab.h to avoid Wimplicit-function-declaration of
+  kzalloc() and kfree() [5,6] (Simon Horman and
+                             'kernel test robot <lkp@intel.com>')
+- Fix transient use of undefined 'ism' pointer [7] (Simon Horman)
+- Fix transient scope of IS_ENABLED(CONFIG_ISM) [7,13] (Simon Horman)
+- Change position of is_attached in struct smc_buf_desc to reduce gaps [1] (Dust Li)
+- Fix SW-pnetid handling for s390 ism devices [9]
+- use dibs->dev instead of defining dibs_get_dev() [8]
+- add const to uuid_t* parameters [12,14] (Julian Ruess)
+- no log message for module load/unload [3] (Jakub Kicinski)
+- Link: https://lore.kernel.org/netdev/20250905145428.1962105-1-wintera@linux.ibm.com/
+
+RFC:
+- Link: https://lore.kernel.org/netdev/20250806154122.3413330-1-wintera@linux.ibm.com/
  
-+int bnge_hwrm_l2_filter_free(struct bnge_dev *bd, struct bnge_l2_filter *fltr)
-+{
-+	struct hwrm_cfa_l2_filter_free_input *req;
-+	int rc;
-+
-+	rc = bnge_hwrm_req_init(bd, req, HWRM_CFA_L2_FILTER_FREE);
-+	if (rc)
-+		return rc;
-+
-+	req->l2_filter_id = fltr->base.filter_id;
-+	return bnge_hwrm_req_send(bd, req);
-+}
-+
-+int bnge_hwrm_l2_filter_alloc(struct bnge_dev *bd, struct bnge_l2_filter *fltr)
-+{
-+	struct hwrm_cfa_l2_filter_alloc_output *resp;
-+	struct hwrm_cfa_l2_filter_alloc_input *req;
-+	int rc;
-+
-+	rc = bnge_hwrm_req_init(bd, req, HWRM_CFA_L2_FILTER_ALLOC);
-+	if (rc)
-+		return rc;
-+
-+	req->flags = cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_PATH_RX);
-+
-+	req->flags |= cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_OUTERMOST);
-+	req->dst_id = cpu_to_le16(fltr->base.fw_vnic_id);
-+	req->enables =
-+		cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR |
-+			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_DST_ID |
-+			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR_MASK);
-+	ether_addr_copy(req->l2_addr, fltr->l2_key.dst_mac_addr);
-+	eth_broadcast_addr(req->l2_addr_mask);
-+
-+	if (fltr->l2_key.vlan) {
-+		req->enables |=
-+			cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_IVLAN |
-+				CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_IVLAN_MASK |
-+				CFA_L2_FILTER_ALLOC_REQ_ENABLES_NUM_VLANS);
-+		req->num_vlans = 1;
-+		req->l2_ivlan = cpu_to_le16(fltr->l2_key.vlan);
-+		req->l2_ivlan_mask = cpu_to_le16(0xfff);
-+	}
-+
-+	resp = bnge_hwrm_req_hold(bd, req);
-+	rc = bnge_hwrm_req_send(bd, req);
-+	if (!rc)
-+		fltr->base.filter_id = resp->l2_filter_id;
-+
-+	bnge_hwrm_req_drop(bd, req);
-+	return rc;
-+}
-+
-+int bnge_hwrm_cfa_l2_set_rx_mask(struct bnge_dev *bd,
-+				 struct bnge_vnic_info *vnic)
-+{
-+	struct hwrm_cfa_l2_set_rx_mask_input *req;
-+	int rc;
-+
-+	rc = bnge_hwrm_req_init(bd, req, HWRM_CFA_L2_SET_RX_MASK);
-+	if (rc)
-+		return rc;
-+
-+	req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
-+	if (vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_MCAST) {
-+		req->num_mc_entries = cpu_to_le32(vnic->mc_list_count);
-+		req->mc_tbl_addr = cpu_to_le64(vnic->mc_list_mapping);
-+	}
-+	req->mask = cpu_to_le32(vnic->rx_mask);
-+	return bnge_hwrm_req_send_silent(bd, req);
-+}
-+
- int bnge_hwrm_vnic_alloc(struct bnge_dev *bd, struct bnge_vnic_info *vnic,
- 			 unsigned int nr_rings)
- {
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-index 09517ffb1a2..042f28e84a0 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-@@ -43,6 +43,10 @@ int bnge_hwrm_vnic_alloc(struct bnge_dev *bd, struct bnge_vnic_info *vnic,
- void bnge_hwrm_vnic_free_one(struct bnge_dev *bd, struct bnge_vnic_info *vnic);
- void bnge_hwrm_vnic_ctx_free_one(struct bnge_dev *bd,
- 				 struct bnge_vnic_info *vnic, u16 ctx_idx);
-+int bnge_hwrm_l2_filter_free(struct bnge_dev *bd, struct bnge_l2_filter *fltr);
-+int bnge_hwrm_l2_filter_alloc(struct bnge_dev *bd, struct bnge_l2_filter *fltr);
-+int bnge_hwrm_cfa_l2_set_rx_mask(struct bnge_dev *bd,
-+				 struct bnge_vnic_info *vnic);
- void bnge_hwrm_stat_ctx_free(struct bnge_net *bn);
- int bnge_hwrm_stat_ctx_alloc(struct bnge_net *bn);
- int hwrm_ring_free_send_msg(struct bnge_net *bn, struct bnge_ring_struct *ring,
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-index 793b84c2bec..2e41347defc 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-@@ -1480,6 +1480,230 @@ static int bnge_setup_vnic(struct bnge_net *bn, struct bnge_vnic_info *vnic)
- 	return rc;
- }
- 
-+static void bnge_del_l2_filter(struct bnge_net *bn, struct bnge_l2_filter *fltr)
-+{
-+	if (!refcount_dec_and_test(&fltr->refcnt))
-+		return;
-+	hlist_del_rcu(&fltr->base.hash);
-+	kfree_rcu(fltr, base.rcu);
-+}
-+
-+static void bnge_init_l2_filter(struct bnge_net *bn,
-+				struct bnge_l2_filter *fltr,
-+				struct bnge_l2_key *key, u32 idx)
-+{
-+	struct hlist_head *head;
-+
-+	ether_addr_copy(fltr->l2_key.dst_mac_addr, key->dst_mac_addr);
-+	fltr->l2_key.vlan = key->vlan;
-+	fltr->base.type = BNGE_FLTR_TYPE_L2;
-+
-+	head = &bn->l2_fltr_hash_tbl[idx];
-+	hlist_add_head_rcu(&fltr->base.hash, head);
-+	refcount_set(&fltr->refcnt, 1);
-+}
-+
-+static struct bnge_l2_filter *__bnge_lookup_l2_filter(struct bnge_net *bn,
-+						      struct bnge_l2_key *key,
-+						      u32 idx)
-+{
-+	struct bnge_l2_filter *fltr;
-+	struct hlist_head *head;
-+
-+	head = &bn->l2_fltr_hash_tbl[idx];
-+	hlist_for_each_entry_rcu(fltr, head, base.hash) {
-+		struct bnge_l2_key *l2_key = &fltr->l2_key;
-+
-+		if (ether_addr_equal(l2_key->dst_mac_addr, key->dst_mac_addr) &&
-+		    l2_key->vlan == key->vlan)
-+			return fltr;
-+	}
-+	return NULL;
-+}
-+
-+static struct bnge_l2_filter *bnge_lookup_l2_filter(struct bnge_net *bn,
-+						    struct bnge_l2_key *key,
-+						    u32 idx)
-+{
-+	struct bnge_l2_filter *fltr;
-+
-+	rcu_read_lock();
-+	fltr = __bnge_lookup_l2_filter(bn, key, idx);
-+	if (fltr)
-+		refcount_inc(&fltr->refcnt);
-+	rcu_read_unlock();
-+	return fltr;
-+}
-+
-+static struct bnge_l2_filter *bnge_alloc_l2_filter(struct bnge_net *bn,
-+						   struct bnge_l2_key *key,
-+						   gfp_t gfp)
-+{
-+	struct bnge_l2_filter *fltr;
-+	u32 idx;
-+
-+	idx = jhash2(&key->filter_key, BNGE_L2_KEY_SIZE, bn->hash_seed) &
-+	      BNGE_L2_FLTR_HASH_MASK;
-+	fltr = bnge_lookup_l2_filter(bn, key, idx);
-+	if (fltr)
-+		return fltr;
-+
-+	fltr = kzalloc(sizeof(*fltr), gfp);
-+	if (!fltr)
-+		return ERR_PTR(-ENOMEM);
-+
-+	bnge_init_l2_filter(bn, fltr, key, idx);
-+	return fltr;
-+}
-+
-+static int bnge_hwrm_set_vnic_filter(struct bnge_net *bn, u16 vnic_id, u16 idx,
-+				     const u8 *mac_addr)
-+{
-+	struct bnge_l2_filter *fltr;
-+	struct bnge_l2_key key;
-+	int rc;
-+
-+	ether_addr_copy(key.dst_mac_addr, mac_addr);
-+	key.vlan = 0;
-+	fltr = bnge_alloc_l2_filter(bn, &key, GFP_KERNEL);
-+	if (IS_ERR(fltr))
-+		return PTR_ERR(fltr);
-+
-+	fltr->base.fw_vnic_id = bn->vnic_info[vnic_id].fw_vnic_id;
-+	rc = bnge_hwrm_l2_filter_alloc(bn->bd, fltr);
-+	if (rc)
-+		goto err_del_l2_filter;
-+	bn->vnic_info[vnic_id].l2_filters[idx] = fltr;
-+	return rc;
-+
-+err_del_l2_filter:
-+	bnge_del_l2_filter(bn, fltr);
-+	return rc;
-+}
-+
-+static bool bnge_mc_list_updated(struct bnge_net *bn, u32 *rx_mask)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	struct net_device *dev = bn->netdev;
-+	struct netdev_hw_addr *ha;
-+	int mc_count = 0, off = 0;
-+	bool update = false;
-+	u8 *haddr;
-+
-+	netdev_for_each_mc_addr(ha, dev) {
-+		if (mc_count >= BNGE_MAX_MC_ADDRS) {
-+			*rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
-+			vnic->mc_list_count = 0;
-+			return false;
-+		}
-+		haddr = ha->addr;
-+		if (!ether_addr_equal(haddr, vnic->mc_list + off)) {
-+			memcpy(vnic->mc_list + off, haddr, ETH_ALEN);
-+			update = true;
-+		}
-+		off += ETH_ALEN;
-+		mc_count++;
-+	}
-+	if (mc_count)
-+		*rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_MCAST;
-+
-+	if (mc_count != vnic->mc_list_count) {
-+		vnic->mc_list_count = mc_count;
-+		update = true;
-+	}
-+	return update;
-+}
-+
-+static bool bnge_uc_list_updated(struct bnge_net *bn)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	struct net_device *dev = bn->netdev;
-+	struct netdev_hw_addr *ha;
-+	int off = 0;
-+
-+	if (netdev_uc_count(dev) != (vnic->uc_filter_count - 1))
-+		return true;
-+
-+	netdev_for_each_uc_addr(ha, dev) {
-+		if (!ether_addr_equal(ha->addr, vnic->uc_list + off))
-+			return true;
-+
-+		off += ETH_ALEN;
-+	}
-+	return false;
-+}
-+
-+static bool bnge_promisc_ok(struct bnge_net *bn)
-+{
-+	return true;
-+}
-+
-+static int bnge_cfg_def_vnic(struct bnge_net *bn)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	struct net_device *dev = bn->netdev;
-+	struct bnge_dev *bd = bn->bd;
-+	struct netdev_hw_addr *ha;
-+	int i, off = 0, rc;
-+	bool uc_update;
-+
-+	netif_addr_lock_bh(dev);
-+	uc_update = bnge_uc_list_updated(bn);
-+	netif_addr_unlock_bh(dev);
-+
-+	if (!uc_update)
-+		goto skip_uc;
-+
-+	for (i = 1; i < vnic->uc_filter_count; i++) {
-+		struct bnge_l2_filter *fltr = vnic->l2_filters[i];
-+
-+		bnge_hwrm_l2_filter_free(bd, fltr);
-+		bnge_del_l2_filter(bn, fltr);
-+	}
-+
-+	vnic->uc_filter_count = 1;
-+
-+	netif_addr_lock_bh(dev);
-+	if (netdev_uc_count(dev) > (BNGE_MAX_UC_ADDRS - 1)) {
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
-+	} else {
-+		netdev_for_each_uc_addr(ha, dev) {
-+			memcpy(vnic->uc_list + off, ha->addr, ETH_ALEN);
-+			off += ETH_ALEN;
-+			vnic->uc_filter_count++;
-+		}
-+	}
-+	netif_addr_unlock_bh(dev);
-+
-+	for (i = 1, off = 0; i < vnic->uc_filter_count; i++, off += ETH_ALEN) {
-+		rc = bnge_hwrm_set_vnic_filter(bn, 0, i, vnic->uc_list + off);
-+		if (rc) {
-+			netdev_err(dev, "HWRM vnic filter failure rc: %d\n", rc);
-+			vnic->uc_filter_count = i;
-+			return rc;
-+		}
-+	}
-+
-+skip_uc:
-+	if ((vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS) &&
-+	    !bnge_promisc_ok(bn))
-+		vnic->rx_mask &= ~CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
-+	rc = bnge_hwrm_cfa_l2_set_rx_mask(bd, vnic);
-+	if (rc && (vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_MCAST)) {
-+		netdev_info(dev, "Failed setting MC filters rc: %d, turning on ALL_MCAST mode\n",
-+			    rc);
-+		vnic->rx_mask &= ~CFA_L2_SET_RX_MASK_REQ_MASK_MCAST;
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
-+		vnic->mc_list_count = 0;
-+		rc = bnge_hwrm_cfa_l2_set_rx_mask(bd, vnic);
-+	}
-+	if (rc)
-+		netdev_err(dev, "HWRM cfa l2 rx mask failure rc: %d\n",
-+			   rc);
-+
-+	return rc;
-+}
-+
- static void bnge_hwrm_vnic_free(struct bnge_net *bn)
- {
- 	int i;
-@@ -1503,8 +1727,24 @@ static void bnge_hwrm_vnic_ctx_free(struct bnge_net *bn)
- 	bn->rsscos_nr_ctxs = 0;
- }
- 
-+static void bnge_hwrm_clear_vnic_filter(struct bnge_net *bn)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	int i;
-+
-+	for (i = 0; i < vnic->uc_filter_count; i++) {
-+		struct bnge_l2_filter *fltr = vnic->l2_filters[i];
-+
-+		bnge_hwrm_l2_filter_free(bn->bd, fltr);
-+		bnge_del_l2_filter(bn, fltr);
-+	}
-+
-+	vnic->uc_filter_count = 0;
-+}
-+
- static void bnge_clear_vnic(struct bnge_net *bn)
- {
-+	bnge_hwrm_clear_vnic_filter(bn);
- 	bnge_hwrm_vnic_free(bn);
- 	bnge_hwrm_vnic_ctx_free(bn);
- }
-@@ -1757,6 +1997,36 @@ static int bnge_init_chip(struct bnge_net *bn)
- 
- 	if (bd->rss_cap & BNGE_RSS_CAP_RSS_HASH_TYPE_DELTA)
- 		bnge_hwrm_update_rss_hash_cfg(bn);
-+
-+	/* Filter for default vnic 0 */
-+	rc = bnge_hwrm_set_vnic_filter(bn, 0, 0, bn->netdev->dev_addr);
-+	if (rc) {
-+		netdev_err(bn->netdev, "HWRM vnic filter failure rc: %d\n", rc);
-+		goto err_out;
-+	}
-+	vnic->uc_filter_count = 1;
-+
-+	vnic->rx_mask = 0;
-+
-+	if (bn->netdev->flags & IFF_BROADCAST)
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_BCAST;
-+
-+	if (bn->netdev->flags & IFF_PROMISC)
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
-+
-+	if (bn->netdev->flags & IFF_ALLMULTI) {
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
-+		vnic->mc_list_count = 0;
-+	} else if (bn->netdev->flags & IFF_MULTICAST) {
-+		u32 mask = 0;
-+
-+		bnge_mc_list_updated(bn, &mask);
-+		vnic->rx_mask |= mask;
-+	}
-+
-+	rc = bnge_cfg_def_vnic(bn);
-+	if (rc)
-+		goto err_out;
- 	return 0;
- 
- err_out:
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-index 1b580761262..cdd6178da68 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-@@ -6,6 +6,7 @@
- 
- #include <linux/bnxt/hsi.h>
- #include <linux/io-64-nonatomic-lo-hi.h>
-+#include <linux/refcount.h>
- #include "bnge_db.h"
- 
- struct tx_bd {
-@@ -383,6 +384,9 @@ struct bnge_vnic_info {
- #define BNGE_MAX_CTX_PER_VNIC	8
- 	u16		fw_rss_cos_lb_ctx[BNGE_MAX_CTX_PER_VNIC];
- 	u16		mru;
-+	/* index 0 always dev_addr */
-+	struct bnge_l2_filter *l2_filters[BNGE_MAX_UC_ADDRS];
-+	u16		uc_filter_count;
- 	u8		*uc_list;
- 	dma_addr_t	rss_table_dma_addr;
- 	__le16		*rss_table;
-@@ -394,6 +398,7 @@ struct bnge_vnic_info {
- #define BNGE_RSS_TABLE_MAX_TBL		8
- #define BNGE_MAX_RSS_TABLE_SIZE			\
- 	(BNGE_RSS_TABLE_SIZE * BNGE_RSS_TABLE_MAX_TBL)
-+	u32		rx_mask;
- 
- 	u8		*mc_list;
- 	int		mc_list_size;
-@@ -408,6 +413,41 @@ struct bnge_vnic_info {
- 	u32		vnic_id;
- };
- 
-+struct bnge_filter_base {
-+	struct hlist_node	hash;
-+	struct list_head	list;
-+	__le64			filter_id;
-+	u8			type;
-+#define BNGE_FLTR_TYPE_L2	2
-+	u8			flags;
-+	u16			rxq;
-+	u16			fw_vnic_id;
-+	u16			vf_idx;
-+	unsigned long		state;
-+#define BNGE_FLTR_VALID		0
-+#define BNGE_FLTR_FW_DELETED	2
-+
-+	struct rcu_head         rcu;
-+};
-+
-+struct bnge_l2_key {
-+	union {
-+		struct {
-+			u8	dst_mac_addr[ETH_ALEN];
-+			u16	vlan;
-+		};
-+		u32	filter_key;
-+	};
-+};
-+
-+#define BNGE_L2_KEY_SIZE	(sizeof(struct bnge_l2_key) / 4)
-+struct bnge_l2_filter {
-+	/* base filter must be the first member */
-+	struct bnge_filter_base	base;
-+	struct bnge_l2_key	l2_key;
-+	refcount_t		refcnt;
-+};
-+
- u16 bnge_cp_ring_for_rx(struct bnge_rx_ring_info *rxr);
- u16 bnge_cp_ring_for_tx(struct bnge_tx_ring_info *txr);
- void bnge_fill_hw_rss_tbl(struct bnge_net *bn, struct bnge_vnic_info *vnic);
+Alexandra Winter (11):
+  net/smc: Remove error handling of unregister_dmb()
+  net/smc: Decouple sf and attached send_buf in smc_loopback
+  dibs: Create drivers/dibs
+  dibs: Register smc as dibs_client
+  dibs: Register ism as dibs device
+  dibs: Define dibs loopback
+  dibs: Define dibs_client_ops and dibs_dev_ops
+  dibs: Local gid for dibs devices
+  dibs: Move vlan support to dibs_dev_ops
+  dibs: Move query_remote_gid() to dibs_dev_ops
+  dibs: Move data path to dibs layer
+
+Julian Ruess (3):
+  dibs: Move struct device to dibs_dev
+  dibs: Create class dibs
+  dibs: Move event handling to dibs layer
+
+ MAINTAINERS                       |   9 +-
+ arch/s390/configs/debug_defconfig |   4 +-
+ arch/s390/configs/defconfig       |   4 +-
+ drivers/Makefile                  |   1 +
+ drivers/dibs/Kconfig              |  23 ++
+ drivers/dibs/Makefile             |   8 +
+ drivers/dibs/dibs_loopback.c      | 356 +++++++++++++++++++
+ drivers/dibs/dibs_loopback.h      |  57 +++
+ drivers/dibs/dibs_main.c          | 278 +++++++++++++++
+ drivers/s390/net/Kconfig          |   3 +-
+ drivers/s390/net/ism.h            |  53 ++-
+ drivers/s390/net/ism_drv.c        | 573 +++++++++++-------------------
+ include/linux/dibs.h              | 464 ++++++++++++++++++++++++
+ include/linux/ism.h               |  28 +-
+ include/net/smc.h                 |  51 +--
+ net/Kconfig                       |   1 +
+ net/smc/Kconfig                   |  16 +-
+ net/smc/Makefile                  |   1 -
+ net/smc/af_smc.c                  |  12 +-
+ net/smc/smc_clc.c                 |   6 +-
+ net/smc/smc_core.c                |   6 +-
+ net/smc/smc_core.h                |   5 +
+ net/smc/smc_diag.c                |   2 +-
+ net/smc/smc_ism.c                 | 224 ++++++------
+ net/smc/smc_ism.h                 |  36 +-
+ net/smc/smc_loopback.c            | 421 ----------------------
+ net/smc/smc_loopback.h            |  60 ----
+ net/smc/smc_pnet.c                |  25 +-
+ net/smc/smc_tx.c                  |   3 +
+ 29 files changed, 1645 insertions(+), 1085 deletions(-)
+ create mode 100644 drivers/dibs/Kconfig
+ create mode 100644 drivers/dibs/Makefile
+ create mode 100644 drivers/dibs/dibs_loopback.c
+ create mode 100644 drivers/dibs/dibs_loopback.h
+ create mode 100644 drivers/dibs/dibs_main.c
+ create mode 100644 include/linux/dibs.h
+ delete mode 100644 net/smc/smc_loopback.c
+ delete mode 100644 net/smc/smc_loopback.h
+
 -- 
-2.47.3
+2.48.1
 
 
