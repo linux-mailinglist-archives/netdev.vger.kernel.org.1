@@ -1,356 +1,357 @@
-Return-Path: <netdev+bounces-222038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F6EB52D55
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:31:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C33B52D96
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D86C3A4DCC
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 09:31:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DEA7587345
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 09:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8CEF2EA147;
-	Thu, 11 Sep 2025 09:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022442EB879;
+	Thu, 11 Sep 2025 09:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DaoX3LOV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYwaHgnR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B3B207A32;
-	Thu, 11 Sep 2025 09:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECE92EB844;
+	Thu, 11 Sep 2025 09:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757583099; cv=none; b=lc8IRGGTXzLQniZHiBoMe9zTOgg/t/AgZ/GuzOxGxdnx+UbIpjX0mbSp21g3zGa9ntqe7tq9u4yA7DZJBhT1OIs8R56+N4IsgbSBv0r4IY0cZNmuXTuuWAr03HZXaIskNhTM86BVI8u3pdtcO+UgX3qdE13nKc4DVMjDyH9t/Ac=
+	t=1757583851; cv=none; b=FeU2joZ8LSIeyR+t8PgsPnq/4JHcA+/+TJehCSDyLrfuVRvGHM/V+jFsm+hBwLNuGXxxteQpqvObK7jf5FIX8ZG8YjS+2JI5XsuzeraAlkg6mRvfHhUrj+s0csaJ+iZPGoRgQSa3b5kRWj7nIiSBX96zilqTHMMkeBMJ32h4bak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757583099; c=relaxed/simple;
-	bh=z75pw58mpU1J8jn8uDK81j/Jt6tUNtkYOdcRD35A4/A=;
+	s=arc-20240116; t=1757583851; c=relaxed/simple;
+	bh=kV7vZm9Eyd7Ie8xphsJvcVh9Ceje97yHegYdpuD0swc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSlVXTxblyII5LZHMFb7yLqZR3c6WstVeVKfI+85SXyqyFF/bXUABRRs+zEiAIFD7Fg8iWBebfjMPvMrNVE2oqz8bjlO2+SD2vg+6R5i83mHOv8ct1OC2qWBGXvG9Pfs0CSNZfGJpMf4WaTbQJcDjdY/d2vaxbFTkMdhl52kQzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DaoX3LOV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F021C4CEF0;
-	Thu, 11 Sep 2025 09:31:33 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qRgvtnPpUMyio4byCj4wklLFdS8kNCEVwyNF1gQ5rd3u1TZcQzJlVv0QWDH1K248YOglMtylfPgHJcmvA4uvNZys+PDBneV7Dlf+nVaTB2Hypich4uf31xWBjurv+ZHmJpxHBJ8RFYMTB6iSYHx+RzbajSzAHAlaXWBby4JTlSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYwaHgnR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19B4EC4CEF0;
+	Thu, 11 Sep 2025 09:44:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757583099;
-	bh=z75pw58mpU1J8jn8uDK81j/Jt6tUNtkYOdcRD35A4/A=;
+	s=k20201202; t=1757583851;
+	bh=kV7vZm9Eyd7Ie8xphsJvcVh9Ceje97yHegYdpuD0swc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DaoX3LOV/jnceBoXDY0xHveKTV+2Iv/EfwWkiwJE6aNm57SGFK25WfhxafNju5RJy
-	 iz/QiR2A19eGrqXnNXpg+AyR+ipcRR0nBnXyEgJdGiMJmouIuaaA559rhYXeD/eF4+
-	 iyvnu5SQdc1qh0li51LCmsdDh4ByxqaIvEI7v0r5Lq96pqSX0IbpKTt+1gE6JAKAIB
-	 1utZ83kizHL1Yk7zSIF8IJuw3DNtG7Y3q+QjrFNF74VkPNT+K5n0V4sq8kRQ8liGfA
-	 x22V1tXu98kmCdVkkKN+gdULo1tIH7pCd//ufri8sZ6fVTfJbTTiA9A7J4UqtEBYVj
-	 4mRQg1Pq+Wq3w==
-Date: Thu, 11 Sep 2025 11:31:30 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 27/32] nsfs: support file handles
-Message-ID: <20250911-werken-raubzug-64735473739c@brauner>
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org>
- <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
+	b=lYwaHgnRT+GFwqcavqxcw9A4C7X2fUz/eMmP2CAjUY9KxbeQ4TQg5XKYtWvKFkfyW
+	 NvzZTzaT2zvGhYjMljGyoHNlO5lt6yuSaoE8hSreAlQY/ZdNbIMxpPL4U62k4I2IXH
+	 a0NaZjV/Xa3AKAGw1spn5xg5qN6cz6YVhuojI+EWHls+w6rjRxpysYPv9GYSRxTFpJ
+	 0xosjezjr2D/5fTo2RQaCOqOFYY+vaxbSKdL+zm7IH3+oksSJ5kBksETELZcCVyPPR
+	 1dxuZOlSmTcmQWLWGXmHVez01boMB1HTG7E+YdgCxqTH/Z4IfoWS6fixP0yFukMD0X
+	 yil8bQMqkS20g==
+Date: Thu, 11 Sep 2025 10:44:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Vivian Wang <uwu@dram.page>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>
+Subject: Re: [PATCH net-next v10 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <20250911094404.GE30363@horms.kernel.org>
+References: <20250908-net-k1-emac-v10-0-90d807ccd469@iscas.ac.cn>
+ <20250908-net-k1-emac-v10-2-90d807ccd469@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
+In-Reply-To: <20250908-net-k1-emac-v10-2-90d807ccd469@iscas.ac.cn>
 
-On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
-> On Wed, Sep 10, 2025 at 4:39 PM Christian Brauner <brauner@kernel.org> wrote:
-> >
-> > A while ago we added support for file handles to pidfs so pidfds can be
-> > encoded and decoded as file handles. Userspace has adopted this quickly
-> > and it's proven very useful.
+On Mon, Sep 08, 2025 at 08:34:26PM +0800, Vivian Wang wrote:
+> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
+> that only superficially resembles some other embedded MACs. SpacemiT
+> refers to them as "EMAC", so let's just call the driver "k1_emac".
 > 
-> > Pidfd file handles are exhaustive meaning
-> > they don't require a handle on another pidfd to pass to
-> > open_by_handle_at() so it can derive the filesystem to decode in.
-> >
-> > Implement the exhaustive file handles for namespaces as well.
+> Supports RGMII and RMII interfaces. Includes support for MAC hardware
+> statistics counters. PTP support is not implemented.
 > 
-> I think you decide to split the "exhaustive" part to another patch,
-> so better drop this paragraph?
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Reviewed-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
+> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
+> Tested-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
+> ---
+>  drivers/net/ethernet/Kconfig            |    1 +
+>  drivers/net/ethernet/Makefile           |    1 +
+>  drivers/net/ethernet/spacemit/Kconfig   |   29 +
+>  drivers/net/ethernet/spacemit/Makefile  |    6 +
+>  drivers/net/ethernet/spacemit/k1_emac.c | 2156 +++++++++++++++++++++++++++++++
 
-Yes, good point. I've dont that.
+This is a large patch, so I'm sure I've missed some things.
+But, overall, I think this is coming together.
+Thanks for your recent updates.
 
-> I am missing an explanation about the permissions for
-> opening these file handles.
-> 
-> My understanding of the code is that the opener needs to meet one of
-> the conditions:
-> 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
-> 2. current task is in the opened namespace
+As the Kernel Patch Robot noticed a problem,
+I've provided some minor feedback for your consideration.
 
-Yes.
+...
 
-> 
-> But I do not fully understand the rationale behind the 2nd condition,
-> that is, when is it useful?
+> +static void emac_wr(struct emac_priv *priv, u32 reg, u32 val)
+> +{
+> +	writel(val, priv->iobase + reg);
+> +}
+> +
+> +static int emac_rd(struct emac_priv *priv, u32 reg)
 
-A caller is always able to open a file descriptor to it's own set of
-namespaces. File handles will behave the same way.
+nit: maybe u32 would be a more suitable return type.
 
-> And as far as I can tell, your selftest does not cover this condition
-> (only both true or both false)?
+> +{
+> +	return readl(priv->iobase + reg);
+> +}
 
-I've added this now.
+...
 
-> 
-> I suggest to start with allowing only the useful and important
-> cases, so if cond #1 is useful enough, drop cond #2 and we can add
-> it later if needed and then your selftests already cover cond #1 true and false.
-> 
-> >
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> 
-> After documenting the permissions, with ot without dropping cond #2
-> feel free to add:
-> 
-> Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+> +static int emac_alloc_tx_resources(struct emac_priv *priv)
+> +{
+> +	struct emac_desc_ring *tx_ring = &priv->tx_ring;
+> +	struct platform_device *pdev = priv->pdev;
+> +	u32 size;
+> +
+> +	size = sizeof(struct emac_tx_desc_buffer) * tx_ring->total_cnt;
+> +
+> +	tx_ring->tx_desc_buf = kzalloc(size, GFP_KERNEL);
 
-Thanks!
+nit: I think you can use kcalloc() here.
 
-> 
-> > ---
-> >  fs/nsfs.c                | 176 +++++++++++++++++++++++++++++++++++++++++++++++
-> >  include/linux/exportfs.h |   6 ++
-> >  2 files changed, 182 insertions(+)
-> >
-> > diff --git a/fs/nsfs.c b/fs/nsfs.c
-> > index 6f8008177133..a1585a2f4f03 100644
-> > --- a/fs/nsfs.c
-> > +++ b/fs/nsfs.c
-> > @@ -13,6 +13,12 @@
-> >  #include <linux/nsfs.h>
-> >  #include <linux/uaccess.h>
-> >  #include <linux/mnt_namespace.h>
-> > +#include <linux/ipc_namespace.h>
-> > +#include <linux/time_namespace.h>
-> > +#include <linux/utsname.h>
-> > +#include <linux/exportfs.h>
-> > +#include <linux/nstree.h>
-> > +#include <net/net_namespace.h>
-> >
-> >  #include "mount.h"
-> >  #include "internal.h"
-> > @@ -417,12 +423,182 @@ static const struct stashed_operations nsfs_stashed_ops = {
-> >         .put_data = nsfs_put_data,
-> >  };
-> >
-> > +struct nsfs_fid {
-> > +       u64 ns_id;
-> > +       u32 ns_type;
-> > +       u32 ns_inum;
-> > +} __attribute__ ((packed));
-> > +
-> > +#define NSFS_FID_SIZE (sizeof(struct nsfs_fid) / sizeof(u32))
-> > +
-> > +static int nsfs_encode_fh(struct inode *inode, u32 *fh, int *max_len,
-> > +                         struct inode *parent)
-> > +{
-> > +       struct nsfs_fid *fid = (struct nsfs_fid *)fh;
-> > +       struct ns_common *ns = inode->i_private;
-> > +       int len = *max_len;
-> > +
-> > +       /*
-> > +        * TODO:
-> > +        * For hierarchical namespaces we should start to encode the
-> > +        * parent namespace. Then userspace can walk a namespace
-> > +        * hierarchy purely based on file handles.
-> > +        */
-> > +       if (parent)
-> > +               return FILEID_INVALID;
-> > +
-> > +       if (len < NSFS_FID_SIZE) {
-> > +               *max_len = NSFS_FID_SIZE;
-> > +               return FILEID_INVALID;
-> > +       }
-> > +
-> > +       len  = NSFS_FID_SIZE;
-> > +
-> > +       fid->ns_id = ns->ns_id;
-> > +       fid->ns_type = ns->ops->type;
-> > +       fid->ns_inum = inode->i_ino;
-> > +       *max_len = len;
-> > +       return FILEID_NSFS;
-> > +}
-> > +
-> > +static struct dentry *nsfs_fh_to_dentry(struct super_block *sb, struct fid *fh,
-> > +                                       int fh_len, int fh_type)
-> > +{
-> > +       struct path path __free(path_put) = {};
-> > +       struct nsfs_fid *fid = (struct nsfs_fid *)fh;
-> > +       struct user_namespace *owning_ns = NULL;
-> > +       struct ns_common *ns;
-> > +       int ret;
-> > +
-> > +       if (fh_len < NSFS_FID_SIZE)
-> > +               return NULL;
-> > +
-> > +       switch (fh_type) {
-> > +       case FILEID_NSFS:
-> > +               break;
-> > +       default:
-> > +               return NULL;
-> > +       }
-> > +
-> > +       scoped_guard(rcu) {
-> > +               ns = ns_tree_lookup_rcu(fid->ns_id, fid->ns_type);
-> > +               if (!ns)
-> > +                       return NULL;
-> > +
-> > +               VFS_WARN_ON_ONCE(ns->ns_id != fid->ns_id);
-> > +               VFS_WARN_ON_ONCE(ns->ops->type != fid->ns_type);
-> > +               VFS_WARN_ON_ONCE(ns->inum != fid->ns_inum);
-> > +
-> > +               if (!refcount_inc_not_zero(&ns->count))
-> > +                       return NULL;
-> > +       }
-> > +
-> > +       switch (ns->ops->type) {
-> > +#ifdef CONFIG_CGROUPS
-> > +       case CLONE_NEWCGROUP:
-> > +               if (!current_in_namespace(to_cg_ns(ns)))
-> > +                       owning_ns = to_cg_ns(ns)->user_ns;
-> > +               break;
-> > +#endif
-> > +#ifdef CONFIG_IPC_NS
-> > +       case CLONE_NEWIPC:
-> > +               if (!current_in_namespace(to_ipc_ns(ns)))
-> > +                       owning_ns = to_ipc_ns(ns)->user_ns;
-> > +               break;
-> > +#endif
-> > +       case CLONE_NEWNS:
-> > +               if (!current_in_namespace(to_mnt_ns(ns)))
-> > +                       owning_ns = to_mnt_ns(ns)->user_ns;
-> > +               break;
-> > +#ifdef CONFIG_NET_NS
-> > +       case CLONE_NEWNET:
-> > +               if (!current_in_namespace(to_net_ns(ns)))
-> > +                       owning_ns = to_net_ns(ns)->user_ns;
-> > +               break;
-> > +#endif
-> > +#ifdef CONFIG_PID_NS
-> > +       case CLONE_NEWPID:
-> > +               if (!current_in_namespace(to_pid_ns(ns))) {
-> > +                       owning_ns = to_pid_ns(ns)->user_ns;
-> > +               } else if (!READ_ONCE(to_pid_ns(ns)->child_reaper)) {
-> > +                       ns->ops->put(ns);
-> > +                       return ERR_PTR(-EPERM);
-> > +               }
-> > +               break;
-> > +#endif
-> > +#ifdef CONFIG_TIME_NS
-> > +       case CLONE_NEWTIME:
-> > +               if (!current_in_namespace(to_time_ns(ns)))
-> > +                       owning_ns = to_time_ns(ns)->user_ns;
-> > +               break;
-> > +#endif
-> > +#ifdef CONFIG_USER_NS
-> > +       case CLONE_NEWUSER:
-> > +               if (!current_in_namespace(to_user_ns(ns)))
-> > +                       owning_ns = to_user_ns(ns);
-> > +               break;
-> > +#endif
-> > +#ifdef CONFIG_UTS_NS
-> > +       case CLONE_NEWUTS:
-> > +               if (!current_in_namespace(to_uts_ns(ns)))
-> > +                       owning_ns = to_uts_ns(ns)->user_ns;
-> > +               break;
-> > +#endif
-> > +       default:
-> > +               return ERR_PTR(-EOPNOTSUPP);
-> > +       }
-> > +
-> > +       if (owning_ns && !ns_capable(owning_ns, CAP_SYS_ADMIN)) {
-> > +               ns->ops->put(ns);
-> > +               return ERR_PTR(-EPERM);
-> > +       }
-> > +
-> > +       /* path_from_stashed() unconditionally consumes the reference. */
-> > +       ret = path_from_stashed(&ns->stashed, nsfs_mnt, ns, &path);
-> > +       if (ret)
-> > +               return ERR_PTR(ret);
-> > +
-> > +       return no_free_ptr(path.dentry);
-> > +}
-> > +
-> > +/*
-> > + * Make sure that we reject any nonsensical flags that users pass via
-> > + * open_by_handle_at().
-> > + */
-> > +#define VALID_FILE_HANDLE_OPEN_FLAGS \
-> > +       (O_RDONLY | O_WRONLY | O_RDWR | O_NONBLOCK | O_CLOEXEC | O_EXCL)
-> > +
-> > +static int nsfs_export_permission(struct handle_to_path_ctx *ctx,
-> > +                                  unsigned int oflags)
-> > +{
-> > +       if (oflags & ~(VALID_FILE_HANDLE_OPEN_FLAGS | O_LARGEFILE))
-> > +               return -EINVAL;
-> > +
-> > +       /* nsfs_fh_to_dentry() is performs further permission checks. */
-> > +       return 0;
-> > +}
-> > +
-> > +static struct file *nsfs_export_open(struct path *path, unsigned int oflags)
-> > +{
-> > +       /* Clear O_LARGEFILE as open_by_handle_at() forces it. */
-> > +       oflags &= ~O_LARGEFILE;
-> > +       return file_open_root(path, "", oflags, 0);
-> > +}
-> > +
-> > +static const struct export_operations nsfs_export_operations = {
-> > +       .encode_fh      = nsfs_encode_fh,
-> > +       .fh_to_dentry   = nsfs_fh_to_dentry,
-> > +       .open           = nsfs_export_open,
-> > +       .permission     = nsfs_export_permission,
-> > +};
-> > +
-> >  static int nsfs_init_fs_context(struct fs_context *fc)
-> >  {
-> >         struct pseudo_fs_context *ctx = init_pseudo(fc, NSFS_MAGIC);
-> >         if (!ctx)
-> >                 return -ENOMEM;
-> >         ctx->ops = &nsfs_ops;
-> > +       ctx->eops = &nsfs_export_operations;
-> >         ctx->dops = &ns_dentry_operations;
-> >         fc->s_fs_info = (void *)&nsfs_stashed_ops;
-> >         return 0;
-> > diff --git a/include/linux/exportfs.h b/include/linux/exportfs.h
-> > index cfb0dd1ea49c..3aac58a520c7 100644
-> > --- a/include/linux/exportfs.h
-> > +++ b/include/linux/exportfs.h
-> > @@ -122,6 +122,12 @@ enum fid_type {
-> >         FILEID_BCACHEFS_WITHOUT_PARENT = 0xb1,
-> >         FILEID_BCACHEFS_WITH_PARENT = 0xb2,
-> >
-> > +       /*
-> > +        *
-> > +        * 64 bit namespace identifier, 32 bit namespace type, 32 bit inode number.
-> > +        */
-> > +       FILEID_NSFS = 0xf1,
-> > +
-> >         /*
-> >          * 64 bit unique kernfs id
-> >          */
-> >
-> > --
-> > 2.47.3
-> >
+> +	if (!tx_ring->tx_desc_buf)
+> +		return -ENOMEM;
+> +
+> +	tx_ring->total_size = tx_ring->total_cnt * sizeof(struct emac_desc);
+> +	tx_ring->total_size = ALIGN(tx_ring->total_size, PAGE_SIZE);
+> +
+> +	tx_ring->desc_addr = dma_alloc_coherent(&pdev->dev, tx_ring->total_size,
+> +						&tx_ring->desc_dma_addr,
+> +						GFP_KERNEL);
+> +	if (!tx_ring->desc_addr) {
+> +		kfree(tx_ring->tx_desc_buf);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	tx_ring->head = 0;
+> +	tx_ring->tail = 0;
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static int emac_alloc_rx_resources(struct emac_priv *priv)
+> +{
+> +	struct emac_desc_ring *rx_ring = &priv->rx_ring;
+> +	struct platform_device *pdev = priv->pdev;
+> +	u32 buf_len;
+> +
+> +	buf_len = sizeof(struct emac_rx_desc_buffer) * rx_ring->total_cnt;
+> +
+> +	rx_ring->rx_desc_buf = kzalloc(buf_len, GFP_KERNEL);
+
+Ditto.
+
+> +	if (!rx_ring->rx_desc_buf)
+> +		return -ENOMEM;
+> +
+> +	rx_ring->total_size = rx_ring->total_cnt * sizeof(struct emac_desc);
+> +
+> +	rx_ring->total_size = ALIGN(rx_ring->total_size, PAGE_SIZE);
+> +
+> +	rx_ring->desc_addr = dma_alloc_coherent(&pdev->dev, rx_ring->total_size,
+> +						&rx_ring->desc_dma_addr,
+> +						GFP_KERNEL);
+> +	if (!rx_ring->desc_addr) {
+> +		kfree(rx_ring->rx_desc_buf);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	rx_ring->head = 0;
+> +	rx_ring->tail = 0;
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static int emac_mii_read(struct mii_bus *bus, int phy_addr, int regnum)
+> +{
+> +	struct emac_priv *priv = bus->priv;
+> +	u32 cmd = 0, val;
+> +	int ret;
+> +
+> +	cmd |= phy_addr & 0x1F;
+> +	cmd |= (regnum & 0x1F) << 5;
+
+nit: I think this could benefit from using FIELD_PREP
+     Likewise for similar patterns in this patch.
+
+> +	cmd |= MREGBIT_START_MDIO_TRANS | MREGBIT_MDIO_READ_WRITE;
+> +
+> +	emac_wr(priv, MAC_MDIO_DATA, 0x0);
+> +	emac_wr(priv, MAC_MDIO_CONTROL, cmd);
+> +
+> +	ret = readl_poll_timeout(priv->iobase + MAC_MDIO_CONTROL, val,
+> +				 !((val >> 15) & 0x1), 100, 10000);
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	val = emac_rd(priv, MAC_MDIO_DATA);
+> +	return val;
+> +}
+
+...
+
+> +/*
+> + * Even though this MAC supports gigabit operation, it only provides 32-bit
+> + * statistics counters. The most overflow-prone counters are the "bytes" ones,
+> + * which at gigabit overflow about twice a minute.
+> + *
+> + * Therefore, we maintain the high 32 bits of counters ourselves, incrementing
+> + * every time statistics seem to go backwards. Also, update periodically to
+> + * catch overflows when we are not otherwise checking the statistics often
+> + * enough.
+> + */
+> +
+> +#define EMAC_STATS_TIMER_PERIOD		20
+> +
+> +static int emac_read_stat_cnt(struct emac_priv *priv, u8 cnt, u32 *res,
+> +			      u32 control_reg, u32 high_reg, u32 low_reg)
+> +{
+> +	u32 val;
+> +	int ret;
+> +
+> +	/* The "read" bit is the same for TX and RX */
+> +
+> +	val = MREGBIT_START_TX_COUNTER_READ | cnt;
+> +	emac_wr(priv, control_reg, val);
+> +	val = emac_rd(priv, control_reg);
+> +
+> +	ret = readl_poll_timeout_atomic(priv->iobase + control_reg, val,
+> +					!(val & MREGBIT_START_TX_COUNTER_READ),
+> +					100, 10000);
+> +
+> +	if (ret) {
+> +		netdev_err(priv->ndev, "Read stat timeout\n");
+> +		return ret;
+> +	}
+> +
+> +	*res = emac_rd(priv, high_reg) << 16;
+> +	*res |= (u16)emac_rd(priv, low_reg);
+
+nit: I think lower_16_bits() and lower_16_bits() would be appropriate here.
+
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static void emac_update_counter(u64 *counter, u32 new_low)
+> +{
+> +	u32 old_low = (u32)*counter;
+> +	u64 high = *counter >> 32;
+
+Similarly, lower_32_bits() and upper_32_bits here.
+
+> +
+> +	if (old_low > new_low) {
+> +		/* Overflowed, increment high 32 bits */
+> +		high++;
+> +	}
+> +
+> +	*counter = (high << 32) | new_low;
+> +}
+> +
+> +static void emac_stats_update(struct emac_priv *priv)
+> +{
+> +	u64 *tx_stats_off = (u64 *)&priv->tx_stats_off;
+> +	u64 *rx_stats_off = (u64 *)&priv->rx_stats_off;
+> +	u64 *tx_stats = (u64 *)&priv->tx_stats;
+> +	u64 *rx_stats = (u64 *)&priv->rx_stats;
+
+nit: I think it would be interesting to use a union containing
+     1. the existing tx/rx stats struct and 2. an array of u64.
+     This may allow avoiding this cast. Which seems nice to me.
+     But YMMV.
+
+> +	u32 i, res;
+> +
+> +	assert_spin_locked(&priv->stats_lock);
+> +
+> +	if (!netif_running(priv->ndev) || !netif_device_present(priv->ndev)) {
+> +		/* Not up, don't try to update */
+> +		return;
+> +	}
+> +
+> +	for (i = 0; i < sizeof(priv->tx_stats) / sizeof(*tx_stats); i++) {
+> +		/*
+> +		 * If reading stats times out, everything is broken and there's
+> +		 * nothing we can do. Reading statistics also can't return an
+> +		 * error, so just return without updating and without
+> +		 * rescheduling.
+> +		 */
+> +		if (emac_tx_read_stat_cnt(priv, i, &res))
+> +			return;
+> +
+> +		/*
+> +		 * Re-initializing while bringing interface up resets counters
+> +		 * to zero, so to provide continuity, we add the values saved
+> +		 * last time we did emac_down() to the new hardware-provided
+> +		 * value.
+> +		 */
+> +		emac_update_counter(&tx_stats[i], res + (u32)tx_stats_off[i]);
+
+nit: maybe lower_32_bits(tx_stats_off[i]) ?
+
+> +	}
+> +
+> +	/* Similar remarks as TX stats */
+> +	for (i = 0; i < sizeof(priv->rx_stats) / sizeof(*rx_stats); i++) {
+> +		if (emac_rx_read_stat_cnt(priv, i, &res))
+> +			return;
+> +		emac_update_counter(&rx_stats[i], res + (u32)rx_stats_off[i]);
+
+Likewise, here for rx_stats_off[i].
+
+> +	}
+> +
+> +	mod_timer(&priv->stats_timer, jiffies + EMAC_STATS_TIMER_PERIOD * HZ);
+> +}
+
+...
+
+> +static u64 emac_get_stat_tx_dropped(struct emac_priv *priv)
+> +{
+> +	u64 result;
+> +	int cpu;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		result += READ_ONCE(per_cpu(*priv->stat_tx_dropped, cpu));
+> +	}
+
+nit: no need for {} here ?
+
+> +
+> +	return result;
+> +}
+
+...
 
