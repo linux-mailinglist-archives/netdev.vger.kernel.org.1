@@ -1,122 +1,166 @@
-Return-Path: <netdev+bounces-222184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF0EB53603
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:44:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 962A5B53600
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:43:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA67D1B203F7
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:43:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3292D7AFA88
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2A326A1BE;
-	Thu, 11 Sep 2025 14:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730AC33769B;
+	Thu, 11 Sep 2025 14:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bY2Z5efy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekGDjM5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BFC34164F
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 14:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E31C313543
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 14:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757601802; cv=none; b=YffC8ATsv/sAAqJYWNMue+ETdt2JYuLLD27ObSrbWqnx5OyLcpKpyHIBOjJyv6zCAD06Z4txWQVSSrELS2AE5Re6NLcBOXqVO0V+mKVDVFSGVGaNjhktNzMRw4gzoCRikbmlJJ8UXSHsHQRNdzF8ijUcxN9ntpCmg7fspgrI67U=
+	t=1757601814; cv=none; b=hwukUi9aCns+iVGQ7HzbLoS1sIyT2iQXXtj14fA8x451Cqot3gLuthO29iZFMotuRgf0XQcQ0fwFyr1WNvWHwIZ3aGCA2D4ciCdn7i/Dkhs/W63O5KC2fHreVs11NArD6cD0sf8oLp0jlGlw0I3FLjJhGvD00qVuoZpeGXr2OCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757601802; c=relaxed/simple;
-	bh=Rft91jJnOO12qJV8wnWgSdUpkz+3VO62acnp2/r+eZY=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=tsRHPFkOX/fU/Qmfx2xJzd3BreybUJEdL8Z3JdDoSshAkzrEQblVyAPNSP09b/LfHZQcLpf8tLq+bvW7sAE9AYn1AH2V1zgwe/H7s+F8j+wqDIINdVNvIBqeupEELvadrMrVEzxIC9K2Vqvy6ypy+P4MeSM6orlUHCOi1c424Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bY2Z5efy; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=I+xGih9jPn+BRxNv2iB2kjv+BHRoQDNSbZQx9OEqWK4=; b=bY2Z5efyVoW0R2dsiXqGiumBfC
-	TNACPC3ytmnARsy7pKNjUhc/RigBGfA2zGWZg50jnswJKfRGwe9kseTKou50Vz97Kl6XYTlSxGdqx
-	sttgf8me2dLvPJDh8zevUy+LkLv8vIZABpzmnbCSvgK+90sXzXSFMNNHJmzNt/OwN7+vmqZ1eNU7a
-	QM3g+MjXK/HkSNEJ05+wjudqbiP16OQEfSwaIhNJOlTbGQ8/83rA2CsObkyKxkjRsd90XFkoLFhhP
-	M/kdsrwkgWsZ9QIaCrtJc2SJyK148jeRXXF/nY3cAmAC2zEW7mQAnySbOlNTvnu/36aKoxzCx3eoj
-	HNelvA6A==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51450 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uwiW4-000000003DH-1zz2;
-	Thu, 11 Sep 2025 15:43:16 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uwiW3-00000004jRF-3CnC;
-	Thu, 11 Sep 2025 15:43:15 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net] net: ethtool: handle EOPNOTSUPP from ethtool
- get_ts_info() method
+	s=arc-20240116; t=1757601814; c=relaxed/simple;
+	bh=5joYKHJyn+/bG1/2W2XI6/SUAwVGFDnecK7PJm4GL2o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y06qAsAb1HXzm7i05YCVZu8thTkbmZkveRPyWuetbSYJ1rwxLbaCkuuKAKQwhSdRVf1SP7jhXKt1tFneQbJvilin65wQ2u/BVl5oOM681s6COTAHZtxqf8oofec9SydobJgQmCxPfDBnyrNY96ZK6XmEb9vmUjcHmwrNP9Btmy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekGDjM5K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A78BC4CEF0;
+	Thu, 11 Sep 2025 14:43:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757601813;
+	bh=5joYKHJyn+/bG1/2W2XI6/SUAwVGFDnecK7PJm4GL2o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ekGDjM5KMruPggDPYPauMwagAzORyFmcF1RCRfdmqpp7uFY6Q2X89RoRgfwkV+kSe
+	 YZRiFIi0AtKeyyNcj8OjTls/pwlRP9IklQTqXIaCAFDfQB20BFO0+syc4Yhdr9Bd60
+	 Ca+x6duxBGRGx6rLN6ylKfcSSs537dEkwyiMOAzreihxwI3RqqLflZe63XNNo0cr9f
+	 Wsl7+0uniNtlXuO+obIN9r4K4JCXezG/LuMO9tlKJUvYoVlH0vRHrNA/nN9w0wUkOz
+	 KmaAQQ5Fbq6Dwav2XFV2qCZbJuh24OpUl82DuHbvo4x3HbKMTZy83Mjfn7Cwo5LSsl
+	 pHJOVMkMFwJ1A==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	almasrymina@google.com,
+	alexanderduyck@fb.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] eth: fbnic: support devmem Tx
+Date: Thu, 11 Sep 2025 07:43:27 -0700
+Message-ID: <20250911144327.1630532-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uwiW3-00000004jRF-3CnC@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 11 Sep 2025 15:43:15 +0100
 
-Network drivers sometimes return -EOPNOTSUPP from their get_ts_info()
-method, and this should not cause the reporting of PHY timestamping
-information to be prohibited. Handle this error code, and also
-arrange for ethtool_net_get_ts_info_by_phc() to return -EOPNOTSUPP
-when the method is not implemented.
+Support devmem Tx. We already use skb_frag_dma_map(), we just need
+to make sure we don't try to unmap the frags. Check if frag is
+unreadable and mark the ring entry.
 
-This allows e.g. PHYs connected to DSA switches which support
-timestamping to report their timestamping capabilities.
+  # ./tools/testing/selftests/drivers/net/hw/devmem.py
+  TAP version 13
+  1..3
+  ok 1 devmem.check_rx
+  ok 2 devmem.check_tx
+  ok 3 devmem.check_tx_chunks
+  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Fixes: b9e3f7dc9ed9 ("net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology")
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
---
-v2: add Fixes: tag
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/ethtool/common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c |  1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c   | 14 +++++++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 4f58648a27ad..92e6a681c797 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -905,7 +905,7 @@ int ethtool_net_get_ts_info_by_phc(struct net_device *dev,
- 	int err;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index dd35de301870..d12b4cad84a5 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -712,6 +712,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
+ 	netdev->netdev_ops = &fbnic_netdev_ops;
+ 	netdev->stat_ops = &fbnic_stat_ops;
+ 	netdev->queue_mgmt_ops = &fbnic_queue_mgmt_ops;
++	netdev->netmem_tx = true;
  
- 	if (!ops->get_ts_info)
--		return -ENODEV;
-+		return -EOPNOTSUPP;
+ 	fbnic_set_ethtool_ops(netdev);
  
- 	/* Does ptp comes from netdev */
- 	ethtool_init_tsinfo(info);
-@@ -973,7 +973,7 @@ int ethtool_get_ts_info_by_phc(struct net_device *dev,
- 	int err;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index ac555e045e34..286ad628a557 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -37,6 +37,8 @@ struct fbnic_xmit_cb {
  
- 	err = ethtool_net_get_ts_info_by_phc(dev, info, hwprov_desc);
--	if (err == -ENODEV) {
-+	if (err == -ENODEV || err == -EOPNOTSUPP) {
- 		struct phy_device *phy;
+ #define FBNIC_XMIT_CB(__skb) ((struct fbnic_xmit_cb *)((__skb)->cb))
  
- 		phy = ethtool_phy_get_ts_info_by_phc(dev, info, hwprov_desc);
++#define FBNIC_XMIT_NOUNMAP	(void *)1
++
+ static u32 __iomem *fbnic_ring_csr_base(const struct fbnic_ring *ring)
+ {
+ 	unsigned long csr_base = (unsigned long)ring->doorbell;
+@@ -315,6 +317,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
+ 	unsigned int tail = ring->tail, first;
+ 	unsigned int size, data_len;
+ 	skb_frag_t *frag;
++	bool is_net_iov;
+ 	dma_addr_t dma;
+ 	__le64 *twd;
+ 
+@@ -330,6 +333,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
+ 	if (size > FIELD_MAX(FBNIC_TWD_LEN_MASK))
+ 		goto dma_error;
+ 
++	is_net_iov = false;
+ 	dma = dma_map_single(dev, skb->data, size, DMA_TO_DEVICE);
+ 
+ 	for (frag = &skb_shinfo(skb)->frags[0];; frag++) {
+@@ -342,6 +346,8 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
+ 				   FIELD_PREP(FBNIC_TWD_LEN_MASK, size) |
+ 				   FIELD_PREP(FBNIC_TWD_TYPE_MASK,
+ 					      FBNIC_TWD_TYPE_AL));
++		if (is_net_iov)
++			ring->tx_buf[tail] = FBNIC_XMIT_NOUNMAP;
+ 
+ 		tail++;
+ 		tail &= ring->size_mask;
+@@ -355,6 +361,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
+ 		if (size > FIELD_MAX(FBNIC_TWD_LEN_MASK))
+ 			goto dma_error;
+ 
++		is_net_iov = skb_frag_is_net_iov(frag);
+ 		dma = skb_frag_dma_map(dev, frag, 0, size, DMA_TO_DEVICE);
+ 	}
+ 
+@@ -387,6 +394,7 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
+ 	while (tail != first) {
+ 		tail--;
+ 		tail &= ring->size_mask;
++		ring->tx_buf[tail] = NULL;
+ 		twd = &ring->desc[tail];
+ 		if (tail == first)
+ 			fbnic_unmap_single_twd(dev, twd);
+@@ -574,7 +582,11 @@ static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
+ 		desc_cnt--;
+ 
+ 		while (desc_cnt--) {
+-			fbnic_unmap_page_twd(nv->dev, &ring->desc[head]);
++			if (ring->tx_buf[head] != FBNIC_XMIT_NOUNMAP)
++				fbnic_unmap_page_twd(nv->dev,
++						     &ring->desc[head]);
++			else
++				ring->tx_buf[head] = NULL;
+ 			head++;
+ 			head &= ring->size_mask;
+ 		}
 -- 
-2.47.3
+2.51.0
 
 
