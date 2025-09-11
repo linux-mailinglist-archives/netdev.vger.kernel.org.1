@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-222325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77FC0B53D7F
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 23:07:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D272B53D80
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 23:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64502566B41
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 21:06:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00FA058697B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 21:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EE92E06E6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1F92E0930;
 	Thu, 11 Sep 2025 21:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fIsGlyAm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TpJrnjrI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB4D2DFA2E
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 21:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337BC2E03F0
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 21:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757624750; cv=none; b=hgrLjtcYy4gPo5B3LkvN7+GdHyZFtPd++Y3MgXAjiBi2Lc0qqwHUh2PJ1VxYhJRyDugCA+0eE+q1zm9QgPgpu01Gk5cuy+nqituA/KebusSo5YMk9OqyP+ml4+dnr9lhrnoTWFulX8sQvgRH/hetuocLMZr0k74PoEWbYL2+06w=
+	t=1757624750; cv=none; b=ECyPOXB5NM0a49zmzN7IOAyl1p2u4veWuyAShT/WKGsoSaJcAhKJ58tibqWgyL67PcF55xnxYKNwrddW5AjMIxU18afFQZpDBxoe3VRI5hjUgt2RpRJM4mKuRiNCRRkwd6hib+oHiY23S0QvKnyHg553ZYV68ySxIUA9SOHHvLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757624750; c=relaxed/simple;
-	bh=cymlQmtsE5tyorvuRHSlLODK/3S7iRInXjdsmXVfSko=;
+	bh=6AcFE2IXEpFr5VeQESS3kSYTsgzIkx5QPRT2Jy7o9/A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HkJ0e5OVJ0c7mrCraxXG+Igs0WSsrBDAyGrEG3cngbwqzoGFJkxYiDi3YLhhyblh4flw1vOvhsPEanVVfVXRdtQbHXvykahRerHFZc7XKXw0MkTxHRtgr5qrzr5v0euhsCE+Yk9YzkgeXSFfaOWpeJgzlv7cb6wswALCfSu2Fro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fIsGlyAm; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=Za3ORjsO+fDQr1VjRf6C0Z7eXYYW+xJ1BYPXefvCbsNqklJggoZxACCqKcUg9DL4zY4fMZc6BoWgWcfaTWWIn3AsZpTQ9zrCduuMBEOI9GyC+VyywQ2KQcFTktoaWMRIX9OPgyeFTAKfOiTmfrPH0NOjI2OYeb0THuxJKnbujfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TpJrnjrI; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757624749; x=1789160749;
+  t=1757624750; x=1789160750;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cymlQmtsE5tyorvuRHSlLODK/3S7iRInXjdsmXVfSko=;
-  b=fIsGlyAmgq5w+MLPJKMz8Lx7bIKbrlrecew2Lbzqg0Y4pfE1Y3hSsgUG
-   8p2sqv2PLgzU2Xkwyb4P7+Zc968QCNh121ZoU3hWtFIRHYfgRZ90kcIfh
-   /3E1mBb5n4zUzfYp4SRtrendwDHxR1yq0yuaF5AohG1BhlgB5MlvGyEq0
-   LN2g/5d9NLlJwyy6imhIVrpEEDIyRWDN3GGqCgPZInGgMxCO2wcdhNvX8
-   y+z1ZM5fykFnL0OpOrDapOnKcEE7nFW9hs/key6ViiOz7bHfZX8eVv182
-   Zi8Iq9UTg7u1o5iR9/LJfcrzi1/ttrOiHlC6xJxpO8A0qzx21xelPhcsF
-   A==;
-X-CSE-ConnectionGUID: kmFCOUq8TUWe6GvuvkCseQ==
-X-CSE-MsgGUID: TiYVv+GhTkaNpNpTjZlHiQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="82558969"
+  bh=6AcFE2IXEpFr5VeQESS3kSYTsgzIkx5QPRT2Jy7o9/A=;
+  b=TpJrnjrIbiUfQTS3QisRO4jvA1roU+zbfr4/NMWYRC8T/r1v315dTKJN
+   Agaoq2erBH3teseOnZiX7vEVC+3DXubYtHaI8s9gHpURBg1xT/4CnRPi9
+   88ylem1j/dop5R6K6te30MXw0xb1zxSZIZ6mZC9EuFlsGkcX98iWMw/Ul
+   2zSebo+5eGnRrhLGN10yo7nP8Ur82S3fdTF9Om0IzVc+Egc5HyQmanlaB
+   uMTpKDVetwbzK7tqlMBZia84/Nw+SL0ooC5+gwzPAGIy4p0QnIyvHJAYC
+   WvlU6WasbUgHFtrnUqLbirrLVr8U9jW3TiuxGx0MfBV5Wcu3bHjM+PjU5
+   w==;
+X-CSE-ConnectionGUID: L0bUlWJ8SK6SbC7ymZ/GHA==
+X-CSE-MsgGUID: xRGpZ+W3TKuKJrnVJhYjOA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="82558977"
 X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="82558969"
+   d="scan'208";a="82558977"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2025 14:05:48 -0700
-X-CSE-ConnectionGUID: L639Q1YvSr6Rr2GYEDsXAA==
-X-CSE-MsgGUID: J+sMbEVJTQi79pap+SxVwQ==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2025 14:05:50 -0700
+X-CSE-ConnectionGUID: zDc9pmE8QHCac4pa3C3czA==
+X-CSE-MsgGUID: pFT+OUtzS3mmFAE//VBiSA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,258,1751266800"; 
-   d="scan'208";a="174583470"
+   d="scan'208";a="174583489"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa010.fm.intel.com with ESMTP; 11 Sep 2025 14:05:47 -0700
+  by fmviesa010.fm.intel.com with ESMTP; 11 Sep 2025 14:05:48 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -72,9 +72,9 @@ Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	dawid.osuchowski@linux.intel.com,
 	horms@kernel.org,
 	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 14/15] ice, libie: move fwlog code to libie
-Date: Thu, 11 Sep 2025 14:05:13 -0700
-Message-ID: <20250911210525.345110-15-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 15/15] ixgbe: fwlog support for e610
+Date: Thu, 11 Sep 2025 14:05:14 -0700
+Message-ID: <20250911210525.345110-16-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250911210525.345110-1-anthony.l.nguyen@intel.com>
 References: <20250911210525.345110-1-anthony.l.nguyen@intel.com>
@@ -88,7 +88,11 @@ Content-Transfer-Encoding: 8bit
 
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Move whole code from ice_fwlog.c/h to libie/fwlog.c/h.
+The device support firmware logging feature. Use libie code to
+initialize it and allow reading the logs using debugfs.
+
+The commands are the same as in ice driver. Look at the description in
+commit 96a9a9341cda ("ice: configure FW logging") for more info.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
@@ -96,195 +100,142 @@ Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/Kconfig                |  1 +
- drivers/net/ethernet/intel/ice/Makefile           |  1 -
- drivers/net/ethernet/intel/ice/ice_main.c         |  1 +
- drivers/net/ethernet/intel/ice/ice_type.h         |  2 +-
- drivers/net/ethernet/intel/libie/Kconfig          |  9 +++++++++
- drivers/net/ethernet/intel/libie/Makefile         |  4 ++++
- .../intel/{ice/ice_fwlog.c => libie/fwlog.c}      | 15 ++++++++++++---
- include/linux/net/intel/libie/adminq.h            |  6 +++---
- .../linux/net/intel/libie/fwlog.h                 |  3 ++-
- 9 files changed, 33 insertions(+), 9 deletions(-)
- rename drivers/net/ethernet/intel/{ice/ice_fwlog.c => libie/fwlog.c} (98%)
- rename drivers/net/ethernet/intel/ice/ice_fwlog.h => include/linux/net/intel/libie/fwlog.h (98%)
+ drivers/net/ethernet/intel/Kconfig            |  1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 32 +++++++++++++++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 10 ++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  2 ++
+ 5 files changed, 47 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index b05cc0d7a15d..09f0af386af1 100644
+index 09f0af386af1..a563a94e2780 100644
 --- a/drivers/net/ethernet/intel/Kconfig
 +++ b/drivers/net/ethernet/intel/Kconfig
-@@ -297,6 +297,7 @@ config ICE
- 	select DIMLIB
- 	select LIBIE
- 	select LIBIE_ADMINQ
+@@ -146,6 +146,7 @@ config IXGBE
+ 	tristate "Intel(R) 10GbE PCI Express adapters support"
+ 	depends on PCI
+ 	depends on PTP_1588_CLOCK_OPTIONAL
 +	select LIBIE_FWLOG
+ 	select MDIO
  	select NET_DEVLINK
- 	select PACKING
  	select PLDMFW
-diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
-index eac45d7c0cf1..5b2c666496e7 100644
---- a/drivers/net/ethernet/intel/ice/Makefile
-+++ b/drivers/net/ethernet/intel/ice/Makefile
-@@ -42,7 +42,6 @@ ice-y := ice_main.o	\
- 	 ice_ethtool.o  \
- 	 ice_repr.o	\
- 	 ice_tc_lib.o	\
--	 ice_fwlog.o	\
- 	 ice_debugfs.o  \
- 	 ice_adapter.o
- ice-$(CONFIG_PCI_IOV) +=	\
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 44e184c6c416..f0d3aee24a93 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -39,6 +39,7 @@ static const char ice_copyright[] = "Copyright (c) 2018, Intel Corporation.";
- MODULE_DESCRIPTION(DRV_SUMMARY);
- MODULE_IMPORT_NS("LIBIE");
- MODULE_IMPORT_NS("LIBIE_ADMINQ");
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+index 7181efd0454d..c2f8189a0738 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+@@ -3921,6 +3921,38 @@ static int ixgbe_read_pba_string_e610(struct ixgbe_hw *hw, u8 *pba_num,
+ 	return err;
+ }
+ 
++static int __fwlog_send_cmd(void *priv, struct libie_aq_desc *desc, void *buf,
++			    u16 size)
++{
++	struct ixgbe_hw *hw = priv;
++
++	return ixgbe_aci_send_cmd(hw, desc, buf, size);
++}
++
++int ixgbe_fwlog_init(struct ixgbe_hw *hw)
++{
++	struct ixgbe_adapter *adapter = hw->back;
++	struct libie_fwlog_api api = {
++		.pdev = adapter->pdev,
++		.send_cmd = __fwlog_send_cmd,
++		.debugfs_root = adapter->ixgbe_dbg_adapter,
++		.priv = hw,
++	};
++
++	if (hw->mac.type != ixgbe_mac_e610)
++		return -EOPNOTSUPP;
++
++	return libie_fwlog_init(&hw->fwlog, &api);
++}
++
++void ixgbe_fwlog_deinit(struct ixgbe_hw *hw)
++{
++	if (hw->mac.type != ixgbe_mac_e610)
++		return;
++
++	libie_fwlog_deinit(&hw->fwlog);
++}
++
+ static const struct ixgbe_mac_operations mac_ops_e610 = {
+ 	.init_hw			= ixgbe_init_hw_generic,
+ 	.start_hw			= ixgbe_start_hw_e610,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+index 782c489b0fa7..11916b979d28 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+@@ -96,5 +96,7 @@ int ixgbe_aci_update_nvm(struct ixgbe_hw *hw, u16 module_typeid,
+ 			 bool last_command, u8 command_flags);
+ int ixgbe_nvm_write_activate(struct ixgbe_hw *hw, u16 cmd_flags,
+ 			     u8 *response_flags);
++int ixgbe_fwlog_init(struct ixgbe_hw *hw);
++void ixgbe_fwlog_deinit(struct ixgbe_hw *hw);
+ 
+ #endif /* _IXGBE_E610_H_ */
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 80e6a2ef1350..91ead3cabe83 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -172,6 +172,7 @@ static int debug = -1;
+ module_param(debug, int, 0);
+ MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
+ 
 +MODULE_IMPORT_NS("LIBIE_FWLOG");
+ MODULE_DESCRIPTION("Intel(R) 10 Gigabit PCI Express Network Driver");
  MODULE_LICENSE("GPL v2");
- MODULE_FIRMWARE(ICE_DDP_PKG_FILE);
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 14296bccc4c9..b0a1b67071c5 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -17,7 +17,7 @@
- #include "ice_protocol_type.h"
- #include "ice_sbq_cmd.h"
- #include "ice_vlan_mode.h"
--#include "ice_fwlog.h"
-+#include <linux/net/intel/libie/fwlog.h>
- #include <linux/wait.h>
- #include <net/dscp.h>
- 
-diff --git a/drivers/net/ethernet/intel/libie/Kconfig b/drivers/net/ethernet/intel/libie/Kconfig
-index e6072758e3d8..70831c7e336e 100644
---- a/drivers/net/ethernet/intel/libie/Kconfig
-+++ b/drivers/net/ethernet/intel/libie/Kconfig
-@@ -14,3 +14,12 @@ config LIBIE_ADMINQ
- 	help
- 	  Helper functions used by Intel Ethernet drivers for administration
- 	  queue command interface (aka adminq).
+@@ -3355,6 +3356,10 @@ static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
+ 			e_crit(drv, "%s\n", ixgbe_overheat_msg);
+ 			ixgbe_down(adapter);
+ 			break;
++		case libie_aqc_opc_fw_logs_event:
++			libie_get_fwlog_data(&hw->fwlog, event.msg_buf,
++					     le16_to_cpu(event.desc.datalen));
++			break;
+ 		default:
+ 			e_warn(hw, "unknown FW async event captured\n");
+ 			break;
+@@ -11998,6 +12003,10 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	ixgbe_devlink_init_regions(adapter);
+ 	devl_register(adapter->devlink);
+ 	devl_unlock(adapter->devlink);
 +
-+config LIBIE_FWLOG
-+	tristate
-+	select LIBIE_ADMINQ
-+	help
-+	  Library to support firmware logging on device that have support
-+	  for it. Firmware logging is using admin queue interface to communicate
-+	  with the device. Debugfs is a user interface used to config logging
-+	  and dump all collected logs.
-diff --git a/drivers/net/ethernet/intel/libie/Makefile b/drivers/net/ethernet/intel/libie/Makefile
-index e98f00b865d3..db57fc6780ea 100644
---- a/drivers/net/ethernet/intel/libie/Makefile
-+++ b/drivers/net/ethernet/intel/libie/Makefile
-@@ -8,3 +8,7 @@ libie-y			:= rx.o
- obj-$(CONFIG_LIBIE_ADMINQ) 	+= libie_adminq.o
- 
- libie_adminq-y			:= adminq.o
++	if (ixgbe_fwlog_init(hw))
++		e_dev_info("Firmware logging not supported\n");
 +
-+obj-$(CONFIG_LIBIE_FWLOG) 	+= libie_fwlog.o
-+
-+libie_fwlog-y			:= fwlog.o
-diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.c b/drivers/net/ethernet/intel/libie/fwlog.c
-similarity index 98%
-rename from drivers/net/ethernet/intel/ice/ice_fwlog.c
-rename to drivers/net/ethernet/intel/libie/fwlog.c
-index 8e7086191030..f39cc11cb7c5 100644
---- a/drivers/net/ethernet/intel/ice/ice_fwlog.c
-+++ b/drivers/net/ethernet/intel/libie/fwlog.c
-@@ -2,12 +2,14 @@
- /* Copyright (c) 2022, Intel Corporation. */
- 
- #include <linux/debugfs.h>
-+#include <linux/export.h>
- #include <linux/fs.h>
-+#include <linux/net/intel/libie/fwlog.h>
-+#include <linux/pci.h>
- #include <linux/random.h>
- #include <linux/vmalloc.h>
--#include "ice.h"
--#include "ice_common.h"
--#include "ice_fwlog.h"
-+
-+#define DEFAULT_SYMBOL_NAMESPACE	"LIBIE_FWLOG"
- 
- /* create a define that has an extra module that doesn't really exist. this
-  * is so we can add a module 'all' to easily enable/disable all the modules
-@@ -1037,6 +1039,7 @@ int libie_fwlog_init(struct libie_fwlog *fwlog, struct libie_fwlog_api *api)
- 
  	return 0;
- }
-+EXPORT_SYMBOL_GPL(libie_fwlog_init);
  
- /**
-  * libie_fwlog_deinit - unroll FW logging configuration
-@@ -1071,6 +1074,7 @@ void libie_fwlog_deinit(struct libie_fwlog *fwlog)
- 		kfree(fwlog->ring.rings);
- 	}
- }
-+EXPORT_SYMBOL_GPL(libie_fwlog_deinit);
+ err_netdev:
+@@ -12055,6 +12064,7 @@ static void ixgbe_remove(struct pci_dev *pdev)
+ 	devl_lock(adapter->devlink);
+ 	devl_unregister(adapter->devlink);
+ 	ixgbe_devlink_destroy_regions(adapter);
++	ixgbe_fwlog_deinit(&adapter->hw);
+ 	ixgbe_dbg_adapter_exit(adapter);
  
- /**
-  * libie_get_fwlog_data - copy the FW log data from ARQ event
-@@ -1095,6 +1099,7 @@ void libie_get_fwlog_data(struct libie_fwlog *fwlog, u8 *buf, u16 len)
- 		libie_fwlog_ring_increment(&fwlog->ring.head, fwlog->ring.size);
- 	}
- }
-+EXPORT_SYMBOL_GPL(libie_get_fwlog_data);
+ 	set_bit(__IXGBE_REMOVING, &adapter->state);
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+index 36577091cd9e..b1bfeb21537a 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+@@ -7,6 +7,7 @@
+ #include <linux/types.h>
+ #include <linux/mdio.h>
+ #include <linux/netdevice.h>
++#include <linux/net/intel/libie/fwlog.h>
+ #include "ixgbe_type_e610.h"
  
- void libie_fwlog_reregister(struct libie_fwlog *fwlog)
- {
-@@ -1104,3 +1109,7 @@ void libie_fwlog_reregister(struct libie_fwlog *fwlog)
- 	if (libie_fwlog_register(fwlog))
- 		fwlog->cfg.options &= ~LIBIE_FWLOG_OPTION_IS_REGISTERED;
- }
-+EXPORT_SYMBOL_GPL(libie_fwlog_reregister);
-+
-+MODULE_DESCRIPTION("Intel(R) Ethernet common library");
-+MODULE_LICENSE("GPL");
-diff --git a/include/linux/net/intel/libie/adminq.h b/include/linux/net/intel/libie/adminq.h
-index 29420193889a..ab13bd777a28 100644
---- a/include/linux/net/intel/libie/adminq.h
-+++ b/include/linux/net/intel/libie/adminq.h
-@@ -265,7 +265,7 @@ enum libie_aqc_fw_logging_mod {
- 	LIBIE_AQC_FW_LOG_ID_TSDRV,
- 	LIBIE_AQC_FW_LOG_ID_PFREG,
- 	LIBIE_AQC_FW_LOG_ID_MDLVER,
--	LIBIE_AQC_FW_LOG_ID_MAX,
-+	LIBIE_AQC_FW_LOG_ID_MAX
+ /* Device IDs */
+@@ -3752,6 +3753,7 @@ struct ixgbe_hw {
+ 	struct ixgbe_flash_info		flash;
+ 	struct ixgbe_hw_dev_caps	dev_caps;
+ 	struct ixgbe_hw_func_caps	func_caps;
++	struct libie_fwlog		fwlog;
  };
  
- /* Set FW Logging configuration (indirect 0xFF30)
-@@ -280,8 +280,8 @@ enum libie_aqc_fw_logging_mod {
- #define LIBIE_AQC_FW_LOG_AQ_REGISTER		BIT(0)
- #define LIBIE_AQC_FW_LOG_AQ_QUERY		BIT(2)
- 
--#define LIBIE_AQC_FW_LOG_MIN_RESOLUTION		(1)
--#define LIBIE_AQC_FW_LOG_MAX_RESOLUTION		(128)
-+#define LIBIE_AQC_FW_LOG_MIN_RESOLUTION		1
-+#define LIBIE_AQC_FW_LOG_MAX_RESOLUTION		128
- 
- struct libie_aqc_fw_log {
- 	u8 cmd_flags;
-diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.h b/include/linux/net/intel/libie/fwlog.h
-similarity index 98%
-rename from drivers/net/ethernet/intel/ice/ice_fwlog.h
-rename to include/linux/net/intel/libie/fwlog.h
-index e534205a2d04..36b13fabca9e 100644
---- a/drivers/net/ethernet/intel/ice/ice_fwlog.h
-+++ b/include/linux/net/intel/libie/fwlog.h
-@@ -3,7 +3,8 @@
- 
- #ifndef _LIBIE_FWLOG_H_
- #define _LIBIE_FWLOG_H_
--#include "ice_adminq_cmd.h"
-+
-+#include <linux/net/intel/libie/adminq.h>
- 
- /* Only a single log level should be set and all log levels under the set value
-  * are enabled, e.g. if log level is set to LIBIE_FW_LOG_LEVEL_VERBOSE, then all
+ struct ixgbe_info {
 -- 
 2.47.1
 
