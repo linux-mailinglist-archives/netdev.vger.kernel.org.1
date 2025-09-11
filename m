@@ -1,146 +1,168 @@
-Return-Path: <netdev+bounces-221979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7376FB52889
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:13:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D70BDB5289C
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 08:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE2F565857
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 06:13:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91426A0552F
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 06:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00934253F11;
-	Thu, 11 Sep 2025 06:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A212580EC;
+	Thu, 11 Sep 2025 06:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="RiAFrEvj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mvek0Zjq"
 X-Original-To: netdev@vger.kernel.org
-Received: from fra-out-009.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-009.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.64.237.68])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF26178372;
-	Thu, 11 Sep 2025 06:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.64.237.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4786AF4FA;
+	Thu, 11 Sep 2025 06:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757571226; cv=none; b=TBUaHmuBek801RfcgHKWueliayOdlge64buNGQ+uoo91Gk/yjuBoTVvp+j/5DogzzNr61T6yPP3D2j19rrvPfN67iIBxAs0btmOBu4fJUNeLOSel33pJZcTH1zcB1sLwbaekhqkrX7GvdyWdc/BGnS2Z0RfASpvXq/BnmPgFwf8=
+	t=1757571424; cv=none; b=mEhG/mx+/BM0IGT3kBEOd3auURDXoWsvgtwZYgWTrbW63+HQ8gXHo5CnScx1/RS2mIfIpPlfSj9h7e+OdONF75MWJ9dVTGfaT3NVKmXq1Id6nT/JuMzv7TCwIi7hAvkU/mTR+XAvXyRhrmEqzp5yK7vggVcPp6bj0su2VxUWsew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757571226; c=relaxed/simple;
-	bh=Rd/zyPwRxZk0R7aXyuI7LZNuG4ltnWdMo8eFSAGvums=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XjmZDKCM23rOBKLUxEsym61uEyAILxonYy9Sxmu+Ekd7DYg03EwgKiipgKay0Zkijo8kpTLgeoGy5vI2i6orOTthR/I7Jf58tp88qjngHk6DauYC1rn4jJ4jtOK7NNyG5W1jYjvRaeSFRio3VXTcuJTwlywd9Fiv69q5F5oEum4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=RiAFrEvj; arc=none smtp.client-ip=3.64.237.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1757571225; x=1789107225;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=Rd/zyPwRxZk0R7aXyuI7LZNuG4ltnWdMo8eFSAGvums=;
-  b=RiAFrEvjCgTNcupUSuufPFM3Yx/DKCTZ9VtyG34dcaCJu31D1VMzs0IX
-   V5/nOTyy3n0gu6zoqyIIcRzGYO09kcVM7ijNBuyrYnDKnUa6Gw1zIoekj
-   EbvfuKbHWtPgMU9rPM6qR2eibNluHKpRXZaQIzOb3eMzvrXOOLbc4I2Dc
-   yPN9iaO2QDwDLWiqt0PdRdgbD/Kmu4l0XFu1wBfzQO0NU2Dy/YNj+ParF
-   4MWkzY0xoOk/+6dvFtaCuxnf7HMNM0GhFxi1WamUz3O98h8jXMveax9CJ
-   SXoVs5owv6Qeb5QjB5Zo/pD5OnSVyS/XBprZikJA3LFNKW++v6sPncq0S
-   Q==;
-X-CSE-ConnectionGUID: LFQOPYTPQFKMfvgYTj0Q/A==
-X-CSE-MsgGUID: vTdcenLPSNiInKJXfGztSw==
-X-IronPort-AV: E=Sophos;i="6.18,256,1751241600"; 
-   d="scan'208";a="1838185"
-Subject: RE: [PATCH 5.10.y] e1000e: fix EEPROM length types for overflow checks
-Thread-Topic: [PATCH 5.10.y] e1000e: fix EEPROM length types for overflow checks
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-009.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2025 06:13:34 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:1748]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.14.93:2525] with esmtp (Farcaster)
- id 1011adb8-4646-4d00-906a-0b591a6b3797; Thu, 11 Sep 2025 06:13:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 1011adb8-4646-4d00-906a-0b591a6b3797
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Thu, 11 Sep 2025 06:13:34 +0000
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19D018EUA004.ant.amazon.com (10.252.50.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Thu, 11 Sep 2025 06:13:33 +0000
-Received: from EX19D018EUA004.ant.amazon.com ([fe80::e53:84f8:3456:a97d]) by
- EX19D018EUA004.ant.amazon.com ([fe80::e53:84f8:3456:a97d%3]) with mapi id
- 15.02.2562.020; Thu, 11 Sep 2025 06:13:33 +0000
-From: "Farber, Eliav" <farbere@amazon.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: "jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>,
-	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
-	<kuba@kernel.org>, "vitaly.lifshits@intel.com" <vitaly.lifshits@intel.com>,
-	"post@mikaelkw.online" <post@mikaelkw.online>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Chocron,
- Jonathan" <jonnyc@amazon.com>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "Farber, Eliav" <farbere@amazon.com>
-Thread-Index: AQHcInjMD5K1PZTplE6DLl3oGc4tIbSNe74AgAAD8ZA=
-Date: Thu, 11 Sep 2025 06:13:33 +0000
-Message-ID: <f524c24888924a999c3bb90de0099b78@amazon.com>
-References: <20250910173138.8307-1-farbere@amazon.com>
- <2025091131-tractor-almost-6987@gregkh>
-In-Reply-To: <2025091131-tractor-almost-6987@gregkh>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1757571424; c=relaxed/simple;
+	bh=6ER7NmlEmraWod3pVcUyD++3p1gLNbMgEjXMejMJ/TY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ec9D7dvZRVDFvz/SSrPpDUjRy5yKopmmLfu0h2HoXj5zOVYtbOPOVArset1C6lQQbTlb7uCi/en0InOGloqQONVKRm7pDY0ANxCx/Pdonl2Y9KjRPIv4XhsXNagO1NyHWmZrs2izsxpAguCDrWpx41g/n6qZgYT6vhiGX9g7JZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mvek0Zjq; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 26A864E40BA4;
+	Thu, 11 Sep 2025 06:16:58 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D126B606D6;
+	Thu, 11 Sep 2025 06:16:57 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6C51D102F29D2;
+	Thu, 11 Sep 2025 08:16:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1757571417; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=2VfQIzqjmdvrj2wF3mCiNeqmLyVAPi3fnAIClyJ+Xek=;
+	b=mvek0ZjqP8arBxPfzTtaJd0OmQcyEUs0lNC4tP0Vft5Dh2JLYm8/QrLjQdvSCH9zKV/u/2
+	7trMPMvsMu7aqDZZD/QCoG3+yYd8Dn03DVPt86r+nib40pIosPS/SWqwoZMYmWgj8KNwbF
+	Hh77mzogQgcy+GOTR8SsssfVs8WhofvTv+YG66osEKLX0E3NAlhBGXelQpFNiG/H/u4ZXT
+	rJubhcvYzcTjrrsHOdhoo92/dsyQEuSkgkeqBzrbduA8+xOeDYjayx2U6Tp1dZ36Y6aS5h
+	BMYsDxu4BtpZpSFZ8EWzVHJr1gD+XOtxfjEIifrBSwSQQHrJ4rd8IbjIjcIaBg==
+Message-ID: <85faa80c-0536-46d8-8f3a-00ae78499fd0@bootlin.com>
+Date: Thu, 11 Sep 2025 08:16:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: microchip: Select SPI_MODE 0 for KSZ8463
+To: Tristram.Ha@microchip.com
+Cc: thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
+ Woojung.Huh@microchip.com, pascal.eberhard@se.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ olteanv@gmail.com, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com
+References: <20250910-fix-omap-spi-v1-1-fd732c42b7be@bootlin.com>
+ <DM3PR11MB87367B6B13B1497C5994884BEC0EA@DM3PR11MB8736.namprd11.prod.outlook.com>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <DM3PR11MB87367B6B13B1497C5994884BEC0EA@DM3PR11MB8736.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-PiBPbiBXZWQsIFNlcCAxMCwgMjAyNSBhdCAwNTozMTozOFBNICswMDAwLCBFbGlhdiBGYXJiZXIg
-d3JvdGU6DQo+PiBGaXggYSBjb21waWxhdGlvbiBmYWlsdXJlIHdoZW4gd2FybmluZ3MgYXJlIHRy
-ZWF0ZWQgYXMgZXJyb3JzOg0KPj4NCj4+IGRyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2UxMDAw
-ZS9ldGh0b29sLmM6IEluIGZ1bmN0aW9uIOKAmGUxMDAwX3NldF9lZXByb23igJk6DQo+PiAuL2lu
-Y2x1ZGUvbGludXgvb3ZlcmZsb3cuaDo3MToxNTogZXJyb3I6IGNvbXBhcmlzb24gb2YgZGlzdGlu
-Y3QgcG9pbnRlciB0eXBlcyBsYWNrcyBhIGNhc3QgWy1XZXJyb3JdDQo+PiAgICA3MSB8ICAodm9p
-ZCkgKCZfX2EgPT0gX19kKTsgICBcDQo+PiAgICAgICB8ICAgICAgICAgICAgICAgXn4NCj4+IGRy
-aXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2UxMDAwZS9ldGh0b29sLmM6NTgyOjY6IG5vdGU6IGlu
-IGV4cGFuc2lvbiBvZiBtYWNybyDigJhjaGVja19hZGRfb3ZlcmZsb3figJkNCj4+ICAgNTgyIHwg
-IGlmIChjaGVja19hZGRfb3ZlcmZsb3coZWVwcm9tLT5vZmZzZXQsIGVlcHJvbS0+bGVuLCAmdG90
-YWxfbGVuKSB8fA0KPj4gICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fg0KPj4NCj4+IFRv
-IGZpeCB0aGlzLCBjaGFuZ2UgdG90YWxfbGVuIGFuZCBtYXhfbGVuIGZyb20gc2l6ZV90IHRvIHUz
-MiBpbiANCj4+IGUxMDAwX3NldF9lZXByb20oKS4NCj4+IFRoZSBjaGVja19hZGRfb3ZlcmZsb3co
-KSBoZWxwZXIgcmVxdWlyZXMgdGhhdCB0aGUgZmlyc3QgdHdvIG9wZXJhbmRzIA0KPj4gYW5kIHRo
-ZSBwb2ludGVyIHRvIHRoZSByZXN1bHQgKHRoaXJkIG9wZXJhbmQpIGFsbCBoYXZlIHRoZSBzYW1l
-IHR5cGUuDQo+PiBPbiA2NC1iaXQgYnVpbGRzLCB1c2luZyBzaXplX3QgY2F1c2VkIGEgbWlzbWF0
-Y2ggd2l0aCB0aGUgdTMyIGZpZWxkcw0KPj4gZWVwcm9tLT5vZmZzZXQgYW5kIGVlcHJvbS0+bGVu
-LCBsZWFkaW5nIHRvIHR5cGUgY2hlY2sgZmFpbHVyZXMuDQo+Pg0KPj4gRml4ZXM6IGNlODgyOWQz
-ZDQ0YiAoImUxMDAwZTogZml4IGhlYXAgb3ZlcmZsb3cgaW4gZTEwMDBfc2V0X2VlcHJvbSIpDQo+
-PiBTaWduZWQtb2ZmLWJ5OiBFbGlhdiBGYXJiZXIgPGZhcmJlcmVAYW1hem9uLmNvbT4NCj4+IC0t
-LQ0KPj4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2UxMDAwZS9ldGh0b29sLmMgfCAyICst
-DQo+PiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+Pg0K
-Pj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2UxMDAwZS9ldGh0b29s
-LmMgDQo+PiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2UxMDAwZS9ldGh0b29sLmMNCj4+
-IGluZGV4IDRhY2E4NTQ3ODNlMi4uNTg0Mzc4MjkxZjNmIDEwMDY0NA0KPj4gLS0tIGEvZHJpdmVy
-cy9uZXQvZXRoZXJuZXQvaW50ZWwvZTEwMDBlL2V0aHRvb2wuYw0KPj4gKysrIGIvZHJpdmVycy9u
-ZXQvZXRoZXJuZXQvaW50ZWwvZTEwMDBlL2V0aHRvb2wuYw0KPj4gQEAgLTU1OSw3ICs1NTksNyBA
-QCBzdGF0aWMgaW50IGUxMDAwX3NldF9lZXByb20oc3RydWN0IG5ldF9kZXZpY2UgDQo+PiAqbmV0
-ZGV2LCAgew0KPj4gICAgICAgc3RydWN0IGUxMDAwX2FkYXB0ZXIgKmFkYXB0ZXIgPSBuZXRkZXZf
-cHJpdihuZXRkZXYpOw0KPj4gICAgICAgc3RydWN0IGUxMDAwX2h3ICpodyA9ICZhZGFwdGVyLT5o
-dzsNCj4+IC0gICAgIHNpemVfdCB0b3RhbF9sZW4sIG1heF9sZW47DQo+PiArICAgICB1MzIgdG90
-YWxfbGVuLCBtYXhfbGVuOw0KPj4gICAgICAgdTE2ICplZXByb21fYnVmZjsNCj4+ICAgICAgIGlu
-dCByZXRfdmFsID0gMDsNCj4+ICAgICAgIGludCBmaXJzdF93b3JkOw0KPj4gLS0NCj4+IDIuNDcu
-Mw0KPj4NCj4NCj4gV2h5IGlzIHRoaXMgbm90IG5lZWRlZCBpbiBMaW51cydzIHRyZWU/DQpLZXJu
-ZWwgNS4xMC4yNDMgZW5mb3JjZXMgdGhlIHNhbWUgdHlwZSwgYnV0IHRoaXMgZW5mb3JjZW1lbnQg
-aXMNCmFic2VudCBmcm9tIDUuMTUuMTkyIGFuZCBsYXRlcjoNCi8qDQogKiBGb3Igc2ltcGxpY2l0
-eSBhbmQgY29kZSBoeWdpZW5lLCB0aGUgZmFsbGJhY2sgY29kZSBiZWxvdyBpbnNpc3RzIG9uDQog
-KiBhLCBiIGFuZCAqZCBoYXZpbmcgdGhlIHNhbWUgdHlwZSAoc2ltaWxhciB0byB0aGUgbWluKCkg
-YW5kIG1heCgpDQogKiBtYWNyb3MpLCB3aGVyZWFzIGdjYydzIHR5cGUtZ2VuZXJpYyBvdmVyZmxv
-dyBjaGVja2VycyBhY2NlcHQNCiAqIGRpZmZlcmVudCB0eXBlcy4gSGVuY2Ugd2UgZG9uJ3QganVz
-dCBtYWtlIGNoZWNrX2FkZF9vdmVyZmxvdyBhbg0KICogYWxpYXMgZm9yIF9fYnVpbHRpbl9hZGRf
-b3ZlcmZsb3csIGJ1dCBhZGQgdHlwZSBjaGVja3Mgc2ltaWxhciB0bw0KICogYmVsb3cuDQogKi8N
-CiNkZWZpbmUgY2hlY2tfYWRkX292ZXJmbG93KGEsIGIsIGQpIF9fbXVzdF9jaGVja19vdmVyZmxv
-dygoewlcDQogDQo+IEFsc28sIHdoeSBpcyBpdCBub3QgY2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5v
-cmc/DQpBZGRlZCB0byBjYy4NCg0KLS0tDQpSZWdhcmRzLCBFbGlhdg0K
+Hi Tristram
+
+On 9/11/25 12:10 AM, Tristram.Ha@microchip.com wrote:
+>> KSZ8463 expects the SPI clock to be low on idle and samples data on
+>> rising edges. This fits SPI mode 0 (CPOL = 0 / CPHA = 0) but the SPI
+>> mode is set to 3 for all the switches supported by the driver. This
+>> can lead to invalid read/write on the SPI bus.
+>>
+>> Set SPI mode to 0 for the KSZ8463.
+>> Leave SPI mode 3 as default for the other switches.
+>>
+>> Signed-off-by: Bastien Curutchet (Schneider Electric)
+>> <bastien.curutchet@bootlin.com>
+>> Fixes: 84c47bfc5b3b ("net: dsa: microchip: Add KSZ8463 switch support to KSZ DSA
+>> driver")
+>> ---
+>>   drivers/net/dsa/microchip/ksz_spi.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/dsa/microchip/ksz_spi.c
+>> b/drivers/net/dsa/microchip/ksz_spi.c
+>> index
+>> d8001734b05741446fa78a1e88c2f82e894835ce..dcc0dbddf7b9d70fbfb31d4b260b80
+>> ca78a65975 100644
+>> --- a/drivers/net/dsa/microchip/ksz_spi.c
+>> +++ b/drivers/net/dsa/microchip/ksz_spi.c
+>> @@ -139,6 +139,7 @@ static int ksz_spi_probe(struct spi_device *spi)
+>>          const struct regmap_config *regmap_config;
+>>          const struct ksz_chip_data *chip;
+>>          struct device *ddev = &spi->dev;
+>> +       u32 spi_mode = SPI_MODE_3;
+>>          struct regmap_config rc;
+>>          struct ksz_device *dev;
+>>          int i, ret = 0;
+>> @@ -155,8 +156,10 @@ static int ksz_spi_probe(struct spi_device *spi)
+>>          dev->chip_id = chip->chip_id;
+>>          if (chip->chip_id == KSZ88X3_CHIP_ID)
+>>                  regmap_config = ksz8863_regmap_config;
+>> -       else if (chip->chip_id == KSZ8463_CHIP_ID)
+>> +       else if (chip->chip_id == KSZ8463_CHIP_ID) {
+>>                  regmap_config = ksz8463_regmap_config;
+>> +               spi_mode = SPI_MODE_0;
+>> +       }
+>>          else if (chip->chip_id == KSZ8795_CHIP_ID ||
+>>                   chip->chip_id == KSZ8794_CHIP_ID ||
+>>                   chip->chip_id == KSZ8765_CHIP_ID)
+>> @@ -185,7 +188,7 @@ static int ksz_spi_probe(struct spi_device *spi)
+>>                  dev->pdata = spi->dev.platform_data;
+>>
+>>          /* setup spi */
+>> -       spi->mode = SPI_MODE_3;
+>> +       spi->mode = spi_mode;
+>>          ret = spi_setup(spi);
+>>          if (ret)
+>>                  return ret;
+>>
+>> ---
+>> base-commit: c65e2aee8971eb9d4bc2b8edc3a3a62dc98f0410
+>> change-id: 20250910-fix-omap-spi-d7c64f2416df
+> 
+> Actually it is best to completely remove the code.  The SPI mode should
+> be dictated by spi-cpol and spi-cpha settings in the device tree.  I do
+> not know why that code was there from the beginning.
+> 
+
+Ok, I didn't know these settings were available on the device-tree, I 
+can remove the spi->mode setting in a new patch.
+
+> All KSZ switches can use SPI mode 0 and 3, and 3 is recommended for high
+> SPI frequency.  Sometimes a bug/quirk in the SPI bus driver prevents the
+> very first SPI transfer to be successful in mode 3 because of a missed
+> rising edge clock signal, so it is forced to use mode 0.  (The Atmel SPI
+> bus driver has this issue in some old kernel versions.)
+> 
+> As for KSZ8463 I have always used mode 3 and do not know of any issue of
+> using that mode.
+> 
+
+I have issues on the first transfer with the AM335x's spi-omap2-mcspi 
+driver. I first tried to fix this driver but since the KSZ8463's 
+datasheet explicitly mentions that it expects the CLK to be low at idle, 
+I thought this was the right fix.
+
+But I'll fix the SPI driver then, thanks.
+
+
+Best regards,
+-- 
+Bastien Curutchet, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
