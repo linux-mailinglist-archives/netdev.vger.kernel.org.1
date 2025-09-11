@@ -1,153 +1,130 @@
-Return-Path: <netdev+bounces-222104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C7AB53171
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:52:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433A9B531F0
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84D351C84E8B
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:52:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 897E8189AD38
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 12:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE343191C7;
-	Thu, 11 Sep 2025 11:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C6D320A1B;
+	Thu, 11 Sep 2025 12:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NP89TnGH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A77312838
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 11:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523DA30EF88;
+	Thu, 11 Sep 2025 12:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757591548; cv=none; b=NTbC3SJ67lQ5UW2u5/JncvjbCwSyJQu7B+Pqbk33K1VnZvaQmijPPGIQJw2bCXQURSl2xkiynBV+r5WqAbTcNM19OfnzK42rZFRNm6k+0kCZR4E/w23Cw6p4aDP5CINIyW6voQVrvnSoahGjPJPo+z8lS1Y502c28KEUoqq84Jg=
+	t=1757593174; cv=none; b=KIhWV4NIL6zUNXhO/MWlPsalkXUx6GWPMSNjQ4cSXCX3sd0s0IEXzxLV6Whj21hXHiEMlx26Hf6HvU8qIp/uaKZtV/f/FIvdokiCLEB0pRLO12noyt3PmOi1Dr5IViPytHxyT9pKxOX3+KltmlWkENvj3LUbovCkXd9EJEJE1xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757591548; c=relaxed/simple;
-	bh=9I1dDeFisZPnn+Dj5yfAWExpYnabZbSAjwN3+8HYvKY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tUrlch4Harb1dfbL4IJg1LBh6mpSyCg7jZRqIDKclcesIEXVeNNUW0xI9vr0+s2KWh2IU4ppCmqQcP0ghzJW1B/9gJ/vjgbbyOM4U1KYZOwZvNOB6cRPKJgkkX7K5Nnnh7hH9nIHqDTuHkvqriTLq/oLtpXZL5JbTaGuzghvrls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3f736aa339aso17288185ab.0
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 04:52:26 -0700 (PDT)
+	s=arc-20240116; t=1757593174; c=relaxed/simple;
+	bh=lWtR/Gen2p00VdXWiJ+YA+dkVfXa9jO+BioMxIij8wo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A5WvNilzsx/5UtUrVLM2lklaDo9UHZXuGwK7a26BnJX1JE7x7QNlZuz2gM9FqsbCn7AQgqqwiyaPMNALElsRVuSe51v578N9Vk+D4CGQde0jeb4eZwH9Z6SWGeV3Hw2vtz07GrP5dkDmmv2tEjCdwY6FOgQEbU+XzNWmA+qBiC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NP89TnGH; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b4d4881897cso437413a12.0;
+        Thu, 11 Sep 2025 05:19:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757593172; x=1758197972; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lWtR/Gen2p00VdXWiJ+YA+dkVfXa9jO+BioMxIij8wo=;
+        b=NP89TnGHAHovDQQW/cr0S8rV0HOy6XU6lONd9YtiJDh8HT3xBkFBep4taV6y/nW5I5
+         gz0gf1ViOJ3QyCGcxXAZTQ8xmXNeKa4AH9XH0AwIUUUj7+ETZqBP4IUdhVtLDvLJkJoz
+         b0AIQzOyVNLGHIyIkupTHGuChuAawTynT2RfxJXITNX7ENVy/0nvcbnfNhWSaDfxiVCV
+         w7OfkUAgOI4APGrgCSZZJqlrquqchQu8vdaohMZqlhaFFNo/fEafKqCn938BgHgI19iH
+         Cd/xEWVzZpNyAI2ncKtgJ7MMuLcpAluoce8FVzz8meRmXpTFZMYNROTYKRVM0ZHxtWuE
+         U6wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757591546; x=1758196346;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CtoXk8z03mWc2+w7zwKiztYGHI1iB1uUwX6rxxpxAcU=;
-        b=CDthwyyo7+VIF4UZmWXRO90reclzhUNrlqwzn2hIxUynJQG/3gBwKI53q9MoHj8mfA
-         2VnJdvpbFj+NVpoIEUHg0rwj03Ikp3Ggl5/357B3MQw3nFDqB/jeU4aHlK9nhENx6Zxy
-         S5Gqm4tTu+jWkpDC/n+4A1NA5C6FjN90dz9d3TNCtIdNCIrNMcliDCE0bLnwsbBWhRph
-         a1U/glA4BFIVgf0JmP2CAztTPAiF3IGL72di5BMRqjqneLyYg6TP2lUFIu+WBTjPZe4p
-         Nakp9RLAJdWaWjbQnj6syabZf/cu6bSQ/dW81QHBSncauPoBzgVwXkBpinMZ8EN6IcN9
-         hlRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTeImaCycdMHcCMgYion/Q5/kJ3sFZ4zZw2XeFt8I+Se0xymYGg+9lZebiK3stKP0VeKAbKWY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKOHF7xs+BFsx618g4EVkc4S0SXRIa+l3rIkW5kOKh370NSRw2
-	HnnmkQGfNS88b1+rtZmFwiso+1quhg36ibyhzcfckjsL9xqcw815od+1W2/zHUtyWIr9WkaB9sV
-	T2oFmhnLaFZNpwVJYslca9Oxqhx9cIVOK+sx7AHXHeguG/QgaceYqrSYeTJw=
-X-Google-Smtp-Source: AGHT+IFYDX+BJN9kmL9kfvs21waufLxbmjzXrq1W+X1L98qiMLcKz0YIm1LnUBkU40f4IVH2y6OMbFpUda2Gr1cY4h0gwae6Ih0I
+        d=1e100.net; s=20230601; t=1757593172; x=1758197972;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lWtR/Gen2p00VdXWiJ+YA+dkVfXa9jO+BioMxIij8wo=;
+        b=Kv8qMeh5UBuso5kv7VnFEB25uuTqKMzBxBi8yWC4Pe52Ns0QSFXKMLr09tt+P3qVzD
+         nEwRp6RHuLpaEHGo5cRLackHeCb7G4NCiNcnWKVsxAd3sRroIQqUQeMikIRDZZkewGue
+         RQ8ih/JFuF5VD1M9Wad/vmjvI9YxY0JzE97ojQT3dSITZsGBtqEiq4wz18/2gvByOtlh
+         ah/j9pCYc+2MF8HleiWSpH+jfNDm/L9TN+1WrCEIXxW29IC2zbl0XippI8jchC2ks7RC
+         CQ5PvYAk8Fs3QlYzgCtGGyxP1w8U6B9Dbmfoz2ZldUwqy6Y+qVAd6TuoWdwQIl/5+lZE
+         mI1w==
+X-Forwarded-Encrypted: i=1; AJvYcCX/YJesqB9GY+RYhPxu3vFS4x85FCbmTw0ae9jJOAAmT7U4J5k96jNqQ8Ii0lgMbqiF4vsuFUY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8qCG5pAYlXLhPF2+6L5YeH+RW6sX3csALNSqjW2c8Xt6jSNK6
+	I95l4yW+U9r3g+gxfqKlkfnzbU5rtDUqKcSXMR0xdOyKV/WvYNXnLpN8ssRvCK026TiE7cpKSdI
+	ULtFdDXvw8kA3XHcJHNpXH1bYoYPjPU/DJMKS
+X-Gm-Gg: ASbGncuDvpsEkdZXcOsOH5d4mFNeHDtVtupJuqbMybP4P6XQ3Nui3Nj5/5mI6rjtqGR
+	7CoggeYrJwzryFU6Fqxgr96WuRqWtpBPcKlw0wsva4e5qYIv8TWOxmJpWLHf6MO1J5k2GyKX37p
+	gssXb6vLcw2pftEfhChBKOMwqaBd5if62eFYISgfW3Wa1O3mIMUSuvW0pjmV4gUz1MU5z9EfRDE
+	D8c+4jm74EdU0UpaA==
+X-Google-Smtp-Source: AGHT+IGGuy1wVQlXKaUW3Yopk59LkHeJDzt8DEdVaN1TIufpl9eGokUpZNY3LXPrK0xJWZNsrIqtCk0NFuNS+NwRklk=
+X-Received: by 2002:a17:90b:3c85:b0:32d:dd7c:c3d8 with SMTP id
+ 98e67ed59e1d1-32ddd7cc580mr1008395a91.25.1757593172462; Thu, 11 Sep 2025
+ 05:19:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3781:b0:3f6:54d1:451e with SMTP id
- e9e14a558f8ab-3fd8cdbe2b1mr276938355ab.1.1757591545786; Thu, 11 Sep 2025
- 04:52:25 -0700 (PDT)
-Date: Thu, 11 Sep 2025 04:52:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68c2b7f9.050a0220.3c6139.003d.GAE@google.com>
-Subject: [syzbot] [wpan?] KMSAN: uninit-value in crc_ccitt (3)
-From: syzbot <syzbot+29d74bf076f40407a62a@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+References: <20250814132637.1659-1-stephen.smalley.work@gmail.com>
+ <20250814132637.1659-2-stephen.smalley.work@gmail.com> <6cfe4uqtic6ga3ch463zflke2wp5hobd7j3r5ctyp4puwbjiet@xgi6jfi7au3c>
+In-Reply-To: <6cfe4uqtic6ga3ch463zflke2wp5hobd7j3r5ctyp4puwbjiet@xgi6jfi7au3c>
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Thu, 11 Sep 2025 08:19:20 -0400
+X-Gm-Features: Ac12FXwAiovuXwx5vA7Sdc_GZCzODjR2jcx4RP-81Fp_mXyPLTv4mjF9qkeI-BA
+Message-ID: <CAEjxPJ4FYD2zyOCiUSnOzf7eP5_aN0d86=R7scwUueyCMQzF-A@mail.gmail.com>
+Subject: Re: [PATCH v7 01/42] selinux: restore passing of selinux_state
+To: Maxwell Bland <mbland@motorola.com>
+Cc: selinux@vger.kernel.org, paul@paul-moore.com, omosnace@redhat.com, 
+	netdev@vger.kernel.org, horms@kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Sep 10, 2025 at 7:12=E2=80=AFPM Maxwell Bland <mbland@motorola.com>=
+ wrote:
+>
+> On Thu, Aug 14, 2025 at 09:25:52AM -0400, Stephen Smalley wrote:
+> > This reverts commit e67b79850fcc4eb5 ("selinux: stop passing selinux_st=
+ate
+> > pointers and their offspring"). This change is necessary in order to
+> > support SELinux namespaces.
+> >
+>
+> FYI, thank you for this new commit. Some "fuel for the fire":
+>
+> Turns out, e67b79850fcc4eb5 makes it hard to enforce immutability on the
+> SELinux state / AVC cache from EL2, because the compiler likes to put
+> them on the same page, leading to having the hypervisor track spinlock
+> management issues, just to ensure the core selinux state remains
+> unmodified.
+>
+> In the past (pre-2023/e67b79850fcc4eb5), it was possible to set the avc
+> cache onto a separate page from the other critical selinux_state data
+> during early boot, and it looks like this *may* restore that.
+>
+> As you likely know, the issue is without EL2 enforcement of immutability
+> on the selinux_state page it is possible to just flip the enforcing bit
+> via EL1 write-gadget. It may also be possible to address this whole
+> issue using ARM MTE or something else.
 
-syzbot found the following issue on:
-
-HEAD commit:    b236920731dd Merge tag 'rust-fixes-6.17-2' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1451fa42580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1ee07385471829e7
-dashboard link: https://syzkaller.appspot.com/bug?extid=29d74bf076f40407a62a
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a67f2d67e93e/disk-b2369207.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/59e5d1fccb4a/vmlinux-b2369207.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f501250ee790/bzImage-b2369207.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+29d74bf076f40407a62a@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in crc_ccitt_byte include/linux/crc-ccitt.h:13 [inline]
-BUG: KMSAN: uninit-value in crc_ccitt+0x21e/0x2a0 lib/crc/crc-ccitt.c:60
- crc_ccitt_byte include/linux/crc-ccitt.h:13 [inline]
- crc_ccitt+0x21e/0x2a0 lib/crc/crc-ccitt.c:60
- ieee802154_tx+0x2c4/0x7e0 net/mac802154/tx.c:74
- ieee802154_hot_tx net/mac802154/tx.c:207 [inline]
- ieee802154_subif_start_xmit+0x183/0x290 net/mac802154/tx.c:239
- __netdev_start_xmit include/linux/netdevice.h:5222 [inline]
- netdev_start_xmit include/linux/netdevice.h:5231 [inline]
- xmit_one net/core/dev.c:3839 [inline]
- dev_hard_start_xmit+0x22c/0xa30 net/core/dev.c:3855
- sch_direct_xmit+0x3b2/0xcf0 net/sched/sch_generic.c:344
- __dev_xmit_skb net/core/dev.c:4114 [inline]
- __dev_queue_xmit+0x3588/0x5e60 net/core/dev.c:4691
- dev_queue_xmit include/linux/netdevice.h:3361 [inline]
- dgram_sendmsg+0xcdb/0x16d0 net/ieee802154/socket.c:689
- ieee802154_sock_sendmsg+0x8f/0xd0 net/ieee802154/socket.c:96
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x330/0x3d0 net/socket.c:729
- ____sys_sendmsg+0x7e0/0xd80 net/socket.c:2614
- ___sys_sendmsg+0x271/0x3b0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2703
- x64_sys_call+0x1dfd/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Local variable rf created at:
- __schedule+0x3b/0x7790 kernel/sched/core.c:6827
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0x17d/0x3c0 kernel/sched/core.c:7058
-
-CPU: 0 UID: 0 PID: 7766 Comm: syz.2.4465 Tainted: G        W           syzkaller #0 PREEMPT(none) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+The reason for e67b79850fcc4eb5 ("selinux: stop passing selinux_state
+pointers and their offspring") was that Linus was unhappy with the
+extra argument passing throughout the SELinux functions for the global
+selinux_state.
+Until/unless we merge my SELinux namespace series (of which this is
+merely the first in the series), we don't have a compelling reason to
+restore the passing of the selinux_state.
+That said, placing selinux_state on a separate page from the AVC cache
+should be doable via a separate patch independent of the SELinux
+namespace series itself, so you could always submit a patch to do
+exactly that.
 
