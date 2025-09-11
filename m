@@ -1,76 +1,177 @@
-Return-Path: <netdev+bounces-222337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58E89B53EE0
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 00:59:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59ED0B53EF7
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:06:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14BDC3A9936
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 22:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A304444BB
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 23:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7087C2F3C2B;
-	Thu, 11 Sep 2025 22:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEABE2F4A05;
+	Thu, 11 Sep 2025 23:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0O/83sd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BDpwE/kh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470BC2F3C19;
-	Thu, 11 Sep 2025 22:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1051A08A3
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 23:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757631553; cv=none; b=eZceGptlH1EUrCOZuVGJPMpahu6tiUlRBcUI0HaHNg55wKdC/rcq+7i2IUYp0pR+eFA+6Z65PMc9jz8n0ROUGcjy7dHOr5DMhedZKgAbWHVsxOlz8rv2uiG+Nj5b695MyINGtll53eIhSIwB8ZsXAFmwM/OARo06lyXuMUYjd+I=
+	t=1757631987; cv=none; b=LEhMep6lNMhEJxZcBDT62vikKdAJgCmrRaOcUlt+DvAB6V1R3YGbvbGvhneDu4jFhbyuFAnchUWrMYqNgpFYIMvrk3GlGb68uGeb1eTfqY/MVlycmzE3lbepkZPkw2YIZKD9xFQ/HyBKchjWLtlSODrXsIA+FTMbcRhmyGFsULw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757631553; c=relaxed/simple;
-	bh=P/ML/piOC3qFkZu5wM7mGQNtM9cZCuzt9Lt0I9+ZpXY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BWjTnBQ9RLhDRIJB6UPO4J1skksIrvLmavHlmcn+dDJbsnv87mXkU/gzNPckks6W6vdg2oG6o7NLwQ1EwzS3S4b+PGI2lABOw6fQGdPRMoixAeaLM6myfhRy+KGTBHX6P1ryQ6OnC5XJsWcsjLJ8enefGezF8rbX+PUi96G7YD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0O/83sd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 598AFC4CEF0;
-	Thu, 11 Sep 2025 22:59:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757631552;
-	bh=P/ML/piOC3qFkZu5wM7mGQNtM9cZCuzt9Lt0I9+ZpXY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D0O/83sdJNJy0/kXf+Fx7ehH6KavrlZDKm98eJfLf2tG5iTy4VfzmqsXEmnKswb/8
-	 3BhtocvAA7mQvYviwWDhmCXKDWIaiHKrfYMsDvHSdQPkBmItE6lHMyZZuhTnFqHd2i
-	 yYMcLW6edJZj3RDBVHC5AiQtyvqCMOGdMTTnVSyVE5sq6haVyo7ZR6q9fLnwXA009j
-	 SG4LZ+pIHocBzoiWMTGdcUsMws4AuVzWoztSXfR8AivmOKSuv8IHfzm5v4KkfV5/n7
-	 zxFVkyjeEbtDFxnW9sVvTu2hNYIXEeDppoNpyzrXtCVZ0v4g4qqmdpLAR4kLAEWWFr
-	 XUNh+I+pmKZLQ==
-Date: Thu, 11 Sep 2025 15:59:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- Jason Gunthorpe <jgg@nvidia.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Parav Pandit <parav@nvidia.com>, Adithya
- Jayachandran <ajayachandra@nvidia.com>, Feng Liu <feliu@nvidia.com>,
- William Tu <witu@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [PATCH mlx5-next 3/4] net/mlx5: E-Switch, Set/Query hca cap via
- vhca id
-Message-ID: <20250911155911.502d4d06@kernel.org>
-In-Reply-To: <20250815194901.298689-4-saeed@kernel.org>
-References: <20250815194901.298689-1-saeed@kernel.org>
-	<20250815194901.298689-4-saeed@kernel.org>
+	s=arc-20240116; t=1757631987; c=relaxed/simple;
+	bh=zYm0m59md0YmJAnONrIhr+tPVXmFfeUu+aOXXuIcRMY=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=Kcis9avy1Bvb9tEmc5Z3wENB3c0nADrq93iO3f5lRAxV6ByOkDWS+E9xO6rMR2KU77cwVPIs9inKKCma627B6cDq9QudH26BSjz9jK1tkxgF5x4FeRxoiYDOs/TUiVwRUGw8AbIR41hM6mUwdObybd8fu3K98XmctrJbSpZmqNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BDpwE/kh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757631984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OQwBcPZWGnJ87xzP7ruqoRhyhedrtIzZGOwOMMIChZg=;
+	b=BDpwE/khaj9PVRdVyZmcUAqfp9KCmB4GvP1evUP9w7qJ6Fe/NQiDgkoSJmMgAUT+v5upLC
+	749u+LyXOXanPH8oQTW/fvsn8xtyJJqJDhfYlLYuLcphSG4pdGKxzPo/4T1R7nbeVinrDP
+	4z4DTq3MCrC21v2aip0r8rbFAM88BuE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-196-YvqObOyDPT675tMG43FfYA-1; Thu,
+ 11 Sep 2025 19:06:23 -0400
+X-MC-Unique: YvqObOyDPT675tMG43FfYA-1
+X-Mimecast-MFC-AGG-ID: YvqObOyDPT675tMG43FfYA_1757631982
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A17BF1955EA4;
+	Thu, 11 Sep 2025 23:06:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.6])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 97BF51800451;
+	Thu, 11 Sep 2025 23:06:18 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org
+cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH net] rxrpc: Fix untrusted unsigned subtract
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2039267.1757631977.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Sep 2025 00:06:17 +0100
+Message-ID: <2039268.1757631977@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri, 15 Aug 2025 12:49:00 -0700 Saeed Mahameed wrote:
-> +static inline bool
-> +mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
+Fix the following Smatch Smatch static checker warning:
 
-Chris Mason is playing with some AI stuff which noticed this should
-probably return false
+   net/rxrpc/rxgk_app.c:65 rxgk_yfs_decode_ticket()
+   warn: untrusted unsigned subtract. 'ticket_len - 10 * 4'
+
+by prechecking the length of what we're trying to extract in two places in
+the token and decoding for a response packet.
+
+Also use sizeof() on the struct we're extracting rather specifying the siz=
+e
+numerically to be consistent with the other related statements.
+
+Fixes: 9d1d2b59341f ("rxrpc: rxgk: Implement the yfs-rxgk security class (=
+GSSAPI)")
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lists.infradead.org/pipermail/linux-afs/2025-September/010=
+135.html
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+---
+ net/rxrpc/rxgk_app.c |   19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/net/rxrpc/rxgk_app.c b/net/rxrpc/rxgk_app.c
+index df684b5a8531..30275cb5ba3e 100644
+--- a/net/rxrpc/rxgk_app.c
++++ b/net/rxrpc/rxgk_app.c
+@@ -54,6 +54,10 @@ int rxgk_yfs_decode_ticket(struct rxrpc_connection *con=
+n, struct sk_buff *skb,
+ =
+
+ 	_enter("");
+ =
+
++	if (ticket_len < 10 * sizeof(__be32))
++		return rxrpc_abort_conn(conn, skb, RXGK_INCONSISTENCY, -EPROTO,
++					rxgk_abort_resp_short_yfs_tkt);
++
+ 	/* Get the session key length */
+ 	ret =3D skb_copy_bits(skb, ticket_offset, tmp, sizeof(tmp));
+ 	if (ret < 0)
+@@ -195,22 +199,23 @@ int rxgk_extract_token(struct rxrpc_connection *conn=
+, struct sk_buff *skb,
+ 		__be32 token_len;
+ 	} container;
+ =
+
++	if (token_len < sizeof(container))
++		goto short_packet;
++
+ 	/* Decode the RXGK_TokenContainer object.  This tells us which server
+ 	 * key we should be using.  We can then fetch the key, get the secret
+ 	 * and set up the crypto to extract the token.
+ 	 */
+ 	if (skb_copy_bits(skb, token_offset, &container, sizeof(container)) < 0)
+-		return rxrpc_abort_conn(conn, skb, RXGK_PACKETSHORT, -EPROTO,
+-					rxgk_abort_resp_tok_short);
++		goto short_packet;
+ =
+
+ 	kvno		=3D ntohl(container.kvno);
+ 	enctype		=3D ntohl(container.enctype);
+ 	ticket_len	=3D ntohl(container.token_len);
+ 	ticket_offset	=3D token_offset + sizeof(container);
+ =
+
+-	if (xdr_round_up(ticket_len) > token_len - 3 * 4)
+-		return rxrpc_abort_conn(conn, skb, RXGK_PACKETSHORT, -EPROTO,
+-					rxgk_abort_resp_tok_short);
++	if (xdr_round_up(ticket_len) > token_len - sizeof(container))
++		goto short_packet;
+ =
+
+ 	_debug("KVNO %u", kvno);
+ 	_debug("ENC  %u", enctype);
+@@ -285,4 +290,8 @@ int rxgk_extract_token(struct rxrpc_connection *conn, =
+struct sk_buff *skb,
+ 	 * also come out this way if the ticket decryption fails.
+ 	 */
+ 	return ret;
++
++short_packet:
++	return rxrpc_abort_conn(conn, skb, RXGK_PACKETSHORT, -EPROTO,
++				rxgk_abort_resp_tok_short);
+ }
+
 
