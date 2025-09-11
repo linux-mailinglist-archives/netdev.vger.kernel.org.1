@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-221930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD8CB525FA
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:48:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DEF7B525FD
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:48:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40037A005A5
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:48:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C05C1178491
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 01:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20EBA19DF5F;
-	Thu, 11 Sep 2025 01:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89103241667;
+	Thu, 11 Sep 2025 01:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BqL5Ro14"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTa/RGWU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA8C21D5AA
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 01:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF66221F15
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 01:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757555269; cv=none; b=lTNyBUBoIWElj0+8xV8D3drPu6626IuDM+/LZOD1cWrtA1MnPRzdBmPMNAGbO+FvEsTzOz5KkT/YHdIej3njrWboarE0YcGoMX75I/VE8faZgh29toVtM5xrddQ1OUjLIv8wYaOE2+P8t9ObLMWZLGlAdT2aZPqN6nrrYfs3bT4=
+	t=1757555271; cv=none; b=K5k/wRRzLlbO/UMgWbnF7a/a84BPUChwTnMjc5ZdKOfd7gEtCWzm7vbvi0ORDHxqKmbn9YFmSLb0jbgBNOd2lvTcRmwLZiGwo8+cZcBbMPUSOPBuPZys72JhCuWAXrNu0p6kSIUANPyasLM0NALWg0Kkqpzg0Ue/GJWt+sjGepA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757555269; c=relaxed/simple;
-	bh=3PVn9HP3G0KkDLYVw5tCL93QzTE0jRO3ZYxz6vdZdOY=;
+	s=arc-20240116; t=1757555271; c=relaxed/simple;
+	bh=NvY+dT2MGf95niCqUulbPKNVPK08e3ssrV9rRCBMpdQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YZYxRURXdN5B4IAlC0maQQHEyzNmiYtTU56r/0zpJwBoFyPsSSvVjr0ypw7TyaksbbG0uuzyE+YRj/iphqMY7lNljCxJbwXilXnxwMQ7MvX8aOGuS44yJ9tjeO0+XqhLxdZdJmV8deXV058L2ZsuvoQ0ouw9Q7pEn9gzEo693+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BqL5Ro14; arc=none smtp.client-ip=209.85.219.181
+	 MIME-Version; b=sVUqVAAQcF0Wy6u9v4B5gCzQ6Dt35mD85ufZVmjuVz8xLcoNXvpKQW3j8ArWoWPtBoO4eFEB8HAnXyYb07jd1bz4oAJFfrcPGV9NDWYbtxKKFMtCgaO1zSF2vpOXfDBV2pxxa4loZc7/OQskJSqs3OLqe1ke2dLGVSXweYy3T30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTa/RGWU; arc=none smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e96f401c478so95409276.3
-        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 18:47:48 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-71d60528734so1836217b3.2
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 18:47:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757555267; x=1758160067; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757555269; x=1758160069; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HDBRQyax5ZX33/axv0zJYoWvzdjsC2AclvlUZciSnlg=;
-        b=BqL5Ro14VYuK7uKFJVVbFNUTvPfFT7/2Lukpr4cmQyIEImr/yBE2N6+ov5OGV/p1Nd
-         iG1oahXNvpYPZ+Cu4XKdlpLiNWvS12A9txZtnpUgs/s2K0e0USJbedPRkkILOrAKrwCq
-         0jrPfq3OUL++kdlPMEhsM/ovS7v42FStDZa5G1LubrC58aqUkZ+/8A7tRxgd9Gus+R9d
-         kzyURX6OnzZ3fxbmHQlXsegcYytq8AGbKwPTVae9R968ZYTu6khuR2WuqdQ+ivUgUQkd
-         c70I4aZ0tBE2sr3fWTM70LUgxnKdJzTSc1OfXS6n0bTFLvwuT8rFPigInttRpO66fLjV
-         yoOw==
+        bh=Kbz8f9ZWzbkdEdCm4i5LXlB7RxvfGAaTEfsZ8w3tgnM=;
+        b=VTa/RGWUYJUQ/ie2H73AXtko46hTdwujXIhPlc0xrC4IgTFnBx7Ocvf83EuRdStZqR
+         XvnB/YRc/28QCckx9FcUKmNU/f3Letag2n1HRb8ZZpMBbkXGZenURIGthSBs7SZ47XFY
+         EtWy/nq3wyzDp+UUin5ImHsYvEBM0D0ESZP14t46SnNY626aZXvEej8qg9oiEGFIWdt/
+         e1Doz9olqdw18Dqp+U5Ir9tBaAurnKY4pZDSBF0X1Ynawj5r+0Z9llbjYbO9nJ+ZKdOf
+         RN1SbVCTIO3WkVMWvLG9FRWqL1QAdjSXK31HJ/P5fcWAFxyBxik7s5Kbw+wQku64vE6H
+         0Oqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757555267; x=1758160067;
+        d=1e100.net; s=20230601; t=1757555269; x=1758160069;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HDBRQyax5ZX33/axv0zJYoWvzdjsC2AclvlUZciSnlg=;
-        b=bXp0FJcHe/mqC0nhYjyQ6hmRX7fgeSBJXYHjKYjDuD+ObMcfbfDgDCLiqViDKEqwBc
-         8PzKqj4WuYiUqJWxPkQkEYqMz6LNQ+fE5buiNvSmNMXaj4R5P9Wx8npv1JPaZKirWadK
-         J/BrJ+3guKVE+EP8eXxHaST4qo99ZnPPEJ6lBm5W8piVcoRYz4GMGeul7IJZUqgENMgp
-         XPAEKf50jGMS24s021mD58aLWwOjwxv1YV6tvBaN6mDdiHbtaOBUpSOqs+jJrCy3X9Dl
-         43NFQvW6XWsVhM9tqM6gWGVW18nIK8nV3vhzulojAm880x7J852y83Jlwt5cuRbDHo5p
-         rvoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW49vROWgVjGPwa9Z/Vp9SvNXhpZ9xZT+A7MimYZNznlBfhu0FIwHynewNDauLB+s6DCHsS5/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/cpN3sz2F81q0E1iIcU3K4vIvVhBT3j4IJAWh59Zqsq5Op/o7
-	1mpR9a9e5rnJRJ7byXL5Z9kXYWdNcU18BRw0Buj3Qri4qzkg+faQ40RG
-X-Gm-Gg: ASbGnctBQ1TbBaK4Eive/RhscZe4nj1lS4BlSBLY6NIwMCbwYLt131RFD8A5d7KuvSD
-	/rSskrUW+X1kZS4ZrI5VFCYUgdHfJqUVhqJKaQODPlJGIGeAaaHCBXKrdIuGqqQsNNiWCtJ460s
-	LDyTGestA/bKHJ2eZMkeKsJNpHPBhQtEZrCk4oIpL5oM5XpPZPWP/i03JxyAkTGoAadoRruM8Xr
-	yQCNOewf58LO9XvKrHfaoYpLztKiJvCNIGHHLvlYIBWck3kN0i8kr6C0gFOfXTFqCS8Mt8UmFa0
-	6l7HTQbM2lN9ahyCz4Zy8dk4DMzEnL8+GaBlJ4U3cgw+21+Jwd+LRsLaLPMI6mS6T4P1dC9dEmx
-	iLcYNA1v8EneC1o5Fkonehx+G+hzOvfn7ffvLIveC
-X-Google-Smtp-Source: AGHT+IG4CU6PIGTRWVZ/exmiFxaCIHcMCynGKkTou1LrcGseTlybIrqBrx6wU87ZXTth0SWqk9/TPw==
-X-Received: by 2002:a53:ad49:0:b0:600:f59f:781c with SMTP id 956f58d0204a3-6102967e7e6mr12437876d50.35.1757555267204;
-        Wed, 10 Sep 2025 18:47:47 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:c::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6247cbed5bdsm99334d50.1.2025.09.10.18.47.46
+        bh=Kbz8f9ZWzbkdEdCm4i5LXlB7RxvfGAaTEfsZ8w3tgnM=;
+        b=PoR7kmivYDopF8ECxft+5FX1OomUqO9VEazyWQRQjm1zCAWiNGe5Bx8eZonT06wJTw
+         yZqL02FS6eE4ydT3KBJuIrCSoz/+fz+HB69x6o8P8/Px8RQGDjcefJh+8LptpzDbWSZ8
+         xvJJmYLtMBdugeIZ1fA5yhcd8z2qnIZBJ3Gq1ojdV8MtVcTa1y0klIJ+xLYOl7/CZ5FH
+         yAvaNdO4NxgZp4ORlXTijaPkdqxtkKcbp7wnfYW+2h4eTBs6ugdfxOKTvjk7ID6wkFvg
+         /OwLeAZ5tId8DmmCA0b5NkTgIlhU7bCxAYYNfBm4rlyiRkIhOjuNWQR2GqpnZkfjTbAy
+         CcHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUx4s8vplh+oxUjjFa9rPlfH4VKUs/DHCG+4TUOqHIWXvkAPVhkEJnd6hBruMe9yOny5lqsd9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOSwtfeP1fAKeTZatcMPHh2cpbP4Y30r46SXXgb0qYO898dnOn
+	nypxFw1225hNl781bB7fVUQQaihzfyQQXAD4EV5ZpaRBPBswZ6SF7YB0i5kJGA==
+X-Gm-Gg: ASbGncuO+PuMVzPzERnBrwPR6yt5ypWIHP0QqlBFFoy0ZLU8KNMV7/pCA7fmTs+cGxE
+	UectyUUacAA/gIuNqjySquzFGSHeH3P2Qpu6ioi4BX00M9QuUF6JkigXCz73NsiVfiPuhSPWmlG
+	zeKIrIy6uUUVVIiTen13UB2hfpHZ8p5N2GH9iMncee7RAef6+cj+5eMLo+x7D6bfug1NTj4yEKy
+	GOu/KJnYFTvNvck8hUpPwWYits8fGSeqSCkpVbPc60mgJwD7oeubE+D1WVZmk94cIAdhKZadGW2
+	wxCQ39jpxS5EndrghjhqZ9niMMkoGxTN0ACJ97JqDN40q2dw/mNsM4GNIkbwTDJen1cZf1JiZ8d
+	wR4UZj9reayTHu/wyOOEkGyXEiDhzKRs=
+X-Google-Smtp-Source: AGHT+IFyuzXspE6EUSTBoukcqJpMfuxJUsysvjl+3nmjhmk4W5r7SZAF4F8G0WrLS35ZUFNxIRHExg==
+X-Received: by 2002:a05:690c:60c5:b0:722:6ab7:f657 with SMTP id 00721157ae682-727f553f4f0mr156310327b3.38.1757555268701;
+        Wed, 10 Sep 2025 18:47:48 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:4e::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-72f76e166fcsm357527b3.32.2025.09.10.18.47.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 18:47:46 -0700 (PDT)
+        Wed, 10 Sep 2025 18:47:48 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -101,9 +101,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Kiran Kella <kiran.kella@broadcom.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v11 06/19] net: move sk_validate_xmit_skb() to net/core/dev.c
-Date: Wed, 10 Sep 2025 18:47:14 -0700
-Message-ID: <20250911014735.118695-7-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v11 07/19] net: tcp: allow tcp_timewait_sock to validate skbs before handing to device
+Date: Wed, 10 Sep 2025 18:47:15 -0700
+Message-ID: <20250911014735.118695-8-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250911014735.118695-1-daniel.zahka@gmail.com>
 References: <20250911014735.118695-1-daniel.zahka@gmail.com>
@@ -115,93 +115,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move definition of sk_validate_xmit_skb() from net/core/sock.c to
-net/core/dev.c.
-
-This change is in preparation of the next patch, where
-sk_validate_xmit_skb() will need to cast sk to a tcp_timewait_sock *,
-and access member fields. Including linux/tcp.h from linux/sock.h
-creates a circular dependency, and dev.c is the only current call site
-of this function.
+Provide a callback to validate skb's originating from tcp timewait
+socks before passing to the device layer. Full socks have a
+sk_validate_xmit_skb member for checking that a device is capable of
+performing offloads required for transmitting an skb. With psp, tcp
+timewait socks will inherit the crypto state from their corresponding
+full socks. Any ACKs or RSTs that originate from a tcp timewait sock
+carrying psp state should be psp encapsulated.
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
 
 Notes:
+    v3:
+    - check for sk_is_inet() before casting to inet_twsk()
     v2:
     - patch introduced in v2
 
- include/net/sock.h | 22 ----------------------
- net/core/dev.c     | 22 ++++++++++++++++++++++
- 2 files changed, 22 insertions(+), 22 deletions(-)
+ include/net/inet_timewait_sock.h |  5 +++++
+ net/core/dev.c                   | 14 ++++++++++++--
+ net/ipv4/inet_timewait_sock.c    |  3 +++
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index ca06430d5145..1c3e1f404dc7 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2973,28 +2973,6 @@ sk_requests_wifi_status(struct sock *sk)
- 	return sk && sk_fullsock(sk) && sock_flag(sk, SOCK_WIFI_STATUS);
- }
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
+index c1295246216c..3a31c74c9e15 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -84,6 +84,11 @@ struct inet_timewait_sock {
+ #if IS_ENABLED(CONFIG_INET_PSP)
+ 	struct psp_assoc __rcu	  *psp_assoc;
+ #endif
++#ifdef CONFIG_SOCK_VALIDATE_XMIT
++	struct sk_buff*		(*tw_validate_xmit_skb)(struct sock *sk,
++							struct net_device *dev,
++							struct sk_buff *skb);
++#endif
+ };
+ #define tw_tclass tw_tos
  
--/* Checks if this SKB belongs to an HW offloaded socket
-- * and whether any SW fallbacks are required based on dev.
-- * Check decrypted mark in case skb_orphan() cleared socket.
-- */
--static inline struct sk_buff *sk_validate_xmit_skb(struct sk_buff *skb,
--						   struct net_device *dev)
--{
--#ifdef CONFIG_SOCK_VALIDATE_XMIT
--	struct sock *sk = skb->sk;
--
--	if (sk && sk_fullsock(sk) && sk->sk_validate_xmit_skb) {
--		skb = sk->sk_validate_xmit_skb(sk, dev, skb);
--	} else if (unlikely(skb_is_decrypted(skb))) {
--		pr_warn_ratelimited("unencrypted skb with no associated socket - dropping\n");
--		kfree_skb(skb);
--		skb = NULL;
--	}
--#endif
--
--	return skb;
--}
--
- /* This helper checks if a socket is a LISTEN or NEW_SYN_RECV
-  * SYNACK messages can be attached to either ones (depending on SYNCOOKIE)
-  */
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 1d1650d9ecff..3be07bc77cca 100644
+index 3be07bc77cca..ee47ad2bf141 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -3907,6 +3907,28 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
- }
- EXPORT_SYMBOL(skb_csum_hwoffload_help);
- 
-+/* Checks if this SKB belongs to an HW offloaded socket
-+ * and whether any SW fallbacks are required based on dev.
-+ * Check decrypted mark in case skb_orphan() cleared socket.
-+ */
-+static struct sk_buff *sk_validate_xmit_skb(struct sk_buff *skb,
-+					    struct net_device *dev)
-+{
-+#ifdef CONFIG_SOCK_VALIDATE_XMIT
-+	struct sock *sk = skb->sk;
-+
-+	if (sk && sk_fullsock(sk) && sk->sk_validate_xmit_skb) {
-+		skb = sk->sk_validate_xmit_skb(sk, dev, skb);
-+	} else if (unlikely(skb_is_decrypted(skb))) {
-+		pr_warn_ratelimited("unencrypted skb with no associated socket - dropping\n");
-+		kfree_skb(skb);
-+		skb = NULL;
-+	}
-+#endif
-+
-+	return skb;
-+}
-+
- static struct sk_buff *validate_xmit_unreadable_skb(struct sk_buff *skb,
- 						    struct net_device *dev)
+@@ -3915,10 +3915,20 @@ static struct sk_buff *sk_validate_xmit_skb(struct sk_buff *skb,
+ 					    struct net_device *dev)
  {
+ #ifdef CONFIG_SOCK_VALIDATE_XMIT
++	struct sk_buff *(*sk_validate)(struct sock *sk, struct net_device *dev,
++				       struct sk_buff *skb);
+ 	struct sock *sk = skb->sk;
+ 
+-	if (sk && sk_fullsock(sk) && sk->sk_validate_xmit_skb) {
+-		skb = sk->sk_validate_xmit_skb(sk, dev, skb);
++	sk_validate = NULL;
++	if (sk) {
++		if (sk_fullsock(sk))
++			sk_validate = sk->sk_validate_xmit_skb;
++		else if (sk_is_inet(sk) && sk->sk_state == TCP_TIME_WAIT)
++			sk_validate = inet_twsk(sk)->tw_validate_xmit_skb;
++	}
++
++	if (sk_validate) {
++		skb = sk_validate(sk, dev, skb);
+ 	} else if (unlikely(skb_is_decrypted(skb))) {
+ 		pr_warn_ratelimited("unencrypted skb with no associated socket - dropping\n");
+ 		kfree_skb(skb);
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 1f83f333b8ac..2ca2912f61f4 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -212,6 +212,9 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
+ 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
+ 		twsk_net_set(tw, sock_net(sk));
+ 		timer_setup(&tw->tw_timer, tw_timer_handler, 0);
++#ifdef CONFIG_SOCK_VALIDATE_XMIT
++		tw->tw_validate_xmit_skb = NULL;
++#endif
+ 		/*
+ 		 * Because we use RCU lookups, we should not set tw_refcnt
+ 		 * to a non null value before everything is setup for this
 -- 
 2.47.3
 
