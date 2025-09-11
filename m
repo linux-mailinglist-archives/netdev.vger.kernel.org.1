@@ -1,77 +1,78 @@
-Return-Path: <netdev+bounces-222123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C952B53338
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:09:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 206CDB5333A
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46EEA5A4C42
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:09:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39AD61C22461
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F260C2E8E17;
-	Thu, 11 Sep 2025 13:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB9F326D51;
+	Thu, 11 Sep 2025 13:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BY2aB+hs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mdli3jPc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381DE376F1
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 13:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B8A326D54;
+	Thu, 11 Sep 2025 13:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757596137; cv=none; b=rYi1Xla3ogAk5ieKurj5sWD6QceMCB+moKo++RHA6eROhg6TAohIZP+/Lz2sSaAICgeUZLCcIe3e7wbdFWStGeI4ex5z5LTRsj5kLt9FhfrVM10xVbV41R2CK5lqVjfzeYNjEXpanAOgPGAJhWaIBjSuucKw60mEUse9EoEsq28=
+	t=1757596144; cv=none; b=A2tGQJMV0NnsXHrBI0AAQz1VfqYDgqcLiaBVI5/kRRi2bRDe5l2MD7IdshmUAY4LHGoSqDlq451S+sOY10s//1bq5AuTnrsCrOy+oZW5/XF2msKsY6IahHhfxn9n3fduLrejVhvaRbO9IqYGMxS/6A/F3JZ35n6vSz3ya4vQG0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757596137; c=relaxed/simple;
-	bh=6tu2GgRecX6mADSNiyvsCz3mmOGNrk1CUTa+72aUpfI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dFvJH3YgZNzl7BeZHBI1YT7RqwyZw2rDxAG29sM5sXntodHHwrr4/5P5Gos77FLck7r7AUnRt+amUUasK/hFGtBnaFrIi+RZQyrnBkR9/Eva67Fw2hfA8W68B+c/yfy/rmXH7UaTN61UpYx/oYP3h79U0UAsooT1jmV8TGKrrFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BY2aB+hs; arc=none smtp.client-ip=209.85.208.51
+	s=arc-20240116; t=1757596144; c=relaxed/simple;
+	bh=V2H9dXIwVgpVXBpviqyiuQS0vIC/+TNnkgW/1tjYST8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=II5PHcVt579CJkAWRxYbTqN/sC/7wKLZSu/svSJP1NE05Qt+6KyX64H1ffYCD+LZYNcH9DLEqWDxFHT4GHfLZmy7Z1OIBoNHqFsHT9m9bzYYgyomJVg6/q0i2hhz4pVvEEMP2S4PcuObLQP0sRRsThybOdB+7aSNccPdQBANt1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mdli3jPc; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6228de280a4so1205515a12.2
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 06:08:55 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-62598fcf41aso919902a12.3;
+        Thu, 11 Sep 2025 06:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757596134; x=1758200934; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NYfwO6IxQ0zU5483Ah3qwMr68UquIj+n1A2JlvNeSS8=;
-        b=BY2aB+hsRNgDPDfOR20w0/PWsaPbF7EN7Ak7Cn7a4XnbI7+JySAW0J0RrbmaiTQxKI
-         bZqOkF/e7GAel/2O8NUPhcPey7rCTebBRnWHFzf1ajEJPJ/ajJURY0ko9FJ+62j2iiVK
-         /ow/jbkI6a0WTe5NtgtO9QgVLHGVDnhUlTxrZDiMUkhViwPFAwXBg5vF6ahodHcBgOCt
-         VTJsCEsqk9F4RGoQ69iTSGZIXFby3gOmdciVujcXpavNp7lCqqIAkmE2M6AsVvEmHYLk
-         H/PTdVH9YMUCDcwD63iqy9vsy9XCSaYaH02OF6dDpvS77fWXT8nw5tjDVds0/EYhGzpm
-         ZFIg==
+        d=gmail.com; s=20230601; t=1757596140; x=1758200940; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C1AkGWYGZhk13kpXwKplWPVQOyZ5VfsAbXzcTkoUclo=;
+        b=mdli3jPcoRFNYyqbraRwvJFVjOcwCJJ9rlYOvLMai/hKQvAM8KipgOaHci5rMRCIqu
+         RRnBsmFuy6KOokkq0AQ7qQCdSTFTmL0kxE2oVkl7bD/gQdGXIY42m9qQWfbagufxf1BV
+         YIWwjE3vg8l/hNASXMHy2NYTvNUJxU1qSt6os+E5sHfkuXxCOGhlk1AIIFNaEvJu2nw6
+         EU8ZWd1UjvUJPmvLov5lSN+BoBk+GqBsoSlJkVG5BsHLEFySWLJaV8aE4ExD36/nUrp6
+         OHJUtI9DHpDIHGK/2tQJGw/dFDfgZ9BBbh620KQ+uVulIeATRtx+jrPFqG8HoWypYuc8
+         9s+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757596134; x=1758200934;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NYfwO6IxQ0zU5483Ah3qwMr68UquIj+n1A2JlvNeSS8=;
-        b=KDOiTLI1MS2I1fg0K/q9hNWwSxke0Et0SGBIMVRVQJJfJYNvcjn1pX7PB9n6doVOJ5
-         cOmotmsCkHWQGdcbB5efctDRag+t/vyLNv6xmc0RuDNwwhzPUuD+RhfF8b4xuT1PITvt
-         CY1rUbH29RNtJ+jbJQJgXdPKHzAWiLLj7mv3LT7DIAMygM39xXUjZTM8nV6Qdb79QzZv
-         Gnr/J7Eakr1hcjook75bNDkx5nQ9KmBBsLFecyub2vrgRL3IEpDdvZCLfIKRNtfi/EvC
-         hBcT/94HjalCZMYrf7EHoY6OC0qF8dqUIJf78fw6AHUu7JjMoMEY3mXvSNydy6M/+6Il
-         3N+g==
-X-Forwarded-Encrypted: i=1; AJvYcCU9+ErulRHqLkOdUgmdjhJKkVfAcdY76dmA2iz8D2YUiEpP1UeYe2uY9pIhf5crXz+fSh35Xpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDe+nUQKrioADwioXCkDx15E6eCzW763OKjji4iDsRNTzN0auY
-	1/juvPKJ/rqSc5ST0mcMdOtVsgtSQd+66RqY7I1BrtbeaZhQ0hNUhvn/
-X-Gm-Gg: ASbGnctRdqLjq5FtXAG2gUBnujQfmyAZkM2vYZ8tkWBW4xr6DGPU0pmRkxTt9xgBW7A
-	Be2J0jI1whZEjWisRbCIlo7Vy95IyC7To9l4Ot1H0h83hJN/TCD7F3cOb+93pX2tM89HbrdLzhc
-	kK81d96vjG7hxHFPmiUiiPJXuCzkWJyjeOxTtfUSMbnLjMF6WT9bjGp2G8yfJzXW7KP98atccq1
-	0t9eL7LJkfv1pAhoOeCVXsb9qG/z5DSjEQR9eeBZ/gNupD6jT9YlXGQlladdNKukdR0TIvto12t
-	jyb/N1HGir2wy2lZ384FIme+uRud1hEsqQ13ZyzYugr6381A5qvSV7Z+qxy7YsDuyQ6WryGMyXX
-	1y/1Ne1tO3gOMxzha+bVag96gJABc6l6VeSdtBrU7NeLiIlhjB98sxpP47GS32l4GUaKGWH56OU
-	lg6DTwug==
-X-Google-Smtp-Source: AGHT+IF1qK2NqhfPfnYI/pqLXo5VsNdOwjXB+8puBwtknztnJSi9VTru+UFZzNb+Q3zjKSsNmXtj+Q==
-X-Received: by 2002:a05:6402:27d1:b0:627:9d08:97a6 with SMTP id 4fb4d7f45d1cf-6279d089899mr13990549a12.18.1757596134332;
-        Thu, 11 Sep 2025 06:08:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757596140; x=1758200940;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C1AkGWYGZhk13kpXwKplWPVQOyZ5VfsAbXzcTkoUclo=;
+        b=JsU4nbeB7/xIkEM7cb7hrv1exEQ157m1ZSfHohDGQck0QpGxMYBZ7TvnCyRiHb7POD
+         4+ssBzzGQtSUpoMcl7mTdLRaW8UjwWDlSykzk131es0lnbMp5Dw9viMgKwT7tnYTZxDi
+         T5EnPJj/bul9V5hlI6SE9bF3fEgnsUsJN7EpsP/n0yJlW/tHgkcYcuFQuuLVCOUQrMro
+         tfERIcRXzoThtMdfBrWh7ayWzUZmv2/PZABtsen9i/Ix7y9HpdOK6DL8EAP3IWgK9Qhp
+         FFaQ3Ka5hYWV1kfXdaAQ8HtzyreqiYXUETZQGupp29jCIbdgDOXcOmiXntY3487oIVgo
+         y0xA==
+X-Forwarded-Encrypted: i=1; AJvYcCVl4prVHBqsv5K1b12aOB2Qsgz45xTkv7C54BmwfL5hIOVxZPqbtaqx27Tsa8vKfUFns+RPskUQ@vger.kernel.org, AJvYcCXAyNr+/2i7PYa0P1ymDRmtZGbXW02bJbYYQE9ujtLMWaRJnxvxI8q1PoVp6/dC9G13GhIyYeuV461ssL4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWscUuJU0xNrrt0k/W0fTwVkpZZdHbTIadXNcjFbi0qHr0R6fh
+	pCWDz1HzRUJFscf0m8yvFfk02EmyScirba2Zq01sCy74juAMQxfrgMtx
+X-Gm-Gg: ASbGnct9lDoh/wqUn38akAk8C8xNtbnXf3aZr8Uttuc6jH+eM3I50/1zcxz/UCfQh6c
+	AEDXD9tM2KMUozs8RJBj9QEwuqUeHkWZjNA3RCmRcIjzLjxMHkzXWK+vzGZtO6rWZMPnXYla7NM
+	jJhLV0ImXKsr5sbyldoQeZTRa2eou2r0awOBiRcAhCvO2Cka+fBrBm2/C+tiFQ6t8GvZxGfmUXj
+	nfgNhvxF1l0liuB3Lajre3r/5v33Sh3uyk221+ZafG/n+kHumW/zqe4Jh4ZGDXLcmJR9oSA44YS
+	AoH6IcXAZ2dEJJe7JBzvtwZY+Hj9gyPlG5bD2fCRp5EVT2Xp9bYwpVGD2DBaG6w7Zz8I0w+2/N5
+	QcKm+1Eu99m9OhlE6brItiqqq/CMLl7RkCRnQYgh3PD0nyxgx2w1gOrgSEY2zi2AVkpqb60w=
+X-Google-Smtp-Source: AGHT+IGpC6N5TNOFIDo3yamTJzl+2SnSbdhkFL0ilGKENQBeqDqBzmADVcGyQJxwQ2VyzHZelNATbQ==
+X-Received: by 2002:a05:6402:280d:b0:615:6a10:f048 with SMTP id 4fb4d7f45d1cf-6237826dd97mr16569149a12.33.1757596139618;
+        Thu, 11 Sep 2025 06:08:59 -0700 (PDT)
 Received: from Ansuel-XPS24 (host-95-249-236-54.retail.telecomitalia.it. [95.249.236.54])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-62ec33f3b16sm1133038a12.24.2025.09.11.06.08.50
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-62ec33f3b16sm1133038a12.24.2025.09.11.06.08.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 06:08:53 -0700 (PDT)
+        Thu, 11 Sep 2025 06:08:58 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
@@ -85,10 +86,12 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v2 1/3] net: phy: introduce phy_id_compare_model() PHY ID helper
-Date: Thu, 11 Sep 2025 15:08:31 +0200
-Message-ID: <20250911130840.23569-1-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 2/3] net: phy: broadcom: Convert to phy_id_compare_model()
+Date: Thu, 11 Sep 2025 15:08:32 +0200
+Message-ID: <20250911130840.23569-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250911130840.23569-1-ansuelsmth@gmail.com>
+References: <20250911130840.23569-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,8 +100,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Similar to phy_id_compare_vendor(), introduce the equivalent
-phy_id_compare_model() helper for the generic PHY ID Model mask.
+Convert driver to phy_id_compare_model() helper instead of the custom
+BRCM_PHY_MODEL macro.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
@@ -106,35 +109,124 @@ Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
 Changes v2:
 - Add review tag
-- Fix copy-paste error in vendor_mask -> model_mask
 
- include/linux/phy.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/net/phy/broadcom.c | 42 ++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 22 deletions(-)
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 04553419adc3..6f3b25cb7f4e 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1308,6 +1308,19 @@ static inline bool phy_id_compare_vendor(u32 id, u32 vendor_mask)
- 	return phy_id_compare(id, vendor_mask, PHY_ID_MATCH_VENDOR_MASK);
- }
+diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
+index a60e58ef90c4..46ca739dcd4a 100644
+--- a/drivers/net/phy/broadcom.c
++++ b/drivers/net/phy/broadcom.c
+@@ -23,9 +23,6 @@
+ #include <linux/irq.h>
+ #include <linux/gpio/consumer.h>
  
-+/**
-+ * phy_id_compare_model - compare @id with @model mask
-+ * @id: PHY ID
-+ * @model_mask: PHY Model mask
-+ *
-+ * Return: true if the bits from @id match @model using the
-+ *	   generic PHY Model mask.
-+ */
-+static inline bool phy_id_compare_model(u32 id, u32 model_mask)
-+{
-+	return phy_id_compare(id, model_mask, PHY_ID_MATCH_MODEL_MASK);
-+}
-+
- /**
-  * phydev_id_compare - compare @id with the PHY's Clause 22 ID
-  * @phydev: the PHY device
+-#define BRCM_PHY_MODEL(phydev) \
+-	((phydev)->drv->phy_id & (phydev)->drv->phy_id_mask)
+-
+ #define BRCM_PHY_REV(phydev) \
+ 	((phydev)->drv->phy_id & ~((phydev)->drv->phy_id_mask))
+ 
+@@ -249,8 +246,8 @@ static int bcm54xx_phydsp_config(struct phy_device *phydev)
+ 	if (err < 0)
+ 		return err;
+ 
+-	if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610 ||
+-	    BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610M) {
++	if (phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610) ||
++	    phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610M)) {
+ 		/* Clear bit 9 to fix a phy interop issue. */
+ 		err = bcm_phy_write_exp(phydev, MII_BCM54XX_EXP_EXP08,
+ 					MII_BCM54XX_EXP_EXP08_RJCT_2MHZ);
+@@ -264,7 +261,7 @@ static int bcm54xx_phydsp_config(struct phy_device *phydev)
+ 		}
+ 	}
+ 
+-	if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM57780) {
++	if (phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM57780)) {
+ 		int val;
+ 
+ 		val = bcm_phy_read_exp(phydev, MII_BCM54XX_EXP_EXP75);
+@@ -292,12 +289,12 @@ static void bcm54xx_adjust_rxrefclk(struct phy_device *phydev)
+ 	bool clk125en = true;
+ 
+ 	/* Abort if we are using an untested phy. */
+-	if (BRCM_PHY_MODEL(phydev) != PHY_ID_BCM57780 &&
+-	    BRCM_PHY_MODEL(phydev) != PHY_ID_BCM50610 &&
+-	    BRCM_PHY_MODEL(phydev) != PHY_ID_BCM50610M &&
+-	    BRCM_PHY_MODEL(phydev) != PHY_ID_BCM54210E &&
+-	    BRCM_PHY_MODEL(phydev) != PHY_ID_BCM54810 &&
+-	    BRCM_PHY_MODEL(phydev) != PHY_ID_BCM54811)
++	if (!(phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM57780) ||
++	      phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610) ||
++	      phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610M) ||
++	      phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM54210E) ||
++	      phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM54810) ||
++	      phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM54811)))
+ 		return;
+ 
+ 	val = bcm_phy_read_shadow(phydev, BCM54XX_SHD_SCR3);
+@@ -306,8 +303,8 @@ static void bcm54xx_adjust_rxrefclk(struct phy_device *phydev)
+ 
+ 	orig = val;
+ 
+-	if ((BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610 ||
+-	     BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610M) &&
++	if ((phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610) ||
++	     phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610M)) &&
+ 	    BRCM_PHY_REV(phydev) >= 0x3) {
+ 		/*
+ 		 * Here, bit 0 _disables_ CLK125 when set.
+@@ -316,7 +313,8 @@ static void bcm54xx_adjust_rxrefclk(struct phy_device *phydev)
+ 		clk125en = false;
+ 	} else {
+ 		if (phydev->dev_flags & PHY_BRCM_RX_REFCLK_UNUSED) {
+-			if (BRCM_PHY_MODEL(phydev) != PHY_ID_BCM54811) {
++			if (!phy_id_compare_model(phydev->drv->phy_id,
++						  PHY_ID_BCM54811)) {
+ 				/* Here, bit 0 _enables_ CLK125 when set */
+ 				val &= ~BCM54XX_SHD_SCR3_DEF_CLK125;
+ 			}
+@@ -330,9 +328,9 @@ static void bcm54xx_adjust_rxrefclk(struct phy_device *phydev)
+ 		val |= BCM54XX_SHD_SCR3_DLLAPD_DIS;
+ 
+ 	if (phydev->dev_flags & PHY_BRCM_DIS_TXCRXC_NOENRGY) {
+-		if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM54210E ||
+-		    BRCM_PHY_MODEL(phydev) == PHY_ID_BCM54810 ||
+-		    BRCM_PHY_MODEL(phydev) == PHY_ID_BCM54811)
++		if (phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM54210E) ||
++		    phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM54810) ||
++		    phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM54811))
+ 			val |= BCM54XX_SHD_SCR3_RXCTXC_DIS;
+ 		else
+ 			val |= BCM54XX_SHD_SCR3_TRDDAPD;
+@@ -461,14 +459,14 @@ static int bcm54xx_config_init(struct phy_device *phydev)
+ 	if (err < 0)
+ 		return err;
+ 
+-	if ((BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610 ||
+-	     BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610M) &&
++	if ((phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610) ||
++	     phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM50610M)) &&
+ 	    (phydev->dev_flags & PHY_BRCM_CLEAR_RGMII_MODE))
+ 		bcm_phy_write_shadow(phydev, BCM54XX_SHD_RGMII_MODE, 0);
+ 
+ 	bcm54xx_adjust_rxrefclk(phydev);
+ 
+-	switch (BRCM_PHY_MODEL(phydev)) {
++	switch (phydev->drv->phy_id & PHY_ID_MATCH_MODEL_MASK) {
+ 	case PHY_ID_BCM50610:
+ 	case PHY_ID_BCM50610M:
+ 		err = bcm54xx_config_clock_delay(phydev);
+@@ -693,7 +691,7 @@ static int bcm5481x_read_abilities(struct phy_device *phydev)
+ 		 * So we must read the bcm54811 as unable to auto-negotiate
+ 		 * in BroadR-Reach mode.
+ 		 */
+-		if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM54811)
++		if (phy_id_compare_model(phydev->drv->phy_id, PHY_ID_BCM54811))
+ 			aneg = 0;
+ 		else
+ 			aneg = val & LRESR_LDSABILITY;
 -- 
 2.51.0
 
