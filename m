@@ -1,320 +1,208 @@
-Return-Path: <netdev+bounces-222191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5079BB536F1
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:07:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44836B53710
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA96B3A356E
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:07:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B2101BC60E5
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 15:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C2D345735;
-	Thu, 11 Sep 2025 15:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A32346A11;
+	Thu, 11 Sep 2025 15:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bA7HPZpy"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="Tp0xnrD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E1E3451B1
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 15:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757603245; cv=none; b=CyJY9DcLmKTc7/9ikhzz/Z/z3R6YWsdzSMrPQUyjAoGLUHPD7OXIaYyXpHyzl8e4gNArS8yLae1uT16prTvsUwqu7iPNLTjDL+rKVpLjc/VlBdIFpgMO0y4fwFs8THfyn7coPoXuay/8ZfHit5Nteq8GzOQoivjh5RVB3wErniE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757603245; c=relaxed/simple;
-	bh=duiT42Dti2TzZNz5hr+s/p+56YnD/6L34BorvlTlUR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A3o6y7TgEpoyBNHe/GfwUZJiHILGATWZZyw8bG/Rrih2X9zpe9Z6b94FikMPyVevjNoIl+YUWQrUsuJ0oy9JPSX4BIIGwNOTmLPfPOXZQZs8uks0lKPvuCoLngV865/vV7GMvRwg8G6+bO/LCf0j9ZhldDByUl+bG2MJE6u6I1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bA7HPZpy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757603241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tFGTlkHvkhPXSSKabVvFO+EXS/7Ai/m84LArwY7OlsA=;
-	b=bA7HPZpyjOtJagw1ifmR2JAyDa1flQyJ9wQArtT/eZ2mJUEFnquYP3FRu3YkR0/l4uZrtD
-	AVN+pGk9oBiZUrUTvSitLp118MYkJlFPA9WFXQ9DiYqKFbGbYtX6hIQFVk66nssh0Nzp+t
-	Ae5uclpqIafY6wcyN3gwFzYbxML/GwI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-298-I4WiGaSpMqmge4LV8d-4XQ-1; Thu,
- 11 Sep 2025 11:07:14 -0400
-X-MC-Unique: I4WiGaSpMqmge4LV8d-4XQ-1
-X-Mimecast-MFC-AGG-ID: I4WiGaSpMqmge4LV8d-4XQ_1757603230
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBEEE18002CD;
-	Thu, 11 Sep 2025 15:07:09 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.33.21])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C508E1944AB5;
-	Thu, 11 Sep 2025 15:07:07 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2FE15746E;
+	Thu, 11 Sep 2025 15:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757603592; cv=pass; b=hqh3e5WQh6x+lCeKEymzLyrYR7a/ZOA0qo+fAC3o4o5fNLB+Us9J4SNMez5hCeCRXGBLqhvxNNWf09f20m/+HyZWoJbPVwdajZ9HWFvbCqLlQ8TTqL2aEXegK92ib0FIT33rTKX83PRnRmRpnnkfp49V8erk/ba4uJzLXQh+mbQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757603592; c=relaxed/simple;
+	bh=dPiSK05fxe+FuQby1ebrZdrIQ9EXZx7N4NljlqZ2c2U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oS/k0DkoOhvLPDWRDqvH16uRVp73hvXAOWgqluoZnVklb3eubfX6TLMph/fhEAZHzjuA2FpTBWtBKsNkE4Q3bPFMR0q9ftrpNziLsANUkHKGKmX5UNl/bmFHviMg+Aymuu+cPa2EB4qb9i9hoAz1jA4QSR1FUccObPrGnlog45g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=Tp0xnrD2; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1757603532; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=B9IGFw7LplNPOkZEq5rg//uOHf2EjeiJHVJse7seMUTzZIMxYd1TVrOZN0zUbq5Xq33L+9q9+TqFilkErBnjfaa/NpughWfaUjECxVa+0PaEb+YDKAdGNrY++tuNVVIv/wj8tJU+KqRR3v9zzmvdP6gOS405s9ICJ1bawZoNf0E=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757603532; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=4E1gkCV3bUB24+jEbYd5O83SC/ksIpy9YseSb1Bd3iA=; 
+	b=OYspCStGN7dInL2eQAJ59H16VwPLP5z4wWe5Nr6htKYI4pPJuPUYGIV4faEbAdxSfzVEwkFgj+ZF3SmcHreJc8qUT/uzUAHUdyXtnkWOokhqUalCV4rW9dIvNsZfNzhRjZLbbMNHmz9gEQaCCxIvVLYhrFc0Y2lAOG7iIOnvWyc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
+	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757603532;
+	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=4E1gkCV3bUB24+jEbYd5O83SC/ksIpy9YseSb1Bd3iA=;
+	b=Tp0xnrD2zRi58CffU5G3TaTiLbJcAER4BZDZ/9WPboVLvTu6uzg9VYi/ZTt2X5qw
+	PMD8pJ8vo2CnYFCkcKqSC4Ganw2/UNoxh4q3T1CUWsieDlvzRf8LKJqusv5Qlx+IBze
+	ExFMJOuw5cTRX/uVEXriSe7jqmq8yEDKe+84VPaw=
+Received: by mx.zohomail.com with SMTPS id 1757603530466436.8737694403886;
+	Thu, 11 Sep 2025 08:12:10 -0700 (PDT)
+From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+To: airlied@gmail.com,
+	amergnat@baylibre.com,
+	andrew+netdev@lunn.ch,
+	andrew-ct.chen@mediatek.com,
+	angelogioacchino.delregno@collabora.com,
+	ariel.dalessandro@collabora.com,
+	broonie@kernel.org,
+	chunkuang.hu@kernel.org,
+	conor+dt@kernel.org,
 	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL v2] Networking for v6.17-rc6
-Date: Thu, 11 Sep 2025 17:06:55 +0200
-Message-ID: <20250911150655.60220-1-pabeni@redhat.com>
+	dmitry.torokhov@gmail.com,
+	edumazet@google.com,
+	flora.fu@mediatek.com,
+	heiko@sntech.de,
+	houlong.wei@mediatek.com,
+	jeesw@melfas.com,
+	kernel@collabora.com,
+	krzk+dt@kernel.org,
+	kuba@kernel.org,
+	lgirdwood@gmail.com,
+	linus.walleij@linaro.org,
+	louisalexis.eyraud@collabora.com,
+	luiz.dentz@gmail.com,
+	maarten.lankhorst@linux.intel.com,
+	marcel@holtmann.org,
+	matthias.bgg@gmail.com,
+	mchehab@kernel.org,
+	minghsiu.tsai@mediatek.com,
+	mripard@kernel.org,
+	p.zabel@pengutronix.de,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	sean.wang@kernel.org,
+	simona@ffwll.ch,
+	support.opensource@diasemi.com,
+	tiffany.lin@mediatek.com,
+	tzimmermann@suse.de,
+	yunfei.dong@mediatek.com
+Cc: devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-sound@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 00/12] MediaTek dt-bindings sanitization (MT8173)
+Date: Thu, 11 Sep 2025 12:09:49 -0300
+Message-ID: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-ZohoMailClient: External
 
-Hi Linus!
+This patch series continues the effort to address Device Tree validation
+warnings for MediaTek platforms, with a focus on MT8173. It follows the
+initial cleanup series by Angelo [0].
 
-I'm sorry for the extra noise. This should be hopefully the good one.
+Similarly to the ongoing MT8183 work done by Julien Massot, this patchset
+eliminates several of the remaining warnings by improving or converting DT
+bindings to YAML, adding missing properties, and updating device tree files
+accordingly.
 
-The following changes since commit d69eb204c255c35abd9e8cb621484e8074c75eaa:
+[0] https://www.spinics.net/lists/kernel/msg5780177.html
 
-  Merge tag 'net-6.17-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-09-04 09:59:15 -0700)
+Changes in v2:
+* Wrapped commit messages to 75 columns line wrap.
+* Replaced "YAML" by "DT schema" in patches subject and content.
+* mt8173-mdp: Fixed properties: compatible, clocks, iommus and
+  mediatek,vpu.
+* mt8173-vpu: Fixed line wrap. Dropped memory-region property description.
+* mediatek,mmsys: Dropped patch as it's not a binding issue.
+* mediatek,od: Rewrote commit log with details on DT schema users missing
+  the related property. Rewrote mediatek,gce-client-reg property.
+* mediatek,ufoe: Rewrote commit log with details on DT schema users missing
+  the related property. Rewrote mediatek,gce-client-reg property.
+* marvell,sd8897-bt: Moved to net/bluetooth/. Added missing ref to
+  bluetooth-controller.yaml. Dropped example. Updated reference in another
+  file. Minor fixes in properties.
+* mediatek,mt8173-rt5650: Dropped unnecessary quotes and unused label.
+* dlg,da9211: Dropped enable-gpios description. Rewrote generic example
+  node names. Minor fixes in properties.
+* melfas,mip4_ts: Dropped unnecessary quotes. Added "active high" to
+  ce-gpios property description.
+* mediatek,jpeg: Dropped patch as it doesn't apply.
 
-are available in the Git repository at:
+Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc6
+Ariel D'Alessandro (12):
+  dt-bindings: media: Convert MediaTek mt8173-mdp bindings to DT schema
+  dt-bindings: media: Convert MediaTek mt8173-vpu bindings to DT schema
+  dt-bindings: net: Convert Marvell 8897/8997 bindings to DT schema
+  dt-bindings: ASoC: Convert MediaTek RT5650 codecs bindings to DT
+    schema
+  dt-bindings: display: mediatek,od: Add mediatek,gce-client-reg
+    property
+  dt-bindings: display: mediatek,ufoe: Add mediatek,gce-client-reg
+    property
+  arm64: dts: mediatek: mt8173: Fix mt8173-pinctrl node names
+  dt-bindings: pinctrl: mt65xx: Allow gpio-line-names
+  dt-bindings: regulator: Convert Dialog DA9211 Regulators to DT schema
+  arm64: dts: mediatek: mt8173-elm: Drop unused bank supply
+  dt-bindings: soc: mediatek: pwrap: Add power-domains property
+  dt-bindings: input: Convert MELFAS MIP4 Touchscreen to DT schema
 
-for you to fetch changes up to 63a796558bc22ec699e4193d5c75534757ddf2e6:
+ .../display/mediatek/mediatek,od.yaml         |  14 ++
+ .../display/mediatek/mediatek,ufoe.yaml       |  15 ++
+ .../input/touchscreen/melfas,mip4_ts.yaml     |  56 +++++
+ .../input/touchscreen/melfas_mip4.txt         |  20 --
+ .../bindings/media/mediatek,mt8173-mdp.yaml   | 169 +++++++++++++++
+ .../bindings/media/mediatek,mt8173-vpu.yaml   |  74 +++++++
+ .../bindings/media/mediatek-mdp.txt           |  95 --------
+ .../bindings/media/mediatek-vpu.txt           |  31 ---
+ .../net/bluetooth/marvell,sd8897-bt.yaml      |  79 +++++++
+ .../devicetree/bindings/net/btusb.txt         |   2 +-
+ .../bindings/net/marvell-bt-8xxx.txt          |  83 -------
+ .../pinctrl/mediatek,mt65xx-pinctrl.yaml      |   2 +
+ .../devicetree/bindings/regulator/da9211.txt  | 205 ------------------
+ .../bindings/regulator/dlg,da9211.yaml        | 104 +++++++++
+ .../bindings/soc/mediatek/mediatek,pwrap.yaml |  15 ++
+ .../sound/mediatek,mt8173-rt5650.yaml         |  73 +++++++
+ .../bindings/sound/mt8173-rt5650.txt          |  31 ---
+ .../dts/rockchip/rk3288-veyron-fievel.dts     |   2 +-
+ .../boot/dts/rockchip/rk3288-veyron-jaq.dts   |   2 +-
+ .../boot/dts/mediatek/mt8173-elm-hana.dtsi    |   2 +-
+ arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi  |  33 ++-
+ arch/arm64/boot/dts/mediatek/mt8173-evb.dts   |  14 +-
+ arch/arm64/boot/dts/mediatek/mt8173.dtsi      |  14 +-
+ 23 files changed, 633 insertions(+), 502 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/input/touchscreen/melfas,mip4_ts.yaml
+ delete mode 100644 Documentation/devicetree/bindings/input/touchscreen/melfas_mip4.txt
+ create mode 100644 Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml
+ create mode 100644 Documentation/devicetree/bindings/media/mediatek,mt8173-vpu.yaml
+ delete mode 100644 Documentation/devicetree/bindings/media/mediatek-mdp.txt
+ delete mode 100644 Documentation/devicetree/bindings/media/mediatek-vpu.txt
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/marvell,sd8897-bt.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+ delete mode 100644 Documentation/devicetree/bindings/regulator/da9211.txt
+ create mode 100644 Documentation/devicetree/bindings/regulator/dlg,da9211.yaml
+ create mode 100644 Documentation/devicetree/bindings/sound/mediatek,mt8173-rt5650.yaml
+ delete mode 100644 Documentation/devicetree/bindings/sound/mt8173-rt5650.txt
 
-  Revert "net: usb: asix: ax88772: drop phylink use in PM to avoid MDIO runtime PM wakeups" (2025-09-11 16:46:04 +0200)
-
-----------------------------------------------------------------
-Including fixes from CAN, netfilter and wireless.
-
-We have an IPv6 routing regression with the relevant fix still
-a WiP. This v2 includes a last-minute revert to avoid more
-problems.
-
-Current release - new code bugs:
-
-  - wifi: nl80211: completely disable per-link stats for now
-
-Previous releases - regressions:
-
-  - dev_ioctl: take ops lock in hwtstamp lower paths
-
-  - netfilter:
-    - fix spurious set lookup failures
-    - fix lockdep splat due to missing annotation
-
-  - genetlink: fix genl_bind() invoking bind() after -EPERM
-
-  - phy: transfer phy_config_inband() locking responsibility to phylink
-
-  - can: xilinx_can: fix use-after-free of transmitted SKB
-
-  - hsr: fix lock warnings
-
-  - eth: igb: fix NULL pointer dereference in ethtool loopback test
-
-  - eth: i40e: fix Jumbo Frame support after iPXE boot
-
-  - eth: macsec: sync features on RTM_NEWLINK
-
-Previous releases - always broken:
-
-  - tunnels: reset the GSO metadata before reusing the skb
-
-  - mptcp: make sync_socket_options propagate SOCK_KEEPOPEN
-
-  - can: j1939: implement NETDEV_UNREGISTER notification hanidler
-
-  - wifi: ath12k: fix WMI TLV header misalignment
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alex Tran (1):
-      docs: networking: can: change bcm_msg_head frames member to support flexible array
-
-Alok Tiwari (1):
-      genetlink: fix genl_bind() invoking bind() after -EPERM
-
-Anssi Hannula (1):
-      can: xilinx_can: xcan_write_frame(): fix use-after-free of transmitted SKB
-
-Antoine Tenart (1):
-      tunnels: reset the GSO metadata before reusing the skb
-
-Carolina Jubran (1):
-      net: dev_ioctl: take ops lock in hwtstamp lower paths
-
-Davide Caratti (1):
-      selftests: can: enable CONFIG_CAN_VCAN as a module
-
-Florian Westphal (7):
-      netfilter: nft_set_bitmap: fix lockdep splat due to missing annotation
-      netfilter: nft_set_pipapo: don't check genbit from packetpath lookups
-      netfilter: nft_set_rbtree: continue traversal if element is inactive
-      netfilter: nf_tables: place base_seq in struct net
-      netfilter: nf_tables: make nft_set_do_lookup available unconditionally
-      netfilter: nf_tables: restart set lookup on base_seq change
-      MAINTAINERS: add Phil as netfilter reviewer
-
-Geert Uytterhoeven (1):
-      can: rcar_can: rcar_can_resume(): fix s2ram with PSCI
-
-Hangbin Liu (3):
-      hsr: use rtnl lock when iterating over ports
-      hsr: use hsr_for_each_port_rtnl in hsr_port_get_hsr
-      hsr: hold rcu and dev lock for hsr_get_port_ndev
-
-Jacob Keller (1):
-      i40e: fix Jumbo Frame support after iPXE boot
-
-Jakub Kicinski (4):
-      Merge branch 'mptcp-misc-fixes-for-v6-17-rc6'
-      Merge branch '1GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'linux-can-fixes-for-6.17-20250910' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
-      Merge tag 'nf-25-09-10-v2' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-James Guan (1):
-      wifi: virt_wifi: Fix page fault on connect
-
-Jiawen Wu (1):
-      net: libwx: fix to enable RSS
-
-Johannes Berg (4):
-      wifi: iwlwifi: fix 130/1030 configs
-      Merge tag 'ath-current-20250909' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-      Merge tag 'iwlwifi-fixes-2025-09-09' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-      wifi: nl80211: completely disable per-link stats for now
-
-Jonas Gorski (1):
-      net: dsa: b53: fix ageing time for BCM53101
-
-Jonas Rebmann (1):
-      net: phy: NXP_TJA11XX: Update Kconfig with TJA1102 support
-
-Kohei Enju (1):
-      igb: fix link test skipping when interface is admin down
-
-Krister Johansen (1):
-      mptcp: sockopt: make sync_socket_options propagate SOCK_KEEPOPEN
-
-Matthieu Baerts (NGI0) (3):
-      netlink: specs: mptcp: fix if-idx attribute type
-      doc: mptcp: net.mptcp.pm_type is deprecated
-      selftests: mptcp: shellcheck: support v0.11.0
-
-Miaoqing Pan (2):
-      wifi: ath12k: Fix missing station power save configuration
-      wifi: ath12k: fix WMI TLV header misalignment
-
-Michal Schmidt (1):
-      i40e: fix IRQ freeing in i40e_vsi_request_irq_msix error path
-
-Nithyanantham Paramasivam (1):
-      wifi: cfg80211: Fix "no buffer space available" error in nl80211_get_station() for MLO
-
-Oleksij Rempel (1):
-      net: usb: asix: ax88772: drop phylink use in PM to avoid MDIO runtime PM wakeups
-
-Oscar Maes (1):
-      selftests: net: add test for destination in broadcast packets
-
-Paolo Abeni (3):
-      Merge branch 'hsr-fix-lock-warnings'
-      Merge tag 'wireless-2025-09-11' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-      Revert "net: usb: asix: ax88772: drop phylink use in PM to avoid MDIO runtime PM wakeups"
-
-Petr Machata (1):
-      net: bridge: Bounce invalid boolopts
-
-Russell King (Oracle) (2):
-      net: phy: fix phy_uses_state_machine()
-      net: ethtool: fix wrong type used in struct kernel_ethtool_ts_info
-
-Stanislav Fomichev (1):
-      macsec: sync features on RTM_NEWLINK
-
-Stefan Wahren (1):
-      net: fec: Fix possible NPD in fec_enet_phy_reset_after_clk_enable()
-
-Tetsuo Handa (3):
-      can: j1939: implement NETDEV_UNREGISTER notification handler
-      can: j1939: j1939_sk_bind(): call j1939_priv_put() immediately when j1939_local_ecu_get() failed
-      can: j1939: j1939_local_ecu_get(): undo increment when j1939_local_ecu_get() fails
-
-Tianyu Xu (1):
-      igb: Fix NULL pointer dereference in ethtool loopback test
-
-Vladimir Oltean (2):
-      net: phylink: add lock for serializing concurrent pl->phydev writes with resolver
-      net: phy: transfer phy_config_inband() locking responsibility to phylink
-
- Documentation/netlink/specs/mptcp_pm.yaml          |   2 +-
- Documentation/networking/can.rst                   |   2 +-
- Documentation/networking/mptcp.rst                 |   8 +-
- MAINTAINERS                                        |   1 +
- drivers/net/can/rcar/rcar_can.c                    |   8 +-
- drivers/net/can/xilinx_can.c                       |  16 +--
- drivers/net/dsa/b53/b53_common.c                   |  17 ++-
- drivers/net/ethernet/freescale/fec_main.c          |   3 +-
- drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h  |   1 +
- drivers/net/ethernet/intel/i40e/i40e_common.c      |  34 ++++++
- drivers/net/ethernet/intel/i40e/i40e_main.c        |  18 +--
- drivers/net/ethernet/intel/i40e/i40e_prototype.h   |   2 +
- drivers/net/ethernet/intel/igb/igb_ethtool.c       |   5 +-
- drivers/net/ethernet/intel/igb/igb_main.c          |   3 +-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c       |  20 +++-
- drivers/net/ethernet/wangxun/libwx/wx_hw.c         |   4 -
- drivers/net/macsec.c                               |   1 +
- drivers/net/phy/Kconfig                            |   2 +-
- drivers/net/phy/phy.c                              |  12 +-
- drivers/net/phy/phy_device.c                       |   5 +-
- drivers/net/phy/phylink.c                          |  28 ++++-
- drivers/net/wireless/ath/ath12k/mac.c              | 122 +++++++++++----------
- drivers/net/wireless/ath/ath12k/wmi.c              |   2 +-
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |  26 ++---
- drivers/net/wireless/virtual/virt_wifi.c           |   4 +-
- include/linux/ethtool.h                            |   4 +-
- include/net/netfilter/nf_tables.h                  |   1 -
- include/net/netfilter/nf_tables_core.h             |  10 +-
- include/net/netns/nftables.h                       |   1 +
- net/bridge/br.c                                    |   7 ++
- net/can/j1939/bus.c                                |   5 +-
- net/can/j1939/j1939-priv.h                         |   1 +
- net/can/j1939/main.c                               |   3 +
- net/can/j1939/socket.c                             |  52 +++++++++
- net/core/dev_ioctl.c                               |  22 +++-
- net/hsr/hsr_device.c                               |  28 +++--
- net/hsr/hsr_main.c                                 |   4 +-
- net/hsr/hsr_main.h                                 |   3 +
- net/ipv4/ip_tunnel_core.c                          |   6 +
- net/mptcp/sockopt.c                                |  11 +-
- net/netfilter/nf_tables_api.c                      |  66 +++++------
- net/netfilter/nft_lookup.c                         |  46 +++++++-
- net/netfilter/nft_set_bitmap.c                     |   3 +-
- net/netfilter/nft_set_pipapo.c                     |  20 +++-
- net/netfilter/nft_set_pipapo_avx2.c                |   4 +-
- net/netfilter/nft_set_rbtree.c                     |   6 +-
- net/netlink/genetlink.c                            |   3 +
- net/wireless/nl80211.c                             |  13 ++-
- tools/testing/selftests/net/Makefile               |   1 +
- tools/testing/selftests/net/broadcast_ether_dst.sh |  83 ++++++++++++++
- tools/testing/selftests/net/can/config             |   3 +
- tools/testing/selftests/net/mptcp/diag.sh          |   2 +-
- tools/testing/selftests/net/mptcp/mptcp_connect.sh |   2 +-
- tools/testing/selftests/net/mptcp/mptcp_join.sh    |   2 +-
- tools/testing/selftests/net/mptcp/mptcp_sockopt.sh |   2 +-
- tools/testing/selftests/net/mptcp/pm_netlink.sh    |   5 +-
- tools/testing/selftests/net/mptcp/simult_flows.sh  |   2 +-
- tools/testing/selftests/net/mptcp/userspace_pm.sh  |   2 +-
- 58 files changed, 542 insertions(+), 227 deletions(-)
- create mode 100755 tools/testing/selftests/net/broadcast_ether_dst.sh
- create mode 100644 tools/testing/selftests/net/can/config
+-- 
+2.50.1
 
 
