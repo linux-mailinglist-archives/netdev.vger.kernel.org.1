@@ -1,107 +1,131 @@
-Return-Path: <netdev+bounces-222162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFAF5B53548
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:28:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A019B53560
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:31:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BBF6484017
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:28:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73B361CC2BB7
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF69433CE9E;
-	Thu, 11 Sep 2025 14:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0682733CE98;
+	Thu, 11 Sep 2025 14:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ug/U8ts+"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="ZCWq2Dt/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB96A33A02E
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 14:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757600889; cv=none; b=f/IaKOd2Q+FSfohGEoo4enO+JAxofF8yNgLm5LGkd5iKC3WyRwuUaGVbrT/jqcCtd4vfakwoeVuDmRUycgIhpHBdjuG5Ihw2jABT+gekEiTuRcbrYavxPfjunbd1A05JuCBz+BN3z1hmtvbsfu73NGRKtTbLNrsTX/6V4eb6Sd0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757600889; c=relaxed/simple;
-	bh=L8Rv5I9MOtjbqMRwzNPRXdtlZUlDe9OzcwdxyOghTrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I56WZve4VANlbh+OirKx/7G1g1ZKKh/Wji3u7ttWUx/Km+scKfHDcG7kASpUE7/DT5xlQ+Mu+3XDDKIqHUw9LoiSGkj3lW+EY9uhjU09BKFvX80QdjfBuJOovLpVbo7fu3iv7k1INJ8GB5il1Pw1kAf1SBhtKEpRyAWBrbfEoxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ug/U8ts+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nRjM2G6ArmE3OzWIa1LqTN8oIhsvSyu0npA7UOn04Qs=; b=ug/U8ts+cKrcqPIqLwFZTzaCBC
-	9vg9JUSNtnq5EzR5n/bjAzYibej9nRxBd/rylIbeXRsdsCDhH4iL5TCT8jtCFzA6I4rCfZiOehMCq
-	PrirYmZ5xvNzsQzXy84ofOtUywPvcll1ipJ7Z/xZdEc9prOrTGvnSgc6AEPajdyFkueg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uwiHC-0085kS-Ag; Thu, 11 Sep 2025 16:27:54 +0200
-Date: Thu, 11 Sep 2025 16:27:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: shayagr@amazon.com, akiyano@amazon.com, saeedb@amazon.com,
-	darinzon@amazon.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: ena: fix duplicate Autoneg setting in
- get_link_ksettings
-Message-ID: <6500d036-f6ef-47df-9158-529b2f376fae@lunn.ch>
-References: <20250911113727.3857978-1-alok.a.tiwari@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCD122259B;
+	Thu, 11 Sep 2025 14:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757601071; cv=pass; b=AxW569ca/UZ9VVbILIlOHvBwNV5H7uKXnt7AW5X+Rql6M9tRF8W/EPfsAt4+0u5dwKj0umNqXkLGDckr+v7MSZfyBXXW/hKE0/81GePp+AEL/yi2PeCOEWZIQ11kj1c+ysiKl247Dc82LPnlCYWma2mpzVUSOnMK0WYWGU3SQeE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757601071; c=relaxed/simple;
+	bh=ENyo8hlExL0a64lneN3wYIQx9ceQ4J02gvt6LoyVFaY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cmdEz6WnYVzJogjLHGGT7dHaNP7KbvF289LTQcJkzHcILlYjDPF0QXKsM6z7zrgwZLd+F+g2PCd9S7qQ20mvYrJbN1hy57upXwzq3vIE/JFDuhCTgwihrvyXioR96Y5mIWM0rVYgGMvn7z3ubc1chgK4i1tYhhDs3ABzpKPVgFs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=ZCWq2Dt/; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1757601008; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=fKylatfoGlWuRdvSCbn3egSlJ82Cbc81pjdBqhTrxvRWzYzpTEHGB+pEol0MxJFv7cSofmdSTGfeMveBJ4mREx8G0LNwE4bLDqwId4ZgLEBpbzxFN5xNm3TfnYFrjN4gd9GASWxHA6CkqAJFTwF8ahTJVfVL7hALfGHbVQ+PHwE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757601008; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Mt87tHkCDrz9K7C85pTFu77GL3qr/zrL67mBd2f4Ly4=; 
+	b=ggbsi/0msrtWqOmLEDVikyKSGUHKt7JutW13zHhtrhLZBh0iFNMP/iLNtcBHMM8VJQQloVCdWfwAJp/kcnqt5JjF3WtDZmfGJbgZoBeqeXi4CvWMjPiwUzZUx0ukViLgRPnLZVHklPCxqzP1hm9l0qN0YxKWLqXUyk6AsisUGWc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
+	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757601008;
+	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=Mt87tHkCDrz9K7C85pTFu77GL3qr/zrL67mBd2f4Ly4=;
+	b=ZCWq2Dt/O+0lXM5sUN/qed2Rp3/lwSfyQJVEzLijcl+pa7YXFipLOLT0myJB/N9/
+	Oq1o7TaV4NBQPNCrbWbExkBpxQABWH1+bda9C3mCLe1Nwh8zGc7CcC7tk4gO6ltwUvI
+	XH41PpeHAD6HBnluijWBcoUR53jddWzEKR6ukUKA=
+Received: by mx.zohomail.com with SMTPS id 1757601005694334.08530516479357;
+	Thu, 11 Sep 2025 07:30:05 -0700 (PDT)
+Message-ID: <5486a77a-7c5b-4316-9ff9-4cd458fb1001@collabora.com>
+Date: Thu, 11 Sep 2025 11:29:48 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250911113727.3857978-1-alok.a.tiwari@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 00/14] MediaTek dt-bindings sanitization (MT8173)
+To: Mark Brown <broonie@kernel.org>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
+ andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
+ chunkuang.hu@kernel.org, ck.hu@mediatek.com, conor+dt@kernel.org,
+ davem@davemloft.net, dmitry.torokhov@gmail.com, edumazet@google.com,
+ flora.fu@mediatek.com, houlong.wei@mediatek.com, jeesw@melfas.com,
+ jmassot@collabora.com, kernel@collabora.com, krzk+dt@kernel.org,
+ kuba@kernel.org, kyrie.wu@mediatek.corp-partner.google.com,
+ lgirdwood@gmail.com, linus.walleij@linaro.org,
+ louisalexis.eyraud@collabora.com, maarten.lankhorst@linux.intel.com,
+ matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com,
+ mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com,
+ robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch,
+ support.opensource@diasemi.com, tiffany.lin@mediatek.com,
+ tzimmermann@suse.de, yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
+ linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-sound@vger.kernel.org, netdev@vger.kernel.org
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <9401aab0-1168-4570-a0a1-1310f37142eb@sirena.org.uk>
+Content-Language: en-US
+From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+In-Reply-To: <9401aab0-1168-4570-a0a1-1310f37142eb@sirena.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-On Thu, Sep 11, 2025 at 04:37:20AM -0700, Alok Tiwari wrote:
-> The ENA ethtool implementation mistakenly sets the Autoneg link mode
-> twice in the 'supported' mask, leaving the 'advertising mask unset.
+Mark,
 
-These are not masks. They are bitfields.
-
-> Fix this by setting Autoneg in 'advertising' instead of duplicating
-> it in 'supported'.
+On 8/20/25 2:19 PM, Mark Brown wrote:
+> On Wed, Aug 20, 2025 at 02:12:48PM -0300, Ariel D'Alessandro wrote:
+>> This patch series continues the effort to address Device Tree validation
+>> warnings for MediaTek platforms, with a focus on MT8173. It follows the initial
+>> cleanup series by Angelo (https://www.spinics.net/lists/kernel/msg5780177.html)
+>>
+>> Similarly to the ongoing MT8183 work done by Julien Massot, this patchset
+>> eliminates several of the remaining warnings by improving or converting DT
+>> bindings to YAML, adding missing properties, and updating device tree files
+>> accordingly.
 > 
-> Fixes: 1738cd3ed342 ("net: ena: Add a driver for Amazon Elastic Network Adapters (ENA)")
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-> ---
->  drivers/net/ethernet/amazon/ena/ena_ethtool.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Same question as for that series, what's the story with
+> interdependencies between the patches?
 > 
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_ethtool.c b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-> index a81d3a7a3bb9..a6ef12c157ca 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-> @@ -471,7 +471,7 @@ static int ena_get_link_ksettings(struct net_device *netdev,
->  		ethtool_link_ksettings_add_link_mode(link_ksettings,
->  						     supported, Autoneg);
->  		ethtool_link_ksettings_add_link_mode(link_ksettings,
-> -						     supported, Autoneg);
-> +						     advertising, Autoneg);
+> Please submit patches using subject lines reflecting the style for the
+> subsystem, this makes it easier for people to identify relevant patches.
+> Look at what existing commits in the area you're changing are doing and
+> make sure your subject lines visually resemble what they're doing.
+> There's no need to resubmit to fix this alone.
 
-While i agree the current code looks wrong, i'm not convinced your
-change is correct.
+I'm resubmitting patchset v2 with several fixes addressing feedback on 
+each patch. While doing so, I've updated each subject line according to 
+each subsystem log.
 
-What does ENA_ADMIN_GET_FEATURE_LINK_DESC_AUTONEG_MASK mean?
+Of course let me know if this still need some work.
 
-That the firmware support autoneg? If so, setting the bit in supported
-makes sense. But does it mean it is actually enabled? If its not
-enabled, you should not set it in advertising.
+Thanks for your help!
 
-However, if we assume the firmware always supports autoneg, but
-ENA_ADMIN_GET_FEATURE_LINK_DESC_AUTONEG_MASK indicates it is enabled,
-supported should always have the bit set, and advertising should be
-set based on this flag.
+-- 
+Ariel D'Alessandro
+Software Engineer
 
-	Andrew
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
+Registered in England & Wales, no. 5513718
+
 
