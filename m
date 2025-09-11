@@ -1,128 +1,77 @@
-Return-Path: <netdev+bounces-222256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D81DB53B50
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:21:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D066B53C0E
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 21:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B713B487516
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:21:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C516F16291C
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF68335A2BE;
-	Thu, 11 Sep 2025 18:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD17B2DC794;
+	Thu, 11 Sep 2025 19:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y1VT2MDp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MkCyK23u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19EE32A802
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 18:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA612DC77C
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 19:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757614900; cv=none; b=ZMxfTU3ZzJ5k/+FaiLPnyj7BnQFR1AOxA2vFeq2n1i4CqYgfzSAHPiaNF8JSrOS7kdZPe/olkJcNVBN/0AWq3Ka+2l7d3XQF7mCFHnlCsk6YREJJqJBRQb2E57VPGFrYRBy3t7aHpGJKh/tQh4bPIS3ow0uTubwefuh9pAYmUZc=
+	t=1757617346; cv=none; b=bi0g6yKzwsOkYEOT5wAU6uhbzAu/zCP3MKH2Q9dfU4FSod6w24clkndtYjWGiTcJBSc2ffcCrCQTORJrwoWWDSBtdX/AM2yEQO9QiTB9EaYUw8UVim/Z4qAgKkhoDb46OtwymXRiz2QXZDB59E8YdKsCeFDUwdIMMQsKoEd4u68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757614900; c=relaxed/simple;
-	bh=Jd+yBImYmRBiHzv3m5PabL2jPVEDNQq+gQDaCuyIRFo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uq1mQ4liDqe3QOSKTutXnj+J8WzNjm6d7EV1o/K4S5qozVe/vVtCy6lEcIBdm7teWZAqbNNTXDLhzO6dOTDh4ZiU6oo3JAdD7MbEym1wOnDibclfrWCOUDrk+5JS8aLxWDAJx8yXUi5xOat+J/QU1VF/osZ7Y3fJQ2hHVVL1/FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y1VT2MDp; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-560885b40e2so1203e87.0
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 11:21:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757614897; x=1758219697; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Me627Z5tFRIjdXPyBuK6dP+9xV8RNbhF9jJs439CQW0=;
-        b=Y1VT2MDpN3+vJoypPL5+w0xOq+GhK/IAz68BtVuPz0UKuddXSuoS5uRg63aRPaRevw
-         Rz3x29mHjm9hW8751FkvQOpEodSdz/jJnh2E2xhdi+8z+DYsV8rS3igeDTCpnjWoYSDp
-         0QejVQVaBzZz3VlGyle585ZOV8P01EeG/Cnk/nx/tKOI5SOLVvmClh/f+NsaH+Mt+9R/
-         abCPICGw/bDpGQOOfNVRb1g/BrgDIICQBDZV5xe+KH3DHHhJpC8Ae2CB+v+D1KbqJbX+
-         uXZ5+atMqaat0ygagmt196woUME4W3JfGwAvB/KYX1a2SiPB1FZr/h9PM1RNLsq7lcVZ
-         CT/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757614897; x=1758219697;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Me627Z5tFRIjdXPyBuK6dP+9xV8RNbhF9jJs439CQW0=;
-        b=s0d8FKLEz2uo9jobr9b1xkWgLdkxm1LsCvsdZ5y6w7HygWpLlfIso8wOw17su65F0w
-         JkJQpJZBSz0Rk05Lc+lmBy+SyuoM91BIwTYFv2cfMu3OXLKWnELw3Zw76rA4/VILWA8U
-         UNIiXl8mpndKQxrks8GOBl08WFgthF+Sq4+PTBeVGDeki580HBfRZbQPeLc8rzsZ71Li
-         TKuzRgoMXpJ1zqzY5ouEnDLrLjN0vBPWvdtmyNOXULkw0n4eN6E7Cmkc9FecYIszjOxG
-         YZBiHoGPa5kvGTcNkdMxbkH4EN7knLZafuYef7ClYyRrtrlCLeDmajRPrvvDQP1teaEs
-         6P9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVhlIKtDcAmevUrK+z68vWqCotVc/8CPDc+eV6/iZaVWjysE9qCD7iy0njO/6TvwO9OJmruCV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzsZPDvJYtiYZq/OctcLK1/HS3fU60r7pOtd3+BUIehZVfs+Bz
-	KFaGwQwa0Oql4svBC6sKVkh1m/zfg6Udg3TQEgAGN5FhaFJJ/E5Ym2Uh6YdbcR/dsIxx4StzbyP
-	ZwEq7B3tsGmoj/nAWHUGpzqormnyGn5N0hjXao7Vx
-X-Gm-Gg: ASbGnctnCYrjTfIHeBZRur/ee7jpYvFlISVhG6I+j5hw14e51b2VleZx0EJkTygHvqm
-	3SVccNJX1ATKMR9ouTI6NVY9DluM1ufdNf+Wrinujqrfnfe6pLWqnmavFyZrR0XCqQkdpKdxvII
-	nOkcUja5PDi/NMqM49WjySpx3zObUHYkv2UUkXoHZ2WXn9WFWcxq69VkzDVN9+7YoC5GBEj+7Th
-	mf9dbaxLSqM2inAYwddQH+R4acZd9QQk0TcaCSxwnG5okhUrWGbooQ=
-X-Google-Smtp-Source: AGHT+IHHliBGfbHylygVzksb7a+0fT63+QPDYN2pfiTQHYKdZKJlxke6/Q66YsWbEXxii3rtonP041JiTf4sxs1EYhs=
-X-Received: by 2002:a05:6512:108c:b0:542:6b39:1d57 with SMTP id
- 2adb3069b0e04-56b3d403120mr647519e87.3.1757614896510; Thu, 11 Sep 2025
- 11:21:36 -0700 (PDT)
+	s=arc-20240116; t=1757617346; c=relaxed/simple;
+	bh=CV/viJpcmWCQfSZOEaoViEoomF90iOdOtLLTr5lL8aM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RzaaSLAQOXgBBnR3dKsLgCbmHxvEoQPuv/tVAxodprLJYvQ6ZrFczYvH+WfU+uDu/HVo9l0PqiA3GcHMOu3eygjRPed84Sq3Y0DzJlr3TWo17QhGlfS14q4dYMxsx5LHBSCCLfZ7I59E89HeZwLaS0kn1UgSYS2PE7mLoPzr75I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MkCyK23u; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nZsrZe1y8qCgCTG5/3LXrcsXtTwDVb+psjvDFy+cWFY=; b=MkCyK23uJBSzSJ0ObZ2BvzL1VG
+	ZWy+B7+TkV+TQd6SpTdRSUZW+SSTT1J8AfAhPrGSUuHycXU2IaesCb+gD/Zl4kaOIpcpwk+vZ0q+Y
+	nCOp3lbzWPNp8zfhbbz3ZW5p6l+UX+N7yTblpFbGMl6SlrN5PTWp5DZtJekitr85Kos8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uwmYl-0087mG-I8; Thu, 11 Sep 2025 21:02:19 +0200
+Date: Thu, 11 Sep 2025 21:02:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+	alexanderduyck@fb.com
+Subject: Re: [PATCH net-next] eth: fbnic: support devmem Tx
+Message-ID: <55352354-2468-42e3-b5e3-815712f83ecf@lunn.ch>
+References: <20250911144327.1630532-1-kuba@kernel.org>
+ <CAHS8izNHRmcuw=Ya4UC_QdtyJ_z_vYiHEWKRk1f6gQ5hdwXODw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911144327.1630532-1-kuba@kernel.org>
-In-Reply-To: <20250911144327.1630532-1-kuba@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 11 Sep 2025 11:21:24 -0700
-X-Gm-Features: Ac12FXyFPo7XyGsAWGFghU6c8_EUB3u70sLxG1wSVRjNUdKgII4yZGLxSxNbPm4
-Message-ID: <CAHS8izNHRmcuw=Ya4UC_QdtyJ_z_vYiHEWKRk1f6gQ5hdwXODw@mail.gmail.com>
-Subject: Re: [PATCH net-next] eth: fbnic: support devmem Tx
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me, 
-	alexanderduyck@fb.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHS8izNHRmcuw=Ya4UC_QdtyJ_z_vYiHEWKRk1f6gQ5hdwXODw@mail.gmail.com>
 
-On Thu, Sep 11, 2025 at 7:43=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Support devmem Tx. We already use skb_frag_dma_map(), we just need
-> to make sure we don't try to unmap the frags. Check if frag is
-> unreadable and mark the ring entry.
->
->   # ./tools/testing/selftests/drivers/net/hw/devmem.py
->   TAP version 13
->   1..3
->   ok 1 devmem.check_rx
->   ok 2 devmem.check_tx
->   ok 3 devmem.check_tx_chunks
->   # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> It seems in your driver you have a special  way to grab fields via
+> FIELD_GET
 
-For most of the netmem stuff we've tried as much as possible to keep
-the complexity and type casts out of the driver and in core. I was
-hoping the driver can avoid mem-type checking and special handling. In
-the case of the tx path, the helpers provided are
-netmem_dma_unmap_addr_set & netmem_dma_unmap_page_attrs. If you can
-use them, great, or if you can improve them so that we don't have to
-have per-driver special handling I think that would be good too.
+There is nothing special about FIELD_GET().
 
-It seems in your driver you have a special  way to grab fields via
-FIELD_GET and that's why you can't use the common helpers.
+~/linux/drivers/net$ grep -r FIELD_GET | wc
+   3724   15584  331380
 
-But this approach is fine too assuming you're ok with a bit extra
-complexity and mem-type checks in the driver, so
+They are the recommended way to access fields within words.
 
-Acked-by: Mina Almasry <almasrymina@google.com>
-
---=20
-Thanks,
-Mina
+     Andrew
 
