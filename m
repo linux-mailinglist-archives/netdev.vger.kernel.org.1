@@ -1,194 +1,155 @@
-Return-Path: <netdev+bounces-222005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB4D2B529C1
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 09:22:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E953B529C0
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 09:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 624CDA024D9
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 07:22:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C002E1B21E50
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 07:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDD126AAB6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB742698A2;
 	Thu, 11 Sep 2025 07:22:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BP0dghcv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOoqW1bD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD1E22D4F1
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 07:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE21214A97
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 07:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757575342; cv=none; b=egjIBmmbb0TQIENW/Wdx+z9Y/GLTtmoqWbxJAxmpLY8BiVGkKk5jZe9PM13glI/Pd/1orQPghjtLTBdPmMDDQ4wc6bqnUlq88SWLQqb7DcZp08AQ6Bjvvvjn07WkXV+XNTig0MjjQbpQsEjjHPCg4WPKbZpnQ4sJYUcUQ3rG4uY=
+	t=1757575342; cv=none; b=RqXZWxjGBjKhaftZFyQsWd+iyx9TBRj7hYOxzflc/7s471Wh3vLIAn8AZwlGnXjUOc289jz4Xw8S3IADhCwDRlRlnZl9BAN76DHsKR7+b2wk3Qpt1x0PI6xdfT+ZIGThFXTiHxD0cdvK6cR+4Xibn6sNIAgm4Ts2RWbH84Lbwww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757575342; c=relaxed/simple;
-	bh=MLuilW7Tf9Dno/7YBATXESI/1zTrs/0ck7+Glf2DvQc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=Cf+n4OBuajpqlpMGNiwfBLc/qdr9mk1yGzQ2Pn0tokjG+1DJtWaIp5JjCNA6/9GKzumfYX6ZwUyYks+oZErPAH7tOY4EmGR1E9R35T1DwXUM6ZDVTiF56JTMiKWCk4LG7sMXDrOED5wq0XBPdIpTcvcm02El4VCqUMbkXK3yvyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BP0dghcv; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 90B931A09D3;
-	Thu, 11 Sep 2025 07:22:18 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5C391606BB;
-	Thu, 11 Sep 2025 07:22:18 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 96128102F2882;
-	Thu, 11 Sep 2025 09:21:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1757575334; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=ymIxetTWocC2/T6DcUZLUqfBudVyTjFDiSDhCwPR4IA=;
-	b=BP0dghcvk2HqRbfKQS3O7ySBOrhO100W9n5AqVrR5PeKtATxfQw0Fg34/tSl45/GNCqkB5
-	4YDn3TU+esRYKH/S7xLXUPXNvWIRKopAHuqEnYhzTqOUVbkXD55NDWUtJs2pjGQaJesftt
-	4UyhJvGAks1d4dAvYXnQCbrr99n+3bCVBOl1UC9ecNzEoDjWRsI8lWbZQqgdjHlJEaAybm
-	wVUUwXjiHFuXkBHSHLPSqCRtPjtCqbF4BeojkAze1q8uA62pIfkwavllHdygrvVrct1wTr
-	rgMfHHXK5dOG9RdqE9rA5g4ojdhyInfMVW5tD3BRfmQ2KzRRrXlhsvcwN2UlPA==
+	bh=ZWaN7YsA4DMy2XRDp49IiuKAKtTkNWybbq8m1ORlV/c=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=DCphA8oZrU/50gLJ7kJoOxz1OlLE2boodmnTYGgynIRwiB5vAVfVUXRE1UGl1VmM/LIupYLxF7G5xCUo2nlONb0srcBfOuSKieKReBuQhAtj/S/FCXbpfh2NHjciUBDxm8JO4rlAhoiBYR7+1UjfjlX2O9+4Fr1uD9lgUDRdPG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VOoqW1bD; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45de6490e74so3503345e9.2
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 00:22:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757575338; x=1758180138; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:to:from:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iBZDug7B3a6KZhOLQWyC0Abrerybwc7sC4SOlNu+UcM=;
+        b=VOoqW1bDxpQoJRa2KUEmLv6ktm8YwJYEh5D9gC7TdwhY3HSjtzv/jf4ZU3Wp8t443X
+         OPfaPd+Xao2lEXKnksBq2ZOU4VmxNbQ7wQwlL7WkQ1SZme21+kCUTIHD1TQb7lyL+jjF
+         jBSU4WvKZz5ea26FfFVJbOcyx3g4Dazf4Y3w1sbs/YWOQw75qI86N9vfYIfZcwM6Ghk6
+         R+bMQj05sqI0lZyLgeyn6SVYnGMC2rVdPVKNJN3BjnjB1n5ea1q/kdIV8ate6aR2f1iN
+         ZqFANIoI2q560N9yeYJ6QyCsdxhivS8YHO75rYF9yUObM0GJaO/WBAexjUwvUmfFiFN+
+         cKdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757575338; x=1758180138;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iBZDug7B3a6KZhOLQWyC0Abrerybwc7sC4SOlNu+UcM=;
+        b=q+ihfUmNSfuybUTVxeIw/EAUoYg5zexYl0qzPPSVrWihPW5QYhRBRL/LAYfsEmaK1h
+         i7lC0PZJUAPA+rebu8fqeMmmoVi26X+KwR9iJ2LWlQjgQfhNecO1Z6lRnU+1fSk/KvFZ
+         kgYKWCxr8Yz8GjxHQpq7ZNnnyoadc8/4D/Pkpiy33XkblR8fk4+KBApcpGnep91Ed25q
+         g4K307r0z4WO6PdKNnvQkts86ivLktSs+tDdPss34vPnRhfxuULOGKBxBtCZUMcZ27wQ
+         7IXqMuH7KhOLu7/ZwYDI+OkFZmEmGTNECslwbAKI6ekvt9HQRJjhtrG3UoCsO8AZ0lsZ
+         dDMA==
+X-Gm-Message-State: AOJu0YwwzuaIJmglObOgL/BWeYs9jzu9eDGZUOTGDAd7F2JxAjsgs6XG
+	I4mubmJTArCRXG6fP/Jm8Dd1DPAUePHBBo7VgKAKYVlXz8bcZGefTzFJSP3bkCcc
+X-Gm-Gg: ASbGncsdpKH9Txl8t2OKGNa6lQ/CWrCJgLsk9Y13huW1MIfdEjKQyr4YYijhzpLA2SS
+	hZdQQNiJ/Awsjw5ZEQHNtZVXiZh+sEuMPEbgGl1/SmPmqRWJxssVemmB7k+RwhULNwq+JvQNOLd
+	AbHn6WwQizVUH29Nk6iffd/bVOyskYlVsnuyK8FzqS36pYzXeVCSLVEzvXANsfr2DgN0z9HRCYc
+	+GL0j5ZXZl1/Fq6qKzlh9kTaWKdPdNSYMIqrDhbUNxXS6qIJ7l3N/oDy5NpdRa8J370gonyjtpb
+	wZ4n9FIlJvdrl0l7Qp9Rrg3iUXmRY+bHp9A+8uKiFQCa+vuBELroTWF8aWJaCPYa1PaRAy6HhuE
+	rIPjwk5z64iUXHl1CMSd2fb5SJAX6RpCBKsN4wj5v3O8KAX6VDRKj/YGAckm5dLTZtcJWtOIwZU
+	zaRIB0d4OIPYx6JlHIZ2MvwnhM30Rp1UxFtLwdOLSDxu2bzfP1e4PV32ApGJOCoA==
+X-Google-Smtp-Source: AGHT+IHz5V7nV8JBl91x1wAz8oXQZ/wriSZAbpgenGV/u8zJ6gkd3CH7anEVb0TSQOAHW6eGajD48g==
+X-Received: by 2002:a05:600c:5248:b0:45b:7d24:beac with SMTP id 5b1f17b1804b1-45df73e889emr57541185e9.10.1757575338041;
+        Thu, 11 Sep 2025 00:22:18 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f4f:5300:882c:6330:ec22:3cc3? (p200300ea8f4f5300882c6330ec223cc3.dip0.t-ipconnect.de. [2003:ea:8f4f:5300:882c:6330:ec22:3cc3])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3e7607770aesm1335638f8f.6.2025.09.11.00.22.17
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Sep 2025 00:22:17 -0700 (PDT)
+Message-ID: <fe09b79f-7d87-4fc7-b0fc-f594c6eaa440@gmail.com>
+Date: Thu, 11 Sep 2025 09:22:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/2] net: phy: print warning if usage of
+ deprecated array-style fixed-link binding is detected
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <964df2db-082b-4977-b4c9-fbdcfc902f9e@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <964df2db-082b-4977-b4c9-fbdcfc902f9e@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 11 Sep 2025 09:21:34 +0200
-Message-Id: <DCPSFZLWJLG7.1B4NISSDKLWBQ@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH v2 1/5] net: cadence: macb: Set upper 32bits of DMA ring
- buffer
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <linux-rpi-kernel@lists.infradead.org>, "Broadcom internal kernel review
- list" <bcm-kernel-feedback-list@broadcom.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Florian Fainelli"
- <florian.fainelli@broadcom.com>, "Andrea della Porta"
- <andrea.porta@suse.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>, "Phil
- Elwell" <phil@raspberrypi.com>, "Jonathan Bell" <jonathan@raspberrypi.com>,
- "Dave Stevenson" <dave.stevenson@raspberrypi.com>,
- <stable@vger.kernel.org>, "Andrew Lunn" <andrew@lunn.ch>
-To: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, "Nicolas Ferre"
- <nicolas.ferre@microchip.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Stanimir Varbanov" <svarbanov@suse.de>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a-dirty
-References: <20250822093440.53941-1-svarbanov@suse.de>
- <20250822093440.53941-2-svarbanov@suse.de>
- <20250825165310.64027275@kernel.org>
- <3bccf773-abd6-4ade-a1c5-99f2a773b723@microchip.com>
- <DCPA2BR78XM8.HWKZZ8WQF3S8@bootlin.com>
-In-Reply-To: <DCPA2BR78XM8.HWKZZ8WQF3S8@bootlin.com>
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 7bit
 
-On Wed Sep 10, 2025 at 6:57 PM CEST, Th=C3=A9o Lebrun wrote:
-> Hello Nicolas, Jakub, Stanimir,
->
-> On Tue Aug 26, 2025 at 11:14 AM CEST, Nicolas Ferre wrote:
->> On 26/08/2025 at 01:53, Jakub Kicinski wrote:
->>> On Fri, 22 Aug 2025 12:34:36 +0300 Stanimir Varbanov wrote:
->>>> In case of rx queue reset and 64bit capable hardware, set the upper
->>>> 32bits of DMA ring buffer address.
->>>>
->>>> Cc: stable@vger.kernel.org # v4.6+
->>>> Fixes: 9ba723b081a2 ("net: macb: remove BUG_ON() and reset the queue t=
-o handle RX errors")
->>>> Credits-to: Phil Elwell <phil@raspberrypi.com>
->>>> Credits-to: Jonathan Bell <jonathan@raspberrypi.com>
->>>> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
->>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->>>=20
->>>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/et=
-hernet/cadence/macb_main.c
->>>> index ce95fad8cedd..36717e7e5811 100644
->>>> --- a/drivers/net/ethernet/cadence/macb_main.c
->>>> +++ b/drivers/net/ethernet/cadence/macb_main.c
->>>> @@ -1634,7 +1634,11 @@ static int macb_rx(struct macb_queue *queue, st=
-ruct napi_struct *napi,
->>>>                macb_writel(bp, NCR, ctrl & ~MACB_BIT(RE));
->>>>
->>>>                macb_init_rx_ring(queue);
->>>> -             queue_writel(queue, RBQP, queue->rx_ring_dma);
->>>> +             queue_writel(queue, RBQP, lower_32_bits(queue->rx_ring_d=
-ma));
->>>> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
->>>> +             if (bp->hw_dma_cap & HW_DMA_CAP_64B)
->>>> +                     macb_writel(bp, RBQPH, upper_32_bits(queue->rx_r=
-ing_dma));
->>>> +#endif
->>>>
->>>>                macb_writel(bp, NCR, ctrl | MACB_BIT(RE));
->>>>
->>>=20
->>> Looks like a subset of Th=C3=A9o Lebrun's work:
->>> https://lore.kernel.org/all/20250820-macb-fixes-v4-0-23c399429164@bootl=
-in.com/
->>> let's wait for his patches to get merged instead?
->>
->> Yes, we can certainly wait. As RBOPH changes by Th=C3=A9o are key, they =
-will=20
->> probably remove the need for this fix altogether: but I count on you=20
->> Stanimir to monitor that (as I don't have a 64 bit capable platform at=
-=20
->> hand).
->
-> I when looking for where this patch came from.
-> Commit in the raspberrypi downstream kernel:
-> https://github.com/raspberrypi/linux/commit/e45c98decbb16e58a79c7ec6fbe43=
-74320e814f1
->
-> It is somewhat unreadable; the only part that seems related is the:
->
->> net: macb: Several patches for RP1
->> 64-bit RX fix
->
->  - Is there any MACB hardware (not GEM) that uses 64-bit DMA
->    descriptors? What platforms? RPi maybe?
->
->  - Assuming such a platform exists, the next question is why does
->    macb_rx() need to reinit RBQPH/0x04D4. It reinits RBQP/0x0018
->    because it is the buffer pointer and increments as buffers get used.
->
->    To reinit RBQPH would be for the case of the increment overflowing
->    into the upper 32-bits. Sounds like a reasonable fix (for a really
->    rare bug) if that hardware actually exists.
->
->    This wouldn't be needed on GEM because RBQPH is shared across queues.
->    So of course RBQPH would not increment with the buffer pointer.
->
-> If this patch is needed (does HW exist?), then my series doesn't address
-> it. I can take the patch in a potential V6 if you want. V5 got posted
-> today [0].
->
-> [0]: https://lore.kernel.org/lkml/20250910-macb-fixes-v5-0-f413a3601ce4@b=
-ootlin.com/
-
-Coming back after some sleep: my series does address this.
-It updates macb_alloc_consistent() so allocs look like:
-
-   size =3D bp->num_queues * macb_tx_ring_size_per_queue(bp);
-   tx =3D dma_alloc_coherent(dev, size, &tx_dma, GFP_KERNEL);
-   if (!tx || upper_32_bits(tx_dma) !=3D upper_32_bits(tx_dma + size - 1))
-      goto out_err;
-
-   // same for rx
-
-In the MACB (!GEM) case, bp->num_queues=3D1 so we will check that the
-start and end of the DMA descriptor ring buffer have the same upper
-32-bits.
-
-That implies macb_rx() doesn't have to reinit RBQPH/0x04D4.
-
-Thanks,
-
+On 9/9/2025 9:14 PM, Heiner Kallweit wrote:
+> The array-style fixed-link binding has been marked deprecated for more
+> than 10 yrs, but still there's a number of users. Print a warning when
+> usage of the deprecated binding is detected.
+> 
+> Heiner Kallweit (2):
+>   of: mdio: warn if deprecated fixed-link binding is used
+>   net: phylink: warn if deprecated array-style fixed-link binding is
+>     used
+> 
+>  drivers/net/mdio/of_mdio.c | 2 ++
+>  drivers/net/phy/phylink.c  | 3 +++
+>  2 files changed, 5 insertions(+)
+> 
 --
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+pw-bot: cr
 
