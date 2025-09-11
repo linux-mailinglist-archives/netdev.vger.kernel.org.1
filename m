@@ -1,242 +1,380 @@
-Return-Path: <netdev+bounces-221968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-221969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580FEB526EC
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 05:13:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC517B5276A
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 05:49:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1ED9468486
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:13:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8257AA0060C
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 03:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FF9223DCF;
-	Thu, 11 Sep 2025 03:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADEF23D7FB;
+	Thu, 11 Sep 2025 03:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="10dDHLp0"
+	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="XghQlNvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2060.outbound.protection.outlook.com [40.107.223.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E95C4AEE2;
-	Thu, 11 Sep 2025 03:13:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757560428; cv=fail; b=f4s9AwAfKVYledZESgEFjHJaIoP/0oVm9wg1mMO/wq1xuAKJlb2cIBUwCEDJ1Xj0ZBl3OobydCISzH1oiwJsQ0zCRpQ7yiSJuNKT1wICKxXpvGZx7BpH60XZ2zrR26OP83ffftPFKtbCHfrXi0d5fzI/2MMbKEioTxsSGeWXyTI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757560428; c=relaxed/simple;
-	bh=hWpXBjuLA/jjRBOYD7ChYutpKUMX1yUeqTVFFN1yipw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=NEgZLJGKcgE+dMYi3GwDLVC4AJVS+at7i0i9Sj5lhJ6dU9x+hTSsa+Nfa2vv11RVUgTuEDS8Oxag7V35MCD2bbcLjbFwMsEaTW7y+kykxrDJfUNnFmg1A6eDdX8X8BGT2D17CqVCa8szy8me40MSwR9iJOjQTJcOHpcd7VdpwOI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=10dDHLp0; arc=fail smtp.client-ip=40.107.223.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KYz06rdTx9eMRImXJxlhSJ3r3sFn+XaWmwrV+VJ+U8B1uQYZzDGPjzmYsjzhX2ciFNd835Ra2IdpIocz3DP58QrKZXr4DtVpgJoSyB9D7XRyLC9ebWfNUzoLOBcoYHhZA2eqTIGoWyEaZ3nHXZ+07ipHwvHjRTeSOODteegYxW6vGzjDsGAudqj94Z+T9/D6RFo8sJutkJoIe5REUwOCyRCN4avTQdX74NKRsD3qtlQeiwvNMi+IZyrqvmwvU/m6haMx9x70vvNrsYOjM8dGkJn7Pol2Tqkpg1EQF3wsKWgWeLmnWa6OoOEkBKT2y1+wW15S+2oRlIQ351hyIePEEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cuB7RsShioQ7IAm0nBgCLj3rV0piVvqJHStYWnwKTFU=;
- b=ttGCpR+MO3PRXNRGArLjB5cstqYuiAmUgkKcBi1U+rTFlORi1n59kgBndJVLVkg7PjN47+49SiLHiErKD/8xCI7s9pv+f9XH7UTRpxMamWjG3cgLadsxlxd9sEWIxiUfTj/M0RYvKZ+TS7unZrermOMheHR5ztC/zYCxMQolv0y26uWdTBnMxJnv3Q29xezRyOsujDXB4/NRxCkDyQ7EHVSFN+TCou2x5Ls2ueH104azX4s/xI7kU9HB0DL3yoqDf9bY4mlFVZBV1PGmlShfNUMvnAXmbtps8CC8YKQqXp+CNI2FlzgQ1lOXvR8TnR/cJRS66ZObmHPBuwbWo/wsgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cuB7RsShioQ7IAm0nBgCLj3rV0piVvqJHStYWnwKTFU=;
- b=10dDHLp0nG4O7XjNT4ToQqi0BWOAx2YFbT1c0SoSIsOheKqTvpboY2ARl5bQw+VQDr0FYIMb0Y0Tf8QmRu3KLl0UahbkdCxLTLvOiW2t3VvPWMHddJWZue6+nVf9NDc8YpfHjMCYabSaT3YVykXeYbG6vETcLcL2lK0oZUEty9I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8)
- by SA1PR12MB6948.namprd12.prod.outlook.com (2603:10b6:806:24f::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.33; Thu, 11 Sep
- 2025 03:13:44 +0000
-Received: from BL1PR12MB5946.namprd12.prod.outlook.com
- ([fe80::3e0f:111:5294:e5bf]) by BL1PR12MB5946.namprd12.prod.outlook.com
- ([fe80::3e0f:111:5294:e5bf%7]) with mapi id 15.20.9094.021; Thu, 11 Sep 2025
- 03:13:43 +0000
-Message-ID: <17d518ca-d35a-4279-b4fe-6930c5e279cd@amd.com>
-Date: Thu, 11 Sep 2025 08:43:32 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5 5/5] net: macb: avoid dealing with endianness in
- macb_set_hwaddr()
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Harini Katakam <harini.katakam@xilinx.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Sean Anderson <sean.anderson@linux.dev>
-References: <20250910-macb-fixes-v5-0-f413a3601ce4@bootlin.com>
- <20250910-macb-fixes-v5-5-f413a3601ce4@bootlin.com>
-Content-Language: en-US
-From: "Karumanchi, Vineeth" <vineeth@amd.com>
-In-Reply-To: <20250910-macb-fixes-v5-5-f413a3601ce4@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0009.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:95::17) To BL1PR12MB5946.namprd12.prod.outlook.com
- (2603:10b6:208:399::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE28C226165
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 03:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757562541; cv=none; b=WFHQLi8pva+4IEsaXD0nKmsLx7lIz+fG4qBXzCVO/ocv03SaAb2LDsMOz1//xRBsrG+LkUHC75Ti2kwQQkLIlsC2lvwdt8gIqORpwiKTvUG64vKH5SJypfjp1DkwTBU0+Zx4qv1duWcP0RZNtRj+b3w0hnam5yYGcIiZooLzSxk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757562541; c=relaxed/simple;
+	bh=vaqhmjYuJa8FnmKBFM+xfprZ1opCDsIvIx2kmEnfcKI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=livP++HY7bcSFjmShhdnqYo9/A7AYecU92v+XPeOYc8fn5XdTCZyw3JqEv55BITRtd9XnZLUjguro8zU2Uhz/HOaWwyN4n+NrjHt44o9tS/WTT6MswiP+rGNx8nli5X9X7ovzze1i5Bqjm0voAV9DojAbjlScJm0IlC0p8qkpAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=XghQlNvj; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=allelesecurity.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3277c603b83so147678a91.2
+        for <netdev@vger.kernel.org>; Wed, 10 Sep 2025 20:48:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=allelesecurity.com; s=google; t=1757562539; x=1758167339; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UN5jIb4+ERpPOs5ItKoedMNqKnz41tpYSoUnnc/bxAI=;
+        b=XghQlNvj5WgA/0okLcy/gpnAYdUQZg240fbTbSfzwCGaB2SuI/W2kF1/5TE7CnFgV1
+         HUaoOx1CjvNCs5OjjhIUxPdwDQxgWjjODQUNJK9PPXu1VV7+Y/pQ80Nge4NvKSIsZlLc
+         RMMrxFhgaYYw2AOfBOCUGdKl6Inu3pDfoOBqg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757562539; x=1758167339;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UN5jIb4+ERpPOs5ItKoedMNqKnz41tpYSoUnnc/bxAI=;
+        b=rHUtBdsXcwh+En1UWNS/j9oPSBMffc7yD7d3U4RyvIUSk5kGtdmOee1LCPe6sUUAbk
+         HwijYUmmfrMJuxkMcLzNHRF4XR8Era/8y8S0OHDaAjVd7NlmxdKLF1IUcvbh1gdlxeHu
+         KwE99z3IwJAPYPPXHvedMAj6OsTPajJaBk+zthDY0D/UWsi9xJlK058P7/NmbWiecHSj
+         IfHbHv5LlOdneSiIOcQe2l0+q9RbM0JnQmdZmJRfdfbMprrqu7yqLV1fQo9gcP+d2HNf
+         Tqg/PB7xM/tUlb9pvkMxVH1Y1IymkxidiNyYxdSmAWt9otnMOH3t9tVKL7I14sakewQo
+         SQvw==
+X-Forwarded-Encrypted: i=1; AJvYcCXecJq0l+yysKGtdQuYmhjHy9nx+3d7oCEGoC4z0+luGy13TWuQ/okVF6isj7XyNmSLPsgjQuY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTUdzgKwCRpuOWrzAroPGSaN7WtLz96Jc5mAL45rdpdqrxJ71d
+	2WeY61R9G7nyzFxpDz+tE+JU41CeLQA/vY49mnisr9gixGi5goqAeg+Gbf5EbTUwHDA=
+X-Gm-Gg: ASbGncv39Su1c5qX6LZZ3xma6HxGY8LHuvZdralBwuBP6O6lFOThSgQeSARaj0oRVlm
+	A/VM9XQezcOI7gMxWnkGBjTpkioEIrAQPWYNoYxz+bmtT9ckt20XsnIUVrwH5moEK0clYhlD7rk
+	RjFsajrEzFccpKnp3PUNzfybo08FjZi2FfXbAMSSuICf54SuxGE0wXyIb5KqHmRwL0r4udlpLX9
+	jTQAaQfsg9IqNlaiewi3TboMLVx23ZxRvxGB1fTBnLXSmeJgAc/8vwIDo7rZ8S9Es78lPsOomJo
+	6UlDn+qEypv64dQSCB4Gcpg/rHKefWRMwa4mDySSdM1Z7P2ZjyMrFOi3Y6IzGcZV0P97rkzb3bu
+	xrYb5qRTZBlu+WFEdeFlmxo1XEm9035eaZNStehu5hsy2FbhnF0BPNxN10P6bBPwLJAez
+X-Google-Smtp-Source: AGHT+IGFis96LLHrCzd5HAV/O1bcCF903alPFEbkR7YbnMs6hbWRbHhHi6lj9RRfvxTMX3t4WNbkZg==
+X-Received: by 2002:a17:90b:224c:b0:32b:6cf2:a2cf with SMTP id 98e67ed59e1d1-32d43f00752mr22711785a91.14.1757562538893;
+        Wed, 10 Sep 2025 20:48:58 -0700 (PDT)
+Received: from fedoraserver42research ([179.105.152.82])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32dd61ea9e5sm871339a91.4.2025.09.10.20.48.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 20:48:58 -0700 (PDT)
+From: Anderson Nascimento <anderson@allelesecurity.com>
+To: edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Anderson Nascimento <anderson@allelesecurity.com>
+Subject: [PATCH v2] net/tcp: Fix a NULL pointer dereference when using TCP-AO with TCP_REPAIR.
+Date: Thu, 11 Sep 2025 00:43:38 -0300
+Message-ID: <20250911034337.43331-2-anderson@allelesecurity.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5946:EE_|SA1PR12MB6948:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3dd06e12-d887-41fe-8508-08ddf0e136e8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eXp5V2NlNlh6bThxdmNDWmVQd2FPN25jMVloQkZtTVlnTG1vK2FLaGdtcy84?=
- =?utf-8?B?Wk5HSFZwTU1lOXJSeldPRTBDWmJBelNneitycmdYRGMrb3NHUnd4dUxMS3FC?=
- =?utf-8?B?MUpHSklCZS9qM3RFR0dtYm56c2FJd0ZMY1p2YWhVeEQxTHpwM2syZTlTWUF6?=
- =?utf-8?B?K3lQUXNFSEJEMXRJZVVmVUhTc0liNHZnMVJRelFDSWNlOHRKdWQyV25UYXNW?=
- =?utf-8?B?d05FVEhWOVAzSUNTWnJxLy9CRlZlWjluZnJjRmZ0T1dpLzYyM2FzU0JzNThP?=
- =?utf-8?B?RWxsMm5tUjBkSm9ySjZOUng4Snd0NjErb3JWMmFDRElvUFNoRlNhRUVqQ3dG?=
- =?utf-8?B?YXlRdGhCT2lKMHVrTG5UWHhYSENORExkenl6TnlPUkw1MU0rK2pTZ1JTMU1X?=
- =?utf-8?B?RU1OMXlack03S2JVaGdEc2I5WVQrOEt1bXpVTzl6OUlVMW96eTBsbE9zTzdY?=
- =?utf-8?B?MFQ1bkE2SWpqcHk2MjM0T0s0Z2FsS0s4V1ZPbzRWa2dTZXY0RE5GeUJtR2Ft?=
- =?utf-8?B?RTdVcnJKUWFvRDFXMFpZNWFpRTFtU0g4a1NjZW50TVRPekFOdW83cmFZT3Jr?=
- =?utf-8?B?OUx5U2xURzBGQ01MamhLT1hrbnFIc1UxQlRDelI1ckZsU3BmRU1GYWVYRWts?=
- =?utf-8?B?M3F2VlZQVWVpV3VJRERja2I2MUpvSDB0dDh6SW1vY0VUM3BPVUN1Y2o0Zmkw?=
- =?utf-8?B?bnZIc2QzU243UVhnSWt5ZkE1VHordG55N2RhV1VuMXdDYkZNeWpYcW5LRjZB?=
- =?utf-8?B?c255OVBSSDRUbTNwOEY3V3YyOFM2bWlRa1VlMis0WVAvZXN4Wk85SVU1T3ly?=
- =?utf-8?B?ZjhlWkJUdHBpRWUwTTFpc3NaSHdTNXFnanA3d3VaUjVPMTU5NEQxNEpDZmxW?=
- =?utf-8?B?VlFDRXNuQ2tBdTMwREgrNFZvYjUzQklNTFlmcjNIQ292UHVDcUl6aUJmRG5s?=
- =?utf-8?B?eEpNVFp4MjBrWno2U1NNd2FheW15WW5NNjJsblorUEpkc3JIQnFuKzFmM0dJ?=
- =?utf-8?B?Y1pPM0xvVU5VQ0NjTis1dmFXUWhUcFVNbDV1OFBFc2plQ0pBY1FQR2RtQTVI?=
- =?utf-8?B?cFJUbkZkZ2hVYVJTWnFPN1grSHIwUnIvdUlzcUg1TnhmZ2FqN0lzbzVLYWht?=
- =?utf-8?B?SEhaZlZNUzR5N0hUdTNUelJtc2Y2dWNPWlREYnE4SGJKUXFRTmVMaGx5dTV5?=
- =?utf-8?B?Zm5odlNRMEU4eGdmdTZGcVV0d2NUYnZqd1lpUjFMMlZ2cFZ5U25VK1R0RkJv?=
- =?utf-8?B?NWFob3FmZGF3NVFNZEVmbFhwUjdVK3NuYUFGSGF1SE9VNXZaRm1WK1BQRmh1?=
- =?utf-8?B?cGwrQ2xFSnFxQnU1VWZpZnR3K2xBcWtGd2p3MGJoOWs4enBwb0RvMXZLY0ti?=
- =?utf-8?B?QzM0S29namcxZ3Z2UnRkdUtScGIwVGlsQkp1NWpkTjFUcmNyWFJlQ0hlUGtm?=
- =?utf-8?B?T2VzZUZuak8wd1g2emZ4V1pzc1hoNHBubHBwcWNtNUwrYkJhMzd4TzM4Ymt2?=
- =?utf-8?B?aFFEWnF4WEJpc3FUSU1zcnRibmtPdTdOR0kvUHRpQlhpamFYTFpNMGpVeTBw?=
- =?utf-8?B?RndTV3pnQi91SU4rMDYzVFBEcGZpOUVOdHUyMkZ6RXU1dmxoSURDZ2NmS0tl?=
- =?utf-8?B?T2hqL0RmT3BVUTUyaHNaRE9GdjZYOFNCRW1xNmIvcVZ6MXR2R0R4emZDSnNl?=
- =?utf-8?B?N2xQZ1hhT1cyREJjWHdQRzMyR0dkeHp4N0ZLcnBXaC9GRVF4eXdUc3hhdWtQ?=
- =?utf-8?B?dkhSQjgxc05jbG5uMTQxcWdlWXdwYStRQ0ZIVlJnK3hWL0ZOb0oxSkVDS1hx?=
- =?utf-8?B?UGNiWm14Y3NYM09KcHRpbGhlZ2I4NTVOdlQxdTNPa3VDWGRnUUVkVStzaGox?=
- =?utf-8?B?cTJJeEJteWMrNDc0czNoa3o5dVZ5QkFvK2hGOGtsY3E2dkM0cS94WlZZK3Bq?=
- =?utf-8?B?MzRLSjhhMFVkOUFFRnhDNEg1dkk3cmpOS1lxVWlmSDhGcjR4R1VDNGxWSThj?=
- =?utf-8?B?Ujg5R29McFJ3PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5946.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UHdVV3hWaE9HLzRyUTQ1K0tXV0VMSm9XOUpobTdUb3p5OVpaSUpuTzlpYVI0?=
- =?utf-8?B?RVRBSGRGNmdKM1QrUi8rbHNrdW9uTnVoR3NVVGEyV3J2ZHQ2ODlrSW5qSHlB?=
- =?utf-8?B?S2F5WHJ2bjRmWmdGU3NRZSt4dWdITk9wakxub2NkMGdqN09xSUJmZGFqOE9q?=
- =?utf-8?B?VDFybHl1OC8rS1NLekpqSzJ2eDkvYnBnRGsrakVyVjFjc2MwaFlEZzRMZHY4?=
- =?utf-8?B?NVdjUlpRZFZ2d3I4OTJmMWRLdkVOS296RTFZbEw0eTczMDNLaXYyMk5nNVVG?=
- =?utf-8?B?bUN3NGVNRlFTRzJ1Tml3QTVjTC8wSSsvZmVKR1pTK2w4ZWdYdGh3dDVxK255?=
- =?utf-8?B?M1NpanBTZHh4Tk11cjhxU0JJbUplcEoxZS9oL2hTVkMrUnVKYk0zRUQvSDYw?=
- =?utf-8?B?cGRjWUJuQitkQlRJZHpWVjZFbzlHQjFJRkx3Unp6MEhiQzc4RVUyTUp1d1lt?=
- =?utf-8?B?VkJEQ0dyeis1QzhOaWl6SDBqcDI5b2svNmZJRWNaY3l4TmF4L0ZMSE8ycVNi?=
- =?utf-8?B?NVBBSE5ZdmhaT01NMGlaRjJnQ09meEp6SEtURExGaC9wSHRtdExYWENUd05J?=
- =?utf-8?B?Q1BpU0t2QzMrYTNHN2VlaTJuZHJDVFloVklIUlpHa1N0RUl6TWhZUjcxa0Yy?=
- =?utf-8?B?L3JMVzB2b2dFaWs3R0RGS1RFZWpIdDdYV1RPR1NqeUVkVWQramY0WkFvZTlB?=
- =?utf-8?B?bVFZY3FFNTJMWUFETERrbGJMQ3hsSms1OXZ5TWJLNXpSa1BpVHR1aHZCck1C?=
- =?utf-8?B?NWtTU21MbnFpSUYrTUhqS3hMQzk4VDk5S1YvUGM2enBTV2NOTzNkOERKTXhE?=
- =?utf-8?B?YU94eEQzTnZ4blZPTWlpOHI0YW5TWVRNTTV0eVZUS2RvWDRkbzZ3dGdKOVoz?=
- =?utf-8?B?b3IzYVhqR2MrRWpDYXdUM2tBbmN1SzUxTVVuZEM2VGdvMUx3bHhjTGFHS1pL?=
- =?utf-8?B?cFZCZnlhTnlxOVJxUEJSYUVWcUxuMVhaamlKYWw4dWQ0L2ZDZmlzR0I2dDV4?=
- =?utf-8?B?UFQ4TjVDNWJpc2hpa1JEUTIxZjFId0R4WHY2UU5SckV3MXZXYkFyR0ZJKzRm?=
- =?utf-8?B?Z3dmTVRKNzFZR3Y2bWtXODNrQWo5dVdjNWVVZ3BvVDE1VngzT24vL29KWm5M?=
- =?utf-8?B?RVU5R1g5TmNzZ3hTeEN4TEFXeThqZlhGUTJ3eHJ5aU1QVzl2UmxlRWQwM0pC?=
- =?utf-8?B?dzg3TUp3ampEZGJuREIvUGtiRkpMeTF6UDMwZUhRSEQ3NVBvL0hRTFdZN01u?=
- =?utf-8?B?MmJ4Rk9QRTh0Zld1N0hIZWM2YThsTnJxemRoZ1FlOEpNYWFtbXBnWU5yY0Vw?=
- =?utf-8?B?OTZvREJlRFErMFpmZlBBRFM0OG1Ka3ptMGx2OXR1MW00ZzJ2cnl6MDhFVVJM?=
- =?utf-8?B?ZGRFT05oRmJsQ2FobEExNFd1ZTd6UlhDM2R1dVNBcXRCOVhQbTB0WCtDQll6?=
- =?utf-8?B?bk0xSUs1akZLSkxGa3lSRG1ZUm13d3pDbU5jT3VQdFEyNUsrN3RQbDdTVmFo?=
- =?utf-8?B?Z2RaYTUwckN2QzV2NDNIYTBXYkdVWDA0U1p3UzJYRnBOWDl6NjNodnFFanJE?=
- =?utf-8?B?L045ZjdRa0oydEVCT3ZBT1VHOE5Wb0wzTWpOM1l4bE9rc2FveXUzUU9DMTdh?=
- =?utf-8?B?MWNGaTEwYWNveFEzM0ZqbzJ0R0R1WmhKNkFuMzN6SVFtdjBnVHN2NjFmZThl?=
- =?utf-8?B?TGZpakVNQmJyOEwvQi94WXZnOUN1UlRrR1lZWlh6WTAwNlV0aG9nUElNUkhG?=
- =?utf-8?B?NTJxTkdTcDZwWkd3TWF5T0hMc001K0l2YWdIWk1aTXd0VStsYXUvd3JLa1Qv?=
- =?utf-8?B?c0dPMzNhSWhVVEVBL2NvU2FXSEVSTEx3ZDk0QmVZYy9TMUdOa2JvRjRVVWl3?=
- =?utf-8?B?Y1AzVU9udGlVbEN1MkJETVBzUkk4WDRMaHJwS1g4ZWVqZWNTbGxmMWFpc1Jh?=
- =?utf-8?B?ZkI1dXhTTkV2eHhkTUFmSTZhRitabTVLbVRaME9DSlpsdTNwclM1N1hZWllG?=
- =?utf-8?B?ZlF1QysvZlY0TkI1YkZxRGZFbDUxMDhJZDVkL3p5ajgrT25RcDNXNmNOblJP?=
- =?utf-8?B?bWZtRGpRT2ZaNEFEeDZwNjNOR0hhcDAwajh4RjB2UXRqNm9HOVZYdi9VemFt?=
- =?utf-8?Q?rvNnqcNt9FRey+T8MN5RGRHtu?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd06e12-d887-41fe-8508-08ddf0e136e8
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5946.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2025 03:13:43.8009
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mwzcIgJrU4daG9VWFDzbqFToJTeKUIIrDDYWRgk3Uf2gI1IsZM2fkuT9KO+GzAP1
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6948
+Content-Transfer-Encoding: 8bit
 
-Hi Theo,
+A NULL pointer dereference can occur in tcp_ao_finish_connect() during a
+connect() system call on a socket with a TCP-AO key added and TCP_REPAIR
+enabled.
 
-On 9/10/2025 9:45 PM, Théo Lebrun wrote:
-> bp->dev->dev_addr is of type `unsigned char *`. Casting it to a u32
-> pointer and dereferencing implies dealing manually with endianness,
-> which is error-prone.
-> 
-> Replace by calls to get_unaligned_le32|le16() helpers.
-> 
-> This was found using sparse:
->     ⟩ make C=2 drivers/net/ethernet/cadence/macb_main.o
->     warning: incorrect type in assignment (different base types)
->        expected unsigned int [usertype] bottom
->        got restricted __le32 [usertype]
->     warning: incorrect type in assignment (different base types)
->        expected unsigned short [usertype] top
->        got restricted __le16 [usertype]
->     ...
-> 
-> Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
-> ---
->   drivers/net/ethernet/cadence/macb_main.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index fc082a7a5a313be3d58a008533c3815cb1b1639a..c16d60048185b4cb473ddfcf4633fa2f6dea20cc 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -271,12 +271,10 @@ static bool hw_is_gem(void __iomem *addr, bool native_io)
->   
->   static void macb_set_hwaddr(struct macb *bp)
->   {
-> -	u32 bottom;
-> -	u16 top;
-> +	u32 bottom = get_unaligned_le32(bp->dev->dev_addr);
-> +	u16 top = get_unaligned_le16(bp->dev->dev_addr + 4);
->   
+The function is called with skb being NULL and attempts to dereference it
+on tcp_hdr(skb)->seq without a prior skb validation.
 
-please change the order as per reverse xmas tree.
+Fix this by checking if skb is NULL before dereferencing it. If skb is 
+not NULL, the ao->risn is set to tcp_hdr(skb)->seq. If skb is NULL,
+ao->risn is set to 0 to keep compatibility with calls made from
+tcp_rcv_synsent_state_process().
 
-> -	bottom = cpu_to_le32(*((u32 *)bp->dev->dev_addr));
->   	macb_or_gem_writel(bp, SA1B, bottom);
-> -	top = cpu_to_le16(*((u16 *)(bp->dev->dev_addr + 4)));
->   	macb_or_gem_writel(bp, SA1T, top);
->   
->   	if (gem_has_ptp(bp)) {
-> 
+int main(void){
+        struct sockaddr_in sockaddr;
+        struct tcp_ao_add tcp_ao;
+        int sk;
+        int one = 1;
 
+        memset(&sockaddr,'\0',sizeof(sockaddr));
+        memset(&tcp_ao,'\0',sizeof(tcp_ao));
+
+        sk = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+        sockaddr.sin_family = AF_INET;
+
+        memcpy(tcp_ao.alg_name,"cmac(aes128)",12);
+        memcpy(tcp_ao.key,"ABCDEFGHABCDEFGH",16);
+        tcp_ao.keylen = 16;
+
+        memcpy(&tcp_ao.addr,&sockaddr,sizeof(sockaddr));
+
+        setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tcp_ao,
+	sizeof(tcp_ao));
+        setsockopt(sk, IPPROTO_TCP, TCP_REPAIR, &one, sizeof(one));
+
+        sockaddr.sin_family = AF_INET;
+        sockaddr.sin_port = htobe16(123);
+
+        inet_aton("127.0.0.1", &sockaddr.sin_addr);
+
+        connect(sk,(struct sockaddr *)&sockaddr,sizeof(sockaddr));
+
+return 0;
+}
+
+$ gcc tcp-ao-nullptr.c -o tcp-ao-nullptr -Wall
+$ unshare -Urn
+# ip addr add 127.0.0.1 dev lo
+# ./tcp-ao-nullptr
+
+BUG: kernel NULL pointer dereference, address: 00000000000000b6
+PGD 1f648d067 P4D 1f648d067 PUD 1982e8067 PMD 0
+Oops: Oops: 0000 [#1] SMP NOPTI
+Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop
+Reference Platform, BIOS 6.00 11/12/2020
+RIP: 0010:tcp_ao_finish_connect (net/ipv4/tcp_ao.c:1182)
+Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 0f 1f
+ 44 00 00 41 54 55 53 48 8b af 00 09 00 00 48 85 ed 74 3e <0f> b7 86 b6 00
+ 00 00 48 8b 96 c8 00 00 00 49 89 fc 8b 44 02 04 c7
+All code
+========
+   0:	90                   	nop
+   1:	90                   	nop
+   2:	90                   	nop
+   3:	90                   	nop
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	90                   	nop
+   8:	90                   	nop
+   9:	90                   	nop
+   a:	90                   	nop
+   b:	90                   	nop
+   c:	90                   	nop
+   d:	90                   	nop
+   e:	90                   	nop
+   f:	90                   	nop
+  10:	90                   	nop
+  11:	66 0f 1f 00          	nopw   (%rax)
+  15:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+  1a:	41 54                	push   %r12
+  1c:	55                   	push   %rbp
+  1d:	53                   	push   %rbx
+  1e:	48 8b af 00 09 00 00 	mov    0x900(%rdi),%rbp
+  25:	48 85 ed             	test   %rbp,%rbp
+  28:	74 3e                	je     0x68
+  2a:*	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
+<-- trapping instruction
+  31:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
+  38:	49 89 fc             	mov    %rdi,%r12
+  3b:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
+  3f:	c7                   	.byte 0xc7
+
+Code starting with the faulting instruction
+===========================================
+   0:	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
+   7:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
+   e:	49 89 fc             	mov    %rdi,%r12
+  11:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
+  15:	c7                   	.byte 0xc7
+RSP: 0018:ffffcf7a858f3a50 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffff8e51e8150000 RCX: 0000000000000002
+RDX: ffffcf7a858f3a1f RSI: 0000000000000000 RDI: ffff8e51e8150000
+RBP: ffff8e51c1509e80 R08: ffff8e51e81506bc R09: 0000000000000001
+R10: 0000000000000000 R11: ffff8e51e8150000 R12: 0000000000000000
+R13: ffff8e51c7019680 R14: ffff8e51d20d1cc0 R15: ffff8e51e8150000
+FS:  00007faa5e4dc740(0000) GS:ffff8e533e55f000(0000) knlGS:00000000000000
+00
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000000000b6 CR3: 000000016d3e0003 CR4: 00000000003706f0
+Call Trace:
+<TASK>
+tcp_finish_connect (net/ipv4/tcp_input.c:6267)
+tcp_connect (net/ipv4/tcp_output.c:4141)
+tcp_v4_connect (net/ipv4/tcp_ipv4.c:345 (discriminator 1))
+__inet_stream_connect (net/ipv4/af_inet.c:677)
+? release_sock (./include/linux/list.h:373 (discriminator 2) ./include/
+linux/wait.h:127 (discriminator 2) net/core/sock.c:3733 (discriminator 2))
+ inet_stream_connect (net/ipv4/af_inet.c:749)
+__sys_connect (./include/linux/file.h:62 (discriminator 1) ./include/linux
+/file.h:83 (discriminator 1) net/socket.c:2095 (discriminator 1))
+__x64_sys_connect (net/socket.c:2111 (discriminator 1) net/socket.c:2108
+(discriminator 1) net/socket.c:2108 (discriminator 1))
+do_syscall_64 (arch/x86/entry/syscall_64.c:63 (discriminator 1) arch/x86/
+entry/syscall_64.c:94 (discriminator 1))
+? do_read_fault (mm/memory.c:5565)
+? handle_pte_fault (mm/memory.c:6047)
+? do_fault (mm/memory.c:5707)
+? __handle_mm_fault (mm/memory.c:5963 mm/memory.c:6131)
+? count_memcg_events (mm/memcontrol.c:839 (discriminator 4))
+? handle_mm_fault (mm/memory.c:6237 mm/memory.c:6390)
+? do_user_addr_fault (arch/x86/mm/fault.c:1337)
+? clear_bhb_loop (arch/x86/entry/entry_64.S:1548)
+? clear_bhb_loop (arch/x86/entry/entry_64.S:1548)
+? clear_bhb_loop (arch/x86/entry/entry_64.S:1548)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+RIP: 0033:0x7faa5e54d77e
+Code: 4d 89 d8 e8 d4 bc 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83
+ f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39
+ 83 fa 08 75 e7 e8 13 ff ff ff 0f 1f 00 f3 0f 1e fa
+All code
+========
+   0:	4d 89 d8             	mov    %r11,%r8
+   3:	e8 d4 bc 00 00       	call   0xbcdc
+   8:	4c 8b 5d f8          	mov    -0x8(%rbp),%r11
+   c:	41 8b 93 08 03 00 00 	mov    0x308(%r11),%edx
+  13:	59                   	pop    %rcx
+  14:	5e                   	pop    %rsi
+  15:	48 83 f8 fc          	cmp    $0xfffffffffffffffc,%rax
+  19:	74 11                	je     0x2c
+  1b:	c9                   	leave
+  1c:	c3                   	ret
+  1d:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+  24:	48 8b 45 10          	mov    0x10(%rbp),%rax
+  28:	0f 05                	syscall
+  2a:*	c9                   	leave		<-- trapping instruction
+  2b:	c3                   	ret
+  2c:	83 e2 39             	and    $0x39,%edx
+  2f:	83 fa 08             	cmp    $0x8,%edx
+  32:	75 e7                	jne    0x1b
+  34:	e8 13 ff ff ff       	call   0xffffffffffffff4c
+  39:	0f 1f 00             	nopl   (%rax)
+  3c:	f3 0f 1e fa          	endbr64
+
+Code starting with the faulting instruction
+===========================================
+   0:	c9                   	leave
+   1:	c3                   	ret
+   2:	83 e2 39             	and    $0x39,%edx
+   5:	83 fa 08             	cmp    $0x8,%edx
+   8:	75 e7                	jne    0xfffffffffffffff1
+   a:	e8 13 ff ff ff       	call   0xffffffffffffff22
+   f:	0f 1f 00             	nopl   (%rax)
+  12:	f3 0f 1e fa          	endbr64
+RSP: 002b:00007ffc0e35e350 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007faa5e54d77e
+RDX: 0000000000000010 RSI: 00007ffc0e35e4e0 RDI: 0000000000000003
+RBP: 00007ffc0e35e360 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffc0e35e628
+R13: 0000000000000001 R14: 00007faa5e717000 R15: 0000000000402e00
+</TASK>
+Modules linked in: rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
+nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct
+nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables
+qrtr intel_rapl_msr intel_rapl_common intel_uncore_frequency_common
+intel_pmc_core pmt_telemetry pmt_class intel_pmc_ssram_telemetry
+intel_vsec rapl vmw_balloon pktcdvd i2c_piix4 i2c_smbus joydev loop
+nfnetlink vsock_loopback vmw_vsock_virtio_transport_common
+vmw_vsock_vmci_transport vsock zram vmw_vmci lz4hc_compress lz4_compress
+xfs polyval_clmulni ghash_clmulni_intel sha512_ssse3 sha1_ssse3 vmwgfx
+drm_ttm_helper vmxnet3 nvme nvme_tcp ata_generic ttm nvme_fabrics
+pata_acpi nvme_core nvme_keyring nvme_auth serio_raw sunrpc be2iscsi bnx2i
+ cnic uio cxgb4i cxgb4 tls cxgb3i cxgb3 mdio libcxgbi libcxgb qla4xxx
+iscsi_boot_sysfs iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi
+scsi_dh_rdac scsi_dh_emc scsi_dh_alua fuse i2c_dev dm_multipath
+CR2: 00000000000000b6
+---[ end trace 0000000000000000 ]---
+RIP: 0010:tcp_ao_finish_connect (net/ipv4/tcp_ao.c:1182)
+Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 0f 1f
+ 44 00 00 41 54 55 53 48 8b af 00 09 00 00 48 85 ed 74 3e <0f> b7 86 b6 00
+ 00 00 48 8b 96 c8 00 00 00 49 89 fc 8b 44 02 04 c7
+All code
+========
+   0:	90                   	nop
+   1:	90                   	nop
+   2:	90                   	nop
+   3:	90                   	nop
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	90                   	nop
+   8:	90                   	nop
+   9:	90                   	nop
+   a:	90                   	nop
+   b:	90                   	nop
+   c:	90                   	nop
+   d:	90                   	nop
+   e:	90                   	nop
+   f:	90                   	nop
+  10:	90                   	nop
+  11:	66 0f 1f 00          	nopw   (%rax)
+  15:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+  1a:	41 54                	push   %r12
+  1c:	55                   	push   %rbp
+  1d:	53                   	push   %rbx
+  1e:	48 8b af 00 09 00 00 	mov    0x900(%rdi),%rbp
+  25:	48 85 ed             	test   %rbp,%rbp
+  28:	74 3e                	je     0x68
+  2a:*	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
+<-- trapping instruction
+  31:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
+  38:	49 89 fc             	mov    %rdi,%r12
+  3b:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
+  3f:	c7                   	.byte 0xc7
+
+Code starting with the faulting instruction
+===========================================
+   0:	0f b7 86 b6 00 00 00 	movzwl 0xb6(%rsi),%eax
+   7:	48 8b 96 c8 00 00 00 	mov    0xc8(%rsi),%rdx
+   e:	49 89 fc             	mov    %rdi,%r12
+  11:	8b 44 02 04          	mov    0x4(%rdx,%rax,1),%eax
+  15:	c7                   	.byte 0xc7
+RSP: 0018:ffffcf7a858f3a50 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffff8e51e8150000 RCX: 0000000000000002
+RDX: ffffcf7a858f3a1f RSI: 0000000000000000 RDI: ffff8e51e8150000
+RBP: ffff8e51c1509e80 R08: ffff8e51e81506bc R09: 0000000000000001
+R10: 0000000000000000 R11: ffff8e51e8150000 R12: 0000000000000000
+R13: ffff8e51c7019680 R14: ffff8e51d20d1cc0 R15: ffff8e51e8150000
+FS:  00007faa5e4dc740(0000) GS:ffff8e533e55f000(0000) knlGS:0000000000000
+000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000000000b6 CR3: 000000016d3e0003 CR4: 00000000003706f0
+note: tcp-ao-nullptr[41065] exited with irqs disabled
+
+Fixes: 7c2ffaf ("net/tcp: Calculate TCP-AO traffic keys")
+Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
+---
+Changes in v2:
+- Wrap the description at 75 columns
+- Add full decoded stack trace
+- Link to v1: https://lore.kernel.org/all/20250911013052.2233-1-anderson@allelesecurity.com/
+
+ net/ipv4/tcp_ao.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index bbb8d5f0eae7..abe913de8652 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -1178,7 +1178,11 @@ void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb)
+ 	if (!ao)
+ 		return;
+ 
+-	WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
++	/* sk with TCP_REPAIR_ON does not have skb in tcp_finish_connect */
++	if (skb)
++		WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
++	else
++		WRITE_ONCE(ao->risn, 0);
+ 	ao->rcv_sne = 0;
+ 
+ 	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
 -- 
-🙏 Vineeth
+2.51.0
 
 
