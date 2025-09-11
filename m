@@ -1,101 +1,98 @@
-Return-Path: <netdev+bounces-222167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 963D3B5358D
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:34:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B689B535B2
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 16:37:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E501AA302A
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:34:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B840B3B4B5B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 14:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC85341AD0;
-	Thu, 11 Sep 2025 14:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF65633CEAA;
+	Thu, 11 Sep 2025 14:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNlN2Sbb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oaC8OiDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72E7219301;
-	Thu, 11 Sep 2025 14:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A49633A004;
+	Thu, 11 Sep 2025 14:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757601219; cv=none; b=XBMiR78BY8QeB9UMwz7HOQtHfpud0px+qhuB83+WLq3hmjPAYpNrUA34GwQOtH9PPlhbyLOcYB1mhFFR6mu2Az6a+trEBBrjalX0/GktALnrgpSbTEpqNnd3l+D2AjLnlXwuIwAWr9vHozstFplQi9u/AUaEE2VOVm5Ov5fvxpc=
+	t=1757601332; cv=none; b=RtCK1pOA43Gr+yYF6ANjisymhIaidFeoqoGVn86K1LUszspuhcuCN+CRCglR6gkK2dwSwyJrcBD5MNIESthS2ukLGf6L1013WixzLeLOp1LjWOMdf04s4uSZfAa70SS7o/1rVvM9Z9evU7ZJB/YcApCLuqFvLrm9+HBM11Afslk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757601219; c=relaxed/simple;
-	bh=OUJiGi+94fM5sV3cXCPP5CAqq/OJPC2n5Oez5un9aqc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=D3A5RW9GRjrKg/i3vA5aS7vh/12mIDTLW+Y8ewDslvjtRHQHnkymIMAGOfK4JA7OpugHo5804cao8k2yZLoyjd/MHGTCkoDvsokWQE3mYu4SsCBOCC1ucCMD/j0L1kgBIM/9X/tCPEo5v64rQnBbzWIwxp23fcD6RtVukkQeBb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNlN2Sbb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02AC2C4CEF9;
-	Thu, 11 Sep 2025 14:33:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757601218;
-	bh=OUJiGi+94fM5sV3cXCPP5CAqq/OJPC2n5Oez5un9aqc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=HNlN2SbbDPOYRE/qguGJ3QO6dg+GeXXMXenRHR7nT6YKwB3MB7vGyJtGbkZYYtPA9
-	 ad2K+IGKQZDDl0JPzJLrXbV/R9QWQ44uMNWqKQ2uJ9zP1rUN66zwQBYiUxvLKl1Nax
-	 wqDrUrPbYR3nmRBNpqmPcAYVb8WuzU8OxhUx6e0RggeZR2oPT2yN5phYEg3NW7Zjb+
-	 HKTwyjTs3ilfq2mtWZSqAVcUFdzdbCG1xq/BwtRPigu2+WXkL9mZ/Ms2bcsXqHyoJ7
-	 XsR1BeazIXyvTkUS9WU+HrRzWKB9n5LLlbkQmClXkEl2nC6JuJQ1kEFD+lZI2cPEP5
-	 /ord5gwiNcx+A==
-From: Lee Jones <lee@kernel.org>
-To: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
- brgl@bgdev.pl, andi.shyti@kernel.org, mkl@pengutronix.de, 
- mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, davem@davemloft.net, 
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
- wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
- alexandre.belloni@bootlin.com, a0282524688@gmail.com
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, 
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org, 
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
- linux-usb@vger.kernel.org
-In-Reply-To: <20250904015048.1801451-1-a0282524688@gmail.com>
-References: <20250904015048.1801451-1-a0282524688@gmail.com>
-Subject: Re: [PATCH RESEND v14 0/7] Add Nuvoton NCT6694 MFD drivers
-Message-Id: <175760121375.1552180.14414071756142571293.b4-ty@kernel.org>
-Date: Thu, 11 Sep 2025 15:33:33 +0100
+	s=arc-20240116; t=1757601332; c=relaxed/simple;
+	bh=c7JCd04MwdS7CUE2Fo15MvufZX7mN9AXA6y5tx0jPAA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qpr+9hhy7rwkLZnbBGATS0/cuLk5VPTXAOwKGFL1vqzsJ3dQHoduD2O1dYtNiJdSAPPP70a0zuWp6lDCmETwosv32pJ4L7oiQ+G9g0qymcpA7WCGKJ5T/OecxPSazQmKiMyrasf+qYfJipcM1YX8urBefygpAYKyQyJv/uLAX5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oaC8OiDI; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0dc424bf-c19b-4eeb-82db-88bff4f85d46@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757601328;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=37t0QPtyu/XvIalXZWt6PWI4bvROoJUZ3WeQvV5JNsU=;
+	b=oaC8OiDIhGEaAAekyBYHmzL+501l+czft7xmdUJGAyUMLfPFEsD/2qKIsZwmQR2JWpta6v
+	5WYqyYOZD8HjDasYlBQkI3L3l3iVDmF4rWUPqBeUaiG+TwnPF+TNxjruTdEI1TlxXKGa5Z
+	VDt6kjHfL6UPggzWsyCfCkcAfMrzwB4=
+Date: Thu, 11 Sep 2025 10:35:22 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.15-dev-c81fc
+Subject: Re: [PATCH net-next 2/2] net: xilinx: axienet: Add inline comment for
+ stats_lock mutex definition
+To: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, michal.simek@amd.com, radhey.shyam.pandey@amd.com,
+ horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, harini.katakam@amd.com
+References: <20250911072815.3119843-1-suraj.gupta2@amd.com>
+ <20250911072815.3119843-3-suraj.gupta2@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250911072815.3119843-3-suraj.gupta2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 04 Sep 2025 09:50:41 +0800, a0282524688@gmail.com wrote:
-> From: Ming Yu <a0282524688@gmail.com>
+On 9/11/25 03:28, Suraj Gupta wrote:
+> Add inline comment to document the purpose of the stats_lock mutex in
+> the axienet_local structure. This mutex protects the hw_stats_seqcount
+> sequence counter used for hardware statistics synchronization.
 > 
-> This patch series introduces support for Nuvoton NCT6694, a peripheral
-> expander based on USB interface. It models the chip as an MFD driver
-> (1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
-> WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
+> Fixes checkpatch warning:
+> CHECK: struct mutex definition without comment
 > 
-> [...]
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> ---
+>  drivers/net/ethernet/xilinx/xilinx_axienet.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> index 5ff742103beb..99b9c27bbd60 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> @@ -598,7 +598,7 @@ struct axienet_local {
+>  
+>  	u64 hw_stat_base[STAT_COUNT];
+>  	u32 hw_last_counter[STAT_COUNT];
+> -	seqcount_mutex_t hw_stats_seqcount;
+> +	seqcount_mutex_t hw_stats_seqcount; /* Lock for hardware statistics */
+>  	struct mutex stats_lock;
+>  	struct delayed_work stats_work;
+>  	bool reset_in_progress;
 
-Applied, thanks!
-
-[1/7] mfd: Add core driver for Nuvoton NCT6694
-      commit: 8c13787893fde313190b7dc844a24114dcc172a2
-[2/7] gpio: Add Nuvoton NCT6694 GPIO support
-      (no commit info)
-[3/7] i2c: Add Nuvoton NCT6694 I2C support
-      (no commit info)
-[4/7] can: Add Nuvoton NCT6694 CANFD support
-      (no commit info)
-[5/7] watchdog: Add Nuvoton NCT6694 WDT support
-      (no commit info)
-[6/7] hwmon: Add Nuvoton NCT6694 HWMON support
-      (no commit info)
-[7/7] rtc: Add Nuvoton NCT6694 RTC support
-      (no commit info)
-
---
-Lee Jones [李琼斯]
-
+NAK. This is already documented in the kernel-doc comment.
 
