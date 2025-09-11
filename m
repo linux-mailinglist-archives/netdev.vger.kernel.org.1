@@ -1,157 +1,119 @@
-Return-Path: <netdev+bounces-222246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09541B53AF0
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 19:59:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE34BB53B10
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 20:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80ABFAA712C
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 17:59:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E6C25A1C72
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 18:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBB4362985;
-	Thu, 11 Sep 2025 17:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FCB36209B;
+	Thu, 11 Sep 2025 18:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sj6ChNil"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yrojD4qb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B7D362998
-	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 17:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0163570B6;
+	Thu, 11 Sep 2025 18:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757613489; cv=none; b=lxl9gvorGV3kjxkg9mWH+gHMSEpiF56mjdh6w+S8wj6lNXNzFR9hAhkZyttQJ+9yTSg17QUb0/qCUuKywV4quWQb+NZ5HMVsCKyMGwoxEhPzYAuFW1u/51tiWz66jXUTNhp9D93e5xfGz9iIsOhBnbtKaZvf/RIh14ZgmeULy9I=
+	t=1757614177; cv=none; b=A9/wYIysn4vZkKLrqPG7mZ52i6N7PmnTzATlS1a9yRJOF+Cs/BgsikSSC+ACFO3FuFAJdsTGLDsaS4e6r3gOQtXDT7J/MpMKZdGFsRFzZDb4OoRCeZYjVPkl5fxMOvuxmuUzCt/MsK6bQiTPihCWbzwS1c3zFoIA4sJXNP0n02Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757613489; c=relaxed/simple;
-	bh=Pm9Apo4QHpXic38DAH5OGxtr6ou8VcwBJFVP53wjRfE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KhSBR4hTxRskpWxeAGxGtnp9bikCcEcQwM6tpzscEBm7RET8D1GywglCMTH+9/UawTai0VdLNotuJh/+/WNVgvXrYzFL+iWjhtkHkS7GDXCZC/XQ+p1JZ0WsnPd1oQROjvM53snL9P8aVlKWpKRS27Ewb5gYbwgF7B6jGQ0A4JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sj6ChNil; arc=none smtp.client-ip=209.85.210.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-7725147ec88so631672b3a.0
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 10:58:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757613487; x=1758218287; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iw7YUMOBfQ9U5b9jGNBg6dyHxPq4WQMdK/IHZCbdPrk=;
-        b=Sj6ChNil8uV1gQtJZ2ETvPGy1/VD3BKPBiojbm18ihfQvKgS1H5LcakMRcVpL4+XH5
-         5uCVGRZsb78ENUdItmK1X4zj9L33Kq6hcKFq3Oz2QUZoYcpRjDBGP2hBBNqZpB26OqQn
-         Nb+7iBnZeegBpFpzxITyiasNYDKwUjyfeL1aIFTCVW1YMg7HEu0tNGcPpcTFXyECOINO
-         Ia/3LZU7Q6Jj8qAXCm6jDNu0Zlk+SayC5FUNsJBOh8RmC6JMappuY6em2ydJ+B4QDbqf
-         AaqPhi0leb5LKyCw+KCrDzQGwnJ/vaeqa54Ae4+LFVCroYtBo4YFvEKLBUzUYUOs/CyM
-         7fVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757613487; x=1758218287;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Iw7YUMOBfQ9U5b9jGNBg6dyHxPq4WQMdK/IHZCbdPrk=;
-        b=AIIfeMS1Uc5EMOl1u1ltPHNEtMKrMaXcai7a/BmyqwEzw2cM7HlcyResvDJnKAQiVY
-         QTtwjxPatrW+Df1LI96n+jLWmXXlx6rXiy5WW1u0CmR0p82mUXuK8rpCdLMqmFSfChdJ
-         EEigh7sOmkyNrL5RykOWFthnZrkFcehrW5Mix+tMNxygTKwCmdeCYGpFdUvpdxOcU0Th
-         kxGqNCNBYeUKOpLqzTwVipBfisc2xhtSWY4sKwdjTeUhoyODb26RErQ0o0w3ZewskioJ
-         ryQTv7wG6tAI/tgL+daObDkBwjwGLD+B7OoYdwAI495nh9Ucvb17QtHxm365Wb1VUO5t
-         bgOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWUaL3IeSDDmp8mnE1QGlL/TN7OCA1yVWnCDtxiHp1c6JwvWc6S5kABpUEyf3b8txJKgGA1IMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOeaiQY5olD2EKGGMnFLAs8a2s7rcWTgpTfDBtBQ3gd1LCUHrV
-	att1ozxUg9Mj3OAnIAil2Y4UuR/p0f0vHiPA0awzn8EgyKQoFvEMh8xW
-X-Gm-Gg: ASbGncuxdnxzwwfMVivpksemhPLu9qwSZeUcQzvVuQmQENR4F1XcjhKkizxeG8hMVGs
-	IhaOjPo8GS42FdWl0QCpNW5u9HOsqCpL3X0sbX4aFebL2PUy8h0WNc8LDfMHjUIosV8HXR5b3I6
-	xTyRR0xBNj4deGCu1blwMGmMnXgwScO/yyx1MEv73L/ZvTO+zfEC5UFdPYwaqO0AR9RmCTvCDQ6
-	ptKekkmqAWvTyLSsO4j3Q1sl6IJhwGstzQnfnmG3SD7cABh68PIa5DjTjvsXztjLHGHz2yKk4HT
-	/f88itv4FQ9xsdI/xhkAgHt5lAMaLB1K0OVX00aPR8Uy4GKFhQAhY4RJaRZudnpl1CAUJ6zdNte
-	Lhx7jrqK4BMkYHU1JCvoPYZs3mwwQox21KZZTPfggmR8QmWncBdrD71I=
-X-Google-Smtp-Source: AGHT+IG77yXU5YlLI1tFffiCTEQpvWi9veG5l2RgvVH0S57Unqa0HNc8Ibh+Grt38fgXKTYeu86E+Q==
-X-Received: by 2002:a05:6a21:3394:b0:243:d1bd:fbac with SMTP id adf61e73a8af0-2602820cf69mr266598637.7.1757613486523;
-        Thu, 11 Sep 2025 10:58:06 -0700 (PDT)
-Received: from LAPTOP-PN4ROLEJ.localdomain ([223.112.146.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77607b34254sm2731524b3a.75.2025.09.11.10.58.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 10:58:06 -0700 (PDT)
-From: Slavin Liu <slavin452@gmail.com>
-To: Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>
-Cc: Slavin Liu <slavin452@gmail.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1757614177; c=relaxed/simple;
+	bh=7gyBEPCZbqL0kKqBIVT/lC6z6mvxa3onrOUFzkyl4KI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KNNDGuaIPpUg7XpBpHfBedUB+7rQOiPGmOw0BlxkjRNeJUeHfHRKvCx7UkjA2utT2u12IEvcKRXwFT2xWTno8I7kzKssAp8DY58SNeVaa2s8gqufvsluNWwqPzWREd1UHcct9WUyFQUmilL0uv+fCHPfvc5wOHzwywD7JMt+k2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=yrojD4qb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VOf/scVy2/G7nPu4vUJje7URYboKIf5FDPfqbmkuw4I=; b=yrojD4qbElqBAA+wqTnlfX3xdH
+	tDMGY8wVO1Lpn3f53UpM/T2uQ1OSY2ePxsyvi/UQjR8SqTMVg6ZPMCpMrc0QgPFLBx0Xj2bDEdqIq
+	0EYxG60KEWIh5KFszlghcXAswWB6OLonPDIhtEwbOEa8cBfJeym1PdxqdJyUodql16E8vb1DlINni
+	xhzLu2bjiSb5tBnZ++rO44wmSq5DOJLviLdvfno3H9e1R4Kq4tybrImmuGHLPjEvV4qNcoLO5Iodw
+	/pyHPI/IQcmHZiGHOQCgptmRJqk8XCn6j1D50gAzuFWbt6SAHFBbmYTtmoDxjZx7VjtMZ2QW5hPsf
+	Y7SxxKIA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53308)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uwljS-000000003Rb-0HkQ;
+	Thu, 11 Sep 2025 19:09:18 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uwljN-000000002Y4-3cKS;
+	Thu, 11 Sep 2025 19:09:13 +0100
+Date: Thu, 11 Sep 2025 19:09:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chen-Yu Tsai <wens@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	lvs-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4] ipvs: Defer ip_vs_ftp unregister during netns cleanup
-Date: Fri, 12 Sep 2025 01:57:59 +0800
-Message-Id: <20250911175759.474-1-slavin452@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250911144020.479-1-slavin452@gmail.com>
-References: 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej@kernel.org>,
+	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH net-next v4 02/10] net: stmmac: Add support for Allwinner
+ A523 GMAC200
+Message-ID: <aMMQSR7yYBQkY4CI@shell.armlinux.org.uk>
+References: <20250908181059.1785605-1-wens@kernel.org>
+ <20250908181059.1785605-3-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250908181059.1785605-3-wens@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On the netns cleanup path, __ip_vs_ftp_exit() may unregister ip_vs_ftp
-before connections with valid cp->app pointers are flushed, leading to a
-use-after-free.
+Hi,
 
-Fix this by introducing a global `exiting_module` flag, set to true in
-ip_vs_ftp_exit() before unregistering the pernet subsystem. In
-__ip_vs_ftp_exit(), skip ip_vs_ftp unregister if called during netns
-cleanup (when module_removing is false) and defer it to
-__ip_vs_cleanup_batch(), which unregisters all apps after all connections
-are flushed. If called during module exit, unregister ip_vs_ftp
-immediately.
+I drafted this but never sent it and can't remember why, but it's
+relevant for v5 that you recently posted. Same concern with v5.
 
-Fixes: 61b1ab4583e2 ("IPVS: netns, add basic init per netns.")
-Suggested-by: Julian Anastasov <ja@ssi.bg>
-Signed-off-by: Slavin Liu <slavin452@gmail.com>
----
- net/netfilter/ipvs/ip_vs_ftp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On Tue, Sep 09, 2025 at 02:10:51AM +0800, Chen-Yu Tsai wrote:
+> +	switch (plat->mac_interface) {
+> +	case PHY_INTERFACE_MODE_MII:
+> +		/* default */
+> +		break;
+> +	case PHY_INTERFACE_MODE_RGMII:
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> +		reg |= SYSCON_EPIT | SYSCON_ETCS_INT_GMII;
+> +		break;
+> +	case PHY_INTERFACE_MODE_RMII:
+> +		reg |= SYSCON_RMII_EN;
+> +		break;
+> +	default:
+> +		return dev_err_probe(dev, -EINVAL, "Unsupported interface mode: %s",
+> +				     phy_modes(plat->mac_interface));
 
-diff --git a/net/netfilter/ipvs/ip_vs_ftp.c b/net/netfilter/ipvs/ip_vs_ftp.c
-index d8a284999544..206c6700e200 100644
---- a/net/netfilter/ipvs/ip_vs_ftp.c
-+++ b/net/netfilter/ipvs/ip_vs_ftp.c
-@@ -53,6 +53,7 @@ enum {
- 	IP_VS_FTP_EPSV,
- };
- 
-+static bool exiting_module;
- /*
-  * List of ports (up to IP_VS_APP_MAX_PORTS) to be handled by helper
-  * First port is set to the default port.
-@@ -605,7 +606,7 @@ static void __ip_vs_ftp_exit(struct net *net)
- {
- 	struct netns_ipvs *ipvs = net_ipvs(net);
- 
--	if (!ipvs)
-+	if (!ipvs || !exiting_module)
- 		return;
- 
- 	unregister_ip_vs_app(ipvs, &ip_vs_ftp);
-@@ -627,6 +628,7 @@ static int __init ip_vs_ftp_init(void)
-  */
- static void __exit ip_vs_ftp_exit(void)
- {
-+	exiting_module = true;
- 	unregister_pernet_subsys(&ip_vs_ftp_ops);
- 	/* rcu_barrier() is called by netns */
- }
+I'm guessing that there's no way that plat->phy_interface !=
+plat->mac_interface on this platform? If so, please use
+plat->phy_interface here.
+
+Thanks.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
