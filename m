@@ -1,151 +1,165 @@
-Return-Path: <netdev+bounces-222097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 813D7B530EA
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:39:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C8C5B530D1
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13683566440
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:39:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 974721BC637D
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AE0321F40;
-	Thu, 11 Sep 2025 11:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9E931DD83;
+	Thu, 11 Sep 2025 11:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="csaVuRTW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbgcjOFd"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540AF321442;
-	Thu, 11 Sep 2025 11:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9377331A067
+	for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 11:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757590631; cv=none; b=bmAsKvTNjm7bELpuPflnDZJXTJ5PGArfI8S4tiAlGVYBOD3am5pRHFqH08fWlWWsRuQkh83jDhmhD/CXw5dHLTtawKokTiZtg8TYDCiZUeFWqbZ28SykzPtxXOoHEZicZg7dJOBuQhQohg+5pfSvyDHMFrMbsbJMxP0N4CYF8xg=
+	t=1757590604; cv=none; b=hd8sn8NzekhKFOb8ts32u2m5tfEzODKIuLuZsuwVrphYLfQaHCMOW8c+KdGrKjswnOzdx8sgG1NULGuIdYVSWoee9Rr/PZxbMprouvDDrrBOwVXa5KkvtVw0Zi14kjruvOUKGlhyeIEx4C8aY/DzHeb0R8xZOB9Uy8MVX47nyIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757590631; c=relaxed/simple;
-	bh=uCqh6weCbxxwSYUyrSLOci8g9ps7pnde7H7nW1y6vTI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LEZPSdLHHa+q08l2rKx0PbgdNx1yuuAMIfl59R4y2Y4zfPkrBFIyFRfWIY/2D+jtnEe88EXmiHN4mIqEN+HgtRqBLhODA+N6MQs+AyViPiOmGgKtkEX34/GEPdRPKfc+RYEacOS5u/6Nokb0yY+CfZxLFj7TqXqI/DDoHK2uyGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=csaVuRTW; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58BBaWZ0793678;
-	Thu, 11 Sep 2025 06:36:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1757590592;
-	bh=zRsIr23BIzgLzTmL8Py68DcXdNh7zzWEy6t51VP+4LQ=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=csaVuRTWANMjTWvJzA+8pI34HZcinEHvdvvHBq/vPXeimK0ExgheZbJ59jgLUQuha
-	 CiSgL0fBWumCz/N0hclO5oyHkHipU4+gqZC5cgeJuk3jMJGiR0oN9QHoK8dorJQzvA
-	 NaVcgiwywP8HPeQLU/wowrmJrcrZwOnNtUEDo8R8=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58BBaWPC1027214
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 11 Sep 2025 06:36:32 -0500
-Received: from DLEE200.ent.ti.com (157.170.170.75) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 11
- Sep 2025 06:36:32 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE200.ent.ti.com
- (157.170.170.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Thu, 11 Sep 2025 06:36:32 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58BBaWWU1766328;
-	Thu, 11 Sep 2025 06:36:32 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 58BBaVFh032092;
-	Thu, 11 Sep 2025 06:36:31 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet
-	<corbet@lwn.net>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        MD Danish Anwar
-	<danishanwar@ti.com>,
-        Mengyuan Lou <mengyuanlou@net-swift.com>,
-        Lei Wei
-	<quic_leiwei@quicinc.com>, Xin Guo <guoxin09@huawei.com>,
-        Michael Ellerman
-	<mpe@ellerman.id.au>, Fan Gong <gongfan1@huawei.com>,
-        Lorenzo Bianconi
-	<lorenzo@kernel.org>,
-        Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>,
-        Lukas Bulwahn
-	<lukas.bulwahn@redhat.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <devicetree@vger.kernel.org>
-Subject: [PATCH net-next v4 7/7] arch: arm64: dts: k3-am64*: Add shared memory region
-Date: Thu, 11 Sep 2025 17:06:12 +0530
-Message-ID: <20250911113612.2598643-8-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250911113612.2598643-1-danishanwar@ti.com>
-References: <20250911113612.2598643-1-danishanwar@ti.com>
+	s=arc-20240116; t=1757590604; c=relaxed/simple;
+	bh=l3WS5mh3b7m+0CGnd7HwPGEX6fOXJSXSic0gzbaETOY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FPdh5yvZZB4VMPcnrXyyTIRorPPrttfbVZXXGsLegWmOKpvjCD0q0+fTWpB4LUNyDyE7nqmEhbH7Q+WqmfKYtq/WWrQMPjgwT1bHoy6hezHtmBMPYc3kPXU6XisfMS4LutwdtShjB9warvE1iommjvGeWeD000nUgnNaxSwCc04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QbgcjOFd; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6188b5ae1e8so789072a12.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 04:36:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757590601; x=1758195401; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l3WS5mh3b7m+0CGnd7HwPGEX6fOXJSXSic0gzbaETOY=;
+        b=QbgcjOFdQCEX77z/FdlRwnzEmGsALvq3U9SOMI0CS5/Coz9cwTG3pr8H10coBpZ0ZT
+         ALfxzqhBFvmTlunvaBg5eojquIU2M0Jaj6+Hd0e8iXqgKuOZqpt4Pv6GARREjVuH73n6
+         hdS/4L12c0LlPui/1Ra+uKktXYpezhtgeFeBAindj/qegG++n014aPkSXSpYqw+JJt2x
+         5d9AacMrKkjsMmKaZ0myeESD6BMVT92frcJGeyabQR1LDI54v2GGB/cQhRWnOlA2P3pb
+         1nosawlRTBFeGlzHK360D6IZGmPAf3T+Q0SiPG4HX3udF0VqG3qAdTsBxdNsQnMuetky
+         AnCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757590601; x=1758195401;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l3WS5mh3b7m+0CGnd7HwPGEX6fOXJSXSic0gzbaETOY=;
+        b=uqrrS1FKlGYwgtAZevyYlraChvaT9kYG1WEgU8xNqXMnHK13SND9vDAZNlJsfDbgyH
+         esvj5w88514rXcd4q91Z14PoLRzDFC+kTBJp2cUxnnVdCLpLqCEIbfIcfKsdvJ3bVxlQ
+         Abs7eEsY+NS7Jp56LSGp/RXNAp9KcydDOIhdb402WCOJDIjIBlqWODX0CVLoe8NTCMzx
+         0Zza8vw0kXY3uZE6dzPQis1lfbiE0+dz5MP7sycwp5aQoOo+zy9N95KTZ5XCV+71J4Pm
+         xTPniF/vbm9wXz25fbfvUszL06jX9ZsIYalQPfyh/a9qqSQihjFtP02s/B4lvJPbYASH
+         TAoA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1W1kNWuApvEvaLqR7cgctc7dXonr84VKo4bcgXMT3ErmWzEcoCPFf+XX2WNLYYQxdDMpsfVI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNugsIg00XWH2lSH34eH41v8tcqxekdG3BBnN/NtnKXlxAFN2T
+	B7DnwtTWX+jbcVc3J7l89tUxTOjHCdVQRcLE9Rccycq4VpWdm95KC4U1f2EhbVDRvP4xGuqxNeW
+	UFMpbuW0pUxfVASHeJKTAg8mOAknUHPpUsT9y42A=
+X-Gm-Gg: ASbGncs+MFssyFBwej+e62TAj43fHXb8dNqDMV08pqOCZpQm0Mjrhykq5DMn0+bMc4C
+	nztx6y0PSUzvHCN8kWB/8PKd4wTCxmYsg8luIgRtJMh75QQRcPzri82sESxy1jKmjWOZFov9mfW
+	25OSdDjvjNtPYNWXv8EhgfFrDYpwPQE4/nbk2K95lsXIIddScjf5CjDmTxXvo971yH+5/X3QB3k
+	I1PoDr5dNkdnBpNtA==
+X-Google-Smtp-Source: AGHT+IFTNKY6jjRUaK+95vjWoIXWhr+sTjejTLV8OOCQsfjrobYVHw8JMmZi1nhLUH2mOW0HugLlXyiAfLiI1n/62Pg=
+X-Received: by 2002:a05:6402:2685:b0:61d:dd9:20db with SMTP id
+ 4fb4d7f45d1cf-6237c048793mr16217741a12.31.1757590600743; Thu, 11 Sep 2025
+ 04:36:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org> <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
+ <20250911-werken-raubzug-64735473739c@brauner>
+In-Reply-To: <20250911-werken-raubzug-64735473739c@brauner>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Thu, 11 Sep 2025 13:36:28 +0200
+X-Gm-Features: Ac12FXxRFt9Ctd5Cl_pR-FdI4tarLWVQlbT7aCbaq2ftodBoMLqTaIDo5wMZnik
+Message-ID: <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
+Subject: Re: [PATCH 27/32] nsfs: support file handles
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
+	Aleksa Sarai <cyphar@cyphar.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reserve a shared memory region for rpmsg eth communication and add it to
-the remote proc device `main_r5fss0_core0`.
+On Thu, Sep 11, 2025 at 11:31=E2=80=AFAM Christian Brauner <brauner@kernel.=
+org> wrote:
+>
+> On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
+> > On Wed, Sep 10, 2025 at 4:39=E2=80=AFPM Christian Brauner <brauner@kern=
+el.org> wrote:
+> > >
+> > > A while ago we added support for file handles to pidfs so pidfds can =
+be
+> > > encoded and decoded as file handles. Userspace has adopted this quick=
+ly
+> > > and it's proven very useful.
+> >
+> > > Pidfd file handles are exhaustive meaning
+> > > they don't require a handle on another pidfd to pass to
+> > > open_by_handle_at() so it can derive the filesystem to decode in.
+> > >
+> > > Implement the exhaustive file handles for namespaces as well.
+> >
+> > I think you decide to split the "exhaustive" part to another patch,
+> > so better drop this paragraph?
+>
+> Yes, good point. I've dont that.
+>
+> > I am missing an explanation about the permissions for
+> > opening these file handles.
+> >
+> > My understanding of the code is that the opener needs to meet one of
+> > the conditions:
+> > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
+> > 2. current task is in the opened namespace
+>
+> Yes.
+>
+> >
+> > But I do not fully understand the rationale behind the 2nd condition,
+> > that is, when is it useful?
+>
+> A caller is always able to open a file descriptor to it's own set of
+> namespaces. File handles will behave the same way.
+>
 
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- arch/arm64/boot/dts/ti/k3-am642-evm.dts | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+I understand why it's safe, and I do not object to it at all,
+I just feel that I do not fully understand the use case of how ns file hand=
+les
+are expected to be used.
+A process can always open /proc/self/ns/mnt
+What's the use case where a process may need to open its own ns by handle?
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am642-evm.dts b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-index e01866372293..6e8e2c39146b 100644
---- a/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-+++ b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-@@ -61,7 +61,13 @@ main_r5fss0_core0_dma_memory_region: r5f-dma-memory@a0000000 {
- 
- 		main_r5fss0_core0_memory_region: r5f-memory@a0100000 {
- 			compatible = "shared-dma-pool";
--			reg = <0x00 0xa0100000 0x00 0xf00000>;
-+			reg = <0x00 0xa0100000 0x00 0x300000>;
-+			no-map;
-+		};
-+
-+		main_r5fss0_core0_memory_region_shm: r5f-shm-memory@a0400000 {
-+			compatible = "shared-dma-pool";
-+			reg = <0x00 0xa0400000 0x00 0xc00000>;
- 			no-map;
- 		};
- 
-@@ -767,7 +773,8 @@ mbox_m4_0: mbox-m4-0 {
- &main_r5fss0_core0 {
- 	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
- 	memory-region = <&main_r5fss0_core0_dma_memory_region>,
--			<&main_r5fss0_core0_memory_region>;
-+			<&main_r5fss0_core0_memory_region>,
-+			<&main_r5fss0_core0_memory_region_shm>;
- };
- 
- &main_r5fss0_core1 {
--- 
-2.34.1
+I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
+do not keep an elevated refcount of ns object could be useful in the same
+way that an NFS client keeps file handles without keeping the file object a=
+live.
 
+But if you do not have CAP_SYS_ADMIN and can only open your own ns
+by handle, what is the application that could make use of this?
+and what's the benefit of such application keeping a file handle instead of
+ns fd?
+
+Sorry. I feel that I may be missing something in the big picture.
+
+Thanks,
+Amir.
 
