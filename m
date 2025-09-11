@@ -1,166 +1,136 @@
-Return-Path: <netdev+bounces-222087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF07DB52FFA
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:19:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10AF8B53017
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 13:22:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34226B60058
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:13:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FCA61BC4C5B
+	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 11:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622BC31CA7F;
-	Thu, 11 Sep 2025 11:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D51314A65;
+	Thu, 11 Sep 2025 11:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g06tfjst"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="rg548nDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03FE31690E;
-	Thu, 11 Sep 2025 11:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9859919A;
+	Thu, 11 Sep 2025 11:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757589042; cv=none; b=S4e3/HqQbvFEBAgn5Q+40Bv1xA1JqilIkVfYnfvTw/s4+krdyalmS/eKNA4yb/NeuHz8n6QGgNcxtOtb4XiUoG9P1KaqlRmdEQFoULmSKAGM7urENBzOwkGltMi/+poYVep4+i8Lw9+nlKmC+2VWLGJH3w5WbkIrqotbQ7ACflU=
+	t=1757589772; cv=none; b=luBEWkBf08jrzoPXqFCg218fVVtNWeIV8J/pgq9M75j/WAgvlGaM43y7jJZGSzfMvyjfXE54fVRRmrERlogbKNUcH2RraQbr7hRP7fZM7j4E7+w+70iTmnJfveKselO05fEJ9IXM1v5VHE3m6azMfHaE8oQFT9+iXS/Sp/Hqy54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757589042; c=relaxed/simple;
-	bh=P6ziM++D7EGjvykroQP/8gShFk9KhYnpWo7xbEc2R64=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=pDwDEtKt5+2IHxnJMYBsjyWL7YrlJZ69zOwWQQeMfRqM0C9LgTY+XgSWFFbcKVrf2nPijBxGAthD5ASpfje2khxt5mOH1oldqvkuNAkxSIoGVg7jn3xu5Jrf6KmVOiLHzO42MUEhDhkDP7ZrtJCTYGzRFUHEbkz10Q64xgWU3zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g06tfjst; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rz0hbAq7fEga5zRohMAv5O8tOvXUWgvThRUc5VepeC8=; b=g06tfjstGQLMFBsLMh67/CK15F
-	sotG04IAJtL2XzV7vxds+1Im8Sv+5ta9ANLbcy63HSdQIAyFnYxzEYGs4ZXZBgbecBSQv+XCZaD04
-	7kLq70Al+H1d0cKZOrzM4So/h1cStXtC7ZuKBvQQVCxsFcaBuSDI5IN3IyLtgEfI8Pp7oXWFW2/YB
-	tF8kLTJdRpuqo1vkj9o1vSJ0h2aHzgLTta4EOLiaB+ZBTngAE0JB3/mAk4deYcpyj9EGLZF2B6eDv
-	fDMjGVWq95gtpYfFZtUdS784V11jtVMNhk6J4wYBih7wavKMcqKvhzgS5is8TPgBT/Chdt/NwdW71
-	QI4u2Kvw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35294 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uwfCB-000000002vD-29GD;
-	Thu, 11 Sep 2025 12:10:31 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uwfC8-00000004j9Q-1iOP;
-	Thu, 11 Sep 2025 12:10:28 +0100
-In-Reply-To: <aMKtV6O0WqlmJFN4@shell.armlinux.org.uk>
-References: <aMKtV6O0WqlmJFN4@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next v2 11/11] net: stmmac: move timestamping/ptp init to
- stmmac_hw_setup() caller
+	s=arc-20240116; t=1757589772; c=relaxed/simple;
+	bh=AirdKhZqAL8setUr4V5GTYPjm/44kfeQid2fzHbOz38=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=VsbZuU9YcUpEhGQFltXG0HPw35F4ofYlV+wL+X5024BI5ZIlG8KJzuqYS3iLJR1XhlrcgOb+lIH4B1PTcaidnYgNESXfapX7Cs/LX9JHRfKi18MOURyhqZZchRNlVbqY1J5GfyFyLS1hmVyqPvR5Fnyqt65QghV924wmHtlY1C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=rg548nDu; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id B72A01A0DD2;
+	Thu, 11 Sep 2025 11:22:46 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7F94160630;
+	Thu, 11 Sep 2025 11:22:46 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F18F4102F29EC;
+	Thu, 11 Sep 2025 13:22:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1757589765; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=7mHOHltEqX8B0G9kFnwXVbwYEPoEFPmOITNQtGHOL7U=;
+	b=rg548nDuSFFxObCMzRXoneppAwOfrCipAzt86agMW5AYRsdyihvUj2lIlXQMffI73pflcX
+	Zx4bykklolsTe7RL5UcahnEZYaZcLHi1K52nKGvNULtwiGucfw6163ReXYK5L5G41Q2utJ
+	zSI9qFkWGoikYwpRvgrqwmFgrkMKsqc2YCFIcQ1+pBG0HS6SzTMrTXv4boAG0O/NVgYReg
+	9UzgnquhTtNMDvPxw18DeqTEI+2cXsuXPS73qJxialxm6rHtzOJybzPV8Gh3y3UUh46wik
+	UyrtIDZziscrpNbVLVv3neuG9yXMQtl9jZp3eRh38yaNZW6lFGn6LAEfxoQ9fw==
+Message-ID: <c320ebea-7c3c-460b-99eb-35f1dc1a3dc3@bootlin.com>
+Date: Thu, 11 Sep 2025 13:22:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: configure strap pins
+ during reset
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Pascal Eberhard <pascal.eberhard@se.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250910-ksz-strap-pins-v1-0-6308bb2e139e@bootlin.com>
+ <20250910-ksz-strap-pins-v1-2-6308bb2e139e@bootlin.com>
+ <87y0qmb9ne.fsf@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <87y0qmb9ne.fsf@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uwfC8-00000004j9Q-1iOP@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 11 Sep 2025 12:10:28 +0100
+X-Last-TLS-Session-Version: TLSv1.3
 
-Move the call to stmmac_init_timestamping() or stmmac_setup_ptp() out
-of stmmac_hw_setup() to its caller after stmmac_hw_setup() has
-successfully completed. This slightly changes the ordering during
-setup, but should be safe to do.
+Hi Miquèl,
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+On 9/10/25 5:38 PM, Miquel Raynal wrote:
+> Hello bastien,
+> 
+>> +static int ksz_configure_strap(struct ksz_device *dev)
+>> +{
+>> +	struct pinctrl_state *state = NULL;
+>> +	struct pinctrl *pinctrl;
+>> +	int ret;
+>> +
+>> +	if (of_device_is_compatible(dev->dev->of_node, "microchip,ksz8463")) {
+>> +		struct gpio_desc *rxd0;
+>> +		struct gpio_desc *rxd1;
+>> +
+>> +		rxd0 = devm_gpiod_get_index_optional(dev->dev, "strap", 0, GPIOD_OUT_LOW);
+>> +		if (IS_ERR(rxd0))
+>> +			return PTR_ERR(rxd0);
+>> +
+>> +		rxd1 = devm_gpiod_get_index_optional(dev->dev, "strap", 1, GPIOD_OUT_HIGH);
+>> +		if (IS_ERR(rxd1))
+>> +			return PTR_ERR(rxd1);
+>> +
+>> +		/* If at least one strap definition is missing we don't do anything */
+>> +		if (!rxd0 || !rxd1)
+>> +			return 0;
+>> +
+>> +		pinctrl = devm_pinctrl_get(dev->dev);
+>> +		if (IS_ERR(pinctrl))
+>> +			return PTR_ERR(pinctrl);
+>> +
+>> +		state = pinctrl_lookup_state(pinctrl, "reset");
+>> +		if (IS_ERR(state))
+>> +			return PTR_ERR(state);
+>> +
+>> +		ret = pinctrl_select_state(pinctrl, state);
+>> +		if (ret)
+>> +			return ret;
+> 
+> In order to simplify the pinctrl handling I would propose to replace
+> these three function calls by:
+> 
+>        devm_pinctrl_get_select(dev->dev, "reset")
+> 
+> I do not think in this case we actually require the internal
+> devm_pinctrl_put() calls from the above helper, but they probably do not
+> hurt either.
+> 
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index ff12c4b34eb6..8c8ca5999bd8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3436,7 +3436,7 @@ static void stmmac_safety_feat_configuration(struct stmmac_priv *priv)
-  *  0 on success and an appropriate (-)ve integer as defined in errno.h
-  *  file on failure.
-  */
--static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
-+static int stmmac_hw_setup(struct net_device *dev)
- {
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 	u32 rx_cnt = priv->plat->rx_queues_to_use;
-@@ -3507,11 +3507,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
- 
- 	stmmac_mmc_setup(priv);
- 
--	if (ptp_register)
--		stmmac_setup_ptp(priv);
--	else
--		stmmac_init_timestamping(priv);
--
- 	if (priv->use_riwt) {
- 		u32 queue;
- 
-@@ -4000,12 +3995,14 @@ static int __stmmac_open(struct net_device *dev,
- 		}
- 	}
- 
--	ret = stmmac_hw_setup(dev, true);
-+	ret = stmmac_hw_setup(dev);
- 	if (ret < 0) {
- 		netdev_err(priv->dev, "%s: Hw setup failed\n", __func__);
- 		goto init_error;
- 	}
- 
-+	stmmac_setup_ptp(priv);
-+
- 	stmmac_init_coalesce(priv);
- 
- 	phylink_start(priv->phylink);
-@@ -7917,7 +7914,7 @@ int stmmac_resume(struct device *dev)
- 	stmmac_free_tx_skbufs(priv);
- 	stmmac_clear_descriptors(priv, &priv->dma_conf);
- 
--	ret = stmmac_hw_setup(ndev, false);
-+	ret = stmmac_hw_setup(ndev);
- 	if (ret < 0) {
- 		netdev_err(priv->dev, "%s: Hw setup failed\n", __func__);
- 		mutex_unlock(&priv->lock);
-@@ -7925,6 +7922,8 @@ int stmmac_resume(struct device *dev)
- 		return ret;
- 	}
- 
-+	stmmac_init_timestamping(priv);
-+
- 	stmmac_init_coalesce(priv);
- 	phylink_rx_clk_stop_block(priv->phylink);
- 	stmmac_set_rx_mode(ndev);
--- 
-2.47.3
+True, thank you.
 
+
+Best regards,
+Bastien
 
