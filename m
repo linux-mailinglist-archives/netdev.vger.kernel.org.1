@@ -1,125 +1,148 @@
-Return-Path: <netdev+bounces-222675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E66B1B555A7
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:55:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA6ECB555DD
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 20:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A22957C2FD9
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:55:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87D635C5294
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 18:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49453329F31;
-	Fri, 12 Sep 2025 17:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7BE32A81F;
+	Fri, 12 Sep 2025 18:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XSN3kVvJ"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="LQ3BgZpe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A95F327A34
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 17:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51810302CB2;
+	Fri, 12 Sep 2025 18:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757699741; cv=none; b=M6+OI17SlHROfg9683VFLh1XFNBFCwK58WhMb/WLfwmYbcW0NuKzCR4PpzMHhCZ4oPwtXAa5K2r9JTE0YAAKcRPf7SHIiWsUBMJlr1lwvL4kZl5240uJ95dVpEgi32x5Dn2drG5A5nFlf72lNWq92nd4i6RVZkZhFOP686FQ9SI=
+	t=1757700609; cv=none; b=JxqUS9OQDGgaAyDAAMKec8QM684ZH6xZQwlJnymGck3XTl4lCq6qylYrbvG0jxl+EF6LL/BYS9BQi8VCPovP3V2DomvnuD/n4q1yYJRl9l/41AiPZ1nQuLCa8LlQ6DZkVTRTFUuBhm51kS4MPcR0m97ZZBW9DLY1ah/972CM0pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757699741; c=relaxed/simple;
-	bh=21udc6JLttU/l5KykgHLGN6cnqZbUcu6oJMFH12Gbc8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OoxWPu+DIWYKyTNJfvSADkWBj/YbC9liJLXsQcJFAFXK8XpH49vBeha1CjUR2FPgdBMbou/2zBOKVSFP9IvBxbOwKvxca8DNdm+op4j+cKtZ4Zz6xTfH6nr+LgdeC4GGOMZuywxgGucMm7hNp4eSCh5ExG9zz+Aw6vCZouzI8Gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XSN3kVvJ; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3e7643b0ab4so1277169f8f.2
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 10:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757699738; x=1758304538; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I1hqm75GbQcmUVjrwGt63wYxMp0L1ujfuRL7MiRNqrs=;
-        b=XSN3kVvJRH5ItNq2CO3DlPwO5D+SEi2EvI22vyF6fgjL+J4+DykHkhPn8ye+UDIJ1b
-         jKr7uJaYWJSfPfBQXLkWk4w/DqtkKP9p6rIJoG8MP5iVm0sypCbTyVeJR025OjqP5QLZ
-         150Md+okjlmJu7r6PQlvMvX2rDiSs3OE7abFFd9UJfsH97t4DeKWqD/knKeOxsOD0V6L
-         rgYdTCgLx91yZK6Yd2xnFC9OzfbL/uIuFiDZ1VMGvZ5aJJUNDWKgNtUj/2dDP1twW5X6
-         ha0pW4NM0j0WI/AhGKHc/OvMfUSdMXt7SgQmYZORrfWDe0jYmfKxev3jfnKh7kBfAE1s
-         HEtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757699738; x=1758304538;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I1hqm75GbQcmUVjrwGt63wYxMp0L1ujfuRL7MiRNqrs=;
-        b=CZm5dpEliHlDlIm9uhcTna8qEDIaosJ+4x0XhCern9xxY1Ai7ZaMWaW4i2gWc3xCgQ
-         hW9fRXzEStOU6CQKlNNyY6bsCdcX8qGlkIKP3+emjFi94WBt154c3WKTvWSgzyg9OwAG
-         g9lDwCGyf7GeUdDsaESL8GBgHPcBQcph1XRag8w/q1uN3TLliWtTe91itJFCq25FDgut
-         bKP01boGmgvNi37vdDQWO7hqbRSi4/RNBshctm5TQI3hpsFoiIF53o6GIOoa426EAM1G
-         wkdEDPKV2AEKQ5RScPkEVxEaIWzQrdwTn/hVXrIPcMMv3MaS3u2/BSXA65XYP4WFgk+A
-         1YTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXwmDOZh0147IwU4XTHboH4QSmrR2661Bfoq0vo3xTcDIHztUbeeiNPXuahVYtuy4afw+6Bw58=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywdl4IGEq0XH43wzn6Ia9oR2QNC2RRGcSfMOq6w66bLrOX69B/3
-	jCbGESmBFSbpKYebXc9K3C72ameoAAZoKBphpRKP9Dfp9/BJSk6HBft6jBnHo9wXgmyl1GmKuZe
-	+6Z/bASrfWiIGMrHbvpRDzV9g1SQkcWQ=
-X-Gm-Gg: ASbGnctDdfxPbULXEJrAX94otBEyRpJeNH1TwALtrBUbRbsmI3BTG9mW+/3/WfWMLRN
-	CwOIuy4FORVhP5Y9Eb7WPyspby6Qy+AWvSZtSP2p6QeXyRkYfJcXscx0hz+WuJC7X1Pb10IrPXx
-	ck30K/Ig7TZ0Bt5xHD4ipHUJcj5Q3mHc1AYR2UvRHm5WNNv+FOWKyqHgx9hQIrFk3c+/pxSlqtH
-	c6Qm4NY3Y9DFDpRYEMLxu79XnseUvjq6kDqq5aWSJEwLXg=
-X-Google-Smtp-Source: AGHT+IGkgj6IrkdGUDNbAf51bRnusq5rydfcWtBFKBRkglsxY7vTPHWpp7JaetFcOJOedb2SaAMVrhhCP6B4H3UnkTM=
-X-Received: by 2002:a5d:5d09:0:b0:3e7:17d4:389b with SMTP id
- ffacd0b85a97d-3e765a1b499mr4151861f8f.52.1757699737563; Fri, 12 Sep 2025
- 10:55:37 -0700 (PDT)
+	s=arc-20240116; t=1757700609; c=relaxed/simple;
+	bh=yPJqLt8S5WWM4BObvCnuZSDbc1t/tgpd5gl4wkceEGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X3c+crgGM9/fJ1XVtzaq2C74CVkrhehomByFYYJ3536xoME/bMOoI+eCfaFN+QpLEeXimyjuMh1mHTFgsWFMP0cunydtYHzj6hzrZoeg6QfcYcDom9jPyqzvP0axGR48m3M6LnNbhmhdWwc3I8hVBhZEFcjUksr1tpZ8m7qj9EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=LQ3BgZpe; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
+	by linux.microsoft.com (Postfix) with ESMTPSA id ED2B42119CBF;
+	Fri, 12 Sep 2025 11:10:00 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com ED2B42119CBF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1757700602;
+	bh=HXYJgEfXFwo/OPKrYhrveFvpXwC44rrX+LkCZApziY4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LQ3BgZpeMJGwjTLRudlWpMa8SX8RO+j/34vsQaL4PkTvTkI/qkWK/wElTFG4ma7bq
+	 8NM3LoJh5HhkcNK+KwwYAoh01/HqKWzw8IdRL8lUGd7y0lqldMU83UUu/URfbdFHiD
+	 X8LZ8UBwGVc2sHYIuNq4iAAYSpEmzqL/34I8VDGk=
+Message-ID: <a8c8305c-b518-c840-fc64-50bcba302725@linux.microsoft.com>
+Date: Fri, 12 Sep 2025 11:10:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250912124059.0428127b@canb.auug.org.au>
-In-Reply-To: <20250912124059.0428127b@canb.auug.org.au>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 12 Sep 2025 10:55:26 -0700
-X-Gm-Features: AS18NWD5ST2IJKM1utHYQwt-Xxi_J7BVpfEK88PJRAO0c4SRtSvsWIsTf6DJ07M
-Message-ID: <CAADnVQ++ULXeQQ=oLTXvoo98QSrk-afc=H5Lq9Pm_LyH3X=sCw@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the tip tree with the bpf-next tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Jiawei Zhao <phoenix500526@163.com>, Jiri Olsa <jolsa@kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v1 2/2] Drivers: hv: Make CONFIG_HYPERV bool
+Content-Language: en-US
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
+ airlied@gmail.com, simona@ffwll.ch, jikos@kernel.org, bentiss@kernel.org,
+ kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, dmitry.torokhov@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, bhelgaas@google.com,
+ James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+ deller@gmx.de, arnd@arndb.de, sgarzare@redhat.com, horms@kernel.org
+References: <20250906010952.2145389-1-mrathor@linux.microsoft.com>
+ <20250906010952.2145389-3-mrathor@linux.microsoft.com>
+ <2025090621-rumble-cost-2c0d@gregkh>
+ <d7d7b23f-eaea-2dbc-9c9d-4bee082f6fe7@linux.microsoft.com>
+ <2025091253-overwrite-carol-b197@gregkh>
+From: Mukesh R <mrathor@linux.microsoft.com>
+In-Reply-To: <2025091253-overwrite-carol-b197@gregkh>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 11, 2025 at 7:41=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
->
-> Hi all,
->
-> Today's linux-next merge of the tip tree got a conflict in:
->
->   tools/testing/selftests/bpf/prog_tests/usdt.c
->
-> between commit:
->
->   69424097ee10 ("selftests/bpf: Enrich subtest_basic_usdt case in selftes=
-ts to cover SIB handling logic")
->
-> from the bpf-next tree and commit:
->
->   875e1705ad99 ("selftests/bpf: Add optimized usdt variant for basic usdt=
- test")
->
-> from the tip tree.
->
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
+On 9/12/25 04:43, Greg KH wrote:
+> On Mon, Sep 08, 2025 at 02:01:34PM -0700, Mukesh R wrote:
+>> On 9/6/25 04:36, Greg KH wrote:
+>>> On Fri, Sep 05, 2025 at 06:09:52PM -0700, Mukesh Rathor wrote:
+>>>> With CONFIG_HYPERV and CONFIG_HYPERV_VMBUS separated, change CONFIG_HYPERV
+>>>> to bool from tristate. CONFIG_HYPERV now becomes the core Hyper-V
+>>>> hypervisor support, such as hypercalls, clocks/timers, Confidential
+>>>> Computing setup, PCI passthru, etc. that doesn't involve VMBus or VMBus
+>>>> devices.
+>>>
+>>> But why are you making it so that this can not be a module anymore?  You
+>>> are now forcing ALL Linux distro users to always have this code in their
+>>> system, despite not ever using the feature.  That feels like a waste to
+>>> me.
+>>>
+>>> What is preventing this from staying as a module?  Why must you always
+>>> have this code loaded at all times for everyone?
+>>
+>> This is currently not a module. I assume it was at the beginning. In
+>> drivers/Makefile today:
+>>
+>> obj-$(subst m,y,$(CONFIG_HYPERV))       += hv/
+>>
+>>
+>> More context: CONFIG_HYPERV doesn't really reflect one module. It is
+>> both for kernel built in code and building of stuff in drivers/hv.
+>>
+>> drivers/hv then builds 4 modules:
+>>
+>> obj-$(CONFIG_HYPERV)            += hv_vmbus.o
+>> obj-$(CONFIG_HYPERV_UTILS)      += hv_utils.o
+>> obj-$(CONFIG_HYPERV_BALLOON)    += hv_balloon.o
+>> obj-$(CONFIG_MSHV_ROOT)         += mshv_root.o
+>>
+>> Notice vmbus is using CONFIG_HYPERV because there is no 
+>> CONFIG_HYPERV_VMBUS. We are trying to fix that here.
+> 
+> This series does not apply to my tree:
+> 
+> checking file drivers/gpu/drm/Kconfig
+> checking file drivers/hid/Kconfig
+> checking file drivers/hv/Kconfig
+> Hunk #2 FAILED at 82.
+> 1 out of 2 hunks FAILED
+> checking file drivers/hv/Makefile
+> checking file drivers/input/serio/Kconfig
+> checking file drivers/net/hyperv/Kconfig
+> checking file drivers/pci/Kconfig
+> checking file drivers/scsi/Kconfig
+> checking file drivers/uio/Kconfig
+> checking file drivers/video/fbdev/Kconfig
+> checking file include/asm-generic/mshyperv.h
+> Hunk #1 succeeded at 162 with fuzz 2 (offset -3 lines).
+> Hunk #2 succeeded at 198 (offset -3 lines).
+> Hunk #3 succeeded at 215 (offset -3 lines).
+> checking file net/vmw_vsock/Kconfig
+> 
+> What was it made against?
+> 
 
-Thanks for headsup. Looks good.
+Sorry to hear that. It was built against hyper-next, but perhaps I 
+accidentally used our internal mirror. Let me rebase and send V2
+right away.
+
+Thanks,
+-Mukesh
+
+
+
 
