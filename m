@@ -1,252 +1,244 @@
-Return-Path: <netdev+bounces-222672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF96B55577
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:29:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5CB5B55598
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D60A18842A8
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:30:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EED131D62E3D
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0849D31AF25;
-	Fri, 12 Sep 2025 17:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46837277004;
+	Fri, 12 Sep 2025 17:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DeZhgqmK"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="ONH6o7Mj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2116.outbound.protection.outlook.com [40.107.236.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728F41DE4CE
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 17:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757698189; cv=none; b=SN6ZlnFnEkpJ8EP9ZdB45zMNiNiK9+OudoTtq6Jwb8x1l0WKYSgb3hEZVlOpA9AXZp1uY0opFp5Xu/pnwC2QJ76vCSY33TTruYyxo3uYJI+6QpOfkg6E8NEZU248DujEJhm6m7O+PMT2gf0aOr9e4WsrMcUyS8ecXJoa0qzRC0c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757698189; c=relaxed/simple;
-	bh=Z1xFc4kWydanc6mTiHOzn4cmKEU6izxR+7X1a1Lgo3E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gypsz/c6YqTPpfUKUfOW8YgIPFgA0ibg0m29/tNU+xYdHPV+qfyG3qd11JKxl9n2Rhg0rmcfFyBIQyZHlQLtMyalgS+m3mf9K0HTNf1WKJXjYWEJOH5huXBHRJngdBulaECM9rCmN/kpKvQVL//oz9yechhPEsiWvLuFTFPa0/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DeZhgqmK; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <80b309fe-6ba0-4ca5-a0b7-b04485964f5d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757698185;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RwQTlkyZSo9/pvc8bk9JLJLXcS+5IKS20oI3BS5xNeg=;
-	b=DeZhgqmKh2wTtYqyV2EbZ7nlICrIHLfC1ZZFz7YJakOBKogfBtJKIYcXDvAIsfbBeuZlDr
-	kSmUUjnz7yHAMpKFHEACsArwwaadMfdjzc4Nx8DWYJNXgpJ1TkSIFbUiYkZ3ThTp7YCOnV
-	QCwIpe2daZC+1TBrCCKsr0E+zzyWOfM=
-Date: Fri, 12 Sep 2025 10:29:39 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC90272802;
+	Fri, 12 Sep 2025 17:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.116
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757699292; cv=fail; b=JTD4nx7qDVbHtsYxtsk+0fzaC+kOb22n1IeqCXpFHVMDU29r1yVSmIvxonFQiB4+5bQ2fWJGUkRmN1AGolx5UsV2O9mMTXOS+zRn/tvjc2t+CeH2jHSi9ECRg0hpHcFCKAxtL4uVJQXHGTTRmMwjt2kCbiigHi3/sMH6HS0QsZo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757699292; c=relaxed/simple;
+	bh=bC0Iexyd8d4xy+aaj337ETAVvWRTwKDdGVaf9TZv1WE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=pM/pFvfz/ovmEl3qwyf/5ruWgDK+Sde1SVjc/BbcW0wGc64QqGI1xAN5k+HwdWwmu5w3h2yM2ddzeJh4qLgH0vgJ2KF38Lc7M+eMYbNJRnL3sLlLIxBowPsfBiUk47n2N3SbzIFtye1sa0Er8LlKSZcFMn21ktUF1+xb0+OQeUA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=ONH6o7Mj; arc=fail smtp.client-ip=40.107.236.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dOid+zoTPWJZtmzZ9T77yludt8R6Hr0q70sF5ymwaXzfjcn70LU7xQEQ7DdxwcgcbBVT2LPS/BwcZWBJgoNx9BFJtsMPD2FGP1xgrD/2zY3e1mmC4mmLjydRcA3vJQRm15ESyuJQVD21SfTCuAcXF4JTt0djW4oOLG3KrKS9kG87PllIGUJsJP/fmlTFBFjPgLLm/MQf6u1+f/kfX3gMCgBVm5f+K/RpFBOUm5KxiqULIWz0Bw8T8gtSfGhzLNNKmH/zPXVco/yLdL6maon/0GRsbqdq8p5O38PM7nFcxxKj2DzsiCCo7EsSOsyCcqJMR0pV+GnvjfXccR8SnBGJVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+HltCYFoyQEefOlgyay2a1na9XRxAfi7sRpmrGhHnWI=;
+ b=v71oSu0UN84fPbw0+ewt3w4h1777hA+ls2p0h/Bsv63lCMOQGPKOkgydmaPJCFqJV9zwD/UBNuzNEv5R5kXQ023PmMcoSnMS6WK73lt+Pn4wAn6kc69IDGkWg1EEUfrSOsF2Cw8I3tYbn5Cf53UHSDWqm1DSluM5LZB8vGS9XleEPUf0DSCL9mLT2r1nXtUamD65oFtXbUuqxfBuUZsR7muFr97AW9Fo0nxlcedKVKuHK1i2+evqTg8x2Yfbt1EfwVhKH6Qop/K1XuIa7sb0jaQLc+hsvlaJPWU19HGpt3Mt5R4PSv2UDbh0jAhbCYhtVXBpx/dLGv9dXZWORabjnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+HltCYFoyQEefOlgyay2a1na9XRxAfi7sRpmrGhHnWI=;
+ b=ONH6o7Mjv2j4Fw6Bnez0qtfy+FH5IXO+ETmy6NvVt7jA8KzG1HyABb1fVkeZM2z1dPnl10d2CBaBY0wiLT6EuEJUJFsFphfpHEPod1qx0Q9/mq0UBFA9noFw9fLMi6GdMJY/t/5+hpb/PZ2YGUylMw51tTH8umutznfQ1uynnkU=
+Received: from SJ2PR21MB4013.namprd21.prod.outlook.com (2603:10b6:a03:546::14)
+ by BL1PR21MB3328.namprd21.prod.outlook.com (2603:10b6:208:399::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.12; Fri, 12 Sep
+ 2025 17:48:06 +0000
+Received: from SJ2PR21MB4013.namprd21.prod.outlook.com
+ ([fe80::3c6d:58dc:1516:f18]) by SJ2PR21MB4013.namprd21.prod.outlook.com
+ ([fe80::3c6d:58dc:1516:f18%4]) with mapi id 15.20.9137.005; Fri, 12 Sep 2025
+ 17:48:05 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Simon Horman <horms@kernel.org>, Haiyang Zhang
+	<haiyangz@linux.microsoft.com>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "edumazet@google.com"
+	<edumazet@google.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>, "ssengar@linux.microsoft.com"
+	<ssengar@linux.microsoft.com>, "ernis@linux.microsoft.com"
+	<ernis@linux.microsoft.com>, "dipayanroy@linux.microsoft.com"
+	<dipayanroy@linux.microsoft.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [PATCH net-next] net: mana: Reduce waiting time if
+ HWC not responding
+Thread-Topic: [EXTERNAL] Re: [PATCH net-next] net: mana: Reduce waiting time
+ if HWC not responding
+Thread-Index: AQHcIpWJOJMKhk/JEkSyLVAsW6srlLSPfGmAgABYLrA=
+Date: Fri, 12 Sep 2025 17:48:05 +0000
+Message-ID:
+ <SJ2PR21MB40130FF8C3278A49A3A6C2D4CA08A@SJ2PR21MB4013.namprd21.prod.outlook.com>
+References: <1757537841-5063-1-git-send-email-haiyangz@linux.microsoft.com>
+ <20250912122849.GA30363@horms.kernel.org>
+In-Reply-To: <20250912122849.GA30363@horms.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=4cf4dce5-c42f-4d78-868a-c0a7f5b292ab;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-09-12T17:44:24Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR21MB4013:EE_|BL1PR21MB3328:EE_
+x-ms-office365-filtering-correlation-id: 3dd933cc-9b1b-4ea2-c5b5-08ddf224873e
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?IYnLrBGC7Pf9kAaMo7dSeNKGYSS/ODUKsHBbiYV2P19A7fuYVcOlFCVC9vWS?=
+ =?us-ascii?Q?LaI+ufamcMxJlNOIDXu9qJt7MtrafKk6yN6WH66N4/SqJfuHaO+cbxXkCTaz?=
+ =?us-ascii?Q?tN5pqpYA5dI8azldf2hBPCeqLyxeI49ontcmnQBBTOD5y4ZZUMKgXjj6ahon?=
+ =?us-ascii?Q?2HL1VTAxf7dJ39RrB9rbBHrFh2htw8K1LMwHmhm893GcylqYMP3iqTgxbjaF?=
+ =?us-ascii?Q?cSEzoKxcl9HkvuIMiCzdrDVpYJ1fbstYsIA5UoyVsrVDUP+jaQluh7YjOBjb?=
+ =?us-ascii?Q?AkbK96xjQFI3SkpV6IZx/HEx4ZXIYPWwmn0ZtkAvsifimS7e++Pc15+yzBOq?=
+ =?us-ascii?Q?DrYwUXum1Z5GYAP22MDfHtiHOtVLvEZJ/6pHoVJYjVJUXgQ42kR4HZYeFSaB?=
+ =?us-ascii?Q?i4+odLqA6o6Q7WEXihMOaYgIWDnvTcFpknP3MsTgtYH+o4/qMUtxh8dV69Yi?=
+ =?us-ascii?Q?TfLz2X3u37jztcV7U3lK+Vi6wJnYfZ3c4QYLatH7QtEYWiJbEt/g5lKgvT04?=
+ =?us-ascii?Q?JTefLaP4GL+ND9ndumi5vHyuDAyHTCrKlZs7FWtejj9IGSkgUAcDQ2xBLl8Y?=
+ =?us-ascii?Q?nGiat/KfU6IlamvKB6qIM0Gb2ifA8ek5gWEWA7QGqUr1UGrAc7GXuGKcQzMl?=
+ =?us-ascii?Q?qzXAQFr0fmnEl+EqvdRhybjQ/8pG0s+yXf724bORBTWawv1FXLfKujtzkxam?=
+ =?us-ascii?Q?nke6zvB3LOg+uzDjXj/VSqnbxTTUpbD1cKja2IqtXpTx4OBDcGExr/kemqCZ?=
+ =?us-ascii?Q?CXR7CBk18YYedy6cUd03cGmkpZDDB258fVNq2csxqJ5jDf5GwGouATqt8xAt?=
+ =?us-ascii?Q?IbVqxsuA+tKDRBw0BKACojkqbtvXiKc97EDLH29hMMjVTyp8MLWkTdNT8bVB?=
+ =?us-ascii?Q?hqQcY3qUibWSIxqQIOsXjmcKZM3jDpTAGn+xeTOjSLnYWP0Ey8en4PNBQLkQ?=
+ =?us-ascii?Q?eB9V75scxlo4sBaWRgJASpT9isiMouTG7/BNjIyA5GlCkVYSkKhd1jA9Elnh?=
+ =?us-ascii?Q?T8k9q0cyhjrW5ORGRmlGkB+NPTAZxXgg+BEbNqBuOR7XKYqMTn8ux+NjCyiT?=
+ =?us-ascii?Q?amqJyRqitzLdCussTWlsOtw/va/KWXUYjcJQ3SKHxDdPuRG7tIjMmxv56at5?=
+ =?us-ascii?Q?sND8CgC6WIE5mIc9zphnUgV75SpKgCGWFwhUgcfkX5rjZe2Hfh3FUZ7XjdiQ?=
+ =?us-ascii?Q?WP9g29Ykhj4BpGsk179yxwKWJq//he7CYvWjLwp5sFnSYo5ejsQGw/c/bEyI?=
+ =?us-ascii?Q?cFQhmyXDfUrejeoqpFL+MB5VvLorJ3yiJRQ3mI0mHm8eU8p6/jk5aLgy2fFS?=
+ =?us-ascii?Q?CZ/SsGjav3DGpjM1Zp4UTgnnsePtUGAvGVDVAs72c1Ent5VWmF+rXCgO4Rvx?=
+ =?us-ascii?Q?PZw5YowpdlvEAymPnpQJ1N9DzaKFXkYa9r+uXWo4NvKn8YkhI9k5zrlgIpx8?=
+ =?us-ascii?Q?Oov7MTSVnR/2rXH7MvU3AmFtavIIxydaDEj15y3S9t3vWttC71peMg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR21MB4013.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?/VrBplZknzbYONG10/WMS00nzVU+A1cBPjBwlDnbViaBgtDsyIHgJM1Y9sAA?=
+ =?us-ascii?Q?2S/5MrYts1sm0SQjvT0nZ7uLCKQhNZjUmHRUSojbLYj6H/JaogsrP66DUKgt?=
+ =?us-ascii?Q?5gs31TWCsobM3bFU8m9MH3no2yrDb9RWcmQXuT43KRb7v78gZ/xTtIeTjENf?=
+ =?us-ascii?Q?pD6Yi+RWgaFTnw/s1HPkfdgwNJ0UZ6OdAgx1BZO/6pns/7BQhruS4K5dsW9A?=
+ =?us-ascii?Q?DFvZV+rkO08/8MY8isI1olVAzmIgyXkF8h1qwe1lmzEMYuPhQqonoHATrQlC?=
+ =?us-ascii?Q?QWlyutLNdUBG5F5k7IiPcP9yviAwrj+i5r5BCEU/IeF+L3GqL0bwGShm7KR9?=
+ =?us-ascii?Q?uMACpcBKLMpKrmTp69M7gBUN4MW8aVt5UW/oi4+2UZi/wkBzAcL9vgkMftde?=
+ =?us-ascii?Q?jQrU5b7D5jzsopmsLvlEezPXKo9Po9BXvR4nQiMtrebEk+5Kjwtv0sgDDtwi?=
+ =?us-ascii?Q?jGg+J2+9H7LVGxTn55GdtNtLE5yyB/VClLDm2JpQawRMHRseGcnNKMtK+o5n?=
+ =?us-ascii?Q?jAv0lSaStUYzv1v3P51QA7B3PPx0ei3W8WDpM0pHVyVbCgaImy8LhqcbO7vv?=
+ =?us-ascii?Q?NH+9SLapsWvJxljjqDDnwFiaOl7/oZB5lEI2PRfzg6ctR9ti7LBQk/PN+YNx?=
+ =?us-ascii?Q?FOn94CowqQ5c0Qx+uQCb85QOeGPsYa8BP+UMrzsnmgLGpTbqN8nYSEShZMQf?=
+ =?us-ascii?Q?6yIzGBPipGq2zlC2u8N6E9OyGO6J9OY7+GFhHb3PIfujgB6A/+LRlvv7ycgM?=
+ =?us-ascii?Q?hL7yVQuVdpK63ZA+SVmA/SrCybWFoSCCSL9DGFgWMHEadsXvQnu3OqCwwEXZ?=
+ =?us-ascii?Q?ZBLcy7xT0AOqP5QhEP59PaZpz44AsGh1C92c6Oz0yGcMt+1IKhnPU7sBza90?=
+ =?us-ascii?Q?VfXOUsflbAY9YsCJ40DmACNMR7A+DKjahnK0SRFQb3YeKk5eTd4s3tyyK3/N?=
+ =?us-ascii?Q?nyCzXv+AEwK1WiBFfglXgSwK5LjXYUIfpi4fZdACZphJXt3I1gX0MGOCfosO?=
+ =?us-ascii?Q?lX5JIVorMoiI80xuxymcyqCDl8d/ljLvew2Ktdxf2D488hHkEwULbTdWJEry?=
+ =?us-ascii?Q?63nwId2/wUDb9kuME3a6VKDTiz3hr593I+1pUo6rqcaz83sjXLNOefQ/ymEW?=
+ =?us-ascii?Q?B/88U75gLeLrmSVdfYySaaGi3Bz+JsYQsbNSmZJeXKrAQGVM22G7umeArOBO?=
+ =?us-ascii?Q?hNQ5gd3mtFgGip+mrhzdPSuc78mQgjhTLFvTPuEG2/RKj+BTNnRqPfbP/th9?=
+ =?us-ascii?Q?L21nV/ky3yD7iAe0dvxARslIwnp8mLGRL3lJvDe+ixtM8r2T0ef5+GTfRsv5?=
+ =?us-ascii?Q?+T8B0szmTnW2/3AvtWNWWK2i0P1Gi5f8S+WOBNri5Yhyc2q283FhQjRiVvRP?=
+ =?us-ascii?Q?iLYVjUpEMj6e12rzBh0xZwK3ZsTC79ddgYka+3zMHJ+9XqM0PxkriTAFtU2T?=
+ =?us-ascii?Q?nTznckQtze6bcCqS4oxYCG/DVyMrbzwd4Ix0t+qIsdnj/GTFjUGoFLOhc8bJ?=
+ =?us-ascii?Q?YP5DDwtJ9DztfeJPEAoDNYLbKS55UV349i8S4O9RoUxO2+UUc9LE1HyPxIAi?=
+ =?us-ascii?Q?bqQz6Om/6K5JmXNS/0clEsCEAUp+R7khcBI8WZ6x?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next 00/14] bpf: Efficient socket destruction
-To: Jordan Rife <jordan@jrife.io>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Stanislav Fomichev
- <sdf@fomichev.me>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Aditi Ghag
- <aditi.ghag@isovalent.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250909170011.239356-1-jordan@jrife.io>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250909170011.239356-1-jordan@jrife.io>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-
-On 9/9/25 9:59 AM, Jordan Rife wrote:
-> MOTIVATION
-> ==========
-> In Cilium we use SOCK_ADDR hooks (cgroup/connect4, cgroup/sendmsg4, ...)
-> to do socket-level load balancing, translating service VIPs to real
-> backend IPs. This is more efficient than per-packet service VIP
-> translation, but there's a consequence: UDP sockets connected to a stale
-> backend will keep trying to talk to it once its gone instead of traffic
-> being redirected to an active backend. To bridge this gap, we forcefully
-> terminate such sockets from the control plane, forcing applications to
-> recreate these sockets and start talking to an active backend. In the
-> past, we've used netlink + sock_diag for this purpose, but have started
-> using BPF socket iterators coupled with bpf_sock_destroy() in an effort
-> to do most dataplane management in BPF and improve the efficiency of
-> socket termination. bpf_sock_destroy() was introduced by Aditi for this
-> very purpose in [1]. More recently, this kind of forceful socket
-> destruction was extended to cover TCP sockets as well so that they more
-> quickly receive a reset when the backend they're connected to goes away
-> instead of relying on timeouts [2].
-> 
-> When a backend goes away, the process to destroy all sockets connected
-> to that backend looks roughly like this:
-> 
-> for each network namespace:
->      enter the network namespace
->      create a socket iterator
->      for each socket in the network namespace:
->          run the iterator BPF program:
->              if sk was connected to the backend:
->                  bpf_sock_destroy(sk)
-> 
-> Clearly, this creates a lot of repeated work, and it became evident in
-> scale tests that create many sockets or frequent service backend churn
-> that this approach won't scale well.
-> 
-> For a simple illustration, I set up a scenario where there are one
-> hundred different workloads each running in their own network namespace
-> and observed the time it took to iterate through all namespaces and
-> sockets to destroy a handful of connected sockets in those namespaces.
-
-How many sockets were destroyed?
-
-> I repeated this five times, each time increasing the number of sockets
-> in the system's UDP hash by 10x using a script that creates lots of
-> connected sockets.
-> 
->                      +---------+----------------+
->                      | Sockets | Iteration Time |
->                      +---------+----------------+
->                      | 100     | 6.35ms         |
->                      | 1000    | 4.03ms         |
->                      | 10000   | 20.0ms         |
->                      | 100000  | 103ms          |
->                      | 1000000 | 9.38s          |
->                      +---------+----------------+
->                        Namespaces = 100
->                        [CPU] AMD Ryzen 9 9900X
-> 
-> Iteration takes longer as more sockets are added. All the while, CPU
-> utilization is high with `perf top` showing `bpf_iter_udp_batch` at the
-> top:
-> 
->    70.58%  [kernel]                 [k] bpf_iter_udp_batch
-> 
-> Although this example uses UDP sockets, a similar trend should be
-> present with TCP sockets and iterators as well. Even low numbers of
-> sockets and sub-second times can be problematic in clusters with high
-> churn or where a burst of backend deletions occurs.
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR21MB4013.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd933cc-9b1b-4ea2-c5b5-08ddf224873e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Sep 2025 17:48:05.7807
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: g6Qng+vrJjryunM4arwQfCOUmD/zXnmRgJoPKzNyLPdfBaulADFX34fFcUPTw9Vs5lvVZtNMc5+mVVmCz3lkww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR21MB3328
 
 
-For TCP, is it possible to abort the connection in BPF_SOCK_OPS_RTO_CB to stop 
-the retry? RTO is not a per packet event.
 
-Does it have a lot of UDP connected sockets left to iterate in production?
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Friday, September 12, 2025 8:29 AM
+> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Haiyang Zhang
+> <haiyangz@microsoft.com>; Dexuan Cui <decui@microsoft.com>; KY Srinivasan
+> <kys@microsoft.com>; wei.liu@kernel.org; edumazet@google.com;
+> davem@davemloft.net; kuba@kernel.org; pabeni@redhat.com; Long Li
+> <longli@microsoft.com>; ssengar@linux.microsoft.com;
+> ernis@linux.microsoft.com; dipayanroy@linux.microsoft.com; Konstantin
+> Taranov <kotaranov@microsoft.com>; Shiraz Saleem
+> <shirazsaleem@microsoft.com>; andrew+netdev@lunn.ch; linux-
+> kernel@vger.kernel.org
+> Subject: [EXTERNAL] Re: [PATCH net-next] net: mana: Reduce waiting time i=
+f
+> HWC not responding
+>=20
+> On Wed, Sep 10, 2025 at 01:57:21PM -0700, Haiyang Zhang wrote:
+> > From: Haiyang Zhang <haiyangz@microsoft.com>
+> >
+> > If HW Channel (HWC) is not responding, reduce the waiting time, so
+> further
+> > steps will fail quickly.
+> > This will prevent getting stuck for a long time (30 minutes or more),
+> for
+> > example, during unloading while HWC is not responding.
+> >
+> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > ---
+> >  drivers/net/ethernet/microsoft/mana/hw_channel.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> > index ef072e24c46d..ada6c78a2bef 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> > @@ -881,7 +881,12 @@ int mana_hwc_send_request(struct hw_channel_contex=
+t
+> *hwc, u32 req_len,
+> >  	if (!wait_for_completion_timeout(&ctx->comp_event,
+> >  					 (msecs_to_jiffies(hwc->hwc_timeout)))) {
+> >  		if (hwc->hwc_timeout !=3D 0)
+> > -			dev_err(hwc->dev, "HWC: Request timed out!\n");
+> > +			dev_err(hwc->dev, "HWC: Request timed out: %u ms\n",
+> > +				hwc->hwc_timeout);
+> > +
+> > +		/* Reduce further waiting if HWC no response */
+> > +		if (hwc->hwc_timeout > 1)
+> > +			hwc->hwc_timeout =3D 1;
+>=20
+> Hi,
+>=20
+> Perhaps it is already the case, but I'm wondering if the configured
+> value of hwc_timeout should be restored at some point.
 
-> 
-> This can be slightly improved by doing some extra bookkeeping that lets
-> us skip certain namespaces that we know don't contain sockets connected
-> to the backend, but in general we're boxed in by three limitations:
-> 
-> 1. BPF socket iterators scan through every socket in the system's UDP or
->     TCP socket hash tables to find those belonging to the current network
->     namespace, since by default all namespaces share the same set of
->     global tables. As the number of sockets in a system grows, more time
->     will be spent filtering out unrelated sockets. You could use
->     udp_child_hash_entries and tcp_child_ehash_entries to give each
+Yes it's already the case: when the driver does reset/recovery, or gets
+a timeout-value-message from the NIC, the time out value will be updated.
 
-I assume the sockets that need to be destroyed could be in different child 
-hashtables (i.e. in different netns) even child_[e]hash is used?
-
->     namespace its own table and avoid these noisy neighbor effects, but
->     managing this automatically for each workload is tricky, uses more
->     memory than necessary, and still doesn't avoid unnecessary filtering,
->     because...
-> 2. ...it's necessary to visit all sockets in a network namespace to find
->     the one(s) you're looking for, since there's no predictible order in
->     the system hash tables. Similar to the last point, this creates
->     unnecessary work.
-> 3. bpf_sock_destroy() only works from BPF socket iterator contexts
->     currently.
-> 
-> OVERVIEW
-> ========
-> It would be ideal if we could visit only the set of sockets we're
-> interested in without lots of wasteful filtering. This patch series
-> seeks to enable this with the following changes:
-> 
-> * Making bpf_sock_destroy() work with BPF_MAP_TYPE_SOCKHASH map
->    iterators.
-> * Enabling control over bucketing behavior of BPF_MAP_TYPE_SOCKHASH to
->    ensure that all sockets sharing the same key prefix are grouped in
->    the same bucket.
-> * Adding a key prefix filter to BPF_MAP_TYPE_SOCKHASH map iterators that
->    limits iteration to only the bucket containing keys with the given
->    prefix, and therefore, a single bucket.
-> * A new sockops event, BPF_SOCK_OPS_UDP_CONNECTED_CB, that allows us to
->    automatically insert connected UDP sockets into a
->    BPF_MAP_TYPE_SOCKHASH in the same way
->    BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB does for connect()ed TCP sockets.
-> 
-> This gives us the means to maintain a socket index where we can
-> efficiently retrieve and destroy the set of sockets sharing some common
-> property, in our case the backend address, without any additional
-> iteration or filtering.
-> 
-> The basic idea looks like this:
-> 
-> * `map_extra` may be used to specify the number of bytes from the key
->    that a BPF_MAP_TYPE_SOCKHASH uses to determine a socket's hash bucket.
-> 
->    ```
->    struct sock_hash_key {
->            __u32 bucket_key;
->            __u64 cookie;
->    } __packed;
-> 
->    struct {
->            __uint(type, BPF_MAP_TYPE_SOCKHASH);
->            __uint(max_entries, 16);
->            __ulong(map_extra, offsetof(struct sock_hash_key, cookie));
->            __type(key, struct sock_hash_key);
->            __type(value, __u64);
->    } sock_hash SEC(".maps");
->    ```
-> 
->    In this example, all keys sharing the same `bucket_key` would be
->    bucketed together. In our case, `bucket_key` would be replaced with a
->    backend ID or (destination address, port) tuple.
-
-Before diving into the discussion whether it is a good idea to add another key 
-to a bpf hashmap, it seems that a hashmap does not actually fit your use case. A 
-different data structure (or at least a different way of grouping sk) is needed. 
-Have you considered using the bpf_list_head/bpf_rb_root/bpf_arena? Potentially, 
-the sk could be stored as a __kptr but I don't think it is supported yet, aside 
-from considerations when sk is closed, etc. However, it can store the numeric 
-ip/port and then use the bpf_sk_lookup helper, which can take netns_id. 
-Iteration could potentially be done in a sleepable SEC("syscall") program in 
-test_prog_run, where lock_sock is allowed. TCP sockops has a state change 
-callback (i.e. for tracking TCP_CLOSE) but connected udp does not have it now.
-
-> * `key_prefix` may be used to parametrize a BPF_MAP_TYPE_SOCKHASH map
->    iterator so that it only visits the bucket matching that key prefix.
-> 
->    ```
->    union bpf_iter_link_info {
->            struct {
->                   __u32 map_fd;
->                   union {
->                           /* Parameters for socket hash iterators. */
->                           struct {
->                                    __aligned_u64 key_prefix;
->                                    __u32         key_prefix_len;
->                           } sock_hash;
-> 	         };
->            } map;
-> 	...
->    };
->    ```
-> * The contents of the BPF_MAP_TYPE_SOCKHASH are automatically managed
->    using a sockops program that inserts connected TCP and UDP sockets
->    into the map.
-> 
+Thanks,
+- Haiyang
 
 
 
