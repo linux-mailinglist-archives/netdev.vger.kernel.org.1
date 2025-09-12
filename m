@@ -1,110 +1,120 @@
-Return-Path: <netdev+bounces-222418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E82A1B542A8
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:19:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD32B542D5
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:25:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8EFF3BCF66
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:19:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1482848583D
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4424727FB2A;
-	Fri, 12 Sep 2025 06:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TAfBsjAS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6337C28313A;
+	Fri, 12 Sep 2025 06:25:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC5F134BD;
-	Fri, 12 Sep 2025 06:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFACD1DF270
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 06:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757657975; cv=none; b=X7pYdzTJOpdaWp2TbcJS6Nkyj24dzj893fNKUzf4mZnkSIHtBJKnFJxcgQbGm/jJhiouxHvz7m/+kuls99BtBlwt4HcwDSPkchsscIn/3sfnto8Mn5zWvG8c6iO7eco5gcWd8aCaSGGc/GyoyfdotE9X0CWJ6AnL1zvBcF3C93g=
+	t=1757658340; cv=none; b=dAeswf/Z8lU0JIQch4Vg2FOjz/se84YiQ/gMyGtgI02Dv5haqV+6/O3xAFdBa9KjgGH5Z9bvW6O52Ubmp8jQ8KQj6aprZiebOYQ0/56c48b2Pzh5BKctWBSLJeExHhmJe7qiSiMMFKSST/uErpAdhDSqT+oZHJUpLHYPlqlYt9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757657975; c=relaxed/simple;
-	bh=o8hk3zQNATXcYNezfLWUb6kcglAXSeb1kRjCzbDhJIw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YzgtSpF6mXwH7jDAD0UqGaW4ZaBURKsxuu4G0cKnTfdcHrUTsyR7kP0VkgByDFvoYyoSaetRZQXv7ZELQvPeFo1jEMDbOyxe34CD8LU4fszuk7WG64CWy/fUc+P7FmVOExaLT00SGdPUUOYH6Y+MTzdayE9Nxs4l92uAz5Mvqug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TAfBsjAS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1432C4CEF4;
-	Fri, 12 Sep 2025 06:19:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757657974;
-	bh=o8hk3zQNATXcYNezfLWUb6kcglAXSeb1kRjCzbDhJIw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TAfBsjASg0j47G0aj71WpPiHwEzVjLh8frxE9MTlUre9o4kgdD0AT9C2l8NxGKnp8
-	 7IFEcYbPKl8ue4IGOaLDKbEJWbquIJXUUac3GR9E8dEo3Jh7cz5KyP8qh3mPDlVArz
-	 meCJadPxluLfi2gaQmclFasUpdycrQpAxtv6mRtBuVlbMKoWoMt6LIpZ7jlivjF0dg
-	 SBAPM4eomEn87Qqye6+Q6x4eBzcUHZ4H1iHg9AmOB6gpsAuvBFvm28piizL42FE7pD
-	 /GR042vD8YIz4ZS/9nvYqbhp9jXT7LOUgXCQDvL0U4FZWriZxiFMJkIGihya5dMtB1
-	 KwwnUs4bBEHfQ==
-Date: Fri, 12 Sep 2025 08:19:32 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
-	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, broonie@kernel.org, 
-	chunkuang.hu@kernel.org, conor+dt@kernel.org, davem@davemloft.net, 
-	dmitry.torokhov@gmail.com, edumazet@google.com, flora.fu@mediatek.com, heiko@sntech.de, 
-	houlong.wei@mediatek.com, jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org, 
-	kuba@kernel.org, lgirdwood@gmail.com, linus.walleij@linaro.org, 
-	louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com, maarten.lankhorst@linux.intel.com, 
-	marcel@holtmann.org, matthias.bgg@gmail.com, mchehab@kernel.org, 
-	minghsiu.tsai@mediatek.com, mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
-	robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch, 
-	support.opensource@diasemi.com, tiffany.lin@mediatek.com, tzimmermann@suse.de, 
-	yunfei.dong@mediatek.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 06/12] dt-bindings: display: mediatek,ufoe: Add
- mediatek,gce-client-reg property
-Message-ID: <20250912-innocent-polite-cricket-05dbd8@kuoka>
-References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
- <20250911151001.108744-7-ariel.dalessandro@collabora.com>
+	s=arc-20240116; t=1757658340; c=relaxed/simple;
+	bh=papfgHm5FqDaaOL8DCUOhGsuCgyu5hfWuljgHEAEeP4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tx1MiZQ4Q9JYFfBjpI6zc/nkBmOvMWdxhxLHVz+JDAt4ZIFuQmQxjGLeLMbSr5Ru9oY7aKULuw+Fbka2BRLcfhTE69kil2VBtU+lCnx1cp/K7lrVdude3aNQITU0nZsK9NYO740QDUnWqqFueXOKHEU80g++7OGi+EJjyIGEOrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpsz8t1757658251te4021178
+X-QQ-Originating-IP: 3hwtgTXPDHBNl0hoS6zltLZBRcswE+yPzJdOZKo8MTk=
+Received: from lap-jiawenwu.trustnetic.com ( [36.20.63.150])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 12 Sep 2025 14:24:08 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 4605509738491810659
+EX-QQ-RecipientCnt: 10
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v4 0/2] net: wangxun: support to configure RSS
+Date: Fri, 12 Sep 2025 14:23:55 +0800
+Message-Id: <20250912062357.30748-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250911151001.108744-7-ariel.dalessandro@collabora.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: Nuk8bQLQf5MZzxGrSn5c7sDiVbS26qRhJ0OpfINLdu7JsTiUdebf9O6/
+	Dok+u+ugtNHqIJA1yjghZ4U+C4vrN/5ZLjDCUlSY1W4kE4l+v9tuvTzBvt8rbBd+3yXUOfY
+	BjjP66vJOQllIrzq3aTUAxowDLWn3akWbWAs8qiutO/F/v+yRzxwSyy9YsCSUjIr6ebv+1i
+	Q9GqMvdmqq5Ovju9T2DQm8RfUJOm3ndeE79WPz2ZGvzZg5Gj9c7Y+XDueT+HGR3KI236tLt
+	9GDghMgGXFbD29SjfPRhlz/G31skKnXu9yqiKUEeez3DQ+C4A/mKzqkLTa0M26ctws2tLl4
+	0OCk9S7Sop5B0USnLBmDdSo03ienLqS7A06AFhx3dyzEBph2xPyUib1znKIMpEdUgl1HIfw
+	o//Z47ibgXAovzLK32IVm3vNj5bTZ5OnACv3ecY1AnsRTGqvzz94lF2D4rqAhtlqj/Kzj9P
+	60XoT6HlWzPE6n+PreC0Spv1XbPXKq41r+2tGY7CWef7nhIBzU4WHXRJ8py+m4OfLUw8QGK
+	a6UgcjuFAkRmc6adr+w0WnZTtSm8sKI5utNUzHaWVbKjA5wrvQk+UTy57wDedHjnssH9J75
+	AqQ9d/lR7EWAt+Bx96H8DLrq12++A8exnTrj4LNcv90mHLQepuX6SXMyr67FooCbZWE/PuL
+	bTqasLkww5NNv2DsPRyAYZiXjN1IzqGroZl+ta1uHcqlag9lKGCmFVPo1ziBN0a0Q9MWeMi
+	btK/YYQXbJLBljG3TwynLuXpE9EUZzFqlC2pxpPRm+lUFUtqkL929UmgwY7I42xpy1OWQGa
+	+4JTxN/D6oClm3oE2gRcfuneKI0YjQxjUVK9Y3B2xOqpHNuf5pz89KA37uRcVCERRaZhXzw
+	VMp4547Yk1aF4ldV8AjfhGMudRQRyNMWE11uIGY8RR+3dN3RyntPZc7bv0iGsHi34iHGEIK
+	vzd9uXOfKga5CGEuTWhQcwxwBds0L+ERlrSX4r+Bjs9L0GmdM0Q90IpDPEJDZp0kPA+fCeN
+	DPhxInhae4+sL/e3vmTBp5/2uPUPI1Gn13nJUwXjsBizRWwEFsVmJvR+9ythc=
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-On Thu, Sep 11, 2025 at 12:09:55PM -0300, Ariel D'Alessandro wrote:
-> Currently, users of Mediatek UFOe (Unified Frame Optimization engine) DT
-> bindings set mediatek,gce-client-reg node property, which is missing from
-> the DT schema.
-> 
-> For example, device tree arch/arm64/boot/dts/mediatek/mt8173.dtsi is
-> causing the following dtb check error:
-> 
-> ```
-> $ make CHECK_DTBS=y mediatek/mt8173-elm.dtb
->    SCHEMA  Documentation/devicetree/bindings/processed-schema.json
->    DTC [C] arch/arm64/boot/dts/mediatek/mt8173-elm.dtb
-> [...]
+Implement ethtool ops for RSS configuration, and support multiple RSS
+for multiple pools.
 
-You can drop above 4 lines, they are obvious. Your "dtbs_check error"
-message already defined that.
+---
+v4:
+- rebase on net-next
 
-> arch/arm64/boot/dts/mediatek/mt8173-elm.dtb: ufoe@1401a000
-> (mediatek,mt8173-disp-ufoe): 'mediatek,gce-client-reg' does not match
-> any of the regexes: '^pinctrl-[0-9]+$'
+v3: https://lore.kernel.org/all/20250902032359.9768-1-jiawenwu@trustnetic.com/
+- remove the redundant check of .set_rxfh
+- add a dependance of the new fix patch
 
-The warning message should not be wrapped, so this should be two lines.
-Maybe entire warning should be in one line, at least that's what I would
-do, after dropping "arch/arm64/boot/dts/".
+v2: https://lore.kernel.org/all/20250829091752.24436-1-jiawenwu@trustnetic.com/
+- embed iterator declarations inside the loop declarations
+- replace int with u32 for the number of queues
+- add space before '}'
+- replace the offset with FIELD_PREP()
 
-Anyway, no need to resend just for these. Thanks for the update.
+v1: https://lore.kernel.org/all/20250827064634.18436-1-jiawenwu@trustnetic.com/
+---
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Jiawen Wu (2):
+  net: libwx: support multiple RSS for every pool
+  net: wangxun: add RSS reta and rxfh fields support
 
-Best regards,
-Krzysztof
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 136 ++++++++++++++++++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  12 ++
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 111 ++++++++++----
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   5 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  10 +-
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  23 +++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   6 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   6 +
+ 8 files changed, 278 insertions(+), 31 deletions(-)
+
+-- 
+2.48.1
 
 
