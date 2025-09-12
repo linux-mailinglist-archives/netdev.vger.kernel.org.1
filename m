@@ -1,144 +1,114 @@
-Return-Path: <netdev+bounces-222514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95758B54AF7
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:25:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FCACB54D04
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F8AB1C2453E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:25:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 218E74E307F
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C03277037;
-	Fri, 12 Sep 2025 11:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE67322A34;
+	Fri, 12 Sep 2025 12:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="FnHQrsJM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aK17vNLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic315-20.consmr.mail.ne1.yahoo.com (sonic315-20.consmr.mail.ne1.yahoo.com [66.163.190.146])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F40426B769
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 11:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.190.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6770B3218D3
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757676304; cv=none; b=dLDtYreE0c3BZMGvjJXowuXpYTXK4ko8EA4TyVUvnOREIPdwndzJ4bPI8tQh3uIFqp8W6ot36zlr4wa4tu83bQKyqoIBpbgG9pvHsuBkFn0TK4arDbRhq3Te4QPLSt/TXmLFY2CXY3W51p/hw71r79F4mFLuMOKBUdJN31jeT9c=
+	t=1757678934; cv=none; b=tR/NkiZHqJazOB1AILL6ZCAF+WNVs5K/561O4v09ASwuEqTUkV7CR/AzFlnNlGhNmOo6zaS2TV0N8AJwbkCOaNPiI6wd4Mm2Tb6ypdEdBfyburpumjZofi0D7rz5mX/JyyDM4pCKgr8zy9bCGIva0h+LcLdX19qsX41thtbmmLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757676304; c=relaxed/simple;
-	bh=gHgAIh5CKdT+Gci5DQnkrW5L4ya1rh1mtkmgIkURaqY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FeNdQvxQ6mm53z9JmRQj85IsAY6fibQ+lgzi6XQN6ObbfiswODbOZapa+ts9XW3XKJPJ4ztXQ8MEf9djuYUmpQgRI3c6wYNg1kYq+gLGiz4p5jKfCEiieEAYna1oT9P8BnouNelVRINPSSMhR5+PBAChf0u6+D8m3+KD17OIVTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=FnHQrsJM; arc=none smtp.client-ip=66.163.190.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1757676301; bh=5tdcv9pUVVHNs+QwD5gb0mr+Chpp7ofQFMpu+NxUlmg=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=FnHQrsJMPTJZ34GLdN3An9gYGdOBNblpnzcxMniCprqy+JGJ1B58Jt0hj2gU5+2UyM5UkZ+jgT0O8TRwN2hLULTYyuej3mfHqISFbzrYGxgVstFNn/nZnydPDcGNrk1m34yPDZPpVuG9IUcjB6wRZlWL0p1zbcawuvI+uJ5OMK2XX1mHpT3zScVDE6ifm95Hp66CcQDSJuk5nJYYjR6Z17yx8lJor3D9eEJ2W2DLJLBpk3UZc7+8B4nOrVUR1pcr9uNdy112VGHASjbDzAQfWjOajOZbe168sdidNxwLK0/I+fDWlGN9BWSl0NS6Gj/dCnhcET0Xxqw12qZ3Irxmqw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1757676301; bh=h1VXu4cusrsAmVKpjOf20nk9BSmOxu5xvGRN3Vaq8vI=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=ehAlZ5FwCoYGruSJGTIf+zpEqA9LN6EHWDR33ouZn8SW7LXuB16CFLLeLUJ6nJtlKljBXYcjZAZcIc5G1CTypzbeQntIOs2w3Ndz+j+gwFijOMhyK+DV8lcDLGiWozqQPAwDAKxa6XB33UB1S4H6S5f3NCRONQjkXWyYH5n08xdXyaDniyQqZXP3ifaUpWLbWI2kX/mLECI7aTjnt1lDF2MKRTLZUE8NX6mrSuInL7o3CJUmVACTIYwDk5W8OAiQgWfV+Insy1uRJ7Kvsdo9HLAoO+mxb7nkCGiufel5zrBCKdEBn+8iRUY/hxVmOs5ctzFQL5kNp7BHSgknW3SdHA==
-X-YMail-OSG: sjMusMgVM1kbrsP_QoAyz0qrbkinPBdd4pjNcIpj655LT8OdKlVAtXxwLveG1Ui
- TnTGBZJPRiDkBWTkM1WWk0xYMpR7K0siOIAoQjs1uZcKy.bX9sIfnkm5evVOs7o7HVuAkFktk6Z.
- 9tJYm2K3_hWqOEFoQKW9dUUOxmBIFJ3U0aY5ljNk1xW9C0TIfL7oCOtEb12mgujscXhszg3zBQ9c
- 68mspQph.FYjZJzQEUtUKWwwPf9WnUxZiQ__TXKSqPO4e9xR_eqXU1EyZXMHpMEXbAx.JDYHRXx2
- My4iGgqXWkbkEkWLs3sKs5AL1IMaaaj.REEs8tyi.W7vcnWvSff8qmYfeZ4QC6GaR2SqeEQtpiPp
- L5ktNh7WN6pR8RrCYI9HhLiKc7FTOvBvva4ULOQd7LsdVK0OutTSszVPaksvHwRPAGAzVdTyYJjB
- bYlOWIn0SVQfKT.hzME.g55MlM8brQfw_P7GTE5CsLw081AifLb3lsDx7xXBwyYXeO86qZEEa6T0
- CDKsHWebwaE3l7lskRXXgeNVTbOQKebk6G_qkcbQjSsfYcWZm5a5QwW2pWsRGc7cWGMPIPYL2Krk
- M3FNwMrI_Io0aPC58QaVUDr.viOeXpS_iDPUS_xYdPt1nCOXsGIElb1TXM0QgDXabTkGqQVFLnOV
- JzL4wtNfkzMbZvHBabFlLDKKXeq6DqXmwbXFmSgmQ_E3VsGoJXp7.xvKJLSqziYmnGlXLXV.OYOu
- LLvyJK.Ch43eliiRNaKGU3AIedI4ntq_3y_x_cOovYRqnFGqgKd8qriWyiiXSb7PQ9VcxMizBSiP
- rAY1syCZx8y7.y1L5V4yv_Xu6XVmp3dzD74ZdSDTN7Iss3OHQwZlqE7GuzaYOIKdBi8VH33tLtlU
- sbgx8hB1aGaQJA5gBZoLN4mk19LIXrCTrjR7XHOlNgvvb78AP5IV9pokpceFTw9QpBdO4XCU57QD
- RcyRmIqAM73_cxzgcXsT0OmDYuzt7kNH7fFyB75Qe6E1Y2qjqklKpBuszaT2.3JljDOseNxhp14_
- ayfFgJKoaD8jo1cIqV4sYxLEVqvH8q6Qy6JQTayZubZKUC00qDvrg3lgr_BY27lXvbXNK6BWdg7U
- cyxZV6zlIabckIPyAM2cop1qfYBKAH6MWf6OBgbnhacJlFWDo2YjWKcfhg7d3LQ7spEEZg1kGilg
- rBWh.8y.zaRgzyYttVcFbTO726SJPRX2C1yKZL6guHDqpJaPmXL53LudDKJSVTN9v2vRh1vOiigN
- 1x7JhzM7uGgyvWTIMA9jKc0RIt_qntZOznjfr1cKmLQfPXZRW0PSjlqbx5P2SHCPdXaCPIZCQUQk
- aHD259fHQTl0wfAdltkngYnpxey55U2GiYIOsXcv.WabBZFZe4DP_VSaELSuFw28_7cnKJZEwIAm
- YrGOVMeeO061qYrVEJJU9htTLIJcmbB1ArvSlSGy5C0B4d_3SeFxkqdGehXt0Z8I1rKfAvfPJ5xV
- gmNn8OcoCoPyZinCiH54nSrXL5xr5JwjBFaSGptWI1Hy0qNpS6ib8yUiCR4PtIQpLmjfy_ZWC1rN
- _eV5eDhmB7QqDY_aHM854dMi6KjHGzNfkodE7TWUEYJDHyd53KI0GZ.24ujSWB1qQaOJabQ5gJe9
- C1J3PZxTiwUHF5nZzaa7cvJvxfi1JEHFcIdhNCHb7kMLskFvXcWOQbaqF54_yIdnDeX6Dz9gr0Of
- 49ZjchR_txWRNVR4_NvFXseoSd9FMHqr3zg6eQuoBueEo2Jliwr_xTGZILzL4Ns79RmQ7uurkOm8
- xEd.Mbjs5iGSdo_._uJ2a87iCoBnf8iEREb_9mIx88a4dxe137KH7H.leo9qXSKZFhWBBNqzZ.jA
- rGe.MMUz9JtJlTAqFGKhVHS3L0xAuTc1aOm2gEUObLacwTTGAKXRgbVqfkq2MOTR.UFKfH7qseku
- 2DHLQzgBB8uUip3IoSG8v3gZCQ2kd31kapHZGp4gyu3HnVMO.k1lIvWwhJ9qYPRTzq0YfONfPggL
- RYjzzg8H0KWt3STiZMDxPSSK2S5_aS3RTVys4Yb3e65jhKpZENGVnUMgUa2J4lYzuMMcNrIKZFn7
- P_XPKTb0F32jtQxB8QtieMM45zK6M1Xf537sfIVnYdZK0i86dveN0D.SN.Gu59QxmQVn8Cho3P_l
- 8WvFiFVzRgGLOATwyez5MU85.hRhteCIOiQnXywTGYFeaq3Ib_l0-
-X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: 5dc2c8ea-e83c-4326-a34e-d2b13ee2b719
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.ne1.yahoo.com with HTTP; Fri, 12 Sep 2025 11:25:01 +0000
-Received: by hermes--production-ir2-7d8c9489f-pnggd (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 93cda13a9625b3ea865113cded111022;
-          Fri, 12 Sep 2025 11:24:57 +0000 (UTC)
-From: Marek Mietus <mmietus97@yahoo.com>
-To: netdev@vger.kernel.org,
-	antonio@openvpn.net,
-	kuba@kernel.org
-Cc: openvpn-devel@lists.sourceforge.net,
-	Marek Mietus <mmietus97@yahoo.com>
-Subject: [PATCH net-next v2 3/3] net: ovpn: use new noref xmit flow in ovpn_udp4_output
-Date: Fri, 12 Sep 2025 13:24:20 +0200
-Message-ID: <20250912112420.4394-4-mmietus97@yahoo.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250912112420.4394-1-mmietus97@yahoo.com>
-References: <20250912112420.4394-1-mmietus97@yahoo.com>
+	s=arc-20240116; t=1757678934; c=relaxed/simple;
+	bh=PqPZ8RULX7eu8BAG8aFIfDKASv+ULLACp+JE+crY35g=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZW9cBZDVZTcQ2ZbvhrohsQn75NHgZOFXFDrfytUNHpszNLHReTbJGe3HDl4iFG/ex/b2+EVom+1EUF8D6ak4KGgCk6xR1i3NEOzIq85akcgFaJKdFduI8l6kartRaE1aqtsqEwCCetzIX7NMaJHUliLsDnNLkewHaySmJOaQ7ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aK17vNLO; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45f2313dd86so5155985e9.2
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 05:08:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757678931; x=1758283731; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PqPZ8RULX7eu8BAG8aFIfDKASv+ULLACp+JE+crY35g=;
+        b=aK17vNLO3FWypqeHtCtGViEf/AACbNqqr1aobsHvHd70tNvEJLvNVO6V9ib/6dbtW9
+         1659OC0X7WwHLO5I+fSBPAbTEXQQll20pooTXhDWqeg6CTeciB5Jl7IHpfO+ia0Lsn3h
+         JIxDGDQK9DeAKy1KtuJRNEGWoxx8TEd8WoLuOPTPizgOkjaPv8lv4mnm01nxDxTDIpT1
+         5sST5WznhYi0MC8G62+4+q9LY9lrrHN+EeY8logmrQc2OqKf0CIThPtFgyEq/jMb2nI/
+         NJHekOwMkqhHYWhcrJA15oKuJqQjfE1EvJsJeWqyAJbm5h3Rhyvalzxhe3rScog7qybV
+         UHjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757678931; x=1758283731;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PqPZ8RULX7eu8BAG8aFIfDKASv+ULLACp+JE+crY35g=;
+        b=TyW6tIV5PwV72jMZ4ZF4t89Be6tDFrJtJCM3KEErSeS7xvcYtvSEkjavPonPU8COIH
+         AY3Fg89J4+5EzVfkCvLnIcCmSZfPEkmhuXjFG74aA/Cdb5TVXmgfiGVxDiQ1TVZ3xV5X
+         IpgLE5cflvfz3UkMgsCrGD/Mo1uh372zjlifp2DslASc7gg0rr+uUibx7a37xlq93817
+         S903tMwCsDdOBPQ253JZvumktNMCF/THhHtrXf07c4LE1fxY4Dbxyl3Y/lexBhiXeJlW
+         RlpCf+UpD5jdIX7AzifL+cq2XOKICl55ucGQnkyGMOcl8IhtynUcXU7fEgImBIjZTv5w
+         hefQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSb9Ax/UMTEG57ZgSiaA2xKpcnzzFCVVdrPgl6vxo84GRblLh+cTjLlquv08UzAq788VZs8PU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY1QcIBXkoR+Q8dOjp2XN18IJ20Lc+QkcscSlfe+CopTU7Ob2v
+	TOseLXq6sHVAAn3x++CQTy1jGNfbgKn6jXjVzB6JZnMdo6KWTuj2WE5US/F+gg==
+X-Gm-Gg: ASbGncs0H7trcQ1DaozbIQlGPDpph0pa3FQ5OwrSZdYdER1VsUYRG5Nlle3v/cfWsgh
+	4XggQ7EWvrwVmQQUm3zx2zJ1U9UPnqT0F6ro9Bmvplw+jmTII4bSNsPctd40dBD4YDlCFA8IWjT
+	Niye5OEmm8urS7sY3PuxmQ/MvSLwxj4AUdsqPNJjiKozechiKyJfB9r23XiaQJ6e5n5i2YCzN4n
+	7S+ctlkeEik4UUfEqZw9tDZiMaOYCFRJT52iAekV+FomNm42v3LrOJvOE7MyxdHuB9NY83wgmQ7
+	4YbwrfzfI+eo6HMqB83RIoMR12hloUBJOr33wbMDWDE1YqwrONmbUi2vBc/4v2G//3NNj8jvBzC
+	CEw+wpkpsAWpigtHSbVkhYTbC8l+SazKwSefgDEXhrDub
+X-Google-Smtp-Source: AGHT+IFcON1v4F5KgBV9t7GPfhbJioy7Wd6FGUuDsb9CuUxnRc9simG96y0fBd2RO2HzmYnS97o6Tw==
+X-Received: by 2002:a7b:c84d:0:b0:45d:da7c:b36 with SMTP id 5b1f17b1804b1-45f211f67camr17284045e9.19.1757678930584;
+        Fri, 12 Sep 2025 05:08:50 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037d7595sm59573645e9.24.2025.09.12.05.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Sep 2025 05:08:50 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
+ <ast@fiberby.net>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Jacob Keller <jacob.e.keller@intel.com>,
+  Sabrina Dubroca <sd@queasysnail.net>,  wireguard@lists.zx2c4.com,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 06/13] tools: ynl-gen: deduplicate
+ fixed_header handling
+In-Reply-To: <20250911200508.79341-7-ast@fiberby.net>
+Date: Fri, 12 Sep 2025 12:24:32 +0100
+Message-ID: <m25xdnvrpr.fsf@gmail.com>
+References: <20250911200508.79341-1-ast@fiberby.net>
+	<20250911200508.79341-7-ast@fiberby.net>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-ovpn_udp4_output unnecessarily references the dst_entry from the
-dst_cache.
+Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
 
-Reduce this overhead by using the newly implemented
-udp_tunnel_xmit_skb_noref function and dst_cache helpers.
+> Fixed headers are handled nearly identical in print_dump(),
+> print_req() and put_req_nested(), generalize them and use a
+> common function to generate them.
+>
+> This only causes cosmetic changes to tc_netem_attrs_put() in
+> tc-user.c.
+>
+> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
 
-Signed-off-by: Marek Mietus <mmietus97@yahoo.com>
----
- drivers/net/ovpn/udp.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
-index d6a0f7a0b75d..c5d289c23d2b 100644
---- a/drivers/net/ovpn/udp.c
-+++ b/drivers/net/ovpn/udp.c
-@@ -158,7 +158,7 @@ static int ovpn_udp4_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
- 	int ret;
- 
- 	local_bh_disable();
--	rt = dst_cache_get_ip4(cache, &fl.saddr);
-+	rt = dst_cache_get_ip4_rcu(cache, &fl.saddr);
- 	if (rt)
- 		goto transmit;
- 
-@@ -194,12 +194,12 @@ static int ovpn_udp4_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
- 				    ret);
- 		goto err;
- 	}
--	dst_cache_set_ip4(cache, &rt->dst, fl.saddr);
-+	dst_cache_steal_ip4(cache, &rt->dst, fl.saddr);
- 
- transmit:
--	udp_tunnel_xmit_skb(rt, sk, skb, fl.saddr, fl.daddr, 0,
--			    ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
--			    fl.fl4_dport, false, sk->sk_no_check_tx, 0);
-+	udp_tunnel_xmit_skb_noref(rt, sk, skb, fl.saddr, fl.daddr, 0,
-+				  ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
-+				  fl.fl4_dport, false, sk->sk_no_check_tx, 0);
- 	ret = 0;
- err:
- 	local_bh_enable();
-@@ -269,7 +269,7 @@ static int ovpn_udp6_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
- 	 * fragment packets if needed.
- 	 *
- 	 * NOTE: this is not needed for IPv4 because we pass df=0 to
--	 * udp_tunnel_xmit_skb()
-+	 * udp_tunnel_xmit_skb_noref()
- 	 */
- 	skb->ignore_df = 1;
- 	udp_tunnel6_xmit_skb(dst, sk, skb, skb->dev, &fl.saddr, &fl.daddr, 0,
--- 
-2.51.0
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
