@@ -1,158 +1,115 @@
-Return-Path: <netdev+bounces-222632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8A64B551E1
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:39:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 218D2B551FB
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:42:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B36C9BA27A8
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:37:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0F063B82D6
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B2E311959;
-	Fri, 12 Sep 2025 14:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05128309DDF;
+	Fri, 12 Sep 2025 14:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aFT/2EW8"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="EOo58T3k"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9DD3128AF;
-	Fri, 12 Sep 2025 14:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97692FE06C
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 14:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757687894; cv=none; b=a5h4SVXsZ9G7bBP+LT3P/GkPAOwfnaryd/sOS7RpCMdggF6FeWnhEYcOC6Kzj+s+gcrDfmf/o/7cyAku5OFPgieRyrF9St7YIzDi+kQmh23tWyHrgwPPCYzYjgVrrzlX35hXbJgGEnyF/toNlibO+iALbvtaZJ+V3Re0xbZW2ao=
+	t=1757688117; cv=none; b=cXrV9h4PcmNR5sEb0fyyjwtrHW3IhT3zkehXNS76wRo8R75B7Xk9mOBTJpcYrE3mvcnylDCwIpLjwdoO4ROlX2tpd4UfPKvpDBb1Nh0/T0quy8nimCY5VOA/kNDV/s423JjL1rI/mOmYvuVPS21PsowtfAWLE6A5u+6Bfs0djCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757687894; c=relaxed/simple;
-	bh=+W9RkNkmmT1IiTtBnRQIf0vW4aRt3gzcijwo74OaTUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DxD9ITJzvsmsQl6kzHhOHc/8XNBPsB/r3UFXneOaHgD/aVyGgiJzpjsOQW3hl2kR2+7GlGPXtnIKs2HQNdCebAnf2tY28IEofK4BsXvl8rBkuae+MFgcpo4nnqF/UOm77/ZRDI4DocYCtyxGT3OBbgpz4Yb2GTWWYZ7bYMgbegQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aFT/2EW8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=KqBKUZlM/P2XIZmldzfqFf87P0LiDauesCM5frm4wHM=; b=aFT/2EW8+DdbUF9V9Qseem00aq
-	TKs/hvQR3QWDTBkaq6UvjrdPvBvBTAu1IbZOng6qIKS58tCRLOhFgdsMyztFvTGf/rtswHIbWnGCL
-	BZ7l4RDv+5NK2eDycPi+DVEuTxHcYKAjNU6kJ02nGhu93bMTq6j1rz3jWpz83Lw6AI8N/dUA2JzFt
-	j+OQEJdOEIMaaEa8pOOhvIPwGc5PDjjUiDfjg2KABjPJxrsJqApXFvWjH29BDxTA3E60fe755FaPg
-	C/3FkTHnZwWYk8tnDcI9tfNsAdfKbM9o0dxnXeA0BuFGhpPMAi/1Okcl5Beu7wFDw9ZDCdhSPecfq
-	4XopNUTw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38276)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ux4uT-000000004j2-1wjo;
-	Fri, 12 Sep 2025 15:37:57 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ux4uO-000000003Za-2uZp;
-	Fri, 12 Sep 2025 15:37:52 +0100
-Date: Fri, 12 Sep 2025 15:37:52 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>, Xu Yang <xu.yang_2@nxp.com>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
- PM to avoid MDIO runtime PM wakeups
-Message-ID: <aMQwQAaoSB0Y0-YD@shell.armlinux.org.uk>
-References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
- <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
- <b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
- <aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
- <20250911075513.1d90f8b0@kernel.org>
- <aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
- <22773d93-cbad-41c5-9e79-4d7f6b9e5ec0@rowland.harvard.edu>
- <aMPawXCxlFmz6MaC@shell.armlinux.org.uk>
- <a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
+	s=arc-20240116; t=1757688117; c=relaxed/simple;
+	bh=FHjbJdtudyt0vGhKMApu2KHBlfl47fZMhc8fNsFkBJo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aNkSjZ+6A14TvNbxysQ6XrDuA6v5I08Zfpl78aeZww29lAtfpa7K2omVC2Z/LIZYbbPGJTkdVyvA7qjkgrgz4fhXokIvSuTfWrqUAoqfPGllCfpgqcDDaLnVxtUovUQc6ei+NbNqNufy31N1J4T3Fx1qMnGzCmFEmP2TwZEeBic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=EOo58T3k; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5688ac2f39dso2306101e87.3
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 07:41:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1757688114; x=1758292914; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FHjbJdtudyt0vGhKMApu2KHBlfl47fZMhc8fNsFkBJo=;
+        b=EOo58T3kd5XIpsTxxM4+JwFhsnF+OAtJIO4BQ1zsY8vM+Kshj1PyXJqnfB+v2F8IWz
+         zo9Qj+imAK67ZOvFNPfjqtfiIX4YVRdxLVc3+2p5y25IEmRhfWbX5X+18hFzS976pFJd
+         QKeNos/2V1YmQpZnXLz6iO3lT77QjjxAo1shKYIcqJ3bMNFHhnrm78qx/yovIdrqBnzA
+         r0GhwfetXtC4ziMWKI2q76bnZvbLcR5N7oWSUnZhqjxJirgKOnkvLp9j7kocgrCyUUKz
+         P55S0/nuXYjt6QOvYSiB8rfgcUaVRjWww2Z+hMy6s1BEEkA6TM3bmXiLfUb9eisMGtNe
+         z91w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757688114; x=1758292914;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FHjbJdtudyt0vGhKMApu2KHBlfl47fZMhc8fNsFkBJo=;
+        b=NQjz1o6KcTHtDaPuERP7xPuHORmc49qDWQnEQFXMyMfMz3lKzVqutU/SN4aw/nMfnu
+         JT2JSZYh1WBhCSR4oh1VqqfJ3hg4SWcFuOx5np7yEwwyrw4LS4gt1EQW56ZkE3xDruDs
+         mevgT8L173lES2MwLFJM7Qrb5ELJzIryRWMej9AsRoQTBFNQ2Njx+FtVm9+jJcPt/M2F
+         +NrYKxiWGfZWZj68WjDNezopOvVE6VKTMHKbalftrahvw+blZClDsg28yQlnVzdCQ6it
+         a5IEirmOfxieanGNwRr6orZXtBh1r3ujSE3iE18TEVfhGgB6z93sR3QB1EU+OlyIAD9B
+         ex3g==
+X-Forwarded-Encrypted: i=1; AJvYcCVOzZafNyGd/lwE0tmPQ3fOPmUAKVNcPBYLsMVSK1b3BY0+noi5fhqvqJKxNlqNAFI6VvBcMYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFML/tvK/TBZGV4/uFDy24OBqv49ovFX5ZkxBHGdJf3ZR3UfKA
+	UVmroA1uy0JOEMksIqqTjU9IIff+T90yX/fHFIgnyaiieug64Tcbg62vJizF1Mdho4DuH1Rnz7I
+	nVrMy9Lkp1rLyUHbguMob+c+34VtYmkxyk6l+xlCfWA==
+X-Gm-Gg: ASbGncvU16zjNI+4dJClSeZyTQlFyYOZV5fIoiJaDfZCY0NEsWYap2jdQA+ntNEcwce
+	O5swpK05Rxd1CwInxGm650Gm1GV+KKfcTkgkPwzi0Z1M7zJlyP7XNzdM2S8CpETaylfe9LWaSnU
+	SR/aRD0v0S1n9J2gxX2MTunP1VMDwIKWuFYOg2jRSF/bl/pmBb48EWV4uQdyHIBDu2/Emq6rAWn
+	0F4Pb0SwE9jJPXhqP/7WSHfyQRCTbJJ+NoXYejF
+X-Google-Smtp-Source: AGHT+IG83mg8C15DLml5L4U3tdpjf0VWv0vGOneubDXR1XMdjs97C4rBDul+MA3shLn7lg6vC3in887d/AjcxERRYDw=
+X-Received: by 2002:a05:6512:3b95:b0:560:8d61:8c03 with SMTP id
+ 2adb3069b0e04-5704a8b5ae5mr969535e87.25.1757688114063; Fri, 12 Sep 2025
+ 07:41:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250905090505.104882-1-marco.crivellari@suse.com>
+ <20250905090505.104882-4-marco.crivellari@suse.com> <86200ee5-c0dc-4a70-823a-ae36b2e6c544@redhat.com>
+In-Reply-To: <86200ee5-c0dc-4a70-823a-ae36b2e6c544@redhat.com>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Fri, 12 Sep 2025 16:41:43 +0200
+X-Gm-Features: Ac12FXwV1cD9lEMSZ-Wc7hO-DGas0od81NQNgf1aZIWSP1dpFq5I19w78J19LHM
+Message-ID: <CAAofZF53u_AfOMbGE1d0RW8-M=VZhxCzvMSTxUbxsrhAAg-8wg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: WQ_PERCPU added to alloc_workqueue users
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Michal Hocko <mhocko@suse.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 12, 2025 at 10:29:47AM -0400, Alan Stern wrote:
-> On Fri, Sep 12, 2025 at 09:33:05AM +0100, Russell King (Oracle) wrote:
-> > On Thu, Sep 11, 2025 at 10:30:09PM -0400, Alan Stern wrote:
-> > > The USB subsystem uses only one pair of callbacks for suspend and resume 
-> > > because USB hardware has only one suspend state.  However, the callbacks 
-> > > do get an extra pm_message_t parameter which they can use to distinguish 
-> > > between system sleep transitions and runtime PM transitions.
-> > 
-> > Unfortunately, this isn't the case. While a struct usb_device_driver's
-> > suspend()/resume() methods get the pm_message_t, a struct usb_driver's
-> > suspend()/resume() methods do not:
-> > 
-> > static int usb_resume_interface(struct usb_device *udev,
-> >                 struct usb_interface *intf, pm_message_t msg, int reset_resume)
-> > {
-> >         struct usb_driver       *driver;
-> > ...
-> >         if (reset_resume) {
-> >                 if (driver->reset_resume) {
-> >                         status = driver->reset_resume(intf);
-> > ...
-> >         } else {
-> >                 status = driver->resume(intf);
-> > 
-> > vs
-> > 
-> > static int usb_resume_device(struct usb_device *udev, pm_message_t msg)
-> > {
-> >         struct usb_device_driver        *udriver;
-> > ...
-> >         if (status == 0 && udriver->resume)
-> >                 status = udriver->resume(udev, msg);
-> > 
-> > and in drivers/net/usb/asix_devices.c:
-> > 
-> > static struct usb_driver asix_driver = {
-> > ...
-> >         .suspend =      asix_suspend,
-> >         .resume =       asix_resume,
-> >         .reset_resume = asix_resume,
-> > 
-> > where asix_resume() only takes one argument:
-> > 
-> > static int asix_resume(struct usb_interface *intf)
-> > {
-> 
-> Your email made me go back and check the code more carefully, and it 
-> turns out that we were both half-right.  :-)
-> 
-> The pm_message_t argument is passed to the usb_driver's ->suspend 
-> callback in usb_suspend_interface(), but not to the ->resume callback in 
-> usb_resume_interface().  Yes, it's inconsistent.
-> 
-> I suppose the API could be changed, at the cost of updating a lot of 
-> drivers.  But it would be easier if this wasn't necessary, if there was 
-> some way to work around the problem.  Unfortunately, I don't know 
-> anything about how the network stack handles suspend and resume, or 
-> what sort of locking it requires, so I can't offer any suggestions.
+On Thu, Sep 11, 2025 at 11:25=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+> This and patch 1/3 do not apply cleanly to the net-next tree.
+>
+> Please rebase and repost.
+>
+> Also I suggest to split the wireless bit out of this series and send
+> them to the relevant sub tree, to avoid later merge issue.
 
-I, too, am unable to help further as I have no bandwidth available
-to deal with this. Sorry.
+Hello,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks Paolo, I will do as you suggested.
+
+--=20
+
+Marco Crivellari
+
+L3 Support Engineer, Technology & Product
+
+marco.crivellari@suse.com
 
