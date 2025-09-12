@@ -1,82 +1,79 @@
-Return-Path: <netdev+bounces-222681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF3CB556C0
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:06:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A307BB556CF
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D8A81CC2BA8
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:07:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D326A161679
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C27728489B;
-	Fri, 12 Sep 2025 19:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192AF322A38;
+	Fri, 12 Sep 2025 19:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dd1C48Xe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wnh1RmUQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5251817BA1
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9F22868B4
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757704015; cv=none; b=pTBSUXghZkVEZ+PLOUvVfJnqscEry1gAV+EiK1OIKNH4qGYv8fiEYv4tF73mFPFIn1yFS9Cr3tupxMPCnTDyMZtGnLsEebyVYVc36TcS0pPNcllntJhqf6Juxh4kV8KeGGZW/1YTtGbU+vP6x/7okF+giy/7EF9SC7XW4/xOT38=
+	t=1757704264; cv=none; b=Ynh/JzxW4xg0XPpzrHO7j0b+ItYts9xyp/Rgonqqcd06e70vfamvTzrAOSI9/tHhhUcjqZ+BHUHLLmfsjyIl/mo5ZsKUTofoq5szdSL9oZL3HfTJZ7eBjBATzFoKF1p7iOhvKA0RMDiUniZHuV2MVf91B8BzWiM+ggXGjtGTslg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757704015; c=relaxed/simple;
-	bh=ZZUAOeZbMeFZMjekRoHqlYXHokiz6et5GCufS6E1WQA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=F++nQKYCL04xmN780cCYkhXPzUzoPOvGa2Ul5/vLvWE89zmvGtVJ1KizqQ2hVzmm6S/wDb6L3VNoJyN8Qcytu8wKlC4rbSHG2SidmqMgaCM2unbmIr1NJ73wOAApfUrnQdD05L/vzofCWmiGJZJhbVw2v4tggonGeZ9VPIMqvxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dd1C48Xe; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1757704264; c=relaxed/simple;
+	bh=3oeYzqU901f5wRgNmTZwhTHdB0P2HYzouA3lZmsOu5Y=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=OxULLC3egjEz8DKsEIXqd6A0XvMV3ZA3r1eLcvHgmG+1FmkRU4Ifv+ZXQnyXALmue7VHQxEog5Bx2uzatilLQM28QXINiAdzeGFBtJxrMfIAJ7weIZUSHdTWuACUNgl2AilpFTx8g+JJPLCh9379iPdYEpOTyRO1DNENX2DsH1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wnh1RmUQ; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3db9641b725so1930023f8f.2
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:06:54 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45df656889cso15648935e9.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:11:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757704013; x=1758308813; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SV6Ojjj4xd7nu4u5yHexJDAjlCPQ8SETV3fhsO+esoA=;
-        b=dd1C48Xe6Kuic1P8iAyfidUDQQZTTlDLgTQ3ywCo6YAM5/1jNw2azwq0+prxfG2JxO
-         kuGkAxDaIFezzbhCSWjH/JdUc+U3szyLBTObJLttjz1Yt1tE68gYB3bkiaFoAQ1/P3sb
-         +whv8gDvQ0bfMG7NA8iyXi12y51cCfpbniUYvRTf0IC6pERkl6ATlYLDOONr6RFs2UFv
-         37Dwb7FuXzKOiNh0qUEe0nThgccBoi6VsYMxdSX7BxhoMNq63nJC0kZ/+NE0p1cZ9W0y
-         3QEu48qYeeUZk2KYAI0D0/xJ99qbj0nXkJbjIjdVQrLXA/cxJAKaDiQp9fa2d9C6ldNQ
-         fO3w==
+        d=gmail.com; s=20230601; t=1757704259; x=1758309059; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=l9Lr5sRXYEo6shpqlaKMxCi6Y5z5GwvfKG/C7kzJN30=;
+        b=Wnh1RmUQC8u1BRPo0xBz76aMXuaIwMSnyC5cffooGwl5wRIH4WOk9SvbE9HaCfihBF
+         tyZPKeAr4kT4x0GyCFzV7LJm4sxx4EMNoxeS0s9iguSPW+9SKq85X+zp8oaI3gdvBWD/
+         0PQ2dRfGDqmqFHcacyEwj8gRtu9qpL5X4YViTTMvva6NcO7ECQl0eG1ktpjbaqigEgwR
+         Slgxiravrl8KQjb+M3sOdxI3FwaggurN7k6gxHRzcH1BpjvmB8oPB2unlOUKkN4s8sTo
+         +i8ghIuZFfJet0LNxD/gcwUAu2IJPrHk13hdFxGuC2ufHmJpwzA2bXNIJHdQofkE4B3K
+         xJyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757704013; x=1758308813;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SV6Ojjj4xd7nu4u5yHexJDAjlCPQ8SETV3fhsO+esoA=;
-        b=flt2w6+ASePPZO8/db41LaSs0zRJcU2JI8PJz4SxfYfcpXS9qLy4Q/1TWtixcoAc2x
-         SLpQ0dcBaYof8uVPjOW8hlRnDRdjUeXEQeE8PMo4cUVGxNzve8Wdiphu5hoBdTnp9Mte
-         wyb5g1PqFJlpBYrN0cclLsNoRDkYpS2rtEjAkS01tqMXqi4pGeon1NwxL8btYMZ5xr/R
-         GcRAL/BnHikDwppmwEaAf0A7va7vDx/ScxLBAYMrk0ZZMoTmBLZMW2r5EnLtwGtHHYR9
-         2kSCX4wAPaAS8G5sdyqhQZhHN7GXNc85tBM8KuaxT6TT0Ty0B1Jlg25cyy3J+pZdnZ1h
-         TGLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEBwATnZMxpR7gMjn66lUyBYUjqBLDBK103vTUrRGNIWGPA1jhPxCHPK5ZEDTA7BD4PUDOmCk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxImVDb+7ZPUT/a6SJbl7OnXmaVTEo5ohDTuQtsnmKRKq/NqqDx
-	OQYVkY3LDBw3Inhvrdcdv9jnDmf9kMMmYjqXyXlLEA8sAEB3+vpU4NXX
-X-Gm-Gg: ASbGnctFnDINmx47LzOeQlfk44/UQ1xDA1foR8m2U2ArlMQciFcFvUq5+IS7JpGl6vJ
-	jh/JalzgffXLDvgZW4zTbcoCy8TgyUm++SYGZ6fwmRCWAL8NfPrbC0ET6qgMJMZO1TCnfT0yRi1
-	R/e3EOxIxLksU9LkGmEUtaRBhYQaB2bOA/U7bz5hkPzTgK6zzpKK5pBzC9ImhiOz7Uzzk3W8dPv
-	gZhpIsMuFKdAjJzQIW1EQNceV+IwCCBEX8crLV/vwidHHyBks87ojWU/a8bMfLFlORrhAixeFsS
-	Lx22l/608etbAx8w5ILMuZFuPRECVlM8aw0JHBhX5vke90qPfvmGsUxoPvSHjGhykoqeKSUQnV+
-	OteswdLf7fwcIrJVWhBSFmDWEPuyZ4YEpnYbf6JNhUGSB4RPegZU2LKMHp/8pL/pNrjY9kre19v
-	t7Na25xECi8XsdcRSB+6c9acRu6YsQKBKhjj7boma0bzdi2K6ZCBxYJ/exRkY=
-X-Google-Smtp-Source: AGHT+IE+lcz8Jco35np3zFKtHZgut/DkmcTOnUh7UtIQngMtViTLG++uhdIOXgyXeRAiRssRRjfWog==
-X-Received: by 2002:a05:6000:2389:b0:3e7:6268:71fd with SMTP id ffacd0b85a97d-3e765a4c887mr4116284f8f.52.1757704012612;
-        Fri, 12 Sep 2025 12:06:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757704259; x=1758309059;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l9Lr5sRXYEo6shpqlaKMxCi6Y5z5GwvfKG/C7kzJN30=;
+        b=gCIc+N5nXavDoAJnyf2azjB0FfWGTAb0VXTqdkWteQJ4Zy7DjG4qOUOWRY6VK5a+Pk
+         5XBfgoCw5J+12US/etMUNs628zUGvJH4YGM/3AC+E/whcjaiHM3oj2oPno1OvXiEvZdR
+         En0rCQ3hSwthn2WInmam4g/SNXhO6UFs4X0sgJPPEYMTCWMkCh+ZTy+0C7c6jyIwuTa1
+         3udbuvS348ul3lMV4rSAPJ1eyHMGqsUJpxwzUtgN8o9kxUiZ8V2xdCLnornzN03acaBo
+         IXn5uiLMfBZ+VjDx76PS3eKQyn0FgUKxjqcpRNf7KsgCtiltJVE9XTRrWiJ7OdO3/Nwz
+         NWZg==
+X-Gm-Message-State: AOJu0YyKKLxRLGpHUwTqVUp1IF8PKGAAHJRwME7LAR6liTgOUwUYYkRh
+	NRBmh7FgaYg8sY/fNPN19t8H04eGAkHplcWkuw/akPIyFPwx9l+paa9Q
+X-Gm-Gg: ASbGncvbL64a4hZ+rPX3kdBykrfoC9rX3kIZ3CMQ6Gb/kD9DDSvG/IvyYo18LtoDwv+
+	UZDF7HFdRat3ig2Hgo2I4E06ZZvESKiQkVW8LQZQYoPO55wjlW9nQuTs+WVjq0IXYU6gkakQgDA
+	gzHiQJU/Nl1CyG6QhxxM2kL9Q7izhDK2Dhr4otVMB78W5RC6wRWUDeuxjByN97FuEXI/jK8o1AT
+	HVgYkYeqDDDjyO22Y2g2pfFW50KDoWTZSfuwatRWAcZ3YWd7SV7UsVqZHIlZ4H5JTZMNaLUkVip
+	cnx1YMdWH4QQUHsC2HtnvK6Xy48eyUsFWXPnSvgOZv582qpAvH9HNSbk8eNtIhxsleRTuZ83FJQ
+	U5CHyydB0xb/YavmYMW0ZfodW5Ckn8ZBtLlpZEtJlfXGFxYhGG2j0Qs8cj80si6BfysybKeW3a9
+	e/+QGM89Y4rRz0RKh5DOlOcF1HUahyIxUfOmvZdiLcdk3EQnloCjFyvuW7u8Q=
+X-Google-Smtp-Source: AGHT+IFjywQtM3sKJ0myaq2ZSPkjtE5Jb5S05vnJSoveFCt+qkcB6BbX4rrWaQQIjiLZPDu4Rn2INw==
+X-Received: by 2002:a05:600c:8486:b0:456:18cf:66b5 with SMTP id 5b1f17b1804b1-45f211f7aaamr35188175e9.22.1757704259440;
+        Fri, 12 Sep 2025 12:10:59 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f09:8900:81f2:fb63:ffd:3c7d? (p200300ea8f09890081f2fb630ffd3c7d.dip0.t-ipconnect.de. [2003:ea:8f09:8900:81f2:fb63:ffd:3c7d])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45e017b2a32sm74994025e9.18.2025.09.12.12.06.51
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45e03718c64sm70902495e9.3.2025.09.12.12.10.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Sep 2025 12:06:51 -0700 (PDT)
-Message-ID: <cc823d38-2a2c-4c83-9a27-d7f25d61a2de@gmail.com>
-Date: Fri, 12 Sep 2025 21:07:16 +0200
+        Fri, 12 Sep 2025 12:10:58 -0700 (PDT)
+Message-ID: <a532b46b-ef68-4d68-a129-35ff0ee35150@gmail.com>
+Date: Fri, 12 Sep 2025 21:11:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,16 +81,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v3 2/2] net: phylink: warn if deprecated array-style
- fixed-link binding is used
 From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <b36f459f-958a-455e-9687-33da56e8b3b6@gmail.com>
+Subject: [PATCH net-next] r8169: log that system vendor flags ASPM as safe
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
@@ -138,38 +132,37 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <b36f459f-958a-455e-9687-33da56e8b3b6@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-The array-style fixed-link binding has been marked deprecated for more
-than 10 yrs, but still there's a number of users. Print a warning when
-usage of the deprecated binding is detected.
+ASPM isn't disabled if system vendor flags it as safe. Log this,
+in order to know whom to blame if a user complains about ASPM
+issues on such a system.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
-v2:
-- use %pfw printk specifier
-v3:
-- add missing newline
----
- drivers/net/phy/phylink.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/ethernet/realtek/r8169_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 1988b7d20..0524dcc1b 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -702,6 +702,9 @@ static int phylink_parse_fixedlink(struct phylink *pl,
- 			return -EINVAL;
- 		}
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 9c601f271..75272510f 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5441,10 +5441,12 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* Disable ASPM L1 as that cause random device stop working
+ 	 * problems as well as full system hangs for some PCIe devices users.
+ 	 */
+-	if (rtl_aspm_is_safe(tp))
++	if (rtl_aspm_is_safe(tp)) {
++		dev_info(&pdev->dev, "System vendor flags ASPM as safe\n");
+ 		rc = 0;
+-	else
++	} else {
+ 		rc = pci_disable_link_state(pdev, PCIE_LINK_STATE_L1);
++	}
+ 	tp->aspm_manageable = !rc;
  
-+		phylink_warn(pl, "%pfw uses deprecated array-style fixed-link binding!\n",
-+			     fwnode);
-+
- 		ret = fwnode_property_read_u32_array(fwnode, "fixed-link",
- 						     prop, ARRAY_SIZE(prop));
- 		if (!ret) {
+ 	tp->dash_type = rtl_get_dash_type(tp);
 -- 
 2.51.0
 
