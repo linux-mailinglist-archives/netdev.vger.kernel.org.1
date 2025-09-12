@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE154B53FE9
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:34:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F42DB53FF4
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71340AA4512
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:34:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05AF656847F
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44715185955;
-	Fri, 12 Sep 2025 01:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154E8153BD9;
+	Fri, 12 Sep 2025 01:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTeaXVH7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m028My3p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1845417A2E6;
-	Fri, 12 Sep 2025 01:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA7C15C0;
+	Fri, 12 Sep 2025 01:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757640839; cv=none; b=skXoOOjTkVN2OU+kNOYOr7qaSdWP36E8EkOeTyOVN2/Shvqk7/cDHBajDM0NgummviG0rjPPbNgsVntXMubLnHVtgAcPlZV/NppkKAC8U4BBulzUmq1hnsnPCgvVOWCf2CjBZQTCgGo/Nclu/9PE9ww0v58pO6ACN6ozuj9Pogs=
+	t=1757641206; cv=none; b=oiJQ6ECu3gA0+eeamDsotFmikU04Lmmge0JmbZLcQxXvhTuB3GCIJTri9wP+rW9bki9yylWncphIVeF3B7dmoes+FwhXtsDPjzzeCoqXSZCV4za/jKh/gw9FzcCZSknsG5f7Hwg9Aa5IcG0xV9OZ8vsL7S8TZ0sD2irU1cn/0i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757640839; c=relaxed/simple;
-	bh=7/CUff/Ud4M09uUqqjZTOkjLKuUTqEhs9KE4Rs6jvPM=;
+	s=arc-20240116; t=1757641206; c=relaxed/simple;
+	bh=XlBrkjUQ/I0LH5kjwZ6InFrcPg3fHynml0VhGQfQObc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nUJx3nJfc/4GivI7HUdJ7sgwi9DZcsqgKAwQdaduqK7YyjsEOSmQ5bRnDCZaEOShg6yQw8gn7V5A69VZfY9rXYlDKixAA26a8T9YNEkElltdNWVgKWHeormpPpq/2UyHpryDyT51NxchTvxlAEA0pBPnnOv35WbO05JBctF8PCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTeaXVH7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A789FC4CEF0;
-	Fri, 12 Sep 2025 01:33:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ub0cNQXTMJItO7ctjpeYCVeviQ9kl9zifn4vYg4E3a4irz1V4mh4tiFbGB31jfmzcgmhNd+mpX7VjE64MNDarwqkOukINm1JIK0rSefe/btSxtdMJg+g+/R4HBDRysUKt/95Cj+wXdvMxxAlPJX9w/B/tx21Llrvm5ytXvuOCnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m028My3p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71454C4CEF0;
+	Fri, 12 Sep 2025 01:40:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757640838;
-	bh=7/CUff/Ud4M09uUqqjZTOkjLKuUTqEhs9KE4Rs6jvPM=;
+	s=k20201202; t=1757641205;
+	bh=XlBrkjUQ/I0LH5kjwZ6InFrcPg3fHynml0VhGQfQObc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pTeaXVH7Fr7pr/NwWsG2owWonbXoP+uZdbLK4bSxaT5V3f0xAlov2d3z7muvPc4eH
-	 UTsT6xhI1j0YsdJ6VLvrIxv53g36NuPJyWAjy6XcqxUjZcglKnmeK3MZ7OkF6weHzu
-	 u9JwPg2T8hxirjk8YDGZGnxorOM3+wRU4rGTkxN89/G+xvcj4j9VfN3xpi6hnUD2Dd
-	 ac7I/zNOGtQxGHD2+rQxuxfExxflDaGyrXmjoKZwnvQGFsSHKaTLyxpDcU8Oq8oT/U
-	 WXhVv8KtOVvfyZ34UYY5mmfPf3IlAARuaRjmQRVcDPV7gTJ6mUXnu7TfZE/hmpjyHF
-	 5hZWxY+F0Z9EA==
+	b=m028My3p2DfYni/SH1nR5n6JDQfR08yR+cqYqk1yrlrQc/o2Oi6y+h3tA839YLb2+
+	 oiEcq3Qzamor0chCVW2Hb9AtvBhfIEHZckbC+uITnynRw8WNzykbiSzhDDlDMPPyIz
+	 J26kYEa2JTnKc1WHWwRjAboD6KgHRNQguCA3b2q3ER4e+hHDNv7qF9TjBvwv1Smvrt
+	 kWHiYF40ssCNYFMGi1IaJwpwp2qDwnNFJ3NFGLzrOMWAd42KefhJlxqA+ZdsbNEt0D
+	 a7W6+u3dc+m/3pByKFUih2pwZ4zFXLZ6P2FNiKwE0TNeesb5ieRWiQkDXlh82lDIqy
+	 99ugTBnhOwaBA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CE9383BF69;
-	Fri, 12 Sep 2025 01:34:02 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DBB383BF69;
+	Fri, 12 Sep 2025 01:40:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,34 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-next-2025-09-11
+Subject: Re: [PATCH net v2] net/mlx5: Not returning mlx5_link_info table when
+ speed is unknown
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175764084099.2367774.7528913497762386236.git-patchwork-notify@kernel.org>
-Date: Fri, 12 Sep 2025 01:34:00 +0000
-References: <20250911100854.20445-3-johannes@sipsolutions.net>
-In-Reply-To: <20250911100854.20445-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+ <175764120782.2369958.686511043382466099.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Sep 2025 01:40:07 +0000
+References: <20250910003732.5973-1-litian@redhat.com>
+In-Reply-To: <20250910003732.5973-1-litian@redhat.com>
+To: Li Tian <litian@redhat.com>
+Cc: netdev@vger.kernel.org, linux-hyperv@vger.kernel.org, saeedm@nvidia.com,
+ tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
+ haiyangz@microsoft.com, bpoirier@redhat.com, vkuznets@redhat.com,
+ cjubran@nvidia.com, shshitrit@nvidia.com
 
 Hello:
 
-This pull request was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 11 Sep 2025 12:08:28 +0200 you wrote:
-> Hi,
+On Wed, 10 Sep 2025 08:37:32 +0800 you wrote:
+> Because mlx5e_link_info and mlx5e_ext_link_info have holes
+> e.g. Azure mlx5 reports PTYS 19. Do not return it unless speed
+> is retrieved successfully.
 > 
-> And a bunch of changes for -next, though that doesn't look
-> like it'll be quieting down just yet.
-> 
-> Please pull and let us know if there's any problem.
+> Fixes: 65a5d35571849 ("net/mlx5: Refactor link speed handling with mlx5_link_info struct")
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Li Tian <litian@redhat.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] wireless-next-2025-09-11
-    https://git.kernel.org/netdev/net-next/c/d103f26a5c85
+  - [net,v2] net/mlx5: Not returning mlx5_link_info table when speed is unknown
+    https://git.kernel.org/netdev/net/c/5577352b5583
 
 You are awesome, thank you!
 -- 
