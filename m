@@ -1,202 +1,123 @@
-Return-Path: <netdev+bounces-222585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF76B54EBA
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:05:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C7CFB54F29
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:17:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF1871B2697B
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:05:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F0A07BE5FB
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E353009CB;
-	Fri, 12 Sep 2025 13:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6D2309DCB;
+	Fri, 12 Sep 2025 13:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYmYXTzS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tm+gETZE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C4A2DC787;
-	Fri, 12 Sep 2025 13:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0772D257827
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 13:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757682331; cv=none; b=Bbe7MImljA1Hkz/KIfNN6ku0dJTI6d+ggw84/8LG3goeGapylPBH9rBqwDVf3aURjqK2prRVU0evg8yurmOAp/rcqex8l+JHD1+6VZp7pXyTGHZF+JpMLy5Hl8j9taCz0yosCwMwqoAy/qe8UO3Kco1pd9kMVXGRdgmOTN0gVCk=
+	t=1757683035; cv=none; b=IqOr8WBLMMIoYiuLia4pz/dwL4P8DmUH4mQdxQcn0J7h+FYOCZ6uKqIGQshrAt2M4tlA5EPIIzNxuo/Tua934+Q6Y1BdhWc93BhDh1kL0e/+LoLmjrvRnXOJD1zCX+6PriT3hBhraE7k6zIJK9P3woSabEYSKijWlGyF52C45so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757682331; c=relaxed/simple;
-	bh=Oj2YhsrlW7/LL2/+FfpL2MDbCW0BhZLRp8bVjxYH3/4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sG0Yha6Kx84OCUdLYCI46WvOpphwmhBiZVq1Ea/jzdrjmtSPETGxCVhc1CcbeVs7VZ+upjlrcacLDKAOrCkWHqNs5Rz5xcByvqCCp4P6FYN7asab6p97/SMj/Yi0dRgjuYLBRfcq4VHD0RmqfCKCaH+7xx4s9Yai26Gb+USyIPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYmYXTzS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCDCC4CEF1;
-	Fri, 12 Sep 2025 13:05:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757682330;
-	bh=Oj2YhsrlW7/LL2/+FfpL2MDbCW0BhZLRp8bVjxYH3/4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QYmYXTzSvoub6ckp1xdpKOdLcSDR/MGN65tzs+mhcDVodcTVq4E0vyN83ehL+5jls
-	 ebOPq+YIRNK8+3qzlOYuHLUMUE+GawtStVvB5HdnTpuQ22W3MW2B3mlKxzDAmBWwy/
-	 1FJAe1Jve27dbaPIBLnrFnxL4ldNsXO/YOdz53BsBfUhceap1kcbGF0zR9X/iooRK+
-	 e5Mj+ZyPjWuKjpM2TzrFWsYtkyBB2VmsSyqjsyY7px1/Q+AJtZLXNMxbk9q6I4rFdP
-	 l33tP7e8dZb7kcc/eFpbFvF9LROABe07SVyr9fIGYJVmEqG2ZSn9gxJocjwm9l2l4T
-	 4mMRrYuK/Xpcw==
-Message-ID: <73c95643-e1eb-461c-b547-931642ec633a@kernel.org>
-Date: Fri, 12 Sep 2025 15:05:25 +0200
+	s=arc-20240116; t=1757683035; c=relaxed/simple;
+	bh=Qmp/sVrKPtWZYE32eNYZrLxUcCXTL+w4Rquv9L6eNds=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zykui7mA9SDC9KdaaGZc5QMo+kCP/08IkuPbXjnaChO7sqz8nogPZAoc3zS4DEE57J8Es2XFYARsIGdRekocSU/lSXlQKPQ5oP/PvdErX6WeaI7KhL4wkBAPgQmPrjqXZIzvbsz5LjDy2NCeQA+RxcZfqH0/7wHpIxiRRBbNku0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tm+gETZE; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757683033; x=1789219033;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Qmp/sVrKPtWZYE32eNYZrLxUcCXTL+w4Rquv9L6eNds=;
+  b=Tm+gETZE2JohBW7eYWsQ1AuXi37+PT9eO4ZqQsX5GLydr3fH5GLZZNud
+   Kr2LGpUw09IR54Cgdj6c+ylnGUikrk69aYeovtrbkGRA+QY2MS7Q+gmzD
+   Yhh1QHLhlAGX7COGnqoz46r/MkSeF7I/fvilrVJh0zTVJIJ+LGVHaBb9r
+   r3pqeWpL8Ag3KiTi/mv288FvdOmcH4Fd+YA3Sj7zCvMCP1W8tL4mdBP2t
+   SLDIGGmMQuxgO3ULkQQXdFDt+7x4VyQ3WuDMmKPdQGo3mBDG5l7ubvNhy
+   BEii3PTEVRU9VtoExh352G97ybUmWo+KLHL+/J5+qqHRjjHPKeZF8jiwt
+   A==;
+X-CSE-ConnectionGUID: IyEDVAWFS96wQBpHFFhdcw==
+X-CSE-MsgGUID: 7Dj4XkB0SQ2KRPL/T15URA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11551"; a="85461397"
+X-IronPort-AV: E=Sophos;i="6.18,259,1751266800"; 
+   d="scan'208";a="85461397"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2025 06:17:12 -0700
+X-CSE-ConnectionGUID: jAmMynUMS+iiQ33zQpcMmQ==
+X-CSE-MsgGUID: dozrqj/ARvOLvhPTPLceOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,259,1751266800"; 
+   d="scan'208";a="173131203"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa006.jf.intel.com with ESMTP; 12 Sep 2025 06:17:10 -0700
+Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 9DF1D2FC6E;
+	Fri, 12 Sep 2025 14:17:08 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: netdev@vger.kernel.org,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next 0/9] ice: pospone service task disabling
+Date: Fri, 12 Sep 2025 15:06:18 +0200
+Message-Id: <20250912130627.5015-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] tools: ynl: rst: display attribute-set doc
-Content-Language: en-GB, fr-BE
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-doc@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250910-net-next-ynl-attr-doc-rst-v1-1-0bbc77816174@kernel.org>
- <m2v7lpuv2w.fsf@gmail.com> <a1f55940-7115-4650-835c-2f1138c5eaa4@kernel.org>
- <m2ecscudyf.fsf@gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <m2ecscudyf.fsf@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/09/2025 13:07, Donald Hunter wrote:
-> Matthieu Baerts <matttbe@kernel.org> writes:
-> 
->> Hi Donald,
->>
->> On 11/09/2025 12:44, Donald Hunter wrote:
->>> "Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
->>>
->>>> Some attribute-set have a documentation (doc:), but it was not displayed
->>>> in the RST / HTML version. Such field can be found in ethtool, netdev,
->>>> tcp_metrics and team YAML files.
->>>>
->>>> Only the 'name' and 'attributes' fields from an 'attribute-set' section
->>>> were parsed. Now the content of the 'doc' field, if available, is added
->>>> as a new paragraph before listing each attribute. This is similar to
->>>> what is done when parsing the 'operations'.
->>>
->>> This fix looks good, but exposes the same issue with the team
->>> attribute-set in team.yaml.
->>
->> Good catch! I forgot to check why the output was like that before
->> sending this patch.
->>
->>> The following patch is sufficient to generate output that sphinx doesn't
->>> mangle:
->>>
->>> diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
->>> index cf02d47d12a4..fae40835386c 100644
->>> --- a/Documentation/netlink/specs/team.yaml
->>> +++ b/Documentation/netlink/specs/team.yaml
->>> @@ -25,7 +25,7 @@ definitions:
->>>  attribute-sets:
->>>    -
->>>      name: team
->>> -    doc:
->>> +    doc: |
->>>        The team nested layout of get/set msg looks like
->>>            [TEAM_ATTR_LIST_OPTION]
->>>                [TEAM_ATTR_ITEM_OPTION]
->> Yes, that's enough to avoid the mangled output in .rst and .html files.
->>
->> Do you plan to send this patch, or do you prefer if I send it? As part
->> of another series or do you prefer a v2?
-> 
-> Could you add it to a v2 please.
+Move service task shutdown to the very end of driver teardown procedure.
+This is needed (or at least beneficial) for all unwinding functions that
+talk to FW/HW via Admin Queue (so, most of top-level functions, like
+ice_deinit_hw()).
 
-Sure, will do!
+Most of the patches move stuff around (I believe it makes it much easier
+to review/proof when kept separate) in preparation to defer stopping the
+service task to the very end of ice_remove() (and other unwinding flows).
+Then last patch fixes duplicate call to ice_init_hw() (actual, but
+unlikely to encounter, so -next, given the size of the changes).
 
->> Note that a few .yaml files have the doc definition starting at the next
->> line, but without this '|' at the end. It looks strange to me to have
->> the string defined at the next line like that. I was thinking about
->> sending patches containing modifications created by the following
->> command, but I see that this way of writing the string value is valid in
->> YAML.
->>
->>   $ git grep -l "doc:$" -- Documentation/netlink/specs | \
->>         xargs sed -i 's/doc:$/doc: |/g'
->>
->> Except the one with "team", the other ones don't have their output
->> mangled. So such modifications are probably not needed for the other ones.
-> 
-> Yeah, those doc: entries look weird to me too. Not sure it's worth
-> fixing them up, given that they are valid. Also worth noting that the
-> two formats that we should encourage are
-> 
->   doc: >-
->     Multi line text that will get folded and
->     stripped, i.e. internal newlines and trailing
->     newlines will be removed.
-> 
->   doc: |
->     Multi line text that will be handled literally
->     and clipped, i.e. internal newlines and trailing
->     newline are preserved but additional trailing
->     newlines get removed.
-> 
-> So if we were to fix up the doc:$ occurrences, then I'd suggest using
-> doc: >-
+First patch is not much related, only by that it was developed together
+with the rest, and is so small, that there is no point for separate thread
 
-Good point!
+--
+changes vs internal review:
+Expanded cover letter (Jake).
 
-If these entries look weird to you too, I will add one patch adding
-'>-', at least to push people to "properly" declare future scalar strings.
+Przemek Kitszel (9):
+  ice: enforce RTNL assumption of queue NAPI manipulation
+  ice: move service task start out of ice_init_pf()
+  ice: move ice_init_interrupt_scheme() prior ice_init_pf()
+  ice: ice_init_pf: destroy mutexes and xarrays on memory alloc failure
+  ice: move udp_tunnel_nic and misc IRQ setup into ice_init_pf()
+  ice: move ice_init_pf() out of ice_init_dev()
+  ice: extract ice_init_dev() from ice_init()
+  ice: move ice_deinit_dev() to the end of deinit paths
+  ice: remove duplicate call to ice_deinit_hw() on error paths
 
-Cheers,
-Matt
+ drivers/net/ethernet/intel/ice/ice.h          |   4 +
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  21 ++-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   3 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     | 159 +++++++++---------
+ 5 files changed, 109 insertions(+), 82 deletions(-)
+
 -- 
-Sponsored by the NGI0 Core fund.
+2.39.3
 
 
