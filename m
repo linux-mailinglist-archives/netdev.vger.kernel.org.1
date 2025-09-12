@@ -1,92 +1,125 @@
-Return-Path: <netdev+bounces-222728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F65B557EE
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 22:50:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D57B5580B
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 23:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 169141896FCE
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 20:50:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5D17B0C60
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E899630DEC5;
-	Fri, 12 Sep 2025 20:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373A820FA9C;
+	Fri, 12 Sep 2025 21:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="N2P6xMfB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gdbk9Rzm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B612D47E0;
-	Fri, 12 Sep 2025 20:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660C325B30E
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 21:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757710206; cv=none; b=lCenNQoPlou6+J7tt9LBBrhELQNThFJfOyZFdlkA0zwMEAvgyz6uvkJiaWiZnCtiaNMGiDc+xRbGMOmCOITON3PVdVw4idj3ih3owqYeccIahrmjiv43vNKf43NHgCbOdjdrRXUX40afJTXuswbJTndZfS8vvHNopwm4E7E4vuY=
+	t=1757711183; cv=none; b=dVioVaW/88gWMNNCzuijbE0AqtA4C8UXHnDuMB9EcJRxj1n7K/IwyaBP9/HXjOADw2f+cf/qdZdHMJD2bFEjmDMGWYn4regj3QXAQCrJ41ec6QKev0it9rKYbHG4TZM+4zH4xqfhK3GKXJnVOrE0+ByZyKLw59ycVHSdNc1DobQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757710206; c=relaxed/simple;
-	bh=QYleAoZewFliXUXCY9XoxI6PTGcIqha8laSnmxsuJoY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uybqY8gqEbDazDfVKj18Z35FOBEDKcDmzqczwu7qdP27RJv4pM1oS3lx12OchcAZSxIjJzPWRQtO1vyKRC8ElSP+b43jtinsP1llFhYm075u9/mEg9K1/ZDuiMBvbOk1B5MVNC6gwhrcHLbVUXFM0N0K3i2QBF9zjur3Q7EOtrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=N2P6xMfB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=BsDgpnLP/BjJT4aNa7Z5gzzlK373l8JvJuqHZ2R3Td8=; b=N2P6xMfBJFfv8Ho8/m3dH8Oyew
-	s2BCcwl5bCaEtdDiXQk+hh60OVzUTHTUVAgLlwB4rgRJYZlFB9izB5r4NSgAf1FgLeT8o4ZUNkZWi
-	LruFkR5O0K01neMIAzm9BDFQhRiE0wxCJCTScxXfjhMsf5v+T0+M4KowaGn6eF0dQ+/k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uxAiS-008Fvz-MG; Fri, 12 Sep 2025 22:49:56 +0200
-Date: Fri, 12 Sep 2025 22:49:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chen-Yu Tsai <wens@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej@kernel.org>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Andre Przywara <andre.przywara@arm.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>
-Subject: Re: [PATCH net-next v5 6/6] arm64: dts: allwinner: t527:
- orangepi-4a: Enable Ethernet port
-Message-ID: <98c03746-2b3a-4eec-863f-4024464dd9dd@lunn.ch>
-References: <20250911174032.3147192-1-wens@kernel.org>
- <20250911174032.3147192-7-wens@kernel.org>
+	s=arc-20240116; t=1757711183; c=relaxed/simple;
+	bh=J0uLC7O54zZEqMTW/1kC7lXHzi7kn0Wiz3wS9V4s0nk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gGdycgVWf22g+XPSOkZOLbg+FbR61Nukp1toxTglTyO9S/O5ffC8j66HupJAa6MybFCQ18P+Jbo2C/5fzewEo4MyVS1ii15pPSqpZYtM2y9B5gXT8VrLyRbaFQ2QeHqC5tbjGNrChMGF13zefW9gQ/HM8qtfsAaI+l9HcDAidR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gdbk9Rzm; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-55f6b77c91fso773e87.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 14:06:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757711178; x=1758315978; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J0uLC7O54zZEqMTW/1kC7lXHzi7kn0Wiz3wS9V4s0nk=;
+        b=Gdbk9Rzmm43q3XC1SuwbKR27h6gTtC9UTih2MIM6UPO5RdNR0+oYmS0tXFpoJa4Iuh
+         olz5CvZp9LuSdXZJPD95gxUvPFx0Ipjn6CaNTF7eHVdeKTeR8pFVCi63G+Ghklr2mSH2
+         YbpJI2i3PhRv/r/z+V73avfQDsj6tpYr3iKOoO0SNi5Ruum0wOIqwPoIRiRbVZ3kfuzi
+         fGgsu6pcSWrd4PJ0YVHHUlZ/zDt+njq1TT9pVtMssbMoqk0DNuoGXYPU9Glaa4Bacj8i
+         Oa2J06pWBtDV7eTSD4YGaIovPLWLFAsFR21FEAnPdfgyF/EmKT2H/Glg3tvZnezV4bjc
+         Is6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757711178; x=1758315978;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J0uLC7O54zZEqMTW/1kC7lXHzi7kn0Wiz3wS9V4s0nk=;
+        b=CKTXTgkGXrf4VkA7Sr45c4OptgtOgmpZkfPQUGhAPLQERG3ae4rwMMd85WXis2Iz/4
+         qR6gi22vYsjOeUCQyn0uyyxeK6doFsnCDCX+pqdCIms2hGfGInIrNRRwsrsJcUmUJszv
+         uPubtrtompEEek5de23swfHqjaSZDcHAJe3jWkzrhvUs4MMwntDk9OVOiyxjCq1lbD1u
+         RwMwt46hZCCmFg4xHsIzC9FbnxHJoQfkWxOMOloiD/x64i6hxHYk3hHwPQyYS42MnP3o
+         7BXqBbwj8qPvKqe5FfxyL73jN11TXHZ+2LPbwxjDNGvNYALVRyC5WuFOU4iOCAlA35rF
+         55eQ==
+X-Gm-Message-State: AOJu0YwcK/JygGOayxWEVSHV+yHAeLtPDvwbSBv8BZJ3RSsbeLmsCOHP
+	u9CDRnL10Fsb/xvpHwxe0oGqRy75KFvJAlo7DB+Unduf3vfLVTNTmM/jYT+plPXm+0Xwc1x7NR/
+	Hro99q1Au/ouKAUvJUB4MRW9J99vW/klneDXe0j9p
+X-Gm-Gg: ASbGnctdm6o7AAtwk+RuUvVXI4JCQdfazwMYJLgxariiQo+85Jrp7QQmT3qls7v7AMo
+	OfR3utlx1LViJFpTxHHZQHQLN+V48XugBFNtBfHvPdZyiWqj/9HO3Gy21EoyCQCZTYDo8BSyltw
+	GIgwUlTL3CqSpiX8/XI6uQFdDzPbJSCfFD2lJ9xfcGWNEWV+u//zuXVD1HrRcv26Idwwzc9xyeC
+	fDcTkEdGCn/KRM5oY5LZer2z9HklRemTrmgk5u8FJXdgOwcRdu8UqE=
+X-Google-Smtp-Source: AGHT+IFo4cD/BxVNOTywCONMB0xxSgIfWIheC5wDA9CVLI7iF4J1whY/WrIulwEDO784Yw6phn3QOH0lmYu8KuRZe0o=
+X-Received: by 2002:a05:6512:4284:b0:55f:6aa7:c20 with SMTP id
+ 2adb3069b0e04-571ec0f1920mr31259e87.2.1757711178303; Fri, 12 Sep 2025
+ 14:06:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250911174032.3147192-7-wens@kernel.org>
+References: <20250912170611.676110-1-sdf@fomichev.me>
+In-Reply-To: <20250912170611.676110-1-sdf@fomichev.me>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 12 Sep 2025 14:06:06 -0700
+X-Gm-Features: Ac12FXyWyx4o42PDWjsODv1chbAaWgFV6VBuUC2qYTuwYWTDLJD2IV5Da0to1WE
+Message-ID: <CAHS8izNSeLSzkTsmhcVwJ1fF25Y_LY7vo_LTWtVL+Erc8dD6SQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: ncdevmem: remove sleep on rx
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, shuah@kernel.org, 
+	joe@dama.to, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 12, 2025 at 01:40:32AM +0800, Chen-Yu Tsai wrote:
-> From: Chen-Yu Tsai <wens@csie.org>
-> 
-> On the Orangepi 4A board, the second Ethernet controller, aka the GMAC200,
-> is connected to an external Motorcomm YT8531 PHY. The PHY uses an external
-> 25MHz crystal, has the SoC's PI15 pin connected to its reset pin, and
-> the PI16 pin for its interrupt pin.
-> 
-> Enable it.
-> 
-> Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
-> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+On Fri, Sep 12, 2025 at 10:06=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.m=
+e> wrote:
+>
+> RX devmem sometimes fails on NIPA:
+>
+> https://netdev-3.bots.linux.dev/vmksft-fbnic-qemu-dbg/results/294402/7-de=
+vmem-py/
+>
+> Both RSS and flow steering are properly installed, but the wait_port_list=
+en
+> fails. Try to remove sleep(1) to see if the cause of the failure is
+> spending too much time during RX setup.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+OK, I can see that happening indeed.
 
-    Andrew
+> I don't see a good reason to
+> have sleep in the first place. If there needs to be a delay between
+> installing the rules and receiving the traffic, let's add it to the
+> callers (devmem.py) instead.
+>
+
+Yeah, I was worried there would be something asynchronous about
+installing flow steering rules (such as by the time when ethtool
+returns, the rule is not yet fully active), that may cause some
+flaky-iness, but that's unlikely the case.
+
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+
+--=20
+Thanks,
+Mina
 
