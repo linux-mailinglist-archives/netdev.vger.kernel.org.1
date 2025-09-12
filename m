@@ -1,377 +1,158 @@
-Return-Path: <netdev+bounces-222411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51B21B5420F
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 07:29:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36D43B54213
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 07:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C54387ABF08
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 05:27:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63A771891490
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 05:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAF0274B42;
-	Fri, 12 Sep 2025 05:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98ED019DF5F;
+	Fri, 12 Sep 2025 05:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuvnMtbo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huTI0XAZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B089927F736
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 05:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120BD9475
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 05:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757654921; cv=none; b=vA1Cgup1nLQR+n9+qqoLIQSnqHkGnHS3Jc4kO2KkERW9Z88gduYKiGfXpuTXL24B5yQa1kItlNlYljbrMq55M7e+9p6Z080/WINcED/TnCLcRoZI83YiMOkp1OFntyeIH9GrkbfVHLKF3jZVa3CR03Fgdov09YtPr586xW755xA=
+	t=1757655059; cv=none; b=AvcZXjgt1/reDcoci2EIZ3NixFLDwlZUL5OWjUcaQBvvr37L52Gxm//rIh9LgmDYlUjPGpBYv+rbLpOzKd6bIJig9VdlWAlNfWdUnHTYTMO/fJAsgLHkFxrZ3TGrTk1e4Z4UD2kkZpMqfdC7R6sw2mFAAhDOrLdINR7QPt+HK8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757654921; c=relaxed/simple;
-	bh=iXk5LtD8VQud/p8QuIvkPtAyIAC7E2tqnLsWZY8OouY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Njc9JtmIWryIjzquxAblwNb86g/UZ9aBiOlDE7WJQHuZUnso7ZSTcVdS5wFsVKTSi7dd4XzJJCmODtbt7onXXA3y66E82KmhlkEo8OPA+HQ4vB81mSPze72PS6u5tgqgSfEvZZICbQSfHTH2WF9yXvk51Nlf0fgun8P+OVo14Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AuvnMtbo; arc=none smtp.client-ip=209.85.128.176
+	s=arc-20240116; t=1757655059; c=relaxed/simple;
+	bh=W+OSo7LmQWJRP3NNZ9QN0GsDiU1D26WWe3ACou34Zco=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=h2XXdM79EpOspGHRTQUD3Q9WqXGY8a/M1E+GdY8jRnxyAiQo9ncqoNGpAQWGwdpy34kZrUptnOa51TTDoxHUL9Y9V2U3WP9qYuJYH3Ma5KBQrNnPzDanDBWbh39QXZI9fxoQtsTQmqBX6udmjmHnJUeABKQXI0Vz5LiHC5DbsyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=huTI0XAZ; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-71d603cebd9so12631667b3.1
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 22:28:39 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45dd7b15a64so12757555e9.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 22:30:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757654918; x=1758259718; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TBxJ9bgU3ETsPO/br9jSR8/72uyQYfX4epNE3oPxRwc=;
-        b=AuvnMtbovYW8BgT/4UfNtvBEEaYvYkdVZABqAlA726TUWkCeMlmXW6UMit0S2d7Pfi
-         YbJfLRX5uU3zXeK5vUr9uz1hj76TNplY6UqXlK5eEkaSkg649iLyFFry9jee72RBwqXO
-         9FU7IA6B11ZlVvmqM0IAlOaLh7qPu1ukV/RQI1Yi/9uF+gRviP4yF8EsffsfOHJn16N3
-         VRngVjqCRBF2cdZzJft1ynrhzvlWK/U/SGjyFi2efkVisvB9tjm0FAY5JsGDJGg8Snto
-         bF17tXBkLjkQrCOhZwzmFKplaEMTIWC9CwJsXrTWRX4dEW/evub3U+AsUSt0g8TEBLN9
-         i4Qg==
+        d=gmail.com; s=20230601; t=1757655056; x=1758259856; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:to:from:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JEFCSKdbKEGUh5juYJLQeJKaHw2t8ajiIvauVo3QkOo=;
+        b=huTI0XAZDHIoMsAQtqrdUo2kRgh8Ha3ZZMSn9FklB5nBXpNpcRsjTCcCKnDfXQWa9B
+         6Y83EDSsMjg6yP09wYbwzEHKw+sVNgIvQH+lmOtMZVVc5KWQjBy1SdSUziUB0ICL5ucE
+         b8pplR/0EzLFpi8D89JhHj2/OYzY1FM45o4zBwVrPsf7KtiDZtInY0SMD7v7mmwT4jTY
+         cd1c4o12Ye5A8DdSiUL4lszUqxU0qefVSnflhqMQcpmQJBsReg+oK/JCX697WACO3n+d
+         M782Pb41jF6I5CaXBYUWnd4278DV/85Hk3lOns8u+uO3RMFR6IBMY1qCqiTG75Pj0Q4H
+         9anQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757654918; x=1758259718;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TBxJ9bgU3ETsPO/br9jSR8/72uyQYfX4epNE3oPxRwc=;
-        b=BlnM0V3zF65KLZm4Z34dwTtFeKU1Xkl2pR4rPflu/3ERXH/6Iz1VDIS4bS1NvvTzJf
-         6cYVeXJOq7on/L2dUxwvDlt5ARPhSQicRVRwOMwdPs57YTBNUNJEvHj+uSjfemFXlPIT
-         KuqBeZJ3K5z1GAZRo3iAYko7TpfyAJ/94qv8ge1kVdIgZRwqi2uUFv1xfRuIC6rp08N6
-         ou0YV04HQpErbyMmfS/Bxbp+Ners7mKUJ7mZ9gJEnL6mgOUUq4/OaTTD91ePbb3e4Esl
-         IwwpWPpcVNUSFexmrUTHP06mV45/1ITZ411ASSjJ4zgGWeCW4+vwNHLHgpiEUv+UpMeq
-         FmAw==
-X-Gm-Message-State: AOJu0YzpoludLEtd7rDuB49t80a02XpR8v/qdbW69S0ZuO+zhHwLCKTq
-	91dfeHBd18T8JethE1+/Hh/7TNzcta8Mc4EpULW3VLeM4IE7/iIhPctb
-X-Gm-Gg: ASbGnct3dEQ+YHv1D1UfajSzJgbY3SPaEdUYi88ylwo4BSr8hb25eETi9KuowzEWKlN
-	hBg5Feps8zPNDrk6LZxiIx/B5wFW1LAvp+080eU89DWytNYyMLJxzYgzW0oOLAXc2XNOza2ubSF
-	bCsjXXQxVJiZth9Q2dmPlfdUVs0SsRaLHMTIE90ChG5RS9+DfN23bU3C+6wfald3eXMKryBR6f2
-	mVwkMD7wVhbygKDqRuADD79yUqx7e+RZcFyF8TWV9UlZj51rMsQoSnDz4E5p+ectlD3AmYjm7Ds
-	R6nW5Rv9RkIj1brOQFDKFqw6f+Eyniw2LB5JbkRC9RAi2x2j7H0gnOGvSUZpSKe36bAJmncTx+w
-	/2weI5UwBs5m8liC4W9gOEzrawL5igCvFZjVlD2uUSV4=
-X-Google-Smtp-Source: AGHT+IEvNdoERnjqUX3gWMOkOVdUpABgLqadOZKxTupu5VHNH+oEciO0ODN2lDoQyjjHn43fJYnwgg==
-X-Received: by 2002:a05:690c:a96:b0:726:697b:9e1f with SMTP id 00721157ae682-73065abe03amr15986057b3.54.1757654918519;
-        Thu, 11 Sep 2025 22:28:38 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:73::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-72f76238482sm8652877b3.12.2025.09.11.22.28.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 22:28:37 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Thu, 11 Sep 2025 22:28:17 -0700
-Subject: [PATCH net-next v2 3/3] net: ethtool: prevent user from breaking
- devmem single-binding rule
+        d=1e100.net; s=20230601; t=1757655056; x=1758259856;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JEFCSKdbKEGUh5juYJLQeJKaHw2t8ajiIvauVo3QkOo=;
+        b=GoxnG70RR7Rv0iiMfAWFBg0jwyK/nNATPJN2D3+3C0JT6aYQMCLLYHBs9LdFpv0bWL
+         3ZzVDVFq+kInOOOS4eGFtJTbsqkF6mnhpyY3N/3Iu7pnf98R0FEuBkK/yO85gD6Q1VCp
+         XvF2dsseiPLlVc5HpdYPDn30Fp4g5t5P9ZQK1YvuK/Jm6H01MRpBum3pHX50j+N9w5aJ
+         aAuLzon98lJmjHcHR4gm7BoWGcRtuH4g62CrEfN1Qe7plhYVA0W7zU0bfOhjyFBTkozg
+         htA+P1RR/OoM71Zq5FqpZFNvwhNrICkCBoWOA/ZemEhk74z+czroJ5fZytxIWoFxBPNr
+         M5Ng==
+X-Gm-Message-State: AOJu0YyNlIyBR4QpgovFUHJO9vj77ZyneRIRFF2LbRJC3vlP6leS6NbS
+	yVhKMQVLmlHa4NXBs2Nw3FVBwZULvfKyfZi4gM0rSB7M51h421PdXjHktzU2gw==
+X-Gm-Gg: ASbGncvpRTWg4b/5CJpobvmTNpadFA7nwOoPeCIJk5vWO1DKY5ypkYn+r6DNBtIxZrK
+	K0s8bXuZy6DjueqnwQ1afWRCRBOWAjZJ3R00de+HvkzdmRxwlYoA3+3z7iV6iv+gSDW+iTpRMqi
+	aCFCAxOFFD4+HLRluPO0UnuMZp2vB/sVFz4rXsrnJKBM3Qm6D3vBqastySKenVT/QzgEZabG9G1
+	Wo5Zf4DTmB06al6qPY53cDuIq8PCJKYR1L8C/vrAeIoncf7CgPEDXgZTEB+oxHaAVQh04W4zTFC
+	2zscfTXFItuGMOf5hKA/SpBjzGA6jS2AAbG1g7AlLoaB4jnvczCOcgORxKWo5sASKsutAgewPmx
+	PGlr55YkA49pCZ8Au4XV2y4ISChckthDe5izSzQzh9khzpVR59euyGN/afWFM9DIZj8xsM3jPsL
+	kgePkKTUpqEPYhDdU42K38LHh8VwSmyztHhbyKMrbnfm9/GnbPvrOY7+9nKR6nLA==
+X-Google-Smtp-Source: AGHT+IHUS5sQ+/dG+WaqckPSPNKdHzAb4MDrBjNZ7Kk3Lx8pckUlxCV1ey1Y1oQGQD/zKodkm5liGw==
+X-Received: by 2002:a05:600c:3e1a:b0:45d:e4d6:a7db with SMTP id 5b1f17b1804b1-45dfe9c6a1fmr48539435e9.5.1757655056044;
+        Thu, 11 Sep 2025 22:30:56 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f09:8900:19b4:30c1:b5e5:56a8? (p200300ea8f09890019b430c1b5e556a8.dip0.t-ipconnect.de. [2003:ea:8f09:8900:19b4:30c1:b5e5:56a8])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45e016b5cbcsm51851435e9.11.2025.09.11.22.30.55
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Sep 2025 22:30:55 -0700 (PDT)
+Message-ID: <c651373d-374b-4a67-9526-1555a11cb8b5@gmail.com>
+Date: Fri, 12 Sep 2025 07:31:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/2] net: phy: print warning if usage of
+ deprecated array-style fixed-link binding is detected
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <f45308fd-635a-458b-97f6-41e0dc276bfb@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <f45308fd-635a-458b-97f6-41e0dc276bfb@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-3-c80d735bd453@meta.com>
-References: <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com>
-In-Reply-To: <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, 
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.13.0
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
-
-Prevent the user from breaking devmem's single-binding rule by rejecting
-ethtool TCP/IP requests to modify or delete rules that will redirect a
-devmem socket to a queue with a different dmabuf binding. This is done
-in a "best effort" approach because not all steering rule types are
-validated.
-
-If an ethtool_rxnfc flow steering rule evaluates true for:
-
-1) matching a devmem socket's ip addr
-2) selecting a queue with a different dmabuf binding
-3) is TCP/IP (v4 or v6)
-
-... then reject the ethtool_rxnfc request with -EBUSY to indicate a
-devmem socket is using the current rules that steer it to its dmabuf
-binding.
-
-Non-TCP/IP rules are completely ignored, and if they do match a devmem
-flow then they can still break devmem sockets. For example, bytes 0 and
-1 of L2 headers, etc... it is still unknown to me if these are possible
-to evaluate at the time of the ethtool call, and so are left to future
-work (or never, if not possible).
-
-FLOW_RSS rules which guide flows to an RSS context are also not
-evaluated yet. This seems feasible, but the correct path towards
-retrieving the RSS context and scanning the queues for dmabuf bindings
-seems unclear and maybe overkill (re-use parts of ethtool_get_rxnfc?).
-
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
- include/net/sock.h  |   1 +
- net/ethtool/ioctl.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp.c      |   9 ++++
- net/ipv4/tcp_ipv4.c |   6 +++
- 4 files changed, 160 insertions(+)
-
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 304aad494764..73a1ff59dcde 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -579,6 +579,7 @@ struct sock {
- 		struct net_devmem_dmabuf_binding	*binding;
- 		atomic_t				*urefs;
- 	} sk_user_frags;
-+	struct list_head	sk_devmem_list;
- 
- #if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
- 	struct module		*sk_owner;
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 0b2a4d0573b3..99676ac9bbaa 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -29,11 +29,16 @@
- #include <linux/utsname.h>
- #include <net/devlink.h>
- #include <net/ipv6.h>
-+#include <net/netdev_rx_queue.h>
- #include <net/xdp_sock_drv.h>
- #include <net/flow_offload.h>
- #include <net/netdev_lock.h>
- #include <linux/ethtool_netlink.h>
- #include "common.h"
-+#include "../core/devmem.h"
-+
-+extern struct list_head devmem_sockets_list;
-+extern spinlock_t devmem_sockets_lock;
- 
- /* State held across locks and calls for commands which have devlink fallback */
- struct ethtool_devlink_compat {
-@@ -1169,6 +1174,142 @@ ethtool_get_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
- 	return ethtool_rxnfc_copy_to_user(useraddr, &info, info_size, NULL);
- }
- 
-+static bool
-+__ethtool_rx_flow_spec_breaks_devmem_sk(struct ethtool_rx_flow_spec *fs,
-+					struct net_device *dev,
-+					struct sock *sk)
-+{
-+	struct in6_addr saddr6, smask6, daddr6, dmask6;
-+	struct sockaddr_storage saddr, daddr;
-+	struct sockaddr_in6 *src6, *dst6;
-+	struct sockaddr_in *src4, *dst4;
-+	struct netdev_rx_queue *rxq;
-+	__u32 flow_type;
-+
-+	if (dev != __sk_dst_get(sk)->dev)
-+		return false;
-+
-+	src6 = (struct sockaddr_in6 *)&saddr;
-+	dst6 = (struct sockaddr_in6 *)&daddr;
-+	src4 = (struct sockaddr_in *)&saddr;
-+	dst4 = (struct sockaddr_in *)&daddr;
-+
-+	if (sk->sk_family == AF_INET6) {
-+		src6->sin6_port = inet_sk(sk)->inet_sport;
-+		src6->sin6_addr = inet6_sk(sk)->saddr;
-+		dst6->sin6_port = inet_sk(sk)->inet_dport;
-+		dst6->sin6_addr = sk->sk_v6_daddr;
-+	} else {
-+		src4->sin_port = inet_sk(sk)->inet_sport;
-+		src4->sin_addr.s_addr = inet_sk(sk)->inet_saddr;
-+		dst4->sin_port = inet_sk(sk)->inet_dport;
-+		dst4->sin_addr.s_addr = inet_sk(sk)->inet_daddr;
-+	}
-+
-+	flow_type = fs->flow_type & ~(FLOW_EXT | FLOW_MAC_EXT | FLOW_RSS);
-+
-+	rxq = __netif_get_rx_queue(dev, fs->ring_cookie);
-+	if (!rxq)
-+		return false;
-+
-+	/* If the requested binding and the sk binding is equal then we know
-+	 * this rule can't redirect to a different binding.
-+	 */
-+	if (rxq->mp_params.mp_priv == sk->sk_user_frags.binding)
-+		return false;
-+
-+	/* Reject rules that redirect RX devmem sockets to a queue with a
-+	 * different dmabuf binding. Because these sockets are on the RX side
-+	 * (registered in the recvmsg() path), we compare the opposite
-+	 * endpoints: the socket source with the rule destination, and the
-+	 * socket destination with the rule source.
-+	 *
-+	 * Only perform checks on the simplest rules to check, that is, IP/TCP
-+	 * rules. Flow hash options are not verified, so may still break TCP
-+	 * devmem flows in theory (VLAN tag, bytes 0 and 1 of L4 header,
-+	 * etc...). The author of this function was simply not sure how
-+	 * to validate these at the time of the ethtool call.
-+	 */
-+	switch (flow_type) {
-+	case IPV4_USER_FLOW: {
-+		const struct ethtool_usrip4_spec *v4_usr_spec, *v4_usr_m_spec;
-+
-+		v4_usr_spec = &fs->h_u.usr_ip4_spec;
-+		v4_usr_m_spec = &fs->m_u.usr_ip4_spec;
-+
-+		if (((v4_usr_spec->ip4src ^ dst4->sin_addr.s_addr) & v4_usr_m_spec->ip4src) ||
-+		    (v4_usr_spec->ip4dst ^ src4->sin_addr.s_addr) & v4_usr_m_spec->ip4dst) {
-+			return true;
-+		}
-+
-+		return false;
-+	}
-+	case TCP_V4_FLOW: {
-+		const struct ethtool_tcpip4_spec *v4_spec, *v4_m_spec;
-+
-+		v4_spec = &fs->h_u.tcp_ip4_spec;
-+		v4_m_spec = &fs->m_u.tcp_ip4_spec;
-+
-+		if (((v4_spec->ip4src ^ dst4->sin_addr.s_addr) & v4_m_spec->ip4src) ||
-+		    ((v4_spec->ip4dst ^ src4->sin_addr.s_addr) & v4_m_spec->ip4dst))
-+			return true;
-+
-+		return false;
-+	}
-+	case IPV6_USER_FLOW: {
-+		const struct ethtool_usrip6_spec *v6_usr_spec, *v6_usr_m_spec;
-+
-+		v6_usr_spec = &fs->h_u.usr_ip6_spec;
-+		v6_usr_m_spec = &fs->m_u.usr_ip6_spec;
-+
-+		memcpy(&daddr6, v6_usr_spec->ip6dst, sizeof(daddr6));
-+		memcpy(&dmask6, v6_usr_m_spec->ip6dst, sizeof(dmask6));
-+		memcpy(&saddr6, v6_usr_spec->ip6src, sizeof(saddr6));
-+		memcpy(&smask6, v6_usr_m_spec->ip6src, sizeof(smask6));
-+
-+		return !ipv6_masked_addr_cmp(&saddr6, &smask6, &dst6->sin6_addr) &&
-+		       !ipv6_masked_addr_cmp(&daddr6, &dmask6, &src6->sin6_addr);
-+	}
-+	case TCP_V6_FLOW: {
-+		const struct ethtool_tcpip6_spec *v6_spec, *v6_m_spec;
-+
-+		v6_spec = &fs->h_u.tcp_ip6_spec;
-+		v6_m_spec = &fs->m_u.tcp_ip6_spec;
-+
-+		memcpy(&daddr6, v6_spec->ip6dst, sizeof(daddr6));
-+		memcpy(&dmask6, v6_m_spec->ip6dst, sizeof(dmask6));
-+		memcpy(&saddr6, v6_spec->ip6src, sizeof(saddr6));
-+		memcpy(&smask6, v6_m_spec->ip6src, sizeof(smask6));
-+
-+		return !ipv6_masked_addr_cmp(&daddr6, &dmask6, &src6->sin6_addr) &&
-+		       !ipv6_masked_addr_cmp(&saddr6, &smask6, &dst6->sin6_addr);
-+	}
-+	default:
-+		return false;
-+	}
-+}
-+
-+static bool
-+ethtool_rx_flow_spec_breaks_devmem_sk(struct ethtool_rx_flow_spec *fs,
-+				      struct net_device *dev)
-+{
-+	struct sock *sk;
-+	bool ret;
-+
-+	ret = false;
-+
-+	spin_lock_bh(&devmem_sockets_lock);
-+	list_for_each_entry(sk, &devmem_sockets_list, sk_devmem_list) {
-+		if (__ethtool_rx_flow_spec_breaks_devmem_sk(fs, dev, sk)) {
-+			ret = true;
-+			break;
-+		}
-+	}
-+	spin_unlock_bh(&devmem_sockets_lock);
-+
-+	return ret;
-+}
-+
- static noinline_for_stack int ethtool_set_rxnfc(struct net_device *dev,
- 						u32 cmd, void __user *useraddr)
- {
-@@ -1197,6 +1338,9 @@ static noinline_for_stack int ethtool_set_rxnfc(struct net_device *dev,
- 			return -EINVAL;
- 	}
- 
-+	if (ethtool_rx_flow_spec_breaks_devmem_sk(&info.fs, dev))
-+		return -EBUSY;
-+
- 	rc = ops->set_rxnfc(dev, &info);
- 	if (rc)
- 		return rc;
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 438b8132ed89..3f57e658ea80 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -311,6 +311,12 @@ DEFINE_STATIC_KEY_FALSE(tcp_have_smc);
- EXPORT_SYMBOL(tcp_have_smc);
- #endif
- 
-+struct list_head devmem_sockets_list;
-+EXPORT_SYMBOL_GPL(devmem_sockets_list);
-+
-+DEFINE_SPINLOCK(devmem_sockets_lock);
-+EXPORT_SYMBOL_GPL(devmem_sockets_lock);
-+
- /*
-  * Current number of TCP sockets.
-  */
-@@ -5229,4 +5235,7 @@ void __init tcp_init(void)
- 	BUG_ON(tcp_register_congestion_control(&tcp_reno) != 0);
- 	tcp_tsq_work_init();
- 	mptcp_init();
-+
-+	spin_lock_init(&devmem_sockets_lock);
-+	INIT_LIST_HEAD(&devmem_sockets_list);
- }
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 68ebf96d06f8..a3213c97aed9 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -92,6 +92,9 @@
- 
- #include <trace/events/tcp.h>
- 
-+extern struct list_head devmem_sockets_list;
-+extern spinlock_t devmem_sockets_lock;
-+
- #ifdef CONFIG_TCP_MD5SIG
- static int tcp_v4_md5_hash_hdr(char *md5_hash, const struct tcp_md5sig_key *key,
- 			       __be32 daddr, __be32 saddr, const struct tcphdr *th);
-@@ -2559,6 +2562,9 @@ static void tcp_release_user_frags(struct sock *sk)
- 	sk->sk_user_frags.binding = NULL;
- 	kvfree(sk->sk_user_frags.urefs);
- 	sk->sk_user_frags.urefs = NULL;
-+	spin_lock_bh(&devmem_sockets_lock);
-+	list_del(&sk->sk_devmem_list);
-+	spin_unlock_bh(&devmem_sockets_lock);
- #endif
- }
- 
-
--- 
-2.47.3
-
+On 9/11/2025 9:18 PM, Heiner Kallweit wrote:
+> The array-style fixed-link binding has been marked deprecated for more
+> than 10 yrs, but still there's a number of users. Print a warning when
+> usage of the deprecated binding is detected.
+> 
+> v2:
+> - use dedicated printk specifiers
+> 
+> Heiner Kallweit (2):
+>   of: mdio: warn if deprecated fixed-link binding is used
+>   net: phylink: warn if deprecated array-style fixed-link binding is
+>     used
+> 
+>  drivers/net/mdio/of_mdio.c | 2 ++
+>  drivers/net/phy/phylink.c  | 3 +++
+>  2 files changed, 5 insertions(+)
+> 
+--
+pw-bot: cr
 
