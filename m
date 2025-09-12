@@ -1,907 +1,252 @@
-Return-Path: <netdev+bounces-222508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 984B3B54A5E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:51:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D10B54A68
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46853188955A
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:50:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 622B24659B0
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4812FFDE1;
-	Fri, 12 Sep 2025 10:48:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A66E2FD7BB;
+	Fri, 12 Sep 2025 10:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="ivAqVbfJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OGZJdOPO"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5DB2FDC3D;
-	Fri, 12 Sep 2025 10:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757674130; cv=none; b=ucUOSzRuEoa5SM4s6mu70XOnPNy5u13GbqodQObXH3imeSDJWCL2Dc4btiHo3NU7vEc/qTetwRq8T2XWZz5iLHEO094pqgGQXq2u0IWySPvH8RzF/FyyPvkhtQnjq1vW2O3HhpOXIEQj4OPIg+Vmw37eI9gTIdv3kcXlEb2xk8c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757674130; c=relaxed/simple;
-	bh=OuIgNdzzHmHnc2FfYOWxvRFtq2hp2olrZAYqKGSmhvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pztCxUvthj73gv3rfypPYFWP4VltpcxOBSiHN4S/VZnFit8ePPA+fZ0E1E/EDudYBmPaQ4BFBQagKs7Gp/UtGXmBV0j0itocvIM5so2kIe/ckMVNOnJ0iAn7pOSRTvuy+gy/9BjWNxG+QBLdPoPnYSRYid5Fi7TmixqvuyAj6+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=ivAqVbfJ; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=wfmOm6BOP1K8kZQtwe6QkdOyHEHKGERm3jYcgSO8V9M=; b=ivAqVbfJ5m5nhNJbHOV8B0w9ZW
-	cmitsjpK563D3pqLwu/U2QNQV1SgcHbW7/s7WQPR1x7649EvpKuDKLT4QQxn8ozEGdaEEyU+bNlmT
-	XT+k6+O7ahNAjIu3znP8NAuHg9Bd+v7Y2QQyFg++p5+P9ZFw+BKeCgI33X/l7J2olQkTWCq1r7lL4
-	eQ/RTOI5C3QRlFG1dmEW7qVslD/fwtSZ9xfGy9ZhGSOSRri+PejfIfA8DRYMNN0j9wn31umoEXBaO
-	8+EZ/RvNQGenpvaxfRQ2kHwvrdKDxvcWlsDZ/JbqGn5aKSYJOx3nRHPjUUbjIPMu8iT+IN9rQ6YrB
-	Ik9J/ljQ==;
-Received: from [122.175.9.182] (port=38569 helo=cypher.couthit.local)
-	by server.couthit.com with esmtpa (Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1ux1Kd-000000022nY-1lLr;
-	Fri, 12 Sep 2025 06:48:43 -0400
-From: Parvathi Pudi <parvathi@couthit.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	ssantosh@kernel.org,
-	richardcochran@gmail.com,
-	m-malladi@ti.com,
-	s.hauer@pengutronix.de,
-	afd@ti.com,
-	jacob.e.keller@intel.com,
-	kory.maincent@bootlin.com,
-	johan@kernel.org,
-	alok.a.tiwari@oracle.com,
-	m-karicheri2@ti.com,
-	s-anna@ti.com,
-	horms@kernel.org,
-	glaroque@baylibre.com,
-	saikrishnag@marvell.com,
-	diogo.ivo@siemens.com,
-	javier.carrasco.cruz@gmail.com,
-	basharath@couthit.com,
-	parvathi@couthit.com,
-	pmohan@couthit.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	vadim.fedorenko@linux.dev,
-	bastien.curutchet@bootlin.com,
-	pratheesh@ti.com,
-	prajith@ti.com,
-	vigneshr@ti.com,
-	praneeth@ti.com,
-	srk@ti.com,
-	rogerq@ti.com,
-	krishna@couthit.com,
-	mohan@couthit.com
-Subject: [PATCH net-next v16 2/6] net: ti: icssm-prueth: Adds ICSSM Ethernet driver
-Date: Fri, 12 Sep 2025 16:14:51 +0530
-Message-ID: <20250912104741.528721-3-parvathi@couthit.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250912104741.528721-1-parvathi@couthit.com>
-References: <20250912104741.528721-1-parvathi@couthit.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB722FD7AD;
+	Fri, 12 Sep 2025 10:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757674336; cv=fail; b=BRyfMnqw7P44INQ9H7NnPQjsv+MByTCP2lP+z6r5cay+ise2VYfsSq8qeU2TBKMo+WuFOpENSlueSOQa/0PpQq1sLFLdrC+8J3Vro33y17/SwnXMzaU+5qTjyuL6r/a819PoATZ7yy60Kko495gUkIoqh3OJUcrJqp7HUUY2PQ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757674336; c=relaxed/simple;
+	bh=MplcPQDVs/1TGeBSe9PL2oiLg07Tw/JJI5RIiO3DtQA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gr+q+ubPBn7cbvXLoCcBZXWXNDqQ+5ij5tuT/XkDoZI9tx4cbi/+ZFf0+iImh/bkdoC5vd2b8+1UdxhLyC9vjCYKI0xcPMrY0ud5xfUead5uiaj98sDl/1zDqVsxI283pmw2o43TGXkBbJrDNi6hqBqtP/PukfkQQVySsePNEAw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OGZJdOPO; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757674335; x=1789210335;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MplcPQDVs/1TGeBSe9PL2oiLg07Tw/JJI5RIiO3DtQA=;
+  b=OGZJdOPOpcOZf6oMYyVWmhm4a3NC4ivc5p5U0GqZVCYLpn9FTe8i+4SF
+   Q6U7wC+E0ZQbBWyvvDm7y1U4/GdtqMP0UJL3mwM+o6RiTS6o7rWUCuS2x
+   +OSgzSjqieG4vOvWUphx7E9/moHWSSi6Alr30xgc+hooMV/kQfg8ElFaO
+   /hijFBV2O21oLiTTw463tYnBt6it1ghm/fE3hiUvhEbDilKsVz29uyFNK
+   Fq+xZAWHDKZ6Vu1cUM0s66lNg0FX1z0ugCl4z11JqLI7Uvn1jCtjYC/S6
+   bM3Kfm3xTFOeiGjtx/vQ/jEVaQI6Kkk5HqwNZaCC+Ptx47qwpyj80TAca
+   A==;
+X-CSE-ConnectionGUID: aHj01XmdS0yPTzl19xxpew==
+X-CSE-MsgGUID: hdgbphEvQqm3inGWJfPlCg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="82605561"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="82605561"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2025 03:52:14 -0700
+X-CSE-ConnectionGUID: y1Yu1k/VTcKJ27CxqbQPnA==
+X-CSE-MsgGUID: AsARh3JWSQSCT9jtC/2BiA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,259,1751266800"; 
+   d="scan'208";a="177974637"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2025 03:52:14 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 12 Sep 2025 03:52:12 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Fri, 12 Sep 2025 03:52:12 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.49) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 12 Sep 2025 03:52:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=goqPPDvp5kfr/exQQEPP8Ugz6hroyHJnkcTwHO36J4s3bFk2wEvCr0nipxVLEDbgmvKijAVTaKu83c9qSnRuViAptgVCMQMlsSLdAzITvUpiWoMrN1FjvjbhtPfAou1szY/cXrWMbXErWlJWhm1pe3/lQnY2NuXwyEUYAj+WHKaRSLyi2+7dqUYUJSNOz9i8bO0kOmtSrWgfAF4CJqZkSl1VpBRMFtBKtXIhjruLKjO8gNbivtPa0lcBu91yLmV7bzMhS+eU4ush/kpoxcv0nT5u+l2rDrSWzIn0X4qRbV6HHKbg4+zxJbt/ekxu0Oimar2z1E414qbhIakjW4kchQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yleKgN/YVIKR2QtGWii8rFUzD39AJXFYNSWQrYzUU50=;
+ b=Hc4YmNxwEu1zFH/hVf6fxuG069naG/PvMM4APrXkebjk0WZH3KFZx8orkdu9Tz+VyLy+H3nWTLX9VKXCPr2hUkhcHPPVNOBDgrL11grELVcjCdcHxsWjDhZKDuWQVzD9F+7GXwpgHOVBjet4R/dW3hBq8PBYurjT5v3wwPS6Sk8DP64uf5Ei3uNin7IF0Y+mGBUiltlEoRZyiAQUd2sJOsQsY8J3MFfFQEpEmzp9ds3hETiEEsEmPnl388HnB5EWgGn10z6BIMDxBqH5yXyMmLN/9z8rHCAORZKELKmAMyV10o1D13tE8HNU4lrhyQnNk7fvJzPiE412zSIh8koLiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22)
+ by LV8PR11MB8697.namprd11.prod.outlook.com (2603:10b6:408:1fe::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Fri, 12 Sep
+ 2025 10:52:01 +0000
+Received: from SJ2PR11MB8452.namprd11.prod.outlook.com
+ ([fe80::d200:bfac:918a:1a38]) by SJ2PR11MB8452.namprd11.prod.outlook.com
+ ([fe80::d200:bfac:918a:1a38%4]) with mapi id 15.20.9094.021; Fri, 12 Sep 2025
+ 10:51:58 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: "Vecera, Ivan" <ivecera@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jiri Pirko
+	<jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, open list
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net] dpll: fix clock quality level reporting
+Thread-Topic: [PATCH net] dpll: fix clock quality level reporting
+Thread-Index: AQHcI8hXluzPttQOwEySpAsBeK4FD7SPXlUA
+Date: Fri, 12 Sep 2025 10:51:58 +0000
+Message-ID: <SJ2PR11MB8452F78722D682E12C2F4C239B08A@SJ2PR11MB8452.namprd11.prod.outlook.com>
+References: <20250912093331.862333-1-ivecera@redhat.com>
+In-Reply-To: <20250912093331.862333-1-ivecera@redhat.com>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR11MB8452:EE_|LV8PR11MB8697:EE_
+x-ms-office365-filtering-correlation-id: 7cf7edb4-4fa1-469e-bfea-08ddf1ea659e
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?heUoFgDpFOQ4OpLQcCqiiV43gPKQaqN2/bmjcSIeaSay3HZGcgXFLcks1pR8?=
+ =?us-ascii?Q?F+t88VTEyC9BHqG21xYcDvgpc002LeXMQ6Rzd14QTwrA5UJZezNKrS24TS3A?=
+ =?us-ascii?Q?+D/OX+LH9o+iCZUSDWRlDbwDgAGh0WiNx3lUbjNU42OwhC6SedZtLQiRqsfK?=
+ =?us-ascii?Q?R2I3TDttjrhobhHcb/hBFTAcfBPxtEmZl1ou6q7h4VXA6Zb0cVarSFe9KzZ2?=
+ =?us-ascii?Q?eDec2dKNgwsZdFMrC6kQ9+LPF3RujMfSkAjbiTyw7WVCj7QdZXmUtPgAyqBA?=
+ =?us-ascii?Q?BZ/Se9/bFFsgRR+XL0I5iByFKvz6tfiLtQJDFI+QpM3olONnFCtMqBsD6Ftg?=
+ =?us-ascii?Q?2EEo1ukLLms7XLJRCYdiow7KVTiZNxu3jJ4bFBIBMWgQ5RV8/MSTdg9F/Uu/?=
+ =?us-ascii?Q?xE6xGdzjOY/y/ZDmmIVUJ3b8uTontfJXX8G/PVG8n0WizHH3qFVHvZZNZ/Lx?=
+ =?us-ascii?Q?Fb5VUAwzkUHEsJh8wo9/mfukmBsY/zNDcCM7F3KtiwDUG5ZxUyZRKsJanf6o?=
+ =?us-ascii?Q?3JuCI3aypGMRl7xBXLzskywwLZ88mixIo8EDOTMRK8r+862i9O7pq+X80j8+?=
+ =?us-ascii?Q?goTbrqS1Sc6QmlA3XWG5FoYXQuZX4YGMKDol2n182Fu5aAAbS4zbDkDlUjTd?=
+ =?us-ascii?Q?8jMgeJc109692P9mg4FexIE+2uualaTPfhLUlua1OxOoul7hu8tKFTmalsS9?=
+ =?us-ascii?Q?pwKPvDaBe18yqoqmBjBWZfhv3xLcmuEZmSMXVcmqYeySBSFM7Kpp37OjoDXh?=
+ =?us-ascii?Q?ud4c2mJDIvfNGx+nwlXoxRc71i6pMdzlrccImuvq1W8XmkhZCYU3AFWUDX8n?=
+ =?us-ascii?Q?fDykotnFZrVdqEjR55TqGDu5Ihj8VwZiXdB6Ne7SelGEYxmqWnIY1EhqwwzD?=
+ =?us-ascii?Q?gR9+HofHJ4fyPITkYaUlE02H5rGpqVJVZOBYY6qWtBETpmVKyi/gsQ0znzVb?=
+ =?us-ascii?Q?OrjzvihnkqnnOMVngWGDi3wll7UKokUFceoHiPGj/YZo6kjo3DKUFH0l60+/?=
+ =?us-ascii?Q?7kN1EqGpaMUVrEz9VPbbgq15uobd/UGoy8cTk0KvZ7TxwJZt7AhZLuOcE0yq?=
+ =?us-ascii?Q?INhjlqGh71azBFGoIYussWZZcUkE9pRNPzTSniwc2dCYgY4sbVihBiRmk+M7?=
+ =?us-ascii?Q?jmHCcPsNjJavURnNibfFTvR1TDDwQSJ9yr42xf9cS94qsboR29XTKKlZCzha?=
+ =?us-ascii?Q?u17H9iDHEUBODbQ3br+ZYnqjD8un7RNHLaAgima4+P9wu3JR+lYXPeQ3JbRb?=
+ =?us-ascii?Q?ybBLoaQ98mELVzBAaC9sjAX6uIbOlOkd1QrJL4bsdylaoxgjthOKLHNB9xbz?=
+ =?us-ascii?Q?9/zyjByyXvY6LDGIJp6Cg9DkNuHn5gk6+FC5VVQHxEdZJ4XzILw+7o36qa3e?=
+ =?us-ascii?Q?vnqNkDrUsUrW4LYVLFADkPbKTGHwVrSiCOT9bAG13GZH6eYO+ZMcT0nIB/o5?=
+ =?us-ascii?Q?Xnmo8lcGbk5rdkRyZ7lq2Gc75yXyFnWj69eg9/W8723C41Z8r1MRjln+wc2L?=
+ =?us-ascii?Q?vybLD3ckEu5qP7c=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8452.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XO/Pu0facErLRydjeEABSoprmXIM7Tu/8pQroRppDBSRqGXUeqAj0tgmxGYb?=
+ =?us-ascii?Q?IESavRHcRbB66sMnE1g0vtnNCKoXDQsbfdLSr9/3fIB1OjVtmX/+vJATcpbj?=
+ =?us-ascii?Q?hc8R8lqS9x0ci4shjaUUmh1CjYHNTr1T38zRgu7NAGbFA8hso9ZhN+K7+3Jq?=
+ =?us-ascii?Q?sckpdvzGEMQX66Yy6jq85Fl1ko/iOO6y5FphrwxqFCOH8svvoogLwuhU3KN+?=
+ =?us-ascii?Q?Dx5uLrV+KS3GziTlO/GXRqo13zhYAFnpPsQXvvcuWXM8oMIIUAp91FPgGaHm?=
+ =?us-ascii?Q?+wrF4XMsynCQviArHI4Jyactos6B+HzbnIRNQ6/8xyB1z612vl/yN/gHk3U6?=
+ =?us-ascii?Q?5m74JSEfQyP+ZCVl4Y6c7opCtn/qpqGpIdU5p3I0TkKFqbRM2Ky6fv9cUNXv?=
+ =?us-ascii?Q?sjCbCH1O/j7rMOM666VT3yJ7mcDjMelrQLZMv7rbDRjiiHXINHxQfN+4f71c?=
+ =?us-ascii?Q?sqbIauT9RXHpi9mIlez3SgU2dPZo8f1hSAgPppBGpvd746kxff5ZkeI4YThR?=
+ =?us-ascii?Q?qbXZCdeFffsnUY7OqGeienjP7FbUD+qYyOQnmbYU3wkF/OPZRgpUcwJ6NC47?=
+ =?us-ascii?Q?1ZrrCfEAW3ECS96cOHSzms1wBkBKc5PaftKuUkrOfdvBapuN+ktaN3thzRRT?=
+ =?us-ascii?Q?aoqpGsyrM9MYC2qYG4O4+/dpIKP8Qo77JFL6CJFBgxCk8ZKipwaYyTiwJvF7?=
+ =?us-ascii?Q?CGsoGszaGW/bbiqi/wAGXmezMJszEgpDnxXJQQqE5F9WYcfQWAN68OUMHM6B?=
+ =?us-ascii?Q?dmimTcyCoNGKc+r4Jz52P6rB4kOJSIetFpCcbfhcTUerXAUiHHs85l9xcaUJ?=
+ =?us-ascii?Q?waRCZU2kBUvblOdM1wxuznKetuLnN3sNKnQ4VdDTzQZq0R7X0w4LxQTx/HaI?=
+ =?us-ascii?Q?pzTc//TU1QQLi+68tX/+xVJrNzRvN4kuVpeMKWv1tuSWg1AA9mGWQWvXSKuz?=
+ =?us-ascii?Q?QQwtRqkPGA8I7JecHWZTWTh6uU042L6cu1yiJXIp5Jsr08DuOQ8UEvoYpYwF?=
+ =?us-ascii?Q?uQQ7TqzWx+8gJS4Qm2nK7fj3B4Ai1e7RbCx4NCuts8JpXbFu5I7emD7EYMIA?=
+ =?us-ascii?Q?ctE+MQsoHVm6PMFgeMunV3rL/xytpVY3ykzQR4rfwLe5tcZNK4QKHwWh/KsB?=
+ =?us-ascii?Q?jcf2rckk2+L3qCqNCyHn3kgnf6GPX3KFHJbypug2ROacBvlPkWzKxdOF7GRh?=
+ =?us-ascii?Q?zMMwWSRi86dBljuWh8fBPnAywRezp4T6/yYgP5WQqudBflSPpAtPu2eM/V4H?=
+ =?us-ascii?Q?XYJdX/rmBDrkps4IlvpBxJop+ux7UEWNUi4h89BLEK/8LMudMTnbLYleJ2Xz?=
+ =?us-ascii?Q?ESORUw0PszFiM3eA811aNlG3TBEdoefEvdltxv7ZDxl8t6p+6K4eemK8D3A8?=
+ =?us-ascii?Q?EWt3Bma0V8aknUuQtXQzlQvM3IORc+DDgMqMzESo9L+th1ZBw2Gr/DjvDGA1?=
+ =?us-ascii?Q?//40urA9RIH11mrfLSc9xYrdy24Jto5CxO6AENtUkHzhep5yUed4ol0EdNv+?=
+ =?us-ascii?Q?s6VGqaF7b0WMB9tUZEsNNzV2gHwUfmgiLrlVjAbuBLgpe+6bbnABOd2UojfS?=
+ =?us-ascii?Q?31H4STrREuVpBTcMZzSNwAXnidoia4Tz5FVrp9gnggqWwFvqH1YDVOGEIF86?=
+ =?us-ascii?Q?aA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
-X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8452.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cf7edb4-4fa1-469e-bfea-08ddf1ea659e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Sep 2025 10:51:58.5384
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Y6dkvEyydjxeHE7XNfp01rumYeyciMkpuCY64vFy/FgmbeUG7BRhmgEpgGsCKH6GCkeg5F3cy6uKh/kSOtWdYnoK08IjNzSxxHYdoGWgPzw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8697
+X-OriginatorOrg: intel.com
 
-From: Roger Quadros <rogerq@ti.com>
+>From: Ivan Vecera <ivecera@redhat.com>
+>Sent: Friday, September 12, 2025 11:34 AM
+>To: netdev@vger.kernel.org
+>Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>; Kubalewski, Arkadiusz
+><arkadiusz.kubalewski@intel.com>; Jiri Pirko <jiri@resnulli.us>; Jakub
+>Kicinski <kuba@kernel.org>; open list <linux-kernel@vger.kernel.org>
+>Subject: [PATCH net] dpll: fix clock quality level reporting
+>
+>The DPLL_CLOCK_QUALITY_LEVEL_ITU_OPT1_EPRC is not reported via netlink due
+>to bug in dpll_msg_add_clock_quality_level(). The usage of
+>DPLL_CLOCK_QUALITY_LEVEL_MAX for both DECLARE_BITMAP() and
+>for_each_set_bit() is not correct because these macros requires bitmap siz=
+e
+>and not the highest valid bit in the bitmap.
+>
+>Use correct bitmap size to fix this issue.
+>
+>Fixes: a1afb959add1 ("dpll: add clock quality level attribute and op")
+>Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-Updates Kernel configuration to enable PRUETH driver and its dependencies
-along with makefile changes to add the new PRUETH driver.
+LGTM,
+Thanks!
 
-Changes includes init and deinit of ICSSM PRU Ethernet driver including
-net dev registration and firmware loading for DUAL-MAC mode running on
-PRU-ICSS2 instance.
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-Changes also includes link handling, PRU booting, default firmware loading
-and PRU stopping using existing remoteproc driver APIs.
-
-Reviewed-by: Mohan Reddy Putluru <pmohan@couthit.com>
-Signed-off-by: Roger Quadros <rogerq@ti.com>
-Signed-off-by: Andrew F. Davis <afd@ti.com>
-Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
-Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
----
- drivers/net/ethernet/ti/Kconfig              |  12 +
- drivers/net/ethernet/ti/Makefile             |   3 +
- drivers/net/ethernet/ti/icssm/icssm_prueth.c | 612 +++++++++++++++++++
- drivers/net/ethernet/ti/icssm/icssm_prueth.h | 100 +++
- 4 files changed, 727 insertions(+)
- create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth.c
- create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth.h
-
-diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-index a07c910c497a..a54d71155263 100644
---- a/drivers/net/ethernet/ti/Kconfig
-+++ b/drivers/net/ethernet/ti/Kconfig
-@@ -229,4 +229,16 @@ config TI_ICSS_IEP
- 	  To compile this driver as a module, choose M here. The module
- 	  will be called icss_iep.
- 
-+config TI_PRUETH
-+	tristate "TI PRU Ethernet EMAC driver"
-+	depends on PRU_REMOTEPROC
-+	depends on NET_SWITCHDEV
-+	select TI_ICSS_IEP
-+	imply PTP_1588_CLOCK
-+	help
-+	  Some TI SoCs has Programmable Realtime Unit (PRU) cores which can
-+	  support Single or Dual Ethernet ports with the help of firmware code
-+	  running on PRU cores. This driver supports remoteproc based
-+	  communication to PRU firmware to expose Ethernet interface to Linux.
-+
- endif # NET_VENDOR_TI
-diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
-index cbcf44806924..93c0a4d0e33a 100644
---- a/drivers/net/ethernet/ti/Makefile
-+++ b/drivers/net/ethernet/ti/Makefile
-@@ -3,6 +3,9 @@
- # Makefile for the TI network device drivers.
- #
- 
-+obj-$(CONFIG_TI_PRUETH) += icssm-prueth.o
-+icssm-prueth-y := icssm/icssm_prueth.o
-+
- obj-$(CONFIG_TI_CPSW) += cpsw-common.o
- obj-$(CONFIG_TI_DAVINCI_EMAC) += cpsw-common.o
- obj-$(CONFIG_TI_CPSW_SWITCHDEV) += cpsw-common.o
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-new file mode 100644
-index 000000000000..2f9c92c8f949
---- /dev/null
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-@@ -0,0 +1,612 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/* Texas Instruments ICSSM Ethernet Driver
-+ *
-+ * Copyright (C) 2018-2022 Texas Instruments Incorporated - https://www.ti.com/
-+ *
-+ */
-+
-+#include <linux/etherdevice.h>
-+#include <linux/genalloc.h>
-+#include <linux/if_bridge.h>
-+#include <linux/if_hsr.h>
-+#include <linux/if_vlan.h>
-+#include <linux/interrupt.h>
-+#include <linux/kernel.h>
-+#include <linux/mfd/syscon.h>
-+#include <linux/module.h>
-+#include <linux/net_tstamp.h>
-+#include <linux/of.h>
-+#include <linux/of_irq.h>
-+#include <linux/of_mdio.h>
-+#include <linux/of_net.h>
-+#include <linux/platform_device.h>
-+#include <linux/phy.h>
-+#include <linux/remoteproc/pruss.h>
-+#include <linux/ptp_classify.h>
-+#include <linux/regmap.h>
-+#include <linux/remoteproc.h>
-+#include <net/pkt_cls.h>
-+
-+#include "icssm_prueth.h"
-+
-+/* called back by PHY layer if there is change in link state of hw port*/
-+static void icssm_emac_adjust_link(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct phy_device *phydev = emac->phydev;
-+	bool new_state = false;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&emac->lock, flags);
-+
-+	if (phydev->link) {
-+		/* check the mode of operation */
-+		if (phydev->duplex != emac->duplex) {
-+			new_state = true;
-+			emac->duplex = phydev->duplex;
-+		}
-+		if (phydev->speed != emac->speed) {
-+			new_state = true;
-+			emac->speed = phydev->speed;
-+		}
-+		if (!emac->link) {
-+			new_state = true;
-+			emac->link = 1;
-+		}
-+	} else if (emac->link) {
-+		new_state = true;
-+		emac->link = 0;
-+	}
-+
-+	if (new_state)
-+		phy_print_status(phydev);
-+
-+	if (emac->link) {
-+	       /* reactivate the transmit queue if it is stopped */
-+		if (netif_running(ndev) && netif_queue_stopped(ndev))
-+			netif_wake_queue(ndev);
-+	} else {
-+		if (!netif_queue_stopped(ndev))
-+			netif_stop_queue(ndev);
-+	}
-+
-+	spin_unlock_irqrestore(&emac->lock, flags);
-+}
-+
-+static int icssm_emac_set_boot_pru(struct prueth_emac *emac,
-+				   struct net_device *ndev)
-+{
-+	const struct prueth_firmware *pru_firmwares;
-+	struct prueth *prueth = emac->prueth;
-+	const char *fw_name;
-+	int ret;
-+
-+	pru_firmwares = &prueth->fw_data->fw_pru[emac->port_id - 1];
-+	fw_name = pru_firmwares->fw_name[prueth->eth_type];
-+	if (!fw_name) {
-+		netdev_err(ndev, "eth_type %d not supported\n",
-+			   prueth->eth_type);
-+		return -ENODEV;
-+	}
-+
-+	ret = rproc_set_firmware(emac->pru, fw_name);
-+	if (ret) {
-+		netdev_err(ndev, "failed to set %s firmware: %d\n",
-+			   fw_name, ret);
-+		return ret;
-+	}
-+
-+	ret = rproc_boot(emac->pru);
-+	if (ret) {
-+		netdev_err(ndev, "failed to boot %s firmware: %d\n",
-+			   fw_name, ret);
-+		return ret;
-+	}
-+
-+	return ret;
-+}
-+
-+/**
-+ * icssm_emac_ndo_open - EMAC device open
-+ * @ndev: network adapter device
-+ *
-+ * Called when system wants to start the interface.
-+ *
-+ * Return: 0 for a successful open, or appropriate error code
-+ */
-+static int icssm_emac_ndo_open(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	int ret;
-+
-+	ret = icssm_emac_set_boot_pru(emac, ndev);
-+	if (ret)
-+		return ret;
-+
-+	/* start PHY */
-+	phy_start(emac->phydev);
-+
-+	return 0;
-+}
-+
-+/**
-+ * icssm_emac_ndo_stop - EMAC device stop
-+ * @ndev: network adapter device
-+ *
-+ * Called when system wants to stop or down the interface.
-+ *
-+ * Return: Always 0 (Success)
-+ */
-+static int icssm_emac_ndo_stop(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+
-+	/* stop PHY */
-+	phy_stop(emac->phydev);
-+
-+	rproc_shutdown(emac->pru);
-+
-+	return 0;
-+}
-+
-+static const struct net_device_ops emac_netdev_ops = {
-+	.ndo_open = icssm_emac_ndo_open,
-+	.ndo_stop = icssm_emac_ndo_stop,
-+};
-+
-+/* get emac_port corresponding to eth_node name */
-+static int icssm_prueth_node_port(struct device_node *eth_node)
-+{
-+	u32 port_id;
-+	int ret;
-+
-+	ret = of_property_read_u32(eth_node, "reg", &port_id);
-+	if (ret)
-+		return ret;
-+
-+	if (port_id == 0)
-+		return PRUETH_PORT_MII0;
-+	else if (port_id == 1)
-+		return PRUETH_PORT_MII1;
-+	else
-+		return PRUETH_PORT_INVALID;
-+}
-+
-+/* get MAC instance corresponding to eth_node name */
-+static int icssm_prueth_node_mac(struct device_node *eth_node)
-+{
-+	u32 port_id;
-+	int ret;
-+
-+	ret = of_property_read_u32(eth_node, "reg", &port_id);
-+	if (ret)
-+		return ret;
-+
-+	if (port_id == 0)
-+		return PRUETH_MAC0;
-+	else if (port_id == 1)
-+		return PRUETH_MAC1;
-+	else
-+		return PRUETH_MAC_INVALID;
-+}
-+
-+static int icssm_prueth_netdev_init(struct prueth *prueth,
-+				    struct device_node *eth_node)
-+{
-+	struct prueth_emac *emac;
-+	struct net_device *ndev;
-+	enum prueth_port port;
-+	enum prueth_mac mac;
-+	int ret;
-+
-+	port = icssm_prueth_node_port(eth_node);
-+	if (port == PRUETH_PORT_INVALID)
-+		return -EINVAL;
-+
-+	mac = icssm_prueth_node_mac(eth_node);
-+	if (mac == PRUETH_MAC_INVALID)
-+		return -EINVAL;
-+
-+	ndev = devm_alloc_etherdev(prueth->dev, sizeof(*emac));
-+	if (!ndev)
-+		return -ENOMEM;
-+
-+	SET_NETDEV_DEV(ndev, prueth->dev);
-+	emac = netdev_priv(ndev);
-+	prueth->emac[mac] = emac;
-+	emac->prueth = prueth;
-+	emac->ndev = ndev;
-+	emac->port_id = port;
-+
-+	/* by default eth_type is EMAC */
-+	switch (port) {
-+	case PRUETH_PORT_MII0:
-+		emac->pru = prueth->pru0;
-+		break;
-+	case PRUETH_PORT_MII1:
-+		emac->pru = prueth->pru1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	/* get mac address from DT and set private and netdev addr */
-+	ret = of_get_ethdev_address(eth_node, ndev);
-+	if (!is_valid_ether_addr(ndev->dev_addr)) {
-+		eth_hw_addr_random(ndev);
-+		dev_warn(prueth->dev, "port %d: using random MAC addr: %pM\n",
-+			 port, ndev->dev_addr);
-+	}
-+	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
-+
-+	/* connect PHY */
-+	emac->phydev = of_phy_get_and_connect(ndev, eth_node,
-+					      icssm_emac_adjust_link);
-+	if (!emac->phydev) {
-+		dev_dbg(prueth->dev, "PHY connection failed\n");
-+		ret = -ENODEV;
-+		goto free;
-+	}
-+
-+	/* remove unsupported modes */
-+	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
-+
-+	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-+	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-+
-+	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
-+	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
-+
-+	ndev->dev.of_node = eth_node;
-+	ndev->netdev_ops = &emac_netdev_ops;
-+
-+	return 0;
-+free:
-+	emac->ndev = NULL;
-+	prueth->emac[mac] = NULL;
-+
-+	return ret;
-+}
-+
-+static void icssm_prueth_netdev_exit(struct prueth *prueth,
-+				     struct device_node *eth_node)
-+{
-+	struct prueth_emac *emac;
-+	enum prueth_mac mac;
-+
-+	mac = icssm_prueth_node_mac(eth_node);
-+	if (mac == PRUETH_MAC_INVALID)
-+		return;
-+
-+	emac = prueth->emac[mac];
-+	if (!emac)
-+		return;
-+
-+	phy_disconnect(emac->phydev);
-+
-+	prueth->emac[mac] = NULL;
-+}
-+
-+static int icssm_prueth_probe(struct platform_device *pdev)
-+{
-+	struct device_node *eth0_node = NULL, *eth1_node = NULL;
-+	struct device_node *eth_node, *eth_ports_node;
-+	enum pruss_pru_id pruss_id0, pruss_id1;
-+	struct device *dev = &pdev->dev;
-+	struct device_node *np;
-+	struct prueth *prueth;
-+	int i, ret;
-+
-+	np = dev->of_node;
-+	if (!np)
-+		return -ENODEV; /* we don't support non DT */
-+
-+	prueth = devm_kzalloc(dev, sizeof(*prueth), GFP_KERNEL);
-+	if (!prueth)
-+		return -ENOMEM;
-+
-+	platform_set_drvdata(pdev, prueth);
-+	prueth->dev = dev;
-+	prueth->fw_data = device_get_match_data(dev);
-+
-+	eth_ports_node = of_get_child_by_name(np, "ethernet-ports");
-+	if (!eth_ports_node)
-+		return -ENOENT;
-+
-+	for_each_child_of_node(eth_ports_node, eth_node) {
-+		u32 reg;
-+
-+		if (strcmp(eth_node->name, "ethernet-port"))
-+			continue;
-+		ret = of_property_read_u32(eth_node, "reg", &reg);
-+		if (ret < 0) {
-+			dev_err(dev, "%pOF error reading port_id %d\n",
-+				eth_node, ret);
-+			of_node_put(eth_node);
-+			return ret;
-+		}
-+
-+		of_node_get(eth_node);
-+
-+		if (reg == 0 && !eth0_node) {
-+			eth0_node = eth_node;
-+			if (!of_device_is_available(eth0_node)) {
-+				of_node_put(eth0_node);
-+				eth0_node = NULL;
-+			}
-+		} else if (reg == 1 && !eth1_node) {
-+			eth1_node = eth_node;
-+			if (!of_device_is_available(eth1_node)) {
-+				of_node_put(eth1_node);
-+				eth1_node = NULL;
-+			}
-+		} else {
-+			if (reg == 0 || reg == 1)
-+				dev_err(dev, "duplicate port reg value: %d\n",
-+					reg);
-+			else
-+				dev_err(dev, "invalid port reg value: %d\n",
-+					reg);
-+
-+			of_node_put(eth_node);
-+		}
-+	}
-+
-+	of_node_put(eth_ports_node);
-+
-+	/* At least one node must be present and available else we fail */
-+	if (!eth0_node && !eth1_node) {
-+		dev_err(dev, "neither port0 nor port1 node available\n");
-+		return -ENODEV;
-+	}
-+
-+	prueth->eth_node[PRUETH_MAC0] = eth0_node;
-+	prueth->eth_node[PRUETH_MAC1] = eth1_node;
-+
-+	if (eth0_node) {
-+		prueth->pru0 = pru_rproc_get(np, 0, &pruss_id0);
-+		if (IS_ERR(prueth->pru0)) {
-+			ret = PTR_ERR(prueth->pru0);
-+			dev_err_probe(dev, ret, "unable to get PRU0");
-+			goto put_pru;
-+		}
-+	}
-+
-+	if (eth1_node) {
-+		prueth->pru1 = pru_rproc_get(np, 1, &pruss_id1);
-+		if (IS_ERR(prueth->pru1)) {
-+			ret = PTR_ERR(prueth->pru1);
-+			dev_err_probe(dev, ret, "unable to get PRU1");
-+			goto put_pru;
-+		}
-+	}
-+
-+	/* setup netdev interfaces */
-+	if (eth0_node) {
-+		ret = icssm_prueth_netdev_init(prueth, eth0_node);
-+		if (ret) {
-+			if (ret != -EPROBE_DEFER) {
-+				dev_err(dev, "netdev init %s failed: %d\n",
-+					eth0_node->name, ret);
-+			}
-+			goto put_pru;
-+		}
-+	}
-+
-+	if (eth1_node) {
-+		ret = icssm_prueth_netdev_init(prueth, eth1_node);
-+		if (ret) {
-+			if (ret != -EPROBE_DEFER) {
-+				dev_err(dev, "netdev init %s failed: %d\n",
-+					eth1_node->name, ret);
-+			}
-+			goto netdev_exit;
-+		}
-+	}
-+
-+	/* register the network devices */
-+	if (eth0_node) {
-+		ret = register_netdev(prueth->emac[PRUETH_MAC0]->ndev);
-+		if (ret) {
-+			dev_err(dev, "can't register netdev for port MII0");
-+			goto netdev_exit;
-+		}
-+
-+		prueth->registered_netdevs[PRUETH_MAC0] =
-+			prueth->emac[PRUETH_MAC0]->ndev;
-+	}
-+
-+	if (eth1_node) {
-+		ret = register_netdev(prueth->emac[PRUETH_MAC1]->ndev);
-+		if (ret) {
-+			dev_err(dev, "can't register netdev for port MII1");
-+			goto netdev_unregister;
-+		}
-+
-+		prueth->registered_netdevs[PRUETH_MAC1] =
-+			prueth->emac[PRUETH_MAC1]->ndev;
-+	}
-+
-+	if (eth1_node)
-+		of_node_put(eth1_node);
-+	if (eth0_node)
-+		of_node_put(eth0_node);
-+	return 0;
-+
-+netdev_unregister:
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		if (!prueth->registered_netdevs[i])
-+			continue;
-+		unregister_netdev(prueth->registered_netdevs[i]);
-+	}
-+
-+netdev_exit:
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		eth_node = prueth->eth_node[i];
-+		if (!eth_node)
-+			continue;
-+
-+		icssm_prueth_netdev_exit(prueth, eth_node);
-+	}
-+
-+put_pru:
-+	if (eth1_node) {
-+		if (prueth->pru1)
-+			pru_rproc_put(prueth->pru1);
-+		of_node_put(eth1_node);
-+	}
-+
-+	if (eth0_node) {
-+		if (prueth->pru0)
-+			pru_rproc_put(prueth->pru0);
-+		of_node_put(eth0_node);
-+	}
-+
-+	return ret;
-+}
-+
-+static void icssm_prueth_remove(struct platform_device *pdev)
-+{
-+	struct prueth *prueth = platform_get_drvdata(pdev);
-+	struct device_node *eth_node;
-+	int i;
-+
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		if (!prueth->registered_netdevs[i])
-+			continue;
-+		unregister_netdev(prueth->registered_netdevs[i]);
-+	}
-+
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		eth_node = prueth->eth_node[i];
-+		if (!eth_node)
-+			continue;
-+
-+		icssm_prueth_netdev_exit(prueth, eth_node);
-+		of_node_put(eth_node);
-+	}
-+
-+	pruss_put(prueth->pruss);
-+
-+	if (prueth->eth_node[PRUETH_MAC0])
-+		pru_rproc_put(prueth->pru0);
-+	if (prueth->eth_node[PRUETH_MAC1])
-+		pru_rproc_put(prueth->pru1);
-+}
-+
-+#ifdef CONFIG_PM_SLEEP
-+static int icssm_prueth_suspend(struct device *dev)
-+{
-+	struct prueth *prueth = dev_get_drvdata(dev);
-+	struct net_device *ndev;
-+	int i, ret;
-+
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		ndev = prueth->registered_netdevs[i];
-+
-+		if (!ndev)
-+			continue;
-+
-+		if (netif_running(ndev)) {
-+			netif_device_detach(ndev);
-+			ret = icssm_emac_ndo_stop(ndev);
-+			if (ret < 0) {
-+				netdev_err(ndev, "failed to stop: %d", ret);
-+				return ret;
-+			}
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int icssm_prueth_resume(struct device *dev)
-+{
-+	struct prueth *prueth = dev_get_drvdata(dev);
-+	struct net_device *ndev;
-+	int i, ret;
-+
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		ndev = prueth->registered_netdevs[i];
-+
-+		if (!ndev)
-+			continue;
-+
-+		if (netif_running(ndev)) {
-+			ret = icssm_emac_ndo_open(ndev);
-+			if (ret < 0) {
-+				netdev_err(ndev, "failed to start: %d", ret);
-+				return ret;
-+			}
-+			netif_device_attach(ndev);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+#endif /* CONFIG_PM_SLEEP */
-+
-+static const struct dev_pm_ops prueth_dev_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(icssm_prueth_suspend, icssm_prueth_resume)
-+};
-+
-+/* AM335x SoC-specific firmware data */
-+static struct prueth_private_data am335x_prueth_pdata = {
-+	.fw_pru[PRUSS_PRU0] = {
-+		.fw_name[PRUSS_ETHTYPE_EMAC] =
-+			"ti-pruss/am335x-pru0-prueth-fw.elf",
-+	},
-+	.fw_pru[PRUSS_PRU1] = {
-+		.fw_name[PRUSS_ETHTYPE_EMAC] =
-+			"ti-pruss/am335x-pru1-prueth-fw.elf",
-+	},
-+};
-+
-+/* AM437x SoC-specific firmware data */
-+static struct prueth_private_data am437x_prueth_pdata = {
-+	.fw_pru[PRUSS_PRU0] = {
-+		.fw_name[PRUSS_ETHTYPE_EMAC] =
-+			"ti-pruss/am437x-pru0-prueth-fw.elf",
-+	},
-+	.fw_pru[PRUSS_PRU1] = {
-+		.fw_name[PRUSS_ETHTYPE_EMAC] =
-+			"ti-pruss/am437x-pru1-prueth-fw.elf",
-+	},
-+};
-+
-+/* AM57xx SoC-specific firmware data */
-+static struct prueth_private_data am57xx_prueth_pdata = {
-+	.fw_pru[PRUSS_PRU0] = {
-+		.fw_name[PRUSS_ETHTYPE_EMAC] =
-+			"ti-pruss/am57xx-pru0-prueth-fw.elf",
-+	},
-+	.fw_pru[PRUSS_PRU1] = {
-+		.fw_name[PRUSS_ETHTYPE_EMAC] =
-+			"ti-pruss/am57xx-pru1-prueth-fw.elf",
-+	},
-+};
-+
-+static const struct of_device_id prueth_dt_match[] = {
-+	{ .compatible = "ti,am57-prueth", .data = &am57xx_prueth_pdata, },
-+	{ .compatible = "ti,am4376-prueth", .data = &am437x_prueth_pdata, },
-+	{ .compatible = "ti,am3359-prueth", .data = &am335x_prueth_pdata, },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, prueth_dt_match);
-+
-+static struct platform_driver prueth_driver = {
-+	.probe = icssm_prueth_probe,
-+	.remove = icssm_prueth_remove,
-+	.driver = {
-+		.name = "prueth",
-+		.of_match_table = prueth_dt_match,
-+		.pm = &prueth_dev_pm_ops,
-+	},
-+};
-+module_platform_driver(prueth_driver);
-+
-+MODULE_AUTHOR("Roger Quadros <rogerq@ti.com>");
-+MODULE_AUTHOR("Andrew F. Davis <afd@ti.com>");
-+MODULE_DESCRIPTION("PRUSS ICSSM Ethernet Driver");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-new file mode 100644
-index 000000000000..b77deb02fc2f
---- /dev/null
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-@@ -0,0 +1,100 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Texas Instruments ICSSM Ethernet driver
-+ *
-+ * Copyright (C) 2018-2022 Texas Instruments Incorporated - https://www.ti.com/
-+ *
-+ */
-+
-+#ifndef __NET_TI_PRUETH_H
-+#define __NET_TI_PRUETH_H
-+
-+#include <linux/phy.h>
-+#include <linux/types.h>
-+#include <linux/pruss_driver.h>
-+#include <linux/remoteproc/pruss.h>
-+
-+/* PRU Ethernet Type - Ethernet functionality (protocol
-+ * implemented) provided by the PRU firmware being loaded.
-+ */
-+enum pruss_ethtype {
-+	PRUSS_ETHTYPE_EMAC = 0,
-+	PRUSS_ETHTYPE_HSR,
-+	PRUSS_ETHTYPE_PRP,
-+	PRUSS_ETHTYPE_SWITCH,
-+	PRUSS_ETHTYPE_MAX,
-+};
-+
-+/* In switch mode there are 3 real ports i.e. 3 mac addrs.
-+ * however Linux sees only the host side port. The other 2 ports
-+ * are the switch ports.
-+ * In emac mode there are 2 real ports i.e. 2 mac addrs.
-+ * Linux sees both the ports.
-+ */
-+enum prueth_port {
-+	PRUETH_PORT_HOST = 0,	/* host side port */
-+	PRUETH_PORT_MII0,	/* physical port MII 0 */
-+	PRUETH_PORT_MII1,	/* physical port MII 1 */
-+	PRUETH_PORT_INVALID,	/* Invalid prueth port */
-+};
-+
-+enum prueth_mac {
-+	PRUETH_MAC0 = 0,
-+	PRUETH_MAC1,
-+	PRUETH_NUM_MACS,
-+	PRUETH_MAC_INVALID,
-+};
-+
-+/**
-+ * struct prueth_firmware - PRU Ethernet FW data
-+ * @fw_name: firmware names of firmware to run on PRU
-+ */
-+struct prueth_firmware {
-+	const char *fw_name[PRUSS_ETHTYPE_MAX];
-+};
-+
-+/**
-+ * struct prueth_private_data - PRU Ethernet private data
-+ * @fw_pru: firmware names to be used for PRUSS ethernet usecases
-+ */
-+struct prueth_private_data {
-+	const struct prueth_firmware fw_pru[PRUSS_NUM_PRUS];
-+};
-+
-+/* data for each emac port */
-+struct prueth_emac {
-+	struct prueth *prueth;
-+	struct net_device *ndev;
-+
-+	struct rproc *pru;
-+	struct phy_device *phydev;
-+
-+	int link;
-+	int speed;
-+	int duplex;
-+
-+	enum prueth_port port_id;
-+	const char *phy_id;
-+	u8 mac_addr[6];
-+	phy_interface_t phy_if;
-+
-+	/* spin lock used to protect
-+	 * during link configuration
-+	 */
-+	spinlock_t lock;
-+};
-+
-+struct prueth {
-+	struct device *dev;
-+	struct pruss *pruss;
-+	struct rproc *pru0, *pru1;
-+
-+	const struct prueth_private_data *fw_data;
-+	struct prueth_fw_offsets *fw_offsets;
-+
-+	struct device_node *eth_node[PRUETH_NUM_MACS];
-+	struct prueth_emac *emac[PRUETH_NUM_MACS];
-+	struct net_device *registered_netdevs[PRUETH_NUM_MACS];
-+
-+	unsigned int eth_type;
-+};
-+#endif /* __NET_TI_PRUETH_H */
--- 
-2.43.0
+>---
+> drivers/dpll/dpll_netlink.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+>index 036f21cac0a9..0a852011653c 100644
+>--- a/drivers/dpll/dpll_netlink.c
+>+++ b/drivers/dpll/dpll_netlink.c
+>@@ -211,8 +211,8 @@ static int
+> dpll_msg_add_clock_quality_level(struct sk_buff *msg, struct dpll_device
+>*dpll,
+> 				 struct netlink_ext_ack *extack)
+> {
+>+	DECLARE_BITMAP(qls, DPLL_CLOCK_QUALITY_LEVEL_MAX + 1) =3D { 0 };
+> 	const struct dpll_device_ops *ops =3D dpll_device_ops(dpll);
+>-	DECLARE_BITMAP(qls, DPLL_CLOCK_QUALITY_LEVEL_MAX) =3D { 0 };
+> 	enum dpll_clock_quality_level ql;
+> 	int ret;
+>
+>@@ -221,7 +221,7 @@ dpll_msg_add_clock_quality_level(struct sk_buff *msg,
+>struct dpll_device *dpll,
+> 	ret =3D ops->clock_quality_level_get(dpll, dpll_priv(dpll), qls,
+>extack);
+> 	if (ret)
+> 		return ret;
+>-	for_each_set_bit(ql, qls, DPLL_CLOCK_QUALITY_LEVEL_MAX)
+>+	for_each_set_bit(ql, qls, DPLL_CLOCK_QUALITY_LEVEL_MAX + 1)
+> 		if (nla_put_u32(msg, DPLL_A_CLOCK_QUALITY_LEVEL, ql))
+> 			return -EMSGSIZE;
+>
+>--
+>2.49.1
 
 
