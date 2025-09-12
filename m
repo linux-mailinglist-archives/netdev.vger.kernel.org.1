@@ -1,110 +1,116 @@
-Return-Path: <netdev+bounces-222665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64745B554C6
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 18:38:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E40F8B554E1
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 18:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC5C3AA2E45
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:38:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A503FAC294B
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73DD4320CC5;
-	Fri, 12 Sep 2025 16:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E0131CA51;
+	Fri, 12 Sep 2025 16:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ukyTTcYM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TZNkjFMp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E96320CB4;
-	Fri, 12 Sep 2025 16:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7424430ACF9;
+	Fri, 12 Sep 2025 16:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757695036; cv=none; b=OB9NNhMUt/1LbQqMRTDpCtcQlmS5piT4sUe25xnY3DtiTk2KpCfkwceqbFpzZqa05KDUFz2K3lXEL2ckNKHhItOtmspE4J9sZIzKTiorV54sht+eeYiyZhxVjhOD/58iTNB17mrx4UafoFQk75braMcZUxZy3FoSMH0fq0MWO3w=
+	t=1757695494; cv=none; b=qk9ybcT+GUaGC4CCSH7Oxg82TzcgH6wBDAv923EuRH+rr+LC2bmspY3FM2CSoGJACtnYohhJHMrkIGGFirk7ccgLwLm1u5l7sGQzfPC/DIGw8LT6VwbC/xLggufOEwmW8FZ2m1wmCjFfJ4SljqOeBJh39wBKTKOViWUPYP5Uew8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757695036; c=relaxed/simple;
-	bh=02RbCJy/0KB0IDkyTE3zAtIENx+JAzvBYgUMKFwaNUk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Osn3kClwehJ8IvtbyrRRowoACacmZSQ+ZoDhVnXOF4peDJAvvaXwPioJU2XZwKDeUfdH98vSFk3CpPnzmpDvgQL0E8vDzYHWlKnjyzSiqr7cq/hZONEPOSy5lKb6OzeNjuwxjoRwY83Q1JE5ATqE6t7gUudnmwYUfwJNLHZH67U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ukyTTcYM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CA2EC4CEF9;
-	Fri, 12 Sep 2025 16:37:12 +0000 (UTC)
+	s=arc-20240116; t=1757695494; c=relaxed/simple;
+	bh=T3k8yXx71WmXCOcPeK8TWijLJrnwnPMe6SmbiBr3OtU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XbwxKghsr/bwZMmisJKohZkLCTnQIRdA5RFMp9VtuiHphF5A0Dyrr8hG5HkN1LJqI9vfJF7YI/2n5eqXt5N7NKIObMaYwaR0HoQFIJmfsGN5bwvooupNLDsCQ9pCZKQFU0LbDyLwv5B7tbOD4a/kNeNGEEzXePbGt/DiYoOdGJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TZNkjFMp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 095D9C4CEF1;
+	Fri, 12 Sep 2025 16:44:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757695034;
-	bh=02RbCJy/0KB0IDkyTE3zAtIENx+JAzvBYgUMKFwaNUk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ukyTTcYMqmmlKWVXqUMe0WzaVjWhmDOfYYtA93ssoHRHyQw54epQXk6n+nzhDaGtj
-	 HwHxv8FGyGmk5rAnpW9geeVrlct8uc84Vo73GRUsuV1TO9YqskRRzjPBlHjOc98v24
-	 LgnccMLCkCRl3RpEjTrRVs1yVCQazC/A0LSqLjMXEymre5MVz+6V7TPFGn442xOMbU
-	 UK3T4TbGqnkuFWSaVW2uIrwq5Leoqm+6ExG3rijM08SWeO4ytEamef5zuf8i6fMVyE
-	 dhUl89U+HcsliAw3Cy9re9E/su2g+g9pmCZ4jsgWs99MQYXshVozngBBAzuMYsZJ+Y
-	 8vGe8zTkAzQ+A==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 12 Sep 2025 18:36:49 +0200
-Subject: [PATCH net-next 3/3] mptcp: pm: netlink: fix if-idx type
+	s=k20201202; t=1757695494;
+	bh=T3k8yXx71WmXCOcPeK8TWijLJrnwnPMe6SmbiBr3OtU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TZNkjFMplEJXcSxt1g922eJbDuHFdtPelJyYXhh+Yt2AuKAX/lTgEtSRnHeht4LnN
+	 PtnVtsYwUw5mzq+D8HreufB1OXMoZT/EQXqJiqcM/uIaPpuVz5DMddIzuz00+2scAd
+	 dmdH0c45mBkpsPeM604mXr9h7GkFVDQP0J2uV27FZzCtjQVf+VD5Zy7F2YypKxsICm
+	 0pvDfnDEW1QtS/WGeL8CW8CbyOWbNEEwTHNPN1A88a11RLp7xVe6EvUBQb14RasyPn
+	 VnznBWomfmKptx6SqPqhaukbxkAwTBGs8LqyIhOJiceINXjw0dsPcWzcXrMq48Q57i
+	 IujrPXbnn4+1Q==
+Date: Fri, 12 Sep 2025 17:44:46 +0100
+From: Simon Horman <horms@kernel.org>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: andrew+netdev@lunn.ch, christophe.jaillet@wanadoo.fr, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, guoxin09@huawei.com,
+	gur.stavi@huawei.com, helgaas@kernel.org, jdamato@fastly.com,
+	kuba@kernel.org, lee@trager.us, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, luosifu@huawei.com,
+	luoyang82@h-partners.com, meny.yossefi@huawei.com,
+	mpe@ellerman.id.au, netdev@vger.kernel.org, pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com, shenchenyang1@hisilicon.com,
+	shijing34@huawei.com, sumang@marvell.com, vadim.fedorenko@linux.dev,
+	wulike1@huawei.com, zhoushuai28@huawei.com,
+	zhuyikai1@h-partners.com
+Subject: Re: [PATCH net-next v05 12/14] hinic3: Add port management
+Message-ID: <20250912164446.GA224143@horms.kernel.org>
+References: <20250911123324.GJ30363@horms.kernel.org>
+ <20250911142504.2518-1-gongfan1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250912-net-next-mptcp-minor-fixes-6-18-v1-3-99d179b483ad@kernel.org>
-References: <20250912-net-next-mptcp-minor-fixes-6-18-v1-0-99d179b483ad@kernel.org>
-In-Reply-To: <20250912-net-next-mptcp-minor-fixes-6-18-v1-0-99d179b483ad@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Donald Hunter <donald.hunter@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1280; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=02RbCJy/0KB0IDkyTE3zAtIENx+JAzvBYgUMKFwaNUk=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKO+Oif3qD3/X3luYob1moJvTddKi6Hn/7SYV1ZEPNqj
- du8sv+vOkpZGMS4GGTFFFmk2yLzZz6v4i3x8rOAmcPKBDKEgYtTACYS5sPwP/FvcN2+3vVNlkJ2
- DmEhjVbCYXLipwsPh1ft0U8VVfvxjOF/satpwcVVc+0MHySIifE/Z/Btm+7upl1/eV/u/sim156
- cAA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250911142504.2518-1-gongfan1@huawei.com>
 
-As pointed out by Donald, when parsing an entry, the wrong type was set
-for the temp value: this value is signed.
+On Thu, Sep 11, 2025 at 10:25:04PM +0800, Fan Gong wrote:
+> On 9/11/2025 8:33 PM, Simon Horman wrote:
+> 
+> > > +	err = hinic3_get_link_status(nic_dev->hwdev, &link_status_up);
+> > > +	if (!err && link_status_up)
+> > > +		netif_carrier_on(netdev);
+> > > +
+> > > +	return 0;
+> > > +
+> > > +err_flush_qps_res:
+> > > +	hinic3_flush_qps_res(nic_dev->hwdev);
+> > > +	/* wait to guarantee that no packets will be sent to host */
+> > > +	msleep(100);
+> > 
+> > I realise that Jakub's feedback on msleep() in his review of v3 was
+> > in a different code path. But I do wonder if there is a better way.
+> 
+> ...
+> 
+> > > +	hinic3_flush_txqs(netdev);
+> > > +	/* wait to guarantee that no packets will be sent to host */
+> > > +	msleep(100);
+> > 
+> > Likewise, here.
+> 
+> Thanks for your review, Simon.
+> 
+> Firstly, The main issue on the code of Jakub's feedback on msleep() is
+> duplicate code function. The msleep() in hinic3_vport_down and
+> hinic3_free_hwdev is repetitive because of our oversight. So we removed
+> msleep() in hinic3_free_hwdev in v04 patch.
+> 
+> Secondly, there is no better way indeed. As our HW bad decision, HW 
+> didn't have an accurate way of checking if rq has been flushed. The
+> only way is to close the func & port . Then we wait for HW to process
+> the pkts and upload them to driver. 
+> The sleep time is determined through our testing. The two calls of
+> msleep() are the same issue.
 
-There are no real issues here, because the intermediate variable was
-only wrong for the sign, not for the size, and the final variable had
-the right sign. But this feels wrong, and is confusing, so fixing this
-small typo introduced by commit ef0da3b8a2f1 ("mptcp: move address
-attribute into mptcp_addr_info").
+Thanks for the clarification, much appreciated.
 
-Reported-by: Donald Hunter <donald.hunter@gmail.com>
-Closes: https://lore.kernel.org/m2plc0ui9z.fsf@gmail.com
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/pm_netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 50aaf259959aeaf36e7ab954c6f7957eaf2bc390..2225b1c5b96666cd4121854c967a7f3a79824047 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -113,7 +113,7 @@ int mptcp_pm_parse_entry(struct nlattr *attr, struct genl_info *info,
- 		return err;
- 
- 	if (tb[MPTCP_PM_ADDR_ATTR_IF_IDX]) {
--		u32 val = nla_get_s32(tb[MPTCP_PM_ADDR_ATTR_IF_IDX]);
-+		s32 val = nla_get_s32(tb[MPTCP_PM_ADDR_ATTR_IF_IDX]);
- 
- 		entry->ifindex = val;
- 	}
-
--- 
-2.51.0
-
+> Finally, we have received your reviews on other patches and we will
+> fix them soon in the next version.
+> 
 
