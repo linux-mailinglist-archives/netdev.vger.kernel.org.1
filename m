@@ -1,110 +1,143 @@
-Return-Path: <netdev+bounces-222575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C68B54DED
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:35:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AACB4B54E74
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A76795613F8
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:31:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D3137C0718
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBC6309DC1;
-	Fri, 12 Sep 2025 12:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EC0304984;
+	Fri, 12 Sep 2025 12:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GrwhzFll"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="CLwevAb3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9715D3009F1;
-	Fri, 12 Sep 2025 12:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84817304BBA;
+	Fri, 12 Sep 2025 12:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757680135; cv=none; b=J9a7mkPTIvlO8lxPS4jofJMxIMYEDmawNP+nTnAi3ijwqdQnaLiDGwtL9yMfN2FcFr2sw1HoBGJhUVp8IktdqF1S0KnzVR67Xj4+v78032mpvj9SwfNm0JOBpbLRr2pl+kVeKStyTfjBWkJtR56LIBcfsAsNRefKbOGYaAqURpU=
+	t=1757681503; cv=none; b=SIS1XXgzSaJHQOG25WkHtORJsT7xStGxgflPSTHlxFiDxI/9HTl7EOzv1jeGBz/nbYG4QwD2hr3hRfs1jvr1Ek81kCs5lnnDNaj2Q7/4WHzYdx2Aw8YWEtLfnh0GJVliqkDSEK0RkBhYus/2mJazRB9M1ObX84lwSa1unbTIx/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757680135; c=relaxed/simple;
-	bh=p830gX6KrZsA/EMfLPYi3m+Z9YLsy7fuGVZR/1xn9+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VW4JDWwoLvm8pLwnGWopNHfGaDVsT+qRwin7+KTiFNTsrVrNrpc/Izy+GjFzZ94uGxN7WlNbq7hAE9OEXhOTEQ84vxvWHU8lLs2mhagSm79ZufplWk3Vz9A+5YONuM9SJSSkRsDj5VYgUE9n5aWv8fZHW0mwTQWDrqHEsw6Ywx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrwhzFll; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B37AEC4CEFC;
-	Fri, 12 Sep 2025 12:28:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757680135;
-	bh=p830gX6KrZsA/EMfLPYi3m+Z9YLsy7fuGVZR/1xn9+A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GrwhzFllMgE7HXfxOzRoap2O3zAjm2C6UWg8j5eEeGhNzmmoqua5Q63o6PQLL17Bs
-	 j8qpa8aQ8fRv/RRuE0lq2Dr90b3mo/s89vhlw9A2p6shCadDxHbbuzfeOE2gScV0BZ
-	 IYm6IXo9HnWwnBkQE15gFxKUzmunVj2GXx4CAxcXqkar6d8eK2cYiiQ8UAW3GhRPs3
-	 KvgDoGPK+6EuFFNZu4h84Qbj+s+SSafvil7KQyUVLqE0nUrMoMMAW78+CcEn+pQoxH
-	 /Il8wgj+JWCpO/ywvIVO3XCpOHS0gsXvhn/xOmtH8+Eclh89bdtJqqVGmRqL8bQ4HG
-	 YDBApuXS1/2GA==
-Date: Fri, 12 Sep 2025 13:28:49 +0100
-From: Simon Horman <horms@kernel.org>
-To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	haiyangz@microsoft.com, decui@microsoft.com, kys@microsoft.com,
-	wei.liu@kernel.org, edumazet@google.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com, kotaranov@microsoft.com,
-	shirazsaleem@microsoft.com, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mana: Reduce waiting time if HWC not
- responding
-Message-ID: <20250912122849.GA30363@horms.kernel.org>
-References: <1757537841-5063-1-git-send-email-haiyangz@linux.microsoft.com>
+	s=arc-20240116; t=1757681503; c=relaxed/simple;
+	bh=2qOtmkngpDfQA1QjDe6RQo1pEYaj3+XYIoXwhftLLaA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jb1suph0ULtZbYdOyddzaCHHN4Z40QPhGruZI5ReOvgyH+V1H0nBeZ7VvT6J6t1rcO5JFOVvrnZItU+/GbBP1XqxJFAvks9cC432AUtiWUWhWeiTaXC7H6u7P90uo9eQ9X00kr4qn31ceD7L3YibLf/+7xCWzO4Pm7m4EaLWbsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=CLwevAb3; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1757681499;
+	bh=2qOtmkngpDfQA1QjDe6RQo1pEYaj3+XYIoXwhftLLaA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=CLwevAb3CWcyJim69XKJIdeuO297ATtaWgZcLKBdj0cxs8L6/lJleYP4V5c3ARgzZ
+	 mvApCazawRn7ksRS8rRgw7+M5IioDk889yvihSyxEjD01Xjzwl7h4yjXJw8uM+8EME
+	 q9Efd0AFpPJRRxC4p1h44uM7i7JE1KaFCsr1tEnW6Oc2lQqZsOGK+fIEkro0Z3z5hQ
+	 pUj37vBazcoYk04C2qJ8h1ERSRzNu82gQ9cVr78+0PC0w47vAOACV+O8RxHuiIcJ2c
+	 QE3T8uVrL7Toa5dwJBwx4YHO1S7HsSJKBtzW5gmIPcYgtwYmnv3Hnh4/Zv7058b2i2
+	 j90us0yAg7dqg==
+Received: from mt.tail9873f4.ts.net (unknown [144.48.130.189])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1EF4917E090D;
+	Fri, 12 Sep 2025 14:51:33 +0200 (CEST)
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+To: Shuah Khan <shuah@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Antonio Quartulli <antonio@openvpn.net>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	kernel@collabora.com,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] selftests/mm: centralize the __always_unused macro
+Date: Fri, 12 Sep 2025 17:51:01 +0500
+Message-ID: <20250912125102.1309796-1-usama.anjum@collabora.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1757537841-5063-1-git-send-email-haiyangz@linux.microsoft.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 10, 2025 at 01:57:21PM -0700, Haiyang Zhang wrote:
-> From: Haiyang Zhang <haiyangz@microsoft.com>
-> 
-> If HW Channel (HWC) is not responding, reduce the waiting time, so further
-> steps will fail quickly.
-> This will prevent getting stuck for a long time (30 minutes or more), for
-> example, during unloading while HWC is not responding.
-> 
-> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-> ---
->  drivers/net/ethernet/microsoft/mana/hw_channel.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> index ef072e24c46d..ada6c78a2bef 100644
-> --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> @@ -881,7 +881,12 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
->  	if (!wait_for_completion_timeout(&ctx->comp_event,
->  					 (msecs_to_jiffies(hwc->hwc_timeout)))) {
->  		if (hwc->hwc_timeout != 0)
-> -			dev_err(hwc->dev, "HWC: Request timed out!\n");
-> +			dev_err(hwc->dev, "HWC: Request timed out: %u ms\n",
-> +				hwc->hwc_timeout);
-> +
-> +		/* Reduce further waiting if HWC no response */
-> +		if (hwc->hwc_timeout > 1)
-> +			hwc->hwc_timeout = 1;
+This macro gets used in different tests. Add it to kselftest.h
+which is central location and tests use this header. Then use this new
+macro.
 
-Hi,
+Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+---
+ tools/testing/selftests/kselftest.h          | 4 ++++
+ tools/testing/selftests/mm/protection_keys.c | 2 +-
+ tools/testing/selftests/net/ovpn/ovpn-cli.c  | 3 ++-
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-Perhaps it is already the case, but I'm wondering if the configured
-value of hwc_timeout should be restored at some point.
+diff --git a/tools/testing/selftests/kselftest.h b/tools/testing/selftests/kselftest.h
+index 661d31c4b558c..274480e3573ab 100644
+--- a/tools/testing/selftests/kselftest.h
++++ b/tools/testing/selftests/kselftest.h
+@@ -92,6 +92,10 @@
+ #endif
+ #define __printf(a, b)   __attribute__((format(printf, a, b)))
+ 
++#ifndef __always_unused
++#define __always_unused __attribute__((__unused__))
++#endif
++
+ #ifndef __maybe_unused
+ #define __maybe_unused __attribute__((__unused__))
+ #endif
+diff --git a/tools/testing/selftests/mm/protection_keys.c b/tools/testing/selftests/mm/protection_keys.c
+index 6281d4c61b50e..2085982dba696 100644
+--- a/tools/testing/selftests/mm/protection_keys.c
++++ b/tools/testing/selftests/mm/protection_keys.c
+@@ -1302,7 +1302,7 @@ static void test_mprotect_with_pkey_0(int *ptr, u16 pkey)
+ 
+ static void test_ptrace_of_child(int *ptr, u16 pkey)
+ {
+-	__attribute__((__unused__)) int peek_result;
++	__always_unused int peek_result;
+ 	pid_t child_pid;
+ 	void *ignored = 0;
+ 	long ret;
+diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+index 9201f2905f2ce..688a5fa6fdacd 100644
+--- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
++++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+@@ -32,9 +32,10 @@
+ 
+ #include <sys/socket.h>
+ 
++#include "../../kselftest.h"
++
+ /* defines to make checkpatch happy */
+ #define strscpy strncpy
+-#define __always_unused __attribute__((__unused__))
+ 
+ /* libnl < 3.5.0 does not set the NLA_F_NESTED on its own, therefore we
+  * have to explicitly do it to prevent the kernel from failing upon
+-- 
+2.47.3
 
->  
->  		err = -ETIMEDOUT;
->  		goto out;
-> -- 
-> 2.34.1
-> 
-> 
 
