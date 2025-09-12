@@ -1,179 +1,169 @@
-Return-Path: <netdev+bounces-222648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2819EB55420
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:50:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7661FB55427
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D81E7AE4DBB
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:49:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A83ED3BCA02
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B50263F38;
-	Fri, 12 Sep 2025 15:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893BC25B695;
+	Fri, 12 Sep 2025 15:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eKn3iU5x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NlkGAl9O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D995F2AC17;
-	Fri, 12 Sep 2025 15:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02ACE242D9E
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 15:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757692173; cv=none; b=RwTH621AMfeq3IZGhhHqql0Jr/lELoYOdcl4oU5YBlUaCqNf/+hKogq4bPs4QcZgApNV3KNXqizI3SK1YbBzhDBex5TaBFSBAf4eMvrmp1jHUYoZ5wOXHusLg3THrO4k7HsE3MdLn68jbGEBGSqWJ6W6+UVGEcpRxyCWHlCMZ4I=
+	t=1757692243; cv=none; b=u6/9CpDkkmxzo2m58dkcwKeQT59d+rg+AsAXl2KsKPkFQ8fMAuCTjdCmklwtJQhhf4DDuDc7fBciNQ5J6AsJQ26+SXaN+lsMPmQfGxF9AwiE6uk0Pcsjb3W+xPvO8PshLHb6H2A7435AIacCywd3B8pBq/5VjcZlMM+QnCrI3aI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757692173; c=relaxed/simple;
-	bh=oYVzC7tZjxxq6Zp3GdbKqJsbqRR/wPhIfgtU/YrCoc0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U7yY2DfMbiiTQtipTTew8wC9M5OfLYBfdegriYeuu/aevfpq5nc1PrTZNtEWrWiGTw3hufHq6jwuZkt0B584tBZ85SV6sH+hxldJlugbThQkbLi6NxDfnoYSsepGs1uWaBWSWHgUWlGDCfLiWxCS+/iKF49NadsHTQcTXy2zde8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eKn3iU5x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33B50C4CEF1;
-	Fri, 12 Sep 2025 15:49:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757692172;
-	bh=oYVzC7tZjxxq6Zp3GdbKqJsbqRR/wPhIfgtU/YrCoc0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eKn3iU5xMHxJPtWKw3aAKBbDHY6hZ4bYpvcibDPz4NHZFpsLDdTdNxFm4uw/fRG7j
-	 6E8e9VdkE5MZMFXlj0S684FEB46rlRHoLW8mybkDC0aeTbYnONrsM3Vjne10MDSTE5
-	 WxZNB90ItxqdJvfnYBglPocNIxFpMCLyJjo7YACv+NtEb/scrE9qXoUlvi46EOQGxM
-	 8uTOCzwHC0rE3G4uPCVbuekozk/uGKpU9/+6zCRd/D+zsv98y41VL0VURFCGTixqN8
-	 dHit5rzQSjYNdpzy8nCqHBkoIwRzLLJ460UEn6J4/0FstYgRV20LOXPnVHodcDJRtu
-	 VNUrkYRjCEjMQ==
-Date: Fri, 12 Sep 2025 16:49:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>
-Subject: Re: [PATCH mlx5-next 2/3] net/mlx5: Refactor MACsec WQE metadata
- shifts
-Message-ID: <20250912154926.GG30363@horms.kernel.org>
-References: <1757574619-604874-1-git-send-email-tariqt@nvidia.com>
- <1757574619-604874-3-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1757692243; c=relaxed/simple;
+	bh=QAP8xPRbr/UWVUxzhd8ZCmVofjt9pXTb3Og3/f9CxgM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
+	 References:In-Reply-To; b=Pj+IWYOW8Wz4Uwde+4qh3SMUTrOYptuCqMyuIAX75r+B7zGBUajjlGyPU4Bdclonlf9RYHLpwl/obRjbMs5644O5h9OMob3mFuh/uctmM8Pslwpc9/I8gqwkjL5KF/JJz5vR/PrcEU45MwVXfhXrNUUDO9ik4+Nm06hIRl+Z79g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NlkGAl9O; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-76e6cbb991aso2071021b3a.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:50:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757692241; x=1758297041; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PmHZZLM+jLINLbKueG0GF/VWczCVBfuAc7hrSwl/VJw=;
+        b=NlkGAl9OLlmIbal17GWxuT/1qYkQJp1foImzAhBNvwwrT93cziY8UwKEcgdHGZ5LvI
+         nBiVvYm2b/cBmmGUppPZHEvkDrX7H8k5zcKIKJK2FyExN1ZatOMqtuFOMy6L+MmQ3I2k
+         EIzXpEMBhOYGtUg+Ib/8zE4MDOjfzQH1IWVxiGY9cA0m31pz27F67u5hOoPN1fiz8emD
+         jZYID1FqfgwwddPrStfvDJeItDbvdyNb4IWcaDUHcEPY6uTHcU9k1T1hYakoVYZqadK4
+         qme7BPpnrYkJpnpeP4SQLcIxh2ANjrIYr1wE5MQKCdXPNSiiD5dXHpXGSzYNhK9u2nrR
+         apqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757692241; x=1758297041;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PmHZZLM+jLINLbKueG0GF/VWczCVBfuAc7hrSwl/VJw=;
+        b=sesQQlqq352vYDFERo8eNq/ojD7ZSPo2ZR7e+8pVq3KA+4qwCd2d63HR1VrILXQRpz
+         aOyjgDFcaTy0RERsGHoGXzILbIGnTAlL6d22ix40WsLY8+85a4vX9zZ2J/2DcZceiVEw
+         F/1kTXMaO5XuAssD4aVFAghLNLzP+T/jq3dOK0XZWsUgE5BsjOCTU9p9F8PoKkODJz/n
+         VflWM/ZQFbYubol74pgIPeD95GGwQAacy6C/CfVYOQ7O3VE9LjQShNI+BnEk0TlrFyDI
+         rF/srAxLJ5B93gy5pF5n2M437T6s8i/p5bzLC3lfA4MuX7zYNErWZtFx2znFebEjN8AB
+         jznA==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ1iuk5Wi0ta77n765ndiF9nbsF0y6+F1mnhN6UF6E/GfERf8G4Z7CEUjkUT8dV+oBqFIuQp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPrdKibRy1HTjNgyPIHw9dTL+E8y0hNiE+qboOMYks/EVW1R6T
+	R67q6ehlweOL+cM058Gpv/XmXSHt3o5MOFJR2Hmc7hpyWIe+orE3S7dI
+X-Gm-Gg: ASbGncv7q5PALi8IwGKPYhEzAEiooYbH2eKf+8TxJUzNyeajR8ZMTVd+yo8IotghQyW
+	v5GWwaQ5X7PujifsK8KHOlVi3bDNRHObYYmEEpaQthOvdjFNExy91xw2JVOdHDUwdxxDeH74bmZ
+	YM3C6zaop0EdiaQumMzFbhHvmjsT+EUTp35m2E9Vj4zR+L/TQqRBvoJcPSpgw+btK0+CMt7q5tN
+	UjSMNPDVPld+snlVQ8jpGMBtnUtLsTTfmsykKRThoehlIL7DjScQcEsu2K+4EoeMPHuK3tgkiZS
+	fKsUQEGxxXDzyWgyGnxuPsfXGG7A6zl9ZWPGVIaOLXaL72gzPhye9XQfwLt7dPCwyrPcGuSKPFr
+	p3gEJ4VsZZAqqlaW0++xPJW8C+R3yKJTrhHMmsvAMnU3tb20/Lh8VgL9RunBNzVE=
+X-Google-Smtp-Source: AGHT+IHplBs4rBxiEhWoleYLgDAH+C3KFfIe+pRXRtODawS1+YsgRO5KAu5iqzqSv2dZN+qba3zvNA==
+X-Received: by 2002:a05:6a00:4644:b0:772:2f06:3325 with SMTP id d2e1a72fcca58-7761218ddc4mr4436593b3a.17.1757692241092;
+        Fri, 12 Sep 2025 08:50:41 -0700 (PDT)
+Received: from localhost ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77607c54a71sm5807277b3a.102.2025.09.12.08.50.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Sep 2025 08:50:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1757574619-604874-3-git-send-email-tariqt@nvidia.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 13 Sep 2025 00:50:37 +0900
+Message-Id: <DCQXWATX22EF.1AWF6AGWZ639S@gmail.com>
+To: "Eric Dumazet" <edumazet@google.com>
+From: "Yeounsu Moon" <yyyynoom@gmail.com>
+Subject: Re: [PATCH net] net: natsemi: fix `rx_dropped` double accounting on
+ `netif_rx()` failure
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20250911053310.15966-2-yyyynoom@gmail.com>
+ <CANn89iLUTs4oKK30g8AjYhreM2Krwt5sAwzsO=xU--G7myt6WQ@mail.gmail.com>
+In-Reply-To: <CANn89iLUTs4oKK30g8AjYhreM2Krwt5sAwzsO=xU--G7myt6WQ@mail.gmail.com>
 
-On Thu, Sep 11, 2025 at 10:10:18AM +0300, Tariq Toukan wrote:
-> From: Carolina Jubran <cjubran@nvidia.com>
-> 
-> Introduce MLX5_ETH_WQE_FT_META_SHIFT as a shared base offset for
-> features that use the lower 8 bits of the WQE flow_table_metadata
-> field, currently used for timestamping, IPsec, and MACsec.
-> 
-> Define MLX5_ETH_WQE_FT_META_MACSEC_FS_ID_MASK so that fs_id occupies
-> bits 2–5, making it clear that fs_id occupies bits in the metadata.
-> 
-> Set MLX5_ETH_WQE_FT_META_MACSEC_MASK as the OR of the MACsec flag and
-> MLX5_ETH_WQE_FT_META_MACSEC_FS_ID_MASK, corresponding to the original
-> 0x3E mask.
-> 
-> Update the fs_id macro to right-shift the MACsec flag by
-> MLX5_ETH_WQE_FT_META_SHIFT and update the RoCE modify-header action to
-> use it.
-> 
-> Introduce the helper macro MLX5_MACSEC_TX_METADATA(fs_id) to compose
-> the full shifted MACsec metadata value.
-> 
-> These changes make it explicit exactly which metadata bits carry MACsec
-> information, simplifying future feature exclusions when multiple
-> features share the WQE flowtable metadata.
-> 
-> In addition, drop the incorrect “RX flow steering” comment, since this
-> applies to TX flow steering.
-> 
-> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Jianbo Liu <jianbol@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+On Fri Sep 12, 2025 at 11:19 PM KST, Eric Dumazet wrote:
+>
+> I do not think this Fixes: is correct.
+>
+> I think core networking got this accounting in netif_rx() in 2010
+>
+> commit caf586e5f23c (" net: add a core netdev->rx_dropped counter")
+>
+I hadn't considered that the Fixes: tag can refer to code outside of the
+changes being made. Thank you for pointing this out. I also noticed your
+earlier work from 2010.
 
-Hi Carolina, Tariq, all,
+I'll update the Fixes: tag as you suggested.
 
-I'm wondering if dropping _SHIFT and making use of FIELD_PREP
-would lead to a cleaner and more idiomatic implementation.
+>> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+>> ---
+>>  drivers/net/ethernet/natsemi/ns83820.c | 13 ++++++-------
+>>  1 file changed, 6 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/natsemi/ns83820.c b/drivers/net/ethern=
+et/natsemi/ns83820.c
+>> index 56d5464222d9..cdbf82affa7b 100644
+>> --- a/drivers/net/ethernet/natsemi/ns83820.c
+>> +++ b/drivers/net/ethernet/natsemi/ns83820.c
+>> @@ -820,7 +820,7 @@ static void rx_irq(struct net_device *ndev)
+>>         struct ns83820 *dev =3D PRIV(ndev);
+>>         struct rx_info *info =3D &dev->rx_info;
+>>         unsigned next_rx;
+>> -       int rx_rc, len;
+>> +       int len;
+>>         u32 cmdsts;
+>>         __le32 *desc;
+>>         unsigned long flags;
+>> @@ -881,8 +881,10 @@ static void rx_irq(struct net_device *ndev)
+>>                 if (likely(CMDSTS_OK & cmdsts)) {
+>>  #endif
+>>                         skb_put(skb, len);
+>> -                       if (unlikely(!skb))
+>
+> I doubt this driver is used.
+>
+I also honestly doubt that this driver is still in use.
 
-I'm thinking that such an approach would involve
-updating MLX5_ETH_WQE_FT_META_MACSEC_MASK rather
-than MLX5_ETH_WQE_FT_META_MACSEC_SHIFT in the following patch.
+I came across it while analyzing the `netif_rx()` and `rx_dropped` code
+paths, and I noticed that there are quite a few unmanaged drivers using
+this kind of code. So I started to fix that.
 
-I'm thinking of something along the lines of following incremental patch.
+But If patches like this only burden busy maintainers and reviewers,
+I'll stop sending them. That said, I do think leaving unmanaged drivers
+as they are is also problematic.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
-index 9ec450603176..58c0ff4af78f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
-@@ -2218,7 +2218,7 @@ static int mlx5_macsec_fs_add_roce_rule_tx(struct mlx5_macsec_fs *macsec_fs, u32
- 	MLX5_SET(set_action_in, action, data,
- 		 mlx5_macsec_fs_set_tx_fs_id(fs_id));
- 	MLX5_SET(set_action_in, action, offset,
--		 MLX5_ETH_WQE_FT_META_MACSEC_SHIFT);
-+		 __bf_shf(MLX5_ETH_WQE_FT_META_MACSEC_MASK));
- 	MLX5_SET(set_action_in, action, length, 32);
- 
- 	modify_hdr = mlx5_modify_header_alloc(mdev, MLX5_FLOW_NAMESPACE_RDMA_TX_MACSEC,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.h
-index 15acaff43641..402840cb3110 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.h
-@@ -13,18 +13,15 @@
- #define MLX5_MACSEC_RX_METADAT_HANDLE(metadata)  ((metadata) & MLX5_MACSEC_RX_FS_ID_MASK)
- 
- /* MACsec TX flow steering */
--#define MLX5_ETH_WQE_FT_META_MACSEC_MASK \
--	(MLX5_ETH_WQE_FT_META_MACSEC | MLX5_ETH_WQE_FT_META_MACSEC_FS_ID_MASK)
--#define MLX5_ETH_WQE_FT_META_MACSEC_SHIFT MLX5_ETH_WQE_FT_META_SHIFT
-+#define MLX5_ETH_WQE_FT_META_MACSEC_MASK GENMASK(7, 0)
- 
- /* MACsec fs_id handling for steering */
- #define mlx5_macsec_fs_set_tx_fs_id(fs_id) \
--	(((MLX5_ETH_WQE_FT_META_MACSEC) >> MLX5_ETH_WQE_FT_META_MACSEC_SHIFT) \
--	 | ((fs_id) << 2))
-+	(MLX5_ETH_WQE_FT_META_IPSEC | (fs_id) << 2)
- 
- #define MLX5_MACSEC_TX_METADATA(fs_id) \
--	(mlx5_macsec_fs_set_tx_fs_id(fs_id) << \
--	 MLX5_ETH_WQE_FT_META_MACSEC_SHIFT)
-+	FIELD_PREP(MLX5_ETH_WQE_FT_META_MACSEC_MASK, \
-+		   mlx5_macsec_fs_set_tx_fs_id(fs_id))
- 
- /* MACsec fs_id uses 4 bits, supports up to 16 interfaces */
- #define MLX5_MACSEC_NUM_OF_SUPPORTED_INTERFACES 16
-diff --git a/include/linux/mlx5/qp.h b/include/linux/mlx5/qp.h
-index b21be7630575..5546c7bd2c83 100644
---- a/include/linux/mlx5/qp.h
-+++ b/include/linux/mlx5/qp.h
-@@ -251,14 +251,9 @@ enum {
- 	MLX5_ETH_WQE_SWP_OUTER_L4_UDP   = 1 << 5,
- };
- 
--/* Base shift for metadata bits used by timestamping, IPsec, and MACsec */
--#define MLX5_ETH_WQE_FT_META_SHIFT 0
--
- enum {
--	MLX5_ETH_WQE_FT_META_IPSEC = BIT(0) << MLX5_ETH_WQE_FT_META_SHIFT,
--	MLX5_ETH_WQE_FT_META_MACSEC = BIT(1) << MLX5_ETH_WQE_FT_META_SHIFT,
--	MLX5_ETH_WQE_FT_META_MACSEC_FS_ID_MASK =
--		GENMASK(5, 2) << MLX5_ETH_WQE_FT_META_SHIFT,
-+	MLX5_ETH_WQE_FT_META_IPSEC = BIT(0),
-+	MLX5_ETH_WQE_FT_META_MACSEC = BIT(1),
- };
- 
- struct mlx5_wqe_eth_seg {
+As a newcomer sending patches to netdev, I realized that there are quite
+a few such drivers. I don't necessarily believe they all must be actively
+maintained, but it feels like some action is needed.
+
+
+> Notice that this test  about skb being NULL or not happens after
+> skb_put(skb, len)
+> which would have crashed anyway if skb was NULL.
+>
+I think I wrote the commit message incorrectly.
+The main point was not about `skb_put()`, but rather about the `if`
+statement that checks `skb`.
+That said, after your comment I realized that `skb_put()` itself also
+looks problematic.
+
+Thank you for the detailed review!
+
+	Yeounsu Moon
+
 
