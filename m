@@ -1,86 +1,117 @@
-Return-Path: <netdev+bounces-222497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D10ADB547D4
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:35:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE081B547F8
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C03CA1C2142C
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:35:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6EF93B977E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0763228B4FE;
-	Fri, 12 Sep 2025 09:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3CE27A465;
+	Fri, 12 Sep 2025 09:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="y2h6V8Es"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DCmoRrsB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10696.protonmail.ch (mail-10696.protonmail.ch [79.135.106.96])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780AE28BA95
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D44274668
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757669555; cv=none; b=OL40NoWQyQVq4pgIxvf2N0Xkbe052WYLWbpVu7OOzKyCD48ddLdpo0QTknHJZ99HImIPJl8n8+7Y3MzRsv7jSVaaaAl55ow1XvXKu26SXoMH54YURNXF+vNd7HRXyLE74k6EqZKhW/KxNIZPJACoweZClotTfMAcQm11emrI01U=
+	t=1757669626; cv=none; b=LdrUE+Q+fhF+xbJEnW4niSxO5qbSa/QlG7tvRY8xaurMvFdll5AbN5/RY12FjITlEEWkHGjcSiaKDvYfpk4zhEUFDKhKBNQ73/6gudyR1bqGtBxHn/mOhTZULT6ub+Oj2alOYOnvTL2KWrMLlUD2QA6p1iNeAoy/08zuwVZEQR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757669555; c=relaxed/simple;
-	bh=449REAjmzKyZZCRxqF75IxbofWTGzye4W/HkQCUR1DM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JImSsXOU3ll1u5WqTXs8bqApWXOr/ZC6wosJkv2Qe8iiTTm6oU8KATsCwsu6UDpGBCVrOAYCzgOVyFcS88m9e71oYRbqhjC3UQ+GFQkCrU192hUSu4czwjZu/xR1+pFARMIyo462Ap1o/Nt9Jt12eY04rJp73OmdEw4kD6EtDV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=y2h6V8Es; arc=none smtp.client-ip=79.135.106.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1757669551; x=1757928751;
-	bh=mKupjn7ejfCcu7B0h/isuQWh8V55vUBuKyP5/Ue7u+U=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=y2h6V8EsR1DgZsiwCg6M/AOfP3AgUquSgEHtTeWLJhvYtiFB+hCP6Y/e0mmXlWgc4
-	 Zz4LWGi8nzsqhv4kolPaht4uKZ+pugnVp0+F+lilcnLPTfH0gHstePx7Ma0dbvhw0t
-	 EIaWsi+IsjWt9K6IkLbZ+MQaMhALEsLPQCZDx7F/W54h58pZqod5TUOABk/BxN3Hbt
-	 6s3cEKADjg7cnYbQSro8JSotL9hdjSRumKtt1FGecdG3uT7AvyXlND5hy69tBS9Q2l
-	 QOLEnQdW2N3BHByQbn2JhKLlYhTAES/Yuty+r+dH9bt+Ir2/6sifdp6Y5qmvWKAtXw
-	 4Bva9MF04K7Uw==
-Date: Fri, 12 Sep 2025 09:32:26 +0000
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: "Named T. Relay" <namedrelay@protonmail.com>
-Cc: "dsahern@kernel.org" <dsahern@kernel.org>
-Subject: Re: Cannot select IPv6 in menuconfig without including IPv4?
-Message-ID: <yHftSrMjQBVGwggLsgBF9hRwwRUF8CS0Sfn4eRfOgm2Rku50-sJfo0aQt3zSVAJEHUspFcxnox2miGOflaFyrrdyktUa06q-SVVE-JuDTzc=@protonmail.com>
-In-Reply-To: <O0MpigXMo6xF3ly3-KV3Lt1jwRZGyYlHwz-qHmca6gSgqS20WcZhnoUYpW_hGaozLSYOMAyo3jfvTKPvYkBP5ZVgTNf58WW3rpoSG1nzlrE=@protonmail.com>
-References: <O0MpigXMo6xF3ly3-KV3Lt1jwRZGyYlHwz-qHmca6gSgqS20WcZhnoUYpW_hGaozLSYOMAyo3jfvTKPvYkBP5ZVgTNf58WW3rpoSG1nzlrE=@protonmail.com>
-Feedback-ID: 19840174:user:proton
-X-Pm-Message-ID: 275011b141eb236c8bd7dbdc457db5252b57ec4c
+	s=arc-20240116; t=1757669626; c=relaxed/simple;
+	bh=ThV2GDf+/LOv1NEDMdhRUL9t0UR+uadCjoaNIrPg7vE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J597m9Q/dscUWFiha+n3OLw4L0grsIt1+4kLTunOI4j++mfxkjiN2yE6ns54Yn6VTSuTUrPtxxLZc5/79wt95bACOPjfqOhl+pVtWfodz+KqXCTRX5RKP/Cs6pzsHFLIWQKPUUEuSc1dRA0CkVWi4xIvTCwIj0Vn8s9ncMaR18s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DCmoRrsB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757669622;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kQVDDKQgSTG1ruil2Wq7UaDisPfJegPx5xURSkhlJks=;
+	b=DCmoRrsBIY4WAHYvBIEij0OMZa3pf/WsKXBtDXFNI3g930nF2wRYic8tXpFVc+CJ3M1ZID
+	57gQAnzEoJRzv7qxevFYC1QN4bsD1qxH5ZT7FkZ2FRwmQx7xPJ6HPy+u8ZK4RX+uotx02N
+	KbjWKiTq7P4IMogm42/cWskmjRcuzWU=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-541-OPgyGCHJMXqYrl47SGXYdQ-1; Fri,
+ 12 Sep 2025 05:33:36 -0400
+X-MC-Unique: OPgyGCHJMXqYrl47SGXYdQ-1
+X-Mimecast-MFC-AGG-ID: OPgyGCHJMXqYrl47SGXYdQ_1757669615
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60DB11956096;
+	Fri, 12 Sep 2025 09:33:35 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.45.224.175])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AF8D830002CA;
+	Fri, 12 Sep 2025 09:33:32 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] dpll: fix clock quality level reporting
+Date: Fri, 12 Sep 2025 11:33:31 +0200
+Message-ID: <20250912093331.862333-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
->  Greetings kernel people,
-Given the lack of response, i presume that my email was forgotten.
-(Or are you supposed to add individuals? I'm new to this.)
+The DPLL_CLOCK_QUALITY_LEVEL_ITU_OPT1_EPRC is not reported via netlink
+due to bug in dpll_msg_add_clock_quality_level(). The usage of
+DPLL_CLOCK_QUALITY_LEVEL_MAX for both DECLARE_BITMAP() and
+for_each_set_bit() is not correct because these macros requires bitmap
+size and not the highest valid bit in the bitmap.
 
->  I wanted to compile an IPv6-only kernel. That basically is a Linux kerne=
-l
->  with only IPv6 networking support. However, if i want to select IPv6 in
->  menuconfig, i am also required to include support for IPv4. From my
->  understanding, IPv4 is not a dependency of IPv6, so it should be possibl=
-e
->  to select either of them independently. Right now, this is not the case.
-> =20
->  I believe the inability to do so is a bug.
->  Woud it be possible to have this fixed?
-i later realised that this may be a result of historic design choices.
-If that's the case, this wouldn't be a bug but a feature request.
-(I hope that calling it a bug didn't sound rude, apologies if it did.)=20
+Use correct bitmap size to fix this issue.
 
+Fixes: a1afb959add1 ("dpll: add clock quality level attribute and op")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/dpll/dpll_netlink.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thank you and have a nice day,
-Named Relay
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 036f21cac0a9..0a852011653c 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -211,8 +211,8 @@ static int
+ dpll_msg_add_clock_quality_level(struct sk_buff *msg, struct dpll_device *dpll,
+ 				 struct netlink_ext_ack *extack)
+ {
++	DECLARE_BITMAP(qls, DPLL_CLOCK_QUALITY_LEVEL_MAX + 1) = { 0 };
+ 	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
+-	DECLARE_BITMAP(qls, DPLL_CLOCK_QUALITY_LEVEL_MAX) = { 0 };
+ 	enum dpll_clock_quality_level ql;
+ 	int ret;
+ 
+@@ -221,7 +221,7 @@ dpll_msg_add_clock_quality_level(struct sk_buff *msg, struct dpll_device *dpll,
+ 	ret = ops->clock_quality_level_get(dpll, dpll_priv(dpll), qls, extack);
+ 	if (ret)
+ 		return ret;
+-	for_each_set_bit(ql, qls, DPLL_CLOCK_QUALITY_LEVEL_MAX)
++	for_each_set_bit(ql, qls, DPLL_CLOCK_QUALITY_LEVEL_MAX + 1)
+ 		if (nla_put_u32(msg, DPLL_A_CLOCK_QUALITY_LEVEL, ql))
+ 			return -EMSGSIZE;
+ 
+-- 
+2.49.1
+
 
