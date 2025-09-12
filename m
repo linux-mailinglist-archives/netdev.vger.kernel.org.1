@@ -1,162 +1,131 @@
-Return-Path: <netdev+bounces-222386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A4BB5404D
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:23:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F14B5405C
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7731216F29D
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:23:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 349AF1C85DF0
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7751D54E3;
-	Fri, 12 Sep 2025 02:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB881EB195;
+	Fri, 12 Sep 2025 02:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1Y7cY4w"
+	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="Wfq4yWJ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408A418A6A5;
-	Fri, 12 Sep 2025 02:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1590B1D5146
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757643802; cv=none; b=WNQNuycGWGnue5Vj8Tb85tuFrjEzNcga3q0PgrEFoOHFRpTN+891MAhCq2nNk1qDQaCmV+lyWxBd6bOmCRz/az9lALHn1Mec7BRegVsK9BOFKUZZk0V6S6jEi9gy/TetqOfU4IDqYv6rDmtZ0neWchGeNCRXYT4suKkLQzN1Od4=
+	t=1757644216; cv=none; b=tx0u4jhCP9BvygLWN0td+2T7RADa6HlBIWFHiNPbX6vq1Tlv+KOrUl2Nj9U3Qdo5hy7eBGjsys1VfW4HC21M7czAw68Y7UhdFjdmPxDq0t17YqAjHE/XHzw9VPI+F/zVOPEa3I4ERi3WVUYr0u6QlxowUHYAhEE6ZW3KQ7WBTnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757643802; c=relaxed/simple;
-	bh=tUqTvYvIU9uIKFNgMQ8Bedpbon7O8hJPf6CcTzXeOjU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pl6LU2XvCJoBTubLalBaBnt3BJnvbPRA/Y5+q+Hibcq3jY+d5hFNhSb3yIFOQSHTYUBK8hBEzdigZ/P6VSyJ4+Ca+Np2Rj3ViT8gDqdSScWf8n1jE8P6PV4ljeT6TQ4eFHSt3vGr34NVCZWmlADcghzEAbFt4M7uGq8ZR2V3J3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1Y7cY4w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2393C4CEF0;
-	Fri, 12 Sep 2025 02:23:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757643799;
-	bh=tUqTvYvIU9uIKFNgMQ8Bedpbon7O8hJPf6CcTzXeOjU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h1Y7cY4wcyCxRlQNLffXlIE/Xpz4DHqLk6SYraoiZ9YzCKEXVZpQ3eQjrCaxiP7OH
-	 uv4wyuL1vzenbpaXFnFr4rdXKbTk8UwLHPiUElO3dmnsUQ67jJHevXYWbCCBxah0rH
-	 WOynvtg47zOLpyU7qWKErEHJOEHkhrkNUi8GX2WLwCEhyO6Xkxoc4OELYV+odCyBZq
-	 pXC+iPvnTjiFS5FbKfsHFmllK5LNok8xJZjxPTLpESZN8oqx+ih4Kk8oCvpO3ylGtC
-	 OivTCl3o6zqyQ2ETXYUYWIarblD8sERDVEYKm1+EpDVr8jr3Umf2sPUKuZmMVE1d8V
-	 569Zp1zCIsvtg==
-Date: Thu, 11 Sep 2025 19:23:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Kory Maincent
- <kory.maincent@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Nishanth Menon <nm@ti.com>,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- linux-doc@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk
- <roan@protonic.nl>
-Subject: Re: [PATCH net-next v5 1/5] ethtool: introduce core UAPI and driver
- API for PHY MSE diagnostics
-Message-ID: <20250911192318.0628831f@kernel.org>
-In-Reply-To: <20250908124610.2937939-2-o.rempel@pengutronix.de>
-References: <20250908124610.2937939-1-o.rempel@pengutronix.de>
-	<20250908124610.2937939-2-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1757644216; c=relaxed/simple;
+	bh=vQQIU6ckHc2+RvHHnlo2eleJNpXZev81qLhetlXEw2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K2CJnfuzkIAkB63I636GzHoZhBiDGboVKsAdujZnMBF6PU6fXJ2C8eiz6RDi3nGNDjjwfef+4C94raAf1O/fljQTJx/sLWUj8+8f3Hs2GMW67ZZLrCTIqdfTjUoRtRfPZyL9OmWc96GOfAeH7CmnID1UmTsFIeBTbpXUD4U1jwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=Wfq4yWJ/; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-72374d6a6caso15208356d6.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 19:30:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rowland.harvard.edu; s=google; t=1757644214; x=1758249014; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bOcBl4BVZOSZI/RGkDZyOTuzjiM4ERqznZpinFtbvyg=;
+        b=Wfq4yWJ/5fRvTYXWHplP2tcJqgI4K5WhBq7exprxaW8O9GnbMVmnQ+WyHtXgyGfoZm
+         qFaaMQ3X/vTI0zZA/7YyhB6ZxyrqgXvEr495XVxOxW0xNtX/Bh+JDkwP4P+neeOQQiHi
+         dXPIgz9l7wEbaiUNqzp+UbdFXOlWSiLmBnjtVwHpkga+6vplDydwiVbt1v323n9qIixg
+         /mzQlk81GgqKDqfrYI7Z3150UXzl6iBlAUkgNfY8oO0K/hz9Mf4vGjCd77NKUlo9MFkU
+         trZdi5ItiDQeB4+ODoTvYS9SJtB1+4dqL7oyaYH3kSDQcHLFwh0/eNK9g9fviC2SVJZs
+         q6Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757644214; x=1758249014;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bOcBl4BVZOSZI/RGkDZyOTuzjiM4ERqznZpinFtbvyg=;
+        b=Oa1PHMuOOhzITxzeomK3jnacdpx2ZQNmLu/h0OUbPOMIrWIswfuMxrl6DRPq8Q1Prl
+         9flrbwssh+DDrJTvb/7yQnGjaSr0PbBwOk7CM33RcgWzx8L1dRSnkCucU10K3j9tW6rn
+         woi6PTzT0ZO8EJxIWxiZemXOLUP0MiSRk8JGRNGDZrDECT8uwwpdjfsPWsDLKmspPlnR
+         jddWAEtVi54Zoy6MiwFMa4YUrsXOnsuOMe7oGJ3V7KJIPAROviX41l7Ag1CpNyUFd4LJ
+         jZm1gUT8RRhZnhqkf5kFN/QYLU5URb4mUdUAOq7nsq7bWjNhyuLpeo9X7RU++PSu6MIG
+         oUTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWiNjhcSKe/MeB8+HUxADwcZF2k/Qn3lfH1OdNuOF+CaVefraxIoTrULFQ4F4aO2BPuzh/KuPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAb8m9Hh3VZVdRAZJAA9ZmGxbm9oLmP3v982bUg5nsuFLY9EkE
+	UnHQbWhUnZ77z4NMBM1foin//7izgb32ClozF1gED0bYTP11fNcpxCVQsveAFc12ww==
+X-Gm-Gg: ASbGncvT0hfEGRIoM2vVRk9bQFSKwSM6zJ01KJUM46Ow6S8BbVNbAYXQSKtoEt2Ch1+
+	7PB3nSTc/K4YkWV2nI3C0Ym6X5f2yfF/sBq7oWv9GUx4H/nJGrYlecun1ooqCVzXIqyL8WZqcAh
+	hVb8HRW2VXNHvImQoKpEyRvfHGPSRYJYazfQQEZ3z4FMo4A5kwHXJvnRrPoWA67E/6NKjiUEaPR
+	vBYF6tV+BQaGBrWuAR/qFOB+zEH+h9+aarbyqgnWzI6FKGZped93WFtLLBvutij0nFivYGsUMdi
+	j4iwvEz9rdWdaAydIUJID+9g5xi2BlPHLR6b381YJ8BjVHQTcJ00/+xGq1z4YkzTRj8PUolYxEc
+	pDYLjKVp3vPs1o1NvjWOnz72GWDOAWMOUnfM=
+X-Google-Smtp-Source: AGHT+IF3YJcN8fftkWAXBvp5e8ChiQTwvDs2PYP+e/p5pRC3qGnSYo/pJ7OVH35ncvR4Bc8YEDrv+A==
+X-Received: by 2002:a05:6214:230c:b0:70d:b2cb:d015 with SMTP id 6a1803df08f44-767c88fae6bmr22357036d6.67.1757644213876;
+        Thu, 11 Sep 2025 19:30:13 -0700 (PDT)
+Received: from rowland.harvard.edu ([2601:19b:d03:1700::6aa9])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-763bdd3773bsm19545826d6.36.2025.09.11.19.30.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 19:30:13 -0700 (PDT)
+Date: Thu, 11 Sep 2025 22:30:09 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
+	stable@vger.kernel.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Lukas Wunner <lukas@wunner.de>, Xu Yang <xu.yang_2@nxp.com>,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
+ PM to avoid MDIO runtime PM wakeups
+Message-ID: <22773d93-cbad-41c5-9e79-4d7f6b9e5ec0@rowland.harvard.edu>
+References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
+ <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
+ <b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
+ <aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
+ <20250911075513.1d90f8b0@kernel.org>
+ <aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
 
-On Mon,  8 Sep 2025 14:46:06 +0200 Oleksij Rempel wrote:
-> Add the base infrastructure for Mean Square Error (MSE) diagnostics,
-> as proposed by the OPEN Alliance "Advanced diagnostic features for
-> 100BASE-T1 automotive Ethernet PHYs" [1] specification.
+On Thu, Sep 11, 2025 at 09:46:35PM +0100, Russell King (Oracle) wrote:
+> On Thu, Sep 11, 2025 at 07:55:13AM -0700, Jakub Kicinski wrote:
+> > We keep having issues with rtnl_lock taken from resume.
+> > Honestly, I'm not sure anyone has found a good solution, yet.
+> > Mostly people just don't implement runtime PM.
+> > 
+> > If we were able to pass optional context to suspend/resume
+> > we could implement conditional locking. We'd lose a lot of
+> > self-respect but it'd make fixing such bugs easier..
 > 
-> The OPEN Alliance spec defines only average MSE and average peak MSE
-> over a fixed number of symbols. However, other PHYs, such as the
-> KSZ9131, additionally expose a worst-peak MSE value latched since the
-> last channel capture. This API accounts for such vendor extensions by
-> adding a distinct capability bit and snapshot field.
+> Normal drivers have the option of separate callbacks for runtime PM
+> vs system suspend/resume states. It seems USB doesn't, just munging
+> everything into one pair of suspend and resume ops without any way
+> of telling them apart. I suggest that is part of the problem here.
 > 
-> Channel-to-pair mapping is normally straightforward, but in some cases
-> (e.g. 100BASE-TX with MDI-X resolution unknown) the mapping is ambiguous.
-> If hardware does not expose MDI-X status, the exact pair cannot be
-> determined. To avoid returning misleading per-channel data in this case,
-> a LINK selector is defined for aggregate MSE measurements.
-> 
-> All investigated devices differ in MSE configuration parameters, such
-> as sample rate, number of analyzed symbols, and scaling factors.
-> For example, the KSZ9131 uses different scaling for MSE and pMSE.
-> To make this visible to userspace, scale limits and timing information
-> are returned via get_mse_config().
+> However, I'm not a USB expert, so...
 
-But the parameter set is set by the standard? If not we should annotate
-which one is and which isn't.
+The USB subsystem uses only one pair of callbacks for suspend and resume 
+because USB hardware has only one suspend state.  However, the callbacks 
+do get an extra pm_message_t parameter which they can use to distinguish 
+between system sleep transitions and runtime PM transitions.
 
-> +  -
-> +    name: phy-mse-capability
-> +    doc: |
-> +      Bitmask flags for MSE capabilities.
-> +
-> +      These flags are used in the 'supported_caps' field of struct
-> +      phy_mse_config to indicate which measurement capabilities are supported
-> +      by the PHY hardware.
-> +    type: flags
-> +    name-prefix: phy-mse-cap-
-> +    entries:
-> +      -
-> +        name: avg
-> +        doc: Average MSE value is supported.
-> +      -
-> +        name: peak
-> +        doc: Current peak MSE value is supported.
-> +      -
-> +        name: worst-peak
-> +        doc: Worst-case peak MSE (latched high-water mark) is supported.
-> +      -
-> +        name: channel-a
-> +        doc: Diagnostics for Channel A are supported.
-> +      -
-> +        name: channel-b
-> +        doc: Diagnostics for Channel B are supported.
-> +      -
-> +        name: channel-c
-> +        doc: Diagnostics for Channel C are supported.
-> +      -
-> +        name: channel-d
-> +        doc: Diagnostics for Channel D are supported.
-> +      -
-> +        name: worst-channel
-> +        doc: |
-> +          Hardware or drivers can identify the single worst-performing channel
-> +          without needing to query each one individually.
-> +      -
-> +        name: link
-> +        doc: |
-> +          Hardware provides only a link-wide aggregate MSE or cannot map
-> +          the measurement to a specific channel/pair. Typical for media where
-> +          the MDI/MDI-X resolution or pair mapping is unknown (e.g. 100BASE-TX).
-
-Should we invert the order here? I think it's more likely we'd
-encounter new statistical measures rather than new channels.
-So channels should go first, and then the measures?
-
-> +  -
-> +    name: phy-mse-channel
-> +    doc: |
-> +      Identifiers for the 'channel' parameter used to select which diagnostic
-> +      data to retrieve.
-> +    type: enum
-> +    name-prefix: phy-mse-channel-
-> +    entries:
-> +      -
-> +        name: a
-> +        value: 0
-
-Don't enums default to starting from 0?  I think setting value is unnecessary
-
-> +        doc: Request data for channel A.
+Alan Stern
 
