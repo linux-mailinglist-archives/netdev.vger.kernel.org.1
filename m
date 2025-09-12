@@ -1,115 +1,158 @@
-Return-Path: <netdev+bounces-222633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218D2B551FB
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:42:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4625B55274
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:56:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0F063B82D6
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:41:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2B77B6129C
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05128309DDF;
-	Fri, 12 Sep 2025 14:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9749C30AAC1;
+	Fri, 12 Sep 2025 14:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="EOo58T3k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BIzKm/Ol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97692FE06C
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 14:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AD83115B8
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 14:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757688117; cv=none; b=cXrV9h4PcmNR5sEb0fyyjwtrHW3IhT3zkehXNS76wRo8R75B7Xk9mOBTJpcYrE3mvcnylDCwIpLjwdoO4ROlX2tpd4UfPKvpDBb1Nh0/T0quy8nimCY5VOA/kNDV/s423JjL1rI/mOmYvuVPS21PsowtfAWLE6A5u+6Bfs0djCM=
+	t=1757688982; cv=none; b=A0Wm9NJq9uERnwGBCDLr1RmFJ2/cIx/T2Bh8IArKG0LoBjReQ2r5p69oD3BHo9oU4065b6nSgKXrwHm332+FJbIIB3Rfm+MA7lryhpyygNn8BABCaSB9DVvPd/vjIOtHo3uMquFgGTSUbZF+SiuLXPH9A/e6mDe/uoWtBOM8ooQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757688117; c=relaxed/simple;
-	bh=FHjbJdtudyt0vGhKMApu2KHBlfl47fZMhc8fNsFkBJo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aNkSjZ+6A14TvNbxysQ6XrDuA6v5I08Zfpl78aeZww29lAtfpa7K2omVC2Z/LIZYbbPGJTkdVyvA7qjkgrgz4fhXokIvSuTfWrqUAoqfPGllCfpgqcDDaLnVxtUovUQc6ei+NbNqNufy31N1J4T3Fx1qMnGzCmFEmP2TwZEeBic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=EOo58T3k; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5688ac2f39dso2306101e87.3
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 07:41:55 -0700 (PDT)
+	s=arc-20240116; t=1757688982; c=relaxed/simple;
+	bh=5bychSERzZRu0Ga8fDtteTf82tNnxalxzUdhbU5SWh0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pp6HL5bafxBNClSeuxQiefmUE6IdF5qNNJE4Zjgfw/MXhewwe32CQ5w5JpO1EdhTS2g+PnDkX7Pr1Dj1zM0VIzggdc9KMIkOwtRElYDSnN/kfI6I5048axFJSwEaWLLIO4/QzK02Xc9SLWrvBlSbjLYiR1BHX6nQp+UQGAJYu9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BIzKm/Ol; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2445824dc27so17262465ad.3
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 07:56:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1757688114; x=1758292914; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FHjbJdtudyt0vGhKMApu2KHBlfl47fZMhc8fNsFkBJo=;
-        b=EOo58T3kd5XIpsTxxM4+JwFhsnF+OAtJIO4BQ1zsY8vM+Kshj1PyXJqnfB+v2F8IWz
-         zo9Qj+imAK67ZOvFNPfjqtfiIX4YVRdxLVc3+2p5y25IEmRhfWbX5X+18hFzS976pFJd
-         QKeNos/2V1YmQpZnXLz6iO3lT77QjjxAo1shKYIcqJ3bMNFHhnrm78qx/yovIdrqBnzA
-         r0GhwfetXtC4ziMWKI2q76bnZvbLcR5N7oWSUnZhqjxJirgKOnkvLp9j7kocgrCyUUKz
-         P55S0/nuXYjt6QOvYSiB8rfgcUaVRjWww2Z+hMy6s1BEEkA6TM3bmXiLfUb9eisMGtNe
-         z91w==
+        d=gmail.com; s=20230601; t=1757688979; x=1758293779; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+rg6DF0J93LU8FePNSoWpCTSyon+Ho3xdECyOIRM0Js=;
+        b=BIzKm/OllJ8zWi4IW2lD8FnjACcau83CL1SMfh9ZJeSwOK/C5QR+TT2BAXZHMHJrY2
+         60f3/lmGBP58K7LpLa+uBD0ug24vv6IclHu/AF9/9M+Si1T2NzQGWVaKmwWXeCRTqW7a
+         K+H/jOwi7Vk31+0yzw22EQR63p+XqI6Zd22CpS4cqp067lbo5/AKqEmmnNjbqYl0rVTj
+         zRoK49+zG5kyhFq5dNDjhpOuBUWXWXh5RtaeHxVrv6Xfj3OqskcdnIOxhuECaJH1Zgwy
+         rDKyrV4uC2o8XrS0bTt76kDJUL5kmJdl//hxSOVt+V3nR7Oj00GFFgTEOKRYY0HSftSG
+         VqGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757688114; x=1758292914;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FHjbJdtudyt0vGhKMApu2KHBlfl47fZMhc8fNsFkBJo=;
-        b=NQjz1o6KcTHtDaPuERP7xPuHORmc49qDWQnEQFXMyMfMz3lKzVqutU/SN4aw/nMfnu
-         JT2JSZYh1WBhCSR4oh1VqqfJ3hg4SWcFuOx5np7yEwwyrw4LS4gt1EQW56ZkE3xDruDs
-         mevgT8L173lES2MwLFJM7Qrb5ELJzIryRWMej9AsRoQTBFNQ2Njx+FtVm9+jJcPt/M2F
-         +NrYKxiWGfZWZj68WjDNezopOvVE6VKTMHKbalftrahvw+blZClDsg28yQlnVzdCQ6it
-         a5IEirmOfxieanGNwRr6orZXtBh1r3ujSE3iE18TEVfhGgB6z93sR3QB1EU+OlyIAD9B
-         ex3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVOzZafNyGd/lwE0tmPQ3fOPmUAKVNcPBYLsMVSK1b3BY0+noi5fhqvqJKxNlqNAFI6VvBcMYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFML/tvK/TBZGV4/uFDy24OBqv49ovFX5ZkxBHGdJf3ZR3UfKA
-	UVmroA1uy0JOEMksIqqTjU9IIff+T90yX/fHFIgnyaiieug64Tcbg62vJizF1Mdho4DuH1Rnz7I
-	nVrMy9Lkp1rLyUHbguMob+c+34VtYmkxyk6l+xlCfWA==
-X-Gm-Gg: ASbGncvU16zjNI+4dJClSeZyTQlFyYOZV5fIoiJaDfZCY0NEsWYap2jdQA+ntNEcwce
-	O5swpK05Rxd1CwInxGm650Gm1GV+KKfcTkgkPwzi0Z1M7zJlyP7XNzdM2S8CpETaylfe9LWaSnU
-	SR/aRD0v0S1n9J2gxX2MTunP1VMDwIKWuFYOg2jRSF/bl/pmBb48EWV4uQdyHIBDu2/Emq6rAWn
-	0F4Pb0SwE9jJPXhqP/7WSHfyQRCTbJJ+NoXYejF
-X-Google-Smtp-Source: AGHT+IG83mg8C15DLml5L4U3tdpjf0VWv0vGOneubDXR1XMdjs97C4rBDul+MA3shLn7lg6vC3in887d/AjcxERRYDw=
-X-Received: by 2002:a05:6512:3b95:b0:560:8d61:8c03 with SMTP id
- 2adb3069b0e04-5704a8b5ae5mr969535e87.25.1757688114063; Fri, 12 Sep 2025
- 07:41:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757688979; x=1758293779;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+rg6DF0J93LU8FePNSoWpCTSyon+Ho3xdECyOIRM0Js=;
+        b=YvKAHItqDcFs9VtpIWNrqeN8PRhX3jESkhbQYzBriL8vh0nIREobB0TfDKdUqU8aOU
+         aZk3iPV/DXd4Y+3usg8vP7fH3TjOGhIvoJ5cLh5UnxxnixSzd+PbHyZG2kO02AouqcG4
+         v/96zViTRvots8/Pc11Ja4cDMCaoroAdfFiUw+wzUmcQ/TpVg/x21nEe4XiB3noM59C+
+         H0UipeKksHsrCcGL3ZA9CbwaeECrx8opCPP6pCKNGE9AZzSdwBsQBcEMHsn1V15FuXOb
+         yxH5vr4BmwjEcWjTcQa3PywylsdI3zewPLSeHY8mCfssZjh+yEQ7qAfIR5pRAU0Cw7NJ
+         /j4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWlY6sc8cnCQIeN6j/NeMKhnzZY87ct3ziK4tmKf6xwy437ErFfcafnyMsqbTjjnrOnJVVlmAg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJyko6hov6sjUURJaoPBjmAvK32Nt8nrt0Sa81c32Lw0ekLU/B
+	SNfC2sVXo/xx4qbSz4zFtt/xNSD7RcIBCAPjNNWZmAQ+GA+fvbVBQaPG
+X-Gm-Gg: ASbGnct6fMp/o5HXTenOAXjHtmMOstVmKTLD+ULcLRwUU+JVxo1AYE8nW7RkJFgJ/r2
+	9t8jTswLEOQzwPqQg1UscPEy6E8pNDM+F4dBvgl4Tm+9+6+RPWP26wqcGu09hEeNbyMl0jDRZ3A
+	/vY0UdWrEIPQgUo8oMwOetydxUkO8PMhOkx7jjYoTUcHss3ChYbNUaWrgFRNIoqZEeMjyHDEFDW
+	g8EiPAZkVrYhL6NoXjOLMJplLAIo9Xfx6KNJq13+s45bwiNZoAGRRnmzfE2Ch5wPaS8377mHQAv
+	T3le3p29Vbc3A83b5spD2hQ/cXML6+OGdpuoBiqFgVJt9/hSpCmSclzKTtLZEGZ4sELxDbX1zTd
+	vqofbEvK6JZCJ1cFGoKwxir5AIgl6RZyX4vAZCAv79rkJyupA7/o/BHbLKsHwS8Z0eHw=
+X-Google-Smtp-Source: AGHT+IGiXFtqjikU8V69Zf2Ja2YTA63RXXh9wfLmsxrcrmVtFj+KeZN6bse3bgKpBr9gnSj742KUmQ==
+X-Received: by 2002:a17:902:dac2:b0:24d:64bc:1495 with SMTP id d9443c01a7336-25d26c4670bmr34394125ad.41.1757688979158;
+        Fri, 12 Sep 2025 07:56:19 -0700 (PDT)
+Received: from mythos-cloud ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32dd98b3b5bsm5957854a91.16.2025.09.12.07.56.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Sep 2025 07:56:18 -0700 (PDT)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Yeounsu Moon <yyyynoom@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: dlink: handle copy_thresh allocation failure
+Date: Fri, 12 Sep 2025 23:53:35 +0900
+Message-ID: <20250912145339.67448-2-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250905090505.104882-1-marco.crivellari@suse.com>
- <20250905090505.104882-4-marco.crivellari@suse.com> <86200ee5-c0dc-4a70-823a-ae36b2e6c544@redhat.com>
-In-Reply-To: <86200ee5-c0dc-4a70-823a-ae36b2e6c544@redhat.com>
-From: Marco Crivellari <marco.crivellari@suse.com>
-Date: Fri, 12 Sep 2025 16:41:43 +0200
-X-Gm-Features: Ac12FXwV1cD9lEMSZ-Wc7hO-DGas0od81NQNgf1aZIWSP1dpFq5I19w78J19LHM
-Message-ID: <CAAofZF53u_AfOMbGE1d0RW8-M=VZhxCzvMSTxUbxsrhAAg-8wg@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: WQ_PERCPU added to alloc_workqueue users
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Michal Hocko <mhocko@suse.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 11, 2025 at 11:25=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
-> This and patch 1/3 do not apply cleanly to the net-next tree.
->
-> Please rebase and repost.
->
-> Also I suggest to split the wireless bit out of this series and send
-> them to the relevant sub tree, to avoid later merge issue.
+The driver did not handle failure of `netdev_alloc_skb_ip_align()`.
+If the allocation failed, dereferencing `skb->protocol` could lead to a
+NULL pointer dereference.
 
-Hello,
+This patch adds proper error handling by falling back to the `else` clause
+when the allocation fails.
 
-Thanks Paolo, I will do as you suggested.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Tested-on: D-Link DGE-550T Rev-A3
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+---
+ drivers/net/ethernet/dlink/dl2k.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
---=20
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index 6bbf6e5584e5..a82e1fd01b92 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -965,26 +965,31 @@ receive_packet (struct net_device *dev)
+ 			struct sk_buff *skb;
+ 
+ 			/* Small skbuffs for short packets */
+-			if (pkt_len > copy_thresh) {
+-				dma_unmap_single(&np->pdev->dev,
+-						 desc_to_dma(desc),
+-						 np->rx_buf_sz,
+-						 DMA_FROM_DEVICE);
+-				skb_put (skb = np->rx_skbuff[entry], pkt_len);
+-				np->rx_skbuff[entry] = NULL;
+-			} else if ((skb = netdev_alloc_skb_ip_align(dev, pkt_len))) {
++			if (pkt_len <= copy_thresh) {
++				skb = netdev_alloc_skb_ip_align(dev, pkt_len);
++				if (!skb)
++					goto reuse_skbuff;
++
+ 				dma_sync_single_for_cpu(&np->pdev->dev,
+ 							desc_to_dma(desc),
+ 							np->rx_buf_sz,
+ 							DMA_FROM_DEVICE);
+-				skb_copy_to_linear_data (skb,
++				skb_copy_to_linear_data(skb,
+ 						  np->rx_skbuff[entry]->data,
+ 						  pkt_len);
+-				skb_put (skb, pkt_len);
++				skb_put(skb, pkt_len);
+ 				dma_sync_single_for_device(&np->pdev->dev,
+ 							   desc_to_dma(desc),
+ 							   np->rx_buf_sz,
+ 							   DMA_FROM_DEVICE);
++			} else {
++reuse_skbuff:
++				dma_unmap_single(&np->pdev->dev,
++						 desc_to_dma(desc),
++						 np->rx_buf_sz,
++						 DMA_FROM_DEVICE);
++				skb_put(skb = np->rx_skbuff[entry], pkt_len);
++				np->rx_skbuff[entry] = NULL;
+ 			}
+ 			skb->protocol = eth_type_trans (skb, dev);
+ #if 0
+-- 
+2.51.0
 
-Marco Crivellari
-
-L3 Support Engineer, Technology & Product
-
-marco.crivellari@suse.com
 
