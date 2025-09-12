@@ -1,178 +1,276 @@
-Return-Path: <netdev+bounces-222464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B42B545BB
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:42:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD19B545E8
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:49:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 982DF1CC3A3A
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:43:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE8B91C2813D
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEA52D641D;
-	Fri, 12 Sep 2025 08:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DC02550AD;
+	Fri, 12 Sep 2025 08:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6LK9jVB"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="b9k6Y/jY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736F92D5946;
-	Fri, 12 Sep 2025 08:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BAEA2DC793;
+	Fri, 12 Sep 2025 08:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757666559; cv=none; b=n3Fu+LCt/y/i/Pen9p6UWMep0gw7nj7hURSA0WgdgrsKkxfqrPdqNM5/S5a1Z5xXIfXw3/jmnuC0t5QglAriyDNS7Sd6JGghnLcIjZyZQsy2OFexWesFAjI+rWSJzYLoHh7+qJMfV3Xkobn/dEgcse54lbsiG52JZHhp88DmsWU=
+	t=1757666980; cv=none; b=oiJI1gnNRNzRde0yy5i09r/wFFKi+JOQg3d/xlUG61FcXRHNKKwv2v5ahVjHrp494u/uNbWWbIXsDlP5NjCZrWt2hYprRphHx9zOoNuXerDQArxhRPBdf+G40Nn5LaeT/Af+xm6aRYh1RxPPQPsFjR5TDzgYlwL6cnLNjKWz9pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757666559; c=relaxed/simple;
-	bh=tC164lnju4nlkcKq4HZ43AZm32SxhQ30U+92JK6VOoc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IjnXiJuQkEJwR2M6nHd/lB9YliZOIOVpfk2/O0laAioonGkD1nbmKtL4a96wAn0L4og0vThNXk3n5uDCGTeNjCzzwj3dxPeLECA3FGjN0FOfm2gOzTNT4SSwzHl97ZEg1POu/ItYU24iTPZhN+/ITaQE8oGSDb07w2HmxbSYedc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6LK9jVB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13389C4CEF4;
-	Fri, 12 Sep 2025 08:42:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757666558;
-	bh=tC164lnju4nlkcKq4HZ43AZm32SxhQ30U+92JK6VOoc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p6LK9jVBBtGh2HQPAML43tiff6de53N868v8/aC+BfFBwTcGxbtAVMawVuQ2GRDnB
-	 Bum4x/NvOeFlFQjR4YajRU3N0QhkltM+UIThlXSGvWHDAX92G6YW/m6XkKj0iazAlh
-	 TF0kv+hGO0mFMhk+CsgCDzTx0L4zYOEzEJXKpHMml4eMN/c3Nr8WAMTbYALYaJY2Ck
-	 Ml1E5Txm7hjYYP2j/1swR3irtOVq5cwozj8TxALnXriUM+JtGLHX3Kj9Qp2MLoUrV6
-	 uEWRKTbCnR6gX98M6zqyYItVgOPYmpygvZWuxJ0C7Dx6tlkVkKSB9L2To/X3+VfxZ2
-	 VAzb8fIThH3PA==
-Date: Fri, 12 Sep 2025 09:42:34 +0100
-From: Simon Horman <horms@kernel.org>
-To: Siva Reddy Kallam <siva.kallam@broadcom.com>
-Cc: leonro@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, vikas.gupta@broadcom.com,
-	selvin.xavier@broadcom.com, anand.subramanian@broadcom.com,
-	Usman Ansari <usman.ansari@broadcom.com>
-Subject: Re: [PATCH 6/8] RDMA/bng_re: Enable Firmware channel and query
- device attributes
-Message-ID: <20250912084234.GT30363@horms.kernel.org>
-References: <20250829123042.44459-1-siva.kallam@broadcom.com>
- <20250829123042.44459-7-siva.kallam@broadcom.com>
+	s=arc-20240116; t=1757666980; c=relaxed/simple;
+	bh=t2CbprpuSHyhZVsAXOvVA2HQNj6MCqFKJW6RdhauD7A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YzyH+KNIYhcyzMHeUFYZxYD3dmrb4Ky+xkHQbu38/qiT0MD+E9tJrRnZRou3fSnq+VwxFoZMeY7Fh3rnsyM/N5JYSqKvCVuArOiYu+xAm7K6rQls+y7az1YnSZAA2jwS2H/T7DJtGXteXrUpptG3yjH5wMqgdtZakvbwZWG0QfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=b9k6Y/jY; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1757666976;
+	bh=t2CbprpuSHyhZVsAXOvVA2HQNj6MCqFKJW6RdhauD7A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=b9k6Y/jYHYRf1lBd3IVQs8MHuAF8Lp6WToReTrp1ENuOHC572Yy8h6K04o261v7Ua
+	 4yW19LAPpuImfWtnGkwQ0AI++cysclzDjM48otKS6QWxc3huIGYnfsD2EIhixgRlnB
+	 DASIixfeR12WRXjgbBInSPg9IQsTxZ3yVzg7gkK97V+olG00bTvwQxVTAQNjgQjLX8
+	 BuV3duQibBT6UOIh8+w26DohRm5Zwb+2dqew+bmZTDDDfA5DyuNbhJDKNQWRtzO5s7
+	 rixyPQa88tYz+a/WjvMPdPxtN1tP4M3Azs1f15mTHQRrIsynehoHJn87WgBxnP8tJx
+	 h179TIG0hlXKg==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0E66317E05BE;
+	Fri, 12 Sep 2025 10:49:35 +0200 (CEST)
+Message-ID: <181e1668-6efc-4dce-91e4-7b535e17dd46@collabora.com>
+Date: Fri, 12 Sep 2025 10:49:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250829123042.44459-7-siva.kallam@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/12] dt-bindings: media: Convert MediaTek mt8173-mdp
+ bindings to DT schema
+To: Chen-Yu Tsai <wenst@chromium.org>, Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Ariel D'Alessandro <ariel.dalessandro@collabora.com>, airlied@gmail.com,
+ amergnat@baylibre.com, andrew+netdev@lunn.ch, andrew-ct.chen@mediatek.com,
+ broonie@kernel.org, chunkuang.hu@kernel.org, conor+dt@kernel.org,
+ davem@davemloft.net, dmitry.torokhov@gmail.com, edumazet@google.com,
+ flora.fu@mediatek.com, heiko@sntech.de, houlong.wei@mediatek.com,
+ jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org,
+ lgirdwood@gmail.com, linus.walleij@linaro.org,
+ louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com,
+ maarten.lankhorst@linux.intel.com, marcel@holtmann.org,
+ matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com,
+ mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com,
+ robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch,
+ support.opensource@diasemi.com, tiffany.lin@mediatek.com,
+ tzimmermann@suse.de, yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
+ linux-bluetooth@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+ <20250911151001.108744-2-ariel.dalessandro@collabora.com>
+ <20250912-alluring-turaco-of-conversion-dca193@kuoka>
+ <CAGXv+5GovP7NuG042AwfmtC-sPJMGuFAm6iZ0iqNZgU0VE+qmQ@mail.gmail.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <CAGXv+5GovP7NuG042AwfmtC-sPJMGuFAm6iZ0iqNZgU0VE+qmQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 29, 2025 at 12:30:40PM +0000, Siva Reddy Kallam wrote:
-> Enable Firmware channel and query device attributes
+Il 12/09/25 10:27, Chen-Yu Tsai ha scritto:
+> On Fri, Sep 12, 2025 at 2:06 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>>
+>> On Thu, Sep 11, 2025 at 12:09:50PM -0300, Ariel D'Alessandro wrote:
+>>> Convert the existing text-based DT bindings for MediaTek MT8173 Media Data
+>>> Path to a DT schema.
+>>>
+>>> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+>>> ---
+>>>   .../bindings/media/mediatek,mt8173-mdp.yaml   | 169 ++++++++++++++++++
+>>>   .../bindings/media/mediatek-mdp.txt           |  95 ----------
+>>>   2 files changed, 169 insertions(+), 95 deletions(-)
+>>>   create mode 100644 Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml
+>>>   delete mode 100644 Documentation/devicetree/bindings/media/mediatek-mdp.txt
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml b/Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml
+>>> new file mode 100644
+>>> index 0000000000000..8ca33a733c478
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml
+>>> @@ -0,0 +1,169 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/media/mediatek,mt8173-mdp.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: MediaTek MT8173 Media Data Path
+>>> +
+>>> +maintainers:
+>>> +  - Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+>>> +
+>>> +description:
+>>> +  Media Data Path is used for scaling and color space conversion.
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    oneOf:
+>>> +      - enum:
+>>> +          - mediatek,mt8173-mdp-rdma
+>>> +          - mediatek,mt8173-mdp-rsz
+>>> +          - mediatek,mt8173-mdp-wdma
+>>> +          - mediatek,mt8173-mdp-wrot
+>>
+>> Why there is no mediatek,mt8173-mdp here? What does this compatible
+>> represent?
+>>
+>>> +      - items:
+>>> +          - const: mediatek,mt8173-mdp-rdma
+>>
+>> Still suspicious. Device cannot be simulatanously: compatible and not
+>> compatible. This is not a well known cat that has superposition of two
+>> states, whenenver you look the other way.
+>>
+>> Maybe the old binding was incorrect, maybe the in-tree DTS is incorrect.
+>> Whichever the reason, this must be investigated and documented, because
+>> by standard rules this is wrong. Each wrong code needs very clear
+>> explanations (and "someone did it" is not a good enough explanation).
 > 
-> Signed-off-by: Siva Reddy Kallam <siva.kallam@broadcom.com>
-> Reviewed-by: Usman Ansari <usman.ansari@broadcom.com>
+> My guess is that "mediatek,mt8173-mdp" is meant to serve as a single
+> entry point for the implementation to bind the driver to. The MDP is
+> a Data Pipeline and there could be multiple instances of the same
+> IP block, as seen in the original example.
+> 
 
-...
+Yeah your guess is right.
 
-> diff --git a/drivers/infiniband/hw/bng_re/bng_sp.c b/drivers/infiniband/hw/bng_re/bng_sp.c
+Cheers,
+Angelo
 
-...
+> The datasheet I have doesn't cover the "RDMA" block specifically, so
+> I can't say whether there is an actual difference between the two RDMA
+> blocks.
+> 
+> 
+> ChenYu
+> 
+>>> +          - const: mediatek,mt8173-mdp
+>>> +
+>>> +  reg:
+>>> +    maxItems: 1
+>>> +
+>>> +  clocks:
+>>> +    minItems: 1
+>>> +    maxItems: 2
+>>> +
+>>> +  power-domains:
+>>> +    maxItems: 1
+>>> +
+>>> +  iommus:
+>>> +    maxItems: 1
+>>> +
+>>> +  mediatek,vpu:
+>>> +    $ref: /schemas/types.yaml#/definitions/phandle
+>>> +    description:
+>>> +      phandle to Mediatek Video Processor Unit for HW Codec encode/decode and
+>>> +      image processing.
+>>> +
+>>> +required:
+>>> +  - compatible
+>>> +  - reg
+>>> +  - clocks
+>>> +  - power-domains
+>>> +
+>>> +allOf:
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            const: mediatek,mt8173-mdp-rdma
+>>> +    then:
+>>> +      properties:
+>>> +        clocks:
+>>> +          items:
+>>> +            - description: Main clock
+>>> +            - description: Mutex clock
+>>> +    else:
+>>> +      properties:
+>>> +        clocks:
+>>> +          items:
+>>> +            - description: Main clock
+>>> +
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            enum:
+>>> +              - mediatek,mt8173-mdp-rdma
+>>> +              - mediatek,mt8173-mdp-wdma
+>>> +              - mediatek,mt8173-mdp-wrot
+>>> +    then:
+>>> +      required:
+>>> +        - iommus
+>>> +
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            const: mediatek,mt8173-mdp
+>>> +    then:
+>>> +      required:
+>>> +        - mediatek,vpu
+>>> +
+>>> +additionalProperties: false
+>>> +
+>>> +examples:
+>>> +  - |
+>>> +    #include <dt-bindings/clock/mt8173-clk.h>
+>>> +    #include <dt-bindings/memory/mt8173-larb-port.h>
+>>> +    #include <dt-bindings/power/mt8173-power.h>
+>>> +
+>>> +    soc {
+>>> +        #address-cells = <2>;
+>>> +        #size-cells = <2>;
+>>> +
+>>> +        mdp_rdma0: rdma@14001000 {
+>>> +            compatible = "mediatek,mt8173-mdp-rdma",
+>>> +                         "mediatek,mt8173-mdp";
+>>> +            reg = <0 0x14001000 0 0x1000>;
+>>> +            clocks = <&mmsys CLK_MM_MDP_RDMA0>,
+>>> +                     <&mmsys CLK_MM_MUTEX_32K>;
+>>> +            power-domains = <&spm MT8173_POWER_DOMAIN_MM>;
+>>> +            iommus = <&iommu M4U_PORT_MDP_RDMA0>;
+>>> +            mediatek,vpu = <&vpu>;
+>>> +        };
+>>> +
+>>> +        mdp_rdma1: rdma@14002000 {
+>>> +            compatible = "mediatek,mt8173-mdp-rdma";
+>>> +            reg = <0 0x14002000 0 0x1000>;
+>>> +            clocks = <&mmsys CLK_MM_MDP_RDMA1>,
+>>> +                     <&mmsys CLK_MM_MUTEX_32K>;
+>>> +            power-domains = <&spm MT8173_POWER_DOMAIN_MM>;
+>>> +            iommus = <&iommu M4U_PORT_MDP_RDMA1>;
+>>> +        };
+>>
+>> My previous comment applies.
+>>
+>> Keep one or two examples.
+>>
+>> Best regards,
+>> Krzysztof
+>>
 
-> +int bng_re_get_dev_attr(struct bng_re_rcfw *rcfw)
-> +{
-> +	struct bng_re_dev_attr *attr = rcfw->res->dattr;
-> +	struct creq_query_func_resp resp = {};
-> +	struct bng_re_cmdqmsg msg = {};
-> +	struct creq_query_func_resp_sb *sb;
-> +	struct bng_re_rcfw_sbuf sbuf;
-> +	struct bng_re_chip_ctx *cctx;
-> +	struct cmdq_query_func req = {};
-> +	u8 *tqm_alloc;
-> +	int i, rc;
-> +	u32 temp;
-> +
-> +	cctx = rcfw->res->cctx;
-
-Similar to my comment on an earlier patch in this series,
-cctx appears to be initialised but otherwise unused in this function.
-
-
-> +	bng_re_rcfw_cmd_prep((struct cmdq_base *)&req,
-> +			     CMDQ_BASE_OPCODE_QUERY_FUNC,
-> +			     sizeof(req));
-> +
-> +	sbuf.size = ALIGN(sizeof(*sb), BNG_FW_CMDQE_UNITS);
-> +	sbuf.sb = dma_alloc_coherent(&rcfw->pdev->dev, sbuf.size,
-> +				     &sbuf.dma_addr, GFP_KERNEL);
-> +	if (!sbuf.sb)
-> +		return -ENOMEM;
-> +	sb = sbuf.sb;
-> +	req.resp_size = sbuf.size / BNG_FW_CMDQE_UNITS;
-> +	bng_re_fill_cmdqmsg(&msg, &req, &resp, &sbuf, sizeof(req),
-> +			    sizeof(resp), 0);
-> +	rc = bng_re_rcfw_send_message(rcfw, &msg);
-> +	if (rc)
-> +		goto bail;
-> +	/* Extract the context from the side buffer */
-> +	attr->max_qp = le32_to_cpu(sb->max_qp);
-> +	/* max_qp value reported by FW doesn't include the QP1 */
-> +	attr->max_qp += 1;
-> +	attr->max_qp_rd_atom =
-> +		sb->max_qp_rd_atom > BNG_RE_MAX_OUT_RD_ATOM ?
-> +		BNG_RE_MAX_OUT_RD_ATOM : sb->max_qp_rd_atom;
-> +	attr->max_qp_init_rd_atom =
-> +		sb->max_qp_init_rd_atom > BNG_RE_MAX_OUT_RD_ATOM ?
-> +		BNG_RE_MAX_OUT_RD_ATOM : sb->max_qp_init_rd_atom;
-> +	attr->max_qp_wqes = le16_to_cpu(sb->max_qp_wr) - 1;
-> +
-> +	/* Adjust for max_qp_wqes for variable wqe */
-> +	attr->max_qp_wqes = min_t(u32, attr->max_qp_wqes, BNG_VAR_MAX_WQE - 1);
-> +
-> +	attr->max_qp_sges = min_t(u32, sb->max_sge_var_wqe, BNG_VAR_MAX_SGE);
-> +	attr->max_cq = le32_to_cpu(sb->max_cq);
-> +	attr->max_cq_wqes = le32_to_cpu(sb->max_cqe);
-> +	attr->max_cq_sges = attr->max_qp_sges;
-> +	attr->max_mr = le32_to_cpu(sb->max_mr);
-> +	attr->max_mw = le32_to_cpu(sb->max_mw);
-> +
-> +	attr->max_mr_size = le64_to_cpu(sb->max_mr_size);
-> +	attr->max_pd = 64 * 1024;
-> +	attr->max_raw_ethy_qp = le32_to_cpu(sb->max_raw_eth_qp);
-> +	attr->max_ah = le32_to_cpu(sb->max_ah);
-> +
-> +	attr->max_srq = le16_to_cpu(sb->max_srq);
-> +	attr->max_srq_wqes = le32_to_cpu(sb->max_srq_wr) - 1;
-> +	attr->max_srq_sges = sb->max_srq_sge;
-> +	attr->max_pkey = 1;
-> +	attr->max_inline_data = le32_to_cpu(sb->max_inline_data);
-> +	/*
-> +	 * Read the max gid supported by HW.
-> +	 * For each entry in HW  GID in HW table, we consume 2
-> +	 * GID entries in the kernel GID table.  So max_gid reported
-> +	 * to stack can be up to twice the value reported by the HW, up to 256 gids.
-> +	 */
-> +	attr->max_sgid = le32_to_cpu(sb->max_gid);
-> +	attr->max_sgid = min_t(u32, BNG_RE_NUM_GIDS_SUPPORTED, 2 * attr->max_sgid);
-> +	attr->dev_cap_flags = le16_to_cpu(sb->dev_cap_flags);
-> +	attr->dev_cap_flags2 = le16_to_cpu(sb->dev_cap_ext_flags_2);
-> +
-> +	if (_is_max_srq_ext_supported(attr->dev_cap_flags2))
-> +		attr->max_srq += le16_to_cpu(sb->max_srq_ext);
-> +
-> +	bng_re_query_version(rcfw, attr->fw_ver);
-> +	for (i = 0; i < BNG_MAX_TQM_ALLOC_REQ / 4; i++) {
-> +		temp = le32_to_cpu(sb->tqm_alloc_reqs[i]);
-> +		tqm_alloc = (u8 *)&temp;
-> +		attr->tqm_alloc_reqs[i * 4] = *tqm_alloc;
-> +		attr->tqm_alloc_reqs[i * 4 + 1] = *(++tqm_alloc);
-> +		attr->tqm_alloc_reqs[i * 4 + 2] = *(++tqm_alloc);
-> +		attr->tqm_alloc_reqs[i * 4 + 3] = *(++tqm_alloc);
-> +	}
-> +
-> +	attr->max_dpi = le32_to_cpu(sb->max_dpi);
-> +	attr->is_atomic = bng_re_is_atomic_cap(rcfw);
-> +bail:
-> +	dma_free_coherent(&rcfw->pdev->dev, sbuf.size,
-> +			  sbuf.sb, sbuf.dma_addr);
-> +	return rc;
-> +}
-
-...
 
