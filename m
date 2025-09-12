@@ -1,57 +1,66 @@
-Return-Path: <netdev+bounces-222357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67957B53F69
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:08:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93BEDB53F6E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE5661CC0499
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 00:08:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6B801CC1924
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 00:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09422F56;
-	Fri, 12 Sep 2025 00:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11AD1114;
+	Fri, 12 Sep 2025 00:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EdzM3Uj8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g84ZqIXI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758E628FD;
-	Fri, 12 Sep 2025 00:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843132AD13;
+	Fri, 12 Sep 2025 00:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757635697; cv=none; b=WEqSEEVbquMUFRtiWl3+Mg8RJ/M0yosIT8d0ETiq51sj7ytulWJobIZ1ETehNQ9wQJ/FB5Zt3vum/AjrowhV59XibaBdBd6XyXAKF23IInm/JFMmvPw/4B6olCxqtAen9lWqLAtNeKCGV7FZmueIW6mUJwn2jX49MQBkcifQb3w=
+	t=1757635890; cv=none; b=iy6I3i1aYFzhDs9KLruIYiZDv0mlgmg8i508vCHxI0WHG6OqfMdfCn8YNAgpLtMz/Vp4lks5zfe4mFwl+DsMwTuXYtjILXZYqzBOWkekdq/nImOCo/1ZOeB5k1YFQGkXBSmtAJ8Ifa1ZxlFT9+QtNOzr9Lg/KZ8bBqla8Fh4yHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757635697; c=relaxed/simple;
-	bh=eUOaiPDTUW/I66NUIlaJw0tipGEEnNadqFZWZAPJ/BQ=;
+	s=arc-20240116; t=1757635890; c=relaxed/simple;
+	bh=kMSq6f7BZjti9F7DmtATF2p14qNOOcc1t/6T4gwRn/4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qECgK+OzHfO63Xp758WQZpDpXPNcH0NSdNz0Xc5m4P2j2Ko3z9c65ved9iO8LlXvG7sl/Ouw5XyVhYqMxXiJQ/nv4XUr34V6/65U6KT/I6zh0oE6MVKCY6frqZpLOiLoUfTKbQj/g8qkWBRJULN3uMGimFBJbEjk3rhVeKAjSIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EdzM3Uj8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF226C4CEF0;
-	Fri, 12 Sep 2025 00:08:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KZBKfxtI9teAoVGKBo420nzpMlyqw0FOW2oXleW2fgp5lASskaU5+sLlFd9+0IQkT/x4LDy9vbHlj/r+1oV1G7bw0GmuCfy61iZWVDKnRQdcKtYn4ZiUBOKjMgh9/3unxYOcfC5o2xauJ3g/YQjBJIzmzRFa069q9Cvb6A4OHS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g84ZqIXI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88A07C4CEF0;
+	Fri, 12 Sep 2025 00:11:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757635697;
-	bh=eUOaiPDTUW/I66NUIlaJw0tipGEEnNadqFZWZAPJ/BQ=;
+	s=k20201202; t=1757635890;
+	bh=kMSq6f7BZjti9F7DmtATF2p14qNOOcc1t/6T4gwRn/4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EdzM3Uj82zSkHDH04VYoPsJosCFAlfTt3PLCiDQIizKM10wo0/h92Z2Mayxcn4yhJ
-	 jZZM1TwTKSxxV9qv7fbAXnimVRDSJX10gUKRvVQ8wa2F+hkD2j79kagZyF2AtfDZr9
-	 R48snxTtnRHigJq6w5RkkbrRukI/Tgbp1TiqWaciaqE3xvkskkklOkm3xf5Ou3GOas
-	 O6p9u0kiwxhLArgKTGTv/nlm8TkXBdZsHkFMktWxqr3dipm2U5k4A1f5bdOIRIlTPZ
-	 icp8P9CVHAgqIROreoG+liwnrmaPEI5LiSTdVTagYBN9STaFvRl0jgvIV5QmoiXNtr
-	 0jXPa0f/deu9A==
-Date: Thu, 11 Sep 2025 17:08:15 -0700
+	b=g84ZqIXIZfENDA5soIt+2NaCJegz3+0URbc+aM1Yo8uN7sBn/9RvaDjYL9uzNBLnx
+	 nz+aXLKwTa8tfXfMhmjbtpw++Lga0s114XeJhENk0U9/xz7NHcsig1/Y4XGMwz9qR0
+	 8k2DIvBA4wEmWM0xdVA7XMwEeH+bG6GBSXTPNxo3vAV5j/8NwERPew+n/qnNtfRyep
+	 otTgVIet0JWK+Wpuu5wosY3h/7uXpLK36EgYjC2OqTTQto6fBuzI9aO7FcgUqjhyAx
+	 jRzhnaJ8ue9LZdp6GUkCW/NxvBnxuEjNDtM0xIgoaoZ/QfE/YYnzJ01za+75xdeafG
+	 PVsfp7a483Pzw==
+Date: Thu, 11 Sep 2025 17:11:28 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dlink: count dropped packets on skb
- allocation failure
-Message-ID: <20250911170815.006b3a31@kernel.org>
-In-Reply-To: <20250910054836.6599-2-yyyynoom@gmail.com>
-References: <20250910054836.6599-2-yyyynoom@gmail.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Saeed Mahameed
+ <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Gal Pressman
+ <gal@nvidia.com>
+Subject: Re: [PATCH net 2/3] net/mlx5e: Prevent entering switchdev mode with
+ inconsistent netns
+Message-ID: <20250911171128.42d0b935@kernel.org>
+In-Reply-To: <5fa69070-59e8-4eba-877e-f0728088fd48@nvidia.com>
+References: <1757326026-536849-1-git-send-email-tariqt@nvidia.com>
+	<1757326026-536849-3-git-send-email-tariqt@nvidia.com>
+	<20250909182319.6bfa8511@kernel.org>
+	<05a83eb7-7fb1-46ae-b7ba-bd366446b5f5@nvidia.com>
+	<20250910174842.6c82fb0c@kernel.org>
+	<5fa69070-59e8-4eba-877e-f0728088fd48@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,26 +70,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Sep 2025 14:48:37 +0900 Yeounsu Moon wrote:
-> Track dropped packet statistics when skb allocation fails
-> in the receive path.
+On Thu, 11 Sep 2025 15:48:24 +0800 Jianbo Liu wrote:
+> >> There is a requirement from customer who wants to manage openvswitch in
+> >> a container. But he can't complete the steps (changing eswitch and
+> >> configuring OVS) in the container if the netns are different.  
+> > 
+> > You're preventing a configuration which you think is "bad" (for a
+> > reason unknown). How is _rejecting_ a config enabling you to fulfill
+> > some "customer requirement" which sounds like having all interfaces
+> > in a separate ns?
+> 
+> My apologies, I wasn't clear. The problem is specific to the OVS control 
+> plane. ovs-vsctl cannot manage the switch if the PF uplink and VF 
+> representors are in different namespaces. When the PF is in a container 
+> while the devlink instance is bound to the host, enabling switchdev 
+> creates this exact split: the PF uplink stays in the container, while 
+> the VF representors are created on the host.
 
-I'm not sure that failing to allocate a buffer results in dropping
-one packet in this driver. The statistics have specific meaning, if
-you're just trying to use dropped to mean "buffer allocation failures"
-that's not allowed. If I'm misreading the code please explain in more
-detail in the commit message and repost.
-
-> diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-> index 6bbf6e5584e5..47d9eef2e725 100644
-> --- a/drivers/net/ethernet/dlink/dl2k.c
-> +++ b/drivers/net/ethernet/dlink/dl2k.c
-> @@ -1009,6 +1009,7 @@ receive_packet (struct net_device *dev)
->  			skb = netdev_alloc_skb_ip_align(dev, np->rx_buf_sz);
->  			if (skb == NULL) {
->  				np->rx_ring[entry].fraginfo = 0;
-> +				dev->stats.rx_dropped++;
->  				printk (KERN_INFO
->  					"%s: receive_packet: "
->  					"Unable to re-allocate Rx skbuff.#%d\n",
+So you're saying the user can mess up the configuration in a way that'd
+prevent them from using OVS. No strong objection to the patch (assuming
+commit message is improved), but I don't see how this is a fix.
 
