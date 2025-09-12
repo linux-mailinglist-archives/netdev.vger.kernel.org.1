@@ -1,146 +1,105 @@
-Return-Path: <netdev+bounces-222457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81FF6B54516
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:20:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B056B54532
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:24:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98F0518968D1
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:20:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A2513A7AFE
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1DC2D73B9;
-	Fri, 12 Sep 2025 08:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE67E20ADD6;
+	Fri, 12 Sep 2025 08:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoAdT8CJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="X1jx//a4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FC12D739C;
-	Fri, 12 Sep 2025 08:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52732D6E60
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757665208; cv=none; b=EN2VkutKcaxxTaDEoWUd1pfT4aaGRzSgPVCIjs1UHV411eWGze1PlFfuI0PR1BNt1O39A4eL/IDUsWDUcqVEDoK8b/Klgc6AcHS8AB6dQ29SyjdL1aSNjJCgk5q4/8yVoiBY69jd7q7Y0X+Sielfl4qi+rkB5c4kAk5F+YVcV4w=
+	t=1757665472; cv=none; b=SL85amjuWoRyHFglK0tIxx8XAdHl3oAcN4sLBN7fCwDYGprLoxApZnfy5VlwvrI5TT4VApyxUK1q/yxZZbO48W7KiwH66K1rJcHHKnu9zNtOLQWiEAezAehyJYZPBXFCH7m0qv697ZL5DpBrePoR6+SRjHuok8aCPDEn1ghvLIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757665208; c=relaxed/simple;
-	bh=OOusLVxnKHKzYYpqIszKMcMpYFoufzRxkmlgmDbuoAE=;
+	s=arc-20240116; t=1757665472; c=relaxed/simple;
+	bh=G3Sdp/ZVwYcMs1IT4JQ3HT2T9kk5odDlxHHxV4fba8I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RIl/z+PTsAoK11LpN2Fbr1CKXLGKIR4GbKS5EZ93sIpgOvs7+nZySzJR5VFeMMuR/XoRu+X6wPJdQ3+k5CHXVrkmSqy3YNx7682ZXhwyTLtE9kBcWsVxQSUNpsSozeytQqPP40lUsqOZMq+vMw4zqTWPR/RDzGMf0qDxOlVsR9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoAdT8CJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53489C4CEF4;
-	Fri, 12 Sep 2025 08:20:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757665208;
-	bh=OOusLVxnKHKzYYpqIszKMcMpYFoufzRxkmlgmDbuoAE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YoAdT8CJrYPBnrdP51NjrTWIRu+cXQR39oCZb/t/2jvT1bIJM9VXgbYW0tSIkbYrL
-	 NVMqDCnH8Dj8VBDVUAgtyQTvh/3MoRpno+6fCQoZSAox46ONzWRZJp1ktv5Lp5bhzi
-	 r9+106OXqgmFfl4iT7miTolwEFwmk1NdK/6Cdi2nBGnzY98SjgBObq8DEg7wHqVRms
-	 7AhZQLM74buaIeh3rrJVvSHBVOu3bHROqsVjaM45tLQQ8qPm3HTbOPAXBwytOq7FnC
-	 ofuKpTvPGQmC535taTMphjBBwAhRG1wg8Y14FaNzd9xz43E+4693r1aCn97d5Bj/T5
-	 ZXJ9rbbMWyWoQ==
-Date: Fri, 12 Sep 2025 10:19:57 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 27/32] nsfs: support file handles
-Message-ID: <20250912-wirsing-karibus-7f6a98621dd1@brauner>
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org>
- <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
- <20250911-werken-raubzug-64735473739c@brauner>
- <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LoPhiKbtQX2Dk9Y5cTFUL+L3JrrSJZoXYFrWpxhuf9K/tljmswV/1OKqKXQUFHC4Zj496ZEKl4kTZjZP7Igwg91wZwUGHpVMVB9dxeeE7LZRsXMdjY1/BJCZnFQPAGpv7uh698CSNKfNYYgeGJpaL7yfJnOHPjl4YyV7HHzcLNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=X1jx//a4; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=K9ICwrst558XFzsKtusIKbwO8AGpP60Ecok/wMJnGPo=; b=X1jx//a4gY1BcJfsyO40Ahb/yx
+	Q4jqC0BAgEQ8TXXz4ubIFzSUzJYF+BtY0tPrJTl+ftwBRgSmisFab/c/Ox9P2qPSQA7K44MzKUS/Y
+	/h8axe61pFbZXUsrVmdzA0ggiiA7HidDcDMEV2jH9JbIuCuaJeGyrgnLifXkVzUkcsFyegGjNwz6M
+	JAehnhVZL8NX2iWkbWtSC8a2pI+N5N7KB2xfw6OPt4FdeYIPzQLdaK/Lt4gyVFLgkiMvwrPzS3ZZX
+	s5Hb/AaJPLXn5rK4aKFj0MS7CbA9mm+qloEZJt3AP7GWYJ5VxOzM3mQWN5U6qPme0hxzyDU5dgKKU
+	aATzbA6Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47896)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uwz4x-0000000049u-0pla;
+	Fri, 12 Sep 2025 09:24:23 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uwz4u-000000003Mr-0vje;
+	Fri, 12 Sep 2025 09:24:20 +0100
+Date: Fri, 12 Sep 2025 09:24:20 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2] net: mvneta: add support for hardware
+ timestamps
+Message-ID: <aMPYtPj1fpstcbgt@shell.armlinux.org.uk>
+References: <E1uwKHe-00000004glk-3nkJ@rmk-PC.armlinux.org.uk>
+ <20250911185506.6ee85d94@kernel.org>
+ <20250911185841.0863ffc0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
+In-Reply-To: <20250911185841.0863ffc0@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Sep 11, 2025 at 01:36:28PM +0200, Amir Goldstein wrote:
-> On Thu, Sep 11, 2025 at 11:31 AM Christian Brauner <brauner@kernel.org> wrote:
-> >
-> > On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
-> > > On Wed, Sep 10, 2025 at 4:39 PM Christian Brauner <brauner@kernel.org> wrote:
-> > > >
-> > > > A while ago we added support for file handles to pidfs so pidfds can be
-> > > > encoded and decoded as file handles. Userspace has adopted this quickly
-> > > > and it's proven very useful.
-> > >
-> > > > Pidfd file handles are exhaustive meaning
-> > > > they don't require a handle on another pidfd to pass to
-> > > > open_by_handle_at() so it can derive the filesystem to decode in.
-> > > >
-> > > > Implement the exhaustive file handles for namespaces as well.
-> > >
-> > > I think you decide to split the "exhaustive" part to another patch,
-> > > so better drop this paragraph?
-> >
-> > Yes, good point. I've dont that.
-> >
-> > > I am missing an explanation about the permissions for
-> > > opening these file handles.
-> > >
-> > > My understanding of the code is that the opener needs to meet one of
-> > > the conditions:
-> > > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
-> > > 2. current task is in the opened namespace
-> >
-> > Yes.
-> >
-> > >
-> > > But I do not fully understand the rationale behind the 2nd condition,
-> > > that is, when is it useful?
-> >
-> > A caller is always able to open a file descriptor to it's own set of
-> > namespaces. File handles will behave the same way.
-> >
+On Thu, Sep 11, 2025 at 06:58:41PM -0700, Jakub Kicinski wrote:
+> On Thu, 11 Sep 2025 18:55:06 -0700 Jakub Kicinski wrote:
+> > On Wed, 10 Sep 2025 13:50:46 +0100 Russell King wrote:
+> > > Subject: [PATCH net-next v2] net: mvneta: add support for hardware timestamps
+> > > Date: Wed, 10 Sep 2025 13:50:46 +0100
+> > > Sender: Russell King <rmk@armlinux.org.uk>
+> > > 
+> > > Add support for hardware timestamps in (e.g.) the PHY by calling  
+> > 
+> > These are _software_ timestamps.. (in the subject as well)
+> > 
+> > Fixed when applying.
 > 
-> I understand why it's safe, and I do not object to it at all,
-> I just feel that I do not fully understand the use case of how ns file handles
-> are expected to be used.
-> A process can always open /proc/self/ns/mnt
-> What's the use case where a process may need to open its own ns by handle?
-> 
-> I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
-> do not keep an elevated refcount of ns object could be useful in the same
-> way that an NFS client keeps file handles without keeping the file object alive.
-> 
-> But if you do not have CAP_SYS_ADMIN and can only open your own ns
-> by handle, what is the application that could make use of this?
-> and what's the benefit of such application keeping a file handle instead of
-> ns fd?
+> Let me take that back, you may actually mean HW because of the PHY
+> handling detour. Maybe call out both software and PHY (hardware)?
 
-A process is not always able to open /proc/self/ns/. That requires
-procfs to be mounted and for /proc/self/ or /proc/self/ns/ to not be
-overmounted. However, they can derive a namespace fd from their own
-pidfd. And that also always works if it's their own namespace.
+I do mean PHY based hardware timestamps, because that is exactly why
+I'm making the change (for my Marvell PHY PTP core.) The software
+timestamping is a side effect.
 
-There's no need to introduce unnecessary behavioral differences between
-/proc/self/ns/, pidfd-derived namespace fs, and file-handle-derived
-namespace fds. That's just going to be confusing.
-
-The other thing is that there are legitimate use-case for encoding your
-own namespace. For example, you might store file handles to your set of
-namespaces in a file on-disk so you can verify when you get rexeced that
-they're still valid and so on. This is akin to the pidfd use-case.
-
-Or just plainly for namespace comparison reasons where you keep a file
-handle to your own namespaces and can then easily check against others.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
