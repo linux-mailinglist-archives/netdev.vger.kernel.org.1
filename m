@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 669A8B53FE6
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:34:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE154B53FE9
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD7181BC6F0F
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:34:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71340AA4512
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7F32C187;
-	Fri, 12 Sep 2025 01:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44715185955;
+	Fri, 12 Sep 2025 01:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="muUGO9kJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTeaXVH7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A556E15ECD7;
-	Fri, 12 Sep 2025 01:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1845417A2E6;
+	Fri, 12 Sep 2025 01:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757640837; cv=none; b=bv0424lVV9yJSoLnSo8tgArvkAGtXzpSNaX0DEV2/uOiIXeIVtdxR9p8rrbSg3Ed4nFu4zkm3PBE1X5pxVbcehCHC+rVUbtyjNepuz8FPMSdNrYo9YyH4TS/Fsx9Z6j9BGBFVJ/qqicpwx3nq7ZdRa5W8sOw5kUVKfFhcdhYkAU=
+	t=1757640839; cv=none; b=skXoOOjTkVN2OU+kNOYOr7qaSdWP36E8EkOeTyOVN2/Shvqk7/cDHBajDM0NgummviG0rjPPbNgsVntXMubLnHVtgAcPlZV/NppkKAC8U4BBulzUmq1hnsnPCgvVOWCf2CjBZQTCgGo/Nclu/9PE9ww0v58pO6ACN6ozuj9Pogs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757640837; c=relaxed/simple;
-	bh=vG0kjAUYKuIhXTyQzMeZYUvyiQzR8Oxef3QN3QE3pHc=;
+	s=arc-20240116; t=1757640839; c=relaxed/simple;
+	bh=7/CUff/Ud4M09uUqqjZTOkjLKuUTqEhs9KE4Rs6jvPM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mhqk0xvI07EDok9xbxHBK325biNDl2be4LbzmIM/KnnB2ppbiQ/NYrhL86VKI0QcPqhAW2pC/4H2Xik14T/GXe2yUh3YNi8v7Ex5x0gZcVwE66KJe0bi60ATBAvntRuwIcIXUcBTgHVFxCoWmWxp63yJITNs/JsnAIXYVjfK2xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=muUGO9kJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 335E8C4CEF0;
-	Fri, 12 Sep 2025 01:33:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nUJx3nJfc/4GivI7HUdJ7sgwi9DZcsqgKAwQdaduqK7YyjsEOSmQ5bRnDCZaEOShg6yQw8gn7V5A69VZfY9rXYlDKixAA26a8T9YNEkElltdNWVgKWHeormpPpq/2UyHpryDyT51NxchTvxlAEA0pBPnnOv35WbO05JBctF8PCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTeaXVH7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A789FC4CEF0;
+	Fri, 12 Sep 2025 01:33:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757640837;
-	bh=vG0kjAUYKuIhXTyQzMeZYUvyiQzR8Oxef3QN3QE3pHc=;
+	s=k20201202; t=1757640838;
+	bh=7/CUff/Ud4M09uUqqjZTOkjLKuUTqEhs9KE4Rs6jvPM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=muUGO9kJFUhSNdq4IJth+6ehIfmg2Vge0aK/Cg1aaECRSx6l9ZBzqFsHCAd3MC5+K
-	 bCinEXeoufMu64+bJaxq5kXD8ptG3m6h7gy0/ajteCSoHjvN36fH5XToQPB5Hp7oeU
-	 C+rnMsjdQhRf8LxAQXKR1mQt+R1DhjtPyMBKRYr7CyTrbhm80QJ8z5CikkQUaGU/x5
-	 OQ/sBVDVPQFzCy5FGoPMpAePqBpj+hFt+uS7Cff5Aw9v46VWfgWXwPC3v8FflWc6zG
-	 K2JNyrXSkkA207DeVIy4c/K7N45EJLRRHcZFxwUDcbIsrQaQY6tO71peQqNURfQBhN
-	 9kwGXk7o/TEqw==
+	b=pTeaXVH7Fr7pr/NwWsG2owWonbXoP+uZdbLK4bSxaT5V3f0xAlov2d3z7muvPc4eH
+	 UTsT6xhI1j0YsdJ6VLvrIxv53g36NuPJyWAjy6XcqxUjZcglKnmeK3MZ7OkF6weHzu
+	 u9JwPg2T8hxirjk8YDGZGnxorOM3+wRU4rGTkxN89/G+xvcj4j9VfN3xpi6hnUD2Dd
+	 ac7I/zNOGtQxGHD2+rQxuxfExxflDaGyrXmjoKZwnvQGFsSHKaTLyxpDcU8Oq8oT/U
+	 WXhVv8KtOVvfyZ34UYY5mmfPf3IlAARuaRjmQRVcDPV7gTJ6mUXnu7TfZE/hmpjyHF
+	 5hZWxY+F0Z9EA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC2383BF69;
-	Fri, 12 Sep 2025 01:34:00 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CE9383BF69;
+	Fri, 12 Sep 2025 01:34:02 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/2] selftests: Disable dad for ipv6 in
- fcnal-test.sh
+Subject: Re: [GIT PULL] wireless-next-2025-09-11
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175764083975.2367774.17529978426990502405.git-patchwork-notify@kernel.org>
-Date: Fri, 12 Sep 2025 01:33:59 +0000
-References: <20250910025828.38900-1-dsahern@kernel.org>
-In-Reply-To: <20250910025828.38900-1-dsahern@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, linux-kselftest@vger.kernel.org,
- shuah@kernel.org
+ <175764084099.2367774.7528913497762386236.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Sep 2025 01:34:00 +0000
+References: <20250911100854.20445-3-johannes@sipsolutions.net>
+In-Reply-To: <20250911100854.20445-3-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  9 Sep 2025 20:58:27 -0600 you wrote:
-> Constrained test environment; duplicate address detection is not needed
-> and causes races so disable it.
+On Thu, 11 Sep 2025 12:08:28 +0200 you wrote:
+> Hi,
 > 
-> Signed-off-by: David Ahern <dsahern@kernel.org>
-> ---
->  tools/testing/selftests/net/fcnal-test.sh | 2 ++
->  1 file changed, 2 insertions(+)
+> And a bunch of changes for -next, though that doesn't look
+> like it'll be quieting down just yet.
+> 
+> Please pull and let us know if there's any problem.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next,1/2] selftests: Disable dad for ipv6 in fcnal-test.sh
-    https://git.kernel.org/netdev/net-next/c/53d591730ea3
-  - [net-next,2/2] selftests: Replace sleep with slowwait
-    https://git.kernel.org/netdev/net-next/c/2f186dd5585c
+  - [GIT,PULL] wireless-next-2025-09-11
+    https://git.kernel.org/netdev/net-next/c/d103f26a5c85
 
 You are awesome, thank you!
 -- 
