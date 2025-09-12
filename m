@@ -1,359 +1,202 @@
-Return-Path: <netdev+bounces-222584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B40B54EA4
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:57:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF76B54EBA
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BC681BC4685
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:58:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF1871B2697B
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D5E30E0E4;
-	Fri, 12 Sep 2025 12:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E353009CB;
+	Fri, 12 Sep 2025 13:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nEJY4alO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYmYXTzS"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A60D30DEB1;
-	Fri, 12 Sep 2025 12:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C4A2DC787;
+	Fri, 12 Sep 2025 13:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757681820; cv=none; b=dFQ6snYqGZeKP/8FPLspSr/GgYbcm5Ah8rh4J+T81IdmZFbjBK558b2XvXZUjGKADrI8tvcVPMSYED0YUl2NsMDhtG/wiK3NglesTe82XZO1zq6iRfK9oozULthL5p8nz4BY7q6hdSGWr+QUCFQa4SoK5kD7U5TrVq6kBVm23uw=
+	t=1757682331; cv=none; b=Bbe7MImljA1Hkz/KIfNN6ku0dJTI6d+ggw84/8LG3goeGapylPBH9rBqwDVf3aURjqK2prRVU0evg8yurmOAp/rcqex8l+JHD1+6VZp7pXyTGHZF+JpMLy5Hl8j9taCz0yosCwMwqoAy/qe8UO3Kco1pd9kMVXGRdgmOTN0gVCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757681820; c=relaxed/simple;
-	bh=isdneW0AQMXzchNHlRx5M+1r0f48Vgl2dv/b+Q9CID4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GcYJfNWWhv1DWaIZEwuc27GspR02oQh6I2GeSgVkhlUbAuGbw2868WW9swm17RcBRhkJ9CQ5jADEvTh9F7aArNLWJKMefUpAZLp17YqMrSylOEtKO9h7LoRMqOcfZTLKetCD6XJqCTFphT+dBzy8JudTjMOYWKrd41HUocgre+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nEJY4alO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rUkbo4gs9EL6YjDDNBllsKMR1qK9GCz5ZHIWIO83/I0=; b=nEJY4alO1BTuBTDh/ZSyG2pxCU
-	Okaqs4ynK0JVqI0eSkVv5lmIN/JrRbn4n1aWYywBmUkcl2OWWRXI3RJYpgO5KDFwRdfQrrN8EJMrM
-	K34R4sxa3ToAGvplZJC4OO4kzj5G1xfG4iTflWBQfzTQ0OSMCpy8zUlif0Jwkj4YkCNc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ux3KX-008D1Y-9j; Fri, 12 Sep 2025 14:56:45 +0200
-Date: Fri, 12 Sep 2025 14:56:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 3/3] net: dsa: yt921x: Add support for
- Motorcomm YT921x
-Message-ID: <ae9f7bb0-aef3-4c53-91a3-6631fea6c734@lunn.ch>
-References: <20250912024620.4032846-1-mmyangfl@gmail.com>
- <20250912024620.4032846-4-mmyangfl@gmail.com>
+	s=arc-20240116; t=1757682331; c=relaxed/simple;
+	bh=Oj2YhsrlW7/LL2/+FfpL2MDbCW0BhZLRp8bVjxYH3/4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sG0Yha6Kx84OCUdLYCI46WvOpphwmhBiZVq1Ea/jzdrjmtSPETGxCVhc1CcbeVs7VZ+upjlrcacLDKAOrCkWHqNs5Rz5xcByvqCCp4P6FYN7asab6p97/SMj/Yi0dRgjuYLBRfcq4VHD0RmqfCKCaH+7xx4s9Yai26Gb+USyIPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYmYXTzS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCDCC4CEF1;
+	Fri, 12 Sep 2025 13:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757682330;
+	bh=Oj2YhsrlW7/LL2/+FfpL2MDbCW0BhZLRp8bVjxYH3/4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QYmYXTzSvoub6ckp1xdpKOdLcSDR/MGN65tzs+mhcDVodcTVq4E0vyN83ehL+5jls
+	 ebOPq+YIRNK8+3qzlOYuHLUMUE+GawtStVvB5HdnTpuQ22W3MW2B3mlKxzDAmBWwy/
+	 1FJAe1Jve27dbaPIBLnrFnxL4ldNsXO/YOdz53BsBfUhceap1kcbGF0zR9X/iooRK+
+	 e5Mj+ZyPjWuKjpM2TzrFWsYtkyBB2VmsSyqjsyY7px1/Q+AJtZLXNMxbk9q6I4rFdP
+	 l33tP7e8dZb7kcc/eFpbFvF9LROABe07SVyr9fIGYJVmEqG2ZSn9gxJocjwm9l2l4T
+	 4mMRrYuK/Xpcw==
+Message-ID: <73c95643-e1eb-461c-b547-931642ec633a@kernel.org>
+Date: Fri, 12 Sep 2025 15:05:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250912024620.4032846-4-mmyangfl@gmail.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] tools: ynl: rst: display attribute-set doc
+Content-Language: en-GB, fr-BE
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250910-net-next-ynl-attr-doc-rst-v1-1-0bbc77816174@kernel.org>
+ <m2v7lpuv2w.fsf@gmail.com> <a1f55940-7115-4650-835c-2f1138c5eaa4@kernel.org>
+ <m2ecscudyf.fsf@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <m2ecscudyf.fsf@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> +static void yt921x_reg_mdio_verify(u32 reg, u16 val, bool lo)
-> +{
-> +	const char *desc;
-> +
-> +	switch (val) {
-> +	case 0xfade:
-> +		desc = "which is likely from a non-existent register";
-> +		break;
-> +	case 0xdead:
-> +		desc = "which is likely a data race condition";
-> +		break;
+On 12/09/2025 13:07, Donald Hunter wrote:
+> Matthieu Baerts <matttbe@kernel.org> writes:
+> 
+>> Hi Donald,
+>>
+>> On 11/09/2025 12:44, Donald Hunter wrote:
+>>> "Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
+>>>
+>>>> Some attribute-set have a documentation (doc:), but it was not displayed
+>>>> in the RST / HTML version. Such field can be found in ethtool, netdev,
+>>>> tcp_metrics and team YAML files.
+>>>>
+>>>> Only the 'name' and 'attributes' fields from an 'attribute-set' section
+>>>> were parsed. Now the content of the 'doc' field, if available, is added
+>>>> as a new paragraph before listing each attribute. This is similar to
+>>>> what is done when parsing the 'operations'.
+>>>
+>>> This fix looks good, but exposes the same issue with the team
+>>> attribute-set in team.yaml.
+>>
+>> Good catch! I forgot to check why the output was like that before
+>> sending this patch.
+>>
+>>> The following patch is sufficient to generate output that sphinx doesn't
+>>> mangle:
+>>>
+>>> diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
+>>> index cf02d47d12a4..fae40835386c 100644
+>>> --- a/Documentation/netlink/specs/team.yaml
+>>> +++ b/Documentation/netlink/specs/team.yaml
+>>> @@ -25,7 +25,7 @@ definitions:
+>>>  attribute-sets:
+>>>    -
+>>>      name: team
+>>> -    doc:
+>>> +    doc: |
+>>>        The team nested layout of get/set msg looks like
+>>>            [TEAM_ATTR_LIST_OPTION]
+>>>                [TEAM_ATTR_ITEM_OPTION]
+>> Yes, that's enough to avoid the mangled output in .rst and .html files.
+>>
+>> Do you plan to send this patch, or do you prefer if I send it? As part
+>> of another series or do you prefer a v2?
+> 
+> Could you add it to a v2 please.
 
-Where did these two values come from? Are they documented in the datasheet?
+Sure, will do!
 
-> +	default:
-> +		return;
-> +	}
-> +
-> +	/* Skip registers which are likely to have any valid values */
-> +	switch (reg) {
-> +	case YT921X_MAC_ADDR_HI2:
-> +	case YT921X_MAC_ADDR_LO4:
-> +	case YT921X_FDB_OUT0:
-> +	case YT921X_FDB_OUT1:
-> +		return;
-> +	}
-> +
-> +	pr_warn("%s: Read 0x%x at 0x%x %s32, %s; "
-> +		"consider reporting a bug if this happens again\n",
-> +		__func__, val, reg, lo ? "lo" : "hi", desc);
+>> Note that a few .yaml files have the doc definition starting at the next
+>> line, but without this '|' at the end. It looks strange to me to have
+>> the string defined at the next line like that. I was thinking about
+>> sending patches containing modifications created by the following
+>> command, but I see that this way of writing the string value is valid in
+>> YAML.
+>>
+>>   $ git grep -l "doc:$" -- Documentation/netlink/specs | \
+>>         xargs sed -i 's/doc:$/doc: |/g'
+>>
+>> Except the one with "team", the other ones don't have their output
+>> mangled. So such modifications are probably not needed for the other ones.
+> 
+> Yeah, those doc: entries look weird to me too. Not sure it's worth
+> fixing them up, given that they are valid. Also worth noting that the
+> two formats that we should encourage are
+> 
+>   doc: >-
+>     Multi line text that will get folded and
+>     stripped, i.e. internal newlines and trailing
+>     newlines will be removed.
+> 
+>   doc: |
+>     Multi line text that will be handled literally
+>     and clipped, i.e. internal newlines and trailing
+>     newline are preserved but additional trailing
+>     newlines get removed.
+> 
+> So if we were to fix up the doc:$ occurrences, then I'd suggest using
+> doc: >-
 
-You probably have a warning from checkpatch about pr_warn. Ideally you
-want to give an indication which device has triggered this, making use
-of a struct device. You might want to include that in context.
+Good point!
 
-> +static int
-> +yt921x_intif_read(struct yt921x_priv *priv, int port, int reg, u16 *valp)
-> +{
-> +	if ((u16)val != val)
-> +		dev_err(dev,
-> +			"%s: port %d, reg 0x%x: Expected u16, got 0x%08x\n",
-> +			__func__, port, reg, val);
-> +	*valp = (u16)val;
-> +	return 0;
+If these entries look weird to you too, I will add one patch adding
+'>-', at least to push people to "properly" declare future scalar strings.
 
-You don't treat this as an error, you don't return -EIO or -EPROTO etc.
-So maybe this should be dev_info() or dev_dbg().
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-> +static int
-> +yt921x_mbus_int_write(struct mii_bus *mbus, int port, int reg, u16 data)
-> +{
-> +	struct yt921x_priv *priv = mbus->priv;
-> +	int res;
-> +
-> +	if (port >= YT921X_PORT_NUM)
-> +		return 0;
-
--ENODEV.
-
-> +yt921x_mbus_int_init(struct yt921x_priv *priv, struct device_node *mnp)
-> +{
-> +	struct device *dev = to_device(priv);
-> +	struct mii_bus *mbus;
-> +	int res;
-> +
-> +	if (!mnp)
-> +		res = devm_mdiobus_register(dev, mbus);
-> +	else
-> +		res = devm_of_mdiobus_register(dev, mbus, mnp);
-
-You can call devm_of_mdiobus_register() with a NULL pointer for the
-OF, and it will do the correct thing.
-
-> +static int yt921x_extif_wait(struct yt921x_priv *priv)
-> +{
-> +	u32 val;
-> +	int res;
-> +
-> +	res = yt921x_reg_read(priv, YT921X_EXT_MBUS_OP, &val);
-> +	if (res)
-> +		return res;
-> +	if ((val & YT921X_MBUS_OP_START) != 0) {
-> +		res = read_poll_timeout(yt921x_reg_read, res,
-> +					(val & YT921X_MBUS_OP_START) == 0,
-> +					YT921X_POLL_SLEEP_US,
-> +					YT921X_POLL_TIMEOUT_US,
-> +					true, priv, YT921X_EXT_MBUS_OP, &val);
-> +		if (res)
-> +			return res;
-> +	}
-> +
-> +	return 0;
-
-In mv88e6xxx, we have the generic mv88e6xxx_wait_mask() and on top of
-that mv88e6xxx_wait_bit(). That allows us to have register specific
-wait functions as one liners. Please consider something similar.
-
-> +static int yt921x_mib_read(struct yt921x_priv *priv, int port, void *data)
-> +{
-
-As far as i can see, data is always a pointer to struct
-yt921x_mib_raw. I would be better to not have the void in the middle.
-It also makes it clearer what assumption you are making about the
-layout of that structure.
-
-> +	unsigned char *buf = data;
-> +	int res = 0;
-> +
-> +	for (size_t i = 0; i < sizeof(struct yt921x_mib_raw);
-> +	     i += sizeof(u32)) {
-> +		res = yt921x_reg_read(priv, YT921X_MIBn_DATA0(port) + i,
-> +				      (u32 *)&buf[i]);
-> +		if (res)
-> +			break;
-> +	}
-> +	return res;
-> +}
-> +
-> +static void yt921x_poll_mib(struct work_struct *work)
-> +{
-> +	struct yt921x_port *pp = container_of_const(work, struct yt921x_port,
-> +						    mib_read.work);
-> +	struct yt921x_priv *priv = (void *)(pp - pp->index) -
-> +				   offsetof(struct yt921x_priv, ports);
-
-Can you make container_of() work for this?
-
-> +	unsigned long delay = YT921X_STATS_INTERVAL_JIFFIES;
-> +	struct device *dev = to_device(priv);
-> +	struct yt921x_mib *mib = &pp->mib;
-> +	struct yt921x_mib_raw raw;
-> +	int port = pp->index;
-> +	int res;
-> +
-> +	yt921x_reg_lock(priv);
-> +	res = yt921x_mib_read(priv, port, &raw);
-> +	yt921x_reg_unlock(priv);
-> +
-> +	if (res) {
-> +		dev_err(dev, "Failed to %s port %d: %i\n", "read stats for",
-> +			port, res);
-> +		delay *= 4;
-> +		goto end;
-> +	}
-> +
-> +	spin_lock(&pp->stats_lock);
-> +
-> +	/* Handle overflow of 32bit MIBs */
-> +	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-> +		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
-> +		u32 *rawp = (u32 *)((u8 *)&raw + desc->offset);
-> +		u64 *valp = &((u64 *)mib)[i];
-> +		u64 newval;
-> +
-> +		if (desc->size > 1) {
-> +			newval = ((u64)rawp[0] << 32) | rawp[1];
-> +		} else {
-> +			newval = (*valp & ~(u64)U32_MAX) | *rawp;
-> +			if (*rawp < (u32)*valp)
-> +				newval += (u64)1 << 32;
-> +		}
-
-There are way too many casts here. Think about your types, and how you
-can remove some of these casts. In general, casts are bad, and should
-be avoided where possible.
-
-> +static void
-> +yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
-> +{
-> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
-> +	struct yt921x_port *pp = &priv->ports[port];
-> +	struct yt921x_mib *mib = &pp->mib;
-> +	size_t j;
-> +
-> +	spin_lock(&pp->stats_lock);
-> +
-> +	j = 0;
-> +	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-> +		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
-> +
-> +		if (!desc->unstructured)
-> +			continue;
-> +
-> +		data[j] = ((u64 *)mib)[i];
-> +		j++;
-> +	}
->
-
-ethtool APIs are called in a context where you can block. So it would
-be good to updated the statistics first before copying them. You just
-need to think about your locking in case the worker is running.
-
-> +static int yt921x_dsa_get_sset_count(struct dsa_switch *ds, int port, int sset)
-> +{
-> +	int cnt;
-> +
-> +	if (sset != ETH_SS_STATS)
-> +		return 0;
-> +
-> +	cnt = 0;
-
-Please do the zeroing above when you declare the local variable.
-
-> +	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-> +		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
-> +
-> +		if (desc->unstructured)
-> +			cnt++;
-> +	}
-> +
-> +	return cnt;
-> +}
-
-> +static int
-> +yt921x_set_eee(struct yt921x_priv *priv, int port, struct ethtool_keee *e)
-> +{
-
-> +	/* Enable / disable port EEE */
-> +	res = yt921x_reg_toggle_bits(priv, YT921X_EEE_CTRL,
-> +				     YT921X_EEE_CTRL_ENn(port), enable);
-> +	if (res)
-> +		return res;
-> +	res = yt921x_reg_toggle_bits(priv, YT921X_EEEn_VAL(port),
-> +				     YT921X_EEE_VAL_DATA, enable);
-
-How do these two different registers differ? Why are there two of
-them? Maybe add a comment to explain this.
-
-> +static bool yt921x_dsa_support_eee(struct dsa_switch *ds, int port)
-> +{
-> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
-> +
-> +	return (priv->pon_strap_cap & YT921X_PON_STRAP_EEE) != 0;
-
-What does the strapping actually tell you?
-
-> +static int
-> +yt921x_dsa_port_mirror_add(struct dsa_switch *ds, int port,
-> +			   struct dsa_mall_mirror_tc_entry *mirror,
-> +			   bool ingress, struct netlink_ext_ack *extack)
-> +{
-> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
-> +	u32 ctrl;
-> +	u32 val;
-> +	int res;
-> +
-> +	yt921x_reg_lock(priv);
-> +	do {
-> +		u32 srcs;
-> +		u32 dst;
-> +
-> +		if (ingress)
-> +			srcs = YT921X_MIRROR_IGR_PORTn(port);
-> +		else
-> +			srcs = YT921X_MIRROR_EGR_PORTn(port);
-> +		dst = YT921X_MIRROR_PORT(mirror->to_local_port);
-> +
-> +		res = yt921x_reg_read(priv, YT921X_MIRROR, &val);
-> +		if (res)
-> +			break;
-> +
-> +		/* other mirror tasks & different dst port -> conflict */
-> +		if ((val & ~srcs & (YT921X_MIRROR_EGR_PORTS_M |
-> +				    YT921X_MIRROR_IGR_PORTS_M)) != 0 &&
-> +		    (val & YT921X_MIRROR_PORT_M) != dst) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "Sniffer port is already configured,"
-> +					   " delete existing rules & retry");
-> +			res = -EBUSY;
-> +			break;
-> +		}
-> +
-> +		ctrl = val & ~YT921X_MIRROR_PORT_M;
-> +		ctrl |= srcs;
-> +		ctrl |= dst;
-> +
-> +		if (ctrl != val)
-> +			res = yt921x_reg_write(priv, YT921X_MIRROR, ctrl);
-> +	} while (0);
-
-What does a while (0) loop bring you here?
-
-
-    Andrew
-
----
-pw-bot: cr
 
