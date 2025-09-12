@@ -1,146 +1,153 @@
-Return-Path: <netdev+bounces-222582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516CAB54E84
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:54:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBCF8B54E8E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4BED583291
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:54:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D474B7B3A4B
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89B930E830;
-	Fri, 12 Sep 2025 12:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8E12FC897;
+	Fri, 12 Sep 2025 12:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8Z6AOWz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="KbhEfAN8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DB73081D6;
-	Fri, 12 Sep 2025 12:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E761C2F39CD;
+	Fri, 12 Sep 2025 12:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757681599; cv=none; b=bww1BJyuTJ3EUARWKenK/jJO9LYUiLiJlU70GEmZ+W2cq0QD+jVnZ1q1Qzy9j8WrQc4ol14IX9XB9JJDamuytcgn11Ccc+ETnQZgm5vpdh1rnqkKhhORtJl41rXIkr/BjQa0Oe4RWovYF2ZU7JsRBs17WtsjzCIUoYBPsFrj0ls=
+	t=1757681724; cv=none; b=PjZMCAQNseO2N6oFpw+QGBnes/GceExYrs0wtS8e5SA7OTGVeP/k6hDlDmKHpGwN/ERy69QTXUmV0eVv2i72V7f/6DEy+NqQm23YPgt1RVk3spxAuUIiYdJ0uptf1pdMrRsfpyDIyvAI9fMfXh+SZeNNNuioBIuBv/XkevwHLs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757681599; c=relaxed/simple;
-	bh=HIFJWzHgSq2h9T+HcGgSfW0yc/cfScRA14LNQRiK9cc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J/NsNUAgBft4P+pn80UOsYQZwRUORrr3fhIZ6+gGM3BHJxZD+Rwbl2PasCCTJRYcnXYruaqeh1TaiZLbyGUtzoJynA1RQcjSwraYkrDVgV8b4uboIjV5DKUXD03/Zjg98+2yubl94HHoEFvvDxhWUuLbiuJYqEzn+DxbscZL1YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8Z6AOWz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30517C4CEF7;
-	Fri, 12 Sep 2025 12:53:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757681599;
-	bh=HIFJWzHgSq2h9T+HcGgSfW0yc/cfScRA14LNQRiK9cc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=g8Z6AOWzQtjySqdPEHaBoUe5v1/Dv9qja9uhXY8w63kvwKNts9K9hbvwsBKdsBdQX
-	 yOlOhUn04h6zMWCOiPx/gLkLT+GfZOcuoZFXriEuIh6Sm2FYEVX5iVD6cA6oiWcicw
-	 iR+SFffpnXmwsmqQ2XXkfcVV7mGziQJlVVWzzwiNAoBC638T686YuGy5ZjscHXt1F/
-	 Umw3Z1FnC1hWmvRJgPbWj/rxve520weSJPHFg8pPTLWGSLgOWI7Y5xPPPlYDRHEfqR
-	 vZu0iIT0js5EmGlfB3zCQUAPq1ppOPwP16L1DHY919Zy8INoiVaZq350jZSsa+0bNB
-	 RAU+i5yJ/UreA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 12 Sep 2025 14:52:24 +0200
-Subject: [PATCH net 5/5] selftests: mptcp: sockopt: fix error messages
+	s=arc-20240116; t=1757681724; c=relaxed/simple;
+	bh=4piJL2JD7w/UByN+p8A0BTsfcXslKwY/3YwqSauegn0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=STiPM5iY1WrowupaBE8dilowJ+b3wuCr0uyLddMgtOTMXSKlVLUa0Ql5GCw84YshI3LXh2vQiGcREf2x/Nj/2/Lt6o8kLYQd1uuu1+D+lLbbBfa6sQ6ZUO6HV9QCXYfSCT6cfWnIPo3FVi+KZcWk9v6uZJbQWb7/M6EHexYzCWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=KbhEfAN8; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=6scNEiCwQDhpiTGreKSN8tOQ3odhAtWxi6tg8cuj+Pk=; b=KbhEfAN88WcM4pD441bT2l6Pa1
+	23flmmlVtXb4d/OfaU+RBRGolmVniBWbCzoiGQUwB5r3WhnnaMr8RYY+D3naKECyvQhkVw817d2iy
+	JSzir0qe4MxEkeVAUGhaTAt5ATR9/yj01IeY7UQGzzHX29VdwRSXJ1qS51q44OO2dEmuyO/RMFIOy
+	waB+6mwaoGhA/I0K7eh4Dw4Wd3YKU6LgKyjy4h6JWHzJQfn2wi/kWbtv8moGnEuqdKeCCprlJ7D/7
+	3hGFjLBh/my8YIFhU8TvsiQJJLAviSSF9zAlwQcLAN6Z93n4TdFBSz2cBSd+WWkWJTN6v7JsU8EXx
+	KV5iBH5w==;
+Received: from [122.175.9.182] (port=50898 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1ux3J7-000000025Qs-1rx5;
+	Fri, 12 Sep 2025 08:55:17 -0400
+From: Parvathi Pudi <parvathi@couthit.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	ssantosh@kernel.org,
+	richardcochran@gmail.com,
+	m-malladi@ti.com,
+	s.hauer@pengutronix.de,
+	afd@ti.com,
+	jacob.e.keller@intel.com,
+	kory.maincent@bootlin.com,
+	johan@kernel.org,
+	alok.a.tiwari@oracle.com,
+	m-karicheri2@ti.com,
+	s-anna@ti.com,
+	horms@kernel.org,
+	glaroque@baylibre.com,
+	saikrishnag@marvell.com,
+	diogo.ivo@siemens.com,
+	javier.carrasco.cruz@gmail.com,
+	basharath@couthit.com,
+	parvathi@couthit.com,
+	pmohan@couthit.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	vadim.fedorenko@linux.dev,
+	bastien.curutchet@bootlin.com,
+	pratheesh@ti.com,
+	prajith@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com
+Subject: [PATCH net-next v16 6/6] MAINTAINERS: Add entries for ICSSM Ethernet driver
+Date: Fri, 12 Sep 2025 18:23:01 +0530
+Message-ID: <20250912125421.530286-7-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250912104741.528721-1-parvathi@couthit.com>
+References: <20250912104741.528721-1-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250912-net-mptcp-pm-uspace-deny_join_id0-v1-5-40171884ade8@kernel.org>
-References: <20250912-net-mptcp-pm-uspace-deny_join_id0-v1-0-40171884ade8@kernel.org>
-In-Reply-To: <20250912-net-mptcp-pm-uspace-deny_join_id0-v1-0-40171884ade8@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
- Florian Westphal <fw@strlen.de>, Kishen Maloor <kishen.maloor@intel.com>, 
- Shuah Khan <shuah@kernel.org>, Dmytro Shytyi <dmytro@shytyi.net>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <geliang@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3129; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=cpAk7g4LSetFcO9JBtJAi95qFs0Yx7aiWJZhlHLpHW0=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKOiK+aMkFTyfvr8xUhDedv9i339Nu+JdOh5Nne1tL3i
- rZBzsUnOkpZGMS4GGTFFFmk2yLzZz6v4i3x8rOAmcPKBDKEgYtTACZSwsrIcKl97c+l3yM9V9q8
- P35s5s5otp8pm//+2GvmE5q4+pnNRWdGhj2RyrqJNwoerXiw5VfhnwWrv2ZM/2KkbFdolS75W+F
- HBD8A
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+Add an entry to MAINTAINERS file for the ICSSM Ethernet driver with
+appropriate maintainer information and mailing list.
 
-This patch fixes several issues in the error reporting of the MPTCP sockopt
-selftest:
-
-1. Fix diff not printed: The error messages for counter mismatches had
-   the actual difference ('diff') as argument, but it was missing in the
-   format string. Displaying it makes the debugging easier.
-
-2. Fix variable usage: The error check for 'mptcpi_bytes_acked' incorrectly
-   used 'ret2' (sent bytes) for both the expected value and the difference
-   calculation. It now correctly uses 'ret' (received bytes), which is the
-   expected value for bytes_acked.
-
-3. Fix off-by-one in diff: The calculation for the 'mptcpi_rcv_delta' diff
-   was 's.mptcpi_rcv_delta - ret', which is off-by-one. It has been
-   corrected to 's.mptcpi_rcv_delta - (ret + 1)' to match the expected
-   value in the condition above it.
-
-Fixes: 5dcff89e1455 ("selftests: mptcp: explicitly tests aggregate counters")
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
 ---
- tools/testing/selftests/net/mptcp/mptcp_sockopt.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ MAINTAINERS | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.c b/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
-index e934dd26a59d9b50445d61e8b8013ce3c8d2a8a0..112c07c4c37a3c827290a0b06d6307abca98c849 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
-+++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
-@@ -667,22 +667,26 @@ static void process_one_client(int fd, int pipefd)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c930a961435e..47bc35743f22 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -25319,6 +25319,18 @@ S:	Maintained
+ F:	Documentation/devicetree/bindings/net/ti,icss*.yaml
+ F:	drivers/net/ethernet/ti/icssg/*
  
- 	do_getsockopts(&s, fd, ret, ret2);
- 	if (s.mptcpi_rcv_delta != (uint64_t)ret + 1)
--		xerror("mptcpi_rcv_delta %" PRIu64 ", expect %" PRIu64, s.mptcpi_rcv_delta, ret + 1, s.mptcpi_rcv_delta - ret);
-+		xerror("mptcpi_rcv_delta %" PRIu64 ", expect %" PRIu64 ", diff %" PRId64,
-+		       s.mptcpi_rcv_delta, ret + 1, s.mptcpi_rcv_delta - (ret + 1));
- 
- 	/* be nice when running on top of older kernel */
- 	if (s.pkt_stats_avail) {
- 		if (s.last_sample.mptcpi_bytes_sent != ret2)
--			xerror("mptcpi_bytes_sent %" PRIu64 ", expect %" PRIu64,
-+			xerror("mptcpi_bytes_sent %" PRIu64 ", expect %" PRIu64
-+			       ", diff %" PRId64,
- 			       s.last_sample.mptcpi_bytes_sent, ret2,
- 			       s.last_sample.mptcpi_bytes_sent - ret2);
- 		if (s.last_sample.mptcpi_bytes_received != ret)
--			xerror("mptcpi_bytes_received %" PRIu64 ", expect %" PRIu64,
-+			xerror("mptcpi_bytes_received %" PRIu64 ", expect %" PRIu64
-+			       ", diff %" PRId64,
- 			       s.last_sample.mptcpi_bytes_received, ret,
- 			       s.last_sample.mptcpi_bytes_received - ret);
- 		if (s.last_sample.mptcpi_bytes_acked != ret)
--			xerror("mptcpi_bytes_acked %" PRIu64 ", expect %" PRIu64,
--			       s.last_sample.mptcpi_bytes_acked, ret2,
--			       s.last_sample.mptcpi_bytes_acked - ret2);
-+			xerror("mptcpi_bytes_acked %" PRIu64 ", expect %" PRIu64
-+			       ", diff %" PRId64,
-+			       s.last_sample.mptcpi_bytes_acked, ret,
-+			       s.last_sample.mptcpi_bytes_acked - ret);
- 	}
- 
- 	close(fd);
-
++TI ICSSM ETHERNET DRIVER (ICSSM)
++M:	MD Danish Anwar <danishanwar@ti.com>
++M:	Parvathi Pudi <parvathi@couthit.com>
++R:	Roger Quadros <rogerq@kernel.org>
++R:	Mohan Reddy Putluru <pmohan@couthit.com>
++L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	Documentation/devicetree/bindings/net/ti,icssm*.yaml
++F:	Documentation/devicetree/bindings/net/ti,pruss-ecap.yaml
++F:	drivers/net/ethernet/ti/icssm/*
++
+ TI J721E CSI2RX DRIVER
+ M:	Jai Luthra <jai.luthra@linux.dev>
+ L:	linux-media@vger.kernel.org
 -- 
-2.51.0
+2.43.0
 
 
