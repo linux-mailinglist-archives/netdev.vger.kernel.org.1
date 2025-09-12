@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-222690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF319B55724
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:54:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B21B55723
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F04227B46BD
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:52:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1CFE5682BE
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C328228466A;
-	Fri, 12 Sep 2025 19:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8BC2DECCD;
+	Fri, 12 Sep 2025 19:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kbDd/84n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZK/4lTVy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740542C027F
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58DE2C08CB
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757706840; cv=none; b=l9zkWsBzfxNr5jaODU+Zcf1dID3b03ieVF0C3qUaVvTrX3IlhRRniw4rHZRNJ+9sLjstgk+INR7eSxs0B1o4s0gsnBQSO5BsnM2DfOBOhGZNPGvVEU8yWbMyDOTilyG/54DaVIpwi2aTD/dthmg2ySgY9/o4dPLNXvR1HIJq6e0=
+	t=1757706841; cv=none; b=ig46067FFsUBuldNnzsFTwsfNysrqv47siTksOcI+3DTevx8aBzpXLZ0kgzHzXfQ6qDOZZFBu6+7vCqxg5BcdKSXcuNmPZg5ZbybntMKuYseMsIAY/hsyQ2Aqi/7h4axleeX8D3T0Fa4v9zaU41dLrLBrwXr38F4Dhpnji25v7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757706840; c=relaxed/simple;
-	bh=/Cagp1ejGJLtDHkq62m/CGsX+fy3cFxlMkW0wgB3n0M=;
+	s=arc-20240116; t=1757706841; c=relaxed/simple;
+	bh=TNwvDQajDJwinfMN+rc6pDxOnb11XL5FJGmkglwQ850=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qHmstIQa8gkuoX55Gq53Zbfr841IrklHGW0dsr4nuxzx0NmMbcviqMD0fy0lb0UOTPL3ofZfRPKbvYGLaQsmI15d81aQmaIqDPdS8OzQ5qYYFvnV6sCdG0mpy32KrafgpmWDkLSgNAIKECyR/ptQtb+Bf3w62R7oyOolnTMe/Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kbDd/84n; arc=none smtp.client-ip=209.85.221.47
+	 MIME-Version; b=G+67KXpJhG8zlbj558H1uKCvR4R9JLiQ0nCOwGU89se239M1icHIvI5mJ/iA10V8PnUi7x/SiON7pofMWPAYrcJzc8XL7jus9mLVVXFMcV6fLHxJnNnZGG1rayqc4RIGdCF3dVsXlxfcRXwRkQmHEJojwUzQ0Vqg4/uBEcBv9Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZK/4lTVy; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3e76766a172so929174f8f.0
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:53:57 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3d44d734cabso1831077f8f.3
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:53:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757706836; x=1758311636; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757706837; x=1758311637; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1tBjQATVO5xgZ/yr5nMn7Qw/eeQsWnjOzogH+eIF8tM=;
-        b=kbDd/84nAUyiUCf7ebIch5zkxHCn1zGhzMDolcCdDpYazKtrQpGjm2lo7EWQBeDhhU
-         sxEGuJrob7SwNVkxEYd+duUZjx0+wWelpSv23B9b20Jc/Uo6FJ+Zkf37cmb/6vhRh0t6
-         PkvAHqNp8TxfM5aHMFZkTGp3Q0MnVilKgKVfZzwqRyKhkdCi14H3nrmTwWu8u4qi2rpT
-         PCtKDhneg0Sx6W0xtuc8reWm6yqclPU4UNVXOv5RMPYFgg42Qg4j+0fevcyTG44KMKd3
-         kbpjAYj9U+VphQPIGziyy6Fy9uVNJU7DSygulJdYZQkFQN2RC5OYqUnl+HSNdIzsjX1/
-         Fspg==
+        bh=OPWRU5hljCQOOfEb+EXXggcIU6tx3t1+caDvvYD1FG4=;
+        b=ZK/4lTVy470vdkEKBTDhMdyDfMbEWwSBfi1lTrG4QJPdfey2vUSJ6mXgFT3MybT/ER
+         NORB5QnzL/Up63RSAenU8IybMdzgtWO6ZoUusqX2JoYbHQNRj2dxRW+21DjlnN8E+cAk
+         AxFGS9f5cHniLWeGhodRMJI5LZR1pzqu5v73FYbC8YF9udKHzy1dxBRbLu3pYJKiHKG3
+         S5DfrCTuk1QR4ZWTwf0IMO2Sm2HGovWSc+mJeUp6V/o0NysE9diq5bjn94WiPll1/PZO
+         eIZc3AKjXsfcKnsBAPOYtPybiOM5IBasn8+iWatkD5VakG4x+jUykblvxccSaO5pcLeZ
+         nSkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757706836; x=1758311636;
+        d=1e100.net; s=20230601; t=1757706837; x=1758311637;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1tBjQATVO5xgZ/yr5nMn7Qw/eeQsWnjOzogH+eIF8tM=;
-        b=R4W2fcFHb10Eaqe09yq9oEyGhs+RfrvfoKj0+Ual1x2RFKXbp2siodXsmnauV9rjux
-         i4DMX/Gg3SACxqd8TYU1G4w8fl7P5YzGsBPGq8JKxhYqR8CHNpkbWBSmWUDtZKeIATXG
-         VhKwOFvSnPfNgmvszzqWS6zBpD+YzwYmOv5UPymtiPUlK0oq/tom2WWS3ZLsw+DYT/XX
-         fTRsX/UsehKUfxkFguCRYZsNi49Vesc/imQ8wykWbN47IDi4dtrdc5FypHHH2rsWmJKv
-         f9atgtTq4zlNSJynWPRbCGRIxtnulgLIofa3jl8UIYlbgRG6hAchsHs+yXyLf/NqfRbv
-         gI4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWRobLrea7Ym0K1Iic80yTV5pAe6L9vv8IAaG9PLcBxDxZQGY//a8wFiMQCE69sTEAbbe+asVg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT1anHpetOkNSa+q4/FmcEZ+PkT186cADaUMMkUvV3ZuSfRUA3
-	gflz2CIbzgkgJjMCPgI1aVbMdeET9nzLAGQiiuuzN+LYZAeymizIw+WK
-X-Gm-Gg: ASbGncvpEKR6/5nDb+iZW0ESpv+oOvMmLMWAKhnmKy3QcLtmovDENUWRr9REMuUYObj
-	4fXySk9hpPaTFY4zwrBdd0VA5qTbx068uQpHiYHhEHbMVodq3w4sPHI05eMbuamqltlQX7CYdtm
-	OIS5Te6pl8JCrQDfe8jSC0mmP5n90LFMSoKBzqe0ApgphTtJmp+nelWUmxLh/9a7jOZX8ap7+77
-	fw6R381+oSLSDpVAvOtEtcZ+4VZvz/iA1tcuQFCSPZD5TkX/cpJhCkWqQ7cOGTKJYyzJKnfnemr
-	7nl2ny8n9Xzqti6OIWZjFuNhU4jKM7zkXh75a/ujKeDUkwEl/qyKogumivWaPolVTMDSKXQGMW3
-	F21cjL7Yr/59cWppjKHUlKnbjCiT+zisItvcgDIAdJFBXt5/vj3lGTagRg3TX6oZHM27C464V
-X-Google-Smtp-Source: AGHT+IGcBKOgx53Jm65PzbAADPlQfjhpj7kfAQIi9dZIUIhMC1gDPjWogKL7/mHKeareCdzLDUBraw==
-X-Received: by 2002:a05:6000:2c04:b0:3d7:cd09:ae1e with SMTP id ffacd0b85a97d-3e7657975f2mr4308727f8f.17.1757706835502;
-        Fri, 12 Sep 2025 12:53:55 -0700 (PDT)
+        bh=OPWRU5hljCQOOfEb+EXXggcIU6tx3t1+caDvvYD1FG4=;
+        b=k54M6muRM81EpT2Yv1VMYV9+JBi9LE91d+EpL0BhnhFcZQ21R/gc0wtM7HicQYeEYl
+         gaJmLoPFGVNDPI4vCMRxuS1bNXSGDok8E4g6SWSgsFPck3AzWWRFGPaTe5Tl6jlq8lge
+         TmoG6Zc4L2PjJBmmO3wEbC04WaIKrba3JETn8hrdSAxwOaxLKSYB+BDLfGHGvrIbb8fz
+         rNtTPcQq0nMXV6Uo7Pvg7iniotIX2CGMl5zq82sST37oG3M65a3lcaF+pxGpEs786af8
+         ZXPmAf9mPrIOrJV40gyQPsTWtVlDri2do6PlmMZlr18VDjHu1hRypFNbVXaw1Ol9NECc
+         FiRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXlyUuTJrH3iT6rmP2GuuONgnAxLJWn/GQlahULpq70jja3t5iejg+XFBBRNbXS8V3LzHCyWfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/HzVbVHEQzqPcLdSUO25/CODvZro7QvOXlJzy8YyrckOCCyzD
+	vzUxcJ+1b51yHftpPvUNkmfp3h8laAXTIFOpxPmw52Hv4bRD/bwdOtYr
+X-Gm-Gg: ASbGncsTaCyZvoJ4PRJgyOEXAS6IbieFeW5IW1cD8Ko8V/zwYvzT0eg+YUNa1goXQSP
+	GDhMA76/2e5Kten9Ro94sVmZb8yCLYja7cOBnnM/IvtzVQLY8regU9w9wyJuSUGzSxd5CMF1/9f
+	gyobjPqVBtvZWCVhfpuWCIb9+dHSn/SMyLXD0RTNoSFOJUvBeLaAJFSovHgG2pjjIw5czKep7eW
+	THoKGwgUeP2xpAlVM1FPEzmYUyc2pCb3QeJDUqYTb241T2O1VWbZx0ktczmCQnoEYvp+SDvsWna
+	58XPxy9YEODfaHrWWbDBRv5Hh0zXMKHguyf6Ix9e6Kvfeb4hugq614nSZQUYb5cO+jutVEd6Gz3
+	6307YZJ3a3Y10w3lrS9spMB6563d1UKraCf/tg7DDkSWj5G8dibhO83zDLUCZ4A==
+X-Google-Smtp-Source: AGHT+IHVc0vSQuTGul1kjR1NEWN+wdKOnJm4ZMECOAgedHoMAITsiioS4A+FpNwFGvjZtFNBcl9gaQ==
+X-Received: by 2002:a5d:5d8a:0:b0:3dc:eb5:51f6 with SMTP id ffacd0b85a97d-3e7659d37b9mr4149963f8f.39.1757706836871;
+        Fri, 12 Sep 2025 12:53:56 -0700 (PDT)
 Received: from yanesskka.. (node-188-187-35-212.domolink.tula.net. [212.35.187.188])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.53.54
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.53.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 12:53:55 -0700 (PDT)
+        Fri, 12 Sep 2025 12:53:56 -0700 (PDT)
 From: Yana Bashlykova <yana2bsh@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>
 Cc: Yana Bashlykova <yana2bsh@gmail.com>,
@@ -82,9 +82,9 @@ Cc: Yana Bashlykova <yana2bsh@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	lvc-project@linuxtesting.org
-Subject: [PATCH 6.1 02/15] genetlink: add TEST_GENL family for netlink testing
-Date: Fri, 12 Sep 2025 22:53:25 +0300
-Message-Id: <20250912195339.20635-3-yana2bsh@gmail.com>
+Subject: [PATCH 6.1 03/15] genetlink: add PARALLEL_GENL test family
+Date: Fri, 12 Sep 2025 22:53:26 +0300
+Message-Id: <20250912195339.20635-4-yana2bsh@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250912195339.20635-1-yana2bsh@gmail.com>
 References: <20250912195339.20635-1-yana2bsh@gmail.com>
@@ -96,225 +96,215 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement basic Generic Netlink family with:
-- 4 commands (ECHO, SET/GET_VALUE, NO_ATTRS)
-- 1 small command (genl_small_ops)
+Implement PARALLEL_GENL Generic Netlink family with:
+- Parallel operations support (parallel dump)
+- 4 commands (SEND, DUMP_INFO, SET/GET_VALUE)
+- Command with reject policy
+- Advanced attribute types (binary, nested, flags)
 - Multicast group support
-- Attribute validation
-- Mutex-protected operations
-- Error handling with netlink_ext_ack
+- Proper error handling
 
 Signed-off-by: Yana Bashlykova <yana2bsh@gmail.com>
 ---
- .../net-pf-16-proto-16-family-PARALLEL_GENL.c | 438 +++++++++++++++++-
- 1 file changed, 431 insertions(+), 7 deletions(-)
+ .../net-pf-16-proto-16-family-PARALLEL_GENL.c | 547 +++++++++++++++++-
+ 1 file changed, 544 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c b/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
-index c50c0daae392..69bcad98babc 100644
+index 69bcad98babc..17f869ece2d6 100644
 --- a/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
 +++ b/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
-@@ -71,17 +71,16 @@ static ssize_t show_genl_test_message(struct kobject *kobj,
+@@ -71,7 +71,7 @@ static ssize_t show_genl_test_message(struct kobject *kobj,
  
  static ssize_t store_genl_test_message(struct kobject *kobj,
  				       struct kobj_attribute *attr,
--				       const char *buf, size_t count)
-+					   const char *buf, size_t count)
+-					   const char *buf, size_t count)
++				       const char *buf, size_t count)
  {
--	size_t len = min(count, sizeof(sysfs_data.genl_test_message) - 1);
-+		size_t len = min(count, sizeof(sysfs_data.genl_test_message) - 1);
+ 		size_t len = min(count, sizeof(sysfs_data.genl_test_message) - 1);
  
--	strncpy(sysfs_data.genl_test_message, buf, len);
--	sysfs_data.genl_test_message[len] = '\0';
--	return count;
-+		strncpy(sysfs_data.genl_test_message, buf, len);
-+		sysfs_data.genl_test_message[len] = '\0';
-+		return count;
- }
+@@ -150,9 +150,12 @@ static DEFINE_MUTEX(genl_mutex);
+ #define MY_GENL_FAMILY_NAME "TEST_GENL"
+ #define MY_GENL_VERSION 1
  
--static ssize_t show_genl_test_value(struct kobject *kobj,
--				    struct kobj_attribute *attr, char *buf)
-+static ssize_t show_genl_test_value(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
- {
- 	return sprintf(buf, "%d", sysfs_data.genl_test_value);
- }
-@@ -146,6 +145,424 @@ static struct kobj_attribute my_attr_str_parallel_genl =
- static struct kobj_attribute my_attr_str_third_genl =
- 	__ATTR(message, 0664, show_third_genl_message, store_third_genl_message);
++#define PARALLEL_GENL_FAMILY_NAME "PARALLEL_GENL"
++
+ #define PATH_GENL_TEST_NUM "/sys/kernel/genl_test/value"
+ #define PATH_GENL_TEST_MES "/sys/kernel/genl_test/message"
+ #define PATH_GENL_TEST_DEV "/sys/kernel/genl_test/some_info"
++#define PATH_PARALLEL_GENL_MES "/sys/kernel/parallel_genl/message"
  
-+static DEFINE_MUTEX(genl_mutex);
+ // TEST_GENL
+ enum {
+@@ -200,6 +203,8 @@ static const struct nla_policy my_genl_policy[MY_GENL_ATTR_MAX + 1] = {
+ /* netlink families */
+ static struct genl_family my_genl_family;
+ 
++static struct genl_family my_genl_family_parallel;
 +
-+#define MY_GENL_FAMILY_NAME "TEST_GENL"
-+#define MY_GENL_VERSION 1
-+
-+#define PATH_GENL_TEST_NUM "/sys/kernel/genl_test/value"
-+#define PATH_GENL_TEST_MES "/sys/kernel/genl_test/message"
-+#define PATH_GENL_TEST_DEV "/sys/kernel/genl_test/some_info"
-+
-+// TEST_GENL
+ enum my_multicast_groups {
+ 	MY_MCGRP_GENL,
+ };
+@@ -544,6 +549,534 @@ static struct genl_family my_genl_family = {
+ 	.n_mcgrps = ARRAY_SIZE(genl_mcgrps),
+ };
+ 
++// PARALLEL_GENL family
 +enum {
-+	MY_GENL_ATTR_UNSPEC,
-+	MY_GENL_ATTR_DATA,
-+	MY_GENL_ATTR_VALUE,
-+	MY_GENL_ATTR_PATH,
-+	MY_GENL_ATTR_NESTED,
-+	__MY_GENL_ATTR_MAX,
++	PARALLEL_GENL_ATTR_UNSPEC,
++	PARALLEL_GENL_ATTR_DATA,
++	PARALLEL_GENL_ATTR_BINARY,
++	PARALLEL_GENL_ATTR_NAME,
++	PARALLEL_GENL_ATTR_DESC,
++	PARALLEL_GENL_ATTR_BITFIELD32,
++	PARALLEL_GENL_ATTR_SIGN_NUM,
++	PARALLEL_GENL_ATTR_ARRAY,
++	PARALLEL_GENL_ATTR_NESTED,
++	PARALLEL_GENL_ATTR_FLAG_NONBLOCK,
++	PARALLEL_GENL_ATTR_FLAG_BLOCK,
++	PARALLEL_GENL_ATTR_REJECT,
++	PARALLEL_GENL_ATTR_PATH,
++	__PARALLEL_GENL_ATTR_MAX,
 +};
 +
-+#define MY_GENL_ATTR_MAX (__MY_GENL_ATTR_MAX - 1)
-+
-+enum {
-+	MY_GENL_CMD_UNSPEC,
-+	MY_GENL_CMD_ECHO,
-+	MY_GENL_CMD_SET_VALUE,
-+	MY_GENL_CMD_GET_VALUE,
-+	MY_GENL_CMD_EVENT,
-+	MY_GENL_CMD_NO_ATTRS,
-+	__MY_GENL_CMD_MAX,
-+};
-+
-+#define MY_GENL_CMD_MAX (__MY_GENL_CMD_MAX - 1)
++#define PARALLEL_GENL_ATTR_MAX (__PARALLEL_GENL_ATTR_MAX - 1)
 +
 +enum {
-+	MY_GENL_SMALL_CMD_GET,
-+	MY_GENL_SMALL_CMD_ERROR,
-+	__MY_GENL_SMALL_CMD_MAX,
++	PARALLEL_GENL_CMD_UNSPEC,
++	PARALLEL_GENL_CMD_SEND,
++	PARALLEL_GENL_CMD_DUMP_INFO,
++	PARALLEL_GENL_CMD_SET_VALUE,
++	PARALLEL_GENL_CMD_GET_VALUE,
++	__PARALLEL_GENL_CMD_MAX,
 +};
 +
-+#define MY_GENL_SMALL_CMD_MAX (__MY_GENL_SMALL_CMD_MAX - 1)
++#define PARALLEL_GENL_CMD_MAX (__PARALLEL_GENL_CMD_MAX - 1)
 +
-+static const struct nla_policy my_genl_policy[MY_GENL_ATTR_MAX + 1] = {
-+	[MY_GENL_ATTR_UNSPEC] = { .type = NLA_UNSPEC },
-+	[MY_GENL_ATTR_DATA] = { .type = NLA_STRING },
-+	[MY_GENL_ATTR_VALUE] = { .type = NLA_U32,
-+				 .validation_type = NLA_VALIDATE_RANGE,
-+				 .min = 0,
-+				 .max = 100 },
-+	[MY_GENL_ATTR_PATH] = { .type = NLA_STRING },
-+	[MY_GENL_ATTR_NESTED] = { .type = NLA_NESTED },
++static const struct nla_policy parallel_genl_policy[PARALLEL_GENL_ATTR_MAX +
++						    1] = {
++	[PARALLEL_GENL_ATTR_UNSPEC] = { .type = NLA_UNSPEC },
++	[PARALLEL_GENL_ATTR_DATA] = { .type = NLA_STRING },
++	[PARALLEL_GENL_ATTR_BINARY] = { .type = NLA_BINARY },
++	[PARALLEL_GENL_ATTR_NAME] = { .type = NLA_NUL_STRING },
++	[PARALLEL_GENL_ATTR_DESC] = { .type = NLA_NUL_STRING },
++	[PARALLEL_GENL_ATTR_BITFIELD32] = { .type = NLA_BITFIELD32 },
++	[PARALLEL_GENL_ATTR_SIGN_NUM] = { .type = NLA_S32,
++					  .validation_type = NLA_VALIDATE_RANGE,
++					  .min = -100,
++					  .max = 100 },
++	[PARALLEL_GENL_ATTR_ARRAY] = { .type = NLA_NESTED_ARRAY },
++	[PARALLEL_GENL_ATTR_NESTED] = { .type = NLA_NESTED },
++	[PARALLEL_GENL_ATTR_FLAG_NONBLOCK] = { .type = NLA_FLAG },
++	[PARALLEL_GENL_ATTR_FLAG_BLOCK] = { .type = NLA_FLAG },
++	[PARALLEL_GENL_ATTR_REJECT] = { .type = NLA_REJECT },
++	[PARALLEL_GENL_ATTR_PATH] = { .type = NLA_STRING },
 +};
 +
-+/* netlink families */
-+static struct genl_family my_genl_family;
-+
-+enum my_multicast_groups {
-+	MY_MCGRP_GENL,
-+};
-+
-+static const struct genl_multicast_group genl_mcgrps[] = {
-+	[MY_MCGRP_GENL] = { .name = "MY_MCGRP_GENL", },
-+};
-+
-+static int my_genl_pre_doit(const struct genl_ops *ops, struct sk_buff *skb,
-+			    struct genl_info *info)
-+{
-+	mutex_lock(&genl_mutex);
-+	return 0;
-+}
-+
-+static void my_genl_post_doit(const struct genl_ops *ops, struct sk_buff *skb,
-+			      struct genl_info *info)
-+{
-+	mutex_unlock(&genl_mutex);
-+}
-+
-+static void my_genl_mcast_msg(struct sk_buff *mcast_skb, struct genl_info *info)
-+{
-+	if (info) {
-+		genl_notify(&my_genl_family, mcast_skb, info, MY_MCGRP_GENL,
-+			    GFP_KERNEL);
-+	} else {
-+		genlmsg_multicast(&my_genl_family, mcast_skb, 0, MY_MCGRP_GENL,
-+				  GFP_KERNEL);
-+	}
-+}
-+
-+// Functions for Generic Netlink TEST_GENL family
-+static int my_genl_echo(struct sk_buff *skb, struct genl_info *info)
++static int parallel_genl_send(struct sk_buff *skb, struct genl_info *info)
 +{
 +	struct sk_buff *msg;
-+	void *data;
++	void *reply;
 +	int ret;
 +	char *str;
 +
-+	if (info->nlhdr->nlmsg_flags & NLM_F_ECHO) {
-+		msg = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+		if (!msg)
-+			return -ENOMEM;
++	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
 +
-+		data = genlmsg_put_reply(msg, info, &my_genl_family, 0,
-+					 MY_GENL_CMD_ECHO);
-+		if (!data)
-+			goto error;
++	if (!msg)
++		return -ENOMEM;
 +
-+		str = "Hello to mcast groups!";
++	reply = genlmsg_put_reply(msg, info, &my_genl_family, 0,
++				  info->genlhdr->cmd);
++	if (!reply)
++		goto error;
 +
-+		strcpy(sysfs_data.genl_test_message, str);
++	str = "NEW family - parallel_genl";
 +
-+		ret = nla_put_string(msg, MY_GENL_ATTR_DATA, str);
-+		if (ret < 0)
-+			goto error;
++	strcpy(sysfs_data.parallel_genl_message, str);
 +
-+		genlmsg_end(msg, data);
-+
-+		my_genl_mcast_msg(msg, info);
++	if (nla_put_string(msg, PARALLEL_GENL_ATTR_DATA, str)) {
++		nlmsg_free(msg);
++		pr_err("%s: Error with putting value to PARALLEL_GENL_ATTR_DATA\n", __func__);
++		return -EMSGSIZE;
 +	}
++
++	genlmsg_end(msg, reply);
++
++	if (nla_get_flag(info->attrs[PARALLEL_GENL_ATTR_FLAG_NONBLOCK]))
++		goto overrun_nonblock;
++	if (nla_get_flag(info->attrs[PARALLEL_GENL_ATTR_FLAG_BLOCK]))
++		goto overrun_block;
++
++	return genlmsg_reply(msg, info);
++
++error:
++	ret = -EMSGSIZE;
++	nlmsg_free(msg);
++	return ret;
++
++overrun_nonblock:
++	skb->sk->sk_sndtimeo = 1000;
++	ret = netlink_unicast(skb->sk, msg, info->snd_portid, 1);
++	if (ret < 0)
++		return ret;
 +
 +	return 0;
 +
-+error:
-+	nlmsg_free(msg);
-+	return -EMSGSIZE;
++overrun_block:
++	ret = netlink_unicast(skb->sk, msg, info->snd_portid, 0);
++	if (ret < 0)
++		return ret;
++
++	return 0;
 +}
 +
-+static int my_genl_set_value(struct sk_buff *skb, struct genl_info *info)
++static int parallel_genl_set_str_value(struct sk_buff *skb,
++				       struct genl_info *info)
 +{
 +	struct sk_buff *msg;
 +	void *msg_head;
 +	struct nlattr *na_path;
 +	struct nlattr *na_value;
 +	char *sysfs_path;
-+	u32 new_value;
++	char *new_value = NULL;
 +	int err;
-+	int code;
-+	struct netlink_ext_ack *extack;
-+	struct nlattr *attr;
-+	struct nlmsghdr *nlh;
-+	char cookie[NETLINK_MAX_COOKIE_LEN];
++	int data_len;
 +
-+	if (!info->attrs[MY_GENL_ATTR_VALUE]) {
-+		pr_info("%s: Missing MY_GENL_ATTR_VALUE\n", __func__);
++	if (!info->attrs[PARALLEL_GENL_ATTR_DATA]) {
++		pr_info("%s: Missing PARALLEL_GENL_ATTR_DATA\n", __func__);
 +		return -EINVAL;
 +	}
 +
-+	na_value = info->attrs[MY_GENL_ATTR_VALUE];
-+	new_value = nla_get_u32(na_value);
++	na_value = info->attrs[PARALLEL_GENL_ATTR_DATA];
++	data_len = nla_len(na_value);
 +
-+	if (new_value != 0 && new_value != 1) {
-+		pr_err("%s: New value is incorrect\n", __func__);
-+		goto error;
-+	}
++	new_value = kmalloc(data_len + 1, GFP_KERNEL);
++	if (!new_value)
++		return -ENOMEM;
 +
-+	na_path = info->attrs[MY_GENL_ATTR_PATH];
++	strncpy(new_value, nla_data(na_value), data_len);
++	new_value[data_len] = '\0';
++
++	na_path = info->attrs[PARALLEL_GENL_ATTR_PATH];
 +	if (!na_path) {
-+		pr_info("%s: Missing MY_GENL_ATTR_PATH\n", __func__);
++		pr_info("%s: Missing PARALLEL_GENL_ATTR_PATH\n", __func__);
 +		return -EINVAL;
 +	}
 +	sysfs_path = nla_data(na_path);
 +
-+	sysfs_data.genl_test_value = new_value;
++	strcpy(sysfs_data.parallel_genl_message, new_value);
 +
 +	msg = genlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
 +	if (!msg)
 +		return -ENOMEM;
 +
 +	msg_head = genlmsg_put(msg, info->snd_portid, info->snd_seq,
-+			       &my_genl_family, 0, MY_GENL_CMD_SET_VALUE);
++			       &my_genl_family_parallel, 0,
++			       PARALLEL_GENL_CMD_SET_VALUE);
 +	if (!msg_head) {
 +		nlmsg_free(msg);
 +		return -ENOMEM;
 +	}
 +
-+	if (nla_put_u32(msg, MY_GENL_ATTR_VALUE, new_value)) {
++	if (nla_put_string(msg, PARALLEL_GENL_ATTR_DATA, new_value)) {
 +		genlmsg_cancel(msg, msg_head);
 +		nlmsg_free(msg);
 +		return -EMSGSIZE;
@@ -329,37 +319,18 @@ index c50c0daae392..69bcad98babc 100644
 +		return err;
 +	}
 +
++	kfree(new_value);
 +	return 0;
-+
-+error:
-+	// sending error ACK
-+	code = -EINVAL;
-+
-+	extack = kmalloc(sizeof(*extack), GFP_KERNEL);
-+	if (!extack)
-+		return -ENOMEM;
-+
-+	strcpy(cookie, "000001");
-+	extack->_msg = "Incorrect value from userspace";
-+	extack->bad_attr = na_value;
-+	extack->policy = my_genl_policy;
-+	extack->cookie_len = strlen(cookie);
-+	extack->miss_type = MY_GENL_ATTR_VALUE;
-+	extack->miss_nest = attr;
-+
-+	nlh = nlmsg_hdr(skb);
-+	netlink_ack(skb, nlh, code, extack);
-+	pr_info("%s: Message with TLV was sent\n", __func__);
-+	return -EINVAL;
 +}
 +
-+static int my_genl_get_value(struct sk_buff *skb, struct genl_info *info)
++static int parallel_genl_get_str_value(struct sk_buff *skb,
++				       struct genl_info *info)
 +{
 +	struct sk_buff *msg;
 +	void *msg_head;
 +	struct nlattr *na_path;
 +	char *sysfs_path;
-+	u32 value;
++	char *value;
 +	int err;
 +	int code;
 +
@@ -368,31 +339,37 @@ index c50c0daae392..69bcad98babc 100644
 +		return -ENOMEM;
 +
 +	msg_head = genlmsg_put(msg, info->snd_portid, info->snd_seq,
-+			       &my_genl_family, 0, MY_GENL_CMD_GET_VALUE);
++			       &my_genl_family_parallel, 0,
++			       PARALLEL_GENL_CMD_GET_VALUE);
 +	if (!msg_head) {
 +		nlmsg_free(msg);
 +		return -ENOMEM;
 +	}
 +
-+	if (!info->attrs[MY_GENL_ATTR_PATH]) {
++	if (!info->attrs[PARALLEL_GENL_ATTR_PATH]) {
 +		nlmsg_free(msg);
 +		return -EINVAL;
 +	}
 +	genl_unlock();
-+	na_path = info->attrs[MY_GENL_ATTR_PATH];
++	na_path = info->attrs[PARALLEL_GENL_ATTR_PATH];
 +	sysfs_path = nla_data(na_path);
 +	genl_lock();
 +
-+	if (strcmp(sysfs_path, PATH_GENL_TEST_NUM) != 0) {
++	if (strcmp(sysfs_path, PATH_PARALLEL_GENL_MES) != 0) {
 +		pr_err("%s: Incorrect path: %s\n", __func__, sysfs_path);
 +		goto error;
 +	}
 +
-+	value = sysfs_data.genl_test_value;
++	value = kmalloc(MAX_DATA_LEN, GFP_KERNEL);
++	if (!value)
++		return -ENOMEM;
 +
-+	if (nla_put_u32(msg, MY_GENL_ATTR_VALUE, value)) {
++	strcpy(value, sysfs_data.parallel_genl_message);
++
++	if (nla_put_string(msg, PARALLEL_GENL_ATTR_DATA, value)) {
 +		genlmsg_cancel(msg, msg_head);
 +		nlmsg_free(msg);
++		kfree(value);
 +		return -EMSGSIZE;
 +	}
 +
@@ -401,188 +378,342 @@ index c50c0daae392..69bcad98babc 100644
 +	if (info) {
 +		err = genlmsg_reply(msg, info);
 +		if (err != 0) {
-+			pr_err("%s: Error in genlmsg_reply, err=%d\n", __func__, err);
++			pr_err("%s: Error in genlmsg_reply, err=%d\n",
++			       __func__, err);
 +			nlmsg_free(msg);
++			kfree(value);
 +			return err;
 +		}
 +	}
++	kfree(value);
 +
 +	return 0;
 +
 +error:
-+	code = -EINVAL;
++	nlmsg_free(msg);
++	code = -ENOENT;
 +	netlink_set_err(skb->sk, 0, MY_MCGRP_GENL, code);
-+	return -EINVAL;
++	return -ENOENT;
 +}
 +
-+static int my_genl_no_attrs(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct sk_buff *msg;
-+	void *msg_head;
-+	int ret;
-+	char *str;
++struct parallel_data {
++	char *name;
++	char *desc;
++};
 +
-+	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!msg)
++struct parallel_data data[] = {
++	{ "TEST_GENL", "one" },
++	{ "PARALLEL_GENL", "two" },
++	{ "THIRD_GENL", "three" },
++	{ "LARGE_GENL", "four" },
++};
++
++#define DATA_SIZE ARRAY_SIZE(data)
++
++static int parallel_genl_dump_start(struct netlink_callback *cb)
++{
++	pr_info("%s: Dump is started", __func__);
++	return 0;
++}
++
++static int __parallel_genl_fill_info(struct parallel_data *info,
++				     struct sk_buff *msg)
++{
++	if (nla_put_string(msg, PARALLEL_GENL_ATTR_NAME, info->name) ||
++	    nla_put_string(msg, PARALLEL_GENL_ATTR_DESC, info->desc))
++		return -EMSGSIZE;
++
++	return 0;
++}
++
++static int __parallel_genl_dump_element(struct parallel_data *info, u32 portid,
++					u32 seq, u32 flags, struct sk_buff *skb,
++					u8 cmd)
++{
++	void *hdr;
++
++	hdr = genlmsg_put(skb, portid, seq, &my_genl_family_parallel, flags,
++			  cmd);
++	if (!hdr)
 +		return -ENOMEM;
 +
-+	msg_head = genlmsg_put_reply(msg, info, &my_genl_family, 0,
-+				     info->genlhdr->cmd);
-+	if (!msg_head)
-+		goto error;
++	if (__parallel_genl_fill_info(info, skb) < 0)
++		goto nla_put_failure;
 +
-+	str = "Reply from GENL_TEST family function with no attrs";
++	genlmsg_end(skb, hdr);
++	return 0;
 +
-+	strcpy(sysfs_data.genl_test_message, str);
++nla_put_failure:
++	genlmsg_cancel(skb, hdr);
++	return -EMSGSIZE;
++}
 +
-+	if (nla_put_string(msg, MY_GENL_ATTR_DATA, str)) {
-+		pr_err("%s: Error with putting value to MY_GENL_ATTR_DATA\n", __func__);
-+		goto error;
++static int parallel_genl_dump_info(struct sk_buff *skb,
++				   struct netlink_callback *cb)
++{
++	int ret;
++	int idx = cb->args[0];
++
++	for (;;) {
++		if (idx >= DATA_SIZE)
++			return 0;
++
++		ret = __parallel_genl_dump_element(&data[idx],
++						   NETLINK_CB(cb->skb).portid,
++						   cb->nlh->nlmsg_seq,
++						   NLM_F_MULTI, skb,
++						   PARALLEL_GENL_CMD_DUMP_INFO);
++
++		if (ret) {
++			pr_err("%s: __parallel_genl_dump_element failed: %d\n", __func__, ret);
++			return ret;
++		}
++
++		cb->args[0]++;
++		idx++;
 +	}
 +
-+	genlmsg_end(msg, msg_head);
-+	return genlmsg_reply(msg, info);
-+
-+error:
-+	ret = -EMSGSIZE;
-+	nlmsg_free(msg);
 +	return ret;
 +}
 +
-+// Generic Netlink operations for TEST_GENL family
-+static const struct genl_ops my_genl_ops[] = {
++static int parallel_genl_dump_done(struct netlink_callback *cb)
++{
++	pr_info("%s: Dump is done", __func__);
++	return 0;
++}
++
++// Generic Netlink operations for PARALLEL_GENL family
++static const struct genl_ops parallel_genl_ops[] = {
 +	{
-+		.cmd = MY_GENL_CMD_ECHO,
++		.cmd = PARALLEL_GENL_CMD_SEND,
 +		.flags = 0,
-+		.policy = my_genl_policy,
-+		.doit = my_genl_echo,
++		.policy = parallel_genl_policy,
++		.doit = parallel_genl_send,
 +		.dumpit = NULL,
 +	},
 +	{
-+		.cmd = MY_GENL_CMD_SET_VALUE,
-+		.policy = my_genl_policy,
-+		.doit = my_genl_set_value,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = MY_GENL_CMD_GET_VALUE,
++		.cmd = PARALLEL_GENL_CMD_DUMP_INFO,
 +		.flags = 0,
-+		.policy = my_genl_policy,
-+		.doit = my_genl_get_value,
-+		.dumpit = NULL,
++		.policy = parallel_genl_policy,
++		.start = parallel_genl_dump_start,
++		.dumpit = parallel_genl_dump_info,
++		.done = parallel_genl_dump_done,
 +	},
 +	{
-+		.cmd = MY_GENL_CMD_NO_ATTRS,
++		.cmd = PARALLEL_GENL_CMD_SET_VALUE,
 +		.flags = 0,
 +		.policy = NULL,
-+		.doit = my_genl_no_attrs,
++		.doit = parallel_genl_set_str_value,
 +		.dumpit = NULL,
 +	},
-+};
-+
-+static int my_genl_small_cmd_get(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct sk_buff *msg;
-+	void *reply;
-+	int ret;
-+	char *str;
-+
-+	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!msg)
-+		return -ENOMEM;
-+
-+	reply = genlmsg_put_reply(msg, info, &my_genl_family, 0,
-+				  info->genlhdr->cmd);
-+	if (!reply)
-+		goto error;
-+
-+	str = "IT'S ME from kernel";
-+
-+	strcpy(sysfs_data.genl_test_message, str);
-+
-+	if (nla_put_string(msg, MY_GENL_ATTR_DATA, str)) {
-+		nlmsg_free(msg);
-+		pr_err("%s: Error with putting value to MY_GENL_ATTR_DATA\n", __func__);
-+		return -EMSGSIZE;
-+	}
-+
-+	genlmsg_end(msg, reply);
-+	return genlmsg_reply(msg, info);
-+
-+error:
-+	ret = -EMSGSIZE;
-+	nlmsg_free(msg);
-+	return ret;
-+}
-+
-+static const struct genl_small_ops my_genl_small_ops[] = {
 +	{
-+		.cmd = MY_GENL_SMALL_CMD_GET,
-+		.doit = my_genl_small_cmd_get,
++		.cmd = PARALLEL_GENL_CMD_GET_VALUE,
++		.flags = GENL_UNS_ADMIN_PERM,
++		.policy = parallel_genl_policy,
++		.doit = parallel_genl_get_str_value,
 +	},
 +};
 +
-+// genl_family struct for TEST_GENL family
-+static struct genl_family my_genl_family = {
-+	.hdrsize = 0,
-+	.name = MY_GENL_FAMILY_NAME,
-+	.version = MY_GENL_VERSION,
-+	.maxattr = MY_GENL_ATTR_MAX,
-+	.netnsok = true,
-+	.pre_doit = my_genl_pre_doit,
-+	.post_doit = my_genl_post_doit,
-+	.ops = my_genl_ops,
-+	.n_ops = ARRAY_SIZE(my_genl_ops),
-+	.small_ops = my_genl_small_ops,
-+	.n_small_ops = ARRAY_SIZE(my_genl_small_ops),
-+	.policy = my_genl_policy,
-+	.mcgrps = genl_mcgrps,
-+	.n_mcgrps = ARRAY_SIZE(genl_mcgrps),
++enum my_multicast_many_groups_two {
++	MCGRP_TWO_1,
++	MCGRP_TWO_2,
++	MCGRP_TWO_3,
++	MCGRP_TWO_4,
++	MCGRP_TWO_5,
++	MCGRP_TWO_6,
++	MCGRP_TWO_7,
++	MCGRP_TWO_8,
++	MCGRP_TWO_9,
++	MCGRP_TWO_10,
++	MCGRP_TWO_11,
++	MCGRP_TWO_12,
++	MCGRP_TWO_13,
++	MCGRP_TWO_14,
++	MCGRP_TWO_15,
++	MCGRP_TWO_16,
++	MCGRP_TWO_17,
++	MCGRP_TWO_18,
++	MCGRP_TWO_19,
++	MCGRP_TWO_20,
++	MCGRP_TWO_21,
++	MCGRP_TWO_22,
++	MCGRP_TWO_23,
++	MCGRP_TWO_24,
++	MCGRP_TWO_25,
++	MCGRP_TWO_26,
++	MCGRP_TWO_27,
++	MCGRP_TWO_28,
++	MCGRP_TWO_29,
++	MCGRP_TWO_30,
++	MCGRP_TWO_31,
++	MCGRP_TWO_32,
++	MCGRP_TWO_33,
++	MCGRP_TWO_34,
++	MCGRP_TWO_35,
++	MCGRP_TWO_36,
++	MCGRP_TWO_37,
++	MCGRP_TWO_38,
++	MCGRP_TWO_39,
++	MCGRP_TWO_40,
++	MCGRP_TWO_41,
++	MCGRP_TWO_42,
++	MCGRP_TWO_43,
++	MCGRP_TWO_44,
++	MCGRP_TWO_45,
++	MCGRP_TWO_46,
++	MCGRP_TWO_47,
++	MCGRP_TWO_48,
++	MCGRP_TWO_49,
++	MCGRP_TWO_50,
++	MCGRP_TWO_51,
++	MCGRP_TWO_52,
++	MCGRP_TWO_53,
++	MCGRP_TWO_54,
++	MCGRP_TWO_55,
++	MCGRP_TWO_56,
++	MCGRP_TWO_57,
++	MCGRP_TWO_58,
++	MCGRP_TWO_59,
++	MCGRP_TWO_60,
++	MCGRP_TWO_61,
++	MCGRP_TWO_62,
++	MCGRP_TWO_63,
++	MCGRP_TWO_64,
++	MCGRP_TWO_65,
++	MCGRP_TWO_66,
++	MCGRP_TWO_67,
++	MCGRP_TWO_68,
++	MCGRP_TWO_69,
 +};
 +
-+static int __init init_netlink(void)
-+{
-+	int rc;
++static const struct genl_multicast_group genl_many_mcgrps_two[] = {
++	[MCGRP_TWO_1] = { .name = "MCGRP_TWO_1", },
++	[MCGRP_TWO_2] = { .name = "MCGRP_TWO_2", },
++	[MCGRP_TWO_3] = { .name = "MCGRP_TWO_3", },
++	[MCGRP_TWO_4] = { .name = "MCGRP_TWO_4", },
++	[MCGRP_TWO_5] = { .name = "MCGRP_TWO_5", },
++	[MCGRP_TWO_6] = { .name = "MCGRP_TWO_6", },
++	[MCGRP_TWO_7] = { .name = "MCGRP_TWO_7", },
++	[MCGRP_TWO_8] = { .name = "MCGRP_TWO_8", },
++	[MCGRP_TWO_9] = { .name = "MCGRP_TWO_9", },
++	[MCGRP_TWO_10] = { .name = "MCGRP_TWO_10", },
++	[MCGRP_TWO_11] = { .name = "MCGRP_TWO_11", },
++	[MCGRP_TWO_12] = { .name = "MCGRP_TWO_12", },
++	[MCGRP_TWO_13] = { .name = "MCGRP_TWO_13", },
++	[MCGRP_TWO_14] = { .name = "MCGRP_TWO_14", },
++	[MCGRP_TWO_15] = { .name = "MCGRP_TWO_15", },
++	[MCGRP_TWO_16] = { .name = "MCGRP_TWO_16", },
++	[MCGRP_TWO_17] = { .name = "MCGRP_TWO_17", },
++	[MCGRP_TWO_18] = { .name = "MCGRP_TWO_18", },
++	[MCGRP_TWO_19] = { .name = "MCGRP_TWO_19", },
++	[MCGRP_TWO_20] = { .name = "MCGRP_TWO_20", },
++	[MCGRP_TWO_21] = { .name = "MCGRP_TWO_21", },
++	[MCGRP_TWO_22] = { .name = "MCGRP_TWO_22", },
++	[MCGRP_TWO_23] = { .name = "MCGRP_TWO_23", },
++	[MCGRP_TWO_24] = { .name = "MCGRP_TWO_24", },
++	[MCGRP_TWO_25] = { .name = "MCGRP_TWO_25", },
++	[MCGRP_TWO_26] = { .name = "MCGRP_TWO_26", },
++	[MCGRP_TWO_27] = { .name = "MCGRP_TWO_27", },
++	[MCGRP_TWO_28] = { .name = "MCGRP_TWO_28", },
++	[MCGRP_TWO_29] = { .name = "MCGRP_TWO_29", },
++	[MCGRP_TWO_30] = { .name = "MCGRP_TWO_30", },
++	[MCGRP_TWO_31] = { .name = "MCGRP_TWO_31", },
++	[MCGRP_TWO_32] = { .name = "MCGRP_TWO_32", },
++	[MCGRP_TWO_33] = { .name = "MCGRP_TWO_33", },
++	[MCGRP_TWO_34] = { .name = "MCGRP_TWO_34", },
++	[MCGRP_TWO_35] = { .name = "MCGRP_TWO_35", },
++	[MCGRP_TWO_36] = { .name = "MCGRP_TWO_36", },
++	[MCGRP_TWO_37] = { .name = "MCGRP_TWO_37", },
++	[MCGRP_TWO_38] = { .name = "MCGRP_TWO_38", },
++	[MCGRP_TWO_39] = { .name = "MCGRP_TWO_39", },
++	[MCGRP_TWO_40] = { .name = "MCGRP_TWO_40", },
++	[MCGRP_TWO_41] = { .name = "MCGRP_TWO_41", },
++	[MCGRP_TWO_42] = { .name = "MCGRP_TWO_42", },
++	[MCGRP_TWO_43] = { .name = "MCGRP_TWO_43", },
++	[MCGRP_TWO_44] = { .name = "MCGRP_TWO_44", },
++	[MCGRP_TWO_45] = { .name = "MCGRP_TWO_45", },
++	[MCGRP_TWO_46] = { .name = "MCGRP_TWO_46", },
++	[MCGRP_TWO_47] = { .name = "MCGRP_TWO_47", },
++	[MCGRP_TWO_48] = { .name = "MCGRP_TWO_48", },
++	[MCGRP_TWO_49] = { .name = "MCGRP_TWO_49", },
++	[MCGRP_TWO_50] = { .name = "MCGRP_TWO_50", },
++	[MCGRP_TWO_51] = { .name = "MCGRP_TWO_51", },
++	[MCGRP_TWO_52] = { .name = "MCGRP_TWO_52", },
++	[MCGRP_TWO_53] = { .name = "MCGRP_TWO_53", },
++	[MCGRP_TWO_54] = { .name = "MCGRP_TWO_54", },
++	[MCGRP_TWO_55] = { .name = "MCGRP_TWO_55", },
++	[MCGRP_TWO_56] = { .name = "MCGRP_TWO_56", },
++	[MCGRP_TWO_57] = { .name = "MCGRP_TWO_57", },
++	[MCGRP_TWO_58] = { .name = "MCGRP_TWO_58", },
++	[MCGRP_TWO_59] = { .name = "MCGRP_TWO_59", },
++	[MCGRP_TWO_60] = { .name = "MCGRP_TWO_60", },
++	[MCGRP_TWO_61] = { .name = "MCGRP_TWO_61", },
++	[MCGRP_TWO_62] = { .name = "MCGRP_TWO_62", },
++	[MCGRP_TWO_63] = { .name = "MCGRP_TWO_63", },
++	[MCGRP_TWO_64] = { .name = "MCGRP_TWO_64", },
++	[MCGRP_TWO_65] = { .name = "MCGRP_TWO_65", },
++	[MCGRP_TWO_66] = { .name = "MCGRP_TWO_66", },
++	[MCGRP_TWO_67] = { .name = "MCGRP_TWO_67", },
++	[MCGRP_TWO_68] = { .name = "MCGRP_TWO_68", },
++	[MCGRP_TWO_69] = { .name = "MCGRP_TWO_69", },
++};
 +
-+	pr_info("%s: My module. Initializing Netlink\n", __func__);
++// genl_family struct for PARALLEL_GENL family
++static struct genl_family my_genl_family_parallel = {
++	.hdrsize = 0,
++	.name = PARALLEL_GENL_FAMILY_NAME,
++	.version = 1,
++	.maxattr = PARALLEL_GENL_ATTR_MAX,
++	.netnsok = true,
++	.parallel_ops = true,
++	.ops = parallel_genl_ops,
++	.n_ops = ARRAY_SIZE(parallel_genl_ops),
++	/** .policy = parallel_genl_policy,
++	 *  needs to delete policy from family to test reject policy
++	 */
++	.resv_start_op = PARALLEL_GENL_CMD_DUMP_INFO + 1,
++	.mcgrps = genl_many_mcgrps_two,
++	.n_mcgrps = ARRAY_SIZE(genl_many_mcgrps_two),
++};
 +
-+	rc = genl_register_family(&my_genl_family);
+ static int __init init_netlink(void)
+ {
+ 	int rc;
+@@ -556,8 +1089,16 @@ static int __init init_netlink(void)
+ 		goto failure_1;
+ 	}
+ 
++	rc = genl_register_family(&my_genl_family_parallel);
 +	if (rc) {
 +		pr_err("%s: Failed to register Generic Netlink family\n", __func__);
-+		goto failure_1;
++		goto failure_2;
 +	}
-+
-+	return 0;
-+
-+failure_1:
-+	pr_debug("%s: My module. Error occurred in %s\n", __func__, __func__);
-+	return rc;
-+}
-+
- static int __init init_sysfs_third_genl(void)
- {
- 	int ret;
-@@ -253,6 +670,11 @@ static int __init module_netlink_init(void)
- 	if (ret)
- 		goto err_sysfs;
- 
-+	ret = init_netlink();
-+	if (ret)
-+		goto err_sysfs;
-+	pr_info("%s: New families are registered\n", __func__);
 +
  	return 0;
  
- err_sysfs:
-@@ -271,6 +693,8 @@ static int __init module_netlink_init(void)
++failure_2:
++	genl_unregister_family(&my_genl_family);
+ failure_1:
+ 	pr_debug("%s: My module. Error occurred in %s\n", __func__, __func__);
+ 	return rc;
+@@ -599,8 +1140,7 @@ static int __init init_sysfs_parallel_genl(void)
+ 		return -ENOMEM;
+ 	}
  
+-	ret = sysfs_create_file(kobj_parallel_genl,
+-				&my_attr_str_parallel_genl.attr);
++	ret = sysfs_create_file(kobj_parallel_genl, &my_attr_str_parallel_genl.attr);
+ 	if (ret) {
+ 		pr_err("%s: Failed to create sysfs file\n", __func__);
+ 		goto err_sysfs;
+@@ -694,6 +1234,7 @@ static int __init module_netlink_init(void)
  static void __exit module_netlink_exit(void)
  {
-+	genl_unregister_family(&my_genl_family);
-+
+ 	genl_unregister_family(&my_genl_family);
++	genl_unregister_family(&my_genl_family_parallel);
+ 
  	sysfs_remove_file(kobj_genl_test, &my_attr_u32_genl_test.attr);
  	sysfs_remove_file(kobj_genl_test, &my_attr_str_genl_test.attr);
- 	device_remove_file(dev_genl_test, &dev_attr_info_genl_test);
 -- 
 2.34.1
 
