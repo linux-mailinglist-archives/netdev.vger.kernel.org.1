@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-222370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3B1BB53FF7
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:43:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AAEEB54005
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3550F1C8297B
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:43:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D93735A59EA
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090C517A2F6;
-	Fri, 12 Sep 2025 01:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A35188580;
+	Fri, 12 Sep 2025 01:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uL2lHga7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWsNbdkJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C2415C0;
-	Fri, 12 Sep 2025 01:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABAC15747D
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 01:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757641410; cv=none; b=IwfdyBlOwQZmOEeCYIa64ZZYsd10zgVYddb1r3BZbSTL9G+lopSUuLraQJqXhE1OMaU9yJ/OF+I1vO/LO4zn4YKrBR7lrea9LOnkRKLZjJSzaWZEW8iTuA3RP0Hlg1eTrEOor1DLeBNS0z7Ng4Pr9kN9dmRIBOkfBZYXm0QgXKk=
+	t=1757642108; cv=none; b=goq1AC53EeZUhGy2cOHcs0cpvs4pL5I2ExCV90qAL8f5QM0/31DxOZ/ksHL/ubXZo6YjbmxNd11KSbL/WdoVLPwWxL2FjOGGacZBAmoBLrRa4pCLmDBhTPVQbKVhlxaXJ5kVVkhXiRbSJSQU7o5Mwf4Kv9tyT7++YZkyATnOulU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757641410; c=relaxed/simple;
-	bh=oVjZI9vyqzeUh4xUrL+0OX408bLyDcaaLWFzVRBXa5c=;
+	s=arc-20240116; t=1757642108; c=relaxed/simple;
+	bh=5a1jEIztMLYNtjBJ73gZ8z7N7ZBItwfbbwqIexbercM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DweDn+DmMmwlYeKG09khRpnSJe351OX6s1hv4YRG82OofD1FBMuws69cuA55gShyHPtWXgmnyqaBe3JDPLoDSgfAH1E64n5OaND8MtvkRkVX6HPA49eFzfHKJRAXYcG9pwYpZM5hlYTgyVzg+Q11rZleGLss+/w9au5RlxeWJKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uL2lHga7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA488C4CEF0;
-	Fri, 12 Sep 2025 01:43:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BTkLj+xtBciDjIJMpcCAmvHEwZ+1tGV+OELHGD9YK7jogQMK6qlxQlEoF6UelVKDyr+GfAbUVgWQ778SMiugZrICNPrQ5dvQ8fiqpbDAe9USijfmzuCVW6PVO5uMoAwpxQwyM/v+ZBTZayW5mmztnykv3ty49MU4OOKUuWb/p0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWsNbdkJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C77F7C4CEF0;
+	Fri, 12 Sep 2025 01:55:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757641410;
-	bh=oVjZI9vyqzeUh4xUrL+0OX408bLyDcaaLWFzVRBXa5c=;
+	s=k20201202; t=1757642108;
+	bh=5a1jEIztMLYNtjBJ73gZ8z7N7ZBItwfbbwqIexbercM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uL2lHga7ZJPnDGI2KadMLRDlhZjvIwdx7Pofa297bjS8qizF+qOZxPpgn18uTrOxL
-	 5OE7CbUIvBImVft25p5TIAdsMSzb7qtMcwkUOcbOYFljktGR1hP5yxQDWaJxeQN9Uu
-	 JkrhFORlvYA4PkcGfwjqdvNTslGhbYd9FHfMFIRBXmKS4xzGTHgTz6k46IBSKqeKj6
-	 OFds7B43uH6duAUFMucx3HP1acWeX/IEDGjboJUgnV/t9SRnz+BD+0oKFepyDupD9n
-	 Q8qfdB9B5AFuGCbGzW8kkmkVMOMihG0zCJYnDMZ6BVc7Iuib20UzJ+Tu48WSvz+dQo
-	 MXyhw3T/Ri+Jg==
-Date: Thu, 11 Sep 2025 18:43:29 -0700
+	b=IWsNbdkJ+w9kAJ1vDn3eAkXyOWDesKAnjJPTGFV44rbzEEP4nt/hcHvNe1g/LiyK+
+	 V6cvnEMzuzJGANnK7QvGtZ9m5kfTcVDjqiqYWbAsZqecAbOkQVX6WbANYmUKrr2F/t
+	 GhkEjt2O5hcAOUulA4OGo86PcE6DhJNEGTEEvc8m70kzMD7CtIFJrISYCvEkKgqaEb
+	 v5bsPHhx1JosKOn4T5Tebd9YkGzuDH/htQFimilNwr6WbfUNkU5YEEVZmpJenmjo+l
+	 E3N/OAXey7ehx5/gwgttbEgym/Ch0CQfUdafayhiGMolaOeB8zqwVO3Xqmuq3kA5cd
+	 dVqgUVPkWYuZQ==
+Date: Thu, 11 Sep 2025 18:55:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH net-next] dt-bindings: net: Drop duplicate
- brcm,bcm7445-switch-v4.0.txt
-Message-ID: <20250911184329.2992ad3a@kernel.org>
-In-Reply-To: <20250909142339.3219200-2-robh@kernel.org>
-References: <20250909142339.3219200-2-robh@kernel.org>
+To: Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Marcin Wojtas
+ <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2] net: mvneta: add support for hardware
+ timestamps
+Message-ID: <20250911185506.6ee85d94@kernel.org>
+In-Reply-To: <E1uwKHe-00000004glk-3nkJ@rmk-PC.armlinux.org.uk>
+References: <E1uwKHe-00000004glk-3nkJ@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,17 +63,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  9 Sep 2025 09:23:38 -0500 Rob Herring (Arm) wrote:
-> The brcm,bcm7445-switch-v4.0.txt binding is already covered by
-> dsa/brcm,sf2.yaml. The listed deprecated properties aren't used anywhere
-> either.
+On Wed, 10 Sep 2025 13:50:46 +0100 Russell King wrote:
+> Subject: [PATCH net-next v2] net: mvneta: add support for hardware timestamps
+> Date: Wed, 10 Sep 2025 13:50:46 +0100
+> Sender: Russell King <rmk@armlinux.org.uk>
 > 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
->  .../bindings/net/brcm,bcm7445-switch-v4.0.txt | 50 -------------------
->  1 file changed, 50 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/brcm,bcm7445-switch-v4.0.txt
+> Add support for hardware timestamps in (e.g.) the PHY by calling
 
-cc: Florian
+These are _software_ timestamps.. (in the subject as well)
 
+Fixed when applying.
 
