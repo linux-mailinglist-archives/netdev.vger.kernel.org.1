@@ -1,275 +1,221 @@
-Return-Path: <netdev+bounces-222637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88EE4B55391
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:30:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CBB8B55397
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 859553A81B1
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CB0F3B5ADC
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A3B3126C5;
-	Fri, 12 Sep 2025 15:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E8030EF91;
+	Fri, 12 Sep 2025 15:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fejmX1cB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TuJhZwGg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088341FDA61
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 15:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9C419ABD8
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 15:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757691022; cv=none; b=FTuvHbCdEae6/fp4IerLUw05s5r8SmB7LLxJuVyCoFFXOhI0XpSIji/VtPKAg7uhILsxoFZ5LdJQj3Y+j5tyZ0Rf9DApo6jAVnz49dnyfEoCwu+ChJf3bPGjdACYNz2dBUR9XSOZTYTlJ/jV7hieLErhDwkuKxnp4CdCkcuDpoU=
+	t=1757691033; cv=none; b=gMacD7mCyGbYYB69ZlQgSqa1b1/gbrb6Ng0zlNzXDoTQeW2tDT4d/6QpFLTQmhgVYSKc+cSd18ei+ViC9as3Xv2JuitJnZxfKFaPXN/CgCU2axcHDMARfUnSsnfa+APtq2IYRJHE1CXoXeKi3Xg+cVNH4W3jOw66/eeBRbRhl/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757691022; c=relaxed/simple;
-	bh=xG0xQio8EPzsul4Ghf8rz0UL2N3MlY4xJdVEYnW3vwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y9wxelQ8UA+BULvtjYKBn8QcS8yGitqcJXFzI2bQf3b8gQq+TcDnDqWwx90IxNl7/ZzXPdVpjW3SB7cJzdYm8jehQTaxSnHBVwVsiBe0GKKzuOkG5QxNYOZ2nJ5qAGFrD9tSd8PH8DLlR+GFd+CPqNR3tY3oSAZjc9mf5e35URg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fejmX1cB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757691020;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P1U2VojtPokeUk+tdxQA3A5MwzgzqZJ7HiBkhr5RCN8=;
-	b=fejmX1cBqkzun5uJyEGLHjXSM49MfWVISG6NvgqVjQbISgE2/Qmp7pzkMYtspEcopwtCH9
-	q1nBMLUEOdvGwaq7DUY4+9+TPUN5C4hU+uMnLlWNSBh1W/xRQBeufBuG1btEaVG21bNyYH
-	pjMAutAQ4XV8Ga80TW7hiiwVtX1sIUo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-wEuyZ6EXOdaLSjVttODIAg-1; Fri, 12 Sep 2025 11:30:18 -0400
-X-MC-Unique: wEuyZ6EXOdaLSjVttODIAg-1
-X-Mimecast-MFC-AGG-ID: wEuyZ6EXOdaLSjVttODIAg_1757691017
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45dd56f0000so15511025e9.2
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:30:18 -0700 (PDT)
+	s=arc-20240116; t=1757691033; c=relaxed/simple;
+	bh=JQy2x87irR+6b6G3lHlD+F5xfCP7dwLfGCxleWGHNXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dc2XzFSPJC8AjOMZuS95igcVz9RXV8pgb5WrzGigrHynFom7gPnISCatUp9z0y2hYcyLGwdYnBS8gUb2iRD9hvh+VncTjEfff37y7gIdZJ8PwWwg87QQUES28hjL/SNlvBK5V9E8Z9VjZYGmgnmQgh7eXSIFUePK9I5kIiQAn6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TuJhZwGg; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-afcb7a16441so312793566b.2
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:30:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757691030; x=1758295830; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=EMHcZD7mDT/xOyFARrYbPCbtK2YhAFDuwMRps1CsJQw=;
+        b=TuJhZwGgE1gP3sg8/yjMIZ0GdNsA8/hgJpbXGP44V2JG5Td+GpNH4MTZ+PmyabQ95+
+         ibdPm+lkV5rZiF0zJGHo+HWPFEECzKZbkGbdAEYatjihjJhGCHXGgLMDDXVznDsH6fgh
+         ev8BlwUqSG6vkLHqBRfvWRxkLo3Gc1cObYKXI59TEMprzAs756azmivAWaBT0Ht1idI3
+         QqEu4mUT7FYvTX2NN+tBAK5SlZGOk7QL2U0mfiZMpFBU2eZ7azTQkx+7NpxzY5QnUu28
+         +3cbDvyXLPzZ4+Rjz205fAi11zmhFEjENQlz/GZkeRFXHFEIsAmwlXGGrUcXeMGEXjFj
+         VLQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757691017; x=1758295817;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1U2VojtPokeUk+tdxQA3A5MwzgzqZJ7HiBkhr5RCN8=;
-        b=LaLEf3IzEETxMQc05rx2GDhNLZJWRh6Tfblormof96lMV1R62Qv8DUBNEN72+bDj1b
-         htzCbGVRgdrkoJ+I8aJxVVdNGwLYoPxwwX9xEGHCkwH/ZqJYwLu2hfMPdKV8TbYTaLEr
-         n5R++Z11pkRVYW7TGXN8Ffh6JjxDHmU6Z2JVvBnbZbe2m5eLbqO09br1eMIL99Ogqjz+
-         BaiYvIZahbdhvNEegSfH1Wf4Sz0lGo8bNNkWoJMz6O+yJm/ZVt4A09jlY/Lq4syqgghr
-         SAL7d22pPZ1gjYyqAirqtGnR3AySSOw+vZmAxF/rTGvhQfqLuXQmpNxnrNWyr61r3Sd8
-         1NFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBcB3Fmaspm/ZGISmlCQYkyU18kmur8f5hlr6QyO0Xl8FjMhoyi3Vz4TibviNcD9/uJ6jjtHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvodIg+ImtVDUQuTNWRb7NtBEHruTbkfviJGHCgLDFYtbOEUQ7
-	A3zJuwR52hyWKsHkZGlHdcHQBY8MX86HYiaNMx7IhWmS5zHNIH5oGfyy+/RJ8SWumKv+DjxVmwE
-	Q4jtT8YzdKO0asPf5GFkLKh9Ig7fbhr4vfPy1q471AM47/8RMS6Cx9mtZrg==
-X-Gm-Gg: ASbGncs2dWl07EuVFWKkjI3CCZK8QFin3BSAgV+mI+TVh7xKBXnV88snen8KAi3by98
-	A08bsApoPrXUV/8oyaJzRTebKDKU63jl0k+V2RXuF130pINAB3Kdfn1hx0KAb38i5yP3/NUz7Po
-	fuC7a6vaUOZLr7gfAOnGZAqYD65CMHAZz8oX9mLrkAb77KZ1PrSgzjB5lhrXnrwibNNtm+cRKPe
-	X+DZmtmjBaBgVjkmiaive5kA+J532uMqzs2nbhHlqFQQyNPAXFBGBQWFXKkBAb75Q279SIgcvlt
-	U13WNixa1IOTTMnaZaheQ+9hXoYVLkIbxIY=
-X-Received: by 2002:a05:600c:c4aa:b0:45d:f7f9:9ac7 with SMTP id 5b1f17b1804b1-45f211c4cf0mr42590785e9.6.1757691017210;
-        Fri, 12 Sep 2025 08:30:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHuVm8pd2LL97DReTjaXXQ9ger3Xdm5br919kQs5cKISKVwPT+FYYKJCNez4asltdGHaL4cTA==
-X-Received: by 2002:a05:600c:c4aa:b0:45d:f7f9:9ac7 with SMTP id 5b1f17b1804b1-45f211c4cf0mr42590345e9.6.1757691016755;
-        Fri, 12 Sep 2025 08:30:16 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73e7:4d00:2294:2331:c6cf:2fde])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e015bf73csm34789585e9.11.2025.09.12.08.30.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 08:30:16 -0700 (PDT)
-Date: Fri, 12 Sep 2025 11:30:12 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	"eperezma@redhat.com" <eperezma@redhat.com>,
-	"jonah.palmer@oracle.com" <jonah.palmer@oracle.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH net 2/2] vhost-net: correctly flush batched packet before
- enabling notification
-Message-ID: <20250912112726-mutt-send-email-mst@kernel.org>
-References: <20250912082658.2262-1-jasowang@redhat.com>
- <20250912082658.2262-2-jasowang@redhat.com>
- <20250912044523-mutt-send-email-mst@kernel.org>
- <63426904-881F-4725-96F5-3343389ED170@nutanix.com>
+        d=1e100.net; s=20230601; t=1757691030; x=1758295830;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EMHcZD7mDT/xOyFARrYbPCbtK2YhAFDuwMRps1CsJQw=;
+        b=d/d3syRcXFl716V6EwSz5tR5MX4CpPT3/bwN7MOKQxT2bQ5U22jAhrIrOLGbtUyosI
+         jOeeQaqDocjkALQ4x8cRJv+gZL7+3SvMahChDdVkkCC7NyWuPODkDPKOdS3pkG8bUBwA
+         apGqF+MMjeELpFgpMSkh96Kzw4DaVNWciP9N9EDGt/pi+32MzXWnQSWuQqzgWJIXyWrI
+         0Gm/OI05dz/NWPnQBepKzdkPtwmzihhV488BkOpo4CGV2kA4PbMygRxpt9jVtCN0qPFm
+         lVZ9l5iwvZH74DeyT9vZzy2i0b2N2HzvM+HjRpsEUEHm5Gf32NU7WkmrVtwTHDi3OLJS
+         LrTA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2pRuEZGYh3tKgwuIucB20QMHEteEwsLl6PFBsRKhMw87qv0idSHPiBJYM3B7mQaA2VjbUGgA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrapTwpFbeY3K3R8XOMUQvbxL8/Pl56NrSh5HodtX+mARfp/bi
+	9mhGGsbc/HdjVymOBNAnPOXxq+ZqBlRX22E9FXsv9AHFkdIpSLIBSkMl
+X-Gm-Gg: ASbGncsIWjotvAughbV+qxNcMnq1syGKYe2JpbCDpvODjjAT0sT1JL01zxw1jVl785s
+	QV1wn5wbRIhC4KTh5JR2/fvhp0bGoAFNRF/jnDAGKusRGk3p5bbB0ScBMgv/2MuLLAoKrmi2juc
+	DL3eaE7yzma+CcQx+VdRtw0O563LFp90gVgH5evEe5uL5GnSBZP44KPwfzs/yTa7/s1Q4wTj+8e
+	PHlFYSBmcns1eme6U/s+h7lhz4nVcgHJ75NpwDuiucqIoTuw3Zc0on30b8qAQJ1j2+vy8rHudWX
+	/YVhJKM6qnIB5fCvhzvODvH0opgE2Eh0n70mpUjH/IsbtWqDTIpsbVzxCrwpd66O73487RzI2fw
+	QDmKOwabmf7RIzoi2vtxY5jIeAlpb2WVjfmOQZHPphVRBTUk6d26ofGLseI6Z+irVhVoUAoCjfO
+	QOqAbL0GcC/leUk9RzP3KgI9XV1J0c+VyJvlNuoT8U0yWoi4lhcdA/JJnkb+Zh1Nc8GiaF4A==
+X-Google-Smtp-Source: AGHT+IGi+LCPKpW/YpBXnwXxivvlBHDvPh4aYIKuRGCS4rbRtN70V4+pwA+CTEbLZ1pjd48/o/8Eww==
+X-Received: by 2002:a17:907:944b:b0:b04:21c9:ad83 with SMTP id a640c23a62f3a-b07c3662cf5mr318560166b.52.1757691029481;
+        Fri, 12 Sep 2025 08:30:29 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f09:8900:81f2:fb63:ffd:3c7d? (p200300ea8f09890081f2fb630ffd3c7d.dip0.t-ipconnect.de. [2003:ea:8f09:8900:81f2:fb63:ffd:3c7d])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b07b32dd3e4sm387641666b.54.2025.09.12.08.30.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Sep 2025 08:30:28 -0700 (PDT)
+Message-ID: <cc91f4ab-e5be-4e7c-abcc-9cc399021e23@gmail.com>
+Date: Fri, 12 Sep 2025 17:30:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <63426904-881F-4725-96F5-3343389ED170@nutanix.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] r8169: enable ASPM on Dell platforms
+To: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>, nic_swsd@realtek.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Wang, Crag" <Crag.Wang@dell.com>, "Chen, Alan" <Alan.Chen6@dell.com>,
+ "Alex Shen@Dell" <Yijun.Shen@dell.com>
+References: <20250912072939.2553835-1-acelan.kao@canonical.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20250912072939.2553835-1-acelan.kao@canonical.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 12, 2025 at 03:24:42PM +0000, Jon Kohler wrote:
+On 9/12/2025 9:29 AM, Chia-Lin Kao (AceLan) wrote:
+> Enable PCIe ASPM for RTL8169 NICs on Dell platforms that have been
+> verified to work reliably with this power management feature. The
+> r8169 driver traditionally disables ASPM to prevent random link
+> failures and system hangs on problematic hardware.
 > 
+> Dell has validated these product families to work correctly with
+> RTL NIC ASPM and commits to addressing any ASPM-related issues
+> with RTL hardware in collaboration with Realtek.
 > 
-> > On Sep 12, 2025, at 4:50 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > 
-> > !-------------------------------------------------------------------|
-> >  CAUTION: External Email
-> > 
-> > |-------------------------------------------------------------------!
-> > 
-> > On Fri, Sep 12, 2025 at 04:26:58PM +0800, Jason Wang wrote:
-> >> Commit 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after
-> >> sendmsg") tries to defer the notification enabling by moving the logic
-> >> out of the loop after the vhost_tx_batch() when nothing new is
-> >> spotted. This will bring side effects as the new logic would be reused
-> >> for several other error conditions.
-> >> 
-> >> One example is the IOTLB: when there's an IOTLB miss, get_tx_bufs()
-> >> might return -EAGAIN and exit the loop and see there's still available
-> >> buffers, so it will queue the tx work again until userspace feed the
-> >> IOTLB entry correctly. This will slowdown the tx processing and may
-> >> trigger the TX watchdog in the guest.
-> > 
-> > It's not that it might.
-> > Pls clarify that it *has been reported* to do exactly that,
-> > and add a link to the report.
-> > 
-> > 
-> >> Fixing this by stick the notificaiton enabling logic inside the loop
-> >> when nothing new is spotted and flush the batched before.
-> >> 
-> >> Reported-by: Jon Kohler <jon@nutanix.com>
-> >> Cc: stable@vger.kernel.org
-> >> Fixes: 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after sendmsg")
-> >> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > 
-> > So this is mostly a revert, but with
-> >                     vhost_tx_batch(net, nvq, sock, &msg);
-> > added in to avoid regressing performance.
-> > 
-> > If you do not want to structure it like this (revert+optimization),
-> > then pls make that clear in the message.
-> > 
-> > 
-> >> ---
-> >> drivers/vhost/net.c | 33 +++++++++++++--------------------
-> >> 1 file changed, 13 insertions(+), 20 deletions(-)
-> >> 
-> >> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> >> index 16e39f3ab956..3611b7537932 100644
-> >> --- a/drivers/vhost/net.c
-> >> +++ b/drivers/vhost/net.c
-> >> @@ -765,11 +765,11 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> >> int err;
-> >> int sent_pkts = 0;
-> >> bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
-> >> - bool busyloop_intr;
-> >> bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
-> >> 
-> >> do {
-> >> - busyloop_intr = false;
-> >> + bool busyloop_intr = false;
-> >> +
-> >> if (nvq->done_idx == VHOST_NET_BATCH)
-> >> vhost_tx_batch(net, nvq, sock, &msg);
-> >> 
-> >> @@ -780,10 +780,18 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> >> break;
-> >> /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> >> if (head == vq->num) {
-> >> - /* Kicks are disabled at this point, break loop and
-> >> - * process any remaining batched packets. Queue will
-> >> - * be re-enabled afterwards.
-> >> + /* Flush batched packets before enabling
-> >> + * virqtueue notification to reduce
-> >> + * unnecssary virtqueue kicks.
-> > 
-> > typos: virtqueue, unnecessary
-> > 
-> >> */
-> >> + vhost_tx_batch(net, nvq, sock, &msg);
-> >> + if (unlikely(busyloop_intr)) {
-> >> + vhost_poll_queue(&vq->poll);
-> >> + } else if (unlikely(vhost_enable_notify(&net->dev,
-> >> + vq))) {
-> >> + vhost_disable_notify(&net->dev, vq);
-> >> + continue;
-> >> + }
-> >> break;
-> >> }
+> This change enables ASPM for the following Dell product families:
+> - Alienware
+> - Dell Laptops/Pro Laptops/Pro Max Laptops
+> - Dell Desktops/Pro Desktops/Pro Max Desktops
+> - Dell Pro Rugged Laptops
 > 
-> See my comment below, but how about something like this?
->  		if (head == vq->num) {
-> 			/* Flush batched packets before enabling
-> 			 * virtqueue notification to reduce
-> 			 * unnecessary virtqueue kicks.
-> 			 */
-> 			vhost_tx_batch(net, nvq, sock, &msg);
-> 			if (unlikely(busyloop_intr))
-> 				/* If interrupted while doing busy polling,
-> 				 * requeue the handler to be fair handle_rx
-> 				 * as well as other tasks waiting on cpu.
-> 				 */
-> 				vhost_poll_queue(&vq->poll);
-> 			else
-> 				/* All of our work has been completed;
-> 				 * however, before leaving the TX handler,
-> 				 * do one last check for work, and requeue
-> 				 * handler if necessary. If there is no work,
-> 				 * queue will be reenabled.
-> 				 */
-> 				vhost_net_busy_poll_try_queue(net, vq);
+I'd like to avoid DMI-based whitelists in kernel code. If more system
+vendors do it the same way, then this becomes hard to maintain.
+There is already a mechanism for vendors to flag that they successfully
+tested ASPM. See c217ab7a3961 ("r8169: enable ASPM L1.2 if system vendor
+flags it as safe").
+Last but not least ASPM can be (re-)enabled from userspace, using sysfs.
 
-
-I mean it's functionally equivalent, but vhost_net_busy_poll_try_queue 
-checks the avail ring again and we just checked it.
-Why is this a good idea?
-This happens on good path so I dislike unnecessary work like this.
-
-
->  			break;
->  		}
+> Signed-off-by: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 29 +++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 > 
-> 
-> >> 
-> >> @@ -839,22 +847,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> >> ++nvq->done_idx;
-> >> } while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
-> >> 
-> >> - /* Kicks are still disabled, dispatch any remaining batched msgs. */
-> >> vhost_tx_batch(net, nvq, sock, &msg);
-> >> -
-> >> - if (unlikely(busyloop_intr))
-> >> - /* If interrupted while doing busy polling, requeue the
-> >> - * handler to be fair handle_rx as well as other tasks
-> >> - * waiting on cpu.
-> >> - */
-> >> - vhost_poll_queue(&vq->poll);
-> >> - else
-> >> - /* All of our work has been completed; however, before
-> >> - * leaving the TX handler, do one last check for work,
-> >> - * and requeue handler if necessary. If there is no work,
-> >> - * queue will be reenabled.
-> >> - */
-> >> - vhost_net_busy_poll_try_queue(net, vq);
-> 
-> Note: the use of vhost_net_busy_poll_try_queue was intentional in my
-> patch as it was checking to see both conditionals.
-> 
-> Can we simply hoist my logic up instead?
-> 
-> >> }
-> >> 
-> >> static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
-> >> -- 
-> >> 2.34.1
-> > 
-> 
-> Tested-by: Jon Kohler <jon@nutanix.com <mailto:jon@nutanix.com>>
-> 
-> Tried this out on a 6.16 host / guest that locked up with iotlb miss loop,
-> applied this patch and all was well. 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 9c601f271c02..63e83cf071de 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -5366,6 +5366,32 @@ static void rtl_init_mac_address(struct rtl8169_private *tp)
+>  	rtl_rar_set(tp, mac_addr);
+>  }
+>  
+> +bool rtl_aspm_new_dell_platforms(void)
+> +{
+> +	const char *family = dmi_get_system_info(DMI_PRODUCT_FAMILY);
+> +	static const char * const dell_product_families[] = {
+> +		"Alienware",
+> +		"Dell Laptops",
+> +		"Dell Pro Laptops",
+> +		"Dell Pro Max Laptops",
+> +		"Dell Desktops",
+> +		"Dell Pro Desktops",
+> +		"Dell Pro Max Desktops",
+> +		"Dell Pro Rugged Laptops"
+> +	};
+> +	int i;
+> +
+> +	if (!family)
+> +		return false;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(dell_product_families); i++) {
+> +		if (str_has_prefix(family, dell_product_families[i]))
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  /* register is set if system vendor successfully tested ASPM 1.2 */
+>  static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
+>  {
+> @@ -5373,6 +5399,9 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
+>  	    r8168_mac_ocp_read(tp, 0xc0b2) & 0xf)
+>  		return true;
+>  
+> +	if (rtl_aspm_new_dell_platforms())
+> +		return true;
+> +
+>  	return false;
+>  }
+>  
 
 
