@@ -1,169 +1,153 @@
-Return-Path: <netdev+bounces-222629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E40CB551CB
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:37:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBA5FB551DB
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:38:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BE171895610
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:34:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC0D71896C49
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758593128B7;
-	Fri, 12 Sep 2025 14:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D8B30E84B;
+	Fri, 12 Sep 2025 14:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="m1AbP2Ti"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="auXB7vrt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33A33126C5
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 14:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4551E13BC0C
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 14:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757687393; cv=none; b=sO+8zW7ECTnO4A6iNJaiV+fopmwlnlOemLK1jcpYYTnanu/aXuUC0l1q2ekrWEYcq+Kjqr706tyDSjkhmvjXFcuXZfkFta1pAnBTZY5TLHdrsz4jVlkxpnt/ZqkwrMCBDpB6t/T4muxM4ehToJ0DCzNRAt586munsGxrhcScXFU=
+	t=1757687478; cv=none; b=JNlKWYYXt5nAil8pRQ4kRwaclTBsKQmklP9VJkyv3tT0agv1ZoFkluCTmM3hq+ax7MfZeaWWVrvBbvaNVU2r6KnnaDWuwtd8pcE3BRygJiMeCdxhvehVr7ZiNe5cto3nJ4GFoD6ZjNaFSZ0JtaNvzErgbEUkuuio6jdVCMoIaZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757687393; c=relaxed/simple;
-	bh=hV+fkBeoyEL70BR3AZPZk+/IitPWaFSZ0qChnKQvBhE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oR8uofJi6zVDj3co96mmeETL0UNR5R8jbyDWgthZ4NgknwT/g5f2h1hnWnpgD2uWoeCgNVYO/tU+eh+s1PtSjaBdF7txPlBwd7JysdPBB1/RyTWbSbNzG79Ds3faarTiyKCrOOmklWcQvTCkXuZcD6z6SxNZKrie6p7PvGlFq3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=m1AbP2Ti; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-80e3612e1a7so327120585a.0
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 07:29:51 -0700 (PDT)
+	s=arc-20240116; t=1757687478; c=relaxed/simple;
+	bh=gR40+yv5BWAm9m99zpH/dybVEm+38OUMRErLrB4+G3A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qJ/uTHfAyGsLwxHalQTm0zsc4ovPFPvt+/0osWiY3BSHrcEtpK5MlxabBtkegx6HXjofGtPMwII3RlcNhvZQO5ayYLlNOQU3kp3s4/evw/PWOSK3oaiDL+3nPIghRne7Jo5mzg/WUGrGZRO4oTb9pzFVNcGpAoLqLng0YfPq93k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=auXB7vrt; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e6cbb991aso1962336b3a.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 07:31:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1757687391; x=1758292191; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S3815g4jYHJhhlasvHknAmQ5Z8UgQ2k4aKoITX7J8o4=;
-        b=m1AbP2TiBWtGuDVgJM36Uezne+LnA/gzOl8SdHNdXU34loo/EgugyBnirTRGsxRW3m
-         k8nKZ+auOjobx9jh0dA63MFEDUbgqMvQP9/qmSArJJ0jfqxR6v8x4h3mECdnal7q0Wxj
-         3K5na5eCWipWSvNNxvxLGqNGC7dLOXzEDghMojfkXqM0gRQNiXhEuNP8+t+xF0olzl7h
-         Kwwddtadp+J11xnRaMrKXx3YwWXctlNqvvkLJ0k2BUmLq5zwVJiAkTS+dJ2BHVoCerYy
-         4aFY2YYTmC4/VcbIxCxzVSu0wr0j4+WPVm2dR+eO0+AcrU6ok/J75dFtFx6FpgvUa3IK
-         XVeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757687391; x=1758292191;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1757687475; x=1758292275; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S3815g4jYHJhhlasvHknAmQ5Z8UgQ2k4aKoITX7J8o4=;
-        b=fWTsXJQQovCcikRAR0YCWkjnwKk9KgyvaiHrL31EMkB/ExIBzr3fahTynkUxwIeR7N
-         c+k2BgrTbvdTR6+FIOLUU6HthkyTN0g7BCYYM44cZSQ8Eyt1LWn5hgFyO101CQ/N361B
-         kBEgA5GYkphONWFIBdC227WE3iBJryKkFBhPHyxsx7ZyYx0u1o1zwN+V6kSx7hV6SS6P
-         H6k0pwgCmH1kgZw2W96na5Y8EZEy5gejCO7TY//EBXZgZYuk4dcYi/vFJNVTodRX2Civ
-         uEhzjDPFnOONg4jnIeEwKA5nz3hqrdXL87XLSpee5mmxPumEdWuaDSYu4c7u2r+hNDz6
-         hVNg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhsi1rYiiU5qWA+3QTIdXlJhwvI3oMIhx9fvuKZYGa1eMErInFF4tw9RtdFJse41o7yQ7g7os=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVMS/uJypdhkgfI4HA0N1RA9AfwDNjVuf2Yc1fDCaWj/LOLU7B
-	zcCq1Hzybs9WGpvyMKcix8/DWZuH28lWB/K8ygEtjJz5SOjcnpFUvoQ1cEhuUWVi9Q==
-X-Gm-Gg: ASbGnctP51P88lT3Q4R9oe00Yz+aR/bhvOhnOsRkRlRmNZ7clxSgrVjska4jHz1jJni
-	IKgZd1FhD/aC1WcuGKaEGtG1/jyJTrn/31K2kvcEvBQvTijwkzyBRyShik9y3A8Uu5NV9dO3i9w
-	3kBT/fyGU3xGi4Gz8TlXC2aGcWhwtQt9oYs6TFxRIosMhlqb+Sttd6fspBaBMIFv8oljUPEwiBL
-	HhV7DyCBY5yXvET5h2JWa8miv9/KM3yxpDa4mctgFBBvafs5fa1UW90K+tl5REYzZEey+SCPi/p
-	5t6mbPHGQkZ+jKsx+alAfoveCHNdNXYSxbfFeghUmOMP30o1dPyf/pWUwACqxF50HgRQsWL/cmq
-	64qhIMs9h0EISGvHQyvPp8aNq1CMIbHlBz6M=
-X-Google-Smtp-Source: AGHT+IFHGCNDq4E3kronwhkO+pICG0brIM0Kb9Hz7hqiD4Sy52fYKpi6o68Y7702rWJbbRJBfdlK+A==
-X-Received: by 2002:a05:620a:190f:b0:823:a881:e447 with SMTP id af79cd13be357-824013d8d5bmr375511385a.77.1757687390335;
-        Fri, 12 Sep 2025 07:29:50 -0700 (PDT)
-Received: from rowland.harvard.edu ([2601:19b:d03:1700::6aa9])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-820c974d68dsm276204885a.16.2025.09.12.07.29.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 07:29:49 -0700 (PDT)
-Date: Fri, 12 Sep 2025 10:29:47 -0400
-From: Alan Stern <stern@rowland.harvard.edu>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>, Xu Yang <xu.yang_2@nxp.com>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
- PM to avoid MDIO runtime PM wakeups
-Message-ID: <a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
-References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
- <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
- <b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
- <aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
- <20250911075513.1d90f8b0@kernel.org>
- <aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
- <22773d93-cbad-41c5-9e79-4d7f6b9e5ec0@rowland.harvard.edu>
- <aMPawXCxlFmz6MaC@shell.armlinux.org.uk>
+        bh=tmzyGR3UO+vTnHSahpvjv5m2UCx489FjqpBnPUP8w/o=;
+        b=auXB7vrt6zzBgh7sWXj7AWsLa/LR/wjC9gQpuUziNJmv9ciYJE+Q+xNHn+AwCHVU5K
+         niybF5EAyCc9Jh0ibnbu6sN+y+Gt8yg5yP0cQJmaSAftZ4ocGwLjJ5B6eZgrTNz1YxxI
+         b5Oiy6UR9VJahQT5vpxLfw/2bQ+ghmBY93XBTFoAhVTlWSG9JJeDpNcjbReO0GtBZCHo
+         prlqho80hH9nq/birSP3YQ1d/j4Bc282eHjASP3TpTsOEgLyS4NtEV8IR3GOUFW+PwoR
+         hR0w+DQl8SBAKItsWBB1+bhR+UgE606tWPAzRLtvVryyRwpZXUtz71HJCKLscSrmOSdm
+         bJww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757687475; x=1758292275;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tmzyGR3UO+vTnHSahpvjv5m2UCx489FjqpBnPUP8w/o=;
+        b=S41wIafO8dDuuXxfDlbfSkoLIxi8G/YgW/ROaTI9nPWvorLgK24bhQZIZqiC89YLm7
+         KsycEXi69ZngNhgyswpQugXCQ65HWMIJDk3V5BBOlovbKw6C/+wFJQ8S7pxXGAO8BrPe
+         s2YdBEBQHPGqXWMiMG14pPgyzvpOJ2zXJb15WQVPhrXbkinipGBJXqh+COdclamoJLjb
+         anz43qFiOjReSgiZXlfqs+HZS6q7ovNCs2SZa2xfv05575mEHwgVE2wazlKFpWqObhmS
+         8JKQTKlPDk6phKzPmmfWTWZOnhaeWEmkK7DE4BTK4BS00JX/3AkeM+ShnoID3P286i21
+         THIA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4WzDa4QGH6x7HoZYb0rXVDsEU2m0V1iAJ+IpN1WyQpqk+8BxKBOY/bbBs0jGNXx3JhX8IQRo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+/4wT5ZyzwjbtqsEMyD/LUuRETyB6SkEXuKAWCQQ3i11OR2Bz
+	DTA3IHw5w5P6PiiEn9kx1eOsdt6ot+LsIwmvTs/9EiPcT9cRot4MHnemeKl2tehosZV2WsAIhRx
+	HvWRwMZ2fdvIUii6ELGxKhsm3sdYrb5MDI3l67b3AvWS+Tunm5sc=
+X-Gm-Gg: ASbGncsI/BRz7trsAB5NuCGW+lOr4sn8UQrlGEUH54RftvgzcfPs2EzHZhyY6GH4FN0
+	wfHM97NxkIa3io/VpWeVWGYQDwcL17EzF4bNf9ssG0oKg6PreydxQdAj86/EE7TNwOs4o0PrnFY
+	TZ3MCdmbDSaiXAVdhGF1Pn7OG/w+zVp7D8QEz0ItTCTgbYap4hxwoYv1u1ag4oE9z8Cgovj0ylJ
+	nAFGyx1znnGErk5Y9BrCX3c6CDc5HJb5NvWGgayaj7VsCvgwmBIric+giqIiPlnhHxTKw==
+X-Google-Smtp-Source: AGHT+IFBUJt3Csm6eE5RXFliSaTZkxqWhnj+Q9O8wEbJrmZbmSox7+yAwdItlnTcqf+8LA6GyIjn1yKxFF4NoqWujYQ=
+X-Received: by 2002:a05:6a20:6a10:b0:24e:c235:d7e6 with SMTP id
+ adf61e73a8af0-26029ea90c7mr4091241637.5.1757687475439; Fri, 12 Sep 2025
+ 07:31:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMPawXCxlFmz6MaC@shell.armlinux.org.uk>
+References: <20250907014216.2691844-1-jay.vosburgh@canonical.com>
+ <CAM0EoMmJaC3OAncWnUOkz6mn7BVXudnG1YKUYZomUkbVu8Zb+g@mail.gmail.com>
+ <d5b7afbf-318a-49c8-9e40-bcb4b452201b@gmail.com> <3090258.1757650744@famine>
+In-Reply-To: <3090258.1757650744@famine>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 12 Sep 2025 10:31:02 -0400
+X-Gm-Features: Ac12FXwLcCe_jHERL4eT4fYASLugePwmNl8Yv_3TeoJwS2YdXKHwZYuOTzv3G0Y
+Message-ID: <CAM0EoM=Q6ewcUbdM_GahUmubxvQeJWAwxPu+3hmC2U1KjPb5_Q@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next] tc/police: Allow 64 bit burst size
+To: Jay Vosburgh <jay.vosburgh@canonical.com>, Victor Nogueira <victor@mojatatu.com>
+Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, 
+	Stephen Hemminger <stephen@networkplumber.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 12, 2025 at 09:33:05AM +0100, Russell King (Oracle) wrote:
-> On Thu, Sep 11, 2025 at 10:30:09PM -0400, Alan Stern wrote:
-> > The USB subsystem uses only one pair of callbacks for suspend and resume 
-> > because USB hardware has only one suspend state.  However, the callbacks 
-> > do get an extra pm_message_t parameter which they can use to distinguish 
-> > between system sleep transitions and runtime PM transitions.
-> 
-> Unfortunately, this isn't the case. While a struct usb_device_driver's
-> suspend()/resume() methods get the pm_message_t, a struct usb_driver's
-> suspend()/resume() methods do not:
-> 
-> static int usb_resume_interface(struct usb_device *udev,
->                 struct usb_interface *intf, pm_message_t msg, int reset_resume)
-> {
->         struct usb_driver       *driver;
-> ...
->         if (reset_resume) {
->                 if (driver->reset_resume) {
->                         status = driver->reset_resume(intf);
-> ...
->         } else {
->                 status = driver->resume(intf);
-> 
-> vs
-> 
-> static int usb_resume_device(struct usb_device *udev, pm_message_t msg)
-> {
->         struct usb_device_driver        *udriver;
-> ...
->         if (status == 0 && udriver->resume)
->                 status = udriver->resume(udev, msg);
-> 
-> and in drivers/net/usb/asix_devices.c:
-> 
-> static struct usb_driver asix_driver = {
-> ...
->         .suspend =      asix_suspend,
->         .resume =       asix_resume,
->         .reset_resume = asix_resume,
-> 
-> where asix_resume() only takes one argument:
-> 
-> static int asix_resume(struct usb_interface *intf)
-> {
+On Fri, Sep 12, 2025 at 12:19=E2=80=AFAM Jay Vosburgh
+<jay.vosburgh@canonical.com> wrote:
+>
+> David Ahern <dsahern@gmail.com> wrote:
+>
+> >On 9/9/25 9:32 PM, Jamal Hadi Salim wrote:
+> >>
+> >> Please run tdc tests. David/Stephen - can we please make this a
+> >> requirement for iproute2 tc related changes?
+> >
+> >I will try to remember to run tdc tests for tc patches. Without an
+> >automated setup, there will be misses over time.
+> >
+> >>
+> >> Jay, your patches fail at least one test because you changed the unit =
+outputs.
+> >> Either we fix the tdc test or you make your changes backward compatibl=
+e.
+> >> In the future also cc kernel tc maintainers (I only saw this because
+> >> someone pointed it to me).
+> >> Overall the changes look fine.
+> >
+> >Sent a patch to add a tc entry to iproute2 maintainers file.
+> >
+> >You say the change looks fine but at least one test fails meaning
+> >changes are requested?
+>
+>         Yes, I ran the tests and saw one failure, in the following:
+>
+>         "cmdUnderTest": "$TC actions add action police pkts_rate 1000 pkt=
+s_burst
+>  200 index 1",
+>         "expExitCode": "0",
+>         "verifyCmd": "$TC actions ls action police",
+>         "matchPattern": "action order [0-9]*:  police 0x1 rate 0bit burst=
+ 0b mtu 4096Mb pkts_rate 1000 pkts_burst 200",
+>
+>         Which is trying to match a returned mtu value of "4096Mb" but
+> the new code prints "4Gb"; should be straightforward to change the test
+> to accept either returned value.
+>
+>         Or I can take out the bit that prints sufficiently large values
+> in units of Gb, if you've got a preference for leaving that part alone.
+> Doing so would ease the lockstep problem between the tests in the kernel
+> tree and the change in iproute2.  The numeric formatting isn't the
+> important part of the patch set, so I'm ok either way.
+>
 
-Your email made me go back and check the code more carefully, and it 
-turns out that we were both half-right.  :-)
+For backward compat we need to support both. IOW, if someone was using
+an older tc then a new kernel should work fine and not fail because of
+different output expected. @Victor Nogueira wanna take a crack at
+fixing the test? Then when the iproute side is merged as is - both
+should work.
 
-The pm_message_t argument is passed to the usb_driver's ->suspend 
-callback in usb_suspend_interface(), but not to the ->resume callback in 
-usb_resume_interface().  Yes, it's inconsistent.
-
-I suppose the API could be changed, at the cost of updating a lot of 
-drivers.  But it would be easier if this wasn't necessary, if there was 
-some way to work around the problem.  Unfortunately, I don't know 
-anything about how the network stack handles suspend and resume, or 
-what sort of locking it requires, so I can't offer any suggestions.
-
-Alan Stern
+cheers,
+jamal
+>         -J
+>
+> ---
+>         -Jay Vosburgh, jay.vosburgh@canonical.com
 
