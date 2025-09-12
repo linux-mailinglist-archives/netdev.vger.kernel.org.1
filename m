@@ -1,117 +1,181 @@
-Return-Path: <netdev+bounces-222498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE081B547F8
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:38:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F98FB5480B
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:40:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6EF93B977E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:35:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8A4B162543
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3CE27A465;
-	Fri, 12 Sep 2025 09:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DCmoRrsB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61082773C7;
+	Fri, 12 Sep 2025 09:40:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D44274668
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19156276046
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757669626; cv=none; b=LdrUE+Q+fhF+xbJEnW4niSxO5qbSa/QlG7tvRY8xaurMvFdll5AbN5/RY12FjITlEEWkHGjcSiaKDvYfpk4zhEUFDKhKBNQ73/6gudyR1bqGtBxHn/mOhTZULT6ub+Oj2alOYOnvTL2KWrMLlUD2QA6p1iNeAoy/08zuwVZEQR8=
+	t=1757670002; cv=none; b=joWac/VLG5h8+/lQWM2xqe1NFp4vZQuKAYYxUflpxhstZ7gjCpTyYWO7kMtLrsoG4+pfbPqAcyoqPhB8GOjv4ZBcBhLE29j/tseygDPHxILeFQ28oc9P4hOb6Gn+9nXdJVhgwdKH2uSFBALtdCqtrboQf0NiR1d8pUGPX+Jrnhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757669626; c=relaxed/simple;
-	bh=ThV2GDf+/LOv1NEDMdhRUL9t0UR+uadCjoaNIrPg7vE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J597m9Q/dscUWFiha+n3OLw4L0grsIt1+4kLTunOI4j++mfxkjiN2yE6ns54Yn6VTSuTUrPtxxLZc5/79wt95bACOPjfqOhl+pVtWfodz+KqXCTRX5RKP/Cs6pzsHFLIWQKPUUEuSc1dRA0CkVWi4xIvTCwIj0Vn8s9ncMaR18s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DCmoRrsB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757669622;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=kQVDDKQgSTG1ruil2Wq7UaDisPfJegPx5xURSkhlJks=;
-	b=DCmoRrsBIY4WAHYvBIEij0OMZa3pf/WsKXBtDXFNI3g930nF2wRYic8tXpFVc+CJ3M1ZID
-	57gQAnzEoJRzv7qxevFYC1QN4bsD1qxH5ZT7FkZ2FRwmQx7xPJ6HPy+u8ZK4RX+uotx02N
-	KbjWKiTq7P4IMogm42/cWskmjRcuzWU=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-541-OPgyGCHJMXqYrl47SGXYdQ-1; Fri,
- 12 Sep 2025 05:33:36 -0400
-X-MC-Unique: OPgyGCHJMXqYrl47SGXYdQ-1
-X-Mimecast-MFC-AGG-ID: OPgyGCHJMXqYrl47SGXYdQ_1757669615
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60DB11956096;
-	Fri, 12 Sep 2025 09:33:35 +0000 (UTC)
-Received: from p16v.luc.cera.cz (unknown [10.45.224.175])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AF8D830002CA;
-	Fri, 12 Sep 2025 09:33:32 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] dpll: fix clock quality level reporting
-Date: Fri, 12 Sep 2025 11:33:31 +0200
-Message-ID: <20250912093331.862333-1-ivecera@redhat.com>
+	s=arc-20240116; t=1757670002; c=relaxed/simple;
+	bh=Rl4LZnuxJh/7FUqam/oyJRnVsEvzTdOO3HZUZncPAOk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=JFr8qbPYQ234eLG0xMGfRn25ehOZQ7VZ6kWcBlKmg7nQUn4TGQMw3o8s0HK6SVXfhQGm9McbFEX4Krt9JCgdquY/FTAgpPqk4IywIihHrngc7katRzeLdiMU6bFYSngYQfe8DjNHPdBMSQxoMNRD535jrAo4X9Gc+QyDS0Glbm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-889b8d95367so194453239f.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:40:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757670000; x=1758274800;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gFUjs+Fu4o45ZXWdCFUMEIMO8W2FMJLrrC6MotjvsXI=;
+        b=oQyFII5wiTghFujJTGNjtOQk1fXunFcZquK0wA1YpeDH486BPkHBxIEq/uIhxmn5SZ
+         oMXhQpImFOwYc8+iaJiuHwZP9v0A4zlY/Ck+BrJvjMPNcQQ+iUc5bQH7DjAyAx8QzY6F
+         p6iwAVVWCpG3Wci6tCm5Y6uVhCBScRdIqtMTHtPz5VkWk58+YOUmUglxsqoi5T/uTxPK
+         NwoG54G23VT6+Tdi1rVEJeV19e58ddhPYuigWm5LL/2ks6Ebdsqy2PoIiFccdRJUTA01
+         q1htjToNOtRw49/ZkskEDsAtLJpz4Qhb5NjurzRLft8J4ZAcrK7mJDVD9B8eVTXjl2xY
+         XtaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUaBas+JBT5/TB8LfMkCsb0D6SDfvwdx+Ex+cVbogRATZmc9y39FeeBadceAUGVp+3jJbRJ4dw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYmAHvzicNNhK24Z8rnJWBs7jZPZbb0rlcJJzuy+l6KL5anGnP
+	r8vL821Pzw1wFTHl7ZljIDdASmXDW3bN7fZB8ONnCTZPWxjKotZkeJ/l1ceqR600R79JfTPE0Jp
+	3G7Dm3QrDM/Y3kCxrDgsL8BozDRNKsM7joObb/22TuSr965QsVGW7gJsCHtw=
+X-Google-Smtp-Source: AGHT+IFmcqWbQZYj0mK10M7BRzGMuWjtQ35FL3y2cmLKlB6WL6LNQORXJu4TcFFRXoWTp4/dfgGqQkDY1Q/U9t3HI9bgKWmFrYwj
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Received: by 2002:a05:6e02:154e:b0:419:de32:2cf7 with SMTP id
+ e9e14a558f8ab-4209d40feabmr41543785ab.3.1757670000237; Fri, 12 Sep 2025
+ 02:40:00 -0700 (PDT)
+Date: Fri, 12 Sep 2025 02:40:00 -0700
+In-Reply-To: <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68c3ea70.050a0220.3c6139.049f.GAE@google.com>
+Subject: [syzbot ci] Re: net: devmem: improve cpu cost of RX token management
+From: syzbot ci <syzbot+ci29ccfbf0bb0ca710@syzkaller.appspotmail.com>
+To: almasrymina@google.com, bobbyeshleman@gmail.com, bobbyeshleman@meta.com, 
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
+	linux-kernel@vger.kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sdf@fomichev.me, willemb@google.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The DPLL_CLOCK_QUALITY_LEVEL_ITU_OPT1_EPRC is not reported via netlink
-due to bug in dpll_msg_add_clock_quality_level(). The usage of
-DPLL_CLOCK_QUALITY_LEVEL_MAX for both DECLARE_BITMAP() and
-for_each_set_bit() is not correct because these macros requires bitmap
-size and not the highest valid bit in the bitmap.
+syzbot ci has tested the following series
 
-Use correct bitmap size to fix this issue.
+[v2] net: devmem: improve cpu cost of RX token management
+https://lore.kernel.org/all/20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com
+* [PATCH net-next v2 1/3] net: devmem: rename tx_vec to vec in dmabuf binding
+* [PATCH net-next v2 2/3] net: devmem: use niov array for token management
+* [PATCH net-next v2 3/3] net: ethtool: prevent user from breaking devmem single-binding rule
 
-Fixes: a1afb959add1 ("dpll: add clock quality level attribute and op")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+and found the following issue:
+general protection fault in sock_devmem_dontneed
+
+Full report is available here:
+https://ci.syzbot.org/series/40b2252a-f8bb-4cec-bfc1-2ff8a3c55336
+
+***
+
+general protection fault in sock_devmem_dontneed
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      5adf6f2b9972dbb69f4dd11bae52ba251c64ecb7
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/2c30c608-f14f-4e6d-9772-cc5e129939fc/config
+C repro:   https://ci.syzbot.org/findings/c89c36f8-4666-47d0-bc39-35662a268e4d/c_repro
+syz repro: https://ci.syzbot.org/findings/c89c36f8-4666-47d0-bc39-35662a268e4d/syz_repro
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 UID: 0 PID: 6028 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:sock_devmem_dontneed+0x40b/0x910 net/core/sock.c:1112
+Code: 8b 44 24 18 44 8b 20 44 03 64 24 14 48 8b 44 24 68 80 3c 18 00 74 08 4c 89 ef e8 f0 bb c9 f8 4d 8b 7d 00 4c 89 f8 48 c1 e8 03 <80> 3c 18 00 74 08 4c 89 ff e8 d7 bb c9 f8 4d 8b 2f 4c 89 e8 48 c1
+RSP: 0018:ffffc90002987ac0 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 1ffff11020d27e78
+RDX: ffff88810a039cc0 RSI: 0000000000000003 RDI: 0000000000000000
+RBP: ffffc90002987c50 R08: ffffc90002987bdf R09: 0000000000000000
+R10: ffffc90002987b60 R11: fffff52000530f7c R12: 0000000000000006
+R13: ffff8881235cb710 R14: 0000000000000000 R15: 0000000000000000
+FS:  000055555e866500(0000) GS:ffff8881a3c14000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b31b63fff CR3: 0000000027a20000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ sk_setsockopt+0x682/0x2dc0 net/core/sock.c:1301
+ do_sock_setsockopt+0x11b/0x1b0 net/socket.c:2340
+ __sys_setsockopt net/socket.c:2369 [inline]
+ __do_sys_setsockopt net/socket.c:2375 [inline]
+ __se_sys_setsockopt net/socket.c:2372 [inline]
+ __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2372
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7faf24f8eba9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc3eb96018 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 00007faf251d5fa0 RCX: 00007faf24f8eba9
+RDX: 0000000000000050 RSI: 0000000000000001 RDI: 0000000000000003
+RBP: 00007faf25011e19 R08: 0000000000000048 R09: 0000000000000000
+R10: 0000200000000100 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007faf251d5fa0 R14: 00007faf251d5fa0 R15: 0000000000000005
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:sock_devmem_dontneed+0x40b/0x910 net/core/sock.c:1112
+Code: 8b 44 24 18 44 8b 20 44 03 64 24 14 48 8b 44 24 68 80 3c 18 00 74 08 4c 89 ef e8 f0 bb c9 f8 4d 8b 7d 00 4c 89 f8 48 c1 e8 03 <80> 3c 18 00 74 08 4c 89 ff e8 d7 bb c9 f8 4d 8b 2f 4c 89 e8 48 c1
+RSP: 0018:ffffc90002987ac0 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 1ffff11020d27e78
+RDX: ffff88810a039cc0 RSI: 0000000000000003 RDI: 0000000000000000
+RBP: ffffc90002987c50 R08: ffffc90002987bdf R09: 0000000000000000
+R10: ffffc90002987b60 R11: fffff52000530f7c R12: 0000000000000006
+R13: ffff8881235cb710 R14: 0000000000000000 R15: 0000000000000000
+FS:  000055555e866500(0000) GS:ffff8881a3c14000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b31b63fff CR3: 0000000027a20000 CR4: 00000000000006f0
+----------------
+Code disassembly (best guess):
+   0:	8b 44 24 18          	mov    0x18(%rsp),%eax
+   4:	44 8b 20             	mov    (%rax),%r12d
+   7:	44 03 64 24 14       	add    0x14(%rsp),%r12d
+   c:	48 8b 44 24 68       	mov    0x68(%rsp),%rax
+  11:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1)
+  15:	74 08                	je     0x1f
+  17:	4c 89 ef             	mov    %r13,%rdi
+  1a:	e8 f0 bb c9 f8       	call   0xf8c9bc0f
+  1f:	4d 8b 7d 00          	mov    0x0(%r13),%r15
+  23:	4c 89 f8             	mov    %r15,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1) <-- trapping instruction
+  2e:	74 08                	je     0x38
+  30:	4c 89 ff             	mov    %r15,%rdi
+  33:	e8 d7 bb c9 f8       	call   0xf8c9bc0f
+  38:	4d 8b 2f             	mov    (%r15),%r13
+  3b:	4c 89 e8             	mov    %r13,%rax
+  3e:	48                   	rex.W
+  3f:	c1                   	.byte 0xc1
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
 ---
- drivers/dpll/dpll_netlink.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 036f21cac0a9..0a852011653c 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -211,8 +211,8 @@ static int
- dpll_msg_add_clock_quality_level(struct sk_buff *msg, struct dpll_device *dpll,
- 				 struct netlink_ext_ack *extack)
- {
-+	DECLARE_BITMAP(qls, DPLL_CLOCK_QUALITY_LEVEL_MAX + 1) = { 0 };
- 	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
--	DECLARE_BITMAP(qls, DPLL_CLOCK_QUALITY_LEVEL_MAX) = { 0 };
- 	enum dpll_clock_quality_level ql;
- 	int ret;
- 
-@@ -221,7 +221,7 @@ dpll_msg_add_clock_quality_level(struct sk_buff *msg, struct dpll_device *dpll,
- 	ret = ops->clock_quality_level_get(dpll, dpll_priv(dpll), qls, extack);
- 	if (ret)
- 		return ret;
--	for_each_set_bit(ql, qls, DPLL_CLOCK_QUALITY_LEVEL_MAX)
-+	for_each_set_bit(ql, qls, DPLL_CLOCK_QUALITY_LEVEL_MAX + 1)
- 		if (nla_put_u32(msg, DPLL_A_CLOCK_QUALITY_LEVEL, ql))
- 			return -EMSGSIZE;
- 
--- 
-2.49.1
-
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
