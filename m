@@ -1,107 +1,84 @@
-Return-Path: <netdev+bounces-222439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7CD7B54369
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:04:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5B54B5436E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:04:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7213A445805
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 07:04:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B51A1B26AB0
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 07:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CC823D7CA;
-	Fri, 12 Sep 2025 07:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H+JvqXb0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C17298CAF;
+	Fri, 12 Sep 2025 07:04:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC00328689C
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 07:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932A5136347;
+	Fri, 12 Sep 2025 07:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757660662; cv=none; b=umRmtkO7YWt4BHrZe39t3yzC9dQjVTtEH9gkqNOV+y7xek5oE8bSbjXXb/W8oPz/jbP6twrCXm+QonVehBE1tbqVlYqL68D7pb1SvPjJtb1g55Vx+H2k9mnKGtvkmZQ/xadDpCCwFafzG019lvuyGEcszWuJRby0Uky578KaDx0=
+	t=1757660670; cv=none; b=K3BefdLuL4OPR2K+uQ6ByK7WPvDW4t+KpdvLD7qXKrFJPABMvb1P/7eRljNf0sy/RwmvtzdeibQ9CMY0fYYk5fVwKtwjlZAMJGccGW6iFBc5AKg9I26raKWQqlHxJvMxyJXnaQzS+cB7CSmRXky0cn2L8agtSIvhcxdw28IWmj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757660662; c=relaxed/simple;
-	bh=q/3azkhASRepTVItgM865PhVwehLOoknq13jGplyT2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oV9inTLUFX3IS1dPSGXO/7N0kq3MGVw4lUCvpsmXIqDE0GQTILTW5Hb0d8B//yJEI4TiLwqbpaOpq8caFyoRXqKThF8ZLwq6FSO2vP2L82xFUShwffF9MLvp2ylmkTisv9aflx8c+3wr6cdjrcB/zEzV/UfNDzOpPgJ93WO5FOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H+JvqXb0; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4b48eabaef3so15489381cf.1
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 00:04:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757660660; x=1758265460; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q/3azkhASRepTVItgM865PhVwehLOoknq13jGplyT2c=;
-        b=H+JvqXb0NTY2ziR0DYc9iXXDLkN8PxZJeA27/OMeSJvWepEJy0Wp/qqpG3P/h0zK5b
-         1/UyUpMLtjd7x4jR8qaR3HENViubXEgR1JLVutMG0IHUTu7yegsxxlFKITm/yw+Kv8Yk
-         9E8MIErhYLOAYb35PcLzX0e38aM3S8CCaZj6BxpnpzoLj1iSdCgongschHnFNr2EWDrL
-         QWuO8Bpp9KFGmjebYDErULrUMTT/yiGpmDSfvXypMNpZP5WkM5gSjoCguwGMYnFYLGFq
-         U1aWXtbz6kTKXQA10dufjq0dPu2vugkVgtSsf82WYd4on0iEb6ShvnR7qvpQydFy3/df
-         mgyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757660660; x=1758265460;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q/3azkhASRepTVItgM865PhVwehLOoknq13jGplyT2c=;
-        b=klBYWUSSqqlUVvysyq76lmkmn51mrLD+IYM0CVtuW6SfOfmwVXEMA3FVwIhxclCLAZ
-         5xF0o5NdF4Troqv91wcAUO+jnicYjsaWqQkMAqYBdpw+ZHPiJFBlNth7LYw3Q+fyu6VI
-         fbypcisUWCM6lrM6tf/kV5tW6nMbKnCphdDzoK80DsE68vaIOU0bK0iWn7mXWN0MPoLd
-         r4vxzlv7o2tf2TcKCikJAR0bPusTKkXcyJcq1WnlNt09yMQV8Dp8J9U7FUeirSz0/6DG
-         NClVCTJLesN/chNS0yazBa669OUJCRDnznjD2WJc5IoGPKbX+teWw/wJQnnCMzcwAeTy
-         qaRA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjDXf4dY11gUYAgXYAtwaYd3/ZLM+ZQKA7WGnGuc1lDXCEEkTB0sobNGaHw/TWPBliJJ8PsIs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqTz+Zqdz81ZQ0VRO4hHTNpasFzMQ6syixjkyXf1A4ESfwlKPf
-	VGk8bmsUwe2wGVO25OZbqcA/ra8tCQ68dAn3nYZR/zgAWSHbWo5fsH+xbdAxiq0VviTMT4INhgL
-	0LDBWmsss3XMnQnxWgsZmhW/b6AqOUUomdrC0cc4z
-X-Gm-Gg: ASbGncsMMp4MA/rwXW+CskYhPw8O6a6Mous0hy6q495c39eh+F44i6kJzrNWAKfjcWZ
-	5JMXvUuMjgk5AeMMsrOLw2mKmLOUH5HR8E5RZFq33Dog2L8NK08oZIUnqeBxYa9lbD3ol6Ji1Jg
-	3NQYYwEQklfYMhmeuF/NzpZwU4eFjONt5eMzbHBarGeN+FuH+wkDhehUN5Ml5e4rHUhTz4ZwM47
-	pGJLJu69sh4W0sSm2m85Q==
-X-Google-Smtp-Source: AGHT+IHgWpsGKQ730X4wPp2YJnGKAlEQTxGeuAX55Bp6TeDYnQIZhudmoMoA+b7dxsgyn8zLKB8Su+Ge7eawJWqcabc=
-X-Received: by 2002:ac8:5882:0:b0:4b6:33e6:bc04 with SMTP id
- d75a77b69052e-4b77d05a075mr20716431cf.60.1757660659500; Fri, 12 Sep 2025
- 00:04:19 -0700 (PDT)
+	s=arc-20240116; t=1757660670; c=relaxed/simple;
+	bh=4WRSRiY2vrLVB4/i8o5RgqvNQK2OOzdq9znWjEzV7cY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y3tCskAnJ2yzQoPRGWJEyB8/OOa/n0zxhY6QVibMLZ5xBrjrM9Y1M+wYrHVL/ZWjZp+i4ZNc3MHVLuTc42WRsQMJbQCuAk7w1QihDx+RTMu+7D1DKNw4x+e97JYPmPYurW2JnIi/ce8Cz/ssISuB6lRhfdzaivpECzwho0dmMGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85DD8C4CEF4;
+	Fri, 12 Sep 2025 07:04:29 +0000 (UTC)
+Date: Fri, 12 Sep 2025 09:04:27 +0200
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Varadarajan Narayanan <quic_varada@quicinc.com>, Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Anusha Rao <quic_anusha@quicinc.com>, Manikanta Mylavarapu <quic_mmanikan@quicinc.com>, 
+	Devi Priya <quic_devipriy@quicinc.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Richard Cochran <richardcochran@gmail.com>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, 
+	devicetree@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com, quic_leiwei@quicinc.com, 
+	quic_pavir@quicinc.com, quic_suruchia@quicinc.com
+Subject: Re: [PATCH v5 02/10] dt-bindings: clock: Add required
+ "interconnect-cells" property
+Message-ID: <20250912-nocturnal-horse-of-acumen-5b2cbd@kuoka>
+References: <20250909-qcom_ipq5424_nsscc-v5-0-332c49a8512b@quicinc.com>
+ <20250909-qcom_ipq5424_nsscc-v5-2-332c49a8512b@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911230743.2551-3-anderson@allelesecurity.com> <CAJwJo6bsZg-arM6GAQM8Lv3DivWUERu0VyFQgi4DA+SxRrZypw@mail.gmail.com>
-In-Reply-To: <CAJwJo6bsZg-arM6GAQM8Lv3DivWUERu0VyFQgi4DA+SxRrZypw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 12 Sep 2025 00:04:07 -0700
-X-Gm-Features: Ac12FXy4bKErw1s13GarDS8xoicxXKEJIYUhfNSFduEdoTfv6TSJEbr9zbXNqeY
-Message-ID: <CANn89i+MPuFReHcGsp6B=40N7kvkDjZipY7ZFZXTkv+erzk8OQ@mail.gmail.com>
-Subject: Re: [PATCH v3] net/tcp: Fix a NULL pointer dereference when using
- TCP-AO with TCP_REPAIR
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: Anderson Nascimento <anderson@allelesecurity.com>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Salam Noureddine <noureddine@arista.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250909-qcom_ipq5424_nsscc-v5-2-332c49a8512b@quicinc.com>
 
-On Thu, Sep 11, 2025 at 4:27=E2=80=AFPM Dmitry Safonov <0x7f454c46@gmail.co=
-m> wrote:
->
-> On Fri, 12 Sept 2025 at 00:23, Anderson Nascimento
+On Tue, Sep 09, 2025 at 09:39:11PM +0800, Luo Jie wrote:
+> The Networking Subsystem (NSS) clock controller acts as both a clock
+> provider and an interconnect provider. The #interconnect-cells property
+> is mandatory in the Device Tree Source (DTS) to ensure that client
+> drivers, such as the PPE driver, can correctly acquire ICC clocks from
+> the NSS ICC provider.
+> 
+> Although this property is already present in the NSS CC node of the DTS
+> for CMN PLL for IPQ9574 SoC which is currently supported, it was previously
+> omitted from the list of required properties in the bindings documentation.
+> Adding this as a required property is not expected to break the ABI for
+> currently supported SoC.
+> 
+> Marking #interconnect-cells as required to comply with Device Tree (DT)
+> binding requirements for interconnect providers.
 
-> LGTM, thanks for your fix!
->
-> Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
+DT bindings do not require interconnect-cells, so that's not a correct
+reason. Drop them from required properties.
 
-Same, thanks for the fix.
+Best regards,
+Krzysztof
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 
