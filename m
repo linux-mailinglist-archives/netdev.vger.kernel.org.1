@@ -1,123 +1,135 @@
-Return-Path: <netdev+bounces-222563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 674E9B54D4B
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:21:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5945B54B4A
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:43:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B0573B6D4B
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:17:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98BEA17218E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2003218BF;
-	Fri, 12 Sep 2025 12:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4986301015;
+	Fri, 12 Sep 2025 11:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WsYaVhjQ"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0TCwjyZx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E05324B3E
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6877641C62;
+	Fri, 12 Sep 2025 11:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757678937; cv=none; b=GHH23SvxzHlye3Mm+B2l06AScoQEh6r0HVN8Td++DPTy3+9X5JQaHorC4TLhNNWu8UVuHY2Mz6r3Bg36Bw8A4VMa8grF09ONb1c8PXcM65F1PkuoHM2Apzzw4ZiymzBPvxCn4vg5+o48W7BnrPledOh56/d/Q6wFXD2Ff/yirBw=
+	t=1757677406; cv=none; b=LqxhO0/hEm2CBiuRf2QSIZfrs1QADxDxXNs9KqooStFKWzUl2txum2r9uL7PH641ezl3Esgj3pwuJJxDmhf76yaZtrZ7qhFpmGAiJcCSdYL/1vH8W6OpWOjkfwr0zG6W3yCq3Lhh689Iuq9HvGW84gxLsOqDSmcQ6bxHUIFsLpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757678937; c=relaxed/simple;
-	bh=Wz4E5peEWJEuLH5HpKzn2maiOPcV7d/t/JntClDMc3Y=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=EfJgqjEPKbVWcOn7UiFPnFoYV4BhFewNiLCGUfhMZ9z/vcQGazuYYU6cjWNDJGA7d8lhPyvFm5lpq/0+lzMIVrRfLMViaRWL6Kw7QLAJgffRbz8ta3IPdhYxhbknpjL7kWKd5/MDdH3OSXLnJFL4YCAcwwhpj4mZIOzwrVvSCts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WsYaVhjQ; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-45cb6428c46so21829145e9.1
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 05:08:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757678933; x=1758283733; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Wz4E5peEWJEuLH5HpKzn2maiOPcV7d/t/JntClDMc3Y=;
-        b=WsYaVhjQn2JqKOoWVPSN3hvIwjd0D7IZWiGO4L4yFLbMk/ocRhAfR+M1tcvbeiXIe2
-         LB2VMBqAyNaKlV33VR9TlZnlKbOZGT088PYnXiLVebdx2M/khLD+oYqScZQgSq8jMOwk
-         JVeOS1sf52TKhpVshHayo436Z9lo5dxkZkxw3Iip8ayWuU/xKH49sUvEbkGpwC4sflaY
-         O/w0b8vAGiBImtanSV1xlRWMmvMqzmRntkYpu3AsRf0l/2JQucBPqV9sxhFuKay4eJaQ
-         cav0gQEn3pUvJGtkdGuw3DkwZUY3dfMQ+bsJVAT09ssZ3vklqDGZk4RjOcDkcG/IycEf
-         04Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757678933; x=1758283733;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wz4E5peEWJEuLH5HpKzn2maiOPcV7d/t/JntClDMc3Y=;
-        b=L15XczDa4AFa7KjW6jdP7AmMD5kW8AgQ565U9Lp7c6tHoUdD3qb3POqW2tggWeXHCR
-         adccyy/6FfOfwnNt6vBsneI6gmixpi0N9kq5qq13LwaFRFpREoD3w7Ms0T2JZrOs4GYS
-         Rthy0asvV5wdoZd+tOZIZ/iwt4TZLVuETaDaECmhNSOfaNtyXN6ZvIJeWQcHEaP/Urd5
-         KmXr2ASIaWjLWNlUvo5TpcvM7TXkjnmNVx03VmBp42SRJ20AMA66z4EGZSM4xED9DGkJ
-         9jzwLVMGVHVnCjB85q5nkOl4SA/xBfQaGW4GSSmKKy2nJGdFWdHuavB1KGxVSa5wPVDB
-         SlSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWEWKO1tBQlqOa0TFT+Hlc/ChHvXaY9XKZoo5riJWH7dVVG7rG6QRrLXrbLCJxv0RfkyIa74p4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ4qRXQABKo/pElqM0OEvFt2FBau3TTfiXPKSLC/lqy/xWRm88
-	7RULLlLUcTFrjsSm4TiS39mzIl4bqpitim4A20XWq+TdFF9tyiQ2q/wt
-X-Gm-Gg: ASbGncsN95kpPoBLsxsLn8nqKD4/eEQrgAC4M2oioDAAKxKHZhevOnIH/iP4lpHMjp/
-	LOs8XR3V+jJYKJ4ymMA9sorS0X1i6bhT2MivHOJ7aCm0KYDTZQCMzJWRNYHBVoZh17OfZZlMri8
-	KiRMPy+7Mn06G+rlkTTtuI55b90rWH0OEgv/QP3WeSVPsysg2Jak5dM7W5UrngzgYyiFrsmfndc
-	kd9eT67+jms4fIFtnrdbVv/yQ4uN3Q8hpOKzRC+aILtSdWKFqUTBHaJLuxks436X0z2D90+19sx
-	ThhyNl1FXvYsVO4WSuJRCub42XaBWZEjf7SEPH2veORGz0KsMS/x7zwMnj5Hpd+RhmG+3RBLrkD
-	FFjHtiZfQ+o1YVgfI+5tnAeY7IgnMLHmvtLT1AI6neWku
-X-Google-Smtp-Source: AGHT+IFBSzBHrD878oYYF5kKGavS67qgNolUi5Ck7EzGdSc891Ykev73AV+0ueAWDKAT71qdNTJHOA==
-X-Received: by 2002:a05:600c:1d2a:b0:45b:9c93:d21d with SMTP id 5b1f17b1804b1-45f24ef20d0mr11997575e9.8.1757678932165;
-        Fri, 12 Sep 2025 05:08:52 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017b2722sm33750515e9.1.2025.09.12.05.08.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 05:08:51 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
- <ast@fiberby.net>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  Jacob Keller <jacob.e.keller@intel.com>,
-  Sabrina Dubroca <sd@queasysnail.net>,  wireguard@lists.zx2c4.com,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 07/13] tools: ynl-gen: avoid repetitive
- variables definitions
-In-Reply-To: <20250911200508.79341-8-ast@fiberby.net>
-Date: Fri, 12 Sep 2025 12:30:32 +0100
-Message-ID: <m21pobvrfr.fsf@gmail.com>
-References: <20250911200508.79341-1-ast@fiberby.net>
-	<20250911200508.79341-8-ast@fiberby.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1757677406; c=relaxed/simple;
+	bh=vQZw18LyMNiHBfayqqKazzYbl6hyR7y4CM3GzrQTcKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RyT9RI2j6qOlTnaYw0KIyVEqiCQewLMLd/nvCUsYpul/nevb3VCawDMMznzTt3QXW27xUIh4k04hjXrPzAaaw8HDSnnQ6fKvlkpQgzxNMzYIEVkbBae5QY+dpEWx5Gx7uILyul80jYkayGann837FbrbbgrtfJUJam7XhYXjr6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0TCwjyZx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2916DC4CEF1;
+	Fri, 12 Sep 2025 11:43:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1757677405;
+	bh=vQZw18LyMNiHBfayqqKazzYbl6hyR7y4CM3GzrQTcKo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=0TCwjyZxwiSPrLtFZN+IyniMywN3vL/LlOWbuAxsnEsOVAbzmqup0WIsjoDHMFsp4
+	 CZHsmzwRAvDxfPp9R9I5o3dTd0LaONRXa7YSjy5cAsJmZrkkOk9zpdlsnFkevQaLH4
+	 NT9opWe3xXbfYZRU1UCBvRT6dZZUiedrQxIwCvto=
+Date: Fri, 12 Sep 2025 13:43:22 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Mukesh R <mrathor@linux.microsoft.com>
+Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
+	linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
+	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+	jikos@kernel.org, bentiss@kernel.org, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	dmitry.torokhov@gmail.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bhelgaas@google.com,
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+	deller@gmx.de, arnd@arndb.de, sgarzare@redhat.com, horms@kernel.org
+Subject: Re: [PATCH v1 2/2] Drivers: hv: Make CONFIG_HYPERV bool
+Message-ID: <2025091253-overwrite-carol-b197@gregkh>
+References: <20250906010952.2145389-1-mrathor@linux.microsoft.com>
+ <20250906010952.2145389-3-mrathor@linux.microsoft.com>
+ <2025090621-rumble-cost-2c0d@gregkh>
+ <d7d7b23f-eaea-2dbc-9c9d-4bee082f6fe7@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d7d7b23f-eaea-2dbc-9c9d-4bee082f6fe7@linux.microsoft.com>
 
-Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
+On Mon, Sep 08, 2025 at 02:01:34PM -0700, Mukesh R wrote:
+> On 9/6/25 04:36, Greg KH wrote:
+> > On Fri, Sep 05, 2025 at 06:09:52PM -0700, Mukesh Rathor wrote:
+> >> With CONFIG_HYPERV and CONFIG_HYPERV_VMBUS separated, change CONFIG_HYPERV
+> >> to bool from tristate. CONFIG_HYPERV now becomes the core Hyper-V
+> >> hypervisor support, such as hypercalls, clocks/timers, Confidential
+> >> Computing setup, PCI passthru, etc. that doesn't involve VMBus or VMBus
+> >> devices.
+> > 
+> > But why are you making it so that this can not be a module anymore?  You
+> > are now forcing ALL Linux distro users to always have this code in their
+> > system, despite not ever using the feature.  That feels like a waste to
+> > me.
+> > 
+> > What is preventing this from staying as a module?  Why must you always
+> > have this code loaded at all times for everyone?
+> 
+> This is currently not a module. I assume it was at the beginning. In
+> drivers/Makefile today:
+> 
+> obj-$(subst m,y,$(CONFIG_HYPERV))       += hv/
+> 
+> 
+> More context: CONFIG_HYPERV doesn't really reflect one module. It is
+> both for kernel built in code and building of stuff in drivers/hv.
+> 
+> drivers/hv then builds 4 modules:
+> 
+> obj-$(CONFIG_HYPERV)            += hv_vmbus.o
+> obj-$(CONFIG_HYPERV_UTILS)      += hv_utils.o
+> obj-$(CONFIG_HYPERV_BALLOON)    += hv_balloon.o
+> obj-$(CONFIG_MSHV_ROOT)         += mshv_root.o
+> 
+> Notice vmbus is using CONFIG_HYPERV because there is no 
+> CONFIG_HYPERV_VMBUS. We are trying to fix that here.
 
-> In the generated attribute parsing code, avoid repetitively
-> defining the same variables over and over again, local to
-> the conditional block for each attribute.
->
-> This patch consolidates the definitions of local variables
-> for attribute parsing, so that they are defined at the
-> function level, and re-used across attributes, thus making
-> the generated code read more natural.
->
-> If attributes defines identical local_vars, then they will
-> be deduplicated, attributes are assumed to only use their
-> local variables transiently.
->
-> ...
->
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+This series does not apply to my tree:
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+checking file drivers/gpu/drm/Kconfig
+checking file drivers/hid/Kconfig
+checking file drivers/hv/Kconfig
+Hunk #2 FAILED at 82.
+1 out of 2 hunks FAILED
+checking file drivers/hv/Makefile
+checking file drivers/input/serio/Kconfig
+checking file drivers/net/hyperv/Kconfig
+checking file drivers/pci/Kconfig
+checking file drivers/scsi/Kconfig
+checking file drivers/uio/Kconfig
+checking file drivers/video/fbdev/Kconfig
+checking file include/asm-generic/mshyperv.h
+Hunk #1 succeeded at 162 with fuzz 2 (offset -3 lines).
+Hunk #2 succeeded at 198 (offset -3 lines).
+Hunk #3 succeeded at 215 (offset -3 lines).
+checking file net/vmw_vsock/Kconfig
+
+What was it made against?
+
+thanks,
+
+greg k-h
 
