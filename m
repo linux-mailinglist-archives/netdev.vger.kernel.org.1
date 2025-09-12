@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-222421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED58B542D6
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:25:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AB62B542D8
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E002E4857F9
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:25:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD8A5565854
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60A727FB2A;
-	Fri, 12 Sep 2025 06:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD35281530;
+	Fri, 12 Sep 2025 06:28:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1701A27146D
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 06:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F4E134BD;
+	Fri, 12 Sep 2025 06:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757658351; cv=none; b=JrQpbTmRw1c2J/lQa2/3fe9ewosglUmIUVjOHQ7idT/bN6TL8MPASVrmzy71ssNpZwTaHRIkXNsIG0D2qmsJuOvjOiL8hieQ0quAaDJXpWYDKvs8FTtFFT2rUkY667oGjThpR23kuxQSqvbStHrPJ481YwSNeIY6mm9dwETmm2E=
+	t=1757658531; cv=none; b=R5/MPQgv70XPq58RFAOnrMEVlltx6QnnaUtmE0v0G1qnJp0rGk27Ix1M/glwrfVX5B+z6M2wdvkfaIpADtABm3+iQUCbZwn2pvpK7m24pjPztwQhe0z7fo+YohdLQ66XLJcjqDFhq0r9s+SMvfPtQ4EMBmlCOUOE0YRvbKUr1hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757658351; c=relaxed/simple;
-	bh=vjEZdDpFMV3rH4VU4funv7m4JRXeK5IqYMfy9h7k71Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r50u+0FEn7aqWprc7sjiFUk/5hCkmZUsSbe92dfkvosHsIXo3Dgcp/TOXjPccfSUR6haXgX9IHIsV4XLYian9rBebX+uLr64dxNMWZj7sscpXW6RrO23gGsPjxFoFCZCOrzoKzEx17bj8F1oKvVpKmIbXHjmCUX9N+LoZuwJ5oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpsz8t1757658256tc5a5c25c
-X-QQ-Originating-IP: mNi/3mo9Jfovmmmi8rSV2EW3ZQ2Fe7gHXPC6DeR8PAU=
-Received: from lap-jiawenwu.trustnetic.com ( [36.20.63.150])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 12 Sep 2025 14:24:14 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8633369479241873877
-EX-QQ-RecipientCnt: 10
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v4 2/2] net: wangxun: add RSS reta and rxfh fields support
-Date: Fri, 12 Sep 2025 14:23:57 +0800
-Message-Id: <20250912062357.30748-3-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20250912062357.30748-1-jiawenwu@trustnetic.com>
-References: <20250912062357.30748-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1757658531; c=relaxed/simple;
+	bh=n9uh+eUbq1plCIfJHPx2hvfSEm+aoHjwv2aI0EWbXII=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tYJZtOCh/9yi9UXNg8XmsEiaX+mNgxUQlGCVzGZZB4AvcU7xLcP+8aBVcRjLbToQsoy8qL9AVpdChHBtcGr4WEW8vK8iNKGejp60QSNhLlmZsVCpH/AOM5MZu7Vxj1/vYtKg2uLO7oZZ6/R3HBRr3nrAA8Ls5mnXJ++rXbKynTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4cNPXh1ZDYz13Ms5;
+	Fri, 12 Sep 2025 14:24:36 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 099D11400C8;
+	Fri, 12 Sep 2025 14:28:39 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 12 Sep 2025 14:28:37 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
+	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>, Meny Yossefi
+	<meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>, Lee Trager
+	<lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Suman Ghosh <sumang@marvell.com>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH net-next v06 00/14] net: hinic3: Add a driver for Huawei 3rd gen NIC - sw and hw initialization
+Date: Fri, 12 Sep 2025 14:28:17 +0800
+Message-ID: <cover.1757653621.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,262 +65,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: N55MlACpQQDvJG6s49fD9UATfdbsPimCmvdQJdyKNk+gkRr92G6AxFvJ
-	5mhS+ZDK/YZtlLz8I1B9/chkBJ8dTVZxddR0qh7WWIQLWn/CByctZRHsjOyOIKKLRkujnw5
-	71ydAucvV7wCWnHO7r7wvCHertzqEmNm13CbqVdSPI4qsm/XWXMSUMvDv4ZvBceTeKl52G5
-	b7527rGl52YinTxaCm7JhHGFimRvjjpa/5RHibTRcS1RmLBr510yZLgfrAU0+u7BnDK4+xc
-	VNWdZaY51RUYhSzhrVf6qNjCHoPZd4SF2Kg+Hqeu0UIAIJZUyNR1MID1TiYL0KGkCvUeOc+
-	EyP4ujlyGGDIAgGGNdfD/nnnTrJhUumRFcRJOKyqNCjrDrZnISnSuWvLrs0zb4sMDu0lau4
-	R2nyM/HPb1CY8RiWVP7L9qvmA3LaA7N+EUT7zPpNqLdvQZqtpZyIsCYEgIEwRU44jDcmR79
-	Csd7Hqe13YdUkgfLUWNfywEt3dbcgbO5xsdAVFJSVoI5j1wudY+pj+0/0hSO447RcTK7Ubl
-	++Hhbn4q0hJbDX5w4ZTOqMprZgoa5gTYOGfntPAp/RUJKE1PIKvCheESKyEM9WvMb/HIwIO
-	jwQ3JhJT1BWKD8nsjB/PXBkq28OzR6K5EYT/9xmpnfrdeHXI0M/70XDJv7NcMRl26u2JQs/
-	Luu4fcqDT306XPEI1n5EsgcURb2oRdDd4tRdBqL4YC+5488JgVne2x2v8tdHeSf+HOXU36U
-	AvdtK6Zqhhq0H0j41O6Toj7wRbcV0qAcjhUq8Fa/N5pToCPbM02zQawo9N7oCg9qUSjurGK
-	EFWZnbrb/R7b5/NV1vVR8yTOyfLrO24CLhqYP3hk90vcgLtzQ0H2KUojcWoX1w2KjU8peeN
-	Vw+l8ml7hIKMyyIIjnt+gm7aq8FJgHqdGs8IY7oEL9IR8htBoknRTMtJYahHsVlM4pOEdXH
-	mWxIasaxFgPBvhfxZ1X8EE/WE9oFabkrVBfRnphVmsxDjtMAQqDU+gu9roPv05yDZVZaXru
-	8xOwLefF8r2M1cOxABWdGGeRXETpiFbSUfreNX/CyiFYCaYfZjKqNr6RxAI9w=
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 
-Add ethtool ops for Rx flow hashing, query and set RSS indirection table
-and hash key. And support to configure L4 header fields with
-TCP/UDP/SCTP for flow hasing.
+This is [3/3] part of hinic3 Ethernet driver initial submission.
+With this patch hinic3 becomes a functional Ethernet driver.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 136 ++++++++++++++++++
- .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  12 ++
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   6 +
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   6 +
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   6 +
- 5 files changed, 166 insertions(+)
+The driver parts contained in this patch:
+Memory allocation and initialization of the driver structures.
+Management interfaces initialization.
+HW capabilities probing, initialization and setup using management
+interfaces.
+Net device open/stop implementation and data queues initialization.
+Register VID:DID in PCI id_table.
+Fix netif_queue_set_napi usage.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 9572b9f28e59..fd826857af4a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -481,6 +481,142 @@ int wx_set_channels(struct net_device *dev,
- }
- EXPORT_SYMBOL(wx_set_channels);
- 
-+u32 wx_rss_indir_size(struct net_device *netdev)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	return wx_rss_indir_tbl_entries(wx);
-+}
-+EXPORT_SYMBOL(wx_rss_indir_size);
-+
-+u32 wx_get_rxfh_key_size(struct net_device *netdev)
-+{
-+	return WX_RSS_KEY_SIZE;
-+}
-+EXPORT_SYMBOL(wx_get_rxfh_key_size);
-+
-+static void wx_get_reta(struct wx *wx, u32 *indir)
-+{
-+	u32 reta_size = wx_rss_indir_tbl_entries(wx);
-+	u16 rss_m = wx->ring_feature[RING_F_RSS].mask;
-+
-+	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags))
-+		rss_m = wx->ring_feature[RING_F_RSS].indices - 1;
-+
-+	for (u32 i = 0; i < reta_size; i++)
-+		indir[i] = wx->rss_indir_tbl[i] & rss_m;
-+}
-+
-+int wx_get_rxfh(struct net_device *netdev,
-+		struct ethtool_rxfh_param *rxfh)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	rxfh->hfunc = ETH_RSS_HASH_TOP;
-+
-+	if (rxfh->indir)
-+		wx_get_reta(wx, rxfh->indir);
-+
-+	if (rxfh->key)
-+		memcpy(rxfh->key, wx->rss_key, WX_RSS_KEY_SIZE);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(wx_get_rxfh);
-+
-+int wx_set_rxfh(struct net_device *netdev,
-+		struct ethtool_rxfh_param *rxfh,
-+		struct netlink_ext_ack *extack)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+	u32 reta_entries, i;
-+
-+	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-+	    rxfh->hfunc != ETH_RSS_HASH_TOP)
-+		return -EOPNOTSUPP;
-+
-+	reta_entries = wx_rss_indir_tbl_entries(wx);
-+	/* Fill out the redirection table */
-+	if (rxfh->indir) {
-+		for (i = 0; i < reta_entries; i++)
-+			wx->rss_indir_tbl[i] = rxfh->indir[i];
-+
-+		wx_store_reta(wx);
-+	}
-+
-+	/* Fill out the rss hash key */
-+	if (rxfh->key) {
-+		memcpy(wx->rss_key, rxfh->key, WX_RSS_KEY_SIZE);
-+		wx_store_rsskey(wx);
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(wx_set_rxfh);
-+
-+static const struct wx_rss_flow_map rss_flow_table[] = {
-+	{ TCP_V4_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV4_TCP },
-+	{ TCP_V6_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV6_TCP },
-+	{ UDP_V4_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV4_UDP },
-+	{ UDP_V6_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV6_UDP },
-+	{ SCTP_V4_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV4_SCTP },
-+	{ SCTP_V6_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV6_SCTP },
-+};
-+
-+int wx_get_rxfh_fields(struct net_device *dev,
-+		       struct ethtool_rxfh_fields *nfc)
-+{
-+	struct wx *wx = netdev_priv(dev);
-+
-+	nfc->data = RXH_IP_SRC | RXH_IP_DST;
-+
-+	for (u32 i = 0; i < ARRAY_SIZE(rss_flow_table); i++) {
-+		const struct wx_rss_flow_map *entry = &rss_flow_table[i];
-+
-+		if (entry->flow_type == nfc->flow_type) {
-+			if (wx->rss_flags & entry->flag)
-+				nfc->data |= entry->data;
-+			break;
-+		}
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(wx_get_rxfh_fields);
-+
-+int wx_set_rxfh_fields(struct net_device *dev,
-+		       const struct ethtool_rxfh_fields *nfc,
-+		       struct netlink_ext_ack *extack)
-+{
-+	struct wx *wx = netdev_priv(dev);
-+	u8 flags = wx->rss_flags;
-+
-+	if (!(nfc->data & RXH_IP_SRC) ||
-+	    !(nfc->data & RXH_IP_DST))
-+		return -EINVAL;
-+
-+	for (u32 i = 0; i < ARRAY_SIZE(rss_flow_table); i++) {
-+		const struct wx_rss_flow_map *entry = &rss_flow_table[i];
-+
-+		if (entry->flow_type == nfc->flow_type) {
-+			if (nfc->data & entry->data)
-+				flags |= entry->flag;
-+			else
-+				flags &= ~entry->flag;
-+
-+			if (flags != wx->rss_flags) {
-+				wx->rss_flags = flags;
-+				wx_config_rss_field(wx);
-+			}
-+
-+			return 0;
-+		}
-+	}
-+
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL(wx_set_rxfh_fields);
-+
- u32 wx_get_msglevel(struct net_device *netdev)
- {
- 	struct wx *wx = netdev_priv(netdev);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-index 9e002e699eca..2ddd4039d5d2 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-@@ -38,6 +38,18 @@ void wx_get_channels(struct net_device *dev,
- 		     struct ethtool_channels *ch);
- int wx_set_channels(struct net_device *dev,
- 		    struct ethtool_channels *ch);
-+u32 wx_rss_indir_size(struct net_device *netdev);
-+u32 wx_get_rxfh_key_size(struct net_device *netdev);
-+int wx_get_rxfh(struct net_device *netdev,
-+		struct ethtool_rxfh_param *rxfh);
-+int wx_set_rxfh(struct net_device *netdev,
-+		struct ethtool_rxfh_param *rxfh,
-+		struct netlink_ext_ack *extack);
-+int wx_get_rxfh_fields(struct net_device *dev,
-+		       struct ethtool_rxfh_fields *cmd);
-+int wx_set_rxfh_fields(struct net_device *dev,
-+		       const struct ethtool_rxfh_fields *nfc,
-+		       struct netlink_ext_ack *extack);
- u32 wx_get_msglevel(struct net_device *netdev);
- void wx_set_msglevel(struct net_device *netdev, u32 data);
- int wx_get_ts_info(struct net_device *dev,
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index bb03a9fdc711..d89b9b8a0a2c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1208,6 +1208,12 @@ struct vf_macvlans {
- #define WX_RSS_FIELD_IPV4_UDP      BIT(6)
- #define WX_RSS_FIELD_IPV6_UDP      BIT(7)
- 
-+struct wx_rss_flow_map {
-+	u8 flow_type;
-+	u32 data;
-+	u8 flag;
-+};
-+
- enum wx_pf_flags {
- 	WX_FLAG_MULTI_64_FUNC,
- 	WX_FLAG_SWFW_RING,
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index 4363bab33496..662f28bdde8a 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -137,6 +137,12 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_channels		= wx_get_channels,
- 	.set_channels		= ngbe_set_channels,
-+	.get_rxfh_fields	= wx_get_rxfh_fields,
-+	.set_rxfh_fields	= wx_set_rxfh_fields,
-+	.get_rxfh_indir_size	= wx_rss_indir_size,
-+	.get_rxfh_key_size	= wx_get_rxfh_key_size,
-+	.get_rxfh		= wx_get_rxfh,
-+	.set_rxfh		= wx_set_rxfh,
- 	.get_msglevel		= wx_get_msglevel,
- 	.set_msglevel		= wx_set_msglevel,
- 	.get_ts_info		= wx_get_ts_info,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index b496ec502fed..e285b088c7b2 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -560,6 +560,12 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.set_channels		= txgbe_set_channels,
- 	.get_rxnfc		= txgbe_get_rxnfc,
- 	.set_rxnfc		= txgbe_set_rxnfc,
-+	.get_rxfh_fields	= wx_get_rxfh_fields,
-+	.set_rxfh_fields	= wx_set_rxfh_fields,
-+	.get_rxfh_indir_size	= wx_rss_indir_size,
-+	.get_rxfh_key_size	= wx_get_rxfh_key_size,
-+	.get_rxfh		= wx_get_rxfh,
-+	.set_rxfh		= wx_set_rxfh,
- 	.get_msglevel		= wx_get_msglevel,
- 	.set_msglevel		= wx_set_msglevel,
- 	.get_ts_info		= wx_get_ts_info,
+Changes:
+
+PATCH 03 V01: https://lore.kernel.org/netdev/cover.1756195078.git.zhuyikai1@h-partners.com
+
+PATCH 03 V02: https://lore.kernel.org/netdev/cover.1756378721.git.zhuyikai1@h-partners.com
+* Remove extra memset 0 after kzalloc (Vadim Fedorenko)
+* Remove another init function in hinic3_init_hwdev/hwif/nic_io (Vadim Fedorenko)
+* Create a new separate patch of fixing code style (Vadim Fedorenko)
+* Use bitmap_free instead of kfree (ALOK TIWARI)
+* Add prefix "hinic3" to non-static functions and parse_* functions (Vadim Fedorenko)
+* Init func_tbl_cfg to {} (Vadim Fedorenko)
+* Extract endianess improvement from queue pair resource initialization (Vadim Fedorenko)
+* Use kmalloc_array before overwrite rss_hkey on the very next line (Vadim Fedorenko)
+* Remove extra key copy about hinic3_rss_set_hash_key (Vadim Fedorenko)
+* Use netdev_rss_key_fill instead of static rss hash key for safety (Eric Dumazet)
+
+PATCH 03 V03: https://lore.kernel.org/netdev/cover.1756524443.git.zhuyikai1@h-partners.com
+* Modify get_hwif_attr function for improving readability (Vadim Fedorenko)
+* Add HINIC3_PCIE_LINK_DOWN errorcode to init_hwif_attr error handling (Vadim Fedorenko)
+
+PATCH 03 V04: https://lore.kernel.org/netdev/cover.1757057860.git.zhuyikai1@h-partners.com
+* Use pci_enable_msix_range instead of pci_alloc_irq_vectors (Jakub Kicinski)
+* Move defensive codes to place that they are set/loaded (Jakub Kicinski)
+* Code format fixes: remove empty lines between error handling path (Jakub Kicinski)
+* Remove redundant waiting sleep in hinic3_rx_tx_flush (Jakub Kicinski)
+* Use ethtool_rxfh_indir_default for standalizing codes (Jakub Kicinski)
+* Use netif_get_num_default_rss_queues instead of driver-local logic (Jakub Kicinski)
+* Use netif_set_real_num_queues to set both TX and RX queues (Jakub Kicinski)
+
+PATCH 03 V05: https://lore.kernel.org/netdev/cover.1757401320.git.zhuyikai1@h-partners.com
+* Merge comm_cmd_clear_doorbell & comm_cmd_clear_resource (Vadim Fedorenko)
+* Merge hinic3_enable/disable_doorbell to hinic3_toggle_doorbel (Vadim Fedorenko)
+* Update hinic3_Nic_io initialization commit message (Vadim Fedorenko)
+
+PATCH 03 V06:
+* Use array_size() instead of multipling directly (Simon Horman)
+* Modify comment in hinic3_config_num_qps to improve readability (Simon Horman)
+
+Fan Gong (14):
+  hinic3: HW initialization
+  hinic3: HW management interfaces
+  hinic3: HW common function initialization
+  hinic3: HW capability initialization
+  hinic3: Command Queue flush interfaces
+  hinic3: Nic_io initialization
+  hinic3: Queue pair endianness improvements
+  hinic3: Queue pair resource initialization
+  hinic3: Queue pair context initialization
+  hinic3: Tx & Rx configuration
+  hinic3: Add Rss function
+  hinic3: Add port management
+  hinic3: Fix missing napi->dev in netif_queue_set_napi
+  hinic3: Fix code style (Missing a blank line before return)
+
+ drivers/net/ethernet/huawei/hinic3/Makefile   |   2 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    | 168 ++++
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |   4 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 363 ++++++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  21 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 115 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c | 541 ++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  | 269 ++++++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |   2 +-
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   |   9 +-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  |   8 +-
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.c  |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |   2 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 119 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 426 ++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 152 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  20 +
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   5 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    | 870 +++++++++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    |  39 +-
+ .../huawei/hinic3/hinic3_pci_id_tbl.h         |   9 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 336 +++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  14 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 226 ++++-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  38 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 184 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |  30 +-
+ 28 files changed, 3923 insertions(+), 86 deletions(-)
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_pci_id_tbl.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.h
+
+
+base-commit: b1c92cdf5af3198e8fbc1345a80e2a1dff386c02
 -- 
-2.48.1
+2.43.0
 
 
