@@ -1,100 +1,146 @@
-Return-Path: <netdev+bounces-222456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5E0B544E1
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:15:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81FF6B54516
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3800F585E20
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:15:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98F0518968D1
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E712D77F6;
-	Fri, 12 Sep 2025 08:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1DC2D73B9;
+	Fri, 12 Sep 2025 08:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="R0dWqSGH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoAdT8CJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FA11B042E;
-	Fri, 12 Sep 2025 08:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FC12D739C;
+	Fri, 12 Sep 2025 08:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757664811; cv=none; b=JGitqaRhDjwEO4mzbGoV1V5tioOoF3tUWwJL2s0AiT42761Q0LWsImfrysdSx45lW2W3rnw5iXwdwsTisaykfLmaIM/DOFvpNZ56NxsPeM48ASJuUSiitnPTdO2Nr1jr9FiAZvEpLBIpAdcH4+9UC89bnvSYeNDr5fSLwyOOBmY=
+	t=1757665208; cv=none; b=EN2VkutKcaxxTaDEoWUd1pfT4aaGRzSgPVCIjs1UHV411eWGze1PlFfuI0PR1BNt1O39A4eL/IDUsWDUcqVEDoK8b/Klgc6AcHS8AB6dQ29SyjdL1aSNjJCgk5q4/8yVoiBY69jd7q7Y0X+Sielfl4qi+rkB5c4kAk5F+YVcV4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757664811; c=relaxed/simple;
-	bh=PVzSvXABa8GXSjgAUepECwM4ACTyEKcHNTczAbtBCjU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Unr+qFDhrBuTR4JL1dQC7ujtabiSqV8rdmGhBlM1HgzTySJTajDQATP4pi00MD1vN150Qx+j00xonPwvefRhnPGMEOIyl2laFZKfdLrmozvM09aySNUgzEdDPUJepyW//RdECtb9YGZJczFcaPnjieTEdwXj761rj5iGG0i8hsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=R0dWqSGH; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1757664806;
-	bh=PVzSvXABa8GXSjgAUepECwM4ACTyEKcHNTczAbtBCjU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=R0dWqSGHxdsV0gXXW25c4EibkmCsCm2OPiHlXMnpPIBKSNJie2tyslyzzq6WNg2mF
-	 rTwsEjaY34TvtovRAl9MZ108lQd7YytIzGM1DzsUn5QAxtwqs8N0bTv9DBh7vzwJ94
-	 lrtktDu/FiCs5ZLZpuclhTOZSrhqz5gmv7n0TBU/W+IkBcDcOCJLUTVxwTsQhMvbh/
-	 u3MgQg7a2cB2EtIxANExKbqnJXQiwHuPLX9ECknbYnHbgiIvg4YDMEAxr8oiv3e4uZ
-	 bbyCjLrIMD5otaK5/0pn12bBoxXsZPfP53ATCpl+6SIavMPIkFGRwJH96tVnfQt8qJ
-	 B5EU1dBwHXOcQ==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id E3FAB17E13B8;
-	Fri, 12 Sep 2025 10:13:24 +0200 (CEST)
-Message-ID: <3526ce55-41bd-47f4-ad8a-118a4b14a076@collabora.com>
-Date: Fri, 12 Sep 2025 10:13:24 +0200
+	s=arc-20240116; t=1757665208; c=relaxed/simple;
+	bh=OOusLVxnKHKzYYpqIszKMcMpYFoufzRxkmlgmDbuoAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RIl/z+PTsAoK11LpN2Fbr1CKXLGKIR4GbKS5EZ93sIpgOvs7+nZySzJR5VFeMMuR/XoRu+X6wPJdQ3+k5CHXVrkmSqy3YNx7682ZXhwyTLtE9kBcWsVxQSUNpsSozeytQqPP40lUsqOZMq+vMw4zqTWPR/RDzGMf0qDxOlVsR9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoAdT8CJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53489C4CEF4;
+	Fri, 12 Sep 2025 08:20:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757665208;
+	bh=OOusLVxnKHKzYYpqIszKMcMpYFoufzRxkmlgmDbuoAE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YoAdT8CJrYPBnrdP51NjrTWIRu+cXQR39oCZb/t/2jvT1bIJM9VXgbYW0tSIkbYrL
+	 NVMqDCnH8Dj8VBDVUAgtyQTvh/3MoRpno+6fCQoZSAox46ONzWRZJp1ktv5Lp5bhzi
+	 r9+106OXqgmFfl4iT7miTolwEFwmk1NdK/6Cdi2nBGnzY98SjgBObq8DEg7wHqVRms
+	 7AhZQLM74buaIeh3rrJVvSHBVOu3bHROqsVjaM45tLQQ8qPm3HTbOPAXBwytOq7FnC
+	 ofuKpTvPGQmC535taTMphjBBwAhRG1wg8Y14FaNzd9xz43E+4693r1aCn97d5Bj/T5
+	 ZXJ9rbbMWyWoQ==
+Date: Fri, 12 Sep 2025 10:19:57 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Amir Goldstein <amir73il@gmail.com>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 27/32] nsfs: support file handles
+Message-ID: <20250912-wirsing-karibus-7f6a98621dd1@brauner>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org>
+ <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
+ <20250911-werken-raubzug-64735473739c@brauner>
+ <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/12] dt-bindings: input: Convert MELFAS MIP4
- Touchscreen to DT schema
-To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>, airlied@gmail.com,
- amergnat@baylibre.com, andrew+netdev@lunn.ch, andrew-ct.chen@mediatek.com,
- broonie@kernel.org, chunkuang.hu@kernel.org, conor+dt@kernel.org,
- davem@davemloft.net, dmitry.torokhov@gmail.com, edumazet@google.com,
- flora.fu@mediatek.com, heiko@sntech.de, houlong.wei@mediatek.com,
- jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org,
- lgirdwood@gmail.com, linus.walleij@linaro.org,
- louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com,
- maarten.lankhorst@linux.intel.com, marcel@holtmann.org,
- matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com,
- mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com,
- robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch,
- support.opensource@diasemi.com, tiffany.lin@mediatek.com,
- tzimmermann@suse.de, yunfei.dong@mediatek.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org
-References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
- <20250911151001.108744-13-ariel.dalessandro@collabora.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <20250911151001.108744-13-ariel.dalessandro@collabora.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
 
-Il 11/09/25 17:10, Ariel D'Alessandro ha scritto:
-> Convert the existing text-based DT bindings for MELFAS MIP4 Touchscreen
-> controller to a DT schema.
+On Thu, Sep 11, 2025 at 01:36:28PM +0200, Amir Goldstein wrote:
+> On Thu, Sep 11, 2025 at 11:31 AM Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
+> > > On Wed, Sep 10, 2025 at 4:39 PM Christian Brauner <brauner@kernel.org> wrote:
+> > > >
+> > > > A while ago we added support for file handles to pidfs so pidfds can be
+> > > > encoded and decoded as file handles. Userspace has adopted this quickly
+> > > > and it's proven very useful.
+> > >
+> > > > Pidfd file handles are exhaustive meaning
+> > > > they don't require a handle on another pidfd to pass to
+> > > > open_by_handle_at() so it can derive the filesystem to decode in.
+> > > >
+> > > > Implement the exhaustive file handles for namespaces as well.
+> > >
+> > > I think you decide to split the "exhaustive" part to another patch,
+> > > so better drop this paragraph?
+> >
+> > Yes, good point. I've dont that.
+> >
+> > > I am missing an explanation about the permissions for
+> > > opening these file handles.
+> > >
+> > > My understanding of the code is that the opener needs to meet one of
+> > > the conditions:
+> > > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
+> > > 2. current task is in the opened namespace
+> >
+> > Yes.
+> >
+> > >
+> > > But I do not fully understand the rationale behind the 2nd condition,
+> > > that is, when is it useful?
+> >
+> > A caller is always able to open a file descriptor to it's own set of
+> > namespaces. File handles will behave the same way.
+> >
 > 
-> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> I understand why it's safe, and I do not object to it at all,
+> I just feel that I do not fully understand the use case of how ns file handles
+> are expected to be used.
+> A process can always open /proc/self/ns/mnt
+> What's the use case where a process may need to open its own ns by handle?
+> 
+> I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
+> do not keep an elevated refcount of ns object could be useful in the same
+> way that an NFS client keeps file handles without keeping the file object alive.
+> 
+> But if you do not have CAP_SYS_ADMIN and can only open your own ns
+> by handle, what is the application that could make use of this?
+> and what's the benefit of such application keeping a file handle instead of
+> ns fd?
 
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+A process is not always able to open /proc/self/ns/. That requires
+procfs to be mounted and for /proc/self/ or /proc/self/ns/ to not be
+overmounted. However, they can derive a namespace fd from their own
+pidfd. And that also always works if it's their own namespace.
 
+There's no need to introduce unnecessary behavioral differences between
+/proc/self/ns/, pidfd-derived namespace fs, and file-handle-derived
+namespace fds. That's just going to be confusing.
 
+The other thing is that there are legitimate use-case for encoding your
+own namespace. For example, you might store file handles to your set of
+namespaces in a file on-disk so you can verify when you get rexeced that
+they're still valid and so on. This is akin to the pidfd use-case.
+
+Or just plainly for namespace comparison reasons where you keep a file
+handle to your own namespaces and can then easily check against others.
 
