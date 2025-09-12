@@ -1,160 +1,176 @@
-Return-Path: <netdev+bounces-222510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28259B54A9A
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:05:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F15F1B54D47
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B76517AA166
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:04:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9988C17F13D
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DA02E6CD9;
-	Fri, 12 Sep 2025 11:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5A33093CB;
+	Fri, 12 Sep 2025 12:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WdWXokpe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/oSd1W4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E951C2DC778;
-	Fri, 12 Sep 2025 11:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927EB32145E
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757675144; cv=none; b=liiMNSTfeeaJZj1fXXIYJJSeiNGunJnF2OszaNJ1GizDO4B1966EObDjDIS0a9EMqUFfuNXoIiPECzVUCuE/CjGxg1zQSHZDlKohN3raAraMWKn9hKFVJ96uhXoSJPUQg2+2ArEkyZa6RmnvZdU1+Gj5k3+LxnYVXLrfnph1OUM=
+	t=1757678931; cv=none; b=Wk51odk12OyntxHSUT8BZZdjCKm2YIVApzzMWvTXcj9kX8H3HEexKVpPpEUn3kmEgB/LfXWDfhtyoYs7m8DIIpHGIlXslldtAJFAEuixDI2F2z4LYFIi+VCQTua6/ggsiNCdGGh6tYdsvrz7gDwVlj+HCMcJNqYCCTzBq+lZmMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757675144; c=relaxed/simple;
-	bh=VWr6YEk/eWyuf8GX6B8kqrku8rVzmRGsF4aKQi6DPC0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ElyIpK+TIqxLS0OvhKEBOjieZPu/DnQRXb2Fx9DacVQvm0TXeH1Bh7MImeADf8sUdLN09tmh5GS+NB5URVJhzQegVGEptz8ZsedeLadZuT7WV5RPTqdxFmwV68ReeWpvvqT0xDojBwN6eoF39tECtT7rV6jSjCPVOdU5CG5vQqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WdWXokpe; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58C9fD3e017429;
-	Fri, 12 Sep 2025 11:05:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=ePnXDXr8x1lIo6VZAPonJQEP
-	xXdMy4DI0k4pmkIC51w=; b=WdWXokpeTtEPV6RLCqA4X0W2OW32tyrmRNuKH+N2
-	ExWZxiT19tLZmV0CN5bMT8YYIYxsSt4KaTcco2HVVvEnha3ezi69s9Z9dKM1IR/M
-	hmtJRgieo1/PZBELBFT4oQvysxOI7vjd4f6DCmvAKcG0HGOsekAbWI9WzrJwszXM
-	TwwlOPgUWhacXxjlng5Thlzy3wOkNN73OxLJOqsLbbsXKGRXCT+mv7Xi+1oJtoLz
-	U5Em42hBCJgCUFNP7BEGMdtwSupaD9gkOdW30H56eImfbwrr5jizS8ED1jw9G0M2
-	dRgBNW905R3zqdWoVh6pmUl6cJRY3+l9ORE6kmr4sJJjkg==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 490db8ufwk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Sep 2025 11:05:38 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 58CB5bdm016550
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Sep 2025 11:05:37 GMT
-Received: from hu-mchunara-hyd.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.24; Fri, 12 Sep 2025 04:05:31 -0700
-Date: Fri, 12 Sep 2025 16:35:21 +0530
-From: Monish Chunara <quic_mchunara@quicinc.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-CC: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        "Bartosz Golaszewski" <brgl@bgdev.pl>, <kernel@oss.qualcomm.com>,
-        Wasim Nazir
-	<wasim.nazir@oss.qualcomm.com>,
-        <linux-mmc@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH v4 01/14] dt-bindings: mmc: sdhci-msm: Document the
- Lemans compatible
-Message-ID: <aMP+cdmPkej+lPtN@hu-mchunara-hyd.qualcomm.com>
-References: <20250908-lemans-evk-bu-v4-0-5c319c696a7d@oss.qualcomm.com>
- <20250908-lemans-evk-bu-v4-1-5c319c696a7d@oss.qualcomm.com>
+	s=arc-20240116; t=1757678931; c=relaxed/simple;
+	bh=pg2OzxfdDmvV4PZ3/yrEF/ttLXM7KmEXR3GgYwf88oM=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=fa6lrTMcNST2nhKswP37dlYXbu1oWfiilOoxq5zyORyO56nR//JihUlXJyo7jDU4BcxbckfnVxrD6bNAIvbDJM1fKrA0/3cWQC8oY/ywyB3pAi2Uzd+NcA/4DAzfRxP9DU4b4rgZFHRhlqCoQGx37rr+InPBp5+3uwHWmhK7Zi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j/oSd1W4; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45df09c7128so14938255e9.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 05:08:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757678928; x=1758283728; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z3mBB6R4Rvgptsn0OxjqAYg70NanrEyHXxP0kqh9yyw=;
+        b=j/oSd1W49q5GqUpc4lcLYvy2FpJ6r6ZYirBlz6SCqXtj+q1E4NhrYMAZRt2jCALf3Z
+         aYdOqFTvZZ7W3ga1P0A4UJ4iPdackJG2xm3HJTeoqJnVJ3+xXSFFYLDYJ6rBlWxTyIvS
+         u8CIOf11nkX+DDYBU9a4/FJ7TDYPDJTJ3d5Pjn4MOJcDzWSBjvjp/59HyOerZOkzWRrz
+         P3Yl115aDgI4ZVtknoMN6rAtqJ9Uh9w+3qjzQK3X0WdDAvFPmDmhCLcS/QoXXqXtzi5q
+         EgzhFN7HpA1/iV+GgMS10JQNKzIiXB64Iukc582CTVveKrg/kBbBhvImGFf9zN8MN/JP
+         z0yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757678928; x=1758283728;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z3mBB6R4Rvgptsn0OxjqAYg70NanrEyHXxP0kqh9yyw=;
+        b=mNGgsY6d6DJFJ3rBKxrHK6+IRJH8RUq0xJHjEObbFg4vQx/WnIL+Nuan7ItSWrsOMK
+         8AItIKb0qOcmTR+sjoXQXWm/MecHpxMRacC+eTYvZsxHx/Zl+qeoFCPRj340bAYwWl1H
+         HGu6n2vOAhNtYXjoEMWkFeJ0B6pZfwHD0fXlDuZ5xBPcCz5vhF/WitO/YrTiUhxv0B4p
+         1hVExsfuhZkeKpuuQ5aKAOaXhHA6X2mS8O69/WT0ushq2xkXF7T7OgDes3OW9vinWi5H
+         UVYYTPf52mnCarhIHYmMe6z/o+uS0PKzGAMZl4ylqy2R4d2IZVf4wzrxWH3wodui0HW9
+         N2IA==
+X-Forwarded-Encrypted: i=1; AJvYcCWKl3mBHpXvfhcG0XyzVKlB8ME8+D7Y3tzan/jfkuCPiCY2DXTNlmQXJnhCJ6BqhonE1KKqVmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVf+bezVZ3o5kx6uRr9CXZi3tyY/cL6mEZRr2/bZn5eqSlthPl
+	vcGeh33ANIo8s1LFyS3oZz/pHxzJoFNuT6RNtm/OK4qIXqoiskJwNAAJ
+X-Gm-Gg: ASbGncv45oL99PohJqecObV+ebc1wWHUhSZIfNezQq/v+KJeVwR6gvYGBTCFEPZAR1S
+	zPKeFSO3sUbIzwEEC0zhtoB1EJjebcavLilF8NOVfA3Rem/bzv2j+dLsWCl75jBxMp1OX2fo9EZ
+	+U6kexvJ2uXdqhMF7OweiZ6IGvilu8wqshZav87qCqAwJHF665shWRlnBjWad29NgLK6cRgZd/v
+	jge7GYKI7LM0v1cgz3yKfCfY1lL9MXYcJdK4+I5Pog1+GJE0bp6+Do2sIC3GYLZL8YaOAICSz08
+	7zvXKniOIMpCi5ipnBIOsnWLz3NmUenC51VRBKunzroO8fYq3kR30HvIcpfPThrd7wYi/sG+F5k
+	nVoVhDK8HniE8Y3VZi5u2qzkrxC4OUh2JRw==
+X-Google-Smtp-Source: AGHT+IGv/35p/W7r3GHx5SA997jhumk8Hh17nHWyXFsjPVhFKF0I3tiZFXsC/nBQd4qsEp3pwnV0nA==
+X-Received: by 2002:a05:600c:548f:b0:45b:8ad2:76c8 with SMTP id 5b1f17b1804b1-45f2125d5cdmr28593575e9.2.1757678927561;
+        Fri, 12 Sep 2025 05:08:47 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037186e5sm60557925e9.5.2025.09.12.05.08.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Sep 2025 05:08:47 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>,  Jakub Kicinski <kuba@kernel.org>,
+  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Simon Horman
+ <horms@kernel.org>,  linux-doc@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] tools: ynl: rst: display attribute-set doc
+In-Reply-To: <a1f55940-7115-4650-835c-2f1138c5eaa4@kernel.org>
+Date: Fri, 12 Sep 2025 12:07:04 +0100
+Message-ID: <m2ecscudyf.fsf@gmail.com>
+References: <20250910-net-next-ynl-attr-doc-rst-v1-1-0bbc77816174@kernel.org>
+	<m2v7lpuv2w.fsf@gmail.com>
+	<a1f55940-7115-4650-835c-2f1138c5eaa4@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250908-lemans-evk-bu-v4-1-5c319c696a7d@oss.qualcomm.com>
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAzMSBTYWx0ZWRfX5305g5kY05Qf
- cXFnWL/GGvkynL+M97Po0o58mwqLIL1k7uqrq4UbC+by8RLygtCBc+RFAw3boa/Z9WbE8B0ljFW
- qeydOXhEhCJnpiW1mFnDmMLs4SohU1I/ggIsIBrIaQBHoAd436+pPkOOLTUr56ONAcDCHtD6W+k
- jy3kno1tuRLh0WR+Y3LxdPfou8YeNL4t6BxHG6zATRnf/ws6jlWAo77lmtLJ/Li1OSHLu/soXiH
- 6fp5c5lgK9O+7pFzjnTtfXE6D9QI+zakJaeyKar+XuMJRsXkaW6jHjh7tHABdTXuhkpSlwFlJ9u
- fnz1etNiUuhTo3tNLGJ+e1CBW/f1vxyi+3mMqNxcF5LbV1pUlEJdg3187rJhngTifaERgtGh0i0
- y3nLMSBm
-X-Proofpoint-ORIG-GUID: EN3UG_QBNxLiwh51FQOdz9fKj5SKLwvk
-X-Proofpoint-GUID: EN3UG_QBNxLiwh51FQOdz9fKj5SKLwvk
-X-Authority-Analysis: v=2.4 cv=VIDdn8PX c=1 sm=1 tr=0 ts=68c3fe82 cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8
- a=KKAkSRfTAAAA:8 a=EUspDBNiAAAA:8 a=6_WQ6zm6zWfZUhxJvNAA:9 a=CjuIK1q_8ugA:10
- a=TjNXssC_j7lpFel5tvFf:22 a=cvBusfyB2V15izCimMoJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-12_04,2025-09-11_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0
- phishscore=0 adultscore=0 clxscore=1011 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060031
+Content-Type: text/plain
 
-On Mon, Sep 08, 2025 at 01:49:51PM +0530, Wasim Nazir wrote:
-> From: Monish Chunara <quic_mchunara@quicinc.com>
-> 
-> Add the MSM SDHCI compatible name to support both eMMC and SD card for
-> Lemans, which uses 'sa8775p' as the fallback SoC. Ensure the new
-> compatible string matches existing Lemans-compatible formats without
-> introducing a new naming convention.
-> 
-> The SDHCI controller on Lemans is based on MSM SDHCI v5 IP. Hence,
-> document the compatible with "qcom,sdhci-msm-v5" as the fallback.
-> 
-> Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Matthieu Baerts <matttbe@kernel.org> writes:
 
-Hi Ulf,
+> Hi Donald,
+>
+> On 11/09/2025 12:44, Donald Hunter wrote:
+>> "Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
+>> 
+>>> Some attribute-set have a documentation (doc:), but it was not displayed
+>>> in the RST / HTML version. Such field can be found in ethtool, netdev,
+>>> tcp_metrics and team YAML files.
+>>>
+>>> Only the 'name' and 'attributes' fields from an 'attribute-set' section
+>>> were parsed. Now the content of the 'doc' field, if available, is added
+>>> as a new paragraph before listing each attribute. This is similar to
+>>> what is done when parsing the 'operations'.
+>> 
+>> This fix looks good, but exposes the same issue with the team
+>> attribute-set in team.yaml.
+>
+> Good catch! I forgot to check why the output was like that before
+> sending this patch.
+>
+>> The following patch is sufficient to generate output that sphinx doesn't
+>> mangle:
+>> 
+>> diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
+>> index cf02d47d12a4..fae40835386c 100644
+>> --- a/Documentation/netlink/specs/team.yaml
+>> +++ b/Documentation/netlink/specs/team.yaml
+>> @@ -25,7 +25,7 @@ definitions:
+>>  attribute-sets:
+>>    -
+>>      name: team
+>> -    doc:
+>> +    doc: |
+>>        The team nested layout of get/set msg looks like
+>>            [TEAM_ATTR_LIST_OPTION]
+>>                [TEAM_ATTR_ITEM_OPTION]
+> Yes, that's enough to avoid the mangled output in .rst and .html files.
+>
+> Do you plan to send this patch, or do you prefer if I send it? As part
+> of another series or do you prefer a v2?
 
-Could you please pick the binding (this patch) through your tree, so that the DT
-Maintainer can pick up the remaining dts changes through the qcom tree?
+Could you add it to a v2 please.
 
-Regards,
-Monish
+> Note that a few .yaml files have the doc definition starting at the next
+> line, but without this '|' at the end. It looks strange to me to have
+> the string defined at the next line like that. I was thinking about
+> sending patches containing modifications created by the following
+> command, but I see that this way of writing the string value is valid in
+> YAML.
+>
+>   $ git grep -l "doc:$" -- Documentation/netlink/specs | \
+>         xargs sed -i 's/doc:$/doc: |/g'
+>
+> Except the one with "team", the other ones don't have their output
+> mangled. So such modifications are probably not needed for the other ones.
 
-> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> ---
->  Documentation/devicetree/bindings/mmc/sdhci-msm.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> index 22d1f50c3fd1..594bd174ff21 100644
-> --- a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> +++ b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> @@ -48,6 +48,7 @@ properties:
->                - qcom,qcs615-sdhci
->                - qcom,qcs8300-sdhci
->                - qcom,qdu1000-sdhci
-> +              - qcom,sa8775p-sdhci
->                - qcom,sar2130p-sdhci
->                - qcom,sc7180-sdhci
->                - qcom,sc7280-sdhci
-> 
-> -- 
-> 2.51.0
-> 
+Yeah, those doc: entries look weird to me too. Not sure it's worth
+fixing them up, given that they are valid. Also worth noting that the
+two formats that we should encourage are
+
+  doc: >-
+    Multi line text that will get folded and
+    stripped, i.e. internal newlines and trailing
+    newlines will be removed.
+
+  doc: |
+    Multi line text that will be handled literally
+    and clipped, i.e. internal newlines and trailing
+    newline are preserved but additional trailing
+    newlines get removed.
+
+So if we were to fix up the doc:$ occurrences, then I'd suggest using
+doc: >-
+
+Cheers,
+Donald
 
