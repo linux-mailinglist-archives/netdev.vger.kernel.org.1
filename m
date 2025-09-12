@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-222480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01E9B546B2
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:17:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57018B546B4
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EBE5AC045E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:17:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E63D582DEF
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B46D284694;
-	Fri, 12 Sep 2025 09:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44512285049;
+	Fri, 12 Sep 2025 09:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TBVpNSul"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="v1TaEspG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3209627E1B1
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729DD27EC7C;
+	Fri, 12 Sep 2025 09:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757668596; cv=none; b=tu24XXlZwJbrIeZUNKEiwjPcawCZkpnUHwV/husz3/IgXuxY8QtbVWxzwMMUgPf9LaknPfGp0hg20HYrlBLrM+YjsWp1BsUiAcdJhPqsoRykoogxJyvBOzUf3Q+x9cUbb/D9Wwh3KM2dFHYIF+z/P4YoT62ccpQZaL6FxaDjP9Y=
+	t=1757668598; cv=none; b=mrCLIJH831I1sapUmx//QckvAhcNrjLzIVan/dFcrIEqWfew7a6PgYxWrjE4nadFpoNGzEkOK6Oju7B9p/GnTfrdZ3XEY2R4JX7bihyHhqaSTdSheU0q/t4srk2skZuGi+klz5Cpj3v2ZqKS1GRsMVXsrjZpUI7B1DpVrNiLqZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757668596; c=relaxed/simple;
-	bh=7xjaN++yI6KEPxU35tjofli5LkxLgcT962mH3BRyDXg=;
+	s=arc-20240116; t=1757668598; c=relaxed/simple;
+	bh=M6H4vuC1kEo4E+gLt9fSDpwP8uZAqmIgNGYQto3FN6w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VbiLzT7A8IE1E+DGRfkqzyQkzA+0N003TzzZycCp8Ewi4vWGFZh2EZqlHY+BMAt+KsVvq0TVuJZpaRAG+H3xgQfyIrxKpgs0MPlEWPCeggM1iKIsAweikq5qvlf2lprs/RNiWjV5FCcaGds5Gs7VHwVV0uRJFXLp+i0mdqQY9zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TBVpNSul; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=UYbDug5gjKOQqKZf4TEN2MMGauDq1lHoE7/p2sG2P7fKIQFUecOb0C3pJS+ny1htebMU0C0AoP1+IXvvrfOVOiBgygXtzvzLgjvS5fg+2ScL+fI9taen0IJc5GhaDEzZ1antvwI9/J8KviC/qF9If+2W6zfNxhPbQTIo3XnmZ2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=v1TaEspG; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 7DDDFC8EC46;
-	Fri, 12 Sep 2025 09:16:16 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id BE04E4E40CA2;
+	Fri, 12 Sep 2025 09:16:34 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 755A260638;
-	Fri, 12 Sep 2025 09:16:32 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 525F1102F29DD;
-	Fri, 12 Sep 2025 11:16:29 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 92B5660638;
+	Fri, 12 Sep 2025 09:16:34 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9C311102F29F0;
+	Fri, 12 Sep 2025 11:16:31 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1757668591; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1757668593; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=L+6jrk72fwMKzwzZOHzEZKdBpoCdacRGXLcgPacqMIc=;
-	b=TBVpNSulOChQdlcmYi2dQcLYtqA+Q+FarGn42UjJOXftDgtEDTZPRWGyii2m/rP80+EzVK
-	ATqwx/Nwpw5P1madWnjfWjsm0qZvOT5BnZyVlCxDCWXXl/fz0dPv5gVwfrNMDrqod0aPmK
-	9KR7P3qkezmyJz6bf5REKk+cMr3LtOSYZOXb1FBOefrCPEO93qpOfeZlpLoPuqeIPrX1Pz
-	rU00wb7SQmT0fo+dbZTyEVqDNQulVyBBdMmJN+X13xg3xvkyQFDoqFSlx6cGOMhgANp3e+
-	dw+BVWGo2jVFdBbO8xOztibiJk0bSMJlA1k8GunUczgq8ul8Z9C7PZiKvzfFLg==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Fri, 12 Sep 2025 11:09:13 +0200
-Subject: [PATCH net-next v2 2/3] dt-bindings: net: dsa: microchip: Add
- strap description to set SPI mode
+	bh=WrEpjzQG6DNyDJzeGBdcuqSqyOJS2DKBX8gv90YD2t4=;
+	b=v1TaEspGpxrRVy9CAufNd7nysVTGp7WzDeWJbuYbWq3jSgdOAofV8kjtAU0R+M9hk98xCH
+	Vgo0qNsz2WFp5siWvHSRuxqjYl1sAFXUhgeClNLb01j7ZKDjU8BNX2FEXos1iO24Ih/HkH
+	gFpN82nVW/ut3i4opQ2pu5rlkuMyYwHSjXsU8YthPAVVfrU9P9kqmTHadi9oc+gHQ1ty3+
+	fHLoQHu/2BoYKFRFWmgBoA/A4xxCvXTUsIPyRLhS0OZ1I5esjbpDPqZ4JsM9zzrIJEHPCW
+	evYSdH77Ge6oA9BQ909yIKT3TTDwNuB69pI+BuwXOFdjvHRJsPXrw5TUoM1hvg==
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Date: Fri, 12 Sep 2025 11:09:14 +0200
+Subject: [PATCH net-next v2 3/3] net: dsa: microchip: Set SPI as bus
+ interface during reset for KSZ8463
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250912-ksz-strap-pins-v2-2-6d97270c6926@bootlin.com>
+Message-Id: <20250912-ksz-strap-pins-v2-3-6d97270c6926@bootlin.com>
 References: <20250912-ksz-strap-pins-v2-0-6d97270c6926@bootlin.com>
 In-Reply-To: <20250912-ksz-strap-pins-v2-0-6d97270c6926@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -78,63 +78,95 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 X-Mailer: b4 0.14.2
 X-Last-TLS-Session-Version: TLSv1.3
 
-At reset, KSZ8463 uses a strap-based configuration to set SPI as
-interface bus. If the required pull-ups/pull-downs are missing (by
-mistake or by design to save power) the pins may float and the
-configuration can go wrong preventing any communication with the switch.
+At reset, the KSZ8463 uses a strap-based configuration to set SPI as
+bus interface. SPI is the only bus supported by the driver. If the
+required pull-ups/pull-downs are missing (by mistake or by design to
+save power) the pins may float and the configuration can go wrong
+preventing any communication with the switch.
 
-Add a 'reset' pinmux state
-Add a KSZ8463 specific strap description that can be used by the driver
-to drive the strap pins during reset. Two GPIOs are used. Users must
-describe either both of them or none of them.
+Introduce a ksz8463_configure_straps_spi() function called during the
+device reset. It relies on the 'strap-rxd*-gpios' OF properties and the
+'reset' pinmux configuration to enforce SPI as bus interface.
 
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- .../devicetree/bindings/net/dsa/microchip,ksz.yaml | 24 ++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ drivers/net/dsa/microchip/ksz_common.c | 45 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-index db8175b4ced6d136ba97c371b68ba993637e444a..099c6b373704427755c3d8cad4b1cd930219f2f2 100644
---- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-@@ -34,6 +34,13 @@ properties:
-       - microchip,ksz8567
-       - microchip,lan9646
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 7292bfe2f7cac3a0d88bb51339cc287f56ca1d1f..ac05dd25b4863a61b15ac1131587b2b4df11ec41 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -23,6 +23,7 @@
+ #include <linux/of_mdio.h>
+ #include <linux/of_net.h>
+ #include <linux/micrel_phy.h>
++#include <linux/pinctrl/consumer.h>
+ #include <net/dsa.h>
+ #include <net/ieee8021q.h>
+ #include <net/pkt_cls.h>
+@@ -5338,6 +5339,38 @@ static int ksz_parse_drive_strength(struct ksz_device *dev)
+ 	return 0;
+ }
  
-+  pinctrl-names:
-+    items:
-+      - const: default
-+      - const: reset
-+        description:
-+          Used during reset for strap configuration.
++static int ksz8463_configure_straps_spi(struct ksz_device *dev)
++{
++	struct pinctrl *pinctrl;
++	struct gpio_desc *rxd0;
++	struct gpio_desc *rxd1;
 +
-   reset-gpios:
-     description:
-       Should be a gpio specifier for a reset line.
-@@ -139,6 +146,23 @@ allOf:
-                     should be provided externally.
-               dependencies:
-                 microchip,rmii-clk-internal: [ethernet]
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            const: microchip,ksz8463
-+    then:
-+      properties:
-+        strap-rxd0-gpios:
-+          description:
-+            RXD0 pin, used to select SPI as bus interface.
-+        strap-rxd1-gpios:
-+          description:
-+            RXD1 pin, used to select SPI as bus interface.
++	rxd0 = devm_gpiod_get_optional(dev->dev, "strap-rxd0", GPIOD_OUT_LOW);
++	if (IS_ERR(rxd0))
++		return PTR_ERR(rxd0);
 +
-+dependencies:
-+  strap-rxd0-gpios: [ strap-rxd1-gpios ]
-+  strap-rxd1-gpios: [ strap-rxd0-gpios ]
++	rxd1 = devm_gpiod_get_optional(dev->dev, "strap-rxd1", GPIOD_OUT_HIGH);
++	if (IS_ERR(rxd1))
++		return PTR_ERR(rxd1);
++
++	if (!rxd0 && !rxd1)
++		return 0;
++
++	if ((rxd0 && !rxd1) || (rxd1 && !rxd0))
++		return -EINVAL;
++
++	pinctrl = devm_pinctrl_get_select(dev->dev, "reset");
++	if (IS_ERR(pinctrl))
++		return PTR_ERR(pinctrl);
++
++	return 0;
++}
++
++static int ksz8463_release_straps_spi(struct ksz_device *dev)
++{
++	return pinctrl_select_default_state(dev->dev);
++}
++
+ int ksz_switch_register(struct ksz_device *dev)
+ {
+ 	const struct ksz_chip_data *info;
+@@ -5353,10 +5386,22 @@ int ksz_switch_register(struct ksz_device *dev)
+ 		return PTR_ERR(dev->reset_gpio);
  
- unevaluatedProperties: false
+ 	if (dev->reset_gpio) {
++		if (of_device_is_compatible(dev->dev->of_node, "microchip,ksz8463")) {
++			ret = ksz8463_configure_straps_spi(dev);
++			if (ret)
++				return ret;
++		}
++
+ 		gpiod_set_value_cansleep(dev->reset_gpio, 1);
+ 		usleep_range(10000, 12000);
+ 		gpiod_set_value_cansleep(dev->reset_gpio, 0);
+ 		msleep(100);
++
++		if (of_device_is_compatible(dev->dev->of_node, "microchip,ksz8463")) {
++			ret = ksz8463_release_straps_spi(dev);
++			if (ret)
++				return ret;
++		}
+ 	}
  
+ 	mutex_init(&dev->dev_mutex);
 
 -- 
 2.51.0
