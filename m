@@ -1,116 +1,156 @@
-Return-Path: <netdev+bounces-222402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949B9B541A6
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:19:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E5A4B541A8
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50CE6486C30
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:19:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E03D05A6302
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C6622D4F1;
-	Fri, 12 Sep 2025 04:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E43523F417;
+	Fri, 12 Sep 2025 04:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQeubunF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTZi9oqP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8991179CD
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 04:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC9523814C
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 04:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757650788; cv=none; b=n0MW3Zst33IGB4k40fKgExBEtttlYUOMtfzbRdJXWBjbNZU9Q43RIHeZV6UTrMMe6C2fs0IeZvD/qY0jry7fxorcVfopIGJwtoSY9ADWdqJWzMV2vglmQLUXWthm8EYtujw6y0I/RWut/ZlwBXzwzI6m0zHpzxsbM+Pvew2ygaQ=
+	t=1757650966; cv=none; b=RRDzy0M18w+okHrJGQxE056xeh3/FOS1MQovFmgodiVfwHoynPgOEA/wVmiF7VoRkX4LvG0vdmmdzQoKwOZP8aQxIPbMb4nuxWW6S6JyFIHSkERQ0Wa/zO1pQpnijnMZaLPxpPbWvV/NN3TfBaxWGdPnOwIpTMO5o1LNDplYudE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757650788; c=relaxed/simple;
-	bh=+JSxQ+gaH1zt0MkLtqDcrldmuerhcNAt6ZV7U/9yqY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fM9ZTXHmGXvSXvcFj5C+lWQIOT370wCIZrIHZq7eqfhFR+ARbdywqeq58fc8uTEqN+ouDRt2kzquLZGq1EvoXAa7RcBqCzUdePSi2Q+NOFFIjrB+ptVeSDyjuHmUItZk38IHyhE2CMetuHJl6zOZCpO+UmsTzd7Sr6LxCcJj4uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQeubunF; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-251ace3e7caso19094235ad.2
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 21:19:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757650787; x=1758255587; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6nKvu5cfJ180DRAKFjFgHBVhF1AV98rGP3oTY8bGprQ=;
-        b=TQeubunFiZqZDah35xyrbJzMHyCGufiq99Ofn3iYvwDXiL5YfJU37kd51LGaHyCqIa
-         8xkJQeyGuROUhIVw5ysh16DZwlJzevmLYIOyUhZ+2f5jlP/N4p4uxwP+hjhLiU6glA31
-         lEuTOtaHJ3ATn3gn4jQa/zVCo2HX2JwWTdqA+pub68z8Pnwq80e29H9JPVAW6QUVGtbC
-         99kYM1gXLaC6DsV2YEKBWAY5RWPbwMQ47E7i3av0D3JSCVS+cxLlxZir7uDioT4YcgjZ
-         hOoRB7fJrpo1N+LND1+a58IXEAxomPx4qp2N8pbVOtO5tzoiFifs3PHnkmFbrHLFEVb0
-         /NUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757650787; x=1758255587;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6nKvu5cfJ180DRAKFjFgHBVhF1AV98rGP3oTY8bGprQ=;
-        b=n/CuAy37E2LDtPDeE3yPxW/3+nasKVjH2eKzr7RPXVmuQi7TU4RhMfvjw4p5xsjPVh
-         4P6ucbFCZCx0bo/NBYaS58VNHLZxhqYOT+H/oQzL+VAys+UhxLI1jJ/U8t2q0hmzjRzw
-         XEQ7t85mCN9Tz7WATAoBsMjQy3hn32lbe5hmfD8fNRHB4bTL1k1TeV+Yz3KXIrd1Htpy
-         6XXIw4neqvMI6JysxmqqKuNAiqq9aJDq29CLZcSexBR2Ux8f7kxgMlUj2tWREEh7hcAc
-         9teLn68/2xZ/LgVGD67E2j7376WmxfWdb8Diqin8owFcbR+ZdaiVnQrrP3YBcNGYgDr3
-         m03g==
-X-Forwarded-Encrypted: i=1; AJvYcCUn9iPVNbBr2L8Ac2GjU4BnRs3YmDWidtXsPlrVcTVktHv5gYq1j/a3BJMZeY55XuRFK8WUhQ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6gAx1yD+zTS1uRkIQndBQiMN2CfnOgXyf408LacVZNYErHQL7
-	jlMpH3+r6A7BRMeOsTFAsYSpBKcxV0Tk5J+g0JCgoyzSzWqMIrK7p1VF
-X-Gm-Gg: ASbGncu9Y8dFMNi2A82+ICVw+T2gSIpYc+MP6d1E0QAZD5thbsgO6N0sfvJFJALoR1g
-	2popm0nfUWiQNaRyeBaRd2cq/FlFWrrfNLbVkTFjrsnSadOAgXTXRVA2WmLNVNZWMY/YLd3n5BC
-	aSHTXPycq423Wvbo1wjHEn63i+q+cyy/OKfmvr6Sro4dbmkHrmjtVlDR1kqOFkSSaj+ZmJfvQiM
-	+NxqajexAvxGGr/HNMbp/dzH97ZkbfqWKAi35RkgebyDZi/B+1Fo8M14lQEO2jvD6t/aztsrC7Q
-	hfRYKoMJcFYJzZDSfiFnAP0NU5tNLy+NjjPRKFkqWg5sVu3cZ5o/qbH84CytSoeV9zsVGsOVxny
-	bUtSyf/ejrFDkQc8XjKZR+sNC2/fx/RMTUXuV
-X-Google-Smtp-Source: AGHT+IEm8DAmJ1SQii6dr3UbWWd9Pal3Of9tFu8U2LJtG2TZhT5L7kA+tBte6WgeHm26m9BBmQd6nQ==
-X-Received: by 2002:a17:903:1ab0:b0:24c:d08e:309b with SMTP id d9443c01a7336-25d24cac50fmr21771995ad.15.1757650786678;
-        Thu, 11 Sep 2025 21:19:46 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3a84957bsm34884335ad.80.2025.09.11.21.19.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 21:19:46 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 41FA141FA3A4; Fri, 12 Sep 2025 11:19:44 +0700 (WIB)
-Date: Fri, 12 Sep 2025 11:19:44 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kenel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>
-Subject: Re: [PATCH net-next] Documentation: ARCnet: Update obsolete contact
- info
-Message-ID: <aMOfYJgE-pKSAbWc@archie.me>
-References: <20250912040933.19036-1-bagasdotme@gmail.com>
+	s=arc-20240116; t=1757650966; c=relaxed/simple;
+	bh=Vv2YrcjBvxFvZZi58UBaLJNHyadz2sEpT9KVQerfpjQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KX2lZxtS7CLQtez+jS9fWL1zBdXiKH5+ZMHsDRWeqo6bxVKhi3yoouLXgAujkHDH7wHoH0ThkEztW8cMM7ZodQexkURGVPVrx/02Z1apsGP/8W9rMQS1xDGTZeIu5eI9HlMOlsOOhTvu8JV8LuLGRaiuYs4ZaDyATPu07o4irYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTZi9oqP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 955CCC113CF
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 04:22:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757650965;
+	bh=Vv2YrcjBvxFvZZi58UBaLJNHyadz2sEpT9KVQerfpjQ=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=mTZi9oqPQCUG17+6d+Y0N/T40s6bdZXvcoppvr+58VDrpnyc5bKxHCYZR4ogxBiY9
+	 j6opu1C0Ipp3RsrRZ949zRP969yzGQR560hkMDPPw8hjuPvjXZ3i6y8jShJqX/kVBP
+	 k7eJdsps0TDdLQn0shhwv+KLvQv9PTb0vVKe7ErNeJ4qvk1r0i33ScXowCqET2ARxe
+	 +LMN4HsCqgMCk63VnnRXsLp+I8Ta4ZVfe5S51cC9qfZx1wf2E9grIuAw4jivjXySax
+	 Es1D8hKj+NI2chI6GhzIaUtevkFg2fExyyYZjV+Mpt4+F/BdNMXzdTNSQTyUsZkJiO
+	 99AkHKnhVXJkA==
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-3517d7954deso2264281fa.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 21:22:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXJkYbqAyweJ7HNrTX6FMxjNh4GspOPfErltxyH3yrbW4BcaWI7AgOEn2HoMbTUPOdnFGvJmSY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySQMS7kBxEvhSM1PszSYai6W0FmoTCRPx4zL7HmGvPEzBJAFZe
+	9LZxnHPDnbMRcclptWmlo0/RQSL6Gv+PC+s21zXbcbAkpksjOG6wVg2DGZ6QSbdE4W17w6yiydC
+	t8m5RRMv5d4W/rqMgQNAXYRYR2eJhGk0=
+X-Google-Smtp-Source: AGHT+IHbHGyZZve3/p2hQZn8nRc22BGYEXQJpdLfsbDiglhu6zahB25whpo6UiHtPzKB79uDzR6h/pwt7mPQi7mAzl0=
+X-Received: by 2002:a2e:ae18:0:10b0:337:f025:512 with SMTP id
+ 38308e7fff4ca-35139e509c9mr2890861fa.16.1757650963840; Thu, 11 Sep 2025
+ 21:22:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250912040933.19036-1-bagasdotme@gmail.com>
+References: <20250908181059.1785605-1-wens@kernel.org> <20250908181059.1785605-3-wens@kernel.org>
+ <aMMQSR7yYBQkY4CI@shell.armlinux.org.uk> <CAGb2v64n_eMBiUaT1S=V6v4Bqv5hLP8vP3=20sp4w4Fxh7RcOQ@mail.gmail.com>
+ <DU0P190MB244515E7CE0741A1E47E0543BC08A@DU0P190MB2445.EURP190.PROD.OUTLOOK.COM>
+In-Reply-To: <DU0P190MB244515E7CE0741A1E47E0543BC08A@DU0P190MB2445.EURP190.PROD.OUTLOOK.COM>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Fri, 12 Sep 2025 12:22:28 +0800
+X-Gmail-Original-Message-ID: <CAGb2v64JvE=9PvaLYi50uK_dNsP6Sdw34H+d0-vCs2GSSoiocQ@mail.gmail.com>
+X-Gm-Features: Ac12FXzFUjZYvnptlxG7S8Tq_6X0mBNQa2E6WmUp7iQd5dFFSAZgzFUYRyKwirM
+Message-ID: <CAGb2v64JvE=9PvaLYi50uK_dNsP6Sdw34H+d0-vCs2GSSoiocQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 02/10] net: stmmac: Add support for Allwinner
+ A523 GMAC200
+To: Muhammed Subair <msubair@hotmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-sunxi@lists.linux.dev" <linux-sunxi@lists.linux.dev>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andre Przywara <andre.przywara@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 12, 2025 at 11:09:33AM +0700, Bagas Sanjaya wrote:
-> ARCnet docs states that inquiries on the subsystem should be emailed to
-> Avery Pennarun <apenwarr@worldvisions.ca>, for whom has been in CREDITS
-> since the beginning of kernel git history and the subsystem is now
-> maintained by Michael Grzeschik since c38f6ac74c9980 ("MAINTAINERS: add
-> arcnet and take maintainership"). In addition, there used to be a
-> dedicated ARCnet mailing list but its archive at epistolary.org has been
-> shut down. ARCnet discussion nowadays take place in netdev list.
+On Fri, Sep 12, 2025 at 12:09=E2=80=AFPM Muhammed Subair <msubair@hotmail.c=
+om> wrote:
+>
+> Hi
+>
+> There are A527 boards with 25 Mhz clock from PH13 ( rgmii-0) and PJ10 (rg=
+mii-1). See the attached .
+> I believe that a patch is required to support this. Not sure it can be a =
+global or board specific.
 
-Please ignore this patch. I will resend with correct LKML address shortly.
+This is board specific. If you have such a board you can send a patch
+on top of this series for it.
 
-Thanks.
+ChenYu
 
--- 
-pw-bot: changes-requested
+> Subair
+>
+> -----Original Message-----
+> From: Chen-Yu Tsai <wens@kernel.org>
+> Sent: Thursday, 11 September 2025 10:18 PM
+> To: Russell King (Oracle) <linux@armlinux.org.uk>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft=
+.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>=
+; Paolo Abeni <pabeni@redhat.com>; Rob Herring <robh@kernel.org>; Krzysztof=
+ Kozlowski <krzk+dt@kernel.org>; Conor Dooley <conor+dt@kernel.org>; Jernej=
+ Skrabec <jernej@kernel.org>; Samuel Holland <samuel@sholland.org>; netdev@=
+vger.kernel.org; devicetree@vger.kernel.org; linux-arm-kernel@lists.infrade=
+ad.org; linux-sunxi@lists.linux.dev; linux-kernel@vger.kernel.org; Andre Pr=
+zywara <andre.przywara@arm.com>
+> Subject: Re: [PATCH net-next v4 02/10] net: stmmac: Add support for Allwi=
+nner A523 GMAC200
+>
+> On Fri, Sep 12, 2025 at 2:09=E2=80=AFAM Russell King (Oracle) <linux@arml=
+inux.org.uk> wrote:
+> >
+> > Hi,
+> >
+> > I drafted this but never sent it and can't remember why, but it's
+> > relevant for v5 that you recently posted. Same concern with v5.
+> >
+> > On Tue, Sep 09, 2025 at 02:10:51AM +0800, Chen-Yu Tsai wrote:
+> > > +     switch (plat->mac_interface) {
+> > > +     case PHY_INTERFACE_MODE_MII:
+> > > +             /* default */
+> > > +             break;
+> > > +     case PHY_INTERFACE_MODE_RGMII:
+> > > +     case PHY_INTERFACE_MODE_RGMII_ID:
+> > > +     case PHY_INTERFACE_MODE_RGMII_RXID:
+> > > +     case PHY_INTERFACE_MODE_RGMII_TXID:
+> > > +             reg |=3D SYSCON_EPIT | SYSCON_ETCS_INT_GMII;
+> > > +             break;
+> > > +     case PHY_INTERFACE_MODE_RMII:
+> > > +             reg |=3D SYSCON_RMII_EN;
+> > > +             break;
+> > > +     default:
+> > > +             return dev_err_probe(dev, -EINVAL, "Unsupported interfa=
+ce mode: %s",
+> > > +                                  phy_modes(plat->mac_interface));
+> >
+> > I'm guessing that there's no way that plat->phy_interface !=3D
+> > plat->mac_interface on this platform? If so, please use phy_interface
+> > plat->here.
+>
+> Makes sense. Looking at stmmac_platform.c, for us mac_interface only come=
+s from phy_interface.
+>
+> I'll wait a day before sending yet another version.
+>
+> ChenYu
+>
 
