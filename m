@@ -1,187 +1,105 @@
-Return-Path: <netdev+bounces-222661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64AC5B554B0
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 18:32:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 320D7B554BD
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 18:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 010AE5A1DD1
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:31:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1E23AA2E70
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602AC3176E4;
-	Fri, 12 Sep 2025 16:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CA531AF22;
+	Fri, 12 Sep 2025 16:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9eqaYZs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCNI+kgL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CE11E503D
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 16:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58C030BBBD;
+	Fri, 12 Sep 2025 16:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757694711; cv=none; b=evJ9kx4PtqqFH454tHDf62hs0F8RhjOqRZBQCML9EIkUEkgYDoX6c4ufl5EG1ilVbSWbxBAaio/fWeL1TLvKYFI2URLEhiazWVgScvWilIXCDUB3VM3wyF2ERSTvX0cBJAaYjm9XojYx3NBSD0CntJXa6bjjoFet1X5F9HzeByM=
+	t=1757695026; cv=none; b=bGPJswGttXMX6i2HgrLB1mtRp1pV3rX3aIXwU4kaADVI9b0SXNh0iXZ+SBqoMfBv9CLESjS7Vv9FIqjuQwZzbTw/BWRdoGv5D8X4rnyLfX+ihQnEU57uKqZI2htIBCGoOQaKYkjyebwX9HqB5hh44OpYS526K211fcSHr/bkFdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757694711; c=relaxed/simple;
-	bh=9ihUSfzSFkwLShWje0yO2srPckLAAToJdNnr5Y0SusM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XbjLMTP129hn5tHYilK2fRpNAwvza0rpnHhJdT65CVDVxKhxszew48qe6ceuaGUNDp+jdlC7mwCFhiqpZtD319TXIayHn1XpxW0yqiopbGkpoy0aTnhn40nvNuNMmx9hzftCm3M+kzCWiRAS/vbCGtvGNj5Bj8m8AiBO0QAlWj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9eqaYZs; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45decc9e83eso20128845e9.3
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:31:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757694707; x=1758299507; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UtKuOJb160u4mrJLBMsiqKEZV9s8rb8J9qjSnxTlACY=;
-        b=H9eqaYZsV/SEKfw+wGD3shjT9uPhaD2GpRZrWX1FwxMVksRLBVvueSGYixtC5Gv+gZ
-         6mDOIsNVcLpxmVn+zeq3rlg5od84xJXerX5EMTUr2IoA+h3HndRWVmVzjg1MwF0nd9/1
-         on+ah4fk8mgjyPYqRtDabi2KUdgeVgkcvssgPH4kdemXfanXM9R6ORipFx3k6M8oQzA5
-         f6W66NWpef6en3LosJMPvUVpfTQh5fIZNE4n36Y8p6wb9fPRpnDhuwt0V8BpyImLH5Cb
-         kv1W/db8YIsQnwHGr7T2BVDXmAsFGPCQi5X1UdDbqGU32467ctLx8GF8YpT//AnJzJyF
-         ASxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757694707; x=1758299507;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UtKuOJb160u4mrJLBMsiqKEZV9s8rb8J9qjSnxTlACY=;
-        b=w/F3rHT5+7GgIuiEd9u9FBfwfhv9Ad3uNaW3vqBHqJTm1NdmU5Pr5tvNosemJndK/+
-         rUv/i/atyuVFmppgA8bu5wataVrDpoB2bVq9VEFs3qb2YUsn/ThTgET00kE7xKSPk329
-         ADQ2AFsAcL/h9bP+u8zu7HvJciQAr4T92BTe2nShmC6Aj3cfQFsF0cWtSdCWA+5Epp6r
-         N4A7f0BMAmJNCTge7jaPh9GTwJtm9l89/sh2SdSEQN0ISTaQdDOOtD2FoS6hHkkPNjaR
-         bt0z7GQBItzPCqVVQaCvTFV2xMDqTpRrecGSV9frTVyFXiuFaE0byQjM202HX0z+v6O8
-         Wm4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUzqTHc8oNUqOuK9BJmebfwb62+F3lRUSWcdcBv2Ski3KUlFR1NRsiz4By/r2IbE7NQvm2HJrg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuEyBkbIDPsZan3eIcigLmSW65j1T77+lN8YMH91CdOeJgYCgM
-	bD8eNDIzrFJGUCQZp+0PhjRXvC5zlwZaDgceqGrEr6+hgObm11TneKdw
-X-Gm-Gg: ASbGnctZ4omeisLjmro3Ir6IzFXZHb+lst3PGdTt3kq3Ci7Q2P4ORkz1SXFiaKtDKYa
-	im27iurxJn1zHE2A8wKPeN8abMAHq2KginhdeTRY04Xp20gDpb8B6yeUf3775xZY73XMr8rhvCf
-	kb7uuyrkqCmoHY61NV/qQ0J+uK8xVpNjoROLoZd4oXhfnsubhgzcAvQ1XZPdTXCnXnv7043J6lv
-	BBxTFyw0EAccRE85yTEr2RsBvTCLqpTE8QSP+lRVRr/IXjy0xC3TEn1QXujsdOMUFZwroQKUUys
-	DCt4ATID79KOk5m7riidi6gc9tUS1ePpWhjhoUam57KJQZd764oZKjC6I8lhhmVP8Mfey9XdB0u
-	k/hUly4xxGkJ5m0JIC5bsLEuXP3XkBkGzeO8/5zWLerwRoLQR0J/CbmFvJb4Q68kR
-X-Google-Smtp-Source: AGHT+IHIRSdEBgoLi0Q0DuZdQBqEeXcgKeXdgViwtka9Vqo2HBpKPmSlfWNGtBJ9utLxGObmeSXi0A==
-X-Received: by 2002:a05:6000:3101:b0:3ca:3206:29f with SMTP id ffacd0b85a97d-3e765a2d9f1mr3941616f8f.40.1757694707074;
-        Fri, 12 Sep 2025 09:31:47 -0700 (PDT)
-Received: from elad-pc.lan ([2a0d:6fc2:68d0:5700:2165:4513:68b5:3f5b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037d638dsm64844795e9.22.2025.09.12.09.31.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 09:31:46 -0700 (PDT)
-From: Elad Yifee <eladwf@gmail.com>
-To: 
-Cc: eladwf@gmail.com,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next RFC] netfilter: flowtable: add CT metadata action for nft flowtables
-Date: Fri, 12 Sep 2025 19:30:35 +0300
-Message-ID: <20250912163043.329233-1-eladwf@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1757695026; c=relaxed/simple;
+	bh=yh4xLWlcA8OHLdyLklXOk+519lgoO0D5wxn1LsqBYRc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mavJhHJ0X+NkMd122V4vs2PiDuMxHTmcm+Hcx+JGXGRL45RAv4s2FGDzjxICWwfebRffeyhKs6RDuq8oHVdx4TPl1+YSR9uU5VuaOMqeepYxbkJilBT1SwdsHAakgczdEBb7EmcqVmq10DgwYLm3j9XpClqSZPfkoK6CI/vfYnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCNI+kgL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EA3FC4CEF1;
+	Fri, 12 Sep 2025 16:37:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757695026;
+	bh=yh4xLWlcA8OHLdyLklXOk+519lgoO0D5wxn1LsqBYRc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=CCNI+kgLbeQQz1G550kyMApK1z1n+nAFuJ7lxKjjqpeYRZxRilmoURC6OeaingmUA
+	 XaAHaAaKYuBqI7ngwAGYqv7dfy5b1ZqmTbHmRCtXCs2qv8Ns9Tvr+aWylrY9HEW6h7
+	 oRZ6A7oPQuwZB0kZCUr0Ay3BH0r38i81PepTEbKzejX8PGOest520rGPn3bf6xaUmD
+	 5SptnNVm7dlzo+WDM5q4nf3R1Wt9H1rBVCTsH6vtvu8D8oeyzQk63MCdY5tXnxJt7r
+	 VF9MwL8y3/GlD7E8BlNOGrm9tac4KKy6Jsi8CZ4HcIOZKp+TN4QAdqfKVxDgs+Gvo7
+	 TLW0MxKKHk5Wg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/3] mptcp: misc minor cleanups
+Date: Fri, 12 Sep 2025 18:36:46 +0200
+Message-Id: <20250912-net-next-mptcp-minor-fixes-6-18-v1-0-99d179b483ad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAB5MxGgC/zWMywqDMBBFf0Vm3YFMau3jV0oXwV51FsaQBBHEf
+ +8gdHEXh8s5OxVkRaFXs1PGqkWXaCCXhvopxBGsX2Pyzt/cUzxHVNtWeU61TzxrXDIPuqFwx/L
+ gIA7SSsAVd7JKyjhfi7zpL9PnOH4PiDfaewAAAA==
+X-Change-ID: 20250912-net-next-mptcp-minor-fixes-6-18-a10e141ae3e7
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Donald Hunter <donald.hunter@gmail.com>, Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=945; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=yh4xLWlcA8OHLdyLklXOk+519lgoO0D5wxn1LsqBYRc=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKO+Gj37O8LPZu3a43K8g3nvavexLqUl+yLfud60D/gI
+ 5dwsv/3jlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgIm4rmFkmJrNmrfb/drur9+Y
+ Pm7cJ25q3SrYFqxeZRnQHFGpzy9qyfA/Xq7f5/knmWz73bzhc42m1D089fpgCeeBM+W+LPUzcuU
+ 4AA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-When offloading a flow via the default nft flowtable path,
-append a FLOW_ACTION_CT_METADATA action if the flow is associated with a conntrack entry.
-We do this in both IPv4 and IPv6 route action builders, after NAT mangles and before redirect.
-This mirrors net/sched/act_ct.c’s tcf_ct_flow_table_add_action_meta() so drivers that already
-parse FLOW_ACTION_CT_METADATA from TC offloads can reuse the same logic for nft flowtables.
+Here are some small unrelated cleanups collected when working on some
+fixes recently.
 
-Signed-off-by: Elad Yifee <eladwf@gmail.com>
+- Patches 1 & 2: close file descriptors in exit paths in the selftests.
+
+- Patch 3: fix a wrong type (int i/o u32) when parsing netlink message.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/netfilter/nf_flow_table_offload.c | 38 +++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+Geliang Tang (2):
+      selftests: mptcp: close server file descriptors
+      selftests: mptcp: close server IPC descriptors
 
-diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
-index e06bc36f49fe..bccae4052319 100644
---- a/net/netfilter/nf_flow_table_offload.c
-+++ b/net/netfilter/nf_flow_table_offload.c
-@@ -12,6 +12,7 @@
- #include <net/netfilter/nf_conntrack_acct.h>
- #include <net/netfilter/nf_conntrack_core.h>
- #include <net/netfilter/nf_conntrack_tuple.h>
-+#include <net/netfilter/nf_conntrack_labels.h>
- 
- static struct workqueue_struct *nf_flow_offload_add_wq;
- static struct workqueue_struct *nf_flow_offload_del_wq;
-@@ -679,6 +680,41 @@ nf_flow_rule_route_common(struct net *net, const struct flow_offload *flow,
- 	return 0;
- }
- 
-+static void flow_offload_add_ct_metadata(const struct flow_offload *flow,
-+					 enum flow_offload_tuple_dir dir,
-+					 struct nf_flow_rule *flow_rule)
-+{
-+	struct nf_conn *ct = flow->ct;
-+	struct flow_action_entry *entry;
-+#if IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS)
-+	u32 *dst_labels;
-+	struct nf_conn_labels *labels;
-+#endif
-+
-+	if (!ct)
-+		return;
-+
-+	entry = flow_action_entry_next(flow_rule);
-+	entry->id = FLOW_ACTION_CT_METADATA;
-+
-+#if IS_ENABLED(CONFIG_NF_CONNTRACK_MARK)
-+	entry->ct_metadata.mark = READ_ONCE(ct->mark);
-+#endif
-+
-+	entry->ct_metadata.orig_dir = (dir == FLOW_OFFLOAD_DIR_ORIGINAL);
-+
-+#if IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS)
-+	dst_labels = entry->ct_metadata.labels;
-+	labels = nf_ct_labels_find(ct);
-+	if (labels)
-+		memcpy(dst_labels, labels->bits, NF_CT_LABELS_MAX_SIZE);
-+	else
-+		memset(dst_labels, 0, NF_CT_LABELS_MAX_SIZE);
-+#else
-+	memset(entry->ct_metadata.labels, 0, NF_CT_LABELS_MAX_SIZE);
-+#endif
-+}
-+
- int nf_flow_rule_route_ipv4(struct net *net, struct flow_offload *flow,
- 			    enum flow_offload_tuple_dir dir,
- 			    struct nf_flow_rule *flow_rule)
-@@ -698,6 +734,7 @@ int nf_flow_rule_route_ipv4(struct net *net, struct flow_offload *flow,
- 	    test_bit(NF_FLOW_DNAT, &flow->flags))
- 		flow_offload_ipv4_checksum(net, flow, flow_rule);
- 
-+	flow_offload_add_ct_metadata(flow, dir, flow_rule);
- 	flow_offload_redirect(net, flow, dir, flow_rule);
- 
- 	return 0;
-@@ -720,6 +757,7 @@ int nf_flow_rule_route_ipv6(struct net *net, struct flow_offload *flow,
- 		flow_offload_port_dnat(net, flow, dir, flow_rule);
- 	}
- 
-+	flow_offload_add_ct_metadata(flow, dir, flow_rule);
- 	flow_offload_redirect(net, flow, dir, flow_rule);
- 
- 	return 0;
+Matthieu Baerts (NGI0) (1):
+      mptcp: pm: netlink: fix if-idx type
+
+ net/mptcp/pm_netlink.c                            | 2 +-
+ tools/testing/selftests/net/mptcp/mptcp_inq.c     | 9 +++++++--
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.c | 9 +++++++--
+ 3 files changed, 15 insertions(+), 5 deletions(-)
+---
+base-commit: dc2f650f7e6857bf384069c1a56b2937a1ee370d
+change-id: 20250912-net-next-mptcp-minor-fixes-6-18-a10e141ae3e7
+
+Best regards,
 -- 
-2.48.1
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
