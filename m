@@ -1,115 +1,200 @@
-Return-Path: <netdev+bounces-222396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FE7B540BF
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 05:09:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F63B5412A
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 05:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82CD21C26BE1
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 731825A181E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBDE222582;
-	Fri, 12 Sep 2025 03:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F6C2676D9;
+	Fri, 12 Sep 2025 03:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIlixAeu"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="XWeS+fZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41E41991CA
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 03:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651B6261B75
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 03:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757646559; cv=none; b=H2jAa9W/hmeumQTpwvaBt7XRWSEkRcikkdxM35hPp3LAzn6/JGcyaZUVXH9iW6CPiCAACIg0Pm6I33Lt06wnxUyDIDh+Nm5208oedYI3t7SYk/1dhjeC+rBnCke7d7M0dp59G3AZ8Kq5m4iOJBL7VAoEI/ATRrh1+hDFJr9XhIE=
+	t=1757648748; cv=none; b=g2rtyxYtypttzRt/7LPUPs5zGgw1DnBBgCDWb7SLFukjcyaa8LW55GPR5NY6VInfOjrpJU0DAtc3O40izajtLJLJQUxQ4V41jM77W16m3AB70qlIJO1U6f9gUgsk96ME+gZrul020mwUBZ2K1FKFU1UFJhevLF44aRIZXBvYAiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757646559; c=relaxed/simple;
-	bh=yUI8GG7e0bDczXxnxpCR8zbI++EUhyVr0r5RE8qR0cc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u8QDkAZwvZ99PpMasXq9dB2u/JTJJRoq/U2/INp6i0+2q1iJmNuGXmkXW8mlxtQX/2Qq2E5Lp8/Cwz/KUeW2aKFmM8m4dApSvVapQqpY8jPVNCOzdAlyc2A3Y9CXaT39pavcRBWH7y5E/Qlgk2qeWzccv/ef65ZHHP5c9qFRqZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIlixAeu; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2570bf6058aso19234625ad.0
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 20:09:17 -0700 (PDT)
+	s=arc-20240116; t=1757648748; c=relaxed/simple;
+	bh=Ta7w7kzg2Da2Ms4qjfefxVRnX0W/a1reodjAWFN1BiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DF4aEND85jjI9817gCH4W7G1h0eHTbe0/hPiBq2vtzwasIiYhlgg56bSwBjnGl3XXm2SJWnKNH5qbIqGGkP9JP9rO1/WIXJuHqmlinURCLkjdi+5xaSyv5R1Pd1ED+Osu1otqxLh3aM4p96MYgNC/YswfiiDsPeBk5q3vNiVq/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=XWeS+fZS; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-32dc4faa0d7so1283627a91.1
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 20:45:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757646557; x=1758251357; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4geV6ob0qK97VAn3WsxVaPTEAoOywPWCevip8ujLoJY=;
-        b=SIlixAeu+drVEKEsaFUNQFZjUHEkqo248Dz361wmfBKrxlNg9sMVpCWfGDYkL1B6GX
-         pLwxqibpe7TXiVvieAp8eCAS76LNRSbnkbS3tXmcicXlNl3XmU+xyV3ASBxXyXZsCUO4
-         SQrC6rGaU98KsQuRkY8rQZSo4CVZ++3RJgquMzJAQMBcaJtGFAR64Rg99iIz+2IqMQn/
-         XE2VG6x8HIfxyVSTFYhjCZEpRGPb9lG5cnGA8A5O1/e7+5qmj7np1mAqE1wV/Rs4bKx/
-         ZV6B7eOuVNUsVS+dmh67xV9TI3wq69zyhPWC6S8y8Qqfc51dN6nh+Cgtg2QPjqfNqGa6
-         ZlkQ==
+        d=bytedance.com; s=google; t=1757648745; x=1758253545; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=srRkUnraQe1DlU8ZTGy562oG8l2prFUcBJnvi6wBpa8=;
+        b=XWeS+fZSu2yyWJJAulPfMETsUa8jGaK5pRn/2bRCCylv1yAraBdxd5cu0kVkBJoxCB
+         hpgcc+/zJFbBAsL6p7Z9bqW5Om0Oy89ho/EYqu0mBP2WXA5XTLN3bMasSJuNnKXiKD/0
+         9Pism5DcLUm7hLREp1MApuyRiPvjmlkI7kmjRiCB0pbFYNzCT0a8WnJsKbSXIYuVt460
+         4EL+eNn3FVRGmbGSpjwuYCmEOiOweg3kFsNmECXzkBQ9DtA3lvcix9ff5IvaA429PXsy
+         v8V2zEbRmXgQwW6ghH+OxaYRWEOopImeTOH2aq12Ivs7PUnwco51bLOjCsTFqRhb0r87
+         qELQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757646557; x=1758251357;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4geV6ob0qK97VAn3WsxVaPTEAoOywPWCevip8ujLoJY=;
-        b=SSPcXgczaM5wE5kgomHp/3hsvPHvGEiWi7krhWfzpUDVq4Yx3d9rkkfXXM6BLE6WzL
-         HpOZAgb9r4sxbYRixafkpnhhggVRkOjMlRSJaGYPzWRv+0131bSr6VRc/iMClMfzy6r0
-         OtH3CPyHI9QtVY6YlPwwnSen3qAZ3QGLMV35IWyJ2nDda+8kbpa6CUn8afZQgqwzhys1
-         0ldHXlQjnmf5sE7Y2qWOsAWL3pX3zTGyL+cmGGA+PIDBLfPdubtvNENRG2iLZnz4hnVY
-         Q7S2Q/ZsMyiZ5cntheSDgsekpAMe+aK2Pqvyyw0A9aJMOk1kmaJtDFG8EJy3Kfid2OSu
-         f81g==
-X-Forwarded-Encrypted: i=1; AJvYcCXGeWC6rgzB39YnQdcf5twUXw3azrRBKmTZHDJJ4XuFM2DSe0CyIp41j/lFa8mhd46OoSTL3RM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlhaVexdLgiof+GHv0WsMcGF8/jhwM1TZ0+zIwYeTu7qo3r+VF
-	tU6jI+/aWlaaxOWotfs4WL1FJveEDgXIgQLSnu3drfOAmxQXzjZgFJXG
-X-Gm-Gg: ASbGnctb9JMAZdoVSAP9jpmBF96TF7Ox/7CSaJIux3ype0jkZV52/UYQm5P8WPJQw0D
-	IK5pEIEkwzVwpL+hsppUM/p7cusXtHcDAB0w58S6U1slgURKrziqFegy3y5DMwzxGJ75DED28ID
-	gMMSGDh1ZerWLWWmU8oDFQA3Ptnf25raMxzNJZbUKCMuA9nJwz4ZEtYdmXQcr86jBbQtsYW2BJ+
-	brE1H9xhFd77OnRLOE+swEEVgQC/Vd19pzNRIHYd+e6ZGE62HOedWDyxTVYmBTl9KAfxWaVoPNE
-	wxJgwadn2ZUFSJjX8grdCpiLByeFKAcRViMO/p4nNBkwPRZFs2qV40+hraVfuoqAAFattYYBeVs
-	Pz2PpjU1Y0CiSymMHVGQWppxaTZ8Kuy9nCbqd/7YHd4SN+rNIlsdzfOEkSEGxvt1e
-X-Google-Smtp-Source: AGHT+IEH+vFRZxmRvPbolGqsR10fXq1V0MB5GrQMkOUwmu9MOHsXS68HiXErC9Ttiqo9utBGOkT7QA==
-X-Received: by 2002:a17:903:2c6:b0:24b:bbf2:4791 with SMTP id d9443c01a7336-25d2646f828mr19572755ad.39.1757646557076;
-        Thu, 11 Sep 2025 20:09:17 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3b305427sm32849755ad.138.2025.09.11.20.09.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Sep 2025 20:09:15 -0700 (PDT)
-Message-ID: <3b1815e9-b17f-430f-b18b-641f99d9f093@gmail.com>
-Date: Thu, 11 Sep 2025 20:09:13 -0700
+        d=1e100.net; s=20230601; t=1757648745; x=1758253545;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=srRkUnraQe1DlU8ZTGy562oG8l2prFUcBJnvi6wBpa8=;
+        b=YU1z1eqJtjMJMAKV+0CFzHetXkWAicqXlL5cNilrTXHYQt5SWbaSOYx9hYXGtn7XrY
+         XtWkuYDMA+85REnUXuSflKYae6TLJTmwYQRcwgbHZZKdo1dkBdHJU3UPIRxRPcEuZw+o
+         fTy4X+6z4Vj6ppzdeMxy/Prk630ezoZD6bfdnrrrAeErYE5eS2+3blzRIDcj5augqmz6
+         /QQDipOdTtncFt/0l7jICd2mlh+4FgiGJ2eOR6OeBblGOvEdrmDvIb8OfldV7mGOJGZ7
+         9m67B+TsvKFMrChQ9FDb4Ncm2KA5QWfN4RtFBbblOFpIFDZB5Z9dYWuTKXJBtIR26SDs
+         U5gw==
+X-Gm-Message-State: AOJu0Yx83t5vMI+RS8dpHrhP8o6zM1u0KV0pDGLeQuTr9Pj7R+bn6zQt
+	LGEQQf/haLpBskMD8jm/sQxJY6EDixGbgcy/rGcz9nv94nL2S8sxEniiTyBgQlsMS+M6y6wWHfx
+	pG7RQOSo=
+X-Gm-Gg: ASbGncsLNAmAdSlqduHpkYD7qnvvvwAk/Z2iajTnt6yU1gLJJ3jc2WG2us4EhJ6jjtO
+	cgedRMh6GcD8fqpiN8L4fYejDOoKwGZPOmRgZt2tVrZYmE4oN1HEI9kwtxuuJEXUzO7JuS+i8BV
+	HNVTHtWA2Ngthzsczo+TY2r7jsLmZZIdb9qm5LsGNWAcIeqKomAZx5aqf3jD3ZWS3zs20bcDhZB
+	RWJk7DuKqYezIWO5JoZsuZg7WrLLONulnjfL5MVctueOUFLIlOo1ypdWTP+1TEyK6Kv0gNde9y2
+	5+dqxoOPxV1ayHezGEGRfj3ywdc3BLfvXXr8sewSxuWGb5qx9br9gt7OPpCZZvE46FKzKV4eTLp
+	mh9H+e3rBr9KJEn5VWVlmlrWBIk7lAIE1lrwyPDE=
+X-Google-Smtp-Source: AGHT+IGR44LGnDHo06RJIktefSGeKyBeGQjrPpDFtTAcSFEoQH8sPjmw2kwB8RmI5j/XqLoeJw8IrA==
+X-Received: by 2002:a17:90b:4ad2:b0:32d:d4fa:4b5 with SMTP id 98e67ed59e1d1-32de4e7d0c1mr1379053a91.2.1757648745477;
+        Thu, 11 Sep 2025 20:45:45 -0700 (PDT)
+Received: from localhost ([106.38.221.104])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32deacdf9bcsm258571a91.23.2025.09.11.20.45.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 20:45:45 -0700 (PDT)
+From: Jian Zhang <zhangjian.3032@bytedance.com>
+To: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	guoheyi@linux.alibaba.com
+Cc: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jacky Chou <jacky_chou@aspeedtech.com>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jian Zhang <zhangjian.3032@bytedance.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] Revert "drivers/net/ftgmac100: fix DHCP potential failure with systemd"
+Date: Fri, 12 Sep 2025 11:45:38 +0800
+Message-ID: <20250912034538.1406132-1-zhangjian.3032@bytedance.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] dt-bindings: net: Drop duplicate
- brcm,bcm7445-switch-v4.0.txt
-To: Jakub Kicinski <kuba@kernel.org>, "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250909142339.3219200-2-robh@kernel.org>
- <20250911184329.2992ad3a@kernel.org>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20250911184329.2992ad3a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+This reverts commit 1baf2e50e48f10f0ea07d53e13381fd0da1546d2.
 
+This patch can trigger a hung task when:
+* rtnetlink is setting the link down
+* the PHY state_queue is triggered and calls ftgmac100_adjust_link
 
-On 9/11/2025 6:43 PM, Jakub Kicinski wrote:
-> On Tue,  9 Sep 2025 09:23:38 -0500 Rob Herring (Arm) wrote:
->> The brcm,bcm7445-switch-v4.0.txt binding is already covered by
->> dsa/brcm,sf2.yaml. The listed deprecated properties aren't used anywhere
->> either.
->>
->> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+Within the rtnetlink flow, `cancel_delayed_work_sync` is called while
+holding `rtnl_lock`. This function cancels or waits for a delay work
+item to complete. If the PHY state_queue (delay work) is simultaneously
+executing `adjust_link`, it will eventually call `rtnl_lock` again,
+causing a deadlock.
 
-Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+This results in the following (partial) trace:
+* rtnetlink (do_setlink):
+[  243.326104] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  243.334871] task:systemd-network state:D stack:0     pid:711   ppid:1      flags:0x0000080d
+[  243.344233] Call trace:
+[  243.346986]  __switch_to+0xac/0xd8
+[  243.350814]  __schedule+0x3c0/0xb78
+[  243.354734]  schedule+0x60/0xc8
+[  243.358258]  schedule_timeout+0x188/0x230
+[  243.362762]  wait_for_completion+0x7c/0x168
+[  243.367461]  __flush_work+0x29c/0x4c8
+[  243.371579]  __cancel_work_timer+0x130/0x1b8
+[  243.376376]  cancel_delayed_work_sync+0x18/0x28
+[  243.381463]  phy_stop+0x7c/0x170
+[  243.385098]  ftgmac100_stop+0x78/0xf0
+[  243.389213]  __dev_close_many+0xb4/0x160
+[  243.393621]  __dev_change_flags+0xfc/0x250
+[  243.398226]  dev_change_flags+0x28/0x78
+[  243.402536]  do_setlink+0x258/0xdb0
+[  243.406460]  rtnl_setlink+0xf0/0x1b8
+[  243.410484]  rtnetlink_rcv_msg+0x2a0/0x768
+[  243.415097]  netlink_rcv_skb+0x64/0x138
+[  243.419473]  rtnetlink_rcv+0x1c/0x30
+[  243.423540]  netlink_unicast+0x1c8/0x2a8
+[  243.427973]  netlink_sendmsg+0x1c4/0x438
+[  243.432402]  __sys_sendto+0xe4/0x178
+[  243.436447]  __arm64_sys_sendto+0x2c/0x40
+[  243.440966]  invoke_syscall.constprop.0+0x60/0x108
+[  243.446397]  do_el0_svc+0xa4/0xc8
+[  243.450171]  el0_svc+0x48/0x118
+[  243.453710]  el0t_64_sync_handler+0x118/0x128
+[  243.458648]  el0t_64_sync+0x14c/0x150
+
+* state_queue (phy_state_machine):
+[  242.882453] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  242.891226] task:kworker/3:0     state:D stack:0     pid:32    ppid:2      flags:0x00000008
+[  242.900592] Workqueue: events_power_efficient phy_state_machine
+[  242.907250] Call trace:
+[  242.910001]  __switch_to+0xac/0xd8
+[  242.913813]  __schedule+0x3c0/0xb78
+[  242.917735]  schedule+0x60/0xc8
+[  242.921268]  schedule_preempt_disabled+0x28/0x48
+[  242.926449]  __mutex_lock+0x1cc/0x400
+[  242.930565]  mutex_lock_nested+0x28/0x38
+[  242.934971]  rtnl_lock+0x60/0x70
+[  242.938607]  ftgmac100_reset+0x34/0x248
+[  242.942919]  ftgmac100_adjust_link+0xe0/0x150
+[  242.947816]  phy_link_change+0x34/0x68
+[  242.952032]  phy_check_link_status+0x8c/0xf8
+[  242.956829]  phy_state_machine+0x16c/0x2e0
+[  242.961428]  process_one_work+0x258/0x620
+[  242.965934]  worker_thread+0x1e8/0x3e0
+[  242.970148]  kthread+0x114/0x120
+[  242.973762]  ret_from_fork+0x10/0x20
+
+Signed-off-by: Jian Zhang <zhangjian.3032@bytedance.com>
+---
+ drivers/net/ethernet/faraday/ftgmac100.c | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+index a863f7841210..477719a518bc 100644
+--- a/drivers/net/ethernet/faraday/ftgmac100.c
++++ b/drivers/net/ethernet/faraday/ftgmac100.c
+@@ -1448,17 +1448,8 @@ static void ftgmac100_adjust_link(struct net_device *netdev)
+ 	/* Disable all interrupts */
+ 	iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
+ 
+-	/* Release phy lock to allow ftgmac100_reset to acquire it, keeping lock
+-	 * order consistent to prevent dead lock.
+-	 */
+-	if (netdev->phydev)
+-		mutex_unlock(&netdev->phydev->lock);
+-
+-	ftgmac100_reset(priv);
+-
+-	if (netdev->phydev)
+-		mutex_lock(&netdev->phydev->lock);
+-
++	/* Reset the adapter asynchronously */
++	schedule_work(&priv->reset_task);
+ }
+ 
+ static int ftgmac100_mii_probe(struct net_device *netdev)
 -- 
-Florian
+2.47.0
 
 
