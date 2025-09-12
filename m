@@ -1,153 +1,359 @@
-Return-Path: <netdev+bounces-222583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBCF8B54E8E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:56:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B40B54EA4
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D474B7B3A4B
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:53:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BC681BC4685
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8E12FC897;
-	Fri, 12 Sep 2025 12:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D5E30E0E4;
+	Fri, 12 Sep 2025 12:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="KbhEfAN8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nEJY4alO"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E761C2F39CD;
-	Fri, 12 Sep 2025 12:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A60D30DEB1;
+	Fri, 12 Sep 2025 12:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757681724; cv=none; b=PjZMCAQNseO2N6oFpw+QGBnes/GceExYrs0wtS8e5SA7OTGVeP/k6hDlDmKHpGwN/ERy69QTXUmV0eVv2i72V7f/6DEy+NqQm23YPgt1RVk3spxAuUIiYdJ0uptf1pdMrRsfpyDIyvAI9fMfXh+SZeNNNuioBIuBv/XkevwHLs4=
+	t=1757681820; cv=none; b=dFQ6snYqGZeKP/8FPLspSr/GgYbcm5Ah8rh4J+T81IdmZFbjBK558b2XvXZUjGKADrI8tvcVPMSYED0YUl2NsMDhtG/wiK3NglesTe82XZO1zq6iRfK9oozULthL5p8nz4BY7q6hdSGWr+QUCFQa4SoK5kD7U5TrVq6kBVm23uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757681724; c=relaxed/simple;
-	bh=4piJL2JD7w/UByN+p8A0BTsfcXslKwY/3YwqSauegn0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=STiPM5iY1WrowupaBE8dilowJ+b3wuCr0uyLddMgtOTMXSKlVLUa0Ql5GCw84YshI3LXh2vQiGcREf2x/Nj/2/Lt6o8kLYQd1uuu1+D+lLbbBfa6sQ6ZUO6HV9QCXYfSCT6cfWnIPo3FVi+KZcWk9v6uZJbQWb7/M6EHexYzCWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=KbhEfAN8; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=6scNEiCwQDhpiTGreKSN8tOQ3odhAtWxi6tg8cuj+Pk=; b=KbhEfAN88WcM4pD441bT2l6Pa1
-	23flmmlVtXb4d/OfaU+RBRGolmVniBWbCzoiGQUwB5r3WhnnaMr8RYY+D3naKECyvQhkVw817d2iy
-	JSzir0qe4MxEkeVAUGhaTAt5ATR9/yj01IeY7UQGzzHX29VdwRSXJ1qS51q44OO2dEmuyO/RMFIOy
-	waB+6mwaoGhA/I0K7eh4Dw4Wd3YKU6LgKyjy4h6JWHzJQfn2wi/kWbtv8moGnEuqdKeCCprlJ7D/7
-	3hGFjLBh/my8YIFhU8TvsiQJJLAviSSF9zAlwQcLAN6Z93n4TdFBSz2cBSd+WWkWJTN6v7JsU8EXx
-	KV5iBH5w==;
-Received: from [122.175.9.182] (port=50898 helo=cypher.couthit.local)
-	by server.couthit.com with esmtpa (Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1ux3J7-000000025Qs-1rx5;
-	Fri, 12 Sep 2025 08:55:17 -0400
-From: Parvathi Pudi <parvathi@couthit.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	ssantosh@kernel.org,
-	richardcochran@gmail.com,
-	m-malladi@ti.com,
-	s.hauer@pengutronix.de,
-	afd@ti.com,
-	jacob.e.keller@intel.com,
-	kory.maincent@bootlin.com,
-	johan@kernel.org,
-	alok.a.tiwari@oracle.com,
-	m-karicheri2@ti.com,
-	s-anna@ti.com,
-	horms@kernel.org,
-	glaroque@baylibre.com,
-	saikrishnag@marvell.com,
-	diogo.ivo@siemens.com,
-	javier.carrasco.cruz@gmail.com,
-	basharath@couthit.com,
-	parvathi@couthit.com,
-	pmohan@couthit.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	vadim.fedorenko@linux.dev,
-	bastien.curutchet@bootlin.com,
-	pratheesh@ti.com,
-	prajith@ti.com,
-	vigneshr@ti.com,
-	praneeth@ti.com,
-	srk@ti.com,
-	rogerq@ti.com,
-	krishna@couthit.com,
-	mohan@couthit.com
-Subject: [PATCH net-next v16 6/6] MAINTAINERS: Add entries for ICSSM Ethernet driver
-Date: Fri, 12 Sep 2025 18:23:01 +0530
-Message-ID: <20250912125421.530286-7-parvathi@couthit.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250912104741.528721-1-parvathi@couthit.com>
-References: <20250912104741.528721-1-parvathi@couthit.com>
+	s=arc-20240116; t=1757681820; c=relaxed/simple;
+	bh=isdneW0AQMXzchNHlRx5M+1r0f48Vgl2dv/b+Q9CID4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GcYJfNWWhv1DWaIZEwuc27GspR02oQh6I2GeSgVkhlUbAuGbw2868WW9swm17RcBRhkJ9CQ5jADEvTh9F7aArNLWJKMefUpAZLp17YqMrSylOEtKO9h7LoRMqOcfZTLKetCD6XJqCTFphT+dBzy8JudTjMOYWKrd41HUocgre+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nEJY4alO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=rUkbo4gs9EL6YjDDNBllsKMR1qK9GCz5ZHIWIO83/I0=; b=nEJY4alO1BTuBTDh/ZSyG2pxCU
+	Okaqs4ynK0JVqI0eSkVv5lmIN/JrRbn4n1aWYywBmUkcl2OWWRXI3RJYpgO5KDFwRdfQrrN8EJMrM
+	K34R4sxa3ToAGvplZJC4OO4kzj5G1xfG4iTflWBQfzTQ0OSMCpy8zUlif0Jwkj4YkCNc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ux3KX-008D1Y-9j; Fri, 12 Sep 2025 14:56:45 +0200
+Date: Fri, 12 Sep 2025 14:56:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v8 3/3] net: dsa: yt921x: Add support for
+ Motorcomm YT921x
+Message-ID: <ae9f7bb0-aef3-4c53-91a3-6631fea6c734@lunn.ch>
+References: <20250912024620.4032846-1-mmyangfl@gmail.com>
+ <20250912024620.4032846-4-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
-X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250912024620.4032846-4-mmyangfl@gmail.com>
 
-Add an entry to MAINTAINERS file for the ICSSM Ethernet driver with
-appropriate maintainer information and mailing list.
+> +static void yt921x_reg_mdio_verify(u32 reg, u16 val, bool lo)
+> +{
+> +	const char *desc;
+> +
+> +	switch (val) {
+> +	case 0xfade:
+> +		desc = "which is likely from a non-existent register";
+> +		break;
+> +	case 0xdead:
+> +		desc = "which is likely a data race condition";
+> +		break;
 
-Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+Where did these two values come from? Are they documented in the datasheet?
+
+> +	default:
+> +		return;
+> +	}
+> +
+> +	/* Skip registers which are likely to have any valid values */
+> +	switch (reg) {
+> +	case YT921X_MAC_ADDR_HI2:
+> +	case YT921X_MAC_ADDR_LO4:
+> +	case YT921X_FDB_OUT0:
+> +	case YT921X_FDB_OUT1:
+> +		return;
+> +	}
+> +
+> +	pr_warn("%s: Read 0x%x at 0x%x %s32, %s; "
+> +		"consider reporting a bug if this happens again\n",
+> +		__func__, val, reg, lo ? "lo" : "hi", desc);
+
+You probably have a warning from checkpatch about pr_warn. Ideally you
+want to give an indication which device has triggered this, making use
+of a struct device. You might want to include that in context.
+
+> +static int
+> +yt921x_intif_read(struct yt921x_priv *priv, int port, int reg, u16 *valp)
+> +{
+> +	if ((u16)val != val)
+> +		dev_err(dev,
+> +			"%s: port %d, reg 0x%x: Expected u16, got 0x%08x\n",
+> +			__func__, port, reg, val);
+> +	*valp = (u16)val;
+> +	return 0;
+
+You don't treat this as an error, you don't return -EIO or -EPROTO etc.
+So maybe this should be dev_info() or dev_dbg().
+
+> +static int
+> +yt921x_mbus_int_write(struct mii_bus *mbus, int port, int reg, u16 data)
+> +{
+> +	struct yt921x_priv *priv = mbus->priv;
+> +	int res;
+> +
+> +	if (port >= YT921X_PORT_NUM)
+> +		return 0;
+
+-ENODEV.
+
+> +yt921x_mbus_int_init(struct yt921x_priv *priv, struct device_node *mnp)
+> +{
+> +	struct device *dev = to_device(priv);
+> +	struct mii_bus *mbus;
+> +	int res;
+> +
+> +	if (!mnp)
+> +		res = devm_mdiobus_register(dev, mbus);
+> +	else
+> +		res = devm_of_mdiobus_register(dev, mbus, mnp);
+
+You can call devm_of_mdiobus_register() with a NULL pointer for the
+OF, and it will do the correct thing.
+
+> +static int yt921x_extif_wait(struct yt921x_priv *priv)
+> +{
+> +	u32 val;
+> +	int res;
+> +
+> +	res = yt921x_reg_read(priv, YT921X_EXT_MBUS_OP, &val);
+> +	if (res)
+> +		return res;
+> +	if ((val & YT921X_MBUS_OP_START) != 0) {
+> +		res = read_poll_timeout(yt921x_reg_read, res,
+> +					(val & YT921X_MBUS_OP_START) == 0,
+> +					YT921X_POLL_SLEEP_US,
+> +					YT921X_POLL_TIMEOUT_US,
+> +					true, priv, YT921X_EXT_MBUS_OP, &val);
+> +		if (res)
+> +			return res;
+> +	}
+> +
+> +	return 0;
+
+In mv88e6xxx, we have the generic mv88e6xxx_wait_mask() and on top of
+that mv88e6xxx_wait_bit(). That allows us to have register specific
+wait functions as one liners. Please consider something similar.
+
+> +static int yt921x_mib_read(struct yt921x_priv *priv, int port, void *data)
+> +{
+
+As far as i can see, data is always a pointer to struct
+yt921x_mib_raw. I would be better to not have the void in the middle.
+It also makes it clearer what assumption you are making about the
+layout of that structure.
+
+> +	unsigned char *buf = data;
+> +	int res = 0;
+> +
+> +	for (size_t i = 0; i < sizeof(struct yt921x_mib_raw);
+> +	     i += sizeof(u32)) {
+> +		res = yt921x_reg_read(priv, YT921X_MIBn_DATA0(port) + i,
+> +				      (u32 *)&buf[i]);
+> +		if (res)
+> +			break;
+> +	}
+> +	return res;
+> +}
+> +
+> +static void yt921x_poll_mib(struct work_struct *work)
+> +{
+> +	struct yt921x_port *pp = container_of_const(work, struct yt921x_port,
+> +						    mib_read.work);
+> +	struct yt921x_priv *priv = (void *)(pp - pp->index) -
+> +				   offsetof(struct yt921x_priv, ports);
+
+Can you make container_of() work for this?
+
+> +	unsigned long delay = YT921X_STATS_INTERVAL_JIFFIES;
+> +	struct device *dev = to_device(priv);
+> +	struct yt921x_mib *mib = &pp->mib;
+> +	struct yt921x_mib_raw raw;
+> +	int port = pp->index;
+> +	int res;
+> +
+> +	yt921x_reg_lock(priv);
+> +	res = yt921x_mib_read(priv, port, &raw);
+> +	yt921x_reg_unlock(priv);
+> +
+> +	if (res) {
+> +		dev_err(dev, "Failed to %s port %d: %i\n", "read stats for",
+> +			port, res);
+> +		delay *= 4;
+> +		goto end;
+> +	}
+> +
+> +	spin_lock(&pp->stats_lock);
+> +
+> +	/* Handle overflow of 32bit MIBs */
+> +	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
+> +		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
+> +		u32 *rawp = (u32 *)((u8 *)&raw + desc->offset);
+> +		u64 *valp = &((u64 *)mib)[i];
+> +		u64 newval;
+> +
+> +		if (desc->size > 1) {
+> +			newval = ((u64)rawp[0] << 32) | rawp[1];
+> +		} else {
+> +			newval = (*valp & ~(u64)U32_MAX) | *rawp;
+> +			if (*rawp < (u32)*valp)
+> +				newval += (u64)1 << 32;
+> +		}
+
+There are way too many casts here. Think about your types, and how you
+can remove some of these casts. In general, casts are bad, and should
+be avoided where possible.
+
+> +static void
+> +yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
+> +{
+> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
+> +	struct yt921x_port *pp = &priv->ports[port];
+> +	struct yt921x_mib *mib = &pp->mib;
+> +	size_t j;
+> +
+> +	spin_lock(&pp->stats_lock);
+> +
+> +	j = 0;
+> +	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
+> +		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
+> +
+> +		if (!desc->unstructured)
+> +			continue;
+> +
+> +		data[j] = ((u64 *)mib)[i];
+> +		j++;
+> +	}
+>
+
+ethtool APIs are called in a context where you can block. So it would
+be good to updated the statistics first before copying them. You just
+need to think about your locking in case the worker is running.
+
+> +static int yt921x_dsa_get_sset_count(struct dsa_switch *ds, int port, int sset)
+> +{
+> +	int cnt;
+> +
+> +	if (sset != ETH_SS_STATS)
+> +		return 0;
+> +
+> +	cnt = 0;
+
+Please do the zeroing above when you declare the local variable.
+
+> +	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
+> +		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
+> +
+> +		if (desc->unstructured)
+> +			cnt++;
+> +	}
+> +
+> +	return cnt;
+> +}
+
+> +static int
+> +yt921x_set_eee(struct yt921x_priv *priv, int port, struct ethtool_keee *e)
+> +{
+
+> +	/* Enable / disable port EEE */
+> +	res = yt921x_reg_toggle_bits(priv, YT921X_EEE_CTRL,
+> +				     YT921X_EEE_CTRL_ENn(port), enable);
+> +	if (res)
+> +		return res;
+> +	res = yt921x_reg_toggle_bits(priv, YT921X_EEEn_VAL(port),
+> +				     YT921X_EEE_VAL_DATA, enable);
+
+How do these two different registers differ? Why are there two of
+them? Maybe add a comment to explain this.
+
+> +static bool yt921x_dsa_support_eee(struct dsa_switch *ds, int port)
+> +{
+> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
+> +
+> +	return (priv->pon_strap_cap & YT921X_PON_STRAP_EEE) != 0;
+
+What does the strapping actually tell you?
+
+> +static int
+> +yt921x_dsa_port_mirror_add(struct dsa_switch *ds, int port,
+> +			   struct dsa_mall_mirror_tc_entry *mirror,
+> +			   bool ingress, struct netlink_ext_ack *extack)
+> +{
+> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
+> +	u32 ctrl;
+> +	u32 val;
+> +	int res;
+> +
+> +	yt921x_reg_lock(priv);
+> +	do {
+> +		u32 srcs;
+> +		u32 dst;
+> +
+> +		if (ingress)
+> +			srcs = YT921X_MIRROR_IGR_PORTn(port);
+> +		else
+> +			srcs = YT921X_MIRROR_EGR_PORTn(port);
+> +		dst = YT921X_MIRROR_PORT(mirror->to_local_port);
+> +
+> +		res = yt921x_reg_read(priv, YT921X_MIRROR, &val);
+> +		if (res)
+> +			break;
+> +
+> +		/* other mirror tasks & different dst port -> conflict */
+> +		if ((val & ~srcs & (YT921X_MIRROR_EGR_PORTS_M |
+> +				    YT921X_MIRROR_IGR_PORTS_M)) != 0 &&
+> +		    (val & YT921X_MIRROR_PORT_M) != dst) {
+> +			NL_SET_ERR_MSG_MOD(extack,
+> +					   "Sniffer port is already configured,"
+> +					   " delete existing rules & retry");
+> +			res = -EBUSY;
+> +			break;
+> +		}
+> +
+> +		ctrl = val & ~YT921X_MIRROR_PORT_M;
+> +		ctrl |= srcs;
+> +		ctrl |= dst;
+> +
+> +		if (ctrl != val)
+> +			res = yt921x_reg_write(priv, YT921X_MIRROR, ctrl);
+> +	} while (0);
+
+What does a while (0) loop bring you here?
+
+
+    Andrew
+
 ---
- MAINTAINERS | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c930a961435e..47bc35743f22 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -25319,6 +25319,18 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/ti,icss*.yaml
- F:	drivers/net/ethernet/ti/icssg/*
- 
-+TI ICSSM ETHERNET DRIVER (ICSSM)
-+M:	MD Danish Anwar <danishanwar@ti.com>
-+M:	Parvathi Pudi <parvathi@couthit.com>
-+R:	Roger Quadros <rogerq@kernel.org>
-+R:	Mohan Reddy Putluru <pmohan@couthit.com>
-+L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/ti,icssm*.yaml
-+F:	Documentation/devicetree/bindings/net/ti,pruss-ecap.yaml
-+F:	drivers/net/ethernet/ti/icssm/*
-+
- TI J721E CSI2RX DRIVER
- M:	Jai Luthra <jai.luthra@linux.dev>
- L:	linux-media@vger.kernel.org
--- 
-2.43.0
-
+pw-bot: cr
 
