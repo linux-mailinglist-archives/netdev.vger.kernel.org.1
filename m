@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-222691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98165B55722
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:54:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0332DB55727
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F5B56810D
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:54:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E32FF5682A0
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835392C21F0;
-	Fri, 12 Sep 2025 19:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503D933471B;
+	Fri, 12 Sep 2025 19:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhl3lePw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNtIf5dJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C722728314B
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403D128466F
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757706841; cv=none; b=rYD9tsWoz4nShcgdBf0evQKdQs0WeuosuEluXEuHU1YNYP6SThRxUVm+Cz/6xoHzGFVwxDxk+GOSAaU+Kn50bTsu5EpSzGXUs2Tz/HR0ks/VqnAbaMwW6M+/KrGD+ZqE5ZSSVs0d8fnv2eYfiXEiwe57TWj1Z8f6nnLnEAmou8w=
+	t=1757706843; cv=none; b=FSi9/oD3Umj0ggpRwoa+MAgWfi03TWt0ptEFBHcMM7DL2Nhy2JkznikFC2cjyBPOpNttN4Hpq/kqAQ+16HL0mU4W6k4+enjD3ZTZwBmBPN7FmTTn14a9WStANinURikErTOGL1ZLrvMn5T4HkuWq9hTLKxRtsHpRXbtGamS64Oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757706841; c=relaxed/simple;
-	bh=S++nbLXYGUNn+kPv+4a4KLGbhT3HHy1Lef48AXgBcmQ=;
+	s=arc-20240116; t=1757706843; c=relaxed/simple;
+	bh=6cXgFykumMGSAobanM946a8yCweHLAexqmweAhTT/O8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SA3TXz+1DXFY7pIpDzdnEtMjcVon2P4OafKZR0h1riue5lLdnt4RxMt5qZAAgUqaVFfK1euaeqXojcNBVAV++325m2z6cdVJO0g64x/vlXEFc5n/UwNzHDzepbAx1XoMI6IGqmw8peY7LrFofXd+ifZq13Jky0jHG4ZonD37pvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhl3lePw; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version; b=F6gl2hbX6nNFSDBLT2pV0LYxTZl73K8rEOrCUZHvU3ojf9Ux7eoTVM85IAJIMjKdVZmUFdc+wNEG5rPjqXJ0Mt5ScPjCXgCSblVMUGWQcSSf6jgZk2e4ReV6gq0yOCy/1w54blWXFBOscZCPFmsu+F35ypTLxTMfiniB2s4F7Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gNtIf5dJ; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45dd7b15a64so20911915e9.0
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:53:59 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3b9edf4cf6cso1819513f8f.3
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:54:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757706838; x=1758311638; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757706840; x=1758311640; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cM2EwFi4Xi2FPT3nNBJPMpu3J3wjRZsJQ3rXDogFCog=;
-        b=hhl3lePwwlUtA7VcbLZcOvxhs54vf2r20WY5booo9eAhAnD/DirKdGvC1dWXvv7Z9r
-         L9KoiyN/zFdw/0TilDcPPe37QaSi8QRnYpQ9opj/WNed8Y3qPs9JK6s83GIlXROwC7Ws
-         xBGuTQGApgu/Dq9ahhe0QokBI0x92zBr5JchQUMffNC+a91+CjtReDQi638HYQtxLfk0
-         qSTdIn1FFLJdKaLvOI7pUaPw/2akA8qcT5qgDQndAepUOTugHOIiW7hbkeJN6RPHCoD8
-         ARuS2z6E0lTn1ArDoKZ0G6se39sP3xQOp88VMzBaiEUNc2G8gMqDwVoDpLBdgNFvNLcC
-         Qd+w==
+        bh=JRFKheYw65XtHsXGttpFWft6Q64Fu052vOHTho4zEao=;
+        b=gNtIf5dJ9radHwUPCFXWn2iGJxMldL+0AKbrv1R0pD4eZFo8w/mpBHtFT5Igdd8o2t
+         vdaUTELAWEMk19ja6HaEnkkDXwaXEwAD5jFbYIHyZPC2gGA1GZahqebBHQk/NZNLucZj
+         1S2uNBv01l1Fmrb/bH7HLkTojIXfxTFEsHKEpl6ElOet636LfrW8q/5ISf/LZ0w50MlB
+         Tu9E1cfRnU9gtzSccyyHEAh1rYh0+aAPabngK5LErAOfO0FFynoAYijRoebW4fHvYT0K
+         x3B/oGw9ih+FHr1EHQRCtgLKBaS1KeRcaN0nwdohdAocr/ELTtU9Pt2+S8HIAedYc8+t
+         Ivbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757706838; x=1758311638;
+        d=1e100.net; s=20230601; t=1757706840; x=1758311640;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cM2EwFi4Xi2FPT3nNBJPMpu3J3wjRZsJQ3rXDogFCog=;
-        b=HOQLngAvRrqnoULXuUHlHVzaCvXJSrdMzEJy+5dw1mTkfjh0mJ3gtMYYKxVWVDimjb
-         qkMPt06qxgiMSwqGiruGOQ34OZr18ah/9eW6LA0p+Wwg1OnqHa9pUanDsaejBS+ns1zB
-         gS/j4WHygP0S2MYCPRhBa4tVwz0t3oCVYMagW0Zt3PjRwu0G8Dc7yjdyuN3zZ13XeJ1/
-         b5zFOMwZMm89k2alSu/wtC1CBYWpW0jeFxIjMSUgklqOVQkRPmjSE2nvdafk3VDr5kyd
-         Kq02bJHh+kLzgpkw7rDTwkmtZf4A4/OUyDQa6rRhBLSqIRzCOrCbZ33IGjfB6dOd1wzt
-         BMSw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGO5llTN4VyiWZfNRHLsDiOY4ivqL7YdIjbugTI/oeXhDZuELNss+dXuZO6Tkr9COVjQYhFfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdvTGcieZkfHu7MiS33kg113zLcov9jjZy4kyAo80tMxv+SUW1
-	5TUEXUO2mOUk5JlMbb8oopAWhKCDnxaWf9rz5iolJo96TGmiX97TfgWx
-X-Gm-Gg: ASbGncszw6VKDhapLoefKgFB9OJRlDf3WIKoRajK9uZ1Zf9OhCtEgZPXDfGtbgPqfag
-	6BPMQqbyzw0cllgI86iwJ0ACJTL/czbIwYzy1XX2zLCuMcwvy8/pJPaNVdbJdC0k+U92VBGpbdy
-	9y6W/z9yCc3m9IaWUtLwCb5G304LodScQ0i7CQvv8lkaA5aKL0tNIHl561+z5JjpEm2rbLKUEsb
-	qtbFL4Wz/KA3RoLbl54wWWXkJkxHP4kDTijA4byDda2WJmbanV3VvGfEJIZcDCc2YfekyGKmdg5
-	oK3sif015zEqBwycdUFmT2e5qwCiTZatbokK1/8zIApLRLkW4eor0vgd+asOQxtrLEWUcS2MGfT
-	bh34vWgcnX621WpDbm/5HjeD23acJ1+5+bq7dfcw6KRg7YjOjeDNyPrQiZwkafwvzpl+8WzK1
-X-Google-Smtp-Source: AGHT+IHhUSN1KRgjO7FW8UWVga5t6VY0VlIT576vaao13oDQslNXzdFjIiW1xn/xILoGBvdikE/Pcw==
-X-Received: by 2002:a05:600c:3b19:b0:45c:b61a:b1bd with SMTP id 5b1f17b1804b1-45f2129bd63mr41142815e9.18.1757706838188;
-        Fri, 12 Sep 2025 12:53:58 -0700 (PDT)
+        bh=JRFKheYw65XtHsXGttpFWft6Q64Fu052vOHTho4zEao=;
+        b=htBd0FaxyPewJ22/8i83+X9hTCJvY/xs8/MDt5tIbFR2oj+CWvguBG8Or9VN7boIJI
+         pK/mjUryUrnAf6FLE47BQl2jcCa7CEO8NYJA4YISjycVIQ/LNoeF12iB+4xUL7yzpTYm
+         sbZSJZ4x/9SozSZTcFi1yNGInVW7E3nirC0zbvR5VsxQqqRuSzekMv+zf3Mxog8IqDFY
+         jQYACabXCdzXWR5/obNf8jNvDF2GlktusaYbUN46CFmTK/yVv8T8DnDEzy0lkdpfsDMN
+         ghiX0M/Qr5g6XIIo6MwhGDQNVDNbS1SPNczm08lRa3xK1FXiuJgxv45ttQghXxqK3CBp
+         FItQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUphg01OIo7q9ILCzuu+V3KWOxZfPKACxBbrl91LuzCLnAjjxJxayFc5EUZDaA4Y5nvRLCCw90=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH89Dawn6QFyFuxdbCozr2+ziWBZ+JzqmxDJmNK/R1SDOgH4Oo
+	dD+WEV3VlxzAzWELky1SWcoJtWQLZeW5BzuDsw/AMGK2b5pWb4iu8u77
+X-Gm-Gg: ASbGnctICRgFxWty33Vb/SV2bdGHyJY8DWVwUsk3ukwcTDGZr1ElSFuXC9xt4E8VmVS
+	o0buF94bHq9D8VuhRp8lIFZoKDv/aV73WeFq/m+8WiOwRyg60Ql+BqHUkaYOhQtsu+YACHeTMDq
+	TmqaFZk9cfLvBq4bCwmTKC8QXnVxLdhNfZ3a1N/ZYUJLzW/akkVZRqVs+FZifPJvHtWoVkwXBsv
+	eh/Yyk1tCNHlLwrkht67bKpqVLOBI43q25u9EUrPKfIpjWbl9Gtzuzi5CaIUC9e8OSygQx+u9ka
+	3CzMDu6C9sMfpufgjK2n0EXbUJMwfXsQDKG/2sq3w/N/Pls4t57yqHEgbAghN0q53dENBw9Gf2x
+	2gCXayU/wUFLIbaVEcZXrsjhE4SbI00ugWqSoZkZorBYkwAM/eFwJ3OxYHaIvPQ==
+X-Google-Smtp-Source: AGHT+IEK0LKxCJMa3T/FE1yn9jWxr5RDOTIv2yx6yaJq5FGhArNPULJ6e1clvwsJhm+STF6/Bbsbjw==
+X-Received: by 2002:a5d:5886:0:b0:3e6:116a:8fdf with SMTP id ffacd0b85a97d-3e7658bcb87mr4036656f8f.13.1757706839452;
+        Fri, 12 Sep 2025 12:53:59 -0700 (PDT)
 Received: from yanesskka.. (node-188-187-35-212.domolink.tula.net. [212.35.187.188])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.53.57
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.53.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 12:53:57 -0700 (PDT)
+        Fri, 12 Sep 2025 12:53:59 -0700 (PDT)
 From: Yana Bashlykova <yana2bsh@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>
 Cc: Yana Bashlykova <yana2bsh@gmail.com>,
@@ -82,9 +82,9 @@ Cc: Yana Bashlykova <yana2bsh@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	lvc-project@linuxtesting.org
-Subject: [PATCH 6.1 04/15] genetlink: add test case for duplicate genl family registration
-Date: Fri, 12 Sep 2025 22:53:27 +0300
-Message-Id: <20250912195339.20635-5-yana2bsh@gmail.com>
+Subject: [PATCH 6.1 05/15] genetlink: add test case for family with invalid ops
+Date: Fri, 12 Sep 2025 22:53:28 +0300
+Message-Id: <20250912195339.20635-6-yana2bsh@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250912195339.20635-1-yana2bsh@gmail.com>
 References: <20250912195339.20635-1-yana2bsh@gmail.com>
@@ -96,74 +96,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add incorrect_genl_family struct with duplicate name to test
-error handling when registering families with conflicting names.
+Add test case that verifies error handling when registering
+a genetlink family with invalid operations where both doit
+and dumpit callbacks are NULL.
+
+The test registers incorrect_ops_genl_family which contains a command with:
+- .doit = NULL
+- .dumpit = NULL
+and expects the registration to fail with -EINVAL.
+
+This validates proper validation of genetlink operations during family
+registration.
 
 Signed-off-by: Yana Bashlykova <yana2bsh@gmail.com>
 ---
- .../net-pf-16-proto-16-family-PARALLEL_GENL.c | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ .../net-pf-16-proto-16-family-PARALLEL_GENL.c | 41 +++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c b/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
-index 17f869ece2d6..1db5d15a6f2c 100644
+index 1db5d15a6f2c..245f3b0f4fbb 100644
 --- a/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
 +++ b/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
-@@ -1077,6 +1077,18 @@ static struct genl_family my_genl_family_parallel = {
- 	.n_mcgrps = ARRAY_SIZE(genl_many_mcgrps_two),
+@@ -1089,6 +1089,33 @@ static struct genl_family incorrect_genl_family = {
+ 	.policy = my_genl_policy,
  };
  
-+// genl_family struct with incorrect name
-+static struct genl_family incorrect_genl_family = {
++enum {
++	INCORRECT_OP_WITH_NULL,
++};
++
++// Generic Netlink operations with incorrect ops
++static const struct genl_ops incorrect_ops_with_null[] = {
++	{
++		.cmd = INCORRECT_OP_WITH_NULL,
++		.flags = 0,
++		.policy = my_genl_policy, // random policy
++		.doit = NULL, // doit and dumpit are NULL --> kernel will send -EINVAL
++		.dumpit = NULL,
++	},
++};
++
++// genl_family struct with incorrect ops
++static struct genl_family incorrect_ops_genl_family = {
 +	.hdrsize = 0,
-+	.name = MY_GENL_FAMILY_NAME,   // such family already exists
-+	.version = MY_GENL_VERSION,
-+	.maxattr = MY_GENL_ATTR_MAX,
++	.name = "INCORRECT",
++	.version = 1,
++	.maxattr = 1,
 +	.netnsok = true,
-+	.ops = my_genl_ops,
-+	.n_ops = ARRAY_SIZE(my_genl_ops),
-+	.policy = my_genl_policy,
++	.ops = incorrect_ops_with_null, // ops contain NULL
++	.n_ops = ARRAY_SIZE(incorrect_ops_with_null),
++	.policy = my_genl_policy, // random policy
 +};
 +
  static int __init init_netlink(void)
  {
  	int rc;
-@@ -1104,6 +1116,25 @@ static int __init init_netlink(void)
+@@ -1116,6 +1143,16 @@ static int __init init_netlink(void)
  	return rc;
  }
  
-+static int __init incorrect_init_netlink(void)
++static int __init incorrect_ops_netlink(void)
 +{
-+	int rc;
++	int ret;
 +
-+	pr_info("%s: My module. Initializing incorrect Netlink\n", __func__);
-+
-+	rc = genl_register_family(&incorrect_genl_family);
-+	if (rc) {
-+		pr_err("%s: Failed to register incorrect Generic Netlink family\n", __func__);
-+		goto failure;
-+	}
-+
++	ret = genl_register_family(&incorrect_ops_genl_family);
++	if (ret != -EINVAL)
++		return ret;
 +	return 0;
-+
-+failure:
-+	pr_info("%s: Error was handled correctly\n", __func__);
-+	return -EINVAL;
 +}
 +
- static int __init init_sysfs_third_genl(void)
+ static int __init incorrect_init_netlink(void)
  {
- 	int ret;
-@@ -1215,6 +1246,10 @@ static int __init module_netlink_init(void)
+ 	int rc;
+@@ -1241,6 +1278,10 @@ static int __init module_netlink_init(void)
+ 	if (ret)
  		goto err_sysfs;
- 	pr_info("%s: New families are registered\n", __func__);
  
-+	ret = incorrect_init_netlink();
++	ret = incorrect_ops_netlink();
 +	if (ret)
-+		pr_err("%s: Incorrect Generic Netlink family wasn't registered\n", __func__);
++		goto err_sysfs;
 +
- 	return 0;
- 
- err_sysfs:
+ 	ret = init_netlink();
+ 	if (ret)
+ 		goto err_sysfs;
 -- 
 2.34.1
 
