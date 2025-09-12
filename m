@@ -1,196 +1,127 @@
-Return-Path: <netdev+bounces-222501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5FBB5488D
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:59:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D804BB548A2
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:03:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8A7D16D3FF
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:59:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22B6A1C2467F
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E46D288CA6;
-	Fri, 12 Sep 2025 09:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F9F2DEA82;
+	Fri, 12 Sep 2025 10:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UtEGVVDs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TdH4pN4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0423D27B356
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04B22DE6F3
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 10:03:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757671186; cv=none; b=nVSlFWTyde33WqliMusPGP7vJT0e8sdCCOCqJIU1eqMw6zFf2b3/VuKAOdE7I6nL9ntK40Pgd5gkg8rRmA+Bb4GCp94VfbOerYLh6MYWEJWlJZHIS7mWJCMyQnN8WS0EX2urPxQwlNNWpy5bCMK974Aco+6rCxLAT3ToV8IwBfY=
+	t=1757671432; cv=none; b=XuN+FQPEAttDY5cPG8wM9sVNQEF4gvpUA2ZfqHd9YFQICbB0DFZcgzQ3KlbgYfUaXfpjHtDnhnOYrHuVZ0ffVEILg2w7xqqLxoBumWF/466R02BAakrHd/sjxJ6eGPBK31gRPWTkaoXtxklgRJc3ACfzpSmLUqwKH5AMu3s1hSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757671186; c=relaxed/simple;
-	bh=lTfgKImhQNfN6u2BxK6SF4NKf7soc+1lwEKH6F0tn1M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X/DBtXOHRn7qTWsUdResZVZNZi76apwJOMmA+xNzfVCem6nSRHBohnzJzRF5eEIyyQvmqS9EePd957danr6su4p0fpopfEnHrrtLNNEVzqLHlUTsCgVM/F9U9SXNZr0dzNPIu/gNL3i48cBHB1TBcf0SPJHcHspija3m63C2R88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UtEGVVDs; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1757671432; c=relaxed/simple;
+	bh=S5r8u/+o4m++Q7OEjk59HHq1b4rZX/yEUTiAFIbXwtI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=SDQRzyLNyH+71bInS2MzxRVAzjOjM8YbqELUWCVNLjIOJieD0mpCifd+R2YdUVMtPG6hYN7VZdVXN4zVfb/415WAMo38EVXARsMLUF0kNBvjWIsHN1lG6AfgQwOLefu6yA2r669kX3nsn7MIK2Cc1yVz4BB1+9DQLRONLTdNHHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TdH4pN4H; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-77287fb79d3so1473409b3a.1
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:59:44 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-77264a94031so1343062b3a.2
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 03:03:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757671184; x=1758275984; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/U/oc7TDR2VUzY00gKP0s0JlDQ9xsneooHDgr8AAAf8=;
-        b=UtEGVVDs8lo+SfXJAlTs/ShvRs7lg/G0NbFd0YxfNaqpNfea4yIiNjhAxbSqAc6ly1
-         5SJntktBYAhpsZbn1sbkfdktWyNXPjoPspNfdpKWprlKuLno2bZHFCPi/DJAyxg4enhW
-         All/bjFhHPEnlUu4MLQTJwYhw1da/X7z47iiEtCKF9h0m1WoteQZHvf+j0/jnehNefT8
-         RBXlAzy/4NPz4JsbfgJseW5Jq9bEt8Q8juInDC7yFnbG1F7Do7khCASyC5dh5cJpuOvU
-         AeB+WmcAWvfxNpx5QzS0jxk72ciXA/DYGuXn0zL4wMRJ8UU2dCj/36XaoNIhDlKHdQWk
-         nN9g==
+        d=gmail.com; s=20230601; t=1757671430; x=1758276230; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9CCmS4zZEAAR6mzSAhpJN9WktstQgURUjEZz2NHTbYc=;
+        b=TdH4pN4HLHRdYTcAyI7qSNadrGtioBb72o88qmerkTqH4VRlweSnk1XT4swu7nhV+C
+         OqpE0OQMLReIFpkuDYewfS4TKuLeMPOb4ZMImeQEbGKLBpxhAXdsnzBFIFTLhc21/ExF
+         vWH3ewOc+8pJKYPhJ3fghMtMI6OlB4tu++l0XPdVm4CpcTbgPyDL1bnREWHDzrOkAaIe
+         H1+b2403pKF0zBkP+Q42EBmCrnOEaejhT6ZhOSRN2RY75U8oopAVfR16R8jYhO4VwBM6
+         j6qce/OzVpUystp0uTl/EIr+HTs0TOqMcQ5UjuhmdOWsr+ZTGFnbH5X2ByklLNRSEvDC
+         d9AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757671184; x=1758275984;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/U/oc7TDR2VUzY00gKP0s0JlDQ9xsneooHDgr8AAAf8=;
-        b=T9697DduR92Hfh+H33hNRqpBHHD/szRtSXPUhxRbjheCzDVJCAmYUmIbRUsTZ8Ukga
-         oUotYOyadfDVwtS7f4UwMfrjPTJptwiL2umuQ9ghIjtz2PD00QUIurd/rT7Jad/JXOjr
-         LSnpHTBlu3TQsLv8ta9eQhbXa09iORP8Gw1XbuiBa3cBVchkjInZhr7d0pq9l0h8Plj4
-         IutHhHQEf0wijxgRxR8McgxvqnHZh1YIapMhy2nc6wfWSG0aBfHCFLeMxJZ6AaX5PqNX
-         +w90UO+zMDmRUSqss+fSWYMfrGdILwbRxl45aoantW0aw+2ieGqfu5qtYr7A7i/kS9/W
-         JIXw==
-X-Forwarded-Encrypted: i=1; AJvYcCV1gaJnIbzPKBm/QP34MqAL3BDy5yXa/xd0d34ojrt6RWM//Ic0qRcXtMs5IdvDO9ctDgaLGk4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtFb9VWPDhfOvRVqvVUJXfOVhlSm0O9QqfjmJy+smPyySvDATW
-	9GxAEYuDBn4oJ3pNhhazM/1Ztr9xPJj5f+H8PXuaHWbGrAT/IH/wXCIYkIksrBC3LJU=
-X-Gm-Gg: ASbGncvFCCP1Fyia+RKsubSKtiDVYaWWgT8/ZokDNruQZNKLEh4bqWTcBuflJv01wn6
-	lrmXUGHQ4GPZ2sfIrGn7p0K5Z5RDQ6LbLaQ6bTLtao4rBoujN8PKhY8WfgFvEkH3uVgMxEC9xei
-	JfpdYTEEYJnWC4IRJ3BW5iXcyEZVf8OYH/IJ0uUFIcFKH355JQhU7ci5iCpf0ko02Uzy0LU+501
-	qHfFL9cxOJD+IlgUexJGloxvtR0Of9D2lNu7NKhpkxyzkF2A0e9Op++/bIBZCRUHorjO5z69kSx
-	gF8y7HPTQfvcvm0lfdPKVQflPojqpwJWFUbWJt7U1h1WF49XFUSPMgqw8VyyJcrZxRw2tcfkFZb
-	Rf0CswKTw92pbMA==
-X-Google-Smtp-Source: AGHT+IF3JR3ArS2DE325tp7329BslWJiRQgkK4DDMmc7Q78E5uRK7Xm4SsTgTiPWVL89HRrP3OJy1w==
-X-Received: by 2002:a05:6a20:4322:b0:246:1c:46d with SMTP id adf61e73a8af0-26029fa0cf6mr3110864637.2.1757671184180;
-        Fri, 12 Sep 2025 02:59:44 -0700 (PDT)
-Received: from gmail.com ([223.166.84.15])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b54a387b5absm4192951a12.25.2025.09.12.02.59.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 02:59:43 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Felix Fietkau <nbd@nbd.name>
-Subject: [PATCH net-next] ppp: enable TX scatter-gather
-Date: Fri, 12 Sep 2025 17:59:27 +0800
-Message-ID: <20250912095928.1532113-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1757671430; x=1758276230;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9CCmS4zZEAAR6mzSAhpJN9WktstQgURUjEZz2NHTbYc=;
+        b=AoQz+3gDPX/72hg0p/eIA+4A2CoLtX3mFwtq8NZ5WXUnemmQw7LquGqJ0M5JjZNw5b
+         XAxf1Z6OINELP3dLNEZ5AL3dxpWIt1XDh8VfqjmjHM+8/4NZ8wqhxbgq5fh3TGKMrU4o
+         Smvz54DN+ABS33LZXKIqmfa+x1eE9fhs6W8VflQgU7IWLFfYXO4Da/08FLXZ0WpGYDGm
+         lcQ0wrwkn6vZiKTTnWGMm3Np6PIoza49za4RL0D8lVr3t6BQCcRFe5oDU2UvRFtS8ogZ
+         W0u81PtNt4FktAnrXR2Xl/NDL1yzHDnKQLHE7SpVzUKy94ihwTiG7lb+WFIbxUrJYL/d
+         fSMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVf07h09LXosO0hczgZ0Ad16YyOzumt8sYJBSd51kI2tun6puHX+QItUHWnXM21qYDbLiAssoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwS4rOhm6VyIMtur4TNFZW1/5yHCqXiQdkHAJ/dSpfXgibJr37D
+	zSTQlnuZbd3JkX8Sza5fRaGyc/cwNkptgPWP7jEqNnGqZCbLQEh0tuuq
+X-Gm-Gg: ASbGnct37DGgNZUFcXVSCjUnYTUdGDjwmDLBU7VNvVMR9/tz85ULuNeWXI1YGbjZHWe
+	wwso9apYXqmr+YGLzJxdtZMOSqiOGI+F8p0yeEKkYW7+qT9yikoofLjT8DOn+bIrvHnwm4IPHNH
+	R8KKHJEfZPxTxIguyaahz3+LTdTmuBiTdUVv0dqzRy1ZPyGHv41LqbHcDcq9pJUyCD2OXCfylKg
+	MppvT1dXum+nMrdlBgsj5M0YZ0GzjQZ5xoMgVij++39xHHfYz27WCUyIsh4cBIkClfYw9uXPn2E
+	WEpSS5+f+MH7vrtCQB8N2bd7bMksam1sOXnRzj4iFuf/Dpfn55a6tuvW4w20ibbxxKB9ffvb1C1
+	pX/9wE6ymXMhqDKHucb9Fscuv6DXLe5oA9DHmvW28VcgWFKRva/x95U80U678bAM=
+X-Google-Smtp-Source: AGHT+IGiDcPhc+jzEsuNi+XDjydRqe0OGFAXmfMB6wQuzhQmuVEOLHZQI8X2MDw0RSlQcQ/piEBtkA==
+X-Received: by 2002:a05:6a21:99a7:b0:249:84dc:e0cb with SMTP id adf61e73a8af0-2602aa89c49mr2775188637.18.1757671429966;
+        Fri, 12 Sep 2025 03:03:49 -0700 (PDT)
+Received: from localhost ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77607c473b9sm5010393b3a.93.2025.09.12.03.03.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Sep 2025 03:03:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 12 Sep 2025 19:03:46 +0900
+Message-Id: <DCQQIQ5STYSJ.1X531TK8K9OTS@gmail.com>
+Subject: Re: [PATCH net-next] net: dlink: count dropped packets on skb
+ allocation failure
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni"
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+To: "Jakub Kicinski" <kuba@kernel.org>
+From: "Yeounsu Moon" <yyyynoom@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <20250910054836.6599-2-yyyynoom@gmail.com>
+ <20250911170815.006b3a31@kernel.org>
+In-Reply-To: <20250911170815.006b3a31@kernel.org>
 
-When chan->direct_xmit is true, and no compressors are in use, PPP
-prepends its header to a skb, and calls dev_queue_xmit directly. In this
-mode the skb does not need to be linearized.
-Enable NETIF_F_SG and NETIF_F_FRAGLIST, and add .ndo_fix_features()
-callback to conditionally disable them if a linear skb is required.
-This is required to support PPPoE GSO.
+On Fri Sep 12, 2025 at 9:08 AM KST, Jakub Kicinski wrote:
+> On Wed, 10 Sep 2025 14:48:37 +0900 Yeounsu Moon wrote:
+>> Track dropped packet statistics when skb allocation fails
+>> in the receive path.
+>
+> I'm not sure that failing to allocate a buffer results in dropping
+> one packet in this driver. The statistics have specific meaning, if
+> you're just trying to use dropped to mean "buffer allocation failures"
+> that's not allowed. If I'm misreading the code please explain in more
+> detail in the commit message and repost.
+>
 
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-v1:
- Remove the test for SC_CCP_OPEN and instead test for xc_state changes.
- Link to RFC v2: https://lore.kernel.org/netdev/20250909012742.424771-1-dqfext@gmail.com/
-RFC v2:
- Dynamically update netdev features with ndo_fix_features() callback.
- Link to RFC v1: https://lore.kernel.org/netdev/20250904021328.24329-1-dqfext@gmail.com/
+I think you understand the code better than I do.
+Your insights are always surprising to me.
 
- drivers/net/ppp/ppp_generic.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+I believed that when `netdev_alloc_skb()` fails, it leads to dropping packe=
+ts.
+I also found many cases where `rx_dropped` was incremented when
+`netdev_alloc_skb()` failed.
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index f9f0f16c41d1..1132159a8b92 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -835,6 +835,10 @@ static long ppp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 		ppp_unlock(ppp);
- 		if (cflags & SC_CCP_OPEN)
- 			ppp_ccp_closed(ppp);
-+
-+		rtnl_lock();
-+		netdev_update_features(ppp->dev);
-+		rtnl_unlock();
- 		err = 0;
- 		break;
- 
-@@ -1545,6 +1549,22 @@ ppp_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats64)
- 	dev_fetch_sw_netstats(stats64, dev->tstats);
- }
- 
-+static netdev_features_t
-+ppp_fix_features(struct net_device *dev, netdev_features_t features)
-+{
-+	struct ppp *ppp = netdev_priv(dev);
-+
-+	ppp_xmit_lock(ppp);
-+	/* Allow SG/FRAGLIST only when we have direct-xmit, and no compression
-+	 * path that wants a linear skb.
-+	 */
-+	if (!(dev->priv_flags & IFF_NO_QUEUE) || ppp->xc_state ||
-+	    ppp->flags & (SC_COMP_TCP | SC_CCP_UP))
-+		features &= ~(NETIF_F_SG | NETIF_F_FRAGLIST);
-+	ppp_xmit_unlock(ppp);
-+	return features;
-+}
-+
- static int ppp_dev_init(struct net_device *dev)
- {
- 	struct ppp *ppp;
-@@ -1619,6 +1639,7 @@ static const struct net_device_ops ppp_netdev_ops = {
- 	.ndo_start_xmit  = ppp_start_xmit,
- 	.ndo_siocdevprivate = ppp_net_siocdevprivate,
- 	.ndo_get_stats64 = ppp_get_stats64,
-+	.ndo_fix_features = ppp_fix_features,
- 	.ndo_fill_forward_path = ppp_fill_forward_path,
- };
- 
-@@ -1641,6 +1662,8 @@ static void ppp_setup(struct net_device *dev)
- 	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
- 	dev->priv_destructor = ppp_dev_priv_destructor;
- 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
-+	dev->features = NETIF_F_SG | NETIF_F_FRAGLIST;
-+	dev->hw_features = dev->features;
- 	netif_keep_dst(dev);
- }
- 
-@@ -3081,6 +3104,9 @@ ppp_set_compress(struct ppp *ppp, struct ppp_option_data *data)
- 				ocomp->comp_free(ostate);
- 				module_put(ocomp->owner);
- 			}
-+			rtnl_lock();
-+			netdev_update_features(ppp->dev);
-+			rtnl_unlock();
- 			err = 0;
- 		} else
- 			module_put(cp->owner);
-@@ -3537,6 +3563,12 @@ ppp_connect_channel(struct channel *pch, int unit)
- 	spin_unlock(&pch->upl);
-  out:
- 	mutex_unlock(&pn->all_ppp_mutex);
-+	if (ret == 0) {
-+		rtnl_lock();
-+		netdev_update_features(ppp->dev);
-+		rtnl_unlock();
-+	}
-+
- 	return ret;
- }
- 
--- 
-2.43.0
+However, I'm not entirely sure whether such a failure actually results
+in a misisng packet. I'll resend the patch after verifying whether the pack=
+et
+is really dropped.
 
+Thank you for reviewing!
+
+	Yeounsu Moon
 
