@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60254B54010
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:00:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9799BB54011
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1929B480515
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:00:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88B565A6E6F
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D418A2AD1F;
-	Fri, 12 Sep 2025 02:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4AD33E7;
+	Fri, 12 Sep 2025 02:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7NySabh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2hHaoSg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAFE33E7;
-	Fri, 12 Sep 2025 02:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BF3195B1A
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757642426; cv=none; b=tHKITZlasCasRJIYV2VE5wVMnTRwCcaGu9PjMqXLB0c4CANd5TvetB5Ijc21Zn6imbXJhcF6zWF0/di6VYMbHv1xiRm7e9Qe8AmVbEXGG0OPCMktybg+614Sf9tr+ukrgaTa1WF/LPguqXp8rCsh5qLQAMH3GPhqnVc9FwWiaC4=
+	t=1757642428; cv=none; b=MMqoQqwo2kuU2HA+izll4HEOB7sTPD8CXiGsQpGVww9p43ppX0rU6tW+/S/KoRR8Og/X4Y0hkmwpp9CetTbWfkhrWOdWVSim3sRF/ccW6C13n0Vmh1YsldKT0aDJDYsVbAhVfDwIKQJS9SQtyjiTkO/tZvtKmdcfPKDDbi0M/W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757642426; c=relaxed/simple;
-	bh=aU2h9QxXe4w357gjDc1xv71/YSvJ2iIm9TDJt4sIz/Y=;
+	s=arc-20240116; t=1757642428; c=relaxed/simple;
+	bh=DAKUBlyjV9d85+isZtwOncLgGKba/y4e5ANoFzeWhh8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iOYM3PGS+GHz8Z1B1/+pJRXvIVS+G6zLi8yBmHNPssRH0m7mV4IXiY3oEU1zVQWBlYmNGMmidn+exia03DlMHMrhqCiv1V1u8PL2tlTZFQwOnjUfn0NcI9WJ2nNeRWLqA6FW00OWpl8DjcJPSYHqMF5hkjn3ZKoK63JayHOJmNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7NySabh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 310D4C4CEF0;
-	Fri, 12 Sep 2025 02:00:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GwK97g/nTrcE1k9UHqSZPfwpcfXhPglLqyD/mkoWYA805wpBAkn07Zr3Y5iVIL18xAZsgy/VRiIGVt7QzenQUPtuzug02cA4t8gwOHuZ9AaUYXzDc1K5DlMRXDuA1FaxYL2OVeeEzB5igawqUT7vw4reBb3d3pb1wIFLkXgZ+qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2hHaoSg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4ECEC4CEF0;
+	Fri, 12 Sep 2025 02:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757642426;
-	bh=aU2h9QxXe4w357gjDc1xv71/YSvJ2iIm9TDJt4sIz/Y=;
+	s=k20201202; t=1757642427;
+	bh=DAKUBlyjV9d85+isZtwOncLgGKba/y4e5ANoFzeWhh8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T7NySabh31MiXrHi+gUnqUMJX81s9fFUd4MdwTydv7/rDnfhsWLnC2K9GCHO/u7Sx
-	 05YokBk8P+qPypZ++9N/Il+Xb8yz9lIcNf/2uJf2aTwy4XqP8eqGx5jRrjKE3Via3E
-	 BNVD6epPhqbyuV3MqZxbeljtqRLROpEMs272/zc42zjTz9q3PkjijIjxldOX31qw2J
-	 2xq3MnGytjB3pvnv7OmtgScpiwzVYLVEXmVnxLYqaRjxUMd5bNzgLYKl7QDE4G3aRM
-	 oPKzzn8TRnK2M+KcQEkPpLSovQrlMBlKukww4JeYPkfSrbLjy9FTtv9Hd7zFtGKXSd
-	 OVhAhD6DsFFew==
+	b=e2hHaoSgRwv2o5hmdKKRTqeZn+HXzN3EYLOzpqWs24p6TBsykNgobvy5iQAde0wxZ
+	 dverTg/7kpFRd8RNpQW81Dj2KKz5ocDMSlCsGbKo9dz0Tta8aXshLfv4T77AneugmN
+	 7C/jumUvpDOPrvNDLwscsSqv55EQFLK1k7gqo7kZMdFZYuZHCy5peQ2GcgeUGsAzgS
+	 LUXqQV+ToR2DeRFLE18MIVLJ/l1mY6usJeNkAGTjEYNcAw0jC3W9YpARVTRJNS9dfu
+	 V01DYutMX9sKJcfbB6hr9Pyten6enfFvg4dcEzSSNRZN+BdpOIH9NMqF4TkAbKbRWN
+	 my+K+hAcaTenQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF2C383BF69;
-	Fri, 12 Sep 2025 02:00:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BDA383BF69;
+	Fri, 12 Sep 2025 02:00:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/3] net: ethernet: renesas: rcar_gen4_ptp: Simplify
- register
- layout
+Subject: Re: [PATCH v2 net-next] ipv6: udp: fix typos in comments
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175764242848.2373516.2098681536238652968.git-patchwork-notify@kernel.org>
-Date: Fri, 12 Sep 2025 02:00:28 +0000
-References: <20250908154426.3062861-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20250908154426.3062861-1-niklas.soderlund+renesas@ragnatech.se>
-To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
-	=?utf-8?q?se=3E?=@codeaurora.org
-Cc: yoshihiro.shimoda.uh@renesas.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
+ <175764242999.2373516.6904077191929718487.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Sep 2025 02:00:29 +0000
+References: <20250909122611.3711859-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250909122611.3711859-1-alok.a.tiwari@oracle.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: dsahern@kernel.org, willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  8 Sep 2025 17:44:23 +0200 you wrote:
-> Hello,
+On Tue,  9 Sep 2025 05:26:07 -0700 you wrote:
+> Correct typos in ipv6/udp.c comments:
+> "execeeds" -> "exceeds"
+> "tacking care" -> "taking care"
+> "measureable" -> "measurable"
 > 
-> The daughter driver rcar_gen4_ptp used by both rswitch and rtsn where
-> upstreamed with support for possible different memory layouts on
-> different users. With all Gen4 boards upstream no such setup is
-> documented.
+> No functional changes.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/3] net: ethernet: renesas: rcar_gen4_ptp: Remove different memory layout
-    https://git.kernel.org/netdev/net-next/c/4da47931a924
-  - [2/3] net: ethernet: renesas: rcar_gen4_ptp: Hide register layout
-    https://git.kernel.org/netdev/net-next/c/492d816b1793
-  - [3/3] net: ethernet: renesas: rcar_gen4_ptp: Use lockdep to verify internal usage
-    https://git.kernel.org/netdev/net-next/c/fd2b2429fbc8
+  - [v2,net-next] ipv6: udp: fix typos in comments
+    https://git.kernel.org/netdev/net-next/c/ac36dea3bc85
 
 You are awesome, thank you!
 -- 
