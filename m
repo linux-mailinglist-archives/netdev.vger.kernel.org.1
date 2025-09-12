@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 713B1B5400E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:00:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60254B54010
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DAD25A6E44
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:00:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1929B480515
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8E3195B1A;
-	Fri, 12 Sep 2025 02:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D418A2AD1F;
+	Fri, 12 Sep 2025 02:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cpmSTASq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7NySabh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCA31957FC
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAFE33E7;
+	Fri, 12 Sep 2025 02:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757642403; cv=none; b=OViOtb621Vlb9Nu9FmQKDv0Yw8cBtr2U+tn+Tz+mrsQ4yj5JKvOImUnQM6eZ6iddTmQG3v3s7hw0WHv1RjM4OiAreASyLxvVr2DlxoWArB7euVsTCVTmC1Ygf59e225n9d0kTyLVHI4Eb1itQnNfcMTEawF42tVh++v/8JK+OXs=
+	t=1757642426; cv=none; b=tHKITZlasCasRJIYV2VE5wVMnTRwCcaGu9PjMqXLB0c4CANd5TvetB5Ijc21Zn6imbXJhcF6zWF0/di6VYMbHv1xiRm7e9Qe8AmVbEXGG0OPCMktybg+614Sf9tr+ukrgaTa1WF/LPguqXp8rCsh5qLQAMH3GPhqnVc9FwWiaC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757642403; c=relaxed/simple;
-	bh=0fpMs+M34glu60tIOWrZ8WX7GPVrlPCGRSHkCUnAbP0=;
+	s=arc-20240116; t=1757642426; c=relaxed/simple;
+	bh=aU2h9QxXe4w357gjDc1xv71/YSvJ2iIm9TDJt4sIz/Y=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=diH8GrzD5CavK1NU93JExKH8m3Kf4ywfbCpyJauPnhtQi9KHp8pB2E/t1046zbUAbG4Oy1Vo4VeXexPDCaNywW1jf2kbriDMQACse9KV7gIJ4TdV8KT/DwwMc9lnNBbHMF4bS1G6Q/T79NcYqY+4S63Ed54ZaI6BlH4FJZf5NpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cpmSTASq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CC56C4CEF0;
-	Fri, 12 Sep 2025 02:00:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iOYM3PGS+GHz8Z1B1/+pJRXvIVS+G6zLi8yBmHNPssRH0m7mV4IXiY3oEU1zVQWBlYmNGMmidn+exia03DlMHMrhqCiv1V1u8PL2tlTZFQwOnjUfn0NcI9WJ2nNeRWLqA6FW00OWpl8DjcJPSYHqMF5hkjn3ZKoK63JayHOJmNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7NySabh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 310D4C4CEF0;
+	Fri, 12 Sep 2025 02:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757642403;
-	bh=0fpMs+M34glu60tIOWrZ8WX7GPVrlPCGRSHkCUnAbP0=;
+	s=k20201202; t=1757642426;
+	bh=aU2h9QxXe4w357gjDc1xv71/YSvJ2iIm9TDJt4sIz/Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cpmSTASqT/NMN78ceQqnG3vxOjrVnia1aSizhHBF8IEHmqJ6LWyDY7UqxoJzPwB+5
-	 bsKKaoZyHUt91cHIFwqFHe0JHxI9UeIxnLWxOM7MRywpAE2hCw8kH9mmwacNXE9R5o
-	 +xczJhQARqOvYofkBjiADpdZoZVQsMwWvuvTZZYCk8seN2ncf9Z8X6X7dRV/9vWdTy
-	 s/i6Q18PKcYLLIE7uU31z1RuEe36Nf3gEPuVXpHO2tfCvLugPEX4DmuN3ABPCwUfEr
-	 raMMQyoOXa1Ic34ZhDo6Tzp2Wi1rlcI1ue2tjpUZUeEs3Ku+h5CGdGUxl9SlK+VyxR
-	 klBTEDzHNoUjw==
+	b=T7NySabh31MiXrHi+gUnqUMJX81s9fFUd4MdwTydv7/rDnfhsWLnC2K9GCHO/u7Sx
+	 05YokBk8P+qPypZ++9N/Il+Xb8yz9lIcNf/2uJf2aTwy4XqP8eqGx5jRrjKE3Via3E
+	 BNVD6epPhqbyuV3MqZxbeljtqRLROpEMs272/zc42zjTz9q3PkjijIjxldOX31qw2J
+	 2xq3MnGytjB3pvnv7OmtgScpiwzVYLVEXmVnxLYqaRjxUMd5bNzgLYKl7QDE4G3aRM
+	 oPKzzn8TRnK2M+KcQEkPpLSovQrlMBlKukww4JeYPkfSrbLjy9FTtv9Hd7zFtGKXSd
+	 OVhAhD6DsFFew==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B79383BF69;
-	Fri, 12 Sep 2025 02:00:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF2C383BF69;
+	Fri, 12 Sep 2025 02:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] dpaa2-switch: fix buffer pool seeding for control
- traffic
+Subject: Re: [PATCH 0/3] net: ethernet: renesas: rcar_gen4_ptp: Simplify
+ register
+ layout
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175764240601.2373516.14083685662692051175.git-patchwork-notify@kernel.org>
-Date: Fri, 12 Sep 2025 02:00:06 +0000
-References: <20250910144825.2416019-1-ioana.ciornei@nxp.com>
-In-Reply-To: <20250910144825.2416019-1-ioana.ciornei@nxp.com>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- vladimir.oltean@nxp.com
+ <175764242848.2373516.2098681536238652968.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Sep 2025 02:00:28 +0000
+References: <20250908154426.3062861-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20250908154426.3062861-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: yoshihiro.shimoda.uh@renesas.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 10 Sep 2025 17:48:25 +0300 you wrote:
-> Starting with commit c50e7475961c ("dpaa2-switch: Fix error checking in
-> dpaa2_switch_seed_bp()"), the probing of a second DPSW object errors out
-> like below.
+On Mon,  8 Sep 2025 17:44:23 +0200 you wrote:
+> Hello,
 > 
-> fsl_dpaa2_switch dpsw.1: fsl_mc_driver_probe failed: -12
-> fsl_dpaa2_switch dpsw.1: probe with driver fsl_dpaa2_switch failed with error -12
+> The daughter driver rcar_gen4_ptp used by both rswitch and rtsn where
+> upstreamed with support for possible different memory layouts on
+> different users. With all Gen4 boards upstream no such setup is
+> documented.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] dpaa2-switch: fix buffer pool seeding for control traffic
-    https://git.kernel.org/netdev/net/c/2690cb089502
+  - [1/3] net: ethernet: renesas: rcar_gen4_ptp: Remove different memory layout
+    https://git.kernel.org/netdev/net-next/c/4da47931a924
+  - [2/3] net: ethernet: renesas: rcar_gen4_ptp: Hide register layout
+    https://git.kernel.org/netdev/net-next/c/492d816b1793
+  - [3/3] net: ethernet: renesas: rcar_gen4_ptp: Use lockdep to verify internal usage
+    https://git.kernel.org/netdev/net-next/c/fd2b2429fbc8
 
 You are awesome, thank you!
 -- 
