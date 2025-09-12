@@ -1,146 +1,125 @@
-Return-Path: <netdev+bounces-222612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10267B54FD4
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F655B55008
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2523D164E41
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:41:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52684161D2B
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BAEE30B527;
-	Fri, 12 Sep 2025 13:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529A930505A;
+	Fri, 12 Sep 2025 13:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="LlA/h/RL"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kcvZOLE3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF99238C08;
-	Fri, 12 Sep 2025 13:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F5F3002DE;
+	Fri, 12 Sep 2025 13:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757684482; cv=none; b=aSbtlFv3VBBROPxn0YgssDOe5Z0V21lIaOnqpJyw7wYctrWEcpHLxxaRDWxXZg/QUp9sIwDQHU5rJNGXfNftiorHwhMj6Zl9XoFMTBz7doysj3LsYHSA8df5Syr3h0UXrVicz1+0cpOa3D5LyCh1yPpENNJmKHBnG3EH5RiE7K8=
+	t=1757685068; cv=none; b=HaATVJyj7Fhs9o+oH31aURraDeQuMWyrHWg3W6yd3sLv6BanwcNSyL4z/WskftqSzoeEicqTq3bnbaRgHh7GJ4NJKKVF182U2tJj5m91/eTlOna3cP6Tfik7vycCEUicNh5AYi27ReGBeZNm4VfqJx0jsNcirrHzYYn9ZIS32qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757684482; c=relaxed/simple;
-	bh=IQD/44xloBE/2XlP+vvhvuHqjMWdWOvkrm0BIe5JmS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iaUGbS3HwFFxV7qKewIhBoR7bjpfPBYdRzHtQQJXvtBcPjaui0xfTpJXYYbQ741ePjm5At7OoyzKC69GvVsI7iUQQ4PGRpeKDIplkOCscdtQrNjtSuMDkOE7KyBxyjv4Pn/gvzvAEMBIVhM6kkZ+YqlPxehuMJSa+JaWvhVfV3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=LlA/h/RL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F163C4CEF1;
-	Fri, 12 Sep 2025 13:41:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1757684481;
-	bh=IQD/44xloBE/2XlP+vvhvuHqjMWdWOvkrm0BIe5JmS8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LlA/h/RLK6XWt3zFTa4qAvpyo/uBfpP6m4SrZuOOQMkfS+NAyFaZbo6x+mEYZsefg
-	 6BfJlPhdy+Dipm6Nq4oIENE/Q0eD/qqtuolGtIFJv7PU2uIMsCbJL4I2GA3/mMH9t0
-	 boSNv79YjwOfXxt8YDwZdrPFv1M2oO2ZqaDAl1Kg=
-Date: Fri, 12 Sep 2025 15:41:18 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: "Farber, Eliav" <farbere@amazon.com>
-Cc: "jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>,
-	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"vitaly.lifshits@intel.com" <vitaly.lifshits@intel.com>,
-	"post@mikaelkw.online" <post@mikaelkw.online>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Chocron, Jonathan" <jonnyc@amazon.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH 5.10.y] e1000e: fix EEPROM length types for overflow
- checks
-Message-ID: <2025091212-resisting-untangled-9b8c@gregkh>
-References: <20250910173138.8307-1-farbere@amazon.com>
- <2025091131-tractor-almost-6987@gregkh>
- <f524c24888924a999c3bb90de0099b78@amazon.com>
- <2025091122-obsolete-earthen-8c9b@gregkh>
- <5614ed5db9bd412cb43a78ad656eb433@amazon.com>
+	s=arc-20240116; t=1757685068; c=relaxed/simple;
+	bh=2UKOvJk8sT4wD4CgxBKlGW2IV/aUfFIbJVKRo8iIYN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PFwfrDm9lucFCT0gZo7gX3GnVIVLvvTtpKGxkuPn2/wgbz6FnByFxW2TCLfXXWHWjSNry3G01uKzUnL9bGJuD6TjzLNbr/TX2J4CI6uP+V81FSx3dLekZGm5n7Fapvj9Pi9eva1ekt1mH+EOFUtT6v1s+pGt/FtK6ZFRvwlGiAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kcvZOLE3; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58C1ug6O022007;
+	Fri, 12 Sep 2025 13:50:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=corp-2025-04-25; bh=FjSQ5V25DxhSwBaA
+	ZR7X4fXaIWfKI+kAQTy1IEtVj7A=; b=kcvZOLE34K4Le2UjSzafLHvlJKN32XXT
+	5ntuMXf87wG4N2SEbxl+CjBEKhLlnQCKtWB6B2mETSQTcNKPv8yYX5pvei+x99+d
+	zBzhIvN+yHJ6sBincrTWZE8S9shiCo/nwWTe6Ml+6ACAd7d0G2UeXt6CVr098WVY
+	shLs1YwzuTTCyyq+BxEb0mVe4t8nFytq5eyx0Su92QQ4NKyQxtiJu9GzllNuJEjH
+	NX70hnDjI3oh4ua0uk63L9dxY05zdYUn6cmhcVaxIbF4nvCesG2RyQOMWRGhCXq2
+	DW6d5Xg7CClFcDyNb1v1lMH2u04FNHsIbJHt4V70crvyKXbl1qIgHA==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4922jh0a6a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 12 Sep 2025 13:50:55 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58CCYdrJ038766;
+	Fri, 12 Sep 2025 13:50:54 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 490bddwe5m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 12 Sep 2025 13:50:54 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58CDosCk009920;
+	Fri, 12 Sep 2025 13:50:54 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 490bddwe53-1;
+	Fri, 12 Sep 2025 13:50:54 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: mbloch@nvidia.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-rdma@vger.kernel.org
+Subject: [PATCH net-next] net/mlx5: fix typo in pci_irq.c comment
+Date: Fri, 12 Sep 2025 06:50:44 -0700
+Message-ID: <20250912135050.3921116-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5614ed5db9bd412cb43a78ad656eb433@amazon.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-12_05,2025-09-11_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 suspectscore=0
+ mlxlogscore=999 adultscore=0 spamscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
+ definitions=main-2509120129
+X-Proofpoint-ORIG-GUID: gRGxFeuuodI3g7xOcg63x8ZwWVzXQPTY
+X-Authority-Analysis: v=2.4 cv=PLMP+eqC c=1 sm=1 tr=0 ts=68c4253f b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=nEMAJ4ySRUttQcq-aIwA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 cc=ntf awl=host:12083
+X-Proofpoint-GUID: gRGxFeuuodI3g7xOcg63x8ZwWVzXQPTY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA4MDE2MiBTYWx0ZWRfX+YMhEWPfmsP9
+ fbzOs+5rzoaYk9lUxWpzPZ6mwtIbkzlQnBMTpPQye0dU7mJxO4V18Xi/zn2TTo81JtV/Z0ETxOM
+ 87hP2PXXHlnrz+Q1JdV/4l8VmT1W3F8pWF1x2x2ACOhmAkeRayMxvXzb0edOLhyF6j21cddWxi0
+ QqthTk5w4wTYbg64x5tLYBeAgqm4M2q+yqoWPNDbSvlmO8mLJcwlm3n96QAdvwfa3+yTXyLXL7r
+ IaCRjwG9Aimf40uL3Kfn0Yrd6TCe3/buBfYgwyUNivXyynSXBtdPvWz9CaHfrtoHmp/m1ddZZw4
+ xwiSCRBoiaP47ia37mYBpKrDGczdPQIcD9kiQJ3jwIVfBqOtZKnOmBPJFRZjpZDlTJDXjAy8Duz
+ Ny8UNEOXQ1hdWZLpszgbWqOfQNe7Pg==
 
-On Fri, Sep 12, 2025 at 01:07:35PM +0000, Farber, Eliav wrote:
-> > On Thu, Sep 11, 2025 at 06:13:33AM +0000, Farber, Eliav wrote:
-> > > > On Wed, Sep 10, 2025 at 05:31:38PM +0000, Eliav Farber wrote:
-> > > >> Fix a compilation failure when warnings are treated as errors:
-> > > >>
-> > > >> drivers/net/ethernet/intel/e1000e/ethtool.c: In function ‘e1000_set_eeprom’:
-> > > >> ./include/linux/overflow.h:71:15: error: comparison of distinct pointer types lacks a cast [-Werror]
-> > > >>    71 |  (void) (&__a == __d);   \
-> > > >>       |               ^~
-> > > >> drivers/net/ethernet/intel/e1000e/ethtool.c:582:6: note: in expansion of macro ‘check_add_overflow’
-> > > >>   582 |  if (check_add_overflow(eeprom->offset, eeprom->len, &total_len) ||
-> > > >>       |      ^~~~~~~~~~~~~~~~~~
-> > > >>
-> > > >> To fix this, change total_len and max_len from size_t to u32 in
-> > > >> e1000_set_eeprom().
-> > > >> The check_add_overflow() helper requires that the first two operands
-> > > >> and the pointer to the result (third operand) all have the same type.
-> > > >> On 64-bit builds, using size_t caused a mismatch with the u32 fields
-> > > >> eeprom->offset and eeprom->len, leading to type check failures.
-> > > >>
-> > > >> Fixes: ce8829d3d44b ("e1000e: fix heap overflow in e1000_set_eeprom")
-> > > >> Signed-off-by: Eliav Farber <farbere@amazon.com>
-> > > >> ---
-> > > >>  drivers/net/ethernet/intel/e1000e/ethtool.c | 2 +-
-> > > >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >>
-> > > >> diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c
-> > > >> b/drivers/net/ethernet/intel/e1000e/ethtool.c
-> > > >> index 4aca854783e2..584378291f3f 100644
-> > > >> --- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-> > > >> +++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-> > > >> @@ -559,7 +559,7 @@ static int e1000_set_eeprom(struct net_device
-> > > >> *netdev,  {
-> > > >>       struct e1000_adapter *adapter = netdev_priv(netdev);
-> > > >>       struct e1000_hw *hw = &adapter->hw;
-> > > >> -     size_t total_len, max_len;
-> > > >> +     u32 total_len, max_len;
-> > > >>       u16 *eeprom_buff;
-> > > >>       int ret_val = 0;
-> > > >>       int first_word;
-> > > >> --
-> > > >> 2.47.3
-> > > >>
-> > > >
-> > > > Why is this not needed in Linus's tree?
-> > > Kernel 5.10.243 enforces the same type, but this enforcement is
-> > > absent from 5.15.192 and later:
-> > > /*
-> > >  * For simplicity and code hygiene, the fallback code below insists on
-> > >  * a, b and *d having the same type (similar to the min() and max()
-> > >  * macros), whereas gcc's type-generic overflow checkers accept
-> > >  * different types. Hence we don't just make check_add_overflow an
-> > >  * alias for __builtin_add_overflow, but add type checks similar to
-> > >  * below.
-> > >  */
-> > > #define check_add_overflow(a, b, d) __must_check_overflow(({  \
-> >
-> > Yeah, the min() build warning mess is slowly propagating back to older
-> > kernels over time as we take these types of fixes backwards.  I count 3
-> > such new warnings in the new 5.10 release, not just this single one.
-> >
-> > Overall, how about fixing this up so it doesn't happen anymore by
-> > backporting the min() logic instead?  That should solve this build
-> > warning, and keep it from happening again in the future?  I did that for
-> > newer kernel branches, but never got around to it for these.
-> 
-> I did backporting of 4 commits to bring include/linux/overflow.h in
-> line with v5.15.193 in order to pull commit 1d1ac8244c22 ("overflow:
-> Allow mixed type arguments").
-> I'll also check what can be done for include/linux/minmax.h.
+Fix a typo in a comment in pci_irq.c:
+ "ssigned" → "assigned"
 
-Very cool, thank you!
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+index 692ef9c2f729..e18a850c615c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+@@ -54,7 +54,7 @@ static int mlx5_core_func_to_vport(const struct mlx5_core_dev *dev,
+ 
+ /**
+  * mlx5_get_default_msix_vec_count - Get the default number of MSI-X vectors
+- *                                   to be ssigned to each VF.
++ *                                   to be assigned to each VF.
+  * @dev: PF to work on
+  * @num_vfs: Number of enabled VFs
+  */
+-- 
+2.50.1
+
 
