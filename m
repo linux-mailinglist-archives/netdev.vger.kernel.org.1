@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-222698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7DEBB55733
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:56:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73760B55737
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D52661D617BA
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:56:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 875DA1D61823
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED2734AB17;
-	Fri, 12 Sep 2025 19:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE9134F48C;
+	Fri, 12 Sep 2025 19:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mMhclOse"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpwGrJZ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D85343219
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBCD34A30D
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757706851; cv=none; b=Qe172wGSPh7ZJO7aT+5A8AbwEcNpf6A/xO1Mk2Esa3mUj6tX33IprdO1F9hWkYjCyoGTXVS66UrtJo1euQXNtw03L+42hqAxYn9YlWDkFcP7xp/4DsaxGg0jchMu2DVTgdw5IAJ+xnVBKSfhq2nccCgu2Q55fVBnt5fgXRn+6Zk=
+	t=1757706852; cv=none; b=Slyr9yxYiJxIiUi8K0ldRu/3XCd7i4FMtgcTH9amAexZObZDn9dg0h4Kd4QAjsfhvkhovgUVqYZw0aaKOePQHd26x3HPmpDRGUu07afZ7r7StQdFW8XE8oGMeSuITTmTgskNwRub9QQq+9Tnu76r2FBKzcbzmxoj+GqYuR1dbWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757706851; c=relaxed/simple;
-	bh=UaxWZRT2eVzBCGKMziU2Aq9Id91zLIcnt32JB283AaM=;
+	s=arc-20240116; t=1757706852; c=relaxed/simple;
+	bh=6L6KchES0/naZZVCLZ0vGuIX8JBrK81BunZ0ve9LFn8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p0Hqu/D6+pE1hx8VHVJBr6dJI2Vt0BdE9hoaaU4pD+z12tal4E3oIHGQdKWmdM6TJW3YOoHScCWHL2maLj3MAnFdoAcKXr1tiWgCyLazndTs5FBj56xyB1deJKk15YpPO7uPH32eh3tv8NNy/avfP3NNgEFwONQJvqdV7Y4+whU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mMhclOse; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version; b=ZfeI36gz7/c18MpOrGO2M+eplEitFXWFxF9/ddYPa1uXtV/COuckykqQWk7vrbIAW/c2JbfdDrttACqNyZq7lC7LAcdCt8rffnx0cMJ58FKV9mDpTLp0rGNARWORNuK99AqF/zqzB+s89W5xex7ibhKAlsnYxeWGkbxMGkOnk4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpwGrJZ9; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45decc9e83eso21805435e9.3
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:54:08 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-45dfe95bbb7so21613685e9.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:54:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757706847; x=1758311647; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757706848; x=1758311648; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=crP5kybyDKEP1L3Fsm57wKH5BFdIt0syo+qIG2jEqhk=;
-        b=mMhclOseYfvl0cVXhPsgKksq+KCwHXTcQEx/CbGjJcA842LJo3sh8SJ2HiBFPdyIb6
-         FWH+LD7NLongLCEUYafG5+L06PRXcbjvlzmEu+IBfH0fy1JsF8lieMSGYccPhjJhbFrd
-         o42ijR1lnTljOjxydmiyGRh6szSXeLYS+1lOGoxjakPfUF1xX2XzaPvAPmA47cGVrY3Q
-         j13hO1dTfJWDjlTVCO0yZ1uXOTUS0+LvP7QJRY4SaqjB4ai7EB1AMtEYICwn8tRRVKjq
-         0PMSByvAHCN0o7KU8xcnN94Zf2DJPorJVqSRvZRbvzSCiRJUVoERPoa90rFVAiaxfYTa
-         geqw==
+        bh=NQCdu2qqA5L2SEaa+R2ExFgFn5V27LFp3SRYw/lxCRA=;
+        b=DpwGrJZ9lRzNgNehBz1gj1WOlg93536Y346VoX9xDOHyXNwsFnt5x9LLCzVzuJMwQw
+         /G2jnPD0BnRfS6kRayVkBPmr8bxxDp1CsgtDZL2twlqsQXaXQ1O2t8qLvFuVFzVns3Ta
+         LzbNHek95TtEf5FriYW+WDxWyUWNwrTTEIu4OHr4o0FWHmMd5naIJbuynX5G6yXbm+uj
+         6GQsbRKlc2tKigGMi/Wj9kwgrboFTxmbcqsHJZ0Yr7oX4sdTOxv0o0WeMT4MeZbg329M
+         aKaHRYz11XRdUSoPWN5+zTcnGVrwEMZzNpt5xRvFDhsncpfYrOw67D4HLaTio49WG5m2
+         9WiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757706847; x=1758311647;
+        d=1e100.net; s=20230601; t=1757706848; x=1758311648;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=crP5kybyDKEP1L3Fsm57wKH5BFdIt0syo+qIG2jEqhk=;
-        b=ByxoSzAWklOs0lLeSEqTH9Mm+Ap+qBXx4l1KV5CQgluMixcRK2ErGF+K1lEsQpTSNw
-         lXqEqpxlQpcuj7S81hv5qjZqoy8BfflREndwbwbXqfQpmEHG0LVZdp60gPrYDnmBXjp+
-         A+mbb+e0AS3lA8zC7MQxcIYn3KqFBZsIs+6XmERFYDRq85QtFKUFvDDtG4kFTw4rBZlo
-         IpdBCW+XHp+zNNEQ483wNUHTLnMkTC5qCdLXRAtzeFNWeGwkGlEl7lcNkljWKSApAm0p
-         RW8nNb7b80Krh2GakZTOq/9kqLH96pyhTQB9QsmYyO4a6cjRxRloqqGENWxIgzaRIs0H
-         1eAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAHycIRqCPgAvSnVcEy8d61wON89+OpAHTRHQKvsfy7Cy46zIXy3Ql0qb1i2MKDZjF/5NjA50=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1QrlJvTVCeoaCwjlM8HX5MS1ZgeIbx9itwczEMKOdEgUPOsDs
-	p7U3Zl2bH9BwgcsI620M1FehDMJbdJHIy777TfC2rTJY4MznG8bVG0TV
-X-Gm-Gg: ASbGncsQ8QQ/5dEW9mM0/gZhgO3FSiam9F9X4M8M1dOl6TIN3WW4GNRjxVsmrvVIHlj
-	jLOsWK2Mp567Fkggr4AcGRhXl4uVgtM3leENObvsblPvz7CDW0FkffuSaWZ0ww3CYPdgZx8Cbhm
-	Bcd8JiCW2ErEIEVQ+ay2iWB3KIOmyzL6rehEdAkpM9bSTU1burEeVQPO9t2YGRKCkvZgYMmfrna
-	V4IPNRM8mqiDkTd2Lk3T3BM1BSbAojUPJdRCjQsji3fPQmjhDZooxguFTdTgJvXljV9pgU1eUBl
-	wRCL4Gsp/Ogphk6/6cHom3UO2HcH+bpPHDBf559YihNXm9LcJEOqWu/JkL+i8+KdobU/dBSwDkr
-	PZbneTucb0bgAvj+5oPmyVa6PKF/uRuS76og8LtlDOpSxjnZ1jGc804lSeMcGO0AWnKEEVGiJqp
-	VXFlNsJJ0=
-X-Google-Smtp-Source: AGHT+IHYbSxBKDnneqMGe4B4GqdstQRPwP2TMBkU5KGjwaP3qxT6Gii/ajCV1viHAEQt0HDASC1PLw==
-X-Received: by 2002:a05:6000:40cb:b0:3da:d015:bf84 with SMTP id ffacd0b85a97d-3e7659cc7e2mr4361632f8f.25.1757706846599;
-        Fri, 12 Sep 2025 12:54:06 -0700 (PDT)
+        bh=NQCdu2qqA5L2SEaa+R2ExFgFn5V27LFp3SRYw/lxCRA=;
+        b=q90Nhy13iDLT5c2HllVMFMUvBueq290xem0iE2ED6YQK+DOv1n4qTIJTwhigHy74u1
+         fFt/yRMWn9Wh8GHFA8zxpCj6zBKX3ttbnMBa/x4ApKJ2y0e1fGCzbGCmS8zH93z1w2/p
+         amG5MVzaggqtRkV/EQpQFxjbfceIATrKh48zgnJ38JXaRhSKihjdCVjTBrH+GxWDFMob
+         G3TsmFLU/4pK8VguD2fgNknSOsSQls273+L6bD4n/DY4JVrx8XxyZ2R0mL6Z3SKwodUw
+         gKfYJojQVJELKg/KS2/xuBJKq84fMSKanwXlvHgawW+tTweswdTT1KjdO8CKnJRJKe+X
+         DyaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7nu6AIq1r9m7EF2ADTC/wRlZ/4H1tFQXZnOVf+7pCjWiDiwpiZchyo5ZasnSqZwg/tnJXkHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoSDXLIbWyTiJarD66jbOOXd51P3HPmW3xnRUJZIFTA7NhuBVD
+	Bu5jmN0r7O63Vw25wiKvTbNF+5oeyuOmyhfKWUGh+cgbjVSD10mUVjcB
+X-Gm-Gg: ASbGnctMy7uTdvwUzxJhK9xU+lsIXPRnxm39QB2baSnM4CUP3vW8mtknk9ucjrzJOmV
+	uXi2SrM20sgc2J3BdOrz2LgXMsy5SPen2xjvqZCqgH27Y8tp6agf/U9NNmr9AuTRNzoMN7O8GpL
+	/QymhaJRrxtiSM3CkaHd5HSgpUKlrUY7tFlGujQeOR+03CTlEggG/LPm3+JJACIKIAdsgRY2sNh
+	MSzxSAM21hNOYe55D/Gavreq5kPwg8l1xfnlC9HhHCYrsiBaCTDl3qOZTKPH/m6MmX2UzzRC/HP
+	3gE7Hn0aWc67J4mgUDk2XgMQ54CgDq9/y7Z1Qh4dWWTwiUtYJ2sNGt6iCjZYhYCuV+vgsNL6AA4
+	ppYkE364+49KJIk9d8P4MQG6G8T42RQsw6RORAFKUfHpq6U69HK8F9vzJdomp7A==
+X-Google-Smtp-Source: AGHT+IG7/dc62nnEkODKkDFjpjftdI9gNf5NvEVk1eA/5v9zXXjcbJVj1cg1bibwNEL1hSD/5mJ+wA==
+X-Received: by 2002:a05:600c:4748:b0:45b:98d4:5eb7 with SMTP id 5b1f17b1804b1-45f211f8799mr46842565e9.18.1757706848078;
+        Fri, 12 Sep 2025 12:54:08 -0700 (PDT)
 Received: from yanesskka.. (node-188-187-35-212.domolink.tula.net. [212.35.187.188])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.54.04
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.54.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 12:54:06 -0700 (PDT)
+        Fri, 12 Sep 2025 12:54:07 -0700 (PDT)
 From: Yana Bashlykova <yana2bsh@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>
 Cc: Yana Bashlykova <yana2bsh@gmail.com>,
@@ -81,22 +80,13 @@ Cc: Yana Bashlykova <yana2bsh@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Shuah Khan <shuah@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>,
-	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	bpf@vger.kernel.org,
-	llvm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
 	lvc-project@linuxtesting.org
-Subject: [PATCH 6.1 10/15] selftests: net: genetlink: add packet capture test infrastructure
-Date: Fri, 12 Sep 2025 22:53:33 +0300
-Message-Id: <20250912195339.20635-11-yana2bsh@gmail.com>
+Subject: [PATCH 6.1 11/15] selftests: net: genetlink: add /proc/net/netlink test
+Date: Fri, 12 Sep 2025 22:53:34 +0300
+Message-Id: <20250912195339.20635-12-yana2bsh@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250912195339.20635-1-yana2bsh@gmail.com>
 References: <20250912195339.20635-1-yana2bsh@gmail.com>
@@ -108,278 +98,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add test cases for monitoring Netlink traffic during test execution
+Add test case to verify proper handling of Netlink sockets in procfs:
 
-Require CONFIG_NLMON.
+- Tests /proc/net/netlink file accessibility
+- Validates socket count changes on creation/deletion
+- Uses kernel's netlink_seq_ops mechanism
+
+Checks that socket entries are correctly added/removed from procfs.
 
 Signed-off-by: Yana Bashlykova <yana2bsh@gmail.com>
 ---
- tools/testing/selftests/net/Makefile    |   6 +
- tools/testing/selftests/net/genetlink.c | 234 ++++++++++++++++++++++++
- 2 files changed, 240 insertions(+)
- create mode 100644 tools/testing/selftests/net/genetlink.c
+ tools/testing/selftests/net/genetlink.c | 74 +++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 69c58362c0ed..0c325ccc5f03 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -71,6 +71,7 @@ TEST_GEN_FILES += bind_bhash
- TEST_GEN_PROGS += sk_bind_sendto_listen
- TEST_GEN_PROGS += sk_connect_zero_addr
- TEST_PROGS += test_ingress_egress_chaining.sh
-+TEST_GEN_PROGS += genetlink
- 
- TEST_FILES := settings
- 
-@@ -82,3 +83,8 @@ $(OUTPUT)/reuseport_bpf_numa: LDLIBS += -lnuma
- $(OUTPUT)/tcp_mmap: LDLIBS += -lpthread
- $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
- $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
-+
-+$(OUTPUT)/genetlink: LDLIBS += -lnl-3 -lnl-genl-3
-+$(OUTPUT)/genetlink: CFLAGS += $(shell pkg-config --cflags libnl-3.0 libnl-genl-3.0)
-+
-+EXTRA_CLEAN := $(SCRATCH_DIR) $(OUTPUT)/genetlink.pcap
 diff --git a/tools/testing/selftests/net/genetlink.c b/tools/testing/selftests/net/genetlink.c
-new file mode 100644
-index 000000000000..5be9ca68accd
---- /dev/null
+index 5be9ca68accd..f8231a302c36 100644
+--- a/tools/testing/selftests/net/genetlink.c
 +++ b/tools/testing/selftests/net/genetlink.c
-@@ -0,0 +1,234 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Generic Netlink and Netlink test cases
-+ *
-+ * This test suite validates various aspects of Generic Netlink and Netlink communication
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <ctype.h>
-+#include <sys/wait.h>
-+#include <time.h>
-+#include <inttypes.h>
-+#include <signal.h>
-+#include <netlink/netlink.h>
-+#include <netlink/genl/genl.h>
-+#include <netlink/genl/family.h>
-+#include <netlink/genl/ctrl.h>
-+#include <netlink/genl/mngt.h>
-+#include <linux/genetlink.h>
-+
-+#include "../kselftest_harness.h"
-+
-+#define MY_GENL_FAMILY_NAME "TEST_GENL"
-+#define MY_GENL_CMD_UNSPEC 0
-+#define MY_GENL_CMD_ECHO 1
-+#define MY_GENL_CMD_SET_VALUE 2
-+#define MY_GENL_CMD_GET_VALUE 3
-+#define MY_GENL_CMD_EVENT 4
-+#define MY_GENL_CMD_NO_ATTRS 5
-+
-+#define MY_GENL_SMALL_CMD_GET 0
-+
-+#define MY_GENL_ATTR_UNSPEC 0
-+#define MY_GENL_ATTR_DATA 1
-+#define MY_GENL_ATTR_VALUE 2
-+#define MY_GENL_ATTR_PATH 3
-+#define MY_GENL_ATTR_NESTED 4
-+#define MY_GENL_ATTR_MAX 4
-+
-+#define THIRD_GENL_FAMILY_NAME "THIRD_GENL"
-+
-+#define THIRD_GENL_CMD_ECHO 1
-+
-+#define THIRD_GENL_ATTR_UNSPEC 0
-+#define THIRD_GENL_ATTR_DATA 1
-+#define THIRD_GENL_ATTR_FLAG 2
-+#define THIRD_GENL_ATTR_MAX 2
-+
-+#define PATH_GENL_TEST_NUM "/sys/kernel/genl_test/value"
-+#define PATH_GENL_TEST_MES "/sys/kernel/genl_test/message"
-+#define PATH_GENL_TEST_DEV "/sys/kernel/genl_test/some_info"
-+#define PATH_PARALLEL_GENL_MES "/sys/kernel/parallel_genl/message"
-+#define PATH_THIRD_GENL_MES "/sys/kernel/third_genl/message"
-+
-+#define MY_MCGRP_NAME "MY_MCGRP_GENL"
-+
-+#define GENL_CTRL "nlctrl"
-+#define CTRL_ATTR_POLICY_MAX (__CTRL_ATTR_POLICY_DUMP_MAX - 1)
-+
-+#define PARALLEL_GENL_FAMILY_NAME "PARALLEL_GENL"
-+#define PARALLEL_GENL_ATTR_UNSPEC 0
-+#define PARALLEL_GENL_CMD_SEND 1
-+#define PARALLEL_GENL_CMD_DUMP_INFO 2
-+#define PARALLEL_GENL_CMD_SET_VALUE 3
-+#define PARALLEL_GENL_CMD_GET_VALUE 4
-+
-+#define PARALLEL_GENL_ATTR_DATA 1
-+#define PARALLEL_GENL_ATTR_BINARY 2
-+#define PARALLEL_GENL_ATTR_NAME 3
-+#define PARALLEL_GENL_ATTR_DESC 4
-+#define PARALLEL_GENL_ATTR_FLAG_NONBLOCK 9
-+#define PARALLEL_GENL_ATTR_FLAG_BLOCK 10
-+#define PARALLEL_GENL_ATTR_PATH 12
-+#define PARALLEL_GENL_ATTR_MAX 12
-+
-+#define LARGE_GENL_FAMILY_NAME "LARGE_GENL"
-+
-+/*
-+ * Test cases
-+ */
-+
-+/**
-+ * TEST(capture_start) - Starts Netlink traffic capture using nlmon interface
-+ *
-+ * Creates a virtual nlmon interface, enables it and starts packet capture
-+ * with tcpdump. Captured packets are saved to 'genetlink.pcap' file.
-+ *
-+ * Note:
-+ * - Requires root privileges
-+ * - Creates temporary interface 'nlmon0'
-+ * - Runs tcpdump in background
-+ * - Adds small delay to ensure capture starts
-+ */
-+
-+TEST(capture_start)
+@@ -81,6 +81,25 @@
+ 
+ #define LARGE_GENL_FAMILY_NAME "LARGE_GENL"
+ 
++struct nl_sock *socket_alloc_and_conn(void)
 +{
-+	printf("Running Test: starting Netlink traffic capture...\n");
++	struct nl_sock *socket;
 +
-+	// Only root can monitor Netlink traffic
-+	if (geteuid()) {
-+		SKIP(return, "test requires root");
-+		return;
++	socket = nl_socket_alloc();
++	if (!socket) {
++		fprintf(stderr, "Failed to allocate socket\n");
++		return NULL;
 +	}
 +
-+	char command[256];
-+	int result;
-+
-+	snprintf(command, sizeof(command), "ip link add nlmon0 type nlmon");
-+	result = system(command);
-+	ASSERT_EQ(WEXITSTATUS(result), 0);
-+	if (result == -1) {
-+		perror("system");
-+		return;
++	if (genl_connect(socket)) {
++		fprintf(stderr,
++			"Failed to connect to generic netlink through socket\n");
++		nl_socket_free(socket);
++		return NULL;
 +	}
-+
-+	snprintf(command, sizeof(command), "ip link set nlmon0 up");
-+	result = system(command);
-+	ASSERT_EQ(WEXITSTATUS(result), 0);
-+	if (result == -1) {
-+		perror("system");
-+		return;
-+	}
-+
-+	snprintf(command, sizeof(command),
-+		 "tcpdump -i nlmon0 -w genetlink.pcap &");
-+	result = system(command);
-+	ASSERT_EQ(WEXITSTATUS(result), 0);
-+	if (result == -1) {
-+		perror("system");
-+		return;
-+	}
-+
-+	printf("nlmon is up. Starting netlink process...\n");
-+
-+	sleep(2);
-+
-+	printf("Starting Netlink tests...\n");
++	return socket;
 +}
 +
+ /*
+  * Test cases
+  */
+@@ -143,6 +162,61 @@ TEST(capture_start)
+ 	printf("Starting Netlink tests...\n");
+ }
+ 
 +/**
-+ * TEST(capture_end) - Terminates Netlink traffic monitoring session
++ * TEST(open_netlink_file) - Verifies correct reading of Netlink socket information
 + *
-+ * Performs controlled shutdown of nlmon capture interface by:
-+ * 1. Stopping tcpdump capture process
-+ * 2. Bringing down nlmon interface
-+ * 3. Deleting nlmon interface
++ * Tests the /proc/net/netlink interface by:
++ * 1. Creating a test Netlink socket
++ * 2. Reading the proc file before and after socket creation
++ * 3. Verifying the socket count changes as expected
 + *
-+ * Test Procedure:
-+ * 1. Privilege Check:
-+ *    - Verifies root privileges (required for nlmon operations)
-+ *    - Gracefully skips if not root
-+ *
-+ * 2. Capture Termination:
-+ *    - Stops tcpdump process (2-second delay for cleanup)
-+ *    - Brings nlmon0 interface down
-+ *    - Deletes nlmon0 interface
-+ *    - Validates each operation succeeds
-+ *
-+ * 3. Cleanup Verification:
-+ *    - Checks system command exit statuses
-+ *    - Provides detailed error reporting
-+ *
-+ * Key Validations:
-+ * - Proper termination of monitoring session
-+ * - Correct interface teardown
-+ * - Root privilege enforcement
-+ * - System command error handling
-+ *
-+ * Expected Behavior:
-+ * - tcpdump process should terminate successfully
-+ * - nlmon0 interface should deactivate cleanly
-+ * - Interface should be removable
-+ * - Non-root execution should skip gracefully
-+ *
-+ * Security Considerations:
-+ * - Requires root for network interface control
-+ * - Ensures complete capture session cleanup
-+ * - Verifies proper resource release
-+ *
-+ * Note:
-+ * - Should be paired with capture_start test
-+ * - Includes 2-second delay for process stabilization
-+ * - Provides status feedback through printf
++ * The test checks that:
++ * - /proc/net/netlink is accessible
++ * - Entries are properly added/removed
++ * - Uses kernel's netlink_seq_ops mechanism
 + */
 +
-+TEST(capture_end)
++TEST(open_netlink_file)
 +{
-+	printf("Running Test: stopping Netlink traffic capture...\n");
++	FILE *file;
++	char line[256];
++	int cnt = 0;
 +
-+	// Only root can monitor Netlink traffic
-+	if (geteuid()) {
-+		SKIP(return, "test requires root");
++	printf("Running Test: opening and reading /proc/net/netlink file...\n");
++
++	struct nl_sock *sock;
++
++	sock = socket_alloc_and_conn();
++
++	file = fopen("/proc/net/netlink", "r");
++	ASSERT_NE(NULL, file);
++	if (file == NULL) {
++		perror("fopen");
 +		return;
 +	}
 +
-+	char command[256];
-+	int result;
++	while (fgets(line, sizeof(line), file) != NULL)
++		cnt++;
 +
-+	sleep(2);
++	nl_socket_free(sock);
 +
-+	snprintf(command, sizeof(command), "pkill tcpdump");
-+	result = system(command);
-+	ASSERT_EQ(WEXITSTATUS(result), 0);
-+	if (result == -1) {
-+		perror("system");
++	fclose(file);
++
++	file = fopen("/proc/net/netlink", "r");
++	ASSERT_NE(NULL, file);
++	if (file == NULL) {
++		perror("fopen");
 +		return;
 +	}
 +
-+	snprintf(command, sizeof(command), "ip link set nlmon0 down");
-+	result = system(command);
-+	ASSERT_EQ(WEXITSTATUS(result), 0);
-+	if (result == -1) {
-+		perror("system");
-+		return;
-+	}
++	while (fgets(line, sizeof(line), file) != NULL)
++		cnt--;
 +
-+	snprintf(command, sizeof(command), "ip link delete nlmon0 type nlmon");
-+	result = system(command);
-+	ASSERT_EQ(WEXITSTATUS(result), 0);
-+	if (result == -1) {
-+		perror("system");
-+		return;
-+	}
++	EXPECT_EQ(cnt, 1);
 +
-+	printf("The capturing is over\n");
++	fclose(file);
 +}
 +
-+TEST_HARNESS_MAIN
+ /**
+  * TEST(capture_end) - Terminates Netlink traffic monitoring session
+  *
 -- 
 2.34.1
 
