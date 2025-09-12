@@ -1,262 +1,168 @@
-Return-Path: <netdev+bounces-222390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48084B54092
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:41:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B48B5409B
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:47:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 867AD4E204C
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:41:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08B6C56594E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729D521CC5A;
-	Fri, 12 Sep 2025 02:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BBB192B75;
+	Fri, 12 Sep 2025 02:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="BAB07N4W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJlFk7Wq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F82C1F582E;
-	Fri, 12 Sep 2025 02:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF851B043C
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757644867; cv=none; b=nN6/e13ZhxztfLdnCMG6ct4+1G1BQ0dKdrRBqDomqNeOTEw3IQ7xHk2ERVs6pnA1ohqZApltXr7Jgu1gRQNGP+UeAGakd3vy2eTfBWJ50oZFIVmwVksf9SHxOeCKm/KJPUJVNjum1fawzFh/3giaU+bMdo4aKUgiFLt2TiLRSWI=
+	t=1757645268; cv=none; b=mrKyraruO/OL0F1pfMyHw31z77cOkHvNkceu6jOlQf4laWgsMu1Q8F3g6w4fDIu76tQ2Tmbw862C/VhMSf3G1wInMn7MrVpwhIP41FJV3tOz5TWnAkWERYvGYopR8ZNgqq4AdGkQqKql3efTcmS/Wu+EuDyK+rLVMF6Xw5iI2D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757644867; c=relaxed/simple;
-	bh=NsauGeiklvzZmSjLPeSDEaoxcNrSuaYWf8M3YHJQe4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=NMkw+Gx2pgm/1A5v/ZA57QX1IWcqErwV6pv9InsEOPOykNoqtOEuuAmwsVKL3LhWBjhi78v59ijecoc9rkw8Sly+r+4DZU2XIt/FgK9wN7v+zofX+Ug9HCOr4JZ0tRRBUXvk1AJbjtATCgwtN9M5cWk1efFMaifXfvSE4yp22TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=BAB07N4W; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1757644861;
-	bh=Mxz+MJMpxgcjbcJa8tZchrjniFjVcmYRhAdQ4VJ3mEw=;
-	h=Date:From:To:Cc:Subject:From;
-	b=BAB07N4WQbbiv9utw13tmckecOGdQcNBaWpBJovcu1tcIpiMVTGp8CDHwCh9l55dh
-	 VjGRjzQ3PxIxBAmpSGF1QFEw2SAGIxqgk84vZFubZEQt2XVYgqg/qHlAa1cI3gYke1
-	 TSlTtfhXUMOBQGp+ykbWeNFCKDb+t7rdWijoE5tslxW2TD5Lg5INLchkL1D6EsdMoR
-	 jBAwLaz2HUpyUsuH32k40wqGvzC2+QkjTdlM1ZkpHMDqQpN0j+oIa087/l69xI1SEE
-	 GfIbUTOQky9W8hdmUV9YcdLOTOw4Pi46QJxL+sk2UiXDD8sqNO8KjvmWdfaigQQpWX
-	 25xkpjOE4/VVA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cNJZh1c8sz4w90;
-	Fri, 12 Sep 2025 12:41:00 +1000 (AEST)
-Date: Fri, 12 Sep 2025 12:40:59 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
-Cc: Jiawei Zhao <phoenix500526@163.com>, Jiri Olsa <jolsa@kernel.org>, bpf
- <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel
- Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the tip tree with the bpf-next tree
-Message-ID: <20250912124059.0428127b@canb.auug.org.au>
+	s=arc-20240116; t=1757645268; c=relaxed/simple;
+	bh=6L2gucGOcFE+nhE434JfQy8YhLSW8k2PnC3la7PG4Do=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kgkJt8uqkHTRdupKkabgT6O23h4d544RtHyRudwrIeLIcvbD1kHfzE3JWeWL5xvn/9JkMnLVx1U4EOBRiqfqPS7wPm2jF2w2v+C3UTBMtaqL3jIsSS8nNQv+lscMedDcvU91WXNRE6SdgeLsZF3ok3FPJA4X77VThlw0sTY5LME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lJlFk7Wq; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-24c89867a17so13286925ad.1
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 19:47:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757645265; x=1758250065; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=deI9FWfpRKpN+slNfOnUT67Ew2gMIzjtJYn6xTizlH0=;
+        b=lJlFk7Wq8CPIRCCovIzwzgWeuJIEfBIYB5xQQbGstJiJeXiE95zCl19EbYqUfNH/C3
+         LVGbFwels3lhV+cyo2h+nQX2RCMvHkVoeumE2d154fWTNe4aB5acOZ3sOF6TJADea8jv
+         tcOgnBnGCfOUdL7RPEleBc6MrTAPrs52naZyssXf9rY5SQm4rKxqE38qp68jzZLbHa2l
+         ZjEYu9K4uI3eSmkLhOCA8sR3PR6xIMaGgJkSnkhBFL4wA0/AH0pm0Hr4vYPdUGNnSpQj
+         cNLc6wry/gdKt6cV+Q6C+uBqcwTyv50NNgcdq/nVNPuo7KA+8+Fle0OTmmY86EPGtWhO
+         97Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757645265; x=1758250065;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=deI9FWfpRKpN+slNfOnUT67Ew2gMIzjtJYn6xTizlH0=;
+        b=pqqp0XpHpvPxgbCy420oAweR84NFAmYiooLGk6roj881j5mo1w+E7/V9iWyKqDSTUW
+         jCMz16dhVrAhYwEtmd/1G1gdKf/Zsq3fGD7Ll9FOOIIjvsb0Ms2eK0lCzYCLHtKFlUT5
+         cgHLKdl7rY2Nh5eJ8xh+h8l0BZxsyLhyZY58KZqTCgBh5/PuJ7b9DXTDDWMiotPjW6Tc
+         UsTmHLqJsNgzRGxmArZV9IvD2GMgpzwGBRJn3y2JCbIjtmarfwHIyVEQXUO6RUM89XI0
+         LFJ36M7B8Er64aHTuLZXRqiFpYO0FQbM4jnE1tICGz4QRait1qxQPv2pjj/pHas6JQu7
+         stng==
+X-Gm-Message-State: AOJu0Yyy/cnLe2rN0NLKvd0ypWOgsb86YfM+cY24NoCtzpklxJV1W6ER
+	s1NFsshTrWE4nVXJ6IsHGxmp6kPZ8AOhAUcTrDiJ/mHGKznozeD6ci7dgg9yTnKm1AY=
+X-Gm-Gg: ASbGncvV+fDimhdWKyDKbxsnNpgCSGntbEONv43cOiQL0CRKi1haJCNjJn/mWI9okX0
+	AvStqoLGV+LfPljgu7nMmTX4qmexVMPdOWSs64mX6ntkdq0GGhJ9RuTCl7VRRM/IWAj3ivnme1j
+	DShuaagF6r0RnG/n3w0RXNj105XA0rFRHq9qsrpIr/CHs6hOKPPwXVRQ2CG3LbSsAdjBeCff/4J
+	yCDmgGcE2KsLrx5jUK9VjxqFkefFKJWjyNNBGUNio0GlvXrBhM4D3DWMDgzdqyaHBpML6u3CZ25
+	tNc+tc3d6jEhP0LHVa6sxfKETozephbLjimH8YcA3z9UDzel4QDzUvcg5t7F/NJ+LnEtyulxX1g
+	ua0GBkvF2iN0sx3SGhy7iGZeSEZfv9Syway/pJGQO
+X-Google-Smtp-Source: AGHT+IHa1Z2PAAK9Pnm3h1vIVsIBwlHU4I825nb1ScQWC/SnmXMegxpKYdP0qmY7c1lDjbKixLc1gg==
+X-Received: by 2002:a17:902:ecc7:b0:250:1c22:e78 with SMTP id d9443c01a7336-25d242f2f04mr15292575ad.1.1757645265421;
+        Thu, 11 Sep 2025 19:47:45 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([45.32.227.231])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32dd61eaa42sm4349827a91.5.2025.09.11.19.47.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 19:47:44 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v8 0/3] net: dsa: yt921x: Add support for Motorcomm YT921x
+Date: Fri, 12 Sep 2025 10:46:14 +0800
+Message-ID: <20250912024620.4032846-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/506VhIn.sowjLdO/xYsUGH_";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/506VhIn.sowjLdO/xYsUGH_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Motorcomm YT921x is a series of ethernet switches developed by Shanghai
+Motorcomm Electronic Technology, including:
 
-Hi all,
+  - YT9215S / YT9215RB / YT9215SC: 5 GbE phys
+  - YT9213NB / YT9214NB: 2 GbE phys
+  - YT9218N / YT9218MB: 8 GbE phys
 
-Today's linux-next merge of the tip tree got a conflict in:
+and up to 2 serdes interfaces.
 
-  tools/testing/selftests/bpf/prog_tests/usdt.c
+This patch adds basic support for a working DSA switch.
 
-between commit:
+v7: https://lore.kernel.org/r/20250905181728.3169479-1-mmyangfl@gmail.com
+  - simplify locking scheme
+v6: https://lore.kernel.org/r/20250824005116.2434998-1-mmyangfl@gmail.com
+  - handle unforwarded packets in tag driver
+  - move register and struct definitions to header file
+  - rework register abstraction and implement a driver lock
+  - implement *_stats and use a periodic work to fetch MIB
+  - remove EEPROM dump
+  - remove sysfs attr and other debug leftovers
+  - remove ds->user_mii_bus assignment
+  - run selftests and fix any errors found
+v5: https://lore.kernel.org/r/20250820075420.1601068-1-mmyangfl@gmail.com
+  - use enum for reg in dt binding
+  - fix phylink_mac_ops in the driver
+  - fix coding style
+v4: https://lore.kernel.org/r/20250818162445.1317670-1-mmyangfl@gmail.com
+  - remove switchid from dt binding
+  - remove hsr from tag driver
+  - use ratelimited log in tag driver
+v3: https://lore.kernel.org/r/20250816052323.360788-1-mmyangfl@gmail.com
+  - fix words and warnings in dt binding
+  - remove unnecessary dev_warn_ratelimited and u64_from_u32
+  - remove lag and mst
+  - check for mdio results and fix a unlocked write in conduit_state_change
+v2: https://lore.kernel.org/r/20250814065032.3766988-1-mmyangfl@gmail.com
+  - fix words in dt binding
+  - add support for lag and mst
+v1: https://lore.kernel.org/r/20250808173808.273774-1-mmyangfl@gmail.com
+  - fix coding style
+  - add dt binding
+  - add support for fdb, vlan and bridge
 
-  69424097ee10 ("selftests/bpf: Enrich subtest_basic_usdt case in selftests=
- to cover SIB handling logic")
+David Yang (3):
+  dt-bindings: net: dsa: yt921x: Add Motorcomm YT921x switch support
+  net: dsa: tag_yt921x: add support for Motorcomm YT921x tags
+  net: dsa: yt921x: Add support for Motorcomm YT921x
 
-from the bpf-next tree and commit:
+ .../bindings/net/dsa/motorcomm,yt921x.yaml    |  169 +
+ drivers/net/dsa/Kconfig                       |    7 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/yt921x.c                      | 2944 +++++++++++++++++
+ drivers/net/dsa/yt921x.h                      |  587 ++++
+ include/net/dsa.h                             |    2 +
+ include/uapi/linux/if_ether.h                 |    1 +
+ net/dsa/Kconfig                               |    6 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_yt921x.c                          |  138 +
+ 10 files changed, 3856 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+ create mode 100644 drivers/net/dsa/yt921x.c
+ create mode 100644 drivers/net/dsa/yt921x.h
+ create mode 100644 net/dsa/tag_yt921x.c
 
-  875e1705ad99 ("selftests/bpf: Add optimized usdt variant for basic usdt t=
-est")
+-- 
+2.50.1
 
-from the tip tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/bpf/prog_tests/usdt.c
-index 615e9c3e93bf,833eb87483a1..000000000000
---- a/tools/testing/selftests/bpf/prog_tests/usdt.c
-+++ b/tools/testing/selftests/bpf/prog_tests/usdt.c
-@@@ -40,73 -40,20 +40,80 @@@ static void __always_inline trigger_fun
-  	}
-  }
- =20
- +#if defined(__x86_64__) || defined(__i386__)
- +/*
- + * SIB (Scale-Index-Base) addressing format: "size@(base_reg, index_reg, =
-scale)"
- + * - 'size' is the size in bytes of the array element, and its sign indic=
-ates
- + *   whether the type is signed (negative) or unsigned (positive).
- + * - 'base_reg' is the register holding the base address, normally rdx or=
- edx
- + * - 'index_reg' is the register holding the index, normally rax or eax
- + * - 'scale' is the scaling factor (typically 1, 2, 4, or 8), which match=
-es the
- + *    size of the element type.
- + *
- + * For example, for an array of 'short' (signed 2-byte elements), the SIB=
- spec would be:
- + * - size: -2 (negative because 'short' is signed)
- + * - scale: 2 (since sizeof(short) =3D=3D 2)
- + *
- + * The resulting SIB format: "-2@(%%rdx,%%rax,2)" for x86_64, "-2@(%%edx,=
-%%eax,2)" for i386
- + */
- +static volatile short array[] =3D {-1, -2, -3, -4};
- +
- +#if defined(__x86_64__)
- +#define USDT_SIB_ARG_SPEC -2@(%%rdx,%%rax,2)
- +#else
- +#define USDT_SIB_ARG_SPEC -2@(%%edx,%%eax,2)
- +#endif
- +
- +unsigned short test_usdt_sib_semaphore SEC(".probes");
- +
- +static void trigger_sib_spec(void)
- +{
- +	/*
- +	 * Force SIB addressing with inline assembly.
- +	 *
- +	 * You must compile with -std=3Dgnu99 or -std=3Dc99 to use the
- +	 * STAP_PROBE_ASM macro.
- +	 *
- +	 * The STAP_PROBE_ASM macro generates a quoted string that gets
- +	 * inserted between the surrounding assembly instructions. In this
- +	 * case, USDT_SIB_ARG_SPEC is embedded directly into the instruction
- +	 * stream, creating a probe point between the asm statement boundaries.
- +	 * It works fine with gcc/clang.
- +	 *
- +	 * Register constraints:
- +	 * - "d"(array): Binds the 'array' variable to %rdx or %edx register
- +	 * - "a"(0): Binds the constant 0 to %rax or %eax register
- +	 * These ensure that when USDT_SIB_ARG_SPEC references %%rdx(%edx) and
- +	 * %%rax(%eax), they contain the expected values for SIB addressing.
- +	 *
- +	 * The "memory" clobber prevents the compiler from reordering memory
- +	 * accesses around the probe point, ensuring that the probe behavior
- +	 * is predictable and consistent.
- +	 */
- +	asm volatile(
- +		STAP_PROBE_ASM(test, usdt_sib, USDT_SIB_ARG_SPEC)
- +		:
- +		: "d"(array), "a"(0)
- +		: "memory"
- +	);
- +}
- +#endif
- +
-- static void subtest_basic_usdt(void)
-+ static void subtest_basic_usdt(bool optimized)
-  {
-  	LIBBPF_OPTS(bpf_usdt_opts, opts);
-  	struct test_usdt *skel;
-  	struct test_usdt__bss *bss;
-- 	int err, i;
-+ 	int err, i, called;
- +	const __u64 expected_cookie =3D 0xcafedeadbeeffeed;
- =20
-+ #define TRIGGER(x) ({			\
-+ 	trigger_func(x);		\
-+ 	if (optimized)			\
-+ 		trigger_func(x);	\
-+ 	optimized ? 2 : 1;		\
-+ 	})
-+=20
-  	skel =3D test_usdt__open_and_load();
-  	if (!ASSERT_OK_PTR(skel, "skel_open"))
-  		return;
-@@@ -126,22 -73,13 +133,22 @@@
-  	if (!ASSERT_OK_PTR(skel->links.usdt0, "usdt0_link"))
-  		goto cleanup;
- =20
- +#if defined(__x86_64__) || defined(__i386__)
- +	opts.usdt_cookie =3D expected_cookie;
- +	skel->links.usdt_sib =3D bpf_program__attach_usdt(skel->progs.usdt_sib,
- +							 0 /*self*/, "/proc/self/exe",
- +							 "test", "usdt_sib", &opts);
- +	if (!ASSERT_OK_PTR(skel->links.usdt_sib, "usdt_sib_link"))
- +		goto cleanup;
- +#endif
- +
-- 	trigger_func(1);
-+ 	called =3D TRIGGER(1);
- =20
-- 	ASSERT_EQ(bss->usdt0_called, 1, "usdt0_called");
-- 	ASSERT_EQ(bss->usdt3_called, 1, "usdt3_called");
-- 	ASSERT_EQ(bss->usdt12_called, 1, "usdt12_called");
-+ 	ASSERT_EQ(bss->usdt0_called, called, "usdt0_called");
-+ 	ASSERT_EQ(bss->usdt3_called, called, "usdt3_called");
-+ 	ASSERT_EQ(bss->usdt12_called, called, "usdt12_called");
- =20
- -	ASSERT_EQ(bss->usdt0_cookie, 0xcafedeadbeeffeed, "usdt0_cookie");
- +	ASSERT_EQ(bss->usdt0_cookie, expected_cookie, "usdt0_cookie");
-  	ASSERT_EQ(bss->usdt0_arg_cnt, 0, "usdt0_arg_cnt");
-  	ASSERT_EQ(bss->usdt0_arg_ret, -ENOENT, "usdt0_arg_ret");
-  	ASSERT_EQ(bss->usdt0_arg_size, -ENOENT, "usdt0_arg_size");
-@@@ -225,18 -163,9 +232,19 @@@
-  	ASSERT_EQ(bss->usdt3_args[1], 42, "usdt3_arg2");
-  	ASSERT_EQ(bss->usdt3_args[2], (uintptr_t)&bla, "usdt3_arg3");
- =20
- +#if defined(__x86_64__) || defined(__i386__)
- +	trigger_sib_spec();
- +	ASSERT_EQ(bss->usdt_sib_called, 1, "usdt_sib_called");
- +	ASSERT_EQ(bss->usdt_sib_cookie, expected_cookie, "usdt_sib_cookie");
- +	ASSERT_EQ(bss->usdt_sib_arg_cnt, 1, "usdt_sib_arg_cnt");
- +	ASSERT_EQ(bss->usdt_sib_arg, nums[0], "usdt_sib_arg");
- +	ASSERT_EQ(bss->usdt_sib_arg_ret, 0, "usdt_sib_arg_ret");
- +	ASSERT_EQ(bss->usdt_sib_arg_size, sizeof(nums[0]), "usdt_sib_arg_size");
- +#endif
- +
-  cleanup:
-  	test_usdt__destroy(skel);
-+ #undef TRIGGER
-  }
- =20
-  unsigned short test_usdt_100_semaphore SEC(".probes");
-
---Sig_/506VhIn.sowjLdO/xYsUGH_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmjDiDsACgkQAVBC80lX
-0Gwn2wf+JdEg0JBrrqOJ/mxKRiIsOTu4bxuxaLCeAgoa0DJNc5hvVaIYnFx/nuAX
-ys9BuJ10hkEWzuJqBSWBKIunMipD1vPZNXQypHYAbu7hTlue2C1uWOTI/xyMEKHw
-bQciNXwP9FAsZoEYse0Hyb9CjYUARd/WN195DAv0IQn1Om1Rh24xr0+WpCCNS8Si
-HCNiZ0L20BHUn3k2t75wme5i77PFWrsdsv24PwzDgSFQ66W+iY1z/d9ZF3J2rClO
-dx/VNN0hkkQ/qnmb4Fxa8LbwNNZaWmQYZBost00aiqEZW9bq9SNPL6956OH9/Ltb
-F/CXavvsytxkpOPiYC3R9mLG6505PA==
-=Su5e
------END PGP SIGNATURE-----
-
---Sig_/506VhIn.sowjLdO/xYsUGH_--
 
