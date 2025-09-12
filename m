@@ -1,144 +1,140 @@
-Return-Path: <netdev+bounces-222512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70405B54AC9
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:15:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C876B54D44
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0213B12E2
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:15:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87648189DAE7
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012EA261B96;
-	Fri, 12 Sep 2025 11:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753B8322550;
+	Fri, 12 Sep 2025 12:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="mwmWvLNi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="USFRPLME"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A743009E7
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 11:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA8F301474
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757675714; cv=none; b=lMfc+72iq/ZtrfTPvSAkCEJnElGVrEndg4EOm5HmZ2m4N4ts+drQbM4SoRI0GmfkxiyqVJ4Lgg1ne9cq3z6n6Pqe9XFw77UhMeEfpP6pz6dzKUvxDArkrWn2hQ6+ZXKA8vDCThETviqtnkM5AaKV0hs1kTg8T8R+FSd+SjBF0LM=
+	t=1757678933; cv=none; b=Pv3DQrd/uvaZcqmW8lx5jnCWUH3u6BnT6WxfUwgk45yYD1CRrp6SqOAg+6xYxBsPbnAGDCKe9qF3f1DagxKpun1G7N365DsLKJ5OHQ+pplJdeJRVTqGdwLVNS9NBGvuoerlRSjh5fiykq4Kd/0XJ9wrmgcY0h3KwQ9hWaAAf7kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757675714; c=relaxed/simple;
-	bh=e5L+tVWzscZr4jLHDRbnNlvC5wSer04cc3J4F0Re2yw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a//cZqk6dEhgd2F9QaugFTu/YtgAlZc4z/VtR1mB44QqCY40DptScotiNlh67dORRHeGbz3D9p3nua4gqDElW/yBiaLMBoSNCd1JN7vcyU6wPfOsNYQGElXTQjrHvnXUurhpCbvDaRkPYadvjk6cBimdcXr5jNlFe8U7ngEgOHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=mwmWvLNi; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-560888dc903so2042949e87.2
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 04:15:12 -0700 (PDT)
+	s=arc-20240116; t=1757678933; c=relaxed/simple;
+	bh=V8fbqWQOTCOVVu7/P1rim4+IvcAYfNiZG/w2GK6cab4=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=k+l/9a2KRjMdE/uaYD11ENEQk05E677vVN3S/azuZTntdJilyQ3cPL7Wg+8pOIUj7FyiRhfp7TO1ZAihvarvn9q0hbvOA/peZ205yYf+VujmSuWXwTpjbY8QpxRFcCbzrS8XVOLRVPVmZl5VlwMku0dM2TbuClcF4PGFSrfUzMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=USFRPLME; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3dae49b117bso1450562f8f.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 05:08:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1757675711; x=1758280511; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y79xIpnC424FlOC64ZAsCAV+HYrgKwpFVZghrIQKO/0=;
-        b=mwmWvLNiXML6exy4SRXlTldwGg6pMxhlr2TDF/7r2m8nA1D5kLFX2CLPLNmcVh60OI
-         ucX3z7bq1gtD8cUHmFrkIL+HugwnqzuTCzdrZuGz3DY8pcQBtDIr9ICTVxIJvsiBzIOt
-         KBmjJWxNuXi/c75xo5pqh2SEtQlmUlmNM2GzbbaIBSyBq9ttp5aZYOgu07pu5JzBsPwe
-         4akkqM2jiK8Zxp7eROQ09tSc2SNqLn2lqdqn+UHrMoBEi/EvveY78lK33EascoHarWRQ
-         zYi/35xeuoYzX2FTi98CcXYbwh+3TROE3VWxymt1ivvcfdP9E2pXN09smovEYPVrJt23
-         Ossg==
+        d=gmail.com; s=20230601; t=1757678930; x=1758283730; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eyXwEntkUq/1IvyuiiJejzbrGCs0SwPC/bonUwQtC/g=;
+        b=USFRPLMET8iMeq4zcZ8E8+nwdjL3RtSi1H1/nHgsrDXabFKMpGZKBVLsQ71tvWuSyE
+         FL17fUmbMAA+/wOyy+fAV1pYhYDM0QqWraHBLcDA1iXEzNTzdblYIBtzMpn+HUCw7qjK
+         wFK/gwa9ORNJ2KJGBhAn7qX2N04p14IzJu1cNz1thEbDs1n+IuYXqCbRKC6jFK2ChiMd
+         qzt2XGJprlrSLEaWE2hReK7Pc2fGc3HQPgWCHN/oM6J2FF5SuHy5MZgnKPZW7/fRTgOC
+         cvDxNEbCOp8JQQJMrSUVuGWyqYeg59NGZwGRrzBp67w7raL3aIxPJMNPCg9wyA6gJaPG
+         46+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757675711; x=1758280511;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y79xIpnC424FlOC64ZAsCAV+HYrgKwpFVZghrIQKO/0=;
-        b=R5tz/6jfxoaANIA2SdHEea9k9fC57hwULx/bR2fPIg8vveWJDv68CTa1wetGyuJ8Ry
-         JFHY1LNt5FcKloPS1vrzBAlbcU/KFxT7L2Pv0xDutJg65wrSj555XSQiV3dTYyAEIs56
-         hrcXKUrADttvtSMkyo7q4BT6Oi3A1A3vPhZpt9CPOHk7Pn6zWj5/7Ue3jV22f1OFxODv
-         /eS20X4TTI45g1od4/nb5uqpvYTjWZyP4k7Gxb5z2oEyUoF4sCMB4QmD0NG5h7a4y3VP
-         GcrRae9XPSUaFlxiyIayT464s+ESwZHsOq5EuqyDfHvisapUaEb/BC/zCVrqBkCItDTN
-         aHeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9Pwvk037j+cNdRpDBt3KBlyySfmsXi7ttvWnHde1J0TCm/kQIaDh/xNVKWHya6PR6u2yGrow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTOIpV11YxJpjbHbLRkR+7JWMi+Vm3FM6pS15fIVFyFNbYcJ+g
-	2jINBmGtzmuYy1YoVPk1xv8EKhd+lANA/7s63wqeCAsg+jhL0sumi15puw4/2HfR9t4=
-X-Gm-Gg: ASbGnctPgSk24mql/faTS/Hl5vyRNuB88DFwTPBmGQw9/+Xq/Q8zixsaYLaq43FVPiP
-	N8rjh/dPI3kJCtWzc+twRhCYMhbOAnXLpUCtwRyLvFeU6B5YErp2lflclymmaU1DfHAzlL5mLnF
-	uuXfq6FIEynSsf0evZ6va/z9NvAhu8B73g8XRQCMAdrMvY5OSU5dlj9ow47/uC+rtOebrjraoT5
-	TZpq7FeWxMcKeGpgoRNo6tS8bipouMfMFcIcWDbglOWFP+/1m420icih2GdXV7kIP9qg7Qr5HHo
-	qtH+egfYWlA7Vkssbk7YFrtjPYbOhW6osZiRFsE0bRf44Vygh3gxvmlySqLkDv9z3q/T+hLTW2/
-	nEbJvMVNZJ3IVw3FDAL3xjsmrOXyuZm459syRBFvvtEi0FwKcmvBmIQprCijIwh/WrrdLzF5pFa
-	hRZQ==
-X-Google-Smtp-Source: AGHT+IEX8lJuZL1YVpyfdl9mCWUkwiQ29IuRWpeUaJuKHQ4wANXuzKH9Gz1hogCk60GadYXtZCSGpA==
-X-Received: by 2002:ac2:4e99:0:b0:55f:65f2:8740 with SMTP id 2adb3069b0e04-5704e34edd5mr666546e87.42.1757675711175;
-        Fri, 12 Sep 2025 04:15:11 -0700 (PDT)
-Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-56e6460f138sm1063220e87.111.2025.09.12.04.15.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Sep 2025 04:15:10 -0700 (PDT)
-Message-ID: <4daaaa7e-7a02-4e4c-be3e-c390d7f6e612@blackwall.org>
-Date: Fri, 12 Sep 2025 14:15:06 +0300
+        d=1e100.net; s=20230601; t=1757678930; x=1758283730;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eyXwEntkUq/1IvyuiiJejzbrGCs0SwPC/bonUwQtC/g=;
+        b=v54A4guLX9+yWQIUZDSzRH20xKdmY0xn45cSovNePAl3FBW0rNBEv02ZzOkLAiC/0R
+         s1b2pgyZ93wOIgJWkPZnBNEygWdCDj/G3hjFp+7qBQ/Lq7s4FMEWq9WVYKJPA/Axdtba
+         IwMFLAZKJBmxVMAVTD7StTxC0Ez3cFeq/Et9ZIKHueT+HikmQza9RsJCF/i9kVB9XgsB
+         f2Z5w99IWA1mNwxndEGFpY6rydfqjwXnrOjk7ob0Npt5UmEWgwRRZHS9oyHe7MPw4okM
+         AYItW4cBn9OKmFB5G0VIp9xTIhYR5NkzECy7ladsX7Mfg9Io73KWRBcyyl+h2lCR3h40
+         9sHw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqeJXfRUbeQjfotJRgBMHm8HC3pEJ4uhCLhVYrRsAbltDj071VLsUeXegaJIysPYkshKa6o8A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCtpUbXjalsWINsQcorpXayjg05g91Hrg4cUcWYZPGzer7fBZO
+	bNfAk6gTugwOf3t8wOn8wwrXvvMINWAUCVi9Zydu/AsvxdgzuI5KsAOC
+X-Gm-Gg: ASbGncv0MjBQbVb9DMbJp1hblkgQ4E/Zo8GsBZv+TR8j5P1D/vJMSzzqoOfxgHQooFe
+	ISOpMiATbHP9/oqpNYNbPqteagrbVaS8Zszq4q3dvO5g/BLvgoPxkhL8+0ENJ7716ddfJgUh1B2
+	mx6+qb3cnJrUjosUnwxgmDDNbnjFYyyN96vIQHgS0JNZ0vcc6lJrAYkcfSRc8Y/QxTVGYX7ByWb
+	MZj7pNSxGT9N3osum8Wjh2oIb13aBywomZYaCmzyEVBl/GrxnOCb6Jiffp/npeIYcxlLVywkyN3
+	/TcmL6q/fV+ATwtkWdAaj1o1imDc9nkcItIpn2070VlM3R5RkXQwS3t7BrbZEmJOY7CaCseJ/JW
+	zIrRIkPMnpwslnjX5wt3ypxUm2NZdg86Z2w==
+X-Google-Smtp-Source: AGHT+IGrPhMBp6GuaPq0wxjpFhNWXqcAEvg0ats210AmO2YrMj5yxfhfipC1GHiYP5KrwliKQotJCg==
+X-Received: by 2002:a5d:5d86:0:b0:3d6:1610:1b6a with SMTP id ffacd0b85a97d-3e765798581mr2392936f8f.22.1757678929127;
+        Fri, 12 Sep 2025 05:08:49 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7607e2d43sm6364880f8f.59.2025.09.12.05.08.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Sep 2025 05:08:48 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
+ <ast@fiberby.net>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Jacob Keller <jacob.e.keller@intel.com>,
+  Sabrina Dubroca <sd@queasysnail.net>,  wireguard@lists.zx2c4.com,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 04/13] tools: ynl-gen: refactor local vars
+ for .attr_put() callers
+In-Reply-To: <20250911200508.79341-5-ast@fiberby.net>
+Date: Fri, 12 Sep 2025 12:23:37 +0100
+Message-ID: <m2a52zvrra.fsf@gmail.com>
+References: <20250911200508.79341-1-ast@fiberby.net>
+	<20250911200508.79341-5-ast@fiberby.net>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net 1/1] net/bonding: add 0 to the range of
- arp_missed_max
-To: Pradyumn Rahar <pradyumn.rahar@oracle.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org
-Cc: anand.a.khoje@oracle.com, rama.nichanamatlu@oracle.com,
- manjunath.b.patil@oracle.com, rajesh.sivaramasubramaniom@oracle.com
-References: <20250912091635.3577586-1-pradyumn.rahar@oracle.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250912091635.3577586-1-pradyumn.rahar@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 9/12/25 12:16, Pradyumn Rahar wrote:
-> NetworkManager uses 0 to indicate that the option `arp_missed_max`
-> is in unset state as this option is not compatible with 802.3AD,
-> balance-tlb and balance-alb modes.
-> 
-> This causes kernel to report errors like this:
-> 
-> kernel: backend0: option arp_missed_max: invalid value (0)
-> kernel: backend0: option arp_missed_max: allowed values 1 - 255
-> NetworkManager[1766]: <error> [1757489103.9525] platform-linux: sysctl: failed to set 'bonding/arp_missed_max' to '0': (22) Invalid argument
-> NetworkManager[1766]: <warn>  [1757489103.9525] device (backend0): failed to set bonding attribute 'arp_missed_max' to '0'
-> 
-> when NetworkManager tries to set this value to 0
-> 
-> Signed-off-by: Pradyumn Rahar <pradyumn.rahar@oracle.com>
-> ---
->   drivers/net/bonding/bond_options.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-> index 3b6f815c55ff..243fde3caecd 100644
-> --- a/drivers/net/bonding/bond_options.c
-> +++ b/drivers/net/bonding/bond_options.c
-> @@ -230,7 +230,7 @@ static const struct bond_opt_value bond_ad_user_port_key_tbl[] = {
->   };
->   
->   static const struct bond_opt_value bond_missed_max_tbl[] = {
-> -	{ "minval",	1,	BOND_VALFLAG_MIN},
-> +	{ "minval",	0,	BOND_VALFLAG_MIN},
->   	{ "maxval",	255,	BOND_VALFLAG_MAX},
->   	{ "default",	2,	BOND_VALFLAG_DEFAULT},
->   	{ NULL,		-1,	0},
+Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
 
-This sounds like a problem in NetworkManager, why not fix it?
-The kernel code is correct and there are many other options which don't make sense in these
-modes, we're not going to add new states to them just to accommodate broken user-space code.
+> Refactor the generation of local variables needed when building
+> requests, by moving the logic into the Type classes, and use the
+> same helper in all places where .attr_put() is called.
+>
+> If any attributes requests identical local_vars, then they will
+> be deduplicated, attributes are assumed to only use their local
+> variables transiently.
+>
+> This patch fixes the build errors below:
+> $ make -C tools/net/ynl/generated/
+> [...]
+> -e      GEN wireguard-user.c
+> -e      GEN wireguard-user.h
+> -e      CC wireguard-user.o
+> wireguard-user.c: In function =E2=80=98wireguard_get_device_dump=E2=80=99:
+> wireguard-user.c:480:9: error: =E2=80=98array=E2=80=99 undeclared (first =
+use in func)
+>   480 |         array =3D ynl_attr_nest_start(nlh, WGDEVICE_A_PEERS);
+>       |         ^~~~~
+> wireguard-user.c:480:9: note: each undeclared identifier is reported
+>                         only once for each function it appears in
+> wireguard-user.c:481:14: error: =E2=80=98i=E2=80=99 undeclared (first use=
+ in func)
+>   481 |         for (i =3D 0; i < req->_count.peers; i++)
+>       |              ^
+> wireguard-user.c: In function =E2=80=98wireguard_set_device=E2=80=99:
+> wireguard-user.c:533:9: error: =E2=80=98array=E2=80=99 undeclared (first =
+use in func)
+>   533 |         array =3D ynl_attr_nest_start(nlh, WGDEVICE_A_PEERS);
+>       |         ^~~~~
+> make: *** [Makefile:52: wireguard-user.o] Error 1
+> make: Leaving directory '/usr/src/linux/tools/net/ynl/generated'
+>
+> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
 
-The option's definition clearly states:
-                .unsuppmodes = BIT(BOND_MODE_8023AD) | BIT(BOND_MODE_TLB) |
-                                BIT(BOND_MODE_ALB)
-
-Cheers,
-  Nik
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
