@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9799BB54011
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:00:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6BCB54012
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88B565A6E6F
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:00:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9D0E5A6E9A
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4AD33E7;
-	Fri, 12 Sep 2025 02:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E37D19E97F;
+	Fri, 12 Sep 2025 02:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2hHaoSg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IiJo/3Xm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BF3195B1A
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768A619D8A3;
+	Fri, 12 Sep 2025 02:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757642428; cv=none; b=MMqoQqwo2kuU2HA+izll4HEOB7sTPD8CXiGsQpGVww9p43ppX0rU6tW+/S/KoRR8Og/X4Y0hkmwpp9CetTbWfkhrWOdWVSim3sRF/ccW6C13n0Vmh1YsldKT0aDJDYsVbAhVfDwIKQJS9SQtyjiTkO/tZvtKmdcfPKDDbi0M/W8=
+	t=1757642429; cv=none; b=E7oa9SGL6W5OetyI9U/2hsjzi/JjCxv91SRJRcnAzbK5gimK3ILFLEUrIPPW4D/NdQg/P5zoqrjBuWdgFk67IPiewwPnF7CV6NBokby5pK3hILCJsqaHEKMiHhtByETxGFfzoVqSG8/8l7RuI7RI2NwrAlMjpwRFXax6whuFfeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757642428; c=relaxed/simple;
-	bh=DAKUBlyjV9d85+isZtwOncLgGKba/y4e5ANoFzeWhh8=;
+	s=arc-20240116; t=1757642429; c=relaxed/simple;
+	bh=lphVgeZ5on8hME4WbnO3PM9jKNXeDY52nLMTTDIR+fI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GwK97g/nTrcE1k9UHqSZPfwpcfXhPglLqyD/mkoWYA805wpBAkn07Zr3Y5iVIL18xAZsgy/VRiIGVt7QzenQUPtuzug02cA4t8gwOHuZ9AaUYXzDc1K5DlMRXDuA1FaxYL2OVeeEzB5igawqUT7vw4reBb3d3pb1wIFLkXgZ+qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2hHaoSg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4ECEC4CEF0;
-	Fri, 12 Sep 2025 02:00:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AqD0TcRduU1zZ0cgemwZG7m2qujU6Ztu8nzC+nGeoA3rKI4ZHuVbDSe+fIjszyERAsG/bV/gktro78UQuGxg1ZVC6ksejeTi4w8hhKbepD1daNG/LuRCpctLExBRCfBHgYj1gJKqaNumCfkwTz/SSAWto8Ybizkzw1jJWePRsGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IiJo/3Xm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44EF5C4CEF0;
+	Fri, 12 Sep 2025 02:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757642427;
-	bh=DAKUBlyjV9d85+isZtwOncLgGKba/y4e5ANoFzeWhh8=;
+	s=k20201202; t=1757642429;
+	bh=lphVgeZ5on8hME4WbnO3PM9jKNXeDY52nLMTTDIR+fI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=e2hHaoSgRwv2o5hmdKKRTqeZn+HXzN3EYLOzpqWs24p6TBsykNgobvy5iQAde0wxZ
-	 dverTg/7kpFRd8RNpQW81Dj2KKz5ocDMSlCsGbKo9dz0Tta8aXshLfv4T77AneugmN
-	 7C/jumUvpDOPrvNDLwscsSqv55EQFLK1k7gqo7kZMdFZYuZHCy5peQ2GcgeUGsAzgS
-	 LUXqQV+ToR2DeRFLE18MIVLJ/l1mY6usJeNkAGTjEYNcAw0jC3W9YpARVTRJNS9dfu
-	 V01DYutMX9sKJcfbB6hr9Pyten6enfFvg4dcEzSSNRZN+BdpOIH9NMqF4TkAbKbRWN
-	 my+K+hAcaTenQ==
+	b=IiJo/3XmDWnP64k5OqvMuwZWtlZLc2eV8+kg8outlM8OYe/leANyK0rZwaee0ZFQv
+	 7W0OGUGgaGoouZb/DFyHBk0RyJGrxE2zePRtU8HEOwsXlnndj8wCHi/LqYpHlE2T8P
+	 KMMS3zE2YUoh4Pzi6/sQ3SMLn4IatoGsjyXw28fiHnzegRsvUh8SfcSPRmKMCqqfjB
+	 T/JzK1aGrDWPIIDhIDNNAnurr1qWkb3iNHuXEWUSHboIkufjN9KZdB0GWa2sA1/Juk
+	 SagRdZ4zKFVuFyJtoQjhjVGgSZ2LOyiXx1k/rhlK8dKHZJi/ILNb81d4G0Rq5SR5eg
+	 67rU7eXPvCbyQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BDA383BF69;
-	Fri, 12 Sep 2025 02:00:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE26383BF69;
+	Fri, 12 Sep 2025 02:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] ipv6: udp: fix typos in comments
+Subject: Re: [PATCH net-next v12 0/2] net: af_packet: optimize retire
+ operation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175764242999.2373516.6904077191929718487.git-patchwork-notify@kernel.org>
-Date: Fri, 12 Sep 2025 02:00:29 +0000
-References: <20250909122611.3711859-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250909122611.3711859-1-alok.a.tiwari@oracle.com>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: dsahern@kernel.org, willemdebruijn.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org
+ <175764243148.2373516.17876362727543730939.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Sep 2025 02:00:31 +0000
+References: <20250908104549.204412-1-jackzxcui1989@163.com>
+In-Reply-To: <20250908104549.204412-1-jackzxcui1989@163.com>
+To: Xin Zhao <jackzxcui1989@163.com>
+Cc: willemdebruijn.kernel@gmail.com, kerneljasonxing@gmail.com,
+ edumazet@google.com, ferenc@fejes.dev, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  9 Sep 2025 05:26:07 -0700 you wrote:
-> Correct typos in ipv6/udp.c comments:
-> "execeeds" -> "exceeds"
-> "tacking care" -> "taking care"
-> "measureable" -> "measurable"
-> 
-> No functional changes.
+On Mon,  8 Sep 2025 18:45:47 +0800 you wrote:
+> In a system with high real-time requirements, the timeout mechanism of
+> ordinary timers with jiffies granularity is insufficient to meet the
+> demands for real-time performance. Meanwhile, the optimization of CPU
+> usage with af_packet is quite significant. Use hrtimer instead of timer
+> to help compensate for the shortcomings in real-time performance.
+> In HZ=100 or HZ=250 system, the update of TP_STATUS_USER is not real-time
+> enough, with fluctuations reaching over 8ms (on a system with HZ=250).
+> This is unacceptable in some high real-time systems that require timely
+> processing of network packets. By replacing it with hrtimer, if a timeout
+> of 2ms is set, the update of TP_STATUS_USER can be stabilized to within
+> 3 ms.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net-next] ipv6: udp: fix typos in comments
-    https://git.kernel.org/netdev/net-next/c/ac36dea3bc85
+  - [net-next,v12,1/2] net: af_packet: remove last_kactive_blk_num field
+    https://git.kernel.org/netdev/net-next/c/28d2420d403a
+  - [net-next,v12,2/2] net: af_packet: Use hrtimer to do the retire operation
+    https://git.kernel.org/netdev/net-next/c/f7460d2989fa
 
 You are awesome, thank you!
 -- 
