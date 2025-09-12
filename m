@@ -1,191 +1,125 @@
-Return-Path: <netdev+bounces-222674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E384B555A1
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:50:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E66B1B555A7
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D1775C67EA
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:50:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A22957C2FD9
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 17:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F28324B3B;
-	Fri, 12 Sep 2025 17:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49453329F31;
+	Fri, 12 Sep 2025 17:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="EUG7vElk";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WWRlpmix"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XSN3kVvJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4057E272802;
-	Fri, 12 Sep 2025 17:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A95F327A34
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 17:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757699442; cv=none; b=ZAnVyvCBqJYOk2Pf42o5ZiBkKENPr1/yhEtZ2+blDSi7aA3htfNLV5jCLYbqQsNDAvjy1kX1kDzOWErD9qDnJIYxg9Sl45tBGTybzCeRW9/jN4hpmudyyC8dU7wcIT5w7MV3FtRw20g2BeNKWpQ0wYGvI5xrImtSbitqxbpT3Ys=
+	t=1757699741; cv=none; b=M6+OI17SlHROfg9683VFLh1XFNBFCwK58WhMb/WLfwmYbcW0NuKzCR4PpzMHhCZ4oPwtXAa5K2r9JTE0YAAKcRPf7SHIiWsUBMJlr1lwvL4kZl5240uJ95dVpEgi32x5Dn2drG5A5nFlf72lNWq92nd4i6RVZkZhFOP686FQ9SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757699442; c=relaxed/simple;
-	bh=eax8y8xW7N2vbnmDVP9nCqvc1jEraI6bgftoeFD7b+A=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=cKtaM2vzdDs3YXzpCtTWAem5/wkqDC09eQhFoAopHFB+Eudta2aXW7HeDUQoUN6mZtPg5Tm5wWvsKTtNOW4QSLmLwKpAoJ/icL0G7YLVVAtx8ywg4xqJaxtRKER86gF/J2/od46SJK0XZamn24UZAeFwX55CxOg/VyN0jlWPOok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=EUG7vElk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WWRlpmix; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 003DA7A0147;
-	Fri, 12 Sep 2025 13:50:37 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Fri, 12 Sep 2025 13:50:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm2; t=1757699437; x=1757785837; bh=jOO3/VpBgTCpFOcadQRlN
-	50Bb//xBWB5RFE36505dpo=; b=EUG7vElkDWTi8QTn6ZQAhInT3jtUpaZB6LPHQ
-	xn1wKV3hqGzQJDIdobIReORI+Mjm+Aq1MVK+Wb/7ETzWcB0z0vyCQBWxHNrVyX+/
-	FQ99dsVE/y0a63ct9fsva0QBg7KsjvSoxd206lihiTLfLncUcOCKbE6zlA9WgOAw
-	92/oo00fYLb7qLTuFTi0BU+7/3ENPnuQn0o4W3frG9L8O/+jAWLEEm/jaV1GSmSJ
-	dVxF6SOOJUI+3x4SK3LLog7vyearUL8ztVS7x4w3EUL6k525BlxwufBGiO9YOpS+
-	EJiItOarw0Z6bcvCOSGws+3e3QvYi5U703A896vprgs2jITGQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1757699437; x=1757785837; bh=jOO3/VpBgTCpFOcadQRlN50Bb//xBWB5RFE
-	36505dpo=; b=WWRlpmixWCo7bakayTCnNzfKFfjbnvWwHAQbTGTJzpW+JlVZEwT
-	k2HM7XYgoqBTl4tKtHusujUUp0M1TqrPBsnNLetKxUbaduekvaR148pB8TE1FDjK
-	LlaeVxfzVEL1awWaXFIL7mJgvoyj7MW1AC3N+XiHqAm+8yNEj2yE9WXkgf6JqFXq
-	1HqVSZk6/zW1iktnTfcZlKu5GbTK8UsVr5yFv9AEN6mf2stkH9OB/rdc3RfOW2T2
-	2EeWBVSb0ZeXM3FbmAHeHnYefPgfNTz20qITmVS5S4GH4cKkqB/HGfo7F4VB8INR
-	XMjNU4ay107d/6G7njR12KcMOEO8mEJ1F3A==
-X-ME-Sender: <xms:bV3EaIl_jrwxVQuX9PR9J1C82NdBLPiyorxwc7566iWdnIilmH0ezw>
-    <xme:bV3EaMb2CJI1IjR2r2qCIFo9rOX10V0S6fcPXCNMudJsri6W8TWN6-V3RJcwHgMV-
-    zAzY2WLb3xZCYN_si0>
-X-ME-Received: <xmr:bV3EaDx2766PZxXI0wfck25xCU7KL-UQ3g3VKA3sces5W_nscxdvELSOBv68j9L1BTpgrg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvleeilecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteefffen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpth
-    htohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgr
-    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghp
-    thhtoheprghnrghnugdrrgdrkhhhohhjvgesohhrrggtlhgvrdgtohhmpdhrtghpthhtoh
-    epmhgrnhhjuhhnrghthhdrsgdrphgrthhilhesohhrrggtlhgvrdgtohhmpdhrtghpthht
-    ohepphhrrgguhihumhhnrdhrrghhrghrsehorhgrtghlvgdrtghomhdprhgtphhtthhope
-    hrrghjvghshhdrshhivhgrrhgrmhgrshhusghrrghmrghnihhomhesohhrrggtlhgvrdgt
-    ohhm
-X-ME-Proxy: <xmx:bV3EaLbQOuqtTAnNM0kBHo9ixoYMN9cMAKNGDllBVigdbOVZ5W3HWw>
-    <xmx:bV3EaEx2i1Vs0RodSOgtZwoeqTjfO0aUI_FoRgqneckILNqvmeaAVQ>
-    <xmx:bV3EaEFGgFtnNaMKHSt4ldGSwTMK95z5TMgrkDyVMSThjmZH5dwTDA>
-    <xmx:bV3EaMxzD3Ka62Ob1cU_M1hsJGNLpXR9QeiaZiTpBQw0uO4hN_K2Bw>
-    <xmx:bV3EaBlbKCFvpeWRk-ya1HfpP1RSEqDMTNmqHF96E7BDX_le2ajZCybh>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 12 Sep 2025 13:50:36 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id BAF079FC97; Fri, 12 Sep 2025 10:50:35 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id B9F829FC38;
-	Fri, 12 Sep 2025 10:50:35 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-cc: Pradyumn Rahar <pradyumn.rahar@oracle.com>,
-    linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-    andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-    kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-    anand.a.khoje@oracle.com, rama.nichanamatlu@oracle.com,
-    manjunath.b.patil@oracle.com, rajesh.sivaramasubramaniom@oracle.com
-Subject: Re: [PATCH RFC net 1/1] net/bonding: add 0 to the range of
- arp_missed_max
-In-reply-to: <4daaaa7e-7a02-4e4c-be3e-c390d7f6e612@blackwall.org>
-References: <20250912091635.3577586-1-pradyumn.rahar@oracle.com>
- <4daaaa7e-7a02-4e4c-be3e-c390d7f6e612@blackwall.org>
-Comments: In-reply-to Nikolay Aleksandrov <razor@blackwall.org>
-   message dated "Fri, 12 Sep 2025 14:15:06 +0300."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1757699741; c=relaxed/simple;
+	bh=21udc6JLttU/l5KykgHLGN6cnqZbUcu6oJMFH12Gbc8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OoxWPu+DIWYKyTNJfvSADkWBj/YbC9liJLXsQcJFAFXK8XpH49vBeha1CjUR2FPgdBMbou/2zBOKVSFP9IvBxbOwKvxca8DNdm+op4j+cKtZ4Zz6xTfH6nr+LgdeC4GGOMZuywxgGucMm7hNp4eSCh5ExG9zz+Aw6vCZouzI8Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XSN3kVvJ; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3e7643b0ab4so1277169f8f.2
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 10:55:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757699738; x=1758304538; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I1hqm75GbQcmUVjrwGt63wYxMp0L1ujfuRL7MiRNqrs=;
+        b=XSN3kVvJRH5ItNq2CO3DlPwO5D+SEi2EvI22vyF6fgjL+J4+DykHkhPn8ye+UDIJ1b
+         jKr7uJaYWJSfPfBQXLkWk4w/DqtkKP9p6rIJoG8MP5iVm0sypCbTyVeJR025OjqP5QLZ
+         150Md+okjlmJu7r6PQlvMvX2rDiSs3OE7abFFd9UJfsH97t4DeKWqD/knKeOxsOD0V6L
+         rgYdTCgLx91yZK6Yd2xnFC9OzfbL/uIuFiDZ1VMGvZ5aJJUNDWKgNtUj/2dDP1twW5X6
+         ha0pW4NM0j0WI/AhGKHc/OvMfUSdMXt7SgQmYZORrfWDe0jYmfKxev3jfnKh7kBfAE1s
+         HEtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757699738; x=1758304538;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I1hqm75GbQcmUVjrwGt63wYxMp0L1ujfuRL7MiRNqrs=;
+        b=CZm5dpEliHlDlIm9uhcTna8qEDIaosJ+4x0XhCern9xxY1Ai7ZaMWaW4i2gWc3xCgQ
+         hW9fRXzEStOU6CQKlNNyY6bsCdcX8qGlkIKP3+emjFi94WBt154c3WKTvWSgzyg9OwAG
+         g9lDwCGyf7GeUdDsaESL8GBgHPcBQcph1XRag8w/q1uN3TLliWtTe91itJFCq25FDgut
+         bKP01boGmgvNi37vdDQWO7hqbRSi4/RNBshctm5TQI3hpsFoiIF53o6GIOoa426EAM1G
+         wkdEDPKV2AEKQ5RScPkEVxEaIWzQrdwTn/hVXrIPcMMv3MaS3u2/BSXA65XYP4WFgk+A
+         1YTw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwmDOZh0147IwU4XTHboH4QSmrR2661Bfoq0vo3xTcDIHztUbeeiNPXuahVYtuy4afw+6Bw58=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywdl4IGEq0XH43wzn6Ia9oR2QNC2RRGcSfMOq6w66bLrOX69B/3
+	jCbGESmBFSbpKYebXc9K3C72ameoAAZoKBphpRKP9Dfp9/BJSk6HBft6jBnHo9wXgmyl1GmKuZe
+	+6Z/bASrfWiIGMrHbvpRDzV9g1SQkcWQ=
+X-Gm-Gg: ASbGnctDdfxPbULXEJrAX94otBEyRpJeNH1TwALtrBUbRbsmI3BTG9mW+/3/WfWMLRN
+	CwOIuy4FORVhP5Y9Eb7WPyspby6Qy+AWvSZtSP2p6QeXyRkYfJcXscx0hz+WuJC7X1Pb10IrPXx
+	ck30K/Ig7TZ0Bt5xHD4ipHUJcj5Q3mHc1AYR2UvRHm5WNNv+FOWKyqHgx9hQIrFk3c+/pxSlqtH
+	c6Qm4NY3Y9DFDpRYEMLxu79XnseUvjq6kDqq5aWSJEwLXg=
+X-Google-Smtp-Source: AGHT+IGkgj6IrkdGUDNbAf51bRnusq5rydfcWtBFKBRkglsxY7vTPHWpp7JaetFcOJOedb2SaAMVrhhCP6B4H3UnkTM=
+X-Received: by 2002:a5d:5d09:0:b0:3e7:17d4:389b with SMTP id
+ ffacd0b85a97d-3e765a1b499mr4151861f8f.52.1757699737563; Fri, 12 Sep 2025
+ 10:55:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3123999.1757699435.1@famine>
+References: <20250912124059.0428127b@canb.auug.org.au>
+In-Reply-To: <20250912124059.0428127b@canb.auug.org.au>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 12 Sep 2025 10:55:26 -0700
+X-Gm-Features: AS18NWD5ST2IJKM1utHYQwt-Xxi_J7BVpfEK88PJRAO0c4SRtSvsWIsTf6DJ07M
+Message-ID: <CAADnVQ++ULXeQQ=oLTXvoo98QSrk-afc=H5Lq9Pm_LyH3X=sCw@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the tip tree with the bpf-next tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Jiawei Zhao <phoenix500526@163.com>, Jiri Olsa <jolsa@kernel.org>, 
+	bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Sep 2025 10:50:35 -0700
-Message-ID: <3124000.1757699435@famine>
 
-Nikolay Aleksandrov <razor@blackwall.org> wrote:
-
->On 9/12/25 12:16, Pradyumn Rahar wrote:
->> NetworkManager uses 0 to indicate that the option `arp_missed_max`
->> is in unset state as this option is not compatible with 802.3AD,
->> balance-tlb and balance-alb modes.
->> This causes kernel to report errors like this:
->> kernel: backend0: option arp_missed_max: invalid value (0)
->> kernel: backend0: option arp_missed_max: allowed values 1 - 255
->> NetworkManager[1766]: <error> [1757489103.9525] platform-linux: sysctl:=
- failed to set 'bonding/arp_missed_max' to '0': (22) Invalid argument
->> NetworkManager[1766]: <warn>  [1757489103.9525] device (backend0): fail=
-ed to set bonding attribute 'arp_missed_max' to '0'
->> when NetworkManager tries to set this value to 0
->> Signed-off-by: Pradyumn Rahar <pradyumn.rahar@oracle.com>
->> ---
->>   drivers/net/bonding/bond_options.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->> diff --git a/drivers/net/bonding/bond_options.c
->> b/drivers/net/bonding/bond_options.c
->> index 3b6f815c55ff..243fde3caecd 100644
->> --- a/drivers/net/bonding/bond_options.c
->> +++ b/drivers/net/bonding/bond_options.c
->> @@ -230,7 +230,7 @@ static const struct bond_opt_value bond_ad_user_por=
-t_key_tbl[] =3D {
->>   };
->>     static const struct bond_opt_value bond_missed_max_tbl[] =3D {
->> -	{ "minval",	1,	BOND_VALFLAG_MIN},
->> +	{ "minval",	0,	BOND_VALFLAG_MIN},
->>   	{ "maxval",	255,	BOND_VALFLAG_MAX},
->>   	{ "default",	2,	BOND_VALFLAG_DEFAULT},
->>   	{ NULL,		-1,	0},
+On Thu, Sep 11, 2025 at 7:41=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
 >
->This sounds like a problem in NetworkManager, why not fix it?
->The kernel code is correct and there are many other options which don't m=
-ake sense in these
->modes, we're not going to add new states to them just to accommodate brok=
-en user-space code.
+> Hi all,
 >
->The option's definition clearly states:
->               .unsuppmodes =3D BIT(BOND_MODE_8023AD) | BIT(BOND_MODE_TLB=
-) |
->                               BIT(BOND_MODE_ALB)
+> Today's linux-next merge of the tip tree got a conflict in:
+>
+>   tools/testing/selftests/bpf/prog_tests/usdt.c
+>
+> between commit:
+>
+>   69424097ee10 ("selftests/bpf: Enrich subtest_basic_usdt case in selftes=
+ts to cover SIB handling logic")
+>
+> from the bpf-next tree and commit:
+>
+>   875e1705ad99 ("selftests/bpf: Add optimized usdt variant for basic usdt=
+ test")
+>
+> from the tip tree.
+>
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
 
-	In addition to Nikolay's comment, permitting arp_missed_max to
-be set to zero implies that zero is a valid setting for the option.
-That's not the case here, as a setting of zero makes no logical sense in
-the context of its documented behavior:
-
-arp_missed_max
-
-        Specifies the number of arp_interval monitor checks that must
-        fail in order for an interface to be marked down by the ARP monito=
-r.
-
-        In order to provide orderly failover semantics, backup interfaces
-        are permitted an extra monitor check (i.e., they must fail
-        arp_missed_max + 1 times before being marked down).
-
-        The default value is 2, and the allowable range is 1 - 255.
-
-	-J
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
+Thanks for headsup. Looks good.
 
