@@ -1,175 +1,290 @@
-Return-Path: <netdev+bounces-222460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE60B54550
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:28:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF99B54557
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 970FB3B9819
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:27:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D2E74645BE
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38D12D876B;
-	Fri, 12 Sep 2025 08:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8369D2D8DD6;
+	Fri, 12 Sep 2025 08:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sh+IAm0D"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B2zDjiL7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC022D837B
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B042D8378
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757665641; cv=none; b=fR79dx95rdrwHBja3Hch1jFdmaAkna4WMg2vvwJ+whO/9Zyr6aQakIXWGRND8Lm87mi7NK2g4PVYgbCBn/iUJY35iSrr9LV5qWYlqohQthkVIZeLDUXG/RSZU1S/QzlYfjjdLsF1E4lTppm9MVX56b8z6YwOJ8WrFhilwXk3eIY=
+	t=1757665681; cv=none; b=SH7uj4B5Z9frsmWgsn4K9KrQx29LDS00ILpSdjK4ZKdobyV2SOQpQswhfL5uc4r0RsgPQJnBC2oMBP+lWsUNEd0Hpr27cOgv27u2OZS0IVpzjZdWOcZAa4yDc+omoteSfqR4IbMSP69eYnWz3h4ql2JlSQgDAKBcbBmYqX8Ol3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757665641; c=relaxed/simple;
-	bh=cdktJ5hQga6TJBt/8XcxZ813/Z5QetZ2cirJ3rE9jpo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lyOymlk4OKv7VXzX3zjFmIiJdQtgkVmKot9ugKnQYIFvu0CE3UoYBwYwbqJSl+dl9KmSPALDMXVejeiEek+8Tq/MiGmxuYU2oUE5toGCjHBIeq1NPoOKez8GEl7w+Tgj80TwpH/g7DuF5sKdUpjHIkrhJLpq7y/bSAWaSRrHYUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sh+IAm0D; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757665638;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t7o7vby/KR5wn11gpagftAl16EWhc4sdyEwdRY+lx+0=;
-	b=Sh+IAm0D3XadjHjauAqbYinIScBlwG2Z72QMpnVWQWoDThTr81MxL416CJzdvVdjWbSevS
-	5sEljp49odbllkKMlDHKlO2PfcFE11IYi+FxKPiBBN4LEezO19Xn88aeFJXl9IG1kB2uZZ
-	PgwHiwHIPsUFizU0f71/NOqBhxLpYdc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-wQjGMYgIOXWPrFAm0QbnYw-1; Fri,
- 12 Sep 2025 04:27:14 -0400
-X-MC-Unique: wQjGMYgIOXWPrFAm0QbnYw-1
-X-Mimecast-MFC-AGG-ID: wQjGMYgIOXWPrFAm0QbnYw_1757665633
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 267A71955D62;
-	Fri, 12 Sep 2025 08:27:13 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.72.112.167])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 14D93180035E;
-	Fri, 12 Sep 2025 08:27:07 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	eperezma@redhat.com
-Cc: jonah.palmer@oracle.com,
-	kuba@kernel.org,
-	jon@nutanix.com,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net 2/2] vhost-net: correctly flush batched packet before enabling notification
-Date: Fri, 12 Sep 2025 16:26:58 +0800
-Message-ID: <20250912082658.2262-2-jasowang@redhat.com>
-In-Reply-To: <20250912082658.2262-1-jasowang@redhat.com>
-References: <20250912082658.2262-1-jasowang@redhat.com>
+	s=arc-20240116; t=1757665681; c=relaxed/simple;
+	bh=M4UFtGv3HJ7UUX5/e1FKWhwvIsp06D8ghh/PjljWBns=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kGiwKv+DbBBBYRFSvkg80Qj5W/kJq4bNCtvCC9cq0yhiWPDjZdh71CUk6lS3CB3CyZuoGjSJODbvtvBxoCCyTPNNUJOdw5MAuB8POSSw4DF2qh+m2CGN0yruTVurU5AHvdEifmH1wiBJoMoV+sVgCdBsG+HVXK1CCH//bten0nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=B2zDjiL7; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-34fed7add35so11000951fa.2
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 01:27:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1757665677; x=1758270477; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zi88VRbZEuFnGbKkriA0LDu6mR+gOJpwP4/2p/PnZ1A=;
+        b=B2zDjiL7rZBnxNGGG1W/zmptbbexjIiboTdiZnl8P4MXjlQtPzFfRQpdeok/XTS5Jp
+         2tYa7NiJe80HLUyXzUiCGN0k7CE9Hp1tLLFZNilsU6onniafBlyY6lVXUsv5BDI15KVt
+         LDURTgbjXb1Z1OrajtBcuSgIYEK2gWqlUUQu0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757665677; x=1758270477;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zi88VRbZEuFnGbKkriA0LDu6mR+gOJpwP4/2p/PnZ1A=;
+        b=TPMFT4vqE2GIbyw75La9Bw1wXHibPEelG20DC/KuawH5yh/Oihr+lsTSbiir9E3Rqx
+         Ih6bA0iyKL0Z81KbFrgkcfIXTXD8QcxyndzuIysV/ccpTKM4+pz09lZZcm+tvWEtu2jJ
+         xshvBHg7PrdRVw7IEdgzeeVOs4TlQv+FaNfRbFY0WjBvpmj0WgTFXuMqZHmOTXVqUSDH
+         l9vyIsLYrWJpuptecUwe+9pSlPZC0uU6Iv1rB2mCqmbjFD9L+P/s9k12AZN+EHL2DHOh
+         aTwjAEsHPb79RtJNvOZfYPCteNj69t4f8ikDgaA0d6QipmAvSyZ/jKeYkTL5E6SSwn8i
+         CkvA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmsA2ptXOyt02E82L0EDFuUI8JjPQ9uX1cvM/CueMSI3cable5jwxEffOeAjKh6C7c4GqZzZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/yGo6cVPwIJ+gp6s/NIpIVUDoLnQy7ENzwNVk1KPS6yybtcr4
+	qX7N/82v2Rp4XQD65LcRICgFL3ffNJJNFEiSAk+JPY0QVM5IFyEq4MgO9NxJSmB/iHZpoI7FaRF
+	+Ki7GhroHNDDVGN+sRWfZegHRogUdbqCHoDWg6wQf
+X-Gm-Gg: ASbGncvgMI0Lzkc9+nqqm7gjmhhvqvrb5hxs+J2hYyxPHEAt6PhrLeNEIwyXs/42/pY
+	yBUCPyIErKhqLnguBdKHwzVFsaI2WjZtIj+Q2rQYjPgnwsfUCK+jzbBHPygXpKEBWFtGqo32+Tr
+	81tCl9Wd70bKkxq24EaWVx55pk40SZvyOpbrnu9dIgqLHBmSW8gne3fc0RSeYQy79VpiKBVWD9S
+	2qrla/G4ugsVZiuNtwk8b9NBJiYMHKAiyT79g==
+X-Google-Smtp-Source: AGHT+IGuFu/6x8GGdyKs3uZP46gycKBj+oJ6yMQK+fd/K5sFBfDmEqPc/X66Qf0G8U/XPK4phpEvZh/Ddpcm0n+c0BE=
+X-Received: by 2002:a05:651c:4350:20b0:336:6481:1549 with SMTP id
+ 38308e7fff4ca-3513aeb2e2amr5142751fa.12.1757665676867; Fri, 12 Sep 2025
+ 01:27:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+ <20250911151001.108744-2-ariel.dalessandro@collabora.com> <20250912-alluring-turaco-of-conversion-dca193@kuoka>
+In-Reply-To: <20250912-alluring-turaco-of-conversion-dca193@kuoka>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Fri, 12 Sep 2025 16:27:45 +0800
+X-Gm-Features: Ac12FXxVG1RuSVKZojzF8lrEoj8T-u7pZlbyr1abmA13aynWyYRO-SXBCvUw2XE
+Message-ID: <CAGXv+5GovP7NuG042AwfmtC-sPJMGuFAm6iZ0iqNZgU0VE+qmQ@mail.gmail.com>
+Subject: Re: [PATCH v2 01/12] dt-bindings: media: Convert MediaTek mt8173-mdp
+ bindings to DT schema
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>, airlied@gmail.com, 
+	amergnat@baylibre.com, andrew+netdev@lunn.ch, andrew-ct.chen@mediatek.com, 
+	angelogioacchino.delregno@collabora.com, broonie@kernel.org, 
+	chunkuang.hu@kernel.org, conor+dt@kernel.org, davem@davemloft.net, 
+	dmitry.torokhov@gmail.com, edumazet@google.com, flora.fu@mediatek.com, 
+	heiko@sntech.de, houlong.wei@mediatek.com, jeesw@melfas.com, 
+	kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org, 
+	lgirdwood@gmail.com, linus.walleij@linaro.org, 
+	louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com, 
+	maarten.lankhorst@linux.intel.com, marcel@holtmann.org, 
+	matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com, 
+	mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
+	robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch, 
+	support.opensource@diasemi.com, tiffany.lin@mediatek.com, tzimmermann@suse.de, 
+	yunfei.dong@mediatek.com, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
+	linux-bluetooth@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after
-sendmsg") tries to defer the notification enabling by moving the logic
-out of the loop after the vhost_tx_batch() when nothing new is
-spotted. This will bring side effects as the new logic would be reused
-for several other error conditions.
+On Fri, Sep 12, 2025 at 2:06=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
+g> wrote:
+>
+> On Thu, Sep 11, 2025 at 12:09:50PM -0300, Ariel D'Alessandro wrote:
+> > Convert the existing text-based DT bindings for MediaTek MT8173 Media D=
+ata
+> > Path to a DT schema.
+> >
+> > Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> > ---
+> >  .../bindings/media/mediatek,mt8173-mdp.yaml   | 169 ++++++++++++++++++
+> >  .../bindings/media/mediatek-mdp.txt           |  95 ----------
+> >  2 files changed, 169 insertions(+), 95 deletions(-)
+> >  create mode 100644 Documentation/devicetree/bindings/media/mediatek,mt=
+8173-mdp.yaml
+> >  delete mode 100644 Documentation/devicetree/bindings/media/mediatek-md=
+p.txt
+> >
+> > diff --git a/Documentation/devicetree/bindings/media/mediatek,mt8173-md=
+p.yaml b/Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml
+> > new file mode 100644
+> > index 0000000000000..8ca33a733c478
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml
+> > @@ -0,0 +1,169 @@
+> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/media/mediatek,mt8173-mdp.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: MediaTek MT8173 Media Data Path
+> > +
+> > +maintainers:
+> > +  - Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> > +
+> > +description:
+> > +  Media Data Path is used for scaling and color space conversion.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    oneOf:
+> > +      - enum:
+> > +          - mediatek,mt8173-mdp-rdma
+> > +          - mediatek,mt8173-mdp-rsz
+> > +          - mediatek,mt8173-mdp-wdma
+> > +          - mediatek,mt8173-mdp-wrot
+>
+> Why there is no mediatek,mt8173-mdp here? What does this compatible
+> represent?
+>
+> > +      - items:
+> > +          - const: mediatek,mt8173-mdp-rdma
+>
+> Still suspicious. Device cannot be simulatanously: compatible and not
+> compatible. This is not a well known cat that has superposition of two
+> states, whenenver you look the other way.
+>
+> Maybe the old binding was incorrect, maybe the in-tree DTS is incorrect.
+> Whichever the reason, this must be investigated and documented, because
+> by standard rules this is wrong. Each wrong code needs very clear
+> explanations (and "someone did it" is not a good enough explanation).
 
-One example is the IOTLB: when there's an IOTLB miss, get_tx_bufs()
-might return -EAGAIN and exit the loop and see there's still available
-buffers, so it will queue the tx work again until userspace feed the
-IOTLB entry correctly. This will slowdown the tx processing and may
-trigger the TX watchdog in the guest.
+My guess is that "mediatek,mt8173-mdp" is meant to serve as a single
+entry point for the implementation to bind the driver to. The MDP is
+a Data Pipeline and there could be multiple instances of the same
+IP block, as seen in the original example.
 
-Fixing this by stick the notificaiton enabling logic inside the loop
-when nothing new is spotted and flush the batched before.
+The datasheet I have doesn't cover the "RDMA" block specifically, so
+I can't say whether there is an actual difference between the two RDMA
+blocks.
 
-Reported-by: Jon Kohler <jon@nutanix.com>
-Cc: stable@vger.kernel.org
-Fixes: 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after sendmsg")
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vhost/net.c | 33 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 16e39f3ab956..3611b7537932 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -765,11 +765,11 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
- 	int err;
- 	int sent_pkts = 0;
- 	bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
--	bool busyloop_intr;
- 	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
- 
- 	do {
--		busyloop_intr = false;
-+		bool busyloop_intr = false;
-+
- 		if (nvq->done_idx == VHOST_NET_BATCH)
- 			vhost_tx_batch(net, nvq, sock, &msg);
- 
-@@ -780,10 +780,18 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
- 			break;
- 		/* Nothing new?  Wait for eventfd to tell us they refilled. */
- 		if (head == vq->num) {
--			/* Kicks are disabled at this point, break loop and
--			 * process any remaining batched packets. Queue will
--			 * be re-enabled afterwards.
-+			/* Flush batched packets before enabling
-+			 * virqtueue notification to reduce
-+			 * unnecssary virtqueue kicks.
- 			 */
-+			vhost_tx_batch(net, nvq, sock, &msg);
-+			if (unlikely(busyloop_intr)) {
-+				vhost_poll_queue(&vq->poll);
-+			} else if (unlikely(vhost_enable_notify(&net->dev,
-+								vq))) {
-+				vhost_disable_notify(&net->dev, vq);
-+				continue;
-+			}
- 			break;
- 		}
- 
-@@ -839,22 +847,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
- 		++nvq->done_idx;
- 	} while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
- 
--	/* Kicks are still disabled, dispatch any remaining batched msgs. */
- 	vhost_tx_batch(net, nvq, sock, &msg);
--
--	if (unlikely(busyloop_intr))
--		/* If interrupted while doing busy polling, requeue the
--		 * handler to be fair handle_rx as well as other tasks
--		 * waiting on cpu.
--		 */
--		vhost_poll_queue(&vq->poll);
--	else
--		/* All of our work has been completed; however, before
--		 * leaving the TX handler, do one last check for work,
--		 * and requeue handler if necessary. If there is no work,
--		 * queue will be reenabled.
--		 */
--		vhost_net_busy_poll_try_queue(net, vq);
- }
- 
- static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
--- 
-2.34.1
+ChenYu
 
+> > +          - const: mediatek,mt8173-mdp
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    minItems: 1
+> > +    maxItems: 2
+> > +
+> > +  power-domains:
+> > +    maxItems: 1
+> > +
+> > +  iommus:
+> > +    maxItems: 1
+> > +
+> > +  mediatek,vpu:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > +    description:
+> > +      phandle to Mediatek Video Processor Unit for HW Codec encode/dec=
+ode and
+> > +      image processing.
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - clocks
+> > +  - power-domains
+> > +
+> > +allOf:
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            const: mediatek,mt8173-mdp-rdma
+> > +    then:
+> > +      properties:
+> > +        clocks:
+> > +          items:
+> > +            - description: Main clock
+> > +            - description: Mutex clock
+> > +    else:
+> > +      properties:
+> > +        clocks:
+> > +          items:
+> > +            - description: Main clock
+> > +
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            enum:
+> > +              - mediatek,mt8173-mdp-rdma
+> > +              - mediatek,mt8173-mdp-wdma
+> > +              - mediatek,mt8173-mdp-wrot
+> > +    then:
+> > +      required:
+> > +        - iommus
+> > +
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            const: mediatek,mt8173-mdp
+> > +    then:
+> > +      required:
+> > +        - mediatek,vpu
+> > +
+> > +additionalProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    #include <dt-bindings/clock/mt8173-clk.h>
+> > +    #include <dt-bindings/memory/mt8173-larb-port.h>
+> > +    #include <dt-bindings/power/mt8173-power.h>
+> > +
+> > +    soc {
+> > +        #address-cells =3D <2>;
+> > +        #size-cells =3D <2>;
+> > +
+> > +        mdp_rdma0: rdma@14001000 {
+> > +            compatible =3D "mediatek,mt8173-mdp-rdma",
+> > +                         "mediatek,mt8173-mdp";
+> > +            reg =3D <0 0x14001000 0 0x1000>;
+> > +            clocks =3D <&mmsys CLK_MM_MDP_RDMA0>,
+> > +                     <&mmsys CLK_MM_MUTEX_32K>;
+> > +            power-domains =3D <&spm MT8173_POWER_DOMAIN_MM>;
+> > +            iommus =3D <&iommu M4U_PORT_MDP_RDMA0>;
+> > +            mediatek,vpu =3D <&vpu>;
+> > +        };
+> > +
+> > +        mdp_rdma1: rdma@14002000 {
+> > +            compatible =3D "mediatek,mt8173-mdp-rdma";
+> > +            reg =3D <0 0x14002000 0 0x1000>;
+> > +            clocks =3D <&mmsys CLK_MM_MDP_RDMA1>,
+> > +                     <&mmsys CLK_MM_MUTEX_32K>;
+> > +            power-domains =3D <&spm MT8173_POWER_DOMAIN_MM>;
+> > +            iommus =3D <&iommu M4U_PORT_MDP_RDMA1>;
+> > +        };
+>
+> My previous comment applies.
+>
+> Keep one or two examples.
+>
+> Best regards,
+> Krzysztof
+>
 
