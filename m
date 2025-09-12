@@ -1,117 +1,153 @@
-Return-Path: <netdev+bounces-222566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85041B54D50
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:22:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F58B54CF8
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:16:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EB711CC65C0
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:18:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F299AA29D8
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 12:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EF732ED41;
-	Fri, 12 Sep 2025 12:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8925730F54C;
+	Fri, 12 Sep 2025 12:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fm5p63t2"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="cnJoxNks"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74842329F2F
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F153081B8;
+	Fri, 12 Sep 2025 12:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757678941; cv=none; b=SkyryOLhtEe9eNyzm3J2eswbDHiEtDJPWfDsswIJ7itG4bgthxfz7omXrr/wswPYQ4eOl+M7O24MHQxKTWGBpsPDsr/Vzojbz8aZptK2i3I8NaLItTrmIeNjUeBODXmfDGK6A+jdJSUBCBpm6z8UIGMNlKTzI+91TyTicxAUqL4=
+	t=1757678731; cv=none; b=RRdJ0bM3WambT+47cJcSEHF5OAQbTHcGf1uylOruIRW1P83f56PT/TeD4DOKViamYh02RkfuNLSOYOeBXxk1ESn0VglwTZkJ9WLYmOrCELgdhtgOdZ6GUWzrvOhfk0H/xZPXdB3mwQ0Ui/PSaMlfsQNocSqCNoXN9Bvr62JNWa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757678941; c=relaxed/simple;
-	bh=ZsDPHM1ssWGkUCApaTOQGhUhKwRqfUFyjo5Rw+9gVd0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=GwFUgMQl7eOodaouy3iWMorR4cDdoZcZpkWt7lp2cpKODPhUYiNEGdiv6j6O5Xhl/AnVxkL6/vuHYDaVO5ieQ02x0emEgS77ZJM6ZsfUtCR5Im+0fVrbEfP4WD+v/1GezPFhMQGth/wcWQeQM294RMzMk7M/U9Ai9vw4r3WASJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fm5p63t2; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45b9814efbcso18219495e9.0
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 05:08:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757678937; x=1758283737; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AuxBhXYIf5asuisWxd1fF0vikMlauZb1ySpXLM4BDYU=;
-        b=Fm5p63t2PJ4ezHqOdrc9AaEaiCNRZdhPRzWPS3ZN8o90x0YV9a+ASscXHBVI4aB19+
-         cwKXlD7MuvcuWBG9CW0Q4GO+3LxBbhnDkM5h6lOXJ9YUkJe9SFkHLdO/d8RYbWCIYLra
-         1iJPNmq3wQfc4KI7mLUeYbODfmXfTiJ4NnqI4a0pdtISllwA4V1zHJsneiNLBUuugICl
-         KSWsjZNDyBPU9EPofr8Wyll3tFROnMy7MBedLAS0LiuSV6245z0MwAz0xXdHLtT172gK
-         dKeOWGdFImuvjxlCDdYwLFBzI9Ad614hY+m0RNqvbjbeqS4lxoyvp4uBIIK4BVz+WV6j
-         gpMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757678937; x=1758283737;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AuxBhXYIf5asuisWxd1fF0vikMlauZb1ySpXLM4BDYU=;
-        b=Lw8UxbXOsfnDYozVJY4bpR5MANNWVKQ0zaDT+RPpjVpwXjmw0uBpesseAFSIkvMPwo
-         FQkid6lXLeEILzOXWCE2XATpHFDELkWHT3TVdeETnncnyJJSCrwgWp7z3tmEhvQyMA5g
-         RCwHDI0HY1uYK9cV2oyQKK/ujLCpO4ag56qeSfsn/MAc6jCKfgRyl4RcXFewCGUeeTpv
-         25xKQoW4xiq0fzudP1vBP/2ElcWvTHmLfsp4ukClDrgT1ZxsgbCtf4w5gZSxR2gfFONZ
-         mB2HPhN3x+I3IJBHAkrz3W5t4PCDTgNRx2nHEFJC2SdCMbvebGwLMHarAAssCj8VeRLp
-         boVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVUTZUCOXieaZNj8OOWHKp2d6TKYABpClLpOpmUqnu3jIa6mI5vfat6vKnyXFqX0Gu3tepDYw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAIGj9TjV/hIUlGbi5BoD9eJ/MN6/4IPIg+3qik4h6+H0b0vPy
-	SNmRg1JTwlSQAoXCT047heJF6fBHlPY1KdK/zBgieUn4OtC/OzXp8iwJ
-X-Gm-Gg: ASbGncuA1U+LSUjzaDkOszuME+dL+xdK2V/h8DmNzUqY663NrWRZZ5WyppTII/PPk1M
-	x8UFBV8OpQd80sa6JAu7oobT3qJKB/sQ4hZP/kWKi8MtGfTnPosIuo7B931IsEVmB36ha6UG17F
-	0Bfq4lzYI5aiAqAIi3p4g4THWknFiWxoEO8ctLR5UTzq4GQ0bbZWfC4UBU3+vtNsqaeaqpBnnuZ
-	Dpg/2C7DrEOv/jwIHEB0WXkQLL/neK4SeK0t/NIzHElL/m6+IwWR0IA55TwE8xY9QP18DP1/ozz
-	XJr/O2srdTsUOWpOFlFWKcreF4QFkAEBki3CKdgdCpfYuInu6/xVcgazLZuKzobkAZhQJPPXYeK
-	K7c+5X4r0IW1SUNIbKSMKO9W7maDJaRBL8g==
-X-Google-Smtp-Source: AGHT+IHXNEYZ8zt4iDcGj+Ej24DzoTie67SzfFJOypYfKefxWkzvz2zcFJy+fpJUKaaXWFGXQhh7ow==
-X-Received: by 2002:a5d:64e6:0:b0:3d3:6525:e320 with SMTP id ffacd0b85a97d-3e765a23893mr2442300f8f.29.1757678936577;
-        Fri, 12 Sep 2025 05:08:56 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:18f9:fa9:c12a:ac60])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7d369ea3bsm616186f8f.0.2025.09.12.05.08.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 05:08:56 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
- <ast@fiberby.net>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  Jacob Keller <jacob.e.keller@intel.com>,
-  Sabrina Dubroca <sd@queasysnail.net>,  wireguard@lists.zx2c4.com,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 12/13] tools: ynl: decode hex input
-In-Reply-To: <20250911200508.79341-13-ast@fiberby.net>
-Date: Fri, 12 Sep 2025 13:01:48 +0100
-Message-ID: <m2o6rfubf7.fsf@gmail.com>
-References: <20250911200508.79341-1-ast@fiberby.net>
-	<20250911200508.79341-13-ast@fiberby.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1757678731; c=relaxed/simple;
+	bh=+knrYgvIRzYhx6NMYWRI3CQllCLkTMhw9DP6cthmIao=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CQ9KdzABkUp1GtSdNHPoDHhBKAFnpFsVm0CbTjphR0djn64wfMSfrDotIlkfhZUgnNV1XdO+74ZKznum/UpgSIuY2GrNZvZaUMa0FXzQqW3hG8iD+JYyymkLZhZzT/ZJx0lU0Vt8lq/4DxCslvEVqe4IdoRxm4qYPTapJya+Tls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=cnJoxNks; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: bde4d0e48fd011f0bd5779446731db89-20250912
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=zguUP/rKI41td6Qd1x37NGTIr2eKo9bTe8UKCbXqKyg=;
+	b=cnJoxNkso4sJcnDHy7hcZraIxd8IQJa0aJruIqq2aYMm2D48aZAzFN52D9ab3wbToTFM3GOuQF6iKKqzky+e/2WngK0K5Ma3XljX5UQCSVIDL/nFYeOC3oieLA4O5tEFmholJE6ThsQTKRwNwaGAZvr2dVi7p30x/eUQFV7auso=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.4,REQID:a9f2bb8b-f07c-4ec4-b9a5-7f177d9ee2fe,IP:0,UR
+	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:-5
+X-CID-META: VersionHash:1ca6b93,CLOUDID:c4c9b884-5317-4626-9d82-238d715c253f,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:-5,Content:0|15|50,EDM:-3,IP:
+	nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,L
+	ES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: bde4d0e48fd011f0bd5779446731db89-20250912
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw01.mediatek.com
+	(envelope-from <irving-ch.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 981950334; Fri, 12 Sep 2025 20:05:15 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Fri, 12 Sep 2025 20:05:13 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Fri, 12 Sep 2025 20:05:13 +0800
+From: irving.ch.lin <irving-ch.lin@mediatek.com>
+To: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+	<sboyd@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Ulf Hansson
+	<ulf.hansson@linaro.org>, Richard Cochran <richardcochran@gmail.com>
+CC: Qiqi Wang <qiqi.wang@mediatek.com>, <linux-clk@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-pm@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>,
+	<sirius.wang@mediatek.com>, <vince-wl.liu@mediatek.com>,
+	<jh.hsu@mediatek.com>, <irving-ch.lin@mediatek.com>
+Subject: [PATCH v2 0/4] Add support for MT8189 clock/power controller
+Date: Fri, 12 Sep 2025 20:04:49 +0800
+Message-ID: <20250912120508.3180067-1-irving-ch.lin@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
+These patches add support for the clock and power controllers
+of MediaTek's new SoC, MT8189. With these changes,
+other modules can easily manage clock and power resources
+using standard Linux APIs, such as the Common Clock Framework (CCF)
+and pm_runtime on MT8189 platform.
 
-> This patch adds support for decoding hex input, so
-> that binary attributes can be read through --json.
->
-> Example (using future wireguard.yaml):
->  $ sudo ./tools/net/ynl/pyynl/cli.py --family wireguard \
->    --do set-device --json '{"ifindex":3,
->      "private-key":"2a ae 6c 35 c9 4f cf <... to 32 bytes>"}'
->
-> In order to somewhat mirror what is done in _formatted_string(),
-> then for non-binary attributes attempt to convert it to an int.
->
-> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+Irving-ch Lin (4):
+  dt-bindings: clock: mediatek: Add MT8189 clock definitions
+  dt-bindings: power: mediatek: Add MT8189 power domain definitions
+  clk: mediatek: Add clock drivers for MT8189 SoC
+  pmdomain: mediatek: Add power domain driver for MT8189 SoC
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+ .../bindings/clock/mediatek,mt8189-clock.yaml |   89 ++
+ .../clock/mediatek,mt8189-sys-clock.yaml      |   58 +
+ .../mediatek,mt8189-power-controller.yaml     |   88 ++
+ drivers/clk/mediatek/Kconfig                  |  146 +++
+ drivers/clk/mediatek/Makefile                 |   14 +
+ drivers/clk/mediatek/clk-mt8189-apmixedsys.c  |  135 +++
+ drivers/clk/mediatek/clk-mt8189-bus.c         |  289 +++++
+ drivers/clk/mediatek/clk-mt8189-cam.c         |  131 ++
+ drivers/clk/mediatek/clk-mt8189-dbgao.c       |  115 ++
+ drivers/clk/mediatek/clk-mt8189-dvfsrc.c      |   61 +
+ drivers/clk/mediatek/clk-mt8189-iic.c         |  149 +++
+ drivers/clk/mediatek/clk-mt8189-img.c         |  122 ++
+ drivers/clk/mediatek/clk-mt8189-mdpsys.c      |  100 ++
+ drivers/clk/mediatek/clk-mt8189-mfg.c         |   56 +
+ drivers/clk/mediatek/clk-mt8189-mmsys.c       |  233 ++++
+ drivers/clk/mediatek/clk-mt8189-scp.c         |   92 ++
+ drivers/clk/mediatek/clk-mt8189-topckgen.c    | 1057 +++++++++++++++++
+ drivers/clk/mediatek/clk-mt8189-ufs.c         |  106 ++
+ drivers/clk/mediatek/clk-mt8189-vcodec.c      |  119 ++
+ drivers/clk/mediatek/clk-mt8189-vlpcfg.c      |  145 +++
+ drivers/clk/mediatek/clk-mt8189-vlpckgen.c    |  280 +++++
+ drivers/clk/mediatek/clk-mux.c                |    4 +
+ drivers/pmdomain/mediatek/mt8189-scpsys.h     |   75 ++
+ drivers/pmdomain/mediatek/mtk-scpsys.c        |  967 ++++++++++++++-
+ .../dt-bindings/clock/mediatek,mt8189-clk.h   |  580 +++++++++
+ .../dt-bindings/power/mediatek,mt8189-power.h |   38 +
+ 26 files changed, 5206 insertions(+), 43 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8189-clock.yaml
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8189-sys-clock.yaml
+ create mode 100644 Documentation/devicetree/bindings/power/mediatek,mt8189-power-controller.yaml
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-apmixedsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-bus.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-cam.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-dbgao.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-dvfsrc.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-iic.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-img.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-mdpsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-mfg.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-mmsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-scp.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-topckgen.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-ufs.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-vcodec.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-vlpcfg.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-vlpckgen.c
+ create mode 100644 drivers/pmdomain/mediatek/mt8189-scpsys.h
+ create mode 100644 include/dt-bindings/clock/mediatek,mt8189-clk.h
+ create mode 100644 include/dt-bindings/power/mediatek,mt8189-power.h
+
+-- 
+2.45.2
+
 
