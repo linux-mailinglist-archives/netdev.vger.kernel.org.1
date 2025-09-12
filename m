@@ -1,119 +1,214 @@
-Return-Path: <netdev+bounces-222495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971D3B547BA
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:34:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73414B547A7
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:33:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 867F33B76D8
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:31:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE1CB1CC5922
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A487F2877F7;
-	Fri, 12 Sep 2025 09:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444032BF01E;
+	Fri, 12 Sep 2025 09:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNNi5qfK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iZn5Rdv0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7B2287515
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C22BDC14
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757669245; cv=none; b=VYARJI6jV/tHqmsSYNgyeWqww90G+P3FgsYFlrTesYcupgFCOGouX30pk2i/TPQ1cftlsjHpmZtdQBMEKh/AjJDC0fy3u8o1iI4nqTwQVZK6u6ezPbTbH7Kc3pH+zBLhVBT/SqOgDY+bvrJNVKwYnI09oHcLsQQCDO0pmA5NsYE=
+	t=1757669265; cv=none; b=Dd1QVX2OTB9awWOLsMOfwrBBBzHInKYpu6qWmRn9SIs9WgV7PspSPGhDPjtm4+B8M5YQJ1LpjfNB+81NtaMs5FKc1Es11GONBla1XMrTXJr19Y8S+5DWqktgYC7VTib4nD6ujsHBH1/F6f3ArU321fmsHAsQgTMYY1w9r+/fg3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757669245; c=relaxed/simple;
-	bh=yJJv2gjhRQfuHF9Gh02OKGyHVT4ciENi2NSMHDOldJQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=p/opHBnKCRJfozQiT2AURLKaEoi6NHxPdumISy/T0ZhVRFKGJiqjxcvhJ4yKzQQnaoGWch98ekDF/WHvroO15KddZTP1X9rQd0et8yFRTtfcpSDJuL6vNpqg5NMw+raj9/DjE0TXDdTxVARd1KpSRAZOqXufY7oojxkGf1I55xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lNNi5qfK; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7725147ec88so1054246b3a.0
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:27:23 -0700 (PDT)
+	s=arc-20240116; t=1757669265; c=relaxed/simple;
+	bh=37s8rtihJZjYcqXMR+EBo1VCyOiF0M83FLmCNi4lZoo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t/24NFlsep0nXLtQNdPMASBPzYWF+/NO7RYxyVP0hiGe4GOxnNU7qexqtNr83o55NIp8VqS/cgiTtKjQ7CbQs4dLslg+bNqiwYNwLkPqh/ERtaxyERRoWOZ5SXdOUrU/WJcXM70XBjYPb+0rB38vNp7mTwBxpROYKH/3ybhJMM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iZn5Rdv0; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45de5246dc4so2976955e9.0
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:27:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757669243; x=1758274043; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3ZB/EENzQ9cknRI92mO2zkQd2VPyMtef2mDXzKHOG7A=;
-        b=lNNi5qfKFf5sKGba01fJO9omJsse1xLX+fvDFKAdfUgfy9E0842oQIFZkTSNdTUReH
-         PiJ6Bb0N9JABw9DuSLWfBYjALx4EbRHTrTFvHUO+XyrjF2XbjR+pktIrgj8Wi4+joxI9
-         UJxp0R6BIbpEBxpIDoNA2gZsHSNlhFSVJkp3uvaaHJTnPUReND5ikhV3h217mOEmIB4c
-         SL4IRwStmqCgdAv88WpfDP5C8yqkqnGnaOPME8ckilYezrGNa++t6hn3dWb/hGlttF4P
-         QOJOnu03VVpZRI6TLBevyNDvIJQySEynQCd4Ws+djCEV8nEkmdrkVDkhyJk3RmPEJBYG
-         supQ==
+        d=linaro.org; s=google; t=1757669261; x=1758274061; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sJZVDaBONrsctBuO8ClmLLuGVSMSeIuOQj38qMjOEC4=;
+        b=iZn5Rdv00r1dKn6QwHXIeW9s7n2haQe/HLb7WrVcE3mI8jXLTETTM/zOFWGApEYsPV
+         IN162GzFi70aMvyxeBVpe6mlQFkUBN9zLvvcW5UdpiCGT4RGapwa3Cafvvr3YCskLuNQ
+         X55xvPQuNaqbOGqXyEKkPVBBUYyii01p3bWaBq9VKYjq6s/9Co3NRZryChpzoroxX8ss
+         3bRhkR3i97Qn/o069pmIbAb09vY9nzJf7JCMgFUx1+C57+gfcKPEUFgvHAX8M2cqBUcW
+         pRmiKrd9qLvCqTCKfxHluZ2mER00uewTBjUrLhOUGnEfPMU9TSfz5OM3QexfzCy0ylzS
+         MJbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757669243; x=1758274043;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3ZB/EENzQ9cknRI92mO2zkQd2VPyMtef2mDXzKHOG7A=;
-        b=sE0XRgerAkn/TVyWjsHTWki/0xfYIDrPA/zDDplyaEu9xv4nl6fMXV7w8YDqOu35xw
-         5q1MqH8sYFbyEh1tnJqR6Mask3kpelzXlEXglWbt7JnGv54t3eN1EqKmalJDh5eSKBLE
-         iZzFRqb03+rBNseP0Z2bkpHootRHsJ978/KNrd5DuJ7XNbXxT8BmDibgRALF+Hooe/eI
-         W1qtNiKO2GniZ9QvUQjUaQXwcRIYl7FddB/Imz/gInWOUc5KCCvF8qKA/u1ppPHUF6Qd
-         h75/04ibNXpA+weT+XOGq7XNq8G674gNn4Cz8AvQAkF4x7ZpMWHOfY4jDDfxsdgt1pU/
-         /m9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWqzFWU9iA5MCTw9FYSulQjU45nFVAVAWerggw76fpXtwuVnCaCeBxbXLbhp1WfK+SSKiMIBvE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiVvNuYXlj9vbYG/XiBc8V/KMSFS2ziShPdl3odu8RG5SgFiq3
-	Fg7MYmi3woOPJ9bRESOC7GnCy8LJhJQL/J/FiGtHOahvb0arKxhzxKOJ
-X-Gm-Gg: ASbGnct/m2jGBw5XHYrO9zWy2IpXD4k1YwnyX65vak9q+qFT0ICNSmxmkucWiYV8pxK
-	4yzvWOoTr8bHWOLglmB1d4lQwRO6b+hegupVXhcykgqzssOHiam6HF145mqr99uvIHxhP6f8Fwn
-	NVBv647js712KTwBFuR7fBaLoYMe88dIYCs16Rh9kgct0fEpkCzVcjCfawd+rekQF9xp8e2ojxl
-	5wKB05IdQylSaszuPqf/GCh2PCQhAC4naNRZrgToLp1B/G2/gdmkCqEr0Wd7JVlL4bioivDOsrp
-	hcIGA0TR8WWOgWHLoXkS5mx/nNJNQ9IyVgkmYfTKYrrkMVDEHHLcB2c76WbwhXdoJn6TirSW3+e
-	GJR7ojUa7T5o34X6SX4QWlGqdkhVVq2qrJbj3JKaMSbf0S3BIg161zsYvZ9Nf2H8=
-X-Google-Smtp-Source: AGHT+IGzZmv4BSLblDExiYIqYLLacdpezaosRNfT06DqWMAt9pAoCpyMABpeGs31Zcum/QN6x1pLbg==
-X-Received: by 2002:a05:6a00:3e02:b0:76b:ecf2:7ece with SMTP id d2e1a72fcca58-77603319615mr6443572b3a.12.1757669243294;
-        Fri, 12 Sep 2025 02:27:23 -0700 (PDT)
-Received: from localhost ([121.159.229.173])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7760793b6d3sm4819370b3a.11.2025.09.12.02.27.21
+        d=1e100.net; s=20230601; t=1757669261; x=1758274061;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sJZVDaBONrsctBuO8ClmLLuGVSMSeIuOQj38qMjOEC4=;
+        b=TOZ6/xi3ypnTvPTYaBUfs/L/pKE9t0oYkQQMpF1oC/8Qg1OUAFJ7nCozkdwn8NpLrL
+         H1XhLqdDuyJkRImWe0kjwRHUUqttpj4jFAw+QQfF++bIxE+3s1mzsVVn3MemFQLl06hn
+         hxmKtLH6MITEt2ktk8dWNKuT38Yko5XmudHWnK2Tw9B30IabvMXZmbyx/1ImCYY1giw8
+         8YaDEuRNxmOuf0MP4KmnTQwIpkyv0gcKrU6Ne8yp3Ii0aHVHAmL+5RZO4Env2H0NbWd2
+         zyI0mvGfwPy3osulzGYisIw0yAeAUWNrVdiYMBUoqkbwFO7DIYI6rz74k9El86IsOneD
+         +/TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWznBUnvvkOH23RM8cPsyJaYpw85alB9ETRFaUFCJyOmzEV2+XxjLGxMAl6wFaI/aB8Em+PxDM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0R36vThWRSDbmp958irjUi4WDFzQ6Nq7YYibtRvC1AaXsn8Od
+	HuvfSNnLrSvDctyVjClBzBpRHfrVruek4dalYY0kZ4JXLUYpfBPLVhxWGoNQjMYWacM=
+X-Gm-Gg: ASbGncuMqhCHwpvoLItIZvJoLp9BRz2JXdV3CMdZ8XUEttwTwR5SR7DdZAEcXY6e/JR
+	XdjI6m9BDC7FZq1WyDBWQ5EFtE3ZrMhu5bKKknMUve2OW9WrsmXYg84IZ+I5Xc/wLf4qH6BRE2D
+	+Kmebd5qMIC0NCbHo0uaCYkAZkgU/Y22BLbWslABZnsaE2rt4WWiYMmqn0XhQ1ZmLdmXjlCOvuW
+	4+IOk7iey62ExcViIuVEzLIUReeBXyl9blweLaRrotmJ9t2jlZ1NuUWpKdgQ8r+LDor81U13qpr
+	oWieS95TUZJzRwTYRZNBf4z9PJG+pGnD4Ds9By6Aq31NtM/JB6twJSunmRZ/dv3FJbS3bfgi3gU
+	4mOzowkNzYZknO4ateSjx2qcvXjloqmU26O4kHFRcOdSQeNvUQxUhGA==
+X-Google-Smtp-Source: AGHT+IFeZIHH+GDuy21c93peZqwyLtGWxcpHg3tJXLEty5kBn/g+Fv9K4spsV8IDT41h2TXjrk+9LQ==
+X-Received: by 2002:a05:600c:8707:b0:45c:b627:a4e3 with SMTP id 5b1f17b1804b1-45f21e65defmr9674305e9.1.1757669261507;
+        Fri, 12 Sep 2025 02:27:41 -0700 (PDT)
+Received: from [192.168.1.29] ([178.197.219.123])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0156d206sm60274825e9.5.2025.09.12.02.27.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Sep 2025 02:27:22 -0700 (PDT)
+        Fri, 12 Sep 2025 02:27:40 -0700 (PDT)
+Message-ID: <1cd6a0f9-2955-4189-8d1e-85fa8ad8dddd@linaro.org>
+Date: Fri, 12 Sep 2025 11:27:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 02/10] dt-bindings: clock: Add required
+ "interconnect-cells" property
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Luo Jie <quic_luoj@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Varadarajan Narayanan <quic_varada@quicinc.com>,
+ Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Anusha Rao <quic_anusha@quicinc.com>,
+ Manikanta Mylavarapu <quic_mmanikan@quicinc.com>,
+ Devi Priya <quic_devipriy@quicinc.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, quic_kkumarcs@quicinc.com,
+ quic_linchen@quicinc.com, quic_leiwei@quicinc.com, quic_pavir@quicinc.com,
+ quic_suruchia@quicinc.com
+References: <20250909-qcom_ipq5424_nsscc-v5-0-332c49a8512b@quicinc.com>
+ <20250909-qcom_ipq5424_nsscc-v5-2-332c49a8512b@quicinc.com>
+ <20250912-nocturnal-horse-of-acumen-5b2cbd@kuoka>
+ <b7487ab1-1abd-40ca-8392-fdf63fddaafc@oss.qualcomm.com>
+ <2951b362-c3c1-4608-8534-4d25b089f927@oss.qualcomm.com>
+ <52714c33-5bd7-4ca5-bf1d-c89318c77746@linaro.org>
+ <d293a11b-155d-45d3-bafc-00c2f90e8c43@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ 2+47PN9NZAOyb771QoVr8A==
+In-Reply-To: <d293a11b-155d-45d3-bafc-00c2f90e8c43@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Fri, 12 Sep 2025 18:27:19 +0900
-Message-Id: <DCQPQTBY5SVC.1FKEWQBMY4WZS@gmail.com>
-Subject: Re: [PATCH net-next] net: dlink: count dropped packets on skb
- allocation failure
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: "Simon Horman" <horms@kernel.org>
-From: "Yeounsu Moon" <yyyynoom@gmail.com>
-X-Mailer: aerc 0.20.1
-References: <20250910054836.6599-2-yyyynoom@gmail.com>
- <20250911170232.GP30363@horms.kernel.org>
-In-Reply-To: <20250911170232.GP30363@horms.kernel.org>
+Content-Transfer-Encoding: 7bit
 
-On Fri Sep 12, 2025 at 2:02 AM KST, Simon Horman wrote:
-> Although new users of dev->stats are discoraged (see ndetdevice.h).
-> That is not the case here, as the driver already uses dev-stats.
-> So I believe this is change is good.
+On 12/09/2025 11:21, Konrad Dybcio wrote:
+> On 9/12/25 11:17 AM, Krzysztof Kozlowski wrote:
+>> On 12/09/2025 11:13, Konrad Dybcio wrote:
+>>> On 9/12/25 11:13 AM, Konrad Dybcio wrote:
+>>>> On 9/12/25 9:04 AM, Krzysztof Kozlowski wrote:
+>>>>> On Tue, Sep 09, 2025 at 09:39:11PM +0800, Luo Jie wrote:
+>>>>>> The Networking Subsystem (NSS) clock controller acts as both a clock
+>>>>>> provider and an interconnect provider. The #interconnect-cells property
+>>>>>> is mandatory in the Device Tree Source (DTS) to ensure that client
+>>>>>> drivers, such as the PPE driver, can correctly acquire ICC clocks from
+>>>>>> the NSS ICC provider.
+>>>>>>
+>>>>>> Although this property is already present in the NSS CC node of the DTS
+>>>>>> for CMN PLL for IPQ9574 SoC which is currently supported, it was previously
+>>>>>> omitted from the list of required properties in the bindings documentation.
+>>>>>> Adding this as a required property is not expected to break the ABI for
+>>>>>> currently supported SoC.
+>>>>>>
+>>>>>> Marking #interconnect-cells as required to comply with Device Tree (DT)
+>>>>>> binding requirements for interconnect providers.
+>>>>>
+>>>>> DT bindings do not require interconnect-cells, so that's not a correct
+>>>>> reason. Drop them from required properties.
+>>>>
+>>>> "Mark #interconnect-cells as required to allow consuming the provided
+>>>> interconnect endpoints"?
+>>>
+>>> "which are in turn necessary for the SoC to function"
+>>
+>> If this never worked and code was buggy, never booted, was sent
+>> incomplete and in junk state, then sure. Say like that. :)
+>>
+>> But I have a feeling code was working okayish...
+> 
+> If Linux is unaware of resources, it can't turn them off/on, so it was
+> only working courtesy of the previous boot stages messing with them.
 
-Thank you for pointing that out! I also plan to rework statistics code
-to rtnl-based statistics. However, that change affects a large amount
-of code, so I'd like to introduce it gradually and gracefully.
 
->
->>  				printk (KERN_INFO
->>  					"%s: receive_packet: "
->>  					"Unable to re-allocate Rx skbuff.#%d\n",
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
+Which is fine and present in all other cases/drivers/devices. Entire
+Linux in many places relies on bootloader and that is not a "work by
+coincidence".
 
-Thank you again for reviewing my patch, Simon :)
+Another thing is if you keep backwards compatibility in the driver but
+want to enforce DTS to care about these resources, but that is not
+explained here, I think.
 
-	Yeounsu Moon
 
+Best regards,
+Krzysztof
 
