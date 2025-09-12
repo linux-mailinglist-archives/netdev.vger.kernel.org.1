@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-222710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D83B55780
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 22:15:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52C7B55782
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 22:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CA97B630A4
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 20:13:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30B191893687
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 20:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0957331A04D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6BA322C6C;
 	Fri, 12 Sep 2025 20:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/wmwxwv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HuIiDEF7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C4C30DD0B
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 20:14:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2856B321F3A
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 20:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757708081; cv=none; b=uwkB/vfHhaP8oI4KaTkmwCqP3oklU/Dupmi5MwGLEfNHKgRzvF3b2Jqy1H1pw1Jp7GKDPGQmJv0JRAFEZ4ygdMUtILtjCOFUsYX/SX2wGKz0JD2oyYBcWDqYGJFtL3oSjAZz3G6cyuZtyoVGn3FtBh/L1JoidHc8jhVJou11INc=
+	t=1757708082; cv=none; b=FOyv+SbwIrOumrp8R5X8E86jioXswglnPTtzrzcp5C+vhT379Uro2QJuycnRpNHm6svS7wevKQyV/Mirc5tnYaPAJ8xQgUZ+itVwWr4RMJBg/zehtHINCl5DJQLmsODvfIFftfKmW3LAssOYkFtj0ZiTK9Pzrk3Eq1QQsSwb5t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757708081; c=relaxed/simple;
-	bh=uWvK7/3B0kgC/E63izUQ28NE4rpJpng4bAJcOHS7/oA=;
+	s=arc-20240116; t=1757708082; c=relaxed/simple;
+	bh=noqzWmwLgxpRbJyfZRusCPih67MNRbIYicbG6V5Q8co=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o0WAoCkuYH3Juu6W2jIbGNs1wIPQxPvVtuUv+h+5ivJBAR8TarnWFQzQ76P9tvxZKQ/8kVpubKJcTVrfIFbIZnIJTKAtEceuMYHiCqpZTtSRXP+AHpZ0mQyFT8wKH2xku5jPFdY8vcvZ1WeMRw7nEfU7rkzMNnpgWRmnNLyFfSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/wmwxwv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57B6AC4CEF4;
+	 MIME-Version; b=NmCms0XewVzcbbYXvFJp4wjmNo22E72VuCCkYjcNx37gSADQqcwOVVXfjL6ou6Pag7Hx0b1of8QkyJ4yvffFubJcXByNce2Z0nw/xS5Tz4bDz3PPFaYs1QsYyyw96RZFuI0d1GpmZ3ptDn7m2ZpCGpOJMfPrBxgyOZOrvb1y9V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HuIiDEF7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDAB6C4CEF1;
 	Fri, 12 Sep 2025 20:14:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757708081;
-	bh=uWvK7/3B0kgC/E63izUQ28NE4rpJpng4bAJcOHS7/oA=;
+	s=k20201202; t=1757708082;
+	bh=noqzWmwLgxpRbJyfZRusCPih67MNRbIYicbG6V5Q8co=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=r/wmwxwvnn4JCbWJoCFJR28ZKiz52Tu41ueqZTFqoZkQwVFixMlQcv7UqAdqGSB0Q
-	 i/QH7NMuRyKnBYy/ZikK59EITKjz259Bg/zT5g2woK2YGq8LeHFK2y+r8eNe1Y65r7
-	 6smtyUioEY5H9T+5MHJ5zKuYu/GHhDz0sfh9dQ5DJLv9E3TsN153BfviIjV3Y+f9MO
-	 Vk0KYFPGoWbHD5hqhe8SWIV0i+Sji95xNLMYIG2mt+hddQTZiHpOVpeHBgtww9qmH5
-	 aAf4ueARdmMNq4ljyEGUzXem7r0skpRkRi0S33jp96NMQgp93mycR+jR+MBdgJ1KZp
-	 850rTS60DH50g==
+	b=HuIiDEF7j0J9KD0Vvnvxp9udby4CQmGnWwcUGriLgQ3i17hsYzE6omiu0Mj1ScUfz
+	 Q6+Gpq0r7QrpZgKa8rlivUJK6Q3DLKdiLDk94VJT8hKwgSNfbfwewyaFMXL8758uhS
+	 8Dk2oVshdsqzmpfXUxndkt51UuS8tPSDoc1OiSMxvsgYbEgSGNjFmnyazaMmGw7O52
+	 eCNh8xiwvGC0nCYoeDyhNQllFya11ZOHIAAr/kQcZ/cmSwZPqX6Sh2U1OZ4wW2/Wxw
+	 h/wKZT0rXUkMRb+HWDkHuogisYYMQqSC7M+6yYv+r5+iVw0uKQ43KlICzJKTEzzJIH
+	 or52XOkaEsXXg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	alexanderduyck@fb.com,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 6/9] eth: fbnic: support FW communication for core dump
-Date: Fri, 12 Sep 2025 13:14:25 -0700
-Message-ID: <20250912201428.566190-7-kuba@kernel.org>
+Subject: [PATCH net-next 7/9] eth: fbnic: add FW health reporter
+Date: Fri, 12 Sep 2025 13:14:26 -0700
+Message-ID: <20250912201428.566190-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250912201428.566190-1-kuba@kernel.org>
 References: <20250912201428.566190-1-kuba@kernel.org>
@@ -65,321 +65,288 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To read FW core dump we need to issue two commands to FW:
- - first get the FW core dump info
- - second read the dump chunk by chunk
-
-Implement these two FW commands. Subsequent commits will use them
-to expose FW dump via devlink heath.
+Add a health reporter to catch FW crashes. Dumping the reporter
+if FW has not crashed will create a snapshot of FW memory.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h |  38 ++++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c | 214 +++++++++++++++++++++
- 2 files changed, 252 insertions(+)
+ .../device_drivers/ethernet/meta/fbnic.rst    |  10 ++
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |   5 +
+ .../net/ethernet/meta/fbnic/fbnic_devlink.c   | 157 ++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  11 +-
+ 4 files changed, 182 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-index 6a413e7296da..7d16a307ff3f 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-@@ -66,6 +66,14 @@ struct fbnic_fw_completion {
- 	struct kref ref_count;
- 	int result;
- 	union {
-+		struct {
-+			u32 size;
-+		} coredump_info;
-+		struct {
-+			u32 size;
-+			u16 stride;
-+			u8 *data[];
-+		} coredump;
- 		struct {
- 			u32 offset;
- 			u32 length;
-@@ -89,6 +97,12 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd);
- int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership);
- int fbnic_fw_init_heartbeat(struct fbnic_dev *fbd, bool poll);
- void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd);
-+int fbnic_fw_xmit_coredump_info_msg(struct fbnic_dev *fbd,
-+				    struct fbnic_fw_completion *cmpl_data,
-+				    bool force);
-+int fbnic_fw_xmit_coredump_read_msg(struct fbnic_dev *fbd,
-+				    struct fbnic_fw_completion *cmpl_data,
-+				    u32 offset, u32 length);
- int fbnic_fw_xmit_fw_start_upgrade(struct fbnic_dev *fbd,
- 				   struct fbnic_fw_completion *cmpl_data,
- 				   unsigned int id, unsigned int len);
-@@ -137,6 +151,10 @@ enum {
- 	FBNIC_TLV_MSG_ID_OWNERSHIP_RESP			= 0x13,
- 	FBNIC_TLV_MSG_ID_HEARTBEAT_REQ			= 0x14,
- 	FBNIC_TLV_MSG_ID_HEARTBEAT_RESP			= 0x15,
-+	FBNIC_TLV_MSG_ID_COREDUMP_GET_INFO_REQ		= 0x18,
-+	FBNIC_TLV_MSG_ID_COREDUMP_GET_INFO_RESP		= 0x19,
-+	FBNIC_TLV_MSG_ID_COREDUMP_READ_REQ		= 0x20,
-+	FBNIC_TLV_MSG_ID_COREDUMP_READ_RESP		= 0x21,
- 	FBNIC_TLV_MSG_ID_FW_START_UPGRADE_REQ		= 0x22,
- 	FBNIC_TLV_MSG_ID_FW_START_UPGRADE_RESP		= 0x23,
- 	FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_REQ		= 0x24,
-@@ -209,6 +227,26 @@ enum {
- 	FBNIC_FW_HEARTBEAT_MSG_MAX
+diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+index fb6559fa4be4..62693566ff1f 100644
+--- a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
++++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+@@ -69,6 +69,16 @@ On host boot the latest UEFI driver is always used, no explicit activation
+ is required. Firmware activation is required to run new control firmware. cmrt
+ firmware can only be activated by power cycling the NIC.
+ 
++Health reporters
++----------------
++
++fw reporter
++~~~~~~~~~~~
++
++The ``fw`` health reporter tracks FW crashes. Dumping the reporter will
++show the core dump of the most recent FW crash, and if no FW crash has
++happened since power cycle - a snapshot of the FW memory.
++
+ Statistics
+ ----------
+ 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index b364c2f0724b..5f99976de0bb 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -27,6 +27,7 @@ struct fbnic_dev {
+ 	struct net_device *netdev;
+ 	struct dentry *dbg_fbd;
+ 	struct device *hwmon;
++	struct devlink_health_reporter *fw_reporter;
+ 
+ 	u32 __iomem *uc_addr0;
+ 	u32 __iomem *uc_addr4;
+@@ -159,8 +160,12 @@ extern char fbnic_driver_name[];
+ 
+ void fbnic_devlink_free(struct fbnic_dev *fbd);
+ struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev);
++int fbnic_devlink_health_create(struct fbnic_dev *fbd);
++void fbnic_devlink_health_destroy(struct fbnic_dev *fbd);
+ void fbnic_devlink_register(struct fbnic_dev *fbd);
+ void fbnic_devlink_unregister(struct fbnic_dev *fbd);
++void __printf(2, 3)
++fbnic_devlink_fw_report(struct fbnic_dev *fbd, const char *format, ...);
+ 
+ int fbnic_fw_request_mbx(struct fbnic_dev *fbd);
+ void fbnic_fw_free_mbx(struct fbnic_dev *fbd);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+index c5f81f139e7e..0e8920685da6 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+@@ -8,6 +8,7 @@
+ #include <net/devlink.h>
+ 
+ #include "fbnic.h"
++#include "fbnic_fw.h"
+ #include "fbnic_tlv.h"
+ 
+ #define FBNIC_SN_STR_LEN	24
+@@ -369,6 +370,162 @@ static const struct devlink_ops fbnic_devlink_ops = {
+ 	.flash_update	= fbnic_devlink_flash_update,
  };
  
-+enum {
-+	FBNIC_FW_COREDUMP_REQ_INFO_CREATE	= 0x0,
-+	FBNIC_FW_COREDUMP_REQ_INFO_MSG_MAX
++static int fbnic_fw_reporter_dump(struct devlink_health_reporter *reporter,
++				  struct devlink_fmsg *fmsg, void *priv_ctx,
++				  struct netlink_ext_ack *extack)
++{
++	struct fbnic_dev *fbd = devlink_health_reporter_priv(reporter);
++	u32 offset, index, index_count, length, size;
++	struct fbnic_fw_completion *fw_cmpl;
++	u8 *dump_data, **data;
++	int err;
++
++	fw_cmpl = fbnic_fw_alloc_cmpl(FBNIC_TLV_MSG_ID_COREDUMP_GET_INFO_RESP);
++	if (!fw_cmpl)
++		return -ENOMEM;
++
++	err = fbnic_fw_xmit_coredump_info_msg(fbd, fw_cmpl, true);
++	if (err) {
++		dev_err(fbd->dev,
++			"Failed to transmit core dump info msg: %d\n", err);
++		goto cmpl_free;
++	}
++	if (!wait_for_completion_timeout(&fw_cmpl->done, 2 * HZ)) {
++		dev_err(fbd->dev, "Timed out waiting on core dump info\n");
++		err = -ETIMEDOUT;
++		goto cmpl_cleanup;
++	}
++
++	size = fw_cmpl->u.coredump_info.size;
++	err = fw_cmpl->result;
++
++	fbnic_mbx_clear_cmpl(fbd, fw_cmpl);
++	fbnic_fw_put_cmpl(fw_cmpl);
++
++	/* Handle error returned by firmware */
++	if (err) {
++		if (err == -ETIMEDOUT)
++			dev_info(fbd->dev, "Firmware timed out on core dump\n");
++		else
++			dev_err(fbd->dev,
++				"Firmware core dump returned error: %d\n", err);
++		return err;
++	}
++	if (!size) {
++		dev_err(fbd->dev, "Firmware core dump returned size 0\n");
++		return -EIO;
++	}
++
++	/* Read the dump, we can only transfer TLV_MAX_DATA at a time */
++	index_count = DIV_ROUND_UP(size, TLV_MAX_DATA);
++
++	fw_cmpl = __fbnic_fw_alloc_cmpl(FBNIC_TLV_MSG_ID_COREDUMP_READ_RESP,
++					sizeof(void *) * index_count + size);
++	if (!fw_cmpl)
++		return -ENOMEM;
++
++	/* Populate pointer table w/ pointer offsets */
++	dump_data = (void *)&fw_cmpl->u.coredump.data[index_count];
++	data = fw_cmpl->u.coredump.data;
++	fw_cmpl->u.coredump.size = size;
++	fw_cmpl->u.coredump.stride = TLV_MAX_DATA;
++
++	for (index = 0; index < index_count; index++) {
++		/* First iteration installs completion */
++		struct fbnic_fw_completion *cmpl_arg = index ? NULL : fw_cmpl;
++
++		offset = index * TLV_MAX_DATA;
++		length = min(size - offset, TLV_MAX_DATA);
++
++		data[index] = dump_data + offset;
++		err = fbnic_fw_xmit_coredump_read_msg(fbd, cmpl_arg,
++						      offset, length);
++		if (err) {
++			dev_err(fbd->dev, "Failed to transmit core dump msg: %d\n",
++				err);
++			if (cmpl_arg)
++				goto cmpl_free;
++			else
++				goto cmpl_cleanup;
++		}
++
++		if (wait_for_completion_timeout(&fw_cmpl->done, 2 * HZ)) {
++			reinit_completion(&fw_cmpl->done);
++		} else {
++			dev_err(fbd->dev,
++				"Timed out waiting on core dump (%d/%d)\n",
++				index + 1, index_count);
++			err = -ETIMEDOUT;
++			goto cmpl_cleanup;
++		}
++
++		/* If we didn't see the reply record as incomplete */
++		if (fw_cmpl->u.coredump.data[index]) {
++			dev_err(fbd->dev,
++				"No data for core dump chunk (%d/%d)\n",
++				index + 1, index_count);
++			err = -EIO;
++			goto cmpl_cleanup;
++		}
++	}
++
++	devlink_fmsg_binary_pair_nest_start(fmsg, "FW coredump");
++
++	for (offset = 0; offset < size; offset += length) {
++		length = min_t(u32, size - offset, TLV_MAX_DATA);
++
++		devlink_fmsg_binary_put(fmsg, dump_data + offset, length);
++	}
++
++	devlink_fmsg_binary_pair_nest_end(fmsg);
++
++cmpl_cleanup:
++	fbnic_mbx_clear_cmpl(fbd, fw_cmpl);
++cmpl_free:
++	fbnic_fw_put_cmpl(fw_cmpl);
++
++	return err;
++}
++
++void __printf(2, 3)
++fbnic_devlink_fw_report(struct fbnic_dev *fbd, const char *format, ...)
++{
++	char msg[FBNIC_FW_LOG_MAX_SIZE];
++	va_list args;
++
++	va_start(args, format);
++	vsnprintf(msg, FBNIC_FW_LOG_MAX_SIZE, format, args);
++	va_end(args);
++
++	devlink_health_report(fbd->fw_reporter, msg, fbd);
++	if (fbnic_fw_log_ready(fbd))
++		fbnic_fw_log_write(fbd, 0, fbd->firmware_time, msg);
++}
++
++static const struct devlink_health_reporter_ops fbnic_fw_ops = {
++	.name = "fw",
++	.dump = fbnic_fw_reporter_dump,
 +};
 +
-+enum {
-+	FBNIC_FW_COREDUMP_INFO_AVAILABLE	= 0x0,
-+	FBNIC_FW_COREDUMP_INFO_SIZE		= 0x1,
-+	FBNIC_FW_COREDUMP_INFO_ERROR		= 0x2,
-+	FBNIC_FW_COREDUMP_INFO_MSG_MAX
-+};
++int fbnic_devlink_health_create(struct fbnic_dev *fbd)
++{
++	fbd->fw_reporter = devlink_health_reporter_create(priv_to_devlink(fbd),
++							  &fbnic_fw_ops, fbd);
++	if (IS_ERR(fbd->fw_reporter)) {
++		dev_warn(fbd->dev,
++			 "Failed to create FW fault reporter: %pe\n",
++			 fbd->fw_reporter);
++		return PTR_ERR(fbd->fw_reporter);
++	}
 +
-+enum {
-+	FBNIC_FW_COREDUMP_READ_OFFSET		= 0x0,
-+	FBNIC_FW_COREDUMP_READ_LENGTH		= 0x1,
-+	FBNIC_FW_COREDUMP_READ_DATA		= 0x2,
-+	FBNIC_FW_COREDUMP_READ_ERROR		= 0x3,
-+	FBNIC_FW_COREDUMP_READ_MSG_MAX
-+};
++	return 0;
++}
 +
- enum {
- 	FBNIC_FW_START_UPGRADE_ERROR		= 0x0,
- 	FBNIC_FW_START_UPGRADE_SECTION		= 0x1,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-index 1a92e4be010e..4644c9f5e300 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -791,6 +791,215 @@ void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd)
- 		dev_warn(fbd->dev, "Failed to send heartbeat message\n");
++void fbnic_devlink_health_destroy(struct fbnic_dev *fbd)
++{
++	devlink_health_reporter_destroy(fbd->fw_reporter);
++}
++
+ void fbnic_devlink_free(struct fbnic_dev *fbd)
+ {
+ 	struct devlink *devlink = priv_to_devlink(fbd);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index 53690db14d77..e71be857d692 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -196,6 +196,8 @@ static void fbnic_health_check(struct fbnic_dev *fbd)
+ 	if (tx_mbx->head != tx_mbx->tail)
+ 		return;
+ 
++	fbnic_devlink_fw_report(fbd, "Firmware crashed detected!");
++
+ 	if (fbnic_fw_config_after_crash(fbd))
+ 		dev_err(fbd->dev, "Firmware recovery failed after crash\n");
+ }
+@@ -279,6 +281,10 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		return -ENOMEM;
+ 	}
+ 
++	err = fbnic_devlink_health_create(fbd);
++	if (err)
++		goto free_fbd;
++
+ 	/* Populate driver with hardware-specific info and handlers */
+ 	fbd->max_num_queues = info->max_num_queues;
+ 
+@@ -289,7 +295,7 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	err = fbnic_alloc_irqs(fbd);
+ 	if (err)
+-		goto free_fbd;
++		goto err_destroy_health;
+ 
+ 	err = fbnic_mac_init(fbd);
+ 	if (err) {
+@@ -358,6 +364,8 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	return 0;
+ free_irqs:
+ 	fbnic_free_irqs(fbd);
++err_destroy_health:
++	fbnic_devlink_health_destroy(fbd);
+ free_fbd:
+ 	fbnic_devlink_free(fbd);
+ 
+@@ -392,6 +400,7 @@ static void fbnic_remove(struct pci_dev *pdev)
+ 	fbnic_fw_free_mbx(fbd);
+ 	fbnic_free_irqs(fbd);
+ 
++	fbnic_devlink_health_destroy(fbd);
+ 	fbnic_devlink_free(fbd);
  }
  
-+/**
-+ * fbnic_fw_xmit_coredump_info_msg - Create and transmit a coredump info message
-+ * @fbd: FBNIC device structure
-+ * @cmpl_data: Structure to store info in
-+ * @force: Force coredump event if one hasn't already occurred
-+ *
-+ * Return: zero on success, negative errno on failure
-+ *
-+ * Asks the FW for info related to coredump. If a coredump doesn't exist it
-+ * can optionally force one if force is true.
-+ */
-+int fbnic_fw_xmit_coredump_info_msg(struct fbnic_dev *fbd,
-+				    struct fbnic_fw_completion *cmpl_data,
-+				    bool force)
-+{
-+	struct fbnic_tlv_msg *msg;
-+	int err = 0;
-+
-+	msg = fbnic_tlv_msg_alloc(FBNIC_TLV_MSG_ID_COREDUMP_GET_INFO_REQ);
-+	if (!msg)
-+		return -ENOMEM;
-+
-+	if (force) {
-+		err = fbnic_tlv_attr_put_flag(msg, FBNIC_FW_COREDUMP_REQ_INFO_CREATE);
-+		if (err)
-+			goto free_msg;
-+	}
-+
-+	err = fbnic_mbx_map_req_w_cmpl(fbd, msg, cmpl_data);
-+	if (err)
-+		goto free_msg;
-+
-+	return 0;
-+
-+free_msg:
-+	free_page((unsigned long)msg);
-+	return err;
-+}
-+
-+static const struct fbnic_tlv_index fbnic_coredump_info_resp_index[] = {
-+	FBNIC_TLV_ATTR_FLAG(FBNIC_FW_COREDUMP_INFO_AVAILABLE),
-+	FBNIC_TLV_ATTR_U32(FBNIC_FW_COREDUMP_INFO_SIZE),
-+	FBNIC_TLV_ATTR_S32(FBNIC_FW_COREDUMP_INFO_ERROR),
-+	FBNIC_TLV_ATTR_LAST
-+};
-+
-+static int
-+fbnic_fw_parse_coredump_info_resp(void *opaque, struct fbnic_tlv_msg **results)
-+{
-+	struct fbnic_fw_completion *cmpl_data;
-+	struct fbnic_dev *fbd = opaque;
-+	u32 msg_type;
-+	s32 err;
-+
-+	/* Verify we have a completion pointer to provide with data */
-+	msg_type = FBNIC_TLV_MSG_ID_COREDUMP_GET_INFO_RESP;
-+	cmpl_data = fbnic_fw_get_cmpl_by_type(fbd, msg_type);
-+	if (!cmpl_data)
-+		return -ENOSPC;
-+
-+	err = fta_get_sint(results, FBNIC_FW_COREDUMP_INFO_ERROR);
-+	if (err)
-+		goto msg_err;
-+
-+	if (!results[FBNIC_FW_COREDUMP_INFO_AVAILABLE]) {
-+		err = -ENOENT;
-+		goto msg_err;
-+	}
-+
-+	cmpl_data->u.coredump_info.size =
-+		fta_get_uint(results, FBNIC_FW_COREDUMP_INFO_SIZE);
-+
-+msg_err:
-+	cmpl_data->result = err;
-+	complete(&cmpl_data->done);
-+	fbnic_fw_put_cmpl(cmpl_data);
-+
-+	return err;
-+}
-+
-+/**
-+ * fbnic_fw_xmit_coredump_read_msg - Create and transmit a coredump read request
-+ * @fbd: FBNIC device structure
-+ * @cmpl_data: Completion struct to store coredump
-+ * @offset: Offset into coredump requested
-+ * @length: Length of section of cordeump to fetch
-+ *
-+ * Return: zero on success, negative errno on failure
-+ *
-+ * Asks the firmware to provide a section of the cordeump back in a message.
-+ * The response will have an offset and size matching the values provided.
-+ */
-+int fbnic_fw_xmit_coredump_read_msg(struct fbnic_dev *fbd,
-+				    struct fbnic_fw_completion *cmpl_data,
-+				    u32 offset, u32 length)
-+{
-+	struct fbnic_tlv_msg *msg;
-+	int err = 0;
-+
-+	msg = fbnic_tlv_msg_alloc(FBNIC_TLV_MSG_ID_COREDUMP_READ_REQ);
-+	if (!msg)
-+		return -ENOMEM;
-+
-+	if (offset) {
-+		err = fbnic_tlv_attr_put_int(msg, FBNIC_FW_COREDUMP_READ_OFFSET,
-+					     offset);
-+		if (err)
-+			goto free_message;
-+	}
-+
-+	if (length) {
-+		err = fbnic_tlv_attr_put_int(msg, FBNIC_FW_COREDUMP_READ_LENGTH,
-+					     length);
-+		if (err)
-+			goto free_message;
-+	}
-+
-+	err = fbnic_mbx_map_req_w_cmpl(fbd, msg, cmpl_data);
-+	if (err)
-+		goto free_message;
-+
-+	return 0;
-+
-+free_message:
-+	free_page((unsigned long)msg);
-+	return err;
-+}
-+
-+static const struct fbnic_tlv_index fbnic_coredump_resp_index[] = {
-+	FBNIC_TLV_ATTR_U32(FBNIC_FW_COREDUMP_READ_OFFSET),
-+	FBNIC_TLV_ATTR_U32(FBNIC_FW_COREDUMP_READ_LENGTH),
-+	FBNIC_TLV_ATTR_RAW_DATA(FBNIC_FW_COREDUMP_READ_DATA),
-+	FBNIC_TLV_ATTR_S32(FBNIC_FW_COREDUMP_READ_ERROR),
-+	FBNIC_TLV_ATTR_LAST
-+};
-+
-+static int fbnic_fw_parse_coredump_resp(void *opaque,
-+					struct fbnic_tlv_msg **results)
-+{
-+	struct fbnic_fw_completion *cmpl_data;
-+	u32 index, last_offset, last_length;
-+	struct fbnic_dev *fbd = opaque;
-+	struct fbnic_tlv_msg *data_hdr;
-+	u32 length, offset;
-+	u32 msg_type;
-+	s32 err;
-+
-+	/* Verify we have a completion pointer to provide with data */
-+	msg_type = FBNIC_TLV_MSG_ID_COREDUMP_READ_RESP;
-+	cmpl_data = fbnic_fw_get_cmpl_by_type(fbd, msg_type);
-+	if (!cmpl_data)
-+		return -ENOSPC;
-+
-+	err = fta_get_sint(results, FBNIC_FW_COREDUMP_READ_ERROR);
-+	if (err)
-+		goto msg_err;
-+
-+	data_hdr = results[FBNIC_FW_COREDUMP_READ_DATA];
-+	if (!data_hdr) {
-+		err = -ENODATA;
-+		goto msg_err;
-+	}
-+
-+	offset = fta_get_uint(results, FBNIC_FW_COREDUMP_READ_OFFSET);
-+	length = fta_get_uint(results, FBNIC_FW_COREDUMP_READ_LENGTH);
-+
-+	if (length > le16_to_cpu(data_hdr->hdr.len) - sizeof(u32)) {
-+		dev_err(fbd->dev, "length greater than size of message\n");
-+		err = -EINVAL;
-+		goto msg_err;
-+	}
-+
-+	/* Only the last offset can have a length != stride */
-+	last_length =
-+		(cmpl_data->u.coredump.size % cmpl_data->u.coredump.stride) ? :
-+		cmpl_data->u.coredump.stride;
-+	last_offset = cmpl_data->u.coredump.size - last_length;
-+
-+	/* Verify offset and length */
-+	if (offset % cmpl_data->u.coredump.stride || offset > last_offset) {
-+		dev_err(fbd->dev, "offset %d out of range\n", offset);
-+		err = -EINVAL;
-+	} else if (length != ((offset == last_offset) ?
-+			      last_length : cmpl_data->u.coredump.stride)) {
-+		dev_err(fbd->dev, "length %d out of range for offset %d\n",
-+			length, offset);
-+		err = -EINVAL;
-+	}
-+	if (err)
-+		goto msg_err;
-+
-+	/* If data pointer is NULL it is already filled, just skip the copy */
-+	index = offset / cmpl_data->u.coredump.stride;
-+	if (!cmpl_data->u.coredump.data[index])
-+		goto msg_err;
-+
-+	/* Copy data and mark index filled by setting pointer to NULL */
-+	memcpy(cmpl_data->u.coredump.data[index],
-+	       fbnic_tlv_attr_get_value_ptr(data_hdr), length);
-+	cmpl_data->u.coredump.data[index] = NULL;
-+
-+msg_err:
-+	cmpl_data->result = err;
-+	complete(&cmpl_data->done);
-+	fbnic_fw_put_cmpl(cmpl_data);
-+
-+	return err;
-+}
-+
- int fbnic_fw_xmit_fw_start_upgrade(struct fbnic_dev *fbd,
- 				   struct fbnic_fw_completion *cmpl_data,
- 				   unsigned int id, unsigned int len)
-@@ -1220,6 +1429,11 @@ static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
- 			 fbnic_fw_parse_ownership_resp),
- 	FBNIC_TLV_PARSER(HEARTBEAT_RESP, fbnic_heartbeat_resp_index,
- 			 fbnic_fw_parse_heartbeat_resp),
-+	FBNIC_TLV_PARSER(COREDUMP_GET_INFO_RESP,
-+			 fbnic_coredump_info_resp_index,
-+			 fbnic_fw_parse_coredump_info_resp),
-+	FBNIC_TLV_PARSER(COREDUMP_READ_RESP, fbnic_coredump_resp_index,
-+			 fbnic_fw_parse_coredump_resp),
- 	FBNIC_TLV_PARSER(FW_START_UPGRADE_RESP,
- 			 fbnic_fw_start_upgrade_resp_index,
- 			 fbnic_fw_parse_fw_start_upgrade_resp),
 -- 
 2.51.0
 
