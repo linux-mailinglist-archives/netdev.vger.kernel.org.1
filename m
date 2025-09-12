@@ -1,88 +1,158 @@
-Return-Path: <netdev+bounces-222631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93CEFB551E2
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:39:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8A64B551E1
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 16:39:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B581CBA1D5A
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:35:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B36C9BA27A8
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 14:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2205C3126C8;
-	Fri, 12 Sep 2025 14:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B2E311959;
+	Fri, 12 Sep 2025 14:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5PCu91a"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aFT/2EW8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6149311C20;
-	Fri, 12 Sep 2025 14:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9DD3128AF;
+	Fri, 12 Sep 2025 14:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757687724; cv=none; b=EuVeYU8UaiJNsYgFII+Qu6OHrpiNu0sDwUkfngAHSa073XctZVgouRtUtViQNb1MgS1jh3AnmrPkF15LsJsD7pCtY3xAdwLTHTpeksMY2QX4gay5G3sqX+UoYn/kCs+srV/jhBcdtW2dg7RZCuStd0Drgkz9lfGYex4HkKfb4Mc=
+	t=1757687894; cv=none; b=a5h4SVXsZ9G7bBP+LT3P/GkPAOwfnaryd/sOS7RpCMdggF6FeWnhEYcOC6Kzj+s+gcrDfmf/o/7cyAku5OFPgieRyrF9St7YIzDi+kQmh23tWyHrgwPPCYzYjgVrrzlX35hXbJgGEnyF/toNlibO+iALbvtaZJ+V3Re0xbZW2ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757687724; c=relaxed/simple;
-	bh=g8zBXWhLOQ8QclhPPIH4f4LSDxcnM1YQ42JzlNbk82w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jZqoutOT5HgI4v8F7cYns36Xttmz2QxpjdrTMDzyBq5eHzXKAta9MAkB+jBZzZKw0yo9PDxKLPGZdVsz/irr3puMIpsEnAPD3FasO2k+MFijgK2GOHDcmyZPMLddx+zt6qjoL3mR4fh2Vh0Uu/PM1GEnKxkvnMxdWj3GawHcgA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5PCu91a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A75C4CEF5;
-	Fri, 12 Sep 2025 14:35:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757687723;
-	bh=g8zBXWhLOQ8QclhPPIH4f4LSDxcnM1YQ42JzlNbk82w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h5PCu91aUshZBhMHeskmm/h12H3VgPmTEpTrvd/LQh5TG794fz36sYpls5TjfDQ65
-	 kuanw3yQ5wFVMeYzURenOj0LH5MPg1nuSqAMzN+/I983P1xB19fHwxX+ODRa6EFrgB
-	 gpV6ixRdBfCo/iHFOj/zDbNLOHmTq4MeaWscRFc53r30xzla9uVAUcXj7kgKiKmrUy
-	 Z4upwfMkGpoJu+9zqOR0sJjtO8eJvP3iHl1YRMsUpd/OPEMZ7xtCavmwWsjeDdLf6B
-	 M9rkFXtc8m04KFkL8/fNFc4QbwocWIDiA2o4911VWlWtG0+HGjRwBdANjHLJKifbNK
-	 BB1Pai+/Dnb7g==
-Date: Fri, 12 Sep 2025 07:35:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Yeounsu Moon" <yyyynoom@gmail.com>
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni"
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: dlink: count dropped packets on skb
- allocation failure
-Message-ID: <20250912073522.26c1b04a@kernel.org>
-In-Reply-To: <DCQQIQ5STYSJ.1X531TK8K9OTS@gmail.com>
-References: <20250910054836.6599-2-yyyynoom@gmail.com>
-	<20250911170815.006b3a31@kernel.org>
-	<DCQQIQ5STYSJ.1X531TK8K9OTS@gmail.com>
+	s=arc-20240116; t=1757687894; c=relaxed/simple;
+	bh=+W9RkNkmmT1IiTtBnRQIf0vW4aRt3gzcijwo74OaTUw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DxD9ITJzvsmsQl6kzHhOHc/8XNBPsB/r3UFXneOaHgD/aVyGgiJzpjsOQW3hl2kR2+7GlGPXtnIKs2HQNdCebAnf2tY28IEofK4BsXvl8rBkuae+MFgcpo4nnqF/UOm77/ZRDI4DocYCtyxGT3OBbgpz4Yb2GTWWYZ7bYMgbegQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aFT/2EW8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=KqBKUZlM/P2XIZmldzfqFf87P0LiDauesCM5frm4wHM=; b=aFT/2EW8+DdbUF9V9Qseem00aq
+	TKs/hvQR3QWDTBkaq6UvjrdPvBvBTAu1IbZOng6qIKS58tCRLOhFgdsMyztFvTGf/rtswHIbWnGCL
+	BZ7l4RDv+5NK2eDycPi+DVEuTxHcYKAjNU6kJ02nGhu93bMTq6j1rz3jWpz83Lw6AI8N/dUA2JzFt
+	j+OQEJdOEIMaaEa8pOOhvIPwGc5PDjjUiDfjg2KABjPJxrsJqApXFvWjH29BDxTA3E60fe755FaPg
+	C/3FkTHnZwWYk8tnDcI9tfNsAdfKbM9o0dxnXeA0BuFGhpPMAi/1Okcl5Beu7wFDw9ZDCdhSPecfq
+	4XopNUTw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38276)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ux4uT-000000004j2-1wjo;
+	Fri, 12 Sep 2025 15:37:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ux4uO-000000003Za-2uZp;
+	Fri, 12 Sep 2025 15:37:52 +0100
+Date: Fri, 12 Sep 2025 15:37:52 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
+	stable@vger.kernel.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Lukas Wunner <lukas@wunner.de>, Xu Yang <xu.yang_2@nxp.com>,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
+ PM to avoid MDIO runtime PM wakeups
+Message-ID: <aMQwQAaoSB0Y0-YD@shell.armlinux.org.uk>
+References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
+ <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
+ <b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
+ <aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
+ <20250911075513.1d90f8b0@kernel.org>
+ <aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
+ <22773d93-cbad-41c5-9e79-4d7f6b9e5ec0@rowland.harvard.edu>
+ <aMPawXCxlFmz6MaC@shell.armlinux.org.uk>
+ <a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 12 Sep 2025 19:03:46 +0900 Yeounsu Moon wrote:
-> > I'm not sure that failing to allocate a buffer results in dropping
-> > one packet in this driver. The statistics have specific meaning, if
-> > you're just trying to use dropped to mean "buffer allocation failures"
-> > that's not allowed. If I'm misreading the code please explain in more
-> > detail in the commit message and repost.
+On Fri, Sep 12, 2025 at 10:29:47AM -0400, Alan Stern wrote:
+> On Fri, Sep 12, 2025 at 09:33:05AM +0100, Russell King (Oracle) wrote:
+> > On Thu, Sep 11, 2025 at 10:30:09PM -0400, Alan Stern wrote:
+> > > The USB subsystem uses only one pair of callbacks for suspend and resume 
+> > > because USB hardware has only one suspend state.  However, the callbacks 
+> > > do get an extra pm_message_t parameter which they can use to distinguish 
+> > > between system sleep transitions and runtime PM transitions.
+> > 
+> > Unfortunately, this isn't the case. While a struct usb_device_driver's
+> > suspend()/resume() methods get the pm_message_t, a struct usb_driver's
+> > suspend()/resume() methods do not:
+> > 
+> > static int usb_resume_interface(struct usb_device *udev,
+> >                 struct usb_interface *intf, pm_message_t msg, int reset_resume)
+> > {
+> >         struct usb_driver       *driver;
+> > ...
+> >         if (reset_resume) {
+> >                 if (driver->reset_resume) {
+> >                         status = driver->reset_resume(intf);
+> > ...
+> >         } else {
+> >                 status = driver->resume(intf);
+> > 
+> > vs
+> > 
+> > static int usb_resume_device(struct usb_device *udev, pm_message_t msg)
+> > {
+> >         struct usb_device_driver        *udriver;
+> > ...
+> >         if (status == 0 && udriver->resume)
+> >                 status = udriver->resume(udev, msg);
+> > 
+> > and in drivers/net/usb/asix_devices.c:
+> > 
+> > static struct usb_driver asix_driver = {
+> > ...
+> >         .suspend =      asix_suspend,
+> >         .resume =       asix_resume,
+> >         .reset_resume = asix_resume,
+> > 
+> > where asix_resume() only takes one argument:
+> > 
+> > static int asix_resume(struct usb_interface *intf)
+> > {
 > 
-> I think you understand the code better than I do.
-> Your insights are always surprising to me.
+> Your email made me go back and check the code more carefully, and it 
+> turns out that we were both half-right.  :-)
 > 
-> I believed that when `netdev_alloc_skb()` fails, it leads to dropping packets.
-> I also found many cases where `rx_dropped` was incremented when
-> `netdev_alloc_skb()` failed.
+> The pm_message_t argument is passed to the usb_driver's ->suspend 
+> callback in usb_suspend_interface(), but not to the ->resume callback in 
+> usb_resume_interface().  Yes, it's inconsistent.
 > 
-> However, I'm not entirely sure whether such a failure actually results
-> in a misisng packet. I'll resend the patch after verifying whether the packet
-> is really dropped.
+> I suppose the API could be changed, at the cost of updating a lot of 
+> drivers.  But it would be easier if this wasn't necessary, if there was 
+> some way to work around the problem.  Unfortunately, I don't know 
+> anything about how the network stack handles suspend and resume, or 
+> what sort of locking it requires, so I can't offer any suggestions.
 
-There's a ring of outstanding Rx buffers. If the ring becomes
-completely empty we'll start dropping. But that's not the same
-as one allocation failure == one packet drop.
+I, too, am unable to help further as I have no bandwidth available
+to deal with this. Sorry.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
