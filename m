@@ -1,122 +1,151 @@
-Return-Path: <netdev+bounces-222608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A8CB54F93
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:31:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091FEB54FAB
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 15:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEA6D5A55FB
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:31:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8C711CC7EFE
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:35:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B722612F5A5;
-	Fri, 12 Sep 2025 13:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0416330F552;
+	Fri, 12 Sep 2025 13:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IuB1hPcA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HZY+ICV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043EB1D6AA
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 13:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16335303C80
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 13:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757683909; cv=none; b=cThJcrNPIvlC0IjutVBUUJpbEssf3vNGPY5T0HTy0DSPrZiO8H9GnBGIxTdHC8vV4NsTI0+pir8E9KadS1FSfczzv/62XW1+Z8qtNKKl+a0UKHIK9qh7TiY+kVHgxx7Vxx0SF81BCJovHBnj0DsZmd4K3RLdCo5zl+MfPZUfuj4=
+	t=1757684095; cv=none; b=U8OLsINkUirAyVPE587uq8VJg2Znf5MzJsXFsCjHnQqvOV7avF9e7ll8tdusz3RrqlrA6lTHvTYOQxfaWxZcaC5UUhe3euvhJA9P5IHYCz3iTGzlG5sdmv6N3zaGvUT3FefFAaKWQ/7UOPEBKz622hAvVA52/oL74lJpRjalRjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757683909; c=relaxed/simple;
-	bh=EOTi/TK/oJV884DxbtG+g0G+c8SUGR+qUHRJKGOa7pU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kHNGopGQJ3szGivQg2m4uIQcvxuV8BqKcZNNNKa2J5cnuAKZv2uqaOgUKrMJBm3wS6GpgbrrEK82ER7lmfy9DONqMVu+pCZ+lRubmziMepMBSt76IepaTwQTBF541OheZi2a4xpJZccTczeUy38W5jjyi+XF+JxMINRwH2LBY4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=IuB1hPcA; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58C2hcXB028100;
-	Fri, 12 Sep 2025 13:31:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=tuMvVsNB23IjiAcbEEICeRDsBsXZ3
-	a3A2OBE2YnR/4c=; b=IuB1hPcApA/NXsc0Qh5mLSUDt5J/3ToSUdV9Yt0CA+rsw
-	OE2mM+t5Oqvad5xtuN8Pur08dnsfQTCfBubNbLlka4MMTyhIoRafl8IYOL+vQUeB
-	iQt3a4mPfQCTriS50MaJk9hJ+h3N0Mz5qZt3pFdLylO4Yj2gMGD8wqa//SGLYQ8N
-	hJxMO4uH+af3ynmu1up0sytZJfhdBqe2w6Fg0ywVRy9ByNUxK5dAfsAe4gJAkc9k
-	HHIbbStsA/8zCp/ofwr7BCS2OOxOmgsRhCNQvi431HhUSh2IRuDhO5Mf3ZaDihr5
-	iWEBf9J1KgkIK0tfvdX6/82uFfk1kCQdG5MOALobA==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4922sj04hf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Sep 2025 13:31:36 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58CCaVwm013865;
-	Fri, 12 Sep 2025 13:31:35 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 490bde2ayg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Sep 2025 13:31:35 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58CDVY4x002365;
-	Fri, 12 Sep 2025 13:31:34 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 490bde2axq-1;
-	Fri, 12 Sep 2025 13:31:34 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] bonding: fix standard reference typo in ad_select description
-Date: Fri, 12 Sep 2025 06:31:30 -0700
-Message-ID: <20250912133132.3920213-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1757684095; c=relaxed/simple;
+	bh=fEA2x43XLCIFZ1HAK3Qmgt2WPelPhB3G6VX1hKyr04E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EuRinNcVO6/zRz34BmD4dOxGcRkiGgHuyVpuCEn0I6m4+pu6bUZVVjM0zh7UmCRKFMNlF9FeT8CkCw92xiwbtfz9d0/vvI6EtNUWtHxvRI0UY/2vp98Xfp7eQPeIKYhQ83dwyKdl/lnj4ZeHOYrBKg90HPgp+THENG1GB+vGwW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HZY+ICV6; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e9e137d69aaso1347665276.0
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 06:34:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1757684093; x=1758288893; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2bpJdu9pcJQYlguGDM8bqSYyNGG/RarwGDha2QaDV7I=;
+        b=HZY+ICV6iudkiQNYe2sLLea4NT501Dw4egsi9L6nTGUS3TP4likQcWCh0l33zEkBor
+         qld7HSDUKGCUZ3+K0pF4lA1NirUluSRDV7pIkFP+hsPRrt7d8IVtUvbAqpgAtK/rMYs3
+         ggav0uF00M845sDJV/DSYbF8jXSMUNnFIPASX80UqZyWNik35Qs+raHmfHG/lGH+933g
+         CQB8WuC2LHrS3Tdo296WX3l/jWoi+AtyWBkgtjg9iY8nsGB/DEVUNeDQ4gFAkY+ayQoe
+         gMTiOLlY43MuWoA4ffPTPYUnyJz8bzYTCWyahejh6QpwdZqjTto+O57VOagO0Y1NYmte
+         SESw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757684093; x=1758288893;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2bpJdu9pcJQYlguGDM8bqSYyNGG/RarwGDha2QaDV7I=;
+        b=XxuCAqc4Gcr3Xvx88AGq4iMlUD4NZDJMeu0DPTZ0u3anBescezNnKkKhYBQ33j7Ce5
+         HkImHhRe5eA1cETTidGl1v3PwMH9wottKeJ6qUkFcQYhQ6L3ty0aDsFH4onDxLomuS9F
+         fqr6Kau8Jfgzk7miWmuPih+DFI2rz9Aqz1RxhVxezN2JntenhhEqgFol0oU86dQi7n6t
+         epQNOXY2trYwD6ZCb6cbo4aFqojqHbAixmNsd+IkWK3qqCh+eOtFa2gGQgF/x+SKk/HA
+         pVLoDOrILcKZuC432D656UJjhH45YugmSRmso6dR6paO2HE1e8sYBXx/+hX/gWYIi5SD
+         CEJA==
+X-Forwarded-Encrypted: i=1; AJvYcCWs14u7RVymNFQyMiC7fPo+HI2htbIJ8G6RnenZ92eSOVY5pkhjC4Nh5YaR8x+E0LvY3dfXqcI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx01QGL4mmCe6q4RmH6gsr2R3RDn+l/AB/58zsCczyUI0ht8mYN
+	0A96eObTTmSJAT1uE60U9HIN9u9oJ05zYP6VFdKCFMU0oj9TFkY4blBoi/3S1MkUcljZM+VPJjv
+	spY3JFftWdjhjZVK3x8muOm7xx4VhckzktPmjqMaKOBL5jn2rtA/z
+X-Gm-Gg: ASbGncs+ExHQ0Fvo3+AXrb1A96czpJFenzRoodsZvneOXX+HWacbklfVPKI8QIatU9V
+	KI/GAi145fFiEB1r/EnJYM7SXlNgKSaQ5YFQm60hHignDAvAlcqvI81ft8N5peVSh1Odtu8MqWG
+	ptac+/4C6YLsYpEA8foAvRKGCl4SsJD4mDyFa45Oth3Mtw0+S1d86LislwrlnkkGZMABrF6OZTB
+	BGH4XjtVMqKRF94EBo=
+X-Google-Smtp-Source: AGHT+IEuZCNOuhgw71RPHODJCaUVdzYWPbD3/yFfpzIGoCGg4ZN37cLNl53g3621ReprRkmpK3fxKWmw69qSmb5zAxc=
+X-Received: by 2002:a05:6902:420a:b0:e96:cb0a:de1e with SMTP id
+ 3f1490d57ef6-ea3d9a52b30mr2169012276.24.1757684092934; Fri, 12 Sep 2025
+ 06:34:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-12_04,2025-09-11_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 phishscore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
- definitions=main-2509120126
-X-Authority-Analysis: v=2.4 cv=esTfzppX c=1 sm=1 tr=0 ts=68c420b8 b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=fhbEuBtg5PAJj_auYQMA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA4MDE2NSBTYWx0ZWRfX3Qcn6IhZa7LJ
- QTakjB2S1+6z4CdEMnQ8+V9JJ1H0NCdrnrM15MRqQdPBrGq8J65eEJveeDz6Do50xqP2krychs1
- EXbi2QAUgyvTKc9hq0Dwd31NttkfmM9jw3sJNv2aM56eR2i2+trq8IvkGCP1TZLh1K2EOAt3BWj
- 65PUXPxtAzV4kSdmBJgHBsZx4VzYy+qpVMOd1qj55gkDCNpO09QEoOMckRa8ODQ7/pr6VgYT850
- EAKVsZbzToC0GiNSy+kEns4rDQzS6c5k18wg6Ci9zw7tMi9pHp+jH9k5xRPrDrs2P5jbuDtqfg0
- lDQUzy/qa6e/OnsfzvwMieY+63BWJt2f40k6APLRykfnQJmq1TqMhZONDi38nmq7SWxyZefhYe5
- DF9gbTLE
-X-Proofpoint-GUID: _43lEVKguIGqIeF5uwH8fnjmsEFz_brI
-X-Proofpoint-ORIG-GUID: _43lEVKguIGqIeF5uwH8fnjmsEFz_brI
+References: <20250908-lemans-evk-bu-v4-0-5c319c696a7d@oss.qualcomm.com>
+ <20250908-lemans-evk-bu-v4-1-5c319c696a7d@oss.qualcomm.com> <aMP+cdmPkej+lPtN@hu-mchunara-hyd.qualcomm.com>
+In-Reply-To: <aMP+cdmPkej+lPtN@hu-mchunara-hyd.qualcomm.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Fri, 12 Sep 2025 15:34:17 +0200
+X-Gm-Features: AS18NWClkCqcmoRAoe-mTGNfJBFQQqeUo2elvNw9ONlW9bzSgs8qRR9fnA2vWEI
+Message-ID: <CAPDyKFoZEWyysS+WT=JBY388kFgKUeUL5hxm1wL1pmn+NUAEhA@mail.gmail.com>
+Subject: Re: [PATCH v4 01/14] dt-bindings: mmc: sdhci-msm: Document the Lemans compatible
+To: Monish Chunara <quic_mchunara@quicinc.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, kernel@oss.qualcomm.com, 
+	Wasim Nazir <wasim.nazir@oss.qualcomm.com>, linux-mmc@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The bonding option description for "ad_select" mistakenly referred
-to "803.ad". Update it to the correct IEEE standard "802.3ad".
+On Fri, 12 Sept 2025 at 13:05, Monish Chunara <quic_mchunara@quicinc.com> wrote:
+>
+> On Mon, Sep 08, 2025 at 01:49:51PM +0530, Wasim Nazir wrote:
+> > From: Monish Chunara <quic_mchunara@quicinc.com>
+> >
+> > Add the MSM SDHCI compatible name to support both eMMC and SD card for
+> > Lemans, which uses 'sa8775p' as the fallback SoC. Ensure the new
+> > compatible string matches existing Lemans-compatible formats without
+> > introducing a new naming convention.
+> >
+> > The SDHCI controller on Lemans is based on MSM SDHCI v5 IP. Hence,
+> > document the compatible with "qcom,sdhci-msm-v5" as the fallback.
+> >
+> > Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
+> > Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>
+> Hi Ulf,
+>
+> Could you please pick the binding (this patch) through your tree, so that the DT
+> Maintainer can pick up the remaining dts changes through the qcom tree?
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/bonding/bond_options.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sure, I usually do that, but sorry for the delay!
 
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index 3b6f815c55ff..5b967522b580 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -370,7 +370,7 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
- 	[BOND_OPT_AD_SELECT] = {
- 		.id = BOND_OPT_AD_SELECT,
- 		.name = "ad_select",
--		.desc = "803.ad aggregation selection logic",
-+		.desc = "802.3ad aggregation selection logic",
- 		.flags = BOND_OPTFLAG_IFDOWN,
- 		.values = bond_ad_select_tbl,
- 		.set = bond_option_ad_select_set
--- 
-2.50.1
+Applied for next, thanks!
 
+Kind regards
+Uffe
+
+
+>
+> Regards,
+> Monish
+>
+> > Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> > ---
+> >  Documentation/devicetree/bindings/mmc/sdhci-msm.yaml | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
+> > index 22d1f50c3fd1..594bd174ff21 100644
+> > --- a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
+> > +++ b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
+> > @@ -48,6 +48,7 @@ properties:
+> >                - qcom,qcs615-sdhci
+> >                - qcom,qcs8300-sdhci
+> >                - qcom,qdu1000-sdhci
+> > +              - qcom,sa8775p-sdhci
+> >                - qcom,sar2130p-sdhci
+> >                - qcom,sc7180-sdhci
+> >                - qcom,sc7280-sdhci
+> >
+> > --
+> > 2.51.0
+> >
 
