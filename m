@@ -1,140 +1,115 @@
-Return-Path: <netdev+bounces-222395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF486B540BC
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 05:04:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FE7B540BF
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 05:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 969853A86B0
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:04:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82CD21C26BE1
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2847C1D90AD;
-	Fri, 12 Sep 2025 03:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBDE222582;
+	Fri, 12 Sep 2025 03:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BHZIIFDH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIlixAeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A537F3597B
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 03:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41E41991CA
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 03:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757646284; cv=none; b=NTqwd7QoFtbOw0Cqxk2zce5jhKwgbU3DLGX/pEUycu5DKFTYaKTKA8GdlG4kfVKiRmq62e89GKfllkejONZZO16IfpZyua7V0gj6Jz6sg5e5499cRwIguPLVpui3/xM/nEeGOZ1ggUnx0dAw6cvvZz3l9wQ9bYSkeOnUe3mfJKE=
+	t=1757646559; cv=none; b=H2jAa9W/hmeumQTpwvaBt7XRWSEkRcikkdxM35hPp3LAzn6/JGcyaZUVXH9iW6CPiCAACIg0Pm6I33Lt06wnxUyDIDh+Nm5208oedYI3t7SYk/1dhjeC+rBnCke7d7M0dp59G3AZ8Kq5m4iOJBL7VAoEI/ATRrh1+hDFJr9XhIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757646284; c=relaxed/simple;
-	bh=nmuRw4Lnt0FC63tNFSruI/MFuiURdvkUmoJvN25GCQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ouN9cXi/a4puz27P2a3ZEFm4Qlht666J4I9f7MUlA7O7QwI+EzJ+0xQ936Ksf+oKdBkJWQntoUIrlRiiZF6uhOfg5qLWu4/oUiYdUg8fNW5M2dMa6PQQpz0wDNnax7bF7yxdUDL76rxobXSVEUIMteGNr8SCihHrqX6yoxG7q60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BHZIIFDH; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1757646559; c=relaxed/simple;
+	bh=yUI8GG7e0bDczXxnxpCR8zbI++EUhyVr0r5RE8qR0cc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u8QDkAZwvZ99PpMasXq9dB2u/JTJJRoq/U2/INp6i0+2q1iJmNuGXmkXW8mlxtQX/2Qq2E5Lp8/Cwz/KUeW2aKFmM8m4dApSvVapQqpY8jPVNCOzdAlyc2A3Y9CXaT39pavcRBWH7y5E/Qlgk2qeWzccv/ef65ZHHP5c9qFRqZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIlixAeu; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-251ace3e7caso18620345ad.2
-        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 20:04:42 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2570bf6058aso19234625ad.0
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 20:09:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757646282; x=1758251082; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=gmail.com; s=20230601; t=1757646557; x=1758251357; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=O6NJfkyxkT3pO+7wqsuPcsmhLtRqJkDys/1ZVlsqcCg=;
-        b=BHZIIFDHCyYLs0VpsKvZTT99EeyPu0aqTOuuhcQNlvKYJ053NN3XDsiB6x+TIz0oLG
-         4rAhWGQNjqlZIQm5MCofs/dGOD9Zd+GixrcOfhJjn8d+w4/6R6BSf8EImtw1weinnkuv
-         py9nedOO/kVcaq8FfQPStzQQBfO+77qVkZZPhjvpWyCZp9lB8FmAXa1YR1a2NR0eUnxJ
-         DVbyyVI9STVbZsC0XWQc2JnL0q6qTSQIlD19pHR5LO9Q0+E1GHEFLBDEJm+w1WuZMSfe
-         yDN3KNVyO+4SEf+WVEVTTCNxpD8ld+hW1ELLKHH+O+XWnFKAG7n04Z+crGjg12/d766D
-         HEDg==
+        bh=4geV6ob0qK97VAn3WsxVaPTEAoOywPWCevip8ujLoJY=;
+        b=SIlixAeu+drVEKEsaFUNQFZjUHEkqo248Dz361wmfBKrxlNg9sMVpCWfGDYkL1B6GX
+         pLwxqibpe7TXiVvieAp8eCAS76LNRSbnkbS3tXmcicXlNl3XmU+xyV3ASBxXyXZsCUO4
+         SQrC6rGaU98KsQuRkY8rQZSo4CVZ++3RJgquMzJAQMBcaJtGFAR64Rg99iIz+2IqMQn/
+         XE2VG6x8HIfxyVSTFYhjCZEpRGPb9lG5cnGA8A5O1/e7+5qmj7np1mAqE1wV/Rs4bKx/
+         ZV6B7eOuVNUsVS+dmh67xV9TI3wq69zyhPWC6S8y8Qqfc51dN6nh+Cgtg2QPjqfNqGa6
+         ZlkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757646282; x=1758251082;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1757646557; x=1758251357;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O6NJfkyxkT3pO+7wqsuPcsmhLtRqJkDys/1ZVlsqcCg=;
-        b=huLS/mZRHjBRyvI+sBnETR2mHTrny9Q/n773gYt5gTHBVoiMdBx+f4y2OGBUm6LGm7
-         CMO8wFtckG2vKf4Hd4Ulkm/VXTBDe3VxQLws8hBIIVtXYUHkEdFPYGlpvTMgLRHztIqU
-         ou9bJsjHJLRHOk2BdiO0BmTWFwjoIP7yOWTJ3pP2HxQJnMZrKGdVrvBWcOzqi8kJGqTT
-         fb4z0dO/G/diGvs3bDSnvxJ4ZbixxWp9eBEx+mtWEU5YpX5crbq2aAhaQoOtlV4zA8EM
-         RZsWpWoLLOJXSiYJIkiOJAkTX2KgzNTAk9YEn+hi9+20apl0Ekyy638pjh3RDh8/jzi4
-         5yRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbGtdf4xrprA/KYTkyIHOCIpM/m5BPljkgpU5kiXNrGvEdzi+HAKp7Zxw5GCsOD8P5uDgxJxg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6Yeyjz2rxQhzByRT1ZHivSfCvkYjymtq+a2uSVN10dWwa81i0
-	gnkU1CCCOvfcXx+9yOJ8j1CwxHuhlhitJ99DJNy+nWjGGb8SXcyraOYL
-X-Gm-Gg: ASbGnctoKxzjsLdz7R1OeWEGnHLECwuv+NYk/c/Uh+rk4wMerT8lMEYclH4KkI6JSvM
-	OAHoL24TNSKyTF4yIzIX6zul/gttkJB3qpqaeZuMH94Q2JQcSFwyP+5TRiasel4HtkvawyK8RdG
-	lK2f4G1PnEmlDzoB6QqLsw1TiFpO5EMW0vuoxWV8Bmb8hJS4Nc2eeGHIqcgS4jCgeijLAEzpGSU
-	wTgrOrdAD2KbaeD17fN3dZUFaMeoTRi+X0cu9TFSivbc/sND1GX7D34cBJLEWxLEC3pxd+urHX8
-	YwEa0YLU6dKNwp26X4RyudeTA0EdtxTW/6ShwKkpfueTGIZ/d0NQYhPgeDPY7ceUzoAZiV949vP
-	uadypeH9SzHXvu+iRGP9reE76wFcv+m9JFYANyw==
-X-Google-Smtp-Source: AGHT+IG/alMKyBXWGuBUs2ZOxE6Mv8W0iR9DLxBoziRoo4LwYai+4BufuaYzJVS4tQItNB3i5PJLpQ==
-X-Received: by 2002:a17:902:f546:b0:248:c96e:f46 with SMTP id d9443c01a7336-25d27d1d5f5mr13747245ad.60.1757646281732;
-        Thu, 11 Sep 2025 20:04:41 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c37866d35sm33839735ad.64.2025.09.11.20.04.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 20:04:41 -0700 (PDT)
-Date: Fri, 12 Sep 2025 03:04:36 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Yunshui Jiang <jiangyunshui@kylinos.cn>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>, Geliang Tang <geliang@kernel.org>
-Subject: [HSR] hsr_ping test failed
-Message-ID: <aMONxDXkzBZZRfE5@fedora>
+        bh=4geV6ob0qK97VAn3WsxVaPTEAoOywPWCevip8ujLoJY=;
+        b=SSPcXgczaM5wE5kgomHp/3hsvPHvGEiWi7krhWfzpUDVq4Yx3d9rkkfXXM6BLE6WzL
+         HpOZAgb9r4sxbYRixafkpnhhggVRkOjMlRSJaGYPzWRv+0131bSr6VRc/iMClMfzy6r0
+         OtH3CPyHI9QtVY6YlPwwnSen3qAZ3QGLMV35IWyJ2nDda+8kbpa6CUn8afZQgqwzhys1
+         0ldHXlQjnmf5sE7Y2qWOsAWL3pX3zTGyL+cmGGA+PIDBLfPdubtvNENRG2iLZnz4hnVY
+         Q7S2Q/ZsMyiZ5cntheSDgsekpAMe+aK2Pqvyyw0A9aJMOk1kmaJtDFG8EJy3Kfid2OSu
+         f81g==
+X-Forwarded-Encrypted: i=1; AJvYcCXGeWC6rgzB39YnQdcf5twUXw3azrRBKmTZHDJJ4XuFM2DSe0CyIp41j/lFa8mhd46OoSTL3RM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlhaVexdLgiof+GHv0WsMcGF8/jhwM1TZ0+zIwYeTu7qo3r+VF
+	tU6jI+/aWlaaxOWotfs4WL1FJveEDgXIgQLSnu3drfOAmxQXzjZgFJXG
+X-Gm-Gg: ASbGnctb9JMAZdoVSAP9jpmBF96TF7Ox/7CSaJIux3ype0jkZV52/UYQm5P8WPJQw0D
+	IK5pEIEkwzVwpL+hsppUM/p7cusXtHcDAB0w58S6U1slgURKrziqFegy3y5DMwzxGJ75DED28ID
+	gMMSGDh1ZerWLWWmU8oDFQA3Ptnf25raMxzNJZbUKCMuA9nJwz4ZEtYdmXQcr86jBbQtsYW2BJ+
+	brE1H9xhFd77OnRLOE+swEEVgQC/Vd19pzNRIHYd+e6ZGE62HOedWDyxTVYmBTl9KAfxWaVoPNE
+	wxJgwadn2ZUFSJjX8grdCpiLByeFKAcRViMO/p4nNBkwPRZFs2qV40+hraVfuoqAAFattYYBeVs
+	Pz2PpjU1Y0CiSymMHVGQWppxaTZ8Kuy9nCbqd/7YHd4SN+rNIlsdzfOEkSEGxvt1e
+X-Google-Smtp-Source: AGHT+IEH+vFRZxmRvPbolGqsR10fXq1V0MB5GrQMkOUwmu9MOHsXS68HiXErC9Ttiqo9utBGOkT7QA==
+X-Received: by 2002:a17:903:2c6:b0:24b:bbf2:4791 with SMTP id d9443c01a7336-25d2646f828mr19572755ad.39.1757646557076;
+        Thu, 11 Sep 2025 20:09:17 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3b305427sm32849755ad.138.2025.09.11.20.09.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Sep 2025 20:09:15 -0700 (PDT)
+Message-ID: <3b1815e9-b17f-430f-b18b-641f99d9f093@gmail.com>
+Date: Thu, 11 Sep 2025 20:09:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] dt-bindings: net: Drop duplicate
+ brcm,bcm7445-switch-v4.0.txt
+To: Jakub Kicinski <kuba@kernel.org>, "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250909142339.3219200-2-robh@kernel.org>
+ <20250911184329.2992ad3a@kernel.org>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20250911184329.2992ad3a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi, Sebastian, Yunshui,
 
-I tried to run hsr_ping recently on x86_64 arch (build via vng --build
---config tools/testing/selftests/net/hsr/config, latest net branch,
-iproute2-6.15.0) and the test always failed due to error
-"Expect to send and receive 10 packets and no duplicates."
 
-I checked the normal ping test and found it also has duplicates.
-e.g.
+On 9/11/2025 6:43 PM, Jakub Kicinski wrote:
+> On Tue,  9 Sep 2025 09:23:38 -0500 Rob Herring (Arm) wrote:
+>> The brcm,bcm7445-switch-v4.0.txt binding is already covered by
+>> dsa/brcm,sf2.yaml. The listed deprecated properties aren't used anywhere
+>> either.
+>>
+>> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 
-PING 100.64.0.3 (100.64.0.3) 56(84) bytes of data.
+Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
---- 100.64.0.3 ping statistics ---
-2 packets transmitted, 2 received, +3 duplicates, 0% packet loss, time 1012ms
-
-I'm not sure if I missed some configurations or anything else. How do we make
-sure there is not duplicates?
-
-Another issue during my testing is that the test checks
-
-        while [ ${WAIT} -gt 0 ]
-        do
-                grep 00:00:00:00:00:00 /sys/kernel/debug/hsr/hsr*/node_table
-                if [ $? -ne 0 ]
-                then
-                        break
-                fi
-                sleep 1
-                let "WAIT = WAIT - 1"
-        done
-
-While in my testing the debug log shows 00:00:00:00:00:00 for mac B address
-during the whole 5 seconds.
-
-/sys/kernel/debug/hsr/hsr1/node_table:00:11:22:00:02:01 00:00:00:00:00:00  10026a200,  100265ef5,              0,     1
-/sys/kernel/debug/hsr/hsr1/node_table:00:11:22:00:02:02 00:00:00:00:00:00  100265ef5,  100269800,              0,     1
-/sys/kernel/debug/hsr/hsr1/node_table:00:11:22:00:03:01 00:00:00:00:00:00  100266140,  10026a200,              0,     1
-/sys/kernel/debug/hsr/hsr1/node_table:00:11:22:00:03:02 00:00:00:00:00:00  100269000,  100266140,              0,     1
-/sys/kernel/debug/hsr/hsr2/node_table:00:11:22:00:01:01 00:00:00:00:00:00  100269000,  100265ef5,              0,     1
-/sys/kernel/debug/hsr/hsr2/node_table:00:11:22:00:01:02 00:00:00:00:00:00  100265ef5,  100269000,              0,     1
-/sys/kernel/debug/hsr/hsr2/node_table:00:11:22:00:03:02 00:00:00:00:00:00  100266140,  10026a200,              0,     1
-/sys/kernel/debug/hsr/hsr2/node_table:00:11:22:00:03:01 00:00:00:00:00:00  10026a200,  100266140,              0,     1
-/sys/kernel/debug/hsr/hsr3/node_table:00:11:22:00:01:02 00:00:00:00:00:00  100269000,  100265ef5,              0,     1
-/sys/kernel/debug/hsr/hsr3/node_table:00:11:22:00:01:01 00:00:00:00:00:00  100265ef5,  100269000,              0,     1
-/sys/kernel/debug/hsr/hsr3/node_table:00:11:22:00:02:02 00:00:00:00:00:00  100265ef5,  10026a200,              0,     1
-/sys/kernel/debug/hsr/hsr3/node_table:00:11:22:00:02:01 00:00:00:00:00:00  10026a200,  100265f98,              0,     1
-
-Thanks
-Hangbin
 
