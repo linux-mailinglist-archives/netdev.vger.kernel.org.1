@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-222695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB4A5B5572D
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:55:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B314B5572C
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 21:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3ED70B600FE
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:53:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E005568232
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 19:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1708B33EAED;
-	Fri, 12 Sep 2025 19:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A07134166B;
+	Fri, 12 Sep 2025 19:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DjxY9xfs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FmB0KJpX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AB03375A9
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BACF33A003
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 19:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757706846; cv=none; b=X0m0QlM3xMgBAlFEMURkw5e0iPWAlEVZ5RrnaXAyei+sI0GLrcq9BHo/KKsLQBDzW4B4gEP00nSQWMlFxleDuAyT/b2s43M7B6+VKwEQlKfwTUiqsrqC9tPYnIbGg8mJk+AOJ+mJwiTOp3FgN4fxkqSbON9UXFdTcu9PkwsDCv0=
+	t=1757706847; cv=none; b=sKSryZ7LqDWN3wlrlec5MOK6HnpbgPVmOaSVtidlPxgz5m+G5ugRJR14FkRHG85gycDn2hVTS4G+LGcyG8VZ9EkguMaDWpVGT41V90SusUDntd0s+7ehvcA+HyulrJ/EtFY7l0FV592Esh60mjftt9+Jkkqrf6oJev1PzmEmomU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757706846; c=relaxed/simple;
-	bh=vtDr/kO1KchOCd5UEjGrTzcH3EcLOyUzNxhEjmZWIks=;
+	s=arc-20240116; t=1757706847; c=relaxed/simple;
+	bh=i9K1yIVISo2iQdbGiNCGMmX6M0Ed8p2gmujg5khZUS0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BORQzset7ouT+L/Or8nmIjSmBfe6gX1DQkgNmL1UOWiEgC3FLE3upzdVDG9nxJh7gTJziJkSNbDDzbqhGLDyApZORCVNIGUghkBqOfynCqOH5p7CfegBkGxLQXP8gPZB+ww5ksuX526GguZPwwoFBaTB6TUfNlii0g8hNb0pJJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DjxY9xfs; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version; b=g1msMk1ucfQ8RzzVvsRS7+NZEb89HLlL1v8KpA4dgSvmkpzscmgZoX8CkBvg415FsdCfinv1D7HM4ySNkJgH5RqaLknYcKze48boIEQTgr94lC3twVkewEGERnag2Z3XeqnKmNTmjBxsE+IkknreaTT8l0REmZkccHnhuYz1P8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FmB0KJpX; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3df2f4aedc7so1537583f8f.2
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:54:03 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3dae49b1293so1278694f8f.1
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 12:54:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757706842; x=1758311642; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757706843; x=1758311643; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RMaCvv0Npwgx9oOEe08/7S4E7IejpQl1+Xgtp1j/Fs0=;
-        b=DjxY9xfsTYSWk4yR99ILE8xz3o2YSg36NeLT/0A2zoMV3EWUuOrsgn1WIyXCR6ANPo
-         UYyLI6YmX1CE6xVed3nBQyAt0A6is/FMJ/Q5g/DEJDDoMmkEkPdijK+A0J0q7OBB4rwz
-         ao0Ubnqb49/zIRFbcuJGVOvYy0AIXEeQ06wEQCJaNHDQswIy0JICDIZLzwlh58zNmNkS
-         KBj5/TlTzGm79+LWErw8FPdnSzmR2MWhRJiosaZh/CryQAfQfMYf4wLsObNr40kdOsrT
-         C+RrSBMBvYu7A3ZT8o70mVOUP8W0JK9FHpS1HXmQwaIawQXHynkVc+tBUjGxuZNMrrv5
-         6x9Q==
+        bh=HJf9PqzT7hCLse/9dc5RnwMhZr9VIrZ+OxaGIRW52I4=;
+        b=FmB0KJpXntobLEh5anKKetIlT+aOKPdtezTmCZwruXA/z0THXKhk9Lzhvafj7kTBBe
+         mox4NOch+Rgntf5TObXKiucVCHfRTKDEkpNzpAynLo25CcTnfC4eC+KZxdjMyLqh1p0L
+         4GtOC5MhB60kSEZdornio4QZEBH9ivwEBpBlPTPK9NIPXwMT1XCsSBUrqLJY+d0ARUlT
+         4LoJkYsa4iMDNbJ4475xeHp75MSBLFdQUGC5LqmMXOjQzyzUJbA2RagXjIQ5lx8sZ7EH
+         fk+jx6HkWf/I1MmoEShVXghMJXBl6tm0i/mPExaUyeuyWj05g4eL/tciGkYeIR9T+INs
+         dvoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757706842; x=1758311642;
+        d=1e100.net; s=20230601; t=1757706843; x=1758311643;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RMaCvv0Npwgx9oOEe08/7S4E7IejpQl1+Xgtp1j/Fs0=;
-        b=xUWBJu9b7g1N8XeoVNo04FXsgJkw4UfDcHEyLC2PAZ51L31gHe5Am9LsiemsUDCrq5
-         wMK/c0qSHpGqEYfilEdGYIFtJoJvfRTKxDzEKFYaszdsOhsZE2HhdGYZzG/qJHtxK8L/
-         BKvY0UgZ2AP6+RfM7G/3uVZ8ky7xwbjLgjxzr9+LpU3tSzlhpON93A64N9Z71MoM5idL
-         nX6KvbQRsEtYL63vUiizQUpabrm0xJZS1I+h7PZS/TQ7GtlROI6TwAaivNJ340F62SDk
-         UYJh5sw+bTNb/pp91jNWgVYk3Z2TGP+2T9J7pFdB2Q029zF53D2HctMW+8tdrQUXK+af
-         040A==
-X-Forwarded-Encrypted: i=1; AJvYcCWWoeY/RmcAS6hKajlwOsq5o8lOr25QRqCY0wDuLnd4ch40BBMIRkaAkj/5u4QEqz4d3uJjpQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybaJYeZMPoKIJSGqvQriBqPyXye+HUminWsNezjAu5LUywb+3y
-	XQSv7l2v7OhdsK/tV89G3FvY4RpbQKBp1GrRTKx9UwIvi2nLS7J0DU75c++Ymg==
-X-Gm-Gg: ASbGncvYkOl2XN2KPFGfTAG/6kMliyxAl+9H6nY4RFR1tI7p1kpJ7EobFjpFpV82IDt
-	2EJC7WjoAjFYoBaHBldGppp5vTWTEBNDzZphrxTpgwRDhhSuT2VtXFOgsbHPz0y9w6VQoiVMLX3
-	g9bw4yr3c0PhXy+JYv5jg7i1qsEKMd8GPr9A7zU2IHRP5qmJz3VLVaYrjcqwoVUAwM7o4p4ZTMB
-	MP6NlkCTbGiBw8OWGJlKk0xIah0/hRQA+ahQyqA6FyImLfeZ5Dltn4I8lUevqB6s+pYMCAolCr0
-	6nuwuypwz88ZMpNQOLlS0LpwNU/qqAQWnMJkgKJC/LYxdVWCRcPS43ZDvgLjVwpoNbgsu2+ycxT
-	1SP1742QaD9H2cNZ/NhiYvBG8CKKL0UFxcNA/aDDqV8gSy6RkFzZrKCBLNJtkpgpGpJc2jk3J
-X-Google-Smtp-Source: AGHT+IHOezLJRLoDEw/gyTNCxGzG6tpMAlxv09ll/ErrKIIhPmloNLfh1ZLyplu0Cr/e++Aufdl6nA==
-X-Received: by 2002:a05:6000:178e:b0:3d6:212b:9ae2 with SMTP id ffacd0b85a97d-3e765a53ca5mr3716925f8f.63.1757706842098;
-        Fri, 12 Sep 2025 12:54:02 -0700 (PDT)
+        bh=HJf9PqzT7hCLse/9dc5RnwMhZr9VIrZ+OxaGIRW52I4=;
+        b=vczOukY3nk/Ex6EJJbAcYSTq6S5ad+ih+U229YfTwNcYxuR4wKpB+qHi5zKACf7SG5
+         PDSg9QX2QWG1XcgPngROnk4I8p2tBHmQNE5pRH66xq4OVxHk3FWxKymogRjY1v3A+FDJ
+         Z9g9mhVEuwhnQJu30Cf2nw/8JLlaRUnKtvg+NA5vFeKez+ute5Oi1oojgWfa+K/25k/z
+         tYzmkE8hbjg9OcNjQjzMvMcldv3/ucV5YG8GBjuY1Xw4xiRJSPpB/tKSb5KmUTlm4mMa
+         +8WR2XA9j50xp2ZlDGV8lKZV5XKTcN3xAEcp4ECRbUMZZiYzbxTkU6N6j3pXYwaP48Xx
+         q/Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCUAoPfeneY2btL9qSwlEMS+ra1Cmpnk3cbamehAvi8vqmBnaYmWlffzpke0MTB5jbJidtjzzXw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTGwBhHjqH8qg4RlamP8vU0BAdTSSXlzZmwtX+iY5UWC66Og54
+	wopCap+YnKz1gDN32MRJWf+FHsvMUCBUGITOROlyyaRA6DTES1M19It9
+X-Gm-Gg: ASbGnctPsGxB0hveCLCDqGWEEDUU6TW1dmG2o1evwDag4DIiUnZio+IDgJN45TRvWds
+	t7z4Xo76pEBnreAkjQG8k6oSVCnHxbxUfIHVRaIoAdP68KRY4v28yuWKGl1wsQ2tqAV4+BKw2eu
+	CRnqTX2WtOlDXxu8okUI4IyeYsu9saoeUrWDybO/nwKLXxlZ+wrjTywmw2Og2IX4ocsH5tgxQIE
+	VXZshDkLVa4elIzp79d6f0wXHTdqhxT+AKIgoqEoWe3aLzwXCq4WtaAkztIpgVuWT5tLY5asOsr
+	+82/JQRW0xi5w023t2SiC+Qy63zi4revZpYs+AylEHG5bEB37l/uMZkscUzojLM+HgzRFrnp4hf
+	wj5QHxtJj72fDCE0G/k6F36X88RyWn8d/2GdeT0N3L37zFXdLkVkT6RXjKfrUQRGhADrwLon6
+X-Google-Smtp-Source: AGHT+IEPloYMebO2+94+EujzqnwtJ3qCQMiLzStQnR21n7BZH1TIPhWvC/p9EdtNP7maaHHDBFj5RQ==
+X-Received: by 2002:a05:6000:26c8:b0:3e4:f194:2872 with SMTP id ffacd0b85a97d-3e765a140damr3473105f8f.31.1757706843387;
+        Fri, 12 Sep 2025 12:54:03 -0700 (PDT)
 Received: from yanesskka.. (node-188-187-35-212.domolink.tula.net. [212.35.187.188])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.54.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e017bfd14sm74650375e9.21.2025.09.12.12.54.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 12:54:01 -0700 (PDT)
+        Fri, 12 Sep 2025 12:54:03 -0700 (PDT)
 From: Yana Bashlykova <yana2bsh@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>
 Cc: Yana Bashlykova <yana2bsh@gmail.com>,
@@ -82,9 +82,9 @@ Cc: Yana Bashlykova <yana2bsh@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	lvc-project@linuxtesting.org
-Subject: [PATCH 6.1 07/15] genetlink: add THIRD_GENL family
-Date: Fri, 12 Sep 2025 22:53:30 +0300
-Message-Id: <20250912195339.20635-8-yana2bsh@gmail.com>
+Subject: [PATCH 6.1 08/15] genetlink: verify unregister fails for non-registered family
+Date: Fri, 12 Sep 2025 22:53:31 +0300
+Message-Id: <20250912195339.20635-9-yana2bsh@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250912195339.20635-1-yana2bsh@gmail.com>
 References: <20250912195339.20635-1-yana2bsh@gmail.com>
@@ -96,170 +96,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-- New family with echo command
-- Supports string and flag attributes
-- Sysfs interface at /sys/kernel/third_genl/message
+Test that genl_unregister_family() returns error
+when called on non-registered family.
 
 Signed-off-by: Yana Bashlykova <yana2bsh@gmail.com>
 ---
- .../net-pf-16-proto-16-family-PARALLEL_GENL.c | 103 ++++++++++++++++++
- 1 file changed, 103 insertions(+)
+ .../net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c   | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c b/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
-index cdedd77b2a1b..f651159a311c 100644
+index f651159a311c..ad4228eda2d5 100644
 --- a/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
 +++ b/drivers/net/genetlink/net-pf-16-proto-16-family-PARALLEL_GENL.c
-@@ -152,10 +152,13 @@ static DEFINE_MUTEX(genl_mutex);
+@@ -1402,6 +1402,10 @@ static int __init module_netlink_init(void)
+ 	if (ret)
+ 		pr_err("%s: Incorrect Generic Netlink family wasn't registered\n", __func__);
  
- #define PARALLEL_GENL_FAMILY_NAME "PARALLEL_GENL"
- 
-+#define THIRD_GENL_FAMILY_NAME "THIRD_GENL"
++	ret = genl_unregister_family(&incorrect_genl_family);
++	if (ret)
++		pr_err("%s: Incorrect Generic Netlink family wasn't unregistered\n", __func__);
 +
- #define PATH_GENL_TEST_NUM "/sys/kernel/genl_test/value"
- #define PATH_GENL_TEST_MES "/sys/kernel/genl_test/message"
- #define PATH_GENL_TEST_DEV "/sys/kernel/genl_test/some_info"
- #define PATH_PARALLEL_GENL_MES "/sys/kernel/parallel_genl/message"
-+#define PATH_THIRD_GENL_MES "/sys/kernel/third_genl/message"
- 
- // TEST_GENL
- enum {
-@@ -205,6 +208,8 @@ static struct genl_family my_genl_family;
- 
- static struct genl_family my_genl_family_parallel;
- 
-+static struct genl_family third_genl_family;
-+
- enum my_multicast_groups {
- 	MY_MCGRP_GENL,
- };
-@@ -1077,6 +1082,94 @@ static struct genl_family my_genl_family_parallel = {
- 	.n_mcgrps = ARRAY_SIZE(genl_many_mcgrps_two),
- };
- 
-+// THIRD_GENL
-+enum {
-+	THIRD_GENL_ATTR_UNSPEC,
-+	THIRD_GENL_ATTR_DATA,
-+	THIRD_GENL_ATTR_FLAG,
-+	__THIRD_GENL_ATTR_MAX,
-+};
-+
-+#define THIRD_GENL_ATTR_MAX (__THIRD_GENL_ATTR_MAX - 1)
-+
-+enum {
-+	THIRD_GENL_CMD_UNSPEC,
-+	THIRD_GENL_CMD_ECHO,
-+	__THIRD_GENL_CMD_MAX,
-+};
-+
-+#define THIRD_GENL_CMD_MAX (__THIRD_GENL_CMD_MAX - 1)
-+
-+static const struct nla_policy third_genl_policy[THIRD_GENL_ATTR_MAX + 1] = {
-+	[THIRD_GENL_ATTR_UNSPEC] = { .type = NLA_UNSPEC },
-+	[THIRD_GENL_ATTR_DATA] = { .type = NLA_STRING },
-+	[THIRD_GENL_ATTR_FLAG] = { .type = NLA_FLAG },
-+};
-+
-+// Functions for THIRD_GENL family
-+static int third_genl_echo(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct sk_buff *msg;
-+	void *data;
-+	int ret;
-+	char *str;
-+
-+	if (info->nlhdr->nlmsg_flags & NLM_F_ECHO) {
-+		msg = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+		if (!msg)
-+			return -ENOMEM;
-+
-+		data = genlmsg_put_reply(msg, info, &my_genl_family, 0,
-+					 THIRD_GENL_CMD_ECHO);
-+		if (!data)
-+			goto error;
-+
-+		str = "Hello from THIRD_GENL!";
-+		strcpy(sysfs_data.third_genl_message, str);
-+
-+		ret = nla_put_string(msg, THIRD_GENL_ATTR_DATA, str);
-+		if (ret < 0)
-+			goto error;
-+
-+		ret = nla_put_flag(msg, THIRD_GENL_ATTR_FLAG);
-+		if (ret < 0)
-+			goto error;
-+
-+		genlmsg_end(msg, data);
-+
-+		genlmsg_reply(msg, info);
-+	}
-+
-+	return 0;
-+
-+error:
-+	nlmsg_free(msg);
-+	return -EMSGSIZE;
-+}
-+
-+// Generic Netlink operations for THIRD_GENL family
-+static const struct genl_ops third_genl_ops[] = {
-+	{
-+		.cmd = THIRD_GENL_CMD_ECHO,
-+		.flags = 0,
-+		.policy = third_genl_policy,
-+		.doit = third_genl_echo,
-+		.dumpit = NULL,
-+	},
-+};
-+
-+// genl_family struct for THIRD_GENL family
-+static struct genl_family third_genl_family = {
-+	.hdrsize = 0,
-+	.name = THIRD_GENL_FAMILY_NAME,
-+	.version = 1,
-+	.maxattr = THIRD_GENL_ATTR_MAX,
-+	.netnsok = true,
-+	.ops = third_genl_ops,
-+	.n_ops = ARRAY_SIZE(third_genl_ops),
-+	.policy = third_genl_policy,
-+};
-+
- // genl_family struct with incorrect name
- static struct genl_family incorrect_genl_family = {
- 	.hdrsize = 0,
-@@ -1144,8 +1237,16 @@ static int __init init_netlink(void)
- 		goto failure_2;
- 	}
- 
-+	rc = genl_register_family(&third_genl_family);
-+	if (rc) {
-+		pr_err("%s: Failed to register Generic Netlink family\n", __func__);
-+		goto failure_3;
-+	}
-+
- 	return 0;
- 
-+failure_3:
-+	genl_unregister_family(&my_genl_family_parallel);
- failure_2:
- 	genl_unregister_family(&my_genl_family);
- failure_1:
-@@ -1311,6 +1412,7 @@ static int __init module_netlink_init(void)
- err_family:
- 	genl_unregister_family(&my_genl_family);
- 	genl_unregister_family(&my_genl_family_parallel);
-+	genl_unregister_family(&third_genl_family);
- err_sysfs:
- 	sysfs_remove_file(kobj_genl_test, &my_attr_u32_genl_test.attr);
- 	sysfs_remove_file(kobj_genl_test, &my_attr_str_genl_test.attr);
-@@ -1330,6 +1432,7 @@ static void __exit module_netlink_exit(void)
- 	netlink_unregister_notifier(&genl_notifier);
- 	genl_unregister_family(&my_genl_family);
- 	genl_unregister_family(&my_genl_family_parallel);
-+	genl_unregister_family(&third_genl_family);
- 
- 	sysfs_remove_file(kobj_genl_test, &my_attr_u32_genl_test.attr);
- 	sysfs_remove_file(kobj_genl_test, &my_attr_str_genl_test.attr);
+ 	ret = netlink_register_notifier(&genl_notifier);
+ 	if (ret)
+ 		goto err_family;
 -- 
 2.34.1
 
