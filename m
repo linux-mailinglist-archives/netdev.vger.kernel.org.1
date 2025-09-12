@@ -1,181 +1,208 @@
-Return-Path: <netdev+bounces-222499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F98FB5480B
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6288B5481E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:42:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8A4B162543
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:40:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6695D17BD73
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61082773C7;
-	Fri, 12 Sep 2025 09:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87F228002B;
+	Fri, 12 Sep 2025 09:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="frl1N9yB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19156276046
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BE927E7F0
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757670002; cv=none; b=joWac/VLG5h8+/lQWM2xqe1NFp4vZQuKAYYxUflpxhstZ7gjCpTyYWO7kMtLrsoG4+pfbPqAcyoqPhB8GOjv4ZBcBhLE29j/tseygDPHxILeFQ28oc9P4hOb6Gn+9nXdJVhgwdKH2uSFBALtdCqtrboQf0NiR1d8pUGPX+Jrnhc=
+	t=1757670118; cv=none; b=TfbE0hgP+u/GbmOpkACexBtag4IQCNw7BuO7TBAqssTkQnIJDSU3XTowH3VS6WLCaavKS7dIjLyWh6xHsom7AqbI0KzL6V3UjVXIqsoI6LR6mKpTsYe+WYpJIKB8pnA4NhiZtImCYEk4JxoKcsFpKRxgJkSdYXCMys98+Fzquyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757670002; c=relaxed/simple;
-	bh=Rl4LZnuxJh/7FUqam/oyJRnVsEvzTdOO3HZUZncPAOk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=JFr8qbPYQ234eLG0xMGfRn25ehOZQ7VZ6kWcBlKmg7nQUn4TGQMw3o8s0HK6SVXfhQGm9McbFEX4Krt9JCgdquY/FTAgpPqk4IywIihHrngc7katRzeLdiMU6bFYSngYQfe8DjNHPdBMSQxoMNRD535jrAo4X9Gc+QyDS0Glbm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-889b8d95367so194453239f.1
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:40:00 -0700 (PDT)
+	s=arc-20240116; t=1757670118; c=relaxed/simple;
+	bh=aHZH4YS5dVoOj6kl4jXgDRDoWhg+l0J0dv5TXRxoBzo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YPBq+9387PsAGyeni6kJYzIh/Djsmd14CB2Li6EKhPWEJuG+OGACAsrMtC+955Ee0xzd+tf2vPylYcsBxmTYPq2HVcEzjWaXOg7HYzmeBKp1UUIbeY72aSCoUXDqG6LMUypzZROCivgdaYsjJwvl4TGIBqqIAggX/n5ecp2q8+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=frl1N9yB; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58C9fPlN012880
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:41:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ubdZE+2MGy4tFDpQKrzviatnp7P+PiPFBJ3kNogasGs=; b=frl1N9yBvDBrBz+g
+	vYpk/y637iCILK5KDEzRuFB1WIT4wlp3iA7Ak3xcVXtckYYSF94Zme5MDaBuQXn2
+	91njJBp2xEcqFGcBQUSHSCBnCBuYDkDiHbsoiQ8yGQmexU7bb7Ntfmp0WyCqOTE2
+	uGBhM20XnimXZfWw4fPpeDIuzI/fN9Fzes9TkxsPQT4QCeCepqUAKEdHfQ9GoQe4
+	yyubFKuDfYboEzIEUsyPMdiDwshIPMZ43ycg4ycI1BYoYRnv3T+sAr8dN6p5Ydok
+	7pBYoiTgxjeMZhxFiYq4EkyTupvgEh5gDNuWZbvNu3+AaZD0zNVjIQzDOtn6lQYg
+	w+PA8g==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 490dqgat69-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:41:56 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-820357763f6so59224685a.2
+        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 02:41:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757670000; x=1758274800;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1757670115; x=1758274915;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gFUjs+Fu4o45ZXWdCFUMEIMO8W2FMJLrrC6MotjvsXI=;
-        b=oQyFII5wiTghFujJTGNjtOQk1fXunFcZquK0wA1YpeDH486BPkHBxIEq/uIhxmn5SZ
-         oMXhQpImFOwYc8+iaJiuHwZP9v0A4zlY/Ck+BrJvjMPNcQQ+iUc5bQH7DjAyAx8QzY6F
-         p6iwAVVWCpG3Wci6tCm5Y6uVhCBScRdIqtMTHtPz5VkWk58+YOUmUglxsqoi5T/uTxPK
-         NwoG54G23VT6+Tdi1rVEJeV19e58ddhPYuigWm5LL/2ks6Ebdsqy2PoIiFccdRJUTA01
-         q1htjToNOtRw49/ZkskEDsAtLJpz4Qhb5NjurzRLft8J4ZAcrK7mJDVD9B8eVTXjl2xY
-         XtaA==
-X-Forwarded-Encrypted: i=1; AJvYcCUaBas+JBT5/TB8LfMkCsb0D6SDfvwdx+Ex+cVbogRATZmc9y39FeeBadceAUGVp+3jJbRJ4dw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYmAHvzicNNhK24Z8rnJWBs7jZPZbb0rlcJJzuy+l6KL5anGnP
-	r8vL821Pzw1wFTHl7ZljIDdASmXDW3bN7fZB8ONnCTZPWxjKotZkeJ/l1ceqR600R79JfTPE0Jp
-	3G7Dm3QrDM/Y3kCxrDgsL8BozDRNKsM7joObb/22TuSr965QsVGW7gJsCHtw=
-X-Google-Smtp-Source: AGHT+IFmcqWbQZYj0mK10M7BRzGMuWjtQ35FL3y2cmLKlB6WL6LNQORXJu4TcFFRXoWTp4/dfgGqQkDY1Q/U9t3HI9bgKWmFrYwj
+        bh=ubdZE+2MGy4tFDpQKrzviatnp7P+PiPFBJ3kNogasGs=;
+        b=CgkQkyiw+6pOgkvBD8A66rCX1zzYIP2d9TxyPMBgbtrUBQD+psY/SGeeVKDQU+7RZc
+         RRVe8WhkiyXECNTechSbxLBggpzcDVk88ZOM6/2ANUfSrInpleBU2mBClYFpHDu6K96D
+         0odRzT7cCSbFm68wMJBOy+zukEpNNpnjJVEcoTqZqyRlhxnqW/S6dG29boNMsmgy+kun
+         njCSjlP7ArEKUHMvev6MQRhfjMZHDIUda9EjWmjA8HQumNh495VsWR+Ecj2XC2lXg12Q
+         d2t1+lhVKRj9dZrm4t2ELpx/rFPVfNp0ldnkBWNpQLp0HFPFwxtHNG3auY1exbfCZKHg
+         z2iA==
+X-Forwarded-Encrypted: i=1; AJvYcCXyqDyhfS0xruhDnvdDwgTNZdLwgxmRNOimmnYVto4LMkk9WVsGCnr82QkiYi5Fj94ehlzBEf8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWNbR1uqDLGnZSeXJYuilheXzzGneqDj3O7znuoxe5hfsLBvoM
+	3vGJRZBprMryDxWmIdkCsevARULKr4rx1Kub+9GjvvT+WVbwEP+ACbUhBJkRswjffMskvdHzt2q
+	ke+wJUa8pigN15P6ET4JM/PV6ptX8IrmdPy1IAf0oOJN3rE7+ObAgPPdi7b8=
+X-Gm-Gg: ASbGncvg386tEYpG8bCzUezMm5kgrGMQh+J+922MruStcQ73HZGfwTkor2lo8YK/Fwa
+	HCJrTUTirmgh1HzaPXBFBYryh9HIZdyIQMLaM/qBGSv9PiaSzU/cVC5yCVRpF5OKlIsjGucby5k
+	vUa7yi1vJwcreN3iMrMSZbpCTapEyDh2pb00UnPd+vLCAbWjh5PEvW6jZOAEeGboJqZCCzBn0zU
+	PHTdEWAQhLnMeqhFvNRHcXp6BOgWt8oKWKGXrGkmrSQwKnEMCXH1TTshoRQAamuaCcu7e9iAtcB
+	JQQWicswLdqDkgkWsN7q3tpiJqWkW4x8OR8V+00Fgqlu4wfMRsNN+ryUKdG1dP8jRsIx3i4gpQv
+	QJXdubXMHW3k2d+lDq9k/RA==
+X-Received: by 2002:a05:6214:f05:b0:70d:e7e1:840f with SMTP id 6a1803df08f44-767c1c8fd01mr17754026d6.3.1757670114619;
+        Fri, 12 Sep 2025 02:41:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEW19WjSadyXUxnUE5X6AqSmTHftlhz5SicnK4cbK2PU6jUKPiXVwSAYDJJeeQH+UMau1p6vw==
+X-Received: by 2002:a05:6214:f05:b0:70d:e7e1:840f with SMTP id 6a1803df08f44-767c1c8fd01mr17753866d6.3.1757670114134;
+        Fri, 12 Sep 2025 02:41:54 -0700 (PDT)
+Received: from [192.168.149.223] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62eed9aec1asm131613a12.3.2025.09.12.02.41.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Sep 2025 02:41:53 -0700 (PDT)
+Message-ID: <0f9d55a4-83a1-48f6-aa19-e3117192bebb@oss.qualcomm.com>
+Date: Fri, 12 Sep 2025 11:41:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:154e:b0:419:de32:2cf7 with SMTP id
- e9e14a558f8ab-4209d40feabmr41543785ab.3.1757670000237; Fri, 12 Sep 2025
- 02:40:00 -0700 (PDT)
-Date: Fri, 12 Sep 2025 02:40:00 -0700
-In-Reply-To: <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68c3ea70.050a0220.3c6139.049f.GAE@google.com>
-Subject: [syzbot ci] Re: net: devmem: improve cpu cost of RX token management
-From: syzbot ci <syzbot+ci29ccfbf0bb0ca710@syzkaller.appspotmail.com>
-To: almasrymina@google.com, bobbyeshleman@gmail.com, bobbyeshleman@meta.com, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, willemb@google.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 02/10] dt-bindings: clock: Add required
+ "interconnect-cells" property
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Luo Jie <quic_luoj@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd
+ <sboyd@kernel.org>,
+        Varadarajan Narayanan <quic_varada@quicinc.com>,
+        Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Anusha Rao <quic_anusha@quicinc.com>,
+        Manikanta Mylavarapu <quic_mmanikan@quicinc.com>,
+        Devi Priya <quic_devipriy@quicinc.com>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
+        quic_leiwei@quicinc.com, quic_pavir@quicinc.com,
+        quic_suruchia@quicinc.com
+References: <20250909-qcom_ipq5424_nsscc-v5-0-332c49a8512b@quicinc.com>
+ <20250909-qcom_ipq5424_nsscc-v5-2-332c49a8512b@quicinc.com>
+ <20250912-nocturnal-horse-of-acumen-5b2cbd@kuoka>
+ <b7487ab1-1abd-40ca-8392-fdf63fddaafc@oss.qualcomm.com>
+ <2951b362-c3c1-4608-8534-4d25b089f927@oss.qualcomm.com>
+ <52714c33-5bd7-4ca5-bf1d-c89318c77746@linaro.org>
+ <d293a11b-155d-45d3-bafc-00c2f90e8c43@oss.qualcomm.com>
+ <1cd6a0f9-2955-4189-8d1e-85fa8ad8dddd@linaro.org>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <1cd6a0f9-2955-4189-8d1e-85fa8ad8dddd@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: ZBTgv4EfyjyaikZRhxFahvjuwokzgGZS
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAzNSBTYWx0ZWRfX1smqRcDwgDzU
+ b7cTKQFxbj/Fp4Bpf/zWqo2db3KkYq/LcVcSNGVS5GQrbv/j76JrEC3LUE1bZ8VoisgClU+mEC+
+ bxuUUsDzho4m3RPZ/+dwRceUD+1kkE9SKU4oqN/uLV8AVRU83zrs8WrDbssz2AHCX8lYgflD8QN
+ uhdIwDpfltgb5i2VXzpuUa0QojLPk1ecFrBM6/gYBGXCAjn3dX0xkHMUIt9W6NhEq9y9BKOsVQo
+ KYGvAlRg2Q3Da+wCYPQU9mOjpX/aWvuQOK1wIu7VWLsv0jdn9TAtyzejv2eilux3bGwZG6ZO38A
+ NQB4ZruLuFT5ttXJlPMlp7d1vS2iucBIF//se3EMk/tRPM0FUjVuZ7oKwjV3afDrBYuTInYsFGk
+ QiJ0dm0o
+X-Proofpoint-GUID: ZBTgv4EfyjyaikZRhxFahvjuwokzgGZS
+X-Authority-Analysis: v=2.4 cv=N8UpF39B c=1 sm=1 tr=0 ts=68c3eae4 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=r2WM0BnHFFIPBb0dDCkA:9
+ a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-12_03,2025-09-11_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0 malwarescore=0 clxscore=1015 bulkscore=0
+ suspectscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060035
 
-syzbot ci has tested the following series
+On 9/12/25 11:27 AM, Krzysztof Kozlowski wrote:
+> On 12/09/2025 11:21, Konrad Dybcio wrote:
+>> On 9/12/25 11:17 AM, Krzysztof Kozlowski wrote:
+>>> On 12/09/2025 11:13, Konrad Dybcio wrote:
+>>>> On 9/12/25 11:13 AM, Konrad Dybcio wrote:
+>>>>> On 9/12/25 9:04 AM, Krzysztof Kozlowski wrote:
+>>>>>> On Tue, Sep 09, 2025 at 09:39:11PM +0800, Luo Jie wrote:
+>>>>>>> The Networking Subsystem (NSS) clock controller acts as both a clock
+>>>>>>> provider and an interconnect provider. The #interconnect-cells property
+>>>>>>> is mandatory in the Device Tree Source (DTS) to ensure that client
+>>>>>>> drivers, such as the PPE driver, can correctly acquire ICC clocks from
+>>>>>>> the NSS ICC provider.
+>>>>>>>
+>>>>>>> Although this property is already present in the NSS CC node of the DTS
+>>>>>>> for CMN PLL for IPQ9574 SoC which is currently supported, it was previously
+>>>>>>> omitted from the list of required properties in the bindings documentation.
+>>>>>>> Adding this as a required property is not expected to break the ABI for
+>>>>>>> currently supported SoC.
+>>>>>>>
+>>>>>>> Marking #interconnect-cells as required to comply with Device Tree (DT)
+>>>>>>> binding requirements for interconnect providers.
+>>>>>>
+>>>>>> DT bindings do not require interconnect-cells, so that's not a correct
+>>>>>> reason. Drop them from required properties.
+>>>>>
+>>>>> "Mark #interconnect-cells as required to allow consuming the provided
+>>>>> interconnect endpoints"?
+>>>>
+>>>> "which are in turn necessary for the SoC to function"
+>>>
+>>> If this never worked and code was buggy, never booted, was sent
+>>> incomplete and in junk state, then sure. Say like that. :)
+>>>
+>>> But I have a feeling code was working okayish...
+>>
+>> If Linux is unaware of resources, it can't turn them off/on, so it was
+>> only working courtesy of the previous boot stages messing with them.
+> 
+> 
+> Which is fine and present in all other cases/drivers/devices. Entire
+> Linux in many places relies on bootloader and that is not a "work by
+> coincidence".
+> 
+> Another thing is if you keep backwards compatibility in the driver but
+> want to enforce DTS to care about these resources, but that is not
+> explained here, I think.
 
-[v2] net: devmem: improve cpu cost of RX token management
-https://lore.kernel.org/all/20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com
-* [PATCH net-next v2 1/3] net: devmem: rename tx_vec to vec in dmabuf binding
-* [PATCH net-next v2 2/3] net: devmem: use niov array for token management
-* [PATCH net-next v2 3/3] net: ethtool: prevent user from breaking devmem single-binding rule
+I don't feel like arguing axiology today ;) But I see your point and I
+won't object to either outcome, so long as the property is *allowed*
 
-and found the following issue:
-general protection fault in sock_devmem_dontneed
+As a sidenote the IPQ SoCs have a rather thin layer of fw
 
-Full report is available here:
-https://ci.syzbot.org/series/40b2252a-f8bb-4cec-bfc1-2ff8a3c55336
-
-***
-
-general protection fault in sock_devmem_dontneed
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      5adf6f2b9972dbb69f4dd11bae52ba251c64ecb7
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/2c30c608-f14f-4e6d-9772-cc5e129939fc/config
-C repro:   https://ci.syzbot.org/findings/c89c36f8-4666-47d0-bc39-35662a268e4d/c_repro
-syz repro: https://ci.syzbot.org/findings/c89c36f8-4666-47d0-bc39-35662a268e4d/syz_repro
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 UID: 0 PID: 6028 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:sock_devmem_dontneed+0x40b/0x910 net/core/sock.c:1112
-Code: 8b 44 24 18 44 8b 20 44 03 64 24 14 48 8b 44 24 68 80 3c 18 00 74 08 4c 89 ef e8 f0 bb c9 f8 4d 8b 7d 00 4c 89 f8 48 c1 e8 03 <80> 3c 18 00 74 08 4c 89 ff e8 d7 bb c9 f8 4d 8b 2f 4c 89 e8 48 c1
-RSP: 0018:ffffc90002987ac0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 1ffff11020d27e78
-RDX: ffff88810a039cc0 RSI: 0000000000000003 RDI: 0000000000000000
-RBP: ffffc90002987c50 R08: ffffc90002987bdf R09: 0000000000000000
-R10: ffffc90002987b60 R11: fffff52000530f7c R12: 0000000000000006
-R13: ffff8881235cb710 R14: 0000000000000000 R15: 0000000000000000
-FS:  000055555e866500(0000) GS:ffff8881a3c14000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b31b63fff CR3: 0000000027a20000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- sk_setsockopt+0x682/0x2dc0 net/core/sock.c:1301
- do_sock_setsockopt+0x11b/0x1b0 net/socket.c:2340
- __sys_setsockopt net/socket.c:2369 [inline]
- __do_sys_setsockopt net/socket.c:2375 [inline]
- __se_sys_setsockopt net/socket.c:2372 [inline]
- __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2372
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7faf24f8eba9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc3eb96018 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007faf251d5fa0 RCX: 00007faf24f8eba9
-RDX: 0000000000000050 RSI: 0000000000000001 RDI: 0000000000000003
-RBP: 00007faf25011e19 R08: 0000000000000048 R09: 0000000000000000
-R10: 0000200000000100 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007faf251d5fa0 R14: 00007faf251d5fa0 R15: 0000000000000005
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:sock_devmem_dontneed+0x40b/0x910 net/core/sock.c:1112
-Code: 8b 44 24 18 44 8b 20 44 03 64 24 14 48 8b 44 24 68 80 3c 18 00 74 08 4c 89 ef e8 f0 bb c9 f8 4d 8b 7d 00 4c 89 f8 48 c1 e8 03 <80> 3c 18 00 74 08 4c 89 ff e8 d7 bb c9 f8 4d 8b 2f 4c 89 e8 48 c1
-RSP: 0018:ffffc90002987ac0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 1ffff11020d27e78
-RDX: ffff88810a039cc0 RSI: 0000000000000003 RDI: 0000000000000000
-RBP: ffffc90002987c50 R08: ffffc90002987bdf R09: 0000000000000000
-R10: ffffc90002987b60 R11: fffff52000530f7c R12: 0000000000000006
-R13: ffff8881235cb710 R14: 0000000000000000 R15: 0000000000000000
-FS:  000055555e866500(0000) GS:ffff8881a3c14000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b31b63fff CR3: 0000000027a20000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	8b 44 24 18          	mov    0x18(%rsp),%eax
-   4:	44 8b 20             	mov    (%rax),%r12d
-   7:	44 03 64 24 14       	add    0x14(%rsp),%r12d
-   c:	48 8b 44 24 68       	mov    0x68(%rsp),%rax
-  11:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1)
-  15:	74 08                	je     0x1f
-  17:	4c 89 ef             	mov    %r13,%rdi
-  1a:	e8 f0 bb c9 f8       	call   0xf8c9bc0f
-  1f:	4d 8b 7d 00          	mov    0x0(%r13),%r15
-  23:	4c 89 f8             	mov    %r15,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1) <-- trapping instruction
-  2e:	74 08                	je     0x38
-  30:	4c 89 ff             	mov    %r15,%rdi
-  33:	e8 d7 bb c9 f8       	call   0xf8c9bc0f
-  38:	4d 8b 2f             	mov    (%r15),%r13
-  3b:	4c 89 e8             	mov    %r13,%rax
-  3e:	48                   	rex.W
-  3f:	c1                   	.byte 0xc1
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Konrad
 
