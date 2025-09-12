@@ -1,93 +1,58 @@
-Return-Path: <netdev+bounces-222467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB4CB545FA
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:51:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9D5B54660
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B976161D32
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:51:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A260163A77
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 09:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766332638BF;
-	Fri, 12 Sep 2025 08:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67E519E97A;
+	Fri, 12 Sep 2025 09:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HevlWepv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YgxJw5iM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE9922F74A
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826822DC79E
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 09:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757667077; cv=none; b=syKNsq/5p7bf9bgPc3ZMYX4ML0MF+EsyWJIbVIOSPqeDrRQN8vWfT5zCTWwT+DZXt84kymZctILyDXFqmHSYiWG1St2FHPDluw6S4Sth1FlNZXPwCjk6NcZjEXBU1YJtYuTT6v6IIZBs2ubX5AU8YZPY9Ge07PnPQmNdtPcRVJA=
+	t=1757667762; cv=none; b=jr4vgpT50G6PaGuRZZTI//dQSvwDkq9QfdbRED+P4UQ9cnRXJljzaiV/oj4SX3Qqhs5+iMztdvVyLUnTXsJxI2ofrNimX1EEOnjsHh3h8wst5s7VErOUWaIUwQ5VWEdN3bW2sWOCLj1ZVefxtw40kMOOvh/5Oyicnkbaw+Oones=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757667077; c=relaxed/simple;
-	bh=47vQnPYhJDC8oGXmWGPzVRbfS0hchpXRA0GG7BlSkd0=;
+	s=arc-20240116; t=1757667762; c=relaxed/simple;
+	bh=kL/p2Bsx1e7gqZn5NE8Tk9hEj2FkuAQnySmNEsb4J2U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5pMGBPZiCe6w4MO3lXXSz3yAFBsgRHh0iaPWKh47RfjoN7mdkW8RrHVHUDjKGwXrmUz6fb0xNvw/BGQbRTuTCpFp4BstpzjwAVK204pgo89hxQ3GEc8iVHDfNOxKiGUZlMWQhMLvwQ5qDoIfPf6F4OKly5A1iHTgy3RN94MuzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HevlWepv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757667075;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8kMSCxiL40HDEAJ/S1kTvsHr28EdmEyCSrCl/4d+5lY=;
-	b=HevlWepvgxJ88W9Ts9BuIqyl6X6wjaMuG53WrjpKj1/I3Qc/UEXkHIuwyKVj6Qj+uUIvTW
-	W2JXDz/emA+hfvPRz/F0bAx+byGaNXUP7u/GRaPo0Z2W7sE084ti+4PJu8pogAKWVPdaXC
-	8TxulreLS5JfcTQPkglxc4WkFDLble0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-qese3qhYPkCLFVVUbuiGPw-1; Fri, 12 Sep 2025 04:51:13 -0400
-X-MC-Unique: qese3qhYPkCLFVVUbuiGPw-1
-X-Mimecast-MFC-AGG-ID: qese3qhYPkCLFVVUbuiGPw_1757667072
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3e38ae5394aso1197217f8f.3
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 01:51:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757667072; x=1758271872;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8kMSCxiL40HDEAJ/S1kTvsHr28EdmEyCSrCl/4d+5lY=;
-        b=YT3RTCF2cspl8OomeblY05gUJh06FHoKMCIizKpAXPODDeTyERryFF9cWK4geVsGDo
-         pawgIENpIs0q9vERjxjKmqh0imuPA0SAWjxdT7tB3cRLKigBRk+Ubf/VH79cq3pP4u47
-         2DLScxGiKfDsdQ2IlG2JMUcHCJivOWZrGnKbHmPFxjAQaSYqMOJi256uW4HIGlXKkTrm
-         ZvoKR4LhFPPNRfdyNlYeRJh8cH/NhHAh1yD4CVI/bTGLXOl/xdW3NIHAAF2MKNdsSMa9
-         +PyNwKcdl3DbZNy722xlGWIrKr9Narh50aF5IAg7m4q/qm5k+++Uv4RUw6/Qw7aZfj71
-         Yuzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZl6hvgLLJdHAtDTFV2XDyWGyL+QEdYy9yTgPFXr09XB2ECve9txXvGfJm2AwKRABCSGMMFts=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxrEcB9b60eDuEM5oQRlHmkNucKD/K9Zf3e1+JrNNlZqWr4zvU
-	AcjS9Ac9/GJ3w01o3wXyCzXSAejHl/Id8eBC/laWqDIeSgmjM3xTr+HzqnqITJFnbnp/DY+WGZS
-	vD1feSj7wyzSbaBhgOi1RJMXVes7pNY1J1RBtvGr+P9bscQh1vGAg/btyqw==
-X-Gm-Gg: ASbGncsQ6TYjOE2NXW7mgELl+aMqRMCt6wthuAKE8cUB3wa76Ph3TynOx4p19G5zZk4
-	OwIN4CFrd17YfEoKbtBy7XPrtckVobzvfKgCxiAJKNhsEbGQBbKOmywr0BO8da4DruJvt7cZta1
-	3jPsVTbCJXKVKDkpRVMvEapSVgqW38rRe0MklknWNv8xYwA7ZQU5QBa9zLaPgg4anPOXtq7dXi6
-	s8gpSmjzJR2BVdtg4+q/gd8LmJPTLdu1owB9Z8mIHJDcnVkV9nwLR9NWH7XsV2ueQrDxoEj7yYl
-	4H60P8PAVMv+Muorsa5p3FQ8bPi66kvO
-X-Received: by 2002:a05:6000:2407:b0:3e3:24c3:6d71 with SMTP id ffacd0b85a97d-3e76559415fmr1647248f8f.1.1757667072443;
-        Fri, 12 Sep 2025 01:51:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZ2GT21YnVBh75Wd3k+yoprEvCJQn5G2Y8wrMGySDHgCshlINWqkn9hIrIH8egTbTA2leqKQ==
-X-Received: by 2002:a05:6000:2407:b0:3e3:24c3:6d71 with SMTP id ffacd0b85a97d-3e76559415fmr1647225f8f.1.1757667072042;
-        Fri, 12 Sep 2025 01:51:12 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1536:c800:2952:74e:d261:8021])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e41b6dbdbsm40474885e9.22.2025.09.12.01.51.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 01:51:11 -0700 (PDT)
-Date: Fri, 12 Sep 2025 04:51:08 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: eperezma@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org,
-	jon@nutanix.com, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] vhost-net: unbreak busy polling
-Message-ID: <20250912045102-mutt-send-email-mst@kernel.org>
-References: <20250912082658.2262-1-jasowang@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ob8D6mpUwf+0LFNy3me3dSg0j71X009v5ry4RjWjKz7HEmZeedFnvDpnGTMxMfylrNTwEzf8UKerQrCh7+osaPOcdW++jfDeN6MzeFwSK+uTk3G+UdYusD1K6Z3ormh+h/FzKVkr8G8RsPwjb7xoEiQstjE55Uc6lppejEcuPwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YgxJw5iM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B7CDC4CEF1;
+	Fri, 12 Sep 2025 09:02:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757667762;
+	bh=kL/p2Bsx1e7gqZn5NE8Tk9hEj2FkuAQnySmNEsb4J2U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YgxJw5iMZUE/m57Rj4X3dmhS/VmzOC7ecD4Fk+VryPGNOshk3H78yH4BV3yxecy8R
+	 ldtVpbEbDudS3hdPsVGuq0vBA1DCvGQ/WTHDAyKC/cZVcJNHL4a3gE59aH+wUrhxYU
+	 izwS2YhdLzOaxf/zJi9ZDiB3EnPYYk6G+xo+6/uU1zXUrC+0GSNzl9F4LcHn4ftPoT
+	 Uq+ZZC6HbcigRjnzY9x43AsgbLLhzr4CIj4fAvOaw2BjeSVjszxp6CIHjcEJwGKobg
+	 xY9be7BwX5ZXHopiT6RQ5GJL41Ga7GInROw5YzAXRzlgRFOCyWsRfGvrrlb37t1fH5
+	 0rwJq+HZMg7Bg==
+Date: Fri, 12 Sep 2025 10:02:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, mschmidt@redhat.com,
+	Dan Nowlin <dan.nowlin@intel.com>, Qi Zhang <qi.z.zhang@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next v4 2/5] ice: add virtchnl and VF context support
+ for GTP RSS
+Message-ID: <20250912090237.GU30363@horms.kernel.org>
+References: <20250829101809.1022945-1-aleksandr.loktionov@intel.com>
+ <20250829101809.1022945-3-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,61 +61,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250912082658.2262-1-jasowang@redhat.com>
+In-Reply-To: <20250829101809.1022945-3-aleksandr.loktionov@intel.com>
 
-On Fri, Sep 12, 2025 at 04:26:57PM +0800, Jason Wang wrote:
-> Commit 67a873df0c41 ("vhost: basic in order support") pass the number
-> of used elem to vhost_net_rx_peek_head_len() to make sure it can
-> signal the used correctly before trying to do busy polling. But it
-> forgets to clear the count, this would cause the count run out of sync
-> with handle_rx() and break the busy polling.
+On Fri, Aug 29, 2025 at 10:18:05AM +0000, Aleksandr Loktionov wrote:
+> Introduce infrastructure to support GTP-specific RSS configuration
+> in the ICE driver, enabling flexible and programmable flow hashing
+> on virtual functions (VFs).
 > 
-> Fixing this by passing the pointer of the count and clearing it after
-> the signaling the used.
+>  - Define new virtchnl protocol header and field types for GTPC, GTPU,
+>    L2TPv2, ECPRI, PPP, GRE, and IP fragment headers.
+>  - Extend virtchnl.h to support additional RSS fields including checksums,
+>    TEID, QFI, and IPv6 prefix matching.
+>  - Add VF-side hash context structures for IPv4/IPv6 and GTPU flows.
+>  - Implement context tracking and rule ordering logic for TCAM-based
+>    RSS configuration.
+>  - Introduce symmetric hashing support for raw and tunnel flows.
+>  - Update ice_vf_lib.h and virt/rss.c to handle advanced RSS
+>    configuration via virtchnl messages.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 67a873df0c41 ("vhost: basic in order support")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ---
->  drivers/vhost/net.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> VFs can express RSS configuration for GTP flows
+> using ethtool and virtchnl, laying the foundation for tunnel-aware
+> RSS offloads in virtualized environments.
 > 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index c6508fe0d5c8..16e39f3ab956 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1014,7 +1014,7 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
->  }
->  
->  static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
-> -				      bool *busyloop_intr, unsigned int count)
-> +				      bool *busyloop_intr, unsigned int *count)
->  {
->  	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
->  	struct vhost_net_virtqueue *tnvq = &net->vqs[VHOST_NET_VQ_TX];
-> @@ -1024,7 +1024,8 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
->  
->  	if (!len && rvq->busyloop_timeout) {
->  		/* Flush batched heads first */
-> -		vhost_net_signal_used(rnvq, count);
-> +		vhost_net_signal_used(rnvq, *count);
-> +		*count = 0;
->  		/* Both tx vq and rx socket were polled here */
->  		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
->  
-> @@ -1180,7 +1181,7 @@ static void handle_rx(struct vhost_net *net)
->  
->  	do {
->  		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> -						      &busyloop_intr, count);
-> +						      &busyloop_intr, &count);
->  		if (!sock_len)
->  			break;
->  		sock_len += sock_hlen;
-> -- 
-> 2.34.1
+> Co-developed-by: Dan Nowlin <dan.nowlin@intel.com>
+> Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
+> Co-developed-by: Jie Wang <jie1x.wang@intel.com>
+> Signed-off-by: Jie Wang <jie1x.wang@intel.com>
+> Co-developed-by: Junfeng Guo <junfeng.guo@intel.com>
+> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+> Co-developed-by: Qi Zhang <qi.z.zhang@intel.com>
+> Signed-off-by: Qi Zhang <qi.z.zhang@intel.com>
+> Co-developed-by: Ting Xu <ting.xu@intel.com>
+> Signed-off-by: Ting Xu <ting.xu@intel.com>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
+Aside from the minor comment below, this looks good to me.
+So with that addressed, feel free to add:
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> diff --git a/drivers/net/ethernet/intel/ice/virt/rss.c b/drivers/net/ethernet/intel/ice/virt/rss.c
+
+...
+
+> +/**
+> + * ice_parse_raw_rss_pattern - Parse raw pattern spec and mask for RSS
+> + * @vf: pointer to the VF info
+> + * @proto: pointer to the virtchnl protocol header
+> + * @raw_cfg: pointer to the RSS raw pattern configuration
+> + *
+> + * Parser function to get spec and mask from virtchnl message, and parse
+> + * them to get the corresponding profile and offset. The profile is used
+> + * to add RSS configuration.
+> + *
+> + * Return: 0 on success; negative error code on failure.
+> + */
+> +static int
+> +ice_parse_raw_rss_pattern(struct ice_vf *vf, struct virtchnl_proto_hdrs *proto,
+> +			  struct ice_rss_raw_cfg *raw_cfg)
+> +{
+> +	struct ice_parser_result pkt_parsed;
+> +	struct ice_hw *hw = &vf->pf->hw;
+> +	struct ice_parser_profile prof;
+> +	u16 pkt_len;
+> +	struct ice_parser *psr;
+> +	u8 *pkt_buf, *msk_buf;
+> +	int ret = 0;
+> +
+> +	pkt_len = proto->raw.pkt_len;
+> +	if (!pkt_len)
+> +		return -EINVAL;
+> +	if (pkt_len > VIRTCHNL_MAX_SIZE_RAW_PACKET)
+> +		pkt_len = VIRTCHNL_MAX_SIZE_RAW_PACKET;
+> +
+> +	pkt_buf = kzalloc(pkt_len, GFP_KERNEL);
+> +	msk_buf = kzalloc(pkt_len, GFP_KERNEL);
+> +	if (!pkt_buf || !msk_buf) {
+> +		ret = -ENOMEM;
+> +		goto free_alloc;
+> +	}
+> +
+> +	memcpy(pkt_buf, proto->raw.spec, pkt_len);
+> +	memcpy(msk_buf, proto->raw.mask, pkt_len);
+> +
+> +	psr = ice_parser_create(hw);
+> +	if (IS_ERR(psr)) {
+> +		ret = PTR_ERR(psr);
+> +		goto parser_destroy;
+
+I think this one should be goto free_alloc.
+Else there will be a NULL pointer dereference in ice_parser_destroy().
+
+> +	}
+> +
+> +	ret = ice_parser_run(psr, pkt_buf, pkt_len, &pkt_parsed);
+> +	if (ret)
+> +		goto parser_destroy;
+> +
+> +	ret = ice_parser_profile_init(&pkt_parsed, pkt_buf, msk_buf,
+> +				      pkt_len, ICE_BLK_RSS, &prof);
+> +	if (ret)
+> +		goto parser_destroy;
+> +
+> +	memcpy(&raw_cfg->prof, &prof, sizeof(prof));
+> +
+> +parser_destroy:
+> +	ice_parser_destroy(psr);
+> +free_alloc:
+> +	kfree(pkt_buf);
+> +	kfree(msk_buf);
+> +	return ret;
+> +}
 
