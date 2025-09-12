@@ -1,105 +1,133 @@
-Return-Path: <netdev+bounces-222458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B056B54532
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:24:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FD5B54547
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 10:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A2513A7AFE
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:24:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FB213B5C2F
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 08:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE67E20ADD6;
-	Fri, 12 Sep 2025 08:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53622D77E0;
+	Fri, 12 Sep 2025 08:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="X1jx//a4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUL9c3e8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52732D6E60
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EE12D6E55
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 08:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757665472; cv=none; b=SL85amjuWoRyHFglK0tIxx8XAdHl3oAcN4sLBN7fCwDYGprLoxApZnfy5VlwvrI5TT4VApyxUK1q/yxZZbO48W7KiwH66K1rJcHHKnu9zNtOLQWiEAezAehyJYZPBXFCH7m0qv697ZL5DpBrePoR6+SRjHuok8aCPDEn1ghvLIU=
+	t=1757665637; cv=none; b=rztUXwSaULLpNo9ghJ1hEgnQFYddP4J2P4OZt/JyvTaktW2RFU5dGYQWdSRPNBo/8W4b4xEkiINCcbS+/+4WMAbuy1a4L8+1xrJlDQsNQJdawWwOlp/WOmhRA6WgNVHN++mVs9Mj3QQA3pAOYptbFaGBoS/tWLWrxbQc8tyrkwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757665472; c=relaxed/simple;
-	bh=G3Sdp/ZVwYcMs1IT4JQ3HT2T9kk5odDlxHHxV4fba8I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LoPhiKbtQX2Dk9Y5cTFUL+L3JrrSJZoXYFrWpxhuf9K/tljmswV/1OKqKXQUFHC4Zj496ZEKl4kTZjZP7Igwg91wZwUGHpVMVB9dxeeE7LZRsXMdjY1/BJCZnFQPAGpv7uh698CSNKfNYYgeGJpaL7yfJnOHPjl4YyV7HHzcLNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=X1jx//a4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=K9ICwrst558XFzsKtusIKbwO8AGpP60Ecok/wMJnGPo=; b=X1jx//a4gY1BcJfsyO40Ahb/yx
-	Q4jqC0BAgEQ8TXXz4ubIFzSUzJYF+BtY0tPrJTl+ftwBRgSmisFab/c/Ox9P2qPSQA7K44MzKUS/Y
-	/h8axe61pFbZXUsrVmdzA0ggiiA7HidDcDMEV2jH9JbIuCuaJeGyrgnLifXkVzUkcsFyegGjNwz6M
-	JAehnhVZL8NX2iWkbWtSC8a2pI+N5N7KB2xfw6OPt4FdeYIPzQLdaK/Lt4gyVFLgkiMvwrPzS3ZZX
-	s5Hb/AaJPLXn5rK4aKFj0MS7CbA9mm+qloEZJt3AP7GWYJ5VxOzM3mQWN5U6qPme0hxzyDU5dgKKU
-	aATzbA6Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47896)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uwz4x-0000000049u-0pla;
-	Fri, 12 Sep 2025 09:24:23 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uwz4u-000000003Mr-0vje;
-	Fri, 12 Sep 2025 09:24:20 +0100
-Date: Fri, 12 Sep 2025 09:24:20 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] net: mvneta: add support for hardware
- timestamps
-Message-ID: <aMPYtPj1fpstcbgt@shell.armlinux.org.uk>
-References: <E1uwKHe-00000004glk-3nkJ@rmk-PC.armlinux.org.uk>
- <20250911185506.6ee85d94@kernel.org>
- <20250911185841.0863ffc0@kernel.org>
+	s=arc-20240116; t=1757665637; c=relaxed/simple;
+	bh=OhkrDdrpf9K9Y/Vcut/XZzSkCyLD31va3Wprom2uduE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZhUrh/C+2j2hui18G5aGG264X4OjXbUSvxg6OXyf3Es/YPYQnkOtMCgm9xcMbom9Qbqp7Th2gtFmBqt/H2KC/BiTCptJi5kUG9JPZb40bL3KAEe+5YesLVINe0yHQxWbwU4FbtO1BiVpSsqkgjVAkp/WgKwQs2eI64z80tl4qLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZUL9c3e8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757665633;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FHPTlBuTNvdrb4eYoAaIH5z9IayKPbhwWYepGjVwam4=;
+	b=ZUL9c3e896lg+Sult8/7UNY0XccbVQKn0FusMzzEiH+rRec+5FwGmFJx+mvCRcMXFAR2Dz
+	xd+phRqf/Q/GPmoH48aEYpPUVxi5BX8WFdsc17MYwsdRjKGHXj48tzZJp8Q/BhejGpZrCB
+	I9EwSND2Bq8wzbLQs0MT/pqu0eL47Oc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-398-RJeBKFiIMPSsbgahKilthg-1; Fri,
+ 12 Sep 2025 04:27:08 -0400
+X-MC-Unique: RJeBKFiIMPSsbgahKilthg-1
+X-Mimecast-MFC-AGG-ID: RJeBKFiIMPSsbgahKilthg_1757665627
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 54EC1195FD30;
+	Fri, 12 Sep 2025 08:27:07 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.72.112.167])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B990118004D8;
+	Fri, 12 Sep 2025 08:27:01 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	eperezma@redhat.com
+Cc: jonah.palmer@oracle.com,
+	kuba@kernel.org,
+	jon@nutanix.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net 1/2] vhost-net: unbreak busy polling
+Date: Fri, 12 Sep 2025 16:26:57 +0800
+Message-ID: <20250912082658.2262-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250911185841.0863ffc0@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Thu, Sep 11, 2025 at 06:58:41PM -0700, Jakub Kicinski wrote:
-> On Thu, 11 Sep 2025 18:55:06 -0700 Jakub Kicinski wrote:
-> > On Wed, 10 Sep 2025 13:50:46 +0100 Russell King wrote:
-> > > Subject: [PATCH net-next v2] net: mvneta: add support for hardware timestamps
-> > > Date: Wed, 10 Sep 2025 13:50:46 +0100
-> > > Sender: Russell King <rmk@armlinux.org.uk>
-> > > 
-> > > Add support for hardware timestamps in (e.g.) the PHY by calling  
-> > 
-> > These are _software_ timestamps.. (in the subject as well)
-> > 
-> > Fixed when applying.
-> 
-> Let me take that back, you may actually mean HW because of the PHY
-> handling detour. Maybe call out both software and PHY (hardware)?
+Commit 67a873df0c41 ("vhost: basic in order support") pass the number
+of used elem to vhost_net_rx_peek_head_len() to make sure it can
+signal the used correctly before trying to do busy polling. But it
+forgets to clear the count, this would cause the count run out of sync
+with handle_rx() and break the busy polling.
 
-I do mean PHY based hardware timestamps, because that is exactly why
-I'm making the change (for my Marvell PHY PTP core.) The software
-timestamping is a side effect.
+Fixing this by passing the pointer of the count and clearing it after
+the signaling the used.
 
+Cc: stable@vger.kernel.org
+Fixes: 67a873df0c41 ("vhost: basic in order support")
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/vhost/net.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index c6508fe0d5c8..16e39f3ab956 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1014,7 +1014,7 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
+ }
+ 
+ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
+-				      bool *busyloop_intr, unsigned int count)
++				      bool *busyloop_intr, unsigned int *count)
+ {
+ 	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
+ 	struct vhost_net_virtqueue *tnvq = &net->vqs[VHOST_NET_VQ_TX];
+@@ -1024,7 +1024,8 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
+ 
+ 	if (!len && rvq->busyloop_timeout) {
+ 		/* Flush batched heads first */
+-		vhost_net_signal_used(rnvq, count);
++		vhost_net_signal_used(rnvq, *count);
++		*count = 0;
+ 		/* Both tx vq and rx socket were polled here */
+ 		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
+ 
+@@ -1180,7 +1181,7 @@ static void handle_rx(struct vhost_net *net)
+ 
+ 	do {
+ 		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
+-						      &busyloop_intr, count);
++						      &busyloop_intr, &count);
+ 		if (!sock_len)
+ 			break;
+ 		sock_len += sock_hlen;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
