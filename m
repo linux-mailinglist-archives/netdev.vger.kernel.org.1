@@ -1,148 +1,99 @@
-Return-Path: <netdev+bounces-222676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA6ECB555DD
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 20:10:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E116B5568A
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 20:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87D635C5294
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 18:10:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D96215674E6
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 18:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7BE32A81F;
-	Fri, 12 Sep 2025 18:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A2D2874E0;
+	Fri, 12 Sep 2025 18:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="LQ3BgZpe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+t+UR+D"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51810302CB2;
-	Fri, 12 Sep 2025 18:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CF172613;
+	Fri, 12 Sep 2025 18:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757700609; cv=none; b=JxqUS9OQDGgaAyDAAMKec8QM684ZH6xZQwlJnymGck3XTl4lCq6qylYrbvG0jxl+EF6LL/BYS9BQi8VCPovP3V2DomvnuD/n4q1yYJRl9l/41AiPZ1nQuLCa8LlQ6DZkVTRTFUuBhm51kS4MPcR0m97ZZBW9DLY1ah/972CM0pE=
+	t=1757702885; cv=none; b=gkigWwXLwkIUSGCMSuolit2GF+1POP0m8/XPNlbwtKpDiQ8dCSyDBoX1+INq4KeMK6LGMeHdsX0tcIMNxbKQB05pgfjNVXTwsfonz5ysgP3QbVC/ZIa0Z8p4/m8KqkjBMPemkwZUalRJ8r/S3lDk7HH3bUG77bkHFVhqL/8VmA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757700609; c=relaxed/simple;
-	bh=yPJqLt8S5WWM4BObvCnuZSDbc1t/tgpd5gl4wkceEGg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X3c+crgGM9/fJ1XVtzaq2C74CVkrhehomByFYYJ3536xoME/bMOoI+eCfaFN+QpLEeXimyjuMh1mHTFgsWFMP0cunydtYHzj6hzrZoeg6QfcYcDom9jPyqzvP0axGR48m3M6LnNbhmhdWwc3I8hVBhZEFcjUksr1tpZ8m7qj9EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=LQ3BgZpe; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
-	by linux.microsoft.com (Postfix) with ESMTPSA id ED2B42119CBF;
-	Fri, 12 Sep 2025 11:10:00 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com ED2B42119CBF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1757700602;
-	bh=HXYJgEfXFwo/OPKrYhrveFvpXwC44rrX+LkCZApziY4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LQ3BgZpeMJGwjTLRudlWpMa8SX8RO+j/34vsQaL4PkTvTkI/qkWK/wElTFG4ma7bq
-	 8NM3LoJh5HhkcNK+KwwYAoh01/HqKWzw8IdRL8lUGd7y0lqldMU83UUu/URfbdFHiD
-	 X8LZ8UBwGVc2sHYIuNq4iAAYSpEmzqL/34I8VDGk=
-Message-ID: <a8c8305c-b518-c840-fc64-50bcba302725@linux.microsoft.com>
-Date: Fri, 12 Sep 2025 11:10:00 -0700
+	s=arc-20240116; t=1757702885; c=relaxed/simple;
+	bh=TF01d6JbBn3mSJtfnI0NvV2969+tVdaRFTz0N3Bel8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kXM50KrH95KbtmKta3PLmENQ1pY5FrvAumrMmY5i6TFNNZGdwn77s5YuufqIK7R2QQk4sXIBhrhsNjAb7KWrEn69MDaQd8spIGW/NXRMtOrnPG23S7fl+sRcNci6hd3q4Zg1Qz2P/jYWTeqvvaDU8iR+o9m5307kJowmP9RProc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+t+UR+D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40969C4CEF1;
+	Fri, 12 Sep 2025 18:48:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757702885;
+	bh=TF01d6JbBn3mSJtfnI0NvV2969+tVdaRFTz0N3Bel8Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N+t+UR+Dccu0XRqNfIh4sY7nzLNeE95dgylO+aNAkRZT5QR0IovaGLty4n1mUr3F8
+	 ShSIf4mlJPxxBcsPP0wDYV0opS+Rp39D1ZOpLIOEtt9D3ODxwzwLfVX7ao0WUENCva
+	 /7tpu3wCETlqCYtd3O4K7SWjwKJ9Ker0akJd/hTdpFLDqmYZwP9tftcOK/cOABruxl
+	 ZpmDY7nMQi5i3e6hQaxc69df4abBEhsViH7+817XA2ITBFKJ2+da27r0Kq7YSGnIOk
+	 Npw1XPocB8ikFNtPHILyFVp9HfXr2PQbY5Pbyi09iQnOAcaNc4j2W6xX6JdS4u/5ia
+	 OhYDa8tAvPVOQ==
+Date: Fri, 12 Sep 2025 19:48:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] rxrpc: Fix untrusted unsigned subtract
+Message-ID: <20250912184801.GD224143@horms.kernel.org>
+References: <2039268.1757631977@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH v1 2/2] Drivers: hv: Make CONFIG_HYPERV bool
-Content-Language: en-US
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
- linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
- maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
- airlied@gmail.com, simona@ffwll.ch, jikos@kernel.org, bentiss@kernel.org,
- kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, dmitry.torokhov@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, bhelgaas@google.com,
- James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
- deller@gmx.de, arnd@arndb.de, sgarzare@redhat.com, horms@kernel.org
-References: <20250906010952.2145389-1-mrathor@linux.microsoft.com>
- <20250906010952.2145389-3-mrathor@linux.microsoft.com>
- <2025090621-rumble-cost-2c0d@gregkh>
- <d7d7b23f-eaea-2dbc-9c9d-4bee082f6fe7@linux.microsoft.com>
- <2025091253-overwrite-carol-b197@gregkh>
-From: Mukesh R <mrathor@linux.microsoft.com>
-In-Reply-To: <2025091253-overwrite-carol-b197@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2039268.1757631977@warthog.procyon.org.uk>
 
-On 9/12/25 04:43, Greg KH wrote:
-> On Mon, Sep 08, 2025 at 02:01:34PM -0700, Mukesh R wrote:
->> On 9/6/25 04:36, Greg KH wrote:
->>> On Fri, Sep 05, 2025 at 06:09:52PM -0700, Mukesh Rathor wrote:
->>>> With CONFIG_HYPERV and CONFIG_HYPERV_VMBUS separated, change CONFIG_HYPERV
->>>> to bool from tristate. CONFIG_HYPERV now becomes the core Hyper-V
->>>> hypervisor support, such as hypercalls, clocks/timers, Confidential
->>>> Computing setup, PCI passthru, etc. that doesn't involve VMBus or VMBus
->>>> devices.
->>>
->>> But why are you making it so that this can not be a module anymore?  You
->>> are now forcing ALL Linux distro users to always have this code in their
->>> system, despite not ever using the feature.  That feels like a waste to
->>> me.
->>>
->>> What is preventing this from staying as a module?  Why must you always
->>> have this code loaded at all times for everyone?
->>
->> This is currently not a module. I assume it was at the beginning. In
->> drivers/Makefile today:
->>
->> obj-$(subst m,y,$(CONFIG_HYPERV))       += hv/
->>
->>
->> More context: CONFIG_HYPERV doesn't really reflect one module. It is
->> both for kernel built in code and building of stuff in drivers/hv.
->>
->> drivers/hv then builds 4 modules:
->>
->> obj-$(CONFIG_HYPERV)            += hv_vmbus.o
->> obj-$(CONFIG_HYPERV_UTILS)      += hv_utils.o
->> obj-$(CONFIG_HYPERV_BALLOON)    += hv_balloon.o
->> obj-$(CONFIG_MSHV_ROOT)         += mshv_root.o
->>
->> Notice vmbus is using CONFIG_HYPERV because there is no 
->> CONFIG_HYPERV_VMBUS. We are trying to fix that here.
+On Fri, Sep 12, 2025 at 12:06:17AM +0100, David Howells wrote:
+> Fix the following Smatch Smatch static checker warning:
+
+nit: Smatch Smatch -> Smatch
+
 > 
-> This series does not apply to my tree:
+>    net/rxrpc/rxgk_app.c:65 rxgk_yfs_decode_ticket()
+>    warn: untrusted unsigned subtract. 'ticket_len - 10 * 4'
 > 
-> checking file drivers/gpu/drm/Kconfig
-> checking file drivers/hid/Kconfig
-> checking file drivers/hv/Kconfig
-> Hunk #2 FAILED at 82.
-> 1 out of 2 hunks FAILED
-> checking file drivers/hv/Makefile
-> checking file drivers/input/serio/Kconfig
-> checking file drivers/net/hyperv/Kconfig
-> checking file drivers/pci/Kconfig
-> checking file drivers/scsi/Kconfig
-> checking file drivers/uio/Kconfig
-> checking file drivers/video/fbdev/Kconfig
-> checking file include/asm-generic/mshyperv.h
-> Hunk #1 succeeded at 162 with fuzz 2 (offset -3 lines).
-> Hunk #2 succeeded at 198 (offset -3 lines).
-> Hunk #3 succeeded at 215 (offset -3 lines).
-> checking file net/vmw_vsock/Kconfig
+> by prechecking the length of what we're trying to extract in two places in
+> the token and decoding for a response packet.
 > 
-> What was it made against?
+> Also use sizeof() on the struct we're extracting rather specifying the size
+> numerically to be consistent with the other related statements.
 > 
+> Fixes: 9d1d2b59341f ("rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lists.infradead.org/pipermail/linux-afs/2025-September/010135.html
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Marc Dionne <marc.dionne@auristor.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Simon Horman <horms@kernel.org>
+> cc: linux-afs@lists.infradead.org
+> cc: netdev@vger.kernel.org
+> ---
+>  net/rxrpc/rxgk_app.c |   19 ++++++++++++++-----
+>  1 file changed, 14 insertions(+), 5 deletions(-)
 
-Sorry to hear that. It was built against hyper-next, but perhaps I 
-accidentally used our internal mirror. Let me rebase and send V2
-right away.
-
-Thanks,
--Mukesh
-
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
