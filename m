@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-222401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D6CB541A5
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:19:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949B9B541A6
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 06:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C907486C17
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:19:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50CE6486C30
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 04:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E3E3D544;
-	Fri, 12 Sep 2025 04:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C6622D4F1;
+	Fri, 12 Sep 2025 04:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="nqnQ8CNz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQeubunF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FFD79CD
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 04:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.121
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8991179CD
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 04:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757650756; cv=none; b=V7PiAqSOYrmsUffaO5Er/aFTyn8Q4K5QuLIoK1InJ2CEvmuqnBpUANwz2UQ49ODxtmg4by6SKVwoK1M8qbwSsges/4Vmn9EQoQEYDt3AwdBMwdbnhVEm+DYdEtkBdvokqnF0nZFNIfT0nU8Q7h7sznhM3+tpsuqb+v0VWX/GMAo=
+	t=1757650788; cv=none; b=n0MW3Zst33IGB4k40fKgExBEtttlYUOMtfzbRdJXWBjbNZU9Q43RIHeZV6UTrMMe6C2fs0IeZvD/qY0jry7fxorcVfopIGJwtoSY9ADWdqJWzMV2vglmQLUXWthm8EYtujw6y0I/RWut/ZlwBXzwzI6m0zHpzxsbM+Pvew2ygaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757650756; c=relaxed/simple;
-	bh=uTXq0zEBSfWlXWzpiE7hQec/LobO7dtqvyKG9+YZ3OA=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=R2DvEEXpN6YdY6/PIaLF5VaVkmxbLaPK/UkZivupQUYf+Z1/LiEWB4PNdZu7zLaZ8YwyCjibP7hWpU5bRzFq4gLaSygrZtAqUD/bS4eN0UXKQ0OEyMWkb61jqI+SMDTs0GnhgTlLSozUAHViv00IjWR2IZ9cYYGd9uLaGkYJQOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=nqnQ8CNz; arc=none smtp.client-ip=185.125.188.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from famine.localdomain (unknown [50.35.97.145])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 6560141BF9;
-	Fri, 12 Sep 2025 04:19:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1757650746;
-	bh=PntQfB2oMsB34fjP/B+XhCke36SETLLjq5qJ9h92Kg8=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=nqnQ8CNz5ZZ9AjdksuVtnlYzSqjEpekWxf2s0IuTRTuklCPangurnixM3gaNdnRnf
-	 eBqe5Cc16yxmGAANWOOrHX9j0nD1ClxIXWp4YXQk0/9wU5cOvsKltMBdSd1FKJdTn9
-	 e3kzFfZpmW/+p/uj012p8ZV6MsE5JJSirVlKeGYSK+cMIqj1KjvPtEyn7DeIz+FuXH
-	 UtDAGLGz01z/0Z3rvbfQJsqj22Ham2O9atf2AD/ufbJEvj34uPn6I2S7Ya9l/g0Tjm
-	 EO9f+UhkEtvKtsunbAxo8XJFRIKsumyA9UVQh4K3vfkbcFZgYcVhWs+BctrNDXE08/
-	 3ox5SOPE0z7uw==
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id B60809FC97; Thu, 11 Sep 2025 21:19:04 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id B2EA39FBF6;
-	Thu, 11 Sep 2025 21:19:04 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: David Ahern <dsahern@gmail.com>
-cc: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org,
-    Stephen Hemminger <stephen@networkplumber.org>
-Subject: Re: [PATCH iproute2-next] tc/police: Allow 64 bit burst size
-In-reply-to: <d5b7afbf-318a-49c8-9e40-bcb4b452201b@gmail.com>
-References: <20250907014216.2691844-1-jay.vosburgh@canonical.com>
- <CAM0EoMmJaC3OAncWnUOkz6mn7BVXudnG1YKUYZomUkbVu8Zb+g@mail.gmail.com>
- <d5b7afbf-318a-49c8-9e40-bcb4b452201b@gmail.com>
-Comments: In-reply-to David Ahern <dsahern@gmail.com>
-   message dated "Thu, 11 Sep 2025 14:50:53 -0600."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1757650788; c=relaxed/simple;
+	bh=+JSxQ+gaH1zt0MkLtqDcrldmuerhcNAt6ZV7U/9yqY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fM9ZTXHmGXvSXvcFj5C+lWQIOT370wCIZrIHZq7eqfhFR+ARbdywqeq58fc8uTEqN+ouDRt2kzquLZGq1EvoXAa7RcBqCzUdePSi2Q+NOFFIjrB+ptVeSDyjuHmUItZk38IHyhE2CMetuHJl6zOZCpO+UmsTzd7Sr6LxCcJj4uU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQeubunF; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-251ace3e7caso19094235ad.2
+        for <netdev@vger.kernel.org>; Thu, 11 Sep 2025 21:19:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757650787; x=1758255587; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6nKvu5cfJ180DRAKFjFgHBVhF1AV98rGP3oTY8bGprQ=;
+        b=TQeubunFiZqZDah35xyrbJzMHyCGufiq99Ofn3iYvwDXiL5YfJU37kd51LGaHyCqIa
+         8xkJQeyGuROUhIVw5ysh16DZwlJzevmLYIOyUhZ+2f5jlP/N4p4uxwP+hjhLiU6glA31
+         lEuTOtaHJ3ATn3gn4jQa/zVCo2HX2JwWTdqA+pub68z8Pnwq80e29H9JPVAW6QUVGtbC
+         99kYM1gXLaC6DsV2YEKBWAY5RWPbwMQ47E7i3av0D3JSCVS+cxLlxZir7uDioT4YcgjZ
+         hOoRB7fJrpo1N+LND1+a58IXEAxomPx4qp2N8pbVOtO5tzoiFifs3PHnkmFbrHLFEVb0
+         /NUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757650787; x=1758255587;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6nKvu5cfJ180DRAKFjFgHBVhF1AV98rGP3oTY8bGprQ=;
+        b=n/CuAy37E2LDtPDeE3yPxW/3+nasKVjH2eKzr7RPXVmuQi7TU4RhMfvjw4p5xsjPVh
+         4P6ucbFCZCx0bo/NBYaS58VNHLZxhqYOT+H/oQzL+VAys+UhxLI1jJ/U8t2q0hmzjRzw
+         XEQ7t85mCN9Tz7WATAoBsMjQy3hn32lbe5hmfD8fNRHB4bTL1k1TeV+Yz3KXIrd1Htpy
+         6XXIw4neqvMI6JysxmqqKuNAiqq9aJDq29CLZcSexBR2Ux8f7kxgMlUj2tWREEh7hcAc
+         9teLn68/2xZ/LgVGD67E2j7376WmxfWdb8Diqin8owFcbR+ZdaiVnQrrP3YBcNGYgDr3
+         m03g==
+X-Forwarded-Encrypted: i=1; AJvYcCUn9iPVNbBr2L8Ac2GjU4BnRs3YmDWidtXsPlrVcTVktHv5gYq1j/a3BJMZeY55XuRFK8WUhQ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6gAx1yD+zTS1uRkIQndBQiMN2CfnOgXyf408LacVZNYErHQL7
+	jlMpH3+r6A7BRMeOsTFAsYSpBKcxV0Tk5J+g0JCgoyzSzWqMIrK7p1VF
+X-Gm-Gg: ASbGncu9Y8dFMNi2A82+ICVw+T2gSIpYc+MP6d1E0QAZD5thbsgO6N0sfvJFJALoR1g
+	2popm0nfUWiQNaRyeBaRd2cq/FlFWrrfNLbVkTFjrsnSadOAgXTXRVA2WmLNVNZWMY/YLd3n5BC
+	aSHTXPycq423Wvbo1wjHEn63i+q+cyy/OKfmvr6Sro4dbmkHrmjtVlDR1kqOFkSSaj+ZmJfvQiM
+	+NxqajexAvxGGr/HNMbp/dzH97ZkbfqWKAi35RkgebyDZi/B+1Fo8M14lQEO2jvD6t/aztsrC7Q
+	hfRYKoMJcFYJzZDSfiFnAP0NU5tNLy+NjjPRKFkqWg5sVu3cZ5o/qbH84CytSoeV9zsVGsOVxny
+	bUtSyf/ejrFDkQc8XjKZR+sNC2/fx/RMTUXuV
+X-Google-Smtp-Source: AGHT+IEm8DAmJ1SQii6dr3UbWWd9Pal3Of9tFu8U2LJtG2TZhT5L7kA+tBte6WgeHm26m9BBmQd6nQ==
+X-Received: by 2002:a17:903:1ab0:b0:24c:d08e:309b with SMTP id d9443c01a7336-25d24cac50fmr21771995ad.15.1757650786678;
+        Thu, 11 Sep 2025 21:19:46 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3a84957bsm34884335ad.80.2025.09.11.21.19.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Sep 2025 21:19:46 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 41FA141FA3A4; Fri, 12 Sep 2025 11:19:44 +0700 (WIB)
+Date: Fri, 12 Sep 2025 11:19:44 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kenel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Michael Grzeschik <m.grzeschik@pengutronix.de>
+Subject: Re: [PATCH net-next] Documentation: ARCnet: Update obsolete contact
+ info
+Message-ID: <aMOfYJgE-pKSAbWc@archie.me>
+References: <20250912040933.19036-1-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3090257.1757650744.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Sep 2025 21:19:04 -0700
-Message-ID: <3090258.1757650744@famine>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250912040933.19036-1-bagasdotme@gmail.com>
 
-David Ahern <dsahern@gmail.com> wrote:
+On Fri, Sep 12, 2025 at 11:09:33AM +0700, Bagas Sanjaya wrote:
+> ARCnet docs states that inquiries on the subsystem should be emailed to
+> Avery Pennarun <apenwarr@worldvisions.ca>, for whom has been in CREDITS
+> since the beginning of kernel git history and the subsystem is now
+> maintained by Michael Grzeschik since c38f6ac74c9980 ("MAINTAINERS: add
+> arcnet and take maintainership"). In addition, there used to be a
+> dedicated ARCnet mailing list but its archive at epistolary.org has been
+> shut down. ARCnet discussion nowadays take place in netdev list.
 
->On 9/9/25 9:32 PM, Jamal Hadi Salim wrote:
->> =
+Please ignore this patch. I will resend with correct LKML address shortly.
 
->> Please run tdc tests. David/Stephen - can we please make this a
->> requirement for iproute2 tc related changes?
->
->I will try to remember to run tdc tests for tc patches. Without an
->automated setup, there will be misses over time.
->
->> =
+Thanks.
 
->> Jay, your patches fail at least one test because you changed the unit o=
-utputs.
->> Either we fix the tdc test or you make your changes backward compatible=
-.
->> In the future also cc kernel tc maintainers (I only saw this because
->> someone pointed it to me).
->> Overall the changes look fine.
->
->Sent a patch to add a tc entry to iproute2 maintainers file.
->
->You say the change looks fine but at least one test fails meaning
->changes are requested?
-
-	Yes, I ran the tests and saw one failure, in the following:
-
-        "cmdUnderTest": "$TC actions add action police pkts_rate 1000 pkts=
-_burst
- 200 index 1",
-        "expExitCode": "0",
-        "verifyCmd": "$TC actions ls action police",
-        "matchPattern": "action order [0-9]*:  police 0x1 rate 0bit burst =
-0b mtu 4096Mb pkts_rate 1000 pkts_burst 200",
-
-	Which is trying to match a returned mtu value of "4096Mb" but
-the new code prints "4Gb"; should be straightforward to change the test
-to accept either returned value.
-
-	Or I can take out the bit that prints sufficiently large values
-in units of Gb, if you've got a preference for leaving that part alone.
-Doing so would ease the lockstep problem between the tests in the kernel
-tree and the change in iproute2.  The numeric formatting isn't the
-important part of the patch set, so I'm ok either way.
-
-	-J
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+-- 
+pw-bot: changes-requested
 
