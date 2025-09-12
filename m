@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-222515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D9B1B54B0F
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:35:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734C7B54B52
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 13:45:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C609C3A46E7
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:35:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 231C63AE7A4
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 11:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E442FDC2C;
-	Fri, 12 Sep 2025 11:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0DA2F3C31;
+	Fri, 12 Sep 2025 11:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="m21+TIdO"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="al6DQyxI"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic303-21.consmr.mail.ne1.yahoo.com (sonic303-21.consmr.mail.ne1.yahoo.com [66.163.188.147])
+Received: from sonic309-20.consmr.mail.ne1.yahoo.com (sonic309-20.consmr.mail.ne1.yahoo.com [66.163.184.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169ED2F531B
-	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 11:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.188.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A382DC791
+	for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 11:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.184.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757676906; cv=none; b=DPfM085laBQ45aGZobUzfRpN0C7AmuSo9xBACCtjPwl30lA0+fJVTxxitUfK4q0G1RN/cLi3b5e4zTbVPPo/y+Y5eiSiJ2OKzS2nv0B8M9iK7dmODhVEklprnSfLj5F9ACvSniIKNqDBAkc3oHt9T+15dlm9074y9Vn30mAneKU=
+	t=1757677513; cv=none; b=NwaWmzak8ryz9D4wLAYqMkiw1fcsLMWMphdnIHf9aoDcM/xZwoTwzxlvpIzmaTWOJnsoNRH1Fb0zn1q6q3CfgxMcZxRmbuECfQvtZYj+y3bH7+bFK8Aj2aZ8kAuLjc+J5CFfJg/xv7WAtoNMc3JHPWaZ0n0KNNjo3/383nfXRSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757676906; c=relaxed/simple;
-	bh=/D4ZsHmPotH4bpkYrgVoQfL3zC2wBli73f92oQH7skE=;
+	s=arc-20240116; t=1757677513; c=relaxed/simple;
+	bh=lZxSpP6bc+yrLhDlPDYG+Ew03JLZO/PQomcPSncCcDo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EuX9R57h74cm5o0EtcP/0HCluMbGhQLsyMo/jvZgIYN416wPNjmx7HmHWpvre33geje6nC3bcYHAmPmTs5FhWkYRNVNSLJAMwFhfIdwpUbP5L+dFmeSzBftaSgUiO5h+A2T3GHCv5KIyLh+sMwXoVTP7H8VxjS9ka6cZUvJOD+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=m21+TIdO; arc=none smtp.client-ip=66.163.188.147
+	 MIME-Version; b=Pk4l2xaeZpySgW2xT+dY2qk8Irs+RRz7SxlKw28ma/9cK719HkWHnrsoR8vUk365xNtaLwFrdkMULpiUdBjSB3pX1o68rUv7iu6/ATnQzOzFBIEejFsuAg16atRHGrfzY8ATSnSLc/wTBSaATyGOBwKmay7yiN07+0NCDYP7IeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=al6DQyxI; arc=none smtp.client-ip=66.163.184.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1757676897; bh=kQN6ns9dR4cKsHVgmniWSuQnXl22gTgXJWUVwRX4GN8=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=m21+TIdOH9jWQeqYpiB71U7foBUC6uXtilbnBTBJnJyocBSya7T2YDFrfDvQPcpIqXOSyqpW+lYV7NybaApmLGpq4yeuBGV1EzQHuUwxrxb663StLWOIDV3dNZtnw0p+X9qAXcq2IwMakqZL3n99M9iLK6+HfImYmn/btChN887cfNg0Ucj7m1Fc8pAQx2IsH7zAFGGe34DruV6bURSSPDkEvN0kyGH0W4T6zG/GoPTkkIkrXWn8Rol9CTG8G6+yZ2lWr4Da1iNTv+3YWTdJIXOi8W7bkusP1QzU19rFro/+a4hFwh5yxQswZDXRNzsDN1/mfXla5kk/TglaFDid9A==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1757676897; bh=R/v30VJvyxYL/dYxfEdkT/MNYEZ9ZBrh3wSmYg2hOON=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=YkQ401uY3xwOe3b6wNdBM1FqZwSTiVMi1PRgjBnrI4qm31OpWWgz6zR//1HLQIZ+SdgukCrVxjX3bahGuWNFY+D/5CXPPXoFFjlWjTAR15SPwrr0z1HM+AA+ujxaB02t7NmR8CvOm1rIdWB9WtPq5xXkApUUTXXA+iPv7mbNsdfe4EuV4rXM5VlKzvWfIpnejs/iTsnVG2sRHHs6rIcAbEpYo474G+taEfeAx1gUtv30oZc+HWqG1HOW0fIvBhIJt+ceuVxe0aOeR4OnJiFV2d0kMNkG318AmMqjxcG9Qtf1C9wWFxcdQRo5qNDDfaCaQwfGMwyPxaylOTzvXY6Azw==
-X-YMail-OSG: nIivqLoVM1lOivMbtDPvpmVJfGn.seRimOY8e4j1gEF5t8ny7vMsefNhWR7kTic
- LGXQv8a8i6bYw3iC06YVurKxglvzWWZquCh4ouBGzlx086GBVnN8XdbybFzVuwYMhZZ.RrpN3som
- HRNGHWhl2VlPDXESXu9YIfavdaBX1DhYZeLAeUrQaBehQ0v4yNU66iV6MDhKPkrGkFZEFmFPvcia
- XaDkCdkPcxxy44znKRDK1whR4usN2b8POSLQWVABPaNIiomf1wdet2aS5V6Si3mnRUcMdqv5mW4Z
- LOHdGDxeLHFsUtWlq7TsTWjX_lNHyAlQ4bvb11TOO8n9k65MIqj4Q.5KOkooJKzhsZZLss.aAgfI
- bTiZY0aGbmytIFqa1KlMN8egoVt8iSL2MYCgI9zuDpv1eX3G6w_DRCk3BteZNgjz18GMYqcbeWUS
- S0Mp6QxyNuDkJdJKnqToIUvpBTsXFeox16pLnVviXhV.GSSzVFOfRHdGxMM50bOQUIbNEoqQZNSy
- dFr.czXFxDXYMfrvTJJGVFQh0IMlA.L_fY0N1b.c1BmOImsUt9sHPqMfIRQ99E7fqyWKMz25Oka5
- su41Jq1VZKy6lZht2WXEasFtUHnSQ5vWCcPr0VvNbkWUJY3kxNfXrEeWyMrn60ckqf2wE54ZtiXX
- 0BkLsJ246oU56yp9FrfsJSwJ6glHXwRoFmww9jT86nW2UxqV2A_g1y7t6t.0vyNomOf_S8tczNq9
- b5ZMvMIWk7UtBKyydik0KV3P.B.M5yCTHdmkxJOyuEKYiFFdOa2uDqDsoEZPgh21X5CezpwqAxE9
- 8.l7g40BqNxajUnOrJkHxRB.rCATrpBK3iPV_mTA6lAq1hU253rAkya2tHuvs7ddZizauhyXNH1.
- vRSsion8a7RJu9PxRqE7tZ5a3zBXZHfofVm1.FW7LenLr_GJOYL5AMhjkLaElOQuox1TiDo7WAWK
- 3Kf_EYObsnq_nWKss8k6l_8udYZXO5dDGlNaBkzHdHg3Rq53mrjSk7nrQf5L2ihrZtuLKd_Sd6ay
- NQdAIueqDxjhuld7lihPHBaf096UQFqZhcXuSxKJZyQ_k7POtgUKXPnK2tFVENuWlfAwtbXOJ.cX
- RDf637coHkJH5BxL4ddrcaq_n6PQp3C5W_O5HhYVElymYU4ZTwgXYri6oiOSPYH81NMcYWKrTSB3
- Wp.Rs0GpN.V9RY5chv71gyrMJeqHaZjSdqmbyYpg7y1GhB2hGnXrovFDGBkllwkWT5M21dazayzB
- WUy93.3BddMhlSFnNsX9wgibjfXUHS0K5CuApR.C1Acsf8..AagdyXqx0sp8YhacmvwIH0VytSR8
- Nu0PZRwS0BWHGNpWFgXuMTVHWv.fET.vNasB3H3fEbc1sG.d1nydKBjzENVQsdUoHJFv2tUtT2vF
- hc7.JIz2MntDy01aSjgXaMAJsRo5br67TDLt9xhblYwxgEBDAL_.E6wwMEt418BvjTHU5IxziC_i
- DjtoR2HKqz_gMIscrfZf5R7bJzD.eiPTtSakkMJvEf4q2tmLkg2to7x7iSgu8W..aGUu9CnsnhEU
- 7qRXNZa6AhEqdulEHqSDOAS3v934_L5Yr2a_aKdqGq85cuFFkaVlllsHnh0tMxcVKHbGvzHzUyDJ
- g_hHkuxcxeeuEOWBdoy8KVoKsLe9X1Nhrej2FzjDaVAFg_ZLvzGW9embB8_v8VhdeWM3EC2oRQMH
- iaZ79E1AHbqJzA693IiLcdUGJWNI83_vA86uQhc4ruKNVNpKaZFpAh78Z_F4gJsf8zsl2t1ZtQEL
- VfcaDu2dzhqK2mo9asTjiwnwVpKZm.aBExAOmC7oSPeZQFBEI.dGKz2rmzgS0dj686EcZTgBj4X4
- kQ9TaigjSlbhixqolDyBY4AJnoV6wKgyiTdWqZCl03B_r0a0RA9tVZZjr74N8Vdfv2L_Kst_S8RN
- GBL5bZyFkXwAi6EOqWXlizDAc.VpFuuJEwQcvjj_hwUhdkv5ySoEEa66wrh27EXb39afWYPI0vVV
- vkreolMg5i9I9tt61aFor2N4l2FeX8S4r_6x9P7xnggrzy_QtdAoQsbCB9FmC5OcVO9aZsDL5pza
- gcmpu5ht8n4siBGpBfMXxZhXGqJz3IcL5G8q52_kEUi2q3NyxB2MzObs7rTC4Yj8VREtTVqFQ9cK
- bTGrrC3Cl0PugKox0niQQ8FA5Sg9qsx8p7N1VZ12HOXNjVw--
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1757677510; bh=hOCx3exMi/gEZlRMsfu6f3yZal5ZMUNsmvImqwmEt+8=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=al6DQyxIgm5jX9CJoZN6/Shihzz7bJ2P3cZjR//pA3Culr8jgisIIQ7AcKSQiWluOLJ/aX1nrzEQNE39ZVNAnla+6dQVSgR3aXSBGvyn8carp+snNzzC+dao7ha0GMdSNffM/5yWwsGT9Af0Jw/8/VLy+S5IrO27LyBP00upOmCooIP8Gw4xAz0gECz016VFe3X832YEzUg+tt1jZU0VO0ah1W7mFmvIUEZdMZx0lFolwwtCOnZpt6IaVgucUxDmLEqU0hGl3eNNbbdcDuxudfE0Y9AimXaDlNXhMzhHEqEcF5tx9v42guDOrV/pJGPq6YzsaxUnNR0IyW+3AUhr2Q==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1757677510; bh=9JkiZoW6deyCjsWlQaLj3VSSdwwok/TE0e0aoWnV9xb=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=e8gDXmmcFaetN6XJ/o5whJ4O7g2S/PgUn+4XM4wAxqLEWuNPc2pPiJObYaLAEiz7q/Hl2SUAeznB+Kh9UCvsVKXJBaUC8KV3lAoeEQoudIeZ0ZBN4F6mT/jyL4g/Vj0E2H4RsL2/DXi0T477SQInirPt5zlNEpfLba4G80VfuSs9KVC5gV16eCD6hMzdViEq44GWjVaxjT/iEwfdJ+MRnNu6WXzHpF8eXYy6ZlpdWOAxasd9i1xpOtC+HXeS9wdG02Y/qkugO086p074Epzr3bshpcgzR6WTcmubhvNys9ifT0ZgEhmePInif0u34MDbG5nj81gjW6un760jTaEw8w==
+X-YMail-OSG: JnAdo2oVM1mN0OqDLmR5gaglMmx8KeC5hCvpizUCTMjAv0EPrJsysxZ3BKjYcIz
+ 4bOEwjTozrhvCHIXSuZbgg6muj00r3ytwu5cjlGbUGqKcgsEEAn9ZaDCMKJD.YK2N9Rg23hb9q7f
+ WO.fQBib8ZUBUua7giPRhVc86gZhO..WNqS4sxlVPGGB6pI8fWsSCpBu.HzRCQ_EvrldpyHNIyRM
+ ip_ukjWUa9HmncvsfwyxKBGtmc6oTjJ3y865FAIgooqj65otmvxbNQUJcc6ZxOChDzfOozKPYc9q
+ XMO7Mpf6EzxTvy_Pe.x3Fp37z6dm4dOGST05rz5Iy3yvMITcOMnjwP3sNIDHb1q6Wpt6R5Y0OBsN
+ YpuvDYDWJXtZDALVzTvOuUvqNGxkvHrPHpdaTYt3MF47nPhXyeEuvBLgeQm3vKeyXxzSrHBWraXi
+ L_Fr8DOrJkOZs1K4Lp1zKR7mocyYzELA6WMXnQ3pyPoaqOMgKLsSmxr._ixEh9.qSxHHkrsUo2De
+ z1RQCkKcI6rle8lEyDPYijc2XzwuwmggBoYVITVcfoQAqkMehPkFTID6HcJtyC8m10RUpwX7XzL.
+ NBVyeFXDJUxgSqB2qH75Lyeb2J468PONhiGOEO7pQQPnVScNmKD3uE7Lk1aRMPQ5.gNDB_4rQi.8
+ ANI8zVFCVRfZ3F2V5sNgzoyCCOebsXekPXvHxKWOEzyPWtXew.xVEwMO1AKN1MxeVufwhLIY2nMJ
+ L.xVaJpaQiBAj1ltAcEYALxzCc863HZ8qHxDyVS1eFDzcw0t_GQSk2zehKSwJsYPHH6jBgdEYscM
+ CSBJexgUOr0SSEQlUNrN0Stfgbw9DI5P4.V2T9hkpUDQZLu8qEOFSNqTowAxo1OarepImD5C2_VI
+ nJcIhSWfPDn4G2UjydaCzVmsezvKDnEPyHGdCSk7K5v4qFdHsiUzWXG36LnoXbAjxx7geM7jXpgh
+ qdOOC1OnAApuV50g_7pfKeyb_crguQqt48G5KdOv5ZB9PtkunHKUV4Ezdctr9T1rHwS4hVjC0zQ0
+ X6LjNhYUrSnGjKphHA_cfe_qNd.iSLZZTdUMeWGmb23pCu9JdehktsEWwVGrtbRD1ES2DYSwOFHM
+ gvMrUW_Vf5K0D5jpxj6u1SLBSjPkmWKtW1fNrjFnj12i2JaC6yMwcT6325kuMLsZlXkmgxyuREbx
+ hQQ63Q8g9neQ9UPlthxDE_26qpxjDZf.C0DqZI0VzCulkOONxgjfUhAi7nGJ7u4Y9OeRVaqsJzwS
+ _4T1z0pCoc9HCwkMuFMLeinv.FA8wcma1IaGrReZtsiqc.bz0WO6vCj2_3vMjSdyAcYTw9ATz.yD
+ 1wuoxE_e9P6Dqxn66JG8CK.dGOxlv2boYssyX6QYDnlJNBZIAeqL1h_wzf9LFjY1iE3gzKa0cbgL
+ lHYvlFAWx9P6KjAbym_WbGfsANarDsbhYjifcSkjjoNj346NeXiKf9CxVtt.YV8cuwOfov8pf1I8
+ 9vGyzE4RouLc_TGaAAsvGmRSSLd1nV_Xu8ZEeddhpe4UhqrPJYPJM_U10aM_5VuPnJh9XlFMk0Ms
+ 9tIMobZTy0_9C2Xcd2I.FvZJW7ZDZnRUHujXdBJSTNeHlzJoDLAcUUt9yR698MR2Rge8cJg6ZOJR
+ .KVgHxQX3PCKXt8t1fHxQf.jxXgBCaUyX4IUHK8gshzP2oTkgfkTi25ltwCHxatJqlxFzKOkEpU.
+ UnRUy3DDfqTvt6T.h.XgQMwf0IgqrlbLI6noTkbFw95Cf2WkKf_yF6CZvSWkvy1zOdxk3hpBoHRs
+ jQXnK8hbuQlSAI_8N5FTY7YKc.yn49dMDwIzcPEjMf7L9AG7eeNlrNTSNroXQfWTH7bC9rQVWA0f
+ EWR_LHbMIgvRUe7uWylSy1VhXI0sYl9m5R9tUtPRf6TDipu61f6Z76yq7skzXM2yXi9Skt7GHt4K
+ yzooLZKGVRavykDxRbAjacp52V1Miliv.0uYBLUL9XIwLvQHOVCubfDVlVshc2pKlttam4crg_GU
+ UtXTul4BrHRm4VT0ru95y2gkc5wZMXulGpxYRQg.z8UFm_3QjlULTVuuUN83p4peT.EAd_8Jkl7q
+ dye2GUOAkbbX7gvhYQPUZ0x1xYWEYWyPFGfMWGRxYFyhqnq7bqobRfB7DJDsvkB.3Ii_tWuZd4tK
+ .41i.vBcfi_bbnl0qH0B_jB1SDNRgNxGsmnY2O2QyjH8NvihwGAI-
 X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: c405784a-adb1-4de2-9ec4-31216b83b70e
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.ne1.yahoo.com with HTTP; Fri, 12 Sep 2025 11:34:57 +0000
+X-Sonic-ID: 1a3c935b-93fc-4057-a8bb-bf9bf1fce931
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic309.consmr.mail.ne1.yahoo.com with HTTP; Fri, 12 Sep 2025 11:45:10 +0000
 Received: by hermes--production-ir2-7d8c9489f-pnggd (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 93cda13a9625b3ea865113cded111022;
-          Fri, 12 Sep 2025 11:24:49 +0000 (UTC)
+          Fri, 12 Sep 2025 11:24:53 +0000 (UTC)
 From: Marek Mietus <mmietus97@yahoo.com>
 To: netdev@vger.kernel.org,
 	antonio@openvpn.net,
 	kuba@kernel.org
 Cc: openvpn-devel@lists.sourceforge.net,
 	Marek Mietus <mmietus97@yahoo.com>
-Subject: [PATCH net-next v2 1/3] net: dst_cache: implement RCU variants for dst_cache helpers
-Date: Fri, 12 Sep 2025 13:24:18 +0200
-Message-ID: <20250912112420.4394-2-mmietus97@yahoo.com>
+Subject: [PATCH net-next v2 2/3] net: tunnel: implement noref flows in udp_tunnel_xmit_skb
+Date: Fri, 12 Sep 2025 13:24:19 +0200
+Message-ID: <20250912112420.4394-3-mmietus97@yahoo.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250912112420.4394-1-mmietus97@yahoo.com>
 References: <20250912112420.4394-1-mmietus97@yahoo.com>
@@ -88,192 +88,164 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement RCU variants for existing dst_cache helpers interacting with
-dst_entry.
+In cases where udp_tunnel_xmit_skb is called inside a RCU read-side
+critical section, we can avoid referencing the dst_entry.
 
-The new helpers avoid referencing the dst_entry, sparing some unnecessary
-atomic operations. They should only be used in flows that are already
-guaranteed to be inside a RCU read-side critical context.
+Implement noref variants for udp_tunnel_xmit_skb and iptunnel_xmit to be
+used in noref flows.
 
 Signed-off-by: Marek Mietus <mmietus97@yahoo.com>
 ---
- include/net/dst_cache.h | 26 ++++++++++++++
- net/core/dst_cache.c    | 78 +++++++++++++++++++++++++++++++++++------
- 2 files changed, 94 insertions(+), 10 deletions(-)
+ include/net/ip_tunnels.h   |  3 +++
+ include/net/udp_tunnel.h   |  4 ++++
+ net/ipv4/ip_tunnel_core.c  | 34 +++++++++++++++++++++++++++-------
+ net/ipv4/udp_tunnel_core.c | 29 +++++++++++++++++++++++++----
+ 4 files changed, 59 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/dst_cache.h b/include/net/dst_cache.h
-index 1961699598e2..d3bf616a6e6f 100644
---- a/include/net/dst_cache.h
-+++ b/include/net/dst_cache.h
-@@ -32,6 +32,21 @@ struct dst_entry *dst_cache_get(struct dst_cache *dst_cache);
-  */
- struct rtable *dst_cache_get_ip4(struct dst_cache *dst_cache, __be32 *saddr);
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 8cf1380f3656..6dcea237bf21 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -604,6 +604,9 @@ static inline int iptunnel_pull_header(struct sk_buff *skb, int hdr_len,
+ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+ 		   __be32 src, __be32 dst, u8 proto,
+ 		   u8 tos, u8 ttl, __be16 df, bool xnet, u16 ipcb_flags);
++void iptunnel_xmit_noref(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
++			 __be32 src, __be32 dst, u8 proto,
++			 u8 tos, u8 ttl, __be16 df, bool xnet, u16 ipcb_flags);
+ struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
+ 					     gfp_t flags);
+ int skb_tunnel_check_pmtu(struct sk_buff *skb, struct dst_entry *encap_dst,
+diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
+index 9acef2fbd2fd..033098ebf789 100644
+--- a/include/net/udp_tunnel.h
++++ b/include/net/udp_tunnel.h
+@@ -135,6 +135,10 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
+ 			 __be32 src, __be32 dst, __u8 tos, __u8 ttl,
+ 			 __be16 df, __be16 src_port, __be16 dst_port,
+ 			 bool xnet, bool nocheck, u16 ipcb_flags);
++void udp_tunnel_xmit_skb_noref(struct rtable *rt, struct sock *sk, struct sk_buff *skb,
++			       __be32 src, __be32 dst, __u8 tos, __u8 ttl,
++			       __be16 df, __be16 src_port, __be16 dst_port,
++			       bool xnet, bool nocheck, u16 ipcb_flags);
  
-+/**
-+ * dst_cache_get_ip4_rcu - lookup cache and ipv4 source under RCU
-+ * @dst_cache: the cache
-+ * @saddr: return value for the retrieved source address
-+ *
-+ * Perform cache lookup and fetch ipv4 source without taking a
-+ * reference on the dst.
-+ * Must be called with local BH disabled, and within an rcu read side
-+ * critical section.
-+ *
-+ * Return: Pointer to retrieved rtable if cache is initialized and
-+ * cached dst is valid, NULL otherwise.
-+ */
-+struct rtable *dst_cache_get_ip4_rcu(struct dst_cache *dst_cache, __be32 *saddr);
-+
- /**
-  *	dst_cache_set_ip4 - store the ipv4 dst into the cache
-  *	@dst_cache: the cache
-@@ -43,6 +58,17 @@ struct rtable *dst_cache_get_ip4(struct dst_cache *dst_cache, __be32 *saddr);
- void dst_cache_set_ip4(struct dst_cache *dst_cache, struct dst_entry *dst,
- 		       __be32 saddr);
+ void udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
+ 			  struct sk_buff *skb,
+diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+index cc9915543637..8b03fb380397 100644
+--- a/net/ipv4/ip_tunnel_core.c
++++ b/net/ipv4/ip_tunnel_core.c
+@@ -47,10 +47,10 @@ const struct ip6_tnl_encap_ops __rcu *
+ 		ip6tun_encaps[MAX_IPTUN_ENCAP_OPS] __read_mostly;
+ EXPORT_SYMBOL(ip6tun_encaps);
  
-+/**
-+ * dst_cache_steal_ip4 - store the ipv4 dst into the cache and steal its
-+ * reference
-+ * @dst_cache: the cache
-+ * @dst: the entry to be cached whose reference will be stolen
-+ * @saddr: the source address to be stored inside the cache
-+ *
-+ * local BH must be disabled
-+ */
-+void dst_cache_steal_ip4(struct dst_cache *dst_cache, struct dst_entry *dst,
-+			 __be32 saddr);
- #if IS_ENABLED(CONFIG_IPV6)
- 
- /**
-diff --git a/net/core/dst_cache.c b/net/core/dst_cache.c
-index 9ab4902324e1..f1e3992d8171 100644
---- a/net/core/dst_cache.c
-+++ b/net/core/dst_cache.c
-@@ -25,20 +25,30 @@ struct dst_cache_pcpu {
- 	};
- };
- 
--static void dst_cache_per_cpu_dst_set(struct dst_cache_pcpu *dst_cache,
--				      struct dst_entry *dst, u32 cookie)
-+static void __dst_cache_per_cpu_dst_set(struct dst_cache_pcpu *dst_cache,
-+					struct dst_entry *dst, u32 cookie)
+-void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+-		   __be32 src, __be32 dst, __u8 proto,
+-		   __u8 tos, __u8 ttl, __be16 df, bool xnet,
+-		   u16 ipcb_flags)
++static void __iptunnel_xmit(struct sock *sk, struct rtable *rt,
++			    struct sk_buff *skb, __be32 src, __be32 dst,
++			    __u8 proto, __u8 tos, __u8 ttl, __be16 df,
++			    u16 ipcb_flags)
  {
- 	DEBUG_NET_WARN_ON_ONCE(!in_softirq());
- 	dst_release(dst_cache->dst);
--	if (dst)
--		dst_hold(dst);
+ 	int pkt_len = skb->len - skb_inner_network_offset(skb);
+ 	struct net *net = dev_net(rt->dst.dev);
+@@ -58,10 +58,7 @@ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+ 	struct iphdr *iph;
+ 	int err;
  
- 	dst_cache->cookie = cookie;
- 	dst_cache->dst = dst;
- }
- 
--static struct dst_entry *dst_cache_per_cpu_get(struct dst_cache *dst_cache,
--					       struct dst_cache_pcpu *idst)
-+static void dst_cache_per_cpu_dst_set(struct dst_cache_pcpu *dst_cache,
-+				      struct dst_entry *dst, u32 cookie)
-+{
-+	if (dst == dst_cache->dst && cookie == dst_cache->cookie)
-+		return;
-+
-+	if (dst)
-+		dst_hold(dst);
-+
-+	__dst_cache_per_cpu_dst_set(dst_cache, dst, cookie);
-+}
-+
-+static struct dst_entry *__dst_cache_per_cpu_get(struct dst_cache *dst_cache,
-+						 struct dst_cache_pcpu *idst)
- {
- 	struct dst_entry *dst;
- 
-@@ -47,14 +57,10 @@ static struct dst_entry *dst_cache_per_cpu_get(struct dst_cache *dst_cache,
- 	if (!dst)
- 		goto fail;
- 
--	/* the cache already hold a dst reference; it can't go away */
--	dst_hold(dst);
+-	skb_scrub_packet(skb, xnet);
 -
- 	if (unlikely(!time_after(idst->refresh_ts,
- 				 READ_ONCE(dst_cache->reset_ts)) ||
- 		     (READ_ONCE(dst->obsolete) && !dst->ops->check(dst, idst->cookie)))) {
- 		dst_cache_per_cpu_dst_set(idst, NULL, 0);
--		dst_release(dst);
- 		goto fail;
+ 	skb_clear_hash_if_not_l4(skb);
+-	skb_dst_set(skb, &rt->dst);
+ 	memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+ 	IPCB(skb)->flags = ipcb_flags;
+ 
+@@ -89,8 +86,31 @@ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+ 		iptunnel_xmit_stats(dev, pkt_len);
  	}
- 	return dst;
-@@ -64,6 +70,18 @@ static struct dst_entry *dst_cache_per_cpu_get(struct dst_cache *dst_cache,
- 	return NULL;
  }
- 
-+static struct dst_entry *dst_cache_per_cpu_get(struct dst_cache *dst_cache,
-+					       struct dst_cache_pcpu *idst)
++
++void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
++		   __be32 src, __be32 dst, __u8 proto,
++		   __u8 tos, __u8 ttl, __be16 df, bool xnet,
++		   u16 ipcb_flags)
 +{
-+	struct dst_entry *dst;
++	skb_scrub_packet(skb, xnet);
++	skb_dst_set(skb, &rt->dst);
 +
-+	dst = __dst_cache_per_cpu_get(dst_cache, idst);
-+	if (dst)
-+		/* the cache already hold a dst reference; it can't go away */
-+		dst_hold(dst);
-+	return dst;
++	__iptunnel_xmit(sk, rt, skb, src, dst, proto, tos, ttl, df, ipcb_flags);
 +}
+ EXPORT_SYMBOL_GPL(iptunnel_xmit);
+ 
++void iptunnel_xmit_noref(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
++			 __be32 src, __be32 dst, __u8 proto,
++			 __u8 tos, __u8 ttl, __be16 df, bool xnet,
++			 u16 ipcb_flags)
++{
++	skb_scrub_packet(skb, xnet);
++	skb_dst_set_noref(skb, &rt->dst);
 +
- struct dst_entry *dst_cache_get(struct dst_cache *dst_cache)
++	__iptunnel_xmit(sk, rt, skb, src, dst, proto, tos, ttl, df, ipcb_flags);
++}
++EXPORT_SYMBOL_GPL(iptunnel_xmit_noref);
++
+ int __iptunnel_pull_header(struct sk_buff *skb, int hdr_len,
+ 			   __be16 inner_proto, bool raw_proto, bool xnet)
  {
- 	struct dst_entry *dst;
-@@ -100,6 +118,28 @@ struct rtable *dst_cache_get_ip4(struct dst_cache *dst_cache, __be32 *saddr)
+diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
+index fce945f23069..c0e9007cf081 100644
+--- a/net/ipv4/udp_tunnel_core.c
++++ b/net/ipv4/udp_tunnel_core.c
+@@ -170,10 +170,9 @@ void udp_tunnel_notify_del_rx_port(struct socket *sock, unsigned short type)
  }
- EXPORT_SYMBOL_GPL(dst_cache_get_ip4);
+ EXPORT_SYMBOL_GPL(udp_tunnel_notify_del_rx_port);
  
-+struct rtable *dst_cache_get_ip4_rcu(struct dst_cache *dst_cache, __be32 *saddr)
-+{
-+	struct dst_cache_pcpu *idst;
-+	struct dst_entry *dst;
-+
-+	if (!dst_cache->cache)
-+		return NULL;
-+
-+	local_lock_nested_bh(&dst_cache->cache->bh_lock);
-+	idst = this_cpu_ptr(dst_cache->cache);
-+	dst = __dst_cache_per_cpu_get(dst_cache, idst);
-+	if (!dst) {
-+		local_unlock_nested_bh(&dst_cache->cache->bh_lock);
-+		return NULL;
-+	}
-+
-+	*saddr = idst->in_saddr.s_addr;
-+	local_unlock_nested_bh(&dst_cache->cache->bh_lock);
-+	return dst_rtable(dst);
-+}
-+EXPORT_SYMBOL_GPL(dst_cache_get_ip4_rcu);
-+
- void dst_cache_set_ip4(struct dst_cache *dst_cache, struct dst_entry *dst,
- 		       __be32 saddr)
+-void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb,
+-			 __be32 src, __be32 dst, __u8 tos, __u8 ttl,
+-			 __be16 df, __be16 src_port, __be16 dst_port,
+-			 bool xnet, bool nocheck, u16 ipcb_flags)
++static void udp_tunnel_add_hdr(struct sk_buff *skb, __be32 src,
++			       __be32 dst, __be16 src_port,
++			       __be16 dst_port, bool nocheck)
  {
-@@ -116,6 +156,24 @@ void dst_cache_set_ip4(struct dst_cache *dst_cache, struct dst_entry *dst,
- }
- EXPORT_SYMBOL_GPL(dst_cache_set_ip4);
+ 	struct udphdr *uh;
  
-+void dst_cache_steal_ip4(struct dst_cache *dst_cache, struct dst_entry *dst,
-+			 __be32 saddr)
-+{
-+	struct dst_cache_pcpu *idst;
-+
-+	if (!dst_cache->cache) {
-+		dst_release(dst);
-+		return;
-+	}
-+
-+	local_lock_nested_bh(&dst_cache->cache->bh_lock);
-+	idst = this_cpu_ptr(dst_cache->cache);
-+	__dst_cache_per_cpu_dst_set(idst, dst, 0);
-+	idst->in_saddr.s_addr = saddr;
-+	local_unlock_nested_bh(&dst_cache->cache->bh_lock);
+@@ -188,12 +187,34 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
+ 	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+ 
+ 	udp_set_csum(nocheck, skb, src, dst, skb->len);
 +}
-+EXPORT_SYMBOL_GPL(dst_cache_steal_ip4);
 +
- #if IS_ENABLED(CONFIG_IPV6)
- void dst_cache_set_ip6(struct dst_cache *dst_cache, struct dst_entry *dst,
- 		       const struct in6_addr *saddr)
++void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk,
++			 struct sk_buff *skb, __be32 src, __be32 dst,
++			 __u8 tos, __u8 ttl, __be16 df, __be16 src_port,
++			 __be16 dst_port, bool xnet, bool nocheck,
++			 u16 ipcb_flags)
++{
++	udp_tunnel_add_hdr(skb, src, dst, src_port, dst_port, nocheck);
+ 
+ 	iptunnel_xmit(sk, rt, skb, src, dst, IPPROTO_UDP, tos, ttl, df, xnet,
+ 		      ipcb_flags);
+ }
+ EXPORT_SYMBOL_GPL(udp_tunnel_xmit_skb);
+ 
++void udp_tunnel_xmit_skb_noref(struct rtable *rt, struct sock *sk,
++			       struct sk_buff *skb, __be32 src, __be32 dst,
++			       __u8 tos, __u8 ttl, __be16 df, __be16 src_port,
++			       __be16 dst_port, bool xnet, bool nocheck,
++			       u16 ipcb_flags)
++{
++	udp_tunnel_add_hdr(skb, src, dst, src_port, dst_port, nocheck);
++
++	iptunnel_xmit_noref(sk, rt, skb, src, dst, IPPROTO_UDP, tos, ttl, df,
++			    xnet, ipcb_flags);
++}
++EXPORT_SYMBOL_GPL(udp_tunnel_xmit_skb_noref);
++
+ void udp_tunnel_sock_release(struct socket *sock)
+ {
+ 	rcu_assign_sk_user_data(sock->sk, NULL);
 -- 
 2.51.0
 
