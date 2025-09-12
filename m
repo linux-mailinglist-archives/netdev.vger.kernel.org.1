@@ -1,103 +1,96 @@
-Return-Path: <netdev+bounces-222355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CC5CB53F4E
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:56:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13DBCB53F5E
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 02:02:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBDA2A05729
-	for <lists+netdev@lfdr.de>; Thu, 11 Sep 2025 23:56:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0F7F560489
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 00:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C837626B942;
-	Thu, 11 Sep 2025 23:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2B7111A8;
+	Fri, 12 Sep 2025 00:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loreQqMe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kd44Djh7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F14426A0A7;
-	Thu, 11 Sep 2025 23:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C444D2DC76D;
+	Fri, 12 Sep 2025 00:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757634982; cv=none; b=uBvOLtEOv3jSd99pULG/CHuXZHk248uc/yq5Hper6SP6LTxXGtE5U9W1pUOFy1nSez4MFRW4NJ/IJJX9lwXM++CqWH55MWA+O4piFz8VKy5eA59zrQyetmFb/l4QUsQHfWpExxladD+UnKbmh1kfG5gQWTARpAXb55vSaPnPpi8=
+	t=1757635321; cv=none; b=f2f8L6tUl7FhiRDn7QF57sLl6JB8tL8Y7QDdmv7vnKKSA4Z3Ac9USzAbT9nqazXsxwlmPgrIaRk3gHR3VYHAyJZrEek/G7+vSKCScFxIXnnmZBAxTh1n9XvPlAi1ZFJSlB+VnEb72Diq6VnTRynFesF4COnjeKCd0eI8w7pwH+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757634982; c=relaxed/simple;
-	bh=KvYjeYboHFWJWtv+WVJpkFkNTuVtS5MQR5jhgNcuTiY=;
+	s=arc-20240116; t=1757635321; c=relaxed/simple;
+	bh=0wrrUK4oFK61WEcwJoC3CXhY9QFy4rgtgWwUYrq0Opk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MUEvoDTKQGnC6sGwtALxhtKvF8L/ZIIHAVDbv7R/gKNI5/oP7MLnvU6Dg/DTQd9iszaLDEbeUloUENWtTtM8QnepzpAnyu/Gh4BaZVgND8QME37kxAa+IWrN3mqetM3QPEkhBvLnBCFwZQ9sn+UCXNasWGzWM+NM9zQkGAk2nH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=loreQqMe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA24EC4CEF0;
-	Thu, 11 Sep 2025 23:56:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=E7YUx9SGzTaMmlKejf+0Kj2DE1sIyub51Q+UNeqfxomyAD3Ygt37vxJQGLcEwrpIQZ0GhdnMhRz9eIIyHL35BJ0m/bFK7BmgBG21d7+I1JoBU6JjXFPgFyfnDOQn5yF7PBiml088waXZFgDMv1ig0EdqYy6Kzy3TCFA7yx7mnxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kd44Djh7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C03CCC4CEF0;
+	Fri, 12 Sep 2025 00:02:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757634982;
-	bh=KvYjeYboHFWJWtv+WVJpkFkNTuVtS5MQR5jhgNcuTiY=;
+	s=k20201202; t=1757635321;
+	bh=0wrrUK4oFK61WEcwJoC3CXhY9QFy4rgtgWwUYrq0Opk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=loreQqMeR6bYdQMcAeEZgvvCWWgG7LReaKaHEWjjywup5hT1YW4AL9BP6BYalM/jE
-	 Z/hG/h8V3skj9H5dSqJt2SSjFypvT7ra+kjxrHbmYdlVmbpRb4w4Z76PjFE+bCI6SX
-	 a1rdIKqBVXCiXhocnwHDtIjB28b0rXrOnpSY1GlBOzIbG7L72HoHyJlv+g+j3JAW1c
-	 NG2hlEBP5sF86NXuLxh6ToNCz3MUVJo7+hG6jL8PSMVa17KZ/4VDortn/XEKDJ9846
-	 0Hhmbuyah/nD1UwG06yreKf91SmxKFylGvbsoT6E5Cz9rA2KnYC8SE5nEOLaWyGkXy
-	 Ynj1KTC3B+wJw==
-Date: Thu, 11 Sep 2025 16:56:21 -0700
+	b=kd44Djh7pYO5hpTr2eXfUuw2U3SIZXAP03Bx/lMr6U5OjMqZoVFGwuKp9niagx3mW
+	 J7wtpMixRjTORzLjl3S57ubl0+IUzLk2Jwu1UVqVexsGvGbvJnRYY+mfuDQ3hUEkt4
+	 y0za4yPT4yyi/dVgIcHUQEK6ourw0nMI3CYlkmVqykCbpokVXyaeIChewqrrWBSgif
+	 vZh8FxXMumht53cMKwt5uakXzo17LP/lsOSN5N6iZN7VpaPIeXChx0YXuUVaX+Tf8J
+	 wFrn2ZgrkBGKTmDjZs0myx2YZDxAwO2DWG630RBOHmXYddJusBJhctH/sQIZCqypnJ
+	 t87HiHPMP/kLg==
+Date: Thu, 11 Sep 2025 17:01:59 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [GIT PULL] wireless-next-2025-09-11
-Message-ID: <20250911165621.027ee3be@kernel.org>
-In-Reply-To: <2da9103af3f341f05bc8c42e4425ec15231498e5.camel@sipsolutions.net>
-References: <20250911100854.20445-3-johannes@sipsolutions.net>
-	<2da9103af3f341f05bc8c42e4425ec15231498e5.camel@sipsolutions.net>
+To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <Jose.Abreu@synopsys.com>, Rohan
+ G Thomas <rohan.g.thomas@intel.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Matthew
+ Gerlach <matthew.gerlach@altera.com>
+Subject: Re: [PATCH net 1/2] net: stmmac: est: Fix GCL bounds checks
+Message-ID: <20250911170159.383edcc6@kernel.org>
+In-Reply-To: <2d00df77-870d-426c-a823-3a9f53d9eb30@altera.com>
+References: <20250911-qbv-fixes-v1-0-e81e9597cf1f@altera.com>
+	<20250911-qbv-fixes-v1-1-e81e9597cf1f@altera.com>
+	<aMKxc6AuEiWplhcV@shell.armlinux.org.uk>
+	<2d00df77-870d-426c-a823-3a9f53d9eb30@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 11 Sep 2025 19:01:39 +0200 Johannes Berg wrote:
-> On Thu, 2025-09-11 at 12:08 +0200, Johannes Berg wrote:
-> > Please pull and let us know if there's any problem. =20
->=20
-> Speaking of problems ... we've kept adding Link: tags. If you're going
-> to insist we remove them then please just say so explicitly, reject this
-> pull request as well if you like, and save everyone the discussion.
->=20
-> I do truly believe Linus to be wrong on this: assuming a patch has no
-> need for any identification/correlation whatsoever before it goes into
-> his (or a feeder) tree (and gets a stable sha1) is akin to assuming it
-> has no life before it actually ends up there, which I think is
-> completely out of touch with reality. But he does ultimately get to
-> reject pull requests, so...
+On Thu, 11 Sep 2025 18:12:16 +0530 G Thomas, Rohan wrote:
+> On 9/11/2025 4:54 PM, Russell King (Oracle) wrote:
+> > On Thu, Sep 11, 2025 at 04:22:59PM +0800, Rohan G Thomas via B4 Relay wrote:  
+> >> @@ -1012,7 +1012,7 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
+> >>   		s64 delta_ns = qopt->entries[i].interval;
+> >>   		u32 gates = qopt->entries[i].gate_mask;
+> >>   
+> >> -		if (delta_ns > GENMASK(wid, 0))
+> >> +		if (delta_ns >= BIT(wid))  
+> > 
+> > While I agree this makes it look better, you don't change the version
+> > below, which makes the code inconsistent. I also don't see anything
+> > wrong with the original comparison.  
+> 
+> Just to clarify the intent behind this change:
+> For example, if wid = 3, then GENMASK(3, 0) = 0b1111 = 15. But the
+> maximum supported gate interval in this case is actually 7, since only 3
+> bits are available to represent the value. So in the patch, the
+> condition delta_ns >= BIT(wid) effectively checks if delta_ns is 8 or
+> more, which correctly returns an error for values that exceed the 3-bit
+> limit.
 
-Let's see, IMHO links to patch.msgid.link are unambiguously purely to
-the posting, not any discussion. I'm planning to try to hack something
-up in our patchwork scripts to try to skip applying them when thread is
-completely bare, but my next two weekends are quite busy. I'd say
-steady as she goes for now..
-
-> Maybe I should make the links go to patchwork, because there you have
-> the CI results ... maybe that could be construed as useful information
-> in the "Linus sense" (phrased that way because to me the mailing list
-> posting is already useful information)?
-
-Maybe. I find ML more useful, but do very occasionally want to look=20
-at pw. As long as one has the message-id it's not hard to find the pw
-entry. I'd recommend against changing the linking to pw. My guess is
-that would only lead to increases hostility :)
-
-My personal opinion is that pw-bot already knows the message-id to
-commit hash mapping. I was asking K to expose this as some REST
-endpoint so that we can trivially script the conversions. But he
-suggested (not without sense) that patchwork should serve as our DB,
-not 100 random disparate services. One day the netdev foundation will
-clear all the organizational hurdles and the PW work will happen :D
-
-
-unrelated - the wireless PR was already pulled, pw-bot did not respond
-=F0=9F=A4=B7=EF=B8=8F
+Comparison to BIT() looks rather odd, I think it's better to correct
+the GENMASK() bound?
 
