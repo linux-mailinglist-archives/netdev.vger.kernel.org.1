@@ -1,235 +1,93 @@
-Return-Path: <netdev+bounces-222365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A3DB53FDE
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:25:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 669A8B53FE6
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 03:34:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 680115A51F6
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:25:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD7181BC6F0F
+	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 01:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36CC145355;
-	Fri, 12 Sep 2025 01:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7F32C187;
+	Fri, 12 Sep 2025 01:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="f86JG/uv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="muUGO9kJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B815913DDAE;
-	Fri, 12 Sep 2025 01:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A556E15ECD7;
+	Fri, 12 Sep 2025 01:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757640338; cv=none; b=Ww9HvdqbSrmaFvVTX4U5JK9ZupyvauiKa8okREfEXaZckz9bKOOIXtOvEzY8JoP2932UgfqOHUn3le3wrtJ4PgC3ijjHGitt78Ir1IPj1/0ZsK3zpL4hzywv9Z6geWB8KsImPpsBxVILTN17He1z30QabrL3uR0jXv8xPgX0s3Y=
+	t=1757640837; cv=none; b=bv0424lVV9yJSoLnSo8tgArvkAGtXzpSNaX0DEV2/uOiIXeIVtdxR9p8rrbSg3Ed4nFu4zkm3PBE1X5pxVbcehCHC+rVUbtyjNepuz8FPMSdNrYo9YyH4TS/Fsx9Z6j9BGBFVJ/qqicpwx3nq7ZdRa5W8sOw5kUVKfFhcdhYkAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757640338; c=relaxed/simple;
-	bh=3YmaqxnuqcxgCvWd/QJ6kWVnfUcuSMAyIHeszBTQ/ng=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Of6LS+cS7Wieb/oFtEIflf9jbjC+GcyA7/AuPqJpJblvJ9RWQ4H9GF/WIfheYGzdFdy01OfDIwk4Z5yE5zwOPgMoXui7+iQ7SYlTlRx3dWZrDnsd5UooUR3/YvydZl+kodLKpksBWUX6D7ybOsmJAc2RwGOVpJdT0eA3uHJxeGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=f86JG/uv; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1757640327;
-	bh=IafyWMUW1UQ/vXdF1tZUL5MaLfxOcMPBhfUqkFXNiwE=;
-	h=Date:From:To:Cc:Subject:From;
-	b=f86JG/uv9FB4d/DY991GKj+DPYOK5s+QeL1Sh7RcoVAb5FcL2Fhr2ulW8769ykUtw
-	 /TWIXbi22VjJSoxwsFMoHiUGAcWiKaRUPxnA05iZPWgsapmO3dOgrCs7vf0dYqDAD+
-	 jX1YTebOTimgkBBQp9FPKK4M8uweH9waQn0ZLC7wEbvAM7ekz0wXC5AP4XEAyTWyBm
-	 zVk+Jbo3xGpOYPjaO/qYB4ktn99JYO5ngOOHHopEZBlf/1Iam1qrQZWMtNiEBZX7TH
-	 k9bjeHApDhLAFWO2wTxOWgiyeswgSNNGdhKG3ZUFzycfCGpUIMVuBpspYBj5Zwr6Gh
-	 FtA7E8btbqPCg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cNGvV29pCz4w9Q;
-	Fri, 12 Sep 2025 11:25:24 +1000 (AEST)
-Date: Fri, 12 Sep 2025 11:25:23 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Florian Westphal <fw@strlen.de>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Matthieu Baerts
- <matttbe@kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20250912112523.4914c6bf@canb.auug.org.au>
+	s=arc-20240116; t=1757640837; c=relaxed/simple;
+	bh=vG0kjAUYKuIhXTyQzMeZYUvyiQzR8Oxef3QN3QE3pHc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mhqk0xvI07EDok9xbxHBK325biNDl2be4LbzmIM/KnnB2ppbiQ/NYrhL86VKI0QcPqhAW2pC/4H2Xik14T/GXe2yUh3YNi8v7Ex5x0gZcVwE66KJe0bi60ATBAvntRuwIcIXUcBTgHVFxCoWmWxp63yJITNs/JsnAIXYVjfK2xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=muUGO9kJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 335E8C4CEF0;
+	Fri, 12 Sep 2025 01:33:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757640837;
+	bh=vG0kjAUYKuIhXTyQzMeZYUvyiQzR8Oxef3QN3QE3pHc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=muUGO9kJFUhSNdq4IJth+6ehIfmg2Vge0aK/Cg1aaECRSx6l9ZBzqFsHCAd3MC5+K
+	 bCinEXeoufMu64+bJaxq5kXD8ptG3m6h7gy0/ajteCSoHjvN36fH5XToQPB5Hp7oeU
+	 C+rnMsjdQhRf8LxAQXKR1mQt+R1DhjtPyMBKRYr7CyTrbhm80QJ8z5CikkQUaGU/x5
+	 OQ/sBVDVPQFzCy5FGoPMpAePqBpj+hFt+uS7Cff5Aw9v46VWfgWXwPC3v8FflWc6zG
+	 K2JNyrXSkkA207DeVIy4c/K7N45EJLRRHcZFxwUDcbIsrQaQY6tO71peQqNURfQBhN
+	 9kwGXk7o/TEqw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC2383BF69;
+	Fri, 12 Sep 2025 01:34:00 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/FyeqAwhVQ+VVDIWRtAYgROf";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 1/2] selftests: Disable dad for ipv6 in
+ fcnal-test.sh
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175764083975.2367774.17529978426990502405.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Sep 2025 01:33:59 +0000
+References: <20250910025828.38900-1-dsahern@kernel.org>
+In-Reply-To: <20250910025828.38900-1-dsahern@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, linux-kselftest@vger.kernel.org,
+ shuah@kernel.org
 
---Sig_/FyeqAwhVQ+VVDIWRtAYgROf
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Today's linux-next merge of the net-next tree got conflicts in:
+On Tue,  9 Sep 2025 20:58:27 -0600 you wrote:
+> Constrained test environment; duplicate address detection is not needed
+> and causes races so disable it.
+> 
+> Signed-off-by: David Ahern <dsahern@kernel.org>
+> ---
+>  tools/testing/selftests/net/fcnal-test.sh | 2 ++
+>  1 file changed, 2 insertions(+)
 
-  net/netfilter/nft_set_pipapo.c
-  net/netfilter/nft_set_pipapo_avx2.c
+Here is the summary with links:
+  - [net-next,1/2] selftests: Disable dad for ipv6 in fcnal-test.sh
+    https://git.kernel.org/netdev/net-next/c/53d591730ea3
+  - [net-next,2/2] selftests: Replace sleep with slowwait
+    https://git.kernel.org/netdev/net-next/c/2f186dd5585c
 
-between commit:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  c4eaca2e1052 ("netfilter: nft_set_pipapo: don't check genbit from packetp=
-ath lookups")
 
-from the net tree and commit:
-
-  416e53e39516 ("netfilter: nft_set_pipapo_avx2: split lookup function in t=
-wo parts")
-
-(and maybe others) from the net-next tree.
-
-I used the resoution provided by Matthieu, thanks.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc net/netfilter/nft_set_pipapo.c
-index 793790d79d13,4b64c3bd8e70..000000000000
---- a/net/netfilter/nft_set_pipapo.c
-+++ b/net/netfilter/nft_set_pipapo.c
-@@@ -539,7 -562,7 +578,7 @@@ nft_pipapo_lookup(const struct net *net
-  	const struct nft_pipapo_elem *e;
- =20
-  	m =3D rcu_dereference(priv->match);
-- 	e =3D pipapo_get(m, (const u8 *)key, NFT_GENMASK_ANY, get_jiffies_64());
- -	e =3D pipapo_get_slow(m, (const u8 *)key, genmask, get_jiffies_64());
-++	e =3D pipapo_get_slow(m, (const u8 *)key, NFT_GENMASK_ANY, get_jiffies_6=
-4());
- =20
-  	return e ? &e->ext : NULL;
-  }
-diff --cc net/netfilter/nft_set_pipapo_avx2.c
-index c0884fa68c79,7559306d0aed..000000000000
---- a/net/netfilter/nft_set_pipapo_avx2.c
-+++ b/net/netfilter/nft_set_pipapo_avx2.c
-@@@ -1241,28 -1226,75 +1226,74 @@@ next_match
- =20
-  #undef NFT_SET_PIPAPO_AVX2_LOOKUP
- =20
-- 		if (ret < 0)
-- 			goto out;
--=20
-- 		if (last) {
-- 			const struct nft_set_ext *e =3D &f->mt[ret].e->ext;
--=20
-- 			if (unlikely(nft_set_elem_expired(e)))
-- 				goto next_match;
--=20
-- 			ext =3D e;
-- 			goto out;
-+ 		if (ret < 0) {
-+ 			scratch->map_index =3D map_index;
-+ 			kernel_fpu_end();
-+ 			__local_unlock_nested_bh(&scratch->bh_lock);
-+ 			return NULL;
-  		}
- =20
-+ 		if (last) {
-+ 			struct nft_pipapo_elem *e;
-+=20
-+ 			e =3D f->mt[ret].e;
-+ 			if (unlikely(__nft_set_elem_expired(&e->ext, tstamp) ||
-+ 				     !nft_set_elem_active(&e->ext, genmask)))
-+ 				goto next_match;
-+=20
-+ 			scratch->map_index =3D map_index;
-+ 			kernel_fpu_end();
-+ 			__local_unlock_nested_bh(&scratch->bh_lock);
-+ 			return e;
-+ 		}
-+=20
-+ 		map_index =3D !map_index;
-  		swap(res, fill);
-- 		rp +=3D NFT_PIPAPO_GROUPS_PADDED_SIZE(f);
-+ 		data +=3D NFT_PIPAPO_GROUPS_PADDED_SIZE(f);
-  	}
- =20
-- out:
-- 	if (i % 2)
-- 		scratch->map_index =3D !map_index;
-  	kernel_fpu_end();
-+ 	__local_unlock_nested_bh(&scratch->bh_lock);
-+ 	return NULL;
-+ }
-+=20
-+ /**
-+  * nft_pipapo_avx2_lookup() - Dataplane frontend for AVX2 implementation
-+  * @net:	Network namespace
-+  * @set:	nftables API set representation
-+  * @key:	nftables API element representation containing key data
-+  *
-+  * This function is called from the data path.  It will search for
-+  * an element matching the given key in the current active copy using
-+  * the AVX2 routines if the FPU is usable or fall back to the generic
-+  * implementation of the algorithm otherwise.
-+  *
-+  * Return: nftables API extension pointer or NULL if no match.
-+  */
-+ const struct nft_set_ext *
-+ nft_pipapo_avx2_lookup(const struct net *net, const struct nft_set *set,
-+ 		       const u32 *key)
-+ {
-+ 	struct nft_pipapo *priv =3D nft_set_priv(set);
- -	u8 genmask =3D nft_genmask_cur(net);
-+ 	const struct nft_pipapo_match *m;
-+ 	const u8 *rp =3D (const u8 *)key;
-+ 	const struct nft_pipapo_elem *e;
-+=20
-+ 	local_bh_disable();
-+=20
-+ 	if (unlikely(!irq_fpu_usable())) {
-+ 		const struct nft_set_ext *ext;
-+=20
-+ 		ext =3D nft_pipapo_lookup(net, set, key);
-+=20
-+ 		local_bh_enable();
-+ 		return ext;
-+ 	}
-+=20
-+ 	m =3D rcu_dereference(priv->match);
-+=20
- -	e =3D pipapo_get_avx2(m, rp, genmask, get_jiffies_64());
-++	e =3D pipapo_get_avx2(m, rp, NFT_GENMASK_ANY, get_jiffies_64());
-  	local_bh_enable();
- =20
-- 	return ext;
-+ 	return e ? &e->ext : NULL;
-  }
-
---Sig_/FyeqAwhVQ+VVDIWRtAYgROf
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmjDdoMACgkQAVBC80lX
-0Gxumwf/YUdfjbXO5iL21/gdeV9CU0TX7SMx1QlfckWoArWzPXIFrt9TEKsHeIV4
-SZSA/DKPEMWEKH7v8XHnBgPwwZzohwFyNXDbE5pfyBz8OmDoq80b+2cDUQFmhle0
-JaOAAJEdMKtdO3CzOyvMZ1VqMgJJCMSkmN/FJNpziOqnISPQ4fjSE9B2Z7BGQY2M
-/H2i9MB3kiHq35o78oJiQi1GMCCrPoeVLcVz/3NfrHK8aP6TkRj4rzFxUXQgbJsp
-5WP5w0swdLBlxgQVgxzGSSbWWiellb7l3CUS2772a3jcd9Ma4s0tYTdHwIipiE+z
-N/ksECtHTJGElVC+LpmObZx845Sm6A==
-=hziR
------END PGP SIGNATURE-----
-
---Sig_/FyeqAwhVQ+VVDIWRtAYgROf--
 
