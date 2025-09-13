@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-222817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F1DAB563ED
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 02:00:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6607B563EE
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 02:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 122E4189EC04
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 00:00:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D1561894D0C
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 00:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE172C11DF;
-	Sat, 13 Sep 2025 23:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184E82C2357;
+	Sat, 13 Sep 2025 23:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Xm3vjlFN"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="S6SpsJhO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C07B2C11CA;
-	Sat, 13 Sep 2025 23:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043B42C11D6;
+	Sat, 13 Sep 2025 23:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757807958; cv=none; b=PIDguIDm4vPIoB2jpmjUiHrkFtQgHvdmQabx4Ya2p3edlDGISh4UxqtDT3gvZHFeFfTHeh6H2t47D2XitEi2Abia9xgjIxqNZ4jO5fWM1xWuxKq+m7WC3kaacLcZcpRkBK2SY+0ipgWeSaWEOp41trC3k7QBSKdTJ1Cz96KhsgM=
+	t=1757807959; cv=none; b=W0zYVqXF+epW+hGsnotyAuWPiUMEh8nGTCMxJCXxw1gcO9T6eioEZIJm/9YxUx+hPdMTsYGNl1YFWgKfMngp0VrAlU18jRjncxdNSTReMxhQwT5zw/fj0GhyTBHR/Kr/DvkRraNpryDCJgzsJW4Bkm/4dwsUBtIdlku8tVQmf8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757807958; c=relaxed/simple;
-	bh=EZJrSC8HKLIZeYkZ/ou7/O3NW58W1W8t+y2LSY8Uu94=;
+	s=arc-20240116; t=1757807959; c=relaxed/simple;
+	bh=NCxd5MRWulhhiQGexBU/b6H+S/dHIidGMKcSy5JY6Lo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VWK9TFs6+dPaMnPN+n/Nr/7ho7PIm5Bz/c6QBrtOcMoQl3X2j0eOhyNj7ZnUR32iOwHqK2EkQhYm3IY00wlVJOdwmupqH+HxU47i6Zh7Hl3LzwafQigGctojNKGy+AXB9OR+Rj1zJMlFckCZJz0ll7Ef1HQ7z8M1AoeLx2CJLn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Xm3vjlFN; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=CTvY7mNc/qkYlHXJ313XAU2JOfnmHCGG3ro3YiC7EPAMOeOy3FKIkPCWWq50Z9AEdiB7UXNw7mWqCnzQUa72u5EQlZK0/D4XDz0tIPnD0zrs1wak/Wa2kLRC/T3wovZNvE0MEBQkQn2HX33PVJRmdrVkvO50qGP8ATQ1BPPCEDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=S6SpsJhO; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1757807952;
-	bh=EZJrSC8HKLIZeYkZ/ou7/O3NW58W1W8t+y2LSY8Uu94=;
+	bh=NCxd5MRWulhhiQGexBU/b6H+S/dHIidGMKcSy5JY6Lo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Xm3vjlFNGg+PC2MuFwo/YHxsjBdtYgSTmDGb05RcKqwbGjVrOmUEn3KSDXp3hmrLC
-	 CNfzPS9uYrrgg7hU9Z9Qy62o6KvWNilvebhCLMvbOF/9gPa7na9bia4r4zw/XSa6ze
-	 MJY5JJ4TlvQNqqHUuTA2Sz1P4QAB1sgaSr7nHmejovxGUv8m+Qd8SiuVecftGHfxn2
-	 r2Xd4PCdr9pX/bqdMVJURnwMsfM1WKTcGR9S9dnEEYKxjO2d2F32ks1r9SulpPCIlC
-	 N4tzs4LGq8Wfgzv7q7gKkJ4T2U+xyV+0wzvYnm58ryGPYiqXBdXR8RpB6qCEsklunm
-	 R3mbguZdl3O3A==
+	b=S6SpsJhOOKjC2w5l1+EX+OcNvD9Ge6paj7F6JlTfAA/TX5zbP0J5TacS7nMKOC4Uv
+	 LPb67ik+J/yIVC9T93JaQKVZMIWsYPfk6aLaM/xi4Gza2EfuMqUR9hYxr4VOLaBYax
+	 kNDyJi7ZtyjXj2PmePNkWXEyZbVpmuBdCTZK/D60HkNdkz1C5vgZrJZLRrVGLni1fk
+	 cY751tl7X2ToujXIZIQJbnS3WYHfHHaHSSaP8jv181bJw2GOl4BdiSmMNTBmYCwGBb
+	 7NMjxojLnqVHQOhQgccRKNJALmMxfv8cEbSuaIKUMBt3SPTkyUg57kGM6MrIISue54
+	 mgQK8SHYKxNGw==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 502BC6000C;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 6C0AB60128;
 	Sat, 13 Sep 2025 23:59:12 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id 45C6D2038ED; Sat, 13 Sep 2025 23:58:57 +0000 (UTC)
+	id 4F10E203A9B; Sat, 13 Sep 2025 23:58:57 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,9 +60,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	wireguard@lists.zx2c4.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 03/11] tools: ynl-gen: add sub-type check
-Date: Sat, 13 Sep 2025 23:58:24 +0000
-Message-ID: <20250913235847.358851-4-ast@fiberby.net>
+Subject: [PATCH net-next v4 04/11] tools: ynl-gen: refactor local vars for .attr_put() callers
+Date: Sat, 13 Sep 2025 23:58:25 +0000
+Message-ID: <20250913235847.358851-5-ast@fiberby.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250913235847.358851-1-ast@fiberby.net>
 References: <20250913235847.358851-1-ast@fiberby.net>
@@ -75,36 +75,113 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add a check to verify that the sub-type is "nest", and throw an
-exception if no policy could be generated, as a guard to prevent
-against generating a bad policy.
+Refactor the generation of local variables needed when building
+requests, by moving the logic into the Type classes, and use the
+same helper in all places where .attr_put() is called.
 
-This is a trivial patch with no behavioural changes intended.
+If any attributes requests identical local_vars, then they will
+be deduplicated, attributes are assumed to only use their local
+variables transiently.
+
+This patch fixes the build errors below:
+$ make -C tools/net/ynl/generated/
+[...]
+-e      GEN wireguard-user.c
+-e      GEN wireguard-user.h
+-e      CC wireguard-user.o
+wireguard-user.c: In function ‘wireguard_get_device_dump’:
+wireguard-user.c:480:9: error: ‘array’ undeclared (first use in func)
+  480 |         array = ynl_attr_nest_start(nlh, WGDEVICE_A_PEERS);
+      |         ^~~~~
+wireguard-user.c:480:9: note: each undeclared identifier is reported
+                        only once for each function it appears in
+wireguard-user.c:481:14: error: ‘i’ undeclared (first use in func)
+  481 |         for (i = 0; i < req->_count.peers; i++)
+      |              ^
+wireguard-user.c: In function ‘wireguard_set_device’:
+wireguard-user.c:533:9: error: ‘array’ undeclared (first use in func)
+  533 |         array = ynl_attr_nest_start(nlh, WGDEVICE_A_PEERS);
+      |         ^~~~~
+make: *** [Makefile:52: wireguard-user.o] Error 1
+make: Leaving directory '/usr/src/linux/tools/net/ynl/generated'
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 33 +++++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 95a60fdaf14e..3266af19edcd 100755
+index 3266af19edcd..85b1de6a7fef 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -825,8 +825,10 @@ class TypeArrayNest(Type):
-             return f'.type = YNL_PT_U{c_upper(self.sub_type[1:])}, '
-         elif self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
-             return f'.type = YNL_PT_BINARY, .len = {self.checks["exact-len"]}, '
--        else:
-+        elif self.attr['sub-type'] == 'nest':
-             return f'.type = YNL_PT_NEST, .nest = &{self.nested_render_name}_nest, '
-+        else:
-+            raise Exception(f"Typol for ArrayNest sub-type {self.attr['sub-type']} not supported, yet")
+@@ -840,6 +840,9 @@ class TypeArrayNest(Type):
+                      '}']
+         return get_lines, None, local_vars
  
-     def _attr_get(self, ri, var):
-         local_vars = ['const struct nlattr *attr2;']
++    def attr_put_local_vars(self):
++        return ['struct nlattr *array;']
++
+     def attr_put(self, ri, var):
+         ri.cw.p(f'array = ynl_attr_nest_start(nlh, {self.enum_name});')
+         if self.sub_type in scalars:
+@@ -2040,6 +2043,18 @@ def put_enum_to_str(family, cw, enum):
+     _put_enum_to_str_helper(cw, enum.render_name, map_name, 'value', enum=enum)
+ 
+ 
++def put_local_vars(struct):
++    local_vars = set()
++    for _, attr in struct.member_list():
++        if attr.presence_type() == 'count':
++            local_vars.add('unsigned int i;')
++        try:
++            local_vars |= set(attr.attr_put_local_vars())
++        except AttributeError:
++            pass
++    return list(local_vars)
++
++
+ def put_req_nested_prototype(ri, struct, suffix=';'):
+     func_args = ['struct nlmsghdr *nlh',
+                  'unsigned int attr_type',
+@@ -2062,15 +2077,7 @@ def put_req_nested(ri, struct):
+         init_lines.append(f"hdr = ynl_nlmsg_put_extra_header(nlh, {struct_sz});")
+         init_lines.append(f"memcpy(hdr, &obj->_hdr, {struct_sz});")
+ 
+-    has_anest = False
+-    has_count = False
+-    for _, arg in struct.member_list():
+-        has_anest |= arg.type == 'indexed-array'
+-        has_count |= arg.presence_type() == 'count'
+-    if has_anest:
+-        local_vars.append('struct nlattr *array;')
+-    if has_count:
+-        local_vars.append('unsigned int i;')
++    local_vars += put_local_vars(struct)
+ 
+     put_req_nested_prototype(ri, struct, suffix='')
+     ri.cw.block_start()
+@@ -2354,10 +2361,7 @@ def print_req(ri):
+         local_vars += ['size_t hdr_len;',
+                        'void *hdr;']
+ 
+-    for _, attr in ri.struct["request"].member_list():
+-        if attr.presence_type() == 'count':
+-            local_vars += ['unsigned int i;']
+-            break
++    local_vars += put_local_vars(ri.struct['request'])
+ 
+     print_prototype(ri, direction, terminate=False)
+     ri.cw.block_start()
+@@ -2424,6 +2428,9 @@ def print_dump(ri):
+         local_vars += ['size_t hdr_len;',
+                        'void *hdr;']
+ 
++    if 'request' in ri.op[ri.op_mode]:
++        local_vars += put_local_vars(ri.struct['request'])
++
+     ri.cw.write_func_lvar(local_vars)
+ 
+     ri.cw.p('yds.yarg.ys = ys;')
 -- 
 2.51.0
 
