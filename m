@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-222743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB0AB55A78
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 01:54:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09E04B55A7C
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 02:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB5677A2CB6
-	for <lists+netdev@lfdr.de>; Fri, 12 Sep 2025 23:53:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A33B55C099A
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 00:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F3428469B;
-	Fri, 12 Sep 2025 23:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B94C6FC5;
+	Sat, 13 Sep 2025 00:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DinqVdA/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z6xa6N1m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEB87494;
-	Fri, 12 Sep 2025 23:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E242B4A04;
+	Sat, 13 Sep 2025 00:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757721284; cv=none; b=tH5mmENQ1MfaMR5b+KEsJ9sQkjocULU8ZZfsBHYfrEK17+o/CQNpoXuCJJIC2WoTliwawUFPdczu4qScM+KtGSHRAJqJ6bfQKjgZREuDZmN+91BKjbHarga1wwHc36ImXse/rxAvHSW+MgXCZonuDvtA2MjeHx3VI+QcstTQn+c=
+	t=1757721656; cv=none; b=KzYOIz3ubYU/HEj9OYh3/xZjiVNGTTyiWaDpX1rhxS1mCzTV38DrT4Dxe7Y58wAGD+zWwcjIhfPPLwRWW1vf+PNdWx51DnHclMOluBUinI+7IVMwgVTXfMpqkrq3+HQtOnoNhao+qlVuleIVwGv5Epio+w0ULl/OHxSAyRQTu18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757721284; c=relaxed/simple;
-	bh=1yk++boy0iy5FJE0t4WFA49gcNkY6JHhuQy9y+mC7s8=;
+	s=arc-20240116; t=1757721656; c=relaxed/simple;
+	bh=vDd0droX2aKcaau/BNTdQdVX/uMVNYwOAjEVk2x/OR0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K6PMGQNyYFlqkZyq9aCK0F1gYvMyZlJCYKm1Bpo6nMMKuPBM84SOALQEIgiATKbMsgZqoAMaG9OdDbe+KZkBGcGXQTdMgpv8UMrWfHks5w7eawxzcE/ppmOJybDL+QTD2EGYGOvsFQS5byakobstV26eIZFdowZB8KYKb8sA7JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DinqVdA/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EAF0C4CEF1;
-	Fri, 12 Sep 2025 23:54:43 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TfDgOw2Yb1UTOHwLUPX5QFNak8LBJs7vl6zdpftWUZUnm+D1WZripg4OIsYxeOE6g1nwspzacG3V/Ap7fdi3ktwkDwt5YCq/vo3vIIof9DmZxs49tok280zwkDpkAs9vnA5+YMyWq/hYe3Z5hQjcd2dMFbdvu3gwKssshCPY0so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z6xa6N1m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D41C4CEF5;
+	Sat, 13 Sep 2025 00:00:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757721283;
-	bh=1yk++boy0iy5FJE0t4WFA49gcNkY6JHhuQy9y+mC7s8=;
+	s=k20201202; t=1757721655;
+	bh=vDd0droX2aKcaau/BNTdQdVX/uMVNYwOAjEVk2x/OR0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DinqVdA/NUdddf35zIasPzhhnDNZvjTjHqquGLCkxiqYF8HqWwqMezy839j5TXILw
-	 7Q4obwimADA8rCmIfiGqxnDRD3jVvqAUHRqu6imtJ6SDd0x1viimgmbURitTz8MXTQ
-	 ISwqb5xSLVES3IZRqoI5bKoms4M2EeoFq6q/KTrnpd2QSs9oQLQeaoaEZmjeCVjl4x
-	 roJp7fxb+qFvQbtp4tI27UZbsdnK81Zjm3w4WX2rRSufiaKc9TLvyTJ9a5io4pLOM2
-	 lw2F0SDsEag8k0ofO6P9nMxj6BMIYTRy5itkm3OJRCss525eRMu7EvKVemx8qE+3LH
-	 xSDfamdCUeJbA==
-Date: Fri, 12 Sep 2025 16:54:42 -0700
+	b=Z6xa6N1msn3dWzdap/jTIR6yKJnb3Fq3ylNH5lk/XVgayapDO1QXYB1QNw4GSOTQ3
+	 qxb8IIsz7q09LOLU8DAKpXGZDoFAV1wIUuLtx6yMx/NDO8jdghaDTQ5WR8h/9lZJKy
+	 D7fGRTgsJpbk2MMmmGm8GjsQ0LTlVpcGtxgIqHIdqrg4dxZfSM6ZauLyKJt7S+Ypzc
+	 4hgiUR3niakewJazMQjQGJeLm187U/o08ITsvOKc8S9ZX9NnXWMycFhsPW+cK2y95Z
+	 plnVJVOAD6dU/Ks2tJf98EbgErdD2gxChjy4b3wrlUNTRksqdFBatcggH1c8AAMOTS
+	 GQ6IZr2AUM02Q==
+Date: Fri, 12 Sep 2025 17:00:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Oleksij Rempel <o.rempel@pengutronix.de>
 Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
@@ -55,14 +55,14 @@ Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
  netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
  linux-doc@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk
  <roan@protonic.nl>
-Subject: Re: [PATCH net-next v5 1/5] ethtool: introduce core UAPI and driver
- API for PHY MSE diagnostics
-Message-ID: <20250912165442.2e3bc13e@kernel.org>
-In-Reply-To: <aMP0F0NVrIHk7jBY@pengutronix.de>
+Subject: Re: [PATCH net-next v5 2/5] ethtool: netlink: add
+ ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
+Message-ID: <20250912170053.24348da3@kernel.org>
+In-Reply-To: <aMPw7kUddvGPJCzx@pengutronix.de>
 References: <20250908124610.2937939-1-o.rempel@pengutronix.de>
-	<20250908124610.2937939-2-o.rempel@pengutronix.de>
-	<20250911192318.0628831f@kernel.org>
-	<aMP0F0NVrIHk7jBY@pengutronix.de>
+	<20250908124610.2937939-3-o.rempel@pengutronix.de>
+	<20250911193440.1db7c6b4@kernel.org>
+	<aMPw7kUddvGPJCzx@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,29 +72,95 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 12 Sep 2025 12:21:11 +0200 Oleksij Rempel wrote:
-> > > All investigated devices differ in MSE configuration parameters, such
-> > > as sample rate, number of analyzed symbols, and scaling factors.
-> > > For example, the KSZ9131 uses different scaling for MSE and pMSE.
-> > > To make this visible to userspace, scale limits and timing information
-> > > are returned via get_mse_config().  
+On Fri, 12 Sep 2025 12:07:42 +0200 Oleksij Rempel wrote:
+> > > +      -
+> > > +        name: max-average-mse
+> > > +        type: u32
+> > > +      -
+> > > +        name: max-peak-mse
+> > > +        type: u32
+> > > +      -
+> > > +        name: refresh-rate-ps
+> > > +        type: u64
+> > > +      -
+> > > +        name: num-symbols
+> > > +        type: u64  
 > > 
-> > But the parameter set is set by the standard? If not we should annotate
-> > which one is and which isn't.  
+> > type: uint for all these?  
 > 
-> Do you mean we should show which parameters are defined by a standard
-> (for example Open-Alliance - MSE/pMSE) or which parts of the measurement
-> method - like how many samples in what time - are vendor or product
-> specific?
+> I would prefer to keep u64 for refresh-rate-ps and num-symbols.
+> 
+> My reasoning comes from comparing the design decisions of today's industrial
+> hardware to the projected needs of upcoming standards like 800 Gbit/s. This
+> analysis shows that future PHYs will require values that exceed the limits of a
+> u32.
 
-Yes. Your call if it really makes sense, but if we have a mix it's good
-to mention which ones are safe(r) to depend on in mixed environments.
-One way to do this would be to annotate the standard ones with standard
-references but doesn't seem like the OA standard lends itself to
-concise ways of referring to it (like IEEE standards do).
+but u64 may or may not also have some alignment expectations, which uint
+explicitly excludes
 
-> And should we only write this in comments/docs, or add a flag/enum so
-> user space can detect it?
+> > > +      -
+> > > +        name: header
+> > > +        type: nest
+> > > +        nested-attributes: header
+> > > +      -
+> > > +        name: channel
+> > > +        type: u32  
+> > 
+> > Please annotate attrs which carry enums and flags with
+> > 
+> > 	enum: $name  
+> 
+> Sorry, I can't follow here. What do you mean?
 
-Just comments/docs
+The values carried by this attr are from enum phy-mse-channel right?
+So you should annotate the attribute, this way C will use an enum
+type, and Python will decode the values into a human readable string.
+
+> > > +        enum: phy-mse-channel
+> > > +      -
+> > > +        name: config
+> > > +        type: nest
+> > > +        nested-attributes: mse-config  
+> > 
+> > config sounds like something we'd be able to change
+> > Looks like this is more of a capability struct?  
+> 
+> Yes? mse-config describes haw the measurements in the snapshot should be
+> interpreted.
+
+Right. 'capability' is not great either, but as I said 'config' sounds
+like something that's tunable by the user. 
+
+> > > +      -
+> > > +        name: snapshot
+> > > +        type: nest
+> > > +        multi-attr: true
+> > > +        nested-attributes: mse-snapshot  
+> > 
+> > This multi-attr feels un-netlinky to me.
+> > You define an enum for IDs which are then carried inside
+> > snapshot.channel. In netlink IDs should be used as attribute types.
+> > Why not add an entry here for all snapshot types?  
+> 
+> Can you please give me some examples here? I feel under-caffeinated, sorry.
+
+Instead of this attr:
+
+	-
+		name: channel-a
+		type: nest
+		nested-attributes: mse-snapshot	
+	        multi-attr: true
+	-
+		name: channel-b
+		type: nest
+		nested-attributes: mse-snapshot	
+	        multi-attr: true
+...
+	-
+		name: worst-channel
+		type: nest
+		nested-attributes: mse-snapshot	
+	        multi-attr: true
+...
 
