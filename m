@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C71BEB55A8C
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 02:10:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39A17B55A8D
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 02:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2AEBAA202F
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 00:10:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2EF51D61B79
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 00:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D0CD531;
-	Sat, 13 Sep 2025 00:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C102A1E4AB;
+	Sat, 13 Sep 2025 00:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5VYBuLc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjtoUn6x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DBABA34;
-	Sat, 13 Sep 2025 00:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBD71C69D
+	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 00:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757722213; cv=none; b=MaBpjK2sS9JhVkO1xLDPgiTrL/cMJiGFJFSnmpM0fBvw6lNadouqK9x7uIMkPgIm/kmMzW6GW6Rn3j6dDwLJAv5NNANZCRGeGWdasHBIbwc9mTOYJzMrMW2o3IBhc4k5o/zZ7uatIcrdIgF/fmT0GWO2+Qfqhu8HyL1Ir+qEhHQ=
+	t=1757722214; cv=none; b=sIxsEoGg8vbZylFcqfW2zP8aF1ILg4+sbu8oYiusJXtCekgqOB0DRhz/3cYpqkUFAPAdOY8zLdV/Sk2hwDTGwQp1+jqxyXGic6k2fAQvasdSqBdyg9HmPJC1nvSEhuHvL/5dFa+S7EjiYMTbuYvxiwAj7GDO/EQVBpCHpqOT+Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757722213; c=relaxed/simple;
-	bh=rEBOCoBIkMyXvnVvbZwDIljs+0e5DTU8VaRVxDExesA=;
+	s=arc-20240116; t=1757722214; c=relaxed/simple;
+	bh=1vtBeJiQ2F6f6juUCqULeZSar99kg5bfTh7K+2aJ+cA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pjVnl5PM8It5bW6oEfiFLKOsXqbR/k4UWA4G7kuFKOnAaLDetBAqMoDZEiPVQJP8lvnPzE1GxDO/Nl6oUD1WxUi7kPLTFycjzWXFavWH2AE1yw01Wv/l1PlYUc3ocBk2b8MoDaZ0csihgHtFXunujAnMhXG3SK0vu5jv/73UZpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5VYBuLc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE420C4CEF8;
-	Sat, 13 Sep 2025 00:10:12 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hH+7tJcurl8e9AXYT5z+bx+1oCJ9VqdtQIjqIC6aqawGRUHqSzpAo9tdXzrUDrA8AxzM6l0FWwZOnOo3zW8LiQjr88Rei2tu7KT9JQdKxb7DOEGeAIuHmqDU6pgzbhlhGcP0EeCQp99f5PyDQ8uHKlA3tRfvHFhqqtL35ePfHZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjtoUn6x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38E6DC4CEF1;
+	Sat, 13 Sep 2025 00:10:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757722212;
-	bh=rEBOCoBIkMyXvnVvbZwDIljs+0e5DTU8VaRVxDExesA=;
+	s=k20201202; t=1757722214;
+	bh=1vtBeJiQ2F6f6juUCqULeZSar99kg5bfTh7K+2aJ+cA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G5VYBuLcDyDl2n46M0LpHOgXgtxFTUxFLnJSrqSExV1SrmrIczeX6l3pp7Xznrc45
-	 tnEERfDVIlXzNwGMJolBK16cOothL3mJXoo+r6oxZOr2pe7du9Yh4oVsciOl7rneRt
-	 aMGNsEVzQCacFKUD0arI+pAqOHFaJoE9S+4CkOK7hhb9qVnILv4ZGc6zYwxvWhAHET
-	 v/SlgDT/cFWi95JRf4LOsNCW/pwVANTwGxuYenLbCl+gzG9OvRxNENqIV0woIyjLsY
-	 xFQB2LWmMpO3E+Zq12ksO6fFx69O+733o3QYfAKKiWXPDYaaRO2EdawQX5otimyM6F
-	 aBdfS3DUV9c5w==
+	b=jjtoUn6xH83qMWWoWDMEpIhyr/Zm9cYtJBZXpR/hhtVriBS/mdq6oaMolJIc2U523
+	 v2kcK/nLyDOnpT/3+zPknbKi6g27wnpm1LqxvYlTw4PrBl3Kw4ItG1x1RoLnDRmtfJ
+	 7K04APD3G1jhMQgBvUVD7G3aKQM6qTeA7Yh1qU9kFVdXpchoXoi+POk7JovOeoUdtL
+	 pJe3uSFmx+wIhbVZB8Hueac/P6HElSCpim96Gr2y3SHZCXF14cyH+mhbLaBxk03Zf/
+	 8k51m0vN2HL1lOsHf7FUv052detsDvVos4LtNEDoCv9RNo+CPDPSmU6ok3G+VnIxKj
+	 2iGkN12z4H0VQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CEA383BF4E;
-	Sat, 13 Sep 2025 00:10:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE15B383BF4E;
+	Sat, 13 Sep 2025 00:10:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/5] selftest:net: fixed spelling mistakes
+Subject: Re: [PATCH net-next v2] net: mvneta: add support for hardware
+ timestamps
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175772221475.3109205.13117121412963824859.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Sep 2025 00:10:14 +0000
-References: <20250911143819.14753-2-fw@strlen.de>
-In-Reply-To: <20250911143819.14753-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+ <175772221624.3109205.2311279043333788576.git-patchwork-notify@kernel.org>
+Date: Sat, 13 Sep 2025 00:10:16 +0000
+References: <E1uwKHe-00000004glk-3nkJ@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1uwKHe-00000004glk-3nkJ@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ marcin.s.wojtas@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Florian Westphal <fw@strlen.de>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 11 Sep 2025 16:38:15 +0200 you wrote:
-> From: Andres Urian Florez <andres.emb.sys@gmail.com>
+On Wed, 10 Sep 2025 13:50:46 +0100 you wrote:
+> Add support for hardware timestamps in (e.g.) the PHY by calling
+> skb_tx_timestamp() as close as reasonably possible to the point that
+> the hardware is instructed to send the queued packets.
 > 
-> Fixed spelling errors in test_redirect6() error message and
-> test_port_shadowing() comments
-> 
-> Signed-off-by: Andres Urian Florez <andres.emb.sys@gmail.com>
-> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-> Signed-off-by: Florian Westphal <fw@strlen.de>
+> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> ---
+> v2: add ethtool_op_get_ts_info(), remove FIXME from comment.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] selftest:net: fixed spelling mistakes
-    https://git.kernel.org/netdev/net-next/c/496a6ed8405e
-  - [net-next,2/5] netfilter: ipset: Remove unused htable_bits in macro ahash_region
-    https://git.kernel.org/netdev/net-next/c/ba941796d7cd
-  - [net-next,3/5] netfilter: nft_meta_bridge: introduce NFT_META_BRI_IIFHWADDR support
-    https://git.kernel.org/netdev/net-next/c/cbd2257dc96e
-  - [net-next,4/5] ipvs: Use READ_ONCE/WRITE_ONCE for ipvs->enable
-    https://git.kernel.org/netdev/net-next/c/944b6b216c03
-  - [net-next,5/5] netfilter: nf_reject: don't reply to icmp error messages
-    https://git.kernel.org/netdev/net-next/c/db99b2f2b3e2
+  - [net-next,v2] net: mvneta: add support for hardware timestamps
+    https://git.kernel.org/netdev/net-next/c/903e6d05876f
 
 You are awesome, thank you!
 -- 
