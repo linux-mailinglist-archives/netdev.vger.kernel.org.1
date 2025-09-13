@@ -1,79 +1,95 @@
-Return-Path: <netdev+bounces-222754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77D38B55AC2
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 02:34:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 884BCB55AC6
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 02:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7BE566C34
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 00:34:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A85A3A17EC
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 00:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC072BAF7;
-	Sat, 13 Sep 2025 00:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4449B70824;
+	Sat, 13 Sep 2025 00:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8EoKhr2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2bYdji8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8FA2629C;
-	Sat, 13 Sep 2025 00:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B137081C
+	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 00:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757723648; cv=none; b=ppcgvvvgBgP8Z+IuX71Q8wmrmWYlaZrVhpjzE88xQucgBi5CMhM9VEaq+DhLBRaEquYF8gguGbSQsHCS58QiL9ulgC01+8b6XRxOMH2HkMTc/QsAYlx3/lV8/4opipYCaRIThBxpCtN7thzxNAaSJA3El9JOW5HsG0jvkcbn3jc=
+	t=1757724003; cv=none; b=OtdGv7BdaJXrOGR0oyG7GslUuwzsHOxRGdonCDGLRjyHtHM1SK7CXP/QDSbqLm7dSFBqkOinlke7pTQsK5fga5kokz+AzKa1UiU9FvHgASO6+CH26U4gLRlH5MiRUx/rjVqQEGnbfJmBwSiuWfikxR4ZlvSS4Bo6jd30deXu7IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757723648; c=relaxed/simple;
-	bh=dfAC4+lFsRLVhxjoVCgW1aNCl36foZU5xBMDEvLDt8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LoAbsLirZ0yVuePinZjetUCOHyf7s1zSwz/fFM+925EvmTqp9ga5/QLA/QtMHMl2BQxQqbQGai/i9zwEC5YOAsY+/OHdb0pgvBikBUk8NjX93yua8+HeOJtfybEAoV7Ga9f+ocdnq7H07bjvIF2xyklPr3wD+LqiShYvuPPH0pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8EoKhr2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B11FC4CEF1;
-	Sat, 13 Sep 2025 00:34:06 +0000 (UTC)
+	s=arc-20240116; t=1757724003; c=relaxed/simple;
+	bh=4/JpEcQWfjnniZzk2QrMSDVWxm7r9Pmz48ObzYURDqo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Y15AQQIvDUq7W7BDbTBak2D0mtDfj65adXDyLsRJoj4AaEYa+9qxuDvTDH0AUlvSCNxY4+heS59xG0QRMQmFFXJBq2Ez72YoGjEVLBwrVO8yzpXw07oQgJ1Gsnz0AcXr9Pg1bXAgsahNmrbcaok73rGz34yNsqutj8Gr7Q0pebo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2bYdji8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4985BC4CEFA;
+	Sat, 13 Sep 2025 00:40:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757723647;
-	bh=dfAC4+lFsRLVhxjoVCgW1aNCl36foZU5xBMDEvLDt8M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=A8EoKhr27QPKybvcMCEROcQN4YnSqT6+JPWp9+g+C8qZ9736Kaw+6Hr+9Qt+CVHR5
-	 A9qjXnu005gva8k2aAwHe8Fhzu2fYEiY9BBw3+g6KshB1tyyw7hY8Vl/+p8b4DyJNH
-	 wJFFwuKcZLECEiausoP7L6pOwBlQFdI2Bp8fBoCPg3WBM3njD0GAngUFKNuE+aQes8
-	 s3Gms3TSfbPRwuPjjOLtDHAaTcMf8hEfCnh/95XuiBT5B6Ie4n4cKbTlp/fHG/BS8O
-	 MigsoVSvT6trYr7Kw+jtj00J05slUXAEe18kWczxtEz+ji902hAu6k2rnI7AcQJeLn
-	 cKRdkF7M2srFw==
-Date: Fri, 12 Sep 2025 17:34:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Leon
- Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Michael
- Guralnik <michaelgur@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
- Patrisious Haddad <phaddad@nvidia.com>
-Subject: Re: [PATCH net-next] net/mlx5: Improve write-combining test
- reliability for ARM64 Grace CPUs
-Message-ID: <20250912173406.1dc8c201@kernel.org>
-In-Reply-To: <1757572873-602396-1-git-send-email-tariqt@nvidia.com>
-References: <1757572873-602396-1-git-send-email-tariqt@nvidia.com>
+	s=k20201202; t=1757724003;
+	bh=4/JpEcQWfjnniZzk2QrMSDVWxm7r9Pmz48ObzYURDqo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=m2bYdji8slk1XZ+2YVFRFWHOWTl82T7jXbtgZPsSKa+A2Xy+CEuc5CzNt5USqEet5
+	 bepYJ6R0r85emIckfvEiJ+3Pja6NO4jlVRQnFwHmI/hASjKa1TByWO97OTrmBuNrZ0
+	 LlE//Q6gf+WjERGf9xSWHZ3+4+7A6G4eoM+LBQTsJYC2W306SEqigDTbUScJhij04u
+	 Fifq+l5czX3WhxcErg5/F91lARxc/31Pw3R4ZLNzo2pQN0DWxcmwjL2dgaUU/tp/H/
+	 YLdfl8nVvn2CZEO6g0knHBR0IkcnmgY/ot/ELfKD1aTYSD2GXKKxPTtvo4/6/6KO81
+	 r+QkJl2oIz0Ag==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE09B383BF4E;
+	Sat, 13 Sep 2025 00:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: ethtool: handle EOPNOTSUPP from ethtool
+ get_ts_info() method
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175772400550.3115588.6343280449330593634.git-patchwork-notify@kernel.org>
+Date: Sat, 13 Sep 2025 00:40:05 +0000
+References: <E1uwiW3-00000004jRF-3CnC@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1uwiW3-00000004jRF-3CnC@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: kory.maincent@bootlin.com, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, horms@kernel.org
 
-On Thu, 11 Sep 2025 09:41:13 +0300 Tariq Toukan wrote:
-> Lastly, this was concluded from the discussion with ARM maintainers
-> which confirms that this is the best approach for the solution:
-> https://lore.kernel.org/r/aHqN_hpJl84T1Usi@arm.com
+Hello:
 
-You should still CC them (and the arm ML) on the patch submission, 
-and hopefully they will ack. Please repost.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 11 Sep 2025 15:43:15 +0100 you wrote:
+> Network drivers sometimes return -EOPNOTSUPP from their get_ts_info()
+> method, and this should not cause the reporting of PHY timestamping
+> information to be prohibited. Handle this error code, and also
+> arrange for ethtool_net_get_ts_info_by_phc() to return -EOPNOTSUPP
+> when the method is not implemented.
+> 
+> This allows e.g. PHYs connected to DSA switches which support
+> timestamping to report their timestamping capabilities.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: ethtool: handle EOPNOTSUPP from ethtool get_ts_info() method
+    https://git.kernel.org/netdev/net/c/201825fb4278
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
