@@ -1,169 +1,164 @@
-Return-Path: <netdev+bounces-222767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2AD7B55F07
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 08:45:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F28DB55F34
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 10:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E0E2AA0B9A
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 06:45:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2285558840F
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 08:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590142E88A2;
-	Sat, 13 Sep 2025 06:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256FD2E8DE1;
+	Sat, 13 Sep 2025 08:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ALcc9yeG"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F472E888C
-	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 06:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643172E88AA
+	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 08:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757745929; cv=none; b=G5yAXrrHfqOYZjN4IuDW2aBCHlmz3wiftliQvfHJgJxmZnRSGgp2IYX/EHGHU0Hu2Y3p/HLRywh1G8MQ5gWptCEqKjqE+rYG463gD1TVR5ATJ4VuAu8DE+LLxK5XivDlQOjU8StDDUKcZcQzM6Pjdlu8mM6IhaZxa0bnOoF99dw=
+	t=1757751073; cv=none; b=jjs7FACeDeY/vgRPmmMvlOuoiY2eC4LB2l0GWgLi4YbXRmXxxa/zWHhGRwXfQ+mCv7CdkW7oJCbnA78TAnjthHnwiXz9Tjj8ByFJgI6+FilSzp3UF1gvtL5uSNWQX22sijRiNgBbNViSFUp3pvL8Pm4LYcFoHXlCS6XKqcmYBAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757745929; c=relaxed/simple;
-	bh=PYlgmZhwhioZnSwJzR77QkbxJdvtLyYNPx/bF8eOzn8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h+PylRklAWs6uvwRYO++77PXofyqyw7sDS/lt9ijVeqVQoyR5Uz5nsU5NM1r6SsJ4jlZLZ1F6owTXC1IegItU4jNSss7dwjNXVFpnM7GGmVGP6yeu51CQmYUAmD7XIsLycITCQ7GsaXuvo1ihDRtCsU0ZhfJVyLA4HLszGPntwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uxK0S-0003EI-0E; Sat, 13 Sep 2025 08:45:08 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uxK0P-0013XQ-2K;
-	Sat, 13 Sep 2025 08:45:05 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uxK0P-00544Q-1t;
-	Sat, 13 Sep 2025 08:45:05 +0200
-Date: Sat, 13 Sep 2025 08:45:05 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alan Stern <stern@rowland.harvard.edu>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>, Xu Yang <xu.yang_2@nxp.com>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
- PM to avoid MDIO runtime PM wakeups
-Message-ID: <aMUS8ZIUpZJ4HNNX@pengutronix.de>
-References: <20250908112619.2900723-1-o.rempel@pengutronix.de>
- <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
- <b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
- <aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
- <20250911075513.1d90f8b0@kernel.org>
- <aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
- <22773d93-cbad-41c5-9e79-4d7f6b9e5ec0@rowland.harvard.edu>
- <aMPawXCxlFmz6MaC@shell.armlinux.org.uk>
- <a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
- <aMQwQAaoSB0Y0-YD@shell.armlinux.org.uk>
+	s=arc-20240116; t=1757751073; c=relaxed/simple;
+	bh=yk1BOJDCKQDhTz8EirmmbNV++Ukm7Mv/8yPoyaaNmYU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZFVZqRmulYsVFc7WshaGmWGthtWqMldYF/EkYbOT1HJh71Q747RrZPQVh78U9cQJ1YYl6/60YhbQ8/AbHjngGq8pSoCSIxbske3wWiF0gNUtWnsTYND1CuyGHCefgLQSLken+a7j6D695niaE2VfsNx8hqMxoLX4QzomyDmLL8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ALcc9yeG; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4b5f3e06ba9so44966081cf.1
+        for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 01:11:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757751070; x=1758355870; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FPMZIHH0Rrm1soiTq3K7uQpKE0IL8W76Rdylalgci7Q=;
+        b=ALcc9yeG1ECpYkvunGJU+moqByS2Cvlj2eYYdzOKGM3EB+oq03Wk+Ra/r8WPhvmgoc
+         0jzIsj4o6+LUbKpJSVFqvnGVL+mgkXwwnV3uYT+8if4hQcMa00YLGm6Ptt7ktid8WnRE
+         IcTTlAVArCEhRefub35SC28GryMJfYFek1OBGPnOqU4xfGkghBmND6hkg+jB2S/lUOJo
+         xdLgHlsbf8QS20+TR2nBg7nK+/67aqi6Nca5iZrUhPNKgd0zfv65XURGJxTuK1LwXHpj
+         K3MtVD4SSVhjw+BJTBmotBmFAJVMwm4VpPgbbpJUPJVbBL9l2KVkOutyngTxDtPpYGEe
+         kD+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757751070; x=1758355870;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FPMZIHH0Rrm1soiTq3K7uQpKE0IL8W76Rdylalgci7Q=;
+        b=rpoAH34eEcQPHCw6Jt/+yn/5ogItsP2TtzNbLUqZFWP3YZ455R3UAwJ9Zpk5krtJD2
+         WdJsMZTyKfaOQT+98/pVNcUCfBoUqhK22T31sKW+ar2KMDL8frc+sQfq3qwZq9USMGTa
+         8gfQdoYBH8QxWNI/WXy1uDdepIOmf1xynZHwF29sXD4HdX+UVNUlEFEC4M8NioVjHya0
+         EgYFM+3sur5CYcVIDTE+Q9ykwxQDzZ1rarezmEEbRdiMTapdQcyzCxZV+z1lbPi+WrAd
+         Rx/byZf13GQovu2HpnMzQDocBp9lcLwlKiXM/A8wynnB7Uc+OEIGLVoec8CYej6so4+V
+         2M2Q==
+X-Gm-Message-State: AOJu0YxL4C4cNAc4wsgAtZUaAHt8iWzOvO0ZsHl1DFEzXTlnbs65GtwL
+	A43ZZ9HgnT9tN0jGpsi2yiyWPb1c1xu/cJWL+NVKWuRbvgjyrMtR26mwE2+OqVcNuqMN1uADXhv
+	gCuja8nftZ/q5MBMS2XXCMSVUKez+JHTY/e+ZAYyh
+X-Gm-Gg: ASbGncu8x/ksiuXuu/EQjXbwkolhVyhdbMjsLeR9aZuHY536Gorb0Jf0gmCBaOVDc1j
+	ReJbQbTFh9Xxhtl5fQ62Yaoxgrm/5DjNOD/LwliUnXDSv2QNud7RAzoqc3rb7iYkAEHc7Y9jnaT
+	YmgnFTc+Vk0+yjNWf9b08cOqNW7sAVzIt55PGZdnT/ETvuHd1iUswXMBtAcPvB3YGMr4GLJKwYl
+	ZoYq/DkAlVbR8GMogwpY/6mTA==
+X-Google-Smtp-Source: AGHT+IF2/DG7z3teZ9UviBtYAqKXIPu5V8UphD3aq8FCBkZBiBWvEJFQN4pQ/D5brNfyYNGVGZvylFYdLkgX9HysvuY=
+X-Received: by 2002:a05:622a:255:b0:4b3:7ec:d22d with SMTP id
+ d75a77b69052e-4b6347e7880mr115083651cf.20.1757751069813; Sat, 13 Sep 2025
+ 01:11:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aMQwQAaoSB0Y0-YD@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250912212216.66338-1-rodgepritesh@gmail.com>
+In-Reply-To: <20250912212216.66338-1-rodgepritesh@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 13 Sep 2025 01:10:58 -0700
+X-Gm-Features: Ac12FXxkWZabCKCN7Y4OupdTdqOowSJPhntrI8BJrv50Bw_akyD4N7KJIte9DmI
+Message-ID: <CANn89i+6naPhD_XJ-qjQ8mRGN1aQdSzMy1446d+0iOk_UjpMOw@mail.gmail.com>
+Subject: Re: [PATCH] net/rose: Fix uninitialized values in rose_add_node
+To: rodgepritesh@gmail.com
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, kuba@kernel.org, 
+	pabeni@redhat.com, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+7d660d9b8bd5efc7ee6e@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 12, 2025 at 03:37:52PM +0100, Russell King (Oracle) wrote:
-> On Fri, Sep 12, 2025 at 10:29:47AM -0400, Alan Stern wrote:
-> > On Fri, Sep 12, 2025 at 09:33:05AM +0100, Russell King (Oracle) wrote:
-> > > On Thu, Sep 11, 2025 at 10:30:09PM -0400, Alan Stern wrote:
-> > > > The USB subsystem uses only one pair of callbacks for suspend and resume 
-> > > > because USB hardware has only one suspend state.  However, the callbacks 
-> > > > do get an extra pm_message_t parameter which they can use to distinguish 
-> > > > between system sleep transitions and runtime PM transitions.
-> > > 
-> > > Unfortunately, this isn't the case. While a struct usb_device_driver's
-> > > suspend()/resume() methods get the pm_message_t, a struct usb_driver's
-> > > suspend()/resume() methods do not:
-> > > 
-> > > static int usb_resume_interface(struct usb_device *udev,
-> > >                 struct usb_interface *intf, pm_message_t msg, int reset_resume)
-> > > {
-> > >         struct usb_driver       *driver;
-> > > ...
-> > >         if (reset_resume) {
-> > >                 if (driver->reset_resume) {
-> > >                         status = driver->reset_resume(intf);
-> > > ...
-> > >         } else {
-> > >                 status = driver->resume(intf);
-> > > 
-> > > vs
-> > > 
-> > > static int usb_resume_device(struct usb_device *udev, pm_message_t msg)
-> > > {
-> > >         struct usb_device_driver        *udriver;
-> > > ...
-> > >         if (status == 0 && udriver->resume)
-> > >                 status = udriver->resume(udev, msg);
-> > > 
-> > > and in drivers/net/usb/asix_devices.c:
-> > > 
-> > > static struct usb_driver asix_driver = {
-> > > ...
-> > >         .suspend =      asix_suspend,
-> > >         .resume =       asix_resume,
-> > >         .reset_resume = asix_resume,
-> > > 
-> > > where asix_resume() only takes one argument:
-> > > 
-> > > static int asix_resume(struct usb_interface *intf)
-> > > {
-> > 
-> > Your email made me go back and check the code more carefully, and it 
-> > turns out that we were both half-right.  :-)
-> > 
-> > The pm_message_t argument is passed to the usb_driver's ->suspend 
-> > callback in usb_suspend_interface(), but not to the ->resume callback in 
-> > usb_resume_interface().  Yes, it's inconsistent.
-> > 
-> > I suppose the API could be changed, at the cost of updating a lot of 
-> > drivers.  But it would be easier if this wasn't necessary, if there was 
-> > some way to work around the problem.  Unfortunately, I don't know 
-> > anything about how the network stack handles suspend and resume, or 
-> > what sort of locking it requires, so I can't offer any suggestions.
-> 
-> I, too, am unable to help further as I have no bandwidth available
-> to deal with this. Sorry.
+On Fri, Sep 12, 2025 at 2:22=E2=80=AFPM <rodgepritesh@gmail.com> wrote:
+>
+> From: Pritesh Rodge <rodgepritesh@gmail.com>
+>
+> The rose_add_node() function uses kmalloc to allocate a new rose_node
+> but only initializes the first element of the 'neighbour' array. If
+> the node's count is later incremented, other parts of the kernel may
+> access the uninitialized pointers in the array.
+>
+> This was discovered by KMSAN, which reported a crash in
+> __run_timer_base. When a timer tried to clean up a resource using
+> one of these garbage pointers.
+>
+> Fix this by switching from kmalloc() to kzalloc() to ensure the
+> entire rose_node struct is initialized to zero upon allocation. This
+> sets all unused neighbour pointers to NULL.
 
-Thanks for all the valuable input.
+Which part exactly of rose node being not initialized would lead to
+the syzbot report ?
 
-I’ll process the feedback and investigate possible ways to proceed. As a
-first step I’ll measure the actual power savings from USB auto-suspend
-on AX88772 to see if runtime PM is worth the added complexity.
+BUG: KMSAN: uninit-value in __hlist_del include/linux/list.h:980 [inline]
+BUG: KMSAN: uninit-value in detach_timer kernel/time/timer.c:891 [inline]
+BUG: KMSAN: uninit-value in expire_timers kernel/time/timer.c:1781 [inline]
+BUG: KMSAN: uninit-value in __run_timers kernel/time/timer.c:2372 [inline]
+BUG: KMSAN: uninit-value in __run_timer_base+0x690/0xd90
+kernel/time/timer.c:2384
+ __hlist_del include/linux/list.h:980 [inline]
+ detach_timer kernel/time/timer.c:891 [inline]
+ expire_timers kernel/time/timer.c:1781 [inline]
+ __run_timers kernel/time/timer.c:2372 [inline]
+ __run_timer_base+0x690/0xd90 kernel/time/timer.c:2384
+ run_timer_base kernel/time/timer.c:2393 [inline]
+ run_timer_softirq+0x3a/0x80 kernel/time/timer.c:2403
+ handle_softirqs+0x166/0x6e0 kernel/softirq.c:579
+ __do_softirq kernel/softirq.c:613 [inline]
+ invoke_softirq kernel/softirq.c:453 [inline]
 
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
+
+>
+> [1] https://syzkaller.appspot.com/bug?extid=3D7d660d9b8bd5efc7ee6e
+>
+> Reported-by: syzbot+7d660d9b8bd5efc7ee6e@syzkaller.appspotmail.com
+> Signed-off-by: Pritesh Rodge <rodgepritesh@gmail.com>
+> ---
+>  net/rose/rose_route.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/rose/rose_route.c b/net/rose/rose_route.c
+> index a1e9b05ef6f5..6ca41cbe867a 100644
+> --- a/net/rose/rose_route.c
+> +++ b/net/rose/rose_route.c
+> @@ -148,7 +148,7 @@ static int __must_check rose_add_node(struct rose_rou=
+te_struct *rose_route,
+>                 }
+>
+>                 /* create new node */
+> -               rose_node =3D kmalloc(sizeof(*rose_node), GFP_ATOMIC);
+> +               rose_node =3D kzalloc(sizeof(*rose_node), GFP_ATOMIC);
+>                 if (rose_node =3D=3D NULL) {
+>                         res =3D -ENOMEM;
+>                         goto out;
+
+I doubt this will fix anything really, given this code is followed by :
+
+rose_node->address      =3D rose_route->address;
+rose_node->mask         =3D rose_route->mask;
+rose_node->count        =3D 1;
+rose_node->loopback     =3D 0;
+rose_node->neighbour[0] =3D rose_neigh;
+
+rose is certainly full of bugs, but I do not see your patch fixing one of t=
+hem.
 
