@@ -1,156 +1,122 @@
-Return-Path: <netdev+bounces-222799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD3B5B5624F
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 19:23:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82D61B56274
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 20:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 540511B26906
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 17:24:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 383687AF897
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 18:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC8F1EFF9A;
-	Sat, 13 Sep 2025 17:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3807720E011;
+	Sat, 13 Sep 2025 18:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="sqn/FvhW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nb0EuTHn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1BF1E8333;
-	Sat, 13 Sep 2025 17:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF7A1F9F51
+	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 18:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757784217; cv=none; b=kYkCHFGeOrUj2O6phL00AwZda7MxAlxQdf0VCPsQQLUUidgxE7BTZJfFJW9RRcZgDm3HkObIV3yZwiNeNKB7AfHPy3Rv3JZ4l7tZp2ettQnpFx9Rbv/zAY7XflfvUnNaGtPz7f9FsTGpwrWgUG9twMHs00a4d6AAPqp1zPSazmw=
+	t=1757786497; cv=none; b=CPhnLkirOd9lxwOhrsghTrtxG964AhSV5MmPNF3ipkt7NDiA0j3G1nsAUrxu79r+CRvDyC0pzLmyt29VFPzCxorWnx31XggrKrK+xwnmGpd61ReqrXufa5/gJcTrdKCB4fmfQhTg9HRujSSp7NXjj23082MLbSs9UFxlHEZeIpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757784217; c=relaxed/simple;
-	bh=hQrqb6mIdtNaw5IoEb/MqdcF49HaYq7QCH933ZOxA3Q=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=rnJCEgPIh9YOXveTxDunJEllkj170Vofa1TEc9zjcmO/L0Kt8b9U6GPHKCLj16fkTtTizj9xzpWhNCsymv+EV76h4mQ5fvd0LONh9+VkwsjbExqwV/gr6uPneyLtv2gEbvbqEI3SqTINZ1l3OsVaKWhLXD0zhCeKxdcuHB8aRTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=sqn/FvhW; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 261D52055B;
-	Sat, 13 Sep 2025 20:23:24 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=U/LMK9fOxEJZWLbS+ivg/XnNJz/FLhKUxGb+S6dYdE4=; b=sqn/FvhWwnIK
-	Pq1Enswo9aHUqGsRmwF/E+CzNALMVkLsr9c0wugg35TMBgTBwz9yIiPhHsIJmFgP
-	1YlA5MZfR8mlb+A1lMCW3QtXRRoAO+89I98ozwHnRbnykfs1R4gi4ma7Yl3OAlIF
-	1tY78io3VqNKwj+0IJG83IjNqic2geer3E2w2i/k2/BHQIhIPbgna93mAdIOdbCf
-	HKLDp1saMzYTTag7aTLsGK0GTafeSb0tGuEHlovynLK1xyOxzyQyhFS3IzgujnKW
-	Ppxsj/0FVe2+97nrauNPq/orFEX5v/ChcCN5Bdgo6rxO1KgttSLcNNdz7MZ2srAY
-	eZ/a3X20t15W2KVbCucQmXH73YHQBXE3soR229FJT4gbrpn3FAnzmAr0t3TVvJup
-	+u+w2wYTJNkLl/XZV9YZtKUAHQ8gQ/gljMRujtVjtEht0a1D8dOa8ALaNS7C8Ceh
-	TOdiWaJ24mYw8EF/hvUCbv6F77lfRoSmnhfwcidv/F+fmObCRzcyep0/v6K+zuVf
-	aLSI/SMawYipt4KQhOEg+8VEo9s7VTwuR+WwW5sur3SWKbUFIqDZCzw8BpnLsQvL
-	fpS93eqUEi8O6J0pkhoywL1ZPf/0qSh0W+YaSc04Carva4PtfEMQMfgypYpk2m1M
-	zloHlo/77jUrAhBB/Ndujs6uFkXcCAE=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Sat, 13 Sep 2025 20:23:23 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id D2360654D1;
-	Sat, 13 Sep 2025 20:23:20 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 58DHN4dO029190;
-	Sat, 13 Sep 2025 20:23:04 +0300
-Date: Sat, 13 Sep 2025 20:23:04 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Slavin Liu <slavin452@gmail.com>
-cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, lvs-devel@vger.kernel.org,
-        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] ipvs: Defer ip_vs_ftp unregister during netns
- cleanup
-In-Reply-To: <20250911175759.474-1-slavin452@gmail.com>
-Message-ID: <0effae4a-4b9d-552e-5de7-756af4627451@ssi.bg>
-References:  <20250911175759.474-1-slavin452@gmail.com>
+	s=arc-20240116; t=1757786497; c=relaxed/simple;
+	bh=UnaOqYluKu28oBnwPH0vnbCU+O6jr21CjF1YCAIsvFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UX8zcacs2KhjEEJmnHFoIyZufhWCSn1gcuFI/N+51+qc1Gg8B9phf9rqiayWFPPaAktyMl2+ThvPhDO/eG9LZjLgtdWn/CwR0qoRsrgF9L4qz18WgzItFwFQnXU+tesFdifd0wgqaXqoliboi3KKKAp+gsucSbrldFtWBN0YAM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nb0EuTHn; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-723bc91d7bbso23819717b3.3
+        for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 11:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757786494; x=1758391294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NjHrIrhN/4pjfGuGdsD+5Ie4bMJa+37LDUXsJfR1WJM=;
+        b=Nb0EuTHnk1rU4+sqHEk9Mz5mpnQs/KBTBTng1Hhz678Q9HwjDl1TLzA0KsKQkGCzYA
+         jvJLACHZmVq69So4rWVOwFZlioYw8vsQ7nvMjkniKntOa312AJjbZDzqnknXXLfvWeSR
+         +/WdVba6LWds6ExTHDYbt5ZgrWi3CdtQPxdzq9j9UTvkoCx5p6EChzRxjrCkl5nrLG65
+         xycttFw6HPHGU5Npw+rEOdC26IQMI4/85fbcZ3ET87A6735jla5h8WJ64hc7KpvxcffE
+         Qa99/97mOmQ7QE2tJiZLd9XrT5snjtLqazOCoVelfzi69R/VqJ1GYcaBd/AnEjHt3TMm
+         voTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757786494; x=1758391294;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NjHrIrhN/4pjfGuGdsD+5Ie4bMJa+37LDUXsJfR1WJM=;
+        b=pUF1xLgsjXia2lmP/UDu4SqPmQ4w77+W5hqgU4dSOpRHbUepgyNABDSnksQ72+6drX
+         cTd1HaIf5wQxEAWTfJIFzHKDRDROsL822YcE8QTyT81Hf8TtMp0R9PL28tCqZdNlS83G
+         dEeBlTpXjKkr/i2Yk7ElLjEOdeVmZfqIXjRrNfpHSDJoPIR+ij5BwC76fzfAlIRt0QO3
+         s4TJ9AS5QkJSYkRs5ZRAJ8hbFj7SuOU4ksJG89i75xVZmhl23o43Y7g5WZbV66W9wlxB
+         Ca6YgRpKOu1pKm88N4jazDD7z8OxI/+1R+NNllNY+WEtF1ixHiFcm/6XGxQIUbRRDTtK
+         URxg==
+X-Forwarded-Encrypted: i=1; AJvYcCWpO2lG8ceYn9r4Ehgb8v5b1CK6D0YjV+v2un2DaXAH4PPIH4NdF5bC7qz3qWelKerTULFUALM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPFmHTJR0zFmWkU6tiFl5+Z9iW6odNGx5zFTVsWVYY9Fe9knnp
+	Aark1eESwM/2ga4bWJdhNjvkAhnKUI7tFLcN0j2+fri3db86IPgPuRD5
+X-Gm-Gg: ASbGnctRTUT0a7mZfWYjo+bVtTbt6jcQN9XW0VYNcYbxIN5GQ2frqS7czoN7t5KTEDB
+	cORGvYTzAPnTnSFlJtq4bh3X/dhdD+kNrht5NBCV2YrT8xL+eCaHWN1zF34dtdFQkE5+lP7wdKM
+	JI+NCoy2Z8y9ZSn669iaQZFDmWcsvbpCiC2mezHN96kbj2iLVobrJ3jQHjbFCiVtNksJq2yEl4J
+	GAMkWSs0H1ADWXhdwewNRp55fVhLy9Chjht8JqWiPybuurwebeBuDYGpWOje6DFGQlhEZrPj7Oo
+	X9RU7RbJIO/MBY37UT3/O/jFZPDrQdxipVAfboXIGgycymSSl+d1/rD06RbiYZQtmp0f1hNJ+/h
+	yRXxKt1Gke8ZPjxbJjIvo/0yhMcgpguInivRQGblaAlroRjGBJM0QZVlaMg==
+X-Google-Smtp-Source: AGHT+IHi0t1g25a3FWwQ5Y/nJHat0XL4SNgFHd21Ox1E7oZI7Dop3SdUOK6vuMiPxpkEVNb3sGWL/Q==
+X-Received: by 2002:a05:690c:620d:b0:721:28ef:8b5a with SMTP id 00721157ae682-73064cfc35fmr58784437b3.31.1757786494286;
+        Sat, 13 Sep 2025 11:01:34 -0700 (PDT)
+Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-62484dd3e12sm1900016d50.8.2025.09.13.11.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Sep 2025 11:01:33 -0700 (PDT)
+From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+To: Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+Subject: [PATCH] mlxsw: spectrum_cnt: use bitmap_empty() in mlxsw_sp_counter_pool_fini()
+Date: Sat, 13 Sep 2025 14:01:31 -0400
+Message-ID: <20250913180132.202593-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 
+The function opencodes bitmap_empty(). Switch to the proper API in sake
+of verbosity.
 
-	Hello,
+Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+---
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_cnt.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-On Fri, 12 Sep 2025, Slavin Liu wrote:
-
-> On the netns cleanup path, __ip_vs_ftp_exit() may unregister ip_vs_ftp
-> before connections with valid cp->app pointers are flushed, leading to a
-> use-after-free.
-> 
-> Fix this by introducing a global `exiting_module` flag, set to true in
-> ip_vs_ftp_exit() before unregistering the pernet subsystem. In
-> __ip_vs_ftp_exit(), skip ip_vs_ftp unregister if called during netns
-> cleanup (when module_removing is false) and defer it to
-
-	Pablo, can you change here module_removing to exiting_module 
-before applying?
-
-> __ip_vs_cleanup_batch(), which unregisters all apps after all connections
-> are flushed. If called during module exit, unregister ip_vs_ftp
-> immediately.
-> 
-> Fixes: 61b1ab4583e2 ("IPVS: netns, add basic init per netns.")
-> Suggested-by: Julian Anastasov <ja@ssi.bg>
-> Signed-off-by: Slavin Liu <slavin452@gmail.com>
-
-	Looks good to me for the nf tree after above text is
-changed, thanks!
-
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
-
-> ---
->  net/netfilter/ipvs/ip_vs_ftp.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_ftp.c b/net/netfilter/ipvs/ip_vs_ftp.c
-> index d8a284999544..206c6700e200 100644
-> --- a/net/netfilter/ipvs/ip_vs_ftp.c
-> +++ b/net/netfilter/ipvs/ip_vs_ftp.c
-> @@ -53,6 +53,7 @@ enum {
->  	IP_VS_FTP_EPSV,
->  };
->  
-> +static bool exiting_module;
->  /*
->   * List of ports (up to IP_VS_APP_MAX_PORTS) to be handled by helper
->   * First port is set to the default port.
-> @@ -605,7 +606,7 @@ static void __ip_vs_ftp_exit(struct net *net)
->  {
->  	struct netns_ipvs *ipvs = net_ipvs(net);
->  
-> -	if (!ipvs)
-> +	if (!ipvs || !exiting_module)
->  		return;
->  
->  	unregister_ip_vs_app(ipvs, &ip_vs_ftp);
-> @@ -627,6 +628,7 @@ static int __init ip_vs_ftp_init(void)
->   */
->  static void __exit ip_vs_ftp_exit(void)
->  {
-> +	exiting_module = true;
->  	unregister_pernet_subsys(&ip_vs_ftp_ops);
->  	/* rcu_barrier() is called by netns */
->  }
-> -- 
-> 2.34.1
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_cnt.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_cnt.c
+index 50e591420bd9..b1094aaffa5f 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_cnt.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_cnt.c
+@@ -170,8 +170,7 @@ void mlxsw_sp_counter_pool_fini(struct mlxsw_sp *mlxsw_sp)
+ 	struct devlink *devlink = priv_to_devlink(mlxsw_sp->core);
+ 
+ 	mlxsw_sp_counter_sub_pools_fini(mlxsw_sp);
+-	WARN_ON(find_first_bit(pool->usage, pool->pool_size) !=
+-			       pool->pool_size);
++	WARN_ON(!bitmap_empty(pool->usage, pool->pool_size));
+ 	WARN_ON(atomic_read(&pool->active_entries_count));
+ 	bitmap_free(pool->usage);
+ 	devl_resource_occ_get_unregister(devlink,
+-- 
+2.43.0
 
 
