@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-222778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71BE4B56006
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 12:14:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2ACBB56004
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 12:14:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B98585A71
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 10:14:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 833ED3BB220
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 10:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA72EB86E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1562EB867;
 	Sat, 13 Sep 2025 10:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="us0kZqdp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFmdph8L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2022D0C7B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF18E27EFEE;
 	Sat, 13 Sep 2025 10:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757758435; cv=none; b=fcyKDiOAlbe6JbCMUSJZUlhkkSYeL51SuQkOrITJiDy27orQgdKeF4QA+OH+EUi4S2TFcGqSgbNdOssO3eshgrXkc4tuUiV0Zp2yyxTdTGRwMPJGRCEmxSTwt+1KGq+S/P2IoNsnhoVzV68QuE1pdiVzYiQtvVLFKBGRYHp28nE=
+	t=1757758435; cv=none; b=qgReufQDvxQM5mM8HxjqA64fsWHIicdzX11/lGZGUEMgcqr6bA/dRbbH6wDSVc4rXac8IBXaM1NyROyBGmEV9pcjozOnuBL7Z7Y1j7bufKZNBL2OmP4aI0XzZpHbGLhpZxUzNgQO1lUygO8xu7q46BQfRggC5Bj1JT0qWx/GpnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757758435; c=relaxed/simple;
-	bh=4zsAEhgPLF5E1lZqO74cbTZq68y+QkaCgneVZaDgIWM=;
+	bh=uugv4ih9nUfyLSO+weAo82v6n2xq5poL7/MsFQnpIOA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kJkQvCMsIx0bKT0G1g6qi3AqfEpcVgtd+qC0EHoa2I2To6xLludIdHyx45BV5mruEZI0+0EHUfqqOQ8agRtStJnooPBR5lJd7VW+CmX+807kohKJPZjwJygNNGQxvVJv2J8TZp7S2nNxEuQ5iriYJzqN1pngoOEk+i+HFiX0+d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=us0kZqdp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41567C4CEEB;
+	 MIME-Version; b=DeFMX1J8TsHzuuG9xr4NTEtZ9LktDNWzQvKk4m6VOT9UZu7JpJBzBc36RACP2VRQHDwLsaFD85tp0vYIl7RcqbdjFkOgwi4RL7t/lmYF82Xg7eedE4FUDtO8Gw3CaEWN8fe0aqLCYwgzYrzd2943R9WN9zp+BLPz58f937+wdDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFmdph8L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D45FC4CEF4;
 	Sat, 13 Sep 2025 10:13:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1757758435;
-	bh=4zsAEhgPLF5E1lZqO74cbTZq68y+QkaCgneVZaDgIWM=;
+	bh=uugv4ih9nUfyLSO+weAo82v6n2xq5poL7/MsFQnpIOA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=us0kZqdpYRqjwaxB6OYXPMK3Ca3nQQEopN3oE5iPkEvrqb1uwzcWcp2x9HT35FyWk
-	 Zhjznfl9QrM+Tae3+7C4d6audEuRlMO6D9zyhzgQxnvWIqydD7Givxo2I4q5sLZ9yd
-	 +TMKlRJ0rX2MtOwEy3ChOAEeeHZpSKChgRp/gR/xxgHCj8DgtjqnroqJdbt8g42aV3
-	 AV5RDeZD8FTQ5TaxRMlymIxOpBB8iOivusZZcO+gW28rpuLk6EfceFwEfqgMCJTDkT
-	 gdHxFc4Qr+Ue1t9NMQt8EtoE69g4MMw6Pf94NNoS7CXtmP5VwB+41QhxjPyHiCtvU8
-	 zcizn7sYjuS0g==
+	b=mFmdph8L2ZMfb6RQU3bnoznLMG+hO5vDVVOfZho1iUpVig1jyD858Q9YyafuZwLwm
+	 4hfhX+N/bygrGFjg6ldvZ454mbPht5CzjKHpfmhFln06ytmWdZzH6PfqNwLSgGZcmu
+	 Z/bmFEDQouExnAwn/J9wy1k2NhnsiueLjavKThqxgYYaM1VBqE5OAUU/hn16u3bb/2
+	 ZVWDKL1JYGSThb2rWqTzQcc3L3BZCX05TD/ixGcDhYJUv0H9b3zVi/AHFBwCQE4fny
+	 bXTdNUxCpEim/9Woxzr7x75A9IRVczrGYo2aEbNgbs98KxDWi4oBrIT/CJwqD6/BQb
+	 2QERk49YDaVrA==
 Received: by wens.tw (Postfix, from userid 1000)
-	id 3DD185FE35; Sat, 13 Sep 2025 18:13:53 +0800 (CST)
+	id 522805FEF1; Sat, 13 Sep 2025 18:13:53 +0800 (CST)
 From: Chen-Yu Tsai <wens@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -61,10 +61,11 @@ Cc: netdev@vger.kernel.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Andre Przywara <andre.przywara@arm.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>
-Subject: [PATCH net-next v6 3/6] arm64: dts: allwinner: a523: Add GMAC200 ethernet controller
-Date: Sat, 13 Sep 2025 18:13:46 +0800
-Message-Id: <20250913101349.3932677-4-wens@kernel.org>
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next v6 4/6] arm64: dts: allwinner: a527: cubie-a5e: Enable second Ethernet port
+Date: Sat, 13 Sep 2025 18:13:47 +0800
+Message-Id: <20250913101349.3932677-5-wens@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250913101349.3932677-1-wens@kernel.org>
 References: <20250913101349.3932677-1-wens@kernel.org>
@@ -78,95 +79,101 @@ Content-Transfer-Encoding: 8bit
 
 From: Chen-Yu Tsai <wens@csie.org>
 
-The A523 SoC family has a second ethernet controller, called the
-GMAC200. It is not exposed on all the SoCs in the family.
+On the Radxa Cubie A5E board, the second Ethernet controller, aka the
+GMAC200, is connected to a second external Maxio MAE0621A PHY. The PHY
+uses an external 25MHz crystal, and has the SoC's PJ16 pin connected to
+its reset pin.
 
-Add a device node for it. All the hardware specific settings are from
-the vendor BSP.
+Enable the second Ethernet port. Also fix up the label for the existing
+external PHY connected to the first Ethernet port. An enable delay for the
+PHY supply regulator is added to make sure the PHY's internal regulators
+are fully powered and the PHY is operational.
 
 Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
 
 Changes since v1:
-- Fixed typo in tx-queues-config
+- Switch to generic (tx|rx)-internal-delay-ps properties
+- Add PHY regulator delay
 ---
- .../arm64/boot/dts/allwinner/sun55i-a523.dtsi | 55 +++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ .../dts/allwinner/sun55i-a527-cubie-a5e.dts   | 28 +++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-index 1b9a392f9bbf..9676caf9bd4e 100644
---- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-+++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-@@ -191,6 +191,16 @@ rgmii0_pins: rgmii0-pins {
- 				bias-disable;
+diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts b/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+index d4cee2222104..e96a419faf21 100644
+--- a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
++++ b/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+@@ -14,6 +14,7 @@ / {
+ 
+ 	aliases {
+ 		ethernet0 = &gmac0;
++		ethernet1 = &gmac1;
+ 		serial0 = &uart0;
+ 	};
+ 
+@@ -76,7 +77,7 @@ &ehci1 {
+ 
+ &gmac0 {
+ 	phy-mode = "rgmii-id";
+-	phy-handle = <&ext_rgmii_phy>;
++	phy-handle = <&ext_rgmii0_phy>;
+ 	phy-supply = <&reg_cldo3>;
+ 
+ 	allwinner,tx-delay-ps = <300>;
+@@ -85,13 +86,24 @@ &gmac0 {
+ 	status = "okay";
+ };
+ 
++&gmac1 {
++	phy-mode = "rgmii-id";
++	phy-handle = <&ext_rgmii1_phy>;
++	phy-supply = <&reg_cldo4>;
++
++	tx-internal-delay-ps = <300>;
++	rx-internal-delay-ps = <400>;
++
++	status = "okay";
++};
++
+ &gpu {
+ 	mali-supply = <&reg_dcdc2>;
+ 	status = "okay";
+ };
+ 
+ &mdio0 {
+-	ext_rgmii_phy: ethernet-phy@1 {
++	ext_rgmii0_phy: ethernet-phy@1 {
+ 		compatible = "ethernet-phy-ieee802.3-c22";
+ 		reg = <1>;
+ 		reset-gpios = <&pio 7 8 GPIO_ACTIVE_LOW>; /* PH8 */
+@@ -100,6 +112,16 @@ ext_rgmii_phy: ethernet-phy@1 {
+ 	};
+ };
+ 
++&mdio1 {
++	ext_rgmii1_phy: ethernet-phy@1 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <1>;
++		reset-gpios = <&pio 9 16 GPIO_ACTIVE_LOW>; /* PJ16 */
++		reset-assert-us = <10000>;
++		reset-deassert-us = <150000>;
++	};
++};
++
+ &mmc0 {
+ 	vmmc-supply = <&reg_cldo3>;
+ 	cd-gpios = <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* PF6 */
+@@ -240,6 +262,8 @@ reg_cldo4: cldo4 {
+ 				regulator-min-microvolt = <3300000>;
+ 				regulator-max-microvolt = <3300000>;
+ 				regulator-name = "vcc-pj-phy";
++				/* enough time for the PHY to fully power on */
++				regulator-enable-ramp-delay = <150000>;
  			};
  
-+			rgmii1_pins: rgmii1-pins {
-+				pins = "PJ0", "PJ1", "PJ2", "PJ3", "PJ4",
-+				       "PJ5", "PJ6", "PJ7", "PJ8", "PJ9",
-+				       "PJ11", "PJ12", "PJ13", "PJ14", "PJ15";
-+				allwinner,pinmux = <5>;
-+				function = "gmac1";
-+				drive-strength = <40>;
-+				bias-disable;
-+			};
-+
- 			uart0_pb_pins: uart0-pb-pins {
- 				pins = "PB9", "PB10";
- 				allwinner,pinmux = <2>;
-@@ -681,6 +691,51 @@ mdio0: mdio {
- 			};
- 		};
- 
-+		gmac1: ethernet@4510000 {
-+			compatible = "allwinner,sun55i-a523-gmac200",
-+				     "snps,dwmac-4.20a";
-+			reg = <0x04510000 0x10000>;
-+			clocks = <&ccu CLK_BUS_EMAC1>, <&ccu CLK_MBUS_EMAC1>;
-+			clock-names = "stmmaceth", "mbus";
-+			resets = <&ccu RST_BUS_EMAC1>;
-+			reset-names = "stmmaceth";
-+			interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-names = "macirq";
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&rgmii1_pins>;
-+			power-domains = <&pck600 PD_VO1>;
-+			syscon = <&syscon>;
-+			snps,fixed-burst;
-+			snps,axi-config = <&gmac1_stmmac_axi_setup>;
-+			snps,mtl-rx-config = <&gmac1_mtl_rx_setup>;
-+			snps,mtl-tx-config = <&gmac1_mtl_tx_setup>;
-+			status = "disabled";
-+
-+			mdio1: mdio {
-+				compatible = "snps,dwmac-mdio";
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+			};
-+
-+			gmac1_mtl_rx_setup: rx-queues-config {
-+				snps,rx-queues-to-use = <1>;
-+
-+				queue0 {};
-+			};
-+
-+			gmac1_stmmac_axi_setup: stmmac-axi-config {
-+				snps,wr_osr_lmt = <0xf>;
-+				snps,rd_osr_lmt = <0xf>;
-+				snps,blen = <256 128 64 32 16 8 4>;
-+			};
-+
-+			gmac1_mtl_tx_setup: tx-queues-config {
-+				snps,tx-queues-to-use = <1>;
-+
-+				queue0 {};
-+			};
-+		};
-+
- 		ppu: power-controller@7001400 {
- 			compatible = "allwinner,sun55i-a523-ppu";
- 			reg = <0x07001400 0x400>;
+ 			reg_cpusldo: cpusldo {
 -- 
 2.39.5
 
