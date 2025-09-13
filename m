@@ -1,131 +1,98 @@
-Return-Path: <netdev+bounces-222809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F261B56335
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 23:23:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF9DB563B6
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 01:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB74FAA246A
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 21:23:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F41621B23D75
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 23:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F1D281358;
-	Sat, 13 Sep 2025 21:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FAA32C0F76;
+	Sat, 13 Sep 2025 23:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WbjCJORV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zAsyiRek"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="tOV+nw/1"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B3A280A5B
-	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 21:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56552C08AF;
+	Sat, 13 Sep 2025 23:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757798540; cv=none; b=AgbNS/+GuEO0AfjMzlTPfRJc2dOm0ooo4xHfegkGHJftc6Ae3Tbv9axtCc9I6GP4R6RUofveQKn0Q4aM+LAvgFi3pyPT1Jrg/I5QbPLvUAujh1LwaG+9U39S2TCBIlGkz56sCeesz+ySKF1aBf/YwMKfbvB/EImVSo/a63r/Q24=
+	t=1757805300; cv=none; b=DfzL8WMbSV4S8mvznKz2M1QMSvfAv1OO+CyhiVVgik5yNnG0xEQXrim0++zI5Nfe/Fe/QpVMSujm23DcIK+MXADLXsb52Eod+hsyKQqpLgsRdQ4eji1UmwG3OpmypF9IUqknQmhFMmL0MmwsVeCsAiQkildUG1uCzjT7v8M5/uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757798540; c=relaxed/simple;
-	bh=P6/RDnXuyvGR5/p3YqZlXfHx3y0Wzd9Q1lGTBel91xE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SbeMkYkHhnU8XoVymrcSDRhqSrRQ8zh+EprSP/kiZRGFL+tUG6CEYDGwetKG2hjsYC6O7NUyH9Yy8owlUGlAqYrGbFFB1PYDhiqKHBu5gfZ4zXURa7d0OmQRe5PYUXigZC3rq3uk0gA2Cyc+lmmjYTb+EYr3xhTOkTQuvFck7xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WbjCJORV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zAsyiRek; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Sat, 13 Sep 2025 23:22:12 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1757798533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D5C7fkGF35hiR7LwAwgyg4oFIfaQBXBh0CwYsral4wc=;
-	b=WbjCJORVN0ATu4p4hmUogZc/L9UBJ89/tRVIqAzIJJjlA6TfROh6zz2X6/h3+Rfg1daidZ
-	qJuqWdfnVaxrsERYmCVg30T1aGbinrqUbwSnoUQ820vuIMAdq1qFC61qD6ZVw01SOykHWs
-	lx7ER1dv55Pm94Zjtw92ZMBCcvH4W7EUTSnk67hlsoT7km984upOsH/BSNyeq3xyDNspLp
-	pOkLDqTM4CIpFtev/MRZXsr6XpWU/S4Ir6mCSGvGeLTUW17cNgIoScdqzNq85+quOTO6Q8
-	3cVtpm2HbZdTR56JrSq8DJOn+Hx9wQMMSuYcPAVvMQqo3Vb0dRhsJQtZSFKYiw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1757798533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D5C7fkGF35hiR7LwAwgyg4oFIfaQBXBh0CwYsral4wc=;
-	b=zAsyiRek2uOkhkCW78BDEONvnrWYao3wF4Qn3FR6rk/pyn+8x23FC6gp3aUYuxJ6rJ3yoG
-	pU4ScYThXEt00QBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Miroslav Lichvar <mlichvar@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-Message-ID: <20250913212212.3nwetWbI@linutronix.de>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
- <aKMbekefL4mJ23kW@localhost>
- <c3250413-873f-4517-a55d-80c36d3602ee@intel.com>
- <aKV_rEjYD_BDgG1A@localhost>
- <87ikhodotj.fsf@jax.kurt.home>
+	s=arc-20240116; t=1757805300; c=relaxed/simple;
+	bh=+X0K9xXdiMhcaEkHVTC+tVGGKcvuzFs/78YZvn5FjyA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VwCSNhY7/fSk33sDalWxaz14PTN+fqD5sao0TjdQ0K6SvebmzZvcHEc9R/rGVWmPoz9ZzuSYXyHAtXPQIXY4buCLx3ws+lhOEC1ShxeXqbhbSC8Q654F36vVI5TSMjC1CwAtwwbJpE/GZF+5JnOJdDXcupVFhhHvhTsS0JGcfck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=tOV+nw/1; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1757805289;
+	bh=+X0K9xXdiMhcaEkHVTC+tVGGKcvuzFs/78YZvn5FjyA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tOV+nw/1UJhrDKxJST+XdYNNyzVTehWOnvxKaWp9fLnE6zALZJr62OSWXUs4M6Hgg
+	 nuv006MBvkwnvAumZIzgH+OT2FKywU8cteYu/rAcL5GXxnNXncy2h9+sajtUQXORgp
+	 9YXWDIs8XUWtub5430bQ/olj/jUgPVZGGR9+1mnH5mCjDf6a0O9e1D2r4RcPPw97Ec
+	 ef3uIH2Lihpqjot9aITUHmbv0nlC43LL1j4TcqH4e/SeDp+lLV9BbJlNOoIbMJb1VB
+	 kV8ggn6rqKBTWOVAZycuqZc280nW15ywckUF+QfprunwDx8pYay3EteaoGwacn5xa5
+	 i0bvR9WIaFWsw==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 2C19B60128;
+	Sat, 13 Sep 2025 23:14:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 7B4FC201010;
+	Sat, 13 Sep 2025 23:14:33 +0000 (UTC)
+Message-ID: <9211971b-a392-4568-b147-d7e97c69ca54@fiberby.net>
+Date: Sat, 13 Sep 2025 23:14:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <87ikhodotj.fsf@jax.kurt.home>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 08/13] tools: ynl-gen: only validate nested
+ array payload
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250911200508.79341-1-ast@fiberby.net>
+ <20250911200508.79341-9-ast@fiberby.net> <20250912172742.3a41b81e@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <20250912172742.3a41b81e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2025-09-12 11:04:24 [+0200], Kurt Kanzenbach wrote:
-=E2=80=A6
-> I did run the same test as you mentioned here. But, my numbers are
-> completely different. Especially the number of hardware TX timestamps
-> are significantly lower overall.
-=E2=80=A6
+On 9/13/25 12:27 AM, Jakub Kicinski wrote:
+> On Thu, 11 Sep 2025 20:05:01 +0000 Asbjørn Sloth Tønnesen wrote:
+>> +int ynl_attr_validate_payload(struct ynl_parse_arg *yarg,
+>> +			      const struct nlattr *attr, unsigned int type)
+>> +{
+>> +	return __ynl_attr_validate(yarg, attr, type);
+>> +}
+> 
+> Why not expose __ynl_attr_validate() to the callers?
+> I don't think the _payload() suffix is crystal clear, we're still
+> validating attr, _payload() makes it sound like we're validating
+> what's inside attr?
 
-Using the command line, I see hardly any difference over 5 runs. One
-thing that made me curious:
+I didn't wanna call __ynl_attr_validate() directly, as the only __ynl_*
+function in ynl-priv.h is __ynl_attr_put_overflow(), and that is only
+used in other static functions within that file. I agree, that _payload()
+might not be the best given that we currently don't look deeper than
+validating that the length a bit, so maybe _length() would have been
+better.
 
-| NTP packets received       : 1061901
-| NTP daemon TX timestamps   : 565892
-| NTP kernel TX timestamps   : 327905
-| NTP hardware TX timestamps : 168104
-| tx_hwstamp:395778
-
-tx_hwstamp is a counter in igb_ptp_tx_tstamp_event() keeping track how
-many packets it processed. So it processed ~395k packets but "NTP
-hardware TX" says 168k. Reading the timestamp directly or via the
-worker, it looks mostly like noise. I see on ntpperf side ~ 45% - 55%
-loss.
-
-If I do
-| ntpperf -i X =E2=80=A6 -I -r 1000 -t 2
-
-then there is no loss and on other side I see
-
-| NTP packets received       : 2201
-| NTP timestamps held        : 2101
-| NTP daemon TX timestamps   : 200
-| NTP kernel TX timestamps   : 901
-| NTP hardware TX timestamps : 1100
-| tx_hwstamp:2101
-
-Here the tx_hwstamp counter colorates with "NTP timestamps held". Does
-it this make any sense? I don't see this matching with the "larger" runs
-where ntpperf reports loss.
-
-> Thanks,
-> Kurt
-
-Sebastian
+In v4, I have changed it to just expose __ynl_attr_validate() in
+ynl-priv.h, and changed ynl_attr_validate() to an inline function.
 
