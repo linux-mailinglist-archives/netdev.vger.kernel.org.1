@@ -1,173 +1,85 @@
-Return-Path: <netdev+bounces-222795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B3BAB5612B
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 15:36:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56213B5613E
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 15:47:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3322D1BC36CC
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 13:36:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B66F81B27989
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 13:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4E72EC0B5;
-	Sat, 13 Sep 2025 13:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374952ED842;
+	Sat, 13 Sep 2025 13:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="ingkWitM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Jb2s8g1C"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zx6w/wak"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B231635;
-	Sat, 13 Sep 2025 13:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A623283FC4;
+	Sat, 13 Sep 2025 13:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757770379; cv=none; b=t9JTeAO3ymbRpgluoNddZtxBmAcwIsFadvdqUf/NvtsRw5gfotS/sQogov9bK4OVXuHeaLimB2nrmRS2c8XBAkH6M2zcaAKxJJFPabITF7P3E63/U4MMcjBPp/mSG4YPB17S5pgvbW1OttSnauT0eLulZAf+9yOqgNIhFmENeDE=
+	t=1757771272; cv=none; b=k8cyMumVW4I1nRuOTm3xXjUM/0mCmpVDr7q1iYXvTar8QXk3CQEVGCd+pqYaDOjrEWyXC+1IoSANURknzEbV/S6O1Dp+vRIVJZRzWL98Wxb0Lep5MbrwELdo+jiOrR26fzB/yIqlgIBRKXVKBIOaC1OWEE6JMncFrYbfWe7SN1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757770379; c=relaxed/simple;
-	bh=yhPN77Gzk8EDCOoaTy1ZfLn6b+mAK1mh5nIHLRWPFck=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i12qRX26A4R7CfSJ59Ylo4BaggfEFUbXPcCo2OMuMq0k+P4xsc+lxI4AW8Lu0/cLhNgHKVBkXIAofCIDSvvcDam/dtjAwwPwDF4A0s/O301QHfyFGP2GGbNNND6TtWUyfsbJBJEFzAx58vsR36nPKcEKYaYSSmQWy+3K28AsyCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=ingkWitM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Jb2s8g1C; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 1BA3E7A00AC;
-	Sat, 13 Sep 2025 09:32:55 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Sat, 13 Sep 2025 09:32:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm3; t=1757770374; x=1757856774; bh=PP
-	i3Q8QR9RpPHucQcYMxCZHsSxLhkFKzDd5oXQp94Bg=; b=ingkWitMYgwq0otpMm
-	FCyJrq1fknGJFEDoIiijGG2iYDBuMSHk35WDz7OWFZmDmfIy+yRxOcviEyIM3ysH
-	Qs8Tc/TuuDRFJ4+1Q1Z0rdMQpCgs/lrT2GJPTgq77kYdZ8TEl/B5DA+wWYoCrUBC
-	KpL0QvLk5xj6w9p5aoOAeoJ8tSEByBXrIsEQBo244+Yh5fj3+V3Ys7RGmUL1tjL/
-	vCCf8RHf1ztMtHtadN3dw2hWKANUhrxu2NdrK0JS2VVOr7pfX8bAn3hTUNtOC0L3
-	hPue1wOGrIcFrLGP3ieYIID/ugVAONk9x4eQl45/RFlNU+Xdbm/Q6gw3jf717X6C
-	pw2w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1757770374; x=1757856774; bh=PPi3Q8QR9RpPHucQcYMxCZHsSxLh
-	kFKzDd5oXQp94Bg=; b=Jb2s8g1Cw6TN5yF/nzmcJeIUxxQ7TUAbNbA6ZNMmyM6G
-	amzGQ0Y7oaS5PKH+8Xzc0bYAr0LoaKvUDbtqg65838bsBUu1s4HOkkOk7mXwfjy1
-	bLmd2dLpgsQHCdKEvHu2Z1JAhZb3aoJpkw6T/7ZKjU6Ib/upmbSagLr62oO2/wK+
-	nAVLnn/bnwWHgVGEJYFcwWciP9filpf7QAgGZgN9fQJUZNVcHzZJP/L23gXPV3Qd
-	HsVdMQ+GHhti0GFTym0oTORCxVDybdhrceSxHcctPCXnij/2gTMxJ+6Dcy3+XeJM
-	pAnzdymHO3G4OcirkT71ONT2BFJN9GKNPycPAs8oDg==
-X-ME-Sender: <xms:hnLFaGx6b8r-3XGyIBnrD7rMO6XRL0yjt82G_bbSlCHvL3BHDpGBlw>
-    <xme:hnLFaPr_ITljrenwdpmTC0KYHGi5q1KJRcNivCj6joZtCxchryeRv7tPksRV9Tq2S
-    lkSQuBJ_A0WaWQo1iU>
-X-ME-Received: <xmr:hnLFaPoQ734N2QZTCe8-Q4yze_GKNWJuZW9W681n__vPvHZnVXWKfHX7RULZE6vyJAP9idA-nCBzFsSkPKjoXZaiYw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdefvddtiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufffkffogggtgfesthekredtredtjeenucfhrhhomheppfhikhhlrghsucfu
-    npguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrghsse
-    hrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepheduleetteekgffffedu
-    feeuvdejiedvkefhveeifeegffehledtvdevhfefteegnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhunhgu
-    sehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmth
-    hpohhuthdprhgtphhtthhopehprghulhesphgsrghrkhgvrhdruggvvhdprhgtphhtthho
-    pegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrhgvnhgvshgrsh
-    dqshhotgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnihhklhgrshdr
-    shhouggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
-X-ME-Proxy: <xmx:hnLFaHA_Q9uIiIpla5UJXpGDBRtFSFbUp52aZW1TyWOjH0qBeaPbig>
-    <xmx:hnLFaFuzUiR1tDH-1uhOsijwnsZJnC7eKkYE42SztLj--dNe83Avdg>
-    <xmx:hnLFaOLhuI_npxSpV5CCMBXPXV8nTSWuY349KqGZ0bSKdney6FlBRQ>
-    <xmx:hnLFaEa_eeear1GtTkCwoL5BvBBY6eEveJl4iRitbItTzOSqeY4KMw>
-    <xmx:hnLFaPD3cca31YtLhYXquWrQXuFgEHjhpvFckh0E-b4XOKqod1ryxhYa>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 13 Sep 2025 09:32:53 -0400 (EDT)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Paul Barker <paul@pbarker.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [net-next,v2] net: ravb: Fix -Wmaybe-uninitialized warning
-Date: Sat, 13 Sep 2025 15:32:29 +0200
-Message-ID: <20250913133229.2087822-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1757771272; c=relaxed/simple;
+	bh=UZ1FFYDAeyzL3fNFGkn2S5wdPo1eKK0Z4qYLy68oj7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=awz+XzaGRgVV98oUR0O8VqHm//Z5A4k8SMBOWscMais2+kRr1eOfCSwyAM1XDnZGBy4MjiqKooXJwp7Z8fVwlyx5GZ3k5Bjfv8WxDoTBAGd+/nY+wPP5IV/Plt16rdHUSszLHYcWFrBrM8QpGDvIwdIQpMcQMBpy2jggLDLreE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zx6w/wak; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=OgE8sh8Nl8Fom30U4y6FEEnUsfW7+fGifiRiLj1bT5M=; b=zx6w/wakWP9gzD8miF9IP8dv88
+	n41j/awfWO4z/uL74iYw5DEO3KMvn78vzYYlS3is3/mqW7UAohpTHqRTkEy91A/wfRXbGV1ReeDr5
+	zQ8torMtWqq7p/kl+xqcQjq6P5iJm4xl17IZLcY7+YGXIjaVii9ssFfgeJTcHE1G41fU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uxQbL-008Ij6-37; Sat, 13 Sep 2025 15:47:39 +0200
+Date: Sat, 13 Sep 2025 15:47:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Li Tian <litian@redhat.com>
+Cc: netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+	Haiyang Zhang <haiyangz@microsoft.com>
+Subject: Re: [PATCH net] net/mlx5: report duplex full when speed is known
+Message-ID: <bacbeaf2-104f-4da5-a66b-b8aee2b2de12@lunn.ch>
+References: <20250913062810.11141-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250913062810.11141-1-litian@redhat.com>
 
-Fix a -Wmaybe-uninitialized warning by initializing the variable to
-NULL. The warning is bogus and should not happen, but fixing it allows
-running the check on the driver to catch potential future problems.
+On Sat, Sep 13, 2025 at 02:28:10PM +0800, Li Tian wrote:
+> Prior commit in Fixes, duplex is always reported full as long
+> as the speed is known. Restore this behavior. Besides, modern
+> Mellanox doesn't seem to care about half duplex. This change
+> mitigates duplex unknown issue on Azure Mellanox 5.
+> 
+> Fixes: c268ca6087f55 ("net/mlx5: Expose port speed when possible")
 
-  $ make CFLAGS_ravb_main.o=-Wmaybe-uninitialized
+I'm confused with your commit message. You say DUPLEX used to be
+reported as Full if the speed is known. How does c268ca6087f55 change
+this? You don't say in the commit message. Why is Half duplex
+important to this fix? I don't see Half anywhere in the code.
 
-  In function 'ravb_rx_csum_gbeth',
-      inlined from 'ravb_rx_gbeth' at .../linux/drivers/net/ethernet/renesas/ravb_main.c:923:6:
-  .../linux/drivers/net/ethernet/renesas/ravb_main.c:765:25: error: 'skb' may be used uninitialized [-Werror=maybe-uninitialized]
-    765 |         if (unlikely(skb->len < csum_len))
-        |                      ~~~^~~~~
-  .../linux/include/linux/compiler.h:77:45: note: in definition of macro 'unlikely'
-     77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
-        |                                             ^
-  .../linux/drivers/net/ethernet/renesas/ravb_main.c: In function 'ravb_rx_gbeth':
-  .../linux/drivers/net/ethernet/renesas/ravb_main.c:806:25: note: 'skb' was declared here
-    806 |         struct sk_buff *skb;
-        |                         ^~~
-  cc1: all warnings being treated as errors
+Also, what sort of problems do you see with duplex unknown? When
+somebody has a problem and is looking to find a patch which might fix
+it, seeing a description of the problem fixed in the commit message is
+useful.
 
-Warning was found when cross compiling using aarch64-linux-gnu-gcc (GCC)
-15.1.0.
-
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-* Changes since v1
-- Expand commit message with compiler version used to produce the
-  warning.
-- Added tag from Przemek Kitszel, thanks!
----
- drivers/net/ethernet/renesas/ravb_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 94b6fb94f8f1..9d3bd65b85ff 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -802,7 +802,6 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
- 	const struct ravb_hw_info *info = priv->info;
- 	struct net_device_stats *stats;
- 	struct ravb_rx_desc *desc;
--	struct sk_buff *skb;
- 	int rx_packets = 0;
- 	u8  desc_status;
- 	u16 desc_len;
-@@ -815,6 +814,8 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
- 	stats = &priv->stats[q];
- 
- 	for (i = 0; i < limit; i++, priv->cur_rx[q]++) {
-+		struct sk_buff *skb = NULL;
-+
- 		entry = priv->cur_rx[q] % priv->num_rx_ring[q];
- 		desc = &priv->rx_ring[q].desc[entry];
- 		if (rx_packets == budget || desc->die_dt == DT_FEMPTY)
--- 
-2.51.0
-
+	Andrew
 
