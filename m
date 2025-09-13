@@ -1,400 +1,178 @@
-Return-Path: <netdev+bounces-222776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE5DB55FFE
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 12:09:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66329B56008
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 12:14:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B81B8583379
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 10:09:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6107C3B9EEF
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 10:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95AE12EB87B;
-	Sat, 13 Sep 2025 10:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234A32EBB8A;
+	Sat, 13 Sep 2025 10:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ZWrg3Haf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zgijsq1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6576384A3E
-	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 10:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23C32E8B91;
+	Sat, 13 Sep 2025 10:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757758183; cv=none; b=YNXTIHY5aHlGMfVjABjYU9mgPfJ/dFztindBFS/jkIyB1ddqZPKRUfFXHOh0z4bbWD8XoYCig5UCiT5/1rzkZ3JemKICwM/tjvDE7XKyoqjbKzOUWke4ng00JaXdDKsoPlbrf356rOKhykkGrsDDa0mgV3gE5BjexyE3+vlZESQ=
+	t=1757758436; cv=none; b=bJ40StrmG91wT1ehsvACdzEJMPp4NlDpeRmUOlOsuVDEQ4r3PGYYISPP7A3WEZg58ZrusKgdoFKUXzNaIU7qSxjJPZowzvtpABxtYbcyw6naVtEjsmhLw4eUtE0ltnl1DEJO7dM27szHiHWDhcb8PIac3qf35mEOwKfQaoW7O0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757758183; c=relaxed/simple;
-	bh=XseRz49x06GL+f9kevxE2MPfOIXpM3I/ZW5WqcW40FU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=V0YUCVhaWP+bIOTsfkZm1CFuKQx+t9sjfstPDsGSaMrXvzm5Zu4zyiWW7nJRgbVq597U12DWUrINq9U7TPEB5WTwLl0J31Li/oygic8QaaJCj2p6mbv/D/449ARdPCPFicTwI1sI2/dTUkoJ6WECZ/ld76NnzoldFOAgrv1zKic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ZWrg3Haf; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-62ee43b5e5bso2529967a12.1
-        for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 03:09:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1757758180; x=1758362980; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5UDzo4tCJfwk/VIWQ7mhz/9h6Wr9YvMdDJ0pHVa/MFM=;
-        b=ZWrg3HafW6X9uBA1GNyjI7rm6zcNIK8ijVUEYVlW6Bz4mxe/EBTODjGggpZfboI23H
-         ecjqIISqR/OdqFiuuMWWgKiPtKFCIc3n+MZDOSX6OjtGwHoPzu3DU5BhouBh80+R6Smu
-         E9UbY1yJUrvzc/jaTBGb3ahsef3oP+fJk5qVDJ+BYTdSFRKEetsaCxLWybHqM/wEnJdD
-         lQAdelkqhv3770XlsGKcFnfvdTpzhpm60enJ2m21pAaLwM1jinQVxvzrpRQm+5nG7rE9
-         6+lRmpvc6WmqeuBatmurojrMJdXlqxyvAzuSUO+SPVAjflE2Uv91Lug6s1Ut14ebKnum
-         qF5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757758180; x=1758362980;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5UDzo4tCJfwk/VIWQ7mhz/9h6Wr9YvMdDJ0pHVa/MFM=;
-        b=o7f5c036xfozofjeFh+xbqaoKN0qA5wghXM8zXQ6+N0w2+PKv3D6x53KkMtBFAZZRq
-         djX8ejcuAOlHfSTOvGAkOtVA+SEd5oyNDpzOr+yAwRMN856lfe6rMfR+vIApd/Q26W9I
-         cee3xVuXsG9QkBEsIjIxaAAMtr3erFCrJb9ZSjG0Ov7EsLyxO8PnMwzMTej1x34DiXSv
-         Ku2fVWmnZvA87w+hkL4ZJ5kRtgpYSvLyVzps0kw3fm54UboF4MGfAn8/75aKjsNrV+jF
-         Y8GntDKYvuOXicoB05/ATGYOzmYjqCo5QEJAWLDyz12xCa1W1bazFy3BFLJogougzsbl
-         SzsA==
-X-Gm-Message-State: AOJu0Yz6v3FpOswRg9/x1Ez0WtR34SSMFZylQsJ5TgjCJEeUE3/+wUzk
-	XUzJVt8Fd6c833sllUB45mSY1BU6cuDkgY78yNqwtv4+ZtLtTwaE93y4L7+yOGuw43w=
-X-Gm-Gg: ASbGncvHgYyWnXK7235rNIbKIgCdOIR462ZVX72VVMM6WCrHDKci+RTj99tmAbqG11j
-	55Vm/G8decEmzJmodfA/bJY+YLo8uya+X7PmJ//XkmFeC7RAFZTNl/GeTzU7e4tPKOxR+19llnB
-	0noBdybokAnm3g5Z40jQ3C438bz9g2y737qV9Mh8aqdkpgvBZMOqTW1IJpoetCK3fSjRWk+v3qn
-	6smk5Xnobv3rkUdG3SLmS5SP8WCzUOlF6prNjtTclu/XdttClQsbjDGDJu6PiGE0iHnItWsUCJC
-	IC5ELRMMTRUpFYbWLxTZ3OnFbn4exli8VCT3R5LSst0rAW1YYhLfSsJO/xdXQilBhARVAQrbUPa
-	zeHnmE2oxxPFRaMxnBZbgNHUE32y/MCgRPgnkeeKLaBm9eE0oy2hMFrL0dSsxswmBu2aP8RE/QU
-	M+V7U=
-X-Google-Smtp-Source: AGHT+IFlU2UvD6MpCJs97AE39ERULlHf8m7BZQkRAwqt9M+0inKC1NgvFhBdGbEKP4p3LhjXFuBI6g==
-X-Received: by 2002:a05:6402:40c5:b0:626:f217:e746 with SMTP id 4fb4d7f45d1cf-62ed82f1169mr6056272a12.26.1757758179591;
-        Sat, 13 Sep 2025 03:09:39 -0700 (PDT)
-Received: from cloudflare.com (79.184.140.27.ipv4.supernova.orange.pl. [79.184.140.27])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62ec833c4f0sm4617700a12.8.2025.09.13.03.09.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Sep 2025 03:09:38 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Sat, 13 Sep 2025 12:09:29 +0200
-Subject: [PATCH net-next v4 2/2] selftests/net: Test tcp port reuse after
- unbinding a socket
+	s=arc-20240116; t=1757758436; c=relaxed/simple;
+	bh=gg+p2abigytfLpQ1USOCeccuZsakIO3PMSF9uUJcR1s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XMBUiMbJ3xxJgRDaLoxWpixEEpoQxwsw3Lt0CfdMgI9d/FLKX64TsOM20yPmIHJMh9KTy7B/TH7AZ6dq3J7Qs2bqifsouEhjwO5F/1viOQxIHOozvPBOpTAI4W8F9aXNZCEjaa+rQ2jHOjWRZfA4vt5FF6wmjVvk89dHP9A+cZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zgijsq1C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F3DBC4AF09;
+	Sat, 13 Sep 2025 10:13:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757758435;
+	bh=gg+p2abigytfLpQ1USOCeccuZsakIO3PMSF9uUJcR1s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Zgijsq1Cqn9yxYRD5qy8CtpiSOZcIb1zSWbiIzKWWGmYz2rLhtjguTJc99ruFTCIO
+	 SBIHbtOsBD0up1g9TcmacgHpwE82waWENv5ohjINdzI82hO9hLHuAxUFzuwaYFqMFy
+	 XpPI7sYHR75Pt1lnBCiwhseRYtwHr4oKrwLFcAhlAjsJBcnn6+GgZFIDtbXs7l9aH2
+	 IqU+qxrvAufsk0IEbkX29d/zeIWyNWzJEQyxKIpn7Gde3pg+xHnuvJRZOW2hpPEOVW
+	 6giKh1xVV6Egj5zGWS1YOyVDeo1oI/WNEE9rYWAQo0b9WLYDUhV1X/B8+a/6RSBDcU
+	 /xzRocsjmtJWw==
+Received: by wens.tw (Postfix, from userid 1000)
+	id 1D62A5FC8D; Sat, 13 Sep 2025 18:13:53 +0800 (CST)
+From: Chen-Yu Tsai <wens@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej@kernel.org>,
+	Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH net-next v6 0/6] net: stmmac: Add support for Allwinner A523 GMAC200
+Date: Sat, 13 Sep 2025 18:13:43 +0800
+Message-Id: <20250913101349.3932677-1-wens@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250913-update-bind-bucket-state-on-unhash-v4-2-33a567594df7@cloudflare.com>
-References: <20250913-update-bind-bucket-state-on-unhash-v4-0-33a567594df7@cloudflare.com>
-In-Reply-To: <20250913-update-bind-bucket-state-on-unhash-v4-0-33a567594df7@cloudflare.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, Neal Cardwell <ncardwell@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, kernel-team@cloudflare.com, 
- Lee Valentine <lvalentine@cloudflare.com>
-X-Mailer: b4 0.15-dev-07fe9
+Content-Transfer-Encoding: 8bit
 
-Exercise the scenario described in detail in the cover letter:
+From: Chen-Yu Tsai <wens@csie.org>
 
-  1) socket A: connect() from ephemeral port X
-  2) socket B: explicitly bind() to port X
-  3) check that port X is now excluded from ephemeral ports
-  4) close socket B to release the port bind
-  5) socket C: connect() from ephemeral port X
+Hi everyone,
 
-As well as a corner case to test that the connect-bind flag is cleared:
+This is v6 of my Allwinner A523 GMAC200 support series.
 
-  1) connect() from ephemeral port X
-  2) disconnect the socket with connect(AF_UNSPEC)
-  3) bind() it explicitly to port X
-  4) check that port X is now excluded from ephemeral ports
+Changes since v5:
+- Use plat->phy_interface instead of plat->mac_interface (Russell)
+- Link to v5
+  https://lore.kernel.org/all/20250911174032.3147192-1-wens@kernel.org/
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
- tools/testing/selftests/net/Makefile         |   1 +
- tools/testing/selftests/net/tcp_port_share.c | 258 +++++++++++++++++++++++++++
- 2 files changed, 259 insertions(+)
+Changes since v4:
+- Moved clock-names list to main schema in DT binding (Rob)
+- Dropped 4 patches that are already merged
+- Link to v4
+  https://lore.kernel.org/all/20250908181059.1785605-1-wens@kernel.org/
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index ae1afe75bc86..5d9d96515c4a 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -122,6 +122,7 @@ TEST_PROGS += broadcast_pmtu.sh
- TEST_PROGS += ipv6_force_forwarding.sh
- TEST_GEN_PROGS += ipv6_fragmentation
- TEST_PROGS += route_hint.sh
-+TEST_GEN_PROGS += tcp_port_share
- 
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := busy_poller
-diff --git a/tools/testing/selftests/net/tcp_port_share.c b/tools/testing/selftests/net/tcp_port_share.c
-new file mode 100644
-index 000000000000..4c39d599dfce
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_port_share.c
-@@ -0,0 +1,258 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+// Copyright (c) 2025 Cloudflare, Inc.
-+
-+/* Tests for TCP port sharing (bind bucket reuse). */
-+
-+#include <arpa/inet.h>
-+#include <net/if.h>
-+#include <sys/ioctl.h>
-+#include <fcntl.h>
-+#include <sched.h>
-+#include <stdlib.h>
-+
-+#include "../kselftest_harness.h"
-+
-+#define DST_PORT 30000
-+#define SRC_PORT 40000
-+
-+struct sockaddr_inet {
-+	union {
-+		struct sockaddr_storage ss;
-+		struct sockaddr_in6 v6;
-+		struct sockaddr_in v4;
-+		struct sockaddr sa;
-+	};
-+	socklen_t len;
-+	char str[INET6_ADDRSTRLEN + __builtin_strlen("[]:65535") + 1];
-+};
-+
-+const int one = 1;
-+
-+static int disconnect(int fd)
-+{
-+	return connect(fd, &(struct sockaddr){ AF_UNSPEC }, sizeof(struct sockaddr));
-+}
-+
-+static int getsockname_port(int fd)
-+{
-+	struct sockaddr_inet addr = {};
-+	int err;
-+
-+	addr.len = sizeof(addr);
-+	err = getsockname(fd, &addr.sa, &addr.len);
-+	if (err)
-+		return -1;
-+
-+	switch (addr.sa.sa_family) {
-+	case AF_INET:
-+		return ntohs(addr.v4.sin_port);
-+	case AF_INET6:
-+		return ntohs(addr.v6.sin6_port);
-+	default:
-+		errno = EAFNOSUPPORT;
-+		return -1;
-+	}
-+}
-+
-+static void make_inet_addr(int af, const char *ip, __u16 port,
-+			   struct sockaddr_inet *addr)
-+{
-+	const char *fmt = "";
-+
-+	memset(addr, 0, sizeof(*addr));
-+
-+	switch (af) {
-+	case AF_INET:
-+		addr->len = sizeof(addr->v4);
-+		addr->v4.sin_family = af;
-+		addr->v4.sin_port = htons(port);
-+		inet_pton(af, ip, &addr->v4.sin_addr);
-+		fmt = "%s:%hu";
-+		break;
-+	case AF_INET6:
-+		addr->len = sizeof(addr->v6);
-+		addr->v6.sin6_family = af;
-+		addr->v6.sin6_port = htons(port);
-+		inet_pton(af, ip, &addr->v6.sin6_addr);
-+		fmt = "[%s]:%hu";
-+		break;
-+	}
-+
-+	snprintf(addr->str, sizeof(addr->str), fmt, ip, port);
-+}
-+
-+FIXTURE(tcp_port_share) {};
-+
-+FIXTURE_VARIANT(tcp_port_share) {
-+	int domain;
-+	/* IP to listen on and connect to */
-+	const char *dst_ip;
-+	/* Primary IP to connect from */
-+	const char *src1_ip;
-+	/* Secondary IP to connect from */
-+	const char *src2_ip;
-+	/* IP to bind to in order to block the source port */
-+	const char *bind_ip;
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_share, ipv4) {
-+	.domain = AF_INET,
-+	.dst_ip = "127.0.0.1",
-+	.src1_ip = "127.1.1.1",
-+	.src2_ip = "127.2.2.2",
-+	.bind_ip = "127.3.3.3",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_share, ipv6) {
-+	.domain = AF_INET6,
-+	.dst_ip = "::1",
-+	.src1_ip = "2001:db8::1",
-+	.src2_ip = "2001:db8::2",
-+	.bind_ip = "2001:db8::3",
-+};
-+
-+FIXTURE_SETUP(tcp_port_share)
-+{
-+	int sc;
-+
-+	ASSERT_EQ(unshare(CLONE_NEWNET), 0);
-+	ASSERT_EQ(system("ip link set dev lo up"), 0);
-+	ASSERT_EQ(system("ip addr add dev lo 2001:db8::1/32 nodad"), 0);
-+	ASSERT_EQ(system("ip addr add dev lo 2001:db8::2/32 nodad"), 0);
-+	ASSERT_EQ(system("ip addr add dev lo 2001:db8::3/32 nodad"), 0);
-+
-+	sc = open("/proc/sys/net/ipv4/ip_local_port_range", O_WRONLY);
-+	ASSERT_GE(sc, 0);
-+	ASSERT_GT(dprintf(sc, "%hu %hu\n", SRC_PORT, SRC_PORT), 0);
-+	ASSERT_EQ(close(sc), 0);
-+}
-+
-+FIXTURE_TEARDOWN(tcp_port_share) {}
-+
-+/* Verify that an ephemeral port becomes available again after the socket
-+ * bound to it and blocking it from reuse is closed.
-+ */
-+TEST_F(tcp_port_share, can_reuse_port_after_bind_and_close)
-+{
-+	const typeof(variant) v = variant;
-+	struct sockaddr_inet addr;
-+	int c1, c2, ln, pb;
-+
-+	/* Listen on <dst_ip>:<DST_PORT> */
-+	ln = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(bind(ln, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+	ASSERT_EQ(listen(ln, 2), 0);
-+
-+	/* Connect from <src1_ip>:<SRC_PORT> */
-+	c1 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c1, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(c1, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src1_ip, 0, &addr);
-+	ASSERT_EQ(bind(c1, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(connect(c1, &addr.sa, addr.len), 0) TH_LOG("connect(%s): %m", addr.str);
-+	ASSERT_EQ(getsockname_port(c1), SRC_PORT);
-+
-+	/* Bind to <bind_ip>:<SRC_PORT>. Block the port from reuse. */
-+	pb = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(pb, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(pb, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->bind_ip, SRC_PORT, &addr);
-+	ASSERT_EQ(bind(pb, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	/* Try to connect from <src2_ip>:<SRC_PORT>. Expect failure. */
-+	c2 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c2, 0) TH_LOG("socket");
-+	ASSERT_EQ(setsockopt(c2, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src2_ip, 0, &addr);
-+	ASSERT_EQ(bind(c2, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(connect(c2, &addr.sa, addr.len), -1) TH_LOG("connect(%s)", addr.str);
-+	ASSERT_EQ(errno, EADDRNOTAVAIL) TH_LOG("%m");
-+
-+	/* Unbind from <bind_ip>:<SRC_PORT>. Unblock the port for reuse. */
-+	ASSERT_EQ(close(pb), 0);
-+
-+	/* Connect again from <src2_ip>:<SRC_PORT> */
-+	EXPECT_EQ(connect(c2, &addr.sa, addr.len), 0) TH_LOG("connect(%s): %m", addr.str);
-+	EXPECT_EQ(getsockname_port(c2), SRC_PORT);
-+
-+	ASSERT_EQ(close(c2), 0);
-+	ASSERT_EQ(close(c1), 0);
-+	ASSERT_EQ(close(ln), 0);
-+}
-+
-+/* Verify that a socket auto-bound during connect() blocks port reuse after
-+ * disconnect (connect(AF_UNSPEC)) followed by an explicit port bind().
-+ */
-+TEST_F(tcp_port_share, port_block_after_disconnect)
-+{
-+	const typeof(variant) v = variant;
-+	struct sockaddr_inet addr;
-+	int c1, c2, ln, pb;
-+
-+	/* Listen on <dst_ip>:<DST_PORT> */
-+	ln = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(bind(ln, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+	ASSERT_EQ(listen(ln, 2), 0);
-+
-+	/* Connect from <src1_ip>:<SRC_PORT> */
-+	c1 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c1, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(c1, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src1_ip, 0, &addr);
-+	ASSERT_EQ(bind(c1, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(connect(c1, &addr.sa, addr.len), 0) TH_LOG("connect(%s): %m", addr.str);
-+	ASSERT_EQ(getsockname_port(c1), SRC_PORT);
-+
-+	/* Disconnect the socket and bind it to <bind_ip>:<SRC_PORT> to block the port */
-+	ASSERT_EQ(disconnect(c1), 0) TH_LOG("disconnect: %m");
-+	ASSERT_EQ(setsockopt(c1, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->bind_ip, SRC_PORT, &addr);
-+	ASSERT_EQ(bind(c1, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	/* Trigger port-addr bucket state update with another bind() and close() */
-+	pb = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(pb, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(pb, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->bind_ip, SRC_PORT, &addr);
-+	ASSERT_EQ(bind(pb, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	ASSERT_EQ(close(pb), 0);
-+
-+	/* Connect from <src2_ip>:<SRC_PORT>. Expect failure. */
-+	c2 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c2, 0) TH_LOG("socket: %m");
-+	ASSERT_EQ(setsockopt(c2, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src2_ip, 0, &addr);
-+	ASSERT_EQ(bind(c2, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	EXPECT_EQ(connect(c2, &addr.sa, addr.len), -1) TH_LOG("connect(%s)", addr.str);
-+	EXPECT_EQ(errno, EADDRNOTAVAIL) TH_LOG("%m");
-+
-+	ASSERT_EQ(close(c2), 0);
-+	ASSERT_EQ(close(c1), 0);
-+	ASSERT_EQ(close(ln), 0);
-+}
-+
-+TEST_HARNESS_MAIN
+Changes since v3:
+- driver
+  - Fixed printf format specifier warning
+- Link to v3
+  https://lore.kernel.org/all/20250906041333.642483-1-wens@kernel.org/
+
+Changes since v2:
+- DT binding
+  - Added "select" to avoid matching against all dwmac entries
+- driver
+  - Include "ps" unit in "... must be multiple of ..." error message
+  - Use FIELD_FIT to check if delay value is in range and FIELD_MAX to get
+    the maximum value
+  - Reword error message for delay value exceeding maximum
+  - Drop MASK_TO_VAL
+- Link to v2:
+  https://lore.kernel.org/all/20250813145540.2577789-1-wens@kernel.org/
+
+Changes since v1:
+- Dropped RFT tag
+- Switched to generic (tx|rx)-internal-delay-ps 
+- dwmac-sun55i driver bits
+  - Changed dev_err() + return to dev_err_probe()
+  - Added check of return value from syscon regmap write
+  - Changed driver name to match file name
+- sram driver bits
+  - Fixed check on return value
+  - Expanded commit message
+- dtsi
+  - Fixed typo in tx-queues-config
+- cubie a5e
+  - Add PHY regulator delay
+- Link to v1:
+  https://lore.kernel.org/all/20250701165756.258356-1-wens@kernel.org/
+
+This series adds support for the second Ethernet controller found on the
+Allwinner A523 SoC family. This controller, dubbed GMAC200, is a DWMAC4
+core with an integration layer around it. The integration layer is
+similar to older Allwinner generations, but with an extra memory bus
+gate and separate power domain.
+
+Patch 1 adds a new compatible string combo to the existing Allwinner
+EMAC binding.
+
+Patch 2 adds a new driver for this core and integration combo.
+
+Patch 3 adds a device node and pinmux settings for the GMAC200.
+
+Patches 4, 5, and 6 enable the GMAC200 on three boards. I only tested
+the Orangepi 4A and Radxa Cubie A5E.
+
+
+Please have a look and help test on the Avaota A1. I don't expect
+any issues there though, since the PHY is always on, unlike on the
+Cubie A5E.
+
+Patches 1 and 2 should go through net-next, and I will take all the
+other patches through the sunxi tree. Hopefully we can get this merged
+for v6.18.
+
+
+Thanks
+ChenYu
+
+Chen-Yu Tsai (6):
+  dt-bindings: net: sun8i-emac: Add A523 GMAC200 compatible
+  net: stmmac: Add support for Allwinner A523 GMAC200
+  arm64: dts: allwinner: a523: Add GMAC200 ethernet controller
+  arm64: dts: allwinner: a527: cubie-a5e: Enable second Ethernet port
+  arm64: dts: allwinner: t527: avaota-a1: enable second Ethernet port
+  arm64: dts: allwinner: t527: orangepi-4a: Enable Ethernet port
+
+ .../net/allwinner,sun8i-a83t-emac.yaml        |  95 ++++++++++-
+ .../arm64/boot/dts/allwinner/sun55i-a523.dtsi |  55 ++++++
+ .../dts/allwinner/sun55i-a527-cubie-a5e.dts   |  28 ++-
+ .../dts/allwinner/sun55i-t527-avaota-a1.dts   |  26 ++-
+ .../dts/allwinner/sun55i-t527-orangepi-4a.dts |  23 +++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-sun55i.c    | 159 ++++++++++++++++++
+ 8 files changed, 393 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
 
 -- 
-2.43.0
+2.39.5
 
 
