@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA571B55A89
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 02:10:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C71BEB55A8C
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 02:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5EFF34E1565
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 00:10:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2AEBAA202F
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 00:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018D71862;
-	Sat, 13 Sep 2025 00:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D0CD531;
+	Sat, 13 Sep 2025 00:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EvaeNJAB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5VYBuLc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EB0139E;
-	Sat, 13 Sep 2025 00:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DBABA34;
+	Sat, 13 Sep 2025 00:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757722211; cv=none; b=qX383ccEr4G4AQoqFyD+wRacgeiTsm0LXp4djP1tmR4BiUtliNhudfei32NtXAXV72fa/UT60qOGm/TIWpFn7/pEvWBxm+S4jzwLsIO2nUhQXI3pe4NiOPdwSVXjcKCOfMJq1xK30+UGH53QG5Q/uc5SefxmhiHMG2N6neqL7zw=
+	t=1757722213; cv=none; b=MaBpjK2sS9JhVkO1xLDPgiTrL/cMJiGFJFSnmpM0fBvw6lNadouqK9x7uIMkPgIm/kmMzW6GW6Rn3j6dDwLJAv5NNANZCRGeGWdasHBIbwc9mTOYJzMrMW2o3IBhc4k5o/zZ7uatIcrdIgF/fmT0GWO2+Qfqhu8HyL1Ir+qEhHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757722211; c=relaxed/simple;
-	bh=huvopUx+fCF+W27J4ozI5YLGzWrBy737PtGOGcG4H2Y=;
+	s=arc-20240116; t=1757722213; c=relaxed/simple;
+	bh=rEBOCoBIkMyXvnVvbZwDIljs+0e5DTU8VaRVxDExesA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DFk9qoBjnDeNeGpgUMNruztKXtObM1CVt9cR0aVu5I/CASUPoM9MFfZ/TIoKmwwsWDLYSPx71mhcTAbfv+M9MNNwetdkkKQGX6SNKKSpwcWMrEB/Gk17HUiVEkDJgMYnigJPnUr4Tbyt8oWbLEciqY+lHUPIxOwqZF9L4/E6qNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EvaeNJAB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A003C4CEF1;
-	Sat, 13 Sep 2025 00:10:11 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pjVnl5PM8It5bW6oEfiFLKOsXqbR/k4UWA4G7kuFKOnAaLDetBAqMoDZEiPVQJP8lvnPzE1GxDO/Nl6oUD1WxUi7kPLTFycjzWXFavWH2AE1yw01Wv/l1PlYUc3ocBk2b8MoDaZ0csihgHtFXunujAnMhXG3SK0vu5jv/73UZpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5VYBuLc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE420C4CEF8;
+	Sat, 13 Sep 2025 00:10:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757722211;
-	bh=huvopUx+fCF+W27J4ozI5YLGzWrBy737PtGOGcG4H2Y=;
+	s=k20201202; t=1757722212;
+	bh=rEBOCoBIkMyXvnVvbZwDIljs+0e5DTU8VaRVxDExesA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EvaeNJABzLxa6LhqrXHKVF36AkpXQbsvz+v9RyeVtxdNP34QjmT8GSOoXFtJL41yc
-	 L9fa9ZC9Y2fW/SNvki+UrPwI4aVkXchkn60Y7pAhT9MzTCEaMOJdy5yOZWsVGv1Tmg
-	 2W9DjDaNl5KiKXmEELv/yDtrB12eG9Rm3SDTfZsWCDcZkGQ/VgwjD2Eq4Mv6IfuQwS
-	 WniiTnX/xtv6q7zkompLKdq29dYD9k+a4jOWuArCXPm401r7kDz4Qa91Z551VtAtPH
-	 s8O2qPPl5/aYv3U1/+I6kmajVP/ON4++MZHi+PxvV2q6AbttUn9mOwSz+fAepwKTOa
-	 BE19EAcU2RhXg==
+	b=G5VYBuLcDyDl2n46M0LpHOgXgtxFTUxFLnJSrqSExV1SrmrIczeX6l3pp7Xznrc45
+	 tnEERfDVIlXzNwGMJolBK16cOothL3mJXoo+r6oxZOr2pe7du9Yh4oVsciOl7rneRt
+	 aMGNsEVzQCacFKUD0arI+pAqOHFaJoE9S+4CkOK7hhb9qVnILv4ZGc6zYwxvWhAHET
+	 v/SlgDT/cFWi95JRf4LOsNCW/pwVANTwGxuYenLbCl+gzG9OvRxNENqIV0woIyjLsY
+	 xFQB2LWmMpO3E+Zq12ksO6fFx69O+733o3QYfAKKiWXPDYaaRO2EdawQX5otimyM6F
+	 aBdfS3DUV9c5w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE329383BF4E;
-	Sat, 13 Sep 2025 00:10:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CEA383BF4E;
+	Sat, 13 Sep 2025 00:10:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dt-bindings: net: Drop duplicate
- brcm,bcm7445-switch-v4.0.txt
+Subject: Re: [PATCH net-next 1/5] selftest:net: fixed spelling mistakes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175772221351.3109205.11738417185121524239.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Sep 2025 00:10:13 +0000
-References: <20250909142339.3219200-2-robh@kernel.org>
-In-Reply-To: <20250909142339.3219200-2-robh@kernel.org>
-To: Rob Herring (Arm) <robh@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <175772221475.3109205.13117121412963824859.git-patchwork-notify@kernel.org>
+Date: Sat, 13 Sep 2025 00:10:14 +0000
+References: <20250911143819.14753-2-fw@strlen.de>
+In-Reply-To: <20250911143819.14753-2-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net-next.git (main)
+by Florian Westphal <fw@strlen.de>:
 
-On Tue,  9 Sep 2025 09:23:38 -0500 you wrote:
-> The brcm,bcm7445-switch-v4.0.txt binding is already covered by
-> dsa/brcm,sf2.yaml. The listed deprecated properties aren't used anywhere
-> either.
+On Thu, 11 Sep 2025 16:38:15 +0200 you wrote:
+> From: Andres Urian Florez <andres.emb.sys@gmail.com>
 > 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
->  .../bindings/net/brcm,bcm7445-switch-v4.0.txt | 50 -------------------
->  1 file changed, 50 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/brcm,bcm7445-switch-v4.0.txt
+> Fixed spelling errors in test_redirect6() error message and
+> test_port_shadowing() comments
+> 
+> Signed-off-by: Andres Urian Florez <andres.emb.sys@gmail.com>
+> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] dt-bindings: net: Drop duplicate brcm,bcm7445-switch-v4.0.txt
-    https://git.kernel.org/netdev/net-next/c/3456820e01f9
+  - [net-next,1/5] selftest:net: fixed spelling mistakes
+    https://git.kernel.org/netdev/net-next/c/496a6ed8405e
+  - [net-next,2/5] netfilter: ipset: Remove unused htable_bits in macro ahash_region
+    https://git.kernel.org/netdev/net-next/c/ba941796d7cd
+  - [net-next,3/5] netfilter: nft_meta_bridge: introduce NFT_META_BRI_IIFHWADDR support
+    https://git.kernel.org/netdev/net-next/c/cbd2257dc96e
+  - [net-next,4/5] ipvs: Use READ_ONCE/WRITE_ONCE for ipvs->enable
+    https://git.kernel.org/netdev/net-next/c/944b6b216c03
+  - [net-next,5/5] netfilter: nf_reject: don't reply to icmp error messages
+    https://git.kernel.org/netdev/net-next/c/db99b2f2b3e2
 
 You are awesome, thank you!
 -- 
