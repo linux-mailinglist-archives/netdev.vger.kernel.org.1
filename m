@@ -1,112 +1,90 @@
-Return-Path: <netdev+bounces-222771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD6CB55FB2
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 11:04:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44423B55FC1
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 11:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E8DF3A58BC
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 09:04:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007C4A0724B
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 09:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6361C29AB12;
-	Sat, 13 Sep 2025 09:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1302EA173;
+	Sat, 13 Sep 2025 09:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Hk9Ji3RX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSbkRV2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58D71B5EB5
-	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 09:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8FE2C0F75;
+	Sat, 13 Sep 2025 09:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757754248; cv=none; b=WuXzRgWrvuFysOhxhTAtMJczCj6QYu+nX7DwBpz8Ndxoc73evik41Bhd5ZzHTTrneVk+lMCRg/5DwrsmXJujM5w9W52zCXt3gkGKPHWVBNmao32YeDhx6h0jvjcD/L/AwnqgBPvDTZAnWp7+7KUd4q3z2UpUubxe5mjbSAD62o8=
+	t=1757754435; cv=none; b=dGlSm2c7TPlENppKf0XRJu961fJvc6WwEUr8ExXKo/X9E/ndPH41Ws62GHeL2JhqwAne5mw+HyEAaFJEaUgJaVeMqXIC0lyqf5gEUOTGT2ihM21mZEbzZJ5SyfhEj/maWezw9HOiureGScbOiqTqTiOYZ1F4oGbRk9kZw4JKBI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757754248; c=relaxed/simple;
-	bh=UVVvhK2i7Y2RoE3+f00O+S3W1jVZajQywCamG7ZRhvI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Rs3sPr/DMmaKJ7VeaEBUBoeb3WGaU+sunOj5oVM3Vpz00KoHOXzkNqZVZlu/8wo+ykfokj5KZZaNWWL/80ofb4QTJWDUKRPfhoAJHjY295A/KGytX2mf1gSV+sAs/LYuj8kAkv5GauTHG1K/l754BO27jR47i1e3OWz3cJ7CBNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Hk9Ji3RX; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-625e1dfc43dso4586141a12.1
-        for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 02:04:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1757754244; x=1758359044; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UVVvhK2i7Y2RoE3+f00O+S3W1jVZajQywCamG7ZRhvI=;
-        b=Hk9Ji3RXPcI4aTwd+6OMVgPA3FjHCZakfDt/7TFOP3MT9C4skseWn0XdP6GZF/hGa4
-         KAzr3lWUSFq7qlJ4pQph1IXTUW8swGdge3wCSeHpVwbJgwQKjJ/CYsb4D07p4OIJKIEA
-         jQOkiC8ry7uBd6Q+lmrPf2syZ8K0CTgN7/1N5V8et8IxsxpTonLC/ExydeyhPv7FqLve
-         jCujm9QroXXMI3izULNtdPcyyHzQAqSR1QQroPk5L4gntAJeJwH9wx4QRNqmwT3fpUt2
-         MMvf+nT7Ki8Me6tLatTmCxFOuNEeQEqLo1xlIylA4LG9wD8hDu5Nuifc6Xs0vcxYHCr4
-         nmmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757754244; x=1758359044;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UVVvhK2i7Y2RoE3+f00O+S3W1jVZajQywCamG7ZRhvI=;
-        b=DpoTme8tczJkKoilTYxsY/3Apu1WODvIPb8mRPRUL0+FjHCwBwC8l9jejat6jqUDQv
-         29tkaNXx4OEjmpI90IF+tcgfD55LIyORghb7nhM+zNq56DlgEIc1qfZBFC2LWChBBMo+
-         2PH7JYcePrAvlMpJY8YH5mNxkJljXyj0CMY3WZFre/DdPUWUhv1SkBV1Fyh5Zwf/72Cd
-         CwJZtH9Puid4K+4a2R5IEi5xUma6mGpa2/ApC2UaUuPmplqXVGMOor0hUTr49DwTMbbf
-         /eeZQL9TXyoyXi5dmjQL6x5mHck2gYHOVM/3HsW8KuvjJhm18WQS17qcIeHcGAyA0trz
-         rqZg==
-X-Gm-Message-State: AOJu0Yx2d2sKoQuLrCyM+wQJh/lCPZXiGVzgz1Ke2v3XvpOrDMumGKr9
-	wOUa76s2D4PfDlkhO0avcEkgG4CFcGp8I8uuZiHIQcSn6ckDwnKMXOs2mAjD4EM8KDg=
-X-Gm-Gg: ASbGnctwtxkDOQ+5DTAZOOWCURdKF6cBtkp6tbHdFg1Hw8nmiJ4HfNPWWQTO+hN1ql6
-	x3+1KUVfC7SGjTc9kJDpAhPYR8SMtctJvl9FaLSTuNIXe+0gAlxcusRzPhA0Pm/4S5UG7VuwZwg
-	Ag7m3fqMNKbuhZg12srUKUzm8A4zwxxz5/x1t8phltovgWpnIV4JuaSs54okYMknEIjswnRwKb/
-	tHiSKMI5AI+rGi4PC/LR42sao+p2qB1ocQCRcKpe+JATIr8dCLrL96u9U99smwnefL52kV8aeJg
-	iqgEqu7U7G6fERoRagU1tSKV3rgT+4PSdcsiBAC8X3A5B17Q5C2/ZJmqlL4bggCx7NMlH7SS4oH
-	EeYgyBNXAB+770znybInDrWSu
-X-Google-Smtp-Source: AGHT+IEmRoINHFXW/b714jq1nah0puvwxLmdIa5RnYaQvTLCE16E1IGzjYI0PWNN2KA/kQnxApRjTw==
-X-Received: by 2002:a05:6402:84d:b0:62e:d473:8582 with SMTP id 4fb4d7f45d1cf-62ed827098amr5640856a12.14.1757754243820;
-        Sat, 13 Sep 2025 02:04:03 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:506a:2dc::49:221])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62ec33f57dbsm4923806a12.25.2025.09.13.02.04.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Sep 2025 02:04:03 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
-  Neal Cardwell <ncardwell@google.com>,  Paolo Abeni <pabeni@redhat.com>,
-  kernel-team@cloudflare.com,  Lee Valentine <lvalentine@cloudflare.com>
-Subject: Re: [PATCH net-next v3 1/2] tcp: Update bind bucket state on port
- release
-In-Reply-To: <20250911180628.3500bf0c@kernel.org> (Jakub Kicinski's message of
-	"Thu, 11 Sep 2025 18:06:28 -0700")
-References: <20250910-update-bind-bucket-state-on-unhash-v3-0-023caaf4ae3c@cloudflare.com>
-	<20250910-update-bind-bucket-state-on-unhash-v3-1-023caaf4ae3c@cloudflare.com>
-	<20250911180628.3500bf0c@kernel.org>
-Date: Sat, 13 Sep 2025 11:04:01 +0200
-Message-ID: <87a52y67we.fsf@cloudflare.com>
+	s=arc-20240116; t=1757754435; c=relaxed/simple;
+	bh=cb2Q1hU2BTJSMSERZdg9xxImCo1b0IDRVIFl13zEi7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bgShBX8zzY5WEv9tNO/zLiUau1BcEITNZJSpVArtDPUWGEymSKcBc7V/1NGFKtp8t1VLBYgjfm3J+rvFU9faiTusWbKZMLJJu3b13EJGO4cTi/bBdYVZpmg/uyGRQdG7Ljp/GvReL5uaeSoAimmUJPhNI2TNPROZu5s7Aa23J2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSbkRV2H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A797AC4CEEB;
+	Sat, 13 Sep 2025 09:07:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757754434;
+	bh=cb2Q1hU2BTJSMSERZdg9xxImCo1b0IDRVIFl13zEi7k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NSbkRV2HmBGKR0IvjNlWBMNvMj2ZwzM+axTyyVP0B1NhK/lPu29kleoUZYZ0kzHE6
+	 iIBLvIEwW1BrD+itZRICi/qMl2r8xilMBWAge74VRMSj4izWj0p87oYKpn4rMlfUaM
+	 DWwYT1YW/7jKzKB805wqGN1AccB+foRDwD4JNeKfK2PaUxdNUHLHTdPZN6WOCs3OLY
+	 /AoWkr4njKga7pyCKxB/j32CHsiUjr0DmLygOuEsa6+h37sc8aMQHT35aW8QDKqEKz
+	 dMA5GDF82bnpzuTGiEDr7R11sFiFMwABTlL/Nq6UfaNM5QHGL7IOLq9DpyslmjYNOf
+	 SDmPuQPPsda1Q==
+Date: Sat, 13 Sep 2025 10:07:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org,
+	corbet@lwn.net, Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [PATCH v3 5/5] ice: refactor to use helpers
+Message-ID: <20250913090710.GJ224143@horms.kernel.org>
+References: <20250911-resend-jbrandeb-ice-standard-stats-v3-0-1bcffd157aa5@intel.com>
+ <20250911-resend-jbrandeb-ice-standard-stats-v3-5-1bcffd157aa5@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250911-resend-jbrandeb-ice-standard-stats-v3-5-1bcffd157aa5@intel.com>
 
-On Thu, Sep 11, 2025 at 06:06 PM -07, Jakub Kicinski wrote:
-> On Wed, 10 Sep 2025 15:08:31 +0200 Jakub Sitnicki wrote:
->> +/**
->> + * sk_is_connect_bind - Check if socket was auto-bound at connect() time.
->> + * @sk: &struct inet_connection_sock or &struct inet_timewait_sock
->> + */
->
-> You need to document Return: value in the kdoc, annoyingly.
-> Unfortunately kdoc warnings gate running CI in netdev 'cause they
-> sometimes result in a lot of htmldocs noise :\
+On Thu, Sep 11, 2025 at 04:40:41PM -0700, Jacob Keller wrote:
+> From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> 
+> Use the ice_netdev_to_pf() helper in more places and remove a bunch of
+> boilerplate code. Not every instance could be replaced due to use of the
+> netdev_priv() output or the vsi variable within a bunch of functions.
+> 
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c   | 48 ++++++++------------------
+>  drivers/net/ethernet/intel/ice/ice_flex_pipe.c |  8 ++---
+>  drivers/net/ethernet/intel/ice/ice_lag.c       |  3 +-
+>  drivers/net/ethernet/intel/ice/ice_main.c      | 10 ++----
+>  drivers/net/ethernet/intel/ice/ice_ptp.c       |  6 ++--
+>  drivers/net/ethernet/intel/ice/ice_sriov.c     |  3 +-
+>  6 files changed, 24 insertions(+), 54 deletions(-)
 
-Ah, thanks for the hint. 'scripts/kernel-doc -v -none' didn't complain
-about it.
+Less is more :)
 
-I think I will drop the doc comment altogether since it's just a private
-helper now and the flag it checks is properly documented.
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
