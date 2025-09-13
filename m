@@ -1,91 +1,73 @@
-Return-Path: <netdev+bounces-222765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56FB9B55ED5
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 08:04:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CCB4B55EF2
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 08:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACA601CC20D7
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 06:04:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 981081C2793B
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 06:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B91A2E6CB2;
-	Sat, 13 Sep 2025 06:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7F02E7652;
+	Sat, 13 Sep 2025 06:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lu3CWZJB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUzKSGav"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97C615D1
-	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 06:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2FA2E7646
+	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 06:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757743439; cv=none; b=QhdrkmiEWr9nE3bsw+ES/W24Uv0Q8GS8YJvq9Z9RuD7kL+sPlaOHunOeco9bfjYmoOo4VOncSBLNUlsUkKeolU7XFZH1FSQqhLXw+cM51IocWK7AlH2KIYeuBS4ewjwoF2tvceCgtpX5vYYA1CblC/mPL6OdDNJjdVxyhhDQ/uk=
+	t=1757744907; cv=none; b=KMga/qKi60uYWWG+2mRYwGJOtnWepA9VpY4/h/t3LnztvLN+1sFG7ytLWD7ql3QGbnv5zXEViPrVVjZpsuydG3c6X/t1yqVFFOn3/9BlYp2Afqv8fAap3t8AO1R23LFCbQ12Zl6FI7iKUkeVcX5x4MAGf6RqdxwHFyKJx6NIQx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757743439; c=relaxed/simple;
-	bh=ix31eSL81pFOW9vzIfsqnpRQ/OW4z+xiuCQH9UQniT0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PnEmkFm51FQd+6XVb4iIpsoklSW55RQK2btWT/6vVE/AyeTmZ2b0TlhGugArQL+qnDpx8/3maWNeoO/ybmFEkzB2+q/JWmOlm7IMPzyQDRhs3MFHJmIewvVfj5TpJQVq4nY8s7cuz4cbuOq7OegzTu9FLeRsvakq6MP9szibaSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lu3CWZJB; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2445826fd9dso31598815ad.3
-        for <netdev@vger.kernel.org>; Fri, 12 Sep 2025 23:03:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757743437; x=1758348237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=41Zu+8Pun+PpMd8x6mUjfEY70mK6ipIOPQyqQYxTK8o=;
-        b=lu3CWZJBKw3WJX2GSKt1JXsZg67FitL42bfcsDg+psVq8AmVO1mi9sjARyYlvckT9a
-         w+tceOy40a8yRz/9RAspkZ/4fUBdIzwPZjPqI/LvjM4HkTEe/dCiGn/8hWe+C2PS/Ju2
-         dLEMjGMbQATPpqdijYjTUPvzAwWdmZJJd5tty25J+noivjKErHmq9a3XC+9RfNqrH1C0
-         qLmKvL8aj38ICSi7gCHO9j+WzY+zOsppzSgIDv8KwxedJpEhGqKd48LarTXrmLP5xc2f
-         vlPJsAWD201OVL6Jkrev0cFDsYfy65UXHzGDgrtqb7PfafWjyL8ZVBKo70XGbQ4vZUk9
-         Oacw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757743437; x=1758348237;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=41Zu+8Pun+PpMd8x6mUjfEY70mK6ipIOPQyqQYxTK8o=;
-        b=KURckbuzPxqmsyqzluBzG2lzVAx5BCag1Gykg9j0012z2HTGa0BluS/xYriEM1COSM
-         LWKFg/wRgZkx0P+SeqkGG92NHt1G/2KwYYONCfNwI6iY22mTQmaOyswobBvVRxAvs4bb
-         yScIBIOp2kOSbCtIiBSTGWIbvSZfeGp0dAniqCebtLjExGQYiJJvC53LUR26fC4r9g3q
-         obl0uBuNUVjOp//69alkLneIniLybMJqXw8GciaPk59GbWc799+LhUNR99JdYS7CDZbw
-         ldiMsbrjw2PR9N4rsA6DEgPDtHQ02FwGjOZ+SOnrf2s1bDLSq+zFt6KPsX+ZEAC/LuqQ
-         d4aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVyCC06A3vwpnRmxhO0XWMEGa2vwABqVGLJsH1NqrQ8MyqD2IlAHtXXM+ZopgvS9x9fIbSu06A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcIrHZCnD6Sc7TGikxWb2hImJLZLFOQpg5qwA8a0iHzOxQcQB3
-	/j0aVraSWW99DzidulO832erlRzkH8ZxuI/kQaznI+0eDrBwJaR2YM/ZN0bMog0nXD4=
-X-Gm-Gg: ASbGnculjL9hgJCbkxpVw4xPQ33R+92Lbf51cFM7zH8ki5Q46S2afMhbDnn8DejlgN6
-	h/eqxxHfd9GT+Mxt0P1klfRI0NDeAWnFuHLuSonz6h8QjSIOr+w+aay/wXH6ZaNEMpzgI9ZGBJQ
-	6PMHjTOe+ts3XdJPgSKi1yRkp76wpHgwsKHVrbFU+MzRIpB/GKD1Kuy9NbA0oqRQVFdL/f9WQ3U
-	SrPAy1IvcdWKBO42iOh+S0/p+fLuv1OcWhQBTIPU4qDR17irkb6bF6yszQDYyWSGSFr8DKlNG+X
-	Ouys2/usJ7tiwu29x4KnVTOtvHbNpcTeero7qDRd8CHI0Nww4UtE4WQKCTVELxf1OVR5O+nwUmj
-	62lTgfnnqIgrswNEozjRlNP1SxFN70YsM8SqI9W18VR0KjTnusCMlSQ3igT1AchXF6V4=
-X-Google-Smtp-Source: AGHT+IEAfgG7M/u2SSxRv4ShiDR+vJqe2T44IbROgBQqdm+3/74ZEJbrOuuf/pP7mig0OgSHGmTtqw==
-X-Received: by 2002:a17:902:ef46:b0:24c:da3b:7376 with SMTP id d9443c01a7336-25d261781d4mr59102455ad.26.1757743437016;
-        Fri, 12 Sep 2025 23:03:57 -0700 (PDT)
-Received: from mythos-cloud ([121.159.229.173])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3ae29aefsm66340855ad.118.2025.09.12.23.03.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 23:03:56 -0700 (PDT)
-From: Yeounsu Moon <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Yeounsu Moon <yyyynoom@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	eric.dumazet@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: natsemi: fix `rx_dropped` double accounting on `netif_rx()` failure
-Date: Sat, 13 Sep 2025 15:01:36 +0900
-Message-ID: <20250913060135.35282-3-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1757744907; c=relaxed/simple;
+	bh=/i/Vpx5Mot8737yhSFoj0KRVF1Oqi+ZajfOBBYnzlY4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SIEwiPPhp6EZyYwebEj2yn04+5QS5tqpwnQM8umol+mG96X1AWP2gtqwrhDdfDl0zgSYH9KkgcCPH5+0la3SE8EoaH0f7jOa0a3nxLgJaCo7ipMK7N+/PPBXcnfx0H8tmlUbXzR4zaZkTsxamYOsJkEclPmGeMl1ln7P5ASrZgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jUzKSGav; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757744904;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mY0zwfbcY1iYfa3XybLBXvWgZp6sPQxxx4em9LXqmGk=;
+	b=jUzKSGav/quFvFIA5zTCUkHwOefHM9CMVRcgv6FA30kjuQtV107DSQ8Fd5JP/6ugf5vrQb
+	/T/c9WCXqJLdqGWUV5Q2sh6lxrH0aeY0bQw88YxQv0cgl+Z9eaEttQE7KC8zJfzeX3vOVA
+	jqYHORkZWGyx2RJ4GXtI6L4LFMT8BfQ=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-88-RKEeC9LyO6O3JcQ8hwjPSg-1; Sat,
+ 13 Sep 2025 02:28:20 -0400
+X-MC-Unique: RKEeC9LyO6O3JcQ8hwjPSg-1
+X-Mimecast-MFC-AGG-ID: RKEeC9LyO6O3JcQ8hwjPSg_1757744899
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3FF51800365;
+	Sat, 13 Sep 2025 06:28:18 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.72.112.52])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 17A2B300021A;
+	Sat, 13 Sep 2025 06:28:12 +0000 (UTC)
+From: Li Tian <litian@redhat.com>
+To: netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org,
+	Haiyang Zhang <haiyangz@microsoft.com>
+Subject: [PATCH net] net/mlx5: report duplex full when speed is known
+Date: Sat, 13 Sep 2025 14:28:10 +0800
+Message-ID: <20250913062810.11141-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,72 +75,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-`netif_rx()` already increments `rx_dropped` core stat when it fails.
-The driver was also updating `ndev->stats.rx_dropped` in the same path.
-Since both are reported together via `ip -s -s` command, this resulted
-in drops being counted twice in user-visible stats.
+Prior commit in Fixes, duplex is always reported full as long
+as the speed is known. Restore this behavior. Besides, modern
+Mellanox doesn't seem to care about half duplex. This change
+mitigates duplex unknown issue on Azure Mellanox 5.
 
-Keep the driver update on `if (unlikely(!skb))`, but skip it after
-`netif_rx()` errors.
-
-Fixes: caf586e5f23c ("net: add a core netdev->rx_dropped counter")
-Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: c268ca6087f55 ("net/mlx5: Expose port speed when possible")
+Signed-off-by: Li Tian <litian@redhat.com>
 ---
-changelog:
-v1: https://lore.kernel.org/netdev/20250911053310.15966-2-yyyynoom@gmail.com/
-v2:
-- Correct commit reference in `Fixes:` tag.
-- Fix incorrect commit message.
----
- drivers/net/ethernet/natsemi/ns83820.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/natsemi/ns83820.c b/drivers/net/ethernet/natsemi/ns83820.c
-index 56d5464222d9..cdbf82affa7b 100644
---- a/drivers/net/ethernet/natsemi/ns83820.c
-+++ b/drivers/net/ethernet/natsemi/ns83820.c
-@@ -820,7 +820,7 @@ static void rx_irq(struct net_device *ndev)
- 	struct ns83820 *dev = PRIV(ndev);
- 	struct rx_info *info = &dev->rx_info;
- 	unsigned next_rx;
--	int rx_rc, len;
-+	int len;
- 	u32 cmdsts;
- 	__le32 *desc;
- 	unsigned long flags;
-@@ -881,8 +881,10 @@ static void rx_irq(struct net_device *ndev)
- 		if (likely(CMDSTS_OK & cmdsts)) {
- #endif
- 			skb_put(skb, len);
--			if (unlikely(!skb))
-+			if (unlikely(!skb)) {
-+				ndev->stats.rx_dropped++;
- 				goto netdev_mangle_me_harder_failed;
-+			}
- 			if (cmdsts & CMDSTS_DEST_MULTI)
- 				ndev->stats.multicast++;
- 			ndev->stats.rx_packets++;
-@@ -901,15 +903,12 @@ static void rx_irq(struct net_device *ndev)
- 				__vlan_hwaccel_put_tag(skb, htons(ETH_P_IPV6), tag);
- 			}
- #endif
--			rx_rc = netif_rx(skb);
--			if (NET_RX_DROP == rx_rc) {
--netdev_mangle_me_harder_failed:
--				ndev->stats.rx_dropped++;
--			}
-+			netif_rx(skb);
- 		} else {
- 			dev_kfree_skb_irq(skb);
- 		}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index d507366d773e..9f35d3b491e0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -1118,9 +1118,11 @@ static void get_link_properties(struct net_device *netdev,
+ 	if (info) {
+ 		speed = info->speed;
+ 		lanes = info->lanes;
+-		duplex = DUPLEX_FULL;
+ 	} else if (data_rate_oper)
+ 		speed = 100 * data_rate_oper;
++	if (!speed)
++		goto out;
++	duplex = DUPLEX_FULL;
  
-+netdev_mangle_me_harder_failed:
- 		nr++;
- 		next_rx = info->next_rx;
- 		desc = info->descs + (DESC_SIZE * next_rx);
+ out:
+ 	link_ksettings->base.duplex = duplex;
 -- 
-2.51.0
+2.50.0
 
 
