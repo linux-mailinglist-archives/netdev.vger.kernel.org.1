@@ -1,166 +1,133 @@
-Return-Path: <netdev+bounces-222784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA566B56042
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 12:31:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E866B5605A
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 12:57:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17BB41C806F6
-	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 10:32:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA7FD1B2143B
+	for <lists+netdev@lfdr.de>; Sat, 13 Sep 2025 10:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A542367A0;
-	Sat, 13 Sep 2025 10:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964062EC0AB;
+	Sat, 13 Sep 2025 10:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZ30YJFI"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DoAkqMFO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAA12472BC
-	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 10:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFEC1DE4E0
+	for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 10:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757759507; cv=none; b=gcB9Wg+jnVN6NH2WNmRGlxa6jmuUiR+PiX4DGSMturM3oNQqo5TQB9aGmy5ZTCqotNtLky2kORqrYUHoGya++38o2tleJNvKbAwv8Pq7PNQJiFmL5eYxOk1Aj3vnL5lLQcDoe2TDG7oYYf6RahkLxSKTOgAGHfP285+t5voBQmI=
+	t=1757761062; cv=none; b=rzWFibKBSHW17G0nh02ciKWEiQqQzCh6BO319GMNRWVcZt0/RRKBe3GBPneZfNNNbUyBI9NwJDbeDtOoc1RTIBlm68ZSxRJmu7T+UZn9HFfuQpTB9VhYkBOQAnCCk1KY0hWnlK9Su+6dOHsxxVBWF8YjsIMD3TAqWZliZ/2VISU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757759507; c=relaxed/simple;
-	bh=kLjujwuai/vpVgO0CVp+hKYrEhCuNSFv89vDY2WVAtI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YwjLv0nNPpIEG+JxMSVEMKRyCA5PWu/6751LSQ5Eo4F19k5Eky4jMcpq90wTkm7DTpHkHh05fxAMvEd9X3nPPGOIwfDfXB+rht9EKGNht9IryqB7lYcurVuBz1L6m0y96/mjXu0jhSeEvAsL/JUN2brvWbEP3O9Y/4EvOvsSuFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZ30YJFI; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7761bca481dso829032b3a.1
-        for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 03:31:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757759504; x=1758364304; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ir/ou5rnkwOqwXWRi/QtrwXILS7ZMKlDX7jKwfdf6bk=;
-        b=eZ30YJFIfsiU5z3icVuoPChp1JDUYPQ+Y0xRUsbwscuJYquJBggi8FVXwgQYISVSXB
-         79U3c7OyN74ajw2wtFM1MZ41L5D31jqkqyd2bUJ4Wkx6bYi0ptJivDKa0Qdd6s8JXUyD
-         0o7UrZca/YX0bkhIHlnPRo7coHdjULBUHrQrwmlgzphqGaDAyilmW/cPazjLbLqb9M3s
-         DlMfooEpdvAVYw22SPZiXNFwLrVbSwV6E+Fnvufx0OrTjTOijGPw0VBG5TrbNtA+R9R4
-         /hnNBa78lsOlSXv7sbKlsli1nLsWE2nOCsAGNmJkOjqg4KuU+xY0SGFEouMArhrc6Yu1
-         SBnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757759504; x=1758364304;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ir/ou5rnkwOqwXWRi/QtrwXILS7ZMKlDX7jKwfdf6bk=;
-        b=G/NgSLReUwyHypzvLoxLqMMC+KQPx6wbDtChHn3rXJbRi3g2P43iRh/SaeR4jR70ww
-         uzUAEGuM1m8lG82mENnh4ThCDvbYRPND1aHYmsRWPrdJMv5Nb753EER0tQ2v3V+AzD/Z
-         9Iy3NTU8pkbL2APYt82PKrpAVhGsVpW/bBMn300/ZtmzsFDglhuQ+CNdTu/axfcyIXsY
-         HcO554PS6dFjfnTzEhxN4Db7DBNzq63LSGrC/LfM6N4LB/egHQSMsEbir8pvY/B2pN6z
-         w9tf6f1mcaaswlPDDfzAA46yGr40Egd9MEETE2A1NeCQuG72WkcDQCjLhcNdgWyHBm6D
-         EUgA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIB/VqK9BMYdMSrOpYaJ3ijr957NAFDfYdUrCA68Ai7cGzc4Qe7AzGO1QLNtGLvhE7EDMfzwQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYqnLT38PyUd1fHJaDnf32ZidhkQujSG00Csyf475D/UiI/L6s
-	bJ+XMxn68/GkTAjDCOTV3YPU+N1fu4NAWd18XWJpEFGFvDiHiSQfDGcO
-X-Gm-Gg: ASbGnctpHnESpkY8BZCaCQ2xZDFwjaufuf46adU4UFRxCWS1tYx+x5JUTEDgT4jYBP6
-	xpyymLZGJnKRnlVv2qYdSZriIMRIQeea/SEu/71Tc4O0ykXcspdWv3Xt3bLL5fAvDKI/oIst/E7
-	htG7LbyRjX9caOV8mBwpeGL1XZ4Amw3eOSCySx3hrgeVN9cePt4BTkq0cA5+jbo1Kii7ZbEa1J/
-	7q0TnMYvrf4Yi3KvkmcI4uESXVE6XOzUMVG5wPwoKcUbX5GBU1xTcpqtLK/rL0hvpNAxLmER+uH
-	PE/BTFkdlUb+950i8B7bPyzPbfFr89LMwCkEWsyHORYdTiOqG+UJYoC/tNRhx68gMbHahnbpBLM
-	ccl3RjBPvr7Cx2aatWCEDwLwK8g==
-X-Google-Smtp-Source: AGHT+IE1M/1765Yw0DM9+sKSZqF04QztVs/dVj/lsNzSSoRC0dhJ9gntacDaXmIdc0UtyGw2H3M2AA==
-X-Received: by 2002:a05:6a00:a8a:b0:774:52b9:b17e with SMTP id d2e1a72fcca58-776121a116amr6003596b3a.30.1757759504326;
-        Sat, 13 Sep 2025 03:31:44 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7760944a9a9sm7622198b3a.78.2025.09.13.03.31.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Sep 2025 03:31:43 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 4A1184206928; Sat, 13 Sep 2025 17:31:40 +0700 (WIB)
-Date: Sat, 13 Sep 2025 17:31:39 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	Avery Pennarun <apenwarr@worldvisions.ca>
-Subject: Re: [PATCH RESEND net-next] Documentation: ARCnet: Update obsolete
- contact info
-Message-ID: <aMVIC1w5-Lm5KBXX@archie.me>
-References: <20250912042252.19901-1-bagasdotme@gmail.com>
- <20250913085926.GI224143@horms.kernel.org>
+	s=arc-20240116; t=1757761062; c=relaxed/simple;
+	bh=upQPXGsB+Lqds9bK49tblzNE68vNfRic6U/rijoXc8I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J5alprpMDmeBQilU0Mc3nsNpd2eVBQas8IFucW2ELgOPF4Rv84Nld9eWwI/wUbkKckBG8uDJUFR2+7kNWJX3dF4R5VW0Sbv/CEyIyXMxWqNa7HbSD5Pqqvw/dvf8rSnNU/E4ELrdGRufSgmPOV2Y8tk0F4y+0yjgq4FfBxt5ekw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DoAkqMFO; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58D6ww0J028203;
+	Sat, 13 Sep 2025 10:57:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=iSlUeSHRmJUsrdQpHMnv5iGSFPvE/
+	krIjkCy3aJEPAE=; b=DoAkqMFOJqvOmu/qLElXVbmgXIxPdsolvVEmfacPB77Ou
+	H197AsglO7/kc8BRTwS67fTeXG5CuRjom8+5DeaHwmMkE8oxVqVyeZdVIlMVMjV3
+	fg9eMc+Ux0VTUcieZBaDCuGC7nSUM0OyOKg2Sb9cgc4yetbEdmEqWkSY/se/+Zf8
+	0qEk+L7UVXO0FclbskIjCLslC5tVQCAujmmuofJ9fN+hdXc5PFCq3d1nNtZfK0yY
+	/Z1KzTNd8zKfXmiLwONd/Cg1qtiuJkByoPy7CXqLuWuSDwJSsf8Ua5r/sCFKA7Ni
+	4XL0oCW0R64TfgsBACBXBWtCM1f8jxH3TlrxqOruw==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49507w07we-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 13 Sep 2025 10:57:33 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58D77cli015291;
+	Sat, 13 Sep 2025 10:57:32 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 494y2frex1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 13 Sep 2025 10:57:32 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58DAvVNn011414;
+	Sat, 13 Sep 2025 10:57:31 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 494y2frewn-1;
+	Sat, 13 Sep 2025 10:57:31 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: kuniyu@google.com, sdf@fomichev.me, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] net: rtnetlink: fix typos in comments
+Date: Sat, 13 Sep 2025 03:57:26 -0700
+Message-ID: <20250913105728.3988422-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4hOK/4Qme/73oVSs"
-Content-Disposition: inline
-In-Reply-To: <20250913085926.GI224143@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-13_03,2025-09-12_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 mlxscore=0
+ adultscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
+ definitions=main-2509130103
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAyNSBTYWx0ZWRfX7yi+63aasqi5
+ 00eefPl5bYNsEpl9OTt9KhwctOh0ZmoNa7gR7IKIzqzFFZI/XUvUwALi6ry1ut4IxxaE+d3RYyp
+ F2RMb3LTiAMSv4vilR3a3VKpKYockA4/ovD1X/BwhmHxuXVT9qd90+p/uUeW0MOZS1jubtU5Z7S
+ GOQQN6Zaycc+Yt4qaG7VrK5/atlotEhCewTJV77yvu2q2w50j6af+jO/mQo2kBZeJpNBpwIjV80
+ PWXNXeIFKGp9grlDaYPJzsnb4IjPSMwB7FsoTwG1cUAjTAifDEvdSM+8qACcb4xMBMHtyGd6NYs
+ TqE2MeBXhGkwZGfysqIL3P0nys4hbdm5ZUeWZSyWyfvSazwFXN1V74PG6rN1mkS/fg92/GPq5vr
+ H7b/XnXl0X7xL+NV8hJ4vD97wjdLmQ==
+X-Proofpoint-ORIG-GUID: nTBoHdMPY50ra26t-Pv7Vv-aJBxEBUEK
+X-Authority-Analysis: v=2.4 cv=RtPFLDmK c=1 sm=1 tr=0 ts=68c54e1d b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=wYRIItBDcXS1zaOhxGIA:9 cc=ntf
+ awl=host:13614
+X-Proofpoint-GUID: nTBoHdMPY50ra26t-Pv7Vv-aJBxEBUEK
 
+- Corrected "rtnl_unregster()" -> "rtnl_unregister()" in the
+ documentation comment of "rtnl_unregister_all()"
+- Fixed typo "bugwards compatibility" -> "backwards compatibility"
 
---4hOK/4Qme/73oVSs
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ net/core/rtnetlink.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Sat, Sep 13, 2025 at 09:59:26AM +0100, Simon Horman wrote:
-> + Avery
->=20
-> On Fri, Sep 12, 2025 at 11:22:52AM +0700, Bagas Sanjaya wrote:
-> > ARCnet docs states that inquiries on the subsystem should be emailed to
-> > Avery Pennarun <apenwarr@worldvisions.ca>, for whom has been in CREDITS
-> > since the beginning of kernel git history and the subsystem is now
-> > maintained by Michael Grzeschik since c38f6ac74c9980 ("MAINTAINERS: add
-> > arcnet and take maintainership"). In addition, there used to be a
-> > dedicated ARCnet mailing list but its archive at epistolary.org has been
-> > shut down. ARCnet discussion nowadays take place in netdev list.
-> >=20
-> > Update contact information.
-> >=20
-> > Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
->=20
-> I think it would be good to get buy-in from Avery (now CCed) on these cha=
-nges.
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 094b085cff20..37a9594c8144 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -478,7 +478,7 @@ static int rtnl_unregister(int protocol, int msgtype)
+  * rtnl_unregister_all - Unregister all rtnetlink message type of a protocol
+  * @protocol : Protocol family or PF_UNSPEC
+  *
+- * Identical to calling rtnl_unregster() for all registered message types
++ * Identical to calling rtnl_unregister() for all registered message types
+  * of a certain protocol family.
+  */
+ void rtnl_unregister_all(int protocol)
+@@ -1096,7 +1096,7 @@ static unsigned int rtnl_dev_combine_flags(const struct net_device *dev,
+ {
+ 	unsigned int flags = ifm->ifi_flags;
+ 
+-	/* bugwards compatibility: ifi_change == 0 is treated as ~0 */
++	/* backwards compatibility: ifi_change == 0 is treated as ~0 */
+ 	if (ifm->ifi_change)
+ 		flags = (flags & ifm->ifi_change) |
+ 			(rtnl_dev_get_flags(dev) & ~ifm->ifi_change);
+-- 
+2.50.1
 
-OK.
-
-> >  Because so many people (myself included) seem to have obtained ARCnet =
-cards
-> >  without manuals, this file contains a quick introduction to ARCnet har=
-dware,
-> > -some cabling tips, and a listing of all jumper settings I can find. Pl=
-ease
-> > -e-mail apenwarr@worldvisions.ca with any settings for your particular =
-card,
-> > -or any other information you have!
-> > +some cabling tips, and a listing of all jumper settings I can find. If=
- you
-> > +have any settings for your particular card, and/or any other informati=
-on you
-> > +have, do not hesistate to :ref:`email to netdev <arcnet-netdev>`.
->=20
-> nit: hesitate
-
-Thanks for the suggestion!
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---4hOK/4Qme/73oVSs
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaMVIBgAKCRD2uYlJVVFO
-o6VhAP9ZHl+3iy4x+Rd15oqUntPdAeEv9b3hRwXxVnaB8WxFSAD/WmtZ92mVhxV/
-pPCAWlZCduMo6eJb8etByHzxQAp7GgU=
-=rMpI
------END PGP SIGNATURE-----
-
---4hOK/4Qme/73oVSs--
 
