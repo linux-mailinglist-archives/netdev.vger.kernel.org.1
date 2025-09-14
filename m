@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE307B56B6D
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 21:00:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54C4B56B71
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 21:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 352584E0FA8
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 19:00:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81DC91899278
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 19:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF1B27A127;
-	Sun, 14 Sep 2025 19:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2982DF12B;
+	Sun, 14 Sep 2025 19:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6OiUtuV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pf5Kjbqn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5BC1A9FB5;
-	Sun, 14 Sep 2025 19:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774FB2DECB7;
+	Sun, 14 Sep 2025 19:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757876416; cv=none; b=LXVwL666QKCFaQ40HGQGgWiwwFK+d1JXN/rVRYN1KYPaDJiEqrv+pnXjuThpDPdm/jN6gtv0AhD6xyvdUDrOLfDyUpxDeWNSISenEWxZpVGGJZjfQ52973HYjGYkpArm7VqyGsDjrU4EXlQoAa+digBK7uftEwkPFdUxOWw4NB8=
+	t=1757876417; cv=none; b=jq1ulH7ivrLp7+IMiu1Us8pDe+DaFyeCMbWhnXDq2U99Pu/g+j7Gyyhm52Mg9t7jkVo8FZFKUG8eiQ/3SK3xu7vIDeW3EjhVXMAIK4RsgKoyD+gBCYsDn0UUt1BtUuTWo7EF+ORl4nfubaOQiJmS066292fabHzAlKlZWyLB+jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757876416; c=relaxed/simple;
-	bh=o07hps2pwSKAibnqP9x0ltQKVFPIMhLl/sMLgFNhBEE=;
+	s=arc-20240116; t=1757876417; c=relaxed/simple;
+	bh=FyF93LpmLxOF9lXH95/wzI5wWyR0u+UOFAJa12hmQhg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TcympX3FngsJhlfjv7Ogm8BnbdxpH5EvZ9wXkwLS/pTr7ooeC4X3t4yCwRZ8Wa40B3ykaxBPtskctgziwCos7rg8Zlx1/8F6HUMihFmebFySAWeG0H5hCTS7FwwLKFqQgNeCp0fVVZZJxux1vC7HDQIwmrQq1zlwhPm1Gg6yRME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6OiUtuV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80AD6C4CEF1;
-	Sun, 14 Sep 2025 19:00:15 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FEGj4Wks/1HUlUZJd3oZ/Noj+N52LVX7fdTIwNZ6XViUnuS+u5+k/ibOgGc0UShZ4tNvsvalORlgnVrEsRqeb71LOxRbSlAg1J39OD9T3txuFC+hFzI5iYVhNJRpT4/W+/qui28TCkEbGdxn/H7Td7xhBpx/akB4lijSiOyrLQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pf5Kjbqn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3C8EC4CEFC;
+	Sun, 14 Sep 2025 19:00:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757876415;
-	bh=o07hps2pwSKAibnqP9x0ltQKVFPIMhLl/sMLgFNhBEE=;
+	s=k20201202; t=1757876417;
+	bh=FyF93LpmLxOF9lXH95/wzI5wWyR0u+UOFAJa12hmQhg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k6OiUtuVn+a75vsC9duCl3l3YKVHSd2WLYfpb6EyyXpJ6RQcJEk6/2yqIkapZ4p3j
-	 kq/FE/v5oV9iyuCyvc4QgFmYuQr4E+EEuy6R1CmaVCGRlszlvsovSKcBKXgjdPjMU0
-	 kmGSfQ2bdcjoj7tJit0H2VCzeLcCPTKeb8eAM9vLWOEFutOuIqJ+9iv+ObdRTRxLVW
-	 mbRxTNm5UVd/BSj9aXTaGqiu0Vrpoxq7iN9Y8AS0uV6HlcPHchvwX8naa8DeT6hVpf
-	 8K1GO1OWw0tjV7vfOCWtslmu+bV/p979Jy7cdBqPAp7mF9upkDdRrrSgGXg/vHb6Ck
-	 /O0KaUUZdGhyw==
+	b=Pf5KjbqnWbLlP28YltZXv3tY2PXYGTN1AFUV0GVv6/CosQ4OTBdUHWvyM7RXw80Bv
+	 p07gUwPwC8gN13XTqBLEHllQZ6g66dtxSL5lrMVjZ8lAh5yfVNNHQfVWsh5B5/vwu4
+	 SKwMQvDKYelSnnGmPk+6K03E+BWzynKoeMiaQjhJGm99ieckiF655ijgvbvXAEJbN3
+	 fpAXJTt9q0K4HqPQV24HwyjdZe192tct6ea0QwQvw4a1fl4rxSM1b7Ou2zXEnJAvhO
+	 oGILmzmY4ZzUCEAoMlLnIFvWat1MGb8IySkskT0fMA+Sye8zuPjeou9v8fxzlT1EEJ
+	 yMkkWCCazdf5g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C0739B167D;
-	Sun, 14 Sep 2025 19:00:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC039B167D;
+	Sun, 14 Sep 2025 19:00:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/smc: Remove unused argument from 2 SMC
- functions
+Subject: Re: [PATCH net-next] net: mana: Reduce waiting time if HWC not
+ responding
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175787641724.3528285.12239252710706994693.git-patchwork-notify@kernel.org>
-Date: Sun, 14 Sep 2025 19:00:17 +0000
-References: <20250910063125.2112577-1-mjambigi@linux.ibm.com>
-In-Reply-To: <20250910063125.2112577-1-mjambigi@linux.ibm.com>
-To: Mahanta Jambigi <mjambigi@linux.ibm.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alibuda@linux.alibaba.com,
- dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
- pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org
+ <175787641849.3528285.16103963300533493791.git-patchwork-notify@kernel.org>
+Date: Sun, 14 Sep 2025 19:00:18 +0000
+References: <1757537841-5063-1-git-send-email-haiyangz@linux.microsoft.com>
+In-Reply-To: <1757537841-5063-1-git-send-email-haiyangz@linux.microsoft.com>
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ haiyangz@microsoft.com, decui@microsoft.com, kys@microsoft.com,
+ wei.liu@kernel.org, edumazet@google.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+ ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+ dipayanroy@linux.microsoft.com, kotaranov@microsoft.com,
+ shirazsaleem@microsoft.com, andrew+netdev@lunn.ch,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 10 Sep 2025 08:31:25 +0200 you wrote:
-> The smc argument is not used in both smc_connect_ism_vlan_setup() &
-> smc_connect_ism_vlan_cleanup(). Hence removing it.
+On Wed, 10 Sep 2025 13:57:21 -0700 you wrote:
+> From: Haiyang Zhang <haiyangz@microsoft.com>
 > 
-> Signed-off-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
-> Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> If HW Channel (HWC) is not responding, reduce the waiting time, so further
+> steps will fail quickly.
+> This will prevent getting stuck for a long time (30 minutes or more), for
+> example, during unloading while HWC is not responding.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net/smc: Remove unused argument from 2 SMC functions
-    https://git.kernel.org/netdev/net-next/c/010fe36ad2a3
+  - [net-next] net: mana: Reduce waiting time if HWC not responding
+    https://git.kernel.org/netdev/net-next/c/c4deabbc1abe
 
 You are awesome, thank you!
 -- 
