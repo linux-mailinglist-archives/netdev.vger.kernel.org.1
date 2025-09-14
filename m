@@ -1,80 +1,101 @@
-Return-Path: <netdev+bounces-222864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64ED5B56B68
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 20:56:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75866B56B6B
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 21:00:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 120B71767B9
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 18:56:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B621B1899005
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 19:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5CE4286D76;
-	Sun, 14 Sep 2025 18:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4D11F4174;
+	Sun, 14 Sep 2025 19:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qCDfEqdC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iiwbhd6+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E3E1DE8A4;
-	Sun, 14 Sep 2025 18:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6131B532F
+	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 19:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757876167; cv=none; b=dsTpr3nQHK/+owmfMAIcs8GbeeZTur3cIcXSjhYQ7qFuT/vf0IXYk/3ywP05ivhNpskYP++HxJACo4EyTlscFiuampymI4J9KUfgTQbc+RoMHboAbpZRNrGw2wLAeKXxLmo6AhiQN/VBV/o5LyY5f/VhMMlFtK16IsAANXlJbk0=
+	t=1757876416; cv=none; b=CuJ9TcPw3y9NlcfxLL0tJ4Xl9AWp4xzApjC9ZE0ISgM3iVJ96mORVlOvHhtRdgPtmCI69aKkn2baqWHsruDX8Owp7nXCyRp29YiA6XWajntxXAXjJnbOHPoe/goStSwIrS3fDVnyxTqrN9f87TS4daqLnWJrYTOVCXlTlGONywo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757876167; c=relaxed/simple;
-	bh=owSCmTywugDQT5TmSEcAhrDCWd18bU9phloIb4CEgt0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hz3eYVPU9Sra1kXR+zb6kI8qOPtUvU4Y6uw3IInB0e504hy/gHHbYQ9FYFaPA1vzmYs4CtDdo0Lr5/dtiY1xrJ7G64DOPffzoaFvXwIWyufIcQlfebTDl56McLWZ+0OpaL7K5FOHAFC4puI6RcRFPHsKXPFjlOUlB6Gkgg4lTH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qCDfEqdC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XLxHUmBnsIL7oqRRVA9M1wQh0Xlcvzf20qSXcEazRTI=; b=qCDfEqdCebqShsXWd9Kx86iupW
-	MIT4c5zj1K90xUZfvRioN/LPt+PEmf8MbctDv8Isvns/MHU6KWGfAIEMeEgk6m2LP67QGMdMJgr4F
-	S7AaeM0XlzoABzJgWGX0FsvqKMxkRzEBG4eJXtbSg5et9a/f+3twErBuDt1rY3nllRXo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uxrtF-008MXn-VN; Sun, 14 Sep 2025 20:55:57 +0200
-Date: Sun, 14 Sep 2025 20:55:57 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/2] net: dlink: fix whitespace around function
- call
-Message-ID: <b1a52aab-9b8a-44f3-ad2b-dbaa0e56abd7@lunn.ch>
-References: <20250914182653.3152-2-yyyynoom@gmail.com>
- <20250914182653.3152-3-yyyynoom@gmail.com>
+	s=arc-20240116; t=1757876416; c=relaxed/simple;
+	bh=K9UTDHKIBQwyOKMcrLhCfzGglpzzynnhfxYA3Xz+AXg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I+TRlP4+h9oUgWRrekuChaiCWsnSDj2029EaAbGDUGkR/LuCFrAJEI6840jz0B9MAx3zc342zdTfzqW73wDxihESJADq54ZsDMNeEfsMYP7Y5uFzMEJoFBQv8YrZC5ofy9gpYThNLZ5eN83kXVaUsKLOEx3Da5pyG1brVo+hd2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iiwbhd6+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46F99C4CEF0;
+	Sun, 14 Sep 2025 19:00:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757876414;
+	bh=K9UTDHKIBQwyOKMcrLhCfzGglpzzynnhfxYA3Xz+AXg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Iiwbhd6+Fr3SsoJsCYoFCdUtR4jzD2xXQ/8bDiJ4yLvvUksxAKqmV4/u+EQ3WNYwh
+	 DoN6kcExFD1+a11mn0RMuJLn1lVwjMYoxENM0VSkTyAendV2exsKVsmhB/LtKMQaMF
+	 pKae7p2Bk9vJ7Cy20IcS0xMivvZjsTX0tjKbfxoJHFow5WZ5p4Mm5px6PlwBmeTS7p
+	 BQyQoobs7B8k5eCBBhTtezmOBN4Cg1hIzW6fKrOesiSZQ42Qh8MR2EKp2+TIGzZp3x
+	 2oTacyOyt60DbsXm/xyksI+4sVEWrloo6OuEaO3X1cTAzJFv9zgDelpAJHqoJjf1QP
+	 ImcTe0isf6ziw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D9439B167D;
+	Sun, 14 Sep 2025 19:00:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250914182653.3152-3-yyyynoom@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/4] net: dsa: mv88e6xxx: remove redundant
+ ptp/timestamping code
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175787641600.3528285.2615248298382187506.git-patchwork-notify@kernel.org>
+Date: Sun, 14 Sep 2025 19:00:16 +0000
+References: <aMKoYyN18FHFCa1q@shell.armlinux.org.uk>
+In-Reply-To: <aMKoYyN18FHFCa1q@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ olteanv@gmail.com
 
-On Mon, Sep 15, 2025 at 03:26:53AM +0900, Yeounsu Moon wrote:
-> Remove unnecessary whitespace between function names and the opening
-> parenthesis to follow kernel coding style.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 11 Sep 2025 11:45:55 +0100 you wrote:
+> Hi,
 > 
-> No functional change intended.
+> mv88e6xxx as accumulated some unused data structures and code over the
+> years. This series removes it and simplifies the code. See the patches
+> for each change.
 > 
-> Tested-on: D-Link DGE-550T Rev-A3
-> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+> v2: fix evap_config typo, remove MV88E6XXX_TAI_EVENT_STATUS_CAP_TRIG
+> definitio
+> 
+> [...]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Here is the summary with links:
+  - [net-next,v2,1/4] net: dsa: mv88e6xxx: remove mv88e6250_ptp_ops
+    https://git.kernel.org/netdev/net-next/c/afc0e12a235c
+  - [net-next,v2,2/4] net: dsa: mv88e6xxx: remove chip->trig_config
+    https://git.kernel.org/netdev/net-next/c/578c1eb9c541
+  - [net-next,v2,3/4] net: dsa: mv88e6xxx: remove chip->evcap_config
+    https://git.kernel.org/netdev/net-next/c/ae4c94981683
+  - [net-next,v2,4/4] net: dsa: mv88e6xxx: remove unused support for PPS event capture
+    https://git.kernel.org/netdev/net-next/c/fbd12de4c5b1
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
