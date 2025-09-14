@@ -1,154 +1,104 @@
-Return-Path: <netdev+bounces-222859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E41B56B3E
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 20:31:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 471E1B56B51
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 20:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F536188B4A8
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 18:32:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 057761731CB
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 18:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3012DEA97;
-	Sun, 14 Sep 2025 18:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E7E2D0C7D;
+	Sun, 14 Sep 2025 18:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b9w61XOr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xoBBG0BI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE35D2DE70A
-	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 18:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8151C5486;
+	Sun, 14 Sep 2025 18:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757874702; cv=none; b=MqqOKlwBbtVUOmhM2ir7OonS5KvoHm12t+rWRb3LXNrZ3UsGNpGocVgDcMy3UWr4TPFjioBNHQxeSR/XBe+9zCmFgvx5FPlqUncrWR9mtKoIHkaNU3pjvQZUHLusZIj05M+ywHsrYkYXqrKL1cCtVAc954kiu++gs40YSgrvJkA=
+	t=1757875045; cv=none; b=g38CEWE8I7ho/BLNWii4mItknlUBsZuMMDd3utBIJRiY/JsMkaVUMuojgLelBn+hi4F7cmP5GZlNsY17FqAIkkdhUxvsu+rJyhWsRLiVB1EEKJoQypqC53wNVcuNQ0eYZd9FSOHpok2Ppeip2/AZj5GIUskv5qgktoAdib1g39w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757874702; c=relaxed/simple;
-	bh=7n4l+yd/t9dYFJyNm3d1lZn7lll+HFRskxQ0eebhwSY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sfxk+Ad64gE5ybOtYp6uNAWmlH7U2pK1PJtyJSjg+1SHwld2L8UFmztehsLhd6VSVFD2lao9DXOl/PDhQNiZcA3zyl1qeuhMYHFpmvv/2lkyrQd+Qh22eJ7e9XbwJjg1NxeD5oGAXtmn1R4cYhA+eeVEw6bd+ESHv93vQ5CsI2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b9w61XOr; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-24457f581aeso34238095ad.0
-        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 11:31:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757874700; x=1758479500; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V72sOLpArLpSzz2BXmWvU3GzOolHbwO0RKkipSbHAww=;
-        b=b9w61XOr9Y4dZVPLsn2XwH72ki9hLNuMj2MXWUcdMcH9d9VItki9xt40ZzZoVnAhH9
-         siUCf8A1T+IEpumoj4kNlhfpPRw2c7hx00sss00H7Ab8P7Yh8PV/RiB3HZ0vI3N/DqzF
-         qCTdIVdbNj8Egc2DT9rSFNmz5EXpLufdsjLoyrNKRBRump5+adcx+KqOODb9FE8undah
-         EkT1UCVs/BrzMOdi2ghdt02YybREtW6c4FnRzbzaO1/niwCJ8KVU0NFN0whIllS24KzJ
-         Jcytd2bsNAF9W8eUilXagUgKAzp64wVALBgQNEp+3cSTc7KsT9o3WRvI29LkO51nO0zz
-         bK7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757874700; x=1758479500;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V72sOLpArLpSzz2BXmWvU3GzOolHbwO0RKkipSbHAww=;
-        b=ZtUU9MpNaUGW9xQ8DFeY+M172xTIQ2xemkCCnrWhVzxz+DVCbOGv4gZT+4ljWAUHa+
-         Kh59TT0ahZZZlSMzul1QFJQxB5inrigaGVK5omaKSnDEVVZu9MGLc0BlGBFgIbHxCQvk
-         tOa/oul0WXUf5a8791nPwbLHcVPaXO6m9UvPJpjONM8WealA8mxSe7vrRVSp4r3qkN8/
-         MDjebizchnT1d9/UTxcGkLiKrkaKdtRLsMxvKR+9dzvyhco4e6rl2ZprkMayVnosumZR
-         VShV7/A5/bARtPy4FVtQ8FlNb786U0TI0NEPBxD+dDbEtrYUU12ljfbNCkHHPhSRO68d
-         25sA==
-X-Gm-Message-State: AOJu0YxzqnI6m46p3W2a/Z2ZNzOuvbGTOAPAHgzbkvPXj8r7UG/lL4L6
-	0DSldom1gI0814bv46uyK5ko3/1l1Xt8f7G2O/6T/T32BIjlQ2rysOgx
-X-Gm-Gg: ASbGnctJpzpedgs7XFna1btZm4n81BOBYZ5Mige0nT2LZ3qG2HJy+up6PUeisSR/21e
-	83RheHLmNAWPfVplw8xBYxQVVTYMPZCISoQDVU8O93U/NRf2d66dvK9tuvIyT+m1VVnu+fpO+r4
-	uIqTaH0s7Juz08Gpkh+SAcKl4zoQnDI4Vg+7uqoSzSmetrvUFk3fJ0kcM7VVjZC2L8y/dvYRNP6
-	z18uMntivGuJG4iZXTaYrRKNmQnaFjY4XWgg0UKqnl9kUq6dniQa+aVGdaay0yOQBk4Is9K8uVx
-	g+sA5iJE7VQ/7o1lEpXGyT8WJz3jFvEV33eqpgsKByROkvGmaWmWxF66iLu4ib7QGp6b7D4DnxO
-	clJ+Qgsud/6cKTaOHnpMK3Sb3Dhv7sZ1TUtVq2MZAQVkE6oYFjtzPMT4SWGsrKFVLmDI=
-X-Google-Smtp-Source: AGHT+IGmaVDfD3oDHDJpd9fsoafiirPe2B8PuFLQIPHGMomPNEO50epFPEOlslvGEv0RscjGM1SFbA==
-X-Received: by 2002:a17:903:3c2e:b0:240:3b9e:dd65 with SMTP id d9443c01a7336-25d26079293mr119493085ad.38.1757874699961;
-        Sun, 14 Sep 2025 11:31:39 -0700 (PDT)
-Received: from mythos-cloud ([121.159.229.173])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25e2fb546f9sm71760225ad.127.2025.09.14.11.31.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Sep 2025 11:31:39 -0700 (PDT)
-From: Yeounsu Moon <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1757875045; c=relaxed/simple;
+	bh=TymjcyE+B0pUrKS96jgP+V0xrVRKHsWFLUAPEo+0Svc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OGMBkITxUiq7/5TB0Lqetn5ueS9D9yQZhp0RSIDLLj3O4IXZPI/VEypGw8VFgSw3m8j3zP5kalnS5W3FIgHbrXokG6/hMyHyAxgCJ4UVl5Hah0b/wMFnWw6IJ3AMvr7a7hptw5ayCyR53KS/CeFPyeb0+DThPzRdNsOvFyAsVTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xoBBG0BI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0gOze54H4cQJFLKODkJQHJhLdjBQtWBsq6A59nmn/Ng=; b=xoBBG0BIK8GqAyPNyfLs7dThg2
+	ZQy3Kp7SHwTCOr6MUvGRR4ktfD+WsT3AMMbDh1Q/uyNASWvfPU2qfCZ7lubTTzngk6jGKImVpPNNU
+	3hBHYxg+HMb1yScmkULqsRT9xyaQdE0mW3CesuVJEOarbJ6zxIbhlY1+4UFaq0YZl/gA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uxrb2-008MT5-1x; Sun, 14 Sep 2025 20:37:08 +0200
+Date: Sun, 14 Sep 2025 20:37:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yeounsu Moon <yyyynoom@gmail.com>
-Subject: [PATCH net v2 2/2] net: dlink: handle copy_thresh allocation failure
-Date: Mon, 15 Sep 2025 03:26:54 +0900
-Message-ID: <20250914182653.3152-4-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250914182653.3152-2-yyyynoom@gmail.com>
-References: <20250914182653.3152-2-yyyynoom@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: qcom: qca808x: Add .get_rate_matching
+ support
+Message-ID: <2f182073-5548-401c-a61c-45163c9a2948@lunn.ch>
+References: <20250914-qca808x_rate_match-v1-1-0f9e6a331c3b@oss.qualcomm.com>
+ <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
 
-The driver did not handle failure of `netdev_alloc_skb_ip_align()`.
-If the allocation failed, dereferencing `skb->protocol` could lead to a
-NULL pointer dereference.
+> So, the bug is likely elsewhere, or your ethernet MAC doesn't support
+> SGMII and you need to add complete support for  rate-matching to the
+> driver.
 
-This patch adds proper error handling by falling back to the `else` clause
-when the allocation fails.
+Russell beat me too it. Just adding:
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Tested-on: D-Link DGE-550T Rev-A3
-Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
----
- drivers/net/ethernet/dlink/dl2k.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+static int qca808x_get_features(struct phy_device *phydev)
+{
+        int ret;
 
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index faf8a9fc7ed1..a82e1fd01b92 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -965,14 +965,11 @@ receive_packet (struct net_device *dev)
- 			struct sk_buff *skb;
- 
- 			/* Small skbuffs for short packets */
--			if (pkt_len > copy_thresh) {
--				dma_unmap_single(&np->pdev->dev,
--						 desc_to_dma(desc),
--						 np->rx_buf_sz,
--						 DMA_FROM_DEVICE);
--				skb_put(skb = np->rx_skbuff[entry], pkt_len);
--				np->rx_skbuff[entry] = NULL;
--			} else if ((skb = netdev_alloc_skb_ip_align(dev, pkt_len))) {
-+			if (pkt_len <= copy_thresh) {
-+				skb = netdev_alloc_skb_ip_align(dev, pkt_len);
-+				if (!skb)
-+					goto reuse_skbuff;
-+
- 				dma_sync_single_for_cpu(&np->pdev->dev,
- 							desc_to_dma(desc),
- 							np->rx_buf_sz,
-@@ -985,6 +982,14 @@ receive_packet (struct net_device *dev)
- 							   desc_to_dma(desc),
- 							   np->rx_buf_sz,
- 							   DMA_FROM_DEVICE);
-+			} else {
-+reuse_skbuff:
-+				dma_unmap_single(&np->pdev->dev,
-+						 desc_to_dma(desc),
-+						 np->rx_buf_sz,
-+						 DMA_FROM_DEVICE);
-+				skb_put(skb = np->rx_skbuff[entry], pkt_len);
-+				np->rx_skbuff[entry] = NULL;
- 			}
- 			skb->protocol = eth_type_trans (skb, dev);
- #if 0
--- 
-2.51.0
+        ret = genphy_c45_pma_read_abilities(phydev);
+        if (ret)
+                return ret;
 
+        /* The autoneg ability is not existed in bit3 of MMD7.1,
+         * but it is supported by qca808x PHY, so we add it here
+         * manually.
+         */
+        linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->supported);
+
+        /* As for the qca8081 1G version chip, the 2500baseT ability is also
+         * existed in the bit0 of MMD1.21, we need to remove it manually if
+         * it is the qca8081 1G chip according to the bit0 of MMD7.0x901d.
+         */
+        if (qca808x_is_1g_only(phydev))
+                linkmode_clear_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->supported);
+
+        return 0;
+}
+
+So it appears this PHY breaks the standard in a number of ways. Maybe
+it is broken in other ways which need additional workarounds.
+
+	Andrew
 
