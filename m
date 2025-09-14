@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-222868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 486E6B56B72
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 21:00:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 929C7B56B74
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 21:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B431A1769D1
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 19:00:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C887F189CFD7
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 19:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B8F2DFA5B;
-	Sun, 14 Sep 2025 19:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A152E0406;
+	Sun, 14 Sep 2025 19:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fba/28Ew"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rDJGkzHs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26A72DFA32;
-	Sun, 14 Sep 2025 19:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC43230BE9
+	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 19:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757876420; cv=none; b=oEdfzGRtMLqRGSxFPrSCIGUOeEHFMe03Rqs9UDfUJBEZ6rZd0dTfZrNBW7sJMHmbJjXiNCVInnGsXb078kYCEPuwhMS00oAgktrDy5A6RDUZByXzl6RjMsd2lAurcUVg7KCMxa0nqzCy5bgc+5dFTRFAJ/NKFqTtPzBIlZdCntE=
+	t=1757876421; cv=none; b=sShQh6p7WXtu/bbgT1zMKdSIm9uz+BNnAnEJ2y3f9NxqH8EbAvynIiRlr9HReGD8wUEuMiXofYZdJt8KGK3IdwatWrk8m0SdXNUUrtXXQ6hPv/ZfrcYNDoDnOdESWZIxWTtr1BzDOS3p2oA/iUI3em4UDlm7LRLY2iGrnGQWJ0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757876420; c=relaxed/simple;
-	bh=HXWTvZ0Rfo/S/tKkpVHE0VLWYEThtftZvmLT4n48M80=;
+	s=arc-20240116; t=1757876421; c=relaxed/simple;
+	bh=Bj3ZYrMHHPqh4jKXqmiaHt7y0LMaPjkAejSpnRuNXuU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sKZYao0agPbp0BH/66x0QPrYmnUx6h56awpNx/BZfK428VwORVeKHjrla7T4MLxEM87jB4m38YKY0nBAZFsm3E+pzQZiryX4pDTyxbzndmeeg5OJAAmrf8PbY9jlOBN7u0zQFvEOPlmMKhcnuMOfZtgN9w063yO2XWHy2DsdQ+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fba/28Ew; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76DF2C4CEFA;
-	Sun, 14 Sep 2025 19:00:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bkyZRPTjFgcg6wnFIW/qxNL9fGkHbvdpwvb/o1JKW/TjdsTNnOA6do5uF3yOQtjpXrV0KshAw5bdApOCNz1IsGbX08xde4hm1zG1nEtRuhLJy/GP8iS+5QjNAht4MpcpdF34a2mnaampiiotbyuld5o9fc0hEPKa8B+eqNY0ilY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rDJGkzHs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49903C4CEF0;
+	Sun, 14 Sep 2025 19:00:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757876418;
-	bh=HXWTvZ0Rfo/S/tKkpVHE0VLWYEThtftZvmLT4n48M80=;
+	s=k20201202; t=1757876420;
+	bh=Bj3ZYrMHHPqh4jKXqmiaHt7y0LMaPjkAejSpnRuNXuU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Fba/28EwLh2TRwkN1ZwmwMKwxkikPrdlXpJJzBHqHRg3oq/Kf5N8arIACMg1IeNNq
-	 xLp0oytxQHtqtHwsOLhevzOOOUDes+fclsXbaSK6JJTSWd8OT5TRrIQ0rg+UvZ0s/a
-	 w8YiHHlv4t6CU41zaM+7/pWFMti9XqeTPJ9cycsof+ORyQx3YMv2RAwHifmc2+U5uU
-	 AsSWHIeqxGcH/qPlcoBAd7ou4+DVLcinzYomhpze+x/EcHz3IoQh+0UknF2KUUkesi
-	 xD+hO8KecAPTna8zK88drNO3UjGj1tqv/r7VprCS0R2pqwYpGAGKcrYleSwGG+xrK7
-	 AUACMWhWFhOAg==
+	b=rDJGkzHsjhYZ3wg2Tw00OBeCmtV/65Rha78pUOR8LQ0FOeDPdvl2L35eYxDw/dmuM
+	 sWAs8uMGLg+YGfHgIne6cd0zE+V48LESBRHw7bfQONx8QqH+Kqtlb3XJrbp/LeFCSF
+	 W1Ye6+QTrSrc8QMtibxnkuGw1OhtdaEOjRMd4AxgxWaFffqHqUiO6NPrR3U8SweBEo
+	 aY9S5AB+r5QbhAvGWkDgD3qhbjxoD2nyOYMwPa653wLR/QToS0ieSAn4vWG87Ramuj
+	 81HMMCNJrydKDKuh+FO2HTW+pw7+5bAi+2pQ8LnqKdr6x1oq5wcVnPAdklJ0wPlNn8
+	 tFZCsk4Xr9hGg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C8139B167D;
-	Sun, 14 Sep 2025 19:00:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C8539B167D;
+	Sun, 14 Sep 2025 19:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,73 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 next-next] net/cls_cgroup: Fix task_get_classid()
- during
- qdisc run
+Subject: Re: [PATCH net-next] net: use NUMA drop counters for
+ softnet_data.dropped
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175787642000.3528285.12140096607438105996.git-patchwork-notify@kernel.org>
-Date: Sun, 14 Sep 2025 19:00:20 +0000
-References: <20250902062933.30087-1-laoar.shao@gmail.com>
-In-Reply-To: <20250902062933.30087-1-laoar.shao@gmail.com>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, daniel@iogearbox.net,
- bigeasy@linutronix.de, tgraf@suug.ch, paulmck@kernel.org,
- razor@blackwall.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+ <175787642178.3528285.12955350723496612407.git-patchwork-notify@kernel.org>
+Date: Sun, 14 Sep 2025 19:00:21 +0000
+References: <20250909121942.1202585-1-edumazet@google.com>
+In-Reply-To: <20250909121942.1202585-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ ncardwell@google.com, willemb@google.com, kuniyu@google.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  2 Sep 2025 14:29:33 +0800 you wrote:
-> During recent testing with the netem qdisc to inject delays into TCP
-> traffic, we observed that our CLS BPF program failed to function correctly
-> due to incorrect classid retrieval from task_get_classid(). The issue
-> manifests in the following call stack:
+On Tue,  9 Sep 2025 12:19:42 +0000 you wrote:
+> Hosts under DOS attack can suffer from false sharing
+> in enqueue_to_backlog() : atomic_inc(&sd->dropped).
 > 
->         bpf_get_cgroup_classid+5
->         cls_bpf_classify+507
->         __tcf_classify+90
->         tcf_classify+217
->         __dev_queue_xmit+798
->         bond_dev_queue_xmit+43
->         __bond_start_xmit+211
->         bond_start_xmit+70
->         dev_hard_start_xmit+142
->         sch_direct_xmit+161
->         __qdisc_run+102             <<<<< Issue location
->         __dev_xmit_skb+1015
->         __dev_queue_xmit+637
->         neigh_hh_output+159
->         ip_finish_output2+461
->         __ip_finish_output+183
->         ip_finish_output+41
->         ip_output+120
->         ip_local_out+94
->         __ip_queue_xmit+394
->         ip_queue_xmit+21
->         __tcp_transmit_skb+2169
->         tcp_write_xmit+959
->         __tcp_push_pending_frames+55
->         tcp_push+264
->         tcp_sendmsg_locked+661
->         tcp_sendmsg+45
->         inet_sendmsg+67
->         sock_sendmsg+98
->         sock_write_iter+147
->         vfs_write+786
->         ksys_write+181
->         __x64_sys_write+25
->         do_syscall_64+56
->         entry_SYSCALL_64_after_hwframe+100
+> This is because sd->dropped can be touched from many cpus,
+> possibly residing on different NUMA nodes.
+> 
+> Generalize the sk_drop_counters infrastucture
+> added in commit c51613fa276f ("net: add sk->sk_drop_counters")
+> and use it to replace softnet_data.dropped
+> with NUMA friendly softnet_data.drop_counters.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,next-next] net/cls_cgroup: Fix task_get_classid() during qdisc run
-    https://git.kernel.org/netdev/net-next/c/66048f8b3cc7
+  - [net-next] net: use NUMA drop counters for softnet_data.dropped
+    https://git.kernel.org/netdev/net-next/c/fdae0ab67d57
 
 You are awesome, thank you!
 -- 
