@@ -1,149 +1,129 @@
-Return-Path: <netdev+bounces-222840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C370B56723
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 09:07:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 448FDB56756
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 10:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B3687AC317
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 07:05:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD923BC6A0
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 08:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD6220FA81;
-	Sun, 14 Sep 2025 07:07:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D8522333D;
+	Sun, 14 Sep 2025 08:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nh/TIy0Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.58.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECFD1AA1D2
-	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 07:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.58.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C3B2147F9
+	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 08:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757833630; cv=none; b=U8I/1pL+A0vXhdh/b4q9xaigigyfD2gfEuQlEyHJngZbwUJnd4LZneLqSiCDAbrVFdWU90GjNDyvXWWWJp1JksS3o1h0usZTn7V+jCxnTOjW0Sq43zzRBWCMLaUC6Q3qqhg9iOGmEJDbQuc5W1VlrVoMAng7Q5iryl1nHU8GIYY=
+	t=1757839920; cv=none; b=ns4n6UPPoOzrhzgwiVdoNEiSBxiJX9jLcjo7D5A6Goj7HJQPAVk5XYFDeF7XDiPOtKIuQIPJxupYKImbeHC7/5z0SGTOkAAkjRzq1onqGWe9FZr9prNNzTqC2EW+OvrGfipc8VDSRCk9vexV/PgQJcizxe+wRDOQCu5BC5NV5xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757833630; c=relaxed/simple;
-	bh=IlJagysJYUQUPlk5oqzmYHPsxKlwdPkHd+MvNhMa//s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=niIXtmWCsqClKzUp09TvZbNFAa4AhKwnVFw9QMmIVbZvOJ4ICv211ZbfjAKhnTuAwLWRw12MkwsO3WfQ0RSAg2AfFvYprVxj9kQGK4fuD4V982MX2bRWfN7WymTzr4MF7lpTFo681IX4jzy+70ECgq2ajsu3bbeMKU5uODSJd+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=114.132.58.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpgz4t1757833591t991aa4fe
-X-QQ-Originating-IP: kzqkpxbmBYEZy6qw4WJ/6EUJulMnzf8ACxs3aiZ7eaI=
-Received: from MacBook-Pro-022.xiaojukeji.com ( [120.244.234.174])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 14 Sep 2025 15:06:29 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8066187958116989696
-EX-QQ-RecipientCnt: 4
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>
-Subject: [PATCH RESEND iproute2-next] ip/bond: add broadcast_neighbor support
-Date: Sun, 14 Sep 2025 15:06:09 +0800
-Message-Id: <20250914070609.37292-1-tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1757839920; c=relaxed/simple;
+	bh=pu0GrjYYfzlRG9ePNGfLSB1xjWRol2JFlYQ+Bg4jd5Y=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
+	 References:In-Reply-To; b=EcBRcMCIpHHwmhOPcrLG258BvD3xsD7DbdKF0tv447b+4rFWRmAPjtBppdAFiVBamIDRi9ynPS64sTfW992kmYBsbeGeIC2czOLfXp4DB8Q2CFo56WLEGqiIhge/jXchkWWC9eRSx8+mvmLkinf5PIS880sghQh0AIwPvSUVFVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nh/TIy0Z; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-77264a94031so2377014b3a.2
+        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 01:51:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757839918; x=1758444718; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9xYB2/4f3FmpIxcEv4UNcJMbm9iSz8Dk35nkey4DobA=;
+        b=nh/TIy0ZC+LHXN0xeF8ymZPWBOzecpqfCtZLHmKhRNthcfS2IaYYp0pu36JWxizD8Q
+         GC4BysKgm7HNivJvOb8SaL5CqWR6REy27rbKezKw8FwfhXt0pIPSZj5+KPPyliTqfAHR
+         /xO/kKMNfAmcEw1gateIfAb7T/V6OzI6jPeQpFYpx0h+PO2CjGVIdnaOe0wPfsAM6Q5J
+         LnoQ1pULLfrQPoO0HtOVgqRfQO7lGR68zVXK+v/uqzg2c9aWNE95AEICT9H0qO86HN2P
+         Gqot6QuwMUJJiAvAp4YrHk7JWrL1IoD7IO6dKFOqtkgCiA409gg4qv/3XjnNpgttcvqP
+         wwfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757839918; x=1758444718;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9xYB2/4f3FmpIxcEv4UNcJMbm9iSz8Dk35nkey4DobA=;
+        b=SutaYJvxs5k0W8ZVvKsMv8L4D0wdMtbuFjJFJJJ1iAar/LDhUOXA7+u257iwNyuG6O
+         Fz3hZjdcc3+YOcJP/spwsBtUSESxPcz0F0+bp3WHCX3bROnaLxMO33i8k3ky50eHgoZs
+         N/t1MQFS4SgRJzuDTV6Bh0FKuSjQJ0GEPJQiu6GzinrizZUvT4pn5I13c4Lv51qBzrrF
+         xSaDmMtfYtrFRioeZGAeLiUDxUt/iq6/BbQBZq9k5Z0ZKEZwJFVmlAmK1gA5lz/I9V2N
+         6lz+0nLUzjDflpD8DMlSb2p+93XxpfNi6e5a5+D5kYyWxmwBOHadcFmJs/p6AXOQx2wc
+         ySjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9EYBeYv/2l4H3pmziMV0U93UvNE8KlIIq5sLxN0SRwvGriX0jom+LyPrJ73vwDgooxJDe2Ak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLAemOQ2sgXmFMGrxFChoiEFRDmtrVDjhQhuWX23Uh6TaFcTQE
+	ttW++id4UqkNdVOWUuEbE9P+eaOp7LW6+5OyUTwf82qYc23eiOqYq0pp
+X-Gm-Gg: ASbGncvztdDX/Zo0pYnUecY3eTPnp1kZor2mH1HPjxiGaZjht1FLTngCSG3jpRmiSi1
+	koR4EEM3Q761U2OA34FDT2+ZMSRNzjBnbelkLItUpCWI2CtXCajETsIx+pAFIFJP3SMMkCq+DXI
+	2jqjbGr0AbuPw7BhesnDNHvKE5d/VHxgfTFA/EEeNr/M3YsLWhFtItTOUdCGAF6LPGd98Sb/XzG
+	LJYYpWU7Q0FHIeKKwDVDMGbS/VW8ZNW6yb10ERuxQM6Pc82RCnZHY85B133yXEezyG1V7XvAZJO
+	bP9z9JKf3YMRRQQny5MQPgWQKZArmhLfKSsADUIqlTIxI8fLa9ygClFtt/RkSijsoTH05l0K/Z2
+	Obd8pk+b756ithx1EgfQsZSuuSHA0h5RLZm3Ube8+aLYseGVNgCG3DUOqdsFxNoU=
+X-Google-Smtp-Source: AGHT+IGBCGF/62swHad3RbhGMxjfqONlAZq9ze+mDcHFiwssxclDQ9ZkAqX+WR2tZzKT+yzYuyr5Pw==
+X-Received: by 2002:a05:6a20:a10a:b0:24c:c33e:8df0 with SMTP id adf61e73a8af0-2602c72030emr10783930637.45.1757839917945;
+        Sun, 14 Sep 2025 01:51:57 -0700 (PDT)
+Received: from localhost ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b54a387cc21sm8937206a12.28.2025.09.14.01.51.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Sep 2025 01:51:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NC8a1JKFOHmWknerBmCa4pCiuLVOl52g9nMohvmE8zGiFNIMtTHwanF3
-	grXBQO3SxplC8xqJ3QxMDxgOifa4WM9oWrr3xVngck36/ljkFANq04M4Ey6D14Ji3gMgrbk
-	dGWIJAITiRgeRvbZflyUFxvUEPBaVvDUKLD2Gr3/VztHDaV0uvnaheuE+FZwC/hJM4iwujl
-	Rd+tumyEoFqeu939zR+kY6goN2ekTciNr4c6jZX54YTUTR3NaxLAcVVstKl57XVUkKvTdNX
-	Y5QOjg1WhptIPAHF4GS1NIA1b6/zVm9ZiMuUVc+h748acCS3squycLNwa7R607nYkSlXdoM
-	T2vT+kGukCN9OJDG0CbJavZFvziU/w93s92Q9txw664d+jwq41NyouKWeftfy46EKUOkuGd
-	HaCKwz5Op98L8uwUej5SVt+UV/18wqBa3/FXDkXwD5agzmVsvrqNBDpcw8rMPYi9vZ2Srrr
-	515m7Q1vkMjLg7cTEmp0QeCkp1vvMd9RFjkVryUVMiZzss9SRcaFfcM32UFmmLXFi6qInXa
-	q8O8r4ZzcqARZOGap59DrxeOecVvm9sIdENHifjcrTY415hoqQKed+cX8aaLl5Q3SWcBA9Y
-	I5oM3PrhzOz5EqxtmTRzBvOCU1aw+13GZcF2RK/zPNonq0+BsySCESEWIOmdB4idq45x1gw
-	2PHrmrsdSSe1FphCapmUYF96Azv5yuEXBIIZ+6Jj2HOjpxp0bIXS5/d/vZ5aVfPtRaPSUf0
-	X85xYFHgDoKiw7jmcK8/jKCoJsFCDXDdnQ/reRHxVgSsccta00sxoRtK4cGEI1JgDpQC5sK
-	1yac75JR87nn0a4s6zJsUi42i4qaTgM4fkmHE/URClyPtLzuUZHHmH5gTac21otrpz73v0Z
-	oUBO4kvcdsyHfZMw60E0FfUYxwf40gSYGIeEVPw9//oVmRWwnRMKfUUqJZBUO7pGRxGjxCO
-	ELAAayI3FIIAwMKX5vwqLpto4TQFq4WvaQV7j06ncQECQqRB7ffYefhwpcE9I8lerQD/rBN
-	7I3ur7DLsWOlRQbxhT
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sun, 14 Sep 2025 17:51:54 +0900
+Message-Id: <DCSE8SBC2ZD1.Z7BOJYSEIELY@gmail.com>
+To: "Andrew Lunn" <andrew@lunn.ch>
+From: "Yeounsu Moon" <yyyynoom@gmail.com>
+Subject: Re: [PATCH net] net: dlink: handle copy_thresh allocation failure
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20250912145339.67448-2-yyyynoom@gmail.com>
+ <57d58296-c656-4dab-a2e2-faf2452fb4de@lunn.ch>
+In-Reply-To: <57d58296-c656-4dab-a2e2-faf2452fb4de@lunn.ch>
 
-This option has no effect in modes other than 802.3ad mode.
-When this option enabled, the bond device will broadcast ARP/ND
-packets to all active slaves.
+On Sat Sep 13, 2025 at 5:39 AM KST, Andrew Lunn wrote:
+>> -				skb_copy_to_linear_data (skb,
+>> +				skb_copy_to_linear_data(skb,
+>>  						  np->rx_skbuff[entry]->data,
+>>  						  pkt_len);
+>> -				skb_put (skb, pkt_len);
+>> +				skb_put(skb, pkt_len);
+>
+> Please don't include white space changes with other changes. It makes
+> the patch harder to review.
+>
+>     Andrew
+Thank you for reviewing!
 
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Cc: David Ahern <dsahern@gmail.com>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
----
-1. no update uapi header. https://marc.info/?l=linux-netdev&m=170614774224160&w=3
-2. the kernel patch is accpted, https://patchwork.kernel.org/project/netdevbpf/patch/84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com/
----
- ip/iplink_bond.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+As you mentioned, it indeed becomes harder to see what the real changes
+are. I have a few questions related to that:
 
-diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
-index a964f547..b1b144fb 100644
---- a/ip/iplink_bond.c
-+++ b/ip/iplink_bond.c
-@@ -149,6 +149,7 @@ static void print_explain(FILE *f)
- 		"                [ lacp_rate LACP_RATE ]\n"
- 		"                [ lacp_active LACP_ACTIVE]\n"
- 		"                [ coupled_control COUPLED_CONTROL ]\n"
-+		"                [ broadcast_neighbor BROADCAST_NEIGHBOR ]\n"
- 		"                [ ad_select AD_SELECT ]\n"
- 		"                [ ad_user_port_key PORTKEY ]\n"
- 		"                [ ad_actor_sys_prio SYSPRIO ]\n"
-@@ -165,6 +166,7 @@ static void print_explain(FILE *f)
- 		"LACP_RATE := slow|fast\n"
- 		"AD_SELECT := stable|bandwidth|count\n"
- 		"COUPLED_CONTROL := off|on\n"
-+		"BROADCAST_NEIGHBOR := off|on\n"
- 	);
- }
+1. If I remove the whitespace between the funciton name and the
+parenthesis, `checkpatch.pl` will warn about it. Of course, I understand
+that we don't need to follow such rules in a mindessly robotic way.
 
-@@ -184,6 +186,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 	__u32 arp_all_targets, resend_igmp, min_links, lp_interval;
- 	__u32 packets_per_slave;
- 	__u8 missed_max;
-+	__u8 broadcast_neighbor;
- 	unsigned int ifindex;
- 	int ret;
+2. However, I also read in the netdev FAQ that cleanup-only patches are
+discouraged. So I thought it would be better to include the cleanup
+together with the patch. But I see your point, and I'll be more careful
+not to send patches that cause such confusion in the future.
 
-@@ -376,6 +379,12 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 			if (ret)
- 				return ret;
- 			addattr8(n, 1024, IFLA_BOND_COUPLED_CONTROL, coupled_control);
-+		} else if (strcmp(*argv, "broadcast_neighbor") == 0) {
-+			NEXT_ARG();
-+			broadcast_neighbor = parse_on_off("broadcast_neighbor", *argv, &ret);
-+			if (ret)
-+				return ret;
-+			addattr8(n, 1024, IFLA_BOND_BROADCAST_NEIGH, broadcast_neighbor);
- 		} else if (matches(*argv, "ad_select") == 0) {
- 			NEXT_ARG();
- 			if (get_index(ad_select_tbl, *argv) < 0)
-@@ -675,6 +684,13 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 			     rta_getattr_u8(tb[IFLA_BOND_COUPLED_CONTROL]));
- 	}
+3. This is more of a personal curiosity: in that case, what would be the
+proper way to handle cleanup patches?
 
-+	if (tb[IFLA_BOND_BROADCAST_NEIGH]) {
-+		print_on_off(PRINT_ANY,
-+			     "broadcast_neighbor",
-+			     "broadcast_neighbor %s ",
-+			     rta_getattr_u8(tb[IFLA_BOND_BROADCAST_NEIGH]));
-+	}
-+
- 	if (tb[IFLA_BOND_AD_SELECT]) {
- 		const char *ad_select = get_name(ad_select_tbl,
- 						 rta_getattr_u8(tb[IFLA_BOND_AD_SELECT]));
---
-2.34.1
+	Yeounsu Moon
 
 
