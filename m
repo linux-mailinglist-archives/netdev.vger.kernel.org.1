@@ -1,105 +1,106 @@
-Return-Path: <netdev+bounces-222861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D56B56B57
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 20:40:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA74B56B63
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 20:53:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93E3418948AF
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 18:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27DBB3BA60C
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 18:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4043A2DAFA5;
-	Sun, 14 Sep 2025 18:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69272271459;
+	Sun, 14 Sep 2025 18:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEiY5IJy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzXF3cyb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097A6635;
-	Sun, 14 Sep 2025 18:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C70F524F;
+	Sun, 14 Sep 2025 18:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757875208; cv=none; b=BNvlzdBBYeIrgZQkyBhPdjVvlSQEhREOwu4uAd2g8KlJjnK8iI4lZkO6zuCaUoJjnXC32hiiF9T01QWBefm6XE48J8sIUSGZxt8qE6Ga9aMPtKqxi8bizciLHFJyuTNS4L6viJ9XIszjmY1Un4mLuhueNq/nEkhS9n4qbW7yoC8=
+	t=1757875993; cv=none; b=V8TtUoSTKdYn1aoqsGLftv/8qu5tSMZtpa0bDMKNku7TZOHFAkD70dl46eAlxLgwHUGWO1Bmvc0JuZHbA/avx7DHQKYIozYnwY1V/Z3+9GFMzw0PaorTXKUX1p+aftegVnfnsYxBxS0Q31kA38phJp5TiAe0hikaWVkZ9SENFEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757875208; c=relaxed/simple;
-	bh=YieT40UUJGq33KYU6kqgUp5hNH+j4q3y+c8x9dfZKSI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=M/lT6E9OUPQwA5o2RnsRnmN01rmyMdVUGsyunLo0qXU4VriITsKv/mtrh6QYKDbYDg9Za7Fru1ST5oxqIob7n6QVFdxw3kUdC6WyDYgB+nEyAxzd7YegAunRGDHAeVv5Hu0QGj58BHUKSPjtKbc0x/A0sKDsRzxTKZCaTD3Yiig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEiY5IJy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA79C4CEF1;
-	Sun, 14 Sep 2025 18:40:07 +0000 (UTC)
+	s=arc-20240116; t=1757875993; c=relaxed/simple;
+	bh=vRulN5Ws2bSafIoz6k8RtzXdFbdwEv4KS1xaxUy+gdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qkseBgluSbCxju0XpEO9MAeBIbJiSBgIVQlRTEb39v0qorHoQ6OaxakaKsVTpSts9CJO+s6K09g3UpT6P2vtinQocQLdrOEyJ3xAW8wroIXO8WQgZjMJV1OlRrajuSPqTtsNeUC2I/bPFOS3yDANRky2ceSSpkb7643wgjv0KpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzXF3cyb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 178C9C4CEF0;
+	Sun, 14 Sep 2025 18:53:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757875207;
-	bh=YieT40UUJGq33KYU6kqgUp5hNH+j4q3y+c8x9dfZKSI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AEiY5IJyCBvKp5SFmrw9R3Ld8gUZhhaZLJpAyli3NTlg1zp8qmByc0FjidSZy+O23
-	 y+TN7mR8rYpW9PJrTO/tFTR9wIokRxb/80u4VDGNAOZFEJQglgib91C7vRkhDROSaH
-	 8DnXF8PQ7ES4aPlP8qpfKvkxx/2RH/wN80qKJF5KirSFhTauyPDZjr1lXAgBa3+Jiv
-	 2y6T56wj52TGAYWKP0Kmh6FWnpdOcn1tEGB6KOc1KQK48gtpN4y6PopQ5PhQyreqJe
-	 ZVZtYYAvHQL6IzBqxd+ZLgDFuosA79V00dReDKONnsmbTsa1YKTcuHZxsCy7scdD0t
-	 QGbEa59BgbHDA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E9F39B167D;
-	Sun, 14 Sep 2025 18:40:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1757875990;
+	bh=vRulN5Ws2bSafIoz6k8RtzXdFbdwEv4KS1xaxUy+gdM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZzXF3cyb/MrINN76yKV+0IrvkIcBrVfD06i2yk4mUiyA6SN5gAe8OjNAZk1ZHeyk8
+	 2xVr0UtahgZCTaXXFtWVUuGjax2mDJa1+s1FFKgjLzJ8f/YgyLslnWW6RKfXDjoHvF
+	 HA6iBG5x/zpraaEWrkkpjFJFxI9hEElxtctjlIsxAx/6BgFo5P7zWFe65K80swmJrj
+	 aRo6BaCdx5XBQR0R39JvvYVU5gqqR7PBdlUCF3Q6ITKpShlIZgm5+rVf6PEaxhA4Bs
+	 LyUn+BLg0VCZKq7SV4t9nRHYixpD3YjtJeU/RHdyauHrzyosvg9dcVYkpZiLYdBFZ5
+	 XJmyT+AHu1/FQ==
+Date: Sun, 14 Sep 2025 11:53:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, "John Fastabend"
+ <john.fastabend@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Boris
+ Pismenny <borisp@nvidia.com>, Shahar Shitrit <shshitrit@nvidia.com>
+Subject: Re: [PATCH net 2/3] net: tls: Cancel RX async resync request on
+ rdc_delta overflow
+Message-ID: <20250914115308.6e991f7d@kernel.org>
+In-Reply-To: <1757486861-542133-3-git-send-email-tariqt@nvidia.com>
+References: <1757486861-542133-1-git-send-email-tariqt@nvidia.com>
+	<1757486861-542133-3-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] Add GMAC support for Renesas RZ/{T2H,
- N2H} SoCs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175787520925.3525025.295266235162136621.git-patchwork-notify@kernel.org>
-Date: Sun, 14 Sep 2025 18:40:09 +0000
-References: <20250908105901.3198975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: 
- <20250908105901.3198975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Lad@codeaurora.org, Prabhakar <prabhakar.csengg@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de, linux@armlinux.org.uk,
- geert+renesas@glider.be, magnus.damm@gmail.com, vladimir.oltean@nxp.com,
- peppe.cavallaro@st.com, joabreu@synopsys.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, biju.das.jz@bp.renesas.com,
- fabrizio.castro.jz@renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  8 Sep 2025 11:58:58 +0100 you wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Wed, 10 Sep 2025 09:47:40 +0300 Tariq Toukan wrote:
+> When a netdev issues an RX async resync request, the TLS module
+> increments rcd_delta for each new record that arrives. This tracks
+> how far the current record is from the point where synchronization
+> was lost.
 > 
-> Hi All,
+> When rcd_delta reaches its threshold, it indicates that the device
+> response is either excessively delayed or unlikely to arrive at all
+> (at that point, tcp_sn may have wrapped around, so a match would no
+> longer be valid anyway).
 > 
-> This series adds support for the Ethernet MAC (GMAC) IP present on
-> the Renesas RZ/T2H and RZ/N2H SoCs.
+> Previous patch introduced tls_offload_rx_resync_async_request_cancel()
+> to explicitly cancel resync requests when a device response failure
+> is detected.
 > 
-> [...]
+> This patch adds a final safeguard: cancel the async resync request when
+> rcd_delta crosses its threshold, as reaching this point implies that
+> earlier cancellation did not occur.
 
-Here is the summary with links:
-  - [net-next,v3,1/3] dt-bindings: net: renesas,rzv2h-gbeth: Document Renesas RZ/T2H and RZ/N2H SoCs
-    https://git.kernel.org/netdev/net-next/c/d43ce9822349
-  - [net-next,v3,2/3] net: stmmac: dwmac-renesas-gbeth: Use OF data for configuration
-    https://git.kernel.org/netdev/net-next/c/264c26934f75
-  - [net-next,v3,3/3] net: stmmac: dwmac-renesas-gbeth: Add support for RZ/T2H SoC
-    https://git.kernel.org/netdev/net-next/c/57e9e4d7023a
+Missing a Fixes tag
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+> index f672a62a9a52..56c14f1647a4 100644
+> --- a/net/tls/tls_device.c
+> +++ b/net/tls/tls_device.c
+> @@ -721,8 +721,11 @@ tls_device_rx_resync_async(struct tls_offload_resync_async *resync_async,
+>  		/* shouldn't get to wraparound:
+>  		 * too long in async stage, something bad happened
+>  		 */
+> -		if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX))
+> +		if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX)) {
+> +			/* cancel resync request */
+> +			atomic64_set(&resync_async->req, 0);
 
-
+we should probably use the helper added by the previous patch (I'd
+probably squash them TBH)
 
