@@ -1,105 +1,96 @@
-Return-Path: <netdev+bounces-222843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD75B567C9
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 12:31:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDBEEB567D0
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 12:51:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8DA0189A177
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 10:31:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C7DE189C3AA
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 10:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB36A1DF723;
-	Sun, 14 Sep 2025 10:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD1323A99E;
+	Sun, 14 Sep 2025 10:51:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEF4487BE;
-	Sun, 14 Sep 2025 10:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DCF2264DB
+	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 10:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757845861; cv=none; b=nMPn+OE2za/+PeaV1faFupfnj9e93RSBEK16zU+7X2iYEWMxfWeLM4h6pIbJzvAfD955KfSywzWGQMqpuhbSAh+YG8JUeqLKnsRKMn2MNT4PaEAhqUcZlRnG9QRWIiNNH/i+X1Iyl05cE3LjLwqhA8dzOA4ReVcoNezepGnu8EA=
+	t=1757847066; cv=none; b=EdhRjl8QQuZdqCih/t2f+tXVCWUpsPHWGRdF4nPXGi5iC28HmGZNn3zfK4/VOGX18bKRx0J9qfBkWwshpczna40KM7h5g7ORSxprL+7WObX2JrXb22TmmRy66Kz5O3cy6ZBVscd90itzYpYJY4IAui2cBbOvcw+6ki81G9NwBAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757845861; c=relaxed/simple;
-	bh=YFMVFVKRndRZpMY+xLg+MtDUEnvjTsFhtHdbGuHbBTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yz4peapzkV8qMsta0nZEgf2M+vdr2UugqeWYilwHn04reb5gqPS7MKmmjoDV6Io/LjbWXRkNQ6oQVWUa9d9Jd+wNthu6T81tb8GFGgrIt5B9ktTheYc14Ucvl3Q8GJGYp5sBVqwRsbHjbIqKhGdPbFWvApR9djFhnd8yiyCBlDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (unknown [180.158.240.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id E745F340EE4;
-	Sun, 14 Sep 2025 10:30:58 +0000 (UTC)
-Date: Sun, 14 Sep 2025 18:30:49 +0800
-From: Yixun Lan <dlan@gentoo.org>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Vivian Wang <uwu@dram.page>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Junhui Liu <junhui.liu@pigmoral.tech>,
-	Simon Horman <horms@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
-	Hendrik Hamerlinck <hendrik.hamerlinck@hammernet.be>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next v12 0/5] Add Ethernet MAC support for SpacemiT K1
-Message-ID: <20250914103049-GYA1238190@gentoo.org>
-References: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
+	s=arc-20240116; t=1757847066; c=relaxed/simple;
+	bh=ua5Vb5zOeYFg3FVg3bHIT2DYfrWRx2dMA6ntfB7TQUU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=HX5oSOFq1h4o57tdY8tWXswX1ZRT1Ur0U4AmTsOgPQgK+CR2zQyH/VVBbmgUmx3Q2Cfnix7Vf5d5fHI/hl7FOeDjeUNZ9JV75/9iE8V7Lej8aLf2Etoq3CsrMVt+q0n2vfhIscfLpJkQrK16SrBhhTJ3GOGuWjjZA0HbabORkZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-401eba8efecso43543375ab.1
+        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 03:51:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757847064; x=1758451864;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1G99QjZJIxqZZW0DGsDJGiZk1djjVFhimNBcqrYyh24=;
+        b=NyrNvUF0C20udnmkIGOCKyvi8jD8HzkRKGrHH9+PT2RmsQMKpQRKt0GYa88846RtxN
+         r5PlkWW3Et4uZjsfMJwoXi5ce3BvRd7KTuuuT6MshvLjtQTzu0VtTwSSNyZeDCicKRSJ
+         zFe0uMDxUy0iVMJY1D62d6euSwKYGrg6MRSBD8mgU5gEz8w79MhiX8vGBbizm3eGTcSx
+         LSp5rx2YtXWvYP88MRGdXQImXcebOpTaALPrzsw8dCyZldu8lttEm5m71BDnh2py8CEo
+         02qLZuCKD1+rGULQZpihYR+KwRX5JLLv/Cjt/Z3n8e0T+6SxyWmZCyuowXjtt2OowAYl
+         b/tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRgnwHdAqV6Vqb7RPw6ITx1eHblHAxSxglh/weIoEbax7QwS//DZmf2s0H8brenYUQ6+0Pi+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGgWUp6xknHzvSsloSd+x3QL8Idu+Vd4XDvnX0pyhJOJdju/Tu
+	nF/5m6NxmdGJokncYQk5hDeHyDBPMCWlk9XzYuxYyKgIRMUcql0DBco3vn2U2KNwEiABU6fUGCw
+	R0wcmeSyzbuLAlgchfOpfvS9xc7kl80kSEO+040AFLeiRxdt9qasPGLTer3E=
+X-Google-Smtp-Source: AGHT+IEWB7tBi7JGtQbX1WM80HBYeWQL4LG1xhguZ8b0CvUJv0a+SKXJBPC5JWj+b2DFXN8yyD+lm184jJWgFLvlptAUAb3a95gX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
+X-Received: by 2002:a92:c24e:0:b0:423:fc5c:c7b9 with SMTP id
+ e9e14a558f8ab-423fc5cc9eemr20438445ab.1.1757847063795; Sun, 14 Sep 2025
+ 03:51:03 -0700 (PDT)
+Date: Sun, 14 Sep 2025 03:51:03 -0700
+In-Reply-To: <684ffc59.a00a0220.279073.0037.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68c69e17.050a0220.3c6139.04e1.GAE@google.com>
+Subject: Re: [syzbot] [sound?] kernel BUG in filemap_fault (2)
+From: syzbot <syzbot+263f159eb37a1c4c67a4@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, chaitanyas.prakash@arm.com, davem@davemloft.net, 
+	david@redhat.com, edumazet@google.com, hdanton@sina.com, horms@kernel.org, 
+	jack@suse.cz, kuba@kernel.org, kuniyu@google.com, 
+	linux-kernel@vger.kernel.org, linux-sound@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, perex@perex.cz, 
+	ryan.roberts@arm.com, syzkaller-bugs@googlegroups.com, tiwai@suse.com, 
+	willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Andrew, Jakub
+syzbot suspects this issue was fixed by commit:
 
-On 12:23 Sun 14 Sep     , Vivian Wang wrote:
-> SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
-> Add devicetree bindings, driver, and DTS for it.
-> 
-> Tested primarily on BananaPi BPI-F3. Basic TX/RX functionality also
-> tested on Milk-V Jupiter.
-> 
-> I would like to note that even though some bit field names superficially
-> resemble that of DesignWare MAC, all other differences point to it in
-> fact being a custom design.
-> 
-> Based on SpacemiT drivers [1]. These patches are also available at:
-> 
+commit bdb86f6b87633cc020f8225ae09d336da7826724
+Author: Ryan Roberts <ryan.roberts@arm.com>
+Date:   Mon Jun 9 09:27:23 2025 +0000
 
-I know this series has been iterated several versions, and Vivian is working
-hard on this.. but since it's quite close to rc6, I'd like to query if
-there is any chance to take it in for v6.18? don't want to be pushy, so I'm
-totally fine if it's too late and have to postpone to next merge window..
+    mm/readahead: honour new_order in page_cache_ra_order()
 
-P.S. I'd just want to see emac/ethernet accepted since it's last bit for
-a minimal headless system..
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1100b934580000
+start commit:   b4911fb0b060 Merge tag 'mmc-v6.16-rc1' of git://git.kernel..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3f6ddf055b5c86f8
+dashboard link: https://syzkaller.appspot.com/bug?extid=263f159eb37a1c4c67a4
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=157cf48c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=146a948c580000
 
-Thanks
+If the result looks correct, please mark the issue as fixed by replying with:
 
--- 
-Yixun Lan (dlan)
+#syz fix: mm/readahead: honour new_order in page_cache_ra_order()
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
