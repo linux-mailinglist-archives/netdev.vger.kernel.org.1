@@ -1,134 +1,125 @@
-Return-Path: <netdev+bounces-222816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81178B563E9
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 02:00:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A13CB56443
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 04:22:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A05F22001D
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 00:00:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5CE317CBEA
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 02:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546392C11F9;
-	Sat, 13 Sep 2025 23:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9123F246BA4;
+	Sun, 14 Sep 2025 02:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="is9uAdaN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XtgqFScy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043412C11CE;
-	Sat, 13 Sep 2025 23:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5712459F3
+	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 02:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757807958; cv=none; b=OqQvoQUTjL7ROT19FPMgL5dzRbegGYVs6fAaKME+qG3ivpIivk/q2oLAeiKfji4vvW8mRCp0Wx/y0vkWhWob4wAos7BEXFNgYYQR4rCBFBY2qXZUgnsCVBuiR++bRE+lDC2eyOFb9IZf8IOv94iEqLU536DhPEvjHViEy/v2Fjs=
+	t=1757816572; cv=none; b=Gf/SdpT/brGiDe2o3RmWorMcNm22vMCCfZ9jSIB0iWOZt0fNVA16ceai+z+jhw8MKkILjv+1YxvncaJBVkwP59hXsjdQ9Iv+kvbjxKPA/IzFxYXNOTCkgO9m0q38hmxBbu4vEXCluGkbPNHCbp+av6A7+udY/3cfnDPLsq9tOcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757807958; c=relaxed/simple;
-	bh=M8RZw0PcAr23td7B4SWZsTm8GfTk/HQcBuK2/+z1TOk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dp3bfDVHibrDc+zZonweAvLXAondxUrs8sQpKPsmkfkba2Ba46vOqfg6+8TkXNH8+mDuig2vNZyDwLgt4LtD7WEav3bmUOk7T6pWA69xuvsrkW/24rnPdZ2qtvoFdRdkue7/oRb1OjEEfKYL+P2vk+qP9Tf1Pj4rAQNLaXdm540=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=is9uAdaN; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1757807952;
-	bh=M8RZw0PcAr23td7B4SWZsTm8GfTk/HQcBuK2/+z1TOk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=is9uAdaN3UZ0mzHCMX0szSPW7peuoWfu+HJ9BcWLE0npk2Je3H+rNphAB1f7b6n9b
-	 U3wa9DTDS+ktV/g9CrKQUXMQhZvIq8pjnqf0pGWsX+lFU2hkA0eBqBOY41ZDeFFa2P
-	 ubNrF9EHP8wa8AiyMkaQD0+JxDwxm0+znMtQ0Xa8Y2w5IBCrZRMnewdlGd42x1mKJr
-	 eb4je4zeyQ2RecQMSQPZxRoW8h5jlNor+7/HkxsIQAtj0EWJ3KqxS5LVpf58jYjWNB
-	 zmwT1iDInze2uP5Z88JsigSQRVuxSuiARFr4eyrQlpXvAp4X6cJg3NEHqB/j8IIAZV
-	 XnWFyaDesxDwQ==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id BF3BF6012E;
-	Sat, 13 Sep 2025 23:59:12 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id 912D32051E5; Sat, 13 Sep 2025 23:58:57 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 11/11] tools: ynl: add ipv4-or-v6 display hint
-Date: Sat, 13 Sep 2025 23:58:32 +0000
-Message-ID: <20250913235847.358851-12-ast@fiberby.net>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250913235847.358851-1-ast@fiberby.net>
-References: <20250913235847.358851-1-ast@fiberby.net>
+	s=arc-20240116; t=1757816572; c=relaxed/simple;
+	bh=EX3TyOfBuaXKwQxkn392r7BCMjWDwZpQoG4WIyx3PWI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dmL5CmZ/WLO9gWBAg+PM046rudwgfWnxCMkFYLe7SBwcCManDDf3n12SIeX+yab++WJyGv1zg4DlZxiA0XVjR0OzAAgyk05oQ7uOGF2nydki3BU/pk6XLcYZ8wSrilVlcSY+6eGFYyQNa9MZy3K4JE6e/Ai2NOUOlFHF5U4ZBmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XtgqFScy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757816569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EX3TyOfBuaXKwQxkn392r7BCMjWDwZpQoG4WIyx3PWI=;
+	b=XtgqFScyhPMV4e4PiBwmnzAW0m80TjHOv7Q30y2+5/93j4HlSjZo40SH86o24yZvI1LNon
+	sWGrokUpkBbZ81gHzNuxJQsnbgQtnzPVMT3CcrZJVV0L7aWiDoV5cMhc7OsADEprWhjCAK
+	DcAXvxOWbV+R8AD5pR+e4drxDptRwhQ=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-688-9q7UdRuiOVqJJOTKyy_oIQ-1; Sat, 13 Sep 2025 22:22:48 -0400
+X-MC-Unique: 9q7UdRuiOVqJJOTKyy_oIQ-1
+X-Mimecast-MFC-AGG-ID: 9q7UdRuiOVqJJOTKyy_oIQ_1757816567
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-571c4a20da8so1566925e87.1
+        for <netdev@vger.kernel.org>; Sat, 13 Sep 2025 19:22:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757816567; x=1758421367;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EX3TyOfBuaXKwQxkn392r7BCMjWDwZpQoG4WIyx3PWI=;
+        b=QrrgqzlZRx2zrMYAZDi+o4UJ1WV9Jfax9X53pfAcMg9N0V+LOyBM4iF/ojdFiYJAgy
+         Qwxkc+af70Nz/wv7ol3DJulXp5QjLiPHdklQW/N3o8QU47rVVAouY+0sq/GCB6u2RsDQ
+         vN/SmuvqP4ZRuNU0aUjFqDINUe7zPEC02Ts5Bx1xY8CNIqQyccqHqUVQQ6DTY+T9PqVD
+         nv/dRE+PMP9WeoD5oomtgIZejryI7zf+wG7HOr4fcZtIaz6d0tkdmdzJtbfvaf+sAOCe
+         SOKEErujG+2Vw/FgB+j9MSUIVanphQp3FU5WOsCRf8GYBftVR8g1lANQQHP+A+TQdA7Z
+         j/fg==
+X-Gm-Message-State: AOJu0YwmsCpbViB513PBJKaPKSiYdGMxkBiKsh6VIG1QKTcSg0wz0kwn
+	6qnLwW/5Bp5Ed0e3uxMwtVDlfHeOMyUMkLPoiaDSeVwADkvhbjhakj0MHhvmHtxKLRq1jkUOJVc
+	VxKLzNhBpG/PhM5a9eB8WgDoJ2FzFKcJx9Q7W9R4/VNhxqaLKwihYBinuRvgWOXoy4Dphp7rMXV
+	z+92EqAWZeTcokXMhO+PPnSfaMFxtxcxsF
+X-Gm-Gg: ASbGnctmsnHf6WTLePgWkoUZK+vQMjTFASH2m1/DZ4yLWHZJ+Qv9Kezhx+p5zHgSisQ
+	cJbNkfurDk+ZtY61jMJuhRMJG+1fCqRP/Z8HiSmhupq4xndBlbKLbj9icNjOn/7o8gPDMvJPE46
+	DRj8//xeEiUu82i/0SEeejfw==
+X-Received: by 2002:a05:6512:61cf:20b0:560:9993:f14d with SMTP id 2adb3069b0e04-5704a3e6909mr2406232e87.3.1757816566876;
+        Sat, 13 Sep 2025 19:22:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG6LBuQC+0fECjQxQjn7BzUOWmOXhHvsIC5jjwUVw3z05iv8yLPovYye6qdflldAjCnE1SB/JiNJw+Ng3RRT8o=
+X-Received: by 2002:a05:6512:61cf:20b0:560:9993:f14d with SMTP id
+ 2adb3069b0e04-5704a3e6909mr2406223e87.3.1757816566498; Sat, 13 Sep 2025
+ 19:22:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250913062810.11141-1-litian@redhat.com> <bacbeaf2-104f-4da5-a66b-b8aee2b2de12@lunn.ch>
+In-Reply-To: <bacbeaf2-104f-4da5-a66b-b8aee2b2de12@lunn.ch>
+From: Li Tian <litian@redhat.com>
+Date: Sun, 14 Sep 2025 10:22:35 +0800
+X-Gm-Features: AS18NWARZWkoG_VR78fDtIJydZ_R8xlJD5gNpW5l3SKmCv3wXuhvflXEKdZ8Jf8
+Message-ID: <CAHhBTWvcd45s5P-TfKBVzHy00jofbgoWtX+z3Uaj+5ZEBTNLfQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/mlx5: report duplex full when speed is known
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	linux-rdma@vger.kernel.org, Haiyang Zhang <haiyangz@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The attribute WGALLOWEDIP_A_IPADDR can contain either an IPv4
-or an IPv6 address depending on WGALLOWEDIP_A_FAMILY, however
-in practice it is enough to look at the attribute length.
+On Sat, Sep 13, 2025 at 10:12=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
 
-This patch implements an ipv4-or-v6 display hint, that can
-deal with this kind of attribute.
+> I'm confused with your commit message. You say DUPLEX used to be
+> reported as Full if the speed is known. How does c268ca6087f55 change
+> this?
 
-It only implements this display hint for genetlink-legacy, it
-can be added to other protocol variants if needed, but we don't
-want to encourage it's use.
+Because in some circumstances like Azure, mlx5e_port_ptys2speed (now
+mlx5_port_ptys2info) does not return a speed. And thus it relies on
+data_rate_oper. It reads to me as long as there's no issue acquiring
+the speed duplex should be set to full.
 
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/netlink/genetlink-legacy.yaml | 2 +-
- tools/net/ynl/pyynl/lib/ynl.py              | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> You don't say in the commit message. Why is Half duplex
+> important to this fix? I don't see Half anywhere in the code.
 
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index b29d62eefa16..66fb8653a344 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -154,7 +154,7 @@ properties:
-                   Optional format indicator that is intended only for choosing
-                   the right formatting mechanism when displaying values of this
-                   type.
--                enum: [ hex, mac, fddi, ipv4, ipv6, uuid ]
-+                enum: [ hex, mac, fddi, ipv4, ipv6, ipv4-or-v6, uuid ]
-               struct:
-                 description: Name of the nested struct type.
-                 type: string
-diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
-index 707753e371e2..62383c70ebb9 100644
---- a/tools/net/ynl/pyynl/lib/ynl.py
-+++ b/tools/net/ynl/pyynl/lib/ynl.py
-@@ -956,7 +956,7 @@ class YnlFamily(SpecFamily):
-                 formatted = hex(raw)
-             else:
-                 formatted = bytes.hex(raw, ' ')
--        elif display_hint in [ 'ipv4', 'ipv6' ]:
-+        elif display_hint in [ 'ipv4', 'ipv6', 'ipv4-or-v6' ]:
-             formatted = format(ipaddress.ip_address(raw))
-         elif display_hint == 'uuid':
-             formatted = str(uuid.UUID(bytes=raw))
-@@ -965,7 +965,7 @@ class YnlFamily(SpecFamily):
-         return formatted
- 
-     def _from_string(self, string, attr_spec):
--        if attr_spec.display_hint in ['ipv4', 'ipv6']:
-+        if attr_spec.display_hint in ['ipv4', 'ipv6', 'ipv4-or-v6']:
-             ip = ipaddress.ip_address(string)
-             if attr_spec['type'] == 'binary':
-                 raw = ip.packed
--- 
-2.51.0
+It does not return half duplex at all. It would be unknown. I'm just
+saying that half duplex shouldn't exist in modern Mellanox 5.
+
+> Also, what sort of problems do you see with duplex unknown?
+
+There were reports of RHEL seeing duplex unknown in ethtool
+on Azure Mellanox 5. The intention is to fix this.
+
+Thanks for reviewing.
+
+Li Tian
 
 
