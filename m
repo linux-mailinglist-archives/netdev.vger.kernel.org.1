@@ -1,90 +1,106 @@
-Return-Path: <netdev+bounces-222889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A5E2B56CA0
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 23:45:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F02FB56CFA
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 01:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF1F03B9864
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 21:45:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBBE01784C7
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 23:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC801FBC92;
-	Sun, 14 Sep 2025 21:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC0D2E1F13;
+	Sun, 14 Sep 2025 23:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVe0CahP"
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="Nu4zsvdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE00192D8A;
-	Sun, 14 Sep 2025 21:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3617B2D0637
+	for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 23:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757886351; cv=none; b=i5bzNzELGx2kZOU0ZdTSJwTsJHVRH6yKGymIaBmKwtDx4nJ5pCQX4ccKN635Rqyp/CF2GqDbdqebXoczqSVq+lqgBaqHpy3KaUfpy+8EJ7mnOl3wHXjhhGpPL8rK/J532wJ4uOpbXObWAIBkg5zBocY6MJlDV0UXyH5hrhJZFY8=
+	t=1757893045; cv=none; b=RSJWvJCpIMwTEJF5IocKyvFz0750OvTiimbjeVjN8vs9OiOvV8hL9jzhl/txegrxGt/N+7To2XNV2D/z1VNHGEjVT7SUVWQkjlgQz0GC7szvzCUzrpTv2Z4miqQcIguuqyDGkMv97YV0q4C24mgISnQedhcZp/tKxMMtXfg3DQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757886351; c=relaxed/simple;
-	bh=PYuyqZRGrl0BoDAtblCL5VEywWNNDkx+2UfVtcus59c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DfuER6nIRzkfTYOS79fRulRWQSWiDUjZaQSZLWF+drVZseE2/PLExyjRg2w65590hadHw+tXoXQ/QNiLPTQxhAJ3rVjYAJR/I/Ezj/i3Uhjlt0p9lFKSAecht8c59CJ/5HqVma2MrLD2zcOpJCIYWZt7m4F+LKZOUIbm+GyZjg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MVe0CahP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8823DC4CEF0;
-	Sun, 14 Sep 2025 21:45:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757886351;
-	bh=PYuyqZRGrl0BoDAtblCL5VEywWNNDkx+2UfVtcus59c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MVe0CahPumcseRpF6VvQrIZLiZsPIvXwd7J/gYWncGAW6kzBTmkctFinBAlaXk/Zf
-	 yH5zh4TPE6u21DoUmg04B5tLZCqAxDv3TZ6OUOJ/NGMSElXcNSd766ZuvQ7RGeddQ6
-	 Lf6GaUSNfJrrYuAWp4qnLcD4SBeOcB+kxUWLM6bjS0TePUaVbiDP6MHaeNTHqusfNP
-	 dKtmAs6h5DBXQ5AM4Xw3rhzL2vA4hQB8turt2HkshDreHU2qLOksvhgJ8+qQyTHFYx
-	 5N3yMlzgV0xJ56dVI1iWrpNBQdO+l3TJ2qCg/xFwgSLq0DX9ezprfqxTJ1NkgOJn3R
-	 A+ClW9j0FEmoQ==
-Date: Sun, 14 Sep 2025 14:45:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Prathosh
- Satish <Prathosh.Satish@microchip.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, Petr
- Oros <poros@redhat.com>
-Subject: Re: [PATCH net-next v6 3/5] dpll: zl3073x: Add firmware loading
- functionality
-Message-ID: <20250914144549.2c8d7453@kernel.org>
-In-Reply-To: <20250909091532.11790-4-ivecera@redhat.com>
-References: <20250909091532.11790-1-ivecera@redhat.com>
-	<20250909091532.11790-4-ivecera@redhat.com>
+	s=arc-20240116; t=1757893045; c=relaxed/simple;
+	bh=odlrz20IXfc9MUnEwi5nRwEYXd3V+Xkv2SYseouBhLA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lkyaIv7jadG0k6k/tdp6w866HZSHTYnzejb8AczFDCkGM4AxxB64yGu0IVriOJhByc5+R3hQQ2sDQg10mwuW5vsFzg52d/SdHh0otWLpne6owDtbfuCU2mU7Oncz1masv67/m20pJNGZtQP6cP11ebV6jRfxCFhKKKa38a+36w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=Nu4zsvdB; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 5E48D240101
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 01:37:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net; s=2017;
+	t=1757893036; bh=5xTBfcIgxXN2CX1CLHSz7aQ83atl75CzIOg3qYAIU7w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 From;
+	b=Nu4zsvdBfdYU3OBXmUfXiAlMIAXTIpKNSYQ+pcZxA2iEjRrS6cjgXj8XS55CFKlrk
+	 KO1jdKhOrSSDbNIgJsUgNuLtE3HyYVB360Ht0GMHaZ9zU+BkmZn3UIe55pXVRQ5R89
+	 ki8eJ9VS9Y8Yfcvgkw1OhtmJS9B4TUZytXgs0OQYH2IsJps0rBrhc+TX9lJpUYo3kR
+	 OKZ8qAAMEXoJOQar+7YQiGID8ye8+8VDM9iPEaCDbww4br+EGRIwm4efNbTjg4znpH
+	 3XMjgGW0nNFR2C7HdBnZujtFGAynvJAHX34Q4+L5EKQ5vlJVBWZBzpme/zw5cJGsYI
+	 tpCoj+guDKJSA==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4cQ4MB58Twz6tn4;
+	Mon, 15 Sep 2025 01:37:10 +0200 (CEST)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+To: syzbot <syzbot+9767c7ed68b95cfa69e6@syzkaller.appspotmail.com>
+Cc: alexei.starovoitov@gmail.com,  andrii@kernel.org,  ast@kernel.org,
+  bpf@vger.kernel.org,  daniel@iogearbox.net,  davem@davemloft.net,
+  eddyz87@gmail.com,  edumazet@google.com,  haoluo@google.com,
+  horms@kernel.org,  jiayuan.chen@linux.dev,  john.fastabend@gmail.com,
+  jolsa@kernel.org,  kpsingh@kernel.org,  kuba@kernel.org,
+  linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org,
+  martin.lau@linux.dev,  mykolal@fb.com,  netdev@vger.kernel.org,
+  pabeni@redhat.com,  sdf@fomichev.me,  shuah@kernel.org,  song@kernel.org,
+  syzkaller-bugs@googlegroups.com,  tj@kernel.org,  yangfeng@kylinos.cn,
+  yonghong.song@linux.dev
+Subject: Re: [syzbot] [net?] WARNING: suspicious RCU usage in corrupted (3)
+In-Reply-To: <68bf3893.050a0220.192772.0885.GAE@google.com> (syzbot's message
+	of "Mon, 08 Sep 2025 13:12:03 -0700")
+References: <68bf3893.050a0220.192772.0885.GAE@google.com>
+Date: Sun, 14 Sep 2025 23:37:15 +0000
+Message-ID: <87h5x4obbt.fsf@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Tue,  9 Sep 2025 11:15:30 +0200 Ivan Vecera wrote:
-> +	/* Fetch image name and size from input */
-> +	strscpy(buf, *psrc, min(sizeof(buf), *psize));
-> +	rc = sscanf(buf, "%15s %u %n", name, &count, &pos);
-> +	if (!rc) {
-> +		/* No more data */
-> +		return 0;
-> +	} else if (rc == 1 || count > U32_MAX / sizeof(u32)) {
-> +		ZL3073X_FW_ERR_MSG(extack, "invalid component size");
-> +		return -EINVAL;
-> +	}
-> +	*psrc += pos;
-> +	*psize -= pos;
+syzbot <syzbot+9767c7ed68b95cfa69e6@syzkaller.appspotmail.com> writes:
 
-Still worried about pos not being bounds checked.
-Admin can crash the kernel with invalid FW file.
+> syzbot suspects this issue was fixed by commit:
+>
+> commit 7f12c33850482521c961c5c15a50ebe9b9a88d1e
+> Author: Charalampos Mitrodimas <charmitro@posteo.net>
+> Date:   Wed Jun 11 17:20:43 2025 +0000
+>
+>     net, bpf: Fix RCU usage in task_cls_state() for BPF programs
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13745562580000
+> start commit:   079e5c56a5c4 bpf: Fix error return value in bpf_copy_from_..
+> git tree:       bpf-next
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=c6c517d2f439239
+> dashboard link: https://syzkaller.appspot.com/bug?extid=9767c7ed68b95cfa69e6
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=114915f4580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15566170580000
+>
+> If the result looks correct, please mark the issue as fixed by replying with:
+>
+> #syz fix: net, bpf: Fix RCU usage in task_cls_state() for BPF programs
 
-	if (pos > *psize)
-		/* error */
+Correct, also did test-run to make sure.
 
-Also what if sscanf() return 2? pos is uninitialized?
+#syz fix: net, bpf: Fix RCU usage in task_cls_state() for BPF programs
+
+C. Mitrodimas
+
+>
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
