@@ -1,104 +1,105 @@
-Return-Path: <netdev+bounces-222860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 471E1B56B51
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 20:37:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15D56B56B57
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 20:40:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 057761731CB
-	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 18:37:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93E3418948AF
+	for <lists+netdev@lfdr.de>; Sun, 14 Sep 2025 18:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E7E2D0C7D;
-	Sun, 14 Sep 2025 18:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4043A2DAFA5;
+	Sun, 14 Sep 2025 18:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xoBBG0BI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEiY5IJy"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8151C5486;
-	Sun, 14 Sep 2025 18:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097A6635;
+	Sun, 14 Sep 2025 18:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757875045; cv=none; b=g38CEWE8I7ho/BLNWii4mItknlUBsZuMMDd3utBIJRiY/JsMkaVUMuojgLelBn+hi4F7cmP5GZlNsY17FqAIkkdhUxvsu+rJyhWsRLiVB1EEKJoQypqC53wNVcuNQ0eYZd9FSOHpok2Ppeip2/AZj5GIUskv5qgktoAdib1g39w=
+	t=1757875208; cv=none; b=BNvlzdBBYeIrgZQkyBhPdjVvlSQEhREOwu4uAd2g8KlJjnK8iI4lZkO6zuCaUoJjnXC32hiiF9T01QWBefm6XE48J8sIUSGZxt8qE6Ga9aMPtKqxi8bizciLHFJyuTNS4L6viJ9XIszjmY1Un4mLuhueNq/nEkhS9n4qbW7yoC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757875045; c=relaxed/simple;
-	bh=TymjcyE+B0pUrKS96jgP+V0xrVRKHsWFLUAPEo+0Svc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OGMBkITxUiq7/5TB0Lqetn5ueS9D9yQZhp0RSIDLLj3O4IXZPI/VEypGw8VFgSw3m8j3zP5kalnS5W3FIgHbrXokG6/hMyHyAxgCJ4UVl5Hah0b/wMFnWw6IJ3AMvr7a7hptw5ayCyR53KS/CeFPyeb0+DThPzRdNsOvFyAsVTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xoBBG0BI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0gOze54H4cQJFLKODkJQHJhLdjBQtWBsq6A59nmn/Ng=; b=xoBBG0BIK8GqAyPNyfLs7dThg2
-	ZQy3Kp7SHwTCOr6MUvGRR4ktfD+WsT3AMMbDh1Q/uyNASWvfPU2qfCZ7lubTTzngk6jGKImVpPNNU
-	3hBHYxg+HMb1yScmkULqsRT9xyaQdE0mW3CesuVJEOarbJ6zxIbhlY1+4UFaq0YZl/gA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uxrb2-008MT5-1x; Sun, 14 Sep 2025 20:37:08 +0200
-Date: Sun, 14 Sep 2025 20:37:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: qcom: qca808x: Add .get_rate_matching
- support
-Message-ID: <2f182073-5548-401c-a61c-45163c9a2948@lunn.ch>
-References: <20250914-qca808x_rate_match-v1-1-0f9e6a331c3b@oss.qualcomm.com>
- <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
+	s=arc-20240116; t=1757875208; c=relaxed/simple;
+	bh=YieT40UUJGq33KYU6kqgUp5hNH+j4q3y+c8x9dfZKSI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=M/lT6E9OUPQwA5o2RnsRnmN01rmyMdVUGsyunLo0qXU4VriITsKv/mtrh6QYKDbYDg9Za7Fru1ST5oxqIob7n6QVFdxw3kUdC6WyDYgB+nEyAxzd7YegAunRGDHAeVv5Hu0QGj58BHUKSPjtKbc0x/A0sKDsRzxTKZCaTD3Yiig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEiY5IJy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA79C4CEF1;
+	Sun, 14 Sep 2025 18:40:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757875207;
+	bh=YieT40UUJGq33KYU6kqgUp5hNH+j4q3y+c8x9dfZKSI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AEiY5IJyCBvKp5SFmrw9R3Ld8gUZhhaZLJpAyli3NTlg1zp8qmByc0FjidSZy+O23
+	 y+TN7mR8rYpW9PJrTO/tFTR9wIokRxb/80u4VDGNAOZFEJQglgib91C7vRkhDROSaH
+	 8DnXF8PQ7ES4aPlP8qpfKvkxx/2RH/wN80qKJF5KirSFhTauyPDZjr1lXAgBa3+Jiv
+	 2y6T56wj52TGAYWKP0Kmh6FWnpdOcn1tEGB6KOc1KQK48gtpN4y6PopQ5PhQyreqJe
+	 ZVZtYYAvHQL6IzBqxd+ZLgDFuosA79V00dReDKONnsmbTsa1YKTcuHZxsCy7scdD0t
+	 QGbEa59BgbHDA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E9F39B167D;
+	Sun, 14 Sep 2025 18:40:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/3] Add GMAC support for Renesas RZ/{T2H,
+ N2H} SoCs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175787520925.3525025.295266235162136621.git-patchwork-notify@kernel.org>
+Date: Sun, 14 Sep 2025 18:40:09 +0000
+References: <20250908105901.3198975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: 
+ <20250908105901.3198975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: Lad@codeaurora.org, Prabhakar <prabhakar.csengg@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de, linux@armlinux.org.uk,
+ geert+renesas@glider.be, magnus.damm@gmail.com, vladimir.oltean@nxp.com,
+ peppe.cavallaro@st.com, joabreu@synopsys.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, biju.das.jz@bp.renesas.com,
+ fabrizio.castro.jz@renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com
 
-> So, the bug is likely elsewhere, or your ethernet MAC doesn't support
-> SGMII and you need to add complete support for  rate-matching to the
-> driver.
+Hello:
 
-Russell beat me too it. Just adding:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-static int qca808x_get_features(struct phy_device *phydev)
-{
-        int ret;
+On Mon,  8 Sep 2025 11:58:58 +0100 you wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> 
+> Hi All,
+> 
+> This series adds support for the Ethernet MAC (GMAC) IP present on
+> the Renesas RZ/T2H and RZ/N2H SoCs.
+> 
+> [...]
 
-        ret = genphy_c45_pma_read_abilities(phydev);
-        if (ret)
-                return ret;
+Here is the summary with links:
+  - [net-next,v3,1/3] dt-bindings: net: renesas,rzv2h-gbeth: Document Renesas RZ/T2H and RZ/N2H SoCs
+    https://git.kernel.org/netdev/net-next/c/d43ce9822349
+  - [net-next,v3,2/3] net: stmmac: dwmac-renesas-gbeth: Use OF data for configuration
+    https://git.kernel.org/netdev/net-next/c/264c26934f75
+  - [net-next,v3,3/3] net: stmmac: dwmac-renesas-gbeth: Add support for RZ/T2H SoC
+    https://git.kernel.org/netdev/net-next/c/57e9e4d7023a
 
-        /* The autoneg ability is not existed in bit3 of MMD7.1,
-         * but it is supported by qca808x PHY, so we add it here
-         * manually.
-         */
-        linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->supported);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-        /* As for the qca8081 1G version chip, the 2500baseT ability is also
-         * existed in the bit0 of MMD1.21, we need to remove it manually if
-         * it is the qca8081 1G chip according to the bit0 of MMD7.0x901d.
-         */
-        if (qca808x_is_1g_only(phydev))
-                linkmode_clear_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->supported);
 
-        return 0;
-}
-
-So it appears this PHY breaks the standard in a number of ways. Maybe
-it is broken in other ways which need additional workarounds.
-
-	Andrew
 
