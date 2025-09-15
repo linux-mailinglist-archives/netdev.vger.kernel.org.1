@@ -1,117 +1,128 @@
-Return-Path: <netdev+bounces-223035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B479DB579FA
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:09:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BF9CB57A00
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B82B1646BC
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:09:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 805E11888C9C
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F8B3009E9;
-	Mon, 15 Sep 2025 12:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121D23054EF;
+	Mon, 15 Sep 2025 12:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fdyrpWby"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Hp32/q8O"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DD82F28EF;
-	Mon, 15 Sep 2025 12:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A28305E24
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 12:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757938189; cv=none; b=sAbaJ0AlTdcn1o+MMLdCU7Sk+mkUx1IfKz/jl5IUyVZKIPm65+ttnZvweNtAYx55vskddbtOTsKfdo3DS4eJzX2MXThLlmcnMHtBtPQVzqRS+zDktVRn/+hGovDlSPsrBk4yV3+wUynooZygfjVEMFvTYZcTORz6thrSgBQnvOc=
+	t=1757938225; cv=none; b=ta8BHrNfH3B7rpa7Siv+rrc493PGR/6iLZK3vgL3kV0PjVBNneDp1IPT99XgQv6q/gO7jRCF+nizMh02tNPKQmltYcClPd1i92TnordurenYFQOJ4S+cCnt8Jp1dnYAZAktBhD5F8Wr1Q8uTT1sjgD+ulNXbO1l3oUOwYhVWrnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757938189; c=relaxed/simple;
-	bh=w9cP/mxteHSkQpcvg/llVtP2xmXmvp4gRw9fqCiwpFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3SFa/m5R4VW7KPeCzd5WwTCR0xWxJO0Xat7iti3JBXy/ZmfA0pZXhOt6AWhJPVeFYrNPDzOzh/UT6Q3UgoN8tr/Gf9a5C1gsPZAjJphquNEowZTKkQNDce8v0T7BKyCpmgecOCBXVaeKrNAwsdvi6O6+OGxixvOmw99TfusoQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fdyrpWby; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1757938225; c=relaxed/simple;
+	bh=4gYGz8FOI/3cQIhfzCfqFVs938meQzpWpNAO1LH11sA=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=SL9FVfGsLBPIRpLfGkNJW775Q436Ui0ifm7/y75p1Kp3DlZj1ChiYOEGXdzu6X4EMC1a8PbpUmXP7LZ/9QQkbnqe4+9VLybT9lu6Aw1uRNW16IcElmfWbnOONfsVtvH8cgnYDmDyd0soU7yju4v1FwvCxtckxHQMm+kA0UklrUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Hp32/q8O; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RMekNsuJ+Ex1pcpZhcTXdoRN9+JBJVQzJ/Rpv2WzC+Y=; b=fdyrpWbyPzCIQhG5sCgGatM25m
-	WlgECQkANzz2d476t3yvz4big790VTw0O4RcOPP4g0uAc91Synr6JFsRaHeDvjmRPxUUntipAFI+l
-	3Jhe9Y6fnERubnsdUiHRce6b/aCCDILLTH+ShPGxOgwRebhSgqVU07RT2T1eSDOzrfzDrFHcD9Ej6
-	qlhL1/P/YzyIy5BlcxdQNmk2mzjIhTmvgYM5JcDWG4Up8rkI9auF6mx9p78NprdYJKANOGy/QBM0G
-	XrUP7Ts1aofdNs76Fxlhr7xJPd9CEU+Ql1sfqBMBzBBeBtplLddnf9fFScMVzO4gQMeazeWahwD4B
-	QCSaO+Hw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60618)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=sQx5saqZIaEHifjngqi/kxmKHGd9S+alLpY+t/N6rUE=; b=Hp32/q8OXogCKNkDXSY5LKP3iN
+	vdtpxGQjhZdUcwQ5VxEDkX5n4bFmcaSk+sZb9I8Zpq5f9wWsz9MXUjzTnodEwiepxNhXP5YLyZ5fI
+	O6pnXalL1U0Zb8LKk+XXZfPX35RteYBP+A57FtkZcmBhiFCjIkYHHC9cWpVpYmJJ/AHYzb3AY6xI5
+	qDkM3jZMTD1F2IARB4Qmq73jM0zrR9beMA9vymMXOo/34Mnyh9bCXzkmR0DGbLKkHgvbWWQSAOvq0
+	V4dl/Ur/Rlb0q5yAOIayVH+DGq45bZd9ZBUCiKk83pJxBH3u5L5ZB4OF/j7gM1zpjx02NwR+C4ivA
+	6fGjYF+g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:56066 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uy81d-000000008TL-1OaU;
-	Mon, 15 Sep 2025 13:09:41 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uy81b-000000006dx-0mFi;
-	Mon, 15 Sep 2025 13:09:39 +0100
-Date: Mon, 15 Sep 2025 13:09:39 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: andrew@lunn.ch, Heiner Kallweit <hkallweit1@gmail.com>,
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1uy82E-000000008Tf-46VX;
+	Mon, 15 Sep 2025 13:10:19 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1uy82E-00000005Sll-0SSy;
+	Mon, 15 Sep 2025 13:10:18 +0100
+From: Russell King <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: qcom: qca808x: Add .get_rate_matching
- support
-Message-ID: <aMgCA13MhTnG80_V@shell.armlinux.org.uk>
-References: <20250914-qca808x_rate_match-v1-1-0f9e6a331c3b@oss.qualcomm.com>
- <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
- <aMfUiBe9gdEAuySZ@oss.qualcomm.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: mvpp2: add support for hardware timestamps
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aMfUiBe9gdEAuySZ@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1uy82E-00000005Sll-0SSy@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 15 Sep 2025 13:10:18 +0100
 
-On Mon, Sep 15, 2025 at 02:25:36PM +0530, Mohd Ayaan Anwar wrote:
-> [    7.937871] qcom-ethqos 23040000.ethernet: IRQ eth_wake_irq not found
-> [    7.944581] qcom-ethqos 23040000.ethernet: IRQ eth_lpi not found
-> [    7.953753] qcom-ethqos 23040000.ethernet: User ID: 0x20, Synopsys ID: 0x52
-> [    7.960927] qcom-ethqos 23040000.ethernet:   DWMAC4/5
+Add support for hardware timestamps in (e.g.) the PHY by calling
+skb_tx_timestamp() as close as reasonably possible to the point that
+the hardware is instructed to send the queued packets.
 
-So we're using stmmac as the MAC.
+As this also introduces software timestamping support, report those
+capabilities via the .get_ts_info() method.
 
-> [    8.348697] qcom-ethqos 23040000.ethernet eth0: PHY stmmac-0:1c uses interfaces 4,23, validating 23
-> [    8.358304] qcom-ethqos 23040000.ethernet eth0:  interface 23 (2500base-x) rate match none supports 6,13-14,47
+Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-This shows that the PHY supports SGMII (4) and 2500base-X (23). However,
-as we only validate 2500base-X, this suggests stmmac doesn't support
-switching between SGMII and 2500base-X.
-
-> // I changed the link partner speed to 1G here:
-> [   74.031182] qcom-ethqos 23040000.ethernet eth0: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
-> [   74.031773] qcom-ethqos 23040000.ethernet eth0: Link is Down
-
-As the PHY will be programmed to only advertise 2500base-T, this is
-expected.
-
-> For reference, this board is using the same MAC as [0] which works
-> perfectly fine with the AQR115C PHY. I got the (wrong) idea to add
-> .get_rate_matching after comparing the two PHY drivers. The MAC driver
-> is stmmac/dwmac-qcom-ethqos.c
-
-AQR115C can be configured to support rate matching.
-
-What *exactly* is the setup with stmmac here? Do you have an external
-PCS to support 2500base-X, or are you using the stmmac internal PCS?
-
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+index 35d1184458fd..ab0c99aa9f9a 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -4439,6 +4439,8 @@ static netdev_tx_t mvpp2_tx(struct sk_buff *skb, struct net_device *dev)
+ 		txq_pcpu->count += frags;
+ 		aggr_txq->count += frags;
+ 
++		skb_tx_timestamp(skb);
++
+ 		/* Enable transmit */
+ 		wmb();
+ 		mvpp2_aggr_txq_pend_desc_add(port, frags);
+@@ -5252,14 +5254,14 @@ static int mvpp2_ethtool_get_ts_info(struct net_device *dev,
+ {
+ 	struct mvpp2_port *port = netdev_priv(dev);
+ 
++	ethtool_op_get_ts_info(dev, info);
+ 	if (!port->hwtstamp)
+-		return -EOPNOTSUPP;
++		return 0;
+ 
+ 	info->phc_index = mvpp22_tai_ptp_clock_index(port->priv->tai);
+-	info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
+-				SOF_TIMESTAMPING_TX_HARDWARE |
+-				SOF_TIMESTAMPING_RX_HARDWARE |
+-				SOF_TIMESTAMPING_RAW_HARDWARE;
++	info->so_timestamping |= SOF_TIMESTAMPING_TX_HARDWARE |
++				 SOF_TIMESTAMPING_RX_HARDWARE |
++				 SOF_TIMESTAMPING_RAW_HARDWARE;
+ 	info->tx_types = BIT(HWTSTAMP_TX_OFF) |
+ 			 BIT(HWTSTAMP_TX_ON);
+ 	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.3
+
 
