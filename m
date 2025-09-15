@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-223211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9604EB5852F
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 21:14:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54355B58540
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 21:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD6DB7A8041
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:13:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 213144867BC
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9661E281368;
-	Mon, 15 Sep 2025 19:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FAB8281509;
+	Mon, 15 Sep 2025 19:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rSjghQhq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eI+9acgi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694F0280339;
-	Mon, 15 Sep 2025 19:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEBF280334;
+	Mon, 15 Sep 2025 19:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757963688; cv=none; b=j/YoEIvU+dl8ODbM/MqrW/OB1SMQA53i/B7LRee8sPJyjWY51B8TK+1+tFCQuobmAmKU8zWhZYyvXTF5VG0CuItV7VV/YdxG+Z+bfMnHLm8PrXKxwICqXGxZU6bTLGBwqij0SwGC64RoydzR179lgXAEavLPJx2+waCYQwZXTwE=
+	t=1757964208; cv=none; b=kLG+gDMq+c0BFBB6HjoR6D1NxdUnP2YPHd/YVgn7M34OM8n1wwOJkjepIRnejz8aq8nM58wh8aMS+ULKcgL2CxGv/s1tfOPsGuSmMOyQ0LXbUXwfARqAQpAXzWWMJ3B0gT4vUFRfo9rv/BQC+Q9AIGVho53jjE6IRL4+4yt8Mlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757963688; c=relaxed/simple;
-	bh=KAfEVizCS8VNcth378q7CbYSTJqnIREoAS9Sg1lT1Fc=;
+	s=arc-20240116; t=1757964208; c=relaxed/simple;
+	bh=0wgdASjQ8+qDJ79gn/NuVPOeE4bNUVFLO8UtfwxeGVQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gdl928ORgy1nNgkKOUg4XJRWeAdWQwl9BV6UwlFsoR8dJYR9jzDnoej1JBZdxS3e1mvnB4AwxpQJzXrJKJxOrpRMo1bSdm3EYihBKU5xpna9x+/Vq/KYmY0JyNxtZtw8QjAhEZMKPJorFUdHsqjUEv6FfOWtOAGE3B0tN3t3L8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rSjghQhq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE807C4CEF1;
-	Mon, 15 Sep 2025 19:14:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=UCdHg9zo/eRSyeFi45tG9i1uYXlYVHx+Hr46C0KlO+1yvF8dg1gtNUungt+zctitJ3lmqHCTb2T8ey2Y6qQt81uww0vdEMBVfNpSc69gr8Ow1UcFYgSiiLBhxccLQ00qEZA2Az1xi2+QXWWWJyspfmUAncuvE5xeMPfV21lp5MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eI+9acgi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B81A3C4CEF7;
+	Mon, 15 Sep 2025 19:23:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757963687;
-	bh=KAfEVizCS8VNcth378q7CbYSTJqnIREoAS9Sg1lT1Fc=;
+	s=k20201202; t=1757964207;
+	bh=0wgdASjQ8+qDJ79gn/NuVPOeE4bNUVFLO8UtfwxeGVQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rSjghQhqHREFpEb7V2ai3N4dAtNSKizxC3ibdIUnqalNqj0e0ZCXq57KvvOqTWgA9
-	 K1ZzBkG2wlbBrmYRRUI5qRrQdFL+SOS3rFYoiLM9FjZjzEIPF/tVHP4THe6lP0bmqW
-	 Evue2rNbhX0Q38v5FHOaT5U7OkqucpoNmSheyboZVC+1y5vFIl+UqW0IpOUWIkt65c
-	 dZD3njzICBQ4NUOi4qre+A3lUhU9W+6IafAEkH+MFDWboheCBO62iW+1AaiAq/TRPJ
-	 3TlvcEyMlIA/oiM8zYDCcyEda1XPdjfnA8Q4VopSveQtS8ETh4hDlXIoIwPCsVNKVu
-	 2xtDPhr/11chw==
-Date: Mon, 15 Sep 2025 20:14:42 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	b=eI+9acgiP6WXqQyvH3870s+EQuPE3FRAzxwJsd0aa6K04KAM/Mt/17qm2MtmTVOsz
+	 3OZQJkwpbm2815yS21+T4NM9Ovp5xQfhEtH7sstIkx/65axdj5gaAz/pT6uzEjOJH2
+	 rXFDqdpyrvmZLrBcl9c72pYJg8wY2x4eIrw46PB2s0nt5uQt7z7QW71UqTno/gQJ0E
+	 P75SbBo4i8eKKqCLxOxEKBYPTkZFbHTeMT7pBspFrHWjYiVTi529rRxtAWfxyQ/Sfp
+	 V7999w8IbTuEcxNseeyUHX/7aq4xSgQwP4p6jjc6yJ2ljNnbKFlcDDMo9F898K/oI6
+	 CovY+eYXxaOrg==
+Date: Mon, 15 Sep 2025 14:23:26 -0500
+From: Rob Herring <robh@kernel.org>
+To: Chen-Yu Tsai <wens@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>
-Subject: Re: [PATCH mlx5-next 3/3] net/mlx5e: Prevent WQE metadata conflicts
- between timestamping and offloads
-Message-ID: <20250915191442.GB322881@horms.kernel.org>
-References: <1757574619-604874-1-git-send-email-tariqt@nvidia.com>
- <1757574619-604874-4-git-send-email-tariqt@nvidia.com>
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej@kernel.org>,
+	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH net-next v6 1/6] dt-bindings: net: sun8i-emac: Add A523
+ GMAC200 compatible
+Message-ID: <20250915192326.GA3089483-robh@kernel.org>
+References: <20250913101349.3932677-1-wens@kernel.org>
+ <20250913101349.3932677-2-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,26 +68,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1757574619-604874-4-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <20250913101349.3932677-2-wens@kernel.org>
 
-On Thu, Sep 11, 2025 at 10:10:19AM +0300, Tariq Toukan wrote:
-> From: Carolina Jubran <cjubran@nvidia.com>
+On Sat, Sep 13, 2025 at 06:13:44PM +0800, Chen-Yu Tsai wrote:
+> From: Chen-Yu Tsai <wens@csie.org>
 > 
-> Update the WQE metadata assignment to avoid overriding existing
-> metadata when setting the sysport timestamp ID. Since timestamp IDs are
-> limited to 256 values, they use only the lower 8 bits of the metadata
-> field.
+> The Allwinner A523 SoC family has a second Ethernet controller, called
+> the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
+> numbering. This controller, according to BSP sources, is fully
+> compatible with a slightly newer version of the Synopsys DWMAC core.
+> The glue layer around the controller is the same as found around older
+> DWMAC cores on Allwinner SoCs. The only slight difference is that since
+> this is the second controller on the SoC, the register for the clock
+> delay controls is at a different offset. Last, the integration includes
+> a dedicated clock gate for the memory bus and the whole thing is put in
+> a separately controllable power domain.
 > 
-> To avoid conflicts, move IPsec and MACsec metadata ID to bits 8 and 9,
-> and shift the MACsec fs_id accordingly. This ensures safe coexistence
-> of timestamping and offload features that use the same metadata field.
+> Add a compatible string entry for it, and work in the requirements for
+> a second clock and a power domain.
 > 
-> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Jianbo Liu <jianbol@nvidia.com>
-> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+> ---
+> Changes since v4:
+> - Move clock-names list to main schema (Rob)
+> Changes since v2:
+> - Added "select" to avoid matching against all dwmac entries
+> Changes since v1:
+> - Switch to generic (tx|rx)-internal-delay-ps properties
+> ---
+>  .../net/allwinner,sun8i-a83t-emac.yaml        | 95 ++++++++++++++++++-
+>  1 file changed, 93 insertions(+), 2 deletions(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
