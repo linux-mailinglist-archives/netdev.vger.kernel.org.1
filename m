@@ -1,111 +1,73 @@
-Return-Path: <netdev+bounces-223034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28D43B579EC
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:07:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B479DB579FA
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:09:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F23FF3AF9AE
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:07:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B82B1646BC
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05060303C88;
-	Mon, 15 Sep 2025 12:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F8B3009E9;
+	Mon, 15 Sep 2025 12:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="s0HewJc9";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="oI++P+tO";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iHXif3SL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="j4PMdWnT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fdyrpWby"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1937130103C
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 12:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DD82F28EF;
+	Mon, 15 Sep 2025 12:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757938018; cv=none; b=OalyGm4iDrodtRq7uBXkQRR2NlnI5AQnbmvijKRcEXF+N5cx/mDmFhelQrwWI40i/YFuNwYp+48ZUc6yCK93lQWv7A+hh6K2xph+S/xFcGxZKtL2dzQrHzNlaHMeIrmfKLfTPSNbXmJ0Ji7Kv1wwD0mkpJ0Xh3vvZUi+c91VjjA=
+	t=1757938189; cv=none; b=sAbaJ0AlTdcn1o+MMLdCU7Sk+mkUx1IfKz/jl5IUyVZKIPm65+ttnZvweNtAYx55vskddbtOTsKfdo3DS4eJzX2MXThLlmcnMHtBtPQVzqRS+zDktVRn/+hGovDlSPsrBk4yV3+wUynooZygfjVEMFvTYZcTORz6thrSgBQnvOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757938018; c=relaxed/simple;
-	bh=q1oHoZ8VCUtdSKEU7pOuAAsbD6Rmea0nWCs/3I4Oyqg=;
+	s=arc-20240116; t=1757938189; c=relaxed/simple;
+	bh=w9cP/mxteHSkQpcvg/llVtP2xmXmvp4gRw9fqCiwpFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YN32VKm/RGnuR3u/tAvDFsLgAnuEPQnbrC+C/ynXPIpK3buOza4eFUPBeKIBG2pUcPckyZDMrZD9FdYWMzlVJnPPtvVAiXaK8K4eGLfNgOQPeAcJbPeRXbb0QjP2GsWNIdkwpYSIfaLcPCWoMcVulf2PAlWSdgXY6L+7+GvYhSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=s0HewJc9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=oI++P+tO; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iHXif3SL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=j4PMdWnT; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 582F13370E;
-	Mon, 15 Sep 2025 12:06:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1757938014; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZNnxc23G5zT9c4WsiSSkHq/o7T1urDMCr/AaNCQXDuc=;
-	b=s0HewJc9RHee/hkp3WAs/NMHZlKukScUOSKp5q3fvQ77nSHNxQ9UNRdPJf9PQnsE2fdID3
-	ltTnaU8gKoEhKhuqV4vY7NucKMYwkILDuPRTjlwhN1xPNu3QoCuIkaO6XzQ7+BDxSLe1FC
-	oSYNgNyXSh/o5i+Af3CHjyKcJEJThJA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1757938014;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZNnxc23G5zT9c4WsiSSkHq/o7T1urDMCr/AaNCQXDuc=;
-	b=oI++P+tOl9e3fkCMbIFZ25/cgyuKy2ZOxpFQT0VL/X9PTfdvTNvuw1NvkMRvlFtWA8hj4E
-	xvb/nKJmudDLFmAg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=iHXif3SL;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=j4PMdWnT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1757938013; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZNnxc23G5zT9c4WsiSSkHq/o7T1urDMCr/AaNCQXDuc=;
-	b=iHXif3SL8RwaFGWofMUxdRbvUMBRQnvri8hC4gPUPXvXLM5llAPFTiW/N/iAGMi77+5sGQ
-	ki/rNkTdO/8K/QE4+v9makNxWK73aGm8bcFTVrtORS6b8JcviqE6k/HqC/iiANfeJt83JN
-	ZXZAWGKsRQlPvCvbeyF+22Fr4PPfmAY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1757938013;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZNnxc23G5zT9c4WsiSSkHq/o7T1urDMCr/AaNCQXDuc=;
-	b=j4PMdWnT/mXUmckib6fM1g/i+kboghs7MNTy2IjMXKB+ReeAbL7eB4Bm56xGal+Ox5+Whk
-	kf+dRC2i15ZwgJAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 48C161398D;
-	Mon, 15 Sep 2025 12:06:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 3tDDEV0ByGjXMgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 15 Sep 2025 12:06:53 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id C396DA0A06; Mon, 15 Sep 2025 14:06:52 +0200 (CEST)
-Date: Mon, 15 Sep 2025 14:06:52 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 23/33] time: support ns lookup
-Message-ID: <z5riatsc5fycrrvw4c6puqlyghsaaoefisy7osujxiu2mlnzzk@js5yxopnexcl>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
- <20250912-work-namespace-v2-23-1a247645cef5@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m3SFa/m5R4VW7KPeCzd5WwTCR0xWxJO0Xat7iti3JBXy/ZmfA0pZXhOt6AWhJPVeFYrNPDzOzh/UT6Q3UgoN8tr/Gf9a5C1gsPZAjJphquNEowZTKkQNDce8v0T7BKyCpmgecOCBXVaeKrNAwsdvi6O6+OGxixvOmw99TfusoQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fdyrpWby; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=RMekNsuJ+Ex1pcpZhcTXdoRN9+JBJVQzJ/Rpv2WzC+Y=; b=fdyrpWbyPzCIQhG5sCgGatM25m
+	WlgECQkANzz2d476t3yvz4big790VTw0O4RcOPP4g0uAc91Synr6JFsRaHeDvjmRPxUUntipAFI+l
+	3Jhe9Y6fnERubnsdUiHRce6b/aCCDILLTH+ShPGxOgwRebhSgqVU07RT2T1eSDOzrfzDrFHcD9Ej6
+	qlhL1/P/YzyIy5BlcxdQNmk2mzjIhTmvgYM5JcDWG4Up8rkI9auF6mx9p78NprdYJKANOGy/QBM0G
+	XrUP7Ts1aofdNs76Fxlhr7xJPd9CEU+Ql1sfqBMBzBBeBtplLddnf9fFScMVzO4gQMeazeWahwD4B
+	QCSaO+Hw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60618)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uy81d-000000008TL-1OaU;
+	Mon, 15 Sep 2025 13:09:41 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uy81b-000000006dx-0mFi;
+	Mon, 15 Sep 2025 13:09:39 +0100
+Date: Mon, 15 Sep 2025 13:09:39 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: andrew@lunn.ch, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: qcom: qca808x: Add .get_rate_matching
+ support
+Message-ID: <aMgCA13MhTnG80_V@shell.armlinux.org.uk>
+References: <20250914-qca808x_rate_match-v1-1-0f9e6a331c3b@oss.qualcomm.com>
+ <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
+ <aMfUiBe9gdEAuySZ@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -114,156 +76,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250912-work-namespace-v2-23-1a247645cef5@kernel.org>
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	TAGGED_RCPT(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL9r1cnt7e4118fjryeg1c95sa)];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_CC(0.00)[suse.cz,gmail.com,vger.kernel.org,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,kernel.dk,cmpxchg.org,suse.com,google.com,redhat.com,oracle.com,linutronix.de];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:email,suse.cz:dkim]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 582F13370E
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -2.51
+In-Reply-To: <aMfUiBe9gdEAuySZ@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri 12-09-25 13:52:46, Christian Brauner wrote:
-> Support the generic ns lookup infrastructure to support file handles for
-> namespaces.
-> 
-> Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+On Mon, Sep 15, 2025 at 02:25:36PM +0530, Mohd Ayaan Anwar wrote:
+> [    7.937871] qcom-ethqos 23040000.ethernet: IRQ eth_wake_irq not found
+> [    7.944581] qcom-ethqos 23040000.ethernet: IRQ eth_lpi not found
+> [    7.953753] qcom-ethqos 23040000.ethernet: User ID: 0x20, Synopsys ID: 0x52
+> [    7.960927] qcom-ethqos 23040000.ethernet:   DWMAC4/5
 
-Looks good. Feel free to add:
+So we're using stmmac as the MAC.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+> [    8.348697] qcom-ethqos 23040000.ethernet eth0: PHY stmmac-0:1c uses interfaces 4,23, validating 23
+> [    8.358304] qcom-ethqos 23040000.ethernet eth0:  interface 23 (2500base-x) rate match none supports 6,13-14,47
 
-								Honza
+This shows that the PHY supports SGMII (4) and 2500base-X (23). However,
+as we only validate 2500base-X, this suggests stmmac doesn't support
+switching between SGMII and 2500base-X.
 
-> ---
->  include/linux/time_namespace.h |  5 +++++
->  init/main.c                    |  2 ++
->  kernel/time/namespace.c        | 11 ++++++++++-
->  3 files changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/time_namespace.h b/include/linux/time_namespace.h
-> index bb2c52f4fc94..7f6af7a9771e 100644
-> --- a/include/linux/time_namespace.h
-> +++ b/include/linux/time_namespace.h
-> @@ -33,6 +33,7 @@ struct time_namespace {
->  extern struct time_namespace init_time_ns;
->  
->  #ifdef CONFIG_TIME_NS
-> +void __init time_ns_init(void);
->  extern int vdso_join_timens(struct task_struct *task,
->  			    struct time_namespace *ns);
->  extern void timens_commit(struct task_struct *tsk, struct time_namespace *ns);
-> @@ -108,6 +109,10 @@ static inline ktime_t timens_ktime_to_host(clockid_t clockid, ktime_t tim)
->  }
->  
->  #else
-> +static inline void __init time_ns_init(void)
-> +{
-> +}
-> +
->  static inline int vdso_join_timens(struct task_struct *task,
->  				   struct time_namespace *ns)
->  {
-> diff --git a/init/main.c b/init/main.c
-> index 0ee0ee7b7c2c..e7d2c57c65a7 100644
-> --- a/init/main.c
-> +++ b/init/main.c
-> @@ -103,6 +103,7 @@
->  #include <linux/randomize_kstack.h>
->  #include <linux/pidfs.h>
->  #include <linux/ptdump.h>
-> +#include <linux/time_namespace.h>
->  #include <net/net_namespace.h>
->  
->  #include <asm/io.h>
-> @@ -1072,6 +1073,7 @@ void start_kernel(void)
->  	fork_init();
->  	proc_caches_init();
->  	uts_ns_init();
-> +	time_ns_init();
->  	key_init();
->  	security_init();
->  	dbg_late_init();
-> diff --git a/kernel/time/namespace.c b/kernel/time/namespace.c
-> index 0be93d8f2896..408f60d0a3b6 100644
-> --- a/kernel/time/namespace.c
-> +++ b/kernel/time/namespace.c
-> @@ -12,6 +12,7 @@
->  #include <linux/seq_file.h>
->  #include <linux/proc_ns.h>
->  #include <linux/export.h>
-> +#include <linux/nstree.h>
->  #include <linux/time.h>
->  #include <linux/slab.h>
->  #include <linux/cred.h>
-> @@ -104,6 +105,7 @@ static struct time_namespace *clone_time_ns(struct user_namespace *user_ns,
->  	ns->user_ns = get_user_ns(user_ns);
->  	ns->offsets = old_ns->offsets;
->  	ns->frozen_offsets = false;
-> +	ns_tree_add(ns);
->  	return ns;
->  
->  fail_free_page:
-> @@ -250,11 +252,13 @@ static void timens_set_vvar_page(struct task_struct *task,
->  
->  void free_time_ns(struct time_namespace *ns)
->  {
-> +	ns_tree_remove(ns);
->  	dec_time_namespaces(ns->ucounts);
->  	put_user_ns(ns->user_ns);
->  	ns_free_inum(&ns->ns);
->  	__free_page(ns->vvar_page);
-> -	kfree(ns);
-> +	/* Concurrent nstree traversal depends on a grace period. */
-> +	kfree_rcu(ns, ns.ns_rcu);
->  }
->  
->  static struct time_namespace *to_time_ns(struct ns_common *ns)
-> @@ -487,3 +491,8 @@ struct time_namespace init_time_ns = {
->  	.ns.ops		= &timens_operations,
->  	.frozen_offsets	= true,
->  };
-> +
-> +void __init time_ns_init(void)
-> +{
-> +	ns_tree_add(&init_time_ns);
-> +}
-> 
-> -- 
-> 2.47.3
-> 
+> // I changed the link partner speed to 1G here:
+> [   74.031182] qcom-ethqos 23040000.ethernet eth0: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
+> [   74.031773] qcom-ethqos 23040000.ethernet eth0: Link is Down
+
+As the PHY will be programmed to only advertise 2500base-T, this is
+expected.
+
+> For reference, this board is using the same MAC as [0] which works
+> perfectly fine with the AQR115C PHY. I got the (wrong) idea to add
+> .get_rate_matching after comparing the two PHY drivers. The MAC driver
+> is stmmac/dwmac-qcom-ethqos.c
+
+AQR115C can be configured to support rate matching.
+
+What *exactly* is the setup with stmmac here? Do you have an external
+PCS to support 2500base-X, or are you using the stmmac internal PCS?
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
