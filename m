@@ -1,154 +1,143 @@
-Return-Path: <netdev+bounces-222941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A1EB572A8
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:17:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25207B572AE
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0A8160EB7
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:17:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77EDF1898925
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0385A2E9EDD;
-	Mon, 15 Sep 2025 08:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC942E9EA8;
+	Mon, 15 Sep 2025 08:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eial+Mne"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCH/Uv+/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB6C278161;
-	Mon, 15 Sep 2025 08:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A2F2E0934
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 08:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757924241; cv=none; b=BWsbLJXUPdWh9XZTn0WGmpB94/sBmwvanSVyEE6ZA29iZaZQOajCVEHXYOyOskq3OroBt6TM8uGeTptSRzW8z09ofNvyVApTNdApyXrdcbO7y/jelRrXODovmRyTY+w6LigWiB+oG78MCIhXicStivZpvnbUXh8osUoyvaxjw84=
+	t=1757924303; cv=none; b=NStUK3jzTFOOFQKI31XrY9huhAkAE1nPhzeyQJldgZMiPETmHKyJ93TFYTneqVhsbpMo6kBN4me46+bUJRBKzEez0btPbl59v+nO6ZoOPWAg+/s6m0cjEhN3GTAAzf7HOn+0pbEtyMjKZJ7hMr0yGLv481hF/6iKGBbzxM7riYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757924241; c=relaxed/simple;
-	bh=CfRwKmWc41Eb4Eo+qu71Ph/IfoEFK4Y9Oi50rGKAmTg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dJi9WGWjRsolha2UPGFD3rD4cj6/XV3nIAucRNJHBQkHHDp2OtKyhaABmcyplIXojiu3mWMm7J+GcI8xxbeqR8q2y+LEzyaJK10wva3H77S2r0LFyIpza8229mZjZGI2tqS7EV+0WD4xvBFfxUwolUgMADBkGtQRINjqqL6x7PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eial+Mne; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E3BEC4CEFB;
-	Mon, 15 Sep 2025 08:17:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757924241;
-	bh=CfRwKmWc41Eb4Eo+qu71Ph/IfoEFK4Y9Oi50rGKAmTg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Eial+Mneq5c2t2JWKpBzGj3AoYS0A+ndPlMb9dRmk34JLeOJdqGeIx5ng1Tq4Zc1/
-	 sYCSdOO7slCV+8/iB06JZSIieeteLW3Scq2ezmpgzGqfxe30tQec0L0dYjKAfpYffP
-	 /MeTZeqsRYJFv61bhLmHzMyPEYg2zeu2g2LMUJpewiiNuOPbmrmw9st1go5LunPnST
-	 pLidiiuFw4x4V8pQocv3Z8YYbsl/I3CaZ8SWvN4lKewznTLgbc1J06MWfXj7t/Ypib
-	 Mo2WO+ncOKn6TVXjjZQPcvDmkqoptIgjEyGCsW9iFxDy0zMzTIcoEvL7pjivtRu8ka
-	 /aPo7p8fdaIjQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD54CAC598;
-	Mon, 15 Sep 2025 08:17:21 +0000 (UTC)
-From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Date: Mon, 15 Sep 2025 16:17:19 +0800
-Subject: [PATCH net v2 2/2] net: stmmac: Consider Tx VLAN offload tag
- length for maxSDU
+	s=arc-20240116; t=1757924303; c=relaxed/simple;
+	bh=GHrc0yQIb9KLUpWhvQ29IYnGW02UxYT9eFseO4jZP4Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rc5/GqZko/vlnV7qnGwPRwgVnLl+mEvghtoT9YPEXxwJ5dE0Zbxvz5RTn2wYJ2yQaAC38MgVBUiHXAAdd2HRFREo/Xs/9iTmMFeyPV/FHofPbZkuE1/GhZutkdfyq6gYSQFD6ME8j85jQZdQcLZtAooo+/z0wUjRRWXQcYorhkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eCH/Uv+/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757924300;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PqEIjCNSum5pekZp097c2PmEi/H7x+xWDTcPJJSAOCs=;
+	b=eCH/Uv+/Db5Zh/88xUQRTdyf+Ykr+XTJjlv0noDkVIS8I+UL8S2ewVUxbbOsLplV4iDm12
+	Qr9gAHm4XcagmdRrhM/zZhfVKMTUQzTGgtVAOorbgJjR8sERyhfGzBKktjHoTWqRvQFrSt
+	lzub2oWleco0V6bkoIPnrCHY1/BLX9Y=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-227-kt0tbXspMEeJwx-LqWhRtA-1; Mon,
+ 15 Sep 2025 04:18:18 -0400
+X-MC-Unique: kt0tbXspMEeJwx-LqWhRtA-1
+X-Mimecast-MFC-AGG-ID: kt0tbXspMEeJwx-LqWhRtA_1757924297
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 79347180045C;
+	Mon, 15 Sep 2025 08:18:16 +0000 (UTC)
+Received: from [10.45.226.64] (unknown [10.45.226.64])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7F89419560A2;
+	Mon, 15 Sep 2025 08:18:05 +0000 (UTC)
+Message-ID: <4bd1847b-00b6-42a6-8391-aba08aeb3721@redhat.com>
+Date: Mon, 15 Sep 2025 10:18:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 3/5] dpll: zl3073x: Add firmware loading
+ functionality
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+ Petr Oros <poros@redhat.com>
+References: <20250909091532.11790-1-ivecera@redhat.com>
+ <20250909091532.11790-4-ivecera@redhat.com>
+ <20250914144549.2c8d7453@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20250914144549.2c8d7453@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250915-qbv-fixes-v2-2-ec90673bb7d4@altera.com>
-References: <20250915-qbv-fixes-v2-0-ec90673bb7d4@altera.com>
-In-Reply-To: <20250915-qbv-fixes-v2-0-ec90673bb7d4@altera.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <Jose.Abreu@synopsys.com>, 
- Rohan G Thomas <rohan.g.thomas@intel.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Rohan G Thomas <rohan.g.thomas@altera.com>, 
- Matthew Gerlach <matthew.gerlach@altera.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1757924239; l=2480;
- i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=DoDmPaXfLB/bLZGa1Ixa2bObvDjP8v/PGAMQq76env8=;
- b=wVN5CaLveZl3eMAmOlvIyWdRSXZumm1eMskrSPcGTz7YXY/h4L+qhZTTZMQPOIdDISwNzEbqL
- UIwCGFHliyXBghBeocR0jNjle9uLD5D4HHeaytqLmPo6xajplrlkvQF
-X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
- pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
-X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
- with auth_id=494
-X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reply-To: rohan.g.thomas@altera.com
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: Rohan G Thomas <rohan.g.thomas@altera.com>
 
-On hardware with Tx VLAN offload enabled, add the VLAN tag
-length to the skb length before checking the Qbv maxSDU.
-Add 4 bytes for 802.1Q an add 8 bytes for 802.1AD tagging.
 
-Fixes: c5c3e1bfc9e0 ("net: stmmac: Offload queueMaxSDU from tc-taprio")
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 25 ++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+On 14. 09. 25 11:45 odp., Jakub Kicinski wrote:
+> On Tue,  9 Sep 2025 11:15:30 +0200 Ivan Vecera wrote:
+>> +	/* Fetch image name and size from input */
+>> +	strscpy(buf, *psrc, min(sizeof(buf), *psize));
+>> +	rc = sscanf(buf, "%15s %u %n", name, &count, &pos);
+>> +	if (!rc) {
+>> +		/* No more data */
+>> +		return 0;
+>> +	} else if (rc == 1 || count > U32_MAX / sizeof(u32)) {
+>> +		ZL3073X_FW_ERR_MSG(extack, "invalid component size");
+>> +		return -EINVAL;
+>> +	}
+>> +	*psrc += pos;
+>> +	*psize -= pos;
+> 
+> Still worried about pos not being bounds checked.
+> Admin can crash the kernel with invalid FW file.
+> 
+> 	if (pos > *psize)
+> 		/* error */
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 8c8ca5999bd8ad369eafa0cd8448a15da55be86b..c06c947ef7764bf40291a556984651f4edd7cb74 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4537,6 +4537,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	bool has_vlan, set_ic;
- 	int entry, first_tx;
- 	dma_addr_t des;
-+	u32 sdu_len;
- 
- 	tx_q = &priv->dma_conf.tx_queue[queue];
- 	txq_stats = &priv->xstats.txq_stats[queue];
-@@ -4553,13 +4554,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 			return stmmac_tso_xmit(skb, dev);
- 	}
- 
--	if (priv->est && priv->est->enable &&
--	    priv->est->max_sdu[queue] &&
--	    skb->len > priv->est->max_sdu[queue]){
--		priv->xstats.max_sdu_txq_drop[queue]++;
--		goto max_sdu_err;
--	}
--
- 	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 1)) {
- 		if (!netif_tx_queue_stopped(netdev_get_tx_queue(dev, queue))) {
- 			netif_tx_stop_queue(netdev_get_tx_queue(priv->dev,
-@@ -4575,6 +4569,23 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	/* Check if VLAN can be inserted by HW */
- 	has_vlan = stmmac_vlan_insert(priv, skb, tx_q);
- 
-+	sdu_len = skb->len;
-+	if (has_vlan) {
-+		/* Add VLAN tag length to sdu length in case of txvlan offload */
-+		if (priv->dev->features & NETIF_F_HW_VLAN_CTAG_TX)
-+			sdu_len += VLAN_HLEN;
-+		if (skb->vlan_proto == htons(ETH_P_8021AD) &&
-+		    priv->dev->features & NETIF_F_HW_VLAN_STAG_TX)
-+			sdu_len += VLAN_HLEN;
-+	}
-+
-+	if (priv->est && priv->est->enable &&
-+	    priv->est->max_sdu[queue] &&
-+	    sdu_len > priv->est->max_sdu[queue]) {
-+		priv->xstats.max_sdu_txq_drop[queue]++;
-+		goto max_sdu_err;
-+	}
-+
- 	entry = tx_q->cur_tx;
- 	first_entry = entry;
- 	WARN_ON(tx_q->tx_skbuff[first_entry]);
+This cannot happen...
 
--- 
-2.26.2
+1) strscpy(buf, *psrc, min(sizeof(buf, *psize)) ensures that the string
+    will be zero padded and strlen(buf) will be less than *psize
 
+2) sscanf(buf, "%15s %u %n", name, &count, &pos) scans for string with
+    max length of 15, one or more whitespace(s), number and one or more
+    whitespaces(s). And reports number of parsed arguments. Note that
+    the %n does not increase the count returned.
+
+So... if:
+1) buf is empty then sscanf returns 0 and /* No more data */ code path
+    is executed
+2) buf contains only string (1st argument) OR string and non-numeric
+    2nd argument then the sscanf returns 1 and 'invalid component size'
+    is executed
+3) buf contains string (1st arg) and numeric 2nd arg then the sscanf
+    returns 2 and the 2nd arg is stored into 'count' and number of
+    consumed characters into 'pos'
+4) if 'count' > (U32_MAX / 4) then 'invalid component size' path is
+    executed
+
+> Also what if sscanf() return 2? pos is uninitialized?
+
+If the sscanf() returns 2 then pos is initialized, in other words
+'pos' is initialized and less then *psize if the 'count' is correctly
+parsed as the numeric value.
+
+Thanks,
+Ivan
 
 
