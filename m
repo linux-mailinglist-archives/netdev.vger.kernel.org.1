@@ -1,230 +1,216 @@
-Return-Path: <netdev+bounces-222958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A73B5742C
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:11:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D9EBB5747F
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67147189C8EA
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 09:12:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5B4FC4E18F0
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 09:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A256F2ED16C;
-	Mon, 15 Sep 2025 09:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6B62F0C5B;
+	Mon, 15 Sep 2025 09:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJRQgNbV"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="OFCXcuUo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEC12E6127
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 09:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BDF2F0C64;
+	Mon, 15 Sep 2025 09:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757927502; cv=none; b=jXEEwTsUmymGHD35lqVzuknfNjFzwtRXL5JDhrzlDzrj1wg6fJti1QF+GhjElwkpYpBpzYTSjgR1KLleheMbqnw599MYBP0txvKdOnBeQX5atE9Nwn39MD5kbgGDSKbey84jZa/yTy/AzoO+zHA7XIsbcIoPzLodsHtNjUCmIs0=
+	t=1757927841; cv=none; b=bdz4tax04+U6jLKpVz82SRSX5VJPUQPWyMf3QhBwbGcf2YSgYU63PEACjAI5ITndA430h/Rxyfwangdy3arQMAHW419vm8xnVZM0P+IM3791t/XxVCkM4v9eEqJ03FMIK2pTZNjc9aevLfJ0sg5Xpd1C0eZso9T1RJqL9aLUlqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757927502; c=relaxed/simple;
-	bh=IdmjxnVRgFKvYi4EvbH9O0PCSB358ZLwIm/ltyiSdjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c83ShmBLqgjLfwkkOKD6t1WgFgHkLkoJ5rYwL5AJDc85U60HFVkJTRXo70iGVFNAg2882gAaboDU7Uz+my15LOqi9rKScmP44JpZs5RnFkr/gJbgIEPyYh8TDEK4b2huQBJ5rurenZMxkSUNn9sKmmCxWNmpgEOlTfpk6ivuh8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJRQgNbV; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45e03730f83so17662695e9.0
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 02:11:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757927499; x=1758532299; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WCn95BTIPllEJXaRNBR7O2ZaWejHXVv/vaw1O/ijRvg=;
-        b=YJRQgNbVSCW1Aw2sHdpmp7CE4kKj2wSPBrYTsZcw751vTPUTvKfemtSmi7uKvEmwyp
-         c8TTDom1E/KLrZ2szUklmGG+sNPS2jNWKncMtgAdPv36tM4MMMQQmy0NJ/WwUrgOczQV
-         Wi8GerIp0hGeQqFJfkbz7mZw00p9Bhu+7JWLCagzaPx5lx+UuJwiIhQDwR+90ST6xC19
-         n0AqVldPbFmR8cOLeYCz+DvHhWq1Q4ci4zkPG5/2OqO39KWEP88sdDc3hk2gEcPQUoBY
-         8nzp4NCUpcwAGEZlIJm6CCM2tcmTDCJ7dAYjx0ccKrCl+RpN8JOuOfa1D6A23KKrVYz/
-         +dPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757927499; x=1758532299;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WCn95BTIPllEJXaRNBR7O2ZaWejHXVv/vaw1O/ijRvg=;
-        b=fhmrnXHJf9FpK3jdA17sC0AcoY8yAbWTSkpsnt2zfj50Z41ShKAN5yyc1q6bexWWAX
-         9lHK0VMAOkcVECriJNjy72jX4pXWWYLll1GySAz80asEeWsBvOITGuz/FNpDhfyLOOEm
-         Qh/bnYF2eZvr3P5dKwpiUVa2RIzvdZwuQZQzPTVxPuW0wJLQ8S/Z9Ho9LHz2evghjEf7
-         YBUvqLgwTclRbs+rlCArrX2ZlnxnAjyz0L0FxbxZwoerBV++DXgIbe20+iZxLJh3J7LB
-         u/QLqKUZd4SlT/e9gb6UH+xbptFA6shPU4cenkUVKNQrasCYjmIN9Z/u3q9IsrXVMoGb
-         rrsA==
-X-Forwarded-Encrypted: i=1; AJvYcCWec0GfQmuF8FSFFzjLAGuiNzy3xJRL2OwPntZN2pULnzsA8NAQQXNL/BYNYdi0vMWdHKCNREs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwS8YsGCls6GeoPHf04gggqvhoCrfiGxKLce8VlSE8ofILpWbN
-	OjqEhGtYgQWTVX7AbWE7JjMEXn/mdoNqFsRdzaBH2dP/X/Dhnlw1RrTO
-X-Gm-Gg: ASbGncvK51k9wQH26wTkyiZkAePvO9fIzin3ouQFXjm5uJdR7ZrhsgqfisSsVJQbpOS
-	a5emoaUWA4VxyffbwH2lccSR8mZyk0MA2AwrAFm4lndECTVlvQsDGsw6JRAZCF+/pRqwZbRIsHR
-	0g/sbk7hy/14wfpEUwopj72EkCrDgMfyYGO66LNloqi8xO8PUdTB6FxzRdlxO2z+pxPj3C9lv6B
-	pZDbgJIhYupUyP5IAnXGIeWm8ZgpwQCziMhFv7zoGoUebMzy7ceT61QyoGWLuHP89Wq5ZQqqz+c
-	/xgb6GnzLkf6SpMb592WYmB86qLdKuLeh6Elfv0k68ozYWf/g6RXSYhYLkIobNyHCsV2rmR7j9Z
-	Qa7ClxG3E8peJRGcorHzPnQoddf9iXbgqaw==
-X-Google-Smtp-Source: AGHT+IHuR3WQVz7I46/sPhKiL+ybrfYStZYlG10jCx/8wiURkkGlKfhXHZbv/80jd39X1bHQWzXbzA==
-X-Received: by 2002:a05:600c:8a1b:20b0:45d:d3a1:70dd with SMTP id 5b1f17b1804b1-45f21221e50mr73711465e9.35.1757927498431;
-        Mon, 15 Sep 2025 02:11:38 -0700 (PDT)
-Received: from localhost ([45.10.155.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e813eb46f3sm10356821f8f.23.2025.09.15.02.11.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Sep 2025 02:11:38 -0700 (PDT)
-Message-ID: <63632c0f-8577-4ecd-8431-7d85fb464bab@gmail.com>
-Date: Mon, 15 Sep 2025 11:11:30 +0200
+	s=arc-20240116; t=1757927841; c=relaxed/simple;
+	bh=zfbydqOh+dk1zNcsBtslvIQY6yi3mBOP1C29nui2VcI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gSNdi5xIAMFCcKqJuFdStkIQSp5loJHjSTEAM+QRzEUH9dOWX9gWtSP2mHpjRH0EwxVsCOJOM5iNGRSy5d17FzxBNd1pt51J9Z0wB6a7g/YS4DAH8We4djdeSs1XOyMsgOffwFeaCUnLr9KsHy1aquiGjNerAJ6WQv9OqRXAHfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=OFCXcuUo; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1757927840; x=1789463840;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zfbydqOh+dk1zNcsBtslvIQY6yi3mBOP1C29nui2VcI=;
+  b=OFCXcuUos/Y72GyXSlFfdK76TdCu4QBRsNVu/kyZDxjuiWO10s5yDA+f
+   U4dTkQhwvXblghfOzSto7lCtMHDSTP+rpJsojF6/XMZXNJ4skTbi5WiGy
+   /hz0fCsUZS5z4WPSDr5SSB5MgeHctc7/n9hNvEZGfvBMnx/TgsQ5r5Mu1
+   Pbd+CgCxolwAgvpe6c36d8GfGBH+4rCYvYo7jkN4JYFP6doEa+40Aw2qm
+   rfhHx4aR/IQ6Dj4RMNTSHsecxbnjwWK5clk8uCV9SSQB8Ryq7HtZ+NFhf
+   p7ueFNi9i8lGw3Cc61QFGM8m+4zRFYFEZXJI6vGXcevHQhxdSPv2e2FDj
+   g==;
+X-CSE-ConnectionGUID: D9R2LNivTDmP0BykzHc4zw==
+X-CSE-MsgGUID: OdHmFyjUQPG9P7zwgDpDVw==
+X-IronPort-AV: E=Sophos;i="6.18,265,1751266800"; 
+   d="scan'208";a="46505434"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Sep 2025 02:17:13 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Mon, 15 Sep 2025 02:16:31 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Mon, 15 Sep 2025 02:16:29 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net-next] net: phy: micrel: Add Fast link failure support for lan8842
+Date: Mon, 15 Sep 2025 11:11:49 +0200
+Message-ID: <20250915091149.3539162-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 4/5] net: gro: remove unnecessary df checks
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, saeedm@nvidia.com,
- tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
- ecree.xilinx@gmail.com, dsahern@kernel.org, ncardwell@google.com,
- kuniyu@google.com, shuah@kernel.org, sdf@fomichev.me,
- aleksander.lobakin@intel.com, florian.fainelli@broadcom.com,
- alexander.duyck@gmail.com, linux-kernel@vger.kernel.org,
- linux-net-drivers@amd.com
-References: <20250901113826.6508-1-richardbgobert@gmail.com>
- <20250901113826.6508-5-richardbgobert@gmail.com>
- <willemdebruijn.kernel.868af9542505@gmail.com>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.868af9542505@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Willem de Bruijn wrote:
-> Richard Gobert wrote:
->> Currently, packets with fixed IDs will be merged only if their
->> don't-fragment bit is set. Merged packets are re-split into segments
->> before being fragmented, so the result is the same as if the packets
->> weren't merged to begin with.
-> 
-> This can perhaps be reworded a bit for clarity. Something like "With
-> the changes in the earlier patches in this series, the ID state (fixed
-> or incrementing) is now recorded for both inner and outer IPv4 headers,
-> so the restriction to only coalesce packets with fixed IDs can now be
-> lifted."
+Add support for fast link failure for lan8842, when this is enabled the
+PHY will detect link down immediately (~1ms). The disadvantage of this
+is that also small instability might be reported as link down.
+Therefore add this feature as a tunable configuration and the user will
+know when to enable or not. By default it is not enabled.
 
-This restriction is unnecessary regardless of this patch series. I'll
-rephrase it anyway.
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/phy/micrel.c | 77 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 2 deletions(-)
 
->>
->> Remove unnecessary don't-fragment checks.
->>
->> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
->> ---
->>  include/net/gro.h                 | 5 ++---
->>  net/ipv4/af_inet.c                | 3 ---
->>  tools/testing/selftests/net/gro.c | 9 ++++-----
->>  3 files changed, 6 insertions(+), 11 deletions(-)
->>
->> diff --git a/include/net/gro.h b/include/net/gro.h
->> index 322c5517f508..691f267b3969 100644
->> --- a/include/net/gro.h
->> +++ b/include/net/gro.h
->> @@ -448,17 +448,16 @@ static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *ip
->>  	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
->>  	const u16 ipid_offset = (id >> 16) - (id2 >> 16);
->>  	const u16 count = NAPI_GRO_CB(p)->count;
->> -	const u32 df = id & IP_DF;
->>  
->>  	/* All fields must match except length and checksum. */
->> -	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF)))
->> +	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | ((id ^ id2) & IP_DF))
->>  		return true;
-> 
-> This is just a cleanup?
-> 
-> If so, please make a brief note in the commit message. I end up
-> staring whether there is some deeper meaning relevant to the
-> functional change.
-> 
-
-Will do.
-
->>  
->>  	/* When we receive our second frame we can make a decision on if we
->>  	 * continue this flow as an atomic flow with a fixed ID or if we use
->>  	 * an incrementing ID.
->>  	 */
->> -	if (count == 1 && df && !ipid_offset)
->> +	if (count == 1 && !ipid_offset)
->>  		NAPI_GRO_CB(p)->ip_fixedid |= 1 << inner;
->>  
->>  	return ipid_offset ^ (count * !(NAPI_GRO_CB(p)->ip_fixedid & (1 << inner)));
->> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
->> index fc7a6955fa0a..c0542d9187e2 100644
->> --- a/net/ipv4/af_inet.c
->> +++ b/net/ipv4/af_inet.c
->> @@ -1393,10 +1393,7 @@ struct sk_buff *inet_gso_segment(struct sk_buff *skb,
->>  
->>  	segs = ERR_PTR(-EPROTONOSUPPORT);
->>  
->> -	/* fixed ID is invalid if DF bit is not set */
->>  	fixedid = !!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCP_FIXEDID << encap));
->> -	if (fixedid && !(ip_hdr(skb)->frag_off & htons(IP_DF)))
->> -		goto out;
-> 
-> I understand why the GRO constraint can now be relaxed. But why does
-> this also affect GSO?
-> 
-> Fixed ID is invalid on the wire if DF is not set. Is the idea behind
-> this change that GRO + GSO is just forwarding existing packets. Even
-> if the incoming packets were invalid on this point?
-> 
-
-Basically. Such packets are forwarded both with and without GRO, and since
-GSO restores the packets to their original form before forwarding, there is
-no reason not to perform GRO. These checks are redundant and are somewhat
-confusing.
-
-Note also that FIXEDID can only be set by GRO, and before this patch, GRO
-didn't accept packets that had fixed IDs with DF not set, so the GSO check
-was redundant anyway. With this patch, the removal of the GSO check is
-necessary as otherwise GSO will not be able to restore the packets to their
-original form.
-
->>  
->>  	if (!skb->encapsulation || encap)
->>  		udpfrag = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP);
->> diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
->> index d5824eadea10..3d4a82a2607c 100644
->> --- a/tools/testing/selftests/net/gro.c
->> +++ b/tools/testing/selftests/net/gro.c
->> @@ -670,7 +670,7 @@ static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
->>  		iph2->id = htons(9);
->>  		break;
->>  
->> -	case 3: /* DF=0, Fixed - should not coalesce */
->> +	case 3: /* DF=0, Fixed - should coalesce */
->>  		iph1->frag_off &= ~htons(IP_DF);
->>  		iph1->id = htons(8);
->>  
->> @@ -1188,10 +1188,9 @@ static void gro_receiver(void)
->>  			correct_payload[0] = PAYLOAD_LEN * 2;
->>  			check_recv_pkts(rxfd, correct_payload, 1);
->>  
->> -			printf("DF=0, Fixed - should not coalesce: ");
->> -			correct_payload[0] = PAYLOAD_LEN;
->> -			correct_payload[1] = PAYLOAD_LEN;
->> -			check_recv_pkts(rxfd, correct_payload, 2);
->> +			printf("DF=0, Fixed - should coalesce: ");
->> +			correct_payload[0] = PAYLOAD_LEN * 2;
->> +			check_recv_pkts(rxfd, correct_payload, 1);
->>  
->>  			printf("DF=1, 2 Incrementing and one fixed - should coalesce only first 2 packets: ");
->>  			correct_payload[0] = PAYLOAD_LEN * 2;
->> -- 
->> 2.36.1
->>
-> 
-> 
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index e403cbbcead5b..a946c34dbbf79 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -107,6 +107,7 @@
+ #define LAN8814_INTC				0x18
+ #define LAN8814_INTS				0x1B
+ 
++#define LAN8814_INT_FLF				BIT(15)
+ #define LAN8814_INT_LINK_DOWN			BIT(2)
+ #define LAN8814_INT_LINK_UP			BIT(0)
+ #define LAN8814_INT_LINK			(LAN8814_INT_LINK_UP |\
+@@ -2805,6 +2806,14 @@ static int ksz886x_cable_test_get_status(struct phy_device *phydev,
+ 	return ret;
+ }
+ 
++/**
++ * LAN8814_PAGE_PCS - Selects Extended Page 0.
++ *
++ * This page appaers to control the fast link failure and there are different
++ * debug info registers.
++ */
++#define LAN8814_PAGE_PCS 0
++
+ /**
+  * LAN8814_PAGE_AFE_PMA - Selects Extended Page 1.
+  *
+@@ -5910,7 +5919,8 @@ static int lan8842_config_intr(struct phy_device *phydev)
+ 		if (err)
+ 			return err;
+ 
+-		err = phy_write(phydev, LAN8814_INTC, LAN8814_INT_LINK);
++		err = phy_write(phydev, LAN8814_INTC,
++				LAN8814_INT_LINK | LAN8814_INT_FLF);
+ 	} else {
+ 		err = phy_write(phydev, LAN8814_INTC, 0);
+ 		if (err)
+@@ -5986,7 +5996,7 @@ static irqreturn_t lan8842_handle_interrupt(struct phy_device *phydev)
+ 		return IRQ_NONE;
+ 	}
+ 
+-	if (irq_status & LAN8814_INT_LINK) {
++	if (irq_status & (LAN8814_INT_LINK | LAN8814_INT_FLF)) {
+ 		phy_trigger_machine(phydev);
+ 		ret = IRQ_HANDLED;
+ 	}
+@@ -6055,6 +6065,67 @@ static int lan8842_update_stats(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++#define LAN8842_FLF				15 /* 0x0e */
++#define LAN8842_FLF_ENA				BIT(1)
++#define LAN8842_FLF_ENA_LINK_DOWN		BIT(0)
++
++static int lan8842_get_fast_down(struct phy_device *phydev, u8 *msecs)
++{
++	int ret;
++
++	ret = lanphy_read_page_reg(phydev, LAN8814_PAGE_PCS, LAN8842_FLF);
++	if (ret < 0)
++		return ret;
++
++	if (ret & LAN8842_FLF_ENA)
++		*msecs = ETHTOOL_PHY_FAST_LINK_DOWN_ON;
++	else
++		*msecs = ETHTOOL_PHY_FAST_LINK_DOWN_OFF;
++
++	return 0;
++}
++
++static int lan8842_set_fast_down(struct phy_device *phydev, const u8 *msecs)
++{
++	if (*msecs == ETHTOOL_PHY_FAST_LINK_DOWN_ON)
++		return lanphy_modify_page_reg(phydev, LAN8814_PAGE_PCS,
++					      LAN8842_FLF,
++					      LAN8842_FLF_ENA |
++					      LAN8842_FLF_ENA_LINK_DOWN,
++					      LAN8842_FLF_ENA |
++					      LAN8842_FLF_ENA_LINK_DOWN);
++
++	if (*msecs == ETHTOOL_PHY_FAST_LINK_DOWN_OFF)
++		return lanphy_modify_page_reg(phydev, LAN8814_PAGE_PCS,
++					      LAN8842_FLF,
++					      LAN8842_FLF_ENA |
++					      LAN8842_FLF_ENA_LINK_DOWN, 0);
++
++	return -EINVAL;
++}
++
++static int lan8842_get_tunable(struct phy_device *phydev,
++			       struct ethtool_tunable *tuna, void *data)
++{
++	switch (tuna->id) {
++	case ETHTOOL_PHY_FAST_LINK_DOWN:
++		return lan8842_get_fast_down(phydev, data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++static int lan8842_set_tunable(struct phy_device *phydev,
++			       struct ethtool_tunable *tuna, const void *data)
++{
++	switch (tuna->id) {
++	case ETHTOOL_PHY_FAST_LINK_DOWN:
++		return lan8842_set_fast_down(phydev, data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
+ static void lan8842_get_phy_stats(struct phy_device *phydev,
+ 				  struct ethtool_eth_phy_stats *eth_stats,
+ 				  struct ethtool_phy_stats *stats)
+@@ -6299,6 +6370,8 @@ static struct phy_driver ksphy_driver[] = {
+ 	.handle_interrupt = lan8842_handle_interrupt,
+ 	.get_phy_stats	= lan8842_get_phy_stats,
+ 	.update_stats	= lan8842_update_stats,
++	.get_tunable	= lan8842_get_tunable,
++	.set_tunable	= lan8842_set_tunable,
+ 	.cable_test_start	= lan8814_cable_test_start,
+ 	.cable_test_get_status	= ksz886x_cable_test_get_status,
+ }, {
+-- 
+2.34.1
 
 
