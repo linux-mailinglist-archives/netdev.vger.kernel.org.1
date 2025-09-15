@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-223139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE7DB580A6
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:30:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BB02B580A7
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 445FD18901CD
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 15:26:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFC571885B0A
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 15:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E58935FC37;
-	Mon, 15 Sep 2025 15:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894A536299E;
+	Mon, 15 Sep 2025 15:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="pwhowDQ6"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="q1UGDHwP"
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E7C35A289;
-	Mon, 15 Sep 2025 15:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1321E35CEB5;
+	Mon, 15 Sep 2025 15:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757949707; cv=none; b=TU6Z3N2uCjw8aJffo3XI1YOXa5el8VGQhsXMw68VTVUc7UklXmesUqNIG86Q0cSUZP7lTeMjWmjsW3oZ1nBsBaDLXTnzUwq9RvAVu/hGdVFGQwQg2fu0ykYqD0B467OzO5UMdnJ/7L3HWZ9XV6QdGpwC1fM/oon8kq1RmP6R1GY=
+	t=1757949708; cv=none; b=a7+X5j0pNG2pcJbLT4MOGnQzbOQIhfA1xfB6w3zjvpB0d7viptkkWGe+0qTNM7o+ilARlsDSpjrrwoaZkKK6eFVXkpZ1cZicY4Rz+JYMwYzhOumoO6IuJrxG+tU47jAy8ZAS+Lca07GbBPKbPiDTEffIS95bFXRNgYWz9majLPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757949707; c=relaxed/simple;
-	bh=xZiTUJoml1PcEKEopIk/v+FM1m3yh+F+ryseknfNl+w=;
+	s=arc-20240116; t=1757949708; c=relaxed/simple;
+	bh=eCbxBzKf9iUFjDYBRLkdqjG13ZIGNuqL9W1Y03OU5/U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q7cmbwy2s5ey6aSsX2q16qW0xOfVKvDrSziIIKfVojI61LRmwvyF7voRd/iqK/pCryp5PiYid4oREWBsuv+IiGSpbA/+8gV8deRKzI76SrclGZpzgFt3k8HLU5M4RSpFVwKr2XBOLx1h4UHSOI39cu5HR2nIoT7S7IyJ7whAOJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=pwhowDQ6; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=Rr5y7FVGPiBmivsQTpRLFDw4hQSqdZFQa9PwP8L8WR0cpFaKVgVSWrRK9XFszPyMiYCrFydwgA2KE6ajjS36/hWky9yUfOhOSOgpVJ7FasWeln3O+sHKjoY8FsDuaflLLE+i9aCZwRvfmmP/oxXo7M7YJULLqMFW3GdxFsX0Ht8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=q1UGDHwP; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1757949703;
-	bh=xZiTUJoml1PcEKEopIk/v+FM1m3yh+F+ryseknfNl+w=;
+	s=mail; t=1757949704;
+	bh=eCbxBzKf9iUFjDYBRLkdqjG13ZIGNuqL9W1Y03OU5/U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pwhowDQ6cQcDh6TLX5jELj/EEHCOBkG9HO34mDv+RaS2KYjK/aFJbXQFJkmCYAQ3S
-	 lcv4jMzvUG2xMNn9+Woh/H1zDmDAB/COFjeszWocvI0fUp7daxV7FptfT9orVIZGTd
-	 wnH6qmGtrRbccP8R2cQSzEMDXtp1u3SW6Su9/4gtlZybwFpE+VeNh0ApqflPMkeTyb
-	 hvVIY5FIsW4AlT4zgojcibL1OTBJrjhv2pnk0Ceb6sWC8bkmrZ3ZhMy4ZI6D5yZQZA
-	 EFjLDaG6nLBJ/MkiqGCNazwmkX8zVd6JrzNRVS2bimq0ZE2uEyyxyxTBMOulCzHLru
-	 5hw2qikG6ip4g==
+	b=q1UGDHwPItokRrGtaECu45gYPoAKNCgjkDgAiADRG2N9fcSTfWlBbAxW7jpPt0pZQ
+	 7YOLftTJ1QhbGWJTkDX9RCi59pvcQDWOs/BSK31SMoz5XLH7oYeaisYurxBDYF6ej5
+	 zAKhvZxQDB4woaZEgBghVTBqkW8FpPkQKjHrBFloamTgh1n4MZYJ2/RfKveRpE0pVN
+	 rrRBfq3wBhLvJ0TNCh5QpyRcA1YB6bWrE+IToAiEUKdMHInZTilAzfFYX8VTbtyPgK
+	 vFZTQUeuGLxr2FoKH+i+3eUC+xdishW57KNsgm/7H55S6REBCtmizcI9IxqwEKPxKn
+	 u7Gtpdd/o54HQ==
 Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:1c8d:f5ba:823d:730b])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: laura.nao)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 938B917E046C;
-	Mon, 15 Sep 2025 17:21:42 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id B475017E090D;
+	Mon, 15 Sep 2025 17:21:43 +0200 (CEST)
 From: Laura Nao <laura.nao@collabora.com>
 To: mturquette@baylibre.com,
 	sboyd@kernel.org,
@@ -69,9 +69,9 @@ Cc: guangjie.song@mediatek.com,
 	kernel@collabora.com,
 	Laura Nao <laura.nao@collabora.com>,
 	=?UTF-8?q?N=C3=ADcolas=20F=20=2E=20R=20=2E=20A=20=2E=20Prado?= <nfraprado@collabora.com>
-Subject: [PATCH v6 17/27] clk: mediatek: Add MT8196 I2C clock support
-Date: Mon, 15 Sep 2025 17:19:37 +0200
-Message-Id: <20250915151947.277983-18-laura.nao@collabora.com>
+Subject: [PATCH v6 18/27] clk: mediatek: Add MT8196 mcu clock support
+Date: Mon, 15 Sep 2025 17:19:38 +0200
+Message-Id: <20250915151947.277983-19-laura.nao@collabora.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250915151947.277983-1-laura.nao@collabora.com>
 References: <20250915151947.277983-1-laura.nao@collabora.com>
@@ -84,56 +84,55 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add support for the MT8196 I2C clock controller, which provides clock
-gate control for I2C.
+Add support for the MT8196 mcu clock controller, which provides PLL
+control for MCU.
 
 Reviewed-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
 Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Reviewed-by: Chen-Yu Tsai <wenst@chromium.org>
 Signed-off-by: Laura Nao <laura.nao@collabora.com>
 ---
- drivers/clk/mediatek/Kconfig                  |   7 ++
- drivers/clk/mediatek/Makefile                 |   1 +
- .../clk/mediatek/clk-mt8196-imp_iic_wrap.c    | 118 ++++++++++++++++++
- 3 files changed, 126 insertions(+)
- create mode 100644 drivers/clk/mediatek/clk-mt8196-imp_iic_wrap.c
+ drivers/clk/mediatek/Kconfig          |   7 ++
+ drivers/clk/mediatek/Makefile         |   1 +
+ drivers/clk/mediatek/clk-mt8196-mcu.c | 167 ++++++++++++++++++++++++++
+ 3 files changed, 175 insertions(+)
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-mcu.c
 
 diff --git a/drivers/clk/mediatek/Kconfig b/drivers/clk/mediatek/Kconfig
-index c977719046a4..fe2697b64ef0 100644
+index fe2697b64ef0..8e5cdae80748 100644
 --- a/drivers/clk/mediatek/Kconfig
 +++ b/drivers/clk/mediatek/Kconfig
-@@ -1010,6 +1010,13 @@ config COMMON_CLK_MT8196
+@@ -1017,6 +1017,13 @@ config COMMON_CLK_MT8196_IMP_IIC_WRAP
  	help
- 	  This driver supports MediaTek MT8196 basic clocks.
+ 	  This driver supports MediaTek MT8196 i2c clocks.
  
-+config COMMON_CLK_MT8196_IMP_IIC_WRAP
-+	tristate "Clock driver for MediaTek MT8196 imp_iic_wrap"
++config COMMON_CLK_MT8196_MCUSYS
++	tristate "Clock driver for MediaTek MT8196 mcusys"
 +	depends on COMMON_CLK_MT8196
 +	default COMMON_CLK_MT8196
 +	help
-+	  This driver supports MediaTek MT8196 i2c clocks.
++	  This driver supports MediaTek MT8196 mcusys clocks.
 +
  config COMMON_CLK_MT8196_PEXTPSYS
  	tristate "Clock driver for MediaTek MT8196 pextpsys"
  	depends on COMMON_CLK_MT8196
 diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
-index 88f7d8a229c2..241e7f5e7316 100644
+index 241e7f5e7316..46358623c3e5 100644
 --- a/drivers/clk/mediatek/Makefile
 +++ b/drivers/clk/mediatek/Makefile
-@@ -153,6 +153,7 @@ obj-$(CONFIG_COMMON_CLK_MT8195_WPESYS) += clk-mt8195-wpe.o
- obj-$(CONFIG_COMMON_CLK_MT8196) += clk-mt8196-apmixedsys.o clk-mt8196-topckgen.o \
+@@ -154,6 +154,7 @@ obj-$(CONFIG_COMMON_CLK_MT8196) += clk-mt8196-apmixedsys.o clk-mt8196-topckgen.o
  				   clk-mt8196-topckgen2.o clk-mt8196-vlpckgen.o \
  				   clk-mt8196-peri_ao.o
-+obj-$(CONFIG_COMMON_CLK_MT8196_IMP_IIC_WRAP) += clk-mt8196-imp_iic_wrap.o
+ obj-$(CONFIG_COMMON_CLK_MT8196_IMP_IIC_WRAP) += clk-mt8196-imp_iic_wrap.o
++obj-$(CONFIG_COMMON_CLK_MT8196_MCUSYS) += clk-mt8196-mcu.o
  obj-$(CONFIG_COMMON_CLK_MT8196_PEXTPSYS) += clk-mt8196-pextp.o
  obj-$(CONFIG_COMMON_CLK_MT8196_UFSSYS) += clk-mt8196-ufs_ao.o
  obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-mt8365.o
-diff --git a/drivers/clk/mediatek/clk-mt8196-imp_iic_wrap.c b/drivers/clk/mediatek/clk-mt8196-imp_iic_wrap.c
+diff --git a/drivers/clk/mediatek/clk-mt8196-mcu.c b/drivers/clk/mediatek/clk-mt8196-mcu.c
 new file mode 100644
-index 000000000000..a63241671650
+index 000000000000..5cbcc411ae73
 --- /dev/null
-+++ b/drivers/clk/mediatek/clk-mt8196-imp_iic_wrap.c
-@@ -0,0 +1,118 @@
++++ b/drivers/clk/mediatek/clk-mt8196-mcu.c
+@@ -0,0 +1,167 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (c) 2025 MediaTek Inc.
@@ -143,114 +142,163 @@ index 000000000000..a63241671650
 + */
 +#include <dt-bindings/clock/mediatek,mt8196-clock.h>
 +
-+#include <linux/clk-provider.h>
++#include <linux/clk.h>
 +#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
 +#include <linux/of_device.h>
 +#include <linux/platform_device.h>
 +
-+#include "clk-gate.h"
 +#include "clk-mtk.h"
++#include "clk-pll.h"
 +
-+static const struct mtk_gate_regs imp_cg_regs = {
-+	.set_ofs = 0xe08,
-+	.clr_ofs = 0xe04,
-+	.sta_ofs = 0xe00,
-+};
++#define ARMPLL_LL_CON0	0x008
++#define ARMPLL_LL_CON1	0x00c
++#define ARMPLL_LL_CON2	0x010
++#define ARMPLL_LL_CON3	0x014
++#define ARMPLL_BL_CON0	0x008
++#define ARMPLL_BL_CON1	0x00c
++#define ARMPLL_BL_CON2	0x010
++#define ARMPLL_BL_CON3	0x014
++#define ARMPLL_B_CON0	0x008
++#define ARMPLL_B_CON1	0x00c
++#define ARMPLL_B_CON2	0x010
++#define ARMPLL_B_CON3	0x014
++#define CCIPLL_CON0	0x008
++#define CCIPLL_CON1	0x00c
++#define CCIPLL_CON2	0x010
++#define CCIPLL_CON3	0x014
++#define PTPPLL_CON0	0x008
++#define PTPPLL_CON1	0x00c
++#define PTPPLL_CON2	0x010
++#define PTPPLL_CON3	0x014
 +
-+#define GATE_IMP(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &imp_cg_regs,			\
-+		.shift = _shift,			\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+		.ops = &mtk_clk_gate_ops_setclr,	\
++#define MT8196_PLL_FMAX		(3800UL * MHZ)
++#define MT8196_PLL_FMIN		(1500UL * MHZ)
++#define MT8196_INTEGER_BITS	8
++
++#define PLL(_id, _name, _reg, _en_reg, _en_mask, _pll_en_bit,	\
++	    _flags, _rst_bar_mask,				\
++	    _pd_reg, _pd_shift, _tuner_reg,			\
++	    _tuner_en_reg, _tuner_en_bit,			\
++	    _pcw_reg, _pcw_shift, _pcwbits) {			\
++		.id = _id,					\
++		.name = _name,					\
++		.reg = _reg,					\
++		.en_reg = _en_reg,				\
++		.en_mask = _en_mask,				\
++		.pll_en_bit = _pll_en_bit,			\
++		.flags = _flags,				\
++		.rst_bar_mask = _rst_bar_mask,			\
++		.fmax = MT8196_PLL_FMAX,			\
++		.fmin = MT8196_PLL_FMIN,			\
++		.pd_reg = _pd_reg,				\
++		.pd_shift = _pd_shift,				\
++		.tuner_reg = _tuner_reg,			\
++		.tuner_en_reg = _tuner_en_reg,			\
++		.tuner_en_bit = _tuner_en_bit,			\
++		.pcw_reg = _pcw_reg,				\
++		.pcw_shift = _pcw_shift,			\
++		.pcwbits = _pcwbits,				\
++		.pcwibits = MT8196_INTEGER_BITS,		\
 +	}
 +
-+static const struct mtk_gate impc_clks[] = {
-+	GATE_IMP(CLK_IMPC_I2C11, "impc_i2c11", "i2c_p", 0),
-+	GATE_IMP(CLK_IMPC_I2C12, "impc_i2c12", "i2c_p", 1),
-+	GATE_IMP(CLK_IMPC_I2C13, "impc_i2c13", "i2c_p", 2),
-+	GATE_IMP(CLK_IMPC_I2C14, "impc_i2c14", "i2c_p", 3),
++static const struct mtk_pll_data cpu_bl_plls[] = {
++	PLL(CLK_CPBL_ARMPLL_BL, "armpll-bl", ARMPLL_BL_CON0, ARMPLL_BL_CON0, 0,
++	    0, PLL_AO, BIT(0), ARMPLL_BL_CON1, 24, 0, 0, 0, ARMPLL_BL_CON1, 0, 22),
 +};
 +
-+static const struct mtk_clk_desc impc_mcd = {
-+	.clks = impc_clks,
-+	.num_clks = ARRAY_SIZE(impc_clks),
++static const struct mtk_pll_data cpu_b_plls[] = {
++	PLL(CLK_CPB_ARMPLL_B, "armpll-b", ARMPLL_B_CON0, ARMPLL_B_CON0, 0, 0,
++	    PLL_AO, BIT(0), ARMPLL_B_CON1, 24, 0, 0, 0, ARMPLL_B_CON1, 0, 22),
 +};
 +
-+static const struct mtk_gate impe_clks[] = {
-+	GATE_IMP(CLK_IMPE_I2C5, "impe_i2c5", "i2c_east", 0),
++static const struct mtk_pll_data cpu_ll_plls[] = {
++	PLL(CLK_CPLL_ARMPLL_LL, "armpll-ll", ARMPLL_LL_CON0, ARMPLL_LL_CON0, 0,
++	    0, PLL_AO, BIT(0), ARMPLL_LL_CON1, 24, 0, 0, 0, ARMPLL_LL_CON1, 0, 22),
 +};
 +
-+static const struct mtk_clk_desc impe_mcd = {
-+	.clks = impe_clks,
-+	.num_clks = ARRAY_SIZE(impe_clks),
++static const struct mtk_pll_data cci_plls[] = {
++	PLL(CLK_CCIPLL, "ccipll", CCIPLL_CON0, CCIPLL_CON0, 0, 0, PLL_AO,
++	    BIT(0), CCIPLL_CON1, 24, 0, 0, 0, CCIPLL_CON1, 0, 22),
 +};
 +
-+static const struct mtk_gate_regs impn_hwv_regs = {
-+	.set_ofs = 0x0000,
-+	.clr_ofs = 0x0004,
-+	.sta_ofs = 0x2c00,
++static const struct mtk_pll_data ptp_plls[] = {
++	PLL(CLK_PTPPLL, "ptppll", PTPPLL_CON0, PTPPLL_CON0, 0, 0, PLL_AO,
++	    BIT(0), PTPPLL_CON1, 24, 0, 0, 0, PTPPLL_CON1, 0, 22),
 +};
 +
-+#define GATE_HWV_IMPN(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &imp_cg_regs,			\
-+		.hwv_regs = &impn_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+static const struct mtk_gate impn_clks[] = {
-+	GATE_IMP(CLK_IMPN_I2C1, "impn_i2c1", "i2c_north", 0),
-+	GATE_IMP(CLK_IMPN_I2C2, "impn_i2c2", "i2c_north", 1),
-+	GATE_IMP(CLK_IMPN_I2C4, "impn_i2c4", "i2c_north", 2),
-+	GATE_HWV_IMPN(CLK_IMPN_I2C7, "impn_i2c7", "i2c_north", 3),
-+	GATE_IMP(CLK_IMPN_I2C8, "impn_i2c8", "i2c_north", 4),
-+	GATE_IMP(CLK_IMPN_I2C9, "impn_i2c9", "i2c_north", 5),
-+};
-+
-+static const struct mtk_clk_desc impn_mcd = {
-+	.clks = impn_clks,
-+	.num_clks = ARRAY_SIZE(impn_clks),
-+};
-+
-+static const struct mtk_gate impw_clks[] = {
-+	GATE_IMP(CLK_IMPW_I2C0, "impw_i2c0", "i2c_west", 0),
-+	GATE_IMP(CLK_IMPW_I2C3, "impw_i2c3", "i2c_west", 1),
-+	GATE_IMP(CLK_IMPW_I2C6, "impw_i2c6", "i2c_west", 2),
-+	GATE_IMP(CLK_IMPW_I2C10, "impw_i2c10", "i2c_west", 3),
-+};
-+
-+static const struct mtk_clk_desc impw_mcd = {
-+	.clks = impw_clks,
-+	.num_clks = ARRAY_SIZE(impw_clks),
-+};
-+
-+static const struct of_device_id of_match_clk_mt8196_imp_iic_wrap[] = {
-+	{ .compatible = "mediatek,mt8196-imp-iic-wrap-c", .data = &impc_mcd },
-+	{ .compatible = "mediatek,mt8196-imp-iic-wrap-e", .data = &impe_mcd },
-+	{ .compatible = "mediatek,mt8196-imp-iic-wrap-n", .data = &impn_mcd },
-+	{ .compatible = "mediatek,mt8196-imp-iic-wrap-w", .data = &impw_mcd },
++static const struct of_device_id of_match_clk_mt8196_mcu[] = {
++	{ .compatible = "mediatek,mt8196-armpll-bl-pll-ctrl",
++	  .data = &cpu_bl_plls },
++	{ .compatible = "mediatek,mt8196-armpll-b-pll-ctrl",
++	  .data = &cpu_b_plls },
++	{ .compatible = "mediatek,mt8196-armpll-ll-pll-ctrl",
++	  .data = &cpu_ll_plls },
++	{ .compatible = "mediatek,mt8196-ccipll-pll-ctrl", .data = &cci_plls },
++	{ .compatible = "mediatek,mt8196-ptppll-pll-ctrl", .data = &ptp_plls },
 +	{ /* sentinel */ }
 +};
-+MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_imp_iic_wrap);
++MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_mcu);
 +
-+static struct platform_driver clk_mt8196_imp_iic_wrap_drv = {
-+	.probe = mtk_clk_simple_probe,
-+	.remove = mtk_clk_simple_remove,
++static int clk_mt8196_mcu_probe(struct platform_device *pdev)
++{
++	const struct mtk_pll_data *plls;
++	struct clk_hw_onecell_data *clk_data;
++	struct device_node *node = pdev->dev.of_node;
++	const int num_plls = 1;
++	int r;
++
++	plls = of_device_get_match_data(&pdev->dev);
++	if (!plls)
++		return -EINVAL;
++
++	clk_data = mtk_alloc_clk_data(num_plls);
++	if (!clk_data)
++		return -ENOMEM;
++
++	r = mtk_clk_register_plls(node, plls, num_plls, clk_data);
++	if (r)
++		goto free_clk_data;
++
++	r = of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_data);
++	if (r)
++		goto unregister_plls;
++
++	platform_set_drvdata(pdev, clk_data);
++
++	return r;
++
++unregister_plls:
++	mtk_clk_unregister_plls(plls, num_plls, clk_data);
++free_clk_data:
++	mtk_free_clk_data(clk_data);
++
++	return r;
++}
++
++static void clk_mt8196_mcu_remove(struct platform_device *pdev)
++{
++	const struct mtk_pll_data *plls = of_device_get_match_data(&pdev->dev);
++	struct clk_hw_onecell_data *clk_data = platform_get_drvdata(pdev);
++	struct device_node *node = pdev->dev.of_node;
++
++	of_clk_del_provider(node);
++	mtk_clk_unregister_plls(plls, 1, clk_data);
++	mtk_free_clk_data(clk_data);
++}
++
++static struct platform_driver clk_mt8196_mcu_drv = {
++	.probe = clk_mt8196_mcu_probe,
++	.remove = clk_mt8196_mcu_remove,
 +	.driver = {
-+		.name = "clk-mt8196-imp_iic_wrap",
-+		.of_match_table = of_match_clk_mt8196_imp_iic_wrap,
++		.name = "clk-mt8196-mcu",
++		.of_match_table = of_match_clk_mt8196_mcu,
 +	},
 +};
-+module_platform_driver(clk_mt8196_imp_iic_wrap_drv);
++module_platform_driver(clk_mt8196_mcu_drv);
 +
-+MODULE_DESCRIPTION("MediaTek MT8196 I2C Wrapper clocks driver");
++MODULE_DESCRIPTION("MediaTek MT8196 mcusys clocks driver");
 +MODULE_LICENSE("GPL");
 -- 
 2.39.5
