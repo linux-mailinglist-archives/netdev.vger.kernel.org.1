@@ -1,94 +1,102 @@
-Return-Path: <netdev+bounces-223198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A633EB58423
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:56:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96921B58429
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2195B17CB49
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:56:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0041AA717E
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0592DAFB7;
-	Mon, 15 Sep 2025 17:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF4222D4C8;
+	Mon, 15 Sep 2025 17:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXZwy6kz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x/ocnuNA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043972D662F;
-	Mon, 15 Sep 2025 17:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D9927442
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 17:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757958984; cv=none; b=skKIM1XhW+p2cRjCQ6g5aI6mid8mpIJNHJq9MRLCtwc/vnfeVq5wR1zRbkYN/weQ0/GwUIDnl9vLVQt/IIb6FzIEhfymVzyuag/LcP0x6T4Tgn03uHgxVniq1yRyoP5YslrU6fnWKsbsaxBdyRWluZd0XQGomgW9tKLNwocd+Ec=
+	t=1757959086; cv=none; b=dBgvyoAM/nfTD2CmPxukhlLSkC05GDvJCVz9CirNJpZ4bSDFeAclE9eIgckGA/i/Ei+zK9jBwJmq8qE9sgAdmd1qkt6csvFkhD1s9RrKS9O8uppYr3NaLcOnyetAOWwUebe0QaONXE7vFpNlbL1iDA9TBSLF9hFDdxjbJl+3Z/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757958984; c=relaxed/simple;
-	bh=UhtlqOXDupzkzc3nSNJvUxuVlPWJGH7dBhTIBsrkvzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cu/8RVJHwVlBeDW4R7LyuBM+oJyUlMYzxqDdecWbS09LcrEp8N716svh7BmyynjxG6oYGMgRLS0wqaFVxQp2RkFfF7LyEEHCtNmfPmsnmNj1d/CP2YVj5pdEUONpQm8/BLAYPc2Wz6TC16rrjLOy+3+j1wZslSsI8lQaRISxU9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXZwy6kz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41507C4CEF1;
-	Mon, 15 Sep 2025 17:56:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757958982;
-	bh=UhtlqOXDupzkzc3nSNJvUxuVlPWJGH7dBhTIBsrkvzc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dXZwy6kz1KMTOyFhhyW7IqtB4tCr5+pVG7dXmvQi93dWtvlJbpq3cdaE4FbQUqy1f
-	 ej4cPuGHYksVOmiPIVi1r67OsVLXYCgvH8HDwFT21fe9YaNLd9T25nnmjFdeHBVnuL
-	 pwz1ZLeC6SgWAmiWyOxUXNSSLEUOEi5v6T90J8nxiNk/27Hl/uA91diEZobWhu3YtJ
-	 nTjD1NtjWFr5WLN9ZISaS8v4BmOn9PDgF0BmQVHe8uhRrGuipLDWFib1wYIbar1Ehm
-	 F4Bi6WC4EVCyv/H8/tdZ8Dp1jiupnLJCu1+aEUz/JfIrzOE91LwqLaAazeewz47bvP
-	 rPsLWYQUpT2Mg==
-Date: Mon, 15 Sep 2025 18:56:17 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Chen-Yu Tsai <wens@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej@kernel.org>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH net-next v6 1/6] dt-bindings: net: sun8i-emac: Add A523
- GMAC200 compatible
-Message-ID: <20250915-golf-antsy-9e71d5398324@spud>
-References: <20250913101349.3932677-1-wens@kernel.org>
- <20250913101349.3932677-2-wens@kernel.org>
+	s=arc-20240116; t=1757959086; c=relaxed/simple;
+	bh=S6AYIUqZuj+29Za+Z5p9GYQaH/iOstnmtVFh41Bl4eQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Y1jxYUejAuX2nCZ/frSlYdhKb2N2tNIzqsauFPXbY/3eQ9VXKnVizyhDwTQFE9WhnrIZr2vqqncKUVROeMOR+cvXOu0/xQLXYS3bxKsdxU8leC0xioap6/aL17qUXTkmkZsSbLQG5oPIepUpF1m6IqX4aI9x2TXA1xPXmz7iOuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x/ocnuNA; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b522c35db5fso2976598a12.0
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 10:58:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757959084; x=1758563884; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=f5E6fcbXSjyuILVnYyyYIio1vYZ0+VSuZo/De2Xr4gI=;
+        b=x/ocnuNAGt1A+xITEgxvycWtkH9BG8fHf++HXOJT1+EbXqIwaN8kWu/2CyIRG0LIoK
+         ioWOuVy7cU8+SjmpOGRSw67AqNi7r28QwBjB/jS+ULDB75+rw4CaBUp1un+8/wgZGpG5
+         VoNUNhMugMfNGjcuXi3C2ATbp7yW5grWvobxumM/uXtK2V5HFe7KGYwz8B5x9YUUVUvV
+         5UqN9wUQuRHYr9zO+7/1MrfGOFhyq4fVf1KpMeOKGV2da2P4fYgbGCJxTMM7IuQxSv4i
+         /ApMGDKMdiSWw8PHerTj/Wuv45cSxku5aZRY2r9dKr2hyhVxQLMBq2DqMxbJGfR0UT/t
+         B1/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757959084; x=1758563884;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f5E6fcbXSjyuILVnYyyYIio1vYZ0+VSuZo/De2Xr4gI=;
+        b=hmLXnc/6PJ+1J5EpT8GbLORA+TQLbSPQu2qBmN9nX7dzYvt9EekpHYQD0bd/pdTBV/
+         a4Ga61ARUeqwj7Xau85P0UAZbv+33rHnesYZkInAh+l6O2jDFRUOXe/XtC7ULGADaKub
+         ADWJBwXfNHd6ITvkkU2W1W1eR9lkxIJUewID2Grs3U5P2Nd8GIIo0ih5kEKkq16K6dDX
+         lHoXpcSJd9PNgthxKCD2Ooga7OlCZv2gQRcvC58THqO/LFP07viOKd/N93BfSWsdVUxW
+         uc9Q99cCyGbVJieTVonEb7S0o+NpVSnszH/S2a4hKOwYg20uT05ruKZ0Rb/wzEyzJbFr
+         qfmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7qeZ1gDeqWsZlWvUqza7d9ZnP4OxRGQocRR5TYb8JCjP2OGsXCn2EU75sFoPBC/fxWXX6kNY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+2VAgMcM6CT2v/coR4vin+De6r4LOICd+RWy9Hfie4d5aaIKA
+	lFjLHMKp260QVR1KExHEEHLVSqXNbn5Nca8/4SS7ZgbcmDGv7+HUMOdjdc0uUDwg/lrd9MwDW5b
+	ZezohjQ==
+X-Google-Smtp-Source: AGHT+IFD4HQElR0ew6DKw9Oenavico71i8TnPPOHfW8i/fGGDtO3jsdkcZu7IBxTsotT02PF6tOLKodsuII=
+X-Received: from pjd16.prod.google.com ([2002:a17:90b:54d0:b0:323:25d2:22db])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7f90:b0:24e:95c2:9081
+ with SMTP id adf61e73a8af0-2602a59389dmr15715289637.3.1757959084023; Mon, 15
+ Sep 2025 10:58:04 -0700 (PDT)
+Date: Mon, 15 Sep 2025 17:56:45 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="PtuhxQmA1Ve8bM5+"
-Content-Disposition: inline
-In-Reply-To: <20250913101349.3932677-2-wens@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250915175800.118793-1-kuniyu@google.com>
+Subject: [PATCH v1 net 0/2] tcp: Clear tcp_sk(sk)->fastopen_rsk in tcp_disconnect().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot reported a warning in tcp_retransmit_timer() for TCP Fast
+Open socket.
+
+Patch 1 fixes the issue and Patch 2 adds a test for the scenario.
 
 
---PtuhxQmA1Ve8bM5+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Kuniyuki Iwashima (2):
+  tcp: Clear tcp_sk(sk)->fastopen_rsk in tcp_disconnect().
+  selftest: packetdrill: Add
+    tcp_fastopen_server_reset-after-disconnect.pkt.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+ net/ipv4/tcp.c                                |  5 ++++
+ ...fastopen_server_reset-after-disconnect.pkt | 26 +++++++++++++++++++
+ 2 files changed, 31 insertions(+)
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-after-disconnect.pkt
 
---PtuhxQmA1Ve8bM5+
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+2.51.0.384.g4c02a37b29-goog
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaMhTQQAKCRB4tDGHoIJi
-0ua/AQDDYt/Sy0eQGk4ojQ0b/BXXDaihykUMqx+YkoTxwrYBSQD9Hk7iZgJFQbQi
-/RNfwxM6H3OrFi9YeWXkX4kS9q4zCQ8=
-=C54e
------END PGP SIGNATURE-----
-
---PtuhxQmA1Ve8bM5+--
 
