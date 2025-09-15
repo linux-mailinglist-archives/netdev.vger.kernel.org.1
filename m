@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-223200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7BBCB5842A
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0357B5842C
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 461B52A2069
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:58:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C782D2A17CC
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43A92C159F;
-	Mon, 15 Sep 2025 17:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D51A2D5C92;
+	Mon, 15 Sep 2025 17:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MLJO3ZIN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UUc2fwoN"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F8C242D78
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 17:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A332E2C08BF
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 17:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757959087; cv=none; b=asxSAsacslK8jKM4EWyhyYtxlW4Q4MmQvSizUkUySg31EaBi/S3/BWQjDjSdpnDEkfSA/vGHr7vSNthkUM3BUYdkp4QEEmShhU7gtKIQNXtAGZIu2HRzR/sCh/jX8uJezjEdYuIMf/U9PX8e8ZHfXmYg7s45BOu+0803obJTHXA=
+	t=1757959089; cv=none; b=KwDDvj/1IDeeJipC4jDY2768TQQtx0VFz6E0ArONjRKBcG0D3bOza8jjJbZLritLVH/jFXh1usIXWDqrwzMO2oHAgS22/YeDJ65547rvhIlDwMfDBByjyzeUbV7h5ZRtuI1vxqVP1gFtrOllLNXW6eNrczILArvSvRQpY0BKW00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757959087; c=relaxed/simple;
-	bh=bI74I7TdDZyuHC7VYTbDDYqA86R9/zyq0WWP9KETNIc=;
+	s=arc-20240116; t=1757959089; c=relaxed/simple;
+	bh=d34ou9ng9xpmvv/5o0b7L/bN+aFu31CdpF6pxJ4sd0Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EwrChAAflYlENFcWh+9K5/nBR/iT3JQ12KCtN6MekboMQjR5DbxJiFZiAZ9s0rth+8rfXts+nd6xnhce1bjEQohbUVYKFRd6u4EUVx7AnIxfwMA7wUU2L86e5uCvNgihRzurc1OBLyWuwMug/eyuuf3cCUV03Y7YxqeqfL3hYnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MLJO3ZIN; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=Hz+lGic0nCD6d72YLoi5gsiuCt78AI8tTpsINvrOzjWTVUO4bwqGMHUeapdsPeL4VShE/AKdLlRTHiRqN8nLjpX1Qc3AvEiAJQ4VucTcKLE9WBTy+msapoigz6+8/REMnigvNgOxaK6rgerNJ8Z4zlN1loG7Lm9uflBmxpQ0siE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UUc2fwoN; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7724877cd7cso4580383b3a.1
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 10:58:06 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77429fb6ce4so4187784b3a.2
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 10:58:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757959085; x=1758563885; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757959087; x=1758563887; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tz2jpaeOsnOKsLURBvXysIf6ek7h5UTW9Vw7XdinUsE=;
-        b=MLJO3ZINYsubVb5glW3OrK3TKiLDkRf8LzW/lU52P/PpeBOOEw+qPhAYsmffF8kVqs
-         VIkjW9Z3egpdBw8AKU0V1AgdoQT7AnSWN5v59EE+E1Ca0nu1007dGwxrhrlTkhDO6ah5
-         F8CFs4xoVRZIknlIP53TrRQs9+9d69VWKzgNvtXAaETN1dan7uotMrfYjCQgnCIEnGv6
-         SXXkm9lDgz2SwJE5rFVcYVjiXzYccoIFz++mTDAI/0sw4CtjEma5e65Y3HBc99A0lrPL
-         GuGaXuyhHm6tAkdEFdRj7natJrNuxabZA0NiVwuprCXu5aT0OYZQsEZRpl4B/G2qLk05
-         h0dg==
+        bh=UZ612J1OTvxIX2VsThcaylv9e17y6VGBcZAW9B8kwcc=;
+        b=UUc2fwoNFZFBG4CKNYM0R3DMOOe1eDOZliYZ8KJ39CIRpBcMP23O9H29Wap8Nn/8pt
+         cvOlBiTvrnolJ/dXKvoi8/dvWNMxm86Y7dfYvEYiIjeZBM7lQ+DCCaiO61UBoOaDf2nQ
+         AvOBP5dxkxi1/+smaJ0FKfZDRZc1wZ6+lkj0LYLgfhsYQ+sLCAH9KYTgrLSVDME+2ywc
+         TFhUnXmahpG1ZNhNpJshb64LGe4NflZ8PcAag7ygsQL6ZAcDUYY5mJ0E5JtXHX/9t7ox
+         9udgm5HcixZuTNlhxTpsUXLrqB5je67BivZHop6kaeawM51TfWi2AcRKfhvIhTjPPrCS
+         kH/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757959085; x=1758563885;
+        d=1e100.net; s=20230601; t=1757959087; x=1758563887;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tz2jpaeOsnOKsLURBvXysIf6ek7h5UTW9Vw7XdinUsE=;
-        b=OGUhxzu0SYblfpFRHa666oAZff9KLwZJ0k+XDde7g65BxcfErC0HsDgWKpf37VeuIn
-         UtTIY5hJBg2IRQ6YC8RnluSqsgalvhVlvn9pkYh7sl9N8dRZmvHtF1b1hfIXjBPGCdQw
-         ng/rEUg99qAZbuFle35AllyhUQsabKuACZ7PItAfoXTOLcw2wkQfKx0ipS5zgKP/eSTD
-         aK/yMUu4eQIsVQAqkJBmDFa6e1/ADceRHQFX3BfYS6lstbyPnbN5EmprtWtnkagPIsbi
-         31ezLLlz+FMjxWo14ucC2mH6TLDXdr2ajUnIVPR3xKIB0YxhW8EReAHFwxEFvhcLsID2
-         wh5g==
-X-Forwarded-Encrypted: i=1; AJvYcCXTWHW+Kdp2ixY53I4szaSGWvrjVeOTT2ZolKral/4hP5pwcE+wqN32sG111PMmmzYVMtnjJH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCXVgK7BkkfWhyxAJgyJaRdfdqY6c5r3TUSfrAFkTCdWPBbuGj
-	79qUEhPqLCfN4HVHBBzq5gRivnHwyYfxIzn4YB7/zBAXIJ0/+C2/StLhOn/+D0S0zzbpoD2Mo1P
-	YqbNK2w==
-X-Google-Smtp-Source: AGHT+IGdiwzDapMGvlgg3htSKTzk88/1VRBLaT6deorGRfg4CqYgDAA+yh/pgxBr7S61pa1yiBP3A97lZcE=
-X-Received: from pfbgh4.prod.google.com ([2002:a05:6a00:6384:b0:76b:3822:35ea])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:72a0:b0:253:6b75:b174
- with SMTP id adf61e73a8af0-2602b08475amr17458109637.25.1757959085525; Mon, 15
- Sep 2025 10:58:05 -0700 (PDT)
-Date: Mon, 15 Sep 2025 17:56:46 +0000
+        bh=UZ612J1OTvxIX2VsThcaylv9e17y6VGBcZAW9B8kwcc=;
+        b=gWuHgb7H2xKGqdgBlK+0me3G5h4S0bIeNWlAsZT86wfEtK08bgmGlH4ycznF6tGj+i
+         Rcfu7H1GXuB0LWfAsIBkJ7kWJrNtlliM2QDAuJDtxRHPMUB9PKUg/Up5DBite6Lj8zyc
+         KNhPLRv/vTaro5trTD04vc6a20rm36QGRHLUvbtrEL9Epy45LGSrD1tx4yZy3kNfsuu/
+         R3hFdM77HMDTEfNxJc6x6xiLbwpAKfHtMLRdeCPhD3h87o0+fntZtgItRkskrnZ6SPPl
+         J4e9gvAvovoG+Im8bdUYUovd7lVAn7EGmXHeSqVtpLdf+lEiPm2iGDvDpyvhZYu8XTnp
+         Hspw==
+X-Forwarded-Encrypted: i=1; AJvYcCWrsM9z7O/nbocBFEYV6MVMICQQGObY+0kJ1C1cRX7DBjLUQV4vkcJdgmM83LM1Y1XdtB5RYdc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0UVZbV6OUigYLka9Q2+Ywg1EGOORZosZci3ExmB5ZsiFZZtYE
+	V0lkysLTL62vKkvqKcKZ4TjsFNZKRkeo2RqlVX2AvzzsG2ft516OSCaky7/9k1kAWIdnY8QjUsK
+	TX1rnpQ==
+X-Google-Smtp-Source: AGHT+IEewbCHsOimx7KMIge/pLJJbD6MLAeohuys4VLAcO3Bx52BWoqMX9AlyW48yijTojVJghjIvOqtnA4=
+X-Received: from pgda13.prod.google.com ([2002:a63:7f0d:0:b0:b52:180f:e5aa])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:999b:b0:245:fdeb:d273
+ with SMTP id adf61e73a8af0-26029fa0baamr16000023637.4.1757959086960; Mon, 15
+ Sep 2025 10:58:06 -0700 (PDT)
+Date: Mon, 15 Sep 2025 17:56:47 +0000
 In-Reply-To: <20250915175800.118793-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,95 +74,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250915175800.118793-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250915175800.118793-2-kuniyu@google.com>
-Subject: [PATCH v1 net 1/2] tcp: Clear tcp_sk(sk)->fastopen_rsk in tcp_disconnect().
+Message-ID: <20250915175800.118793-3-kuniyu@google.com>
+Subject: [PATCH v1 net 2/2] selftest: packetdrill: Add tcp_fastopen_server_reset-after-disconnect.pkt.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
 	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzkaller <syzkaller@googlegroups.com>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot reported the splat below where a socket had tcp_sk(sk)->fastopen_rsk
-in the TCP_ESTABLISHED state. [0]
+The test reproduces the scenario explained in the previous patch.
 
-syzbot reused the server-side TCP Fast Open socket as a new client before
-the TFO socket completes 3WHS:
+Without the patch, the test triggers the warning and cannot see the last
+retransmitted packet.
 
-  1. accept()
-  2. connect(AF_UNSPEC)
-  3. connect() to another destination
+  # ./ksft_runner.sh tcp_fastopen_server_reset-after-disconnect.pkt
+  TAP version 13
+  1..2
+  [   29.229250] ------------[ cut here ]------------
+  [   29.231414] WARNING: CPU: 26 PID: 0 at net/ipv4/tcp_timer.c:542 tcp_retransmit_timer+0x32/0x9f0
+  ...
+  tcp_fastopen_server_reset-after-disconnect.pkt:26: error handling packet: Timed out waiting for packet
+  not ok 1 ipv4
+  tcp_fastopen_server_reset-after-disconnect.pkt:26: error handling packet: Timed out waiting for packet
+  not ok 2 ipv6
+  # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
 
-As of accept(), sk->sk_state is TCP_SYN_RECV, and tcp_disconnect() changes
-it to TCP_CLOSE and makes connect() possible, which restarts timers.
-
-Since tcp_disconnect() forgot to clear tcp_sk(sk)->fastopen_rsk, the
-retransmit timer triggered the warning and the intended packet was not
-retransmitted.
-
-Let's call reqsk_fastopen_remove() in tcp_disconnect().
-
-[0]:
-WARNING: CPU: 2 PID: 0 at net/ipv4/tcp_timer.c:542 tcp_retransmit_timer (net/ipv4/tcp_timer.c:542 (discriminator 7))
-Modules linked in:
-CPU: 2 UID: 0 PID: 0 Comm: swapper/2 Not tainted 6.17.0-rc5-g201825fb4278 #62 PREEMPT(voluntary)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:tcp_retransmit_timer (net/ipv4/tcp_timer.c:542 (discriminator 7))
-Code: 41 55 41 54 55 53 48 8b af b8 08 00 00 48 89 fb 48 85 ed 0f 84 55 01 00 00 0f b6 47 12 3c 03 74 0c 0f b6 47 12 3c 04 74 04 90 <0f> 0b 90 48 8b 85 c0 00 00 00 48 89 ef 48 8b 40 30 e8 6a 4f 06 3e
-RSP: 0018:ffffc900002f8d40 EFLAGS: 00010293
-RAX: 0000000000000002 RBX: ffff888106911400 RCX: 0000000000000017
-RDX: 0000000002517619 RSI: ffffffff83764080 RDI: ffff888106911400
-RBP: ffff888106d5c000 R08: 0000000000000001 R09: ffffc900002f8de8
-R10: 00000000000000c2 R11: ffffc900002f8ff8 R12: ffff888106911540
-R13: ffff888106911480 R14: ffff888106911840 R15: ffffc900002f8de0
-FS:  0000000000000000(0000) GS:ffff88907b768000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8044d69d90 CR3: 0000000002c30003 CR4: 0000000000370ef0
-Call Trace:
- <IRQ>
- tcp_write_timer (net/ipv4/tcp_timer.c:738)
- call_timer_fn (kernel/time/timer.c:1747)
- __run_timers (kernel/time/timer.c:1799 kernel/time/timer.c:2372)
- timer_expire_remote (kernel/time/timer.c:2385 kernel/time/timer.c:2376 kernel/time/timer.c:2135)
- tmigr_handle_remote_up (kernel/time/timer_migration.c:944 kernel/time/timer_migration.c:1035)
- __walk_groups.isra.0 (kernel/time/timer_migration.c:533 (discriminator 1))
- tmigr_handle_remote (kernel/time/timer_migration.c:1096)
- handle_softirqs (./arch/x86/include/asm/jump_label.h:36 ./include/trace/events/irq.h:142 kernel/softirq.c:580)
- irq_exit_rcu (kernel/softirq.c:614 kernel/softirq.c:453 kernel/softirq.c:680 kernel/softirq.c:696)
- sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1050 (discriminator 35) arch/x86/kernel/apic/apic.c:1050 (discriminator 35))
- </IRQ>
-
-Fixes: 8336886f786f ("tcp: TCP Fast Open Server - support TFO listeners")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv4/tcp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ ...fastopen_server_reset-after-disconnect.pkt | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-after-disconnect.pkt
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 71a956fbfc55..ad76556800f2 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3327,6 +3327,7 @@ int tcp_disconnect(struct sock *sk, int flags)
- 	struct inet_connection_sock *icsk = inet_csk(sk);
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	int old_state = sk->sk_state;
-+	struct request_sock *req;
- 	u32 seq;
- 
- 	if (old_state != TCP_CLOSE)
-@@ -3442,6 +3443,10 @@ int tcp_disconnect(struct sock *sk, int flags)
- 
- 
- 	/* Clean up fastopen related fields */
-+	req = rcu_dereference_protected(tp->fastopen_rsk,
-+					lockdep_sock_is_held(sk));
-+	if (req)
-+		reqsk_fastopen_remove(sk, req, false);
- 	tcp_free_fastopen_req(tp);
- 	inet_clear_bit(DEFER_CONNECT, sk);
- 	tp->fastopen_client_fail = 0;
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-after-disconnect.pkt b/tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-after-disconnect.pkt
+new file mode 100644
+index 000000000000..26794e7ddfd5
+--- /dev/null
++++ b/tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-after-disconnect.pkt
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0
++`./defaults.sh
++ ./set_sysctls.py /proc/sys/net/ipv4/tcp_fastopen=0x602 /proc/sys/net/ipv4/tcp_timestamps=0`
++
++    0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 3
++   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
++   +0 bind(3, ..., ...) = 0
++   +0 listen(3, 1) = 0
++
++   +0 < S 0:10(10) win 32792 <mss 1460,nop,nop,sackOK>
++   +0 > S. 0:0(0) ack 11 win 65535 <mss 1460,nop,nop,sackOK>
++
++// sk->sk_state is TCP_SYN_RECV
++  +.1 accept(3, ..., ...) = 4
++
++// tcp_disconnect() sets sk->sk_state to TCP_CLOSE
++   +0 connect(4, AF_UNSPEC, ...) = 0
++   +0 > R. 1:1(0) ack 11 win 65535
++
++// connect() sets sk->sk_state to TCP_SYN_SENT
++   +0 fcntl(4, F_SETFL, O_RDWR|O_NONBLOCK) = 0
++   +0 connect(4, ..., ...) = -1 EINPROGRESS (Operation is now in progress)
++   +0 > S 0:0(0) win 65535 <mss 1460,nop,nop,sackOK,nop,wscale 8>
++
++// tp->fastopen_rsk must be NULL
++   +1 > S 0:0(0) win 65535 <mss 1460,nop,nop,sackOK,nop,wscale 8>
 -- 
 2.51.0.384.g4c02a37b29-goog
 
