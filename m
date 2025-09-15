@@ -1,143 +1,123 @@
-Return-Path: <netdev+bounces-222937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8747B571AB
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 09:38:48 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7D8B57207
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 09:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A44B3A570A
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 07:38:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6F27B4E1713
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 07:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21262D595A;
-	Mon, 15 Sep 2025 07:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268972D663F;
+	Mon, 15 Sep 2025 07:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4TfD9VM"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="AlhJ2HZs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1392C0F79
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 07:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C532D739B
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 07:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757921924; cv=none; b=ScQJn4QZ48K9UJPDCRyhg2nsCp9A14tXMh3f3PgTSnkuTNBJmce2TrlCX0CBhQ0kd2H1LnO0UIqUkY8BDGrG6CGGbg8ZzTtqriEeImZL7eEmssswLzyX2dIpW/+bWFm6d4LObnVDSAHK6iVfd0zv+rn1XymeQEHLxu8vnq0oiA8=
+	t=1757922711; cv=none; b=e+UrOLCWvomekhZL31XseiSk6WI9coo+6kCCyvKtOBWFtyuulxX4taBTYxnvfpZwJ3b/HhAVPfoejUKEeJi24UPB42wtFkaW0NAPd3ucXYPceyPL4F8pVQUR56KxTSRNjs6PB4cJ0dBwoidtk6J/BrfQ1YB1V8wxWNJ3WVbLZaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757921924; c=relaxed/simple;
-	bh=kGHwg3luaanPBk/Byu/i1GQ/JK31vdNJbOeeSmaUbuw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QkKkPorJ0SHfTp5liEC9iJ1LiZVjbcQ25hnB7MN1GT99QjfqW1ODmis1seVACzXFookVOKe6XLvy5mlb43P8R6klqAV8p4qc5K+fwF/0/cagH4hSV3BsOrhOjVrn8XmQ1t6zCjNzQEaPQ0aUEZXGc7TgZCNbqYadscJYPHFKGjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4TfD9VM; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45df7dc1b98so25845025e9.1
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 00:38:42 -0700 (PDT)
+	s=arc-20240116; t=1757922711; c=relaxed/simple;
+	bh=TIUykqSVlqjMNwtVv4K7W+Ru6Hg2RdZqkUzbnXeg9IY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SW5MidG0+Agqs9nVN28g9otMKescRf+Tf4LSpUQI95Nr2cBI+Aiinvmv6ttRn+yqAFd9T897vJt4hdEUZfrVFTkJbn1u4MfnB631Zfc6fvHcVIRJTTISrtpPsFyMmrQ9BsBybARU12rDYyvpvP1tntx5pMittpztsJ+Gp6CckTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=AlhJ2HZs; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-32e1b2dba00so1179067a91.1
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 00:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757921921; x=1758526721; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JanCUlFRjj5laV++kf8eFiKJiHLqqlH/hnFp+08fd18=;
-        b=R4TfD9VMicu4a+dndbYW2Pupiy7oleCgttsD4I3EJ8FNX0Dk4WSl+mGHE4ABpzi14+
-         2n7Cn+gdHLbe+EU5lHVgpccdC0M8BKIG8N4AJHQZh8lsZyC3TyA7Iu5Is3hz5gydaO7h
-         EohqoQCSpPgI2JCwBnEUuYgjVDbk90PtV/YkY3sxNpFGpMBzLW4k04ikRlwG3RmTv3Xf
-         cTq+BfPJH4okDNrqVE5Ay6eYO0hWzA2emOK1sGjSIX7hDfeKa95Fm4T2Rwxcp2NwjYwv
-         fWfqMzpYFKVRwiMFzJ6sTIcmsrVmMehe54l+hX1oN7bf4pl4DuaKY+rMXA5ibUm5r6AL
-         xylA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1757922708; x=1758527508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TIUykqSVlqjMNwtVv4K7W+Ru6Hg2RdZqkUzbnXeg9IY=;
+        b=AlhJ2HZssR5Wkvx9yMFOvsz4/LacoYr/QOEZqulUeIbUA4UpX02oymylMSrO2aNV/x
+         yR5/45HvOARJqxP5pmyCzNBZD4i7JWvXmY4HrvTdJb+CbCci2M/20KiixgfuS9vnj7Jp
+         a04Ss3oFif41KBMT9CGCUmoiefNi3m3rFks5uBqC5dprYM0WNjWWDniJNQ1uGYHTyYm/
+         9rqkJufxsB64gT7kxZsuCvfCrrYBEUj6nvRYQ8ydJYG6KNhjF8GeCD/wNToYlDe/Uux6
+         lSR/A+XPE79wcXs7Z6BR+W16l2IEpLulOUg8lTsTElxKEkZqbvXICBodZLQDaHn+RjL7
+         rivA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757921921; x=1758526721;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JanCUlFRjj5laV++kf8eFiKJiHLqqlH/hnFp+08fd18=;
-        b=YIeFKNqHs+yR5xCNiS/Gsx3sF3rKWF8MWdzQ+o/LLDBv/KMiTt/IsBJNZzkN3aLuD2
-         u/wNQHgYiwLOdIl3W7bTPwY+DoNvLGDZgQSncksYjCtXQtMW4/8phht/ozqz9JC2L4vw
-         m/AA4N0w5mjcJmeInRtjnv7KJ4pfETSQKDE1IfXTT43/LgU0h8w7aPfynbEHR2Lz61HE
-         dIvURqg0w8c7UWtCJauEqHnUOJJDnHNFvHdSMvyXAwuhYBRCgL76O97Sq7FWx8RLPdOf
-         Ize2SdndDbVprLW03Y6RYVFV5T0JTJZDVnYanaGj9QfGsF8dgTn4mhf5vCRQQj7DXGtF
-         4e/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5oQ9cExA9WCaPBg1Ufn/aYa7wv5lZwZT2vuAHuzq/NMV+ZGy1dUw/xMxgt0wjVzHxzYFsI6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywsk3+sBOtUQVhpGJZni5ypVWK9S7wIF5giKA54GRdk6mI5Vct1
-	XE775N4ChJ8UBhIp6Xvc7BhvZfmMDOJH58rDzt4BJYUPMPuhVQHrOKoJ
-X-Gm-Gg: ASbGnctxBpc+MkLrmK6R5B2gaRMy/EJjCKH0hdk1AOyH4pgESR/vA7LCP00PqBPyQdv
-	Z8JRXqjPq102pMcVAJxnPbKxVjluSNSac1UH/CsaKKboEea9IB7Y4mpZPf7cy1qHuzN+xGAugnb
-	pRkwFGHm/EhygFEJziFM+bB96EU+b3bfww95rSvMaRiQ7KzCu9qAbcl5OV6QUorzM6lRajwbOvz
-	Hw4WIM/OKiXFOgtx+2+9BXIvyGrUxZ6ZgV3XICgcjc3VoxOKc4qP/Br4xvBzMmH+dGfQ2DQYceT
-	hLrXJFjljjl6YN3TxeAO13iMAD6LYqRAGaltBmp+qrd/AC/j4Nv1PNu8cDFhomtJT3SQDmaj6rZ
-	RBFoKFEr1eTYOc2DViU2e0S+BYowoxjZx/NBqm1NC6yldQJ8NdaxtWQ==
-X-Google-Smtp-Source: AGHT+IGgiNZFCx3A7Cjv6G6Nbr0a0VbqLvidbmj1KLlT+PabE1SdR3T2bnemHbr80ONhrSj9iyyLsg==
-X-Received: by 2002:a05:600c:3515:b0:45f:28ed:6e1e with SMTP id 5b1f17b1804b1-45f28ed71c9mr64761095e9.16.1757921920946;
-        Mon, 15 Sep 2025 00:38:40 -0700 (PDT)
-Received: from [10.80.3.86] ([72.25.96.18])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e0157619fsm169321285e9.7.2025.09.15.00.38.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Sep 2025 00:38:40 -0700 (PDT)
-Message-ID: <af70c86b-2345-4403-9078-be5c8ef0886f@gmail.com>
-Date: Mon, 15 Sep 2025 10:38:39 +0300
+        d=1e100.net; s=20230601; t=1757922708; x=1758527508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TIUykqSVlqjMNwtVv4K7W+Ru6Hg2RdZqkUzbnXeg9IY=;
+        b=XIVxj6XWZcTp5tzBUoJry1CNJSWrnN7mqmDAyFzY4vlP1wT9uV6Mg0UNs7zR/pOGKb
+         n061JP1slMwPco6MIdRpZLpKn3prmZ/0lGyp/7Nv65yZLbtfIuETcQ0A6TywJSpAVsuE
+         qCRMa/DOmu2qF656O3NUaL8MtHnEYqr44PWgoVMZtTk1BH3gWcm92awNfWxH79B0wq4X
+         rPHJgLXq5XwXDIZdA/ctw78rbWPpfyn8yap6b+Aqf3pBmci/lfhJaTQ20vT8MONJmOL7
+         Rpc1zTxBb/idmq9IKCwh1nn3VkRHz47tYSYOgnJn96KeV2q2RY+sgspkLqQzyzhV+M8d
+         J2lQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2ql74p+6EAMLV4u9c9m6SLNKIoQry4uRRJK7SRQLhaVuh+Bp1eZcInHlPgR1YS/SpwCBRW7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzjd6/FSE4rcgI2PQHtzplqALOxKSb+uq8YevcqN3vL524ID47J
+	FoaI23wp/EfFO8ZQr5V+VUrWyX+mnYPVTLX/HWNrJE9aB30U4HJM0U/QfoF9jspnTSmDY9+eWNh
+	BzwFK8AvGI08MP2BDUdYSZLGm5F2e9QYd/YlhG11/
+X-Gm-Gg: ASbGncsA+UZVdRczdF0y56ZMlG52KKFVLKU20Zh5M/u/h1aQgovfteY+pZk/cwwfyOc
+	6mJCFOdayhIRQIHpau8O3LSF48865W2+Zun8P+wRKYyr1F2/F1EDPQmzFRpnD5SZZzEOAhBr0xY
+	MtSI3+tQsI3LGrSL+zpjSvtDNPIQ+WA0z6xt28b5T3dmHGAA1DBpRhC8nV0allW3I1WFNI4DlPG
+	aB4Wb+7ugdZqyxy/2Ec7EP9jZ3sLYJPFsHppIeUjJOQqYCRE3ifkLRiYtk=
+X-Google-Smtp-Source: AGHT+IESdl3p2ny4HFv4v32UYdjhTPEJJJzNYt1DsDb5yMYZ2iBKM4++dZKr9nKUBLCeAUCqu58vWOwnvloutkugsrc=
+X-Received: by 2002:a17:90a:e18d:b0:32b:bc2c:fa1e with SMTP id
+ 98e67ed59e1d1-32de4fb9f20mr10699452a91.36.1757922708313; Mon, 15 Sep 2025
+ 00:51:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V2 10/11] net/mlx5e: Update and set Xon/Xoff upon port
- speed set
-To: Jakub Kicinski <kuba@kernel.org>, Mark Bloch <mbloch@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, linux-rdma@vger.kernel.org,
- Alexei Lazar <alazar@nvidia.com>
-References: <20250825143435.598584-1-mbloch@nvidia.com>
- <20250825143435.598584-11-mbloch@nvidia.com>
- <20250910170011.70528106@kernel.org> <20250911064732.2234b9fb@kernel.org>
- <fdd4a537-8fa3-42ae-bfab-80c0dc32a7c2@nvidia.com>
- <20250911073630.14cd6764@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250911073630.14cd6764@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250907014216.2691844-1-jay.vosburgh@canonical.com>
+ <CAM0EoMmJaC3OAncWnUOkz6mn7BVXudnG1YKUYZomUkbVu8Zb+g@mail.gmail.com> <d5b7afbf-318a-49c8-9e40-bcb4b452201b@gmail.com>
+In-Reply-To: <d5b7afbf-318a-49c8-9e40-bcb4b452201b@gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 15 Sep 2025 03:51:36 -0400
+X-Gm-Features: Ac12FXyDIzC8gC5c3ATbcTZlcOBV-j65w-3laXB3hp_jRdl9ovVz1d5K-jasy3U
+Message-ID: <CAM0EoMmA1j=q0XtNB_Xax2eVuyAKtnrkkZuXAm3O34asqGNk0g@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next] tc/police: Allow 64 bit burst size
+To: David Ahern <dsahern@gmail.com>
+Cc: Jay Vosburgh <jay.vosburgh@canonical.com>, netdev@vger.kernel.org, 
+	Stephen Hemminger <stephen@networkplumber.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Sep 11, 2025 at 4:50=E2=80=AFPM David Ahern <dsahern@gmail.com> wro=
+te:
+>
+> On 9/9/25 9:32 PM, Jamal Hadi Salim wrote:
+> >
+> > Please run tdc tests. David/Stephen - can we please make this a
+> > requirement for iproute2 tc related changes?
+>
+> I will try to remember to run tdc tests for tc patches. Without an
+> automated setup, there will be misses over time.
+>
+> >
+> > Jay, your patches fail at least one test because you changed the unit o=
+utputs.
+> > Either we fix the tdc test or you make your changes backward compatible=
+.
+> > In the future also cc kernel tc maintainers (I only saw this because
+> > someone pointed it to me).
+> > Overall the changes look fine.
+>
+> Sent a patch to add a tc entry to iproute2 maintainers file.
+>
+> You say the change looks fine but at least one test fails meaning
+> changes are requested?
 
+Pending the kernel patch being applied...
 
-On 11/09/2025 17:36, Jakub Kicinski wrote:
-> On Thu, 11 Sep 2025 17:25:22 +0300 Mark Bloch wrote:
->> On 11/09/2025 16:47, Jakub Kicinski wrote:
->>> On Wed, 10 Sep 2025 17:00:11 -0700 Jakub Kicinski wrote:
->>>> Hi, this is breaking dual host CX7 w/ 28.45.1300 (but I think most
->>>> older FW versions, too). Looks like the host is not receiving any
->>>> mcast (ping within a subnet doesn't work because the host receives
->>>> no ndisc), and most traffic slows down to a trickle.
->>>> Lost of rx_prio0_buf_discard increments.
->>>>
->>>> Please TAL ASAP, this change went to LTS last week.
->>>
->>> Any news on this? I heard that it also breaks DCB/QoS configuration
->>> on 6.12.45 LTS.
->>
->> We are looking into this, once we have anything I'll update.
->> Just to make sure, reverting this is one commit solves the
->> issue you are seeing?
-> 
-> It did for me, but Daniel (who is working on the PSP series)
-> mentioned that he had reverted all three to get net-next working:
-> 
->    net/mlx5e: Set local Xoff after FW update
->    net/mlx5e: Update and set Xon/Xoff upon port speed set
->    net/mlx5e: Update and set Xon/Xoff upon MTU set
-> 
+Acked-by: Jamal Hadi Salim
 
-Hi Jakub,
-
-Thanks for reporting.
-We're investigating and will update soon.
-
-Regards,
-Tariq
-
+cheers,
+jamal
 
