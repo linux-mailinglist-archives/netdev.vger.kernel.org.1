@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-222907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA13B56EAE
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 05:07:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8E88B56EAF
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 05:07:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3ACD16D620
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 03:07:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB199173E1D
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 03:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DE1230BCB;
-	Mon, 15 Sep 2025 03:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6225233136;
+	Mon, 15 Sep 2025 03:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VE1uJAkc"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UlvN8Zit"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f100.google.com (mail-io1-f100.google.com [209.85.166.100])
+Received: from mail-pg1-f227.google.com (mail-pg1-f227.google.com [209.85.215.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244C621ADCB
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 03:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F4722F75B
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 03:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757905562; cv=none; b=UfD21bTRPVWOgpyeaGCGcRpCHK9do3cPg7LLqfzTOwyoDk3ZDW1A9xTG+0VQZTxVj3m1i6vPFzNqF9W6GdL+55SvuoMVCo3dY7fS9YOw7iLynhWBSVNavSnzz3YQR2dbklIkz1tNIW9f1ddhENxl4gMNeG01opxkUyUqceNF3Lc=
+	t=1757905563; cv=none; b=d171pXkSMr1AMQ3Pci7rCSQjdMGVA9jj2lVqjM26r/ypQfc2j2WOapibwjZNOT5lcKAklbl1eArDodKjIUWHVo3yoyXN48qrPOf9FwdjGuJLlZcCABtwLzpn7AM4uK/78ptmIQNipe4HbeD0THXb9OnWQYMSClszy04spMEg1/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757905562; c=relaxed/simple;
-	bh=NfhWBmsRylLfhsJLrn1x00pHioL0uNyYIuPdbD6/0ag=;
+	s=arc-20240116; t=1757905563; c=relaxed/simple;
+	bh=T0rWBk2/cst3C//lEBm1PyEGk2YPR0qlZhfOvfQSvTI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QAfR57CmfFGqjSkkWbsfBCiQa69plLMyBHExoRefwoDk5WffELnNud+2ty9g0kGskPw4NT80KMXOlQjWD3ke1tU09IL9vHE4pG1aCKGqG+j7Glk5tAL6pKzgLGU1MIcv9azaVaz5sfqB+huWyDfwyIJFePw4/wU8RbrPYrqkBDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VE1uJAkc; arc=none smtp.client-ip=209.85.166.100
+	 MIME-Version; b=gqhRIA4zcl346AEaQIMC4r+3XMvi+Un8HqS+mdILVljV2TYVTUd411tNmQxBIQVF7iGVo8rPpOTBDVUrm7qIhbXfpUaUFxj8PoCIaxoxiBYq4w+OaD4LooUuTPVuXoRfrE1Tvj1C47xYNyoqfYgmCLrF9asVioFxCLPFwiMW8bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UlvN8Zit; arc=none smtp.client-ip=209.85.215.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-io1-f100.google.com with SMTP id ca18e2360f4ac-88432e1af6dso321903739f.2
-        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:00 -0700 (PDT)
+Received: by mail-pg1-f227.google.com with SMTP id 41be03b00d2f7-b52047b3f19so2606934a12.2
+        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757905560; x=1758510360;
+        d=1e100.net; s=20230601; t=1757905561; x=1758510361;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DJd0/kKLycxMmQkqbPHraxdypl0eRMdFsjzgQpNiWX0=;
-        b=EjV5IhiMoi7NNaLKTKICPZ87xb8GMRaBEHnsOP5N969xyXk5V0MC1n4+QwY/JYYXtB
-         aLiOE2vVLIe0oKJwaVZn/l08Pj39+ATk8o6PGBvhHboAzTobt+ZesYFziu8dzJE+RNEN
-         luTvmVb/tkLAPfHEq0yJvZnjsvebLYeBVK3SmMhi1xuy0zgxSNkrYRr89BC0d/6Z+1I/
-         005Tf2m+90aGF7vpOAJ+Nz/wemmphse06LwS45Kw4n4K/Tyy/bXXS78i0WPX0VHQ2kna
-         +bGJm8p+XRJHYNNWDE05lpG4WJ3b1IJJAg+U/CwkJo19UTwX6a2l0a9hRVYd1vhKjzv7
-         ybHw==
-X-Gm-Message-State: AOJu0Yy3vh/2b94gGhG6tlyVURlfs2QtCl832k866L6hh9eEM+opIETm
-	plr9b+ZkqAGcDOP5z71mRPgy+GW+O05NNZkwGG1Kh6+gjW6cDhrzGC+Ulnq8XyS1cg1T/tBqrQJ
-	i3OLv9fGibmUwOy9L0nbz/9pubxYkgXRFnsgdAgei8QyGxJYXR/gawEg/3kjV7N2L4gHokH9IRI
-	Szh0FEqLDOhOG++Xrj5sot2hRVdZ1dwkDmh+gaKw2SQWErSJH1V766ebxA7+BxH3DvJAK9DZ1oJ
-	VDR3ZpfoxE=
-X-Gm-Gg: ASbGncs4Gbw3HOBFzs6Rgzb2zbxbA/+AKKFoKCybVuIccGqRgEMXhh/FyxELmbBi5YC
-	dWVxwFjPJajCNZnAA9F7NvXPd2iZwnGkduUr00EkeqCGXUUdHHGoZOxmNG0RHDmxQ9CIvP7/7gh
-	1w2nih7r4H0hep66LUY/78b5yjGUkH9nxDgS6Opb/ONJ/bDEGMkoKqoJjaPiYwkvQiU5faMpqtR
-	kAc61383Oxn6vd7ne0Q05ynwVdpXAJUH0vzAmBHv4d8pYOLgBEVrA0EGpmAtuYHgxQUI0Goge8a
-	NAaatrPu4HstpD3V2k9acMnmR/GRZ3yJCDMcdORr6gohccRP4OKDLAjtK5le2/j6bewqF8d6aGG
-	H2zUQxLV7J5zIwvZoiDK4cVwQScJf05Y3lrWafgzhHkOT+bFp8NpVub0cfRmh7kOR+7sdgRy/wP
-	8=
-X-Google-Smtp-Source: AGHT+IH4rH3MIqlvyT8m/nCRZrgeCtdcCVS6TPXf6uZGpRkciKi1pkWMDdwJ1QWtdunmVPIiMJ267jOtw4ta
-X-Received: by 2002:a05:6602:3409:b0:887:5799:7ab0 with SMTP id ca18e2360f4ac-89034be430cmr1207011139f.16.1757905560235;
-        Sun, 14 Sep 2025 20:06:00 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-20.dlp.protect.broadcom.com. [144.49.247.20])
-        by smtp-relay.gmail.com with ESMTPS id ca18e2360f4ac-893793eb0e6sm3163139f.15.2025.09.14.20.05.59
+        bh=EkgzcGpggyz8+m3UB5aMFLhbNRjFNPjtiTscZDda+bA=;
+        b=j8RzOt59mYjdLfWmp7jbeKN6gEhIhHecfEPZ7m7GH2iy4BX82geBJAgDaqktp1gtWh
+         CLxrX1YM4BSU4ivzUY9PoZUxqRG/UT3PjutMtX3lpqKAoRYHFLIZNI0HGYPxg6G5uV02
+         jC+q6oPdoCFZIbUfDi0pv6ruW41Q7M/1paST0184VZGki5T54D3u+ZNxj6QNiqCAjICu
+         evqjY+NHfLJcIq2XuKFGB/XW/jpjkQwncbhKkMXrX34ov8dS+O6aAwIVnWmUst2Nx7xd
+         JYzc5tRdwodWBC2otrRzl2ub8QgkhtB1JkJ34RSjuyynHAXAU+WB6Q5BD0ur4xYVbTtt
+         ZHFQ==
+X-Gm-Message-State: AOJu0YyoubygLJmi4L5UHfH1OyrR3cAh5aliorCkrbPYjEQFoZy2GGMI
+	+JmKNmh1iKX+q8fFxxrGriDng26I2QgiOVvhP+FyEL0Se1nZJI4Ux/BiQx15WN7dtHm/kYqZ6uj
+	yGCKxfEIsrHlVJTVBkT8a4KJCDvKuFpWLtuJezIKhP1jsWdKtvDwJRfCXtnW/mvPkCbTF9qx7k2
+	bwPsb6CTO3drdsXnhiURSj6sxkeLfUpevBGuWjXzqYxgaFASdQ9OQjXeKDxlHS0ClOqaAt4ozjR
+	KvJPI0lRqs=
+X-Gm-Gg: ASbGnctJKX/IAVCDWXz/PxfB3sqy7AmRoOIDAHcLRb1SuDHwSSb7CsO8fJd0aU6ENYZ
+	7zpU+LQGdRfk7BT4gsW6Mv/set+C9oQpZlfyoJZDXm3IfITmLqqoi6ZuYrq+q63gTHd5+mRp4ls
+	ZJ7ahAvhOE0lxaBogwe0GiHyLe5TAGFZYzqQsGWxd6uWy0S8ehyBvao4OF3VEm5j1lEIvpBEedh
+	gqX9ub5MyT+r7L3kPlVulbvm9UWJo9GwljwQFLmPmD/C0ASU+n9ygSqC0tzPFWT7UVQurIWxdDX
+	mcE6gTdc3T9LWL2udZrq3inqm3ovVJRSSraGiATQdO5aW4HapJLzL9MYSfvPjAOW6tGt7rKX33W
+	6AG+iZfaPBYQHUZYd5H+zBmoH84+6be4h97cjM8ZBjU1xqhgwFiUyfRCr8aAN6UNuHLIz3kzizV
+	pi6w==
+X-Google-Smtp-Source: AGHT+IFeqhiHYIMpzi7FUeXFNhEesswmrm215LO3vrnxp6MT7saT8zFd30UMMpGMqXzaX2UfgygRB99Khp/q
+X-Received: by 2002:a17:902:f549:b0:24c:caab:dfd2 with SMTP id d9443c01a7336-25d2810636cmr115400895ad.61.1757905561453;
+        Sun, 14 Sep 2025 20:06:01 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2679e2e61a1sm163145ad.12.2025.09.14.20.06.01
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 14 Sep 2025 20:06:00 -0700 (PDT)
+        Sun, 14 Sep 2025 20:06:01 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b4c928089fdso5039101a12.0
-        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:05:58 -0700 (PDT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2621fab9befso12401315ad.2
+        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1757905558; x=1758510358; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1757905559; x=1758510359; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DJd0/kKLycxMmQkqbPHraxdypl0eRMdFsjzgQpNiWX0=;
-        b=VE1uJAkcuTl/jaWiK4vXFlvWwC+9JggnDYGYE9/bJbuX1xJ0KoErhuyYVvO6i2jUQ0
-         udUJC8vNjv3LeC3groq80Y4/Y5FW9/xSJDSsTu4x9E0PPvOB6A9ODJuxA2zxOUyUFujf
-         vFfsqVZbjwcfleDbgmEBlpY5vJbthpY2TYlzk=
-X-Received: by 2002:a17:903:1b68:b0:264:f3ed:ee10 with SMTP id d9443c01a7336-264f3edf620mr38819725ad.11.1757905558095;
-        Sun, 14 Sep 2025 20:05:58 -0700 (PDT)
-X-Received: by 2002:a17:903:1b68:b0:264:f3ed:ee10 with SMTP id d9443c01a7336-264f3edf620mr38819465ad.11.1757905557667;
-        Sun, 14 Sep 2025 20:05:57 -0700 (PDT)
+        bh=EkgzcGpggyz8+m3UB5aMFLhbNRjFNPjtiTscZDda+bA=;
+        b=UlvN8ZitNns0Mln7kJla+sUiD+BcK3xmm/jcFulMRWZgl5m5OUX55wtlrB1Pk9i9Yj
+         7pTeyuz0LbHZfp+xl680Ps3Z2yWtfT7DBJAvJM00rJYk4nWm0SrqDSCFVCWqnMufm9H4
+         tPqRiUa/hYSitubscZdB+L60YlujVc8utbhoI=
+X-Received: by 2002:a17:902:fc4b:b0:24f:fb79:e25f with SMTP id d9443c01a7336-25d27624323mr138149685ad.46.1757905559577;
+        Sun, 14 Sep 2025 20:05:59 -0700 (PDT)
+X-Received: by 2002:a17:902:fc4b:b0:24f:fb79:e25f with SMTP id d9443c01a7336-25d27624323mr138149485ad.46.1757905559255;
+        Sun, 14 Sep 2025 20:05:59 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3b0219f9sm112723575ad.123.2025.09.14.20.05.56
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3b0219f9sm112723575ad.123.2025.09.14.20.05.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Sep 2025 20:05:56 -0700 (PDT)
+        Sun, 14 Sep 2025 20:05:58 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -95,11 +95,12 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Shruti Parab <shruti.parab@broadcom.com>
-Subject: [PATCH net-next 07/11] bnxt_en: Add err_qpc backing store handling
-Date: Sun, 14 Sep 2025 20:05:01 -0700
-Message-ID: <20250915030505.1803478-8-michael.chan@broadcom.com>
+	Anantha Prabhu <anantha.prabhu@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net-next 08/11] bnxt_en: Support for RoCE resources dynamically shared within VFs.
+Date: Sun, 14 Sep 2025 20:05:02 -0700
+Message-ID: <20250915030505.1803478-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20250915030505.1803478-1-michael.chan@broadcom.com>
 References: <20250915030505.1803478-1-michael.chan@broadcom.com>
@@ -112,95 +113,90 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-From: Kashyap Desai <kashyap.desai@broadcom.com>
+From: Anantha Prabhu <anantha.prabhu@broadcom.com>
 
-New backing store component err_qpc is added to the existing host
-logging interface for FW traces.
+Add support for dynamic RoCE SRIOV resource configuration.  Instead of
+statically dividing the RoCE resources by the number of VFs, provide
+the maximum resources and let the FW dynamically dsitribute to the VFs
+on the fly.
 
-Allocate the backing store memory if this memory type is supported.
-Copy this memory when collecting the coredump.
-
-Reviewed-by: Shruti Parab <shruti.parab@broadcom.com>
-Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Signed-off-by: Anantha Prabhu <anantha.prabhu@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c          | 3 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h          | 3 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c | 3 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h | 1 +
- 4 files changed, 7 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c       | 8 ++++++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h       | 3 +++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c | 7 +++++++
+ 3 files changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 97165624acf5..dba3966c1ebd 100644
+index dba3966c1ebd..207a74450e38 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -266,6 +266,7 @@ const u16 bnxt_bstore_to_trace[] = {
- 	[BNXT_CTX_CA2]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_CA2_TRACE,
- 	[BNXT_CTX_RIGP1]	= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_RIGP1_TRACE,
- 	[BNXT_CTX_KONG]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_AFM_KONG_HWRM_TRACE,
-+	[BNXT_CTX_QPC]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_ERR_QPC_TRACE,
- };
+@@ -9632,10 +9632,10 @@ static int __bnxt_hwrm_ptp_qcfg(struct bnxt *bp)
  
- static struct workqueue_struct *bnxt_pf_wq;
-@@ -9159,7 +9160,7 @@ static int bnxt_backing_store_cfg_v2(struct bnxt *bp)
- 	int rc = 0;
- 	u16 type;
+ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
+ {
++	u32 flags, flags_ext, flags_ext2, flags_ext3;
++	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
+ 	struct hwrm_func_qcaps_output *resp;
+ 	struct hwrm_func_qcaps_input *req;
+-	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
+-	u32 flags, flags_ext, flags_ext2;
+ 	int rc;
  
--	for (type = BNXT_CTX_SRT; type <= BNXT_CTX_KONG; type++) {
-+	for (type = BNXT_CTX_SRT; type <= BNXT_CTX_QPC; type++) {
- 		ctxm = &ctx->ctx_arr[type];
- 		if (!bnxt_bs_trace_avail(bp, type))
- 			continue;
+ 	rc = hwrm_req_init(bp, req, HWRM_FUNC_QCAPS);
+@@ -9702,6 +9702,10 @@ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
+ 	    (flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_ROCE_VF_RESOURCE_MGMT_SUPPORTED))
+ 		bp->fw_cap |= BNXT_FW_CAP_ROCE_VF_RESC_MGMT_SUPPORTED;
+ 
++	flags_ext3 = le32_to_cpu(resp->flags_ext3);
++	if (flags_ext3 & FUNC_QCAPS_RESP_FLAGS_EXT3_ROCE_VF_DYN_ALLOC_SUPPORT)
++		bp->fw_cap |= BNXT_FW_CAP_ROCE_VF_DYN_ALLOC_SUPPORT;
++
+ 	bp->tx_push_thresh = 0;
+ 	if ((flags & FUNC_QCAPS_RESP_FLAGS_PUSH_MODE_SUPPORTED) &&
+ 	    BNXT_FW_MAJ(bp) > 217)
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 37c3f6507250..57a1af40cc19 100644
+index 57a1af40cc19..c0f46eaf91c0 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1969,10 +1969,11 @@ struct bnxt_ctx_mem_type {
- #define BNXT_CTX_CA2	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CA2_TRACE
- #define BNXT_CTX_RIGP1	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RIGP1_TRACE
- #define BNXT_CTX_KONG	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_AFM_KONG_HWRM_TRACE
-+#define BNXT_CTX_QPC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_ERR_QPC_TRACE
+@@ -2479,6 +2479,7 @@ struct bnxt {
+ 	#define BNXT_FW_CAP_ENABLE_RDMA_SRIOV           BIT_ULL(5)
+ 	#define BNXT_FW_CAP_ROCE_VF_RESC_MGMT_SUPPORTED	BIT_ULL(6)
+ 	#define BNXT_FW_CAP_KONG_MB_CHNL		BIT_ULL(7)
++	#define BNXT_FW_CAP_ROCE_VF_DYN_ALLOC_SUPPORT	BIT_ULL(8)
+ 	#define BNXT_FW_CAP_OVS_64BIT_HANDLE		BIT_ULL(10)
+ 	#define BNXT_FW_CAP_TRUSTED_VF			BIT_ULL(11)
+ 	#define BNXT_FW_CAP_ERROR_RECOVERY		BIT_ULL(13)
+@@ -2523,6 +2524,8 @@ struct bnxt {
+ #define BNXT_SUPPORTS_MULTI_RSS_CTX(bp)				\
+ 	(BNXT_PF(bp) && BNXT_SUPPORTS_NTUPLE_VNIC(bp) &&	\
+ 	 ((bp)->rss_cap & BNXT_RSS_CAP_MULTI_RSS_CTX))
++#define BNXT_ROCE_VF_DYN_ALLOC_CAP(bp)				\
++	((bp)->fw_cap & BNXT_FW_CAP_ROCE_VF_DYN_ALLOC_SUPPORT)
+ #define BNXT_SUPPORTS_QUEUE_API(bp)				\
+ 	(BNXT_PF(bp) && BNXT_SUPPORTS_NTUPLE_VNIC(bp) &&	\
+ 	 ((bp)->fw_cap & BNXT_FW_CAP_VNIC_RE_FLUSH))
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+index e7fbfeb1a387..1d8df44c3f9e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+@@ -541,6 +541,13 @@ static void bnxt_hwrm_roce_sriov_cfg(struct bnxt *bp, int num_vfs)
+ 	if (rc)
+ 		goto err;
  
- #define BNXT_CTX_MAX	(BNXT_CTX_TIM + 1)
- #define BNXT_CTX_L2_MAX	(BNXT_CTX_FTQM + 1)
--#define BNXT_CTX_V2_MAX	(BNXT_CTX_KONG + 1)
-+#define BNXT_CTX_V2_MAX (BNXT_CTX_QPC + 1)
- #define BNXT_CTX_INV	((u16)-1)
- 
- struct bnxt_ctx_mem_info {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-index a0a37216efb3..0181ab1f2dfd 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-@@ -37,6 +37,7 @@ static const u16 bnxt_bstore_to_seg_id[] = {
- 	[BNXT_CTX_CA2]			= BNXT_CTX_MEM_SEG_CA2,
- 	[BNXT_CTX_RIGP1]		= BNXT_CTX_MEM_SEG_RIGP1,
- 	[BNXT_CTX_KONG]			= BNXT_CTX_MEM_SEG_KONG,
-+	[BNXT_CTX_QPC]			= BNXT_CTX_MEM_SEG_QPC,
- };
- 
- static int bnxt_dbg_hwrm_log_buffer_flush(struct bnxt *bp, u16 type, u32 flags,
-@@ -360,7 +361,7 @@ static u32 bnxt_get_ctx_coredump(struct bnxt *bp, void *buf, u32 offset,
- 
- 	if (buf)
- 		buf += offset;
--	for (type = 0; type <= BNXT_CTX_KONG; type++) {
-+	for (type = 0; type < BNXT_CTX_V2_MAX; type++) {
- 		struct bnxt_ctx_mem_type *ctxm = &ctx->ctx_arr[type];
- 		bool trace = bnxt_bs_trace_avail(bp, type);
- 		u32 seg_id = bnxt_bstore_to_seg_id[type];
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
-index 8d0f58c74cc3..c087df88154a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
-@@ -102,6 +102,7 @@ struct bnxt_driver_segment_record {
- #define BNXT_CTX_MEM_SEG_CA1	0x9
- #define BNXT_CTX_MEM_SEG_CA2	0xa
- #define BNXT_CTX_MEM_SEG_RIGP1	0xb
-+#define BNXT_CTX_MEM_SEG_QPC	0xc
- #define BNXT_CTX_MEM_SEG_KONG	0xd
- 
- #define BNXT_CRASH_DUMP_LEN	(8 << 20)
++	/* In case of VF Dynamic resource allocation, driver will provision
++	 * maximum resources to all the VFs. FW will dynamically allocate
++	 * resources to VFs on the fly, so always divide the resources by 1.
++	 */
++	if (BNXT_ROCE_VF_DYN_ALLOC_CAP(bp))
++		num_vfs = 1;
++
+ 	cfg_req->fid = cpu_to_le16(0xffff);
+ 	cfg_req->enables2 =
+ 		cpu_to_le32(FUNC_CFG_REQ_ENABLES2_ROCE_MAX_AV_PER_VF |
 -- 
 2.51.0
 
