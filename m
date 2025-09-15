@@ -1,77 +1,95 @@
-Return-Path: <netdev+bounces-223257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCDFFB5884D
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:28:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D114AB58851
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 255F17A129D
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 23:27:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A873188DF0A
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 23:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2482D2383;
-	Mon, 15 Sep 2025 23:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A9A2DBF48;
+	Mon, 15 Sep 2025 23:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hH7uZ0kP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fEZDq2ig"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB91229B36;
-	Mon, 15 Sep 2025 23:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD7A2D47F1;
+	Mon, 15 Sep 2025 23:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757978921; cv=none; b=kSV/o9Y4p0Adq81aFkwiGOGTEmxBeI46RV7OKsFmtADTy1jgWKc8zDacZBLGZCw13BlbqJKuudpxR3T8f6VLlVWqpWhsHOJQfeAze12E3rtmJmxnhFtlhisn7ydbrRJfbP8JxZ3ardF9ArbB2tUHLJv95i3xwgaQHRZYmxPIcO4=
+	t=1757979004; cv=none; b=YukYfDeezZ1zYMxwJF5/IojSofUA+7BWY3sRTM+MQmklLBoPCxLP0Go6JeB2H+GKFSMAV/5Qk4tgDdWTVhYcUFGptvDhugn5e4g1owxDk2gWFCB+9aWEOo/R7DRnaeOenD4Gy7mt2yt9Rq6ZqI8IOi3/e2k1njeCap/+s3X3PdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757978921; c=relaxed/simple;
-	bh=PA6UoBlSVe0qI71y4d+0FeBhLV3+k7F2gbm2YXxBHSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QvbFthgT8gfgmbRz4Dvq24TzUPPvl1g2ERHBT2OgZ1nZ5S6fWWMey2tqsxiazTG38oamLsEOupV9xFpVizG1U4mC3ne676tXRQEx+w0MHcyrKU3DRAapgDa+EJqfc1y0RXq6I5QqfOpbB2RMeBRj2qLVXSRbwwjn+PVQFqZXTi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hH7uZ0kP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B325C4CEF1;
-	Mon, 15 Sep 2025 23:28:39 +0000 (UTC)
+	s=arc-20240116; t=1757979004; c=relaxed/simple;
+	bh=yoQbZRc/nb2BJoeq+on6jDO88ZNiKxPAGxL/dcMOaNI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PigDiK5Noo3d4c//015PxP61e4C9+WL58AH7ytHeLRwOuqZ85JvrOSega5Ykr06EwqlW7+b49c0yGhUFwifXjPVpegslBgASZ9uSXC32Vii0zcQiVh1XyHCkBle/6H1rJlcuhpRgLj7PF+TDjHrC1v7yKC6IXtYsI+0ggCjtXR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fEZDq2ig; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F05FC4CEF1;
+	Mon, 15 Sep 2025 23:30:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757978920;
-	bh=PA6UoBlSVe0qI71y4d+0FeBhLV3+k7F2gbm2YXxBHSU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hH7uZ0kPPtDZeqFuCChGGhnIQmPfE/I+l2jSOEMr5lN3oMVpQjpevALXKVAon98Rh
-	 pBh8o5lRKjXUMjFTXf1aV4NpWIPjL0gYosArFnlxhM2rV2HP3k2SLp0EEHIOY5b0qD
-	 OureWc6oIamF/uUl6RkszeHt99ZB9MWEbHI9Z/9XWaclhlyg0DDeAqPd+Z57wVzJMX
-	 WaGF4+qZSQdRsBN9CBbcl5V+pygYkemNaQRAH+etJosOh+2ILRbRN35IlaP7DBkY6A
-	 hfbTaNs/hMttI5IKZ/Gk8CWN5Aw6Xj2zAsUonvSkug+87rWwwLEB3jXloTk9GRSYeb
-	 CqhRPj3BsT5hw==
-Date: Mon, 15 Sep 2025 16:28:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, edumazet@google.com, linux-doc@vger.kernel.org,
- corbet@lwn.net, horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com,
- jhs@mojatatu.com, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Subject: Re: [PATCH v18 net-next 00/14] AccECN protocol patch series
-Message-ID: <20250915162838.2d968900@kernel.org>
-In-Reply-To: <20250911110642.87529-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250911110642.87529-1-chia-yu.chang@nokia-bell-labs.com>
+	s=k20201202; t=1757979004;
+	bh=yoQbZRc/nb2BJoeq+on6jDO88ZNiKxPAGxL/dcMOaNI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fEZDq2ig4Fb3lhzbXc/i6d4wvLFAcWkdx22QStHL/vhN6l0+Yv2kwGCDlgxSB/mr5
+	 Q1XC7hItBMTeNDrYAoQPmMgVxDwkmnE37HKlymFWvprtKlc/X9Qi6K/AqVL5ZYuZ6O
+	 74pVX4lzAMOvSzL2+QTD4pSvY5xYD4Hxji8uiTrFewb3fXPbUMdklF4UDJWC+aekyR
+	 821ECkJ2A+GeoBK84hq8Mx5G1MYpnM97GzJTC+tSnrwEAf1Caqz8a4iyHiJd6amfhx
+	 Y+GapMiCZ5fSnrz3ImBg2YCKvZkp70HsF8d9bL9NLERo7D9Y3wnyA990vNGwmG2NI0
+	 QLXlMIx1QlYig==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD7739D0C18;
+	Mon, 15 Sep 2025 23:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 1/1] net: phy: clear EEE runtime state in
+ PHY_HALTED/PHY_ERROR
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175797900575.527844.13813808525579188622.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Sep 2025 23:30:05 +0000
+References: <20250912132000.1598234-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250912132000.1598234-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux@armlinux.org.uk, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Thu, 11 Sep 2025 13:06:28 +0200 chia-yu.chang@nokia-bell-labs.com
-wrote:
-> Subject: [PATCH v18 net-next 00/14] AccECN protocol patch series
+Hello:
 
-I'll apply the first four patches because they keep conflicting with
-other series in the CI. Please repost the rest.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 12 Sep 2025 15:20:00 +0200 you wrote:
+> Clear EEE runtime flags when the PHY transitions to HALTED or ERROR
+> and the state machine drops the link. This avoids stale EEE state being
+> reported via ethtool after the PHY is stopped or hits an error.
+> 
+> This change intentionally only clears software runtime flags and avoids
+> MDIO accesses in HALTED/ERROR. A follow-up patch will address other
+> link state variables.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/1] net: phy: clear EEE runtime state in PHY_HALTED/PHY_ERROR
+    https://git.kernel.org/netdev/net-next/c/0915cb224527
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
