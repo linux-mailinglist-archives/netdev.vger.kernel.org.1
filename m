@@ -1,178 +1,243 @@
-Return-Path: <netdev+bounces-223019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0061B578C6
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 13:45:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B169B578D6
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 13:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F43F1A27E95
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:44:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7A2D1620A2
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D401A2F39AE;
-	Mon, 15 Sep 2025 11:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F56301021;
+	Mon, 15 Sep 2025 11:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hrm3W7WU"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kKV3asQ+";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Tt2qUBSu";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dteWhLgs";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Gw8fxY46"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2430D2C3257
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 11:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20FF2FF174
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 11:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757936672; cv=none; b=D/GeJlhqFa7Y0VlrphP5SbGoM0zNsQBYtwEK1tRr8oSe/kx6I6sHCpu8Fky044ydbKA/AY5pGyj9uzC3Xk1O1cY7UdIcdGq9EmTzjfUpPv3gomY9EUgXEDNXx8r4k4rQmaPnjyte2DNYwtrxtiZYqKN+luaZbo3VIdLZ2YhYqio=
+	t=1757936701; cv=none; b=O+zEweIACFEazFaNMrXfsYWUhLg3+DlRCYKWZGi6YzsFIKnHHCaSUkiozo1I/Usq68F3vVWBeuCA8TXodgDtAOi5pteKH4FUls5biW6yp0b79AC/Rn+eLHZepDJVdxJDNe8YEZn6J7oOmd7E6kA2rKNUfc0F+iL6RtoI982dqnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757936672; c=relaxed/simple;
-	bh=cNrkaf1zcYZ6OYMY83uyni6z7lKaEV/DOsgxV2yxxOQ=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=m39/QUty/U4JL7A9+gx55QyekwEZs3y1iyODBpwKTc0vEd4WcPFj0zUSiMs8CEjvS87iXMcb2Nk1uwDCn4WIaPqj98CgZ4w6ISy1LO4O/QDZvD+ZLJxTxXptoLR/VGJFPTEhygCIEHVMiQjqspgQ4X/9mRaPZoP1WJJz3TGCJMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hrm3W7WU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757936670;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1757936701; c=relaxed/simple;
+	bh=5yf8nV3xrpBaS1AHZN+XpcTcJZ0krDefwOIcmJml3Kc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=swGln0GCDXn0AEToa3+mpJg6cFsnsdl0EgWz1IhPQDW9NA8yN+oEwVAqHbiUDun6UGW/MzPe5luuiyLcfNG5gCFJMlq9nOrz1pNRWXJGNXopua4hx1NiQVXBq+YkR5uyDIcw7V+Vh4VDeO9jhXNcsO8MLtCN1BTxcYngpnr61vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kKV3asQ+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Tt2qUBSu; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dteWhLgs; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Gw8fxY46; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DC3243372C;
+	Mon, 15 Sep 2025 11:44:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1757936696; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uSHPRUFaXeFg56s3ZlnqQHiikskw++1DW2WVyVaExKo=;
-	b=Hrm3W7WUS1yk3pl7cjFx5wVjX3uUATdEhn5WDdOQ3DqMuIGNmJ4OWB05re+vr9myLKTCkF
-	8absuRKcs80An49xbgxBrOcnoL8rMh9fwicj8q+m1fpJZzPn4KLS6KGeoofYwjsPSb03El
-	WIOV/WezAuhJuLOKt2/+eMvDWAjyx14=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-182-QrCYYBJsP6CmtM0kKwFi2Q-1; Mon, 15 Sep 2025 07:44:29 -0400
-X-MC-Unique: QrCYYBJsP6CmtM0kKwFi2Q-1
-X-Mimecast-MFC-AGG-ID: QrCYYBJsP6CmtM0kKwFi2Q_1757936667
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b07d13a7752so380653866b.3
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 04:44:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757936667; x=1758541467;
-        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uSHPRUFaXeFg56s3ZlnqQHiikskw++1DW2WVyVaExKo=;
-        b=qSU3CvePHrHNgZLNmUzjLkBHajAjDGrFLsuaPIelrHhbcNVky8X0V6Cpnu7d0x/CHa
-         0BY4Hb61LWxR8ww2HBvDXV6e4Z8/G6NawtPVx8pnLLb7qlEQbCsjOAmmgFPmcZAYWiN8
-         Z9havCEA9qrzz7yrX9fCb1VztFWGaHrtFEzIbhBCJqQ5j5pYdyn1211ezmsh41c4CXeO
-         1X1UxyLbwoVBpB91crFDm/4h/NenwZOlGa4WHNpO4V/mnwo+LlmFode6fjyPhUqvxB5/
-         azNJbg3HeM3Wab1+oZ1YnRLBAUmk1kb3Eqyf4hS5b0zPfiHtWwS4jb8Bot0zJC+1zK2U
-         RA9A==
-X-Forwarded-Encrypted: i=1; AJvYcCXZfNTtG4QgS44m+t2oElDjp4Wn3wfWUB+1OJlHMavyVDnj3/ZF9ofxEF+bdZ4GeTw9x0yHnzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZnRhPJfpdkjJMyRmneTEq5fWshe7hmx+6R2V5PI+B8yHJTzCy
-	PcinLdvEnJeEtkzfWDgFC/U1L8LPoVw98wKC/Z8vetKfVZgquq5OJpYyCq17lmBUgZufDnjrTYH
-	fLloEdXU4evHzKJ9wpywI3wp2GwKPbkwe4Bjv/mr+B3TmzFFTBu1GqAE67dLcuuL/8A==
-X-Gm-Gg: ASbGnctkg0KyhwDpW41TbbahjzHmp+gTR5WZPKFLsnZPoyZVGAbOIhAEDJ9JbY1WpEM
-	2OHke8CQYl4th5j4wkGiwAngL0MccDqd7ZstwMdYkMHnob51XdbqCWRFUr0Pla1mrAl7baGzmj+
-	ZwETAtXKLqf7puOpVW+/6fxknXKcJPcNlRoWrb9MBImtoq4NYGqH/LB/MtCPeC1C8pbEnnqFgT1
-	nJSIEPUfSjzHW54t6gKISzvroBf0URlG7eTTZFTczcn+HbpQk5yJIyXmSR3LBgkLpbxSejQZ8SC
-	BXXxvclOxTtfdaJmXWzgq284xL1FW56fqb7uXApe2kplNj9/9OlPthKI2Ei7qMjD
-X-Received: by 2002:a17:907:3cd4:b0:b04:626e:f43d with SMTP id a640c23a62f3a-b07c386845emr1107738066b.47.1757936666842;
-        Mon, 15 Sep 2025 04:44:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGP/rnaPf4TLpT9wQUB5MJEnJsUtYxAdTzEBrkYO+7lF79YJ4d63LszUhAd2mHJ20+wHOss3Q==
-X-Received: by 2002:a17:907:3cd4:b0:b04:626e:f43d with SMTP id a640c23a62f3a-b07c386845emr1107735566b.47.1757936666370;
-        Mon, 15 Sep 2025 04:44:26 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b30da289sm914339566b.17.2025.09.15.04.44.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 04:44:25 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 9FC69215498; Mon, 15 Sep 2025 13:44:24 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Helge Deller <deller@kernel.org>, David Hildenbrand <david@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>,
- Linux Memory Management List <linux-mm@kvack.org>, netdev@vger.kernel.org,
- Linux parisc List <linux-parisc@vger.kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>
-Subject: Re: [PATCH][RESEND][RFC] Fix 32-bit boot failure due inaccurate
- page_pool_page_is_pp()
-In-Reply-To: <aMSni79s6vCCVCFO@p100>
-References: <aMSni79s6vCCVCFO@p100>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 15 Sep 2025 13:44:24 +0200
-Message-ID: <87zfawvt2f.fsf@toke.dk>
+	bh=6y2PKDzyPqYi6KX3GddLjJHSW4ruu+RGlXgaVbxg9T4=;
+	b=kKV3asQ+LtgRXgQgFmsbfPtQR3ipSxZ+4N6C1pcsfpvXhO3dc5IciV7O57Xv6j+x1dpbNA
+	5DhOgfMyn+holsds4tqnkmT+hrhuB7NWhGZV9Aj+1y5bBLZDgljYQ0F78nNhyL00Wds4Nl
+	14t58TTrvF5vBaEhyWHTF+PD5NmGCxE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1757936696;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6y2PKDzyPqYi6KX3GddLjJHSW4ruu+RGlXgaVbxg9T4=;
+	b=Tt2qUBSucstfMiHKFJ+ySPPi/im3XoTl7XfQbPBnIRsSjAEZ6NBcGjHd2GzZRtwy3GkHJA
+	WQB4CJYFXUTr6ABQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=dteWhLgs;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Gw8fxY46
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1757936695; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6y2PKDzyPqYi6KX3GddLjJHSW4ruu+RGlXgaVbxg9T4=;
+	b=dteWhLgsoXDBt1yizUoUOdeCZW7IYxG9QMM0dCMopC8wAcIzol4780DQSp73AevmFGMdef
+	UK2uHwq92eknXxeNii9l6Rjqcyl2GaJUTjcbcrwChnAmuLY7U8c0UBXD2A303cEVwqqFpQ
+	JyCY3YinymXFcAQwujjlHPOTV1OpI7k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1757936695;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6y2PKDzyPqYi6KX3GddLjJHSW4ruu+RGlXgaVbxg9T4=;
+	b=Gw8fxY46SRz/l4wHNJJ0ir6m9NdJubtKo4jQwylyfZ3PztOGM1+7wTMjm3Th32WT1isETe
+	E22T4yn9lUzwl6AA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5A14A1368D;
+	Mon, 15 Sep 2025 11:44:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id q1dbFDf8x2j5KgAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 15 Sep 2025 11:44:55 +0000
+Message-ID: <68e45231-8344-447d-95cc-4b95a13df353@suse.de>
+Date: Mon, 15 Sep 2025 13:44:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/7] nvme-tcp: Support receiving KeyUpdate requests
+To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+ kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
+References: <20250905024659.811386-1-alistair.francis@wdc.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250905024659.811386-1-alistair.francis@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: DC3243372C
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ietf.org:url,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email]
+X-Spam-Score: -4.51
 
-Helge Deller <deller@kernel.org> writes:
+On 9/5/25 04:46, alistair23@gmail.com wrote:
+> From: Alistair Francis <alistair.francis@wdc.com>
+> 
+> The TLS 1.3 specification allows the TLS client or server to send a
+> KeyUpdate. This is generally used when the sequence is about to
+> overflow or after a certain amount of bytes have been encrypted.
+> 
+> The TLS spec doesn't mandate the conditions though, so a KeyUpdate
+> can be sent by the TLS client or server at any time. This includes
+> when running NVMe-OF over a TLS 1.3 connection.
+> 
+> As such Linux should be able to handle a KeyUpdate event, as the
+> other NVMe side could initiate a KeyUpdate.
+> 
+> Upcoming WD NVMe-TCP hardware controllers implement TLS support
+> and send KeyUpdate requests.
+> 
+> This series builds on top of the existing TLS EKEYEXPIRED work,
+> which already detects a KeyUpdate request. We can now pass that
+> information up to the NVMe layer (target and host) and then pass
+> it up to userspace.
+> 
+> Userspace (ktls-utils) will need to save the connection state
+> in the keyring during the initial handshake. The kernel then
+> provides the key serial back to userspace when handling a
+> KeyUpdate. Userspace can use this to restore the connection
+> information and then update the keys, this final process
+> is similar to the initial handshake.
+> 
+> Link: https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
+> 
+> v2:
+>   - Change "key-serial" to "session-id"
+>   - Fix reported build failures
+>   - Drop tls_clear_err() function
+>   - Stop keep alive timer during KeyUpdate
+>   - Drop handshake message decoding in the NVMe layer
+> 
+> Alistair Francis (7):
+>    net/handshake: Store the key serial number on completion
+>    net/handshake: Make handshake_req_cancel public
+>    net/handshake: Expose handshake_sk_destruct_req publically
+>    nvmet: Expose nvmet_stop_keep_alive_timer publically
+>    net/handshake: Support KeyUpdate message types
+>    nvme-tcp: Support KeyUpdate
+>    nvmet-tcp: Support KeyUpdate
+> 
+>   Documentation/netlink/specs/handshake.yaml |  19 +++-
+>   Documentation/networking/tls-handshake.rst |   4 +-
+>   drivers/nvme/host/tcp.c                    |  88 +++++++++++++++--
+>   drivers/nvme/target/core.c                 |   1 +
+>   drivers/nvme/target/tcp.c                  | 104 +++++++++++++++++++--
+>   include/net/handshake.h                    |  17 +++-
+>   include/uapi/linux/handshake.h             |  14 +++
+>   net/handshake/genl.c                       |   5 +-
+>   net/handshake/handshake.h                  |   1 -
+>   net/handshake/request.c                    |  18 ++++
+>   net/handshake/tlshd.c                      |  46 +++++++--
+>   net/sunrpc/svcsock.c                       |   3 +-
+>   net/sunrpc/xprtsock.c                      |   3 +-
+>   13 files changed, 289 insertions(+), 34 deletions(-)
+> 
 
-> Commit ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unmap them when
-> destroying the pool") changed PP_MAGIC_MASK from 0xFFFFFFFC to 0xc000007c on
-> 32-bit platforms.
->
-> The function page_pool_page_is_pp() uses PP_MAGIC_MASK to identify page pool
-> pages, but the remaining bits are not sufficient to unambiguously identify
-> such pages any longer.
+Hey Alistair,
+thanks for doing this. While the patchset itself looks okay-ish, there
+are some general ideas/concerns for it:
 
-Why not? What values end up in pp_magic that are mistaken for the
-pp_signature?
+- I have posted a patch for replacing the current 'read_sock()'
+interface with a recvmsg() base workflow. That should give us
+access to the 'real' control message, so it would be good if you
+could fold it in.
+- Olga has send a patchset fixing a security issue with control
+messages; the gist is that the network code expects a 'kvec' based
+msg buffer when receiving a control message. So essentially one
+has to receive a message _without_ a control buffer, check for
+MSG_CTRUNC, and then read the control message via kvec.
+Can you ensure that your patchset follows these guidelines?
+- There is no method to trigger a KeyUpdate, making it really hard
+to test this feature (eg by writin a blktest for it). Ideally we
+should be able to trigger it from both directions, but having just
+one (eg on the target side) should be enough for starters.
+A possible interface would be to implement write support to the
+'tls_key' debugfs attribute; when writing the same key ID as
+the one currently in use the KeyUpdate mechanism could be started.
 
-As indicated by the comment above the definition of the PP_DMA_INDEX_*
-definitions, I did put some care into ensuring that the values would not
-get mistaken, see specifically this:
+But thanks for doing the work!
 
-(...) On arches where POISON_POINTER_DELTA is
- * 0, we make sure that we leave the six topmost bits empty, as that guarantees
- * we won't mistake a valid kernel pointer for a value we set, regardless of the
- * VMSPLIT setting.
+Cheers,
 
-So if that does not hold, I'd like to understand why not?
-
-> So page_pool_page_is_pp() now sometimes wrongly reports pages as page pool
-> pages and as such triggers a kernel BUG as it believes it found a page pool
-> leak.
->
-> There are patches upcoming where page_pool_page_is_pp() will not depend on
-> PP_MAGIC_MASK and instead use page flags to identify page pool pages. Until
-> those patches are merged, the easiest temporary fix is to disable the check
-> on 32-bit platforms.
-
-As Jesper pointed out, we also use this check internally in the network
-stack, and the patch as proposed will at least trigger the
-DEBUG_NET_WARN_ON_ONCE() in include/net/netmem.h. I think a better
-solution would be, as Jesper also alludes to, simply adding more bits to
-the mask. For instance, the patch below reserves (somewhat arbitrarily)
-six bits instead of two, changing the mask to 0xfc00007c; would that
-work?
-
--Toke
-
-diff --git i/include/linux/mm.h w/include/linux/mm.h
-index 1ae97a0b8ec7..17cb8157ba08 100644
---- i/include/linux/mm.h
-+++ w/include/linux/mm.h
-@@ -4159,12 +4159,12 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-  * since this value becomes part of PP_SIGNATURE; meaning we can just use the
-  * space between the PP_SIGNATURE value (without POISON_POINTER_DELTA), and the
-  * lowest bits of POISON_POINTER_DELTA. On arches where POISON_POINTER_DELTA is
-- * 0, we make sure that we leave the two topmost bits empty, as that guarantees
-+ * 0, we make sure that we leave the six topmost bits empty, as that guarantees
-  * we won't mistake a valid kernel pointer for a value we set, regardless of the
-  * VMSPLIT setting.
-  *
-  * Altogether, this means that the number of bits available is constrained by
-- * the size of an unsigned long (at the upper end, subtracting two bits per the
-+ * the size of an unsigned long (at the upper end, subtracting six bits per the
-  * above), and the definition of PP_SIGNATURE (with or without
-  * POISON_POINTER_DELTA).
-  */
-@@ -4175,8 +4175,8 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-  */
- #define PP_DMA_INDEX_BITS MIN(32, __ffs(POISON_POINTER_DELTA) - PP_DMA_INDEX_SHIFT)
- #else
--/* Always leave out the topmost two; see above. */
--#define PP_DMA_INDEX_BITS MIN(32, BITS_PER_LONG - PP_DMA_INDEX_SHIFT - 2)
-+/* Always leave out the topmost six; see above. */
-+#define PP_DMA_INDEX_BITS MIN(32, BITS_PER_LONG - PP_DMA_INDEX_SHIFT - 6)
- #endif
- 
- #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SHIFT - 1, \
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
