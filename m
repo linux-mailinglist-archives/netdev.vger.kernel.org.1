@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-222909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C27EB56EB0
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 05:07:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7872CB56EB1
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 05:07:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A94DB18955E4
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 03:07:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63B0D17B1AD
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 03:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9ADD22F16E;
-	Mon, 15 Sep 2025 03:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8026D215F5C;
+	Mon, 15 Sep 2025 03:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="evUWrsjO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CIojWejn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f97.google.com (mail-io1-f97.google.com [209.85.166.97])
+Received: from mail-vs1-f99.google.com (mail-vs1-f99.google.com [209.85.217.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5982E2367AC
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 03:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CBC22F75B
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 03:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757905566; cv=none; b=rfTgdYX/G1TTkNAWbUIHCiSDhSYIyl7ac4IqNL3q83iHk+Yo+xB8uX7cj0/kMi1GZ12pCGK7Ln7vLoiUczoq4VUqrMHFkI8uW9zWdCwKx2oB/9EkSwC7YoB5gtDTE+iMzH2d6QEZtf+/urkhWG3hXc+K7maKPkh5b1jp98y7xHU=
+	t=1757905567; cv=none; b=NSeUhF61N35tzA/anvMGeIB9GiG3v2GkhExuKHuBUMxXMx271QS5e2BaoYF1P1g5nhVqKOdcuJfN8GxtQq1z93jjlTGAL1gmX+ZfSfdgWDN/NO8Sp+Slbscu/JFrwnNYRZHShF+KWQBqSYSwo50NnFygz6ES15TBd1byQegOXo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757905566; c=relaxed/simple;
-	bh=LzuxOO7MUsz9QeWcAv8CL6k9NX9Zk0+3wU4IrOTgU00=;
+	s=arc-20240116; t=1757905567; c=relaxed/simple;
+	bh=wtkL5DHqFURGVN+d+i91d+vz0NScfo12n6jAYJ4agko=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uCDIpw2gnFPHS1TVHnVF1Df19rVp3mYUA+Og9FKJpBy678a28CXQZW4eqfTsJ/ixezh9z6rX1lbCC0eBOntMYZ+x/R/u3ZcJxS4mMyMnoBUGOJT9T1W4fz6KTXqZHirK3qW8cJirKcQFlfbcdjBS0lzVhLt0mzfrulxuPUYVM4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=evUWrsjO; arc=none smtp.client-ip=209.85.166.97
+	 MIME-Version; b=YMeBIqilKw5gfTSqQ/lIXVWHfqjmv4Ij4Zll5wGZmu0UQqNN3QDk7BOvr/XcMf7dHTfFrb4l9NsxDtC7KS6yO7d25E21/zQ7TPYt5peyJEbqfVY10GQr/T+p1xQ3dAQ9Zl+XYAimICy8Z6M0MNNar0llR9Qp8ZkxOjVdn1MJ7CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CIojWejn; arc=none smtp.client-ip=209.85.217.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-io1-f97.google.com with SMTP id ca18e2360f4ac-88762f20125so302950239f.0
-        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:04 -0700 (PDT)
+Received: by mail-vs1-f99.google.com with SMTP id ada2fe7eead31-559cd5166bbso262268137.3
+        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1757905564; x=1758510364;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZGwiH9q/1gsZh2ntFuSvxj+ApHIpi+jE8hURCuHY8Eo=;
-        b=m7wVRCTve/72RQpE0tX6eiDl9V0vbBw6Pt5qlb4XV2u1wqWGNDKjX/blzEBsW/oRh7
-         Pg+s2GPnLE0BKg03tQl2doSnsKngHM/5tnbvwAtwHRLew/DF5bwVazLqXpQiAvFIdHrP
-         n1K0k33DKiH0SqXkWtoDy40uzgSiDVheDO98GwwyKREciufKPopqGPo1+6LgTLT84Nox
-         ghtnt1UHrFlqCrdzqhlvZLD2xdJZLedQDH107FdB0GcvxhRxQByiWOVMR5Ua8HthXnjG
-         y+0s1kOMSc12Yt/MEKVSiRLUKF/VpEntihQCNrFTp9Jelms9EjKuuBfaQUvqKcOFGxrN
-         zT0Q==
-X-Gm-Message-State: AOJu0YzGJCHdujGaHjG3JUEzy4QaRF5H1A+5bxh6grSgAj9/Ief0RGYY
-	1qMMTPtUl8IV1dUmAJFaQ3/aadqJQkOhpyFcifR+VQGTxYRZde5Uat+84IBJU4tx59VhNGhuatv
-	79PQF2Md9QstKv0oKehsPZKVyEavF/MCstZLU1URVOSuiChNur6/s6hQ0qn1piIWQHv2aDO13L3
-	vjy1DWZ5icizwncRAYYP1VKgx3T36cawMew58mXvH7+zalg66TBQXiXtsUfKXGk+vbsntgtcgGE
-	/g3xC+PPdk=
-X-Gm-Gg: ASbGncvMzgEx4dnOsgqoLsTyDQQ4gkjLLnxbw213eDoOQNLsTNeL8Do+5jF7Sqzu9aB
-	FaENfcuRrd0ZsOMYoj18XRiRMqpCb/AgQdCzGsg2BI1D98a5Ma38ML6bZE7BqB4t+R2qtN2vKzt
-	UzGFb6w39FRI7rzmfW7UAE3R2eYRCMOLMiDf7bKEShEHohpUmtUVeTcmaAXQx5IpF9HPFPdOD4l
-	B1nRtO2JWxQIiX6VEUkjI2AfoN/mUZxH5AeHI8P1BiD0hTckkBfnuwSqRlH5CReu7bMezPaCP8s
-	4RMtV/DvRDIv/gDnOTDMsT6DgxT9tm9woVdG2ROy0m8NiZ/A/YTjwBQX/dS1HrXcfqIYWj760ID
-	Hr1cgNA+lnkRq1y4ucCy1hEjpHsh8MYlVv1KDf0AIGzflJRcJHhG+e8hy/RJxvlwRh3FZ5Tunyd
-	c=
-X-Google-Smtp-Source: AGHT+IEz6K1aje4lIK5k11uJmrzJ/GoQBkXIcIb/vmkwd6Iz3/WAGFADGH3bFDHPZVk0/x9yvEzpz1zisMto
-X-Received: by 2002:a05:6602:4804:b0:887:6eb:2282 with SMTP id ca18e2360f4ac-89033c6b647mr1268862839f.13.1757905564132;
+        bh=+ZVd3+ZhKxHycnqwGZkQtACeRnTx3QVNbbfGQy/YVTE=;
+        b=bLf19NmfsRmIJL7OQBsNUDCQ1B10DASH8f5EcQadHKcdl2TWbBY3KtUM/6YT3KQ64Q
+         ryMYXqFmoZF2eoHEmJqncLZRKgcMCgc3TkuhsZZG55GW2tgrupkwCClpEI/qW89DtJ2K
+         1SlQZMRanlCfpnb3irWFwzWbk7ktaO8iiFxYfRaWrFsilCiJWGwz+0Q+iTeYp7hmFc9l
+         x/A+j97EIcEcNqb+yGqmXxSWKV5LSrBQH5wBnSQKGRwU+cOQRndM0vThG0BgObfQ1Ssb
+         SrWTcBJtwjH58Fv2SgJIUPKPptEwJQOadsD1Oy8vqmhXwsdXv3GHMLk5CbglLZKDVIl7
+         NCbw==
+X-Gm-Message-State: AOJu0YymX1iamqgN42Puh8SlXb56PVOCqOCOejM9Lbl++o4MZ34yfATD
+	NUZhVfzsWiTTcIUbfBd96DIh9gJwWag1RJZR6ziZV3r1TyUpuLxzkhdCMGewSwmnnFLm3UtsHNK
+	eHqCSFT4LwWmM7VHbjuFw4ALeCYTCY/ZudpuA8hJW+R8b2Aghqxz+2wCCBy+Ljt/KhShLMI/YvW
+	b5ngqzdUJFMbUlx5dbCiDJrjQt2TlregRim6NpVwfXxOD1pCt8QFDV9W1mY/84P+KQIDBIujFTh
+	q9jx/u0+EY=
+X-Gm-Gg: ASbGncuPaqkppJpeX2uX78wbuaUch5DTjmU+9QJEP0aLHbgHwbfvj2tJwv+BW8Plh+p
+	L7lAGdVxE0wJhZRTyMS97vQNzEoFGiNRzULmfPBcnem7NztHaUqjU8pgR/OLyFy0aNoLz9C1hlU
+	y/rMCkXLDTvr0KMlSM5nwN//wFCtwnKvxWTPKdNDYZWKlsdXPmc01zj2D9tXAkBWloi13kHPkux
+	ksevRu2aXkiVR4a+uJBw2ec8TspSBriftbu8nAXVayweew4TeILW+HF1ZIAgR7f4rs4zLUcvnsj
+	N2HiwK5df72f2xB1CA+tz7YuGvfsGr9s2L2qCALz8tGilAqMDTP58a7DogqOr+flH09XAlFbNQO
+	Ar1PTKbtmdXaIHYga1kLFzsk9BjRJalVoYIJSGCsguJ0YI5yjx2JBsmxhB4ZFGGkACv9a6RfmFR
+	A=
+X-Google-Smtp-Source: AGHT+IGVV22inbZS7TWnKRiIlhtE0p2V191nrM4PUU092aZAxCRK9IwsI1+jeHnyRVKWBeDiGp2T9oylkJNi
+X-Received: by 2002:a05:6102:b12:b0:520:a44f:3dd6 with SMTP id ada2fe7eead31-5560a3ff4dfmr3461749137.8.1757905564599;
         Sun, 14 Sep 2025 20:06:04 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-25.dlp.protect.broadcom.com. [144.49.247.25])
-        by smtp-relay.gmail.com with ESMTPS id ca18e2360f4ac-88f2fcb5810sm70239139f.11.2025.09.14.20.06.02
+        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-55377959e3bsm971294137.4.2025.09.14.20.06.03
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
         Sun, 14 Sep 2025 20:06:04 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-24ca417fb41so35713565ad.1
-        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:02 -0700 (PDT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2621fab9befso12401665ad.2
+        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1757905561; x=1758510361; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1757905563; x=1758510363; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZGwiH9q/1gsZh2ntFuSvxj+ApHIpi+jE8hURCuHY8Eo=;
-        b=evUWrsjO6nKPdvH5NlfVmxjo1quGzi6ax6C+QMHBrqil01PWbZrsSLu/M/xMUKRGRm
-         hOe+uimVvZLXFr2wQtvGL/yCeSXnHQTTEPV/Ujjcy3qfE7UpsVRIG83taFclV/95/eRu
-         qLulDHV7KL2jskSyBJwq0UMA/YGRXpE2DBGCg=
-X-Received: by 2002:a17:902:d590:b0:25c:ceca:9493 with SMTP id d9443c01a7336-25d26a5b6afmr145731355ad.49.1757905561199;
-        Sun, 14 Sep 2025 20:06:01 -0700 (PDT)
-X-Received: by 2002:a17:902:d590:b0:25c:ceca:9493 with SMTP id d9443c01a7336-25d26a5b6afmr145731115ad.49.1757905560830;
-        Sun, 14 Sep 2025 20:06:00 -0700 (PDT)
+        bh=+ZVd3+ZhKxHycnqwGZkQtACeRnTx3QVNbbfGQy/YVTE=;
+        b=CIojWejn9qRjP4jBeO613C3SlwFB0DIIwZbQF1W3hAUMCP3LcUuYqSPRFGKXjJ7E36
+         j22o/iMMcNJhbmHxa9qIT/soEIRVMAuJihRTqez2iqkZZc3U3Z2uCLvrjjOvgNNcJFyC
+         u7CR8LyQpIZlusvP/Sl7trePazDrFWkBKNPkQ=
+X-Received: by 2002:a17:903:2f06:b0:24e:47ea:9519 with SMTP id d9443c01a7336-25d2771f10dmr115122645ad.47.1757905562643;
+        Sun, 14 Sep 2025 20:06:02 -0700 (PDT)
+X-Received: by 2002:a17:903:2f06:b0:24e:47ea:9519 with SMTP id d9443c01a7336-25d2771f10dmr115122335ad.47.1757905562179;
+        Sun, 14 Sep 2025 20:06:02 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3b0219f9sm112723575ad.123.2025.09.14.20.05.59
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3b0219f9sm112723575ad.123.2025.09.14.20.06.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Sep 2025 20:06:00 -0700 (PDT)
+        Sun, 14 Sep 2025 20:06:01 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -95,10 +95,10 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next 09/11] bnxt_en: Use VLAN_ETH_HLEN when possible
-Date: Sun, 14 Sep 2025 20:05:03 -0700
-Message-ID: <20250915030505.1803478-10-michael.chan@broadcom.com>
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next 10/11] bnxt_en: Implement ethtool .get_tunable() for ETHTOOL_PFC_PREVENTION_TOUT
+Date: Sun, 14 Sep 2025 20:05:04 -0700
+Message-ID: <20250915030505.1803478-11-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20250915030505.1803478-1-michael.chan@broadcom.com>
 References: <20250915030505.1803478-1-michael.chan@broadcom.com>
@@ -111,54 +111,157 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Return the current PFC watchdog timeout value if it is supported.
 
-Replace ETH_HLEN + VLAN_HLEN with VLAN_ETH_HLEN.  Cosmetic change and
-no functional changes intended.
-
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c       | 4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 18 +++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 21 ++++++++++
+ include/linux/bnxt/hsi.h                      | 40 +++++++++++++++++++
+ 4 files changed, 81 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 207a74450e38..f63e5dd429db 100644
+index f63e5dd429db..47579dc7e080 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6838,7 +6838,7 @@ int bnxt_hwrm_vnic_cfg(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- 	req->dflt_ring_grp = cpu_to_le16(bp->grp_info[grp_idx].fw_grp_id);
- 	req->lb_rule = cpu_to_le16(0xffff);
- vnic_mru:
--	vnic->mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
-+	vnic->mru = bp->dev->mtu + VLAN_ETH_HLEN;
- 	req->mru = cpu_to_le16(vnic->mru);
+@@ -14748,6 +14748,23 @@ static bool bnxt_fw_pre_resv_vnics(struct bnxt *bp)
+ 	return false;
+ }
  
- 	req->vnic_id = cpu_to_le16(vnic->fw_vnic_id);
-@@ -16086,7 +16086,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
- 	napi_enable_locked(&bnapi->napi);
- 	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
++static void bnxt_hwrm_pfcwd_qcaps(struct bnxt *bp)
++{
++	struct hwrm_queue_pfcwd_timeout_qcaps_output *resp;
++	struct hwrm_queue_pfcwd_timeout_qcaps_input *req;
++	int rc;
++
++	bp->max_pfcwd_tmo_ms = 0;
++	rc = hwrm_req_init(bp, req, HWRM_QUEUE_PFCWD_TIMEOUT_QCAPS);
++	if (rc)
++		return;
++	resp = hwrm_req_hold(bp, req);
++	rc = hwrm_req_send_silent(bp, req);
++	if (!rc)
++		bp->max_pfcwd_tmo_ms = le16_to_cpu(resp->max_pfcwd_timeout);
++	hwrm_req_drop(bp, req);
++}
++
+ static int bnxt_fw_init_one_p1(struct bnxt *bp)
+ {
+ 	int rc;
+@@ -14825,6 +14842,7 @@ static int bnxt_fw_init_one_p2(struct bnxt *bp)
+ 	if (bnxt_fw_pre_resv_vnics(bp))
+ 		bp->fw_cap |= BNXT_FW_CAP_PRE_RESV_VNICS;
  
--	mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
-+	mru = bp->dev->mtu + VLAN_ETH_HLEN;
- 	for (i = 0; i < bp->nr_vnics; i++) {
- 		vnic = &bp->vnic_info[i];
++	bnxt_hwrm_pfcwd_qcaps(bp);
+ 	bnxt_hwrm_func_qcfg(bp);
+ 	bnxt_hwrm_vnic_qcaps(bp);
+ 	bnxt_hwrm_port_led_qcaps(bp);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index c0f46eaf91c0..06a4c2afdf8a 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2426,6 +2426,8 @@ struct bnxt {
+ 	u8			max_q;
+ 	u8			num_tc;
  
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-index 1d8df44c3f9e..80fed2c07b9e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-@@ -741,7 +741,7 @@ static int bnxt_hwrm_func_cfg(struct bnxt *bp, int num_vfs)
- 				   FUNC_CFG_REQ_ENABLES_NUM_VNICS |
- 				   FUNC_CFG_REQ_ENABLES_NUM_HW_RING_GRPS);
++	u16			max_pfcwd_tmo_ms;
++
+ 	u8			tph_mode;
  
--	mtu = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
-+	mtu = bp->dev->mtu + VLAN_ETH_HLEN;
- 	req->mru = cpu_to_le16(mtu);
- 	req->admin_mtu = cpu_to_le16(mtu);
+ 	unsigned int		current_interval;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 2830a2b17a27..d94a8a2bf0f9 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -4399,6 +4399,23 @@ static int bnxt_get_eee(struct net_device *dev, struct ethtool_keee *edata)
+ 	return 0;
+ }
  
++static int bnxt_hwrm_pfcwd_qcfg(struct bnxt *bp, u16 *val)
++{
++	struct hwrm_queue_pfcwd_timeout_qcfg_output *resp;
++	struct hwrm_queue_pfcwd_timeout_qcfg_input *req;
++	int rc;
++
++	rc = hwrm_req_init(bp, req, HWRM_QUEUE_PFCWD_TIMEOUT_QCFG);
++	if (rc)
++		return rc;
++	resp = hwrm_req_hold(bp, req);
++	rc = hwrm_req_send(bp, req);
++	if (!rc)
++		*val = le16_to_cpu(resp->pfcwd_timeout_value);
++	hwrm_req_drop(bp, req);
++	return rc;
++}
++
+ static int bnxt_set_tunable(struct net_device *dev,
+ 			    const struct ethtool_tunable *tuna,
+ 			    const void *data)
+@@ -4431,6 +4448,10 @@ static int bnxt_get_tunable(struct net_device *dev,
+ 	case ETHTOOL_RX_COPYBREAK:
+ 		*(u32 *)data = bp->rx_copybreak;
+ 		break;
++	case ETHTOOL_PFC_PREVENTION_TOUT:
++		if (!bp->max_pfcwd_tmo_ms)
++			return -EOPNOTSUPP;
++		return bnxt_hwrm_pfcwd_qcfg(bp, data);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+diff --git a/include/linux/bnxt/hsi.h b/include/linux/bnxt/hsi.h
+index 8c5dac3b3ef3..23e7b1290a92 100644
+--- a/include/linux/bnxt/hsi.h
++++ b/include/linux/bnxt/hsi.h
+@@ -6751,6 +6751,46 @@ struct hwrm_queue_dscp2pri_cfg_output {
+ 	u8	valid;
+ };
+ 
++/* hwrm_queue_pfcwd_timeout_qcaps_input (size:128b/16B) */
++struct hwrm_queue_pfcwd_timeout_qcaps_input {
++	__le16	req_type;
++	__le16	cmpl_ring;
++	__le16	seq_id;
++	__le16	target_id;
++	__le64	resp_addr;
++};
++
++/* hwrm_queue_pfcwd_timeout_qcaps_output (size:128b/16B) */
++struct hwrm_queue_pfcwd_timeout_qcaps_output {
++	__le16	error_code;
++	__le16	req_type;
++	__le16	seq_id;
++	__le16	resp_len;
++	__le16	max_pfcwd_timeout;
++	u8	unused_0[5];
++	u8	valid;
++};
++
++/* hwrm_queue_pfcwd_timeout_qcfg_input (size:128b/16B) */
++struct hwrm_queue_pfcwd_timeout_qcfg_input {
++	__le16	req_type;
++	__le16	cmpl_ring;
++	__le16	seq_id;
++	__le16	target_id;
++	__le64	resp_addr;
++};
++
++/* hwrm_queue_pfcwd_timeout_qcfg_output (size:128b/16B) */
++struct hwrm_queue_pfcwd_timeout_qcfg_output {
++	__le16	error_code;
++	__le16	req_type;
++	__le16	seq_id;
++	__le16	resp_len;
++	__le16	pfcwd_timeout_value;
++	u8	unused_0[5];
++	u8	valid;
++};
++
+ /* hwrm_vnic_alloc_input (size:192b/24B) */
+ struct hwrm_vnic_alloc_input {
+ 	__le16	req_type;
 -- 
 2.51.0
 
