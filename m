@@ -1,207 +1,149 @@
-Return-Path: <netdev+bounces-222911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C98CB56EB2
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 05:07:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD00CB56EE2
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 05:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07B6517B144
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 03:07:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27DCE1899292
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 03:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C39233145;
-	Mon, 15 Sep 2025 03:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E92420A5DD;
+	Mon, 15 Sep 2025 03:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PNQWBwGl"
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="Lvl5S8pN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m15577.qiye.163.com (mail-m15577.qiye.163.com [101.71.155.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AC6212548
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 03:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E341B6D06;
+	Mon, 15 Sep 2025 03:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757905569; cv=none; b=fK9IuNM5GTTjxZ/kmBx1kfQ7a1JKJzFDksGKWqg/3e2HyhHRXjzdgAVoC0cXkNDxBl2JtbCe4+PWqhy+CCogaYHvH3HHDCdpmgzuY+p+fxekb0YdZuUQnwFoKvVMfKgbxTEuCNwGGjKCOw6P/NcxgUxGDhhGsthyAxZ21NKf8vg=
+	t=1757907507; cv=none; b=WLSgnX7ZCHqHcb34WsiFMkv3kIIuW0dLM5Um8mXCp5uAtyLGaawB76tyjOhnSc2WgrEkKlmBP30bVJbbUPP7MDiQ9mr0rTKDutOuKx1crgTzGK1Nml+hbX8DgMQ3yBpLQ6v3/yAJlCWBPbyxh9z90CZNherj7xfs12yiCCpO4jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757905569; c=relaxed/simple;
-	bh=3JY0Fh2Mj8lLUYnsip4Cp1sHrpq7cmtvvX59Qga5kIQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OqYw1TG13DCLBzLUIXteqCIbA2L7gdnvY1zRH+iPmICooq2/xjd+khgsCIRJ6TnQeXwznPDjLaHQ0E3HcheuONJAXbk/yAsLN/dQOSyLmiMSeZ/xelcaMHlNN6aroi9+B+5m7Ci7H0BnFfhBiPmrXPs61rzTNAWzBvJxN5P7CqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PNQWBwGl; arc=none smtp.client-ip=209.85.214.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-24b13313b1bso24468085ad.2
-        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757905567; x=1758510367;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SUEIX0FP9Dl4IxlF6+h5nDbwqqrS0Xlw4YysY3ryNrg=;
-        b=UVo1tA5XwfTF9gYaNXEn491bM4mqamymQ0FPPO7OaLLgoX4v5hOVtphit4JhfaSMGS
-         WaHH3Uy2dmkoYc+4lQWTnbmj5DOfm2Kdm+g/bHn9Wm7ZiMxVbSqdnzYbNStl2LfS4Ki4
-         B5Vb2KplSYeu70O7eY8fmn2OQL3zQav5Igs1nq7oWU13jna05Gld0UnDqfHFQ68vA4qP
-         H0PjdtF/2CMMdxDjrsZ4rFORR63v+6t2HZcGoxWKpENNCxAMBkOy3FyUfP5lVEygYL0l
-         4dm/bl7gkr3PmgsG+wEDCOxH9KDfqNVUxmQEX3lb9C/9f5YP8C7FPkNE9eKalXKPTrQq
-         d/8A==
-X-Gm-Message-State: AOJu0YyDKv4DcBffAb/OluYE+HzW7K8dIWBASDEWJoGIrBZESGDl2VNk
-	ejK6rCuNQMFCcK1pZ5EjrAm37+PFWsrMDlU4A0hpHqFy7DOJd+jUPKoXwURTb4beu6Uuk0ucmZn
-	d8WUpiL7SjyzfDOJ30ZFdgS3wghS+lr6jHdsYm9D65x6wKdOozSOPOb9raJp0ucpy5hfR9wdOeX
-	ndhSYHApbkli9ZamFQDN8WmA7N2xCBX08GMNzDJiHwK2/X7QSSoIkDqFgvWxSYRgdoSaKRsWBY1
-	YKEv5OkfGo=
-X-Gm-Gg: ASbGncsVklk5Q87SiVOxDQT4vn/4S+DilyWfEQ3vuTXPH6SFiwi7J6DRw+S5DNDUnzE
-	7I/ZX0sX7q6Zvo7keolLLIiQs6bQPUI+mmcbVSPGJLzazSHuuJCSOIsIGvn0D48IlqkvCBmjQ5b
-	ofkcjtHkIG9q4fMw+lDU88y1YTN/duiXEzy36wXdr2EXAiVs+OGxa84BMRYJ1NVPgeck56W++8W
-	jwdNSRSnvFe08TqhSUebD+10LXWjIwKqKCZqtTBEvv4b+hTU5AC0LIwA4f/usQ0j1kMY0CsRYm2
-	Fm9JzrJn1id4bkV3K//AJmbQhJrYJXRh+Ktta45467CiAqMXsE1KZ0uhIya9EKz7ci5CiuWWSxl
-	1rlpNO9eBvBfKEKGPN/umdx7jtr8KqKoqKZ8cfjg3LYfn0yJgMtftNLWpANSR8DiWgYfvAVwcuD
-	5wnQ==
-X-Google-Smtp-Source: AGHT+IErcG4R+4YrSwkbJOdehc4PVrmvKzPIoP0ieyvRzO5fn2yzegCEC5jsmWISP4PwhC7srhSkkxDTPBlQ
-X-Received: by 2002:a17:903:1aa3:b0:248:7018:c739 with SMTP id d9443c01a7336-25d26079f41mr126728335ad.28.1757905566220;
-        Sun, 14 Sep 2025 20:06:06 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2605c561de9sm7162485ad.9.2025.09.14.20.06.05
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 14 Sep 2025 20:06:06 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-244581953b8so42671205ad.2
-        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 20:06:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1757905564; x=1758510364; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SUEIX0FP9Dl4IxlF6+h5nDbwqqrS0Xlw4YysY3ryNrg=;
-        b=PNQWBwGl8VOzvibwOtJPEj9SOkInJy9sCCvw7DrSfcmxCCEkpJ7sYpeia0Q8qIsfzr
-         gnm/HaflViDbkRY05wQZ5dqf9zMYMoadk4ClPZ7IUuZv0V00eLN+K7UWpXqELe60/9ld
-         WpqRfTnaC4qgTeS4inCKdPpEHedNKdIa5m5y4=
-X-Received: by 2002:a17:903:1b10:b0:252:50ad:4e6f with SMTP id d9443c01a7336-25d27038fcdmr145663785ad.54.1757905564439;
-        Sun, 14 Sep 2025 20:06:04 -0700 (PDT)
-X-Received: by 2002:a17:903:1b10:b0:252:50ad:4e6f with SMTP id d9443c01a7336-25d27038fcdmr145663455ad.54.1757905564000;
-        Sun, 14 Sep 2025 20:06:04 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25c3b0219f9sm112723575ad.123.2025.09.14.20.06.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Sep 2025 20:06:02 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 11/11] bnxt_en: Implement ethtool .set_tunable() for ETHTOOL_PFC_PREVENTION_TOUT
-Date: Sun, 14 Sep 2025 20:05:05 -0700
-Message-ID: <20250915030505.1803478-12-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.4
-In-Reply-To: <20250915030505.1803478-1-michael.chan@broadcom.com>
-References: <20250915030505.1803478-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1757907507; c=relaxed/simple;
+	bh=/xc1zd9KAuHRGU1aPx+ust4hmr4zb1B5xHZFfFubWXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ig346lkSWc7awJuYvAwvKinyYogKFKs7fd5mIKiROnOAViYwKNxmYk7GCb3SzYzB3QATFq+e7QpndW5Wtcyx/rKGllL4yjQ/vWR2XH66rz0QoWL3ORx3DJHhMSG8kwxKsJoTQmmIdMT9byZcch9FijReKg2Mnqe5qzT6Ehx9XPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=Lvl5S8pN; arc=none smtp.client-ip=101.71.155.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
+Received: from [172.16.12.153] (unknown [58.22.7.114])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 22c8b5b47;
+	Mon, 15 Sep 2025 11:38:12 +0800 (GMT+08:00)
+Message-ID: <bda5453b-5cc8-4d31-9143-3e23b5d914d2@rock-chips.com>
+Date: Mon, 15 Sep 2025 11:38:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: stmmac: dwmac-rk: Ensure clk_phy doesn't contain
+ invalid address
+To: Sebastian Reichel <sebastian.reichel@collabora.com>
+Cc: Yao Zi <ziyao@disroot.org>, "Russell King (Oracle)"
+ <linux@armlinux.org.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
+References: <20250904031222.40953-3-ziyao@disroot.org>
+ <aLlwv3v8ACha8b-3@shell.armlinux.org.uk>
+ <b5fbeb3f-9962-444d-85b3-3b8a11f69266@rock-chips.com>
+ <aLlyb6WvoBiBfUx3@shell.armlinux.org.uk>
+ <aLly7lJ05xQjqCWn@shell.armlinux.org.uk> <aLvIbPfWWNa6TwNv@pie>
+ <5d691f5b-460e-46cb-9658-9c391058342f@rock-chips.com>
+ <wgau7accvif4pcblnkpppyve4isstvmxyljlojt2yu4cwnyqvf@od4zasgpwdjr>
+Content-Language: en-US
+From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+In-Reply-To: <wgau7accvif4pcblnkpppyve4isstvmxyljlojt2yu4cwnyqvf@od4zasgpwdjr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-HM-Tid: 0a994b739fc103abkunm50451f02ab88b3
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZGUtISFZPSUsZTkxLTk5NGklWFRQJFh
+	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
+	hVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=Lvl5S8pN8u8JQeTy99+juZGGQlsIspYWMdGRWMc49pPXE9TcJEuPh0U3r5oetVv7l+BEpCygircNrUnlXK5O4vBw3XrB3GkE+xRXa7yy5F+QYIbAQjQQbTjW7dtHcyVBOOfmhyRJEsBS5mokBDNKjJChhqvhpMuacvImDYZckvQ=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
+	bh=Mq67zs+U1255nllj+V7rSH0ZUO6DNosUCaee26uoN3Y=;
+	h=date:mime-version:subject:message-id:from;
 
-Support the setting of the tunable if it is supported by firmware.
-The supported range is 0 to the maximum msec value reported by
-firmware.  PFC_STORM_PREVENTION_AUTO is also supported and 0 means it
-is disabled.
+Hi Sebastian,
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 24 ++++++++++++++++++-
- include/linux/bnxt/hsi.h                      | 21 ++++++++++++++++
- 2 files changed, 44 insertions(+), 1 deletion(-)
+On 9/7/2025 4:25 AM, Sebastian Reichel wrote:
+> Hi,
+>
+> On Sat, Sep 06, 2025 at 02:26:31PM +0800, Chaoyi Chen wrote:
+>> On 9/6/2025 1:36 PM, Yao Zi wrote:
+>>
+>>> On Thu, Sep 04, 2025 at 12:07:26PM +0100, Russell King (Oracle) wrote:
+>>>> On Thu, Sep 04, 2025 at 12:05:19PM +0100, Russell King (Oracle) wrote:
+>>>>> On Thu, Sep 04, 2025 at 07:03:10PM +0800, Chaoyi Chen wrote:
+>>>>>> On 9/4/2025 6:58 PM, Russell King (Oracle) wrote:
+>>>>>>> On Thu, Sep 04, 2025 at 03:12:24AM +0000, Yao Zi wrote:
+>>>>>>>>     	if (plat->phy_node) {
+>>>>>>>>     		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+>>>>>>>>     		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+>>>>>>>> -		/* If it is not integrated_phy, clk_phy is optional */
+>>>>>>>> +		/*
+>>>>>>>> +		 * If it is not integrated_phy, clk_phy is optional. But we must
+>>>>>>>> +		 * set bsp_priv->clk_phy to NULL if clk_phy isn't proivded, or
+>>>>>>>> +		 * the error code could be wrongly taken as an invalid pointer.
+>>>>>>>> +		 */
+>>>>>>> I'm concerned by this. This code is getting the first clock from the DT
+>>>>>>> description of the PHY. We don't know what type of PHY it is, or what
+>>>>>>> the DT description of that PHY might suggest that the first clock would
+>>>>>>> be.
+>>>>>>>
+>>>>>>> However, we're geting it and setting it to 50MHz. What if the clock is
+>>>>>>> not what we think it is?
+>>>>>> We only set integrated_phy to 50M, which are all known targets. For external PHYs, we do not perform frequency settings.
+>>>>> Same question concerning enabling and disabling another device's clock
+>>>>> that the other device should be handling.
+>>>> Let me be absolutely clear: I consider *everything* that is going on
+>>>> with clk_phy here to be a dirty hack.
+>>>>
+>>>> Resources used by a device that has its own driver should be managed
+>>>> by _that_ driver alone, not by some other random driver.
+>>> Agree on this. Should we drop the patch, or fix it up for now to at
+>>> least prevent the oops? Chaoyi, I guess there's no user of the feature
+>>> for now, is it?
+>> This at least needs fixing. Sorry, I have no idea how to implement
+>> this in the PHY.
+> I think the proper fix is to revert da114122b8314 ("net: ethernet:
+> stmmac: dwmac-rk: Make the clk_phy could be used for external phy"),
+> which has only recently been merged. External PHYs should reference
+> their clocks themself instead of the MAC doing it.
+>
+> Chaoyi Chen: Have a look at the ROCK 4D devicetree:
+>
+> &mdio0 {
+> 	rgmii_phy0: ethernet-phy@1 {
+> 		compatible = "ethernet-phy-id001c.c916";
+> 		reg = <0x1>;
+> 		clocks = <&cru REFCLKO25M_GMAC0_OUT>;
+> 		assigned-clocks = <&cru REFCLKO25M_GMAC0_OUT>;
+> 		assigned-clock-rates = <25000000>;
+>          ...
+>      };
+> };
+>
+> The clock is enabled by the RTL8211F PHY driver (check for
+> devm_clk_get_optional_enabled in drivers/net/phy/realtek/realtek_main.c),
+> as the PHY is the one needing the clock and not the Rockchip MAC. For
+> this to work it is important to set the right compatible string, so
+> that the kernel can probe the right driver without needing to read the
+> identification registers (as that would require the clock to be already
+> configured before the driver is being probed).
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index d94a8a2bf0f9..be32ef8f5c96 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -4416,12 +4416,25 @@ static int bnxt_hwrm_pfcwd_qcfg(struct bnxt *bp, u16 *val)
- 	return rc;
- }
- 
-+static int bnxt_hwrm_pfcwd_cfg(struct bnxt *bp, u16 val)
-+{
-+	struct hwrm_queue_pfcwd_timeout_cfg_input *req;
-+	int rc;
-+
-+	rc = hwrm_req_init(bp, req, HWRM_QUEUE_PFCWD_TIMEOUT_CFG);
-+	if (rc)
-+		return rc;
-+	req->pfcwd_timeout_value = cpu_to_le16(val);
-+	rc = hwrm_req_send(bp, req);
-+	return rc;
-+}
-+
- static int bnxt_set_tunable(struct net_device *dev,
- 			    const struct ethtool_tunable *tuna,
- 			    const void *data)
- {
- 	struct bnxt *bp = netdev_priv(dev);
--	u32 rx_copybreak;
-+	u32 rx_copybreak, val;
- 
- 	switch (tuna->id) {
- 	case ETHTOOL_RX_COPYBREAK:
-@@ -4434,6 +4447,15 @@ static int bnxt_set_tunable(struct net_device *dev,
- 			bp->rx_copybreak = rx_copybreak;
- 		}
- 		return 0;
-+	case ETHTOOL_PFC_PREVENTION_TOUT:
-+		if (BNXT_VF(bp) || !bp->max_pfcwd_tmo_ms)
-+			return -EOPNOTSUPP;
-+
-+		val = *(u16 *)data;
-+		if (val > bp->max_pfcwd_tmo_ms &&
-+		    val != PFC_STORM_PREVENTION_AUTO)
-+			return -EINVAL;
-+		return bnxt_hwrm_pfcwd_cfg(bp, val);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/include/linux/bnxt/hsi.h b/include/linux/bnxt/hsi.h
-index 23e7b1290a92..47c34990cf23 100644
---- a/include/linux/bnxt/hsi.h
-+++ b/include/linux/bnxt/hsi.h
-@@ -6771,6 +6771,27 @@ struct hwrm_queue_pfcwd_timeout_qcaps_output {
- 	u8	valid;
- };
- 
-+/* hwrm_queue_pfcwd_timeout_cfg_input (size:192b/24B) */
-+struct hwrm_queue_pfcwd_timeout_cfg_input {
-+	__le16	req_type;
-+	__le16	cmpl_ring;
-+	__le16	seq_id;
-+	__le16	target_id;
-+	__le64	resp_addr;
-+	__le16	pfcwd_timeout_value;
-+	u8	unused_0[6];
-+};
-+
-+/* hwrm_queue_pfcwd_timeout_cfg_output (size:128b/16B) */
-+struct hwrm_queue_pfcwd_timeout_cfg_output {
-+	__le16	error_code;
-+	__le16	req_type;
-+	__le16	seq_id;
-+	__le16	resp_len;
-+	u8	unused_0[7];
-+	u8	valid;
-+};
-+
- /* hwrm_queue_pfcwd_timeout_qcfg_input (size:128b/16B) */
- struct hwrm_queue_pfcwd_timeout_qcfg_input {
- 	__le16	req_type;
--- 
-2.51.0
+Yes, what you said is correct. This is also the issue we encountered earlier on RK3576 board :)
 
 
