@@ -1,156 +1,92 @@
-Return-Path: <netdev+bounces-222979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35965B57673
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:34:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 195C2B576B3
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E4FA177C04
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:34:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C44F11A23055
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4152FD7D3;
-	Mon, 15 Sep 2025 10:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1482FCC1B;
+	Mon, 15 Sep 2025 10:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="n52fYylc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h0kRvbRh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7652FC892;
-	Mon, 15 Sep 2025 10:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BFC2FD1D0
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 10:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757932410; cv=none; b=eO6WAj6sOMRln/hycgeqh+hSwBOUBZx3L6WQydIJX57clKAcAlbfl+5LlrYkMvMWAE/XQEOy7yhBF4ePkYHf3GkuLiGi7HdHM6Cxz7aI0E/CBm+aPeC8xXvblKt5+4cHszsRH1pW55jEeP/j0MbEoinHPBAG2+VRY9uLZrUZhvg=
+	t=1757932749; cv=none; b=cCoIcnjykzh6fQ7tteqcJGH6zZcVnqTtInwCBlsPkivsnmTc8kvxlhvTx0+yW35ihbmsvo5cvXRM3CLZYlJKg535RJjVLUKrZKesaWm+U0LUSF0oP7h6wBqiDyYhyAh83cfy8YrqMmDOaRQ8G/SI6Y/hXNrblQ61VPX97kvCz4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757932410; c=relaxed/simple;
-	bh=B+vY08F4i/HnCv1ScZcxAk8Aza1H/zvJQLkJgxXZeNM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qlrhzXH4WYJTe9d/1W3mX/E65vnK1y6Pkbwjgq5hHvNJb39Xj+QF6O1+W9OkosBx+lZMUuhWTq0FaXC6Y7l+mq+yBUMvXY5znqAPvy2uiROcqcd7ij0AIidHYT2JBIFdnahTFIhY9gw+47ZOu9dBnSm2SYsTyyJoNmDTwRnBd5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=n52fYylc; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58F8FiYk018062;
-	Mon, 15 Sep 2025 10:33:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	hEwwZy8ATsI5rPJueJK8Mx9VooV1umz/QHEkRLAcREw=; b=n52fYylc7qSgB3eV
-	Yq8T9m4YvkV6suTPvdHEhNr2U53aDcWrxgSkfOVypocqN2xVZVjtVnnXxQPJPuHw
-	3TTVcLRgsoochUq7FSUQ0Eiu0B4gqImRFTAzWfzWb1ilwhwwblo/cu/eX9aakQ7u
-	wvs0TZWcn0NEF9PQSzvKq9tbKDaWShs9sBF2p4ouUr/vSuMSL5WWDdip5rG61H/s
-	Nh+2GQB40NMUZucg6oT4/6DhdOs+ekqubCdUghiyeodBdc5CPOyQ7bSDiIdEB+HH
-	RpgEQJloWZAVcqcWzBmeVveUvaJb3ppg1Mh/R13CrBCkp/MbYdO48Kug2l886uLD
-	csqK7A==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4950u54h7c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Sep 2025 10:33:23 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 58FAXNwQ011646
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Sep 2025 10:33:23 GMT
-Received: from [10.218.18.194] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.24; Mon, 15 Sep
- 2025 03:33:16 -0700
-Message-ID: <8f8df889-3f88-4b9b-a238-16044796d897@quicinc.com>
-Date: Mon, 15 Sep 2025 16:03:14 +0530
+	s=arc-20240116; t=1757932749; c=relaxed/simple;
+	bh=Ah9SUnFFUGDtrtZY6tlGLbggWcwF5sKBov3cvuNP86o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3GwyWp50GSnB1ETNV/PUUwt26rHYt3fbLdfxXk3zDfHE+ZXqU2G4f4/vGMqo6hAaV5EDy5xerL5Aq9XSrWfJ37ZVM3OPrkKoHQe2xzmPnqPMguUX8ycxLliPInW1g9O94mpmzIWyHZrut7JS5l7euX8Qsy+aoG17gh4X85M56U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h0kRvbRh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9594EC4CEF1;
+	Mon, 15 Sep 2025 10:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757932748;
+	bh=Ah9SUnFFUGDtrtZY6tlGLbggWcwF5sKBov3cvuNP86o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h0kRvbRhK8BuBDhwOJ1GypZxYMoYrP/FqFK/KrlQqMMbJEBdwSRopO3qZduEL1IiH
+	 GvdRKEnuEV1BusvjBDVCCciMOveWVbsDvfym/IbKm1ZVePzGBDx/mH/0GHdhiEdVD/
+	 aTsefAVhQqtn4UPslkZeS6zqkur0A7oXbQ0wvkkiDIsnK6hzgSddRGXsEZSwkiQNwl
+	 ikXBP0k//GVQyNJEYApvgMR3zET0oyS3e7pQ1QQSAQnnHJJDR3W8S0YoLnRg9RX9t+
+	 hptR6nQPwkRVjkdDsKX+Y/hMAfNBL1/mXxJlzZTkhieWw9gy/8yW146VIoH7mdTvyo
+	 zBG7d30TuTUHg==
+Date: Mon, 15 Sep 2025 11:39:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, kernel-team@cloudflare.com,
+	Lee Valentine <lvalentine@cloudflare.com>
+Subject: Re: [PATCH net-next v3 1/2] tcp: Update bind bucket state on port
+ release
+Message-ID: <20250915103904.GQ224143@horms.kernel.org>
+References: <20250910-update-bind-bucket-state-on-unhash-v3-0-023caaf4ae3c@cloudflare.com>
+ <20250910-update-bind-bucket-state-on-unhash-v3-1-023caaf4ae3c@cloudflare.com>
+ <20250911180628.3500bf0c@kernel.org>
+ <87a52y67we.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 07/14] arm64: dts: qcom: lemans-evk: Enable PCIe
- support
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Wasim Nazir
-	<wasim.nazir@oss.qualcomm.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        "Konrad Dybcio" <konradybcio@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>
-CC: <kernel@oss.qualcomm.com>, <linux-mmc@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>
-References: <20250908-lemans-evk-bu-v4-0-5c319c696a7d@oss.qualcomm.com>
- <20250908-lemans-evk-bu-v4-7-5c319c696a7d@oss.qualcomm.com>
- <cb2a5c93-0643-4c6b-a97f-b947c9aad32c@oss.qualcomm.com>
-Content-Language: en-US
-From: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
-In-Reply-To: <cb2a5c93-0643-4c6b-a97f-b947c9aad32c@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: FwbzkJhGeavS9d001wAdTXfxE2E5nA0T
-X-Proofpoint-ORIG-GUID: FwbzkJhGeavS9d001wAdTXfxE2E5nA0T
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAzMSBTYWx0ZWRfX5A8o8LawJiuj
- ZfRqPlGLcbUehF2ldAHuPlAYE2Zqi8490lZVou3ouPVQ84oPO2siT3oo17b5qPtRA5V8tQB0+9K
- fAByYXkREws+8q8Qg0vEIH6v3zmQKuqjfgAiTK5GfjJrUmtRS3+GbgvkjcSrYbzLkW20iXz7VOK
- 1Tj6GWGgVSS1STzo1UEkAyO+JL6ALV7r9Nf/t2RgM+tLsluqsidDhCDf7StCNYzqFDYqiiXefss
- 6f/Df74X+3PeRvCbSNzbles0aJYf0ItTBZnq5DD7PhaCDSCRDb9K7ab42OHzc+i+GhTz4FSzJaQ
- V6OXqbUCHYobs7eCJUkKzMC44XxHgUE/WbV5OkCelgwLVfvdWlIGGn27sNcV98qN6JWpJaBP6UK
- q60A0o10
-X-Authority-Analysis: v=2.4 cv=JvzxrN4C c=1 sm=1 tr=0 ts=68c7eb73 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8
- a=EUspDBNiAAAA:8 a=XuqPMlvQ3-AsHj1PTisA:9 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-15_04,2025-09-12_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 phishscore=0 suspectscore=0 clxscore=1011 impostorscore=0
- spamscore=0 adultscore=0 malwarescore=0 bulkscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509130031
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a52y67we.fsf@cloudflare.com>
 
+On Sat, Sep 13, 2025 at 11:04:01AM +0200, Jakub Sitnicki wrote:
+> On Thu, Sep 11, 2025 at 06:06 PM -07, Jakub Kicinski wrote:
+> > On Wed, 10 Sep 2025 15:08:31 +0200 Jakub Sitnicki wrote:
+> >> +/**
+> >> + * sk_is_connect_bind - Check if socket was auto-bound at connect() time.
+> >> + * @sk: &struct inet_connection_sock or &struct inet_timewait_sock
+> >> + */
+> >
+> > You need to document Return: value in the kdoc, annoyingly.
+> > Unfortunately kdoc warnings gate running CI in netdev 'cause they
+> > sometimes result in a lot of htmldocs noise :\
+> 
+> Ah, thanks for the hint. 'scripts/kernel-doc -v -none' didn't complain
+> about it.
 
-On 9/12/2025 5:57 PM, Konrad Dybcio wrote:
-> On 9/8/25 10:19 AM, Wasim Nazir wrote:
->> From: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
->>
->> Enable PCIe0 and PCIe1 along with the respective phy-nodes.
->>
->> PCIe0 is routed to an m.2 E key connector on the mainboard for wifi
->> attaches while PCIe1 routes to a standard PCIe x4 expansion slot.
->>
->> Signed-off-by: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
->> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
->> ---
-> [...]
->
->> +		perst-pins {
->> +			pins = "gpio2";
->> +			function = "gpio";
->> +			drive-strength = <2>;
->> +			bias-pull-down;
->> +		};
-> Pulling down an active-low pin is a bad idea
+FWIIW, I think -Wall would cause kernel-doc to complain about this.
 
-Ack, we should do pull up.
-we took reference from the previous targets which seems to be wrong.
-we will make it pull up.
-
-Bjorn,
-can you make this change while applying or shall we send new series.
-
-- Sushrut
-
->
-> Konrad
+> 
+> I think I will drop the doc comment altogether since it's just a private
+> helper now and the flag it checks is properly documented.
+> 
 
