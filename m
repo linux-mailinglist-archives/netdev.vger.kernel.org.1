@@ -1,203 +1,381 @@
-Return-Path: <netdev+bounces-222952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADA79B5735E
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:47:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD3C0B57318
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FE6017ACFC
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:47:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF95717E894
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2B12ECD34;
-	Mon, 15 Sep 2025 08:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFA32EF67F;
+	Mon, 15 Sep 2025 08:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ZOoHV2I7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rOvI2GGV"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011031.outbound.protection.outlook.com [40.107.130.31])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2053.outbound.protection.outlook.com [40.107.100.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD4B2D5C61;
-	Mon, 15 Sep 2025 08:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793CF2E9EC6;
+	Mon, 15 Sep 2025 08:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757926045; cv=fail; b=s7Ry3+ZgeBFKnqWBEh6taTDPUfn7coCzSPex3GIYfuUqc7R2Vy7kl7jIhG2ag5IbXnTnaLN3XN/3Gu9EbdBddBeV8+Hp9229zI0a91UXhJPRfa1X4kAgObsVS6fvP5rzd6bsHRrthHzj8eqAR0+218RIu8M7FiZo1FXaxDuGQqQ=
+	t=1757925365; cv=fail; b=iybtzht6dmxhhM4J6iNLlP2vXakzruc7TA0itspfUAO8XT+X6ainjXHUCekT797MIX/ZenbM1hN4jSZ2AUkFRUwv0kqR+5qfF4vXij97rLMxdUUeF8trR+uUDlnOC+kuSnEfJqwH7okXMj8zBJEiMkBIyxcb/qPzpU+6FUNIyE0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757926045; c=relaxed/simple;
-	bh=lQ4aatYPPehxx0vsNWfO/Ri9fjYtzoh3Y81B6ErAGCs=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=u7MB8OSpB+j4onXCiJrHZJcQ7bmaXr8KGqU1DS+ABHpqy0kp/6lUDM/mbORTiYpAuXZFgerr2fIp+Jtx9ZOMYyeQquM78VFt+2R8N6OqbViYqFEEsGVnoqsOU9yRlS7qIkEn5f+LMyqou9W5Gcof7Hs0+XaYDUMSnSoIN8hpxdw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ZOoHV2I7; arc=fail smtp.client-ip=40.107.130.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1757925365; c=relaxed/simple;
+	bh=wQrPULds2DfYAzaQ1mim3Ph1BcPl8J0kauRnkv+WmEs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hTsITSefhsCZS8xDWanpQgam9iMPx0T04GmhJPvJNs+yUYHNt7zIqaTHWZS1xvh5T/EXGqQ/QwqfTpUltRzN/b1njysKeOJaC5pw1IuVUqUy9X3eqrCCr7/jIUzArUMH3CUCYTRRk5angJCI0S5safcpom0LtciKFDhzytTkGJQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rOvI2GGV; arc=fail smtp.client-ip=40.107.100.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MB9L2ZIEqI84rZ+EfeGjszSmQMDY1ORmmPWgt0JmktxA3hDOjgkQrKuEnWsVQ8rrltOroyiHG6mGqDeqiMsqDwvAAgabX5iR3RLmch0bckjA7tFlS3HnSu26M9lvx79WUY4UzYaGh4AtILGeKK8DOaYZnkG160gOD4jgyFkA3rolfJ4gEPzwSyG71sSXUEmELoLVdCETLwM7W7LfE0g1gNyx/GOt0Dzs/K+Ey9dzZlw+lB4k6nH0JGlXEYKtwAckBLcgnV3t1g5IR32PCxLzRAE6eVxazlttevf0eKggxkiBldZg5wnBkxH8b7HkVWm5RrE1SRtEq9kE5HUKgTQEZA==
+ b=CdLcvYr77D3V1GFpQ/BYBbouSR9UxZqkmMHyWKOSqXWyt780S8Th1rALEBMDL0377v7dE/hQsFSivZSIh6R88M9gSceP2LT4kyLhzX+e1GgkBvY6c01rnu7QfnlXIUPFJBPgibezUL5mhkIw2OeCh450HKFoqrDv9jLAVJtfqlA+XKxJqTtyuvq48NiFZVMQLHiaCa7P7LUvhYIVYYGIDFgGlnO5c5EnFWCF0wwfWbewZU5smGA3qxFH5ktFAslXQrtfzp+Huiy0TVCYXbfSfgX4sQZqA91jeJxSRsZ1yMNvW0zA2UllrSj7zoV0sQD6WhrNxFU9DnEl4+P1O6e5IQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=znwwAll8NY6RVMeyjy12bDCdQqCYMsVSIpcoY9CplhI=;
- b=FP8mitNc47WdFMJgcl2z7DmWfr9PR5znNral6sBNn/brNu3S39TALcsGEOYdKB9AizrKbNVoFhwOZctZlbz3XRzNdjLO4ExMApc1VTBb4aUWUHAnfSqIkLu+rKmSm5v+AYqryD3bcMSUnMJlC5a1RFh497tcj9F8CtqdRpTIeq4JSg+mM0XQKFC3BkNwqqZiLehEd2eJIO+bbgfnFpaZvw+AIe9IpoE3OdtXMHwt5GF2fcm1QEnE6NaP4zjZA6pMk8DiK3bh4DiKPVL1rEHlx/CqPC73fb6dNSHLq3JSzfsH+yfQ3P8knIZllBvAH0VHPTEf0foFYqnDoNnX8thtQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ bh=5+7xzu2TqCSZQdzPiepLQxO3vbI6eorOZ/UIvlG774E=;
+ b=iLCRo8GwZMoLtQAvxgaj7+eDCgkB5BBtdYFry3DSgIBjD+Dw+SVpOrzr8fnqdar03Fz7ySnUKQUiSD+QEuhfKSRch4Mt1A9n39t9y0TQEb9z6ALacOoJzAVWZzdkbUUC42NV3u2zOnbWa2QXFUg35gynkb2+y8YngeFZSEm+7UQYKWA5zjYF9MdJrjdW80N/NLqqyL2Ev3xuAhhs3Zb2ZIKevYsp1go+twV3a/K1fV6WlGMxR3u+qL8xm9d1XRQPgrbNNirZ7aFn80dxTNCmV2573oz3u0ElT3Yx3hxGBbPbZo9SMcxyrgzPxyTN23vlr5VmgCB4Yl+WYIQHg4RhXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=arm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=znwwAll8NY6RVMeyjy12bDCdQqCYMsVSIpcoY9CplhI=;
- b=ZOoHV2I7csFExI2rgJKngj/5S/fwym4SNqed3yi6TDBhCHTrjVZYl/gSXb7DFSHqL3pdBXIl5XNJ+uID8SNdAui/GYJF4V/FgnoIwAv28vwoib1Ch7WaDI5TlZvLm2j+nxmB4OWqexbzBDpn9zMDIp7X0DI9YbFEo3AYIg6qp3UpMEXgg+q/pDSSztseqGAKwfQSdLhVsimHWcw2Fhx+Fcp27zNhmMpaeo1CRGL/gad4W46e0Q7RZczDcqHMAogNyRIFmaHlD+RLuHHA6vEuNPtD8cZLyIl4rS1qXLZZqbpnV1eIlUxHkIjcW4LxcxSkvt0XXRJGUyDEiRVAGkTcCw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by VI1PR04MB7040.eurprd04.prod.outlook.com (2603:10a6:800:121::19) with
+ bh=5+7xzu2TqCSZQdzPiepLQxO3vbI6eorOZ/UIvlG774E=;
+ b=rOvI2GGVztuV+IEMl4H/5JGONZhCh87Wztge2OfeHUy+83E3DVgHAyG5symgkC7Ti5I2bJuxaqQH9fqA1dfV92wMq2LHbKcQQmqFuT+epPNpjWxhIpxskkrR0AhAHnrJKurjDDLGsZtk2JSw2+Em89FCVFqVkjgmc43h241NV8XD69mlCJ4HVA+zlZ+Lvk7K8/vZxjZURb/mR51oXKFZtzv8XtL9e1hUiURE5qVn1BjDrs3TQeR8nDH3UTgAMUr9X67oTw38rElRTAiwFpE4DQYmWn4gH8rbnfxPndfbzY8oSxSmIM2lNstW1WDiCf3gARpEAclvBQ54YP/GycZ1rQ==
+Received: from MN2PR19CA0003.namprd19.prod.outlook.com (2603:10b6:208:178::16)
+ by BL1PR12MB5972.namprd12.prod.outlook.com (2603:10b6:208:39b::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.11; Mon, 15 Sep
- 2025 08:47:18 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9137.010; Mon, 15 Sep 2025
- 08:47:18 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: xiaoning.wang@nxp.com,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Frank.Li@nxp.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] ptp: netc: only enable periodic pulse event interrupts for PPS
-Date: Mon, 15 Sep 2025 16:25:28 +0800
-Message-Id: <20250915082528.1616361-1-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR02CA0051.apcprd02.prod.outlook.com
- (2603:1096:4:196::10) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Mon, 15 Sep
+ 2025 08:35:57 +0000
+Received: from BN3PEPF0000B06B.namprd21.prod.outlook.com
+ (2603:10b6:208:178:cafe::3f) by MN2PR19CA0003.outlook.office365.com
+ (2603:10b6:208:178::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.20 via Frontend Transport; Mon,
+ 15 Sep 2025 08:35:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BN3PEPF0000B06B.mail.protection.outlook.com (10.167.243.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9160.0 via Frontend Transport; Mon, 15 Sep 2025 08:35:57 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 15 Sep
+ 2025 01:35:47 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 15 Sep 2025 01:35:46 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Mon, 15 Sep 2025 01:35:35 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "Sabrina
+ Dubroca" <sd@queasysnail.net>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe
+	<jgg@nvidia.com>, Michael Guralnik <michaelgur@nvidia.com>, Moshe Shemesh
+	<moshe@nvidia.com>, Will Deacon <will@kernel.org>, Alexander Gordeev
+	<agordeev@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, Gerald Schaefer
+	<gerald.schaefer@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Justin Stitt
+	<justinstitt@google.com>, <linux-s390@vger.kernel.org>,
+	<llvm@lists.linux.dev>, Ingo Molnar <mingo@redhat.com>, Bill Wendling
+	<morbo@google.com>, Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Salil Mehta <salil.mehta@huawei.com>, "Sven
+ Schnelle" <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
+	<x86@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>, Arnd Bergmann
+	<arnd@arndb.de>, Leon Romanovsky <leonro@mellanox.com>,
+	<linux-arch@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, "Mark
+ Rutland" <mark.rutland@arm.com>, Michael Guralnik <michaelgur@mellanox.com>,
+	<patches@lists.linux.dev>, Niklas Schnelle <schnelle@linux.ibm.com>, "Jijie
+ Shao" <shaojijie@huawei.com>, Patrisious Haddad <phaddad@nvidia.com>
+Subject: [PATCH net-next V2] net/mlx5: Improve write-combining test reliability for ARM64 Grace CPUs
+Date: Mon, 15 Sep 2025 11:35:08 +0300
+Message-ID: <1757925308-614943-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|VI1PR04MB7040:EE_
-X-MS-Office365-Filtering-Correlation-Id: 706e134b-3e7d-4dcc-453b-08ddf43479f8
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06B:EE_|BL1PR12MB5972:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b5d6194-1796-458e-7336-08ddf432e49c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|19092799006|52116014|38350700014;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TpGi7e7T7r5kiyYszIaaJ7Vur2gQuyJnaW1ZN9yKuvYDpMchn5I9bLPW8iRQ?=
- =?us-ascii?Q?NY3frgpVUJg1OVPX8cCme+Dpl4H7CeYrU2ERRaBobw7c5eTHoPO2UiOCWS0D?=
- =?us-ascii?Q?FU9+VrEbjeSdrOjF7TrMYFB4BijxxJZ/cXgpWtCuyFw3lWLvRtO2is7Ekgpg?=
- =?us-ascii?Q?mXa0U7ZURM4Krynsm1jS1xL3cU8ANhEGl9zz9dgw39OaebV2BQ0bYWJMfGgS?=
- =?us-ascii?Q?H+blhfAQpJDyVQWa2tJsRFvuUoZj7+Cq6CX7kcrE8GLKqSXmIuLwXvVuUY0A?=
- =?us-ascii?Q?L0hwlo5XjX6+O7PVVS9AK70/NwYOeCDHJhB29p14vaEwm693nuCcycGROHsj?=
- =?us-ascii?Q?h8lXhZhQe1nCpkzxh5BwgGlGcuOSJ5w1r1da3PQkDLAExVIMrpKj9uNSBOIb?=
- =?us-ascii?Q?sCfmHwnWTuCNqMjC6yfwj8Xpl5G/8p7dPtXG0ZcZbzLu5YCR8Kn/8szfV6h1?=
- =?us-ascii?Q?1GBs7LWb54nhOE6llH/Lu1pFZndfAAjRvYwn98XUMw5ThXIffo+kGcHO+dcG?=
- =?us-ascii?Q?9MIPfE/WS7/tbx0mVLNhTMSlrhWET2xQHRyEoC7akOmq45/PqAT750/a6oK7?=
- =?us-ascii?Q?Q5PofC+csNyCyW1MTL2v0YsLZxEQdlwmW0r+BbQ7gXgBOQLvYM+J8UNwj9US?=
- =?us-ascii?Q?HgXVaVkzg6FR88ia2btZ/b1fEPxiQkU3miTTN30kmhIpnnzG4tjvZRh4yEUn?=
- =?us-ascii?Q?ewU/pNwSgZH0Wku7wnCbX6j664hKWFyt1ViBSIXGQH2+fA3HG6+M22sDtd5l?=
- =?us-ascii?Q?t0XCED3aiZ7s7x1q0YfDOZJYqsIYojB00BKqcbqSQsgoHvF5q3T9B3MpUbLr?=
- =?us-ascii?Q?CJfHuS7uzwhcpRprUoztgU3PJrQuK2DPDw0ndrq5HXc1UcgCxeix+qg4QMjA?=
- =?us-ascii?Q?NoT32TfDY4kPTU239mU58QTofWxXoR6cXAxrpQY6n1Vil1Zfjji0gNgbbaf+?=
- =?us-ascii?Q?jiCnWWilEDL7ivBS0Zg3um9WGY2JK+IbLWerUAUTCIhI59ZtfzxcNLAZRlag?=
- =?us-ascii?Q?v6zCv1f2mjtJEDSNiXyoikPM6UR7Xb33fM9CXYPqEwVMXqM7pWevDt4iWSF2?=
- =?us-ascii?Q?8LTqUvACniVFsEMNwJ8L45EYlgrSvve5Huv3o6iMonaXVuisIG6wbY7wn5HP?=
- =?us-ascii?Q?vcpSsg8gf48HWUvZs4XCPZqZR6SCs3Hcp9EHl30Q3oW0+l5ce0fU8d/8wU7K?=
- =?us-ascii?Q?IhXQS9RQfV6lV+xE0EFnUUoCcbuDDJDED66MoM487sJvEoSyB1JB0Obo8k40?=
- =?us-ascii?Q?h044ULiaQcc4NaBJXasD/qJHvYkSDbpRlZ6ZRKvUp8pRchBvjX6Nq/QJLSAK?=
- =?us-ascii?Q?cEpKxIzxXyAiEYADRkX11t1VrkUQ3XM1ykTTqSJ8ICOowxI0pLryKk0FZq/L?=
- =?us-ascii?Q?GNd1wHaHtLwS8YOPR7J80Iqf3e/PninckZTiRw5erNPIpxOfunWKLYXKlRSF?=
- =?us-ascii?Q?1vF9JEucMbVinGRleI42Oo1A7ST0qQUJkXWvpZr37/5YvFNaZE+FqA=3D=3D?=
+	=?us-ascii?Q?ngA+L5vR3nH1N/kUn3TJKv+d0r020PiOuxS1BwhNayP29zzJAcE4nTvkVC8y?=
+ =?us-ascii?Q?uR5ELW9phd7TbqwnNiv2w4VeC/iQgIxtE+hViPHGCIrbkE3zNR4cCYAvX79D?=
+ =?us-ascii?Q?1kHR8ny3xyM1p9a/OFIu/UXqnTTOg5HNm4HiRNwVCZjrqKHbrHWg38CHkokK?=
+ =?us-ascii?Q?QrAvMpTYoSLnrJ6PvSB5bXAWe1pGqt1vAYc3R/g0Yi6+wW/G46FKimtT5WE6?=
+ =?us-ascii?Q?mPFA8vxUb7FAcTAIOZ0d38uTYannqLECYB5CKtL8u/8WMdUZ8C+WCKErOelp?=
+ =?us-ascii?Q?S+MIGvXJWqQ/s/f0PE8Z01cuT0lVYQZr3Yrn9sPktoBTwNyGFS0ttdGXEcnI?=
+ =?us-ascii?Q?lE2ufpd71Tx25uLVRwDsKtpTD+pQXTcvJElq82go+ID/uUQtjx2LrK3/s/g1?=
+ =?us-ascii?Q?ujKhohOL7wd77lgB/qCJjFzFpwZsZIIHm/2t3eFlm9opqwFXkot2tsOzwKUq?=
+ =?us-ascii?Q?qaNrDbny6d/ijKfUJ2X1jD+RjQUl+Gm+5X9sReb2HSflq5WFZuJm/I82XhC+?=
+ =?us-ascii?Q?U7/71sOkMLiVkd5LPelXFWebGQwyvZcu4INASm2OMt3G4vpv4d2h44XvdVZ+?=
+ =?us-ascii?Q?+RHYSyFJ6e7xSVrdWgfRP4Aa7BSxAKBOGVLQfTG/1ambrJVaAtg5Gjbzhtrg?=
+ =?us-ascii?Q?9q26WRc2P18l3Jj9nXrgcwgT9QdYjaHGXy8lWuqPqDAzTqIA8ehUKCCX0ILc?=
+ =?us-ascii?Q?cOTN/ZQNtrmxgOWkrxYx2iqra9MKfnCa2JGLKx0MWd51WlDzqiMWdUfYg+wC?=
+ =?us-ascii?Q?dLoR3KJP3p8FEZKyNo/A73Ed5uFb8JEsY2UrcVN87KITui6E19e5O/cxZTDb?=
+ =?us-ascii?Q?ZyK0rjI2hs1CXh8is8HJLjfli9wXrP5sqRW+KbDdKxkbQVmK8aBqLJRQlzFc?=
+ =?us-ascii?Q?L5Or1vViSrxKJgLH6tHFLkCaHYLHs5vDHFUmrM1U4JEXF7jtkWnDi6Q/1Rs1?=
+ =?us-ascii?Q?lXvr+OW221Jyg4WIDGI576416sW4xONDglVXT0RzOkiSKDcWfkVN0xW97ypw?=
+ =?us-ascii?Q?7ttT6Seys6KAeheS0rQXaZJdwY0Ffrqgy1u0DJw936UBI2Tu+yudqeCK2hJ3?=
+ =?us-ascii?Q?BEUePrh7bAnEKjBU7Rsm/oacSzP5xc45vnhzZ1D0AAGDBpuMCejZ5a02a7Yk?=
+ =?us-ascii?Q?dhRAEJFnlLi8Bpj9qtiYwW9iqhNsmvF+Wa56EIBdNdZrM9XjjMgmdZhxb2rp?=
+ =?us-ascii?Q?IaDYU9wExfWrHvImS2x6VkHuNZQIFxyIqePu6P97uKTmVS6R8SrqF4Umr0+S?=
+ =?us-ascii?Q?3UUhPmzRe/UNRpAPx3FEjOydXeI70OhlLwWVBlXtK0VOlB6gOaP8caP3RQFo?=
+ =?us-ascii?Q?aV/CXKJxQhxa2z0H/mhdbid+rVYYGB7PUrNl+2uYoUZkohRxbGyd52eQzvbC?=
+ =?us-ascii?Q?nFYuMacAGI/jJPM980uQPaDwdvptZXBwRGNegHx1nb6Z3uWvvHIu6mptllD3?=
+ =?us-ascii?Q?XgmaSlHuoDJM/WQzfpWu8AXpM2+arNtbaXazAeXH7SdN6K+AMwscYLc44YFD?=
+ =?us-ascii?Q?/DeE2UL/8Rza22fntL5dW6ydxHrWqXk/W01Q8K8pfxRplN5HPspZYs4XdQ?=
+ =?us-ascii?Q?=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(19092799006)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?DB8uXGD+PoRoVoiVXPr7gyf+D668VoBy9qmp4NBTu8QbGX7hlx7K20N23zUm?=
- =?us-ascii?Q?Xp39dMnJNVmKOVVrvNCguabEmiHarp0PKIlYi+slJgQA2TMiIhj1b8rF6w2r?=
- =?us-ascii?Q?P4yKgi9KBKJRR0IIbj1DxN9ff+4FVKNf0grYhQvRYqG6hh53GYM2fXFhr/WF?=
- =?us-ascii?Q?PyBixlDItNIOsNHhc7Hp3QB3pe1Be5VyoCSvDQFj2GjrDx1+jfXkr5Mp9eZJ?=
- =?us-ascii?Q?5DQRSnXyFw4+AwaAJOmlerMnssOnv8y7UkeVcdUvcN+9GpVB5eK96i9JjVPM?=
- =?us-ascii?Q?uVvjR1goomkSd+MEtbElr1wdnENWlfl+qEWVEeZ2PDYodDBEeu6r52Fd5W9q?=
- =?us-ascii?Q?tz9E4OCgYtLP+5E63Er2ny/cSzcs2Vp/JUk4Gzh1udvrdRdIoY2MH4eWlbeg?=
- =?us-ascii?Q?SBrhHoEyVovKbqPCsQyf8ooGjTcVspS7T4mgdgKcGu8Rvu8kWNEJKnywBPT3?=
- =?us-ascii?Q?sOkWHSXiW+t3+sj4kQjt0+vMeT4oIUd4CuJsFNxilc474nsYmKwdWwUBCRKO?=
- =?us-ascii?Q?l5uOUIdd4EUIyVMi4Zs1OOBshVQpfDBalQOUrpSnufbkfxlYukS2eZpzGncD?=
- =?us-ascii?Q?rw8vBVS8N4gGQTNrkFmydNfYpDV/HWR+uc+3hYaInMjJWvx+TYWiOfNlvrZQ?=
- =?us-ascii?Q?jP8bB4J8lCuz+NtW1ixmplcAkLxabv57Cm1P5a9U8qecJiytng/ULTvz56F/?=
- =?us-ascii?Q?zDKSv/zzuuSugZSioyenr3c8iFOqpNzP2ndCHsxfBCl1XerF9CLmwyWe2AH+?=
- =?us-ascii?Q?ZrKmR8rrPJCtPf4hDUVXH+/O0nHTH8vp9D5Qij5zHDeVCdEaS9wC5aLeUNTQ?=
- =?us-ascii?Q?BqW70zIcmof0qbiq4RySaJP/6fn0CMJhpA8AhfCTWFwZbzYf4lmBWKLKDw3a?=
- =?us-ascii?Q?ooX7YUGCB6aK19Gswr/ShzmU4X4jQFr7PJF/jMROBiYJ0pCiiw12hSVEtT6k?=
- =?us-ascii?Q?NOyOzskzQEeBKZ5zwtgdyN8at4S/3sTb1VrQ1asZxbYFbTVnq5yeSMy4tSH/?=
- =?us-ascii?Q?e9UdiIUf4xSAY4OyvqcQO555SnMAbX7pmOXNVu2UrZHlsbOMY+U4lRQmMQSS?=
- =?us-ascii?Q?N1k63n/cRSZO4hhSH/zN2sVTAG2JqxYpF3jt2kV1xzRuw7F8Vv6pUSL/JqAZ?=
- =?us-ascii?Q?cnhYTg1al+z9U0KNiMlx0dUdOm5DhWUGbzxTrNXB5oX2Kq/hf4Fkl4+rkZxu?=
- =?us-ascii?Q?UovWs9sS7++Hli+0lofLgl0x5qHMWKExDs/ii8THFakPyEY7aOrHaoU1aAp4?=
- =?us-ascii?Q?7EBEsH3ODLtsw4Y3YxSF2La6327JgZVebZsIGMq7rmzbnGHJFHvlbCExnCpS?=
- =?us-ascii?Q?bo52UUktXrENK0eYXFhKdbpOZybD1AMn7Hnuup4AGP3HbbY/KXq4gmlATv5y?=
- =?us-ascii?Q?NgIZtgNqLk09H+H6Am/yVQL6DztJ7E4OVqJi5bTUOzQOhGWEySFNDI8pw8gI?=
- =?us-ascii?Q?ketLnv1SFMCVaYXl6heit6HyvKYJXuH5S8MPY5l26Olf396hODZ38uFvJcLJ?=
- =?us-ascii?Q?dQImIpBev0fRJLkTDtTJF054Z3Lh71jZfXWiI4q9Ilh6Z0hYD4TxtrMm2mGT?=
- =?us-ascii?Q?IS2997bO6gqXuTQKU/gMGybbn5GzYU7ecqYRJfVe?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 706e134b-3e7d-4dcc-453b-08ddf43479f8
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 08:47:18.5017
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 08:35:57.5997
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RRKsehFFR2dnpovAJrDOCLw+FHZb5NMjR0aKtHuiNpO+flMufavz0ZiPD2g1hQAjeEjO/j8M8Tn4B9lrASYIlw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7040
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b5d6194-1796-458e-7336-08ddf432e49c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B06B.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5972
 
-The periodic pulse event interrupts are used to register the PPS events
-into the system, so it is only applicable to PTP_CLK_REQ_PPS request.
-However, these interrupts are mistakenly enabled in PTP_CLK_REQ_PEROUT
-request, so fix this error.
+From: Patrisious Haddad <phaddad@nvidia.com>
 
-Fixes: 671e266835b8 ("ptp: netc: add periodic pulse output support")
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
+Write combining is an optimization feature in CPUs that is frequently
+used by modern devices to generate 32 or 64 byte TLPs at the PCIe level.
+These large TLPs allow certain optimizations in the driver to HW
+communication that improve performance. As WC is unpredictable and
+optional the HW designs all tolerate cases where combining doesn't
+happen and simply experience a performance degradation.
 
+Unfortunately many virtualization environments on all architectures have
+done things that completely disable WC inside the VM with no generic way
+to detect this. For example WC was fully blocked in ARM64 KVM until
+commit 8c47ce3e1d2c ("KVM: arm64: Set io memory s2 pte as normalnc for
+vfio pci device").
+
+Trying to use WC when it is known not to work has a measurable
+performance cost (~5%). Long ago mlx5 developed an boot time algorithm
+to test if WC is available or not by using unique mlx5 HW features to
+measure how many large TLPs the device is receiving. The SW generates a
+large number of combining opportunities and if any succeed then WC is
+declared working.
+
+In mlx5 the WC optimization feature is never used by the kernel except
+for the boot time test. The WC is only used by userspace in rdma-core.
+
+Sadly modern ARM CPUs, especially NVIDIA Grace, have a combining
+implementation that is very unreliable compared to pretty much
+everything prior. This is being fixed architecturally in new CPUs with a
+new ST64B instruction, but current shipping devices suffer this problem.
+
+Unreliable means the SW can present thousands of combining opportunities
+and the HW will not combine for any of them, which creates a performance
+degradation, and critically fails the mlx5 boot test. However, the CPU
+is very sensitive to the instruction sequence used, with the better
+options being sufficiently good that the performance loss from the
+unreliable CPU is not measurable.
+
+Broadly there are several options, from worst to best:
+1) A C loop doing a u64 memcpy.
+   This was used prior to commit ef302283ddfc
+   ("IB/mlx5: Use __iowrite64_copy() for write combining stores")
+   and failed almost all the time on Grace CPUs.
+
+2) ARM64 assembly with consecutive 8 byte stores. This was implemented
+   as an arch-generic __iowriteXX_copy() family of functions suitable
+   for performance use in drivers for WC. commit ead79118dae6
+   ("arm64/io: Provide a WC friendly __iowriteXX_copy()") provided the
+   ARM implementation.
+
+3) ARM64 assembly with consecutive 16 byte stores. This was rejected
+   from kernel use over fears of virtualization failures. Common ARM
+   VMMs will crash if STP is used against emulated memory.
+
+4) A single NEON store instruction. Userspace has used this option for a
+   very long time, it performs well.
+
+5) For future silicon the new ST64B instruction is guaranteed to
+   generate a 64 byte TLP 100% of the time
+
+The past upgrade from #1 to #2 was thought to be sufficient to solve
+this problem. However, more testing on more systems shows that #3 is
+still problematic at a low frequency and the kernel test fails.
+
+Thus, make the mlx5 use the same instructions as userspace during the
+boot time WC self test. This way the WC test matches the userspace and
+will properly detect the ability of HW to support the WC workload that
+userspace will generate. While #4 still has imperfect combining
+performance, it is substantially better than #2, and does actually give
+a performance win to applications. Self-test failures with #2 are like
+3/10 boots, on some systems, #4 has never seen a boot failure.
+
+There is no real general use case for a NEON based WC flow in the
+kernel. This is not suitable for any performance path work as getting
+into/out of a NEON context is fairly expensive compared to the gain of
+WC. Future CPUs are going to fix this issue by using an new ARM
+instruction and __iowriteXX_copy() will be updated to use that
+automatically, probably using the ALTERNATES mechanism.
+
+Since this problem is constrained to mlx5's unique situation of needing
+a non-performance code path to duplicate what mlx5 userspace is doing as
+a matter of self-testing, implement it as a one line inline assembly in
+the driver directly.
+
+Lastly, this was concluded from the discussion with ARM maintainers
+which confirms that this is the best approach for the solution:
+https://lore.kernel.org/r/aHqN_hpJl84T1Usi@arm.com
+
+Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
+Reviewed-by: Michael Guralnik <michaelgur@nvidia.com>
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 ---
-This issue currently only exists in net-next tree, so the target tree
-is net-next.
----
----
- drivers/ptp/ptp_netc.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |  6 +++++
+ .../mlx5/core/lib/wc_neon_iowrite64_copy.c    | 14 +++++++++++
+ .../mlx5/core/lib/wc_neon_iowrite64_copy.h    | 12 ++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/wc.c  | 24 +++++++++++++++++--
+ 4 files changed, 54 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h
 
-diff --git a/drivers/ptp/ptp_netc.c b/drivers/ptp/ptp_netc.c
-index 8c5fea1f43fa..4fefb5ef3685 100644
---- a/drivers/ptp/ptp_netc.c
-+++ b/drivers/ptp/ptp_netc.c
-@@ -304,13 +304,14 @@ static void netc_timer_enable_periodic_pulse(struct netc_timer *priv,
- 	fiper_ctrl |= FIPER_CTRL_SET_PW(channel, fiper_pw);
- 	fiper_ctrl |= alarm_id ? FIPER_CTRL_FS_ALARM(channel) : 0;
+Find V1 here:
+https://lore.kernel.org/all/1757572873-602396-1-git-send-email-tariqt@nvidia.com/
+
+V2: no changes, extended the CC list.
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+index d77696f46eb5..06d0eb190816 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+@@ -176,3 +176,9 @@ mlx5_core-$(CONFIG_PCIE_TPH) += lib/st.o
  
--	priv->tmr_emask |= TMR_TEVNET_PPEN(channel) |
--			   TMR_TEVENT_ALMEN(alarm_id);
-+	priv->tmr_emask |= TMR_TEVENT_ALMEN(alarm_id);
+ obj-$(CONFIG_MLX5_DPLL) += mlx5_dpll.o
+ mlx5_dpll-y :=	dpll.o
++
++#
++# NEON WC specific for mlx5
++#
++mlx5_core-$(CONFIG_KERNEL_MODE_NEON) += lib/wc_neon_iowrite64_copy.o
++FLAGS_lib/wc_neon_iowrite64_copy.o += $(CC_FLAGS_FPU)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c
+new file mode 100644
+index 000000000000..8c07d2040607
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.c
+@@ -0,0 +1,14 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#include "lib/wc_neon_iowrite64_copy.h"
++
++void mlx5_wc_neon_iowrite64_copy(void __iomem *to, const void *from)
++{
++	asm volatile
++	("ld1 {v0.16b, v1.16b, v2.16b, v3.16b}, [%0]\n\t"
++	"st1 {v0.16b, v1.16b, v2.16b, v3.16b}, [%1]"
++	:
++	: "r"(from), "r"(to)
++	: "memory", "v0", "v1", "v2", "v3");
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h
+new file mode 100644
+index 000000000000..ff2a2e263190
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/wc_neon_iowrite64_copy.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#ifndef __MLX5_LIB_WC_NEON_H__
++#define __MLX5_LIB_WC_NEON_H__
++
++/* Executes a 64 byte copy between the two provided pointers via ARM neon
++ * instruction.
++ */
++void mlx5_wc_neon_iowrite64_copy(void __iomem *to, const void *from);
++
++#endif /* __MLX5_LIB_WC_NEON_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/wc.c b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
+index 2f0316616fa4..44c2ac953ea2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/wc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
+@@ -7,6 +7,11 @@
+ #include "mlx5_core.h"
+ #include "wq.h"
  
--	if (pp->type == NETC_PP_PPS)
-+	if (pp->type == NETC_PP_PPS) {
-+		priv->tmr_emask |= TMR_TEVNET_PPEN(channel);
- 		netc_timer_set_pps_alarm(priv, channel, integral_period);
--	else
-+	} else {
- 		netc_timer_set_perout_alarm(priv, channel, integral_period);
++#ifdef CONFIG_KERNEL_MODE_NEON
++#include "lib/wc_neon_iowrite64_copy.h"
++#include <asm/neon.h>
++#endif
++
+ #define TEST_WC_NUM_WQES 255
+ #define TEST_WC_LOG_CQ_SZ (order_base_2(TEST_WC_NUM_WQES))
+ #define TEST_WC_SQ_LOG_WQ_SZ TEST_WC_LOG_CQ_SZ
+@@ -249,6 +254,22 @@ static int mlx5_wc_create_sq(struct mlx5_core_dev *mdev, struct mlx5_wc_sq *sq)
+ 	return err;
+ }
+ 
++static void mlx5_iowrite64_copy(struct mlx5_wc_sq *sq, __be32 mmio_wqe[16],
++				size_t mmio_wqe_size)
++{
++#ifdef CONFIG_KERNEL_MODE_NEON
++	if (cpu_has_neon()) {
++		kernel_neon_begin();
++		mlx5_wc_neon_iowrite64_copy(sq->bfreg.map + sq->bfreg.offset,
++					    mmio_wqe);
++		kernel_neon_end();
++		return;
 +	}
++#endif
++	__iowrite64_copy(sq->bfreg.map + sq->bfreg.offset, mmio_wqe,
++			 mmio_wqe_size / 8);
++}
++
+ static void mlx5_wc_destroy_sq(struct mlx5_wc_sq *sq)
+ {
+ 	mlx5_core_destroy_sq(sq->cq.mdev, sq->sqn);
+@@ -288,8 +309,7 @@ static void mlx5_wc_post_nop(struct mlx5_wc_sq *sq, bool signaled)
+ 	 */
+ 	wmb();
  
- 	netc_timer_wr(priv, NETC_TMR_TEMASK, priv->tmr_emask);
- 	netc_timer_wr(priv, NETC_TMR_FIPER(channel), fiper);
+-	__iowrite64_copy(sq->bfreg.map + sq->bfreg.offset, mmio_wqe,
+-			 sizeof(mmio_wqe) / 8);
++	mlx5_iowrite64_copy(sq, mmio_wqe, sizeof(mmio_wqe));
+ 
+ 	sq->bfreg.offset ^= buf_size;
+ }
+
+base-commit: 1f24a240974589ce42f70502ccb3ff3f5189d69a
 -- 
-2.34.1
+2.31.1
 
 
