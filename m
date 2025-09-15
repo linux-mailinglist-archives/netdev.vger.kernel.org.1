@@ -1,231 +1,291 @@
-Return-Path: <netdev+bounces-222954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D516B573B7
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:58:00 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD849B57408
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 668307A1F82
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:56:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 992474E14C6
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 09:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461E42D8387;
-	Mon, 15 Sep 2025 08:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64462ED178;
+	Mon, 15 Sep 2025 09:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="NlrgJBRa"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Z6WMJZ+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0BF36D
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 08:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757926546; cv=none; b=mhTyjx9G+I+L+b6d5Iaa7BqQpPqnAYMYM0Usq4X1t1ondUTXKF7Gj49wkdfz1AYdXIKDrLBnBNDq/k3TC4vDskeC941fY++GkJfBDoK0YPWqEQw7TlnQ7a48zETy4iDIJQgC1iHnoiywrWsVL8K11Tcc/glNS2P7rnxh6Su+KZM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757926546; c=relaxed/simple;
-	bh=Yy5STNsXLz/oHRvxTISnADXePW8lhB72PMJ0pnkSnxI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qVKP5tirRnWilZpZEwLFch0xTjNc4ri60UD68vjMxzK7nOgBUyosw2HnQ6bEKUv8DZgZNiTpjDrHu8BHAMEN3wy7axtWcSyRie8jG/23Z290J6bGqCQLtouaWV2t27TeeQUMgQoBiM/uealPpUdyoC4C4ndRNNfzYT7NcsWkAl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=NlrgJBRa; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58F8FspP018204
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 08:55:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=wLNuOM/rMRTF8+cnf91YECVB
-	LsmZQln4JgL+duYQ6Gs=; b=NlrgJBRawrjeWrAQ5UWTM9g22eePJlPV2MQFS4hI
-	Cm9O7stq6FVxXmxVUKC6ld0lOXvA2HUZKTeulmvKSp7VM1vWg5n4ekDmgnBpcc9d
-	KAj7V2W7h5oADnM8vQgp0SBGU0Q9Tss12/uRuvvcYLBhpLWnvJIbAPF6SGuVLfU7
-	mLyqPTbuATHtezLVQmcaf2KUQrI630ueopKEM20Mrz9xXmAMwoIJUXfSc3R8+8Ws
-	kNg1xppWRMv2tNDr3FtdapQMkZbG3OQBRjRGBs1AuGT/q474+W0R0V/vlZGoMpk0
-	HAIALg9UPfa0qthIhs1E2UT8wbSnm3aVPOfbx0JKw1LHhA==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4950u5442q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 08:55:43 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-26472a98ab8so7507555ad.0
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 01:55:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757926543; x=1758531343;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wLNuOM/rMRTF8+cnf91YECVBLsmZQln4JgL+duYQ6Gs=;
-        b=gxRTxsvtF1k3B9vidAW6IfEVqFk4NauCvHK1hu+hAUpk5xrnM2eTBzhoF9yYVn0CVa
-         xydjUupLVixK6c5J7pe4xx/VMe+FSejMrJx8U5pH0O2bu+0syia47p4pejXYItxuAAez
-         ax4kEevPcNzfv8JL+oyQH/7Eo/cK97+BTjyQx3eouIESqokahTt4jk/0H+kNC9oyvzjw
-         86PYI/nencg0yyMsuL0DCno/Vc8j4ian79h4L0g+xDqIRiVbqdlQY8rKkeWuO6yhr8NM
-         u0vLwZ1ti1kBDch1Bz8eI0ZB77GgrIkUqEVrn0oM50S+BAUwNaz7RPtIOSIeBlqPKsZy
-         51Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCU8MMhb5m3uVAFozSLVEtqp7CEqByP8dR6yutVfEyynLN4a5w32wxr7qwz6mFOgCHSFIrBSF70=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz24i0y5Dcj2ve8+ayOlFPSdlgzY7eJm+5B2GkubMMYvDBHjXNZ
-	ckuhvgeY9SqK/pHu6uTcYoy0eligrF24ReE0rzOkdibvUGTekvOpU4JqBXVsQ5l4oHKP7Mi271z
-	Xjs2sU0uI28UCoMAtZ0xuFOec1v2qDfBUr0WihBfbMA3P22O6PO9uzYAPO9E=
-X-Gm-Gg: ASbGnctLIJ4C7zwovFJjyP/f4XFD1CQp4u5oSK9lg+vdcCqrLZyey9Yt0L8iATvx4T7
-	OQ5OednF3nSBSlM+gzsinky5ZdY5svrxOcCt9JR7Zf2QFpGr8D+2OVF9pliECGLcQD9DARAw2uJ
-	krZOAuEH/q53NlPm8G+VGlA90AGeCRqiOoqvxfPbsERxNnl5zNcoaVrUfLKKkDK6kgQkuhBj/m5
-	l+2Mc6RZJfXXxsuIm6NRQlLPuZw8dDbAh3b663GJGgjA8KAQ7GKspV+Rpuo9GpYHGiO5unP1jZh
-	Qf+rel5ylD38EuIkP+3H7TUKG3V79tHpl3QYHk8yyLL7xWrXpeeuXw==
-X-Received: by 2002:a17:902:f147:b0:246:2da9:73a2 with SMTP id d9443c01a7336-25bae8dca71mr118773195ad.27.1757926542606;
-        Mon, 15 Sep 2025 01:55:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFxJVzmN8L1lYkKLjLebIOGAD4Y/rC3K4e1Kjs12zKjyg936oG4vniFvJPtY1SQDO/H0GB+HA==
-X-Received: by 2002:a17:902:f147:b0:246:2da9:73a2 with SMTP id d9443c01a7336-25bae8dca71mr118772965ad.27.1757926542028;
-        Mon, 15 Sep 2025 01:55:42 -0700 (PDT)
-Received: from oss.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-264eeab7bf1sm35739675ad.5.2025.09.15.01.55.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 01:55:41 -0700 (PDT)
-Date: Mon, 15 Sep 2025 14:25:36 +0530
-From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>, andrew@lunn.ch
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: qcom: qca808x: Add .get_rate_matching
- support
-Message-ID: <aMfUiBe9gdEAuySZ@oss.qualcomm.com>
-References: <20250914-qca808x_rate_match-v1-1-0f9e6a331c3b@oss.qualcomm.com>
- <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C0B279324;
+	Mon, 15 Sep 2025 09:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757926919; cv=fail; b=hZcqNK4NEhORNw162rSQkEUmAaCDS002LoBV2JsP3WZ3cCGjHkDE7QaKz8fzD9oTa3bwQSkMSxq+Bvmf0MoKY+OAHdYJlAG3VMIGMoMaoWMIyEvp0R18Ok0miiWZOSDxIkjhZ8yy5slC4kInRJhznNiTpwugaS/bwu8r0rnlCrg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757926919; c=relaxed/simple;
+	bh=nKvpqkVkcfGFo36XnUQs9TQRX9pDauwsrNQTqEVKBDk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aupOcbQyN9+6ZW+q2nd7G+jf/+mQEs0w2rhKj1RQ4i7U3mpOMl0d++xYFgOaf6pAFK0NXUurt4USDqpeXsaCv2FNfdUd40KgPoRfK/+AVfvV7sep/9MQFmtC1G3JTbScmqq9lIEPaJ3f0u7DwAPDhgVb84vZStmDbAG3OI6dbBg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Z6WMJZ+N; arc=fail smtp.client-ip=40.107.243.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MCECjYNbvhp0fIiyVn7NBKcAnE+ouihp9YFzsFf4wqa0WVTOSWMK72pcytxpwCLRSwv3X03uiUWUjEqsspDa7gKAtsQP5ZT9KxbKhEaqCvHU0s/YK9zy8fQNGFlyNHWVj3MES5YXD9utTbPFRIrUKdZz06gdFSKvPp4TXpw7/3AmZp6ljsf2tmiw1rLlVxtJfLOLzVc0weoamDIe1aMlFM3cCQBSGQEwgj4Cr8KMo/5J0CBTdgpxUah/+AZarASZyD0p+1WkhaQ8lesqT7hqbvJGZX19Srf1QOX8B4QWlOZq5wTglsUGHKXsDpICsr6alYL8zAqApq5H0WJMqpsjYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IDub70ys3u1U0+3kpB4xyFatjKV1C2LaNK5PD0Kk6/c=;
+ b=nYZDkVVSw77GbFD/XsahAeq7jh5GtDM2BClDvYNbOEODAu6EphNR3TIZoepU1r7yKhIVadBf+0K6hzgTtoZex3tFdCRthBIf/gNZFSbFFkt0pkawozDtou0b37Bmo8UcxnkgJM9VJY4cDdnDLNQEgs5yu63d/6yS904Cg5vQ3J5glTNcCcYleIru8MLxzD50UeaZf/PefyFXLkIEbM5RLPcrND/r8OvLQe/zY8sx3ErpzIUDhS4fEyWK8IQkTcIC7GUib/ZjgkGbv5UbFyJhKLY95VDc7BNznqJaxEVoLKiQw9edBEiuDNtyMHLDDtq1l/UR+Jq+oVMPW6v/HcDsjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=broadcom.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IDub70ys3u1U0+3kpB4xyFatjKV1C2LaNK5PD0Kk6/c=;
+ b=Z6WMJZ+NhuTt9+4Ibfs0J30595uOimm/5lBvAwr1yvUjlEU+16nWdsrf2LM+R56FjQfl+IPE5YJp+pl17qWSg0xhx6oFGz/JHl7UhdSJ7c+vz8ebHelcSy15MbsVgUIgtSu54tMDeKM/Vc6Y2tXXTfCsReUhYdIAWoco43ybEPH0hqeNGp7LxK/KKI24xXBZO4n7BFGV4iKZol7seb+kUAml0e5hl2IsQEErD8AWs74Yp/0A1dzOelsDcCxp7D3+yxvazS2rQhXYizsSk9yPnoTeVlZHV02whQTj2QNyk0pQ3vCEFwSgWwTTHPR3mJamkUdOAdcyxcPsFVRnhbgx7A==
+Received: from BYAPR07CA0008.namprd07.prod.outlook.com (2603:10b6:a02:bc::21)
+ by IA0PR12MB7752.namprd12.prod.outlook.com (2603:10b6:208:442::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.19; Mon, 15 Sep
+ 2025 09:01:52 +0000
+Received: from SJ1PEPF00002311.namprd03.prod.outlook.com
+ (2603:10b6:a02:bc:cafe::c1) by BYAPR07CA0008.outlook.office365.com
+ (2603:10b6:a02:bc::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.20 via Frontend Transport; Mon,
+ 15 Sep 2025 09:01:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF00002311.mail.protection.outlook.com (10.167.242.165) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9115.13 via Frontend Transport; Mon, 15 Sep 2025 09:01:51 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 15 Sep
+ 2025 02:01:39 -0700
+Received: from localhost (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 15 Sep
+ 2025 02:01:37 -0700
+Date: Mon, 15 Sep 2025 12:00:30 +0300
+From: Leon Romanovsky <leonro@nvidia.com>
+To: Siva Reddy Kallam <siva.kallam@broadcom.com>
+CC: Simon Horman <horms@kernel.org>, <jgg@nvidia.com>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<vikas.gupta@broadcom.com>, <selvin.xavier@broadcom.com>,
+	<anand.subramanian@broadcom.com>, Usman Ansari <usman.ansari@broadcom.com>
+Subject: Re: [PATCH 5/8] RDMA/bng_re: Add infrastructure for enabling
+ Firmware channel
+Message-ID: <20250915090030.GB9353@unreal>
+References: <20250829123042.44459-1-siva.kallam@broadcom.com>
+ <20250829123042.44459-6-siva.kallam@broadcom.com>
+ <20250912083928.GS30363@horms.kernel.org>
+ <CAMet4B7SJXk1yMsJ61a026U3wNKr-7oNX9_-V+_W1PA0VRaaTQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
-X-Proofpoint-GUID: PYmieEHdb9AaYisL_h3G20vs1q9_LJRs
-X-Proofpoint-ORIG-GUID: PYmieEHdb9AaYisL_h3G20vs1q9_LJRs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAzMSBTYWx0ZWRfX4LT5/SEygWQ1
- 1o99u8g7IjTVWPCxrcQ+nHLTEuhBMBFo4nFJdWQaALEKOzrk9ZwqMApQqhBWXgXsT1uUTtcs2VF
- S6g68ZRNhDiaJCfqsCmonxh6W7D+WJuIl0zP0mkBvUE7msM70EJu2H94udSrX+8MMcyVMU/5YlV
- 2iY93q1wMc7sUQZMLeMnAo4zzD0j+qm89NhzCuRPdl8kfR9NBqr0iCNWC9Z12ab6aVfflq8mRgK
- ZfyD2hLb4fDGnBGf1NVXt5YFKvFg+wtsZaaii4WNZBf7KdirkJhqVpjJ6Q9Km4p7oVAJ+1BXZUe
- 0Vda+LgzqPqQz3U+xDDpss4gwwIb5fIl+rVDGcDKc7utXlhptX+7BumF7lx8ZbD+3vTS5YPIK59
- rQOjNeg5
-X-Authority-Analysis: v=2.4 cv=JvzxrN4C c=1 sm=1 tr=0 ts=68c7d48f cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=P-IC7800AAAA:8 a=c4qJPYNQ9Ol6fpErAFgA:9
- a=CjuIK1q_8ugA:10 a=uG9DUKGECoFWVXl0Dc02:22 a=d3PnA9EDa4IxuAV0gXij:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-15_03,2025-09-12_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 phishscore=0 suspectscore=0 clxscore=1015 impostorscore=0
- spamscore=0 adultscore=0 malwarescore=0 bulkscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509130031
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMet4B7SJXk1yMsJ61a026U3wNKr-7oNX9_-V+_W1PA0VRaaTQ@mail.gmail.com>
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002311:EE_|IA0PR12MB7752:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2cd6e19c-6252-44a5-a1cd-08ddf4368306
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bnJhQ242bEoyUkxZUWwwK0hqNVh6V3lON0Vsa25oYVBRSzJjWWxHeFBnUm8z?=
+ =?utf-8?B?bXVYaW5MUnZnc0FHNE4zREM3blNXNVdTM3dNOE44Y1dpZ29FL2p5L1FLaUJ2?=
+ =?utf-8?B?THcwOFZJbXM3ZklCYjRIQ0lYNC9UU3dVTFVIQkRVU1pCSzFhVy85cWEvaU85?=
+ =?utf-8?B?MDZxamhoQTRHdW9DTUxzSTdRblRwVmFMb2FKQ24zU0hjemxRVmp5MUpYT0li?=
+ =?utf-8?B?SDYzazRsNGRuSlFXbUhFUGlaQk5BbjBxZm1SOVByTVhIOFBrWUU0S01oeldB?=
+ =?utf-8?B?NTlpUHY5VWE3MFRndno5K3RsUFp1eENrYkRpcmpKZTFtVlBIY21jMmVxMGsr?=
+ =?utf-8?B?M0p6TFpubHNmRlhVaGtja1hxMzhwam9YOGFSb25zemdWMXhVY3pUazQrVmlj?=
+ =?utf-8?B?bHphdWVRdWtKNkhPUG96RTRFc1gvQjd4TXVzRE10ZkJnWG4vZGZ3bzFZa1VS?=
+ =?utf-8?B?SkNPNW5PVmd3a0NOR1UyWVlWa3V1T0FtRDNhbWxvR0ZTdkpvUGxRN1EvdWFP?=
+ =?utf-8?B?WWo5ejN1dlNmM2pGeXlDeFltTDVjQU1lTUJHMlhUczZhQXg3MHg2Zy9rUG8y?=
+ =?utf-8?B?Um44NlVGMFJwN1g4bzJSTzQwMS8vMTF0b3VnK25LS3ZXcHNpWEJqT2h6bXRj?=
+ =?utf-8?B?SFZJUURwMThKaThqZjU3dE1hMUYzZmcxbzRVWkVpV3B3emwydXhrbGlFeEUv?=
+ =?utf-8?B?b3E3aWlDNUhhNGVCbGd6bi9nMkFEVnJ1YzYvbFNsU1JEZ2wrakVFZEZpMVJP?=
+ =?utf-8?B?Sm9FQUFjbmJYMmo1bEZ1eW9xQXBNRUppL09HY0x4ZUVhRHZXdmIwZFRucHVq?=
+ =?utf-8?B?ajg4L2V5cXgrZzBHTzRxTGZHMWtFMDRyb0MxU3JSZWlXNDJRakJKc2VXOEpN?=
+ =?utf-8?B?MUFtc3lZRnp1Q1RXd3dKbXpYeC9MbHIvSjhCbEpQcnNrNE95ZGxqNmdnUGdN?=
+ =?utf-8?B?cjRwNEd0YVRIRGNvY3pwYnZPYTZ0WFV4NWE3cjZRNHRmRmt5YWFuc2dNRkdq?=
+ =?utf-8?B?VEg4N3h3VVFBbXBPamd1djJEVGtuNThZUklQYURNN04wN1dZcGhLNDc4QllV?=
+ =?utf-8?B?WXEyMWJ1RXpKSHlGYVIvUGtEbklYajVaa1l5eXlsbUZENUVxbUZJNUtDV1dk?=
+ =?utf-8?B?U08wdCtmSTZlSGdZeWJXWlhmVVBnVjdZbjVFWXRaSFF4eElKcHdVMSt0MjJS?=
+ =?utf-8?B?Y0pqYkZNV0JTNmI5a21Xd1JoS2pOQ2M4ZVFGNXo0eXk4eVVHd2F6c2dVRnh0?=
+ =?utf-8?B?blo0NTIvRk9sQ3REVlZ6NDRZcUZueUU4SWNtcmp4Qk5FYmxGcU9tK0dodC9C?=
+ =?utf-8?B?ckppWWpTYVhWWnRjWWNwcU9rMlBwZW1IRVJ4U0NLUnFTVmE3STk1T0JtTkxx?=
+ =?utf-8?B?SXFFanlZbTlRNnZGaXo3UnMwYTRsRkhyekxjbXBzZkt6R1hwZm52QlRXRWJn?=
+ =?utf-8?B?QzZGbHRWT3N2TE01T0haa1MvVWFiYmZuNVBRT09jblUrMmR0a2tGSW9OZnRP?=
+ =?utf-8?B?QjBXM3o1VEtJbWJkTi9nY1NKYkpRZ2N6THJyUjNGSFVDdlp4NnRtcTRTazJx?=
+ =?utf-8?B?SFFvdXBCR2dHWExuSU5PWVBHYmFYRHY3Y3Z1UXlsZ3FNWXUzUjVlQVViTlBM?=
+ =?utf-8?B?aDRyVlJnUU5PVEI1V0ZGcGtJL2R6YnlCdXd5U2ZITlJiTjkrTm9yK2lHa3hS?=
+ =?utf-8?B?b1NiTFlYNkVWVjU1c3I1ZDlwYlJPcHZkVGlGclRCTi9PdzZIUFdhMkRtZS9M?=
+ =?utf-8?B?WTF0SG1XWnE4aUFsQmtsaG1yTGlvL09QcWxmbkl6QVYyNmhDZ0djMVo3cHJ1?=
+ =?utf-8?B?RDVFT3A3bzZjcy9CUzVEWXI3dDBaVUwwOGVhWW1XNExDWDZnMEl3L0Z0cERB?=
+ =?utf-8?B?ZjI3Q3U5VVJGNnRwSkY0SFIzc1dRdWtVbWpJUlBMeTgvZ2RmMnd6RjJuM094?=
+ =?utf-8?B?VG1xMkpobVN5UWRKMmVqZlp0MzhuOWlKQ0xFcHU0RWRBemFuTmVIWUh4UE5I?=
+ =?utf-8?B?VGUxTUJ5QytSeER6YlRHQld3Y1owOG8xa2x3dUFvN0N6SXpXczFwalpjOU43?=
+ =?utf-8?Q?DaYmTP?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 09:01:51.9783
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cd6e19c-6252-44a5-a1cd-08ddf4368306
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002311.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7752
 
-On Sun, Sep 14, 2025 at 07:10:36PM +0100, Russell King (Oracle) wrote:
-> On Sun, Sep 14, 2025 at 08:36:48PM +0530, Mohd Ayaan Anwar wrote:
-> > Add support for rate matching to the QCA8081 PHY driver to correctly
-> > report its capabilities. Some boards[0][1] with this PHY currently
-> > report support only for 2.5G.
-> > 
-> > Implement the .get_rate_matching callback to allow phylink to determine
-> > the actual PHY capabilities and report them accurately.
+On Mon, Sep 15, 2025 at 02:14:19PM +0530, Siva Reddy Kallam wrote:
+> On Fri, Sep 12, 2025 at 2:09 PM Simon Horman <horms@kernel.org> wrote:
+> >
+> > On Fri, Aug 29, 2025 at 12:30:39PM +0000, Siva Reddy Kallam wrote:
+> > > Add infrastructure for enabling Firmware channel.
+> > >
+> > > Signed-off-by: Siva Reddy Kallam <siva.kallam@broadcom.com>
+> > > Reviewed-by: Usman Ansari <usman.ansari@broadcom.com>
+> >
+> > ...
+> >
+> > > diff --git a/drivers/infiniband/hw/bng_re/bng_fw.c b/drivers/infiniband/hw/bng_re/bng_fw.c
+> >
+> > ...
+> >
+> > > +/* function events */
+> > > +static int bng_re_process_func_event(struct bng_re_rcfw *rcfw,
+> > > +                                  struct creq_func_event *func_event)
+> > > +{
+> > > +     int rc;
+> > > +
+> > > +     switch (func_event->event) {
+> > > +     case CREQ_FUNC_EVENT_EVENT_TX_WQE_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_TX_DATA_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_RX_WQE_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_RX_DATA_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_CQ_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_TQM_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_CFCQ_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_CFCS_ERROR:
+> > > +             /* SRQ ctx error, call srq_handler??
+> > > +              * But there's no SRQ handle!
+> > > +              */
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_CFCC_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_CFCM_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_TIM_ERROR:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_VF_COMM_REQUEST:
+> > > +             break;
+> > > +     case CREQ_FUNC_EVENT_EVENT_RESOURCE_EXHAUSTED:
+> > > +             break;
+> > > +     default:
+> > > +             return -EINVAL;
+> > > +     }
+> > > +
+> > > +     return rc;
+> >
+> > rc does not appear to be initialised in this function.
+> >
+> > Flagged by Clang 20.1.8 with -Wuninitialized
 > 
-> Sorry, but this is incorrect.
-> 
-> The PHY does not support rate matching, but switches between SGMII
-> and 2500BASE-X depending on the negotiated speed according to the code:
-> 
-> static void qca808x_fill_possible_interfaces(struct phy_device *phydev)
-> {
->         unsigned long *possible = phydev->possible_interfaces;
-> 
->         __set_bit(PHY_INTERFACE_MODE_SGMII, possible);
-> 
->         if (!qca808x_is_1g_only(phydev))
->                 __set_bit(PHY_INTERFACE_MODE_2500BASEX, possible);
-> }
-> 
-> static int qca808x_read_status(struct phy_device *phydev)
-> {
-> ...
->         if (phydev->link) {
->                 if (phydev->speed == SPEED_2500)
->                         phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
->                 else
->                         phydev->interface = PHY_INTERFACE_MODE_SGMII;
->         } else {
-> 
-> The driver certainly does not support rate-matching, even if the PHY
-> can support it, and even with your patch. All you are doing is making
-> ethtool suggest that other speeds are supported, but I think you'll
-> find that if the PHY negotiates those speeds, it won't work.
-> 
+> Thank you for the review. We will fix it in the next version of the patchset.
 
-Weirdly, I was able to test both 1G and 2.5G with my patch. Could this
-be because the driver is already deviating from the standard in other
-areas?
+Once you are fixing it, please squeeze you switch-case to be something
+like that:
 
-> So, the bug is likely elsewhere, or your ethernet MAC doesn't support
-> SGMII and you need to add complete support for  rate-matching to the
-> driver.
+switch (func_event->event) {
+     case CREQ_FUNC_EVENT_EVENT_TX_WQE_ERROR:
+     case CREQ_FUNC_EVENT_EVENT_TX_DATA_ERROR:
+     case CREQ_FUNC_EVENT_EVENT_RX_WQE_ERROR:
+     ....
+     	break;
+     default:
+     	return -EINVAL;
+    }
+
+Thanks
+
 > 
-
-I tried setting phy-mode=sgmii in the Devicetree and I am able to get 1G
-and lower speeds to work.
-
-> Please enable phylink debugging and send the kernel messages so I can
-> see what's going on.
+> >
+> > > +}
+> >
+> > ...
+> >
+> > > +int bng_re_enable_fw_channel(struct bng_re_rcfw *rcfw,
+> > > +                          int msix_vector,
+> > > +                          int cp_bar_reg_off)
+> > > +{
+> > > +     struct bng_re_cmdq_ctx *cmdq;
+> > > +     struct bng_re_creq_ctx *creq;
+> > > +     int rc;
+> > > +
+> > > +     cmdq = &rcfw->cmdq;
+> > > +     creq = &rcfw->creq;
+> >
+> > Conversely, creq is initialised here but otherwise unused in this function.
+> >
+> > Flagged by GCC 15.1.0 and Clang 20.1.8 with -Wunused-but-set-variable
 > 
-
-Filtered logs (without my patch):
-[    7.937871] qcom-ethqos 23040000.ethernet: IRQ eth_wake_irq not found
-[    7.944581] qcom-ethqos 23040000.ethernet: IRQ eth_lpi not found
-[    7.953753] qcom-ethqos 23040000.ethernet: User ID: 0x20, Synopsys ID: 0x52
-[    7.960927] qcom-ethqos 23040000.ethernet:   DWMAC4/5
-[    7.966049] qcom-ethqos 23040000.ethernet: DMA HW capability register supported
-[    7.973564] qcom-ethqos 23040000.ethernet: RX Checksum Offload Engine supported
-[    7.981073] qcom-ethqos 23040000.ethernet: TX Checksum insertion supported
-[    7.988139] qcom-ethqos 23040000.ethernet: TSO supported
-[    7.993603] qcom-ethqos 23040000.ethernet: Enable RX Mitigation via HW Watchdog Timer
-[    8.001654] qcom-ethqos 23040000.ethernet: Enabled L3L4 Flow TC (entries=8)
-[    8.008817] qcom-ethqos 23040000.ethernet: Enabled RFS Flow TC (entries=10)
-[    8.008819] qcom-ethqos 23040000.ethernet: Enabling HW TC (entries=128, max_off=64)
-[    8.008821] qcom-ethqos 23040000.ethernet: TSO feature enabled
-[    8.008822] qcom-ethqos 23040000.ethernet: SPH feature enabled
-[    8.008824] qcom-ethqos 23040000.ethernet: Using 36/40 bits DMA host/device width
-[    8.243500] qcom-ethqos 23040000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
-[    8.253778] qcom-ethqos 23040000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-1
-[    8.261991] qcom-ethqos 23040000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-2
-[    8.262527] qcom-ethqos 23040000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-3
-[    8.348697] qcom-ethqos 23040000.ethernet eth0: PHY stmmac-0:1c uses interfaces 4,23, validating 23
-[    8.358304] qcom-ethqos 23040000.ethernet eth0:  interface 23 (2500base-x) rate match none supports 6,13-14,47
-[    8.368589] qcom-ethqos 23040000.ethernet eth0: PHY [stmmac-0:1c] driver [Qualcomm QCA8081] (irq=POLL)
-[    8.368595] qcom-ethqos 23040000.ethernet eth0: phy: 2500base-x setting supported 0000000,00000000,00008000,00006040 advertising 0000000,00000000,00008000,00006040
-[    8.381057] qcom-ethqos 23040000.ethernet eth0: Enabling Safety Features
-[    8.416398] qcom-ethqos 23040000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
-[    8.425541] qcom-ethqos 23040000.ethernet eth0: registered PTP clock
-[    8.434778] qcom-ethqos 23040000.ethernet eth0: configuring for phy/2500base-x link mode
-[    8.446169] qcom-ethqos 23040000.ethernet eth0: major config, requested phy/2500base-x
-[    8.454323] qcom-ethqos 23040000.ethernet eth0: interface 2500base-x inband modes: pcs=00 phy=00
-[    8.463353] qcom-ethqos 23040000.ethernet eth0: major config, active phy/outband/2500base-x
-[    8.471939] qcom-ethqos 23040000.ethernet eth0: phylink_mac_config: mode=phy/2500base-x/none adv=0000000,00000000,00000000,00000000 pause=00
-[    8.485780] 8021q: adding VLAN 0 to HW filter on device eth0
-[    8.489653] qcom-ethqos 23040000.ethernet eth0: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
-[   13.615848] qcom-ethqos 23040000.ethernet eth0: phy link up 2500base-x/2.5Gbps/Full/none/rx/tx/nolpi
-[   13.617924] qcom-ethqos 23040000.ethernet eth0: Link is Up - 2.5Gbps/Full - flow control rx/tx
-
-// I changed the link partner speed to 1G here:
-[   74.031182] qcom-ethqos 23040000.ethernet eth0: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
-[   74.031773] qcom-ethqos 23040000.ethernet eth0: Link is Down
-
-For reference, this board is using the same MAC as [0] which works
-perfectly fine with the AQR115C PHY. I got the (wrong) idea to add
-.get_rate_matching after comparing the two PHY drivers. The MAC driver
-is stmmac/dwmac-qcom-ethqos.c
-
-	Ayaan
----
-[0] https://elixir.bootlin.com/linux/v6.17-rc5/source/arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dts
+> Thank you for the review. We will fix it in the next version of the patchset.
+> 
+> >
+> > > +
+> > > +     /* Assign defaults */
+> > > +     cmdq->seq_num = 0;
+> > > +     set_bit(FIRMWARE_FIRST_FLAG, &cmdq->flags);
+> > > +     init_waitqueue_head(&cmdq->waitq);
+> > > +
+> > > +     rc = bng_re_map_cmdq_mbox(rcfw);
+> > > +     if (rc)
+> > > +             return rc;
+> > > +
+> > > +     rc = bng_re_map_creq_db(rcfw, cp_bar_reg_off);
+> > > +     if (rc)
+> > > +             return rc;
+> > > +
+> > > +     rc = bng_re_rcfw_start_irq(rcfw, msix_vector, true);
+> > > +     if (rc) {
+> > > +             dev_err(&rcfw->pdev->dev,
+> > > +                     "Failed to request IRQ for CREQ rc = 0x%x\n", rc);
+> > > +             bng_re_disable_rcfw_channel(rcfw);
+> > > +             return rc;
+> > > +     }
+> > > +
+> > > +     return 0;
+> > > +}
+> >
+> > ...
+> 
 
