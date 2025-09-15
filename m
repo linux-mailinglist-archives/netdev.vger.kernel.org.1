@@ -1,124 +1,121 @@
-Return-Path: <netdev+bounces-223229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765B4B58742
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 00:15:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D9C3B58757
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 00:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF4914C4487
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 22:14:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90D6B1B25087
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 22:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABFE2C0285;
-	Mon, 15 Sep 2025 22:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507E92C08AF;
+	Mon, 15 Sep 2025 22:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="sUpTjn5O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGT6EmnQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA62523957D
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 22:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.121
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9AD29E114;
+	Mon, 15 Sep 2025 22:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757974494; cv=none; b=cOZKjCImyiLHdYqQckDxvuqfZTUm31H9lXrN+K8nV1ddJLPWjSX5nLySQHK1od451HzIPJjO0Oy3ma28r8fyDNfz/T2iNHHBDgopbjBb6GMApBKvHEvH4fI9hNp02ZtfSPIDFkO295Ojs9eYZn3b3hF8og1aprHKgovfYI3x2sU=
+	t=1757974752; cv=none; b=LPH2znTb2tOhZvs5WQPeSQxv5M+IMYQLc/rf/1UWPzX52I3dqoz+AeHadUqOFhzogt7/FC1KkFacm4KVaMohqdiD/kf7n2SPmcO8YWhKP0AWxtDMPnE3pMiWP8OUU+ecj4MPxqT3aHLDKZ6Jo3Us+GlFvr8AI/KTewjbVz4iUe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757974494; c=relaxed/simple;
-	bh=WMfVJAH35ejDvzEqyox5w+jzPDgfrRaXulsQeZMNTek=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=ez9Rk4lTrnIh9BuqXDShvaP0F+A9/erLw84BsLALnNopF7863mD616wwjv01X9ySDdTpSFRMpeqmm4XkoWsged6NLn037XYLeQfw4XtGxZqc08gDQ8WEN2fxL/i6a3f3xARaLW1Zf7RhVgUk70HHuvjfU3P6ScS1jwkO6Q10WYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=sUpTjn5O; arc=none smtp.client-ip=185.125.188.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from famine.localdomain (unknown [50.35.97.145])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 364953F7C0;
-	Mon, 15 Sep 2025 22:14:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1757974483;
-	bh=5lYp7gcNzUtZKs1Ue4wh5p1hwSW4oe5/RnQqQo5Ok4g=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=sUpTjn5OFMdz2Sq2r7z9duYIsbRtEYvVyDggUHUrZQ/7I/zUwlXKoVaqT8Kfza6H8
-	 QcxHPTPFdfgWd2nZ1x1aKOoatJhSikXAR4FTDMKzDyCigrxR7EVpZ2mLr4eWsOlxSr
-	 SqlKetAa8QKV5xlCkpEbGsb1WWFSeXYSQ4MjlmnCRG472sDbIkyzgMhpsssvviKtOT
-	 6uYvykBuTKBjCQPQiYntsnXIHN9ALkB1AtGif16fFOqfit0eqoQ85EKrhQs7chR/qr
-	 ef1andKcVkQBoCxR9l68IvrqXt34O3I/jisQ5X/a4ZXbALibtk67emdeEJSs/tEyLv
-	 N/3sjJrxgqxwg==
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id EC9739FC97; Mon, 15 Sep 2025 15:14:41 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id E9B019FC6F;
-	Mon, 15 Sep 2025 15:14:41 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Victor Nogueira <victor@mojatatu.com>
-cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
-    kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests/tc-testing: Adapt tc police action
- tests for Gb rounding changes
-In-reply-to: <20250912154616.67489-1-victor@mojatatu.com>
-References: <20250912154616.67489-1-victor@mojatatu.com>
-Comments: In-reply-to Victor Nogueira <victor@mojatatu.com>
-   message dated "Fri, 12 Sep 2025 12:46:16 -0300."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1757974752; c=relaxed/simple;
+	bh=b/KAMT/vU3fpIChuCZ8uax4id1ddqwonwf8AV/cakto=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S2U0buxusUzkJR/mgwCfcWv/x01Mg5aCeq1SjGR2vTYPUg8y93wc9t+mpDqBMEbyZRhgSJJCqS4ULenjJ5/aZul+aUg2W0OHE0qz2/pcB+CwI/JTzscmVVdHAdV6HJNraEqbMfQPpSY4cAm7trYxcJp5wjGCyaQEwb5uUzXE6VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGT6EmnQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C50C4CEF1;
+	Mon, 15 Sep 2025 22:19:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757974751;
+	bh=b/KAMT/vU3fpIChuCZ8uax4id1ddqwonwf8AV/cakto=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gGT6EmnQvukqFMqMtqlepbmHr2WQI1aQineneVKQQSGzOY1R6Q+XDnwa3NsHXFQOV
+	 hmI40g/TeZ7O/rX9/+oJl1mrj/tdRdV5JiW6497YhnCgSztVVbei6nPKjfkGcS0eVG
+	 6J/oVwgHOtWRKx2Q2bxpv/YuoGK0hmyIOFQ01bKfzCSnazZXtKE5x6b/Rz39elUVTF
+	 dJmk2wUg4D3bzoi7AqfyRJi1PJTa7b2g2oomBqh773Qjhba70EW1sj2NgI9EPVxqON
+	 x2hGtjFgJvhONx5/L8mpl0ia6De74xa66l+Y6mAi5ahONM7ADPHt9qw/alKSWsd0Qs
+	 d1D0WOSovq6ZA==
+Date: Mon, 15 Sep 2025 15:18:59 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Michael Guralnik <michaelgur@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>, Will Deacon <will@kernel.org>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>, linux-s390@vger.kernel.org,
+	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
+	Bill Wendling <morbo@google.com>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Patrisious Haddad <phaddad@nvidia.com>
+Subject: Re: [PATCH net-next V2] net/mlx5: Improve write-combining test
+ reliability for ARM64 Grace CPUs
+Message-ID: <20250915221859.GB925462@ax162>
+References: <1757925308-614943-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3365173.1757974481.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Sep 2025 15:14:41 -0700
-Message-ID: <3365174.1757974481@famine>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1757925308-614943-1-git-send-email-tariqt@nvidia.com>
 
-Victor Nogueira <victor@mojatatu.com> wrote:
+On Mon, Sep 15, 2025 at 11:35:08AM +0300, Tariq Toukan wrote:
+...
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+> index d77696f46eb5..06d0eb190816 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+> @@ -176,3 +176,9 @@ mlx5_core-$(CONFIG_PCIE_TPH) += lib/st.o
+>  
+>  obj-$(CONFIG_MLX5_DPLL) += mlx5_dpll.o
+>  mlx5_dpll-y :=	dpll.o
+> +
+> +#
+> +# NEON WC specific for mlx5
+> +#
+> +mlx5_core-$(CONFIG_KERNEL_MODE_NEON) += lib/wc_neon_iowrite64_copy.o
+> +FLAGS_lib/wc_neon_iowrite64_copy.o += $(CC_FLAGS_FPU)
 
->For the tc police action, iproute2 rounds up mtu and burst sizes to a
->higher order representation. For example, if the user specifies the defau=
-lt
->mtu for a police action instance (4294967295 bytes), iproute2 will output
->it as 4096Mb when this action instance is dumped. After Jay's changes [1]=
-,
->iproute2 will round up to Gb, so 4096Mb becomes 4Gb. With that in mind,
->fix police's tc test output so that it works both with the current
->iproute2 version and Jay's.
->
->[1] https://lore.kernel.org/netdev/20250907014216.2691844-1-jay.vosburgh@=
-canonical.com/
->
->Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+Does this work as is? I think this needs to be CFLAGS instead of FLAGS
+but I did not test to verify.
 
-Reviewed-by: Jay Vosburgh <jay.vosburgh@canonical.com>
-
-
->---
-> tools/testing/selftests/tc-testing/tc-tests/actions/police.json | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/police.j=
-son b/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
->index 5596f4df0e9f..b2cc6ea74450 100644
->--- a/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
->+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
->@@ -879,7 +879,7 @@
->         "cmdUnderTest": "$TC actions add action police pkts_rate 1000 pk=
-ts_burst 200 index 1",
->         "expExitCode": "0",
->         "verifyCmd": "$TC actions ls action police",
->-        "matchPattern": "action order [0-9]*:  police 0x1 rate 0bit burs=
-t 0b mtu 4096Mb pkts_rate 1000 pkts_burst 200",
->+        "matchPattern": "action order [0-9]*:  police 0x1 rate 0bit burs=
-t 0b mtu (4Gb|4096Mb) pkts_rate 1000 pkts_burst 200",
->         "matchCount": "1",
->         "teardown": [
->             "$TC actions flush action police"
->-- =
-
->2.51.0
->
+Cheers,
+Nathan
 
