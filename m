@@ -1,55 +1,63 @@
-Return-Path: <netdev+bounces-222978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF8AB5766B
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:33:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35965B57673
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:34:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DA28163DF3
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:33:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E4FA177C04
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACE12FC86B;
-	Mon, 15 Sep 2025 10:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4152FD7D3;
+	Mon, 15 Sep 2025 10:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OjMAQCK/"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="n52fYylc"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1A32FC03B;
-	Mon, 15 Sep 2025 10:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7652FC892;
+	Mon, 15 Sep 2025 10:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757932387; cv=none; b=bybrXpZJsGk3z3Q8PjM4Z6ymrG+hmPKzV9k14p2XMPkDhDh8oQjDADl9RgtmJZMBmNJxJAWaCBiya4k0Cwxcu2DgahKQe6pqmn9fvVsxMFzukaEGmGByMTssO2q5IkZXZO6aHu6Bzg6Jb5/nrvGabY4LxeVnO1W5buK4P+SXf+0=
+	t=1757932410; cv=none; b=eO6WAj6sOMRln/hycgeqh+hSwBOUBZx3L6WQydIJX57clKAcAlbfl+5LlrYkMvMWAE/XQEOy7yhBF4ePkYHf3GkuLiGi7HdHM6Cxz7aI0E/CBm+aPeC8xXvblKt5+4cHszsRH1pW55jEeP/j0MbEoinHPBAG2+VRY9uLZrUZhvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757932387; c=relaxed/simple;
-	bh=jBrXosrEm0ufxE9d6vgC0d6AOZqOTBjfpGs+BYCBuG4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JubSvzZhp/em8Py3obeCEZ2uNm2X1JFSXMsk7L++j8lZ0ois5uZ5n0CzVkVMozX+VqjJ6VYMw2ppIkK8/EjgptkGQLfpz1aNkZcxoqmjSY+NyESvFA6GO3fauyFrOP+liDStI7MLrSe2y0VvNZRQZW9hDdP4xCTUf3GojY8rfOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OjMAQCK/; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1757932384;
-	bh=jBrXosrEm0ufxE9d6vgC0d6AOZqOTBjfpGs+BYCBuG4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OjMAQCK/+gG+8jCO5AoowfuI++dUaRvWFld0urxeYgovi0jkDMe5Hkvib9GMsAoKB
-	 so1ns4TynJKzquBxFeLk+lGtZ/wj5YqsJMDLQlzbAw4n8Ksu5tAEBmnwghPdTHZ2OP
-	 OFp8Kpmgf3UaRNETufLr6u9k91pQVvvCCxiju/lEFiSae9B1TKBQsBAsKTlKaviL65
-	 24Rtmz0d9GAcsrMZDj6sCieAaQnU8nBf670lpSR2bo4itx3HxxyXhhV6e0xwMgxILt
-	 0AeHNx8nfeBGj9hpaLXRdM+xVX8TT6Hm3bR990osPafCN/VHxc997xHTHb02oADDZV
-	 whNUksv/BgHgA==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5E3AD17E107A;
-	Mon, 15 Sep 2025 12:33:03 +0200 (CEST)
-Message-ID: <db803bd3-4e7d-4aa2-bdd1-6e0b14812c03@collabora.com>
-Date: Mon, 15 Sep 2025 12:33:02 +0200
+	s=arc-20240116; t=1757932410; c=relaxed/simple;
+	bh=B+vY08F4i/HnCv1ScZcxAk8Aza1H/zvJQLkJgxXZeNM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qlrhzXH4WYJTe9d/1W3mX/E65vnK1y6Pkbwjgq5hHvNJb39Xj+QF6O1+W9OkosBx+lZMUuhWTq0FaXC6Y7l+mq+yBUMvXY5znqAPvy2uiROcqcd7ij0AIidHYT2JBIFdnahTFIhY9gw+47ZOu9dBnSm2SYsTyyJoNmDTwRnBd5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=n52fYylc; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58F8FiYk018062;
+	Mon, 15 Sep 2025 10:33:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	hEwwZy8ATsI5rPJueJK8Mx9VooV1umz/QHEkRLAcREw=; b=n52fYylc7qSgB3eV
+	Yq8T9m4YvkV6suTPvdHEhNr2U53aDcWrxgSkfOVypocqN2xVZVjtVnnXxQPJPuHw
+	3TTVcLRgsoochUq7FSUQ0Eiu0B4gqImRFTAzWfzWb1ilwhwwblo/cu/eX9aakQ7u
+	wvs0TZWcn0NEF9PQSzvKq9tbKDaWShs9sBF2p4ouUr/vSuMSL5WWDdip5rG61H/s
+	Nh+2GQB40NMUZucg6oT4/6DhdOs+ekqubCdUghiyeodBdc5CPOyQ7bSDiIdEB+HH
+	RpgEQJloWZAVcqcWzBmeVveUvaJb3ppg1Mh/R13CrBCkp/MbYdO48Kug2l886uLD
+	csqK7A==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4950u54h7c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Sep 2025 10:33:23 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 58FAXNwQ011646
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Sep 2025 10:33:23 GMT
+Received: from [10.218.18.194] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.24; Mon, 15 Sep
+ 2025 03:33:16 -0700
+Message-ID: <8f8df889-3f88-4b9b-a238-16044796d897@quicinc.com>
+Date: Mon, 15 Sep 2025 16:03:14 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,157 +65,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 19/27] clk: mediatek: Add MT8196 mdpsys clock support
-To: Chen-Yu Tsai <wenst@chromium.org>
-Cc: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
- sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- matthias.bgg@gmail.com, p.zabel@pengutronix.de, richardcochran@gmail.com,
- guangjie.song@mediatek.com, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, kernel@collabora.com
-References: <20250829091913.131528-1-laura.nao@collabora.com>
- <20250829091913.131528-20-laura.nao@collabora.com>
- <0e6592b7-6f6d-4291-992c-ff321c920381@collabora.com>
- <CAGXv+5GFaudGqm4C9CY-_spiXcyWk7OvWHTdkehsyrV4sO1Ndw@mail.gmail.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH v4 07/14] arm64: dts: qcom: lemans-evk: Enable PCIe
+ support
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Wasim Nazir
+	<wasim.nazir@oss.qualcomm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Konrad Dybcio" <konradybcio@kernel.org>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Bartosz Golaszewski <brgl@bgdev.pl>
+CC: <kernel@oss.qualcomm.com>, <linux-mmc@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>
+References: <20250908-lemans-evk-bu-v4-0-5c319c696a7d@oss.qualcomm.com>
+ <20250908-lemans-evk-bu-v4-7-5c319c696a7d@oss.qualcomm.com>
+ <cb2a5c93-0643-4c6b-a97f-b947c9aad32c@oss.qualcomm.com>
 Content-Language: en-US
-In-Reply-To: <CAGXv+5GFaudGqm4C9CY-_spiXcyWk7OvWHTdkehsyrV4sO1Ndw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-Il 05/09/25 10:53, Chen-Yu Tsai ha scritto:
-> On Fri, Sep 5, 2025 at 4:39 PM AngeloGioacchino Del Regno
-> <angelogioacchino.delregno@collabora.com> wrote:
->>
->> Il 29/08/25 11:19, Laura Nao ha scritto:
->>> Add support for the MT8196 mdpsys clock controller, which provides clock
->>> gate control for MDP.
->>>
->>> Signed-off-by: Laura Nao <laura.nao@collabora.com>
->>> ---
->>>    drivers/clk/mediatek/Kconfig             |   7 +
->>>    drivers/clk/mediatek/Makefile            |   1 +
->>>    drivers/clk/mediatek/clk-mt8196-mdpsys.c | 186 +++++++++++++++++++++++
->>>    3 files changed, 194 insertions(+)
->>>    create mode 100644 drivers/clk/mediatek/clk-mt8196-mdpsys.c
->>>
->>> diff --git a/drivers/clk/mediatek/Kconfig b/drivers/clk/mediatek/Kconfig
->>> index 8e5cdae80748..68ac08cf8e82 100644
->>> --- a/drivers/clk/mediatek/Kconfig
->>> +++ b/drivers/clk/mediatek/Kconfig
->>> @@ -1024,6 +1024,13 @@ config COMMON_CLK_MT8196_MCUSYS
->>>        help
->>>          This driver supports MediaTek MT8196 mcusys clocks.
->>>
->>> +config COMMON_CLK_MT8196_MDPSYS
->>> +     tristate "Clock driver for MediaTek MT8196 mdpsys"
->>> +     depends on COMMON_CLK_MT8196
->>> +     default COMMON_CLK_MT8196
->>> +     help
->>> +       This driver supports MediaTek MT8196 mdpsys clocks.
->>> +
->>>    config COMMON_CLK_MT8196_PEXTPSYS
->>>        tristate "Clock driver for MediaTek MT8196 pextpsys"
->>>        depends on COMMON_CLK_MT8196
->>> diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
->>> index 46358623c3e5..d2d8bc43e45b 100644
->>> --- a/drivers/clk/mediatek/Makefile
->>> +++ b/drivers/clk/mediatek/Makefile
->>> @@ -155,6 +155,7 @@ obj-$(CONFIG_COMMON_CLK_MT8196) += clk-mt8196-apmixedsys.o clk-mt8196-topckgen.o
->>>                                   clk-mt8196-peri_ao.o
->>>    obj-$(CONFIG_COMMON_CLK_MT8196_IMP_IIC_WRAP) += clk-mt8196-imp_iic_wrap.o
->>>    obj-$(CONFIG_COMMON_CLK_MT8196_MCUSYS) += clk-mt8196-mcu.o
->>> +obj-$(CONFIG_COMMON_CLK_MT8196_MDPSYS) += clk-mt8196-mdpsys.o
->>>    obj-$(CONFIG_COMMON_CLK_MT8196_PEXTPSYS) += clk-mt8196-pextp.o
->>>    obj-$(CONFIG_COMMON_CLK_MT8196_UFSSYS) += clk-mt8196-ufs_ao.o
->>>    obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-mt8365.o
->>> diff --git a/drivers/clk/mediatek/clk-mt8196-mdpsys.c b/drivers/clk/mediatek/clk-mt8196-mdpsys.c
->>> new file mode 100644
->>> index 000000000000..a46b1627f1f3
->>> --- /dev/null
->>> +++ b/drivers/clk/mediatek/clk-mt8196-mdpsys.c
->>> @@ -0,0 +1,186 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +/*
->>> + * Copyright (c) 2025 MediaTek Inc.
->>> + *                    Guangjie Song <guangjie.song@mediatek.com>
->>> + * Copyright (c) 2025 Collabora Ltd.
->>> + *                    Laura Nao <laura.nao@collabora.com>
->>> + */
->>> +#include <dt-bindings/clock/mediatek,mt8196-clock.h>
->>> +
->>> +#include <linux/clk-provider.h>
->>> +#include <linux/module.h>
->>> +#include <linux/of_device.h>
->>> +#include <linux/platform_device.h>
->>> +
->>> +#include "clk-gate.h"
->>> +#include "clk-mtk.h"
->>> +
->>> +static const struct mtk_gate_regs mdp0_cg_regs = {
->>> +     .set_ofs = 0x104,
->>> +     .clr_ofs = 0x108,
->>> +     .sta_ofs = 0x100,
->>> +};
->>> +
->>> +static const struct mtk_gate_regs mdp1_cg_regs = {
->>> +     .set_ofs = 0x114,
->>> +     .clr_ofs = 0x118,
->>> +     .sta_ofs = 0x110,
->>> +};
->>> +
->>> +static const struct mtk_gate_regs mdp2_cg_regs = {
->>> +     .set_ofs = 0x124,
->>> +     .clr_ofs = 0x128,
->>> +     .sta_ofs = 0x120,
->>> +};
->>> +
->>> +#define GATE_MDP0(_id, _name, _parent, _shift) {     \
->>> +             .id = _id,                              \
->>> +             .name = _name,                          \
->>> +             .parent_name = _parent,                 \
->>> +             .regs = &mdp0_cg_regs,                  \
->>> +             .shift = _shift,                        \
->>> +             .flags = CLK_OPS_PARENT_ENABLE,         \
->>
->> Why would MDP0 and MDP2 be different, as in why would MDP1 be so special to not
->> need CLK_OPS_PARENT_ENABLE while the others do?
->>
->> Either they all do, or they all don't.
->>
->> I guess they all don't, but I'm not sure how you tested that at all, since the
->> only way to test this is downstream (and upstream will very likely be different
->> from that).
->>
->> Even though I think they don't need that - please add back CLK_OPS_PARENT_ENABLE
->> to GATE_MDP1 to be safe, as in (all) MediaTek SoCs the multimedia subsystem is
->> kinda separate from the rest.
-> 
-> That kind of doesn't fly since the parent of mdp_f26m is clk26m, not the
-> mdp clock. So either this block doesn't need a clock for register access
-> or this clock is going to be broken.
-> 
-> This is why I raised the question about the validity of the flag in the
-> first place.
-> 
->> +       GATE_MDP1(CLK_MDP_F26M, "mdp_f26m", "clk26m", 27),
-> 
->> Once MT8196 MDP support is upstreamed, we will be able to run a number of tests
->> to evaluate whether this flag is really needed or not.
->>
->> After all, if it turns out we can remove it, it's going to be a 3 lines patch,
->> not a big deal.
-> 
-> That also works. Though IMO it makes the error harder to notice.
-> 
-
-Okay, I understand your point.
-
-Let's keep CLK_OPS_PARENT_ENABLE out of MDP1.
-
-Cheers,
-Angelo
+From: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
+In-Reply-To: <cb2a5c93-0643-4c6b-a97f-b947c9aad32c@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: FwbzkJhGeavS9d001wAdTXfxE2E5nA0T
+X-Proofpoint-ORIG-GUID: FwbzkJhGeavS9d001wAdTXfxE2E5nA0T
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAzMSBTYWx0ZWRfX5A8o8LawJiuj
+ ZfRqPlGLcbUehF2ldAHuPlAYE2Zqi8490lZVou3ouPVQ84oPO2siT3oo17b5qPtRA5V8tQB0+9K
+ fAByYXkREws+8q8Qg0vEIH6v3zmQKuqjfgAiTK5GfjJrUmtRS3+GbgvkjcSrYbzLkW20iXz7VOK
+ 1Tj6GWGgVSS1STzo1UEkAyO+JL6ALV7r9Nf/t2RgM+tLsluqsidDhCDf7StCNYzqFDYqiiXefss
+ 6f/Df74X+3PeRvCbSNzbles0aJYf0ItTBZnq5DD7PhaCDSCRDb9K7ab42OHzc+i+GhTz4FSzJaQ
+ V6OXqbUCHYobs7eCJUkKzMC44XxHgUE/WbV5OkCelgwLVfvdWlIGGn27sNcV98qN6JWpJaBP6UK
+ q60A0o10
+X-Authority-Analysis: v=2.4 cv=JvzxrN4C c=1 sm=1 tr=0 ts=68c7eb73 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8
+ a=EUspDBNiAAAA:8 a=XuqPMlvQ3-AsHj1PTisA:9 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-15_04,2025-09-12_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 phishscore=0 suspectscore=0 clxscore=1011 impostorscore=0
+ spamscore=0 adultscore=0 malwarescore=0 bulkscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2509130031
 
 
+On 9/12/2025 5:57 PM, Konrad Dybcio wrote:
+> On 9/8/25 10:19 AM, Wasim Nazir wrote:
+>> From: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
+>>
+>> Enable PCIe0 and PCIe1 along with the respective phy-nodes.
+>>
+>> PCIe0 is routed to an m.2 E key connector on the mainboard for wifi
+>> attaches while PCIe1 routes to a standard PCIe x4 expansion slot.
+>>
+>> Signed-off-by: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
+>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+>> ---
+> [...]
+>
+>> +		perst-pins {
+>> +			pins = "gpio2";
+>> +			function = "gpio";
+>> +			drive-strength = <2>;
+>> +			bias-pull-down;
+>> +		};
+> Pulling down an active-low pin is a bad idea
+
+Ack, we should do pull up.
+we took reference from the previous targets which seems to be wrong.
+we will make it pull up.
+
+Bjorn,
+can you make this change while applying or shall we send new series.
+
+- Sushrut
+
+>
+> Konrad
 
