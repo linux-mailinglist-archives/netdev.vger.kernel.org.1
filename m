@@ -1,200 +1,125 @@
-Return-Path: <netdev+bounces-223093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B00FCB57F00
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 16:32:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF15CB57F4B
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 16:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46F7C3A9536
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:31:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DE507AFAC7
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AB432A806;
-	Mon, 15 Sep 2025 14:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF6332BF38;
+	Mon, 15 Sep 2025 14:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="N6wMOPav";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RVHJWlNB";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="N6wMOPav";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RVHJWlNB"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kJqEilup";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="u+YNkMxE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D14E1D79BE
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 14:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CC627461;
+	Mon, 15 Sep 2025 14:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757946687; cv=none; b=BcN5NNfejY4cMq+FXfkgsqOgYf8pXM95DI1TnfzcWd63t5uUTHGTr1KyDWh0wIxut6KqL7vE4mVzcnk96C6EH8/oPiAJZ6JTj8+BWzfEeeWpSc8YbbTsw3hFZ1KEYq5Rt0J/UB1Is5cq8i+sF7VAVXW4Zn+xSmYtvlWhaZ8Y4io=
+	t=1757947257; cv=none; b=o893vUd9mG6COsQA2Z7Fd2JfzT28j/C+IMllAxh72F+t0ozY+f3mQ7VgjDIMBNKiH+DSUGBM2sr7IRX9dkdZQAGNKPCCRa91e4Xxb4gcY0TNTjsgzEr2sy4yNlAg2DBO4rrXJZ93mumpMXoixPU3StwnRtP9WyDvBJ1tDdXZZKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757946687; c=relaxed/simple;
-	bh=yoQolAx41O8GQCQhu9dZcTPWss6tqiCGnkwE4nYtSqc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qt6Z/8WukzKZlzddaXPjXARogm9qNj5ruECcOe6hS6mbQFfd3ad2s7BAFIaF7hM8SegT0gyh9VB6Zcy9w1gj9dbdu1B4N5oRwF9xudJW/GtPWk+NE8xK3qxT+x8Mqy2C4H5svvW7JKjSQ971apPyO46n23cz/3AqemZLsa4TQ/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=N6wMOPav; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RVHJWlNB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=N6wMOPav; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RVHJWlNB; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 2B87F336BF;
-	Mon, 15 Sep 2025 14:31:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757946683; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=arc-20240116; t=1757947257; c=relaxed/simple;
+	bh=x67mCxmqkj9+e9pzvDN8Tta0qPHWFpvcCgabamG1AWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M1YuLDuFYnYMhKhOW8vvPXidTn8COjP8bDvsfMC+QEtemcSZ0Cpr0juo862/4ivYAUuliSMHrUp/eOXoV05rwK+8lWnM6CF5/DpSaNl+B3B/h2h5wjc5z8Edo02Ty9tOkUaRDpKyteObeYuWE8zUZmOT6ZvE0N0Qrbg07b/AxAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kJqEilup; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=u+YNkMxE; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 15 Sep 2025 16:40:52 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1757947254;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7mNaU9AhJn4Xq2FHC7G2kb7GgzktfPd9RfttKwzj4HA=;
-	b=N6wMOPavB1lqRwyCxggSCOXxUC4RE9D4hvNEiH8DopNz2Io85LyNsX2urRGQ8lyuu3HHhP
-	t1aNNFc4E4LTYGrHNwjksYnWUEGYPVh/1ikzA/gf63Mq4WQHIM520X/ukYi0HxRkuOBUfI
-	tBp1trRLeaOXzToXGcVolwq6M3k04/k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757946683;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	bh=lni+I3buozORHBU99Fb6S2L5ArlJnPvanU1k2nG+bqs=;
+	b=kJqEilupnjshBEyflsSxaQ1cYXo1HmvwEGZxE5Hry+3tMhFnVh3frgVMySXIVU3YA7sr/P
+	ZmzsU0E7Km8Wp9l5bZDkkyDgnPFZnbLtBPRK/3LI31uDYiDIGpPjLv9wsR2eeUTNRRAX//
+	dmNhtGH6hrZaFy0o25aqc/JiLREHt/y5ZcTdXzlyLdSjRzpWF1ajC/tWXeGrJKOz1r4JdJ
+	O+HZHd0cB6caRbdRPYpFuFCDeIfE27yuCYcWeSk2ELWrhiOAF7HeL/2G+EZODCQqXklj6A
+	WbRdcD38CnfevP/TM/aX4fpES3ouPOth51eerceMkkYhcApyFTE2c/6EC96NyA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1757947254;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7mNaU9AhJn4Xq2FHC7G2kb7GgzktfPd9RfttKwzj4HA=;
-	b=RVHJWlNBbcWbFWhbZWerd4SLJEEPIkqECj7HlekZWRPZXKYUavodpaTZAERdl+WcMFVU58
-	QXfo9dkBx6dnJZAQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757946683; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7mNaU9AhJn4Xq2FHC7G2kb7GgzktfPd9RfttKwzj4HA=;
-	b=N6wMOPavB1lqRwyCxggSCOXxUC4RE9D4hvNEiH8DopNz2Io85LyNsX2urRGQ8lyuu3HHhP
-	t1aNNFc4E4LTYGrHNwjksYnWUEGYPVh/1ikzA/gf63Mq4WQHIM520X/ukYi0HxRkuOBUfI
-	tBp1trRLeaOXzToXGcVolwq6M3k04/k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757946683;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7mNaU9AhJn4Xq2FHC7G2kb7GgzktfPd9RfttKwzj4HA=;
-	b=RVHJWlNBbcWbFWhbZWerd4SLJEEPIkqECj7HlekZWRPZXKYUavodpaTZAERdl+WcMFVU58
-	QXfo9dkBx6dnJZAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2EED21368D;
-	Mon, 15 Sep 2025 14:31:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id mooGCTojyGiRYgAAD6G6ig
-	(envelope-from <svarbanov@suse.de>); Mon, 15 Sep 2025 14:31:22 +0000
-Message-ID: <c2448974-7a66-4fa8-87ee-3c4a824ea1cc@suse.de>
-Date: Mon, 15 Sep 2025 17:31:13 +0300
+	bh=lni+I3buozORHBU99Fb6S2L5ArlJnPvanU1k2nG+bqs=;
+	b=u+YNkMxEXUeLN4I2gvc5y9anOucA/bETagP+D7VWVq55ed12wCZJ5YaxLNDq/vrnZRM5c4
+	1K1FhWVW76s3WjAg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: pengdonglin <dolinux.peng@gmail.com>
+Cc: tj@kernel.org, tony.luck@intel.com, jani.nikula@linux.intel.com,
+	ap420073@gmail.com, jv@jvosburgh.net, freude@linux.ibm.com,
+	bcrl@kvack.org, trondmy@kernel.org, longman@redhat.com,
+	kees@kernel.org, linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, linux-nfs@vger.kernel.org,
+	linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, linux-acpi@vger.kernel.org,
+	linux-s390@vger.kernel.org, cgroups@vger.kernel.org,
+	Hillf Danton <hdanton@sina.com>,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	pengdonglin <pengdonglin@xiaomi.com>
+Subject: Re: [PATCH v2] rcu: Remove redundant rcu_read_lock/unlock() in
+ spin_lock critical sections
+Message-ID: <20250915144052.VHYlgilw@linutronix.de>
+References: <20250915134729.1801557-1-dolinux.peng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] net: cadence: macb: Add support for Raspberry Pi
- RP1 ethernet controller
-To: Andrew Lunn <andrew@lunn.ch>, Stanimir Varbanov <svarbanov@suse.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rpi-kernel@lists.infradead.org,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrea della Porta <andrea.porta@suse.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Phil Elwell
- <phil@raspberrypi.com>, Jonathan Bell <jonathan@raspberrypi.com>,
- Dave Stevenson <dave.stevenson@raspberrypi.com>
-References: <20250822093440.53941-1-svarbanov@suse.de>
- <20250822093440.53941-4-svarbanov@suse.de>
- <0142ac69-f0eb-4135-b0d2-50c9fec27d43@suse.de>
- <8715a21b-83ac-4bc1-b856-fa90bb5b809f@suse.de>
- <d2afd474-1514-4663-9e96-7efea30a5eaa@lunn.ch>
-Content-Language: en-US
-From: Stanimir Varbanov <svarbanov@suse.de>
-In-Reply-To: <d2afd474-1514-4663-9e96-7efea30a5eaa@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_RCPT(0.00)[dt,netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
-X-Spam-Flag: NO
-X-Spam-Score: -6.80
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250915134729.1801557-1-dolinux.peng@gmail.com>
 
-Hi Andrew,
-
-Thank you the answer!
-
-On 9/15/25 4:34 PM, Andrew Lunn wrote:
-> On Mon, Sep 15, 2025 at 02:27:34PM +0300, Stanimir Varbanov wrote:
->>
->>
->> On 9/10/25 2:32 PM, Stanimir Varbanov wrote:
->>> Hi Jakub,
->>>
->>> On 8/22/25 12:34 PM, Stanimir Varbanov wrote:
->>>> From: Dave Stevenson <dave.stevenson@raspberrypi.com>
->>>>
->>>> The RP1 chip has the Cadence GEM block, but wants the tx_clock
->>>> to always run at 125MHz, in the same way as sama7g5.
->>>> Add the relevant configuration.
->>>>
->>>> Signed-off-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
->>>> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
->>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->>>> ---
->>>>  drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++++
->>>>  1 file changed, 12 insertions(+)
->>>>
->>>
->>> This patch is missing in net-next but ("dt-bindings: net: cdns,macb: Add
->>> compatible for Raspberry Pi RP1") from this series has been applied.
->>>
->>> Could you take this patch as well, please.
->>
->> Gentle ping.
+On 2025-09-15 21:47:29 [+0800], pengdonglin wrote:
+> From: pengdonglin <pengdonglin@xiaomi.com>
 > 
-> Such pings are ignored. Please rebase the patch to net-next and submit
-> it again.
+> Per Documentation/RCU/rcu_dereference.rst [1], since Linux 4.20's RCU
+> consolidation [2][3], RCU read-side critical sections include:
+>   - Explicit rcu_read_lock()
+>   - BH/interrupt/preemption-disabling regions
+>   - Spinlock critical sections (including CONFIG_PREEMPT_RT kernels [4])
+> 
+> Thus, explicit rcu_read_lock()/unlock() calls within spin_lock*() regions are redundant.
+> This patch removes them, simplifying locking semantics while preserving RCU protection.
+> 
+> [1] https://elixir.bootlin.com/linux/v6.17-rc5/source/Documentation/RCU/rcu_dereference.rst#L407
+> [2] https://lore.kernel.org/lkml/20180829222021.GA29944@linux.vnet.ibm.com/
+> [3] https://lwn.net/Articles/777036/
+> [4] https://lore.kernel.org/lkml/6435833a-bdcb-4114-b29d-28b7f436d47d@paulmck-laptop/
 
-Sorry about that.
+What about something like this:
 
-I did not realized that if it applies cleanly on net-next I need to
-re-send it.
+  Since commit a8bb74acd8efe ("rcu: Consolidate RCU-sched update-side
+  function definitions") there is no difference between rcu_read_lock(),
+  rcu_read_lock_bh() and rcu_read_lock_sched() in terms of RCU read
+  section and the relevant grace period. That means that spin_lock(),
+  which implies rcu_read_lock_sched(), also implies rcu_read_lock().
 
-I will send it as a separate one with version v3.
+  There is no need no explicitly start a RCU read section if one has
+  already been started implicitly by spin_lock().
 
-~Stan
+  Simplify the code and remove the inner rcu_read_lock() invocation.
 
 
+The description above should make it clear what:
+- the intention is
+- the proposed solution to it and why it is correct.
+
+You can't send a patch like this. You need to split it at the very least
+by subsystem. The networking bits need to follow to follow for instance
+   Documentation/process/maintainer-netdev.rst
+
+and so on.
+
+Sebastian
 
