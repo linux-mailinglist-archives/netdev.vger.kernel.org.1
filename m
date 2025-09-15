@@ -1,191 +1,132 @@
-Return-Path: <netdev+bounces-223097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57717B57F54
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 16:42:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FDB4B57F6B
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 16:48:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BC803BACE1
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:42:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F03F7ABB0F
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CAC31C565;
-	Mon, 15 Sep 2025 14:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E0F33EAF2;
+	Mon, 15 Sep 2025 14:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TzLxw/oV"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="NA8xF+H6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB26334723
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 14:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BC032F757;
+	Mon, 15 Sep 2025 14:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757947337; cv=none; b=UfDtKtTy4xF0XgCVRiALyqGN5+e1L5/P2cywsKOOE6ll0o+oKr5UaMPZWjU47AdZWWOCZ/q+pvKEv4A4+67vF4XxTxxDtssFhZNPjM8WcLJMOKD3FruEh8SqGw+MA2A/E6d1tk41S4aE/VatCUmhtM4npW1O2u9YhVa+a2m0Wmc=
+	t=1757947672; cv=none; b=jyAu1zL7EsjZhJmcY3D5uUSYYpw7qddesqZyCOUJJl0RoPcVgvzys31/Aj8hgE+QAnjo5ZHS1fZNhXAMK6TfU/LNYgpxMdX5wDqBdWvmMjTaYOM+xuvGpSl0J86SMLFmr3TrPqXyCZpXc7OrFw4hVF4+Cg6RjjCeVnCROURjMoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757947337; c=relaxed/simple;
-	bh=jeI8PSzbZZ7Z+pal3lt3rL+QC2O42V8dlsZm4Z/7p8g=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=SQZRjr/+NMIJNIy5GPEJTyxVkPkE7umyJBIjO+qb8kCwzIUL2RTz3DrDhYlhL2FDaYEevLOxk9dL4bJ/qUyz204vvwJMrt41196zN3MLLmN80EzBEBrOmaNawmEbO+JAvQImYahTLGFVqd0rbjKzSbsU4aa3ByUPO7LMsEOKkDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TzLxw/oV; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=b5N7H20JIuzaWKE/IdgrKSPktcQcllLZYfJZoGtLKA4=; b=TzLxw/oV/yRpPHMKxL0bzI9fcQ
-	BdeqfPMy5y8XgAWpI1a2mQI9Vh1cZvWtS6SX8aBtJMJODyYjuj0E1+2zN1LT+ZhgS/NRAdFMkQ5KA
-	SP/A7Lrwpre4xS6Gxv0uBqyM6O86RpFRALNyvzYnVq8S3lyri7BuQ+cA7r+6Iwnsu7oPfTbUMv9O5
-	+cmWto+KO1G4M65+ncL1dvP+MYAfYgdXyrlWBfqq6BeycJLldcdZH+X/UCSTkMU48dijcrOVjAOas
-	KQuZ6m3pf9o1acTH4Os3Usxn06DnbZJogumMtzUqTnB/T+mahHfANWC43JHi9rPhbLirGpYWNo9Km
-	ufk83wTg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53628 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uyAP8-000000000fk-2rQP;
-	Mon, 15 Sep 2025 15:42:06 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uyAP7-00000005lGq-3FqI;
-	Mon, 15 Sep 2025 15:42:05 +0100
-In-Reply-To: <aMglp11mUGk9PAvu@shell.armlinux.org.uk>
-References: <aMglp11mUGk9PAvu@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
+	s=arc-20240116; t=1757947672; c=relaxed/simple;
+	bh=RbIKwA1YEbJ9B7hJPqXCkfvKOCOA7kqlj5tzz3+rIX4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WSqevvYVHzmFwcmwrrp/K5qGSfufIhCDJyYrhRZ8CcaMmMNK3f55VHSAIir6hUFQTUsexMxX71+Lzvbun8hK0tnuf47ekWfp5JyzRgNyDWiyGMsdzxXCXJWyYESPJTWLOoPXXpQ7YnmoSFlBM2bQWG+PwF7HouMKIepZ+A8l3f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=NA8xF+H6; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1757947660;
+	bh=RbIKwA1YEbJ9B7hJPqXCkfvKOCOA7kqlj5tzz3+rIX4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NA8xF+H6E0QwDJU+/6IiEQBcJIE2tW6qMYTk9BF4TMKtUVDe+b9m6mnefi1Pe+Fxg
+	 Ttb0HG4q1Ny4mbpQWDqOgThDA14FWM+ibf32SsoRV4tJuQABhnv5k9Of10MeV/dcHb
+	 Hsty9YfGo6Bb92Z0T8jpkVclWq8GkpNX+P+WSMidgfJQxT/XYjrQJuNF0QW2XjvGJ7
+	 ilRDwdKYxX/Fr5x7V4sSF+rH7RBHIg0OWyKaf5VgWkfnbgtBAj5oDhsm3Xvv66K5Np
+	 4p5pW3S2WpSTSEUsy6nqhH5RYfkYWJQkQlVxyduRoNuFQAnL16ysXTXicVBJwlGnoE
+	 7cKN7w3Y82wGg==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id DDC8F60078;
+	Mon, 15 Sep 2025 14:47:39 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id F3401201BEC; Mon, 15 Sep 2025 14:43:05 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
 	Eric Dumazet <edumazet@google.com>,
-	imx@lists.linux.dev,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	wireguard@lists.zx2c4.com,
 	netdev@vger.kernel.org,
-	Nick Shi <nick.shi@broadcom.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	Yangbo Lu <yangbo.lu@nxp.com>
-Subject: [PATCH net-next 2/2] ptp: rework ptp_clock_unregister() to disable
- events
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 00/11] tools: ynl: prepare for wireguard
+Date: Mon, 15 Sep 2025 14:42:45 +0000
+Message-ID: <20250915144301.725949-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uyAP7-00000005lGq-3FqI@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 15 Sep 2025 15:42:05 +0100
 
-the ordering of ptp_clock_unregister() is not ideal, as the chardev
-remains published while state is being torn down. There is also no
-cleanup of enabled pin settings, which means enabled events can
-still forward into the core.
+This series contains the last batch of YNL changes to support
+the wireguard YNL conversion.
 
-Rework the ordering of cleanup in ptp_clock_unregister() so that we
-unpublish the posix clock (and user chardev), disable any pins that
-have events enabled, and then clean up the aux work and PPS source.
+The wireguard changes, to be applied on top of this series,
+has been posted as an RFC series here:
+  https://lore.kernel.org/netdev/20250904-wg-ynl-rfc@fiberby.net/
 
-This avoids potential use-after-free and races in PTP clock driver
-teardown.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/ptp/ptp_chardev.c | 13 +++++++++++++
- drivers/ptp/ptp_clock.c   | 17 ++++++++++++++++-
- drivers/ptp/ptp_private.h |  2 ++
- 3 files changed, 31 insertions(+), 1 deletion(-)
+v5:
+- In patch 4, just copy the old local_vars logic into the new helper.
+v4:
+- Added a few Reviewed-by (thanks Donald).
+- In patch 4, changed the implementation a bit, to avoid overloading.
+- In patch 6, expose __ynl_attr_validate(), and move ynl_attr_validate()
+  to ynl-priv.h, as an inline function.
+- Dropped v3 patch 5 and 6 from this series.
+v3: https://lore.kernel.org/netdev/20250911200508.79341-1-ast@fiberby.net/
+- Rebased on top of new net-next, after Matthieu's cleanup.
+- Added a Reviewed-by (thanks Donald).
+- Added the parsing local vars cleanup as patch 7
+- In patch 4, change to use set() for deduplication.
+- In patch 8, declare __ynl_attr_validate() as static.
+v2: https://lore.kernel.org/netdev/20250910230841.384545-1-ast@fiberby.net/
+- Added Reviewed-by's to unchanged patches. Thanks to all reviewers.
+- Patch 4, refactors local variables for .attr_put() callers, and
+  replaces the old patch 4 and 5.
+- Patch 5 and 6 are new, and reduces the differences between the 3
+  .attr_put() callers, so it might be easier to keep them in sync.
+- Patch 7, now validates the nested payload (thanks Jakub).
+- Patch 8, now renames more variables (thanks Jakub),
+- Patch 10, got a dead line remove (thanks Donald).
+- Patch 11, revised hex input to support macsec (suggested by Sabrina).
+v1: https://lore.kernel.org/netdev/20250904-wg-ynl-prep@fiberby.net/
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index eb4f6d1b1460..640a98f17739 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -47,6 +47,19 @@ static int ptp_disable_pinfunc(struct ptp_clock_info *ops,
- 	return err;
- }
- 
-+void ptp_disable_all_pins(struct ptp_clock *ptp)
-+{
-+	struct ptp_clock_info *info = ptp->info;
-+	unsigned int i;
-+
-+	mutex_lock(&ptp->pincfg_mux);
-+	for (i = 0; i < info->n_pins; i++)
-+		if (info->pin_config[i].func != PTP_PF_NONE)
-+			ptp_disable_pinfunc(info, info->pin_config[i].func,
-+					    info->pin_config[i].chan);
-+	mutex_unlock(&ptp->pincfg_mux);
-+}
-+
- int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
- 		    enum ptp_pin_function func, unsigned int chan)
- {
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index 1d920f8e20a8..d2eb77081071 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -498,9 +498,23 @@ int ptp_clock_unregister(struct ptp_clock *ptp)
- 		device_for_each_child(&ptp->dev, NULL, unregister_vclock);
- 	}
- 
-+	/* Get the device to stop posix_clock_unregister() doing the last put
-+	 * and freeing the structure(s)
-+	 */
-+	get_device(&ptp->dev);
-+
-+	/* Wake up any userspace waiting for an event. */
- 	ptp->defunct = 1;
- 	wake_up_interruptible(&ptp->tsev_wq);
- 
-+	/* Tear down the POSIX clock, which removes the user interface. */
-+	posix_clock_unregister(&ptp->clock);
-+
-+	/* Disable any pin functions that the user may have setup, quiescing
-+	 * all incoming events.
-+	 */
-+	ptp_disable_all_pins(ptp);
-+
- 	if (ptp->kworker) {
- 		kthread_cancel_delayed_work_sync(&ptp->aux_work);
- 		kthread_destroy_worker(ptp->kworker);
-@@ -510,7 +524,8 @@ int ptp_clock_unregister(struct ptp_clock *ptp)
- 	if (ptp->pps_source)
- 		pps_unregister_source(ptp->pps_source);
- 
--	posix_clock_unregister(&ptp->clock);
-+	/* The final put, normally here, will invoke ptp_clock_release(). */
-+	put_device(&ptp->dev);
- 
- 	return 0;
- }
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index b352df4cd3f9..9d90aace7e64 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -141,6 +141,8 @@ extern const struct class ptp_class;
-  * see ptp_chardev.c
-  */
- 
-+void ptp_disable_all_pins(struct ptp_clock *ptp);
-+
- /* caller must hold pincfg_mux */
- int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
- 		    enum ptp_pin_function func, unsigned int chan);
+Asbjørn Sloth Tønnesen (11):
+  tools: ynl-gen: allow overriding name-prefix for constants
+  tools: ynl-gen: generate nested array policies
+  tools: ynl-gen: add sub-type check
+  tools: ynl-gen: refactor local vars for .attr_put() callers
+  tools: ynl-gen: avoid repetitive variables definitions
+  tools: ynl-gen: validate nested arrays
+  tools: ynl-gen: rename TypeArrayNest to TypeIndexedArray
+  tools: ynl: move nest packing to a helper function
+  tools: ynl: encode indexed-arrays
+  tools: ynl: decode hex input
+  tools: ynl: add ipv4-or-v6 display hint
+
+ Documentation/netlink/genetlink-legacy.yaml |  2 +-
+ tools/net/ynl/lib/ynl-priv.h                | 10 ++-
+ tools/net/ynl/lib/ynl.c                     |  6 +-
+ tools/net/ynl/pyynl/lib/ynl.py              | 38 +++++++--
+ tools/net/ynl/pyynl/ynl_gen_c.py            | 92 ++++++++++++---------
+ 5 files changed, 100 insertions(+), 48 deletions(-)
+
 -- 
-2.47.3
+2.51.0
 
 
