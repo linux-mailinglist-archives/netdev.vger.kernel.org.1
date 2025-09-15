@@ -1,155 +1,113 @@
-Return-Path: <netdev+bounces-222931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FA36B570B1
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:55:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7931AB570AE
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:54:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E4563B6F3F
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 06:55:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1F4E189CAAF
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 06:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B793C2C029D;
-	Mon, 15 Sep 2025 06:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lezOvOnO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF172C031B;
+	Mon, 15 Sep 2025 06:54:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2625E2C0292;
-	Mon, 15 Sep 2025 06:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BA32C028E
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 06:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757919276; cv=none; b=RqylXRoHDDEQE20EPSzv924usQHxje+pqgdr2VfEqTqyb9zK9Ljz3oY57I7zPuqWz2tRRech/fcCCmPr1l26n+tEdXZ7UlHFZhGHX8txJB/3bgy8O1yFIWr72zTVHiTpZEZdIYxsJSeYwztYQup1osJR/i3cj/y7v/Fk28R2r30=
+	t=1757919269; cv=none; b=jBbaeQDVy8UCydZzxpOrf9LD1MwbDWunBpWVYD3Vtv9VjbJ6ecOAr1F2xIKGL0rS/fD3ykmKyxA2faklMfeFIoTcbGfZzMczEnTMqL2/S0j6VD/YS3cUmE7UTbLSMbRlqmtBnY63JsI3IDa26dqm+cNJWiRBjBkoevzVWHLjgoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757919276; c=relaxed/simple;
-	bh=OMLJ/ZFVeR1gLezarNQ5OBojq/UZy6AcuS5aa48/Ycs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HuBH/pMJw7z+bzP25CAQb8jhGp/H7ENntNY6xbAKeH9G565IUCE6OsMRn1zLn6U4gBRbnlm/Dr43bI6WANjKnqOtHuDngO7mKt2xp6sGi7VNqTU8wbTiC2V1ZP7p4Fb7z/rcWHuCg/jzgteO3UljaRzRAMCx5Bu+HUC0ZXgf7Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lezOvOnO; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58EHfpb3017258;
-	Mon, 15 Sep 2025 06:54:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=vEj5al
-	LflW09tPN3ZyNcdQe0I3TVk9mFaQmKSpib4T4=; b=lezOvOnOlUmnymoOlzGXde
-	TXb8dEcZmvfTAO7lbHpdcLIoJxyexX7G2MlrCsmDw9bSmBvfRx/r0nyWylolXxvk
-	WAe6hQhC/SIvOvdjACmBwMIwr8OXsbO7rnlAGVO9gEmBLW3VJFEdfzzln6/cF99M
-	oHPPgdI1UxaFG60xeEmYcjAbCVCn26Ep5nfo9Fh89yJV9jwwoEBVZuHug3nHWQCV
-	FZudVJonOv4ZRYOK8DIapujIVM37UMIuYUUuGc8vbrz94CZJ4dmfEhiYtEGdiVVA
-	PH9MdnVJmCYy3/OJ1P1MZZuNQlU2o7Vq5xBHNQ5NSyoPAIiBMT1+lU7A43qm45IQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49504b0xrj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Sep 2025 06:54:28 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58F6iHMl020195;
-	Mon, 15 Sep 2025 06:54:28 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49504b0xre-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Sep 2025 06:54:27 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58F4SJiM018625;
-	Mon, 15 Sep 2025 06:54:27 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 495n5m4ux0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Sep 2025 06:54:26 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58F6sPXZ26411538
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Sep 2025 06:54:26 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CDFCD58063;
-	Mon, 15 Sep 2025 06:54:25 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 13B2A5805D;
-	Mon, 15 Sep 2025 06:54:18 +0000 (GMT)
-Received: from [9.109.249.37] (unknown [9.109.249.37])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 15 Sep 2025 06:54:17 +0000 (GMT)
-Message-ID: <947756ad-f9aa-479f-b463-4c97ff23a936@linux.ibm.com>
-Date: Mon, 15 Sep 2025 12:24:16 +0530
+	s=arc-20240116; t=1757919269; c=relaxed/simple;
+	bh=RUZH9MrG6R2Wn6lSGMC7EE6+Qysluoi8w7ciEMdR1qs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Y+jVwajmmvz+HQts7QSjbk+gLmEK4n2FyYmAqBvQbVhNxQEXIKGjLe6cZZnoP0pTEfHZmUjWNRTAAEbpa8oPtC2SjB01YKsTsVzivgLxwGz7T53XHUbGbk7/tvi3jlHKUtW17D0PJ8HhPMGaFWPmJYc/5iQI4ua/J4Pqoe3vpIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3f65be4978cso43836165ab.0
+        for <netdev@vger.kernel.org>; Sun, 14 Sep 2025 23:54:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757919267; x=1758524067;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N7hR5rpAZBPEZc1EKhxVCYMk7mWTNMUgwIo/9YzXWOU=;
+        b=phORIJwzDOiXtHekcVzaAronbb9Th6xHd226/y88dalUSfiWKX8vwrHmUl/K7F1ukC
+         Y0nysM7+6S2xtDxcJW/d7ZxDjXiYwTpMSkTz4kmtxXnbuw7sN6Em1f9hxbfc5lbkQl9b
+         WNJZgTpxMOpGEqfHbI7TIOhfpiAtKdVY4+pyWloaOriuZwPnbNotiUQjfFFk6JX7NEnE
+         RTKpDDKMDj9gttRq+k+9EGUL+WvD2LNU+pSUFdyZsDbFDt7NMgvkvFOfdd7ffgwutpJD
+         rTtJzIVtieksHPIa41F2ZZlIZ4UY7Mf0BTYVDevLAgtlZKNSTsOBr8DRtxDYGNW891z1
+         ZYEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXZSfyNMvcf4T2aBW6bYhPzEHL53HDSpvqUpVl5dWdyYpFB9VS7pxuItqSzTnJ+Oaa72ATovJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZWcAl3kkkKVwnsYndW06qil5Gd+Mm/icSu4Cx0u5/qFM+aMeL
+	GiFdE5M9clxRLOcVyHbUDJSXUZnO+vXKjtw70C9B8Xvjesqd2yvyTlQ4Rpxe98ejueY+xT9LCBK
+	RR0XF0mm51RoZc5AFwBF0SHeyCaDOTZtYMlzIbAxp94tilCpQxQjFA/obx0I=
+X-Google-Smtp-Source: AGHT+IF2L9yVZW7XISBlrtauCEba2ApjG5kZ+P92pW97GXCIXBM2cihO3vzh0aiAlyO+QMnj3FbPATvgocOZde63LNFTX0c6SMs9
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/smc: replace strncpy with strscpy for ib_name
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Kriish Sharma <kriish.sharma2006@gmail.com>, alibuda@linux.alibaba.com,
-        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-        linux-kernel-mentees@lists.linuxfoundation.org
-References: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
- <20250910100100.GM341237@unreal>
- <24ced585-1b7f-4577-9cb5-8d6e60ecb363@linux.ibm.com>
- <20250912090713.GV341237@unreal>
-Content-Language: en-US
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-In-Reply-To: <20250912090713.GV341237@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAyMCBTYWx0ZWRfX0sdSJ71fpUby
- 0ibdThPTyCKdd4t55OvEAHa5gFmOpbKZi8NBNCE7lg+Fg6OEVfn5ZKAAj06bZ0mluSmXxkBhZsG
- ZuEBGYp99Sv9PUbEf3P9xdHbOQTOHxGp9oDlA0yWdkE5zcZ6HpbhtWjW7JEOs6Se4/HRIgeDWPl
- W0Uv4nbKHYikznVfRsehW0TN7Rf4L65y7/b6f4ZOd1mkrhspn7KX0oeE4HG8agM768to8lEThZy
- iKINernQlPEDnEof0T6hnbvugoXVNZ/Q4agbWrj8PCFQVIPFFAZGaNafnZvJ0DgS5L9yq0KPTLA
- WJa70KS+C4toReim18gizBkSElTMKdf7NmeynPly0oDM//LcMKnAiZqiz5vN9kAyUXZCZL/DKwi
- 4L8Q3jMH
-X-Proofpoint-ORIG-GUID: 98MEKJqvXtHcWaEUBIhwix6ZJl7Ui-1B
-X-Authority-Analysis: v=2.4 cv=dt/bC0g4 c=1 sm=1 tr=0 ts=68c7b824 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=fb0p5f3yy6WXCT3W6uYA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: ntakgdyemlx5g5foZQmcm0hfHM21whH5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-15_03,2025-09-12_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 impostorscore=0 adultscore=0 malwarescore=0 bulkscore=0
- spamscore=0 clxscore=1015 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509130020
+X-Received: by 2002:a05:6e02:1a24:b0:423:fcd6:548d with SMTP id
+ e9e14a558f8ab-423fcd65896mr37175755ab.21.1757919266933; Sun, 14 Sep 2025
+ 23:54:26 -0700 (PDT)
+Date: Sun, 14 Sep 2025 23:54:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68c7b822.050a0220.2ff435.038e.GAE@google.com>
+Subject: [syzbot] Monthly net report (Sep 2025)
+From: syzbot <syzbot+lista3c06afc490da39b0b27@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/09/25 2:37 pm, Leon Romanovsky wrote:
-> On Fri, Sep 12, 2025 at 01:18:52PM +0530, Mahanta Jambigi wrote:
->> On 10/09/25 3:31 pm, Leon Romanovsky wrote:
->>>> --- a/net/smc/smc_pnet.c
->>>> +++ b/net/smc/smc_pnet.c
->>>> @@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
->>>>  		return -ENOMEM;
->>>>  	new_pe->type = SMC_PNET_IB;
->>>>  	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
->>>> -	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
->>>> +	strscpy(new_pe->ib_name, ib_name);
->>>
->>> It is worth to mention that caching ib_name is wrong as IB/core provides
->>> IB device rename functionality.
->>
->> In our case we hit this code path where we pass *PCI_ID*
->> as the *ib_name* using *smc_pnet* tool(smc_pnet -a <pnet_name> -D
->> <PCI_ID>). I believe PCI_ID will not change, so caching it here is fine.
-> 
-> If I remember, you are reporting that cached ib_name through netlink much later.
-> 
-> The caching itself is not an issue, but incorrect reported name can be seen as
-> a wrong thing to do.
+Hello net maintainers/developers,
 
-In what case we can see this incorrect reported name, could you please
-elaborate.
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
+
+During the period, 8 new issues were detected and 6 were fixed.
+In total, 107 issues are still open and 1615 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  13347   Yes   BUG: workqueue lockup (5)
+                   https://syzkaller.appspot.com/bug?extid=f0b66b520b54883d4b9d
+<2>  11498   Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
+<3>  7829    Yes   WARNING: suspicious RCU usage in dev_deactivate_queue
+                   https://syzkaller.appspot.com/bug?extid=ca9ad1d31885c81155b6
+<4>  7624    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<5>  3337    Yes   INFO: task hung in linkwatch_event (4)
+                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
+<6>  2653    Yes   WARNING in rcu_check_gp_start_stall
+                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
+<7>  1860    Yes   INFO: task hung in del_device_store
+                   https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
+<8>  1782    Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
+                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
+<9>  1540    Yes   INFO: task hung in addrconf_dad_work (5)
+                   https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
+<10> 1383    No    KASAN: use-after-free Read in __xfrm_state_insert
+                   https://syzkaller.appspot.com/bug?extid=409c1e76795047429447
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
