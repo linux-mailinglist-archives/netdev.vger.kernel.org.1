@@ -1,115 +1,115 @@
-Return-Path: <netdev+bounces-222939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA7D2B57268
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:04:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A61C8B572A9
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 10:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13D15189FEF2
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:04:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C4661898647
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 08:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF702EFD80;
-	Mon, 15 Sep 2025 08:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B1B2EA736;
+	Mon, 15 Sep 2025 08:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uorC5lsH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GV9RqtAc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061212EE617;
-	Mon, 15 Sep 2025 08:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECA72D5932;
+	Mon, 15 Sep 2025 08:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757923360; cv=none; b=Z7MEY9+MOUDu/LAc6zoXsUMcEZzNXGaZ7Rz4iw79h6Z8YfBcWfHiKGjVsj21Dqv05T11XTa4xXzxsB4XREeRikWz5W5Sm/znL+QEWE/arsgkfZTZLqiV/gLaGgab0h+i18sV+PgW9pC3b+QXUU1yWA+PJWh+OUVFigG/zoWnyaI=
+	t=1757924241; cv=none; b=RDccq8nxWOsjAith+JgkuBuCA7k8QdmsECbKEslmIo2aCLgvwMBWGDhAaqwoaZWbNGoS6WI45toc6xR6risBka2BZj/VB5CcLizeuDN+CxMnUi6IhrSIE/r8sfGPdVnUjINzS36+nx00wM1nzFtIuPb5cOSBvuEf8uw8vZ0m+6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757923360; c=relaxed/simple;
-	bh=yEm2bzoiP+h/01QXVowc2unEj0br7/I+82JQsjglZt4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SFYF1X2NgALhEtsxNFqNxx/Ff1w3ULRLdqvhPVTzNM4V6OQyDMD3OCrFJaa82EURH3bx4oCa4AIBleoof17cuaaCqWLhOBR6MP7HOOmTO2+gpqcjEKQlYKRVGZPkHF8NfzoPFVwseHEA+aJFSI7rGVYNndfspOEFdAva06VBegY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uorC5lsH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C793C4AF09;
-	Mon, 15 Sep 2025 08:02:37 +0000 (UTC)
+	s=arc-20240116; t=1757924241; c=relaxed/simple;
+	bh=F/X+TtZHooGZVCVdoXlX23gyuHCMQDwSSkVtX3di3Hg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NDT+PTlM9+UFmaoP5bA0vwkrW99bikpvpIrOsyf44a4RSW8qz/tm0IR8A3Ffr0ni+x+lefzEKnsVKrsCQ39rOGpWEVjxjKi1PT1CRC/cmJnyK4uKQHLtzSkNqg7VV3wD/UQZNE/TOBFybWHV8s5KXU7MLlY/6BPNknd4bQCTEKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GV9RqtAc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 70B48C4CEF1;
+	Mon, 15 Sep 2025 08:17:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757923358;
-	bh=yEm2bzoiP+h/01QXVowc2unEj0br7/I+82JQsjglZt4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uorC5lsHLES+BCYb8oEHYS7RGXDtLY0MYCZlFj/JgkPCIg7eVxjft9QeVc/O4+JiD
-	 VWYAyx/HXk8vuDOvoaIgZawtwa7duDJUL5RhO+mPaWfVAsoDevA1cGNVR4oNVVaZaj
-	 zP7GONv5P2+Dh5H5tX8dqDa7NKGy2bVK9xZdHmyGX74mM/HxaEDBkUF4rMo+8fdvIi
-	 0j7rMpquFaNuK0jESLtzfC8vpVbd1j8L4pSt9q/vo1RNoqqVHG53783DBRKtDO21cx
-	 pMIX6YzQ0hTN2NMj4FI2o1D8ZWJ4dcq5cULVdz8VN2jb+34BuQKN9RANHzY56C9zpQ
-	 sYnvOFrD8+IyA==
-Date: Mon, 15 Sep 2025 11:02:32 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Mahanta Jambigi <mjambigi@linux.ibm.com>
-Cc: Kriish Sharma <kriish.sharma2006@gmail.com>, alibuda@linux.alibaba.com,
-	dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH] net/smc: replace strncpy with strscpy for ib_name
-Message-ID: <20250915080232.GA9353@unreal>
-References: <20250908180913.356632-1-kriish.sharma2006@gmail.com>
- <20250910100100.GM341237@unreal>
- <24ced585-1b7f-4577-9cb5-8d6e60ecb363@linux.ibm.com>
- <20250912090713.GV341237@unreal>
- <947756ad-f9aa-479f-b463-4c97ff23a936@linux.ibm.com>
+	s=k20201202; t=1757924241;
+	bh=F/X+TtZHooGZVCVdoXlX23gyuHCMQDwSSkVtX3di3Hg=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=GV9RqtAc3SB8pgtHReS7bf1ET/E5vlZUVbYsXHtspijXoI45Txf5P71bCW1PTgJV3
+	 ex0yceO9ZS+ovvANqgyEHfA2Qj+1iAM6DXHZrjU8MczOnLdaRHjSKBj3K0rKEz9GQf
+	 9krMvdrr8vcMowZZT9Xs7F9IjBlFcNkDW3gwqB4SFlOCoN9qAT5g1NjZfrSVeRdYQx
+	 icJL5z60ZHfKeJvQCTjkAo4G5K2VGF+x8qlXmdPuyibktjmqLtE1A3WkITAL3lOGzw
+	 QH/EkozVXDMET64a3VJSdExZenU+NQYYtSE6NT693CXgaTgUqea8BcXoX8GKS4+pVr
+	 4CPy9LxgzY7IA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E10ACAC597;
+	Mon, 15 Sep 2025 08:17:21 +0000 (UTC)
+From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
+Subject: [PATCH net v2 0/2] net: stmmac: Minor fixes for stmmac EST
+ implementation
+Date: Mon, 15 Sep 2025 16:17:17 +0800
+Message-Id: <20250915-qbv-fixes-v2-0-ec90673bb7d4@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <947756ad-f9aa-479f-b463-4c97ff23a936@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAI7Lx2gC/22Myw7CIBQFf6W5azG9pC9c+R+mC2xPLYlCBUI0D
+ f8u6drlnJmcnQK8QaBLtZNHMsE4W0CeKppWbR8QZi5MspZtrZjF+57EYj4IotHomhlDB/RU+s3
+ jECW/kUWksYyrCdH57/Gf+FB/rhKLWmBgqFb108LLVT8jvD5P7kVjzvkHWuVGd6gAAAA=
+X-Change-ID: 20250911-qbv-fixes-4ae64de86ee7
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <Jose.Abreu@synopsys.com>, 
+ Rohan G Thomas <rohan.g.thomas@intel.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Rohan G Thomas <rohan.g.thomas@altera.com>, 
+ Matthew Gerlach <matthew.gerlach@altera.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1757924239; l=899;
+ i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
+ bh=F/X+TtZHooGZVCVdoXlX23gyuHCMQDwSSkVtX3di3Hg=;
+ b=bi6AtS44Cm+PAB1TLYBv/5mE8nemeFtjJHyyt2gUpKfTRwLORFKt6gXA8FrQeXWPi9muVBfYJ
+ Lh5o/Pnal8SCzk2Xrv11tNs0rwrZbC5HqjijLT6SOGWlDtKX5riau4o
+X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
+ pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
+X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
+ with auth_id=494
+X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reply-To: rohan.g.thomas@altera.com
 
-On Mon, Sep 15, 2025 at 12:24:16PM +0530, Mahanta Jambigi wrote:
-> On 12/09/25 2:37 pm, Leon Romanovsky wrote:
-> > On Fri, Sep 12, 2025 at 01:18:52PM +0530, Mahanta Jambigi wrote:
-> >> On 10/09/25 3:31 pm, Leon Romanovsky wrote:
-> >>>> --- a/net/smc/smc_pnet.c
-> >>>> +++ b/net/smc/smc_pnet.c
-> >>>> @@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
-> >>>>  		return -ENOMEM;
-> >>>>  	new_pe->type = SMC_PNET_IB;
-> >>>>  	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
-> >>>> -	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
-> >>>> +	strscpy(new_pe->ib_name, ib_name);
-> >>>
-> >>> It is worth to mention that caching ib_name is wrong as IB/core provides
-> >>> IB device rename functionality.
-> >>
-> >> In our case we hit this code path where we pass *PCI_ID*
-> >> as the *ib_name* using *smc_pnet* tool(smc_pnet -a <pnet_name> -D
-> >> <PCI_ID>). I believe PCI_ID will not change, so caching it here is fine.
-> > 
-> > If I remember, you are reporting that cached ib_name through netlink much later.
-> > 
-> > The caching itself is not an issue, but incorrect reported name can be seen as
-> > a wrong thing to do.
-> 
-> In what case we can see this incorrect reported name, could you please
-> elaborate.
+This patchset includes following minor fixes for stmmac EST
+implementation:
+   1. Fix GCL bounds checks
+   2. Consider Tx VLAN offload tag length for maxSDU
 
-Did you open net/smc/smc_pnet.c?
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+---
+Changes in v2:
+- Use GENMASK instead of BIT for clarity and consistency
+- Link to v1: https://lore.kernel.org/r/20250911-qbv-fixes-v1-0-e81e9597cf1f@altera.com
 
-Everything that uses ib_name in that file is incorrect.
+---
+Rohan G Thomas (2):
+      net: stmmac: est: Fix GCL bounds checks
+      net: stmmac: Consider Tx VLAN offload tag length for maxSDU
 
-From glance look:
-1. smc_pnet_find_ib() returns completely random results if device is
-renamed in parallel.
-2. SMC_PNETID_GET returns wrong names. It returns cached name which
-doesn't exist anymore.
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 25 ++++++++++++++++-------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c   |  4 ++--
+ 2 files changed, 20 insertions(+), 9 deletions(-)
+---
+base-commit: 5b5ba63a54cc7cb050fa734dbf495ffd63f9cbf7
+change-id: 20250911-qbv-fixes-4ae64de86ee7
 
-IB devices have stable indexes in similar way to netdevice. The code
-should rely on it and not on the name.
+Best regards,
+-- 
+Rohan G Thomas <rohan.g.thomas@altera.com>
 
-Thanks
+
 
