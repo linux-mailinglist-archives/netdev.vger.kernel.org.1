@@ -1,60 +1,84 @@
-Return-Path: <netdev+bounces-223259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA87B58865
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:43:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246F7B5886E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5D633B335D
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 23:43:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37F887B1437
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 23:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5291C2D238A;
-	Mon, 15 Sep 2025 23:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060542DAFDD;
+	Mon, 15 Sep 2025 23:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KhPnF2ef"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="jtyIs3jT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD472DAFAA
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 23:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6417829617D;
+	Mon, 15 Sep 2025 23:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757979778; cv=none; b=HITcmvfE98HUtWwqHwym2p1Rqr7vwtgPHOPPShovScGF2sUZooetK1npp9U2IYaCgKGUiRuv+eqtsVoFuepu1yMsVFSs47PH/jgUer/Bz9Tt5ez1f36GNRN2NMeaDSgHIiHNJZyiadyhuC0DaIUPjb5qLY5t8eb4ghLV6aJgaRo=
+	t=1757979981; cv=none; b=WVkQIUoGGyb5DvFQ/Q35ufqgKy62bZUxyNrU+AENH4Bf+9f8oPqGcLdiGrZxq/ZGqTr/wnbFRMjeaRNj4mlDl2e/RbEC6ZCrC1DB5HGn4zK2fRPrzuIyqJ1GIqhgO0g0S1PxtMHhnro7T1nmm/2Oei9nzGs+T2mDaQM2Titr9qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757979778; c=relaxed/simple;
-	bh=ARNiHd3whMI4T+4IYKlqRhQ/DL9+UClvdDO+h/804Dk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=arbXTUyB+VeuZiSrKEOe79iDDk8MOqiyJ7UyZ0ZTk0fTsqArloF8hG1wCEDF9HdY6SNmiQq4xlGPHSh+DRernvyV1UKIJF4i7Em2DmimES//r4fA4B3ecVpcFmLLDhrxhSYLNfjgLWOfYI7Em3W7lKeywzARCD3BdxBxiKTHtsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KhPnF2ef; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D84C4CEF1;
-	Mon, 15 Sep 2025 23:42:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757979778;
-	bh=ARNiHd3whMI4T+4IYKlqRhQ/DL9+UClvdDO+h/804Dk=;
+	s=arc-20240116; t=1757979981; c=relaxed/simple;
+	bh=lW3xNWJvBeUd78+N4Yyo06/B2znJyfp8Mxfc+3/obNA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ej/C3FtzONFg6Uy0Sk7eN1qqR9fPu8tGF1XNjF5F4qU4EDzqPa13nhsduFM9/Z4zGzI12vylxaSZm3wFLkTW6xB34bPw22OxmmOAanYfH/6jKE46ckq5Y2Dy42XqAlBGMl53PFkspv5RHEMfnnXNJc5AWT3qJmVuy3N+hzMsAN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=jtyIs3jT; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from mrdev.corp.microsoft.com (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
+	by linux.microsoft.com (Postfix) with ESMTPSA id A6840212329C;
+	Mon, 15 Sep 2025 16:46:18 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A6840212329C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1757979979;
+	bh=7luzChTMUszkb9nUQYYy7F6No80YdK2nCBJEz1e/6Zs=;
 	h=From:To:Cc:Subject:Date:From;
-	b=KhPnF2efZc7cBtDK9iZwL+ZmWMqQkHUNni64ZYuQsF2LQQYqFvkyyiR+l0YpWuX6S
-	 PFW1hQ6vE9YOOzcMyvKZsR8/cI41o4mJwRrNcfG9al3uNWUbmisstmhPCvCZjYIb2N
-	 5l3JNZy5Y2ERex15xPFd1HzwVh2yMqsn8DgpxbLsjMTr6WyRSrMmn7/xN5v9GGT6tG
-	 kJf5Z76ISxHq64LSj+lb9WhfTqTRgTDSBMzByU9cwTDWp4K08eySH4Z91srFTvIHES
-	 COCYxNqT9C5SWqPw4QP6/dWNfLHQgqt9C4MyQVxtFhasRzwld+GyiWC6HJx4Y37pFc
-	 ncHT7N474oQLw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
+	b=jtyIs3jTrdwZXnDw9vxxokbXUXOLvwgRveEkFIwYiy+pMrWiva5ENlTdDcwoZTzmu
+	 FBJ51hSc8k8vMU9Fiwr1q8p1aQUcRRLs2BkWEZHNAsahuKe/NddZwgTT7E21RFLNJR
+	 5fJJ1WTPMe2vBTDNUjFz+vcGC294CxqRnKvMTVqE=
+From: Mukesh Rathor <mrathor@linux.microsoft.com>
+To: dri-devel@lists.freedesktop.org,
+	linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-fbdev@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org,
+	tzimmermann@suse.de,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	jikos@kernel.org,
+	bentiss@kernel.org,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	dmitry.torokhov@gmail.com,
 	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	jiri@resnulli.us
-Subject: [PATCH net] MAINTAINERS: make the DPLL entry cover drivers
-Date: Mon, 15 Sep 2025 16:42:55 -0700
-Message-ID: <20250915234255.1306612-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bhelgaas@google.com,
+	James.Bottomley@HansenPartnership.com,
+	martin.petersen@oracle.com,
+	gregkh@linuxfoundation.org,
+	deller@gmx.de,
+	arnd@arndb.de,
+	sgarzare@redhat.com,
+	horms@kernel.org
+Subject: [PATCH v2 0/2] Fix CONFIG_HYPERV and vmbus related anamoly
+Date: Mon, 15 Sep 2025 16:46:02 -0700
+Message-Id: <20250915234604.3256611-1-mrathor@linux.microsoft.com>
+X-Mailer: git-send-email 2.36.1.vfs.0.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,33 +87,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-DPLL maintainers should probably be CCed on driver patches, too.
-Remove the *, which makes the pattern only match files directly
-under drivers/dpll but not its sub-directories.
+At present, drivers/Makefile will subst =m to =y for CONFIG_HYPERV
+for hv subdir. Also, drivers/hv/Makefile replaces =m to =y to build in
+hv_common.c that is needed for the drivers. Moreover, vmbus driver is
+built if CONFIG_HYPER is set, either loadable or builtin.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: vadim.fedorenko@linux.dev
-CC: arkadiusz.kubalewski@intel.com
-CC: jiri@resnulli.us
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is not a good approach. CONFIG_HYPERV is really an umbrella
+config that encompasses builtin code and various other things and not
+a dedicated config option for VMBus. VMBus should really have a config
+option just like CONFIG_HYPERV_BALLOON etc. This small series introduces
+CONFIG_HYPERV_VMBUS to build VMBus driver and make that distinction
+explicit. With that CONFIG_HYPERV could be changed to bool.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 47bc35743f22..4b2ef595c764 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7431,7 +7431,7 @@ S:	Supported
- F:	Documentation/devicetree/bindings/dpll/dpll-device.yaml
- F:	Documentation/devicetree/bindings/dpll/dpll-pin.yaml
- F:	Documentation/driver-api/dpll.rst
--F:	drivers/dpll/*
-+F:	drivers/dpll/
- F:	include/linux/dpll.h
- F:	include/uapi/linux/dpll.h
- 
+For now, hv_common.c is left as is to reduce conflicts for upcoming
+patches, but once merges are mostly done, that and some others should
+be moved to virt/hyperv directory.
+
+V2:
+ o rebased on hyper-next: commit 553d825fb2f0 
+        ("x86/hyperv: Switch to msi_create_parent_irq_domain()")
+
+V1:
+ o Change subject from hyper-v to "Drivers: hv:"
+ o Rewrite commit messages paying attention to VMBus and not vmbus
+ o Change some wordings in Kconfig
+ o Make new VMBUS config option default to HYPERV option for a smoother
+   transition
+
+Mukesh Rathor (2):
+  Driver: hv: Add CONFIG_HYPERV_VMBUS option
+  Drivers: hv: Make CONFIG_HYPERV bool
+
+ drivers/Makefile               |  2 +-
+ drivers/gpu/drm/Kconfig        |  2 +-
+ drivers/hid/Kconfig            |  2 +-
+ drivers/hv/Kconfig             | 13 ++++++++++---
+ drivers/hv/Makefile            |  4 ++--
+ drivers/input/serio/Kconfig    |  4 ++--
+ drivers/net/hyperv/Kconfig     |  2 +-
+ drivers/pci/Kconfig            |  2 +-
+ drivers/scsi/Kconfig           |  2 +-
+ drivers/uio/Kconfig            |  2 +-
+ drivers/video/fbdev/Kconfig    |  2 +-
+ include/asm-generic/mshyperv.h |  8 +++++---
+ net/vmw_vsock/Kconfig          |  2 +-
+ 13 files changed, 28 insertions(+), 19 deletions(-)
+
 -- 
-2.51.0
+2.36.1.vfs.0.0
 
 
