@@ -1,128 +1,180 @@
-Return-Path: <netdev+bounces-223036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BF9CB57A00
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:10:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 699F1B57A13
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 14:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 805E11888C9C
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:10:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F611886C60
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 12:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121D23054EF;
-	Mon, 15 Sep 2025 12:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C57305E20;
+	Mon, 15 Sep 2025 12:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Hp32/q8O"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="bR13VG/y";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cKqSdVk6";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="bR13VG/y";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cKqSdVk6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A28305E24
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 12:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5887302769
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 12:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757938225; cv=none; b=ta8BHrNfH3B7rpa7Siv+rrc493PGR/6iLZK3vgL3kV0PjVBNneDp1IPT99XgQv6q/gO7jRCF+nizMh02tNPKQmltYcClPd1i92TnordurenYFQOJ4S+cCnt8Jp1dnYAZAktBhD5F8Wr1Q8uTT1sjgD+ulNXbO1l3oUOwYhVWrnM=
+	t=1757938319; cv=none; b=o4fBAkNEs2M7tFYxrVaz9gQVS/fGbPv4e0V3EB0Ow7A6e8xZ649v3lBja72X7CCTa0lIu0jdZZ2jW0tomGY4zbUy+FBo1aMdwdCTsyBgCuTAXSIH1JOAEzCnQUsqw6+Ia85YrvmS1YRVjBsib1Tkx9ZCbkkY6FCuXa3uP70zNJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757938225; c=relaxed/simple;
-	bh=4gYGz8FOI/3cQIhfzCfqFVs938meQzpWpNAO1LH11sA=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=SL9FVfGsLBPIRpLfGkNJW775Q436Ui0ifm7/y75p1Kp3DlZj1ChiYOEGXdzu6X4EMC1a8PbpUmXP7LZ/9QQkbnqe4+9VLybT9lu6Aw1uRNW16IcElmfWbnOONfsVtvH8cgnYDmDyd0soU7yju4v1FwvCxtckxHQMm+kA0UklrUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Hp32/q8O; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sQx5saqZIaEHifjngqi/kxmKHGd9S+alLpY+t/N6rUE=; b=Hp32/q8OXogCKNkDXSY5LKP3iN
-	vdtpxGQjhZdUcwQ5VxEDkX5n4bFmcaSk+sZb9I8Zpq5f9wWsz9MXUjzTnodEwiepxNhXP5YLyZ5fI
-	O6pnXalL1U0Zb8LKk+XXZfPX35RteYBP+A57FtkZcmBhiFCjIkYHHC9cWpVpYmJJ/AHYzb3AY6xI5
-	qDkM3jZMTD1F2IARB4Qmq73jM0zrR9beMA9vymMXOo/34Mnyh9bCXzkmR0DGbLKkHgvbWWQSAOvq0
-	V4dl/Ur/Rlb0q5yAOIayVH+DGq45bZd9ZBUCiKk83pJxBH3u5L5ZB4OF/j7gM1zpjx02NwR+C4ivA
-	6fGjYF+g==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:56066 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uy82E-000000008Tf-46VX;
-	Mon, 15 Sep 2025 13:10:19 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uy82E-00000005Sll-0SSy;
-	Mon, 15 Sep 2025 13:10:18 +0100
-From: Russell King <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: mvpp2: add support for hardware timestamps
+	s=arc-20240116; t=1757938319; c=relaxed/simple;
+	bh=xlRPAJhIpH4XL1xNECA1LZs2RkYtgCf8hJ82IBt380o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lov3a7O6aYlrn90X0XeSjkx6ctvnvRB5ZUSySydZwfixuNdjDZxJbnvbInQ2DlC6hAQJWk3EqqRZ6vUkfmfoywwBfKXeR5rFm58MBDxsmMP6KS+r9iTIgd15XTP6TtRHSp/QhYOvP9tEKSlBdTXi5IP6bubyD0DTC4CzS89FUD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=bR13VG/y; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cKqSdVk6; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=bR13VG/y; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cKqSdVk6; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 1573A1F8C3;
+	Mon, 15 Sep 2025 12:11:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1757938316; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nzSUoqECYfRg+oyrfybo/qQ/BsSe+olVOPSSTCRTm6I=;
+	b=bR13VG/ypFDAljAvyBvCy2YVXy/I/PORbr5tUkjn5F9r1crhzdkbUxHwewqmu20Pxx1gq/
+	4gEvtZ9hwWLQVW318siwg1279Djdjbq6x0VyOI2LCkUb7JXi5CPYr8ZvATBs/ltW6mqyXS
+	0oKJ2lNK0onk90zYoY6TNHWssCy9VwM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1757938316;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nzSUoqECYfRg+oyrfybo/qQ/BsSe+olVOPSSTCRTm6I=;
+	b=cKqSdVk60T9hGN8FTqcgtgMCBF1ftl1bM33V6q+QS90kH+GAxRuGGpcF0OPVG6u2dkAQaL
+	hvSQhZ6yuQzFxQAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1757938316; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nzSUoqECYfRg+oyrfybo/qQ/BsSe+olVOPSSTCRTm6I=;
+	b=bR13VG/ypFDAljAvyBvCy2YVXy/I/PORbr5tUkjn5F9r1crhzdkbUxHwewqmu20Pxx1gq/
+	4gEvtZ9hwWLQVW318siwg1279Djdjbq6x0VyOI2LCkUb7JXi5CPYr8ZvATBs/ltW6mqyXS
+	0oKJ2lNK0onk90zYoY6TNHWssCy9VwM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1757938316;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nzSUoqECYfRg+oyrfybo/qQ/BsSe+olVOPSSTCRTm6I=;
+	b=cKqSdVk60T9hGN8FTqcgtgMCBF1ftl1bM33V6q+QS90kH+GAxRuGGpcF0OPVG6u2dkAQaL
+	hvSQhZ6yuQzFxQAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 08E921368D;
+	Mon, 15 Sep 2025 12:11:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id jpwqAowCyGhoNAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 15 Sep 2025 12:11:56 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id BAC22A0A06; Mon, 15 Sep 2025 14:11:55 +0200 (CEST)
+Date: Mon, 15 Sep 2025 14:11:55 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 24/33] user: support ns lookup
+Message-ID: <bh6wllwygal6hfdjbv3amgok2yxzjgmemyvzriqf2wos6b3plp@tvhvgz47mll3>
+References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+ <20250912-work-namespace-v2-24-1a247645cef5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uy82E-00000005Sll-0SSy@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 15 Sep 2025 13:10:18 +0100
+In-Reply-To: <20250912-work-namespace-v2-24-1a247645cef5@kernel.org>
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLbyy5b47ky7xssyr143sji8pp)];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[suse.cz,gmail.com,vger.kernel.org,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,kernel.dk,cmpxchg.org,suse.com,google.com,redhat.com,oracle.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -2.30
 
-Add support for hardware timestamps in (e.g.) the PHY by calling
-skb_tx_timestamp() as close as reasonably possible to the point that
-the hardware is instructed to send the queued packets.
+On Fri 12-09-25 13:52:47, Christian Brauner wrote:
+> Support the generic ns lookup infrastructure to support file handles for
+> namespaces.
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+...
+> @@ -200,6 +202,7 @@ static void free_user_ns(struct work_struct *work)
+>  	do {
+>  		struct ucounts *ucounts = ns->ucounts;
+>  		parent = ns->parent;
+> +		ns_tree_remove(ns);
+>  		if (ns->gid_map.nr_extents > UID_GID_MAP_MAX_BASE_EXTENTS) {
+>  			kfree(ns->gid_map.forward);
+>  			kfree(ns->gid_map.reverse);
+> @@ -218,7 +221,8 @@ static void free_user_ns(struct work_struct *work)
+>  		retire_userns_sysctls(ns);
+>  		key_free_user_ns(ns);
+>  		ns_free_inum(&ns->ns);
+> -		kmem_cache_free(user_ns_cachep, ns);
+> +		/* Concurrent nstree traversal depends on a grace period. */
+> +		kfree_rcu(ns, ns.ns_rcu);
 
-As this also introduces software timestamping support, report those
-capabilities via the .get_ts_info() method.
+So this is correct for now but it's a bit of a landmine. A lot of stuff
+that ns references is kfreed before the RCU expires. Thus if you lookup ns
+using id, then even if you're under RCU protection you have to be very
+careful about what you can and cannot dereference. IMHO this deserves a
+careful documentation at least or, preferably, split free_user_ns() into
+pre and post-RCU period parts...
 
-Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+								Honza
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 35d1184458fd..ab0c99aa9f9a 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -4439,6 +4439,8 @@ static netdev_tx_t mvpp2_tx(struct sk_buff *skb, struct net_device *dev)
- 		txq_pcpu->count += frags;
- 		aggr_txq->count += frags;
- 
-+		skb_tx_timestamp(skb);
-+
- 		/* Enable transmit */
- 		wmb();
- 		mvpp2_aggr_txq_pend_desc_add(port, frags);
-@@ -5252,14 +5254,14 @@ static int mvpp2_ethtool_get_ts_info(struct net_device *dev,
- {
- 	struct mvpp2_port *port = netdev_priv(dev);
- 
-+	ethtool_op_get_ts_info(dev, info);
- 	if (!port->hwtstamp)
--		return -EOPNOTSUPP;
-+		return 0;
- 
- 	info->phc_index = mvpp22_tai_ptp_clock_index(port->priv->tai);
--	info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
--				SOF_TIMESTAMPING_TX_HARDWARE |
--				SOF_TIMESTAMPING_RX_HARDWARE |
--				SOF_TIMESTAMPING_RAW_HARDWARE;
-+	info->so_timestamping |= SOF_TIMESTAMPING_TX_HARDWARE |
-+				 SOF_TIMESTAMPING_RX_HARDWARE |
-+				 SOF_TIMESTAMPING_RAW_HARDWARE;
- 	info->tx_types = BIT(HWTSTAMP_TX_OFF) |
- 			 BIT(HWTSTAMP_TX_ON);
- 	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
 -- 
-2.47.3
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
