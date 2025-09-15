@@ -1,266 +1,159 @@
-Return-Path: <netdev+bounces-222971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-222972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72541B57560
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:58:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25DCBB57561
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 996F47A29B5
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 09:57:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA9D83A7FD1
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 09:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD712F618F;
-	Mon, 15 Sep 2025 09:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2F12F6187;
+	Mon, 15 Sep 2025 09:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JFSIVGHo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pvdh/vXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805B52F39C4
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 09:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757930323; cv=fail; b=THC10miV1LDIoOmchOSpjIUD4vh27axc3EK2mEuIhkuq19wShvWvNG/PjObWFxV32RpLzv9xxUVEuxHo8LbcU5KDP2OfX726KeubldaHFZcwonTCnZRfuLWooaa6ACzcFfBO89kB99TL8AvwkGAXo5dwQumSg/JaBqbxWsbdtaM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757930323; c=relaxed/simple;
-	bh=g7PQg9ccuRz90SR3TkSETcjb2OsP2tON7HVMfmLucxA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MrBnObik5ou3zyt192IYEpPkvpznX9Q2j65lij9rxKHDyro61JcOk4BGoG4fMMCUQQHkVHuDRFGHRb3dw+eWBlfhsV5LUCWkhMSHj37mCH+5gE2H9be/MjRaPWsMrcmYDN7CQvFd/i/Q6YLU6vFo2f6OLFDchhCB3AoYUA3/CJE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JFSIVGHo; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757930321; x=1789466321;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=g7PQg9ccuRz90SR3TkSETcjb2OsP2tON7HVMfmLucxA=;
-  b=JFSIVGHowxSSQ91sHTlAKHUFgLPtKoJABoi/S24n0fBI5mNuxknEI9aa
-   Cl+yUPcIt+lhdx8gSA1ZZ3xztuPsHibIin5q9p92CTm8VpTm0XfNT1WaK
-   CpyxoijOmJXAoGSjDe/+CNIUwRSHWU8JFvCYrDTckLpEmf+W2uWXDxNhT
-   TQnAd3OtPM0N3AA+hmp1zuNco6r2PPmNrtrJzec63xmrKUuuuMZKZdsKc
-   NSTq/OBb8xf0ueU5uVE94Cw3e0jA9Xc6fDt+rbFsaiT/VMpuoi9tt/h+g
-   iFaxEGK0zgecHcOMFekFdfnkmkWnKfdT47nW5kJbum2uCO+Z8c+5opKPu
-   A==;
-X-CSE-ConnectionGUID: 0aw3dt4USSWlBfJr2vLZzQ==
-X-CSE-MsgGUID: jDARfFzwS5a7ouW5/UAsBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="60099576"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="60099576"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 02:58:41 -0700
-X-CSE-ConnectionGUID: P7GdHFe/RhajmkKhAF4lOQ==
-X-CSE-MsgGUID: slfY9B07QMev50rQ+hY9Rw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,265,1751266800"; 
-   d="scan'208";a="174403867"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 02:58:40 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 15 Sep 2025 02:58:39 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 15 Sep 2025 02:58:39 -0700
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.37) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 15 Sep 2025 02:58:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QCNgCjJ+VGkrPptbR2RY+Auzc+hXkkp6+2+7De8asUwBdrMtNy2NV70YuY1xsCJ2nHu2MTdbgYda+1URHK6fNFCgVXbA5k8/1onrUPOla9wiEZiW4g2Dr9fixIAP6Jqy3ZflM6A/04rbWMxfDxIK5ziS9QsJMYHl/l7jhu9SeC5ZxEw68n8C9XdGECj27UKZq029WrTqt6JuC6iA/vUkfSmDJ5V7s31ek3FYwGMnKQ35J2zGVoP0r5tn5lBEWZ0IlwH05yL/gbE+pwvtAK7H7qNSgag9AyCC+XXSQCSp7hZ7haqYCKOR+1g8Fd/CwWT3RQoRGvUNGZm+nnWQNBbH5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TyIsDmvDqrigHe2UQIV7BB3QTeufKmwaRjgZjs3Y1Hs=;
- b=RCtgzOHE4v2ZR0b3fvF8MwYyPxn6169RpAcsMZWkYakEp99biflyC+c8wqIgxZy4alkxrlmhpvwDNTBInXobOtOybdL4X5s8K0Ur1C2GSt6E2EZykAoJRD+VEQIp5i+rYOzcFAU4CtaxSpSmqgc0LQseNhcm7Dht7/l4rHUMXuVuNvH2S/HmxBpablHdrFIgI3HoeueE5BEjuqmiUz6y6G4HkT5gvg3Yl+Y0kXB0mDeI+fOy7RwoLmcP1Yr7co8VoDHd1hPS9R1L8nLvcIcheBwe7pWbBqfKC3YmuPoFSec/V3EBURn3k8NDfjAugE3fL6gJA/hfo0g4etAJgoR58w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by DS4PPF30373102B.namprd11.prod.outlook.com (2603:10b6:f:fc02::1b) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.19; Mon, 15 Sep
- 2025 09:58:37 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9115.020; Mon, 15 Sep 2025
- 09:58:36 +0000
-Message-ID: <679b3ad8-91fd-4570-9e63-c6c5e22a8820@intel.com>
-Date: Mon, 15 Sep 2025 11:58:32 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] iavf: fix proper type for
- error code in iavf_resume()
-To: Paul Menzel <pmenzel@molgen.mpg.de>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <anthony.l.nguyen@intel.com>,
-	<netdev@vger.kernel.org>
-References: <20250912080208.1048019-1-aleksandr.loktionov@intel.com>
- <8c3d7bc5-7269-4c8c-922d-7d6013ac51cb@molgen.mpg.de>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <8c3d7bc5-7269-4c8c-922d-7d6013ac51cb@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DU2PR04CA0213.eurprd04.prod.outlook.com
- (2603:10a6:10:2b1::8) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B61D2F3613
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 09:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757930330; cv=none; b=o/sk64m8v8fOrbMIr3Sq4StW3Eq8qaAJ27U5LBzH7wmDkm3FGy+G6Oe6oj6Y8QGyfC77B76vYAirSKtaT6kFjnaVHXbcA+XzC3pJ3VnzVIyuPTWZ9akyMLUXrhEcr5/1pe9f8SryzSCzo+mS/lEsmF8I8fPZRfcZq9l92Pb3A80=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757930330; c=relaxed/simple;
+	bh=FsKJ8c81julWLc3GJCezM9mE5Z2asGVrmNz1XbPv02s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m7v0Njay6DyaUjFaLgggOIfd0UB707taznbVG60TekzqKYiMwg3KDY2OMDM+mhgRL7WEqV2HQnBczqPyRHJgTg24j6y12gBqZIATDktlZ7pageKsjBx1hJMOR3D0oKOPhZVn9/P3b4M5m6g5FXeKc/H1zXiDB+7eH6vloZfqkDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pvdh/vXA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66208C4CEF1;
+	Mon, 15 Sep 2025 09:58:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757930330;
+	bh=FsKJ8c81julWLc3GJCezM9mE5Z2asGVrmNz1XbPv02s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pvdh/vXAtL+Lh9tEsXZxJwsTfCQ1tVO9QiAhSEtWs6h1cBWWsID4zUoqCV4JtWeol
+	 U7p1SLQd66A8IiiBXrdyjTKSeStikeSmp5usEcTFq8orMBOfVY08TEd1wFLFw0wu3u
+	 TegtUQ/V0mp1B04IxjMHIsHAeQazgIjHBEWRj5I4BunBITEpEVJbo2Dm09PQiFPeew
+	 QE0i5B0feUsVusSRu9y/uQ6hDS2uMbdIEy8hmHOphMGUp6+qbnDuU2+0AWEQPBXXYU
+	 xudRj54+GaKJDCMNYtg0+8vsL+lHmJHksdwTyx730Qi5Eu60shsnD2huZF3w/Q6mAA
+	 aRrJ8psV3c6Kw==
+Date: Mon, 15 Sep 2025 10:58:46 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, alexanderduyck@fb.com,
+	jacob.e.keller@intel.com
+Subject: Re: [PATCH net-next 2/9] eth: fbnic: use fw uptime to detect fw
+ crashes
+Message-ID: <20250915095846.GO224143@horms.kernel.org>
+References: <20250912201428.566190-1-kuba@kernel.org>
+ <20250912201428.566190-3-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DS4PPF30373102B:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3e7b45a0-c00f-4c0d-b9ca-08ddf43e7051
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?cDRFNzVUdTFiUmZBdGxCN1VHYjdoSUl1YXBpTVJ1amYwRDJNdWNjbVpKc0xV?=
- =?utf-8?B?bWg4Q3d4VE9zUkd5S0xkc3FOb3hXMzJDMytHWWtROHpOSFpvTC90K2hWV0FX?=
- =?utf-8?B?VWt6ZEY1WnBsZ01rZnlBV0tKZGJVTnFJRC9mNTR0T0FKaG5jNU1CUlZva1R3?=
- =?utf-8?B?ZmxrRjVrdHVCY2JmMTRDT1F2T3JOY1BVZHlDMVIvVFRBQXNPM1hJUU5NUXVp?=
- =?utf-8?B?V0cyLzFzYjJpYldVQ0ZUMmhadEkvSHFFRndtUEdzVEUweTZiV29jTDlFYVB5?=
- =?utf-8?B?RWk5OUdHUG5xcUxBdFZIcy9oYkVyWXBTYzBjckIwQkl2bElBMVpiRXJYbUY0?=
- =?utf-8?B?c3NEbXJIWUVremdyc0hHSWVVSHg1TjJlelNSVWZ5cEFoSW8xaHF4MjB4ckpt?=
- =?utf-8?B?WHJmSnpHeXVzOG5UaCttUGZ5LytBaXViUXV0aDJteExOOW1SNng4RGdEb2x5?=
- =?utf-8?B?S3hVR2k3YWZJVFpBUkNQWlVKekxyMko2R1E5WUNXZkdGM08vY09ZMGJXWlFw?=
- =?utf-8?B?cEYzY3B2ZWE0dzVWZ2x5NndVeG9QMFdnbVIrMTBIYmF1c0pkNWw5dnY2YjZG?=
- =?utf-8?B?WXFlaXlaczdLZVR2M21XYWVvWWV0V2lMNGd4WC9CZXcyZUFuTDFRSytFWDI4?=
- =?utf-8?B?aHdhMEFaQVZHQnF2eDd1R0dLTldaSktnWk1ZMFRTNWxHRStpU1NBUkxuU255?=
- =?utf-8?B?WXJack9DY0lWWWlOM3A4akRJc1VRVHNVNEFCRHFad0dIWG5KMXFES2lmb3M4?=
- =?utf-8?B?cXBCVUQ2c1pNaXh6bXVGQ2UvbGFGMzludzVpTHpLTFRFQTg3Y2dzMzR5ZWIr?=
- =?utf-8?B?SS92ZXdhMHM1L3VONG9uQWR1Um14cXdjaWljUXl2OTRDalJ2OTRmOUhGNzJr?=
- =?utf-8?B?V05Xc0YxVTN1RGx0N3lwKzBCekFaSEp5Z0EzVnY3eUJkVVZpNDRCNzA2WFdx?=
- =?utf-8?B?N0xtR1V3V0l0NnlHYktFUml6UzNvY3hSdVpXajNtY2dqbkdMZDhVcERuZG1O?=
- =?utf-8?B?ZUFWOCtnWUUvc0g3UFArdStBQnVCcXBKOHBBZ1Q3elkrc0ZuY0M0STFwMTlC?=
- =?utf-8?B?cnJmaG1hcitkTEFOU0kwWGxyZllFQ2psUDFPRnFRSmpHN0tlRFBxMHE0ZWFk?=
- =?utf-8?B?bnFweU5IbHluajdvN3V3SE52ZGZ4bTN4ektDSG5FS3VGL2hiMWlTT1NJdmll?=
- =?utf-8?B?c0tsQ0tya08xc1FaVFQzN29XMGsvNmhTeG1vY2R0ZXJUSm90VlRkN0JJbGU5?=
- =?utf-8?B?NlRWd2VvSVVua0hKNDQwZDM5RTArWWU2VlpyNmNWZGd1Q3BVQ3VtQ2kyQ0JI?=
- =?utf-8?B?alBTRExYWUpYQjF4RVcxNkxpY2Y4OVVUYmJJWTlpYkJVNE1idTZmSkllZEFL?=
- =?utf-8?B?WHJScWgyMmFaRFFNTFpnQ281aWJydHFLTGtVbTlPV2d5Q09BNmFvWWZQQVhO?=
- =?utf-8?B?bDFKaUN2ZmJESWU0YXJhK0xhWDZCNHFIemtKYTNjVHFUbDhZbzV2aTFCbHNY?=
- =?utf-8?B?RlUwR3RhN0xPVWZiQUNsYXlrT2dxVHNpazNqM3M3TDVMVFFXc2twbmtXc0ZD?=
- =?utf-8?B?SXRlbVY5Q2Z5QWlwNE9zY0ZzcXhPcXdPcHlkQkI0VmVtVVNGRE9BSHNsbkdC?=
- =?utf-8?B?NU53andsSS9UeTZCQ1JWSW56cTZCVGhVeHExSG5weG9JNzNGODRVZytld2pB?=
- =?utf-8?B?T2thZ21GQ0ZPbTJJMXAvM1FCM1VaeGtma1BZMncvN1A1MElzUEdWS0VMZ3Ix?=
- =?utf-8?B?Q2ZqSVFCOFFYekY0bTBvczRsNWhSV205UlFjcTVHMVVLb2syYUdpN1dvNTVn?=
- =?utf-8?B?OWN1cHl4TENoUnlrRGROd2I5U3BuRVIzRGEwVy9VVVdyWjFqem94cnlzcHJv?=
- =?utf-8?B?YzhIeWF0cDdQNDZHazBSQy9EV2QyTzJLNlloQk1zeU9qZlE9PQ==?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eHBnQmdJejdNUFdMaFlYRkpkek9uK2kyQjI0ejh0Z1lPMlNaN3lMMTN0RVBX?=
- =?utf-8?B?ejJqQisrWWZ6V092NVFoRTM3ZjN5eWtKSGZrUnhLN2liMU1oZWhzU2FZTlNX?=
- =?utf-8?B?SWNSWkxSSXhJQ1NiTHFTRHpLUDhoQTdXRzl4UDl4QS9ON2pHNDlhLzBtUk1n?=
- =?utf-8?B?TW5DMzVtTkhqdWlGb3FabmVrbnVjYTR1bGZISFdIYW5PMCtDQnpacU9PeUhn?=
- =?utf-8?B?MjlDazVacUZtQWxWTEF6cWJORU9Qc044VFdXNmIxMDVvRXB0c3BjclNtNlpO?=
- =?utf-8?B?TFV4RGkxTURhZWlScGl6NnlaMkhTTlNjaXJRYi91RmVkRkVjUDltNG00YXA5?=
- =?utf-8?B?amt0R2l3SGM1U09IbU5taGI5VEhEK25ybmZObXQ5VjF0eG9meFgwTzBJT1dl?=
- =?utf-8?B?S3dVOVJwN0w2SzVkZk1ocE9HaVhQRlZqakt2UTdnRDRzUjVQbUlNblZWc3ZF?=
- =?utf-8?B?azB1M25yMVVheFp2aHNpRTJkZ0tJVmhmWnBBejJtck1SWnF0M0FYRVBNT3pZ?=
- =?utf-8?B?dVV5UmFtSkdBWFhRZWxHVll0MlFVaUxWVUk1T0VqenZHU2ZEYnEzK1hlVVg5?=
- =?utf-8?B?bFFHaDYveVAzZDZ4TDJnNWZkTExzWVZYSXFBNUd6ZVBzNm03bjByWVlGNFU5?=
- =?utf-8?B?dU44ZUh1RUxzOTVadDg1OW1LYzBjUDFjdFdhTEZ5WHNTSld1RkVRbGRveXo4?=
- =?utf-8?B?L2c0TDRsdTZLV0NrdFhNUVM3a1I1VmdrNXRsakkwSFFTbFBERk84TE5HT2xX?=
- =?utf-8?B?bDh6VHRYcnB0enY5ZVpEZHo3RTJKbUVia1UwTS9Ld1htaFBGaTRYL2JrbDJC?=
- =?utf-8?B?cWszOHpFOXkyb042bVlZeFhFTVVwczRDQWZFWTB1RlplK01tMW1Pa0xidU1q?=
- =?utf-8?B?OWM5MDFUKy9aWitrRmFOaUpHdTI1RzFNV3VjUGM2Rk1UOFlvSXhVTWo5dVp0?=
- =?utf-8?B?TXBEZ1d5MVRPV0UvOXFMcURxdTVnZkl0djJkZUNhd2FRcHBrRm9nTElheC81?=
- =?utf-8?B?M2RJUitFK1N3bkc0Uk85Q1paL2dLU1J5L3FxUlRvQWpvTUQ5VEttb01MUFpa?=
- =?utf-8?B?bHh6aTcwaFdqcnd3K2xkQStPa0o3RWZ0RzEzUitNNHZEbnVMQ3hYSk5BSlVS?=
- =?utf-8?B?eWVLZkVyaUpPdEgyTGxndERaSzhuV2diTzFXek9rK09CNGdKT0JUKzVWL2VP?=
- =?utf-8?B?OTY5WFk3YjY3di9wRlhoeDFPK1JLT3llVGU3MENPbTEvb25vSTYyN081Szh2?=
- =?utf-8?B?UlJySUh5R3pveTlDVlpDeXBLQUdjZ2twU24rSjlYd3lzN00yYnJMekZLWHhK?=
- =?utf-8?B?OGNKUWRJUXh0dlljRVB1Vnh2NHZtTGEvMHJOL2s4andlS24ydVE1Y1RzWWEv?=
- =?utf-8?B?RUV3cXhyN1Y4Vm4wdU0rcGlQaWZ2MGlFYmJyZk1HSFRTNlRkb2MrK2JLdHcr?=
- =?utf-8?B?UmZINGI2bngwMXhVN2xsTUtvNzZPbzRELzA5NjhrNGlvSlZ5eXQxeTVta0VE?=
- =?utf-8?B?TEdITkFkRUpGZ3ZJRWtJVkRUb0hWSEpET05wbFpEcUdWLzlFRnlQeHRPVjZk?=
- =?utf-8?B?cXQ0TTRBOGIwR1dzbnNna0hzMHl2R0RCM2kyd1JqdWFNL29rak1wV3hIVVB1?=
- =?utf-8?B?NUpweGFuc2dleGdNSit0MG1GL0VQLyswby9RcWJjeGtWZ1lBZU5YcWpwTzlG?=
- =?utf-8?B?THpDZ05aWlpDMHJDcWxYcE5LQ2liOVZja01aeXRWRmQwUXVPYVgxSGZ5TVNk?=
- =?utf-8?B?WCt5RzFjVDdzZmJ5U2tPRnI0V0VlVERaWmlGQU11RVJUMHRHaVZXT1Rsb2FU?=
- =?utf-8?B?V1FlWVFlUTJ4Y082TitNQXg3d01RMGRUMjlVc2VUNHQya0FBakxwbmlBaXY0?=
- =?utf-8?B?SFB4R1dCUjM1MjJJM1RSRGtFSnVES0hUb1lOQUlWTjBrMmpwTkphbGxWQWll?=
- =?utf-8?B?WVhwYXpRS09Yd3lyLzcxQlUvajZuOWJWRzAvNkNSTkZWVHYzdE0yMVNLTVcx?=
- =?utf-8?B?ZW1yMEs5SEZtUkUrMDRoSnE0WGFjRkw5WklWSVk2djUyQUdwcTlDQUxUSnZ6?=
- =?utf-8?B?cVB6M2k0NFZCdW5rRXZtcHcxNC9ndnM3dWFiSUtnQmJma3Q1MjVGb1dNWTFq?=
- =?utf-8?B?TU9vWFJFdWlyaTNlYzg4N25KcXhXbFRmdDdGdjYwUmlLdDFDcmYrbG4yeWZF?=
- =?utf-8?B?UWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e7b45a0-c00f-4c0d-b9ca-08ddf43e7051
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 09:58:36.7976
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: evpb1XAu6wzN8HcuzqmhOyDVgcxCh3HCHOcV0X+S3Ax9tJ21gOEatBGVw33VTP9wP2Mnds1wWNNCoSveXM4Ctw3c5hWZvcJa2ejv3xl7KRo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF30373102B
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250912201428.566190-3-kuba@kernel.org>
 
-On 9/15/25 11:12, Paul Menzel wrote:
-> Dear Aleksandr,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 12.09.25 um 10:02 schrieb Aleksandr Loktionov:
->> The variable 'err' in iavf_resume() is used to store the return value
->> of different functions, which return an int. Currently, 'err' is
->> declared as u32, which is semantically incorrect and misleading.
->>
->> In the Linux kernel, u32 is typically reserved for fixed-width data
->> used in hardware interfaces or protocol structures. Using it for a
->> generic error code may confuse reviewers or developers into thinking
->> the value is hardware-related or size-constrained.
->>
->> Replace u32 with int to reflect the actual usage and improve code
->> clarity and semantic correctness.
-> 
-> Why not use `unsigned int`?
+On Fri, Sep 12, 2025 at 01:14:21PM -0700, Jakub Kicinski wrote:
+> Currently we only detect FW crashes when it stops responding
+> to heartbeat messages. FW has a watchdog which will reset it
+> in case of crashes. Use FW uptime sent in the heartbeat messages
+> to detect that the watchdog has fired.
 
-I don't think we need to provide rationale for "kernel has adopted
-a long standing practice of encoding errors as negative integer codes"
-each time we change a type, IOW it's too basic thing to mention.
+I see that the time sent in heartbeat messages is critical to this check.
+But the time sent in ownership messages is also used, right?
 
 > 
->>
->> No functional change.
->>
->> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> ---
->>   drivers/net/ethernet/intel/iavf/iavf_main.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/ 
->> net/ethernet/intel/iavf/iavf_main.c
->> index 69054af..c2fbe44 100644
->> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
->> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
->> @@ -5491,7 +5491,7 @@ static int iavf_resume(struct device *dev_d)
->>   {
->>       struct pci_dev *pdev = to_pci_dev(dev_d);
->>       struct iavf_adapter *adapter;
->> -    u32 err;
->> +    int err;
->>       adapter = iavf_pdev_to_adapter(pdev);
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/meta/fbnic/fbnic.h    |  4 ++++
+>  drivers/net/ethernet/meta/fbnic/fbnic_fw.h |  6 ++++++
+>  drivers/net/ethernet/meta/fbnic/fbnic_fw.c | 15 ++++++++++++++-
+>  3 files changed, 24 insertions(+), 1 deletion(-)
 > 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> index 311c7dda911a..09058d847729 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> @@ -84,6 +84,10 @@ struct fbnic_dev {
+>  	/* Local copy of hardware statistics */
+>  	struct fbnic_hw_stats hw_stats;
+>  
+> +	/* Firmware time since boot in milliseconds */
+> +	u64 firmware_time;
+> +	u64 prev_firmware_time;
+> +
+>  	struct fbnic_fw_log fw_log;
+>  };
+>  
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> index ec67b80809b0..c1de2793fa3d 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> @@ -201,6 +201,12 @@ enum {
+>  	FBNIC_FW_OWNERSHIP_MSG_MAX
+>  };
+>  
+> +enum {
+> +	FBNIC_FW_HEARTBEAT_UPTIME               = 0x0,
+> +	FBNIC_FW_HEARTBEAT_NUMBER_OF_MESSAGES   = 0x1,
+> +	FBNIC_FW_HEARTBEAT_MSG_MAX
+> +};
+> +
+>  enum {
+>  	FBNIC_FW_START_UPGRADE_ERROR		= 0x0,
+>  	FBNIC_FW_START_UPGRADE_SECTION		= 0x1,
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> index 6e580654493c..72f750eea055 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> @@ -495,6 +495,11 @@ int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership)
+>  
+>  	fbd->last_heartbeat_request = req_time;
+>  
+> +	/* Set prev_firmware_time to 0 to avoid triggering firmware crash
+> +	 * detection now that we received a response from firmware.
+> +	 */
 
-Thank you
+I'm having a bit of trouble understanding this comment.
+Here we are sending an ownership message.
+Have we (also) received a response from firmware?
 
-> 
-> 
-> Kind regards,
-> 
-> Paul
+> +	fbd->prev_firmware_time = 0;
+> +
+>  	/* Set heartbeat detection based on if we are taking ownership */
+>  	fbd->fw_heartbeat_enabled = take_ownership;
+>  
+> @@ -671,6 +676,9 @@ static int fbnic_fw_parse_ownership_resp(void *opaque,
+>  	/* Count the ownership response as a heartbeat reply */
+>  	fbd->last_heartbeat_response = jiffies;
+>  
+> +	/* Capture firmware time for logging and firmware crash check */
+> +	fbd->firmware_time = fta_get_uint(results, FBNIC_FW_HEARTBEAT_UPTIME);
 
+Maybe FBNIC_FW_OWNERSHIP_UPTIME?
+
+> +
+>  	return 0;
+>  }
+>  
+> @@ -685,6 +693,9 @@ static int fbnic_fw_parse_heartbeat_resp(void *opaque,
+>  
+>  	fbd->last_heartbeat_response = jiffies;
+>  
+> +	/* Capture firmware time for logging and firmware crash check */
+> +	fbd->firmware_time = fta_get_uint(results, FBNIC_FW_HEARTBEAT_UPTIME);
+> +
+>  	return 0;
+>  }
+
+...
 
