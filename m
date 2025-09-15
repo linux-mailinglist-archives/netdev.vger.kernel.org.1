@@ -1,158 +1,95 @@
-Return-Path: <netdev+bounces-223026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7761B5798D
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 13:58:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57AC8B57990
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 13:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4164E16D279
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:57:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC3DC161B22
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 11:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A80E3043C4;
-	Mon, 15 Sep 2025 11:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D2E2FD7DD;
+	Mon, 15 Sep 2025 11:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="JkBXfelQ"
+	dkim=pass (2048-bit key) header.d=tcarey.uk header.i=@tcarey.uk header.b="uLQav3Oh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-24421.protonmail.ch (mail-24421.protonmail.ch [109.224.244.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B93E27A124
-	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 11:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CDC3009E7
+	for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 11:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757937439; cv=none; b=hylYGMh4EvNhUkvN+Z3Pn51LIm6IjMSNHudQRhMMt0GIWL/FSzdrc9r5HPwC6izYNgJvLOyltSHD/c87BsbM6qgHylj6rYIsDKatoFAU0h4PTDpLZEahhTrDq31YX5J3kAQGjHEYjnY1RPKfmJgjSapR0OWXh1E7rlSHvHqiMRA=
+	t=1757937524; cv=none; b=mAsGgyo6UB4xRODRwgJBM3IXw7HhHEKBMP/2blEazFAfWB7iZZ3SJc+qAqe7wt6r38aiZimilwgJHd/NZ92AIc/n3BaTvsA/7Hc0vEjK1HluBrW5R24VxGYZFXlogmVQgN7HSyr5mLBJjpfOc026q1zTt286Wx9OwxHxlQK5nFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757937439; c=relaxed/simple;
-	bh=4iIsT/e0SkZkgz6cT/6zDmKcSsAO4TPDDaXg4J888mU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mUZHVaOAWSU+PMZboI58awDnq+cGs19czfH5thmqFlG0u6Y72Y9Sfq+cAFAYwtl+7rD1UVQ8gFyFPLb4KUHK3nP6Ux4ev0r1kaAAQMXJaQSgJfEunBdMRj2ObDl4VvCyQlsWyrcURVmWeV3pISsX0czi8v31erjhTD+zRBfCTDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=JkBXfelQ; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-329b760080fso4017365a91.1
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 04:57:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1757937437; x=1758542237; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nGJm8DYIvDlO/KkwD8vnmqae7TgyeCejeZ/3X9vddjo=;
-        b=JkBXfelQjExfOkJuzaIYeCjBy61YbFf13yL15Io6y8wBOlMz71sU0OrKiNNIjkIh9r
-         lFqVlkQTjQsa4D7hvpa4n2FRtW4MxUk/o6aQ61qUseCTBVi8e6ai1wxAm9IAIaW8i0mQ
-         0+NYaQ0IPIbY+ukY6/xRngxrjkrJucjGWyRoCWrBscnGOiAWMN3mvNKpf5NV2OE8Jwar
-         UBh0VGs51hbKq6+FA9Q3fyY6iRk2wQbjLhVo4H3ItjchqwFfiRq7U3rvEY6gKrwW6GvO
-         s5m9crVN6zy8MtrX6pWIPy7rIXaTD4DSLl2b+1zI4q0s/X9ZpxrNBtASPMVIr7kY3jDl
-         q5Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757937437; x=1758542237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nGJm8DYIvDlO/KkwD8vnmqae7TgyeCejeZ/3X9vddjo=;
-        b=Eqs04F1BYiitnGaBrPsMOqjqAeNVeipkPtZ18Db1JivRWLJgTYscKjEk+wyzvkmJ9F
-         05S04wZtG6+bU4pjwZ26oHZcg9Apx8ju8CnaDzyHDubZEFWeBNCWalKkL+lHGhRtMdko
-         0ey8l9YPXJ6Cfp6a8WGlnvqiDBQI48DUZfdIHo77LeQ3rU0Kt8W2cdVDa9HLMFypYbwf
-         yGJ+D5stQUjLZCWCeTS4xmO32/w3oYmKjufuWKY48NRqxPoH7mHc+KukNGYYX/V+ltkE
-         JiJx8oI3GiMBtnSPAY28yi0K/LeUQPWg3KKutg25+8OrnLJA9ctnLdSBZNFzSTgWswPz
-         Xk1g==
-X-Gm-Message-State: AOJu0Yx654HQL24LlFZkkTplTBoD1Ur8WsdP2LzH4kt9UWA2S21Phrnj
-	CQ1lu81Hw0yy2ZaIxk2vUjxBFYIavK7M3ARHcOB/3sUbcCggl8utZd0qR+/cxELoanlyfHfOLVL
-	IGdEU8Q76M1KoFYdL5W2zQn89fOtpYaH4BZv16oDTnw==
-X-Gm-Gg: ASbGncu22gSmciwFIGZ2MkR8q2aEVGQLCk3eAsLD8a9Bj0tJTp9MxVqq3TojtKjDomT
-	G3Ww7WyYkMF3/VROw/fRhf/fo1MYIvYgHMuoMoF+fK9CyvH/spLU/dA8hAOAcw29+8bztNlgGDr
-	lTvk3tvzDDo/iUw4qnqxElVCcA1MiwQQ/bvnSBAg9BcQFFim7sW1Gqe1dqEkn54MdC/LDwMDmVu
-	VWMkwg6AvYmkWssRszkBruP3Q8=
-X-Google-Smtp-Source: AGHT+IHC9MtMM4aoht490pTslenJiMyVWixD64PNiClIAKHESGsSGqs2QzKXHaL4Reakb94ywmWjqmzVBmseZb4+OWE=
-X-Received: by 2002:a17:90b:3810:b0:32e:749d:fcb4 with SMTP id
- 98e67ed59e1d1-32e749dff67mr2285280a91.6.1757937436607; Mon, 15 Sep 2025
- 04:57:16 -0700 (PDT)
+	s=arc-20240116; t=1757937524; c=relaxed/simple;
+	bh=n9NDKjcJnS8ZyenWeoSequo4p01+vgPSe2A2lsLaNMU=;
+	h=Date:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ffX3LaxDM4rTCOVlulgkV1fQO/EZ9A7L8/SnMiRGv1cQEk8RRh1P1dsOdX5nij4QCDxwZW3XWiN6ssIMGiRptc2VLnLU0ErFGCZ8t9REc174FgN32nvY4Malg8JQofEK4jUxug2ibyWCPu0ITtZcKko1TS4Vb8g5po99ZUyBLfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tcarey.uk; spf=pass smtp.mailfrom=tcarey.uk; dkim=pass (2048-bit key) header.d=tcarey.uk header.i=@tcarey.uk header.b=uLQav3Oh; arc=none smtp.client-ip=109.224.244.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tcarey.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tcarey.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tcarey.uk;
+	s=protonmail; t=1757937518; x=1758196718;
+	bh=n9NDKjcJnS8ZyenWeoSequo4p01+vgPSe2A2lsLaNMU=;
+	h=Date:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=uLQav3OhCSeIaLIbej5hQbagiONKHlR5f7BBDTQbn6lUmecS9VPeS17vy96s/clAD
+	 uogqxQ0SfnG4kLCup5UUjg4L8K3beJ9952JwgR+OnXn3x8GPBeVwmUxt/agpJ+sO0B
+	 r4kwbfcVhDi0PIhvEJ68r0I+T/7s50ZLiOSeYgOLa9PMfWSwJLYrjxtMn9O3TNQWtb
+	 uVnu/+Km8MjXJ2SN3KklswH2Vt23NqHaqbF1DEMXO12YlwUKO2ape0n2FVBBh1sIlT
+	 f0eSykoWf+HEozUVMoqOKFSrF5ttW2hrKTEKPbV0Ne+JupMzW1zt+ZrhvbRnL0bTsd
+	 G2YMwjlV96nGA==
+Date: Mon, 15 Sep 2025 11:58:34 +0000
+From: Torin Carey <torin@tcarey.uk>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, wireguard@lists.zx2c4.com, netdev@vger.kernel.org
+Subject: [PATCH] wireguard: do not use sin6_scope_id if not needed
+Message-ID: <aMf_ZORMji8eiHpH@omega.tcarey.uk>
+Feedback-ID: 43460779:user:proton
+X-Pm-Message-ID: d7cdfb9e0fdac2cd82cf4244fd72ce05e77958fb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250912034538.1406132-1-zhangjian.3032@bytedance.com> <4a639a86-37e2-4b3d-b870-f85f2c86cb81@lunn.ch>
-In-Reply-To: <4a639a86-37e2-4b3d-b870-f85f2c86cb81@lunn.ch>
-From: Zhang Jian <zhangjian.3032@bytedance.com>
-Date: Mon, 15 Sep 2025 19:57:05 +0800
-X-Gm-Features: AS18NWBh34xROiv3qqyYwXVx8rfGAbuctXdOp2l0uDfwsHFQdd4X0dtuYdgDNtM
-Message-ID: <CA+J-oUvsnovtMGKVAWnw-eG6SZvNZLEOsf-8zp6BEwzq4_wvhw@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH 1/1] Revert "drivers/net/ftgmac100: fix
- DHCP potential failure with systemd"
-To: Andrew Lunn <andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, andrew+netdev@lunn.ch, 
-	guoheyi@linux.alibaba.com, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Sep 13, 2025 at 4:25=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Fri, Sep 12, 2025 at 11:45:38AM +0800, Jian Zhang wrote:
-> > This reverts commit 1baf2e50e48f10f0ea07d53e13381fd0da1546d2.
->
-> > * rtnetlink is setting the link down
-> > * the PHY state_queue is triggered and calls ftgmac100_adjust_link
-> > -     /* Release phy lock to allow ftgmac100_reset to acquire it, keepi=
-ng lock
-> > -      * order consistent to prevent dead lock.
-> > -      */
-> > -     if (netdev->phydev)
-> > -             mutex_unlock(&netdev->phydev->lock);
-> > -
-> > -     ftgmac100_reset(priv);
-> > -
-> > -     if (netdev->phydev)
-> > -             mutex_lock(&netdev->phydev->lock);
-> > -
-> > +     /* Reset the adapter asynchronously */
-> > +     schedule_work(&priv->reset_task);
-> >  }
->
-> So we are swapping one set of bugs for another set of bugs.
->
-Yes, If the full reset is necessary.
-In commit 855944ce1cc4 (=E2=80=9Cftgmac100: Add a reset task and use it for
-link changes=E2=80=9D, about 8 years ago)
-it was mentioned that a full hardware reset is required, and it also
-notes that the rtnl lock is held.
+sin6_scope_id should only be used if the address is link-local and
+otherwise ignored.
 
-> No other adjust_link callback messes with locks like this.  Have you
-> investigated what actually needs to be done by adjust_link?
->
-> Determining maccr in ftgmac100_reset_and_config_mac() look relevant.
-> Does it actually need a reset, or is it sufficient to just set the
-> bits in FTGMAC100_OFFSET_MACCR?
->
+Currently send6 uses the sin6_scope_id for flowi6_oif without a check of
+whether this is needed, so this can cause non-link local endpoints to
+use an incorrect device.
 
-I checked most drivers=E2=80=99 adjust_link callbacks, and they basically o=
-nly
-write to a few MAC controller registers.
-I also tried calling only `ftgmac100_reset_and_config_mac` and did
-some tests, the network works fine
-but I=E2=80=99m not sure this change is correct, which is why I wanted to
-revert to the previous code.
+Signed-off-by: Torin Carey <torin@tcarey.uk>
+---
+ drivers/net/wireguard/netlink.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> ftgmac100_config_pause() is called from ftgmac100_set_pauseparam()
-> suggesting it can be called at any time.
->
-> So i think the crux of the problem is what needs to happen to set bits
-> in MACCR.
->
-Yes, I think so too. However, here we just need to do some necessary
-register configurations,
-and that should be sufficient.
+diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlin=
+k.c
+index 67f962eb8b46..738041f72c2b 100644
+--- a/drivers/net/wireguard/netlink.c
++++ b/drivers/net/wireguard/netlink.c
+@@ -453,6 +453,8 @@ static int set_peer(struct wg_device *wg, struct nlattr=
+ **attrs)
+ =09=09=09wg_socket_set_peer_endpoint(peer, &endpoint);
+ =09=09} else if (len =3D=3D sizeof(struct sockaddr_in6) && addr->sa_family=
+ =3D=3D AF_INET6) {
+ =09=09=09endpoint.addr6 =3D *(struct sockaddr_in6 *)addr;
++=09=09=09if (!__ipv6_addr_needs_scope_id(ipv6_addr_type(&endpoint.addr6.si=
+n6_addr)))
++=09=09=09=09endpoint.addr6.sin6_scope_id =3D 0;
+ =09=09=09wg_socket_set_peer_endpoint(peer, &endpoint);
+ =09=09}
+ =09}
 
-Hi Jacky;
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+--=20
+2.48.1
 
-I=E2=80=99m not sure if you=E2=80=99re familiar with these, Could you give =
-us some suggestions?
 
->         Andrew
-Jian
 
