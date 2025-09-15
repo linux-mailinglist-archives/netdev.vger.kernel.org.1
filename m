@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-223187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E4AFB582CE
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:07:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA38B582D3
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 19:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 835753B3B60
-	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:07:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F21F93B19BA
+	for <lists+netdev@lfdr.de>; Mon, 15 Sep 2025 17:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF0529C323;
-	Mon, 15 Sep 2025 17:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBC42D0C7D;
+	Mon, 15 Sep 2025 17:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WKArIyPr"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZPA5f6y/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AFA28504D;
-	Mon, 15 Sep 2025 17:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCA4261B91;
+	Mon, 15 Sep 2025 17:07:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757956039; cv=none; b=UH/eDUDvGx6jf+1vPxxoyt+gFPyqWBrMssBpwzM9qUyqBU35U6dWlpuYIYt2sivDDX1e3dTZPqHJxRyxz4e7J1e/6zXwGCnhnNUjH/BcGLd9ueICDb42tmNjjxN1BZEgS9YFyp5AxnXnYi1lkuNmyKzwANf5/a4RB2jXZ/MdTWc=
+	t=1757956041; cv=none; b=imTkhgZ0yNyuXulqYZ4ydRWbqYCxpLOrTKBn3+Z9zhOV4dAHHLiPySS31fj7IYkCUGkK8rq4L0QAyoQGbqbHBYob0f12zLFJ1tv1Xvy7GIBAtfx6Zql1O2Fpex6knZwhJb5VEG0yGRKWQPMlB6qrdOpbvwAEpM+fAP2WP43mTWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757956039; c=relaxed/simple;
-	bh=ZllPKJmOopZErDj9wtEyccp3PlVYrDDwwQXK/gNCSi4=;
+	s=arc-20240116; t=1757956041; c=relaxed/simple;
+	bh=qeilsRwEs9JHRw0hX35gdC10jXev2u0uQOZPOb523R4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hUq1fpsgGWX3dFYSYXZSxL//9/oo5hg5wkANsHo6olsB1SIIxzAiCnUPghdHSSikDhzxmqn2xYXKeVrm1wULkfccZJdS0krk3sZfcIXzxxJXRedw+PEVSCzThHdunJLR+SLTtK2DQwteroao732ELHsXW4UYUxBniyIQm9thLc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WKArIyPr; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=qI2wL8WXgiw6hJFraoYGHd8GZy2dmLNPWtSo5ndYPj3ZjzXDCUJZJRTMMff4WA5iPWyHzvN0AgfkWfIjawkgDoH+C4OiK9tf2ZDSscZQY6Mdik6VCmPRHo0DB7Jr9IA05xduKdobatyt2/+nck8fRR1VAjiWqqKWGuP9PZIuzLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZPA5f6y/; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id B829D1A0E24;
-	Mon, 15 Sep 2025 17:07:15 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 8FEEA1A09DD;
+	Mon, 15 Sep 2025 17:07:17 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 8CC746063F;
-	Mon, 15 Sep 2025 17:07:15 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4602C102F2AC9;
-	Mon, 15 Sep 2025 19:07:12 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 65D846063F;
+	Mon, 15 Sep 2025 17:07:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 888B1102F2B16;
+	Mon, 15 Sep 2025 19:07:14 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1757956034; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1757956036; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=RbT/67VUQWDst0vtW16bTCia0o5hBTJsAvPw7EYhrNw=;
-	b=WKArIyPrnEL/6eOJ7OzalcsLwDkElpUnzQUA/BXwjOhFvqZ/KQLPUyAFOtH0w7bKXODJ7i
-	+93/I3zaRqm82kb9JkH3oueRitExCvBzNxMZy2i6U1dMUGGK+oG6gJAa5Y7NAKHQSShsEx
-	/S8FHISNWLDbE4BFilC2plraSSG3OrNCnzmWIRFOgI+8i4ulJfdor3VQr0/ie7BLnGHZbA
-	LkdxB9rXl8DH1dacBQXIMlikhEeq8+Jp/Hne5oa4GVNmUY+Y6Niipeo+e12kWiMBTC6OxU
-	ulTLrwUBp+0GHbuX1415tZrd0zEQVHzJ+Mszs3qLTGq39LV/QgAl3oBWnhUlfw==
+	bh=HeSRne8hf27jj3oT7aSQnAmbULkaO0oyiQdL/Xcz6pM=;
+	b=ZPA5f6y/wzeqN5lzuTsmgHwpkehQ90DXybdmcaKg5wqqIfOlJRdtPyakGdPAXOvy+5B3CN
+	JxIpgH/Br4gEKHyqkoXhboxFViHE+GHcnfi5E4hJ+X8CWH5INQDXYSlZaI5kTaBJoI/fRY
+	7fyABa0nGHBDQP+aS+ECFNe/taYx5WHpMUQ7b4mRCd9lNIAjFZZFj/pSMZhwdA8XCK8t93
+	VKyrYOKjawdx+cC9LM14vu55sEf+HWlBXVQsUzIFkNb89e0bBBaM2D42eeBNQ2ZnbaN8z6
+	aW0l1kcaK0DdKog8R5IoOahwpa7Z1PwSESgsLH6+W5wg8TjQv2Pygai0gQjNXg==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Mon, 15 Sep 2025 19:06:29 +0200
-Subject: [PATCH net-next v3 4/5] devlink: Add devlink-conf uAPI for NV
- memory management
+Date: Mon, 15 Sep 2025 19:06:30 +0200
+Subject: [PATCH net-next v3 5/5] net: pse-pd: pd692x0: Add devlink
+ interface for configuration save/reset
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250915-feature_poe_permanent_conf-v3-4-78871151088b@bootlin.com>
+Message-Id: <20250915-feature_poe_permanent_conf-v3-5-78871151088b@bootlin.com>
 References: <20250915-feature_poe_permanent_conf-v3-0-78871151088b@bootlin.com>
 In-Reply-To: <20250915-feature_poe_permanent_conf-v3-0-78871151088b@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -80,310 +80,332 @@ X-Last-TLS-Session-Version: TLSv1.3
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Introduce a new devlink-conf uAPI to manage device configuration stored
-in non-volatile memory. This provides a standardized interface for
-devices that need to persist configuration changes across reboots.
+Add devlink conf_save and conf_reset ops to enable userspace management
+of the PSE's permanent configuration stored in non-volatile memory.
+The save_conf allows saving the current configuration to non-volatile
+memory. The reset_conf attribute restores factory defaults configurations.
 
-Add two new devlink operations:
-- conf_save: Save current configuration to non-volatile memory
-- conf_reset: Reset configuration in non-volatile memory to factory
-	      defaults
-
-The uAPI is designed to be generic and can be used by any device driver
-that manages persistent configuration storage.
+Skip hardware configuration initialization on probe when a saved
+configuration is already present in non-volatile memory (detected via user
+byte set to 42).
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 
-After two NAKs on sysfs and devlink-param design choices due to uAPI not
-being appropriate, I moved to this new design approach.
-Also, the choice of saving the configuration to NVM on every config change
-seemed inappropriate as the save and the reset processes would be in two
-different Kernel framework.
-The new design intend to extend devlink uAPI with a devlink-conf interface.
-This uAPI is designed to be generic. While currently only one driver
-implements it, controllers that manage non-volatile memory to save
-configuration are not uncommon.
+Changes in v2:
+- Move on from sysfs to devlink param for userspace management.
 
-Change in v3:
-- New patch.
+Changes in v3:
+- Move on from devlink param to new devlink conf uAPI.
 ---
- Documentation/netlink/specs/devlink.yaml          | 23 +++++++++++++++++
- Documentation/networking/devlink/devlink-conf.rst | 22 ++++++++++++++++
- Documentation/networking/devlink/index.rst        |  1 +
- MAINTAINERS                                       |  2 ++
- include/net/devlink.h                             | 20 +++++++++++++++
- include/uapi/linux/devlink.h                      |  4 +++
- net/devlink/Makefile                              |  3 ++-
- net/devlink/conf.c                                | 31 +++++++++++++++++++++++
- net/devlink/netlink.c                             |  2 +-
- net/devlink/netlink_gen.c                         | 20 ++++++++++++++-
- net/devlink/netlink_gen.h                         |  3 ++-
- 11 files changed, 127 insertions(+), 4 deletions(-)
+ Documentation/networking/devlink/index.rst   |   1 +
+ Documentation/networking/devlink/pd692x0.rst |  24 ++++
+ MAINTAINERS                                  |   1 +
+ drivers/net/pse-pd/pd692x0.c                 | 160 ++++++++++++++++++++++++++-
+ 4 files changed, 183 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 3db59c9658694..27db92457e886 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -857,6 +857,14 @@ attribute-sets:
-         name: health-reporter-burst-period
-         type: u64
-         doc: Time (in msec) for recoveries before starting the grace period.
-+      -
-+        name: conf-save
-+        type: flag
-+        doc: Save device configuration to non-volatile memory.
-+      -
-+        name: conf-reset
-+        type: flag
-+        doc: Reset device configuration located in non-volatile memory.
-   -
-     name: dl-dev-stats
-     subset-of: devlink
-@@ -2325,3 +2333,18 @@ operations:
-             - bus-name
-             - dev-name
-             - port-index
-+    -
-+      name: conf-set
-+      doc: Manage device configuration.
-+      attribute-set: devlink
-+      dont-validate: [strict]
-+      flags: [admin-perm]
-+      do:
-+        pre: devlink-nl-pre-doit
-+        post: devlink-nl-post-doit
-+        request:
-+          attributes:
-+            - bus-name
-+            - dev-name
-+            - conf-save
-+            - conf-reset
-diff --git a/Documentation/networking/devlink/devlink-conf.rst b/Documentation/networking/devlink/devlink-conf.rst
-new file mode 100644
-index 0000000000000..34f866f2f9594
---- /dev/null
-+++ b/Documentation/networking/devlink/devlink-conf.rst
-@@ -0,0 +1,22 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+============
-+Devlink Conf
-+============
-+
-+The ``devlink-conf`` API allows saving the device configuration as
-+permanent writing it to a non-volatile memory.
-+
-+Drivers are expected to implement ``devlink-conf`` functionality through
-+``conf_save`` and ``conf_reset`` devlink operations.
-+
-+example usage
-+-------------
-+
-+.. code:: shell
-+
-+    $ devlink dev conf help
-+    $ devlink dev conf DEV [ save | reset ]
-+
-+    # Run conf command for saving configuration to non-volatile memory:
-+    $ devlink dev conf i2c/1-003c save
 diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index 0c58e5c729d92..ba381ecadc3dc 100644
+index ba381ecadc3dc..336b4cc00bd14 100644
 --- a/Documentation/networking/devlink/index.rst
 +++ b/Documentation/networking/devlink/index.rst
-@@ -56,6 +56,7 @@ general.
-    :maxdepth: 1
- 
-    devlink-dpipe
-+   devlink-conf
-    devlink-eswitch-attr
-    devlink-flash
-    devlink-health
+@@ -97,6 +97,7 @@ parameters, info versions, and other features it supports.
+    netdevsim
+    nfp
+    octeontx2
++   pd692x0
+    prestera
+    qed
+    sfc
+diff --git a/Documentation/networking/devlink/pd692x0.rst b/Documentation/networking/devlink/pd692x0.rst
+new file mode 100644
+index 0000000000000..d7166f6f3ba91
+--- /dev/null
++++ b/Documentation/networking/devlink/pd692x0.rst
+@@ -0,0 +1,24 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++===========================
++PSE PD692x0 devlink support
++===========================
++
++This document describes the devlink features implemented by the PSE
++``PD692x0`` device drivers.
++
++Operations
++==========
++
++The ``PD692x0`` drivers implement the following devlink operations.
++
++.. list-table:: Devlink ops implemented
++   :widths: 5 85
++
++   * - Name
++     - Description
++   * - ``conf_save``
++     - Save the current configuration to non-volatile memory.
++   * - ``conf_reset``
++     - Reset the current and saved configuration located the non-volatile
++       memory.
 diff --git a/MAINTAINERS b/MAINTAINERS
-index b81595e9ea955..429303a9447f3 100644
+index 429303a9447f3..cc6f7a8986b04 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -20299,7 +20299,9 @@ M:	Kory Maincent <kory.maincent@bootlin.com>
- L:	netdev@vger.kernel.org
+@@ -20300,6 +20300,7 @@ L:	netdev@vger.kernel.org
  S:	Maintained
  F:	Documentation/devicetree/bindings/net/pse-pd/
-+F:	Documentation/networking/devlink/devlink-conf.rst
+ F:	Documentation/networking/devlink/devlink-conf.rst
++F:	Documentation/networking/devlink/pd692x0.rst
  F:	drivers/net/pse-pd/
-+F:	net/devlink/conf.c
+ F:	net/devlink/conf.c
  F:	net/ethtool/pse-pd.c
+diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
+index 782b1abf94cb1..97f9c0648fdb6 100644
+--- a/drivers/net/pse-pd/pd692x0.c
++++ b/drivers/net/pse-pd/pd692x0.c
+@@ -14,6 +14,7 @@
+ #include <linux/pse-pd/pse.h>
+ #include <linux/regulator/driver.h>
+ #include <linux/regulator/machine.h>
++#include <net/devlink.h>
  
- PSTORE FILESYSTEM
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index 5f44e702c25ca..04256d1973417 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -1551,6 +1551,26 @@ struct devlink_ops {
- 	enum devlink_selftest_status
- 	(*selftest_run)(struct devlink *devlink, unsigned int id,
- 			struct netlink_ext_ack *extack);
+ #define PD692X0_PSE_NAME "pd692x0_pse"
+ 
+@@ -30,6 +31,8 @@
+ #define PD692X0_FW_MIN_VER	5
+ #define PD692X0_FW_PATCH_VER	5
+ 
++#define PD692X0_USER_BYTE	42
 +
-+	/**
-+	 * conf_save - Save configuration to non-volatile memory
-+	 * @devlink: Devlink instance
-+	 * @extack: extack for reporting error messages
-+	 *
-+	 * Return: 0 on success, negative value otherwise.
-+	 */
-+	int (*conf_save)(struct devlink *devlink,
-+			 struct netlink_ext_ack *extack);
-+
-+	/**
-+	 * conf_reset - Reset configuration located in non-volatile memory
-+	 * @devlink: Devlink instance
-+	 * @extack: extack for reporting error messages
-+	 *
-+	 * Return: 0 on success, negative value otherwise.
-+	 */
-+	int (*conf_reset)(struct devlink *devlink,
-+			  struct netlink_ext_ack *extack);
+ enum pd692x0_fw_state {
+ 	PD692X0_FW_UNKNOWN,
+ 	PD692X0_FW_OK,
+@@ -80,6 +83,9 @@ enum {
+ 	PD692X0_MSG_GET_PORT_PARAM,
+ 	PD692X0_MSG_GET_POWER_BANK,
+ 	PD692X0_MSG_SET_POWER_BANK,
++	PD692X0_MSG_SET_USER_BYTE,
++	PD692X0_MSG_SAVE_SYS_SETTINGS,
++	PD692X0_MSG_RESTORE_FACTORY,
+ 
+ 	/* add new message above here */
+ 	PD692X0_MSG_CNT
+@@ -103,11 +109,13 @@ struct pd692x0_priv {
+ 	bool last_cmd_key;
+ 	unsigned long last_cmd_key_time;
+ 
++	bool cfg_saved;
+ 	enum ethtool_c33_pse_admin_state admin_state[PD692X0_MAX_PIS];
+ 	struct regulator_dev *manager_reg[PD692X0_MAX_MANAGERS];
+ 	int manager_pw_budget[PD692X0_MAX_MANAGERS];
+ 	int nmanagers;
+ 	struct pd692x0_matrix *port_matrix;
++	struct devlink *dl;
  };
  
- void *devlink_priv(struct devlink *devlink);
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index bcad11a787a55..ce9192e772d93 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -141,6 +141,8 @@ enum devlink_command {
- 
- 	DEVLINK_CMD_NOTIFY_FILTER_SET,
- 
-+	DEVLINK_CMD_CONF_SET,
-+
- 	/* add new commands above here */
- 	__DEVLINK_CMD_MAX,
- 	DEVLINK_CMD_MAX = __DEVLINK_CMD_MAX - 1
-@@ -638,6 +640,8 @@ enum devlink_attr {
- 
- 	DEVLINK_ATTR_HEALTH_REPORTER_BURST_PERIOD,	/* u64 */
- 
-+	DEVLINK_ATTR_CONF_SAVE,			/* u8 */
-+	DEVLINK_ATTR_CONF_RESET,		/* u8 */
- 	/* Add new attributes above here, update the spec in
- 	 * Documentation/netlink/specs/devlink.yaml and re-generate
- 	 * net/devlink/netlink_gen.c.
-diff --git a/net/devlink/Makefile b/net/devlink/Makefile
-index 000da622116a3..e4ff40fc65ef2 100644
---- a/net/devlink/Makefile
-+++ b/net/devlink/Makefile
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- obj-y := core.o netlink.o netlink_gen.o dev.o port.o sb.o dpipe.o \
--	 resource.o param.o region.o health.o trap.o rate.o linecard.o
-+	 resource.o param.o region.o health.o trap.o rate.o linecard.o \
-+	 conf.o
-diff --git a/net/devlink/conf.c b/net/devlink/conf.c
-new file mode 100644
-index 0000000000000..09cec798d5e48
---- /dev/null
-+++ b/net/devlink/conf.c
-@@ -0,0 +1,31 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright (c) 2025 Bootlin, Kory Maincent <kory.maincent@bootlin.com>
-+ */
-+
-+#include "devl_internal.h"
-+
-+int devlink_nl_conf_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct nlattr **tb = info->attrs;
-+	const struct devlink_ops *ops;
-+
-+	ops = devlink->ops;
-+	if (!ops->conf_save || !ops->conf_reset)
-+		return -EOPNOTSUPP;
-+
-+	if (tb[DEVLINK_ATTR_CONF_SAVE] && tb[DEVLINK_ATTR_CONF_RESET]) {
-+		NL_SET_ERR_MSG_MOD(info->extack,
-+				   "Can't save and reset the configuration simultaneously");
-+		return -EINVAL;
-+	}
-+
-+	if (tb[DEVLINK_ATTR_CONF_SAVE])
-+		return ops->conf_save(devlink, info->extack);
-+
-+	if (tb[DEVLINK_ATTR_CONF_RESET])
-+		return ops->conf_reset(devlink, info->extack);
-+
-+	return 0;
-+}
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 593605c1b1ef4..e22f5bfaba931 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -367,7 +367,7 @@ struct genl_family devlink_nl_family __ro_after_init = {
- 	.module		= THIS_MODULE,
- 	.split_ops	= devlink_nl_ops,
- 	.n_split_ops	= ARRAY_SIZE(devlink_nl_ops),
--	.resv_start_op	= DEVLINK_CMD_SELFTESTS_RUN + 1,
-+	.resv_start_op	= DEVLINK_CMD_MAX + 1,
- 	.mcgrps		= devlink_nl_mcgrps,
- 	.n_mcgrps	= ARRAY_SIZE(devlink_nl_mcgrps),
- 	.sock_priv_size		= sizeof(struct devlink_nl_sock_priv),
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index 9fd00977d59e3..51a1f55c7063d 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -602,8 +602,16 @@ static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_
- 	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
- };
- 
-+/* DEVLINK_CMD_CONF_SET - do */
-+static const struct nla_policy devlink_conf_set_nl_policy[DEVLINK_ATTR_CONF_RESET + 1] = {
-+	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
-+	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
-+	[DEVLINK_ATTR_CONF_SAVE] = { .type = NLA_FLAG, },
-+	[DEVLINK_ATTR_CONF_RESET] = { .type = NLA_FLAG, },
-+};
-+
- /* Ops table for devlink */
--const struct genl_split_ops devlink_nl_ops[74] = {
-+const struct genl_split_ops devlink_nl_ops[75] = {
- 	{
- 		.cmd		= DEVLINK_CMD_GET,
- 		.validate	= GENL_DONT_VALIDATE_STRICT,
-@@ -1282,4 +1290,14 @@ const struct genl_split_ops devlink_nl_ops[74] = {
- 		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
- 		.flags		= GENL_CMD_CAP_DO,
+ /* Template list of communication messages. The non-null bytes defined here
+@@ -193,6 +201,24 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
+ 		.key = PD692X0_KEY_CMD,
+ 		.sub = {0x07, 0x0b, 0x57},
  	},
-+	{
-+		.cmd		= DEVLINK_CMD_CONF_SET,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.pre_doit	= devlink_nl_pre_doit,
-+		.doit		= devlink_nl_conf_set_doit,
-+		.post_doit	= devlink_nl_post_doit,
-+		.policy		= devlink_conf_set_nl_policy,
-+		.maxattr	= DEVLINK_ATTR_CONF_RESET,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
++	[PD692X0_MSG_SET_USER_BYTE] = {
++		.key = PD692X0_KEY_PRG,
++		.sub = {0x41, PD692X0_USER_BYTE},
++		.data = {0x4e, 0x4e, 0x4e, 0x4e,
++			 0x4e, 0x4e, 0x4e, 0x4e},
++	},
++	[PD692X0_MSG_SAVE_SYS_SETTINGS] = {
++		.key = PD692X0_KEY_PRG,
++		.sub = {0x06, 0x0f},
++		.data = {0x4e, 0x4e, 0x4e, 0x4e,
++			 0x4e, 0x4e, 0x4e, 0x4e},
++	},
++	[PD692X0_MSG_RESTORE_FACTORY] = {
++		.key = PD692X0_KEY_PRG,
++		.sub = {0x2d, 0x4e},
++		.data = {0x4e, 0x4e, 0x4e, 0x4e,
++			 0x4e, 0x4e, 0x4e, 0x4e},
 +	},
  };
-diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
-index 09cc6f264ccfa..9e99528bd36c7 100644
---- a/net/devlink/netlink_gen.h
-+++ b/net/devlink/netlink_gen.h
-@@ -17,7 +17,7 @@ extern const struct nla_policy devlink_dl_rate_tc_bws_nl_policy[DEVLINK_RATE_TC_
- extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
  
- /* Ops table for devlink */
--extern const struct genl_split_ops devlink_nl_ops[74];
-+extern const struct genl_split_ops devlink_nl_ops[75];
+ static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
+@@ -1268,9 +1294,12 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ 	if (ret)
+ 		goto err_managers_req_pw;
  
- int devlink_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
- 			struct genl_info *info);
-@@ -145,5 +145,6 @@ int devlink_nl_selftests_get_dumpit(struct sk_buff *skb,
- int devlink_nl_selftests_run_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
- 				      struct genl_info *info);
-+int devlink_nl_conf_set_doit(struct sk_buff *skb, struct genl_info *info);
+-	ret = pd692x0_hw_conf_init(priv);
+-	if (ret)
+-		goto err_managers_req_pw;
++	/* Do not init the conf if it is already saved */
++	if (!priv->cfg_saved) {
++		ret = pd692x0_hw_conf_init(priv);
++		if (ret)
++			goto err_managers_req_pw;
++	}
  
- #endif /* _LINUX_DEVLINK_GEN_H */
+ 	pd692x0_of_put_managers(priv, manager);
+ 	kfree(manager);
+@@ -1727,14 +1756,118 @@ static const struct fw_upload_ops pd692x0_fw_ops = {
+ 	.cleanup = pd692x0_fw_cleanup,
+ };
+ 
++/* Devlink Params APIs */
++enum pd692x0_devlink_param_id {
++	PD692X0_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
++	PD692X0_DEVLINK_PARAM_ID_SAVE_CONF,
++	PD692X0_DEVLINK_PARAM_ID_RESET_CONF,
++};
++
++struct pd692x0_devlink {
++	struct pd692x0_priv *priv;
++};
++
++static int pd692x0_dl_conf_save(struct devlink *devlink,
++				struct netlink_ext_ack *extack)
++{
++	struct pd692x0_devlink *dl = devlink_priv(devlink);
++	struct pd692x0_priv *priv = dl->priv;
++	struct pd692x0_msg msg, buf = {0};
++	int ret;
++
++	mutex_lock(&priv->pcdev.lock);
++	ret = pd692x0_fw_unavailable(priv);
++	if (ret)
++		goto out;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_USER_BYTE];
++	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
++	if (ret)
++		goto out;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_SAVE_SYS_SETTINGS];
++	ret = pd692x0_send_msg(priv, &msg);
++	if (ret) {
++		dev_err(&priv->client->dev,
++			"Failed to save the configuration (%pe)\n",
++			ERR_PTR(ret));
++		goto out;
++	}
++
++	msleep(50); /* Sleep 50ms as described in the datasheet */
++
++	ret = i2c_master_recv(priv->client, (u8 *)&buf, sizeof(buf));
++	if (ret != sizeof(buf)) {
++		if (ret >= 0)
++			ret = -EIO;
++		goto out;
++	}
++
++	ret = 0;
++
++out:
++	mutex_unlock(&priv->pcdev.lock);
++	return ret;
++}
++
++static int pd692x0_dl_conf_reset(struct devlink *devlink,
++				 struct netlink_ext_ack *extack)
++{
++	struct pd692x0_devlink *dl = devlink_priv(devlink);
++	struct pd692x0_priv *priv = dl->priv;
++	struct pd692x0_msg msg, buf = {0};
++	int ret;
++
++	mutex_lock(&priv->pcdev.lock);
++	ret = pd692x0_fw_unavailable(priv);
++	if (ret)
++		goto out;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_RESTORE_FACTORY];
++	ret = pd692x0_send_msg(priv, &msg);
++	if (ret) {
++		dev_err(&priv->client->dev,
++			"Failed to reset the configuration (%pe)\n",
++			ERR_PTR(ret));
++		goto out;
++	}
++
++	msleep(100); /* Sleep 100ms as described in the datasheet */
++
++	ret = i2c_master_recv(priv->client, (u8 *)&buf, sizeof(buf));
++	if (ret != sizeof(buf)) {
++		if (ret >= 0)
++			ret = -EIO;
++		goto out;
++	}
++
++	ret = pd692x0_hw_conf_init(priv);
++	if (ret) {
++		dev_err(&priv->client->dev,
++			"Error configuring ports matrix (%pe)\n",
++			ERR_PTR(ret));
++	}
++
++out:
++	mutex_unlock(&priv->pcdev.lock);
++	return ret;
++}
++
++static const struct devlink_ops pd692x0_dl_ops = {
++	.conf_save = pd692x0_dl_conf_save,
++	.conf_reset = pd692x0_dl_conf_reset,
++};
++
+ static int pd692x0_i2c_probe(struct i2c_client *client)
+ {
+ 	static const char * const regulators[] = { "vdd", "vdda" };
+ 	struct pd692x0_msg msg, buf = {0}, zero = {0};
++	struct pd692x0_devlink *pd692x0_dl;
+ 	struct device *dev = &client->dev;
+ 	struct pd692x0_msg_ver ver;
+ 	struct pd692x0_priv *priv;
+ 	struct fw_upload *fwl;
++	struct devlink *dl;
+ 	int ret;
+ 
+ 	ret = devm_regulator_bulk_get_enable(dev, ARRAY_SIZE(regulators),
+@@ -1793,6 +1926,9 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
+ 		}
+ 	}
+ 
++	if (buf.data[2] == PD692X0_USER_BYTE)
++		priv->cfg_saved = true;
++
+ 	priv->np = dev->of_node;
+ 	priv->pcdev.nr_lines = PD692X0_MAX_PIS;
+ 	priv->pcdev.owner = THIS_MODULE;
+@@ -1813,7 +1949,24 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
+ 				     "failed to register to the Firmware Upload API\n");
+ 	priv->fwl = fwl;
+ 
++	dl = devlink_alloc(&pd692x0_dl_ops, sizeof(*pd692x0_dl), dev);
++	if (!dl) {
++		dev_err(dev, "devlink_alloc failed\n");
++		ret = -ENOMEM;
++		goto err_unregister_fw;
++	}
++
++	pd692x0_dl = devlink_priv(dl);
++	pd692x0_dl->priv = priv;
++	priv->dl = dl;
++	devlink_register(dl);
++
+ 	return 0;
++
++err_unregister_fw:
++	firmware_upload_unregister(priv->fwl);
++
++	return ret;
+ }
+ 
+ static void pd692x0_i2c_remove(struct i2c_client *client)
+@@ -1821,6 +1974,7 @@ static void pd692x0_i2c_remove(struct i2c_client *client)
+ 	struct pd692x0_priv *priv = i2c_get_clientdata(client);
+ 
+ 	pd692x0_managers_free_pw_budget(priv);
++	devlink_unregister(priv->dl);
+ 	firmware_upload_unregister(priv->fwl);
+ }
+ 
 
 -- 
 2.43.0
