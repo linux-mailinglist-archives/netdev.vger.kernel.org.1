@@ -1,97 +1,134 @@
-Return-Path: <netdev+bounces-223267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A29EB588B3
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 02:00:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC8C8B588BD
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 02:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5089C204DF2
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 00:00:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43A291889DF9
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 00:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6231A00F0;
-	Tue, 16 Sep 2025 00:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877E32AD02;
+	Tue, 16 Sep 2025 00:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvGG+cPS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fvC7vPkv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108531BC5C;
-	Tue, 16 Sep 2025 00:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AEBE571
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 00:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757980807; cv=none; b=bVpavt41DxZj2Sy2SP8iMLfZA6l9IWMv4WEDhYQSn7/n6rwFjrlZXSRJAiW2rKS8JmerRYP1G7Y9T2Y2naEM7XG/qEMQH0M/maQ3E/DTLd4z8Q/RKvn0GMsgdh0Ssoh0UC/qAdvwn3qzrumVPwxeLJp2RKOMSx/7wLpGy/RoGKc=
+	t=1757980913; cv=none; b=Mu22OFnJhrQEkJVDwxuqUCAkB7XQgV/ZmJ1yMDK3rksrIM6/eP1z0qLqVd2DJL8p9z1hZHY2tJfTvI1oLg6bgzhpkmZ1wXK+888fzoAXsrq9W1tImNtCjHWO7r1FMIF3fmRo/jJm9sOvIBf0c3UwjhOOPfEWSbDbMpYzAS+9vuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757980807; c=relaxed/simple;
-	bh=m+NikykpL2wGDa+qKk4c9X1UBB6XqdEMd19a08SIEZ8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kefwohh01GWA4ruJt79ln7lBwg/rhWxNtNkQi2LornH/okCXB5OHU0cmo1/vXyuDJFIft10kSvfXOAUZ4IGa7VPXtSn1YMakTddVEMYf5P1s4GOIqyJ7OZESqk1BveSMUmklZKo9amdclr4TZhOS90T9A04Ehdu3ePAwAZWxpwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvGG+cPS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B175C4CEF1;
-	Tue, 16 Sep 2025 00:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757980805;
-	bh=m+NikykpL2wGDa+qKk4c9X1UBB6XqdEMd19a08SIEZ8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TvGG+cPSNlSG5chnTgb0er0AajH2OG2DeGwKS2heVVx7WR26QLzyD3Ab27CcsNxMk
-	 lGagpUaIMJV86Q70lvnbktL1cgcOT/E+FN9L7us+4pygvxKOad4R7kV03rKcH0hm5q
-	 Inw1VjTyJNVU2odz7W/2cCDuy/QFMAotMBGAb/jmwevUtU7s3yE5XMsSiDBscMGUvn
-	 VmtvgzzpYfpeuL0xdYyCpKxh8tjm9uZB+WBMET+713YUjFQoS8SenzVwtFyKCErkVa
-	 doQDbmXRxXEO78idJ69obuM4HsMMxrp8voxyDyqxbuW1gmOGcRvqXC0IQgkek/9/WQ
-	 FQ8UX2RGBtFgg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D1939D0C18;
-	Tue, 16 Sep 2025 00:00:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1757980913; c=relaxed/simple;
+	bh=OGGD+kObc2F8RK1KPO2tRg5YhSB7GSmN9r4+FXRdiU8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=NFLQ2k4ajAFZPakzxoHx9cPnpn5PTsk7LSlBjd/XEb5cD5KZ67ReL+SUE2vivPpPrQq+bOgIdN0uCFmpnCLyhS/hK1XbomtytK5gBzr81G2bXKUTB5iBZQi5P3WUmOcMs+hWS9MavGMnkKD4sAeONY4opd/YVifE9yw3XUxfYAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fvC7vPkv; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-82946485d12so166505085a.2
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 17:01:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757980911; x=1758585711; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Km5Y2enaETffJi393MZ/B/rn6VFmUTZwKRF4EtXN2SI=;
+        b=fvC7vPkv+fNB+PWLIfgbo4FiMvrfAR0UjxOt3sCsShzX91ABaemqKhYagFtneLmyyN
+         AMgkhxYlRX+Gk+2eFe8fFjVwOwTJ/f0kQo2+ZT6Ardk0jH6gVsfxnuIs2DNyvHxX/uJh
+         tEoIwl6mXqRMNb8FNPiu4WSOWXDkFK9aeR5Yyqbq46Zbv8dgi3VDuw0HzzSDVPFV94K9
+         7gt4zeuy/FjsdbDeqcoeGia+pBCPTH+AvXiPGYUvIqqY5PXKMTnTb0MjHwZ4YvUHKY2Y
+         byQeEP8eXd/awD2+4ismaClURubSVQNU1hTcwfjgceAJfHnFe82MrDdTcJ+xPsWFO2WP
+         BjEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757980911; x=1758585711;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Km5Y2enaETffJi393MZ/B/rn6VFmUTZwKRF4EtXN2SI=;
+        b=eBrCe+s3Adwy5iGoRhltAGeecTyJAyD20rxLi9rFjV5xNuqG+CzJFkhpWD1lQiAT5i
+         NJOwmI+7gbjm7szKryZwT2SJPn1YlQxcbMBQD2TyzrjmbwTPH/Nt4gGHZi29hCsn24Gz
+         KStybe/ss6wVSQzMjUl0Xf/b1FJ+ee4Ie/0tulbPkfMRSnp9IZ5O8Ntda1iwjiS2uzqY
+         vixeQvimR2xY+5bBiWX5nHvJ+iu5FAk9x6UfSUiliWnGSB1HADEX4d5wmgeuHsbwaAeE
+         7S8G2esMMiXgvcpRKTamZNH5342Z/DVln78vfm/NzO+uYi83ODDCh8RSU/8luwsNz8dq
+         HaAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUI0X+/K0SaO0ky1n4vQ3lXUw/TD4EIi4TLxNs/eUxyFDOk2e8nvaxamacYTpTBjcX9UbczH0M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCfjvWnWXx2YNpWtcAwDjPFls/VYUz1TQzh2cFHno9gQfkg7x1
+	wEj/KfM7VGSdHI7EUMZWQ20dp8nyE0XvDhBuq6jNxOT4DmqQYXOI91qx9PQZzw==
+X-Gm-Gg: ASbGncuzbyYwulilM6u93y4ziJX+Nqu+aPsV3ChNnQexA4q+G7/DeYeTwIliydF5RAy
+	+1s5RQeVtajy7mL7EaoPlhKB6tG3c7fWTr4g1/dz1mRavpQV3tJD2pAf9HwS5kOPOiWLptjHyAU
+	kxELu64uFXOp9Qx1AV/wZ2vQiz7sGd1iRqtpgLSO9qRiOPwcolyMY2VnS0nYT7ltxyfiQaqU4n8
+	qCw1Qw6e5QuRRr6E1BynOdpCqGog3Q1M0aVAgmp8XwO45Xmu6nWZa7SX6qqPWycFn50MyfF/bgW
+	5lV+LieLBTyApu1z72Nv1vT7J5jyL+2CeIpoREYbl51mKG/cDBK20LmLmVqIZ2GGyVr/jCJuDlE
+	fjrERp6Hj0hPQ527ZJhVCUnrjdeRxMs3BY6PReQbiA90g1O+fZ5tbFMzFYwIZ3w1Yelx5e4oeLn
+	bxZkigynlXz5vy
+X-Google-Smtp-Source: AGHT+IFqxyzlxIdJJRSkJ2g3wJFGm2A/PhKso66jv8vm3GpnTZZg0yc6FDwEhLZjKevphIjKV/wmHA==
+X-Received: by 2002:a05:620a:1720:b0:81a:9d8c:7b26 with SMTP id af79cd13be357-823ff6db1a9mr1804763785a.34.1757980910684;
+        Mon, 15 Sep 2025 17:01:50 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-783c85f16a1sm26696386d6.14.2025.09.15.17.01.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Sep 2025 17:01:49 -0700 (PDT)
+Date: Mon, 15 Sep 2025 20:01:49 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ ecree.xilinx@gmail.com, 
+ willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ horms@kernel.org, 
+ corbet@lwn.net, 
+ saeedm@nvidia.com, 
+ tariqt@nvidia.com, 
+ mbloch@nvidia.com, 
+ leon@kernel.org, 
+ dsahern@kernel.org, 
+ ncardwell@google.com, 
+ kuniyu@google.com, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ aleksander.lobakin@intel.com, 
+ florian.fainelli@broadcom.com, 
+ alexander.duyck@gmail.com, 
+ linux-kernel@vger.kernel.org, 
+ linux-net-drivers@amd.com, 
+ Richard Gobert <richardbgobert@gmail.com>
+Message-ID: <willemdebruijn.kernel.163f3efc42108@gmail.com>
+In-Reply-To: <20250915113933.3293-2-richardbgobert@gmail.com>
+References: <20250915113933.3293-1-richardbgobert@gmail.com>
+ <20250915113933.3293-2-richardbgobert@gmail.com>
+Subject: Re: [PATCH net-next v5 1/5] net: gro: remove is_ipv6 from napi_gro_cb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] rds: ib: Increment i_fastreg_wrs before bailing
- out
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175798080701.534846.17163351278679972758.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Sep 2025 00:00:07 +0000
-References: <20250911133336.451212-1-haakon.bugge@oracle.com>
-In-Reply-To: <20250911133336.451212-1-haakon.bugge@oracle.com>
-To: Haakon Bugge <haakon.bugge@oracle.com>
-Cc: allison.henderson@oracle.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 11 Sep 2025 15:33:34 +0200 you wrote:
-> We need to increment i_fastreg_wrs before we bail out from
-> rds_ib_post_reg_frmr().
+Richard Gobert wrote:
+> Remove is_ipv6 from napi_gro_cb and use sk->sk_family instead.
+> This frees up space for another ip_fixedid bit that will be added
+> in the next commit.
 > 
-> We have a fixed budget of how many FRWR operations that can be
-> outstanding using the dedicated QP used for memory registrations and
-> de-registrations. This budget is enforced by the atomic_t
-> i_fastreg_wrs. If we bail out early in rds_ib_post_reg_frmr(), we will
-> "leak" the possibility of posting an FRWR operation, and if that
-> accumulates, no FRWR operation can be carried out.
+> udp_sock_create always creates either a AP_INET or a AF_INET6 socket,
+
+tiny typo: AP_INET -> AF_INET
+
+> so using sk->sk_family is reliable. In IPv6-FOU, cfg->ipv6_v6only is
+> always enabled.
 > 
-> [...]
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 
-Here is the summary with links:
-  - [net,v4] rds: ib: Increment i_fastreg_wrs before bailing out
-    https://git.kernel.org/netdev/net/c/4351ca3fcb3f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
