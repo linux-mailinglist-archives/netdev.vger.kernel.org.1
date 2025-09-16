@@ -1,126 +1,121 @@
-Return-Path: <netdev+bounces-223398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E880B59048
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:21:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BA4B5901A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:12:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA1CF1B24657
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:21:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 781AA1B2273A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E420286890;
-	Tue, 16 Sep 2025 08:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F2628A1F1;
+	Tue, 16 Sep 2025 08:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="M5jmvdY2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I422P7/x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD0C1B532F
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 08:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B0F264F81
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 08:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758010856; cv=none; b=TdtbgdCcoey020yDHW6pdeb7dJwrNGqoFOCMdQSvTaWjTkOOe3atKKBKFsOeQd5OkD/UeggXwTPoATbhCw7i+e5h9XIFAyjEIPCMZroa4lrAkBuL20v0yxqwIJRBIWaWyeADd7e3ciJPUCRDU8PPIZeTmWk6ZlR9ezQvVXhYs2A=
+	t=1758010341; cv=none; b=ETSfbGCEdvkkZxGG6+KSWkICSY/GaYEhqFjsn65qp4fDeL5VHpTokxfnRRi53ExcVfvqUqQpYT2JZLz4vwk5eJaAQscQTfb89/lSFRd/HaDNgiFT/Sbayq1zEQ/0ntxUv4rR4V8b9aGolG/sSrv68LeF1nIJZKVPOzRynOW9s80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758010856; c=relaxed/simple;
-	bh=4KE3ZIM46VZBGWx1rOrIwDYke0hW1+PjLACdRpNqbEQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LkmSGwYxDVK+AALyYhd1YRJlZjIav8ZnC8zEH6tfwRjHiFe9x/eQgqqHbrwotiJw+shYwD0homsGxRy+g2fErBGPhx5NcKBCMG5I+TFjUWXu2bjjRd5noL7BOWFj31CqYdJn8zHlaY1Sze2cAB/wqogndgGbhF0mmWwrjF+Fkjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=M5jmvdY2; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 799302076B;
-	Tue, 16 Sep 2025 10:11:18 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xUMulOkRt5Pq; Tue, 16 Sep 2025 10:11:14 +0200 (CEST)
-Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id B152620704;
-	Tue, 16 Sep 2025 10:11:14 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B152620704
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1758010274;
-	bh=2XIifIGekRVtEO8555U5kYgBep2JshmsVkCS7TmCgIM=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=M5jmvdY2cHCBVyM2opoCHe3KjpNoWNq3CegKvHtT9Aw61/3u3q6yO4E5gQyW9wwP8
-	 zCuukYjydFikqjlD3u5VujRihNUWd7HktvXoHLBT4onc7Ayaff0A+cB4KYXDfcOoRE
-	 E563uY6e+hC0TToEiUtToP+gJkX8twcJkVyOnUS6KhcdtyE2qBv5XQsQyQRpt0N/6g
-	 kuPUegaDRjp1HlmfroDswrV5yagdUBKtWZJ1LfJj2v7cNQF0EaJvLgwEFq7nENtxre
-	 tgFqyJdQ9fLEkC39+if3syfnHZmsrEI3FKjRl4jHXaVOq4oxSEHyVnPZ3O+wsxTZh0
-	 gcUDospxSADvw==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Tue, 16 Sep
- 2025 10:11:14 +0200
-Received: (nullmailer pid 1264670 invoked by uid 1000);
-	Tue, 16 Sep 2025 08:11:13 -0000
-Date: Tue, 16 Sep 2025 10:11:13 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: <netdev@vger.kernel.org>, Xiumei Mu <xmu@redhat.com>, Leon Romanovsky
-	<leonro@nvidia.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: Re: [PATCH ipsec v2] xfrm: fix offloading of cross-family tunnels
-Message-ID: <aMkbobzEx53SfGEx@secunet.com>
-References: <c4b61b2da197f2ef3742afec3f8866c5ab8e9051.1757516819.git.sd@queasysnail.net>
+	s=arc-20240116; t=1758010341; c=relaxed/simple;
+	bh=pkce+jGzodkXaiRgQjuOTkSEiMTNx+A9Iqb0yK0hNsI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W6Mui53JDIEZARv4S84pVkUTyD1e4yaRDQCL4q3rXvcLs31Ctadbw/sBvHT+jxAz655aooLo9ozt9QpfhoJxvI7Gw4cNphRNA+wKiIE/9tA+l1aXhlLyt0AQdOTd/+jh4bCPpduJYnzla+seyopJl8HbW1jEC9DQKLMJf1jvOrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I422P7/x; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <09d9a014-5687-4b60-9646-95c3644efe19@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758010334;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vq8i+FrvoUldSg+h34xo0dhV0YLyNZdNrb44Lwik8ik=;
+	b=I422P7/xtbqfx+dq/dDnuBlD/sAnA5IDn54VQM6Sg8ztVHXFH3mGRubc18+BHWxoB8E/pe
+	AKZ0T2uTj+vkMidmxxM8lzmDau/t2eTZ8ikdSn2vi5bJI9xO6Wu6ZQOIrqhclUK3B1M4GE
+	QOFsjsXy4CvgZNJBrF8epM5DjYC7Gy0=
+Date: Tue, 16 Sep 2025 16:11:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <c4b61b2da197f2ef3742afec3f8866c5ab8e9051.1757516819.git.sd@queasysnail.net>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- EXCH-01.secunet.de (10.32.0.171)
+Subject: Re: [PATCH net-next v2 0/3] net: Avoid ehash lookup races
+To: Eric Dumazet <edumazet@google.com>
+Cc: kuniyu@google.com, kerneljasonxing@gmail.com, davem@davemloft.net,
+ kuba@kernel.org, netdev@vger.kernel.org,
+ Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+References: <20250916064614.605075-1-xuanqiang.luo@linux.dev>
+ <CANn89iLC6F3P6PcP4cKG9=f7+ymW1By1EyhFH+Q0V6V-xXn7jA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: luoxuanqiang <xuanqiang.luo@linux.dev>
+In-Reply-To: <CANn89iLC6F3P6PcP4cKG9=f7+ymW1By1EyhFH+Q0V6V-xXn7jA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 10, 2025 at 05:22:13PM +0200, Sabrina Dubroca wrote:
-> Xiumei reported a regression in IPsec offload tests over xfrmi, where
-> the traffic for IPv6 over IPv4 tunnels is processed in SW instead of
-> going through crypto offload, after commit
-> cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
-> implementation").
-> 
-> Commit cc18f482e8b6 added a generic version of existing checks
-> attempting to prevent packets with IPv4 options or IPv6 extension
-> headers from being sent to HW that doesn't support offloading such
-> packets. The check mistakenly uses x->props.family (the outer family)
-> to determine the inner packet's family and verify if
-> options/extensions are present.
-> 
-> In the case of IPv6 over IPv4, the check compares some of the traffic
-> class bits to the expected no-options ihl value (5). The original
-> check was introduced in commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add
-> Innova IPSec offload TX data path"), and then duplicated in the other
-> drivers. Before commit cc18f482e8b6, the loose check (ihl > 5) passed
-> because those traffic class bits were not set to a value that
-> triggered the no-offload codepath. Packets with options/extension
-> headers that should have been handled in SW went through the offload
-> path, and were likely dropped by the NIC or incorrectly
-> processed. Since commit cc18f482e8b6, the check is now strict (ihl !=
-> 5), and in a basic setup (no traffic class configured), all packets go
-> through the no-offload codepath.
-> 
-> The commits that introduced the incorrect family checks in each driver
-> are:
-> 2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
-> 8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
-> 859a497fe80c ("nfp: implement xfrm callbacks and expose ipsec offload feature to upper layer")
-> 32188be805d0 ("cn10k-ipsec: Allow ipsec crypto offload for skb with SA")
-> [ixgbe/ixgbevf commits are ignored, as that HW does not support tunnel
-> mode, thus no cross-family setups are possible]
-> 
-> Fixes: cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback implementation")
-> Reported-by: Xiumei Mu <xmu@redhat.com>
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-> Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
 
-Applied, thanks a lot Sabrina!
+在 2025/9/16 15:30, Eric Dumazet 写道:
+> On Mon, Sep 15, 2025 at 11:47 PM <xuanqiang.luo@linux.dev> wrote:
+>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>
+>> After replacing R/W locks with RCU in commit 3ab5aee7fe84 ("net: Convert
+>> TCP & DCCP hash tables to use RCU / hlist_nulls"), a race window emerged
+>> during the switch from reqsk/sk to sk/tw.
+>>
+>> Now that both timewait sock (tw) and full sock (sk) reside on the same
+>> ehash chain, it is appropriate to introduce hlist_nulls replace
+>> operations, to eliminate the race conditions caused by this window.
+>>
+>> ---
+>> Changes:
+>>    v2:
+>>      * Patch 1
+>>          * Use WRITE_ONCE() to initialize old->pprev.
+>>      * Patch 2&3
+>>          * Optimize sk hashed check. Thanks Kuni for pointing it out!
+>>
+>>    v1: https://lore.kernel.org/all/20250915070308.111816-1-xuanqiang.luo@linux.dev/
+> Note : I think you sent an earlier version, you should have added a
+> link to the discussion,
+> and past feedback/suggestions.
+>
+> Lack of credit is a bit annoying frankly.
+>
+> I will take a look at your series, thanks.
+
+This patch's solution isn't very related to previous ones, so I didn't
+include prior discussions.
+
+But to help others get the full picture, I'll share past links and
+earlier discussions related to this type of issue in the next version
+or a reply. Sorry for any oversight.
+
+Thanks
+Xuanqiang.
+
+>> Xuanqiang Luo (3):
+>>    rculist: Add __hlist_nulls_replace_rcu() and
+>>      hlist_nulls_replace_init_rcu()
+>>    inet: Avoid ehash lookup race in inet_ehash_insert()
+>>    inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
+>>
+>>   include/linux/rculist_nulls.h | 61 +++++++++++++++++++++++++++++++++++
+>>   include/net/sock.h            | 23 +++++++++++++
+>>   net/ipv4/inet_hashtables.c    |  4 ++-
+>>   net/ipv4/inet_timewait_sock.c | 15 ++++-----
+>>   4 files changed, 93 insertions(+), 10 deletions(-)
+>>
+>> --
+>> 2.25.1
+>>
 
