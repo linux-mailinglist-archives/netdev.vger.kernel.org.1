@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-223455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03EC1B5934A
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:20:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD26B593DD
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9001F1BC531E
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:20:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0D8D3B06DF
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28474303C83;
-	Tue, 16 Sep 2025 10:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320A1305959;
+	Tue, 16 Sep 2025 10:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGIAYYce"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S2pQI+xo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E90302CA2;
-	Tue, 16 Sep 2025 10:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433D42F83D8
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 10:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758018007; cv=none; b=Su56fnVY42x/Fjaa0VG8O44oEet2erXkIM85+zkpwBoeqfzACA+DFZVEVCVT7J15exMoFOWbhNuiPx5ZzKERIefyewR0oKCOpJjd23d6mUJ6JDECUldzAN12D8/6eHoXZQr4iV1F7JuGCi7FZArqFoPPDcgLt/ySTj2bEGR9NqM=
+	t=1758018673; cv=none; b=QZ6koaSOF+CGAFZrKabPpjzGrv9Qju6MUbJ6KKMRZQNGU1mf+MHaIPZ/fSxFJ529Xo9gQDNXq3cCKAFqYZWWMQbDvEEwYsJcyn9HW4CTKKsvWvZrOskxiEAPXM7HyvtWyXQp7Yy4AB4IYCrR9vB5i/uaN+AMKK87sgEfSl34uBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758018007; c=relaxed/simple;
-	bh=TbzkzVHEK1yEbMNnfkgImEYVcP6Q0LNVAAHXAk3Oil8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KZcqCFVnCGO5uHPUwMQL97jHmN7pFKj/6cGWhrOK1GnyA93QAO9nQUgnPtJWg1idzwcpNlaWhEiIBgZo5o/HEbBWjI8ILGBC7etlJqyrdlux9TVCbgVyHy7/M8FUESs/X9GJfnKnMdELZpiK6U2wXxe+HL+EJ2f6YTWbmfJSmME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGIAYYce; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 819A9C4CEFC;
-	Tue, 16 Sep 2025 10:20:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758018006;
-	bh=TbzkzVHEK1yEbMNnfkgImEYVcP6Q0LNVAAHXAk3Oil8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EGIAYYce8e8rXdcjgfq4rkk01Qfd3kY8EVjhL4DScF/Nn6Tv5VYSR9AOx9SiRLmoq
-	 DrVbtCnRTsPVHIwS3Vg2LL3jEft4vf8J1hiWjwCYe0qeqnoS73OfeUs/XIE7c3774p
-	 ajk/eDUF0crP/xkbhmkE4DAM1RjeN39LOJi41Evt5gn5bTLs9zTcOW/hR2ncCAkUR8
-	 XBXBrpdt85lg1QIeD04zIOfKDBY0Kyx8Q1RwbDAC4g2kp0gHYh7mwjMi79awGDcpN+
-	 dOb60MqmTuU4kYHdsnbYr22I2j55pHgonfd++Y9Sgbx1djKvUYtK6bPCpIbYB/KSMb
-	 tJRvNQXZqUd0Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF7939D0C1A;
-	Tue, 16 Sep 2025 10:20:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758018673; c=relaxed/simple;
+	bh=NJinrFCzcZ68I+aBpzVovN88TypFb/3QQmi8NohuNO0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=l31+VDGX1xrQJXDD6Fj+FIWv4FEhKmQTUEktYK/tSq3BG3w1ky51uzYeNi9w+WrzIUgsvaS1Hf8K9ljrnGxZhrxhz1VWF1kgw4l7e3Bt4zx+xiCY2EFYLINfjnaek0pULRDWz1zYtRNYUSb64IddVrVzO8b4ZVDLIicAiwqs3W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S2pQI+xo; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758018668;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=stIFJdGmQvw+Rab15vYBysG3v/OeR56vWXNVACGEFwI=;
+	b=S2pQI+xooKIWPoPnTrMI912WC5/nqpRU9iEAVCFsGj4SxHdrzax8N33+0FBnKsQaf0khuP
+	r8gdI30foGUqv+lJcz1tFYYvw2fUnNCKujeBaF5zgjIgOsbr92HBIDA8BPHd4eDO61d9op
+	L9xOfJo0qZGlGNUxY6rBIj4BVD0pHwA=
+From: xuanqiang.luo@linux.dev
+To: edumazet@google.com,
+	kuniyu@google.com
+Cc: kerneljasonxing@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Subject: [PATCH net-next v3 0/3] net: Avoid ehash lookup races
+Date: Tue, 16 Sep 2025 18:30:51 +0800
+Message-Id: <20250916103054.719584-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,42 +58,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: phy: nxp-c45-tja11xx: use bitmap_empty() where
- appropriate
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175801800777.695774.17798425923008297639.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Sep 2025 10:20:07 +0000
-References: <20250913182837.206800-1-yury.norov@gmail.com>
-In-Reply-To: <20250913182837.206800-1-yury.norov@gmail.com>
-To: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-Cc: andrei.botila@oss.nxp.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, sd@queasysnail.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+After replacing R/W locks with RCU in commit 3ab5aee7fe84 ("net: Convert
+TCP & DCCP hash tables to use RCU / hlist_nulls"), a race window emerged
+during the switch from reqsk/sk to sk/tw.
 
-On Sat, 13 Sep 2025 14:28:36 -0400 you wrote:
-> The driver opencodes bitmap_empty() in a couple of funcitons. Switch to
-> the proper and more verbose API.
-> 
-> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> ---
->  drivers/net/phy/nxp-c45-tja11xx-macsec.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+Now that both timewait sock (tw) and full sock (sk) reside on the same
+ehash chain, it is appropriate to introduce hlist_nulls replace
+operations, to eliminate the race conditions caused by this window.
 
-Here is the summary with links:
-  - net: phy: nxp-c45-tja11xx: use bitmap_empty() where appropriate
-    https://git.kernel.org/netdev/net-next/c/29fa7f9e5adf
+Before this series of patches, I previously sent another version of the
+patch, attempting to avoid the issue using a lock mechanism. However, it
+seems there are some problems with that approach now, so I've switched to
+the "replace" method in the current patches to resolve the issue.
+For details, refer to:
+https://lore.kernel.org/netdev/20250903024406.2418362-1-xuanqiang.luo@linux.dev/
 
-You are awesome, thank you!
+Before I encountered this type of issue recently, I found there had been
+several historical discussions about it. Therefore, I'm adding this
+background information for those interested to reference:
+1. https://lore.kernel.org/lkml/20230118015941.1313-1-kerneljasonxing@gmail.com/
+2. https://lore.kernel.org/netdev/20230606064306.9192-1-duanmuquan@baidu.com/
+
+---
+Changes:
+  v3:
+    * Add more background information on this type of issue to the letter cover.
+
+  v2: https://lore.kernel.org/all/20250916064614.605075-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Use WRITE_ONCE() to initialize old->pprev.
+    * Patch 2&3
+        * Optimize sk hashed check. Thanks Kuni for pointing it out!
+
+  v1: https://lore.kernel.org/all/20250915070308.111816-1-xuanqiang.luo@linux.dev/
+
+Xuanqiang Luo (3):
+  rculist: Add __hlist_nulls_replace_rcu() and
+    hlist_nulls_replace_init_rcu()
+  inet: Avoid ehash lookup race in inet_ehash_insert()
+  inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
+
+ include/linux/rculist_nulls.h | 61 +++++++++++++++++++++++++++++++++++
+ include/net/sock.h            | 23 +++++++++++++
+ net/ipv4/inet_hashtables.c    |  4 ++-
+ net/ipv4/inet_timewait_sock.c | 15 ++++-----
+ 4 files changed, 93 insertions(+), 10 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
