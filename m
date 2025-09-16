@@ -1,131 +1,329 @@
-Return-Path: <netdev+bounces-223534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1C2B596DA
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:04:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AEA5B596EB
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:05:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF7B03B4F29
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:03:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CC6716A069
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C23F2D73BD;
-	Tue, 16 Sep 2025 13:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04B02E92DA;
+	Tue, 16 Sep 2025 13:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tHYL8Gle"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ABaUMkrg";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EZ0J10S9";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QHZ53mBL";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="peEeA59n"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06EA5248F7D
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 13:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253DA21D5B0
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 13:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758027785; cv=none; b=jo9+ZCCLvOYOGNP8Jyv+hDBfD2iTcXfIQwfdqYCmNkNlT9tQ98a9Y/YVzMPkl80Tu4Kr4PXfnoxfMzZsYYTgNID0yFVndZuLgGftAyrm+NTCDKn/MTmBGyU8icOs9YCSEMJhOcIDJrSFvLh4HRcbbPEjAEm6nz6x6iGlDVnM27o=
+	t=1758027859; cv=none; b=ZIfAszzzLmbdMk8HQZYfwA2EY68dfql/b53Eu4wMMhQRv7HCUL45BiQOSm3guRLfQ4CetexcraSV0E2YpcwDebuFkI3hb16llnJQM5EZa5kY4jorQryV9Qf1wX8Ma6lShHgN5d2OwBtBAv4zUeJFE118ZdgissNrjuw14I8npB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758027785; c=relaxed/simple;
-	bh=zkTIaovo86K2Fs3yp+tdXlVVJpsvXWwe9xrdORsXMjw=;
+	s=arc-20240116; t=1758027859; c=relaxed/simple;
+	bh=/eqp/iDZYlHEnsa4vuAVT4u/N0f+kUwO2etZb6Zrvfk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pXxiy18r363jmHB0BTzXi0ia5VtN33jhPFTcRe5xPCcGr2e2XKs/8DXJbQOEpaUPsBafRuiGkV2ntPAbn14nzOma+UceyUXoXrYWJUImo4xNjhN7II1vh1x5ckdjwxjUsoJ119mb0fm4L98vsCDnNWzVBgGIw9mpV8gYsnyqUgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tHYL8Gle; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9d197d92-3990-4e48-aa35-87a51eccb87a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758027779;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=NGZogm4wU2AhqsG/ad9aTDs1Ayvzb/kSqdqcoQkYHAWbQyuRfoCOddvcsrduCDnGu5QMKzdx2n6ALx24xe/P/YIb1tgwpBgffLmTCosu3np+elQB/b6GE248gIWf0rYIBMvJ61qUU87vH8RoOsMC6joJCP0UGD9sbjRvrxquh/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ABaUMkrg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EZ0J10S9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QHZ53mBL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=peEeA59n; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6B24F21CB5;
+	Tue, 16 Sep 2025 13:04:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758027855; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0l51roOY8mL8wGeiKdL6Wccc2vrF+Htbvn0n+KqebS8=;
-	b=tHYL8GleWD5V7BwWLOfrPL7qz1AtXq3AXJl174foyTg6BzxTK/CkPNuaq0/rFTdaGkQUxk
-	0njfmoO40f97TADZBYEkJ4dgNlqJxxV6SSvBR5un61l0BVGf3iS9q1bhPznmmAFvj2glkT
-	O+S16sH02+qwXyQY7iOG6fj/fSvN1VE=
-Date: Tue, 16 Sep 2025 14:02:56 +0100
+	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
+	b=ABaUMkrgvIb8hV6oIbUbcc0WgdTpr6wDm5TzqqFEUM6VfAkqJHhNS7a/qQG0n9GKSf4OTq
+	vaiRL0CAIOjbz/jd1bigQGueAviCk/JHqqHWqqSMATllQS1p+rcCqb7Al92biSOuJIahIy
+	3e0I0PdeeIUG6wCS6S8RXI9m/oy9jYs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758027855;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
+	b=EZ0J10S96HO8dwYjF5NSIR9icbMiB3TFlSYUEZq49imHRryQ9mBF2TUslu6u0+lFnIpjEL
+	JzWahpYJ8iZ+HzAg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QHZ53mBL;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=peEeA59n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758027854; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
+	b=QHZ53mBLwhOpDZzdNVXcv7QuAejEj4nB4C5DJhmy281xEhKsefLCCG32IdeZazr2SCEEo5
+	wSDosPnXiIZTlgcg8osh8VDWCvpkR0wv3Tt7nb+bnY9rWGStui22S1ZtAdPmiGM35KCj/Y
+	+CNngRCUWq2yJ5+ne1U3J5doU+0HMko=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758027854;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
+	b=peEeA59nroXgxW0jlx/AzyZYlNEoeGbm/7bHfvwxI6Sbdz7a+Eewbt/ruX1Vqh2yP8L4w6
+	IpZsJ2pjHVXGxLAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 31DC9139CB;
+	Tue, 16 Sep 2025 13:04:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +DmmC05gyWioCQAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 16 Sep 2025 13:04:14 +0000
+Message-ID: <f1a7b0b5-65e3-4cd0-9c62-50bbb554e589@suse.de>
+Date: Tue, 16 Sep 2025 15:04:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/2] ptp: rework ptp_clock_unregister() to
- disable events
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Ajay Kaher <ajay.kaher@broadcom.com>,
- Alexey Makhalov <alexey.makhalov@broadcom.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Clark Wang <xiaoning.wang@nxp.com>,
- "David S. Miller" <davem@davemloft.net>,
- David Woodhouse <dwmw2@infradead.org>, Eric Dumazet <edumazet@google.com>,
- imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, netdev@vger.kernel.org,
- Nick Shi <nick.shi@broadcom.com>, Paolo Abeni <pabeni@redhat.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
- Yangbo Lu <yangbo.lu@nxp.com>
-References: <aMglp11mUGk9PAvu@shell.armlinux.org.uk>
- <E1uyAP7-00000005lGq-3FqI@rmk-PC.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/7] nvme-tcp: Support KeyUpdate
+To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+ kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
+References: <20250905024659.811386-1-alistair.francis@wdc.com>
+ <20250905024659.811386-7-alistair.francis@wdc.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <E1uyAP7-00000005lGq-3FqI@rmk-PC.armlinux.org.uk>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250905024659.811386-7-alistair.francis@wdc.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 6B24F21CB5
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email]
+X-Spam-Score: -4.51
 
-On 15/09/2025 15:42, Russell King (Oracle) wrote:
-> the ordering of ptp_clock_unregister() is not ideal, as the chardev
-> remains published while state is being torn down. There is also no
-> cleanup of enabled pin settings, which means enabled events can
-> still forward into the core.
+On 9/5/25 04:46, alistair23@gmail.com wrote:
+> From: Alistair Francis <alistair.francis@wdc.com>
 > 
-> Rework the ordering of cleanup in ptp_clock_unregister() so that we
-> unpublish the posix clock (and user chardev), disable any pins that
-> have events enabled, and then clean up the aux work and PPS source.
+> If the nvme_tcp_try_send() or nvme_tcp_try_recv() functions return
+> EKEYEXPIRED then the underlying TLS keys need to be updated. This occurs
+> on an KeyUpdate event.
 > 
-> This avoids potential use-after-free and races in PTP clock driver
-> teardown.
+> If the NVMe Target (TLS server) initiates a KeyUpdate this patch will
+> allow the NVMe layer to process the KeyUpdate request and forward the
+> request to userspace. Userspace must then update the key to keep the
+> connection alive.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> This patch allows us to handle the NVMe target sending a KeyUpdate
+> request without aborting the connection. At this time we don't support
+> initiating a KeyUpdate.
+> 
+> Link: https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->   drivers/ptp/ptp_chardev.c | 13 +++++++++++++
->   drivers/ptp/ptp_clock.c   | 17 ++++++++++++++++-
->   drivers/ptp/ptp_private.h |  2 ++
->   3 files changed, 31 insertions(+), 1 deletion(-)
+> v2:
+>   - Don't change the state
+>   - Use a helper function for KeyUpdates
+>   - Continue sending in nvme_tcp_send_all() after a KeyUpdate
+>   - Remove command message using recvmsg
+>   
+>   drivers/nvme/host/tcp.c | 73 +++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 70 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-> index eb4f6d1b1460..640a98f17739 100644
-> --- a/drivers/ptp/ptp_chardev.c
-> +++ b/drivers/ptp/ptp_chardev.c
-> @@ -47,6 +47,19 @@ static int ptp_disable_pinfunc(struct ptp_clock_info *ops,
->   	return err;
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index 776047a71436..b6449effc2ac 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -171,6 +171,7 @@ struct nvme_tcp_queue {
+>   	bool			tls_enabled;
+>   	u32			rcv_crc;
+>   	u32			snd_crc;
+> +	key_serial_t		user_session_id;
+>   	__le32			exp_ddgst;
+>   	__le32			recv_ddgst;
+>   	struct completion       tls_complete;
+> @@ -210,6 +211,7 @@ static int nvme_tcp_start_tls(struct nvme_ctrl *nctrl,
+>   			      struct nvme_tcp_queue *queue,
+>   			      key_serial_t pskid,
+>   			      handshake_key_update_type keyupdate);
+> +static void update_tls_keys(struct nvme_tcp_queue *queue);
+>   
+>   static inline struct nvme_tcp_ctrl *to_tcp_ctrl(struct nvme_ctrl *ctrl)
+>   {
+> @@ -393,6 +395,14 @@ static inline void nvme_tcp_send_all(struct nvme_tcp_queue *queue)
+>   	do {
+>   		ret = nvme_tcp_try_send(queue);
+>   	} while (ret > 0);
+> +
+> +	if (ret == -EKEYEXPIRED) {
+> +		update_tls_keys(queue);
+> +
+> +		do {
+> +			ret = nvme_tcp_try_send(queue);
+> +		} while (ret > 0);
+> +	}
 >   }
 >   
-> +void ptp_disable_all_pins(struct ptp_clock *ptp)
-> +{
-> +	struct ptp_clock_info *info = ptp->info;
-> +	unsigned int i;
+>   static inline bool nvme_tcp_queue_has_pending(struct nvme_tcp_queue *queue)
+> @@ -1347,6 +1357,8 @@ static int nvme_tcp_try_send(struct nvme_tcp_queue *queue)
+>   done:
+>   	if (ret == -EAGAIN) {
+>   		ret = 0;
+> +	} else if (ret == -EKEYEXPIRED) {
+> +		goto out;
+>   	} else if (ret < 0) {
+>   		dev_err(queue->ctrl->ctrl.device,
+>   			"failed to send request %d\n", ret);
+> @@ -1371,9 +1383,56 @@ static int nvme_tcp_try_recv(struct nvme_tcp_queue *queue)
+>   	queue->nr_cqe = 0;
+>   	consumed = sock->ops->read_sock(sk, &rd_desc, nvme_tcp_recv_skb);
+>   	release_sock(sk);
 > +
-> +	mutex_lock(&ptp->pincfg_mux);
-> +	for (i = 0; i < info->n_pins; i++)
-> +		if (info->pin_config[i].func != PTP_PF_NONE)
-> +			ptp_disable_pinfunc(info, info->pin_config[i].func,
-> +					    info->pin_config[i].chan);
-> +	mutex_unlock(&ptp->pincfg_mux);
+> +	/* If we received EINVAL from read_sock then it generally means the
+> +	 * other side sent a command message. So let's try to clear it from
+> +	 * our queue with a recvmsg, otherwise we get stuck in an infinite
+> +	 * loop.
+> +	 */
+> +	if (consumed == -EINVAL) {
+> +		char cbuf[CMSG_LEN(sizeof(char))] = {};
+> +		struct msghdr msg = { .msg_flags = MSG_DONTWAIT };
+> +		struct bio_vec bvec;
+> +
+> +		bvec_set_virt(&bvec, (void *)cbuf, sizeof(cbuf));
+> +		iov_iter_bvec(&msg.msg_iter, ITER_DEST, &bvec, 1, sizeof(cbuf));
+> +
+> +		msg.msg_control = cbuf;
+> +		msg.msg_controllen = sizeof(cbuf);
+> +
+> +		consumed = sock_recvmsg(sock, &msg, msg.msg_flags);
+> +	}
+> +
+>   	return consumed == -EAGAIN ? 0 : consumed;
+>   }
+>   
+> +static void update_tls_keys(struct nvme_tcp_queue *queue)
+> +{
+> +	int qid = nvme_tcp_queue_id(queue);
+> +	int ret;
+> +
+> +	dev_dbg(queue->ctrl->ctrl.device,
+> +		"updating key for queue %d\n", qid);
+> +
+> +	cancel_work(&queue->io_work);
+> +	handshake_req_cancel(queue->sock->sk);
+> +	handshake_sk_destruct_req(queue->sock->sk);
+> +
+Careful here. The RFC fully expects to have several KeyUpdate requests
+pending (eg if both sides decide so initiate a KeyUpdate at the same
+time). And cancelling a handshake request would cause tlshd/gnutls
+to lose track of the generation counter and generate an invalid
+traffic secret.
+I would just let it rip and don't bother with other handshake
+requests.
+
+> +	nvme_stop_keep_alive(&(queue->ctrl->ctrl));
+> +	flush_work(&(queue->ctrl->ctrl).async_event_work);
+> +
+Oh bugger. Seems like gnutls is generating the KeyUpdate message
+itself, and we have to wait for that.
+So much for KeyUpdate being transparent without having to stop I/O...
+
+Can't we fix gnutls to make sending the KeyUpdate message and changing
+the IV parameters an atomic operation? That would be a far better 
+interface, as then we would not need to stop I/O and the handshake
+process could run fully asynchronous to normal I/O...
+
+> +	ret = nvme_tcp_start_tls(&(queue->ctrl->ctrl),
+> +				 queue, queue->ctrl->ctrl.tls_pskid,
+> +				 HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED);
+> +
+> +	if (ret < 0) {
+> +		dev_err(queue->ctrl->ctrl.device,
+> +			"failed to update the keys %d\n", ret);
+> +		nvme_tcp_fail_request(queue->request);
+> +		nvme_tcp_done_send_req(queue);
+> +	}
 > +}
 > +
+>   static void nvme_tcp_io_work(struct work_struct *w)
+>   {
+>   	struct nvme_tcp_queue *queue =
+> @@ -1389,15 +1448,21 @@ static void nvme_tcp_io_work(struct work_struct *w)
+>   			mutex_unlock(&queue->send_mutex);
+>   			if (result > 0)
+>   				pending = true;
+> -			else if (unlikely(result < 0))
+> +			else if (unlikely(result < 0)) {
+> +				if (result == -EKEYEXPIRED)
+> +					update_tls_keys(queue);
 
-This part is questionable. We do have devices which have PPS out enabled
-by default. The driver reads pins configuration from the HW during PTP
-init phase and sets up proper function for pin in ptp_info::pin_config.
+How exactly can we get -EKEYEXPIRED when _sending_?
+To my understanding that would have required userspace to intercept
+here trying (or even sending) a KeyUpdate message, right?
+So really not something we should see during normal operation.
+As mentioned in my previous mail we should rather code the
+KeyUpdate process itself here, too.
+Namely: Trigger the KeyUpdate via userspace (eg by writing into the 
+tls_key attribute for the controller), and then have the kernel side
+to call out into tlshd to initiate the KeyUpdate 'handshake'.
+That way we have identical flow of control for both the sending
+and receiving side.
 
-With this patch applied these pins have PEROUT function disabled on
-shutdown and in case of kexec'ing into a new kernel the PPS out feature
-needs to be manually enabled, and it breaks expected behavior.
+Incidentally: the RFC has some notion about 'request_update' setting
+in the KeyUpdate message. Is that something we have to care about at
+this level?
 
-Why do you need to clear up configured PEROUT function?
+Cheers,
 
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
