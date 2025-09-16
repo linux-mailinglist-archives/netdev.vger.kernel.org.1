@@ -1,109 +1,205 @@
-Return-Path: <netdev+bounces-223394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 972FCB5900A
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:09:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B63BB59013
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57E9D3BA5A2
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:09:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A16D418995EF
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C45F28134C;
-	Tue, 16 Sep 2025 08:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255DA286880;
+	Tue, 16 Sep 2025 08:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bc7cXl9l"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eK76GdGC";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0d3ZNCPe";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aHSY5Aoo";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="021jsuaE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF8F21771B
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 08:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204CB285C8B
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 08:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758010150; cv=none; b=eYXCHq8zcn3fklaD9ZOprY4sbH47Qk29POCqY61QaLUbdLtz6Bo8Tl5rel3JmcF8rBcS5MWQHN6eCoppYbHdT70rVrKVtSV+7Ut99zkRpqq3zxsAx97MGRZ3huwpstaweobw1ID/E+7WjYiYI0AcPXoIvxPDW+OM/R6IuuvcbBU=
+	t=1758010281; cv=none; b=eGQ/QjbRcHNV6OnVEX2YjSYZKgUFwT5MWBmbSaXoBj5XvHZy/AhcxAuMQZqmq20kAKxHYoRL6SSS8PrOs3T1awj3URP1awr0YbQJJaFpdVwq2IEjD77bvw1vqd3zVGTgyjujKvPm2jG808SQEhIn5fkZl0fFte/zJearkfZOLOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758010150; c=relaxed/simple;
-	bh=6j1/MZUxJh4G+iGyaTKwe4KuwbIfGBSsgXqvvtNvsTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sY4QiNZUpzSHrFEVMSS3e8e24rx5yS/1CsvB6GbQqKy5KOBGMSvpZvp2dTIGgP2eJTF6+SRX6dnH8nd3b5FvoYj8m1FWdM38hrDRc2oF7iNEX8F5CnfsT3+nBJ7OZMZvHDkBkzGwXAt9QmEnF9DkyA53aiJcN1D41gN7NRWORhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bc7cXl9l; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b086b4a3f8fso69275766b.3
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:09:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758010147; x=1758614947; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cxTcFJ7B/8CVO+mwvohENAPIywHUmrIODz4+UjUrUAI=;
-        b=Bc7cXl9lw/GPTuO2LTeg9LD4XiuPu1HWsr2X2gW37Fmyzg0odIg8UDJMBVxpgUDA3Y
-         R3ETMCRPHenFKUYKD4aUm/JPuXdi0IOmjSgmptkwkV5VjYf0IZ7P7EJFcN1pE/5xpsBL
-         Lcb8H/6IOFrZo1EHeDaIa7iGCR3Ke5IaGn3Bh2E8t8ykdffrCImu848PbJ5EYF8VSvMQ
-         AodNQlI5FjKg5F/vaNi+INX3vZFT2NCXcHC7sqUe0w9KQAh1QhNyWq+Y6nZT1o6+p8pj
-         AyWJfy0U4JHwnexvqdLkt+iGoz/Awzd8ErPOOf0dBTX2T/bNFQIwHzX0qS+hlJGGCHd+
-         9dWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758010147; x=1758614947;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cxTcFJ7B/8CVO+mwvohENAPIywHUmrIODz4+UjUrUAI=;
-        b=ALCda9io+yyPHacf1cIH17Ob6d23kaMtM6NzNil+eBkccaFdAlqX4ZisLJ5KnHCnK1
-         0aIILmJfsn5zx54Fy0Ip/Z8g0IaJ9zjy+JXGHIMZDozCclcFBF926vcwc2xbaScNXJLV
-         PyrDgBgl+QVdPY48WGsDiHRwx9ou/9Ev25f2t3N5W20AjIuN+XzXx3VoXB7w/CAzLNEk
-         dyVRrBVR4S+DzJfYD6F48DBkqHXESGu1xy+fVN4W8CW0ENizeoibLduNwWaG2JCRux9N
-         5gNoctIZSRRDSi8QkGVRYqyi7c4RUPjKW1b4152ITcB2myo5maIjwFLy63svoQC2vEBL
-         5Elw==
-X-Forwarded-Encrypted: i=1; AJvYcCXi8O2CqMAWHguQC+zWF958rcs6Y4yMZr8uRi/OCQV+lkUVpLPazPELVV3yGZJ/rMuwqAEENpg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOoIvodLmVhQIypRg/jUKDzQEDGPGZKD1KqbSfbPkTtxaE+aXI
-	sX/ebkSwlGoZhE8CewJLn9RFVg+EKOKOBfP6138Ndcvl9Zc5CcMyV0uv
-X-Gm-Gg: ASbGnct8R3BsfeNpw1kfRDYSz0/YFfRDeTnqoTgRU95AIyp4obg0xpsRpDu0XD64SUh
-	0J9Nq2VGVOrgdL1o9xifemkg3agPEw5zOAMRyr46zREaRtRVsdJv0mrg+rldWhLxVhEyytLD6XP
-	x+7F+P1teYBUHNbPE8zo/fd76fDZRJciiwE/q/KZJzQExWvNSOQwxk4nRcAwozYE8yCq5ojnvVh
-	r6U882/Ec1r/d5KrXFiKekPyIHJE62bcZlcClav8Q1ilhZd89Rxc639+yp79ZXEw9fOGsPteYD/
-	qaSXaQmiUfSYyqrgx10zL7CPjWSHVoM7jaWPy7pX1AgOxPOeB0kbotLmjIVVwrtFg2b9SXbGqB8
-	+pnzZjtg9Hzu0NjE=
-X-Google-Smtp-Source: AGHT+IHuMFE/aT0dMon2fGxiiuIGx+KLwh/5BRAIjAdyNSjrXTrMl1Cvc4UwA/Fkrwuo+9ZbsHOeEw==
-X-Received: by 2002:a17:907:3f95:b0:b04:36bb:54e with SMTP id a640c23a62f3a-b07c353ff38mr859250366b.1.1758010146707;
-        Tue, 16 Sep 2025 01:09:06 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:2310:283e:a4d5:639c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b33478e4sm1093258766b.96.2025.09.16.01.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 01:09:06 -0700 (PDT)
-Date: Tue, 16 Sep 2025 11:09:03 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1758010281; c=relaxed/simple;
+	bh=5M0kjGxE1KbGseV/rLSMtaMrM1BG022VZzwLwrPoyEQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dlU4CrgKbdpF68Ng+DfzlPyhIYBmvePz/UbUIu1YKU7RGVecygNBxXPXrx+3W1BMBvTifx1tFE1VEz1OSJk7/7xWnE7zKVBECygyAG0GHtZVNvobxeGdma0lEn9ap2cJFgsArx11KiEOBSbgSfyc8515HUGKXmzWCVXqz9KDX/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eK76GdGC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0d3ZNCPe; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aHSY5Aoo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=021jsuaE; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9BC99225E1;
+	Tue, 16 Sep 2025 08:11:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758010277; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=uRNnXJQeuXa4RjZ/hgAqaDL48ggOEmDjVhxxiZdCQ1c=;
+	b=eK76GdGCrqzbzg4E9cOFHyrtzcP55R3/+IXiPIyc/ykxV/oDGvkNcFBnyrtwhsKzemeizo
+	tK3+i9fKSICZHvUkVReuL3c2uPUx6wL8ZP4XBb14JUqmSP39Oh7HN0X73mQOC83mmSFnFe
+	gvQCc/0R6UegCgGVfErHDOnhtK9eCA8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758010277;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=uRNnXJQeuXa4RjZ/hgAqaDL48ggOEmDjVhxxiZdCQ1c=;
+	b=0d3ZNCPeeOXC6WSfhDKfkS6ruKRy9ZVWC86YtDKA2SDwmGryBPCtaeYFE5TUpn54DJHsQe
+	7L1JnczjennectBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=aHSY5Aoo;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=021jsuaE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1758010276; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=uRNnXJQeuXa4RjZ/hgAqaDL48ggOEmDjVhxxiZdCQ1c=;
+	b=aHSY5AooXtS81XC54WJ1Lrl97BsOP0JTjCSeRb4Kr0vaQrcO6PXt9uJYH8HWDr5uaYpPOB
+	ol0bL0AhwdeHjn4l+97yKbya4DwN7ALzOt7GOVB9uakQvUE8cQswv9Ith3CVnvgFOOY0mA
+	VewKJDGTT+nDHJziFvrYNxyXrLCChrs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1758010276;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=uRNnXJQeuXa4RjZ/hgAqaDL48ggOEmDjVhxxiZdCQ1c=;
+	b=021jsuaEL1/2n02fIHwBaaWO+GAc+sNhcK/3pHuNE3BR2ImRKuEaHfh7390k/cdUVAa6af
+	31/0qMa2ICuFBQCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 996BA13A63;
+	Tue, 16 Sep 2025 08:11:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3f4JI6MbyWjEGAAAD6G6ig
+	(envelope-from <svarbanov@suse.de>); Tue, 16 Sep 2025 08:11:15 +0000
+From: Stanimir Varbanov <svarbanov@suse.de>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rpi-kernel@lists.infradead.org,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next 5/5] net: dsa: mv88e6xxx: move
- mv88e6xxx_hwtstamp_work() prototype
-Message-ID: <20250916080903.24vbpv7hevhrzl4g@skbuf>
-References: <aMgPN6W5Js5ZrL5n@shell.armlinux.org.uk>
- <E1uy8uh-00000005cFT-40x8@rmk-PC.armlinux.org.uk>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Phil Elwell <phil@raspberrypi.com>,
+	Jonathan Bell <jonathan@raspberrypi.com>,
+	Dave Stevenson <dave.stevenson@raspberrypi.com>,
+	Stanimir Varbanov <svarbanov@suse.de>,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH v3] net: cadence: macb: Add support for Raspberry Pi RP1 ethernet controller
+Date: Tue, 16 Sep 2025 11:10:59 +0300
+Message-ID: <20250916081059.3992108-1-svarbanov@suse.de>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1uy8uh-00000005cFT-40x8@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[dt,netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,tuxon.dev:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Rspamd-Queue-Id: 9BC99225E1
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -1.51
 
-On Mon, Sep 15, 2025 at 02:06:35PM +0100, Russell King (Oracle) wrote:
-> Since mv88e6xxx_hwtstamp_work() is defined in hwtstamp.c, its
-> prototype should be in hwtstamp.h, so move it there.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
+From: Dave Stevenson <dave.stevenson@raspberrypi.com>
 
-This leaves the shim definition (for when CONFIG_NET_DSA_MV88E6XXX_PTP
-is not defined) in ptp.h. It creates an inconsistency and potential
-problem - the same header should provide all definitions of the same
-function.
+The RP1 chip has the Cadence GEM block, but wants the tx_clock
+to always run at 125MHz, in the same way as sama7g5.
+Add the relevant configuration.
+
+Signed-off-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
+Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+---
+changes in v3:
+ - Added Reviewed-by and Acked-by tags.
+ - Split the patch from the original series.
+
+ drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 36717e7e5811..260fdac46f4b 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5135,6 +5135,17 @@ static const struct macb_config versal_config = {
+ 	.usrio = &macb_default_usrio,
+ };
+ 
++static const struct macb_config raspberrypi_rp1_config = {
++	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
++		MACB_CAPS_JUMBO |
++		MACB_CAPS_GEM_HAS_PTP,
++	.dma_burst_length = 16,
++	.clk_init = macb_clk_init,
++	.init = macb_init,
++	.usrio = &macb_default_usrio,
++	.jumbo_max_len = 10240,
++};
++
+ static const struct of_device_id macb_dt_ids[] = {
+ 	{ .compatible = "cdns,at91sam9260-macb", .data = &at91sam9260_config },
+ 	{ .compatible = "cdns,macb" },
+@@ -5155,6 +5166,7 @@ static const struct of_device_id macb_dt_ids[] = {
+ 	{ .compatible = "microchip,mpfs-macb", .data = &mpfs_config },
+ 	{ .compatible = "microchip,sama7g5-gem", .data = &sama7g5_gem_config },
+ 	{ .compatible = "microchip,sama7g5-emac", .data = &sama7g5_emac_config },
++	{ .compatible = "raspberrypi,rp1-gem", .data = &raspberrypi_rp1_config },
+ 	{ .compatible = "xlnx,zynqmp-gem", .data = &zynqmp_config},
+ 	{ .compatible = "xlnx,zynq-gem", .data = &zynq_config },
+ 	{ .compatible = "xlnx,versal-gem", .data = &versal_config},
+-- 
+2.47.0
+
 
