@@ -1,217 +1,176 @@
-Return-Path: <netdev+bounces-223487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98788B5951D
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:27:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF6DB594ED
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:19:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3577E17F8D5
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:27:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E12E11BC6BDE
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7860B2D640F;
-	Tue, 16 Sep 2025 11:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B679E2D47F3;
+	Tue, 16 Sep 2025 11:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B+HNJ4x+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQDbh1Va"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010016.outbound.protection.outlook.com [52.101.85.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10DE2D0626
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 11:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758022017; cv=fail; b=ksHf5lSxi3IfhOVZWSXOlMuTAT5nrDa/loJtmwMGmg0tMhA+OCTE2MDq+g8scHIVMpB/CVEZOmZmkIvb3v9kWgr9P3tqSQl8wwr858BdkHjQNM7s3VudQi+ifnwJt3ip7mTQ36maUSpEpJ1bkV7vFgB40Gb3CUjkvbBksAPm7R8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758022017; c=relaxed/simple;
-	bh=PC6cb7f+tz+jAeFgsYXnpisbFDFWS4C0HiweTeCmmC0=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=EakzSsaP1ov6vQudLQDJcRUx+mr+ZK6zlxa9Gh0vLMZdnPESZVbQKnwl73hnlbAlA6yT+DEUJOZYBtlTjKKc9r7ijRPaNSPSivuwp3VryDd1CsB0IJJ8oRuChASrNXzMSyCn8t11xy14w8sO5YktA2xgSiEzfr4P4Z55GIkrKfY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B+HNJ4x+; arc=fail smtp.client-ip=52.101.85.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tjhuqmB4uR4P4lvkfmHYFAxjTGzYTsAablyCC5wFatP8Yod9FidftYBRY+KreIjyntYo/kB596K8wPL/WtmnBMJZp9sNNSjLa9H0R3Gs0+IXDbcC8DIXgC1e3EjPd4b6SH7poPRXSrUIaBNlN2GaFlcU/+ME9bR2kjsspJJBd/1SNgR5RrqiYDjjPva+7Fg1DlnDxPykXS0ReowUjzG7U1UVj2xMKG/f6csv+9IbwnJZfSK7Dw1xRfcxE/fc1x8hK2P/asn2NlIiAIcXQa3VB6HKNVJSpm+9zFg4uBENX0NFytV3J3FeocZkWXIkNhNTzfFm+zYfFZ3Qb4hky99f6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4l3jEk/JWUQrOenLiScIhN5GCXY3tP5HTZWPcS9ayT4=;
- b=VWqmkVfWTFiJCMzIduv9s0SNOaXxKufgd4F2eDnth5PIlMOX9G0LJfYESRus3f2cAoVIPKZnQa7bJeD7s7wumiP+IZKf4bil1726tLQSohjUcr0TQCvraH9iZ5RCYDaciqtGNnS3mKIc/mhnGqqLYUfUunazd3Mtz5/VIPQHW1PAIhMOtq4CbyrIo/TjrnclBKxxrjPI7jbDha9X4utfD41pqve1hSnd3z8JSTuURTZHnvkWuL7KRS76eJ556Qcx+16jbD5rD1leE5P2uQdB/xVuWioQuhxv+8tu6Le9K5u1C8nvmb3wRs9+SMlJzDd/CXAgDIwIvPb1cCYu/PHrng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4l3jEk/JWUQrOenLiScIhN5GCXY3tP5HTZWPcS9ayT4=;
- b=B+HNJ4x+PHCTgQNIdw+0vWHG1t2sN4/ne0uf9DrhqgudPdSk6Mr8jxZwYP4C41UlPYr+CLPTSEy6TOQqd0TMZiZZYsvxPyqTPwi2q/plA2Irsvf9yg4qWZJZq9ZQOO3gnGMMtkrr2p4RaO0MyhEYVgUHArBDRGXcxz6lBc4GuJ14SoCGZsgBk2pAfG9t97ZSoA2FhNOV82zJLFw/JFRv+pSMp7P5NqDqbUHOVcBC9QVmHOLF6w3+Ut3GbO7TvQ3Ulgl7CyGO2MfKL8kpUej7dRNUj6PPBUwE8pzNBqp2/5BjOu0KGtVa4kuEf314+aiH/vmbGxHtIafrNr/ySxDW3g==
-Received: from SJ0PR13CA0179.namprd13.prod.outlook.com (2603:10b6:a03:2c7::34)
- by DS0PR12MB8416.namprd12.prod.outlook.com (2603:10b6:8:ff::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 16 Sep
- 2025 11:26:51 +0000
-Received: from SJ5PEPF000001D1.namprd05.prod.outlook.com
- (2603:10b6:a03:2c7:cafe::d4) by SJ0PR13CA0179.outlook.office365.com
- (2603:10b6:a03:2c7::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.12 via Frontend Transport; Tue,
- 16 Sep 2025 11:26:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF000001D1.mail.protection.outlook.com (10.167.242.53) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Tue, 16 Sep 2025 11:26:50 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 16 Sep
- 2025 04:26:32 -0700
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 16 Sep
- 2025 04:26:27 -0700
-References: <8ca075b0d6052511b57b07796a64c5be831b3b53.1757945582.git.petrm@nvidia.com>
- <f41661e4-a7c2-4565-8167-3eb452402133@blackwall.org>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-CC: Petr Machata <petrm@nvidia.com>, David Ahern <dsahern@gmail.com>,
-	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, Andy Roulin
-	<aroulin@nvidia.com>
-Subject: Re: [PATCH iproute2-next] ip: iplink_bridge: Support fdb_local_vlan_0
-Date: Tue, 16 Sep 2025 13:14:46 +0200
-In-Reply-To: <f41661e4-a7c2-4565-8167-3eb452402133@blackwall.org>
-Message-ID: <87ms6uprku.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707232773C3;
+	Tue, 16 Sep 2025 11:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758021539; cv=none; b=EPkEazpkFKMm/0KT7zutLn7lCrawp2HXIN2RF/Y4s40EeRJ8ZiF516E/ywXAXrOCC6+N4Oq4IglM4jqowcr1Pt84mxi4dZMzKTQfexD7zx2qksQqDnsShcFyY13zK1jZqSjua5xLJuqKsuN6GODMRsrNcgDtNa728ZOI53xjaXQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758021539; c=relaxed/simple;
+	bh=fPi2jTo0hJ6xkgxaFB3CE37jdXxU+Q3zu80o0dV1unM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oif6+3BJVrYclfn356Z4EoofjbGMmvGIipGKdVufCUNZt3hfW+73iaejBRO8hCKG2XbSAR8ku3VnnFSy45DCmxvVBb67tCvbpxpi1EbCe4NUtPjMeT7dsEczhORDjn7EFuY4ScSfkDcHVEc1NtV1pKYaft09b6mapD5XQj1j9eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQDbh1Va; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB3C2C4CEEB;
+	Tue, 16 Sep 2025 11:18:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758021538;
+	bh=fPi2jTo0hJ6xkgxaFB3CE37jdXxU+Q3zu80o0dV1unM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NQDbh1VaUF3+xG9O6//FoHCGnbQqBuJSEFwsn9AWaLs19tnsOKvOZeXgtT2Ppbvh7
+	 zDCkjUFEK2bdYgvEchH4TzeIt6kwysmCsoRqQjdVJbkIYKTZ3q04vmBlHo725QsvxO
+	 7AhrEzl52ZcqfZzj3uI7n5oA/VBZAihCXEtpKdn38X5G1vEogTg4rY1Xs4mpRx0rwL
+	 LuyuHxRxaub0nEEe9tvc8fAnssi5DcdHD1bYPfb2UJIA2PoTryL/GJ7dwW60Kxyoqy
+	 zIXqsQ3Dze7L2+355gXdYkt1Z58WO6RCsVslYfMxHuV++DyfOaya0rg/PVyTka9aHH
+	 QsrmJgW1c/GmA==
+Date: Tue, 16 Sep 2025 12:18:50 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 04/33] block: use extensible_ioctl_valid()
+Message-ID: <02da33e3-6583-4344-892f-a9784b9c5b1b@sirena.org.uk>
+References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+ <20250912-work-namespace-v2-4-1a247645cef5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D1:EE_|DS0PR12MB8416:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb3db30f-8c35-4fc1-c67f-08ddf513ee80
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mAc86H6y6umr2l4jr+pnk18pGylcUW88KNa/pzN+WOAvWLiDS3coW5EXsWO4?=
- =?us-ascii?Q?xpSjJYTUy6EtB3gk55Hf1FFh75i9TJB54zngzCE4exc1J3YDInak5PMNBT1p?=
- =?us-ascii?Q?/OlHP0wN+v12Hjk3wBmjaC/Qx1GbwiCMBEGUGW4cofCqo2V0B6cYK4AIZHuN?=
- =?us-ascii?Q?vVCyDiY88cdnY2PddvLuWArN1z6Ed1+rI7WCegXOUb8NLgyCwVkw742ymA0/?=
- =?us-ascii?Q?W/tIk2a3v5lPgiNWcQkMn0MAn23JPrn86RtTUvVCJAR9WPSAFEiaHmzzMLkY?=
- =?us-ascii?Q?W9wSMfEE/Zi4zI73Jk45Wt5n2ozysADQ0i60hLGxD50kUIhc6J3aDODWzRg6?=
- =?us-ascii?Q?gaLv/DCWHhQOo8jtqj6uACbNJ0PFHg3X+SPXCaALdKSLIfCB/Cfa7pB/BBd9?=
- =?us-ascii?Q?E6q0mFrpQ71wXKGAD+Tgo0CoQrBEsaspp4GtrxzGppL6IdssrQFQS4kn2TM5?=
- =?us-ascii?Q?f/V4NNnbFylqxlU0/tUHZ9kS2tNtglW1OgCT9ME48ii/gtxPIBHQBRyHTf4x?=
- =?us-ascii?Q?++6jjDXGzQPl0XUxpipjinkNGQZ38lfcmfj89cR1jKzNH5cW9NBXCWUIAQdl?=
- =?us-ascii?Q?nmjK66j+1p/lGMJtCPbRhUQfR6FJluml15jLyK4rMs+SEGj3eegdRSpfZLMj?=
- =?us-ascii?Q?V5zw4S6X1IMovOGNChoB9t6vW0RO/LEURLGbLXSiPchPFDhdAaHmRrPOOk1d?=
- =?us-ascii?Q?hLcEaEfd2o3KyfR6dd5J9JB6mqIIMCMzaH3ODIqt8pW3OxFYx13U0Vp1Hsbs?=
- =?us-ascii?Q?zCJARipjMwj4TBxX5zxTcCsX2hkJDQi5P4HCAQC37gPFgCRry/xrDGyCJcgu?=
- =?us-ascii?Q?NTNl0+ER4HuBghbsEyzTfSPb4dcdxoj91je3nfbUNSxKXgk7MiCFDor0//IH?=
- =?us-ascii?Q?bPoaOpGu8plFSy7cqDU3hpeQDpg0C18au+mnWsXVJQVZbVjBRl2fPCHrv40H?=
- =?us-ascii?Q?muslT5xwFFa0II7IFS1YGYXvpL2jqYJ9aidvO763XoVZML4XiGTPFdxgGWoL?=
- =?us-ascii?Q?knh0s1GGNpwi2/68fNPqrkfJzxuJ0Ptk1g2tweXhopkvqpt+M8RbRxfwYb56?=
- =?us-ascii?Q?+ee+DJD9h/Hl7OixtcW3NNCagp8eV86So7uAb/drR3J3jU/HMJhvlXdTmVv7?=
- =?us-ascii?Q?LSzkkMgLBdT21lxFb28CffRinsOyc4zO9xRuHMPbd887SXZqQryUBBU8ceoX?=
- =?us-ascii?Q?X7UNClsOwlhWBYJLIazsOwYLOHYZhGBgKRoS+/mY29zExrdqHzQeknIDdH7H?=
- =?us-ascii?Q?PSkrfueeBqvxO3XlFbntMisfq6DbqVKs5CwSfenLBxI5MLNchLEj8lskkIxe?=
- =?us-ascii?Q?cWq6UcfGiYtZyXuiFt9wgy/uMUxbNauI+bCRhtn7HV73BqAQUcXaYR5bFoc/?=
- =?us-ascii?Q?nms+rUcEICBYEDBDNqnq4bydDlq+GZaRGhoAgXdan3B4UOAhTtliM3vTN+/r?=
- =?us-ascii?Q?uwDqOxlv62Ja6dj4Tedf59wTILLDeMGJ1wu2mDfuAg3F6s0yMvCZQ5J4dgdm?=
- =?us-ascii?Q?356DVWzpaNiBU0NXpLl2L2nOEmClOcZ/Uti9?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 11:26:50.9819
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb3db30f-8c35-4fc1-c67f-08ddf513ee80
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001D1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8416
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pXrdOnUKtpdJm8VZ"
+Content-Disposition: inline
+In-Reply-To: <20250912-work-namespace-v2-4-1a247645cef5@kernel.org>
+X-Cookie: You dialed 5483.
 
 
-Nikolay Aleksandrov <razor@blackwall.org> writes:
+--pXrdOnUKtpdJm8VZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> On 9/15/25 17:21, Petr Machata wrote:
->> Add support for the new bridge option BR_BOOLOPT_FDB_LOCAL_VLAN_0.
->> Signed-off-by: Petr Machata <petrm@nvidia.com>
->> ---
->
-> Please CC me as well on bridge patches.
+On Fri, Sep 12, 2025 at 01:52:27PM +0200, Christian Brauner wrote:
+> Use the new extensible_ioctl_valid() helper which is equivalent to what
+> is done here.
 
-Sorry. I need to get into habit of running get_maintainer on the
-iproute2 patches as well.
+I'm seeing several LTP tests (at least getdents02, msync04, renameat01
+and statx12) failing in yesterday's -next pending-fixes on Raspberry Pi
+4 with bisections pointing to this commit.  renameat01 fails with:
 
->> @@ -637,6 +650,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->>   		__u32 mofn_bit = 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
->>   		__u32 mcvl_bit = 1 << BR_BOOLOPT_MCAST_VLAN_SNOOPING;
->>   		__u32 no_ll_learn_bit = 1 << BR_BOOLOPT_NO_LL_LEARN;
->> +		__u32 fdb_vlan_0_bit = 1 << BR_BOOLOPT_FDB_LOCAL_VLAN_0;
->>   		__u32 mst_bit = 1 << BR_BOOLOPT_MST_ENABLE;
->>   		struct br_boolopt_multi *bm;
->
-> nit: the block vars seem arranged in reverse xmas tree, could you please keep it?
+  renameat01    0  TINFO  :  Using /tmp/LTP_renEtNZrS as tmpdir (nfs filesystem)
+  renameat01    1  TBROK  :  tst_device.c:97: Could not stat loop device 0
+  renameat01    2  TBROK  :  tst_device.c:97: Remaining cases broken
 
-OK
+Full log for that run:
 
->>   @@ -661,6 +675,11 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr
->> *tb[])
->>   				   "mdb_offload_fail_notification",
->>   				   "mdb_offload_fail_notification %u ",
->>   				   !!(bm->optval & mofn_bit));
->> +		if (bm->optval & fdb_vlan_0_bit)
->> +			print_uint(PRINT_ANY,
->> +				   "fdb_local_vlan_0",
->> +				   "fdb_local_vlan_0 %u ",
->> +				   !!(bm->optval & fdb_vlan_0_bit));
->>   	}
->>     	if (tb[IFLA_BR_MCAST_ROUTER])
->> diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
->> index e3297c57..8bc11257 100644
->> --- a/man/man8/ip-link.8.in
->> +++ b/man/man8/ip-link.8.in
->> @@ -1725,6 +1725,8 @@ the following additional arguments are supported:
->>   ] [
->>   .BI no_linklocal_learn " NO_LINKLOCAL_LEARN "
->>   ] [
->> +.BI fdb_local_vlan_0 " FDB_LOCAL_VLAN_0 "
->> +] [
->>   .BI fdb_max_learned " FDB_MAX_LEARNED "
->>   ] [
->>   .BI vlan_filtering " VLAN_FILTERING "
->> @@ -1852,6 +1854,18 @@ or off
->>   When disabled, the bridge will not learn from link-local frames (default:
->>   enabled).
->>   +.BI fdb_local_vlan_0 " FDB_LOCAL_VLAN_0 "
->> +When disabled, local FDB entries (i.e. those for member port addresses and
->> +address of the bridge itself) are kept at VLAN 0 as well as any member VLANs.
->> +When the option is enabled, they are only kept at VLAN 0.
->> +
->> +When this option is enabled, when making a forwarding decision, the bridge looks
->> +at VLAN 0 for a matching entry that is permanent, but not added by user. However
->> +in all other ways the entry only exists on VLAN 0. This affects dumping, where
->> +the entries are not shown on non-0 VLANs, and FDB get and flush do not find the
->> +entry on non-0 VLANs. When the entry is deleted, it affects forwarding on all
->> +VLANs.
->> +
->
-> Please add what is the default.
+  https://lava.sirena.org.uk/scheduler/job/1830765#L6680
 
-OK
+bisect log for renameat (all the bisects cover the same builds, though I
+split the jobs up so it's different test jobs for some of the tests):
+
+# bad: [179688318d56cee63802eb49e3503d799c43db6c] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+# good: [f83ec76bf285bea5727f478a68b894f5543ca76e] Linux 6.17-rc6
+# good: [690aa09b1845c0d5c3c29dabd50a9d0488c97c48] ASoC: Intel: catpt: Expose correct bit depth to userspace
+# good: [3254959b4dd065eae396cf78ccc1361460b2f53e] ASoC: amd: amd_sdw: Add quirks for some new Dell laptops
+# good: [9004a450fccbeb40a71cc173747da37a459fd4dc] ASoC: codecs: lpass-wsa-macro: Fix speaker quality distortion
+# good: [ec630c2c8ce215dd365b8c3644f004f645714a0f] ASoC: SDCA: Reorder members of hide struct to remove holes
+# good: [68f27f7c7708183e7873c585ded2f1b057ac5b97] ASoC: qcom: q6apm-lpass-dais: Fix NULL pointer dereference if source graph failed
+# good: [0c28431f6fe13f3a3be0978f79c1a7ae8a93d028] ASoC: SOF: imx: Fix devm_ioremap_resource check
+# good: [28edfaa10ca1b370b1a27fde632000d35c43402c] ASoC: SDCA: Add quirk for incorrect function types for 3 systems
+# good: [35fc531a59694f24a2456569cf7d1a9c6436841c] ASoC: SOF: Intel: hda-stream: Fix incorrect variable used in error message
+# good: [9b17d3724df55ecc2bc67978822585f2b023be48] ASoC: wm8974: Correct PLL rate rounding
+# good: [f54d87dad7619c8026e95b848d6ef677b9f2b55f] ASoC: rt712: avoid skipping the blind write
+git bisect start '179688318d56cee63802eb49e3503d799c43db6c' 'f83ec76bf285bea5727f478a68b894f5543ca76e' '690aa09b1845c0d5c3c29dabd50a9d0488c97c48' '3254959b4dd065eae396cf78ccc1361460b2f53e' '9004a450fccbeb40a71cc173747da37a459fd4dc' 'ec630c2c8ce215dd365b8c3644f004f645714a0f' '68f27f7c7708183e7873c585ded2f1b057ac5b97' '0c28431f6fe13f3a3be0978f79c1a7ae8a93d028' '28edfaa10ca1b370b1a27fde632000d35c43402c' '35fc531a59694f24a2456569cf7d1a9c6436841c' '9b17d3724df55ecc2bc67978822585f2b023be48' 'f54d87dad7619c8026e95b848d6ef677b9f2b55f'
+# test job: [690aa09b1845c0d5c3c29dabd50a9d0488c97c48] https://lava.sirena.org.uk/scheduler/job/1805508
+# test job: [3254959b4dd065eae396cf78ccc1361460b2f53e] https://lava.sirena.org.uk/scheduler/job/1769788
+# test job: [9004a450fccbeb40a71cc173747da37a459fd4dc] https://lava.sirena.org.uk/scheduler/job/1774162
+# test job: [ec630c2c8ce215dd365b8c3644f004f645714a0f] https://lava.sirena.org.uk/scheduler/job/1772919
+# test job: [68f27f7c7708183e7873c585ded2f1b057ac5b97] https://lava.sirena.org.uk/scheduler/job/1772831
+# test job: [0c28431f6fe13f3a3be0978f79c1a7ae8a93d028] https://lava.sirena.org.uk/scheduler/job/1762707
+# test job: [28edfaa10ca1b370b1a27fde632000d35c43402c] https://lava.sirena.org.uk/scheduler/job/1762245
+# test job: [35fc531a59694f24a2456569cf7d1a9c6436841c] https://lava.sirena.org.uk/scheduler/job/1762959
+# test job: [9b17d3724df55ecc2bc67978822585f2b023be48] https://lava.sirena.org.uk/scheduler/job/1758830
+# test job: [f54d87dad7619c8026e95b848d6ef677b9f2b55f] https://lava.sirena.org.uk/scheduler/job/1758090
+# test job: [179688318d56cee63802eb49e3503d799c43db6c] https://lava.sirena.org.uk/scheduler/job/1830765
+# bad: [179688318d56cee63802eb49e3503d799c43db6c] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+git bisect bad 179688318d56cee63802eb49e3503d799c43db6c
+# test job: [4c3c40178b0e1578a3898092cc33ffb2618edc51] https://lava.sirena.org.uk/scheduler/job/1830986
+# good: [4c3c40178b0e1578a3898092cc33ffb2618edc51] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/zonefs.git
+git bisect good 4c3c40178b0e1578a3898092cc33ffb2618edc51
+# test job: [78ca913586336540ec12f262c5bdf16f8925de82] https://lava.sirena.org.uk/scheduler/job/1831233
+# bad: [78ca913586336540ec12f262c5bdf16f8925de82] Merge branch 'vfs.all' of https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+git bisect bad 78ca913586336540ec12f262c5bdf16f8925de82
+# test job: [06dd3eda0e958cdae48ca755eb5047484f678d78] https://lava.sirena.org.uk/scheduler/job/1831745
+# good: [06dd3eda0e958cdae48ca755eb5047484f678d78] Merge branch 'vfs-6.18.rust' into vfs.all
+git bisect good 06dd3eda0e958cdae48ca755eb5047484f678d78
+# test job: [a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0] https://lava.sirena.org.uk/scheduler/job/1832263
+# bad: [a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0] Merge patch series "ns: support file handles"
+git bisect bad a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0
+# test job: [670f2f915084d1c53f14d59946011b7645601813] https://lava.sirena.org.uk/scheduler/job/1832304
+# bad: [670f2f915084d1c53f14d59946011b7645601813] nstree: make iterator generic
+git bisect bad 670f2f915084d1c53f14d59946011b7645601813
+# test job: [011090b6c0a97a3aa1f659d670d85bbf0eddbe06] https://lava.sirena.org.uk/scheduler/job/1832355
+# bad: [011090b6c0a97a3aa1f659d670d85bbf0eddbe06] cgroup: use ns_common_init()
+git bisect bad 011090b6c0a97a3aa1f659d670d85bbf0eddbe06
+# test job: [60949057a2e71c9244e82608adf269e62e6ac443] https://lava.sirena.org.uk/scheduler/job/1832402
+# bad: [60949057a2e71c9244e82608adf269e62e6ac443] block: use extensible_ioctl_valid()
+git bisect bad 60949057a2e71c9244e82608adf269e62e6ac443
+# test job: [4d906371d1f9fc9ce47b2c8f37444680246557bc] https://lava.sirena.org.uk/scheduler/job/1832439
+# good: [4d906371d1f9fc9ce47b2c8f37444680246557bc] nsfs: drop tautological ioctl() check
+git bisect good 4d906371d1f9fc9ce47b2c8f37444680246557bc
+# test job: [f8527a29f4619f74bc30a9845ea87abb9a6faa1e] https://lava.sirena.org.uk/scheduler/job/1832550
+# good: [f8527a29f4619f74bc30a9845ea87abb9a6faa1e] nsfs: validate extensible ioctls
+git bisect good f8527a29f4619f74bc30a9845ea87abb9a6faa1e
+# first bad commit: [60949057a2e71c9244e82608adf269e62e6ac443] block: use extensible_ioctl_valid()
+
+--pXrdOnUKtpdJm8VZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjJR5kACgkQJNaLcl1U
+h9CJ4Af+ISZ3lljoI72V72kUBKwG6lq4beym3VICH+8DyjBOtQJqkqIE5OlcUns9
+gY6sqsqpxxIvI+a6v6GPW0eqWuAu36UuvdqjURrMubJCQi6zeT4lYVIgcioh4U4G
+FWmhUV1LC5FGYKc7KfibPRCcggsT/XKqMH88jkIfAYSUiQHyuMZMaiA+vNDdVDK+
+f3ZZj6bKcB6h0wVse+BUtM5+Ha+RIzS4bpK9JNzJqV3pHra6Yg3myz2sd46lT4mg
+5K5amhS9uYN26RZGTr3ioMhuGUywjeyWsLccmtBq/fG+bofT1tEReGLdVC9fsvOO
+wPu0MoWdSMaeA2rJE/z5wrxA2nePqA==
+=6jkN
+-----END PGP SIGNATURE-----
+
+--pXrdOnUKtpdJm8VZ--
 
