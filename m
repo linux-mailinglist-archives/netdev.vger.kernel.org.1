@@ -1,91 +1,86 @@
-Return-Path: <netdev+bounces-223392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68DCB58FF1
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:03:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F38BB59007
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8030169F06
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:03:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C082D1BC2878
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D12128504C;
-	Tue, 16 Sep 2025 08:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFEFF28134C;
+	Tue, 16 Sep 2025 08:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ByIbdWfq"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lGPYHXI1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01188283CA7
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 08:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE1221771B
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 08:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758009834; cv=none; b=ny4ugyuDrUYS3Ka7PCYd5sqdyMpEvrXiUipiVWvXJWbtO0WL6TVnNTiriA9PIDeZKXDLLvxf2fpN4U5qyvgytAFlQYWAAIZkr6TvOIM5lnsJyvEbWqw71TlhueThSp2PpuIX+8/XmnL8pABQKuv4OQWYJD6K4S9ac62yPQ5GLqE=
+	t=1758010091; cv=none; b=smWRWkXtrdrVK6O2v3bhvNJz+NlYe5gMXokj481PfgSSKfo5mzg3pP+gQnl5iRGdy4KGLvcdEvnCnlaR88eMeaQJ2P6Pp3P0cf+wK/XFHDwOcWj9SugTqMBZlX8R9MnYmAgSbz+1DMwmJVmW1BHxmnqyhULMil0AKOc9pU+2zrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758009834; c=relaxed/simple;
-	bh=7S3jMA6dJvBpqjiAp8xNW4/IJhcKzItPBV2TuC3nQuY=;
+	s=arc-20240116; t=1758010091; c=relaxed/simple;
+	bh=MKTbJcLjCW/fqxMN70uHFxtQsKlUBxG66gfkmkYNLMo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C7Vm/0ZcGwbpIl4vLYVXATouXKtPRb7hpuifXjyh+CHFJU8DwWcmHKVM0h0NO4zEeM0+2SvdcosKIyQ1M1fdccEZHdGtWm0wDdazjnQKbQh73unDUST2Sg9NATtfRTVSzgY/dDVlaeGd+E3FWkbjE7k0tWADiZ4g6eAPISy/2TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ByIbdWfq; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-45f2a662690so4396405e9.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:03:52 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ccE9ezxBlt6tJo/vX2pYkAB6DR/1I/lwj1FzeHaRWKcAvBuTLuwDNZ5TRCjqw4fhfHCOYkfYKv3FxFeCPyBJCfCqyAFMLGglr4AuNr21ZesU2Jjq1/wqppWArkWkW1nJQNgNeEHHwTvuH17FcyMNOASxr8MsYeoG9ER3EsJgfp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=lGPYHXI1; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6228de280a4so2238086a12.2
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:08:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758009831; x=1758614631; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1758010088; x=1758614888; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GtiZrewOUJmbmN1btTpjme1msV4pbF4XenzrEJ4Aw0A=;
-        b=ByIbdWfq3m2eID/Eidj6z7cDrxWKXbxrzv7mQDt/b/ETgKM1op7E7qSF1ccyFvPwho
-         RMFAH1Hf0C8kj8jBO6Oq2KyW/RdQJgU4YDb1Ht0eL4bl0sR9XBRCQ1/dMPkDjSFyNYZG
-         5mJxHWHldrmFyehNq41dQO3ej+Fl1hrXf8u+/ButRZyL3+lQLuVdlY99mAVyplBaaAKE
-         BYvLUVFye3wEJHGRKzkmpE6HOem0Dhny+aw1TXa6pmzj47A/Bx+ohvfoRZ1+NbNl1ixR
-         D4IUGMff4mZPXwVIiKU+VY5+9a21qECcbCt2JEVeDa8Axor2dV/ZY/NGweF2kzSARGaZ
-         UQoA==
+        bh=MKTbJcLjCW/fqxMN70uHFxtQsKlUBxG66gfkmkYNLMo=;
+        b=lGPYHXI1A35HI4A9UNAwec3VE2P0dy+WJYFqvDAiKmH2qokbm11YUi2swPmd9V06e0
+         F3ydnEL4v7MyEvw/kVAJdPupn2YILz+5l5SzCL+tkUM3qdcXa8r9jAFFgmzk9PeiKOgA
+         AFA7OiXlDJuoWu5BMKqLpMVgzGI6hRIUQGqPhzgA8Q2ytczHbJtnjsduxcTJbij718sm
+         kp7ypm3TL9zab8A/fkXVhfIDmaWtCB++mlK/afoM8vT0/lfmhme8ZZgDl9k29faeCWOC
+         i3KP3KlLm7nRLLgMcPPx7BW09aqoLRxF8srj3fNFczPQvngJ1TS5WQ8hsqBJ4OP/dFqx
+         c9JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758009831; x=1758614631;
+        d=1e100.net; s=20230601; t=1758010088; x=1758614888;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GtiZrewOUJmbmN1btTpjme1msV4pbF4XenzrEJ4Aw0A=;
-        b=jK4omXNCL/KVHX0gOqdvfTRNgnfnX3Ic+wju+OdDExe2TPdR0HGFb8rpzBXg9P2E5z
-         iEbkYQ7ONdDVOWewjvj5pCjzFhaD5QVx+igLKMdhsK/1lUBVjwhHHL4+tngIci0iftQS
-         LYu/Yua2GTYyujVkbpfFy0SKBzcJrNoytNc/+Zuk/yagiFAj4d/Ens5MM8e66V/WG6Uc
-         Oa8B2xgnK/lZZvUnL6ab+QmpigslzVcXL7aEXBp+pzR0ues9COKmUgOWv/2uUlCPKt3f
-         uGpvVa0CwefGbQNmzFkkKsXeD5BasSfn9V8ZDH+2Q7qMlI8Ix5ggF2RLDSAwK9HEzbMl
-         SVhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZn6hhnM7YXHUzp+0KEULmqHyBf9gdL8DT+07D4PobLRoBB1TjjTVHnCQVAxe3NffWpepHYIc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqFFA7H2CQlASjimjr7xT+easJac0JygTYF1jjFP4RFyL6yTvs
-	EtxAAoQVMyqDx2cXZPG6YvoJ23WSmf0fTXX8dhVxbbS2U+MU+GjWBuio
-X-Gm-Gg: ASbGncs455fvNvQ8T6QdiC242Dk5imzoPDhmylPzVODSKEOjO4AvXan804gIM+jxxmP
-	jSyc6zu5hj1txv920zSKiBbdi+j+G6SkROo2v93RVZZqouMyGYJOh5Pt7FWO0I10zucTvc2+tlT
-	sq83/NJINwIt+aVirfcvbmq152GOtJAbzfKqqcdm1jzCjxMKrbVQ1swg6ks+R1SrPj4ZzLVQO/v
-	oXtfStaBefWDqER0vO3bUUfIl7hfyg+ZU0yihhmVPL4YJxLPnAne7Gv1j1an4xUkV4CL2Cmhq0C
-	3X7o4MORArSSf56Lz1n6Wbyd5crA6fI2+ot5pK6dVcciES7H7EOOvqlPrxoF6h/YekGxpZGHEZ6
-	vPwIpwb1S1Mi81vM=
-X-Google-Smtp-Source: AGHT+IGxAN9w5hc1ITa0m9lg8ARwDzqbXi5jTCZPBqSCCmcVl7KsJCQq/5+dONFfwUDlB7tpQlHPhQ==
-X-Received: by 2002:a05:600c:5303:b0:45d:d5bb:5b8c with SMTP id 5b1f17b1804b1-45f29b1295emr50748135e9.0.1758009831194;
-        Tue, 16 Sep 2025 01:03:51 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:2310:283e:a4d5:639c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e9cf04db65sm9554619f8f.3.2025.09.16.01.03.49
+        bh=MKTbJcLjCW/fqxMN70uHFxtQsKlUBxG66gfkmkYNLMo=;
+        b=H1e+510QYRG3oXTZN8BsvDZoC7rhryfX8ywj5WHPfU0yzvNNTcLZgW3OOver9KFuk+
+         xr5dw85zYATNKN06wa0ZZ8RKXXq9jsUqRxbSlvJpLnOezkOzWvEX3qgOEHB8x9DdJwMe
+         Rp/LFl0SCvHa6FVlWn3TgM+AXLXv/bKpmYfyho4OCSvZ75t54SdX9SRIaL9gK+kVudVX
+         SPbn/JB7vXzwGjEjlYXVcV43S8c8bcYYvO73a1+/i8uRhq4mEme+mD9Tw0VHXt1z2W2V
+         Ggj7DziSAjq+gjpIbFgxLaSEWNb2JyyCG8mfMcLFrYUtlOHi4qj5lfUVmvFOj17l98Jo
+         SYIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfh76edbYFqbQUizudHxbG9Fn0G2/O+eou7eQLGtuG3MVWgpsJuP4t/ggUj5SCJwG7p6gH0l4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwl6sB3xKw/+j/z7SEqDmjctQfQqDt/E24J34LwEjYpH0sjq2u
+	bRneYCGtf3/l2H3ibeSB0FNy9A0H5jBuUVsgXRgIgfs7Q4rWPFATQYi5vKvB5GfM6no=
+X-Gm-Gg: ASbGncscMqQ9QjFUcNAghVS1kqs4eYjKodlLHOoHPk7tkvcgcPp5s2YOfxqBTfNjOsG
+	bAAhf783ZT6wn37kYeyJErci+sQ4OQZCANlxKgRhS9GEalOpI6y91j8GmvleJuAlBczM27Bm8Xs
+	kltBjz2VlHHFrfJ5VLWTCg1kEgNyeUqKCRhfX13TXtq6kIhZqFG62aXznTyKNM6IHvcvuq3aC6f
+	IeD2m4nwtzyRIe0X6JteUDocwfdlMQXkWfBaJr9P+vYJSuX8aJ4hwwRATFuaIqobz5wNXvN0Ite
+	LSKH3fvTDDyjb76R/932QhprEdyCeIvhlQiyJKsnduU1snyhxFtpVB7pqzmEWDiChriUNDOiMi2
+	koAE8c8dzA37LPqDwbcKo/Gc=
+X-Google-Smtp-Source: AGHT+IHiA7pzhRGLyXgIXCLENujiL8QEpIiWV80zYUtRJoUbdl+04OsaBCFNoanpg5Y9cxK04kHKVA==
+X-Received: by 2002:a05:6402:4603:b0:62f:6068:db4e with SMTP id 4fb4d7f45d1cf-62f6068df80mr2032807a12.32.1758010084796;
+        Tue, 16 Sep 2025 01:08:04 -0700 (PDT)
+Received: from jiri-mlt ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62f2b2a8c38sm4957713a12.31.2025.09.16.01.08.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 01:03:50 -0700 (PDT)
-Date: Tue, 16 Sep 2025 11:03:47 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: clean up PTP clock during
- setup failure
-Message-ID: <20250916080347.es66wv7esea6v4oc@skbuf>
-References: <E1uy84w-00000005Spi-46iF@rmk-PC.armlinux.org.uk>
- <E1uy84w-00000005Spi-46iF@rmk-PC.armlinux.org.uk>
+        Tue, 16 Sep 2025 01:08:04 -0700 (PDT)
+Date: Tue, 16 Sep 2025 10:08:02 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com
+Subject: Re: [PATCH net] MAINTAINERS: make the DPLL entry cover drivers
+Message-ID: <i5nxymuun6x5nahiqcs2dcjk4je7b35ve4jbhoyk2tcxquutze@emtogwrmgc6f>
+References: <20250915234255.1306612-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,33 +89,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1uy84w-00000005Spi-46iF@rmk-PC.armlinux.org.uk>
- <E1uy84w-00000005Spi-46iF@rmk-PC.armlinux.org.uk>
+In-Reply-To: <20250915234255.1306612-1-kuba@kernel.org>
 
-On Mon, Sep 15, 2025 at 01:13:06PM +0100, Russell King (Oracle) wrote:
-> If an error occurs during mv88e6xxx_setup() and the PTP clock has been
-> registered, the clock will not be unregistered as mv88e6xxx_ptp_free()
-> will not be called. mv88e6xxx_hwtstamp_free() also is not called.
-> 
-> As mv88e6xxx_ptp_free() can cope with being called without a successful
-> call to mv88e6xxx_ptp_setup(), and mv88e6xxx_hwtstamp_free() is empty,
-> add both these *_free() calls to the error cleanup paths in
-> mv88e6xxx_setup().
-> 
-> Moreover, mv88e6xxx_teardown() should teardown setup done in
-> mv88e6xxx_setup() - see dsa_switch_setup(). However, instead *_free()
-> are called from mv88e6xxx_remove() function that is only called when a
-> device is unbound, which omits cleanup should a failure occur later in
-> dsa_switch_setup(). Move the *_free() calls from mv88e6xxx_remove() to
-> mv88e6xxx_teardown().
-> 
-> Note that mv88e6xxx_ptp_setup() must be called holding the reg_lock,
-> but mv88e6xxx_ptp_free() must never be. This is especially true after
-> commit "ptp: rework ptp_clock_unregister() to disable events". This
-> patch does not change this, but adds a comment to that effect.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
+Tue, Sep 16, 2025 at 01:42:55AM +0200, kuba@kernel.org wrote:
+>DPLL maintainers should probably be CCed on driver patches, too.
+>Remove the *, which makes the pattern only match files directly
+>under drivers/dpll but not its sub-directories.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Acked-by: Jiri Pirko <jiri@nvidia.com>
 
