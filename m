@@ -1,199 +1,183 @@
-Return-Path: <netdev+bounces-223557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F4083B598EE
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:11:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03CBB598F7
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B70CE18849E2
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:08:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D0A8464DD5
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82758324B01;
-	Tue, 16 Sep 2025 14:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6873F3431E6;
+	Tue, 16 Sep 2025 14:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7oRb/Fn"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="X03ZJERA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17863315D5C
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 14:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5062129E6E;
+	Tue, 16 Sep 2025 14:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758031321; cv=none; b=VcKQpjN6dW0X4qmVv7ASKjZ6ALPyVyMvLnu+6SadZFzapKT4VrBXE44IQkwJqbzWhw+/e8mw+mI4atAA0eYMlMSoNM7QGcQTXAQzz3lg/Zrx2yMvCuS84FuzBrNXFtWkPik3YZYhkpuN5uhZkJPIjmJsi/qW0LzHplb/kX9hOuE=
+	t=1758031428; cv=none; b=JwUDG0TneVLuOt0Gx2+luPIhKJ2JI1gSwfPEnrezTp5ZPdTZO7f3YfD8vn0OebxRxcUHus/yqaBiGmgvGwPLN5pk87FCsigooIRRCiUsp8qRTQoduZ74XucOcHq2sx8CTasr5dXLa7KzE4kELD6GdooIO0QxOYgqnO9i0lNMvdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758031321; c=relaxed/simple;
-	bh=jxnqzczZbbOSMi5t02loBOLyXo7kXtt+w3BDV7IeZfY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EBHoEVeKiUQygg8u0q44C8NbwCh4VlBMBlOGA9d4u7mQimKYiU24N7H2hY9b8vu6VkHZs5LL+/9fQnyUuQeS7H3WD7McTTiihUPphlYbK3aJGXpkaNtDfDN5PxygpDrgfMbffqygMbgOqK/3YI3yFrnL72LUbV/TxBE1eUxLYsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7oRb/Fn; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b0473327e70so308156166b.3
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 07:01:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758031316; x=1758636116; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+1/wO2aa6vwf2RnAiZIcGlD55m2MeNlNGw0Ms6XcA88=;
-        b=b7oRb/FngBaBg8MUVyrJJyt3CErG5S7LRVYKHdpUNyqBj5C3NkLGvr0zF/RONe/Snp
-         hmYd6LLOygfIAW4q0sU9NW5KpMm8SWEL8xFIuoZgVkqmrk771wKAvfZryrFEydSI20fI
-         OwxF97041wPP/MgCpEQzxPzgg3l3BRptyfqLtNZawMQbmvl0tr/o3RQbQQ1/+128bHtQ
-         TV+mga7aqVK5MpSbk8srbanZh+UAtOLqZBO0xg4I0A1FniGvilPe4c438ns8r6kDjuk8
-         RIQ5WzL/KIR40KyXy04Au3fqVYXoi8pdNHGRmo9/0ZCEdD9LKViODumUAVgTp9ESSOCI
-         ODkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758031316; x=1758636116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+1/wO2aa6vwf2RnAiZIcGlD55m2MeNlNGw0Ms6XcA88=;
-        b=hc5LGReVJZkXAODwpVJMbaLwspqNLCmTrK+71gmefgDc7+IWVYSk8w5G+I+/Q4qxVS
-         AQm6918Lr1eSD60JMazwd38DrzwTfku2TcwgRCU1+xTlTOtSfSN3VeZnEvs/fh28PO9D
-         OGKGftId9dl9OodA2RNKmAPRtmwrS6N4vaZsUEOBoslswAZEuSBtdzJaaRkeO3rff5z/
-         8T4WFg5lZ/u3iKVaK0a1wFb8iVtoV3WrGRgAoTEpaAwvg9vxwnbr+Kzv2aJiy+Ve42If
-         sSP2gfmOljpxufUwms8go6tHTRULpv9E7+fP8oG2bNv4KJ8W/kqpXnuvQN5zmOyH6KWA
-         A1DA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ8tX56KLJA7IZcMMmJlpFgUSuqofIwvapaiHkZe0KJpfL7Uok7jgDeKMrX67iJ+RQ6v0Vvco=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZdstT3Q+3d9XhEW4ahCRAdcckLx7FIB+CXGk09VjQxuwj2nLc
-	3V9YSunEJKcvdmHKafFxx2paBj+vkjzNlUmpgsfPLEU0dUplK7sUO5qtkPnVA3lO4VX6QPJvCWm
-	XZP5AgSwdWSSCYkE1pCzA0JsBp5ZdEE4=
-X-Gm-Gg: ASbGncv/aGFDSa/ZgIZJ24xXMvysdfB8UeZxEHWYMGQqPehwZvXaask+iI0mDH3e9m+
-	M7N4xTuK3NXcRRcJYLZjMCPWSxffIzrxR6jDiCI9t73HpsNcbYD7tvOkRn6VCvcNMK5z4nIuxU3
-	z5+TU2OpDcc8fJ9MfiBDGoOufE/GSbQMTMR4CD29ig4FVQjqXzY5kXsU8LtYUqxUzy0BjnnZIZc
-	SKc7v2y
-X-Google-Smtp-Source: AGHT+IF6Zy4nzr1OXuX8lE0GqEoG4kJn0jZymLRdcAOKhzS2jAVa02oHblL7nubcp0VuU3f+RU4UUOjge2+K+7voqcc=
-X-Received: by 2002:a17:907:9629:b0:afd:d994:7d1a with SMTP id
- a640c23a62f3a-b07c3ada566mr1656686866b.63.1758031315726; Tue, 16 Sep 2025
- 07:01:55 -0700 (PDT)
+	s=arc-20240116; t=1758031428; c=relaxed/simple;
+	bh=jDkzduPIFAj6tQpA9LK703PSOe4qFHKJ6yj+8XUz7U4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=q8ZTogQhAU9wRDQai+xOH5Vvctj/L1NCsSlUy97Q81u79jJ5goKIOzL/THfaAw9L7nsMO0WRLTS4kKNVLnoS1JjMa8wrLY1OMHtGANO19ey5p+uP7n70A+dLfvJ9lapo7YZ/v048ijnbGitqQnKt2yntTDvKB4/o2Roknxu8oRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=X03ZJERA; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58GAmwKL021429;
+	Tue, 16 Sep 2025 14:03:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	6X4Oo9dw265PURxeYMUaHsX4sLsJPuBPvb+0hPhB0tw=; b=X03ZJERAb6N+nykO
+	fRhY76URm/EZRth1agRZGE+rmcUE0A8iieizzc7LMY61aORwVFv4jx5sPQiqn8PM
+	LB3F3scF2PRfbAxdef75VtJFXwB9TUByWNjGmUdT9HDx3J/PPMSZQa17gJNT7w9O
+	ztT31JoyjV/2tAQ24qj3EwzKu8cWXpenI/qJSGPtMfXnS2YZsMBw4Ztm1jsQ6Wdm
+	UEMAanrQ4ZjdrwPXf17KUbxwLXBo9BVremMaIRqhOYxpwMh4kt8llEVyGD6YEdDg
+	Fp6Ehbjyrk7JBL1YqIFhuINTmzto00p3+U05za7REZLW+kP//hoDurAu/3cgrJ8K
+	VKyS1g==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 494yma92qj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 14:03:26 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 58GE3Ppj030456
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 14:03:25 GMT
+Received: from [10.253.73.4] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.24; Tue, 16 Sep
+ 2025 07:03:18 -0700
+Message-ID: <1e7d7066-fa0b-4ebc-8f66-e3208bb6f948@quicinc.com>
+Date: Tue, 16 Sep 2025 22:03:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250908105901.3198975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250908105901.3198975-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <aMlgg_QpJOEDGcEA@monster> <CAMuHMdXWVXd5FauMYNq0yXgQa87F4Z9HcGOu2O_ercQg48GNoQ@mail.gmail.com>
-In-Reply-To: <CAMuHMdXWVXd5FauMYNq0yXgQa87F4Z9HcGOu2O_ercQg48GNoQ@mail.gmail.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 16 Sep 2025 15:01:28 +0100
-X-Gm-Features: AS18NWCVgZqFQH49bSZ6oVph3-y6Eo3LOyTc2vGW-dgo3A64cLzcN5-yV35knnc
-Message-ID: <CA+V-a8snd9Qeb_Fbj=_E6Y28EUV-ad+PO=cZcWrZ2F1_RwscGw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: dwmac-renesas-gbeth: Add
- support for RZ/T2H SoC
-To: Anders Roxell <anders.roxell@linaro.org>, Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 02/10] dt-bindings: clock: Add required
+ "interconnect-cells" property
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Konrad Dybcio
+	<konrad.dybcio@oss.qualcomm.com>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        "Varadarajan
+ Narayanan" <quic_varada@quicinc.com>,
+        Georgi Djakov <djakov@kernel.org>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Anusha Rao <quic_anusha@quicinc.com>,
+        "Manikanta Mylavarapu" <quic_mmanikan@quicinc.com>,
+        Devi Priya
+	<quic_devipriy@quicinc.com>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        "Richard
+ Cochran" <richardcochran@gmail.com>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_leiwei@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_suruchia@quicinc.com>
+References: <20250909-qcom_ipq5424_nsscc-v5-0-332c49a8512b@quicinc.com>
+ <20250909-qcom_ipq5424_nsscc-v5-2-332c49a8512b@quicinc.com>
+ <20250912-nocturnal-horse-of-acumen-5b2cbd@kuoka>
+ <b7487ab1-1abd-40ca-8392-fdf63fddaafc@oss.qualcomm.com>
+ <0aa8bf54-50e4-456d-9f07-a297a34b86c5@linaro.org>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <0aa8bf54-50e4-456d-9f07-a297a34b86c5@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAxOSBTYWx0ZWRfX+9fniE3pPWHB
+ OK1mPcvWK39tjQpXeg8MT+BqotrnwWTpPXA47FselkKhjNIKTmvcDr6saYw99d/BVXIJhsDfVHF
+ etU73HHUoARWi+cuEUe8kEn/BU/2eceCg7Dbb0SjbIcoVuKZE1W1IK8KPMGTthcJmUCAYXaTF1g
+ CmoetI2YNTVgs5IaaRvgpKChIoq4svHTMffGrXGdZIM0MujvmF6vY7J7V3QxNTTGFqDPzFmCGEI
+ FHPXtmj2Ll8giOhyYfxfJVLYTozy2RMuteHsZySMVg/01HkUkCTYqjMQEWhrDxlCKGaIePm2pnm
+ H8rVrDGCmQCoIF0paiVaQAAOxAw2TzK20GcvInI19G3+HEPn0mvLaecbopPySZGzt01qjn9umyu
+ 9KiSVr3P
+X-Authority-Analysis: v=2.4 cv=cdTSrmDM c=1 sm=1 tr=0 ts=68c96e2e cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10
+ a=gKVqG3yGxRJGUVRL1-wA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: LvqLRf81n_ETBpixAjO1G1xzpO7c-pka
+X-Proofpoint-GUID: LvqLRf81n_ETBpixAjO1G1xzpO7c-pka
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 phishscore=0 priorityscore=1501 adultscore=0 suspectscore=0
+ bulkscore=0 impostorscore=0 spamscore=0 malwarescore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2509130019
 
-Hi Andres and Geert,
 
-On Tue, Sep 16, 2025 at 2:31=E2=80=AFPM Geert Uytterhoeven <geert@linux-m68=
-k.org> wrote:
->
-> Hi Anders,
->
-> On Tue, 16 Sept 2025 at 15:05, Anders Roxell <anders.roxell@linaro.org> w=
-rote:
-> > On 2025-09-08 11:59, Prabhakar wrote:
-> > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > >
-> > > Extend the Renesas GBETH stmmac glue driver to support the RZ/T2H SoC=
-,
-> > > where the GMAC is connected through a MIIC PCS. Introduce a new
-> > > `has_pcs` flag in `struct renesas_gbeth_of_data` to indicate when PCS
-> > > handling is required.
-> > >
-> > > When enabled, the driver parses the `pcs-handle` phandle, creates a P=
-CS
-> > > instance with `miic_create()`, and wires it into phylink. Proper clea=
-nup
-> > > is done with `miic_destroy()`. New init/exit/select hooks are added t=
-o
-> > > `plat_stmmacenet_data` for PCS integration.
-> > >
-> > > Update Kconfig to select `PCS_RZN1_MIIC` when building the Renesas GB=
-ETH
-> > > driver so the PCS support is always available.
-> > >
-> > > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com=
->
-> > > ---
-> > > v2->v3:
-> > > - Dropped passing STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP flag in stmmac_fl=
-ags
-> > >   as it is always set for all the SoCs.
-> > > - Updated Kconfig to include RZ/T2H and RZ/N2H.
-> > >
-> > > v1->v2:
-> > > - No changes.
-> >
-> > The following warning is seen when doing a defconfig build (make
-> > defconfig) for arm64 on the Linux next-20250915 tag.
-> >
-> > First seen on next-20250915
-> > Good: next-20250912
-> > Bad: next-20250915
-> >
-> > Regression Analysis:
-> > - New regression? yes
-> > - Reproducibility? yes
-> >
-> > Build regression: WARNING: unmet direct dependencies detected for PCS_R=
-ZN1_MIIC
-> >
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> >
-> > This is the build warning:
-> > WARNING: unmet direct dependencies detected for PCS_RZN1_MIIC
-> >   Depends on [n]: NETDEVICES [=3Dy] && OF [=3Dy] && (ARCH_RZN1 [=3Dn] |=
-| COMPILE_TEST [=3Dn])
-> >   Selected by [m]:
-> >   - DWMAC_RENESAS_GBETH [=3Dm] && NETDEVICES [=3Dy] && ETHERNET [=3Dy] =
-&& NET_VENDOR_STMICRO [=3Dy] && STMMAC_ETH [=3Dm] && STMMAC_PLATFORM [=3Dm]=
- && OF [=3Dy] && (ARCH_RENESAS [=3Dy] || COMPILE_TEST [=3Dn])
-> >
-> > WARNING: unmet direct dependencies detected for PCS_RZN1_MIIC
-> >   Depends on [n]: NETDEVICES [=3Dy] && OF [=3Dy] && (ARCH_RZN1 [=3Dn] |=
-| COMPILE_TEST [=3Dn])
-> >   Selected by [m]:
-> >   - DWMAC_RENESAS_GBETH [=3Dm] && NETDEVICES [=3Dy] && ETHERNET [=3Dy] =
-&& NET_VENDOR_STMICRO [=3Dy] && STMMAC_ETH [=3Dm] && STMMAC_PLATFORM [=3Dm]=
- && OF [=3Dy] && (ARCH_RENESAS [=3Dy] || COMPILE_TEST [=3Dn])
-> > I: config: PASS in 0:00:01.592356
->
-> Thanks for your report!
->
->     config DWMAC_RENESAS_GBETH
->         depends on OF && (ARCH_RENESAS || COMPILE_TEST)
->         select PCS_RZN1_MIIC
->
->     config PCS_RZN1_MIIC
->         depends on ARCH_RZN1 || ARCH_R9A09G077 || ARCH_R9A09G087 || COMPI=
-LE_TEST
->
-> "ARCH_RENESAS" is wider than "ARCH_RZN1 || ARCH_R9A09G077 || ARCH_R9A09G0=
-87".
-> I would just change the latter to ARCH_RENESAS.
->
-Thank you both. I'll create a patch updating it to use `ARCH_RENESAS`.
 
-Cheers,
-Prabhakar
+On 9/12/2025 5:16 PM, Krzysztof Kozlowski wrote:
+> On 12/09/2025 11:13, Konrad Dybcio wrote:
+>> On 9/12/25 9:04 AM, Krzysztof Kozlowski wrote:
+>>> On Tue, Sep 09, 2025 at 09:39:11PM +0800, Luo Jie wrote:
+>>>> The Networking Subsystem (NSS) clock controller acts as both a clock
+>>>> provider and an interconnect provider. The #interconnect-cells property
+>>>> is mandatory in the Device Tree Source (DTS) to ensure that client
+>>>> drivers, such as the PPE driver, can correctly acquire ICC clocks from
+>>>> the NSS ICC provider.
+>>>>
+>>>> Although this property is already present in the NSS CC node of the DTS
+>>>> for CMN PLL for IPQ9574 SoC which is currently supported, it was previously
+>>>> omitted from the list of required properties in the bindings documentation.
+>>>> Adding this as a required property is not expected to break the ABI for
+>>>> currently supported SoC.
+>>>>
+>>>> Marking #interconnect-cells as required to comply with Device Tree (DT)
+>>>> binding requirements for interconnect providers.
+>>>
+>>> DT bindings do not require interconnect-cells, so that's not a correct
+>>> reason. Drop them from required properties.
+>>
+>> "Mark #interconnect-cells as required to allow consuming the provided
+>> interconnect endpoints"?
+> 
+> 
+> The point is they do not have to be required.
+
+The reason for adding this property as required is to enforce
+the DTS to define this important resource correctly. If this property
+is missed from the DTS, the client driver such as PPE driver will not
+be able to initialize correctly. This is necessary irrespective of
+whether these clocks are enabled by bootloader or not. The IPQ9574 SoC
+DTS defines this property even though the property was not marked as
+mandatory in the bindings, and hence the PPE driver is working.
+
+By now marking it as required, we can enforce that DTS files going
+forward for newer SoC (IPQ5424 and later) are properly defining this
+resource. This prevents any DTS misconfiguration and improves bindings
+validation as new SoCs are introduced.
+
+> 
+> Best regards,
+> Krzysztof
+
 
