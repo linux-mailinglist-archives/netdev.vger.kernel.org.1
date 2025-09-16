@@ -1,150 +1,219 @@
-Return-Path: <netdev+bounces-223555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85E6CB59839
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:53:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CFABB59846
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:54:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C004A1BC5C59
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:53:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 351C64620A8
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B120D31D75F;
-	Tue, 16 Sep 2025 13:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F67532ED2D;
+	Tue, 16 Sep 2025 13:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+INquI5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPG8QG+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115102D7388
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 13:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272CA321458
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 13:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758030779; cv=none; b=oK5a4CsNhSVBPjaQqZxBHb1PQ5YJVgHoGuVWrf+WBFKNRK59WsvnyX6zN/wOtG2D7JmrNkeNEQWzmMX5w4xQRPKJnzXNazC5/WN28TsxNXlaTJyUge0HL2LaZJDkKYFpTAZj++2Wd7pLqj0D8BEcsBFHq0TH+n0hUecpiymmkZ0=
+	t=1758030815; cv=none; b=JJPZf98BGs3TYR+BWbXkcUK0SzETikFH9LViLpF6zDr0//rFnAZlu4BAVPLPcxg1KzmrXXkC13/ezL19twkYQeKCDdksIu/CMoQ7ieQsH72OjgQGm1HAUFEN7SnyHlflszz4iRJVeVSFlVQCFJcQ1s5WJOcvWklgWolETLx7ZSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758030779; c=relaxed/simple;
-	bh=noQokfXo677HbO1KhlsTtMZqS1QjS+MugjU8Nq/bfI8=;
+	s=arc-20240116; t=1758030815; c=relaxed/simple;
+	bh=zmbvb49IeeOyESGBcfHqaA3NfX6J0j7u/p7UgQNCKCw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a3xcRuspnOa0QO32R5tYeqmjcFZs8DWxgPFHrRTvkZLLfDC9UpEFTISWiKIOcRSDGdW/6Hylo1QNxOmtasijC6FJGCHJ9HhCfnRJ7N9wGIyOoskziqMcKeGWKE7OzFL+d5K+tqBijDhaFVjPV+2af6hZup5Dux0XpLmbcfgweSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+INquI5; arc=none smtp.client-ip=209.85.219.44
+	 In-Reply-To:Content-Type; b=ASOifp1gGAFZSUh1j8SIIP20cem0DwoG5EqwTpP/XUbeJYJWCi+gyZGidrY8KoJM0ublSR3OrLtraNvXAFC800ZBhKp8Qd8mMrBreT79cAfEx6G56cmPVdBeZf1oVF5HnKAbx4HbNtFrGgVDip/WcZt5n2i0abO4LhM0mT6wpCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bPG8QG+A; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-78defc1a2afso3532506d6.2
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:52:57 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3ea3d3ae48fso1592131f8f.1
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:53:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758030777; x=1758635577; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eKXrLdmO0cSeCLSERWY1pZi3jW8d5F1Vj2Erw5DVfII=;
-        b=T+INquI52NIFQsxNO1kmBVM3ZtM7R5uCZfJI6Cpb3TrWtQSsvtapdTZVtx5y7OkZEA
-         329ewXmQMvxXIR2FByNdd0TT3TzQVhNCrXQkhqlB0dAFIlXqChdBno5ofi+a8nj2ezFh
-         HpU/fhoneyEkuUH3XoKgA5RSJFpsD1NPBwx8fih0HPBUJRSzxMP47WZz9fE1QBdpgQpB
-         UA3CFyd8JnQoWgZEfwVUGlx2ydv1PbFmqHuUJiBxGAijBJ/jMm4fIhzSALK+0yVmkTOw
-         pCDLf/m6ZCjLSgjC20F6XiTwoAZbvSV2GxC3nSXkXuxWKiq3vC3Of3+dSFF7lrMnuC/r
-         whzQ==
+        d=gmail.com; s=20230601; t=1758030811; x=1758635611; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bbOqW/N5SrxnkUMTlhv0qPouv1IVrVTd6BKNTP3Kvvc=;
+        b=bPG8QG+AKeex0ja9c1ZwP84OZkdtecE3wipirDp0LmZInag/xdSSbwMahjl/9TWZeX
+         OCv7xjLafm2Ux9gGDzOVV/FDuccf3TkbiIKGUoI5YxZ7SmOnThlYuD/91mCVzg25IvWn
+         6FOs6Vjt5zIglHHsOcUZEambXZC+CzwzqabjPKyCdrk6jB46IRfGChWPAhSeC17KlSPN
+         +gafxf/WYOQiiETMgsqHjkL2uHiV8MKBx9iXq5wv5jt1ZtMw9pnzuSd1aEdEC+qsZ/XC
+         VaJe0svUdLirij+58gcGJhByGXw7FvYNVZHx1jcvpSJyscOQntoahHFeUeMEB2udsChu
+         BGAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758030777; x=1758635577;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eKXrLdmO0cSeCLSERWY1pZi3jW8d5F1Vj2Erw5DVfII=;
-        b=ZHaf9xG/5f1yBV2/vwHS06DzkECdZ/Dkk37NSFEzNnssTvXjf8B5i9bOdFvKbn3Cu0
-         1MKmArY51cbQrNn0jjP0fCzdTOSNaga/uSgX7tR72o+t9d4DljX4pauBFK2vhdC+RoHH
-         LAklWZjunrFlsKdXfYYlBdmgjki0xA2+l8ri0jZK+7hdQ+gAMAO/r59F+2fWibFxGFY8
-         buYZYupfrKrU1/nJpRFHpanSAYTJlHwaZu1Gy9ZtzJcowErk0ME/Tu4yIvjzfbfbC+OU
-         tAmGpOscd34Os3op2d7l2E3Rw7ZBjUlX9Okji97XhqenoIfX25q+ani07t8un4RL7umc
-         /MaA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/OUV4dzoiTXqMlgf5bWqWtq/cnO4iC528ly00xsu9IWyTBo3dJSr5ri6eWmi08H+VXLJFmx8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzl5BFVLIOX8yQTGNjFFSbsvxQe2g3E2916w73ACvasys+HWyvl
-	wDiNjHztQ7CTM/y9TpIxj/Jfi+Hur+bPFL/7dB3J/ybL9ng/M1hvN9Se
-X-Gm-Gg: ASbGncva/t5Qum06CH/Hbuqh9ynZcT2dzLuj1XjrRaDCHBCugCiucsauiSDbR2Xooiu
-	nlUUc3xeWme5ai+zP2Nml2W1iu1D7Mvp9xwLPsnCbS/0tABWyrlWVKiO49mNwcjJG91J0koGfP3
-	inQ7rVw8laYm2RAakq5gC1k5FRaFv+aDtITJ3c4m514T7beefLk+Iw83Ykw4AMQ3d/svCDfXn3m
-	K5qL9oSCuUsUGg/gZ8es6UksO0SY5knFzoBvOEAprEFpi+O9d5i6iaBx+GaTJB28IbUkINE+NJR
-	q80xvxXH6SXYuYX4TAQVlr47gVymuZAmgsMZoPLCsJIVe4XpKMrgnhe5p+7ONWEO7HXtF2/sgf6
-	RFhdkWejFY1bWI+pdPlZ+Qp7cEhJuHUIdayFPtJfaTkR+STPHBgZzGBF0Dwp9
-X-Google-Smtp-Source: AGHT+IGRi37NipeT9mfdnQOJH6WATIfzhlHcS9dh3l5GiuasMXMo41tfF0sRmtMehk4/PnYd7mmu9w==
-X-Received: by 2002:a05:6214:b6a:b0:77a:29ba:1b68 with SMTP id 6a1803df08f44-77a2a15a977mr122287156d6.63.1758030776758;
-        Tue, 16 Sep 2025 06:52:56 -0700 (PDT)
-Received: from [10.221.203.56] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-778d99113d1sm53465096d6.68.2025.09.16.06.52.53
+        d=1e100.net; s=20230601; t=1758030811; x=1758635611;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bbOqW/N5SrxnkUMTlhv0qPouv1IVrVTd6BKNTP3Kvvc=;
+        b=iocUkgYdE7mgBXnnVzgJRbj+1OupzBgJJHBUhITX93hXaTWfGmvrenJhjfpHCLqb92
+         UwTQ6Q7+6rX8RwFm0W+wRGxF1GN0Sg20DZuI94mX02Q+t9WHuBS9vgDWlMzqAU5yr3ZS
+         jwkyjrPaUJPXXtQCQSDcS5Qz88b1YL+uJOGcojMZht1SYeCmTYORlOACUBfhzKm1Ggc2
+         1663zs19h+iGj4Zls/+HCsF69EnrEu4U+f+PijfatBNmypL8juxpvRDHyouSkTzyNzy6
+         S/SF85DB/nDdy8IjotvbxMruE/3TkE5a8nNghzVmL6ty2C1LCucuKbxkDvjJqGSOPTUx
+         ffjw==
+X-Forwarded-Encrypted: i=1; AJvYcCXeYXLX2rQ/j25TjJjvft8QNJC0tAXTNd+HLIr+iXpwX7p8FkBcr5jjF8yFAyiu91LebupJok4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3y528OJ2mrb8FSvrAclk94E9738GbAK/naV1TsTbnr73qcLgc
+	ZRDJ2muL/198Hm3I8eSwHiblYWMAtmxXl4f1TJaO0Uad86A8EmbGWJLV
+X-Gm-Gg: ASbGncv28VeAY5TRyWvsmX2fqMth1Cd3W00feO076qtMIhEFEvzA7hUE2FLyVbdLwRw
+	awciUP1jnPV0IuoYfIHWI9doyKFRSjvQzUSJVGhY01dimiSEh5H/sBwMdXyZUPvQv0S1N/fybJ0
+	aTBpNKsxjHJSTRd+PRHIi5YvLYD6MSxVJ+VA26GgvaM59SxawJEQkDD19KngLoDmI5cu2CtslXM
+	iAqar6IBDQYsKhEVq+jLkxSY/Fj+hd7FC2YVQP04RBvltq8l6pAgqrPpdVZfz3M/tgdGDAQgKR9
+	+6zgyYgYMlBGQClUHi6+abR+PdSg6v4+tSan2fULDnIzD3OWnoSF9a6gjPd2PyJinh1UqL1h1QF
+	lfa0Zipgw0C37xoRdn+HM9blC8a6zWgpmlg==
+X-Google-Smtp-Source: AGHT+IHy6QB40r36ed9Cp1ALANrI+6S8gqwrZ50ik7DfqXSHvOuRtzJ/EoBpWSCvOSi0lDjDm10lpQ==
+X-Received: by 2002:a05:6000:4009:b0:3ea:c893:95b6 with SMTP id ffacd0b85a97d-3eca04743f7mr2229713f8f.27.1758030811194;
+        Tue, 16 Sep 2025 06:53:31 -0700 (PDT)
+Received: from localhost ([45.10.155.18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f29174de1sm136858115e9.2.2025.09.16.06.53.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Sep 2025 06:52:56 -0700 (PDT)
-Message-ID: <b67f9d89-72e0-4c6d-b89b-87ac5443ba2e@gmail.com>
-Date: Tue, 16 Sep 2025 16:52:52 +0300
+        Tue, 16 Sep 2025 06:53:30 -0700 (PDT)
+Message-ID: <4b2c5770-ab53-43f6-8c68-7e2f4a912d8e@gmail.com>
+Date: Tue, 16 Sep 2025 15:53:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/2] Fix generating skb from non-linear xdp_buff
- for mlx5
-To: Amery Hung <ameryhung@gmail.com>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
- martin.lau@kernel.org, noren@nvidia.com, dtatulea@nvidia.com,
- saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, cpaasch@openai.com,
- kernel-team@meta.com
-References: <20250915225857.3024997-1-ameryhung@gmail.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250915225857.3024997-1-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH net-next v5 4/5] net: gro: remove unnecessary df checks
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ netdev@vger.kernel.org, pabeni@redhat.com, ecree.xilinx@gmail.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ horms@kernel.org, corbet@lwn.net, saeedm@nvidia.com, tariqt@nvidia.com,
+ mbloch@nvidia.com, leon@kernel.org, dsahern@kernel.org,
+ ncardwell@google.com, kuniyu@google.com, shuah@kernel.org, sdf@fomichev.me,
+ aleksander.lobakin@intel.com, florian.fainelli@broadcom.com,
+ alexander.duyck@gmail.com, linux-kernel@vger.kernel.org,
+ linux-net-drivers@amd.com
+References: <20250915113933.3293-1-richardbgobert@gmail.com>
+ <20250915113933.3293-5-richardbgobert@gmail.com>
+ <willemdebruijn.kernel.d5fd7a312fe9@gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.d5fd7a312fe9@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 16/09/2025 1:58, Amery Hung wrote:
-> v1 -> v2
->    - Simplify truesize calculation (Tariq)
->    - Narrow the scope of local variables (Tariq)
->    - Make truesize adjustment conditional (Tariq)
+Willem de Bruijn wrote:
+> Richard Gobert wrote:
+>> Currently, packets with fixed IDs will be merged only if their
+>> don't-fragment bit is set. This restriction is unnecessary since packets
+>> without the don't-fragment bit will be forwarded as-is even if they were
+>> merged together.
 > 
-> v1
->    - Separate the set from [0] (Dragos)
->    - Split legacy RQ and striding RQ fixes (Dragos)
->    - Drop conditional truesize and end frag ptr update (Dragos)
->    - Fix truesize calculation in striding RQ (Dragos)
->    - Fix the always zero headlen passed to __pskb_pull_tail() that
->      causes kernel panic (Nimrod)
+> Please expand why this is true.
 > 
->    Link: https://lore.kernel.org/bpf/20250910034103.650342-1-ameryhung@gmail.com/
-> 
-> ---
-> 
-> Hi all,
-> 
-> This patchset, separated from [0], contains fixes to mlx5 when handling
-> non-linear xdp_buff. The driver currently generates skb based on
-> information obtained before the XDP program runs, such as the number of
-> fragments and the size of the linear data. However, the XDP program can
-> actually change them through bpf_adjust_{head,tail}(). Fix the bugs
-> bygenerating skb according to xdp_buff after the XDP program runs.
-> 
-> [0] https://lore.kernel.org/bpf/20250905173352.3759457-1-ameryhung@gmail.com/
-> 
-> ---
-> 
-> Amery Hung (2):
->    net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for legacy
->      RQ
->    net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for
->      striding RQ
-> 
->   .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 47 +++++++++++++++----
->   1 file changed, 38 insertions(+), 9 deletions(-)
+> Because either NETIF_F_TSO_MANGLEID is set or segmentation
+> falls back onto software GSO which handles the two FIXEDID
+> variants correctly now, I guess?
 > 
 
-Thanks for your patches.
-They LGTM.
+This is true because the merged packets will be segmented back to
+their original forms before being forwarded. As you already said, the IDs
+will either stay identical or potentially become incrementing if MANGLEID
+is set, either of which is fine.
 
-As these are touching a sensitive area, I am taking them into internal 
-functional and perf testing.
-I'll update with results once completed.
+>> If packets are merged together and then fragmented, they will first be
+>> re-split into segments before being further fragmented, so the behavior
+>> is identical whether or not the packets were first merged together.
+> 
+> I don't follow this scenario. Fragmentation of a GSO packet after GRO
+> and before GSO?
+> 
+
+Yes. One could worry that merging packets with the same ID but without DF
+would cause issues if they are then fragmented by the host. What I'm saying
+is that if such packets are merged and then fragmented, they will first be
+segmented back to their original forms by GSO before being further fragmented
+(see ip_finish_output_gso). The fragmentation occurs as if the packets were
+never merged to begin with. IOW, fragmentation occurs the same way regardless
+of whether the packets were merged (GRO + GSO is transparent). I thought I'd
+mention this to clarify why this patch doesn't cause any issues.
+
+>> Clean up the code by removing the unnecessary don't-fragment checks.
+>>
+>> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+>> ---
+>>  include/net/gro.h                 | 5 ++---
+>>  net/ipv4/af_inet.c                | 3 ---
+>>  tools/testing/selftests/net/gro.c | 9 ++++-----
+>>  3 files changed, 6 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/include/net/gro.h b/include/net/gro.h
+>> index 6aa563eec3d0..f14b7e88dbef 100644
+>> --- a/include/net/gro.h
+>> +++ b/include/net/gro.h
+>> @@ -448,17 +448,16 @@ static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *ip
+>>  	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
+>>  	const u16 ipid_offset = (id >> 16) - (id2 >> 16);
+>>  	const u16 count = NAPI_GRO_CB(p)->count;
+>> -	const u32 df = id & IP_DF;
+>>  
+>>  	/* All fields must match except length and checksum. */
+>> -	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF)))
+>> +	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | ((id ^ id2) & IP_DF))
+>>  		return true;
+>>  
+>>  	/* When we receive our second frame we can make a decision on if we
+>>  	 * continue this flow as an atomic flow with a fixed ID or if we use
+>>  	 * an incrementing ID.
+>>  	 */
+>> -	if (count == 1 && df && !ipid_offset)
+>> +	if (count == 1 && !ipid_offset)
+>>  		NAPI_GRO_CB(p)->ip_fixedid |= 1 << inner;
+>>  
+>>  	return ipid_offset ^ (count * !(NAPI_GRO_CB(p)->ip_fixedid & (1 << inner)));
+>> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+>> index fc7a6955fa0a..c0542d9187e2 100644
+>> --- a/net/ipv4/af_inet.c
+>> +++ b/net/ipv4/af_inet.c
+>> @@ -1393,10 +1393,7 @@ struct sk_buff *inet_gso_segment(struct sk_buff *skb,
+>>  
+>>  	segs = ERR_PTR(-EPROTONOSUPPORT);
+>>  
+>> -	/* fixed ID is invalid if DF bit is not set */
+>>  	fixedid = !!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCP_FIXEDID << encap));
+>> -	if (fixedid && !(ip_hdr(skb)->frag_off & htons(IP_DF)))
+>> -		goto out;
+>>  
+>>  	if (!skb->encapsulation || encap)
+>>  		udpfrag = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP);
+>> diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
+>> index d5824eadea10..3d4a82a2607c 100644
+>> --- a/tools/testing/selftests/net/gro.c
+>> +++ b/tools/testing/selftests/net/gro.c
+>> @@ -670,7 +670,7 @@ static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
+>>  		iph2->id = htons(9);
+>>  		break;
+>>  
+>> -	case 3: /* DF=0, Fixed - should not coalesce */
+>> +	case 3: /* DF=0, Fixed - should coalesce */
+>>  		iph1->frag_off &= ~htons(IP_DF);
+>>  		iph1->id = htons(8);
+>>  
+>> @@ -1188,10 +1188,9 @@ static void gro_receiver(void)
+>>  			correct_payload[0] = PAYLOAD_LEN * 2;
+>>  			check_recv_pkts(rxfd, correct_payload, 1);
+>>  
+>> -			printf("DF=0, Fixed - should not coalesce: ");
+>> -			correct_payload[0] = PAYLOAD_LEN;
+>> -			correct_payload[1] = PAYLOAD_LEN;
+>> -			check_recv_pkts(rxfd, correct_payload, 2);
+>> +			printf("DF=0, Fixed - should coalesce: ");
+>> +			correct_payload[0] = PAYLOAD_LEN * 2;
+>> +			check_recv_pkts(rxfd, correct_payload, 1);
+>>  
+>>  			printf("DF=1, 2 Incrementing and one fixed - should coalesce only first 2 packets: ");
+>>  			correct_payload[0] = PAYLOAD_LEN * 2;
+>> -- 
+>> 2.36.1
+>>
+> 
+> 
 
 
