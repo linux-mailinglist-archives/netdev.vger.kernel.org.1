@@ -1,125 +1,170 @@
-Return-Path: <netdev+bounces-223660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC0F5B59D54
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:20:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F7BB59D5E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF8824E25CD
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:20:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0659C188ACB3
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA432F616D;
-	Tue, 16 Sep 2025 16:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A282F6579;
+	Tue, 16 Sep 2025 16:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="afyD42e0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="puqqU5o2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817F62550CA
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5515228488D
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758039603; cv=none; b=jPxRvgzPUJU3dcO5oP12cZyMBAv6rs56G0oDqOZm5yasBBKk0BsSLAOB6XidjiRnVRq6ADrM/qKsezdxgpIkVKFe3glzmTUEBbQQwoZBRBpsAYvK4vry/X8jK12qE3XRx9dcW/FZJivMENd8NrCm8cB+BHKWuaj2EIwhAX2vej0=
+	t=1758039629; cv=none; b=vDpueGlqKONr/llCMJdcVrIDpFE4XsHHeSTStnPRr3c4wwc/et3mrnBCSa5f3rZ1hCxrT76Fr/KiT9fwj6P0XyskkYfzDlk7lwE51Ska6T2t0O/bFsD8F6LQ44+25Cd9G+cNXBoO6f4ijjjjDEPgFb5NJpEWwU+getBzO7njdW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758039603; c=relaxed/simple;
-	bh=2KVXFAZp5IcHcS48N3SKVacU5EiaWni1hFMGzAygg3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ST1LRd3n9OT0aUtHbjvLdTuB/5z6n+QjYxipeg1rcL3AZB2bRGmfumDkFVCu6TMuJva2q/ZaLIdPoyUs++W4cfwixeLa4XbM67iXcErq20LtRubHqX0nPJo1ta/RoMQdshJVzbJmrSM6sQ6Je6yRRdPvMpfarfW3mOvH5EL0FzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=afyD42e0; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id A01D21A0D84;
-	Tue, 16 Sep 2025 16:19:58 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 680976061E;
-	Tue, 16 Sep 2025 16:19:58 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 18884102F17A0;
-	Tue, 16 Sep 2025 18:19:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758039597; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=ej+wp5p0fJnjhQXj/WM+W+BpDjADolh8Mt44etUbHsE=;
-	b=afyD42e0P2VcYx6l8yshxYMReM4wzxrYhRibzcL67RgODiVLwheEMFqYZsO2BCeG9v9EZJ
-	oGV/GwwRuycg9f4Uq3ssq9uDTc7B1wpZ45tsnPtxwIYoYRVv3heT5yhCFg9kWHO2hrrmAR
-	dQGBo0puAotlCcXXmvvM8U3u23wDa5dNNBHcdp5jh6ULItRzto0uNxmrFYBKLJvsh+ZnKq
-	kn2jga8rRUaWBPP4dvlwZt4nTOmcAwGg/AZ8hXde3My17d5uaZH/NI5cZCK81RdWP+9Vin
-	2etuv1M52cSY/OTJrkurXHicj0WeezV70rLIwz0T//a7DpfOzGRBFC4Jq87jTA==
-Date: Tue, 16 Sep 2025 18:19:53 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: David Ahern <dsahern@gmail.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH iproute2-next 1/2] scripts: Add uapi header import
- script
-Message-ID: <20250916181953.1c0aa4ee@kmaincent-XPS-13-7390>
-In-Reply-To: <7d03fa72-b6ca-4f98-9f48-634ea45a0cc8@gmail.com>
-References: <20250909-feature_uapi_import-v1-0-50269539ff8a@bootlin.com>
-	<20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
-	<20250916074155.48794eae@hermes.local>
-	<20250916180100.5f9db66d@kmaincent-XPS-13-7390>
-	<7d03fa72-b6ca-4f98-9f48-634ea45a0cc8@gmail.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1758039629; c=relaxed/simple;
+	bh=+FFvRqfTMNtjcJ1Bge4aDv1coqZlJWD3ttRj9H9DYRs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DLVd4oIoriKpqoMUoxuzwG2DD3fz/0y2gUrUSbHh7p57g2ZE2uAg/xcIq71qr2DAXf3UMyaMJ1+YA67WRznWQemmIbVuOMpxSm/Go9T4CoG6gmVN4rf8MULteGl5Wck+NNIZPfCcXnA9+InVm6fszYYrb6F/fv+iELA3myM1xbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=puqqU5o2; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b6e0d1e5-bd50-464a-9eae-05ecd11de4ee@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758039623;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aQC89dD1c3jT6JY0wqpeRVJR3Kc57Rt3TOanUiinKWA=;
+	b=puqqU5o2fTXlNQUA2Y7bIK0rOQ/5P9qd6u8lCM1nsldMsoqZRyqPb0HxaIPspMfut/taCx
+	T6fyvRk2UL1RZVmzyeuB1woRMtRtlToUMp4fm5i+iOWV7uD5b08wiLaAbvK0NvbvX9q7PA
+	5zmk28y+HHiZSwhcrfL0PrhFO/mtTOA=
+Date: Tue, 16 Sep 2025 17:20:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Subject: Re: [PATCH net-next 2/2] ptp: rework ptp_clock_unregister() to
+ disable events
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+ Ajay Kaher <ajay.kaher@broadcom.com>,
+ Alexey Makhalov <alexey.makhalov@broadcom.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ David Woodhouse <dwmw2@infradead.org>, Eric Dumazet <edumazet@google.com>,
+ imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, netdev@vger.kernel.org,
+ Nick Shi <nick.shi@broadcom.com>, Paolo Abeni <pabeni@redhat.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+ Yangbo Lu <yangbo.lu@nxp.com>
+References: <aMglp11mUGk9PAvu@shell.armlinux.org.uk>
+ <E1uyAP7-00000005lGq-3FqI@rmk-PC.armlinux.org.uk>
+ <9d197d92-3990-4e48-aa35-87a51eccb87a@linux.dev>
+ <aMmGFQx5lWdXQq_j@shell.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <aMmGFQx5lWdXQq_j@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 16 Sep 2025 10:05:16 -0600
-David Ahern <dsahern@gmail.com> wrote:
+On 16/09/2025 16:45, Russell King (Oracle) wrote:
+> On Tue, Sep 16, 2025 at 02:02:56PM +0100, Vadim Fedorenko wrote:
+>> On 15/09/2025 15:42, Russell King (Oracle) wrote:
+>>> the ordering of ptp_clock_unregister() is not ideal, as the chardev
+>>> remains published while state is being torn down. There is also no
+>>> cleanup of enabled pin settings, which means enabled events can
+>>> still forward into the core.
+>>>
+>>> Rework the ordering of cleanup in ptp_clock_unregister() so that we
+>>> unpublish the posix clock (and user chardev), disable any pins that
+>>> have events enabled, and then clean up the aux work and PPS source.
+>>>
+>>> This avoids potential use-after-free and races in PTP clock driver
+>>> teardown.
+>>>
+>>> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+>>> ---
+>>>    drivers/ptp/ptp_chardev.c | 13 +++++++++++++
+>>>    drivers/ptp/ptp_clock.c   | 17 ++++++++++++++++-
+>>>    drivers/ptp/ptp_private.h |  2 ++
+>>>    3 files changed, 31 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+>>> index eb4f6d1b1460..640a98f17739 100644
+>>> --- a/drivers/ptp/ptp_chardev.c
+>>> +++ b/drivers/ptp/ptp_chardev.c
+>>> @@ -47,6 +47,19 @@ static int ptp_disable_pinfunc(struct ptp_clock_info *ops,
+>>>    	return err;
+>>>    }
+>>> +void ptp_disable_all_pins(struct ptp_clock *ptp)
+>>> +{
+>>> +	struct ptp_clock_info *info = ptp->info;
+>>> +	unsigned int i;
+>>> +
+>>> +	mutex_lock(&ptp->pincfg_mux);
+>>> +	for (i = 0; i < info->n_pins; i++)
+>>> +		if (info->pin_config[i].func != PTP_PF_NONE)
+>>> +			ptp_disable_pinfunc(info, info->pin_config[i].func,
+>>> +					    info->pin_config[i].chan);
+>>> +	mutex_unlock(&ptp->pincfg_mux);
+>>> +}
+>>> +
+>>
+>> This part is questionable. We do have devices which have PPS out enabled
+>> by default. The driver reads pins configuration from the HW during PTP
+>> init phase and sets up proper function for pin in ptp_info::pin_config.
+>>
+>> With this patch applied these pins have PEROUT function disabled on
+>> shutdown and in case of kexec'ing into a new kernel the PPS out feature
+>> needs to be manually enabled, and it breaks expected behavior.
+> 
+> Does kexec go to the trouble of unregistering PTP clocks? I don't see
+> any driver in drivers/ptp/ that has the .shutdown method populated.
+> 
+> That doesn't mean there aren't - it isn't obvious where they are or
+> if it does happen.
 
-> On 9/16/25 10:01 AM, Kory Maincent wrote:
-> > On Tue, 16 Sep 2025 07:41:55 -0700
-> > Stephen Hemminger <stephen@networkplumber.org> wrote:
-> >  =20
-> >> On Tue, 09 Sep 2025 15:21:42 +0200
-> >> Kory Maincent <kory.maincent@bootlin.com> wrote:
-> >> =20
->  [...] =20
-> >>
-> >> Script I use is much simpler. =20
-> >=20
-> > The aim of my patch was to add a standard way of updating the uAPI head=
-er.
-> > Indeed I supposed you maintainers, already have a script for that but f=
-or
-> > developers that add support for new features they don't have such scrip=
-ts.
-> > People even may do it manually, even if I hope that's not the case.
-> > We can see that the git commit messages on include/uapi/ are not
-> > really consistent.=20
-> >=20
-> > IMHO using the same script as ethtool was natural.
-> > The final decision is your call but I think we should have a standard s=
-cript
-> > whatever it is.
-> >=20
-> > Regards, =20
->=20
-> There are separate needs.
->=20
-> I sync include/uapi for iproute2-next based on net-next. rdma and vdpa
-> have separate -next trees which is why they have their own include/uapi
-> directories. This script makes this part much easier for me hence why I
-> merged it.
->=20
-> Stephen will ensure all uapi headers match the kernel release meaning
-> Linus' tree.
+That's part of mlx5 and at least Intel's igc and igb drivers.
 
-Oh, ok. Thanks for the clarification.
+> The question about whether one wants to leave the other features in
+> place when the driver is removed is questionable - without the driver
+> (or indeed without something discplining the clock) it's going to
+> drift, so the accuracy of e.g. the PPS signal is going to be as good
+> as the clock source clocking the TAI.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+In our use-case we use PPS out as an input to the external monitoring
+and we would like to see the PPS signal to drift in case of any errors.
+
+> Having used NTP with a PPS sourced from a GPS, I'd personally want
+> the PPS to stop if the GPS is no longer synchronised, so NTP knows
+> that a fault has occurred, rather than PPS continuing but being
+> undiscplined and thus of unknown accuracy.
+> 
+> I'd suggest that whether PPS continues to be generated should be a
+> matter of user policy. I would suggest that policy should include
+> whether or not userspace is discplining the clock - in other words,
+> whether the /dev/ptp* device is open or not.
+
+The deduction based on the amount of references to ptp device is not
+quite correct. Another option is to introduce another flag and use it
+as a signal to remove the function in case of error/shutdown/etc.
+> Consider the case where the userspace daemons get OOM-killed and
+> that isn't realised. The PPS signal continues to be generated but
+> is now unsynchronised and drifts. Yet PPS users continue to
+> believe it's accurate.
+
+And again, there is another use-case which actually needs 
+thisunsynchronised signal
+
 
