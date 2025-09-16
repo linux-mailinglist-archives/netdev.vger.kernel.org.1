@@ -1,245 +1,282 @@
-Return-Path: <netdev+bounces-223370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B47B58E65
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:22:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E55B5B58E74
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:25:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0DB31640EF
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:22:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D48F23BAEDF
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE40B1DB551;
-	Tue, 16 Sep 2025 06:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95431E7C11;
+	Tue, 16 Sep 2025 06:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ge9G4gQz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/GDSS7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BED2EAE3
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758003763; cv=fail; b=f/jrphDtu4y0/vCd2IK6HEJTfzrjLzgC+UFDPLNgl1y+EuRhsB1ZsB4wCA91bWin3acp9xcj1dTsqrxJG9D/ENiWdWFyUe9q9/2GuX0NQwyVw7wvVCf4Ua9lJdQ3XQnhvtX8GspbO9zswH7eHjtByWym+gYhuHIA/2/W2ql/nYk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758003763; c=relaxed/simple;
-	bh=8I4L9zv82aoCLFpArIcG13W9XIQ6R0g0aXxyvL3AS2Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IxqCBp3WCn4SQCwXof44T68Ia4lAUSBWkWaGWrzYR57Nt4zbJrN/buZYk2pZ8Er/arISJrAA3ameS8aQhonIDetuSAmG8JPh+uCE5eY9ecHg254kkA9g/z0ErFpVKkCzJqM93t6x1ZFKmURhc4f+Alt53HSTh+uumUR0s6IqvXc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ge9G4gQz; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758003762; x=1789539762;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=8I4L9zv82aoCLFpArIcG13W9XIQ6R0g0aXxyvL3AS2Q=;
-  b=ge9G4gQz5Uh8f5jt7ktxLa1YTaA4JL/zrBg7t+kwd2HpTBK6AWeYi7mG
-   tFb+IGiQf24GsMl3Sa2S/F8mA+oOMEK7UIlWjg/fWWP5oHvz4kgKVCg9M
-   u/711/dNTnIHO7/sU8iyVv86lUi7vS/+Sex5uT23sUAFdUcCXnX7PrRHo
-   +B7dy5ARa0rr4ulfIUu+Z5IIwnQWmarJq7feBmoaecmb+aLzWUXKGhq6Q
-   NW7mB/nEZ39gsW/czOVamJxLgw8nk/THzvGiG6r6hTyxkIGeLtUOV9LVP
-   9ouWNGkOYGnhAay8BlpDuaglA8H6TcO5mEGe2AQ60FYSJRu3UYXGs7CKm
-   g==;
-X-CSE-ConnectionGUID: L6NRFoZjQPuuEtcMRG/Ncg==
-X-CSE-MsgGUID: 9a074iyTQhyI9d+n7p/TAA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11554"; a="70955004"
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="70955004"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 23:22:41 -0700
-X-CSE-ConnectionGUID: oGDMfwHMQPakxNTZswbFzg==
-X-CSE-MsgGUID: HaN8vF64SsWa317dvIrpDw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="180092756"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 23:22:41 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 15 Sep 2025 23:22:40 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 15 Sep 2025 23:22:40 -0700
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.31) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 15 Sep 2025 23:22:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=shb2hcJ4L66k6P5/y2IwWhc7ESw1BdJdRbnMMXDrSOz+wsTiO/c81AG8K5JKVr5kYiGT2ED/dixtAAQ3zRq9sz4Ibu57744yr7+BbGWPffph+3mvWRFR3gaCrHcEcorqYZT1KqgE3Vev5CudORmSf3DFu/EBgagxQ24XJA2PYtXX4W/5phWOsMM7/rvXfebPSqwYJn9/J0/mlygnJN/6L6KX3NnWs75xsHpJTtJaMg/wEuqL5liGAyQMLKDvoL8l9QZl+pyD/6oumGk98NXzudqOzMpleKo11cZzxwEvLa/B8PQ8LM3+YCx1OSmE2DCyjvT1WkAFpQjS4CveJGU64A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dqImWI5493Ke+df4PhxDLBQg1qa4zutPldqOUL7djjo=;
- b=dToFUVPEA0/8Fub/xwyODBGOJO/Qmk+ekKOJFYeDDxdzfSGEuBe4g6VHVCAAw5P2x9AVMrF8N3Y2NvmI/whwDiII9cTtmreeHJJNKGahIqgGeW5DMk78MF+OUs/QyiGpIQYJdlyqK6QjhbpbAC65dATZt6ZB0jAAIT9VRe02y1iNqyJN0qBIl1JlTwdFvOil9Yv/kfdH1sxNTE9l7ZEFc69tUQs3Zj1T6AAUbV2T+1uE82zUG5RuTLKfm8Ju7NMSd9CiraaqOOFtHVclMczP9JScYNpx7D5lPoejhsl2NbwmMh8vFqWRupJGfLITPW7O4r8RRJREdEC7Ah0zDRMNCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by DM3PPF63A6024A9.namprd11.prod.outlook.com (2603:10b6:f:fc00::f27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 16 Sep
- 2025 06:22:38 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9094.021; Tue, 16 Sep 2025
- 06:22:38 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2 2/2] ixgbe: destroy aci.lock
- later within ixgbe_remove path
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2 2/2] ixgbe: destroy aci.lock
- later within ixgbe_remove path
-Thread-Index: AQHcILXp3/RfPCenmkar+FhvAMkBOLSVYEIg
-Date: Tue, 16 Sep 2025 06:22:38 +0000
-Message-ID: <IA1PR11MB62419B24470EDDC4EDB618E28B14A@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20250908112629.1938159-1-jedrzej.jagielski@intel.com>
- <20250908112629.1938159-3-jedrzej.jagielski@intel.com>
-In-Reply-To: <20250908112629.1938159-3-jedrzej.jagielski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|DM3PPF63A6024A9:EE_
-x-ms-office365-filtering-correlation-id: bc5ac92f-6f0e-4b60-ab28-08ddf4e96ee4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?+B0FkvL42VXMB9Eql9RB1CJTuMlm2X8Q1+2KxCxNHx35An3i5030yZWPIJxr?=
- =?us-ascii?Q?08d/akwWOmIMhMwRPvLYmXMvVUfsgqrRCNE/MZD92+ozcDWBv6XPDxIAVh98?=
- =?us-ascii?Q?DjCudWhnIq4/MwrJwZOFEjiQdMfZ6pUIghQIQCcDkrWUs39fABxYj+izowuN?=
- =?us-ascii?Q?J5CG7GlV1iw56+/Q0pL3cZPdp9G3CWmJSOca3ue72ikZQHP5gA959JlpxzEk?=
- =?us-ascii?Q?AqFylHd2jHKLX6HzpIXNxQHm2K3G2giok5svMU86FKo9FZOYDjpkkZYvXFp1?=
- =?us-ascii?Q?Yq6XVA5ByjkzRMYED6GIXTvyQ6Q+2rAzLm3WAaPn4Jj2ntn1MLMlVsFWu7It?=
- =?us-ascii?Q?Vz18POj+v8UToYO7C/Nm97axjJm3jjgJWe+BqDn+KSmQeZH2KBySb1hJkwA2?=
- =?us-ascii?Q?yhcmHyaJaoDCgIS1VTETuml5XZzWIJDspg73zm0jditR0czw9QsIwda3IFPY?=
- =?us-ascii?Q?dLIFgPBlWON41onsEfdEiNy6wMDdk4aEA60V2TVdpWhQ+wL6Ehda+f0t7yEH?=
- =?us-ascii?Q?AuS2Oi9Cy6FeQKGd19FbtKobYeORgyiudk5GhHKvRWpvPtGG3L1ggwd3cnIO?=
- =?us-ascii?Q?+fWiq5YVZWMQ+JaQBtOoH36LeHFLD9sE7AzN3tO/L3SEdsA6QQ65xENjX/8P?=
- =?us-ascii?Q?1ChM2OAVLpmGgb6wPeWcGl+KgMdM8xgi2mLgSnN44OeifX29f2a7UjYYJ+ia?=
- =?us-ascii?Q?2v/o7FkINbTDJkCwHCYL19BJ/dg/jjYXZEpDvgdI+e/mgSs8DZ3hXFhAYaSC?=
- =?us-ascii?Q?VT56oa7EUcO1XFzmTNBS7DScCFr8bz36b758BaVxUc3xugA5SNJMPEtgQYge?=
- =?us-ascii?Q?J8ZvnUFweuEF5cukNCq5+cfHu2cZj4H7BsgyPiCsfsRgl1GgAjKdAnGRdbr/?=
- =?us-ascii?Q?F2iO0+zb0jzmBvzBx7eRL635y1IU8BOvf6xbA49pzbn5pS7fxkelu+UGyJIN?=
- =?us-ascii?Q?CQiKfAJ5xX8BI5dh2nbJQIsa5JCTWxGEMsfpZ83EySRCuzgk7xFsthBooyTz?=
- =?us-ascii?Q?7VUKID8qJHUFdNtiPvF0ShUTSVhyew6qfohzXmLKk9uE7P6Sd2vEsjGigfl6?=
- =?us-ascii?Q?Iuzfc8tWfLB0zE564OMJ+/W6lQv5PLBOIKbBjhZ9LJDPmXRncXGM9ExzJdD8?=
- =?us-ascii?Q?04Pjn/tVTxLa8vezT5tyIK2l/xFb6gUXCLXQkokgTgGIdXs7EMxAGEVpTRxI?=
- =?us-ascii?Q?pcRuo5Y2vhUm2U5+AXLMtwQo3AVRiF91BE0heqeMmTlFt0pqbENCcO1f0tFt?=
- =?us-ascii?Q?9A9jkrVfXlfEvCl8Q0CRiUeFFQiv2z/LT85juwdSmeL+B+kzum+3XdtbwUos?=
- =?us-ascii?Q?PPa8KHVk8UR1Yb7/QQSZfsy5MbmPHDBbHsy22jg+hismEQ+AOdmGkf8aK9Ul?=
- =?us-ascii?Q?fIzlpij0qQkunwIp8+Co6oT808Fq6dyBOcTUvj0BuupAf5LdPBStcBz6QDwn?=
- =?us-ascii?Q?P0Ru1m26ADj5p9/KycVaZuPCE6cnCFdYgDeI39O3KvYmZn5za2T1Cg=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gMpjbOdSrxYo+yA78iyxxGryW9aAiWrQSHIhykbCAElAu9aQybLmoG24AaFJ?=
- =?us-ascii?Q?QSAWtlaJxu0EY4Ri10h16DjxOia4Q43B5H9GsByTC4IjGENkNKLPc5MQ78Qi?=
- =?us-ascii?Q?y4WvIuEXRpSE9cs23ig6jdzmJL4TZGyEFVYPwVFREXVad0O7KIe9g/xJIrz9?=
- =?us-ascii?Q?xedVxgPLMOAzovk7RQG87O22lSF57UeaTgBgN7O6WEjqJ/QDIzcJze5RQIWY?=
- =?us-ascii?Q?OsfFEVW6rVF8XoZTAL29WwdM3VY1LpoRF2aZ0jERDl3bvnsY5yJVkJrhXZeu?=
- =?us-ascii?Q?8sBon7b4p0kPccSZfvvFrVgosT5765MUqbwhipN1aRKiaFY5QWZHab8Hbnkw?=
- =?us-ascii?Q?nPAb48dfZVKX/brLO/y9AUjz9iEOc1GvTg+rY8S/jEnJngKGCcPTxC9X6GfX?=
- =?us-ascii?Q?vBIc4yALk11ltHTXishuvjtZnuzFCtz1a5yI5Ms/47tPWglXFooKwYDru73G?=
- =?us-ascii?Q?R5LqaBAsB9RnBFQzPrX1qMe9zhBuOtq0qes1umsn7cnO4UmBC5e5WXMzSBD2?=
- =?us-ascii?Q?K6L/dG2F1FWQ1kgKTeHYzYUrfLWIYZFVhiXNl5zETPnpPyafmmD9JqPWqrUh?=
- =?us-ascii?Q?3DoY/urPfhbqyeDCpsscm76UhGZ7HiroYkxBV6/kIFgHt7rjOzAtp7kZIjX4?=
- =?us-ascii?Q?1cww0Pt6cgee36CYbWAbjeT+1r4NpT3FqPrdfLVgjS7ktj+LJnKIaFeYFaUu?=
- =?us-ascii?Q?Tgl8as+Y409PFHAXfmzNa6f04w6cnRt23j4PI/Bmn82z2HIYQmpq70dHxNQO?=
- =?us-ascii?Q?lCXIFPmPgXEUtjn9KjH7U4QVeZ4knVuZ38g0pp+qUTXhJaj4SIkLW7SYOIHu?=
- =?us-ascii?Q?C9I4+rv1q5vipPyWeSM/fQcbqDh8wuxAY1es9+fk0C3eej0ATbXeTw1jWve9?=
- =?us-ascii?Q?oeFKhd5eBOTAnpU3SkY09aAprjDVTROc5tpUd7E0c85EnR7/8iP+Yabp7RxH?=
- =?us-ascii?Q?Hvcq7Ez4MB0zAYaeWCyVMpKPbVYHQ1TIwd4XEpYxTkPWWX0YUgbtz2IZKn/T?=
- =?us-ascii?Q?mklIAGFL3sLa+fgLAV56NyfZPBb2CQ3NDxgcCnK1y6dnRrEcMS53QBtl1oqH?=
- =?us-ascii?Q?y14PmiSU411h+VYWLxn+pxCvKSkxCvRJaleyni7Xwwy/mObB96FwM2apea10?=
- =?us-ascii?Q?2OFbmO7txEu26zW5xr2K9G7OelongcDlAEvCEApR6fCsb+f9K5uR1NHnEgBp?=
- =?us-ascii?Q?/U1Go9FJtuG9uDWopqBMxmCXbssOfydF72t2WDYgyQYf6oJejvaQsrTuGr+9?=
- =?us-ascii?Q?Awt6C3kFwlNC/MpqheC9/PL2jCvILOM1FuVzH27pCTXOe0g0SK8v9WluynGE?=
- =?us-ascii?Q?0Sdz3FYV8gUUAyYhfwsleu3s67t9y2AhMQcpaKphZ2An2bYoFtYNTMgK8yWy?=
- =?us-ascii?Q?KIQJZj7b1kj8O2juRWRBnjo3HDA7HAynAwMC7Hb+5KlWsoRIkK/n9b79GYEv?=
- =?us-ascii?Q?VdlH/17Xbuw+s4XLFj6QnvfHasme2tNYh+upUf+/h950/owE4ZGVTI2AwlYD?=
- =?us-ascii?Q?fbcg1yg0d80MIti11paQacIHkMOegbluuygMAsMqFnb8aAVmTzuQhQwSFgtT?=
- =?us-ascii?Q?B0Fu45jDnw98VNeJPRRgwNZ641soDVcPbcqOpMnp?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37E72848A8
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758003886; cv=none; b=THrRS7pVX+uGbGOpNmrLQEESDcS+XTqTCtiGdoN8wzTKXJUhpirgG1/5w4UuwnH8LxIbWUOZixbOduOT+PoL0s1bqcVb8V3HNZDfzWKrqL/W4r2JpbTdAUFmrPJaad/OEx1RWqJltBpIzCymWT0bRkaU6CjcEzGkZ1zXRRrINqc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758003886; c=relaxed/simple;
+	bh=huKYgVyJW4FB240PvQMLWp06kAelPCsGdj3ntdrQhJg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hff3jTiXD7k1lbOOW12yzaPzPKkJu/qhJjlmsNYWbUKgpb841iac4fzNZodT+O2bSf22/IBfK0wqHf6FTW5w7qhl69qjT/zUJ6M1uX6erJAGrMDyeKM4jpXptUwnj5ISQQkLQY2Xd34zm4QigXaR+6z0By9aZJtDLhrgz0cvEcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/GDSS7L; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758003884;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dlQN4SQLxZ6U3+89gIilu0VdL6Q8/3iQQAj8V3mQl2E=;
+	b=Z/GDSS7L69VQ9bQPLdn4K+ag/70hHwUxbZtl1/MO17GYQkwvAOt9ge9V5TRdyhhWnSQDzh
+	CJgWtKkjEzDiNNOWW5Y16oPlGBd0j0+4thJ0+09h08F/c8nPm1ksIXddpHfzU7hbzUB+90
+	oJsqI0kyMWNag9+1QP1Rluh4zrXYOUU=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-307-dW1tnKMfN76UdlT2KcoZGA-1; Tue, 16 Sep 2025 02:24:39 -0400
+X-MC-Unique: dW1tnKMfN76UdlT2KcoZGA-1
+X-Mimecast-MFC-AGG-ID: dW1tnKMfN76UdlT2KcoZGA_1758003874
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-32e43b0f038so1575956a91.0
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 23:24:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758003874; x=1758608674;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dlQN4SQLxZ6U3+89gIilu0VdL6Q8/3iQQAj8V3mQl2E=;
+        b=h9Dthtj2n37QPmZZtzEC+mtEiiPbJC8296M1d09wFqkT2yVAo8k3dX8x+LBSuGURoI
+         Q8D9EAePA1oWahZDk0EU4T/0Jz/aXDCb4H8us19xIiWQbxVewmn8jSp8/JUimT/kCq/i
+         4RaEBsgPq2fXMwcMkV6N72s/akma/NrPpx5VXb6BmvxBZfjpi6oP/v2TTr6vrKWUOIQN
+         YggTZZGxFw4TTk5M+eU5QwkQKzFgcrc4mn+HLBUSyQNh6L+lUJHYorzsRhYdRSiE6w4Q
+         ERZH10PQbMkJcJOB/iIm3JECsLFnmc3ZUS0RzgUM8QQPJpNuL+7SwJ6SrpxlwCqb3IgH
+         MthA==
+X-Forwarded-Encrypted: i=1; AJvYcCWxL3C+JVSoHmJckqDhmTLSIuVUxyT7jPJqjtq8FjgX7o+pKGjoOFLmGkUT6CYDX0jYAGEiT3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzde1rIG0ChF94u1oU+I8fFkt+5D+O/ZiX8dqVYcJN+JgpR787b
+	zN+4271jyKungVnda+jM9kb/KbNpJ6NJz5R0dXYGlIMGw0Z36zKuLJVzmYTUBMWipW1uVw/oGm9
+	A1gJLP41JDNpaI46QEfzO65qIYg5R3ulm3ngh2ND+QsLrXl2wxwXn/JddGqKARF+zJbhJSfCg0i
+	wb2LqbAL2Ynupm31fSOVw/27dlSW3IZEzDpaJyof++tHzR4w==
+X-Gm-Gg: ASbGncsY4BOSeo9o4duaXJnfX/TA7fA43uBwCu4jPg3LtVNE1SB4a1aXDmW0aZm9SyY
+	47ttX7Mm83vEiPFgV4pSzmYgG4bHrNWbXyvTMeLfmADrtESpw/KdMgYmDu9sufWtQuORjZh5cxT
+	7MJpnT/a+p6906EbUeRQT1ug==
+X-Received: by 2002:a17:90b:2648:b0:32d:ea1c:a4e5 with SMTP id 98e67ed59e1d1-32dea1ca751mr15264752a91.1.1758003873960;
+        Mon, 15 Sep 2025 23:24:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1pLFeOzviQ4Xy/lHgZpWGGPzFdvtokwot9P7w4EynJ3kpRhRB6zmkC7K48b57/V9M7J8hnwn7YZsltep2S8A=
+X-Received: by 2002:a17:90b:2648:b0:32d:ea1c:a4e5 with SMTP id
+ 98e67ed59e1d1-32dea1ca751mr15264722a91.1.1758003873504; Mon, 15 Sep 2025
+ 23:24:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc5ac92f-6f0e-4b60-ab28-08ddf4e96ee4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Sep 2025 06:22:38.0891
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vSaAy6wb0+KwZnfGlc5tAmoWaGMjtHeUsx1803eRhUdk045KgKzeZbh9QZs8LqHEbk3Zy0oG3dCkSIM22WEtLg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF63A6024A9
-X-OriginatorOrg: intel.com
+References: <20250912082658.2262-1-jasowang@redhat.com> <20250912082658.2262-2-jasowang@redhat.com>
+ <20250915120210-mutt-send-email-mst@kernel.org> <CACGkMEufUAL1tBrfZVMQCEBmBZ=Z+aPqUtP=RzOQhjtG9jn7UA@mail.gmail.com>
+ <20250916011733-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250916011733-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 16 Sep 2025 14:24:22 +0800
+X-Gm-Features: AS18NWBEENXnq_7VvTKCq3s046_2Fg4yd7Uf6NSOzQJJ0vEyLQYZEm5uVl98-eY
+Message-ID: <CACGkMEu_p-ouLbEq26vMTJmeGs1hw5JHOk1qLt8mLLPOMLDbaQ@mail.gmail.com>
+Subject: Re: [PATCH net 2/2] vhost-net: correctly flush batched packet before
+ enabling notification
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: eperezma@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org, 
+	jon@nutanix.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
-edrzej Jagielski
-> Sent: 08 September 2025 16:56
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; netdev@vger.kernel.or=
-g; Jagielski, Jedrzej <jedrzej.jagielski@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v2 2/2] ixgbe: destroy aci.lock=
- later within ixgbe_remove path
+On Tue, Sep 16, 2025 at 1:19=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
 >
-> There's another issue with aci.lock and previous patch uncovers it.
-> aci.lock is being destroyed during removing ixgbe while some of the ixgbe=
- closing routines are still ongoing. These routines use Admin Command Inter=
-face which require taking aci.lock which has been already destroyed what le=
-ads to call trace.
+> On Tue, Sep 16, 2025 at 10:37:35AM +0800, Jason Wang wrote:
+> > On Tue, Sep 16, 2025 at 12:03=E2=80=AFAM Michael S. Tsirkin <mst@redhat=
+.com> wrote:
+> > >
+> > > On Fri, Sep 12, 2025 at 04:26:58PM +0800, Jason Wang wrote:
+> > > > Commit 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until aft=
+er
+> > > > sendmsg") tries to defer the notification enabling by moving the lo=
+gic
+> > > > out of the loop after the vhost_tx_batch() when nothing new is
+> > > > spotted. This will bring side effects as the new logic would be reu=
+sed
+> > > > for several other error conditions.
+> > > >
+> > > > One example is the IOTLB: when there's an IOTLB miss, get_tx_bufs()
+> > > > might return -EAGAIN and exit the loop and see there's still availa=
+ble
+> > > > buffers, so it will queue the tx work again until userspace feed th=
+e
+> > > > IOTLB entry correctly. This will slowdown the tx processing and may
+> > > > trigger the TX watchdog in the guest.
+> > > >
+> > > > Fixing this by stick the notificaiton enabling logic inside the loo=
+p
+> > > > when nothing new is spotted and flush the batched before.
+> > > >
+> > > > Reported-by: Jon Kohler <jon@nutanix.com>
+> > > > Cc: stable@vger.kernel.org
+> > > > Fixes: 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until aft=
+er sendmsg")
+> > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > > ---
+> > > >  drivers/vhost/net.c | 33 +++++++++++++--------------------
+> > > >  1 file changed, 13 insertions(+), 20 deletions(-)
+> > > >
+> > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > > > index 16e39f3ab956..3611b7537932 100644
+> > > > --- a/drivers/vhost/net.c
+> > > > +++ b/drivers/vhost/net.c
+> > > > @@ -765,11 +765,11 @@ static void handle_tx_copy(struct vhost_net *=
+net, struct socket *sock)
+> > > >       int err;
+> > > >       int sent_pkts =3D 0;
+> > > >       bool sock_can_batch =3D (sock->sk->sk_sndbuf =3D=3D INT_MAX);
+> > > > -     bool busyloop_intr;
+> > > >       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> > > >
+> > > >       do {
+> > > > -             busyloop_intr =3D false;
+> > > > +             bool busyloop_intr =3D false;
+> > > > +
+> > > >               if (nvq->done_idx =3D=3D VHOST_NET_BATCH)
+> > > >                       vhost_tx_batch(net, nvq, sock, &msg);
+> > > >
+> > > > @@ -780,10 +780,18 @@ static void handle_tx_copy(struct vhost_net *=
+net, struct socket *sock)
+> > > >                       break;
+> > > >               /* Nothing new?  Wait for eventfd to tell us they ref=
+illed. */
+> > > >               if (head =3D=3D vq->num) {
+> > > > -                     /* Kicks are disabled at this point, break lo=
+op and
+> > > > -                      * process any remaining batched packets. Que=
+ue will
+> > > > -                      * be re-enabled afterwards.
+> > > > +                     /* Flush batched packets before enabling
+> > > > +                      * virqtueue notification to reduce
+> > > > +                      * unnecssary virtqueue kicks.
+> > > >                        */
+> > > > +                     vhost_tx_batch(net, nvq, sock, &msg);
+> > >
+> > > So why don't we do this in the "else" branch"? If we are busy polling
+> > > then we are not enabling kicks, so is there a reason to flush?
+> >
+> > It should be functional equivalent:
+> >
+> > do {
+> >     if (head =3D=3D vq->num) {
+> >         vhost_tx_batch();
+> >         if (unlikely(busyloop_intr)) {
+> >             vhost_poll_queue()
+> >         } else if () {
+> >             vhost_disable_notify(&net->dev, vq);
+> >             continue;
+> >         }
+> >         return;
+> > }
+> >
+> > vs
+> >
+> > do {
+> >     if (head =3D=3D vq->num) {
+> >         if (unlikely(busyloop_intr)) {
+> >             vhost_poll_queue()
+> >         } else if () {
+> >             vhost_tx_batch();
+> >             vhost_disable_notify(&net->dev, vq);
+> >             continue;
+> >         }
+> >         break;
+> > }
+> >
+> > vhost_tx_batch();
+> > return;
+> >
+> > Thanks
+> >
 >
-> [  +0.000004] DEBUG_LOCKS_WARN_ON(lock->magic !=3D lock) [  +0.000007] WA=
-RNING: CPU: 12 PID: 10277 at kernel/locking/mutex.c:155 mutex_lock+0x5f/0x7=
-0 [  +0.000002] Call Trace:
-> [  +0.000003]  <TASK>
-> [  +0.000006]  ixgbe_aci_send_cmd+0xc8/0x220 [ixgbe] [  +0.000049]  ? try=
-_to_wake_up+0x29d/0x5d0 [  +0.000009]  ixgbe_disable_rx_e610+0xc4/0x110 [ix=
-gbe] [  +0.000032]  ixgbe_disable_rx+0x3d/0x200 [ixgbe] [  +0.000027]  ixgb=
-e_down+0x102/0x3b0 [ixgbe] [  +0.000031]  ixgbe_close_suspend+0x28/0x90 [ix=
-gbe] [  +0.000028]  ixgbe_close+0xfb/0x100 [ixgbe] [  +0.000025]  __dev_clo=
-se_many+0xae/0x220 [  +0.000005]  dev_close_many+0xc2/0x1a0 [  +0.000004]  =
-? kernfs_should_drain_open_files+0x2a/0x40
-> [  +0.000005]  unregister_netdevice_many_notify+0x204/0xb00
-> [  +0.000006]  ? __kernfs_remove.part.0+0x109/0x210
-> [  +0.000006]  ? kobj_kset_leave+0x4b/0x70 [  +0.000008]  unregister_netd=
-evice_queue+0xf6/0x130
-> [  +0.000006]  unregister_netdev+0x1c/0x40 [  +0.000005]  ixgbe_remove+0x=
-216/0x290 [ixgbe] [  +0.000021]  pci_device_remove+0x42/0xb0 [  +0.000007] =
- device_release_driver_internal+0x19c/0x200
-> [  +0.000008]  driver_detach+0x48/0x90
-> [  +0.000003]  bus_remove_driver+0x6d/0xf0 [  +0.000006]  pci_unregister_=
-driver+0x2e/0xb0 [  +0.000005]  ixgbe_exit_module+0x1c/0xc80 [ixgbe]
+> But this is not what the code comment says:
 >
-> Same as for the previous commit, the issue has been highlighted by the co=
-mmit 337369f8ce9e ("locking/mutex: Add MUTEX_WARN_ON() into fast path").
+>                      /* Flush batched packets before enabling
+>                       * virqtueue notification to reduce
+>                       * unnecssary virtqueue kicks.
 >
-> Move destroying aci.lock to the end of ixgbe_remove(), as this simply fix=
-es the issue.
 >
-> Fixes: 4600cdf9f5ac ("ixgbe: Enable link management in E610 device")
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
-> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
+> So I ask - of we queued more polling, why do we need
+> to flush batched packets? We might get more in the next
+> polling round, this is what polling is designed to do.
+
+The reason is there could be a rx work when busyloop_intr is true, so
+we need to flush.
+
+Thanks
+
+>
+>
+> >
+> > >
+> > >
+> > > > +                     if (unlikely(busyloop_intr)) {
+> > > > +                             vhost_poll_queue(&vq->poll);
+> > > > +                     } else if (unlikely(vhost_enable_notify(&net-=
+>dev,
+> > > > +                                                             vq)))=
+ {
+> > > > +                             vhost_disable_notify(&net->dev, vq);
+> > > > +                             continue;
+> > > > +                     }
+> > > >                       break;
+> > > >               }
+> > > >
+> > > > @@ -839,22 +847,7 @@ static void handle_tx_copy(struct vhost_net *n=
+et, struct socket *sock)
+> > > >               ++nvq->done_idx;
+> > > >       } while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_=
+len)));
+> > > >
+> > > > -     /* Kicks are still disabled, dispatch any remaining batched m=
+sgs. */
+> > > >       vhost_tx_batch(net, nvq, sock, &msg);
+> > > > -
+> > > > -     if (unlikely(busyloop_intr))
+> > > > -             /* If interrupted while doing busy polling, requeue t=
+he
+> > > > -              * handler to be fair handle_rx as well as other task=
+s
+> > > > -              * waiting on cpu.
+> > > > -              */
+> > > > -             vhost_poll_queue(&vq->poll);
+> > > > -     else
+> > > > -             /* All of our work has been completed; however, befor=
+e
+> > > > -              * leaving the TX handler, do one last check for work=
+,
+> > > > -              * and requeue handler if necessary. If there is no w=
+ork,
+> > > > -              * queue will be reenabled.
+> > > > -              */
+> > > > -             vhost_net_busy_poll_try_queue(net, vq);
+> > > >  }
+> > > >
+> > > >  static void handle_tx_zerocopy(struct vhost_net *net, struct socke=
+t *sock)
+> > > > --
+> > > > 2.34.1
+> > >
 >
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
