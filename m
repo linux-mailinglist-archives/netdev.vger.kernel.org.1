@@ -1,135 +1,207 @@
-Return-Path: <netdev+bounces-223757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9342B7D5DB
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:26:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACDD6B7DF91
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:39:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A9333A4DAB
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:16:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CED37AAF96
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D382C27874F;
-	Tue, 16 Sep 2025 22:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA7429B8FE;
+	Tue, 16 Sep 2025 22:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SxKy4Vrc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PbGhk40v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B781D2FB
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 22:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D443228C869;
+	Tue, 16 Sep 2025 22:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758061004; cv=none; b=WEwvqyBs8yhOCyhGvanVB6f5c0bKfspnY8ixAbfmLLg6dKBT8p4hDdIk058EtvFIGcvIwobGpz2W2NL/hxMRGfv58EmAZ5HJgoaAqNcEbOjBs9ETc3AsVPUAUtOyhy1AQtfzOBcUalxmtcCOk2sczw9+4HdK6kEvxqW7akH0dAI=
+	t=1758061197; cv=none; b=LRBLMoLjFrJCf9rZn/9wvSf5M57BpZBQymkY5PKoUN71qClAS2BQ58a3Vwplob87Dq8bqj6ZHtck8pGZEB9qvd6OIKOHjeGRNC2iRmEVpo+aDjsipJX48uF0M7NY1ecTrj8EAMAlxThdtJr7A9h3ltIsYGhGt9Won1qFaprHlWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758061004; c=relaxed/simple;
-	bh=ZhrtNX2kW4+SEm0NDR3oatPjuXJvSmAGowa5Ma02sfQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jQx5QARNO3SYu1/HrIN8JfxiVGJGnpi5y/xfpwfhK4cLLXaBeok6Wxs5xf9UVNcohQ1B+qjMJAT8jani1fECga8ke8FybAIHqlXlmOBf9BK3Mpmucy7IuDAKHyew3HgMx8Ke60T/lDHAzxvQigfQwwsXDS3ldb+gBOfdXNkE5fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SxKy4Vrc; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-32be6bc21c7so4356716fac.3
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 15:16:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758061002; x=1758665802; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ykbi9ORR6F/chC/kV2ctSfLFRdnZlKnXwUjsJoavaTU=;
-        b=SxKy4VrcMoh0eYAxDY4MNWX9pcdyCoEU1I/knjhVy4Gyv6q2WMKcgyaLgu8fcMmpIk
-         21C0dobTWZluv6lDhyonKKqpL3Unf/xSfT3uA4mG2fD2rwuU+ClLK4g1kUOD7AuBVJNo
-         I03OBZpoTnd/a8NdvdO8XrMhZUxw2nYgyBztTETTU3XJYs4huj2OB+nVXtviwEH2ApQl
-         Wwvm7g07JGSgJ7SM2n9kMRtC7R3B+RXOH1g/YPczazQerjq4ON5AKE6Och+qeA3KSFl8
-         JegJq42pmGzSvK/xh5nia89hTI3A/M6gChlrE+6fgoskzRRM/UQzTAdyReEci8q4/O/s
-         MKbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758061002; x=1758665802;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ykbi9ORR6F/chC/kV2ctSfLFRdnZlKnXwUjsJoavaTU=;
-        b=rSsCjmNxNCc4bL89lLV5vgv4/xUoY5/7d1bBKavYXEzMxR4IkiKuoIVJlLabJ0WSo4
-         chSTvKA9gjnUFTj82tfD3j/IJev9zovbVNqSZr9Q5ycEOJ1U7c6x/L7nH1BKqXErxvjH
-         jVGlHc/fgQL8cS2nInlW1+0LhkBnhysAXy6oAJZhrkEn8pKe1I6auvUbmTklmOfrPe+Q
-         dKrxfW4n2B95SO0VUvrzUOiSi7Yl162P/QH+jrg5Q+3jn3Jb9vrkIMfJ0GYzOqNctsTJ
-         e2AyT/KU3bDTykPTNKlBakEJOEDfozdp8gFcpt2PpSvJQlvMwQD1QJGYRRFbzbioUUSh
-         o1hA==
-X-Forwarded-Encrypted: i=1; AJvYcCUuGibb4OIWYosBhqwFBOP1HrSXe5AGNyl23hmtmsvwg5VlGzlz5NpLHmgMgmhhFr7kKVQ6aZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLeWFX4qGeaLckT2WEsPJNu65Lbvo+/wpnpeo6QllsfuJ94oTN
-	/BB7Q26Re83h2gUMqJF7AsoE2P2osKxtzFKDuQxdasU9T7rIT5/DlvbB
-X-Gm-Gg: ASbGncsB5+pStGKCO7v2UODI7gfpBjf5TzEn/8q+fqQWWvgviy5poKJca03HYlFA4eu
-	G2lwUSYag26u82adZ4hKaY2HRuDU3Vi2ujEESehOKrS37TaBA23FfTLrG21wCHu/jJ4oB6DJzx0
-	qgKOIPqDf7QORKd26QZR8K9taW9BaFuazn5vYRjChFzSfPhiekRyLcuBa0ciQ7e0bQQ2Cb7tRx1
-	brVOKZhU//XavaQQ8GD7oKEN84Wj1uv+RC86I3bA8RI/8NumHmQvPoeNE8IdzAmqq53+akRD9oB
-	PvIRPs4Qiw8d437dMcbEOSKtvhc5xwcc7rVT0LGVvb0lcRJBGRYFy0pf9YqjPLdny+jSq3KJOrJ
-	nNoP/8XYN4NKGhgJS6FVf9A3TLlz9mW4yNTQ/ZFjbYAV1N0AeKbOBEsQu1Dm5DGzXKOMCF5f/tu
-	gkktIGEwPHfEfiRd580H8zc7fCnq5G2kJM3Vc=
-X-Google-Smtp-Source: AGHT+IEZnSDUvYgihKJtLaN2Xpm1odOGPMiQ/3sbr28jrHO6rgLxPXvbdax1sAYKsoitj5HevBF6BQ==
-X-Received: by 2002:a05:6870:b251:b0:2d6:6688:a625 with SMTP id 586e51a60fabf-335c014cba9mr29867fac.37.1758061002296;
-        Tue, 16 Sep 2025 15:16:42 -0700 (PDT)
-Received: from [10.0.11.20] (57-132-132-155.dyn.grandenetworks.net. [57.132.132.155])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7598664d715sm1707318a34.0.2025.09.16.15.16.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 15:16:41 -0700 (PDT)
-Message-ID: <c36676c1640cefad7f8066a98be9b9e99d233bef.camel@gmail.com>
-Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
-From: brian.scott.sampson@gmail.com
-To: Kuniyuki Iwashima <kuni1840@gmail.com>, christian@heusel.eu
-Cc: davem@davemloft.net, difrost.kernel@gmail.com, dnaim@cachyos.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, mario.limonciello@amd.com,
- netdev@vger.kernel.org, 	pabeni@redhat.com, regressions@lists.linux.dev
-Date: Tue, 16 Sep 2025 17:16:40 -0500
-In-Reply-To: <20250611164339.2828069-1-kuni1840@gmail.com>
-References: <58be003a-c956-494b-be04-09a5d2c411b9@heusel.eu>
-	 <20250611164339.2828069-1-kuni1840@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (by Flathub.org) 
+	s=arc-20240116; t=1758061197; c=relaxed/simple;
+	bh=m4JY9aGLYVoEfQTvIOCGSK9fG/1zq/kPVw6zLN783uQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MY+MJzCBVG7m73E74aNoVf+V9ZJFvjiCEQMsXlKR00uoc8i6gN3YOpveDMoIpoFNbV+ZKau4E+6sIiibPOPZZOcwIpuBvOPk0iCNufwBBLfLDvMnks6+ZaazlVVv2xB90j7mX/EWvRxXZD+eeBlEwwA5/oGXWpThCh5PIirzSsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PbGhk40v; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=6jJa1yb6mq/yCOx6rK0pnWqPtQg/Mqf+5GEFWxFsvHU=; b=PbGhk40vPRpR4Y38Yd5CXsgOaC
+	Ingfdvy+FZckMkZJRlESAaVZaRGIrREu/7sMA+TyDBh15nM2L34u/cbtJRtrKsDDSNIjquIkoxpUv
+	MAwpW5lTHDf4HwH70NGP/CObiaadLjKXVCKlgQ36ZJR3XLnaRBV9uXGndZAr/fGHV+OqeXPr0RAnf
+	XhQq1qeZDvgBh0Q/Dkq1ksASa5fjifQx1XexIUz2emDWMhUD6wx0jTKFjzyKjER/HJXCbJHZWVRcL
+	b53hkOrayZEQZ1nRdIvtToxDitAkeJKZPwaZRcJYtKYUQ4DgEKsKgFS2p4V4uI8rd1S91uudMm97j
+	uPvbti9A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33612)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uye1d-000000006Wl-3upM;
+	Tue, 16 Sep 2025 23:19:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uye1b-0000000082K-1ZIi;
+	Tue, 16 Sep 2025 23:19:47 +0100
+Date: Tue, 16 Sep 2025 23:19:47 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: andrew@lunn.ch, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: qcom: qca808x: Add .get_rate_matching
+ support
+Message-ID: <aMnigwTeMQc0GxaD@shell.armlinux.org.uk>
+References: <20250914-qca808x_rate_match-v1-1-0f9e6a331c3b@oss.qualcomm.com>
+ <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
+ <aMfUiBe9gdEAuySZ@oss.qualcomm.com>
+ <aMgCA13MhTnG80_V@shell.armlinux.org.uk>
+ <aMgootkPQ/GcdiXX@oss.qualcomm.com>
+ <aMgsiDS5tFeqJsKD@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMgsiDS5tFeqJsKD@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> Thanks for the report.
->=20
-> Could you test the diff below ?
->=20
-> look like some programs start listen()ing before setting
-> SO_PASSCRED or SO_PASSPIDFD and there's a small race window.
->=20
-> ---8<---
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index fd6b5e17f6c4..87439d7f965d 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1971,7 +1971,8 @@ static void unix_maybe_add_creds(struct sk_buff
-> *skb, const struct sock *sk,
-> =C2=A0	if (UNIXCB(skb).pid)
-> =C2=A0		return;
-> =C2=A0
-> -	if (unix_may_passcred(sk) || unix_may_passcred(other)) {
-> +	if (unix_may_passcred(sk) || unix_may_passcred(other) ||
-> +	=C2=A0=C2=A0=C2=A0 !other->sk_socket) {
-> =C2=A0		UNIXCB(skb).pid =3D get_pid(task_tgid(current));
-> =C2=A0		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
-> =C2=A0	}
-> ---8<---
-Just came across this when troubleshooting a resume from suspend issue
-where I'm get a black screen after suspend. Initially saw this with my
-distribution's(Linux 6.16.7-2-cachyos) kernel, and confirmed the issue
-in the latest version of the vanilla mainline kernel. Bisection is also
-pointing to commit 3f84d577b79d2fce8221244f2509734940609ca6.=20
+On Mon, Sep 15, 2025 at 04:11:04PM +0100, Russell King (Oracle) wrote:
+> On Mon, Sep 15, 2025 at 08:24:26PM +0530, Mohd Ayaan Anwar wrote:
+> > On Mon, Sep 15, 2025 at 01:09:39PM +0100, Russell King (Oracle) wrote:
+> > > This shows that the PHY supports SGMII (4) and 2500base-X (23). However,
+> > > as we only validate 2500base-X, this suggests stmmac doesn't support
+> > > switching between SGMII and 2500base-X.
+> > > 
+> > > What *exactly* is the setup with stmmac here? Do you have an external
+> > > PCS to support 2500base-X, or are you using the stmmac internal PCS?
+> > 
+> > Internal PCS. But it's not really pure 2500base-X...
+> > I found an older thread for this exact MAC core [0], and it looks like
+> > we have an overclocked SGMII, i.e., 2500base-X without in-band
+> > signalling.
+> > 
+> > Just wondering if registering a `.get_interfaces` callback in
+> > `dwmac-qcom-ethqos.c` and doing something like the following will be
+> > helpful?
+> > 
+> > case PHY_INTERFACE_MODE_2500BASEX:
+> > 	__set_bit(PHY_INTERFACE_MODE_2500BASEX, interfaces);
+> > 	fallthrough;
+> > case PHY_INTERFACE_MODE_SGMII:
+> > 	__set_bit(PHY_INTERFACE_MODE_SGMII, interfaces);
+> > 	break;
+> > ...
+> > 
+> > This should ensure that both SGMII and 2500base-X are validated,
+> > allowing switching between them.
+> 
+> So, this is something that has never worked with this hardware setup.
+> I don't think we should rush to make it work. The stmmac internal
+> PCS code is a mess, bypassing phylink. I had a patch series which
+> addressed this a while back but it went nowhere, but I guess this is
+> an opportunity to say "look, we need to get this sorted properly".
+> 
+> I suspect this isn't going to be simple - stmmac does _not_ use
+> phylink properly (I've been doing lots of cleanups to this driver
+> over the last year or so to try and make the code more
+> understandable so I can start addressing this deficiency) and
+> there's still lots of work to be done. The way the "platform glue"
+> drivers work is far from ideal, especially when it comes to
+> switching interfaces.
+> 
+> I'll try to post the stmmac PCS cleanup series in the coming few
+> days, and it would be useful if you could give it whatever
+> testing you can.
 
-This patch appears to be already applied in the mainline kernel, so
-this might be something different. I'm new to mailing lists, so wasn't
-sure if I should report this issue here or start a new email chain.
+... and it's been delayed because I've had to rework three of the
+patch series I recently posted.
 
---=20
- Brian Sampson <brian.scott.sampson@gmail.com>
+I did get some time late last night to read through the documentation
+I have for one version of the dwmac which has optional PCS, and I'm
+coming to the conclusion that the whole mac_interface vs phy_interface
+thing is wrong in the driver.
+
+My comment update which added this a few years ago:
+
+        /* MAC ----- optional PCS ----- SerDes ----- optional PHY ----- Media
+         *       ^                               ^
+         * mac_interface                   phy_interface
+         *
+         * mac_interface is the MAC-side interface, which may be the same
+         * as phy_interface if there is no intervening PCS. If there is a
+         * PCS, then mac_interface describes the interface mode between the
+         * MAC and PCS, and phy_interface describes the interface mode
+         * between the PCS and PHY.
+         */
+
+appears to be incorrect. It was based on just phylink knowledge and a
+reasonable guess about what was going on with this driver. It seems
+no one had any better ideas on exactly what mac_interface was trying
+to describe.
+
+Having looked at the information I now have, and referred back to the
+psat code, it appears to me that what is actually going on here is
+this:
+
+	MAC --- optional integrated PCS --- SerDes --- world (media or PHY)
+                                         ^          ^
+                                 mac_interface  phy_interface
+				        TBI      1000base-X
+
+It seems that TBI is used on the PCS output when talking to a SerDes
+for 1000BASE-X or SGMII. RTBI is used with a PHY that can talk RTBI.
+
+Considering just 2.5G and below, it seems to me that mac_interface
+can be determined from phy_interface:
+
+phy_interface		mac_interface
+SGMII			TBI
+1000BASE-X		TBI
+2500BASE-X		TBI
+RTBI			RTBI
+
+These are the "official" modes. There is also a seperate block that
+is used for SMII and RGMII which the code treats as a PCS (partly
+because it uses the same registers) so I'd throw into this:
+
+phy_interface		mac_interface
+SMII			SMII
+RGMII*			RGMII*
+
+For every other phy_interface <= 2.5G, mac_interface is basically
+not applicable, and we should be referring to phy_interface everywhere.
+
+In fact, I can't see that mac_interface actually matters for most of
+the driver. The only case I can see it matters is when the core
+supports multiple interfaces, and needs to be configured appropriately
+(which needs an entire core-wide reset if it changes.)
+
+So, I'm going to propose at the very least selecting whether the driver
+uses the PCS not based on mac_interface as the code currently does, but
+on phy_interface (actually the interface passed by phylink.) That will
+make phylink happier when stmmac is converted to phylink_pcs.
+
+This means I need to spend some time reworking my series... and yay,
+more patches to add to my already massive stack of stmmac patches. :/
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
