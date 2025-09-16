@@ -1,141 +1,125 @@
-Return-Path: <netdev+bounces-223540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15399B59711
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:11:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D156AB59722
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0AAF2A67A3
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:11:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A49C320A0F
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CBF2BE05F;
-	Tue, 16 Sep 2025 13:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95225313E3C;
+	Tue, 16 Sep 2025 13:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="mHy9trfc";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SKzlUm7o"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="I1tJQ1kz"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0CD314A8D;
-	Tue, 16 Sep 2025 13:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09C531352A;
+	Tue, 16 Sep 2025 13:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758028183; cv=none; b=mqB8LTaVLzSuU383g7ixaUMBRs1p2lsHGKXUOqHIiM+56wdWp0y07b+IN/X9BRlthn16ZUVokA9WgnEmSFwbH0vPeBWZ9mzJ0UDUIVFSshLS+dNH94VoVhz8aZn0qi9KY+8e6O0jnt6ZVkkhaiD4FiLFAu2B4aGiSIOAuCrB14w=
+	t=1758028370; cv=none; b=RZ7VP5W2mTu2sAFkpcyFM2y9fXoZDZq4p7kKYz/RZ8X3n+gW/RGiWWrM1P1SpgSG95Wp53KUKnW0dzjBzoN/Gp8otFPo1cc7UQ27PC/60IiE42QVOQxArQJ1EZo/ZORa64FZTRbUMF3gqO35URQFaj9eUn15+jUNY65M80Mi6hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758028183; c=relaxed/simple;
-	bh=7t1DSmWPBV7Ep4cXIBfIkNKeLzym3rQus0S4yZvxJOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iusUp0hGxvZWPZrAW0v1sxPZude5u2qxmo4la8x2JiOBspvnehOqHQjQUFJjA/3dJf80BJfshcu4OFHAUqbFL3Ypqz5BPX6Vsn2YpNEn+jeA3Uf01mZuM0Gf6tKh0e69fZjLeNL40Oqc4BX5NS0R/nFwWbfnJFiZvaxY/69KRV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=mHy9trfc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SKzlUm7o; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 5EBE17A02B7;
-	Tue, 16 Sep 2025 09:09:40 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Tue, 16 Sep 2025 09:09:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1758028180;
-	 x=1758114580; bh=vqtACckqXXBnggK/TvO0gaH/m3c1JrFkfitNI82HTL4=; b=
-	mHy9trfc2up+BLc0JX/8LSI3g7iYYCDyu09kd9NwUo/lJCTSR82Q6PNtHJ/6zayo
-	gmUvNAi7zK//25gpEXaZA4K4cYfMsYITRd0eHEURQmyppOTuElWpDmFADVjOHK2M
-	eJVPIz6dBYoLnzvudBvujWh4IZ09y7SkOOe8n87q1WfuNWHCsNlrLZL/T0tJ+G65
-	6KrhsXQ+rFvlq6p5QpENzCa2C5wRp8sXLs95Q1PDkY5mkIlH2bKtGuEGAFEe8wfB
-	4GD1H9CTS00tZQK8A9vUuup9l6tP4fP6+6zTNVYGF8C4X4nxCAODtAQDwr9KRZ23
-	7VztDiVvUNaHNy3o9sLzfA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758028180; x=
-	1758114580; bh=vqtACckqXXBnggK/TvO0gaH/m3c1JrFkfitNI82HTL4=; b=S
-	KzlUm7oH+Aa+KFi9G3jaZiZcsZZeIpNXr05cPEwh7zchMCd1SmAkaTWmM5g3fmo/
-	Ghdjz1EaDjypusTUTAnxadfun+AQ+mP79my1pZIazvPX7i5eCOv7EaAdbR4X4xQp
-	wmXVvTttwFK+BCAQ+cW6zFOBQuYfcyv+tYyQAwA66QGFdKdLRlSm1zJdXbkssjaX
-	hQRJBDd+8v9kGeLGiQKV5Cdh3KP8P+D47JR+0Jx3IoE2MQ7rg0I3zSf1YVGg9FRj
-	Gcqzmr3SQDC9uQkERunZ0ZuVOogzDIkj7TrD0dyv/SkL1vA5LU8ivwRBV9yinr96
-	zPaB78oRdmGECc3bBz1hg==
-X-ME-Sender: <xms:k2HJaETK0hTFVSQZQRY_ctHL8XMvVJquEuB1jsnsydT3xMgfXCkSpg>
-    <xme:k2HJaL1BE0fY_VTvtuM96aLP3lUWUrzGv4CQd-kplh-Nlb8_tz1b160S1Aq_xMbIg
-    8lcBt9qt9pypBXFdHM>
-X-ME-Received: <xmr:k2HJaGwXKR5fcE56NRveqw977mNyBHH7Jxvr2BKKsHFWn94r-14M2BXiDB8eJVm_TM__q_VJilAKdkctsu8fUxMSrWmCtbD7PA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegtdeihecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomheppfhikhhlrghs
-    ucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrg
-    hssehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepfefhleelhfffjefg
-    fedugfegjeelhfevheeikefhueelgfdtfeeuhefftddvleeinecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhu
-    nhguodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepud
-    efpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgt
-    hhdprhgtphhtthhopehprghulhesphgsrghrkhgvrhdruggvvhdprhgtphhtthhopegrnh
-    gurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggr
-    vhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephihoshhhihhhihhrohdrsh
-    hhihhmohgurgdruhhhsehrvghnvghsrghsrdgtohhmpdhrtghpthhtohepghgvvghrthdo
-    rhgvnhgvshgrshesghhlihguvghrrdgsvg
-X-ME-Proxy: <xmx:k2HJaPzjB3xaLNhNUgCWSuEfaKZun41zSwgaWhQS0t2kKNrLrw5Ljg>
-    <xmx:k2HJaK9tRjgOv5bDqlQBh8iof8CjJry0x87hv5UomHorouHStQVnzQ>
-    <xmx:k2HJaB87U-NMHTei5y1_IkoNXHeTrKuAhvUGGSMJW7khKPQhzsxoOg>
-    <xmx:k2HJaK5NoiTvYE7Gbw4uPU3AH32hZUtIMRbWCvE-kNjzcoxs8K5JmA>
-    <xmx:lGHJaBg9pWMYP9XR7G6DPbkMfh26_E2gdpUkR8RTfmRGTzQbayfTBpNT>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 16 Sep 2025 09:09:39 -0400 (EDT)
-Date: Tue, 16 Sep 2025 15:09:38 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 3/6] net: rswitch: Use common defines for time
- stamping control
-Message-ID: <20250916130938.GE1045278@ragnatech.se>
-References: <20250916101055.740518-1-niklas.soderlund+renesas@ragnatech.se>
- <20250916101055.740518-4-niklas.soderlund+renesas@ragnatech.se>
- <610436b7-ab28-4a76-b702-772b5756b17c@lunn.ch>
+	s=arc-20240116; t=1758028370; c=relaxed/simple;
+	bh=NdsjIpLQ/ZCIkYQFwRJqqaobbgPnADrDW11zLKXJU0M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=O6PgRhT4bzt3nmnSbnCfltBIUnQdDUlB1b7Gdhi3jtFnSluXsHCyhriYQjIz+AEfxXowEuP+YXnir8qXCWAkN0rTV3OEiWE07YTGSvk0YoqsrnieFTwnpjkK41elS7NDTsshlLi0Hd1CSE9vYT6MGmeKp5RM+2RJwydiIQXu3hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=I1tJQ1kz; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58G9RMM3014997;
+	Tue, 16 Sep 2025 06:12:38 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=S43lXPw2lCJOOulxOQ+29E0
+	fsDGAddr6dm3x72BG9Bk=; b=I1tJQ1kzg5YbjS2KVQXzWdOnTtkbtgagUFBU2+N
+	dNT+2zwtXVQpi3lZzLwqnXWizDV8ZoalbWAOvU3odGE3zfVqP190bix01Ijj8W1j
+	+CqRlVA2L72Cwh3sXviGIB1pAtXrVQ+2KkqA6HP/DTLliCP+qUytXrqVG1fayrvk
+	HGKEmtQcTqK/KpwALqb+G/J+YdY7OvlMOdd1hnWAOvgiv/VGH8wLytApZNzG9MYy
+	pM5R/sgURrBdRwb3yO8zUWmaCDYOePfGKiWQggH4iodSGGatI6JEtBrlC2IwNLtC
+	SnXu8AdDVEbXwfIxFfhM4XmiTxLAoRmqHbzXL1pmcwIzvSg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 496tgysjs5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 06:12:38 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 16 Sep 2025 06:12:44 -0700
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 16 Sep 2025 06:12:36 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 16 Sep 2025 06:12:36 -0700
+Received: from sburla-PowerEdge-T630.sclab.marvell.com (unknown [10.106.27.217])
+	by maili.marvell.com (Postfix) with ESMTP id 523123F7045;
+	Tue, 16 Sep 2025 06:12:36 -0700 (PDT)
+From: Sathesh B Edara <sedara@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <sburla@marvell.com>, <vburru@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>, <hgani@marvell.com>,
+        <andrew@lunn.ch>, <srasheed@marvell.com>
+CC: <sedara@marvell.com>
+Subject: [net PATCH v2] octeon_ep: Clear VF info at PF when VF driver is removed
+Date: Tue, 16 Sep 2025 06:12:25 -0700
+Message-ID: <20250916131225.21589-1-sedara@marvell.com>
+X-Mailer: git-send-email 2.36.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <610436b7-ab28-4a76-b702-772b5756b17c@lunn.ch>
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=KpVN2XWN c=1 sm=1 tr=0 ts=68c96246 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=yJojWOMRYYMA:10 a=M5GUcnROAAAA:8 a=DmOvae2lHUslj-ssQz4A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: D9z8UjjYgHqZDk8tCwnomO0at0y4l_MF
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE1MDE5OCBTYWx0ZWRfX82iOB9Wa8OmN bn+b8j1mduxKKnETsINw6R5hD29y2+qrea9YaK4QpL5D4ONHPP/k62qEpOcKXlY92EdDjauuMUC 6w+ODDxScC/YJ8EaSR9tEMGUfrZxl6IVZnSHbit+INRvJCUzh47boHi3PjFFhVmeV8PUVIWmNq3
+ vvapK9pW+9OmxbCqssakLixhBa9KTWYVYyPRELIU9K7Jdry11Zo6WEDmnqJaT/0qlcpi+7MOUoa m1pjam1bd5t2EkA5uwwYSq7HcrEiCuvdPsQaRfy1DazftnOWnUhfIdRvYmnjZ6ZsZ2J4BKI2YYn ydVmgXN2o2Jyl8UmVKOpRZD86Sv9lr/BGJz/IE9N+lT2iAHHa+DEl9seRAQh7aT8bsyOxB2tA7f RjqD8GsP
+X-Proofpoint-GUID: D9z8UjjYgHqZDk8tCwnomO0at0y4l_MF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
 
-On 2025-09-16 14:31:29 +0200, Andrew Lunn wrote:
-> > -		get_ts = rdev->priv->tstamp_rx_ctrl & RCAR_GEN4_RXTSTAMP_TYPE_V2_L2_EVENT;
-> > +		get_ts = rdev->priv->tstamp_rx_ctrl != HWTSTAMP_FILTER_NONE;
-> 
-> That is not an obvious transformation. The first looks like a specific
-> subset of events, while the second looks like any sort. It might be
-> worth commenting about this in the commit message.
+When a VF (Virtual Function) driver is removed, the PF (Physical Function)
+driver continues to retain stale VF-specific information. This can lead to
+inconsistencies or unexpected behavior when the VF is re-initialized or
+reassigned.
 
-Good point, I will do so in v2.
+This patch ensures that the PF driver clears the corresponding VF info
+when the VF driver is removed, maintaining a clean state and preventing
+potential issues.
 
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+Fixes: cde29af9e68e ("octeon_ep: add PF-VF mailbox communication")
+Signed-off-by: Sathesh B Edara <sedara@marvell.com>
+---
+Changes:
+V2:
+  - Commit header format corrected.
 
+ drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+index ebecdd29f3bd..f2759d2073d1 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+@@ -205,6 +205,8 @@ static void octep_pfvf_dev_remove(struct octep_device *oct,  u32 vf_id,
+ {
+ 	int err;
+ 
++	/* Reset VF-specific information maintained by the PF */
++	memset(&oct->vf_info[vf_id], 0, sizeof(struct octep_pfvf_info));
+ 	err = octep_ctrl_net_dev_remove(oct, vf_id);
+ 	if (err) {
+ 		rsp->s.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
 -- 
-Kind Regards,
-Niklas Söderlund
+2.36.0
+
 
