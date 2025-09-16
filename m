@@ -1,145 +1,114 @@
-Return-Path: <netdev+bounces-223296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C7AFB58A7B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:01:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0096B58A91
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:03:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2426D169563
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:01:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65420168ECA
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F43C186E40;
-	Tue, 16 Sep 2025 01:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB2B199935;
+	Tue, 16 Sep 2025 01:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GTNmXHCY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ESYbNM0Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B11084E07
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DF0199920
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:03:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757984495; cv=none; b=fspgqNuagY14o2rjhhSg5ClSHF6YhIc1b4OU0ygwe1AVy1o44OWtFYxv+VZMXoyGGI7o8/tbrqnt64adIyz0qeYxRCowJ5eikLBfpEPa91YgyZ/HCtloAkeEAFYeDu/uerCVwROa3RP/YGN5H1RnnpRMuBIbo2Agr9VcYDMzbF4=
+	t=1757984632; cv=none; b=eVp8FxyeAaTnTjAi6OuJSJURpsaVQ28KIC1reK0c2AAyxcZoOZfQTWUVeTWOp8Di3EYdEPC+GqVT25cXf5+4xuzZftT/9dnCm+KnofcKegZ+XVO0pIvjw09V9X47kUHiJ6co/baAESD5ds4ZEUevCJJqyP47UjCgY9rhLPEQPlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757984495; c=relaxed/simple;
-	bh=wKrQfWtd1tZ0qs+AjJ1pBwafLoTFRq+T98zZFLasgcM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KRw7T8l1u1EouYsXLjut3dsKqdG5qBqJgpU3cSySeq+XTvlnzumMoQz6BIINi30WQuFUedaDan7ffP28oj1IAVVSJLnZol7624GxCeDvTvDuWqpuygXJcKRU2wTta2IAZtorsakrURp8xzH1mK6IcbwLTvQYy+KQnNHg1TbGC6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GTNmXHCY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D1CAC4CEF1;
-	Tue, 16 Sep 2025 01:01:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757984494;
-	bh=wKrQfWtd1tZ0qs+AjJ1pBwafLoTFRq+T98zZFLasgcM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GTNmXHCY8qY8FhVPgIja8JH5xC4y641+xFbT7AVWiZE7j+DfX+6Aj3cDEXQ/Y5w8C
-	 2q6bXQbi0+zkB5Obfqd4gaFCqVLIgnk4nDOAjehaS9I87Z7gQognrV5IdA8V696u3N
-	 UsY15CtFsuj26RcloaARRDG4xBI1ByeKvaOAl7XQU/wkhA//xE8QXt1YFel2sNpKVC
-	 xmLGusRAHIbDemQHdD+PrdHbg0r7G3fl2OfC2ePYT6fzTZtDlZB8BnU0VvsSOXsvxL
-	 5O1AVk9P661WfiXDeAYUETEswQy2S25PtWF9kq9ThpcWrAJYW85DDAAytQKJbQEElW
-	 ntudvvIyfuUDA==
-Date: Mon, 15 Sep 2025 18:01:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Alexander
- Lobakin <aleksander.lobakin@intel.com>, Mengyuan Lou
- <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next v4 1/2] net: libwx: support multiple RSS for
- every pool
-Message-ID: <20250915180133.2af67344@kernel.org>
-In-Reply-To: <20250912062357.30748-2-jiawenwu@trustnetic.com>
-References: <20250912062357.30748-1-jiawenwu@trustnetic.com>
-	<20250912062357.30748-2-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1757984632; c=relaxed/simple;
+	bh=PyD9tFabiPyt6k44PDHVW/3DRPPYLG2L7qxqdcs6P6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=icpqpjiCyEm3RQb81sG/LwyKsTTYhpkt2xpxBMzxkiWwL0WUn2CTJfBwuMLxlHXmPReKDa5q8e+XUP15L7hnKAr3g6t76MjYPAkITbEvW8etaHG2Vj2eZaO9M0yLToXw2z5lvEQUEEWKsR36TOOSuDngMsrmEGRryAyioKfRMCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ESYbNM0Q; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-329a41dc2ebso4166147a91.3
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 18:03:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757984630; x=1758589430; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JTTqJ1PzYlN5Tf9LOZRyEc/wEnKH/fR6iyZ4aVL4EiQ=;
+        b=ESYbNM0QIBBCQnFT920tIXTXl5fFijzfQDXYf1ZZH6OrEOrhVHJt/CdHBrKuV73bZp
+         bDVoLMMyouiU2iuvCAxss/oCqIiXQpw2+WDIEt8qmDcGiousdyK1tfRg+JOexxFGe8gl
+         3JClKwqWhUnjaCPPD1K3/J6nYoxqWSLCDZG1vIt0GBnXPrYoxlILtR1HW6AFxYRgKFX2
+         2payqmDq9ibXbxjDILs1RdCGPMRxbD/vOVwMrw3st2f94tO2rL88Wr0thID9lqj/ukPb
+         JHGs802FL0ykv7EjA7i2+rLjVxMgbhLuoCi77GSD3lYwwNr1yUi1E4qtsuJfAnPPOq63
+         2qDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757984630; x=1758589430;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JTTqJ1PzYlN5Tf9LOZRyEc/wEnKH/fR6iyZ4aVL4EiQ=;
+        b=Q2OcW1kcxUFoxnrP3sYNgDFmqOPzlRSY5PWQVQUiYok/1HrORpHT2ySD0Y8y4vgeZW
+         H4cTsUFL/86k+MmoESMGT6oSU9rspQUyET0TkIXc+xfxk+f3suz03HA6L/3ic9z8PcDR
+         da1D3JQ+2H9G8gznNo/9Ii2UPH5L7PICe11nx8FxF/Z4LGjKQcAeOH4mxpcyOqJt17hq
+         0rvy3iIQkUTfw0C4wraFl9I2wqtwVRrz8MHHT+685J0U/4/UYXkH7mXlU1aB86M0z2JY
+         +05PTuTa3lTJXWS8+qA0k6YrMK6Qt2kegeqZuHdNr7S7aMkgRQ5oavGwUokh/B0J12Hg
+         PVyQ==
+X-Gm-Message-State: AOJu0YyNC9JpsjEK81xSifWIztl3PsRcXL/ykNbJ0rTPzItnRY+Wc8Wf
+	MG0lANAIl2wPPu9wilr+hdeuBZAIwDCNU/V8uHke8tcK594j0qrlYOPO
+X-Gm-Gg: ASbGncukoDndN9sGQXMUFgOzEbdphzjpDngkonjlhv1Nn0nvoslmuAadI7NHQnkQj3l
+	NGZ/CKK0QOshvQBiaAG7/iyWryHmIZZW9WTUQUejEwcq3TL4hxCvOuWAQHpmHtjkqFgYXDvR7jf
+	wepznhXV63AYT5RLnrW36Vww1/FAX629KpYOpqlDerV3EQeiEcA5gKq0JMEgCtx0Wz/b22nOBw/
+	PMzwr2cMHW49GKthOx01tt2lkCugXReNLivNtC8xK8yYluqvPHMrPZe58sfKjg9yHFqf27SeXvS
+	T+jpQAAw2QgZnSlZBSht5fTe0GLG/l2CeAlRxVkuS6RI/SzU9+kGVWlmXUGaXBPXc3+C6bNLyYs
+	Vjms5ODmw5M2V7LC6ngmrCEu7P8Q=
+X-Google-Smtp-Source: AGHT+IGsrrWACmY2x5NwzTWtkLaNRfykuTFOCxWVyvnZeymkbbhwpyyNZO3It9swEPkiXiS3QXUkzg==
+X-Received: by 2002:a17:90b:3148:b0:32e:a6c3:67d4 with SMTP id 98e67ed59e1d1-32ea6c369b3mr345922a91.15.1757984629817;
+        Mon, 15 Sep 2025 18:03:49 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32ea3c6fefdsm272384a91.3.2025.09.15.18.03.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Sep 2025 18:03:49 -0700 (PDT)
+Date: Tue, 16 Sep 2025 01:03:44 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net 0/4] wireguard fixes for 6.17-rc6
+Message-ID: <aMi3cB7Epg-I7tMn@fedora>
+References: <20250910013644.4153708-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250910013644.4153708-1-Jason@zx2c4.com>
 
-On Fri, 12 Sep 2025 14:23:56 +0800 Jiawen Wu wrote:
-> Subject: [PATCH net-next v4 1/2] net: libwx: support multiple RSS for every pool
+On Wed, Sep 10, 2025 at 03:36:40AM +0200, Jason A. Donenfeld wrote:
+> Hi Jakub,
+> 
+> Please find three small fixes to wireguard:
+> 
+> 1) A general simplification to the way wireguard chooses the next
+>    available cpu, by making use of cpumask_nth(), and covering an edge
+>    case.
+> 
+> 2) A cleanup to the selftests kconfig.
+> 
+> 3) A fix to the selftests kconfig so that it actually runs again.
 
-"support multiple RSS" needs an object. Multiple RSS keys? Multiple
-contexts? Multiple tables?
+Hi Jason,
 
-> -static void wx_store_reta(struct wx *wx)
-> +u32 wx_rss_indir_tbl_entries(struct wx *wx)
->  {
-> +	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags))
-> +		return 64;
-> +	else
-> +		return 128;
-> +}
+Sorry to bother you, but I have a WireGuard self-test update [1] that has been
+stuck in "Awaiting Upstream" for a long time without any comments. Could you
+please help review it?
 
-Is WX_FLAG_SRIOV_ENABLED set only when VFs are created?
-What if the user set a table with 128 entries?
-The RSS table can't shrink once intentionally set to a specific size.
+[1] https://lore.kernel.org/netdev/20250527032635.10361-1-liuhangbin@gmail.com
 
-> +void wx_store_reta(struct wx *wx)
-> +{
-> +	u32 reta_entries = wx_rss_indir_tbl_entries(wx);
->  	u8 *indir_tbl = wx->rss_indir_tbl;
->  	u32 reta = 0;
->  	u32 i;
-> @@ -2007,36 +2016,55 @@ static void wx_store_reta(struct wx *wx)
->  	/* Fill out the redirection table as follows:
->  	 *  - 8 bit wide entries containing 4 bit RSS index
->  	 */
-> -	for (i = 0; i < WX_MAX_RETA_ENTRIES; i++) {
-> +	for (i = 0; i < reta_entries; i++) {
->  		reta |= indir_tbl[i] << (i & 0x3) * 8;
->  		if ((i & 3) == 3) {
-> -			wr32(wx, WX_RDB_RSSTBL(i >> 2), reta);
-> +			if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags) &&
-> +			    test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
-> +				wr32(wx, WX_RDB_VMRSSTBL(i >> 2, wx->num_vfs), reta);
-
-Do we need to reprogram the RSS when number of VFs change, now?
-
-> +			else
-> +				wr32(wx, WX_RDB_RSSTBL(i >> 2), reta);
->  			reta = 0;
->  		}
->  	}
->  }
->  
-> +void wx_store_rsskey(struct wx *wx)
-> +{
-> +	u32 random_key_size = WX_RSS_KEY_SIZE / 4;
-
-They key is just initialized to a random value, it doesn't have to be
-random. Just "key_size" is better.
-
-> +	u32 i;
-> +
-> +	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags) &&
-> +	    test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
-> +		for (i = 0; i < random_key_size; i++)
-> +			wr32(wx, WX_RDB_VMRSSRK(i, wx->num_vfs),
-> +			     *(wx->rss_key + i));
-
-Prefer normal array indexing:
-
-			     wx->rss_key[i]
-
-> +	} else {
-> +		for (i = 0; i < random_key_size; i++)
-> +			wr32(wx, WX_RDB_RSSRK(i), wx->rss_key[i]);
-> +	}
-> +}
-
-> -	u32 rss_field = 0;
-
-completely unclear to me why moving rss_field to struct wx is part of
-this patch. It looks unrelated / prep for the next patch. 
--- 
-pw-bot: cr
+Thanks
+Hangbin
 
