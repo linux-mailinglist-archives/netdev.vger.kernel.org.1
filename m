@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-223304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18822B58B33
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:31:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 978DAB58B36
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C434460625
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:31:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91BCD52168F
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F2020010A;
-	Tue, 16 Sep 2025 01:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1271B2222AC;
+	Tue, 16 Sep 2025 01:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pxqG5lE7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BMO4EjvN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B943824A3;
-	Tue, 16 Sep 2025 01:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3FB221FB2
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757986239; cv=none; b=BkEu7EH3zGvfgTYCgySqUoM4yiJ3aBveVUYVKH9VhBTdO+vuwpH/MEqpudu5M8uhH97jy1rdANkp9v+MLH5vWq35eMKUEK0gvF4uoHYegNNCsuanTi5dRP7AuUNRzRSdi8/r8TGG86Ck0GjpNH/cYI6G/BhesNd7h2ZQbgXB+no=
+	t=1757986241; cv=none; b=OLaQDxuhQOj1nySHjqoIQg51dUUbVs6bAFZ5ljt6Pk8stj6Sxevz1vSJ/I6CkRa+qyJDvXYbx/ib0QH1s1NwAFVWA9c8ee/PdVUhUamnIE+eXVoU453/AugWxkGs1KWAE/bbYEEYpht3253OKmu0RE9GSjhj/WMQd9x20U1z+sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757986239; c=relaxed/simple;
-	bh=v9tC8NiGK9d1Q1Se1trYoJ8mZvSBVLWX2i6c4mciDCQ=;
+	s=arc-20240116; t=1757986241; c=relaxed/simple;
+	bh=/0fVPoedDebJ/PlMi9yT/nQRv8fIS9HH0sIeFetXn2U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HDuCXe3cq0PPGQO8dpGpI6ANIDf/DssqQRTuNK2WU+gikonIaHOh3DJolgnfRIncNNEwfvGPCTIZWw3CY2MkIBsByZZ3H9oVGSkkIrqkjHj8steAZSPWp08u4eFmnE7CK7n+XW5mqzckPygPCfIIHZr4Gl7U+NY9L6icnRsdYVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pxqG5lE7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC33C4CEF1;
-	Tue, 16 Sep 2025 01:30:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cqsVNjAj6srL6Dq0eKn8xVVZsQtOxHVOT6nRmt2RmMr5pfkkWn0XYWxosj5MmYR2yosWPlMx7EpoHHe8GvxovsmfPYh8TjO6HenFdHe6oywsL3DUsVL77EbQp2n6eFt2rGl68LaDNpygv0dQG9G23KmTmH2ig04npifPUigadSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BMO4EjvN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 511DAC4CEFC;
+	Tue, 16 Sep 2025 01:30:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757986239;
-	bh=v9tC8NiGK9d1Q1Se1trYoJ8mZvSBVLWX2i6c4mciDCQ=;
+	s=k20201202; t=1757986240;
+	bh=/0fVPoedDebJ/PlMi9yT/nQRv8fIS9HH0sIeFetXn2U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pxqG5lE7BEaXo8yXYR1n7DpO+ePghIH9ud4/ipVp59Jd4BWL8CYcrRifqXoxmAGmb
-	 79/dRdQnQTvxIRE3P+c4gd6KD7kOAIZ3rn1/Bk3joxgx6D36tAWIOIaZE6dRVui9VP
-	 RKmJ4PEGSYNZBaDslYGmwQyJ8SYSF63TPWoje/2N+6ezafnKAIYhNu4XYyJwbqZebK
-	 K3V+8qg30D8QgjT25vVKyAcKS8/gxPfuhKmgwGK4FgFc6Ty4E/N/c/HllW+2GCtHxt
-	 u0Ip0PJkbnzUhHwqsYretAiZFyJoujj9a3NzFFIp1f/xT9V+T9sEkP4GOrhcsmBuRl
-	 UhnhXollRKB7A==
+	b=BMO4EjvNOKfWEMPSyQNXN8VuZQdUDrq1e0CM7u7B8TPrPLEDQ2pVUyphXhooA8tCm
+	 g0lrj2fagGf8fsfK1Dx+qqzOqxUPpP0Psseg51e46aiBT7z0stvzxaS8bVqysgbqxV
+	 s910mIMLZXj2FCvp5LMAj9PdjwyBPiwwNfM3hqNx+hDYRV6bgnFXAUPRchNlso0z1J
+	 wnBroEzWu7SZncEaStn9tHa1zOpK8NZMQ6xJhRcCFTVCpCy/1Swh3GyfFtaA5QRLYR
+	 eZh7G1BJZzwraq1c2asmYbgtFElso4kX+fyWHBxaGXwGPLYnOgYBGUnHeIrBfsjXYN
+	 riai4Kfb89/Tg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF2039D0C17;
-	Tue, 16 Sep 2025 01:30:41 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD2F39D0C17;
+	Tue, 16 Sep 2025 01:30:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] io_uring/zcrx: fix ifq->if_rxq is -1,
- get dma_dev is NULL
+Subject: Re: [PATCH net-next] bonding: fix standard reference typo in
+ ad_select
+ description
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175798624024.559370.11569066407695924130.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Sep 2025 01:30:40 +0000
-References: <20250912140133.97741-1-zhoufeng.zf@bytedance.com>
-In-Reply-To: <20250912140133.97741-1-zhoufeng.zf@bytedance.com>
-To: Feng zhou <zhoufeng.zf@bytedance.com>
-Cc: axboe@kernel.dk, asml.silence@gmail.com, almasrymina@google.com,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- saeedm@nvidia.com, tariqt@nvidia.co, mbloch@nvidia.com, leon@kernel.org,
- andrew+netdev@lunn.ch, dtatulea@nvidia.com, netdev@vger.kernel.org,
- io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+ <175798624174.559370.16766476727267509750.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Sep 2025 01:30:41 +0000
+References: <20250912133132.3920213-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250912133132.3920213-1-alok.a.tiwari@oracle.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 12 Sep 2025 22:01:33 +0800 you wrote:
-> From: Feng Zhou <zhoufeng.zf@bytedance.com>
+On Fri, 12 Sep 2025 06:31:30 -0700 you wrote:
+> The bonding option description for "ad_select" mistakenly referred
+> to "803.ad". Update it to the correct IEEE standard "802.3ad".
 > 
-> ifq->if_rxq has not been assigned, is -1, the correct value is
-> in reg.if_rxq.
-> 
-> Fixes: 59b8b32ac8d469958936fcea781c7f58e3d64742 ("io_uring/zcrx: add support for custom DMA devices")
-> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
-> 
-> [...]
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+>  drivers/net/bonding/bond_options.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next] io_uring/zcrx: fix ifq->if_rxq is -1, get dma_dev is NULL
-    https://git.kernel.org/netdev/net-next/c/3a0ac202534b
+  - [net-next] bonding: fix standard reference typo in ad_select description
+    https://git.kernel.org/netdev/net-next/c/1bdf99fd1d82
 
 You are awesome, thank you!
 -- 
