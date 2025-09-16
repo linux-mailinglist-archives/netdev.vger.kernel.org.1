@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-223276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22915B588DE
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 02:06:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216E3B588E7
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 02:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00EE81B210F3
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 00:06:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFABD5206D0
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 00:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF7D14885D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70871581EE;
 	Tue, 16 Sep 2025 00:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YwFymW/z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="As0mvFIR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5C3129E6E
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 00:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3372155C97
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 00:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757981171; cv=none; b=dy1SSkxsRcQ0ia9uIremFb4ST62ViU8uG2/sm/eKpjldlA+KdbIycguyOKSSuyXsdZwkN7gEEPEy4RN9Zkbx6an4RknzrCYg5wlwr/Y42CamJyAYLcmijsr7iBp6KFsBsay50w/udm9m8dDs1gqbl6ldFxyny8L7C3YLDrCHxVE=
+	t=1757981171; cv=none; b=mWVzYdI5QlAIh+XRL4Ryb92xmfZAZYGgTovYXUYxTrmeRLQqv6NmByPrKx1gjqeIjZi922GUTsepuQiRj6OkCAMOavjpqE0HH09cGHCqJDr+ER9BKLzmvCTXuBWhoV7xm56EhAfhIxwUSWDab34jEI9OgThtjBComFVdwoA/gYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757981171; c=relaxed/simple;
-	bh=48KlWY+KPKhwoA7yUGfqOky/wnkiQxDoo2MwVcQM1HM=;
+	bh=B9iXRqVukdG5dQox7VpxoFqAWFbtlwcH/aaegLFK4Ww=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OOGj5gfVBNafO29/ejjd02KT9MQ2W4MJsvanJ2dPldNco0by/3WYsSy6Wqce/8/9z1PHAvWQmTkTUml3VSxSE0vgTkhSfOLrEaxNZE3GGr5/H7sV31M6e7xCqXAITgtpYSAlQCdqVRB+pStYXgPExqOEFK5ckzb1CTxFHda9++Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YwFymW/z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D3AC4CEF9;
+	 MIME-Version; b=jTXIxZeU3anKUgWS50uSbbYRy1wwZA1qwMTKIwAMNxl/G/lp5jePLVHPk3c8PFcRyPIUIGZ7kEFjLHFWA5fwSINIb/MUuTAKztU7fBMIiCBYeSZqV4wCtP5cLdI7XP7wUPKtCbzz5UYYMF+vyV/nE2zXcQMYw+QCFF1Xo8g1ruc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=As0mvFIR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D36C3C4CEF1;
 	Tue, 16 Sep 2025 00:06:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757981170;
-	bh=48KlWY+KPKhwoA7yUGfqOky/wnkiQxDoo2MwVcQM1HM=;
+	s=k20201202; t=1757981171;
+	bh=B9iXRqVukdG5dQox7VpxoFqAWFbtlwcH/aaegLFK4Ww=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YwFymW/zH4lZlq0qSeTYsEOeZGzUMERIyMpuODkHrIkhLOVWqfz+UD4snrIm7z5q9
-	 K1Noq41Mh1N2xjArSliYkH+/i3yQEFQa3Kak6vqSP97NDqp8oJrUVddgXPntlg0O8w
-	 4iC4nEdQKm4NqxyxpxN07LP2M57seqz2g7DMObLuBeL++WoFACv4jSNTxxWBNFxh3n
-	 JdRFbOXpPs9ARlQYGQGKcrCmoNgnqbUVBPNmumx2DXByVF1U9MPJgPc7o8kQwUKuWN
-	 Z7TIH0yuZDN4jkIB9HBOqWr9jj+MYQwE9/2QRtbE/lk5ZiDVAur1dqDldsOco3+S2/
-	 3wDfyIVsOjtDQ==
+	b=As0mvFIR1s+ChXQl/9aR01XgHCLOXDrPMFjxnZKGc2QhCrTUy7eBb1UFgpt4cARTO
+	 9pn24URv43w1ILVOT9kHr8SrW4P8/HszZPomjqLQBem6MdnKYCWiH/8zaoVSEWGigC
+	 p39d3t20F2sXE3skfl7mbwkputOxKRoLIYzVD3PNvVouB+G88r/W74dZ685v8VnKTR
+	 ityvpVvCaE7ITScn1siXkfXvuKdjVFFLUOmA5iqE3tJA6NGmhh0WMuHXC9AA7jmYnV
+	 TI7M/zz/EUBGHgKbf55AK1N+wFIdUWsADJOkklkh2AIw6abtAvZ+Vd1GvGLkQ/kpTV
+	 BpcR2GIFGB7IQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	willemb@google.com,
 	Daniel Zahka <daniel.zahka@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v12 06/19] net: move sk_validate_xmit_skb() to net/core/dev.c
-Date: Mon, 15 Sep 2025 17:05:46 -0700
-Message-ID: <20250916000559.1320151-7-kuba@kernel.org>
+Subject: [PATCH net-next v12 07/19] net: tcp: allow tcp_timewait_sock to validate skbs before handing to device
+Date: Mon, 15 Sep 2025 17:05:47 -0700
+Message-ID: <20250916000559.1320151-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250916000559.1320151-1-kuba@kernel.org>
 References: <20250916000559.1320151-1-kuba@kernel.org>
@@ -67,93 +67,86 @@ Content-Transfer-Encoding: 8bit
 
 From: Daniel Zahka <daniel.zahka@gmail.com>
 
-Move definition of sk_validate_xmit_skb() from net/core/sock.c to
-net/core/dev.c.
-
-This change is in preparation of the next patch, where
-sk_validate_xmit_skb() will need to cast sk to a tcp_timewait_sock *,
-and access member fields. Including linux/tcp.h from linux/sock.h
-creates a circular dependency, and dev.c is the only current call site
-of this function.
+Provide a callback to validate skb's originating from tcp timewait
+socks before passing to the device layer. Full socks have a
+sk_validate_xmit_skb member for checking that a device is capable of
+performing offloads required for transmitting an skb. With psp, tcp
+timewait socks will inherit the crypto state from their corresponding
+full socks. Any ACKs or RSTs that originate from a tcp timewait sock
+carrying psp state should be psp encapsulated.
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 Notes:
+    v3:
+    - check for sk_is_inet() before casting to inet_twsk()
     v2:
     - patch introduced in v2
 ---
- include/net/sock.h | 22 ----------------------
- net/core/dev.c     | 22 ++++++++++++++++++++++
- 2 files changed, 22 insertions(+), 22 deletions(-)
+ include/net/inet_timewait_sock.h |  5 +++++
+ net/core/dev.c                   | 14 ++++++++++++--
+ net/ipv4/inet_timewait_sock.c    |  3 +++
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index d1d3d36e39ae..bf92029a88d6 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2960,28 +2960,6 @@ sk_requests_wifi_status(struct sock *sk)
- 	return sk && sk_fullsock(sk) && sock_flag(sk, SOCK_WIFI_STATUS);
- }
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
+index c1295246216c..3a31c74c9e15 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -84,6 +84,11 @@ struct inet_timewait_sock {
+ #if IS_ENABLED(CONFIG_INET_PSP)
+ 	struct psp_assoc __rcu	  *psp_assoc;
+ #endif
++#ifdef CONFIG_SOCK_VALIDATE_XMIT
++	struct sk_buff*		(*tw_validate_xmit_skb)(struct sock *sk,
++							struct net_device *dev,
++							struct sk_buff *skb);
++#endif
+ };
+ #define tw_tclass tw_tos
  
--/* Checks if this SKB belongs to an HW offloaded socket
-- * and whether any SW fallbacks are required based on dev.
-- * Check decrypted mark in case skb_orphan() cleared socket.
-- */
--static inline struct sk_buff *sk_validate_xmit_skb(struct sk_buff *skb,
--						   struct net_device *dev)
--{
--#ifdef CONFIG_SOCK_VALIDATE_XMIT
--	struct sock *sk = skb->sk;
--
--	if (sk && sk_fullsock(sk) && sk->sk_validate_xmit_skb) {
--		skb = sk->sk_validate_xmit_skb(sk, dev, skb);
--	} else if (unlikely(skb_is_decrypted(skb))) {
--		pr_warn_ratelimited("unencrypted skb with no associated socket - dropping\n");
--		kfree_skb(skb);
--		skb = NULL;
--	}
--#endif
--
--	return skb;
--}
--
- /* This helper checks if a socket is a LISTEN or NEW_SYN_RECV
-  * SYNACK messages can be attached to either ones (depending on SYNCOOKIE)
-  */
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 2522d9d8f0e4..384e59d7e715 100644
+index 384e59d7e715..5e22d062bac5 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -3907,6 +3907,28 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
- }
- EXPORT_SYMBOL(skb_csum_hwoffload_help);
- 
-+/* Checks if this SKB belongs to an HW offloaded socket
-+ * and whether any SW fallbacks are required based on dev.
-+ * Check decrypted mark in case skb_orphan() cleared socket.
-+ */
-+static struct sk_buff *sk_validate_xmit_skb(struct sk_buff *skb,
-+					    struct net_device *dev)
-+{
-+#ifdef CONFIG_SOCK_VALIDATE_XMIT
-+	struct sock *sk = skb->sk;
-+
-+	if (sk && sk_fullsock(sk) && sk->sk_validate_xmit_skb) {
-+		skb = sk->sk_validate_xmit_skb(sk, dev, skb);
-+	} else if (unlikely(skb_is_decrypted(skb))) {
-+		pr_warn_ratelimited("unencrypted skb with no associated socket - dropping\n");
-+		kfree_skb(skb);
-+		skb = NULL;
-+	}
-+#endif
-+
-+	return skb;
-+}
-+
- static struct sk_buff *validate_xmit_unreadable_skb(struct sk_buff *skb,
- 						    struct net_device *dev)
+@@ -3915,10 +3915,20 @@ static struct sk_buff *sk_validate_xmit_skb(struct sk_buff *skb,
+ 					    struct net_device *dev)
  {
+ #ifdef CONFIG_SOCK_VALIDATE_XMIT
++	struct sk_buff *(*sk_validate)(struct sock *sk, struct net_device *dev,
++				       struct sk_buff *skb);
+ 	struct sock *sk = skb->sk;
+ 
+-	if (sk && sk_fullsock(sk) && sk->sk_validate_xmit_skb) {
+-		skb = sk->sk_validate_xmit_skb(sk, dev, skb);
++	sk_validate = NULL;
++	if (sk) {
++		if (sk_fullsock(sk))
++			sk_validate = sk->sk_validate_xmit_skb;
++		else if (sk_is_inet(sk) && sk->sk_state == TCP_TIME_WAIT)
++			sk_validate = inet_twsk(sk)->tw_validate_xmit_skb;
++	}
++
++	if (sk_validate) {
++		skb = sk_validate(sk, dev, skb);
+ 	} else if (unlikely(skb_is_decrypted(skb))) {
+ 		pr_warn_ratelimited("unencrypted skb with no associated socket - dropping\n");
+ 		kfree_skb(skb);
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 1f83f333b8ac..2ca2912f61f4 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -212,6 +212,9 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
+ 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
+ 		twsk_net_set(tw, sock_net(sk));
+ 		timer_setup(&tw->tw_timer, tw_timer_handler, 0);
++#ifdef CONFIG_SOCK_VALIDATE_XMIT
++		tw->tw_validate_xmit_skb = NULL;
++#endif
+ 		/*
+ 		 * Because we use RCU lookups, we should not set tw_refcnt
+ 		 * to a non null value before everything is setup for this
 -- 
 2.51.0
 
