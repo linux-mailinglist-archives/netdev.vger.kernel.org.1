@@ -1,101 +1,110 @@
-Return-Path: <netdev+bounces-223761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D442B7EC84
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:00:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7715B7E831
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:51:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B67CE7A43D3
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:37:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D32FB18912E4
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3988429C327;
-	Tue, 16 Sep 2025 22:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4E62BEC27;
+	Tue, 16 Sep 2025 22:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+cOa2Lr"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="c3oPenFr";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="W9nFgTNo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F07292B2E;
-	Tue, 16 Sep 2025 22:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359C32BE647;
+	Tue, 16 Sep 2025 22:39:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758062374; cv=none; b=Xpq6N+mSTkFkuwWYL0RwGrpc14fP32KST5eOGzci0/yleiKGBkVc0zkQM+gavExJbPZF9xzTWj3am6gBFzmNMnznyT45ZyMe9i2ubx5jG+2cIBPg47iOjGW9ggUGQc8xs9g0C51CltjG3xGI9s/SPeTSQJxsaNb3Du3V8ju9TQg=
+	t=1758062387; cv=none; b=OJZuxEVxebDuodtR2u6+i+Psl1rmsmaUZsKnKxeoKllYYIAkGznCqNPlNX3so3pvplvdscBrs4rVMRzMEOma6WsDK4gS/fY8YMCI57toUwNFuNkXYVKEIZZjdKmULhAneseXBBvRs3c7JyoFXeFRI63nSzInf87r7TwBS56NElA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758062374; c=relaxed/simple;
-	bh=Ort8kF21YmqS/VszU+RQlm6xUoyQ77hb3hySCxPgjDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pPxFDjRNb8WeKa1BJu+OXMLYQIrln0a8UCoDZ39D1KgG2NglCCPbPBPm5NumIIskmhHqtc1SKEdM75i1XXtVT+fXZJjJ64/Iri5Hnv8I+nzkbDFSdcRUAq5EEbNGxujF3E3qQH08rdagMAgls2Qec1T9mIRTplbyJFgJWiDB6qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+cOa2Lr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 163A6C4CEEB;
-	Tue, 16 Sep 2025 22:39:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758062373;
-	bh=Ort8kF21YmqS/VszU+RQlm6xUoyQ77hb3hySCxPgjDk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s+cOa2LrKFip85zl7kxfCjTEXmwSTQ87NTyhrwlFjZ1FGAr6a48/UdWwirn3ixWo+
-	 QD4g5Vb6nkKT2n6zllDTiSUUb9zIDkUVND5IMyNREKoohCP8J6LFSG2QVMTv3l2kf1
-	 uOEpqH80l4uIcUk3y94BVc0b09Awuk9H2a1dpdY/oCqUJ4TOB0wxi9QFeXk7NouzaC
-	 gzPfjevTfZzqnNp+6/9VWfssfLYTxHoeJjaitIhn57y5PW7aiMVoSL+qJChB3VYnJY
-	 xvzdxHu/G/UnRzIGt52uKd8wvfRkO6dQ1pG8ds56koRuAjapL7TTJLF/YtWH6TcQip
-	 6VPbZ7JY8gnjA==
-Date: Tue, 16 Sep 2025 15:39:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
- <ast@fiberby.net>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald Hunter
- <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>, Jacob Keller
- <jacob.e.keller@intel.com>, Sabrina Dubroca <sd@queasysnail.net>,
- wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 00/11] tools: ynl: prepare for wireguard
-Message-ID: <20250916153932.200647ad@kernel.org>
-In-Reply-To: <CAHmME9rf9NGRVtJBnjUJVPraGKL6dk0nRxzXmSi-7X6Y1zjmsA@mail.gmail.com>
-References: <20250915144301.725949-1-ast@fiberby.net>
-	<CAHmME9rf9NGRVtJBnjUJVPraGKL6dk0nRxzXmSi-7X6Y1zjmsA@mail.gmail.com>
+	s=arc-20240116; t=1758062387; c=relaxed/simple;
+	bh=DTj+rpK7YKaRjpCjv8Y1UDvAhYegvGxlCwQxz84dYZs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rYIm/JTPQNB6Dk9DpmyJADqnh9I6cn1toAOi31TI5iK72ScGGGw8ThgAm23xk1E32vVamKauhlqMPD+dXu4gBS7MTz73dVMx0uG/Q9jd9JzQV1uuORTTDL+3b3W6nkJGB6ZSv0PBTLc07CQHf2ZfoasA+r/l3pGi7LndBeWqUzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=c3oPenFr; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=W9nFgTNo; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 761056026B; Wed, 17 Sep 2025 00:39:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1758062383;
+	bh=9ZhYP+GtZzerSLJDFwCvOxGvIp7KTXCxXJzN2snHOuA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c3oPenFrOGgqpIgvNYxQpfF6l0dg9sixGhSVpkLkju0usSEW+XlwL4+cD3SJvR84r
+	 V/5QrFgeMoy80ubN02bZxVqKgDgNnu696CvSWVzx3HaDc2NTM3zZrtiljGEwjpAfie
+	 uAI/OyURswG0HYv95d8Y2+QlWmzBC1lTyGHxMCalm74YGBHBzgiiVsh8swzzmFu3W6
+	 t4ks+rKgGs9wVYkorGZHDvwTgEBTqeP2Xool2vkTX1At+YCIEPa6Y3eQ3oBU/gP6k9
+	 qdMmw9tap5vPIqBQACI39mV/+Os8wPCGWlgKZCZkwFA35Wftz+YIdkG/1GErVLV+JR
+	 yjUEDEgRz0MXQ==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 88F0460254;
+	Wed, 17 Sep 2025 00:39:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1758062380;
+	bh=9ZhYP+GtZzerSLJDFwCvOxGvIp7KTXCxXJzN2snHOuA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W9nFgTNoBQ452WKh4OVAmLDed56W51i1efNqr2UYGpt5Ec2Qka+VTSGJc379M49Tu
+	 IOz6VRG57D2xi4Imwu0SdrDeB6otzBASK3yXtLEKSuzzf1BWYZH8NqMjp6wQ5wxmj4
+	 iom8PI7pJOKLylIVkl+thcV30KuAQAJnUBgx0jCKTynSkiW0zIdAwlCU9RNC4SMIHy
+	 Fgo+njYD80ovgh6pOj5CAgxzFD3fPkFNK/Jx16ERyUyalYb/wZbBZWMQEOxfxXP8Yb
+	 VoUMdSjeoXM4SPkyB8yI7X+fx8D5fluweT6yrZM8xNZK0tVnZotgePQJXZQirA7Qgg
+	 gj89eqXd56ODg==
+Date: Wed, 17 Sep 2025 00:39:38 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Elad Yifee <eladwf@gmail.com>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next RFC] netfilter: flowtable: add CT metadata
+ action for nft flowtables
+Message-ID: <aMnnKsqCGw5JFVrD@calendula>
+References: <20250912163043.329233-1-eladwf@gmail.com>
+ <CA+SN3sp6ZidPXhZnP0E4KQyt95pp_-M9h2MMwLozObp9JH-8LQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+SN3sp6ZidPXhZnP0E4KQyt95pp_-M9h2MMwLozObp9JH-8LQ@mail.gmail.com>
 
-On Tue, 16 Sep 2025 17:53:00 +0200 Jason A. Donenfeld wrote:
-> On Mon, Sep 15, 2025 at 4:47=E2=80=AFPM Asbj=C3=B8rn Sloth T=C3=B8nnesen =
-<ast@fiberby.net> wrote:
-> >
-> > This series contains the last batch of YNL changes to support
-> > the wireguard YNL conversion. =20
->=20
-> "the wireguard YNL conversion"
+On Tue, Sep 16, 2025 at 07:49:34PM +0300, Elad Yifee wrote:
+> Hi all,
+> 
+> One caveat: this change will cause some existing drivers to start
+> returning -EOPNOTSUPP, since they walk the action list and treat any
+> unknown action as fatal in their default switch. In other words, adding
+> CT metadata unconditionally would break offload in those drivers until
+> they are updated.
+> 
+> Follow-up patches will therefore be needed to make drivers either parse
+> or safely ignore FLOW_ACTION_CT_METADATA. Because this action is only
+> advisory, it should be harmless for drivers that don’t use it to simply
+> accept and no-op it.
+> 
+> Just flagging this up front: the core patch by itself will break some
+> drivers, and additional work is required to make them tolerant of the
+> new metadata.
 
-FWIW these patches stand on their own whether we accept the wireguard
-patches or not. Put more plainly - please do not read me applying this
-set as an endorsement of the larger plan..
+May I ask, where is the software plane extension for this feature?
+Will you add it for net/sched/act_ct.c?
 
-> Did I miss some conversation about this? I figure I must have. I must
-> say I'm not too keen on wireguard (and apparently only wireguard?)
-> being a guinea pig for this.
-
-The specs themselves are gaining maturity. I think adding a YNL spec
-for wireguard would be quite nice. Whether we should be converting
-the kernel code and uAPI to take advantage of the auto-generation is
-a completely separate conversation. If you're not anticipating many
-new additions in the uAPI there's little to be gained.
-
-Intro:
-https://docs.kernel.org/next/userspace-api/netlink/specs.html
-Existing specs:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/Do=
-cumentation/netlink/specs/
-Libs:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/to=
-ols/net/ynl/pyynl/lib/ynl.py
-https://github.com/linux-netdev/ynl-c (this one is also in tree)
-https://github.com/linux-netdev/ynl-cpp
+Adding the hardware offload feature only is a deal breaker IMO.
 
