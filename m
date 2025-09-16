@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-223653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F05EB59D35
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:15:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC689B59D37
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7E703BA7A3
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:10:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74E643BB8BD
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D073164BC;
-	Tue, 16 Sep 2025 16:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0489B31FED6;
+	Tue, 16 Sep 2025 16:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L25AjDIE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="caEPwM6f"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F5B31FED0
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309FA31FEDC
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758039010; cv=none; b=BBeTD76nPjHyEQrAgzcURIDICWiZwBaIPkvfk9aJdLfNrXvp/rXU8jOcAK031MNvoacDD1COlNhvcsnF/AzT9YjsHDrhb2BYMTM2wyjRp3pn4na6mn1xS7efEe0mLXECtbJZ1hWpts4IJWxtcJnR008bshxAALJSRZAO12pJqps=
+	t=1758039012; cv=none; b=cxqmVYJkdonO89Kp7iMe9qI1bxTsKQYpPNbOk0/ZE+oZDphaXFKupEmiVdj6m4MFMJxgY9cRUqV1XVfO3ga8JZz8MSOzoasbvXjU/WMSWC3Z26hqIGE/4hgYxlnzRU7gOuEd8LJpobHZx7wvtZ79cbZGh0Z0Yn/zHgcBafIDYRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758039010; c=relaxed/simple;
-	bh=R/P1k/Y+6Rp+lpjpmWLC/2++RRWbaSFW+OR1moYK+c4=;
+	s=arc-20240116; t=1758039012; c=relaxed/simple;
+	bh=FWFvUYSn3y7PBiV5fwCDTdyiaDCrpArNF4vinvWdH7M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uUgZl0/jl0/RGB3pU1NH/HhbFsfGngGuC9yIB/fya9Pdxi+QeH3ZRWK2uFE7N985jsWXdR14xe/rcHwKmhqo/wo7E4py5kIBy4Yc0v4u4M2NPa9Esgn85woR3X52cNa6g8/ymOJ0qC9pTUt1Q2CGr5ppIzZ+zhp6lGK4aHsYxJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L25AjDIE; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=kyaYFm9ymoFNUYeGgxLlG64AOkbHaiA/cnEa+4SUDXkrzVozcf1HisdlQcurNXK3SkrcQ5oS5gNC0yijuLaA59cLrkd3V+QCcgOjyvNj7G04PkBc+glx06aRop1WFq+8fuXu7FxZlCRbKb9Lgjl8+ufFOBua9PXNDXtXKTk6ShM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=caEPwM6f; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4b47b4d296eso148664061cf.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:10:08 -0700 (PDT)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4b78fb758e9so356231cf.1
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:10:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758039007; x=1758643807; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758039010; x=1758643810; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j/MQSA3eVX1BRHvsH1qSEgSg5eYH/+2RsDjkquuJiFY=;
-        b=L25AjDIElKXR8VE/GnwSyeWrimV18GEigYYxRkrOygkzmoW9M8Z0CmR01Ud4HUOsi+
-         hlgSvthet9oyglL1Dqt0mGxo76wbwxNAn7mde7Qc5onMp7HDn/SIUDPoVcCZ8DuNpZqB
-         VmwQuy6qnTTcBPR5MXeEvGQSQpnr1KH3eyJs+/rRjmJqnLm+0tF64H5eaHLgCtXPkNDu
-         VKiSLmmVSEHx2KUR/ibqLz9PnYLIoQQs/A4TAWuUdpOu7LsMVQVLJfzXeKopa/hG1wIQ
-         gnE7X3hMP0h+h0e3ojplOU3ypuFDSczLIrGQ48CwgRvd2wOSAr9CkvVzituKBwbyjIsO
-         LAuA==
+        bh=TRcJvKf5KbDdNoEqUl0sHmcotIGvW7XEXU0xFoxyrgk=;
+        b=caEPwM6f+io+EBAuU8NYjzt27lF2hMOtZ/2WxKeQbFmgFKkUKQE5sjuxXs2RWojZ4e
+         OqGQWdeBCc5Kfw0qNjXPvPbDP81UyoarMo0J4q5g6FaAJLomFogiPr8ySvoc7u+Tg/K0
+         rA2nq9niOP4307GzVLBRro/Oi6lkGJ+Ak12CqS9Z6kOJbkl52XV6/uqcAjOsNU3YGjB8
+         Qfg3YLFCECcWA+VXqVhdAfBZdb5Fck0Rfbh3pZUwwctitnQtVne18AzQ/kXwBDXvCtjD
+         uubO1R+s6Ak39q8g/0H9IfSmBGPcakvFjiFKJ3Wb4cghAIdRbnWLKTxhYOvXWQ1vzT6Z
+         LVtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758039007; x=1758643807;
+        d=1e100.net; s=20230601; t=1758039010; x=1758643810;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j/MQSA3eVX1BRHvsH1qSEgSg5eYH/+2RsDjkquuJiFY=;
-        b=p5MxmyAX9HfFVSP/nE7RAMASVDKdcj1gTADIxtRGIDOFMoQQrJVTo+1jCUGl7Tf39/
-         zxSh83IH6ryri48tumRxPkjks6F25oVobHcQQo9LLCNZtaA9saCsSO8KcSq1wOhOulQI
-         P8+HMQ0Bjq+WCqLCIL8Bqdh9AEbMPyz2LkthGPwc5alut1yRlJdSIIXNjgGfp44dh36q
-         BdCWCSkS4g3bIXp0dM2TfjQWxpEJ/s9wHh3ubOzvTjztCNBnC5/x3IoUsw/UNiojEKLc
-         ru5FVw75LbDbhrm01mKPyeuz298YbsBYXpU2GeL0WTTCTj84r3tYyRCnTavY4gENXDec
-         F9uA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGpShdx6UdpauVE7khQp0N2PT1jCl9D9ItoX0vherMiMRC5Nt74ScJhsuUEfqXUZ2LkBYBYgg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykKpSAZK8sUIdf2gH/DAA2IzJjSEl/vhk2rkpDFQmw4FYAmuqg
-	ZaWv5wURlLthQkob1HlmTrtIBv0+D8ux4Lp0yw3iR8+DMMPVbPBIvM3QQlnwhVSt0GEaCZzqGn4
-	tjwOb8AjSjfOYyw==
-X-Google-Smtp-Source: AGHT+IHSy7xwb7RoedvutTGianBuDSpFtByuT/1LZBbw3mEeONc9IFivYHvejt8cDzwda779HdU8MjOz8YiE4g==
-X-Received: from qta21.prod.google.com ([2002:a05:622a:8c15:b0:4b5:fa2a:fdd5])
+        bh=TRcJvKf5KbDdNoEqUl0sHmcotIGvW7XEXU0xFoxyrgk=;
+        b=r9sR1Fw03uRdrc9gAs5y6LwL4qsifjhbOBHRFQIRDxyMd8BA+0NPI2ICjGI5Ii+FNz
+         eRe1qjdaRYnwKIV9TijAB+zfxVh7xcFUJZQhtGGPynZywygNfI75LDPlHV2wb196MqbI
+         4SnySNLfAU9hgxjVlscUrL47vogQhflL985ZGSWHDlKuWf15tbJp4Zd8Pcant/4j0C8/
+         rXvlcIt0cDE+v/SAInabn7vl+v0p6xvNo2qBtoeKvxYJb49ZGO4StC90Bx/qsZ83shMz
+         J7vDAG5HaSU1s/+5zJeiDOrbdE5JH0+Jnu1RbLe4UlJH0MQHautkIrQhUcUHdPfs0IYa
+         bYMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXRlHTRc5i++7O5A4oOSvkhUt1pVzdoYxiCNVJdltMg1eQm3pgBsyOtlqz48vxac4hrvXppjLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkFiuqBgSxAd7TaW3WtEUGqs4estpFgfU/vdeRoumRpw0XYGH+
+	e9wblv7Rv4zGWrVBKzFGYAUh4vAHAQ5U7GXz4BCMKjfGE8ju0ZOb29DrpjZ5+jsd0zEcpPZNMid
+	1iwpvglxfBjW9rQ==
+X-Google-Smtp-Source: AGHT+IE/TSunP819iRMcTQuv/jpJc4DUguEH5j598KCeu4B7OLWpwp1bmlcyJkxo+U2We9SmSjENHTo/WPIb9g==
+X-Received: from qtqg19.prod.google.com ([2002:ac8:4813:0:b0:4b3:4718:504c])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:5a9b:b0:4b6:22c0:28b2 with SMTP id d75a77b69052e-4b77cfff59amr219638441cf.35.1758039007432;
- Tue, 16 Sep 2025 09:10:07 -0700 (PDT)
-Date: Tue, 16 Sep 2025 16:09:48 +0000
+ 2002:a05:622a:5b0d:b0:4b3:4d20:301 with SMTP id d75a77b69052e-4b7b449cdabmr34555061cf.18.1758039010013;
+ Tue, 16 Sep 2025 09:10:10 -0700 (PDT)
+Date: Tue, 16 Sep 2025 16:09:49 +0000
 In-Reply-To: <20250916160951.541279-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250916160951.541279-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250916160951.541279-8-edumazet@google.com>
-Subject: [PATCH net-next 07/10] net: group sk_backlog and sk_receive_queue
+Message-ID: <20250916160951.541279-9-edumazet@google.com>
+Subject: [PATCH net-next 08/10] udp: add udp_drops_inc() helper
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,65 +84,158 @@ Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-UDP receivers suffer from sk_rmem_alloc updates,
-currently sharing a cache line with fields that
-need to be read-mostly (sock_read_rx group):
+Generic sk_drops_inc() reads sk->sk_drop_counters.
+We know the precise location for UDP sockets.
 
-1) RFS enabled hosts read sk_napi_id
-from __udpv6_queue_rcv_skb().
-
-2) sk->sk_rcvbuf is read from __udp_enqueue_schedule_skb()
-
-/* --- cacheline 3 boundary (192 bytes) --- */
-struct {
-    atomic_t           rmem_alloc;           /*  0xc0   0x4 */   // Oops
-    int                len;                  /*  0xc4   0x4 */
-    struct sk_buff *   head;                 /*  0xc8   0x8 */
-    struct sk_buff *   tail;                 /*  0xd0   0x8 */
-} sk_backlog;                                /*  0xc0  0x18 */
-__u8                       __cacheline_group_end__sock_write_rx[0]; /*  0xd8     0 */
-__u8                       __cacheline_group_begin__sock_read_rx[0]; /*  0xd8     0 */
-struct dst_entry *         sk_rx_dst;        /*  0xd8   0x8 */
-int                        sk_rx_dst_ifindex;/*  0xe0   0x4 */
-u32                        sk_rx_dst_cookie; /*  0xe4   0x4 */
-unsigned int               sk_ll_usec;       /*  0xe8   0x4 */
-unsigned int               sk_napi_id;       /*  0xec   0x4 */
-u16                        sk_busy_poll_budget;/*  0xf0   0x2 */
-u8                         sk_prefer_busy_poll;/*  0xf2   0x1 */
-u8                         sk_userlocks;     /*  0xf3   0x1 */
-int                        sk_rcvbuf;        /*  0xf4   0x4 */
-struct sk_filter *         sk_filter;        /*  0xf8   0x8 */
-
-Move sk_error (which is less often dirtied) there.
-
-Alternative would be to cache align sock_read_rx but
-this has more implications/risks.
+Move sk_drop_counters out of sock_read_rxtx
+so that sock_write_rxtx starts at a cache line boundary.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/sock.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/sock.h |  2 +-
+ include/net/udp.h  |  5 +++++
+ net/core/sock.c    |  1 -
+ net/ipv4/udp.c     | 12 ++++++------
+ net/ipv6/udp.c     |  6 +++---
+ 5 files changed, 15 insertions(+), 11 deletions(-)
 
 diff --git a/include/net/sock.h b/include/net/sock.h
-index 0fd465935334160eeda7c1ea608f5d6161f02cb1..867dc44140d4c1b56ecfab1220c81133fe0394a0 100644
+index 867dc44140d4c1b56ecfab1220c81133fe0394a0..82bcdb7d7e6779de41ace0dde3a8b54e6adb0c14 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -394,7 +394,6 @@ struct sock {
+@@ -451,7 +451,6 @@ struct sock {
+ #ifdef CONFIG_XFRM
+ 	struct xfrm_policy __rcu *sk_policy[2];
+ #endif
+-	struct numa_drop_counters *sk_drop_counters;
+ 	__cacheline_group_end(sock_read_rxtx);
  
- 	atomic_t		sk_drops;
- 	__s32			sk_peek_off;
--	struct sk_buff_head	sk_error_queue;
- 	struct sk_buff_head	sk_receive_queue;
- 	/*
- 	 * The backlog queue is special, it is always used with
-@@ -412,6 +411,7 @@ struct sock {
- 	} sk_backlog;
- #define sk_rmem_alloc sk_backlog.rmem_alloc
+ 	__cacheline_group_begin(sock_write_rxtx);
+@@ -568,6 +567,7 @@ struct sock {
+ #ifdef CONFIG_BPF_SYSCALL
+ 	struct bpf_local_storage __rcu	*sk_bpf_storage;
+ #endif
++	struct numa_drop_counters *sk_drop_counters;
+ 	struct rcu_head		sk_rcu;
+ 	netns_tracker		ns_tracker;
+ 	struct xarray		sk_user_frags;
+diff --git a/include/net/udp.h b/include/net/udp.h
+index 93b159f30e884ce7d30e2d2240b846441c5e135b..a08822e294b038c0d00d4a5f5cac62286a207926 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -295,6 +295,11 @@ static inline void udp_lib_init_sock(struct sock *sk)
+ 	set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
+ }
  
-+	struct sk_buff_head	sk_error_queue;
- 	__cacheline_group_end(sock_write_rx);
++static inline void udp_drops_inc(struct sock *sk)
++{
++	numa_drop_add(&udp_sk(sk)->drop_counters, 1);
++}
++
+ /* hash routines shared between UDPv4/6 and UDP-Litev4/6 */
+ static inline int udp_lib_hash(struct sock *sk)
+ {
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 1f8ef4d8bcd9e8084eda82cad44c010071ceb171..21742da19e45bbe53e84b8a87d5a23bc2d2275f8 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -4444,7 +4444,6 @@ static int __init sock_struct_check(void)
+ #ifdef CONFIG_MEMCG
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_rxtx, sk_memcg);
+ #endif
+-	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_rxtx, sk_drop_counters);
  
- 	__cacheline_group_begin(sock_read_rx);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rxtx, sk_lock);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rxtx, sk_reserved_mem);
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 658ae87827991a78c25c2172d52e772c94ea217f..25143f932447df2a84dd113ca33e1ccf15b3503c 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1790,7 +1790,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+ 	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
+ 
+ drop:
+-	sk_drops_inc(sk);
++	udp_drops_inc(sk);
+ 	busylock_release(busy);
+ 	return err;
+ }
+@@ -1855,7 +1855,7 @@ static struct sk_buff *__first_packet_length(struct sock *sk,
+ 					IS_UDPLITE(sk));
+ 			__UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS,
+ 					IS_UDPLITE(sk));
+-			sk_drops_inc(sk);
++			udp_drops_inc(sk);
+ 			__skb_unlink(skb, rcvq);
+ 			*total += skb->truesize;
+ 			kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
+@@ -2011,7 +2011,7 @@ int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+ 
+ 		__UDP_INC_STATS(net, UDP_MIB_CSUMERRORS, is_udplite);
+ 		__UDP_INC_STATS(net, UDP_MIB_INERRORS, is_udplite);
+-		sk_drops_inc(sk);
++		udp_drops_inc(sk);
+ 		kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
+ 		goto try_again;
+ 	}
+@@ -2081,7 +2081,7 @@ int udp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags,
+ 
+ 	if (unlikely(err)) {
+ 		if (!peeking) {
+-			sk_drops_inc(sk);
++			udp_drops_inc(sk);
+ 			UDP_INC_STATS(sock_net(sk),
+ 				      UDP_MIB_INERRORS, is_udplite);
+ 		}
+@@ -2452,7 +2452,7 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ 	__UDP_INC_STATS(sock_net(sk), UDP_MIB_CSUMERRORS, is_udplite);
+ drop:
+ 	__UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
+-	sk_drops_inc(sk);
++	udp_drops_inc(sk);
+ 	sk_skb_reason_drop(sk, skb, drop_reason);
+ 	return -1;
+ }
+@@ -2537,7 +2537,7 @@ static int __udp4_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
+ 		nskb = skb_clone(skb, GFP_ATOMIC);
+ 
+ 		if (unlikely(!nskb)) {
+-			sk_drops_inc(sk);
++			udp_drops_inc(sk);
+ 			__UDP_INC_STATS(net, UDP_MIB_RCVBUFERRORS,
+ 					IS_UDPLITE(sk));
+ 			__UDP_INC_STATS(net, UDP_MIB_INERRORS,
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index e87d0ef861f88af3ff7bf9dd5045c4d4601036e3..9f4d340d1e3a63d38f80138ef9f6aac4a33afa05 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -524,7 +524,7 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	}
+ 	if (unlikely(err)) {
+ 		if (!peeking) {
+-			sk_drops_inc(sk);
++			udp_drops_inc(sk);
+ 			SNMP_INC_STATS(mib, UDP_MIB_INERRORS);
+ 		}
+ 		kfree_skb(skb);
+@@ -908,7 +908,7 @@ static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ 	__UDP6_INC_STATS(sock_net(sk), UDP_MIB_CSUMERRORS, is_udplite);
+ drop:
+ 	__UDP6_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
+-	sk_drops_inc(sk);
++	udp_drops_inc(sk);
+ 	sk_skb_reason_drop(sk, skb, drop_reason);
+ 	return -1;
+ }
+@@ -1013,7 +1013,7 @@ static int __udp6_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
+ 		}
+ 		nskb = skb_clone(skb, GFP_ATOMIC);
+ 		if (unlikely(!nskb)) {
+-			sk_drops_inc(sk);
++			udp_drops_inc(sk);
+ 			__UDP6_INC_STATS(net, UDP_MIB_RCVBUFERRORS,
+ 					 IS_UDPLITE(sk));
+ 			__UDP6_INC_STATS(net, UDP_MIB_INERRORS,
 -- 
 2.51.0.384.g4c02a37b29-goog
 
