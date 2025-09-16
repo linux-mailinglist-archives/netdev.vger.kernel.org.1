@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-223303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D29B58B2D
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:30:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18822B58B33
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 625124E2870
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:30:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C434460625
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0673E1F542E;
-	Tue, 16 Sep 2025 01:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F2020010A;
+	Tue, 16 Sep 2025 01:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eWVE2bSo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pxqG5lE7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C6B1E379B;
-	Tue, 16 Sep 2025 01:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B943824A3;
+	Tue, 16 Sep 2025 01:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757986218; cv=none; b=lXi1WxfaxwRz09wrFHDI5g19TEUfvdmQIpriqU7LqQpHYsz/+i69Zro3YUc7XGlSxbGShb2FRmieAHM08wl1Aa0pXMzVITCab609n8gp/t1Y+VNC+K+RbopHSFMsdhtvwpoDOygNfUbINluYhxTEzMK33ptpfduTbegiI0Aocr8=
+	t=1757986239; cv=none; b=BkEu7EH3zGvfgTYCgySqUoM4yiJ3aBveVUYVKH9VhBTdO+vuwpH/MEqpudu5M8uhH97jy1rdANkp9v+MLH5vWq35eMKUEK0gvF4uoHYegNNCsuanTi5dRP7AuUNRzRSdi8/r8TGG86Ck0GjpNH/cYI6G/BhesNd7h2ZQbgXB+no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757986218; c=relaxed/simple;
-	bh=1jnjci6bRhFdax2eDMvwFKReYb8NK6G/YWbEbRNYPws=;
+	s=arc-20240116; t=1757986239; c=relaxed/simple;
+	bh=v9tC8NiGK9d1Q1Se1trYoJ8mZvSBVLWX2i6c4mciDCQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=K8seL0Wf+eTgk76UdFkEDZY/rZUxyZViY5EMXoWxQ9dVUSQ6jKBWJWrBSzKLrK4GN9o4o8LSUoykW2Jt3B7CfHUnIprs4SDUc8LR+Qqs+rtbL3CShK6TNYJQfpn9OOvM7txAmNOGJCdbmlyy8DyPflWypKwvIoFNsx97vUM55vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eWVE2bSo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5604EC4CEF5;
-	Tue, 16 Sep 2025 01:30:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=HDuCXe3cq0PPGQO8dpGpI6ANIDf/DssqQRTuNK2WU+gikonIaHOh3DJolgnfRIncNNEwfvGPCTIZWw3CY2MkIBsByZZ3H9oVGSkkIrqkjHj8steAZSPWp08u4eFmnE7CK7n+XW5mqzckPygPCfIIHZr4Gl7U+NY9L6icnRsdYVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pxqG5lE7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC33C4CEF1;
+	Tue, 16 Sep 2025 01:30:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757986218;
-	bh=1jnjci6bRhFdax2eDMvwFKReYb8NK6G/YWbEbRNYPws=;
+	s=k20201202; t=1757986239;
+	bh=v9tC8NiGK9d1Q1Se1trYoJ8mZvSBVLWX2i6c4mciDCQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eWVE2bSohiSHV3vMPcRpuwIz2Sm3XZ+538RHT1I1DIgAJ/bZqr1CdnKPoxgQhymdm
-	 rGd38Q2MwelfeJiqrux0Z4sijvEyXHqIy+5AI9RYgHQofPOfVw/0ud1MriqdXhm6yB
-	 6YJQBHY+sZ9kiv2rer+95ty42g1JaIaW1NhzPm+7ag/SUDA3yDlZsX2mR9B+rfE4a3
-	 DPMpHjok7GtRx7JaIFbbXRo/As6HQCRAZZAdDtY1wt2pRVtyv5mz2+TEOtWcuVpeNN
-	 Vy4XN9yjbxrRzSFgtwulDBo/tKAAEvVSRVSjvdrAmnvSS1sPLbMZhUntS1WcrZPLcp
-	 XIxhEDEdg58yw==
+	b=pxqG5lE7BEaXo8yXYR1n7DpO+ePghIH9ud4/ipVp59Jd4BWL8CYcrRifqXoxmAGmb
+	 79/dRdQnQTvxIRE3P+c4gd6KD7kOAIZ3rn1/Bk3joxgx6D36tAWIOIaZE6dRVui9VP
+	 RKmJ4PEGSYNZBaDslYGmwQyJ8SYSF63TPWoje/2N+6ezafnKAIYhNu4XYyJwbqZebK
+	 K3V+8qg30D8QgjT25vVKyAcKS8/gxPfuhKmgwGK4FgFc6Ty4E/N/c/HllW+2GCtHxt
+	 u0Ip0PJkbnzUhHwqsYretAiZFyJoujj9a3NzFFIp1f/xT9V+T9sEkP4GOrhcsmBuRl
+	 UhnhXollRKB7A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE3539D0C17;
-	Tue, 16 Sep 2025 01:30:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF2039D0C17;
+	Tue, 16 Sep 2025 01:30:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,58 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] selftests: mptcp: avoid spurious errors on TCP
- disconnect
+Subject: Re: [PATCH net-next] io_uring/zcrx: fix ifq->if_rxq is -1,
+ get dma_dev is NULL
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175798621949.559370.15168394018432640770.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Sep 2025 01:30:19 +0000
-References: <20250912-net-mptcp-fix-sft-connect-v1-0-d40e77cbbf02@kernel.org>
-In-Reply-To: <20250912-net-mptcp-fix-sft-connect-v1-0-d40e77cbbf02@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- shuah@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- stable@vger.kernel.org
+ <175798624024.559370.11569066407695924130.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Sep 2025 01:30:40 +0000
+References: <20250912140133.97741-1-zhoufeng.zf@bytedance.com>
+In-Reply-To: <20250912140133.97741-1-zhoufeng.zf@bytedance.com>
+To: Feng zhou <zhoufeng.zf@bytedance.com>
+Cc: axboe@kernel.dk, asml.silence@gmail.com, almasrymina@google.com,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ saeedm@nvidia.com, tariqt@nvidia.co, mbloch@nvidia.com, leon@kernel.org,
+ andrew+netdev@lunn.ch, dtatulea@nvidia.com, netdev@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 12 Sep 2025 14:25:49 +0200 you wrote:
-> This series should fix the recent instabilities seen by MPTCP and NIPA
-> CIs where the 'mptcp_connect.sh' tests fail regularly when running the
-> 'disconnect' subtests with "plain" TCP sockets, e.g.
+On Fri, 12 Sep 2025 22:01:33 +0800 you wrote:
+> From: Feng Zhou <zhoufeng.zf@bytedance.com>
 > 
->   # INFO: disconnect
->   # 63 ns1 MPTCP -> ns1 (10.0.1.1:20001      ) MPTCP     (duration   996ms) [ OK ]
->   # 64 ns1 MPTCP -> ns1 (10.0.1.1:20002      ) TCP       (duration   851ms) [ OK ]
->   # 65 ns1 TCP   -> ns1 (10.0.1.1:20003      ) MPTCP     Unexpected revents: POLLERR/POLLNVAL(19)
->   # (duration   896ms) [FAIL] file received by server does not match (in, out):
->   # -rw-r--r-- 1 root root 11112852 Aug 19 09:16 /tmp/tmp.hlJe5DoMoq.disconnect
->   # Trailing bytes are:
->   # /{ga 6@=#.8:-rw------- 1 root root 10085368 Aug 19 09:16 /tmp/tmp.blClunilxx
->   # Trailing bytes are:
->   # /{ga 6@=#.8:66 ns1 MPTCP -> ns1 (dead:beef:1::1:20004) MPTCP     (duration   987ms) [ OK ]
->   # 67 ns1 MPTCP -> ns1 (dead:beef:1::1:20005) TCP       (duration   911ms) [ OK ]
->   # 68 ns1 TCP   -> ns1 (dead:beef:1::1:20006) MPTCP     (duration   980ms) [ OK ]
->   # [FAIL] Tests of the full disconnection have failed
+> ifq->if_rxq has not been assigned, is -1, the correct value is
+> in reg.if_rxq.
+> 
+> Fixes: 59b8b32ac8d469958936fcea781c7f58e3d64742 ("io_uring/zcrx: add support for custom DMA devices")
+> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] mptcp: propagate shutdown to subflows when possible
-    https://git.kernel.org/netdev/net/c/f755be0b1ff4
-  - [net,2/5] selftests: mptcp: connect: catch IO errors on listen side
-    https://git.kernel.org/netdev/net/c/14e22b43df25
-  - [net,3/5] selftests: mptcp: avoid spurious errors on TCP disconnect
-    https://git.kernel.org/netdev/net/c/8708c5d8b3fb
-  - [net,4/5] selftests: mptcp: print trailing bytes with od
-    https://git.kernel.org/netdev/net/c/a17c5aa3a323
-  - [net,5/5] selftests: mptcp: connect: print pcap prefix
-    https://git.kernel.org/netdev/net/c/cf74e0aa0eb0
+  - [net-next] io_uring/zcrx: fix ifq->if_rxq is -1, get dma_dev is NULL
+    https://git.kernel.org/netdev/net-next/c/3a0ac202534b
 
 You are awesome, thank you!
 -- 
