@@ -1,95 +1,137 @@
-Return-Path: <netdev+bounces-223299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0208B58AFA
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:22:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0D5B58B28
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FA477B23E9
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:21:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A95C91B201E7
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DE61C84B8;
-	Tue, 16 Sep 2025 01:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7B11FA178;
+	Tue, 16 Sep 2025 01:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="murGcq0I"
+	dkim=pass (1024-bit key) header.d=airkyi.com header.i=@airkyi.com header.b="J98MyLcb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A07A27707;
-	Tue, 16 Sep 2025 01:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7484F13B293;
+	Tue, 16 Sep 2025 01:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757985757; cv=none; b=Zjs6Mo0KFNAn1vUd16rKnObvJ1PsJU+bgPH7edxU6RHdGtZGNh9CcirC42mfO6kRGgd3ZN8Nr5cDVVtUGQMo/0BKoU+qhS+h6CdqZbWGK55YqIG3uzc+Xgqvs8T3cyKmtlzvmcoj36jyNDypAx/d0s/37NGMST7zDMgshWWWDkU=
+	t=1757986130; cv=none; b=LYBEQSXtIKsVCYfiUlMfaVxcL582Z04DXlBnJCVinp87EdKds0sCGaiEKgX+mSnbiTXD5GFD548cUqaJJKk0+Sh4LXWMokBEMWUW/i3CdztDwlwKpQQvHSjUfAYIfMSVP04go/RVd72C+ZkJmz9bT5UyIeGS3Nwmu0Zz6Lh6C/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757985757; c=relaxed/simple;
-	bh=eyioPMYjM7Js5Z4579HK7Un1nYwROg8WTUONfABacPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fvx2xMxB1hrjKj+mb438anmxe3jdJVp6WFWx9oYFzF+PEDY6kLe4gcZ+PsBUYirSq6bctbVm9w0dZfN0CEznTKPxRrdb+0v26LMX7tg6VqUcDD0I9vpaQXdSYPvMGpys4Hrgt40Ngaq+jIJ/vdSW+WO+ojzDCsfiFLFglg0TXEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=murGcq0I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30565C4CEF5;
-	Tue, 16 Sep 2025 01:22:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757985756;
-	bh=eyioPMYjM7Js5Z4579HK7Un1nYwROg8WTUONfABacPU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=murGcq0IJz6lOUXB6LXaK4UK6+WRiurYLP+H4Zn7uTHsGAfqBYftIRJ6oTfEsp7RB
-	 JalhCkRbo9S1kcHMdyjjfNugtqy3RLFWypxGZy/GXi3EcnNTzE4ljrTCeBO5eay4Ty
-	 FZ09GZqnaAXp8u3B/f5fqPi9d+omqDTynEirrmipZs7uABT2yiYuk9fIiyodgmTkdA
-	 1M2kK7d2twEzwuFlULodKwOoDCR3uZjNSj4Os3x6vqcD0GF8hqwqI1tjfXi66Q0U+1
-	 Kd9tOgKzotJ1IE0UfTVXwf/wQiGF5McnaVxm2TloYkosPVH2J2/khnT1yiWvP9rUc0
-	 4CXXR05WEo6oQ==
-Date: Mon, 15 Sep 2025 18:22:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Duoming Zhou <duoming@zju.edu.cn>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch
-Subject: Re: [PATCH net] cnic: Fix use-after-free bugs in cnic_delete_task
-Message-ID: <20250915182235.77a556c4@kernel.org>
-In-Reply-To: <20250914034335.35643-1-duoming@zju.edu.cn>
-References: <20250914034335.35643-1-duoming@zju.edu.cn>
+	s=arc-20240116; t=1757986130; c=relaxed/simple;
+	bh=dOrtMow+yygUOhhXu/PCIEqWa9NtW5uvhs7mmCFFDXg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FYjhOyknzXgA7+kT2MIZ/CkLHIpEpX5xkFAtl1EAU6ndBVlujaBqjZ9ZE9fwrWoSIGlbOxdb2VzqMCT0ZzUd+e+aHiEDnusEkNECG8nSkFfpVAM35kyZdjPJZc1sjHSmnFtX6j6YuHWKllCzkGw98IvCOl7jmRaEmJfZEe8Vtr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=airkyi.com; spf=pass smtp.mailfrom=airkyi.com; dkim=pass (1024-bit key) header.d=airkyi.com header.i=@airkyi.com header.b=J98MyLcb; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=airkyi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=airkyi.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=airkyi.com;
+	s=altu2504; t=1757986002;
+	bh=r40/9/byFQ5Kdho5bSZgFzvBLnr6GNZb9hi7qVjYjLk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=J98MyLcbMRG94NEiVPEjeSXACyzHlGMhioQe+AoZz+U5Pl5VQ3tvrizeCPZchXSH0
+	 d2rMdEy5H/PcgpFTo13OzEfrZ4GonSnL1tUb0wvZGI64BXUf/kaItCe4zy6dRa1XJM
+	 oVipO6zCRqLqhivuCR8IJ8o6LMSpaqpg8K/p6Q98=
+X-QQ-mid: esmtpgz16t1757985994tb691f01f
+X-QQ-Originating-IP: 9WqvNV5m81o9OAQGGCKKLjLtxMwpN1LWrrj43UnBIq8=
+Received: from DESKTOP-8BT1A2O.localdomain ( [58.22.7.114])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 16 Sep 2025 09:26:31 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 13026834714890684059
+From: Chaoyi Chen <kernel@airkyi.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Jonas Karlman <jonas@kwiboo.se>,
+	David Wu <david.wu@rock-chips.com>
+Cc: sebastian.reichel@collabora.com,
+	ziyao@disroot.org,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>
+Subject: [PATCH net-next] Revert "net: ethernet: stmmac: dwmac-rk: Make the clk_phy could be used for external phy"
+Date: Tue, 16 Sep 2025 09:26:28 +0800
+Message-ID: <0A3F1D1604FEE424+20250916012628.1819-1-kernel@airkyi.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:airkyi.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: NpSUeF22LnzDaMKYiEuFqevqeK1MYzf4iSkkCu3fQqOjrNgyfGsywGra
+	GMwsWfxhO5M0UlGrG374jH3Xa17Hadfevx69JtfBFyquyr68EHvK2gqjtNyOyGoN5N/9Ypm
+	kv2vOCH1CMFRpEpIgjYRQ4sSB5udtTSTunJKOV7T8qxujPtCch7tkg2wkeh3aY97izqA7zs
+	fNXf6auP3iTDII0WIJKE9Vltww++i4bLigltiLAncAP7lsgqPay9ChFGa2sxFMpXFSxkRUY
+	IwLGia11ARql5Ns2AvaY2uG+nPJpXN/KnzHaVl2+I5OI0r6qtg7kXLjJN1i0dPSHDedKhUd
+	T+PdR1TWVAMpVmesdSinSeyyZDWVmffXSDAgV88zwpKYQ8Gq6yuQr+VyVwoSM8+h96Tm+z+
+	2KutP7P6l+B5dU/6fULMPT4BnM+MQr7iNsYP19RJm79bjmiepNqfxbjs6b21AsjrcnsLrnJ
+	EAKuVCXTj5X7ze5uXsIQBXeYa2SDOSrXiUEFiE50dqj5xOV9znX4FbpLeCNQXvnFBkRelAB
+	FsVObfsXPkF0WkkL+619MIYdebgIOFIBx3c2t5Xe2VjtDokOc4Xitf2eprN8YvgcVULfnLa
+	OlnhGfIoX2E9URDE+Lrbj7S/f8plgVl/ok2vV/W0LOcD3WCS3S3ez6xM0rfr2A/QCpPuBex
+	8XGoTFjaDSUilnJkOizFTOeG2SavuAvNPlzPjAB0DYksyIVmUE9Om69N8nL9S0zyVez7No1
+	XQU4G9/uczKgpSlwBVZqiM2LIaucy41R4WKSeefH/4j+mu1JCf+n2horpNVZCsaNmG3QQWC
+	zo5Bu9MIFGZxBHe3foojnFqdZ02SDzWGyEdxAcdwwNmhG6SfD5zwaND74VHf5UzjvZpFty+
+	AhYAiM9/If3Q55L+HCWcd5BbrrCEb9ZMzW8zlvJ0wcflYp8sT3LiBQwYwAx4fDtI4IdkAys
+	xRiJLq952WEZ+uDHpDt5/KlbJma6R/bcVeWasD1XDg7yJeg==
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-On Sun, 14 Sep 2025 11:43:35 +0800 Duoming Zhou wrote:
-> The original code uses cancel_delayed_work() in cnic_cm_stop_bnx2x_hw(),
-> which does not guarantee that the delayed work item 'delete_task' has
-> fully completed if it was already running. Additionally, the delayed work
-> item is cyclic, flush_workqueue() in cnic_cm_stop_bnx2x_hw() could not
-> prevent the new incoming ones. This leads to use-after-free scenarios
-> where the cnic_dev is deallocated by cnic_free_dev(), while delete_task
-> remains active and attempt to dereference cnic_dev in cnic_delete_task().
+From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
 
-[snip]
+This reverts commit da114122b83149d1f1db0586b1d67947b651aa20.
 
-> Replace cancel_delayed_work() with cancel_delayed_work_sync() to ensure
-> that the delayed work item is properly canceled and any executing delayed
-> work has finished before the cnic_dev is deallocated.
+As discussed, the PHY clock should be managed by PHY driver instead
+of other driver like dwmac-rk.
 
-Have you tested this on real HW? Please always include information on
-how you discovered the problem and whether you managed to test the fix.
+Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-> Fixes: fdf24086f475 ("cnic: Defer iscsi connection cleanup")
-> Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
-
->  	cnic_bnx2x_delete_wait(dev, 0);
->  
-> -	cancel_delayed_work(&cp->delete_task);
-> +	cancel_delayed_work_sync(&cp->delete_task);
->  	flush_workqueue(cnic_wq);
-
-AFAICT your patch is a nop, doubt this if fixing anything
-
->  	if (atomic_read(&cp->iscsi_conn) != 0)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+index 266c53379236..49f92cd79aa8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+@@ -1410,15 +1410,12 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+ 		clk_set_rate(plat->stmmac_clk, 50000000);
+ 	}
+ 
+-	if (plat->phy_node) {
++	if (plat->phy_node && bsp_priv->integrated_phy) {
+ 		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+ 		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+-		/* If it is not integrated_phy, clk_phy is optional */
+-		if (bsp_priv->integrated_phy) {
+-			if (ret)
+-				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+-			clk_set_rate(bsp_priv->clk_phy, 50000000);
+-		}
++		if (ret)
++			return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
++		clk_set_rate(bsp_priv->clk_phy, 50000000);
+ 	}
+ 
+ 	return 0;
 -- 
-pw-bot: cr
-pv-bot: s
+2.49.0
+
 
