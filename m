@@ -1,176 +1,93 @@
-Return-Path: <netdev+bounces-223482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FF6DB594ED
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:19:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDFFDB594F8
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E12E11BC6BDE
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CC7C4E0E18
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B679E2D47F3;
-	Tue, 16 Sep 2025 11:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A01D2D7397;
+	Tue, 16 Sep 2025 11:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQDbh1Va"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iAhOZc7j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707232773C3;
-	Tue, 16 Sep 2025 11:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7787E2D6E64;
+	Tue, 16 Sep 2025 11:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758021539; cv=none; b=EPkEazpkFKMm/0KT7zutLn7lCrawp2HXIN2RF/Y4s40EeRJ8ZiF516E/ywXAXrOCC6+N4Oq4IglM4jqowcr1Pt84mxi4dZMzKTQfexD7zx2qksQqDnsShcFyY13zK1jZqSjua5xLJuqKsuN6GODMRsrNcgDtNa728ZOI53xjaXQ=
+	t=1758021566; cv=none; b=TrIjralx9oO1jgWO9u0xJzS9JSTTSrkaN/J7Xl6UF1N/c2hPTwCDSq3B63CTW1B21O2SQNT/Obxznz8JYyYZPCQMSK7kmHNrsHdmDhh+/v/L0Kp7/Y214kl8iKomPUhtOPGoHyby1+HzzGAAbLp27BUWm2rw2s2pEHJL/fy2e7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758021539; c=relaxed/simple;
-	bh=fPi2jTo0hJ6xkgxaFB3CE37jdXxU+Q3zu80o0dV1unM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oif6+3BJVrYclfn356Z4EoofjbGMmvGIipGKdVufCUNZt3hfW+73iaejBRO8hCKG2XbSAR8ku3VnnFSy45DCmxvVBb67tCvbpxpi1EbCe4NUtPjMeT7dsEczhORDjn7EFuY4ScSfkDcHVEc1NtV1pKYaft09b6mapD5XQj1j9eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQDbh1Va; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB3C2C4CEEB;
-	Tue, 16 Sep 2025 11:18:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758021538;
-	bh=fPi2jTo0hJ6xkgxaFB3CE37jdXxU+Q3zu80o0dV1unM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NQDbh1VaUF3+xG9O6//FoHCGnbQqBuJSEFwsn9AWaLs19tnsOKvOZeXgtT2Ppbvh7
-	 zDCkjUFEK2bdYgvEchH4TzeIt6kwysmCsoRqQjdVJbkIYKTZ3q04vmBlHo725QsvxO
-	 7AhrEzl52ZcqfZzj3uI7n5oA/VBZAihCXEtpKdn38X5G1vEogTg4rY1Xs4mpRx0rwL
-	 LuyuHxRxaub0nEEe9tvc8fAnssi5DcdHD1bYPfb2UJIA2PoTryL/GJ7dwW60Kxyoqy
-	 zIXqsQ3Dze7L2+355gXdYkt1Z58WO6RCsVslYfMxHuV++DyfOaya0rg/PVyTka9aHH
-	 QsrmJgW1c/GmA==
-Date: Tue, 16 Sep 2025 12:18:50 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 04/33] block: use extensible_ioctl_valid()
-Message-ID: <02da33e3-6583-4344-892f-a9784b9c5b1b@sirena.org.uk>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
- <20250912-work-namespace-v2-4-1a247645cef5@kernel.org>
+	s=arc-20240116; t=1758021566; c=relaxed/simple;
+	bh=ZkEUkqP6FZBlXHDVGb/IKSKdn6/DO0jUbBztVIUKexc=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=FmOpVHGbadaeFgYboQqKFo3VwC8At2+WeHblw8yZpNzlSbH43tz2RCzevx/4xC/70I9+QSngjydkUmH+EDH2P+bLv5BIG1PrvQ4nSCc+fXcsHbBJc9oISyIlpddpapn448q/06F/jYdUnB+Hu7VYlsWNy8a9CJ4lvq3A1Bp9680=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iAhOZc7j; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58GBEO7k001188;
+	Tue, 16 Sep 2025 04:19:03 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=Ab6LVYTy3wdjdNsodU2BuvBNogQMb57VcpoD69+tAxk=; b=iAh
+	OZc7jmcfoAtKTuIe75kPTRsGY9bQ/+LUnpDyF2IJC8bkI57JMeuhlYUat3pA1iRK
+	W+wCJjHrudUN6jAOikspco4s0yGhCVh0BlwF6lwcEUV2K9wExM9NlMSakBK1TNcm
+	T93rBFVjg1fuTunzzFkZSfDEwZ4G1SS8ALl84uaBQTx5ocSZsStjpIqTqyuS325X
+	ZYNJU/5VPQ+lF6PeS1gaK3X8TOqg5/VENXB14fH+u8jx/A/ifItZ0KkAxU+rGWnD
+	1QjNageV6cE70PUTY1U29kDztHFfgLOogiZciSWgydl+XZHSlmkKH4gwnF00uHZV
+	l/wkLSLyCkZlm8LK55Q==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4976ukg060-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 04:19:03 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 16 Sep 2025 04:19:09 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 16 Sep 2025 04:19:09 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id D27375E6872;
+	Tue, 16 Sep 2025 04:18:57 -0700 (PDT)
+Date: Tue, 16 Sep 2025 16:48:56 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <sbhatta@marvell.com>, <naveenm@marvell.com>,
+        <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        <bbhushan2@marvell.com>
+Subject: Query regarding Phy loopback support
+Message-ID: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pXrdOnUKtpdJm8VZ"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250912-work-namespace-v2-4-1a247645cef5@kernel.org>
-X-Cookie: You dialed 5483.
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDEwNiBTYWx0ZWRfX5veuNGpLKakX n6LyHf6Y88IWZgqddag0rcKhZKvpfVv3lxY7T9IQAKX+CTwSMegQS9VOwR2QHmXiXvWQ5X3kKXB PzQ6fPnbqV7eAvBeq02rD9eNeU8Z0rlhS8WZVlCG3l6E2vCo0YgGNa+ZX35SmfqaP1Kih7ZZw4V
+ QBEbPR1pZ4/u0f4NNSUs4gG3YIrKWJ3lYj6SlhkaKzKhig5iKlzaPXIBnxfIbGxFrWskea014UN 5tBfWDaYRcp1erPy/61eYDfYjQSXd7Pez27fQgbwKUxA+G+yj6sT83WrfAfbuWmjEUfOdN14CkL v9RZsUXoNxYpYIQ7NmcDnP7plwNDdii3zlUYvy4IwCmkzUnEkYPd4/Pr88rYS7VP9FSrD/zLfxc J82oVcTK
+X-Proofpoint-GUID: N1wQo6NOJfc867ctH2CRmUh7HuymDQ6R
+X-Proofpoint-ORIG-GUID: N1wQo6NOJfc867ctH2CRmUh7HuymDQ6R
+X-Authority-Analysis: v=2.4 cv=deWA3WXe c=1 sm=1 tr=0 ts=68c947a7 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=Q0HHoM9fUppamqbhzqYA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
 
+We're looking for a standard way to configure PHY loopback on a network 
+interface using common Linux tools like ethtool, ip, or devlink.
 
---pXrdOnUKtpdJm8VZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Currently, ethtool -k eth0 loopback on enables a generic loopback, but it 
+doesn't specify if it's an internal, external, or PHY loopback. 
+Need suggestions to implement this feature in a standard way.
 
-On Fri, Sep 12, 2025 at 01:52:27PM +0200, Christian Brauner wrote:
-> Use the new extensible_ioctl_valid() helper which is equivalent to what
-> is done here.
-
-I'm seeing several LTP tests (at least getdents02, msync04, renameat01
-and statx12) failing in yesterday's -next pending-fixes on Raspberry Pi
-4 with bisections pointing to this commit.  renameat01 fails with:
-
-  renameat01    0  TINFO  :  Using /tmp/LTP_renEtNZrS as tmpdir (nfs filesystem)
-  renameat01    1  TBROK  :  tst_device.c:97: Could not stat loop device 0
-  renameat01    2  TBROK  :  tst_device.c:97: Remaining cases broken
-
-Full log for that run:
-
-  https://lava.sirena.org.uk/scheduler/job/1830765#L6680
-
-bisect log for renameat (all the bisects cover the same builds, though I
-split the jobs up so it's different test jobs for some of the tests):
-
-# bad: [179688318d56cee63802eb49e3503d799c43db6c] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
-# good: [f83ec76bf285bea5727f478a68b894f5543ca76e] Linux 6.17-rc6
-# good: [690aa09b1845c0d5c3c29dabd50a9d0488c97c48] ASoC: Intel: catpt: Expose correct bit depth to userspace
-# good: [3254959b4dd065eae396cf78ccc1361460b2f53e] ASoC: amd: amd_sdw: Add quirks for some new Dell laptops
-# good: [9004a450fccbeb40a71cc173747da37a459fd4dc] ASoC: codecs: lpass-wsa-macro: Fix speaker quality distortion
-# good: [ec630c2c8ce215dd365b8c3644f004f645714a0f] ASoC: SDCA: Reorder members of hide struct to remove holes
-# good: [68f27f7c7708183e7873c585ded2f1b057ac5b97] ASoC: qcom: q6apm-lpass-dais: Fix NULL pointer dereference if source graph failed
-# good: [0c28431f6fe13f3a3be0978f79c1a7ae8a93d028] ASoC: SOF: imx: Fix devm_ioremap_resource check
-# good: [28edfaa10ca1b370b1a27fde632000d35c43402c] ASoC: SDCA: Add quirk for incorrect function types for 3 systems
-# good: [35fc531a59694f24a2456569cf7d1a9c6436841c] ASoC: SOF: Intel: hda-stream: Fix incorrect variable used in error message
-# good: [9b17d3724df55ecc2bc67978822585f2b023be48] ASoC: wm8974: Correct PLL rate rounding
-# good: [f54d87dad7619c8026e95b848d6ef677b9f2b55f] ASoC: rt712: avoid skipping the blind write
-git bisect start '179688318d56cee63802eb49e3503d799c43db6c' 'f83ec76bf285bea5727f478a68b894f5543ca76e' '690aa09b1845c0d5c3c29dabd50a9d0488c97c48' '3254959b4dd065eae396cf78ccc1361460b2f53e' '9004a450fccbeb40a71cc173747da37a459fd4dc' 'ec630c2c8ce215dd365b8c3644f004f645714a0f' '68f27f7c7708183e7873c585ded2f1b057ac5b97' '0c28431f6fe13f3a3be0978f79c1a7ae8a93d028' '28edfaa10ca1b370b1a27fde632000d35c43402c' '35fc531a59694f24a2456569cf7d1a9c6436841c' '9b17d3724df55ecc2bc67978822585f2b023be48' 'f54d87dad7619c8026e95b848d6ef677b9f2b55f'
-# test job: [690aa09b1845c0d5c3c29dabd50a9d0488c97c48] https://lava.sirena.org.uk/scheduler/job/1805508
-# test job: [3254959b4dd065eae396cf78ccc1361460b2f53e] https://lava.sirena.org.uk/scheduler/job/1769788
-# test job: [9004a450fccbeb40a71cc173747da37a459fd4dc] https://lava.sirena.org.uk/scheduler/job/1774162
-# test job: [ec630c2c8ce215dd365b8c3644f004f645714a0f] https://lava.sirena.org.uk/scheduler/job/1772919
-# test job: [68f27f7c7708183e7873c585ded2f1b057ac5b97] https://lava.sirena.org.uk/scheduler/job/1772831
-# test job: [0c28431f6fe13f3a3be0978f79c1a7ae8a93d028] https://lava.sirena.org.uk/scheduler/job/1762707
-# test job: [28edfaa10ca1b370b1a27fde632000d35c43402c] https://lava.sirena.org.uk/scheduler/job/1762245
-# test job: [35fc531a59694f24a2456569cf7d1a9c6436841c] https://lava.sirena.org.uk/scheduler/job/1762959
-# test job: [9b17d3724df55ecc2bc67978822585f2b023be48] https://lava.sirena.org.uk/scheduler/job/1758830
-# test job: [f54d87dad7619c8026e95b848d6ef677b9f2b55f] https://lava.sirena.org.uk/scheduler/job/1758090
-# test job: [179688318d56cee63802eb49e3503d799c43db6c] https://lava.sirena.org.uk/scheduler/job/1830765
-# bad: [179688318d56cee63802eb49e3503d799c43db6c] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
-git bisect bad 179688318d56cee63802eb49e3503d799c43db6c
-# test job: [4c3c40178b0e1578a3898092cc33ffb2618edc51] https://lava.sirena.org.uk/scheduler/job/1830986
-# good: [4c3c40178b0e1578a3898092cc33ffb2618edc51] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/zonefs.git
-git bisect good 4c3c40178b0e1578a3898092cc33ffb2618edc51
-# test job: [78ca913586336540ec12f262c5bdf16f8925de82] https://lava.sirena.org.uk/scheduler/job/1831233
-# bad: [78ca913586336540ec12f262c5bdf16f8925de82] Merge branch 'vfs.all' of https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-git bisect bad 78ca913586336540ec12f262c5bdf16f8925de82
-# test job: [06dd3eda0e958cdae48ca755eb5047484f678d78] https://lava.sirena.org.uk/scheduler/job/1831745
-# good: [06dd3eda0e958cdae48ca755eb5047484f678d78] Merge branch 'vfs-6.18.rust' into vfs.all
-git bisect good 06dd3eda0e958cdae48ca755eb5047484f678d78
-# test job: [a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0] https://lava.sirena.org.uk/scheduler/job/1832263
-# bad: [a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0] Merge patch series "ns: support file handles"
-git bisect bad a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0
-# test job: [670f2f915084d1c53f14d59946011b7645601813] https://lava.sirena.org.uk/scheduler/job/1832304
-# bad: [670f2f915084d1c53f14d59946011b7645601813] nstree: make iterator generic
-git bisect bad 670f2f915084d1c53f14d59946011b7645601813
-# test job: [011090b6c0a97a3aa1f659d670d85bbf0eddbe06] https://lava.sirena.org.uk/scheduler/job/1832355
-# bad: [011090b6c0a97a3aa1f659d670d85bbf0eddbe06] cgroup: use ns_common_init()
-git bisect bad 011090b6c0a97a3aa1f659d670d85bbf0eddbe06
-# test job: [60949057a2e71c9244e82608adf269e62e6ac443] https://lava.sirena.org.uk/scheduler/job/1832402
-# bad: [60949057a2e71c9244e82608adf269e62e6ac443] block: use extensible_ioctl_valid()
-git bisect bad 60949057a2e71c9244e82608adf269e62e6ac443
-# test job: [4d906371d1f9fc9ce47b2c8f37444680246557bc] https://lava.sirena.org.uk/scheduler/job/1832439
-# good: [4d906371d1f9fc9ce47b2c8f37444680246557bc] nsfs: drop tautological ioctl() check
-git bisect good 4d906371d1f9fc9ce47b2c8f37444680246557bc
-# test job: [f8527a29f4619f74bc30a9845ea87abb9a6faa1e] https://lava.sirena.org.uk/scheduler/job/1832550
-# good: [f8527a29f4619f74bc30a9845ea87abb9a6faa1e] nsfs: validate extensible ioctls
-git bisect good f8527a29f4619f74bc30a9845ea87abb9a6faa1e
-# first bad commit: [60949057a2e71c9244e82608adf269e62e6ac443] block: use extensible_ioctl_valid()
-
---pXrdOnUKtpdJm8VZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjJR5kACgkQJNaLcl1U
-h9CJ4Af+ISZ3lljoI72V72kUBKwG6lq4beym3VICH+8DyjBOtQJqkqIE5OlcUns9
-gY6sqsqpxxIvI+a6v6GPW0eqWuAu36UuvdqjURrMubJCQi6zeT4lYVIgcioh4U4G
-FWmhUV1LC5FGYKc7KfibPRCcggsT/XKqMH88jkIfAYSUiQHyuMZMaiA+vNDdVDK+
-f3ZZj6bKcB6h0wVse+BUtM5+Ha+RIzS4bpK9JNzJqV3pHra6Yg3myz2sd46lT4mg
-5K5amhS9uYN26RZGTr3ioMhuGUywjeyWsLccmtBq/fG+bofT1tEReGLdVC9fsvOO
-wPu0MoWdSMaeA2rJE/z5wrxA2nePqA==
-=6jkN
------END PGP SIGNATURE-----
-
---pXrdOnUKtpdJm8VZ--
 
