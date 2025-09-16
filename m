@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-223516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0BFB5964A
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:34:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3897DB5964C
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19CFD3B554B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:34:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D14321BC09EB
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB66E2D24A1;
-	Tue, 16 Sep 2025 12:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1388F2D8393;
+	Tue, 16 Sep 2025 12:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oy5uNtuC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PwSS0rs3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DD5469D;
-	Tue, 16 Sep 2025 12:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C7014658D
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 12:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758026056; cv=none; b=DyuGsGUqr6r8AN8CovGZt/g8RpMxQjj4Wcma/tOSUvpWdcAVDwAR5E1B7au953vYXSE5vVlxeyyMsoMC14dEh/MgWERpjtpmJWezl36w0A/PlA3JtyeGKby70t65tZHsvA6wmZnRq1z7iXMF2UD2P4yhdT4Rbb2+CiPKPd+jYbQ=
+	t=1758026089; cv=none; b=UE0B2m/L85DUrLZM0Hgsq4MfIsCfnh+o/TkJdZrZY43Al0rFApJE5WPEmJioxlpnVWC4eJzcEPTzqUs8yOpKag3OUQ32Hwn3o36lL8WoGtgu1b6I46RO3h0ngBCX/SJImOrqrhy6L2LBW1f+vlmusin+fyTvv6H+t4sC0CGbD+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758026056; c=relaxed/simple;
-	bh=LkVC7SOF1ecwe4fjNrM/LffIi1MGAwKsiw8rXf3dpnU=;
+	s=arc-20240116; t=1758026089; c=relaxed/simple;
+	bh=WTTAnbxVklt98ysGADcRykPM3syZlKDOfNqtfiExGMg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q6lmdR5OyvSUklmMfVQlW0N67Rg+FY5l9fJat8HWii3cibnH1OiANg4M6pNfxCswHbql2ybcKgSXKcB0sFBd4yyoJ+jE5GqZ/sV6Oi8x9c0ul7SIwmeT7rjMK0+vYjoyTbp3/eoIoK2RaNYesZO+BtVWqDAsMtFaKtH4IUNSGS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oy5uNtuC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C676C4CEEB;
-	Tue, 16 Sep 2025 12:34:14 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=V+fgMEZhyfcRwTvD/n7c7vYaZg6ilslcsWYiaDJZgSy6uY4WGRh39gK+xn78sFErQhza0BaKLjcONtDAevfaNyUEnxU6aUxkKVNWp82B2hz3rFuBaYB3K6ScldtjD5dq8vkPY/Rm1aIotLVgmmbYu0MUPwZh+4+eViEDMN2c4RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PwSS0rs3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2962C4CEEB;
+	Tue, 16 Sep 2025 12:34:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758026056;
-	bh=LkVC7SOF1ecwe4fjNrM/LffIi1MGAwKsiw8rXf3dpnU=;
+	s=k20201202; t=1758026088;
+	bh=WTTAnbxVklt98ysGADcRykPM3syZlKDOfNqtfiExGMg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oy5uNtuC+vXnJWcFRK31VNoVAveH3bBQqFLGlZsn4wVJB3dIS+bFCbsy/KNe9ZIMZ
-	 3/T3Bm0GxEfOIDcEw7mrFMHX/3bwtUTDu24absed3pPYLdbxc75x8or2pE1/JP8lV4
-	 wcLfXs7KtzZqrXlnv9FG+R520jSiAvb6THg18xRowowv1JZDjSz6a1Qo+RjUllfcih
-	 XYL7cNYk8hulxYCQyotssPBQVhaQ0cy0XJGOT8utWeRFchTwlpnOkjJjSxOuYQwuDB
-	 KfSEvWcR9iVzdA97BulN0pJYVM24pXsb7cACng0CKolegK3DAeFp6qZ/bt/bNJEuhJ
-	 lFJhbt65yu32Q==
-Date: Tue, 16 Sep 2025 13:34:12 +0100
+	b=PwSS0rs3ZME6aPgcuZ7dZppr9pSFF6m3/gRTbhtetegSmiM6REjK8Dkec07eDg69Q
+	 4og5zMk0GZ8A3aBYBIOuTbx/N9p85zGbpexx/u8HFcdRcl/AuqWN+xd+J7buDm6fzz
+	 7wSHSh/6Vqk0nnUS933aBhI9Hr5ixX61rlol6ntV21KUtCqED16GRofIcUC5+4jazZ
+	 XqCsIMUvoGRIipzlJXY5hQUQ+A87hsLl41qrXpuKiTE1Y9MgexAAGpwgJzQp1o0pwT
+	 4nO04DjTNp1sruI3wiO0CXjYw4HcRq4XyV0VuzikcfiQ8W5EIbRnrhJR3g7itWIRoP
+	 ktEm57o00VASA==
+Date: Tue, 16 Sep 2025 13:34:44 +0100
 From: Simon Horman <horms@kernel.org>
-To: Siva Reddy Kallam <siva.kallam@broadcom.com>
-Cc: leonro@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, vikas.gupta@broadcom.com,
-	selvin.xavier@broadcom.com, anand.subramanian@broadcom.com,
-	Usman Ansari <usman.ansari@broadcom.com>
-Subject: Re: [PATCH 2/8] RDMA/bng_re: Add Auxiliary interface
-Message-ID: <20250916123412.GZ224143@horms.kernel.org>
-References: <20250829123042.44459-1-siva.kallam@broadcom.com>
- <20250829123042.44459-3-siva.kallam@broadcom.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, alexanderduyck@fb.com,
+	jacob.e.keller@intel.com
+Subject: Re: [PATCH net-next v2 2/9] eth: fbnic: use fw uptime to detect fw
+ crashes
+Message-ID: <20250916123444.GA224143@horms.kernel.org>
+References: <20250915155312.1083292-1-kuba@kernel.org>
+ <20250915155312.1083292-3-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,59 +60,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250829123042.44459-3-siva.kallam@broadcom.com>
+In-Reply-To: <20250915155312.1083292-3-kuba@kernel.org>
 
-On Fri, Aug 29, 2025 at 12:30:36PM +0000, Siva Reddy Kallam wrote:
-> Add basic Auxiliary interface to the driver which supports
-> the BCM5770X NIC family.
+On Mon, Sep 15, 2025 at 08:53:05AM -0700, Jakub Kicinski wrote:
+> Currently we only detect FW crashes when it stops responding
+> to heartbeat messages. FW has a watchdog which will reset it
+> in case of crashes. Use FW uptime sent in the ownership and
+> heartbeat messages to detect that the watchdog has fired
+> (uptime went down).
 > 
-> Signed-off-by: Siva Reddy Kallam <siva.kallam@broadcom.com>
-> Reviewed-by: Usman Ansari <usman.ansari@broadcom.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - update commit msg
+>  - use uptime the entry from OWNERSHIP enum in ownership rsp parsing
+>  - update comment about heartbeat rsp
+> v1: https://lore.kernel.org/20250912201428.566190-3-kuba@kernel.org
 
-...
+Thanks for the updates.
 
-> diff --git a/drivers/infiniband/hw/bng_re/bng_dev.c b/drivers/infiniband/hw/bng_re/bng_dev.c
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
-
-> +static int bng_re_add_device(struct auxiliary_device *adev)
-> +{
-> +	struct bnge_auxr_priv *auxr_priv =
-> +		container_of(adev, struct bnge_auxr_priv, aux_dev);
-> +	struct bng_re_en_dev_info *dev_info;
-> +	struct bng_re_dev *rdev;
-> +	int rc;
-> +
-> +	dev_info = auxiliary_get_drvdata(adev);
-> +
-> +	rdev = bng_re_dev_add(adev, auxr_priv->auxr_dev);
-> +	if (!rdev || !rdev_to_dev(rdev)) {
-
-Hi Siva,
-
-Sorry if somehow this is a duplicate, it got stuck in my outbox somehow.
-
-GCC 15.1.0 says:
-
-  .../bng_dev.c: In function 'bng_re_add_device':
-  .../bng_dev.c:54:22: warning: the comparison will always evaluate as 'true' for the address of 'dev' will never be NULL [-Waddress]
-     54 |         if (!rdev || !rdev_to_dev(rdev)) {
-        |                      ^
-  In file included from drivers/infiniband/hw/bng_re/bng_dev.c:8:
-  ./include/rdma/ib_verbs.h:2812:41: note: 'dev' declared here
-   2812 |                 struct device           dev;
-        |
-
-> +		rc = -ENOMEM;
-> +		goto exit;
-> +	}
-> +
-> +	dev_info->rdev = rdev;
-> +
-> +	return 0;
-> +exit:
-> +	return rc;
-> +}
-
-...
 
