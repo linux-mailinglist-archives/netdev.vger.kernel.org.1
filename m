@@ -1,132 +1,134 @@
-Return-Path: <netdev+bounces-223715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F461B5A353
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:39:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B747B5A356
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:39:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFFBB16D2BC
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 20:36:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E53B4837EB
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 20:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F79279DB4;
-	Tue, 16 Sep 2025 20:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D59F31BC92;
+	Tue, 16 Sep 2025 20:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XVsckE6c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpp5cQ8M"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A494427FB37
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 20:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B9931BC8F;
+	Tue, 16 Sep 2025 20:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758054917; cv=none; b=n7g84ylPxZ1rGorRRHKyFs7cKg5VeQmp4N+oQD0zwxdED8mi/6badSJMtUyNfZ8K5iJ3Cu2Yp/i9WIjoveGaf4jR0HrQ8q0osOCWpgMg39nL1lVsAG4g3hAdrNZTlxEY1baGbWroxKLCG2tsFOuavqgj/fVYqI7BOGLJL4XnGqk=
+	t=1758054941; cv=none; b=G1DP1fLCMq3tTm2JmBootjmQpFKoYDBFaG699eLfYLB6Zib64krNN472NfJlDMFKSCAa7wJRs3La9MAmUJhZO2gLth0/Rtb7Cs0KXXTjHGrZza02+zvs7TCDhNY/Y7fibxDUpVsh9wUZbPs+IMzqqNSTlRY3rkjb8SrzXxdDSLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758054917; c=relaxed/simple;
-	bh=Qq43jd6cKgexMNe6qqLI1Nd3hRYO58R9kgAFidVnRB8=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=GwrbxNpW+CACxkMO4a1psbC3VI1P9qt3mBNmFn4gsp9Mlqzl9qQCY8ubZ37a2jZE1S4tm8YC8E6EuyHH6bkxJFeFDEGRXSs3V4ELXp55OzCS+nQGxWEthoE5sgTasc+QMtd/figXFY6zE8fq7oXmb9jcDGdsKgco+MMqWarB4H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XVsckE6c; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DP1KDkcCQWHsBx4lXmiT5I8ma3EZUUmQWlQZMtNFcus=; b=XVsckE6c97kB51cGTfoJelVM2+
-	qehdIpsFWUD4bODJfn+BoqJwTc4dlvSmVebJtcYskPHjuJT1bsJwbW6PedtmTOfAlwFjC+MZ9G9wo
-	BbFxJAghf6GrRFGhgtqYx0UwW6m9ajWPPYSGgW+UXktEykwje0b2VJ8dvr2NPJqIvL8UpWAC9M8Ez
-	fzGF+sBGt7iUf+oI1zGcP6o6XzUwpQxGNRgp+PBFrN6/cmg7s1JeayCE7zWDubj6amO5XX551FBLY
-	FjJYmx6dX5BExB4TzweMGovYW8mL3nA85t96UodA45O5xmJB4SqpmU5YzgJgToI72rILA09mpYCLj
-	rTmtzTYw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:40718 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uycOL-0000000068n-3Fx5;
-	Tue, 16 Sep 2025 21:35:09 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uycOK-00000005xbI-3u2c;
-	Tue, 16 Sep 2025 21:35:08 +0100
-In-Reply-To: <aMnJ1uRPvw82_aCT@shell.armlinux.org.uk>
-References: <aMnJ1uRPvw82_aCT@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1758054941; c=relaxed/simple;
+	bh=KqfC65wNBi+Y/C3HaiesaaDgdsXgozVufkjtOAiu4hM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=BfzbexwznLCPkNGwbicJxk5WRPXtCeTw5eoU3oa2KIF443Ga0H6O7aD3GJgA8TOVRpXWSpptkO9pf18dMG928QP1Nkp8/LRHy3Hgcz3o7POcpBPVTRHTTkHtNrfWv7LseML17GI3irwlgsfdZaCcDecqqrq9j85oYtBWmyrBb4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpp5cQ8M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8304C4CEEB;
+	Tue, 16 Sep 2025 20:35:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758054940;
+	bh=KqfC65wNBi+Y/C3HaiesaaDgdsXgozVufkjtOAiu4hM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=gpp5cQ8MDuThAKuE8YpdMV+sVmG1CQsK86y/CmAihJJHE7cjHFOtU+vBlylCrbI/B
+	 lkY285P/FU7qaXK1zTJsd0Uy9haUzrsSnqAKTj9pxM3bxqo491TsNsOl9LfISl5v+3
+	 dCUmflIjzOaN8eacQOndiOs4z+ePCcVHzgG8AQdQD2SB9IgOACAVpGSI/q18Z++lMp
+	 i5FYXY9WRiRyOlU7eo3XUR7kQuJT1uYmRXwaj9L/VhQ50qoSiW9SeCH+MAImQa9z2F
+	 ONE1Tn7ylJq2aVqatsdhE9zACAPUYCJw5cNPtF6AVXbcNBe+SKpSyJ/qE4CHEQMRHA
+	 NHRiyZI6sn0yg==
+Date: Tue, 16 Sep 2025 15:35:39 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>,
+	nic_swsd@realtek.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next v2 5/5] net: dsa: mv88e6xxx: move
- mv88e6xxx_hwtstamp_work() prototype
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Wang, Crag" <Crag.Wang@dell.com>,
+	"Chen, Alan" <Alan.Chen6@dell.com>,
+	"Alex Shen@Dell" <Yijun.Shen@dell.com>, linux-pci@vger.kernel.org
+Subject: Re: [PATCH] r8169: enable ASPM on Dell platforms
+Message-ID: <20250916203539.GA1815401@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uycOK-00000005xbI-3u2c@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 16 Sep 2025 21:35:08 +0100
+In-Reply-To: <ec602131-ed22-44a8-a356-03729764a690@gmail.com>
 
-Since mv88e6xxx_hwtstamp_work() is defined in hwtstamp.c, its prototype
-should be in hwtstamp.h, so move it there. Remove it's redundant stub
-definition, as both hwtstamp.c (the function provider) and ptp.c (the
-consumer) are both dependent on the same config symbol.
+[+cc linux-pci]
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/dsa/mv88e6xxx/hwtstamp.h | 1 +
- drivers/net/dsa/mv88e6xxx/ptp.h      | 6 ------
- 2 files changed, 1 insertion(+), 6 deletions(-)
+On Mon, Sep 15, 2025 at 09:25:39PM +0200, Heiner Kallweit wrote:
+> On 9/15/2025 3:37 AM, Chia-Lin Kao (AceLan) wrote:
+> > On Fri, Sep 12, 2025 at 05:30:52PM +0200, Heiner Kallweit wrote:
+> >> On 9/12/2025 9:29 AM, Chia-Lin Kao (AceLan) wrote:
+> >>> Enable PCIe ASPM for RTL8169 NICs on Dell platforms that have been
+> >>> verified to work reliably with this power management feature. The
+> >>> r8169 driver traditionally disables ASPM to prevent random link
+> >>> failures and system hangs on problematic hardware.
+> >>>
+> >>> Dell has validated these product families to work correctly with
+> >>> RTL NIC ASPM and commits to addressing any ASPM-related issues
+> >>> with RTL hardware in collaboration with Realtek.
+> >>>
+> >>> This change enables ASPM for the following Dell product families:
+> >>> - Alienware
+> >>> - Dell Laptops/Pro Laptops/Pro Max Laptops
+> >>> - Dell Desktops/Pro Desktops/Pro Max Desktops
+> >>> - Dell Pro Rugged Laptops
+> >>>
+> >> I'd like to avoid DMI-based whitelists in kernel code. If more system
+> >> vendors do it the same way, then this becomes hard to maintain.
+> >
+> > I totally understand your point; I also don’t like constantly adding DMI
+> > info to the list. But this list isn’t for a single product name, it’s a
+> > product family that covers a series of products, and it probably won’t
+> > change anytime soon.
+> > 
+> >> There is already a mechanism for vendors to flag that they successfully
+> >> tested ASPM. See c217ab7a3961 ("r8169: enable ASPM L1.2 if system vendor
+> >> flags it as safe").
+> >
+> > Right, but writing the flag is not applicable for Dell manufacturing
+> > processes.
+> > 
+> Can you elaborate on why this doesn't work for Dell?
+> 
+> >> Last but not least ASPM can be (re-)enabled from userspace, using sysfs.
+> >
+> > That doesn't sound like a good solution to push the list to userspace.
+> > 
+> > Dell has already been working with Canonical for more than a decade to
+> > ship their products with r8169 ASPM enabled. Dell has also had lengthy
+> > discussions with Realtek to have this feature enabled by default in the
+> > r8169 driver. I think this is a good opportunity for Dell to work with
+> > Realtek to spot bugs and refine the r8169 driver.
+>
+> One more option to avoid having to change kernel code with each new
+> and successfully ASPM-tested system family from any system vendor:
+> 
+> We could define a device property which states that ASPM has been
+> successfully tested on a system. This device property could be set
+> via device tree or via ACPI. Then a simple device_property_present()
+> in the driver would be sufficient.
+> A device property would also have the advantage that vendors can
+> control behavior per device, not only per device family.
+> An ACPI device property could be rolled out via normal BIOS update
+> for existing systems.
+> 
+> See also:
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/firmware-guide/acpi/DSD-properties-rules.rst?h=v6.16.7
 
-diff --git a/drivers/net/dsa/mv88e6xxx/hwtstamp.h b/drivers/net/dsa/mv88e6xxx/hwtstamp.h
-index 22e4acc957f0..c359821d5a6e 100644
---- a/drivers/net/dsa/mv88e6xxx/hwtstamp.h
-+++ b/drivers/net/dsa/mv88e6xxx/hwtstamp.h
-@@ -124,6 +124,7 @@ void mv88e6xxx_port_txtstamp(struct dsa_switch *ds, int port,
- int mv88e6xxx_get_ts_info(struct dsa_switch *ds, int port,
- 			  struct kernel_ethtool_ts_info *info);
- 
-+long mv88e6xxx_hwtstamp_work(struct ptp_clock_info *ptp);
- int mv88e6xxx_hwtstamp_setup(struct mv88e6xxx_chip *chip);
- void mv88e6xxx_hwtstamp_free(struct mv88e6xxx_chip *chip);
- int mv88e6352_hwtstamp_port_enable(struct mv88e6xxx_chip *chip, int port);
-diff --git a/drivers/net/dsa/mv88e6xxx/ptp.h b/drivers/net/dsa/mv88e6xxx/ptp.h
-index 529ac5d0907b..95bdddb0bf39 100644
---- a/drivers/net/dsa/mv88e6xxx/ptp.h
-+++ b/drivers/net/dsa/mv88e6xxx/ptp.h
-@@ -66,7 +66,6 @@
- 
- #ifdef CONFIG_NET_DSA_MV88E6XXX_PTP
- 
--long mv88e6xxx_hwtstamp_work(struct ptp_clock_info *ptp);
- int mv88e6xxx_ptp_setup(struct mv88e6xxx_chip *chip);
- void mv88e6xxx_ptp_free(struct mv88e6xxx_chip *chip);
- 
-@@ -79,11 +78,6 @@ extern const struct mv88e6xxx_ptp_ops mv88e6390_ptp_ops;
- 
- #else /* !CONFIG_NET_DSA_MV88E6XXX_PTP */
- 
--static inline long mv88e6xxx_hwtstamp_work(struct ptp_clock_info *ptp)
--{
--	return -1;
--}
--
- static inline int mv88e6xxx_ptp_setup(struct mv88e6xxx_chip *chip)
- {
- 	return 0;
--- 
-2.47.3
-
+Related conversation:
+https://lore.kernel.org/r/5b00870c-be1a-42d6-8857-48b89716d5e2@gmail.com
 
