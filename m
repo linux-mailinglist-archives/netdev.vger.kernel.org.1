@@ -1,77 +1,99 @@
-Return-Path: <netdev+bounces-223315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21200B58B49
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:37:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37017B58B4F
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBB031B27169
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:37:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7C381B27935
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334491EFF9B;
-	Tue, 16 Sep 2025 01:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0DA21254D;
+	Tue, 16 Sep 2025 01:40:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fR/ML7LF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SdSjEaxG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096D0132117;
-	Tue, 16 Sep 2025 01:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5961F542E;
+	Tue, 16 Sep 2025 01:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757986644; cv=none; b=sO4Mp626PFNXSME/afmZQlz4C7TpvDKZjuGZkt6qd74nQ1r9DPx+wE1ib6wmc/EByAnTiEIxshOPOhRVZp/zusBO0UF3bBz1KlHwjH931LQB7mt+EVHIZB8RaTxwfRvIDJ8zwK3ln2/J3CaEyKRfyFKZ4ikScY1gChdf3tOGHAU=
+	t=1757986815; cv=none; b=gAb4bpeZ5haa7YFpa4b9rcfOZUDwII3nOOgm38vKkcJBX9/1U2kqegVL5r0MUhwLs1MFr5nWoBk9UHfQ2BhPvWzqAjiSv83CWawZ9tRTMDrWPzzsF6HdMlM/hy+xHKNNitF7v4lSctl+LgOp/QjZNI+ujOANICedk/216GYV9J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757986644; c=relaxed/simple;
-	bh=7HwG7iGKyKIIChKcO1I+A2YrFISPv1gEMBtMTdiCqds=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jlVUJjbS6bYfcmCWP+eKv0BUWA4j6iftdLAI6CJf7qXMc+7KzT1Qc1Kvsvd8DTvLuTIiFLljHl1OmCgvD6FJGK4NtxysMaJeifIWh4Sc4RnqXYlBi0IezyTYxrBE2iz1jNL0ZBOM16lbbLUvCAZDmR6YZrqD/iTrKZbEP8tug6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fR/ML7LF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 330E5C4CEF1;
-	Tue, 16 Sep 2025 01:37:23 +0000 (UTC)
+	s=arc-20240116; t=1757986815; c=relaxed/simple;
+	bh=XEkpR8NWRQZ1eWEHnM8hYiYezDkGF/Zxa6o+qN2kpZg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ek/YsrHFbxPPTqwzeCJM2OojOMILmH9Ph8hTzO6Cjacofvj28Zj5gGxxEOCk8S8ZfZ5CSIZMdGYKvVKJ2DbkzAvgmLUr4N177okbqA9CroKbo+cWZ72M6Ig12e3orbBu+kjf8F4qB6VU4sm6qahJJRAv7C0WWZIxXe1Gnezqfzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SdSjEaxG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B54C4CEF1;
+	Tue, 16 Sep 2025 01:40:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757986643;
-	bh=7HwG7iGKyKIIChKcO1I+A2YrFISPv1gEMBtMTdiCqds=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fR/ML7LFO+0xYXsreQmJ6E9a5P/y4H6ListzR4l8tO/1sF+8YBm2JfnR6PDvkmriX
-	 xqeu9PCMCPAHRtd0Y7bhI+7Ny/jnPt9k3HwwKO+kb6r0EThML38uWNtKBk9fcdVsGs
-	 sPDOkQNlHbpK0R0U5N5mIPSPoevmXH/H1N9eMbiRQnixQu9U60Wrey2XPvQDoFOY/1
-	 3RcCAkq4G7Nu/seQU/9f330kOMn8DOzf+AIom0Am5qud1EiKTBCyO1r3cGKYdaX25G
-	 PydZF5Sj3i6M9v5q3HKTtnLflZM2kIfXWjBeNkV7NTXNL6FYrKhBNaLipdUA7y/ejp
-	 9mGkcKcanLkhw==
-Date: Mon, 15 Sep 2025 18:37:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?=
- <niklas.soderlund+renesas@ragnatech.se>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>
-Subject: Re: [net-next,v2] net: ravb: Fix -Wmaybe-uninitialized warning
-Message-ID: <20250915183722.50e83484@kernel.org>
-In-Reply-To: <20250913133229.2087822-1-niklas.soderlund+renesas@ragnatech.se>
-References: <20250913133229.2087822-1-niklas.soderlund+renesas@ragnatech.se>
+	s=k20201202; t=1757986814;
+	bh=XEkpR8NWRQZ1eWEHnM8hYiYezDkGF/Zxa6o+qN2kpZg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SdSjEaxGaLSLA1gG8WFngzR0Os6PDV02sI70IHhG5he4Ws+E4VBxm0Uo8UqjXiOog
+	 XHXk+4FMpBJqbTsOEoeWVGM9Qsi2Gd+QdGfoWnxOZhhjxTxSnzFr/+OSUFtIyYgNuk
+	 dGLH7RYVOfylunbwvXw1pZt2GtqNewfN6OGCqmr+odBhoqTKWOAZ4WiO14xR2jt9oa
+	 CKfJ7+doivHCKENnseF5HKeoW4Tqa+E4H1FpVghKgBOxXyAgf85O8zSmzGtZJ6D/2Y
+	 +vvsjTrEeQiFo8foWhPRF7NZtBuPUYYQRlSALvI/YB6qWzCFsKe5VPKzKxteZATRBp
+	 FYdSFfFPGeBQQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE00039D0C17;
+	Tue, 16 Sep 2025 01:40:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/3] tools: ynl: rst: display attribute-set
+ doc
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175798681550.561918.14633148960106754244.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Sep 2025 01:40:15 +0000
+References: <20250913-net-next-ynl-attr-doc-rst-v3-0-4f06420d87db@kernel.org>
+In-Reply-To: <20250913-net-next-ynl-attr-doc-rst-v3-0-4f06420d87db@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: corbet@lwn.net, donald.hunter@gmail.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, jiri@resnulli.us, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, chuck.lever@oracle.com,
+ jacob.e.keller@intel.com, fw@strlen.de, idosch@nvidia.com
 
-On Sat, 13 Sep 2025 15:32:29 +0200 Niklas S=C3=B6derlund wrote:
-> Fix a -Wmaybe-uninitialized warning by initializing the variable to
-> NULL. The warning is bogus and should not happen, but fixing it allows
-> running the check on the driver to catch potential future problems.
->=20
->   $ make CFLAGS_ravb_main.o=3D-Wmaybe-uninitialized
+Hello:
 
-FWIW this is why kernel only enables this warning at W=3D2 for gcc.
-Clang appears to suck much less in detecting uninitialized variables.
-Testing with both compilers at W=3D1 is usually better for one's sanity
-than trying to fix W=3D2 warnings.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 13 Sep 2025 15:29:50 +0200 you wrote:
+> Some attribute-set have a documentation (doc:), but they are not
+> displayed in the RST / HTML version. This series adds the missing
+> parsing of these 'doc' fields.
+> 
+> While at it, it also fixes how the 'doc' fields are declared on multiple
+> lines.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,1/3] tools: ynl: rst: display attribute-set doc
+    https://git.kernel.org/netdev/net-next/c/a51126424f75
+  - [net-next,v3,2/3] netlink: specs: team: avoid mangling multilines doc
+    https://git.kernel.org/netdev/net-next/c/515c0ead788f
+  - [net-next,v3,3/3] netlink: specs: explicitly declare block scalar strings
+    https://git.kernel.org/netdev/net-next/c/12e74931ee97
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
