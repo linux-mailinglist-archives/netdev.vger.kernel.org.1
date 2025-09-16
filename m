@@ -1,191 +1,153 @@
-Return-Path: <netdev+bounces-223729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6BF2B5A3ED
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:28:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5135AB5A40D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D590582494
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F734864B9
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32322F9DAD;
-	Tue, 16 Sep 2025 21:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CE72836A6;
+	Tue, 16 Sep 2025 21:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dplU8l7L"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0cs+9xG/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1652F0689
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6D031BCAE
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758058096; cv=none; b=ucymviUiSQ2rXb65lqCb+9ALcTKyG/eino2gNfyPE/kHCWA3+mGKLMpDVt6c4fQe7DfxQXV1tQGvybEBBx40gRL7R9RGof8eFGc8/LnlY1d57881SJ4DO5ooLmNOzQGuukjsSbMQQ8pvHt9OPhHEcmouohhfAAP30NwPd2s4MJY=
+	t=1758058543; cv=none; b=apHUdIG1+lJLxS4WL/fsDRPnmv8N7h58kglR+1MFSxhfKvE8/2CRmOUMSUqmEmDugn2qpjCxI/g+faudJPApJ2yzBLsR6nWHQhl3MdEt75E5Z5oO6KryIfdZatdAEvSTs9JjpV7uAJuWNgP5KGDCe717JVAGlYZQ7N9pkOm/pSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758058096; c=relaxed/simple;
-	bh=G5Ro/tTwEz/32uIV9sojWYSBXPZLxnHIoSL3Gqg2Ekw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=miu3pIcVvByQ5ZR/DHmrI7II1krcqrZ+bbmOc1hMcK/K/5U2S01fqI1uH0oEE5JOffKBpqW54rNuLE3afvo3SYONWnn7nWFIhI+08UO5S17gQCOXAzNNwFnC6+yWHo6R2ch8u6vp7JMk+y2LFrasKVYsMA/TqD8NX/x9DxdWYSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dplU8l7L; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758058095; x=1789594095;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=G5Ro/tTwEz/32uIV9sojWYSBXPZLxnHIoSL3Gqg2Ekw=;
-  b=dplU8l7LHsAIqNbVbJfBQgQbOQNyBo7yaGXYBls/Fyl7rfbV5QZX2nXg
-   niOv76iFOUXCnvik8Cru62cYYFoUM1bP8V4OwQNqc+xDMaFd8eyuyzQCm
-   7eC4GcyuCZy2lAPqZQk0jDTPS8QDrTo4Us96KcAtK7RIywRLIZ2yxAOse
-   PLjmLDqKseABcvSbk40B2bA0Ztqtt042IDDYkLyPqEhr1dMEMcX4QSx4s
-   iRMg9KYeCh+AUV9+gA/vXvyFugej9BiEBH5KdeawufD+jXnfu1VMa8imd
-   3UfOBAmt1jBTYRZV0SFqjGSu9WVjIHBQofxLdDttaasFBEhYhvy6xtUFn
-   w==;
-X-CSE-ConnectionGUID: 7aRwK8dtR8WUMX39MX3SAQ==
-X-CSE-MsgGUID: dn4sJiLDTTCCrm0B2F/vLg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="60410786"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="60410786"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 14:28:14 -0700
-X-CSE-ConnectionGUID: 13wuMgfgSGOAN5+2c4o9Gw==
-X-CSE-MsgGUID: jgNkKl0fRT+11JR7tz7ttA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,270,1751266800"; 
-   d="scan'208";a="180316944"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa004.fm.intel.com with ESMTP; 16 Sep 2025 14:28:13 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Kohei Enju <enjuk@amazon.com>,
-	anthony.l.nguyen@intel.com,
-	kohei.enju@gmail.com,
-	vitaly.lifshits@intel.com,
-	dima.ruinskiy@intel.com,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: [PATCH net 5/5] igc: don't fail igc_probe() on LED setup error
-Date: Tue, 16 Sep 2025 14:28:00 -0700
-Message-ID: <20250916212801.2818440-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250916212801.2818440-1-anthony.l.nguyen@intel.com>
-References: <20250916212801.2818440-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1758058543; c=relaxed/simple;
+	bh=GzXsPGxgSPtnUzOnC0pzPzXBCKex8zRkL3uu5xax5oA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uM+GLkm4CsTsJizKZ0aEISdpy7avWuI+A6UW4K0EA+NpMfT+s2KqnKoNllX+gaq2Yfw7p4cXZEv+5FaJY/QRk4ZBcSacMRdmHnADfE6UASTgUsSV6nloxfUohrhMEiBFloiZiGYVNM9SqiYgLGfQue2qiBYVEx8DKC7BcbsTX1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0cs+9xG/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=oEaBh55+azWDXu/wNCOa8loY8KkzsLqXMQnJI7BUjns=; b=0cs+9xG/YQE9aeC+yUC2wWtxfX
+	iW6btycrN1RQ+TfDEsaeJBJGEQektJXx+cZGXpqVZlWsJM0wZY86prtgEtgyVzLytRnv8IV5n5Nea
+	UyfYtEqC5sISmwJxJM7G7swdNEyHivWNquWTKTiMBLHP1GBfdNGFGdMbm2ShCp/MfN+rRbbsIbb4z
+	m9ZTnK4RSuEnAA7tdRggdW3FO6hpfHaij9DtvClVxhOnF2TXFHMbbqqohzx+rpY6lkym5vwduKN0G
+	jYhU4pUjgBURDOqoxaIgfWnkJmolkzPwxaOT5jKLys05YM1VafJGqAzv0Gcw7IBBD5ItYNMbUjrWO
+	piQqO0rA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46122)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uydKn-000000006L6-3O3E;
+	Tue, 16 Sep 2025 22:35:33 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uydKk-000000007zr-34yR;
+	Tue, 16 Sep 2025 22:35:30 +0100
+Date: Tue, 16 Sep 2025 22:35:30 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Eric Dumazet <edumazet@google.com>, imx@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>, netdev@vger.kernel.org,
+	Nick Shi <nick.shi@broadcom.com>, Paolo Abeni <pabeni@redhat.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>, Yangbo Lu <yangbo.lu@nxp.com>
+Subject: [PATCH net-next v2 0/2] ptp: safely cleanup when unregistering a PTP
+ clock
+Message-ID: <aMnYIu7RbgfXrmGx@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Kohei Enju <enjuk@amazon.com>
+(I'm assuming drivers/ptp/ patches go via net-next as there is no
+git tree against the "PTP HARDWARE CLOCK SUPPORT" maintainers entry.)
 
-When igc_led_setup() fails, igc_probe() fails and triggers kernel panic
-in free_netdev() since unregister_netdev() is not called. [1]
-This behavior can be tested using fault-injection framework, especially
-the failslab feature. [2]
+The standard rule in the kernel for unregistering user visible devices
+is to unpublish the userspace API before doing any shutdown of the
+resources necessary for the operation of the device.
 
-Since LED support is not mandatory, treat LED setup failures as
-non-fatal and continue probe with a warning message, consequently
-avoiding the kernel panic.
+PTP has several issues in this area:
 
-[1]
- kernel BUG at net/core/dev.c:12047!
- Oops: invalid opcode: 0000 [#1] SMP NOPTI
- CPU: 0 UID: 0 PID: 937 Comm: repro-igc-led-e Not tainted 6.17.0-rc4-enjuk-tnguy-00865-gc4940196ab02 #64 PREEMPT(voluntary)
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
- RIP: 0010:free_netdev+0x278/0x2b0
- [...]
- Call Trace:
-  <TASK>
-  igc_probe+0x370/0x910
-  local_pci_probe+0x3a/0x80
-  pci_device_probe+0xd1/0x200
- [...]
+1. ptp_clock_unregister() cancells and destroys work while the PTP
+   chardev is still published, which gives the opportunity for a
+   precisely timed user API call to cause a driver to attempt to
+   queue the aux work.
 
-[2]
- #!/bin/bash -ex
+2. PTP pins are not cleaned up - if userspace has enabled PTP pins,
+   e.g. for extts, drivers are forced to do cleanup before calling
+   ptp_clock_unregister() to stop events being forwarded into the
+   PTP layer. E.g mv88e6xxx cancells its internal tai_event_work
+   to avoid calling into the PTP clock code with a stale ptp_clock
+   pointer, but a badly timed userspace EXTTS enable will re-schedule
+   the tai_event_work.
 
- FAILSLAB_PATH=/sys/kernel/debug/failslab/
- DEVICE=0000:00:05.0
- START_ADDR=$(grep " igc_led_setup" /proc/kallsyms \
-         | awk '{printf("0x%s", $1)}')
- END_ADDR=$(printf "0x%x" $((START_ADDR + 0x100)))
+Simplify the process by ensuring that:
 
- echo $START_ADDR > $FAILSLAB_PATH/require-start
- echo $END_ADDR > $FAILSLAB_PATH/require-end
- echo 1 > $FAILSLAB_PATH/times
- echo 100 > $FAILSLAB_PATH/probability
- echo N > $FAILSLAB_PATH/ignore-gfp-wait
+1. we take a referene on the PTP struct device to stop the
+   ptp_clock structure going away underneath us when we call
+   posix_clock_unregister().
 
- echo $DEVICE > /sys/bus/pci/drivers/igc/bind
+2. call posix_clock_unregister() to remove the /dev/ptp* device.
 
-Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
-Signed-off-by: Kohei Enju <enjuk@amazon.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+3. add additional functionality to disable any PTP EXTTS pins and
+   PPS event generation that have been configured on this device.
+   This should shutdown all events coming from PTP clock drivers.
+
+4. cancel the delayed aux_work and destroy the kthread.
+
+5. remove the PPS source.
+
+6. drop the reference on the PTP struct device to allow the
+   ptp_clock structure to be released.
+
+This is difficult for me to test beyond build testing - on the
+Clearfog platform with Marvell PHY PTP, the ethernet PHY is the
+primary connectivity, so removing the PHY driver for an in-use
+network interface isn't possible.
+
+On the ZII rev B platform, where the DSA switches have the TAI
+hardware and where root NFS is used, removal of the DSA switch
+module somehow forces the FEC interface _not_ connected to the DSA
+switch to lose link, causing the machine to become unresponsive
+as its root filesystem vanishes.
+
 ---
- drivers/net/ethernet/intel/igc/igc.h      |  1 +
- drivers/net/ethernet/intel/igc/igc_main.c | 12 +++++++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
+v2:
+- add r-b's to patch 1
+- only disable EXTTS pins
+- disable PPS event generation
 
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index 266bfcf2a28f..a427f05814c1 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -345,6 +345,7 @@ struct igc_adapter {
- 	/* LEDs */
- 	struct mutex led_mutex;
- 	struct igc_led_classdev *leds;
-+	bool leds_available;
- };
- 
- void igc_up(struct igc_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index e79b14d50b24..728d7ca5338b 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7335,8 +7335,14 @@ static int igc_probe(struct pci_dev *pdev,
- 
- 	if (IS_ENABLED(CONFIG_IGC_LEDS)) {
- 		err = igc_led_setup(adapter);
--		if (err)
--			goto err_register;
-+		if (err) {
-+			netdev_warn_once(netdev,
-+					 "LED init failed (%d); continuing without LED support\n",
-+					 err);
-+			adapter->leds_available = false;
-+		} else {
-+			adapter->leds_available = true;
-+		}
- 	}
- 
- 	return 0;
-@@ -7392,7 +7398,7 @@ static void igc_remove(struct pci_dev *pdev)
- 	cancel_work_sync(&adapter->watchdog_task);
- 	hrtimer_cancel(&adapter->hrtimer);
- 
--	if (IS_ENABLED(CONFIG_IGC_LEDS))
-+	if (IS_ENABLED(CONFIG_IGC_LEDS) && adapter->leds_available)
- 		igc_led_free(adapter);
- 
- 	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
+ drivers/ptp/ptp_chardev.c | 28 +++++++++++++++++++++++++++-
+ drivers/ptp/ptp_clock.c   | 15 ++++++++++++++-
+ drivers/ptp/ptp_private.h |  2 ++
+ 3 files changed, 43 insertions(+), 2 deletions(-)
+
 -- 
-2.47.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
