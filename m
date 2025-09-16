@@ -1,124 +1,184 @@
-Return-Path: <netdev+bounces-223440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22D62B59230
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:28:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8CBB59241
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:31:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 347057A8021
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 09:26:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98F5F16595E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 09:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65421291C1E;
-	Tue, 16 Sep 2025 09:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4351C2BDC1B;
+	Tue, 16 Sep 2025 09:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SreKXC7j"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="YZNuJBqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10882747B
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FF829E0E8
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758014900; cv=none; b=Hnb6rjw4A6yFV3qIpTqDlOOX5WMjcP2BOTkrcsA13TYLqth8wu9D1WqOXwrfh+GsF6SCKF3d80fqca7NMnuHL17+AEXV8JRsB9y2HGxW45otCMp5a4VNW4qt9Ahh8/H564ZOthrUWLDPd/etQm4BD5DqFlpOg5qLhl/96eC4quE=
+	t=1758015075; cv=none; b=l2T0L30jhPqSRMUcn8e5G/o9sLvEAyMxWgzb2l+rfdnYal/B5lEUBk+yJilILZOxSwtk9ooi/nLOoPxXZndj7jmTVdGokOLJzbnpCHaMvQ85xyY11+WF+DS8QxnSn6WiyJRCXh4XYv5hmoKM1NN6P3C6Ter0VFJ4ZW7ZoVf6uDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758014900; c=relaxed/simple;
-	bh=BwgE0fZVTpou5PLODf+f62b8c5+XA7mBXcjB5INVY8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i1Mvqw4PuOg84F2LaVeTzGG3eOZFUgRDTkiTJcq5twdb30aC18q85tcb5oewijOMAus0AXx8k9hKP3GUfv336eEtfBqOYfBHB7ZVl7Iv7dTd0jw0ZWKHqGrI+xzoJ1xz+KBxWCDtzLSYTiir2LAIpn05Y1a3gL0xDKzx2I/CEb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SreKXC7j; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758014898;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WZGtytud95tmaRHsL0gi2KrAJr2S6c/aqPB68a1SH9U=;
-	b=SreKXC7jUWKReTtfkr5vEyoknEWqOQebmQ2VvEwqi126oCONl/fhKjqYEKqd5SmyvO5+/a
-	RVNaVtdaprL2Ji56qLvBLvZYDGzkhHltGaBMCaagjy85qZpiFvTwNEH4oUsxlzUQqwcocV
-	4/JtcQY2jfPA3fanXaVmfzq2wzSbFWg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-288-C1ndYAQyNSyPgqmKBKWkaQ-1; Tue, 16 Sep 2025 05:28:16 -0400
-X-MC-Unique: C1ndYAQyNSyPgqmKBKWkaQ-1
-X-Mimecast-MFC-AGG-ID: C1ndYAQyNSyPgqmKBKWkaQ_1758014895
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3df19a545c2so691119f8f.3
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 02:28:15 -0700 (PDT)
+	s=arc-20240116; t=1758015075; c=relaxed/simple;
+	bh=G5DKJK3CELjgpndrNA/+eHqI1RVUDy7+NIgwgAlKssg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O4YR2W3O0vzTm9fw9kxSeVD8ow5SIlqiAet6cHxK/325lh3r+7nUloGVEIQb5QTH1rBnvLEIFc/W7tyICPqc8sjQN60ydBtaLGzW8JlLxDppk/vwoLxxtBUeR9RtRi4Rz+oZsnACs2Vmfh8W4KLfn5AL9RZB/uBwU/UgHRgY2ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=YZNuJBqu; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45f2c4c3853so10818985e9.2
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 02:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1758015071; x=1758619871; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ACpTvDk4rKkRfQ2RQ4sxr8j1UikIa22f7RQMKzB/pRg=;
+        b=YZNuJBquxbhPFirZrZK7NYrrhJrCjpOG0kGgAY47Lr7F0TXTMcCVUdtjFuhDb88l51
+         2BszKTLLZnttGF7JJCiX9urlimaYhq2mA3nRKB7P16jim67VSirJ1MSqOS/YCpxPpU3N
+         JMrSkC1yarTUQ6Iu0TEjD8qke4gl+zLXsSN9YxP3rNJPBDjnIn814v0ZPPysHE37iMyi
+         n47vbPjX8wjZ5es8QWIbrtA5v6DCXorVwW+lL6keMhUW9KufG3KkNbYLJx5kRGmFB4h0
+         XLpxdS2G9uxm1jUYIItn0FsRG00A7rIPQKfTFi9Mn6KXU+9FXoiRvyDhTRHGoUySTLgz
+         0s3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758014895; x=1758619695;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1758015071; x=1758619871;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WZGtytud95tmaRHsL0gi2KrAJr2S6c/aqPB68a1SH9U=;
-        b=LRvwyu3G5vn0f3oXoPtTZyva3zejJSk0eOGsvxPhFg/e5XNvXO5QT1d/lm8PKbXyaq
-         t6jpj2ZqGs7h6nYksnxLTq64318FHHlzvApn/fvH97t9NKMdqg58XgEeLnWCsfJ/hFvL
-         qx17+juYmgFKCtKx+NH1bAqxgE+U7PM68CZA/OZHvHVaZd7VkrEkhqPov+erGY4quq5Z
-         ef4k39iCaHKEuguJAiBLQOqEvS+6sMDTs+m1zkIg1U25abiJ/bHpI7JnEXRGt+ef5d3M
-         NX/9yqcklQZ2GA6z2mcUwJHXTy0f7oFAxdnP85+HgCYlS3DnYqZmIj/Pv9XYB682j49s
-         /TZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXaphk+DScZaq0awAQX4hAcIb5N62mPfJKjgfjpnbHOS1+b5kkzDiMH/oEihbMT1S9vA9m3LC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysYKXvnBGlV0CcLhoiD/Q0i8EATOo/LicxCQDeqZeYAvQKM3iH
-	rUF1ObFH9QC7CEkaxYOygEeN0IzM3EpkchN28w3CkY/wyrlzW2iJQmC7838fkbuqIo1GZG9A68c
-	/Fsro1a10wvVKUHBUhA8mLfOH6RnTZ6b7s0lEIyBi8ePgfovCvZ/5UaYv3A==
-X-Gm-Gg: ASbGncudd+6dDBnfIWQ4sNAcpabZ8eYXOOLjb5qLYRpKWuQYw8zdGNYkBw64S7aI0K0
-	UUmzX0xgEHW9BfgH2uFsccr4KYE4rLuC2vO8gFpPh3ipn/JO0LtE4paskOuNJvuCMcYPrjH/R0A
-	bIdY9xLo9OA7vCuqc8uqB3fDWCa12Jrm0KBIvkt6Tzfxwqh5rma+qBRaBTGmVB2lLg6prYxEAni
-	bhTeb9HhNhcIKi+dHNvRl4AU6aNMLcwK155mbNReSMmVL9vvXEUj5DmtBAr0bVhwbgwOMbEkOME
-	bl9olY5Onx0RD4SM3iOToXcvuGcX/JyDJkPp3aKwK+NFLlHNpTqvqyZf61tVRPDix+kj1My7Fef
-	phsdRipZguyGd
-X-Received: by 2002:a5d:6592:0:b0:3e8:e52:31c5 with SMTP id ffacd0b85a97d-3e80e52323fmr8339971f8f.2.1758014894728;
-        Tue, 16 Sep 2025 02:28:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQKEXO6nFjtGMdgaerRdcKqXIwJME36jj4KIcxvhqrfG77hW4CHdStElBYMZ7IzvBSFlkSZA==
-X-Received: by 2002:a5d:6592:0:b0:3e8:e52:31c5 with SMTP id ffacd0b85a97d-3e80e52323fmr8339952f8f.2.1758014894298;
-        Tue, 16 Sep 2025 02:28:14 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e037d741asm211065015e9.23.2025.09.16.02.28.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Sep 2025 02:28:13 -0700 (PDT)
-Message-ID: <f8521a23-3b79-4946-b5e4-fb6b4963959a@redhat.com>
-Date: Tue, 16 Sep 2025 11:28:12 +0200
+        bh=ACpTvDk4rKkRfQ2RQ4sxr8j1UikIa22f7RQMKzB/pRg=;
+        b=fRgt7GkXY1HESbh/1t4vzPlkw8giADFLJUVB7VqgXxZre0T4GRXFiCYflxTwnl6HAe
+         AXTHfAqUhVBE6kcv+yWUukWDwovIuUfnqyUafBm6ek/IjH/epNC3lYcVD6YMeljAfqUo
+         mlLpWZuTYtfDLQuYL/6WXE7wxc2Jp3QO5HOicweuBdfRClYN5rVfGUujA9AxNGBAmXWv
+         rUltty7V6r7GJ7g8PiMn9NfMFMoAs6ZdKOqP2Rm73mCtoRgrHsJ575AGAm7h+OHbAK00
+         3GhbqGSDlO3sA4DdJwBlO3fc3T4Lhj4NMjoeKz2odOSvjEhNkjZcO6HdM48+Xm1H65+i
+         GFbw==
+X-Forwarded-Encrypted: i=1; AJvYcCX8xv7YgqKe7Khds0l5+tziq1dXBOY0jDPkp8kF2blwRHHXyn+GbT9Z/ttqR0hLdW3oIl7kfgc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjN/8TF08KSbbs3ipLkiFOKqnV61D1gXGn1VkW9F6EYwzL+5FB
+	GkwVge2o75sFpDaDtFzQvY4novyQWV4CNIyIsgvLEKm/ZKrytDWoKIqj4FdlSJaP53Y=
+X-Gm-Gg: ASbGnctK+4c52RYQYF5JKdNP+gvo2fLYieFQ7XQ/Zq9dJuJBi5K02oEdkJzjvjBPPji
+	S+W4+DLTvx5cQuEIajl068A2XMMctwXezEVxslMKaavUPfD0UZS2jB0mKsRdiEmVq1mK7Fqc+a4
+	v7rNqU8AytDm7TmiazsIk9woQ9SxLsVZQxSx430p7ErR2r9XBRIz7Cpt//eC0IMDKGhZmkq65tR
+	9hyEjAsh0m6G/wm7zumW2NAZmdX31hivZ6Z3nvd46eiMiaapZz4TX4XIJFJEKKnPhMYHE7NvbY3
+	C42WDyxwdfLvA5sLsbBuvMT/tGWfU97kDknDappSHC3TIQbppV4DUEmEMw6S224jNETXcuC6MVB
+	0XaPsJmLmiePIrYYB/pmlqknI
+X-Google-Smtp-Source: AGHT+IH8DCDGESmWObhYAAet3S0BhH1Fzzukf1zx3cCjpw50+fa6UzbNTX5giSJQmy/9uVP0YCa3Ow==
+X-Received: by 2002:a05:600c:828c:b0:45d:98be:ee95 with SMTP id 5b1f17b1804b1-45f211caa67mr130397715e9.3.1758015071252;
+        Tue, 16 Sep 2025 02:31:11 -0700 (PDT)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f325a32f6sm13224245e9.2.2025.09.16.02.31.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 02:31:10 -0700 (PDT)
+Date: Tue, 16 Sep 2025 11:31:02 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>, 
+	netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, 
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
+ reference property
+Message-ID: <nj6wipqud7gnaiuvj6cl4sum7zfyp7jdvjb63op6ff4ruz7rjx@5rtkshsuxojl>
+References: <20250815144736.1438060-1-ivecera@redhat.com>
+ <20250820211350.GA1072343-robh@kernel.org>
+ <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com>
+ <CAL_JsqKui29O_8xGBVx9T2e85Dy0onyAp4mGqChSuuwABOhDqA@mail.gmail.com>
+ <bc39cdc9-c354-416d-896f-c2b3c3b64858@redhat.com>
+ <CAL_JsqL5wQ+0Xcdo5T3FTyoa2csQ9aW8ZxxMxVOhRJpzc7fGhA@mail.gmail.com>
+ <4dc015f7-63ad-4b44-8565-795648332ada@redhat.com>
+ <350cecaf-9e41-4c34-8bc0-4b1c93b0ddfe@lunn.ch>
+ <dcca9d10-b2b7-4534-abe6-999a9013a8e9@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] net: dst_cache: implement RCU variants
- for dst_cache helpers
-To: Marek Mietus <mmietus97@yahoo.com>, netdev@vger.kernel.org,
- antonio@openvpn.net, kuba@kernel.org
-Cc: openvpn-devel@lists.sourceforge.net
-References: <20250912112420.4394-1-mmietus97@yahoo.com>
- <20250912112420.4394-2-mmietus97@yahoo.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250912112420.4394-2-mmietus97@yahoo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dcca9d10-b2b7-4534-abe6-999a9013a8e9@redhat.com>
 
-On 9/12/25 1:24 PM, Marek Mietus wrote:
-> -static struct dst_entry *dst_cache_per_cpu_get(struct dst_cache *dst_cache,
-> -					       struct dst_cache_pcpu *idst)
-> +static void dst_cache_per_cpu_dst_set(struct dst_cache_pcpu *dst_cache,
-> +				      struct dst_entry *dst, u32 cookie)
-> +{
-> +	if (dst == dst_cache->dst && cookie == dst_cache->cookie)
-> +		return;
+Wed, Sep 10, 2025 at 02:51:33PM +0200, ivecera@redhat.com wrote:
+>On 09. 09. 25 3:50 odp., Andrew Lunn wrote:
+>> > > > Yesterday I was considering the implementation from the DPLL driver's
+>> > > > perspective and encountered a problem when the relation is defined from
+>> > > > the Ethernet controller's perspective. In that case, it would be
+>> > > > necessary to enumerate all devices that contain a “dpll” property whose
+>> > > > value references this DPLL device.
+>> > > 
+>> > > Why is that?
+>> > 
+>> > Because the DPLL driver has to find a mac-address of the ethernet
+>> > controller to generate clock identity that is used for DPLL device
+>> > registration.
+>> 
+>> Maybe this API is the wrong way around? Maybe what you want is that
+>> the MAC driver says to the DPLL driver: hey, you are my clock
+>> provider, here is an ID to use, please start providing me a clock?
+>
+>Yes, this could be fine but there is a problem because clock id is part
+>of DPLL device and pins registration and it is not possible to change
+>the clock id without full de-re-registration. I have provided in zl3073x
+>a user to change the clock id via devlink but it means that the driver
+>has to unregister all dpll devices and pins and register them under
+>different clock id.
+>
+>> So it is the MAC driver which will follow the phandle, and then make a
+>> call to bind the dpll to the MAC, and then provide it with the ID?
+>
+>In fact that would be enough to expose from the DPLL core a function
+>to change clock id of the existing DPLL devices.
+>
+>E.g.
+>
+>int dpll_clock_id_change(struct module *module, u64 clock_id,
+>			 u64 new_clock_id)
+>{
+>	struct dpll_device *dpll_pos;
+>	struct dpll_pin *pin_pos;
+>	unsigned long i;
+>
+>	mutex_lock(&dpll_lock);
+>	/* Change clock_id of all devices registered by given module
+>	 * with given clock_id.
+>	 */
+>	xa_for_each(&dpll_device_xa, i, dpll_pos) {
+>		if (dpll->clock_id == clock_id &&
+>		    dpll->module == module)
+>			dpll_pos->clock_id = new_clock_id;
+>		}
+>	}
+>	/* Change clock_id of all pins registered by given module
+>	 * with given clock_id.
+>	 */
+>	xa_for_each(&dpll_pin_xa, i, pos) {
+>		if (pin_pos->clock_id == clock_id &&
+>		    pin_pos->module == module) {
+>			pos->clock_id = new_clock_id;
+>		}
+>	}
+>	mutex_unlock(&dpll_lock);
+>}
+>
+>With this, the standalone DPLL driver can register devices and pins with
+>arbitrary clock_id and then the MAC driver can change it.
+>
+>Thoughts?
 
-The additional checks above could possibly make sense, but should never
-trigger as the _set operation should follow a failing lookup.
+The clock_id in dpll is basically a property. It is not used in uapi
+(other then for show and obtaining the device id). So if you introduce
+a mean the change this property, I don't see a problem with that.
 
-Also are unrelated with the other changes here, they should land in a
-separate patch - or be dropped.
 
-Thanks,
-
-Paolo
-
+>
+>Thanks,
+>Ivan
+>
 
