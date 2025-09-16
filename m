@@ -1,215 +1,122 @@
-Return-Path: <netdev+bounces-223742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19ECB5A434
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:48:03 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B62D5B5A435
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 733B417ECA3
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:47:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AA4B84E1DA0
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3856E2F5A1D;
-	Tue, 16 Sep 2025 21:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C10306B2E;
+	Tue, 16 Sep 2025 21:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rYoC83Uq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HX1tdxO/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8192E92D0;
-	Tue, 16 Sep 2025 21:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160D7284695
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758059233; cv=none; b=HnQBxXtlzagGUKYv9XrPCzonspw6pj0VJG5RDiy0nu8kEc6QSFoi+OWkxzubgiqahS1Y9STiRUmdzN0luoi7oLGOAQT3M0zh/RLG8UY/9LGyickfmGCBT+CzHUA0jaI+cPXnbt3N+oX1bpjdxT99zz/9VQSvHUcNuIpIUx9QIY8=
+	t=1758059285; cv=none; b=aZrs8jVja4mvoajnj0uF3W2K34kd4uo/RwRqMBzhAXZLdjVeZ5eh79LmDkFyFK63m+sBi8iz3/ThFO9AwmiZ2TGIo/aOqQPWCbscXRKcXJjgGMXGnbYpOebnsWg6gMYst65CuGOyP/z1WbLIJTL6XQbw2SGFxMXpEDlX4PmrBdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758059233; c=relaxed/simple;
-	bh=kxIW5dxCqalhpFmoDO3aaqWJ44pGzvhHUZg+09t33GI=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=eD2B7/G8+G8MpqoVgYwUkl8+fByG5+UPXZL27L6N0ll88GVbLfmIdKzbegY1l50UW4JFT32Rl6K+qq+ATbOme/C90p0yvWNkZRLcY5LNM8IoRApkxILBix54n2glNz3IrfB0BPP8bxyXjtPb8WOjU2TMh5iSZLAMoFAaiuhzEBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rYoC83Uq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qcVW22TOs2gRLP7G+Xi6iKltAJreHyc3R//4lQkBChk=; b=rYoC83Uq2KbtedpqHZxFdaHjS6
-	F96Kkqec3r9B4vtLA5X6FgmvfiWyAUM5Lci8OLS9Btlz5nW3HzDDSPf9ZLQZo8+4O7zUPfQgG7NDC
-	9mNQfpLqsNuyyq7Rneh0noxKxxs0IJ+1mBYrf5SFZtVRwIHUVKvIMjiotzPSLg0925ch/UES61Lyn
-	mDg4XusFlNI8i0zTdJukkHcRP0k4AFwdPyojnyWYTqWTSDeHT5kgigj/boZWVaRX4WuT9Lx4KUtDr
-	Lyy3xgI+sjFAjKGinjOME4KgznPTlj6+rH9YvTqNMrHLHVjCS13yVF7yULVq6tiwMuvNo4Q12OFYG
-	AwCOLCaw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37946 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uydVz-000000006QK-4B90;
-	Tue, 16 Sep 2025 22:47:08 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uydVz-000000061Wj-13Yd;
-	Tue, 16 Sep 2025 22:47:07 +0100
-In-Reply-To: <aMnaoPjIuzEAsESZ@shell.armlinux.org.uk>
-References: <aMnaoPjIuzEAsESZ@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-msm@vger.kernel.org,
-	"Marek Beh__n" <kabel@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 7/7] net: sfp: remove old sfp_parse_* functions
+	s=arc-20240116; t=1758059285; c=relaxed/simple;
+	bh=CObait3kFGFpvsvNCdCyH9uYzuTFkkgSxCm0HusgqfM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=e2FANPNiRfMobgoYfuvMFPXyT8bpQT9483s4WchQLUe+f7wGfeo/aQUAVoPqUuDvUaJbBUHGSrKMsv0rmgqZrwA/AGaiuACHL2g3rCus5qqcGF6iL5UifasFG3ACgq60nkFDhAMijblJvWZy4adW6LXYJ/e9bwRVG0ucdnczuC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HX1tdxO/; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b52047b3f1dso7797916a12.2
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 14:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758059282; x=1758664082; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kcM/YJBIHy8sjmemES5vmSV7YGZnZX3rkycIaGM0nZM=;
+        b=HX1tdxO/lEXTuie04vFWX5gEff2rnKBdj9NX0PSl3RD2kxkkZQhFfTUkyeAA6Xh49i
+         IlMIO7fAtuxGNFzQsLvCYWjqPOIQPfukZaMBJjxPj0uh9V6W4jibWberzcWx1P49ho9J
+         Dk7tPzmvFTKQyPCg4RNi7ZjzXTI+vHRQEln3GKNsL50oIXJ802PtzVbA3lmWcz42kYOJ
+         SLv//SWB41lc1mYk5urGZgp5ugfNDbuFEhqaTr1cHhPf+/Mlu/c1aNseI1MOAPUHRoVI
+         nMnP/eDHuTU+p7byAwI5Zxg25Joe1mozccYLJ5FfDjk6PcMEqjbkyNSxz2xwevFQ0EiM
+         qMgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758059282; x=1758664082;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kcM/YJBIHy8sjmemES5vmSV7YGZnZX3rkycIaGM0nZM=;
+        b=IQmzN21Ndln8JArvIITpNIB7LfICg/P7sOuS7+PrWgBg/FXEguRVTZC+K0D6t+RZuI
+         sbtyxkqSjqeBWr8bH1rDJry5NLbVS9eBT4+KqCCsdQt2uPKBnHsfduZMg3uQDPZ9FUpB
+         MbOscxLz7c5EW5o/NaFFGu70+cakoB273NvHJ15D53RI7gESgYFW3qYTebQXiOYBDo4i
+         rhKF+04D4YMNVxiOGT9Ev9L0phB6pxVd7r5jzkbUGwQI0HvrLonaIC026bs6OO+m9dQu
+         CJYAkZk2gM2o9zwEVL0Gj2cqunoLohct36DkRG8NMOrfAliDhbUut1rpj7/gw5T8EVAT
+         iIuw==
+X-Forwarded-Encrypted: i=1; AJvYcCVP9239DkRwUwyto5yxmrOfKqOqwDRi5+XPsXlArD4JQI+wM+iOTgdB0CiScp9Exm5nVFg82Yk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyc4lKSSZJOEp3HhRt4n5EOgaAQun+fCoUKdQ8QUuJR0YxPwZNo
+	Ej7XZTvHMlO1UegkK9SUInti/TYslyLSTtPq0QosdddEnIZSxOcxBd6J5XyUfjgXopEOBXKMP8s
+	FBjFqVQ==
+X-Google-Smtp-Source: AGHT+IE9Y+G+OaoRIZTgQtrRADW+TE2mjmfZXkD0ji1q5+kvjXQyjtUIJrGNM1ouCArsYZtq+KggBgdy5hs=
+X-Received: from pfhz15.prod.google.com ([2002:a05:6a00:240f:b0:772:908:b5c2])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:328d:b0:264:10e4:fbe
+ with SMTP id adf61e73a8af0-26410e41368mr11043254637.52.1758059282439; Tue, 16
+ Sep 2025 14:48:02 -0700 (PDT)
+Date: Tue, 16 Sep 2025 21:47:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uydVz-000000061Wj-13Yd@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 16 Sep 2025 22:47:07 +0100
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250916214758.650211-1-kuniyu@google.com>
+Subject: [PATCH v2 net-next 0/7] net: Fix UAF of sk_dst_get(sk)->dev.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Remove the old sfp_parse_*() functions that are now no longer used.
+syzbot caught use-after-free of sk_dst_get(sk)->dev,
+which was not fetched under RCU nor RTNL. [0]
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/sfp-bus.c | 54 ---------------------------------------
- include/linux/sfp.h       | 25 ------------------
- 2 files changed, 79 deletions(-)
+Patch 1 ~ 5, 7 fix UAF in smc, tcp, ktls, mptcp
+Patch 6 fixes dst ref leak in mptcp
 
-diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
-index e8cf411396fa..b945d75966d5 100644
---- a/drivers/net/phy/sfp-bus.c
-+++ b/drivers/net/phy/sfp-bus.c
-@@ -39,27 +39,6 @@ const struct sfp_module_caps *sfp_get_module_caps(struct sfp_bus *bus)
- }
- EXPORT_SYMBOL_GPL(sfp_get_module_caps);
- 
--/**
-- * sfp_parse_port() - Parse the EEPROM base ID, setting the port type
-- * @bus: a pointer to the &struct sfp_bus structure for the sfp module
-- * @id: a pointer to the module's &struct sfp_eeprom_id
-- * @support: optional pointer to an array of unsigned long for the
-- *   ethtool support mask
-- *
-- * Parse the EEPROM identification given in @id, and return one of
-- * %PORT_TP, %PORT_FIBRE or %PORT_OTHER. If @support is non-%NULL,
-- * also set the ethtool %ETHTOOL_LINK_MODE_xxx_BIT corresponding with
-- * the connector type.
-- *
-- * If the port type is not known, returns %PORT_OTHER.
-- */
--int sfp_parse_port(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
--		   unsigned long *support)
--{
--	return bus->caps.port;
--}
--EXPORT_SYMBOL_GPL(sfp_parse_port);
--
- static void sfp_module_parse_port(struct sfp_bus *bus,
- 				  const struct sfp_eeprom_id *id)
- {
-@@ -118,20 +97,6 @@ static void sfp_module_parse_port(struct sfp_bus *bus,
- 	bus->caps.port = port;
- }
- 
--/**
-- * sfp_may_have_phy() - indicate whether the module may have a PHY
-- * @bus: a pointer to the &struct sfp_bus structure for the sfp module
-- * @id: a pointer to the module's &struct sfp_eeprom_id
-- *
-- * Parse the EEPROM identification given in @id, and return whether
-- * this module may have a PHY.
-- */
--bool sfp_may_have_phy(struct sfp_bus *bus, const struct sfp_eeprom_id *id)
--{
--	return bus->caps.may_have_phy;
--}
--EXPORT_SYMBOL_GPL(sfp_may_have_phy);
--
- static void sfp_module_parse_may_have_phy(struct sfp_bus *bus,
- 					  const struct sfp_eeprom_id *id)
- {
-@@ -154,25 +119,6 @@ static void sfp_module_parse_may_have_phy(struct sfp_bus *bus,
- 	bus->caps.may_have_phy = false;
- }
- 
--/**
-- * sfp_parse_support() - Parse the eeprom id for supported link modes
-- * @bus: a pointer to the &struct sfp_bus structure for the sfp module
-- * @id: a pointer to the module's &struct sfp_eeprom_id
-- * @support: pointer to an array of unsigned long for the ethtool support mask
-- * @interfaces: pointer to an array of unsigned long for phy interface modes
-- *		mask
-- *
-- * Parse the EEPROM identification information and derive the supported
-- * ethtool link modes for the module.
-- */
--void sfp_parse_support(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
--		       unsigned long *support, unsigned long *interfaces)
--{
--	linkmode_or(support, support, bus->caps.link_modes);
--	phy_interface_copy(interfaces, bus->caps.interfaces);
--}
--EXPORT_SYMBOL_GPL(sfp_parse_support);
--
- static void sfp_module_parse_support(struct sfp_bus *bus,
- 				     const struct sfp_eeprom_id *id)
- {
-diff --git a/include/linux/sfp.h b/include/linux/sfp.h
-index 9f29fcad52be..5c71945a5e4d 100644
---- a/include/linux/sfp.h
-+++ b/include/linux/sfp.h
-@@ -577,11 +577,6 @@ struct sfp_upstream_ops {
- 
- #if IS_ENABLED(CONFIG_SFP)
- const struct sfp_module_caps *sfp_get_module_caps(struct sfp_bus *bus);
--int sfp_parse_port(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
--		   unsigned long *support);
--bool sfp_may_have_phy(struct sfp_bus *bus, const struct sfp_eeprom_id *id);
--void sfp_parse_support(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
--		       unsigned long *support, unsigned long *interfaces);
- phy_interface_t sfp_select_interface(struct sfp_bus *bus,
- 				     const unsigned long *link_modes);
- 
-@@ -607,26 +602,6 @@ sfp_get_module_caps(struct sfp_bus *bus)
- 	return NULL;
- }
- 
--static inline int sfp_parse_port(struct sfp_bus *bus,
--				 const struct sfp_eeprom_id *id,
--				 unsigned long *support)
--{
--	return PORT_OTHER;
--}
--
--static inline bool sfp_may_have_phy(struct sfp_bus *bus,
--				    const struct sfp_eeprom_id *id)
--{
--	return false;
--}
--
--static inline void sfp_parse_support(struct sfp_bus *bus,
--				     const struct sfp_eeprom_id *id,
--				     unsigned long *support,
--				     unsigned long *interfaces)
--{
--}
--
- static inline phy_interface_t sfp_select_interface(struct sfp_bus *bus,
- 						const unsigned long *link_modes)
- {
+
+[0]: https://lore.kernel.org/netdev/68c237c7.050a0220.3c6139.0036.GAE@google.com/
+
+
+Changes:
+  v2:
+    * Rebase to net-next (Eric)
+    * Drop tcp patch as it's already fixed in net-next (Eric)
+    * Drop sk_dst_dev_rcu() helper patch and use dst_dev_rcu() directly (Eric)
+    * Split mptcp dst_release() patch (Matthieu)
+
+  v1: https://lore.kernel.org/netdev/20250911030620.1284754-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (7):
+  smc: Fix use-after-free in __pnet_find_base_ndev().
+  smc: Use __sk_dst_get() and dst_dev_rcu() in in smc_clc_prfx_set().
+  smc: Use __sk_dst_get() and dst_dev_rcu() in smc_clc_prfx_match().
+  smc: Use __sk_dst_get() and dst_dev_rcu() in smc_vlan_by_tcpsk().
+  tls: Use __sk_dst_get() and dst_dev_rcu() in get_netdev_for_sock().
+  mptcp: Call dst_release() in mptcp_active_enable().
+  mptcp: Use __sk_dst_get() and dst_dev_rcu() in mptcp_active_enable().
+
+ net/mptcp/ctrl.c     |  9 ++++--
+ net/smc/smc_clc.c    | 67 +++++++++++++++++++++++---------------------
+ net/smc/smc_core.c   | 27 ++++++++----------
+ net/smc/smc_pnet.c   | 43 ++++++++++++++--------------
+ net/tls/tls_device.c | 18 ++++++------
+ 5 files changed, 86 insertions(+), 78 deletions(-)
+
 -- 
-2.47.3
+2.51.0.384.g4c02a37b29-goog
 
 
