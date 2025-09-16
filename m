@@ -1,107 +1,84 @@
-Return-Path: <netdev+bounces-223318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E63B58B51
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:40:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9376B58B54
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1275B4607D1
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 403F21688D0
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473122222A9;
-	Tue, 16 Sep 2025 01:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC0621E091;
+	Tue, 16 Sep 2025 01:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbjgEDhp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="baZQh+Zg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCD61DFDA1;
-	Tue, 16 Sep 2025 01:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56CD2135AD;
+	Tue, 16 Sep 2025 01:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757986817; cv=none; b=Nl22CJsameJap4WTFPfmHHb3A1KWJlv8Hfg5MnZagjWqOVVT5Utt7xNW5AQJdp7Qo/HfAmEcfiM6c8D60VL9UNs6U8KA3Dx/8h+fH3kISt2Cv5VWiyfxxWuzfiIGGDlggu2wQZ6dNxIp+R7NeG3VFomwVNsEBvmTjPXk7M0XIV8=
+	t=1757986884; cv=none; b=L7GvDIYb6e+vIPnxjA9+39QRCLjAsm56UsxwN60yNPSkC8jaN7k05KvGH1yqqOqUF2HOVLPt0wmMlHw7f+5j3/qk0/0Yll6eBPhq35uEEeMSW5nO7Ifc18uMBcgt0svwVCulhdbCdSez84EM+JgqDvATscfRKQH0Uh0a0r4JbtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757986817; c=relaxed/simple;
-	bh=3kpxLji/xRcRxJxLCAlMf/+ZIeRWsZRmmpAJjEZdb34=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DmdCOKD+CYocFH6uKCmAwpKs2Kgds7E/2PXzXGuu6oqEpVU+l5XQWRhhx/TCpROLhMDYvsvAsuQ6CYCv7+AFj//+ddxLA4dLMyDL8mkS4LDGZ07gSp0p6Hb4XD1G9VT/ZwlwTCn9NBBT6dHO8d13p/VheOUrw91eiY/i+wVOoLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbjgEDhp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91DDDC4CEF5;
-	Tue, 16 Sep 2025 01:40:16 +0000 (UTC)
+	s=arc-20240116; t=1757986884; c=relaxed/simple;
+	bh=8hwQcwBHz2zuy1ceLhAuHCSU5WJ152SvEZ/BnmXPAnY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X5DyJXadQ4oDYxTd8036Y8FRmsAJvwVntWW0XsC1yUryRd4T5IuzxUOGdJma69r81mVvr2s9rMqjWqVxibagICTkJ8Fe2YakuCImvo7nvmTiKiIUfUnGXzWDCQcWW8d0Y7hOSmZ20Suyg1S3TIrGjoM8ITlF0yx3AM7FeoUrWkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=baZQh+Zg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35B67C4CEF1;
+	Tue, 16 Sep 2025 01:41:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757986816;
-	bh=3kpxLji/xRcRxJxLCAlMf/+ZIeRWsZRmmpAJjEZdb34=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dbjgEDhpot6JXVL47LDWz2F9FKbcoHcgVLhSTwNiJbGN9LTTSRgmHYzpB9k7YzbTX
-	 0m5uUqSt/EbN6xdUlTW9xoTekRM6boS/uVFSkY9Mt7zpa2CeuK+KpRz8SKsI37FxKF
-	 R0zTBgDYjLGqzOZofi3iK3hhAMEYd3Sqygg+FxEBzSE5ROtIMhhkDUX+1H20eOCJ6e
-	 u/hMprHaMQ7AkPQVFUHDt1LXX40Xn/fgbFvNMixqcrq75l0CLFUMMEQA9NRleK7+Kj
-	 nECaz4S7QnqGnaTas8E94OM1drJsgR80Mt9nVC+DL6KyIWe75FxApUKjLR2JFEU9Ci
-	 /yKhnuM21TFtg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D3939D0C17;
-	Tue, 16 Sep 2025 01:40:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1757986884;
+	bh=8hwQcwBHz2zuy1ceLhAuHCSU5WJ152SvEZ/BnmXPAnY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=baZQh+Zg8nNrO1680vkA2olUSKrxkFZBUqJQI63+xryyLibk78TRlw0NSuyMb6EEO
+	 oA5mj4aVqpPc8oQ7Hs3h+efA+4ZoIiTfRawD2FoL89AcECgPCdCzAKf6BiGWVrw7BA
+	 ju+Qnm3xWBh62qdNtCxo7YHHWJaLxME2n9UpFj1uPDpufxfGSLiEtZ243FzqyydMei
+	 gvY/VJhEkFET8Uz3NtW2a9FDH5oFKMj2xZ+H9WOc6J4Gu+/DbzH2uci5wDsWS85VDi
+	 JGLEHqr6rgiUkC+iX2Ki4YFdXYfG6texEFGGHhdezhYfhTtGj1xuXI99uLT2uZkc7Y
+	 ajvfKqmfW5TOw==
+Date: Mon, 15 Sep 2025 18:41:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Petr Machata
+ <petrm@nvidia.com>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] bonding: fix xfrm offload feature setup on
+ active-backup mode
+Message-ID: <20250915184123.505d2bb8@kernel.org>
+In-Reply-To: <20250915083742.423741-1-liuhangbin@gmail.com>
+References: <20250915083742.423741-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next,v2] net: ravb: Fix -Wmaybe-uninitialized warning
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175798681799.561918.2218938223734656047.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Sep 2025 01:40:17 +0000
-References: <20250913133229.2087822-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20250913133229.2087822-1-niklas.soderlund+renesas@ragnatech.se>
-To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
-	=?utf-8?q?se=3E?=@codeaurora.org
-Cc: paul@pbarker.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- przemyslaw.kitszel@intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 13 Sep 2025 15:32:29 +0200 you wrote:
-> Fix a -Wmaybe-uninitialized warning by initializing the variable to
-> NULL. The warning is bogus and should not happen, but fixing it allows
-> running the check on the driver to catch potential future problems.
+On Mon, 15 Sep 2025 08:37:41 +0000 Hangbin Liu wrote:
+> The active-backup bonding mode supports XFRM ESP offload. However, when
+> a bond is added using command like `ip link add bond0 type bond mode 1
+> miimon 100`, the `ethtool -k` command shows that the XFRM ESP offload is
+> disabled. This occurs because, in bond_newlink(), we change bond link
+> first and register bond device later. So the XFRM feature update in
+> bond_option_mode_set() is not called as the bond device is not yet
+> registered, leading to the offload feature not being set successfully.
 > 
->   $ make CFLAGS_ravb_main.o=-Wmaybe-uninitialized
-> 
->   In function 'ravb_rx_csum_gbeth',
->       inlined from 'ravb_rx_gbeth' at .../linux/drivers/net/ethernet/renesas/ravb_main.c:923:6:
->   .../linux/drivers/net/ethernet/renesas/ravb_main.c:765:25: error: 'skb' may be used uninitialized [-Werror=maybe-uninitialized]
->     765 |         if (unlikely(skb->len < csum_len))
->         |                      ~~~^~~~~
->   .../linux/include/linux/compiler.h:77:45: note: in definition of macro 'unlikely'
->      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
->         |                                             ^
->   .../linux/drivers/net/ethernet/renesas/ravb_main.c: In function 'ravb_rx_gbeth':
->   .../linux/drivers/net/ethernet/renesas/ravb_main.c:806:25: note: 'skb' was declared here
->     806 |         struct sk_buff *skb;
->         |                         ^~~
->   cc1: all warnings being treated as errors
-> 
-> [...]
+> To resolve this issue, we can modify the code order in bond_newlink() to
+> ensure that the bond device is registered first before changing the bond
+> link parameters. This change will allow the XFRM ESP offload feature to be
+> correctly enabled.
 
-Here is the summary with links:
-  - [net-next,v2] net: ravb: Fix -Wmaybe-uninitialized warning
-    https://git.kernel.org/netdev/net-next/c/05c05d14d95f
-
-You are awesome, thank you!
+This reportedly doesn't apply.. I suppose we want it to go via net?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
