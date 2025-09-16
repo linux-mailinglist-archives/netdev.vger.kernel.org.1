@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-223345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5D3CB58D1C
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:50:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06E05B58D34
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:51:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA9AC3218A0
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 04:50:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68FA33B3A9B
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 04:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199D72D1F6B;
-	Tue, 16 Sep 2025 04:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6824A2DA769;
+	Tue, 16 Sep 2025 04:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UgiTKs98"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fkm2iDgr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E41C257825
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 04:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD402D7DC3
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 04:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757998104; cv=none; b=IcXjCQ9mj5VoWcj2rLk2D7yjD1rK7Tv7N34ByDS3e1OqeQrH1Z5vWbi4SZOh6EULWKrubIdJtvUqZvLI+l1TW7LNstsAjOA2HtsDTBfEiTFV2rz04SwuyaiKUNz0fWF+6+npJwSMsTu8q+nQlo/EX2fC4IRxb2S80fe1qqxcfqE=
+	t=1757998111; cv=none; b=eEI5WIQocGbbJ8sMshC6Omj1Vs2w8CdCkjjoo13jmjkR+U1hLVBOwqAj1NKyloO4030ThqJ5p3UwuzB9UKAfy5mTwt8/cn91+TuWtd0sUVlyn6aJa/W1tTtPgKy8qfMP3Aj47rYjEKo1HcbifM8RK31QMxN/tkFQ1jIY2WCa7ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757998104; c=relaxed/simple;
-	bh=psJk8MWkw4yWUzhoGl6iC+/oKrIajPgKeNxYtGpbGJs=;
+	s=arc-20240116; t=1757998111; c=relaxed/simple;
+	bh=ja+bbJPbRSrQwDXA6/q8IikecZ6d8Rw7OMDfeYI0NFk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ph27U6nSo/E/fSMmLjOgT6bbcv0mvTBWa9cQKW/brKJR0BEmmxfUCXX2k7aD+/98JpYJRSDpEIt04Zdavt0jSfVvkV47pZqE2omCM7D5tyyxi+NClEYCO8u/3ojC8frSKLYvlaReh4bLx5jGw7u8lfJChazE9NuxOnxoMzG2nhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UgiTKs98; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=gDk77YDvcGvA1lPDkdWqO6B6bVuPzLRwMeMngd75CiMlGqDpYhc786Jtd3gtlpXshWPKjzsGNiQla4ugr0cOjB5XcuAJBzv6AMf35TzqqbtctWGAqh5IWB7dzB292Uj8K2n+rX9DwJsjVTrNZ4bjNmt+SPH6bxrMzxezv0TGSZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fkm2iDgr; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-24c8ef94e5dso40142325ad.1
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 21:48:21 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-264417f3a26so15970315ad.0
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 21:48:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757998101; x=1758602901; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757998108; x=1758602908; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vOaEQ/7pID9TluLY7/w8zgk+8Z8ChedlXZfnOV6tq/0=;
-        b=UgiTKs98TYt0zah/UeSi4De4R5qcPuP9nE+oBFiDNrhtI0JRukYpwBGkrD1qMj8YZJ
-         zxAPGGH9qL2hIdPkF9Ps9Xnd7Jvxf/ZVlkbnd47UidqnLrPiaPttc/PPgcfGNO4KSZFH
-         MII8pjx2Ab32A8kOPiHi/IVq0+PdVSk9AH6nKylqP4ciHrUFZteDTLfbAAMcPsfOW9/9
-         SxBLWNNbByPGH2KJGO4I8tQi++oIv91NAcecNWvFFImMV/zfHb4u5kUEiUYwITx8m6l+
-         PbhcI71UPtGbN3T10jjL7ELy4EIjkaG/PtU6I9mrth/K43lLg7JX0O8z0A9pbbonH3JS
-         zeIA==
+        bh=E4GnwUXvg4e1SjHBDj7IOnsANmiVf/8g2S4TikZ2k4g=;
+        b=Fkm2iDgrcPVBuaesrw7FvVYaF9dMzh7OYHeK4JX3EgxQ++R33RT7gwSxXKWspg2bZz
+         5FOFvJ9AkTWPvAhIegP4B+Vj0Gy+5liVRyC8yoicuKPE5FKhfmFF8b8qV0G+MVzpCmms
+         4qfEPXAE3lymVWIuTtXVTadXIAI1bFHNZBRgjs69h3p8XbsTTNKEC7MjRXJjx38eAhgc
+         zaoIwDnkLZSXNeCZxzCz630o7NNmGpGKTQrdgbdy1CKScwc/89o++bjOv83NkYZeXeTq
+         FO51pCkeizUOyu86k/oKP//hAvAEpA9Za35Q8X5WtgOWGeoJmw9MQI/icPPvrJpZWAX+
+         n2Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757998101; x=1758602901;
+        d=1e100.net; s=20230601; t=1757998108; x=1758602908;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vOaEQ/7pID9TluLY7/w8zgk+8Z8ChedlXZfnOV6tq/0=;
-        b=riJ5LEaM0LhFns0+l6CVF2AfHg8wCDfL+5qn/BcSJpQCWSAVUU0lHhycCsscHBO3Qp
-         wpF4QZvTb89fzxYimn5VOjxhnaFK3vXhzxO6WOu0RcZGK1e3eq83ND+Vijl9tYDcMijt
-         gjBa01XxLahLXF9KAfwdJn5SMjXGPzyRW2agXYuPqCCr/5ewsgifbUgi9ebLnFUESoJ2
-         Rp2iFqNwsUkpqdC6xZNdZGbKvuNx4bJ837hFkPi2Bte3ntyARlaIcEUBYXLfnEwz8T5W
-         clWjMlBp2g9pPziBqlNGH5YcRcS6Uz6ywZaBrjJQ2jdh8k02JxTJ1+zM+IcawW4pKCzh
-         Ey3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXSK+bbAJbpoYvXPy+BXUlqTJUI7I8/+RJmyGDcmcvRvIvqxgirwukCSf1YEltHJrHJA6YsOUc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEOTuu0YgUqgod35gzQKBBhqckkFwnXm600q7o0CIB+6Lhy/7A
-	5xnqtShV4Q2hYD4FrUPNF/B/ScYbS+CstYjuZl1Tv1KQmzkDTEViM7PD
-X-Gm-Gg: ASbGncvglVXRP4o0xjeo8uKMJg0tHSr78Oqnqyn34w9AVlTxaBKDGqLpNXGef6DMRFS
-	DR1zsCuUU6RXTrkBVWFP80fLTZgXiNwVaKqTJzKrqGjqcMa3or+hnL6N+fJvvl/3PzcrtR5MqMO
-	O0B6tn9MURv0tOpNZgFR/fYRbAMMSJUjBGoFLadh/D/lWpqSLSWV7jQHDNPbiigyPjM5DW/oj9c
-	MTuJhafuERUlLmINlgCleuyU06JPVsDJgh41iRoNGage1Rs8BJN/eG1nXsB01ntTfzLZHAm9GGL
-	6sLyeJWG0gK95/0dWxgcutKBlxxi96/A3RmYO/Mnc6vGBOkYH/FG8OOwXdlo0mQBbOG2ts4DOBl
-	mZutuSHwWy2nnXIlSyPfm9JqgmrUII6EXti7akhw=
-X-Google-Smtp-Source: AGHT+IFncLMpEiSXyRV3g2udd9oLTip5CIZ6fjiDS7nm0eY3IrUPzgwzagMuf9PJuGmIj5O4nns0xw==
-X-Received: by 2002:a17:903:2f87:b0:249:71f5:4e5a with SMTP id d9443c01a7336-267d161e3b9mr10726455ad.26.1757998100825;
-        Mon, 15 Sep 2025 21:48:20 -0700 (PDT)
+        bh=E4GnwUXvg4e1SjHBDj7IOnsANmiVf/8g2S4TikZ2k4g=;
+        b=nJp0UM0m6yFLgsUdJZCi8C5Y+kvJAJEcpmIWfxIbiNmGqGQ8V5n4l9faX4+VGmrpph
+         0q2AiIcQIwH9fNoAyUwB3+52fh4BMhXwa6y7/7bnf8mUgYTPLh+ETxr6rzc9lqXZpMJ/
+         X53VX30KrJGYcr//JRc34FwnX1t/4u0ziUwcw8ipJu9K5V0xeEA+0BB7gpRddbsC/yl6
+         zkqaH2pPAQf32pxjsi2rKH3DNFGwX6sDbgarKDhKKpnVNgQmRV5pK6uZwhvXQMLCNFsj
+         IzFxp2YYXjkZqJJOTM3ZQCnWYu33SVCJ92vduvIO4PqRXY/2TSIrn8vOMMgnf+M6sZhA
+         DZ9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVx7cMlMII3ITaDlngduZI1PVIfCbD6A9ZoVgwWBTsvCiMP2RbEaDJDWPAuO7hQjCw5z8tW7SM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsLPitVgCNiBsW5fv5s2hdtKZL3C95r9otbqW/r8JTShVa4qdO
+	J6ihQorm3dcl7UwaCuVCDEbZuMbZbfJC9HiJiiZDYMwV3upAVyr7f5sQ
+X-Gm-Gg: ASbGncsPrRxyrB0jYw46vlaZ1ud1UZABF8NiRNVbBBTabdW4Ws8tFi/ub9gQz9AuWJi
+	SpnYvpOfXhSA+mNIo26ZYC8qgHyerg4saGZHQzMvTGGHpkBum78HLsp6BYqlbMWUjIYfD5Oiyxz
+	65HxnIIFROHSkibNBbcmBYR71bp1EWSKV6cZK6mliaENGokk0yYTI7IDWPuLwcZrJQm3BQMqHMt
+	1/lvQVyvbkVh5pB14xmiLRlrLZM2Ac9wKQQlrsIcSQZUvbEhnQ8RUlJLXIvuKpdtzluY7nZR9z3
+	kCDv61RgetGjeX17PbZrxGf5vHljVotAF3t5E10W2LRHukd3a1HouDyOBDl8KFavbqzCyWTiiF2
+	1WGsWLanzRde/T92srBX1Bdx0YB/S33uWufu+gv8=
+X-Google-Smtp-Source: AGHT+IEX+DuJO9pqL+sh6jlOJbx2wPh/MnPUcew7z+h1RxAPsxkAl191gDKewoy1JkBZ+L5tKb1L0g==
+X-Received: by 2002:a17:902:ec8e:b0:25d:d848:1cca with SMTP id d9443c01a7336-25dd8481fbdmr195481725ad.35.1757998107572;
+        Mon, 15 Sep 2025 21:48:27 -0700 (PDT)
 Received: from pengdl-pc.mioffice.cn ([43.224.245.249])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25ef09c77f8sm104600605ad.15.2025.09.15.21.48.14
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25ef09c77f8sm104600605ad.15.2025.09.15.21.48.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 21:48:20 -0700 (PDT)
+        Mon, 15 Sep 2025 21:48:27 -0700 (PDT)
 From: pengdonglin <dolinux.peng@gmail.com>
 To: tj@kernel.org,
 	tony.luck@intel.com,
@@ -100,12 +100,12 @@ Cc: bigeasy@linutronix.de,
 	linux-s390@vger.kernel.org,
 	cgroups@vger.kernel.org,
 	pengdonglin <dolinux.peng@gmail.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Hanjun Guo <guohanjun@huawei.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
 	pengdonglin <pengdonglin@xiaomi.com>
-Subject: [PATCH v3 01/14] ACPI: APEI: Remove redundant rcu_read_lock/unlock() in spin_lock
-Date: Tue, 16 Sep 2025 12:47:22 +0800
-Message-Id: <20250916044735.2316171-2-dolinux.peng@gmail.com>
+Subject: [PATCH v3 02/14] drm/i915/gt: Remove redundant rcu_read_lock/unlock() in spin_lock
+Date: Tue, 16 Sep 2025 12:47:23 +0800
+Message-Id: <20250916044735.2316171-3-dolinux.peng@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250916044735.2316171-1-dolinux.peng@gmail.com>
 References: <20250916044735.2316171-1-dolinux.peng@gmail.com>
@@ -130,32 +130,34 @@ been started implicitly by spin_lock().
 
 Simplify the code and remove the inner rcu_read_lock() invocation.
 
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Tony Luck <tony.luck@intel.com>
-Cc: Hanjun Guo <guohanjun@huawei.com>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+Cc: Tvrtko Ursulin <tursulin@ursulin.net>
 Signed-off-by: pengdonglin <pengdonglin@xiaomi.com>
 Signed-off-by: pengdonglin <dolinux.peng@gmail.com>
 ---
- drivers/acpi/apei/ghes.c | 2 --
+ drivers/gpu/drm/i915/gt/intel_ring_submission.c | 2 --
  1 file changed, 2 deletions(-)
 
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index a0d54993edb3..97ee19f2cae0 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -1207,12 +1207,10 @@ static int ghes_notify_hed(struct notifier_block *this, unsigned long event,
- 	int ret = NOTIFY_DONE;
+diff --git a/drivers/gpu/drm/i915/gt/intel_ring_submission.c b/drivers/gpu/drm/i915/gt/intel_ring_submission.c
+index 2a6d79abf25b..bf73166a1337 100644
+--- a/drivers/gpu/drm/i915/gt/intel_ring_submission.c
++++ b/drivers/gpu/drm/i915/gt/intel_ring_submission.c
+@@ -392,14 +392,12 @@ static void reset_rewind(struct intel_engine_cs *engine, bool stalled)
  
- 	spin_lock_irqsave(&ghes_notify_lock_irq, flags);
+ 	rq = NULL;
+ 	spin_lock_irqsave(&engine->sched_engine->lock, flags);
 -	rcu_read_lock();
- 	list_for_each_entry_rcu(ghes, &ghes_hed, list) {
- 		if (!ghes_proc(ghes))
- 			ret = NOTIFY_OK;
+ 	list_for_each_entry(pos, &engine->sched_engine->requests, sched.link) {
+ 		if (!__i915_request_is_complete(pos)) {
+ 			rq = pos;
+ 			break;
+ 		}
  	}
 -	rcu_read_unlock();
- 	spin_unlock_irqrestore(&ghes_notify_lock_irq, flags);
  
- 	return ret;
+ 	/*
+ 	 * The guilty request will get skipped on a hung engine.
 -- 
 2.34.1
 
