@@ -1,84 +1,80 @@
-Return-Path: <netdev+bounces-223319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9376B58B54
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:41:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3241B58B59
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:42:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 403F21688D0
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B31FF3B57D3
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:42:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC0621E091;
-	Tue, 16 Sep 2025 01:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8F4217716;
+	Tue, 16 Sep 2025 01:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="baZQh+Zg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hvbr8TxA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56CD2135AD;
-	Tue, 16 Sep 2025 01:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79B8154425;
+	Tue, 16 Sep 2025 01:42:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757986884; cv=none; b=L7GvDIYb6e+vIPnxjA9+39QRCLjAsm56UsxwN60yNPSkC8jaN7k05KvGH1yqqOqUF2HOVLPt0wmMlHw7f+5j3/qk0/0Yll6eBPhq35uEEeMSW5nO7Ifc18uMBcgt0svwVCulhdbCdSez84EM+JgqDvATscfRKQH0Uh0a0r4JbtI=
+	t=1757986933; cv=none; b=NDeZtIhXeyWq+CzCJ/59QzK55FpDUY8WTSdo69sDFNubPVxpOnE/jP06g4P0WjQV59xYF72Ryx1Jbgp12yh+5/mGgwPK+6KpQUmD5TPY1i7LDeps4nKJE7TGvwqafqU+gr4CQxYBth4f83/qp+kEkTbIJFFUIcfZme9J35E6Fr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757986884; c=relaxed/simple;
-	bh=8hwQcwBHz2zuy1ceLhAuHCSU5WJ152SvEZ/BnmXPAnY=;
+	s=arc-20240116; t=1757986933; c=relaxed/simple;
+	bh=cEbPcPh84M0mskAwQZCusts2IzzcqM/jBUtK/XGRNNQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X5DyJXadQ4oDYxTd8036Y8FRmsAJvwVntWW0XsC1yUryRd4T5IuzxUOGdJma69r81mVvr2s9rMqjWqVxibagICTkJ8Fe2YakuCImvo7nvmTiKiIUfUnGXzWDCQcWW8d0Y7hOSmZ20Suyg1S3TIrGjoM8ITlF0yx3AM7FeoUrWkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=baZQh+Zg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35B67C4CEF1;
-	Tue, 16 Sep 2025 01:41:24 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Zo8j3dMDlTmqLhfBsAwxQSpEzcSz1JgjiukssJE5wwWHHXw6j/eR30d3PciAWb6/BZgvo9HAiVe5g5AiulHHSxpGgVTZnFQrNhcEtkeiNeIfJkAEWIOMSKcI9NHRG3ZLmZNN7ToDtCc4pVgV7l0FQzfXVS+x2bn8iYtNgEAWdcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hvbr8TxA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F04BAC4CEF1;
+	Tue, 16 Sep 2025 01:42:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757986884;
-	bh=8hwQcwBHz2zuy1ceLhAuHCSU5WJ152SvEZ/BnmXPAnY=;
+	s=k20201202; t=1757986933;
+	bh=cEbPcPh84M0mskAwQZCusts2IzzcqM/jBUtK/XGRNNQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=baZQh+Zg8nNrO1680vkA2olUSKrxkFZBUqJQI63+xryyLibk78TRlw0NSuyMb6EEO
-	 oA5mj4aVqpPc8oQ7Hs3h+efA+4ZoIiTfRawD2FoL89AcECgPCdCzAKf6BiGWVrw7BA
-	 ju+Qnm3xWBh62qdNtCxo7YHHWJaLxME2n9UpFj1uPDpufxfGSLiEtZ243FzqyydMei
-	 gvY/VJhEkFET8Uz3NtW2a9FDH5oFKMj2xZ+H9WOc6J4Gu+/DbzH2uci5wDsWS85VDi
-	 JGLEHqr6rgiUkC+iX2Ki4YFdXYfG6texEFGGHhdezhYfhTtGj1xuXI99uLT2uZkc7Y
-	 ajvfKqmfW5TOw==
-Date: Mon, 15 Sep 2025 18:41:23 -0700
+	b=Hvbr8TxA+7xfE2rx271ZLwyVy9+IGciTMEcZ7EM2y5RNx3VKJSpP9IlvoFyJLlNk9
+	 zIaz15Bn3SFA343yCVI/Z6bRYryXZ2F2NuypWVGVLqng/Nlbqyupa44DuxsxhlxPE2
+	 3iAK5CIuQ3xRMG6WNkixbzVbGX7L4us91jiWugVCOjgd0lQ02TEMiKweimbfZ0LoXp
+	 TEXcY9sTbVcRzlmz965sPWmbG8Lk60r/OA1sMVAkR10yqeem6sWHR6vrGHRjJowJxi
+	 AZJGRsc1Yf6qw840vLJW6vV8LGot39KZqxshgiPHpDY0cGRjxJJ3Q5xB9wwUtJo/sv
+	 h5GK+HHrmzyPg==
+Date: Mon, 15 Sep 2025 18:42:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Petr Machata
- <petrm@nvidia.com>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] bonding: fix xfrm offload feature setup on
- active-backup mode
-Message-ID: <20250915184123.505d2bb8@kernel.org>
-In-Reply-To: <20250915083742.423741-1-liuhangbin@gmail.com>
-References: <20250915083742.423741-1-liuhangbin@gmail.com>
+To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
+ <ast@fiberby.net>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Simon Horman
+ <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, Sabrina
+ Dubroca <sd@queasysnail.net>, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 04/11] tools: ynl-gen: refactor local vars
+ for .attr_put() callers
+Message-ID: <20250915184212.1dc0abf2@kernel.org>
+In-Reply-To: <20250915144301.725949-5-ast@fiberby.net>
+References: <20250915144301.725949-1-ast@fiberby.net>
+	<20250915144301.725949-5-ast@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 15 Sep 2025 08:37:41 +0000 Hangbin Liu wrote:
-> The active-backup bonding mode supports XFRM ESP offload. However, when
-> a bond is added using command like `ip link add bond0 type bond mode 1
-> miimon 100`, the `ethtool -k` command shows that the XFRM ESP offload is
-> disabled. This occurs because, in bond_newlink(), we change bond link
-> first and register bond device later. So the XFRM feature update in
-> bond_option_mode_set() is not called as the bond device is not yet
-> registered, leading to the offload feature not being set successfully.
-> 
-> To resolve this issue, we can modify the code order in bond_newlink() to
-> ensure that the bond device is registered first before changing the bond
-> link parameters. This change will allow the XFRM ESP offload feature to be
-> correctly enabled.
+On Mon, 15 Sep 2025 14:42:49 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
+> Refactor the generation of local variables needed when building
+> requests, by moving the logic from put_req_nested() into a new
+> helper put_local_vars(), and use the helper before .attr_put() is
+> called, thus generating the local variables assumed by .attr_put().
+>=20
+> Previously only put_req_nested() generated the variables assumed
+> by .attr_put(),  print_req() only generated the count iterator `i`,
+> and print_dump() neither generated `i` nor `array`.
 
-This reportedly doesn't apply.. I suppose we want it to go via net?
--- 
-pw-bot: cr
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
