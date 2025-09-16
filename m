@@ -1,139 +1,115 @@
-Return-Path: <netdev+bounces-223385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 052FCB58F2B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 09:31:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D55B58F52
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 09:38:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96B81522E6B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 07:31:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E71113AC896
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 07:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 467382E8E1C;
-	Tue, 16 Sep 2025 07:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED5F2E9EAE;
+	Tue, 16 Sep 2025 07:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u0Bk9t0E"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Z0Vpu0eb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F9E2E8B84
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 07:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF8E2E9748;
+	Tue, 16 Sep 2025 07:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758007859; cv=none; b=cqCglibpj6gL2Yql0X26TcdtOXHBnP2PqEjMwVpED3zNQ2RT2Iq814wzAdm7TU5ZLUtLdfjfghLIly/YTzo4312F7L8ZApi4VX+uiRV4OPCegZrHSyCBhtWm5FL8ZoOBoG7s17pfzAO21G4Ngy3lTMrfmJ14gj9GvHEm9NmyFgU=
+	t=1758008317; cv=none; b=HcYfiPlIhk3bb9zvg5xN/tr5movOda5fAgM8Z6iq7jrq818E0AtuAjOmTUKjYZN1yGHgxlro3kHOzAf5Uritm1C13H0u6BpxX4TjWjzmHlGIb4O48Z5HGeoIUeDGULr3dkEhLXHBfq8W1d/HUEzPvm95y6ZkGbwoOTdJg1tOgHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758007859; c=relaxed/simple;
-	bh=HNBZo6YmtOvoklO/9TNn2nUgKlp09Byr2dJuH6nrM6E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nx48SM9BVW+tLq7kKFuzm1RGqRCRCUg1y81RvRlQa0xxkcTXYxXZJB3FO4jn7nW3OG87THVf4h78BAbH1oXeYQ1Ky+pdbzR4yy4icpI6d5wsHuDSLy8iRS1i4byf88IyYgb1wDrr2A0gdp3ADevc7n4lfSYCVw62fw3yiKatCxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u0Bk9t0E; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b5d5b1bfa3so45781271cf.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 00:30:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758007856; x=1758612656; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b+KYYSsasADpLxsCi9t7AMiqgPbIRGaMguUdJ8zlhTk=;
-        b=u0Bk9t0EeJEsYMoOAjIRlCcGIgiezX+h91THe+6nX9+AjoDap2H1MlkgONlI1mJ20U
-         pw0xF/aHQdvqb1ARH3XfJBFNCUof/HGosXaMI21tKjkvno4vJQ+7pXsZbhOft30Lnw0e
-         LtVKJ4iWQ6c008YXP8IsFKWzgvOXgSoX7jDJvd7ZamthpkKqgCIGdBNZmb7veT2C3GCQ
-         qWr19CgDNTETs12b91qY5hzhUHlgoZDGDkxyf8OHv5E+Fxp+NwnHVLZzTHv3A3mTMsJj
-         vj/Dg1qILTe1ZsaA4um+pfdSqDMaAWmLlVLnibbgWcpnkGCdhZiF2JzRXMVBrUNhT/VZ
-         FN9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758007856; x=1758612656;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b+KYYSsasADpLxsCi9t7AMiqgPbIRGaMguUdJ8zlhTk=;
-        b=NcdhBktQUsxqBc0bq+Pv0qinnW1IwGsXoToYfJeanc4bwqBGa40tfEuOBPdD/McAwo
-         o5HOm34iil1ADZ4/8xQ6mtQxF+ZIkSxuq/DabKaDOrmmS5RcBYW8GD43BYbSOiwW/5A8
-         xyGNT/Q0JVAZCj7iY1oe6VwbGkpXMSj8m5tTjA5m+X1hxKbVFJ+sYBfZAe8a5RfMgnGM
-         eGJuXhJDPQQjiUKDH/fUky6YD8ZuyCJFMzm+xAJnTmEAjVyTLyn6M+irEpAhyQ9uKxmO
-         kGWFnzkS8EiNP00jEYopCdeNZ1ShtBZTQDRPM5N5IaG3e7u7eLg/Gq1ONrN7cxWrMZ4C
-         Gv7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXIY14ms0/QcedU6XdMwyFpBl95ZN5PpRCsDlyY2hzMeoy/vC26xJtXTj06NYxTDhkv1uNcS8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWLzFrI3gF1hj23Ig3DQz1NNUTvAiYeO73Uj/mhTN+1zAjx8pO
-	BLEMXIl/AhDxBodv5KmQPuYUfjp2TMgUW2aaQmz+hwYFEDqT4Qpg4j1kOsYK1zZdbX6pAOp8U9t
-	ePKE/rbpGrzHAtUn3m98X38J7aSjlDX9m9JoSo9Lb
-X-Gm-Gg: ASbGncsXiC6HqcdQFe0DUQyV9JGvcRtkmiSYzDgxthmKQOvJljtYEbhlcuepJ7y62+b
-	8HxtqqzufHEIh2KdJVedaEv0AI4itUeTjcmyAtOSql0gD2tt52P0BQJTsN9p6QRbcCC8pNrsLfp
-	vtLPKSFqgVPXVT9UQgYgCA57fjAHqN/iTLICK8skvOinVRRzsscZuHmiD+ho55BzapmqJyzxIsI
-	Oufz4o6Em5Of34uJKUfpXLO
-X-Google-Smtp-Source: AGHT+IEELxqlTNuXChT+lpcimkJJDsX8mW+815tWWCNb8fL/iwJbIl86hrMCdWh/xiN97MN1s1Aon5sXyGjmCJpPmX4=
-X-Received: by 2002:ac8:59c5:0:b0:4b4:8eb7:a45e with SMTP id
- d75a77b69052e-4b77cfd7c3bmr184461691cf.35.1758007856110; Tue, 16 Sep 2025
- 00:30:56 -0700 (PDT)
+	s=arc-20240116; t=1758008317; c=relaxed/simple;
+	bh=6hkL4CWqr5+YDd9Ncdh8bvXQbjUgV4NXSfCuyYYiZQs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iVr8eDgv1/gu1v2mqsgs4BGbcayqb2azTxE5ETx9taioOQpftiB+VcHINz3nCuhh3aJwaUIHtgxrAXTdy4EIriALQBMEun0SEyhvrljO0Ovm6IOosHJIyVRuzkM1Nqfj+LLZqjvnla8rzEsDUNpweEiiyhx+ULTI1RyWYO8SBSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Z0Vpu0eb; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1758008316; x=1789544316;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6hkL4CWqr5+YDd9Ncdh8bvXQbjUgV4NXSfCuyYYiZQs=;
+  b=Z0Vpu0ebMAYzQOHcBi/d1262DJu27nwX4/st63kfSYGomR2hpYQRg/WK
+   8cGtfPRdO70rk5JPWj7fhlT7BKLphAkKcQr8BENCnZxiKRZXcpHXUgOAL
+   RLORXA21MwNFSiBJnMBLaXQKRa0k1B/4TpgFnabUyXSy6XS+szROhqw6J
+   ZaDn1r6TP2GxmqLZxVuNxzAHQEFOpyy4/1PQ4oGLoGkqDTKfe+YCthnJ3
+   rCBAgz1UXH9+ITImJ4w44Bvtirs/FbGD2r9MQigg9m6cx7Ji+lJzraV1C
+   649QD6DKfq6N8EK3YZrFxWDlfP3pa1CvzSMV8rhRQudM0zgA28pRBYd1b
+   A==;
+X-CSE-ConnectionGUID: uu6TxwMOSQ2ZIPOgQXRKkQ==
+X-CSE-MsgGUID: JNefeZIjTuCYPDDHdVIw2A==
+X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
+   d="scan'208";a="277928877"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Sep 2025 00:38:35 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Tue, 16 Sep 2025 00:38:23 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Tue, 16 Sep 2025 00:38:23 -0700
+Date: Tue, 16 Sep 2025 09:34:27 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: micrel: Add Fast link failure support
+ for lan8842
+Message-ID: <20250916073427.xohv2cywonkfzp5k@DEN-DL-M31836.microchip.com>
+References: <20250915091149.3539162-1-horatiu.vultur@microchip.com>
+ <698d4fbe-a84b-40cd-986f-1ebaecbf60b1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916064614.605075-1-xuanqiang.luo@linux.dev>
-In-Reply-To: <20250916064614.605075-1-xuanqiang.luo@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 16 Sep 2025 00:30:45 -0700
-X-Gm-Features: AS18NWBEu9CHVZddnyNNHIxHSzotBe8l2QeZa79QRVH5M-9yrw21laO7YOXggoE
-Message-ID: <CANn89iLC6F3P6PcP4cKG9=f7+ymW1By1EyhFH+Q0V6V-xXn7jA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/3] net: Avoid ehash lookup races
-To: xuanqiang.luo@linux.dev
-Cc: kuniyu@google.com, kerneljasonxing@gmail.com, davem@davemloft.net, 
-	kuba@kernel.org, netdev@vger.kernel.org, 
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <698d4fbe-a84b-40cd-986f-1ebaecbf60b1@lunn.ch>
 
-On Mon, Sep 15, 2025 at 11:47=E2=80=AFPM <xuanqiang.luo@linux.dev> wrote:
->
-> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->
-> After replacing R/W locks with RCU in commit 3ab5aee7fe84 ("net: Convert
-> TCP & DCCP hash tables to use RCU / hlist_nulls"), a race window emerged
-> during the switch from reqsk/sk to sk/tw.
->
-> Now that both timewait sock (tw) and full sock (sk) reside on the same
-> ehash chain, it is appropriate to introduce hlist_nulls replace
-> operations, to eliminate the race conditions caused by this window.
->
-> ---
-> Changes:
->   v2:
->     * Patch 1
->         * Use WRITE_ONCE() to initialize old->pprev.
->     * Patch 2&3
->         * Optimize sk hashed check. Thanks Kuni for pointing it out!
->
->   v1: https://lore.kernel.org/all/20250915070308.111816-1-xuanqiang.luo@l=
-inux.dev/
+The 09/15/2025 14:42, Andrew Lunn wrote:
 
-Note : I think you sent an earlier version, you should have added a
-link to the discussion,
-and past feedback/suggestions.
+Hi Andrew,
 
-Lack of credit is a bit annoying frankly.
+> 
+> > +/**
+> > + * LAN8814_PAGE_PCS - Selects Extended Page 0.
+> > + *
+> > + * This page appaers to control the fast link failure and there are different
+> 
+> appears.
 
-I will take a look at your series, thanks.
+Good catch.
 
->
-> Xuanqiang Luo (3):
->   rculist: Add __hlist_nulls_replace_rcu() and
->     hlist_nulls_replace_init_rcu()
->   inet: Avoid ehash lookup race in inet_ehash_insert()
->   inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
->
->  include/linux/rculist_nulls.h | 61 +++++++++++++++++++++++++++++++++++
->  include/net/sock.h            | 23 +++++++++++++
->  net/ipv4/inet_hashtables.c    |  4 ++-
->  net/ipv4/inet_timewait_sock.c | 15 ++++-----
->  4 files changed, 93 insertions(+), 10 deletions(-)
->
-> --
-> 2.25.1
->
+> 
+> And just curious. Why appears? Don't you have access to the data sheet?
+
+I have access to datasheet. It is public here:
+https://www.microchip.com/en-us/product/lan8842#Documentation
+
+The problem is that now the register are described in a different
+document and this one is not yet public. I have asked and they are
+working to publish also this one but I can't say if it takes a day or a
+month.
+
+And the reason why I say it 'appears' is because I have seen most of the
+registers are for debug and some timers.
+
+> 
+>         Andrew
+
+-- 
+/Horatiu
 
