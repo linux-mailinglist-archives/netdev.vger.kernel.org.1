@@ -1,116 +1,134 @@
-Return-Path: <netdev+bounces-223595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD31DB59A9F
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:44:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65179B59A8B
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:42:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2931E167242
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:38:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14C013B865E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0D7313E39;
-	Tue, 16 Sep 2025 14:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AD0334391;
+	Tue, 16 Sep 2025 14:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P4X5dLLl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k+Q8lbQv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A313081AE;
-	Tue, 16 Sep 2025 14:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BE63081AE;
+	Tue, 16 Sep 2025 14:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758033502; cv=none; b=NNzx5wFYSceZ6uvjjUbMWUtPubogqTgIxcuHIdp2c078gNybAcF/JwM3X8SFFe3zQIYvSuC9sNm/lpgjT2IG0UneP2wbjKq74okjZezmIi2NGZIgEwFVpCDpbb+BDTogmnPPGgsZjlX9s8GshCI+jOVK+SZRWLSrLG+WIf1avLA=
+	t=1758033535; cv=none; b=D0Mt/XvXX+2jopZcqBFeFPIbojy87gDczqNeipNMsHT0uar/ovY7Zy2hgwp9dXJTn2VT7w9MWHaNLqaiwCyyagrBWdLXD+hOp2OtRLaLdbx6njpoTf06i6M5tMhNqnZ4pUNEmDdi5/1+3QBAlP/9Zz85L3jxGbjyWoUJBECjZCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758033502; c=relaxed/simple;
-	bh=MjN8NM+9Mz20xb1nIlZpOEr/3Qh3fNWBkaaj1YjyEdc=;
+	s=arc-20240116; t=1758033535; c=relaxed/simple;
+	bh=Ph/hIiO+tXjORKxzfu06YoivQsZaFkxYB4pQsUq4gpQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AdfmPN2yUhvvtc6ENFkdQsCZKsOgmjohV9EEblIfXiWEUK71vufxwNhtQ+cESFZzhAaXU2OgvKTYeRNnD4pfRtGQ4zW+GcHxLu8FOLa8j80OiKwkoa+Z+SjDtHD9yb75Kp6gTW1ELGz7HfPx0ZkLi18QBrW804vD8EkOx+64HsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P4X5dLLl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=M6rgThuM1WGuVWDhs++mootFR4ZaiAUjcCQGb6p8Tss=; b=P4X5dLLlT8VyoF4RIlX15OQY1w
-	NSvr5fdoleoIJbcE58nozjiIy5z0pribctXcYMd9koR2tvsswbhZE6PoV1ZjimQkogS6SYgmXg6H4
-	/+RgV2Ix4nHkXjOpLmfwenkHqoVlDPLQhA1NdH8C3IwB2raG7FxB29aoR1t0lBRCf34s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uyWos-008Zkp-6q; Tue, 16 Sep 2025 16:38:10 +0200
-Date: Tue, 16 Sep 2025 16:38:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Wei Fang <wei.fang@nxp.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Nick Shi <nick.shi@broadcom.com>, Paolo Abeni <pabeni@redhat.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"Y.B. Lu" <yangbo.lu@nxp.com>
-Subject: Re: [PATCH net-next 2/2] ptp: rework ptp_clock_unregister() to
- disable events
-Message-ID: <ac7c6c84-02e6-4e3d-8c38-abd5339a021d@lunn.ch>
-References: <aMglp11mUGk9PAvu@shell.armlinux.org.uk>
- <E1uyAP7-00000005lGq-3FqI@rmk-PC.armlinux.org.uk>
- <PAXPR04MB851098C0A69B74DD232071B68814A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <aMloTwObRUIRAzPF@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sf9FxGW+yWha84yJlVqeAhNaPs7M0f6OXTtfKHKvX9DOPNJL+DmRR7S3KKm4belqof8AIQi35NAbL/shV+373M7j72bDqqOi+6VnDt9zJ/TjT4xe1UphDNeIhBLZkqLGPM5V751tn9x+i1j5EmqKse+z3Q9W7ePvRCpM/yherv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k+Q8lbQv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C2FAC4CEEB;
+	Tue, 16 Sep 2025 14:38:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758033535;
+	bh=Ph/hIiO+tXjORKxzfu06YoivQsZaFkxYB4pQsUq4gpQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k+Q8lbQvzfiLPscbR5ZPBPkpIbgIzkAK2T0BtjPuBHrfNmtyNZj/YF2ioJPAu+aqT
+	 k0Fj5O2OQ1MMzl3YYquE394xUYf9bbOTEbgwFoppUmMbqRQKQbQmxJ/af6CuOV+Ct2
+	 sKjZxOjK/W5NMn3Z1o+rQ0FB78oookqGpHcoucoZ1FOPU8LXl8KgBkD25Txo9bfdhL
+	 hkwet2ivAS5IRwptEjYJl735BJoSktrlFCsOILzOWHB/GWz+YtSaHdmKkxx24a9q1e
+	 eT0tDZHSOp3d0yvhUYi3GttGy7WSLJgG1HXn8jer+jI+O1V+vV6aGKuYr5nRGCxCUd
+	 SSSsnYJSBNujA==
+Date: Tue, 16 Sep 2025 15:38:47 +0100
+From: Lee Jones <lee@kernel.org>
+To: a0282524688@gmail.com
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
+	andi.shyti@kernel.org, mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH RESEND v14 0/7] Add Nuvoton NCT6694 MFD drivers
+Message-ID: <20250916143847.GF3585920@google.com>
+References: <20250912091952.1169369-1-a0282524688@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aMloTwObRUIRAzPF@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250912091952.1169369-1-a0282524688@gmail.com>
 
-On Tue, Sep 16, 2025 at 02:38:23PM +0100, Russell King (Oracle) wrote:
-> On Tue, Sep 16, 2025 at 09:03:17AM +0000, Wei Fang wrote:
-> > > the ordering of ptp_clock_unregister() is not ideal, as the chardev
-> >  ^
-> > Nit: Uppercase, 't' -> 'T'
-> > 
-> > > +void ptp_disable_all_pins(struct ptp_clock *ptp)
-> > > +{
-> > > +	struct ptp_clock_info *info = ptp->info;
-> > > +	unsigned int i;
-> > > +
-> > > +	mutex_lock(&ptp->pincfg_mux);
-> > 
-> > Currently ptp_chardev.c has been converted to use the auto-cleanup
-> > API (scoped_cond_guard()), so scoped_guard() can be used here.
-> 
-> ... which are very non-C like, non-obvious, and I currently have no
-> idea at the moment how to use it. In my opinion, it makes code more
-> difficult to understand.
+Enjoy!
 
-+1
+The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
 
-Plain scoped_guard() is not too magical and reasonably
-understandable. But ptp_chardev.c is using scoped_conf_guard() which
-is much more magical and i have no idea what it does.
+  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
 
-> Maybe someone else can convert this for me to this non-C like
-> structure?
+are available in the Git repository at:
 
-Yes, if you want to write plain simple code, I submit it so. Somebody
-else can follow up with an obfuscation patch.
+  git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git ib-mfd-gpio-hwmon-i2c-can-rtc-watchdog-v6.18
 
-     Andrew
+for you to fetch changes up to d463bb140583609f78f61d48c3dfb6f46c5cb062:
+
+  rtc: Add Nuvoton NCT6694 RTC support (2025-09-16 14:41:58 +0100)
+
+----------------------------------------------------------------
+Immutable branch between MFD, GPIO, HWMON, I2C, CAN, RTC and Watchdog due for the v6.18 merge window
+
+----------------------------------------------------------------
+Ming Yu (7):
+      mfd: Add core driver for Nuvoton NCT6694
+      gpio: Add Nuvoton NCT6694 GPIO support
+      i2c: Add Nuvoton NCT6694 I2C support
+      can: Add Nuvoton NCT6694 CANFD support
+      watchdog: Add Nuvoton NCT6694 WDT support
+      hwmon: Add Nuvoton NCT6694 HWMON support
+      rtc: Add Nuvoton NCT6694 RTC support
+
+ MAINTAINERS                         |  12 +
+ drivers/gpio/Kconfig                |  12 +
+ drivers/gpio/Makefile               |   1 +
+ drivers/gpio/gpio-nct6694.c         | 499 +++++++++++++++++++
+ drivers/hwmon/Kconfig               |  10 +
+ drivers/hwmon/Makefile              |   1 +
+ drivers/hwmon/nct6694-hwmon.c       | 949 ++++++++++++++++++++++++++++++++++++
+ drivers/i2c/busses/Kconfig          |  10 +
+ drivers/i2c/busses/Makefile         |   1 +
+ drivers/i2c/busses/i2c-nct6694.c    | 196 ++++++++
+ drivers/mfd/Kconfig                 |  15 +
+ drivers/mfd/Makefile                |   2 +
+ drivers/mfd/nct6694.c               | 388 +++++++++++++++
+ drivers/net/can/usb/Kconfig         |  11 +
+ drivers/net/can/usb/Makefile        |   1 +
+ drivers/net/can/usb/nct6694_canfd.c | 832 +++++++++++++++++++++++++++++++
+ drivers/rtc/Kconfig                 |  10 +
+ drivers/rtc/Makefile                |   1 +
+ drivers/rtc/rtc-nct6694.c           | 297 +++++++++++
+ drivers/watchdog/Kconfig            |  11 +
+ drivers/watchdog/Makefile           |   1 +
+ drivers/watchdog/nct6694_wdt.c      | 307 ++++++++++++
+ include/linux/mfd/nct6694.h         | 102 ++++
+ 23 files changed, 3669 insertions(+)
+ create mode 100644 drivers/gpio/gpio-nct6694.c
+ create mode 100644 drivers/hwmon/nct6694-hwmon.c
+ create mode 100644 drivers/i2c/busses/i2c-nct6694.c
+ create mode 100644 drivers/mfd/nct6694.c
+ create mode 100644 drivers/net/can/usb/nct6694_canfd.c
+ create mode 100644 drivers/rtc/rtc-nct6694.c
+ create mode 100644 drivers/watchdog/nct6694_wdt.c
+ create mode 100644 include/linux/mfd/nct6694.h
+
+-- 
+Lee Jones [李琼斯]
 
