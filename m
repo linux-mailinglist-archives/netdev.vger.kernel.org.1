@@ -1,141 +1,112 @@
-Return-Path: <netdev+bounces-223597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B4BB59AA9
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:45:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB960B59AA3
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45B57177069
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:39:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 055F33AF40F
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAE7334372;
-	Tue, 16 Sep 2025 14:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A748338F54;
+	Tue, 16 Sep 2025 14:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mL2ctDOg"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="PB7HSN8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31CC30C357;
-	Tue, 16 Sep 2025 14:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAE3334375
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 14:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758033592; cv=none; b=jijTMJvdKffBUY2YhjiT1AeO7sTXZ9h3E/iFzbcPK4Y2OFHm+TLE10SYxJJRU+K0qiLpS7ziQobpxoa2YRrAFKyVDDVThYNI5F8s/GQjROZOnMaY98PYUo9IiVd6boGbiPVcS1ocO9h2yewm6CdvExEdw8X6YA1ZcK6KcjcfE5o=
+	t=1758033639; cv=none; b=bbUi8DJ7umRhcbcY5o7UmnHo4E5MjZEo2n09Gh+YTe7N3oahLKa/VthifmDK9dnVhV5AJRX4L+Tj4lDnwwr4i7gXKJsFEzD6ryYzO3bgXftrlfdPYmgJ3m3TTUNgwUNxw0qDX6tkzve5SHhiKN/c99GLjmwJWKi7ZftGFXTRBcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758033592; c=relaxed/simple;
-	bh=EDfRX0RIkPJUTOzyTgi+O83Ih7FSf4+t7TnGTIzv5YY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C/33kfJolMkdU6A3P0qQmtB0tV0ZbXMb9PslMtStFtskhhPgPXcqueepuc0PneGweOkVL6TLN9o9bhj2LI7L9Imvf8/s/PDoWEd0WCtNtSTEkxmFIhPMlBf0rCLYQeE0VHuPEElLNlQrqFHzZvf63rOjXqASiHDK+1b8YSvg+uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mL2ctDOg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4495C4CEEB;
-	Tue, 16 Sep 2025 14:39:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758033591;
-	bh=EDfRX0RIkPJUTOzyTgi+O83Ih7FSf4+t7TnGTIzv5YY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mL2ctDOgNiUrtib5Onat+P6I+mOGVVODkCpHQQYsGq98p2Yv+8VmQRrnw7PKghuWy
-	 N938OCWn3kYfO2X0JmKhWohOjBvAoYP5k2oH4Q/5Xwsl0TWQIsLs4TnO7/A8ocIHLn
-	 r444P8KtJASp2xl4+ZhYXRlqNT+EeYV7MC4wQc+m9WnLMCN+skLBEwl3vzB7ykxERE
-	 oCYgzPNR7BQnJfyA2/UMW0juU4iKyKH1eZD/sIwahhSeIkhCeZH8ycgyM4NReAvoUH
-	 CUQya1qaY/ZXD1n5oXZGHdw38FWd21saHMt+hG/NKpKQMjO5sCz9qfXxLPuvhspFnq
-	 TfeRsjdJS5F7Q==
-Date: Tue, 16 Sep 2025 15:39:44 +0100
-From: Lee Jones <lee@kernel.org>
-To: a0282524688@gmail.com
-Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
-	andi.shyti@kernel.org, mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
-	jdelvare@suse.com, alexandre.belloni@bootlin.com,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: [GIT PULL] Immutable branch between MFD, GPIO, HWMON, I2C, CAN, RTC
- and Watchdog due for the v6.18 merge window
-Message-ID: <20250916143944.GG3585920@google.com>
-References: <20250912091952.1169369-1-a0282524688@gmail.com>
- <20250916143847.GF3585920@google.com>
+	s=arc-20240116; t=1758033639; c=relaxed/simple;
+	bh=kAE/kP/8YfHAtmz/50ewqbMlclPzTuDXYPsLPzAXlIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nQP2cjcTITUYhuXyCXpOFuI7Y/rIUe4N9adzlXD65ZxNhucWO1jbBa88OSHC4h3Y9SOw+z0oz9ac9AF9qiZVQm9ptEoGobbnkZgPeujRjXdn8YQMgruTwiS3H9Trn3/Y57/9UUeoxahV6tOBNGAKjwidx1u0MVxNdg5E1Qxyogk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=PB7HSN8n; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b00a9989633so1070777066b.0
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 07:40:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1758033635; x=1758638435; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HbBlPdVxLUiaaDwT7hPM1pqY2WWWX1/pW0PwvjmsMxY=;
+        b=PB7HSN8n4OVhAt6PHhuyq87QtAHQbEYm2UVriBnM2D5xXiov2AldrKoXKQgTf03W/O
+         MHh0zkQ5tW97HyoCZ8Nwz5Zk0qvWvu8FWHBVPNk1pGUyEacYsL4lqvVd/MqaNpL/NJs5
+         vnGeEdEcs/CcQIkR+TdnY1FOu1igSGn7gEhdMpyoB6ov6FQsD8jqEVEFGobzgPL9MFCE
+         0KkpEQFltdaRnwg3m3PK8++fWGyvn8XA2TcTkKkrPZEEQ6drYB3FXLaR1xemcahNN9MP
+         oL1mqB5f3Ovd/p9ydEFDdRSIi40jXrwpzC6RtKGj8+jIIMljLMQJDbo1VvI3DdVkz3D1
+         WVwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758033635; x=1758638435;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HbBlPdVxLUiaaDwT7hPM1pqY2WWWX1/pW0PwvjmsMxY=;
+        b=jcvgd36laYqU5PBaWp1/3CPWodGf+MJl97zYS1kCEXQotzjYZn2nfUx7NHPWasLX3H
+         0Kxbc92luGaqXC/aI+jDCjPYrn9X8tqdcqTXGxIDcJ3re0eXCAcB6GS2SfGr2/L4RnhC
+         u6cOzetxPMhCF2iMslfnlAoHyZsFCiLQHrKo9CSbRMTWuZD6Ce2g48tQ6Z9oGauSUapV
+         SePqNhbZ4cWm+7vLd40C7de62mvCXYyrXZljtemyyCYwQK0cMeSF0ZoPkTCzM3b31s0M
+         d8L1UB/oBhUEuZB0i3e3Bv5VY3VRTeGpTIRfR+AtMMvdHHrHqM29RBC25K8muIrszxTz
+         uOoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW46syVTFYqnkxGG8jMSQbjffHI78ntnXtVgklsB4GZTZSSpGg02oXfZC0uUVb0LNoMir8ksw8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySrXB2FI+wS1/27ecOLX520SSRZlsxCAipMcduB7Sf+hh1x/7O
+	MMp/1JrnU+xIkB0K5H8ltkN6w0RraSLDu8hl+bPB3CXfMqWAkvKXJ7EXAX2ChXOjHjy/IAW+vDo
+	B9faK
+X-Gm-Gg: ASbGncvBb+KSfPJRU+Co3KqaXyiD0iwkdQuY75dVjolFxo7hpj45gXTeKqLoc5y/miR
+	STjPNfqF3TXDC14NBMtbJPc7I+Y100ELws3Adswhf221787jYL9+usOZPDYOSDsej2oMC/Qahoa
+	CthbPc8351Gghh5eMhudmU5w1dWwX909SDxk9oWFU3KsHMhFe8M48bc1QSLW/ri5S1n+TEzuSuV
+	hr1HIDpCc4cmXnpZGjNSB/T7TeCjMkN8NU9SQKJYWd3XT88lGT1Gl7Ap6MyGCtxgNMc9XPJ7bix
+	LZ3DXmNbfmGsNmU4/mOzET2IwVKrzNxsQjNhtKJ5QW7VjmGJM0piFARz2Kg9naaHp9CmIe2a0Ai
+	ckiJ3+8fBbkXGzqLeCZf+dEqmR/F2ggeq42Ug0perCenLFSqdScBybHb05xHsJwvlZbXiEVaZw6
+	k=
+X-Google-Smtp-Source: AGHT+IFFcTDwDiDOtPqR3E7U5zaFBMKY2xjU8p4A7q0S2luPNaRMxTxNX+e7Cw9Osx+vABmjXj5K7A==
+X-Received: by 2002:a17:907:3ea6:b0:b04:3b97:f972 with SMTP id a640c23a62f3a-b167ea60331mr328183166b.3.1758033634639;
+        Tue, 16 Sep 2025 07:40:34 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0bf0334ab0sm635180366b.31.2025.09.16.07.40.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 07:40:34 -0700 (PDT)
+Date: Tue, 16 Sep 2025 07:40:28 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH iproute2-next 1/2] scripts: Add uapi header import
+ script
+Message-ID: <20250916074028.1e161f5d@hermes.local>
+In-Reply-To: <20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
+References: <20250909-feature_uapi_import-v1-0-50269539ff8a@bootlin.com>
+	<20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250916143847.GF3585920@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Sorry, fingers faster than brain!  With the corrected subject this time.
+On Tue, 09 Sep 2025 15:21:42 +0200
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-> Enjoy!
+> Add a script to automate importing Linux UAPI headers from kernel source.
+> The script handles dependency resolution and creates a commit with proper
+> attribution, similar to the ethtool project approach.
 > 
-> The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
+> Usage:
+>     $ LINUX_GIT="$LINUX_PATH" iproute2-import-uapi [commit]
 > 
->   Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git ib-mfd-gpio-hwmon-i2c-can-rtc-watchdog-v6.18
-> 
-> for you to fetch changes up to d463bb140583609f78f61d48c3dfb6f46c5cb062:
-> 
->   rtc: Add Nuvoton NCT6694 RTC support (2025-09-16 14:41:58 +0100)
-> 
-> ----------------------------------------------------------------
-> Immutable branch between MFD, GPIO, HWMON, I2C, CAN, RTC and Watchdog due for the v6.18 merge window
-> 
-> ----------------------------------------------------------------
-> Ming Yu (7):
->       mfd: Add core driver for Nuvoton NCT6694
->       gpio: Add Nuvoton NCT6694 GPIO support
->       i2c: Add Nuvoton NCT6694 I2C support
->       can: Add Nuvoton NCT6694 CANFD support
->       watchdog: Add Nuvoton NCT6694 WDT support
->       hwmon: Add Nuvoton NCT6694 HWMON support
->       rtc: Add Nuvoton NCT6694 RTC support
-> 
->  MAINTAINERS                         |  12 +
->  drivers/gpio/Kconfig                |  12 +
->  drivers/gpio/Makefile               |   1 +
->  drivers/gpio/gpio-nct6694.c         | 499 +++++++++++++++++++
->  drivers/hwmon/Kconfig               |  10 +
->  drivers/hwmon/Makefile              |   1 +
->  drivers/hwmon/nct6694-hwmon.c       | 949 ++++++++++++++++++++++++++++++++++++
->  drivers/i2c/busses/Kconfig          |  10 +
->  drivers/i2c/busses/Makefile         |   1 +
->  drivers/i2c/busses/i2c-nct6694.c    | 196 ++++++++
->  drivers/mfd/Kconfig                 |  15 +
->  drivers/mfd/Makefile                |   2 +
->  drivers/mfd/nct6694.c               | 388 +++++++++++++++
->  drivers/net/can/usb/Kconfig         |  11 +
->  drivers/net/can/usb/Makefile        |   1 +
->  drivers/net/can/usb/nct6694_canfd.c | 832 +++++++++++++++++++++++++++++++
->  drivers/rtc/Kconfig                 |  10 +
->  drivers/rtc/Makefile                |   1 +
->  drivers/rtc/rtc-nct6694.c           | 297 +++++++++++
->  drivers/watchdog/Kconfig            |  11 +
->  drivers/watchdog/Makefile           |   1 +
->  drivers/watchdog/nct6694_wdt.c      | 307 ++++++++++++
->  include/linux/mfd/nct6694.h         | 102 ++++
->  23 files changed, 3669 insertions(+)
->  create mode 100644 drivers/gpio/gpio-nct6694.c
->  create mode 100644 drivers/hwmon/nct6694-hwmon.c
->  create mode 100644 drivers/i2c/busses/i2c-nct6694.c
->  create mode 100644 drivers/mfd/nct6694.c
->  create mode 100644 drivers/net/can/usb/nct6694_canfd.c
->  create mode 100644 drivers/rtc/rtc-nct6694.c
->  create mode 100644 drivers/watchdog/nct6694_wdt.c
->  create mode 100644 include/linux/mfd/nct6694.h
-> 
-> -- 
-> Lee Jones [李琼斯]
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
--- 
-Lee Jones [李琼斯]
+This script doesn't handle the fact that kernel headers for iproute
+exist in multiple locations because rdma and vduse.
 
