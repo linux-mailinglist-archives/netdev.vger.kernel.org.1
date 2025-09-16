@@ -1,92 +1,75 @@
-Return-Path: <netdev+bounces-223594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78CB8B59A91
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:42:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD31DB59A9F
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6903716E637
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2931E167242
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A9F31B808;
-	Tue, 16 Sep 2025 14:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0D7313E39;
+	Tue, 16 Sep 2025 14:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7yIZDHE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P4X5dLLl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A9C28C84F
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 14:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A313081AE;
+	Tue, 16 Sep 2025 14:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758033340; cv=none; b=QUzeky6KLmMOMiZGnULgcbamnEmwDVXpwrh1yvhPxJ4eyhLuswDD/LoQktwFC1Y7V20nfK3TCchbOKW3WhAzvCXfwewhwa3AybWyDXapmhVSajS/AQeTKvBxbvrRypL1cB1byfy/Kw2Bw6c93kPpgWrYJac3Wl0HpaGQ27PlGLI=
+	t=1758033502; cv=none; b=NNzx5wFYSceZ6uvjjUbMWUtPubogqTgIxcuHIdp2c078gNybAcF/JwM3X8SFFe3zQIYvSuC9sNm/lpgjT2IG0UneP2wbjKq74okjZezmIi2NGZIgEwFVpCDpbb+BDTogmnPPGgsZjlX9s8GshCI+jOVK+SZRWLSrLG+WIf1avLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758033340; c=relaxed/simple;
-	bh=nh+rfaYH23FisXMTZy0AbxT1UHZAIUEFMBVA+YZOxjY=;
+	s=arc-20240116; t=1758033502; c=relaxed/simple;
+	bh=MjN8NM+9Mz20xb1nIlZpOEr/3Qh3fNWBkaaj1YjyEdc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qUgHza7pF0pSCwZoE5hhiDqB1yF3lIMKWcciz+9rl5B/p0TdV7bU7qIfRuYyiuMQI5iFdFdUI1YllSiwqwQrIql1vocVHP601tBgr/AQ1lrQIuoGRZ0JMYaYl/c21u1LsbmmjMs1giU2YgCEvFWD7soFokqAAM8TuZ+VDhKBspg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K7yIZDHE; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-45b9bc2df29so5212795e9.0
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 07:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758033337; x=1758638137; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PiACegxonOL+XxSJ3T2OwCjP6EWjOpVRSkXRaLRkEiE=;
-        b=K7yIZDHEJGWv62GRDK5YOYgsHrGyzJiLCHZZfYgSkBEaw9GYpvq6Z+FmqkWkBbqnVE
-         qGa7bitw3m0xD2M92QIxLa3uigJKDkr/Q1Pgbotpr9JQe/Tkl267xpwW8MekBO3a8KPC
-         Gn49F8bQnN4/qDMY8h9L59j0Q51Ty94fP6dK3cM8/NcyFdl08SZGyCoTGzBKA0siEwsb
-         Q9joDVROnPSyrvkWTINqJMkOD60lDgGkyyGszfnlDzUm2TRMWuBArXK2k1jEukAdrjk6
-         asT+fDM+ab16UY4lVjry+G0apKfLUGtNuhGdc4pIcb/k1l8gEVnYUu3LlhQ9EAqhtEdI
-         WfHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758033337; x=1758638137;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PiACegxonOL+XxSJ3T2OwCjP6EWjOpVRSkXRaLRkEiE=;
-        b=nUcKrZvj6wbNOgo83PU5DDGQ8bXmsEr5ph2+PKs/VKidXpVG7SsxXfBMmQ/ZRAJ533
-         6wa82lm3gsUl/5sgjXJzkl7wFCSIcs7mbtICB6XnGAsw9QZjnSCPioI8+dZkLGm5Xr6A
-         cqRLKU4D3fXjasgvCkY6wvuR35jG9j8yWfFmjjFN2abN97ivxKXwHCEWizFdZ0J+/pVF
-         Xli2EI3Zav/1at5ilZEmGlKK3JwzG56sPrCbcsJJLW3JAszybyZK7HPIHFzI0hoBlhXJ
-         VoZVJLrtyPx4MhMTae3n2QgTWDdrC/hJkamzuQaJtmylH6HbDSSB4cOGqOngTjMUcdwB
-         dpyw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuI9jAFYXvE6gZ80dPDk8x5N1a79bjI1oJqQQQP/XMGBkF9+NLjxKZgWrSvjULKCclufe2sjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOlEaCieHdWtCiYnDNB4ht42Xb9PhWnzH2igYy5j5TIs0xczag
-	NCcqffPtjhRCZANsAFijNQDFM8dMKNWLQ4A4s8JPWEl2byByKT/3+OzV
-X-Gm-Gg: ASbGncthGxG5i/lDz+Sdrrr+PlvK1mES0GwLLsk0KOZdjP6si58K0hSIELYupYrPF20
-	6BVB1bs0HXcfpPLnASj6619vOkq9edus8yh65E3bs59576GNuEdVz0ip+Iuaa6UeVrE5GXVuG/k
-	FA5rjp2pKnJ0VnVQQLq10RWXFCf9tY1DDm1OkfYKfMu8wSUmHpJqBwg+p/pc2vXlo80ZfND4krl
-	SgshFeKy+digARqFuMZcfNYcQXyvJCm950dGw/n7siLp/uaMAwIbLt/yJtyEQGV4e9QuaEF8VQf
-	tSNeePd/vQU3BSw1J6scRqlviDmWMfCYiOzSkQ/35TIu4S9smjXaOAyQvJr0xHt0gQZg9SeylIZ
-	n9DWV66OJuLfaZDs=
-X-Google-Smtp-Source: AGHT+IEDQ9H77WIyx0CUbsnB6V/0is5YXI2rXFKa/FK49p3xCH+rakNhgdjzq4WG/+gUAsD4xFaFlg==
-X-Received: by 2002:a05:600c:5492:b0:45d:d39b:53e4 with SMTP id 5b1f17b1804b1-45f29356ca0mr49567505e9.8.1758033336406;
-        Tue, 16 Sep 2025 07:35:36 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:2310:283e:a4d5:639c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f325a32f6sm18441425e9.2.2025.09.16.07.35.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 07:35:35 -0700 (PDT)
-Date: Tue, 16 Sep 2025 17:35:33 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AdfmPN2yUhvvtc6ENFkdQsCZKsOgmjohV9EEblIfXiWEUK71vufxwNhtQ+cESFZzhAaXU2OgvKTYeRNnD4pfRtGQ4zW+GcHxLu8FOLa8j80OiKwkoa+Z+SjDtHD9yb75Kp6gTW1ELGz7HfPx0ZkLi18QBrW804vD8EkOx+64HsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P4X5dLLl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=M6rgThuM1WGuVWDhs++mootFR4ZaiAUjcCQGb6p8Tss=; b=P4X5dLLlT8VyoF4RIlX15OQY1w
+	NSvr5fdoleoIJbcE58nozjiIy5z0pribctXcYMd9koR2tvsswbhZE6PoV1ZjimQkogS6SYgmXg6H4
+	/+RgV2Ix4nHkXjOpLmfwenkHqoVlDPLQhA1NdH8C3IwB2raG7FxB29aoR1t0lBRCf34s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uyWos-008Zkp-6q; Tue, 16 Sep 2025 16:38:10 +0200
+Date: Tue, 16 Sep 2025 16:38:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+Cc: Wei Fang <wei.fang@nxp.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Woodhouse <dwmw2@infradead.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next 1/5] net: dsa: mv88e6xxx: rename TAI definitions
- according to core
-Message-ID: <20250916143533.3jqqlpyp62gjwhh7@skbuf>
-References: <aMgPN6W5Js5ZrL5n@shell.armlinux.org.uk>
- <E1uy8uN-00000005cF5-24Vd@rmk-PC.armlinux.org.uk>
- <20250916084645.gy3zdejdsl54xoet@skbuf>
- <aMlnwFGS-uBbBzRF@shell.armlinux.org.uk>
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Nick Shi <nick.shi@broadcom.com>, Paolo Abeni <pabeni@redhat.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	"Y.B. Lu" <yangbo.lu@nxp.com>
+Subject: Re: [PATCH net-next 2/2] ptp: rework ptp_clock_unregister() to
+ disable events
+Message-ID: <ac7c6c84-02e6-4e3d-8c38-abd5339a021d@lunn.ch>
+References: <aMglp11mUGk9PAvu@shell.armlinux.org.uk>
+ <E1uyAP7-00000005lGq-3FqI@rmk-PC.armlinux.org.uk>
+ <PAXPR04MB851098C0A69B74DD232071B68814A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <aMloTwObRUIRAzPF@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,52 +78,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aMlnwFGS-uBbBzRF@shell.armlinux.org.uk>
+In-Reply-To: <aMloTwObRUIRAzPF@shell.armlinux.org.uk>
 
-On Tue, Sep 16, 2025 at 02:36:00PM +0100, Russell King (Oracle) wrote:
-> On Tue, Sep 16, 2025 at 11:46:45AM +0300, Vladimir Oltean wrote:
-> > On Mon, Sep 15, 2025 at 02:06:15PM +0100, Russell King (Oracle) wrote:
-> > >  /* Offset 0x09: Event Status */
-> > > -#define MV88E6XXX_TAI_EVENT_STATUS		0x09
-> > > -#define MV88E6XXX_TAI_EVENT_STATUS_ERROR	0x0200
-> > > -#define MV88E6XXX_TAI_EVENT_STATUS_VALID	0x0100
-> > > -#define MV88E6XXX_TAI_EVENT_STATUS_CTR_MASK	0x00ff
-> > > -
-> > >  /* Offset 0x0A/0x0B: Event Time */
+On Tue, Sep 16, 2025 at 02:38:23PM +0100, Russell King (Oracle) wrote:
+> On Tue, Sep 16, 2025 at 09:03:17AM +0000, Wei Fang wrote:
+> > > the ordering of ptp_clock_unregister() is not ideal, as the chardev
+> >  ^
+> > Nit: Uppercase, 't' -> 'T'
 > > 
-> > Was it intentional to keep the comment for a register with removed
-> > definitions, and this placement for it? It looks like this (confusing
-> > to me):
+> > > +void ptp_disable_all_pins(struct ptp_clock *ptp)
+> > > +{
+> > > +	struct ptp_clock_info *info = ptp->info;
+> > > +	unsigned int i;
+> > > +
+> > > +	mutex_lock(&ptp->pincfg_mux);
 > > 
-> > /* Offset 0x09: Event Status */
-> > /* Offset 0x0A/0x0B: Event Time */
-> > #define MV88E6352_TAI_EVENT_STATUS		0x09
+> > Currently ptp_chardev.c has been converted to use the auto-cleanup
+> > API (scoped_cond_guard()), so scoped_guard() can be used here.
 > 
-> Yes, totally intentional.
-> 
-> All three registers are read by the code - as a single block, rather
-> than individually. While the definitions for the event time are not
-> referenced, I wanted to keep their comment, and that seemed to be
-> the most logical way.
+> ... which are very non-C like, non-obvious, and I currently have no
+> idea at the moment how to use it. In my opinion, it makes code more
+> difficult to understand.
 
-What I don't find so logical is that the bit fields of MV88E6352_TAI_EVENT_STATUS
-follow a comment which refers to "Event Time".
++1
 
-Do we read the registers in a single mv88e6xxx_tai_read() call because
-the hardware requires us, or because of convenience? For writes, we
-write only a single u16 corresponding to the Event Status, so I suspect
-they are not completely indivisible, but I don't have documentation to
-confirm.
+Plain scoped_guard() is not too magical and reasonably
+understandable. But ptp_chardev.c is using scoped_conf_guard() which
+is much more magical and i have no idea what it does.
 
-This is more of what I was expecting.
+> Maybe someone else can convert this for me to this non-C like
+> structure?
 
-/* Offset 0x09: Event Status */
-#define MV88E6352_TAI_EVENT_STATUS		0x09
-#define MV88E6352_TAI_EVENT_STATUS_CAP_TRIG	0x4000
-#define MV88E6352_TAI_EVENT_STATUS_ERROR	0x0200
-#define MV88E6352_TAI_EVENT_STATUS_VALID	0x0100
-#define MV88E6352_TAI_EVENT_STATUS_CTR_MASK	0x00ff
-/* Offset 0x0A/0x0B: Event Time Lo/Hi. Always read together with Event Status */
+Yes, if you want to write plain simple code, I submit it so. Somebody
+else can follow up with an obfuscation patch.
 
-Anyway, this is not so important.
+     Andrew
 
