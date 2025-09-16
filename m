@@ -1,148 +1,93 @@
-Return-Path: <netdev+bounces-223599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF505B59AA8
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1023DB59ABC
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8ECE3B56F6
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:42:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 895961695C4
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CFD3054C5;
-	Tue, 16 Sep 2025 14:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA343375C0;
+	Tue, 16 Sep 2025 14:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="y4MK9gcD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lTDC3X4b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E712F6598
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 14:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED7932F77B;
+	Tue, 16 Sep 2025 14:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758033722; cv=none; b=MteaECsPDlFFrey/qU0Adw2tZrEaGZ4/kz3mgNUN4erXMMmIVJde6MTemc2wbpMEQE58w1zp1aQOHq2tdPwt/9CxzyLTHvuuBSYFFmgcIsW1Lw/FRkXvk63X8y9oUj524hWHjW+ZZlAqA/3huyOn6fuh3sWj9vghKoP5wu8FuaU=
+	t=1758033782; cv=none; b=etP7oUjiPNw3K4IaVrv8H35EKzfVJx8RUOm1xpZ1WR2UHgyr/5G+I8sjGnS++A8MrHvBKC8Y/3Z5GLFeh4tUalsChrm0IB+8nlSJP6N3ownBFSUntGZy2JNSB7qqDtczm5NeGcR4l6snYZXBJ9r6fQ1+cOMZ5aBg/JaXGu0r1QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758033722; c=relaxed/simple;
-	bh=X+YYV6m315BJrq5g9Y6qrALYP7pmjMtRpYkpKDaxQjA=;
+	s=arc-20240116; t=1758033782; c=relaxed/simple;
+	bh=9CXMfeWckRDvBvDHG9XadDvfadOIeWKQ5x4Hda3B4pA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nzzu5pjAfJSFE3scaNFvTu1hgG343vohH6F8wwBTpbsH99iqF/EwWjFynujhJCG4tVpg/POEC5ORWJls9DLkjo1vTeYBLmhkoCwFvx0+GgUQC4r7lcWQs0jstKTa9ygJvqgCopUZ0nnNNCiSI+jqUn2cSF1gAZ6NoO8TnsXe3zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=y4MK9gcD; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-78defc1a2afso4218676d6.2
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 07:41:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1758033719; x=1758638519; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u+pRG4uKKvAD1hAGCQi66sw0UlVJv0iD8922lD8ndJU=;
-        b=y4MK9gcDb9czQSsfz2vVM73In+dZcB93tGoi87su/rw6h25NGJ8BBykwuzyMJsDW4a
-         mpGBBcU5Kbn0W5qRHz85b+qykgT0osBOr1PA309IBv6+4nTM9Pk8Zzs/dtCG/Ty8xpRB
-         EKNVOqq3wR6PTCHMD358fA75sxHN38JlzOeUhrYo1rUBm2RcVnpBmnias2wDzIpNOfAS
-         XTpr+9m7pqUltycVaWgcVCYNpUMVfJXhO/FqfGibG11KSCHtPmdXKsY42K0XAj/KA1Z2
-         1YL0ncS4IJF+aacn8PEU8vk/77kdBhbpTA7mUl8NSfzeTiCXq4mZt37ShWUsomPorZkB
-         TlKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758033719; x=1758638519;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u+pRG4uKKvAD1hAGCQi66sw0UlVJv0iD8922lD8ndJU=;
-        b=WIJAiQkwUJp3UPBwrn3dVZ4zLOtYdIyWA7gx5xcVUYcJaSaT7UNwzoYir9BJFdIitk
-         XJYIUdixgkFy4UJxDwlxZqSkIfa81lz8okhmwWgt7RGMb+kHbx31WuaQ6EL7ptgMc9hf
-         tEKfzi2L1h8yhkLsAQKeaNCLaE69VPWw6Cz/LdiliALIBmMQqDzI3me8nS/RVvZIR1Ds
-         0uk5UlEWX0VLbxvOC+Jt9wnnh+y4HHQTNfdeq+gWQQmTvWP7X9DaNNJXImIFJKJVCQv0
-         MgAbK9rH11dhJy0X+PQyvBX07jQAj8eWAFARqDN8s4nJ4WAr4ozYhj3FuFkzt/DT1T7R
-         Zeww==
-X-Forwarded-Encrypted: i=1; AJvYcCVzarpt+ShxQrR6hxn2PVUcnUIcFFLALCVpwDlYaUJqCmR0P9hrLf4fjCgj9lei3wJhXs0UCkk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhdSRL2wzT9yTw4ExiPWUllX5LEdp15OMnpNu3qOrhvpE6ut4L
-	lpTbNruE6lPlrupHDaa78NVQGx0wLramZHIrLt4+qCg5TEMDcpzLOO7dVz+RxVM1ePg=
-X-Gm-Gg: ASbGncvVwafELtxgwGJQbtEYIYY+45Kp1Exmw0eBzOFgGIZwdmVcNUeRBSuzVD/iy0r
-	BbvutX3ytUvlbVYd4ZZG/JGC1c8YvRyRdPNKNS5oafg6n+H0ZkgBed1OJqTtQcC9euCxaSXOf8Y
-	0eXa4r0anWUK/adq+6p9KY7vAvGBeOBJaNacG/jYO2FeSRHgstZKEEdag7l6gdYt2bKWi2B/2f7
-	ElTEu1bRnmGNe7ntBgwxyA5rBVE1CW7Zv3IE9cz4Z6tRAsnd8otOX5yWOTkCTv2c8kWiVaJVgoO
-	rorg+pEy+BnL6fZbtGEAaz9rGz/twzbeILc9yQUFSSAe1Wc7doJpQiSpzLsZNZzeZ2upjKLaLlQ
-	yn7Jcr4RUxs54Q1FVQDiSo7gdkmRhuGZ0AAzdrJASgVimh0s8kULx6mzBKehgmfZcsfz3erAUvn
-	gTEiKxE0+9qg==
-X-Google-Smtp-Source: AGHT+IGU5qT6hTkVD3zlyzUVtmJ12JjDOu2eiegpz9xAgrxztoAs8qTwOTdY7X0Qwe8dLwzUevDPyw==
-X-Received: by 2002:a05:6214:21a5:b0:78d:96e1:ac50 with SMTP id 6a1803df08f44-78d96e1adb0mr21339036d6.64.1758033718912;
-        Tue, 16 Sep 2025 07:41:58 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-787f7ee380csm29356246d6.11.2025.09.16.07.41.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 07:41:58 -0700 (PDT)
-Date: Tue, 16 Sep 2025 07:41:55 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH iproute2-next 1/2] scripts: Add uapi header import
- script
-Message-ID: <20250916074155.48794eae@hermes.local>
-In-Reply-To: <20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
-References: <20250909-feature_uapi_import-v1-0-50269539ff8a@bootlin.com>
-	<20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
+	 MIME-Version:Content-Type; b=Do0ETyFFpqAX7ZjSVF5v5BckdPP8i56Djr6Ixy+Ri2pqwPNksKeTo0Il5GeuzfuDWwXkNFYzshTturtlLCWX6fu6QV7siN08kIJHT1R4Di3QO65GVIaVvAmoAhpb1jMltwsG6uMV98yiYqU7/4dMKFJoyBOM1xUpWaTlfnpanig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lTDC3X4b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35D1AC4CEEB;
+	Tue, 16 Sep 2025 14:43:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758033780;
+	bh=9CXMfeWckRDvBvDHG9XadDvfadOIeWKQ5x4Hda3B4pA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lTDC3X4bKxLH2t/3/4Y1FMq57qD4H2OA8iFV5D7XfOCnxgFbuRlQWLN/hgpT0ImnX
+	 XArmcMufNimUat9F7TQKapLm+ELbpmklb0OWALKXJvBKsQRYLfGoVnidWBde3LZb4u
+	 +6cOQPLpG29uGuNg7Dz+ZmxNBtUohnMIWCMmJSU/KxR4YX2+AE+f8nXaG1aF3fPnnC
+	 tz74rwSPDLG2tPkFevWux32vJJ6FQDz6yhAW3q9bxInrfpoLmXvAOMHiGRCmurTHaO
+	 2RFSdVF8t8RN02HZ4K5u/c4zs704H6+hiBtf54LWD3+jtIC/UOJQk5O6K10seTjvtU
+	 flFvejGWLWdcQ==
+Date: Tue, 16 Sep 2025 07:42:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>, "Russell King (Oracle)"
+ <linux@armlinux.org.uk>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Hubert =?UTF-8?B?V2nFm25pZXdza2k=?=
+ <hubert.wisniewski.25632@gmail.com>, stable@vger.kernel.org,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, Xu Yang
+ <xu.yang_2@nxp.com>, linux-usb@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
+ PM to avoid MDIO runtime PM wakeups
+Message-ID: <20250916074259.509382a8@kernel.org>
+In-Reply-To: <aMkPMa650kfKfmF4@pengutronix.de>
+References: <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
+	<b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
+	<aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
+	<20250911075513.1d90f8b0@kernel.org>
+	<aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
+	<22773d93-cbad-41c5-9e79-4d7f6b9e5ec0@rowland.harvard.edu>
+	<aMPawXCxlFmz6MaC@shell.armlinux.org.uk>
+	<a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
+	<aMQwQAaoSB0Y0-YD@shell.armlinux.org.uk>
+	<aMUS8ZIUpZJ4HNNX@pengutronix.de>
+	<aMkPMa650kfKfmF4@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 09 Sep 2025 15:21:42 +0200
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+On Tue, 16 Sep 2025 09:18:09 +0200 Oleksij Rempel wrote:
+> Given autosuspend brings no measurable benefit here, and it hasn=E2=80=99=
+t been
+> effectively functional for this device in earlier kernels, I suggest a mi=
+nimal
+> -stable patch that disables USB autosuspend for ASIX driver to avoid the
+> PM/RTNL/MDIO issues. If someone needs autosuspend-based low-power later, =
+they
+> can implement a proper device low-power sequence and re-enable it.
+>=20
+> Would this minimal -stable patch be acceptable?
 
-> Add a script to automate importing Linux UAPI headers from kernel source.
-> The script handles dependency resolution and creates a commit with proper
-> attribution, similar to the ethtool project approach.
-> 
-> Usage:
->     $ LINUX_GIT="$LINUX_PATH" iproute2-import-uapi [commit]
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
-
-Script I use is much simpler.
-
-#! /bin/bash
-# script to copy sanitized kernel headers
-
-if [ $# -ne 1 ]; then
-   echo "Usage: $0 kernel-directory"
-   exit 1
-fi
-
-SRC=$1
-if [ ! -r $SRC/usr/include/linux/rtnetlink.h ]; then
-   echo "$SRC is missing headers"
-   exit 1
-fi
-
-if [ ! -r include/uapi/linux/rtnetlink.h ]; then
-    echo "$PWD is not iproute2 source"
-    exit 1
-fi
-
-for subdir in . rdma vdpa
-do	   
-    DST=$subdir/include/uapi
-    echo Checking $DST
-
-    (cd $DST; find . -type f) | \
-	while read f
-	do
-	    from=$SRC/usr/include/$f
-	    to=$DST/$f
-	    if ! cmp -s $from $to
-	    then
-		echo Updating $f
-		cp $from $to
-	    fi
-	done
-done
+SGTM
 
