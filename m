@@ -1,131 +1,100 @@
-Return-Path: <netdev+bounces-223666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBE9AB59DD1
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:35:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAD1BB59DF1
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:43:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 936241C01397
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:35:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A1E8323E80
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8FF31E88A;
-	Tue, 16 Sep 2025 16:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025FF31E8AD;
+	Tue, 16 Sep 2025 16:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lc4uTPT5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="22RQ88Lj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBD331E886
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2789431E89B;
+	Tue, 16 Sep 2025 16:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758040522; cv=none; b=CJ2J473ClL0kXC/v8R46x/gb4I33ffBdCfnS81lTqRzHR+klSDrDb+RI2qUwrAMp6YA/qsxdAehsspFBh0Jy3SjhKdzvEP0gyZCfOgJO0KT6PMFVKRngoIiTI3Ha6VbXU+NIcdY1UKaUnzUURil8Bc1i331C9OxxRMSGC9Kfswg=
+	t=1758041007; cv=none; b=b6Z3iVHpsFsQ2nJANPfOugc9PxSxe8n6pA4knlK+0PmzV0GOjdpotrz3LLO7BgG4ZrwICh5hChPsFWhhL/iMUNjKp1WJc8MBgq/JAQkgZ37JZ6MUSkqEgM4GSCO05dq7+/9Q9Lf4NOXkEViAE9Gw15Mk9ucDVYsdhS5mTMP7k+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758040522; c=relaxed/simple;
-	bh=W9pIZSJJd90LkruG1/ysGwyisU1HWLXk6DyjzcXgGco=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sSZrZSP5zhaAphIArBy6n2vihe4D16nclWIDe2SH+kYhlXp5eLzcbD7P/rFXpN8MMIMpnJcGugUZvGM8dJPuuRmahAX87TojB13LMJO0vQVV70JJfxHkuTJXQ/qcNDhWu2qX9E50+WZKKjQgt3i0KriNQ5hkNRb9F+6vqq25EuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lc4uTPT5; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-71d603b60cbso51343457b3.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:35:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758040519; x=1758645319; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kuKVeqxC1e52+9KOcIW3A/OViu0706QA58Vh/Z8d+28=;
-        b=lc4uTPT5iwLZIq6+Gfq0UVeORPzREqdfb1aSTO7FcygpGRNA8ncWVK7xfEII22VjLh
-         G2yxwZge52CfSzodHF5RR53aTIo8/9zJK1Fo/dI8l6qh0yHlMUkjKjk0lSMJIFBVMn6K
-         +UBnFZHhd8y5wZ4mNGTTYjYoiKXfj+Qlm5vW/V8CAJmWCRufyMcIsWIzVNaGG9jsAtYL
-         v26JzRAQIN4nK2S98tSMXGPefHwOVWNnI3m5kelfJnSKIGpikBxdgnSwqYXgCjajOFhQ
-         SkJLQcu7ld30R3q5sUYwfhDG7B/vd8D8Vj3SSCdeA1duVu6mzGhIw0F9nSXCKsHrQ0tD
-         uu8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758040519; x=1758645319;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kuKVeqxC1e52+9KOcIW3A/OViu0706QA58Vh/Z8d+28=;
-        b=ZtH5eXg4uilaassMJWkPv/1UNvEy0l7QmfCNqB48WVbhU1Ez5Pbq4X4ESnLl9V/ryK
-         lx8ozbPMpXZvp+6w8+Ay5ouZd0RHMtGr+uqVjLcSHU4L81DgyWZOutwrd01uOsEARg5t
-         iG9nQunyZdr9INGxQYuZCROzVHLaFQ69R5zcC3Is9jSHL9bTAtb7fg5+6D2RirsYPwAU
-         TAVIehZETheDXimnkyMJFpgPdsESYbTpIecGo3BLa94VrtrjYWflpPdnRPxZaJs3PNg8
-         GTOWg+j3ngZBFL+5T25o8dQyDPm/sj1M2b+vXtjKS4DZgn+DWtCtdMfjLHdGo4n4cziQ
-         KjLg==
-X-Gm-Message-State: AOJu0Yx2Ecn0er/dTJCIamgKnbhINVrAjlteNAzAn8XsYVJGuCsNhHxZ
-	9Gq5ktoTNjq3TE188Hq1IhK8Jdfyc7JSDDl/5t+AcGPZ0Ei1THQx+hck
-X-Gm-Gg: ASbGnctzSn9gCKPGMegnEVoWU3oOYHIHP8mfTxQWOgTrsgk6On/SGp0qPYXt6QiqG68
-	AJmaOLULeOsWoReK7MEIGQfMFT0sAV9QW9Wrox+ahJgRfxVjX96ZIE8bGEDfRviGts+nF1JjIva
-	iPtbd3Xsd+V3XDRj8OZ7+nLOtdMd8WIbn2E7lyjzvJO3nKoPVfxLWV/UfBXLEaZ4XSr5MlL80Da
-	0JUGuSbHJem33f4nrmlYmwBqt/eV8S2ev0WkO6vKMZfZXMjXck1TRh0r1wz22BTHhydcSyKjn3b
-	OwLhLlZnACPz2LZXX2EqEL6eBZ4W/oCfwqXXB6200nkxnfw9/s0c8zV6KHaxFN/RicCI5SiTyK9
-	b1q5bmDVFHWEvCTWwULwY1gYiqjq/xQT3YdilBV+B+VOl7G0jtqYhSHSxdA==
-X-Google-Smtp-Source: AGHT+IELK6d8jAkr7WzE3/g8PvsLx8V6BOoNS9QvY2+YNcoJ5bf+I2q1PR/+pmVM3steyyY7/7i/0A==
-X-Received: by 2002:a05:690c:4912:b0:725:39d:a31a with SMTP id 00721157ae682-730652dd1dfmr178212297b3.27.1758040519218;
-        Tue, 16 Sep 2025 09:35:19 -0700 (PDT)
-Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6247490a012sm4214557d50.0.2025.09.16.09.35.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 09:35:18 -0700 (PDT)
-From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	"Yury Norov (NVIDIA)" <yury.norov@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND net-next v2] net: renesas: rswitch: simplify rswitch_stop()
-Date: Tue, 16 Sep 2025 12:35:16 -0400
-Message-ID: <20250916163516.486827-1-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1758041007; c=relaxed/simple;
+	bh=X+A5QepVxxB/C4oNxZOIEjs1x4Gld77ngaDhdwgfJgs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lrpK9qLhOow2Q6/q+NQUr/u7rRuKLgDxyOgvZckuRdcNXAGgdzGNwjgpqBPgx6UwcwpRIrj0/0CLLyVelYalVXVHYMivFhBxLloVdY9970t1wb6ehyBlp0RpNKLaxbWCX2l7CzXiLxWySIHBMhjJlWz3qlhDJwWe3RPeZnV4yJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=22RQ88Lj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ujqmExvwfuuSaiII8kWPHE54Lu5K+HYfHMgIwgz3ujA=; b=22RQ88LjeOArVk8mpNe1j9rroF
+	RewwsSuOMlgqLrn7G6B+h3ig9x48M9UpRfV3pCCwZWXLAurtqTVLq2zKFKx8BzmrheF10kFLNGZqq
+	0ilHdprkMWIV0bvlvgBAchRwQmPVtnvn6DUhk6GhD0uimcEana4WqkwaEIYAmIBKe2Z8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uyYm0-008ahz-BY; Tue, 16 Sep 2025 18:43:20 +0200
+Date: Tue, 16 Sep 2025 18:43:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
+	sbhatta@marvell.com, naveenm@marvell.com, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, bbhushan2@marvell.com
+Subject: Re: Query regarding Phy loopback support
+Message-ID: <3b76cc60-f0c5-478b-b26c-e951a71d3d0b@lunn.ch>
+References: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
 
-rswitch_stop() opencodes for_each_set_bit().
+On Tue, Sep 16, 2025 at 04:48:56PM +0530, Hariprasad Kelam wrote:
+> We're looking for a standard way to configure PHY loopback on a network 
+> interface using common Linux tools like ethtool, ip, or devlink.
+> 
+> Currently, ethtool -k eth0 loopback on enables a generic loopback, but it 
+> doesn't specify if it's an internal, external, or PHY loopback. 
+> Need suggestions to implement this feature in a standard way.
 
-CC: Simon Horman <horms@kernel.org>
-Reviewed-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
----
-v1: https://lore.kernel.org/all/20250913181345.204344-1-yury.norov@gmail.com/
-v2: Rebase on top of net-next/main
+What actually do you mean by PHY loopback?
 
- drivers/net/ethernet/renesas/rswitch_main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+88e1118R supports two different loopbacks. It can do the loop at the
+PCS, looping packets from the MAC back to the MAC. Or it can do the
+loop at the PCS, looping packets from the media back to the media and
+also deliver them to the MAC.
 
-diff --git a/drivers/net/ethernet/renesas/rswitch_main.c b/drivers/net/ethernet/renesas/rswitch_main.c
-index ff5f966c98a9..69676db20fec 100644
---- a/drivers/net/ethernet/renesas/rswitch_main.c
-+++ b/drivers/net/ethernet/renesas/rswitch_main.c
-@@ -1656,9 +1656,7 @@ static int rswitch_stop(struct net_device *ndev)
- 	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
- 		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
- 
--	for (tag = find_first_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT);
--	     tag < TS_TAGS_PER_PORT;
--	     tag = find_next_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT, tag + 1)) {
-+	for_each_set_bit(tag, rdev->ts_skb_used, TS_TAGS_PER_PORT) {
- 		ts_skb = xchg(&rdev->ts_skb[tag], NULL);
- 		clear_bit(tag, rdev->ts_skb_used);
- 		if (ts_skb)
--- 
-2.43.0
+The 88e1510 has a slight different loopback. When used with copper, it
+can loopback frames from the MAC back to the MAC in the copper
+PCS. When used with Fibre is can loopback frames from the MAC to the
+MAC in the fibre PCS. Additionally, it can loop back frames from the
+MAC in the SERDES layer. And it can loopback frames from the media
+back out the media.
 
+From what a know of the aquantia PHY, it can loopback frames from the
+MAC at the PCS or the PMA. And frames from the media can be looped
+back at the PMA or the PCS.
+
+I expect other vendors have a similar set of different places they can
+do loopback, probably with variations.
+
+Or do you simply mean as defined in 802.3, c22.2.4.1.2? And
+c45.2.1.1.4, C45.2.1.1.5, taking into account c45.2.1.7.15 and
+c45.2.1.12.1? And c45.2.1.18.1, c45.2.1.21.1, c45.2.1.22.1,
+c45.2.1.231.6, c45.2.1.232.1, c45.2.1.234.5, c45.2.1.235.1, ...
+
+	Andrew
 
