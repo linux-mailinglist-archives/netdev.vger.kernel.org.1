@@ -1,93 +1,101 @@
-Return-Path: <netdev+bounces-223600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1023DB59ABC
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:47:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B02BB59AC6
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:49:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 895961695C4
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:43:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 716B21B21126
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA343375C0;
-	Tue, 16 Sep 2025 14:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0519A3469FF;
+	Tue, 16 Sep 2025 14:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lTDC3X4b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aA+2vuDf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED7932F77B;
-	Tue, 16 Sep 2025 14:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6FE345752;
+	Tue, 16 Sep 2025 14:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758033782; cv=none; b=etP7oUjiPNw3K4IaVrv8H35EKzfVJx8RUOm1xpZ1WR2UHgyr/5G+I8sjGnS++A8MrHvBKC8Y/3Z5GLFeh4tUalsChrm0IB+8nlSJP6N3ownBFSUntGZy2JNSB7qqDtczm5NeGcR4l6snYZXBJ9r6fQ1+cOMZ5aBg/JaXGu0r1QQ=
+	t=1758034100; cv=none; b=W251eaXOa2+iSwPwegOPzwCajxDRX6+R4kg8hhwBC52mf1JrQwlltH4IUnBF5FZJFrS1Iq81Ki/KF71/b6rAeJWPaF9Y0QXVHFnpv6g/eK156QU+OR+CjhrKY8IvJ5ZFqd8HMxOcHb1KjmMOaiCNcLRabtqxvMnuPux0cyHnMq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758033782; c=relaxed/simple;
-	bh=9CXMfeWckRDvBvDHG9XadDvfadOIeWKQ5x4Hda3B4pA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Do0ETyFFpqAX7ZjSVF5v5BckdPP8i56Djr6Ixy+Ri2pqwPNksKeTo0Il5GeuzfuDWwXkNFYzshTturtlLCWX6fu6QV7siN08kIJHT1R4Di3QO65GVIaVvAmoAhpb1jMltwsG6uMV98yiYqU7/4dMKFJoyBOM1xUpWaTlfnpanig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lTDC3X4b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35D1AC4CEEB;
-	Tue, 16 Sep 2025 14:43:00 +0000 (UTC)
+	s=arc-20240116; t=1758034100; c=relaxed/simple;
+	bh=CXrQbmAAPCdFfNP2ODalbJjSr2f4p5P/pB6C9b016xM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUOYy3Cwu+6nem5iljelvdhv+puP2NMk/CWyhUPaFQVnQs6BVtd65OqOeN4iaQ55khqVKtvfA4l6IrEuQmXNcCE8bOPWDWk8lWCl2/rsfjsX1pIUAqPCrU/pO2LPUCTQv3ePYyo3o32C957w1rJ16qmxYN4aFH06cRdwLtvgPpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aA+2vuDf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB11C4CEEB;
+	Tue, 16 Sep 2025 14:48:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758033780;
-	bh=9CXMfeWckRDvBvDHG9XadDvfadOIeWKQ5x4Hda3B4pA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lTDC3X4bKxLH2t/3/4Y1FMq57qD4H2OA8iFV5D7XfOCnxgFbuRlQWLN/hgpT0ImnX
-	 XArmcMufNimUat9F7TQKapLm+ELbpmklb0OWALKXJvBKsQRYLfGoVnidWBde3LZb4u
-	 +6cOQPLpG29uGuNg7Dz+ZmxNBtUohnMIWCMmJSU/KxR4YX2+AE+f8nXaG1aF3fPnnC
-	 tz74rwSPDLG2tPkFevWux32vJJ6FQDz6yhAW3q9bxInrfpoLmXvAOMHiGRCmurTHaO
-	 2RFSdVF8t8RN02HZ4K5u/c4zs704H6+hiBtf54LWD3+jtIC/UOJQk5O6K10seTjvtU
-	 flFvejGWLWdcQ==
-Date: Tue, 16 Sep 2025 07:42:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>, "Russell King (Oracle)"
- <linux@armlinux.org.uk>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Hubert =?UTF-8?B?V2nFm25pZXdza2k=?=
- <hubert.wisniewski.25632@gmail.com>, stable@vger.kernel.org,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, Xu Yang
- <xu.yang_2@nxp.com>, linux-usb@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: drop phylink use in
- PM to avoid MDIO runtime PM wakeups
-Message-ID: <20250916074259.509382a8@kernel.org>
-In-Reply-To: <aMkPMa650kfKfmF4@pengutronix.de>
-References: <CGME20250911135853eucas1p283b1afd37287b715403cd2cdbfa03a94@eucas1p2.samsung.com>
-	<b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com>
-	<aMLfGPIpWKwZszrY@shell.armlinux.org.uk>
-	<20250911075513.1d90f8b0@kernel.org>
-	<aMM1K_bkk4clt5WD@shell.armlinux.org.uk>
-	<22773d93-cbad-41c5-9e79-4d7f6b9e5ec0@rowland.harvard.edu>
-	<aMPawXCxlFmz6MaC@shell.armlinux.org.uk>
-	<a25b24ec-67bd-42b7-ac7b-9b8d729faba4@rowland.harvard.edu>
-	<aMQwQAaoSB0Y0-YD@shell.armlinux.org.uk>
-	<aMUS8ZIUpZJ4HNNX@pengutronix.de>
-	<aMkPMa650kfKfmF4@pengutronix.de>
+	s=k20201202; t=1758034098;
+	bh=CXrQbmAAPCdFfNP2ODalbJjSr2f4p5P/pB6C9b016xM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aA+2vuDfTgddzPeBptarS26VSs2gOVvvWeCJidsDEFuhceBFFXaZoUfCAlDweUfT1
+	 mlgDfeVZwNrVasQtVBkCMuc6DgH3LGcdulTfXxjv543vcfT9TCCkqG/GK8pWbJ97L8
+	 lU3R8ybSsKQJKsvZnScxtt5vznQBGm3sJIh0ljmDqjWGaKKTzd6+aVxNAqQaQ/l3FT
+	 ka0LdD/6nU924r98Oa2j5sae9SKBEJI0BFAp19dQFmP3G3LY27RejTCRSpRdP83bYm
+	 bxKqrAHBSs1CliE39wz6S/n6JuQn4WotAlzjjbgERtW2CN7ziFtpqkOpBvRasC2Xz3
+	 YUZ76AZTaKt0A==
+Date: Tue, 16 Sep 2025 15:48:13 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re:
+Message-ID: <20250916144813.GG224143@horms.kernel.org>
+References: <20250915195231.403865-1-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250915195231.403865-1-yury.norov@gmail.com>
 
-On Tue, 16 Sep 2025 09:18:09 +0200 Oleksij Rempel wrote:
-> Given autosuspend brings no measurable benefit here, and it hasn=E2=80=99=
-t been
-> effectively functional for this device in earlier kernels, I suggest a mi=
-nimal
-> -stable patch that disables USB autosuspend for ASIX driver to avoid the
-> PM/RTNL/MDIO issues. If someone needs autosuspend-based low-power later, =
-they
-> can implement a proper device low-power sequence and re-enable it.
->=20
-> Would this minimal -stable patch be acceptable?
+On Mon, Sep 15, 2025 at 03:52:31PM -0400, Yury Norov (NVIDIA) wrote:
+> Subject: [PATCH net-next v2] net: renesas: rswitch: simplify rswitch_stop()
+> 
+> rswitch_stop() opencodes for_each_set_bit().
+> 
+> CC: Simon Horman <horms@kernel.org>
+> Reviewed-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+> ---
+> v1: https://lore.kernel.org/all/20250913181345.204344-1-yury.norov@gmail.com/
+> v2: Rebase on top of net-next/main
+> 
+>  drivers/net/ethernet/renesas/rswitch_main.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
-SGTM
+Hi Yury,
+
+I see this marked as Changes Requested in Patchwork.
+But no response on the netdev ML. So I'll provide one.
+
+Unfortunately it seems that the posting is slightly mangled,
+there was no Subject in the header (or an empty one), and what
+was supposed to be the Subject ended up at the top of the body.
+
+I'm wondering if you could repost with that addressed,
+being sure to observe the 24h delay between postings.
+
+Thanks!
+
+...
 
