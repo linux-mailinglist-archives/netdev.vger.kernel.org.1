@@ -1,244 +1,118 @@
-Return-Path: <netdev+bounces-223688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15BB0B5A0DC
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:00:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52354B5A0E9
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 843761C04822
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:01:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E403C1C04D12
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C7702DBF45;
-	Tue, 16 Sep 2025 19:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6222DE707;
+	Tue, 16 Sep 2025 19:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aQEk3/vf"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDBB32D5D4;
-	Tue, 16 Sep 2025 19:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD4F26E6FB
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 19:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758049249; cv=none; b=C8B5/SMzAz5lEc62LYJPBD9cBRbp3BTYGkyUIjL2+Ytb65GX++YS4mh7LMSLupYVXq07Cs+gbkW2jkLHxNm17woYrd2nt5x/QYmCgh5VKRIme64gQlXQlDbwklvaKVw9+sNjaepkBxXwpbcBI4Na3b40gdtviwI3b/0EhN71E7E=
+	t=1758049456; cv=none; b=dhJm4+j1eUboYc7Ytlp8xerQYJgwJyOIXeclGhdtabJ4yxt5UzxJSgBUmYbKjrCcryk2pglLcsK+gZjyzbzYIVWrxLnOiIwzJIrvrdaCnMjXPFkHrST+5Q5bmlIMtkyyBujQHVI9RqT2eHzt6gwNduOdtjLTw/tfSc4OVLYp0CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758049249; c=relaxed/simple;
-	bh=/rgxq4FRkkAatSQxJg1/+3l0fRdSYyVMBLI8ihCClYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ciS2rEQaSk2EQonoKI+hWTCiBYA6+jbW4DKBy/0QebjkjfjRSk2qSB7KYPAWs8y96giXP9qw0fqePbryiHY7Z2VFf7UlrxiTRlyJ3ie3PFnXdejym1ufs3k5nLQznh5wOjYDn2T6vufgk2OF3Cl81qDKnKtY9p4MT1hozKRkWZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.98.2)
-	(envelope-from <joerg@jo-so.de>)
-	id 1uyaud-00000001UpH-35cH;
-	Tue, 16 Sep 2025 21:00:23 +0200
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98.2)
-	(envelope-from <joerg@jo-so.de>)
-	id 1uyaud-000000027gj-0U27;
-	Tue, 16 Sep 2025 21:00:23 +0200
-Date: Tue, 16 Sep 2025 21:00:23 +0200
-From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, 
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au, danishanwar@ti.com, 
-	lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be, 
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com, alexanderduyck@fb.com, 
-	richardcochran@gmail.com, kees@kernel.org, gustavoars@kernel.org, rdunlap@infradead.org, 
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next v12 1/5] net: rnpgbe: Add build support for
- rnpgbe
-Message-ID: <mr6wuiqeucy6shybrqrg3pwim22ep5tbdivspsjwpo5335ri7j@u4jcc6os3ndr>
-OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
- preference=signencrypt
-References: <20250916112952.26032-1-dong100@mucse.com>
- <20250916112952.26032-2-dong100@mucse.com>
+	s=arc-20240116; t=1758049456; c=relaxed/simple;
+	bh=eVMZ8aJw3wzjCNrVys1HEp1kSdur0B6Zj2ywjbkTItM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oryPKVFwBJohLlENYO3ccYpR8WbPWabJhej8m/EhIP/BE7kEsb7FzBXQejNAoZ+Ef1VhSeB8Y4+2aXkq2OhZ7z1KQJ91IHOBzBXhG9yhH4LgsDPVXsyXHjETLmtupqab7wyBZGcejoo9o07IU8v36mb1/b/HCe6CIqznplRXfl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aQEk3/vf; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d605d4af-69dc-491d-85a3-b1681b89abd7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758049451;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HXOAPEjzekOAjE4mciNBEhLhGsM198o+7B85xHhnuzA=;
+	b=aQEk3/vfn2molZrZKNuI31cy6yCYMkCI7CiNCMpqf1iPYO5lrulrKVailmopFUznZ86QU7
+	tsSsgwMKsfaAuhZf5ARVKNEwUicYVqghTmaaeLua0aGGC7zp4jipiFyRfROryJqLfIEkKh
+	XLiC2oDRJgC3dygNGBLNW4+Vblncp8k=
+Date: Tue, 16 Sep 2025 20:04:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="trz2bbyp7goo7nx7"
-Content-Disposition: inline
-In-Reply-To: <20250916112952.26032-2-dong100@mucse.com>
+Subject: Re: [PATCH net-next] libie: fix linking with libie_{adminq,fwlog}
+ when CONFIG_LIBIE=n
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>,
+ kernel test robot <lkp@intel.com>, Naresh Kamboju
+ <naresh.kamboju@linaro.org>, nxne.cnse.osdt.itp.upstreaming@intel.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250916160118.2209412-1-aleksander.lobakin@intel.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250916160118.2209412-1-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+
+On 16/09/2025 17:01, Alexander Lobakin wrote:
+> Initially, libie contained only 1 module and I assumed that new modules
+> in its folder would depend on it.
+> However, Michał did a good job and libie_{adminq,fwlog} are completely
+> independent, but libie/ is still traversed by Kbuild only under
+> CONFIG_LIBIE != n.
+> This results in undefined references with certain kernel configs.
+> 
+> Tell Kbuild to always descend to libie/ to be able to build each module
+> regardless of whether the basic one is enabled.
+> If none of CONFIG_LIBIE* is set, Kbuild will just create an empty
+> built-in.a there with no side effects.
+> 
+> Fixes: 641585bc978e ("ixgbe: fwlog support for e610")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/all/202509140606.j8z3rE73-lkp@intel.com
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Closes: https://lore.kernel.org/all/CA+G9fYvH8d6pJRbHpOCMZFjgDCff3zcL_AsXL-nf5eB2smS8SA@mail.gmail.com
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+> Sending directly to net-next to quickly unbreak net-next and
+> linux-next builds.
+> Also to net-next as the blamed commit landed recently and is
+> not present in any other tree.
+> ---
+>   drivers/net/ethernet/intel/Makefile | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/Makefile b/drivers/net/ethernet/intel/Makefile
+> index 04c844ef4964..9a37dc76aef0 100644
+> --- a/drivers/net/ethernet/intel/Makefile
+> +++ b/drivers/net/ethernet/intel/Makefile
+> @@ -4,7 +4,7 @@
+>   #
+>   
+>   obj-$(CONFIG_LIBETH) += libeth/
+> -obj-$(CONFIG_LIBIE) += libie/
+> +obj-y += libie/
+>   
+>   obj-$(CONFIG_E100) += e100.o
+>   obj-$(CONFIG_E1000) += e1000/
 
 
---trz2bbyp7goo7nx7
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v12 1/5] net: rnpgbe: Add build support for
- rnpgbe
-MIME-Version: 1.0
-
-Dong Yibo schrieb am Di 16. Sep, 19:29 (+0800):
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/ne=
-t/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> new file mode 100644
-> index 000000000000..60bbc806f17b
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> @@ -0,0 +1,124 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
-> +
-> +#include <linux/pci.h>
-> +
-> +#include "rnpgbe.h"
-> +
-> +static const char rnpgbe_driver_name[] =3D "rnpgbe";
-> +
-> +/* rnpgbe_pci_tbl - PCI Device ID Table
-> + *
-> + * { PCI_DEVICE(Vendor ID, Device ID),
-> + *   driver_data (used for different hw chip) }
-> + */
-> +static struct pci_device_id rnpgbe_pci_tbl[] =3D {
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_MUCSE, PCI_DEVICE_ID_N500_QUAD_PORT),
-> +	  .driver_data =3D board_n500},
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_MUCSE, PCI_DEVICE_ID_N500_DUAL_PORT),
-> +	  .driver_data =3D board_n500},
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_MUCSE, PCI_DEVICE_ID_N210),
-> +	  .driver_data =3D board_n210},
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_MUCSE, PCI_DEVICE_ID_N210L),
-> +	  .driver_data =3D board_n210},
-
-Should there be a space before }?
-
-> +	/* required last entry */
-> +	{0, },
-> +};
-> +
-> +/**
-> + * rnpgbe_probe - Device initialization routine
-> + * @pdev: PCI device information struct
-> + * @id: entry in rnpgbe_pci_tbl
-> + *
-> + * rnpgbe_probe initializes a PF adapter identified by a pci_dev
-> + * structure.
-> + *
-> + * Return: 0 on success, negative errno on failure
-> + **/
-> +static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id=
- *id)
-> +{
-> +	int err;
-
-In rnpgbe_mbx.c you use `int ret` for this pattern. I think you should unify
-this. But I'm more in favour of `err` than `ret`.
-
-> +
-> +	err =3D pci_enable_device_mem(pdev);
-> +	if (err)
-> +		return err;
-> +
-> +	err =3D dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(56));
-> +	if (err) {
-> +		dev_err(&pdev->dev,
-> +			"No usable DMA configuration, aborting %d\n", err);
-> +		goto err_disable_dev;
-> +	}
-> +
-> +	err =3D pci_request_mem_regions(pdev, rnpgbe_driver_name);
-> +	if (err) {
-> +		dev_err(&pdev->dev,
-> +			"pci_request_selected_regions failed %d\n", err);
-> +		goto err_disable_dev;
-> +	}
-> +
-> +	pci_set_master(pdev);
-> +	err =3D pci_save_state(pdev);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "pci_save_state failed %d\n", err);
-> +		goto err_free_regions;
-> +	}
-> +
-> +	return 0;
-> +err_free_regions:
-> +	pci_release_mem_regions(pdev);
-> +err_disable_dev:
-> +	pci_disable_device(pdev);
-> +	return err;
-> +}
-> +
-> +/**
-> + * rnpgbe_remove - Device removal routine
-> + * @pdev: PCI device information struct
-> + *
-> + * rnpgbe_remove is called by the PCI subsystem to alert the driver
-> + * that it should release a PCI device. This could be caused by a
-> + * Hot-Plug event, or because the driver is going to be removed from
-> + * memory.
-> + **/
-> +static void rnpgbe_remove(struct pci_dev *pdev)
-> +{
-> +	pci_release_mem_regions(pdev);
-> +	pci_disable_device(pdev);
-> +}
-> +
-> +/**
-> + * rnpgbe_dev_shutdown - Device shutdown routine
-> + * @pdev: PCI device information struct
-> + **/
-> +static void rnpgbe_dev_shutdown(struct pci_dev *pdev)
-> +{
-> +	pci_disable_device(pdev);
-> +}
-> +
-> +/**
-> + * rnpgbe_shutdown - Device shutdown routine
-> + * @pdev: PCI device information struct
-> + *
-> + * rnpgbe_shutdown is called by the PCI subsystem to alert the driver
-> + * that os shutdown. Device should setup wakeup state here.
-> + **/
-> +static void rnpgbe_shutdown(struct pci_dev *pdev)
-> +{
-> +	rnpgbe_dev_shutdown(pdev);
-
-Is this the only user of rnpgbe_dev_shutdown?
-
-> +}
-> +
-> +static struct pci_driver rnpgbe_driver =3D {
-> +	.name =3D rnpgbe_driver_name,
-> +	.id_table =3D rnpgbe_pci_tbl,
-> +	.probe =3D rnpgbe_probe,
-> +	.remove =3D rnpgbe_remove,
-> +	.shutdown =3D rnpgbe_shutdown,
-> +};
-> +
-> +module_pci_driver(rnpgbe_driver);
-> +
-> +MODULE_DEVICE_TABLE(pci, rnpgbe_pci_tbl);
-> +MODULE_AUTHOR("Mucse Corporation, <techsupport@mucse.com>");
-> +MODULE_DESCRIPTION("Mucse(R) 1 Gigabit PCI Express Network Driver");
-> +MODULE_LICENSE("GPL");
-> --=20
-> 2.25.1
->=20
->=20
-
---=20
-Als deutscher Tourist im Ausland steht man vor der Frage, ob man sich
-anst=E4ndig benehmen muss oder ob schon deutsche Touristen dagewesen sind.
-                                                (Kurt Tucholsky)
-
---trz2bbyp7goo7nx7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCaMmzxQAKCRB9LJoj0a6j
-dSVyAQC4VqtXOkURplHbCIfta22QVK4Vlmem6/yJlEBnh3O6bgD/Q7r+2UJGJp64
-0om4OmUSW+7Q3Tvw3GrR145+DmJqTFM=
-=AZSs
------END PGP SIGNATURE-----
-
---trz2bbyp7goo7nx7--
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
