@@ -1,73 +1,84 @@
-Return-Path: <netdev+bounces-223509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D948B5963F
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:32:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AFEB59648
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:33:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0407F2A316D
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:32:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D2CF520247
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEBD2BE034;
-	Tue, 16 Sep 2025 12:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4482C14658D;
+	Tue, 16 Sep 2025 12:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/ljuU8E"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EtGB3hi2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F12298991
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 12:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618CA2DBF5E;
+	Tue, 16 Sep 2025 12:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758025908; cv=none; b=bZdhuHDvFBlcwH1wFzmKtIdq37SnPqx8P/WOesy1j8pYb7qPD3p+Z5tWMZrbTreTGPIZLkWCXVZ6+oRDaA+Q+RoYpdD30dV08G2f6RKsJICb8seBSHEcIuSZj4CHA6dSgpuTKnJ41dJngqMtCwLiyiGfsKPYITLgt1QXz8u26zk=
+	t=1758025974; cv=none; b=TSPZ9q7SviUmhGmdNWDxt3Zq5NDl6S3uWBNXP8wx6eyllFy4/tOVQ89xLyCURrt8zCq9qDkumt+cJcGST/luQgUBqSGzLjEQJBMjFe89syyD8X24vq2WZ4Q/Dsinsc7N/jg201FuSw6RDSuE/sU01OD+SWnWe0AegVY8wva/Nq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758025908; c=relaxed/simple;
-	bh=jZWMRY9mUhPPrj6oZ8u8ZvwgE9DdtUy1L7lAUtkCW4s=;
+	s=arc-20240116; t=1758025974; c=relaxed/simple;
+	bh=aFFJQ3c3cKy0cTqTwtO7pqGldxJqu1mCv2bidJ7C+2k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKeZIIBjbOxWSwGI4z9c/oK5vqbk7HGL5iqkaGbkcCU6ANY9OsvM7yqaXXq5s8hGAVa5F4A6kBy9/fDUWK8lU7akgLjALBWoD9TYRBxuIZBQCcEYvzM5KKgFmiiCKKLSE4UvtQMdXksNvDBcGT8TNxi846JZYLc0cxU8hJrB1W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/ljuU8E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DB2FC4CEFA;
-	Tue, 16 Sep 2025 12:31:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758025907;
-	bh=jZWMRY9mUhPPrj6oZ8u8ZvwgE9DdtUy1L7lAUtkCW4s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u/ljuU8Ep7u3m7cHpJzV5q0AJzs9lrKaiZi5jTGHTF+eWHFmnwVECVVOA5HWekrMy
-	 8CqDHWr8P/yxuj1vYrM6Y2k0ffpodjrWESQCe8ABq7r8LmDIVuKMMGRTWGdfq5MCeo
-	 P0BH92DW877OiUxSyG2seNnidtNpmTkw472KZaIo2XClgGOcfUYnrx3ugn0Mzv7k77
-	 zIM1mEOTQ9XYLwk6qPIGE4dL40n0vyEYgYYR5tHUx8BSncqwFBl+pd4eDS/8v9YLDd
-	 1zy55kHqK1BCxctR2++drstDO6PtXBzQVchbcSsy9rPZ8cbI3U/iMxRqETVJ18EGyM
-	 Eh2Mmb+B6grOQ==
-Date: Tue, 16 Sep 2025 13:31:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, alexanderduyck@fb.com,
-	jacob.e.keller@intel.com
-Subject: Re: [PATCH net-next v2 1/9] eth: fbnic: make fbnic_fw_log_write()
- parameter const
-Message-ID: <20250916123143.GY224143@horms.kernel.org>
-References: <20250915155312.1083292-1-kuba@kernel.org>
- <20250915155312.1083292-2-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kDcsn3YQNGjVu3BoiGlZK34lmZnzv6eu7XChaX+GVD+q8AELCWaYow0Tv6yUiao3T9XvFfU6pWGc3UZjj8Z0Llu3WluUkNTzTWXGZQozr2hYjzHtDkFoMp6IbZedFxpewSVMVbsDtF2a4Ctebhk2HsfiVI9n3AhqBOBm+qrbYAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EtGB3hi2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=SZlYo6B8YW/emlghHc4MKfQxPkRtnwrIZO7LDI4zirQ=; b=Et
+	GB3hi2aiQsaJh66KdUKhBXsGB7EJNNKv/lQfsMkcr8bpwjlnRi1oSgz2V5p9Vck/V5HUzskqKL3m/
+	4ZRQ62ezhdez3Yb6eDSS2/7YsRrFZeWC/rRSsz0gQdL+5VXFyq5AnXBiy822q5aVfnbyT1uPxhn+S
+	cbScYLzSRZFWJzg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uyUrJ-008Ykb-Hq; Tue, 16 Sep 2025 14:32:33 +0200
+Date: Tue, 16 Sep 2025 14:32:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next 5/6] net: rcar_gen4_ptp: Remove unused defines
+Message-ID: <177c71c1-c281-449a-a8f4-4858ca488f55@lunn.ch>
+References: <20250916101055.740518-1-niklas.soderlund+renesas@ragnatech.se>
+ <20250916101055.740518-6-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250915155312.1083292-2-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250916101055.740518-6-niklas.soderlund+renesas@ragnatech.se>
 
-On Mon, Sep 15, 2025 at 08:53:04AM -0700, Jakub Kicinski wrote:
-> Make the log message parameter const, it's not modified
-> and this lets us pass in strings which are const for the caller.
+On Tue, Sep 16, 2025 at 12:10:54PM +0200, Niklas Söderlund wrote:
+> The driver specific flags to control packet time stamps have all been
+> replaced by values from enum hwtstamp_tx_types and enum
+> hwtstamp_rx_filters. Remove the driver specific flags as there are no
+> more users.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
+    Andrew
 
