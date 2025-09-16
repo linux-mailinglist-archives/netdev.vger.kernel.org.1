@@ -1,185 +1,188 @@
-Return-Path: <netdev+bounces-223488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19476B5951F
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:28:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69F84B59526
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59343BB709
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:28:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63D557A8476
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 11:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7D62D73AB;
-	Tue, 16 Sep 2025 11:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iRsl15wP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QVJuz3Oz";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iRsl15wP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QVJuz3Oz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F6F2D8372;
+	Tue, 16 Sep 2025 11:30:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6B22D6E64
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 11:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A602C2C15A3;
+	Tue, 16 Sep 2025 11:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758022116; cv=none; b=p+eLvKnuvjI5YzycRP4JMwxG/jFbPrnviwlfKC/srG0XH+935E98j8hKgPmRkaitQ15B3szG74HNfsjinIV806hrCgWS3tO5E6RoDUnkskWJ6dG40Ldd82UuqwGZL/cyty4mdXtpCjnZI91ses7lY1t091kFUWRIe55tBVf1dd0=
+	t=1758022242; cv=none; b=iKMKGe213UeytYnnST4n2x6yBhOB5FIHfO3vozqzurP5/GfDc0iMn0PuV/kSLx+EO485KIWy3pnOi56wjAwCwFnOwSgqG9+/3ha84hAi8ZTIaVyYuyTDNW3bkgAQX7xEdFytrWfH2UluuZVXjDIIE3wTbU4HOlRMv+fhh/FmyXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758022116; c=relaxed/simple;
-	bh=SqVgP+GfGAadYcUao5GJvrjWwnaMdU9RUmqq01HfK7Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xj3OXV/Bz8glOWWB8hkVgGzPIB7pewWKR/gn1bZyLK+Di+lvoTEzE1kqB+ekr7iybfElw7EZQOtRhXOohQ1I4HSW/RbbmtN87zHWVEJ/xpBQNj1fbV71xWg+BqTJ1CdyubQr8D0ByFRXQrcbu5Jn7SJdf8HHhfy4qldoBnkIULg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iRsl15wP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QVJuz3Oz; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iRsl15wP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QVJuz3Oz; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0CE0221E2A;
-	Tue, 16 Sep 2025 11:28:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758022112; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q9oCpgqurBom31W/n+RHNghX4/6UcJ4QSLsIdYBaQMw=;
-	b=iRsl15wPBs+dpd5s3bWELQcCCYZvA4kVggDx5MyyLfYHvMUo8/E2nULZx4lM5y0ZBuXSyU
-	6ldC+EHot2bA+mh1u6AXEJtFQJk8Xb5rBSt79e+uJ4xw8c12XJTbo1uVjwBCTA3DbYZyBM
-	FdEnK3a44FLYoX5QVd/5BwThhZvurYQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758022112;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q9oCpgqurBom31W/n+RHNghX4/6UcJ4QSLsIdYBaQMw=;
-	b=QVJuz3Oz116B1y/b/5jqbhtvr1Mu3RUlMpdnnaKv+thZTJrM4Oq7iUxsXCeiKcQe6nvIM7
-	Kukzafq15n4Cc5Bg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=iRsl15wP;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=QVJuz3Oz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758022112; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q9oCpgqurBom31W/n+RHNghX4/6UcJ4QSLsIdYBaQMw=;
-	b=iRsl15wPBs+dpd5s3bWELQcCCYZvA4kVggDx5MyyLfYHvMUo8/E2nULZx4lM5y0ZBuXSyU
-	6ldC+EHot2bA+mh1u6AXEJtFQJk8Xb5rBSt79e+uJ4xw8c12XJTbo1uVjwBCTA3DbYZyBM
-	FdEnK3a44FLYoX5QVd/5BwThhZvurYQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758022112;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q9oCpgqurBom31W/n+RHNghX4/6UcJ4QSLsIdYBaQMw=;
-	b=QVJuz3Oz116B1y/b/5jqbhtvr1Mu3RUlMpdnnaKv+thZTJrM4Oq7iUxsXCeiKcQe6nvIM7
-	Kukzafq15n4Cc5Bg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CB93513ACD;
-	Tue, 16 Sep 2025 11:28:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 0+4DMd9JyWgTZAAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 16 Sep 2025 11:28:31 +0000
-Message-ID: <40c707d6-db49-40a8-8372-7c3a91c2ff5f@suse.de>
-Date: Tue, 16 Sep 2025 13:28:31 +0200
+	s=arc-20240116; t=1758022242; c=relaxed/simple;
+	bh=R76IMJLguW9jEl/x6KjDzeHvljOVNXxID7Gge6OE1z8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WKyWLP+pUAY1aQTrcQeIbxgXQbAJCK7KRZMdGjfeK7PnZ5gcvJO3NFOylRH3BOFRNPSv4lO4Md6YZw4mYEEky83/fDgzaTKktAx0Rb+gOLm9WnbnuNUNuebbQMQk+8t+1QVlrviArD75kEJFt5grZQpawiCEdybGfAhKvtsWrAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz17t1758022206tc6521c11
+X-QQ-Originating-IP: q9jwI2VI3r4VL+Xrm6HltrFEmT8gcCMxyZhOgQttr5o=
+Received: from localhost.localdomain ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 16 Sep 2025 19:30:02 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 2406107247980798672
+EX-QQ-RecipientCnt: 29
+From: Dong Yibo <dong100@mucse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	gur.stavi@huawei.com,
+	maddy@linux.ibm.com,
+	mpe@ellerman.id.au,
+	danishanwar@ti.com,
+	lee@trager.us,
+	gongfan1@huawei.com,
+	lorenzo@kernel.org,
+	geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com,
+	lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com,
+	richardcochran@gmail.com,
+	kees@kernel.org,
+	gustavoars@kernel.org,
+	rdunlap@infradead.org,
+	vadim.fedorenko@linux.dev,
+	joerg@jo-so.de
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	dong100@mucse.com
+Subject: [PATCH net-next v12 0/5] Add driver for 1Gbe network chips from MUCSE
+Date: Tue, 16 Sep 2025 19:29:47 +0800
+Message-Id: <20250916112952.26032-1-dong100@mucse.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] nvmet-tcp: fix handling of tls alerts
-To: Jakub Kicinski <kuba@kernel.org>, Keith Busch <kbusch@kernel.org>
-Cc: Olga Kornievskaia <aglo@umich.edu>,
- Olga Kornievskaia <okorniev@redhat.com>, chuck.lever@oracle.com,
- jlayton@kernel.org, trondmy@hammerspace.com, anna.schumaker@oracle.com,
- hch@lst.de, sagi@grimberg.me, kch@nvidia.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, linux-nfs@vger.kernel.org,
- linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
- kernel-tls-handshake@lists.linux.dev, neil@brown.name, Dai.Ngo@oracle.com,
- tom@talpey.com, horms@kernel.org
-References: <20250731180058.4669-1-okorniev@redhat.com>
- <20250731180058.4669-4-okorniev@redhat.com>
- <CAN-5tyF=5oQLyy7ikbbhFW10OrUfHh0Sr3D=G1nHN+pEsfiSzw@mail.gmail.com>
- <aMg0jDkXOd8E7Ihj@kbusch-mbp> <20250915144651.7bec7ad4@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250915144651.7bec7ad4@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 0CE0221E2A
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NVmy503YIpjOPeg7/iUtZ9JGGd5jcCxY6+I31a2+QSF4re1SUCUxzIPY
+	CyxPyOkObyZpQGlgWdluPEDBkIMOlYFI0nXTthqVuvB/QbbxPUKOfi0qVRb+gVcKo5DWixQ
+	INRK16oOUB8ap+tp1Nb6wy7akUnnPDQ0lLJqpUGiS8T7rSdlOSiRedXD9B/wuGhmGCfzQ3L
+	sYL4N4I+OtWQFPORh/I+658hdyV2HfMvrx3coy4dS31Et3bKP2a07PsBAw1xsCKR8l3JK92
+	SH5WtPK9fF9cSDHOBxfGe+BNxCtaj7ofZmnN8uOKBXE+ZJBqRm9BRqXxFo+log6Sf3pPQC+
+	GzHNMhcsEvkqEqt2F6R+gkpQkUKNlCZyBh+H7Lt6cQkS1GSD9WZj9JQDB0mp3qXOLh7RUy3
+	DBKpfrm3/y6JTF/DYO/aqHfcir0iXAPm8kmioqRDw7Mny8cdw2ifP09YzI1KemlyuTls0nH
+	t2JQIb4FIssjQAeBGjuaq6NgoeU0nkcBrttNIUk98LY7hffz0d6Ukl3Rbd7GyLVns3pc1hz
+	Y38jPt++BdSEFXGQuthZ9oFfNWLto2oL2da0woUBFvAqfFnmT0z7TjTfRkzN9u9qbLTVYhm
+	0jSxg83g/P8L6H3OOjiVXF7ccB9xProygrOcpUw918Tu5qav2KR+iBzLZJ1YI+kn3cnKhn2
+	xVt5l1XMN05UqSZjgEIxHfrAxsGP3I3Yc6pCDaXSlEck6BPkP0uhPBqCrGB5mB5nm0JzrSn
+	rIL4kPjoYPG5cisIBnn1Jzrb+TZIYxGkYtDttwXb8+//ZCDcw1Y+hbJNh+JEfyamv0S9Hu0
+	mNxA71BU3hFe9Vl5CuSVoo2pdk2JSecIgWqnYaKvVV5dwh3YQ4auDUh++h/SbL5xCn7N45K
+	ZoVoaSwcrYM3pEd8pZDYPcCAMSQNhbdbRWupKFnj7CgEgD+52JxcAvWYb4AOn9Tq4fLmHD5
+	jK/AbzJQLAGh+OwxzwbsEPTRuiRf8jAcbdkM1hoxOoLt3V2tCsKiblx7eoXbqVkMbBqhDdd
+	1mvXE5c77VTtXueCxaYB6EO1nI5c66eV+TiBnlmA==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-On 9/15/25 23:46, Jakub Kicinski wrote:
-> On Mon, 15 Sep 2025 09:45:16 -0600 Keith Busch wrote:
->> On Fri, Sep 05, 2025 at 12:10:21PM -0400, Olga Kornievskaia wrote:
->>> Dear NvME maintainers,
->>>
->>> Are there objections to this patch? What's the path forward to
->>> including it in the nvme code.
->>
->> Sorry for the delay here. This series is mostly outside the nvme driver,
->> so we need at least need an Ack from the networking folks if we're going
->> to take this through the nvme tree.
-> 
-> In case you decide to take it, LGTM:
-> 
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> Thanks!
-> 
-Okay, after further thinking I would vote for the
-NVMe tree after all. There are more patches queued
-up which will require these changes, and life will
-be easier if we had just one branch where we could
-base them on.
+Hi maintainers,
 
-Cheers,
+This patch series adds support for MUCSE RNPGBE 1Gbps PCIe Ethernet controllers
+(N500/N210 series), including build infrastructure, hardware initialization,
+mailbox (MBX) communication with firmware, and basic netdev registration
+(Can show mac witch is got from firmware, and tx/rx will be added later).
 
-Hannes
+Series breakdown (5 patches):
+ 01/05: net: ethernet/mucse: Add build support for rnpgbe
+       - Kconfig/Makefile for MUCSE vendor, basic PCI probe (no netdev)
+ 02/05: net: ethernet/mucse: Add N500/N210 chip support
+       - netdev allocation, BAR mapping
+ 03/05: net: ethernet/mucse: Add basic MBX ops for PF-FW communication
+       - base read/write, write with poll ack, poll and read data
+ 04/05: net: ethernet/mucse: Add FW commands (sync, reset, MAC query)
+       - FW sync retry logic, MAC address retrieval, reset hw with
+         base mbx ops in patch4
+ 05/05: net: ethernet/mucse: Complete netdev registration
+       - HW reset, MAC setup, netdev_ops registration
+
+Changelog:
+v11 -> v12:
+  [patch 3/5]:
+  1. fix switch code style.
+  2. rename mbx struct define 'timeout_cnt to timeout_us',
+     'usec_delay to delay_us'.
+  [patch 4/5]:
+  1. update function mucse_mbx_sync_fw.
+  [patch 5/5]:
+  1. update commit for rnpgbe_xmit_frame.
+  2. update define position for 'struct mucse_hw_operations'.
+  3. remove struct dma.
+
+links:
+v11: https://lore.kernel.org/netdev/20250909120906.1781444-1-dong100@mucse.com/
+v10: https://lore.kernel.org/netdev/20250903025430.864836-1-dong100@mucse.com/
+v9 : https://lore.kernel.org/netdev/20250828025547.568563-1-dong100@mucse.com/
+v8 : https://lore.kernel.org/netdev/20250827034509.501980-1-dong100@mucse.com/
+v7 : https://lore.kernel.org/netdev/20250822023453.1910972-1-dong100@mucse.com
+v6 : https://lore.kernel.org/netdev/20250820092154.1643120-1-dong100@mucse.com/
+v5 : https://lore.kernel.org/netdev/20250818112856.1446278-1-dong100@mucse.com/
+v4 : https://lore.kernel.org/netdev/20250814073855.1060601-1-dong100@mucse.com/
+v3 : https://lore.kernel.org/netdev/20250812093937.882045-1-dong100@mucse.com/
+v2 : https://lore.kernel.org/netdev/20250721113238.18615-1-dong100@mucse.com/
+v1 : https://lore.kernel.org/netdev/20250703014859.210110-1-dong100@mucse.com/
+
+Dong Yibo (5):
+  net: rnpgbe: Add build support for rnpgbe
+  net: rnpgbe: Add n500/n210 chip support with BAR2 mapping
+  net: rnpgbe: Add basic mbx ops support
+  net: rnpgbe: Add basic mbx_fw support
+  net: rnpgbe: Add register_netdev
+
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/mucse/rnpgbe.rst  |  21 +
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/mucse/Kconfig            |  34 ++
+ drivers/net/ethernet/mucse/Makefile           |   7 +
+ drivers/net/ethernet/mucse/rnpgbe/Makefile    |  11 +
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  75 ++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 150 +++++++
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  17 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 311 +++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 421 ++++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  20 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 246 ++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 121 +++++
+ 16 files changed, 1445 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+ create mode 100644 drivers/net/ethernet/mucse/Kconfig
+ create mode 100644 drivers/net/ethernet/mucse/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.25.1
+
 
