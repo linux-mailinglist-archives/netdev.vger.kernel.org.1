@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-223747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13855B5A43B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:48:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96065B5A43D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A41842A0262
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:48:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5199D17B85D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2D7307ACC;
-	Tue, 16 Sep 2025 21:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCED7323F66;
+	Tue, 16 Sep 2025 21:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xqneV3gB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GEkSFj6G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8420E323F66
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338AF31FEE4
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758059291; cv=none; b=Lvvls+FV5FVF3jOtiQPUK14/diMC0PX2mTGzd8LAnizwP++DXQGpd6ceH/YPwDV/gwpcRAs95OrnDdZzl7RfRr0XvW0CCNAXz6QipfrqX7cjecoG4babALWmEJhCauzL1XFrGymErR2jFMfk4CafHs1MmzrCOQ9uhOT2JT39M+8=
+	t=1758059292; cv=none; b=GY9+kRHAsWJPGKaY6Gs2+GUnNXiaXixFzW9/OotPpTDQADYJHVGD2g+HcxeDQwncB9jSPAivgonwVbzP+5lQVZEq2/5bi01u5Mw+tp13hnq8TtTYkeXbcSqPuaD63qfOs8te5MgZYwKC9pMyL753S12GNK9KeMnNXLLuEdzVv/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758059291; c=relaxed/simple;
-	bh=ISUTxH3KBRJ/hLAqxxtiCXziqQaSY+AFoZXRVI9fx7Q=;
+	s=arc-20240116; t=1758059292; c=relaxed/simple;
+	bh=dI2fxOZumwf1A98VcKvR3x0t9iORh71GXyvSqDwDV9w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TqBznfHtdg0QHf6RWuNLdpl0IZst8kOYrMDTBP0kSCCLOMDOC8YSWZeZT7OklSpsnHiQw/KXjmrXthIWmV2pvUYzo80wv4jSHqXanZeenQBXqYFWVQBr+nxsyK6Lht3hmdmYGnYzB8/boOtRRMUEqLyQlBPZhR9rjCjSZYmXL3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xqneV3gB; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=Bm2Aks8rcFaQ7hTpn9tYNLk1Vh0W3FwMaXQ+UJjU/KZD3ta7ChQbo4UsLyn2cg4Ucs09lOp7uWpMiyQaOp1T1VHbMyOfSAAwtsk7tEjHGKxC0WfPneV25/Azga7ZmODIuULS7I+supjxl7Ewns0siuk1jvB9M1ewWjUk0CX5TJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GEkSFj6G; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b4c72281674so4181313a12.3
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 14:48:09 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ec67fcb88so631374a91.3
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 14:48:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758059289; x=1758664089; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758059290; x=1758664090; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PLnJ00CGYCau3TqDaF4rwQzqPipVMF4v1bzsVsUM2dQ=;
-        b=xqneV3gBqD+/ZRZO6rjW7uXIhNmUiId5/Z4MX6en4yP2lCFNsao5/ah1apUE0XrZpU
-         RA4H2qC+hScjXeYLmZbcjjkfAgK8P/rXDWCfNtFgjbnLn7Mztr+pHe+4CrBiNBHh50RJ
-         CYpiI/db2wEjbaLuiEHEIJDYffoa9C7mA/PucxH0sSf2K7gtNTQ00mXwSxawtuv/KpyK
-         AF/qdmbPl/xKWxkAqiDip4zdebLdHZGeDipscKdClCOnBih7w6k8hZryVePtbGGRVf1t
-         yps9vEG4XgHLuS1JzXZuJBMu/nT5RGF7eQeufIHWiAAr+aU/TZr9WTta2tOwWD4fOZCo
-         O3Uw==
+        bh=Zd/DJ5adDesHyGLwexvXHpnhbgXEiGpH2D2QGWRkaAI=;
+        b=GEkSFj6GcwxgYgrxxvqsaPlTEiR5Yi9K7QCRmNG/+ZTdzFlW2WobaJ9FnyCJqvIzhz
+         9ZlKf2fD4tykO7JAArjOJDp3NsWeei8mJ8t6QlGaKrdJ06d/lQ0JlUhzut7zG0awE8XZ
+         SZjnUVoliwfqXf8U953eTGkpWnmjc9F61ETc3aLForgMg8OeML2aU6NzK1MhNKLTZEMY
+         7wVKCvHZG51HqpCtq8YLqZR8Nt3x1/kQ5DKm/431DyO4ThD+pMd1I+fxMNLP5QVkSr54
+         wmX3FhCBwf7oLFoEJomaqFgc/KpSM6qZbfpL8zk3kFJx8R7EWhcTn6rhJNaVuxunQgOL
+         R98w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758059289; x=1758664089;
+        d=1e100.net; s=20230601; t=1758059290; x=1758664090;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PLnJ00CGYCau3TqDaF4rwQzqPipVMF4v1bzsVsUM2dQ=;
-        b=ISnVcl97AI6asYh+r+/7uEv68IfsKCUZVVlmheDGoD6Y9KAC12XsZSETw0JFNsW+Ll
-         rCc5zQybv4D+LPxzPcYDao1hNyBpsvoV0eJDYwDoXEnJoTfrbt2N6sG+4ufDEW1BpiN2
-         kIlPQuEacZ5p7nuYpqsYAhAIDPs9EXZw9iDLm6fQo3uV2jdZEhkpY0LcoysUCDT8A83t
-         E+JzIOLt3kTMNw4bWnf4edOg2qNhHb65Hc4X9v6K4DFM3xW6i6hzOx2iLVAJ6XaCAUgU
-         vPKrzK1vXeFxTotb18aF67VI7HkBMFk+aHpjXyRQC2sGi0LPCEV+SUpatR/B8WSlhXYM
-         OLrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVAl8UKE+tB0VHhoX4ZEY2+ptYwv/NJxi4Lrk+mxFvWDAIzvkH64lDQrj4AnG6XXhxZxXr3nWo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOrPkverdL70tXsW4ImM6Kr1Kir/NbNICPEIe41M363BQcsoMH
-	qf1aUBjhO5/wm/RLfmu6WsMeJgwdDnLW0Pz6aXdtr5B8Y80QO0tfYUUWJPyCXbuzz2q3DuTrl9m
-	pWiJfMw==
-X-Google-Smtp-Source: AGHT+IETalBQzyzEHtrECjU84UXFiZy1fQvu0C9Em3QvGr1R8DFPOBE5DbW4kOpq3tPQXcffqfIQilh2rXI=
-X-Received: from plmm2.prod.google.com ([2002:a17:902:c442:b0:268:cfa:6a80])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:384f:b0:248:a642:eec6
- with SMTP id d9443c01a7336-25d26e498d3mr211110615ad.50.1758059288853; Tue, 16
- Sep 2025 14:48:08 -0700 (PDT)
-Date: Tue, 16 Sep 2025 21:47:22 +0000
+        bh=Zd/DJ5adDesHyGLwexvXHpnhbgXEiGpH2D2QGWRkaAI=;
+        b=PoashtduV3R+h2zT991dWmezbiwYUspp2LgpTVoRCDwImN064BaLT+uuabbHc1ND78
+         EXPBtNtoOhxu2CwrVdsdi6169zPTgZytKD39d6QFJd42ptPUBBlH614vW2fHodtjXObp
+         /ya/ZPeWHEp5aFDU+jcrIoKIPu7/caizhhtJtrfZfiZOB70bAOImtTbAeNdyd2sPuehv
+         Kk0UpkOqmxRjAm5nAAsuWHRmk1qnOnzfFNCtqie17n3egam2wEXzAO3nefpMxt7OKmGB
+         JV6q9TaGaahEURpRsH8X1wPezVavYdNtr+iSOZLX5+k6ZwEG0wwEYA/ZAWBQ9C/CBlIC
+         5LOw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwdKEWVqQgeg+6qIcrnpHrEN/+Y6//EDPSm5HnI/pXdk+xhdJq6/0KIRen149L67TUb4p7iNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQw7LAFXxENAiM5K3stzgCfx7WN0ZbuWM5++IEdUNKpmKlQMnw
+	DMcwfAJP5r7CRuirxCBRcThxO2ZieJK4DsSrFCdUM5Mq+jpScEdV8VuBDRlUR0jwCFSYN1MvWdy
+	gJqbEhQ==
+X-Google-Smtp-Source: AGHT+IG58fz5u3Im2NKSFcMn7Wnk5G/9SnItYpmazANGVNXLMmHhCTHH9DJCPwymEC771T4FS2fo91no45M=
+X-Received: from pjtq15.prod.google.com ([2002:a17:90a:c10f:b0:32e:8396:7798])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b09:b0:32e:a4d:41cb
+ with SMTP id 98e67ed59e1d1-32e0a4d449amr16531343a91.1.1758059290361; Tue, 16
+ Sep 2025 14:48:10 -0700 (PDT)
+Date: Tue, 16 Sep 2025 21:47:23 +0000
 In-Reply-To: <20250916214758.650211-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,97 +74,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250916214758.650211-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250916214758.650211-5-kuniyu@google.com>
-Subject: [PATCH v2 net-next 4/7] smc: Use __sk_dst_get() and dst_dev_rcu() in smc_vlan_by_tcpsk().
+Message-ID: <20250916214758.650211-6-kuniyu@google.com>
+Subject: [PATCH v2 net-next 5/7] tls: Use __sk_dst_get() and dst_dev_rcu() in get_netdev_for_sock().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
-	Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, Ursula Braun <ubraun@linux.vnet.ibm.com>
+	John Fastabend <john.fastabend@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Ilya Lesokhin <ilyal@mellanox.com>
 Content-Type: text/plain; charset="UTF-8"
 
-smc_vlan_by_tcpsk() fetches sk_dst_get(sk)->dev before RTNL and
-passes it to netdev_walk_all_lower_dev(), which is illegal.
+get_netdev_for_sock() is called during setsockopt(),
+so not under RCU.
 
-Also, smc_vlan_by_tcpsk_walk() does not require RTNL at all.
+Using sk_dst_get(sk)->dev could trigger UAF.
 
-Let's use __sk_dst_get(), dst_dev_rcu(), and
-netdev_walk_all_lower_dev_rcu().
+Let's use __sk_dst_get() and dst_dev_rcu().
 
-Note that the returned value of smc_vlan_by_tcpsk() is not used
-in the caller.
+Note that the only ->ndo_sk_get_lower_dev() user is
+bond_sk_get_lower_dev(), which uses RCU.
 
-Fixes: 0cfdd8f92cac ("smc: connection and link group creation")
+Fixes: e8f69799810c ("net/tls: Add generic NIC offload infrastructure")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Dust Li <dust.li@linux.alibaba.com>
-Cc: Sidraya Jayagond <sidraya@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>
-Cc: Tony Lu <tonylu@linux.alibaba.com>
-Cc: Wen Gu <guwen@linux.alibaba.com>
-Cc: Ursula Braun <ubraun@linux.vnet.ibm.com>
+Cc: John Fastabend <john.fastabend@gmail.com>
+Cc: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Ilya Lesokhin <ilyal@mellanox.com>
 ---
- net/smc/smc_core.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
+ net/tls/tls_device.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index 262746e304dd..2a559a98541c 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -1883,35 +1883,32 @@ static int smc_vlan_by_tcpsk_walk(struct net_device *lower_dev,
- /* Determine vlan of internal TCP socket. */
- int smc_vlan_by_tcpsk(struct socket *clcsock, struct smc_init_info *ini)
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index f672a62a9a52..a82fdcf19969 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -123,17 +123,19 @@ static void tls_device_queue_ctx_destruction(struct tls_context *ctx)
+ /* We assume that the socket is already connected */
+ static struct net_device *get_netdev_for_sock(struct sock *sk)
  {
--	struct dst_entry *dst = sk_dst_get(clcsock->sk);
- 	struct netdev_nested_priv priv;
- 	struct net_device *ndev;
+-	struct dst_entry *dst = sk_dst_get(sk);
+-	struct net_device *netdev = NULL;
++	struct net_device *dev, *lowest_dev = NULL;
 +	struct dst_entry *dst;
- 	int rc = 0;
  
- 	ini->vlan_id = 0;
--	if (!dst) {
--		rc = -ENOTCONN;
--		goto out;
--	}
--	if (!dst->dev) {
-+
+-	if (likely(dst)) {
+-		netdev = netdev_sk_get_lowest_dev(dst->dev, sk);
+-		dev_hold(netdev);
 +	rcu_read_lock();
-+
-+	dst = __sk_dst_get(clcsock->sk);
-+	ndev = dst ? dst_dev_rcu(dst) : NULL;
-+	if (!ndev) {
- 		rc = -ENODEV;
--		goto out_rel;
-+		goto out;
++	dst = __sk_dst_get(sk);
++	dev = dst ? dst_dev_rcu(dst) : NULL;
++	if (likely(dev)) {
++		lowest_dev = netdev_sk_get_lowest_dev(dev, sk);
++		dev_hold(lowest_dev);
  	}
- 
--	ndev = dst->dev;
- 	if (is_vlan_dev(ndev)) {
- 		ini->vlan_id = vlan_dev_vlan_id(ndev);
--		goto out_rel;
-+		goto out;
- 	}
- 
- 	priv.data = (void *)&ini->vlan_id;
--	rtnl_lock();
--	netdev_walk_all_lower_dev(ndev, smc_vlan_by_tcpsk_walk, &priv);
--	rtnl_unlock();
--
--out_rel:
--	dst_release(dst);
-+	netdev_walk_all_lower_dev_rcu(ndev, smc_vlan_by_tcpsk_walk, &priv);
- out:
 +	rcu_read_unlock();
-+
- 	return rc;
+ 
+-	dst_release(dst);
+-
+-	return netdev;
++	return lowest_dev;
  }
  
+ static void destroy_record(struct tls_record_info *record)
 -- 
 2.51.0.384.g4c02a37b29-goog
 
