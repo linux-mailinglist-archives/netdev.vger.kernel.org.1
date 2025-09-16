@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-223373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A821B58E99
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:47:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FC5B58E9A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:47:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56F1E7AFE23
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:45:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1129A1BC26A4
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BEBB280338;
-	Tue, 16 Sep 2025 06:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7360729AAFA;
+	Tue, 16 Sep 2025 06:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tKGD0OcL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fYLziVqc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D7C2777F3
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CD823D283
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758005228; cv=none; b=TwzdARvzo2cYuBht/xuxg3WRlZzow9oVADJaT2I1gg0ulq3dam4q+7rP3f0TuT6tJbXnlgcZ7SJgxyJSoaQvUTO0dT4MHtgnm6F1To4mzo1FisU77z8JnjG4jcGG/dc/cO5e5Uil1Y8lP2qr82nvwXYpAWPjrQq1BBa9NelMIDk=
+	t=1758005232; cv=none; b=X+ptj4e8WqRTgh2/F1tNs6RBHuAmOXcTJryVMWEkXxq81a5dqvH49OoAN19VMFWXXk1UATtLxfaUP3NRvnLuux4O36MOD5z7HIV7jH8Xeo04Qm0u/QvUf4OGygQDcM9EZ47F6Y0jBhCByF5ddPqzLb5HVxuy+PunjgjsyZMi8ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758005228; c=relaxed/simple;
-	bh=ixnPJSz/rvC/EypjUzFbrjm7d8lthdogrnUalvRW89Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cZI8c0LL0+ZbCxic786xd4ebvUkEOP16+pVXCTcmSpftUBksQUamVxMxky+Ul6xrRw8yx0SZafaY+yz0e+zO92ZOieWtaVQuRSAEDmFRs/H0BrCwrfoSy3Yttn9C0aSXtalXlLG1ihoPeZeN2O1yn6BV+mcwPLbRffWLHKrrZRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tKGD0OcL; arc=none smtp.client-ip=91.218.175.174
+	s=arc-20240116; t=1758005232; c=relaxed/simple;
+	bh=e2Och8MCNRVJ2HqPs7A28h0GKMf4Vc3xffz2+8mv0e0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=eWFhF6aUvM2ICsio6R+OSv4iDctHJqLqlJ7rlKZIMxgp39mYsvQfHBhGjBKSe8er5s4iEImJDozL22TqDUimZBtEB3sMYCCWOFl4l8DusQ/RBxkmmnOlEGLtFVGjq+Gfi/HJ5k+QU62k/PKygUO9gI5uOA/KbGKJPKkQ4Cq5HU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fYLziVqc; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758005221;
+	t=1758005226;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9POLLP8ZbOwDyCGGly8E/uUVBxtn+SCHe1doDfsp8mk=;
-	b=tKGD0OcLrodTUA41+TiNv0p8iiAz0ao/Bqj++eW63vemizWLX+t6392bh+cYEjpKMvztyC
-	a+3QNKGcagKnIxN7cOw4I41N1FKECv+HJp13sZzmwECQwAmlL6OIdgIBQ8H9pkSPEZzr81
-	KbjUznRFhpx1dvmtmnieNICTqa/0Vd8=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T8uH/d61lIzsXarIEdO6A+UL33AK9E0ycEfJKcpiYbk=;
+	b=fYLziVqcl7neDH+U9CUKsFZ5F1qedt+FMWgv2oohoGW8wKWHDmv+n/bz11/OKio98kTR2n
+	Np5lsJk/9KZ4wDGyBXiyOGfKEIfFgjodREZ7r6MED6drhdbTFrrBbLRl3VqEdNYazPQ/4p
+	gBu49oCJopv7p9OSwvx3ytRuzEwB5jk=
 From: xuanqiang.luo@linux.dev
 To: edumazet@google.com,
 	kuniyu@google.com
@@ -48,9 +50,11 @@ Cc: kerneljasonxing@gmail.com,
 	kuba@kernel.org,
 	netdev@vger.kernel.org,
 	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [PATCH net-next v2 0/3] net: Avoid ehash lookup races
-Date: Tue, 16 Sep 2025 14:46:11 +0800
-Message-Id: <20250916064614.605075-1-xuanqiang.luo@linux.dev>
+Subject: [PATCH net-next v2 1/3] rculist: Add __hlist_nulls_replace_rcu() and hlist_nulls_replace_init_rcu()
+Date: Tue, 16 Sep 2025 14:46:12 +0800
+Message-Id: <20250916064614.605075-2-xuanqiang.luo@linux.dev>
+In-Reply-To: <20250916064614.605075-1-xuanqiang.luo@linux.dev>
+References: <20250916064614.605075-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,36 +66,85 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-After replacing R/W locks with RCU in commit 3ab5aee7fe84 ("net: Convert
-TCP & DCCP hash tables to use RCU / hlist_nulls"), a race window emerged
-during the switch from reqsk/sk to sk/tw.
+Add two functions to atomically replace RCU-protected hlist_nulls entries.
 
-Now that both timewait sock (tw) and full sock (sk) reside on the same
-ehash chain, it is appropriate to introduce hlist_nulls replace
-operations, to eliminate the race conditions caused by this window.
-
+Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 ---
-Changes:
-  v2:
-    * Patch 1
-	* Use WRITE_ONCE() to initialize old->pprev. 
-    * Patch 2&3
-	* Optimize sk hashed check. Thanks Kuni for pointing it out!
-
-  v1: https://lore.kernel.org/all/20250915070308.111816-1-xuanqiang.luo@linux.dev/
-
-Xuanqiang Luo (3):
-  rculist: Add __hlist_nulls_replace_rcu() and
-    hlist_nulls_replace_init_rcu()
-  inet: Avoid ehash lookup race in inet_ehash_insert()
-  inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
-
  include/linux/rculist_nulls.h | 61 +++++++++++++++++++++++++++++++++++
- include/net/sock.h            | 23 +++++++++++++
- net/ipv4/inet_hashtables.c    |  4 ++-
- net/ipv4/inet_timewait_sock.c | 15 ++++-----
- 4 files changed, 93 insertions(+), 10 deletions(-)
+ 1 file changed, 61 insertions(+)
 
+diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.h
+index 89186c499dd4..8ed604f65a3e 100644
+--- a/include/linux/rculist_nulls.h
++++ b/include/linux/rculist_nulls.h
+@@ -152,6 +152,67 @@ static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
+ 	n->next = (struct hlist_nulls_node *)NULLS_MARKER(NULL);
+ }
+ 
++/**
++ * __hlist_nulls_replace_rcu - replace an old entry by a new one
++ * @old: the element to be replaced
++ * @new: the new element to insert
++ *
++ * Description:
++ * Replace the old entry with the new one in a RCU-protected hlist_nulls, while
++ * permitting racing traversals.
++ *
++ * The caller must take whatever precautions are necessary (such as holding
++ * appropriate locks) to avoid racing with another list-mutation primitive, such
++ * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on this same
++ * list.  However, it is perfectly legal to run concurrently with the _rcu
++ * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
++ */
++static inline void __hlist_nulls_replace_rcu(struct hlist_nulls_node *old,
++					     struct hlist_nulls_node *new)
++{
++	struct hlist_nulls_node *next = old->next;
++
++	new->next = next;
++	WRITE_ONCE(new->pprev, old->pprev);
++	rcu_assign_pointer(*(struct hlist_nulls_node __rcu **)new->pprev, new);
++	if (!is_a_nulls(next))
++		WRITE_ONCE(new->next->pprev, &new->next);
++}
++
++/**
++ * hlist_nulls_replace_init_rcu - replace an old entry by a new one and
++ * initialize the old
++ * @old: the element to be replaced
++ * @new: the new element to insert
++ *
++ * Description:
++ * Replace the old entry with the new one in a RCU-protected hlist_nulls, while
++ * permitting racing traversals, and reinitialize the old entry.
++ *
++ * Return: true if the old entry was hashed and was replaced successfully, false
++ * otherwise.
++ *
++ * Note: hlist_nulls_unhashed() on the old node returns true after this.
++ * It is useful for RCU based read lockfree traversal if the writer side must
++ * know if the list entry is still hashed or already unhashed.
++ *
++ * The caller must take whatever precautions are necessary (such as holding
++ * appropriate locks) to avoid racing with another list-mutation primitive, such
++ * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on this same
++ * list. However, it is perfectly legal to run concurrently with the _rcu
++ * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
++ */
++static inline bool hlist_nulls_replace_init_rcu(struct hlist_nulls_node *old,
++						struct hlist_nulls_node *new)
++{
++	if (!hlist_nulls_unhashed(old)) {
++		__hlist_nulls_replace_rcu(old, new);
++		WRITE_ONCE(old->pprev, NULL);
++		return true;
++	}
++	return false;
++}
++
+ /**
+  * hlist_nulls_for_each_entry_rcu - iterate over rcu list of given type
+  * @tpos:	the type * to use as a loop cursor.
 -- 
 2.25.1
 
