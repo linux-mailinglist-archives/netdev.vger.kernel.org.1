@@ -1,140 +1,145 @@
-Return-Path: <netdev+bounces-223645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 482E6B59D08
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:10:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D2AB59D2F
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:13:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC7EB481D85
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:06:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF23C3B7814
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFBA31FEEB;
-	Tue, 16 Sep 2025 16:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0587C279DC8;
+	Tue, 16 Sep 2025 16:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwEgc+uK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2B93b8LT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4F031FED7
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B52328586
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758038723; cv=none; b=KV0psaoMsLeD9PiLXvdeIktQYYKVJvbWD9aQ4w0a5dlWLpzi4hNGx/cPFudw6aPMssmec/72QVI8t6ikkPxD3mXZTQPmyy0Hsbd6SZVBiqRpWcaeynlJcL4dWvrtHxxaeYiXFyqF8fYFgufeFLOyReo4nUb8FC/HA/MPEoplwGY=
+	t=1758038997; cv=none; b=ScoCX+Zi12l6v8AcXKkMb7490BAd3ps9pIWqCAOkHVo+ht0dcED2IARd9qmLjyHx+NJNCXWwF02jrzDTTwwiCUG17YuJ1mGj3XowZqWeNSiD2roVAyrDkQjWm+M4Bn1vAuhtFDvIxJQW36FkhDocgNLy9qQdDa5NLyCZ+hORzJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758038723; c=relaxed/simple;
-	bh=oHRXTI+7kTCylfEAVG8J0Jcuvb/SZi6In82M6iQbx9A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UExPDq2i0SmuaFR5nk/EV8YrVjIKVxwZK1bfomGkrHEr0MO/QKpto5gqYbLER0xUXIKY7hQZCE4k2BT8jiHm2rXPm/7dxznsvyuYaP+Z+w3W/XfDSyKfkild5iAxfs3J1b5U9C+H0HcZxEtnDao2wijiC6eBuE981olhxeONMJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hwEgc+uK; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-89336854730so86093739f.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:05:19 -0700 (PDT)
+	s=arc-20240116; t=1758038997; c=relaxed/simple;
+	bh=PLTS7YLmNVLAibIPolrVrckW2x/g0La72gXKKChg3ew=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oprQ0GDk93r8kJ8JjxGV6wA8zfeAXdoA/TqRGXwDuPs0WQIURY9EgV6TCWYk3S7w4Ftn6+0SkZ5uxYMBje+eeRnSRhEq9DO6DUGUv5BbAzEVNb6z55YyawvHbBf18COH8/azJaTz0KmyeuOjD6VkSHKVgURStW53XkIIiShStiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2B93b8LT; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b5fb1f057fso81761791cf.0
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:09:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758038718; x=1758643518; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ONqPQabgnBykEY79xtJLoW2kJlD0fAbuF5tH/LZZvY4=;
-        b=hwEgc+uKOOASdYm3rdlJMDo+4JxrEy/5/hTSdaHXnYVBPOuu9gEf5HkJBNUAaH4XPa
-         zbPwydVC7oLmrskyLzIGYzD4bQXqE0Tszn6EjN+ys3R0k+A4ge0YFgRoGo55ai/0FiZX
-         060rBblEnf2j6p1DN3zzLezZ42d4Eee2/weEq/wmxEKBE3u3ai//2Nl++XTflXaKmWId
-         lhWOblrnzfDot7yo8kKPY6S5tXbWgqThEO3sTBhxi+jII6hBEzpQnPF+QsaYXnquNAp7
-         uK6SgIkr7BjKD6P2uBzjIwjOhqFSgzJi3K6doG+0mGHpBQOr49SJphWPHMQv1VkDHuK3
-         CatQ==
+        d=google.com; s=20230601; t=1758038995; x=1758643795; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ev7UlKDng61bYRawaL3+HBlxIteZ27n2CF/AcPtUIOo=;
+        b=2B93b8LTKn7nTmq0kv+14Kcbv2rdIR7dmH8eBZyoGrxVT8QIKCJ+dUAqNvWbHL5Vyf
+         ybWWYLmiE7JjmREuL64V59Zn4gbnqhMwvbJlsjxAY6JR6WcCV8t5taSpvqwsez/Dj9Yd
+         ZhI5c7vFcDKV0l/ZXkehRELFgrtrMDor4G5DHxCycJMPgTgdn+Qy55NS77nuSKHBQxe5
+         JcQv6BamjFFIhz+fejZOdElIQ91qZCPVuoJt8Nt3kEM6UGvqzjwIksucGcBjwyXOazLP
+         /6kJLIMH4B122K02iIuAuZCPNMhNc+gruiHryFaT0du0o+v8LnGJNHUDEPB73AEEckNs
+         Zm/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758038718; x=1758643518;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ONqPQabgnBykEY79xtJLoW2kJlD0fAbuF5tH/LZZvY4=;
-        b=QEf05tRFpxjcStT3b8x+ILgsvj7vHMPqTkZfjmy0ADKKnPikYZS1yD+PPxLIE7NR+U
-         eMJMVgFeOQ1MaYPqC0z9GPVkW8LMqDCwPImdv2GuZi+AzFxA0m1MbJVg6Au35LC0etuS
-         BnFc34JnKq/999wm864dKiRYDCX0ss2kDAOwWrGL4ywceSQw0GNMQvZfHmif/I32EcUs
-         h4Q1lG/iU9C+qVk4xHycQk27c/HtQGigiAnlGoHVTVtDaX3/hYscNSB4VgLquJ2O3iPw
-         2a9qoHxnozgPdwQb+RVFG/N2YanrPbGGJJderCv4ZTIbYIUyJOpeNXBh5SH2JZs4Sdkg
-         Cv3Q==
-X-Gm-Message-State: AOJu0YyF4yKgaJlyQ4xbpuXgNQYeBrrMom3YjMpvFlzhMXAmmkjBfxEW
-	LXwCJ+x3BCpeJCPqlz+OYkc2dP/5PISbY3e+uR+uSBtC+GPDkdKDtOlS6o7BeA==
-X-Gm-Gg: ASbGnctlKW+v2deWM1Si9yZJae+OeiKsLIo3UnTWqQ7ObtFQLwVUvE7Jnt1YwnHH9lP
-	RH29Na0vV8s6UoQg4ha5nCE19JK86I3FcuZ6w5Wbq8ovc9nwGznq7jYDJNuJkSnLhNghwN5qlxI
-	EUEdiqS4KDzSgZd4jVyycaclhh8aOJ3niNHqfA6jaB8Hd8Yc58NYiiesZEVu9cqJgAkCHx/sjAo
-	+pV/evEP5txgfOKGlNsypiZF5zyUy8pU4kO85PnMijRiWU904o2oBKi017uLrQAVeHsOvm4lBNQ
-	Q0rmEAuqnNvRUkbMVpf2T9FX815hT+gs1feA/KFw+USga+GpzRKOrKXPyOa59wC99mS3XZ4invs
-	VfW5OKBViDNtPyhQfe4jc7NNGnPJSQlikjNnBsj5Da+TD/nc1HO8vkhjNPRvoJ2X39fl0vKCpUY
-	0Ia3KRh5YN
-X-Google-Smtp-Source: AGHT+IFN3Gv+m9V0IfxaNnbV2KeWRy35X0A7U0enN8GwLniXySfimLqM3kZXWktP3rUws49tZfN/Rw==
-X-Received: by 2002:a05:6e02:1567:b0:424:57d:1a53 with SMTP id e9e14a558f8ab-424057d1b5amr60694005ab.7.1758038718269;
-        Tue, 16 Sep 2025 09:05:18 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e02:1040:a4da:effc:65ff:6899? ([2601:282:1e02:1040:a4da:effc:65ff:6899])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-511f309b695sm6009326173.58.2025.09.16.09.05.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Sep 2025 09:05:17 -0700 (PDT)
-Message-ID: <7d03fa72-b6ca-4f98-9f48-634ea45a0cc8@gmail.com>
-Date: Tue, 16 Sep 2025 10:05:16 -0600
+        d=1e100.net; s=20230601; t=1758038995; x=1758643795;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ev7UlKDng61bYRawaL3+HBlxIteZ27n2CF/AcPtUIOo=;
+        b=Yldm2YUN9RTkblyRwcsqFp3oV4230nctBGlL/QLmyyz6KVrY2UNAFHtetaPIahKJCi
+         0drAKYgNFO3Pf+YhNcCI7NekSGhRdmApWLMRJPsIZurSEcXfva0jYMhaQ0rGS3BLDrQG
+         YSWTahpjbw06cy3PbEl84OC7o30LXRNiKt844ZZX+1kfV0iIM55ya2ozbK6tFFXuHVhf
+         LJ+D8k+vumQO4eRYjSUo8MC3VvkfjmFdjJzWbNY0XF0wMTCdPHsB1771apRd2RthMZvW
+         ahFA8lh9VPngSc+Bhxus5gdDTToAgaBmqaVL8h9i0OuAwNm93cFqx3WOLrBrTuNE4G/V
+         2dUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWjbQSBjAA5QBtaAY7cUducOWwqqvwijROhW21CxVWkHqi3zy5QAMmFTfaNRfdK0U7oMsW3Wpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv/KsVKlHCkCd/KXh8PkksKY+smEHOOxv9wDGbKQT69wyRVjAp
+	Low6rnkUb/2InxNu2kEbBT4ttfFkCiAF/ffaGUXbBmP/4QzNdCotnZenVxRsSyPre6SshAlPSSb
+	+pi03ozfRLds5hw==
+X-Google-Smtp-Source: AGHT+IFj801zrpGw/QyE9jiL89sU6sBG5G9jud7ln6WDbRXQdRaY2Bc8aownywDMV71WXJhkuvCu6rLo5wDgYQ==
+X-Received: from qtbne22.prod.google.com ([2002:a05:622a:8316:b0:4b5:e0ab:fe1])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:40cd:b0:4b2:ed82:29d5 with SMTP id d75a77b69052e-4b77d00fd60mr243971601cf.33.1758038995285;
+ Tue, 16 Sep 2025 09:09:55 -0700 (PDT)
+Date: Tue, 16 Sep 2025 16:09:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next 1/2] scripts: Add uapi header import script
-Content-Language: en-US
-To: Kory Maincent <kory.maincent@bootlin.com>,
- Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20250909-feature_uapi_import-v1-0-50269539ff8a@bootlin.com>
- <20250909-feature_uapi_import-v1-1-50269539ff8a@bootlin.com>
- <20250916074155.48794eae@hermes.local>
- <20250916180100.5f9db66d@kmaincent-XPS-13-7390>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20250916180100.5f9db66d@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250916160951.541279-1-edumazet@google.com>
+Subject: [PATCH net-next 00/10] udp: increase RX performance under stress
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/16/25 10:01 AM, Kory Maincent wrote:
-> On Tue, 16 Sep 2025 07:41:55 -0700
-> Stephen Hemminger <stephen@networkplumber.org> wrote:
-> 
->> On Tue, 09 Sep 2025 15:21:42 +0200
->> Kory Maincent <kory.maincent@bootlin.com> wrote:
->>
->>> Add a script to automate importing Linux UAPI headers from kernel source.
->>> The script handles dependency resolution and creates a commit with proper
->>> attribution, similar to the ethtool project approach.
->>>
->>> Usage:
->>>     $ LINUX_GIT="$LINUX_PATH" iproute2-import-uapi [commit]
->>>
->>> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
->>> ---  
->>
->> Script I use is much simpler.
-> 
-> The aim of my patch was to add a standard way of updating the uAPI header.
-> Indeed I supposed you maintainers, already have a script for that but for
-> developers that add support for new features they don't have such scripts.
-> People even may do it manually, even if I hope that's not the case.
-> We can see that the git commit messages on include/uapi/ are not
-> really consistent. 
-> 
-> IMHO using the same script as ethtool was natural.
-> The final decision is your call but I think we should have a standard script
-> whatever it is.
-> 
-> Regards,
+This series is the result of careful analysis of UDP stack,
+to optimize the receive side, especially when under one or several
+UDP sockets are receiving a DDOS attack.
 
-There are separate needs.
+I have measured a 47 % increase of throughput when using
+IPv6 UDP packets with 120 bytes of payload, under DDOS.
 
-I sync include/uapi for iproute2-next based on net-next. rdma and vdpa
-have separate -next trees which is why they have their own include/uapi
-directories. This script makes this part much easier for me hence why I
-merged it.
+16 cpus are receiving traffic targeting a single socket.
 
-Stephen will ensure all uapi headers match the kernel release meaning
-Linus' tree.
+Even after adding NUMA aware drop counters, we were suffering
+from false sharing between packet producers and the consumer.
+
+1) First four patches are shrinking struct ipv6_pinfo size
+   and reorganize fields to get more efficient TX path.
+   They should also benefit TCP, by removing one cache line miss.
+
+2) patches 5 & 6 changes how sk->sk_rmem_alloc is read and updated.
+   They reduce reduce spinlock contention on the busylock.
+
+3) Patches 7 & 8 change the ordering of sk_backlog (including
+   sk_rmem_alloc) sk_receive_queue and sk_drop_counters for
+   better data locality.
+
+4) Patch 9 removes the hashed array of spinlocks in favor of
+   a per-udp-socket one.
+
+5) Final patch adopts skb_attempt_defer_free(), after TCP got
+   good results with it.
+
+
+Eric Dumazet (10):
+  ipv6: make ipv6_pinfo.saddr_cache a boolean
+  ipv6: make ipv6_pinfo.daddr_cache a boolean
+  ipv6: np->rxpmtu race annotation
+  ipv6: reorganise struct ipv6_pinfo
+  udp: refine __udp_enqueue_schedule_skb() test
+  udp: update sk_rmem_alloc before busylock acquisition
+  net: group sk_backlog and sk_receive_queue
+  udp: add udp_drops_inc() helper
+  udp: make busylock per socket
+  udp: use skb_attempt_defer_free()
+
+ include/linux/ipv6.h             | 37 ++++++++++++-----------
+ include/linux/udp.h              |  1 +
+ include/net/ip6_route.h          |  8 ++---
+ include/net/sock.h               |  4 +--
+ include/net/udp.h                |  6 ++++
+ net/core/sock.c                  |  1 -
+ net/ipv4/udp.c                   | 50 ++++++++++++++------------------
+ net/ipv6/af_inet6.c              |  2 +-
+ net/ipv6/inet6_connection_sock.c |  2 +-
+ net/ipv6/ip6_output.c            |  6 ++--
+ net/ipv6/raw.c                   |  2 +-
+ net/ipv6/route.c                 |  7 ++---
+ net/ipv6/tcp_ipv6.c              |  4 +--
+ net/ipv6/udp.c                   |  8 ++---
+ 14 files changed, 69 insertions(+), 69 deletions(-)
+
+-- 
+2.51.0.384.g4c02a37b29-goog
+
 
