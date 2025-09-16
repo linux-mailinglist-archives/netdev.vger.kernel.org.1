@@ -1,198 +1,108 @@
-Return-Path: <netdev+bounces-223732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A8CAB5A410
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:36:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC13B5A419
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:42:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4DB3582F5F
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:36:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 923F5523E5E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33537283FF0;
-	Tue, 16 Sep 2025 21:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD222DC783;
+	Tue, 16 Sep 2025 21:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VZuvD9Vm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiKilsRb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8344F281369
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893F12820B9;
+	Tue, 16 Sep 2025 21:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758058576; cv=none; b=Dm7w1CgcW+fUOksYiWnvGuOdpxK8j4TxwcNfUks6MZvBjeyKNgads3fFLJJUlY4PxeIuUVTTjO+a3wmMXqO0+37BdeIFvAaJ4TqfmL1kFq9nTmQZMOU4SMR0nFAiXk2i5EHPVbQv/k42p7boS/AL3HTVdS/wuhkYJg6NBN6CkFs=
+	t=1758058920; cv=none; b=Rl1ayH5HnHZtwaMpTzQZdZQ+OMJIsHIczrumY3+bhFf3QZaYRsHea3fQw+B6eu97974Xi2bLdjSk1W25GhqAk++HmYu9ysE0Yy/m0hghn9NrpbOSU2VaUAJMATyrEXQmaB0tdMv+qGdx5LoPdsAWUCuJtVA88Mex6+qhbJLcu0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758058576; c=relaxed/simple;
-	bh=N56YtZJFoXvsE7cRT1onTi17/fepHuemQoI30iftZh4=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=jqwF3BnPS4aiyysRG9OmOYa8laa4xSvLGLqqHLIkuKpMiDSilC+B1o6uRhWti7xq45B2wHuovqmflIIQwyP25z4hOkVszr7WTObB7bH6uQDlviAeT6/cjX5eKW7zgFNwRyiyV7kU2Vp7okNqX3VO+uL1ylOJcSiyqs8XqGAcvWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VZuvD9Vm; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kRXoK0A2hBXkU7zBWyuZuw+fxiVrjBZqA9iVdeGMOLk=; b=VZuvD9VmcNDTwAHN7jn2a2HRs4
-	+b4FqadQcvgxW+fz9bZA1kKt7kx6Zh3iZvTlSOHAINJtUJYNJAi+ImGgf8o4sbI4B0MzHT+KlVMRF
-	FznaiCMNSqQo+9lCziditrXqLCgCi/XQCpF8fRW5GZHYQKfdes3UXALvFMzqx1FDhAS4lWJMr57P+
-	F96+rJC4qOt9dGhdb2mh5fY1ZHbCTN4O80vSg4cmhjJUUJS9FScN5A0KDky314I3bDU3U0RudxJKB
-	xuovbpNVMsa4JtCv/epI2g/4eRm01ClxQDz/WjJYZS23lj073YSo2j/B67In3zZo5kxX3nytMsr4i
-	0Aom7Pcw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47242 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uydLI-000000006Lm-1xiv;
-	Tue, 16 Sep 2025 22:36:04 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uydLH-000000061DM-2gcV;
-	Tue, 16 Sep 2025 22:36:03 +0100
-In-Reply-To: <aMnYIu7RbgfXrmGx@shell.armlinux.org.uk>
-References: <aMnYIu7RbgfXrmGx@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Eric Dumazet <edumazet@google.com>,
-	imx@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	netdev@vger.kernel.org,
-	Nick Shi <nick.shi@broadcom.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	Yangbo Lu <yangbo.lu@nxp.com>
-Subject: [PATCH net-next v2 2/2] ptp: rework ptp_clock_unregister() to disable
- events
+	s=arc-20240116; t=1758058920; c=relaxed/simple;
+	bh=tRIfdhsAJMME1a45JIICOi38lqR6oYNtURxnDEmjumg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=ZCxleXv/YpG6imYdnln+24v0YGazAw/fQuwmXZcgckAws3NHj8NAygd3f4S9LG6K++cF5bWZvfM1WG4NGq8gv7G3TEF8pMPnt0nr+ZQqr1iZC2WjW/QvnoIJYi2oT+1Qdu8dLeD/5la0DYp0yvki4N05P6mjVx5T1mCbThFJ240=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RiKilsRb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60407C4CEEB;
+	Tue, 16 Sep 2025 21:41:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758058920;
+	bh=tRIfdhsAJMME1a45JIICOi38lqR6oYNtURxnDEmjumg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=RiKilsRb4kpDl0//LUuc+uz2OTTgEllKymx7sarK7K5V2gLsr1ROtovFW0kOsUepf
+	 CVUdEQwwFLuSUlqYhn6YaIEwVcdS85CEUrDgYJ/g/48X7rp29GP9CNn6aMIQ33PIx6
+	 qMTtsWRCJkxlISgeK+B5r9gsmYQwYK6nqqaFNCyItywRMPpokt8mtHhDOYHRiXCGLD
+	 KWtBypRC0GLgKb/k4OKDQX3TcZQszrX6kdAAB5qWE85+zq27Y2ISZzvlf2onQxOUXP
+	 eVaTIJcnLNpTPwq+FD10s0x7LBVntsCuIxjWMtNZ14xDhjF+mKr+hGMh5HIGCYjgHd
+	 JlE06EhPv51FA==
+From: Mark Brown <broonie@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+ Shengjiu Wang <shengjiu.wang@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Jonas Rebmann <jre@pengutronix.de>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-sound@vger.kernel.org, imx@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, Lucas Stach <l.stach@pengutronix.de>, 
+ David Jander <david@protonic.nl>, Oleksij Rempel <o.rempel@pengutronix.de>
+In-Reply-To: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
+References: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
+Subject: Re: (subset) [PATCH 0/4] Mainline Protonic PRT8ML board
+Message-Id: <175805891512.247117.14108545633571750279.b4-ty@kernel.org>
+Date: Tue, 16 Sep 2025 22:41:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uydLH-000000061DM-2gcV@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 16 Sep 2025 22:36:03 +0100
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-56183
 
-The ordering of ptp_clock_unregister() is not ideal, as the chardev
-remains published while state is being torn down, which means userspace
-can race with the kernel teardown. There is also no cleanup of enabled
-pin settings nor of the internal PPS event, which means enabled events
-can still forward into the core, dereferencing a free'd pointer.
+On Wed, 10 Sep 2025 14:35:20 +0200, Jonas Rebmann wrote:
+> This series adds the Protonic PRT8ML device tree as well as some minor
+> corrections to the devicetree bindings used.
+> 
+> 
 
-Rework the ordering of cleanup in ptp_clock_unregister() so that we
-unpublish the posix clock (and user chardev), disable any pins that
-have EXTTS events enabled, disable the PPS event, and then clean up
-the aux work and PPS source.
+Applied to
 
-This avoids potential use-after-free and races in PTP clock driver
-teardown.
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/ptp/ptp_chardev.c | 20 ++++++++++++++++++++
- drivers/ptp/ptp_clock.c   | 15 ++++++++++++++-
- drivers/ptp/ptp_private.h |  2 ++
- 3 files changed, 36 insertions(+), 1 deletion(-)
+Thanks!
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index eb4f6d1b1460..8106eb617c8c 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -47,6 +47,26 @@ static int ptp_disable_pinfunc(struct ptp_clock_info *ops,
- 	return err;
- }
- 
-+void ptp_disable_all_events(struct ptp_clock *ptp)
-+{
-+	struct ptp_clock_info *info = ptp->info;
-+	unsigned int i;
-+
-+	mutex_lock(&ptp->pincfg_mux);
-+	/* Disable any pins that may raise EXTTS events */
-+	for (i = 0; i < info->n_pins; i++)
-+		if (info->pin_config[i].func == PTP_PF_EXTTS)
-+			ptp_disable_pinfunc(info, info->pin_config[i].func,
-+					    info->pin_config[i].chan);
-+
-+	/* Disable the PPS event if the driver has PPS support */
-+	if (info->pps) {
-+		struct ptp_clock_request req = { .type = PTP_CLK_REQ_PPS };
-+		info->enable(info, &req, 0);
-+	}
-+	mutex_unlock(&ptp->pincfg_mux);
-+}
-+
- int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
- 		    enum ptp_pin_function func, unsigned int chan)
- {
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index 1d920f8e20a8..ef020599b771 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -498,9 +498,21 @@ int ptp_clock_unregister(struct ptp_clock *ptp)
- 		device_for_each_child(&ptp->dev, NULL, unregister_vclock);
- 	}
- 
-+	/* Get the device to stop posix_clock_unregister() doing the last put
-+	 * and freeing the structure(s)
-+	 */
-+	get_device(&ptp->dev);
-+
-+	/* Wake up any userspace waiting for an event. */
- 	ptp->defunct = 1;
- 	wake_up_interruptible(&ptp->tsev_wq);
- 
-+	/* Tear down the POSIX clock, which removes the user interface. */
-+	posix_clock_unregister(&ptp->clock);
-+
-+	/* Disable all sources of event generation. */
-+	ptp_disable_all_events(ptp);
-+
- 	if (ptp->kworker) {
- 		kthread_cancel_delayed_work_sync(&ptp->aux_work);
- 		kthread_destroy_worker(ptp->kworker);
-@@ -510,7 +522,8 @@ int ptp_clock_unregister(struct ptp_clock *ptp)
- 	if (ptp->pps_source)
- 		pps_unregister_source(ptp->pps_source);
- 
--	posix_clock_unregister(&ptp->clock);
-+	/* The final put, normally here, will invoke ptp_clock_release(). */
-+	put_device(&ptp->dev);
- 
- 	return 0;
- }
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index b352df4cd3f9..76ab9276b588 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -141,6 +141,8 @@ extern const struct class ptp_class;
-  * see ptp_chardev.c
-  */
- 
-+void ptp_disable_all_events(struct ptp_clock *ptp);
-+
- /* caller must hold pincfg_mux */
- int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
- 		    enum ptp_pin_function func, unsigned int chan);
--- 
-2.47.3
+[2/4] ASoC: dt-bindings: asahi-kasei,ak4458: Reference common DAI properties
+      commit: 8d7de4a014f589c1776959f7fdadbf7b12045aac
+
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.
+
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
+
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
+
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
+
+Thanks,
+Mark
 
 
