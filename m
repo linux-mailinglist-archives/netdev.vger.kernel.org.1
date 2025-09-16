@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-223365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C470EB58E09
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 07:46:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B38A4B58E17
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 07:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ED152A27B7
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 05:46:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D61A16E4DE
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 05:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678782DF149;
-	Tue, 16 Sep 2025 05:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE122D6E7D;
+	Tue, 16 Sep 2025 05:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B3Rc5ZBE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a7mwEH4W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77B42DF125
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 05:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DAD221DAD
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 05:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758001560; cv=none; b=bNilgHv8jK6N1Ajm3aGcLbKWUstppL9cfz2yu2fwGWSNZKqTZXXAqHLfyAgJCE8USomRkEE70xpGto666ayxgxIyMwSlYah6bOzowghUtzkUPbAlk+qR9HQ8RwjM1F/m1CZR1N5atJAXaVT/T2dWcjuaOB34gOUGmWk4b7Zq7JY=
+	t=1758001853; cv=none; b=Q2Kew/AdSmIAeSMwZn1Pb/FVI5v+a7I/RHZoTqgMSPnBHHFo3i+V4xYq3RVfnRvWxDXdneLKXaSViLdLDtdOFwSOdCGzteG5e1+9vvsF3lKaKz18vM6ITJVKnTOjq8y/rRXF1hx09NHyLgOj4JTyF5POABIHhzAKlGBOxgprN5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758001560; c=relaxed/simple;
-	bh=A13MkdRWtYEoGnVQtmR4Rh4OuvVy1425Eajd//TFG4E=;
+	s=arc-20240116; t=1758001853; c=relaxed/simple;
+	bh=jOFjelAeUGYYJhWOrvXJRPCoPExWqx9ES6ZMZOxMdUc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qfdD9q6UqEsOUy60aNBrPYFscqslaxga/kKPZlxvKDCb25gEp4PQlqwVNjgJ0kQ59ggxrR7tKLMO8WXiAP3ke94aX6Q0m9W+wfTEL+tqzEtDK+e/Gz2ul9PxzrJhzZzjr7t1Wwpon8ZKMKiQHfU+7KA0CYfLSPJtFdzJbkOXEJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B3Rc5ZBE; arc=none smtp.client-ip=209.85.214.178
+	 To:Cc:Content-Type; b=hcoovJzbPznCDRTY4PUa0L9Bd5DHc4jnmIuLmsujVaZm3Diq9mcbUEZUwm80kmfUZu6QFf/2Z6nx9drof6rPUNeHerZq2TZdhZ9jpoGM2R3I5blEyeqy8uAe38cPt8Gb61ATw/aOIc5qhB45EvOmy4pajWfUhqtef6gYdHFA8KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a7mwEH4W; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2570bf6058aso66061925ad.0
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 22:45:58 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b54c707374fso1393793a12.1
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 22:50:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758001558; x=1758606358; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758001851; x=1758606651; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A13MkdRWtYEoGnVQtmR4Rh4OuvVy1425Eajd//TFG4E=;
-        b=B3Rc5ZBE5pC9eI/nHkU4JMcyoLtwLvkAgbwMbaI+3FfE3MJIDZoQx+zQN8Ptg2I5Rc
-         B30JPyhsfZYrCsW4Zpe67ly8iYZBfxTwKqGnW9dhSIX3A2z8Z/VE6py30X+w7E4m0BGg
-         ZRvZ1GUFrLUx3FqWAT5bNAk5BKLprJdjQM4G+AO4MMe2USANgDKLngqEwgFaJyAZ4VD2
-         KKLcnHK8sDNcdmNGRnO/+gOJ9mhRIpvd44o6MTIwLpStnEeopXuU5kDa+Lz3vfBI8Cdv
-         KNjn6HLcL7pxzLxDjYMXJyxTHzDtaZVymYzV/9Q1c7lxRsZuP9nzZxZPnC8LfZQsuxu3
-         elqA==
+        bh=uC7lcdF5yoRsiFdtU9hvyBhv7JRrCU6GaaI4bilxlMA=;
+        b=a7mwEH4Wn/lXCwJ/z6Xf1QtmD7hJ3vsqf1Y7Jalkm1h8CjHW404bG6EszAA3pYxWGI
+         ntXvKaX098nU1day1l/69u4pEKVri4uHFmms4jxGrwurpt6gkfW7/ijiViXuiZxNYrz+
+         2SVIIfuQA5S7lyeBsx136rnufKEyCCSGYbL3hCnpD+vg3kK3Ts4K6vH9/WibaRuoSFn9
+         0oUgNerrh1vd+PUeVdsU2nDXXCE3oOU3brXh9SEb9HntMkVwjzZk7IqVQV1ogis16skt
+         4NWDu8aRXuGqd9qhMs5a0/oaJc9F6qVimAcZGgpyo+O54P4fgm1OVbniFxpsIcRYbVxe
+         OvzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758001558; x=1758606358;
+        d=1e100.net; s=20230601; t=1758001851; x=1758606651;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=A13MkdRWtYEoGnVQtmR4Rh4OuvVy1425Eajd//TFG4E=;
-        b=DTjmQkllJWSaGhhZYNWklgy1vAnvUpLdJUwMPIfqpp3clHTzLzl92+BGJEbIdMNc1Y
-         tykrv+8td9QwuURs+v06e7jb2vuiL3X9PE42FdvRfS/dji4EAEhBfjZHgJVNToiPtEne
-         1zrpA8hq6A2IsxI4eLMvIE7fzFB+kdqxQS5I/Wnue+FONu8+q/gLgfKje4WSLWp00EF3
-         LRAanOCrate6tLcBWQtz4k8VvPXwX7CFbr8mzFnf5ZReGnjc+W8UXSeFCuNi8Cger2iz
-         yZPY7MjEitrvddl4T2c/JLAAV88JKu652roqDR/5lYxIP0pEJd7tLKUdh9jRq+un69L3
-         HEaw==
-X-Gm-Message-State: AOJu0YwaeI65uTKkG3Dp0W17FskuKWvsH9/AxjHh7+epQMiasSWVy+Pe
-	Jbg8hwEICkEPZ5rdlbbFZ64IBx5s1u8Mhw+42hiimojzJt7oodXH4fcZP+ETtImjyYXkrRg5o87
-	/iKO8FUt971N3OtyXPj2FqczajCSrVYb/0l0atdQN
-X-Gm-Gg: ASbGncsjyAUmFDb0fgx+/heESFjHrSd64sE99Z4XqCYuZPlZwY0la726+QPKHRI+iQf
-	Z7vXorT8885AwuTlRWKefmVLpW3Ffn7TDgZYGUBAx/sd2RrAGSbKkjmrS0NrDLU4lraZNY9rePH
-	XR1RgxD/OyhWz/jvXwdXSU9QU2Ybvysvcj/QMt7XfeX16GA9+gWig9HTb0kRo88YRJmAbcJ0rjx
-	nCX1uXEzfVKguwYrQrKwLTYIgJ4GD2lRGlv2N7xIztSVBE40Pzt5C6cQw==
-X-Google-Smtp-Source: AGHT+IHY5w3Oc3NFOJMOi8eRlyuHJUpeK0esdxyvf7SakcPihGOVGm4QvA4sKPnrtOoJ+M7i/HFV6YntdozcvUJmUWU=
-X-Received: by 2002:a17:902:ebc5:b0:240:a889:554d with SMTP id
- d9443c01a7336-25d26a5ac8emr186490495ad.45.1758001557993; Mon, 15 Sep 2025
- 22:45:57 -0700 (PDT)
+        bh=uC7lcdF5yoRsiFdtU9hvyBhv7JRrCU6GaaI4bilxlMA=;
+        b=f/VNz7Q8EYfbX/tb5+r3uoSbY/1A68Zx1qvf0f5dwbgezdUUKkJhDMasdQ2p+CcVnH
+         kKPsRft4t1C0t0Onu96/NWdmXItexA4ZTzF5J7InVzGW3JcwI1F6vFYr7wppJM2UQaO8
+         3Png2biwn6FSzxbflM2X7TARUYUK/q1jzZsWsN9HBGvu0m6RyHSez4NTBrCoF47sS4j/
+         2Ldp17MUrZY45qllYDN+Jq+6PnfZhJV4YGWUVQUvN2k5WPiDbrDHsIpD3O7ys1SWQ1ge
+         3I6nVmctAhTBvFDUwbQegPNc24ROWIwuKb7SAgaQ4ZKEZSZA9ECw5tZ4jh0RQ3yR7L1V
+         ewCQ==
+X-Gm-Message-State: AOJu0YwYkUuq5qHvxAj86w5jH7P8MZCFZdpJMYNpb8E3WcmuC/k9usjg
+	RVJKzv7tO1zwl+dpPPehPlfPaZKcUS/ODOFIfgf1s6umv++SI67AWY+9GK4tT/rYZn/jELHVddO
+	PK05/tSBwftMur6N/R0RyFtOCuUEfvqW5huQnffSd
+X-Gm-Gg: ASbGncvgGrmOUYt9/f4E/Y+kUiHu7iemJclksX4QdRonBSQXPr/WjbAS1oCSfF1UNFt
+	bcJYvI3/pJ1kf0aqb2+2PE6lBtNKqJyvG9pVGppWz2/W2z8oTGcooCnBr/hiEZEpSmns+0pvrxO
+	PD1UKl6Yo/QI9D7xVPkV9GiKNFYD/uIBX4mSlWyPp9svwg0hoLn6Z7TUm+biVssodqoJ3V0orXY
+	ZeMU+xjYxxy+/Kik4nYEZxZ+x7IJHBchsrIGQBUVKBGaSMwON4VvSaNLA==
+X-Google-Smtp-Source: AGHT+IH09e/UIwLHFIn5tHBbvjGloxcnDvNUC5XqPJ6Ur5oPUJmXEEWj5rpHipUdPu/FhGvqE6CzeD7bxJH1uBFa3v8=
+X-Received: by 2002:a17:902:ebc5:b0:24b:164d:4e61 with SMTP id
+ d9443c01a7336-25d243ef720mr148256445ad.13.1758001850396; Mon, 15 Sep 2025
+ 22:50:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,13 +75,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250913-update-bind-bucket-state-on-unhash-v4-0-33a567594df7@cloudflare.com>
- <20250913-update-bind-bucket-state-on-unhash-v4-1-33a567594df7@cloudflare.com>
-In-Reply-To: <20250913-update-bind-bucket-state-on-unhash-v4-1-33a567594df7@cloudflare.com>
+ <20250913-update-bind-bucket-state-on-unhash-v4-2-33a567594df7@cloudflare.com>
+In-Reply-To: <20250913-update-bind-bucket-state-on-unhash-v4-2-33a567594df7@cloudflare.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 15 Sep 2025 22:45:46 -0700
-X-Gm-Features: Ac12FXy3FrCKhwYNn7AA2ebaq3APOssLKI1yVfAo1Kze7nSIT980kRvBZQhdtgM
-Message-ID: <CAAVpQUCiH6pE9zG_iEfFGNrXW=+A3rLT-JLe0AaBqpu0Q43Pew@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/2] tcp: Update bind bucket state on port release
+Date: Mon, 15 Sep 2025 22:50:38 -0700
+X-Gm-Features: Ac12FXwEOEoC0t6UZJJv-0VKN3jaamvHvSxEOTs7rz-typPuEzzo_VmJk3L3jMM
+Message-ID: <CAAVpQUBLvvhPjbmGSnUk_Up10AowDEeY_bR=ecZFoSN5ef1Sfw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/2] selftests/net: Test tcp port reuse after
+ unbinding a socket
 To: Jakub Sitnicki <jakub@cloudflare.com>
 Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
@@ -93,27 +94,24 @@ Content-Transfer-Encoding: quoted-printable
 On Sat, Sep 13, 2025 at 3:09=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
 m> wrote:
 >
-> Today, once an inet_bind_bucket enters a state where fastreuse >=3D 0 or
-> fastreuseport >=3D 0 after a socket is explicitly bound to a port, it rem=
-ains
-> in that state until all sockets are removed and the bucket is destroyed.
+> Exercise the scenario described in detail in the cover letter:
 >
-> In this state, the bucket is skipped during ephemeral port selection in
-> connect(). For applications using a reduced ephemeral port
-> range (IP_LOCAL_PORT_RANGE socket option), this can cause faster port
-> exhaustion since blocked buckets are excluded from reuse.
+>   1) socket A: connect() from ephemeral port X
+>   2) socket B: explicitly bind() to port X
+>   3) check that port X is now excluded from ephemeral ports
+>   4) close socket B to release the port bind
+>   5) socket C: connect() from ephemeral port X
 >
-> The reason the bucket state isn't updated on port release is unclear.
-> Possibly a performance trade-off to avoid scanning bucket owners, or just
-> an oversight.
+> As well as a corner case to test that the connect-bind flag is cleared:
 >
-> Fix it by recalculating the bucket state when a socket releases a port. T=
-o
-> limit overhead, each inet_bind2_bucket stores its own (fastreuse,
-> fastreuseport) state. On port release, only the relevant port-addr bucket
-> is scanned, and the overall state is derived from these.
+>   1) connect() from ephemeral port X
+>   2) disconnect the socket with connect(AF_UNSPEC)
+>   3) bind() it explicitly to port X
+>   4) check that port X is now excluded from ephemeral ports
 >
 > Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+Thanks!
 
