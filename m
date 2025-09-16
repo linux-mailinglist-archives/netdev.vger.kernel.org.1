@@ -1,84 +1,118 @@
-Return-Path: <netdev+bounces-223515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AFEB59648
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0BFB5964A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D2CF520247
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:33:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19CFD3B554B
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4482C14658D;
-	Tue, 16 Sep 2025 12:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB66E2D24A1;
+	Tue, 16 Sep 2025 12:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EtGB3hi2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oy5uNtuC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618CA2DBF5E;
-	Tue, 16 Sep 2025 12:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DD5469D;
+	Tue, 16 Sep 2025 12:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758025974; cv=none; b=TSPZ9q7SviUmhGmdNWDxt3Zq5NDl6S3uWBNXP8wx6eyllFy4/tOVQ89xLyCURrt8zCq9qDkumt+cJcGST/luQgUBqSGzLjEQJBMjFe89syyD8X24vq2WZ4Q/Dsinsc7N/jg201FuSw6RDSuE/sU01OD+SWnWe0AegVY8wva/Nq4=
+	t=1758026056; cv=none; b=DyuGsGUqr6r8AN8CovGZt/g8RpMxQjj4Wcma/tOSUvpWdcAVDwAR5E1B7au953vYXSE5vVlxeyyMsoMC14dEh/MgWERpjtpmJWezl36w0A/PlA3JtyeGKby70t65tZHsvA6wmZnRq1z7iXMF2UD2P4yhdT4Rbb2+CiPKPd+jYbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758025974; c=relaxed/simple;
-	bh=aFFJQ3c3cKy0cTqTwtO7pqGldxJqu1mCv2bidJ7C+2k=;
+	s=arc-20240116; t=1758026056; c=relaxed/simple;
+	bh=LkVC7SOF1ecwe4fjNrM/LffIi1MGAwKsiw8rXf3dpnU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kDcsn3YQNGjVu3BoiGlZK34lmZnzv6eu7XChaX+GVD+q8AELCWaYow0Tv6yUiao3T9XvFfU6pWGc3UZjj8Z0Llu3WluUkNTzTWXGZQozr2hYjzHtDkFoMp6IbZedFxpewSVMVbsDtF2a4Ctebhk2HsfiVI9n3AhqBOBm+qrbYAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EtGB3hi2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=SZlYo6B8YW/emlghHc4MKfQxPkRtnwrIZO7LDI4zirQ=; b=Et
-	GB3hi2aiQsaJh66KdUKhBXsGB7EJNNKv/lQfsMkcr8bpwjlnRi1oSgz2V5p9Vck/V5HUzskqKL3m/
-	4ZRQ62ezhdez3Yb6eDSS2/7YsRrFZeWC/rRSsz0gQdL+5VXFyq5AnXBiy822q5aVfnbyT1uPxhn+S
-	cbScYLzSRZFWJzg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uyUrJ-008Ykb-Hq; Tue, 16 Sep 2025 14:32:33 +0200
-Date: Tue, 16 Sep 2025 14:32:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 5/6] net: rcar_gen4_ptp: Remove unused defines
-Message-ID: <177c71c1-c281-449a-a8f4-4858ca488f55@lunn.ch>
-References: <20250916101055.740518-1-niklas.soderlund+renesas@ragnatech.se>
- <20250916101055.740518-6-niklas.soderlund+renesas@ragnatech.se>
+	 Content-Type:Content-Disposition:In-Reply-To; b=q6lmdR5OyvSUklmMfVQlW0N67Rg+FY5l9fJat8HWii3cibnH1OiANg4M6pNfxCswHbql2ybcKgSXKcB0sFBd4yyoJ+jE5GqZ/sV6Oi8x9c0ul7SIwmeT7rjMK0+vYjoyTbp3/eoIoK2RaNYesZO+BtVWqDAsMtFaKtH4IUNSGS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oy5uNtuC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C676C4CEEB;
+	Tue, 16 Sep 2025 12:34:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758026056;
+	bh=LkVC7SOF1ecwe4fjNrM/LffIi1MGAwKsiw8rXf3dpnU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oy5uNtuC+vXnJWcFRK31VNoVAveH3bBQqFLGlZsn4wVJB3dIS+bFCbsy/KNe9ZIMZ
+	 3/T3Bm0GxEfOIDcEw7mrFMHX/3bwtUTDu24absed3pPYLdbxc75x8or2pE1/JP8lV4
+	 wcLfXs7KtzZqrXlnv9FG+R520jSiAvb6THg18xRowowv1JZDjSz6a1Qo+RjUllfcih
+	 XYL7cNYk8hulxYCQyotssPBQVhaQ0cy0XJGOT8utWeRFchTwlpnOkjJjSxOuYQwuDB
+	 KfSEvWcR9iVzdA97BulN0pJYVM24pXsb7cACng0CKolegK3DAeFp6qZ/bt/bNJEuhJ
+	 lFJhbt65yu32Q==
+Date: Tue, 16 Sep 2025 13:34:12 +0100
+From: Simon Horman <horms@kernel.org>
+To: Siva Reddy Kallam <siva.kallam@broadcom.com>
+Cc: leonro@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, vikas.gupta@broadcom.com,
+	selvin.xavier@broadcom.com, anand.subramanian@broadcom.com,
+	Usman Ansari <usman.ansari@broadcom.com>
+Subject: Re: [PATCH 2/8] RDMA/bng_re: Add Auxiliary interface
+Message-ID: <20250916123412.GZ224143@horms.kernel.org>
+References: <20250829123042.44459-1-siva.kallam@broadcom.com>
+ <20250829123042.44459-3-siva.kallam@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250916101055.740518-6-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20250829123042.44459-3-siva.kallam@broadcom.com>
 
-On Tue, Sep 16, 2025 at 12:10:54PM +0200, Niklas Söderlund wrote:
-> The driver specific flags to control packet time stamps have all been
-> replaced by values from enum hwtstamp_tx_types and enum
-> hwtstamp_rx_filters. Remove the driver specific flags as there are no
-> more users.
+On Fri, Aug 29, 2025 at 12:30:36PM +0000, Siva Reddy Kallam wrote:
+> Add basic Auxiliary interface to the driver which supports
+> the BCM5770X NIC family.
 > 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> Signed-off-by: Siva Reddy Kallam <siva.kallam@broadcom.com>
+> Reviewed-by: Usman Ansari <usman.ansari@broadcom.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+...
 
-    Andrew
+> diff --git a/drivers/infiniband/hw/bng_re/bng_dev.c b/drivers/infiniband/hw/bng_re/bng_dev.c
+
+...
+
+> +static int bng_re_add_device(struct auxiliary_device *adev)
+> +{
+> +	struct bnge_auxr_priv *auxr_priv =
+> +		container_of(adev, struct bnge_auxr_priv, aux_dev);
+> +	struct bng_re_en_dev_info *dev_info;
+> +	struct bng_re_dev *rdev;
+> +	int rc;
+> +
+> +	dev_info = auxiliary_get_drvdata(adev);
+> +
+> +	rdev = bng_re_dev_add(adev, auxr_priv->auxr_dev);
+> +	if (!rdev || !rdev_to_dev(rdev)) {
+
+Hi Siva,
+
+Sorry if somehow this is a duplicate, it got stuck in my outbox somehow.
+
+GCC 15.1.0 says:
+
+  .../bng_dev.c: In function 'bng_re_add_device':
+  .../bng_dev.c:54:22: warning: the comparison will always evaluate as 'true' for the address of 'dev' will never be NULL [-Waddress]
+     54 |         if (!rdev || !rdev_to_dev(rdev)) {
+        |                      ^
+  In file included from drivers/infiniband/hw/bng_re/bng_dev.c:8:
+  ./include/rdma/ib_verbs.h:2812:41: note: 'dev' declared here
+   2812 |                 struct device           dev;
+        |
+
+> +		rc = -ENOMEM;
+> +		goto exit;
+> +	}
+> +
+> +	dev_info->rdev = rdev;
+> +
+> +	return 0;
+> +exit:
+> +	return rc;
+> +}
+
+...
 
