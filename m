@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-223667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD1BB59DF1
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:43:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACF12B59E13
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A1E8323E80
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:43:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F79E4608AA
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025FF31E8AD;
-	Tue, 16 Sep 2025 16:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5B52AE7F;
+	Tue, 16 Sep 2025 16:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="22RQ88Lj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CfvXmgaj"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2789431E89B;
-	Tue, 16 Sep 2025 16:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32AD72FFF80;
+	Tue, 16 Sep 2025 16:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758041007; cv=none; b=b6Z3iVHpsFsQ2nJANPfOugc9PxSxe8n6pA4knlK+0PmzV0GOjdpotrz3LLO7BgG4ZrwICh5hChPsFWhhL/iMUNjKp1WJc8MBgq/JAQkgZ37JZ6MUSkqEgM4GSCO05dq7+/9Q9Lf4NOXkEViAE9Gw15Mk9ucDVYsdhS5mTMP7k+o=
+	t=1758041135; cv=none; b=nM1woT/xuSYx9NPwkpaApFBDzICIVuOCPAK+YhL4z0s0ifRddubeLP0WTJMHaKgmBoVzzG0X+uKqenuJqWF7yXAYV+AQS9kcn6rSNTxt3vqzYVw43wjiYfrzKE2z1aEqyc7Q96BnuRDp6jZO+137fOAook7XtTflZzLIm9yy1UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758041007; c=relaxed/simple;
-	bh=X+A5QepVxxB/C4oNxZOIEjs1x4Gld77ngaDhdwgfJgs=;
+	s=arc-20240116; t=1758041135; c=relaxed/simple;
+	bh=+t/HWhG+SPiQHaU/as8kRI8y4qlgUGT045L/wciADKw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lrpK9qLhOow2Q6/q+NQUr/u7rRuKLgDxyOgvZckuRdcNXAGgdzGNwjgpqBPgx6UwcwpRIrj0/0CLLyVelYalVXVHYMivFhBxLloVdY9970t1wb6ehyBlp0RpNKLaxbWCX2l7CzXiLxWySIHBMhjJlWz3qlhDJwWe3RPeZnV4yJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=22RQ88Lj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ujqmExvwfuuSaiII8kWPHE54Lu5K+HYfHMgIwgz3ujA=; b=22RQ88LjeOArVk8mpNe1j9rroF
-	RewwsSuOMlgqLrn7G6B+h3ig9x48M9UpRfV3pCCwZWXLAurtqTVLq2zKFKx8BzmrheF10kFLNGZqq
-	0ilHdprkMWIV0bvlvgBAchRwQmPVtnvn6DUhk6GhD0uimcEana4WqkwaEIYAmIBKe2Z8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uyYm0-008ahz-BY; Tue, 16 Sep 2025 18:43:20 +0200
-Date: Tue, 16 Sep 2025 18:43:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
-	sbhatta@marvell.com, naveenm@marvell.com, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, bbhushan2@marvell.com
-Subject: Re: Query regarding Phy loopback support
-Message-ID: <3b76cc60-f0c5-478b-b26c-e951a71d3d0b@lunn.ch>
-References: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tacJiFVhhUPl4p+53eQvahXueNEixadZA93TZp4gVdOjL3kEIScF8RZwjO6PGgj3sEYItQ8YmM0X69RCDR0yDe74AD88Cu8okZ3ehnqwj82ZVnUgvyY+6rVl3uzoOJuzQ8+hiIlD4o8htnLX171bMBYVq0AGuCQ4UWDDwVnHF7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CfvXmgaj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4074C4CEEB;
+	Tue, 16 Sep 2025 16:45:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758041134;
+	bh=+t/HWhG+SPiQHaU/as8kRI8y4qlgUGT045L/wciADKw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CfvXmgajGLKScNA9oqQjde50Dhj4E5OLTwIXXgK64ccDRnirol4gDX10hm0RCWV+w
+	 NBigjsXrL14SneTwJxXGkovLCehf/5ccj1GhjyusOSjMWNQ6nxX3ZG+8IGkLdf2urq
+	 fck7zOEqhaUu8zn8pGbdex3jrQmdKOneQbqEv3BVYMcSKOzOu9NbikfaY+uL1PbEwS
+	 T42BeR4pGQJsa15JC2Ma9rKL/iTPXYVuepa7WEoR8KvkFskTy/Y5pzSWfBow6XX4cw
+	 PcwBkHE7FRrCVBiaxKwjSE6xEr7HeQM97JdaFVu2MD+v1c3obRuGqMVmL90CJifySu
+	 +2+3hEkwGabYA==
+Date: Tue, 16 Sep 2025 17:45:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Konrad Leszczynski <konrad.leszczynski@intel.com>
+Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cezary.rojewski@intel.com,
+	sebastian.basierski@intel.com
+Subject: Re: [PATCH net v4 1/2] net: stmmac: replace memcpy with ethtool_puts
+ in ethtool
+Message-ID: <20250916164530.GM224143@horms.kernel.org>
+References: <20250916120932.217547-1-konrad.leszczynski@intel.com>
+ <20250916120932.217547-2-konrad.leszczynski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,41 +61,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
+In-Reply-To: <20250916120932.217547-2-konrad.leszczynski@intel.com>
 
-On Tue, Sep 16, 2025 at 04:48:56PM +0530, Hariprasad Kelam wrote:
-> We're looking for a standard way to configure PHY loopback on a network 
-> interface using common Linux tools like ethtool, ip, or devlink.
+On Tue, Sep 16, 2025 at 02:09:31PM +0200, Konrad Leszczynski wrote:
+> Fix kernel exception by replacing memcpy with ethtool_puts when used with
+> safety feature strings in ethtool logic.
 > 
-> Currently, ethtool -k eth0 loopback on enables a generic loopback, but it 
-> doesn't specify if it's an internal, external, or PHY loopback. 
-> Need suggestions to implement this feature in a standard way.
+> [  +0.000023] BUG: KASAN: global-out-of-bounds in stmmac_get_strings+0x17d/0x520 [stmmac]
+> [  +0.000115] Read of size 32 at addr ffffffffc0cfab20 by task ethtool/2571
+> 
+> [  +0.000005] Call Trace:
+> [  +0.000004]  <TASK>
+> [  +0.000003]  dump_stack_lvl+0x6c/0x90
+> [  +0.000016]  print_report+0xce/0x610
+> [  +0.000011]  ? stmmac_get_strings+0x17d/0x520 [stmmac]
+> [  +0.000108]  ? kasan_addr_to_slab+0xd/0xa0
+> [  +0.000008]  ? stmmac_get_strings+0x17d/0x520 [stmmac]
+> [  +0.000101]  kasan_report+0xd4/0x110
+> [  +0.000010]  ? stmmac_get_strings+0x17d/0x520 [stmmac]
+> [  +0.000102]  kasan_check_range+0x3a/0x1c0
+> [  +0.000010]  __asan_memcpy+0x24/0x70
+> [  +0.000008]  stmmac_get_strings+0x17d/0x520 [stmmac]
+> 
+> Reviewed-by: Sebastian Basierski <sebastian.basierski@intel.com>
+> Reviewed-by: Cezary Rojewski <cezary.rojewski@intel.com>
+> Signed-off-by: Konrad Leszczynski <konrad.leszczynski@intel.com>
 
-What actually do you mean by PHY loopback?
+As per my comment on v3 (sorry, I missed that you had already posted v4):
 
-88e1118R supports two different loopbacks. It can do the loop at the
-PCS, looping packets from the MAC back to the MAC. Or it can do the
-loop at the PCS, looping packets from the media back to the media and
-also deliver them to the MAC.
+I think it would be good to explain why using memcpy() is a problem here.
 
-The 88e1510 has a slight different loopback. When used with copper, it
-can loopback frames from the MAC back to the MAC in the copper
-PCS. When used with Fibre is can loopback frames from the MAC to the
-MAC in the fibre PCS. Additionally, it can loop back frames from the
-MAC in the SERDES layer. And it can loopback frames from the media
-back out the media.
+I looked and it seems to me that one reason is that the strings may be
+too long. But are there others?
 
-From what a know of the aquantia PHY, it can loopback frames from the
-MAC at the PCS or the PMA. And frames from the media can be looped
-back at the PMA or the PCS.
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> index 77758a7299b4..d5a2b7e9b2a9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> @@ -752,7 +752,7 @@ static void stmmac_get_strings(struct net_device *dev, u32 stringset, u8 *data)
+>  				if (!stmmac_safety_feat_dump(priv,
+>  							&priv->sstats, i,
+>  							NULL, &desc)) {
+> -					memcpy(p, desc, ETH_GSTRING_LEN);
+> +					ethtool_puts(&p, desc);
+>  					p += ETH_GSTRING_LEN;
 
-I expect other vendors have a similar set of different places they can
-do loopback, probably with variations.
+ethtool_puts() increments p, so I think the line above should be removed.
 
-Or do you simply mean as defined in 802.3, c22.2.4.1.2? And
-c45.2.1.1.4, C45.2.1.1.5, taking into account c45.2.1.7.15 and
-c45.2.1.12.1? And c45.2.1.18.1, c45.2.1.21.1, c45.2.1.22.1,
-c45.2.1.231.6, c45.2.1.232.1, c45.2.1.234.5, c45.2.1.235.1, ...
-
-	Andrew
+>  				}
+>  			}
+> -- 
+> 2.34.1
+> 
+> 
 
