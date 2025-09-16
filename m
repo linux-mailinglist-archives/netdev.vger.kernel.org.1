@@ -1,114 +1,129 @@
-Return-Path: <netdev+bounces-223669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F260EB59E4E
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:50:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F01B59EAC
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEFF14839C3
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 16:49:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C9434623D1
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 17:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E0328505E;
-	Tue, 16 Sep 2025 16:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A780632D5A1;
+	Tue, 16 Sep 2025 16:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTMvh5Bi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ufGW4ipa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9276C3016E3
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 16:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAB1329517;
+	Tue, 16 Sep 2025 16:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758041389; cv=none; b=gwTWLOLlL8FIoA57KFcHryUbqbZXZKvqrw2taIn3ePdH0wI5yybWNlLwhK3C8hHyElodxmwW+xywUVChbnU9W+djOd1HD2F6v4hicXH8wDSI7aI7m4EuTGg29rxdl/i5heGsEFJND3Syx3M1VSm+sJHioIX3JRSh8iycIqLMtns=
+	t=1758041919; cv=none; b=DUXq8vthkEBxBGZPYTU3tHm+myshRgQN8K0CgXJZt6I+UbVgTCCbLgRxSmuhET2b6g1ohxjhPviWXSjxNytzxN3fIkaN4fVsrW2junZKcVkMgDumAphRZ1CPLX/6+9r7K3X3lL8d2ytlPUYNKG5b2KG+xi3moIuLDoCUuvmu0jY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758041389; c=relaxed/simple;
-	bh=TwcfabmK9WC+2NnCZx+uDvKHL+px3+cu4KrnzhiY1uY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 Cc:Content-Type; b=fkFCuSVH82NDe5KIGzHdHAZ9gzoFwkz1b6tEDjclToiF65241wZXGVpZ+7C4RZbfhtA821zRenKS9sGgvmSbhtb+6GdDo+SwdD3AGxt8kgNLcLraLxvgDO6MyYruGUG+5vTDyNKIHYyqHSN+6ez2cjd4we6Yjg/p+aYMT7GZzMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cTMvh5Bi; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45dcfecdc0fso57507295e9.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 09:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758041386; x=1758646186; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TwcfabmK9WC+2NnCZx+uDvKHL+px3+cu4KrnzhiY1uY=;
-        b=cTMvh5BiZAQT7XxuqXQALlC0nPbDxLSNPWLLTD6SDCVaPRvLnG1dPSdFZkIaf80UTT
-         FZ7dKG3/4W0ASBzyTsgRAxvJWGT+xJnMT4qllBWWu4xnhxHKQr+exMN8pqlMyzDhVThA
-         C9mKynrDNjxMka4Xw4BITjSzRZCxh3YNIc6JKlh/3nzoLtnifA0nVZMhrr0tJL6MgXjx
-         +PhO5nrvR4A787I7o0Jh+WVTZUQYbHNAQppxq3YdBKe/5MItN/GcosBy3awlf2+JIdph
-         qjxJ5RDKwdCYcBHxO40afUcVR1tsdopQVgEBdy/Yui9JYqjWLD/oQlfnB2h37GsqfjgS
-         m/dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758041386; x=1758646186;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TwcfabmK9WC+2NnCZx+uDvKHL+px3+cu4KrnzhiY1uY=;
-        b=M9RvKFwLK9rPjfCmyth+f7FYdl4GD+qRbv+sRAYbSlGtEnGlX2JJpjCNWaUeZ6WI1G
-         XSyx+2SFTIJHOLojSXylPmZu9aJWCcs8waagDKoKjs9K3ACUM+NbjbgHyNfDvzoNJOvZ
-         c3tYxNDIKBzUtrh551VDpALdHKcQaYA1pUWci04GK4nuSij1MCg5APUtZ+ANin7ahtWi
-         cxWde//74LVCB5phxbIcaE9EGH72TdIVOLN2RlL+JkPWb/TfYAIsRPskJQh4+Knx0oOb
-         EXrC3Ib8bBm0w3h8PBpW0kQs5vrgAwTzlJgz8+1oq0BW7h010NN8R4Uw1K6LxSKonsAh
-         LCOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2UkDiolR088m1eJwRYk0V18IBaWcW0X622u+SH3kH0gR1NwRwr0k4digiOYBCTKcAKRFUh98=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1+AMAhCPQSPpygDkdjuEV4JgqlJ/3N1Kz4yLj+XfpMyH18ffp
-	6d2V1qlDf85JycP+PBMDygixj3rezGQy6dS2THXLN/7xpoucKa3+Qw5nfpUL+ZH9V+Ag2aJAu6g
-	zlO0rFYON+nlgh0IXeHYi30599Oy1csdWC4g3UqA=
-X-Gm-Gg: ASbGncsMusimJhdBh/WowUgCYgU3XZSEEh+B59IKNl6/mes41my4vJEzbxacrfzfZbR
-	cd2qTqkT528Sh3UIkEl/qXNEhydTfdoaSW5E6n0zGBjDaJzWmXvcDQUPEGUTNdxwJFBd412fHBf
-	I3TvgQKuHdAz0PRUMJ9ZzOIsfqKD2yaF9GPQEP5iW39qdGnT9NSUUUmvvacvSNObdfFWxrGQ9No
-	meULixzSXXwd2uEBfoU78ovrycWza2PYJxPWIYBdu4UBSHSh6hNCW756ng116Rf052bsehPJ3i4
-	+Vns4Nw=
-X-Received: by 2002:a05:6000:144e:b0:3ec:25d2:2bdf with SMTP id
- ffacd0b85a97d-3ec25d22d48mt4512325f8f.27.1758041385551; Tue, 16 Sep 2025
- 09:49:45 -0700 (PDT)
+	s=arc-20240116; t=1758041919; c=relaxed/simple;
+	bh=cN2ZRIwpPuuTuFydKsuswQytPt7ZVYZueiDnIohjvxg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zia4YqMQgCEV9MFnkqQFQMpYvuZpLaDNbOwiXJmgItyd9Sz/Sgt/SBrqvYFAjJWoI+j7t61cdevfwmXyE+plCgzQFyq90dRQWFkHNCRdblWSrsKtgw5YoSoAEvbnUXft/vr8XRfOWXBGg1PUXae2Y6ggn2xbvmkGIjmzhE4eYgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ufGW4ipa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B765AC4CEF7;
+	Tue, 16 Sep 2025 16:58:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758041919;
+	bh=cN2ZRIwpPuuTuFydKsuswQytPt7ZVYZueiDnIohjvxg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ufGW4ipaBuqkZumNSbHozdOrPtbsJc8gOophMG/yqg6lu3A61SeJaSBfuxc/Rfoqz
+	 7HlzyPzelhOESnR9HvCdsZNEJSi0JGD8fNAsXzEEQIFoRTSAwhZcdWAv9sfxBiHIa+
+	 QsQOlGSghSU+nZNF2/mgsoKRKupQOzyAmoiHjNrT2lu9yNP/GsbWi/27oN/DI1AAfl
+	 zhkF9YltDSNt97izaa1CNRYiHmiKhHSE3sYTraXEXL+suTLKc3XHHn/EbzUMw00Lcm
+	 wpZyb0qfI6x5YGMxPsO/qMDVtdIuHtZCvSyscPc5RJV+CeIM+h3vbjB92oM0yZBh+Z
+	 f+0pQYAh9+jHA==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Ulf Hansson <ulf.hansson@linaro.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+Cc: kernel@oss.qualcomm.com,
+	linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	Monish Chunara <quic_mchunara@quicinc.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>,
+	Nirmesh Kumar Singh <quic_nkumarsi@quicinc.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Sushrut Shree Trivedi <quic_sushruts@quicinc.com>,
+	Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>,
+	Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>,
+	Vikash Garodia <vikash.garodia@oss.qualcomm.com>
+Subject: Re: [PATCH v5 00/10] arm64: dts: qcom: lemans-evk: Extend board support for additional peripherals
+Date: Tue, 16 Sep 2025 11:58:21 -0500
+Message-ID: <175804189844.3983789.17270960228782770722.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250916-lemans-evk-bu-v5-0-53d7d206669d@oss.qualcomm.com>
+References: <20250916-lemans-evk-bu-v5-0-53d7d206669d@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250912163043.329233-1-eladwf@gmail.com>
-In-Reply-To: <20250912163043.329233-1-eladwf@gmail.com>
-From: Elad Yifee <eladwf@gmail.com>
-Date: Tue, 16 Sep 2025 19:49:34 +0300
-X-Gm-Features: AS18NWCrlr2QeaCB--5yANKThME9nJo6aat3FBzn5_cxJNe5mTnDqX1wNE37gpE
-Message-ID: <CA+SN3sp6ZidPXhZnP0E4KQyt95pp_-M9h2MMwLozObp9JH-8LQ@mail.gmail.com>
-Subject: Re: [PATCH net-next RFC] netfilter: flowtable: add CT metadata action
- for nft flowtables
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi all,
 
-One caveat: this change will cause some existing drivers to start
-returning -EOPNOTSUPP, since they walk the action list and treat any
-unknown action as fatal in their default switch. In other words, adding
-CT metadata unconditionally would break offload in those drivers until
-they are updated.
+On Tue, 16 Sep 2025 16:16:48 +0530, Wasim Nazir wrote:
+> This series extend support for additional peripherals on the Qualcomm
+> Lemans EVK board to enhance overall hardware functionality.
+> 
+> It includes:
+>   - New peripherals like:
+>     - I2C based devices like GPIO I/O expander and EEPROM.
+>     - GPI (Generic Peripheral Interface) DMA controllers and QUPv3 controllers
+>       for peripheral communication.
+>     - PCIe HW with required regulators and PHYs.
+>     - Remoteproc subsystems for supported DSPs.
+>     - Iris video codec.
+>     - First USB controller in device mode.
+>     - SD card support on SDHC v5.
+>     - Qca8081 2.5G Ethernet PHY.
+> 
+> [...]
 
-Follow-up patches will therefore be needed to make drivers either parse
-or safely ignore FLOW_ACTION_CT_METADATA. Because this action is only
-advisory, it should be harmless for drivers that don=E2=80=99t use it to si=
-mply
-accept and no-op it.
+Applied, thanks!
 
-Just flagging this up front: the core patch by itself will break some
-drivers, and additional work is required to make them tolerant of the
-new metadata.
+[01/10] arm64: dts: qcom: lemans: Add SDHC controller and SDC pin configuration
+        commit: dfdbe4bf6ff386d96c1dc8c7407201d882fc4113
+[02/10] arm64: dts: qcom: lemans-evk: Enable GPI DMA and QUPv3 controllers
+        commit: 5bc646aa0c7a444d4e81d8e3cae4baf463e1a018
+[03/10] arm64: dts: qcom: lemans-evk: Add TCA9534 I/O expander
+        commit: 6ae6381f871803246e9f655537999f163656de33
+[04/10] arm64: dts: qcom: lemans-evk: Add EEPROM and nvmem layout
+        commit: 81618ba3fe33017be5e1fce99891abd220a775b8
+[05/10] arm64: dts: qcom: lemans-evk: Enable PCIe support
+        commit: 94d7d37f6ac34bd683a93fbf1013736616fc3677
+[06/10] arm64: dts: qcom: lemans-evk: Enable remoteproc subsystems
+        commit: cac44c46970adb4553bab5c5aa528462a5fe98d0
+[07/10] arm64: dts: qcom: lemans-evk: Enable Iris video codec support
+        commit: fd32b5d586ac650ce1c6f58535ec79cd2632be09
+[08/10] arm64: dts: qcom: lemans-evk: Enable first USB controller in device mode
+        commit: 7bd68ef80661a9436120702e1300b56904fdd022
+[09/10] arm64: dts: qcom: lemans-evk: Enable SDHCI for SD Card
+        commit: c3f107b514c357cbc08ae70a69700222e7d1192d
+[10/10] arm64: dts: qcom: lemans-evk: Enable 2.5G Ethernet interface
+        commit: 71ee90ed1756724d62cb55873555e006372792c7
 
-Thanks,
-Elad
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
 
