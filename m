@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-223692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D86B5A12B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:17:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C1EB5A130
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:17:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 74B834E221C
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:17:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D3352A7C0A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA8C25B695;
-	Tue, 16 Sep 2025 19:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDF32DCC05;
+	Tue, 16 Sep 2025 19:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wi6l0DFO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ewqBVhYB"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E59CB661;
-	Tue, 16 Sep 2025 19:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A7A7E0E8;
+	Tue, 16 Sep 2025 19:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758050215; cv=none; b=STDmOU6R5k6TekYnwjTOFlD4THuTx0xAcfgPoot0z7uO7whFFpIhzmR4EGOV8R4UNAnntkxfIUqDFiPgQZFJPf9TcrG/JqWJzBDfS+JiHnJ8kV1L9z9PJMwQMTpmfxPLivDlB2AzWoIhzp+eZv2mspA88BeWroJJPL+U7Rr26Bo=
+	t=1758050216; cv=none; b=rr3IMtiRb/IhJkVxuU7vtgSLpE0Yok/OESzbg0oUdwoMPpf8/LwLXugtuuFr89fIui0o7cU5JiPXA4xAy3NEK11hdDv68qoE+JDDIHYi3Q2zojNkSsQGntZEjdP9dhNkIhb9HXSSy9D2FA3WWF90k52KFDTf4W+neitAnw091wM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758050215; c=relaxed/simple;
-	bh=rnnvGOspUX8LMCfMNzcnUQjB720Pd9PtIOQ/ZSdxyJY=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pMugBk/rj8vefFN83tPeTuvQBmALXr70eaqD2YLvSAV7wTpd+xPdOlCldcmLWGofZBg1J6zQnGHwghoOoLDe6eVNPOXvdES14Ahlbx0Sz4DKyQX9ZXfI5l27WnsaUlUBARz3deVMZVZfuxb+VJ25p5o/3BhGrOHiEO7U4VPiTIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Wi6l0DFO; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1758050216; c=relaxed/simple;
+	bh=U5LicZk3zOH+cfVm8UiDiYn2gNrNlZZkTJ30LuKTw3c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Im/b0KP/gSXtarMrGgBo6L0qkPEJ9mtUiLeFO66fieRR0mVgvx2DTTk9WDehI33RVYAqpYYCYJTxUMQMAde2T0ip28owY//t+2WF1oYE4FHFeKR22q6UoiqJyOMTa7y+9cthmtf3ffQpi5g4Ufhgze//AVRMbceIzmi+JNIU0IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ewqBVhYB; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758050214; x=1789586214;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=rnnvGOspUX8LMCfMNzcnUQjB720Pd9PtIOQ/ZSdxyJY=;
-  b=Wi6l0DFOcSgDBNiRkMAZqFZdM2s41+Qfek4HGdw4M8U6iu9fkLsPJGwD
-   lrjf8pfqyzKShVhfCkJTs3fYmrcWCVK2cmf9fKIZif2DXA8mOJ0rnpDy7
-   Wf9jFkqNT7aQR3D+KEGQObafccQT+J4nYRA4hGKxBBTb8SdEPMUxzDEtQ
-   Q33VLVWW65yYx0yiSzdHPXMlCci6OHOc7ws2jDbaS0BVMxfIR7/5MTxXW
-   MUZ8t4x1gQDXinFConSbkPbrd24FGZyWUHdgsVb0kkEaOcN+98FpYHYJd
-   yp+FQL/o7DY7iDRQr6CJ4/T7xtx6nJ0V0FLfO/x0WpAMlT/LIwRwBs6xz
-   w==;
-X-CSE-ConnectionGUID: 9sVfK6s9TzSROSfY94Jyxg==
-X-CSE-MsgGUID: LV8+2u/UTLSt/N5mjEvViQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="60037570"
+  t=1758050215; x=1789586215;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=U5LicZk3zOH+cfVm8UiDiYn2gNrNlZZkTJ30LuKTw3c=;
+  b=ewqBVhYBp9hLQyyTB0Hll+vJbOTrkPEaullwGybQDCLBSZM1h3rx9BwS
+   WvB/D9RRY7xvmcfJvJZF/Heu3CCiKKPXSu8O/4uHTJBYSZNBVgdG8XfvY
+   cwnHAlbtVawwqjnAqD5PD/pmBwQoEPnDOBgg1JoOiYj/ose5QdC4xNhI8
+   LqkXPrUuVfxGZxyY3NsCOqoouykyopcAAqB0syEL9ge6UbFSxLLzXeCuq
+   UJCPbOqgahK9Yv98A4SULHB84lconnndQjQCZNN1Tw3wonNb2dUh18/qk
+   rVgfVTtZvunS1JINcTfX5x4cex5KX3Ernc/koHSCxVgxi32qZMFvo7dpX
+   Q==;
+X-CSE-ConnectionGUID: w1bJyIOzSrK7LrEpBT+vcw==
+X-CSE-MsgGUID: THIUZuE6THut1JBzRkDnhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="60037575"
 X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
-   d="scan'208";a="60037570"
+   d="scan'208";a="60037575"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 12:16:53 -0700
-X-CSE-ConnectionGUID: Yu+J6Ej6QImXf/3Y9qD62w==
-X-CSE-MsgGUID: MYUgQzR3Q4ibhM4wf0T4+Q==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 12:16:54 -0700
+X-CSE-ConnectionGUID: 6n+vR93nSqCTUNP7tKLnRw==
+X-CSE-MsgGUID: J18ZnI/HQ1O3fJFO1fJTAQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
-   d="scan'208";a="174961751"
+   d="scan'208";a="174961755"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
   by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 12:16:53 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH iwl-next v4 0/5] ice: add standard stats
-Date: Tue, 16 Sep 2025 12:14:53 -0700
-Message-Id: <20250916-resend-jbrandeb-ice-standard-stats-v4-0-ec198614c738@intel.com>
+Date: Tue, 16 Sep 2025 12:14:54 -0700
+Subject: [PATCH iwl-next v4 1/5] net: docs: add missing features that can
+ have stats
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,11 +70,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAC63yWgC/5WNQQ6CMBBFr2Jm7RhaqEZX3sOwGNqpjMFi2gYxh
- LtbuYG79/KT/xZIHIUTXHYLRJ4kyRiKNPsd2J7CnVFccdCVNtVZKYycODh8dJGC4w7FMqZcmKL
- 7QU541E1jFGsi56EcvSJ7mbfIDeQ9YOA5Q1uWXlIe42erT/W2/xOaaqxQddZ7p8yJyFwlZB4Od
- nxCu67rF/lEIYjeAAAA
-X-Change-ID: 20250911-resend-jbrandeb-ice-standard-stats-624451e2aadf
+Message-Id: <20250916-resend-jbrandeb-ice-standard-stats-v4-1-ec198614c738@intel.com>
+References: <20250916-resend-jbrandeb-ice-standard-stats-v4-0-ec198614c738@intel.com>
+In-Reply-To: <20250916-resend-jbrandeb-ice-standard-stats-v4-0-ec198614c738@intel.com>
 To: Jesse Brandeburg <jbrandeburg@cloudflare.com>, 
  Jakub Kicinski <kuba@kernel.org>, Hariprasad Kelam <hkelam@marvell.com>, 
  Simon Horman <horms@kernel.org>, 
@@ -81,70 +80,57 @@ To: Jesse Brandeburg <jbrandeburg@cloudflare.com>,
  Rahul Rameshbabu <rrameshbabu@nvidia.com>, netdev@vger.kernel.org, 
  intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org, corbet@lwn.net, 
  Jacob Keller <jacob.e.keller@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- jbrandeburg@cloudflare.com
+Cc: jbrandeburg@cloudflare.com
 X-Mailer: b4 0.15-dev-cbe0e
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2256;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1472;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=rnnvGOspUX8LMCfMNzcnUQjB720Pd9PtIOQ/ZSdxyJY=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoyT2+cLqvBO2GF2xeSfn4fTIicL779z+ZWUn/W+0n1kx
- HA8k2l6RykLgxgXg6yYIouCQ8jK68YTwrTeOMvBzGFlAhnCwMUpABPZupOR4afZqthLDWse35K+
- MfM/X2vZf/HD0ukG33ku6/XGbK/alsrw3/9y5Z2Jm6qaQ5WNTHT2Or46fcP986Owb08+FHB8D13
- TzwYA
+ bh=tgbQu2OqsM4wvoaJ2Ac7Pu7HlNzbap0vQ4hGe758rUM=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoyT2xfbrSpT5zhu5a/0JWHqvtk2sV6eCayXUrfY3Vn6M
+ r9qjtO/jlIWBjEuBlkxRRYFh5CV140nhGm9cZaDmcPKBDKEgYtTACaSVsjIsHtekb7solp18/j5
+ izKMWyTj6jwElhZdDrq7wujfJe2nuQz/w1ef9FZLjgzQsfayyGR60qqeuF5Ablac6eu/Wz5ZGcq
+ yAQA=
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-I recently rediscovered this work while migrating data off of one of my
-less used systems. The v2 apparently got rejected due to some test issues,
-and its been accumulating dust since... *checks notes* over a year.
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-Supporting standardized statistics is important for usability and
-consistency, so I thought it was a good idea to revive it.
+While trying to figure out ethtool -I | --include-statistics, I noticed
+some docs got missed when implementing commit 0e9c127729be ("ethtool:
+add interface to read Tx hardware timestamping statistics").
 
-The main point of the series is the implementation of standard stats for
-the ice driver. It also includes a related documentation fix, and finishes
-off with some cleanup to remove boiler plate code by making use of
-ice_netdev_to_pf().
+Fix up the docs to match the kernel code, and while there, sort them in
+alphabetical order.
 
+Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
-Changes in v4:
-- Add missing iwl-next target
-- Pick up review tags on final patch
-- Link to v3: https://lore.kernel.org/r/20250911-resend-jbrandeb-ice-standard-stats-v3-0-1bcffd157aa5@intel.com
+ Documentation/networking/statistics.rst | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Changes in v3:
-- Rebase from a year ago.
-- Move standard stats functions in ice_ethtool.c to align with where we
-  placed the ice_fec_stats function.
-- Add a few more users of ice_netdev_to_pf() I noticed while rebasing.
-- Fix the kdoc nit reported by Simon
-- Drop review tags on the final patch since its got new work.
+diff --git a/Documentation/networking/statistics.rst b/Documentation/networking/statistics.rst
+index 518284e287b0..66b0ef941457 100644
+--- a/Documentation/networking/statistics.rst
++++ b/Documentation/networking/statistics.rst
+@@ -184,9 +184,11 @@ Protocol-related statistics can be requested in get commands by setting
+ the `ETHTOOL_FLAG_STATS` flag in `ETHTOOL_A_HEADER_FLAGS`. Currently
+ statistics are supported in the following commands:
+ 
+-  - `ETHTOOL_MSG_PAUSE_GET`
+   - `ETHTOOL_MSG_FEC_GET`
++  - `ETHTOOL_MSG_LINKSTATE_GET`
+   - `ETHTOOL_MSG_MM_GET`
++  - `ETHTOOL_MSG_PAUSE_GET`
++  - `ETHTOOL_MSG_TSINFO_GET`
+ 
+ debugfs
+ -------
 
----
-Jesse Brandeburg (5):
-      net: docs: add missing features that can have stats
-      ice: implement ethtool standard stats
-      ice: add tracking of good transmit timestamps
-      ice: implement transmit hardware timestamp statistics
-      ice: refactor to use helpers
-
- drivers/net/ethernet/intel/ice/ice_ptp.h       |   2 +
- drivers/net/ethernet/intel/ice/ice_type.h      |   1 +
- drivers/net/ethernet/intel/ice/ice_ethtool.c   | 144 +++++++++++++++++++------
- drivers/net/ethernet/intel/ice/ice_flex_pipe.c |   8 +-
- drivers/net/ethernet/intel/ice/ice_lag.c       |   3 +-
- drivers/net/ethernet/intel/ice/ice_main.c      |  13 ++-
- drivers/net/ethernet/intel/ice/ice_ptp.c       |  15 ++-
- drivers/net/ethernet/intel/ice/ice_sriov.c     |   3 +-
- Documentation/networking/statistics.rst        |   4 +-
- 9 files changed, 138 insertions(+), 55 deletions(-)
----
-base-commit: 10ee8b756efd0913ef0ec6fc7a147771cdc36416
-change-id: 20250911-resend-jbrandeb-ice-standard-stats-624451e2aadf
-
-Best regards,
---  
-Jacob Keller <jacob.e.keller@intel.com>
+-- 
+2.51.0.rc1.197.g6d975e95c9d7
 
 
