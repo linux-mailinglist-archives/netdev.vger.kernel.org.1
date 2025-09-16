@@ -1,138 +1,138 @@
-Return-Path: <netdev+bounces-223708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AFA5B5A1AD
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:53:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 995D9B5A1FD
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E034580593
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:53:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 671F7327A2E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 20:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149972DD60F;
-	Tue, 16 Sep 2025 19:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D212E424F;
+	Tue, 16 Sep 2025 20:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0+eeMU/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BfoKt/L/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F97119F40A
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 19:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9463A284B29;
+	Tue, 16 Sep 2025 20:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758052413; cv=none; b=ruP4FxTWWc6sqfFUK77v4TorTOUvSdxS2U/tFd2utTFxPeMtwr3+WF56lMUrwnAA7yREe3G0p4r9uHAq/KtFXWe/EfdBwtPCc+MBPVLsZx1+sMzuVGdsyvVjbNyHuY1EqyGOdH4Tae7QqswO3y9LFt3SzBB8JVUlxigBZB5j6vQ=
+	t=1758053408; cv=none; b=VOKoZ0OwYtQszS78NEoaWCoTGClBJX47QCb6T7i/1g75IHscB8dL6+gYvA77DFDtRJAHOU0VGTi5+VgS8K8sVXmSnQDVDCUoiTRehhfPxA5MsE283vKHcVqCNPrRP/3Cghyrd3X+N1PiY9TrFMPAQ7Uvpx/3yXPDB7rzaqbPEQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758052413; c=relaxed/simple;
-	bh=3T9D2t1qq69LqhN17EDkyhBUgxegMxL2fRfUXiYb7qE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tWeu28hwe/Ff4I1kW/WPBoL45TjGiHfGZUL7CDnzbROJ0EcISr2N07pn+i27W7+GxpAAQq3FFo6vNI0F1bpYoO/BYPcmfFowHgSoROH9QBrY8vQVHAg/LNzWRdBEWgpTams4Z5OY9RljQztN554oxIXxUPZ/zU8tYHs2vddd9/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H0+eeMU/; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45dec026c78so59634145e9.0
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 12:53:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758052409; x=1758657209; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Op/mfZsVaCIiTyvcgrObOgRcD7fjVHYfzWijrbsL1E4=;
-        b=H0+eeMU/odAE2HFN91lkgYZbFr9UjZqmOnfFf1IUkva9P3H28pTiKdQtVAqPj5WVrf
-         l5MeqimiUyvt4jF2MrhF4c93jfb9qR4389blVOPwnwfmJMzk5rP7/n3Cltm8Wc4+SSSn
-         0RtocYq7A1NFedPaBxaJkSY7z5JNygUT3mxrNcIcH5IloDpHkpM25HfGjaKXQ/0cq3UV
-         lBdJiw2CSD9uDUl13xuDfX1hBKanbprTPyqZTblbBVSpPqnj/uOJX7rCOTlmDU48gVGw
-         JpJ6iTNqnmC9GChTpxSpBkhoYzw9Gws+LKhje2y+e6xLEkl8VNeK0qi0PJWqbQeESI+6
-         3sCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758052409; x=1758657209;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Op/mfZsVaCIiTyvcgrObOgRcD7fjVHYfzWijrbsL1E4=;
-        b=Z4XsiyRD+6HYWVbyQomjFy5OIJG3TD7YU42x0EzArWQTWXnadScIm3imaNZaKYODlZ
-         GF4/SDmqXKG7PuZk9o/nIyLvS4TYASZGOhxmJhZInshE/kfHbuce6RGv0ZQpUhTpPkec
-         I0xQoRfItnqNsWKDWKmN22ogeBBD5rVLbemadX7Tx+LiFlQqyW9zZuyYpouPc3ENCQZl
-         fYzsCL2kVm5LZYgfSsJrcPKzPwivSY33FS1EMiG45PkiELPvAqPFT+4k1IFFuvX/5oaR
-         bTEnBLjr2Z57vbhfR2U0vd1KllkdyUeTSEPFTkkH8MVakEtdcIVvRklP0UA1/g/GvCDA
-         v3Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCUVHe4iPdqIpKnGhSM+cfaQI0yRcsj2lA0Y4dRLDwohIkwS6CZmT4E9Cvlsc3/Pk6iYIgNTUfQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1vLS7tIVI9jzmhgxByMESCDdjAiaxNzX84EqgKtvaQ6bClHXD
-	z49Xaty9ez01o8ETIEeFhHEfN5ohMz5ydgFjHlf+YqnQ3Y7thkn7QwUy
-X-Gm-Gg: ASbGnctsr3HdpR2dUOFkeRQZ4FVfZUJ+IxnlDmS5RxlzMU4vfNw1uRs8PBnn4K17Dkx
-	TZpUvAIPb2J7tK00njfGnhZdFV5Qd4syvNhj3a34WikDuVe49t9LeseMiNXkfEmEt9Mu0LkGlGJ
-	II8RHL834drws383Oxy96L9jvXiD6MdyNOBip8Tsf/raPXR0VFgj3OytqLp5Lp6B0IT4W7fJk09
-	sNi505A9fF8EgZDr2e6qNq402iPr+HFVz7Zxeb7WdQMOk/ttCsrqKHz1pO5GgyKBmUG7QbbrT7H
-	XoLjQoumw1JwZXY9Vfwecanaw6sMedq2Iuj+h0e/nNyAFmtwdFOxnMYFGmi50FYSa9xVCdgD5n/
-	HoaiYLF0NZ4AARSN0ym7+GCDFsPlmN0UFn/EibodbNOkPYpfzuw==
-X-Google-Smtp-Source: AGHT+IFsJDK9nhbWZy8UpoS+giPB9I8eqLFrqS1+V+EAPmi5yJXPv9nuFGXnTz8G4O98qeZZKmgX/w==
-X-Received: by 2002:a05:600c:3505:b0:45f:2843:e76b with SMTP id 5b1f17b1804b1-45f2843e99cmr107649975e9.2.1758052409285;
-        Tue, 16 Sep 2025 12:53:29 -0700 (PDT)
-Received: from [10.221.203.56] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46138694957sm7592775e9.4.2025.09.16.12.53.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Sep 2025 12:53:28 -0700 (PDT)
-Message-ID: <c9533a24-a02a-4601-9b4d-197b03634c4f@gmail.com>
-Date: Tue, 16 Sep 2025 22:53:26 +0300
+	s=arc-20240116; t=1758053408; c=relaxed/simple;
+	bh=sG1UguvSYSALefbAtByxqgdIGq4a3+WwUJhHmXPgZfI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=kP3cYPBSNOZ3VK9T5J2yGfHE2XE+xxudUZiDyOLcvMEwjEFPqVMCW7C0SNrjJIVI+cgmE5lu6QuHlE7jDAD7nL9Y5mOVkDeF/6CJ9SfB6406UtUmwyylLlUqHAqqmX6+fdgDYw1IreqnRJz6ISeMo6YWbuF5DIhNja1s7u/ki7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BfoKt/L/; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758053406; x=1789589406;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=sG1UguvSYSALefbAtByxqgdIGq4a3+WwUJhHmXPgZfI=;
+  b=BfoKt/L/J11MEDsQMKH2E2whppU0pmglb6YZ50qiSuPnCXVsgNocVhtF
+   HXY+m7Lgb+Y4WFFg3oGtS5eeflzCSsnUhK8V8V/YzoQK7/VcS4Q+qJyG4
+   zCDIyMR2djqsizmakBReqTIbNMeqoupDHPlrXrCkDNio6QJR5+qT5+ycB
+   j5H8xeOmpMRzRBoIGnL47tbAUmTkdmP8Syj1u6e05DSJJpTJCUpVgl5UF
+   HgZR6NScyQfdGd+udh+EP34h7FIJU6wb6WjqrRZXRB95nvx71Vamuleua
+   DnGyITKPHbp7a+ubPaD4QxogPof9g1zTva91cfvNNYGGEubfd4IaTdx12
+   g==;
+X-CSE-ConnectionGUID: Kjxxa4kZSsqL54rd8dDQnA==
+X-CSE-MsgGUID: Aq2bgQy2Rx6sVtvZWShVzg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="85788647"
+X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
+   d="scan'208";a="85788647"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 13:10:05 -0700
+X-CSE-ConnectionGUID: vn90qRE9QhSC/MRX6GTXUA==
+X-CSE-MsgGUID: S98OtFRQQvm6Vf0Ma9eNNw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
+   d="scan'208";a="174606731"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 13:10:06 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Tue, 16 Sep 2025 13:09:20 -0700
+Subject: [PATCH iwl-net] libie: fix string names for AQ error codes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] net/mlx5: Clean up only new IRQ glue on
- request_irq() failure
-To: Shay Drori <shayd@nvidia.com>,
- Mohith Kumar Thummaluru <mohith.k.kumar.thummaluru@oracle.com>,
- "saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org"
- <leon@kernel.org>, "tariqt@nvidia.com" <tariqt@nvidia.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
- "elic@nvidia.com" <elic@nvidia.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Anand Khoje <anand.a.khoje@oracle.com>,
- Manjunath Patil <manjunath.b.patil@oracle.com>,
- Rama Nichanamatlu <rama.nichanamatlu@oracle.com>,
- Rajesh Sivaramasubramaniom <rajesh.sivaramasubramaniom@oracle.com>,
- Rohit Sajan Kumar <rohit.sajan.kumar@oracle.com>,
- Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Qing Huang <qing.huang@oracle.com>
-References: <1eda4785-6e3e-4660-ac04-62e474133d71@oracle.com>
- <d9bea817-279c-4024-9bff-c258371b3de7@nvidia.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <d9bea817-279c-4024-9bff-c258371b3de7@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250916-jk-fix-missing-underscore-v1-1-a64be25ec2ac@intel.com>
+X-B4-Tracking: v=1; b=H4sIAPDDyWgC/x2MzQ6CQAwGX4X0bBNYFMVXMR7M8i3Un0JaFRLCu
+ 7vxOMnMrOQwgdO5WMnwFZdRM1S7guJw0x4sXWYKZTiUbdXw/cFJFn6Ju2jPH+1gHkcDI6QUj6j
+ bfX2i3E+GbP7fF5L5yYo3XbftB79OuVt0AAAA
+X-Change-ID: 20250916-jk-fix-missing-underscore-e2ffc7e39438
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.15-dev-cbe0e
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1709;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=sG1UguvSYSALefbAtByxqgdIGq4a3+WwUJhHmXPgZfI=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoyTRyQ/61pyhXNnxYsLe2xZ8/H+b/28r5bhKVP7CnsO2
+ DmGqW3pKGVhEONikBVTZFFwCFl53XhCmNYbZzmYOaxMIEMYuDgFYCJyBgz/lHOuvAhMzrx5TLPe
+ ULB0u8MWyWYNbkNPwRenhLd2a0jFMfzTfHx1y5XfhbuWBHc3qUZZvzv59cymewtSLubqqC9yNWl
+ mAgA=
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
+The LIBIE_AQ_STR macro() introduced by commit 5feaa7a07b85 ("libie: add
+adminq helper for converting err to str") is used in order to generate
+strings for printing human readable error codes. Its definition is missing
+the separating underscore ('_') character which makes the resulting strings
+difficult to read. Additionally, the string won't match the source code,
+preventing search tools from working properly.
 
+Add the missing underscore character, fixing the error string names.
 
-On 16/09/2025 8:24, Shay Drori wrote:
-> Hi, sorry for the late response :(
-> 
-> On 27/06/2025 9:50, Mohith Kumar Thummaluru wrote:
->> External email: Use caution opening links or attachments
->>
->>
-..
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Fixes: 5feaa7a07b85 ("libie: add adminq helper for converting err to str")
+---
+I found this recently while reviewing the libie code. I believe this
+warrants a net fix because it is both simple, and because users may attempt
+to pass printed error codes into search tools like grep, and will be unable
+to locate the error values without manually adding the missing '_'.
+---
+ drivers/net/ethernet/intel/libie/adminq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> now that the condition is only one line, you need to remove the
-> parenthesis.
-> 
-> other than that.
-> Reviewed-by: Shay Drory <shayd@nvidia.com>
-> 
+diff --git a/drivers/net/ethernet/intel/libie/adminq.c b/drivers/net/ethernet/intel/libie/adminq.c
+index 55356548e3f0..7b4ff479e7e5 100644
+--- a/drivers/net/ethernet/intel/libie/adminq.c
++++ b/drivers/net/ethernet/intel/libie/adminq.c
+@@ -6,7 +6,7 @@
+ 
+ static const char * const libie_aq_str_arr[] = {
+ #define LIBIE_AQ_STR(x)					\
+-	[LIBIE_AQ_RC_##x]	= "LIBIE_AQ_RC" #x
++	[LIBIE_AQ_RC_##x]	= "LIBIE_AQ_RC_" #x
+ 	LIBIE_AQ_STR(OK),
+ 	LIBIE_AQ_STR(EPERM),
+ 	LIBIE_AQ_STR(ENOENT),
 
-LGTM.
+---
+base-commit: 93ab4881a4e2b9657bdce4b8940073bfb4ed5eab
+change-id: 20250916-jk-fix-missing-underscore-e2ffc7e39438
 
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
 
 
