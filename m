@@ -1,319 +1,159 @@
-Return-Path: <netdev+bounces-223382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B05B58F00
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 09:20:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C47B58F18
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 09:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4FFB2A83D8
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 07:20:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B40E7A1B67
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 07:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DCC2D8799;
-	Tue, 16 Sep 2025 07:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59F8278753;
+	Tue, 16 Sep 2025 07:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cBotE6hO"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="nR9KV2KC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33834265CAB
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 07:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39EF27E049
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 07:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758007254; cv=none; b=LW5peJtbkB7ue6JAME8vFw1lijKoimVRWe2JyUK6S4U3WA2KzY6RPbAWTF1uUPlQ5aRCO5sodGRE3oyuoTcLwX9j/F4DS+YyJc8big0UJNFqe7tEYTgIYtAAO6eCw7abHaPgexejnzmjC0/XtZGkHJF4Gk1TswR6pAiaTWaHGyM=
+	t=1758007464; cv=none; b=ht1FEsBQwBPwlMh4ovI0qAJRgeajoLh3WEsmLLNluwGUYBU1/6YPiLMoCmggWKE+5yUT7Hx7/rWpVlex32HnTyaC8kVHkHgaJ81R4A5m9phVZocunP84GOO9ERaT3uaO50rJWIsFAvI7HJi+eqjZdy24ds59eXn5TJoE5G9azU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758007254; c=relaxed/simple;
-	bh=D2PYxksF/dZdIIrgGr9oJIXIyMD6Og9N45pfqzQ7Io8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dqVDCrWFvTTPIoVmrmSjwnmWyPifFMqJB5h6IpzTGSNjgTxIU1DWl2d/iYQRow4mUQLfUBuIpAUcYm7YR7/eda+JFhX1jNvwrbwQpueMt6WTt6vAAvQy8qoDGx22GqHiJcPHGwVRCYO2IGD8S+UuZBfgA8Ge2LIztQcuBOjUSmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cBotE6hO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758007251;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q/Nxsdqh36+lmBaZm9CtqQ3jvwS0JIENCmRR3IT8IFg=;
-	b=cBotE6hOJNuyUyWkZBtwekLfflJqfGFd/XtUlZlTTXnPMr7b6hqk7GWJ9lChp2bFPKVecH
-	0Na2aJBr5tDfoZ/vtNQPwSzf/OwdV9Vkdl59EK1jajm0+Qsf7/L2sEN3PWAqqltkSpdR3a
-	u5YBUiQDtDlo0gG2/SWPDfXoaYO4uNc=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-rI1ULfPaPEatn8DG7ybKTA-1; Tue, 16 Sep 2025 03:20:49 -0400
-X-MC-Unique: rI1ULfPaPEatn8DG7ybKTA-1
-X-Mimecast-MFC-AGG-ID: rI1ULfPaPEatn8DG7ybKTA_1758007248
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-32db3d5f20aso4359045a91.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 00:20:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758007248; x=1758612048;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q/Nxsdqh36+lmBaZm9CtqQ3jvwS0JIENCmRR3IT8IFg=;
-        b=pSweYnfeL5+3gEwbU0ALU4kmJDHZIWoZYPT8ssBA8FqqJwKVoN9K4yS+8GEsTIvS6N
-         Inp/noxDriWad754i0P+m76DZxNHGRjc0VbIem7eqbJH1n3ITu4v4ssM1R90mKV+AwMz
-         jfBMN3P638/p36napfAC8XD29MOlyFQGqBbtGl1RBuwlYnV61Ex8S4gbl/i8gTMdkky9
-         dvxjEOga5+yQJLs9fv02NZpHSvaL6DGUzq42drtyfHNUXc1P0KYdimevYwiVqqegecE7
-         mQPHtyS3vqMf0Niokyl80tsxLfKHFw+mRa/MVhhqVWXo5SeZhvL7AuQ9MYDlfdSaZbvR
-         a+wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWH61cAv77GGI5DuxxgR8CfciOSQPoNColQ4Bz0C+CxP0jzcF3gCa7gNi3+8rxq+bismtqtqHA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8KnFRDBXH4gmALXUlEMjHaUXcQHvTRvMZ92bSSQ/aasz5w85o
-	nKIXdbRHmlX9+RpC9L14KTBdTYUaemWiMJqsxtywwxky0XrLLvZhuKc+PCaKQA+V+JsFAF02gP4
-	+VpkR5S2SlIi1vby4b/zcA8pBS5TvPn0jldK7NSnICLGobt7JBetEDNZgfRAj6GwSZLx/PDr6fd
-	w/ZAUMog3Tvt0r+J4mkxYtpXvqvGXJ3pGG
-X-Gm-Gg: ASbGncsQlD9Up68HOJV+O03yhQog3m+vW7mB4MZ6qgb/YpuDXjppCiSuvxwwqnwhcyD
-	8e2tYKxn/+O17+r3i7KozrQcJ+Ot0WzT7KnSqyl+4wVa1IkNGte1RHD3v16gfTJTGG+kvL35PrT
-	r7LiKfbdo0NOQUoKMcroW9
-X-Received: by 2002:a17:90b:4c43:b0:32b:6cf2:a2cf with SMTP id 98e67ed59e1d1-32de4ecfef6mr18297099a91.14.1758007248404;
-        Tue, 16 Sep 2025 00:20:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFhF2Kgtp4xrR3HJKlpJRKm798eKMryRKtU0e/2ABrGoXHJxF41jb2NOJdiA0RY3u/G/hSk1zeKHpmSBpMi9yw=
-X-Received: by 2002:a17:90b:4c43:b0:32b:6cf2:a2cf with SMTP id
- 98e67ed59e1d1-32de4ecfef6mr18297077a91.14.1758007248004; Tue, 16 Sep 2025
- 00:20:48 -0700 (PDT)
+	s=arc-20240116; t=1758007464; c=relaxed/simple;
+	bh=1ARRown3psxtimh8GI/ZmbaEdm2ZSJtOgxnsw3noyd4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=ZoN62TETc/5JwcKA8eyUXodMsgWTgik+WnRvR1qLv3R2DEGbN4YsNeoMFSXsc6OjI1O+gZFFJFigAAwHBKXVozcr1wBysa6D3Y/ghV3OYLIyuPJqq+KP/qHgzx2PgD2I1j1LSOPY704daep6IDiEok0/mScar16Hj15ydXRLs2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=nR9KV2KC reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=0/CJX2i9ynTHEK5K1wk3BuWrC4SDjfoOxQbQtBiAKLo=; b=n
+	R9KV2KC0KhaSCOiR4XhfDtV0a3rApMfm7eR4YyPVp4cqnSnoclgclUvHC7G9K1Y0
+	tBEvOd+RGVdQ1f1Jtf/OuWXZuiTAXdvJFHKxCqwWDzDFgEt5TF3wqb4mqGJzMYFj
+	7h0gRZxFZ/DuQQ0MdhTREAes75Zwk5jOe1D7sY4x3I=
+Received: from slark_xiao$163.com ( [2408:8459:3c60:81a:5ea0:7c24:b38e:9af4]
+ ) by ajax-webmail-wmsvr-40-122 (Coremail) ; Tue, 16 Sep 2025 15:23:20 +0800
+ (CST)
+Date: Tue, 16 Sep 2025 15:23:20 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
+To: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>
+Cc: "Loic Poulain" <loic.poulain@oss.qualcomm.com>,
+	"Muhammad Nuzaihan" <zaihan@unrealasia.net>,
+	"Johannes Berg" <johannes@sipsolutions.net>,
+	"Andrew Lunn" <andrew+netdev@lunn.ch>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	"Jakub Kicinski" <kuba@kernel.org>,
+	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
+	"Qiang Yu" <quic_qianyu@quicinc.com>,
+	"Manivannan Sadhasivam" <mani@kernel.org>,
+	"Johan Hovold" <johan@kernel.org>
+Subject: Re:Re: [RFC PATCH v2 0/6] net: wwan: add NMEA port type support
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
+In-Reply-To: <19a5c6e0-fd2a-4cba-92ed-b5c09d68e90c@gmail.com>
+References: <20250624213801.31702-1-ryazanov.s.a@gmail.com>
+ <CAFEp6-08JX1gDDn2-hP5AjXHCGsPYHe05FscQoyiP_OaSQfzqQ@mail.gmail.com>
+ <fc1f5d15-163c-49d7-ab94-90e0522b0e57@gmail.com>
+ <CAFEp6-1xoFW6xpQHPN4_XNtbjwvW=TUdFrOkFKwM+-rEH7WqMg@mail.gmail.com>
+ <e8d7bab.2987.19936a78b86.Coremail.slark_xiao@163.com>
+ <19a5c6e0-fd2a-4cba-92ed-b5c09d68e90c@gmail.com>
+X-NTES-SC: AL_Qu2eCvybuEwr5iaabOkfmUobhuo3W8u1vvgn1YNfOJl8jDHp6AMdfVFtMFXz0sCOLhqNljqLcwp2z95WYalhbrstHxMbqQFuYjjKEm5VNjgayA==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250912082658.2262-1-jasowang@redhat.com> <20250912082658.2262-2-jasowang@redhat.com>
- <20250915120210-mutt-send-email-mst@kernel.org> <CACGkMEufUAL1tBrfZVMQCEBmBZ=Z+aPqUtP=RzOQhjtG9jn7UA@mail.gmail.com>
- <20250916011733-mutt-send-email-mst@kernel.org> <CACGkMEu_p-ouLbEq26vMTJmeGs1hw5JHOk1qLt8mLLPOMLDbaQ@mail.gmail.com>
- <20250916030549-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250916030549-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 16 Sep 2025 15:20:36 +0800
-X-Gm-Features: AS18NWDLd3H-vMtakLEmVtIvlkzOFoFZiZ-WeXmRjS-Z87EyAa_8rPBU-THus9Y
-Message-ID: <CACGkMEt2fAkCb_nC4QwR+3Jq+fS8=7bx=T3AEzPP1KGLErbSBA@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] vhost-net: correctly flush batched packet before
- enabling notification
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: eperezma@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org, 
-	jon@nutanix.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <317b6512.6a9b.1995168196c.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:eigvCgD3n19oEMlo2CIyAA--.1914W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiJQrJZGjId2372AAHsc
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Tue, Sep 16, 2025 at 3:08=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Tue, Sep 16, 2025 at 02:24:22PM +0800, Jason Wang wrote:
-> > On Tue, Sep 16, 2025 at 1:19=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
-com> wrote:
-> > >
-> > > On Tue, Sep 16, 2025 at 10:37:35AM +0800, Jason Wang wrote:
-> > > > On Tue, Sep 16, 2025 at 12:03=E2=80=AFAM Michael S. Tsirkin <mst@re=
-dhat.com> wrote:
-> > > > >
-> > > > > On Fri, Sep 12, 2025 at 04:26:58PM +0800, Jason Wang wrote:
-> > > > > > Commit 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until=
- after
-> > > > > > sendmsg") tries to defer the notification enabling by moving th=
-e logic
-> > > > > > out of the loop after the vhost_tx_batch() when nothing new is
-> > > > > > spotted. This will bring side effects as the new logic would be=
- reused
-> > > > > > for several other error conditions.
-> > > > > >
-> > > > > > One example is the IOTLB: when there's an IOTLB miss, get_tx_bu=
-fs()
-> > > > > > might return -EAGAIN and exit the loop and see there's still av=
-ailable
-> > > > > > buffers, so it will queue the tx work again until userspace fee=
-d the
-> > > > > > IOTLB entry correctly. This will slowdown the tx processing and=
- may
-> > > > > > trigger the TX watchdog in the guest.
-> > > > > >
-> > > > > > Fixing this by stick the notificaiton enabling logic inside the=
- loop
-> > > > > > when nothing new is spotted and flush the batched before.
-> > > > > >
-> > > > > > Reported-by: Jon Kohler <jon@nutanix.com>
-> > > > > > Cc: stable@vger.kernel.org
-> > > > > > Fixes: 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until=
- after sendmsg")
-> > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > > > ---
-> > > > > >  drivers/vhost/net.c | 33 +++++++++++++--------------------
-> > > > > >  1 file changed, 13 insertions(+), 20 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > > > index 16e39f3ab956..3611b7537932 100644
-> > > > > > --- a/drivers/vhost/net.c
-> > > > > > +++ b/drivers/vhost/net.c
-> > > > > > @@ -765,11 +765,11 @@ static void handle_tx_copy(struct vhost_n=
-et *net, struct socket *sock)
-> > > > > >       int err;
-> > > > > >       int sent_pkts =3D 0;
-> > > > > >       bool sock_can_batch =3D (sock->sk->sk_sndbuf =3D=3D INT_M=
-AX);
-> > > > > > -     bool busyloop_intr;
-> > > > > >       bool in_order =3D vhost_has_feature(vq, VIRTIO_F_IN_ORDER=
-);
-> > > > > >
-> > > > > >       do {
-> > > > > > -             busyloop_intr =3D false;
-> > > > > > +             bool busyloop_intr =3D false;
-> > > > > > +
-> > > > > >               if (nvq->done_idx =3D=3D VHOST_NET_BATCH)
-> > > > > >                       vhost_tx_batch(net, nvq, sock, &msg);
-> > > > > >
-> > > > > > @@ -780,10 +780,18 @@ static void handle_tx_copy(struct vhost_n=
-et *net, struct socket *sock)
-> > > > > >                       break;
-> > > > > >               /* Nothing new?  Wait for eventfd to tell us they=
- refilled. */
-> > > > > >               if (head =3D=3D vq->num) {
-> > > > > > -                     /* Kicks are disabled at this point, brea=
-k loop and
-> > > > > > -                      * process any remaining batched packets.=
- Queue will
-> > > > > > -                      * be re-enabled afterwards.
-> > > > > > +                     /* Flush batched packets before enabling
-> > > > > > +                      * virqtueue notification to reduce
-> > > > > > +                      * unnecssary virtqueue kicks.
-> > > > > >                        */
-> > > > > > +                     vhost_tx_batch(net, nvq, sock, &msg);
-> > > > >
-> > > > > So why don't we do this in the "else" branch"? If we are busy pol=
-ling
-> > > > > then we are not enabling kicks, so is there a reason to flush?
-> > > >
-> > > > It should be functional equivalent:
-> > > >
-> > > > do {
-> > > >     if (head =3D=3D vq->num) {
-> > > >         vhost_tx_batch();
-> > > >         if (unlikely(busyloop_intr)) {
-> > > >             vhost_poll_queue()
-> > > >         } else if () {
-> > > >             vhost_disable_notify(&net->dev, vq);
-> > > >             continue;
-> > > >         }
-> > > >         return;
-> > > > }
-> > > >
-> > > > vs
-> > > >
-> > > > do {
-> > > >     if (head =3D=3D vq->num) {
-> > > >         if (unlikely(busyloop_intr)) {
-> > > >             vhost_poll_queue()
-> > > >         } else if () {
-> > > >             vhost_tx_batch();
-> > > >             vhost_disable_notify(&net->dev, vq);
-> > > >             continue;
-> > > >         }
-> > > >         break;
-> > > > }
-> > > >
-> > > > vhost_tx_batch();
-> > > > return;
-> > > >
-> > > > Thanks
-> > > >
-> > >
-> > > But this is not what the code comment says:
-> > >
-> > >                      /* Flush batched packets before enabling
-> > >                       * virqtueue notification to reduce
-> > >                       * unnecssary virtqueue kicks.
-> > >
-> > >
-> > > So I ask - of we queued more polling, why do we need
-> > > to flush batched packets? We might get more in the next
-> > > polling round, this is what polling is designed to do.
-> >
-> > The reason is there could be a rx work when busyloop_intr is true, so
-> > we need to flush.
-> >
-> > Thanks
->
-> Then you need to update the comment to explain.
-> Want to post your version of this patchset?
-
-I'm fine if you wish. Just want to make sure, do you prefer a patch
-for your vhost tree or net?
-
-For net, I would stick to 2 patches as if we go for 3, the last patch
-that brings back flush looks more like an optimization.
-For vhost, I can go with 3 patches, but I see that your series has been que=
-ued.
-
-And the build of the current vhost tree is broken by:
-
-commit 41bafbdcd27bf5ce8cd866a9b68daeb28f3ef12b (HEAD)
-Author: Michael S. Tsirkin <mst@redhat.com>
-Date:   Mon Sep 15 10:47:03 2025 +0800
-
-    vhost-net: flush batched before enabling notifications
-
-It looks like it misses a brace.
-
-Thanks
-
->
->
-> > >
-> > >
-> > > >
-> > > > >
-> > > > >
-> > > > > > +                     if (unlikely(busyloop_intr)) {
-> > > > > > +                             vhost_poll_queue(&vq->poll);
-> > > > > > +                     } else if (unlikely(vhost_enable_notify(&=
-net->dev,
-> > > > > > +                                                             v=
-q))) {
-> > > > > > +                             vhost_disable_notify(&net->dev, v=
-q);
-> > > > > > +                             continue;
-> > > > > > +                     }
-> > > > > >                       break;
-> > > > > >               }
-> > > > > >
-> > > > > > @@ -839,22 +847,7 @@ static void handle_tx_copy(struct vhost_ne=
-t *net, struct socket *sock)
-> > > > > >               ++nvq->done_idx;
-> > > > > >       } while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, to=
-tal_len)));
-> > > > > >
-> > > > > > -     /* Kicks are still disabled, dispatch any remaining batch=
-ed msgs. */
-> > > > > >       vhost_tx_batch(net, nvq, sock, &msg);
-> > > > > > -
-> > > > > > -     if (unlikely(busyloop_intr))
-> > > > > > -             /* If interrupted while doing busy polling, reque=
-ue the
-> > > > > > -              * handler to be fair handle_rx as well as other =
-tasks
-> > > > > > -              * waiting on cpu.
-> > > > > > -              */
-> > > > > > -             vhost_poll_queue(&vq->poll);
-> > > > > > -     else
-> > > > > > -             /* All of our work has been completed; however, b=
-efore
-> > > > > > -              * leaving the TX handler, do one last check for =
-work,
-> > > > > > -              * and requeue handler if necessary. If there is =
-no work,
-> > > > > > -              * queue will be reenabled.
-> > > > > > -              */
-> > > > > > -             vhost_net_busy_poll_try_queue(net, vq);
-> > > > > >  }
-> > > > > >
-> > > > > >  static void handle_tx_zerocopy(struct vhost_net *net, struct s=
-ocket *sock)
-> > > > > > --
-> > > > > > 2.34.1
-> > > > >
-> > >
->
-
+CkF0IDIwMjUtMDktMTUgMDA6NDM6MDUsICJTZXJnZXkgUnlhemFub3YiIDxyeWF6YW5vdi5zLmFA
+Z21haWwuY29tPiB3cm90ZToKPkhpIFNsYXJrLAo+Cj5PbiA5LzExLzI1IDA1OjQyLCBTbGFyayBY
+aWFvIHdyb3RlOgo+PiBBdCAyMDI1LTA2LTMwIDE1OjMwOjE0LCAiTG9pYyBQb3VsYWluIiA8bG9p
+Yy5wb3VsYWluQG9zcy5xdWFsY29tbS5jb20+IHdyb3RlOgo+Pj4gT24gU3VuLCBKdW4gMjksIDIw
+MjUgYXQgMTI6MDfigK9QTSBTZXJnZXkgUnlhemFub3YgPHJ5YXphbm92LnMuYUBnbWFpbC5jb20+
+IHdyb3RlOgo+Pj4+IE9uIDYvMjkvMjUgMDU6NTAsIExvaWMgUG91bGFpbiB3cm90ZToKPj4+Pj4g
+T24gVHVlLCBKdW4gMjQsIDIwMjUgYXQgMTE6MznigK9QTSBTZXJnZXkgUnlhemFub3YgPHJ5YXph
+bm92LnMuYUBnbWFpbC5jb20+IHdyb3RlOgo+Pj4+Pj4gVGhlIHNlcmllcyBpbnRyb2R1Y2VzIGEg
+bG9uZyBkaXNjdXNzZWQgTk1FQSBwb3J0IHR5cGUgc3VwcG9ydCBmb3IgdGhlCj4+Pj4+PiBXV0FO
+IHN1YnN5c3RlbS4gVGhlcmUgYXJlIHR3byBnb2Fscy4gRnJvbSB0aGUgV1dBTiBkcml2ZXIgcGVy
+c3BlY3RpdmUsCj4+Pj4+PiBOTUVBIGV4cG9ydGVkIGFzIGFueSBvdGhlciBwb3J0IHR5cGUgKGUu
+Zy4gQVQsIE1CSU0sIFFNSSwgZXRjLikuIEZyb20KPj4+Pj4+IHVzZXIgc3BhY2Ugc29mdHdhcmUg
+cGVyc3BlY3RpdmUsIHRoZSBleHBvcnRlZCBjaGFyZGV2IGJlbG9uZ3MgdG8gdGhlCj4+Pj4+PiBH
+TlNTIGNsYXNzIHdoYXQgbWFrZXMgaXQgZWFzeSB0byBkaXN0aW5ndWlzaCBkZXNpcmVkIHBvcnQg
+YW5kIHRoZSBXV0FOCj4+Pj4+PiBkZXZpY2UgY29tbW9uIHRvIGJvdGggTk1FQSBhbmQgY29udHJv
+bCAoQVQsIE1CSU0sIGV0Yy4pIHBvcnRzIG1ha2VzIGl0Cj4+Pj4+PiBlYXN5IHRvIGxvY2F0ZSBh
+IGNvbnRyb2wgcG9ydCBmb3IgdGhlIEdOU1MgcmVjZWl2ZXIgYWN0aXZhdGlvbi4KPj4+Pj4+Cj4+
+Pj4+PiBEb25lIGJ5IGV4cG9ydGluZyB0aGUgTk1FQSBwb3J0IHZpYSB0aGUgR05TUyBzdWJzeXN0
+ZW0gd2l0aCB0aGUgV1dBTgo+Pj4+Pj4gY29yZSBhY3RpbmcgYXMgcHJveHkgYmV0d2VlbiB0aGUg
+V1dBTiBtb2RlbSBkcml2ZXIgYW5kIHRoZSBHTlNTCj4+Pj4+PiBzdWJzeXN0ZW0uCj4+Pj4+Pgo+
+Pj4+Pj4gVGhlIHNlcmllcyBzdGFydHMgZnJvbSBhIGNsZWFudXAgcGF0Y2guIFRoZW4gdHdvIHBh
+dGNoZXMgcHJlcGFyZXMgdGhlCj4+Pj4+PiBXV0FOIGNvcmUgZm9yIHRoZSBwcm94eSBzdHlsZSBv
+cGVyYXRpb24uIEZvbGxvd2VkIGJ5IGEgcGF0Y2ggaW50cm9kaW5nIGEKPj4+Pj4+IG5ldyBXV05B
+IHBvcnQgdHlwZSwgaW50ZWdyYXRpb24gd2l0aCB0aGUgR05TUyBzdWJzeXN0ZW0gYW5kIGRlbXV4
+LiBUaGUKPj4+Pj4+IHNlcmllcyBlbmRzIHdpdGggYSBjb3VwbGUgb2YgcGF0Y2hlcyB0aGF0IGlu
+dHJvZHVjZSBlbXVsYXRlZCBFTUVBIHBvcnQKPj4+Pj4+IHRvIHRoZSBXV0FOIEhXIHNpbXVsYXRv
+ci4KPj4+Pj4+Cj4+Pj4+PiBUaGUgc2VyaWVzIGlzIHRoZSBwcm9kdWN0IG9mIHRoZSBkaXNjdXNz
+aW9uIHdpdGggTG9pYyBhYm91dCB0aGUgcHJvcyBhbmQKPj4+Pj4+IGNvbnMgb2YgcG9zc2libGUg
+bW9kZWxzIGFuZCBpbXBsZW1lbnRhdGlvbi4gQWxzbyBNdWhhbW1hZCBhbmQgU2xhcmsgZGlkCj4+
+Pj4+PiBhIGdyZWF0IGpvYiBkZWZpbmluZyB0aGUgcHJvYmxlbSwgc2hhcmluZyB0aGUgY29kZSBh
+bmQgcHVzaGluZyBtZSB0bwo+Pj4+Pj4gZmluaXNoIHRoZSBpbXBsZW1lbnRhdGlvbi4gTWFueSB0
+aGFua3MuCj4+Pj4+Pgo+Pj4+Pj4gQ29tbWVudHMgYXJlIHdlbGNvbWVkLgo+Pj4+Pj4KPj4+Pj4+
+IFNsYXJrLCBNdWhhbW1hZCwgaWYgdGhpcyBzZXJpZXMgc3VpdHMgeW91LCBmZWVsIGZyZWUgdG8g
+YnVuZGxlIGl0IHdpdGgKPj4+Pj4+IHRoZSBkcml2ZXIgY2hhbmdlcyBhbmQgKHJlLSlzZW5kIGZv
+ciBmaW5hbCBpbmNsdXNpb24gYXMgYSBzaW5nbGUgc2VyaWVzLgo+Pj4+Pj4KPj4+Pj4+IENoYW5n
+ZXMgUkZDdjEtPlJGQ3YyOgo+Pj4+Pj4gKiBVbmlmb3JtbHkgdXNlIHB1dF9kZXZpY2UoKSB0byBy
+ZWxlYXNlIHBvcnQgbWVtb3J5LiBUaGlzIG1hZGUgY29kZSBsZXNzCj4+Pj4+PiAgICAgd2VpcmQg
+YW5kIHdheSBtb3JlIGNsZWFyLiBUaGFuayB5b3UsIExvaWMsIGZvciBub3RpY2luZyBhbmQgdGhl
+IGZpeAo+Pj4+Pj4gICAgIGRpc2N1c3Npb24hCj4+Pj4+Cj4+Pj4+IEkgdGhpbmsgeW91IGNhbiBu
+b3cgc2VuZCB0aGF0IHNlcmllcyB3aXRob3V0IHRoZSBSRkMgdGFnLiBJdCBsb29rcyBnb29kIHRv
+IG1lLgo+Pj4+Cj4+Pj4gVGhhbmsgeW91IGZvciByZXZpZXdpbmcgaXQuIERvIHlvdSB0aGluayBp
+dCBtYWtlcyBzZW5zZSB0byBpbnRyb2R1Y2UgbmV3Cj4+Pj4gQVBJIHdpdGhvdXQgYW4gYWN0dWFs
+IHVzZXI/IE9rLCB3ZSBoYXZlIHR3byBkcml2ZXJzIHBvdGVudGlhbGx5IHJlYWR5IHRvCj4+Pj4g
+dXNlIEdOU1MgcG9ydCB0eXBlLCBidXQgdGhleSBhcmUgbm90IHlldCBoZXJlLiBUaGF0IGlzIHdo
+eSBJIGhhdmUgc2VuZAo+Pj4+IGFzIFJGQy4gT24gYW5vdGhlciBoYW5kLCB0ZXN0aW5nIHdpdGgg
+c2ltdWxhdG9yIGhhcyBub3QgcmV2ZWFsZWQgYW55Cj4+Pj4gaXNzdWUgYW5kIEdOU1MgcG9ydCB0
+eXBlIGltcGxlbWVudGF0aW9uIGxvb2tzIHJlYWR5IHRvIGJlIG1lcmdlZC4KPj4+Cj4+PiBSaWdo
+dCwgd2UgbmVlZCBhIHByb3BlciB1c2VyIGZvciBpdCwgSSB0aGluayBzb21lIE1ISSBQQ0llIG1v
+ZGVtcyBhbHJlYWR5Cj4+PiBoYXZlIHRoaXMgTk1FQSBwb3J0IGF2YWlsYWJsZSwgc28gaXQgY2Fu
+IGVhc2lseSBiZSBhZGRlZCB0byB0aGlzIFBSLiBGb3Igc3VyZQo+Pj4gd2Ugd2lsbCBuZWVkIHNv
+bWVvbmUgdG8gdGVzdCB0aGlzLgo+Pj4KPj4gSGkgTG9pYywgU2VyZ2V5LAo+PiBBbnkgdXBkYXRl
+IGFib3V0IHRoaXMgdG9waWM/Cj4+IElmIHlvdSB3YW50IHRvIHRlc3QgaXQsIHdlIGNhbiBwcm92
+aWRlIHNvbWUgaGVscCBvbiB0aGlzLiBBbHNvLCBJIHRoaW5rIHRoZSBxdWljaW5jCj4+IGNlbnRl
+ciBtYXkgYWxzbyBkbyBzb21lIHRlc3QuIFlvdSBjYW4gY29udGFjdCBpdCB3aXRoIE1hbmkgZm9y
+IGZ1cnRoZXIgZGV0YWlscy4KPgo+QmFzaWNhbGx5IHRoZSBmdW5jdGlvbmFsaXR5IGlzIGRvbmUs
+IExvaWMgaGFzIHJldmlld2VkIGl0LCB3aGlsZSBub3QgCj5mb3JtYWxseSBhY2tlZCB5ZXQuIEFu
+ZCBpdCBjYW4gYmUgbWVyZ2VkIGp1c3Qgbm93LiBPbiBhbm90aGVyIGhhbmQgd2UgCj5oYXZlIG5v
+IHVzZXJzIGZvciBpdC4gVGhhdCBpcyB3aHkgSSBoYXZlIG5vdCBzZW50IGl0IGFzIGEgZmluYWwg
+cGF0Y2guCj4KPkkgd2FzIGV4cGVjdGVkIHlvdSwgU2xhcmssIG9yIE11aGFtbWFkIHdpbGwgdGFr
+ZSB0aGVzZSBwYXRjaGVzLCAKPmluY29ycG9yYXRlIGludG8gYSBkcml2ZXIgY2hhbmdlIHRoYXQg
+aW50cm9kdWNlcyBOTUVBIHBvcnQgZXhwb3J0IGFuZCB3ZSAKPmNhbiBtZXJnZSBhbGwgdG9nZXRo
+ZXIuIE9yIGlmIHlvdSBwcmVmZXIgdGhpcyBzZXJpZXMgYmVpbmcgbWVyZ2VkIGZpcnN0IAo+YW5k
+IHRoZW4geW91IHdpbGwgc2VuZCB5b3VyIGNoYW5nZXMuIEluIHRoaXMgY2FzZSBJIG5lZWQgYSBn
+cmVlbiBsaWdodCAKPmZyb20geW91IHRoYXQgeW91IHRlc3RlZCB0aGlzIHNlcmllcyBsb2NhbGx5
+IGFuZCB0aGVyZSBhcmUgbm8gb2JqZWN0aW9ucy4KPgo+VG8gc3VtbWFyaXplLCB3ZSBoYXZlIHR3
+byBvcHRpb25zOgo+YSkgeW91IGluY29ycG9yYXRlIHRoaXMgc2VyaWVzIGludG8geW91ciBjaGFu
+Z2VzIGFuZCBzZW5kIGEgYmlnZ2VyIAo+c2VyaWVzIGltcGxlbWVudGluZyBldmVyeXRoaW5nIGZy
+b20gZHJpdmVyIHRvIHRoZSBjb3JlOwo+Yikgd2UgbWVyZ2UgdGhpcyBzZXJpZXMgYXMgaXQgaXMs
+IGFuZCB0aGVuIHlvdSBzZW5kIGFuIGZvbGxvdyB1cCBjaGFuZ2VzIAo+aW50cm9kdWNpbmcgYSBk
+cml2ZXIgc3VwcG9ydC4KPgo+U2xhcmssIE11aGFtbWFkLCBsZXQgbWUga25vdywgd2hpY2ggd2F5
+IGlzIG1vcmUgc3VpdGFibGUgZm9yIHlvdS4KPgo+LS0KPlNlcmdleQoKSSB3b3VsZCBwcmVmZXIg
+dG8gc2VsZWN0IG9wdGlvbiAoYikuCkJhc2ljYWxseSB0aGVyZSBpcyBubyBiaWcgcHJvYmxlbSBp
+biBteSBsb2NhbCBiYXNlZCBvbiB5b3VyIFYxIHBhdGNoZXMgLgpBbmQgSSB0aGluayBpdCdzIGhh
+cmQgdG8gcmVhY2ggdG8gMTAwJSBmb3IgYSBuZXcgZmVhdHVyZS4gVGhlcmUgbXVzdCBiZSBoYXZl
+IApzb21lIGV4dHJhIHBhdGNoZXMgdG8gY29tcGxldGUgaXQuCkhvdyBhYm91dCB5b3VyIG9waW5p
+b24sIE1hbmk/Cg==
 
