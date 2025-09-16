@@ -1,108 +1,97 @@
-Return-Path: <netdev+bounces-223733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC13B5A419
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:42:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C02C8B5A41D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:43:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 923F5523E5E
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:42:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6961E1C04D69
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD222DC783;
-	Tue, 16 Sep 2025 21:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9B128643F;
+	Tue, 16 Sep 2025 21:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiKilsRb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H6ZTbDh6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893F12820B9;
-	Tue, 16 Sep 2025 21:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DDF276045;
+	Tue, 16 Sep 2025 21:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758058920; cv=none; b=Rl1ayH5HnHZtwaMpTzQZdZQ+OMJIsHIczrumY3+bhFf3QZaYRsHea3fQw+B6eu97974Xi2bLdjSk1W25GhqAk++HmYu9ysE0Yy/m0hghn9NrpbOSU2VaUAJMATyrEXQmaB0tdMv+qGdx5LoPdsAWUCuJtVA88Mex6+qhbJLcu0g=
+	t=1758058986; cv=none; b=sP7mD/bXZkeCNUVYYphRfkKfCK1qfrJDOMKFOm+rVC746nxtuvb1ZDJDktG0iyH0GGX3DzPRhlrDX4tRK4JHqUMbFWFHq6np3zcvpmQTCD1Bbbt1YJ46RkIke1YFJJd5/dJnfe+4h2E4eUaOz9bhVvCv9yNhKgDBLplOaoJeVf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758058920; c=relaxed/simple;
-	bh=tRIfdhsAJMME1a45JIICOi38lqR6oYNtURxnDEmjumg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ZCxleXv/YpG6imYdnln+24v0YGazAw/fQuwmXZcgckAws3NHj8NAygd3f4S9LG6K++cF5bWZvfM1WG4NGq8gv7G3TEF8pMPnt0nr+ZQqr1iZC2WjW/QvnoIJYi2oT+1Qdu8dLeD/5la0DYp0yvki4N05P6mjVx5T1mCbThFJ240=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RiKilsRb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60407C4CEEB;
-	Tue, 16 Sep 2025 21:41:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758058920;
-	bh=tRIfdhsAJMME1a45JIICOi38lqR6oYNtURxnDEmjumg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=RiKilsRb4kpDl0//LUuc+uz2OTTgEllKymx7sarK7K5V2gLsr1ROtovFW0kOsUepf
-	 CVUdEQwwFLuSUlqYhn6YaIEwVcdS85CEUrDgYJ/g/48X7rp29GP9CNn6aMIQ33PIx6
-	 qMTtsWRCJkxlISgeK+B5r9gsmYQwYK6nqqaFNCyItywRMPpokt8mtHhDOYHRiXCGLD
-	 KWtBypRC0GLgKb/k4OKDQX3TcZQszrX6kdAAB5qWE85+zq27Y2ISZzvlf2onQxOUXP
-	 eVaTIJcnLNpTPwq+FD10s0x7LBVntsCuIxjWMtNZ14xDhjF+mKr+hGMh5HIGCYjgHd
-	 JlE06EhPv51FA==
-From: Mark Brown <broonie@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, 
- Shengjiu Wang <shengjiu.wang@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
- Sascha Hauer <s.hauer@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Jonas Rebmann <jre@pengutronix.de>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-sound@vger.kernel.org, imx@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, Lucas Stach <l.stach@pengutronix.de>, 
- David Jander <david@protonic.nl>, Oleksij Rempel <o.rempel@pengutronix.de>
-In-Reply-To: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
-References: <20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de>
-Subject: Re: (subset) [PATCH 0/4] Mainline Protonic PRT8ML board
-Message-Id: <175805891512.247117.14108545633571750279.b4-ty@kernel.org>
-Date: Tue, 16 Sep 2025 22:41:55 +0100
+	s=arc-20240116; t=1758058986; c=relaxed/simple;
+	bh=MiXPsf7L7852ojyfxFvPJouhhyZAjmQW87Ms+A7spPY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y+QsXHgCW1oAj/DwX0t+AjJgc7SdUIpqstO6dE43ET7lPki4BKtrl1IbUV354QLyGjqn1XjHSjyvZGg8XY2wZeZe1yPj03mQFxeaxvB66ArEwkf7ZHzs+HmQP7/fFuIpxxk95QrVExbolYjafPx/nAoUigA3y29EU/HWi1STpJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=H6ZTbDh6; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=sOFhBT4om+1Vj3WVvNgiUqXVRyHTYzIYuFWj+roWekI=; b=H6ZTbDh6Xa2zSVWSXO+2ZAM4Sl
+	C6Ise7xHVLIh/S0L1YT55eN8//6A+yyKA+2Lzw//jbUT4mYyzZVgugvqt1dFWfUrvcvlBnWP2JQ/v
+	+s4a1I8rGFCNXOVLG5houuP16qGUOEg/WEC+yV4RtufMWXeOH5mw8tgF+ygwwzJQP1taEri/X7nZi
+	HOe/nqJB8i9YlLFxUbhSjkK8rNoAjBOted5EUJf2YHECjwiFXVpZdB8MCss/syr+2J899v8dcWpWG
+	azTbqNJKWU0bVn2YawcLKHP93SVp2/09hnEqq7ZjtsqAwq0+gd2kJYZDst7yeP6xXLTDxqJIFEFhT
+	yWc6LtEA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33612)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uydS0-000000006Nv-3pNB;
+	Tue, 16 Sep 2025 22:43:00 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uydRz-0000000080u-1DYH;
+	Tue, 16 Sep 2025 22:42:59 +0100
+Date: Tue, 16 Sep 2025 22:42:59 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-arm-msm@vger.kernel.org,
+	Marek Beh__n <kabel@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/7] net: sfp: pre-parse the module support
+Message-ID: <aMnZ40TN68WhWcMb@shell.armlinux.org.uk>
+References: <aMgRwdtmDPNqbx4n@shell.armlinux.org.uk>
+ <E1uy9J8-00000005jg1-1lhL@rmk-PC.armlinux.org.uk>
+ <54efefb7-690e-492e-9f2d-8457d6424861@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-56183
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <54efefb7-690e-492e-9f2d-8457d6424861@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, 10 Sep 2025 14:35:20 +0200, Jonas Rebmann wrote:
-> This series adds the Protonic PRT8ML device tree as well as some minor
-> corrections to the devicetree bindings used.
+On Mon, Sep 15, 2025 at 05:12:19PM +0200, Andrew Lunn wrote:
+> > +static void sfp_module_may_have_phy(struct sfp_bus *bus,
+> > +				    const struct sfp_eeprom_id *id)
+> > +{
 > 
+> _may_have_phy() sounds like a question, and you would expect a return
+> value as the answer. But that is not what this does.
 > 
+> Maybe sfp_module_set_may_have_phy()? 
 
-Applied to
+I'll stick a parse_ in there rather than set_ so it matches all the
+others which are parsing the SFP ID to obtain something.
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next
-
-Thanks!
-
-[2/4] ASoC: dt-bindings: asahi-kasei,ak4458: Reference common DAI properties
-      commit: 8d7de4a014f589c1776959f7fdadbf7b12045aac
-
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
