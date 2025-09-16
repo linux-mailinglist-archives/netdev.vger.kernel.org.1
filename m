@@ -1,139 +1,93 @@
-Return-Path: <netdev+bounces-223454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C056B59343
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:19:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03EC1B5934A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C523B946B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:19:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9001F1BC531E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 10:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910623019BB;
-	Tue, 16 Sep 2025 10:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28474303C83;
+	Tue, 16 Sep 2025 10:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGIAYYce"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3A524338F;
-	Tue, 16 Sep 2025 10:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E90302CA2;
+	Tue, 16 Sep 2025 10:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758017969; cv=none; b=QD4u6b3m+bfMoKxOgTYwZeS1F40p9509TF/87oYH8DKkCVQ2UCsmGGcMWLwhuCk+SdrMgz3Xm2amZDDrUEsD4E3kZOBEr3Q3xPswvnQSHvH9J15LL/HRfbb0IOIWcqF1DNcYIUpGXsrkRELynRNDTVm+5J07c/trU6T8T+Ajeqg=
+	t=1758018007; cv=none; b=Su56fnVY42x/Fjaa0VG8O44oEet2erXkIM85+zkpwBoeqfzACA+DFZVEVCVT7J15exMoFOWbhNuiPx5ZzKERIefyewR0oKCOpJjd23d6mUJ6JDECUldzAN12D8/6eHoXZQr4iV1F7JuGCi7FZArqFoPPDcgLt/ySTj2bEGR9NqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758017969; c=relaxed/simple;
-	bh=W5YIT3+BDwsaliPJO5D4/+GpNuefOW/D5AS/xsXGfms=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=QmHSpXLRm96k0ddiZGknVvfTl+97N8L4tDR97dFlw4bVtO7Ypa7Iv+UEvg1ky0sOFGIiKbGopPGEyDpEx25U/hmTVMozHspxZuktCcJ/M+A047xSrZotFNNADw+PM8wP/dXNO1m3ZWTe1h1tBoNhA8bRSV0ynv4zoflrfVwmbbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [106.117.98.100])
-	by mtasvr (Coremail) with SMTP id _____wD34GqZOclo2ro9Ag--.591S3;
-	Tue, 16 Sep 2025 18:19:06 +0800 (CST)
-Received: from duoming$zju.edu.cn ( [106.117.98.100] ) by
- ajax-webmail-mail-app2 (Coremail) ; Tue, 16 Sep 2025 18:19:04 +0800
- (GMT+08:00)
-Date: Tue, 16 Sep 2025 18:19:04 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: duoming@zju.edu.cn
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch
-Subject: Re: [PATCH net] cnic: Fix use-after-free bugs in cnic_delete_task
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
- 20250620(94335109) Copyright (c) 2002-2025 www.mailtech.cn zju.edu.cn
-In-Reply-To: <20250915182235.77a556c4@kernel.org>
-References: <20250914034335.35643-1-duoming@zju.edu.cn>
- <20250915182235.77a556c4@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1758018007; c=relaxed/simple;
+	bh=TbzkzVHEK1yEbMNnfkgImEYVcP6Q0LNVAAHXAk3Oil8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KZcqCFVnCGO5uHPUwMQL97jHmN7pFKj/6cGWhrOK1GnyA93QAO9nQUgnPtJWg1idzwcpNlaWhEiIBgZo5o/HEbBWjI8ILGBC7etlJqyrdlux9TVCbgVyHy7/M8FUESs/X9GJfnKnMdELZpiK6U2wXxe+HL+EJ2f6YTWbmfJSmME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGIAYYce; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 819A9C4CEFC;
+	Tue, 16 Sep 2025 10:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758018006;
+	bh=TbzkzVHEK1yEbMNnfkgImEYVcP6Q0LNVAAHXAk3Oil8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EGIAYYce8e8rXdcjgfq4rkk01Qfd3kY8EVjhL4DScF/Nn6Tv5VYSR9AOx9SiRLmoq
+	 DrVbtCnRTsPVHIwS3Vg2LL3jEft4vf8J1hiWjwCYe0qeqnoS73OfeUs/XIE7c3774p
+	 ajk/eDUF0crP/xkbhmkE4DAM1RjeN39LOJi41Evt5gn5bTLs9zTcOW/hR2ncCAkUR8
+	 XBXBrpdt85lg1QIeD04zIOfKDBY0Kyx8Q1RwbDAC4g2kp0gHYh7mwjMi79awGDcpN+
+	 dOb60MqmTuU4kYHdsnbYr22I2j55pHgonfd++Y9Sgbx1djKvUYtK6bPCpIbYB/KSMb
+	 tJRvNQXZqUd0Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF7939D0C1A;
+	Tue, 16 Sep 2025 10:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <1bb984a1.4455.1995208fc7b.Coremail.duoming@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:zC_KCgAHIUWYOclo47sEAg--.52277W
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwELAWjIa-sOCQAIs3
-X-CM-DELIVERINFO: =?B?ejjX0AXKKxbFmtjJiESix3B1w3uoVhYI+vyen2ZzBEkOnu5chDpkB+ZdGnv/zQ0PbP
-	CR1/7cgVV3ofNmrvLphm9h9KSdQ6gWx4m7N3E1IpYaFopor/Utk1b8mb/TyWa9iv/7g5Ij
-	NyuI6fTO1uy65bQUXPJDvr+MbXTmyfN4WXPfTHGra/VIiW8Xv3q7tH0yCShV1w==
-X-Coremail-Antispam: 1Uk129KBj93XoWxGw4kAr1UurWxKF4DWFyUJwc_yoW5ZFy8pr
-	WfW345XFZ7Jr18twsaqr48XF1Y9w4vya47Grs5Jrs2y34rJF1YgryfKFWruaykurWkZF4x
-	ZFn8ZFZxZFyqkFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUmvb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAF
-	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0Y48IcxkI7V
-	AKI48G6xCjnVAKz4kxM4xvF2IEb7IF0Fy264kE64k0F24lFcxC0VAYjxAxZF0Ex2IqxwAK
-	zVCY07xG64k0F24l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r12
-	6r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
-	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UMVCEFcxC0VAYjxAxZFUvcSsGvf
-	C2KfnxnUUI43ZEXa7IU848BUUUUUU==
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: phy: nxp-c45-tja11xx: use bitmap_empty() where
+ appropriate
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175801800777.695774.17798425923008297639.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Sep 2025 10:20:07 +0000
+References: <20250913182837.206800-1-yury.norov@gmail.com>
+In-Reply-To: <20250913182837.206800-1-yury.norov@gmail.com>
+To: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+Cc: andrei.botila@oss.nxp.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, sd@queasysnail.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-T24gTW9uLCAxNSBTZXAgMjAyNSAxODoyMjozNSAtMDcwMCBKYWt1YiBLaWNpbnNraSB3cm90ZToK
-PiA+IFRoZSBvcmlnaW5hbCBjb2RlIHVzZXMgY2FuY2VsX2RlbGF5ZWRfd29yaygpIGluIGNuaWNf
-Y21fc3RvcF9ibngyeF9odygpLAo+ID4gd2hpY2ggZG9lcyBub3QgZ3VhcmFudGVlIHRoYXQgdGhl
-IGRlbGF5ZWQgd29yayBpdGVtICdkZWxldGVfdGFzaycgaGFzCj4gPiBmdWxseSBjb21wbGV0ZWQg
-aWYgaXQgd2FzIGFscmVhZHkgcnVubmluZy4gQWRkaXRpb25hbGx5LCB0aGUgZGVsYXllZCB3b3Jr
-Cj4gPiBpdGVtIGlzIGN5Y2xpYywgZmx1c2hfd29ya3F1ZXVlKCkgaW4gY25pY19jbV9zdG9wX2Ju
-eDJ4X2h3KCkgY291bGQgbm90Cj4gPiBwcmV2ZW50IHRoZSBuZXcgaW5jb21pbmcgb25lcy4gVGhp
-cyBsZWFkcyB0byB1c2UtYWZ0ZXItZnJlZSBzY2VuYXJpb3MKPiA+IHdoZXJlIHRoZSBjbmljX2Rl
-diBpcyBkZWFsbG9jYXRlZCBieSBjbmljX2ZyZWVfZGV2KCksIHdoaWxlIGRlbGV0ZV90YXNrCj4g
-PiByZW1haW5zIGFjdGl2ZSBhbmQgYXR0ZW1wdCB0byBkZXJlZmVyZW5jZSBjbmljX2RldiBpbiBj
-bmljX2RlbGV0ZV90YXNrKCkuCj4gCj4gW3NuaXBdCj4gCj4gPiBSZXBsYWNlIGNhbmNlbF9kZWxh
-eWVkX3dvcmsoKSB3aXRoIGNhbmNlbF9kZWxheWVkX3dvcmtfc3luYygpIHRvIGVuc3VyZQo+ID4g
-dGhhdCB0aGUgZGVsYXllZCB3b3JrIGl0ZW0gaXMgcHJvcGVybHkgY2FuY2VsZWQgYW5kIGFueSBl
-eGVjdXRpbmcgZGVsYXllZAo+ID4gd29yayBoYXMgZmluaXNoZWQgYmVmb3JlIHRoZSBjbmljX2Rl
-diBpcyBkZWFsbG9jYXRlZC4KPiAKPiBIYXZlIHlvdSB0ZXN0ZWQgdGhpcyBvbiByZWFsIEhXPyBQ
-bGVhc2UgYWx3YXlzIGluY2x1ZGUgaW5mb3JtYXRpb24gb24KPiBob3cgeW91IGRpc2NvdmVyZWQg
-dGhlIHByb2JsZW0gYW5kIHdoZXRoZXIgeW91IG1hbmFnZWQgdG8gdGVzdCB0aGUgZml4LgoKVG8g
-cmVwcm9kdWNlIHRoZSBpc3N1ZSwgSSBlbXVsYXRlZCB0aGUgY25pYyBkZXZpY2UgaW4gUUVNVSBh
-bmQgbWFudWFsbHkKdHJpZ2dlcmVkIHRoZSBwcm9ibGVtIGJ5IGludHJvZHVjaW5nIGRlbGF5cywg
-c3VjaCBhcyBjYWxscyB0b8Kgc3NsZWVwKCksIAp3aXRoaW4gdGhlwqBjbmljX2RlbGV0ZV90YXNr
-KCnCoGZ1bmN0aW9uLgoKV2hpbGUgdGhlIGRlbGF5ZWQgd29yayB3YXMgZXhlY3V0aW5nLMKgY2Fu
-Y2VsX2RlbGF5ZWRfd29yaygpwqBmYWlsZWQgdG8gCnRlcm1pbmF0ZSBpdC4gRnVydGhlcm1vcmUs
-IHNpbmNlwqBjbmljX2RlbGV0ZV90YXNrKCnCoGlzIGEgcmVjdXJyaW5nCmRlbGF5ZWQgd29yayBp
-dGVtLMKgZmx1c2hfd29ya3F1ZXVlKCnCoG9ubHkgYmxvY2tzIGFuZCB3YWl0cyBmb3Igd29yawpp
-dGVtcyB0aGF0IHdlcmUgYWxyZWFkeSBxdWV1ZWQgdG8gdGhlIHdvcmtxdWV1ZSBwcmlvciB0byBp
-dHMgaW52b2NhdGlvbi4gCkFueSB3b3JrIGl0ZW1zIHN1Ym1pdHRlZCBhZnRlcsKgZmx1c2hfd29y
-a3F1ZXVlKCnCoGlzIGNhbGxlZCBhcmUgbm90CmluY2x1ZGVkIGluIHRoZSBzZXQgb2YgdGFza3Mg
-dGhhdCB0aGUgZmx1c2ggb3BlcmF0aW9uIGF3YWl0cy4gVGhpcwptZWFucyB0aGF0IGFmdGVyIHRo
-ZSBjeWNsaWMgd29yayBpdGVtcyBoYXZlIGZpbmlzaGVkIGV4ZWN1dGluZywgCmEgZGVsYXllZCB3
-b3JrIGl0ZW0gbWF5IHN0aWxsIGV4aXN0IGluIHRoZSB3b3JrIHF1ZXVlLgoKWW91IGNhbiBzZWUg
-dGhlIGRldGFpbCBpbiB0aGUgZm9sbG93aW5nIGxpbms6Cmh0dHBzOi8vZWxpeGlyLmJvb3RsaW4u
-Y29tL2xpbnV4L3Y2LjE3LXJjNi9zb3VyY2Uva2VybmVsL3dvcmtxdWV1ZS5jI0wzOTM3CgpGdXJ0
-aGVybW9yZSwgSSB3cm90ZSBhIGtlcm5lbCBtb2R1bGUgdG8gdGVzdCB3aGV0aGVyIHRoZSBjb21i
-aW5hdGlvbiBvZgpjYW5jZWxfZGVsYXllZF93b3JrKCnCoGFuZMKgZmx1c2hfd29ya3F1ZXVlKCnC
-oGNhbiBzYWZlbHkgdGVybWluYXRlIHJlY3VycmluZwpkZWxheWVkIHdvcmsgaXRlbXMuIFRoZSBy
-ZXN1bHQgaXMgbmVnYXRpdmUsIGluZGljYXRpbmcgdGhhdCB0aGUgYWZvcmVtZW50aW9uZWQKY29t
-YmluYXRpb24gY2FycmllcyBwb3RlbnRpYWwgcmlza3MuCgpUaGUgY2FuY2VsX2RlbGF5ZWRfd29y
-a19zeW5jwqBjYWxsc8KgX19jYW5jZWxfd29yayh3b3JrLCAuLi4gfCBXT1JLX0NBTkNFTF9ESVNB
-QkxFKQp0byBhdHRlbXB0IHRvIHJlbW92ZSB0aGUgd29yayBpdGVtIGZyb20gdGhlIHF1ZXVlIGFu
-ZCBzZXRzIHRoZcKgV09SS19DQU5DRUxfRElTQUJMRQpmbGFnLCBwcmV2ZW50aW5nIHRoZSB3b3Jr
-IGl0ZW0gZnJvbSBiZWluZyBleGVjdXRlZCBhZ2Fpbi4gTWVhbndoaWxlLCBpdCB1c2VzCl9fZmx1
-c2hfd29yayh3b3JrLCB0cnVlKcKgdG8gcGVyZm9ybSBhIHN5bmNocm9ub3VzIG9wZXJhdGlvbiwg
-d2FpdGluZyBmb3IgYW55CmN1cnJlbnRseSBleGVjdXRpbmcgd29yayBpdGVtIHRvIGZpbmlzaCBy
-dW5uaW5nLgoKWW91IGNhbiBzZWUgdGhlIGRldGFpbCBpbiB0aGUgZm9sbG93aW5nIGxpbms6Cmh0
-dHBzOi8vZWxpeGlyLmJvb3RsaW4uY29tL2xpbnV4L3Y2LjE3LXJjNi9zb3VyY2Uva2VybmVsL3dv
-cmtxdWV1ZS5jI0w0MzQ4Cgo+ID4gRml4ZXM6IGZkZjI0MDg2ZjQ3NSAoImNuaWM6IERlZmVyIGlz
-Y3NpIGNvbm5lY3Rpb24gY2xlYW51cCIpCj4gPiBTaWduZWQtb2ZmLWJ5OiBEdW9taW5nIFpob3Ug
-PGR1b21pbmdAemp1LmVkdS5jbj4KPiAKPiA+ICAJY25pY19ibngyeF9kZWxldGVfd2FpdChkZXYs
-IDApOwo+ID4gIAo+ID4gLQljYW5jZWxfZGVsYXllZF93b3JrKCZjcC0+ZGVsZXRlX3Rhc2spOwo+
-ID4gKwljYW5jZWxfZGVsYXllZF93b3JrX3N5bmMoJmNwLT5kZWxldGVfdGFzayk7Cj4gPiAgCWZs
-dXNoX3dvcmtxdWV1ZShjbmljX3dxKTsKPiAKPiBBRkFJQ1QgeW91ciBwYXRjaCBpcyBhIG5vcCwg
-ZG91YnQgdGhpcyBpZiBmaXhpbmcgYW55dGhpbmcKClRoaXMgcGF0Y2ggaXMgbm90IGEgbm9wLCBh
-bHRob3VnaCB0aGUgcHJvYmFiaWxpdHkgb2YgdHJpZ2dlcmluZwp0aGlzIGlzc3VlIGlzIGxvdywg
-dGhpcyBwYXRjaCBpbmRlZWQgZml4ZXMgdGhlIHVuZGVybHlpbmcKcHJvYmxlbS4KCkJlc3QgcmVn
-YXJkcywKRHVvbWluZyBaaG91Cg==
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 13 Sep 2025 14:28:36 -0400 you wrote:
+> The driver opencodes bitmap_empty() in a couple of funcitons. Switch to
+> the proper and more verbose API.
+> 
+> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+> ---
+>  drivers/net/phy/nxp-c45-tja11xx-macsec.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+
+Here is the summary with links:
+  - net: phy: nxp-c45-tja11xx: use bitmap_empty() where appropriate
+    https://git.kernel.org/netdev/net-next/c/29fa7f9e5adf
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
