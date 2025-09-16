@@ -1,329 +1,193 @@
-Return-Path: <netdev+bounces-223535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AEA5B596EB
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:05:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68903B596ED
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CC6716A069
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:04:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 948123A905C
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04B02E92DA;
-	Tue, 16 Sep 2025 13:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E103930BF7F;
+	Tue, 16 Sep 2025 13:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ABaUMkrg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EZ0J10S9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QHZ53mBL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="peEeA59n"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fos5Uf5H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253DA21D5B0
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 13:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D454F248F7D
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 13:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758027859; cv=none; b=ZIfAszzzLmbdMk8HQZYfwA2EY68dfql/b53Eu4wMMhQRv7HCUL45BiQOSm3guRLfQ4CetexcraSV0E2YpcwDebuFkI3hb16llnJQM5EZa5kY4jorQryV9Qf1wX8Ma6lShHgN5d2OwBtBAv4zUeJFE118ZdgissNrjuw14I8npB0=
+	t=1758027917; cv=none; b=sIlLHHQl+iXwKz8rmqtCHOvFnljY4UXpqVAGro+kq4nzWXwaTbsqQmDP0JGJsCXKlHZ8H+A44yBYBMkcuYwgzcA0i3ZnjMAwKknO+a5kRWyNhE+XgFFfEJDjyC5+4xnkACmfMIhCoEXaCRxCzzuQ/xV4+hitIKbWAAWXXCxaGw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758027859; c=relaxed/simple;
-	bh=/eqp/iDZYlHEnsa4vuAVT4u/N0f+kUwO2etZb6Zrvfk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NGZogm4wU2AhqsG/ad9aTDs1Ayvzb/kSqdqcoQkYHAWbQyuRfoCOddvcsrduCDnGu5QMKzdx2n6ALx24xe/P/YIb1tgwpBgffLmTCosu3np+elQB/b6GE248gIWf0rYIBMvJ61qUU87vH8RoOsMC6joJCP0UGD9sbjRvrxquh/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ABaUMkrg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EZ0J10S9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QHZ53mBL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=peEeA59n; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6B24F21CB5;
-	Tue, 16 Sep 2025 13:04:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758027855; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
-	b=ABaUMkrgvIb8hV6oIbUbcc0WgdTpr6wDm5TzqqFEUM6VfAkqJHhNS7a/qQG0n9GKSf4OTq
-	vaiRL0CAIOjbz/jd1bigQGueAviCk/JHqqHWqqSMATllQS1p+rcCqb7Al92biSOuJIahIy
-	3e0I0PdeeIUG6wCS6S8RXI9m/oy9jYs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758027855;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
-	b=EZ0J10S96HO8dwYjF5NSIR9icbMiB3TFlSYUEZq49imHRryQ9mBF2TUslu6u0+lFnIpjEL
-	JzWahpYJ8iZ+HzAg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QHZ53mBL;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=peEeA59n
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758027854; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
-	b=QHZ53mBLwhOpDZzdNVXcv7QuAejEj4nB4C5DJhmy281xEhKsefLCCG32IdeZazr2SCEEo5
-	wSDosPnXiIZTlgcg8osh8VDWCvpkR0wv3Tt7nb+bnY9rWGStui22S1ZtAdPmiGM35KCj/Y
-	+CNngRCUWq2yJ5+ne1U3J5doU+0HMko=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758027854;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZEaiEMMM28n+rEM/oEhzbsdplft5zfFjRRugUCJ3aLQ=;
-	b=peEeA59nroXgxW0jlx/AzyZYlNEoeGbm/7bHfvwxI6Sbdz7a+Eewbt/ruX1Vqh2yP8L4w6
-	IpZsJ2pjHVXGxLAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 31DC9139CB;
-	Tue, 16 Sep 2025 13:04:14 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +DmmC05gyWioCQAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 16 Sep 2025 13:04:14 +0000
-Message-ID: <f1a7b0b5-65e3-4cd0-9c62-50bbb554e589@suse.de>
-Date: Tue, 16 Sep 2025 15:04:13 +0200
+	s=arc-20240116; t=1758027917; c=relaxed/simple;
+	bh=A3J/tFGOFdBX0jXW1C50S6raOvMVBUSgWZvi7Kanhlc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rePLF3aA70keZCTVrVDjOrJQfRayrkfhgw+vshzNdP9NvX1frHOAM6vUVFWK5Efq8cevYb7gTinaOjBwXBw2S2qrbVEXZI9BpAQc7Djpvt31zxpzLPXHaCwDNibWjBu1ZiJAFJIVYJI9P0wnL6i53FnxFG32dPZ5y7UxqK1rP7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fos5Uf5H; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5632630dd04so878004e87.1
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:05:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1758027913; x=1758632713; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7/8TL00Hlar3x8JkbaIO/sy+q7FGgNPnwJ9JADaoRL4=;
+        b=fos5Uf5HmtyHtL+lmjA3a2H9HrHhg8P/6Oolr9AJUDGP9OMkPBwjrxX4OljDwPgr6d
+         EGU3mAK2k3oxuwsvYOcV9dbWMOzECSpFh5rGQAoVPBdCYGIzcxU1qmZg5zk4kcKy1o8m
+         ObLceXCuhryPZVREmWltfaDyU3ZSF1AB8tcM7qcx3s+Gz+c2nfs8LaVe1SpP50rIkaBH
+         5kjixBwE/ipFb5iKq7VUmS/Jj4sUhCRs8m+4ruHcLezKuG1xEXn3RG6EeIVEcmOnGCUs
+         3gWXyvDwyTqCB2iiTAz4a69UtfssPH55UjmP+s5EQSAjGrj7AA9BVG9u3gT7Ox6W1DjG
+         Y+8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758027913; x=1758632713;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7/8TL00Hlar3x8JkbaIO/sy+q7FGgNPnwJ9JADaoRL4=;
+        b=JXPRGAAeW0fidRwRCq1Y2Seez2pqbYI2kZPLS5GqD4AHSDh+razyp1/RP6bsGLQf0n
+         xBAQfiJTjm2al7P0ffxnMxDuaON9nVL69OZhjQSWvyq7TvJUTkwUyfadBdrihn3BJIee
+         f/XXsdZxyK9zLQ023ceqex5GgJWm0keMc2E3syjtfdij8AIBWx+isiK4vYbPnS+aEXgl
+         26PzwqH6f8FQEBxyyXBBsa9PKkjnNsknGTJGSHsAkB5Ew+vznHittoTHcZ+KT94FqniE
+         Cl1F/duyUmgCPCWNlhzrhChXx0ldM27Q0yBUloAlw/FwLe0sKT9UNssxhXuKdU5ziXFL
+         +AOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRV/nqOYprTflMfqrEGxFvEQvppoYN96Re+TJVe7VlyXQRXeC7EeCatk5xarjPwPu+e0zApWY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRayJDioZX1HoGRqOQ6ludcLidflJSZjiXCDbEyKf0LFMrltKF
+	g1dXZ1GKWsX3i8LINNFtXgfVRwhY54K3b4M19oj+C1jLvJDQ+2j4utCnJ1JQhZ7+2fY=
+X-Gm-Gg: ASbGncsxUQeI1E+75PpfpOuAKHhckbmhbrNWqRGjmUf/q3ufg/KgO0aI4x6eKD67GYU
+	0/zAmxJEky2HtGUO7IvkwsJQJX5X0Y0usaeJU5i7i2cFd4gD9YKA2B7fiC9eEKi9hVHxzSCxCLj
+	d2GzxeH8qrStQfrWwScewO0tCITbrBKkhLU9d8YgF/8KKwAMmDR4OCN9k/Cqo4Ubt/6O2InMYt0
+	IP9O0ZGx73D+25656wZ+MjqyExxxUT5z2Epeg/McMKI4lo6YxY7D1thMsKfJ5iduEXyfP2C+sxv
+	NSAwKrY9qCxk44gAS7ILYrcJ79blG4Sq9H3mA+9jsAzEGUKdGHT2Mh+sPnkVi7VuHRjAWArXa44
+	PQvSqmEPShYAz7RMBgyz7moEzmptVoo7tDbp1o5HZT1InINC2LHLzX2GJpC/e00OUGQ==
+X-Google-Smtp-Source: AGHT+IENshuIe1ZzBTlZI8ErHAIWfYofEIxwEqD/DxJUwphDcoj5NYeMYiaSJpT5gnIx28eNAX2rmA==
+X-Received: by 2002:a2e:bea2:0:b0:336:e445:92c5 with SMTP id 38308e7fff4ca-3513dd54c2amr23580931fa.3.1758027912735;
+        Tue, 16 Sep 2025 06:05:12 -0700 (PDT)
+Received: from monster (c-85-229-7-191.bbcust.telenor.se. [85.229.7.191])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-34f1b2a931fsm33599691fa.47.2025.09.16.06.05.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 06:05:10 -0700 (PDT)
+Date: Tue, 16 Sep 2025 15:05:07 +0200
+From: Anders Roxell <anders.roxell@linaro.org>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v3 3/3] net: stmmac: dwmac-renesas-gbeth: Add
+ support for RZ/T2H SoC
+Message-ID: <aMlgg_QpJOEDGcEA@monster>
+References: <20250908105901.3198975-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250908105901.3198975-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/7] nvme-tcp: Support KeyUpdate
-To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
- kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
- kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
-References: <20250905024659.811386-1-alistair.francis@wdc.com>
- <20250905024659.811386-7-alistair.francis@wdc.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250905024659.811386-7-alistair.francis@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 6B24F21CB5
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email]
-X-Spam-Score: -4.51
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250908105901.3198975-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-On 9/5/25 04:46, alistair23@gmail.com wrote:
-> From: Alistair Francis <alistair.francis@wdc.com>
+On 2025-09-08 11:59, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > 
-> If the nvme_tcp_try_send() or nvme_tcp_try_recv() functions return
-> EKEYEXPIRED then the underlying TLS keys need to be updated. This occurs
-> on an KeyUpdate event.
+> Extend the Renesas GBETH stmmac glue driver to support the RZ/T2H SoC,
+> where the GMAC is connected through a MIIC PCS. Introduce a new
+> `has_pcs` flag in `struct renesas_gbeth_of_data` to indicate when PCS
+> handling is required.
 > 
-> If the NVMe Target (TLS server) initiates a KeyUpdate this patch will
-> allow the NVMe layer to process the KeyUpdate request and forward the
-> request to userspace. Userspace must then update the key to keep the
-> connection alive.
+> When enabled, the driver parses the `pcs-handle` phandle, creates a PCS
+> instance with `miic_create()`, and wires it into phylink. Proper cleanup
+> is done with `miic_destroy()`. New init/exit/select hooks are added to
+> `plat_stmmacenet_data` for PCS integration.
 > 
-> This patch allows us to handle the NVMe target sending a KeyUpdate
-> request without aborting the connection. At this time we don't support
-> initiating a KeyUpdate.
+> Update Kconfig to select `PCS_RZN1_MIIC` when building the Renesas GBETH
+> driver so the PCS support is always available.
 > 
-> Link: https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > ---
-> v2:
->   - Don't change the state
->   - Use a helper function for KeyUpdates
->   - Continue sending in nvme_tcp_send_all() after a KeyUpdate
->   - Remove command message using recvmsg
->   
->   drivers/nvme/host/tcp.c | 73 +++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 70 insertions(+), 3 deletions(-)
+> v2->v3:
+> - Dropped passing STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP flag in stmmac_flags
+>   as it is always set for all the SoCs.
+> - Updated Kconfig to include RZ/T2H and RZ/N2H.
 > 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 776047a71436..b6449effc2ac 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -171,6 +171,7 @@ struct nvme_tcp_queue {
->   	bool			tls_enabled;
->   	u32			rcv_crc;
->   	u32			snd_crc;
-> +	key_serial_t		user_session_id;
->   	__le32			exp_ddgst;
->   	__le32			recv_ddgst;
->   	struct completion       tls_complete;
-> @@ -210,6 +211,7 @@ static int nvme_tcp_start_tls(struct nvme_ctrl *nctrl,
->   			      struct nvme_tcp_queue *queue,
->   			      key_serial_t pskid,
->   			      handshake_key_update_type keyupdate);
-> +static void update_tls_keys(struct nvme_tcp_queue *queue);
->   
->   static inline struct nvme_tcp_ctrl *to_tcp_ctrl(struct nvme_ctrl *ctrl)
->   {
-> @@ -393,6 +395,14 @@ static inline void nvme_tcp_send_all(struct nvme_tcp_queue *queue)
->   	do {
->   		ret = nvme_tcp_try_send(queue);
->   	} while (ret > 0);
-> +
-> +	if (ret == -EKEYEXPIRED) {
-> +		update_tls_keys(queue);
-> +
-> +		do {
-> +			ret = nvme_tcp_try_send(queue);
-> +		} while (ret > 0);
-> +	}
->   }
->   
->   static inline bool nvme_tcp_queue_has_pending(struct nvme_tcp_queue *queue)
-> @@ -1347,6 +1357,8 @@ static int nvme_tcp_try_send(struct nvme_tcp_queue *queue)
->   done:
->   	if (ret == -EAGAIN) {
->   		ret = 0;
-> +	} else if (ret == -EKEYEXPIRED) {
-> +		goto out;
->   	} else if (ret < 0) {
->   		dev_err(queue->ctrl->ctrl.device,
->   			"failed to send request %d\n", ret);
-> @@ -1371,9 +1383,56 @@ static int nvme_tcp_try_recv(struct nvme_tcp_queue *queue)
->   	queue->nr_cqe = 0;
->   	consumed = sock->ops->read_sock(sk, &rd_desc, nvme_tcp_recv_skb);
->   	release_sock(sk);
-> +
-> +	/* If we received EINVAL from read_sock then it generally means the
-> +	 * other side sent a command message. So let's try to clear it from
-> +	 * our queue with a recvmsg, otherwise we get stuck in an infinite
-> +	 * loop.
-> +	 */
-> +	if (consumed == -EINVAL) {
-> +		char cbuf[CMSG_LEN(sizeof(char))] = {};
-> +		struct msghdr msg = { .msg_flags = MSG_DONTWAIT };
-> +		struct bio_vec bvec;
-> +
-> +		bvec_set_virt(&bvec, (void *)cbuf, sizeof(cbuf));
-> +		iov_iter_bvec(&msg.msg_iter, ITER_DEST, &bvec, 1, sizeof(cbuf));
-> +
-> +		msg.msg_control = cbuf;
-> +		msg.msg_controllen = sizeof(cbuf);
-> +
-> +		consumed = sock_recvmsg(sock, &msg, msg.msg_flags);
-> +	}
-> +
->   	return consumed == -EAGAIN ? 0 : consumed;
->   }
->   
-> +static void update_tls_keys(struct nvme_tcp_queue *queue)
-> +{
-> +	int qid = nvme_tcp_queue_id(queue);
-> +	int ret;
-> +
-> +	dev_dbg(queue->ctrl->ctrl.device,
-> +		"updating key for queue %d\n", qid);
-> +
-> +	cancel_work(&queue->io_work);
-> +	handshake_req_cancel(queue->sock->sk);
-> +	handshake_sk_destruct_req(queue->sock->sk);
-> +
-Careful here. The RFC fully expects to have several KeyUpdate requests
-pending (eg if both sides decide so initiate a KeyUpdate at the same
-time). And cancelling a handshake request would cause tlshd/gnutls
-to lose track of the generation counter and generate an invalid
-traffic secret.
-I would just let it rip and don't bother with other handshake
-requests.
+> v1->v2:
+> - No changes.
 
-> +	nvme_stop_keep_alive(&(queue->ctrl->ctrl));
-> +	flush_work(&(queue->ctrl->ctrl).async_event_work);
-> +
-Oh bugger. Seems like gnutls is generating the KeyUpdate message
-itself, and we have to wait for that.
-So much for KeyUpdate being transparent without having to stop I/O...
+The following warning is seen when doing a defconfig build (make
+defconfig) for arm64 on the Linux next-20250915 tag.
 
-Can't we fix gnutls to make sending the KeyUpdate message and changing
-the IV parameters an atomic operation? That would be a far better 
-interface, as then we would not need to stop I/O and the handshake
-process could run fully asynchronous to normal I/O...
+First seen on next-20250915
+Good: next-20250912
+Bad: next-20250915
 
-> +	ret = nvme_tcp_start_tls(&(queue->ctrl->ctrl),
-> +				 queue, queue->ctrl->ctrl.tls_pskid,
-> +				 HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED);
-> +
-> +	if (ret < 0) {
-> +		dev_err(queue->ctrl->ctrl.device,
-> +			"failed to update the keys %d\n", ret);
-> +		nvme_tcp_fail_request(queue->request);
-> +		nvme_tcp_done_send_req(queue);
-> +	}
-> +}
-> +
->   static void nvme_tcp_io_work(struct work_struct *w)
->   {
->   	struct nvme_tcp_queue *queue =
-> @@ -1389,15 +1448,21 @@ static void nvme_tcp_io_work(struct work_struct *w)
->   			mutex_unlock(&queue->send_mutex);
->   			if (result > 0)
->   				pending = true;
-> -			else if (unlikely(result < 0))
-> +			else if (unlikely(result < 0)) {
-> +				if (result == -EKEYEXPIRED)
-> +					update_tls_keys(queue);
+Regression Analysis:
+- New regression? yes
+- Reproducibility? yes
 
-How exactly can we get -EKEYEXPIRED when _sending_?
-To my understanding that would have required userspace to intercept
-here trying (or even sending) a KeyUpdate message, right?
-So really not something we should see during normal operation.
-As mentioned in my previous mail we should rather code the
-KeyUpdate process itself here, too.
-Namely: Trigger the KeyUpdate via userspace (eg by writing into the 
-tls_key attribute for the controller), and then have the kernel side
-to call out into tlshd to initiate the KeyUpdate 'handshake'.
-That way we have identical flow of control for both the sending
-and receiving side.
+Build regression: WARNING: unmet direct dependencies detected for PCS_RZN1_MIIC
 
-Incidentally: the RFC has some notion about 'request_update' setting
-in the KeyUpdate message. Is that something we have to care about at
-this level?
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-Cheers,
+This is the build warning:
+WARNING: unmet direct dependencies detected for PCS_RZN1_MIIC
+  Depends on [n]: NETDEVICES [=y] && OF [=y] && (ARCH_RZN1 [=n] || COMPILE_TEST [=n])
+  Selected by [m]:
+  - DWMAC_RENESAS_GBETH [=m] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_STMICRO [=y] && STMMAC_ETH [=m] && STMMAC_PLATFORM [=m] && OF [=y] && (ARCH_RENESAS [=y] || COMPILE_TEST [=n])
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+WARNING: unmet direct dependencies detected for PCS_RZN1_MIIC
+  Depends on [n]: NETDEVICES [=y] && OF [=y] && (ARCH_RZN1 [=n] || COMPILE_TEST [=n])
+  Selected by [m]:
+  - DWMAC_RENESAS_GBETH [=m] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_STMICRO [=y] && STMMAC_ETH [=m] && STMMAC_PLATFORM [=m] && OF [=y] && (ARCH_RENESAS [=y] || COMPILE_TEST [=n])
+I: config: PASS in 0:00:01.592356
+
+
+By reverting this patch the warning disapears.
+
+
+## Source
+* Kernel version: 6.17.0-rc6
+* Git tree:
+* https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
+* Git describe: next-20250915
+* Git commit: c3067c2c38316c3ef013636c93daa285ee6aaa2e
+* Architectures: arm64
+* Toolchains: gcc and clang
+* Kconfigs: lkftconfigs
+
+## Build
+* Build log: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/build.log
+* Test details: https://regressions.linaro.org/lkft/linux-next-master/next-20250915/log-parser-build-clang/general-unmet-dependencies-warning-unmet-direct-dependencies-detected-for-pcs_rzn_miic/
+* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/
+* Kernel config: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/config
+
+
+--
+Linaro LKFT
 
