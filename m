@@ -1,132 +1,206 @@
-Return-Path: <netdev+bounces-223538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A63DB59702
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:09:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DB55B59707
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95ED217C31D
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:09:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6A2A7AC9DA
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701593128C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4489313296;
 	Tue, 16 Sep 2025 13:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="XrFnaE0t";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Dqx1tW24"
 X-Original-To: netdev@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B98030BF62;
-	Tue, 16 Sep 2025 13:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7773830EF92;
+	Tue, 16 Sep 2025 13:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758028135; cv=none; b=l77ZCBz3YkEit3IwN4pQzPhIVWU3qBr65xTDrizLLdJapRcCReoyA2fgGlgQ7BmkTUKZIDtvRtiWXq1mwJen2MxUXeIEisyKq/4XVJ5n3wVVfMRjmzyndMTgI12hVwpXJ+ZlGY7Fr9GrIixWYO0zpPnSuJpxccS/7DCh22fdQS8=
+	t=1758028135; cv=none; b=UESPh9M0pxzCpgTP0rT17aQEvyStJtQFeqDluev3HfEWHc1Dhz31u2DNDnquu1KEVUxCgZPN8lGfLS/4MIkDvtt/fAvaUIGMxORHDbmHmdpmfxfkSjvSyIx8y/K5nQNUIW7Zlmc8ZntwyU2X+6Pj8oyYOCQLlh+Do22XLAWZseo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758028135; c=relaxed/simple;
-	bh=qDj+abcioeDYHEL9GUvWc+GSz1TXk8QkygcWuJ07fKk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aRB8QwQiiloEYS0StXFSWIdwo2LVJXHcc0iw9hYI976VXgKdr9iIJ6pixr4wz2tnxsUQs2WGThRDP2yeyumr5/wm/zyuV+bCuzSxbctNjYXefNiHIcWkQVipUMLrbwfkVUDAQehrcTsMTWGlocZT+cS/XLMXsHKXb0/pVV1tBu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [106.117.98.100])
-	by mtasvr (Coremail) with SMTP id _____wCnrwNIYclol4g+Ag--.3882S3;
-	Tue, 16 Sep 2025 21:08:25 +0800 (CST)
-Received: from ubuntu.localdomain (unknown [106.117.98.100])
-	by mail-app3 (Coremail) with SMTP id zS_KCgC3uGtEYcloScWmAg--.111S2;
-	Tue, 16 Sep 2025 21:08:23 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH v2 net] cnic: Fix use-after-free bugs in cnic_delete_task
-Date: Tue, 16 Sep 2025 21:08:18 +0800
-Message-Id: <20250916130818.13617-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	bh=WeTBIfSJ5Z8ivbbBQqRNRmhhqLaZsrw58259nQwZ/0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=siAN5oCV0LKNm7oIfW0NBPbeX6+q60Kwwq9HMvySEFtoqbqhKKWz8Sak/YpWyvcXipXJgSS94bC63abeQiYRQaj5D50tB3VJve0pmJ+WKgUvORhP3Lc1ily96z/6YvWB6MAIbQnntRfPZFfPruQAkPMrLvP/3oS51qhEIbGqcHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=XrFnaE0t; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Dqx1tW24; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 3AC6E7A02BB;
+	Tue, 16 Sep 2025 09:08:52 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Tue, 16 Sep 2025 09:08:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1758028132;
+	 x=1758114532; bh=OFomf3Gkg99WJzC0kc3CgX2BW0qAYCzUzDBFtqLeVlQ=; b=
+	XrFnaE0t/fWQG9RXKlN2OjCgdCwwMzORY9y190V7eMqU1zZWAS1jsWWS4V544xux
+	WcUiYFIK2oGTUccuSeyE5sGQUZHaitVJmi09DSjg+30F3KBJ238YCvwAtu+pIvzC
+	hT6RbzYJESYC2Js0as/Ci14DMZPXUBullvHGHEFcjpGHTds2pvI8zr1Znz/E25ts
+	3Xp5P6jid5EcQUPFj+uOkCgdvoe680rqlNJUKhkaEiDTXOzI5SPoC8U9J98zX3jZ
+	VTEeavunHLge9KcsUkk+27+txn0fasVzSC2GcUUTT2YbtprW8W1MowVrMwIo2tbe
+	XzKYJRN3oBy1Ok9CtgDn6Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758028132; x=
+	1758114532; bh=OFomf3Gkg99WJzC0kc3CgX2BW0qAYCzUzDBFtqLeVlQ=; b=D
+	qx1tW24HJaXqIQiIF5j/B3Ae/KSvO7LEEkwMQb/SNCf4NYP20NzIKxQFqglmv0qL
+	vgKvZ/pUGH0DqHh2JwwsYtoI5TjMJjnDmQrK0SuXxtFx6s0tj7yHkgDCsdVnzYOj
+	V54V2CXjbcf6sW/w9uLILD1SbakDIyvoHQVEC5qsoOycf/1+JdRwCPLowcDGg2TR
+	3GXZLGj2U3Kduw8DoZxtCmsOpIxijQYzBvCa6q6P9zOoGc7UiHRkDfCeq2VebUFH
+	Zlg6cBkpxlGN1+fLAf/2yhUK4x6GzVR3nX/j7S86a1+YebdsE1S5KgIlSau6W/Hf
+	keVssymBw33uhepym0llw==
+X-ME-Sender: <xms:Y2HJaJYgjlQyzkwR0Bo99nFByNzjPPIxtq0QGDygBXz_LJZFtjLXuQ>
+    <xme:Y2HJaNHvvN1AU0wUZ1ehxnaTGHNS4VxYsAWy3hCRRCp_LLP4i9XMWCH7dytAoNBB1
+    F53xYiVfLsutsYTbEA>
+X-ME-Received: <xmr:Y2HJaP3EgfVzPgwC8Q5jFwmv2BRKYQlaMXBYUQhAqTPRE4MEV9Wn2B1ZPnezTigBKJZRoyHpd-dM_O5p5sMvC49TymGscWPgpg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegtdeiiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomheppfhikhhlrghs
+    ucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrg
+    hssehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepfefhleelhfffjefg
+    fedugfegjeelhfevheeikefhueelgfdtfeeuhefftddvleeinecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhu
+    nhguodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepud
+    efpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgt
+    hhdprhgtphhtthhopehprghulhesphgsrghrkhgvrhdruggvvhdprhgtphhtthhopegrnh
+    gurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggr
+    vhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephihoshhhihhhihhrohdrsh
+    hhihhmohgurgdruhhhsehrvghnvghsrghsrdgtohhmpdhrtghpthhtohepghgvvghrthdo
+    rhgvnhgvshgrshesghhlihguvghrrdgsvg
+X-ME-Proxy: <xmx:Y2HJaBwhPrw3fTDwU9Gfv_erGowK_ygOmbLwzYXDhSNSu-LOm2Y5jg>
+    <xmx:Y2HJaIiOeo3erKwjAlTU9t1du-goPsXOeFid3tnWpltTzv5HhfXFFw>
+    <xmx:Y2HJaGMnHd96LFFYhgKpytPDFJzJlmSu-23s0Qpijd7Ko6nLEA56Fw>
+    <xmx:Y2HJaDc_e3l_U5bHMw7g89nRwmLlfh5FsxxyAJagm1MKDhzEHOQ9sA>
+    <xmx:ZGHJaKqa3Qj5zforCSeMfkUJUtSetg7b8cDYKfaMQu1AA9UJ0PmD8KoG>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 16 Sep 2025 09:08:50 -0400 (EDT)
+Date: Tue, 16 Sep 2025 15:08:48 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next 6/6] net: ravb: Use common defines for time stamping
+ control
+Message-ID: <20250916130848.GD1045278@ragnatech.se>
+References: <20250916101055.740518-1-niklas.soderlund+renesas@ragnatech.se>
+ <20250916101055.740518-7-niklas.soderlund+renesas@ragnatech.se>
+ <b52b6209-d0c3-49fb-8e99-3cd16e5121d9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zS_KCgC3uGtEYcloScWmAg--.111S2
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwYLAWjIa-sOEQBVs1
-X-CM-DELIVERINFO: =?B?H8mvOgXKKxbFmtjJiESix3B1w3uoVhYI+vyen2ZzBEkOnu5chDpkB+ZdGnv/zQ0PbP
-	CR14TypnDR0EenxcC6lfWFMIVY2RKNCZIKtuJneKdZ8TxEXvvd4crKYD9Q0FFzVH8d5luh
-	i0RlUb/Ldsdi21hmwFT6O6Zg8/4WlLuTPc36JYD3j8WAKTIGYr108AJ9d6PROQ==
-X-Coremail-Antispam: 1Uk129KBj93XoW7Zr1xWr4xJr4DWw45JFWftFc_yoW8Kry5p3
-	y5Ga4UXa97Jr13tanrXr48WFn8Cayvya47Gr4fJws5Z34rtF15tryrKFWfua4vyrWkZF1x
-	Zrs8Za9xZF90kFcCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvmb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAF
-	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0Y48IcxkI7V
-	AKI48G6xCjnVAKz4kxMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I
-	3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxV
-	WUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8I
-	cVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aV
-	AFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZE
-	Xa7IU801v3UUUUU==
+In-Reply-To: <b52b6209-d0c3-49fb-8e99-3cd16e5121d9@lunn.ch>
 
-The original code uses cancel_delayed_work() in cnic_cm_stop_bnx2x_hw(),
-which does not guarantee that the delayed work item 'delete_task' has
-fully completed if it was already running. Additionally, the delayed work
-item is cyclic, the flush_workqueue() in cnic_cm_stop_bnx2x_hw() only
-blocks and waits for work items that were already queued to the
-workqueue prior to its invocation. Any work items submitted after
-flush_workqueue() is called are not included in the set of tasks that the
-flush operation awaits. This means that after the cyclic work items have
-finished executing, a delayed work item may still exist in the workqueue.
-This leads to use-after-free scenarios where the cnic_dev is deallocated
-by cnic_free_dev(), while delete_task remains active and attempt to
-dereference cnic_dev in cnic_delete_task().
+On 2025-09-16 14:38:58 +0200, Andrew Lunn wrote:
+> > @@ -1010,18 +1009,27 @@ static int ravb_rx_rcar(struct net_device *ndev, int budget, int q)
+> >  				break;
+> >  			}
+> >  			skb_mark_for_recycle(skb);
+> > -			get_ts &= (q == RAVB_NC) ?
+> > -					RAVB_RXTSTAMP_TYPE_V2_L2_EVENT :
+> > -					~RAVB_RXTSTAMP_TYPE_V2_L2_EVENT;
+> > -			if (get_ts) {
+> > -				struct skb_shared_hwtstamps *shhwtstamps;
+> > -
+> > -				shhwtstamps = skb_hwtstamps(skb);
+> > -				memset(shhwtstamps, 0, sizeof(*shhwtstamps));
+> > -				ts.tv_sec = ((u64) le16_to_cpu(desc->ts_sh) <<
+> > -					     32) | le32_to_cpu(desc->ts_sl);
+> > -				ts.tv_nsec = le32_to_cpu(desc->ts_n);
+> > -				shhwtstamps->hwtstamp = timespec64_to_ktime(ts);
+> > +
+> > +			if (priv->tstamp_rx_ctrl != HWTSTAMP_FILTER_NONE) {
+> > +				bool get_ts = false;
+> > +
+> > +				if (q == RAVB_NC)
+> > +					get_ts = priv->tstamp_rx_ctrl ==
+> > +						HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+> > +				else
+> > +					get_ts = priv->tstamp_rx_ctrl !=
+> > +						HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+> > +
+> > +				if (get_ts) {
+> > +					struct skb_shared_hwtstamps *shhwtstamps;
+> > +
+> > +					shhwtstamps = skb_hwtstamps(skb);
+> > +					memset(shhwtstamps, 0, sizeof(*shhwtstamps));
+> > +					ts.tv_sec = ((u64)le16_to_cpu(desc->ts_sh) << 32)
+> > +						| le32_to_cpu(desc->ts_sl);
+> > +					ts.tv_nsec = le32_to_cpu(desc->ts_n);
+> > +					shhwtstamps->hwtstamp = timespec64_to_ktime(ts);
+> > +				}
+> 
+> This hunk is bigger than it needs to be because this block has been
+> indented further. Maybe keep get_ts as function scope, initialised to
+> false, so you don't need to touch this block?
 
-A typical race condition is illustrated below:
+Thanks for the suggestion. I could do that. What I like about this is 
+that it's immediately clear that all this depends on 
+priv->tstamp_rx_ctrl.
 
-CPU 0 (cleanup)              | CPU 1 (delayed work callback)
-cnic_netdev_event()          |
-  cnic_stop_hw()             | cnic_delete_task()
-    cnic_cm_stop_bnx2x_hw()  | ...
-      cancel_delayed_work()  | /* the queue_delayed_work()
-      flush_workqueue()      |    executes after flush_workqueue()*/
-                             | queue_delayed_work()
-  cnic_free_dev(dev)//free   | cnic_delete_task() //new instance
-                             |   dev = cp->dev; //use
+If I keep the chunk as-is it gives the impression there is some other 
+condition other then priv->tstamp_rx_ctrl that could set get_ts and make 
+a valid use-case of reading the timestamp from the descriptor.
 
-Replace cancel_delayed_work() with cancel_delayed_work_sync() to ensure
-that the cyclic delayed work item is properly canceled and any executing
-delayed work has finished before the cnic_dev is deallocated.
+I could break it out to a separate function if you prefer to reduce the 
+indentation level,
 
-Fixes: fdf24086f475 ("cnic: Defer iscsi connection cleanup")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
-Changes in v2:
-  - Make commit messages more clearer.
+static void ravb_rx_rcar_hwstamp(...)
+{
+    bool get_ts = false;
 
- drivers/net/ethernet/broadcom/cnic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+    ...
 
-diff --git a/drivers/net/ethernet/broadcom/cnic.c b/drivers/net/ethernet/broadcom/cnic.c
-index a9040c42d2ff..73dd7c25d89e 100644
---- a/drivers/net/ethernet/broadcom/cnic.c
-+++ b/drivers/net/ethernet/broadcom/cnic.c
-@@ -4230,7 +4230,7 @@ static void cnic_cm_stop_bnx2x_hw(struct cnic_dev *dev)
- 
- 	cnic_bnx2x_delete_wait(dev, 0);
- 
--	cancel_delayed_work(&cp->delete_task);
-+	cancel_delayed_work_sync(&cp->delete_task);
- 	flush_workqueue(cnic_wq);
- 
- 	if (atomic_read(&cp->iscsi_conn) != 0)
+    if (get_ts) {
+        ....
+    }
+
+}
+
+static int ravb_rx_rcar(..)
+{
+    ...
+
+    if (priv->tstamp_rx_ctrl != HWTSTAMP_FILTER_NONE)
+        ravb_rx_rcar_hwstamp(...);
+
+    ...
+}
+
+Would that work ?
+
+> 
+> 	Andrew
+
 -- 
-2.34.1
-
+Kind Regards,
+Niklas Söderlund
 
