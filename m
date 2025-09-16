@@ -1,129 +1,101 @@
-Return-Path: <netdev+bounces-223670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F01B59EAC
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:02:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4CFB59EC0
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:04:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C9434623D1
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 17:01:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5416816CDEE
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 17:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A780632D5A1;
-	Tue, 16 Sep 2025 16:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD52632D5DF;
+	Tue, 16 Sep 2025 17:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ufGW4ipa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mj+TwxSB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAB1329517;
-	Tue, 16 Sep 2025 16:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89673285404
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 17:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758041919; cv=none; b=DUXq8vthkEBxBGZPYTU3tHm+myshRgQN8K0CgXJZt6I+UbVgTCCbLgRxSmuhET2b6g1ohxjhPviWXSjxNytzxN3fIkaN4fVsrW2junZKcVkMgDumAphRZ1CPLX/6+9r7K3X3lL8d2ytlPUYNKG5b2KG+xi3moIuLDoCUuvmu0jY=
+	t=1758042273; cv=none; b=Y5Tx13keIYOe3SThKwOcr9AMP4IKEUJ3d6XFEQlBPTbO4zXNaAT6La04zbzc22/6ZxpiZkiJLpSBCVrrO6B/qLNhPIXcYX3ck9WcjK4aMQMv1q6mKDP8CRFywwxLYzvbBCTa53hWmzEHAwFB/xy6bHThIpC2UGbNtptAiOH73nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758041919; c=relaxed/simple;
-	bh=cN2ZRIwpPuuTuFydKsuswQytPt7ZVYZueiDnIohjvxg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zia4YqMQgCEV9MFnkqQFQMpYvuZpLaDNbOwiXJmgItyd9Sz/Sgt/SBrqvYFAjJWoI+j7t61cdevfwmXyE+plCgzQFyq90dRQWFkHNCRdblWSrsKtgw5YoSoAEvbnUXft/vr8XRfOWXBGg1PUXae2Y6ggn2xbvmkGIjmzhE4eYgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ufGW4ipa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B765AC4CEF7;
-	Tue, 16 Sep 2025 16:58:37 +0000 (UTC)
+	s=arc-20240116; t=1758042273; c=relaxed/simple;
+	bh=8Sg8pwr3MNkCXQAkCXG+gPQWVgQaLi8u3K0fwwpf1zg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BiyB6keB1Am29fUB6UeOo6a7TKKKC+GXG1aZxIvWA5X5AtV2rLWAe0Wo/dcubKvAZ1haKxn0e4o1aIAFX0Ds5oqax4D3ueJBnv6ScYRSOHhkX6N7HF1PvUYtNIQJy2WKRTeTlQz5GoUgtJDT3s4eE3DOUiKmneHT1XgcLuUgnzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mj+TwxSB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97269C4CEF7;
+	Tue, 16 Sep 2025 17:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758041919;
-	bh=cN2ZRIwpPuuTuFydKsuswQytPt7ZVYZueiDnIohjvxg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ufGW4ipaBuqkZumNSbHozdOrPtbsJc8gOophMG/yqg6lu3A61SeJaSBfuxc/Rfoqz
-	 7HlzyPzelhOESnR9HvCdsZNEJSi0JGD8fNAsXzEEQIFoRTSAwhZcdWAv9sfxBiHIa+
-	 QsQOlGSghSU+nZNF2/mgsoKRKupQOzyAmoiHjNrT2lu9yNP/GsbWi/27oN/DI1AAfl
-	 zhkF9YltDSNt97izaa1CNRYiHmiKhHSE3sYTraXEXL+suTLKc3XHHn/EbzUMw00Lcm
-	 wpZyb0qfI6x5YGMxPsO/qMDVtdIuHtZCvSyscPc5RJV+CeIM+h3vbjB92oM0yZBh+Z
-	 f+0pQYAh9+jHA==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Ulf Hansson <ulf.hansson@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-Cc: kernel@oss.qualcomm.com,
-	linux-mmc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	Monish Chunara <quic_mchunara@quicinc.com>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>,
-	Nirmesh Kumar Singh <quic_nkumarsi@quicinc.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Sushrut Shree Trivedi <quic_sushruts@quicinc.com>,
-	Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>,
-	Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>,
-	Vikash Garodia <vikash.garodia@oss.qualcomm.com>
-Subject: Re: [PATCH v5 00/10] arm64: dts: qcom: lemans-evk: Extend board support for additional peripherals
-Date: Tue, 16 Sep 2025 11:58:21 -0500
-Message-ID: <175804189844.3983789.17270960228782770722.b4-ty@kernel.org>
+	s=k20201202; t=1758042273;
+	bh=8Sg8pwr3MNkCXQAkCXG+gPQWVgQaLi8u3K0fwwpf1zg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mj+TwxSBP1lNfvu1rDsL6nXdPU37PZkTDVvQ9HG21Hy0xyv7wXNafgS4mo2EjOmiG
+	 U/1NP8RggRG+4euDwWAB7JK7CfLSFv3op7IxUvrGEuaal/FFeQa8nCac/2371fASC/
+	 rEuuJ8MjVa/LrRAhG2RBXW1K6CpW/32NdPNLd2aozDqc18Ebk8NXoJ04AbzUi4v+8n
+	 czYiOPK5rVWyF3YndZPeB4FrIoJQap0XhdE7Qenu8HWlEpLbK8w5+Dr2doGOTA5iFs
+	 BPgv9M9kyrLm6OJLNLFWHxI4h1w1+011lT+gFI335DoAyQdQJjXsoOMP5pJc6Yb1kG
+	 N4fc5paDVwCKQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	donald.hunter@gmail.com,
+	jacob.e.keller@intel.com
+Subject: [PATCH net-next] tools: ynl-gen: support uint in multi-attr
+Date: Tue, 16 Sep 2025 10:04:31 -0700
+Message-ID: <20250916170431.1526726-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250916-lemans-evk-bu-v5-0-53d7d206669d@oss.qualcomm.com>
-References: <20250916-lemans-evk-bu-v5-0-53d7d206669d@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+The ethtool FEC histogram series run into a build issue with
+type: uint + multi-attr: True. Auto scalars use 64b types,
+we need to convert them explicitly when rendering the types.
 
-On Tue, 16 Sep 2025 16:16:48 +0530, Wasim Nazir wrote:
-> This series extend support for additional peripherals on the Qualcomm
-> Lemans EVK board to enhance overall hardware functionality.
-> 
-> It includes:
->   - New peripherals like:
->     - I2C based devices like GPIO I/O expander and EEPROM.
->     - GPI (Generic Peripheral Interface) DMA controllers and QUPv3 controllers
->       for peripheral communication.
->     - PCIe HW with required regulators and PHYs.
->     - Remoteproc subsystems for supported DSPs.
->     - Iris video codec.
->     - First USB controller in device mode.
->     - SD card support on SDHC v5.
->     - Qca8081 2.5G Ethernet PHY.
-> 
-> [...]
+No current spec needs this, and the ethtool FEC histogram
+doesn't need this either any more, so not posting as a fix.
 
-Applied, thanks!
+Link: https://lore.kernel.org/8f52c5b8-bd8a-44b8-812c-4f30d50f63ff@redhat.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: donald.hunter@gmail.com
+CC: jacob.e.keller@intel.com
+---
+ tools/net/ynl/pyynl/ynl_gen_c.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-[01/10] arm64: dts: qcom: lemans: Add SDHC controller and SDC pin configuration
-        commit: dfdbe4bf6ff386d96c1dc8c7407201d882fc4113
-[02/10] arm64: dts: qcom: lemans-evk: Enable GPI DMA and QUPv3 controllers
-        commit: 5bc646aa0c7a444d4e81d8e3cae4baf463e1a018
-[03/10] arm64: dts: qcom: lemans-evk: Add TCA9534 I/O expander
-        commit: 6ae6381f871803246e9f655537999f163656de33
-[04/10] arm64: dts: qcom: lemans-evk: Add EEPROM and nvmem layout
-        commit: 81618ba3fe33017be5e1fce99891abd220a775b8
-[05/10] arm64: dts: qcom: lemans-evk: Enable PCIe support
-        commit: 94d7d37f6ac34bd683a93fbf1013736616fc3677
-[06/10] arm64: dts: qcom: lemans-evk: Enable remoteproc subsystems
-        commit: cac44c46970adb4553bab5c5aa528462a5fe98d0
-[07/10] arm64: dts: qcom: lemans-evk: Enable Iris video codec support
-        commit: fd32b5d586ac650ce1c6f58535ec79cd2632be09
-[08/10] arm64: dts: qcom: lemans-evk: Enable first USB controller in device mode
-        commit: 7bd68ef80661a9436120702e1300b56904fdd022
-[09/10] arm64: dts: qcom: lemans-evk: Enable SDHCI for SD Card
-        commit: c3f107b514c357cbc08ae70a69700222e7d1192d
-[10/10] arm64: dts: qcom: lemans-evk: Enable 2.5G Ethernet interface
-        commit: 71ee90ed1756724d62cb55873555e006372792c7
-
-Best regards,
+diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
+index 56c63022d702..58086b101057 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_c.py
++++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+@@ -720,7 +720,11 @@ from lib import SpecSubMessage
+             return 'struct ynl_string *'
+         elif self.attr['type'] in scalars:
+             scalar_pfx = '__' if ri.ku_space == 'user' else ''
+-            return scalar_pfx + self.attr['type']
++            if self.is_auto_scalar:
++                name = self.type[0] + '64'
++            else:
++                name = self.attr['type']
++            return scalar_pfx + name
+         else:
+             raise Exception(f"Sub-type {self.attr['type']} not supported yet")
+ 
 -- 
-Bjorn Andersson <andersson@kernel.org>
+2.51.0
+
 
