@@ -1,115 +1,151 @@
-Return-Path: <netdev+bounces-223503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030D6B595EA
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:20:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F5BAB595E8
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 14:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A122C32149B
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:20:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DDAF17486E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 12:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A35730BF65;
-	Tue, 16 Sep 2025 12:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982942C11D6;
+	Tue, 16 Sep 2025 12:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="HR0f2jik";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G84Imd35"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C172D8DDA;
-	Tue, 16 Sep 2025 12:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC736256D;
+	Tue, 16 Sep 2025 12:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758025239; cv=none; b=l2aEXeNisMYzKjeZkOiIhBzAQDynwattHTTNEclKvrDsorn+60Fm7e9AWdZebcEFroYd2JlM9qpzfWjDcI0wEcF24nvkPiVT/XzfqlJXVlJBadHk13+b3O5AaXOtU8TXxHaix/zNZiwoF1Zhqkm/SrOtuvvZkbtMhcKoEd717ao=
+	t=1758025237; cv=none; b=iejzE8NzDLsMsNCALpWsmIowwP2AajOBa2YUjKHITze3GNK9oL02gSKEiQMoe3QNQ7948aXud2sClNY07mYBWPvGrsclT9qa0thCCB/nxytKybNwUVOT1qbzjpaww09yaJgyZwhYESKTpebbEr/iBfgR9Z1t8PQiZCcRR25FlqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758025239; c=relaxed/simple;
-	bh=Ea9+rkswREodz+LF4GSRMjtdY2KBM5WSAG3M5nIxo/o=;
+	s=arc-20240116; t=1758025237; c=relaxed/simple;
+	bh=ohM3qeqIdtQ9b/vfVH/lPbFE9ScNSgSBQ+xoI2nV8cc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M1MJHDuu1ZZ6wwdmJi7TpioSQWZe3Rrz8D372XOuEWtBaqH5kRSnbFfI9wJpGEvyJodE/s9nu3hItDcpQKirupKosT5a2HtMiflrvw4Pxg3G9MeqvwyKo5r02HhYnIjb0dYRlhB6fBa5jxuRIJJ9lVxpoDwEvBWTeSVZRDw3TRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (unknown [180.158.240.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id B1D73340DBF;
-	Tue, 16 Sep 2025 12:20:36 +0000 (UTC)
-Date: Tue, 16 Sep 2025 20:20:26 +0800
-From: Yixun Lan <dlan@gentoo.org>
-To: pabeni@redhat.com
-Cc: Vivian Wang <wangruikang@iscas.ac.cn>, andrew+netdev@lunn.ch,
-	kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, p.zabel@pengutronix.de, paul.walmsley@sifive.com,
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
-	uwu@dram.page, vadim.fedorenko@linux.dev, junhui.liu@pigmoral.tech,
-	horms@kernel.org, maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
-	linux-kernel@vger.kernel.org, conor.dooley@microchip.com,
-	troy.mitchell@linux.spacemit.com, hendrik.hamerlinck@hammernet.be,
-	andrew@lunn.ch
-Subject: Re: [PATCH net-next v12 0/5] Add Ethernet MAC support for SpacemiT K1
-Message-ID: <20250916122026-GYB1255161@gentoo.org>
-References: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
- <175802161326.713595.16381910315366172301.git-patchwork-notify@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jyGuZRZAGQ1rz1EVPr/zOKuJeCFbU7mGKHkXv5l7mXz/x4Hypy6QSn3UhI/vAg7Tmq9MKQrELYr1ieixKL8p4AzmIRirpvqNO/eDt+tCHh8vVA+EJa7ZeorqJDpiRvo5sZK83YSDSmCjM9564FcLlQl3RPdABk4bUYQmOpZyasI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=HR0f2jik; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G84Imd35; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 2D5017A0295;
+	Tue, 16 Sep 2025 08:20:33 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Tue, 16 Sep 2025 08:20:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1758025233;
+	 x=1758111633; bh=P9ErBKpOPiGkq5qufoOjZLyFPL/vF0xAfJHQgAZIL3s=; b=
+	HR0f2jikvN9Qe6j5eQH7s/GrC2s86MUX+4VEgyVPyp0BCOJR/Re631oEW4EOcaEI
+	uVGFtnphRCJb8khdUFfXSCBeZ9lAKOgDiok128GiLx8syl+lqRDbkMca3vHwf5u6
+	IiCfu3CbFbWr2YVrCMEy/HJs/7kCW3EC40l3nGOQNKYMA63scSesScMR652UZ7WU
+	y0yWAa2nRVAzneY1kbkx1jHctGWqQjGqGY6a5aCWgL8ipsG6tYefPasvWmOqt143
+	bvGYW14OJkBg34AUkJDgUbwgHdLlxylpjeR/EwtHoWZdqMAOhFcuXN4RWSkZ2EuD
+	lIc5Jgewjn6jFWzIEcRpJA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758025233; x=
+	1758111633; bh=P9ErBKpOPiGkq5qufoOjZLyFPL/vF0xAfJHQgAZIL3s=; b=G
+	84Imd35BqhTnQ06rhMIyosxZZYueWTeDze5u90+qeAz1C7v6LhMEsL6srxETktr9
+	kYPTeLYCRVEWnjMzB2IoPFmhg4p+c5Cmva1idLqx1eb0eOb9/NEQ0tZ0fzgF/GJz
+	tZBA0YdsYckeqkLH3lCYAcgDC+cR108JGEXWtD6BP/0PsCrVEzW1ps2JVeIcNiAh
+	PKAKfVndi4gWZf52UxrHxa5Ua4/X1BSNb+N/AucFForRMlDTqyexin9XBQPY0W7y
+	aB2HdxO9O0Olwo6UH2kSVOiBGb86ssJGzjASdnJD049ZdgHEVObb74BgMgvimBBF
+	v+CMvaIeHeoUoel6rt+dg==
+X-ME-Sender: <xms:EFbJaE-F_OSP1b2RxEsylyCqY5DsVyPb6hygvdaFqzsWkPk5XDqUgw>
+    <xme:EFbJaGzHB19HNj-zfNCfxheBCF6T8zTc9QEe1MqWmt4-Xjid1kat3rmx2GppaLEvY
+    HBO4x9WBZBfdEJLDP4>
+X-ME-Received: <xmr:EFbJaO88tQCq6Qpbmxau9wWXce23c-wDwfC1oG7IyGv7CobriapqzuKIJsJhilSpiwg9-K2nzY4lrT_jyCvuMPZAafxSUhlSYw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegtdehhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomheppfhikhhlrghs
+    ucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrg
+    hssehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepfefhleelhfffjefg
+    fedugfegjeelhfevheeikefhueelgfdtfeeuhefftddvleeinecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhu
+    nhguodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepud
+    efpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgt
+    hhdprhgtphhtthhopehprghulhesphgsrghrkhgvrhdruggvvhdprhgtphhtthhopegrnh
+    gurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggr
+    vhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephihoshhhihhhihhrohdrsh
+    hhihhmohgurgdruhhhsehrvghnvghsrghsrdgtohhmpdhrtghpthhtohepghgvvghrthdo
+    rhgvnhgvshgrshesghhlihguvghrrdgsvg
+X-ME-Proxy: <xmx:EFbJaMOOKwqejEm3fM4KDPuT-n5dheT58Hu9NiRFmJ4WNTuRIhkPTQ>
+    <xmx:EFbJaGruWMqSfZHzjjVfjp5cU3fkI56RRKaJaCY39tP2hXFzbkksrA>
+    <xmx:EFbJaL4MQIuvpmWlM0vJWqEyq1NvHcvMNFKQKEMIP7ofK6NELzJiVA>
+    <xmx:EFbJaGFoYIk_0RboC1esB9S6c3CHt01X6rlfrRyKL7hEKqKGjJzuUA>
+    <xmx:EVbJaD83jMsiDYR6WHF4fYV-Nm8TM8RmfADth2wDvS09kPpU175Phw8z>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 16 Sep 2025 08:20:31 -0400 (EDT)
+Date: Tue, 16 Sep 2025 14:20:29 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next 1/6] net: rswitch: Move definition of S4 gPTP offset
+Message-ID: <20250916122029.GC1045278@ragnatech.se>
+References: <20250916101055.740518-1-niklas.soderlund+renesas@ragnatech.se>
+ <20250916101055.740518-2-niklas.soderlund+renesas@ragnatech.se>
+ <bff98e48-ae2c-489e-b422-3cae28bd0e16@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <175802161326.713595.16381910315366172301.git-patchwork-notify@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bff98e48-ae2c-489e-b422-3cae28bd0e16@lunn.ch>
 
-Hi Paolo Abeni,
-
-Thanks for taking this series, but I have one comment (see below)
-
-On 11:20 Tue 16 Sep     , patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
-> 
-> This series was applied to netdev/net-next.git (main)
-> by Paolo Abeni <pabeni@redhat.com>:
-> 
-> On Sun, 14 Sep 2025 12:23:11 +0800 you wrote:
-> > SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
-> > Add devicetree bindings, driver, and DTS for it.
+On 2025-09-16 14:16:09 +0200, Andrew Lunn wrote:
+> On Tue, Sep 16, 2025 at 12:10:50PM +0200, Niklas Söderlund wrote:
+> > The files rcar_gen4_ptp.{c,h} implements an abstraction of the gPTP
+> > support implemented together with different other IP blocks. The first
+> > device added which supported this was RSWITCH on R-Car S4.
 > > 
-> > Tested primarily on BananaPi BPI-F3. Basic TX/RX functionality also
-> > tested on Milk-V Jupiter.
-> > 
-> > I would like to note that even though some bit field names superficially
-> > resemble that of DesignWare MAC, all other differences point to it in
-> > fact being a custom design.
-> > 
-> > [...]
+> > While doing so the RSWITCH R-Car S4 specific offset was added to the
+> > generic Gen4 gPTP header file. Move it to the RSWITCH driver to make it
+> > clear it only applies to this driver.
 > 
-> Here is the summary with links:
->   - [net-next,v12,1/5] dt-bindings: net: Add support for SpacemiT K1
->     https://git.kernel.org/netdev/net-next/c/62a12a221769
->   - [net-next,v12,2/5] net: spacemit: Add K1 Ethernet MAC
->     https://git.kernel.org/netdev/net-next/c/bfec6d7f2001
-..
->   - [net-next,v12,3/5] riscv: dts: spacemit: Add Ethernet support for K1
->     https://git.kernel.org/netdev/net-next/c/60775f28cfb7
->   - [net-next,v12,4/5] riscv: dts: spacemit: Add Ethernet support for BPI-F3
->     https://git.kernel.org/netdev/net-next/c/3c247a6366d5
->   - [net-next,v12,5/5] riscv: dts: spacemit: Add Ethernet support for Jupiter
->     https://git.kernel.org/netdev/net-next/c/e32dc7a936b1
+> This is a nice simple patch to understand, which is good. But i do
+> wounder about naming schemes. Since this is a RSWITCH define, should
+> it use the RSWITCH_ prefix? 
+
+It could, I opted for the least disruptive path and just moved it as is.  
+Would you prefers I rename?
+
 > 
+> Are there other implementations which have an equivalent of
+> RCAR_GEN4_GPTP_OFFSET_S4? How are they named?
 
-Generally, I'd expect the DT part patch (3-5) to go via SpacemiT's SoC tree[1],
-so, this will avoid potential conflicts..
+There are none, at least not so far as the RSWITCH IP are only available 
+on the R-Car S4 SoC.
 
-Can you drop patch 3-5? then I will take care of them, plus there is one more
-patch in my queue..
-
-Link: https://github.com/spacemit-com/linux/tree/k1/dt-for-next [1]
+> 
+> 	Andrew
 
 -- 
-Yixun Lan (dlan)
+Kind Regards,
+Niklas Söderlund
 
