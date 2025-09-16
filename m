@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-223353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20980B58D66
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:54:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF5CB58D5E
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04BEB1BC5BA5
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 04:54:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 872F37A588D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 04:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ABB2EA46F;
-	Tue, 16 Sep 2025 04:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF682EB869;
+	Tue, 16 Sep 2025 04:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KoJa0Qc3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsGY6hpS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFB02E9ED8
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 04:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67185273D77
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 04:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757998156; cv=none; b=FHtAywqs9k51c1NgiURxIABCXcNBSmY7JzdZDcMyxPh0jXXeGCoHjKwGGpxKOJy1i1GiVlLcS7S6zmxoVW2heaBaN8dN2S4AYMlCgfy8ijeDNEt7hWWxagkCw/HPNGskRbBL7rCUj05cu6Bc2gT80IiW3lqDkspuqUoPizc+7nw=
+	t=1757998163; cv=none; b=E9BDEtohjmyW+lFUCo7njD5869OfbroNVV16LRX7QprfbxdOOhIT6rRcfFKWg3CLBTiMuo7BMDZMfwuBPzR/RWuY6S/n7Y9/oOYWykuatNyMQ34do0EC2WJ7YRzTkEisuH/MiC6ybuDzDy2GMy5IRHm1shcTSaMsygRuhZ59qLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757998156; c=relaxed/simple;
-	bh=7sG+E8vq4OG/BfLJfXnS6N7EfrLQmjqnuIf5XUjAWWw=;
+	s=arc-20240116; t=1757998163; c=relaxed/simple;
+	bh=URVaUhKMvCuYEZ8psO6dkhmdgwpR5FJ6tmwMgMKVfqU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S6YafJFMutxg26eKE6E+pZWrHBXoxDhzUkm/qhOGtndeUGds3wtiJBsCjeD/m1poUkf8HYTx2GBsb+/El3UQQvQzzH6RCeLGDbGfyuBu4SJANTq29bEM+PpwyTy8KuWm8dAJ+bK8Z6tG8zVACFyOX7CYjrVILSTRqharHYMnwZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KoJa0Qc3; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=I9MFrFDop+jf++pzthkRlA1VEgG6376JUbcM/tJVLhlzhZFCJDIcDf3JJsSxllVKYT2h9fLPht9IqwYo5dhGlQPW1kICQYkhe8I1R9rNCfEyqBqtd49+r0EQZXVsLRJ1y1G9Ih6cgPdbYhKa6zN9DPiHwPcPg8AXLMfD4qAV9i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BsGY6hpS; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-25669596921so50774765ad.1
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 21:49:14 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-266914a33e5so14506655ad.2
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 21:49:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757998154; x=1758602954; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757998160; x=1758602960; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zNMpbtPTFBPk6JIOba7CD2qKlqPbw337arz8FniHJF8=;
-        b=KoJa0Qc3lt8G1CQ5AbwOj3qvb9bu5qliDuEc4sfIPbr1BRCVYR3Bx/XN92R2rWqFFv
-         nHGpulI2lx/uODqzl/0u0h/6Rd9sByZfpl3GezXb8FqkGEAdnsFhVtRYZkSK5GIUv0/U
-         88Lv5WhrrzMFy50Fxe3cVARMTRYHZ/bppdUMJGJiCZEz6603dKLXzj7HX0yNRqQMWyyo
-         JfK/UKwhrbZ4VNufXLGhr1uiC09OVkI4kemP0MSwbP+Qk2WkAhoNM2BA+QwLdUISw40+
-         6iGnCmDltYbiDd7B2YnOenE3yDZDTJGhVOPaXTN2KCrPIOiSFy+O9HlA808tUeXmw29z
-         3WIQ==
+        bh=WKFiV5+5iXRxF8ed4BpSpPqD3Dy/BIf3yej7QaTDllk=;
+        b=BsGY6hpSYfjuzifoJRtLEh+RcYVKPOj/4OL+ufcIYnWtFBm/6QKRUYkJx+jCgDAYD9
+         YbHuWQTT5bLKUtqT+ubu+NEUfJBxR9OEocsjh9hJTzGzPujujp2fEClDsxRly5Wh+GMu
+         vAlet4HSbTFgfIXuLduTgjZkp3SvB2dtCggWXba0sMJuWRzKqA7VTN20NSPo4MynPFP0
+         WuO6w0KUp+uNup9bgaj8lXwq5oTYBUHITPqcgH636iYC3TyW0hUwfAo9PqEIVLbRYNGT
+         AxXCAE3GeOSG9xKNzkv5hGF9Lp6ZvA0RqWhnuBVOe8wtQPQVKOlMmfBy/dzJJndpdxDQ
+         ZzbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757998154; x=1758602954;
+        d=1e100.net; s=20230601; t=1757998160; x=1758602960;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zNMpbtPTFBPk6JIOba7CD2qKlqPbw337arz8FniHJF8=;
-        b=nHO4n+uMXBsO+uFeXg1+OyV3hWqcQM/sV8bKwwMSEPhhC0+cjU8FVoIxj5cN73px7T
-         iEMfJm5slkuLpGuKUfgYVHC60vVGG7rd9486GJ/fnzqPcRbG0HLAYx5mpYShUDeyyT2N
-         h/taYF1O1+7IfriVz4oTIpFbVZ69/KvfUhTDp8Igt0LGYVsnY4mS5asecuqio+nFOZdY
-         2WO0DGjpb1SwsYts2sb8OEmL4bUVym9vpUNcyoaluaD0cWNc6uNY+7Yyr0oLhzYpRg04
-         qZqcrE/CaXhq9bpvxAKr+Pye0u9MvW6d+xsFtbAN/JZiOZGTR/6sLZyYJRTFBJv/hJRP
-         gbIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2kzVvKxa6MxuRxtwF46bqyTenFoe9K/MLMFG/Ot5+lAmEVqVKoXMLf/TWc2IjtScG+FvcA78=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwgjEolucHig4NoAS4hxCspkyq7PbxGcFvpr14D+2iuBIT/3/l
-	Q2iZ2yJKwwRwH42QYZqxjNGpZdWvism4o6D1P27nkKKH3VH0yMVYgWDI
-X-Gm-Gg: ASbGncvesw9UnTB3NxuLX2xoWJXR5qR/TpM50yN3BaSi3TEO7RzUYop2RkBujfuUbS3
-	ridHDezOgRud+oGBonoyZNUAx9bdNi7jrvT0nJ5Drr9G7kxiHkz7QfZiGwQXdOwH1quoLt7OVKZ
-	5D5HT63mSynoRGEeTgAWyf+TQ/jCR9H/42ca/RlV5K/2ZognnU6aHFfKA1fDR4lxMJbWL4tegIw
-	aZys7hiCFL4mRZuDATyAlWFbGPqq383/bXvG/rZfsFDW626kNJtnFSUvf+cPh4vOhN0I8kEaGPf
-	dHt3TjAsLlPIHU1iiUI9wOJd+I7s2/nDokxa59J6IypHS8sJnX5yDtv3/6ylXngz1gz4eTtA54q
-	uh7MAEJST2HlhI+jGeTAES4XZC0kt3FmyHjs9n44=
-X-Google-Smtp-Source: AGHT+IESqtMzjXYDIyoiu7v1JuOroH/dzFervHo7F64ECeuOEjCMVsn8AAVx3YpgubRO047K2xnTHQ==
-X-Received: by 2002:a17:903:3c2c:b0:24b:2b07:5fa5 with SMTP id d9443c01a7336-25d26663dcamr182035635ad.29.1757998153712;
-        Mon, 15 Sep 2025 21:49:13 -0700 (PDT)
+        bh=WKFiV5+5iXRxF8ed4BpSpPqD3Dy/BIf3yej7QaTDllk=;
+        b=hf/3CcKp107eoW+9G/FntdutKlrtfP8SClHWjmJKCXFnJEPNK0rtJjqtaNRG/aCC9K
+         krjiiB03OYeH4g2JH58U5k8OQ+KMYykKY6qBLidYNmuhwUrCEkTK7f4Xkw0ZomBjEx8L
+         e5oY6t1sEXg8rn05kDcjD+hKnIrQLCYbxmtA586+mFDnaWRupv+JatjdRsaJd5pl4LRu
+         ylrE+IhZmRl4lP3aH69fMZHddPVf6M+bB8E02iR2FXXe/NRULFslnRE7IsIcdeJ8cmOF
+         DPrddU5ReT2LmUYr0lOdrCksXM8QMQhDyvFixKIiftHQU9LLxcBGnTBBgqRFCD/7HUO2
+         ITLg==
+X-Forwarded-Encrypted: i=1; AJvYcCV33O3JMW5xUC5pFDRRTCwJ43ySzAEoePR+GEytzUGCjZtGJT7SNhXC+NK/T89T8obZhAPzKWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVqlKICXqGrRrb2mZPdlsJCp8fIiGIDwre/5/nIrXU7HPR0x6p
+	C4aF85hh2SSILBYkVFjas2yUbkTaXvPTozSHZLegqQzjLu9VZ3ppnscX
+X-Gm-Gg: ASbGncvTrcqgdBUdJ+VAz7B4OF2Au/bkw3K1qb5n5F70A7noIj1MdDlf+AiKTJDjKXn
+	2nRKJNyY8zLVMfbMRtaP5R9j0cCNHojNak4x+DE3yzvJCpBHuv/lxODQ5/izVb//n7p5VD6lG/k
+	uco+gV92c91j9zpZ54OtidkjJIlCA2L5DMEOGsXxMIm17ArSpzeiWFaEAY0MOeVkFplUMf3gBv2
+	JG2jkNI5utru0/GckNf/GBes6sZBYMOHBBz5UU3uyf/H/UABKiHC898qw3ZhRVK3WTWmt7pSUJS
+	F9ee7mPhPCixovoBGLaN6fhGIAiQz7A3+uVp87QdJsbAatwuEn5zshSqznBXRPbtSzbNcC5TbsJ
+	H++62osEK7BODRarM8H4pXRytx2GFDimfR57kDtXn1ERileWSJA==
+X-Google-Smtp-Source: AGHT+IFnY0JR12RUAnqJgicB9FLxjxZB94pUdOOycWzScDVS8Oor/+yCs+nfn4PrPMaqh+5e4UELMQ==
+X-Received: by 2002:a17:902:c408:b0:267:d82a:127c with SMTP id d9443c01a7336-267d82a15fcmr9300035ad.42.1757998160302;
+        Mon, 15 Sep 2025 21:49:20 -0700 (PDT)
 Received: from pengdl-pc.mioffice.cn ([43.224.245.249])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25ef09c77f8sm104600605ad.15.2025.09.15.21.49.07
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25ef09c77f8sm104600605ad.15.2025.09.15.21.49.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 21:49:13 -0700 (PDT)
+        Mon, 15 Sep 2025 21:49:19 -0700 (PDT)
 From: pengdonglin <dolinux.peng@gmail.com>
 To: tj@kernel.org,
 	tony.luck@intel.com,
@@ -100,11 +100,11 @@ Cc: bigeasy@linutronix.de,
 	linux-s390@vger.kernel.org,
 	cgroups@vger.kernel.org,
 	pengdonglin <dolinux.peng@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	pengdonglin <pengdonglin@xiaomi.com>
-Subject: [PATCH v3 09/14] cgroup/cpuset: Remove redundant rcu_read_lock/unlock() in spin_lock
-Date: Tue, 16 Sep 2025 12:47:30 +0800
-Message-Id: <20250916044735.2316171-10-dolinux.peng@gmail.com>
+Subject: [PATCH v3 10/14] wifi: mac80211: Remove redundant rcu_read_lock/unlock() in spin_lock
+Date: Tue, 16 Sep 2025 12:47:31 +0800
+Message-Id: <20250916044735.2316171-11-dolinux.peng@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250916044735.2316171-1-dolinux.peng@gmail.com>
 References: <20250916044735.2316171-1-dolinux.peng@gmail.com>
@@ -129,56 +129,115 @@ been started implicitly by spin_lock().
 
 Simplify the code and remove the inner rcu_read_lock() invocation.
 
-Cc: Waiman Long <longman@redhat.com>
-Cc: Johannes Weiner <hannes@cmpxchg.org>
-Acked-by: Waiman Long <longman@redhat.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>
 Signed-off-by: pengdonglin <pengdonglin@xiaomi.com>
 Signed-off-by: pengdonglin <dolinux.peng@gmail.com>
 ---
- kernel/cgroup/cpuset.c | 6 ------
- 1 file changed, 6 deletions(-)
+ net/mac80211/cfg.c            | 2 --
+ net/mac80211/debugfs.c        | 2 --
+ net/mac80211/debugfs_netdev.c | 2 --
+ net/mac80211/debugfs_sta.c    | 2 --
+ net/mac80211/sta_info.c       | 2 --
+ 5 files changed, 10 deletions(-)
 
-diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-index 27adb04df675..9b7e8e8e9411 100644
---- a/kernel/cgroup/cpuset.c
-+++ b/kernel/cgroup/cpuset.c
-@@ -4073,7 +4073,6 @@ void cpuset_cpus_allowed(struct task_struct *tsk, struct cpumask *pmask)
- 	struct cpuset *cs;
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index 2ed07fa121ab..4fe50d4c461d 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -4825,7 +4825,6 @@ static int ieee80211_get_txq_stats(struct wiphy *wiphy,
+ 	int ret = 0;
  
- 	spin_lock_irqsave(&callback_lock, flags);
+ 	spin_lock_bh(&local->fq.lock);
 -	rcu_read_lock();
  
- 	cs = task_cs(tsk);
- 	if (cs != &top_cpuset)
-@@ -4095,7 +4094,6 @@ void cpuset_cpus_allowed(struct task_struct *tsk, struct cpumask *pmask)
- 			cpumask_copy(pmask, possible_mask);
+ 	if (wdev) {
+ 		sdata = IEEE80211_WDEV_TO_SUB_IF(wdev);
+@@ -4851,7 +4850,6 @@ static int ieee80211_get_txq_stats(struct wiphy *wiphy,
+ 	}
+ 
+ out:
+-	rcu_read_unlock();
+ 	spin_unlock_bh(&local->fq.lock);
+ 
+ 	return ret;
+diff --git a/net/mac80211/debugfs.c b/net/mac80211/debugfs.c
+index e8b78ec682da..82099f4cedbe 100644
+--- a/net/mac80211/debugfs.c
++++ b/net/mac80211/debugfs.c
+@@ -82,7 +82,6 @@ static ssize_t aqm_read(struct file *file,
+ 	int len = 0;
+ 
+ 	spin_lock_bh(&local->fq.lock);
+-	rcu_read_lock();
+ 
+ 	len = scnprintf(buf, sizeof(buf),
+ 			"access name value\n"
+@@ -105,7 +104,6 @@ static ssize_t aqm_read(struct file *file,
+ 			fq->limit,
+ 			fq->quantum);
+ 
+-	rcu_read_unlock();
+ 	spin_unlock_bh(&local->fq.lock);
+ 
+ 	return simple_read_from_buffer(user_buf, count, ppos,
+diff --git a/net/mac80211/debugfs_netdev.c b/net/mac80211/debugfs_netdev.c
+index 1dac78271045..30a5a978a678 100644
+--- a/net/mac80211/debugfs_netdev.c
++++ b/net/mac80211/debugfs_netdev.c
+@@ -625,7 +625,6 @@ static ssize_t ieee80211_if_fmt_aqm(
+ 	txqi = to_txq_info(sdata->vif.txq);
+ 
+ 	spin_lock_bh(&local->fq.lock);
+-	rcu_read_lock();
+ 
+ 	len = scnprintf(buf,
+ 			buflen,
+@@ -642,7 +641,6 @@ static ssize_t ieee80211_if_fmt_aqm(
+ 			txqi->tin.tx_bytes,
+ 			txqi->tin.tx_packets);
+ 
+-	rcu_read_unlock();
+ 	spin_unlock_bh(&local->fq.lock);
+ 
+ 	return len;
+diff --git a/net/mac80211/debugfs_sta.c b/net/mac80211/debugfs_sta.c
+index 49061bd4151b..ef75255d47d5 100644
+--- a/net/mac80211/debugfs_sta.c
++++ b/net/mac80211/debugfs_sta.c
+@@ -148,7 +148,6 @@ static ssize_t sta_aqm_read(struct file *file, char __user *userbuf,
+ 		return -ENOMEM;
+ 
+ 	spin_lock_bh(&local->fq.lock);
+-	rcu_read_lock();
+ 
+ 	p += scnprintf(p,
+ 		       bufsz + buf - p,
+@@ -178,7 +177,6 @@ static ssize_t sta_aqm_read(struct file *file, char __user *userbuf,
+ 			       test_bit(IEEE80211_TXQ_DIRTY, &txqi->flags) ? " DIRTY" : "");
  	}
  
 -	rcu_read_unlock();
- 	spin_unlock_irqrestore(&callback_lock, flags);
+ 	spin_unlock_bh(&local->fq.lock);
+ 
+ 	rv = simple_read_from_buffer(userbuf, count, ppos, buf, p - buf);
+diff --git a/net/mac80211/sta_info.c b/net/mac80211/sta_info.c
+index 8c550aab9bdc..663318a75d7f 100644
+--- a/net/mac80211/sta_info.c
++++ b/net/mac80211/sta_info.c
+@@ -2637,13 +2637,11 @@ static void sta_set_tidstats(struct sta_info *sta,
+ 
+ 	if (link_id < 0 && tid < IEEE80211_NUM_TIDS) {
+ 		spin_lock_bh(&local->fq.lock);
+-		rcu_read_lock();
+ 
+ 		tidstats->filled |= BIT(NL80211_TID_STATS_TXQ_STATS);
+ 		ieee80211_fill_txq_stats(&tidstats->txq_stats,
+ 					 to_txq_info(sta->sta.txq[tid]));
+ 
+-		rcu_read_unlock();
+ 		spin_unlock_bh(&local->fq.lock);
+ 	}
  }
- 
-@@ -4168,9 +4166,7 @@ nodemask_t cpuset_mems_allowed(struct task_struct *tsk)
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&callback_lock, flags);
--	rcu_read_lock();
- 	guarantee_online_mems(task_cs(tsk), &mask);
--	rcu_read_unlock();
- 	spin_unlock_irqrestore(&callback_lock, flags);
- 
- 	return mask;
-@@ -4265,10 +4261,8 @@ bool cpuset_current_node_allowed(int node, gfp_t gfp_mask)
- 	/* Not hardwall and node outside mems_allowed: scan up cpusets */
- 	spin_lock_irqsave(&callback_lock, flags);
- 
--	rcu_read_lock();
- 	cs = nearest_hardwall_ancestor(task_cs(current));
- 	allowed = node_isset(node, cs->mems_allowed);
--	rcu_read_unlock();
- 
- 	spin_unlock_irqrestore(&callback_lock, flags);
- 	return allowed;
 -- 
 2.34.1
 
