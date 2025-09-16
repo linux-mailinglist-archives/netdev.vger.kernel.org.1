@@ -1,114 +1,82 @@
-Return-Path: <netdev+bounces-223297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0096B58A91
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:03:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6317AB58ADC
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:10:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65420168ECA
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:03:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 32BB34E265A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB2B199935;
-	Tue, 16 Sep 2025 01:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB77C1A9FA1;
+	Tue, 16 Sep 2025 01:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ESYbNM0Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6tEYVOR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DF0199920
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E661397;
+	Tue, 16 Sep 2025 01:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757984632; cv=none; b=eVp8FxyeAaTnTjAi6OuJSJURpsaVQ28KIC1reK0c2AAyxcZoOZfQTWUVeTWOp8Di3EYdEPC+GqVT25cXf5+4xuzZftT/9dnCm+KnofcKegZ+XVO0pIvjw09V9X47kUHiJ6co/baAESD5ds4ZEUevCJJqyP47UjCgY9rhLPEQPlo=
+	t=1757985018; cv=none; b=X0oll3IFaeuIMsAYyOMCIR+6GkTJvl+hU51Nqo0ItmEER5bYgwEJMXAwNpEc0ZrYzC++305GkJq/ovgp+yljIzkzILFV+WxjnNWmwB7F5Ux493yIexzxvLBkeiULK40bBYUMhrWRpZpa9wIH6hLnHKdYzRVwP5qvVXiBjRkIT9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757984632; c=relaxed/simple;
-	bh=PyD9tFabiPyt6k44PDHVW/3DRPPYLG2L7qxqdcs6P6w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=icpqpjiCyEm3RQb81sG/LwyKsTTYhpkt2xpxBMzxkiWwL0WUn2CTJfBwuMLxlHXmPReKDa5q8e+XUP15L7hnKAr3g6t76MjYPAkITbEvW8etaHG2Vj2eZaO9M0yLToXw2z5lvEQUEEWKsR36TOOSuDngMsrmEGRryAyioKfRMCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ESYbNM0Q; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-329a41dc2ebso4166147a91.3
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 18:03:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757984630; x=1758589430; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JTTqJ1PzYlN5Tf9LOZRyEc/wEnKH/fR6iyZ4aVL4EiQ=;
-        b=ESYbNM0QIBBCQnFT920tIXTXl5fFijzfQDXYf1ZZH6OrEOrhVHJt/CdHBrKuV73bZp
-         bDVoLMMyouiU2iuvCAxss/oCqIiXQpw2+WDIEt8qmDcGiousdyK1tfRg+JOexxFGe8gl
-         3JClKwqWhUnjaCPPD1K3/J6nYoxqWSLCDZG1vIt0GBnXPrYoxlILtR1HW6AFxYRgKFX2
-         2payqmDq9ibXbxjDILs1RdCGPMRxbD/vOVwMrw3st2f94tO2rL88Wr0thID9lqj/ukPb
-         JHGs802FL0ykv7EjA7i2+rLjVxMgbhLuoCi77GSD3lYwwNr1yUi1E4qtsuJfAnPPOq63
-         2qDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757984630; x=1758589430;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JTTqJ1PzYlN5Tf9LOZRyEc/wEnKH/fR6iyZ4aVL4EiQ=;
-        b=Q2OcW1kcxUFoxnrP3sYNgDFmqOPzlRSY5PWQVQUiYok/1HrORpHT2ySD0Y8y4vgeZW
-         H4cTsUFL/86k+MmoESMGT6oSU9rspQUyET0TkIXc+xfxk+f3suz03HA6L/3ic9z8PcDR
-         da1D3JQ+2H9G8gznNo/9Ii2UPH5L7PICe11nx8FxF/Z4LGjKQcAeOH4mxpcyOqJt17hq
-         0rvy3iIQkUTfw0C4wraFl9I2wqtwVRrz8MHHT+685J0U/4/UYXkH7mXlU1aB86M0z2JY
-         +05PTuTa3lTJXWS8+qA0k6YrMK6Qt2kegeqZuHdNr7S7aMkgRQ5oavGwUokh/B0J12Hg
-         PVyQ==
-X-Gm-Message-State: AOJu0YyNC9JpsjEK81xSifWIztl3PsRcXL/ykNbJ0rTPzItnRY+Wc8Wf
-	MG0lANAIl2wPPu9wilr+hdeuBZAIwDCNU/V8uHke8tcK594j0qrlYOPO
-X-Gm-Gg: ASbGncukoDndN9sGQXMUFgOzEbdphzjpDngkonjlhv1Nn0nvoslmuAadI7NHQnkQj3l
-	NGZ/CKK0QOshvQBiaAG7/iyWryHmIZZW9WTUQUejEwcq3TL4hxCvOuWAQHpmHtjkqFgYXDvR7jf
-	wepznhXV63AYT5RLnrW36Vww1/FAX629KpYOpqlDerV3EQeiEcA5gKq0JMEgCtx0Wz/b22nOBw/
-	PMzwr2cMHW49GKthOx01tt2lkCugXReNLivNtC8xK8yYluqvPHMrPZe58sfKjg9yHFqf27SeXvS
-	T+jpQAAw2QgZnSlZBSht5fTe0GLG/l2CeAlRxVkuS6RI/SzU9+kGVWlmXUGaXBPXc3+C6bNLyYs
-	Vjms5ODmw5M2V7LC6ngmrCEu7P8Q=
-X-Google-Smtp-Source: AGHT+IGsrrWACmY2x5NwzTWtkLaNRfykuTFOCxWVyvnZeymkbbhwpyyNZO3It9swEPkiXiS3QXUkzg==
-X-Received: by 2002:a17:90b:3148:b0:32e:a6c3:67d4 with SMTP id 98e67ed59e1d1-32ea6c369b3mr345922a91.15.1757984629817;
-        Mon, 15 Sep 2025 18:03:49 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32ea3c6fefdsm272384a91.3.2025.09.15.18.03.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 18:03:49 -0700 (PDT)
-Date: Tue, 16 Sep 2025 01:03:44 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net 0/4] wireguard fixes for 6.17-rc6
-Message-ID: <aMi3cB7Epg-I7tMn@fedora>
-References: <20250910013644.4153708-1-Jason@zx2c4.com>
+	s=arc-20240116; t=1757985018; c=relaxed/simple;
+	bh=kOJRebOyNrjtGQTHYFxOMmCbyn7l6GlPyxXq/vEITR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=muOHVnhK44J5IovOEeEHMgTr+I24xRzgNNgDnocwo702Av7TZYHMI4rUuk0B4Enr3TWBWy+lMElSOB0bNKWWbmRgGs8h0XF7UlEfNR80kWJsM3ik58rSTI16TqAf/aZtGFkqcxr6FigtToqKFkS3Tca0CrJaMudmPsPkV+wguMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6tEYVOR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C380C4CEF1;
+	Tue, 16 Sep 2025 01:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757985017;
+	bh=kOJRebOyNrjtGQTHYFxOMmCbyn7l6GlPyxXq/vEITR4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b6tEYVORKtq5k8fBdicdRDr13J9nfXjirDWwjUxutxLGZttb4HmFdNQQydUVcDyLy
+	 r+5vv/+//odchuC6QLnJkrA5DCA3YDxtcPW0ZbSLZxXs3XguLmODL2P1qEkmiU4/HQ
+	 FMoLTLPmuH6q5nOnvfTJIP1RJJEiJokgQqm5Jmnol4xAVAFWKyjMT1kzVp2e1H5unA
+	 DEfazjPPfnP1m30pw4QZTjsv/LtOGH0Fm/ynrby6itxOuDC6yD2HX1aeDKleqwr5Di
+	 QFD7sDZ+jTKkfe0enM/dY+BTkM9Df3RI7utZHpJeiq1HMxYHgMb/Gd+5qqF+c42rhv
+	 5CuQ5ZO3Xv1Sg==
+Date: Mon, 15 Sep 2025 18:10:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Felix Fietkau <nbd@nbd.name>
+Subject: Re: [PATCH net-next] ppp: enable TX scatter-gather
+Message-ID: <20250915181015.67588ec2@kernel.org>
+In-Reply-To: <20250912095928.1532113-1-dqfext@gmail.com>
+References: <20250912095928.1532113-1-dqfext@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250910013644.4153708-1-Jason@zx2c4.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 10, 2025 at 03:36:40AM +0200, Jason A. Donenfeld wrote:
-> Hi Jakub,
-> 
-> Please find three small fixes to wireguard:
-> 
-> 1) A general simplification to the way wireguard chooses the next
->    available cpu, by making use of cpumask_nth(), and covering an edge
->    case.
-> 
-> 2) A cleanup to the selftests kconfig.
-> 
-> 3) A fix to the selftests kconfig so that it actually runs again.
+On Fri, 12 Sep 2025 17:59:27 +0800 Qingfang Deng wrote:
+> When chan->direct_xmit is true, and no compressors are in use, PPP
+> prepends its header to a skb, and calls dev_queue_xmit directly. In this
+> mode the skb does not need to be linearized.
+> Enable NETIF_F_SG and NETIF_F_FRAGLIST, and add .ndo_fix_features()
+> callback to conditionally disable them if a linear skb is required.
+> This is required to support PPPoE GSO.
 
-Hi Jason,
+Seems a bit racy. We can't netdev_update_features() under the spin lock
+so there's going to be a window of time where datapath will see new
+state but netdev flags won't be cleared, yet?
 
-Sorry to bother you, but I have a WireGuard self-test update [1] that has been
-stuck in "Awaiting Upstream" for a long time without any comments. Could you
-please help review it?
-
-[1] https://lore.kernel.org/netdev/20250527032635.10361-1-liuhangbin@gmail.com
-
-Thanks
-Hangbin
+We either need to add a explicit linearization check in the xmit path,
+or always reset the flags to disabled before we start tweaking the
+config and re-enable after config (tho the latter feels like a bit of 
+a hack).
+-- 
+pw-bot: cr
 
