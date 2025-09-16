@@ -1,137 +1,128 @@
-Return-Path: <netdev+bounces-223301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0D5B58B28
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:28:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 032F1B58B25
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 03:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A95C91B201E7
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:29:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F81B1B2019D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 01:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7B11FA178;
-	Tue, 16 Sep 2025 01:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDD01E98F3;
+	Tue, 16 Sep 2025 01:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=airkyi.com header.i=@airkyi.com header.b="J98MyLcb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMOPtzsF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7484F13B293;
-	Tue, 16 Sep 2025 01:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799981A3172
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 01:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757986130; cv=none; b=LYBEQSXtIKsVCYfiUlMfaVxcL582Z04DXlBnJCVinp87EdKds0sCGaiEKgX+mSnbiTXD5GFD548cUqaJJKk0+Sh4LXWMokBEMWUW/i3CdztDwlwKpQQvHSjUfAYIfMSVP04go/RVd72C+ZkJmz9bT5UyIeGS3Nwmu0Zz6Lh6C/M=
+	t=1757985998; cv=none; b=mtYMJLEjnwE5Byylv2wMb5C4T7SrhkSyFst2I0f6P6gFujBlJQDHAGcO1nvN7MojWmbaKhzsklQD+BKMnLK7jNOOWgnyFWv+I8hESti8XuZQRINtY5sx5bra1lyazsCbjAvuwMeGmQDOJzNQCWTDsvGzF3GVJ3gjKzWwvXKBOow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757986130; c=relaxed/simple;
-	bh=dOrtMow+yygUOhhXu/PCIEqWa9NtW5uvhs7mmCFFDXg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FYjhOyknzXgA7+kT2MIZ/CkLHIpEpX5xkFAtl1EAU6ndBVlujaBqjZ9ZE9fwrWoSIGlbOxdb2VzqMCT0ZzUd+e+aHiEDnusEkNECG8nSkFfpVAM35kyZdjPJZc1sjHSmnFtX6j6YuHWKllCzkGw98IvCOl7jmRaEmJfZEe8Vtr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=airkyi.com; spf=pass smtp.mailfrom=airkyi.com; dkim=pass (1024-bit key) header.d=airkyi.com header.i=@airkyi.com header.b=J98MyLcb; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=airkyi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=airkyi.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=airkyi.com;
-	s=altu2504; t=1757986002;
-	bh=r40/9/byFQ5Kdho5bSZgFzvBLnr6GNZb9hi7qVjYjLk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=J98MyLcbMRG94NEiVPEjeSXACyzHlGMhioQe+AoZz+U5Pl5VQ3tvrizeCPZchXSH0
-	 d2rMdEy5H/PcgpFTo13OzEfrZ4GonSnL1tUb0wvZGI64BXUf/kaItCe4zy6dRa1XJM
-	 oVipO6zCRqLqhivuCR8IJ8o6LMSpaqpg8K/p6Q98=
-X-QQ-mid: esmtpgz16t1757985994tb691f01f
-X-QQ-Originating-IP: 9WqvNV5m81o9OAQGGCKKLjLtxMwpN1LWrrj43UnBIq8=
-Received: from DESKTOP-8BT1A2O.localdomain ( [58.22.7.114])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 16 Sep 2025 09:26:31 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13026834714890684059
-From: Chaoyi Chen <kernel@airkyi.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	David Wu <david.wu@rock-chips.com>
-Cc: sebastian.reichel@collabora.com,
-	ziyao@disroot.org,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>
-Subject: [PATCH net-next] Revert "net: ethernet: stmmac: dwmac-rk: Make the clk_phy could be used for external phy"
-Date: Tue, 16 Sep 2025 09:26:28 +0800
-Message-ID: <0A3F1D1604FEE424+20250916012628.1819-1-kernel@airkyi.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1757985998; c=relaxed/simple;
+	bh=N9K2lSbMY9MsiMRz4ZwFKfpt4d3auIjGYtraxpQf+eY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=opIB5tdefgLjkYLABisd6y/N4PHeQlwi6s2OjLbUTLov9jyV1ZDNDGllxvlw9dsFm+glgmvrcNV4b8UN4n6dTqFJdjFWojkI9GzIKgvWvc9kGb2A3ikPCQwc1j2LEvkZXx683fKbUUBGqyRXATO8lN1yUrUJlvcH0HrcnhE0Wp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMOPtzsF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C65A3C4CEF1;
+	Tue, 16 Sep 2025 01:26:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757985998;
+	bh=N9K2lSbMY9MsiMRz4ZwFKfpt4d3auIjGYtraxpQf+eY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kMOPtzsFCTV3rm0/f1GxX8v/XSvuoFhYNe6CyVM2s3AnvBhRtNEw9nw3Q61S9uOTB
+	 lwKxAlIVDeHllWqRWe/VL2M3wN3anLyfWvzxF3s0FTJ8OtJkkRrA7EzSoINYQc1qdL
+	 Louy7C1V+icM2rl+lRzrdA7MqmGyQaL/ifO8IAWLIsgnoJmHUY4PJdhH4pWoNnoNUv
+	 hEyRSp0MdqOcopI3i146jpKdtr+0PFPR6BbKxCuap/CIhOmFR7PvbjRnZOYDp6NBPh
+	 WSWSGnEFEJ2ne7eiOVrxKnSCR6LBQ1xQX34VU7G6upSZiVlIrkPxCyXsEbQouTgMqZ
+	 s3RBQ+fPi7Xqg==
+Date: Mon, 15 Sep 2025 18:26:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Remy D. Farley" <one-d-wide@protonmail.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
+ fw@strlen.de
+Subject: Re: [PATCH] doc/netlink: Fix typos in operation attributes
+Message-ID: <20250915182636.7284c0ad@kernel.org>
+In-Reply-To: <20250913140515.1132886-1-one-d-wide@protonmail.com>
+References: <20250913140515.1132886-1-one-d-wide@protonmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:airkyi.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NpSUeF22LnzDaMKYiEuFqevqeK1MYzf4iSkkCu3fQqOjrNgyfGsywGra
-	GMwsWfxhO5M0UlGrG374jH3Xa17Hadfevx69JtfBFyquyr68EHvK2gqjtNyOyGoN5N/9Ypm
-	kv2vOCH1CMFRpEpIgjYRQ4sSB5udtTSTunJKOV7T8qxujPtCch7tkg2wkeh3aY97izqA7zs
-	fNXf6auP3iTDII0WIJKE9Vltww++i4bLigltiLAncAP7lsgqPay9ChFGa2sxFMpXFSxkRUY
-	IwLGia11ARql5Ns2AvaY2uG+nPJpXN/KnzHaVl2+I5OI0r6qtg7kXLjJN1i0dPSHDedKhUd
-	T+PdR1TWVAMpVmesdSinSeyyZDWVmffXSDAgV88zwpKYQ8Gq6yuQr+VyVwoSM8+h96Tm+z+
-	2KutP7P6l+B5dU/6fULMPT4BnM+MQr7iNsYP19RJm79bjmiepNqfxbjs6b21AsjrcnsLrnJ
-	EAKuVCXTj5X7ze5uXsIQBXeYa2SDOSrXiUEFiE50dqj5xOV9znX4FbpLeCNQXvnFBkRelAB
-	FsVObfsXPkF0WkkL+619MIYdebgIOFIBx3c2t5Xe2VjtDokOc4Xitf2eprN8YvgcVULfnLa
-	OlnhGfIoX2E9URDE+Lrbj7S/f8plgVl/ok2vV/W0LOcD3WCS3S3ez6xM0rfr2A/QCpPuBex
-	8XGoTFjaDSUilnJkOizFTOeG2SavuAvNPlzPjAB0DYksyIVmUE9Om69N8nL9S0zyVez7No1
-	XQU4G9/uczKgpSlwBVZqiM2LIaucy41R4WKSeefH/4j+mu1JCf+n2horpNVZCsaNmG3QQWC
-	zo5Bu9MIFGZxBHe3foojnFqdZ02SDzWGyEdxAcdwwNmhG6SfD5zwaND74VHf5UzjvZpFty+
-	AhYAiM9/If3Q55L+HCWcd5BbrrCEb9ZMzW8zlvJ0wcflYp8sT3LiBQwYwAx4fDtI4IdkAys
-	xRiJLq952WEZ+uDHpDt5/KlbJma6R/bcVeWasD1XDg7yJeg==
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+On Sat, 13 Sep 2025 14:05:28 +0000 Remy D. Farley wrote:
+> I'm trying to generate Rust bindings for netlink using the yaml spec.
+> 
+> It looks like there's a typo in conntrack spec: attribute set conntrack-attrs
+> defines attributes "counters-{orig,reply}" (plural), while get operation
+> references "counter-{orig,reply}" (singular). The latter should be fixed, as it
+> denotes multiple counters (packet and byte). The corresonding C define is
+> CTA_COUNTERS_ORIG.
+> 
+> Also, dump request references "nfgen-family" attribute, which neither exists in
+> conntrack-attrs attrset nor ctattr_type enum. There's member of nfgenmsg struct
+> with the same name, which is where family value is actually taken from.
+> 
+> > static int ctnetlink_dump_exp_ct(struct net *net, struct sock *ctnl,
+> >                struct sk_buff *skb,
+> >                const struct nlmsghdr *nlh,
+> >                const struct nlattr * const cda[],
+> >                struct netlink_ext_ack *extack)
+> > {
+> >   int err;
+> >   struct nfgenmsg *nfmsg = nlmsg_data(nlh);
+> >   u_int8_t u3 = nfmsg->nfgen_family;  
+>                          ^^^^^^^^^^^^
 
-This reverts commit da114122b83149d1f1db0586b1d67947b651aa20.
+cc: fw@strlen.de
+Fixes: 23fc9311a526 ("netlink: specs: add conntrack dump and stats dump support")
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-As discussed, the PHY clock should be managed by PHY driver instead
-of other driver like dwmac-rk.
-
-Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 266c53379236..49f92cd79aa8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1410,15 +1410,12 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
- 		clk_set_rate(plat->stmmac_clk, 50000000);
- 	}
- 
--	if (plat->phy_node) {
-+	if (plat->phy_node && bsp_priv->integrated_phy) {
- 		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
- 		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
--		/* If it is not integrated_phy, clk_phy is optional */
--		if (bsp_priv->integrated_phy) {
--			if (ret)
--				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
--			clk_set_rate(bsp_priv->clk_phy, 50000000);
--		}
-+		if (ret)
-+			return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
-+		clk_set_rate(bsp_priv->clk_phy, 50000000);
- 	}
- 
- 	return 0;
--- 
-2.49.0
+>  Documentation/netlink/specs/conntrack.yaml | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/netlink/specs/conntrack.yaml b/Documentation/netlink/specs/conntrack.yaml
+> index c6832633a..591e22a2e 100644
+> --- a/Documentation/netlink/specs/conntrack.yaml
+> +++ b/Documentation/netlink/specs/conntrack.yaml
+> @@ -575,8 +575,8 @@ operations:
+>              - nat-dst
+>              - timeout
+>              - mark
+> -            - counter-orig
+> -            - counter-reply
+> +            - counters-orig
+> +            - counters-reply
+>              - use
+>              - id
+>              - nat-dst
+> @@ -591,7 +591,6 @@ operations:
+>          request:
+>            value: 0x101
+>            attributes:
+> -            - nfgen-family
+>              - mark
+>              - filter
+>              - status
+> @@ -608,8 +607,8 @@ operations:
+>              - nat-dst
+>              - timeout
+>              - mark
+> -            - counter-orig
+> -            - counter-reply
+> +            - counters-orig
+> +            - counters-reply
+>              - use
+>              - id
+>              - nat-dst
 
 
