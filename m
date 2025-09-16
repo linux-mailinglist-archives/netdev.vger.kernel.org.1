@@ -1,384 +1,232 @@
-Return-Path: <netdev+bounces-223697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E88B5A13A
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:17:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC806B5A126
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 717EF1C02C93
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:17:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86396523C2D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B298316905;
-	Tue, 16 Sep 2025 19:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CA02F5A25;
+	Tue, 16 Sep 2025 19:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KvVTxrqe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0nZ8xZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856A02F5A0D;
-	Tue, 16 Sep 2025 19:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C816A283FD0
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 19:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758050219; cv=none; b=MU9m6T1qBBcCqNpzgzi6mLf/6lZFkbyLWhIy+7P4ZCzDsjaUcKTcWljxBYTHzWf1LeaTXxZa7eHxaGG6NdbeOEU/dzQMAwvG3v6mfTH6dozWcxvWI4Rz+XFAHDoWr7Yh3QXs9dg0go3G8K9wS/jOxUlZyF7TC1LqmTosyiapGHE=
+	t=1758050104; cv=none; b=WsW9hWrpgN0iF/WuejF2h1bl0oKmHqp2EjUsxbUBNYGWAMopFrcbKXrRcMZn0+UmL+dZS/fYMrPq7fFQg+aX/LdDy3oI16gtNdMwZuHUtV5RBD4jJTCEklWWVaUTfFMhZGNerib1AAj1e6PpECGUFzTXDB1qAgPpQiVjQ+/ykvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758050219; c=relaxed/simple;
-	bh=UATtTNQzoabKuQM/6vY2vzTps6UhIUpgfFktUIIOqaQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iDY7ITxpyGEhSO4BdYrtK42VkLPj7jQhRR04tkTWzWEyHSKcC46t9VxRxmT5cpKTklD21U8JJbHRtvpPR3lz4YcTXniEsmj/cK1lLGUFU4Dxpj5Bi9/I0N7+C17Q6nEqYs6yllLkS2A9Z0ZzHil9ZhhgDqU9NkDXovmFaqWCZM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KvVTxrqe; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758050217; x=1789586217;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=UATtTNQzoabKuQM/6vY2vzTps6UhIUpgfFktUIIOqaQ=;
-  b=KvVTxrqe2htI1Trcm+RLke+nG8Zr1wdA2pHT673ZmRXSlERRzLwE8eeZ
-   fxQHF7DCivQjTyxBkEmSE2yAshSauNkhmyym5ZAQlep17fZQ5mRtikgrs
-   so7RgDpR5Ea/vt2fme+VkzdFdMhTZsMPK8UFQLynnEyasNQMWYNfgH07i
-   1rICXsNBzb+DS4tYLGf0U4CMdo2jzMCxKh6mBcVs/3hDFYKsA96CshR4n
-   pQT0+x0sPBLDDcZDGSP1d3l3V6Fa7R05VjCb3HjMyzW7y387Tvu9TGwDe
-   QqPQIeXsocZxQgHNXEQSvuWbc4XG+w8i6xN0+M3czfs5k2kb2OdHuwWiO
-   g==;
-X-CSE-ConnectionGUID: uX7rLUjBQJ2tFCZpBq0lXw==
-X-CSE-MsgGUID: n+8Q9DV9TkCZ7VxU3bt0rA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="60037604"
-X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
-   d="scan'208";a="60037604"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 12:16:55 -0700
-X-CSE-ConnectionGUID: YyawpJIJQFWiFuOnXXwbiQ==
-X-CSE-MsgGUID: ruwDdXVqQtiIgQwl+pbp5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,269,1751266800"; 
-   d="scan'208";a="174961773"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 12:16:55 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Tue, 16 Sep 2025 12:14:58 -0700
-Subject: [PATCH iwl-next v4 5/5] ice: refactor to use helpers
+	s=arc-20240116; t=1758050104; c=relaxed/simple;
+	bh=c+EWKTYNyHf42e0Fru5vwEBa84g8bGa7yRNicMAjiiY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=fhPTKTkrTME1WKaXAtLYRuyi6Wy+w4je60ksR4GwFteqWwIxJa4jfBda2oRpKCaJLM6b0zfdVTXN/9PvIyjbtKQ7wEdx3ZGDyFnHMm3b4BIo13rfucVilNnrzcuemmaXpy+rRWrcQkJSfH01Gf8arFNEE8c8ciQEvERGRwTHOTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j0nZ8xZu; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4b79773a389so30632451cf.1
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 12:15:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758050102; x=1758654902; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LJgX4ZVONk4444uHBMJ6ZL0jLQUk5fEKkJAqY49cNQY=;
+        b=j0nZ8xZuOz4p8UTWD4f27grJYjuB2RZs4m1z4+QXM6AjCG5cR31UeTa0nKSnCo0MQi
+         xHWkd+cgvbJOBZjFFb/rxbb6zt2K4DjDESSrhRQbrc8pSIFrOAfDAQ7HjMI1loeppnYN
+         64toak0wdT3WgXtdg6ta6k+0N8X9hdF3BLMonrYKXlVH4D1IJ0dmr/lO+DSmzOYP1gL+
+         BlS5cCudP5NtIABLuzR89eZoHHydG07obbfCAyVR4sgWIqVw+uMzxhAvhKUGDpHZmKa1
+         QqqyKr2xBz7SaluTPZ6C9ZTKOZ+gskpa3Pd3MpFWOSG+vugKHwdWmr8sMSUArQ8LCAX6
+         HcWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758050102; x=1758654902;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LJgX4ZVONk4444uHBMJ6ZL0jLQUk5fEKkJAqY49cNQY=;
+        b=THS+DbuKvKIkYTUmHrHK9AKxc5qaLHC4iQ+EnQsgxnfeH7Maye7iyRGjKQIZrdwzTu
+         XWWS0gKol8fjrO8XVWyHpWN7UutSK/RtWdEBWutt+zzvmmasp8dlIYD5ol8CnDxtJhD+
+         oSPsrRCBNnYbvpOVI96waFoACSw3zYSNLGX1jeaJcd1Axq5Nqz+aDnUh7p+SxprA4i2R
+         0vLlkLc/gvUmhhAccQOWGDTW8Wv/phl+I+r5iVp3Lo8DY2VmYJ4/f5Xk8KaBaT1V/qWb
+         q+WJoYgB0A6XZcT4egTD9qgdBhXhoQVqNnddU/8Qz2ZCmBlW2imekakEacQFwoIz7DGr
+         Z+fA==
+X-Forwarded-Encrypted: i=1; AJvYcCXWfLNsIsayTEmKVzdydQtAG2+5FIn9XYNPPZUiCX2AdlTbeNnGhQb2uhWVimuALZLdKxPaelA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxMnc882lUpobmWpimyzhe6yC97vtvTBBtFBAPCArlAFQKDEpb
+	pNOoUVDgnH8e4Dn/2pNnLmWCyPJ32smkGtJDE1w7zMRZhcPjLOrTG6ns
+X-Gm-Gg: ASbGncsNVV2+XUgJcmRnWjpJ0sq8L4y0L0AZkTcxHnrtez04scVGllX1IIpGnQMFJr5
+	i915Y86dMUS2OxlpkL+TVIO+ymNPXPFDKMdy1PGMwaI8dNR1aX6sdfBJKCet4454fBDocXqVAut
+	BD3LEETU3JozU8fEDetDkpg5g5iWGvi5L0hVAg7FhmuUBIifL97RJxZNQeW/9CsWCxtn1nHU0Mn
+	fjwJlDBUfN08ALhcndTP27dBS84bNP/ew3OalhT2OWEDSXUj3VYFJ2bLtB5kggBp08DLrxfEFNk
+	v4nh62AxR/ObyzvH7YJvFu5FacQEXhsTRvdIMPKQyTjoiHZ3iHCsCh+JfPfNSCiQpWLaKP1UI7w
+	wFMKLgINTG/mU25lmj4yI9/wMdCz1r0dWk43UWO0kwy5mQI+q1USNQiaKqniP26rER+6J071W+3
+	0echIDzemrisJf
+X-Google-Smtp-Source: AGHT+IE+Vwflbd0hOb/UZOJIBZdgEfbrgB6G+ThUuhIU0Sah9JfS0hnRU4r1Ow5Cq55Rqw3Emr/3sQ==
+X-Received: by 2002:ac8:584a:0:b0:4b7:a62d:ef6f with SMTP id d75a77b69052e-4b7a62dfbecmr97874561cf.64.1758050101562;
+        Tue, 16 Sep 2025 12:15:01 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4b780290365sm70476281cf.18.2025.09.16.12.15.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 12:15:00 -0700 (PDT)
+Date: Tue, 16 Sep 2025 15:15:00 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com
+Message-ID: <willemdebruijn.kernel.17894869e21ae@gmail.com>
+In-Reply-To: <CANn89i+KGxhZNmFw8TsD9GzQ8=Acag_ALDw9AB5A4gupBpRzQQ@mail.gmail.com>
+References: <20250916160951.541279-1-edumazet@google.com>
+ <20250916160951.541279-10-edumazet@google.com>
+ <willemdebruijn.kernel.e4b37db8cf47@gmail.com>
+ <CANn89i+KGxhZNmFw8TsD9GzQ8=Acag_ALDw9AB5A4gupBpRzQQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 09/10] udp: make busylock per socket
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250916-resend-jbrandeb-ice-standard-stats-v4-5-ec198614c738@intel.com>
-References: <20250916-resend-jbrandeb-ice-standard-stats-v4-0-ec198614c738@intel.com>
-In-Reply-To: <20250916-resend-jbrandeb-ice-standard-stats-v4-0-ec198614c738@intel.com>
-To: Jesse Brandeburg <jbrandeburg@cloudflare.com>, 
- Jakub Kicinski <kuba@kernel.org>, Hariprasad Kelam <hkelam@marvell.com>, 
- Simon Horman <horms@kernel.org>, 
- Marcin Szycik <marcin.szycik@linux.intel.com>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, netdev@vger.kernel.org, 
- intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org, corbet@lwn.net, 
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- jbrandeburg@cloudflare.com
-X-Mailer: b4 0.15-dev-cbe0e
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11409;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=A10gTwzw8UAmR4U3sxzOasO0Vo16YSPxlv82FPThXgc=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoyT25eozfzG7p97ZlVzQe+koElqIraGXcfuWDAc9LPVP
- Xa78ujljlIWBjEuBlkxRRYFh5CV140nhGm9cZaDmcPKBDKEgYtTACbyIoPhnynP0ukdCdvXfVPg
- PbW185Xi/Ovv3Nf9i54hJ5p9XOGQzGFGhp/C/jM8U2c0G955zy0dvSPh8oR1RU5MRUkuqRtWTpp
- wnBkA
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Eric Dumazet wrote:
+> On Tue, Sep 16, 2025 at 9:31=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Eric Dumazet wrote:
+> > > While having all spinlocks packed into an array was a space saver,
+> > > this also caused NUMA imbalance and hash collisions.
+> > >
+> > > UDPv6 socket size becomes 1600 after this patch.
+> > >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > ---
+> > >  include/linux/udp.h |  1 +
+> > >  include/net/udp.h   |  1 +
+> > >  net/ipv4/udp.c      | 20 ++------------------
+> > >  3 files changed, 4 insertions(+), 18 deletions(-)
+> > >
+> > > diff --git a/include/linux/udp.h b/include/linux/udp.h
+> > > index 6ed008ab166557e868c1918daaaa5d551b7989a7..e554890c4415b411f35=
+007d3ece9e6042db7a544 100644
+> > > --- a/include/linux/udp.h
+> > > +++ b/include/linux/udp.h
+> > > @@ -109,6 +109,7 @@ struct udp_sock {
+> > >        */
+> > >       struct hlist_node       tunnel_list;
+> > >       struct numa_drop_counters drop_counters;
+> > > +     spinlock_t              busylock ____cacheline_aligned_in_smp=
+;
+> > >  };
+> > >
+> > >  #define udp_test_bit(nr, sk)                 \
+> > > diff --git a/include/net/udp.h b/include/net/udp.h
+> > > index a08822e294b038c0d00d4a5f5cac62286a207926..eecd64097f91196897f=
+45530540b9c9b68c5ba4e 100644
+> > > --- a/include/net/udp.h
+> > > +++ b/include/net/udp.h
+> > > @@ -289,6 +289,7 @@ static inline void udp_lib_init_sock(struct soc=
+k *sk)
+> > >       struct udp_sock *up =3D udp_sk(sk);
+> > >
+> > >       sk->sk_drop_counters =3D &up->drop_counters;
+> > > +     spin_lock_init(&up->busylock);
+> > >       skb_queue_head_init(&up->reader_queue);
+> > >       INIT_HLIST_NODE(&up->tunnel_list);
+> > >       up->forward_threshold =3D sk->sk_rcvbuf >> 2;
+> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > index 25143f932447df2a84dd113ca33e1ccf15b3503c..7d1444821ee51a19cd5=
+fd0dd5b8d096104c9283c 100644
+> > > --- a/net/ipv4/udp.c
+> > > +++ b/net/ipv4/udp.c
+> > > @@ -1689,17 +1689,11 @@ static void udp_skb_dtor_locked(struct sock=
+ *sk, struct sk_buff *skb)
+> > >   * to relieve pressure on the receive_queue spinlock shared by con=
+sumer.
+> > >   * Under flood, this means that only one producer can be in line
+> > >   * trying to acquire the receive_queue spinlock.
+> > > - * These busylock can be allocated on a per cpu manner, instead of=
+ a
+> > > - * per socket one (that would consume a cache line per socket)
+> > >   */
+> > > -static int udp_busylocks_log __read_mostly;
+> > > -static spinlock_t *udp_busylocks __read_mostly;
+> > > -
+> > > -static spinlock_t *busylock_acquire(void *ptr)
+> > > +static spinlock_t *busylock_acquire(struct sock *sk)
+> > >  {
+> > > -     spinlock_t *busy;
+> > > +     spinlock_t *busy =3D &udp_sk(sk)->busylock;
+> > >
+> > > -     busy =3D udp_busylocks + hash_ptr(ptr, udp_busylocks_log);
+> > >       spin_lock(busy);
+> > >       return busy;
+> > >  }
+> > > @@ -3997,7 +3991,6 @@ static void __init bpf_iter_register(void)
+> > >  void __init udp_init(void)
+> > >  {
+> > >       unsigned long limit;
+> > > -     unsigned int i;
+> > >
+> > >       udp_table_init(&udp_table, "UDP");
+> > >       limit =3D nr_free_buffer_pages() / 8;
+> > > @@ -4006,15 +3999,6 @@ void __init udp_init(void)
+> > >       sysctl_udp_mem[1] =3D limit;
+> > >       sysctl_udp_mem[2] =3D sysctl_udp_mem[0] * 2;
+> > >
+> > > -     /* 16 spinlocks per cpu */
+> > > -     udp_busylocks_log =3D ilog2(nr_cpu_ids) + 4;
+> > > -     udp_busylocks =3D kmalloc(sizeof(spinlock_t) << udp_busylocks=
+_log,
+> > > -                             GFP_KERNEL);
+> >
+> > A per sock busylock is preferable over increasing this array to be
+> > full percpu (and converting percpu to avoid false sharing)?
+> >
+> > Because that would take a lot of space on modern server platforms?
+> > Just trying to understand the trade-off made.
+> =
 
-Use the ice_netdev_to_pf() helper in more places and remove a bunch of
-boilerplate code. Not every instance could be replaced due to use of the
-netdev_priv() output or the vsi variable within a bunch of functions.
+> The goal of the busylock is to have a single gate before sk->sk_receive=
+_queue.
+> =
 
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c   | 48 ++++++++------------------
- drivers/net/ethernet/intel/ice/ice_flex_pipe.c |  8 ++---
- drivers/net/ethernet/intel/ice/ice_lag.c       |  3 +-
- drivers/net/ethernet/intel/ice/ice_main.c      | 10 ++----
- drivers/net/ethernet/intel/ice/ice_ptp.c       |  6 ++--
- drivers/net/ethernet/intel/ice/ice_sriov.c     |  3 +-
- 6 files changed, 24 insertions(+), 54 deletions(-)
+> Having per-cpu spinlocks will not fit the need ?
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index f8bb2d55b28c..0b99a7b863d8 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -794,8 +794,7 @@ static int ice_get_extended_regs(struct net_device *netdev, void *p)
- static void
- ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	u32 *regs_buf = (u32 *)p;
- 	unsigned int i;
-@@ -810,8 +809,7 @@ ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- 
- static u32 ice_get_msglevel(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- #ifndef CONFIG_DYNAMIC_DEBUG
- 	if (pf->hw.debug_mask)
-@@ -824,8 +822,7 @@ static u32 ice_get_msglevel(struct net_device *netdev)
- 
- static void ice_set_msglevel(struct net_device *netdev, u32 data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- #ifndef CONFIG_DYNAMIC_DEBUG
- 	if (ICE_DBG_USER & data)
-@@ -840,16 +837,14 @@ static void ice_set_msglevel(struct net_device *netdev, u32 data)
- static void ice_get_link_ext_stats(struct net_device *netdev,
- 				   struct ethtool_link_ext_stats *stats)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	stats->link_down_events = pf->link_down_events;
- }
- 
- static int ice_get_eeprom_len(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	return (int)pf->hw.flash.flash_size;
- }
-@@ -858,9 +853,7 @@ static int
- ice_get_eeprom(struct net_device *netdev, struct ethtool_eeprom *eeprom,
- 	       u8 *bytes)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	struct device *dev;
- 	int ret;
-@@ -959,8 +952,7 @@ static u64 ice_link_test(struct net_device *netdev)
-  */
- static u64 ice_eeprom_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	netdev_info(netdev, "EEPROM test\n");
- 	return !!(ice_nvm_validate_checksum(&pf->hw));
-@@ -1277,9 +1269,8 @@ static int ice_lbtest_receive_frames(struct ice_rx_ring *rx_ring)
-  */
- static u64 ice_loopback_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *orig_vsi = np->vsi, *test_vsi;
--	struct ice_pf *pf = orig_vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
-+	struct ice_vsi *test_vsi;
- 	u8 *tx_frame __free(kfree) = NULL;
- 	u8 broadcast[ETH_ALEN], ret = 0;
- 	int num_frames, valid_frames;
-@@ -1368,8 +1359,7 @@ static u64 ice_loopback_test(struct net_device *netdev)
-  */
- static u64 ice_intr_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	u16 swic_old = pf->sw_int_count;
- 
- 	netdev_info(netdev, "interrupt test\n");
-@@ -1397,9 +1387,8 @@ static void
- ice_self_test(struct net_device *netdev, struct ethtool_test *eth_test,
- 	      u64 *data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	bool if_running = netif_running(netdev);
--	struct ice_pf *pf = np->vsi->back;
- 	struct device *dev;
- 
- 	dev = ice_pf_to_dev(pf);
-@@ -1723,9 +1712,7 @@ static int ice_nway_reset(struct net_device *netdev)
-  */
- static u32 ice_get_priv_flags(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	u32 i, ret_flags = 0;
- 
- 	for (i = 0; i < ICE_PRIV_FLAG_ARRAY_SIZE; i++) {
-@@ -4413,9 +4400,7 @@ static int
- ice_get_module_info(struct net_device *netdev,
- 		    struct ethtool_modinfo *modinfo)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	u8 sff8472_comp = 0;
- 	u8 sff8472_swap = 0;
-@@ -4487,12 +4472,10 @@ static int
- ice_get_module_eeprom(struct net_device *netdev,
- 		      struct ethtool_eeprom *ee, u8 *data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- #define SFF_READ_BLOCK_SIZE 8
- 	u8 value[SFF_READ_BLOCK_SIZE] = { 0 };
- 	u8 addr = ICE_I2C_EEPROM_DEV_ADDR;
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
- 	struct ice_hw *hw = &pf->hw;
- 	bool is_sfp = false;
- 	unsigned int i, j;
-@@ -4768,8 +4751,7 @@ static void ice_get_ts_stats(struct net_device *netdev,
-  */
- static int ice_ethtool_reset(struct net_device *dev, u32 *flags)
- {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(dev);
- 	enum ice_reset_req reset;
- 
- 	switch (*flags) {
-diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-index fc94e189e52e..c2caee083ca7 100644
---- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-@@ -574,9 +574,7 @@ ice_destroy_tunnel(struct ice_hw *hw, u16 index, enum ice_tunnel_type type,
- int ice_udp_tunnel_set_port(struct net_device *netdev, unsigned int table,
- 			    unsigned int idx, struct udp_tunnel_info *ti)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	enum ice_tunnel_type tnl_type;
- 	int status;
- 	u16 index;
-@@ -598,9 +596,7 @@ int ice_udp_tunnel_set_port(struct net_device *netdev, unsigned int table,
- int ice_udp_tunnel_unset_port(struct net_device *netdev, unsigned int table,
- 			      unsigned int idx, struct udp_tunnel_info *ti)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	enum ice_tunnel_type tnl_type;
- 	int status;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index aebf8e08a297..d2576d606e10 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -2177,8 +2177,7 @@ static void ice_lag_chk_disabled_bond(struct ice_lag *lag, void *ptr)
-  */
- static void ice_lag_disable_sriov_bond(struct ice_lag *lag)
- {
--	struct ice_netdev_priv *np = netdev_priv(lag->netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(lag->netdev);
- 
- 	ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
- 	ice_clear_feature_support(pf, ICE_F_SRIOV_AA_LAG);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 249fd3c050eb..9994a9479082 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -8043,9 +8043,7 @@ static int
- ice_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
- 		   struct net_device *dev, u32 filter_mask, int nlflags)
- {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(dev);
- 	u16 bmode;
- 
- 	bmode = pf->first_sw->bridge_mode;
-@@ -8115,8 +8113,7 @@ ice_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 		   u16 __always_unused flags,
- 		   struct netlink_ext_ack __always_unused *extack)
- {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(dev);
- 	struct nlattr *attr, *br_spec;
- 	struct ice_hw *hw = &pf->hw;
- 	struct ice_sw *pf_sw;
-@@ -9550,8 +9547,7 @@ ice_indr_setup_tc_cb(struct net_device *netdev, struct Qdisc *sch,
-  */
- int ice_open(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	if (ice_is_reset_in_progress(pf->state)) {
- 		netdev_err(netdev, "can't open net device while reset is in progress");
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index d2ca9d7bcfc1..9b9b408c0adb 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2244,8 +2244,7 @@ static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
- int ice_ptp_hwtstamp_get(struct net_device *netdev,
- 			 struct kernel_hwtstamp_config *config)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	if (pf->ptp.state != ICE_PTP_READY)
- 		return -EIO;
-@@ -2316,8 +2315,7 @@ int ice_ptp_hwtstamp_set(struct net_device *netdev,
- 			 struct kernel_hwtstamp_config *config,
- 			 struct netlink_ext_ack *extack)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	int err;
- 
- 	if (pf->ptp.state != ICE_PTP_READY)
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 843e82fd3bf9..6b1126ddb561 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -1190,8 +1190,7 @@ ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event)
-  */
- int ice_set_vf_spoofchk(struct net_device *netdev, int vf_id, bool ena)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_vsi *vf_vsi;
- 	struct device *dev;
- 	struct ice_vf *vf;
+Oh of course. For high rate UDP servers I was mistakenly immediately
+thinking of SO_REUSEPORT and CPU pinning.
 
--- 
-2.51.0.rc1.197.g6d975e95c9d7
+And thus different sockets that may accidentally share a hashed lock
+or hit cacheline false sharing.
 
+But this is a single socket being hit with traffic from multiple
+producers.
+ =
+
+> Note that having per-NUMA receive queues is on my plate, but not finish=
+ed yet.
+
+Interesting!
+
+> I tried to remove the busylock (because modern UDP has a second queue
+> (up->reader_queue),
+> so __skb_recv_udp() splices things in batches), but busylock was still
+> beneficial.
+
+Good to know, thanks.
 
