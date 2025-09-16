@@ -1,60 +1,64 @@
-Return-Path: <netdev+bounces-223719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF300B5A3E0
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:24:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4EC0B5A3E1
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:25:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82434326602
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:24:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A21F2487CA2
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A868C2EA49E;
-	Tue, 16 Sep 2025 21:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377172F9D99;
+	Tue, 16 Sep 2025 21:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="IuxcQMEN"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qp7asGzo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6292E6CCE
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9CB2E7BC0
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 21:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758057864; cv=none; b=IFa25mptXRYEg9VqLMITQUxlXuOazGAAMaWlHn2zcFxP2QAO7OG3y8BGwfgwYzpP71qQCbaBaMxFoor/pPLuGnT4QEYEYFo4fJltj1mKhib5hlw/mQzz/IDi0iT9+hL8bm9TPqc0joUMbRkUBGXymb0xmSkiylke+xf7xUGfQqs=
+	t=1758057866; cv=none; b=Prbg8Dqbn1n3GiowCXuDcxHSbgUYgqQQHEOPzY23m2AjEYN0he9keVDf/lp0fydIAQB0j11K0icWUo/mPGtbWqJMJX07SwNe+ND4R3dTvRf1Ic4dZ5Iysgv2LumaqPgXGSzOsgbTVI46LMz28Qj9ymazM8RLdNfGxXvKRnDj9aY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758057864; c=relaxed/simple;
-	bh=YeeG6slrY6p+MaGhZqqn+Mm+dm/Uj5nMTG44+lWvKT0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hnE7R3zck/B9mmt0h4I0p6ZWiZvgiHjmUNgabhvH9mkeBGVF5uDp8iFeqGsqAecXr2BuTeX4JYRpG83NfOqO3lCOppVRYv4MWKybe5A2qY72Mce4ZSCBUmRuwuMK9IHvEwr2SKP5lNoyAsZOYLV/r0Fg93S54Mn8ARE5fBJjc4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=IuxcQMEN; arc=none smtp.client-ip=185.125.188.121
+	s=arc-20240116; t=1758057866; c=relaxed/simple;
+	bh=LP6ZRagWBdxeVw+YfiHmPptwNySx5umrCTuT1IbM2xE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=COEvzustgp5z1cIwd0JgSJnq6SwtD/1xcMXl+S1dlaIfYh3AK9Xk3ZKJ0KYph0TulmanJm3VaHgNc5NQ+wTdAazr3lju9SWEH0B7qtXxPXcUBEw4wvD8YA+Nk2x+XDgSkkb3L6vUg0LP/O15UrqvQfojpcycy6Ytodct/VdHyhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=qp7asGzo; arc=none smtp.client-ip=185.125.188.121
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Received: from famine.localdomain (unknown [50.35.97.145])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id AD533454B1;
-	Tue, 16 Sep 2025 21:24:15 +0000 (UTC)
+	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id BC149454B7;
+	Tue, 16 Sep 2025 21:24:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1758057856;
-	bh=oT/5XD5R8nYnD20M4RR9UBNEUYYJZrKrGY06h8mzemo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=IuxcQMENjaSKXl5cbclxt4Yq4q8wJ9mfCBr5FPXK2YwpQFZZWIl0fTymGea3RXDkS
-	 s+MyfRjpyl6735XwSnQUT9GSVDov5QN7W26EUmz7NQg2bCbxLhoIHRLGai82pBZ32y
-	 lSec50vfGVuZoUhK0iR4XT5Ae1g4UMOJMvI/3E+Z+fKvkkNcLHzShj6pgx7ebwzVZg
-	 PawMviqMOtRS6U5ow3bkHjr7SC0MEIg2UjRZTCanUF/kJmEpURk4nE0s69fzFYuWwi
-	 gMbX3K7iIa9g5cfch2KFWsMVU73Zc+FPc7L2sFR91smkUfZ7CQoBz+HZ3PDcfdLZZn
-	 yZAiCV/TfsaNA==
+	s=20210705; t=1758057857;
+	bh=q5nT8jhqPHVE6bhlgcmllcv0Y1IYbvYUTgMHrWJCXbQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version;
+	b=qp7asGzoECnnJnujBn0fM3sEnGSHt5cIK54rJNx9aBwWAh6fn71payrPP7SpzVqaM
+	 3u+HopVZ/GpFTAKSXehxCSa/I+qF1y0ML2Z/qqXXbJuQ96a9XiIDgVrEt/7xk6WK+c
+	 A/MAw5jaMNc4+ZxGujWrYUptS1rWSn0oWyiGzcJ2WAoFLYA9MoXaB9981GGvOmkJvX
+	 qXpfRX1Eshmjcd2feHvDgc63R2MLY7DNkR06eX1PtmfpuUOzCn8MRmf0uuPGDhmtrR
+	 LRys5d9E+bncJme7qDb01mYoT288yB7MTSWCFz7yIJnGnSiHXGNFTnudJJgQxU8Ckj
+	 DFlvphuqy4R5w==
 From: Jay Vosburgh <jay.vosburgh@canonical.com>
 To: netdev@vger.kernel.org
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
 	Stephen Hemminger <stephen@networkplumber.org>,
 	David Ahern <dsahern@gmail.com>
-Subject: 
-Date: Tue, 16 Sep 2025 14:23:59 -0700
-Message-Id: <20250916212403.3429851-1-jay.vosburgh@canonical.com>
+Subject: [PATCH v2 1/4 iproute2-next] lib: Update backend of print_size to accept 64 bit size
+Date: Tue, 16 Sep 2025 14:24:00 -0700
+Message-Id: <20250916212403.3429851-2-jay.vosburgh@canonical.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250916212403.3429851-1-jay.vosburgh@canonical.com>
+References: <20250916212403.3429851-1-jay.vosburgh@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,111 +67,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+	In preparation for accepting 64 bit burst sizes, modify
+sprint_size, the formatting function behind print_size, to accept __u64 as
+its size parameter.  Also include a "Gb" size category.
 
-Subject: [PATCH v2 0/4 iproute2-next] tc/police: Allow 64 bit burst size
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+---
 
-	In summary, this patchset changes the user space handling of the
-tc police burst parameter to permit burst sizes that exceed 4 GB when the
-specified rate is high enough that the kernel API for burst can accomodate
-such.
+v2: add Jamal's ack
 
-	Additionally, if the burst exceeds the upper limit of the kernel
-API, this is now flagged as an error.  The existing behavior silently
-overflows, resulting in arbitrary values passed to the kernel.
+ include/json_print.h  |  4 ++--
+ lib/json_print_math.c | 11 +++++++----
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
-	In detail, as presently implemented, the tc police burst option
-limits the size of the burst to to 4 GB, i.e., UINT_MAX for a 32 bit
-unsigned int.  This is a reasonable limit for the low rates common when
-this was developed.  However, the underlying implementation of burst is
-computed as "time at the specified rate," and for higher rates, a burst
-size exceeding 4 GB is feasible without modification to the kernel.
-
-	The burst size provided on the command line is translated into a
-duration, representing how much time is required at the specified rate to
-transmit the given burst size.
-
-	This time is calculated in units of "psched ticks," each of which
-is 64 nsec[0].  The computed number of psched ticks is sent to the kernel
-as a __u32 value.
-
-	Because burst is ultimately calculated as a time duration, the
-real upper limit for a burst is UINT_MAX psched ticks, i.e.,
-
-	UINT_MAX * psched tick duration / NSEC_PER_SEC
-	(2^32-1) *         64           / 1E9
-
-	which is roughly 274.88 seconds (274.8779...).
-
-	At low rates, e.g., 5 Mbit/sec, UINT_MAX psched ticks does not
-correspond to a burst size in excess of 4 GB, so the above is moot, e.g.,
-
-	5Mbit/sec / 8 = 625000 MBytes/sec
-	625000 * ~274.88 seconds = ~171800000 max burst size, below UINT_MAX
-
-	Thus, the burst size at 5Mbit/sec is limited by the __u32 size of
-the psched tick field in the kernel API, not the 4 GB limit of the tc
-police burst user space API.
-
-	However, at higher rates, e.g., 10 Gbit/sec, the burst size is
-currently limited by the 4 GB maximum for the burst command line parameter
-value, rather than UINT_MAX psched ticks:
-
-	10 Gbit/sec / 8 = 1250000000 MBbytes/sec
-	1250000000 * ~274.88 seconds = ~343600000000, more than UINT_MAX
-
-	Here, the maximum duration of a burst the kernel can handle
-exceeds 4 GB of burst size.
-
-	While the above maximum may be an excessively large burst value,
-at 10 Gbit/sec, a 4 GB burst size corresponds to just under 3.5 seconds in
-duration:
-
-	2^32 bytes / 10 Gbit/sec
-	2^32 bytes / 1250000000 bytes/sec
-	equals ~3.43 sec
-
-	So, at higher rates, burst sizes exceeding 4 GB are both
-reasonable and feasible, up to the UINT_MAX limit for psched ticks.
-Enabling this requires changes only to the user space processing of the
-burst size parameter in tc.
-
-	In principle, the other packet schedulers utilizing psched ticks
-for burst sizing, htb and tbf, could be similarly changed to permit larger
-burst sizes, but this patch set does not do so.
-
-	Separately, for the burst duration calculation overflow (i.e.,
-that the number of psched ticks exceeds UINT_MAX), under the current
-implementation, one example of overflow is as follows:
-
-# /sbin/tc filter add dev eth0 protocol ip prio 1 parent ffff: handle 1 fw police rate 1Mbit peakrate 10Gbit burst 34375000 mtu 64Kb conform-exceed reclassify
-
-# /sbin/tc -raw filter get dev eth0 ingress protocol ip pref 1 handle 1 fw
-filter ingress protocol ip pref 1 fw chain 0 handle 0x1  police 0x1 rate 1Mbit burst 15261b mtu 64Kb [001d1bf8] peakrate 10Gbit action reclassify overhead 0b 
-        ref 1 bind 1 
-
-	Note that the returned burst value is 15261b, which does not match
-the supplied value of 34375000.  With this patch set applied, this
-situation is flagged as an error.
-
-
-[0] psched ticks are defined in the kernel in include/net/pkt_sched.h:
-
-#define PSCHED_SHIFT                    6
-#define PSCHED_TICKS2NS(x)              ((s64)(x) << PSCHED_SHIFT)
-#define PSCHED_NS2TICKS(x)              ((x) >> PSCHED_SHIFT)
-
-#define PSCHED_TICKS_PER_SEC            PSCHED_NS2TICKS(NSEC_PER_SEC)
-
-	where PSCHED_TICKS_PER_SEC is 15625000.
-
-	These values are exported to user space via /proc/net/psched, the
-second field being PSCHED_TICKS2NS(1), which at present is 64 (0x40).  tc
-uses this value to compute its internal "tick_in_usec" variable containing
-the number of psched ticks per usec (15.625) used for the psched tick
-computations.
-
-	Lastly, note that PSCHED_SHIFT was previously 10, and changed to 6
-in commit a4a710c4a7490 in 2009.  I have not tested backwards
-compatibility of these changes with kernels of that era.
+diff --git a/include/json_print.h b/include/json_print.h
+index daebcf5d25f5..59edd5b2467e 100644
+--- a/include/json_print.h
++++ b/include/json_print.h
+@@ -68,7 +68,7 @@ _PRINT_FUNC(on_off, bool)
+ _PRINT_FUNC(null, const char*)
+ _PRINT_FUNC(string, const char*)
+ _PRINT_FUNC(uint, unsigned int)
+-_PRINT_FUNC(size, __u32)
++_PRINT_FUNC(size, __u64)
+ _PRINT_FUNC(u64, uint64_t)
+ _PRINT_FUNC(hhu, unsigned char)
+ _PRINT_FUNC(hu, unsigned short)
+@@ -109,6 +109,6 @@ static inline int print_bool_opt(enum output_type type,
+ }
+ 
+ /* A backdoor to the size formatter. Please use print_size() instead. */
+-char *sprint_size(__u32 sz, char *buf);
++char *sprint_size(__u64 sz, char *buf);
+ 
+ #endif /* _JSON_PRINT_H_ */
+diff --git a/lib/json_print_math.c b/lib/json_print_math.c
+index f4d504995924..3e951cd9f504 100644
+--- a/lib/json_print_math.c
++++ b/lib/json_print_math.c
+@@ -7,25 +7,28 @@
+ #include "utils.h"
+ #include "json_print.h"
+ 
+-char *sprint_size(__u32 sz, char *buf)
++char *sprint_size(__u64 sz, char *buf)
+ {
+ 	long kilo = 1024;
+ 	long mega = kilo * kilo;
++	long giga = mega * kilo;
+ 	size_t len = SPRINT_BSIZE - 1;
+ 	double tmp = sz;
+ 
+-	if (sz >= mega && fabs(mega * rint(tmp / mega) - sz) < 1024)
++	if (sz >= giga && fabs(giga * rint(tmp / giga) - sz) < 1024)
++		snprintf(buf, len, "%gGb", rint(tmp / giga));
++	else if (sz >= mega && fabs(mega * rint(tmp / mega) - sz) < 1024)
+ 		snprintf(buf, len, "%gMb", rint(tmp / mega));
+ 	else if (sz >= kilo && fabs(kilo * rint(tmp / kilo) - sz) < 16)
+ 		snprintf(buf, len, "%gKb", rint(tmp / kilo));
+ 	else
+-		snprintf(buf, len, "%ub", sz);
++		snprintf(buf, len, "%llub", sz);
+ 
+ 	return buf;
+ }
+ 
+ int print_color_size(enum output_type type, enum color_attr color,
+-		     const char *key, const char *fmt, __u32 sz)
++		     const char *key, const char *fmt, __u64 sz)
+ {
+ 	SPRINT_BUF(buf);
+ 
+-- 
+2.25.1
 
 
