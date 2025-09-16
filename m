@@ -1,141 +1,145 @@
-Return-Path: <netdev+bounces-223367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293AEB58E31
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:00:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA54EB58E39
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 08:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517CD1B28051
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:00:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27A731BC2FBB
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 06:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288FD2DE71D;
-	Tue, 16 Sep 2025 06:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3520E1FBC91;
+	Tue, 16 Sep 2025 06:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pQ+7WkfH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AltbzPJK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8841A2DC775
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8CF1917F0
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 06:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758002402; cv=none; b=UcKn9qaBXQqjXZCXSU7hQetomITtulafI25QxCZBAND+44uFSeZ+EMgGV7Coe6uCcXR4OPYAZpBpMxctQsNsIQMed3FKPcAI01mbGorJgNsImnyhGaGABem3C2pZD7AW+DZXcVbiJDtFURQX5aHCdQLTYTuw9YYBbbIAxfxpYFw=
+	t=1758002606; cv=none; b=d+oFniq/i/JhdCSN/k1vmtQHnTgLW7ouOZAgcs9X4JYiWAsEL/3DoWZ7g8JOpEZ2rpIr9uVu6sq8sRZe9J6CBlGUxMBCGam2TihZR3a1XSr7UefNPmuAaFN52CbaMwFNiiZ5Lp4DQojHcLa4pUHPlomMssR7dquLCfL8KPreJT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758002402; c=relaxed/simple;
-	bh=ljoqVmPtyWJEQ7U7MOfPa8LsiwPv3AOqOyuXdT6fCjo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E5WluQPuY24S7kcLZ36rgTJNF+yoVNXBcmTRlAPo7bsV03Ylj5xWxihGuSRJuidc3uC5atm074InWzjphX5eqTsBvgEtJ4r60st8lb8Jjq/uxwCQPQ8+c7DkiZoq3ReBpWQV7WNtpEHtEHhoOkRBTnsNnZETXAids0qzD7c3A4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pQ+7WkfH; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b7a40c7fc2so21983241cf.2
-        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 23:00:00 -0700 (PDT)
+	s=arc-20240116; t=1758002606; c=relaxed/simple;
+	bh=yLz9txVwcnZbWd4ywhxn8K7GFJpnpjcbZ8DpqsNG4Sw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ZhGJKns8H7XnOZ/U33dw7fLJL0OOvYRGenpNCTjtEDOAjMggYJ4qHLwj7kBhOcWUciFoNoVfLo25iTsTpwMhBWZiCSZkiBoUIaQ5qtHJg2MidAfZo8VgLZ0hzSzg70J6pkd6eoay/LM5pa1OoJY0KxhkHicsfKTtedxeS7+o86E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AltbzPJK; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-263b1cf4d99so16033015ad.0
+        for <netdev@vger.kernel.org>; Mon, 15 Sep 2025 23:03:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758002399; x=1758607199; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lta4t//ehvgO4Xrq14DW07TQW6qacrgDSlXFltVJrFs=;
-        b=pQ+7WkfHnrnmjk+ynBnKk8NgPibZRbd/Ty+ISgab+vCnICbtm2boSaurEviAWosMp4
-         6VixIxiR7JUOiqg3zhM7GrilKpmYAEIMCKymbb6K01yzJ5UoiJfZecyO+ZmyKQkIDLF7
-         VUegAJuH8ZxyLDjAirsmdAWe42Olleh/g/ytsG+i+hngqPHzIx0zBvB9RAVP6U6BN7U3
-         WDTZnPKpO1xorXqnMJIfBqDgql07fuWXea0rKV/esyEYx1BfANGNfSJxVDHHDeG38f4A
-         LgmdPy31It1gwkdduimlHq8heb+Fn4YTskRhiu34mKr8e/4LIUPgmDHU7hrhf08bHvMh
-         Eg2w==
+        d=linaro.org; s=google; t=1758002604; x=1758607404; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rOJIcs5drTzBTEY0tV1pMT9TX9JsWUffwaHGsiB/nGA=;
+        b=AltbzPJKCoEREjS+s073KHZbO8NHhSxyNWNEKBQI4YZdtUm3a4UluaDNDwZSvOjwnZ
+         RnNcd5WQDcGn8HpMSOUxMgew6PMMi1Ya0A/AvvQdNwPk2W+okh55kDBuWCSjpQAuZsNK
+         lkLcHOxmGaqBarPgODIJrcYb8scOaASeZrsml1XQisiOe16CrxuCVd8nAMhch+nP3W+d
+         OE2hjlzyvzOEzTIrY3uAU0khtOKnCq0Dwu0l5VVDJwzencH+ucNFxIfhrWUhcwpy3ToH
+         IH7vOjQKwE6YjgD/Vpp/j9pVz3ES/XZ7o1d3l6NhYKvtzX6RZ+SzM4QiMU90VeEJ0U0h
+         6Y/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758002399; x=1758607199;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lta4t//ehvgO4Xrq14DW07TQW6qacrgDSlXFltVJrFs=;
-        b=t9YP7ENxW6U+X8RiFVzfQjA5WcJuFKCJiyTPK+g0h86r/WN2aB10ThIfYOkCJ1hm3e
-         m+K1P/1oqDJ73YItuhofl8vrUNjpwqYPgA0DwlFHY5Dd7G7G74HZ3q19EVVEVBg5uPFO
-         kqO93UFuxPnQpqRZZY76eeVob3KVWCSpCJr5RhnMl1X4lFAYJAFqa6YJ16nWHM2PjnGF
-         nU3/YAOpYQl9r2ZIZLM1s12IbA7ovESTnQ3SDIZq8Kq/k8A+rOJbVMjO2L+0KqbqW+tR
-         o5FmUMLPZ33w+/+WWv11kYTEwWDro/O9PKAN7dL6Hc3UaGFGv9vWMNZH3l8UTNRPNNA4
-         3lcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9SI/1tRULfEe0zfGwgXXOnxyAvQLc84XHtQOCdRGGk3yfjFxmN3mY8uWVNIZO0MX4UW+19NA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUTd4hINyvXDioJkSsfAKKrBIeJ7Xds6Pmn/8JtaPdvvIk+Tqp
-	fUNRp73Uc+jHNFrqh2Z+Fn1MjssoooEpLd1fWF29qxv6iZk2GvamhY6/VbJqKKak6CuGOVevcbb
-	Q5OqXZZC8Pz8gIG82MlnjKOn+bed6XiRkcBS/I1oh
-X-Gm-Gg: ASbGnctVLaIkz97VKL0rOsuw2DOSlvUcW8/frV8o+Z3B7VoWpbYgu+O2eixAZdh1PZP
-	Vey6B/5StWVCjh5+zvUdDX5uLR4Z5wHGGkwVY3UWMAKLGSeNZQKyn/waeN/n9o/AIsH1X3XBeqv
-	N2vU1ZPVY1+LtTtfaMps1Xese+oOGRvSkthAHv8hxqem9PdnNRC96wawBkMHZBchhOkaZiQW0P8
-	eCrTAPu6YL30g==
-X-Google-Smtp-Source: AGHT+IEALiIbiBGWbxH9zWJXsRjXiSuplBD4Cego9ysHIAowKr6mniZNtJZI7xpMyEDd86lmD5lNHrIjCoYW2RYaFBs=
-X-Received: by 2002:ac8:5882:0:b0:4b6:33e6:bc04 with SMTP id
- d75a77b69052e-4b77d05a075mr161544331cf.60.1758002399132; Mon, 15 Sep 2025
- 22:59:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758002604; x=1758607404;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rOJIcs5drTzBTEY0tV1pMT9TX9JsWUffwaHGsiB/nGA=;
+        b=tcAX3rZoSm7Xee3aMUxcyUJbGXqSblbQK+uHy2/NOpot6/aY1QZX06wiJamxsBUeDz
+         TiST0nQDrZdTFDh8+7BKAmpRLPQh/4B/q1s5lyJgj/z33WYIXS0mxB00DAgxtBqXE6IL
+         3Jb+XUh/RM8pDl/ifNm9tzJehNhlvQXpjXE7FkfXnfMnysJh5oFFrS9EvK/DoX9Jwb/u
+         CHzBeBuAG9unM0q+eZnfxJuoOY3EqErgoII/lrs8YIWle0VVno0UGhvT0REk3EYWaHml
+         E+8jG7RBqALVQodXLXmqG1QDwDhViZ0xyEom3LuPbzwQCeIxHu0aTRid8A07m6innWl/
+         fb6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX0hL5ZWwgT+zm/1bF0fdLbsZAMB5ylTWsCAUOyDUjvEtXmWSpEe5rG4XmQSJmOXeSrQmWkMys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSd9D6V6Xc1N1ok40rklq+z9mhVILmVCs3FwRz7rMNldmz9aru
+	z+frE7dvvahkGlrfUydXnVpL2icN3hWPjrPdPHXSTpHVxYXq8y1HeE7bdwT/+Ovn3Go8iIRHtXb
+	eBwVnBVxO5GXCNtJ2N8omzWfeLp0evfNAMCrGtXrJpQ==
+X-Gm-Gg: ASbGnct9N37UxSX68PeGo9D0FAS+tGq1sIyXzaj8yejO+aROXR5uhT8e81bloW8qqez
+	a6dInhT0NkRvEMNe+H9FpWGs8ba0r5E4cU4JJteEcqYjClzmtrVRwejKrGGOlXB3A3D00PLZXc+
+	Or6SrOCfOlEO9tCqJNSQYSkyyWY+aGTE47WF9Ge9UXTyFYOCusJ4EFW2g8OQfhC50jV+sVdd6qd
+	9jsTKyTfdp7x6Lym+bCRqg6flCTDwPmqVTtPj5jTPpErn3L2zyrH1JC5CL86tDrT9zeuC2p
+X-Google-Smtp-Source: AGHT+IFV325JIbcAfi1+4GJFDPX/Lf6OkNWpQhdHX1kwwf8lrDz1Wr7tESi3mLj2u4jharlYlnA+pRIIqSG0XyZXHl0=
+X-Received: by 2002:a17:902:d2cd:b0:267:44e6:11d6 with SMTP id
+ d9443c01a7336-267d1540ec7mr19417725ad.6.1758002603798; Mon, 15 Sep 2025
+ 23:03:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916034841.2317171-1-jbaron@akamai.com>
-In-Reply-To: <20250916034841.2317171-1-jbaron@akamai.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 15 Sep 2025 22:59:48 -0700
-X-Gm-Features: Ac12FXwCdwRq-w5aW00Jpqxtm57WMWsFNDi35qDcaFlfsjhusKR6MvqvNKGiyQQ
-Message-ID: <CANn89iLMd64djnN_KZi6y49zcd46Lg96uDO7YxkHaDsaJ=vdAw@mail.gmail.com>
-Subject: Re: [PATCH net] net: allow alloc_skb_with_frags() to use MAX_SKB_FRAGS
-To: Jason Baron <jbaron@akamai.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 16 Sep 2025 11:33:12 +0530
+X-Gm-Features: AS18NWCGBnaNFEvWs2ru3e2aqzs-uznr7CWnwt9WJqflYhg3DElbi0V21AVd2FA
+Message-ID: <CA+G9fYvH8d6pJRbHpOCMZFjgDCff3zcL_AsXL-nf5eB2smS8SA@mail.gmail.com>
+Subject: next-20250915: powerpc: ERROR: modpost: "libie_fwlog_init"
+ [drivers/net/ethernet/intel/ixgbe/ixgbe.ko] undefined!
+To: open list <linux-kernel@vger.kernel.org>, Netdev <netdev@vger.kernel.org>, 
+	intel-wired-lan@lists.osuosl.org, lkft-triage@lists.linaro.org, 
+	Linux Regressions <regressions@lists.linux.dev>
+Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Alok Tiwari <alok.a.tiwari@oracle.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, 
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Qiang Liu <liuqiang@kylinos.cn>, 
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 15, 2025 at 8:49=E2=80=AFPM Jason Baron <jbaron@akamai.com> wro=
-te:
->
-> Currently, alloc_skb_with_frags() will only fill (MAX_SKB_FRAGS - 1)
-> slots. I think it should use all MAX_SKB_FRAGS slots, as callers of
-> alloc_skb_with_frags() will size their allocation of frags based
-> on MAX_SKB_FRAGS.
+The following build warnings / errors are noticed on the powerpc
+with ppc6xx_defconfig build on the Linux next-20250915 tag.
 
-Hi Jason
+First seen on next-20250915
+Good: next-20250912
+Bad: next-20250915
 
-Interesting !
+Regression Analysis:
+- New regression? yes
+- Reproducibility? yes
 
-Could you give some details here, have you found this for af_unix users ?
+* powerpc, build
+  - gcc-13-ppc6xx_defconfig
+  - gcc-8-ppc6xx_defconfig
 
-They would still fail if no high order pages are available, for
-allocations bigger than 64K ?
+Build regression: next-20250915: powerpc: ERROR: modpost:
+"libie_fwlog_init" [drivers/net/ethernet/intel/ixgbe/ixgbe.ko]
+undefined!
 
->
-> Signed-off-by: Jason Baron <jbaron@akamai.com>
-> ---
->  net/core/skbuff.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 23b776cd9879..df942aca0617 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -6669,7 +6669,7 @@ struct sk_buff *alloc_skb_with_frags(unsigned long =
-header_len,
->                 return NULL;
->
->         while (data_len) {
-> -               if (nr_frags =3D=3D MAX_SKB_FRAGS - 1)
-> +               if (nr_frags =3D=3D MAX_SKB_FRAGS)
->                         goto failure;
->                 while (order && PAGE_ALIGN(data_len) < (PAGE_SIZE << orde=
-r))
->                         order--;
-> --
-> 2.25.1
->
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-We require a Fixes: tag for patches targeting net tree.
+## Build log
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/swim3.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in
+drivers/net/ethernet/freescale/fec_mpc52xx_phy.o
+ERROR: modpost: "libie_fwlog_init"
+[drivers/net/ethernet/intel/ixgbe/ixgbe.ko] undefined!
+ERROR: modpost: "libie_get_fwlog_data"
+[drivers/net/ethernet/intel/ixgbe/ixgbe.ko] undefined!
+ERROR: modpost: "libie_fwlog_deinit"
+[drivers/net/ethernet/intel/ixgbe/ixgbe.ko] undefined!
+make[3]: *** [scripts/Makefile.modpost:147: Module.symvers] Error 1
 
-I suspect this would be
+## Source
+* Kernel version: 6.17.0-rc6
+* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
+* Git describe: 6.17.0-rc6-next-20250915
+* Git commit: c3067c2c38316c3ef013636c93daa285ee6aaa2e
+* Architectures: powerpc
+* Toolchains: gcc-13 and gcc-8
+* Kconfigs: ppc6xx_defconfig
 
-Fixes: 09c2c90705bb ("net: allow alloc_skb_with_frags() to allocate
-bigger packets")
+## Build
+* Build log: https://qa-reports.linaro.org/api/testruns/29894450/log_file/
+* Build details:
+https://regressions.linaro.org/lkft/linux-next-master/next-20250915/build/gcc-13-ppc6xx_defconfig/
+* Build plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/builds/32l4NthnSk7ehgpfv9NJaE6gjqk
+* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4NthnSk7ehgpfv9NJaE6gjqk/
+* Kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4NthnSk7ehgpfv9NJaE6gjqk/config
 
-Thank you.
+--
+Linaro LKFT
 
