@@ -1,166 +1,132 @@
-Return-Path: <netdev+bounces-223537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43932B596F1
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:05:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A63DB59702
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 15:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BB3B18855A7
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:05:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95ED217C31D
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 13:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64EA3101BF;
-	Tue, 16 Sep 2025 13:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="m8uZ4vnQ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="oPCGfQyg";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="m8uZ4vnQ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="oPCGfQyg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701593128C7;
+	Tue, 16 Sep 2025 13:08:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF972F6592
-	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 13:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B98030BF62;
+	Tue, 16 Sep 2025 13:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758027918; cv=none; b=KBKBTeOO6UzfV+aSMJWM1aFttew5CkSStzGJmjS5yf6eoBvsLh8HiX77CmjtpMJbYIhrWfnnyE/HolYvpX+aGmlXVjK5qy5Su1p7TNM44oj00jnXCi+B9m9FULINVFg0B4XhBRgsQcbFlWNwo6AfV3yRHDeK7yDAgzD3rrSysso=
+	t=1758028135; cv=none; b=l77ZCBz3YkEit3IwN4pQzPhIVWU3qBr65xTDrizLLdJapRcCReoyA2fgGlgQ7BmkTUKZIDtvRtiWXq1mwJen2MxUXeIEisyKq/4XVJ5n3wVVfMRjmzyndMTgI12hVwpXJ+ZlGY7Fr9GrIixWYO0zpPnSuJpxccS/7DCh22fdQS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758027918; c=relaxed/simple;
-	bh=r5/fVGUqR5HFq3vZ6jzZGnPxFTJWkyAAbjkTFFzkg/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=srWqXyEJAIadUYi61J+RWtrCFXFnsUI2gbn+sG4uqLqig2VPIfNFcZqK6ZaNw0evKty+fk/kypN3eH9Lsnyo2olBsDTXNKPLnqrR5hMU0AjLE9dW/mnB2EIj5dGHMXp5oWMcTrwznN4YyTqeFvrRZX+4L0PapWBSNDGm7k9HOpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=m8uZ4vnQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=oPCGfQyg; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=m8uZ4vnQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=oPCGfQyg; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 35D5A2285F;
-	Tue, 16 Sep 2025 13:05:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758027915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9A36b/S0SgJ3ZG9RQ8biclrjxz+wbguqohO1hbWIE+g=;
-	b=m8uZ4vnQE1zjwjbdlDny+v1H3oz4YmrTFGp6HpHPSf5CboZShTGyHPnPBUpCB5jSggp9Oi
-	//XJLJe2XQvYRxXajkl0SrUSDnPxZUmkpg3CopZ2VIf/xIlmWJZtG/mTxCwViYi45O984C
-	SH2n4gq1xeUD6nckgNH910cUkIEUChY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758027915;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9A36b/S0SgJ3ZG9RQ8biclrjxz+wbguqohO1hbWIE+g=;
-	b=oPCGfQyghRK4oZdMQzenU12tiuFL6w91f1jKeOpG7gchJFVCaG+gA0g0qW7Xciy5GETPVP
-	gEnzfcVHGzB7qxDw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758027915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9A36b/S0SgJ3ZG9RQ8biclrjxz+wbguqohO1hbWIE+g=;
-	b=m8uZ4vnQE1zjwjbdlDny+v1H3oz4YmrTFGp6HpHPSf5CboZShTGyHPnPBUpCB5jSggp9Oi
-	//XJLJe2XQvYRxXajkl0SrUSDnPxZUmkpg3CopZ2VIf/xIlmWJZtG/mTxCwViYi45O984C
-	SH2n4gq1xeUD6nckgNH910cUkIEUChY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758027915;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9A36b/S0SgJ3ZG9RQ8biclrjxz+wbguqohO1hbWIE+g=;
-	b=oPCGfQyghRK4oZdMQzenU12tiuFL6w91f1jKeOpG7gchJFVCaG+gA0g0qW7Xciy5GETPVP
-	gEnzfcVHGzB7qxDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1CFDA139CB;
-	Tue, 16 Sep 2025 13:05:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id biARB4tgyWgLCgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 16 Sep 2025 13:05:15 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 9D3CFA0A83; Tue, 16 Sep 2025 15:05:14 +0200 (CEST)
-Date: Tue, 16 Sep 2025 15:05:14 +0200
-From: Jan Kara <jack@suse.cz>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: syzbot <syzbot+263f159eb37a1c4c67a4@syzkaller.appspotmail.com>, 
-	akpm@linux-foundation.org, chaitanyas.prakash@arm.com, davem@davemloft.net, 
-	david@redhat.com, edumazet@google.com, hdanton@sina.com, horms@kernel.org, 
-	jack@suse.cz, kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
-	linux-sound@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, perex@perex.cz, 
-	syzkaller-bugs@googlegroups.com, tiwai@suse.com, willemb@google.com
-Subject: Re: [syzbot] [sound?] kernel BUG in filemap_fault (2)
-Message-ID: <lqzgi7abe2onda3faavn5ays6gdw4syiu32hmrfaibrh6cmozs@pjf3llvnnefk>
-References: <68c69e17.050a0220.3c6139.04e1.GAE@google.com>
- <80840307-942d-4e7b-849d-2ca9bb4bbefa@arm.com>
+	s=arc-20240116; t=1758028135; c=relaxed/simple;
+	bh=qDj+abcioeDYHEL9GUvWc+GSz1TXk8QkygcWuJ07fKk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aRB8QwQiiloEYS0StXFSWIdwo2LVJXHcc0iw9hYI976VXgKdr9iIJ6pixr4wz2tnxsUQs2WGThRDP2yeyumr5/wm/zyuV+bCuzSxbctNjYXefNiHIcWkQVipUMLrbwfkVUDAQehrcTsMTWGlocZT+cS/XLMXsHKXb0/pVV1tBu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from zju.edu.cn (unknown [106.117.98.100])
+	by mtasvr (Coremail) with SMTP id _____wCnrwNIYclol4g+Ag--.3882S3;
+	Tue, 16 Sep 2025 21:08:25 +0800 (CST)
+Received: from ubuntu.localdomain (unknown [106.117.98.100])
+	by mail-app3 (Coremail) with SMTP id zS_KCgC3uGtEYcloScWmAg--.111S2;
+	Tue, 16 Sep 2025 21:08:23 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH v2 net] cnic: Fix use-after-free bugs in cnic_delete_task
+Date: Tue, 16 Sep 2025 21:08:18 +0800
+Message-Id: <20250916130818.13617-1-duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80840307-942d-4e7b-849d-2ca9bb4bbefa@arm.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[263f159eb37a1c4c67a4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[sina.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,linux-foundation.org,arm.com,davemloft.net,redhat.com,google.com,sina.com,kernel.org,suse.cz,vger.kernel.org,perex.cz,googlegroups.com,suse.com];
-	RCVD_COUNT_THREE(0.00)[3];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,arm.com:email,suse.com:email];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zS_KCgC3uGtEYcloScWmAg--.111S2
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwYLAWjIa-sOEQBVs1
+X-CM-DELIVERINFO: =?B?H8mvOgXKKxbFmtjJiESix3B1w3uoVhYI+vyen2ZzBEkOnu5chDpkB+ZdGnv/zQ0PbP
+	CR14TypnDR0EenxcC6lfWFMIVY2RKNCZIKtuJneKdZ8TxEXvvd4crKYD9Q0FFzVH8d5luh
+	i0RlUb/Ldsdi21hmwFT6O6Zg8/4WlLuTPc36JYD3j8WAKTIGYr108AJ9d6PROQ==
+X-Coremail-Antispam: 1Uk129KBj93XoW7Zr1xWr4xJr4DWw45JFWftFc_yoW8Kry5p3
+	y5Ga4UXa97Jr13tanrXr48WFn8Cayvya47Gr4fJws5Z34rtF15tryrKFWfua4vyrWkZF1x
+	Zrs8Za9xZF90kFcCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvmb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
+	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAF
+	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0Y48IcxkI7V
+	AKI48G6xCjnVAKz4kxMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I
+	3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxV
+	WUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8I
+	cVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aV
+	AFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZE
+	Xa7IU801v3UUUUU==
 
-On Tue 16-09-25 13:50:08, Ryan Roberts wrote:
-> On 14/09/2025 11:51, syzbot wrote:
-> > syzbot suspects this issue was fixed by commit:
-> > 
-> > commit bdb86f6b87633cc020f8225ae09d336da7826724
-> > Author: Ryan Roberts <ryan.roberts@arm.com>
-> > Date:   Mon Jun 9 09:27:23 2025 +0000
-> > 
-> >     mm/readahead: honour new_order in page_cache_ra_order()
-> 
-> I'm not sure what original bug you are claiming this is fixing? Perhaps this?
-> 
-> https://lore.kernel.org/linux-mm/6852b77e.a70a0220.79d0a.0214.GAE@google.com/
+The original code uses cancel_delayed_work() in cnic_cm_stop_bnx2x_hw(),
+which does not guarantee that the delayed work item 'delete_task' has
+fully completed if it was already running. Additionally, the delayed work
+item is cyclic, the flush_workqueue() in cnic_cm_stop_bnx2x_hw() only
+blocks and waits for work items that were already queued to the
+workqueue prior to its invocation. Any work items submitted after
+flush_workqueue() is called are not included in the set of tasks that the
+flush operation awaits. This means that after the cyclic work items have
+finished executing, a delayed work item may still exist in the workqueue.
+This leads to use-after-free scenarios where the cnic_dev is deallocated
+by cnic_free_dev(), while delete_task remains active and attempt to
+dereference cnic_dev in cnic_delete_task().
 
-I think it was:
+A typical race condition is illustrated below:
 
-https://lore.kernel.org/all/684ffc59.a00a0220.279073.0037.GAE@google.com/
+CPU 0 (cleanup)              | CPU 1 (delayed work callback)
+cnic_netdev_event()          |
+  cnic_stop_hw()             | cnic_delete_task()
+    cnic_cm_stop_bnx2x_hw()  | ...
+      cancel_delayed_work()  | /* the queue_delayed_work()
+      flush_workqueue()      |    executes after flush_workqueue()*/
+                             | queue_delayed_work()
+  cnic_free_dev(dev)//free   | cnic_delete_task() //new instance
+                             |   dev = cp->dev; //use
 
-at least that's what the syzbot email replies to... And it doesn't make a
-lot of sense but it isn't totally off either. So I'd just let the syzbot
-bug autoclose after some timeout.
+Replace cancel_delayed_work() with cancel_delayed_work_sync() to ensure
+that the cyclic delayed work item is properly canceled and any executing
+delayed work has finished before the cnic_dev is deallocated.
 
-								Honza
+Fixes: fdf24086f475 ("cnic: Defer iscsi connection cleanup")
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+---
+Changes in v2:
+  - Make commit messages more clearer.
+
+ drivers/net/ethernet/broadcom/cnic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/broadcom/cnic.c b/drivers/net/ethernet/broadcom/cnic.c
+index a9040c42d2ff..73dd7c25d89e 100644
+--- a/drivers/net/ethernet/broadcom/cnic.c
++++ b/drivers/net/ethernet/broadcom/cnic.c
+@@ -4230,7 +4230,7 @@ static void cnic_cm_stop_bnx2x_hw(struct cnic_dev *dev)
+ 
+ 	cnic_bnx2x_delete_wait(dev, 0);
+ 
+-	cancel_delayed_work(&cp->delete_task);
++	cancel_delayed_work_sync(&cp->delete_task);
+ 	flush_workqueue(cnic_wq);
+ 
+ 	if (atomic_read(&cp->iscsi_conn) != 0)
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.34.1
+
 
