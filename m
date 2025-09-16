@@ -1,190 +1,115 @@
-Return-Path: <netdev+bounces-223703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50F3DB5A155
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:22:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3FD8B5A180
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 21:34:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF57316A824
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:21:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51AD7485EAE
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 19:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D22F2F5A29;
-	Tue, 16 Sep 2025 19:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E642DA74C;
+	Tue, 16 Sep 2025 19:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wkjh3SWJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A561FBEA2;
-	Tue, 16 Sep 2025 19:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9223127F006;
+	Tue, 16 Sep 2025 19:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758050492; cv=none; b=WsvAGpLrVMWaVX9ill/wHab4Y6fsPaNjkrNftVaNr6VDuDQh26sVRHYxIbJ/UAWV5NgcsjULW+jXthd+rgiQDY32uBKculfmgPV3gWnYqbjBxAyNFd4SsdrPRork6KN9uDyk4nWGee0yJQZlbq6NGKT0D/VOiaVcvF7THwiWzn4=
+	t=1758051261; cv=none; b=aEedoyqsJFLJup53LJj7UbXPIFu4XmqqSN2vCCQv69aXoJANz/KdeFGpW40IH+EZVz7yac9itsyAiteFnnWYbqU2JF5yHUhAuLl0ADJiIA/eefkFDSK3nLDpJEGk87F+LBw+vH64PKvT9mBpcoTWBH+kqp6fSnUtsKuB/XAKoAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758050492; c=relaxed/simple;
-	bh=VVgIyIvhFIRGLe9aaJKQZNnY2mT71sn0CpTCBtep7UY=;
+	s=arc-20240116; t=1758051261; c=relaxed/simple;
+	bh=btjlquJZgN4cfS3dp6NZPpiz13/EggiO0pSdV9kExQg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dpZ+gsRSnSajLP1ZBD0Y0Xn8LWEv8+QoId1MCwHldiIU16IHCZ+q3TMre9CBS0of/wwpy+qxV8k6z0DZyFznWQBt32Wt3D6tgNsKkWqv9iiFTsFYvUAYX7Xm5txd30rk2VJA5zEx0Hgvz0FcKg03cbHqTh6m30R5amNSaYdh/us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.98.2)
-	(envelope-from <joerg@jo-so.de>)
-	id 1uybEV-00000001VFD-2hyk;
-	Tue, 16 Sep 2025 21:20:55 +0200
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98.2)
-	(envelope-from <joerg@jo-so.de>)
-	id 1uybEU-000000028Ed-48e9;
-	Tue, 16 Sep 2025 21:20:54 +0200
-Date: Tue, 16 Sep 2025 21:20:54 +0200
-From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, 
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au, danishanwar@ti.com, 
-	lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be, 
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com, alexanderduyck@fb.com, 
-	richardcochran@gmail.com, kees@kernel.org, gustavoars@kernel.org, rdunlap@infradead.org, 
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v12 2/5] net: rnpgbe: Add n500/n210 chip support
- with BAR2 mapping
-Message-ID: <qbvrpeywjv6jvngkdtfcducex4jpsgqktfqs6ar2plc5bcgt5o@7bsfau64w3om>
-OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
- preference=signencrypt
+	 Content-Type:Content-Disposition:In-Reply-To; b=LTVoB9vebuvfseBf5eVUiqxiQREa12qB7eB2s3xLDqHuOTRTGNATBhvnPsUIBavHxDVjgoJ0RoAVF+6TWDmYI2MagtRPXAEzf3nZrxqrUIqnZU1HtKZoZfj67clIJrMqZtU/BF5p9RKkxDY9XZn1hO94PeM9qVtUlZ2hxq5AGpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wkjh3SWJ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DirpkGByuFZfnnqnuYZc8fUxpUvQJF3y+mZitXGzjPU=; b=wkjh3SWJtut/oefauPN+WQTgpL
+	fwRI5OHhy7A2arc4MRTDdvSjCDuTx1m3EDlvtahIWysgdVB06IIb3u4pJlqYApEp3wd7zwxH1uOKN
+	qiEO/54r8kw+rAkA03grxvlaiBf8xpfDRARPuO7Z6qXkz+qLL143nvG9x4NrNyp2bUgc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uybQm-008bS6-3R; Tue, 16 Sep 2025 21:33:36 +0200
+Date: Tue, 16 Sep 2025 21:33:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
+Cc: Dong Yibo <dong100@mucse.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, rdunlap@infradead.org,
+	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v12 3/5] net: rnpgbe: Add basic mbx ops support
+Message-ID: <5a942120-fe95-4d6a-a2cf-ef832f65343e@lunn.ch>
 References: <20250916112952.26032-1-dong100@mucse.com>
- <20250916112952.26032-3-dong100@mucse.com>
+ <20250916112952.26032-4-dong100@mucse.com>
+ <7d4olrtuyagvcma5sspca6urmkjotkjtthbbekkeqltnd6mgq6@pn4smgsdaf4c>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="knfqrve42bbn7g3c"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250916112952.26032-3-dong100@mucse.com>
+In-Reply-To: <7d4olrtuyagvcma5sspca6urmkjotkjtthbbekkeqltnd6mgq6@pn4smgsdaf4c>
 
+> > +	if (fw_req != 0 && fw_req != hw->mbx.fw_req) {
+> > +		hw->mbx.stats.reqs++;
+> > +		return 0;
+> > +	}
+> > +
+> > +	return -EIO;
+> 
+> Only a suggestion: Might it be clearer to flip the cases and handle the if
+> as error case and continue with the success case?
+> 
+> if (fw_req == 0 || fw_req == hw->mbx.fw_req)
+> 	return -EIO;
+> 
+> hw->mbx.stats.reqs++;
+> return 0;
 
---knfqrve42bbn7g3c
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v12 2/5] net: rnpgbe: Add n500/n210 chip support
- with BAR2 mapping
-MIME-Version: 1.0
+That would by the usual pattern in the kernel. It is good to follow
+usual patterns.
 
-Dong Yibo schrieb am Di 16. Sep, 19:29 (+0800):
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/ne=
-t/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> index 60bbc806f17b..0afe39621661 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-> @@ -2,8 +2,11 @@
->  /* Copyright(c) 2020 - 2025 Mucse Corporation. */
-> =20
->  #include <linux/pci.h>
-> +#include <net/rtnetlink.h>
-> +#include <linux/etherdevice.h>
-> =20
->  #include "rnpgbe.h"
-> +#include "rnpgbe_hw.h"
-> =20
->  static const char rnpgbe_driver_name[] =3D "rnpgbe";
-> =20
-> @@ -25,6 +28,54 @@ static struct pci_device_id rnpgbe_pci_tbl[] =3D {
->  	{0, },
->  };
-> =20
-> +/**
-> + * rnpgbe_add_adapter - Add netdev for this pci_dev
-> + * @pdev: PCI device information structure
-> + * @board_type: board type
-> + *
-> + * rnpgbe_add_adapter initializes a netdev for this pci_dev
-> + * structure. Initializes Bar map, private structure, and a
-> + * hardware reset occur.
-> + *
-> + * Return: 0 on success, negative errno on failure
-> + **/
-> +static int rnpgbe_add_adapter(struct pci_dev *pdev,
-> +			      int board_type)
-> +{
-> +	struct net_device *netdev;
-> +	void __iomem *hw_addr;
-> +	struct mucse *mucse;
-> +	struct mucse_hw *hw;
-> +	int err;
-> +
-> +	netdev =3D alloc_etherdev_mq(sizeof(struct mucse), RNPGBE_MAX_QUEUES);
-> +	if (!netdev)
-> +		return -ENOMEM;
-> +
-> +	SET_NETDEV_DEV(netdev, &pdev->dev);
-> +	mucse =3D netdev_priv(netdev);
-> +	mucse->netdev =3D netdev;
-> +	mucse->pdev =3D pdev;
-> +	pci_set_drvdata(pdev, mucse);
-> +
-> +	hw =3D &mucse->hw;
-> +	hw_addr =3D devm_ioremap(&pdev->dev,
-> +			       pci_resource_start(pdev, 2),
-> +			       pci_resource_len(pdev, 2));
-> +	if (!hw_addr) {
-> +		err =3D -EIO;
-> +		goto err_free_net;
-> +	}
-> +
-> +	hw->hw_addr =3D hw_addr;
-> +
-> +	return 0;
-> +
-> +err_free_net:
-> +	free_netdev(netdev);
-> +	return err;
-> +}
-> +
->  /**
->   * rnpgbe_probe - Device initialization routine
->   * @pdev: PCI device information struct
-> @@ -37,6 +88,7 @@ static struct pci_device_id rnpgbe_pci_tbl[] =3D {
->   **/
->  static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id=
- *id)
->  {
-> +	int board_type =3D id->driver_data;
->  	int err;
-> =20
->  	err =3D pci_enable_device_mem(pdev);
-> @@ -63,6 +115,9 @@ static int rnpgbe_probe(struct pci_dev *pdev, const st=
-ruct pci_device_id *id)
->  		dev_err(&pdev->dev, "pci_save_state failed %d\n", err);
->  		goto err_free_regions;
->  	}
-> +	err =3D rnpgbe_add_adapter(pdev, board_type);
+> > +static void mucse_mbx_inc_pf_req(struct mucse_hw *hw)
+> > +{
+> > +	struct mucse_mbx_info *mbx = &hw->mbx;
+> > +	u16 req;
+> > +	u32 val;
+> > +
+> > +	val = mbx_data_rd32(mbx, MUCSE_MBX_PF2FW_CNT);
+> > +	req = FIELD_GET(GENMASK_U32(15, 0), val);
+> 
+> Why not assign the values in the declaration like done with mbx?
 
-Would an empty line before this assignment make the code more readable?
+Reverse Christmas tree.
 
+	struct mucse_mbx_info *mbx = &hw->mbx;
+	u32 val = mbx_data_rd32(mbx, MUCSE_MBX_PF2FW_CNT);
+	u16 req = FIELD_GET(GENMASK_U32(15, 0), val);
 
+This is not reverse christmas tree. Sometimes you need to put
+assignments into the body of the function.
 
---=20
-Professor: =E2=80=9AGott=E2=80=98, unverst=C3=A4ndliches und mythisches Wes=
-en, das sich einmal
-  pro Woche im Kreis der Sterblichen manifestiert um Weisheit auf Folien
-  unter das Volk zu bringen.		(Dschungelbuch=C2=A011, FSU=C2=A0Jena)
-
---knfqrve42bbn7g3c
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCaMm4kwAKCRB9LJoj0a6j
-dcomAPwK0FbLAeUxOE6JiQpjcigplrvqMi5jCaJJvPAK7Fxo2QD/SnaCTg1bNL5B
-nDsd8Xyg2CtKj9MluTtobPMagELo2nw=
-=fT2B
------END PGP SIGNATURE-----
-
---knfqrve42bbn7g3c--
+	Andrew
 
