@@ -1,207 +1,198 @@
-Return-Path: <netdev+bounces-223758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACDD6B7DF91
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:39:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD2FB7D8BB
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:30:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CED37AAF96
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:18:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C73FD52739A
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 22:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA7429B8FE;
-	Tue, 16 Sep 2025 22:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EF12E03EF;
+	Tue, 16 Sep 2025 22:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PbGhk40v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qj0CYl71"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D443228C869;
-	Tue, 16 Sep 2025 22:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D912E2DF2
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 22:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758061197; cv=none; b=LRBLMoLjFrJCf9rZn/9wvSf5M57BpZBQymkY5PKoUN71qClAS2BQ58a3Vwplob87Dq8bqj6ZHtck8pGZEB9qvd6OIKOHjeGRNC2iRmEVpo+aDjsipJX48uF0M7NY1ecTrj8EAMAlxThdtJr7A9h3ltIsYGhGt9Won1qFaprHlWU=
+	t=1758061283; cv=none; b=hXNQpuuKifToqtJ2JFiy6ia2k1yCfXziBnKcA+4b3gYZbVL4avyOLgEw6+B2K2JGIfz2+203PLc9jwD6TsL/Teh9F5m2dr0wgvZWPlJAhELP4xN/e5MzIQi2pkbZnX/FdA4gF0Bd6TpvCLEQJCsKA/VOMYK5BqLvnwurubKlzpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758061197; c=relaxed/simple;
-	bh=m4JY9aGLYVoEfQTvIOCGSK9fG/1zq/kPVw6zLN783uQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MY+MJzCBVG7m73E74aNoVf+V9ZJFvjiCEQMsXlKR00uoc8i6gN3YOpveDMoIpoFNbV+ZKau4E+6sIiibPOPZZOcwIpuBvOPk0iCNufwBBLfLDvMnks6+ZaazlVVv2xB90j7mX/EWvRxXZD+eeBlEwwA5/oGXWpThCh5PIirzSsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PbGhk40v; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6jJa1yb6mq/yCOx6rK0pnWqPtQg/Mqf+5GEFWxFsvHU=; b=PbGhk40vPRpR4Y38Yd5CXsgOaC
-	Ingfdvy+FZckMkZJRlESAaVZaRGIrREu/7sMA+TyDBh15nM2L34u/cbtJRtrKsDDSNIjquIkoxpUv
-	MAwpW5lTHDf4HwH70NGP/CObiaadLjKXVCKlgQ36ZJR3XLnaRBV9uXGndZAr/fGHV+OqeXPr0RAnf
-	XhQq1qeZDvgBh0Q/Dkq1ksASa5fjifQx1XexIUz2emDWMhUD6wx0jTKFjzyKjER/HJXCbJHZWVRcL
-	b53hkOrayZEQZ1nRdIvtToxDitAkeJKZPwaZRcJYtKYUQ4DgEKsKgFS2p4V4uI8rd1S91uudMm97j
-	uPvbti9A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33612)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uye1d-000000006Wl-3upM;
-	Tue, 16 Sep 2025 23:19:50 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uye1b-0000000082K-1ZIi;
-	Tue, 16 Sep 2025 23:19:47 +0100
-Date: Tue, 16 Sep 2025 23:19:47 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: andrew@lunn.ch, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: qcom: qca808x: Add .get_rate_matching
- support
-Message-ID: <aMnigwTeMQc0GxaD@shell.armlinux.org.uk>
-References: <20250914-qca808x_rate_match-v1-1-0f9e6a331c3b@oss.qualcomm.com>
- <aMcFHGa1zNFyFUeh@shell.armlinux.org.uk>
- <aMfUiBe9gdEAuySZ@oss.qualcomm.com>
- <aMgCA13MhTnG80_V@shell.armlinux.org.uk>
- <aMgootkPQ/GcdiXX@oss.qualcomm.com>
- <aMgsiDS5tFeqJsKD@shell.armlinux.org.uk>
+	s=arc-20240116; t=1758061283; c=relaxed/simple;
+	bh=+iD5+4+0qV0RZp5lNqZac3Yap4texCIIDj49z8ZUf5s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Sq6rs+Aix04wW4/+XScOFFuA1djbIvkR7LYx4U6jWPx6MDJACtOz5szIOzSJMxCa98F1jnmwEoOfZ7LqBiZGeeKxFaGWQgVcP3SlJQx/frx0lkSpzB64VdnNwplrDEqqVjQjqq6eb5bCc98hd7Nn9XeRtml/pMC0bldJrflYodg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qj0CYl71; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-560885b40e2so3430e87.0
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 15:21:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758061280; x=1758666080; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wVdLglpxhRso4AWsi+Qr5Xu9puyLriieQDhQNzvchd4=;
+        b=Qj0CYl71jGdasQHS+GlwO5f5zmsVK3M5GSdmhUqZLvLz1nXUWvhGagf/VfEi+rj4by
+         lKEYBeC4c1ypnhW3P3tLHdrpc1JL+RfFTDp0zRB76BJ5L0kAAM1Qf46AMUTMAmkpPPfG
+         18nhZf970+okuqxuIheVHtdjF5acmYiNkWmoiD6uHqS5ViDmRVgwID8fyTaK/qv0x7yX
+         8jGW+eE5q1ye9BVudOK9KRV5SzmdXfcuTZb9m6nJIUX9HcTJxG7QFmWnFFJLEmeYzHVe
+         TKwqPQaBI3Qr49lwzD4v3+UBFmrrVM/ojkDbTGyHvHd99kSDLtxHTyvUP1gFwlHu74sG
+         MBbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758061280; x=1758666080;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wVdLglpxhRso4AWsi+Qr5Xu9puyLriieQDhQNzvchd4=;
+        b=uHvFPX/ikYZqUPEEzeDptlglGLjquv/PbtTpdaVqY/ZJACwy+x2TmHMUjxbgQUIuUP
+         ucC1G/Zaxc8o+kC/Gi7EuqBgHWEGQMRCQ5AOb/2tE7gVnInMjMwdj5bIwDEvp00MnZNi
+         K+m++1eDQ+dea/VA0fomiwbiTJqy46aDXWF2ws05hg3u8U47Avtpl5qHUH71Vxdi1dvq
+         qT4ELYFCQTPevst3QNJI3jfy3BHwssZT1GtZOSxoBFTPpTHTigjebyCMbb+8EiCezXio
+         wRFVMEerB/GT4uvVcsMxF2bbJwOXqwt7RFEQmIhcy5GHcvzI7e6AgT5qtkIe5qo/mUs1
+         biTg==
+X-Forwarded-Encrypted: i=1; AJvYcCUz16AKWjiFsxnqcG2t305Jzw+vdc3JFimsGYhUVg0AtfuwRsWMzYw8hoiq37Vz04H+0S1xzRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvmR/S4Nl1ebIPr62/U7GTY7m317xeiy5BB/qWnkuoBRzD9z9n
+	4LmVH5oo9Bt2+P/f4eAYI30HTE3e0knApXoZJzqmzQrKqhO+H+uzu5dQsGVovXQJbIfFhW9qYwM
+	myL8LtDuQ/xRBTgmyirVVL8HPV53xpl3Zte2h8ult
+X-Gm-Gg: ASbGncsbcHyYtghpDOv/+R54o5PfuomhyA1+0N1ssM24N30eanSsAzPnH3pgxkPDLoc
+	WYUwAVIaVRTmEk0/c2ZBXsqFjUDGy/QyTL77Xxk0hnYT+/3VAoON1vpNJ9pRGQmPDX2ZObcjNSh
+	fQu2yuXZeDvKmOIZpRxT+AmlB8YOozT0s7mVTxt6DsSKTGA1h2jpDb5t1WIhITkwXaNWRsMeWIe
+	MpjbLAt/iBnRnvcbgT+/dOj+LQIA5deLdAMjHPRmRmkbA8zuHrDniQ=
+X-Google-Smtp-Source: AGHT+IETuMnvpwfVigTN61m6CycwMEcPdpn0JfGM8MkTwo9jHq/f412owy6e2+xnogamcc5EfMS02Pn2xCx3TgBeTYc=
+X-Received: by 2002:a05:6512:3ba6:b0:542:6b39:1d57 with SMTP id
+ 2adb3069b0e04-57778c48d17mr57515e87.3.1758061279366; Tue, 16 Sep 2025
+ 15:21:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMgsiDS5tFeqJsKD@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <aMSni79s6vCCVCFO@p100> <87zfawvt2f.fsf@toke.dk>
+ <f64372ec-c127-457f-b8e2-0f48223bd147@gmx.de> <CAHS8izMjKub2cPa9Qqiga96XQ7piq3h0Vb_p+9RzNbBXXeGQrw@mail.gmail.com>
+ <87y0qerbld.fsf@toke.dk>
+In-Reply-To: <87y0qerbld.fsf@toke.dk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 16 Sep 2025 15:21:07 -0700
+X-Gm-Features: AS18NWB-7AWKLsrqIUr07vEaC8LUK6IRwvPrOQdWgLCThpwa-rYMqW2OhB3IAn8
+Message-ID: <CAHS8izOY3aSe96aUQBV76ZRpqj5mXwkPenNvmN6yN0cJmceLUA@mail.gmail.com>
+Subject: Re: [PATCH][RESEND][RFC] Fix 32-bit boot failure due inaccurate page_pool_page_is_pp()
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Helge Deller <deller@gmx.de>, Helge Deller <deller@kernel.org>, 
+	David Hildenbrand <david@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Linux Memory Management List <linux-mm@kvack.org>, netdev@vger.kernel.org, 
+	Linux parisc List <linux-parisc@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 15, 2025 at 04:11:04PM +0100, Russell King (Oracle) wrote:
-> On Mon, Sep 15, 2025 at 08:24:26PM +0530, Mohd Ayaan Anwar wrote:
-> > On Mon, Sep 15, 2025 at 01:09:39PM +0100, Russell King (Oracle) wrote:
-> > > This shows that the PHY supports SGMII (4) and 2500base-X (23). However,
-> > > as we only validate 2500base-X, this suggests stmmac doesn't support
-> > > switching between SGMII and 2500base-X.
-> > > 
-> > > What *exactly* is the setup with stmmac here? Do you have an external
-> > > PCS to support 2500base-X, or are you using the stmmac internal PCS?
-> > 
-> > Internal PCS. But it's not really pure 2500base-X...
-> > I found an older thread for this exact MAC core [0], and it looks like
-> > we have an overclocked SGMII, i.e., 2500base-X without in-band
-> > signalling.
-> > 
-> > Just wondering if registering a `.get_interfaces` callback in
-> > `dwmac-qcom-ethqos.c` and doing something like the following will be
-> > helpful?
-> > 
-> > case PHY_INTERFACE_MODE_2500BASEX:
-> > 	__set_bit(PHY_INTERFACE_MODE_2500BASEX, interfaces);
-> > 	fallthrough;
-> > case PHY_INTERFACE_MODE_SGMII:
-> > 	__set_bit(PHY_INTERFACE_MODE_SGMII, interfaces);
-> > 	break;
-> > ...
-> > 
-> > This should ensure that both SGMII and 2500base-X are validated,
-> > allowing switching between them.
-> 
-> So, this is something that has never worked with this hardware setup.
-> I don't think we should rush to make it work. The stmmac internal
-> PCS code is a mess, bypassing phylink. I had a patch series which
-> addressed this a while back but it went nowhere, but I guess this is
-> an opportunity to say "look, we need to get this sorted properly".
-> 
-> I suspect this isn't going to be simple - stmmac does _not_ use
-> phylink properly (I've been doing lots of cleanups to this driver
-> over the last year or so to try and make the code more
-> understandable so I can start addressing this deficiency) and
-> there's still lots of work to be done. The way the "platform glue"
-> drivers work is far from ideal, especially when it comes to
-> switching interfaces.
-> 
-> I'll try to post the stmmac PCS cleanup series in the coming few
-> days, and it would be useful if you could give it whatever
-> testing you can.
+On Tue, Sep 16, 2025 at 2:27=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
+oke@redhat.com> wrote:
+>
+> Mina Almasry <almasrymina@google.com> writes:
+>
+> > On Mon, Sep 15, 2025 at 6:08=E2=80=AFAM Helge Deller <deller@gmx.de> wr=
+ote:
+> >>
+> >> On 9/15/25 13:44, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> >> > Helge Deller <deller@kernel.org> writes:
+> >> >
+> >> >> Commit ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unmap t=
+hem when
+> >> >> destroying the pool") changed PP_MAGIC_MASK from 0xFFFFFFFC to 0xc0=
+00007c on
+> >> >> 32-bit platforms.
+> >> >>
+> >> >> The function page_pool_page_is_pp() uses PP_MAGIC_MASK to identify =
+page pool
+> >> >> pages, but the remaining bits are not sufficient to unambiguously i=
+dentify
+> >> >> such pages any longer.
+> >> >
+> >> > Why not? What values end up in pp_magic that are mistaken for the
+> >> > pp_signature?
+> >>
+> >> As I wrote, PP_MAGIC_MASK changed from 0xFFFFFFFC to 0xc000007c.
+> >> And we have PP_SIGNATURE =3D=3D 0x40  (since POISON_POINTER_DELTA is z=
+ero on 32-bit platforms).
+> >> That means, that before page_pool_page_is_pp() could clearly identify =
+such pages,
+> >> as the (value & 0xFFFFFFFC) =3D=3D 0x40.
+> >> So, basically only the 0x40 value indicated a PP page.
+> >>
+> >> Now with the mask a whole bunch of pointers suddenly qualify as being =
+a pp page,
+> >> just showing a few examples:
+> >> 0x01111040
+> >> 0x082330C0
+> >> 0x03264040
+> >> 0x0ad686c0 ....
+> >>
+> >> For me it crashes immediately at bootup when memblocked pages are hand=
+ed
+> >> over to become normal pages.
+> >>
+> >
+> > I tried to take a look to double check here and AFAICT Helge is correct=
+.
+> >
+> > Before the breaking patch with PP_MAGIC_MASK=3D=3D0xFFFFFFFC, basically
+> > 0x40 is the only pointer that may be mistaken as a valid pp_magic.
+> > AFAICT each bit we 0 in the PP_MAGIC_MASK (aside from the 3 least
+> > significant bits), doubles the number of pointers that can be mistaken
+> > for pp_magic. So with 0xFFFFFFFC, only one value (0x40) can be
+> > mistaken as a valid pp_magic, with  0xc000007c AFAICT 2^22 values can
+> > be mistaken as pp_magic?
+> >
+> > I don't know that there is any bits we can take away from
+> > PP_MAGIC_MASK I think? As each bit doubles the probablity :(
+> >
+> > I would usually say we can check the 3 least significant bits to tell
+> > if pp_magic is a pointer or not, but pp_magic is unioned with
+> > page->lru I believe which will use those bits.
+>
+> So if the pointers stored in the same field can be any arbitrary value,
+> you are quite right, there is no safe value. The critical assumption in
+> the bit stuffing scheme is that the pointers stored in the field will
+> always be above PAGE_OFFSET, and that PAGE_OFFSET has one (or both) of
+> the two top-most bits set (that is what the VMSPLIT reference in the
+> comment above the PP_DMA_INDEX_SHIFT definition is alluding to).
+>
 
-... and it's been delayed because I've had to rework three of the
-patch series I recently posted.
+I see... but where does the 'PAGE_OFFSET has one (or both) of the two
+top-most bits set)' assumption come from? Is it from this code?
 
-I did get some time late last night to read through the documentation
-I have for one version of the dwmac which has optional PCS, and I'm
-coming to the conclusion that the whole mac_interface vs phy_interface
-thing is wrong in the driver.
+/*
+ * PAGE_OFFSET -- the first address of the first page of memory.
+ * When not using MMU this corresponds to the first free page in
+ * physical memory (aligned on a page boundary).
+ */
+#ifdef CONFIG_MMU
+#ifdef CONFIG_64BIT
+....
+#else
+#define PAGE_OFFSET _AC(0xc0000000, UL)
+#endif /* CONFIG_64BIT */
+#else
+#define PAGE_OFFSET ((unsigned long)phys_ram_base)
+#endif /* CONFIG_MMU */
 
-My comment update which added this a few years ago:
+It looks like with !CONFIG_MMU we use phys_ram_base and I'm unable to
+confirm that all the values of this have the first 2 bits set. I
+wonder if his setup is !CONFIG_MMU indeed.
 
-        /* MAC ----- optional PCS ----- SerDes ----- optional PHY ----- Media
-         *       ^                               ^
-         * mac_interface                   phy_interface
-         *
-         * mac_interface is the MAC-side interface, which may be the same
-         * as phy_interface if there is no intervening PCS. If there is a
-         * PCS, then mac_interface describes the interface mode between the
-         * MAC and PCS, and phy_interface describes the interface mode
-         * between the PCS and PHY.
-         */
+It also looks like pp_magic is also union'd with __folio_index in
+struct page, and it looks like the data there is sometimes used as a
+pointer and sometimes not.
 
-appears to be incorrect. It was based on just phylink knowledge and a
-reasonable guess about what was going on with this driver. It seems
-no one had any better ideas on exactly what mac_interface was trying
-to describe.
-
-Having looked at the information I now have, and referred back to the
-psat code, it appears to me that what is actually going on here is
-this:
-
-	MAC --- optional integrated PCS --- SerDes --- world (media or PHY)
-                                         ^          ^
-                                 mac_interface  phy_interface
-				        TBI      1000base-X
-
-It seems that TBI is used on the PCS output when talking to a SerDes
-for 1000BASE-X or SGMII. RTBI is used with a PHY that can talk RTBI.
-
-Considering just 2.5G and below, it seems to me that mac_interface
-can be determined from phy_interface:
-
-phy_interface		mac_interface
-SGMII			TBI
-1000BASE-X		TBI
-2500BASE-X		TBI
-RTBI			RTBI
-
-These are the "official" modes. There is also a seperate block that
-is used for SMII and RGMII which the code treats as a PCS (partly
-because it uses the same registers) so I'd throw into this:
-
-phy_interface		mac_interface
-SMII			SMII
-RGMII*			RGMII*
-
-For every other phy_interface <= 2.5G, mac_interface is basically
-not applicable, and we should be referring to phy_interface everywhere.
-
-In fact, I can't see that mac_interface actually matters for most of
-the driver. The only case I can see it matters is when the core
-supports multiple interfaces, and needs to be configured appropriately
-(which needs an entire core-wide reset if it changes.)
-
-So, I'm going to propose at the very least selecting whether the driver
-uses the PCS not based on mac_interface as the code currently does, but
-on phy_interface (actually the interface passed by phylink.) That will
-make phylink happier when stmmac is converted to phylink_pcs.
-
-This means I need to spend some time reworking my series... and yay,
-more patches to add to my already massive stack of stmmac patches. :/
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+Thanks,
+Mina
 
