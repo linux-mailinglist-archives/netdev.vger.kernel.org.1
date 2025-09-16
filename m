@@ -1,100 +1,161 @@
-Return-Path: <netdev+bounces-223684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0118DB5A0A7
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 20:37:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171D1B5A0B0
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 20:38:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22BC97AE4EC
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:35:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 131815860DC
+	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 18:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF612D839F;
-	Tue, 16 Sep 2025 18:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1F52D2383;
+	Tue, 16 Sep 2025 18:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfMXSqG/"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0SZdHot0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EE72D063E;
-	Tue, 16 Sep 2025 18:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136EA22758F
+	for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 18:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758047837; cv=none; b=IWlL2MFCGeE58GZpKlO8ezY6zaCtdEkEs5Z+dCiYmjBENa2haMbNIz1WDHA0IyPbIy+rLZ4efHIQIqMbTL3f6dw3eklSTOIs+e4X7RkurJ0K/SgK9aAYuEpEb3T3cmhB46u+PSKFAniE2BGny1ud93vtnH/Xx2Zpv7DsEePH/B4=
+	t=1758047860; cv=none; b=mKgfuuLc7KjSj71j0wjWr/4VGcOkoASZUGUs/CqsVCJeldjUmSIYrMzQr2ttNeoDI84eo86S+07mS5GX3z5KLk5qm++rojN4Oc38e+1WZEeSq+cqwvuTz05mry7jmNe9OlXsEZsdRzQSzM2QYAjLMPc2xPM0bblPtagCdxVlxpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758047837; c=relaxed/simple;
-	bh=uZNzYbnMobWY+QykZ4WTqTR72hqNvnvoYs9ygOwBweU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GKRaoU82xZhYipfpfGfvjZr6y8N4qLy61PF9Fs/e7SYNCPYwHCxIFv+Gci7PDs8Nb93byyXGqWPWEEeiwQqJOJOiQdICZONzpZEVKr2jrZUG/KKU0wL2DiDThFks+ubaK1et3Tg96a/7elawtc21ZlVz1ivOs2inKL+uPC1+8FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfMXSqG/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E135C4CEEB;
-	Tue, 16 Sep 2025 18:37:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758047836;
-	bh=uZNzYbnMobWY+QykZ4WTqTR72hqNvnvoYs9ygOwBweU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VfMXSqG/J8Ygsl2+/uZU1iHZZa3OW9+E+KPN8SZJpir7n+K8w4aiXm7xBqBfH34un
-	 d9Sqql4SQSGK9EwhWgUc0aDkpsYJOYQiz6Pq2GSnVfwdY+SVZBjoutHCLosYp0CiH1
-	 gcOeJOcKowSA4SBmMWh5iE01DEnn2aO2TQfhjHy5MUpRg9l393B8HtROeSNOXx7G3C
-	 Wlyssw55oFrb5N5s1MixBgRTutUavCoOI9MsJUOGso3HBjHZqkOlXqNIHX15ucg8Go
-	 xRj+Tkzqo/D+ogyQwh7VST52JMsEaNzN1f+QfgCZuleVNXwNsWkLeNmh1qFOOcMlb7
-	 FTmPb6kUpz7Aw==
-Date: Tue, 16 Sep 2025 08:37:15 -1000
-From: Tejun Heo <tj@kernel.org>
-To: pengdonglin <dolinux.peng@gmail.com>
-Cc: tony.luck@intel.com, jani.nikula@linux.intel.com, ap420073@gmail.com,
-	jv@jvosburgh.net, freude@linux.ibm.com, bcrl@kvack.org,
-	trondmy@kernel.org, longman@redhat.com, kees@kernel.org,
-	bigeasy@linutronix.de, hdanton@sina.com, paulmck@kernel.org,
-	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	linux-nfs@vger.kernel.org, linux-aio@kvack.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, linux-wireless@vger.kernel.org,
-	linux-acpi@vger.kernel.org, linux-s390@vger.kernel.org,
-	cgroups@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
-	pengdonglin <pengdonglin@xiaomi.com>
-Subject: Re: [PATCH v3 09/14] cgroup/cpuset: Remove redundant
- rcu_read_lock/unlock() in spin_lock
-Message-ID: <aMmuW8VhLbPRWwwx@slm.duckdns.org>
-References: <20250916044735.2316171-1-dolinux.peng@gmail.com>
- <20250916044735.2316171-10-dolinux.peng@gmail.com>
+	s=arc-20240116; t=1758047860; c=relaxed/simple;
+	bh=rN/jo/5sC5E4maX3WWr2oW11NMAVvjpBx15n5Ts+Yz8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=S6rbGialliMPiZBTA5GtIm0IVYFNf+0TNyQKzgC9SqmALKEf1zvX0OEt/xTLtjMWlPI0WTRLLoL7jb5mKpaoTiQiuyryY0l04Rz2zrHIRRIws7FgSiTQfnGL5td9UcsCX/j6Ni7sv7xNwsNoh5jdDVkPBAfPBQC8eGYSQtNCya0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0SZdHot0; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-42404af30b0so13381705ab.0
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 11:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758047858; x=1758652658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z0SXbkcQGPwwHkITWoViQ+ET3skRPP4oXVS8ZcpgxqM=;
+        b=0SZdHot0HLf7wwZv79yYDTWxxgXsIGvAyeUsnv7Fs0nb5Yjsqyl/YobSkH3by3rOxf
+         /sIfg3p0aWJw25Bt6yGTSZZ9T2Tzyp3HH60S2IyLEiRrVsKnxd3sa3AQsLPeo8lJZg66
+         6jyN3K/T4g9f4+ll4lG6ZR6oJVuxY3IYJftGegQt2cMDYXDHCjZ08zwqa537ElHNBuTW
+         So3ED0iTimGq+NlCwhZOGAkTbDK0SfyO2MqMZmT26AxwAGBwdhE8/4jkpY09Fc+19dU3
+         tLhXhq+OVCPWiS+JeASkOwjWG/WzcOdWOcigsg2zrkuu0rMzSp6ErsusssijIyF4uqGi
+         7KJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758047858; x=1758652658;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z0SXbkcQGPwwHkITWoViQ+ET3skRPP4oXVS8ZcpgxqM=;
+        b=ZU0aBqlpxru4njeXd7WoLoVMObPjaFLGmBPl4a8fGVy0rvwFt5G1AOxXdkUgVRFZqp
+         qP76wCok8BPHwISnV3mSAPWnpk3Du3FVEJCeljygsodINn9TXHRRBI2FuYuz201M1U2S
+         ip63JHIgnClXLgO/R28WnJJmcnHY5eEQf6CAdhQX2pgc3Pzhd5lCOZdHApuuaGhKeLgC
+         Qq5T1OANwMSw5K8vc1YJbs+L6p2eL767My1q/Nqt9gUw8Z5Ubvo7ZEAiKFCZIV6sEub+
+         TTvA48n4ppKMvax0VqvePYr87RPJbN2fsgrrS3ng1PYbY/tppxUWITETCHydI4ryJw8g
+         g84A==
+X-Gm-Message-State: AOJu0Yz3w1FvE8CrOx1fyy9SEWLj9XLKdn/GUs60eBNrAf2oBVwrs3H0
+	YpSo3aGZDlmgQcGYXgHMN/GmAOjtW149JFhcazlN/P5FS/KOHITiaqXQOlLIr6qvRao=
+X-Gm-Gg: ASbGncvecfyNspUEopUb7o9LilWblCs3n/cTGLZwHv592bTq8jCPi3K5e6gZbSGXesH
+	oFwEqNAhIV9jUVf6SnE1UuujT1HHQosVayOY0kNfzwQ2LYDxOUMO3vsHkhQAWmNhanvQaXIoLwk
+	Np3UaSDU4VvDJuxCZxwW0eGwZ5Z+HBydi9n3UC5lCD03IduLRmX6qOCyI5giiKNSviLcwjLNQCg
+	LE1M8wsAbh4JzyX+hwgSvPlzHpDy1Bul1nv2eDwqji+rz/oMT80D3sjXryP/Cg8S2nsKu1+D0AJ
+	Rr8The/kToWUkq+mNn/3jwWuiP8yuFL7hOLzFAYX908FEZxDu1i9tlplUXft0TjrIFEy0IN3pj1
+	XhG6jkgD4mgG8Tw==
+X-Google-Smtp-Source: AGHT+IGJRlPq2xs2KrnSiyYADlgw7DCrjgkZgehz/9Vy/rlLFJSiUpO9LvRKxJQ3oGCOynZcYXo3rw==
+X-Received: by 2002:a05:6e02:3801:b0:424:596:a474 with SMTP id e9e14a558f8ab-4240596a636mr73116055ab.16.1758047858032;
+        Tue, 16 Sep 2025 11:37:38 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-511f2efcd0csm6121195173.5.2025.09.16.11.37.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 11:37:37 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org
+In-Reply-To: <cover.1758030357.git.asml.silence@gmail.com>
+References: <cover.1758030357.git.asml.silence@gmail.com>
+Subject: Re: [PATCH io_uring for-6.18 00/20] zcrx for-6.18 updates
+Message-Id: <175804785727.344121.4196119067317346525.b4-ty@kernel.dk>
+Date: Tue, 16 Sep 2025 12:37:37 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250916044735.2316171-10-dolinux.peng@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On Tue, Sep 16, 2025 at 12:47:30PM +0800, pengdonglin wrote:
-> From: pengdonglin <pengdonglin@xiaomi.com>
-> 
-> Since commit a8bb74acd8efe ("rcu: Consolidate RCU-sched update-side function definitions")
-> there is no difference between rcu_read_lock(), rcu_read_lock_bh() and
-> rcu_read_lock_sched() in terms of RCU read section and the relevant grace
-> period. That means that spin_lock(), which implies rcu_read_lock_sched(),
-> also implies rcu_read_lock().
-> 
-> There is no need no explicitly start a RCU read section if one has already
-> been started implicitly by spin_lock().
-> 
-> Simplify the code and remove the inner rcu_read_lock() invocation.
-> 
-> Cc: Waiman Long <longman@redhat.com>
-> Cc: Johannes Weiner <hannes@cmpxchg.org>
-> Acked-by: Waiman Long <longman@redhat.com>
-> Signed-off-by: pengdonglin <pengdonglin@xiaomi.com>
-> Signed-off-by: pengdonglin <dolinux.peng@gmail.com>
 
-Applied to cgroup/for-6.18.
+On Tue, 16 Sep 2025 15:27:43 +0100, Pavel Begunkov wrote:
+> A bunch of assorted zcrx patches for 6.18, which includes
+> - Improve refill entry alignment for better caching (Patch 1)
+> - Various cleanups, especially around deduplicating normal memory vs
+>   dmabuf setup.
+> - Generalisation of the niov size (Patch 12). It's still hard coded to
+>   PAGE_SIZE on init, but will let the user to specify the rx buffer
+>   length on setup.
+> - Syscall / synchronous bufer return (Patch 19). It'll be used as a
+>   slow fallback path for returning buffers when the refill queue is
+>   full. Useful for tolerating slight queue size misconfiguration or
+>   with inconsistent load.
+> - Accounting more memory to cgroups (Patch 20)
+> - Additional independent cleanups that will also be useful for
+>   mutli-area support.
+> 
+> [...]
 
-Thanks.
+Applied, thanks!
 
+[01/20] io_uring/zcrx: improve rqe cache alignment
+        commit: 9eb3c571787d1ef7e2c3393c153b1a6b103a26e3
+[02/20] io_uring/zcrx: replace memchar_inv with is_zero
+        commit: bdc0d478a1632a72afa6d359d7fdd49dd08c0b25
+[03/20] io_uring/zcrx: use page_pool_unref_and_test()
+        commit: d5e31db9a950f1edfa20a59e7105e9cc78135493
+[04/20] io_uring/zcrx: remove extra io_zcrx_drop_netdev
+        commit: c49606fc4be78da6c7a7c623566f6cf7663ba740
+[05/20] io_uring/zcrx: don't pass slot to io_zcrx_create_area
+        commit: d425f13146af0ef10b8f1dc7cc9fd700ce7c759e
+[06/20] io_uring/zcrx: move area reg checks into io_import_area
+        commit: 01464ea405e13789bf4f14c7d4e9fa97f0885d46
+[07/20] io_uring/zcrx: check all niovs filled with dma addresses
+        commit: d7ae46b454eb05e3df0d46c2ac9c61416a4d9057
+[08/20] io_uring/zcrx: pass ifq to io_zcrx_alloc_fallback()
+        commit: 02bb047b5f42ed30ca97010069cb36cd3afb74e1
+[09/20] io_uring/zcrx: deduplicate area mapping
+        commit: 439a98b972fbb1991819b5367f482cd4161ba39c
+[10/20] io_uring/zcrx: remove dmabuf_offset
+        commit: 6c185117291a85937fa67d402efc4f11b2891c6a
+[11/20] io_uring/zcrx: set sgt for umem area
+        commit: 5d93f7bade0b1eb60d0f395ad72b35581d28a896
+[12/20] io_uring/zcrx: make niov size variable
+        commit: d8d135dfe3e8e306d9edfcccf28dbe75c6a85567
+[13/20] io_uring/zcrx: rename dma lock
+        commit: 4f602f3112c8271e32bea358dd2a8005d32a5bd5
+[14/20] io_uring/zcrx: protect netdev with pp_lock
+        commit: 20dda449c0b6297ed7c13a23a1207ed072655bff
+[15/20] io_uring/zcrx: reduce netmem scope in refill
+        commit: 73fa880effc5644aaf746596acb1b1efa44606df
+[16/20] io_uring/zcrx: use guards for the refill lock
+        commit: c95257f336556de05f26dc88a890fb2a59364939
+[17/20] io_uring/zcrx: don't adjust free cache space
+        commit: 5a8b6e7c1d7b5863faaf392eafa089bd599a8973
+[18/20] io_uring/zcrx: introduce io_parse_rqe()
+        commit: 8fd08d8dda3c6c4e9f0b73acdcf8a1cf391b0c8f
+[19/20] io_uring/zcrx: allow synchronous buffer return
+        commit: 705d2ac7b2044f1ca05ba6033183151a04dbff4d
+[20/20] io_uring/zcrx: account niov arrays to cgroup
+        commit: 31bf77dcc3810e08bcc7d15470e92cdfffb7f7f1
+
+Best regards,
 -- 
-tejun
+Jens Axboe
+
+
+
 
