@@ -1,118 +1,189 @@
-Return-Path: <netdev+bounces-224071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4096B805DD
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:06:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B076B806B8
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:12:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF22A461DCE
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:05:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7A36165097
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E4B333AB6;
-	Wed, 17 Sep 2025 15:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4733161A4;
+	Wed, 17 Sep 2025 15:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ByP9AcqU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="paOB4LDX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0331F9F70
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255C021B19D
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758121439; cv=none; b=uPRd3xNlX/1/vkw/XuGDuAEsBvpZOAEaar4pD+E3j7QKEeVXMo8eenF+87DHRzCYfyZJ989fKCFwAZGQ7+XhZ734nwcbsH+LEHb1/ItjjrZSdnYGCjc6t4kag6LxteBBvmrxAeoq2PEBkgHQFaL0MUXH38FsgB0mPVg3B0NlpmQ=
+	t=1758121932; cv=none; b=Oi7bF9lkPKOW8rj2nhfcWVqi+vaRtSP51NsG855qnWoDgFKRvLSOOOHI9n5Jo6aMZITYrM7kZGDTXxgn8rN+ssKRsa+AE2ipVitRlPY4gEo0JvNmWN7hS/eHY896hMkYfqNpHCEbwNmvtI00g1BWYeSAXXcKGpcf0+91iekfZfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758121439; c=relaxed/simple;
-	bh=MALzW0zDbfClRbGx2CTwVRhi1zlNbjzHC3926pkWEEQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=EyypdijBA+yDiCl5ISh3O1A5n5EpLyJjhFvjctT6K8vik0VrM2jrQZOFk4JL1+grawzQenzcWtAjEEZum0Uon3GO0Ux4tZfXJd17YEBLVPTdza9B3dc6cGA/U1QHwyuSIpCEDYBerJmlZ6za1iRvfuaB0sE6HS4TpHZlURrVK08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ByP9AcqU; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b79773a389so39215161cf.1
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:03:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758121437; x=1758726237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DBnbMV8ce9LVl9kK9MLhKc2hPd8QzeMgYISaqbaleCg=;
-        b=ByP9AcqUDAA68oq6QygwJIgnjW/e9jYQTKHa86HlwyBnIn4XrkJktTei5rjpIX0bxL
-         V6r1uL36li+5pkSK27m/oo1YUi8/wBsypITaJvb1U8Gr5wlDcvcr7kJwm9VrU0igGIa0
-         /WMA+HwN9ryGD8LGiFXNi7U27I1tuJDOswgrX7TBHh0dmRfV3HSCeMyeMG8Sb8vToSpO
-         9TvjdHS6Z1xNla1ek27fvZmkTzbuSvK6xAdH3E15nuTEjk+N2Uf9l20fW1ZbZwivSPUL
-         hXVdw3a7oBPNxNj3AB5ALpG/CWE1AEIQ1GVq7bv1KeGpApJMwBkntNhbNSgQDRlXJhuO
-         If2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758121437; x=1758726237;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DBnbMV8ce9LVl9kK9MLhKc2hPd8QzeMgYISaqbaleCg=;
-        b=hsCJkRqKzcrnCGHsBIm0/eYfZmla5ComTAUzqv4nPflNyt9bQCN7SFOCSfsm4twdaT
-         7iwxiBdNJIvfylZF8wyVGzcPkIPW1Im0NWLLSXtdz7uh8japxLTtQtep/neN0DD9M6Mc
-         M/qNVPRgXDL95K/kcPMzKi15y4aIxgF6cqxwD3G2F+cX+M60pgukbXc15Fpr7YP+fvoZ
-         fKZ90X2I0vQVxuc+JTp3LrLi0Hxjl4cpYxDOpB8NvKdNcohcMSVLVKrBLKqEDmPFY4Ma
-         vYKEbWRB7xmsS5mU9q8IcUnqpDSSRxw2AOXqBfuulZL8R1N89sO43NkdnhaP155/TU8k
-         QdJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX41nsTOsaR9RMlRK6+pB+r+U5Xpxvoi0/Re9fKv+hXYr0TKddXDETZLGf4sHMundLcnkRQDPQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR230sYXnubwBEEgwgT47/bcaqDepF8MoiRxlO9r2ny9VIfZes
-	9u/RPFTGA42ELGwTkaD4WZBDYUCOb4gOSZST+UPl/jwkhPYApF5bfIkS
-X-Gm-Gg: ASbGncuXII1FQzBLVGgJ1EB7NMC4cE+eptkII2URVOJE+y5Hkcs4c9eRHkgxSjt62R7
-	5edYY/kYGM1sxs/E3+OkYp8/SxqZqpuwo26bS0bfaDug0Yi3IcheTbWntqJdOJSXCF6rP52zw2S
-	Jitr2wM5bYRY93mOHytomFf6QDdh0pCXarXmB4y2g99hyZqAroByCpRM31ZD8DzTcpUg7VxLS/x
-	v8vZkEQA0TyqBNfhxMObjX91SU9B8Y76hHg/jnhx9RG76eGtOzNblhORvi2orHOxCa0CpN6CFQz
-	tdybGky6ZCxVJAKPr5kUdIciwFyXyr6bTyOmad6EXjRmphPGdSP3n1C0jqJY5fTvH4YcQRXH9fP
-	VPrYJ53g9ZVEVgarIx5N8d9/ovA/xfLGznWrOxQBG8j4XbLIwOadrBFMxYJ+qOrV0Y/8/8zhy5R
-	RnpMMV6UmdEB+G
-X-Google-Smtp-Source: AGHT+IFN/LdmTceeIwa42QTXfRXeHuG0Ui7SZMhzDGql3Bn5h0r8qGqVJ2qim/xfj+KR0dqFekkbBw==
-X-Received: by 2002:a05:622a:58e:b0:4b2:9620:33b4 with SMTP id d75a77b69052e-4ba65bc22a3mr31669471cf.13.1758121436736;
-        Wed, 17 Sep 2025 08:03:56 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4bb18769b2fsm7345041cf.10.2025.09.17.08.03.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 08:03:55 -0700 (PDT)
-Date: Wed, 17 Sep 2025 11:03:53 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- David Ahern <dsahern@kernel.org>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <willemdebruijn.kernel.1c9ea4473a835@gmail.com>
-In-Reply-To: <20250916160951.541279-11-edumazet@google.com>
-References: <20250916160951.541279-1-edumazet@google.com>
- <20250916160951.541279-11-edumazet@google.com>
-Subject: Re: [PATCH net-next 10/10] udp: use skb_attempt_defer_free()
+	s=arc-20240116; t=1758121932; c=relaxed/simple;
+	bh=QyTOxYYLGB6ntQjZDZCZZywA+7fBl0fJN0sLN9wVR0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=u9+cT0NSp+uyJ0+gIijYEBIpYnrkSzGcgqV69jyvkEJuYGW6Su8NgCebvxD2TEdkto7vqy4eRUNmVjs4jDchLezVKH1a72WkdM+boYbh9HXHJ6V4S8YnbTDkJvY1hoTLUCeaN+tVpMY3z/Rb+akpzB699xL/sSHf4xUXDuI/zdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=paOB4LDX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Z9DCHnUskoAQsh4r0zX0pM3YjsFlNAkxg7COa2SK03s=; b=paOB4LDXN15KG0UXWrMKam+OMH
+	aZOO7D2SyGG0TEQzk8TvwQx527ujk+cjVaq9dB5vejyXfhPCSkTUJs64LU/CTQ9tZThfqn88jGwO8
+	5wR9xFtWLStSP/S1t5sY9e6o64ps6PeMAJZYb8HxbyPmmhvY0fy1s2iKuXnGotbZEEAJkyS58BUHC
+	Qun28H6WmBZUyEPcX2PntSb2b1KeGYKAvV63EpVbPs4MLVG4js2lHn1wNFqUU1cHEDDPwpqasmdj3
+	9NcyfYEEP1QUudsP4DznsTI7pEdsn5dJeYOyBJ7cC7Zj1oI4BWiC+boI55TDbz201JJx0ijh+qH0Z
+	1ZyX2ONA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43408)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uytot-000000004jS-0P44;
+	Wed, 17 Sep 2025 16:11:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uytoj-000000000Hx-11GN;
+	Wed, 17 Sep 2025 16:11:33 +0100
+Date: Wed, 17 Sep 2025 16:11:33 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@csie.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Drew Fustini <fustini@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, Fu Wei <wefu@redhat.com>,
+	Guo Ren <guoren@kernel.org>, imx@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-sunxi@lists.linux.dev,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Samuel Holland <samuel@sholland.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>, Vladimir Zapolskiy <vz@mleia.com>
+Subject: [PATCH net-next 00/10] net: stmmac: remove mac_interface
+Message-ID: <aMrPpc8oRxqGtVPJ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Eric Dumazet wrote:
-> Move skb freeing from udp recvmsg() path to the cpu
-> which allocated/received it, as TCP did in linux-5.17.
-> 
-> This increases max thoughput by 20% to 30%, depending
-> on number of BH producers.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+The dwmac core supports a range of interfaces, but when it comes to
+SerDes interfaces, the core itself does not include the SerDes block.
+Consequently, it has to provide an interface suitable to interface such
+a block to, and uses TBI for this.
 
-Acked-by: Willem de Bruijn <willemb@google.com>
+The driver also uses "PCS" for RGMII, even though the dwmac PCS block
+is not present for this interface type - it was a convenice for the
+code structure as RGMII includes inband signalling of the PHY state,
+much like Cisco SGMII does at a high level.
 
-LGTM. But I'm not the most familiar with this deferred free path and
-its conditions.
+As such, the code refers to RGMII and SGMII modes for the PCS, and
+there used to be STMMAC_PCS_TBI and STMMAC_PCS_RTBI constants as well
+but these were never set, although they were used in the code.
+
+The selection of the PCS mode was from mac_interface. Thus, it seems
+that the original intention was for mac_interface to describe the
+interface mode used within the dwmac core, and phy_interface to
+describe the external world-accessible interface (e.g. which would
+connect to a PHY or SFP cage.)
+
+It appears that many glue drivers misinterpret these. A good exmple
+is socfpga. This supports SGMII and 1000BASE-X, but does not include
+the dwmac PCS, relying on the Lynx PCS instead. However, it makes use
+of mac_interface to configure the dwmac core to its GMII/MII mode.
+
+So, when operating in either of these modes, the dwmac is configured
+for GMII mode to communicate with the Lynx PCS which then provides
+the SGMII or 1000BASE-X interface mode to the external world.
+
+Given that phy_interface is the external world interface, and
+mac_interface is the dwmac core interface, selecting the interface
+mode based on mac_interface being 1000BASEX makes no sense.
+
+Moreover, mac_interface is initialised by the stmmac core code. If
+the "mac-mode" property is set in DT, this will be used. Otherwise,
+it will reflect the "phy-mode" property - meaning that it defaults
+to phy_interface. As no in-kernel DT makes reference to a "mac-mode"
+property, we can assume that for all in-kernel platforms, these two
+interface variables are the same. The exception are those platform
+glues which I reviwed and suggested they use phy_interface, setting
+mac_interface to PHY_INTERFACE_MODE_NA.
+
+The conclusion to all of this is that mac_interface serves no useful
+purpose, and causes confusion as the platform glue code doesn't seem
+to know which one should be used.
+
+Thus, let's get rid of mac_interface, which makes all this code more
+understandable. It also helps to untangle some of the questions such
+as:
+- should this be using the interface passed from phylink
+- should we set the range of phylink supported interfaces to be
+  more than one
+- when we get phylink PCS support for the dwmac PCS, should we be
+  selecting it based on mac_interface or phy_interface, and how
+  should we populate the PCS' supported_interface bitmap.
+
+Having converted socfpga to use phy_interface, this turns out to
+feel like "the right way" to do this - convert the external world
+"phy_interface" to whatever phy_intf_sel value that the dwmac core
+needs to achieve the connection to whatever hardware blocks are
+integrated inside the SoC to achieve the requested external world
+interface.
+
+As an illustration why - consider that in the case of socfpga, it
+_could_ have been implemented such that the dwmac PCS was used for
+SGMII, and the Lynx PCS for 1000BASE-X, or vice versa. Only the
+platform glue would know which it is.
+
+I will also note that several cores provide their currently configured
+interface mode via the ACTPHYIF field of Hardware Feature 0, and thus
+can be read back in the platform-independent parts of the driver to
+decide whether the internal PCS or the RGMII (or actually SMII) "PCS"
+should be used.
+
+This is hot-off-the-press, and has only been build tested. As I have
+none of these platforms, this series has not been run-tested, so
+please test on your hardware. Thanks.
+
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c    | 20 +++++++-------
+ .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 25 ++++++++++-------
+ .../net/ethernet/stmicro/stmmac/dwmac-loongson.c   |  2 --
+ .../net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c    |  1 -
+ .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-starfive.c   |  6 ++---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c  | 26 +++++++++---------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c  |  4 +--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c  | 24 ++++++++---------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |  6 ++++-
+ include/linux/stmmac.h                             | 31 ++++++++++++++--------
+ 12 files changed, 82 insertions(+), 67 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
