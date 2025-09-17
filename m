@@ -1,151 +1,126 @@
-Return-Path: <netdev+bounces-224146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D19FB8137F
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:43:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 234D8B813E2
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:53:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 265F6626F5F
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:43:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4883627AFB
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA202FE05B;
-	Wed, 17 Sep 2025 17:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DB12FE048;
+	Wed, 17 Sep 2025 17:53:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O4y303Bc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q3/dUE42"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B979D229B18
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B1F2F6593
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758131015; cv=none; b=bxKeymybHEL1t14ohHxd96VK8jsftkUDTwuW/rC7lYdEk7J6TEpkfest5l5g0v484vvbRb4LWwdHIiYiQzaV+Q6Lw3DQfB49UhkaOZUf8YvjHDwCIiMc8CoDFLrXtGCDRiNispw4R85d4ATg/ODO1BBnPS/5VGn2KLDKiXhH0rg=
+	t=1758131606; cv=none; b=Mmnc1Vz9vw6Wb2Bde1uJTigngAytnbz6kFl2NYOhm3GDP0ykdpt1qNjPdeqK7IAgKcHbOkYSV7az5XgHlneiwr0chafMoL3j5vmQbujpsvcAu0iGl8Mp3ysvOCLxe3/+/wDN6pqtaDSJnb3Csj3NWDjAiZJcCJYYcH3xJ9lr/yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758131015; c=relaxed/simple;
-	bh=cl/QBklktfInLptufkRFqpIhQE+bUOHby0dmoiW+QNQ=;
+	s=arc-20240116; t=1758131606; c=relaxed/simple;
+	bh=prPeBKaa51G6J+deMhX0xW4lFPImemmeU0KVGD66rv8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XsLikZ/BwjJX7UCTAdvfQX/9W3xltDdTEC5UbAsctayHxO+IJN6huhjIZ8xfLyKWnq+HcyJx5zrvwmLnXHEZynqa6j0trx4FI1rj6uXipjfcPcDVsGBK4w7+uIS8rsaARWKVM1yFTQfOKct2EBQ/7xnKYMDMxZ7BmOJhaoR8HJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O4y303Bc; arc=none smtp.client-ip=209.85.215.177
+	 To:Cc:Content-Type; b=EodKjr4K3lTmpvtDc34FQLTRJejoCksEF60shxqdV3O0hRyQjqRtH/7qFhqxD2DV/oS/xXnWS7np+ii7Pp9LRuLqkXJMObjDVl4RDadv57fYOfRk3rVaYNraAlg98TncezanOpR+JRfol2BormjxHSBEDu+kdyhdVk9IJDaAAGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q3/dUE42; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b5488c409d1so47343a12.1
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:43:33 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b54a2ab01ffso38668a12.2
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:53:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758131013; x=1758735813; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758131604; x=1758736404; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vo97Fly3OOsDHs8De0mPKOIklIZmDk0IMBGJgZmyy/8=;
-        b=O4y303Bc0CD7s3JgbUvA1IYtCMKkmSmo7eesMHl5w2MUE7k/0roMndEhYjg+IDHVZR
-         c7OJIHIPBc9Xi7WTZiQf9KffcvYZm7ja5zLcm8L58kJudD8MYznIu2l8k1bcXb/jz94q
-         U9ciSfQJ2HDjc8pN7/OrqFNVXTL578B/nQ40HwOL4Xbl1LRpBpd5tZwsFT2/x6gkpMxw
-         SHVgxqq1HMV+oPuXE5x4Cii8kgb02pXN+DFl/MinrcxrwNMMF62rWBGrhaCdqutU5yrl
-         qCnXzSUIz6AkSFsOc7IDfTjmUmdXIJC+GHvaVfCzJOFobKkJCL5tQ/XPR+v0laXP0WVi
-         e6hw==
+        bh=prPeBKaa51G6J+deMhX0xW4lFPImemmeU0KVGD66rv8=;
+        b=Q3/dUE42GYgbO0eACTfvr/1XjNFBSovzF2SpKViVFipTHebigQdT7RuyxmSOw2OMW1
+         gDiF3nuEiJHWBbihwysFwO+pRE7EJdZW3wGERQZ3UJx8I2uinxmR6ErUr8HOKwVlTCCl
+         HKFPiRM5Rl5Uc+XSB6dEv1hj7Z3scX/It9c1ztusrIR746zFQmFRw6oCND5B+8zgbSkm
+         NJvmCWfNi6YnL4GLBWc4SWwt6aDuc5RwM7Evy7c29QAr+jQAsDR5zRegBGQDTQaJH4IK
+         LP4tcgkSWIa/f3ikmKZeSedNY97wMTQrM2N8hRR0IFxKbnsIwIAu/pBOb5U2HmHk8eJM
+         q4HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758131013; x=1758735813;
+        d=1e100.net; s=20230601; t=1758131604; x=1758736404;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vo97Fly3OOsDHs8De0mPKOIklIZmDk0IMBGJgZmyy/8=;
-        b=XlcqXnYBOVsi9urQQ0sF1AYwsiAcuHktp5GGG/8jkEDGH/hCm4B1TwtTHz69NtSK32
-         3Kt0xWebMpdo3pNDyPbjumBJlYo62wkxquJ7nrNY8Euzq6CIStpenUxdhwSvlvwrOwmg
-         Jh59FdHFbj4YztKbRA9+tIFYOONLVn39T8By5vl45bQ602w1XwSsrkfZ5ewYKYFwpkBV
-         vBj++4602r412BCxKBRviKctLYwhgtHl5zrL49zSkIXlkABRf1FFiIuhyBT3NbJNpZGu
-         /rgaX2fhw+Far+tltPlEAJ/XfPgr/u8Ot1DOSVgHgPQFVKSzbwwtrAPitSpsi4ywN/3+
-         2/GA==
-X-Forwarded-Encrypted: i=1; AJvYcCXLaKUYsDhvbNeZHK0X+XjUoDb/6LUaY6RiPMUA9txJHAy5RoNOwTamstY2UWZNf6sYz4H1mjk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/qVCNtTsbcpuZTfroZlT7BUQMihVZw9PtT5nodhRT5ix6Br3+
-	BAOWbeIiHGJztwod664t8n7K92q/ARs/tQf4Z+SOXoRDcLlhdqwF0ae/vagCmhbwAGe0kWAQ5g5
-	nyR4s1NVcD2ugMBhEZ0IzE13vOiFvOCLnTrSxB1RD
-X-Gm-Gg: ASbGnctwpnLvFRnxIpl3l23OEIYdKJCn92EVxwj6v1skuFQr11ouYUshauc9Y6zLYwj
-	NZwoMBZhE2wcevgHKYTfdhoee+2JQUHn7etkJB2sP8/gpAUcPj+soMYXImCryO6wTPZtKI5IoiM
-	pDsx1KWna0VyyhOEuu0CIYVb64tvcELx1HUJi64N0yaf/3K0cvfsPIAvPgh3N1yoforI++BzM1a
-	LZ3OnDrLSWJuvq3aMUOOpOafVKVL32HHTkCZECNX8/YWxcU743SRtI=
-X-Google-Smtp-Source: AGHT+IHRsNYTF8HFp02zV71mkFgDpJDb1RppmdmCpRXDipPQJRP2KRFw9F+po60L0KieDIvyZLOppfoQ4hJEG/V6GRU=
-X-Received: by 2002:a17:90b:4cc7:b0:32d:d4fa:4c3 with SMTP id
- 98e67ed59e1d1-32ee3f26156mr3717088a91.31.1758131012761; Wed, 17 Sep 2025
- 10:43:32 -0700 (PDT)
+        bh=prPeBKaa51G6J+deMhX0xW4lFPImemmeU0KVGD66rv8=;
+        b=mak/gL+tY9TvLXuy/o+d8LC7HUVw3KZdJMYNXYWVJObnshE9wHz4NuQb9VGK+OWx7R
+         +h7qk2d8kqkw3mSfJuq+9w8Bfw0+J460/3ktTswYT0twweGL5x36q7zd/2WMnML9fJ3f
+         DeGev4Q0P2btwxdznp9usZ5QoH1BsSHfVpUmeN1OB+MeMToi1t4ZtryhtsHNXZKD6iL0
+         LCiTrtd9U+X0OORBJ21zEZJ/k/NF+RUANsZM9rXGrn5AV1HO2fEar0neymIzAYrqo90E
+         Y3QFESQwEgYEFtIPn1iojBwfNqXufrI9kPiq7OQ5OFeyD3b4UmSgZEQ5zOOr3oCVoIOG
+         kLNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwIEMjQioI+u7gC8twCuwGgrpn2pqFVX9y+yA4oNi0jhcyBhLjAlu8ec3uJ/ASm3WnZr/4TeI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOK7pmdDYMy5ldKg6TzoMqIK/uyqr/V9/koTEP/743SAXBnCOC
+	XVDF8SzF2WtGxcvt7U5b7R/9uCZ075TBQreBwrKxyXcAsOnquZ2aN50RXCBVeAN2rqA9lORkChn
+	wLK+ZpXqQe0LHL7Se8LAQ1imE5ihK7fcHwGebYSAV
+X-Gm-Gg: ASbGncvwkvduLulP5p0P1E+tIHJ/GDy1QKwYu8qiju8z3cxHUsIcGMgoTPGTO6KFMML
+	XoF+0IHsJSE0f7BEfjV0yccuX2WLtLaVu+DuGT/RW2ovVUA4JybyiVr4y+Hg/G1qf0tebzEVw7U
+	e40pV4t7lLDQSOPJaRyKN/iHt3xvqcVSDeOWvluthy8Gpu+Rw1hvtqfdruKvY2kuvJOIMMrg5SD
+	0bZ0Olr7RJDNP8M4qCAInG7KpEdv2l5PmfyvW64xLqU9VcyOIqLa9q1C0+LCcln8Q==
+X-Google-Smtp-Source: AGHT+IHrJyd++NKInVDvIQJcyYRssVLier9sPAlip2/M1DiUex+LiAM1Mht5QSgk3G61jDHUUIML93p9VzFcFZYKZKY=
+X-Received: by 2002:a17:903:1b46:b0:245:f7f3:6760 with SMTP id
+ d9443c01a7336-26813efae44mr34443275ad.55.1758131603620; Wed, 17 Sep 2025
+ 10:53:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916214758.650211-1-kuniyu@google.com> <20250916214758.650211-8-kuniyu@google.com>
- <4209a283-8822-47bd-95b7-87e96d9b7ea3@kernel.org>
-In-Reply-To: <4209a283-8822-47bd-95b7-87e96d9b7ea3@kernel.org>
+References: <20250916160951.541279-1-edumazet@google.com> <20250916160951.541279-6-edumazet@google.com>
+ <willemdebruijn.kernel.20220031a140a@gmail.com> <CANn89iKPip5QppUDo_NT-KrZ4Lg+maqJ6_zz0-NpVwbuR8yomw@mail.gmail.com>
+In-Reply-To: <CANn89iKPip5QppUDo_NT-KrZ4Lg+maqJ6_zz0-NpVwbuR8yomw@mail.gmail.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 17 Sep 2025 10:43:21 -0700
-X-Gm-Features: AS18NWBmYjxoJo3zWhukNZG1Bg8jiKna2xlrpyh2ezZh84z07q26ZAEQ7_PaSKI
-Message-ID: <CAAVpQUCHUd+M-Kvbvpkd5qYcmD_UfCyC_2FeF9m6HkxTC6+2Xw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 7/7] mptcp: Use __sk_dst_get() and
- dst_dev_rcu() in mptcp_active_enable().
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>
+Date: Wed, 17 Sep 2025 10:53:11 -0700
+X-Gm-Features: AS18NWBxSYHsRh9Op5FdNeSeuENMMATNG6Aeri7ZABL3gBgHQSVkqAQ0FI3AoGM
+Message-ID: <CAAVpQUCumbFexO9TBhed0G0wGToLc4crVMSh8OxqwLep6kSzuA@mail.gmail.com>
+Subject: Re: [PATCH net-next 05/10] udp: refine __udp_enqueue_schedule_skb() test
+To: Eric Dumazet <edumazet@google.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 17, 2025 at 3:17=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org=
-> wrote:
+On Wed, Sep 17, 2025 at 8:57=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> Hi Kuniyuki,
->
-> On 16/09/2025 23:47, Kuniyuki Iwashima wrote:
-> > mptcp_active_enable() is called from subflow_finish_connect(),
-> > which is icsk->icsk_af_ops->sk_rx_dst_set() and it's not always
-> > under RCU.
+> On Wed, Sep 17, 2025 at 8:00=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
 > >
-> > Using sk_dst_get(sk)->dev could trigger UAF.
+> > Eric Dumazet wrote:
+> > > Commit 5a465a0da13e ("udp: Fix multiple wraparounds
+> > > of sk->sk_rmem_alloc.") allowed to slightly overshoot
+> > > sk->sk_rmem_alloc, when many cpus are trying
+> > > to feed packets to a common UDP socket.
+> > >
+> > > This patch, combined with the following one reduces
+> > > false sharing on the victim socket under DDOS.
 > >
-> > Let's use __sk_dst_get() and dst_dev_rcu().
-> >
-> > Fixes: 27069e7cb3d1 ("mptcp: disable active MPTCP in case of blackhole"=
-)
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > It also changes the behavior. There was likely a reason to allow
+> > at least one packet if the buffer is small. Kuniyuki?
 >
-> Thank you for the fix! It looks good to me!
+> It should not change the behavior.
 >
-> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> rmem would be zero if there is no packet in the queue : We still
+> accept the incoming skb, regardless of its truesize.
 >
-> > ---
-> > Cc: Matthieu Baerts <matttbe@kernel.org>
-> > Cc: Mat Martineau <martineau@kernel.org>
-> > Cc: Geliang Tang <geliang@kernel.org>
-> > ---
-> >  net/mptcp/ctrl.c | 11 +++++++----
-> >  1 file changed, 7 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
-> > index c0e516872b4b..e8ffa62ec183 100644
-> > --- a/net/mptcp/ctrl.c
-> > +++ b/net/mptcp/ctrl.c
-> > @@ -501,12 +501,15 @@ void mptcp_active_enable(struct sock *sk)
-> >       struct mptcp_pernet *pernet =3D mptcp_get_pernet(sock_net(sk));
-> >
-> >       if (atomic_read(&pernet->active_disable_times)) {
-> > -             struct dst_entry *dst =3D sk_dst_get(sk);
-> > +             struct net_device *dev;
-> > +             struct dst_entry *dst;
-> >
-> > -             if (dst && dst->dev && (dst->dev->flags & IFF_LOOPBACK))
->
-> Mmh, I don't know why but the condition was already wrong before your
-> patch. It should be the opposite: we should reset if we manage to open
-> an MPTCP connection on a non-loopback interface...
->
-> I don't want to block this series for this non-directly related issue.
-> If you prefer, I can send a fix when this series will be applied. I
-> guess it would be easier to send it to net-next to avoid conflicts,
-> which should be fine if we are close to the merge windows.
+> If there is any packet, rmem > 0
 
-Sounds good to me.
+Agreed, this change should be fine.
 
-Thanks for the review!
+The rule comes from 0fd7bac6b6157, and later 850cbaddb52d
+tried to be more strict but caused regression, and the condition
+was converted to the current form in 363dc73acacbb.
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
