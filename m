@@ -1,133 +1,235 @@
-Return-Path: <netdev+bounces-224177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE5ECB8196D
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 21:23:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 162A3B81A8A
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 21:37:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18DA83AB17A
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:20:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83DC8462274
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B0E30C0FA;
-	Wed, 17 Sep 2025 19:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943A92FC873;
+	Wed, 17 Sep 2025 19:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="GV8rDsAm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7VOPK+8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254F02FB968
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 19:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A382FB0A3
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 19:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758136825; cv=none; b=BggXKo2M/cejyfLTBF2ehql+2hGJAvdv3c1j/r27w5dbq+IbJFejWG+xfqzbW4rmStqLfoEZWbmd46+Y666DkCwb40oDZes2D06Paj5PcNnF3GdWXmdEPsRDmIafBrMcNVpAWom9buHQdVzuBYdjMjk9gMfjwraNHfa5LeyyA+M=
+	t=1758137843; cv=none; b=i1xvwe88NL9YjlOjAH9M68UqWIgbnrNNOOfFLwCB6vCZDi/2lnhm3JXGwFz3YpCNn/S0mdh2fFXeIdJs3TQ7AUgH0tggWa6csBL6pQhm243I2I1Rjy7mv9KKznzob7A8kTdWyS6jQ3l/d4lsNoWrQGFifzQNVKgT5o39L4pNDvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758136825; c=relaxed/simple;
-	bh=yf5Y9YG2oLtvjs7wQ7MzVcyxI3AqukqgyzPKsUEW0oo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bKH2PQyNIATLc9u+pDN90nmmOdJWzvUMXWxp3UVJQ+X38MP81YS+CXB6YLXnHQp6KDZhFjQiQw7kmArhe+kZ/yrkv/irlODP/8Odlr1Fq9jrLE1occWnY3vYNjTzPxbvDTY6BioxgBINTikOc5jElHIGmNfnRYyPr8l4Lb7Ixco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=GV8rDsAm; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-71b9d805f2fso1554086d6.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 12:20:22 -0700 (PDT)
+	s=arc-20240116; t=1758137843; c=relaxed/simple;
+	bh=q1iCwZvMDFTy7Jc4lEAA87uuTHihaEy+2OvWFQBL1cU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=szZD8MH5mbkcxNEsDVtGAr/biLqte26q02L4cISOCMQjHG5KOFVo5v4ZPJIx8wTwrmdrPWIvPrNp4FVq7u2kQ5RxLX1JoAA6T775m0kbwUZpMyxPjxPFxVD+qauvqo+UehEqLaPOEyqjofantWwVzMWawm8AxNPYKBWcxPtYwGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O7VOPK+8; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-71d6083cc69so2349067b3.2
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 12:37:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1758136822; x=1758741622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1758137841; x=1758742641; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ADTukD6B7RmHl8VVR//EKxw6ixi7COixouKBx3IfTSs=;
-        b=GV8rDsAm8TkU35HbBKPXbW+oG3amqkDVTJ+MYuDs+WzJKbHyNH5g3uJnzDSKNHq8Ki
-         Q3aQIF1ePUbG1GZccUzzltQKF1dwDHoKOCcAw5HhT8+gfnW9eiMHFFovCYdHzDnpPYw2
-         2MCH4cfCao3dwlMzAA/qA2BJwX5k6T+fGJ5pruwwJfFpkOPyTbCf2V8NZ3k8E8vI5sb/
-         IVTqRQj7xdp8+KR09ye/VdKg6TnJd8rBD/xFBF+u4lhCfyWEuXM5HZmop+JvDMJgAoeF
-         wnY4SeCGNtim5VTs9jMg7/1dXggIltg+dX+ha4EkxrhZ4BEJTGKnoE0/Q5TZBYdmVV1U
-         +30Q==
+        bh=g500mWMdVffBJl/bJFPiPQYd74E9jSVxrHMEKT+H8A8=;
+        b=O7VOPK+8Z7xaryTcqCNwSfKAEwGN9O8X1KkQNtOFPvpU8IMT9pdplW/8pzWgOsIyCe
+         0v8iwJHJvutRVtFv7QhDqV8MJjSP22Oc+W3dLBYnTAw1C+KclFRdWCdgmWpnOk+zUvLy
+         DVf9+NmcPSEd1bI5gNXIeIR0qUF5sSjqTrTOI7BUUPLdkSCWUgoXTHnA6PXvBtMFitx2
+         CWS1H5y+EbIeA6Bn6O7yB9th9vVD8tiONBhF6fBHGgiCtja9MfZUsultaCvu9rGWcbcy
+         NPR1PrbDb0ONy3wMhNibtI0n/OUjlsC034tteTio+16TJlBuIMTuNNu6Hb7KTC/18QkS
+         t1UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758136822; x=1758741622;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1758137841; x=1758742641;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ADTukD6B7RmHl8VVR//EKxw6ixi7COixouKBx3IfTSs=;
-        b=QHg0yCrqrWpO4S2NdzGQbpQ7PntisbelC4U6fN0w5i2GZaF0NQmaEirCWMUEmQdEez
-         86E1zJG82rFzB/ETatTr+UrY2Rz0URLX8SvEn3sNP5XNn6oOwagSOgEBQEfdqKX9UkGU
-         SJBzQpmN4O97YDBX02y4wXENQVIpBhVM/Q23wrj9DPt0ri9SpKApbEg4sCnFX0azxn/v
-         ZH7apzv0sT4k7ES+QKuI0mWBKdWm2+aEX1by79zjSx+xsD0N0IzT3DQQvhgDDLIdLkXF
-         NdvTGq9LX8FspzVi9ghm5xMF8V03k6tx1iIsefQWniXaLyB/kxKGkRrOEQaOvRb2L0Ly
-         INVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXHfO8CK4O9TCvX4RJ7MqEpJYPbBHqLyUsxIir7TXa5jMSoojqXqW6llggcQ0DqcF+ZkxPrY9c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/i3W+rnnHxEXgR5bfQxQkVcWbSSO35ZeOnK6vKFMxkO9B96By
-	t9BMaFW0BG3q083knkT9qtggA5esOgz3NJ91ltb+ZcKyk+frCeMAWrIjZOhf0cm+xRHwZiQ8q0n
-	tYo0z
-X-Gm-Gg: ASbGnctcirhhb4oW6p3QXv93OGHjRVSFdCv8e+CN9XBz+xJV4sk62NapyYphhhRZ+dT
-	+imWo0Sa7I933F+19OAuzrFFqXjC4pRW0gvAqV58hxWLX0/evT7HCTM7SKLMM9iYETEb5c1UQQk
-	Sslc+hOL7vkyidTqOvJEJtNmkFZb/jv/YoRPxHay5S+MI5I57xLSuyvxTCpA4wwnatyAy8AOGuv
-	EqT27Sv9vc1OEj1I0YLFQIQVLOqS5voXvowuaIL2c5bpEauXHVXok5pbRmA6f+hhflixvWBGpxi
-	aVrhQ7MBMhimi6PYjjJSW35VqTYkhMUA3L7OD0TxIu/a8QZP0G1pohrVPMZQT6v6rVf+Htg+K/h
-	fo7tEqFAezWbQKJqgzeFPm0YbHAxkylQjn+HLb94e2K1bBQBk41hh0dUlJHIyBvMZbqDpUXgmqG
-	4=
-X-Google-Smtp-Source: AGHT+IG12vBilRC+cgBC1jCZkudS7dmyFjCdSCbkSVm0/Gtt5e9SMEtssx9m8PysHelzuij9pJgwiA==
-X-Received: by 2002:a05:6214:b6b:b0:725:29f0:c7c8 with SMTP id 6a1803df08f44-78eced22fc2mr43150376d6.47.1758136821985;
-        Wed, 17 Sep 2025 12:20:21 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-793446acfa6sm990666d6.14.2025.09.17.12.20.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 12:20:21 -0700 (PDT)
-Date: Wed, 17 Sep 2025 12:20:18 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Alasdair McWilliam <alasdair@mcwilliam.dev>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, Daniel
- Borkmann <daniel@iogearbox.net>
-Subject: Re: [PATCH iproute2-next] ip: geneve: Add support for
- IFLA_GENEVE_PORT_RANGE
-Message-ID: <20250917122018.40ee1cbe@hermes.local>
-In-Reply-To: <20250917162449.78412-1-alasdair@mcwilliam.dev>
-References: <20250917162449.78412-1-alasdair@mcwilliam.dev>
+        bh=g500mWMdVffBJl/bJFPiPQYd74E9jSVxrHMEKT+H8A8=;
+        b=PppDv2ja3bkOSldnhjO6OprfaDzWnP5Ksv1CYchZdGYUWQFEWc4GL3AgAU/HarPFhd
+         xeUWpdGvGFCmxBevEgH8mb6moiVpCUzDvNXtNNZ6OMcIq6xEzOL3Ez01NFcSffos89bU
+         Q1Rq893aCEMTW+FuFowGP7nzQU6aIC9yZsEETo5MOIp++7EU5cululJBHGvEjzbZoxSW
+         oL9Xjfs7hQuio39rfP4LhRASChqYfyGD/qgcVCuB4ksyqK8rBondzvDpQLOye79jDm2w
+         dNW8ocEHBLvjO85eNkPseYzbo93WL9Eq+oovAAv2wei+wbwcfQQELjjZzK6IXlxCf8a9
+         3zjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXxDVVLhgz1tSrVyVNzCXEky7iCRjNKmKRcjV6R6hyrgfU91GOU5PCk8kOy926V0WQ/VJL9uJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMkDwmJQ+hJ/awjN7Ht5V31YmQDvRVF7ZbiRkW93863KJ7jz54
+	uJP5QY/Lc+n9wpdpEvhPki9zQQkizjhdPiufniWCfhCys6lOHAJ3l7JhisSKxwTA1mvFofM8ONb
+	ewz8Zt1+k5mjiuvynOY2KRpb/lJq8cqw=
+X-Gm-Gg: ASbGnct3vk523vppZJAcnubEJJJbatFrGUIo/lQnxssErySAt7uXbO2gbsoPvSHNnYG
+	edqWm2BFJx+D0MTbD2DsKxOXX0ASTTJ04+ojoT6awWTG/8072bF9JzcYiw9AG+nADq0IT5858Ka
+	mmzOsGUNJjas8zAkD+3iPyHmrUJ2nUfZUZBaNqQTe4ptbT8PrpI4CB4qE3unYXzjfeGeFUaZPJc
+	UuxRGhDNOW6P0dGij9aJpo=
+X-Google-Smtp-Source: AGHT+IG3vQaW005fde5b4zqUMR17PartwKIJqcAzKGwXOiUPVogF/n8idXHAuFYB7+1VXUc9LmJOJFHjv/G3JVn+EAw=
+X-Received: by 2002:a05:690c:62c3:b0:730:72a:7991 with SMTP id
+ 00721157ae682-7388ffc0ef8mr27948337b3.4.1758137840814; Wed, 17 Sep 2025
+ 12:37:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250915224801.2961360-1-ameryhung@gmail.com> <20250915224801.2961360-3-ameryhung@gmail.com>
+ <20250916171711.1b0d0bc4@kernel.org>
+In-Reply-To: <20250916171711.1b0d0bc4@kernel.org>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Wed, 17 Sep 2025 12:37:07 -0700
+X-Gm-Features: AS18NWDv6Ea5HmSGFJJW07mg_OFNMakkxNsk-0L_X3PaPDq3T_ITlK-yfGXNQ_A
+Message-ID: <CAMB2axODF+XGfe-yrsCCzSO1er6KKBBXCaiEHYGsLBNFZnpOHg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 2/6] bpf: Support pulling non-linear xdp data
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, paul.chaignon@gmail.com, 
+	stfomichev@gmail.com, martin.lau@kernel.org, mohsin.bashr@gmail.com, 
+	noren@nvidia.com, dtatulea@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com, 
+	mbloch@nvidia.com, maciej.fijalkowski@intel.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 17 Sep 2025 17:24:49 +0100
-Alasdair McWilliam <alasdair@mcwilliam.dev> wrote:
-> @@ -142,6 +143,22 @@ static int geneve_parse_opt(struct link_util *lu, int argc, char **argv,
->  			    (uval & ~LABEL_MAX_MASK))
->  				invarg("invalid flowlabel", *argv);
->  			label = htonl(uval);
-> +		} else if (!matches(*argv, "port")
-> +			|| !matches(*argv, "srcport")) {
-> +			struct ifla_geneve_port_range range = { 0, 0 };
-> +
+On Tue, Sep 16, 2025 at 5:17=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 15 Sep 2025 15:47:57 -0700 Amery Hung wrote:
+> > +/**
+> > + * bpf_xdp_pull_data() - Pull in non-linear xdp data.
+> > + * @x: &xdp_md associated with the XDP buffer
+> > + * @len: length of data to be made directly accessible in the linear p=
+art
+> > + *
+> > + * Pull in non-linear data in case the XDP buffer associated with @x i=
+s
+>
+> looks like there will be a v4, so nit, I'd drop the first non-linear:
+>
+>         Pull in data in case the XDP buffer associated with @x is
+>
+> we say linear too many times, makes the doc hard to read
+>
+> > + * non-linear and not all @len are in the linear data area.
+> > + *
+> > + * Direct packet access allows reading and writing linear XDP data thr=
+ough
+> > + * packet pointers (i.e., &xdp_md->data + offsets). The amount of data=
+ which
+> > + * ends up in the linear part of the xdp_buff depends on the NIC and i=
+ts
+> > + * configuration. When an eBPF program wants to directly access header=
+s that
+>
+> s/eBPF/frag-capable XDP/ ?
+>
 
-Do not use matches(), it leads to confusion because of duplicate prefixes.
-It is only allowed in legacy iproute parts. I.e no new additions.
+Will change. Thanks for helping improve the comments.
 
-> +	if (tb[IFLA_GENEVE_PORT_RANGE]) {
-> +		const struct ifla_geneve_port_range *r
-> +			= RTA_DATA(tb[IFLA_GENEVE_PORT_RANGE]);
-> +		if (is_json_context()) {
-> +			open_json_object("port_range");
-> +			print_uint(PRINT_JSON, "low", NULL, ntohs(r->low));
-> +			print_uint(PRINT_JSON, "high", NULL, ntohs(r->high));
-> +			close_json_object();
-> +		} else {
-> +			fprintf(f, "srcport %u %u ", ntohs(r->low), ntohs(r->high));
-> +		}
+> > + * may be in the non-linear area, call this kfunc to make sure the dat=
+a is
+> > + * available in the linear area. Alternatively, use dynptr or
+> > + * bpf_xdp_{load,store}_bytes() to access data without pulling.
+> > + *
+> > + * This kfunc can also be used with bpf_xdp_adjust_head() to decapsula=
+te
+> > + * headers in the non-linear data area.
+> > + *
+> > + * A call to this kfunc may reduce headroom. If there is not enough ta=
+ilroom
+> > + * in the linear data area, metadata and data will be shifted down.
+> > + *
+> > + * A call to this kfunc is susceptible to change the buffer geometry.
+> > + * Therefore, at load time, all checks on pointers previously done by =
+the
+> > + * verifier are invalidated and must be performed again, if the kfunc =
+is used
+> > + * in combination with direct packet access.
+> > + *
+> > + * Return:
+> > + * * %0         - success
+> > + * * %-EINVAL   - invalid len
+> > + */
+> > +__bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len)
+> > +{
+> > +     struct xdp_buff *xdp =3D (struct xdp_buff *)x;
+> > +     int i, delta, shift, headroom, tailroom, n_frags_free =3D 0, len_=
+free =3D 0;
+> > +     struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(x=
+dp);
+> > +     void *data_hard_end =3D xdp_data_hard_end(xdp);
+> > +     int data_len =3D xdp->data_end - xdp->data;
+> > +     void *start, *new_end =3D xdp->data + len;
+> > +
+> > +     if (len <=3D data_len)
+> > +             return 0;
+> > +
+> > +     if (unlikely(len > xdp_get_buff_len(xdp)))
+> > +             return -EINVAL;
+> > +
+> > +     start =3D xdp_data_meta_unsupported(xdp) ? xdp->data : xdp->data_=
+meta;
+> > +
+> > +     headroom =3D start - xdp->data_hard_start - sizeof(struct xdp_fra=
+me);
+> > +     tailroom =3D data_hard_end - xdp->data_end;
+> > +
+> > +     delta =3D len - data_len;
+> > +     if (unlikely(delta > tailroom + headroom))
+> > +             return -EINVAL;
+> > +
+> > +     shift =3D delta - tailroom;
+> > +     if (shift > 0) {
+> > +             memmove(start - shift, start, xdp->data_end - start);
+> > +
+> > +             xdp->data_meta -=3D shift;
+> > +             xdp->data -=3D shift;
+> > +             xdp->data_end -=3D shift;
+> > +
+> > +             new_end =3D data_hard_end;
+> > +     }
+> > +
+> > +     for (i =3D 0; i < sinfo->nr_frags && delta; i++) {
+> > +             skb_frag_t *frag =3D &sinfo->frags[i];
+> > +             u32 shrink =3D min_t(u32, delta, skb_frag_size(frag));
+> > +
+> > +             memcpy(xdp->data_end + len_free, skb_frag_address(frag), =
+shrink);
+> > +
+> > +             len_free +=3D shrink;
+> > +             delta -=3D shrink;
+> > +             if (bpf_xdp_shrink_data(xdp, frag, shrink, false))
+> > +                     n_frags_free++;
+> > +     }
+> > +
+> > +     if (unlikely(n_frags_free)) {
+> > +             memmove(sinfo->frags, sinfo->frags + n_frags_free,
+> > +                     (sinfo->nr_frags - n_frags_free) * sizeof(skb_fra=
+g_t));
+> > +
+> > +             sinfo->nr_frags -=3D n_frags_free;
+> > +
+> > +             if (!sinfo->nr_frags)
+> > +                     xdp_buff_clear_frags_flag(xdp);
+> > +     }
+> > +
+> > +     sinfo->xdp_frags_size -=3D len_free;
+> > +     xdp->data_end =3D new_end;
+>
+> Not sure I see the benefit of maintaining the new_end, and len_free.
+> We could directly adjust
+>
+>         xdp->data_end +=3D shrink;
+>         sinfo->xdp_frags_size -=3D shrink;
+>
+> as we copy from the frags. But either way:
+>
 
-Do not use fprintf directly instead use multiple calls to print_uint like:
+Great suggestion! I will drop new_end and len_free.
 
-		open_json_object("port_range");
-		print_uint(PRINT_ANY, "low", "srcport %u", ntohs(r->low));
-		print_uint(PRINT_ANY, "high", " %u ", ntohs(r->high));
-		close_json_object();
-
-Avoid having json specific code with is_json_context() if possible.
-It leads to untested code paths.
-
+> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+>
+> The whole things actually looks pretty clean, I was worried
+> the shifting down of the data would add a lot of complexity :)
 
