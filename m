@@ -1,123 +1,139 @@
-Return-Path: <netdev+bounces-223993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E95B7CCDD
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:10:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CF2CB7C7BA
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 566E73A513C
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:52:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A1997B0016
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB62370584;
-	Wed, 17 Sep 2025 11:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="fEjfsLAh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D34370584;
+	Wed, 17 Sep 2025 11:52:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01320275B1F;
-	Wed, 17 Sep 2025 11:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD58371E8C
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 11:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758109973; cv=none; b=YuNmsM8/QAEHBYdt1k8MC4bRQ5QZKtD9vWUfhboo2mjkGalhCcouVsesZvK/VISnYWw0LdfV+5vWCPzfAQ9u9gi3yGA+7RnyPsSw/x1GxAwybFWTCVMl4WcathMyQlhXa7xCE5I9NUGQ33aAMkIfJ4IsaDe/UaLmSGSiRbXKvPg=
+	t=1758109979; cv=none; b=MSrbOAt9JvzBRpxTyR/wY4qQYskxPt2kfBBCwYMcvWKd9CxgMW5RdmSkFME58xf491yHiEX7wtFSzqWyOJBtV86JmyOE2b/RZ1N372A3ad6SH/XuBOB7ssQQxFIw6AqRsd+PBoldxMThsyK6hGThmfNFHftcVnmTVvtZELsuZdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758109973; c=relaxed/simple;
-	bh=l8P6VVsXBU38WfjdWgZ0TeaKIxF9oSBoHAXutncct44=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=diDtox3VEHP6mcnXhq+NW5nYwNoMSmSdScuBwPIZEOvMSQWDqI6/M6sjALPDvAzWPaZESjuBpr1JFgOzi60KH2zExf6+gdivtk/AHvB2WpVGedJAo1bI7Cw9BTa6sde/FMN019A9woty1r/+rUbR6v+YB9KyDjsQWY/lEYyKx0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=fEjfsLAh; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1758109961;
-	bh=l8P6VVsXBU38WfjdWgZ0TeaKIxF9oSBoHAXutncct44=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=fEjfsLAhripGLJL0TJTLwBJDhbRCWdGFbHexy7CEmiK6TqC8UXCzV7TvXoT69QiOL
-	 wAz3Eefbyv7RavbL837tWA/UXoBSDTG8MVSG+ravzS86rYjoV9difpkFNg1jn03rUO
-	 M+OIKskjaAEZCbpQbHwHfVbu+f/wu13v82+40j/Czss3GdTR5PRb4kYcd8Fq28a40z
-	 wYo/FHrdJn+kShx0To4hB1Q02fAiG/nkgLSL2rR4vpHWUSVDeeTixBakEd+VswVNlp
-	 SycmVV6ZsC3v2gCKxkQvu1igIdNgx4ALAT/JSl0Acw+mYW4jha0c8+PDH/UIzPo+FB
-	 bBRVNTNT6t9Tg==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id DF60460132;
-	Wed, 17 Sep 2025 11:52:37 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 1EA39201672;
-	Wed, 17 Sep 2025 11:52:32 +0000 (UTC)
-Message-ID: <de8ecfb8-ca4d-4397-9d70-4fe789e706f5@fiberby.net>
-Date: Wed, 17 Sep 2025 11:52:31 +0000
+	s=arc-20240116; t=1758109979; c=relaxed/simple;
+	bh=uqaJ1Aj4tgRkY2VxqYrivb+JAi9VHqoNbdDpXMjZ9oU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LF3LC8W1aB3N3yyEZIGB24GcTTNDxw5A5MKDZ5f5RSay6xBQZYgr0DHMCQOR37pbO1X7imGrUSSKSsyepuozpwC4wXpFyaKWpqK0ycj5TQ6oxQ6LeAo0TZz9M7fF389URodbFZCaK26uGD0roHFodrXPbquFHBCcWV/hPsku4e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyqiG-0007bg-Rh; Wed, 17 Sep 2025 13:52:40 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyqiE-001kqb-0v;
+	Wed, 17 Sep 2025 13:52:38 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyqiE-00Dh2D-0U;
+	Wed, 17 Sep 2025 13:52:38 +0200
+Date: Wed, 17 Sep 2025 13:52:38 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>, stable@vger.kernel.org,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Lukas Wunner <lukas@wunner.de>,
+	Russell King <linux@armlinux.org.uk>, Xu Yang <xu.yang_2@nxp.com>,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] net: usb: asix: forbid runtime PM to avoid
+ PM/MDIO + RTNL deadlock
+Message-ID: <aMqhBsH-zaDdO3q8@pengutronix.de>
+References: <20250917095457.2103318-1-o.rempel@pengutronix.de>
+ <0f2fe17b-89bb-4464-890d-0b73ed1cf117@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-Subject: Re: [RFC net-next 00/14] wireguard: netlink: ynl conversion
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250904-wg-ynl-rfc@fiberby.net>
- <CAHmME9ra4_P0-FdVV75gaAWiW8yWsUJJsmTes_kac0EdTgnjHQ@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CAHmME9ra4_P0-FdVV75gaAWiW8yWsUJJsmTes_kac0EdTgnjHQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <0f2fe17b-89bb-4464-890d-0b73ed1cf117@suse.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 9/16/25 3:51 PM, Jason A. Donenfeld wrote:
-> On Fri, Sep 5, 2025 at 12:03 AM Asbjørn Sloth Tønnesen <ast@fiberby.net> wrote:
->>
->> This series contains the wireguard changes needed to adopt
->> an YNL-based generated netlink code.
->>
->> This RFC series is posted for reference, as it is referenced
->> from the current v1 series of ynl preparations, which has to
->> go in before this series can be submitted for net-next.
+Hi Oliver,
+
+On Wed, Sep 17, 2025 at 12:10:48PM +0200, Oliver Neukum wrote:
+> Hi,
 > 
-> I'm not actually convinced this makes anything better. It seems like
-> the code becomes more complicated and less obvious. What is the
-> benefit here? As is, I really don't like this direction.
+> On 17.09.25 11:54, Oleksij Rempel wrote:
+> 
+> > With autosuspend active, resume paths may require calling phylink/phylib
+> > (caller must hold RTNL) and doing MDIO I/O. Taking RTNL from a USB PM
+> > resume can deadlock (RTNL may already be held), and MDIO can attempt a
+> > runtime-wake while the USB PM lock is held. Given the lack of benefit
+> > and poor test coverage (autosuspend is usually disabled by default in
+> > distros), forbid runtime PM here to avoid these hazards.
+> 
+> This reasoning depends on netif_running() returning false during system resume.
+> Is that guaranteed?
 
-By adding an YNL spec, we lower the barrier for implementing and
-using the protocol especially from non-C languages.
+You’re right - there is no guarantee that netif_running() is false
+during system resume. This change does not rely on that. If my wording
+suggested otherwise, I’ll reword the commit message to make it explicit.
 
-The specs are currently used for:
-- Documentation generation [1].
-- Optional UAPI header generation.
-- Optional kernel netlink code generation.
-- In-tree user-space clients:
-   - Auto-generated C library code.
-   - Optional sample program using above C library.
-   - Python client - ./tools/net/ynl/pyynl/cli.py.
+1) Runtime PM (autosuspend/autoresume)
 
-The generated kernel code is still committed in git,
-and is thus protected from accidental changes.
+Typical chain when user does ip link set dev <if> up while autosuspended:
+rtnl_newlink (RTNL held)
+  -> __dev_open -> usbnet_open
+     -> usb_autopm_get_interface -> __pm_runtime_resume
+        -> usb_resume_interface -> asix_resume
 
-When we can generate the UAPI from the spec., with only cosmetic
-differences it proves that the spec is correct. Same goes for generating
-the netlink policy generation.
+Here resume happens synchronously under RTNL (and with USB PM locking). If the
+driver then calls phylink/phylib from resume (caller must hold RTNL; MDIO I/O),
+we can deadlock or hit PM-lock vs MDIO wake issues.
 
-I have split up adopting the generated UAPI and netlink code, over many
-patches mostly to keep the diff readable, as the code moves would
-otherwise become interlaced.
+Patch effect:
+I forbid runtime PM per-interface in ax88772_bind(). This removes the
+synchronous autoresume path.
 
-Including a sample program, makes it trivial to exercise the generated
-C library.
+2) System suspend/resume
 
-This RFC is a bit more complicated, than v1 will be, as it includes an
-alternative implementation for patch 4 in patch 12, I had hoped those
-patches would have generated some comments. Right now it looks like,
-they will both be squashed into patch 3 in v1.
+Typical chain:
+... dpm_run_callback (workqueue)
+ -> usb_resume_interface -> asix_resume
 
-I can also split this series up further, if you would prefer that.
+This is not under RTNL, and no pm_runtime locking is involved. The patch does
+not change this path and makes no assumption about netif_running() here.
 
-[1] https://docs.kernel.org/networking/netlink_spec/
+If helpful, I can rework the commit message.
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
