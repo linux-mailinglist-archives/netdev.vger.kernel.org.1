@@ -1,166 +1,328 @@
-Return-Path: <netdev+bounces-223962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95CE5B7F9C4
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:56:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D98B7F85F
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:47:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84DBC1BC0BAD
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:40:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 179203A6E73
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388142EB853;
-	Wed, 17 Sep 2025 10:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB77534F462;
+	Wed, 17 Sep 2025 10:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cp2CBoTN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A8Igic/o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E86278150
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DD4309F12
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758105586; cv=none; b=Qzu3aJz78y289CV9usiQ5ZcHwPDFSnuKXTCsimhKGxV5c2JIYtSJ7zN8fVY5FgacTEqB41eShvyeRHlfU4Os5MLz0tbqv1oXvNka0jv81tifZbS+5cgWBtA3eMWgQ5V9ia+0WM3GS6M9qRaz+Dj75Wti8/pu8SIhASzSkjPvuR8=
+	t=1758105812; cv=none; b=nfAIivLUV4I4aVEViR+i03hCt67KXMtDgoUvGz2EACFLTBMQHfc5TWGBwGdPeo2SXhxpR5UiwRR9Vzakjd8mqGh8q5uqHu5LDWZklxLW2H5c6FM5HSfTpZ28tWEWw4Y/e3nZ4XD1ohEvc/5lwsLOb4K/kc4QXIYl9kOe4N6J0jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758105586; c=relaxed/simple;
-	bh=R4CWvOUtCvrgdNMym402PYTJjWgUILHeZKrnJPMuhgM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=g1d6bt9gyLd2kO3uhwcO86yPpyMX1mTtSwz4oZMz6uDZiiqwFZa1MYbakNaOwhsFIZD65H1xb3m7PXnkZTd5Aytz1L/TTXjN5NC99rfqqDbeua/fGKDgA0Lw26Ug8hDLIku5NHEJqiAtCK3yLKBJxzsdI+/ESlYj7va9KPG6D+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cp2CBoTN; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1758105812; c=relaxed/simple;
+	bh=7I53Ykw1eFryroVQTuUQXnFZzr85bDzFPt1fAEv0b6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=btstctlyKNc4sYfmdV2Jnr1X651cEQEeMtyy8ZTnK+vvwmi474EmSoOedny4pRl4dqmeNVWm2kmvH5CvyoX/hkAuOcb4aqin9CL7oN26jvTGsj/997MnZ9wpvW4yiYiSWr6mi55aJO2g1u/l3gfi/3cZ0zEN+pv+CtxzIpFHj14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A8Igic/o; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45dd7b15a64so7096355e9.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 03:39:44 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b07da72aff2so77821966b.1
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 03:43:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758105583; x=1758710383; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=k+sQHbuAnUVLK2DcccTjeny/VsR+2o6xAMfUxaFboC4=;
-        b=Cp2CBoTNalC9pWPf5OZPZP1oscN+RkKFGAyyVs7kQcsgII9WtM0putFb1oyuIlXPE4
-         BfjcAQCWf1ML6yJsT8l9C+dtkQLCeSrAsNKSI2fqVAWZl85J70p9bYxHc7S/zBPC8Wpc
-         nqfd+dqpEwbzM7S456aUjosi9hnwumnUl4i4W3Nk5fnvOUS46VdaTNZXpUbZHPoW7AwI
-         uBS7UXlt8Esd1t6SmJvDRNBrNnXQ3zKad9pgzOMk4SmC694YNgaaGoZjPDpm1P7L8YC3
-         o6XvUa7Job/nOGboGpq0FArTqFGJ1bh1KicVinPuKYMOEEhYgwPdx41Qhag+XMSUNmUn
-         N+Hg==
+        d=gmail.com; s=20230601; t=1758105809; x=1758710609; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Yyh8Hkqs7GqsXIM+okxGaGUnlxOgHFmx9rSotm4MB8=;
+        b=A8Igic/oEB//tu0k72oof6mGPZKpfAXvaJzlLQERXXttCRaly8afI5OKULJcaaJaZ7
+         dNbwam/HPx8EPMjfZpF6yyLbmCOy9FN3DKXxMbpqiw1EFttv/bAYFupFlhzOi2ppEMMJ
+         iuD/703qij7BsKIETYwzlXvbbu54Yt9gxzHhoYZY94yhEHDrDckuyJAn7+CV+4qdHqta
+         1olTqp5HmMy25UZVhMExyd7K6bSEKuk195o/BKMRCv7YUvYryYvwpC1DqAEyi6XBR1Va
+         MecsB6oRtPUD1kDqkVNfIy0+X9nsHtA+E9dM6Xddn15/+7GAHSFtkae/pPfYVtpUpHGm
+         ZYsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758105583; x=1758710383;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k+sQHbuAnUVLK2DcccTjeny/VsR+2o6xAMfUxaFboC4=;
-        b=XEqGDymDJQAIOi25DZ+G3T69U9Y8g9xRNqEkRuj9i8mRBklDzfCONw3s9BRFewwXiE
-         d0dq5n4/XG5B04y0EVa9PZTvVCQpxHiCho/OhZ2h1xP0fGd8vmhG5Gjhp1H7CM1ZsjMC
-         BoOLbpfs2JMADmFEj9Pwy/aHxrl8N5JlIFXL8rb0lh1hyZUstPgBhik8THnbOS2sb2F3
-         KS7UCH3y4j1ongO4Cmn/o5+A44wleqHsscbnsdVEHeZhk0yRcFVIBSEj8/VzMyYkDfdl
-         QI3WzPjJ1hyY+I5MM+36Jlzqvg4qALYXbTF3mm25bbawHzkbtCgkqiOKkM8QtKdhywc3
-         DqlA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4QlR9FHx6cjJJV815+RsUx5Wc0WBw877uvHmgyMuPVurekvL0yN0z0ACSdhYd416mM9lOOMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLB30DUAJ7gXoX6BQ7fBzOfzQM8IkcsFqd4zgMhVE8iP5aVJwB
-	mcSdqZMgF1PW5iitOxylk4k+It6sX3Kj4kC6QcId5XOiFTOyjWHmWD2u
-X-Gm-Gg: ASbGncsKIo89jwqDYzeRxRzDyyGSoGmUv9K1mx3cQNOvA780D4odShKDxmTQ9MEnfuk
-	UFSI8pgU5jgMVHwqOe7snoQQHG19ob76HuAY5mm9heCS8SFcpn/5kiaM9v14ybKOplcoPvdo77z
-	TiFHdU4BMHYGW+wlNHF1OJBbGboPgttxrWIXyAHYgocmNUTDpYpmd16gVoyg3Dv9MZuHdK+CHJm
-	/ikjq817xjpF/7qkr0sXR0R2yA8WG3kKClXK3l0eH3+e3KfRaJ5BqaEJOcEiTpWjWzNp/jM0oMh
-	m2To8bfbZXdUbscCT+gmgSqJ1hULv3zsSoS79EV/X21P8iP4GMTrkbRQTux9M5yI5muQCZw2Jad
-	L+CXC5ubaXEwxIahsNYWuSFOsvYSnlclTyyzap73e6qf3JK/qADKmEA==
-X-Google-Smtp-Source: AGHT+IGusD+yhysHUCpNgRezV67Os0zRE0BcwTnTYY3tkSiddnSyzrDXOcH3hNEFYbbdLLij2+d3RA==
-X-Received: by 2002:a05:600c:6d2:b0:45d:d295:fddc with SMTP id 5b1f17b1804b1-45f32d002aemr36748375e9.4.1758105582776;
-        Wed, 17 Sep 2025 03:39:42 -0700 (PDT)
-Received: from [10.80.3.86] ([72.25.96.18])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e760775b13sm26083726f8f.10.2025.09.17.03.39.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 03:39:42 -0700 (PDT)
-Message-ID: <1407e41e-2750-4594-adaf-77f8d9f8ccf7@gmail.com>
-Date: Wed, 17 Sep 2025 13:39:40 +0300
+        d=1e100.net; s=20230601; t=1758105809; x=1758710609;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Yyh8Hkqs7GqsXIM+okxGaGUnlxOgHFmx9rSotm4MB8=;
+        b=Mw7DJ4Z01wiOxQjMORzXa20ODIw5vQ3HaKXzdSUzKcBirSo4p+/m2W7+/oaXH/rz9h
+         txxj/8zz/IB/QDR3P+jXKdmqtSonsuZ+rQl6EQhN7FwRmJoGuXsd33sRdfFFnyNpot55
+         cNZ6/oV6dvh5yKeXSxkKGlgjL4DT9xSEuSik3alfbLzsjIA69C3vvP89lPIULzc3NFYf
+         x16h8PDRggNu0x+o5IJcBTqYTE7MwiIEcX4ds7zPq9PW/Cuji19R+F1nx52Zl88ZdYaR
+         Zg6dJukN4gmU1OzmGipRwDXeX2pKFc8pB1oRF0DHHsAxXZMp6HPApK79Gkyr+4KQJmwg
+         qqHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVlBkhCtjAjdCwJflRGC9T5S+Z+deBlqwHz+9cbwhzwvD04EB+K+O0Amecff1d0QpZ0uyBvG/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCJlGh4/lV6ZJd0wnObsSec7/aAf9JXX61BW9Mp3uD2tKVmh+j
+	zo2U61N/8UZtyOFFtIqq/7GAnAULy/YzAw+TIDv2zQdC3e9LjmhAhzl/
+X-Gm-Gg: ASbGncsL0c1r0PZoYc2ew10EIz7MY46b/Ro0f9dNSn0BFuSfKwtuCL1XLJZ6zmmYEUY
+	ash3fBsvl20ZOxmnsLYRjKqC48R3FZDCdGhY0StT5QjvRXyquG1+vrlEup2iasDVUzOdzmEctgv
+	kqqNTwqhHcnNDHk140GmsfW5H66ifPEIF60bmatbLvUhFBCdtkoSPJCSQJ/43Lt+0z/S7Oh9+2p
+	PP7ejLQkpuGXaG/BHlaEzltkSGucNP5Jp3honbhPK5RClgE7hIQ1dn2WK1FxgKjryBFTHMPxH8P
+	J9ZbiKzezDPX1WUfQd5f3Wq/gWhHO5+TbLzHz9jmou1jRR1BFhoYZ5FRftLPO/uC5Mu7mbf90vd
+	SQDcAjBUFsfDY3hQ=
+X-Google-Smtp-Source: AGHT+IF0bGu8coGo8S13flYMunWY6PoCzFUDuD7l8SY41Vuc7seAVPH3vRAusBx3pRQ3RA9KkKbEpA==
+X-Received: by 2002:a17:907:7e93:b0:b04:669f:e70f with SMTP id a640c23a62f3a-b1bb7f2a4f5mr112464766b.2.1758105808719;
+        Wed, 17 Sep 2025 03:43:28 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d005:3b00:8bcc:b603:fee7:a273])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07c6110c27sm1132722066b.66.2025.09.17.03.43.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 03:43:28 -0700 (PDT)
+Date: Wed, 17 Sep 2025 13:43:25 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v18 5/8] net: dsa: Add Airoha AN8855 5-Port
+ Gigabit DSA Switch driver
+Message-ID: <20250917104325.j5je2jtachee7thw@skbuf>
+References: <20250915104545.1742-1-ansuelsmth@gmail.com>
+ <20250915104545.1742-6-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V2 10/11] net/mlx5e: Update and set Xon/Xoff upon port
- speed set
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, linux-rdma@vger.kernel.org,
- Alexei Lazar <alazar@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-References: <20250825143435.598584-1-mbloch@nvidia.com>
- <20250825143435.598584-11-mbloch@nvidia.com>
- <20250910170011.70528106@kernel.org> <20250911064732.2234b9fb@kernel.org>
- <fdd4a537-8fa3-42ae-bfab-80c0dc32a7c2@nvidia.com>
- <20250911073630.14cd6764@kernel.org>
- <af70c86b-2345-4403-9078-be5c8ef0886f@gmail.com>
-Content-Language: en-US
-In-Reply-To: <af70c86b-2345-4403-9078-be5c8ef0886f@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250915104545.1742-6-ansuelsmth@gmail.com>
 
+On Mon, Sep 15, 2025 at 12:45:41PM +0200, Christian Marangi wrote:
+> +static const struct an8855_mib_desc an8855_mib[] = {
+> +	MIB_DESC(1, AN8855_PORT_MIB_TX_DROP, "TxDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_TX_CRC_ERR, "TxCrcErr"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_TX_COLLISION, "TxCollision"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_TX_OVERSIZE_DROP, "TxOversizeDrop"),
+> +	MIB_DESC(2, AN8855_PORT_MIB_TX_BAD_PKT_BYTES, "TxBadPktBytes"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RX_DROP, "RxDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RX_FILTERING, "RxFiltering"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RX_CRC_ERR, "RxCrcErr"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RX_CTRL_DROP, "RxCtrlDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RX_INGRESS_DROP, "RxIngressDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RX_ARL_DROP, "RxArlDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_FLOW_CONTROL_DROP, "FlowControlDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_WRED_DROP, "WredDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_MIRROR_DROP, "MirrorDrop"),
+> +	MIB_DESC(2, AN8855_PORT_MIB_RX_BAD_PKT_BYTES, "RxBadPktBytes"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RXS_FLOW_SAMPLING_PKT_DROP, "RxsFlowSamplingPktDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_RXS_FLOW_TOTAL_PKT_DROP, "RxsFlowTotalPktDrop"),
+> +	MIB_DESC(1, AN8855_PORT_MIB_PORT_CONTROL_DROP, "PortControlDrop"),
+> +};
+> +
+> +static int
+> +an8855_mib_init(struct an8855_priv *priv)
+> +{
+> +	int ret;
+> +
+> +	ret = regmap_write(priv->regmap, AN8855_MIB_CCR,
+> +			   AN8855_CCR_MIB_ENABLE);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return regmap_write(priv->regmap, AN8855_MIB_CCR,
+> +			    AN8855_CCR_MIB_ACTIVATE);
+> +}
+> +
+> +static void an8855_get_strings(struct dsa_switch *ds, int port,
+> +			       u32 stringset, uint8_t *data)
+> +{
+> +	int i;
+> +
+> +	if (stringset != ETH_SS_STATS)
+> +		return;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(an8855_mib); i++)
+> +		ethtool_puts(&data, an8855_mib[i].name);
 
+Same feedback as for yt921x. For new drivers we want in unstructured
+ethtool -S only those statistics which are not exposed through standard
+variants (to force the adoption of the new interfaces).
 
-On 15/09/2025 10:38, Tariq Toukan wrote:
-> 
-> 
-> On 11/09/2025 17:36, Jakub Kicinski wrote:
->> On Thu, 11 Sep 2025 17:25:22 +0300 Mark Bloch wrote:
->>> On 11/09/2025 16:47, Jakub Kicinski wrote:
->>>> On Wed, 10 Sep 2025 17:00:11 -0700 Jakub Kicinski wrote:
->>>>> Hi, this is breaking dual host CX7 w/ 28.45.1300 (but I think most
->>>>> older FW versions, too). Looks like the host is not receiving any
->>>>> mcast (ping within a subnet doesn't work because the host receives
->>>>> no ndisc), and most traffic slows down to a trickle.
->>>>> Lost of rx_prio0_buf_discard increments.
->>>>>
->>>>> Please TAL ASAP, this change went to LTS last week.
->>>>
->>>> Any news on this? I heard that it also breaks DCB/QoS configuration
->>>> on 6.12.45 LTS.
->>>
->>> We are looking into this, once we have anything I'll update.
->>> Just to make sure, reverting this is one commit solves the
->>> issue you are seeing?
->>
->> It did for me, but Daniel (who is working on the PSP series)
->> mentioned that he had reverted all three to get net-next working:
->>
->>    net/mlx5e: Set local Xoff after FW update
->>    net/mlx5e: Update and set Xon/Xoff upon port speed set
->>    net/mlx5e: Update and set Xon/Xoff upon MTU set
->>
-> 
-> Hi Jakub,
-> 
-> Thanks for reporting.
-> We're investigating and will update soon.
-> 
-> Regards,
-> Tariq
-> 
-
-Hi,
-
-We prefer reverting the single patch [1] for now. We'll submit a fixed 
-version later.
-
-Regarding the other two patches [2], initial testing showed no issues.
-Can you/Daniel share more info? What issues you see, and the repro steps.
-
-Thanks,
-Tariq
-
-[1]
-net/mlx5e: Update and set Xon/Xoff upon port speed set
-
-[2]
-net/mlx5e: Set local Xoff after FW update
-net/mlx5e: Update and set Xon/Xoff upon MTU set
-
+> +}
+> +
+> +static void an8855_read_port_stats(struct an8855_priv *priv, int port,
+> +				   u32 offset, u8 size, uint64_t *data)
+> +{
+> +	u32 val, reg = AN8855_PORT_MIB_COUNTER(port) + offset;
+> +
+> +	regmap_read(priv->regmap, reg, &val);
+> +	*data = val;
+> +
+> +	if (size == 2) {
+> +		regmap_read(priv->regmap, reg + 4, &val);
+> +		*data |= (u64)val << 32;
+> +	}
+> +}
+> +
+> +static void an8855_get_ethtool_stats(struct dsa_switch *ds, int port,
+> +				     uint64_t *data)
+> +{
+> +	struct an8855_priv *priv = ds->priv;
+> +	const struct an8855_mib_desc *mib;
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(an8855_mib); i++) {
+> +		mib = &an8855_mib[i];
+> +
+> +		an8855_read_port_stats(priv, port, mib->offset, mib->size,
+> +				       data + i);
+> +	}
+> +}
+> +
+> +static int an8855_get_sset_count(struct dsa_switch *ds, int port,
+> +				 int sset)
+> +{
+> +	if (sset != ETH_SS_STATS)
+> +		return 0;
+> +
+> +	return ARRAY_SIZE(an8855_mib);
+> +}
+> +
+> +static void an8855_get_eth_mac_stats(struct dsa_switch *ds, int port,
+> +				     struct ethtool_eth_mac_stats *mac_stats)
+> +{
+> +	struct an8855_priv *priv = ds->priv;
+> +
+> +	/* MIB counter doesn't provide a FramesTransmittedOK but instead
+> +	 * provide stats for Unicast, Broadcast and Multicast frames separately.
+> +	 * To simulate a global frame counter, read Unicast and addition Multicast
+> +	 * and Broadcast later
+> +	 */
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_UNICAST, 1,
+> +			       &mac_stats->FramesTransmittedOK);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_SINGLE_COLLISION, 1,
+> +			       &mac_stats->SingleCollisionFrames);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_MULTIPLE_COLLISION, 1,
+> +			       &mac_stats->MultipleCollisionFrames);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_UNICAST, 1,
+> +			       &mac_stats->FramesReceivedOK);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_BYTES, 2,
+> +			       &mac_stats->OctetsTransmittedOK);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_ALIGN_ERR, 1,
+> +			       &mac_stats->AlignmentErrors);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_DEFERRED, 1,
+> +			       &mac_stats->FramesWithDeferredXmissions);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_LATE_COLLISION, 1,
+> +			       &mac_stats->LateCollisions);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_EXCESSIVE_COLLISION, 1,
+> +			       &mac_stats->FramesAbortedDueToXSColls);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_BYTES, 2,
+> +			       &mac_stats->OctetsReceivedOK);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_MULTICAST, 1,
+> +			       &mac_stats->MulticastFramesXmittedOK);
+> +	mac_stats->FramesTransmittedOK += mac_stats->MulticastFramesXmittedOK;
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_BROADCAST, 1,
+> +			       &mac_stats->BroadcastFramesXmittedOK);
+> +	mac_stats->FramesTransmittedOK += mac_stats->BroadcastFramesXmittedOK;
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_MULTICAST, 1,
+> +			       &mac_stats->MulticastFramesReceivedOK);
+> +	mac_stats->FramesReceivedOK += mac_stats->MulticastFramesReceivedOK;
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_BROADCAST, 1,
+> +			       &mac_stats->BroadcastFramesReceivedOK);
+> +	mac_stats->FramesReceivedOK += mac_stats->BroadcastFramesReceivedOK;
+> +}
+> +
+> +static const struct ethtool_rmon_hist_range an8855_rmon_ranges[] = {
+> +	{ 0, 64 },
+> +	{ 65, 127 },
+> +	{ 128, 255 },
+> +	{ 256, 511 },
+> +	{ 512, 1023 },
+> +	{ 1024, 1518 },
+> +	{ 1519, AN8855_MAX_MTU },
+> +	{}
+> +};
+> +
+> +static void an8855_get_rmon_stats(struct dsa_switch *ds, int port,
+> +				  struct ethtool_rmon_stats *rmon_stats,
+> +				  const struct ethtool_rmon_hist_range **ranges)
+> +{
+> +	struct an8855_priv *priv = ds->priv;
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_UNDER_SIZE_ERR, 1,
+> +			       &rmon_stats->undersize_pkts);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_OVER_SZ_ERR, 1,
+> +			       &rmon_stats->oversize_pkts);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_FRAG_ERR, 1,
+> +			       &rmon_stats->fragments);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_JABBER_ERR, 1,
+> +			       &rmon_stats->jabbers);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PKT_SZ_64, 1,
+> +			       &rmon_stats->hist[0]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PKT_SZ_65_TO_127, 1,
+> +			       &rmon_stats->hist[1]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PKT_SZ_128_TO_255, 1,
+> +			       &rmon_stats->hist[2]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PKT_SZ_256_TO_511, 1,
+> +			       &rmon_stats->hist[3]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PKT_SZ_512_TO_1023, 1,
+> +			       &rmon_stats->hist[4]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PKT_SZ_1024_TO_1518, 1,
+> +			       &rmon_stats->hist[5]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PKT_SZ_1519_TO_MAX, 1,
+> +			       &rmon_stats->hist[6]);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PKT_SZ_64, 1,
+> +			       &rmon_stats->hist_tx[0]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PKT_SZ_65_TO_127, 1,
+> +			       &rmon_stats->hist_tx[1]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PKT_SZ_128_TO_255, 1,
+> +			       &rmon_stats->hist_tx[2]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PKT_SZ_256_TO_511, 1,
+> +			       &rmon_stats->hist_tx[3]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PKT_SZ_512_TO_1023, 1,
+> +			       &rmon_stats->hist_tx[4]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PKT_SZ_1024_TO_1518, 1,
+> +			       &rmon_stats->hist_tx[5]);
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PKT_SZ_1519_TO_MAX, 1,
+> +			       &rmon_stats->hist_tx[6]);
+> +
+> +	*ranges = an8855_rmon_ranges;
+> +}
+> +
+> +static void an8855_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
+> +				      struct ethtool_eth_ctrl_stats *ctrl_stats)
+> +{
+> +	struct an8855_priv *priv = ds->priv;
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_TX_PAUSE, 1,
+> +			       &ctrl_stats->MACControlFramesTransmitted);
+> +
+> +	an8855_read_port_stats(priv, port, AN8855_PORT_MIB_RX_PAUSE, 1,
+> +			       &ctrl_stats->MACControlFramesReceived);
+> +}
 
