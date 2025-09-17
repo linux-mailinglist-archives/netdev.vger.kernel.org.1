@@ -1,120 +1,103 @@
-Return-Path: <netdev+bounces-224148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5077B8140C
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:55:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9882CB8142F
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:57:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1C00581629
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:55:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 563B23B8193
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74982FFDD9;
-	Wed, 17 Sep 2025 17:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFC52FE045;
+	Wed, 17 Sep 2025 17:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WbGs5oyC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4eValvNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEEB2FE56B
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06DA2FFDE6
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758131708; cv=none; b=QcB531ETkWJHO4keN4p5hpHUCdh62apvMrct3v//e6PpO5jnNNn6apEbsPKFW2zgxFkZdpu4XEF2MKlWgfX5zJsLDQVotBMU2pwgcCgwIZ5L0lWQ1ogN5+mA6bmaqz1iYuW3LZBrwVbFkFJsZDHuTTcYlEMBQv1Wa7rXujEauFc=
+	t=1758131826; cv=none; b=LzQBFlTCPAPXd5uPQwCJlC5U/1frTIaV8W1m6F3fsx0NVpT6uRnz12A9lhR8s9KCVlCdRdyl0NtgFOkRuxCuKW61LCcSLxa5yFxHj6iFYLZL2ni0K+7He03f5RIMIOTiCEHbH6ksrtuNu02v3nFBOq3xXb3NwwhiVYtEajJIdzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758131708; c=relaxed/simple;
-	bh=ofFEnoomr9zWU+tWjXkp+bAT4Dziq/sGt4TDVyE8xWs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZCrgEOqsW1+B0pd3Hcw1ojbMlywQ/MwgkQw9BMbXby7VhrV/804Px+JP1BIgx3jVvK0JUtYlOZI9GFGkRDfNoMZrQlgvz8IXiy9IbbBxbr5CkaijTwvI9idfjfyVykfgOZSXiSunSAlmdYp7YI7F7oBCssI2dTwyD+FkY7IjgSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WbGs5oyC; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <28df67a9-528d-41e9-8441-722237b9add9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758131700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=59R9HA7jlm2dD2+dCG2KHNnU9UurkcLnLEbQfzZDzBU=;
-	b=WbGs5oyC0EOgmSoY0o0b9VbHmMLQ607VpU28tO4E7PfFIEqK75aAaozK1XGjzGVu4W+5Kw
-	bbhp/oSw+HyEDp5G4Q2bsMS5GCXJ8tPIj5ViNXoJSS0/8qCOamYtZzg9q+guZb8W9BvQ03
-	jWToEGRc7SBWIHXYEoKhRZhPes4UKL4=
-Date: Wed, 17 Sep 2025 10:54:46 -0700
+	s=arc-20240116; t=1758131826; c=relaxed/simple;
+	bh=TSvJlr704CKx/cfRFOjh/vjSrZRGeDDCYBcFuzEhaeg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YsAwTmjI/UF9dsfHaz79xegMzEGe1dlFE8wgTGZyZNKJRQo7cPI+O6W7JIr3DxF4bPCHPO6dFY/2sB3PC4sVx0WCNKmD87PFS3oH8buZvblY/i1qpYoQR2w5Y2XLFfi34ZkutUR88bAmgjAQQYw8ap+R+tDdKF4m4u1Gu+rK88c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4eValvNL; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2570bf6058aso1133755ad.0
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:57:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758131824; x=1758736624; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TSvJlr704CKx/cfRFOjh/vjSrZRGeDDCYBcFuzEhaeg=;
+        b=4eValvNLeDTzqFyIIDXsAkyOhnjF9x/VBH4HyPK64P1gvd2elmEfAlroK0foLI9pbJ
+         A86g97UgNft6IY9p0VCRqK80GFDxS7haC32NQDgg3L74xirJ7N3U/Ozkg85WPV7nvkqx
+         pcQeMlS8g3iok1unS4xZ+azq9Y/qlOiK3npxxYEWscnSzaVrMxe6GBROxQXn7AJFeztd
+         yYSDuXf4mft9HfjVBJ8wwAwv5ALNneTFw3On+ScnhRpehECL5C41KEV4JFyuazisX3MU
+         AUBDxNBLbRtauxvaww7czsNSk/lk5QpZDcPuNUEhBuWeNC1bx3d3VcHlqM/7U8tcPMN7
+         LP1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758131824; x=1758736624;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TSvJlr704CKx/cfRFOjh/vjSrZRGeDDCYBcFuzEhaeg=;
+        b=JMiWiZNWP15f2tXt1grembQ00c/XIfTjNmI0Jm8soxkTCERdzPnr1bqvzG2SROKcRv
+         /IfasvzLnGtqMKq+9lTVb/tWfC5fX3GAXdiPtlut+QAshK+HoHIaxDMvRtsclmbKCEju
+         dA1IZ848/c381m73SLlC35MIIoqCiVhwCd4SyCUkFZoPOa2f7UpvbTn6ntqaQ/glJj6e
+         HmrfDZZmYv+lyFGycmEqJ/2Cnw4A01U4//10+E7+Uk+z8hHtMJ82CFgegCQPf6BbeshT
+         PwRpM1u3UDMDP3DMqMTdE/uU69zql7TnYWJxKfDNXMeet0ShtD3rnJSs0mKgNGVi8xNu
+         9S9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVwUZPnbPumeOvVqgyF/HBRTvWHw0HqVKDMJZt2ha1CEe07p83qwOykrfxVBHrU9h8gR4ZYmFo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYpCxA3sqTy71943ols3si7FfJRVGFX5GZMKP1fWSV7ZWzlOB9
+	xNFEuhWQc6mO9SfxmrX9N5zA6TQVWznmfypWo9e3SCX+pwDiPAe0X0VWhJZ9xqpyqcq+Zg/L9kO
+	YJZERAXu0RITx1vt7rGbnAvauDrZiPBd74AkbFDEN
+X-Gm-Gg: ASbGncuPQh+cpiyvb3X94OC7MJc77rHUOhbIo/EWLW3SE+IkQ7E7fQJ21W2Ybx9j6pY
+	Jo5oM5/n/0KM9V/MgaG8AupI23iWeAWJjtr07S5cbM8/yOKbXBVxdpuySws4qkLRAO/Rf1FDFRm
+	Ky0Lg0JajIGFEsTjT/ZwfBHdIi1FgSjot13SxDIFOgxRs7S41OsqLjUUtMfH7Kbr+VCKRsH+ozp
+	nbfUYv/4/LHmbLt8C0kiBzb8DEGaDQWm72Lr7+P0XXm
+X-Google-Smtp-Source: AGHT+IHbxMlKRMFhB+PBX0sXiGNrVNurA14cH8x8gvEfTbRO9kU1rSVToA0XPISn9mt2/VtkNazrAUts468SIOR0v6s=
+X-Received: by 2002:a17:902:ccce:b0:24c:8984:5f9c with SMTP id
+ d9443c01a7336-268137f314emr36740855ad.36.1758131824113; Wed, 17 Sep 2025
+ 10:57:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 5/6] selftests/bpf: Test bpf_xdp_pull_data
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- paul.chaignon@gmail.com, kuba@kernel.org, stfomichev@gmail.com,
- martin.lau@kernel.org, mohsin.bashr@gmail.com, noren@nvidia.com,
- dtatulea@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com,
- mbloch@nvidia.com, maciej.fijalkowski@intel.com, kernel-team@meta.com
-References: <20250915224801.2961360-1-ameryhung@gmail.com>
- <20250915224801.2961360-6-ameryhung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250915224801.2961360-6-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250916160951.541279-1-edumazet@google.com> <20250916160951.541279-2-edumazet@google.com>
+In-Reply-To: <20250916160951.541279-2-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 17 Sep 2025 10:56:52 -0700
+X-Gm-Features: AS18NWB-q7VMIVcDkb2ovLugxLWEwqpxBvQk76E9bupvKoZjCDtBWUs3VkBLM9I
+Message-ID: <CAAVpQUDSNDOSriMhb89u338LEQdtL0_6+KQH2VdKREhuJm1qKg@mail.gmail.com>
+Subject: Re: [PATCH net-next 01/10] ipv6: make ipv6_pinfo.saddr_cache a boolean
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/15/25 3:48 PM, Amery Hung wrote:
-> +/* Find sizes of struct skb_shared_info and struct xdp_frame so that
-> + * we can calculate the maximum pull lengths for test cases
-> + */
-> +int find_xdp_sizes(struct test_xdp_pull_data *skel, int frame_sz)
+On Tue, Sep 16, 2025 at 9:09=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> ipv6_pinfo.saddr_cache is either NULL or &np->saddr.
+>
+> We do not need 8 bytes, a boolean is enough.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-static
-
-> +{
-> +	LIBBPF_OPTS(bpf_test_run_opts, topts);
-> +	struct xdp_md ctx = {};
-> +	int prog_fd, err;
-> +	__u8 *buf;
-> +
-> +	buf = calloc(frame_sz, sizeof(__u8));
-
-buf is leaked.
-
-> +	if (!ASSERT_OK_PTR(buf, "calloc buf"))
-> +		return -ENOMEM;
-> +
-> +	topts.data_in = buf;
-> +	topts.data_out = buf;
-> +	topts.data_size_in = frame_sz;
-> +	topts.data_size_out = frame_sz;
-> +	/* Pass a data_end larger than the linear space available to make sure
-> +	 * bpf_prog_test_run_xdp() will fill the linear data area so that
-> +	 * xdp_find_data_hard_end can infer the size of struct skb_shared_info
-> +	 */
-> +	ctx.data_end = frame_sz;
-> +	topts.ctx_in = &ctx;
-> +	topts.ctx_out = &ctx;
-> +	topts.ctx_size_in = sizeof(ctx);
-> +	topts.ctx_size_out = sizeof(ctx);
-> +
-> +	prog_fd = bpf_program__fd(skel->progs.xdp_find_sizes);
-> +	err = bpf_prog_test_run_opts(prog_fd, &topts);
-> +	ASSERT_OK(err, "bpf_prog_test_run_opts");
-> +
-> +	return err;
-> +}
-> +
-> +/* xdp_pull_data_prog will directly read a marker 0xbb stored at buf[1024]
-> + * so caller expecting XDP_PASS should always pass pull_len no less than 1024
-> + */
-> +void run_test(struct test_xdp_pull_data *skel, int retval,
-
-static
-
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
