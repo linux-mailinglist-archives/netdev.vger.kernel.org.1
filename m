@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-224193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01693B8224D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 00:20:37 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5791BB82250
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 00:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 580771C23FC6
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 22:20:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2FC764E1A6E
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 22:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21E930EF80;
-	Wed, 17 Sep 2025 22:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936B630F931;
+	Wed, 17 Sep 2025 22:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rw09I1uC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRIC5E+W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D8B30E85E;
-	Wed, 17 Sep 2025 22:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680DC30F92C;
+	Wed, 17 Sep 2025 22:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758147624; cv=none; b=jUnGdugzfCWmbOrWN7RIOcnkjOWrxmkNYYCiP06grYCpu+upTDsGdau27KdHzlzeA16vskxNdTGEh2oHtT9Dg0VNYpF0YVIc8UIxVY2Cm2RW+RPbL/b0qFwKbqdMovwfDEUY79J/fsteFnj9cstHycz3M5Zvwgjz/ZPMz8FG2Vs=
+	t=1758147626; cv=none; b=PPJ0OtVOONvqIj+4fRiMnw2FTzPhQQPgEQ59YPcDX/iD7W4RND+TDfxbciowkfn24wBF2wJwLJJs2FGCZdG3gM4EfHIrz7Uu3uQ8VfO+s0R7JaOMwiVK1z/3zXHVzi63DDI1C9AtRs3068qIJ+rha/hRG/m+NWt0NOymVlADwe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758147624; c=relaxed/simple;
-	bh=UAXtTYSSZXwRncb6qHR46TFy6fZj+ssxz42YvkNnIos=;
+	s=arc-20240116; t=1758147626; c=relaxed/simple;
+	bh=vFFGJiMFCDxsnqXYrf83viYFTXNZ4fZQAJmYQsJZIpk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YT9y5wPXTaf3HnKDfR2dJDQOlFts+LvZx7SKOavfX3rGgy7EgbTudVjSdATH/qLtIxEXFRBqg+2/NFm1V/9ypVbd+AcemCGpG8G//6LZKJKtT0IHYOyudZxy88+6y5yEC2M/1N693pVczLXXzcavwNGpPIx6yxRMN5m5Z+7eKtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rw09I1uC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E17BC4CEE7;
-	Wed, 17 Sep 2025 22:20:24 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=stryXgvXzMCpYeVCQHlo9pPAji7IiDPEJ22oWc6CXk8RgM+7IWvTWhmFoShjBRQbHDqVIBZBdDYGmjSzwoi4l4A95gOR0VAAC0uDpZdTL67ALfgXeRv0xdKdiYkPfZMenK7ELk1JSrp1j4qEImdvYD+SCPTkM3qb5P2WtDAmlMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRIC5E+W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8E17C4CEE7;
+	Wed, 17 Sep 2025 22:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758147624;
-	bh=UAXtTYSSZXwRncb6qHR46TFy6fZj+ssxz42YvkNnIos=;
+	s=k20201202; t=1758147626;
+	bh=vFFGJiMFCDxsnqXYrf83viYFTXNZ4fZQAJmYQsJZIpk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Rw09I1uCNEqwlDcoHmLxffqhGJuSYrqsfILM2GsfGu91XQDQL69XpD16n5/tCEARD
-	 kSYmvF156axjFpN7K6cstRnL8OMaZqHJ/asvKIe31HssvMj4mqYzSNZzxL+iqnK7vH
-	 CNoIIl89cN0GOr/ve7Cz3m4c8nzcqjeNrv5hpU3TG1P4IPlzkg9EjF/oVj3ASiVCeU
-	 5ez0vme/bXEhj7+PW0Q0BCu922cvFc/r0GKwxweaOqq1Lju8qr7ceqV8s/T8As6liD
-	 UzfAOcYHGfMKswCLzF6aWeIDjnuHiRpsq1XWSS7Lhikq5z/AE2F/WVyT3NYNXY6J9L
-	 fBnS8LG50mqtQ==
+	b=GRIC5E+WHHkSoae1unctFYI0d7NNuf8nEoIrbIK05aW3y0P+bTYroix9cgOhgHV7o
+	 PDF7RgluuleyDGrvn/63ckQTAIL6ERy1HaMBYYQWzvMEPeQ7lv6DyO3PNy8sIGKgHH
+	 0IBEUg27+M1ZZGPrgIZJNkQyub10TLwi8q59cbRTFw35MAwNeipAenM3U7WD9Wwnsw
+	 JtJCvrmzkPi2uIIgRkceO9cAxAwky3nAlzMBlGzlwS9AJm59z0r8ig0Ife3CbgSqrw
+	 lPTM8dqw5ixhhymDP4Z16lBCwWruRgFyWOj0kst4e9i2hJSrmlxKtdZI06VD7CyGyK
+	 aRrjNn2e8E+MQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3402D39D0C3D;
-	Wed, 17 Sep 2025 22:20:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD9D39D0C3D;
+	Wed, 17 Sep 2025 22:20:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] net: cadence: macb: Add support for Raspberry Pi RP1
- ethernet controller
+Subject: Re: [PATCH net-next] net: pcs: Kconfig: Fix unmet dependency warning
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175814762499.2168096.11472987759617415372.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Sep 2025 22:20:24 +0000
-References: <20250916081059.3992108-1-svarbanov@suse.de>
-In-Reply-To: <20250916081059.3992108-1-svarbanov@suse.de>
-To: Stanimir Varbanov <svarbanov@suse.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rpi-kernel@lists.infradead.org, bcm-kernel-feedback-list@broadcom.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, florian.fainelli@broadcom.com, andrea.porta@suse.com,
- nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, phil@raspberrypi.com,
- jonathan@raspberrypi.com, dave.stevenson@raspberrypi.com, andrew@lunn.ch
+ <175814762624.2168096.4750691508233260895.git-patchwork-notify@kernel.org>
+Date: Wed, 17 Sep 2025 22:20:26 +0000
+References: <20250916162335.3339558-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: 
+ <20250916162335.3339558-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ geert+renesas@glider.be, linux-renesas-soc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ biju.das.jz@bp.renesas.com, fabrizio.castro.jz@renesas.com,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, lkft@linaro.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 16 Sep 2025 11:10:59 +0300 you wrote:
-> From: Dave Stevenson <dave.stevenson@raspberrypi.com>
+On Tue, 16 Sep 2025 17:23:35 +0100 you wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > 
-> The RP1 chip has the Cadence GEM block, but wants the tx_clock
-> to always run at 125MHz, in the same way as sama7g5.
-> Add the relevant configuration.
-> 
-> Signed-off-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
-> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
-> Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> Fix the Kconfig dependencies for PCS_RZN1_MIIC to avoid the unmet direct
+> dependency warning when enabling DWMAC_RENESAS_GBETH. The PCS driver is
+> used on multiple Renesas SoCs including RZ/N1, RZ/N2H and RZ/T2H, but the
+> existing condition only allowed ARCH_RZN1, ARCH_R9A09G077, or
+> ARCH_R9A09G087. This conflicted with the GBETH/GMAC driver which selects
+> PCS_RZN1_MIIC under ARCH_RENESAS.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] net: cadence: macb: Add support for Raspberry Pi RP1 ethernet controller
-    https://git.kernel.org/netdev/net-next/c/dc110d1b2356
+  - [net-next] net: pcs: Kconfig: Fix unmet dependency warning
+    https://git.kernel.org/netdev/net-next/c/dfc85640796b
 
 You are awesome, thank you!
 -- 
