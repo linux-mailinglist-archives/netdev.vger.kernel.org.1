@@ -1,594 +1,197 @@
-Return-Path: <netdev+bounces-224215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74C47B824F5
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 01:38:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF6DB8253D
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 01:55:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 251DB7A2471
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 23:36:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF6CF5813F7
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 23:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2F93294FE;
-	Wed, 17 Sep 2025 23:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C7F29A326;
+	Wed, 17 Sep 2025 23:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J95J5G0K"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HGgUr0jW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EF6265630
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 23:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF002877D8
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 23:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758152313; cv=none; b=tfX4vqYiENr5zDWsHi79bSqgJ3NK5+Qr9jv0NMlpmiIRIzWzgSCLXQokoPOAkw5UAvPkyn4SVQp2SLM2WFeKjHv3UnFqO2FmK3rxhAr2sleTgCHZ3uLGo+RrKGi1yLU5ZtEq5+HMb6APYdysFmthuh+E73L6ML/U0oa9ARGjgQQ=
+	t=1758153351; cv=none; b=qlYcjuvb7wzuGa9ONNGECys+Z40Po01I8q4b6tyvvX/PKOvnSCCoQ78lQdN4NW08+1+2ZF1juPgdIj6jIlxUOndtwvKAAzErmnm3aJifQC5UWd1nQI5Is7unLwPQNJw9P7BnWkhXRGHa219BDUFdx9KA8lM4kTDOy142SNyoN70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758152313; c=relaxed/simple;
-	bh=lrTHq0RZKlXNr12IIHcf/QuBQ8dQbTXenh1lsayWT2I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tMJOuwHe3O/yAsRjoQ1ixFrSiN8drsDerxkv/kMaMv+MN6IILyuHaO9dHiQ0v0LnNZZfKaz+w9+c3JKhr8Cxe77Df3+JADK8rW5QrwP2BArzQfBI1EZX5ignRDeXo2ntm2mT5+g8n96Va0pY6BwdRGKcvnhhvgvp6CJEhRuG368=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J95J5G0K; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a706bb87-46e1-4524-8d35-8f22569a73e7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758152299;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=slS7VafjOvasitxCHtJrhEeq6XWzVWafcmogWCG+nCQ=;
-	b=J95J5G0KYuSu5/ZRohC8ixTS2Cv5u1SyMOf/kXXN1fbHlSpO5RpO9KYnesYeZLnrZyYpeb
-	etiK5JIrDZ3L5F0ulrtw/TVmJ3auVBf7L3w0wL6ikULVDoNwnMgb2cRqodp1Pr3lqguUtt
-	ep1hB/WdIw9Jde8GBbx4F4tMTHHYvaw=
-Date: Wed, 17 Sep 2025 16:38:11 -0700
+	s=arc-20240116; t=1758153351; c=relaxed/simple;
+	bh=s3kx4Yc+B/QQMXBOgQOpaOW3sMuakNxguXeeY6yqNeA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MxJiWeiJK7CaYIidpqFW8bFESOpl4zKUGdDHWydODrIuClaRGBS2Vl4Ee+3D+eJ2g4lGP+VcfbVGtMA0P+qnb4WKh6W9s9G2TEV3X3iTErpTu1bseubnShR1zHbD3ZOxUg7jh+Mb5fLTXzKKBTU9FrsVawHKLmCSye+C6eRgDhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HGgUr0jW; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-572e153494eso1757e87.1
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:55:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758153348; x=1758758148; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h2BqbA+mdt4TSxAifBWwgyG/76v4E1bDgqDxwYgdDNY=;
+        b=HGgUr0jWdlWBtEfv/9You9L4DZ8VNxIvnv9mtumi9UpOk9tnnwr2inzAoKbirIP/cR
+         2NcRDbEdUqzxEsy5XwxP3+NdtiSWWkdUuItzPOhOVqXYJnZk3mB9u6PyO+IbS3mACy2r
+         1cJ87drey8X8DM8gkr5HTXdV8UOfAmBNSbu89USaHr5WVlIL8U3VXGcpm7XBhudwjusb
+         6l39C2NkXtQ3YmpKOXTQZL9elWCj7ehRW/eaQNaGNww/50jZ4ivjkLf/hCMArj8q2wd1
+         9mvzlSVn6vCXztokFpftcHgFFYk16CIYZPiJtkh2wR8ygqd5zGUDvT87wlGfmagG0taW
+         iaLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758153348; x=1758758148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h2BqbA+mdt4TSxAifBWwgyG/76v4E1bDgqDxwYgdDNY=;
+        b=dCZkUlKb5ALh947jh4DZOipm6JPUuZ7vd2vlhpfzohNyUiqF7RviuPWvL3j94xinnt
+         Qik+cWho2ktW/C+660qe1Zg+f0Z2q/Inz/uyt25HhKzKDAACCHiRwhGTQvthEeo8g4b1
+         VhpQtaQTGJhutDv7hIhFUXpj/YG8Ukn4us/wBifu1WNcLuKtGe8lkq1FSC/BOf93C9EB
+         z79D7+yLt6woCoPPkZUJXP8TSNFPilc4X0wxG49LbvxuqkDC/jBt8CFJGc2dOIVjaTV3
+         eMw6dZDNVwCGuZzXPZ4qiCCNopHbWAKXAiEzGM8PSUi6t+V5xephBflPXDKW/7XddeXj
+         rO5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUy/6h6402sKxa5sDZnwR3jerZe2Ht+9zM3ZjpJDwrnrGbm+SxUG66jAMWEZx+krsT5kNrb6Hc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/fuw6aQTfQLQFL6BIiTQlB6f2LvDKXDA4vLATqp3mJPBEn8Jq
+	vH3u9gZu3jQGLuisQL/301G85Prc/baCj6zIRhx/XAIIb9Aqz77suvrMqImuJtaFuV67b/6QldV
+	5TlDztunZotpSswyimQuUumfT0B3d79qcXdPlqvsM
+X-Gm-Gg: ASbGnctMc4MV03foqp3KkAZIIlX3GpFr9rHmLarM290FEJfK9Z+JoDRiJaD6j2bhCMG
+	sGMsPsbjjRRvZGIUXuNA9Nv8Z72ie6OoQawVcKerrayR7sa1O9YVdjiEaJletShysMd60BL0izt
+	J/itxgPaj3EIV3i0gjx30mbAV/O0sujsqU/SpuwvTslewclyX72Bb5TEvL5NDyHv2LSvIwwaIMo
+	+BBlItFmK+2k4VSd5Glp4h59xP/Yswvm4NJ+L1kzCp1pDALTNsV01nq+izidcc=
+X-Google-Smtp-Source: AGHT+IGAuAFB/cjvpY7Y4AZju/AFSMn3Ds5rHS2LUoc+dpzjwn1K7OXUpwxzSZfe8tpiqg4YPaRsvQ/ih9HrDwCBidg=
+X-Received: by 2002:a05:6512:3ba6:b0:542:6b39:1d57 with SMTP id
+ 2adb3069b0e04-57778c48d17mr515140e87.3.1758153347419; Wed, 17 Sep 2025
+ 16:55:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v9 bpf-next/net 6/6] selftest: bpf: Add test for
- SK_MEMCG_EXCLUSIVE.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250917191417.1056739-1-kuniyu@google.com>
- <20250917191417.1056739-7-kuniyu@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250917191417.1056739-7-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com>
+ <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-2-c80d735bd453@meta.com>
+In-Reply-To: <20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-2-c80d735bd453@meta.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 17 Sep 2025 16:55:34 -0700
+X-Gm-Features: AS18NWDDuUAXlqLMWoiuJyipblvfnn6oVju_1frRroYSHlxNGTk3xhMxeaVEObI
+Message-ID: <CAHS8izPNC65OUr4j1AjWFwRi-kNFobQ=cS4UtwNSVJsZrw19nQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/3] net: devmem: use niov array for token management
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/17/25 12:14 PM, Kuniyuki Iwashima wrote:
-> The test does the following for IPv4/IPv6 x TCP/UDP sockets
-> with/without SK_MEMCG_EXCLUSIVE, which can be turned on by
-> net.core.memcg_exclusive or bpf_setsockopt(SK_BPF_MEMCG_EXCLUSIVE).
-> 
->    1. Create socket pairs
->    2. Send a bunch of data that requires more than 1024 pages
->    3. Read memory_allocated from sk->sk_prot->memory_allocated and
->       sk->sk_prot->memory_per_cpu_fw_alloc
->    4. Check if unread data is charged to memory_allocated
-> 
-> If SK_MEMCG_EXCLUSIVE is set, memory_allocated should not be
-> changed, but we allow a small error (up to 10 pages) in case
-> other processes on the host use some amounts of TCP/UDP memory.
-> 
-> The amount of allocated pages are buffered to per-cpu variable
-> {tcp,udp}_memory_per_cpu_fw_alloc up to +/- net.core.mem_pcpu_rsv
-> before reported to {tcp,udp}_memory_allocated.
-> 
-> At 3., memory_allocated is calculated from the 2 variables twice
-> at fentry and fexit of socket create function to check if the per-cpu
-> value is drained during calculation.  In that case, 3. is retried.
-> 
-> We use kern_sync_rcu() for UDP because UDP recv queue is destroyed
-> after RCU grace period.
-> 
-> The test takes ~2s on QEMU (64 CPUs) w/ KVM but takes 6s w/o KVM.
-> 
->    # time ./test_progs -t sk_memcg
->    #370/1   sk_memcg/TCP  :OK
->    #370/2   sk_memcg/UDP  :OK
->    #370/3   sk_memcg/TCPv6:OK
->    #370/4   sk_memcg/UDPv6:OK
->    #370     sk_memcg:OK
->    Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
-> 
->    real	0m1.623s
->    user	0m0.165s
->    sys	0m0.366s
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
-> v7:
->    * Add test for sysctl
-> 
-> v6:
->    * Trace sk_prot->memory_allocated + sk_prot->memory_per_cpu_fw_alloc
-> 
-> v5:
->    * Use kern_sync_rcu()
->    * Double NR_SEND to 128
-> 
-> v4:
->    * Only use inet_create() hook
->    * Test bpf_getsockopt()
->    * Add serial_ prefix
->    * Reduce sleep() and the amount of sent data
-> ---
->   .../selftests/bpf/prog_tests/sk_memcg.c       | 261 ++++++++++++++++++
->   tools/testing/selftests/bpf/progs/sk_memcg.c  | 146 ++++++++++
->   2 files changed, 407 insertions(+)
->   create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
->   create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sk_memcg.c b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-> new file mode 100644
-> index 000000000000..777fb81e9365
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-> @@ -0,0 +1,261 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright 2025 Google LLC */
-> +
-> +#include <test_progs.h>
-> +#include "sk_memcg.skel.h"
-> +#include "network_helpers.h"
-> +
-> +#define NR_SOCKETS	64
-> +#define NR_SEND		128
-> +#define BUF_SINGLE	1024
-> +#define BUF_TOTAL	(BUF_SINGLE * NR_SEND)
-> +
-> +struct test_case {
-> +	char name[8];
-> +	int family;
-> +	int type;
-> +	int (*create_sockets)(struct test_case *test_case, int sk[], int len);
-> +	long (*get_memory_allocated)(struct test_case *test_case, struct sk_memcg *skel);
-> +};
-> +
-> +static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
-> +{
-> +	int server, i;
-> +
-> +	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
-> +	ASSERT_GE(server, 0, "start_server_str");
-> +
-> +	for (i = 0; i < len / 2; i++) {
-> +		sk[i * 2] = connect_to_fd(server, 0);
-> +		if (!ASSERT_GE(sk[i * 2], 0, "connect_to_fd"))
-> +			return sk[i * 2];
-> +
-> +		sk[i * 2 + 1] = accept(server, NULL, NULL);
-> +		if (!ASSERT_GE(sk[i * 2 + 1], 0, "accept"))
-> +			return sk[i * 2 + 1];
-> +	}
-> +
-> +	close(server);
-> +
-> +	return 0;
-> +}
-> +
-> +static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
-> +{
-> +	int i, err, rcvbuf = BUF_TOTAL;
-> +
-> +	for (i = 0; i < len / 2; i++) {
+On Thu, Sep 11, 2025 at 10:28=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gmai=
+l.com> wrote:
+>
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+> Improve CPU performance of devmem token management by using page offsets
+> as dmabuf tokens and using them for direct array access lookups instead
+> of xarray lookups. Consequently, the xarray can be removed. The result
+> is an average 5% reduction in CPU cycles spent by devmem RX user
+> threads.
+>
+> This patch changes the meaning of tokens. Tokens previously referred to
+> unique fragments of pages. In this patch tokens instead represent
+> references to pages, not fragments.  Because of this, multiple tokens
+> may refer to the same page and so have identical value (e.g., two small
+> fragments may coexist on the same page). The token and offset pair that
+> the user receives uniquely identifies fragments if needed.  This assumes
+> that the user is not attempting to sort / uniq the token list using
+> tokens alone.
+>
+> A new restriction is added to the implementation: devmem RX sockets
+> cannot switch dmabuf bindings. In practice, this is a symptom of invalid
+> configuration as a flow would have to be steered to a different queue or
+> device where there is a different binding, which is generally bad for
+> TCP flows. This restriction is necessary because the 32-bit dmabuf token
+> does not have enough bits to represent both the pages in a large dmabuf
+> and also a binding or dmabuf ID. For example, a system with 8 NICs and
+> 32 queues requires 8 bits for a binding / queue ID (8 NICs * 32 queues
+> =3D=3D 256 queues total =3D=3D 2^8), which leaves only 24 bits for dmabuf=
+ pages
+> (2^24 * 4096 / (1<<30) =3D=3D 64GB). This is insufficient for the device =
+and
+> queue numbers on many current systems or systems that may need larger
+> GPU dmabufs (as for hard limits, my current H100 has 80GB GPU memory per
+> device).
+>
+> Using kperf[1] with 4 flows and workers, this patch improves receive
+> worker CPU util by ~4.9% with slightly better throughput.
+>
+> Before, mean cpu util for rx workers ~83.6%:
+>
+> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal =
+ %guest  %gnice   %idle
+> Average:       4    2.30    0.00   79.43    0.00    0.65    0.21    0.00 =
+   0.00    0.00   17.41
+> Average:       5    2.27    0.00   80.40    0.00    0.45    0.21    0.00 =
+   0.00    0.00   16.67
+> Average:       6    2.28    0.00   80.47    0.00    0.46    0.25    0.00 =
+   0.00    0.00   16.54
+> Average:       7    2.42    0.00   82.05    0.00    0.46    0.21    0.00 =
+   0.00    0.00   14.86
+>
+> After, mean cpu util % for rx workers ~78.7%:
+>
+> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal =
+ %guest  %gnice   %idle
+> Average:       4    2.61    0.00   73.31    0.00    0.76    0.11    0.00 =
+   0.00    0.00   23.20
+> Average:       5    2.95    0.00   74.24    0.00    0.66    0.22    0.00 =
+   0.00    0.00   21.94
+> Average:       6    2.81    0.00   73.38    0.00    0.97    0.11    0.00 =
+   0.00    0.00   22.73
+> Average:       7    3.05    0.00   78.76    0.00    0.76    0.11    0.00 =
+   0.00    0.00   17.32
+>
+> Mean throughput improves, but falls within a standard deviation (~45GB/s
+> for 4 flows on a 50GB/s NIC, one hop).
+>
+> This patch adds an array of atomics for counting the tokens returned to
+> the user for a given page. There is a 4-byte atomic per page in the
+> dmabuf per socket. Given a 2GB dmabuf, this array is 2MB.
+>
 
-nit. How about "for (i = 0; i < len; i += 2) {" once here instead of "i * 2" 
-below. Same for the tcp_create_sockets() above.
+I think this may be an issue. A typical devmem application doing real
+work will probably use a dmabuf around this size and will have
+thousands of connections. For algorithms like all-to-all I believe
+every node needs a number of connections to each other node, and it's
+common to see 10K devmem connections while a training is happening or
+what not.
 
-> +		sk[i * 2] = start_server(test_case->family, test_case->type, NULL, 0, 0);
-> +		if (!ASSERT_GE(sk[i * 2], 0, "start_server"))
-> +			return sk[i * 2];
-> +
-> +		sk[i * 2 + 1] = connect_to_fd(sk[i * 2], 0);
-> +		if (!ASSERT_GE(sk[i * 2 + 1], 0, "connect_to_fd"))
-> +			return sk[i * 2 + 1];
-> +
-> +		err = connect_fd_to_fd(sk[i * 2], sk[i * 2 + 1], 0);
-> +		if (!ASSERT_EQ(err, 0, "connect_fd_to_fd"))
-> +			return err;
-> +
-> +		err = setsockopt(sk[i * 2], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-> +		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-> +			return err;
-> +
-> +		err = setsockopt(sk[i * 2 + 1], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-> +		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-> +			return err;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static long get_memory_allocated(struct test_case *test_case,
-> +				 bool *activated, bool *stable,
-> +				 long *memory_allocated)
-> +{
-> +	*stable = false;
-> +
-> +	do {
-> +		*activated = true;
-> +
-> +		/* AF_INET and AF_INET6 share the same memory_allocated.
-> +		 * tcp_init_sock() is called by AF_INET and AF_INET6,
-> +		 * but udp_lib_init_sock() is inline.
-> +		 */
-> +		socket(AF_INET, test_case->type, 0);
+Having (2MB * 10K) =3D 20GB extra memory now being required just for
+this book-keeping is a bit hard to swallow. Do you know what's the
+existing memory footprint of the xarrays? Were they large anyway
+(we're not actually adding more memory), or is the 2MB entirely new?
 
-fd is leaked.
+If it's entirely new, I think we may need to resolve that somehow. One
+option is implement a resizeable array... IDK if that would be more
+efficient, especially since we need to lock it in the
+tcp_recvmsg_dmabuf and in the setsockopt.
 
-> +	} while (!*stable);
+Another option is to track the userrefs per-binding, not per socket.
+If we do that, we can't free user refs the user leaves behind when
+they close the socket (or crash). We can only clear refs on dmabuf
+unbind. We have to trust the user to do the right thing. I'm finding
+it hard to verify that our current userspace is careful about not
+leaving refs behind. We'd have to run thorough tests and stuff against
+your series.
 
-cannot loop forever. The test needs to assume the machine is relatively network 
-quiet anyway (so serial_). Things can still change after the stable test also. I 
-think having a way (the fentry in the progs/sk_memcg.c) to account for the 
-percpu fw alloc is good enough, and this should help if there is some light 
-background traffic that suddenly flush the hidden +255 percpu counter to the 
-global one and another percpu counter still has a -254 for example.
-
-> +
-> +	return *memory_allocated;
-> +}
-> +
-> +static long tcp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
-> +{
-> +	return get_memory_allocated(test_case,
-> +				    &skel->bss->tcp_activated,
-> +				    &skel->bss->tcp_stable,
-> +				    &skel->bss->tcp_memory_allocated);
-> +}
-> +
-> +static long udp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
-> +{
-> +	return get_memory_allocated(test_case,
-> +				    &skel->bss->udp_activated,
-> +				    &skel->bss->udp_stable,
-> +				    &skel->bss->udp_memory_allocated);
-> +}
-> +
-> +static int check_exclusive(struct test_case *test_case,
-> +			   struct sk_memcg *skel, bool exclusive)
-> +{
-> +	char buf[BUF_SINGLE] = {};
-> +	long memory_allocated[2];
-> +	int sk[NR_SOCKETS] = {};
-> +	int err, i, j;
-> +
-> +	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-> +	if (err)
-> +		goto close;
-> +
-> +	memory_allocated[0] = test_case->get_memory_allocated(test_case, skel);
-> +
-> +	/* allocate pages >= 1024 */
-> +	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-> +		for (j = 0; j < NR_SEND; j++) {
-> +			int bytes = send(sk[i], buf, sizeof(buf), 0);
-> +
-> +			/* Avoid too noisy logs when something failed. */
-> +			if (bytes != sizeof(buf)) {
-> +				ASSERT_EQ(bytes, sizeof(buf), "send");
-> +				if (bytes < 0) {
-> +					err = bytes;
-> +					goto close;
-> +				}
-> +			}
-> +		}
-> +	}
-> +
-> +	memory_allocated[1] = test_case->get_memory_allocated(test_case, skel);
-> +
-> +	if (exclusive)
-> +		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "exclusive");
-> +	else
-> +		ASSERT_GT(memory_allocated[1], memory_allocated[0] + 1024, "not exclusive");The test is taking >10s in my environemnt. Although it has kasan and other dbg 
-turned on, my environment is not a slow one tbh. The WATCHDOG > 10s warning is 
-hit pretty often. The exclusive case is expecting +10. May be we just need to 
-check +128 for non-exclusive which should be subtle enough to contrast with the 
-exclusive case? With +128, NR_SEND 32 is more than enough?
-
-> +
-> +close:
-> +	for (i = 0; i < ARRAY_SIZE(sk); i++)
-> +		close(sk[i]);
-> +
-> +	if (test_case->type == SOCK_DGRAM) {
-> +		/* UDP recv queue is destroyed after RCU grace period.
-> +		 * With one kern_sync_rcu(), memory_allocated[0] of the
-> +		 * isoalted case often matches with memory_allocated[1]
-> +		 * of the preceding non-exclusive case.
-> +		 */
-
-I don't think I understand the double kern_sync_rcu() below.
-
-> +		kern_sync_rcu();
-> +		kern_sync_rcu();> +	}
-> +
-> +	return err;
-> +}
-> +
-> +void run_test(struct test_case *test_case)
-
-static
-
-> +{
-> +	struct nstoken *nstoken;
-> +	struct sk_memcg *skel;
-> +	int cgroup, err;
-> +
-> +	skel = sk_memcg__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-> +		return;
-> +
-> +	skel->bss->nr_cpus = libbpf_num_possible_cpus();
-> +
-> +	err = sk_memcg__attach(skel);
-> +	if (!ASSERT_OK(err, "attach"))
-> +		goto destroy_skel;
-> +
-> +	cgroup = test__join_cgroup("/sk_memcg");
-> +	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
-> +		goto destroy_skel;
-> +
-> +	err = make_netns("sk_memcg");
-> +	if (!ASSERT_EQ(err, 0, "make_netns"))
-> +		goto close_cgroup;
-> +
-> +	nstoken = open_netns("sk_memcg");
-> +	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
-> +		goto remove_netns;
-> +
-> +	err = check_exclusive(test_case, skel, false);
-> +	if (!ASSERT_EQ(err, 0, "test_exclusive(false)"))
-> +		goto close_netns;
-> +
-> +	err = write_sysctl("/proc/sys/net/core/memcg_exclusive", "1");
-> +	if (!ASSERT_EQ(err, 0, "write_sysctl(1)"))
-> +		goto close_netns;
-> +
-> +	err = check_exclusive(test_case, skel, true);
-> +	if (!ASSERT_EQ(err, 0, "test_exclusive(true by sysctl)"))
-> +		goto close_netns;
-> +
-> +	err = write_sysctl("/proc/sys/net/core/memcg_exclusive", "0");
-> +	if (!ASSERT_EQ(err, 0, "write_sysctl(0)"))
-> +		goto close_netns;
-> +
-> +	skel->links.sock_create = bpf_program__attach_cgroup(skel->progs.sock_create, cgroup);
-> +	if (!ASSERT_OK_PTR(skel->links.sock_create, "attach_cgroup(sock_create)"))
-> +		goto close_netns;
-> +
-> +	err = check_exclusive(test_case, skel, true);
-> +	ASSERT_EQ(err, 0, "test_exclusive(true by bpf)");
-> +
-> +close_netns:
-> +	close_netns(nstoken);
-> +remove_netns:
-> +	remove_netns("sk_memcg");
-> +close_cgroup:
-> +	close(cgroup);
-> +destroy_skel:
-> +	sk_memcg__destroy(skel);
-> +}
-> +
-> +struct test_case test_cases[] = {
-> +	{
-> +		.name = "TCP  ",
-> +		.family = AF_INET,
-> +		.type = SOCK_STREAM,
-> +		.create_sockets = tcp_create_sockets,
-> +		.get_memory_allocated = tcp_get_memory_allocated,
-> +	},
-> +	{
-> +		.name = "UDP  ",
-> +		.family = AF_INET,
-> +		.type = SOCK_DGRAM,
-> +		.create_sockets = udp_create_sockets,
-> +		.get_memory_allocated = udp_get_memory_allocated,
-> +	},
-> +	{
-> +		.name = "TCPv6",
-> +		.family = AF_INET6,
-> +		.type = SOCK_STREAM,
-> +		.create_sockets = tcp_create_sockets,
-> +		.get_memory_allocated = tcp_get_memory_allocated,
-> +	},
-> +	{
-> +		.name = "UDPv6",
-> +		.family = AF_INET6,
-> +		.type = SOCK_DGRAM,
-> +		.create_sockets = udp_create_sockets,
-> +		.get_memory_allocated = udp_get_memory_allocated,
-> +	},
-> +};
-> +
-> +void serial_test_sk_memcg(void)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-> +		test__start_subtest(test_cases[i].name);
-
-This is not doing anything without "if".
-
-> +		run_test(&test_cases[i]);
-> +	}
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/sk_memcg.c b/tools/testing/selftests/bpf/progs/sk_memcg.c
-> new file mode 100644
-> index 000000000000..6b1a928a0c90
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/sk_memcg.c
-> @@ -0,0 +1,146 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright 2025 Google LLC */
-> +
-> +#include "bpf_tracing_net.h"
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_tracing.h>
-> +#include <errno.h>
-> +
-> +extern int tcp_memory_per_cpu_fw_alloc __ksym;
-> +extern int udp_memory_per_cpu_fw_alloc __ksym;
-> +
-> +int nr_cpus;
-> +bool tcp_activated, tcp_stable, udp_activated, udp_stable;
-> +long tcp_memory_allocated, udp_memory_allocated;
-> +static struct sock *tcp_sk_tracing, *udp_sk_tracing;
-> +
-> +struct sk_prot {
-> +	long *memory_allocated;
-> +	int *memory_per_cpu_fw_alloc;
-> +};
-> +
-> +static int drain_memory_per_cpu_fw_alloc(__u32 i, struct sk_prot *sk_prot_ctx)
-> +{
-> +	int *memory_per_cpu_fw_alloc;
-> +
-> +	memory_per_cpu_fw_alloc = bpf_per_cpu_ptr(sk_prot_ctx->memory_per_cpu_fw_alloc, i);
-> +	if (memory_per_cpu_fw_alloc)
-> +		*sk_prot_ctx->memory_allocated += *memory_per_cpu_fw_alloc;
-> +
-> +	return 0;
-> +}
-> +
-> +static long get_memory_allocated(struct sock *_sk, int *memory_per_cpu_fw_alloc)
-> +{
-> +	struct sock *sk = bpf_core_cast(_sk, struct sock);
-> +	struct sk_prot sk_prot_ctx;
-> +	long memory_allocated;
-> +
-> +	/* net_aligned_data.{tcp,udp}_memory_allocated was not available. */
-> +	memory_allocated = sk->__sk_common.skc_prot->memory_allocated->counter;
-> +
-> +	sk_prot_ctx.memory_allocated = &memory_allocated;
-> +	sk_prot_ctx.memory_per_cpu_fw_alloc = memory_per_cpu_fw_alloc;
-> +
-> +	bpf_loop(nr_cpus, drain_memory_per_cpu_fw_alloc, &sk_prot_ctx, 0);
-> +
-> +	return memory_allocated;
-> +}
-> +
-> +static void fentry_init_sock(struct sock *sk, struct sock **sk_tracing,
-> +			     long *memory_allocated, int *memory_per_cpu_fw_alloc,
-> +			     bool *activated)
-> +{
-> +	if (!*activated)
-> +		return;
-> +
-> +	if (__sync_val_compare_and_swap(sk_tracing, NULL, sk))
-> +		return;
-> +
-> +	*activated = false;
-> +	*memory_allocated = get_memory_allocated(sk, memory_per_cpu_fw_alloc);
-> +}
-> +
-> +static void fexit_init_sock(struct sock *sk, struct sock **sk_tracing,
-> +			    long *memory_allocated, int *memory_per_cpu_fw_alloc,
-> +			    bool *stable)
-> +{
-> +	long new_memory_allocated;
-> +
-> +	if (sk != *sk_tracing)
-> +		return;
-> +
-> +	new_memory_allocated = get_memory_allocated(sk, memory_per_cpu_fw_alloc);
-> +	if (new_memory_allocated == *memory_allocated)
-> +		*stable = true;
-
-I am not sure that help. The total memory_allocated can still change after this. 
-I would just grab the total in fentry once and then move on without confirming 
-in fexit.
-
-> +
-> +	*sk_tracing = NULL;
-> +}
-> +
-> +SEC("fentry/tcp_init_sock")
-> +int BPF_PROG(fentry_tcp_init_sock, struct sock *sk)
-> +{
-> +	fentry_init_sock(sk, &tcp_sk_tracing,
-> +			 &tcp_memory_allocated, &tcp_memory_per_cpu_fw_alloc,
-> +			 &tcp_activated);
-> +	return 0;
-> +}
-> +
-> +SEC("fexit/tcp_init_sock")
-> +int BPF_PROG(fexit_tcp_init_sock, struct sock *sk)
-> +{
-> +	fexit_init_sock(sk, &tcp_sk_tracing,
-> +			&tcp_memory_allocated, &tcp_memory_per_cpu_fw_alloc,
-> +			&tcp_stable);
-> +	return 0;
-> +}
-> +
-> +SEC("fentry/udp_init_sock")
-> +int BPF_PROG(fentry_udp_init_sock, struct sock *sk)
-> +{
-> +	fentry_init_sock(sk, &udp_sk_tracing,
-> +			 &udp_memory_allocated, &udp_memory_per_cpu_fw_alloc,
-> +			 &udp_activated);
-> +	return 0;
-> +}
-> +
-> +SEC("fexit/udp_init_sock")
-> +int BPF_PROG(fexit_udp_init_sock, struct sock *sk)
-> +{
-> +	fexit_init_sock(sk, &udp_sk_tracing,
-> +			&udp_memory_allocated, &udp_memory_per_cpu_fw_alloc,
-> +			&udp_stable);
-> +	return 0;
-> +}
-> +
-> +SEC("cgroup/sock_create")
-> +int sock_create(struct bpf_sock *ctx)
-> +{
-> +	u32 flags = SK_BPF_MEMCG_EXCLUSIVE;
-> +	int err;
-> +
-> +	err = bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-> +			     &flags, sizeof(flags));
-> +	if (err)
-> +		goto err;
-> +
-> +	flags = 0;
-> +
-> +	err = bpf_getsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-> +			     &flags, sizeof(flags));
-> +	if (err)
-> +		goto err;
-> +
-> +	if (flags != SK_BPF_MEMCG_EXCLUSIVE) {
-> +		err = -EINVAL;
-> +		goto err;
-> +	}
-> +
-> +	return 1;
-> +
-> +err:
-> +	bpf_set_retval(err);
-> +	return 0;
-> +}
-> +
-> +char LICENSE[] SEC("license") = "GPL";
-
-
+--
+Thanks,
+Mina
 
