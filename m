@@ -1,105 +1,120 @@
-Return-Path: <netdev+bounces-224099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76016B80B27
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:46:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79A45B80971
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:33:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D01A27BB115
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:44:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBDB216D09B
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FBB830C108;
-	Wed, 17 Sep 2025 15:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC07F333AA6;
+	Wed, 17 Sep 2025 15:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b="mUK7Y2JD"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Fbq2AHxG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nppct.ru (mail.nppct.ru [195.133.245.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BB42F2607
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.133.245.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9511369B4;
+	Wed, 17 Sep 2025 15:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758123619; cv=none; b=Vbfl4qy5JU8flQg6Uz53ntwFGAgbcHsNTP3BCNQkDJpj8yQ1agzW0Sp4FDmysi6BMMp103X28z4gVtgO4+K1B52msaJrlGNNikdfiWmKhFgM2Fm39FUpxZhJ0De5CBbaQctS1qbzP4ZWA7OJwnVT88gKd7mFXM+WDiX4qbDSbLc=
+	t=1758123184; cv=none; b=Pvmwd8jrvgnqWCsseJ43bUzhDIR73KrnKwKOhjB7EFklknTjAUM+U6tR4/Lf0jHtB/q5el2l29FOkGvwViZWHlbL75LK5b5DURUcoWgj4be0Mf3LTOLTjPOaYs1Gvu0X2L5aiM/gCp1+D6DDZrSCgxgD3XnDqvnH5EqA0cOTNsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758123619; c=relaxed/simple;
-	bh=W+nAB7mlSdd0jKuQKWnzw6YNuQNulCyIVJxWcBkg+d0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qu5zVNHW1VrCd0r6gIgUVdKI7KPlTj0A2JBQhisu9yisTPuU9ksjzMFtOiXxg+3LPUbui2U6PG40XL0rrKNdiDSUlZdr3AnYa2QRPmp60TkWDmkE/5ehHQisnar9p/eu1RMDlq8cUHKwUeo3iOYzXk4ZSClSKz4JqWQeB40lRCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru; spf=pass smtp.mailfrom=nppct.ru; dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b=mUK7Y2JD; arc=none smtp.client-ip=195.133.245.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nppct.ru
-Received: from mail.nppct.ru (localhost [127.0.0.1])
-	by mail.nppct.ru (Postfix) with ESMTP id CEA8B1C127C
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 18:31:21 +0300 (MSK)
-Authentication-Results: mail.nppct.ru (amavisd-new); dkim=pass (1024-bit key)
-	reason="pass (just generated, assumed good)" header.d=nppct.ru
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nppct.ru; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:to:from:from; s=dkim; t=1758123080; x=
-	1758987081; bh=W+nAB7mlSdd0jKuQKWnzw6YNuQNulCyIVJxWcBkg+d0=; b=m
-	UK7Y2JDolCC4ftU69n3P0AGiWfHotidgiNjBSyT7VJzTPEEd0HaKE/GN6stqlu66
-	haIlkdCUTF96H/gv+sIkGAW7jlt1hWJagZhisNwuGuByGOiPGbbFiOjS78Edbr4+
-	Ts1eq5o6vgLqO6dcCSXlXmRMfzMjXKtfZmfT+97O8A=
-X-Virus-Scanned: Debian amavisd-new at mail.nppct.ru
-Received: from mail.nppct.ru ([127.0.0.1])
-	by mail.nppct.ru (mail.nppct.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id R1LhbHdQy2eB for <netdev@vger.kernel.org>;
-	Wed, 17 Sep 2025 18:31:20 +0300 (MSK)
-Received: from localhost.localdomain (unknown [87.249.24.51])
-	by mail.nppct.ru (Postfix) with ESMTPSA id 024D61C0CC1;
-	Wed, 17 Sep 2025 18:31:18 +0300 (MSK)
-From: Alexey Nepomnyashih <sdl@nppct.ru>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Alexey Nepomnyashih <sdl@nppct.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: [PATCH] net: liquidio: fix overflow in octeon_init_instr_queue()
-Date: Wed, 17 Sep 2025 15:30:58 +0000
-Message-ID: <20250917153105.562563-1-sdl@nppct.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1758123184; c=relaxed/simple;
+	bh=Hc351q4nYxBtizLPpdMYPsra/T/ADj1HoY+Za3zpojg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GTtWW73ZQKHtoazL92kYnGic9eMb9cA7NH0/n0RbTiECoHCPItp1J2pT/UFbK7VR9/2WdM0n9plVyvZ0Q4Df74e4pzyfH9dVahmTH0QRLL6rni9LxV+C5hqHcpNsmiL5LOYk+Fl9Q9g8KVG4bP7MxzKZ/4PtZNsIU3sGnMsCZoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Fbq2AHxG; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 5878A1A0E8F;
+	Wed, 17 Sep 2025 15:33:01 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2A93D6063E;
+	Wed, 17 Sep 2025 15:33:01 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 36D80102F1BF4;
+	Wed, 17 Sep 2025 17:32:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758123180; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=KvBFi2h1uOxbQSe3Qg7pMz9oi1pLN3OKIQs0ZmF1Qzk=;
+	b=Fbq2AHxGtY47IIcSa4Culc0rQoPlBe6J/KabnGGAnkRHAImzIyRedtbsPZLnBcuH928DBF
+	zqdZk+la6iUXkeNOEFqwVW2en9mAgIB+TjRSRQcwum+LM48/+2zWzuAm0zW+U/WE3Niskn
+	sLrFBtXum9AmBL6yoAP5mHAHQPaBz30jp7tKLyaGBDwTSXJo/iQ1fG7WA51k2/xJPCwqg2
+	LFLMZgY9FO2gSSfsWGmPDgf+XJKxnHnLVi90kOzUGCGI24PrcDtW52tX6mCRKLZTW6/WTm
+	sEUV2z180ESgNff9cRCU+VULMjFt7a+91OrnBMr4zfIdF1KAExOCtcm3kgV5mg==
+Message-ID: <6ac21f07-45ef-4e80-bedf-c0470df47bc7@bootlin.com>
+Date: Wed, 17 Sep 2025 17:32:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v3 03/14] selftests/bpf: test_xsk: Fix memory
+ leaks
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250904-xsk-v3-0-ce382e331485@bootlin.com>
+ <20250904-xsk-v3-3-ce382e331485@bootlin.com> <aMmlNc1z5ULnOjJY@boxer>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aMmlNc1z5ULnOjJY@boxer>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-The expression `(conf->instr_type == 64) << iq_no` can overflow because
-`iq_no` may be as high as 64 (`CN23XX_MAX_RINGS_PER_PF`). Casting the
-operand to `u64` ensures correct 64-bit arithmetic.
+Hi Maciej
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+On 9/16/25 7:58 PM, Maciej Fijalkowski wrote:
+> On Thu, Sep 04, 2025 at 12:10:18PM +0200, Bastien Curutchet (eBPF Foundation) wrote:
+>> Some tests introduce memory leaks by not freeing all the pkt_stream
+>> objects they're creating.
+>>
+>> Fix these memory leaks.
+> 
+> I would appreciate being more explicit here as I've been scratching my
+> head here.
+> 
 
-Cc: stable@vger.kernel.org # v4.2+
-Fixes: f21fb3ed364b ("Add support of Cavium Liquidio ethernet adapters")
-Signed-off-by: Alexey Nepomnyashih <sdl@nppct.ru>
----
- drivers/net/ethernet/cavium/liquidio/request_manager.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Indeed it lacks details sorry. IIRC I spotted these with valgrind, maybe 
+I can add valgrind's output to the commit log in next iteration.
 
-diff --git a/drivers/net/ethernet/cavium/liquidio/request_manager.c b/drivers/net/ethernet/cavium/liquidio/request_manager.c
-index de8a6ce86ad7..12105ffb5dac 100644
---- a/drivers/net/ethernet/cavium/liquidio/request_manager.c
-+++ b/drivers/net/ethernet/cavium/liquidio/request_manager.c
-@@ -126,7 +126,7 @@ int octeon_init_instr_queue(struct octeon_device *oct,
- 	oct->io_qmask.iq |= BIT_ULL(iq_no);
- 
- 	/* Set the 32B/64B mode for each input queue */
--	oct->io_qmask.iq64B |= ((conf->instr_type == 64) << iq_no);
-+	oct->io_qmask.iq64B |= ((u64)(conf->instr_type == 64) << iq_no);
- 	iq->iqcmd_64B = (conf->instr_type == 64);
- 
- 	oct->fn_list.setup_iq_regs(oct, iq_no);
+>  From what I see the problem is with testapp_stats_rx_dropped() as it's the
+> one case that uses replace and receive half of pkt streams, both of which
+> overwrite the default pkt stream. So we lose a pointer to one of pkt
+> streams and leak it eventually.
+> 
+
+Exactly, we lose pointers in some cases when xsk->pkt_stream gets 
+replaced by a new stream. testapp_stats_rx_dropped() is the most 
+convoluted of these cases.
+
+Best regards,
 -- 
-2.43.0
+Bastien Curutchet, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
