@@ -1,215 +1,278 @@
-Return-Path: <netdev+bounces-223981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EC24B7CFEC
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:15:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CF9B7CFAB
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:15:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82051520B65
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:26:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDDF75865E2
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09756309DDD;
-	Wed, 17 Sep 2025 11:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA4D303A39;
+	Wed, 17 Sep 2025 11:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eP4/C49y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ngUeDs2T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08045304985
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 11:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758108389; cv=none; b=GSdUszb5gy8U6m1woEe4PgzNE2V87WarhsOQfWtxOTFJowpeGgudrrLmqEmgeReuGFU1M4t+B5ayx57WrSt+SWpLgxaeKTqTE+15ChY56CPGk5fNyo8qL4rjJ3syuHY2Pj9dIO1JBZql6G5oY5oU52AGVJ02TvLS24dalh1bhkM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758108389; c=relaxed/simple;
-	bh=ppa9xqtoGfGGmWZPvjGVyKSOFbJHHlCDfK1ROI9sSuc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=I+rgH9VlBSCoIm9qGnEIV/PX4ZBRN+CkzDhHUVs/YOJui3zwSSIKNqEf4XwzrrCKfwMPdRGXRmGlyN9dTSFMX/7YJSqeb+G90JUUZgZI0MYzcU/JIbNN1Y2S4H8jtyrBW16+DKiJ4oanuzXFiHhJdVGLuXmCdwwb0vRyehopRI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eP4/C49y; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b042cc3954fso1174172266b.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 04:26:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758108386; x=1758713186; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HgyP1skDDpJkVrmkkvIDINFO9MgyddQrfr7riBVEJpU=;
-        b=eP4/C49yE/BRvaU3klF2lUBfV5xFx4nym6GMuSa3xR2rbLkwV85cKFvaf+GEJE+wjk
-         dnAiIBZQWDdPFNqQ0O4XdKOQwIUZukP+HrIrz7rREM918n/XuMmKfcguv/mTJNhOX0U3
-         sHmFjL+JOguJgshk1dRs+60vR/ZhMBaLJAN/abEFYUc1qG27uGk5v0Ne+szca+mlZjyP
-         YKKzAZ313FhKoj29YoqhxLQmScpKSHgJ2O6RXBNMfAKS7r748BMaKje7priHMZy+gK/H
-         s8p5qh7eJcVNqyBZ88mzCaX+7hIAUznTqUzdx0nJhbisdq4wPVUBGKXeR409g81HYVws
-         q1cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758108386; x=1758713186;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HgyP1skDDpJkVrmkkvIDINFO9MgyddQrfr7riBVEJpU=;
-        b=DFVMUEaHsbCZ4pxZ7Abt9hplT8QiW3EbNHyjK9Vv69kj1CZe2iyqeEe9i2CuhOEQET
-         RhWMxb4dLDsqvKp9xjuMspbDO1Fd91R/rYLBIHQ7ZQL77zoha0i+L2K/jHY3iRywuFHT
-         hfo35NKD57jZ7grNm/1pZH8kjgvUh3vBorD54VQq67RjpwuyfkGEPDcagqPBXjV1SI3h
-         ksVhtCQh65IYouB7AV8Tk/g6vcyy/qPnVsUgnzccFFzRDy4R9Uye6JYTKmV7GUFSIAe7
-         Ty1a5SZJjlFxXAVPciZpSL/6N6wWS86ZkzqCTZrv5EUYEGTmbFzF2j7xHRfU6r2ihnr+
-         yL9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUJzU2/kOvIhog31CDHtonRidO/EAUWL+ig6R//y7KklSI5mNlxyTrINRKHEtrCL2Fmq1kw9FA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFumB+yf/KkQhwcbFTcG+zwqKnwuoLTcuCIftxIc16kD7sihXK
-	N3s1nYFTQURFq2X7kTN7y4H+QdagYEmfcmjyouF9nW6b6qYWoP3WHoAu
-X-Gm-Gg: ASbGncuEi773j3cPqa+DJ/Mdp4dIviJ64h2/KVxC9phOJnbZodzl58g5+ja8y7aXqe9
-	kaLZ2ORc4v6SDaRI+ROCDs0HHugeOlOnfexFlPsFRwhJw2hwcXeNTxzVwQRwyG1OvB0ezv1sT3Y
-	/j3/rc5phg0Q27puEWAAflJn+PRkVezyIdoWiJ0xGct8z711JWGPLknPq2zN+qz+0v/s7cxyRks
-	2yYGoRklnu2d8rxuw5w2NKOqjl14mT3/GgoVyl5DQTF7qLbjMAA/4FH5xiIXEJ+/Iqvpbn+Z7rG
-	8UUbtAn0aCgU98ZlNJrLiJVjUa1pHlsNea+rXl7BlT6wD+mHhMnzRYu2kIWMoWZNujLV5/U9mUQ
-	0HIUIVFozkf4PVPFEhXaHZX7X2ld/KoD52K30LU/lUD11QcPtcrjND7kVX+5ocE2CYjk=
-X-Google-Smtp-Source: AGHT+IFZoOXXk0BzdVxzupl6UXjj53Xlysq4bZMGAJDUG5f0y1MlvEMSvXFKvK4gq4mVVf9cuDDYRA==
-X-Received: by 2002:a17:906:f592:b0:b0d:61a0:9a28 with SMTP id a640c23a62f3a-b1baf60b87cmr182559666b.6.1758108385868;
-        Wed, 17 Sep 2025 04:26:25 -0700 (PDT)
-Received: from localhost (public-gprs292944.centertel.pl. [31.62.31.145])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b30da388sm1340847766b.22.2025.09.17.04.26.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 04:26:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86E02F83CD
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 11:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758108409; cv=fail; b=i6ytpBgT0XI4qmje6r3BvXAl1S+TmnRfyUt2bZ0XvsEUZ7TIrn16zNSeEf+Qo7pVI5uV3bE6TS2UPlDZ/hpd8ZIk/XsnVSJn30JXA92JFELsocdD6yAKCYGWQVSnSsHwBKIbIygf/5K03LfM3R78Vu4NeFSZsWNqhfQhb8VFP5A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758108409; c=relaxed/simple;
+	bh=Z0CdFWvaIjePJBYAYMg2Iyj2ZoaLMMfJwLgu08kjrkk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FgHwIWIzVlQARoolAFlQeEoAArPnMdQ24fkGgFzvmQgg2VCJnsSehsz1b04eEIeHZGJ46+AWRmI//X5itvZsYtkOalSNyeJFuVzNDx3nT8M+cx1U0bNYfmay3aIGbvFZJG4LAwfxMKwsl0daLfHSBQXWR3HAH0imuT/fZQ19yJk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ngUeDs2T; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758108408; x=1789644408;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Z0CdFWvaIjePJBYAYMg2Iyj2ZoaLMMfJwLgu08kjrkk=;
+  b=ngUeDs2Tkvy9KT6LH7uE9vRgo9UEpvnuwitndkD9akIsw+8h4Tn8g023
+   wWxaFG8MNgXLKZX8U7V3QobTHlOnSfIzIojyPh4hGKYhkVLwIPiu5sU18
+   tjXfFdIW/4XUVCGqyh0JYVGl4PWNw6UrMBhEyckrd3UOzGp+FJR11XPBh
+   2H3HO7bB29/99GprpvCwGM4ikFuo4Z6mFuYXwRJMEkTedOjqIoNQtxnEh
+   uR+wGBpQGIOoStPNhFYrns7kD57b2SJRJ1iJnUFhHMdI1a0SsmBqmLodT
+   X4cxb07mVS91v79f36LDDLySc+ZB6sUEwjd6x3NkXRHwaconaqyHCdF2M
+   g==;
+X-CSE-ConnectionGUID: zb5FExicS7y4h+zLvzjPWQ==
+X-CSE-MsgGUID: R3b1Lni6QX+owzVAMnEX/w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="71833648"
+X-IronPort-AV: E=Sophos;i="6.18,271,1751266800"; 
+   d="scan'208";a="71833648"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 04:26:47 -0700
+X-CSE-ConnectionGUID: O0v2JUy7TvuNq5TGdle5Ag==
+X-CSE-MsgGUID: 5SXHWUlvS4O3DKXd8zotQg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,271,1751266800"; 
+   d="scan'208";a="174507954"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 04:26:47 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 17 Sep 2025 04:26:46 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Wed, 17 Sep 2025 04:26:46 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.0) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 17 Sep 2025 04:26:46 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ShM/o5VCL4FdDqnEy4DU4ZPWRK6z5uSDAdJnHr+DGUlSoN4wDI/Db/jqjajD4WRjP2xDLeURzjEalGW8YqPdkImxHUlUmPQfq1wHHoU3Zb8CSSfZnnS8uLzLkmcIawqC2CCpGhnWVaUyZxqNtI35lx9ZbtQyUvLpp6b2012+4eiGjdf3AjXqjBekqKHGekuVapIQ8jMGeOik0m3Jty6wEmwBMovK0YyzZWq4823+rcJK/zL9fxDZc5jIBxiVS+y6Fgm+YceBfKpHVMdVFAjJgkeycP8ZxVFYLEZK03aqDlyr+nC5N8jYNmHdL95jCJiKj/uXv6qdtk2tCtwgb2zTtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=au2QhoVJW5InYQ0cH/uVAqff0dvazaV3AJMjS5RFSXg=;
+ b=QGLfofRapsqCGYSTdaJ6hTn31PSuJCB9JIDr9pafwAEx1wGZljf1fImPsiXa9/kafKIZ+MpYx+t5MGS5A0lLptti1GRlg/8GdUsTCf4/HY/d7Vv/1dtRGWHuIkyI5BpravNEfT1nfVTijGWqeeLlCswcjALaWUToAvpl57gpPraLhnxxlRPvO88UB6LyoKHG2lVoyix+1YABJqrhhMWICXLV9JTx1KlkRy4vkqEHGVmrUDhwDQzKNzbmzLpJTg7OSgIaI1YhFHMoRJby+O25n292LmC4+sOBzSwH57faYvmCsPFefWcVZwESZtjcpSpJ7jAItD0eZPKcdAM7DWt14g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by SJ0PR11MB4845.namprd11.prod.outlook.com (2603:10b6:a03:2d1::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Wed, 17 Sep
+ 2025 11:26:43 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9115.020; Wed, 17 Sep 2025
+ 11:26:43 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
+	<kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Michael Chan
+	<michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, Donald
+ Hunter <donald.hunter@gmail.com>, Carolina Jubran <cjubran@nvidia.com>
+CC: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Yael Chemla <ychemla@nvidia.com>
+Subject: RE: [Intel-wired-lan] [PATCH net-next v3 2/4] net/mlx5e: Don't query
+ FEC statistics when FEC is disabled
+Thread-Topic: [Intel-wired-lan] [PATCH net-next v3 2/4] net/mlx5e: Don't query
+ FEC statistics when FEC is disabled
+Thread-Index: AQHcJz8hTRxl90gPVECtESmA7F3WJLSXPUsA
+Date: Wed, 17 Sep 2025 11:26:43 +0000
+Message-ID: <IA3PR11MB8986436CA0A49118F43491A6E517A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20250916191257.13343-1-vadim.fedorenko@linux.dev>
+ <20250916191257.13343-3-vadim.fedorenko@linux.dev>
+In-Reply-To: <20250916191257.13343-3-vadim.fedorenko@linux.dev>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SJ0PR11MB4845:EE_
+x-ms-office365-filtering-correlation-id: c1cf55a1-d93a-4b9a-47e0-08ddf5dd1469
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014|921020|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?p2+s6glo/2aw2j5q7pOg/JQid0Rirh24rlmCxqo9J0oASPZGtva6HToaudZu?=
+ =?us-ascii?Q?lLimstnCFTNGUHnbs4JCzvnwNFY3UB225xe1hpjhQAEckCPzNvwRDawh5YPP?=
+ =?us-ascii?Q?E7yy1r4cUq7Dt0637VbN2EiFLjY4XEgxrNSgdxv/MLNzFnIy1WibQ0F0r0ZF?=
+ =?us-ascii?Q?yEYsJtrRiEqb4jjdA4O/Bob+FO7LPKJ1lnO7p2jREgLO1yalpHuqAeshyHVm?=
+ =?us-ascii?Q?dA4Cc4QK2RpzTXD1kny3uRTWN1+RAHAD2sHtY7ZWy8vc14nc1XPbWGrLGjZI?=
+ =?us-ascii?Q?tYbchiqrbaScT04tx6A9ALdrqKSkvlT6Jw4Ykaqp6UKri6cZPMPqS0ow92xZ?=
+ =?us-ascii?Q?YgHi2K+YfBca5IUrmC8+0fRam7BvXpWE2K6WTTy1lehglzLLS5uvcMPzrIGE?=
+ =?us-ascii?Q?/9ii58WJTwp6FkdGQbVOP7DwM2Lh7mIIAnMrg/p8Qt5f6h3w42b5xt6AoPQA?=
+ =?us-ascii?Q?ATmkclc/b4FmW33lIFaSTZ3LVRWa3MnUk5BcLsZnda10UjrXIwadYHGx4FtR?=
+ =?us-ascii?Q?4BGoqd1wn5TphR5H6j1AnOrlm6duTgUaLuukuXBs/5nBt0SspvH/cmk6392R?=
+ =?us-ascii?Q?WCAT2qSwBf7FStey3gUV43y+RKIqzkKEQw8oB66CVDpnhlJgfS93QXrbNuM6?=
+ =?us-ascii?Q?ZZvCIFJmu6gDG5fY6/k4FNhNFRiBE2yPJtO6p599RTFXmTLIeJlUucS2oG8Q?=
+ =?us-ascii?Q?cfF2JpobM7FYzHfxKaE2ZKaXnFcnu8jBcOXbTe8QMu3V9xu9MoQlk+I6aogY?=
+ =?us-ascii?Q?BT2Tw4yOGvh99IfG7nw0wYIu79rPufFYUE5L+1rVJzXX/wi3iURl7S6VLN+X?=
+ =?us-ascii?Q?6O7jyABDct/AwptWr8S6bWb0op0WXdWRlah0ny5hdSH5QmI58EkKQ3VH+rF9?=
+ =?us-ascii?Q?P23hHWwaMkYUx9acdBPkbyM/7FOWcwNWGwUzBQirJrvDYhomHA+f8dkhkuaq?=
+ =?us-ascii?Q?PxRM4DsNfL3XyR3V50PAuvZLH1JtacuFoLapYE9aQLfj70YjYimfE5Q3ZszF?=
+ =?us-ascii?Q?aWW8BIsq1KPr8fRxWRXvXTZ2ayajWafWdVsKZZvP6MOwFBKT+O7Qd0oNQl2r?=
+ =?us-ascii?Q?RiXA1ruVzjVBre8Vp39UcFN3m9dvroJsN3nFR6F2u2PM6oiMnF5GxSgnt8fj?=
+ =?us-ascii?Q?3lD+PRqxw8o/zBSSG2fU2e0lIVLIUr/qCj2DEuH7NaDYFlnpaEzAoZf7Xc+e?=
+ =?us-ascii?Q?XynQ3eVhYWazFvx23q6Xdt/hESLsgPpL8g/L/WH2wy3kzwkydHPvaR3JlPy7?=
+ =?us-ascii?Q?kPuH5Vj4zlprQzRb1o9Ans3tW7hy3AkR2/TF9LPsq1Y9smsxqXBYPuZb9KfG?=
+ =?us-ascii?Q?DOUJzEIOk6rx2cLjRxe/yVWl5u09IqfsYMM5TDOcMdm9asdgalRS/9dSxvTH?=
+ =?us-ascii?Q?t5S//WdIi2Y4nH6Viqn0MsowPTe+vyJ1Nv1hYddsKrDGk4QrQP/ifqEMsqjX?=
+ =?us-ascii?Q?TXGh06HHWHoazwOYo6Hzufa6IV/qlEWOWZ17lgNwMBn/Ddzv+0Ke5X4PJEgH?=
+ =?us-ascii?Q?lmOe2oiHhhJq9ok=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014)(921020)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?abFVYadWUFrRt7s0rcbV0IX5BFl4KJzhpeJOVHMoarYDKYA9EX3EGQYTS7dL?=
+ =?us-ascii?Q?wCjkmAnrcM18M+Wi0xPBzw/VO1N1z0N8jqhhmFhXM+K+DRUtukdys9otN8QY?=
+ =?us-ascii?Q?WzlXKHf1U3h5lsZPP4zvTGSLNVkFmyzfXtESZSBBWjD0vLwikr9ljfmZV4mq?=
+ =?us-ascii?Q?nm7sNRRUZjIVEi73HlEkuIys6FZK1zbx8Cao3qaZ3mnArS9HfTfP2om3rABw?=
+ =?us-ascii?Q?yxwSeW2bY6gk3S0yf7gWf50IIfM0gwFOWbfBEvZ96uyxiiTjh7u2C13BPuUP?=
+ =?us-ascii?Q?MqIckCPd30FaG7N8DCY5kV8DbJsVLjuMqPerzc6hD1FHgmWLJXxFZNFWAoWk?=
+ =?us-ascii?Q?+vtot7er+bVumAtcxxEJGPlX+RozBSUsRNayORnTIteD5BOV9OJMK+OyD70W?=
+ =?us-ascii?Q?LRjiHZxr16vw5QaLwVdElxdAfFFmOKQu1iTfGmidaQoWrm/DK13zcy1IFNgp?=
+ =?us-ascii?Q?GXx9NtUJGkOcYSGPItF4GIbxgDLbmC2q2w25dwvvj8DgoRJp4TcCFlbKDT2p?=
+ =?us-ascii?Q?VbC6jDlghqSm0kKKhxi8ISqyjcvmaJSeYp57bjp0ZMUUtFyUOtSy+kVTQ8H8?=
+ =?us-ascii?Q?2D0LwIfqCCS/yfbTNsIBDg8Z7zjRDip75HUiBTPdyUSMXgcozkwWz6tSw2mw?=
+ =?us-ascii?Q?IkDZziFNmwsnyH0fNj39f8QvfttXLAeY/P/EnPmBC4wiWBzOIxshLpAIlipU?=
+ =?us-ascii?Q?qsPgw3Ur2FlFbvIJO/bd4z1nPdX/9r9NhncdwcBnK5q3eXssgSwJofwEoW8Y?=
+ =?us-ascii?Q?mCx8Sr4ty3NAIAl1HqMkLHPz8fvLFu6ZJqtyWiZOisI7y7M1rQ7FqMKOBuOW?=
+ =?us-ascii?Q?lVl41W9D7l3j6Iu+kLXRzz5bFuL37/gw9pWEsgH/kVN2WRXJHuUOOAIN3lOE?=
+ =?us-ascii?Q?GAjebL4jD95TEgQS15V1FAHKKUDkUKzRxtPKW6hymdH6p65F6beVmQLAqyrr?=
+ =?us-ascii?Q?hKI6204vIh2XHV4N1fic50gbmRcIEVZwPMJ110qQ09haHVHQTaJHX9+jfhLj?=
+ =?us-ascii?Q?t6le1CmkFQVm6eZzsWRPEuKHVjBHNiy+CfjB6L+Mrkw1v86b46XjQ19vPcNQ?=
+ =?us-ascii?Q?qU0NtXKh7GflWHDkPCPvyvtMFpTQ99kJvN1YKjJycoAmT6+UWxUNmPyJiqsR?=
+ =?us-ascii?Q?X38GuWlQzn5i9LL/DmHl390ws83hi1BD596LLEeI+i1ql8MGbI7D7zNxujo7?=
+ =?us-ascii?Q?3HMSv53591DTLfYVZg8VMwlgjXR51RWpO2zjeW2sdtY2WeXAsFn+Q3LASWA8?=
+ =?us-ascii?Q?pGMUe5tpZkWIQFh0PhySr5yZTDFLDvW9cXGBmtw3pSdlQBbp2trgW9ADy923?=
+ =?us-ascii?Q?i9BwhnhQ+NoIGMrWNAjari/oLr/xKCX2JLRNhRqsw/ayd8Sc5DFZWTbj6Nzg?=
+ =?us-ascii?Q?Q4kZ1tF5/6hBbl2mkwcVZrsoufy8DvDvbYQvP7UjwRsGDxroJ3DZ+/jQwdgL?=
+ =?us-ascii?Q?EysXLa4Hws3WUGu2oYZO8v+jnc42Jn/KkU4ooLhMNtJfnyVJnaD/GXPcOgxi?=
+ =?us-ascii?Q?80vgH9YmkNAvhWFbUVDDc1b2pTeoPRIqzZITayub2HNgej4GrOUqqXe99QEq?=
+ =?us-ascii?Q?o1q8kmu8Eu4ivfyKOaTclAphwjYWeI49AuoulITF8AMMmTCEgx+31QFI8vSD?=
+ =?us-ascii?Q?AQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 17 Sep 2025 13:26:23 +0200
-Message-Id: <DCV1EPLCX5L5.3MWOCVTH5AWM4@gmail.com>
-Cc: "Marek Szyprowski" <m.szyprowski@samsung.com>, <stable@vger.kernel.org>,
- <kernel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, "Lukas Wunner" <lukas@wunner.de>, "Russell King"
- <linux@armlinux.org.uk>, "Xu Yang" <xu.yang_2@nxp.com>,
- <linux-usb@vger.kernel.org>
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: forbid runtime PM to avoid
- PM/MDIO + RTNL deadlock
-From: =?utf-8?q?Hubert_Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>
-To: "Oleksij Rempel" <o.rempel@pengutronix.de>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-X-Mailer: aerc 0.20.0
-References: <20250917095457.2103318-1-o.rempel@pengutronix.de>
-In-Reply-To: <20250917095457.2103318-1-o.rempel@pengutronix.de>
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1cf55a1-d93a-4b9a-47e0-08ddf5dd1469
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2025 11:26:43.4934
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +Lbj+l7mOq09bi8lWS+hgvR4N+u1l+hIv/y3pXyXmY4iFkniPNOuIqNS63FWwdVn5qfqyxzl6pIyVPy+bYBO0emFwdtL8nV5onYbCAl8XCU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4845
+X-OriginatorOrg: intel.com
 
-On Wed Sep 17, 2025 at 11:54 AM CEST, Oleksij Rempel wrote:
-> Forbid USB runtime PM (autosuspend) for AX88772* in bind.
->
-> usbnet enables runtime PM by default in probe, so disabling it via the
-> usb_driver flag is ineffective. For AX88772B, autosuspend shows no
-> measurable power saving in my tests (no link partner, admin up/down).
-> The ~0.453 W -> ~0.248 W reduction on 6.1 comes from phylib powering
-> the PHY off on admin-down, not from USB autosuspend.
->
-> With autosuspend active, resume paths may require calling phylink/phylib
-> (caller must hold RTNL) and doing MDIO I/O. Taking RTNL from a USB PM
-> resume can deadlock (RTNL may already be held), and MDIO can attempt a
-> runtime-wake while the USB PM lock is held. Given the lack of benefit
-> and poor test coverage (autosuspend is usually disabled by default in
-> distros), forbid runtime PM here to avoid these hazards.
->
-> This affects only AX88772* devices (per-interface in bind). System
-> sleep/resume is unchanged.
->
-> Fixes: 4a2c7217cd5a ("net: usb: asix: ax88772: manage PHY PM from MAC")
-> Reported-by: Hubert Wi=C5=9Bniewski <hubert.wisniewski.25632@gmail.com>
-> Closes: https://lore.kernel.org/all/20220622141638.GE930160@montezuma.acc=
-.umu.se
-> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> Closes: https://lore.kernel.org/all/b5ea8296-f981-445d-a09a-2f389d7f6fdd@=
-samsung.com
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Vadim Fedorenko
+> Sent: Tuesday, September 16, 2025 9:13 PM
+> To: Jakub Kicinski <kuba@kernel.org>; Andrew Lunn <andrew@lunn.ch>;
+> Michael Chan <michael.chan@broadcom.com>; Pavan Chebbi
+> <pavan.chebbi@broadcom.com>; Tariq Toukan <tariqt@nvidia.com>; Gal
+> Pressman <gal@nvidia.com>; intel-wired-lan@lists.osuosl.org; Donald
+> Hunter <donald.hunter@gmail.com>; Carolina Jubran
+> <cjubran@nvidia.com>; Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Cc: Paolo Abeni <pabeni@redhat.com>; Simon Horman <horms@kernel.org>;
+> netdev@vger.kernel.org; Dragos Tatulea <dtatulea@nvidia.com>; Yael
+> Chemla <ychemla@nvidia.com>
+> Subject: [Intel-wired-lan] [PATCH net-next v3 2/4] net/mlx5e: Don't
+> query FEC statistics when FEC is disabled
+>=20
+> From: Carolina Jubran <cjubran@nvidia.com>
+>=20
+> Update mlx5e_stats_fec_get() to check the active FEC mode and skip
+> statistics collection when FEC is disabled.
+>=20
+> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Yael Chemla <ychemla@nvidia.com>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 > ---
-> Link to the measurement results:
-> https://lore.kernel.org/all/aMkPMa650kfKfmF4@pengutronix.de/
-> ---
->  drivers/net/usb/asix_devices.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
->
-> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_device=
-s.c
-> index 792ddda1ad49..0d341d7e6154 100644
-> --- a/drivers/net/usb/asix_devices.c
-> +++ b/drivers/net/usb/asix_devices.c
-> @@ -625,6 +625,22 @@ static void ax88772_suspend(struct usbnet *dev)
->  		   asix_read_medium_status(dev, 1));
->  }
-> =20
-> +/*
-> + * Notes on PM callbacks and locking context:
-> + *
-> + * - asix_suspend()/asix_resume() are invoked for both runtime PM and
-> + *   system-wide suspend/resume. For struct usb_driver the ->resume()
-> + *   callback does not receive pm_message_t, so the resume type cannot
-> + *   be distinguished here.
-> + *
-> + * - The MAC driver must hold RTNL when calling phylink interfaces such =
-as
-> + *   phylink_suspend()/resume(). Those calls will also perform MDIO I/O.
-> + *
-> + * - Taking RTNL and doing MDIO from a runtime-PM resume callback (while
-> + *   the USB PM lock is held) is fragile. Since autosuspend brings no
-> + *   measurable power saving for this device with current driver version=
-, it is
-> + *   disabled below.
-> + */
->  static int asix_suspend(struct usb_interface *intf, pm_message_t message=
-)
->  {
->  	struct usbnet *dev =3D usb_get_intfdata(intf);
-> @@ -919,6 +935,16 @@ static int ax88772_bind(struct usbnet *dev, struct u=
-sb_interface *intf)
->  	if (ret)
->  		goto initphy_err;
-> =20
-> +	/* Disable USB runtime PM (autosuspend) for this interface.
-> +	 * Rationale:
-> +	 * - No measurable power saving from autosuspend for this device.
-> +	 * - phylink/phylib calls require caller-held RTNL and do MDIO I/O,
-> +	 *   which is unsafe from USB PM resume paths (possible RTNL already
-> +	 *   held, USB PM lock held).
-> +	 * System suspend/resume is unaffected.
-> +	 */
-> +	pm_runtime_forbid(&intf->dev);
+>  drivers/net/ethernet/mellanox/mlx5/core/en_stats.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> index 87536f158d07..aae0022e8736 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> @@ -1446,16 +1446,13 @@ static void fec_set_rs_stats(struct
+> ethtool_fec_stats *fec_stats, u32 *ppcnt)  }
+>=20
+>  static void fec_set_block_stats(struct mlx5e_priv *priv,
+> +				int mode,
+>  				struct ethtool_fec_stats *fec_stats)  {
+>  	struct mlx5_core_dev *mdev =3D priv->mdev;
+>  	u32 out[MLX5_ST_SZ_DW(ppcnt_reg)] =3D {};
+>  	u32 in[MLX5_ST_SZ_DW(ppcnt_reg)] =3D {};
+>  	int sz =3D MLX5_ST_SZ_BYTES(ppcnt_reg);
+> -	int mode =3D fec_active_mode(mdev);
+> -
+> -	if (mode =3D=3D MLX5E_FEC_NOFEC)
+> -		return;
+>=20
+>  	MLX5_SET(ppcnt_reg, in, local_port, 1);
+>  	MLX5_SET(ppcnt_reg, in, grp,
+> MLX5_PHYSICAL_LAYER_COUNTERS_GROUP);
+> @@ -1496,11 +1493,14 @@ static void
+> fec_set_corrected_bits_total(struct mlx5e_priv *priv,  void
+> mlx5e_stats_fec_get(struct mlx5e_priv *priv,
+>  			 struct ethtool_fec_stats *fec_stats)  {
+> -	if (!MLX5_CAP_PCAM_FEATURE(priv->mdev,
+> ppcnt_statistical_group))
+> +	int mode =3D fec_active_mode(priv->mdev);
 > +
->  	return 0;
-> =20
->  initphy_err:
-> @@ -948,6 +974,10 @@ static void ax88772_unbind(struct usbnet *dev, struc=
-t usb_interface *intf)
->  	phylink_destroy(priv->phylink);
->  	ax88772_mdio_unregister(priv);
->  	asix_rx_fixup_common_free(dev->driver_priv);
-> +	/* Re-allow runtime PM on disconnect for tidiness. The interface
-> +	 * goes away anyway, but this balances forbid for debug sanity.
-> +	 */
-> +	pm_runtime_allow(&intf->dev);
+> +	if (mode =3D=3D MLX5E_FEC_NOFEC ||
+> +	    !MLX5_CAP_PCAM_FEATURE(priv->mdev,
+> ppcnt_statistical_group))
+>  		return;
+>=20
+>  	fec_set_corrected_bits_total(priv, fec_stats);
+> -	fec_set_block_stats(priv, fec_stats);
+> +	fec_set_block_stats(priv, mode, fec_stats);
 >  }
-> =20
->  static void ax88178_unbind(struct usbnet *dev, struct usb_interface *int=
-f)
-> @@ -1600,6 +1630,10 @@ static struct usb_driver asix_driver =3D {
->  	.resume =3D	asix_resume,
->  	.reset_resume =3D	asix_resume,
->  	.disconnect =3D	usbnet_disconnect,
-> +	/* usbnet will force supports_autosuspend=3D1; we explicitly forbid RPM
-> +	 * per-interface in bind to keep autosuspend disabled for this driver
-> +	 * by using pm_runtime_forbid().
-> +	 */
->  	.supports_autosuspend =3D 1,
->  	.disable_hub_initiated_lpm =3D 1,
->  };
+>=20
+>  #define PPORT_ETH_EXT_OFF(c) \
+> --
+> 2.47.3
 
-Well, this fixes the issue for me. No suspend/resume -- no deadlock -- no
-problem. Thanks.
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-Tested-by: Hubert Wi=C5=9Bniewski <hubert.wisniewski.25632@gmail.com>
 
