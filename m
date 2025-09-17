@@ -1,109 +1,138 @@
-Return-Path: <netdev+bounces-224027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8FA0B7F07E
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:11:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02165B7F1AA
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:16:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35EED1C262D1
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:06:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1572B32600A
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1EA333AAC;
-	Wed, 17 Sep 2025 12:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C9D33B48A;
+	Wed, 17 Sep 2025 13:00:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5462D333A8B;
-	Wed, 17 Sep 2025 12:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A2C33B47C
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 13:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758113997; cv=none; b=U+8Zbpz67S/rpUT1+LOu3DHQoL4uulwUQ3Q8SrpMN2h4h1bF/EBoCrRNL4N4cw5/vpoZOga1sBHKg0jIsvQhv8/Xx6T7BgfNO3a+QabSe9Kv59igVIucX0+TbTnpwazpOMkqjLTZjKqCjItnIPmLEAR5ktD5oy/aCj0MsyoBAZM=
+	t=1758114031; cv=none; b=HT6Ukxf4GXq/t0DKFv73qbdlugOV1jXA+oLtSqKESNDmQA4+LkmIKw2tH2rjbfhf6QaKxd93S83usXwtQSOo6TKE82qfGA3AZvOP4wxhuSo3HF+AD0T+bodtkw6LWAZ1uH51++JefkQAsz2NhYnMIumaZcoc4FwAuXv2FLKCGWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758113997; c=relaxed/simple;
-	bh=O/3KyCZXB9bUpKW0JLg6l7WwA0FWJdFKRYxf/Jz8kLQ=;
+	s=arc-20240116; t=1758114031; c=relaxed/simple;
+	bh=t5wDfKI8ueIOw6uWaPpRM/5Of4iVvIdpItVCXVEyTIs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BQabs1pHwhWQqcU/S0JOp1yHm1VXMpq5LaZr7zXjFLaF6lXJQCSlPiIVedo98lI6Hr54GeopbgM0kVjcvQkjy6wxT0Cpq4PFshoj286bhvy6/BuZdsojFI3b+kXXtmTO8KfRhmRo2BMyJy+BYoa3IlnuKVOX/TzoO/nXDF7DDCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (unknown [180.158.240.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id 3B17B340E2A;
-	Wed, 17 Sep 2025 12:59:54 +0000 (UTC)
-Date: Wed, 17 Sep 2025 20:59:47 +0800
-From: Yixun Lan <dlan@gentoo.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Vivian Wang <wangruikang@iscas.ac.cn>,
-	David Miller <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=rJ7ayp4o95m7JaOHlEE7CrYs5J2t+B+T4faox6fe9jjDnLe8W5V/1Ru1RA2GKAuC3LIy6tTUTTdtWcR84GRbAr8chLJpLUxIyM8WHMQG5Hp8RyyJu5rPyzyH6SDOtdxmKT/9jj/xrMvSUxQJulxd0Ckc03bu1ZnV5za2BeJMtRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyrli-0007aq-BS; Wed, 17 Sep 2025 15:00:18 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyrlh-001lSo-05;
+	Wed, 17 Sep 2025 15:00:17 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyrlg-00Dhy1-2x;
+	Wed, 17 Sep 2025 15:00:16 +0200
+Date: Wed, 17 Sep 2025 15:00:16 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alex Elder <elder@riscstar.com>,
-	Networking <netdev@vger.kernel.org>,
-	Guodong Xu <guodong@riscstar.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the net-next tree with the spacemit
- tree
-Message-ID: <20250917125947-GYA1266976@gentoo.org>
-References: <aMqby4Cz8hn6lZgv@sirena.org.uk>
- <597466da-643d-4a75-b2e8-00cf7cf3fcd0@iscas.ac.cn>
- <76970eed-cb88-4a42-864a-8c2290624b72@sirena.org.uk>
- <20250917123045-GYA1265885@gentoo.org>
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Andre Edich <andre.edich@microchip.com>,
+	Lukas Wunner <lukas@wunner.de>
+Subject: Re: [PATCH net v4 0/3] net: phy: smsc: use IRQ + relaxed polling to
+ fix missed link-up
+Message-ID: <aMqw4LuoTTRspqfA@pengutronix.de>
+References: <20250714095240.2807202-1-o.rempel@pengutronix.de>
+ <657997b5-1c20-4008-8b70-dc7a7f56c352@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250917123045-GYA1265885@gentoo.org>
+In-Reply-To: <657997b5-1c20-4008-8b70-dc7a7f56c352@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Mark,
+Hi Andrew,
 
-On 20:30 Wed 17 Sep     , Yixun Lan wrote:
-> Hi Mark,
+On Fri, Jul 18, 2025 at 03:58:56PM +0200, Andrew Lunn wrote:
+> On Mon, Jul 14, 2025 at 11:52:37AM +0200, Oleksij Rempel wrote:
+> > This series makes the SMSC LAN8700 (as used in LAN9512 and similar USB
+> > adapters) reliable again in configurations where it is forced to 10 Mb/s
+> > and the link partner still advertises autonegotiation.
 > 
-> On 13:03 Wed 17 Sep     , Mark Brown wrote:
-> > On Wed, Sep 17, 2025 at 07:48:34PM +0800, Vivian Wang wrote:
-> > 
-> > > Just FYI, Yixun has proposed for net-next to back out of the DTS changes
-> > > and taking them up through the spacemit tree instead [1], resolving the
-> > > conflicts in the spacemit tree. This would certainly mean less headaches
-> > > while managing pull requests, as well as allowing Yixun to take care of
-> > > code style concerns like node order. However, I do not know what the
-> > > norms here are.
-> > 
-> > Thanks.  They're pretty trivial conflicts so I'm not sure it's critical,
-> > though like you say node order might easily end up the wrong way round
-> > depending on how the conflict resolution gets done.
+> I've seen a comment from another Maintainer that thinks this is rather
+> hackish. I tend to agree, you are adding complexity to the core to
+> handle one broken PHY, and a corner case in that PHY. It would be
+> better to hide as much of this in the PHY driver.
 > 
-> Thanks for the help and fixing this, but ..
+> I'm wondering if there is a much simpler solution, which does not need
+> the core changing. Have the driver dynamically flip between interrupts
+> and polling, depending on the link mode.
 > 
-> If it's possible to revert the DT patch 3-5, then I'd be happy to take,
-> but if this is too much job, e.g. the net-next's main branch is imuutable
-> and reverting it will cause too much trouble, then I'm fine with current
-> solution - carry the fix via net-next tree..
+> Start up in the usual way. If the platform supports interrupts, let
+> the core get the interrupt, install the handler and use
+> interrupts. Otherwise do polling.
 > 
-> But please use commit: 0f084b221e2c5ba16eca85b3d2497f9486bd0329 of
-> https://github.com/spacemit-com/linux/tree/k1/dt-for-next as the merge
-> parent, which I'm about to send to Arnd (the SoC tree)
+> If .config_aneg() puts the PHY into the broken state, forced to 10
+> Mb/s, and interrupts are used, set phydev->irq = PHY_POLL, and call
+> phy_trigger_machine() to kick off polling.
 > 
-No matter which way choose to go, I've created an immutable tag here,
+> If .config_aneg() is called to take it out of the broken state,
+> restore phydev->irq. An additional poll up to one second later should
+> not cause any issues.
+> 
+> I don't think this needs any core code changes.
+> 
+> Maybe there is an issue with phy_free_interrupt() being called while
+> irq has been set to polling? You might be able to use the
+> phy_driver.remove() to handle that?
 
-https://github.com/spacemit-com/linux/ spacemit-dt-for-6.18-1
+I tried to go this way, but it feels even dirtier. The driver would need
+to overwrite phydev->irq and phydev->interrupts, and also care about
+proper interrupt (re)configuration. On disconnect, phy_disconnect()
+unconditionally calls phy_free_interrupt() if phy_interrupt_is_valid(),
+but phy_driver.remove() is invoked too late. This leads to warnings
+like:
+removing non-empty directory 'irq/210', leaking at least 'usb-001:003:01'
 
-> BTW, The 'for-next' branch is a merged branch contains clock and DT patches
-> for SpacemiT SoC tree's which isn't immutable..
-> 
-> Let me know what I should proceed, thank you
-> 
+So the driver ends up fighting with core assumptions about IRQ lifetime.
 
+How about a minimal change instead: conditionally call
+phy_queue_state_machine() from lan87xx_config_aneg()? That would trigger
+a poll in the broken mode without touching phydev->irq or core teardown
+paths. Seems less intrusive than rewriting IRQ handling.
+
+Best Regards,
+Oleksij
 -- 
-Yixun Lan (dlan)
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
