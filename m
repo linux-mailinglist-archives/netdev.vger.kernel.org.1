@@ -1,171 +1,301 @@
-Return-Path: <netdev+bounces-223867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5A5B7EB0B
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:57:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 042C1B7D5FC
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:26:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 544C5521373
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 06:50:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 821E03A6BC9
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 06:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43AC82798E8;
-	Wed, 17 Sep 2025 06:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964E32475D0;
+	Wed, 17 Sep 2025 06:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b="F4wjIh8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC2D23D281;
-	Wed, 17 Sep 2025 06:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF66610F1;
+	Wed, 17 Sep 2025 06:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758091837; cv=none; b=tiENIeOoexcaSYgjY+SaFwLattdZbdLXLAVn5lhj5vkP34wzPewONH1KP+hvTyWtpW+mQrPVRDXtUieLHs34bZZN1Hqd9y+n/1Q9q/NUVCIOdLPjzAykCb1a33wJe876N+apRmvN+Nhj8IRz6ECxub4owejZLW14pNZ4wsC3Rfg=
+	t=1758090443; cv=none; b=eIFsWuqrJxbuHquOQpiizJoSROoifZrBucBHOUFrqt6uQmR4uh+/Fnmy4h+aOLtpDUrNLAyk5pUo6UQwHZXE8bAqO4dmP8KdSjRIXd4iPL3GL6CzlOmEGtUT52pj1LOy+okF20OfY8GUKIim0/e4IjRuCRcIUaTXZNsitrPmZoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758091837; c=relaxed/simple;
-	bh=yUebgToB8fNqLYyOXSBAVPWT0p5rZMhaAsCibJB/MRE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wd99bOmdegSc2szX7RQVxSC993lf+ldMHVJ/qMSeQECeg9HVniTWEdmuKXLteb9zn+kS4gS462YbIGZkDzmZqVz58bAuvkbE5VVX1ZpMo0Yi7MmnAKISlSXSlVuOQqhvI+1rLQ4lp1/Eoa9Ez+8AsOaoAIxACiVEPhpO7c43TmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cRTHm5Xlbz9sxc;
-	Wed, 17 Sep 2025 08:24:04 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cdMlgPgnLR0b; Wed, 17 Sep 2025 08:24:04 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cRTHm3mDVz9sxY;
-	Wed, 17 Sep 2025 08:24:04 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 4EAAC8B766;
-	Wed, 17 Sep 2025 08:24:04 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id ZNb0SINzbGae; Wed, 17 Sep 2025 08:24:04 +0200 (CEST)
-Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id C684C8B763;
-	Wed, 17 Sep 2025 08:24:03 +0200 (CEST)
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Herve Codina <herve.codina@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] net: wan: framer: Add version sysfs attribute for the Lantiq PEF2256 framer
-Date: Wed, 17 Sep 2025 08:24:01 +0200
-Message-ID: <2e01f4ed00d0c1475863ffa30bdc2503f330b688.1758089951.git.christophe.leroy@csgroup.eu>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1758090443; c=relaxed/simple;
+	bh=izH2gMoNjAHcvk2r9+b0JsMer4zWMg9JpX5jfaYsXlE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AeKJ5LQlpViUNVBr7HAQvk0PcyzqJpg9Y3ANN9HheXi6i/CG0CLeccXXFVpi5gil2JFAGDsJeqN+aWU4BRSdcqb3HF6Yv1B2FAiVBYqno2R1kCsvRl1MtDhU/n9EUAdnjvCOjUWRQphrbl7HlQJ+sTISbVnKBHpXcGgBbGHZJd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b=F4wjIh8z; arc=none smtp.client-ip=212.227.17.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1758090438; x=1758695238; i=deller@gmx.de;
+	bh=BgHbGS1Eo/NYp/d/kiwk0P2tMfA78VX2y50K67XVTo0=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=F4wjIh8zq+X4pOKP5zpRvWVKFtBl+60XjcpmLVHT0Ojsh+z9UFQb613jAxZPZ4se
+	 /C8ll7KCnFV2kLgvSVv8bsMRUKg1Re6u786qHneBo9mkxFMlmb6DBsRym4Y0A/N0E
+	 UmjE0gcHqqty4hcNreK9Bwa85vjgYfPMIGwx4AulmDpi2uq3Gz4/swjf0//ZTs3Pp
+	 kKTYC6x8f+XR2EAZ68NZSZf7ZBzmxNcMEwQAVr4CuymdBXc8nOFFnftvJNPJ7H5bC
+	 vwryRJ51iDRDM83M3IJan6O6wge+jrPM7boLcs6ZyTFRz+9G0nYAn5QedHVxkMANb
+	 B5iRvYQJITTZIN18Uw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.20.55] ([109.250.63.58]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MPGRp-1ukf8K3an7-00LzUQ; Wed, 17
+ Sep 2025 08:27:17 +0200
+Message-ID: <6aa9fd2f-4a7c-49db-91ee-67cf2f561957@gmx.de>
+Date: Wed, 17 Sep 2025 08:27:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1758090241; l=3036; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=yUebgToB8fNqLYyOXSBAVPWT0p5rZMhaAsCibJB/MRE=; b=XinTr0sQd/fycGPP9Ahs+KCsT52jn6P0PjWwxzML/HAyXtlvz85bQ/3HFUOcTJvz4KCIavxke xhO9gi/FA+vBoFKf2SdHRX9DHgHLs/OYBcq4bCVaw+bNMDGV58B+AJm
-X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][RESEND][RFC] Fix 32-bit boot failure due inaccurate
+ page_pool_page_is_pp()
+To: Mina Almasry <almasrymina@google.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Helge Deller <deller@kernel.org>, David Hildenbrand <david@redhat.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Linux Memory Management List <linux-mm@kvack.org>, netdev@vger.kernel.org,
+ Linux parisc List <linux-parisc@vger.kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+References: <aMSni79s6vCCVCFO@p100> <87zfawvt2f.fsf@toke.dk>
+ <f64372ec-c127-457f-b8e2-0f48223bd147@gmx.de>
+ <CAHS8izMjKub2cPa9Qqiga96XQ7piq3h0Vb_p+9RzNbBXXeGQrw@mail.gmail.com>
+ <87y0qerbld.fsf@toke.dk>
+ <CAHS8izOY3aSe96aUQBV76ZRpqj5mXwkPenNvmN6yN0cJmceLUA@mail.gmail.com>
+Content-Language: en-US
+From: Helge Deller <deller@gmx.de>
+Autocrypt: addr=deller@gmx.de; keydata=
+ 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
+In-Reply-To: <CAHS8izOY3aSe96aUQBV76ZRpqj5mXwkPenNvmN6yN0cJmceLUA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:4+fwHU54tyonjWnP/umRiDkexNHK9Wts2ptVu5jzIJ3ITwwN5DI
+ 75dut9PhVhAuIy0Cjmhhg38jAOmvmaiP6/7DIaHyUAn2TpRv3Jy4uMEObFz3cBF0KzCtlAZ
+ GLZZDFBy3uteMwX0SzAX/24VQvAAvM1yBwIT/y3FDgxxV+aY/cjEUZ1ACqXF/256OC1NQg6
+ GJo+j4ievkb57jg7XRxNw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:kG/X0+TuUWo=;fi/NleBtQTRCTslF71Z6yB1tuz5
+ 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
 
-Lantiq PEF2256 framer has some little differences in behaviour
-depending on its version.
+On 9/17/25 00:21, Mina Almasry wrote:
+> On Tue, Sep 16, 2025 at 2:27=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen=
+ <toke@redhat.com> wrote:
+>>
+>> Mina Almasry <almasrymina@google.com> writes:
+>>
+>>> On Mon, Sep 15, 2025 at 6:08=E2=80=AFAM Helge Deller <deller@gmx.de> w=
+rote:
+>>>>
+>>>> On 9/15/25 13:44, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>>>>> Helge Deller <deller@kernel.org> writes:
+>>>>>
+>>>>>> Commit ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unmap t=
+hem when
+>>>>>> destroying the pool") changed PP_MAGIC_MASK from 0xFFFFFFFC to 0xc0=
+00007c on
+>>>>>> 32-bit platforms.
+>>>>>>
+>>>>>> The function page_pool_page_is_pp() uses PP_MAGIC_MASK to identify =
+page pool
+>>>>>> pages, but the remaining bits are not sufficient to unambiguously i=
+dentify
+>>>>>> such pages any longer.
+>>>>>
+>>>>> Why not? What values end up in pp_magic that are mistaken for the
+>>>>> pp_signature?
+>>>>
+>>>> As I wrote, PP_MAGIC_MASK changed from 0xFFFFFFFC to 0xc000007c.
+>>>> And we have PP_SIGNATURE =3D=3D 0x40  (since POISON_POINTER_DELTA is =
+zero on 32-bit platforms).
+>>>> That means, that before page_pool_page_is_pp() could clearly identify=
+ such pages,
+>>>> as the (value & 0xFFFFFFFC) =3D=3D 0x40.
+>>>> So, basically only the 0x40 value indicated a PP page.
+>>>>
+>>>> Now with the mask a whole bunch of pointers suddenly qualify as being=
+ a pp page,
+>>>> just showing a few examples:
+>>>> 0x01111040
+>>>> 0x082330C0
+>>>> 0x03264040
+>>>> 0x0ad686c0 ....
+>>>>
+>>>> For me it crashes immediately at bootup when memblocked pages are han=
+ded
+>>>> over to become normal pages.
+>>>>
+>>>
+>>> I tried to take a look to double check here and AFAICT Helge is correc=
+t.
+>>>
+>>> Before the breaking patch with PP_MAGIC_MASK=3D=3D0xFFFFFFFC, basicall=
+y
+>>> 0x40 is the only pointer that may be mistaken as a valid pp_magic.
+>>> AFAICT each bit we 0 in the PP_MAGIC_MASK (aside from the 3 least
+>>> significant bits), doubles the number of pointers that can be mistaken
+>>> for pp_magic. So with 0xFFFFFFFC, only one value (0x40) can be
+>>> mistaken as a valid pp_magic, with  0xc000007c AFAICT 2^22 values can
+>>> be mistaken as pp_magic?
+>>>
+>>> I don't know that there is any bits we can take away from
+>>> PP_MAGIC_MASK I think? As each bit doubles the probablity :(
+>>>
+>>> I would usually say we can check the 3 least significant bits to tell
+>>> if pp_magic is a pointer or not, but pp_magic is unioned with
+>>> page->lru I believe which will use those bits.
+>>
+>> So if the pointers stored in the same field can be any arbitrary value,
+>> you are quite right, there is no safe value. The critical assumption in
+>> the bit stuffing scheme is that the pointers stored in the field will
+>> always be above PAGE_OFFSET, and that PAGE_OFFSET has one (or both) of
+>> the two top-most bits set (that is what the VMSPLIT reference in the
+>> comment above the PP_DMA_INDEX_SHIFT definition is alluding to).
+>>
+>=20
+> I see... but where does the 'PAGE_OFFSET has one (or both) of the two
+> top-most bits set)' assumption come from? Is it from this code?
+>=20
+> /*
+>   * PAGE_OFFSET -- the first address of the first page of memory.
+>   * When not using MMU this corresponds to the first free page in
+>   * physical memory (aligned on a page boundary).
+>   */
+> #ifdef CONFIG_MMU
+> #ifdef CONFIG_64BIT
+> ....
+> #else
+> #define PAGE_OFFSET _AC(0xc0000000, UL)
+> #endif /* CONFIG_64BIT */
+> #else
+> #define PAGE_OFFSET ((unsigned long)phys_ram_base)
+> #endif /* CONFIG_MMU */
+>=20
+> It looks like with !CONFIG_MMU we use phys_ram_base and I'm unable to
+> confirm that all the values of this have the first 2 bits set. I
+> wonder if his setup is !CONFIG_MMU indeed.
 
-Add a sysfs attribute to allow user applications to know the
-version.
+Btw, on 32-bit parisc we have PAGE_OFFSET =3D 0x10000000.
+Other architectures seem to have other values than 0xc0000000 too.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
-v2:
-- Make DEVICE_ATTR_RO(version) static
-- Split version_show() prototype into 2 lines to remain under 80 chars
-
-v1: https://lore.kernel.org/all/f9aaa89946f1417dc0a5e852702410453e816dbc.1757754689.git.christophe.leroy@csgroup.eu/
----
- drivers/net/wan/framer/pef2256/pef2256.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
-index 1e4c8e85d598..a2166b424428 100644
---- a/drivers/net/wan/framer/pef2256/pef2256.c
-+++ b/drivers/net/wan/framer/pef2256/pef2256.c
-@@ -37,6 +37,7 @@ struct pef2256 {
- 	struct device *dev;
- 	struct regmap *regmap;
- 	enum pef2256_version version;
-+	const char *version_txt;
- 	struct clk *mclk;
- 	struct clk *sclkr;
- 	struct clk *sclkx;
-@@ -114,6 +115,16 @@ enum pef2256_version pef2256_get_version(struct pef2256 *pef2256)
- }
- EXPORT_SYMBOL_GPL(pef2256_get_version);
- 
-+static ssize_t version_show(struct device *dev, struct device_attribute *attr,
-+			    char *buf)
-+{
-+	struct pef2256 *pef2256 = dev_get_drvdata(dev);
-+
-+	return sysfs_emit(buf, "%s\n", pef2256->version_txt);
-+}
-+
-+static DEVICE_ATTR_RO(version);
-+
- enum pef2256_gcm_config_item {
- 	PEF2256_GCM_CONFIG_1544000 = 0,
- 	PEF2256_GCM_CONFIG_2048000,
-@@ -697,7 +708,6 @@ static int pef2256_probe(struct platform_device *pdev)
- 	unsigned long sclkr_rate, sclkx_rate;
- 	struct framer_provider *framer_provider;
- 	struct pef2256 *pef2256;
--	const char *version_txt;
- 	void __iomem *iomem;
- 	int ret;
- 	int irq;
-@@ -763,18 +773,18 @@ static int pef2256_probe(struct platform_device *pdev)
- 	pef2256->version = pef2256_get_version(pef2256);
- 	switch (pef2256->version) {
- 	case PEF2256_VERSION_1_2:
--		version_txt = "1.2";
-+		pef2256->version_txt = "1.2";
- 		break;
- 	case PEF2256_VERSION_2_1:
--		version_txt = "2.1";
-+		pef2256->version_txt = "2.1";
- 		break;
- 	case PEF2256_VERSION_2_2:
--		version_txt = "2.2";
-+		pef2256->version_txt = "2.2";
- 		break;
- 	default:
- 		return -ENODEV;
- 	}
--	dev_info(pef2256->dev, "Version %s detected\n", version_txt);
-+	dev_info(pef2256->dev, "Version %s detected\n", pef2256->version_txt);
- 
- 	ret = pef2556_of_parse(pef2256, np);
- 	if (ret)
-@@ -835,6 +845,8 @@ static int pef2256_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
-+	device_create_file(pef2256->dev, &dev_attr_version);
-+
- 	return 0;
- }
- 
-@@ -849,6 +861,8 @@ static void pef2256_remove(struct platform_device *pdev)
- 	pef2256_write8(pef2256, PEF2256_IMR3, 0xff);
- 	pef2256_write8(pef2256, PEF2256_IMR4, 0xff);
- 	pef2256_write8(pef2256, PEF2256_IMR5, 0xff);
-+
-+	device_remove_file(pef2256->dev, &dev_attr_version);
- }
- 
- static const struct of_device_id pef2256_id_table[] = {
--- 
-2.49.0
-
+Helge
 
