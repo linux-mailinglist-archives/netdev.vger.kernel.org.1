@@ -1,60 +1,57 @@
-Return-Path: <netdev+bounces-224187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372BBB81F04
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 23:22:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BFFB821D1
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 00:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E778017988F
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 21:22:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 765B7620F24
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 22:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081202FF64C;
-	Wed, 17 Sep 2025 21:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBC130DED4;
+	Wed, 17 Sep 2025 22:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pIzvUw3I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8yQ/Gk+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D492D2749CE;
-	Wed, 17 Sep 2025 21:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B7230DECB;
+	Wed, 17 Sep 2025 22:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758144161; cv=none; b=Qv3VHvPxJ1QzRw840APn+sgOLsOIDoavjhU38OfFWRhk9EM7IWoJQE6LMzZ4c0+pUgCBVQY3BO52N3iIoEZ3SqV0sCxTNST4h2X3K5LYlVqvbt9/z+H7TqojdzljOdU6S52bozXFemOc/vhSNuY3pBsL5fqP3rhe369nwz/zvcg=
+	t=1758146860; cv=none; b=mAjGYJoc0YI+HZqJdUE8uw1dkdVJai5Pv4kBUn4ExHDQYuLY9bYUiesWe+E5Jy48WK/vt+QIk3hsRANK/ydN7gmm0ri7eX6mKS2jqxIbTx8CTpR9/PjYwfE2MZKRiaqgL0yqXPBAGAbwaJda7yjEq4GQ3HXgG/F+gazuob5IyM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758144161; c=relaxed/simple;
-	bh=VhFn1wpwrS1RDDHi1pYQzMzqmS3pgxJXwPkAvzdGmLM=;
+	s=arc-20240116; t=1758146860; c=relaxed/simple;
+	bh=FMxIelZ1xsAYWEoxG8Awp9yBOpIhjQskhZlgQG/Iwi4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q/pq33TlU/HG+zboWtRkYzF5X3AOgJtrrhluqBCVne57LS7ROaYcHLZ7Lt25bdaRsDNZOIZ0WRjLwq3mD5956WNf+RkilKYTJVP9Hdb5C+NlyTKqTJLS8F49VkHt7W/9auz7hosqJYJOlPVrFny7JURINvkoh+KrsHJb5y6N8js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pIzvUw3I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A44B8C4CEE7;
-	Wed, 17 Sep 2025 21:22:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=V+kYfuD8ZJaTZhpPg7ApuosbvQlcjXX26TgPeoYw5nXYq4OpEwU6UyIAmg3eDNg+FHiQyDI5vrOV/lPCP96bvxl3Odd4Dq2ABQtBHzXvPUaZH9voA0CaQoHNuRFTjDovK8LfU++Rf+dNj79ayuWoQ8Z9EZjmZN5NzOHVqTqACMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8yQ/Gk+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF68C4CEE7;
+	Wed, 17 Sep 2025 22:07:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758144161;
-	bh=VhFn1wpwrS1RDDHi1pYQzMzqmS3pgxJXwPkAvzdGmLM=;
+	s=k20201202; t=1758146860;
+	bh=FMxIelZ1xsAYWEoxG8Awp9yBOpIhjQskhZlgQG/Iwi4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pIzvUw3I0UOxJ6ri0qF8bQvssPEiHWybKK6nGydjeutCXElYZ9adAh3YJ3EyL0YFZ
-	 mnnxRj5kO/X/R71T18nqEOh3fQb4w6qAQbwyrun5vWoe9iGmgn41r56qrZ6ALIuFFt
-	 Zb8tHdUmZB7cQs/bbSeq3QptZMe0+bdYXiJZ1diC2ZhrLI34FL7t681u3PAKTe5PtP
-	 XsOYEOgAPB7cIAFjMf62RhzPYp2zZCboUspqGLFZ4FtUQIh55mbbfCXjPwL4Hvguxp
-	 o6+BpsoGJfGEsvdQVU2JuWs8Y8tkAfLpoJwG5TFaoImj8K/zsupfyy269wS+vOlIm6
-	 ZI7zD4pcQ/Ekg==
-Date: Wed, 17 Sep 2025 14:22:39 -0700
+	b=X8yQ/Gk+Etzjvi78OpgbfaGLL48NWQl/6nkVB3Kaw87pdc09WxWMOMi9RaokSd9iM
+	 8rf07wvoYZdfga/GmpxRSpLE5JIpcvxKhhUAlu4SS7OplSYeSyhMUnlx2RfgTfBiOk
+	 p96hPtolnBRi0zOTV7NgeZ9Vo2ZxfnVLpu+BLZXsBG+5BRJDtpw9nffJRFb1FEVKum
+	 9pm8grAibRiR0XNNYMDFq8eVZk4ry27n29UZcZnKmDrxap2Z4IohZlWznVgnNxPknS
+	 9hQ3TvBbgtAbLnwqUJVyZKIU5NTkmV2/xfWr1UC/bGY+trUlHfeqEc3ClF+4B6eOYZ
+	 ULLsXWyEpiA0Q==
+Date: Wed, 17 Sep 2025 15:07:39 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Martin KaFai Lau <martin.lau@linux.dev>, noren@nvidia.com
-Cc: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, paul.chaignon@gmail.com, stfomichev@gmail.com,
- martin.lau@kernel.org, mohsin.bashr@gmail.com, dtatulea@nvidia.com,
- saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
- maciej.fijalkowski@intel.com, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next v3 0/6] Add kfunc bpf_xdp_pull_data
-Message-ID: <20250917142239.245e9ed2@kernel.org>
-In-Reply-To: <a9ce1249-f459-440f-a234-bdb8dd4238f2@linux.dev>
-References: <20250915224801.2961360-1-ameryhung@gmail.com>
-	<a9ce1249-f459-440f-a234-bdb8dd4238f2@linux.dev>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC] net: selftests: Adding TX checksum offload validation
+Message-ID: <20250917150739.7c40c5c0@kernel.org>
+In-Reply-To: <aMkp4vGilSPbAyun@pengutronix.de>
+References: <aMkp4vGilSPbAyun@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,21 +61,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 17 Sep 2025 11:50:01 -0700 Martin KaFai Lau wrote:
-> On 9/15/25 3:47 PM, Amery Hung wrote:
-> >   include/net/xdp_sock_drv.h                    |  21 ++-
-> >   kernel/bpf/verifier.c                         |  13 ++
-> >   net/bpf/test_run.c                            |  26 ++-
-> >   net/core/filter.c                             | 123 +++++++++++--
-> >   .../bpf/prog_tests/xdp_context_test_run.c     |   4 +-
-> >   .../selftests/bpf/prog_tests/xdp_pull_data.c  | 174 ++++++++++++++++++
-> >   .../selftests/bpf/progs/test_xdp_pull_data.c  |  48 +++++
-> >   .../selftests/net/lib/xdp_native.bpf.c        |  89 +++++++--  
+On Tue, 16 Sep 2025 11:12:02 +0200 Oleksij Rempel wrote:
+> While working with the smsc95xx driver, I identified a need for better
+> validation of the driver and hardware TX checksum offloading capabilities. I
+> believe a generic test suite for this would benefit other drivers as well.
 > 
-> I think the next re-spin should be ready. Jakub, can this be landed to 
-> bpf-next/master alone and will be available in net-next after the upcoming merge 
-> window, considering it is almost rc7?
+> The generic selftest framework in net/core/selftests.c seems like the ideal
+> location. It already contains a test for the RX checksum path, so adding
+> validation for the TX path feels like a natural extension.
+> 
+> Here is the list of test cases I propose to add:
+> - TX csum offload, IPv4, TCP, Standard MTU Packet
+> - TX csum offload, IPv4, UDP, Standard MTU Packet
+> - TX csum offload, IPv4, ICMP, Standard Payload
+> - TX csum offload, IPv4, TCP, Minimal Size Packet (1-byte payload)
+> - TX csum offload, IPv4, UDP, Minimal Size Packet (1-byte payload)
+> - TX csum offload, IPv4, UDP, Zero-Checksum Payload (Verify checksum becomes
+>                               0xFFFF)
+> - TX csum offload, IPv4, TCP, With Single VLAN Tag
+> - TX csum offload, IPv4, TCP, With Double VLAN Tag (Q-in-Q)
+> - TX csum offload, IPv6, TCP, Standard MTU Packet
+> - TX csum offload, IPv6, UDP, Standard MTU Packet
 
-Nimrod, are you waiting for these before you send you dyn_ptr flavor of
-XDP tests? Other than Nimrod's work I don't see a problem.
+The in-kernel tests are best for things which are hard to trigger from
+user space. Have you seen tools/testing/selftests/drivers/net/hw/csum.py
+and tools/testing/selftests/net/lib/csum.c ?
 
