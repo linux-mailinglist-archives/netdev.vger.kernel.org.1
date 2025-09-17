@@ -1,102 +1,121 @@
-Return-Path: <netdev+bounces-224052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22EE7B80179
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:39:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9BD7B80263
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:43:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 322A85278DC
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:39:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBD8F1C0623B
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D34C2F49E0;
-	Wed, 17 Sep 2025 14:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767C32F25F7;
+	Wed, 17 Sep 2025 14:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1eeGgeq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LJlr4ay0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B97A2F3600;
-	Wed, 17 Sep 2025 14:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED741F0994
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758119948; cv=none; b=COdEeGDM/uEnnSav0ZMNSYnNuLSAGRiD9n5bmNolrtG2v6HAD+eodPrhj8nIJcmZmeBH5cQ742eKBhsvgowMyp+RPqwhWcdjytJCHFUpT/MSeMzBAzUhD12wzxmlgUI3HmFXM0npV9z/J1W/Dn3CpIzt0BK/Bmbmd47xgdWK7zQ=
+	t=1758120027; cv=none; b=qS+/6IUHWGKe+LTyBrRryoJo9yOcPYOUznubHrjnIJ3r/x6OoEN/qgdvaaWS+EaGpcgG/du9AMSA5xRFyaSpiCzqXWJ7ExX2cHtn341NukQ/Wwg30QQ9bPQh+8VuIN5GrABV6YWqtEwEVZnS71mWzBVILzKGd9xAab8zeyRoq7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758119948; c=relaxed/simple;
-	bh=u3+VBb0+jmWQQQNa6YrZZDY0GATxxNhEQ0yXVlXJ5Pk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cMCEEu1unu78TVa9PF2bjOfp36HkHYwvCp02ly91OM2rNPTImIOGO4pddSLmkez2xBzvxo1ggCjSFOdMADfQO7soe+vT/U6QRF7obA60M5RZgN+r2I2pQb21KakrpedKZfWXlOhKxHfAXbxKODBtM25sGQJNj9h6B1R4BZfiXQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1eeGgeq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D468C4CEF0;
-	Wed, 17 Sep 2025 14:39:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758119947;
-	bh=u3+VBb0+jmWQQQNa6YrZZDY0GATxxNhEQ0yXVlXJ5Pk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i1eeGgeq+AggIW9AVtyBJpJpYfNoylI143diff794sXLTNMKVy8ghMpQkHfSUWdqK
-	 8yzWuwzF/4OMauvcVuI+l1WcCsr0O8EvNvvVe5gnagmj+FYVWXJQt1BBlXH4t20Wxv
-	 FHFr8csxCJhbqYX7jhighmBjfgphjTvzfNbJkryId3thChMrhKA2uF4kNMpbQ8GKv9
-	 kRa6Brvzu85IjGzOA30wQPsrSC6vsDHdlq5z4DxpIzZc/QP5YW1ZyWb3LiSWhdg0pY
-	 pmV4ZIsOEWZQqZUcR73pF8EWnESbcESf1IYuhDAtPfGMF4U6+q8BsOIRGpsmrczXwn
-	 ICvosiogou9cg==
-Date: Wed, 17 Sep 2025 15:39:03 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sathesh B Edara <sedara@marvell.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Satananda Burla <sburla@marvell.com>,
-	Veerasenareddy Burru <vburru@marvell.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Haseeb Gani <hgani@marvell.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
-	Shinas Rasheed <srasheed@marvell.com>
-Subject: Re: [EXTERNAL] Re: [net PATCH v2] octeon_ep: Clear VF info at PF
- when VF driver is removed
-Message-ID: <20250917143903.GL394836@horms.kernel.org>
-References: <20250916131225.21589-1-sedara@marvell.com>
- <20250917115542.GA394836@horms.kernel.org>
- <CO1PR18MB47473C9867B184DDDB51E1C5D817A@CO1PR18MB4747.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1758120027; c=relaxed/simple;
+	bh=eK5I0FXdGi22EZiC1nWona0mCu3fJMZ3aNkjHWYqN8A=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IhmDa50FGeUHh79kh99keGJc37W9tqjI+Eetl7UblkFF0vjppOoHrysjzwXlMK9E6TWqqqCf5blbYxPR8UsITuu4H/b1no8T+VBL5AFWYgiFYrfRA5bamimHvQY7GrQSEHYmxy1wra7kaiEMM7dejiw2djqxXTnItrdHnPefxXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LJlr4ay0; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-74382048b8cso5121406a34.3
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 07:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758120025; x=1758724825; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eK5I0FXdGi22EZiC1nWona0mCu3fJMZ3aNkjHWYqN8A=;
+        b=LJlr4ay06ECm4nkSjq0+SOjLx9vUQyeWZZUHO6ImtRMcYYp1y6H43siDFuOg0gktRE
+         MPe3y+oHofr8zuWrjoFjxkBAldLY10K6Yzc4HLdJgLOxQnXzd61zm62miGuZQDzV5cL/
+         9etQxKlMKcGXgSAo80kHFWxNkG3QaFndZhxkCNoYl0KSnHD1LfEBwdsPZwxp7J8QUL2m
+         2xpiOvywuoOYy+NnPhvItHgaGlbN/mKtEw0UL3EvxAx3AzFMT+0wnDeYLVJIPAgi/KDC
+         IPwSx50u676ACe36OuQdTZMtI0HfMMtVYqZnWKYcyie5RLrCrFxZX6Asf5PQ9oqzuvMY
+         DmuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758120025; x=1758724825;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eK5I0FXdGi22EZiC1nWona0mCu3fJMZ3aNkjHWYqN8A=;
+        b=YPrzc1nSQJjUGo+yfK+qK+K2lucRbL/f0e80qf8TqRKAc3Oz+pH3oC88XwJ6h0ZB8N
+         aU0UKXQM+Mq9gvP7V9kuSY/XBuF868y4OdDabifE0IJJliBqp0fXRJHA6i1P8bheYLOD
+         xlC73l3OmKSzl3N0qonBrwEwX1HimQadyBY2a+cZOoVMJlnfz8iklLhiJZV1a5LaNquY
+         Py8QBA6ifJ4dLMZgp9zcx9lMWye1YwErhsDGH8sS/VbH4y18c/6Kvc2fRoQvDXqP0OBz
+         bk8HOPG1vbqrAmH/k3WckZ3TZ/n1qXC0dVec9TrcTAMPncTlqB+cv1hTl4EBfezU018k
+         MRtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUpFwowijw2RR03vED5JQC2+dfq7u0XccDKbseg0cvk7BDsHnG5WdAAOgLOTS6jiQOIoJI40NE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWTswGz5vRWfmwaDLA/kNtMhKL7QCkdhhvCRWHIG7gOs7pTu0+
+	QjTmEOu14eaqEPnS7QgjjDFkRtGdKQ7XeSvHJKZgdX4dogBXGCcl/82T
+X-Gm-Gg: ASbGnctgssS5LqwW3motTSQnwYfVj8olyEFAXnm/UQLGgvmxG0AF1xvHwFDHhPJ8vaC
+	SnvjQwkwkviLyyZ5OxyORO1icxrBjJuD+oCoj9fy1n7todjutUclKIUOf+aOR2sm+TaeL/LGJhL
+	70HdBbR2FimLEStacHftdm2MiP53E8KLalVxCVmXyHBZ5cUYl6K8XZOj+accYu8twJrN2f9Apfy
+	02VCTTdz4iMdmMUWV+xoBdg2/kmSDAjC84B6PkgzpszoayF8Gv/YbzWB0XCipNxXZXJmOHUU0fF
+	RXsscSLGYEX796NvA8OaCFqpLe4ZHHEzKtEd7haBKoX6vnEM+p20hsHlcbj6WdCs7/nzbOMr8J9
+	50+EeggbLjmPPJe8Lc5kgfUiIT3aNYM2TL/+EZH40vMQYOlJAVLjM4OsCp6XlgZC/mIcjaRr7bO
+	syXFxfpnKocVuf6hy4LP/SN1Zg7oQCEASn94o=
+X-Google-Smtp-Source: AGHT+IFuoZQvqnwPXo5d6wnHV1ZaiWFbmg5Q2lv6uwuvzfmGXwFkkmE+hWJ3iTKF8TqLazP+Spi/Ig==
+X-Received: by 2002:a05:6830:6f4c:b0:745:49ef:d74a with SMTP id 46e09a7af769-7632644afc4mr1151794a34.26.1758120024839;
+        Wed, 17 Sep 2025 07:40:24 -0700 (PDT)
+Received: from [10.0.11.20] (57-132-132-155.dyn.grandenetworks.net. [57.132.132.155])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7524c260735sm5317009a34.39.2025.09.17.07.40.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 07:40:24 -0700 (PDT)
+Message-ID: <d994dd8855c3977190b23acbe643c536deb3af71.camel@gmail.com>
+Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
+From: brian.scott.sampson@gmail.com
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: christian@heusel.eu, davem@davemloft.net, difrost.kernel@gmail.com, 
+	dnaim@cachyos.org, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	kuni1840@gmail.com, linux-kernel@vger.kernel.org,
+ mario.limonciello@amd.com, 	netdev@vger.kernel.org, pabeni@redhat.com,
+ regressions@lists.linux.dev
+Date: Wed, 17 Sep 2025 09:40:22 -0500
+In-Reply-To: <20250917013352.722151-1-kuniyu@google.com>
+References: <c36676c1640cefad7f8066a98be9b9e99d233bef.camel@gmail.com>
+	 <20250917013352.722151-1-kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (by Flathub.org) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CO1PR18MB47473C9867B184DDDB51E1C5D817A@CO1PR18MB4747.namprd18.prod.outlook.com>
 
-On Wed, Sep 17, 2025 at 12:24:22PM +0000, Sathesh B Edara wrote:
-> 
-> > On Tue, Sep 16, 2025 at 06:12:25AM -0700, Sathesh B Edara wrote:
-> > > When a VF (Virtual Function) driver is removed, the PF (Physical
-> > > Function) driver continues to retain stale VF-specific information.
-> > > This can lead to inconsistencies or unexpected behavior when the VF is
-> > > re-initialized or reassigned.
-> > >
-> > > This patch ensures that the PF driver clears the corresponding VF info
-> > > when the VF driver is removed, maintaining a clean state and
-> > > preventing potential issues.
-> > >
-> > > Fixes: cde29af9e68e ("octeon_ep: add PF-VF mailbox communication")
-> > > Signed-off-by: Sathesh B Edara <sedara@marvell.com>
-> > > ---
-> > > Changes:
-> > > V2:
-> > >   - Commit header format corrected.
-> > 
-> > Hi,
-> > 
-> > I feel that I must be missing something terribly obvious.
-> > But this patch seems to be a subset of the one at the link below.
-> > 
-> You're absolutely right — apologies for the confusion. I mistakenly sent the wrong patch and so marked its state as 'Not Applicable'.
->  Please disregard this patch.
+> Could you test it with this diff and see if 2 or 3 splats are logged
+> in dmesg ?=C2=A0 and in that case, please share the stack traces.
+>=20
+> I expect this won't trigger the black screen and you can check dmesg
+> after resume.
+>=20
+> Thanks!
+>=20
+>=20
+Good morning/afternoon. Applied this patch to the latest mainline, but
+still see the black screen upon trying to resume after suspend. The
+keyboard looks to be unresponsive, as trying to switch to a tty
+terminal or back doesn't result in anything happening(as well as
+numlock/caps not being responsive either). I also tried using the power
+button, as well as closing/reopening the laptop lid to see if I could
+trigger resume.=C2=A0
 
-Thanks, understood.
+Checked the systemd journal just in case, but no splats or anything
+else is recorded after the suspend. Finally, attempted following dmesg
+with -Wh to a text file before suspending, but that also doesn't record
+any new input after the suspend.
 
