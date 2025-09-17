@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-223814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76200B7C515
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:56:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E12AB7C5F4
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A024146140D
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 00:11:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18FDC1C05174
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 00:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AFD1C3314;
-	Wed, 17 Sep 2025 00:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8561D5ABA;
+	Wed, 17 Sep 2025 00:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eq/LxN9t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0tUMvZj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838221ADC7E
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 00:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9438E7082A
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 00:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758067818; cv=none; b=NB2wU5CQcqTNcq9M7l3BRjH4YctX4fIJwlg9P70jrQeyas7Hym+JmuF7FFWbG3JdL2eDqtxA3E10yUHMoWikqlGtmPZgddN9D370bt0PSq/7AoMyqxOGzJm4uC5eLxV+Yzk05ECseDgLfQvO5/sa0Zg3G3g1J/0a44TIIkvOkAk=
+	t=1758067819; cv=none; b=ALB/D7NHF9+IYZVQlBiNWbNK42L4zgs47TVfv9OuVN83nImTvh36NhS/F6X7P9sdaryoxAg620wd/Sw/MRzKluqEKp35wz/JJQDGa82HeaMPnR+BCkD7kEemvgd8rPqWGpbbhUxFu7hH/hNoCcIB/FAmOdM85+SKI3quNzF9nXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758067818; c=relaxed/simple;
-	bh=9DvafNw8cwYPpzZGEMdWSlROiZppkxClbq+lw9hyWNE=;
+	s=arc-20240116; t=1758067819; c=relaxed/simple;
+	bh=nh+Jt2BZuwU9nJydOubi1FfHRgLwzJflWQ2qqHZ6n8c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YnqWnrhWOKNAPQzms7Mcguq/pPsyEvtLlIWc1lyrNggKp8g+sT7N8XOIXN4b+DJbHj0EPnPiZl4aCQiAqVn1N1dXrwxpG59K6en1oGrz2LvCMUqi+YK07B29CX8/x2dcaWx2eU4VU9rKsAROlRQPcUOayyGfdeZ1u0O0YRAuGiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eq/LxN9t; arc=none smtp.client-ip=209.85.219.182
+	 MIME-Version; b=fY0ztXPhy9L+03WL4E2HhdEkgVfh9aDaOtILXT71L668XWXVPOQv8K/y2inFv4CP+l79dQY3Jrx18mxKQbNqD90VshLwxcrRJBsiEYdcaS9rpAXB0gCHAnKx+Aj7Cpp0VsXJOKzb7jiZXOSt4UKUUK4DzDbVRHOZYUtjMgCxMcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T0tUMvZj; arc=none smtp.client-ip=74.125.224.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-ea3c51e4cffso4565749276.3
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 17:10:15 -0700 (PDT)
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-61381743635so3346327d50.1
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 17:10:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758067814; x=1758672614; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758067815; x=1758672615; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g79/U4urq71CTxSrw75vwBmOS/YmH5rjCGRyqNAYWuk=;
-        b=Eq/LxN9tIErnLZAzZmNyLUq2zb8v7oe5Vx0uU21DaJ5o0/korQnRigMdNP8u7n0Xan
-         pq2SCL35BPjuHTGbe5DKMe8pZT1wnGiBRR7fj1I3+Ur9jBO/S0LWn/fG0EzNO+QYxroV
-         hWdCnYylgb2P9KgiAXvE8Xd2umIdNrHT0TQORmqHyrqfsRHXcTnbwoocddYQWQ9JvA9/
-         CjqNXQPbjRkl2ErK0aXjlFL7lhVxtCJMgrkkEHiFbKwJSznGs1T8x/jMd872FhJfWuo2
-         XgBbCIWgCCEDkYO/t8PvQu7+SeNZnmA4YgL0MtPUF0auRKrYGg0+1PTNAYxPVdSVkwm4
-         WHPw==
+        bh=fApwIF4D8JplyJ/cOuGEEuLjKMoHSUvrBQQ+Ym2esuo=;
+        b=T0tUMvZjYkhO2yE0+bp0bjrgwnvnrbAk8D/UPX7eJUxH3ufIhJcVIp8t/us4DTUWRf
+         AeMs5RZS0s53a2BZ9qCegOz2balIWvuuE2tS4azM2bsSq2SN+x7Fnrt/G5aSbq7X8aHU
+         xR5XxnMKqbpZUZnMt/g6TOvneXZr2m+FLI4KkS7CDXUIqLZhOY5APubDkXvvL3MD3lxm
+         YV93kf7jrzcAaoW6DPRZGohzlrbGjO5rwzGAfybmhMzdM8n0xgeyH/6kicld1TKxLQDd
+         Bm4hpup2E+9w0doYAZkDOhQ4MRSGMb+JRaeqmV1VzZF/E2HnA4Jp/XAWRE22Slo6ajHK
+         rB9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758067814; x=1758672614;
+        d=1e100.net; s=20230601; t=1758067815; x=1758672615;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g79/U4urq71CTxSrw75vwBmOS/YmH5rjCGRyqNAYWuk=;
-        b=PnquK5dl85tU5FBWLAGxmPtP9mwptnb+Wa/xlnS9t5tVEpvakz1VrvdKpBLVF6l9GJ
-         fuuZea/35vIU2eSC+ONnC1asRKjfw9GFf5hx2G5XHLGxBfcoimHUXCiSC0d2XXOEKDCe
-         i6eliqyqRE+ZbXEDcEK3Z4VR+bBcgSRQ4WCF6Lj7VPxyDJqor950AfUomdWiI82XWff9
-         bI0ZaGRoRzbFT2IOWK4yaE8/xpbtFA50vxI1Jyuhvf+AuCTbs4HRnswFq/PVUcR2QWaS
-         di8De3wVvNvfc58B7pLOilRr4lW6wu/Nj4QPZr2Ca48fJ9CJUFoTyW3rAtPzsO7jwoQn
-         OQbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTRIAHqNS66nDG7NO/5m9bLOG8E05G8vIixZQDY+ZQvLsGXBcOp6oVAUnukxMGErFsX6zij2s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGAd09gRmgqDx5DsYfTOz5WR+fHR6TqdsgP6XjW6C8IndTgu5i
-	ib6WN7JWWfNHcKWbUgkKjlDCZW9b3YquCI98ue4VmDZkCwLizLHVVIGa
-X-Gm-Gg: ASbGncs/UiaJTHUZaOBR1Y0lT1RFKIt0XrmroRfHRrgOdIcBYnLYW7uAXjZjkUaf4qa
-	NsOto7M2wzREXU775Np8OeTRjxFzlOgt0+Gpt1HYq2e6s3840nD/LXIUbnna7GDjW4gJOBRPxAq
-	/+WQbVVRcQ9H4vnYSuPQLNB8hBDK9LHA73aS+8PJfZwLIuzNdyMSSXKowrgOZts0e3UCbMu/pHu
-	ozUi0qd04Shn+ky9z4KQxtssMU+fa2oalwF/XMEZI1CdqjfhIJNWbVllk7p4Ldjuu9HCGE0kVYG
-	G9p+cUZAsA6xKh0+EdL4SgqPWko8R2ehC2kd5nH6WVEX5vogTS4zLfXfUfg2HEnaKQ5ghAmrJvn
-	eQ8fGglCPxDYlJ+QivXcr
-X-Google-Smtp-Source: AGHT+IEOifu8AymFNhuJtvvV4PCpwYMP9Ly5a+YEeML+3nFk01ekMmhANEaWFl7uymINThZJnA9dng==
-X-Received: by 2002:a05:690c:9988:b0:723:b330:3dd6 with SMTP id 00721157ae682-738907bf689mr1755537b3.12.1758067814287;
-        Tue, 16 Sep 2025 17:10:14 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:4b::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-62482271efasm5376638d50.4.2025.09.16.17.10.13
+        bh=fApwIF4D8JplyJ/cOuGEEuLjKMoHSUvrBQQ+Ym2esuo=;
+        b=SuV7yZwDgpqIcL+OPCcLNw1HVWalzebryUbDUWAWYCUVylPw6+fhdDAKzpiWcQmyrQ
+         T6VxG+fPt4Prs+1FsFj38N5pjagMXaE5rtyhsngHbLy3Hef81tqRgj35pSwIzKHuBZFC
+         K6Ybh7s1raIh7b/MmrpiTZxWUyHFIKGEx/bQysLdX2QzZkofLlyQ4l/QeL26I+0nRJe5
+         cZeHE/XazBRivQfrNM0CqxjHVS2i1WMmE/W/y+DgGZaT3qxdPd3FpTNJrJ9R8HJL/IeZ
+         d9K1G4aSXEo8SZRJljg+VeRmkBv+UD4iQkuA+mlfL58GwEb1ESLHIrgEb4yA5r7X/kIk
+         1sIA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbmSk3zHKmQUUJ90IkTbA3FzQOXwDQ/KfRghTjBYexwmYZvAl+bHmfgWL/mxk2EOa5S9A9xd0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4cVbDgaf2xfOsc+p4QR4XT1ctRzGFH8T5e/TAvVqg+kwciIvG
+	fyfQKp5BUyeujjVVOAgka0hYwdpxBcvgE8Wses2CLD1QNrpb0IDSA+Zr
+X-Gm-Gg: ASbGnctYjxjKKAl7EvfceqffXHj6FysDG9oe+Q/YFJsNHwdDOs9TK3GsCBcxFI6DyZC
+	zQs3qr4L85PUfHakwOtTrTKKoT8JX9kTN92qhrc+EBLSh4LA1VfP7lPIkUZjBnoJg0km9JwAgXA
+	69Vud2wH2pogzypusf4MwdZtGbYGHlJur1k9isbba2S95IsJKO5rxC1qx/ugFDcYNI1RZ762Uq4
+	8SA+pFr/uAISXDuQLm6IPM7xCG52lEGP+eDhxK/NavggeFRrPiPT101ytufV0wxD9LlynvpNPE8
+	7p5bGXl5+I+seTA1mtU8xnq+2S4xCCjE493EDuBvkHpEXbVv4PsFN0UtkLse6DsguaFru6FqN6R
+	TtSyPxCbyiJcq8yovZTxe
+X-Google-Smtp-Source: AGHT+IGNSGdgnGSrwwlf7i88buC616/QUiAbXnrwOTSghWlAV3OdSqGYYL1ekXSOSrem1wrH8An0jw==
+X-Received: by 2002:a05:690e:124a:b0:62a:94fd:f2e with SMTP id 956f58d0204a3-633b068d117mr325958d50.21.1758067815423;
+        Tue, 16 Sep 2025 17:10:15 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:57::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7335af1ea69sm23771177b3.34.2025.09.16.17.10.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 17:10:13 -0700 (PDT)
+        Tue, 16 Sep 2025 17:10:14 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -101,9 +101,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Kiran Kella <kiran.kella@broadcom.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v13 16/19] net/mlx5e: Configure PSP Rx flow steering rules
-Date: Tue, 16 Sep 2025 17:09:43 -0700
-Message-ID: <20250917000954.859376-17-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v13 17/19] psp: provide decapsulation and receive helper for drivers
+Date: Tue, 16 Sep 2025 17:09:44 -0700
+Message-ID: <20250917000954.859376-18-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250917000954.859376-1-daniel.zahka@gmail.com>
 References: <20250917000954.859376-1-daniel.zahka@gmail.com>
@@ -117,151 +117,147 @@ Content-Transfer-Encoding: 8bit
 
 From: Raed Salem <raeds@nvidia.com>
 
-Set the Rx PSP flow steering rule where PSP packet is identified and
-decrypted using the dedicated UDP destination port number 1000. If packet
-is decrypted then a PSP marker and syndrome are added to metadata so SW can
-use it later on in Rx data path.
+Create psp_dev_rcv(), which drivers can call to psp decapsulate and attach
+a psp_skb_ext to an skb.
 
-The rule is set as part of init_rx netdev profile implementation.
+psp_dev_rcv() only supports what the PSP architecture specification
+refers to as "transport mode" packets, where the L3 header is either
+IPv6 or IPv4.
 
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Raed Salem <raeds@nvidia.com>
 Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Co-developed-by: Daniel Zahka <daniel.zahka@gmail.com>
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
 
 Notes:
-    v6:
-    - change loop index in mlx5_accel_psp_fs_init_rx_tables() to int to
-      avoid relying on udefined behavior.
-    v1:
-    - https://lore.kernel.org/netdev/20240510030435.120935-14-kuba@kernel.org/
+    v11:
+    - support ipv4 in psp_dev_rcv()
+    - check for psp-udp header in psp_dev_rcv()
+    - check psbk_may_pull() in psp_dev_rcv()
+    v4:
+    - rename psp_rcv() to psp_dev_rcv()
+    - add strip_icv param psp_dev_rcv() to make trailer stripping optional
+    v3:
+    - patch introduced
 
- .../mellanox/mlx5/core/en_accel/en_accel.h    | 14 +++++-
- .../mellanox/mlx5/core/en_accel/psp.c         | 43 ++++++++++++++++---
- .../mellanox/mlx5/core/en_accel/psp.h         |  8 ++++
- 3 files changed, 59 insertions(+), 6 deletions(-)
+ include/net/psp/functions.h |  1 +
+ net/psp/psp_main.c          | 88 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 89 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/en_accel.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/en_accel.h
-index a5df21b5da83..8bef99e8367e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/en_accel.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/en_accel.h
-@@ -237,12 +237,24 @@ static inline void mlx5e_accel_tx_finish(struct mlx5e_txqsq *sq,
+diff --git a/include/net/psp/functions.h b/include/net/psp/functions.h
+index 0a539e1b39f4..91ba06733321 100644
+--- a/include/net/psp/functions.h
++++ b/include/net/psp/functions.h
+@@ -19,6 +19,7 @@ psp_dev_create(struct net_device *netdev, struct psp_dev_ops *psd_ops,
+ void psp_dev_unregister(struct psp_dev *psd);
+ bool psp_dev_encapsulate(struct net *net, struct sk_buff *skb, __be32 spi,
+ 			 u8 ver, __be16 sport);
++int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv);
  
- static inline int mlx5e_accel_init_rx(struct mlx5e_priv *priv)
- {
--	return mlx5e_ktls_init_rx(priv);
-+	int err;
-+
-+	err = mlx5_accel_psp_fs_init_rx_tables(priv);
-+	if (err)
-+		goto out;
-+
-+	err = mlx5e_ktls_init_rx(priv);
-+	if (err)
-+		mlx5_accel_psp_fs_cleanup_rx_tables(priv);
-+
-+out:
-+	return err;
+ /* Kernel-facing API */
+ void psp_assoc_put(struct psp_assoc *pas);
+diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+index e026880fa1a2..b4b756f87382 100644
+--- a/net/psp/psp_main.c
++++ b/net/psp/psp_main.c
+@@ -223,6 +223,94 @@ bool psp_dev_encapsulate(struct net *net, struct sk_buff *skb, __be32 spi,
  }
+ EXPORT_SYMBOL(psp_dev_encapsulate);
  
- static inline void mlx5e_accel_cleanup_rx(struct mlx5e_priv *priv)
- {
- 	mlx5e_ktls_cleanup_rx(priv);
-+	mlx5_accel_psp_fs_cleanup_rx_tables(priv);
- }
- 
- static inline int mlx5e_accel_init_tx(struct mlx5e_priv *priv)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-index c433c1b215d6..372513edfb92 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-@@ -460,9 +460,6 @@ static void accel_psp_fs_cleanup_rx(struct mlx5e_psp_fs *fs)
- 	if (!fs->rx_fs)
- 		return;
- 
--	for (i = 0; i < ACCEL_FS_PSP_NUM_TYPES; i++)
--		accel_psp_fs_rx_ft_put(fs, i);
--
- 	accel_psp = fs->rx_fs;
- 	for (i = 0; i < ACCEL_FS_PSP_NUM_TYPES; i++) {
- 		fs_prot = &accel_psp->fs_prot[i];
-@@ -488,11 +485,47 @@ static int accel_psp_fs_init_rx(struct mlx5e_psp_fs *fs)
- 		mutex_init(&fs_prot->prot_mutex);
- 	}
- 
-+	fs->rx_fs = accel_psp;
++/* Receive handler for PSP packets.
++ *
++ * Presently it accepts only already-authenticated packets and does not
++ * support optional fields, such as virtualization cookies. The caller should
++ * ensure that skb->data is pointing to the mac header, and that skb->mac_len
++ * is set.
++ */
++int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
++{
++	int l2_hlen = 0, l3_hlen, encap;
++	struct psp_skb_ext *pse;
++	struct psphdr *psph;
++	struct ethhdr *eth;
++	struct udphdr *uh;
++	__be16 proto;
++	bool is_udp;
++
++	eth = (struct ethhdr *)skb->data;
++	proto = __vlan_get_protocol(skb, eth->h_proto, &l2_hlen);
++	if (proto == htons(ETH_P_IP))
++		l3_hlen = sizeof(struct iphdr);
++	else if (proto == htons(ETH_P_IPV6))
++		l3_hlen = sizeof(struct ipv6hdr);
++	else
++		return -EINVAL;
++
++	if (unlikely(!pskb_may_pull(skb, l2_hlen + l3_hlen + PSP_ENCAP_HLEN)))
++		return -EINVAL;
++
++	if (proto == htons(ETH_P_IP)) {
++		struct iphdr *iph = (struct iphdr *)(skb->data + l2_hlen);
++
++		is_udp = iph->protocol == IPPROTO_UDP;
++		l3_hlen = iph->ihl * 4;
++		if (l3_hlen != sizeof(struct iphdr) &&
++		    !pskb_may_pull(skb, l2_hlen + l3_hlen + PSP_ENCAP_HLEN))
++			return -EINVAL;
++	} else {
++		struct ipv6hdr *ipv6h = (struct ipv6hdr *)(skb->data + l2_hlen);
++
++		is_udp = ipv6h->nexthdr == IPPROTO_UDP;
++	}
++
++	if (unlikely(!is_udp))
++		return -EINVAL;
++
++	uh = (struct udphdr *)(skb->data + l2_hlen + l3_hlen);
++	if (unlikely(uh->dest != htons(PSP_DEFAULT_UDP_PORT)))
++		return -EINVAL;
++
++	pse = skb_ext_add(skb, SKB_EXT_PSP);
++	if (!pse)
++		return -EINVAL;
++
++	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
++				 sizeof(struct udphdr));
++	pse->spi = psph->spi;
++	pse->dev_id = dev_id;
++	pse->generation = generation;
++	pse->version = FIELD_GET(PSPHDR_VERFL_VERSION, psph->verfl);
++
++	encap = PSP_ENCAP_HLEN;
++	encap += strip_icv ? PSP_TRL_SIZE : 0;
++
++	if (proto == htons(ETH_P_IP)) {
++		struct iphdr *iph = (struct iphdr *)(skb->data + l2_hlen);
++
++		iph->protocol = psph->nexthdr;
++		iph->tot_len = htons(ntohs(iph->tot_len) - encap);
++		iph->check = 0;
++		iph->check = ip_fast_csum((u8 *)iph, iph->ihl);
++	} else {
++		struct ipv6hdr *ipv6h = (struct ipv6hdr *)(skb->data + l2_hlen);
++
++		ipv6h->nexthdr = psph->nexthdr;
++		ipv6h->payload_len = htons(ntohs(ipv6h->payload_len) - encap);
++	}
++
++	memmove(skb->data + PSP_ENCAP_HLEN, skb->data, l2_hlen + l3_hlen);
++	skb_pull(skb, PSP_ENCAP_HLEN);
++
++	if (strip_icv)
++		pskb_trim(skb, skb->len - PSP_TRL_SIZE);
 +
 +	return 0;
 +}
++EXPORT_SYMBOL(psp_dev_rcv);
 +
-+void mlx5_accel_psp_fs_cleanup_rx_tables(struct mlx5e_priv *priv)
-+{
-+	int i;
-+
-+	if (!priv->psp)
-+		return;
-+
- 	for (i = 0; i < ACCEL_FS_PSP_NUM_TYPES; i++)
--		accel_psp_fs_rx_ft_get(fs, ACCEL_FS_PSP4);
-+		accel_psp_fs_rx_ft_put(priv->psp->fs, i);
-+}
-+
-+int mlx5_accel_psp_fs_init_rx_tables(struct mlx5e_priv *priv)
-+{
-+	struct mlx5e_psp_fs *fs;
-+	int err, i;
-+
-+	if (!priv->psp)
-+		return 0;
-+
-+	fs = priv->psp->fs;
-+	for (i = 0; i < ACCEL_FS_PSP_NUM_TYPES; i++) {
-+		err = accel_psp_fs_rx_ft_get(fs, i);
-+		if (err)
-+			goto out_err;
-+	}
- 
--	fs->rx_fs = accel_psp;
- 	return 0;
-+
-+out_err:
-+	i--;
-+	while (i >= 0) {
-+		accel_psp_fs_rx_ft_put(fs, i);
-+		--i;
-+	}
-+
-+	return err;
- }
- 
- static int accel_psp_fs_tx_create_ft_table(struct mlx5e_psp_fs *fs)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
-index fb3d5f3dd9d4..42bb671fb2cb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
-@@ -27,6 +27,8 @@ static inline bool mlx5_is_psp_device(struct mlx5_core_dev *mdev)
- 	return true;
- }
- 
-+int mlx5_accel_psp_fs_init_rx_tables(struct mlx5e_priv *priv);
-+void mlx5_accel_psp_fs_cleanup_rx_tables(struct mlx5e_priv *priv);
- int mlx5_accel_psp_fs_init_tx_tables(struct mlx5e_priv *priv);
- void mlx5_accel_psp_fs_cleanup_tx_tables(struct mlx5e_priv *priv);
- void mlx5e_psp_register(struct mlx5e_priv *priv);
-@@ -34,6 +36,12 @@ void mlx5e_psp_unregister(struct mlx5e_priv *priv);
- int mlx5e_psp_init(struct mlx5e_priv *priv);
- void mlx5e_psp_cleanup(struct mlx5e_priv *priv);
- #else
-+static inline int mlx5_accel_psp_fs_init_rx_tables(struct mlx5e_priv *priv)
-+{
-+	return 0;
-+}
-+
-+static inline void mlx5_accel_psp_fs_cleanup_rx_tables(struct mlx5e_priv *priv) { }
- static inline int mlx5_accel_psp_fs_init_tx_tables(struct mlx5e_priv *priv)
+ static int __init psp_init(void)
  {
- 	return 0;
+ 	mutex_init(&psp_devs_lock);
 -- 
 2.47.3
 
