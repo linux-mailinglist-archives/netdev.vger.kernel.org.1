@@ -1,117 +1,141 @@
-Return-Path: <netdev+bounces-223945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 015FBB7E0F7
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:40:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50934B7E01C
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:39:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA904520FE6
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:11:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D9761BC7A4B
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B70350D4E;
-	Wed, 17 Sep 2025 10:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUhpTyNX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD4734F470;
+	Wed, 17 Sep 2025 10:12:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC83F34A330
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B2B2EC0BB
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758103881; cv=none; b=h/OouVgbC2hb2iheCex1uqz/mjrlP4R/8th7052ql+hrfMKOiREnnBnfnt0b7fkzq/XBAUTmO1eqAVRcnUNI5+1KCiC5sopljOwmiGD9lMCc2oJS9fongFXTQk61aQBpCbTj7/WYL8lNRYiMb5ffgxGAxKvJaffpE/tUzr9XDnc=
+	t=1758103971; cv=none; b=TsJvHl/zpfjQWz4gizG0uI6vxIxEc6OnldDatWM2bRg2ijG7mzxQ9hSm8f0bPdlfHrrTRxcQUt78PYh0Gtm0LUa0mX4Av22EdXWabcomHRjyOIoUXd0uryOKe/xrlPSYz1LmhqK84ln9q2HIEng9g7Ta4dt1vvrcqyeywzFXa64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758103881; c=relaxed/simple;
-	bh=4ga+azf3in2hBznJTvkA4X779mL4ML+24lGMfj0nOIA=;
+	s=arc-20240116; t=1758103971; c=relaxed/simple;
+	bh=+HNLf5Nh134LRJe7Yk2RbvrVFs07+caGghRIwhbRwKA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UHyHU+PDq0lX6sCct8qAkEWH0SSP6YrVJWNg9L1Qhvqw/5by43gHVCYb3BdTnRvPS5Bw66bNZXE4m5zGD7u+LUPclJLCGS83bcE4NqulLtLZ6dCoQtko1Br+bcbALIf68p7PjmTbE8Q5p8Bcqy2XhGg6rHfOEz1F2Xso6kiEW2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MUhpTyNX; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-45de5246dc4so14016635e9.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 03:11:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758103878; x=1758708678; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RFlgCXptLNgS0oUFv7P/jnH+n8Ia5ZxafQyZ/H5sxnA=;
-        b=MUhpTyNX/GINaDZeI389tgHDDW8Iot5T8E8vryV5EYWiBHdMXKiKz4ErdSibSbOtv0
-         b5nTyXNQfKyGEXzqNiQhyE81tnq+Bf6uoScQZ4si8+8wGtqi5Um9Oji8OlnjqeoBQT/l
-         k0HV1W88o8UHmcbXHyEfkyNwD8dS5eucgA2UPWtC1VxxM5r/ezoin+p4NN+KbMQkwt0m
-         +H3asFVkENIYAM/fQikTZ8ughU2pumIMXMfA98ROCJvNQNisnhsxa7luxfKcHuZN8p/I
-         ItnHtdeRqdbFYAY6dqkZSeHoMsdgKT1APsgH2umX3P2r8ym9wMjZ8dkxKd7pyhIQyPnb
-         l9dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758103878; x=1758708678;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RFlgCXptLNgS0oUFv7P/jnH+n8Ia5ZxafQyZ/H5sxnA=;
-        b=Dhoz0pOTN0FBO+pVoczFwDYt8PCVyE9sY51jAOZnR56pPviLf7Dq60qMH+dqyoLCqp
-         gT19torurMlw2j47Q575JTJnjtGQ2iVKI9PXPwyW5sPTcaOiYqrLZEnrVUohpbjUejXk
-         XVph48Ws6Ufv3tUU4+nPv/+NydIVRHylXbgJk4VG5Wfj0uhwCfEbuRQvn1lfUBLxdNXE
-         3q6uFHsam+IPHwBs62l625kSGyp+ZGq3LC4wUCDSr3nhRMucC9dAo2NYqQodBUdqdPj5
-         emEnjnn3qOWe9ZaQgKJEOHf7dLDF3021W6yEMiIieCZ1p4aqtaNo9vTdMrlZZ6wrFkww
-         rjpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVOoH6cvgQh5fy9k0S+j3FFoBYMua5YD7sLtAYcrGvlfODt7bkE6nZ+buOa8zPr6BAEHL26Gvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyNT+RqRw3aUY5eTCC0hno9gsdaBDeCVju1xy3Oau65GDJNIbf
-	tL0d3TyUO2Px31aGBIcdBFf59QtZLH3TFxUpQXK9oee3a6bdSNqPIVKk
-X-Gm-Gg: ASbGnctmvSCUcM8u7O23z/YA110K6LK78TBY6gXiSa957E6hnPRwZZqdv1HdaPCi1EZ
-	73Fed9V+ABEJ1n79x427RZ4bHsrMnIV1s8TsxzI7d3tepeSWryxea6qcHYcnBTKIQpamv9LVoPS
-	v3e8FX+lSc2V3ZdN0AvdZJ3Sx3/+fKQI1o/hV2OSj4gf6ooPomWvWd8fKwG/WplhzA/TLxE2ye2
-	3ioOJQ4jKVc3bKhTa0xGbv2uNg9E+o0QQAmwGIG530pbY6k7LGslqwT1k7W8pfCkVaWIl58Aeyy
-	u9IrB6vrUaoioicnbVrcPltkr/W3yeBqrHFkOh9LxShNmCACa4xk0fl8472YwWVZv9PD2NaSMBH
-	aZnhG5/fMHvEDF4Q=
-X-Google-Smtp-Source: AGHT+IEGAWHbOGCVA8E1ghCrTfok0wf8HrSSu83uqpK5rtG+yvptJ+uZiWuJFaorxUfrNpWZkT3p1g==
-X-Received: by 2002:a05:6000:400e:b0:3e9:e2cf:cda2 with SMTP id ffacd0b85a97d-3ecdfa5ad4fmr599670f8f.8.1758103878166;
-        Wed, 17 Sep 2025 03:11:18 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:8bcc:b603:fee7:a273])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ece0fba34dsm1092120f8f.9.2025.09.17.03.11.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 03:11:15 -0700 (PDT)
-Date: Wed, 17 Sep 2025 13:11:12 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DIRqAeMLI5/aLmaUS80PwCYlQoGRGnsmLBE0TqMAed0W5MI74eg1aXL1dM+SA/F0ekX+2PD1IP5wHhPvQQmBvw7QqmPYWOD/43EcNRpws0xY/WVmUQnqY6VQYEjEbg4M1LbbJ2fwZMazV5bIH0iocnS6PIOCOuUDRdkBLeLxxdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyp9E-0006bW-BM; Wed, 17 Sep 2025 12:12:24 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyp9D-001k60-0W;
+	Wed, 17 Sep 2025 12:12:23 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyp9D-00DffQ-03;
+	Wed, 17 Sep 2025 12:12:23 +0200
+Date: Wed, 17 Sep 2025 12:12:22 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alexei Starovoitov <ast@kernel.org>,
 	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v18 6/8] mfd: an8855: Add support for Airoha
- AN8855 Switch MFD
-Message-ID: <20250917101112.555jzhzlmpkhgmh5@skbuf>
-References: <20250915104545.1742-1-ansuelsmth@gmail.com>
- <20250915104545.1742-7-ansuelsmth@gmail.com>
+	Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Lukasz Majewski <lukma@denx.de>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Divya.Koppera@microchip.com,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+	Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v4 0/3] Documentation and ynl: add flow control
+Message-ID: <aMqJhl2swbkiYx_p@pengutronix.de>
+References: <20250909072212.3710365-1-o.rempel@pengutronix.de>
+ <20250909143256.24178247@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250915104545.1742-7-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250909143256.24178247@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Sep 15, 2025 at 12:45:42PM +0200, Christian Marangi wrote:
-> +static int an855_regmap_phy_reset_page(struct an8855_core_priv *priv,
-> +				       int phy) __must_hold(&priv->bus->mdio_lock)
+On Tue, Sep 09, 2025 at 02:32:56PM -0700, Jakub Kicinski wrote:
+> On Tue,  9 Sep 2025 09:22:09 +0200 Oleksij Rempel wrote:
+> > This series improves kernel documentation around Ethernet flow control
+> > and enhances the ynl tooling to generate kernel-doc comments for
+> > attribute enums.
+> > 
+> > Patch 1 extends the ynl generator to emit kdoc for enums based on YAML
+> > attribute documentation.
+> > Patch 2 regenerates all affected UAPI headers (dpll, ethtool, team,
+> > net_shaper, netdev, ovpn) so that attribute enums now carry kernel-doc.
+> > Patch 3 adds a new flow_control.rst document and annotates the ethtool
+> > pause/pause-stat YAML definitions, relying on the kdoc generation
+> > support from the earlier patches.
+> 
+> The reason we don't render the kdoc today is that I thought it's far
+> more useful to focus on the direct ReST generation. I think some of 
+> the docs are not rendered, and other may be garbled, but the main
+> structure of the documentation works quite well:
+> 
+>   https://docs.kernel.org/next/netlink/specs/dpll.html
+> 
+> Could you spell out the motivation for this change a little more?
 
-s/an855/an8855/ throughout this file.
+The reason I went down the kdoc-in-UAPI route is mostly historical.
+When I first started writing the flow control documentation, reviewers
+pointed out that the UAPI parts should be documented in the header
+files.  Since these headers are generated from YAML, the natural way was
+to move  the docstrings into the YAML and let the generator emit them.
+One step led  to another, and we ended up with this change.
+
+I don’t have a strong preference for where the documentation lives, my
+primary goal was to avoid duplicating text and make sure the UAPI enums
+for pause / pause-stat are self-describing. If the consensus is that we
+should concentrate on ReST output only, I’m happy to reduce the scope of
+this series and drop the kernel-doc emission. The actual motivation of
+my  series is to add flow_control.rst and document the ethtool API
+there.
+
+So if you prefer, I can respin with just the flow_control.rst and YAML  
+annotations, and skip the generator changes.
+
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
