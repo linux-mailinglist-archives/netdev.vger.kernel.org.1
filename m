@@ -1,299 +1,170 @@
-Return-Path: <netdev+bounces-223960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E15B8027B
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:43:40 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B26CCB7C542
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:57:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D81C14603F4
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:31:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 558634E2FEB
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384B636C098;
-	Wed, 17 Sep 2025 10:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DCAB343D92;
+	Wed, 17 Sep 2025 10:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gorm2omj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixNeAMcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABAD36C089;
-	Wed, 17 Sep 2025 10:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9156B32D5AC
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758104960; cv=none; b=W5Ampax1tG1Eid8MUbZKLYNZ9NJkTnKkDdGbBazHHaG0lN4ZzKLGhlGc09gsfSWErkNSyazTs8BP2Vv6rVStMOG4fIFcQqS4RGuuJxmqBHpi/T8rWAc/r9lJlJ080Tq9o4AKcTgCmsnUAV/DBZGLl+zG9/KeY9m7nAuwEFl1T60=
+	t=1758105473; cv=none; b=HZoj/CN3kVHDgRE20iu3p8BAMxvd+/BFs4MpJ4+04etAHP9sIo/i6BieegryY3HxF16Fr/+h3gfzoP+84ZTg89cUBwqOXq8jMJ48/cbvvyX3jTJBHFaeYMrztYCPV0V9iqOSfoxT9Ki+lvHpG3YjcR3yT+Dhm324HniKUsJ5VTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758104960; c=relaxed/simple;
-	bh=ytXUVuRhFL2Z6NxX49D7FGEXV8wRySnj7wZZcy3g2hw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TOvmbhiyo62BhUuysohUdRXAM1Zrh+i2oo5301wtwgXMcGRBslfU5fPj3W4+Ip8YXfm8DePF4ReV05uIiFJdkdVxhLhMfJnVtOs5YnLtyjP7FXD90wtdNcifP3a5FIPqatPJOynux6vSGailCfDSDRmX1vQviqcsCDQUsY3N+CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gorm2omj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C60DC4CEF0;
-	Wed, 17 Sep 2025 10:29:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758104959;
-	bh=ytXUVuRhFL2Z6NxX49D7FGEXV8wRySnj7wZZcy3g2hw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Gorm2omjhgozGjfbkc3lGBFqws6mJOT8moEN/MqjLxiy1KyUb1JXEwjpym3JWoU0P
-	 4buI4jXUxadgENvkIuXApYHKTrSIkzC32TC1ZjAa/oUCDkEZkEfMy3c4PGqfcFTY5T
-	 DUl9abrxXbzi32a2Nr8z8AWrUErNvcOL8q2pynUZpvYeWDuH9Qd/JSqcSjBTQboLTF
-	 YOlcVSPwrMWjxT9rzs/KoOPTuKn1zgj4xqH7BsidPzMlGVa5L5Mw8jDYzWaNepjZgw
-	 9Xj6K2lyrIbzfxtMjU0NFokOb4FkTeuf776k/C5uVOlC+ptcNAHRo+rzj3UfosZLpC
-	 tp5h+vgqL9CYA==
-From: Christian Brauner <brauner@kernel.org>
-Date: Wed, 17 Sep 2025 12:28:08 +0200
-Subject: [PATCH 9/9] ns: add ns_common_free()
+	s=arc-20240116; t=1758105473; c=relaxed/simple;
+	bh=+jUeO/7waznrAiGaH6nmbusoTFDyzVVMGz6K6davJk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kgG+6rLUIxDgWpcUTz/4cdpf8K3/iWcGjjijVkGJRHH3jC9Ki4XvX4j7/Eu2d1AbdurzarBJdTK1ecQo7i0rZD8o0YteEzkdw1Rc7k558of3mR/IURE8kGAGbNrn6N+/PKE/iibw7PlPWnn2/AEfS4GueMHeaMm+eJTY4v879lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ixNeAMcC; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-45a1b0ce15fso9574055e9.3
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 03:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758105470; x=1758710270; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wsYcWLS54K1ej44Yjhz6yrulC2XJ3aJ+2KhXmhL8N/4=;
+        b=ixNeAMcCtIwuhadNQBJP2UfBAm9SUCCGrfVtT2EPDG3TsEWMjB6nGC6D+fsT1OVdxq
+         LLx5P4Vjal47z5jUXRKMgeIY/WUV7mBVscAfIBIWxWLB+PJu2IN1oQYCfIOVJVyKpWu0
+         lFTCQmVubbambfUhvkiW2YOJ4OuuTaWJg5JmG/or24hT+Qlayp4pD2+rxmG6rx42oJho
+         U1CMkIzhyihb9HfgKBx+wFsgwRRHcnbZUnGLfHIkCjkoeAf075UmCeJC9E2AGzCizuhy
+         bEEcA1SZoYTulRZU+JjQz5NNFeSkmcCRn6uCSc3QXmx3KsVSW8Q/O6/L0X9SRkmi0wFp
+         X/BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758105470; x=1758710270;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wsYcWLS54K1ej44Yjhz6yrulC2XJ3aJ+2KhXmhL8N/4=;
+        b=bdHAbtBcpGSzLU8on13PvRZ/irgjhmWRIFuMt3f30w2U2P1IWIPoWfSZNJ3vhrpmmH
+         gcY3MCNl0W7ug6fPpvI8mKgnBkBchV3jEzw+qYJfRX3Sj/D1+5xGeCA9BguOFoF8Sm+a
+         x2kvWVjswK72QUbCUfmQWBEAhe3sG8pyKluZYwWwo/rWiU9LQzIUwiJxb5tmxd+6vZhJ
+         LeB/2T/YHtVvlxuM9yN+4dFYhTEBiPOpcv4cFRigQURIkDFX4aIM8iOzH+m3ZAWI/C2M
+         lJucx2zmTrvwcZ/Qafa6Sns6LL4LMfLPgSC5q+H7UcLMXkek8FNhYo+zONzOEYlHHvYW
+         bNmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIAX3Ws/Y2SyArFRRXfvg/UarqcbS2e9QIt/IR4R8/QuVDEzIiXGvFIqkUaKRofRGtrncoK4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+f5nnqSu+fIDe8w0f7CJjm4GylUqkI0wawolCiwq8QkbmVeSO
+	hzEohQlZk9LUkcx8uvBfxDm88uFj3Uiz9+1+KKLUngyV3wKj/huegry1
+X-Gm-Gg: ASbGncs55yEnhREsYp4gLhAlmT9Xm+/PQJRlC+JKP3tUa+PHnjvUkp8XdAlgB7wR+/C
+	4nozJC0goqS0zAAis4xfWhZkYwcQfZpxQL63YqtXTD1pveAB4krxUqyPJxnCx+4BTfOPEA7Y/mj
+	VpzDC0DF4eim54O8xKTJa2mKyssjjzpU/4EPElWbQ5/nDQe1e9fvzWTKpq7eaqqKI7UMs0Tu3hH
+	fXTUfuaKH597D5TcE7EiExay45m6evqQLU2yZIe6HR13+LTZZlIrCQGKLOX6Ge7g+F961TTyA51
+	jgrA6nGTAO79GhC5jOhALUhA1AyoYGC+vnebx3SeLwK5sfP5xrV2rtZ6nAhV2cchO4HfuRWcfU3
+	rIPXmccg2BKQaPeY=
+X-Google-Smtp-Source: AGHT+IHmbRK/RR/f6CMsiKwgVCww0CbZLWw9FNcy1YCsTBab4ScCzhgCjBGfKDPKwCMgjbZt1yeo9Q==
+X-Received: by 2002:a05:600c:3d92:b0:45f:2919:5e8d with SMTP id 5b1f17b1804b1-46201cac25dmr7562685e9.1.1758105469624;
+        Wed, 17 Sep 2025 03:37:49 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d005:3b00:8bcc:b603:fee7:a273])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4613e93dd85sm34991125e9.22.2025.09.17.03.37.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 03:37:48 -0700 (PDT)
+Date: Wed, 17 Sep 2025 13:37:45 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>, devicetree@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	DENG Qingfang <dqfext@gmail.com>, Lee Jones <lee@kernel.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Subject: Re: [net-next PATCH v18 3/8] dt-bindings: mfd: Document support for
+ Airoha AN8855 Switch SoC
+Message-ID: <20250917103745.vhdsvrrv7z23qpnn@skbuf>
+References: <20250915104545.1742-1-ansuelsmth@gmail.com>
+ <20250915104545.1742-4-ansuelsmth@gmail.com>
+ <175795551518.2905345.11331954231627495466.robh@kernel.org>
+ <20250915201938.GA3326233-robh@kernel.org>
+ <68c8a6fd.050a0220.26bdf7.871a@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250917-work-namespace-ns_common-v1-9-1b3bda8ef8f2@kernel.org>
-References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
-In-Reply-To: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
-To: linux-fsdevel@vger.kernel.org
-Cc: Amir Goldstein <amir73il@gmail.com>, Josef Bacik <josef@toxicpanda.com>, 
- Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
- =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
- Lennart Poettering <mzxreary@0pointer.de>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
- =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Anna-Maria Behnsen <anna-maria@linutronix.de>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Christian Brauner <brauner@kernel.org>
-X-Mailer: b4 0.15-dev-56183
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7062; i=brauner@kernel.org;
- h=from:subject:message-id; bh=ytXUVuRhFL2Z6NxX49D7FGEXV8wRySnj7wZZcy3g2hw=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSc6vU7VnPgb5xAyW3ru5V2F6bNdJEx0rRf6FFx0KPt/
- urP5qrGHaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABPZkcnwv/iTuOi5/4scpDjm
- OK768M1ubqKuZFuX4ObDDAoyr2w/6DH89zJ+us/AS9fx8eu7re0T/rC17m3gX73hfKVQYN4jdsZ
- yVgA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68c8a6fd.050a0220.26bdf7.871a@mx.google.com>
 
-And drop ns_free_inum(). Anything common that can be wasted centrally
-should be wasted in the new common helper.
+On Tue, Sep 16, 2025 at 01:53:27AM +0200, Christian Marangi wrote:
+> On Mon, Sep 15, 2025 at 03:19:38PM -0500, Rob Herring wrote:
+> > On Mon, Sep 15, 2025 at 12:01:47PM -0500, Rob Herring (Arm) wrote:
+> > > 
+> > > On Mon, 15 Sep 2025 12:45:39 +0200, Christian Marangi wrote:
+> > > > Document support for Airoha AN8855 Switch SoC. This SoC expose various
+> > > > peripherals like an Ethernet Switch, a NVMEM provider and Ethernet PHYs.
+> > > > 
+> > > > It does also support i2c and timers but those are not currently
+> > > > supported/used.
+> > > > 
+> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > > > ---
+> > > >  .../bindings/mfd/airoha,an8855.yaml           | 173 ++++++++++++++++++
+> > > >  1 file changed, 173 insertions(+)
+> > > >  create mode 100644 Documentation/devicetree/bindings/mfd/airoha,an8855.yaml
+> > > > 
+> > > 
+> > > My bot found errors running 'make dt_binding_check' on your patch:
+> > > 
+> > > yamllint warnings/errors:
+> > > 
+> > > dtschema/dtc warnings/errors:
+> > > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/mfd/airoha,an8855.yaml:
+> > > 	Error in referenced schema matching $id: http://devicetree.org/schemas/nvmem/airoha,an8855-efuse.yaml
+> > > 	Tried these paths (check schema $id if path is wrong):
+> > > 	/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
+> > > 	/usr/local/lib/python3.13/dist-packages/dtschema/schemas/nvmem/airoha,an8855-efuse.yaml
+> > > 
+> > > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/mfd/airoha,an8855.example.dtb: soc@1 (airoha,an8855): efuse: {'compatible': ['airoha,an8855-efuse'], '#nvmem-cell-cells': 0, 'nvmem-layout': {'compatible': ['fixed-layout'], '#address-cells': 1, '#size-cells': 1, 'shift-sel-port0-tx-a@c': {'reg': [[12, 4]], 'phandle': 3}, 'shift-sel-port0-tx-b@10': {'reg': [[16, 4]], 'phandle': 4}, 'shift-sel-port0-tx-c@14': {'reg': [[20, 4]], 'phandle': 5}, 'shift-sel-port0-tx-d@18': {'reg': [[24, 4]], 'phandle': 6}, 'shift-sel-port1-tx-a@1c': {'reg': [[28, 4]], 'phandle': 7}, 'shift-sel-port1-tx-b@20': {'reg': [[32, 4]], 'phandle': 8}, 'shift-sel-port1-tx-c@24': {'reg': [[36, 4]], 'phandle': 9}, 'shift-sel-port1-tx-d@28': {'reg': [[40, 4]], 'phandle': 10}}} should not be valid under {'description': "Can't find referenced schema: http://devicetree.org/schemas/nvmem/airoha,an8855-efuse.yaml#"}
+> > > 	from schema $id: http://devicetree.org/schemas/mfd/airoha,an8855.yaml#
+> > > Documentation/devicetree/bindings/mfd/airoha,an8855.example.dtb: /example-0/mdio/soc@1/efuse: failed to match any schema with compatible: ['airoha,an8855-efuse']
+> > 
+> > Why are we on v18 and still getting errors? I only review patches 
+> > without errors.
+> 
+> Hi Rob,
+> 
+> the problem is that the MFD driver and the schema patch subset of this
+> series has been picked separately and are now in linux-next.
 
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- fs/namespace.c            | 4 ++--
- include/linux/ns_common.h | 3 +++
- include/linux/proc_ns.h   | 2 --
- ipc/namespace.c           | 4 ++--
- kernel/cgroup/namespace.c | 2 +-
- kernel/nscommon.c         | 5 +++++
- kernel/pid_namespace.c    | 4 ++--
- kernel/time/namespace.c   | 2 +-
- kernel/user_namespace.c   | 4 ++--
- kernel/utsname.c          | 2 +-
- net/core/net_namespace.c  | 4 ++--
- 11 files changed, 21 insertions(+), 15 deletions(-)
+Link for MFD driver? I don't see the MFD driver in linux-next.
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/drivers/mfd
 
-diff --git a/fs/namespace.c b/fs/namespace.c
-index 31eb0e8f21eb..03bd04559e69 100644
---- a/fs/namespace.c
-+++ b/fs/namespace.c
-@@ -4083,7 +4083,7 @@ static void dec_mnt_namespaces(struct ucounts *ucounts)
- static void free_mnt_ns(struct mnt_namespace *ns)
- {
- 	if (!is_anon_ns(ns))
--		ns_free_inum(&ns->ns);
-+		ns_common_free(ns);
- 	dec_mnt_namespaces(ns->ucounts);
- 	mnt_ns_tree_remove(ns);
- }
-@@ -4155,7 +4155,7 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
- 	new = copy_tree(old, old->mnt.mnt_root, copy_flags);
- 	if (IS_ERR(new)) {
- 		namespace_unlock();
--		ns_free_inum(&new_ns->ns);
-+		ns_common_free(ns);
- 		dec_mnt_namespaces(new_ns->ucounts);
- 		mnt_ns_release(new_ns);
- 		return ERR_CAST(new);
-diff --git a/include/linux/ns_common.h b/include/linux/ns_common.h
-index 284bba2b7c43..5094c0147b54 100644
---- a/include/linux/ns_common.h
-+++ b/include/linux/ns_common.h
-@@ -41,6 +41,7 @@ struct ns_common {
- };
- 
- int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops, int inum);
-+void __ns_common_free(struct ns_common *ns);
- 
- #define to_ns_common(__ns)                              \
- 	_Generic((__ns),                                \
-@@ -82,4 +83,6 @@ int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops,
- #define ns_common_init_inum(__ns, __ops, __inum) \
- 	__ns_common_init(&(__ns)->ns, __ops, __inum)
- 
-+#define ns_common_free(__ns) __ns_common_free(to_ns_common((__ns)))
-+
- #endif
-diff --git a/include/linux/proc_ns.h b/include/linux/proc_ns.h
-index 9f21670b5824..08016f6e0e6f 100644
---- a/include/linux/proc_ns.h
-+++ b/include/linux/proc_ns.h
-@@ -66,8 +66,6 @@ static inline void proc_free_inum(unsigned int inum) {}
- 
- #endif /* CONFIG_PROC_FS */
- 
--#define ns_free_inum(ns) proc_free_inum((ns)->inum)
--
- #define get_proc_ns(inode) ((struct ns_common *)(inode)->i_private)
- 
- #endif /* _LINUX_PROC_NS_H */
-diff --git a/ipc/namespace.c b/ipc/namespace.c
-index 0f8bbd18a475..09d261a1a2aa 100644
---- a/ipc/namespace.c
-+++ b/ipc/namespace.c
-@@ -97,7 +97,7 @@ static struct ipc_namespace *create_ipc_ns(struct user_namespace *user_ns,
- 
- fail_put:
- 	put_user_ns(ns->user_ns);
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- fail_free:
- 	kfree(ns);
- fail_dec:
-@@ -161,7 +161,7 @@ static void free_ipc_ns(struct ipc_namespace *ns)
- 
- 	dec_ipc_namespaces(ns->ucounts);
- 	put_user_ns(ns->user_ns);
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- 	kfree(ns);
- }
- 
-diff --git a/kernel/cgroup/namespace.c b/kernel/cgroup/namespace.c
-index d928c557e28b..16ead7508371 100644
---- a/kernel/cgroup/namespace.c
-+++ b/kernel/cgroup/namespace.c
-@@ -40,7 +40,7 @@ void free_cgroup_ns(struct cgroup_namespace *ns)
- 	put_css_set(ns->root_cset);
- 	dec_cgroup_namespaces(ns->ucounts);
- 	put_user_ns(ns->user_ns);
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- 	/* Concurrent nstree traversal depends on a grace period. */
- 	kfree_rcu(ns, ns.ns_rcu);
- }
-diff --git a/kernel/nscommon.c b/kernel/nscommon.c
-index c3a90bb665ad..7c1b07e2a6c9 100644
---- a/kernel/nscommon.c
-+++ b/kernel/nscommon.c
-@@ -18,3 +18,8 @@ int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops,
- 	}
- 	return proc_alloc_inum(&ns->inum);
- }
-+
-+void __ns_common_free(struct ns_common *ns)
-+{
-+	proc_free_inum(ns->inum);
-+}
-diff --git a/kernel/pid_namespace.c b/kernel/pid_namespace.c
-index 170757c265c2..27e2dd9ee051 100644
---- a/kernel/pid_namespace.c
-+++ b/kernel/pid_namespace.c
-@@ -127,7 +127,7 @@ static struct pid_namespace *create_pid_namespace(struct user_namespace *user_ns
- 	return ns;
- 
- out_free_inum:
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- out_free_idr:
- 	idr_destroy(&ns->idr);
- 	kmem_cache_free(pid_ns_cachep, ns);
-@@ -152,7 +152,7 @@ static void destroy_pid_namespace(struct pid_namespace *ns)
- 	ns_tree_remove(ns);
- 	unregister_pidns_sysctls(ns);
- 
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- 
- 	idr_destroy(&ns->idr);
- 	call_rcu(&ns->rcu, delayed_free_pidns);
-diff --git a/kernel/time/namespace.c b/kernel/time/namespace.c
-index ce8e952104a7..d49c73015d6e 100644
---- a/kernel/time/namespace.c
-+++ b/kernel/time/namespace.c
-@@ -255,7 +255,7 @@ void free_time_ns(struct time_namespace *ns)
- 	ns_tree_remove(ns);
- 	dec_time_namespaces(ns->ucounts);
- 	put_user_ns(ns->user_ns);
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- 	__free_page(ns->vvar_page);
- 	/* Concurrent nstree traversal depends on a grace period. */
- 	kfree_rcu(ns, ns.ns_rcu);
-diff --git a/kernel/user_namespace.c b/kernel/user_namespace.c
-index db9f0463219c..32406bcab526 100644
---- a/kernel/user_namespace.c
-+++ b/kernel/user_namespace.c
-@@ -165,7 +165,7 @@ int create_user_ns(struct cred *new)
- #ifdef CONFIG_PERSISTENT_KEYRINGS
- 	key_put(ns->persistent_keyring_register);
- #endif
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- fail_free:
- 	kmem_cache_free(user_ns_cachep, ns);
- fail_dec:
-@@ -220,7 +220,7 @@ static void free_user_ns(struct work_struct *work)
- #endif
- 		retire_userns_sysctls(ns);
- 		key_free_user_ns(ns);
--		ns_free_inum(&ns->ns);
-+		ns_common_free(ns);
- 		/* Concurrent nstree traversal depends on a grace period. */
- 		kfree_rcu(ns, ns.ns_rcu);
- 		dec_user_namespaces(ucounts);
-diff --git a/kernel/utsname.c b/kernel/utsname.c
-index 399888be66bd..95d733eb2c98 100644
---- a/kernel/utsname.c
-+++ b/kernel/utsname.c
-@@ -98,7 +98,7 @@ void free_uts_ns(struct uts_namespace *ns)
- 	ns_tree_remove(ns);
- 	dec_uts_namespaces(ns->ucounts);
- 	put_user_ns(ns->user_ns);
--	ns_free_inum(&ns->ns);
-+	ns_common_free(ns);
- 	/* Concurrent nstree traversal depends on a grace period. */
- 	kfree_rcu(ns, ns.ns_rcu);
- }
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index fdb266bbdf93..fdbaf5f8ac78 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -597,7 +597,7 @@ struct net *copy_net_ns(unsigned long flags,
- 		net_passive_dec(net);
- dec_ucounts:
- 		dec_net_namespaces(ucounts);
--		ns_free_inum(&net->ns);
-+		ns_common_free(net);
- 		return ERR_PTR(rv);
- 	}
- 	return net;
-@@ -719,7 +719,7 @@ static void cleanup_net(struct work_struct *work)
- #endif
- 		put_user_ns(net->user_ns);
- 		net_passive_dec(net);
--		ns_free_inum(&net->ns);
-+		ns_common_free(net);
- 	}
- 	WRITE_ONCE(cleanup_net_task, NULL);
- }
+> I tried to make the bot happy by using base-commit but it doesn't seem
+> to work. Any hint for this? 
+> 
+> The errors comes from the missing efuse schema.
 
--- 
-2.47.3
+So the efuse schema is in the nvmem tree and this schema needs to go
+through the mfd tree.
 
+For v17, you used "base-commit: 04b74f665961599e807b24af28099a29d691b18c":
+https://lore.kernel.org/netdev/20250911133929.30874-4-ansuelsmth@gmail.com/
+I ran "git show", after fetching linux-next, where all trees should be
+included, and didn't find this commit. What does it represent?
 
