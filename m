@@ -1,93 +1,102 @@
-Return-Path: <netdev+bounces-223796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09E84B8058C
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:03:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E99B7F97C
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 283F07AE8CA
-	for <lists+netdev@lfdr.de>; Tue, 16 Sep 2025 23:53:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 867241C02C98
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 00:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB0C28CF42;
-	Tue, 16 Sep 2025 23:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB50D1388;
+	Wed, 17 Sep 2025 00:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/VyDMQ1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lMGNRmiT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C521A9F86;
-	Tue, 16 Sep 2025 23:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E024738B;
+	Wed, 17 Sep 2025 00:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758066882; cv=none; b=Ic88+fC8IfRlF7Jd744XOcy3YrUkRr5RZfQ7DSws74npKj+gFN2x4GAmWbVG/Tn/yJkBPaaFQiGyCmuLxQXKVq2xqYRjLxsAK0m/9I444KbQZmEqzbhWNI7uAwt5KKJA9sVmAH/dUuuEMqPvTomBrvxt+WyBNwA1tLKgeo/1bKA=
+	t=1758067724; cv=none; b=tJwOSGTIXxkW4U01JmU8uTzGwjPd822vLDJfv5muLGcqWR5bcNhhW1JQdSN1TWG6KrrHapUiwCLNIPBWoMdYe7euBsL0HxDpLFezJTsmlkEbyJ+RHOpyX1ttzV09tYc09m+Z8XbUw2Y4kFlqx8VhO9zuFPCmWDxFbFO1Mbyasgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758066882; c=relaxed/simple;
-	bh=Y+tPfvJVVYGlAcY7y107Sa9854mjgV5kRi5vGaZ+aM4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rFOh95YRFcmEPz8eXYUCYAkDwjtHOWyCdYarq/aPWohEiRpemePAqISZGwIFoJBSb+w1ZMNMJdUoLjNnwZltGxXYdJdZgXTlUcpmGbZXlSpeb4rs14vdyif0Hulj7Wfr2OqIU02WMyaudgSTY+StVODm+3o+pKQihbmt1JEnPxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P/VyDMQ1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B89DC4CEEB;
-	Tue, 16 Sep 2025 23:54:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758066881;
-	bh=Y+tPfvJVVYGlAcY7y107Sa9854mjgV5kRi5vGaZ+aM4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P/VyDMQ1IrauQVwoVCYdxeCl0OPm4zgcatmsizn569t5sIEB8yPvGkAoJzvtRS4dn
-	 s5Ktw1cgKCn9irL8jrxoliIp9kKBfUjhMRlUZpFY5fZzs08kXz4dsJ5hH142XNgi6v
-	 Tq/86p/Zv1WZl0512E4jWdHJvteTa1EGdibhJQaBwE8liKxZOyVSF7P3W0wQZiygry
-	 SsCXWThK4945VABj021U+u80xrSoMcF9vZOKajdwPi0iwXfeJcFSbpRV9lqt4EsCt5
-	 PWd+tVtJWZILVQ7ASFSxNxtiPYfbsNuIn6pCk0b4vvGhGeRKQgWJDBibc569hzQqkM
-	 v6RKqctFE6ELQ==
-Date: Tue, 16 Sep 2025 16:54:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
- kernel@pengutronix.de, Dent Project <dentproject@linuxfoundation.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>
-Subject: Re: [PATCH net-next v3 0/5] net: pse-pd: pd692x0: Add permanent
- configuration management support
-Message-ID: <20250916165440.3d4e498a@kernel.org>
-In-Reply-To: <20250915-feature_poe_permanent_conf-v3-0-78871151088b@bootlin.com>
-References: <20250915-feature_poe_permanent_conf-v3-0-78871151088b@bootlin.com>
+	s=arc-20240116; t=1758067724; c=relaxed/simple;
+	bh=OC74HdkHSu0fNzteZin6vgvT5P9ck5s51EIpPDksXzU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EVTKaNu6KS4S+9zwsrM4iMXUX1tXIPudACsS7qHhP0tFTtuJYttSsyzLe7YjuVSyYTjlyLyEyltspukuKO1mdNW386TKORyUOUZIi/snxh4ig8R3v+ERsLnS/4sZ/7TXpNYMecmaVFMb49gGjAdUGzwQVtqpOak9Z81fViRm3pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lMGNRmiT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HhSodjO7+BLllzkoJSDhQVPsZqnYQB8PQbR2WvHcmbw=; b=lMGNRmiTtzKHeRkm6TOtq4Ff4L
+	YiIsSJ3YJ9wwuxHF1Qd8sYHPdR8cWGJtUGZC8rnvyMIazSWNB+46mZuA1AftbqBIvxpH+cq9Re0uM
+	YaDaMQ8b/IA6RCHYp5RtbnECzKdiY86f8U97ISX90XaiSlH7dR/puTNPFKedOmhsJLbI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uyfip-008d3V-IW; Wed, 17 Sep 2025 02:08:31 +0200
+Date: Wed, 17 Sep 2025 02:08:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v9 3/3] net: dsa: yt921x: Add support for
+ Motorcomm YT921x
+Message-ID: <b0fc2de5-bccc-4ef8-a04d-0c3b13cde914@lunn.ch>
+References: <20250913044404.63641-1-mmyangfl@gmail.com>
+ <20250913044404.63641-4-mmyangfl@gmail.com>
+ <20250916231714.7cg5zgpnxj6qmg3d@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250916231714.7cg5zgpnxj6qmg3d@skbuf>
 
-On Mon, 15 Sep 2025 19:06:25 +0200 Kory Maincent wrote:
-> This patch series introduces a new devlink-conf uAPI to manage device
-> configuration stored in non-volatile memory. This provides a standardized
-> interface for devices that need to persist configuration changes across
-> reboots. The uAPI is designed to be generic and can be used by any device
-> driver that manages persistent configuration storage.
+> > +static int yt921x_reg_mdio_read(void *context, u32 reg, u32 *valp)
+> > +{
+> > +	struct yt921x_reg_mdio *mdio = context;
+> > +	struct mii_bus *bus = mdio->bus;
+> > +	int addr = mdio->addr;
+> > +	u32 reg_addr;
+> > +	u32 reg_data;
+> > +	u32 val;
+> > +	int res;
+> > +
+> > +	/* Hold the mdio bus lock to avoid (un)locking for 4 times */
+> > +	mutex_lock_nested(&bus->mdio_lock, MDIO_MUTEX_NESTED);
 > 
-> The permanent configuration allows settings to persist across device
-> resets and power cycles, providing better control over PSE behavior
-> in production environments.
+> Andrew, are you satisfied with this lock?
 
-I'm still unclear on the technical justification for this.
-"There's a tool in another project which does it this way"
-is not usually sufficient upstream. For better or worse we
-like to re-implement things from first principles.
+This is O.K. You snipped too much context. As the comment says, the
+code is about to do 4 MDIO bus transactions. Each will take and
+release the lock. By taking it now, and then using the unlocked
+version for read/write, it will make it a tiny bit faster. The time to
+do the bus transaction will however dominate.
 
-Could you succinctly explain why "saving config" can't be implemented
-by some user space dumping out ethtool configuration, saving it under
-/etc, and using that config after reboot. A'la iptables-save /
-iptables-restore?
+> Perhaps I missed some part of
+> the conversation, but didn't you say "leave the mdio lock alone"?
 
-(I'll apply patch 3 now, looks like a nice cleanup)
+Yes, i did, but then the mdio lock was being abused as a DSA driver
+lock. The DSA driver now has its own lock. So what we see above is
+purely an optimisation, not a locking scheme.
+
+	Andrew
 
