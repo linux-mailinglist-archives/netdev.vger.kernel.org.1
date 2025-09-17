@@ -1,85 +1,119 @@
-Return-Path: <netdev+bounces-224110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46BEAB80CE3
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:58:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B09A5B80D0A
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:00:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7BDF18918CA
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:58:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE96A7AF3D6
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA412FBE0C;
-	Wed, 17 Sep 2025 15:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7FC309F02;
+	Wed, 17 Sep 2025 16:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1U5IH8F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fzli/wkD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0555C2494FF;
-	Wed, 17 Sep 2025 15:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975A92DC35A
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758124682; cv=none; b=ilF8fCw82RMRH3lhZchYzWwddT6VyxGkQmogFzVsWJ24/+LZqQGlGfBzQ9nyezvEhMg+9HKFK4W3BVnGghRhBsvEJwuxAEsDyhcd+4uOkKDfOsvFOW9y4hnQoi1mvhnvXA81xWOa3tpnYEAhuPjrnyWn2B8EmDbw5/aMEL4xkG4=
+	t=1758124801; cv=none; b=uIXKkL2ca/i5in3MlX7u/BPkyCWZkS2gevQKpg5f9S6xNdGbHnedEN/RI+wLwIkLZarcuaRncEywblgZaPGJ03eVtEODnDpz5RW/EvI8g3Y5ZYaHLPK2p+XihHEJNHmzwou2gRFq3ZU9G+Yn3CUDeEalRsoii5othIlDvf+oiaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758124682; c=relaxed/simple;
-	bh=xG22n7axY6Ofs7ii3TGXeh3hEeXxxgfUykSiRa+z6SE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l6YjqfBrqULtIXpIWMeinsPBBtYOp6Uqv+hRSp6LcIjalwkcTBDe4nSnhAmJcBUkxxESXC5IMZx7xGriVe0puJOmO2R7K+pSG8alRQaoqMkZay5/BMtmJoJCH5Kq69eVlTOY+OngJPST4bv6bvjQ4eoPnZgNSd9tBOIDynaGK7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1U5IH8F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46656C4CEF7;
-	Wed, 17 Sep 2025 15:57:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758124681;
-	bh=xG22n7axY6Ofs7ii3TGXeh3hEeXxxgfUykSiRa+z6SE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j1U5IH8F/mMJ5c+Wfzm+wjTVqPpBLRSE78+bHZCrCgSaU9RlEG8cHA4HVknSu/QVJ
-	 tq3EeihS+0AJ8R9xiEDoCKJCVG4/5Fha/mPLE/6UZB4HhZ87XTvVdhll/hNEGFyR/U
-	 NM/qOxfKZQIbH910KOFIe7XGLnL4gs2oyhB65VyeDgfYPPQAa6CVpmpIlpW9ralswQ
-	 F/h2MWg7BMCpNCB2Nw65TifuQjr7qXVqhpet33GSUyH/xxkJfM1x5O8kJnk+H+PdFM
-	 NQ71rCf7J9CdRRPtFmj/MyBx8U08RUG9GwdaEmV/TaZkg1iFa2mMjlxv6McvH+1m7h
-	 hg2GLRW1wVIDA==
-Date: Wed, 17 Sep 2025 16:57:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND net-next v2] net: renesas: rswitch: simplify
- rswitch_stop()
-Message-ID: <20250917155757.GO394836@horms.kernel.org>
-References: <20250916163516.486827-1-yury.norov@gmail.com>
+	s=arc-20240116; t=1758124801; c=relaxed/simple;
+	bh=p8VU8d7acAevSPUK7uEtuzMqc5TZahg5NjVNZ0H49LM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YAViao4n4Yx2QBYTXQ+G1CQOaElb8wi+kYR5T5z9FUfDsY/SoJ9okRn3lgnBzpmpB3k2grIaUrN4kntt4OahazuGP7r6XrA7B9cDSHXusk14WgPuWoG5tXWcksepW38a83QxcRLV062MUj07WPmvadlz67fzAPF8VHTdomDpbuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fzli/wkD; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-80a6937c8c6so821832885a.2
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758124798; x=1758729598; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p8VU8d7acAevSPUK7uEtuzMqc5TZahg5NjVNZ0H49LM=;
+        b=fzli/wkD90orpjV+GHgZws5gLaAF5+ZZoGjaYus+EalAjcLFStVi1oXoQBEhPBNwVm
+         PBboavCgKkM7ZIuLK/bbjmUDIuJxNFYAAEuAPY6lHjCKG9bx6W1E5jxFh/i0xxSILcWY
+         d4+kjhrZqX0SMB4j1/3mUaelOx4y6SRrSsXi8wogAzINXBRID1/3sBBaBl9qAdWT018v
+         sxeO4neHYTW+SNMPNRTItlZEqmNG7lWlDsWXIdFi4yyMDRGYIyJZyecSaUUV6GR26kZp
+         2bDhcEfYgcGgpE8lyvVt3vbcnEV317MMAFpx7Y4QBWXzfrn6VDdDCTp6KsCSKXmWZt/E
+         MKqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758124798; x=1758729598;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p8VU8d7acAevSPUK7uEtuzMqc5TZahg5NjVNZ0H49LM=;
+        b=pO7nqqDdgtHgO6NZFqWIpBmtTd3pMfQ0WoV5oigRwOXMcxzDnV2aJVdvoKKQ39yjRC
+         m6TtMLtzfNSpCUmU2tO8D3ockWjKxjpbx/VHtWXz3oF6XUsoZHCwpWv+304gKoQN8RZ9
+         zRkdp/y2jZYIQwxBz/skI9G3wjtUAMZcD9Emh2UOFxxZfunQJBfgvgVv+UsIigEB64nT
+         U9kuMD0tZzkWtWShP3W4XS3h60OnbD6xYzh1lVn9vER1ufYiw6T1Gk6zMwKqTmTmVC6y
+         bhb4Sdv7wCfllzfj6cw6DpWfrA+95cuauEtGBJ4JMpuIeg4AwgE7QXvpmGqn5B9BJQTB
+         Jgnw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4MfPmroc0jglNleY7xT7CmkInqJZp/in7E+37F6tOrQbUWXlIDPBGt7hPzrnTQ4HUpG6ZEg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHsAI2It5qKZlJ1cAtSWvCRs35VL2uaOTnLCPCEsX3rQXfBGMJ
+	YPMxl7mT5xEBdcVSyX9erzfg9gfM+2zNyywMVizqA7DV8pzTa1w+wBQ2zmtoWIip/Ku8GoBXp4m
+	MFK+FAynzF1RzsVqxhc/qHuL06EC+AR11vSA7ltwA
+X-Gm-Gg: ASbGncsiOynzPzEATnBB7Ummze3RV/sHyLbvS6U0GUpJ9Dvjbltq4xw0fwPdEUO8OOD
+	94fZUv4Ali5sFSVlpCnrMa/0dRlZi88Gw1LncQf884/xwQmaJC6kNg9JEsXPbY6i0SjOJTTqafM
+	nomxwfbmq8I+4mX6Ioi+lbGb6MI2eCqRob++RQUxY3BrRuYYty/qcucMFHuipc5STwEColLPLPu
+	hBWqwIWqM7k
+X-Google-Smtp-Source: AGHT+IEY/PyZp1WBGsKJPyJFeI1IEf25apm8zXHVEw5wScGBo8SqeCbSKDuMXCsjLK828SsoHGuQ8EqD1wN180MnPzU=
+X-Received: by 2002:a05:620a:44d4:b0:82b:54f:5b8a with SMTP id
+ af79cd13be357-8311186db3dmr308775585a.75.1758124797892; Wed, 17 Sep 2025
+ 08:59:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250916163516.486827-1-yury.norov@gmail.com>
+References: <20250917135337.1736101-1-edumazet@google.com> <CAEWA0a6b5P-9_ERvh9mCWOgbH6OYdTUXWVGgA20CQ5pfDC2sYA@mail.gmail.com>
+In-Reply-To: <CAEWA0a6b5P-9_ERvh9mCWOgbH6OYdTUXWVGgA20CQ5pfDC2sYA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Sep 2025 08:59:46 -0700
+X-Gm-Features: AS18NWDpc54Ny7WiC6WI8_pv5gt_wkspmTrUnbWeHn8u7AoM0Y3ZYaBU4oQyyGA
+Message-ID: <CANn89iLC+Gr9BbyNQq-udVY-EZjtjZxCL9sJEpaySTps0KkFyg@mail.gmail.com>
+Subject: Re: [PATCH net] net: clear sk->sk_ino in sk_set_socket(sk, NULL)
+To: Andrei Vagin <avagin@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 16, 2025 at 12:35:16PM -0400, Yury Norov (NVIDIA) wrote:
-> rswitch_stop() opencodes for_each_set_bit().
-> 
-> CC: Simon Horman <horms@kernel.org>
-> Reviewed-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> ---
-> v1: https://lore.kernel.org/all/20250913181345.204344-1-yury.norov@gmail.com/
-> v2: Rebase on top of net-next/main
+On Wed, Sep 17, 2025 at 8:39=E2=80=AFAM Andrei Vagin <avagin@google.com> wr=
+ote:
+>
+> On Wed, Sep 17, 2025 at 6:53=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > Andrei Vagin reported that blamed commit broke CRIU.
+> >
+> > Indeed, while we want to keep sk_uid unchanged when a socket
+> > is cloned, we want to clear sk->sk_ino.
+> >
+> > Otherwise, sock_diag might report multiple sockets sharing
+> > the same inode number.
+> >
+> > Move the clearing part from sock_orphan() to sk_set_socket(sk, NULL),
+> > called both from sock_orphan() and sk_clone_lock().
+> >
+> > Fixes: 5d6b58c932ec ("net: lockless sock_i_ino()")
+> > Closes: https://lore.kernel.org/netdev/aMhX-VnXkYDpKd9V@google.com/
+> > Closes: https://github.com/checkpoint-restore/criu/issues/2744
+> > Reported-by: Andrei Vagin <avagin@google.com>
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+>
+> Acked-by: Andrei Vagin <avagin@google.com>
+> I think we need to add `Cc: stable@vger.kernel.org`.
 
-Thanks for the updates.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+I never do this. Note that the prior patch had no such CC.
 
