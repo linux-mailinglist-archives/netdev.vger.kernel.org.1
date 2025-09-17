@@ -1,198 +1,142 @@
-Return-Path: <netdev+bounces-223946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5596B7E1E3
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:42:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82ED8B7E45D
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434601626F2
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:12:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 463391C07213
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D02350D4E;
-	Wed, 17 Sep 2025 10:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCD035A2BE;
+	Wed, 17 Sep 2025 10:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x/WjXV+Z";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LRMRUKwG";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x/WjXV+Z";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LRMRUKwG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tXxDfwBz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D78134AAEA
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9684E35A2B3
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758103956; cv=none; b=aReKWDbdpQha5ptlvlF/TfYVDndwChfCNBsaloCSVzSEcyldjjwE+pR4a7NkH4tfptpdhYfWQwzIMSMEjO1uRlusj2mheHvdcbYSi7SutabtnEO8AqSEY9kFBVUrAMV959JXBxDuZW+1EA9xauqYu83lTyBdxbOLahMTMsHKS80=
+	t=1758104234; cv=none; b=T0blEGXutws/ezl7Y3rWwOvF8OJDoNfGd/YNSZGT0yz+t6Qk6hAtr5Cj0FPhb7udBf6xWp9he3fwR5bD5kuRH2rVmUf9ECVvWdXYNOKVYB164crv3Lk9TurROZiU49dug9TV9pNAceb+V5XMgEPfCv4UTnA6S2vQPiswHiBL0K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758103956; c=relaxed/simple;
-	bh=8e8Brzm+1wZGNs58gO1mdgq1/scxk7JOqubxQJUxxzI=;
+	s=arc-20240116; t=1758104234; c=relaxed/simple;
+	bh=IvietE9JkXKS7w9qtNuxLpxmV+K7Q5GqlA/kPY5CBMs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bL2Ckef57eSzDyixMXUDtIemmSC3gZIyCrOcajNpUhMoZ++8vhCSLfSRZMVe3JvuJM1TjiNSXPxow4hcoM4VkXWYsgEMbjDQzSU5VIV/QA8Wyqhn3kom+Bqc1yV8k6EVwc90bLtXxffKuz8InRVXyM9N28Og3QkPKmtPz4Bsdcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x/WjXV+Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LRMRUKwG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x/WjXV+Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LRMRUKwG; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 3590D1F79A;
-	Wed, 17 Sep 2025 10:12:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758103953; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5E9/S7qoG8T5tftMOCDuagTwyxXbc7UL6OlEQkZhyWA=;
-	b=x/WjXV+Zb4dAahPF7MRFFPXIyt2+sPQRn9izyvT9TdzG8VnQzNXqBDf5wCF2qFkUo1XhPR
-	Pr89ohH3MZnPfV9sfx584yzuBY7pMt1zP+egj49R2CytGsywgsuOomHDPYOqYMxMuGKf+k
-	SwiQ092qzgSRrgUpEIDuTlROglhrZwI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758103953;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5E9/S7qoG8T5tftMOCDuagTwyxXbc7UL6OlEQkZhyWA=;
-	b=LRMRUKwGtiWrvLEIswJYKOY0uqpd274iUtmhNlx2QyrlRgwC9L8lngiYiV9gQq/hiKL9k7
-	AEBq5o6/bMp9rECw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758103953; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5E9/S7qoG8T5tftMOCDuagTwyxXbc7UL6OlEQkZhyWA=;
-	b=x/WjXV+Zb4dAahPF7MRFFPXIyt2+sPQRn9izyvT9TdzG8VnQzNXqBDf5wCF2qFkUo1XhPR
-	Pr89ohH3MZnPfV9sfx584yzuBY7pMt1zP+egj49R2CytGsywgsuOomHDPYOqYMxMuGKf+k
-	SwiQ092qzgSRrgUpEIDuTlROglhrZwI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758103953;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5E9/S7qoG8T5tftMOCDuagTwyxXbc7UL6OlEQkZhyWA=;
-	b=LRMRUKwGtiWrvLEIswJYKOY0uqpd274iUtmhNlx2QyrlRgwC9L8lngiYiV9gQq/hiKL9k7
-	AEBq5o6/bMp9rECw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E5A6D137C3;
-	Wed, 17 Sep 2025 10:12:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 7ZhVN5CJymjjLwAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 17 Sep 2025 10:12:32 +0000
-Message-ID: <e168255c-82a0-4b9a-b155-cb90e6162870@suse.de>
-Date: Wed, 17 Sep 2025 12:12:32 +0200
+	 In-Reply-To:Content-Type; b=lJCzOrkWtoSTWqnR0gIeED7GwZc5VCy7Po+Mejd5lw96wHerEqXD5/LXa7Dl+g0ydmmWMPn528CM0BNDpec63BByMa8OJmBOVtv6yYH0Qs6RZRgRWfG5RlSBRASUeXrd28zjBDkYqIQ/5Y9wgWY4Kbaaq0SVSu2ffsxraj+uMWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tXxDfwBz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1010C4CEF5;
+	Wed, 17 Sep 2025 10:17:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758104234;
+	bh=IvietE9JkXKS7w9qtNuxLpxmV+K7Q5GqlA/kPY5CBMs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tXxDfwBzDpDpGuCYjlLfBQ8kgZfLDB+QIPU79cA6oqIpKGU1oY/iY1IWYWJXptlLv
+	 t0KAeE78vlYh4+RKFfSb9Z7IXR5XyJS/ejQnP5ZVnlgGShGcJFolT8kqWPSemR3TDt
+	 g9rK87tuaLzH73WyuCZmjFcdb0ncrKgE9ddQqZB5S2vhXZ9yIIe7/MpMzyZVySZF24
+	 KKfeSDrfiLkMq1F+FNTytbC/uGBdJEApIhmJ8zjLcme+wKW/C4y7D9/gsNyLKagIkN
+	 JLsuLSh46/DzZclsl30AanEV59pSh2qNYmK8fcLwaxV2tmI2ISlO07KBio1a//v0Lt
+	 Fjs5LpgzHj7tQ==
+Message-ID: <35a48361-c69f-4cf9-aec9-db1ac0597f96@kernel.org>
+Date: Wed, 17 Sep 2025 12:17:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/7] nvme-tcp: Support KeyUpdate
-To: Alistair Francis <alistair23@gmail.com>
-Cc: chuck.lever@oracle.com, hare@kernel.org,
- kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
- kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
- kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
-References: <20250905024659.811386-1-alistair.francis@wdc.com>
- <20250905024659.811386-7-alistair.francis@wdc.com>
- <f1a7b0b5-65e3-4cd0-9c62-50bbb554e589@suse.de>
- <CAKmqyKM6_Fp9rc5Fz0qCsNq7yCGGb-o66XhycJez2nzcEs5GmA@mail.gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <CAKmqyKM6_Fp9rc5Fz0qCsNq7yCGGb-o66XhycJez2nzcEs5GmA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -4.30
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v2 net-next 6/7] mptcp: Call dst_release() in
+ mptcp_active_enable().
+Content-Language: en-GB, fr-BE
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>
+References: <20250916214758.650211-1-kuniyu@google.com>
+ <20250916214758.650211-7-kuniyu@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250916214758.650211-7-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 9/17/25 05:14, Alistair Francis wrote:
-> On Tue, Sep 16, 2025 at 11:04 PM Hannes Reinecke <hare@suse.de> wrote:
->>
-[ .. ]
->> Oh bugger. Seems like gnutls is generating the KeyUpdate message
->> itself, and we have to wait for that.
-> 
-> Yes, we have gnutls generate the message.
-> 
->> So much for KeyUpdate being transparent without having to stop I/O...
->>
->> Can't we fix gnutls to make sending the KeyUpdate message and changing
->> the IV parameters an atomic operation? That would be a far better
-> 
-> I'm not sure I follow.
-> 
-> ktls-utils will first restore the gnutls session. Then have gnutls
-> trigger a KeyUpdate.gnutls will send a KeyUpdate and then tell the
-> kernel the new keys. The kernel cannot send or encrypt any data after
-> the KeyUpdate has been sent until the keys are updated.
-> 
-> I don't see how we could make it an atomic operation. We have to stop
-> the traffic between sending a KeyUpdate and updating the keys.
-> Otherwise we will send invalid data.
-> 
-Fully agree with that.
-But thing is, the KeyUpdate message is a unidirectional thing.
-Host A initiating a KeyUpdate must only change the _sender_ side
-keys after sending a KeyUpdate message to host B; the receiver
-side keys on host A can only be update once it received the 
-corresponding KeyUpdate from host B. If both keys on host A
-are modified at the same time we cannot receive the KeyUpdate
-message from host B as that will be encoded with the old
-keys ...
+Hi Kuniyuki,
 
-I wonder how that can be modeled in gnutls; I only see
-gnutls_session_key_update() which apparently will update both
-keys at once.
-Which would fit perfectly for host B receiving the initial KeyUpdate,
-(and is probably the reason why you did that side first :-)
-but what to do for host A?
+On 16/09/2025 23:47, Kuniyuki Iwashima wrote:
+> mptcp_active_enable() calls sk_dst_get(), which returns dst with its
+> refcount bumped, but forgot dst_release().
+> 
+> Let's add missing dst_release().
+> 
+> Fixes: 27069e7cb3d1 ("mptcp: disable active MPTCP in case of blackhole")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+> v2: split from the next patch as dst_dev_rcu() patch hasn't been
+>     backported to 6.12+, where the cited commit exists.
 
-Looking at the code gnutls seem to expect to read the handshake
-message from the socket, but that message is already processed by
-the in-kernel TLS socket.
-So either we need to patch gnutls or push a fake handshake
-message onto the socket for gnutls to read. Bah.
+Thank you for the v2 and for the split!
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+Ideally, it would be great to if the 'Cc: stable' tag can be added when
+applying the patch, so I would be notified in case of issues with the
+backport of this patch.
+
+Cc: stable@vger.kernel.org
 
 Cheers,
-
-Hannes
+Matt
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Sponsored by the NGI0 Core fund.
+
 
