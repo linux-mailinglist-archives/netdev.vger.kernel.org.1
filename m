@@ -1,144 +1,171 @@
-Return-Path: <netdev+bounces-224130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC07B8109F
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:35:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 220ECB810D5
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:38:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 534F03AB232
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:33:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B23337B2453
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A0934BA55;
-	Wed, 17 Sep 2025 16:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD532FAC00;
+	Wed, 17 Sep 2025 16:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6cnV/rF"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="q0ERZa5t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D648523AE62
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289A22F9DBB;
+	Wed, 17 Sep 2025 16:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758126829; cv=none; b=EQgNPEr0udrNTEX+LBgVKcaOyKmlOS1WPMXaN/HrHlDRv7XLjI6uCefeKREvjaHqlOdhRkbSZdMB8SChL+mCXqKDR25pjLMPBEGSu8ysXzV4BFiYnXjKYZP6iVHgjL2nF+ljg9yIFkMBpBWwce2yXcxWZrA4bmUDYBrqocmK+GQ=
+	t=1758127111; cv=none; b=QRJSpHBBHKs2Iwz8IuIsK2p4Wbcc5nAlXhP0upPkJHZWOgD4wyTC4FXfluTclzacHbZ24q7SopDpeBBd6fjCFD4PMkoVwUswOln9QNeIMwDlr7ntaWucwqfRkSk/+/Gf514v3lhdjFiIV5gab03JCmeYloDVYS8zUYoyZHV5kZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758126829; c=relaxed/simple;
-	bh=T5rlTmWWL8B+5YTFOLQue/O9Et9XFS1RiNWss6/XQ4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EelDuPHB5SuEeN6sX7xLBQojcsSpe+/dWX3e2xGSMA02wqUhMtHu9csVJhqZvH5nZ2OR5F02qeUcoFeiCT6H0nFmLR4L0df1HL5lCPH72QePxtnrnZy82SLww4xbJ5qMEqm9xhbti7X7hiS4lYixFB2B9ESHCMbkjANOKFTJlLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T6cnV/rF; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-72267c05111so460127b3.2
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 09:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758126827; x=1758731627; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=G8RlqH67o65j5zlsChBs5Q8TtBN1OWluyR+3o2WLBvY=;
-        b=T6cnV/rFgXqt/niP2fM57gb+CLF2WZs6T4GqVWyC9DWxPy5yB5DIXwEtk/EA2yC0c9
-         0PQb6m3EeiWNuPGw41KNOJKGH1B+Gxw3XtErDq8N+EpKg9dUnIVPoVV+LrNtfrTG7bDv
-         l6As/7Cf9DhfTtH+Kz0AiLoCOdbFWsYLublGV2BMqjZQacHM3LRjD7b6KkJwL+oQsc7J
-         60Q47It15vBvlfyUWta/IRfGh3ZtAZ40RLOe/6QtUm/M1cW3GeASWktY6Qyog33Sc9jY
-         m56tERbOLqDzHNkr5AAu+lX/VGaBLlBlPpZTYoUxZ/OC0DGnGAesr7hX90PdM/oR0oJM
-         5+Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758126827; x=1758731627;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G8RlqH67o65j5zlsChBs5Q8TtBN1OWluyR+3o2WLBvY=;
-        b=h3vKyhGTI+am6Ltxs6T0VtYT+PB3wLW/RlLYiSORs8e13NvzTDZtKsjAMzh5eoPo4P
-         eVySBvIexn8HalTdBTB3amtfcTSOm0P/Ryietceq8nXGEQuHago7Gum+bWRQyi9xRpld
-         F/BZGWAiEwdrvEWiGxLUj0wGHanp0x0+ut281UJxXGmNW6TL+5zFeufwLB+RMCkdVK/f
-         3zAO9spHo5kiUcITKvfvKLSUrYBnp3AqrdBsFOeNbW5topDsAnt3bimNWlRYLnF6hckD
-         4MpIJ+Aye7w/zIieS147NN5ek3Q2NBfUPrWFWBtvhbNe5M37W6xy40uYrwN0HXZkiOYO
-         PFxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXdmKjZgA6u1CqjLGdF8pOE4h6fMqCRrnDyjsQb6/gYoc3PHRXTfR6KBfjtcvpY8y1jx8i2HU8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSPTqyLiYNV1PomiRB+GXOuGJ+IMAPCZfNpwXDYgozxIEckiqm
-	nNMDkUrhAHVpvhgSqRWSyajE2T+XXT93I3mp7c0RsWLeEgRBs5q4zVCn
-X-Gm-Gg: ASbGncv/YXsH3pnL78MTaThaAp+Eh5gso0gy7VbW3Q/ovQeCjr03+08q1CkkEAxLJKl
-	liQ/uElXwPvEgfcsqBgnmgQZQAqpkQ1DaLciyqzxswsXyVqTGTjQ8zaDJRVIFUyFG46soKTmD41
-	vnBJv5nKAgUXpyt+1XFeb1Mz+hWsHJ7u0gTXNMtfoEJKt/3Tywy6yjw0yyx+NiowabI71wxf/yq
-	hFyse63sp1Fsje9riQq5HK9D/Xd6rLl5U3aNXua8KHPr7jpoI0xXl3scsznBPhupLdplNB7uPh6
-	/XVBmzPpGjJg/DWGbrDv77TVkOkmPBKxsHuf2Mwb+3/AFOsbaEcDY+eBN8JOzBWJZ17qBbr8yK4
-	6eCIyIFukVGGk9drh5v6hSFVq18vJzUjYpkoQ6fg2/QDRWgg=
-X-Google-Smtp-Source: AGHT+IFLdAPsCemxYmXa54CmGTZ+ICmGT/J4SrrjoNdABQMevWtNWlVjH/3dQNMTr0HHKjs9ZEs8Vw==
-X-Received: by 2002:a05:690c:64ca:b0:734:ee:200b with SMTP id 00721157ae682-7389304b317mr22927617b3.51.1758126826608;
-        Wed, 17 Sep 2025 09:33:46 -0700 (PDT)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:4c::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7389d32a27dsm5115687b3.10.2025.09.17.09.33.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 09:33:46 -0700 (PDT)
-Date: Wed, 17 Sep 2025 09:33:41 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v6 0/9] vsock: add namespace support to
- vhost-vsock
-Message-ID: <aMri5apAxBpHtZbJ@devvm11784.nha0.facebook.com>
-References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
- <20250917161928.GR394836@horms.kernel.org>
+	s=arc-20240116; t=1758127111; c=relaxed/simple;
+	bh=OBlEWnVjEbpj1lDN0s0regPLqqWIbwrgcbV5Ph1zy7o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=q3ZwK8dCeaGi+9UXtBCiCs8hLbXGz8aCMjn8palgHPoXTsc1mS1SfATcjdlbWE1HgkNKNCQpIvYqyp7WXvXv2X4Rts60DK7jUqmxRvlCYmiD5RHSQCERlBA1Snwh9BRC0DJrab5VHdpZPD1np0Yr3jIKh0O9C63lFuQybQ8z5ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=q0ERZa5t; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58HGbcFp1655272;
+	Wed, 17 Sep 2025 11:37:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1758127058;
+	bh=6BD0XefKDj9yNlwNGnApL1S2MWmUQptL4sGSYMNTzvM=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=q0ERZa5tqZqU4zCPUnv1rj/OdqwUCgq2yIoNfx9SuMVkU4OcYwD5RChM1gSOiaI+8
+	 LrbmZdc1KQIlqXwSZbu9NpLP2ShxIdOn0BwI4vqHo/975hH3Odtd+Fg+QrvMp+Wx50
+	 JH1pfcoft4byTIaa6aw1dQu6syisj9+1ccjnz7F8=
+Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
+	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58HGbcDA1459556
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Wed, 17 Sep 2025 11:37:38 -0500
+Received: from DLEE203.ent.ti.com (157.170.170.78) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 17
+ Sep 2025 11:37:37 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE203.ent.ti.com
+ (157.170.170.78) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 17 Sep 2025 11:37:37 -0500
+Received: from [10.249.42.149] ([10.249.42.149])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58HGbafA3364151;
+	Wed, 17 Sep 2025 11:37:36 -0500
+Message-ID: <65a98655-68a1-4bf9-b139-c4172f48dad4@ti.com>
+Date: Wed, 17 Sep 2025 11:37:36 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250917161928.GR394836@horms.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 0/7] Add RPMSG Ethernet Driver
+To: MD Danish Anwar <danishanwar@ti.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Nishanth Menon
+	<nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo
+	<kristo@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        Mengyuan Lou <mengyuanlou@net-swift.com>,
+        Lei Wei
+	<quic_leiwei@quicinc.com>, Xin Guo <guoxin09@huawei.com>,
+        Michael Ellerman
+	<mpe@ellerman.id.au>, Fan Gong <gongfan1@huawei.com>,
+        Lorenzo Bianconi
+	<lorenzo@kernel.org>,
+        Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>,
+        Lukas Bulwahn
+	<lukas.bulwahn@redhat.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>
+References: <20250911113612.2598643-1-danishanwar@ti.com>
+ <8a20160e-1528-4d0e-9347-0561fc3426b4@ti.com>
+ <7cd06f8f-bd74-429d-bf2c-71858178950a@ti.com>
+Content-Language: en-US
+From: Andrew Davis <afd@ti.com>
+In-Reply-To: <7cd06f8f-bd74-429d-bf2c-71858178950a@ti.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Wed, Sep 17, 2025 at 05:19:28PM +0100, Simon Horman wrote:
-> On Tue, Sep 16, 2025 at 04:43:44PM -0700, Bobby Eshleman wrote:
+On 9/17/25 6:44 AM, MD Danish Anwar wrote:
+> Hi Andrew,
 > 
-> ...
+> On 11/09/25 9:34 pm, Andrew Davis wrote:
+>> On 9/11/25 6:36 AM, MD Danish Anwar wrote:
+>>> This patch series introduces the RPMSG Ethernet driver, which provides a
+>>> virtual Ethernet interface for communication between a host processor and
+>>> a remote processor using the RPMSG framework. The driver enables
+>>> Ethernet-like packet transmission and reception over shared memory,
+>>> facilitating inter-core communication in systems with heterogeneous
+>>> processors.
+>>>
+>>
+>> This is neat and all but I have to ask: why? What does this provide
+>> that couldn't be done with normal RPMSG messages? Or from a userspace
+>> TAP/TUN driver on top of RPMSG?
+>>
 > 
-> > base-commit: 949ddfb774fe527cebfa3f769804344940f7ed2e
-> 
-> Hi Bobby,
-> 
-> This series does not seem to compile when applied to the commit above.
-> Likewise when applied to current net-next (which is now slightly newer).
-> 
-> hyperv_transport.c: In function ‘hvs_open_connection’:
-> hyperv_transport.c:316:14: error: too few arguments to function ‘vsock_find_bound_socket’
->   316 |         sk = vsock_find_bound_socket(&addr, vsock_global_dummy_net());
->       |              ^~~~~~~~~~~~~~~~~~~~~~~
-> In file included from hyperv_transport.c:15:
-> /home/horms/projects/linux/linux/include/net/af_vsock.h:218:14: note: declared here
->   218 | struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net,
->       |              ^~~~~~~~~~~~~~~~~~~~~~~
-> 
-> -- 
-> pw-bot: changes-requested
+> This is different from RPMSG because here I am not using RPMSG to do the
+> actual TX / RX. RPMSG is only used to share information (tx / rx
+> offsets, buffer size, etc) between driver and firmware. The TX / RX
+> happens in the shared memory. This implementation uses a shared memory
 
-Ah dang it, looks like I had hvc disabled when I build tested it.
+This is how RPMSG is supposed to be used, it is meant for small messages
+and signaling, bulk data should be send out-of-band. We have examples
+specifically showing how this should be done when using RPMSG[0], and our
+RPMSG backed frameworks do the same (like DSP audio[1] and OpenVX[2]).
 
-Thanks for the catch, I'll fix this in the next rev.
+> circular buffer with head/tail pointers for efficient data passing
+> without copies between cores.
+> 
+>> This also feels like some odd layering, as RPMSG sits on virtio, and
+>> we have virtio-net, couldn't we have a firmware just expose that (or
+>> would the firmware be vhost-net..)?
+>>
+> 
+> PMSG sits on virtio, and we do have virtio-net but I am not trying to do
+> ethernet communication over RPMSG. RPMSG is only used to exchange
+> information between cores regarding the shared memory where the actual
+> ethernet communication happens.
+> 
 
-Best,
-Bobby
+Again nothing new here, virtio-net does control plane work though a
+message channel but the data plane is done using fast shared memory
+vqueues with vhost-net[3]. Using RPMSG would just be an extra unneeded
+middle layer and cause you to re-implement what is already done with
+virtio-net/vhost-net.
+
+Andrew
+
+[0] https://git.ti.com/cgit/rpmsg/rpmsg_char_zerocopy
+[1] https://github.com/TexasInstruments/rpmsg-dma
+[2] https://github.com/TexasInstruments/tiovx
+[3] https://www.redhat.com/en/blog/deep-dive-virtio-networking-and-vhost-net
+
+>> Andrew
+>>
+> 
+> 
+
 
