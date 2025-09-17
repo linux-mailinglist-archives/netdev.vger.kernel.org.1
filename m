@@ -1,150 +1,214 @@
-Return-Path: <netdev+bounces-224167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3397DB816D8
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 21:07:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 222B8B818A7
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 21:17:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5A991C26D79
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:07:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD9477B0227
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5F82727ED;
-	Wed, 17 Sep 2025 19:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B851303A21;
+	Wed, 17 Sep 2025 19:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z4U0rMPE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FBxpw1IU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FE51A315C
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 19:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46523009E2
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 19:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758136039; cv=none; b=SJo8yTExpanjMknxz1Oz68c6GIuTBoe8xqmWAyafs742g5oari9mbjRLvQv51pdhskTJm0txaV4A4ATHgtKmsk4EXNzyma/QR2XioWbaZogefp0wFA6LYRvRGusFR1XXG0Qj0Np2sd2shHhZ58t7/06OA7mzYCRnwHGXKp5GXF4=
+	t=1758136464; cv=none; b=C+Opyv7e7x/ASlmUUF7Zu0jomUgNILh1gLKfiJPow859F/7MFq7CKq31ZiIVo++aTctYn60QvxB/zW1v3fLOMFDAjOM5ji5haZMPfQqlmnEDVCbrbfU4nC5zEYVBhnJlRwV2GhOjmuIQ8LBeNu9AVU5kmciP5KVV3mtoVTUTxVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758136039; c=relaxed/simple;
-	bh=byvrkWcLSc+D3J0J6P6u54xndl8WT+MLirwMnepcsD4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nE5alOHE2IKc1IU0evRHA1ayjQhCfGRDfRN+SN/20GgRIQeyTNaqq58x21vJ5Qst5sZ0lNlW7pWM43/3r5X3p8mEBKCZ3kQOODWcXpZB7jnnC9NcuWR40ujx/aj7I3W+xvUDCO2Gb9GC925Mmo8XKxAHWeaVMCml8WbLaMb/QDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z4U0rMPE; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8112c7d196eso18178885a.3
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 12:07:17 -0700 (PDT)
+	s=arc-20240116; t=1758136464; c=relaxed/simple;
+	bh=Vd9qNZWDGL7ikShcQOSspb5EV2nqMn5JZHk4wc/qcJ8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Py/9Ow7Lelww1ukEIfw+fbguoDZoPHY5dDqO0Cfl3mVvZ/9+kTf4Wf30djH5z61u9spZ/l/yPBwBeyLSUbdRY13drX3hDngk+/457RoHP8CU8MMiEyUaM48OsZ/kCeD4/MNwO3gjzk0Sw2re+QLyRu2eqqNYkGp5TYge1U1LOGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FBxpw1IU; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7761c58f77fso175684b3a.2
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 12:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758136037; x=1758740837; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=byvrkWcLSc+D3J0J6P6u54xndl8WT+MLirwMnepcsD4=;
-        b=Z4U0rMPEEQU8FHEzoCKTIvDPQn5rAFZJqUaDbbm8bAQpXeYtwBOxBVjIjJagR/ppT/
-         PpcNMEy9tvQ/YR+hcocLq2Rt/21tP3CYUV8rAXTp2ekct/toLKjmYJK99buoF/mmWsEg
-         CRpAYha/tcjdY+VMlGuChHR3IJz6kOUkjv5z+BjDd7E+U/atzV6oQ97RRRFfbfTEP/Lr
-         Nd0CtHIvyG4cNfhm8HbN51Pje5jaz/GtKfNt1iIaPieCN2yaydrRtUu3fdILelGStnaj
-         U/m1ZLii/gqeoM74nF3KAfYJ+QpBgQKZb+AIOjCzDg03ian1xDF/O39DH//I/BKiYNXB
-         5pTA==
+        d=google.com; s=20230601; t=1758136462; x=1758741262; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=l0akSjZfbj6Vf3Tl8NTruMY+vgfk0nXr+wClAWAUBvI=;
+        b=FBxpw1IUWgQAcBxQqaF6eVxIdIAlhgUIW/NVwQL8YdlXqjqggmfHAFdiSP8U4/Olt1
+         dYUMbvvDFBsGnPbpbmMxhf7VsVBZEJP6eyOJm46NF1K0a8p/JDwscoxAl+7vUOxq3zEK
+         6jYiZfdfZZa6KHtzIvwTTif2VQB6koNngVGqBclnO9WumJ0ZIAwAwcPbjhDHjJblYkPJ
+         8gwgqesdtUapDk7/ecrPhsFVm2fcfDIQZqG6IRLD1m1DlkwK4wUxbNoSAJ6g9dfR+dSI
+         5AAg6TFbGJZ4VvRMew/2WRFMKxMRTXoBuJb1JeIHrqthBWWoJau6Z2Bf9h+Xq3lOUnZs
+         WraQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758136037; x=1758740837;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=byvrkWcLSc+D3J0J6P6u54xndl8WT+MLirwMnepcsD4=;
-        b=rPxdZjtMFQiJJ2RIXlN8BBKX9sQ2S4FNQjCEQFsa5XfMAQE32rUj1xH9o5pxjLvUGb
-         SayTlx5xAzJFq/ASMBPck+wIRXj4tS6ED+m9GwP8ZP8E/DsYG7nR1pdumKFnWNjhcRxG
-         eH3mNKdOF3c+sF7NxDF6g+WZYlZGlGTVWBFPRi4k0vbULu2aM3CGWkccFoTKUKXlzS95
-         o+1HzjSdQ7TF44E9ny5eHPMvLGPktLUVSU7AqaZJGUhvkdtppC3hva76HYcnl2YbjbXF
-         jVJSuCnoPqPDJCcU5wLxjHD4D/hYUqwDTw1qy2j005NKsFSNJArccf7c2NYii6xSe8hM
-         MHuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYQHFfafKRxJpOibDO5/6S1dXoFtewoeQanbIxslIkcX7FSuezm6NEOxeH46EVZQuLq0+CY48=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFm/uyHN0F4YYLcVYetLjINydM2I185UfdyfnfMMmFHtxBjMrM
-	kylf9pSwKu9VSRg+UV3kHfXg0sPPGCLL9x/bZdnppREVS1p9RDI8p+Oe
-X-Gm-Gg: ASbGncuETle0MvuT5DlEhtyBs6DYnAJOZxy31YqbFkogi/RY1W316MswByJp/w/JHpK
-	ytDiebvczf730qJ/yWYdIIiiKXMqXdMYC1Si+S76XjuHq3zgjkWBEbRdaPPh4sCuIg0QmX6/i13
-	sN0SvGeDF1IPKJDbkxSKhx+E/fEt1b0WIPhXc0ckdZ/CrRdWXIbamYZdOOhcvx4pAbYmiF5Uqdr
-	S0ZP+4zmKfbZ/noVVwAy0eRs8TYt5+8ZC1BGTXVHPz6WIU5sn/jGSzE913EYszC6lLhzic+49WA
-	x9ZglsrzyS55tPTQ458nBixrsfeZGjcNHmnZMj2pG/xoK9aVqQ4mCLYvbX2O3b2UTsYHGEFtV+K
-	UQR2t227OcSa2ProdVsfYvKldrxmjaMqDRwaTdVM90PVniJFxO+YW++hkW4IkT5QsBWtt/4I5x7
-	tTUQ==
-X-Google-Smtp-Source: AGHT+IGpIBLiSD6jpr3D6aB/ySS1xNWNfZqMZM6WqsRzP1GM1/T4MasIDqLbkdJfNBB5jOoIhVn3AQ==
-X-Received: by 2002:a05:620a:414a:b0:826:474a:9f81 with SMTP id af79cd13be357-8310b5994a0mr388348585a.25.1758136036558;
-        Wed, 17 Sep 2025 12:07:16 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-83630299579sm29768285a.41.2025.09.17.12.07.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 12:07:16 -0700 (PDT)
-Date: Wed, 17 Sep 2025 15:07:15 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>, 
- Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- David Ahern <dsahern@kernel.org>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com
-Message-ID: <willemdebruijn.kernel.1cc75fc0f6dfe@gmail.com>
-In-Reply-To: <CAAVpQUCumbFexO9TBhed0G0wGToLc4crVMSh8OxqwLep6kSzuA@mail.gmail.com>
-References: <20250916160951.541279-1-edumazet@google.com>
- <20250916160951.541279-6-edumazet@google.com>
- <willemdebruijn.kernel.20220031a140a@gmail.com>
- <CANn89iKPip5QppUDo_NT-KrZ4Lg+maqJ6_zz0-NpVwbuR8yomw@mail.gmail.com>
- <CAAVpQUCumbFexO9TBhed0G0wGToLc4crVMSh8OxqwLep6kSzuA@mail.gmail.com>
-Subject: Re: [PATCH net-next 05/10] udp: refine __udp_enqueue_schedule_skb()
- test
+        d=1e100.net; s=20230601; t=1758136462; x=1758741262;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l0akSjZfbj6Vf3Tl8NTruMY+vgfk0nXr+wClAWAUBvI=;
+        b=KUY4bGb7Xyg4rwfQglvmcyPMcRpt+0/GLE/WGysHPaZn1rDgmCzMqJl3O5WOIKkZpr
+         RL22cSGH6lZhdyPqFvlgHDmxeRraZ3qha/V1alP7mPm+JVKUqYJGvIPwnAvn1cgpkVuu
+         ERg1plG6eK0JndZA6jaopNvTmdH/SVvaJFzKBJZuzZAioikaP2osfcQESY/3zekTzVrv
+         RkIYyB0nqz8XVO8ngix7F1ysRXwraVa/m7eW7BVgLU/MlHyfOSlJ4dytSaJPhRBscPdo
+         AhHcEkDn1T8nvHHK4nSxa69hjeEw5va27n6Y+/M/79otFU/iL4jsHSg3iBf+z35rF2PE
+         E8sg==
+X-Forwarded-Encrypted: i=1; AJvYcCV0BkhjjOnPaAec6i3pXhVNDCsngG77EIxmwNOdvCo+UoaatH7+Gd7kUK0S/F9onL1vmjgC9jg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKZlXPwy80wKHbTFYPSMW4jEY1GmfFl5bLSTiwU6D/6Y+RAjuw
+	VKri4e+Rrp3ZeyGYBy6wgjCkt9bIf5RD1Vu8ZxL5GY0TblU5WgteHKWHJrDqQf+WqEKSKG54HGX
+	aqFWgwQ==
+X-Google-Smtp-Source: AGHT+IGTGnuayicoK0UH5tP8FKqZjmrrAtqDAsabxLHs7sx0IbvZb8UMsSG+4vljfYJzHyqkb2u5N8tBCrc=
+X-Received: from pgnm9.prod.google.com ([2002:a63:7d49:0:b0:b54:f9fb:b204])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:431e:b0:240:1a3a:d7bc
+ with SMTP id adf61e73a8af0-27a900612a5mr4733528637.3.1758136462032; Wed, 17
+ Sep 2025 12:14:22 -0700 (PDT)
+Date: Wed, 17 Sep 2025 19:13:56 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250917191417.1056739-1-kuniyu@google.com>
+Subject: [PATCH v9 bpf-next/net 0/6] bpf: Allow decoupling memcg from sk->sk_prot->memory_allocated.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
+Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Kuniyuki Iwashima wrote:
-> On Wed, Sep 17, 2025 at 8:57=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> >
-> > On Wed, Sep 17, 2025 at 8:00=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Eric Dumazet wrote:
-> > > > Commit 5a465a0da13e ("udp: Fix multiple wraparounds
-> > > > of sk->sk_rmem_alloc.") allowed to slightly overshoot
-> > > > sk->sk_rmem_alloc, when many cpus are trying
-> > > > to feed packets to a common UDP socket.
-> > > >
-> > > > This patch, combined with the following one reduces
-> > > > false sharing on the victim socket under DDOS.
-> > >
-> > > It also changes the behavior. There was likely a reason to allow
-> > > at least one packet if the buffer is small. Kuniyuki?
-> >
-> > It should not change the behavior.
-> >
-> > rmem would be zero if there is no packet in the queue : We still
-> > accept the incoming skb, regardless of its truesize.
-> >
-> > If there is any packet, rmem > 0
-> =
+Some protocols (e.g., TCP, UDP) have their own memory accounting for
+socket buffers and charge memory to global per-protocol counters such
+as /proc/net/ipv4/tcp_mem.
 
-> Agreed, this change should be fine.
-> =
+If the socket has sk->sk_memcg, this memory is also charged to the memcg
+as sock in memory.stat.
 
-> The rule comes from 0fd7bac6b6157, and later 850cbaddb52d
-> tried to be more strict but caused regression, and the condition
-> was converted to the current form in 363dc73acacbb.
-> =
+We do not need to pay costs for two orthogonal memory accounting
+mechanisms.
 
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+This series allows decoupling memcg from the global memory accounting
+(memcg + tcp_mem -> memcg) if socket is configured as such by sysctl
+or BPF prog.
 
-Interesting. Thanks both!
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Overview of the series:
+
+  patch 1 & 2 prepares for decoupling memcg from sk_prot->memory_allocated
+    based on the SK_MEMCG_EXCLUSIVE flag
+  patch 3 introduces net.core.memcg_exclusive
+  patch 4 & 5 supports flagging SK_MEMCG_EXCLUSIVE via bpf_setsockopt()
+  patch 6 is selftest
+
+
+Changes:
+  v9:
+    * Patch 1: Drop sk_is_mptcp() as it's always true for MPTCP subflow
+               and unnecessary for SCTP (kernel-test-robot)
+
+  v8:
+    * Patch 3: Fix build failure when CONFIG_NET=n (kernel-test-robot)
+
+  v7: https://lore.kernel.org/netdev/20250909204632.3994767-1-kuniyu@google.com/
+    * Rename s/ISOLATED/EXCLUSIVE/ (Shakeel)
+    * Add patch 3 (net.core.memcg_exclusive sysctl) (Shakeel)
+    * Reorder the core patch 2 before sysctl + bpf changes
+    * Patch 6
+      * Add test for sysctl
+
+  v6: https://lore.kernel.org/netdev/20250908223750.3375376-1-kuniyu@google.com/
+    * Patch 4
+      * Update commit message (Shakeel)
+    * Patch 5
+      * Trace sk_prot->memory_allocated + sk_prot->memory_per_cpu_fw_alloc (Martin)
+
+  v5: https://lore.kernel.org/netdev/20250903190238.2511885-1-kuniyu@google.com/
+    * Patch 2
+      * Rename new variants to bpf_sock_create_{get,set}sockopt() (Martin)
+    * Patch 3
+      * Limit getsockopt() to BPF_CGROUP_INET_SOCK_CREATE (Martin)
+    * Patch 5
+      * Use kern_sync_rcu() (Martin)
+      * Double NR_SEND to 128
+
+  v4: https://lore.kernel.org/netdev/20250829010026.347440-1-kuniyu@google.com/
+    * Patch 2
+      * Use __bpf_setsockopt() instead of _bpf_setsockopt() (Martin)
+      * Add getsockopt() for a cgroup with multiple bpf progs running (Martin)
+    * Patch 3
+      * Only allow inet_create() to set flags (Martin)
+      * Inherit flags from listener to child in sk_clone_lock() (Martin)
+      * Support clearing flags (Martin)
+    * Patch 5
+      * Only use inet_create() hook
+      * Test bpf_getsockopt()
+      * Add serial_ prefix
+      * Reduce sleep() and the amount of sent data
+
+  v3: https://lore.kernel.org/netdev/20250826183940.3310118-1-kuniyu@google.com/
+    * Drop patches for accept() hook
+    * Patch 1
+      * Merge if blocks
+    * Patch2
+      * Drop bpf_func_proto for accept()
+    * Patch 3
+      * Allow flagging without sk->sk_memcg
+      * Inherit SK_BPF_MEMCG_SOCK_ISOLATED in __inet_accept()
+
+  v2: https://lore.kernel.org/bpf/20250825204158.2414402-1-kuniyu@google.com/
+    * Patch 2
+      * Define BPF_CGROUP_RUN_PROG_INET_SOCK_ACCEPT() when CONFIG_CGROUP_BPF=n
+    * Patch 5
+      * Make 2 new bpf_func_proto static
+    * Patch 6
+      * s/mem_cgroup_sk_set_flag/mem_cgroup_sk_set_flags/ when CONFIG_MEMCG=n
+      * Use finer CONFIG_CGROUP_BPF instead of CONFIG_BPF_SYSCALL for ifdef
+
+  v1: https://lore.kernel.org/netdev/20250822221846.744252-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (6):
+  tcp: Save lock_sock() for memcg in inet_csk_accept().
+  net-memcg: Allow decoupling memcg from global protocol memory
+    accounting.
+  net-memcg: Introduce net.core.memcg_exclusive sysctl.
+  bpf: Support bpf_setsockopt() for BPF_CGROUP_INET_SOCK_CREATE.
+  bpf: Introduce SK_BPF_MEMCG_FLAGS and SK_BPF_MEMCG_EXCLUSIVE.
+  selftest: bpf: Add test for SK_MEMCG_EXCLUSIVE.
+
+ Documentation/admin-guide/sysctl/net.rst      |   9 +
+ include/net/netns/core.h                      |   3 +
+ include/net/proto_memory.h                    |  15 +-
+ include/net/sock.h                            |  47 +++-
+ include/net/tcp.h                             |  10 +-
+ include/uapi/linux/bpf.h                      |   6 +
+ mm/memcontrol.c                               |  15 +-
+ net/core/filter.c                             |  82 ++++++
+ net/core/sock.c                               |  65 +++--
+ net/core/sysctl_net_core.c                    |  11 +
+ net/ipv4/af_inet.c                            |  36 +++
+ net/ipv4/inet_connection_sock.c               |  26 +-
+ net/ipv4/tcp.c                                |   3 +-
+ net/ipv4/tcp_output.c                         |  10 +-
+ net/mptcp/protocol.c                          |   3 +-
+ net/tls/tls_device.c                          |   4 +-
+ tools/include/uapi/linux/bpf.h                |   6 +
+ .../selftests/bpf/prog_tests/sk_memcg.c       | 261 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/sk_memcg.c  | 146 ++++++++++
+ 19 files changed, 700 insertions(+), 58 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
+
+-- 
+2.51.0.384.g4c02a37b29-goog
 
 
