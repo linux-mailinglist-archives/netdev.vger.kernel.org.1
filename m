@@ -1,135 +1,89 @@
-Return-Path: <netdev+bounces-223882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C46B7CB71
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:08:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52338B7ECCE
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2B147B4142
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 07:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05EBD167085
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 07:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903792F7467;
-	Wed, 17 Sep 2025 07:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E462BEFFE;
+	Wed, 17 Sep 2025 07:00:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9611F099C;
-	Wed, 17 Sep 2025 07:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0655028CF41;
+	Wed, 17 Sep 2025 07:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758093653; cv=none; b=QgQoV4HY0HKUu5FfcpqXmIT9MKKMbb4RxsF14Cxv7z55h5/s1IvKGsGfwMy3snk1mDD5mPsOTIh0qg13793siY2ySLuZkQQALgNBIyBxhYGnTBXfcSVT2NSPDhJokM9JM5KdvWHiBBl7arBzS9Rohzvjk0KUqRuZmosSmFtcp2Y=
+	t=1758092441; cv=none; b=clDByzk9OmjOz99dHrMpkk7Auk6rYaGKv7ZRYuuWtvvCE4LR2bezV8JR6du23ZXAVOTAX6J6wO97GDcD65g7UTHbf+B0/kijXRqeBAYR0mMuDxrnMrVUCwpgmBeUPm9XJxl2SMF7iQv62aVQxDGdFnH1U0MCwB5NkGQxFmH5oc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758093653; c=relaxed/simple;
-	bh=T7exeBmULLWJga5OH37VIX/fG1+uHZkVbo/pMfIxDCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B9z3vnv3JgwWLd4d8KUQznGSDlNr5JqijdWGGnfb2XkoGvV8EBLNFKAXzuvlTWPuXajSffsrx+eFq0nMDweCIbCPsahh7Iy8Nz5/eb+cE6paso6W/aaIYqm40Y1g2zEEBqPxgafiJhVQUB6kPynUJcXzaLtTsDu3BJerjS1FLFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cRV5W1bycz9sxf;
-	Wed, 17 Sep 2025 09:00:15 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 11XSx90_uVxX; Wed, 17 Sep 2025 09:00:15 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cRV5W0cBKz9sxd;
-	Wed, 17 Sep 2025 09:00:15 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id D2F708B766;
-	Wed, 17 Sep 2025 09:00:14 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id fs-jRcZF6hG5; Wed, 17 Sep 2025 09:00:14 +0200 (CEST)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 8BAFE8B763;
-	Wed, 17 Sep 2025 09:00:13 +0200 (CEST)
-Message-ID: <c7b767f3-168e-41dd-8c72-3d40f766c018@csgroup.eu>
-Date: Wed, 17 Sep 2025 09:00:13 +0200
+	s=arc-20240116; t=1758092441; c=relaxed/simple;
+	bh=0rx7sRVBfmTsQQRZiCNlXEGlShuA/08z1vTySs1d+D4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=IH23pkBAeqD3ScW9gvMK4nC2Vf8LYetCwKrwidcib50KoKo2NyvviuJoMroFaSEVW3UDTZTgndtNo6xB4cMvVBR2o86Bp/CwnaL1lDlYWmp7+eMlKvZ1vZN+4k3qMzkfv99/z3l5xid8wmMbRcqfbJ/6btUJt/6g/l+QDL0OgHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn; spf=pass smtp.mailfrom=jmu.edu.cn; arc=none smtp.client-ip=45.254.49.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jmu.edu.cn
+Received: from localhost.localdomain (unknown [119.122.213.2])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 23172db05;
+	Wed, 17 Sep 2025 15:00:27 +0800 (GMT+08:00)
+From: Chukun Pan <amadeus@jmu.edu.cn>
+To: wens@kernel.org
+Cc: andre.przywara@arm.com,
+	andrew+netdev@lunn.ch,
+	conor+dt@kernel.org,
+	davem@davemloft.net,
+	devicetree@vger.kernel.org,
+	edumazet@google.com,
+	jernej@kernel.org,
+	krzk+dt@kernel.org,
+	kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-sunxi@lists.linux.dev,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	samuel@sholland.org,
+	wens@csie.org,
+	Chukun Pan <amadeus@jmu.edu.cn>
+Subject: Re: [PATCH net-next v6 2/6] net: stmmac: Add support for Allwinner A523 GMAC200
+Date: Wed, 17 Sep 2025 15:00:20 +0800
+Message-Id: <20250917070020.728420-1-amadeus@jmu.edu.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250913101349.3932677-3-wens@kernel.org>
+References: <20250913101349.3932677-3-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 06/18] dt-bindings: net: dp83822: Deprecate
- ti,fiber-mode
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20250909152617.119554-1-maxime.chevallier@bootlin.com>
- <20250909152617.119554-7-maxime.chevallier@bootlin.com>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <20250909152617.119554-7-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9956797fa103a2kunm2e50bc1654ced5
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDS01JVhlLT09IGU1NHh1CHlYeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlKSkJVSklJVUlKSFVJWVdZFhoPEhUdFFlBWU9LSFVKS0lPT09LVUpLS1VLWQ
+	Y+
 
+Hi,
 
+I tested this on Radxa Cubie A5E and there seems to be a small issue:
 
-Le 09/09/2025 à 17:26, Maxime Chevallier a écrit :
-> The newly added ethernet-connector binding allows describing an Ethernet
-> connector with greater precision, and in a more generic manner, than
-> ti,fiber-mode. Deprecate this property.
-> 
-> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+When VLAN_8021Q is enabled (CONFIG_VLAN_8021Q=y), down the eth1 interface:
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+~ # ifconfig eth1 down
+[   96.695463] dwmac-sun55i 4510000.ethernet eth1: Timeout accessing MAC_VLAN_Tag_Filter
+[   96.703356] dwmac-sun55i 4510000.ethernet eth1: failed to kill vid 0081/0
 
-> ---
->   Documentation/devicetree/bindings/net/ti,dp83822.yaml | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> index 28a0bddb9af9..dc6c50413a67 100644
-> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> @@ -47,6 +47,9 @@ properties:
->          is disabled.
->          In fiber mode, auto-negotiation is disabled and the PHY can only work in
->          100base-fx (full and half duplex) modes.
-> +       This property is deprecated, for details please refer to
-> +       Documentation/devicetree/bindings/net/ethernet-connector.yaml
-> +    deprecated: true
->   
->     rx-internal-delay-ps:
->       description: |
-> @@ -141,7 +144,12 @@ examples:
->           tx-internal-delay-ps = <1>;
->           ti,gpio2-clk-out = "xi";
->           mac-termination-ohms = <43>;
-> +        mdi {
-> +          connector-0 {
-> +            lanes = <1>;
-> +            media = "BaseF";
-> +          };
-> +        };
->         };
->       };
-> -
->   ...
+Is this a known issue?
 
+Thanks,
+Chukun
 
