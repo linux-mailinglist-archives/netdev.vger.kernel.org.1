@@ -1,107 +1,117 @@
-Return-Path: <netdev+bounces-224043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78317B7FE37
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:19:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 855D6B7FE88
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAB52720706
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:13:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE949624BFD
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116CE2E3705;
-	Wed, 17 Sep 2025 14:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C975292936;
+	Wed, 17 Sep 2025 14:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KXrXHs/g"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hruhWcjs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02BA2E2F15
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1395291C07
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758118104; cv=none; b=nNSLLmRT8iUweR1YW+Q58oZs2mYymHZf+CLOsZltmEdxH/ShQYcQWUZSxp9aFncDJNqEtYhTJsotvGCZKO+LPIwDtBmlhlv6AZ+62vS/zSufnFCQQ1w4kt25TCS9DdYcXY8iTn5WDnoITBO6Z6gClP9AGnQngNpijYxp8v7hyoQ=
+	t=1758118181; cv=none; b=Diw7s8vs+T7eCCUI5Jgqwk2JHVXI04uZgzWu6N9oAujFDgeGLWY/BAjLAgepv4mzTdILLx4XCJlV77TK8TmaXZXVyKInKX2MWNOnpZcYYt42dzouIVKNe9YhgQkJLYLamJBWqzlBzBYjXGtsrJNXA4iVaCT5x4UBm4wjDV5Vp6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758118104; c=relaxed/simple;
-	bh=lXCWglnUt90yI4aRsoMOta6ojCYjUYZrQfBXDrQOyNM=;
+	s=arc-20240116; t=1758118181; c=relaxed/simple;
+	bh=ZothtfKO7aaqFLyfUGVAsvQjW0P77GqQnn6jpX8mzag=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=muvDcASslmhyCCGx2XqzehO76m80y1Yn1jPYxzIUox2rgXuK06hiRa8XWPiJcxMCmHYWo5/U/xKK755EVRtga4IwxMoo9yeeIr+P+Y4CIUJRr230eJ3zvZVwNb7au9liSr0bnEukqPHUaDyulEdLhcyIHXtpLdm3BquFmBAw6Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KXrXHs/g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BEE8C19422
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:08:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758118103;
-	bh=lXCWglnUt90yI4aRsoMOta6ojCYjUYZrQfBXDrQOyNM=;
-	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
-	b=KXrXHs/g1qw/613j5auhUt3GIPp/QsjHcbCOjwPwoByTRaQfe1HCwKpmUuEvRLM5P
-	 ieAavHzuBLh5oRok+jpEDvm9ZuacjnuqhBa8cvZkI15sQsKj+m7VLNAXraT817uh3h
-	 hKQZlNeEgDIhIMQbQ0+ezLdyb9KnqeC1GZrnxlYRZNTrP2NrXtihrDz0Q1Bu+tr9Y1
-	 eMfCLYldKd/dveVkVrDggkTvfopSbs8uyofOjTe8UH9ftwYQMvOoDdEmxk2t0pQJ3U
-	 AAejCD24iU+BEer8SCaDe5evgQp78RlAQ3LdRekoLNzURBMNRTvM6+d/TNxQMv1yn+
-	 wuym0xuDm8ZSg==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-351c164936eso53059821fa.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 07:08:23 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWZ4XuQEKGl4OWZcMsc5XuNTI5N9ZuB/B7ELH+hpLC79c0TgM5ckHxgPG+zKR5jkwC1ZkHO56Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIevjEuAGck7wxB2nRdA7CZg1/Mee1IacKrcnEhDDuEAVt9HHK
-	pqRCw2qnI/NkJzYP1RMECmqSmxkkBW5Ew1ngL+pb4nmb5vGwOmQJpCS8z4U7jLBcX+WM9fMyjv+
-	qNXtDp9Ve/h29qo7aTW3umORQMo/rudA=
-X-Google-Smtp-Source: AGHT+IGqdaQ8C9lVtjuyq3Lst//zIEIlnNEWTnnZW0oeQInZavtI2ovFzZs+fzDjBgh6Oll2QYo+R+KbyOIjgKRKfDM=
-X-Received: by 2002:a2e:a484:0:b0:338:7f3:a740 with SMTP id
- 38308e7fff4ca-35f6093b1aamr6295401fa.7.1758118101743; Wed, 17 Sep 2025
- 07:08:21 -0700 (PDT)
+	 To:Cc:Content-Type; b=Eh2w7ViD6WUu6sgGNQvlommTyb18m7rjG3ULGTiZ+6HQSn80xl0JUTFLpS/tioy4ez0ad2N0i/pdqc5YXcJHfXRMNc1DNTW8B0ba4ecWcuk+WTHZ1qOOI9VTqSZL0vqV0gom+kX7896U73+U8CBT3cvhZo60Yx2FT6fnQRO7GZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hruhWcjs; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-ea5c612297bso451323276.3
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 07:09:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758118179; x=1758722979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZothtfKO7aaqFLyfUGVAsvQjW0P77GqQnn6jpX8mzag=;
+        b=hruhWcjsPqAkPak6faTUh/fuSYnhlfpQ/+Up9Zvqb3ilXRDoRtG7E/chCdjB6NftOG
+         mcVUeXwOmNzqXoHYIsz29pawSvEYfFyRLzG5sa4gb4d7sM/ZAXi7YqDN3aKm23VnM92B
+         NAJWKkxvZ22R4RtzR5XjbtgmN2hm1kGWrXTpJRjmDT2iXVgx6zL4L0R5tB1g8wUquaT7
+         Oy7iuFDe3a0GSYQy2P9tTJfR3g1zlLUfOFYzFSjjVtYjYHqbcOvEAQ3BGHoEUJ8mtanS
+         oMHM58aQYN6qe0HwoA7PC8yA4pbJYYCz7cgLHTNB6gPXuBxqyUd19mXguldLH6Cgighw
+         wl+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758118179; x=1758722979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZothtfKO7aaqFLyfUGVAsvQjW0P77GqQnn6jpX8mzag=;
+        b=VZ+zz9MTIq/EPkTrR/m5RbVUqPkrx+T6TN0BgX5Icf73Cu16sXulfIC1TSYqsZEQTQ
+         ICZyx/kpvQxoyeLLT0kpMfvH6/fY1b6AXchHGYsxbxlX9SlV/0KolP5//9dHmtV1whwf
+         z/9K/+xjxL/fSv+f21tcwTlmiMWTQMkNtB4IAI0H+eUXaVObeWcz2GeGeNw8Rea+mT3Q
+         xEMTOywhVon053FhPeydtrbOYxGgEoASdSt0OQQYPlqwJH5XrLs87ynprOMXF+444Pgn
+         DycxO3md5wjNP7Od16e86AUApXPIuntcE7lxenm8uopgOJH4UzE/oAtFpAGtiVPXVFj2
+         q4kw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ+nsTCYBC6zrglMu0PIxO0vxodlTfEYlloKWss2t3/FUyFF3fuZte5qekDLkuWQeemdXOMyg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd4XNpS3NDjDKnlCx8ltewKAACwStYns2YZDA9d+GwRGF6wCfg
+	jWmSyyFwascR8y8k08sExZPi6tyP9VootzcRd1meRN6E/s6wJOwdOdr9GWOkuTBsq3rIErfw7Jt
+	nrwWafd4IQtDAVfBj7EUiG+hdy8/6xXQgH2ueC6BV
+X-Gm-Gg: ASbGncspGVx7H/aXJYZK0wnpKcakQ3dqTWT808eN4Tvol1d0tI79p2QLel10rtl0Ec2
+	iPCaOapRjEPRpAhEMIQibzIjVdcdV38HYXJjXSY35ZNdQX8faOh4ej88ZcsO3r/8ojqca9QpSZL
+	JKJ4gQxqDaSnhWcv0Grfrel11775bRLP5BT0nbkT1j8iHerb3ZHMINqlB+uYUug0HTXwFoqJcze
+	HJ8sMb9XG6P
+X-Google-Smtp-Source: AGHT+IGPsm9qlvsaWaOQ0Up4+YrvSYG//gaNCGpPq4PzflQy70uPMncGPfmgc7QX+79taCdvY65HUJ++xh0Q6CvLepk=
+X-Received: by 2002:a05:6902:4209:b0:ea3:c162:3f3f with SMTP id
+ 3f1490d57ef6-ea5c0360690mr1757885276.15.1758118178039; Wed, 17 Sep 2025
+ 07:09:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250913101349.3932677-3-wens@kernel.org> <20250917070020.728420-1-amadeus@jmu.edu.cn>
-In-Reply-To: <20250917070020.728420-1-amadeus@jmu.edu.cn>
-Reply-To: wens@kernel.org
-From: Chen-Yu Tsai <wens@kernel.org>
-Date: Wed, 17 Sep 2025 22:08:10 +0800
-X-Gmail-Original-Message-ID: <CAGb2v640r+TwB7O+UAB9PehZ2FaXDjhVerK6j_CZ2+caJoJ9zA@mail.gmail.com>
-X-Gm-Features: AS18NWACYa7boO8HaxahcwxNgufh9JCYIxjbMd7TaIvgTTRgZ9eVfnU6RZmksT8
-Message-ID: <CAGb2v640r+TwB7O+UAB9PehZ2FaXDjhVerK6j_CZ2+caJoJ9zA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 2/6] net: stmmac: Add support for Allwinner
- A523 GMAC200
-To: Chukun Pan <amadeus@jmu.edu.cn>
-Cc: andre.przywara@arm.com, andrew+netdev@lunn.ch, conor+dt@kernel.org, 
-	davem@davemloft.net, devicetree@vger.kernel.org, edumazet@google.com, 
-	jernej@kernel.org, krzk+dt@kernel.org, kuba@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-sunxi@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com, 
-	robh@kernel.org, samuel@sholland.org
+References: <20250916214758.650211-1-kuniyu@google.com> <20250916214758.650211-5-kuniyu@google.com>
+ <e1bae4d7-98f7-4fe6-96ba-c237330c5a64@linux.ibm.com>
+In-Reply-To: <e1bae4d7-98f7-4fe6-96ba-c237330c5a64@linux.ibm.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Sep 2025 07:09:26 -0700
+X-Gm-Features: AS18NWBHtWj3yNRxOprYEXtavqN9ZTcr5UVf6xvEmYzKrCXN4clJXGpKjhe9LCU
+Message-ID: <CANn89iL39xRi1Fw0N4Wu6fbNjbbNjnYS4Q8BD3q+8HrY2XB_4A@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 4/7] smc: Use __sk_dst_get() and dst_dev_rcu()
+ in smc_vlan_by_tcpsk().
+To: Mahanta Jambigi <mjambigi@linux.ibm.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	"D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
+	Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
+	Ursula Braun <ubraun@linux.vnet.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On Wed, Sep 17, 2025 at 3:00=E2=80=AFPM Chukun Pan <amadeus@jmu.edu.cn> wro=
-te:
+On Wed, Sep 17, 2025 at 2:14=E2=80=AFAM Mahanta Jambigi <mjambigi@linux.ibm=
+.com> wrote:
 >
-> Hi,
 >
-> I tested this on Radxa Cubie A5E and there seems to be a small issue:
 >
-> When VLAN_8021Q is enabled (CONFIG_VLAN_8021Q=3Dy), down the eth1 interfa=
-ce:
+> On 17/09/25 3:17 am, Kuniyuki Iwashima wrote:
+> > Note that the returned value of smc_vlan_by_tcpsk() is not used
+> > in the caller.
 >
-> ~ # ifconfig eth1 down
-> [   96.695463] dwmac-sun55i 4510000.ethernet eth1: Timeout accessing MAC_=
-VLAN_Tag_Filter
-> [   96.703356] dwmac-sun55i 4510000.ethernet eth1: failed to kill vid 008=
-1/0
->
-> Is this a known issue?
+> I see that smc_vlan_by_tcpsk() is called in net/smc/af_smc.c file & the
+> return value is used in if block to decide whether the ini->vlan_id is
+> set or not. In failure case, the return value has an impact on the CLC
+> handshake.
 
-I don't have 802.1q enabled so I didn't see this.
+I guess Kuniyuki wanted to say the precise error (-ENODEV or
+-ENOTCONN) was not used,
+because his patch is now only returning -ENODEV
 
-Can you provide the base commit you applied the patches to?
-
-
-Thanks
-ChenYu
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
