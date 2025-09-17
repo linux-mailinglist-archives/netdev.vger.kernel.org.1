@@ -1,400 +1,198 @@
-Return-Path: <netdev+bounces-224033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F184B7F2C8
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:22:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94AB9B7F4E4
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EDF044E314B
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:22:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A646B3AED24
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427E2283FD6;
-	Wed, 17 Sep 2025 13:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499502DA76C;
+	Wed, 17 Sep 2025 13:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Je70SqG7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UtOwKQVY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012010.outbound.protection.outlook.com [40.107.209.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BA81E25EF
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 13:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758115340; cv=none; b=o0hHnkg0X4qrnMalFhJoY38vVPTWfYxVChcvLzPQTypZqYw/1KUCdV+wSLwk53vqpKWAJ/93/ZQHIouBfimRdPFNdGWqcP7nKBmbOPT5bRtEE8ODRZGsftogB185jc6RvVe4NAHjQl4rmWxMGpzzIqctnG01kd7MjliM4pJ0hUE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758115340; c=relaxed/simple;
-	bh=XgW0B9LKZhxor2JJEYL+n5zVPVGQN1BX+rPfv6v+2Fs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SI+yXWmK8kE/JTfswB5A6hEebvs2Z08yLtcP6QbvioQwtukJr8rRIuj6rZsl7+AqqrsWvS6chA8lSDmOhTKDwTZtJfFtHwJs9Zx4wlm4SXbK5yIknLx5p9jV9/zG42EfAZaLkWPTRNc9DPoixCDHiTJythWYX327ci6mdW9nKFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Je70SqG7; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-62105d21297so12887486a12.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 06:22:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1758115333; x=1758720133; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2sZ7IXMKmXJa2eJmlNkOzVCF8zHbYbZahJ05OIujADI=;
-        b=Je70SqG78pdW+WS324gKbtDv0OWJme4ayZ0ZvKIDq0UoRyjyQy7cUG73CFZre+GlZa
-         PKzlQmsweSJl+vH5fGfdIvtTwX5HW8MKoJsqzN0dpqtjrlS8eDV4Dg5IiOjfVyUpBqh6
-         B+0ICn+ZkZal1r15qI/GcmG+CaVGed4tiX4+qWW5hf/4lq3LQikuOkPgC/9sj8NXJMqx
-         R0nX0R9xaZgHImqTj1L0faslho30Mk8egMs1963wwNaPfPPB5MrddOCAPOKgdAQxImNY
-         7IDAStoLL2Ie7T9AnHduecS+4CyArwAoDbzk/5sOgjeH4DaNxLV2cvy/4rkUVJAbstgV
-         BBfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758115333; x=1758720133;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2sZ7IXMKmXJa2eJmlNkOzVCF8zHbYbZahJ05OIujADI=;
-        b=BmsNAOXKskvgxag2DUeqU7PClQ21iPYn/QJ1RgSIiz51GBSL3I0L3RkjckQG6fKf+r
-         6PMYfsfWIttSaa2PxMEohyyg9DApyyNdNUc+gkAT6M2J/fnNCoJsoGCEhz2equEFB9ft
-         DpqzgZshSYdB1wSSKkv6ikh4j9giE7kQ7zt21t15u57BZ3otpHJP+tBCw9G7GjRDzV/L
-         nOcNT5QT+tAkB1GA1vEunrrTN0C3u/krx9ZoLLIRXrck0r0xKncgq/31UY5f4fgTMSyh
-         tr6swvqGOe4Ojdq/Pcaz6FddFcQH5rxkgEvsLPS0FJOINS1L5PDf3ss47ZUxm1gAYVJ3
-         tz8w==
-X-Gm-Message-State: AOJu0YxU5FIP3sF/512dEI8f3kXgRM2swwZ6QNTTJwMQbxMwsh8Wo90q
-	vHns9jITfdF6Nh+Wj891/bhxHGbebtYTpdiXNZvLtrJGvXH3Nsjpj+EtLMODhTfyW3k=
-X-Gm-Gg: ASbGncsMQL4ruSw7fRlGOcl9EQHFDvnZj9RvfemBdqxkVX6MunzJazu3YuSa4h6WaBF
-	PBla0HFClrDoChfM8JGKeRYBKoabrLp6spsUVJX/f+VJthfpnRqEfCEK1KV7/VHufDQomQbkXkl
-	Mlf8KZZq97hT5pFd1/C37eKLK+J0rLg03AQTnKjWUCefYA1Sit2xGIumVQDZJcKqjvBQCnEszXR
-	kaq2bxRy4+1IWn8V3TiEwqUKBg3Ab3q4Iuzc23jnj5gFTD3LZo2ZNAhG/jAN8sxcyhpBPpc3TgL
-	pJkGnZZgk6XGdahkfRsEaVe3Wkm2hRtn/pR9ROCh950GytJLIs4tY5PmYKRnTKqZTac2J9sAfjI
-	fpz1PvfJchvKY8xY=
-X-Google-Smtp-Source: AGHT+IF7NrGor5r5XQA2bFkuFWEkG/TlvyGsM430f7FNzJ7JDL1cGQ33TOioWB4Lc9+tfQVRcVWqrA==
-X-Received: by 2002:a17:907:3e1a:b0:b09:48c6:b7ad with SMTP id a640c23a62f3a-b1bba5d1046mr268914566b.57.1758115333083;
-        Wed, 17 Sep 2025 06:22:13 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:506a:295f::41f:64])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b30da327sm1384011066b.11.2025.09.17.06.22.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 06:22:12 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 17 Sep 2025 15:22:05 +0200
-Subject: [PATCH net-next v5 2/2] selftests/net: Test tcp port reuse after
- unbinding a socket
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24B229ACD1;
+	Wed, 17 Sep 2025 13:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758115715; cv=fail; b=dURD+XstEPyVc0PrTt9log37r3LMYmOyNmY339bpcbJVzdCOsxFIoZ+7iyKrVhCf8eIKRR36+68dpNn9VtG8m+dg3mq5c0jvKkl3NOM5kVOPRfwi13ck2hgR/Dm2axk0Dn15c2cSQWYIekEl+eROWxJh6OVT5r61OCfhMocAitE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758115715; c=relaxed/simple;
+	bh=5sxgxzM4drHRAnK7nMS2yTx3iUztGpAe45tnI4KJfM4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KaR0pMRkHmnrFa6ExGDpqOqCxpzbqiIIIXCbE2jfey7R8ye/PauEBH2FpogdUMWpBvSy78use4kx/JIRdRU/lDe9xhrCrvqow+pIY4NgRcjLkHuvNdLq90XZMaqCNlTt0+dFWLt2dFMT45w2ATAEZgoNvUIm4uWlVwRa5rK2t2o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UtOwKQVY; arc=fail smtp.client-ip=40.107.209.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nZUNNmJ84jAdly4ffQw+MEeNwMkP0Ggo13ktCoywm6zlECEOMPl/Y9pI7GevYbaIACDhsihDYi3thNeb5gyLB8DQcUZLVlYlFk6aqdYg+vT42HeHHCgiLmB41uet8F2/bxt5srqeTaQ2ckFS5C+IwwjRiVv8qtHp9vR70wrabCyb60A/Eh+3fSSRUy5Jm9CWHzAHu4ipIlcfaUd/aBHcft8WHPxfcQs5ocnmlrUa/FoGSzl8ZUE2OWziB6wgsvnuyLQZ9M4iMmGaiSd9fF1AXiHL9Ijasl6tGF/Gw/WrHVCALReB5KU2eRNk6Zu9EeOmoMlNbzb3IvAhvM5HdY1x4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rzlm+SpWkniIJCrg3tut3iZYX+LXqgInWtrEGlP+fVo=;
+ b=i8gYBnFiJJPiP4oqQtOy5i8MmAmdSH0OYfDUWD7rM1VQqIyuBa1gpXWlWJM8zFHgp1FKbXyw+p5SOBDE6Twc+ik3YACTVFQEqD2nXCyz937wbEKPGSMBas02FPDFupn9XsKliakeooCg+wxxRAw9lBbweodyCFCZHErifkXCMyPFY4W6WTX2wcvC4tKHbbgC+fj88mCL8N04CskFxQ7eQ3Im9Pc+VxsWoAECVYdXadofuNuf8MNzZpLaj1NFneM7Mouq/KWujzuEZKe6Mbu+4hpD183GkQBVqKzbAmIRPet4EZNngUKk1ift2TmTlHAEPcj30A332CiRu1vbIQiPmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rzlm+SpWkniIJCrg3tut3iZYX+LXqgInWtrEGlP+fVo=;
+ b=UtOwKQVY73CWIpx1wPJypBZWhR7frKxxlY9nd9bc3femULn2yWLtDPLnJIZfQGZ7WkVySh5vCp1AJ8cdc3kuNMcj5nbk/uxNbYfeGa0YJtg+8NAvhhFwQoeVWQF+lMuj//ri2BSs8e7VNn1KuWmvtiz/57sDkxc7eUyERv20mBJRdo+oOgvetUp9u3bzSfF8B4M2YS4b+GiQ/85fDo/l73UOkp3ModHUDHYnrmYI+xPlJgTSY2ucKHF5MFLyrAOiuqmkimT1kQ6r8Lpzw2xjCgOpAFNC8ud3hszD5kjtdyxQxa2T/5s4UdPV0lNvQGG+JheXkmEm87Jg5ZzVkp3jrg==
+Received: from BY3PR10CA0005.namprd10.prod.outlook.com (2603:10b6:a03:255::10)
+ by LV2PR12MB5893.namprd12.prod.outlook.com (2603:10b6:408:175::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Wed, 17 Sep
+ 2025 13:28:30 +0000
+Received: from SJ5PEPF000001F5.namprd05.prod.outlook.com
+ (2603:10b6:a03:255:cafe::78) by BY3PR10CA0005.outlook.office365.com
+ (2603:10b6:a03:255::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.13 via Frontend Transport; Wed,
+ 17 Sep 2025 13:28:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SJ5PEPF000001F5.mail.protection.outlook.com (10.167.242.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9137.12 via Frontend Transport; Wed, 17 Sep 2025 13:28:30 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 17 Sep
+ 2025 06:28:20 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 17 Sep 2025 06:28:20 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Wed, 17 Sep 2025 06:28:16 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>, "Mark
+ Bloch" <mbloch@nvidia.com>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Gal Pressman
+	<gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Akiva Goldberger
+	<agoldberger@nvidia.com>
+Subject: [PATCH mlx5-next] net/mlx5: Add uar access and odp page fault counters
+Date: Wed, 17 Sep 2025 16:27:58 +0300
+Message-ID: <1758115678-643464-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250917-update-bind-bucket-state-on-unhash-v5-2-57168b661b47@cloudflare.com>
-References: <20250917-update-bind-bucket-state-on-unhash-v5-0-57168b661b47@cloudflare.com>
-In-Reply-To: <20250917-update-bind-bucket-state-on-unhash-v5-0-57168b661b47@cloudflare.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, Neal Cardwell <ncardwell@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, kernel-team@cloudflare.com, 
- Lee Valentine <lvalentine@cloudflare.com>
-X-Mailer: b4 0.15-dev-07fe9
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F5:EE_|LV2PR12MB5893:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b358bdd-99f2-48ae-347f-08ddf5ee1781
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1j19e7WmiBP541KKNUFPuIfBqFdQ+w3Lx5/4DlJYsp4+RChbiUVyv4H08Lwm?=
+ =?us-ascii?Q?H5eSWaaxo9uT7oiS6KVdS9cOymlfQx/mylwGpJDl7CGSyGn7/JvI2YsO+VeK?=
+ =?us-ascii?Q?K20nOciyu4zl1m6Xw/7N7Q6jTvgntM3JUHWBNbEBIZsV/E8vdqWBw512KdF3?=
+ =?us-ascii?Q?mRKQ+XN9/nfKQZHAS5WSO+v7dTSimvxV4JGd3hwO98lSRZ8/pT6ImOihZMGK?=
+ =?us-ascii?Q?kvUPj+gnHnA7dQojV4IOmAruiD/zGiFeLQC9JZgZrjKYdCfTnBkOHWl6/4Mo?=
+ =?us-ascii?Q?J3GZk1o+b4Ci5zKlBFDQMVVZzWNk/Gpgmu9Lu2/4XykDV847Fp3Xn0b5OVJO?=
+ =?us-ascii?Q?/UmBrEFIHryUe+FyHKEs/H60YOrhJpiaBuryO5z+9ZrSWiUmVO1U4JQfb7Lj?=
+ =?us-ascii?Q?pJao5SnG3p4kFiWCv5/+bHpxMIGZmnF0DwHf6o/M08WlJ2tbiqdenEsIFReK?=
+ =?us-ascii?Q?xEJKOzB8BXbaACpqw/cY7TrKim66bkY7nyk8WQtZSSrBd1gMQbGXkHopQWE4?=
+ =?us-ascii?Q?PyKo6k7AKyvV117yN/xhVLwA7Q0I5V43gfuwWxXn50c6SnFiivLx+F1dGgDj?=
+ =?us-ascii?Q?Ato0x1Xmlb3cceATPB1gy+YZJe2o9nIJmLJOLOWNUmtVngLZBxI9dVSlkfNr?=
+ =?us-ascii?Q?jSebmGIXPKcFHXWD60VUNk6gxnHDv/d9KtOPELCSgBwseARWDmurF4KWWULf?=
+ =?us-ascii?Q?55hupz2mLcp86F7xz8r+kra9AcYvu099O8azisdeukhvsQEw9HY3Mke2hWS8?=
+ =?us-ascii?Q?Kw+NIfAiwV81hb/Mmcy1L4flOJAiggZHPXxnyhl9nMAvLqduqXnbamN+W7KI?=
+ =?us-ascii?Q?du5isG7r4o92zPVK8DXiD6QW4+xiYqXDJLerXffSNcXzaF33+bNgUVWjPztO?=
+ =?us-ascii?Q?i54YueO4uOC6jsO251+ciMIN9DGclVJQ8DC+XPCc+/DMX6FhxxbHO+KJ+C/B?=
+ =?us-ascii?Q?4vrI1A3+jm8uPWrXa5d/EUOyF7kdK97fL124e4fvC63b9gzOlCP/yvxsRv7X?=
+ =?us-ascii?Q?/rfCKeooiIiIMOA5vvhCTBF+mlfEYsp0+JW/EXQ7dE0sKFo2V1rLD1NvZA84?=
+ =?us-ascii?Q?8eXPz80UeJdr5CZBtjegwK5PhzhMl9iUTYBpq5Jl0NQL0LQjuyyU1xssuoHT?=
+ =?us-ascii?Q?6ogBdmlXbk/CBEHIRQvAOCTH/8iyz0JhAAt1CffgWWVMQCsAcgoGe2BHuZqB?=
+ =?us-ascii?Q?07TweenwZKqNaI3ElyjGyQ8SPw1ENkULUtJ/LzyroD3Z9YUtQYcPHPnp89Ii?=
+ =?us-ascii?Q?pukEbzvQQTJqgfe2gUgGGmJHEDbF1nPYF9/DWGbqwG2FqICbJL8/DywPrSkr?=
+ =?us-ascii?Q?aZCu/jHK2VExsBQ5oDu7vf1N27iCPUtgZ16Ke2BlVLP8JgnG7vo5/JFIxqCK?=
+ =?us-ascii?Q?tdBRvDNz+u2C2QU7UxrCORnR/bBIyDcFoz1zoC5ktHC/T6sUfPHMy/dejbB3?=
+ =?us-ascii?Q?ijG3QDWaKthwgmfS9881ZEghYZYMGzHq+jQo8EimsFFHlSGd8i8U6DNDo7es?=
+ =?us-ascii?Q?KUKkgvXJzLHkAi4nAgkBHZjnGtBQSVbhKlAR?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2025 13:28:30.1669
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b358bdd-99f2-48ae-347f-08ddf5ee1781
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001F5.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5893
 
-Exercise the scenario described in detail in the cover letter:
+From: Akiva Goldberger <agoldberger@nvidia.com>
 
-  1) socket A: connect() from ephemeral port X
-  2) socket B: explicitly bind() to port X
-  3) check that port X is now excluded from ephemeral ports
-  4) close socket B to release the port bind
-  5) socket C: connect() from ephemeral port X
+Add bar_uar_access, odp_local_triggered_page_fault, and
+odp_remote_triggered_page_fault counters to the query_vnic_env command.
+Additionally, add corresponding capabilities bits to the HCA CAP.
 
-As well as a corner case to test that the connect-bind flag is cleared:
-
-  1) connect() from ephemeral port X
-  2) disconnect the socket with connect(AF_UNSPEC)
-  3) bind() it explicitly to port X
-  4) check that port X is now excluded from ephemeral ports
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+Signed-off-by: Akiva Goldberger <agoldberger@nvidia.com>
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- tools/testing/selftests/net/Makefile         |   1 +
- tools/testing/selftests/net/tcp_port_share.c | 258 +++++++++++++++++++++++++++
- 2 files changed, 259 insertions(+)
+ include/linux/mlx5/mlx5_ifc.h | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index ae1afe75bc86..5d9d96515c4a 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -122,6 +122,7 @@ TEST_PROGS += broadcast_pmtu.sh
- TEST_PROGS += ipv6_force_forwarding.sh
- TEST_GEN_PROGS += ipv6_fragmentation
- TEST_PROGS += route_hint.sh
-+TEST_GEN_PROGS += tcp_port_share
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index 097b1b7ada63..0cf187e13def 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -1958,7 +1958,9 @@ struct mlx5_ifc_cmd_hca_cap_bits {
+ 	u8         log_max_rqt[0x5];
+ 	u8         reserved_at_390[0x3];
+ 	u8         log_max_rqt_size[0x5];
+-	u8         reserved_at_398[0x3];
++	u8         reserved_at_398[0x1];
++	u8	   vnic_env_cnt_bar_uar_access[0x1];
++	u8	   vnic_env_cnt_odp_page_fault[0x1];
+ 	u8         log_max_tis_per_sq[0x5];
  
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := busy_poller
-diff --git a/tools/testing/selftests/net/tcp_port_share.c b/tools/testing/selftests/net/tcp_port_share.c
-new file mode 100644
-index 000000000000..4c39d599dfce
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_port_share.c
-@@ -0,0 +1,258 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+// Copyright (c) 2025 Cloudflare, Inc.
+ 	u8         ext_stride_num_range[0x1];
+@@ -4019,7 +4021,13 @@ struct mlx5_ifc_vnic_diagnostic_statistics_bits {
+ 
+ 	u8         handled_pkt_steering_fail[0x40];
+ 
+-	u8         reserved_at_360[0xc80];
++	u8         bar_uar_access[0x20];
 +
-+/* Tests for TCP port sharing (bind bucket reuse). */
++	u8         odp_local_triggered_page_fault[0x20];
 +
-+#include <arpa/inet.h>
-+#include <net/if.h>
-+#include <sys/ioctl.h>
-+#include <fcntl.h>
-+#include <sched.h>
-+#include <stdlib.h>
++	u8         odp_remote_triggered_page_fault[0x20];
 +
-+#include "../kselftest_harness.h"
-+
-+#define DST_PORT 30000
-+#define SRC_PORT 40000
-+
-+struct sockaddr_inet {
-+	union {
-+		struct sockaddr_storage ss;
-+		struct sockaddr_in6 v6;
-+		struct sockaddr_in v4;
-+		struct sockaddr sa;
-+	};
-+	socklen_t len;
-+	char str[INET6_ADDRSTRLEN + __builtin_strlen("[]:65535") + 1];
-+};
-+
-+const int one = 1;
-+
-+static int disconnect(int fd)
-+{
-+	return connect(fd, &(struct sockaddr){ AF_UNSPEC }, sizeof(struct sockaddr));
-+}
-+
-+static int getsockname_port(int fd)
-+{
-+	struct sockaddr_inet addr = {};
-+	int err;
-+
-+	addr.len = sizeof(addr);
-+	err = getsockname(fd, &addr.sa, &addr.len);
-+	if (err)
-+		return -1;
-+
-+	switch (addr.sa.sa_family) {
-+	case AF_INET:
-+		return ntohs(addr.v4.sin_port);
-+	case AF_INET6:
-+		return ntohs(addr.v6.sin6_port);
-+	default:
-+		errno = EAFNOSUPPORT;
-+		return -1;
-+	}
-+}
-+
-+static void make_inet_addr(int af, const char *ip, __u16 port,
-+			   struct sockaddr_inet *addr)
-+{
-+	const char *fmt = "";
-+
-+	memset(addr, 0, sizeof(*addr));
-+
-+	switch (af) {
-+	case AF_INET:
-+		addr->len = sizeof(addr->v4);
-+		addr->v4.sin_family = af;
-+		addr->v4.sin_port = htons(port);
-+		inet_pton(af, ip, &addr->v4.sin_addr);
-+		fmt = "%s:%hu";
-+		break;
-+	case AF_INET6:
-+		addr->len = sizeof(addr->v6);
-+		addr->v6.sin6_family = af;
-+		addr->v6.sin6_port = htons(port);
-+		inet_pton(af, ip, &addr->v6.sin6_addr);
-+		fmt = "[%s]:%hu";
-+		break;
-+	}
-+
-+	snprintf(addr->str, sizeof(addr->str), fmt, ip, port);
-+}
-+
-+FIXTURE(tcp_port_share) {};
-+
-+FIXTURE_VARIANT(tcp_port_share) {
-+	int domain;
-+	/* IP to listen on and connect to */
-+	const char *dst_ip;
-+	/* Primary IP to connect from */
-+	const char *src1_ip;
-+	/* Secondary IP to connect from */
-+	const char *src2_ip;
-+	/* IP to bind to in order to block the source port */
-+	const char *bind_ip;
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_share, ipv4) {
-+	.domain = AF_INET,
-+	.dst_ip = "127.0.0.1",
-+	.src1_ip = "127.1.1.1",
-+	.src2_ip = "127.2.2.2",
-+	.bind_ip = "127.3.3.3",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_share, ipv6) {
-+	.domain = AF_INET6,
-+	.dst_ip = "::1",
-+	.src1_ip = "2001:db8::1",
-+	.src2_ip = "2001:db8::2",
-+	.bind_ip = "2001:db8::3",
-+};
-+
-+FIXTURE_SETUP(tcp_port_share)
-+{
-+	int sc;
-+
-+	ASSERT_EQ(unshare(CLONE_NEWNET), 0);
-+	ASSERT_EQ(system("ip link set dev lo up"), 0);
-+	ASSERT_EQ(system("ip addr add dev lo 2001:db8::1/32 nodad"), 0);
-+	ASSERT_EQ(system("ip addr add dev lo 2001:db8::2/32 nodad"), 0);
-+	ASSERT_EQ(system("ip addr add dev lo 2001:db8::3/32 nodad"), 0);
-+
-+	sc = open("/proc/sys/net/ipv4/ip_local_port_range", O_WRONLY);
-+	ASSERT_GE(sc, 0);
-+	ASSERT_GT(dprintf(sc, "%hu %hu\n", SRC_PORT, SRC_PORT), 0);
-+	ASSERT_EQ(close(sc), 0);
-+}
-+
-+FIXTURE_TEARDOWN(tcp_port_share) {}
-+
-+/* Verify that an ephemeral port becomes available again after the socket
-+ * bound to it and blocking it from reuse is closed.
-+ */
-+TEST_F(tcp_port_share, can_reuse_port_after_bind_and_close)
-+{
-+	const typeof(variant) v = variant;
-+	struct sockaddr_inet addr;
-+	int c1, c2, ln, pb;
-+
-+	/* Listen on <dst_ip>:<DST_PORT> */
-+	ln = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(bind(ln, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+	ASSERT_EQ(listen(ln, 2), 0);
-+
-+	/* Connect from <src1_ip>:<SRC_PORT> */
-+	c1 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c1, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(c1, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src1_ip, 0, &addr);
-+	ASSERT_EQ(bind(c1, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(connect(c1, &addr.sa, addr.len), 0) TH_LOG("connect(%s): %m", addr.str);
-+	ASSERT_EQ(getsockname_port(c1), SRC_PORT);
-+
-+	/* Bind to <bind_ip>:<SRC_PORT>. Block the port from reuse. */
-+	pb = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(pb, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(pb, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->bind_ip, SRC_PORT, &addr);
-+	ASSERT_EQ(bind(pb, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	/* Try to connect from <src2_ip>:<SRC_PORT>. Expect failure. */
-+	c2 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c2, 0) TH_LOG("socket");
-+	ASSERT_EQ(setsockopt(c2, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src2_ip, 0, &addr);
-+	ASSERT_EQ(bind(c2, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(connect(c2, &addr.sa, addr.len), -1) TH_LOG("connect(%s)", addr.str);
-+	ASSERT_EQ(errno, EADDRNOTAVAIL) TH_LOG("%m");
-+
-+	/* Unbind from <bind_ip>:<SRC_PORT>. Unblock the port for reuse. */
-+	ASSERT_EQ(close(pb), 0);
-+
-+	/* Connect again from <src2_ip>:<SRC_PORT> */
-+	EXPECT_EQ(connect(c2, &addr.sa, addr.len), 0) TH_LOG("connect(%s): %m", addr.str);
-+	EXPECT_EQ(getsockname_port(c2), SRC_PORT);
-+
-+	ASSERT_EQ(close(c2), 0);
-+	ASSERT_EQ(close(c1), 0);
-+	ASSERT_EQ(close(ln), 0);
-+}
-+
-+/* Verify that a socket auto-bound during connect() blocks port reuse after
-+ * disconnect (connect(AF_UNSPEC)) followed by an explicit port bind().
-+ */
-+TEST_F(tcp_port_share, port_block_after_disconnect)
-+{
-+	const typeof(variant) v = variant;
-+	struct sockaddr_inet addr;
-+	int c1, c2, ln, pb;
-+
-+	/* Listen on <dst_ip>:<DST_PORT> */
-+	ln = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(bind(ln, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+	ASSERT_EQ(listen(ln, 2), 0);
-+
-+	/* Connect from <src1_ip>:<SRC_PORT> */
-+	c1 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c1, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(c1, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src1_ip, 0, &addr);
-+	ASSERT_EQ(bind(c1, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	ASSERT_EQ(connect(c1, &addr.sa, addr.len), 0) TH_LOG("connect(%s): %m", addr.str);
-+	ASSERT_EQ(getsockname_port(c1), SRC_PORT);
-+
-+	/* Disconnect the socket and bind it to <bind_ip>:<SRC_PORT> to block the port */
-+	ASSERT_EQ(disconnect(c1), 0) TH_LOG("disconnect: %m");
-+	ASSERT_EQ(setsockopt(c1, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->bind_ip, SRC_PORT, &addr);
-+	ASSERT_EQ(bind(c1, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	/* Trigger port-addr bucket state update with another bind() and close() */
-+	pb = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(pb, 0) TH_LOG("socket(): %m");
-+	ASSERT_EQ(setsockopt(pb, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->bind_ip, SRC_PORT, &addr);
-+	ASSERT_EQ(bind(pb, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	ASSERT_EQ(close(pb), 0);
-+
-+	/* Connect from <src2_ip>:<SRC_PORT>. Expect failure. */
-+	c2 = socket(v->domain, SOCK_STREAM, 0);
-+	ASSERT_GE(c2, 0) TH_LOG("socket: %m");
-+	ASSERT_EQ(setsockopt(c2, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &one, sizeof(one)), 0);
-+
-+	make_inet_addr(v->domain, v->src2_ip, 0, &addr);
-+	ASSERT_EQ(bind(c2, &addr.sa, addr.len), 0) TH_LOG("bind(%s): %m", addr.str);
-+
-+	make_inet_addr(v->domain, v->dst_ip, DST_PORT, &addr);
-+	EXPECT_EQ(connect(c2, &addr.sa, addr.len), -1) TH_LOG("connect(%s)", addr.str);
-+	EXPECT_EQ(errno, EADDRNOTAVAIL) TH_LOG("%m");
-+
-+	ASSERT_EQ(close(c2), 0);
-+	ASSERT_EQ(close(c1), 0);
-+	ASSERT_EQ(close(ln), 0);
-+}
-+
-+TEST_HARNESS_MAIN
++	u8         reserved_at_3c0[0xc20];
+ };
+ 
+ struct mlx5_ifc_traffic_counter_bits {
 
+base-commit: 2ac207381c37eebc49559634ce5642119784bc7c
 -- 
-2.43.0
+2.31.1
 
 
