@@ -1,178 +1,182 @@
-Return-Path: <netdev+bounces-223817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D208B7C6DB
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:01:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E344CB7C80E
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:04:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4AD16436D
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 00:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43FC81B25373
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 00:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712C67DA93;
-	Wed, 17 Sep 2025 00:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85921B3925;
+	Wed, 17 Sep 2025 00:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JuGiBwQZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJRn9QkW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF091C84DE
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 00:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE45C1ADC83;
+	Wed, 17 Sep 2025 00:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758067822; cv=none; b=k0j9ZTLIIL/+Vzq7UA4W1GaEkl0PEN2AuxH++lzEcut1Cf3qb2ZOskVjEeqTYGODjoz8NTY81mCNnWTr9Di3ovStcDFtrnJg3iOqk7P6UQ4FVxiz7asoO9Jdc/1j0UK8gdpm/EDW3TT91pqLe78IiE8S6aNnH+MKQ9MeBSTGYCw=
+	t=1758068234; cv=none; b=stBhXluKUS8zHWtaMwKCb35JnVAM74CmyF+uQP5ShEOWCMBYd+ALpp/77OQMySCrfI/JQdHWxgHWslXUATd1MeKpv58YV0fNpJaKjS5M8hbrfN9GQaLb+KG1Pop6EXO4cmhTy/sClcDyc8L5SJGGep0dwr8Ap+n4G75cEDHQ32M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758067822; c=relaxed/simple;
-	bh=z7CCUcXNRGOSwRx55UilEXeZ7ji/KjYa3aBI66esJBk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YGg5/xHNhLwCsZzolEiqE0rDPEwK3vOYsIMceRAFUmll6hRh9Y0kFdZv/Ct0hrYc89D0RSRA5JDcxoCzjMTBGBh2M8AoDVJsOxrIL/q/VNuDt2YV0iPxYXv7d4O+5bz5dxivcAv9DVTE2HMU8BvOHOFxuv4hHX/xivxg7UEzLdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JuGiBwQZ; arc=none smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-60f476e97f1so1994567d50.2
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 17:10:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758067818; x=1758672618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f1dbg2IUW/gjxWay8VnxqBQUaNJkg2EY3rMaMW38x1g=;
-        b=JuGiBwQZQOyUF4HGmghLL9rZfR7CvcMf6ISflUmmGEFhFqmlPG1+CjEEj+iTwDQT/o
-         9ySqs4Bz/r3w5KFHKmJ6SgYRYKMxBEs1aP2FJMVvhQTo2ZJnIuO5ZbvqUXDCxFfyk7+r
-         FUezHiikXH4ebH6Xfk3eLGp6gJFbuU4kEEnktxMSs9a+N+tIdJsfHR7MBjw2nNzhNDOm
-         paeB+Om77ccLb+HQk7vEomH8lPPGVtf6jNcRsIyw8CErojltwier8zGgujibAQ8wPRYu
-         J9HPI9U5sokECSvazAGMpDcReH/QDvBCEdVDGzw6jj9zbgj1Vm4d/c8alUtHPlFf0MIV
-         +nzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758067818; x=1758672618;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f1dbg2IUW/gjxWay8VnxqBQUaNJkg2EY3rMaMW38x1g=;
-        b=KnlSYh6W/7S+/i6mas/5Ikd1BAXqVHZcG3C0tURMiTdgRfCHFCMGcVa2g858XxceX+
-         nxGn5TQJLesYDmU4pC52Kjagzhg4RErWZsbsra1DCAOjumnJBpWfvhdHFmI/AQFKRDn5
-         +8WuV57t53nbNR3sThV8KEMtX/4++UAQ61WPYwX0sqqy2oclta2UAH+BoKidu4aYQcdq
-         7JH8ERXCJNaENOYKhtJQPrfnw9oQqFYaz82EpzruiJw8ovyoLfsIhq7yunkv5BcJCcV9
-         nEs+CmFxSovFsty9ksuzdhHbEjM0P8bkM7lEPicHVkfMBsEbYw+K+6ROHXqEaYJaGeFz
-         CsXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVaXlV3ATUWJnJBebkZQDx34hnwdQjiPYIbOamzgdvl368XJnFwmjCb4/8SZ141MfJSBItjAgU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPXhuTbACpRp9698VbfKwguVBLMUIkeHRYYUwHNN8mJg2lf+YM
-	f6vPq5QeuoS3JCWXFZIwhzUnYC6GbU2uZXjYRr5GLngBHMBJ7SFzVygQ
-X-Gm-Gg: ASbGncvX7n0zWDPDwzaqvCZONHG/OOInK3zXZUnGIe2ZyHFQolcNVJM5bEqxNnABSIY
-	xWAJcO5ha9EESU+d23T0olgVE1roUen/pOYmv7UUmbl7Ekls94yc2YYCiqcDx6UtPoEMhCQIggA
-	lAnpX3AnTusazWHFciDWhXP02AII7SEXxVcsbFKhcP7f/EglW8qeeglflUTN6Wg05brB5fFZpHZ
-	WaRcISJWJ12UgLLDuJ7vijjCWIqvEKF2ExjNvraG/A6TGOvQBeKwuPuZDwxTgrNHlKiwbAGAUJ2
-	qHXa5vZzJo+4l/HSVsI/daTqGdUxVZPlPbip6C/3k+SzvZVfKhErInZaArY8b2+1UxJEUUn82RQ
-	R55ZaakNCVtzudGIBiM2t
-X-Google-Smtp-Source: AGHT+IFyBQY3nWCBR/EDLTT2eZbVIHaUp4hHedFvbFA96KHoGYn2V3MyQiYLY0PUUEXvSt25VszwbQ==
-X-Received: by 2002:a05:690e:418c:b0:600:c2be:313e with SMTP id 956f58d0204a3-633b05dfca9mr281145d50.14.1758067817673;
-        Tue, 16 Sep 2025 17:10:17 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:55::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-72f79697b3bsm43330837b3.52.2025.09.16.17.10.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 17:10:17 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Raed Salem <raeds@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Kiran Kella <kiran.kella@broadcom.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v13 19/19] net/mlx5e: Implement PSP key_rotate operation
-Date: Tue, 16 Sep 2025 17:09:46 -0700
-Message-ID: <20250917000954.859376-20-daniel.zahka@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250917000954.859376-1-daniel.zahka@gmail.com>
-References: <20250917000954.859376-1-daniel.zahka@gmail.com>
+	s=arc-20240116; t=1758068234; c=relaxed/simple;
+	bh=mEul8jQTOkU94mBq+7NiagJVKM5XCiIvGTEPa5OsxNk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ipaNquiAXrjnrAfUdPcH63o03WoXAfkixpqd5gONdVkDBXnuwEiuacXRlNBRX0DriVXnujn/5s/RuXFqtuhBb7qlG9r6KzvAM9LdkO69An++NXngzGfUJBpokJVhXxZg7sj1UGNbrqIeAXq/XEsOtDd4JD/HKMVfXY2baH1q10U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJRn9QkW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81437C4CEEB;
+	Wed, 17 Sep 2025 00:17:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758068233;
+	bh=mEul8jQTOkU94mBq+7NiagJVKM5XCiIvGTEPa5OsxNk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uJRn9QkWz2maCP9RrO73znk28cDmphYDt/ibXkkJFHlZ5BxXfyc4opgVmogBxPjsU
+	 NtguJ/WPgxC4eBDcRc4v/ePeC475dXq0BFn3wdBeHsEsJCwBGdNe6n8DviAsQHPsMI
+	 fZvmzScorpQCYuv0Gb8Td5UVmteTPZ9qvhM7OD3sHB+dbZ+PB9nLYZDzzSlSKeIBg0
+	 WpHvmasJ6NrCzBB3tgPdP0Oj1vPzUp9pRk7rQ+RaKkrEqgIp8dFe08Sqatz2asqQYL
+	 nSrioiCvjBtuaBEGLWgGGil+SMULyES5nmpOtRhwr28XrMTuoFnPhEPJ3qYZMsxho2
+	 SAuteLwZsSb6Q==
+Date: Tue, 16 Sep 2025 17:17:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ paul.chaignon@gmail.com, stfomichev@gmail.com, martin.lau@kernel.org,
+ mohsin.bashr@gmail.com, noren@nvidia.com, dtatulea@nvidia.com,
+ saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
+ maciej.fijalkowski@intel.com, kernel-team@meta.com
+Subject: Re: [PATCH bpf-next v3 2/6] bpf: Support pulling non-linear xdp
+ data
+Message-ID: <20250916171711.1b0d0bc4@kernel.org>
+In-Reply-To: <20250915224801.2961360-3-ameryhung@gmail.com>
+References: <20250915224801.2961360-1-ameryhung@gmail.com>
+	<20250915224801.2961360-3-ameryhung@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Raed Salem <raeds@nvidia.com>
+On Mon, 15 Sep 2025 15:47:57 -0700 Amery Hung wrote:
+> +/**
+> + * bpf_xdp_pull_data() - Pull in non-linear xdp data.
+> + * @x: &xdp_md associated with the XDP buffer
+> + * @len: length of data to be made directly accessible in the linear part
+> + *
+> + * Pull in non-linear data in case the XDP buffer associated with @x is
 
-Implement .key_rotate operation where when invoked will cause the HW to use
-a new master key to derive PSP spi/key pairs with complience with PSP spec.
+looks like there will be a v4, so nit, I'd drop the first non-linear:
 
-Signed-off-by: Raed Salem <raeds@nvidia.com>
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
+	Pull in data in case the XDP buffer associated with @x is
 
-Notes:
-    v1:
-    - https://lore.kernel.org/netdev/20240510030435.120935-16-kuba@kernel.org/
+we say linear too many times, makes the doc hard to read
 
- .../mellanox/mlx5/core/en_accel/psp.c         | 23 +++++++++++++++++++
- 1 file changed, 23 insertions(+)
+> + * non-linear and not all @len are in the linear data area.
+> + *
+> + * Direct packet access allows reading and writing linear XDP data through
+> + * packet pointers (i.e., &xdp_md->data + offsets). The amount of data which
+> + * ends up in the linear part of the xdp_buff depends on the NIC and its
+> + * configuration. When an eBPF program wants to directly access headers that
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-index 372513edfb92..b4cb131c5f81 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
-@@ -827,11 +827,34 @@ static void mlx5e_psp_assoc_del(struct psp_dev *psd, struct psp_assoc *pas)
- 	atomic_dec(&psp->tx_key_cnt);
- }
- 
-+static int mlx5e_psp_rotate_key(struct mlx5_core_dev *mdev)
-+{
-+	u32 in[MLX5_ST_SZ_DW(psp_rotate_key_in)] = {};
-+	u32 out[MLX5_ST_SZ_DW(psp_rotate_key_out)];
-+
-+	MLX5_SET(psp_rotate_key_in, in, opcode,
-+		 MLX5_CMD_OP_PSP_ROTATE_KEY);
-+
-+	return mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
-+}
-+
-+static int
-+mlx5e_psp_key_rotate(struct psp_dev *psd, struct netlink_ext_ack *exack)
-+{
-+	struct mlx5e_priv *priv = netdev_priv(psd->main_netdev);
-+
-+	/* no support for protecting against external rotations */
-+	psd->generation = 0;
-+
-+	return mlx5e_psp_rotate_key(priv->mdev);
-+}
-+
- static struct psp_dev_ops mlx5_psp_ops = {
- 	.set_config   = mlx5e_psp_set_config,
- 	.rx_spi_alloc = mlx5e_psp_rx_spi_alloc,
- 	.tx_key_add   = mlx5e_psp_assoc_add,
- 	.tx_key_del   = mlx5e_psp_assoc_del,
-+	.key_rotate   = mlx5e_psp_key_rotate,
- };
- 
- void mlx5e_psp_unregister(struct mlx5e_priv *priv)
--- 
-2.47.3
+s/eBPF/frag-capable XDP/ ?
 
+> + * may be in the non-linear area, call this kfunc to make sure the data is
+> + * available in the linear area. Alternatively, use dynptr or
+> + * bpf_xdp_{load,store}_bytes() to access data without pulling.
+> + *
+> + * This kfunc can also be used with bpf_xdp_adjust_head() to decapsulate
+> + * headers in the non-linear data area.
+> + *
+> + * A call to this kfunc may reduce headroom. If there is not enough tailroom
+> + * in the linear data area, metadata and data will be shifted down.
+> + *
+> + * A call to this kfunc is susceptible to change the buffer geometry.
+> + * Therefore, at load time, all checks on pointers previously done by the
+> + * verifier are invalidated and must be performed again, if the kfunc is used
+> + * in combination with direct packet access.
+> + *
+> + * Return:
+> + * * %0         - success
+> + * * %-EINVAL   - invalid len
+> + */
+> +__bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len)
+> +{
+> +	struct xdp_buff *xdp = (struct xdp_buff *)x;
+> +	int i, delta, shift, headroom, tailroom, n_frags_free = 0, len_free = 0;
+> +	struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
+> +	void *data_hard_end = xdp_data_hard_end(xdp);
+> +	int data_len = xdp->data_end - xdp->data;
+> +	void *start, *new_end = xdp->data + len;
+> +
+> +	if (len <= data_len)
+> +		return 0;
+> +
+> +	if (unlikely(len > xdp_get_buff_len(xdp)))
+> +		return -EINVAL;
+> +
+> +	start = xdp_data_meta_unsupported(xdp) ? xdp->data : xdp->data_meta;
+> +
+> +	headroom = start - xdp->data_hard_start - sizeof(struct xdp_frame);
+> +	tailroom = data_hard_end - xdp->data_end;
+> +
+> +	delta = len - data_len;
+> +	if (unlikely(delta > tailroom + headroom))
+> +		return -EINVAL;
+> +
+> +	shift = delta - tailroom;
+> +	if (shift > 0) {
+> +		memmove(start - shift, start, xdp->data_end - start);
+> +
+> +		xdp->data_meta -= shift;
+> +		xdp->data -= shift;
+> +		xdp->data_end -= shift;
+> +
+> +		new_end = data_hard_end;
+> +	}
+> +
+> +	for (i = 0; i < sinfo->nr_frags && delta; i++) {
+> +		skb_frag_t *frag = &sinfo->frags[i];
+> +		u32 shrink = min_t(u32, delta, skb_frag_size(frag));
+> +
+> +		memcpy(xdp->data_end + len_free, skb_frag_address(frag), shrink);
+> +
+> +		len_free += shrink;
+> +		delta -= shrink;
+> +		if (bpf_xdp_shrink_data(xdp, frag, shrink, false))
+> +			n_frags_free++;
+> +	}
+> +
+> +	if (unlikely(n_frags_free)) {
+> +		memmove(sinfo->frags, sinfo->frags + n_frags_free,
+> +			(sinfo->nr_frags - n_frags_free) * sizeof(skb_frag_t));
+> +
+> +		sinfo->nr_frags -= n_frags_free;
+> +
+> +		if (!sinfo->nr_frags)
+> +			xdp_buff_clear_frags_flag(xdp);
+> +	}
+> +
+> +	sinfo->xdp_frags_size -= len_free;
+> +	xdp->data_end = new_end;
+
+Not sure I see the benefit of maintaining the new_end, and len_free.
+We could directly adjust
+
+	xdp->data_end += shrink;
+	sinfo->xdp_frags_size -= shrink;
+
+as we copy from the frags. But either way:
+
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+
+The whole things actually looks pretty clean, I was worried 
+the shifting down of the data would add a lot of complexity :)
 
