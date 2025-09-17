@@ -1,129 +1,109 @@
-Return-Path: <netdev+bounces-224049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A94B7FFEE
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:30:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94959B8001D
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:32:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 568BC54564E
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:20:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B005B2A23C2
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E542D375C;
-	Wed, 17 Sep 2025 14:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D3E2D7818;
+	Wed, 17 Sep 2025 14:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m/yE0OEb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vr0eQWPg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED432C324F
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F29A1CDFD5;
+	Wed, 17 Sep 2025 14:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758118716; cv=none; b=R/iZj1t99eYGbhW616HE+PgPjl2fMpZlkdSWNip74cEpZE3LwqOgerpoJcQ2fOMfjD4JyvzG1zL56bYoObL4IP+wNaeBC+u0fb1p1grABBgc9ry5LEmtrrardzetJn6zaDl9bQ/liMv9KhHGKHcV8kHNe/OQIv4ljMupOm62WtU=
+	t=1758119188; cv=none; b=gMYFzFtKXAgSw7q7qACbrZMsKGiJZMv0QLx4ofqsCFzEUViIo1A3lrjQac8HqcDGcxwlxy6n/D6WcIeMUHYWvidmjkHkVfG1JV967bAQNcZUASgdXXf8fu+0sTbhKE3xXINDkTj8nJ2bCd5HOi0k6V/jq9FzM915eoxAGGjxIII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758118716; c=relaxed/simple;
-	bh=GSEP0UxkbSq28RxbUKMYWJeiLik+SNWkj2DdmQyr/uY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SSWlvw9manh0HkiL3My2bm28oHbIN5PlfJd73eKfUKIHtoiaG48BHSmD6vgQMEmyLlANlnS3XwrQ07cRXvb0DwriNIPbQdLM9Y1IISaJtSnvhmJg5CLUsxypD2SY+NFEH4s/nxjt6epfWq16TAbIbX9GBZCyIk4uPd9tobLbOng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m/yE0OEb; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7f04816589bso644160385a.3
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 07:18:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758118714; x=1758723514; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k7xWdF+r/5i0xJN6wtkMYq6hTk1GD/nZovhiTCNzQWQ=;
-        b=m/yE0OEb9F16I+4OQOU75YtIXhXSU5IBZrktpOlcj1AaUbosCUGl8D1m1gqSm1BxMf
-         +7/zojL9A7tgDxo7EEZ+s1+MyVr8lCOZQK5TtW2vksyrWo3P7gRLdVK/ZiXEXmgmHBkV
-         yvk7T6uTdNeKej5Ya5lwQiIKmUj0Y6l5qKUDgsZSrMjuTt37Kxug1IU2gReIDH52M5qW
-         rsgJ/ZZWJUHGqaZNsF9Rbt1tevJCugnqTXosenJX0viTjPduietEOmtzjRVu5l95hnDU
-         DXt1SXbPtTjXo6/oB8k/cRiXSw6/aliMb2NME5AB5tO9MM46AJQbmeyHZH8ZaHz7jW8l
-         0Rqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758118714; x=1758723514;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k7xWdF+r/5i0xJN6wtkMYq6hTk1GD/nZovhiTCNzQWQ=;
-        b=m1eb63T1ASYjylOueAzpmCBqmhN9kYB2Wn/u1T4DltgKzb4SMmKj2H03SmYvZb9JLE
-         P5bs/FXmJqPsjeg0JvwLLjdTXNH2noa8faIl3+8NwpY3ygm5FtqciW/yaLCudp76VdTt
-         iJVbqBS5a4ySHpvfEfHvDbMVnDF5B2GvuQF3kvzlkj0PFKmSNoL0uG4ItSPQ2RRZQ5PO
-         Z9zIAfv/Zv/z9bOKwApCmz2OrULyUiR0G3PKrIAxICO7D5Q7WRZYvO08VNOzFtgNVFV3
-         54+yzb85abVEOxj+J9kboJKu/8GUczjKlg1xHZ0MLX95qic/x8crejyHHk3ev5REjyvV
-         7m+w==
-X-Forwarded-Encrypted: i=1; AJvYcCULzj6BLjLoOcXYzV0AzVsRrj8PlfXNqUDOBYUFv0sPN4WOvwZr6TaUo9ILs/vmpAUFg6DIv/s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0IVAwLnTBg0//qROBiTmRJm9Bc7LY1cEyM1pesrHFBN9Icx8t
-	CZFAJV0U5siazI6iTuITitaogY7bjvaoT0ajPyfwdMRHSQb1lbbbMeu/Gf33eJ3ExVfWoTT3/NQ
-	770nwcFd2Xs3Jym6ZUxndrg4Q3Q3eLHoVUf+Rkfha
-X-Gm-Gg: ASbGnctXUNdu7iwX1rYSYHriqJ03o2W4dmKmz40HD+WFQV5PVhSOhED82N9866M5wCO
-	O1w5dCs7QS03cIRw7bmFNgCOWn/OSUl20CgANuT06gWg+Y147jgEA0r9QrJMXBxfVZycNkmlH4t
-	9cTPZ3KPlUwbItwN/6JuyX/2qg/gR2CM8rWa1PG9WwYUKMY6GoYXjt9WBYcNVJ5+iNaF8EKJ2yO
-	2tsGcB8Kgapvvf7LE3AyMg=
-X-Google-Smtp-Source: AGHT+IEQhamDW2XkxN1/MlpD9St4v8e4syVJb3R5bSHKt9nK0Skb5V21LC+HQoSSI6B8dq2ZJrIuokcfAvYwze9ZmS0=
-X-Received: by 2002:a05:620a:c50:b0:7f3:9036:13ec with SMTP id
- af79cd13be357-8310dfd570emr224356885a.38.1758118712952; Wed, 17 Sep 2025
- 07:18:32 -0700 (PDT)
+	s=arc-20240116; t=1758119188; c=relaxed/simple;
+	bh=CEMDjEZ/mnQiP0gOxvoYTIsm9kEz18K1AgKACsQi870=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TfmOuI+owKsRixh+BNTCgpoOqDQLV8KbcClgwtXfg2h3DR6/7Q8coImfdAUiKvEO7NFuPvlqoe8m1NWdQbk3l/pe7rbY2K5slF/lV94tLUF9c3CCV7abDqhICoIe/X0zS49j8VQBqxGMJdfuHHEaEJfu1A20/Euc0TV8DPvzEU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vr0eQWPg; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/ZxtDJ8NDcYS0cSetpXt7raMXbyInlYYiFA0w5yReZ0=; b=vr0eQWPgmDBkic8/GVQiu43zFP
+	uc/rYJqtnhoAciwrfHu+jkE3Ox8j2JAlJfTbQ//7gO9xX2bnoIFPZYxUgxHeulz+hKj56q+1r29E3
+	7Lk5XS9KE3VP41UrUye2FWA5ucMVt6cF/H8fkRLCseZYqDZNlkZSkz43uCc3DwmJB10uN9LEffXGD
+	vGYXokojPtUciD2QFQ4ZfTUAxF6BihQsZjLSG+TMWEji9mdGYre38hjcPP5xyGLMV/fwkix62hy7j
+	YyrFUnU92vsZK12eC4FE8kEhqUv1mwAn6cN9K1zvhn7ySvBjKs+wbjEOo1A5HdsSpoRpm3cCCbriP
+	sGt/buQQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44676)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uyt6l-000000004Ti-01AJ;
+	Wed, 17 Sep 2025 15:26:07 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uyt6h-000000000Fo-2Qq3;
+	Wed, 17 Sep 2025 15:26:03 +0100
+Date: Wed, 17 Sep 2025 15:26:03 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	UNGLinuxDriver@microchip.com, jacob.e.keller@intel.com,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: sparx5/lan969x: Add support for ethtool
+ pause parameters
+Message-ID: <aMrE-9rtW20A9Xnj@shell.armlinux.org.uk>
+References: <20250917-802-3x-pause-v1-1-3d1565a68a96@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916214758.650211-1-kuniyu@google.com> <20250916214758.650211-2-kuniyu@google.com>
-In-Reply-To: <20250916214758.650211-2-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 17 Sep 2025 07:18:21 -0700
-X-Gm-Features: AS18NWB1nBDYMm64aNa9koMVEuL_uPqlLy7zr7xpvbiHZ613L3rc_flltelpbOo
-Message-ID: <CANn89iLo-8gw=jEF6ixie0Nn87f+2Zot-GTwRTbbK_4rNznGWw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 1/7] smc: Fix use-after-free in __pnet_find_base_ndev().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+ea28e9d85be2f327b6c6@syzkaller.appspotmail.com, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
-	Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, Ursula Braun <ubraun@linux.ibm.com>, 
-	Hans Wippel <hwippel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917-802-3x-pause-v1-1-3d1565a68a96@microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Sep 16, 2025 at 2:48=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> syzbot reported use-after-free of net_device in __pnet_find_base_ndev(),
-> which was called during connect(). [0]
->
-> smc_pnet_find_ism_resource() fetches sk_dst_get(sk)->dev and passes
-> down to pnet_find_base_ndev(), where RTNL is held.  Then, UAF happened
-> at __pnet_find_base_ndev() when the dev is first used.
->
-> This means dev had already been freed before acquiring RTNL in
-> pnet_find_base_ndev().
->
-> While dev is going away, dst->dev could be swapped with blackhole_netdev,
-> and the dev's refcnt by dst will be released.
->
-> We must hold dev's refcnt before calling smc_pnet_find_ism_resource().
->
-> Also, smc_pnet_find_roce_resource() has the same problem.
->
-> Let's use __sk_dst_get() and dst_dev_rcu() in the two functions.
->
+On Wed, Sep 17, 2025 at 01:49:43PM +0200, Daniel Machon wrote:
+> Implement get_pauseparam() and set_pauseparam() ethtool operations for
+> Sparx5 ports.  This allows users to query and configure IEEE 802.3x
+> pause frame settings via:
+> 
+> ethtool -a ethX
+> ethtool -A ethX rx on|off tx on|off autoneg on|off
+> 
+> The driver delegates pause parameter handling to phylink through
+> phylink_ethtool_get_pauseparam() and phylink_ethtool_set_pauseparam().
+> 
+> The underlying configuration of pause frame generation and reception is
+> already implemented in the driver; this patch only wires it up to the
+> standard ethtool interface, making the feature accessible to userspace.
+> 
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 
-> Fixes: 0afff91c6f5e ("net/smc: add pnetid support")
-> Fixes: 1619f770589a ("net/smc: add pnetid support for SMC-D and ISM")
-> Reported-by: syzbot+ea28e9d85be2f327b6c6@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/68c237c7.050a0220.3c6139.0036.GAE@=
-google.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+It is nice to see drivers not having to implement complicated code
+to add support for pause configuration!
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
