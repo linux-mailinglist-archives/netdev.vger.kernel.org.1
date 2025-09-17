@@ -1,144 +1,308 @@
-Return-Path: <netdev+bounces-224139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B24B81259
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:20:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32EB9B81289
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 19:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A060462AE9
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:20:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF9C1323232
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687792FA0E9;
-	Wed, 17 Sep 2025 17:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F0A2FC006;
+	Wed, 17 Sep 2025 17:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AVgTlUEO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TE6gZzxz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A990C2F9C3E
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74462FB084
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758129632; cv=none; b=MAqt/+AvZccM78iC201bW2ii8sIu+zxgiABAxf93KzKSdOsQrWJoxBT60rntKZWgoGkOJIaEXwQLru/jW9yf9Kdhlg0W6+hWHsJl9dsKi/kQ/OEP/ozwLFOWvpFBiG+hEa7ILmRpHM8IL0AJNy0590JtPbm2IkfsFPjN2QZOiug=
+	t=1758129834; cv=none; b=Y2wjN5yueiTCFLVw3INjR+VcqSN7NLUDzV9QdMATlD+UrRTSxsm73hL+acymesu9u/KgG1ZaxNQe0fwI8L+6bQVH9zh3GW9W8morq+S4nnCHg5zDVouiQ4FjRgvKwdpCTNBAF7eyu/tLiVsE53ou+KN52PxqOiInbUQXcR14BfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758129632; c=relaxed/simple;
-	bh=/vy1AWwaIm2CnLmZbXU2CpyIRzkKxxughA8uZl7Q2M4=;
+	s=arc-20240116; t=1758129834; c=relaxed/simple;
+	bh=TZUbd2GLfy1MRkJqa1uqSqOmuAo8UwOs+RmqhyiAsEc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=byWGolKUw6hN0WdFmt5RAowWdW7AoL5smTJnbk4DYo0agdQM6PumDWHke97a9Pqq8j2sIUGcOJ/Pp9aa6SSWZ0H0RHE0KnydqAOyQUEtj8UchrnnU5zKnNxJvHmmy4spQAgtSRUJRzX8uqCcAGt+hzG+ihTfhvaM8W6Qm/DFmvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AVgTlUEO; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b79773a389so721181cf.1
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:20:30 -0700 (PDT)
+	 To:Cc:Content-Type; b=VXk83++vhKfc+wJ3q+tLAOdu8iFn14wumoocTE1XIfD6oGQnnhT1uj9cusnFuZZrDwfGa5aVwTJvtnAV/71UTVZ+JKmg1RUKEV57zQf2Ux5kUUb8OzR4r9/3WUQBP/YLDg+O3cy6GpoADD8feEvzTrxYS04OHgS2CJfvJ9AcLLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TE6gZzxz; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-71d603cebd9so835137b3.1
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:23:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758129629; x=1758734429; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758129832; x=1758734632; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M+LfTPWxGtESwfNdYqgO0bM4lV3SAmEoBrc7Qa6udhA=;
-        b=AVgTlUEOFXUZvlOD5kzof+jZH9Szy9DQ/fbsuSBs+4llvk32vRp32MiURE39FFovC7
-         T+COX7JRDYVj6dd/Y/qk7Y6h0p0jea48nMbjaPj5WGJu8tngpwdr//gO3AIRwIl4Nigz
-         tOM1r00ZkI8IkbUBBgV9N772ZAeXVmLKRdbWULkjhUFFng29bfmh/HpuhECn1J6KiLS0
-         eKLMPwsY7rVVuuTd4xIdti/kK1dlfkAlJBfpvAX9+iLdhpAou6RObMCbIO8sRYwIfgXM
-         ZXxMguktQb7PvAyp0m+KvshMZ+1l5XM3UcKhH366UzwkavzXJXlCBrcwXJwpCDpPbO3W
-         nK5w==
+        bh=C3DO+dRyUaKvk/Ean/5aYwmfLKnd1LbE8meMekDjjic=;
+        b=TE6gZzxzoAuFZXTYGn5H3TGXJJSCmlwenzr2g7sm7RrdkMfC3NNxulFsxBNoDipn+S
+         YyhOUMulqZeLejU5602LzMGfwCCM8rmYVFEfikfrKWGDRXBTZyJNtfY89f+bGUmyfc3q
+         NAjYlOr5IyDQTVt8lZwo6380C3YN0jlSto+ZzNI/c+GNBgE90+oeuCgL2YzA/Dgup65B
+         K6+96CY9HksqVc25sgE+YfaC4Yv4yK4NRVA1+j5JGbhG45B3Pix2galN7pnUtQyy+BnK
+         VDFW3JPf3od67KYwdQC2FJ2QOw0LWgy7CrIYnnQaWbVoaOAM0tNuOdNUcNre+9QbdtPi
+         BdDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758129629; x=1758734429;
+        d=1e100.net; s=20230601; t=1758129832; x=1758734632;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M+LfTPWxGtESwfNdYqgO0bM4lV3SAmEoBrc7Qa6udhA=;
-        b=sdeNt86RV0P1TRre2hQjizYwAptAKt0l/J4QDXwx9jD6mb4zzlgZNG4H3Ya5drc7Gf
-         +n2TtbewkdNT6zsnbLINTinWrFU1sx55zpAfgfv7w0F0jfUfMUTNVZbZglp4og3NWxhf
-         1tKI8ZTTHeAlv4GBgoK9nUyWkKxd3YSa+1WMzT4rcr3J9GYp+OEWyH4eTzDj+T5SNGJB
-         xrqsgGgxnjWWlp96p1/kDU0ouyCA50JbMiMoOu4fGAimLeVn54QVu7SDUPnVuPCZBIfS
-         b6yhMANMFO5q0Pf2rlsyF5P/GqnWxQJIaX/Hj8ggr6uq8/ncfe0lUIEjRZJ/cJXmLolJ
-         sN4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWmksUINFrt7tS3RtoYN0gFpZdahSrbTpL0/kNu7h04xUYs//OKg+kIm3874L17HKCt4sq1Z5I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2m1Gg/Ff/f2pulG7g1A6Tk5xy+7tOt3DUqgt9ltgr7FIjSxyj
-	7umtd7XEpUe7zAAjIL7edZHDnjUVMFv83wYFwXlSyZLpw7pIxYLr2u8rdlV9cCRahlqYoK0+PEP
-	p6dBHXHWsC5TwFuQ5erJSaON8sWkYxYxnQpqwIN0I
-X-Gm-Gg: ASbGncuRNbG+jLS3867ZmwkJf5M5EeScQSq60VxKuEuFWC4/SSSxs70SJ/5+9As0kSJ
-	EVFDG/robf124uwBze2SFCdSEppiOeuvqtGatkqTt4VHoaGfEfBo3RbRsj2SkDs9XISrIz/SVmv
-	3E2L31uW8ZTnQWO6FG0UfgyruHeHJWiH64GxQg+qxrAgvO+lDTmgl7dQQ3THPXUhHymuvSl59bN
-	15dHcpYteNXqdQU8nnE0B4=
-X-Google-Smtp-Source: AGHT+IFQDui72xfWFBil78fA+RutTLvzXuM23RmVZw5RDPSFC0t/VuO4PKRhCwr70nXCULFwZVkRdnMlqxM9P8muvq8=
-X-Received: by 2002:a05:622a:5d3:b0:4b6:9b2:e83e with SMTP id
- d75a77b69052e-4ba66c1e0f8mr31755291cf.24.1758129629027; Wed, 17 Sep 2025
- 10:20:29 -0700 (PDT)
+        bh=C3DO+dRyUaKvk/Ean/5aYwmfLKnd1LbE8meMekDjjic=;
+        b=FBZuH9ulRe1UNFVD/AFBmWVVFvjLP2u3phF0rohkNc7Q0Y2LORH0tLPINKzSbjjdjA
+         AAsXN9x/QKb27KRdy/Uf4RkQrghb8sHBrR29kCDJY3DLyDsrbr9paX9sJH6VIpzA/MWn
+         S6fIFh/WLZxkSDzbm77F69LloGcG6zulZz8CHG9LTzgNDstDdzS99Lb3s13u5SHvYYMw
+         bjDFsDgLqhNKoVpSoxxlAO6xMmee9btpnR0JB+7YrmFUuPUZDncCuU0LLyz+AC884icO
+         ARgiQjOuOLjLH9lFgVlqNUR0O2zrOiVRgpBSM2Eai83saav3Gb6F/CIVP4/n2idEAKHg
+         s5SA==
+X-Forwarded-Encrypted: i=1; AJvYcCVkzLOk6d6Yr4ihfrg+EURJeKRFx0AlhmJVE96J32Wox01AAZ4iHG8Er6odD2odCMWowJWSoes=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7vGYyPYtTEPZ5cEOQMZgni0f+jBLhQFuvil03UQCq3sE3qPut
+	frZ0RT866PbbAgq2vsUanSkmiszF5ZbgAyeE1asGlzwS5vByQkoSjNPiesk5v8820wrf7SXQHJM
+	Z/YHWJEUcyCjBW/5SIj5BxntlQPb5r88=
+X-Gm-Gg: ASbGncvOlW+mjYChyDmRWwW974RsDWgHl80FzMDE+nD9laa21Y6jruJZRsS5uEjOV62
+	gYz6VaDGzuiTK9ySKUoH709DmIZNMVhG4kAbRtSkMCpFCXah2BrcBDbV6VJhsXLGe5b2u85PidK
+	OiR+NekOhDjgN/1ZIKpVJhg/KvkW52k7lODoOmxlPS8oZwH0C1sXc6+AtN+d2297whsjMfAtPIN
+	N/8SfxJelVh7YjAXqKi7Fk=
+X-Google-Smtp-Source: AGHT+IGkWdVWEgNNWEXOlIdY00KRDH1oZ7EWZVb+0n5e99zDGBZRSGsYBYGDRHQL8iDGsVSNKTbDA5a/DR3q3lyd1Rs=
+X-Received: by 2002:a05:690c:4991:b0:72c:139c:24fa with SMTP id
+ 00721157ae682-73892659a83mr23746317b3.52.1758129831375; Wed, 17 Sep 2025
+ 10:23:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250917135337.1736101-1-edumazet@google.com> <CAEWA0a6b5P-9_ERvh9mCWOgbH6OYdTUXWVGgA20CQ5pfDC2sYA@mail.gmail.com>
- <CANn89iLC+Gr9BbyNQq-udVY-EZjtjZxCL9sJEpaySTps0KkFyg@mail.gmail.com> <CAEWA0a4x4XMZKtpz_pNKruC4zwjETVxUuEMs2m_==Dpib_Jrqg@mail.gmail.com>
-In-Reply-To: <CAEWA0a4x4XMZKtpz_pNKruC4zwjETVxUuEMs2m_==Dpib_Jrqg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 17 Sep 2025 10:20:17 -0700
-X-Gm-Features: AS18NWBe_Ohe6j0QfjVQ8V4ffOaHdFwMRrHPQuT-vJAPZqZF3jpye1GAnMAEvcA
-Message-ID: <CANn89iKZDvL9vKbmDa4ivnrm11e0fc65A-MXs8kY4MxR0CnGTw@mail.gmail.com>
-Subject: Re: [PATCH net] net: clear sk->sk_ino in sk_set_socket(sk, NULL)
-To: Andrei Vagin <avagin@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, stable <stable@vger.kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20250915224801.2961360-1-ameryhung@gmail.com> <20250915224801.2961360-5-ameryhung@gmail.com>
+ <bc297803-68e6-4f59-a32d-490398b8e590@linux.dev>
+In-Reply-To: <bc297803-68e6-4f59-a32d-490398b8e590@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Wed, 17 Sep 2025 10:23:40 -0700
+X-Gm-Features: AS18NWA4M21sdZhYBO_RtkwB2Gg37crKxhyeqsBqYKRLCZsFSHDXVgAqSq7uSPE
+Message-ID: <CAMB2axMmHzDjpe40Xr64m1iEc=RRTJgQ+O4YQu9krqEYtskxFQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 4/6] bpf: Support specifying linear xdp packet
+ data size for BPF_PROG_TEST_RUN
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, paul.chaignon@gmail.com, 
+	kuba@kernel.org, stfomichev@gmail.com, martin.lau@kernel.org, 
+	mohsin.bashr@gmail.com, noren@nvidia.com, dtatulea@nvidia.com, 
+	saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, 
+	maciej.fijalkowski@intel.com, kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 17, 2025 at 10:03=E2=80=AFAM Andrei Vagin <avagin@google.com> w=
-rote:
+On Tue, Sep 16, 2025 at 3:59=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
 >
->  is
->
-> On Wed, Sep 17, 2025 at 8:59=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
+> On 9/15/25 3:47 PM, Amery Hung wrote:
+> > To test bpf_xdp_pull_data(), an xdp packet containing fragments as well
+> > as free linear data area after xdp->data_end needs to be created.
+> > However, bpf_prog_test_run_xdp() always fills the linear area with
+> > data_in before creating fragments, leaving no space to pull data. This
+> > patch will allow users to specify the linear data size through
+> > ctx->data_end.
 > >
-> > On Wed, Sep 17, 2025 at 8:39=E2=80=AFAM Andrei Vagin <avagin@google.com=
-> wrote:
-> > >
-> > > On Wed, Sep 17, 2025 at 6:53=E2=80=AFAM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > Andrei Vagin reported that blamed commit broke CRIU.
-> > > >
-> > > > Indeed, while we want to keep sk_uid unchanged when a socket
-> > > > is cloned, we want to clear sk->sk_ino.
-> > > >
-> > > > Otherwise, sock_diag might report multiple sockets sharing
-> > > > the same inode number.
-> > > >
-> > > > Move the clearing part from sock_orphan() to sk_set_socket(sk, NULL=
-),
-> > > > called both from sock_orphan() and sk_clone_lock().
-> > > >
-> > > > Fixes: 5d6b58c932ec ("net: lockless sock_i_ino()")
-> > > > Closes: https://lore.kernel.org/netdev/aMhX-VnXkYDpKd9V@google.com/
-> > > > Closes: https://github.com/checkpoint-restore/criu/issues/2744
-> > > > Reported-by: Andrei Vagin <avagin@google.com>
-> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > >
-> > > Acked-by: Andrei Vagin <avagin@google.com>
-> > > I think we need to add `Cc: stable@vger.kernel.org`.
+> > Currently, ctx_in->data_end must match data_size_in and will not be the
+> > final ctx->data_end seen by xdp programs. This is because ctx->data_end
+> > is populated according to the xdp_buff passed to test_run. The linear
+> > data area available in an xdp_buff, max_data_sz, is alawys filled up
+> > before copying data_in into fragments.
 > >
-> > I never do this. Note that the prior patch had no such CC.
+> > This patch will allow users to specify the size of data that goes into
+> > the linear area. When ctx_in->data_end is different from data_size_in,
+> > only ctx_in->data_end bytes of data will be put into the linear area wh=
+en
+> > creating the xdp_buff.
+> >
+> > While ctx_in->data_end will be allowed to be different from data_size_i=
+n,
+> > it cannot be larger than the data_size_in as there will be no data to
+> > copy from user space. If it is larger than the maximum linear data area
+> > size, the layout suggested by the user will not be honored. Data beyond
+> > max_data_sz bytes will still be copied into fragments.
+> >
+> > Finally, since it is possible for a NIC to produce a xdp_buff with empt=
+y
+> > linear data area, allow it when calling bpf_test_init() from
+> > bpf_prog_test_run_xdp() so that we can test XDP kfuncs with such
+> > xdp_buff.
+> >
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >   net/bpf/test_run.c                            | 26 ++++++++++++------=
+-
+> >   .../bpf/prog_tests/xdp_context_test_run.c     |  4 +--
+> >   2 files changed, 17 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+> > index 4a862d605386..558126bbd180 100644
+> > --- a/net/bpf/test_run.c
+> > +++ b/net/bpf/test_run.c
+> > @@ -660,12 +660,15 @@ BTF_ID_FLAGS(func, bpf_kfunc_call_memb_release, K=
+F_RELEASE)
+> >   BTF_KFUNCS_END(test_sk_check_kfunc_ids)
+> >
+> >   static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size=
+,
+> > -                        u32 size, u32 headroom, u32 tailroom)
+> > +                        u32 size, u32 headroom, u32 tailroom, bool is_=
+xdp)
 >
-> The original patch has been ported to the v6.16 kernels. According to the
-> kernel documentation
-> (https://www.kernel.org/doc/html/v6.5/process/stable-kernel-rules.html),
-> adding Cc: stable@vger.kernel.org is required for automatic porting into
-> stable trees. Without this tag, someone will likely need to manually requ=
-est
-> that this patch be ported. This is my understanding of how the stable
-> branch process works, sorry if I missed something.
+> Understood that the patch has inherited this function. I found it hard to=
+ read
+> when it is called by xdp but this could be just me. For example, what is =
+passed
+> as "size" from the bpf_prog_test_run_xdp(), which ends up being "PAGE_SIZ=
+E -
+> headroom - tailroom". I am not sure how to fix it. e.g. can we always all=
+ocate a
+> PAGE_SIZE for non xdp callers also. or may be the xdp should not reuse th=
+is
+> function. This probably is a fruit of thoughts for later. Not asking to c=
+onsider
+> it in this set.
+>
+> I think at least the first step is to avoid adding "is_xdp" specific logi=
+c here.
+>
+> >   {
+> >       void __user *data_in =3D u64_to_user_ptr(kattr->test.data_in);
+> >       void *data;
+> >
+> > -     if (user_size < ETH_HLEN || user_size > PAGE_SIZE - headroom - ta=
+ilroom)
+> > +     if (!is_xdp && user_size < ETH_HLEN)
+>
+> Move the lower bound check to its caller. test_run_xdp() does not need th=
+is
+> check. test_run_flow_dissector() and test_run_nf() already have its own c=
+heck.
+> test_run_nf() actually has a different bound. test_run_skb() is the only =
+one
+> that needs this check, so it can be explicitly done in there like other c=
+allers.
+>
 
-Andrei, I think I know pretty well what I am doing. You do not have to
-explain to me anything.
+Yeah, is _xdp is bad. I will move lower bound checks to callers.
+Thanks for pointing this out.
 
-Thank you.
+> > +             return ERR_PTR(-EINVAL);
+> > +
+> > +     if (user_size > PAGE_SIZE - headroom - tailroom)
+> >               return ERR_PTR(-EINVAL);
+> >
+> >       size =3D SKB_DATA_ALIGN(size);
+> > @@ -1003,7 +1006,8 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, =
+const union bpf_attr *kattr,
+> >
+> >       data =3D bpf_test_init(kattr, kattr->test.data_size_in,
+> >                            size, NET_SKB_PAD + NET_IP_ALIGN,
+> > -                          SKB_DATA_ALIGN(sizeof(struct skb_shared_info=
+)));
+> > +                          SKB_DATA_ALIGN(sizeof(struct skb_shared_info=
+)),
+> > +                          false);
+> >       if (IS_ERR(data))
+> >               return PTR_ERR(data);
+> >
+> > @@ -1207,8 +1211,8 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, =
+const union bpf_attr *kattr,
+> >   {
+> >       bool do_live =3D (kattr->test.flags & BPF_F_TEST_XDP_LIVE_FRAMES)=
+;
+> >       u32 tailroom =3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> > +     u32 retval =3D 0, duration, max_data_sz, data_sz;
+> >       u32 batch_size =3D kattr->test.batch_size;
+> > -     u32 retval =3D 0, duration, max_data_sz;
+> >       u32 size =3D kattr->test.data_size_in;
+> >       u32 headroom =3D XDP_PACKET_HEADROOM;
+> >       u32 repeat =3D kattr->test.repeat;
+> > @@ -1246,7 +1250,7 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, =
+const union bpf_attr *kattr,
+> >
+> >       if (ctx) {
+> >               /* There can't be user provided data before the meta data=
+ */
+> > -             if (ctx->data_meta || ctx->data_end !=3D size ||
+> > +             if (ctx->data_meta || ctx->data_end > size ||
+> >                   ctx->data > ctx->data_end ||
+> >                   unlikely(xdp_metalen_invalid(ctx->data)) ||
+> >                   (do_live && (kattr->test.data_out || kattr->test.ctx_=
+out)))
+> > @@ -1256,14 +1260,15 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog=
+, const union bpf_attr *kattr,
+> >       }
+> >
+> >       max_data_sz =3D PAGE_SIZE - headroom - tailroom;
+> > -     if (size > max_data_sz) {
+> > +     data_sz =3D (ctx && ctx->data_end < max_data_sz) ? ctx->data_end =
+: max_data_sz;
+>
+> hmm... can the "size" (not data_sz) be directly updated to ctx->data_end =
+in the
+> above "if (ctx)".
+>
+
+That simplifies things a lot. Will change in the next version.
+
+> > +     if (size > data_sz) {
+> >               /* disallow live data mode for jumbo frames */
+> >               if (do_live)
+> >                       goto free_ctx;
+> > -             size =3D max_data_sz;
+> > +             size =3D data_sz;
+> >       }
+> >
+> > -     data =3D bpf_test_init(kattr, size, max_data_sz, headroom, tailro=
+om);
+> > +     data =3D bpf_test_init(kattr, size, max_data_sz, headroom, tailro=
+om, true);
+> >       if (IS_ERR(data)) {
+> >               ret =3D PTR_ERR(data);
+> >               goto free_ctx;
+> > @@ -1386,7 +1391,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_p=
+rog *prog,
+> >       if (size < ETH_HLEN)
+> >               return -EINVAL;
+> >
+> > -     data =3D bpf_test_init(kattr, kattr->test.data_size_in, size, 0, =
+0);
+> > +     data =3D bpf_test_init(kattr, kattr->test.data_size_in, size, 0, =
+0, false);
+> >       if (IS_ERR(data))
+> >               return PTR_ERR(data);
+> >
+> > @@ -1659,7 +1664,8 @@ int bpf_prog_test_run_nf(struct bpf_prog *prog,
+> >
+> >       data =3D bpf_test_init(kattr, kattr->test.data_size_in, size,
+> >                            NET_SKB_PAD + NET_IP_ALIGN,
+> > -                          SKB_DATA_ALIGN(sizeof(struct skb_shared_info=
+)));
+> > +                          SKB_DATA_ALIGN(sizeof(struct skb_shared_info=
+)),
+> > +                          false);
+> >       if (IS_ERR(data))
+> >               return PTR_ERR(data);
+> >
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_ru=
+n.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+> > index 46e0730174ed..178292d1251a 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+> > @@ -97,9 +97,7 @@ void test_xdp_context_test_run(void)
+> >       /* Meta data must be 255 bytes or smaller */
+> >       test_xdp_context_error(prog_fd, opts, 0, 256, sizeof(data), 0, 0,=
+ 0);
+> >
+> > -     /* Total size of data must match data_end - data_meta */
+> > -     test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32),
+> > -                            sizeof(data) - 1, 0, 0, 0);
+> > +     /* Total size of data must be data_end - data_meta or larger */
+> >       test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32),
+> >                              sizeof(data) + 1, 0, 0, 0);
+> >
+>
 
