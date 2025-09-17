@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-224032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B286B7F2C2
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:22:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44FCBB7F583
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 199317BB053
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:20:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21BA3326BAB
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5401AA1F4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267191A76DE;
 	Wed, 17 Sep 2025 13:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="aGxEGVAX"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bYL71Di1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EFB33C773
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 13:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0672433C765
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 13:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758115335; cv=none; b=FTjbpOEyAtKzr5HknE6dfv3lp/YadZYm/2ajKZRKs8oTMXiDt9CK83LQ1XONNf6TS0CFfxkD1EaZdEcOqOqI8EpvZ59cHBmzx7mmaPiUZ0afIPawW8lfNCY6RAF7d1n2g8aRLxtuo5NVnvC9iGoSBtSrU3mcRHl0Vrt5223fpyE=
+	t=1758115335; cv=none; b=XYLb8srTjeRdwvjOyDdfKdMXnsI61U3WX8jNWOjr6M8Jwy1cxW/fFwB6QXu0c6yPAnLYFdlbo/TK1zJn3vIS4S6TuAqpAMesQVaopzMeSr7meDyF6V5BLkxOu9LwX4z5LdjQjexegbWVzXfXZ+2ybkgFvG93v3OHdEWCtt/IOIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758115335; c=relaxed/simple;
-	bh=SskrMhc+baRIk2wshNN8yYA/DUeFmc7xb1EKKQMCh6E=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LHewW24T9xzsTEhOOq5BbdnRBzKutqCwKxjcofHpJtpFg5SRtM/cbHXt5FLuFK3F1WbGuvJkyJV5VZjUu2nAc/yYdFn6LmTVPuG5t5OSpb2vbIDgTRw1ilYCT01BivgN/lyIydcvmNTyJcEJTgWzj+MQiJFOYbw7pPs95Us9R7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=aGxEGVAX; arc=none smtp.client-ip=209.85.208.43
+	bh=AZCqstzk7zekhFrtC95BZOvz01tJrxIoCw9qFTnLdGs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=SDnLHal2SZYrwQPG0RPwgS2I7TcIsSgrwz0vr84gCUzWgMSmvqLmJgmHX+EoY/9C+5ob5mxoWvy+dAE0Kdvwis0N+9OYE9V9sXmZA0yaFPqWFbg6gOcIWQIa46BfJYDhCqrB3MCGSDEmV1A5t+n0pR2CYpynYLZzyiPwhsVamDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=bYL71Di1; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-62f277546abso8214986a12.3
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 06:22:13 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b042eb09948so1339739366b.3
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 06:22:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1758115332; x=1758720132; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MG5mE8BumLZV4RAxNdz/1d3caBAqNcPqIhSFatN8Rng=;
-        b=aGxEGVAXKbqiUJWvs5tGrOqQJodleIPHAe+12BxoMF8OM+WShxO4ZR7SvmbMlD8KUQ
-         ZM4JMwMsrUbHd+tPwzy3vPGSdwvpW+Fj0vPo/0Hx1VNEj8IcbbnHmK8gRHCUJpj9ez06
-         CthOYvdhBX1WaMdw39Zyyu2MGqW2JObgWHZi8bBZdy2dhFS6FJB5o7YYi0Hlfz8D6gWh
-         kPeKOAxlHDTm+YfLmqTSaR8UkS25Zs9nKEnyzVLhXIQLn5JD4ZSi+ZKWvEYzCQ5uw3X9
-         PgEslm+gNev1Cn6+MCmNxRXvgvdAFzyDTUbXiaAXTgxQZNzH1axVwZpKgWG2ruUWOfTm
-         wl+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758115332; x=1758720132;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=cloudflare.com; s=google09082023; t=1758115331; x=1758720131; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MG5mE8BumLZV4RAxNdz/1d3caBAqNcPqIhSFatN8Rng=;
-        b=FJaISVpFauQhXHn9ZFbCAG7xLzJFZX41D4+efKZacMsRI8OgS5Hqi3n+Kt7zXh8ai+
-         tbiMnOKvwY4B50Dg+h3kuBX0ocGCYiMzHvASNmotxFFw/FDBqXJlwyo/QZo7F6VLYffq
-         OuAKxO5DvY6zYPiEIOhjDrpABm/inKTnI76EkKHizivSvpVpgiCui5ya4WaQHn1V2igG
-         ffeiKa06/T7VOg7pd840y3FwmJujhtzMKkvCG+NPiQ9kwmVhb8QmPw2axlLZJNfBpqft
-         chla+Dwk3Ml1AJRUeKoPa/tpazHI79Gy+78LcQtmJ65fX6fbai+DQ7yZecCyvwE72sFD
-         7WLg==
-X-Gm-Message-State: AOJu0YwbdfE2TLAtvVyxbAuTaq+Nz9INr4YycOZ5E5d+KUZFiPumR2uW
-	pWgzCUn8s5mAgE+tJlmRLGRAX8jix/g1ROvWCNDEqWqXP8Gk+g5rnW+G+3XD1OpB6JCnq39kYbG
-	PgQ3a
-X-Gm-Gg: ASbGncunsTqp82f+E6DH1v4FujHrVIETjHFadsqayFOW7DdMetAN9o11OYtCYbmYfbV
-	e1QyLd0YG6Qp3JdMjoolz4EgjygBYM8PMJA+E6WosqVGiv2+6jkxC7vtAJtR0UmQzH+L8IuW2J/
-	rhyCQuv0Bd9XzDx+Hg9F0qNstDTZfN/HH1S2IBP2iVVW1Dv6UVSapB0uhYgESAkWwOARUJ/Pst/
-	zMLacc1bGpGdRZhRZrLbptZlFp4p+dmFeYXQN6+C1nRvQ654zJ5eNwnDXyRWPlPK3h0DutVXm9j
-	OH9ew17/vx4H+ZIvaHjGAz5SHt3U323Lm+1Ph+ykGbzF4ksTC87FdithTZxdrqZBgDnXIi5y//G
-	rHGKKS0Gca1TW98g=
-X-Google-Smtp-Source: AGHT+IHUaxe0AnXph4dBIevozEZnUOcrwvDqIl2g8h8IvDVF4l6egDSUPF8nXc6ljHILalz+X+vDAQ==
-X-Received: by 2002:a17:907:3d8e:b0:b09:48c6:b7b0 with SMTP id a640c23a62f3a-b1bc00ff8a1mr275398166b.56.1758115329082;
-        Wed, 17 Sep 2025 06:22:09 -0700 (PDT)
+        bh=zxHJ6YWeIRTtthEArUF4cARG1qX3tNYYzwro9p5CGbY=;
+        b=bYL71Di1f9zNWI3MwdGZG4V2867TGspxHZesDE3QK7eX8VkJb7lLzFke9iD0SamRee
+         UpvyhzgyKTMiOwdn52lf4a0xH6FJgHrgawFIDIBfAYPgXxyRwgCCUhPDlN7Cpv2XlxDI
+         CRyO8IJPx7n6eyNbyhD60mB5GC6GkF6efQQNC6rJPbSb4Ubi9WrDC54jp+7w6o1gMiav
+         rgSbh6IFHLv2XIupBq4ieS+Qb52n6QKX/MWOLwCfPfAxjtDyz2nVZDoRAq4CcShMHl1n
+         BEKixcU4SqXjHPC+wwiMdHg57mzxTqsZhKW33VnDVMPyKJxr/i4DBSXNLhZvyTJKNAt4
+         ZGhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758115331; x=1758720131;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zxHJ6YWeIRTtthEArUF4cARG1qX3tNYYzwro9p5CGbY=;
+        b=g+E0FEJBrtcZ+gvCBBVatXGMaKQUF7pwzy5gVKa3+RN3V8TJbHk8aSZ62M6YWbGjOW
+         NlcTCLCFgTFuEcy7yfIGTE91QWrl2rqJHZOD208aqGrapKRSAD5mevDFLYYAMYqLgIRT
+         mu6EELme5qmPR7qwU9Xpya06hLjHZ6dCogllvDR5vp+BzYH9cndgvjbWZjaAdCiyD3nk
+         mAe5ozkM3+rdFN9ghiDTR15ka+epjvHs5PAPZhEW+bxgZisZpLzDR0ABzJG0LGT2iD8p
+         rRtcWUYC2OmeIZrY723qKrMOuG8Oka+M7HOVdyUaCnarCb2Zdwb2NBaCvQVoFKNrguOJ
+         Fx2Q==
+X-Gm-Message-State: AOJu0Yxz3kITJdhnhK7fR/OlzLpsp8SRqXSk8QEHfOI8UEkhNHYoUeoR
+	FeqquK/+1sWJac3FIy9FbH4or1tg5zqVv9UoODjyOheKa06UeLxChB32ygelxCWXmlI=
+X-Gm-Gg: ASbGncsoKcqQoH03kC62aQqldKSTlIbj59DdapjH2RDic1zlhueFEvBREPmHZ0t8+AR
+	6FP2TE8PX11llCuSI97g1TKQQ3EbYqq+YFbFlKq/zybbRobC1myyqGU/QbBW4jPr2QQSgfvcp8v
+	jI0ffvpfhKlA3GUkP9eTRi6Zw3nQ6g/hBe69dqZUHk8xG3VLBqPEf3mUiuqRInbz97EzYSI71v2
+	SukOgg1vPE+LVQljCEFaUF8rVOMTSJ0+ZAYwx1jO4SxIrUj/tr3OiLjjNp94hFkvhJc3EOjXSM5
+	yzpldIo/mifJpKUf3VEnJXg1//YcF0k+n2kc47YNS3yeEPnSxE7/35IY0hZMcjDD1nTf7T14CGk
+	n9E+9ND/6cktSuzK1EtQNiLRbCA==
+X-Google-Smtp-Source: AGHT+IF7Ee7YE/Y71wJztkRX4dFlXmrMDrVbuVqtKYbGKU7ssf5LPJaP0WP67bRL7EY/oPbIftBdWQ==
+X-Received: by 2002:a17:907:9813:b0:b04:616c:d746 with SMTP id a640c23a62f3a-b1bb0f27edamr272809966b.25.1758115331070;
+        Wed, 17 Sep 2025 06:22:11 -0700 (PDT)
 Received: from cloudflare.com ([2a09:bac5:506a:295f::41f:64])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07cedd8cdesm1064763366b.24.2025.09.17.06.22.08
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b33478besm1391129966b.99.2025.09.17.06.22.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 06:22:08 -0700 (PDT)
+        Wed, 17 Sep 2025 06:22:10 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Subject: [PATCH net-next v5 0/2] tcp: Update bind bucket state on port
+Date: Wed, 17 Sep 2025 15:22:04 +0200
+Subject: [PATCH net-next v5 1/2] tcp: Update bind bucket state on port
  release
-Date: Wed, 17 Sep 2025 15:22:03 +0200
-Message-Id: <20250917-update-bind-bucket-state-on-unhash-v5-0-57168b661b47@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,12 +84,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAPu1ymgC/43OwW7DIAyA4VepOI8JDDTJTnuPaQcHzILWQQUk6
- lTl3UejSau0HnI0lr+fKyuUAxX2criyTEsoIcU2mKcDsxPGD+LBtZmBACN60fH57LASH0N0fJz
- tJ1Ve6u0lRT7HCcvEfa/BoOlgAMcadM7kw2WLvLHYDiJdKntvmymUmvL3Vl/ktv8N9XtCi+SCe
- /S9EcPgjnJ8tac0O3/CTM82fW2NBe5ckLtcaK6wILTRCg3AQ1f9uYMUu1x1c0FZRK+RlH3o6nt
- X7XJ1c1X76bEzg3a+++eu6/oDHLpYPusBAAA=
-X-Change-ID: 20250807-update-bind-bucket-state-on-unhash-f8425a57292d
+Message-Id: <20250917-update-bind-bucket-state-on-unhash-v5-1-57168b661b47@cloudflare.com>
+References: <20250917-update-bind-bucket-state-on-unhash-v5-0-57168b661b47@cloudflare.com>
+In-Reply-To: <20250917-update-bind-bucket-state-on-unhash-v5-0-57168b661b47@cloudflare.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
@@ -98,150 +95,271 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  Lee Valentine <lvalentine@cloudflare.com>
 X-Mailer: b4 0.15-dev-07fe9
 
-TL;DR
------
+Today, once an inet_bind_bucket enters a state where fastreuse >= 0 or
+fastreuseport >= 0 after a socket is explicitly bound to a port, it remains
+in that state until all sockets are removed and the bucket is destroyed.
 
-This is another take on addressing the issue we already raised earlier [1].
+In this state, the bucket is skipped during ephemeral port selection in
+connect(). For applications using a reduced ephemeral port
+range (IP_LOCAL_PORT_RANGE socket option), this can cause faster port
+exhaustion since blocked buckets are excluded from reuse.
 
-This time around, instead of trying to relax the bind-conflict checks in
-connect(), we make an attempt to fix the tcp bind bucket state accounting.
+The reason the bucket state isn't updated on port release is unclear.
+Possibly a performance trade-off to avoid scanning bucket owners, or just
+an oversight.
 
-The goal of this patch set is to make the bind buckets return to "port
-reusable by ephemeral connections" state when all sockets blocking the port
-from reuse get unhashed.
+Fix it by recalculating the bucket state when a socket releases a port. To
+limit overhead, each inet_bind2_bucket stores its own (fastreuse,
+fastreuseport) state. On port release, only the relevant port-addr bucket
+is scanned, and the overall state is derived from these.
 
-Changelog
----------
-Changes in v5:
-- Fix initial port-addr bucket state on saddr update with ip_dynaddr=1
-- Add Kuniyuki's tag for tests
-- Link to v4: https://lore.kernel.org/r/20250913-update-bind-bucket-state-on-unhash-v4-0-33a567594df7@cloudflare.com
-
-Changes in v4:
-- Drop redundant sk_is_connect_bind helper doc comment
-- Link to v3: https://lore.kernel.org/r/20250910-update-bind-bucket-state-on-unhash-v3-0-023caaf4ae3c@cloudflare.com
-
-Changes in v3:
-- Move the flag from inet_flags to sk_userlocks (Kuniyuki)
-- Rename the flag from AUTOBIND to CONNECT_BIND to avoid a name clash (Kuniyuki)
-- Drop unreachable code for sk_state == TCP_NEW_SYN_RECV (Kuniyuki)
-- Move the helper to inet_hashtables where it's used
-- Reword patch 1 description for conciseness
-- Link to v2: https://lore.kernel.org/r/20250821-update-bind-bucket-state-on-unhash-v2-0-0c204543a522@cloudflare.com
-
-Changes in v2:
-- Rename the inet_sock flag from LAZY_BIND to AUTOBIND (Eric)
-- Clear the AUTOBIND flag on disconnect path (Eric)
-- Add a test to cover the disconnect case (Eric)
-- Link to RFC v1: https://lore.kernel.org/r/20250808-update-bind-bucket-state-on-unhash-v1-0-faf85099d61b@cloudflare.com
-
-Situation
----------
-
-We observe the following scenario in production:
-
-                                                  inet_bind_bucket
-                                                state for port 54321
-                                                --------------------
-
-                                                (bucket doesn't exist)
-
-// Process A opens a long-lived connection:
-s1 = socket(AF_INET, SOCK_STREAM)
-s1.setsockopt(IP_BIND_ADDRESS_NO_PORT)
-s1.setsockopt(IP_LOCAL_PORT_RANGE, 54000..54500)
-s1.bind(192.0.2.10, 0)
-s1.connect(192.51.100.1, 443)
-                                                tb->fastreuse = -1
-                                                tb->fastreuseport = -1
-s1.getsockname() -> 192.0.2.10:54321
-s1.send()
-s1.recv()
-// ... s1 stays open.
-
-// Process B opens a short-lived connection:
-s2 = socket(AF_INET, SOCK_STREAM)
-s2.setsockopt(SO_REUSEADDR)
-s2.bind(192.0.2.20, 0)
-                                                tb->fastreuse = 0
-                                                tb->fastreuseport = 0
-s2.connect(192.51.100.2, 53)
-s2.getsockname() -> 192.0.2.20:54321
-s2.send()
-s2.recv()
-s2.close()
-
-                                                // bucket remains in this
-                                                // state even though port
-                                                // was released by s2
-                                                tb->fastreuse = 0
-                                                tb->fastreuseport = 0
-
-// Process A attempts to open another connection
-// when there is connection pressure from
-// 192.0.2.30:54000..54500 to 192.51.100.1:443.
-// Assume only port 54321 is still available.
-
-s3 = socket(AF_INET, SOCK_STREAM)
-s3.setsockopt(IP_BIND_ADDRESS_NO_PORT)
-s3.setsockopt(IP_LOCAL_PORT_RANGE, 54000..54500)
-s3.bind(192.0.2.30, 0)
-s3.connect(192.51.100.1, 443) -> EADDRNOTAVAIL (99)
-
-Problem
--------
-
-We end up in a state where Process A can't reuse ephemeral port 54321 for
-as long as there are sockets, like s1, that keep the bind bucket alive. The
-bucket does not return to "reusable" state even when all sockets which
-blocked it from reuse, like s2, are gone.
-
-The ephemeral port becomes available for use again only after all sockets
-bound to it are gone and the bind bucket is destroyed.
-
-Programs which behave like Process B in this scenario - that is, binding to
-an IP address without setting IP_BIND_ADDRESS_NO_PORT - might be considered
-poorly written. However, the reality is that such implementation is not
-actually uncommon. Trying to fix each and every such program is like
-playing whack-a-mole.
-
-For instance, it could be any software using Golang's net.Dialer with
-LocalAddr provided:
-
-        dialer := &net.Dialer{
-                LocalAddr: &net.TCPAddr{IP: srcIP},
-        }
-        conn, err := dialer.Dial("tcp4", dialTarget)
-
-Or even a ubiquitous tool like dig when using a specific local address:
-
-        $ dig -b 127.1.1.1 +tcp +short example.com
-
-Hence, we are proposing a systematic fix in the network stack itself.
-
-Solution
---------
-
-Please see the description in patch 1.
-
-[1] https://lore.kernel.org/r/20250714-connect-port-search-harder-v3-0-b1a41f249865@cloudflare.com
-
-Reported-by: Lee Valentine <lvalentine@cloudflare.com>
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
-Jakub Sitnicki (2):
-      tcp: Update bind bucket state on port release
-      selftests/net: Test tcp port reuse after unbinding a socket
+ include/net/inet_connection_sock.h |  5 +++--
+ include/net/inet_hashtables.h      |  2 ++
+ include/net/inet_timewait_sock.h   |  3 ++-
+ include/net/sock.h                 |  4 ++++
+ net/ipv4/inet_connection_sock.c    | 12 +++++++----
+ net/ipv4/inet_hashtables.c         | 44 +++++++++++++++++++++++++++++++++++++-
+ net/ipv4/inet_timewait_sock.c      |  1 +
+ 7 files changed, 63 insertions(+), 8 deletions(-)
 
- include/net/inet_connection_sock.h           |   5 +-
- include/net/inet_hashtables.h                |   2 +
- include/net/inet_timewait_sock.h             |   3 +-
- include/net/sock.h                           |   4 +
- net/ipv4/inet_connection_sock.c              |  12 +-
- net/ipv4/inet_hashtables.c                   |  44 ++++-
- net/ipv4/inet_timewait_sock.c                |   1 +
- tools/testing/selftests/net/Makefile         |   1 +
- tools/testing/selftests/net/tcp_port_share.c | 258 +++++++++++++++++++++++++++
- 9 files changed, 322 insertions(+), 8 deletions(-)
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index 0737d8e178dd..b4b886647607 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -316,8 +316,9 @@ int inet_csk_listen_start(struct sock *sk);
+ void inet_csk_listen_stop(struct sock *sk);
+ 
+ /* update the fast reuse flag when adding a socket */
+-void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+-			       struct sock *sk);
++void inet_csk_update_fastreuse(const struct sock *sk,
++			       struct inet_bind_bucket *tb,
++			       struct inet_bind2_bucket *tb2);
+ 
+ struct dst_entry *inet_csk_update_pmtu(struct sock *sk, u32 mtu);
+ 
+diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+index a3b32241c2f2..1875853e97a4 100644
+--- a/include/net/inet_hashtables.h
++++ b/include/net/inet_hashtables.h
+@@ -108,6 +108,8 @@ struct inet_bind2_bucket {
+ 	struct hlist_node	bhash_node;
+ 	/* List of sockets hashed to this bucket */
+ 	struct hlist_head	owners;
++	signed char		fastreuse;
++	signed char		fastreuseport;
+ };
+ 
+ static inline struct net *ib_net(const struct inet_bind_bucket *ib)
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
+index 67a313575780..baafef24318e 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -70,7 +70,8 @@ struct inet_timewait_sock {
+ 	unsigned int		tw_transparent  : 1,
+ 				tw_flowlabel	: 20,
+ 				tw_usec_ts	: 1,
+-				tw_pad		: 2,	/* 2 bits hole */
++				tw_connect_bind	: 1,
++				tw_pad		: 1,	/* 1 bit hole */
+ 				tw_tos		: 8;
+ 	u32			tw_txhash;
+ 	u32			tw_priority;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 0fd465935334..2e398ac33308 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1490,6 +1490,10 @@ static inline int __sk_prot_rehash(struct sock *sk)
+ 
+ #define SOCK_BINDADDR_LOCK	4
+ #define SOCK_BINDPORT_LOCK	8
++/**
++ * define SOCK_CONNECT_BIND - &sock->sk_userlocks flag for auto-bind at connect() time
++ */
++#define SOCK_CONNECT_BIND	16
+ 
+ struct socket_alloc {
+ 	struct socket socket;
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 142ff8d86fc2..cdd1e12aac8c 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -423,7 +423,7 @@ inet_csk_find_open_port(const struct sock *sk, struct inet_bind_bucket **tb_ret,
+ }
+ 
+ static inline int sk_reuseport_match(struct inet_bind_bucket *tb,
+-				     struct sock *sk)
++				     const struct sock *sk)
+ {
+ 	if (tb->fastreuseport <= 0)
+ 		return 0;
+@@ -453,8 +453,9 @@ static inline int sk_reuseport_match(struct inet_bind_bucket *tb,
+ 				    ipv6_only_sock(sk), true, false);
+ }
+ 
+-void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+-			       struct sock *sk)
++void inet_csk_update_fastreuse(const struct sock *sk,
++			       struct inet_bind_bucket *tb,
++			       struct inet_bind2_bucket *tb2)
+ {
+ 	bool reuse = sk->sk_reuse && sk->sk_state != TCP_LISTEN;
+ 
+@@ -501,6 +502,9 @@ void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+ 			tb->fastreuseport = 0;
+ 		}
+ 	}
++
++	tb2->fastreuse = tb->fastreuse;
++	tb2->fastreuseport = tb->fastreuseport;
+ }
+ 
+ /* Obtain a reference to a local port for the given sock,
+@@ -582,7 +586,7 @@ int inet_csk_get_port(struct sock *sk, unsigned short snum)
+ 	}
+ 
+ success:
+-	inet_csk_update_fastreuse(tb, sk);
++	inet_csk_update_fastreuse(sk, tb, tb2);
+ 
+ 	if (!inet_csk(sk)->icsk_bind_hash)
+ 		inet_bind_hash(sk, tb, tb2, port);
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index ef4ccfd46ff6..0e0b3d24c3f5 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -58,6 +58,14 @@ static u32 sk_ehashfn(const struct sock *sk)
+ 			    sk->sk_daddr, sk->sk_dport);
+ }
+ 
++static bool sk_is_connect_bind(const struct sock *sk)
++{
++	if (sk->sk_state == TCP_TIME_WAIT)
++		return inet_twsk(sk)->tw_connect_bind;
++	else
++		return sk->sk_userlocks & SOCK_CONNECT_BIND;
++}
++
+ /*
+  * Allocate and initialize a new local port bind bucket.
+  * The bindhash mutex for snum's hash chain must be held here.
+@@ -87,10 +95,22 @@ struct inet_bind_bucket *inet_bind_bucket_create(struct kmem_cache *cachep,
+  */
+ void inet_bind_bucket_destroy(struct inet_bind_bucket *tb)
+ {
++	const struct inet_bind2_bucket *tb2;
++
+ 	if (hlist_empty(&tb->bhash2)) {
+ 		hlist_del_rcu(&tb->node);
+ 		kfree_rcu(tb, rcu);
++		return;
++	}
++
++	if (tb->fastreuse == -1 && tb->fastreuseport == -1)
++		return;
++	hlist_for_each_entry(tb2, &tb->bhash2, bhash_node) {
++		if (tb2->fastreuse != -1 || tb2->fastreuseport != -1)
++			return;
+ 	}
++	tb->fastreuse = -1;
++	tb->fastreuseport = -1;
+ }
+ 
+ bool inet_bind_bucket_match(const struct inet_bind_bucket *tb, const struct net *net,
+@@ -121,6 +141,8 @@ static void inet_bind2_bucket_init(struct inet_bind2_bucket *tb2,
+ #else
+ 	tb2->rcv_saddr = sk->sk_rcv_saddr;
+ #endif
++	tb2->fastreuse = 0;
++	tb2->fastreuseport = 0;
+ 	INIT_HLIST_HEAD(&tb2->owners);
+ 	hlist_add_head(&tb2->node, &head->chain);
+ 	hlist_add_head(&tb2->bhash_node, &tb->bhash2);
+@@ -143,11 +165,23 @@ struct inet_bind2_bucket *inet_bind2_bucket_create(struct kmem_cache *cachep,
+ /* Caller must hold hashbucket lock for this tb with local BH disabled */
+ void inet_bind2_bucket_destroy(struct kmem_cache *cachep, struct inet_bind2_bucket *tb)
+ {
++	const struct sock *sk;
++
+ 	if (hlist_empty(&tb->owners)) {
+ 		__hlist_del(&tb->node);
+ 		__hlist_del(&tb->bhash_node);
+ 		kmem_cache_free(cachep, tb);
++		return;
+ 	}
++
++	if (tb->fastreuse == -1 && tb->fastreuseport == -1)
++		return;
++	sk_for_each_bound(sk, &tb->owners) {
++		if (!sk_is_connect_bind(sk))
++			return;
++	}
++	tb->fastreuse = -1;
++	tb->fastreuseport = -1;
+ }
+ 
+ static bool inet_bind2_bucket_addr_match(const struct inet_bind2_bucket *tb2,
+@@ -191,6 +225,7 @@ static void __inet_put_port(struct sock *sk)
+ 	tb = inet_csk(sk)->icsk_bind_hash;
+ 	inet_csk(sk)->icsk_bind_hash = NULL;
+ 	inet_sk(sk)->inet_num = 0;
++	sk->sk_userlocks &= ~SOCK_CONNECT_BIND;
+ 
+ 	spin_lock(&head2->lock);
+ 	if (inet_csk(sk)->icsk_bind2_hash) {
+@@ -277,7 +312,7 @@ int __inet_inherit_port(const struct sock *sk, struct sock *child)
+ 		}
+ 	}
+ 	if (update_fastreuse)
+-		inet_csk_update_fastreuse(tb, child);
++		inet_csk_update_fastreuse(child, tb, tb2);
+ 	inet_bind_hash(child, tb, tb2, port);
+ 	spin_unlock(&head2->lock);
+ 	spin_unlock(&head->lock);
+@@ -966,6 +1001,10 @@ static int __inet_bhash2_update_saddr(struct sock *sk, void *saddr, int family,
+ 	if (!tb2) {
+ 		tb2 = new_tb2;
+ 		inet_bind2_bucket_init(tb2, net, head2, inet_csk(sk)->icsk_bind_hash, sk);
++		if (sk_is_connect_bind(sk)) {
++			tb2->fastreuse = -1;
++			tb2->fastreuseport = -1;
++		}
+ 	}
+ 	inet_csk(sk)->icsk_bind2_hash = tb2;
+ 	sk_add_bind_node(sk, &tb2->owners);
+@@ -1136,6 +1175,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 					       head2, tb, sk);
+ 		if (!tb2)
+ 			goto error;
++		tb2->fastreuse = -1;
++		tb2->fastreuseport = -1;
+ 	}
+ 
+ 	/* Here we want to add a little bit of randomness to the next source
+@@ -1148,6 +1189,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 
+ 	/* Head lock still held and bh's disabled */
+ 	inet_bind_hash(sk, tb, tb2, port);
++	sk->sk_userlocks |= SOCK_CONNECT_BIND;
+ 
+ 	if (sk_unhashed(sk)) {
+ 		inet_sk(sk)->inet_sport = htons(port);
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 5b5426b8ee92..3d51f751876d 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -207,6 +207,7 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
+ 		tw->tw_hash	    = sk->sk_hash;
+ 		tw->tw_ipv6only	    = 0;
+ 		tw->tw_transparent  = inet_test_bit(TRANSPARENT, sk);
++		tw->tw_connect_bind = !!(sk->sk_userlocks & SOCK_CONNECT_BIND);
+ 		tw->tw_prot	    = sk->sk_prot_creator;
+ 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
+ 		twsk_net_set(tw, sock_net(sk));
+
+-- 
+2.43.0
 
 
