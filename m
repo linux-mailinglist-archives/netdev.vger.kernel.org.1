@@ -1,55 +1,48 @@
-Return-Path: <netdev+bounces-224086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79A45B80971
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:33:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DED76B8098C
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:33:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBDB216D09B
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:33:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3F961C2728D
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC07F333AA6;
-	Wed, 17 Sep 2025 15:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD228333AB7;
+	Wed, 17 Sep 2025 15:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Fbq2AHxG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l66zIifN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9511369B4;
-	Wed, 17 Sep 2025 15:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EB2333AA7
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758123184; cv=none; b=Pvmwd8jrvgnqWCsseJ43bUzhDIR73KrnKwKOhjB7EFklknTjAUM+U6tR4/Lf0jHtB/q5el2l29FOkGvwViZWHlbL75LK5b5DURUcoWgj4be0Mf3LTOLTjPOaYs1Gvu0X2L5aiM/gCp1+D6DDZrSCgxgD3XnDqvnH5EqA0cOTNsE=
+	t=1758123193; cv=none; b=AL7LeD0UBASlwhd375ojnYzuBlPEGZsseTOSwhbZFncifgNAU4nN0GJIlxDCWROhlgvIPmE4QkvnWraq9MJp+NRgO0lLD19yDwA7YdS76kq1U6rLTYu4FJJP3w+2BztMnoaedrakquxEDfFfulucVxg6zsopB/5GMbBfbyFZz9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758123184; c=relaxed/simple;
-	bh=Hc351q4nYxBtizLPpdMYPsra/T/ADj1HoY+Za3zpojg=;
+	s=arc-20240116; t=1758123193; c=relaxed/simple;
+	bh=0eHJKUg9Z9QwSL1QKlQ9WcBEPmU6m6jNIupR+6jrlUU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GTtWW73ZQKHtoazL92kYnGic9eMb9cA7NH0/n0RbTiECoHCPItp1J2pT/UFbK7VR9/2WdM0n9plVyvZ0Q4Df74e4pzyfH9dVahmTH0QRLL6rni9LxV+C5hqHcpNsmiL5LOYk+Fl9Q9g8KVG4bP7MxzKZ/4PtZNsIU3sGnMsCZoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Fbq2AHxG; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 5878A1A0E8F;
-	Wed, 17 Sep 2025 15:33:01 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2A93D6063E;
-	Wed, 17 Sep 2025 15:33:01 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 36D80102F1BF4;
-	Wed, 17 Sep 2025 17:32:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758123180; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=KvBFi2h1uOxbQSe3Qg7pMz9oi1pLN3OKIQs0ZmF1Qzk=;
-	b=Fbq2AHxGtY47IIcSa4Culc0rQoPlBe6J/KabnGGAnkRHAImzIyRedtbsPZLnBcuH928DBF
-	zqdZk+la6iUXkeNOEFqwVW2en9mAgIB+TjRSRQcwum+LM48/+2zWzuAm0zW+U/WE3Niskn
-	sLrFBtXum9AmBL6yoAP5mHAHQPaBz30jp7tKLyaGBDwTSXJo/iQ1fG7WA51k2/xJPCwqg2
-	LFLMZgY9FO2gSSfsWGmPDgf+XJKxnHnLVi90kOzUGCGI24PrcDtW52tX6mCRKLZTW6/WTm
-	sEUV2z180ESgNff9cRCU+VULMjFt7a+91OrnBMr4zfIdF1KAExOCtcm3kgV5mg==
-Message-ID: <6ac21f07-45ef-4e80-bedf-c0470df47bc7@bootlin.com>
-Date: Wed, 17 Sep 2025 17:32:55 +0200
+	 In-Reply-To:Content-Type; b=nsygrbwc/W41pHXKgj8q8boozpFtoP8iFwSKtIa/RBo/EF5hY0x3poyIp6tqPfTllV+r4QKfDm0XllgeY5k4b7zOyTd9432IhTPvM2Ubh1d1bHuaRrfWS151OcSvygfsR+axXkZhS/J7mjaty28ejvU8F3ITv1V1tas8D7w0Kio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l66zIifN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D10CCC4CEE7;
+	Wed, 17 Sep 2025 15:33:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758123193;
+	bh=0eHJKUg9Z9QwSL1QKlQ9WcBEPmU6m6jNIupR+6jrlUU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=l66zIifNxSnT1U3KP2jCIL3a3bJYVA2V3YYg6zQWV3x1/AJyW6gayVi+eWS89KQdH
+	 hTACyPeQaLl5Q0jJIwDjA2pz0FFzubv9rj20UtKMbfDT+BtG/xSxwl75tgWdBthMBi
+	 fI06lnwtTajLCpYLUtWatONu+8SrpistTTFzIenZXdjbLG/p9yQqZOGk85dX9q05Nf
+	 WrF8v0g7IJVfCh9u40Ym9fRuRn+wSOZLH78k/WaZGxhSZ42eDtqb80yRNVszI59zPn
+	 mXk3/h6OuhyfDk+MhuBTUjFQnr4IcLiuvtJDl6qshUCU1ho5PRB0agp/iwiCEf2/or
+	 beKHwli25fvyw==
+Message-ID: <a694fead-4e27-4eb2-b1c5-6a283b6a30f8@kernel.org>
+Date: Wed, 17 Sep 2025 09:33:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,64 +50,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 03/14] selftests/bpf: test_xsk: Fix memory
- leaks
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250904-xsk-v3-0-ce382e331485@bootlin.com>
- <20250904-xsk-v3-3-ce382e331485@bootlin.com> <aMmlNc1z5ULnOjJY@boxer>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Subject: Re: [PATCH net-next 02/10] ipv6: make ipv6_pinfo.daddr_cache a
+ boolean
 Content-Language: en-US
-In-Reply-To: <aMmlNc1z5ULnOjJY@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20250916160951.541279-1-edumazet@google.com>
+ <20250916160951.541279-3-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250916160951.541279-3-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Maciej
-
-On 9/16/25 7:58 PM, Maciej Fijalkowski wrote:
-> On Thu, Sep 04, 2025 at 12:10:18PM +0200, Bastien Curutchet (eBPF Foundation) wrote:
->> Some tests introduce memory leaks by not freeing all the pkt_stream
->> objects they're creating.
->>
->> Fix these memory leaks.
+On 9/16/25 10:09 AM, Eric Dumazet wrote:
+> ipv6_pinfo.daddr_cache is either NULL or &sk->sk_v6_daddr
 > 
-> I would appreciate being more explicit here as I've been scratching my
-> head here.
+> We do not need 8 bytes, a boolean is enough.
 > 
-
-Indeed it lacks details sorry. IIRC I spotted these with valgrind, maybe 
-I can add valgrind's output to the commit log in next iteration.
-
->  From what I see the problem is with testapp_stats_rx_dropped() as it's the
-> one case that uses replace and receive half of pkt streams, both of which
-> overwrite the default pkt stream. So we lose a pointer to one of pkt
-> streams and leak it eventually.
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/linux/ipv6.h             | 2 +-
+>  include/net/ip6_route.h          | 4 ++--
+>  net/ipv6/af_inet6.c              | 2 +-
+>  net/ipv6/inet6_connection_sock.c | 2 +-
+>  net/ipv6/ip6_output.c            | 3 ++-
+>  net/ipv6/route.c                 | 3 +--
+>  net/ipv6/tcp_ipv6.c              | 4 ++--
+>  7 files changed, 10 insertions(+), 10 deletions(-)
 > 
 
-Exactly, we lose pointers in some cases when xsk->pkt_stream gets 
-replaced by a new stream. testapp_stats_rx_dropped() is the most 
-convoluted of these cases.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Best regards,
--- 
-Bastien Curutchet, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
 
 
