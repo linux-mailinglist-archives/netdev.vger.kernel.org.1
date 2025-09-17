@@ -1,151 +1,145 @@
-Return-Path: <netdev+bounces-223857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7293FB7DD7F
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:35:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E94B80011
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 907F05811D9
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 05:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C949324B6C
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 05:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411AE264A60;
-	Wed, 17 Sep 2025 05:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="cfitw200"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A8F242D6E;
+	Wed, 17 Sep 2025 05:46:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azolkn19010095.outbound.protection.outlook.com [52.103.10.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4EC21578F;
-	Wed, 17 Sep 2025 05:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.10.95
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758087002; cv=fail; b=RuqSLWxQo56jPtfmW9h9q65dvAycTLiBBZWqlxpBDbesHp/9IuwnHKzEa0XMQK8fbUlaqGTPc4bO6hjJIq89sssBiTXfuaqE9du7LF6/f7TBeIN2U/8PKcVSA4zfinU4fCfBe3YKto/8aoKIrhSXllYr1c9TZR8YTJ/P+SwoxWs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758087002; c=relaxed/simple;
-	bh=YtH8n9QdP0+DMmlNy8GyHh2RgAzR+JXVlDGLYKlH0fQ=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=WkOohiOhcrMUBdlW1uGJqbKLxTA2Gx9S/wzGswoM5lyJ2Lzm+GjtnQ5lu81VRBlesSLKZy+5ayPu6odJ5j4/1MZ6/VHlGmCEOXQKcjt5wtbnu+bp9kjiuZ8H3XmDFp2ltGqq132lf7HIE6i8zgTbiV7rFLlc5NKgxvL4RU66Fsg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=cfitw200; arc=fail smtp.client-ip=52.103.10.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=M5JPo2L026jA9qoK9FSSKijIau2cjB45yJYKDGldnrOSgiMfG9g+wk0XTAKhRVSTktmxxTdJjrZGaE9PSwzjDCZc30EhiAOCqWKrlijDYVK7X4Am7tUatYsreGU4TkaKC8vpxKtXCxEo3o+2b8C65P6Vl28sbUbf3Lnexmg3QO7pbwQmoe0Tic/F70620Ct+065mKfGpRICM4ZmLYKkZ4dm2dE9IOuR/f6ccHOZrSBJTidA/qNOLiX+0MDiiXgFhuGhVS+FIqCVq88PNDuLmCVS9H1IysRSYHYhWjpQS4a49/NtUC3mVjnY84zoCGzHTiSufnSugO5j/xejo3UOOHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YtH8n9QdP0+DMmlNy8GyHh2RgAzR+JXVlDGLYKlH0fQ=;
- b=CtBbnT4NkaAFXf8K+MkJHxdhFdBHc/q/+LRL4pwtLCIHfCAPyof1rGIVfxbgrgnNGrS+/u/wJGCfCyVfGNOKbRDAQD4zQMCNKUBf9adJCSLUZQrpPwScHE+lwxeg3XpAlaFGijWSdm2+hQwHRdubzfNbUAWMJUo2IUKbuN/vTO+H0LbkVw+3igDPRXOSDMIbW5QkhhUhg8ofxRfURSM1tetIhDyGmFqwZIJTt4rAdy4BBoLbIEO+Qoanm9glendJzAlJJxVD9OvOAfN4uKP9RMDYiVdooa266Djo52qO347JrVpVO5WOtW8TPyMCkLFhZOEDWjqZXFoZVwhJwhf1tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YtH8n9QdP0+DMmlNy8GyHh2RgAzR+JXVlDGLYKlH0fQ=;
- b=cfitw200uqr3hp58VLdBdtOy2eNkp/yUfuxnBcF32+WtshluEPySmHKFIIqQv3sqdyeDAtTD+Ui31jSsssY0GxYWlZrPu/t1QKoksHowfdq05F4XSdDJM08scyOGOF2tg62KSRRfBrQ4VM0sIG6I/39W7ZtnBXf3KpTpVXL8dq6TLxJE0nnWuOR4d1mVOACLXnq6LCNt2lfeh+9WkiI2Cu3XsisBhcYiL6g2iMy3L5GOBWpzlR5/vvqK+zELogSDyQWH+2kKgEARxjT9BNZhP5BTmbAIsFpg/RT5JRxYbvUbKCqtAdW7Ixc5EF9x2njASMD92VNDViD6EEtP5eSGZQ==
-Received: from PH7PR10MB6531.namprd10.prod.outlook.com (2603:10b6:510:202::5)
- by DS7PR10MB5022.namprd10.prod.outlook.com (2603:10b6:5:3a3::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Wed, 17 Sep
- 2025 05:29:59 +0000
-Received: from PH7PR10MB6531.namprd10.prod.outlook.com
- ([fe80::459d:2445:2e8b:26cd]) by PH7PR10MB6531.namprd10.prod.outlook.com
- ([fe80::459d:2445:2e8b:26cd%7]) with mapi id 15.20.9094.018; Wed, 17 Sep 2025
- 05:29:58 +0000
-From: Da Shi Cao <dscao999@hotmail.com>
-To: "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Configure CAN port using NETLINK messages
-Thread-Topic: Configure CAN port using NETLINK messages
-Thread-Index: AQHcJ5PgVeyE9tTzzkWYcTIqTLk3Ug==
-Date: Wed, 17 Sep 2025 05:29:58 +0000
-Message-ID:
- <PH7PR10MB65312C84F0B6A652BB3A34178C17A@PH7PR10MB6531.namprd10.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR10MB6531:EE_|DS7PR10MB5022:EE_
-x-ms-office365-filtering-correlation-id: b3525837-c90b-489d-bc0b-08ddf5ab3e1c
-x-microsoft-antispam:
- BCL:0;ARA:14566002|15080799012|15030799006|8062599012|8060799015|461199028|31061999003|19110799012|102099032|39105399003|40105399003|51005399003|440099028|3412199025|26104999006;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?fihBeX+wRTRwcK6vSHSgtGraWNaRPFwaCU0oLcrOe9kreriY186NpGiq3O?=
- =?iso-8859-1?Q?b1WQ1Vyw/wLKx7YLmf+2CKOaAZJWLcHa2McrSpkWVEH1Rw0xS6PqJq8krI?=
- =?iso-8859-1?Q?bj+BcX2rJAO5LwGmj6j2yKjHhaFQF/LE3q8J7B3pxJpAwN1elgl1ox4MLN?=
- =?iso-8859-1?Q?xSN9I3IslJ0zylpPtUFWQQMbQ5fxgfvnFJsWzzUYHS8p8Aa/1SKIZIl/T6?=
- =?iso-8859-1?Q?W9IQ5iCY+i4lYl3wQtBYcuBXLo/F2/8cHEwUqRJvqwafQ7lXWJUWiVCNrW?=
- =?iso-8859-1?Q?40AKwTNI2ovq4UU2NySyYkABaWOxkmbBKtDj6C5jBIJYYe2dOgEd7uI0kh?=
- =?iso-8859-1?Q?DlHmkIgm+bz9CRS/Eg5VZ1QXCK/cJJEdUG66tHG8+1kYyIRCjfv/MnzmGs?=
- =?iso-8859-1?Q?/6lNYSBVJDDcm+2kdjxyKjzTpEYZq0I0ok2dcyGUCS23NwnLIoQMeMCLXE?=
- =?iso-8859-1?Q?HAgFid3tpEkUZ5W2y3kBx0IwLk9Gl/dkoC3tQcID7/SmZ92HYbu+8bv5Xc?=
- =?iso-8859-1?Q?m8COjPCbd7XP1GCG4cTlbZRPzE28E6SkyNmXafdov/Te1u2u7GEtM2m4qP?=
- =?iso-8859-1?Q?R57l7QKcUzWLlhGozzEPfsfV2wsXBNEqTwHj83kPRlKhfIUDe0gnl4w2t+?=
- =?iso-8859-1?Q?ivUu4rJ6r/8mrOKGit/bl9Fs2eptoUlUsQNPYvRrdx0Wq3XCJwtcRlF6WF?=
- =?iso-8859-1?Q?xMUyrG0FZL2MsoyXAat2nKSDeRRs4mCx/1ipT6WLIeyUE1WGLTaNpC+rwC?=
- =?iso-8859-1?Q?oH/g04MHxnVW8vAVpWu+pgTDeV1/7w/aQYPODgilG1BZrNjSzw820Mt3UJ?=
- =?iso-8859-1?Q?JtnmuiA/kM+uWVO/9+wpVupHrPfg/NzwOwyq+YkDNrea1oid0K5r1RBd2w?=
- =?iso-8859-1?Q?qSTcryZzNGYi9FqnGH2oXvh4lIBPR5Nn9W09A6Dm5sAb0fF4Shx2+9JjJO?=
- =?iso-8859-1?Q?9fELRt5MpdK/bCgQoIFErDXMxCtEeRD4xoxwJxoGYh+ckiVgfNIjxWyfu9?=
- =?iso-8859-1?Q?gaJfRDMAVrd+DewURNy8j+g82EIRsikB6ptu/OU/JjxOblh+qWKYCxt0Id?=
- =?iso-8859-1?Q?vnE4Mqw6UQbkfNuA9jDtBScEplZdL9drpgwtTN8c0MnxL/boAE2Ze6wETa?=
- =?iso-8859-1?Q?8vYy4kAQC9/NFryHSETulNR/xAQ/SXH61IfPLKEm/niZaN3nwxCtmyzu2K?=
- =?iso-8859-1?Q?w2IOKuZXoy3oWk03gIBQihdlKTchpiA+7dwVT2XI8tTB8P+/kftHmScj/t?=
- =?iso-8859-1?Q?kdbXI+EObAb77mYJzAE39wY8TeP3YYRdstyb7DfHT3VNxyi+5iS0sv2uES?=
- =?iso-8859-1?Q?/+yESzJM4PPqh/qK5aoBA+D3gw=3D=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?b7QVqBw8B1Yg38sRWqD+8D6VmY7x/QIFgZaIdRuVtIrvnCg5gRu1lwyhiC?=
- =?iso-8859-1?Q?CsgJ7GAvCe/zJ98dajjjIMHVnU7OODFrf4oLEegSwMLL8oQ/O8xTly3QJV?=
- =?iso-8859-1?Q?Fp8DB6u+CMTVgLM99bZqrpfc32N4JyVsJaOM9O7vZdoRkqlExOaKiztrL0?=
- =?iso-8859-1?Q?Xsf8EIBQAGwttu8gQs5XJQeZuxbfUHQLy2t7HsjycfaWUg+eU9KOwPt+TC?=
- =?iso-8859-1?Q?wAXoMuG6/flMPs0eD3veBdjlKOH9jb/hsFFhFx8JOuwIAzXqse+vuco4A4?=
- =?iso-8859-1?Q?pkuhzVgpCzFnmUbFcvA0R9/xa/vig72frHiW2BxhmXEXZfZ18JE1utmvwY?=
- =?iso-8859-1?Q?r3Ri1O0nJm0q0SvQv2hM8Im87ze4a2jv7x4tOJdbyARR2/brv8EPX+6Fuv?=
- =?iso-8859-1?Q?iKqS2gqA37xvOZ5zIv+ih5VLsO8/oBdFSOeSRAjr6jVfRHW+Cqym3JErKZ?=
- =?iso-8859-1?Q?xG6tgaVCqiUrxJac7wqHeq5Cbn1wxn3Rsbfa6FMJsLqB2Iw0JVuPKEAEg+?=
- =?iso-8859-1?Q?Z50DVlyKbZ+AlJ/JOhX1lrVLPvm/MfiOjd7I3FvEKV4OV/eP6ir03chvrt?=
- =?iso-8859-1?Q?P4XU7686e2vWs7zyG7Fcf1uGECn6gxdfRBEebDnzcu6XicFNUDwAosrfqY?=
- =?iso-8859-1?Q?nq5fPjWQVgE7qheWJ68CSMgB2JELweSuvYIe6uYmZNXZkDozdhIPaHH9lY?=
- =?iso-8859-1?Q?JSGa9NFdHYzF8UZ43AsBRKicoMrdSXV7WRv0lxpML8hWERfZDdj+6kz9ol?=
- =?iso-8859-1?Q?VwB9vvbfCWyhu8HHuUsrGgnChLxTIopF8daVY9mIZXuytwp42UieuB8DdN?=
- =?iso-8859-1?Q?vF1xrb+6VZlUHQhoWuSGIInDzTqLaf4FlAsKevEZGfV2JH9qBHtonBWTrA?=
- =?iso-8859-1?Q?UGGS1C9NeWFOulnQPyMBidaRV1BGLi3HG2Ca3F63oYn3av8yqvK5espfFg?=
- =?iso-8859-1?Q?hrLrvLDTWV3yJ8bR5msex8ukgrCrYdoCemyCMDj5SC92vDU0YljG2b/35g?=
- =?iso-8859-1?Q?O1JYUVdd5FC4xqIjQ+4Dx1ixeM/4kQLEaYaQ+L92SaYrQ4eQq1pZSc8Pbl?=
- =?iso-8859-1?Q?2IexmLwVS0AqLS8C1+JBkXSrMEMoFM+4T9ixX5NHsGdR2ImNmasKYTsLQF?=
- =?iso-8859-1?Q?tU2jlg0bFINW++Rir9Sp91glI4HqgbCFUYZnQfgTteXaEJZN9F9E2bzQz2?=
- =?iso-8859-1?Q?pLVuH8Ct6Jb6LEmimQKlOHCXljRNm/fXYQ2zuXwe4SfP12jEfBobBI5cvu?=
- =?iso-8859-1?Q?GgmrfCnshHFMUZCBp9JQ=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1172539FCE;
+	Wed, 17 Sep 2025 05:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.182.222
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758087996; cv=none; b=XZteDee/llt/Q/2tcj6hr5HR/uMtHN2Y65TaJnlY9AEZW1+vzzkQv4sFnlIy+zlvJqXZQyMOaTzfL5ykEgxdZjtVYaoA4LXI87KpXLNXLJptTupfBcoUGAZ5uGCwZya+w8ScFxTTXtpo3KdlUCmoVY1sAJTN1fFwIh93BdWXZew=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758087996; c=relaxed/simple;
+	bh=2f19mQav6gwzMIg6V1nSP79ryNXoYeYfagKKlybhPSE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=W4vAWfau886CbnIt6VybftJINy9OIPdjMrc6yukK3swMGKMdvnDbgm5MNjbbznOJQBwXJyeZPiS1koPOKio/dcZlD2iBFTj06lcc0NvjqZ+mHxHSBLlUJiUCHC7bkRZk3BoGkbBZmn59ltTTUKp+q9zLVf2+iwMsSw3tci8ON60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=209.97.182.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from zju.edu.cn (unknown [106.117.98.100])
+	by mtasvr (Coremail) with SMTP id _____wDnoewfS8poC6JCAg--.2647S3;
+	Wed, 17 Sep 2025 13:46:08 +0800 (CST)
+Received: from ubuntu.localdomain (unknown [106.117.98.100])
+	by mail-app4 (Coremail) with SMTP id zi_KCgC3TYMcS8poA53oAQ--.17850S2;
+	Wed, 17 Sep 2025 13:46:06 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH v3 net] cnic: Fix use-after-free bugs in cnic_delete_task
+Date: Wed, 17 Sep 2025 13:46:02 +0800
+Message-Id: <20250917054602.16457-1-duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-8534-20-msonline-outlook-1700c.templateTenant
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR10MB6531.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3525837-c90b-489d-bc0b-08ddf5ab3e1c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2025 05:29:58.6602
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5022
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zi_KCgC3TYMcS8poA53oAQ--.17850S2
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwQMAWjJvXsG9gAHsa
+X-CM-DELIVERINFO: =?B?qNoS9wXKKxbFmtjJiESix3B1w3uoVhYI+vyen2ZzBEkOnu5chDpkB+ZdGnv/zQ0PbP
+	CR131FE3wBtlILXmPZxD8pDyDF6auOnSUBe/Otpe715s37l1u0dpkuwlm+i5YvY82xOPTB
+	XevXbOfKwvDIw1MoGswrnuIdOBCKa07kOFutN/OoK9AMAT+3mukI9oR5gRN+Mw==
+X-Coremail-Antispam: 1Uk129KBj93XoWxGw13WFyrAr1xZw4UJr1UArc_yoW5CryUpr
+	W5Ga4UJa97Jr13twsrXr48XFn09ayvy34UGr4fJws5Z3s0qF15Kry8KFWfua4UCrZ5ZF1x
+	Zrs8ZFZxZF90kFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvmb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
+	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAF
+	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0Y48IcxkI7V
+	AKI48G6xCjnVAKz4kxMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I
+	3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxV
+	WUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8I
+	cVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aV
+	AFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZE
+	Xa7IU801v3UUUUU==
 
-Dear all,=0A=
-To set CAN port attributes, command RTM_NEWLINK must be used. RTM_SETLINK w=
-ill not do the job.=0A=
-Why?=0A=
-=0A=
-Thanks,=0A=
-Dashi Cao=
+The original code uses cancel_delayed_work() in cnic_cm_stop_bnx2x_hw(),
+which does not guarantee that the delayed work item 'delete_task' has
+fully completed if it was already running. Additionally, the delayed work
+item is cyclic, the flush_workqueue() in cnic_cm_stop_bnx2x_hw() only
+blocks and waits for work items that were already queued to the
+workqueue prior to its invocation. Any work items submitted after
+flush_workqueue() is called are not included in the set of tasks that the
+flush operation awaits. This means that after the cyclic work items have
+finished executing, a delayed work item may still exist in the workqueue.
+This leads to use-after-free scenarios where the cnic_dev is deallocated
+by cnic_free_dev(), while delete_task remains active and attempt to
+dereference cnic_dev in cnic_delete_task().
+
+A typical race condition is illustrated below:
+
+CPU 0 (cleanup)              | CPU 1 (delayed work callback)
+cnic_netdev_event()          |
+  cnic_stop_hw()             | cnic_delete_task()
+    cnic_cm_stop_bnx2x_hw()  | ...
+      cancel_delayed_work()  | /* the queue_delayed_work()
+      flush_workqueue()      |    executes after flush_workqueue()*/
+                             | queue_delayed_work()
+  cnic_free_dev(dev)//free   | cnic_delete_task() //new instance
+                             |   dev = cp->dev; //use
+
+Replace cancel_delayed_work() with cancel_delayed_work_sync() to ensure
+that the cyclic delayed work item is properly canceled and that any
+ongoing execution of the work item completes before the cnic_dev is
+deallocated. Furthermore, since cancel_delayed_work_sync() uses
+__flush_work(work, true) to synchronously wait for any currently
+executing instance of the work item to finish, the flush_workqueue()
+becomes redundant and should be removed.
+
+This bug was identified through static analysis. To reproduce the issue
+and validate the fix, I simulated the cnic PCI device in QEMU and
+introduced intentional delays — such as inserting calls to ssleep()
+within the cnic_delete_task() function — to increase the likelihood
+of triggering the bug.
+
+Fixes: fdf24086f475 ("cnic: Defer iscsi connection cleanup")
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+---
+Changes in v3:
+  - Add how I discovered and tested the patch in the commit message.
+  - Remove flush_workqueue() in cnic_cm_stop_bnx2x_hw().
+
+ drivers/net/ethernet/broadcom/cnic.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/cnic.c b/drivers/net/ethernet/broadcom/cnic.c
+index a9040c42d2ff..6e97a5a7daaf 100644
+--- a/drivers/net/ethernet/broadcom/cnic.c
++++ b/drivers/net/ethernet/broadcom/cnic.c
+@@ -4230,8 +4230,7 @@ static void cnic_cm_stop_bnx2x_hw(struct cnic_dev *dev)
+ 
+ 	cnic_bnx2x_delete_wait(dev, 0);
+ 
+-	cancel_delayed_work(&cp->delete_task);
+-	flush_workqueue(cnic_wq);
++	cancel_delayed_work_sync(&cp->delete_task);
+ 
+ 	if (atomic_read(&cp->iscsi_conn) != 0)
+ 		netdev_warn(dev->netdev, "%d iSCSI connections not destroyed\n",
+-- 
+2.34.1
+
 
