@@ -1,203 +1,107 @@
-Return-Path: <netdev+bounces-224042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C979BB7FE7D
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:21:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78317B7FE37
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:19:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16F427BAE88
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:11:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAB52720706
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E2B2E1EFD;
-	Wed, 17 Sep 2025 14:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116CE2E3705;
+	Wed, 17 Sep 2025 14:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKhqAzz1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KXrXHs/g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634B32E11C3
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02BA2E2F15
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758118073; cv=none; b=TnWEhHTBX5V102giiSvYe/GCCvM9UcUeGtYxnMbOy9XudSG6OONOtEC3kG9xzQNDEdPGGnhKMtCr9E23xnis0f/b2YkLOMbbbtJRIaQJAHO+CelljRdNHGG0uhy8GIZsnLT9b5kWAiocOMGYJJBm+3Kpi7dJrBXogAJSAHlV+4s=
+	t=1758118104; cv=none; b=nNSLLmRT8iUweR1YW+Q58oZs2mYymHZf+CLOsZltmEdxH/ShQYcQWUZSxp9aFncDJNqEtYhTJsotvGCZKO+LPIwDtBmlhlv6AZ+62vS/zSufnFCQQ1w4kt25TCS9DdYcXY8iTn5WDnoITBO6Z6gClP9AGnQngNpijYxp8v7hyoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758118073; c=relaxed/simple;
-	bh=2GfL6H8CYFvd2zlRSEbFF6hlTsz3/QN8XHAewO9l4TE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lSIWyoRqB+zm270/MkAdRVw/PSAQsX544qkg0YWBzVOi5bs6LKzE7Cqcs8IR67dAeB3DRFYsqZ95y52SS/faeEbwGF+OVlRXXJu7wZNRXABJV9fpKxajU0IC8qK6gkzq0KI7yybaG64dtAMy3srtdLcOu8qqTks6svHqj0uO5wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bKhqAzz1; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b4ee87cc81eso5948988a12.1
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 07:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758118071; x=1758722871; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1lF4l0V5Y3ywmZyeZWtOMP5+EAmRdCLutinoQNvLsYc=;
-        b=bKhqAzz1RYU+WN4YcRXTAuRdtzatwy3JvyKDgt/OiYTrysCutpZduydK3ohWeewB2B
-         jeJvZekRb1vJsntgRTiBy5blW0xkO2+8LflNlvVn5EzWECLMpYqh/S7r/sypOHjlZzyh
-         qR5DVRXlMowpvoDLuTBIc1Rvib+4d8uZDUaXoZpFFQGMxi3KxELsgdx/PlfO8ZTTToU0
-         rJFzOe1F4vKYcR3bklsa6uG1E7HNb1PFo7sR2NL3tdoH/6NT/sFAS6hAfUu9s2aQiwVb
-         juoeMrTNCjfVO272DJc1NrQ3YJ8sZGMhEB990KjXAZwQ3Z1hmnnO9B7ed9VbIXFVQCo6
-         eLEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758118071; x=1758722871;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1lF4l0V5Y3ywmZyeZWtOMP5+EAmRdCLutinoQNvLsYc=;
-        b=qJkuY0eAB9qPHJHxrwO+NgC3ItubadjfvD1qkOuL8nTyVKXLBBSLygcU8Ye4+4zEyX
-         mNOAzAXbxbzpcpHlh/JtKS4CDfjCaPbS62pX3mxudO/dMDKxiv7/SjfbZV3agZox2YMz
-         l7E7o2uRFZSu8p9M+BS1PZZT8OCiwhyHniwdejXZz4Wtwz5k7klxvYWUvB0rhcoVqiWn
-         WswOmgWRu79vyGCVAtQxbH+x7sjPgDiDN1l1uRx6HJon7EWj5pA8bfUWApL70efVAW5X
-         edFbdeH2gmSx0XqNV/zI4YirukvMIZtvmqjSIZAe0jcya7qaowK4IC5V5UpJ5K82heW0
-         rFSA==
-X-Gm-Message-State: AOJu0YyFFsRMldz8aq6Kx7tkG1G+lYIStNb1TY0Wm1e1jWNvOcWSdJ48
-	e5YT5vvtqaqjBTNev59aVolITTq6rG0srWX0ILXUS24foACnfKgfLF5p
-X-Gm-Gg: ASbGnctrzYz5mYecKSQmgec3t37xbsaYM7VhQVXECtUp1rYvEWR2jbVU2+7QWCRTBjn
-	q/a672hafcq3P0JcSDuItN/xNY/gPF5jIdx3Xnp1EWzqlA+aFcK3MmdR9aBUm/esa7xfneVbn06
-	KZFcb6JmzUlAYLjtHFFeapvRdcYwU3kMIb8ahud/YLoGrPqKB1xPpww4UrsewieqvBfMt7OIjV2
-	QmPvYNXNl23wx8oGOUHMQBcJwpHv/ChxHf/cvKSlnVarKGVYGJI485V1Avg3Jbg3q5Mz01ah7vt
-	1lOWUZIA0AiDwPkFmPpL8zOxV1iGEkG0A+dEdzNYu5rMvn8o+ktCZE/mEugajCmCW4CyBCVcNXK
-	I+A/KIaZl5hpthwzpI7N6UVeCKDr+KX10PtUFsF0=
-X-Google-Smtp-Source: AGHT+IEr/hdZRZQ5SAxQUru2gpuQ/w8Xb+9gVyVGs2q8Lew9lO8+3ZDoV3nfvoNYt6YCJNKJutUiJA==
-X-Received: by 2002:a17:903:4b03:b0:251:3d1c:81f4 with SMTP id d9443c01a7336-26813cf3339mr34224225ad.54.1758118070389;
-        Wed, 17 Sep 2025 07:07:50 -0700 (PDT)
-Received: from cortexauth ([2402:e280:2313:10b:d917:bfec:531b:9193])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-267c9996c93sm53058285ad.122.2025.09.17.07.07.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 07:07:49 -0700 (PDT)
-From: Deepak Sharma <deepak.sharma.472935@gmail.com>
-To: krzk@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev,
-	Deepak Sharma <deepak.sharma.472935@gmail.com>,
-	syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Subject: [PATCH v2] net: nfc: nc: Add parameter validation for packet data
-Date: Wed, 17 Sep 2025 19:35:47 +0530
-Message-ID: <20250917140547.66886-1-deepak.sharma.472935@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1758118104; c=relaxed/simple;
+	bh=lXCWglnUt90yI4aRsoMOta6ojCYjUYZrQfBXDrQOyNM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=muvDcASslmhyCCGx2XqzehO76m80y1Yn1jPYxzIUox2rgXuK06hiRa8XWPiJcxMCmHYWo5/U/xKK755EVRtga4IwxMoo9yeeIr+P+Y4CIUJRr230eJ3zvZVwNb7au9liSr0bnEukqPHUaDyulEdLhcyIHXtpLdm3BquFmBAw6Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KXrXHs/g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BEE8C19422
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 14:08:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758118103;
+	bh=lXCWglnUt90yI4aRsoMOta6ojCYjUYZrQfBXDrQOyNM=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=KXrXHs/g1qw/613j5auhUt3GIPp/QsjHcbCOjwPwoByTRaQfe1HCwKpmUuEvRLM5P
+	 ieAavHzuBLh5oRok+jpEDvm9ZuacjnuqhBa8cvZkI15sQsKj+m7VLNAXraT817uh3h
+	 hKQZlNeEgDIhIMQbQ0+ezLdyb9KnqeC1GZrnxlYRZNTrP2NrXtihrDz0Q1Bu+tr9Y1
+	 eMfCLYldKd/dveVkVrDggkTvfopSbs8uyofOjTe8UH9ftwYQMvOoDdEmxk2t0pQJ3U
+	 AAejCD24iU+BEer8SCaDe5evgQp78RlAQ3LdRekoLNzURBMNRTvM6+d/TNxQMv1yn+
+	 wuym0xuDm8ZSg==
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-351c164936eso53059821fa.0
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 07:08:23 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWZ4XuQEKGl4OWZcMsc5XuNTI5N9ZuB/B7ELH+hpLC79c0TgM5ckHxgPG+zKR5jkwC1ZkHO56Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIevjEuAGck7wxB2nRdA7CZg1/Mee1IacKrcnEhDDuEAVt9HHK
+	pqRCw2qnI/NkJzYP1RMECmqSmxkkBW5Ew1ngL+pb4nmb5vGwOmQJpCS8z4U7jLBcX+WM9fMyjv+
+	qNXtDp9Ve/h29qo7aTW3umORQMo/rudA=
+X-Google-Smtp-Source: AGHT+IGqdaQ8C9lVtjuyq3Lst//zIEIlnNEWTnnZW0oeQInZavtI2ovFzZs+fzDjBgh6Oll2QYo+R+KbyOIjgKRKfDM=
+X-Received: by 2002:a2e:a484:0:b0:338:7f3:a740 with SMTP id
+ 38308e7fff4ca-35f6093b1aamr6295401fa.7.1758118101743; Wed, 17 Sep 2025
+ 07:08:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250913101349.3932677-3-wens@kernel.org> <20250917070020.728420-1-amadeus@jmu.edu.cn>
+In-Reply-To: <20250917070020.728420-1-amadeus@jmu.edu.cn>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Wed, 17 Sep 2025 22:08:10 +0800
+X-Gmail-Original-Message-ID: <CAGb2v640r+TwB7O+UAB9PehZ2FaXDjhVerK6j_CZ2+caJoJ9zA@mail.gmail.com>
+X-Gm-Features: AS18NWACYa7boO8HaxahcwxNgufh9JCYIxjbMd7TaIvgTTRgZ9eVfnU6RZmksT8
+Message-ID: <CAGb2v640r+TwB7O+UAB9PehZ2FaXDjhVerK6j_CZ2+caJoJ9zA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 2/6] net: stmmac: Add support for Allwinner
+ A523 GMAC200
+To: Chukun Pan <amadeus@jmu.edu.cn>
+Cc: andre.przywara@arm.com, andrew+netdev@lunn.ch, conor+dt@kernel.org, 
+	davem@davemloft.net, devicetree@vger.kernel.org, edumazet@google.com, 
+	jernej@kernel.org, krzk+dt@kernel.org, kuba@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-sunxi@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com, 
+	robh@kernel.org, samuel@sholland.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is v2 for the original patch, I realized soon after 
-sending the patch that I missed the release of skb before
-returning, apologies.
+Hi,
 
-Syzbot reported an uninit-value bug at nci_init_req for commit
-5aca7966d2a7
+On Wed, Sep 17, 2025 at 3:00=E2=80=AFPM Chukun Pan <amadeus@jmu.edu.cn> wro=
+te:
+>
+> Hi,
+>
+> I tested this on Radxa Cubie A5E and there seems to be a small issue:
+>
+> When VLAN_8021Q is enabled (CONFIG_VLAN_8021Q=3Dy), down the eth1 interfa=
+ce:
+>
+> ~ # ifconfig eth1 down
+> [   96.695463] dwmac-sun55i 4510000.ethernet eth1: Timeout accessing MAC_=
+VLAN_Tag_Filter
+> [   96.703356] dwmac-sun55i 4510000.ethernet eth1: failed to kill vid 008=
+1/0
+>
+> Is this a known issue?
 
-This bug arises due to very limited and poor input validation
-that was done at net/nfc/nci/core.c:1543. This validation only
-validates the skb->len (directly reflects size provided at the
-userspace interface) with the length provided in the buffer
-itself (interpreted as NCI_HEADER). This leads to the processing
-of memory content at the address assuming the correct layout
-per what opcode requires there. This leads to the accesses to
-buffer of `skb_buff->data` which is not assigned anything yet
+I don't have 802.1q enabled so I didn't see this.
 
-Following the same silent drop of packets of invalid sizes, at
-net/nfc/nci/core.c:1543, I have added validation in the 
-`nci_nft_packet` which processes NFT packets and silently return
-in case of failure of any validation check
+Can you provide the base commit you applied the patches to?
 
-Possible TODO: because we silently drop the packets, the
-call to `nci_request` will be waiting for completion of request
-and will face timeouts. These timeouts can get excessively logged
-in the dmesg. A proper handling of them may require to export
-`nci_request_cancel` (or propagate error handling from the
-nft packets handlers)
 
-Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
-Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
----
- net/nfc/nci/ntf.c | 42 ++++++++++++++++++++++++++++++++++--------
- 1 file changed, 34 insertions(+), 8 deletions(-)
-
-diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-index a818eff27e6b..f5e03f3ff203 100644
---- a/net/nfc/nci/ntf.c
-+++ b/net/nfc/nci/ntf.c
-@@ -809,35 +809,61 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
- 
- 	switch (ntf_opcode) {
- 	case NCI_OP_CORE_RESET_NTF:
--		nci_core_reset_ntf_packet(ndev, skb);
-+		if (skb->len < sizeof(struct nci_core_reset_ntf))
-+			goto end;
-+		else
-+			nci_core_reset_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_CORE_CONN_CREDITS_NTF:
--		nci_core_conn_credits_ntf_packet(ndev, skb);
-+		if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
-+			goto end;
-+		else
-+			nci_core_conn_credits_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_CORE_GENERIC_ERROR_NTF:
--		nci_core_generic_error_ntf_packet(ndev, skb);
-+		if (skb->len < 1)
-+			goto end;
-+		else
-+			nci_core_generic_error_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_CORE_INTF_ERROR_NTF:
--		nci_core_conn_intf_error_ntf_packet(ndev, skb);
-+		if (skb->len < sizeof(struct nci_core_intf_error_ntf))
-+			goto end;
-+		else
-+			nci_core_conn_intf_error_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_RF_DISCOVER_NTF:
--		nci_rf_discover_ntf_packet(ndev, skb);
-+		// tech specific params are included as unions
-+		if (skb->len < sizeof(struct nci_rf_discover_ntf))
-+			goto end;
-+		else
-+			nci_rf_discover_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_RF_INTF_ACTIVATED_NTF:
--		nci_rf_intf_activated_ntf_packet(ndev, skb);
-+		// tech specific params are included as unions
-+		if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
-+			goto end;
-+		else
-+			nci_rf_intf_activated_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_RF_DEACTIVATE_NTF:
--		nci_rf_deactivate_ntf_packet(ndev, skb);
-+		if (skb->len < sizeof(struct nci_rf_deactivate_ntf))
-+			goto end;
-+		else
-+			nci_rf_deactivate_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_NFCEE_DISCOVER_NTF:
--		nci_nfcee_discover_ntf_packet(ndev, skb);
-+		if (skb->len < sizeof(struct nci_nfcee_discover_ntf))
-+			goto end;
-+		else
-+			nci_nfcee_discover_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_RF_NFCEE_ACTION_NTF:
--- 
-2.51.0
-
+Thanks
+ChenYu
 
