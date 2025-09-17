@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-224213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53381B82408
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 01:20:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D11EBB8240B
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 01:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE8C02A7503
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 23:20:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A4902A7666
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 23:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AC131159B;
-	Wed, 17 Sep 2025 23:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EC03126B7;
+	Wed, 17 Sep 2025 23:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CSSfVSIY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHL1GaOa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7229A31158F
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 23:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE423311C3F;
+	Wed, 17 Sep 2025 23:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758151217; cv=none; b=LOR7TGQ8W4qHu/oMz+RLIiwfwbtEg1X8LxWnFUXrlOT8MxaaIPpXE0LZbvQHH2s4R2DX8P+oiHtj+/weg5qvCMm6jVuoPtcahDYRXB3vxzYtl/sw4tnVpFah9DGvZeogf8eyiEYJJpct+BtCJw53xX5G1+hhiVxiv9w9+JeXoQo=
+	t=1758151218; cv=none; b=kdn+Lj1G2h+Y+6KSVRAC2x13E9JRYYur/2eGIvSx4D2p3yz9NF/Z9UOeUtR4G5Iq4VjeoJgXQpNwa8jYwyn7rQgAUN10reDBA+Xu7yrXAXEhYa9RjP6iQ8z8MDor8kmo5x2pAMrSutE3/BqfcDKOsPcWH4PNFfbFqKcJUY0atvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758151217; c=relaxed/simple;
-	bh=Vs/DnZgJptmNCxWNvDc6vOtwhOi4Q9QbEw5fFdZXQ58=;
+	s=arc-20240116; t=1758151218; c=relaxed/simple;
+	bh=kTPX/Qit8A+yHPzAeCP7/dSvgGXt6RhfncIwKmJTJOk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mlXOj46EAnmxY65fKjDoE/9wElhWVWc/DugFN51sxuIyggyTa/Unqw4vyeHQWsnOV0DoZHM7khUfbwpYn5cXDmqUZWVKAX2mGKW/QBcoX47jPKeKo4/1D6SddOM4Kml6ycd1copSnwbwUrzMqcNztPDsKkgFna0TMdLY64ZRExs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CSSfVSIY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E31C4CEF5;
-	Wed, 17 Sep 2025 23:20:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758151217;
-	bh=Vs/DnZgJptmNCxWNvDc6vOtwhOi4Q9QbEw5fFdZXQ58=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CSSfVSIYmBJYMnDoFCgHw3e4iNiRJC25R4qzk1Gn1Nn4uXWFqZcNjH0aTqx8/0QoJ
-	 CVWP7bg/mas2WYPcoB60BDgcq02EDw6cjkcdeD/CdxLtzdMlKGpndKYrHB3HQF9QcJ
-	 I4+zEPh7M2AfHHubE1Nh4cKKLwdb1MC4DdZfQUuFohwO6N44Iow/AaDscRQ639SKxs
-	 KBfday3ZokbS6EY/GT+XRk6ktZ6vIFOd3DGxdWEBERcnMMJ1DinJqDISFwmdbcDgRE
-	 iqJk5fwaAGecFGDfwDm9ALrqjMZu88vl8rSS3CR2a7S8fl1N61+Gb7HWjBH4RVPyTh
-	 aloY0baV8fu9g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDB139D0C28;
+	 In-Reply-To:To:Cc; b=Z7bQz0hm1Rr14XB5b7m6lAEzbM4hnLef3HDeT7xmg9rLANTvjlZrzq++bDHqMYPbjFOn0JitjCzjEL7w2yhdsSu3NpqwIs7wfmzHfaeLBqbe95+E7apRGUacF+ycGDBL3SBv9T5XXvEBdg2643rn75L3LezhKunqRJRAB0LdnNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHL1GaOa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D63C4CEF9;
 	Wed, 17 Sep 2025 23:20:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758151218;
+	bh=kTPX/Qit8A+yHPzAeCP7/dSvgGXt6RhfncIwKmJTJOk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uHL1GaOa3+9fpOT3tebzMEMWury6tEgQr0OjXE+703N1fCK0e02dN9xAD9mCJDo12
+	 VwtGvRUTO30x/f4rfo+UbUoR5okV/FxnILYIwo2rDKXYF/TxrBpelEA8wd6Hcl49A9
+	 njsZsN5ip3JXYYzDY2b/68yI7+dMenTGIKAeop91OTwJ/fNqEqvpgeitfqwRQi7cTK
+	 eqDLgT4tGbMM1LJQeRq3ocwHV/6ubLStZHISBD13nOJ+s6k+STvBSY+WYhIDvh+D3L
+	 iOfdtm80BBG5tPnMkZ5hpxM3dnGFKNXS34xS7ScqXpqn75KHo7juAMijJ4xSIINuv6
+	 BV2Ot/9NI9yTg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB06039D0C28;
+	Wed, 17 Sep 2025 23:20:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5][pull request] Intel Wired LAN Driver Updates
- 2025-09-16 (ice, i40e, ixgbe, igc)
+Subject: Re: [GIT PULL] wireless-2025-09-17
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175815121723.2184180.13322022585138233446.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Sep 2025 23:20:17 +0000
-References: <20250916212801.2818440-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250916212801.2818440-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+ <175815121874.2184180.8748956295385324183.git-patchwork-notify@kernel.org>
+Date: Wed, 17 Sep 2025 23:20:18 +0000
+References: <20250917105159.161583-3-johannes@sipsolutions.net>
+In-Reply-To: <20250917105159.161583-3-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 16 Sep 2025 14:27:55 -0700 you wrote:
-> For ice:
-> Jake resolves leaking pages with multi-buffer frames when a 0-sized
-> descriptor is encountered.
+On Wed, 17 Sep 2025 12:49:50 +0200 you wrote:
+> Hi,
 > 
-> For i40e:
-> Maciej removes a redundant, and incorrect, memory barrier.
+> Two more fixes, but I think things have quieted down to say
+> we probably won't have more. The iwlwifi aggregation thing
+> is myself having messed up some recent changes, while rfkill
+> has a potential crash that doesn't really seem to happen in
+> practice, or only on some select machines.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] ice: fix Rx page leak on multi-buffer frames
-    https://git.kernel.org/netdev/net/c/84bf1ac85af8
-  - [net,2/5] i40e: remove redundant memory barrier when cleaning Tx descs
-    https://git.kernel.org/netdev/net/c/e37084a26070
-  - [net,3/5] ixgbe: initialize aci.lock before it's used
-    https://git.kernel.org/netdev/net/c/b85936e95a4b
-  - [net,4/5] ixgbe: destroy aci.lock later within ixgbe_remove path
-    https://git.kernel.org/netdev/net/c/316ba68175b0
-  - [net,5/5] igc: don't fail igc_probe() on LED setup error
-    https://git.kernel.org/netdev/net/c/528eb4e19ec0
+  - [GIT,PULL] wireless-2025-09-17
+    https://git.kernel.org/netdev/net/c/934da21f99c0
 
 You are awesome, thank you!
 -- 
