@@ -1,188 +1,116 @@
-Return-Path: <netdev+bounces-223866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F37B7E0D8
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:40:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA6E1B7E818
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF75485247
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 06:41:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA1851C03760
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 06:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B9829A9F9;
-	Wed, 17 Sep 2025 06:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsYit2XW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9767C27B34D;
+	Wed, 17 Sep 2025 06:50:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73C9283121
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 06:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31D425EFBE;
+	Wed, 17 Sep 2025 06:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758091262; cv=none; b=oghWZ0OgI2lI0c8oRWFh7OyT2MX68QOAjeQxfMYEpowjwKn6PnURJf1h1Lgv3ze3exvBm9QX0O4vsMGtzRj4zCdeoT0EHQE5qzoQVOvoldKRLnw0VeWjDLp6e+Q+VnrrbmUB6vj5h/p8wpPfqfMT84acZCPyUAqa6EZDQIGzS1I=
+	t=1758091851; cv=none; b=feerAJwZVc0u8XMAsDwTKhVPlAt93QF89UaFMx5DkY41mQk69iBFoqMkQ7orpkP8wpBMq9xDzn+pBuh2D+YxXZRqVZyvshntzE3zQaKHYRLB1BPlEH4FpP6N08+MqS7YAev4VFgxpDadrGKghc1cl6/rTWekR3RgzcULj9oJE4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758091262; c=relaxed/simple;
-	bh=GTsD+zDHi5iUxyCHZCjNne7OiB64xj+ttr+pkOj+OwQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DRxDBja5eT5v0tveob8RxlXnaNw+JNEYp12fVWLI/xVkGTxBVlCLKYB9KsVciGR1o9C0jv73EJjDm8MRiHongq6NAdwUxKbrIkwTYEIE/CGQnX0Vsf4X+5K61sCLCJyWK5jNlm0o4LXPOyoqtvKayklHtnT50W+AKfhGSDD6gas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TsYit2XW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758091259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LTbbBlln6DCFneAUqcEqgaH8223TNkqnZLXB2rPiJQQ=;
-	b=TsYit2XWG+q/zCqkZemU2sfVZ597u7sAIosRsIKKbNbkV0VaKZxV57eWOYcO033fEARUJX
-	d3vy8Mo8nWt/W35H1qFMiO4LhqWiN2j7os3CfhQoktdmHrEDY2XYaON/uoF0oNTDltVGrV
-	sowSyKuDyaLjeEHj3KqPHzfD8uRXibs=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-564-Ky8FxcsBMnebP_0v5Slu7Q-1; Wed, 17 Sep 2025 02:40:58 -0400
-X-MC-Unique: Ky8FxcsBMnebP_0v5Slu7Q-1
-X-Mimecast-MFC-AGG-ID: Ky8FxcsBMnebP_0v5Slu7Q_1758091257
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-61d2d2b792aso6536211a12.1
-        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 23:40:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758091257; x=1758696057;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LTbbBlln6DCFneAUqcEqgaH8223TNkqnZLXB2rPiJQQ=;
-        b=WStAp5R5s7aVDkSln6+B3lWQXklyY4OolswlW1cMTlWRRmVeCgovh1fzCFNbWGURmW
-         zDARwF8Pt2uulz79JgdeavgSAKeR7biKiyP8WlNBDiVFLL7JaKTimq6SLsv/dnosOTdX
-         EWuoIxDS8G6c7FHVrqbxCaM+9TXHRfNdVJO559J7E4YY5i/Fhr+hQ67rGZ6IWTTnVyRe
-         U4l11K+v2r2op0InIJz4BhlHaktyTbuonaCZ+53uxhCchJPYOAi/6I8ervNnPEPc3guP
-         tkzhmISsjiGDHSxlz6NWpPNsWJT49UAYxACVjib6i1HgULGkIshkz1T0yke3LXWRWE77
-         pekQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSncnK6KMuH76qN7WdxJHpQlVVOIQLCX1P+QlJPEDK0eIicE4u1SCFIU2FLsACjfpUtg/gV7g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvTOqm85Nf0jYtwbKv3TktOYSCa2Aea3DphG5UYnir2mkgtd+X
-	2YE9SrZJshwfl1QSrsFwo/SZIM8JMpqjVoKu/BKXiIOzIgCDYbAypyZDGeEXRXolMOM4n4s39Ab
-	O1HbH7IcD6VajG0L9DpbXG9XgdEx86OGNnjI0D3Foq31SgGQHtNDC1/WLAja6LfYYkAcxMRCcGe
-	MR7i747KZousDYcWQSBoGBE5Ba+W8XmAkF
-X-Gm-Gg: ASbGnctg8bmlwVdQd0ur0Sd72NWAx1RvYCP9ojGkyQJPb3FZ91RTNTaOzfsLFsH0kyB
-	+nmzwgdZXH9lEhRxD+w8xCoPEZYGxmsC89FUs8KbJlHa4vgk4rHE8dD8ofYMHQ905ayq/vewNja
-	QwlDWB5aVPncnYhN+T3FzyYw==
-X-Received: by 2002:a05:6402:40c8:b0:627:c739:ee36 with SMTP id 4fb4d7f45d1cf-62f83c34ad3mr933040a12.14.1758091256866;
-        Tue, 16 Sep 2025 23:40:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHuCx8Wm2NjgvVx8aU5k6RVtZU9jl0CgUhRhEkRJ87iAGzVB+vCxFRz69dVnXZ4ziFgE912UQsq1iIuOuRI/cM=
-X-Received: by 2002:a05:6402:40c8:b0:627:c739:ee36 with SMTP id
- 4fb4d7f45d1cf-62f83c34ad3mr933005a12.14.1758091256362; Tue, 16 Sep 2025
- 23:40:56 -0700 (PDT)
+	s=arc-20240116; t=1758091851; c=relaxed/simple;
+	bh=8tluT2i8GW6WhEmoITXfxdorw8zGejI+ZxqHYeHI9gg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ggFHhX2kivR33O0b/YhtUW4Gq3w8gDS9xlqIZJiC5qScaB0v3m/otZaIbF+tvO9Hd3eGYuyjgPdUEqkXMmGawpj0X4V/jufA4D7Qecg1wQpgGSqAgGubxAMYgBMS9Q1/2lIJnyHF/85RV9cciayMCAGRkInvbszcKmdL58qoSd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.205] (p5dc55721.dip0.t-ipconnect.de [93.197.87.33])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 58A2F60213C82;
+	Wed, 17 Sep 2025 08:49:47 +0200 (CEST)
+Message-ID: <329bdb90-578b-4fba-97fd-7000baa281e6@molgen.mpg.de>
+Date: Wed, 17 Sep 2025 08:49:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250915-gxrings-v3-0-bfd717dbcaad@debian.org>
-In-Reply-To: <20250915-gxrings-v3-0-bfd717dbcaad@debian.org>
-From: Lei Yang <leiyang@redhat.com>
-Date: Wed, 17 Sep 2025 14:40:19 +0800
-X-Gm-Features: AS18NWAdyteJLjS2OkZ5AwPMlO36O2pUFdRp0nHMdxW5VJOQ-UMOLbGst0il8i0
-Message-ID: <CAPpAL=wz5t4cMuVeksmpsv5aRyhJez=W4Uc2jOUqr7bNHHYJRw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 0/8] net: ethtool: add dedicated GRXRINGS
- driver callbacks
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, kuba@kernel.org, 
-	Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] libie: fix string names for AQ
+ error codes
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250916-jk-fix-missing-underscore-v1-1-a64be25ec2ac@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250916-jk-fix-missing-underscore-v1-1-a64be25ec2ac@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Tested this series of patches v3 with virtio-net regression tests,
-everything works fine.
+Dear Jacob,
 
-Tested-by: Lei Yang <leiyang@redhat.com>
 
-On Mon, Sep 15, 2025 at 6:47=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> This patchset introduces a new dedicated ethtool_ops callback,
-> .get_rx_ring_count, which enables drivers to provide the number of RX
-> rings directly, improving efficiency and clarity in RX ring queries and
-> RSS configuration.
->
-> Number of drivers implements .get_rxnfc callback just to report the ring
-> count, so, having a proper callback makes sense and simplify .get_rxnfc
-> (in some cases remove it completely).
->
-> This has been suggested by Jakub, and follow the same idea as RXFH
-> driver callbacks [1].
->
-> This also port virtio_net to this new callback. Once there is consensus
-> on this approach, I can start moving the drivers to this new callback.
->
-> Link: https://lore.kernel.org/all/20250611145949.2674086-1-kuba@kernel.or=
-g/ [1]
->
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Tested-by: Lei Yang <leiyang@redhat.com>
-> ---
-> Changes in v3:
-> - Make ethtool_get_rx_ring_count() non static and use it in rss_set_prep_=
-indir()
-> - Check return function of ethtool_get_rx_ring_count() in
->   ethtool_get_rx_ring_count() (Jakub)
-> - Link to v2: https://lore.kernel.org/r/20250912-gxrings-v2-0-3c7a60bbeeb=
-f@debian.org
->
-> Changes in v2:
-> - rename get_num_rxrings() to ethtool_get_rx_ring_count() (Jakub)
-> - initialize struct ethtool_rxnfc() (Jakub)
-> - Link to v1: https://lore.kernel.org/r/20250909-gxrings-v1-0-634282f06a5=
-4@debian.org
-> ---
-> Changes v1 from RFC:
-> - Renaming and changing the return type of .get_rxrings() callback (Jakub=
-)
-> - Add the docstring format for the new callback (Simon)
-> - Remove the unecessary WARN_ONCE() (Jakub)
-> - Link to RFC: https://lore.kernel.org/r/20250905-gxrings-v1-0-984fc471f2=
-8f@debian.org
->
-> ---
-> Breno Leitao (8):
->       net: ethtool: pass the num of RX rings directly to ethtool_copy_val=
-idate_indir
->       net: ethtool: add support for ETHTOOL_GRXRINGS ioctl
->       net: ethtool: remove the duplicated handling from ethtool_get_rxrin=
-gs
->       net: ethtool: add get_rx_ring_count callback to optimize RX ring qu=
-eries
->       net: ethtool: update set_rxfh to use ethtool_get_rx_ring_count help=
-er
->       net: ethtool: update set_rxfh_indir to use ethtool_get_rx_ring_coun=
-t helper
->       net: ethtool: use the new helper in rss_set_prep_indir()
->       net: virtio_net: add get_rxrings ethtool callback for RX ring queri=
-es
->
->  drivers/net/virtio_net.c | 15 ++-------
->  include/linux/ethtool.h  |  2 ++
->  net/ethtool/common.h     |  2 ++
->  net/ethtool/ioctl.c      | 88 ++++++++++++++++++++++++++++++++++++++----=
-------
->  net/ethtool/rss.c        | 15 ++++-----
->  5 files changed, 84 insertions(+), 38 deletions(-)
-> ---
-> base-commit: 5b5ba63a54cc7cb050fa734dbf495ffd63f9cbf7
-> change-id: 20250905-gxrings-a2ec22ee2aec
->
-> Best regards,
-> --
-> Breno Leitao <leitao@debian.org>
->
+Thank you for your patch.
 
+Am 16.09.25 um 22:09 schrieb Jacob Keller:
+> The LIBIE_AQ_STR macro() introduced by commit 5feaa7a07b85 ("libie: add
+> adminq helper for converting err to str") is used in order to generate
+> strings for printing human readable error codes. Its definition is missing
+> the separating underscore ('_') character which makes the resulting strings
+> difficult to read. Additionally, the string won't match the source code,
+> preventing search tools from working properly.
+> 
+> Add the missing underscore character, fixing the error string names.
+> 
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Fixes: 5feaa7a07b85 ("libie: add adminq helper for converting err to str")
+> ---
+> I found this recently while reviewing the libie code. I believe this
+> warrants a net fix because it is both simple, and because users may attempt
+> to pass printed error codes into search tools like grep, and will be unable
+> to locate the error values without manually adding the missing '_'.
+
+As always, great commit message! Thank you.
+
+> ---
+>   drivers/net/ethernet/intel/libie/adminq.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/libie/adminq.c b/drivers/net/ethernet/intel/libie/adminq.c
+> index 55356548e3f0..7b4ff479e7e5 100644
+> --- a/drivers/net/ethernet/intel/libie/adminq.c
+> +++ b/drivers/net/ethernet/intel/libie/adminq.c
+> @@ -6,7 +6,7 @@
+>   
+>   static const char * const libie_aq_str_arr[] = {
+>   #define LIBIE_AQ_STR(x)					\
+> -	[LIBIE_AQ_RC_##x]	= "LIBIE_AQ_RC" #x
+> +	[LIBIE_AQ_RC_##x]	= "LIBIE_AQ_RC_" #x
+>   	LIBIE_AQ_STR(OK),
+>   	LIBIE_AQ_STR(EPERM),
+>   	LIBIE_AQ_STR(ENOENT),
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
