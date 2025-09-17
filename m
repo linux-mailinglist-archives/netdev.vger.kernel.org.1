@@ -1,126 +1,114 @@
-Return-Path: <netdev+bounces-224160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E36B815B6
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 20:37:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD6AB815E9
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 20:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F24771C2559E
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:37:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5B0F1C26168
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBF52FE581;
-	Wed, 17 Sep 2025 18:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72D63009ED;
+	Wed, 17 Sep 2025 18:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="f/w4ebSq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEovyDBd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6C726D4C4
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 18:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2DE2FFDFE;
+	Wed, 17 Sep 2025 18:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758134239; cv=none; b=U2QujBVIK4OHk/ZdpAw4+nYMFOF038VYut4SXVEMjSHqAN801LYzZNDi2d5Al3jryJkHSatajThihTL5ShJtDW8fdJt5TnSjFqbL3qrsolK8/PclVHmOQSg+x7u2vazKYtEqgB4BjvvVZWzMFAQ211Rw5+/0DKr5MrRLzKqhJ4Q=
+	t=1758134461; cv=none; b=MvIn+T7jHA0PLuWgqG7C8aX0WJzePrcDxD9vGERg/fSsPAuc5DP7U7gmW0WpTyz+qzRHEArVKYnRmkZgsyw8hLM/5m0MY2vBEuUptpsdO8GAy+Ig3xYQIqeolPR8+cJfhjY38gfZWPaKnbppIlLLLC2m0slfrl5Cukg1i64zaHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758134239; c=relaxed/simple;
-	bh=d/cXv9TJ2gZky00AHUpOB7Iu2f9ruX+BgUBAGnFflZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dPTz9DVaQPsToDmnqjhl4RM04y40MFwetIhzmKLZIwZvO+3KDSmM6HlzR5BohpAaF9HmW5667GBLo8WqXJuPPoI9AJJJZghHvHefyAT5/kJFcEydQbgemFCyOQWCepm4+UcTm/SiG1tAlyKYhsOuNlYgbFtfGLNjJ8l3U1HtaB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=f/w4ebSq; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-81076e81a23so18371085a.3
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 11:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1758134235; x=1758739035; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ALzpm41EAiaTvICdkzCMrTUL/bFHqE33rx1kUd5U0Ig=;
-        b=f/w4ebSqe+BTueM9YV71jV3S84EEREnoSyuAgqxob46nbh//Zm1blCQhp31IduMWij
-         eUynh9aK8WvqtFgX/mOgTSx9Z9cHPLhz4v3KnoD6EQsj3HCI5Q1blqn3FChatpdYvhuD
-         eeflJhhsQFV184y20Fu4U1LUrYVw3F7wZ9F1kFW20C/K0J8nHIus7Ji7X6W3tRojx3l1
-         DeiQGMBvr61O5hHIwg29sjQZy5yK/pgDd1t4tr1sIOCTxAyuOPbUFzZv4fa4c94gJXWI
-         WVtbCITbHOu9j/qUpqisNlM1YqFZs2IjYkvBXJOG7IRrtuNci+MqxMJsfbYsxF9OeldG
-         6QPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758134235; x=1758739035;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ALzpm41EAiaTvICdkzCMrTUL/bFHqE33rx1kUd5U0Ig=;
-        b=YbqPpmyHgqJ1c9H43vhVK/IU8bwKGa+sFmysCRnYSPKaVGzScZfhcLnp8dZFBho2m4
-         iv4q66zg1d6YQ8XZ5xFhAAynIv3eRWyZFpHycqGnxWxcy4HejYn2UE2LyxlRugyygD/e
-         o/tBgaJQAKYlZ4hepXhvvAuN/C8jWYZ11qxPjZDAgF1bCFPQoUzNduR5fGf+OohTUUKZ
-         WKMUJ4LebAfnsaqHJP4+Vly8Wv6QeJ+qz9ufFa1Ver96vEWN9vFqs20pYNNDtCuE7/XX
-         yYacoIlxybLg+0mKlluAYNm8+z/MWyKAfT7Vlx620LzArhzCeOoz6jty9UBIYfw7TbJJ
-         HPcw==
-X-Gm-Message-State: AOJu0YyZYNi3t9OJv8Kj+THZYjhP1i605LnOPhSFo7lgkCzGFU7p7iYb
-	Dpn7hZpt0v6G4kMk/HFO7Fu7VUhnekWvOtrJhhBBGf6ZpNNcyE/z+9uVeiyCOUIYhE5sk7Z7mw2
-	JFfdw
-X-Gm-Gg: ASbGncskqzHvUMS//BIaVpND2QpF5paAL8g8RRXPWYsekir0n4fQI9Il/4QR7Cnq69n
-	5JzBh2Kx2Qg9TY/v3DlLVuPgPketc9VRuocNM57LrJmk8+Xv8m8zt7L4fK23wbi+vy/Lk6od5LU
-	iESLxHdy1s0vpT49MrgU+VLnWJoLOaS1f8nXj8wOqr8pdQjsWD8IfBMpzxPXHpCvjyZ3H6MhZ1p
-	IgSneOnQc+i7rf8eGPO2WchUSfnXOxBQFnOeRP6Ta3fuRyNiRyaPxccATQfYtvWyRG+V03rJy1Z
-	zcbG1koeaPlpvdl13UjHiQJoP5NpvsoeYokTVTSDqJwzy8G8vfymhToXaMs1/pdAT/ebQIUDkwO
-	rSJ+KsKCb143eK8osQKWQq5cOt7+I1vOzaaMIn+HM1+neBOY/o8yEZS3CnPPVuyATwmER+Ox6GU
-	A=
-X-Google-Smtp-Source: AGHT+IHIRQvwEpq0oA/caQr65AoRiReE6U3a9fBAd+cRFw59ch8vIjUp8BduzOFrExFM8w5vXd7ZGg==
-X-Received: by 2002:a05:620a:199f:b0:82a:7a99:6650 with SMTP id af79cd13be357-83115bb0cc0mr390825585a.65.1758134234910;
-        Wed, 17 Sep 2025 11:37:14 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-83627d7d9c5sm27392685a.20.2025.09.17.11.37.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 11:37:14 -0700 (PDT)
-Date: Wed, 17 Sep 2025 11:37:10 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Petr Malat <oss@malat.biz>
-Cc: netdev@vger.kernel.org, sgoutham@marvell.com, lcherian@marvell.com,
- gakula@marvell.com, jerinj@marvell.com, sbhatta@marvell.com
-Subject: Re: [PATCH] ethernet: rvu-af: Remove slash from the driver name
-Message-ID: <20250917113710.75b5f9db@hermes.local>
-In-Reply-To: <20250917071229.1742013-1-oss@malat.biz>
-References: <20250917071229.1742013-1-oss@malat.biz>
+	s=arc-20240116; t=1758134461; c=relaxed/simple;
+	bh=v5a8HDMTWo9UE7JwWuCAP2Rrqh4yWlt5INN+qU7/k9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pU33ezDuJbo2YyvcUzqqD9r1D8X8yxvo1xYW/XdpwoGMa0S22j4lyIHSls1pUDDrLqTbM76MYxOSNXwXXynJUb5vgIpjSRFXo9HXM5GM36qL2GL5iq5LezORdSDpvlnxfy2gg+sNCTVpFQUkWvGBz5dydFNkxa0EVKvev7rMk1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEovyDBd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11FE7C4CEE7;
+	Wed, 17 Sep 2025 18:40:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758134460;
+	bh=v5a8HDMTWo9UE7JwWuCAP2Rrqh4yWlt5INN+qU7/k9Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YEovyDBdAidm++9nE0MUACQWUj04x3i0Ti0RfsJxCYJ/A/Bh9kp/NLbQewbyVy9x6
+	 bG2fy1bnO0c9Z9UrKN1cVoWN6cC2aKk8DcZyLgs+cTEk2CRheotZ/Odnj1mY6ZrT3b
+	 BuUH1ydBNossTwdmb5SUjrluU98XRUxhNSiZi15s9kj/1f47j4sCHxpq3jte2+AmUB
+	 UeRdrUU6hOOlQ0IRdsT8cAtJEyNs9LtTLJTVa1rKrw74CGocsJS5/YBOPWXae5Shev
+	 c818Zgw3Vm9RnlLt2UFWwqZPbzDKMwxtPRdinyciOq29FgoFpiHKDNqVu1zmJhceK7
+	 vQaU+hJE99pvg==
+Date: Wed, 17 Sep 2025 19:40:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 0/9] vsock: add namespace support to
+ vhost-vsock
+Message-ID: <20250917184053.GV394836@horms.kernel.org>
+References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+ <20250917161928.GR394836@horms.kernel.org>
+ <aMri5apAxBpHtZbJ@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aMri5apAxBpHtZbJ@devvm11784.nha0.facebook.com>
 
-On Wed, 17 Sep 2025 09:12:30 +0200
-Petr Malat <oss@malat.biz> wrote:
-
-> Having a slash in the driver name leads to EIO being returned while
-> reading /sys/module/rvu_af/drivers content.
+On Wed, Sep 17, 2025 at 09:33:41AM -0700, Bobby Eshleman wrote:
+> On Wed, Sep 17, 2025 at 05:19:28PM +0100, Simon Horman wrote:
+> > On Tue, Sep 16, 2025 at 04:43:44PM -0700, Bobby Eshleman wrote:
+> > 
+> > ...
+> > 
+> > > base-commit: 949ddfb774fe527cebfa3f769804344940f7ed2e
+> > 
+> > Hi Bobby,
+> > 
+> > This series does not seem to compile when applied to the commit above.
+> > Likewise when applied to current net-next (which is now slightly newer).
+> > 
+> > hyperv_transport.c: In function ‘hvs_open_connection’:
+> > hyperv_transport.c:316:14: error: too few arguments to function ‘vsock_find_bound_socket’
+> >   316 |         sk = vsock_find_bound_socket(&addr, vsock_global_dummy_net());
+> >       |              ^~~~~~~~~~~~~~~~~~~~~~~
+> > In file included from hyperv_transport.c:15:
+> > /home/horms/projects/linux/linux/include/net/af_vsock.h:218:14: note: declared here
+> >   218 | struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net,
+> >       |              ^~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > -- 
+> > pw-bot: changes-requested
 > 
-> Remove DRV_STRING as it's not used anywhere.
+> Ah dang it, looks like I had hvc disabled when I build tested it.
 > 
-> Signed-off-by: Petr Malat <oss@malat.biz>
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> index 0c46ba8a5adc..69324ae09397 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> @@ -21,8 +21,7 @@
->  #include "rvu.h"
->  #include "lmac_common.h"
->  
-> -#define DRV_NAME	"Marvell-CGX/RPM"
-> -#define DRV_STRING      "Marvell CGX/RPM Driver"
-> +#define DRV_NAME	"Marvell-CGX-RPM"
->  
->  #define CGX_RX_STAT_GLOBAL_INDEX	9
->  
-Please add
+> Thanks for the catch, I'll fix this in the next rev.
 
-Fixes: 91c6945ea1f9 ("octeontx2-af: cn10k: Add RPM MAC support")
-
+Thanks, that would explain things.
+Stuff happens :)
 
