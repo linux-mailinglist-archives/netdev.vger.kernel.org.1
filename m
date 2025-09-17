@@ -1,121 +1,181 @@
-Return-Path: <netdev+bounces-223924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3223B7D39A
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:21:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED54B7D78F
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:28:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7418B188DF9A
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 09:51:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D7177AF9CD
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 09:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5E03451DC;
-	Wed, 17 Sep 2025 09:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fSuYhjIB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040993451AE;
+	Wed, 17 Sep 2025 09:55:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1598884A3E;
-	Wed, 17 Sep 2025 09:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE8D2DC34B
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 09:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758102638; cv=none; b=IhFJoLDj3Abj7EB6k8YepCEXmLpc7sP2caWygZWllac7LIBvT64ff8qLdXPIB+RJnfWNtMdwMgSfwc4QTc7yaz9Yk8ht6gfgMDbtNBR74V/3IJF6fNRHUJURpI0iOibNHjtzjjp9fdC7bL4QHSPbjeQwN2zES9S7CmFdI4wdhUs=
+	t=1758102919; cv=none; b=SBuJeuFPki4fM1Z7osjEkFvDuAThWarFC5hwraNM2Y9qlni/nrI4ARNlQpyoHyxfcEv2zv0brP3i1OpwXY12K1RhGimPT+TzlNEl1rTEEI2quzbx6+EszFm7eh/skU9lQb9DtjPMuco6p0VS9OsQgA0CLSUFrkEgIvfLsCsmslk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758102638; c=relaxed/simple;
-	bh=R8bBc8E+Z3IqtxfpLmr+7QmObySQ+mWruEPNJ7MrlFc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRMeF4W6ekx/PijDAcV0ISs+X7z2Fnxendp9khd5uOsLWypBXhciz274l4BSp27TOccjsthLtGBKGdXbtUbQpBt4ZhXoZWDFW7PZMzNRCyQgyMu5o0nZVERtxsGUdLsE+Nb0tDKvBgLzt4dp7fsb1xF3BMA8dCjUzHOmtm07ie4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fSuYhjIB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A16DC4CEF0;
-	Wed, 17 Sep 2025 09:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758102637;
-	bh=R8bBc8E+Z3IqtxfpLmr+7QmObySQ+mWruEPNJ7MrlFc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fSuYhjIBPQXozMo1k0MYS23BlFjFflyKzb9M1olal1DqbotYr5zJO8l0sSMemANvr
-	 JIZm0E5KcqWHVcq+UJR7QNrEUu2z+Rqrfyhj932a9O2x1WDTMZMU4LHeGU+0J4eyuJ
-	 K4kixSlqEBJGjJYTr3gob3XKckJSRylgsFH58XOdeqYKnyayTN6YBRMdf+fctC4SK3
-	 AWzPoJBDk4fWUyo6RG6EQbGarou/c5TaQLpI7f38fr8zD+Df32I8yfBtDATeVEFvmA
-	 MZx+1PLSxEuhCwUODD21YBZbHLhi2AHw+SNDcQEVNHcWpClXy2uRenMP8fORyCC7zI
-	 kZFU+jQ0ZIGfA==
-Date: Wed, 17 Sep 2025 11:50:29 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, Jens Axboe <axboe@kernel.dk>, 
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 18/33] mnt: support ns lookup
-Message-ID: <20250917-garten-nirgendwo-f65f951a9268@brauner>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
- <20250912-work-namespace-v2-18-1a247645cef5@kernel.org>
- <20250916035633.GM39973@ZenIV>
- <20250916035949.GO39973@ZenIV>
- <20250916044648.GP39973@ZenIV>
+	s=arc-20240116; t=1758102919; c=relaxed/simple;
+	bh=kMPNSqfXiTA47FxCKgCB2/oJ9gSc4/KzV97yHyY8Ha4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JZqdcDqqFSuZxvLE4BMALoGYWYNOD9idIXTGRJLsY+yZQosTxi82pjkmfKtWpfTq3fxNpXeOHr3zvgpjgOpvGrNGyU35X4AY5CYodrk8HjVq7UzW39s1iw2JiMCl6p+NhjBzVwnOPcR9pKXaA5wgCl7TgidM5fx+iGcA1iBQxJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyosO-0002zq-En; Wed, 17 Sep 2025 11:55:00 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyosM-001jx6-32;
+	Wed, 17 Sep 2025 11:54:58 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uyosM-00000008pAy-3bgU;
+	Wed, 17 Sep 2025 11:54:58 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Hubert=20Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	stable@vger.kernel.org,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Lukas Wunner <lukas@wunner.de>,
+	Russell King <linux@armlinux.org.uk>,
+	Xu Yang <xu.yang_2@nxp.com>,
+	linux-usb@vger.kernel.org
+Subject: [PATCH net v1 1/1] net: usb: asix: forbid runtime PM to avoid PM/MDIO + RTNL deadlock
+Date: Wed, 17 Sep 2025 11:54:57 +0200
+Message-ID: <20250917095457.2103318-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250916044648.GP39973@ZenIV>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Sep 16, 2025 at 05:46:48AM +0100, Al Viro wrote:
-> On Tue, Sep 16, 2025 at 04:59:49AM +0100, Al Viro wrote:
-> > On Tue, Sep 16, 2025 at 04:56:33AM +0100, Al Viro wrote:
-> > > 	if (!RB_EMPTY_NODE(to_ns_common(ns)->ns_tree_node))
-> > 
-> >  	if (!RB_EMPTY_NODE(&to_ns_common(ns)->ns_tree_node))
-> > 
-> > obviously...
-> 
-> FWIW, how about the following - I put the commit below into never-rebased
-> branch, pull it into #work.mount and you do the same to your branch
-> just prior to 18/33?  The difference from one in #work.mount is that
-> this variant checks RB_EMPTY_NODE(&ns->mnt_ns_tree_node) instead of
-> list_empty(&ns->mnt_ns_list).  The reasons why it's safe lockless are
-> pretty much the same...
-> 
-> Objections?  Does vfs/vfs.git #no-rebases-mnt_ns_tree_remove look sane
-> for you?
+Forbid USB runtime PM (autosuspend) for AX88772* in bind.
 
-Perfect, thank you!
+usbnet enables runtime PM by default in probe, so disabling it via the
+usb_driver flag is ineffective. For AX88772B, autosuspend shows no
+measurable power saving in my tests (no link partner, admin up/down).
+The ~0.453 W -> ~0.248 W reduction on 6.1 comes from phylib powering
+the PHY off on admin-down, not from USB autosuspend.
 
-> 
-> mnt_ns_tree_remove(): DTRT if mnt_ns had never been added to mnt_ns_list
->     
-> Actual removal is done under the lock, but for checking if need to bother
-> the lockless RB_EMPTY_NODE() is safe - either that namespace had never
-> been added to mnt_ns_tree, in which case the the node will stay empty, or
-> whoever had allocated it has called mnt_ns_tree_add() and it has already
-> run to completion.  After that point RB_EMPTY_NODE() will become false and
-> will remain false, no matter what we do with other nodes in the tree.
->     
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> ---
-> diff --git a/fs/namespace.c b/fs/namespace.c
-> index ae6d1312b184..39afeb521a80 100644
-> --- a/fs/namespace.c
-> +++ b/fs/namespace.c
-> @@ -187,7 +187,7 @@ static void mnt_ns_release_rcu(struct rcu_head *rcu)
->  static void mnt_ns_tree_remove(struct mnt_namespace *ns)
->  {
->  	/* remove from global mount namespace list */
-> -	if (!is_anon_ns(ns)) {
-> +	if (!RB_EMPTY_NODE(&ns->mnt_ns_tree_node)) {
->  		mnt_ns_tree_write_lock();
->  		rb_erase(&ns->mnt_ns_tree_node, &mnt_ns_tree);
->  		list_bidir_del_rcu(&ns->mnt_ns_list);
+With autosuspend active, resume paths may require calling phylink/phylib
+(caller must hold RTNL) and doing MDIO I/O. Taking RTNL from a USB PM
+resume can deadlock (RTNL may already be held), and MDIO can attempt a
+runtime-wake while the USB PM lock is held. Given the lack of benefit
+and poor test coverage (autosuspend is usually disabled by default in
+distros), forbid runtime PM here to avoid these hazards.
+
+This affects only AX88772* devices (per-interface in bind). System
+sleep/resume is unchanged.
+
+Fixes: 4a2c7217cd5a ("net: usb: asix: ax88772: manage PHY PM from MAC")
+Reported-by: Hubert Wiśniewski <hubert.wisniewski.25632@gmail.com>
+Closes: https://lore.kernel.org/all/20220622141638.GE930160@montezuma.acc.umu.se
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Closes: https://lore.kernel.org/all/b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com
+Cc: stable@vger.kernel.org
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+Link to the measurement results:
+https://lore.kernel.org/all/aMkPMa650kfKfmF4@pengutronix.de/
+---
+ drivers/net/usb/asix_devices.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+index 792ddda1ad49..0d341d7e6154 100644
+--- a/drivers/net/usb/asix_devices.c
++++ b/drivers/net/usb/asix_devices.c
+@@ -625,6 +625,22 @@ static void ax88772_suspend(struct usbnet *dev)
+ 		   asix_read_medium_status(dev, 1));
+ }
+ 
++/*
++ * Notes on PM callbacks and locking context:
++ *
++ * - asix_suspend()/asix_resume() are invoked for both runtime PM and
++ *   system-wide suspend/resume. For struct usb_driver the ->resume()
++ *   callback does not receive pm_message_t, so the resume type cannot
++ *   be distinguished here.
++ *
++ * - The MAC driver must hold RTNL when calling phylink interfaces such as
++ *   phylink_suspend()/resume(). Those calls will also perform MDIO I/O.
++ *
++ * - Taking RTNL and doing MDIO from a runtime-PM resume callback (while
++ *   the USB PM lock is held) is fragile. Since autosuspend brings no
++ *   measurable power saving for this device with current driver version, it is
++ *   disabled below.
++ */
+ static int asix_suspend(struct usb_interface *intf, pm_message_t message)
+ {
+ 	struct usbnet *dev = usb_get_intfdata(intf);
+@@ -919,6 +935,16 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	if (ret)
+ 		goto initphy_err;
+ 
++	/* Disable USB runtime PM (autosuspend) for this interface.
++	 * Rationale:
++	 * - No measurable power saving from autosuspend for this device.
++	 * - phylink/phylib calls require caller-held RTNL and do MDIO I/O,
++	 *   which is unsafe from USB PM resume paths (possible RTNL already
++	 *   held, USB PM lock held).
++	 * System suspend/resume is unaffected.
++	 */
++	pm_runtime_forbid(&intf->dev);
++
+ 	return 0;
+ 
+ initphy_err:
+@@ -948,6 +974,10 @@ static void ax88772_unbind(struct usbnet *dev, struct usb_interface *intf)
+ 	phylink_destroy(priv->phylink);
+ 	ax88772_mdio_unregister(priv);
+ 	asix_rx_fixup_common_free(dev->driver_priv);
++	/* Re-allow runtime PM on disconnect for tidiness. The interface
++	 * goes away anyway, but this balances forbid for debug sanity.
++	 */
++	pm_runtime_allow(&intf->dev);
+ }
+ 
+ static void ax88178_unbind(struct usbnet *dev, struct usb_interface *intf)
+@@ -1600,6 +1630,10 @@ static struct usb_driver asix_driver = {
+ 	.resume =	asix_resume,
+ 	.reset_resume =	asix_resume,
+ 	.disconnect =	usbnet_disconnect,
++	/* usbnet will force supports_autosuspend=1; we explicitly forbid RPM
++	 * per-interface in bind to keep autosuspend disabled for this driver
++	 * by using pm_runtime_forbid().
++	 */
+ 	.supports_autosuspend = 1,
+ 	.disable_hub_initiated_lpm = 1,
+ };
+-- 
+2.47.3
+
 
