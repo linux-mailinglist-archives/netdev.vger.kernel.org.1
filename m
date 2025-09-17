@@ -1,104 +1,148 @@
-Return-Path: <netdev+bounces-223997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A47D1B7C7CF
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:03:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C71D3B7D501
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65AE4463D00
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 12:03:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A96CD620AEB
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 12:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AD4374291;
-	Wed, 17 Sep 2025 12:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3231D3233EF;
+	Wed, 17 Sep 2025 12:18:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzC7Qm7j"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+i9x2GY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B26372882;
-	Wed, 17 Sep 2025 12:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CF83233EC
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 12:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758110624; cv=none; b=ZLP4KUPmMEDKwvrfdCn0N2dCFNUkCdOsYZGa5jmriMQKGHODUw5AEW8CBA7PTlicQ/X2uJ3H/6mxmM6plzz4eusUMTLCG1g+hCqQZanWwEvimAdJQWDQMdqU7EsgHSLh/3/t7sNL2b9u22rnlwwUEaJZBx46MeayM5XNKGvpdsI=
+	t=1758111512; cv=none; b=lkPx51dggxoCd5aoSpfitDeRod/9VZ/l1CljOdSkDhO+WwfEhzLON4Sn6r+Rrd+d0E0MMlBBc+dabCKSe/p1Ven/WB0QH/w039c914WURx5FhwfnjOLzb0cc6GN6O5MuE9Ns0rmRSgQB1OKLGCSeX5Z37n30XPYAXZ1U5gtmlIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758110624; c=relaxed/simple;
-	bh=EHrb4gqL1rHU8061yTQb4iB8KrgSabWPuy5lggceznk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RkCuz/wIKCSqwfdpBRiakIA3Z+cydfiBXs8awUhqMSPtQK5o+tnxRzgJJtQrPBWkiWlqJrUmGyE3Gisa9pu7DloSzgCsNowETDMDzDIjEY6Po5/vaGKrBwoar7kr9L33esgljEi/GEWh9bQkRIhQX28AlPjo3R7turZtlQODzDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzC7Qm7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05383C4CEF5;
-	Wed, 17 Sep 2025 12:03:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758110623;
-	bh=EHrb4gqL1rHU8061yTQb4iB8KrgSabWPuy5lggceznk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kzC7Qm7jvkKwVjOdxqmUipfmdIolkXA48NHLg4RPZy7f6r5YaJECKhpzlMmwQedDv
-	 qBn6Z6JuEhPIs5Kpbg5kN6QQ+8o0ZT6vP5z5XXGf0p2XFwyX1qdCWTpk5kZyMr2cdp
-	 jMyt/EOXdruxwpX1+7+TN7Zx9WMtq1MTiVm6aEP9jiCcA7wJrahh3IP0sz214d/cR7
-	 lQtS0ikgZVX42hQ1szoK/HivkJnESGzJyjwcFTaTgy0CDi6+XQNfUcAr/HNpCf7sEN
-	 h51AMvI+XBNPQWK1t2ECUsiWaF0vJihNcmVG/q42F5qBxmreG5eoGIj7d9hZzCUvzW
-	 4NLiR2+OwfvIg==
-Date: Wed, 17 Sep 2025 13:03:39 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>, Yixun Lan <dlan@gentoo.org>,
-	Guodong Xu <guodong@riscstar.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the net-next tree with the spacemit
- tree
-Message-ID: <76970eed-cb88-4a42-864a-8c2290624b72@sirena.org.uk>
-References: <aMqby4Cz8hn6lZgv@sirena.org.uk>
- <597466da-643d-4a75-b2e8-00cf7cf3fcd0@iscas.ac.cn>
+	s=arc-20240116; t=1758111512; c=relaxed/simple;
+	bh=Fu6VJL0MenpK/PD9UnrT8AK9a4ClFtuRJz79IysQBbY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uFBgUUzOj3fikNTkLj37rYtFFeH85VXgYzza4F4U2pX02BwPav/KP/aJSkMbino1+aZlKpx4PGSxHAV0USJwimNspTB1HRlobZOezAOoNI39Nc00p+o5asa5WVQJYefqiHh1m0/IRRLSd3ZFIuo6dkWpFNYeLM5BCdk5D5KBSMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b+i9x2GY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758111509;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WHUsCtApx+pxExGjQp0qwPu/9kvqAUJMxOY2ilcMotc=;
+	b=b+i9x2GYwzymS9ayjtrD7VIfMnc3CF3rhMxaNmg5ZU3IK3JXk7GrGZsNU5eTHQWUEVLEbb
+	FyXy4cS1NhGSqysXzyCgmezpj0p4rKGMvfylKK8Mm/5PPigtfr6lcYpt79ac8Rs3FbGZsg
+	fsXCNfUWef1umRdtOMCHpqFzYbUNXlo=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-159-hsrNCk_4Nw-FpNyMYA7TAw-1; Wed,
+ 17 Sep 2025 08:18:25 -0400
+X-MC-Unique: hsrNCk_4Nw-FpNyMYA7TAw-1
+X-Mimecast-MFC-AGG-ID: hsrNCk_4Nw-FpNyMYA7TAw_1758111503
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CBB5C1800378;
+	Wed, 17 Sep 2025 12:18:22 +0000 (UTC)
+Received: from [10.45.225.133] (unknown [10.45.225.133])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2A1B6195608E;
+	Wed, 17 Sep 2025 12:18:17 +0000 (UTC)
+Message-ID: <c60779d6-938d-4adc-a264-2d78fb3c5947@redhat.com>
+Date: Wed, 17 Sep 2025 14:18:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="h8vWFp2zCMfk9XgN"
-Content-Disposition: inline
-In-Reply-To: <597466da-643d-4a75-b2e8-00cf7cf3fcd0@iscas.ac.cn>
-X-Cookie: Lake Erie died for your sins.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] dpll: zl3073x: Allow to use custom phase
+ measure averaging factor
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20250911072302.527024-1-ivecera@redhat.com>
+ <20250915164641.0131f7ed@kernel.org>
+ <SA1PR11MB844643902755174B7D7E9B3F9B17A@SA1PR11MB8446.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <SA1PR11MB844643902755174B7D7E9B3F9B17A@SA1PR11MB8446.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
+On 17. 09. 25 1:26 odp., Kubalewski, Arkadiusz wrote:
+>> From: Jakub Kicinski <kuba@kernel.org>
+>> Sent: Tuesday, September 16, 2025 1:47 AM
+>>
+>> cc: Arkadiusz
+>>
+>> On Thu, 11 Sep 2025 09:23:01 +0200 Ivan Vecera wrote:
+>>> The DPLL phase measurement block uses an exponential moving average,
+>>> calculated using the following equation:
+>>>
+>>>                         2^N - 1                1
+>>> curr_avg = prev_avg * --------- + new_val * -----
+>>>                           2^N                 2^N
+>>>
+>>> Where curr_avg is phase offset reported by the firmware to the driver,
+>>> prev_avg is previous averaged value and new_val is currently measured
+>>> value for particular reference.
+>>>
+>>> New measurements are taken approximately 40 Hz or at the frequency of
+>>> the reference (whichever is lower).
+>>>
+>>> The driver currently uses the averaging factor N=2 which prioritizes
+>>> a fast response time to track dynamic changes in the phase. But for
+>>> applications requiring a very stable and precise reading of the average
+>>> phase offset, and where rapid changes are not expected, a higher factor
+>>> would be appropriate.
+>>>
+>>> Add devlink device parameter phase_offset_avg_factor to allow a user
+>>> set tune the averaging factor via devlink interface.
+>>
+>> Is averaging phase offset normal for DPLL devices?
+>> If it is we should probably add this to the official API.
+>> If it isn't we should probably default to smallest possible history?
+>>
+> 
+> AFAIK, our phase offset measurement uses similar mechanics, but the algorithm
+> is embedded in the DPLL device FW and currently not user controlled.
+> Although it might happen that one day we would also provide such knob,
+> if useful for users, no plans for it now.
+>  From this perspective I would rather see it in dpll api, especially
+> this relates to the phase measurement which is already there, the value
+> being shared by multiple dpll devices seems HW related, but also seem not a
+> problem, as long as a change would notify each device it relates with.
 
---h8vWFp2zCMfk9XgN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+What if the averaging is implemented in different HW differently? As I
+mentioned the Microchip HW uses exponential moving average but
+a different HW can do it differently.
 
-On Wed, Sep 17, 2025 at 07:48:34PM +0800, Vivian Wang wrote:
+> Does frequency offset measurement for EEC DPLL would also use the same value?
 
-> Just FYI, Yixun has proposed for net-next to back out of the DTS changes
-> and taking them up through the spacemit tree instead [1], resolving the
-> conflicts in the spacemit tree. This would certainly mean less headaches
-> while managing pull requests, as well as allowing Yixun to take care of
-> code style concerns like node order. However, I do not know what the
-> norms here are.
+Nope, this only affects phase offset measurement. AFAIK there is no such
+tuning knob for FFO or frequency measurement in general...
+Is it correct Prathosh?
 
-Thanks.  They're pretty trivial conflicts so I'm not sure it's critical,
-though like you say node order might easily end up the wrong way round
-depending on how the conflict resolution gets done.
+Thanks,
+Ivan
 
---h8vWFp2zCMfk9XgN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjKo5oACgkQJNaLcl1U
-h9D03Qf/auRPE6g6mEJyZh5upt8xEArJkkPzZN2q9m3dfeL3iJx1JpoKO9NonZux
-D9bk09lirIdMIVl7d+F8hOSeGV1tvbnKTgmhpksGSCOHoTOdNklClukJchpxGyei
-oMFq9TYntSmp00szOt9batea3nXOdbk6gHT+rvm6llYt5Etdx7+I+FbIkCRRrI+g
-yFm2xQP5e3eiUG0JOn5HtpbtNjhm8UHzKwo1WZLMaDzAbbzHOBQxxCNUKoGYjQmm
-D1agVE1azU50EXDxNAIMbS/E8tDO48+fYJg5kYMCr1tXDS8Wgrf1bwfZMi5UyQA/
-MQ+Kkl7aEsTO6yWS2gLARhq2nGxU8A==
-=etPz
------END PGP SIGNATURE-----
-
---h8vWFp2zCMfk9XgN--
 
