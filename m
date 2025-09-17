@@ -1,130 +1,104 @@
-Return-Path: <netdev+bounces-224134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA35CB81180
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:57:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A63B81177
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2BE92A7790
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:57:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 511121B26393
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C570E2FB61D;
-	Wed, 17 Sep 2025 16:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rMGRGJTR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D18A2FB0B7;
+	Wed, 17 Sep 2025 16:56:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710E52FB085
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAC62E0927
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758128227; cv=none; b=oaoFE4fA1Wkn7Nx25eShikLDPVlar/tXT4Y4hgqUdMX2uAP91mkEKchHiQXlC1mM5tfH5cVFrdYqfa8sf3QiXjN/vnRu08In1zI+FX2SBGk6H4owYBaLQpi/GyU9LE4WB5SDUWQ4a3yU4rHhaIN3H4gsQtrJaUlXBw1l3ZKkpDY=
+	t=1758128216; cv=none; b=pG08LP9NG6saoISPOMW99tMtK/Z1x1XPaA7QfBeqgR49aynvLPzatF7+6lJ2kqsbQpbGWK85ly495rN4KGGpZJyk0SGMDaSuglzSn3zR2tNFrAKo4xv3rggKbJWNndT+l8WsHjsHU+Ve2fsjAwnJa6YbjCePlVhohc0Nvc9i+Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758128227; c=relaxed/simple;
-	bh=RoYs+lOPKP6EI+cACs3xu9y1s81zhU0ASthwBE3+IQU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CyCtkXfZS1QGfg2t0wY2uZAixgTpbTR3WQMaj1R5qp6+38zlbBC7kXhqqZm5GsQlefnL/Lbbcb+fU6tqkqY89huiPUqW4Vt0+zRqtWFluvUmv4gNqSOov7EdMA050ysJIppbYJ2Uusb64U/+U4PozngXSovMC1keX8bleE6fbgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rMGRGJTR; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0be046b6-a48e-45be-9b0e-3922f298b089@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758128213;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1JoFXqqjHsUv55cfZ28zVmVLyTt7+FuolwMXE9BtBiU=;
-	b=rMGRGJTREOYpdTnMVNhvvmi5BAKKTLUj7wP1zqJOVOHkUO0Ttj8HFZ3l5nXc/iaw0o1MQL
-	2QM9jmog1MShmwUw6gyM0sKRbNzoYZwf7/8/VfUKicRYjLICunvr2ZhR3T3VADDscVI9EF
-	wYhQDUM30pposu7scRj3bV4GGxVOhnA=
-Date: Wed, 17 Sep 2025 17:56:46 +0100
+	s=arc-20240116; t=1758128216; c=relaxed/simple;
+	bh=2hPN7ILfVqTEJ+c3AG1t5AUjGGnDy82Y4ctwGuvzzZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EDdp3S0uCJLCwmixX02Ld7n1+lXk6im7msHivQFt5MDtrx6rmsDmMpcI5EOCSjTQpKNsBRm55dXDmm3fMxa5YwqlpL6QgpgvQtNgMc8KAHjDk91eFfenGH/zz1hloqGcCUhtYh5/WpgvrInb1j31obPbnx1uqtuFFZdFngRWYSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-62f0411577aso8792163a12.1
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 09:56:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758128213; x=1758733013;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9U8MKFNdluOhv4aa38RV9TP5AYkB3xRCykBzF0UIvoM=;
+        b=Xjg5sNUTWdxT7Fj7bTJHXBH3K80XnDEDwNtJqIW1od8OgKwJen4IZjZF/dJ+zXjpfM
+         kSxF31jnv4YkRj+HX3wvm6xOUcXljhMVjogIhvF8R4chv6nzxBNB9ZJu4rTsia/8o1A6
+         +/qYwElphEtjkL9MjktgpKQ+DIZoIWOYAlwmW3zMY8OMg41qI67/xPnGCDSPktohvL8f
+         r7zUOfDozc4IdmPpAqOSyaRIqBv7+SS9johFD6Pxazxe+vbS6oafSq4dqraKQY5ZYN++
+         E8qlLlNPUKMLEq463s9yOsKIHyNUFpaiGY3DUhbiQADtZiOeEvTRFO7lFcGL2ksbNiPl
+         i7jw==
+X-Forwarded-Encrypted: i=1; AJvYcCVu6gd5HJSLDPhUpHNp3Pda1kNa7FlRbDpxNek2kggUb18GVUWQufMEl0omFRrD0c1URGr9L6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxtl5DxEODtfUnt6LekanEVyQXIruto404KhA8K0kaYVdYZN9ft
+	ekhrmOckgGSZ499BsHCCqWB9hCpCZrsTOMyKB2Jnkt+hoAcMiLbiSSwb
+X-Gm-Gg: ASbGncvL+dWq5OeyqqXqgnUducwTxt39D1UZocQakVihJfp0Py5GMHB2w1mq0tpdMzq
+	SuWZvZdo4qpbnA2V09fDNwROcKl/YLTT3NoxE5Fb8oCGmffLfFBmHlDVLvPjvW7B+gWEYJZ5sQG
+	0dBJKmYA/x1xFZvqSRkCK7LRXZlI1jpmNWWSjScHlcmnSuzk8ZNAsiqwjaOgM7ZlJKMUCebOBNi
+	SXcCJFHe0D1pYTVQ3EyMJhdF9sjWghshmFOevDdomENN060dvclRIhiqSy+5+WPEBl4+xttuzCK
+	mkG2DbYoT5oJfeQABogOLsCEOqx1YIb96uhsHwHcKpnix3M/u87h4GcFOKRq4uEav3quhbc8way
+	gXehkIOCPseCn
+X-Google-Smtp-Source: AGHT+IHJpIlHY2aCZmF0CH+nbnFOFzfFn3bboh6zZrx2bP16Eyzb6LmBuSNHyS/M1WQcJVBhRlM65A==
+X-Received: by 2002:a05:6402:2816:b0:61c:e1d6:6bf6 with SMTP id 4fb4d7f45d1cf-62f83a06fcemr2995700a12.7.1758128212480;
+        Wed, 17 Sep 2025 09:56:52 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:5::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62efe17e03esm10425340a12.47.2025.09.17.09.56.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 09:56:52 -0700 (PDT)
+Date: Wed, 17 Sep 2025 09:56:49 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+	david decotigny <decot@googlers.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, calvin@wbinvd.org, 
+	kernel-team@meta.com, jv@jvosburgh.net
+Subject: Re: [PATCH net v4 4/4] selftest: netcons: add test for netconsole
+ over bonded interfaces
+Message-ID: <xskolllpk7re4qptsyznfbqngns55hetjwy2psdio2b5fyr7qe@26qv7rpschzs>
+References: <20250917-netconsole_torture-v4-0-0a5b3b8f81ce@debian.org>
+ <20250917-netconsole_torture-v4-4-0a5b3b8f81ce@debian.org>
+ <20250917091309.1149dc5a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] net: nfc: nc: Add parameter validation for packet data
-To: Deepak Sharma <deepak.sharma.472935@gmail.com>, krzk@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel-mentees@lists.linux.dev,
- syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-References: <20250917140547.66886-1-deepak.sharma.472935@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250917140547.66886-1-deepak.sharma.472935@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917091309.1149dc5a@kernel.org>
 
-On 17/09/2025 15:05, Deepak Sharma wrote:
-> This is v2 for the original patch, I realized soon after
-> sending the patch that I missed the release of skb before
-> returning, apologies.
+On Wed, Sep 17, 2025 at 09:13:09AM -0700, Jakub Kicinski wrote:
+> On Wed, 17 Sep 2025 05:51:45 -0700 Breno Leitao wrote:
+> >  tools/testing/selftests/drivers/net/Makefile       |   1 +
+> >  .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 167 +++++++++++++++++++--
+> >  .../selftests/drivers/net/netcons_over_bonding.sh  |  76 ++++++++++
+> 
+> We need to add bonding to selftests/drivers/net/config:
 
-this part shouldn't be in the commit message, it has to go under
-strip mark ("---")
+Oh, I though it was using selftests/net/config. I even wrote on 
+the commit message:
 
-> 
-> Syzbot reported an uninit-value bug at nci_init_req for commit
-> 5aca7966d2a7
-> 
-> This bug arises due to very limited and poor input validation
-> that was done at net/nfc/nci/core.c:1543. This validation only
-> validates the skb->len (directly reflects size provided at the
-> userspace interface) with the length provided in the buffer
-> itself (interpreted as NCI_HEADER). This leads to the processing
-> of memory content at the address assuming the correct layout
-> per what opcode requires there. This leads to the accesses to
-> buffer of `skb_buff->data` which is not assigned anything yet
-> 
-> Following the same silent drop of packets of invalid sizes, at
-> net/nfc/nci/core.c:1543, I have added validation in the
-> `nci_nft_packet` which processes NFT packets and silently return
-> in case of failure of any validation check
-> 
-> Possible TODO: because we silently drop the packets, the
-> call to `nci_request` will be waiting for completion of request
-> and will face timeouts. These timeouts can get excessively logged
-> in the dmesg. A proper handling of them may require to export
-> `nci_request_cancel` (or propagate error handling from the
-> nft packets handlers)
-> 
-> Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
-> Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
-> ---
->   net/nfc/nci/ntf.c | 42 ++++++++++++++++++++++++++++++++++--------
->   1 file changed, 34 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-> index a818eff27e6b..f5e03f3ff203 100644
-> --- a/net/nfc/nci/ntf.c
-> +++ b/net/nfc/nci/ntf.c
-> @@ -809,35 +809,61 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
->   
->   	switch (ntf_opcode) {
->   	case NCI_OP_CORE_RESET_NTF:
-> -		nci_core_reset_ntf_packet(ndev, skb);
-> +		if (skb->len < sizeof(struct nci_core_reset_ntf))
-> +			goto end;
-> +		else
-> +			nci_core_reset_ntf_packet(ndev, skb);
->   		break;
+```
+This depends on CONFIG_BONDING, which is already set in
+tools/testing/selftests/net/config.
+```
 
-every case here has it's special function. I believe the length check
-should be put into these functions and then the return value should
-indicate error. That's the actual style of kernel code.
-
-You should also indicate the tree to apply your patch, as this is the
-fix, the tree will be net, so the subject should be:
-[PATCH net v2] net: nfc: nc: Add parameter validation for packet data
-
-And the Fixes tag should be added to provide some information for
-possible backports.
+but, in fact, It should be selftests/drivers/net/config. I will update.
 
