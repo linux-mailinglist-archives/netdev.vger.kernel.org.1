@@ -1,119 +1,84 @@
-Return-Path: <netdev+bounces-224111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B09A5B80D0A
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:00:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECACB80EAF
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:17:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE96A7AF3D6
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:58:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27AAC62716A
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:16:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7FC309F02;
-	Wed, 17 Sep 2025 16:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C682FB097;
+	Wed, 17 Sep 2025 16:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fzli/wkD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4gAVDv3K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975A92DC35A
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2225D2FB0B7
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758124801; cv=none; b=uIXKkL2ca/i5in3MlX7u/BPkyCWZkS2gevQKpg5f9S6xNdGbHnedEN/RI+wLwIkLZarcuaRncEywblgZaPGJ03eVtEODnDpz5RW/EvI8g3Y5ZYaHLPK2p+XihHEJNHmzwou2gRFq3ZU9G+Yn3CUDeEalRsoii5othIlDvf+oiaM=
+	t=1758125171; cv=none; b=h/0QvtmuwHRYJeZsypMqx7mTJkITbObuUffXo0Ohn8LbmdAAIbBLCZrkPy7+7M5TGxtlXBrhmFp42C8KjuBFFmIeyeruUlglYu6zAIhv9CEjonQif7FV9LrUC2MS3kohjNUvCAO3yM1at/u1zl7JeRIGAJ0tK6LzFKW+zTjvABM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758124801; c=relaxed/simple;
-	bh=p8VU8d7acAevSPUK7uEtuzMqc5TZahg5NjVNZ0H49LM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YAViao4n4Yx2QBYTXQ+G1CQOaElb8wi+kYR5T5z9FUfDsY/SoJ9okRn3lgnBzpmpB3k2grIaUrN4kntt4OahazuGP7r6XrA7B9cDSHXusk14WgPuWoG5tXWcksepW38a83QxcRLV062MUj07WPmvadlz67fzAPF8VHTdomDpbuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fzli/wkD; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-80a6937c8c6so821832885a.2
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758124798; x=1758729598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p8VU8d7acAevSPUK7uEtuzMqc5TZahg5NjVNZ0H49LM=;
-        b=fzli/wkD90orpjV+GHgZws5gLaAF5+ZZoGjaYus+EalAjcLFStVi1oXoQBEhPBNwVm
-         PBboavCgKkM7ZIuLK/bbjmUDIuJxNFYAAEuAPY6lHjCKG9bx6W1E5jxFh/i0xxSILcWY
-         d4+kjhrZqX0SMB4j1/3mUaelOx4y6SRrSsXi8wogAzINXBRID1/3sBBaBl9qAdWT018v
-         sxeO4neHYTW+SNMPNRTItlZEqmNG7lWlDsWXIdFi4yyMDRGYIyJZyecSaUUV6GR26kZp
-         2bDhcEfYgcGgpE8lyvVt3vbcnEV317MMAFpx7Y4QBWXzfrn6VDdDCTp6KsCSKXmWZt/E
-         MKqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758124798; x=1758729598;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p8VU8d7acAevSPUK7uEtuzMqc5TZahg5NjVNZ0H49LM=;
-        b=pO7nqqDdgtHgO6NZFqWIpBmtTd3pMfQ0WoV5oigRwOXMcxzDnV2aJVdvoKKQ39yjRC
-         m6TtMLtzfNSpCUmU2tO8D3ockWjKxjpbx/VHtWXz3oF6XUsoZHCwpWv+304gKoQN8RZ9
-         zRkdp/y2jZYIQwxBz/skI9G3wjtUAMZcD9Emh2UOFxxZfunQJBfgvgVv+UsIigEB64nT
-         U9kuMD0tZzkWtWShP3W4XS3h60OnbD6xYzh1lVn9vER1ufYiw6T1Gk6zMwKqTmTmVC6y
-         bhb4Sdv7wCfllzfj6cw6DpWfrA+95cuauEtGBJ4JMpuIeg4AwgE7QXvpmGqn5B9BJQTB
-         Jgnw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4MfPmroc0jglNleY7xT7CmkInqJZp/in7E+37F6tOrQbUWXlIDPBGt7hPzrnTQ4HUpG6ZEg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHsAI2It5qKZlJ1cAtSWvCRs35VL2uaOTnLCPCEsX3rQXfBGMJ
-	YPMxl7mT5xEBdcVSyX9erzfg9gfM+2zNyywMVizqA7DV8pzTa1w+wBQ2zmtoWIip/Ku8GoBXp4m
-	MFK+FAynzF1RzsVqxhc/qHuL06EC+AR11vSA7ltwA
-X-Gm-Gg: ASbGncsiOynzPzEATnBB7Ummze3RV/sHyLbvS6U0GUpJ9Dvjbltq4xw0fwPdEUO8OOD
-	94fZUv4Ali5sFSVlpCnrMa/0dRlZi88Gw1LncQf884/xwQmaJC6kNg9JEsXPbY6i0SjOJTTqafM
-	nomxwfbmq8I+4mX6Ioi+lbGb6MI2eCqRob++RQUxY3BrRuYYty/qcucMFHuipc5STwEColLPLPu
-	hBWqwIWqM7k
-X-Google-Smtp-Source: AGHT+IEY/PyZp1WBGsKJPyJFeI1IEf25apm8zXHVEw5wScGBo8SqeCbSKDuMXCsjLK828SsoHGuQ8EqD1wN180MnPzU=
-X-Received: by 2002:a05:620a:44d4:b0:82b:54f:5b8a with SMTP id
- af79cd13be357-8311186db3dmr308775585a.75.1758124797892; Wed, 17 Sep 2025
- 08:59:57 -0700 (PDT)
+	s=arc-20240116; t=1758125171; c=relaxed/simple;
+	bh=fNAjYCt/dU7H8sBgKv5dg+BUdC6OpbrM6DMmuH8vkEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MybbJAfCiZU6PPtQuuay5aRsmBc8cVdM4z673dP7BFz2qvHmd8mUqcZRex3fZRfYiOjOypdDTjQjSFcm+gpsfIno35vppkol1QlksXJTXrGyKsayzUG9NOPS/lygerip/CqnYTnOYId9O1QKs3+FY00SZl9mhWKEu+Dp7J/MWYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4gAVDv3K; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=m/MDqomzgI6pBI6nzwPoyNMxfPqurjDyksayxWbnCpo=; b=4gAVDv3KBeS8AM9m1eLUQ8EEHP
+	/eLkmu6ZHO+D7AzvSphkC4ZzhwcSm09xxT67z/X+XjM2VfJu9hixVO9hgeTdoQIc8KvPpYBYNNEoM
+	A+qxnNULJiSHyQe9aJm13rQmOEY4P3/N+uiG011m5NBWeh07dLks7u/QsjKuRUJsNeVg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uyufW-008iDl-4Y; Wed, 17 Sep 2025 18:06:06 +0200
+Date: Wed, 17 Sep 2025 18:06:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Petr Malat <oss@malat.biz>
+Cc: netdev@vger.kernel.org, sgoutham@marvell.com, lcherian@marvell.com,
+	gakula@marvell.com, jerinj@marvell.com, sbhatta@marvell.com
+Subject: Re: [PATCH] ethernet: rvu-af: Remove slash from the driver name
+Message-ID: <a12eb1fb-6110-4266-b60e-2b74c1927418@lunn.ch>
+References: <20250917071229.1742013-1-oss@malat.biz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250917135337.1736101-1-edumazet@google.com> <CAEWA0a6b5P-9_ERvh9mCWOgbH6OYdTUXWVGgA20CQ5pfDC2sYA@mail.gmail.com>
-In-Reply-To: <CAEWA0a6b5P-9_ERvh9mCWOgbH6OYdTUXWVGgA20CQ5pfDC2sYA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 17 Sep 2025 08:59:46 -0700
-X-Gm-Features: AS18NWDpc54Ny7WiC6WI8_pv5gt_wkspmTrUnbWeHn8u7AoM0Y3ZYaBU4oQyyGA
-Message-ID: <CANn89iLC+Gr9BbyNQq-udVY-EZjtjZxCL9sJEpaySTps0KkFyg@mail.gmail.com>
-Subject: Re: [PATCH net] net: clear sk->sk_ino in sk_set_socket(sk, NULL)
-To: Andrei Vagin <avagin@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917071229.1742013-1-oss@malat.biz>
 
-On Wed, Sep 17, 2025 at 8:39=E2=80=AFAM Andrei Vagin <avagin@google.com> wr=
-ote:
->
-> On Wed, Sep 17, 2025 at 6:53=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > Andrei Vagin reported that blamed commit broke CRIU.
-> >
-> > Indeed, while we want to keep sk_uid unchanged when a socket
-> > is cloned, we want to clear sk->sk_ino.
-> >
-> > Otherwise, sock_diag might report multiple sockets sharing
-> > the same inode number.
-> >
-> > Move the clearing part from sock_orphan() to sk_set_socket(sk, NULL),
-> > called both from sock_orphan() and sk_clone_lock().
-> >
-> > Fixes: 5d6b58c932ec ("net: lockless sock_i_ino()")
-> > Closes: https://lore.kernel.org/netdev/aMhX-VnXkYDpKd9V@google.com/
-> > Closes: https://github.com/checkpoint-restore/criu/issues/2744
-> > Reported-by: Andrei Vagin <avagin@google.com>
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
->
-> Acked-by: Andrei Vagin <avagin@google.com>
-> I think we need to add `Cc: stable@vger.kernel.org`.
+On Wed, Sep 17, 2025 at 09:12:30AM +0200, Petr Malat wrote:
+> Having a slash in the driver name leads to EIO being returned while
+> reading /sys/module/rvu_af/drivers content.
+> 
+> Remove DRV_STRING as it's not used anywhere.
+> 
+> Signed-off-by: Petr Malat <oss@malat.biz>
 
-I never do this. Note that the prior patch had no such CC.
+Hi Petr
+
+This probably should be for net, not next-next. Please see:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+Please also include a Fixes: tag.
+
+
+    Andrew
+
+---
+pw-bot: cr
 
