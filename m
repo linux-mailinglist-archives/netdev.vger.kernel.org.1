@@ -1,61 +1,50 @@
-Return-Path: <netdev+bounces-223823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98716B7CECE
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:14:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F13AB7D0B2
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:16:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EBE01B274C0
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 00:28:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6AA32A7A50
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 00:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238CB1C7013;
-	Wed, 17 Sep 2025 00:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0381DF99A;
+	Wed, 17 Sep 2025 00:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OZE4Xv2K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l7nfDF/A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B101C4A0A
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 00:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9201D5170;
+	Wed, 17 Sep 2025 00:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758068907; cv=none; b=cKej1QmO7SQr5YkeWev5M0gnUg5Fj/e1g12r4u61uVZRc7HON+InOCQLvTpX4BbyilPYYhB5ruoQ4WqzBDkllXyhZL8THrueA6KR3sgaQlBSfPo9MWR/J82shxaI0p0nJdaTCdgVaaxVPyon6Yo7UZyRMKb0NqR96KJeSTtyNxU=
+	t=1758069008; cv=none; b=rbMNcUrKXDUyS9JaFOl7xFZLRZnhNiY3Fkz81EoF++D1+qUHh5yUY3fdcOiAA44kjFLtMMoDqYUnrfEmdxV6YkEkC4tHdQgHoo09Ak5PASvkM9W75XrpJeCUP7+LENju6kSDnECBQsbJcr1Yw/yxKCPhWShSWyAohZnCKqFDSHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758068907; c=relaxed/simple;
-	bh=ckV537HOKN+hfxC+f++NTwcm9JJZ35azQb1FUInmSU4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NFrMPLfbJX4emwRNUgIrExSC5D83VpCb5A/8bnO+STS3Kxr0dsSYg+KKRu7aBSyTBopvZn4JZ3CNJdWgtt3iR4lZ+vfPk8C5noGyqZsJ7K16PO88m1JSZgKJZ7Sbwj0IFVA00AO10IeO98DwMqEYLxF4xjzrxh3ohuBmWJm/BgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OZE4Xv2K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D749C4CEFC;
-	Wed, 17 Sep 2025 00:28:26 +0000 (UTC)
+	s=arc-20240116; t=1758069008; c=relaxed/simple;
+	bh=KJ6VAfAH7Wk3uo6UlNgWRvLun6k5q0iiGTieHPf+ads=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=l1U0+uBdOk0FofeptvBU8sAnJVQyJjs/Da7v1gOJijppOM7RtG4zdhXmhTeDNkVgPXSpoRkLIsw4ApylCXrdpZcENlskDIIgZiONxdzbs0nhsT6QeleSjdKPqOwa3xfy9pf8KUO8BWTxET+luirN8rFB6CDeUPl4I7f2OuFbHTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l7nfDF/A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8BD4C4CEEB;
+	Wed, 17 Sep 2025 00:30:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758068906;
-	bh=ckV537HOKN+hfxC+f++NTwcm9JJZ35azQb1FUInmSU4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OZE4Xv2K9Mm1wLmeTi3zCMSxKnjHJQD41qGuwT320IVcJmrN9wsFjD0Z3r2fkWQn6
-	 YKHoBrMx9gmAg9XQ7EQNHeiDT6dafNvn7cri9n9FR/mDKLQOrhQv9xKXjRcao3TJnn
-	 luTeTmR3aQscVFb4OK4l0wZgrblFe9/uOY7z2YjHdO7KSEckjD/Kwr22oMqwJJZN2/
-	 yWTRvj5dhgm/EDKjaty5K6MnlTEpIxow6aXV0tiwtexskyb2q/sNuaVOg3CqJeo6FH
-	 3cnqxtyRvQ1mp5YJFDmyTkRogZGJpKMgYskS0ya+lPUEeS5HswflwYGnJW7kPgfBqf
-	 0R0ss2vddsnJg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH net 2/2] selftests: tls: test skb copy under mem pressure and OOB
-Date: Tue, 16 Sep 2025 17:28:14 -0700
-Message-ID: <20250917002814.1743558-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250917002814.1743558-1-kuba@kernel.org>
-References: <20250917002814.1743558-1-kuba@kernel.org>
+	s=k20201202; t=1758069007;
+	bh=KJ6VAfAH7Wk3uo6UlNgWRvLun6k5q0iiGTieHPf+ads=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l7nfDF/AyIoIlabjctDp7PAMzC5k5cD4ZrYH2d/lIA0HAXyFKzYpGQmuRN+M6nDIm
+	 G7v+Y2JEbp6AK4quJ01mv3fUJxZJmdJwXFZSlZUf+aEh86/Jh6N0XSMIJJzBT//Hzd
+	 qF5jjuvxpj8iUFjBI0hdnVy6zIND81j43W3xfgPds3JR3dUO1LqNOAo5IVKe4LNOuw
+	 4Q59qU+PRSHTlS/SbIyA0DoPumUWibRXflIHVBsOOSd2BfFBEgow/zIjJ9AjgAICw1
+	 nb92L8UXNr6MUCb5jMDEzkGDwp0AjvMUUQFS+eHw6XE0LfQf3huC8WIfMF4qeI1NZL
+	 2iMFuY3tJA9Nw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0F839D0C1A;
+	Wed, 17 Sep 2025 00:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,43 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net V2 0/3] mlx5e misc fixes 2025-09-15
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175806900878.1413145.9987654326424093380.git-patchwork-notify@kernel.org>
+Date: Wed, 17 Sep 2025 00:30:08 +0000
+References: <1757939074-617281-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1757939074-617281-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com
 
-Add a test which triggers mem pressure via OOB writes.
+Hello:
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/tls.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index cd67b0ae75a7..e788b84551ca 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -2775,6 +2775,22 @@ TEST_F(tls_err, poll_partial_rec_async)
- 	}
- }
- 
-+/* Use OOB+large send to trigger copy mode due to memory pressure.
-+ * OOB causes a short read.
-+ */
-+TEST_F(tls_err, oob_pressure)
-+{
-+	char buf[1<<16];
-+	int i;
-+
-+	memrnd(buf, sizeof(buf));
-+
-+	EXPECT_EQ(send(self->fd2, buf, 5, MSG_OOB), 5);
-+	EXPECT_EQ(send(self->fd2, buf, sizeof(buf), 0), sizeof(buf));
-+	for (i = 0; i < 64; i++)
-+		EXPECT_EQ(send(self->fd2, buf, 5, MSG_OOB), 5);
-+}
-+
- TEST(non_established) {
- 	struct tls12_crypto_info_aes_gcm_256 tls12;
- 	struct sockaddr_in addr;
+On Mon, 15 Sep 2025 15:24:31 +0300 you wrote:
+> Hi,
+> 
+> This patchset provides misc bug fixes from the team to the mlx5 Eth
+> driver.
+> 
+> Find V1 here:
+> https://lore.kernel.org/all/1757326026-536849-1-git-send-email-tariqt@nvidia.com/
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,V2,1/3] net/mlx5e: Harden uplink netdev access against device unbind
+    https://git.kernel.org/netdev/net/c/6b4be64fd9fe
+  - [net,V2,2/3] net/mlx5e: Prevent entering switchdev mode with inconsistent netns
+    (no matching commit)
+  - [net,V2,3/3] net/mlx5e: Add a miss level for ipsec crypto offload
+    https://git.kernel.org/netdev/net/c/7601a0a46216
+
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
