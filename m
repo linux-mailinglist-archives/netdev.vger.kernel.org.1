@@ -1,99 +1,107 @@
-Return-Path: <netdev+bounces-223965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58925B7C8A4
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:05:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE177B7CC3A
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:09:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCB5C3A517C
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:47:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C0B71B26A3B
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 10:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D8B28315D;
-	Wed, 17 Sep 2025 10:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B52128B3EB;
+	Wed, 17 Sep 2025 10:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KfJ5e/O/"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="nqX4hXc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FFB27990A
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 10:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29DC2D05D;
+	Wed, 17 Sep 2025 10:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758106039; cv=none; b=LqGdyZ+YK9ImRL61R2L/WbpKdkqa63RZPgk7SWPJ7t7nOOTB8dy3ZjEzecN5uZbWefi6zkBZrz1jGe+iUiKb+JOft9dfNAMApGMJXQuclgQzsJPoUvKK5NiEgyFtQRykCGDJwJ8BhAJA04MyDZwx98BbZE5q8XFKHpGDnXDQB1Q=
+	t=1758106328; cv=none; b=qzdjjXH/QlC1rVaRVp45SEdaXE6AzQEHBAkhTf6csgeAzG2jtMSGxAveqa7w2YxGmUhEZD6NFE32ySm39koGCZxVj072Yenm5Uel9AT26GCgycaFhW2Twz5bIYcn34urxaLTRsd2l8fpUuOJuWi4oNf2yiAFACHosz6r80Gwjdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758106039; c=relaxed/simple;
-	bh=VRLwGUcuRKvY24Qe4T2v4d9v5n56AV4gdzIOLjHFicE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VWDlfRFUaAEv72h/WD+BIuAwXPoLUobGCqeJKjpeBCdm3Sy49A00CRP/0hMttycGjmQbv7I98pbjELaAwcgAy+WB8uvroXQ7psbZgmoVB/N58w8Xb5ZEJSuIwnKCtCqvHplesrRPOlB631Vle8ZR9x7DxDe4BaMy2P2i6U/bbAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KfJ5e/O/; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8994414a-07f3-425f-8b76-5d433ff4716f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758106034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qXvN9zguKxTNFj65lLAAK90IdwxrcqN9SiKarg0zXno=;
-	b=KfJ5e/O/KhKd96q2i3CAATfQT+IfK9EVuUHgX0Z5dZ481iRGJUY44exufBYubXLTvzBiNh
-	l5d4JlA78FXiKiXE/mCPN59mc3sKv5AfBv5LoHluHdhxobYquAyXEbpVVYn4l5+z4YFuXM
-	dJ2MC06zispZ469q84bmL7MfxZ2fB7c=
-Date: Wed, 17 Sep 2025 11:47:08 +0100
+	s=arc-20240116; t=1758106328; c=relaxed/simple;
+	bh=MguEq0RFysX6iVHApwFAjBaZigxJOOEDap5FC+ybZ9E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oMg6+CHeff87QRC22qAYn6xHwofL6ed34aUU6yYyj3nkb42sPr8FpJu28vTZ/BPRI3T3VVE+2aIpyF5loaQyxqDblTeUixvqqRGX23oDeMabRcCzQwoPzCRyOz7eo3QVgW9ttuylLbkO9Q+1hb9zwAJjLcHwxtXTg3cPDqjglcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=nqX4hXc6; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=lr3uZ43uOxqUdkQuwA7YKfaJGPDt8d6P0M2HrbHSyoA=; t=1758106326; x=1759315926; 
+	b=nqX4hXc6YRmHp9U3PjEgQzmqShyzSCXug4vpdm+njpFqyef9TKiZnevDA90M8qcKPhQptPPTAj/
+	27NSbVQdrjLylMDN3l5NGpCNHNmTJwcZgi2IJJCJzKQFAHi25DUrmyzAXMUVul0f3XHSnhqe6Gfkc
+	SQ0DqLoN/Va+1kq8maILePc9/AohM3GFPaTt9bn3l0+24ERA6vWcbxkVWte8Zd3kNQeYCnmbFuqbe
+	UYDPMbgeQmjnwXxu+QaS6doZg3OecURwQ3Ksaho1QC5FsiVAgZJ/iDvS8W0H7YaVraPMNo6xT55f0
+	WBzocL0O60yLg6JWdkt9aGUBQydEeQiYEVng==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1uyplc-0000000AoDo-1930;
+	Wed, 17 Sep 2025 12:52:04 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2025-09-17
+Date: Wed, 17 Sep 2025 12:49:50 +0200
+Message-ID: <20250917105159.161583-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 2/2] ptp: rework ptp_clock_unregister() to
- disable events
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Ajay Kaher <ajay.kaher@broadcom.com>,
- Alexey Makhalov <alexey.makhalov@broadcom.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Clark Wang <xiaoning.wang@nxp.com>,
- "David S. Miller" <davem@davemloft.net>,
- David Woodhouse <dwmw2@infradead.org>, Eric Dumazet <edumazet@google.com>,
- imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, netdev@vger.kernel.org,
- Nick Shi <nick.shi@broadcom.com>, Paolo Abeni <pabeni@redhat.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
- Yangbo Lu <yangbo.lu@nxp.com>
-References: <aMnYIu7RbgfXrmGx@shell.armlinux.org.uk>
- <E1uydLH-000000061DM-2gcV@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <E1uydLH-000000061DM-2gcV@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 16/09/2025 22:36, Russell King (Oracle) wrote:
-> The ordering of ptp_clock_unregister() is not ideal, as the chardev
-> remains published while state is being torn down, which means userspace
-> can race with the kernel teardown. There is also no cleanup of enabled
-> pin settings nor of the internal PPS event, which means enabled events
-> can still forward into the core, dereferencing a free'd pointer.
-> 
-> Rework the ordering of cleanup in ptp_clock_unregister() so that we
-> unpublish the posix clock (and user chardev), disable any pins that
-> have EXTTS events enabled, disable the PPS event, and then clean up
-> the aux work and PPS source.
-> 
-> This avoids potential use-after-free and races in PTP clock driver
-> teardown.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Hi,
 
-Now LGTM, shouldn't break our use-case, thanks!
+Two more fixes, but I think things have quieted down to say
+we probably won't have more. The iwlwifi aggregation thing
+is myself having messed up some recent changes, while rfkill
+has a potential crash that doesn't really seem to happen in
+practice, or only on some select machines.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Please pull and let us know if there's any problem.
+
+Thanks,
+johannes
+
+
+
+The following changes since commit db87bd2ad1f736c2f7ab231f9b40c885934f6b2c:
+
+  Merge tag 'net-6.17-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-09-11 08:54:42 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-09-17
+
+for you to fetch changes up to b6f56a44e4c1014b08859dcf04ed246500e310e5:
+
+  net: rfkill: gpio: Fix crash due to dereferencering uninitialized pointer (2025-09-17 12:37:05 +0200)
+
+----------------------------------------------------------------
+Just two fixes:
+ - fix crash in rfkill due to uninitialized type_name
+ - fix aggregation in iwlwifi 7000/8000 devices
+
+----------------------------------------------------------------
+Hans de Goede (1):
+      net: rfkill: gpio: Fix crash due to dereferencering uninitialized pointer
+
+Johannes Berg (2):
+      wifi: iwlwifi: pcie: fix byte count table for some devices
+      Merge tag 'iwlwifi-fixes-2025-09-15' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+
+ drivers/net/wireless/intel/iwlwifi/pcie/gen1_2/tx.c | 2 +-
+ net/rfkill/rfkill-gpio.c                            | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
