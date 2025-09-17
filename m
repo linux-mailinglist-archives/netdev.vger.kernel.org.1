@@ -1,194 +1,130 @@
-Return-Path: <netdev+bounces-224132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965DCB8112C
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:45:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA35CB81180
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09EFB1761BA
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:45:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2BE92A7790
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E5E2FBDEC;
-	Wed, 17 Sep 2025 16:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C570E2FB61D;
+	Wed, 17 Sep 2025 16:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mBK7gO1t";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RGbVzhw7";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mBK7gO1t";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RGbVzhw7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rMGRGJTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2B02F9DBD
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710E52FB085
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758127524; cv=none; b=uo9/t65q6AZcf4K4sdoLhcoeUQ6WD62HUTm4OMEsfJ6lfngtJKmzR8go/6qfavzGiX3Vtcv0D6OkaFZ0hmS+m2uVPHTo0nbp6x2oxWeRvRKW0iCn80qwYWAsDRA3Wkc0HGc4927Bma1Qml+ZnVu7fFz8EGSp8RhgU6F3wtrbbrY=
+	t=1758128227; cv=none; b=oaoFE4fA1Wkn7Nx25eShikLDPVlar/tXT4Y4hgqUdMX2uAP91mkEKchHiQXlC1mM5tfH5cVFrdYqfa8sf3QiXjN/vnRu08In1zI+FX2SBGk6H4owYBaLQpi/GyU9LE4WB5SDUWQ4a3yU4rHhaIN3H4gsQtrJaUlXBw1l3ZKkpDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758127524; c=relaxed/simple;
-	bh=uYUc+SSJCWLgbh/+WRSu9C/gqTvfR7PLujHxWfgfBww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TYbC+EhC/x8hNMBz+c24y5T4KtrPSu5mEHXxp/SWEoIVk6Kz0KAc1VcBWlfjKD57XwS2DQRiaBO+g/ilVym3DCHP5rsoFlLOU1raGXQKwItqCr3uRnWTGbf/W1NE88/FzXUly+rROLDB2D+YzeblTXS2/6WpBnULgi48nrYOiVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mBK7gO1t; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=RGbVzhw7; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mBK7gO1t; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=RGbVzhw7; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 868B920CCF;
-	Wed, 17 Sep 2025 16:45:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758127520; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1758128227; c=relaxed/simple;
+	bh=RoYs+lOPKP6EI+cACs3xu9y1s81zhU0ASthwBE3+IQU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CyCtkXfZS1QGfg2t0wY2uZAixgTpbTR3WQMaj1R5qp6+38zlbBC7kXhqqZm5GsQlefnL/Lbbcb+fU6tqkqY89huiPUqW4Vt0+zRqtWFluvUmv4gNqSOov7EdMA050ysJIppbYJ2Uusb64U/+U4PozngXSovMC1keX8bleE6fbgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rMGRGJTR; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0be046b6-a48e-45be-9b0e-3922f298b089@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758128213;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Bp8Go5rdsl2s4/DveaRnepGB9XRFDOIIjd/3pjEQhk=;
-	b=mBK7gO1tSk2oJYQTm0Bz/a3POPx8osq5QUAxF6aeOI5JmP2yo8A+1dIF9xosG+5ujgG7la
-	LwQoM7nt6cPOInJPg5iC7nGO1C/tFbm0O9vXUTpW9vfjRAt+LJLV9WwPW4xLQUPWs2BJM1
-	xV2E8e/eUW/MI1RYLTzgA5f3UB866Pc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758127520;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Bp8Go5rdsl2s4/DveaRnepGB9XRFDOIIjd/3pjEQhk=;
-	b=RGbVzhw7oZQmfXmQU4x5KrXIFR+1/1xgEdCemVIq0XGEVtkccO6RAaEmPehEidU2ZzLpAc
-	NmQv4dYu/wkmvJBg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758127520; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Bp8Go5rdsl2s4/DveaRnepGB9XRFDOIIjd/3pjEQhk=;
-	b=mBK7gO1tSk2oJYQTm0Bz/a3POPx8osq5QUAxF6aeOI5JmP2yo8A+1dIF9xosG+5ujgG7la
-	LwQoM7nt6cPOInJPg5iC7nGO1C/tFbm0O9vXUTpW9vfjRAt+LJLV9WwPW4xLQUPWs2BJM1
-	xV2E8e/eUW/MI1RYLTzgA5f3UB866Pc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758127520;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Bp8Go5rdsl2s4/DveaRnepGB9XRFDOIIjd/3pjEQhk=;
-	b=RGbVzhw7oZQmfXmQU4x5KrXIFR+1/1xgEdCemVIq0XGEVtkccO6RAaEmPehEidU2ZzLpAc
-	NmQv4dYu/wkmvJBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 729C31368D;
-	Wed, 17 Sep 2025 16:45:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id bx5jG6Dlymj/NgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 17 Sep 2025 16:45:20 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id F3BCEA083B; Wed, 17 Sep 2025 18:45:11 +0200 (CEST)
-Date: Wed, 17 Sep 2025 18:45:11 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 6/9] mnt: simplify ns_common_init() handling
-Message-ID: <syskz2nr23sqc27swfxwbvlbnnf7tgglrbn52vjoxd2bn3ryyv@id7hurupxcuy>
-References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
- <20250917-work-namespace-ns_common-v1-6-1b3bda8ef8f2@kernel.org>
+	bh=1JoFXqqjHsUv55cfZ28zVmVLyTt7+FuolwMXE9BtBiU=;
+	b=rMGRGJTREOYpdTnMVNhvvmi5BAKKTLUj7wP1zqJOVOHkUO0Ttj8HFZ3l5nXc/iaw0o1MQL
+	2QM9jmog1MShmwUw6gyM0sKRbNzoYZwf7/8/VfUKicRYjLICunvr2ZhR3T3VADDscVI9EF
+	wYhQDUM30pposu7scRj3bV4GGxVOhnA=
+Date: Wed, 17 Sep 2025 17:56:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250917-work-namespace-ns_common-v1-6-1b3bda8ef8f2@kernel.org>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_RCPT(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,suse.cz,cmpxchg.org,suse.com,linutronix.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
+Subject: Re: [PATCH v2] net: nfc: nc: Add parameter validation for packet data
+To: Deepak Sharma <deepak.sharma.472935@gmail.com>, krzk@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel-mentees@lists.linux.dev,
+ syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+References: <20250917140547.66886-1-deepak.sharma.472935@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250917140547.66886-1-deepak.sharma.472935@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed 17-09-25 12:28:05, Christian Brauner wrote:
-> Assign the reserved MNT_NS_ANON_INO sentinel to anonymous mount
-> namespaces and cleanup the initial mount ns allocation. This is just a
-> preparatory patch and the ns->inum check in ns_common_init() will be
-> dropped in the next patch.
+On 17/09/2025 15:05, Deepak Sharma wrote:
+> This is v2 for the original patch, I realized soon after
+> sending the patch that I missed the release of skb before
+> returning, apologies.
+
+this part shouldn't be in the commit message, it has to go under
+strip mark ("---")
+
 > 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-
-...
+> Syzbot reported an uninit-value bug at nci_init_req for commit
+> 5aca7966d2a7
+> 
+> This bug arises due to very limited and poor input validation
+> that was done at net/nfc/nci/core.c:1543. This validation only
+> validates the skb->len (directly reflects size provided at the
+> userspace interface) with the length provided in the buffer
+> itself (interpreted as NCI_HEADER). This leads to the processing
+> of memory content at the address assuming the correct layout
+> per what opcode requires there. This leads to the accesses to
+> buffer of `skb_buff->data` which is not assigned anything yet
+> 
+> Following the same silent drop of packets of invalid sizes, at
+> net/nfc/nci/core.c:1543, I have added validation in the
+> `nci_nft_packet` which processes NFT packets and silently return
+> in case of failure of any validation check
+> 
+> Possible TODO: because we silently drop the packets, the
+> call to `nci_request` will be waiting for completion of request
+> and will face timeouts. These timeouts can get excessively logged
+> in the dmesg. A proper handling of them may require to export
+> `nci_request_cancel` (or propagate error handling from the
+> nft packets handlers)
+> 
+> Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
+> Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
 > ---
->  fs/namespace.c    | 7 ++++---
->  kernel/nscommon.c | 2 +-
->  2 files changed, 5 insertions(+), 4 deletions(-)
+>   net/nfc/nci/ntf.c | 42 ++++++++++++++++++++++++++++++++++--------
+>   1 file changed, 34 insertions(+), 8 deletions(-)
 > 
-> diff --git a/fs/namespace.c b/fs/namespace.c
-> index c8251545d57e..09e4ecd44972 100644
-> --- a/fs/namespace.c
-> +++ b/fs/namespace.c
-> @@ -4104,6 +4104,8 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns, bool a
->  		return ERR_PTR(-ENOMEM);
->  	}
->  
-> +	if (anon)
-> +		new_ns->ns.inum = MNT_NS_ANON_INO;
->  	ret = ns_common_init(&new_ns->ns, &mntns_operations, !anon);
->  	if (ret) {
->  		kfree(new_ns);
-> @@ -6020,10 +6022,9 @@ static void __init init_mount_tree(void)
->  	if (IS_ERR(mnt))
->  		panic("Can't create rootfs");
->  
-> -	ns = alloc_mnt_ns(&init_user_ns, true);
-> +	ns = alloc_mnt_ns(&init_user_ns, false);
->  	if (IS_ERR(ns))
->  		panic("Can't allocate initial namespace");
-> -	ns->ns.inum = PROC_MNT_INIT_INO;
->  	m = real_mount(mnt);
->  	ns->root = m;
->  	ns->nr_mounts = 1;
-> @@ -6037,7 +6038,7 @@ static void __init init_mount_tree(void)
->  	set_fs_pwd(current->fs, &root);
->  	set_fs_root(current->fs, &root);
->  
-> -	ns_tree_add(ns);
-> +	ns_tree_add_raw(ns);
+> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+> index a818eff27e6b..f5e03f3ff203 100644
+> --- a/net/nfc/nci/ntf.c
+> +++ b/net/nfc/nci/ntf.c
+> @@ -809,35 +809,61 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
+>   
+>   	switch (ntf_opcode) {
+>   	case NCI_OP_CORE_RESET_NTF:
+> -		nci_core_reset_ntf_packet(ndev, skb);
+> +		if (skb->len < sizeof(struct nci_core_reset_ntf))
+> +			goto end;
+> +		else
+> +			nci_core_reset_ntf_packet(ndev, skb);
+>   		break;
 
-But we don't have ns->ns_id set by anything now? Or am I missing something?
+every case here has it's special function. I believe the length check
+should be put into these functions and then the return value should
+indicate error. That's the actual style of kernel code.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+You should also indicate the tree to apply your patch, as this is the
+fix, the tree will be net, so the subject should be:
+[PATCH net v2] net: nfc: nc: Add parameter validation for packet data
+
+And the Fixes tag should be added to provide some information for
+possible backports.
 
