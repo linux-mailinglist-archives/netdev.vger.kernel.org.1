@@ -1,89 +1,335 @@
-Return-Path: <netdev+bounces-223871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52338B7ECCE
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:02:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA29BB7CD14
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05EBD167085
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 07:00:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B25C3484B60
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 07:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E462BEFFE;
-	Wed, 17 Sep 2025 07:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A67B2C15BB;
+	Wed, 17 Sep 2025 07:20:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0655028CF41;
-	Wed, 17 Sep 2025 07:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E77921B19D;
+	Wed, 17 Sep 2025 07:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758092441; cv=none; b=clDByzk9OmjOz99dHrMpkk7Auk6rYaGKv7ZRYuuWtvvCE4LR2bezV8JR6du23ZXAVOTAX6J6wO97GDcD65g7UTHbf+B0/kijXRqeBAYR0mMuDxrnMrVUCwpgmBeUPm9XJxl2SMF7iQv62aVQxDGdFnH1U0MCwB5NkGQxFmH5oc0=
+	t=1758093637; cv=none; b=iZCPU0+s3ayl0y2JyE+/sthEJokwpmrcIs2DZNIAEpUShQ2EmhHJSod3JT+7eL5recIuEojsYOqSuoLHCDr//UtvDdfNxO6q2/lFZJV4lbLpHMMWCKAexaraFu6at+deUbZ2JimNZuKUTAXGiKVJ6ux4RFBhOw+23IkqZWnma9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758092441; c=relaxed/simple;
-	bh=0rx7sRVBfmTsQQRZiCNlXEGlShuA/08z1vTySs1d+D4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IH23pkBAeqD3ScW9gvMK4nC2Vf8LYetCwKrwidcib50KoKo2NyvviuJoMroFaSEVW3UDTZTgndtNo6xB4cMvVBR2o86Bp/CwnaL1lDlYWmp7+eMlKvZ1vZN+4k3qMzkfv99/z3l5xid8wmMbRcqfbJ/6btUJt/6g/l+QDL0OgHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn; spf=pass smtp.mailfrom=jmu.edu.cn; arc=none smtp.client-ip=45.254.49.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jmu.edu.cn
-Received: from localhost.localdomain (unknown [119.122.213.2])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 23172db05;
-	Wed, 17 Sep 2025 15:00:27 +0800 (GMT+08:00)
-From: Chukun Pan <amadeus@jmu.edu.cn>
-To: wens@kernel.org
-Cc: andre.przywara@arm.com,
-	andrew+netdev@lunn.ch,
-	conor+dt@kernel.org,
-	davem@davemloft.net,
-	devicetree@vger.kernel.org,
-	edumazet@google.com,
-	jernej@kernel.org,
-	krzk+dt@kernel.org,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	samuel@sholland.org,
-	wens@csie.org,
-	Chukun Pan <amadeus@jmu.edu.cn>
-Subject: Re: [PATCH net-next v6 2/6] net: stmmac: Add support for Allwinner A523 GMAC200
-Date: Wed, 17 Sep 2025 15:00:20 +0800
-Message-Id: <20250917070020.728420-1-amadeus@jmu.edu.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250913101349.3932677-3-wens@kernel.org>
-References: <20250913101349.3932677-3-wens@kernel.org>
+	s=arc-20240116; t=1758093637; c=relaxed/simple;
+	bh=eAIl0DwNMJOtfw6IWY6RbGkrXh2+vvM9eENcc0HkwRo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jW75da4vvYpmcB3DCfabWGNVwUHJWpWXaoSDs9tqalbm977KN1GuxoYS34TWWjLLiIcVdJtALqJn2x+fEQ5IWM/s4Pewm+iSWrN4QUpVKlm6TPThIiYel0ST8GuOpuiVNcNifaYz/gAjtXjGV36YVXlgWKjC5QvdwEH/DaG6YsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4cRV6547rDz9sxj;
+	Wed, 17 Sep 2025 09:00:45 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 0jycUt0D3HEs; Wed, 17 Sep 2025 09:00:45 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cRV652Pthz9sxg;
+	Wed, 17 Sep 2025 09:00:45 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 24D818B766;
+	Wed, 17 Sep 2025 09:00:45 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id X30wXOSaiMnX; Wed, 17 Sep 2025 09:00:45 +0200 (CEST)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id BAB618B763;
+	Wed, 17 Sep 2025 09:00:43 +0200 (CEST)
+Message-ID: <4b67331e-823e-4fac-9af7-35c11f996ae5@csgroup.eu>
+Date: Wed, 17 Sep 2025 09:00:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 08/18] net: phylink: Move
+ phylink_interface_max_speed to phy_caps
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20250909152617.119554-1-maxime.chevallier@bootlin.com>
+ <20250909152617.119554-9-maxime.chevallier@bootlin.com>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <20250909152617.119554-9-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9956797fa103a2kunm2e50bc1654ced5
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDS01JVhlLT09IGU1NHh1CHlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlKSkJVSklJVUlKSFVJWVdZFhoPEhUdFFlBWU9LSFVKS0lPT09LVUpLS1VLWQ
-	Y+
 
-Hi,
 
-I tested this on Radxa Cubie A5E and there seems to be a small issue:
 
-When VLAN_8021Q is enabled (CONFIG_VLAN_8021Q=y), down the eth1 interface:
+Le 09/09/2025 à 17:26, Maxime Chevallier a écrit :
+> The phylink_interface_max_speed() retrieves the max achievable speed
+> on a MII interface. This logic needs to be re-used in other parts of the
+> PHY stack, let's move it to phy_caps as it already contains most of the
+> interface attribute accessors.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-~ # ifconfig eth1 down
-[   96.695463] dwmac-sun55i 4510000.ethernet eth1: Timeout accessing MAC_VLAN_Tag_Filter
-[   96.703356] dwmac-sun55i 4510000.ethernet eth1: failed to kill vid 0081/0
+Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-Is this a known issue?
+> ---
+>   drivers/net/phy/phy-caps.h |  1 +
+>   drivers/net/phy/phy_caps.c | 80 +++++++++++++++++++++++++++++++++++
+>   drivers/net/phy/phylink.c  | 87 ++------------------------------------
+>   3 files changed, 85 insertions(+), 83 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
+> index 01df1bdc1516..ba81cd75e122 100644
+> --- a/drivers/net/phy/phy-caps.h
+> +++ b/drivers/net/phy/phy-caps.h
+> @@ -49,6 +49,7 @@ void phy_caps_linkmode_max_speed(u32 max_speed, unsigned long *linkmodes);
+>   bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmodes);
+>   void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes);
+>   unsigned long phy_caps_from_interface(phy_interface_t interface);
+> +int phy_caps_interface_max_speed(phy_interface_t interface);
+>   
+>   const struct link_capabilities *
+>   phy_caps_lookup_by_linkmode(const unsigned long *linkmodes);
+> diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
+> index e4efd5c477b4..b38c567ec6ef 100644
+> --- a/drivers/net/phy/phy_caps.c
+> +++ b/drivers/net/phy/phy_caps.c
+> @@ -440,3 +440,83 @@ u32 phy_caps_mediums_from_linkmodes(unsigned long *linkmodes)
+>   	return mediums;
+>   }
+>   EXPORT_SYMBOL_GPL(phy_caps_mediums_from_linkmodes);
+> +
+> +/**
+> + * phy_caps_interface_max_speed() - get the maximum speed of a phy interface
+> + * @interface: phy interface mode defined by &typedef phy_interface_t
+> + *
+> + * Determine the maximum speed of a phy interface. This is intended to help
+> + * determine the correct speed to pass to the MAC when the phy is performing
+> + * rate matching.
+> + *
+> + * Return: The maximum speed of @interface
+> + */
+> +int phy_caps_interface_max_speed(phy_interface_t interface)
+> +{
+> +	switch (interface) {
+> +	case PHY_INTERFACE_MODE_100BASEX:
+> +	case PHY_INTERFACE_MODE_REVRMII:
+> +	case PHY_INTERFACE_MODE_RMII:
+> +	case PHY_INTERFACE_MODE_SMII:
+> +	case PHY_INTERFACE_MODE_REVMII:
+> +	case PHY_INTERFACE_MODE_MII:
+> +	case PHY_INTERFACE_MODE_MIILITE:
+> +		return SPEED_100;
+> +
+> +	case PHY_INTERFACE_MODE_TBI:
+> +	case PHY_INTERFACE_MODE_MOCA:
+> +	case PHY_INTERFACE_MODE_RTBI:
+> +	case PHY_INTERFACE_MODE_1000BASEX:
+> +	case PHY_INTERFACE_MODE_1000BASEKX:
+> +	case PHY_INTERFACE_MODE_TRGMII:
+> +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +	case PHY_INTERFACE_MODE_RGMII:
+> +	case PHY_INTERFACE_MODE_PSGMII:
+> +	case PHY_INTERFACE_MODE_QSGMII:
+> +	case PHY_INTERFACE_MODE_QUSGMII:
+> +	case PHY_INTERFACE_MODE_SGMII:
+> +	case PHY_INTERFACE_MODE_GMII:
+> +		return SPEED_1000;
+> +
+> +	case PHY_INTERFACE_MODE_2500BASEX:
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+> +		return SPEED_2500;
+> +
+> +	case PHY_INTERFACE_MODE_5GBASER:
+> +		return SPEED_5000;
+> +
+> +	case PHY_INTERFACE_MODE_XGMII:
+> +	case PHY_INTERFACE_MODE_RXAUI:
+> +	case PHY_INTERFACE_MODE_XAUI:
+> +	case PHY_INTERFACE_MODE_10GBASER:
+> +	case PHY_INTERFACE_MODE_10GKR:
+> +	case PHY_INTERFACE_MODE_USXGMII:
+> +		return SPEED_10000;
+> +
+> +	case PHY_INTERFACE_MODE_25GBASER:
+> +		return SPEED_25000;
+> +
+> +	case PHY_INTERFACE_MODE_XLGMII:
+> +		return SPEED_40000;
+> +
+> +	case PHY_INTERFACE_MODE_50GBASER:
+> +	case PHY_INTERFACE_MODE_LAUI:
+> +		return SPEED_50000;
+> +
+> +	case PHY_INTERFACE_MODE_100GBASEP:
+> +		return SPEED_100000;
+> +
+> +	case PHY_INTERFACE_MODE_INTERNAL:
+> +	case PHY_INTERFACE_MODE_NA:
+> +	case PHY_INTERFACE_MODE_MAX:
+> +		/* No idea! Garbage in, unknown out */
+> +		return SPEED_UNKNOWN;
+> +	}
+> +
+> +	/* If we get here, someone forgot to add an interface mode above */
+> +	WARN_ON_ONCE(1);
+> +	return SPEED_UNKNOWN;
+> +}
+> +EXPORT_SYMBOL_GPL(phy_caps_interface_max_speed);
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index c7cb95aa8007..091b1ee5c49a 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -218,85 +218,6 @@ static unsigned int phylink_interface_signal_rate(phy_interface_t interface)
+>   	}
+>   }
+>   
+> -/**
+> - * phylink_interface_max_speed() - get the maximum speed of a phy interface
+> - * @interface: phy interface mode defined by &typedef phy_interface_t
+> - *
+> - * Determine the maximum speed of a phy interface. This is intended to help
+> - * determine the correct speed to pass to the MAC when the phy is performing
+> - * rate matching.
+> - *
+> - * Return: The maximum speed of @interface
+> - */
+> -static int phylink_interface_max_speed(phy_interface_t interface)
+> -{
+> -	switch (interface) {
+> -	case PHY_INTERFACE_MODE_100BASEX:
+> -	case PHY_INTERFACE_MODE_REVRMII:
+> -	case PHY_INTERFACE_MODE_RMII:
+> -	case PHY_INTERFACE_MODE_SMII:
+> -	case PHY_INTERFACE_MODE_REVMII:
+> -	case PHY_INTERFACE_MODE_MII:
+> -	case PHY_INTERFACE_MODE_MIILITE:
+> -		return SPEED_100;
+> -
+> -	case PHY_INTERFACE_MODE_TBI:
+> -	case PHY_INTERFACE_MODE_MOCA:
+> -	case PHY_INTERFACE_MODE_RTBI:
+> -	case PHY_INTERFACE_MODE_1000BASEX:
+> -	case PHY_INTERFACE_MODE_1000BASEKX:
+> -	case PHY_INTERFACE_MODE_TRGMII:
+> -	case PHY_INTERFACE_MODE_RGMII_TXID:
+> -	case PHY_INTERFACE_MODE_RGMII_RXID:
+> -	case PHY_INTERFACE_MODE_RGMII_ID:
+> -	case PHY_INTERFACE_MODE_RGMII:
+> -	case PHY_INTERFACE_MODE_PSGMII:
+> -	case PHY_INTERFACE_MODE_QSGMII:
+> -	case PHY_INTERFACE_MODE_QUSGMII:
+> -	case PHY_INTERFACE_MODE_SGMII:
+> -	case PHY_INTERFACE_MODE_GMII:
+> -		return SPEED_1000;
+> -
+> -	case PHY_INTERFACE_MODE_2500BASEX:
+> -	case PHY_INTERFACE_MODE_10G_QXGMII:
+> -		return SPEED_2500;
+> -
+> -	case PHY_INTERFACE_MODE_5GBASER:
+> -		return SPEED_5000;
+> -
+> -	case PHY_INTERFACE_MODE_XGMII:
+> -	case PHY_INTERFACE_MODE_RXAUI:
+> -	case PHY_INTERFACE_MODE_XAUI:
+> -	case PHY_INTERFACE_MODE_10GBASER:
+> -	case PHY_INTERFACE_MODE_10GKR:
+> -	case PHY_INTERFACE_MODE_USXGMII:
+> -		return SPEED_10000;
+> -
+> -	case PHY_INTERFACE_MODE_25GBASER:
+> -		return SPEED_25000;
+> -
+> -	case PHY_INTERFACE_MODE_XLGMII:
+> -		return SPEED_40000;
+> -
+> -	case PHY_INTERFACE_MODE_50GBASER:
+> -	case PHY_INTERFACE_MODE_LAUI:
+> -		return SPEED_50000;
+> -
+> -	case PHY_INTERFACE_MODE_100GBASEP:
+> -		return SPEED_100000;
+> -
+> -	case PHY_INTERFACE_MODE_INTERNAL:
+> -	case PHY_INTERFACE_MODE_NA:
+> -	case PHY_INTERFACE_MODE_MAX:
+> -		/* No idea! Garbage in, unknown out */
+> -		return SPEED_UNKNOWN;
+> -	}
+> -
+> -	/* If we get here, someone forgot to add an interface mode above */
+> -	WARN_ON_ONCE(1);
+> -	return SPEED_UNKNOWN;
+> -}
+> -
+>   static struct {
+>   	unsigned long mask;
+>   	int speed;
+> @@ -430,7 +351,7 @@ static unsigned long phylink_get_capabilities(phy_interface_t interface,
+>   					      int rate_matching)
+>   {
+>   	unsigned long link_caps = phy_caps_from_interface(interface);
+> -	int max_speed = phylink_interface_max_speed(interface);
+> +	int max_speed = phy_caps_interface_max_speed(interface);
+>   	unsigned long caps = MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+>   	unsigned long matched_caps = 0;
+>   
+> @@ -1529,7 +1450,7 @@ static void phylink_link_up(struct phylink *pl,
+>   		 * the link_state) to the interface speed, and will send
+>   		 * pause frames to the MAC to limit its transmission speed.
+>   		 */
+> -		speed = phylink_interface_max_speed(link_state.interface);
+> +		speed = phy_caps_interface_max_speed(link_state.interface);
+>   		duplex = DUPLEX_FULL;
+>   		rx_pause = true;
+>   		break;
+> @@ -1539,7 +1460,7 @@ static void phylink_link_up(struct phylink *pl,
+>   		 * the link_state) to the interface speed, and will cause
+>   		 * collisions to the MAC to limit its transmission speed.
+>   		 */
+> -		speed = phylink_interface_max_speed(link_state.interface);
+> +		speed = phy_caps_interface_max_speed(link_state.interface);
+>   		duplex = DUPLEX_HALF;
+>   		break;
+>   	}
+> @@ -2732,7 +2653,7 @@ static phy_interface_t phylink_sfp_select_interface_speed(struct phylink *pl,
+>   		if (!test_bit(interface, pl->sfp_interfaces))
+>   			continue;
+>   
+> -		max_speed = phylink_interface_max_speed(interface);
+> +		max_speed = phy_caps_interface_max_speed(interface);
+>   
+>   		/* The logic here is: if speed == max_speed, then we've found
+>   		 * the best interface. Otherwise we find the interface that
 
-Thanks,
-Chukun
 
