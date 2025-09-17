@@ -1,139 +1,111 @@
-Return-Path: <netdev+bounces-223994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CF2CB7C7BA
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:03:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12938B7C89F
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:05:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A1997B0016
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:51:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F7A83BD37E
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D34370584;
-	Wed, 17 Sep 2025 11:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7757D30F93A;
+	Wed, 17 Sep 2025 11:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZa3cJYp"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD58371E8C
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 11:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F61F1E32B9;
+	Wed, 17 Sep 2025 11:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758109979; cv=none; b=MSrbOAt9JvzBRpxTyR/wY4qQYskxPt2kfBBCwYMcvWKd9CxgMW5RdmSkFME58xf491yHiEX7wtFSzqWyOJBtV86JmyOE2b/RZ1N372A3ad6SH/XuBOB7ssQQxFIw6AqRsd+PBoldxMThsyK6hGThmfNFHftcVnmTVvtZELsuZdw=
+	t=1758110148; cv=none; b=aVzD9oD0Lj10M9jlrDnzrABWPuBHAxDL5CjZh/xrRzQUiEfvpyITG8+YzNxF+u5sbzlNan9fxyXPAzGAUg/5P9fnyhzCPx//KZBX8t9lBHNiRaQ+5hDQul/cRrdjIYh69ZedDwnex+euXsf9/YUc2XUFjtrhyPGN22YlDGK3/uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758109979; c=relaxed/simple;
-	bh=uqaJ1Aj4tgRkY2VxqYrivb+JAi9VHqoNbdDpXMjZ9oU=;
+	s=arc-20240116; t=1758110148; c=relaxed/simple;
+	bh=DU4gxgbx65FsLQiFOCl1ZpFN4B1SDz2XuaVWJL83vYY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LF3LC8W1aB3N3yyEZIGB24GcTTNDxw5A5MKDZ5f5RSay6xBQZYgr0DHMCQOR37pbO1X7imGrUSSKSsyepuozpwC4wXpFyaKWpqK0ycj5TQ6oxQ6LeAo0TZz9M7fF389URodbFZCaK26uGD0roHFodrXPbquFHBCcWV/hPsku4e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uyqiG-0007bg-Rh; Wed, 17 Sep 2025 13:52:40 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uyqiE-001kqb-0v;
-	Wed, 17 Sep 2025 13:52:38 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uyqiE-00Dh2D-0U;
-	Wed, 17 Sep 2025 13:52:38 +0200
-Date: Wed, 17 Sep 2025 13:52:38 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>, stable@vger.kernel.org,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Lukas Wunner <lukas@wunner.de>,
-	Russell King <linux@armlinux.org.uk>, Xu Yang <xu.yang_2@nxp.com>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] net: usb: asix: forbid runtime PM to avoid
- PM/MDIO + RTNL deadlock
-Message-ID: <aMqhBsH-zaDdO3q8@pengutronix.de>
-References: <20250917095457.2103318-1-o.rempel@pengutronix.de>
- <0f2fe17b-89bb-4464-890d-0b73ed1cf117@suse.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HqOs+6vSy///uxQSMzJoeULoTBusQADDVNPgF220AB7tdxsOvQ6jZ7+B1YMKj7bDoyNxxaOVxtvBge9tpV7pxGgKAMhcvHlUoRz1I+4OFpqqfdwmcvOSfpIL4oLJpdw9RRyzn0MZArq0wVRgZcwyfPIiEhudsqEWxZIwaVGZc5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZa3cJYp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98B5DC4CEF0;
+	Wed, 17 Sep 2025 11:55:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758110146;
+	bh=DU4gxgbx65FsLQiFOCl1ZpFN4B1SDz2XuaVWJL83vYY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cZa3cJYpPOWrn2Y3HUiznWvb7PqCcanOlOp/absxm7F1zW4SWZTK3MKNzNekiAF9L
+	 rJfmsXWTbBf0pJRn50m8dHW51naVFpJChdsE4J0nvNiukmpOseJ64X+lpaPVdtBSnO
+	 Z1kYCFboqxI8/aI7LKXqhkFiqBauC2xmETqN8Eb/4P2/DyLYCgRI6U8gi5yH7nyRAV
+	 JEuEob9PvAE5UgRB5e4BSbObMZmH2lth1NEYrYGS5irhOPL4k/5OiayE4OwB199JIT
+	 AHAW9MHO17dWPi69tktp+vwW3wkhvswah9sWW57lQmwbc13vwd/JNmneeQZUd7F2wo
+	 x6XWoHXt0lrlA==
+Date: Wed, 17 Sep 2025 12:55:42 +0100
+From: Simon Horman <horms@kernel.org>
+To: Sathesh B Edara <sedara@marvell.com>
+Cc: linux-kernel@vger.kernel.org, sburla@marvell.com, vburru@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org, hgani@marvell.com,
+	andrew@lunn.ch, srasheed@marvell.com
+Subject: Re: [net PATCH v2] octeon_ep: Clear VF info at PF when VF driver is
+ removed
+Message-ID: <20250917115542.GA394836@horms.kernel.org>
+References: <20250916131225.21589-1-sedara@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0f2fe17b-89bb-4464-890d-0b73ed1cf117@suse.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20250916131225.21589-1-sedara@marvell.com>
 
-Hi Oliver,
-
-On Wed, Sep 17, 2025 at 12:10:48PM +0200, Oliver Neukum wrote:
-> Hi,
+On Tue, Sep 16, 2025 at 06:12:25AM -0700, Sathesh B Edara wrote:
+> When a VF (Virtual Function) driver is removed, the PF (Physical Function)
+> driver continues to retain stale VF-specific information. This can lead to
+> inconsistencies or unexpected behavior when the VF is re-initialized or
+> reassigned.
 > 
-> On 17.09.25 11:54, Oleksij Rempel wrote:
+> This patch ensures that the PF driver clears the corresponding VF info
+> when the VF driver is removed, maintaining a clean state and preventing
+> potential issues.
 > 
-> > With autosuspend active, resume paths may require calling phylink/phylib
-> > (caller must hold RTNL) and doing MDIO I/O. Taking RTNL from a USB PM
-> > resume can deadlock (RTNL may already be held), and MDIO can attempt a
-> > runtime-wake while the USB PM lock is held. Given the lack of benefit
-> > and poor test coverage (autosuspend is usually disabled by default in
-> > distros), forbid runtime PM here to avoid these hazards.
+> Fixes: cde29af9e68e ("octeon_ep: add PF-VF mailbox communication")
+> Signed-off-by: Sathesh B Edara <sedara@marvell.com>
+> ---
+> Changes:
+> V2:
+>   - Commit header format corrected.
+
+Hi,
+
+I feel that I must be missing something terribly obvious.
+But this patch seems to be a subset of the one at the link below.
+
+* [net PATCH v2] octeon_ep: fix VF MAC address lifecycle handling
+  https://lore.kernel.org/netdev/20250916133207.21737-1-sedara@marvell.com/
+
 > 
-> This reasoning depends on netif_running() returning false during system resume.
-> Is that guaranteed?
-
-You’re right - there is no guarantee that netif_running() is false
-during system resume. This change does not rely on that. If my wording
-suggested otherwise, I’ll reword the commit message to make it explicit.
-
-1) Runtime PM (autosuspend/autoresume)
-
-Typical chain when user does ip link set dev <if> up while autosuspended:
-rtnl_newlink (RTNL held)
-  -> __dev_open -> usbnet_open
-     -> usb_autopm_get_interface -> __pm_runtime_resume
-        -> usb_resume_interface -> asix_resume
-
-Here resume happens synchronously under RTNL (and with USB PM locking). If the
-driver then calls phylink/phylib from resume (caller must hold RTNL; MDIO I/O),
-we can deadlock or hit PM-lock vs MDIO wake issues.
-
-Patch effect:
-I forbid runtime PM per-interface in ax88772_bind(). This removes the
-synchronous autoresume path.
-
-2) System suspend/resume
-
-Typical chain:
-... dpm_run_callback (workqueue)
- -> usb_resume_interface -> asix_resume
-
-This is not under RTNL, and no pm_runtime locking is involved. The patch does
-not change this path and makes no assumption about netif_running() here.
-
-If helpful, I can rework the commit message.
-
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>  drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+> index ebecdd29f3bd..f2759d2073d1 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+> @@ -205,6 +205,8 @@ static void octep_pfvf_dev_remove(struct octep_device *oct,  u32 vf_id,
+>  {
+>  	int err;
+>  
+> +	/* Reset VF-specific information maintained by the PF */
+> +	memset(&oct->vf_info[vf_id], 0, sizeof(struct octep_pfvf_info));
+>  	err = octep_ctrl_net_dev_remove(oct, vf_id);
+>  	if (err) {
+>  		rsp->s.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
+> -- 
+> 2.36.0
+> 
+> 
 
