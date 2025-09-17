@@ -1,202 +1,188 @@
-Return-Path: <netdev+bounces-223865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29FE1B7DE35
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:36:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49F37B7E0D8
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 303632A7472
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 06:39:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF75485247
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 06:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43AF9239085;
-	Wed, 17 Sep 2025 06:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B9829A9F9;
+	Wed, 17 Sep 2025 06:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsYit2XW"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (l-sdnproxy.icoremail.net [20.188.111.126])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2435D137932;
-	Wed, 17 Sep 2025 06:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.188.111.126
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73C9283121
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 06:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758091174; cv=none; b=sYbOtEsFc/WdcL95GwggX3lrIAHxk/ujnYx0P4AbikE9hP37stuaTBn2HmPfSZpNcspGcZNTcR+uavdZCrpPNsBvmtjpiRA5Yi0gGJihaVx9j4kL15jzydulotSZ8w7ydtV8iZ9piJ4KYldpEtJgRyKcn64sRRg2g5vUxGhGSww=
+	t=1758091262; cv=none; b=oghWZ0OgI2lI0c8oRWFh7OyT2MX68QOAjeQxfMYEpowjwKn6PnURJf1h1Lgv3ze3exvBm9QX0O4vsMGtzRj4zCdeoT0EHQE5qzoQVOvoldKRLnw0VeWjDLp6e+Q+VnrrbmUB6vj5h/p8wpPfqfMT84acZCPyUAqa6EZDQIGzS1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758091174; c=relaxed/simple;
-	bh=nwn3Ln4XsRKJAo3XtNQr2a3ITfICHvKXmczYHSVAtww=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b8bwvZE8BMvPvLffqXgvQzC7HmRr04S0CZ6CJnKUUILoVJ8OFiAik1oGXmZkaMMXp6RYgo1clmzshDi9uRJULl3A2J1U1EUxrqJ4g2Yk6VX8C4EnK8uU4jkPEiy6WHbwpuUkv7ZscKDFCoRJmeLCUFRQX+K8jFYB0DTb9Zl94Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=20.188.111.126
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [106.117.98.100])
-	by mtasvr (Coremail) with SMTP id _____wCnrwOIV8poo+lCAg--.13924S3;
-	Wed, 17 Sep 2025 14:39:05 +0800 (CST)
-Received: from ubuntu.localdomain (unknown [106.117.98.100])
-	by mail-app4 (Coremail) with SMTP id zi_KCgDXbIKCV8poEuDoAQ--.46016S2;
-	Wed, 17 Sep 2025 14:39:03 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	bbhushan2@marvell.com,
-	andrew+netdev@lunn.ch,
-	richardcochran@gmail.com,
-	naveenm@marvell.com,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH v2 net] octeontx2-pf: Fix use-after-free bugs in otx2_sync_tstamp()
-Date: Wed, 17 Sep 2025 14:38:53 +0800
-Message-Id: <20250917063853.24295-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1758091262; c=relaxed/simple;
+	bh=GTsD+zDHi5iUxyCHZCjNne7OiB64xj+ttr+pkOj+OwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DRxDBja5eT5v0tveob8RxlXnaNw+JNEYp12fVWLI/xVkGTxBVlCLKYB9KsVciGR1o9C0jv73EJjDm8MRiHongq6NAdwUxKbrIkwTYEIE/CGQnX0Vsf4X+5K61sCLCJyWK5jNlm0o4LXPOyoqtvKayklHtnT50W+AKfhGSDD6gas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TsYit2XW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758091259;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LTbbBlln6DCFneAUqcEqgaH8223TNkqnZLXB2rPiJQQ=;
+	b=TsYit2XWG+q/zCqkZemU2sfVZ597u7sAIosRsIKKbNbkV0VaKZxV57eWOYcO033fEARUJX
+	d3vy8Mo8nWt/W35H1qFMiO4LhqWiN2j7os3CfhQoktdmHrEDY2XYaON/uoF0oNTDltVGrV
+	sowSyKuDyaLjeEHj3KqPHzfD8uRXibs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-564-Ky8FxcsBMnebP_0v5Slu7Q-1; Wed, 17 Sep 2025 02:40:58 -0400
+X-MC-Unique: Ky8FxcsBMnebP_0v5Slu7Q-1
+X-Mimecast-MFC-AGG-ID: Ky8FxcsBMnebP_0v5Slu7Q_1758091257
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-61d2d2b792aso6536211a12.1
+        for <netdev@vger.kernel.org>; Tue, 16 Sep 2025 23:40:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758091257; x=1758696057;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LTbbBlln6DCFneAUqcEqgaH8223TNkqnZLXB2rPiJQQ=;
+        b=WStAp5R5s7aVDkSln6+B3lWQXklyY4OolswlW1cMTlWRRmVeCgovh1fzCFNbWGURmW
+         zDARwF8Pt2uulz79JgdeavgSAKeR7biKiyP8WlNBDiVFLL7JaKTimq6SLsv/dnosOTdX
+         EWuoIxDS8G6c7FHVrqbxCaM+9TXHRfNdVJO559J7E4YY5i/Fhr+hQ67rGZ6IWTTnVyRe
+         U4l11K+v2r2op0InIJz4BhlHaktyTbuonaCZ+53uxhCchJPYOAi/6I8ervNnPEPc3guP
+         tkzhmISsjiGDHSxlz6NWpPNsWJT49UAYxACVjib6i1HgULGkIshkz1T0yke3LXWRWE77
+         pekQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSncnK6KMuH76qN7WdxJHpQlVVOIQLCX1P+QlJPEDK0eIicE4u1SCFIU2FLsACjfpUtg/gV7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvTOqm85Nf0jYtwbKv3TktOYSCa2Aea3DphG5UYnir2mkgtd+X
+	2YE9SrZJshwfl1QSrsFwo/SZIM8JMpqjVoKu/BKXiIOzIgCDYbAypyZDGeEXRXolMOM4n4s39Ab
+	O1HbH7IcD6VajG0L9DpbXG9XgdEx86OGNnjI0D3Foq31SgGQHtNDC1/WLAja6LfYYkAcxMRCcGe
+	MR7i747KZousDYcWQSBoGBE5Ba+W8XmAkF
+X-Gm-Gg: ASbGnctg8bmlwVdQd0ur0Sd72NWAx1RvYCP9ojGkyQJPb3FZ91RTNTaOzfsLFsH0kyB
+	+nmzwgdZXH9lEhRxD+w8xCoPEZYGxmsC89FUs8KbJlHa4vgk4rHE8dD8ofYMHQ905ayq/vewNja
+	QwlDWB5aVPncnYhN+T3FzyYw==
+X-Received: by 2002:a05:6402:40c8:b0:627:c739:ee36 with SMTP id 4fb4d7f45d1cf-62f83c34ad3mr933040a12.14.1758091256866;
+        Tue, 16 Sep 2025 23:40:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHuCx8Wm2NjgvVx8aU5k6RVtZU9jl0CgUhRhEkRJ87iAGzVB+vCxFRz69dVnXZ4ziFgE912UQsq1iIuOuRI/cM=
+X-Received: by 2002:a05:6402:40c8:b0:627:c739:ee36 with SMTP id
+ 4fb4d7f45d1cf-62f83c34ad3mr933005a12.14.1758091256362; Tue, 16 Sep 2025
+ 23:40:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zi_KCgDXbIKCV8poEuDoAQ--.46016S2
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwQMAWjJvXsG9gAWsL
-X-CM-DELIVERINFO: =?B?enZ52gXKKxbFmtjJiESix3B1w3uoVhYI+vyen2ZzBEkOnu5chDpkB+ZdGnv/zQ0PbP
-	CR131FE3wBtlILXmPZxD8pDyC02ccIf/9fDDg6eoYLJDkfkwCYjU3+iOBFXlFG9IYNFiPp
-	K+ldc1nqAuJEq/mrvVuurBTRxM8HF4AQVNStdriUEDQmUyGmK1ud4Y6B1ao51g==
-X-Coremail-Antispam: 1Uk129KBj93XoWxZw4DGF15ArW8Aw48Wr13Jrc_yoWrAr1Up3
-	y5C345Awn8Ars3Jrs7JF40vF1kJan5t34UWrn2gr4fZws3Wr1UXa48KF4F93WUGrWkAFZ3
-	Aas8JrZ3XFn5tabCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9Kb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7xvr2IYc2Ij64
-	vIr40E4x8a64kEw24lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I
-	3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxV
-	WUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAF
-	wI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcI
-	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j
-	6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7xwIDUUUU
+References: <20250915-gxrings-v3-0-bfd717dbcaad@debian.org>
+In-Reply-To: <20250915-gxrings-v3-0-bfd717dbcaad@debian.org>
+From: Lei Yang <leiyang@redhat.com>
+Date: Wed, 17 Sep 2025 14:40:19 +0800
+X-Gm-Features: AS18NWAdyteJLjS2OkZ5AwPMlO36O2pUFdRp0nHMdxW5VJOQ-UMOLbGst0il8i0
+Message-ID: <CAPpAL=wz5t4cMuVeksmpsv5aRyhJez=W4Uc2jOUqr7bNHHYJRw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/8] net: ethtool: add dedicated GRXRINGS
+ driver callbacks
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, kuba@kernel.org, 
+	Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The original code relies on cancel_delayed_work() in otx2_ptp_destroy(),
-which does not ensure that the delayed work item synctstamp_work has fully
-completed if it was already running. This leads to use-after-free scenarios
-where otx2_ptp is deallocated by otx2_ptp_destroy(), while synctstamp_work
-remains active and attempts to dereference otx2_ptp in otx2_sync_tstamp().
-Furthermore, the synctstamp_work is cyclic, the likelihood of triggering
-the bug is nonnegligible.
+Tested this series of patches v3 with virtio-net regression tests,
+everything works fine.
 
-A typical race condition is illustrated below:
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-CPU 0 (cleanup)           | CPU 1 (delayed work callback)
-otx2_remove()             |
-  otx2_ptp_destroy()      | otx2_sync_tstamp()
-    cancel_delayed_work() |
-    kfree(ptp)            |
-                          |   ptp = container_of(...); //UAF
-                          |   ptp-> //UAF
-
-This is confirmed by a KASAN report:
-
-BUG: KASAN: slab-use-after-free in __run_timer_base.part.0+0x7d7/0x8c0
-Write of size 8 at addr ffff88800aa09a18 by task bash/136
-...
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x55/0x70
- print_report+0xcf/0x610
- ? __run_timer_base.part.0+0x7d7/0x8c0
- kasan_report+0xb8/0xf0
- ? __run_timer_base.part.0+0x7d7/0x8c0
- __run_timer_base.part.0+0x7d7/0x8c0
- ? __pfx___run_timer_base.part.0+0x10/0x10
- ? __pfx_read_tsc+0x10/0x10
- ? ktime_get+0x60/0x140
- ? lapic_next_event+0x11/0x20
- ? clockevents_program_event+0x1d4/0x2a0
- run_timer_softirq+0xd1/0x190
- handle_softirqs+0x16a/0x550
- irq_exit_rcu+0xaf/0xe0
- sysvec_apic_timer_interrupt+0x70/0x80
- </IRQ>
-...
-Allocated by task 1:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- __kasan_kmalloc+0x7f/0x90
- otx2_ptp_init+0xb1/0x860
- otx2_probe+0x4eb/0xc30
- local_pci_probe+0xdc/0x190
- pci_device_probe+0x2fe/0x470
- really_probe+0x1ca/0x5c0
- __driver_probe_device+0x248/0x310
- driver_probe_device+0x44/0x120
- __driver_attach+0xd2/0x310
- bus_for_each_dev+0xed/0x170
- bus_add_driver+0x208/0x500
- driver_register+0x132/0x460
- do_one_initcall+0x89/0x300
- kernel_init_freeable+0x40d/0x720
- kernel_init+0x1a/0x150
- ret_from_fork+0x10c/0x1a0
- ret_from_fork_asm+0x1a/0x30
-
-Freed by task 136:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3a/0x60
- __kasan_slab_free+0x3f/0x50
- kfree+0x137/0x370
- otx2_ptp_destroy+0x38/0x80
- otx2_remove+0x10d/0x4c0
- pci_device_remove+0xa6/0x1d0
- device_release_driver_internal+0xf8/0x210
- pci_stop_bus_device+0x105/0x150
- pci_stop_and_remove_bus_device_locked+0x15/0x30
- remove_store+0xcc/0xe0
- kernfs_fop_write_iter+0x2c3/0x440
- vfs_write+0x871/0xd70
- ksys_write+0xee/0x1c0
- do_syscall_64+0xac/0x280
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-...
-
-Replace cancel_delayed_work() with cancel_delayed_work_sync() to ensure
-that the delayed work item is properly canceled before the otx2_ptp is
-deallocated.
-
-This bug was initially identified through static analysis. To reproduce
-and test it, I simulated the OcteonTX2 PCI device in QEMU and introduced
-artificial delays within the otx2_sync_tstamp() function to increase the
-likelihood of triggering the bug.
-
-Fixes: 2958d17a8984 ("octeontx2-pf: Add support for ptp 1-step mode on CN10K silicon")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
-Changes in v2:
-  - Describe how the issue was discovered and how the patch was tested.
-
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_ptp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ptp.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ptp.c
-index e52cc6b1a26c..dedd586ed310 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ptp.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ptp.c
-@@ -491,7 +491,7 @@ void otx2_ptp_destroy(struct otx2_nic *pfvf)
- 	if (!ptp)
- 		return;
- 
--	cancel_delayed_work(&pfvf->ptp->synctstamp_work);
-+	cancel_delayed_work_sync(&pfvf->ptp->synctstamp_work);
- 
- 	ptp_clock_unregister(ptp->ptp_clock);
- 	kfree(ptp);
--- 
-2.34.1
+On Mon, Sep 15, 2025 at 6:47=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
+ote:
+>
+> This patchset introduces a new dedicated ethtool_ops callback,
+> .get_rx_ring_count, which enables drivers to provide the number of RX
+> rings directly, improving efficiency and clarity in RX ring queries and
+> RSS configuration.
+>
+> Number of drivers implements .get_rxnfc callback just to report the ring
+> count, so, having a proper callback makes sense and simplify .get_rxnfc
+> (in some cases remove it completely).
+>
+> This has been suggested by Jakub, and follow the same idea as RXFH
+> driver callbacks [1].
+>
+> This also port virtio_net to this new callback. Once there is consensus
+> on this approach, I can start moving the drivers to this new callback.
+>
+> Link: https://lore.kernel.org/all/20250611145949.2674086-1-kuba@kernel.or=
+g/ [1]
+>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Tested-by: Lei Yang <leiyang@redhat.com>
+> ---
+> Changes in v3:
+> - Make ethtool_get_rx_ring_count() non static and use it in rss_set_prep_=
+indir()
+> - Check return function of ethtool_get_rx_ring_count() in
+>   ethtool_get_rx_ring_count() (Jakub)
+> - Link to v2: https://lore.kernel.org/r/20250912-gxrings-v2-0-3c7a60bbeeb=
+f@debian.org
+>
+> Changes in v2:
+> - rename get_num_rxrings() to ethtool_get_rx_ring_count() (Jakub)
+> - initialize struct ethtool_rxnfc() (Jakub)
+> - Link to v1: https://lore.kernel.org/r/20250909-gxrings-v1-0-634282f06a5=
+4@debian.org
+> ---
+> Changes v1 from RFC:
+> - Renaming and changing the return type of .get_rxrings() callback (Jakub=
+)
+> - Add the docstring format for the new callback (Simon)
+> - Remove the unecessary WARN_ONCE() (Jakub)
+> - Link to RFC: https://lore.kernel.org/r/20250905-gxrings-v1-0-984fc471f2=
+8f@debian.org
+>
+> ---
+> Breno Leitao (8):
+>       net: ethtool: pass the num of RX rings directly to ethtool_copy_val=
+idate_indir
+>       net: ethtool: add support for ETHTOOL_GRXRINGS ioctl
+>       net: ethtool: remove the duplicated handling from ethtool_get_rxrin=
+gs
+>       net: ethtool: add get_rx_ring_count callback to optimize RX ring qu=
+eries
+>       net: ethtool: update set_rxfh to use ethtool_get_rx_ring_count help=
+er
+>       net: ethtool: update set_rxfh_indir to use ethtool_get_rx_ring_coun=
+t helper
+>       net: ethtool: use the new helper in rss_set_prep_indir()
+>       net: virtio_net: add get_rxrings ethtool callback for RX ring queri=
+es
+>
+>  drivers/net/virtio_net.c | 15 ++-------
+>  include/linux/ethtool.h  |  2 ++
+>  net/ethtool/common.h     |  2 ++
+>  net/ethtool/ioctl.c      | 88 ++++++++++++++++++++++++++++++++++++++----=
+------
+>  net/ethtool/rss.c        | 15 ++++-----
+>  5 files changed, 84 insertions(+), 38 deletions(-)
+> ---
+> base-commit: 5b5ba63a54cc7cb050fa734dbf495ffd63f9cbf7
+> change-id: 20250905-gxrings-a2ec22ee2aec
+>
+> Best regards,
+> --
+> Breno Leitao <leitao@debian.org>
+>
 
 
