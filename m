@@ -1,256 +1,121 @@
-Return-Path: <netdev+bounces-223877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17923B7F325
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:24:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF98B7F794
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 866463B7E39
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 07:12:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FEDD4881B5
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 07:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB122DEA8F;
-	Wed, 17 Sep 2025 07:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668732EAD0F;
+	Wed, 17 Sep 2025 07:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oFbLN6uL"
+	dkim=pass (2048-bit key) header.d=malat-biz.20230601.gappssmtp.com header.i=@malat-biz.20230601.gappssmtp.com header.b="Tn3xO+zE"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F61200127;
-	Wed, 17 Sep 2025 07:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3AA27B327
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 07:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758093136; cv=none; b=sJCEJzhxyxWFwuIsi4ZlV07ziN3UIBpTfAcPmt66oD3P6DQgqZ5hCTBVy+Ym1/FsHVfRZrZ+RLviERcLmJN7oesjwJ+Igz07MGt1k5/rWtFCDnXLYov8vBf3jEE2rXxtfTkfk1L+LUtWPkbwsL5Dpht9KvW/UHaqUvps3mzsG5Q=
+	t=1758093208; cv=none; b=uRmZcw8GeiO3HTrTU3akf4c5pXo9J9MCyHOfKKF4kPpBmLzyDjseVom7Vf12RB1NcOBOjm74Lxn5sLIfz85ZEBjD9DWQYpa1yT3drt92YtGMR+tjKudOSvAIGZmwH1Rxk0hcc6TRQQ3pAxEQ7Qu4BBGqexQvZ0N6Czmg6F5prBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758093136; c=relaxed/simple;
-	bh=AnUEUznLqClCmdYSXr4NxPzJ7PnwHzaxSWx9a+Ughrs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pbmuPZAwWxM8E7CFwm2LZVIzh0Otza6p0ztGW0cYlV58NCuniUmLB1srDsHeGDxz0vqjv5MBvAUnnodWJgTAWtSqzFkUPEEu62M5qU034tJUY3n0SjpeI07nZ1dH+/yhJV3hun58ZpurAphpPs+v8jDZIB2YwhY2OQpCiCcOU5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oFbLN6uL; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58H7A95w1551071;
-	Wed, 17 Sep 2025 02:10:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1758093009;
-	bh=JhpSRRMgVqAgduSNDjKmLQdUXJ0KKY7dsmGJD0xdH98=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=oFbLN6uL9Yp+2AUPSNOKZwf1JWAVNRsp0wg5LTa8IHaUSXtGQKLTzjUXK6ptQpM9D
-	 IsVEOwUoDjB1NvyqeuovRGSHWwofGcJD7/XhEHBwJhmLSo+KVY6Qu37WaAE9RKqs/R
-	 SXrGoQPR/uutEu3YeZ2vscJ/6JlAqs8ZwRw9Hm3c=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58H7A8O0575420
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 17 Sep 2025 02:10:08 -0500
-Received: from DFLE202.ent.ti.com (10.64.6.60) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 17
- Sep 2025 02:10:08 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE202.ent.ti.com
- (10.64.6.60) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Wed, 17 Sep 2025 02:10:08 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58H79xa42605473;
-	Wed, 17 Sep 2025 02:10:00 -0500
-Message-ID: <f095f31c-b725-4a3f-bc73-7cc57428e5f2@ti.com>
-Date: Wed, 17 Sep 2025 12:39:59 +0530
+	s=arc-20240116; t=1758093208; c=relaxed/simple;
+	bh=bUmCTb9jkGVVCvC/nOWrqBV9kwtDCMrxp4/c7tccdUA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FrMX7yQ9rtjOeb/GmWLOtRPray8DqzzWm0bvXzmOjD6Tqd1M5MEba2VuwEOjKLdA/y7GsFmgl/VBF5qjN13/evVd1yVKoF78sVa73uYYn9pj7RMNDsyrWY3lpG5GVvuRsuXuhPRftQ6Uhyp5TRhxHkx5QiPgJqsbt/suz4/BCPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=malat.biz; spf=none smtp.mailfrom=malat.biz; dkim=pass (2048-bit key) header.d=malat-biz.20230601.gappssmtp.com header.i=@malat-biz.20230601.gappssmtp.com header.b=Tn3xO+zE; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=malat.biz
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=malat.biz
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45dd5e24d16so59709475e9.3
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 00:13:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=malat-biz.20230601.gappssmtp.com; s=20230601; t=1758093203; x=1758698003; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ABVLiwcXV5PMjRvO+SuQAWut/4KQWIcA7lTzLyvH5OA=;
+        b=Tn3xO+zEnjJucTrKtT72DemJLBUagoI4bXbTWPWi1RTbfM3emqb5OGGZOza8I1645G
+         oP8bJFzjk1QzJaFPt8fp+XST3ik3w4Ejnj6K7kheppzWH9Bcjnk/5Tg4LfSUVjRvYnez
+         tI99vOYj2AbD9Rhb0ypR5WwgOi5peNCSRzbJn0A3dO4aKo9ubU1pNOteIbJlUAAsKyrb
+         4a3si558aS/x8+bXs3Phs477pwDMDF+Dr5RTtctsaWRljSf1TnaNqvGcQKrAPQzm6pXm
+         M2n3DRbYHurK5L/ucVV02taguf7IkNS982vdhBBZzjxI12qe0xw/pUvWlZensmFl1mgJ
+         P8fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758093203; x=1758698003;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ABVLiwcXV5PMjRvO+SuQAWut/4KQWIcA7lTzLyvH5OA=;
+        b=O1I+KIxYJeBMr9DG0XJS3j9i1iZ1DCopyO/IkIlL7dBmtMRbZHHQNEeaMFLZNTl6zM
+         b/Alx3w6Y4tXEOQVMc+tfLjeLVLstCP5GcKrXC+YBLcLsWHUlNYRpSBDCgGg7HlJm80L
+         Nxt+IMY+uEzWQ5HY/7lKeKbdda/gbd3eSO3s3Y0GBOTudQZGvf3OdaYg1MMU6yJTOYSb
+         3SNeeJHq/Iu4vA8cIzVZT3YjAfyfFnVSjLJxuPSz35mKa0D02oolnQaz6ZDAtOYrb2CK
+         zgI3Hm88VWLgXTem5epbY5cM3ny0mfsHfs2AjwjGX+NEJrEZnUjQDB3L2GK5z1aBUzag
+         C4ug==
+X-Gm-Message-State: AOJu0YwO/QEazQ9v7ftBj9BLxrPN2WhAU13JCSVKv1Nqn9i2wxkIvnCN
+	YWHvBDaWfaCWKmx83UpZHTM0Wo6gYGvaefrTT9cVvW51us8/XBcAWAKU/HZMm7EeNvdMtNfnJ+Z
+	37DeNQA==
+X-Gm-Gg: ASbGncvPbunEMteM1oWZp3WP6bqihI2hUPRfGw3/K9EkI0Ux0MZHxIgpSC9WtiRj49l
+	qm8eDfINf/FIhr4rY3RKMASI7bFjt2649jF36DTHMgKD2+/kjzsDY4IhCtDu7CBgBncs0rEmGnY
+	9mNyEki/l/ozOaMO+xw4iM2BSwHWLI6WSn50SC8AxMCpcq8qNjuaAixc1w6/QF6WdLz4hzFHNOg
+	YzP1oQ5q3yUth4QY9sbMWyyP9QDda9nJ0BX/DgTOhX01LsHkyuCpQqo6hTUcxPX5E1SIpCu3P+8
+	8NsWNE3pc1c4fKUfN8NzSwvDiJdY6n5RDAZgfRieV91nATOT5lhIzLA988zs8p2lz5aHC7pqwOl
+	PMgCUGt0ygGI3mZaQ8ovE4v0c
+X-Google-Smtp-Source: AGHT+IGDWjnay3JILWMQOopOj+q2n0DeNQNBc4uLGFp45zDsDjPITixBaZh5gHRaF0cSj0VuKEBk1w==
+X-Received: by 2002:a05:600c:3150:b0:45f:28ba:e17f with SMTP id 5b1f17b1804b1-462072dc871mr9439625e9.31.1758093202627;
+        Wed, 17 Sep 2025 00:13:22 -0700 (PDT)
+Received: from ntb.emea.nsn-net.net ([193.86.118.65])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45f321032a1sm36380025e9.2.2025.09.17.00.13.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 00:13:22 -0700 (PDT)
+From: Petr Malat <oss@malat.biz>
+To: netdev@vger.kernel.org
+Cc: sgoutham@marvell.com,
+	lcherian@marvell.com,
+	gakula@marvell.com,
+	jerinj@marvell.com,
+	sbhatta@marvell.com,
+	Petr Malat <oss@malat.biz>
+Subject: [PATCH] ethernet: rvu-af: Remove slash from the driver name
+Date: Wed, 17 Sep 2025 09:12:30 +0200
+Message-Id: <20250917071229.1742013-1-oss@malat.biz>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 5/5] net: rnpgbe: Add register_netdev
-To: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
-        <gur.stavi@huawei.com>, <maddy@linux.ibm.com>, <mpe@ellerman.id.au>,
-        <lee@trager.us>, <gongfan1@huawei.com>, <lorenzo@kernel.org>,
-        <geert+renesas@glider.be>, <Parthiban.Veerasooran@microchip.com>,
-        <lukas.bulwahn@redhat.com>, <alexanderduyck@fb.com>,
-        <richardcochran@gmail.com>, <kees@kernel.org>, <gustavoars@kernel.org>,
-        <rdunlap@infradead.org>, <vadim.fedorenko@linux.dev>, <joerg@jo-so.de>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>
-References: <20250916112952.26032-1-dong100@mucse.com>
- <20250916112952.26032-6-dong100@mucse.com>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250916112952.26032-6-dong100@mucse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
+Having a slash in the driver name leads to EIO being returned while
+reading /sys/module/rvu_af/drivers content.
 
+Remove DRV_STRING as it's not used anywhere.
 
-On 16/09/25 4:59 pm, Dong Yibo wrote:
-> Complete the network device (netdev) registration flow for Mucse Gbe
-> Ethernet chips, including:
-> 1. Hardware state initialization:
->    - Send powerup notification to firmware (via echo_fw_status)
->    - Sync with firmware
->    - Reset hardware
-> 2. MAC address handling:
->    - Retrieve permanent MAC from firmware (via mucse_mbx_get_macaddr)
->    - Fallback to random valid MAC (eth_random_addr) if not valid mac
->      from Fw
-> 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
-> ---
->  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  18 +++
->  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  80 ++++++++++++++
->  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   2 +
->  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 103 ++++++++++++++++++
->  4 files changed, 203 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> index 41b580f2168f..4c4b2f13cb4a 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> @@ -6,6 +6,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/mutex.h>
-> +#include <linux/netdevice.h>
->  
->  enum rnpgbe_boards {
->  	board_n500,
-> @@ -34,12 +35,26 @@ struct mucse_mbx_info {
->  	u32 fwpf_ctrl_base;
->  };
->  
-> +enum {
-> +	mucse_fw_powerup,
-> +};
-> +
+Signed-off-by: Petr Malat <oss@malat.biz>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-This enum has only one value. You should either use a #define or add
-more values to justify having an enum.
-
->  struct mucse_hw {
->  	void __iomem *hw_addr;
-> +	struct pci_dev *pdev;
-> +	const struct mucse_hw_operations *ops;
->  	struct mucse_mbx_info mbx;
-> +	int port;
-> +	u8 perm_addr[ETH_ALEN];
->  	u8 pfvfnum;
->  };
->  
-> +struct mucse_hw_operations {
-> +	int (*reset_hw)(struct mucse_hw *hw);
-> +	int (*get_perm_mac)(struct mucse_hw *hw);
-> +	int (*mbx_send_notify)(struct mucse_hw *hw, bool enable, int mode);
-> +};
-> +
->  struct mucse {
->  	struct net_device *netdev;
->  	struct pci_dev *pdev;
-> @@ -54,4 +69,7 @@ int rnpgbe_init_hw(struct mucse_hw *hw, int board_type);
->  #define PCI_DEVICE_ID_N500_DUAL_PORT 0x8318
->  #define PCI_DEVICE_ID_N210 0x8208
->  #define PCI_DEVICE_ID_N210L 0x820a
-> +
-> +#define mucse_hw_wr32(hw, reg, val) \
-> +	writel((val), (hw)->hw_addr + (reg))
->  #endif /* _RNPGBE_H */
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> index 86f1c75796b0..667e372387a2 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> @@ -1,11 +1,88 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright(c) 2020 - 2025 Mucse Corporation. */
->  
-> +#include <linux/pci.h>
->  #include <linux/errno.h>
-> +#include <linux/etherdevice.h>
->  
->  #include "rnpgbe.h"
->  #include "rnpgbe_hw.h"
->  #include "rnpgbe_mbx.h"
-> +#include "rnpgbe_mbx_fw.h"
-> +
-> +/**
-> + * rnpgbe_get_permanent_mac - Get permanent mac
-> + * @hw: hw information structure
-> + *
-> + * rnpgbe_get_permanent_mac tries to get mac from hw
-> + *
-> + * Return: 0 on success, negative errno on failure
-> + **/
-> +static int rnpgbe_get_permanent_mac(struct mucse_hw *hw)
-> +{
-> +	struct device *dev = &hw->pdev->dev;
-> +	u8 *mac_addr = hw->perm_addr;
-> +	int err;
-> +
-> +	err = mucse_mbx_get_macaddr(hw, hw->pfvfnum, mac_addr, hw->port);
-> +	if (err) {
-> +		dev_err(dev, "Failed to get MAC from FW %d\n", err);
-> +		return err;
-> +	}
-> +
-> +	if (!is_valid_ether_addr(mac_addr)) {
-> +		dev_err(dev, "Failed to get valid MAC from FW\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * rnpgbe_reset - Do a hardware reset
-> + * @hw: hw information structure
-> + *
-> + * rnpgbe_reset calls fw to do a hardware
-> + * reset, and cleans some regs to default.
-> + *
-> + * Return: 0 on success, negative errno on failure
-> + **/
-> +static int rnpgbe_reset(struct mucse_hw *hw)
-> +{
-> +	mucse_hw_wr32(hw, RNPGBE_DMA_AXI_EN, 0);
-> +	return mucse_mbx_reset_hw(hw);
-> +}
-> +
-> +/**
-> + * rnpgbe_mbx_send_notify - Echo fw status
-> + * @hw: hw information structure
-> + * @enable: true or false status
-> + * @mode: status mode
-> + *
-> + * Return: 0 on success, negative errno on failure
-> + **/
-> +static int rnpgbe_mbx_send_notify(struct mucse_hw *hw,
-> +				  bool enable,
-> +				  int mode)
-> +{
-> +	int err;
-> +
-> +	switch (mode) {
-> +	case mucse_fw_powerup:
-> +		err = mucse_mbx_powerup(hw, enable);
-> +		break;
-> +	default:
-> +		err = -EINVAL;
-> +	}
-> +
-
-Since you only have one mode currently, this switch statement seems
-unnecessary.
-
-> +	return err;
-> +}
-
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+index 0c46ba8a5adc..69324ae09397 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+@@ -21,8 +21,7 @@
+ #include "rvu.h"
+ #include "lmac_common.h"
+ 
+-#define DRV_NAME	"Marvell-CGX/RPM"
+-#define DRV_STRING      "Marvell CGX/RPM Driver"
++#define DRV_NAME	"Marvell-CGX-RPM"
+ 
+ #define CGX_RX_STAT_GLOBAL_INDEX	9
+ 
 -- 
-Thanks and Regards,
-Danish
+2.39.5
 
 
