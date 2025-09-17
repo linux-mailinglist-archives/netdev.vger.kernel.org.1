@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-224080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4B7B80751
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:15:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FA85B80935
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:32:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14CF53A5B2C
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:13:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 564F36227A2
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4CA332A48;
-	Wed, 17 Sep 2025 15:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5140530C0E5;
+	Wed, 17 Sep 2025 15:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mvFAhoOs"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0YjQF4VT"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886B1330D52
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66B730C0E4
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758121993; cv=none; b=PueBsUD8oIYfMTZuDHj76MqzdEp3X4pFbrdlv/jMqHnkfuXrG4T9GepuOZbz8uzgrhLGdErD5xJFOpYR5lJlMA2I82guUQgRUgimQFBJad4Q94FchJFV7yuRwkH1JqD7YAtlklcrF2upxI6O0yXvAAZKGP2l4C0sH56Wr3Ym+P4=
+	t=1758122990; cv=none; b=gjJX/fEVs7o5nHGaxZKhTffhPg3cWMCDfLUmHcP0oKAmreLaJFZyL7UMh1ijXvFZoZ1KRnoYxdijRrvNrO+wrN/tq+TDROztFM9z00QyNOm8bCXxS2Njrf0GkiA/aaZzIe7hJiyzP610Sjt0TJosJOUo6Wka/Gv4m8fpdpBk4qQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758121993; c=relaxed/simple;
-	bh=pjIGeCc4Qbd7UvvngP0+aYr2C++x0mYR7wKm134A4wM=;
+	s=arc-20240116; t=1758122990; c=relaxed/simple;
+	bh=UdW3ae6sTPDx44OpTpreWT5On9qNKbtCzO7LHscts0I=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=ZVUdkYRyFCLQMRTIxd23t9tAPotIuvgs/K1uqd0hDg5so3t8y9wfkPNL6+0zIq3gKg2UUAbHWNkCOeHb9UlXaHBhtE89ppJqnCjh8S+fTmBx2lOaJAUa2zewcQ7PQ1EqmIdoEiQsGMavAlCtXDLzXNKZKuwPu1qA8xJU823V6YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mvFAhoOs; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=HFmwa7EcmlevDifZF1ly6LAylwfQrsWXcuEBtmDQJtvsO+k274wNBuj+40Tl3l+ymGSnBF2faVgVlxhevvpYAiiSyIkbVO1J5bnVzGREw8K5y9t1R/Exl6Tt627GJiqaZYtLf2e+X44edhwcug2iz78z0i+HonD9oDC0wztXmbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0YjQF4VT; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ChcytkVLrz+IKUJS3Cck/qqHKiLa2YGrU2v03wuGGrM=; b=mvFAhoOslfMXI6PpLYMlk+frsP
-	A5cengYY0t6QZcdChxdPgmGo+ipcwiIcPyi2US5P9uC3kBocp2y9pf2sPs6KqkmRVXIzzhNG87Mkb
-	iugRGz6jqqB9LyxbZEtthJlUPBsl/NIVom9Ks0mvfrrbh53EJqOpQzmb5/u4lMvIow8qD57kP4XIZ
-	x6xOYDqMRZGdfqtRANEiOpqoNx9UtoRESXyAffLyBt6F5kjpc9mfmbLwnfkvrwOk9s/QeklW+0Kj3
-	BQyLhO7rQezSrusw4pBk7Yg8+mKrLMNPa7mHN+9WbaUcHqkhsk3kx8TchCH4mPCGtiypxU0a6suV6
-	brzJOU8w==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:32780 helo=rmk-PC.armlinux.org.uk)
+	bh=JRAJRW4WfloKke+sA3cXYCgUSWJDPjglxO5sAwdnW9Y=; b=0YjQF4VTUahjY2yLEZTHLsirA9
+	PmtQnLqyIa+N9Biz3pWT4UPa3AVij5qesBfp0YDnwdGc7Wq/WQ1+HwQdPkENVqDIksW9znV3+9a1f
+	ISQo4WIImUOMmHsM8Emuf9P0MCwoxa9RL6W22jfMyjn+1s9PO1SsErOlhang4vSFhpbtPRs8dVGQp
+	0wJvgqB+ECAtCKkcn3K0P85Yls1KJnJij/sQSIbuA/LTdqLRxtrAnUeEZ3MPg26dAqFC1MPz3/QRg
+	3j1ZDLRaIkCR2+CcgGv6s86gtpKnLs63wPqVlWK29iTQXbWglpSXwCtqk/uszytdKzEvu+lrUirz3
+	9KJyp2Nw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42810 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uytpq-000000004mN-0A9j;
-	Wed, 17 Sep 2025 16:12:42 +0100
+	id 1uytpu-000000004mr-1r1L;
+	Wed, 17 Sep 2025 16:12:46 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uytpl-00000006H2k-08pH;
-	Wed, 17 Sep 2025 16:12:37 +0100
+	id 1uytpq-00000006H2q-0ajY;
+	Wed, 17 Sep 2025 16:12:42 +0100
 In-Reply-To: <aMrPpc8oRxqGtVPJ@shell.armlinux.org.uk>
 References: <aMrPpc8oRxqGtVPJ@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -86,7 +86,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Sascha Hauer <s.hauer@pengutronix.de>,
 	Shawn Guo <shawnguo@kernel.org>,
 	Vladimir Zapolskiy <vz@mleia.com>
-Subject: [PATCH net-next 08/10] net: stmmac: sun8i: convert to use
+Subject: [PATCH net-next 09/10] net: stmmac: thead: convert to use
  phy_interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,43 +97,106 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uytpl-00000006H2k-08pH@rmk-PC.armlinux.org.uk>
+Message-Id: <E1uytpq-00000006H2q-0ajY@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 17 Sep 2025 16:12:37 +0100
+Date: Wed, 17 Sep 2025 16:12:42 +0100
 
-dwmac-sun8i supports MII, RMII and RGMII interface modes only. It
-is unclear whether the dwmac core interface is different from the
-one presented to the outside world.
+dwmac-thead supports either MII or RGMII interface modes only.
 
-However, as none of the DTS files set "mac-mode", mac_interface will
-be identical to phy_interface.
+None of the DTS files set "mac-mode", so mac_interface will be
+identical to phy_interface.
 
-Convert dwmac-sun8i to use phy_interface when determining the
+Convert dwmac-thead to use phy_interface when determining the
 interface mode rather than mac_interface.
+
+Also convert the error prints to use phy_modes() so that we get a
+meaningful string rather than a number for the interface mode.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-thead.c | 24 +++++++++----------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 690f3650f84e..5d871b2cd111 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -974,7 +974,7 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 		}
- 	}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+index 6c6c49e4b66f..a3378046b061 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+@@ -56,7 +56,7 @@ static int thead_dwmac_set_phy_if(struct plat_stmmacenet_data *plat)
+ 	struct thead_dwmac *dwmac = plat->bsp_priv;
+ 	u32 phyif;
  
 -	switch (plat->mac_interface) {
 +	switch (plat->phy_interface) {
  	case PHY_INTERFACE_MODE_MII:
- 		/* default */
+ 		phyif = PHY_INTF_MII_GMII;
  		break;
-@@ -989,7 +989,7 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
+@@ -67,8 +67,8 @@ static int thead_dwmac_set_phy_if(struct plat_stmmacenet_data *plat)
+ 		phyif = PHY_INTF_RGMII;
  		break;
  	default:
- 		dev_err(dev, "Unsupported interface mode: %s",
--			phy_modes(plat->mac_interface));
+-		dev_err(dwmac->dev, "unsupported phy interface %d\n",
+-			plat->mac_interface);
++		dev_err(dwmac->dev, "unsupported phy interface %s\n",
++			phy_modes(plat->phy_interface));
+ 		return -EINVAL;
+ 	}
+ 
+@@ -81,7 +81,7 @@ static int thead_dwmac_set_txclk_dir(struct plat_stmmacenet_data *plat)
+ 	struct thead_dwmac *dwmac = plat->bsp_priv;
+ 	u32 txclk_dir;
+ 
+-	switch (plat->mac_interface) {
++	switch (plat->phy_interface) {
+ 	case PHY_INTERFACE_MODE_MII:
+ 		txclk_dir = TXCLK_DIR_INPUT;
+ 		break;
+@@ -92,8 +92,8 @@ static int thead_dwmac_set_txclk_dir(struct plat_stmmacenet_data *plat)
+ 		txclk_dir = TXCLK_DIR_OUTPUT;
+ 		break;
+ 	default:
+-		dev_err(dwmac->dev, "unsupported phy interface %d\n",
+-			plat->mac_interface);
++		dev_err(dwmac->dev, "unsupported phy interface %s\n",
++			phy_modes(plat->phy_interface));
+ 		return -EINVAL;
+ 	}
+ 
+@@ -112,7 +112,7 @@ static int thead_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
+ 
+ 	plat = dwmac->plat;
+ 
+-	switch (plat->mac_interface) {
++	switch (plat->phy_interface) {
+ 	/* For MII, rxc/txc is provided by phy */
+ 	case PHY_INTERFACE_MODE_MII:
+ 		return 0;
+@@ -143,8 +143,8 @@ static int thead_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
+ 		return 0;
+ 
+ 	default:
+-		dev_err(dwmac->dev, "unsupported phy interface %d\n",
+-			plat->mac_interface);
++		dev_err(dwmac->dev, "unsupported phy interface %s\n",
++			phy_modes(plat->phy_interface));
+ 		return -EINVAL;
+ 	}
+ }
+@@ -154,7 +154,7 @@ static int thead_dwmac_enable_clk(struct plat_stmmacenet_data *plat)
+ 	struct thead_dwmac *dwmac = plat->bsp_priv;
+ 	u32 reg, div;
+ 
+-	switch (plat->mac_interface) {
++	switch (plat->phy_interface) {
+ 	case PHY_INTERFACE_MODE_MII:
+ 		reg = GMAC_RX_CLK_EN | GMAC_TX_CLK_EN;
+ 		break;
+@@ -177,8 +177,8 @@ static int thead_dwmac_enable_clk(struct plat_stmmacenet_data *plat)
+ 		break;
+ 
+ 	default:
+-		dev_err(dwmac->dev, "unsupported phy interface %d\n",
+-			plat->mac_interface);
++		dev_err(dwmac->dev, "unsupported phy interface %s\n",
 +			phy_modes(plat->phy_interface));
  		return -EINVAL;
  	}
