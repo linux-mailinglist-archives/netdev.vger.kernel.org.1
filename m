@@ -1,182 +1,150 @@
-Return-Path: <netdev+bounces-223988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5371B7C6B4
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:01:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD5DB7C891
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D06D2A1CCB
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:41:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B7DA483832
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E88435AAA4;
-	Wed, 17 Sep 2025 11:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31E129B8C7;
+	Wed, 17 Sep 2025 11:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKW0W/pb"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="c31U7ebF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B562D30ACFE
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 11:41:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCE820E03F;
+	Wed, 17 Sep 2025 11:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758109295; cv=none; b=QsXbgqUfwD5RKkQK3/jM+OYQeHK+dU1POHJiBepxKCDzHQcbQ0XXiHPTHPR4u8qVfIU8oNE7bJHVIpSRyYgWm3Id8ZPqrFtPrEUgv98Ei/9642ffTLkbElnjVh+16c/t1NW6agRJDlR0U627gDm0+cNA+YQ/arD+mDK3YCupbIE=
+	t=1758109575; cv=none; b=N+wYAHEw1p1g1+odNFHOmQK4VgH+BP34kSA4tariNwpoI50nZRfCt+ef/2dQwKe3/CafcRS5zjCd4BMsqo/D1nNBAH9H91ixxSkW7VEodvcnOpI+Yxk3iAbcbZy+ckjc41O3PRHq+bxXunef8bHQ5bxERjU/JmDWtMj4ckBU1D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758109295; c=relaxed/simple;
-	bh=N/Ee7PwVVD0Btz2fKiYLBUQb8Z3NZU3V0y/CRtFbjSA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F8+7l9jaM6OkiUUqEil9Dadnge8AuQBLHS0ge8KpXwbr1Wgcr7Fvep5+TGR1VVxa81RAKJ3fsvi0/8WVWNANJID1/TEn9u7QZi7oYiKOR6xdAy1w78/ilZuitTVcEjPhOfzU7pzivZdlwQfdlLr3jGBJFiaAYgkx/lpP6a77cok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKW0W/pb; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-26799bf6a2eso29158855ad.3
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 04:41:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758109293; x=1758714093; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/71U6mk1HE0y17xhkV6xojGxhUtQ/FIiDu4wfoMksm4=;
-        b=EKW0W/pbg9cMSg6fB7b1BouuG0gkjiRWe7E+nVCM77Yf6cL7E102AqI/eugcToG8JZ
-         RY6j464BIGUq3sGAX4OtI4WyrrsBDw6S7WkqzXVhZXfmAokaIvPfcmxHGwHBRAE6mvdC
-         U9zHX1iaZsjM89WrSeMrkf4x0YsGMEsfmbamjqYWese1JtWyfuv4RXKEJTwVzw6TOf6c
-         EADN37ocsbv9vTGWLRiGT7XCqcr8zLGBrBUdWtrkZu9BHRJzaZXfh2GYhWBRlUb3SRlU
-         mG/4vlYEEKw6yIfavvRgA2513XFgtJEv0AGr4gVjJxjf//haot2ZPlWch/7EGMZWG9A1
-         42iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758109293; x=1758714093;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/71U6mk1HE0y17xhkV6xojGxhUtQ/FIiDu4wfoMksm4=;
-        b=cFjIteNDMxAus5LwcFjmu2mn8dAAOnwdzcDj/aFo3s4AKLZKoNPMm17lb2qbVRJ1dk
-         J7xUE0wpAvjpeaK0FGQip0NX7bYIjp/q4YSHM7btmjlR2XX0IPv8ruQhaoBWX2C+b/ZF
-         33Ea/ByiuPeTEKpqCLO+lAXxe63tFrwU/kGMIKc4L1eFWCdzezNUWpZJsIXmYG8QG2ZB
-         brfwf28VPy8LUGUx1ulqoSnMrFDqyWQhLdbZprmIs4dApz+k4M/OvcGCa/h2Z+RXhudU
-         1hlq2siFrUyYGg8q8hJYJXSbB7PHu3Vko/nLJLtmsgEdr0SHNWM6vKf0/f0Fb4Ghl1Bc
-         WL0w==
-X-Gm-Message-State: AOJu0YyF6Gtl75woo4PMWkSnh25ktR/yvstDtIaqdpL9Ld9bYs0k7//0
-	jEXbZv2nU7tIUQB7giQ+RwAxiykPkYdd/V3kEOTbL+IDTnbxuBzMA7lZ
-X-Gm-Gg: ASbGnct4dZkl5QRH0cVxFntfVkf1U3t0X9U1+KHv5AnpF0EjaZr88H7cygaIDc6JCgD
-	E30ybKrXRZxSiah68+kKXCbtaQVYRVAxU4DHqMTORAlQTYgU7mUr6Q7BhUAmvW0HZzLc/R8N8fx
-	zAzv9QxWtfIXlG2ahiPgQMTZ8DIv6JNhlWwwijM324IdzUgAZKEFgqjIfN6MOC4C51qrsURMqgj
-	DFyly26IEQQFjiG15xTyoFp5r7P6D4pEVMhB3SUQrHDKCNA45UYc4ojdnIAKGPkO7PSK7zq29uI
-	cQ4vgH09uPWBsnpC5wnP/8J8tAl+pj+wV8KnWNavVlZiRkCjf2kmJSEmXlsGSLQbDuZiouB4+Ov
-	CNP6jpF4LU1i8SqqmMcemQ9v5bNqBNzf/mRJtEAY=
-X-Google-Smtp-Source: AGHT+IF4IlklU6MYc9xEkBsSBCRnBKDqQDO2bhUmKc2QNEE0v/TjKfWMhF7G9o+gmjzjr/VZtfcv4g==
-X-Received: by 2002:a17:903:2c9:b0:246:441f:f144 with SMTP id d9443c01a7336-26813e00ab9mr24839985ad.56.1758109292952;
-        Wed, 17 Sep 2025 04:41:32 -0700 (PDT)
-Received: from cortexauth ([2402:e280:2313:10b:d917:bfec:531b:9193])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-269741690a2sm2722865ad.92.2025.09.17.04.41.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 04:41:32 -0700 (PDT)
-From: Deepak Sharma <deepak.sharma.472935@gmail.com>
-To: krzk@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev,
-	Deepak Sharma <deepak.sharma.472935@gmail.com>,
-	syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Subject: [PATCH] net: nfc: nc: Add parameter validation for packet data
-Date: Wed, 17 Sep 2025 17:09:37 +0530
-Message-ID: <20250917113937.57499-1-deepak.sharma.472935@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1758109575; c=relaxed/simple;
+	bh=GE1ZvajMjR1jpdcyQ23SFnVuz3QmYfCASBO13hwms0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VEFe8TkLGPiV3YPVwaYYI9L0gEUYM336U/YFilgfBMO3NN8NdlWsl2pOouTfIVpuBrDMazOvE1V7lZG061tvdeeQqieDWFVYlndh9py9ZUAtQEoatzPNR7eC3IAuxGglNIbPtE+pgqtNPjYukBm9tz5lsrvgR1+wL1J71FQzANU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=c31U7ebF; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58HBj7G91597639;
+	Wed, 17 Sep 2025 06:45:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1758109507;
+	bh=CESIdT/b5vC34F/eerVXaRdloEbeJeSQadVRXpn30xo=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=c31U7ebFlqU6kZuPjeR3YrLRk3pu22idBxlSh8Qez5VPn+A9Pd896Vfs9dUFchjaq
+	 WQwPgC5USgoJu/BmU6RwfRFBd+IXgVYn/3y/Td1AAmKwptbKrDi3dYpM36blp2qNPj
+	 QyUxKkARwRsEFJiJufjePXpCFZiDDPIr7n+JX6Ro=
+Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
+	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58HBj6CM2312628
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Wed, 17 Sep 2025 06:45:06 -0500
+Received: from DLEE213.ent.ti.com (157.170.170.116) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 17
+ Sep 2025 06:45:06 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE213.ent.ti.com
+ (157.170.170.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 17 Sep 2025 06:45:06 -0500
+Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58HBivYL2975345;
+	Wed, 17 Sep 2025 06:44:58 -0500
+Message-ID: <7cd06f8f-bd74-429d-bf2c-71858178950a@ti.com>
+Date: Wed, 17 Sep 2025 17:14:57 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 0/7] Add RPMSG Ethernet Driver
+To: Andrew Davis <afd@ti.com>, "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet
+	<corbet@lwn.net>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mengyuan Lou
+	<mengyuanlou@net-swift.com>,
+        Lei Wei <quic_leiwei@quicinc.com>, Xin Guo
+	<guoxin09@huawei.com>,
+        Michael Ellerman <mpe@ellerman.id.au>, Fan Gong
+	<gongfan1@huawei.com>,
+        Lorenzo Bianconi <lorenzo@kernel.org>,
+        Parthiban
+ Veerasooran <Parthiban.Veerasooran@microchip.com>,
+        Lukas Bulwahn
+	<lukas.bulwahn@redhat.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>
+References: <20250911113612.2598643-1-danishanwar@ti.com>
+ <8a20160e-1528-4d0e-9347-0561fc3426b4@ti.com>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <8a20160e-1528-4d0e-9347-0561fc3426b4@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Syzbot reported an uninit-value bug at nci_init_req for commit
-5aca7966d2a7
+Hi Andrew,
 
-This bug arises due to very limited and poor input validation
-that was done at net/nfc/nci/core.c:1543. This validation only
-validates the skb->len (directly reflects size provided at the
-userspace interface) with the length provided in the buffer
-itself (interpreted as NCI_HEADER). This leads to the processing
-of memory content at the address assuming the correct layout
-per what opcode requires there. This leads to the accesses to
-buffer of `skb_buff->data` which is not assigned anything yet
+On 11/09/25 9:34 pm, Andrew Davis wrote:
+> On 9/11/25 6:36 AM, MD Danish Anwar wrote:
+>> This patch series introduces the RPMSG Ethernet driver, which provides a
+>> virtual Ethernet interface for communication between a host processor and
+>> a remote processor using the RPMSG framework. The driver enables
+>> Ethernet-like packet transmission and reception over shared memory,
+>> facilitating inter-core communication in systems with heterogeneous
+>> processors.
+>>
+> 
+> This is neat and all but I have to ask: why? What does this provide
+> that couldn't be done with normal RPMSG messages? Or from a userspace
+> TAP/TUN driver on top of RPMSG?
+> 
 
-Following the same silent drop of packets of invalid sizes,
-I have added validation in the `nci_nft_packet` which processes
-NFT packets and silently return in case of failure of any
-validation check
+This is different from RPMSG because here I am not using RPMSG to do the
+actual TX / RX. RPMSG is only used to share information (tx / rx
+offsets, buffer size, etc) between driver and firmware. The TX / RX
+happens in the shared memory. This implementation uses a shared memory
+circular buffer with head/tail pointers for efficient data passing
+without copies between cores.
 
-Possible TODO: because we silently drop the packets, the
-call to `nci_request` will be waiting for completion of request 
-and will face timeouts. These timeouts can get excessively logged
-in the dmesg. A proper handling of them may require to export
-`nci_request_cancel` (or propagate error handling from the 
-nft packets handlers)
+> This also feels like some odd layering, as RPMSG sits on virtio, and
+> we have virtio-net, couldn't we have a firmware just expose that (or
+> would the firmware be vhost-net..)?
+> 
 
-Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
-Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
----
- net/nfc/nci/ntf.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+PMSG sits on virtio, and we do have virtio-net but I am not trying to do
+ethernet communication over RPMSG. RPMSG is only used to exchange
+information between cores regarding the shared memory where the actual
+ethernet communication happens.
 
-diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-index a818eff27e6b..05ee474a1068 100644
---- a/net/nfc/nci/ntf.c
-+++ b/net/nfc/nci/ntf.c
-@@ -809,34 +809,52 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
- 
- 	switch (ntf_opcode) {
- 	case NCI_OP_CORE_RESET_NTF:
-+		if (skb->len < sizeof(struct nci_core_reset_ntf))
-+			return;
- 		nci_core_reset_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_CORE_CONN_CREDITS_NTF:
-+		if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
-+			return;
- 		nci_core_conn_credits_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_CORE_GENERIC_ERROR_NTF:
-+		if (skb->len < 1)
-+			return;
- 		nci_core_generic_error_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_CORE_INTF_ERROR_NTF:
-+		if (skb->len < sizeof(struct nci_core_intf_error_ntf))
-+			return;
- 		nci_core_conn_intf_error_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_RF_DISCOVER_NTF:
-+		// tech specific params are included as unions
-+		if (skb->len < sizeof(struct nci_rf_discover_ntf))
-+			return;
- 		nci_rf_discover_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_RF_INTF_ACTIVATED_NTF:
-+		// tech specific params are included as unions
-+		if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
-+			return;
- 		nci_rf_intf_activated_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_RF_DEACTIVATE_NTF:
-+		if (skb->len < sizeof(struct nci_rf_deactivate_ntf))
-+			return;
- 		nci_rf_deactivate_ntf_packet(ndev, skb);
- 		break;
- 
- 	case NCI_OP_NFCEE_DISCOVER_NTF:
-+		if (skb->len < sizeof(struct nci_nfcee_discover_ntf))
-+			return;
- 		nci_nfcee_discover_ntf_packet(ndev, skb);
- 		break;
- 
+> Andrew
+> 
+
+
 -- 
-2.51.0
+Thanks and Regards,
+Danish
 
 
