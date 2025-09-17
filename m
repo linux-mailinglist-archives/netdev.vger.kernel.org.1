@@ -1,171 +1,158 @@
-Return-Path: <netdev+bounces-224012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E31B7EB87
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:58:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98C48B7EA83
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:56:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7681C520F40
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 12:53:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB3D41895F40
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 12:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA7132BC0A;
-	Wed, 17 Sep 2025 12:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DJnsYk9d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F84B328983;
+	Wed, 17 Sep 2025 12:52:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011009.outbound.protection.outlook.com [40.93.194.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AA618FDBD
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 12:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758113539; cv=fail; b=uJp5wE3E40Qyf8WOPVBpMNMAvoZd1NUWc0MEBRal9jzt6SoPUID9UMJNAqL4rEoplqoUcWiHg1zH6We5P0froA2v9cVTxBkJsnUpc+6z1Pemrx9f+22wtnt6WsnVP5OyWslCi4w+wBmSrIBkfALT/3ep7UsQW1zQ1XN04I8obOI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758113539; c=relaxed/simple;
-	bh=HXZVQ1NBENrUaX8xEEppFNqyAEvgSwKc1QUWCD1q22M=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=ogW4j318gu8rPeyMuMOMqLIuX6+Ht4GLaFTgzx3bW2MFyqna/4ybANDnji/tYvHKhiaPc3BsymZ4fNuaD8db0fnD9T9Qxot7E4xGTW+clygFqGlAUpOwaG1G5VzC4X5CrZgzshh/qc8Eet8oTMHiYJwt9wE3yBppYoYn9ooR62w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DJnsYk9d; arc=fail smtp.client-ip=40.93.194.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IGyKAXRunMGksQQ7ILV9z5Ygm1u7mRoyadZl78M9RT4r0YW2lgCVzR7+nKDXBV+37rqnYDumk0I8MFUcYC9GAh6QcYpInFIO43zTc08j3cdbwIwWN8EN3pJRXKAm98yvF2sI0EGDbehAH+f+57l2rDLRqXmzSIPucCdnEAwF/qKLb3ET3qSboHl6hhWcnAPP4TYH0MeALJbHRAH6Qbto7QXm2sWHVCvoYlcR8OLB8zPgpU9y/NMwbS5af9HUtGD2pLQYIKXKpZ7yKxgwxvirUFNntlQe/FR0otNS07aJGB+V/jF+KYfnJrUDIhGNp9pN6RiIa+EU5H8vbHL3aqLQmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vvh/mxhj2GUAEnN1icwmSsQzATIAySNU3NTpO8OakrY=;
- b=tex8Vl4wNuwF+ntQDhISrwY5sFaKolEbzXCaenrL6N4r3JAhGh6CTf8LbNP8+lr6YOanVekprr8nD1XHnWvAIIAcUNjgLQimvUIqjVXW73yh/fAUfbqLjHHv+HiJhLUx0iJmAfX+sym4Rlfss94DbuVl4Ok/ZShO5z11SVclBQGwggaFHyliUOyGqFHIOmVP/O9wE3ozjMrvWinc+i+qzi8XmLsLpGq+ZpRc30TNahj2hV0BwsOsuYILThMy3I1BrFzeXo8VvGjXfj3bY/sUEenvpFQvzCNTFV04fYprsyGdI/tSY+z1pxMCyfOKGuYjrMXcXR+qnXQnJOIM2w6z4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=lists.linux-foundation.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vvh/mxhj2GUAEnN1icwmSsQzATIAySNU3NTpO8OakrY=;
- b=DJnsYk9dMoG1ftyTIZpgNMDF+7UgGqYnVhQn7UCTUcbYEj23ZdLcOwHWk8qRUErsvgkpXQz+HGXenN2e21L0SGNPs66GRERUratcE90ijmOnWGy8wXv5FteM18zkpdpeQF25rYC9LO9vIlM+NYGxwmRUeNDrN2+NKv9RlxszzRwmbkwHuC3BW4Lkm1m+BiUlISuHzP3jDbxgY9IsnJHKv6FRRjAA2zOySCpI7r6rj3art0Hu+YiJznHaPIr4ZW4qiy2OTB8j+5kPxNoAGJmf4XIelfm3Ryov87lLFS+MU+i+LD8G7ptcj0/+uEEXXORxhW8cRiDWOiPb6AkEK0TCbw==
-Received: from BL1PR13CA0093.namprd13.prod.outlook.com (2603:10b6:208:2b9::8)
- by DM6PR12MB4386.namprd12.prod.outlook.com (2603:10b6:5:28f::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Wed, 17 Sep
- 2025 12:52:13 +0000
-Received: from BL6PEPF00020E61.namprd04.prod.outlook.com
- (2603:10b6:208:2b9:cafe::f0) by BL1PR13CA0093.outlook.office365.com
- (2603:10b6:208:2b9::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.13 via Frontend Transport; Wed,
- 17 Sep 2025 12:52:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BL6PEPF00020E61.mail.protection.outlook.com (10.167.249.22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Wed, 17 Sep 2025 12:52:12 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 17 Sep
- 2025 05:51:58 -0700
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 17 Sep
- 2025 05:51:54 -0700
-References: <9d887044246a656e15d05df716cde77e9d9ba64a.1758038828.git.petrm@nvidia.com>
- <aMqi98APC2YXu5xn@shredder>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-CC: Petr Machata <petrm@nvidia.com>, Nikolay Aleksandrov
-	<razor@blackwall.org>, David Ahern <dsahern@kernel.org>,
-	<netdev@vger.kernel.org>, <bridge@lists.linux-foundation.org>, Andy Roulin
-	<aroulin@nvidia.com>
-Subject: Re: [PATCH iproute2-next v2] ip: iplink_bridge: Support
- fdb_local_vlan_0
-Date: Wed, 17 Sep 2025 14:50:43 +0200
-In-Reply-To: <aMqi98APC2YXu5xn@shredder>
-Message-ID: <87bjn9s0nr.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE2229B76F
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 12:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758113537; cv=none; b=CnW+1FCocylqRuq19pyDQAZ3SX9i5PXeinrJcRvJsfl+BsMKDgmycKK4TMTz0fcA5IbBMiVwn3jsNGgwTVWkh9Ru4upTatpXN15uI0n39Z4j82cE76/aSdDB0ZnNbczFYQvb6oiIIJYUq1P+Rv7yA5/CAfl0NmA0KP/HF6230pY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758113537; c=relaxed/simple;
+	bh=z0CqdaKtG3FXMT+SGr/8fspurJp6wIxXOOHn9NBLkew=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=KOZ4n4u8uZ9kHJO4/+Z4mMKUSPS6iyHnnpSx71O2gt9Gr21QcsiSEnRscqUvy8wVquQ1iwmkNunkIoz2AiM3nYLVzR8e/XPWbM4T6BpRDIA/vtyq5O7g5yxuFyxQFZu8DT1tmaiPDy8y3Mea2FVDLLoSPou0LLn11GssbkrMsVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b07dac96d1eso136515966b.1
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 05:52:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758113533; x=1758718333;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3Fwe6Jox9lvYBGadLqyIGGqu9khZAUVhT2PK4Qt0Hm8=;
+        b=lwL++kCuMuzKJQH1Hglz8hX5D4wfqir0THLAcFD3VLpkiL+q2pKdOnkiwhHTEKk14c
+         rTDWZ4AsuRIKgQaj2SjZwG4F+xLC3v5HrKwv89GzDInoDMb3QHFXE83AV2iiDZq+agLV
+         M8TeKnAvQEkirLhu0XhVKyEpUptexHFdug464ahXWtPTeEsoqA+AjtdbOfKUOjkCKxfD
+         1a44HQ08xdoje+upwcJ0sQmr5C1dte25UBm3iDkM61i2tbnjVnJ0v31bX4tdHq4noTNP
+         BS3FAVMeWUUmwevXE/biyuO66E27PCXMWh0rkYg2vPoJibtgTwoa5xAUNAOTZ3B6DlDS
+         mZKA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1UhNgJT5+xmWKKhQA9tQehTmTCA6caA/NBDEgl2ClDAmgocHAnbhWu29zy05+25bRaPRuePU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwISSk9jDlqRxhFxIlDQeoMWrJVuynCbJrfImYsKOz8t4Cap0H2
+	HMLuq/xalFKlW9Ft2hLC5FtKn9+johfJ7ANIl+blBN5CG3ejBc7Ml5bm
+X-Gm-Gg: ASbGncvG6jiogMYQEgQe/0dNho64Ey96BVHi3/cclgQVM0Xg4qCB1kDhouryvMg+7O7
+	R+VgJ8PnxUlcA8BZPKQWanC8tP6Etm69bdNLs9G1SPXrqbMZy3C4A1ZrMstW1h4F8bChKqbJfhf
+	TlEQAM2ifo4Zdww6Mkom79gKz+SWj5arbKCHXjx++dQ6/Xogufn1yzqoBVMImRJLpmGrinS/rQI
+	1atj73MBWiSc94BaXee7LCJVJKtikfMGFWLZ3ZMORkY/FXo2rkS3PMA+so+PJ0Jm2vzsZh5J1LG
+	2kOHSXK3TbZlOeRtIfHoMDmUJNlrmRJ+sVib+NKVJMZtV2O5eEZkvkrLWhQE14pzwbUqbB+KLEV
+	602rdi/MBlAOlmseMcujXEdS7
+X-Google-Smtp-Source: AGHT+IEapc8hSIjb349hAjbQsB4lVpp+5A+aiu4G8+6KZFoS/VpkK60FcM7fDOTphXJBAbk8gn9SUg==
+X-Received: by 2002:a17:907:d78a:b0:afa:1d2c:bbd1 with SMTP id a640c23a62f3a-b1bedda96f0mr250991266b.30.1758113533179;
+        Wed, 17 Sep 2025 05:52:13 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:45::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b19a4c2d3cfsm210880766b.26.2025.09.17.05.52.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 05:52:12 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net v4 0/4] net: netpoll: fix memory leak and add
+ comprehensive selftests
+Date: Wed, 17 Sep 2025 05:51:41 -0700
+Message-Id: <20250917-netconsole_torture-v4-0-0a5b3b8f81ce@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00020E61:EE_|DM6PR12MB4386:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3009e80-e892-41ed-a230-08ddf5e905dc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rqmk8za+IjcScajKomiT5GtJIzJRvgq/7ZMSCT58Dg4FOzm0ox9rm7U/3G7+?=
- =?us-ascii?Q?vwtwykJcvXytZi9sZ36e1dild4YjREL+us0uDVurI7ry1vSxrVM7pYFT/HbP?=
- =?us-ascii?Q?nsxmAkMqM2RX1ZqH5QF+A6a4PtphpOaid5Qh8F7ruHTqbwa/cy+j4+vRtqp/?=
- =?us-ascii?Q?ZEBHCNoNvkhWbNnFH8qJugJlTWK7hUF1pM1L2DoEwGKJdUyF/DoEykOjfVNB?=
- =?us-ascii?Q?caf3Phy255xfjj/9Dz1lf90Y+fK4orAMyKgMvs0tyZDjbrD+AGslH94jBrty?=
- =?us-ascii?Q?ctOJ0y0Lpe/Q8HUW1E7fM0ltCHYjmI0ImRT6AFHL4zINtTb/C5gNVaJe3lje?=
- =?us-ascii?Q?4LwsD2rFMh0RMHXamDzFjBqpcbWEG9D++1CuJXr3Adh4sXe79suB21pSOcTY?=
- =?us-ascii?Q?n7bKytVnP46/mHqN8/HB2UrmYmXKVUG2G2YCGNIXev72zcHYuxot8Cuecuiy?=
- =?us-ascii?Q?ykVMsGNzO193H5ZlMFC+JHw29UE0vvpRZQjNFL9KW/t9CIonIl15zO+tBGCZ?=
- =?us-ascii?Q?GA9FbOBEk50jcWbWcgi7tlKqBpQ4tKwljwOENpuE+3Ov1dXQYFTUW4oZTmqn?=
- =?us-ascii?Q?dwRvsR6qMjLglsJJe4OMz7GokYS6IpI55yk5bmlqA2w3EAt2USE91mSeaMND?=
- =?us-ascii?Q?CS8UBUIaZUCKM54VYdv+WciQSIsXuC4u4DRG9hvftpWdRySxQf+kjMUeC3sZ?=
- =?us-ascii?Q?KqCB6nZMTXFCLBjHw/FqRa2CZ14sLGRRZGV/E+YS96XS8bca3fEvNOlTaiQO?=
- =?us-ascii?Q?LSvODJOQZDLT7kyDmRq+lHfSjL1wKRnEK7HmJQkjBqhhEQiyVyHw2LsX7R81?=
- =?us-ascii?Q?RhTn8tQAxvnMyqcz/VlbgzXqw8kEgeViFLLey69zk/S+xjXnxt89Fxsr1BD7?=
- =?us-ascii?Q?e4UbVuRwhtQmvpFhy1id0fdVovSezGDI79l4kWWVnF40GRuCiYmogFp3tBqo?=
- =?us-ascii?Q?J3T1iEkzTdKzLQpe8dM2MdwhitpdPdj7Fgap3QFZwi1liNbC5LjBFAM2NhQu?=
- =?us-ascii?Q?DMm1akCP81/OManyz/27l1V8QE4e0dLAL8DLdcCd97SPhUp53aKdV9Ztc2cN?=
- =?us-ascii?Q?KFncB6XRAIFE7pDN5AzTSu9LnNLPxAbr+8pKAoDwKeRN/QFdX3DlXop25quA?=
- =?us-ascii?Q?6ECPWVHlSbP+/I8+H9cN68Wfmww2RBGnzfn0axxQoBQgE+Q77N9XvFYX+imc?=
- =?us-ascii?Q?9NRXEbTo9lONE3pIjSjUvqptpXPFEFQT0GEqCkd7RvpBZRFWM0RH4OLNT4pW?=
- =?us-ascii?Q?AGLngaIqf7fJ8pzJ3izcgHqI6sK8bDNBEhnBq+supiDq69k1VDxUHGQmcIZC?=
- =?us-ascii?Q?0yrAHmVvFaB6J/px8Q2CDithzqGc5INKgGnvzmqfNY/Elt0r8jkBbqcz5AD0?=
- =?us-ascii?Q?P5c2X7vevuit584RFk7gHry4c7OgO0t6Y0g+ucaWcE9stcnnPcjOHGT6xV+m?=
- =?us-ascii?Q?hFcGfdqdvn8P0GJReQhfgv7DplSjFj+TjbcA9hKnpIwsqb45HdGFEtho5nKO?=
- =?us-ascii?Q?EWxW5bpMWu7FP+l3IF9Nne8PFjBoncoAu7f1?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2025 12:52:12.9184
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3009e80-e892-41ed-a230-08ddf5e905dc
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00020E61.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4386
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAN2uymgC/33N0QrCIBSA4VeRc70TTtPNXfUeEbHpWQmhoTaKs
+ XcPdlU0uv7h+2fIlDxl6NgMiSaffQzQsX3FwF77cCH0DjoGggvFDRcYqNgYcrzRucRUHomwHa2
+ QI+9tbwxUDO6JRv9c0SMEKnCqGFx9LjG91tFUr+mfOdVYI5dWc62VackcHA2+D7uYLqs3iU9jv
+ 2kI5KiaRpFTzkqtfwz5aahNQyLHtlG2GWlwsv42lmV5A2ng6BRCAQAA
+X-Change-ID: 20250902-netconsole_torture-8fc23f0aca99
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+ david decotigny <decot@googlers.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+ calvin@wbinvd.org, kernel-team@meta.com, calvin@wbinvd.org, 
+ jv@jvosburgh.net, Breno Leitao <leitao@debian.org>, stable@vger.kernel.org
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2160; i=leitao@debian.org;
+ h=from:subject:message-id; bh=z0CqdaKtG3FXMT+SGr/8fspurJp6wIxXOOHn9NBLkew=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoyq77SqEFfQYQIeE0oilLdana10QcJmXq1NYfh
+ 0NII2YzuHGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaMqu+wAKCRA1o5Of/Hh3
+ bTiXD/99+CjULWfW0x5zaGcailnXvJJh/yLySYqlL+wAw/wRoxS0kGxDVpTJjxwcJpQjyyO47fI
+ tikEHJ8t6RewkSEHO4UCDvZM5+ex6aCY8zzi1Gg2hjP/pUX+cD4djQAiEFLKkB7bJKpJpiqTtwv
+ oSsUQTC9D1F2fWZ8zwnPVEXw4v6w3H2+CHfQCv1kqYkzm7rT3Xyxrjs7DuKEKbnk8r4zBCsUu28
+ HfmJQMfDrvUhaC3fvZKCznwvE/0Vg8RqMEXCrYHxib08YVm1LZRGN0cLhW2E1YJLxxiZJQAMiqs
+ 2XMXGTs0/AbUqLvViHtBNWoIcW5PXMH3gpzQbJLaSIc8vdKZCdxOOzKZS8eYnF8Sy7HF90QECcv
+ LJ2tuQGPREaU7FRKOUeTlveuJv/+7fZtJw4ACW9CbS4fUim2y5M4bjN221I1/rI4Z8e+VPwRAha
+ ou20Y29IymiHjqBM2MrxKcNafaVjL8d9cZnU7c0EBUAaMfp0OJedlZpRsyD6sywjKjsPy0cRLFh
+ Tn7A1VEls/sqj6GKwhhgjJsb/+uytRprX6fU9MRg3hM7ZZCoDtPvgCfkzHc4p3W/4Ecn1Sy2I9O
+ qa5nhL9CuxeLakwRKjaB67gF+UH4F0tfIQPxWIvM3GNeevYfYjSZ/tnXHnzRr/CFsY0hRa5+Px0
+ vOPvPH/y11fEKYA==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
+Fix a memory leak in netpoll and introduce netconsole selftests that
+expose the issue when running with kmemleak detection enabled.
 
-Ido Schimmel <idosch@nvidia.com> writes:
+This patchset includes a selftest for netpoll with multiple concurrent
+users (netconsole + bonding), which simulates the scenario from test[1]
+that originally demonstrated the issue allegedly fixed by commit
+efa95b01da18 ("netpoll: fix use after free") - a commit that is now
+being reverted.
 
-> On Tue, Sep 16, 2025 at 06:25:46PM +0200, Petr Machata wrote:
->> @@ -635,6 +648,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->>  
->>  	if (tb[IFLA_BR_MULTI_BOOLOPT]) {
->>  		__u32 mofn_bit = 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
->> +		__u32 fdb_vlan_0_bit = 1 << BR_BOOLOPT_FDB_LOCAL_VLAN_0;
->>  		__u32 mcvl_bit = 1 << BR_BOOLOPT_MCAST_VLAN_SNOOPING;
->>  		__u32 no_ll_learn_bit = 1 << BR_BOOLOPT_NO_LL_LEARN;
->>  		__u32 mst_bit = 1 << BR_BOOLOPT_MST_ENABLE;
->> @@ -661,6 +675,11 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->>  				   "mdb_offload_fail_notification",
->>  				   "mdb_offload_fail_notification %u ",
->>  				   !!(bm->optval & mofn_bit));
->> +		if (bm->optval & fdb_vlan_0_bit)
->
-> Shouldn't this be 'bm->optmask' ?
+Sending this to "net" branch because this is a fix, and the selftest
+might help with the backports validation.
 
-It should.
+Link: https://lore.kernel.org/lkml/96b940137a50e5c387687bb4f57de8b0435a653f.1404857349.git.decot@googlers.com/ [1]
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v4:
+- Added an additional selftest to test multiple netpoll users in
+  parallel
+- Link to v3: https://lore.kernel.org/r/20250905-netconsole_torture-v3-0-875c7febd316@debian.org
+
+Changes in v3:
+- This patchset is a merge of the fix and the selftest together as
+  recommended by Jakub.
+
+Changes in v2:
+- Reuse the netconsole creation from lib_netcons.sh. Thus, refactoring
+  the create_dynamic_target() (Jakub)
+- Move the "wait" to after all the messages has been sent.
+- Link to v1: https://lore.kernel.org/r/20250902-netconsole_torture-v1-1-03c6066598e9@debian.org
+
+---
+Breno Leitao (4):
+      net: netpoll: fix incorrect refcount handling causing incorrect cleanup
+      selftest: netcons: refactor target creation
+      selftest: netcons: create a torture test
+      selftest: netcons: add test for netconsole over bonded interfaces
+
+ net/core/netpoll.c                                 |   7 +-
+ tools/testing/selftests/drivers/net/Makefile       |   2 +
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 197 ++++++++++++++++++---
+ .../selftests/drivers/net/netcons_over_bonding.sh  |  76 ++++++++
+ .../selftests/drivers/net/netcons_torture.sh       | 127 +++++++++++++
+ 5 files changed, 384 insertions(+), 25 deletions(-)
+---
+base-commit: 5e87fdc37f8dc619549d49ba5c951b369ce7c136
+change-id: 20250902-netconsole_torture-8fc23f0aca99
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
