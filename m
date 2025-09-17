@@ -1,129 +1,143 @@
-Return-Path: <netdev+bounces-224038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A906B7FA7E
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:01:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44382B7FA18
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:58:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AE26540418
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:56:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3A06622450
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31EA7328970;
-	Wed, 17 Sep 2025 13:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2201632E739;
+	Wed, 17 Sep 2025 13:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y3FFbOLa"
+	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="fmGapKok"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8F0316193
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 13:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA45932BBF5
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 13:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758117222; cv=none; b=p3DInW+IL240EUSKRMsHq75Rw9+Gi6m1X9gdqg7YTriVqWPVXPe1+5Z0/FQHi4jbckaRjARupsORFIqJxckpdIKd3jGgpki2xBvXgbuYP9HRzM8uVYdUNQcrFk6ErQhYCUR6AgV71e8k5j2ekA/oEOQTloGWBMz/fuKgf7v4DHc=
+	t=1758117250; cv=none; b=s2shCEvjsP8V+BgFaw1bShpAaJDQ/c8Can8CRm5gafAvPh7kB2P0sHIXIpctKkYswgLvrXq68UQj+83F8RewrmXSAkCCvCis/E/Z92bSuwiDuzo4zHlswlmdkpCfOo03CnyCGDkUxivVVfnSgTYQspaJoBr3uOe5FWoyb1H/Cj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758117222; c=relaxed/simple;
-	bh=809Xoa81SsuA/YaVGt54p8msWHOJUrtDL2RTeT0u+Is=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qfUrkoGrTZIs7qd5SUS/yNrSvOhnLoI+uIMhXxu7Z7CUJAoiSmjc0DGd7KvCw+c3K5BcRBzSjoYTQ+H7RjkFX89VWYeuaGlRiT0DEHPibO4S5FLjwyu+u9U43HyrfdCA6Ur6k6CJQ/simMqrIrFr46xJBT0hXMVvfygfRy5xxIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y3FFbOLa; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-81ea2bb8602so1945461085a.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 06:53:40 -0700 (PDT)
+	s=arc-20240116; t=1758117250; c=relaxed/simple;
+	bh=nV1QrshvRehJ/eXBSMMeuT6hGEcacS/VSfv5Aahy3qc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EZbJDYP7FFPi4phbi1v2penrCu6T+LWJmaFdnU1Vf9/vO33vEduCYaKQvalq5x3FHlWsf5jTvcjyGkdTd/Bk+QJfyPIWSXogAYxpkrACY8BzP3xnQieZ81RCkzp9S7le33I4lxioOiXCEe8w3oZawHWb4upt1frHnz0XSxbrxQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=fmGapKok; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8112c7d196eso701449485a.3
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 06:54:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758117219; x=1758722019; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aJILwjN0524PmDn2xMZf53Vv0Yu8hqDvySpvkgdBkdc=;
-        b=Y3FFbOLa/Kn5uRZFJMkLjFcMx4CG9ivKwhO7AxW2KXqfF+vwvgCpQnQF+OkimJZ2e2
-         vXT+wTERwLAZoLsiE6BxpB5nhBtWaGpDsSvwb6SK5Wm8jScOERfEKbTTs6duU0SkBJ+J
-         gRr/42YFARxVPaLjEn/yjAGnME3kOFUMKMB6g5W6hWxPI6WmuF0Gm2Q+Wbj4M7TgVOIV
-         6Zb3fCApVp0e+TfQzypBZ/eb9iD8s2ALm5BIr0y4w0w6bWJqXUcA71OkaNrLhtx3Vp2P
-         WyBnP5kxaOPrvXHQxBn6Z1Pg4MNwBOiCOK3jNE2jzb9dEOXZBvXETYLSvacDg7ep/z3w
-         BkoQ==
+        d=rowland.harvard.edu; s=google; t=1758117246; x=1758722046; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=to4BXgFyFuRjiSPORVXGshM37diVDi0cjrsHXYAgKmw=;
+        b=fmGapKokLz9Fcmrm+nnUjiBmvailZKN+eXBViNgThFZcWW19Vmx7mlOTKESzUXi37B
+         bs07Bfpv0vPwxX87e0/CVX7SE+rfHLbUu5LhZfHHxpBsWZxqJzUD7T1FQKiYBcELbr/3
+         tycxPy/BbxgZyi/OBh0MXs0wciy4FKRW0kBEXz6oAralAR8S31KhPOUKqNhM2flGyjZM
+         mXgAR0E2WSV7g6k3isAoALB1kzYFjlEA3OCIW6LBLdyOdKzDLffiipLxAO6PbpeHufyJ
+         vNbUOvar8vSc+A/xmQAycFDBypO9mTF1YRVvfp7sTLCP9qeXVh5hmitRiypaZHStkKYg
+         zQ7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758117219; x=1758722019;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aJILwjN0524PmDn2xMZf53Vv0Yu8hqDvySpvkgdBkdc=;
-        b=GsP5C0+tWFiguYjCZjYcjbWMUaIBIgKlt1e3J/1BwTW+FRniaWNZsXjGs8hx/jtSOv
-         o16eTeaiuek4glfg8bxVuaZ4BYM2fHgFhT+FfB0wK/bz+N6v4bROy7laHWnWLRCzQPD/
-         TisexoRqsScIlfQfEcCA8KJf52li4nI/7PObZc9gUNJ69xJbLhwOBZQ3xrCOxkgRXHZe
-         p0RmkU9lP+r3dKmiZZLhN/kimWU1QDfQPDZoPuxawcp/yT33HzV8LPgLO2au5/AHMwAh
-         9Ahhn3bIc1RSxGQ2SnklQYhE0dEaJsvadTiXfQeyb14IBYj1NBl9sC3dtAKUMfGXEoJA
-         01PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaQY/RmhGUdYx2nBgRCkoPemlgDQLSbQdfP+MUsO2ecdmq30Xl1FWVU39BAiioxpCaAV8gZzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzM1nnNj0x3sGzgKqSlNLS8J8OMEbxm2HpuB1KDa5tTw6LrvX9l
-	QSRICX0i3JF+r2Qv+17DFmdH+twu7y/Yk6lLoXIqUr9p/7phy/vZ7o3Mh3A8qK9TRbpt49AlbyY
-	8j+8GPpUzHoKPlw==
-X-Google-Smtp-Source: AGHT+IF8JLS0Han2K15u5D6bRo/vItKKpuZe0LS/S4/WvawkmQZcC8BjeQ8zgMl8RxYhTBdl8EsA5Bu2ZM5U7w==
-X-Received: from qknqf4.prod.google.com ([2002:a05:620a:6604:b0:829:9702:a0f8])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:7013:b0:829:edaa:a0d7 with SMTP id af79cd13be357-83106ccb8ecmr217687485a.1.1758117219143;
- Wed, 17 Sep 2025 06:53:39 -0700 (PDT)
-Date: Wed, 17 Sep 2025 13:53:37 +0000
+        d=1e100.net; s=20230601; t=1758117246; x=1758722046;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=to4BXgFyFuRjiSPORVXGshM37diVDi0cjrsHXYAgKmw=;
+        b=W4jXvcnaubvW4KLWhGh2rYbCI6OhnFipyd6Q+Rq34Njr5V1VFFHQPW3EAacfdTsOn3
+         2siooSomL+LXne3qeCiuz9mRVYbwPyeKLen+8IHW4mlWJ1U8TgiobAHQsM3lKVJdZMRN
+         hH0CtL0+RRKiX2ujhg7yz37dDrnjTjfq58F/ogeKgKp9IDTvvAYw4Nsiaoo4tuFpG/So
+         46oWR3k2sVglZZSd4zBA2u5CPjE0z5y3JLcf1KE8dFWbUhV/Mkdvip31bBJb4ncWMYum
+         bUH4FkJTTZk8HjGonJimhR+kaA9D5ytexQsfunmUqiyBbcdBqyaCke39HQw0nBwJzHE0
+         iPIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVM7oB7Iez2nY1InBhg+cRDHCORxbbvd2xgC8e2lj/w/Kv2UrFalngYxTAyfWNwHSSGEH/a7Jk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3+4i3sPvJZFH4rrbSXPT8Oh/WEQ+quUgeVoIgybiw3wXEO/WL
+	lf19kIasRbaeIZVYtMaJtjgYQXABP5I9MneDOhFXfQMnHmGQLbEwhOtTxGwvlne84g==
+X-Gm-Gg: ASbGncudnogv6R8H6Yc1RnwvG5o+YXU03kahw7VLjwwC68Wj8u3k6AqBahj8EemR/r4
+	5ZwCk7sSeS66PbV2+ktLxuDKxVCYBdxseBuIzu2ypJhE3omdJ3plNukvIxYrV1WMyViPZQDTfH4
+	UEclCWds+e216tSqUf2dMEBu+mpKGZM6MKuiMZxTWuzu9wCIZRXnxjN302S6MECn4xclZRYnjtr
+	nzG5qet20mbWRHNQ+cJn8JhOzdeL/KGs8rHIWtlaieJR6sThdSEO+6EofNCSuv7LQPlET0GVJiU
+	tYvx3J2/mLSJVQX8DUjzPj1PKIB1cqXjClXrQi7KjkFM/beudchX1ZLGgtP8SFZRITp4eLGFqpy
+	F40Epx9Vk+sPme5J8qIMSe1/8ax4WeQfa8/E+Sj7/HqhIGOXNyOOJN6HK
+X-Google-Smtp-Source: AGHT+IGRBja0r5jLJ3qHXTLicrQ5EPV+1Dbg2srLDJPVrFlUWF3hlqL5YtcEGgwOtuhZt3aFjNDHDA==
+X-Received: by 2002:a05:620a:4009:b0:817:6fe8:dabd with SMTP id af79cd13be357-8310b59ae28mr257079385a.28.1758117245776;
+        Wed, 17 Sep 2025 06:54:05 -0700 (PDT)
+Received: from rowland.harvard.edu ([140.247.181.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-82b15c2202dsm372471385a.55.2025.09.17.06.54.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 06:54:05 -0700 (PDT)
+Date: Wed, 17 Sep 2025 09:54:01 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hubert =?utf-8?Q?Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>, stable@vger.kernel.org,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Lukas Wunner <lukas@wunner.de>,
+	Russell King <linux@armlinux.org.uk>, Xu Yang <xu.yang_2@nxp.com>,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] net: usb: asix: forbid runtime PM to avoid
+ PM/MDIO + RTNL deadlock
+Message-ID: <c94af0e9-dc67-432e-a853-e41bfa59e863@rowland.harvard.edu>
+References: <20250917095457.2103318-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250917135337.1736101-1-edumazet@google.com>
-Subject: [PATCH net] net: clear sk->sk_ino in sk_set_socket(sk, NULL)
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Andrei Vagin <avagin@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917095457.2103318-1-o.rempel@pengutronix.de>
 
-Andrei Vagin reported that blamed commit broke CRIU.
+On Wed, Sep 17, 2025 at 11:54:57AM +0200, Oleksij Rempel wrote:
+> Forbid USB runtime PM (autosuspend) for AX88772* in bind.
+> 
+> usbnet enables runtime PM by default in probe, so disabling it via the
+> usb_driver flag is ineffective. For AX88772B, autosuspend shows no
+> measurable power saving in my tests (no link partner, admin up/down).
+> The ~0.453 W -> ~0.248 W reduction on 6.1 comes from phylib powering
+> the PHY off on admin-down, not from USB autosuspend.
+> 
+> With autosuspend active, resume paths may require calling phylink/phylib
+> (caller must hold RTNL) and doing MDIO I/O. Taking RTNL from a USB PM
+> resume can deadlock (RTNL may already be held), and MDIO can attempt a
+> runtime-wake while the USB PM lock is held. Given the lack of benefit
+> and poor test coverage (autosuspend is usually disabled by default in
+> distros), forbid runtime PM here to avoid these hazards.
+> 
+> This affects only AX88772* devices (per-interface in bind). System
+> sleep/resume is unchanged.
 
-Indeed, while we want to keep sk_uid unchanged when a socket
-is cloned, we want to clear sk->sk_ino.
+> @@ -919,6 +935,16 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+>  	if (ret)
+>  		goto initphy_err;
+>  
+> +	/* Disable USB runtime PM (autosuspend) for this interface.
+> +	 * Rationale:
+> +	 * - No measurable power saving from autosuspend for this device.
+> +	 * - phylink/phylib calls require caller-held RTNL and do MDIO I/O,
+> +	 *   which is unsafe from USB PM resume paths (possible RTNL already
+> +	 *   held, USB PM lock held).
+> +	 * System suspend/resume is unaffected.
+> +	 */
+> +	pm_runtime_forbid(&intf->dev);
 
-Otherwise, sock_diag might report multiple sockets sharing
-the same inode number.
+Are you aware that the action of pm_runtime_forbid() can be reversed by 
+the user (by writing "auto" to the .../power/control sysfs file)?
 
-Move the clearing part from sock_orphan() to sk_set_socket(sk, NULL),
-called both from sock_orphan() and sk_clone_lock().
+To prevent the user from re-enabling runtime PM, you should call 
+pm_runtime_get_noresume() (and then of course pm_runtime_put() or 
+equivalent while unbinding).
 
-Fixes: 5d6b58c932ec ("net: lockless sock_i_ino()")
-Closes: https://lore.kernel.org/netdev/aMhX-VnXkYDpKd9V@google.com/
-Closes: https://github.com/checkpoint-restore/criu/issues/2744
-Reported-by: Andrei Vagin <avagin@google.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/sock.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/sock.h b/include/net/sock.h
-index fb13322a11fcf75211ce3ee8925807e888374f70..2e14283c5be1adeddc024527bd10dbd8a97a54bf 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2061,6 +2061,9 @@ static inline void sk_set_socket(struct sock *sk, struct socket *sock)
- 	if (sock) {
- 		WRITE_ONCE(sk->sk_uid, SOCK_INODE(sock)->i_uid);
- 		WRITE_ONCE(sk->sk_ino, SOCK_INODE(sock)->i_ino);
-+	} else {
-+		/* Note: sk_uid is unchanged. */
-+		WRITE_ONCE(sk->sk_ino, 0);
- 	}
- }
- 
-@@ -2082,8 +2085,6 @@ static inline void sock_orphan(struct sock *sk)
- 	sock_set_flag(sk, SOCK_DEAD);
- 	sk_set_socket(sk, NULL);
- 	sk->sk_wq  = NULL;
--	/* Note: sk_uid is unchanged. */
--	WRITE_ONCE(sk->sk_ino, 0);
- 	write_unlock_bh(&sk->sk_callback_lock);
- }
- 
--- 
-2.51.0.384.g4c02a37b29-goog
-
+Alan Stern
 
