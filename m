@@ -1,263 +1,165 @@
-Return-Path: <netdev+bounces-223900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A619B7EB7B
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:58:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88A23B7C4CD
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:56:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9532A1C0461E
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 08:08:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49342465B02
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 08:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFCF305E09;
-	Wed, 17 Sep 2025 08:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8748A305E32;
+	Wed, 17 Sep 2025 08:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="MIaj6d43"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoKeeMTK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE23305E28
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE0E306B1E
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758096421; cv=none; b=iBFOmOK0PxeiXLSxuoFjZpR9+4MESqZEgK7PZZyWF9F8rbA9lxJQSXGi0kUAKzaEHpIPgWXuB1DOjegb9oCW+GQ+SWPidLDEhQkTzP8qKdUv4k6okpXxl4BkCQUh3VQPEBb/G6zcleDOwovDK4J4VOoXjn2+pGR3hlvkD8F0tBM=
+	t=1758096964; cv=none; b=IRvoOK447rC8noaCn8Ml/mSThjdMznMhcTMVdUPhvpkJuU3C0wxV7EpgXltpyWMakVMpNSEG1P4Oe+Ly+gEpbwNgK8FnjYBgJJkTw35sCNwhL+Mss8bqkSBdI0LbFG3h6tt0XIrzKkyIsbPcnTKAokjLbCIYQwMiyIC1d3HrjCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758096421; c=relaxed/simple;
-	bh=99E/Q8dl1z6a1fSwTsa33XnQl0e7pN1bDPF/vKPOGmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ncJEdAPtDqpTTIQyZEX+KW7fNZXLv0TJAIKpgYrOO/CILGCi5RMr6TDtlPSxMjKHDWA3yoBW88Vwim89wHmpNwqwQRqcrOZkM3/ParPZTtlANsnorzNw7p4wBI1io7XR6rvDwl8K5K2B3I+oyBNaw2rWeZxED8fnpRWOfb6lND0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=MIaj6d43; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58H5QdUh031523
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:06:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	c4+1T7hrQrCbgIKXWS+wJqveQlpBa3wYZt9yOaHwkvU=; b=MIaj6d43UK9ZQSx8
-	agM81e5wqoSWBC63D43WjsF1gm5IB6k/xb2BpVZo02QhE//HDj4YZ0HW4pKmu6K4
-	aBDGT3bH/DZIWE5OLCyG7elAqlIIaR9pO5kL+zq2+Uaq/raR82fc0MvpWJOAC/A6
-	I6qnI2kA6wvFxm+Iz42kP1C15JzKsqH5jKlFIvI7h7hhWtNLPcMcTdpZbXLQADtS
-	y/3kf/z0catX7heqa8vF7T0miUEZknxZ99Sc7Jhry8IApYEKsozHOqTGI8vkraD3
-	hrseruWwNV7XY02zlHATrDUAUvvXqkTdl/8tkjyZMWyc6W4rbvXFNx9vEo/cA8yH
-	w/bkWQ==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 497fxu1hqy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:06:58 +0000 (GMT)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2681623f927so4243585ad.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 01:06:58 -0700 (PDT)
+	s=arc-20240116; t=1758096964; c=relaxed/simple;
+	bh=DZJjEilvh8soI1BKTSfA4Ey5iDL2dw9rLc+r+sxOjtU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EE1TjKJEErvoIaYtT3O7+tYnePlZgPEdttQ6xcr8V9YMIsZQ9eZ5WJIy7sCjkuJ211vGCv/wNPS/A3+bjvzmXWDDb6zh6OmrpSgTr7IEPeCSyWA3SYUECPpsbfigDYCckJ+l/DMWtqsV3KVqXPHey2G31yfpyRn726J6D7/bEak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XoKeeMTK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758096961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eedUNpaU5+NqwyQ8eXKTY11TfX3TYBW7jRyqO48Q8K4=;
+	b=XoKeeMTKu0gpgfJHuLWswxJAGqCjjKpuINRBQraqSY9q8vgpNcBVtjXiFhSYkG8W4YN65/
+	4No2q9FHPyuJunUXhi+DU1IrMASJ8MZbKZ05kGdhWhR4jesmx7GqtO92rXF0vz9CIUef5g
+	2e0YdnswDRE6uKV5HwS3Q7hKbtluozk=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-bYKE44zHOju7ZwDaET6MTA-1; Wed, 17 Sep 2025 04:16:00 -0400
+X-MC-Unique: bYKE44zHOju7ZwDaET6MTA-1
+X-Mimecast-MFC-AGG-ID: bYKE44zHOju7ZwDaET6MTA_1758096960
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-7216c46b069so66626427b3.1
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 01:16:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758096418; x=1758701218;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c4+1T7hrQrCbgIKXWS+wJqveQlpBa3wYZt9yOaHwkvU=;
-        b=n1G0UIZo9qqBp3X7t5IE7i0sxJKJ35v3TmeuJ+MJOlxPeEgIshU9BhqhwS/EiwnqW3
-         bNHQNdHPm3bMGpwSBE/6czyebGcCVCtTzooEgUXOfZuRcv9vQEWuz2waXMbKbzoxy3UI
-         eFfY6NNU33rtB17tm9GYS2ENVbV/+rtMG7JxCj85VW9bStQVZ52u+oePteqTkkGabpYj
-         mZBZv/I0rkRN1m2g/4AgJyUIAYwvgKDU6ry+gfQueeF86XGtfqJ9m0jUjF9+Pez6ClSs
-         v7sMiynsVuQ+a5wRLzny0+C9TR5Jm2x5i6fk1feuFvbqsoDujJWJFTfWkfZEeVKJHRqc
-         rDMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXcLgECsbWR6mv881DRgp2yP6lZ8YA6oZHo+nCbySZXl/ffh5IrCf8UNbfgUAiXpt1oZl9hWL8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJngpczVrpiXSluh4r5S0yWRk8z3QRVndwCxH/P0zcipZX4bIz
-	dHc+zpe16wd40ErFrMqFV+oVZfq928DNuAMKQx2apxGPehdeMlHrUvjqSeaJc1bij2EYaFy7OZo
-	VzcZEZVv6ZfwHFfydmbXOaWrCZHr6cYJdEntbvrTs3bEnvEvHAykPPncekMU=
-X-Gm-Gg: ASbGncta3yh4473Wl1rtUVw7lIcWYkkDOg4vYqApz99IzpqiXAU8Gm4R6Pg468ZeFSf
-	AWFieTc6JUdIrqy6feq+Xg36a7K0Hr7orTwrBghQRyu24alt8jfNQDFqueFCF9i1M67LdGgj7Tp
-	bjxAIUBKFNHdYqbiDEXZOq2w245TiFN4JOHV5W0YphbZALa7ffqmJAZvuCMhzqTRfiltQnI3mRG
-	XKB7PxlEXhVanNFJpyoAdyUgQXVZPwjn2TrnRse2vEoQbmWIWpBVD2ipO/xFdJuzUyZ3cTIYUhm
-	SMFzXOGFfsIScZF8dte+1xF65f5ZQiZQsq57LKrCLTHo0cKj6nCmIOc=
-X-Received: by 2002:a17:903:8ce:b0:24b:1609:5e2b with SMTP id d9443c01a7336-268119b3b6emr16788385ad.5.1758096417023;
-        Wed, 17 Sep 2025 01:06:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5UMbMaWJIzZ57Vql1tJjVuAN5j2QcuMqGy0y+1atO6oPbE3RHp/4BjwtArBerLWUYCCdoJg==
-X-Received: by 2002:a17:903:8ce:b0:24b:1609:5e2b with SMTP id d9443c01a7336-268119b3b6emr16788085ad.5.1758096416585;
-        Wed, 17 Sep 2025 01:06:56 -0700 (PDT)
-Received: from work ([120.60.54.163])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32ee223f2ecsm1177088a91.18.2025.09.17.01.06.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 01:06:56 -0700 (PDT)
-Date: Wed, 17 Sep 2025 13:36:47 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>, kernel@oss.qualcomm.com,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-i2c@vger.kernel.org,
-        Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
-Subject: Re: [PATCH v5 05/10] arm64: dts: qcom: lemans-evk: Enable PCIe
- support
-Message-ID: <h2t7ajhtyq3vivbw67tifrn73i4zisicoktsgab76zptxre6at@vl2q4d6i3lms>
-References: <20250916-lemans-evk-bu-v5-0-53d7d206669d@oss.qualcomm.com>
- <20250916-lemans-evk-bu-v5-5-53d7d206669d@oss.qualcomm.com>
+        d=1e100.net; s=20230601; t=1758096960; x=1758701760;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eedUNpaU5+NqwyQ8eXKTY11TfX3TYBW7jRyqO48Q8K4=;
+        b=kOle6t4BHpKM547gQgmYu6pT5uRer9x8SZBEliCAxDBCoc0UTcppOxb0Kw5hguJVhM
+         Q5uHJ4/nn2Pu4SXJQNlyyXImheU7bDSlERrHL+hLQ4MYFsK5aApF4En7YC99+PBBSqTy
+         I+d/AoEc9VYeenPWyaC8w6IDnO8bK6dR0EvKnPOhdORhLD7suhEZVdSQk8wX2rg/lk37
+         zKxsw20rIL2LBJKc5oVibsk7GohGpgVKuxL5631xMCVFiG0N4GP0E0r1N5XbXudo1FsC
+         DrMQYidLnCcfXLE1hhznHPzbBegNpoP/nqQZmDcIJ4UeUNi+pU+MEJgGX7kZC4Y4q5YX
+         K68w==
+X-Forwarded-Encrypted: i=1; AJvYcCXiX7ndV/2Q/jdutgMjMpW6gYyeKdKLAdOM8sChFzH2NEODXJNy6OcNe66aGv44qtyPx/I89ps=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8/e6NoXgQ2TFLBUmFzzAEBfPGoOsQ3RvUlHP7xWrXL8WfU41u
+	QSTUQ4qn1m+YMpSH/HSYQTLoENCT984LoWpok+gFL6ZEsYwVD9GsLb3gJ2AqNyltg7oOs9URML/
+	bjbtdQspj7NVoUiRgPccIiZviYWgoTepQXjH8JTMc8nIof/qCHq5nptWqbHd5+nyHMXCNgBomXA
+	VlAi81iGHn1Y5nJ3MOZqA/nc1TcWcODyu0
+X-Gm-Gg: ASbGncua2EpVt1KDcXcDyYrBBX7vpxyYfExiW2GFbU1r1i8CVofYogyuOU7p7s3FZqB
+	Wh7NnPuboI120C9ox0dWrLRQzIwSvhEbalKWHTDwSW/Qm9274bkjvKiPAYcPSKwKbRz4FWGj600
+	2hm2WlpBxNMwpUNY8ZwH13/nhEM2+zWllbE+1NvkHaVajrwcoP+Apl5Z1PF0uBo8K72IZC2xASl
+	oimAlZY
+X-Received: by 2002:a05:690c:6c86:b0:723:b37b:f75f with SMTP id 00721157ae682-73891b87784mr10853857b3.26.1758096959689;
+        Wed, 17 Sep 2025 01:15:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHyEE0NjY/G5cvHcAfaFUYZLAJa4QZLLCvZPWadjWH10jQVSkAeb7QCxJDkVvvAIV4aZoNVgVWuy6Xs42oRk5I=
+X-Received: by 2002:a05:690c:6c86:b0:723:b37b:f75f with SMTP id
+ 00721157ae682-73891b87784mr10853617b3.26.1758096959304; Wed, 17 Sep 2025
+ 01:15:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250916-lemans-evk-bu-v5-5-53d7d206669d@oss.qualcomm.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwMiBTYWx0ZWRfX72wqi4Lo4ZAR
- u+MRJ5/hFJ2qEpmEZ4NlNMHbjWh6VgCk8bATC5EpM2F9sTu7XhPEQjUO8ONbxbX8FMqvd/CU4gG
- kzyvo5kc7apj7aVVeE20HHWGAf2NlSn5B6+Iml8v+KX3NMVVGAK+6/H+WIPuG3HqcpaUj3Lc7Ox
- nmRz5Iz1h8VPjKHjo67CSEPqCjzsIPdSYMhbUGLuhBLgG+InKeoKN495SqyX1/NVHOJdoJHQ6uv
- ft488Uoe0RyPTi5BV1lwuvaGppbFYjEu11jDL1S5SQeLoW5Ib0BoJ9yLcePDnkuSduw2xNx/Po4
- wU6Os4o/2ag8crAbmqKsYHVu11EkfRNC5VGuzWqdrMqWU0pLIcfSJ9Qs8x+74+ooe8HZFSTwOAY
- dv04g6M5
-X-Proofpoint-ORIG-GUID: PHOqwFt7tD5FQl6UxbUTqtjAyCQowZwu
-X-Authority-Analysis: v=2.4 cv=R+UDGcRX c=1 sm=1 tr=0 ts=68ca6c22 cx=c_pps
- a=cmESyDAEBpBGqyK7t0alAg==:117 a=zfGe9qrPU0lfmTaoSSnydg==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
- a=qGp1FZVzPMbQ2NxWyGYA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=1OuFwYUASf3TG4hYMiVC:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: PHOqwFt7tD5FQl6UxbUTqtjAyCQowZwu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-16_02,2025-09-17_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 phishscore=0 adultscore=0 clxscore=1011 priorityscore=1501
- bulkscore=0 malwarescore=0 suspectscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509160202
+References: <20250917063045.2042-1-jasowang@redhat.com>
+In-Reply-To: <20250917063045.2042-1-jasowang@redhat.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Wed, 17 Sep 2025 10:15:22 +0200
+X-Gm-Features: AS18NWDDF_GZcJeZupVOj5tO-bkVG3qVNzTBHe2X19uvGqJmtk3QOixi1mHlzhU
+Message-ID: <CAJaqyWdoLiXJ8Skgwp14Ov66WP1wjnJkR0wwUdmcziSAFJoxCA@mail.gmail.com>
+Subject: Re: [PATCH vhost 1/3] vhost-net: unbreak busy polling
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org, jon@nutanix.com, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 16, 2025 at 04:16:53PM GMT, Wasim Nazir wrote:
-> From: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
-> 
-> Enable PCIe0 and PCIe1 along with the respective phy-nodes.
-> 
-> PCIe0 is routed to an m.2 E key connector on the mainboard for wifi
-> attaches while PCIe1 routes to a standard PCIe x4 expansion slot.
-> 
+On Wed, Sep 17, 2025 at 8:31=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> Commit 67a873df0c41 ("vhost: basic in order support") pass the number
+> of used elem to vhost_net_rx_peek_head_len() to make sure it can
+> signal the used correctly before trying to do busy polling. But it
+> forgets to clear the count, this would cause the count run out of sync
+> with handle_rx() and break the busy polling.
+>
+> Fixing this by passing the pointer of the count and clearing it after
+> the signaling the used.
+>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Where did you define the supply for M.2 connector? We don't have a proper
-binding for M.2 today, but atleast the supply should be modeled as a fixed
-regulator with EN GPIOs as like other boards.
+Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-- Mani
-
-> Signed-off-by: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
-> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 67a873df0c41 ("vhost: basic in order support")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  arch/arm64/boot/dts/qcom/lemans-evk.dts | 82 +++++++++++++++++++++++++++++++++
->  1 file changed, 82 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/lemans-evk.dts b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> index 97428d9e3e41..99400ff12cfd 100644
-> --- a/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> +++ b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> @@ -431,6 +431,40 @@ &mdss0_dp1_phy {
->  	status = "okay";
->  };
->  
-> +&pcie0 {
-> +	perst-gpios = <&tlmm 2 GPIO_ACTIVE_LOW>;
-> +	wake-gpios = <&tlmm 0 GPIO_ACTIVE_HIGH>;
-> +
-> +	pinctrl-0 = <&pcie0_default_state>;
-> +	pinctrl-names = "default";
-> +
-> +	status = "okay";
-> +};
-> +
-> +&pcie0_phy {
-> +	vdda-phy-supply = <&vreg_l5a>;
-> +	vdda-pll-supply = <&vreg_l1c>;
-> +
-> +	status = "okay";
-> +};
-> +
-> +&pcie1 {
-> +	perst-gpios = <&tlmm 4 GPIO_ACTIVE_LOW>;
-> +	wake-gpios = <&tlmm 5 GPIO_ACTIVE_HIGH>;
-> +
-> +	pinctrl-0 = <&pcie1_default_state>;
-> +	pinctrl-names = "default";
-> +
-> +	status = "okay";
-> +};
-> +
-> +&pcie1_phy {
-> +	vdda-phy-supply = <&vreg_l5a>;
-> +	vdda-pll-supply = <&vreg_l1c>;
-> +
-> +	status = "okay";
-> +};
-> +
->  &qupv3_id_0 {
->  	status = "okay";
->  };
-> @@ -447,6 +481,54 @@ &sleep_clk {
->  	clock-frequency = <32768>;
->  };
->  
-> +&tlmm {
-> +	pcie0_default_state: pcie0-default-state {
-> +		clkreq-pins {
-> +			pins = "gpio1";
-> +			function = "pcie0_clkreq";
-> +			drive-strength = <2>;
-> +			bias-pull-up;
-> +		};
-> +
-> +		perst-pins {
-> +			pins = "gpio2";
-> +			function = "gpio";
-> +			drive-strength = <2>;
-> +			bias-pull-up;
-> +		};
-> +
-> +		wake-pins {
-> +			pins = "gpio0";
-> +			function = "gpio";
-> +			drive-strength = <2>;
-> +			bias-pull-up;
-> +		};
-> +	};
-> +
-> +	pcie1_default_state: pcie1-default-state {
-> +		clkreq-pins {
-> +			pins = "gpio3";
-> +			function = "pcie1_clkreq";
-> +			drive-strength = <2>;
-> +			bias-pull-up;
-> +		};
-> +
-> +		perst-pins {
-> +			pins = "gpio4";
-> +			function = "gpio";
-> +			drive-strength = <2>;
-> +			bias-pull-up;
-> +		};
-> +
-> +		wake-pins {
-> +			pins = "gpio5";
-> +			function = "gpio";
-> +			drive-strength = <2>;
-> +			bias-pull-up;
-> +		};
-> +	};
-> +};
-> +
->  &uart10 {
->  	compatible = "qcom,geni-debug-uart";
->  	pinctrl-0 = <&qup_uart10_default>;
-> 
-> -- 
-> 2.51.0
-> 
+>  drivers/vhost/net.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index c6508fe0d5c8..16e39f3ab956 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -1014,7 +1014,7 @@ static int peek_head_len(struct vhost_net_virtqueue=
+ *rvq, struct sock *sk)
+>  }
+>
+>  static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock=
+ *sk,
+> -                                     bool *busyloop_intr, unsigned int c=
+ount)
+> +                                     bool *busyloop_intr, unsigned int *=
+count)
+>  {
+>         struct vhost_net_virtqueue *rnvq =3D &net->vqs[VHOST_NET_VQ_RX];
+>         struct vhost_net_virtqueue *tnvq =3D &net->vqs[VHOST_NET_VQ_TX];
+> @@ -1024,7 +1024,8 @@ static int vhost_net_rx_peek_head_len(struct vhost_=
+net *net, struct sock *sk,
+>
+>         if (!len && rvq->busyloop_timeout) {
+>                 /* Flush batched heads first */
+> -               vhost_net_signal_used(rnvq, count);
+> +               vhost_net_signal_used(rnvq, *count);
+> +               *count =3D 0;
+>                 /* Both tx vq and rx socket were polled here */
+>                 vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
+>
+> @@ -1180,7 +1181,7 @@ static void handle_rx(struct vhost_net *net)
+>
+>         do {
+>                 sock_len =3D vhost_net_rx_peek_head_len(net, sock->sk,
+> -                                                     &busyloop_intr, cou=
+nt);
+> +                                                     &busyloop_intr, &co=
+unt);
+>                 if (!sock_len)
+>                         break;
+>                 sock_len +=3D sock_hlen;
+> --
+> 2.34.1
+>
 
--- 
-மணிவண்ணன் சதாசிவம்
 
