@@ -1,57 +1,67 @@
-Return-Path: <netdev+bounces-224001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B7A5B7DB4E
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:33:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40B0B7DF67
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A98D7161C02
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 12:31:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E7BE2A3D2C
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 12:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7AA77111;
-	Wed, 17 Sep 2025 12:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613F53233FD;
+	Wed, 17 Sep 2025 12:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4ueDrypv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06736288DA;
-	Wed, 17 Sep 2025 12:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21DC1EF38E;
+	Wed, 17 Sep 2025 12:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758112259; cv=none; b=SCPBCQnlildcYMHQWnmItyJqgXqwOriQZx6/v1AF4QHRXddK6gK27V9e4trSvlK9gDdBiVHYu1tOXGaC1v1EeE6wj404QgIxyPZ7NtKb+c3PiizTM/ll4ho904fGYHsuwf7zg1Bxi78z9Cs+NBhvnKYRDvqtyWSIhkv0JqkRfZE=
+	t=1758112681; cv=none; b=JKz9U06XZpKfGXMQ24xWRbsY9N/COnpQogmqjRi+GYqRLqQt8QWLPXder++qhRLWRFIGA6U0DVYJNmILddm8wdGBGLimq5pBCNFRkQKesyCr00N8j7gEkRmSlqTYlgjBiAA3U9aOdtGPfk7cbOc4NtNS2hf31ltjmRJGIxDANUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758112259; c=relaxed/simple;
-	bh=Cl8E2kLQ7/p5S5S9om1u8eRejpquMbqieTheoYS7NVg=;
+	s=arc-20240116; t=1758112681; c=relaxed/simple;
+	bh=V2ZPWJHV9jW0DR04zuEk3OE/ujMijnKfpmKtkP4xCME=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sDSkwmSVFbrP4/m55GJckk5g8J804Z84svgfQuocO8BTZW9N4ffiHzk2PZEdM1PuTFhArnJh3K4jBMcvM0pZgIBuupTxqz3isowW4RqaQarRANIx7rxKyV00t4lTSWHJYAOIssCkTskoJIlzWd1zZzVsXpzXA0WrzWarxTNivGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (unknown [180.158.240.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id 527CD340F2E;
-	Wed, 17 Sep 2025 12:30:56 +0000 (UTC)
-Date: Wed, 17 Sep 2025 20:30:45 +0800
-From: Yixun Lan <dlan@gentoo.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Vivian Wang <wangruikang@iscas.ac.cn>,
-	David Miller <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=QCnbnt3cGjKpmqjxtDE+VS2Sm44lMrsijKhWR+DMcYysIcNS764IcvRo7lIiIClPbzs8Xxstp9er58VRSaNueGIfBmer8wNr+Iou160lrwcG+GYKMW7k/PO9PRWdgmgCxjnXW1AmootKeFHdWY38Xj8asW4jX0FuFdRKu8b82iQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4ueDrypv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=e2ZMXo1Gxkk2gy72Jq8lMDtCEkvQOtMbArjyfiUYt4Q=; b=4ueDrypvy4EXJXttDp9V1oXmUr
+	rO10IvneSDBEbwMy+mhX/3SIrGmP97e0fNRzWg8RcskCDUYHP2klt6bKvvMuWsUicm/OXFe7+1AUX
+	qujZh0PTXXT7ET25zSZq+STMEKnTIKo2ijXyBdi7iA4vpRALof1De68XppAgogqFWcfY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uyrPr-008gHb-4f; Wed, 17 Sep 2025 14:37:43 +0200
+Date: Wed, 17 Sep 2025 14:37:43 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>,
-	Guodong Xu <guodong@riscstar.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the net-next tree with the spacemit
- tree
-Message-ID: <20250917123045-GYA1265885@gentoo.org>
-References: <aMqby4Cz8hn6lZgv@sirena.org.uk>
- <597466da-643d-4a75-b2e8-00cf7cf3fcd0@iscas.ac.cn>
- <76970eed-cb88-4a42-864a-8c2290624b72@sirena.org.uk>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v9 3/3] net: dsa: yt921x: Add support for
+ Motorcomm YT921x
+Message-ID: <482f27de-f660-4e7a-a1a9-3000b7119567@lunn.ch>
+References: <20250913044404.63641-1-mmyangfl@gmail.com>
+ <20250913044404.63641-4-mmyangfl@gmail.com>
+ <20250916231714.7cg5zgpnxj6qmg3d@skbuf>
+ <b0fc2de5-bccc-4ef8-a04d-0c3b13cde914@lunn.ch>
+ <20250917100243.s55irruj4bzg343v@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,40 +70,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <76970eed-cb88-4a42-864a-8c2290624b72@sirena.org.uk>
+In-Reply-To: <20250917100243.s55irruj4bzg343v@skbuf>
 
-Hi Mark,
+> I'm not sure that a "driver lock" is something that drivers need.
+> In this case it creates a lot of red tape. Function yt921x_dsa_X() takes
+> the driver lock and calls function yt921x_X() which does the work.
+> IMO that's part of what gives "vendor crap" drivers their name, when
+> there's no reason behind it.
 
-On 13:03 Wed 17 Sep     , Mark Brown wrote:
-> On Wed, Sep 17, 2025 at 07:48:34PM +0800, Vivian Wang wrote:
-> 
-> > Just FYI, Yixun has proposed for net-next to back out of the DTS changes
-> > and taking them up through the spacemit tree instead [1], resolving the
-> > conflicts in the spacemit tree. This would certainly mean less headaches
-> > while managing pull requests, as well as allowing Yixun to take care of
-> > code style concerns like node order. However, I do not know what the
-> > norms here are.
-> 
-> Thanks.  They're pretty trivial conflicts so I'm not sure it's critical,
-> though like you say node order might easily end up the wrong way round
-> depending on how the conflict resolution gets done.
+As you said, some methods are protected by RTNL. But not all. And it
+is hard to know which are not. A driver lock is KISS, and easy to get
+right, easy to see is right, and easy to prove is right. Locking can
+be hard, so KISS is good.
 
-Thanks for the help and fixing this, but ..
-
-If it's possible to revert the DT patch 3-5, then I'd be happy to take,
-but if this is too much job, e.g. the net-next's main branch is imuutable
-and reverting it will cause too much trouble, then I'm fine with current
-solution - carry the fix via net-next tree..
-
-But please use commit: 0f084b221e2c5ba16eca85b3d2497f9486bd0329 of
-https://github.com/spacemit-com/linux/tree/k1/dt-for-next as the merge
-parent, which I'm about to send to Arnd (the SoC tree)
-
-BTW, The 'for-next' branch is a merged branch contains clock and DT patches
-for SpacemiT SoC tree's which isn't immutable..
-
-Let me know what I should proceed, thank you
-
--- 
-Yixun Lan (dlan)
+	Andrew
 
