@@ -1,84 +1,107 @@
-Return-Path: <netdev+bounces-224126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F62B81068
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:34:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17B3AB81054
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 18:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 086C13B20E4
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:32:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D24F21C813A7
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05822F3C35;
-	Wed, 17 Sep 2025 16:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6763F2FB092;
+	Wed, 17 Sep 2025 16:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lqNmbubT"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1X0FB2mM";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="908+1eCG";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1X0FB2mM";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="908+1eCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B86288A2;
-	Wed, 17 Sep 2025 16:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A5B2F9DA2
+	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 16:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758126696; cv=none; b=IwhsmY29IwVbqHznnfies+249KXt6HUZxBCDwdRCNmz1h5OiGuIn3woygP65edyq33c6b3xJ5myNR6Tsvp683/1LAj+4cCxO6WJ82TUkeqlQR9D0kpT+xaCvPm6m8gJ0idEG8AfJRaDzNA1PtsGkTgRutic0jJsoQFlVfdIS/pc=
+	t=1758126722; cv=none; b=u7Lmea8ALsD5TQ7YmhFwH9EbQbiCGWYj/Hgc3g5uR3tnoVrtqN3ZFQNhSU27nfjcaZxsnnqQugCj+U7n1A6MRZDr5IeM0JcwWrb5M+WPSgXXEB1LPue3yJmNmTkf/2Pfpbq2ieko1hwah7L4CyxGCby0+86hgrJvO0pMr3zhEnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758126696; c=relaxed/simple;
-	bh=UVuCdBv0y0ssaMtXvdPJf82lnAZePvxoqcizxkhuiYg=;
+	s=arc-20240116; t=1758126722; c=relaxed/simple;
+	bh=b/sX81J63Q/D5xL8SS2bkKQF5x4z5vx2k9v0pU4YPAw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p1r7snYmhVZhZgfk81vPWMfzQHH/4eRpF4YA7PcXbhl1yWULi/NBlfbe5licoLsItmgQN2mD06ZBVZMh3SzMah83t69Xvq0ONJK2dz54XpX+4HXRbpMy5Z1mYrElDuzXRjKy+znpwNFVSoWxuTJl7O/tEILvVGN60LlONkvILCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lqNmbubT; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=t7ZqalwnvjICi7kuOiOIafiliCtJGxrARFdp8W4lXxY=; b=lqNmbubTKYTpthGWHPykLNREkq
-	a6h0sXLqwZcvzf1kHFi8/4wqRzTLPZ5t4JG0CX4Ax83EBEIolNl3BmwHrN5NmNiZX671xdmPJSgH2
-	nFtq7ceA+M5n1PeBvkOVPFNvRXxDrq8tYVBobWZmNDyHpKQmZ158OQtCadM+oLJDaOmnk77cmCPYl
-	IFMBaQIdpJj0yuWqNpTnxRkrKexCbJs00Ef7dR2v3QxXq/JjrV8aDwIZKLzlbVv7iTPkFIPpFwXkb
-	d6e9GNwiy2bH5R5G8dIxQjEYUZwXZcz8KvO6Swi1xoMfVcDOTSVBZeIUeAISi+cACfrpX4OE/tHJs
-	d90qzIPw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49908)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uyv3v-000000005BG-32EF;
-	Wed, 17 Sep 2025 17:31:19 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uyv3s-000000000LJ-1mOb;
-	Wed, 17 Sep 2025 17:31:16 +0100
-Date: Wed, 17 Sep 2025 17:31:16 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/4] net: stmmac: stm32: add WoL from PHY
- support
-Message-ID: <aMriVDAgZkL8DAdH@shell.armlinux.org.uk>
-References: <20250917-wol-smsc-phy-v2-0-105f5eb89b7f@foss.st.com>
- <20250917-wol-smsc-phy-v2-2-105f5eb89b7f@foss.st.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n5t2zJFtJ+UNS3OuDmiOltcQH5EH26W0TG7nVhhcPn+oOqduBgPM7HITlKrpItyX4FobuFQXSTdVbwFIah22o7WFQT+IzsFv1Q/Ir5Edgm0qeLAEz3cd/hGUfIgtAOgg+PdhnmYJrJkfbCBTmZ7vKluhmnbP2luVWq00nImugf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1X0FB2mM; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=908+1eCG; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1X0FB2mM; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=908+1eCG; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 17AD633C57;
+	Wed, 17 Sep 2025 16:31:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758126718; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aL6KHVqrA0+agv7oS7Ez+IbCA7tUmgOwJs7zPgxI9r0=;
+	b=1X0FB2mMj4oEImvp29+3U2d9zUSH37fSBz56gaAfkm3pwa3Fn89MtqftCAK57YgeBbRMb+
+	vRThtzzMOzDr+uDlLH9PHmA0OYya8/X+/+CiONWoJYVjQsf2z7x1noEXoCEcfCVYK0yuRx
+	CrN2SclEOhWT7tKzdaUlRkjAljo3ySk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758126718;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aL6KHVqrA0+agv7oS7Ez+IbCA7tUmgOwJs7zPgxI9r0=;
+	b=908+1eCGihaZOHuP+g+77+hlOg8IVfCklFBjjUZddW0lrNLP/KXUPWSEiEi0sSXs1FQi20
+	Y1m/lfGBXiDQCxDw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758126718; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aL6KHVqrA0+agv7oS7Ez+IbCA7tUmgOwJs7zPgxI9r0=;
+	b=1X0FB2mMj4oEImvp29+3U2d9zUSH37fSBz56gaAfkm3pwa3Fn89MtqftCAK57YgeBbRMb+
+	vRThtzzMOzDr+uDlLH9PHmA0OYya8/X+/+CiONWoJYVjQsf2z7x1noEXoCEcfCVYK0yuRx
+	CrN2SclEOhWT7tKzdaUlRkjAljo3ySk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758126718;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aL6KHVqrA0+agv7oS7Ez+IbCA7tUmgOwJs7zPgxI9r0=;
+	b=908+1eCGihaZOHuP+g+77+hlOg8IVfCklFBjjUZddW0lrNLP/KXUPWSEiEi0sSXs1FQi20
+	Y1m/lfGBXiDQCxDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0EA0213A63;
+	Wed, 17 Sep 2025 16:31:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id CS+QA37iymgrMwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 17 Sep 2025 16:31:58 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id AEA3DA083B; Wed, 17 Sep 2025 18:31:53 +0200 (CEST)
+Date: Wed, 17 Sep 2025 18:31:53 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 5/9] nsfs: add inode number for anon namespace
+Message-ID: <yb2ijk5qzgjz6beqk7vub5uzsensvxrcccllwl5dj4swbbwaik@vt2sqwvgkkyz>
+References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
+ <20250917-work-namespace-ns_common-v1-5-1b3bda8ef8f2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,149 +110,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250917-wol-smsc-phy-v2-2-105f5eb89b7f@foss.st.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250917-work-namespace-ns_common-v1-5-1b3bda8ef8f2@kernel.org>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,suse.cz,cmpxchg.org,suse.com,linutronix.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
 
-On Wed, Sep 17, 2025 at 05:36:37PM +0200, Gatien Chevallier wrote:
-> If the "st,phy-wol" property is present in the device tree node,
-> set the STMMAC_FLAG_USE_PHY_WOL flag to use the WoL capability of
-> the PHY.
-> 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+On Wed 17-09-25 12:28:04, Christian Brauner wrote:
+> Add an inode number anonymous namespaces.
+                     ^ missing 'for'
+ 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+
+Otherwise looks good. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
 > ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  include/uapi/linux/nsfs.h | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> index 77a04c4579c9dbae886a0b387f69610a932b7b9e..6f197789cc2e8018d6959158b795e4bca46869c5 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> @@ -106,6 +106,7 @@ struct stm32_dwmac {
->  	u32 speed;
->  	const struct stm32_ops *ops;
->  	struct device *dev;
-> +	bool phy_wol;
+> diff --git a/include/uapi/linux/nsfs.h b/include/uapi/linux/nsfs.h
+> index 5d5bf22464c9..e098759ec917 100644
+> --- a/include/uapi/linux/nsfs.h
+> +++ b/include/uapi/linux/nsfs.h
+> @@ -53,6 +53,9 @@ enum init_ns_ino {
+>  	TIME_NS_INIT_INO	= 0xEFFFFFFAU,
+>  	NET_NS_INIT_INO		= 0xEFFFFFF9U,
+>  	MNT_NS_INIT_INO		= 0xEFFFFFF8U,
+> +#ifdef __KERNEL__
+> +	MNT_NS_ANON_INO		= 0xEFFFFFF7U,
+> +#endif
 >  };
 >  
->  struct stm32_ops {
-> @@ -433,6 +434,8 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
->  		}
->  	}
->  
-> +	dwmac->phy_wol = of_property_read_bool(np, "st,phy-wol");
-> +
->  	return err;
->  }
->  
-> @@ -557,6 +560,8 @@ static int stm32_dwmac_probe(struct platform_device *pdev)
->  	plat_dat->bsp_priv = dwmac;
->  	plat_dat->suspend = stm32_dwmac_suspend;
->  	plat_dat->resume = stm32_dwmac_resume;
-> +	if (dwmac->phy_wol)
-> +		plat_dat->flags |= STMMAC_FLAG_USE_PHY_WOL;
-
-I would much rather we found a different approach, rather than adding
-custom per-driver DT properties to figure this out.
-
-Andrew has previously suggested that MAC drivers should ask the PHY
-whether WoL is supported, but this pre-supposes that PHY drivers are
-coded correctly to only report WoL capabilities if they are really
-capable of waking the system. As shown in your smsc PHY driver patch,
-this may not be the case.
-
-Given that we have historically had PHY drivers reporting WoL
-capabilities without being able to wake the system, we can't
-implement Andrew's suggestion easily.
-
-The only approach I can think that would allow us to transition is
-to add:
-
-static inline bool phy_can_wakeup(struct phy_device *phy_dev)
-{
-	return device_can_wakeup(&phy_dev->mdio.dev);
-}
-
-to include/linux/phy.h, and a corresponding wrapper for phylink.
-This can then be used to determine whether to attempt to use PHY-based
-Wol in stmmac_get_wol() and rtl8211f_set_wol(), falling back to
-PMT-based WoL if supported at the MAC.
-
-So, maybe something like:
-
-static u32 stmmac_wol_support(struct stmmac_priv *priv)
-{
-	u32 support = 0;
-
-	if (priv->plat->pmt && device_can_wakeup(priv->device)) {
-		support = WAKE_UCAST;
-		if (priv->hw_cap_support && priv->dma_cap.pmt_magic_frame)
-			support |= WAKE_MAGIC;
-	}
-
-	return support;
-}
-
-static void stmmac_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
-{
-	struct stmmac_priv *priv = netdev_priv(dev);
-	int err;
-
-	/* Check STMMAC_FLAG_USE_PHY_WOL for legacy */
-	if (phylink_can_wakeup(priv->phylink) ||
-	    priv->plat->flags & STMMAC_FLAG_USE_PHY_WOL) {
-		err = phylink_ethtool_get_wol(priv->phylink, wol);
-		if (err != 0 && err != -EOPNOTSUPP)
-			return;
-	}
-
-	wol->supported |= stmmac_wol_support(priv);
-
-	/* A read of priv->wolopts is single-copy atomic. Locking
-	 * doesn't add any benefit.
-	 */
-	wol->wolopts |= priv->wolopts;
-}
-
-static int stmmac_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
-{
-	struct stmmac_priv *priv = netdev_priv(dev);
-	u32 support, wolopts;
-	int err;
-
-	wolopts = wol->wolopts;
-
-	/* Check STMMAC_FLAG_USE_PHY_WOL for legacy */
-	if (phylink_can_wakeup(priv->phylink) ||
-	    priv->plat->flags & STMMAC_FLAG_USE_PHY_WOL) {
-		struct ethtool_wolinfo w;
-
-		err = phylink_ethtool_set_wol(priv->phylink, wol);
-		if (err != -EOPNOTSUPP)
-			return err;
-
-		/* Remove the WoL modes that the PHY is handling */
-		if (!phylink_ethtool_get_wol(priv->phylink, &w))
-			wolopts &= ~w.wolopts;
-	}
-
-	support = stmmac_wol_support(priv);
-
-	mutex_lock(&priv->lock);
-	priv->wolopts = wolopts & support;
-	device_set_wakeup_enable(priv->device, !!priv->wolopts);
-	mutex_unlock(&priv->lock);
-
-	return 0;
-}
-
-... and now I'm wondering whether this complexity is something that
-phylink should handle internally, presenting a mac_set_wol() method
-to configure the MAC-side WoL settings. What makes it difficult to
-just move into phylink is the STMMAC_FLAG_USE_PHY_WOL flag, but
-that could be a "force_phy_wol" flag in struct phylink_config as
-a transitionary measure... so long as PHY drivers get fixed.
-
+>  struct nsfs_file_handle {
+> 
+> -- 
+> 2.47.3
+> 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
