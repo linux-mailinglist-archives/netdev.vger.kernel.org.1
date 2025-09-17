@@ -1,87 +1,91 @@
-Return-Path: <netdev+bounces-224097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C06B80B1F
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:46:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39054B80B5A
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 17:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85A107BA8AA
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:43:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D30BE7BACB1
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56F434135E;
-	Wed, 17 Sep 2025 15:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D19341378;
+	Wed, 17 Sep 2025 15:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCMljDv9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fO82zLSZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E9341360
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 15:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B17341374;
+	Wed, 17 Sep 2025 15:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758123571; cv=none; b=Cx/yqmr0OjHK+KlZ8O9yu0VFJzRrJUcixr94VtT/Kx36ueYkEx6lLPTqRs18fKzp45YMvzppxmkiQvcA88AG/PAY19rwX10rFqGXFVilXFbfmbrHSKEauADK8LeOCkI4FQ1DYgLM8VEgakc03m1SzVNtQhPIJXuWMF6zEZdONIg=
+	t=1758123605; cv=none; b=XPqzIr9KXJVOltQahmzltTYZBcK+t5VegizWI739o8YE4Ekf5lYxEsVOoYUdWYdpAYSGiUlMIS6qSiNaMMHVj/6Q/9y4XPbf1iSzBazH1CB4v9qdQqa0PJpRhGzg69nrI7nCytsLziwkaG1xmQh5/8giXugF+842pNUVmhmgxWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758123571; c=relaxed/simple;
-	bh=az/OFVz230XFrSks6xi2HFyjTWpfolow49KvdHiw9/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uPX+DqFQXfEp0cNqSo0peFG+3cYWCqOmqA5HUjKNIUuXaNTIH8LY+aK/nagUECQMccPkYbJPzekUFRCdtxW7inE2mlKT63ySu6bYBrI6VWetYrQJrzQONnE/0WeNQ8qb/VORlh0tgXw8fe4d7BkmQUUXHof2LP0htuxJuRc3LfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCMljDv9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF350C4CEE7;
-	Wed, 17 Sep 2025 15:39:30 +0000 (UTC)
+	s=arc-20240116; t=1758123605; c=relaxed/simple;
+	bh=yN/U/jhwhDljjCnEG6NxhXzHQCHYjmUdn1DRxaE/3Hk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pU6xF9eNFrKjnkw8QzY5xIi4GPWdv+zmB5ycmYtot05SaJS7tAAsoJOq14kWwHXnF5rkBb54BoV9nA6W9F0KeJ98gwgU1dNWKXdWkKw5OSuEe5H/9PLfAz53XuOclhiaWx9qj4mw7WJERno5XCptLqxNJbPd805abBfPK2k5WSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fO82zLSZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A269C4CEE7;
+	Wed, 17 Sep 2025 15:40:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758123571;
-	bh=az/OFVz230XFrSks6xi2HFyjTWpfolow49KvdHiw9/Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RCMljDv956cLY0VUTSA/XUGm/U14izZiktQAp8QAlHM2Rhovm4FnIjpAjTC1Ppjb0
-	 +D+fFbdoUpp61QEiTyft0Ll65SWIgk8YpUCGWe/yINJZQm4KisMDm1J3KdHLtNKlru
-	 UWPLZpc99sO7YgaOsn6gkwjxCCUlrdfRbqNAEJrPa1Dr8Pokk5Xo/yuDzs8phd5NJL
-	 W94seUd55n4N7BFqwqnqijQqvWXup2H3DFgtEN1kZ/bl3ORrhsl03FRIPIzs9IuZZZ
-	 H/OHy8C1ybqwXTLxoS7NDJwwm1hOT7pVDGdFUOXzM/M4eel6iklaXZ9iHROoVNbFI4
-	 i5UoXJ3FQC3wg==
-Message-ID: <c9cd9193-d0cd-4cc8-88cd-4fcc205bbeba@kernel.org>
-Date: Wed, 17 Sep 2025 09:39:30 -0600
+	s=k20201202; t=1758123605;
+	bh=yN/U/jhwhDljjCnEG6NxhXzHQCHYjmUdn1DRxaE/3Hk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fO82zLSZNMmm7aqB8df19tB6ITe4K3DCVGGI2E4sc3NugRYrMdCtDY2M4gNtoy6DO
+	 OtLo4sbtY4vZ4k9V2BYYzSteL+R0nK1BoFfJqA4gT2K2knEPiVyMAN69XzQ3dc5Xwq
+	 j5SiSb2dCe2si917JJ/ZJUFJKB/82LyQX/Wd6kEWeVIFjZokI9ZiD9whLk3zkdaXCx
+	 kIghApnHpoi5zY9sXK+T4nKRyvW4mNKU+FJm19+hR6nHbwvBLzbofJXPCjjQmkigvj
+	 shzxnkyyb+FxiYGVS1kUsVlMX//+spuE5ElDFw6A9JWHp3wf3TsiUwy8P6Fqh1X7fp
+	 qcT6Bzt5XryUg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E1339D0C20;
+	Wed, 17 Sep 2025 15:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 05/10] udp: refine __udp_enqueue_schedule_skb()
- test
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20250916160951.541279-1-edumazet@google.com>
- <20250916160951.541279-6-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250916160951.541279-6-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute] mptcp: fix event attributes type
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175812360603.2048620.7321956968651605409.git-patchwork-notify@kernel.org>
+Date: Wed, 17 Sep 2025 15:40:06 +0000
+References: <20250916-mptcp-attr-sign-v1-1-316aa96b93ca@kernel.org>
+In-Reply-To: <20250916-mptcp-attr-sign-v1-1-316aa96b93ca@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: stephen@networkplumber.org, mptcp@lists.linux.dev, netdev@vger.kernel.org
 
-On 9/16/25 10:09 AM, Eric Dumazet wrote:
-> Commit 5a465a0da13e ("udp: Fix multiple wraparounds
-> of sk->sk_rmem_alloc.") allowed to slightly overshoot
-> sk->sk_rmem_alloc, when many cpus are trying
-> to feed packets to a common UDP socket.
-> 
-> This patch, combined with the following one reduces
-> false sharing on the victim socket under DDOS.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/ipv4/udp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
+Hello:
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Tue, 16 Sep 2025 11:24:33 +0200 you wrote:
+> The 'backup' and 'error' attributes are unsigned.
+> 
+> Even if, for the moment, >2^7 values are not expected, they should be
+> printed as unsigned (%u) and not as signed (%d).
+> 
+> Fixes: ff619e4f ("mptcp: add support for event monitoring")
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [iproute] mptcp: fix event attributes type
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=ccbd9b64d666
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
