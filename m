@@ -1,165 +1,120 @@
-Return-Path: <netdev+bounces-223901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A23B7C4CD
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:56:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3959BB7FCC2
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 16:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49342465B02
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 08:17:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB411C06367
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 08:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8748A305E32;
-	Wed, 17 Sep 2025 08:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D43230748D;
+	Wed, 17 Sep 2025 08:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoKeeMTK"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="AdwB6HDA";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Wbvh7kr6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE0E306B1E
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 08:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2E4307486;
+	Wed, 17 Sep 2025 08:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758096964; cv=none; b=IRvoOK447rC8noaCn8Ml/mSThjdMznMhcTMVdUPhvpkJuU3C0wxV7EpgXltpyWMakVMpNSEG1P4Oe+Ly+gEpbwNgK8FnjYBgJJkTw35sCNwhL+Mss8bqkSBdI0LbFG3h6tt0XIrzKkyIsbPcnTKAokjLbCIYQwMiyIC1d3HrjCI=
+	t=1758097102; cv=none; b=af5D0jKd0pm4nCRFGIyT4eZdiug+ciFIFL63VHGfNo2XgjP7wEZpqzrG0/Wpk77g1RxSZeLSHWDxoPrJWAeLLBltIM3tfrrBddWfzkpf/OmX6WFD7shG7aPdq78DP17zJgtZMRl7jm3a7yL4njrtPGLkL2ImVuI362JgvZkSQ4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758096964; c=relaxed/simple;
-	bh=DZJjEilvh8soI1BKTSfA4Ey5iDL2dw9rLc+r+sxOjtU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EE1TjKJEErvoIaYtT3O7+tYnePlZgPEdttQ6xcr8V9YMIsZQ9eZ5WJIy7sCjkuJ211vGCv/wNPS/A3+bjvzmXWDDb6zh6OmrpSgTr7IEPeCSyWA3SYUECPpsbfigDYCckJ+l/DMWtqsV3KVqXPHey2G31yfpyRn726J6D7/bEak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XoKeeMTK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758096961;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eedUNpaU5+NqwyQ8eXKTY11TfX3TYBW7jRyqO48Q8K4=;
-	b=XoKeeMTKu0gpgfJHuLWswxJAGqCjjKpuINRBQraqSY9q8vgpNcBVtjXiFhSYkG8W4YN65/
-	4No2q9FHPyuJunUXhi+DU1IrMASJ8MZbKZ05kGdhWhR4jesmx7GqtO92rXF0vz9CIUef5g
-	2e0YdnswDRE6uKV5HwS3Q7hKbtluozk=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-66-bYKE44zHOju7ZwDaET6MTA-1; Wed, 17 Sep 2025 04:16:00 -0400
-X-MC-Unique: bYKE44zHOju7ZwDaET6MTA-1
-X-Mimecast-MFC-AGG-ID: bYKE44zHOju7ZwDaET6MTA_1758096960
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-7216c46b069so66626427b3.1
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 01:16:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758096960; x=1758701760;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eedUNpaU5+NqwyQ8eXKTY11TfX3TYBW7jRyqO48Q8K4=;
-        b=kOle6t4BHpKM547gQgmYu6pT5uRer9x8SZBEliCAxDBCoc0UTcppOxb0Kw5hguJVhM
-         Q5uHJ4/nn2Pu4SXJQNlyyXImheU7bDSlERrHL+hLQ4MYFsK5aApF4En7YC99+PBBSqTy
-         I+d/AoEc9VYeenPWyaC8w6IDnO8bK6dR0EvKnPOhdORhLD7suhEZVdSQk8wX2rg/lk37
-         zKxsw20rIL2LBJKc5oVibsk7GohGpgVKuxL5631xMCVFiG0N4GP0E0r1N5XbXudo1FsC
-         DrMQYidLnCcfXLE1hhznHPzbBegNpoP/nqQZmDcIJ4UeUNi+pU+MEJgGX7kZC4Y4q5YX
-         K68w==
-X-Forwarded-Encrypted: i=1; AJvYcCXiX7ndV/2Q/jdutgMjMpW6gYyeKdKLAdOM8sChFzH2NEODXJNy6OcNe66aGv44qtyPx/I89ps=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8/e6NoXgQ2TFLBUmFzzAEBfPGoOsQ3RvUlHP7xWrXL8WfU41u
-	QSTUQ4qn1m+YMpSH/HSYQTLoENCT984LoWpok+gFL6ZEsYwVD9GsLb3gJ2AqNyltg7oOs9URML/
-	bjbtdQspj7NVoUiRgPccIiZviYWgoTepQXjH8JTMc8nIof/qCHq5nptWqbHd5+nyHMXCNgBomXA
-	VlAi81iGHn1Y5nJ3MOZqA/nc1TcWcODyu0
-X-Gm-Gg: ASbGncua2EpVt1KDcXcDyYrBBX7vpxyYfExiW2GFbU1r1i8CVofYogyuOU7p7s3FZqB
-	Wh7NnPuboI120C9ox0dWrLRQzIwSvhEbalKWHTDwSW/Qm9274bkjvKiPAYcPSKwKbRz4FWGj600
-	2hm2WlpBxNMwpUNY8ZwH13/nhEM2+zWllbE+1NvkHaVajrwcoP+Apl5Z1PF0uBo8K72IZC2xASl
-	oimAlZY
-X-Received: by 2002:a05:690c:6c86:b0:723:b37b:f75f with SMTP id 00721157ae682-73891b87784mr10853857b3.26.1758096959689;
-        Wed, 17 Sep 2025 01:15:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHyEE0NjY/G5cvHcAfaFUYZLAJa4QZLLCvZPWadjWH10jQVSkAeb7QCxJDkVvvAIV4aZoNVgVWuy6Xs42oRk5I=
-X-Received: by 2002:a05:690c:6c86:b0:723:b37b:f75f with SMTP id
- 00721157ae682-73891b87784mr10853617b3.26.1758096959304; Wed, 17 Sep 2025
- 01:15:59 -0700 (PDT)
+	s=arc-20240116; t=1758097102; c=relaxed/simple;
+	bh=PxX2wWK2AzUL3Kv8PxHLOuoo7uCUWpaXq79PBXnYeaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UQtcNB3xSFSdNL8DhKiUZsGh+27E9qugykdNN1Bw1lrYgjOE00fTlxBAzR+0Zqtc7RSO1TS/3bxBgoJbZoSKV1Zg56A4wDIqjnFnlHlhiC7PdHgGCWT4ikkTyUo8e3gHvSmKYK7g+zAdK/1f7ySCaaTtTldA8cBMaf+5SbK8DaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=AdwB6HDA; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Wbvh7kr6; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id C69B960272; Wed, 17 Sep 2025 10:18:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1758097095;
+	bh=RbG84KRk+ZARIr3NTuMvsr3teq8bq7o+LQmBa3ocmxw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AdwB6HDAf15JmLsk1MytzPVu37WB9THdQt+wQGTu4uriwDLt2SZV4ibE/a0kf6g6B
+	 0IqIiezkQUxn+5YciilsPRIqmxrETQdCMuoHlbLmUF5GNKtkuHqYLBXdMdYKfgQ6oW
+	 kvTH4AUpgXUyAvRWhKRMh4E2DU7ctBlVNSw6ixqrAFdAJzeq3Qu3mOtf/U5uahet5P
+	 AaPI4Q9HYpQojZHy1nq+7GUEBxkmWVGzvdLBHQKp6qyyLyClNXXFeiMPoIhQgGVwc9
+	 ShGnIhkZm+NFXNnYm8L1iw/19MeOLFwrAhV+nqJU7INg5iiM/IMk0TXiXn6LOkaTSE
+	 hmOzf+DNlP8zw==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id E89D460254;
+	Wed, 17 Sep 2025 10:18:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1758097092;
+	bh=RbG84KRk+ZARIr3NTuMvsr3teq8bq7o+LQmBa3ocmxw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Wbvh7kr6OODQtOuwXTSScZOukMPX5FkGpmCRibj4SxfgahGIqk1pslNgLcIhmkf1g
+	 HHVZSYV4PoLgBF09PHCEeixzgb6catrzG/W0CLojfK/t3KQ/Wq5GQrbqXc0KrDFIhx
+	 X15fPPe1IfFX6tWaFzpGZgpA3tE45oVUcaxcuHRW17jkYCsQNkA5jQcJNQNXH+8dE7
+	 zVqP95kPx2k5UhFWshF+wK4S2tx/9BvXunmDVFXUH6gvFwPUyUeQbCUz/++HzKxIZX
+	 CYrkUjiVVEQAo5GF8cBUYwuhAty4ZuT590sx6GDQUELBnNGzxMIEy9kJZ1R3ywNOXc
+	 DhIKNyZer+0wg==
+Date: Wed, 17 Sep 2025 10:18:09 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Elad Yifee <eladwf@gmail.com>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next RFC] netfilter: flowtable: add CT metadata
+ action for nft flowtables
+Message-ID: <aMpuwRiqBtG7ps30@calendula>
+References: <20250912163043.329233-1-eladwf@gmail.com>
+ <CA+SN3sp6ZidPXhZnP0E4KQyt95pp_-M9h2MMwLozObp9JH-8LQ@mail.gmail.com>
+ <aMnnKsqCGw5JFVrD@calendula>
+ <CA+SN3srpbVBK10-PtOcikSphYDRf1WwWjS0d+R76-qCouAV2rQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250917063045.2042-1-jasowang@redhat.com>
-In-Reply-To: <20250917063045.2042-1-jasowang@redhat.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Wed, 17 Sep 2025 10:15:22 +0200
-X-Gm-Features: AS18NWDDF_GZcJeZupVOj5tO-bkVG3qVNzTBHe2X19uvGqJmtk3QOixi1mHlzhU
-Message-ID: <CAJaqyWdoLiXJ8Skgwp14Ov66WP1wjnJkR0wwUdmcziSAFJoxCA@mail.gmail.com>
-Subject: Re: [PATCH vhost 1/3] vhost-net: unbreak busy polling
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org, jon@nutanix.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+SN3srpbVBK10-PtOcikSphYDRf1WwWjS0d+R76-qCouAV2rQ@mail.gmail.com>
 
-On Wed, Sep 17, 2025 at 8:31=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> Commit 67a873df0c41 ("vhost: basic in order support") pass the number
-> of used elem to vhost_net_rx_peek_head_len() to make sure it can
-> signal the used correctly before trying to do busy polling. But it
-> forgets to clear the count, this would cause the count run out of sync
-> with handle_rx() and break the busy polling.
->
-> Fixing this by passing the pointer of the count and clearing it after
-> the signaling the used.
->
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+On Wed, Sep 17, 2025 at 06:10:10AM +0300, Elad Yifee wrote:
+> On Wed, Sep 17, 2025 at 1:39 AM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> >
+> > May I ask, where is the software plane extension for this feature?
+> > Will you add it for net/sched/act_ct.c?
+> >
+> >
+> > Adding the hardware offload feature only is a deal breaker IMO.
+> Software plane: This doesn’t add a new user feature, it just surfaces
+> existing CT state to offload so the software plane already exists
+> today via nft/TC. In software you can already set/match ct mark/labels
+> (e.g., tag flows), and once offloaded the exporter snapshots that so a
+> driver can map the tag to a HW queue/class if it wants per-flow QoS in
+> hardware. Drivers that don’t need it can simply accept and ignore the
+> metadata.
 
-Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+Hm, flowtable software datapath cannot do ct marks/label at this time.
 
-> Cc: stable@vger.kernel.org
-> Fixes: 67a873df0c41 ("vhost: basic in order support")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vhost/net.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index c6508fe0d5c8..16e39f3ab956 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1014,7 +1014,7 @@ static int peek_head_len(struct vhost_net_virtqueue=
- *rvq, struct sock *sk)
->  }
->
->  static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock=
- *sk,
-> -                                     bool *busyloop_intr, unsigned int c=
-ount)
-> +                                     bool *busyloop_intr, unsigned int *=
-count)
->  {
->         struct vhost_net_virtqueue *rnvq =3D &net->vqs[VHOST_NET_VQ_RX];
->         struct vhost_net_virtqueue *tnvq =3D &net->vqs[VHOST_NET_VQ_TX];
-> @@ -1024,7 +1024,8 @@ static int vhost_net_rx_peek_head_len(struct vhost_=
-net *net, struct sock *sk,
->
->         if (!len && rvq->busyloop_timeout) {
->                 /* Flush batched heads first */
-> -               vhost_net_signal_used(rnvq, count);
-> +               vhost_net_signal_used(rnvq, *count);
-> +               *count =3D 0;
->                 /* Both tx vq and rx socket were polled here */
->                 vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
->
-> @@ -1180,7 +1181,7 @@ static void handle_rx(struct vhost_net *net)
->
->         do {
->                 sock_len =3D vhost_net_rx_peek_head_len(net, sock->sk,
-> -                                                     &busyloop_intr, cou=
-nt);
-> +                                                     &busyloop_intr, &co=
-unt);
->                 if (!sock_len)
->                         break;
->                 sock_len +=3D sock_hlen;
-> --
-> 2.34.1
->
+> act_ct.c: Yes - I’ll include a small common helper so TC and nft
+> flowtable offloads produce identical CT metadata.
+> 
+> If there’s no objection to the direction, I’ll respin with:
+> - the common helper
+> - act_ct switched to it
+> - nft flowtable exporter appending CT metadata
 
+Just to make sure we are on the same page: Software plane has to match
+the capabilities of the hardware offload plan, new features must work
+first in the software plane, then extend the hardware offload plane to
+support it.
 
