@@ -1,124 +1,156 @@
-Return-Path: <netdev+bounces-223970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-223971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 724E7B7D0A0
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:16:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F868B7D531
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 14:23:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DD62463ADE
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:01:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E20F7A861F
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 11:04:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F41B20E005;
-	Wed, 17 Sep 2025 11:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="ZtzQoxrb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCBDF2C21E2;
+	Wed, 17 Sep 2025 11:06:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1CC31BC86
-	for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 11:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E002DAFA5;
+	Wed, 17 Sep 2025 11:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758106883; cv=none; b=IGZTrH5v5StnQVT3phsTU6b+B5G2FI7dwrBPyXSSHUZZ143N1JvVb73v97qq3ONZnMBqp1LPg0ltBAJFZCbhoVd0W7bM7UTRIfABqgYBhgcPjf5QUCwQD8tUecKQ3tF8RDNi60Xajfxso66ikoramlxycxyVYaHyQtpU3T+DIec=
+	t=1758107175; cv=none; b=W3ytlmWshnfH9h0We00xQryL8hDgUP++7ZlBuYK6RBDIFoc4DzS0VFNCZR3cZ9WmkbjzWIOTM7+FZYLejA+ykAQst4ZvdDxLoqmjlhKo990A9PQbODHzpQKLJuctpx199F0zDxULmWSHe7VSYc8d2Q+LCYh/eSd12ABnGJOw5uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758106883; c=relaxed/simple;
-	bh=DXe+3PYozcWXl57aBr5WezaAMdVFPw3kN1QoS1BjuR0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KLG2NP0ZEJJ7OAAJy0I1whpGBXSXbgYtLP7aietj+iLHg0S+4JsTspRiF/lh79s05US6t52Ug9PakgA/xGHRYKSMSlR2CDgr8lzjWozsSIqROmKXAZ3otnFD0jFDtscJ6gCRQOWX7n+JOqiyz82HSwvvM82HbatGsq3U23ZYxtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=ZtzQoxrb; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-26058a9e3b5so32880275ad.2
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 04:01:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1758106881; x=1758711681; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VMQsS7dEiEcn1XR+6VViCf5cMvlHhDrANmtU1f3oLC4=;
-        b=ZtzQoxrbB/VnwBnWRvWG3K85BKlJGdwoNTM1+O0esT1jio4TWqZWs+yKdSV5yMouXY
-         y1S4YXcJsNMzqwiiIiD0G+50MiAYCiSl3/Av13EyBpbjWczenQpABZMWeu4vcY44lryr
-         d6s/5/3i9ZHFAcv2KqIXXkP5CUHMqv/XqGRrMwIcnNVNaSh8JSkJN/Zvx2XVEidroZM/
-         Moiz9Zovqw1b2GeKTVrUibHz6Tti21WnzIcvAZmKevieerpgiV5eCa0ysqrOhySuMiwi
-         qzNIQQ5yNBDImOHRWYxR3Fe7XKiTeA13YiG+F/m3f9o4YQFh9uBu9Q/AaCDztmdMRFzY
-         6Q/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758106881; x=1758711681;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VMQsS7dEiEcn1XR+6VViCf5cMvlHhDrANmtU1f3oLC4=;
-        b=C8Dd2ACEQK9IiGdSESvilHMtFYzrd5dMZjntgLXnxUfzURA6XI+uqx3sjpDC1s19dO
-         n7iBRpvb6o7gkwciG8zHhvrydq6qpAw6brrFe3rxzcq9L5JULuc5dlJn5UCfqut9uOD8
-         fzv1snUrFOQX5VImBEU/mTROgEkQzOP/ggjtkeDEwzoGC5ruyJXMxqMJxPmOgIfPeYUQ
-         z1egAYdhH5Tny8K4azuAw4RW65je8/gWRzFJUqTMwAB7i2Gngup+HXLtj84n66u2aci2
-         GBqW5tCX4fe6Ve8Mo4BQlv3qMsy1kFMixdPb09YOpv3IYYuny4K5tXKxY2WJJVpTuiiZ
-         raRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9cRnRKbB26S2TrUo0Cc9VZYt815WaSJLBKVwDePkShlWUgH6TF9jRQwAIhwMeLbPlZNo1vYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykcGe04IWs5+FDyH6SStxMb73S1eO7yiZUUiPD6BVnuR+dvzZz
-	e11tWa63HUrDYz0LSZQfHOsgH3utgnc8OkR77putUNQpC5z4dnQQlocW1AvyiwOFXC4=
-X-Gm-Gg: ASbGncu/iqtWWOq5gOLUjmAx7n0bWoc4+gjSPllFW2P52vmdSttcQss79lRyg3RS33X
-	iNKz7u0HqqHnDTWJRrJIeOB6iD2Yi1eQ2oGnmmgqksfQvFgP5nHuxPbzNjcXTIxQUO+KK30IcIq
-	IxAniXSlDX7oQb6bZ1t1lG6HT2X3x+hzMZLtVKhINmp5oK/jbPKGjTbNjaJ6/QDTmkLGfjNUJH5
-	VNMPhR0Lwnm2mcGUd1Vu8GC2HEJxz2fY7JzDV8wYzLSXn7Sk1aWXT0oqUQs+xRfXnwky4ByOtqk
-	kg0LasbEbSRaLIyQHbCLz8yCseWZni2uQU22VEsXqo7LUIqJDYqEk7wS0ARAShU9fjdRHIyqD5P
-	X49kiYFBEgQR+JPGDLe3KWLr+/LNADYfz7lerj2XqX3ZSjqHbZOcTIx0i
-X-Google-Smtp-Source: AGHT+IFzHlVzYa/q3MnbGUKmGNaxoTqhiBZhkinwoVOAqXMfYX6776FYQwngWLp/NNcoxyCfaQZaUA==
-X-Received: by 2002:a17:902:d4c9:b0:246:eb4d:80c8 with SMTP id d9443c01a7336-268137fd08fmr17646195ad.34.1758106880901;
-        Wed, 17 Sep 2025 04:01:20 -0700 (PDT)
-Received: from fedora (cpezg-94-253-146-122-cbl.xnet.hr. [94.253.146.122])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-265819a6212sm94231445ad.57.2025.09.17.04.01.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 04:01:20 -0700 (PDT)
-From: Robert Marko <robert.marko@sartura.hr>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Steen.Hegelund@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: luka.perkov@sartura.hr,
-	benjamin.ryzman@canonical.com,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH net-next] net: ethernet: microchip: sparx5: make it selectable for ARCH_LAN969X
-Date: Wed, 17 Sep 2025 13:00:24 +0200
-Message-ID: <20250917110106.55219-1-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1758107175; c=relaxed/simple;
+	bh=qUsp7FIwmTAFssINAeQmhTm8DdUAGD6ER7hbOPzidRI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ogkwLOfNX+zcEWKguJjecK8Dp882f/obZBxGrN37iu1KY89tIC+jVVPlU5KDhlAIDKrkcpkllh6xhfq4MFgYws/PMSgLcvebXS5eTl10uC4Az6Gw4XmGR9ffw1JK0xFZv85DaMrxB1WR00AchCgxeVWjRWl4RvWV3pziL+lQEJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpgz16t1758107143tfd4595b3
+X-QQ-Originating-IP: KyjLbqrSwWDsBL167vTWTlsLOGuQf/XO+VF1mGtMYgQ=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 17 Sep 2025 19:05:41 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14013483781731506798
+Date: Wed, 17 Sep 2025 19:05:40 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, rdunlap@infradead.org, joerg@jo-so.de,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v12 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <D7EC5E8B6F6E685E+20250917110540.GA91482@nic-Precision-5820-Tower>
+References: <20250916112952.26032-1-dong100@mucse.com>
+ <20250916112952.26032-5-dong100@mucse.com>
+ <3058c061-3a17-4077-8d4e-c91ad72b3831@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3058c061-3a17-4077-8d4e-c91ad72b3831@linux.dev>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MnvGtZwO7LbyrzQzy3gSHZpndqqwTFAD5/Ae+NgTmFBU3bMcwjYbP9X4
+	JygP+AELsD9LsI6vEN5nT9Sn+Jx33MzhoY5CycW1lXPnpPquSXTtb1fiDRyWRK3hbIYkEcs
+	TpEHel0XMPaNIzv91OfktmfkF8v6L0prtnbgl5uEiIq4b7gyGT59Q2oDaqFVDP6oIHePRtP
+	3Z02o4hmjgAjWrPDJ/eirNyr2/0e/IyXA+KDqY8xtsTzhLwIkFPy/4y+rrs79AvnAh9KXkl
+	07mw0+FoHAkiRrGk4iVx120LnNUG6JL+k7nq3hJ8AVmGVbvX/JwTlXU8NfpoJ2AtkbCoNC5
+	TF5aA91iewsjDKkaOOo4Ywzb1gHitCxuSEU45M9l8W1al+46F5xxk04pDdrIT7Qs4XYqaE4
+	fsmwuKgZKGa85Auy00JK2CQ3FUYo6vvYeM5u4Gj1LgrgJdOJu+NxOPofjK/xzyuc28WMIfH
+	5ssTzCFEW/ZGePPkamaWB5yc/+2yp/wMvNL2V8P2RPmIKP+lFtI/xX8PhVHYaIkvRrvIbHD
+	53GrWF81/VW8JMnjSklS7xDFB8afGeJVe0Qv0knuaTm96O4EU50Fe8yd/NkxG/ixZbCsPs6
+	NRVJZEtxbETljjMujNrK5J4Qu0vzTu41C4WLb4JNQa0VETovxx5ECpsvqdNPrB76EdmPSqS
+	GS5APoy7YAww9vsyw2r3buItsteWzZXkgU93wnEe/ofZK/j5DITAQ9x92EqIRIh9bc8x6U5
+	hw0Vya09oIBVxMdll0WGciNwcwwPA5DzPaRTc1NODP6TL6sz9KD9Z3Bfg39+zx/vokSDnZU
+	TPz53oN19CF1Kwai2+7N2gmL2ne5OHj2l/LcvPfLs/J8k6BrsqqqVuW8nA4mJdJMtJSTAWh
+	1QqiLCvaSKZWU04D5I9BhuArYln3eWezSFKxJLH/GdbSBYHenHbXkMpsMT5l3p0GHTtv60L
+	oe8PND9S7Bz0oJ6AaUWpwoHm2Xh6AO7ZNZjxdMHoD2z+xI/hLV0566KNU50uy37SvfAOOfE
+	qnzlWp0teWx8xpDy52
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-LAN969x switchdev support depends on the SparX-5 core,so make it selectable
-for ARCH_LAN969X.
+On Wed, Sep 17, 2025 at 11:45:31AM +0100, Vadim Fedorenko wrote:
+> On 16/09/2025 12:29, Dong Yibo wrote:
+> > Add fundamental firmware (FW) communication operations via PF-FW
+> > mailbox, including:
+> > - FW sync (via HW info query with retries)
+> > - HW reset (post FW command to reset hardware)
+> > - MAC address retrieval (request FW for port-specific MAC)
+> > - Power management (powerup/powerdown notification to FW)
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> 
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> 
+> small nits below
+> 
+> 
+> > +static void build_get_hw_info_req(struct mbx_fw_cmd_req *req)
+> > +{
+> > +	req->flags = 0;
+> > +	req->opcode = cpu_to_le16(GET_HW_INFO);
+> > +	req->datalen = cpu_to_le16(MUCSE_MBX_REQ_HDR_LEN);
+> > +	req->reply_lo = 0;
+> > +	req->reply_hi = 0;
+> > +}
+> 
+> All these build*() functions re-init flags and reply to 0, but all
+> mbx_fw_cmd_req are zero-inited on the stack. Might be better clean
+> things assignments, but no strong opinion because the code is explicit
+> 
+> If you will think of refactoring this part, it might be a good idea to
+> avoid build*() functions at all and do proper initialization of
+> mbx_fw_cmd_req in callers?
+> 
+> > +
+> > +/**
+> > + * mucse_mbx_get_info - Get hw info from fw
+> > + * @hw: pointer to the HW structure
+> > + *
+> > + * mucse_mbx_get_info tries to get hw info from hw.
+> > + *
+> > + * Return: 0 on success, negative errno on failure
+> > + **/
+> > +static int mucse_mbx_get_info(struct mucse_hw *hw)
+> > +{
+> > +	struct mbx_fw_cmd_reply reply = {};
+> > +	struct mbx_fw_cmd_req req = {};
+> 
+> something like:
+> 
+> struct mbx_fw_cmd_req req =
+> 	{
+> 	  .opcode = cpu_to_le16(GET_HW_INFO),
+> 	  .datalen = cpu_to_le16(MUCSE_MBX_REQ_HDR_LEN),
+> 	}
+> 
+> 
+> 
 
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
----
- drivers/net/ethernet/microchip/sparx5/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+That's a good idea! That makes the code more compact.
+I think I should update this as your suggestion.
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/Kconfig b/drivers/net/ethernet/microchip/sparx5/Kconfig
-index 35e1c0cf345e..a4d6706590d2 100644
---- a/drivers/net/ethernet/microchip/sparx5/Kconfig
-+++ b/drivers/net/ethernet/microchip/sparx5/Kconfig
-@@ -3,7 +3,7 @@ config SPARX5_SWITCH
- 	depends on NET_SWITCHDEV
- 	depends on HAS_IOMEM
- 	depends on OF
--	depends on ARCH_SPARX5 || COMPILE_TEST
-+	depends on ARCH_SPARX5 || ARCH_LAN969X || COMPILE_TEST
- 	depends on PTP_1588_CLOCK_OPTIONAL
- 	depends on BRIDGE || BRIDGE=n
- 	select PHYLINK
--- 
-2.51.0
+Regarding adding your "Reviewed-by" tag in the next version:
+Would it be acceptable to include it when I submit the updated patch (with
+the initialization logic adjusted), or should I wait for your further
+review of the modified code first?
+
+Thanks for your feedback.
 
 
