@@ -1,70 +1,59 @@
-Return-Path: <netdev+bounces-224026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E5DB7EFFA
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:10:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8FA0B7F07E
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 15:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 814B64A4B72
-	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:01:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35EED1C262D1
+	for <lists+netdev@lfdr.de>; Wed, 17 Sep 2025 13:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74535332A4C;
-	Wed, 17 Sep 2025 12:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V/PC3TTo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1EA333AAC;
+	Wed, 17 Sep 2025 12:59:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42239332A48;
-	Wed, 17 Sep 2025 12:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5462D333A8B;
+	Wed, 17 Sep 2025 12:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758113809; cv=none; b=iztCd3TcQ5gclgkoLIT0bte2oKLiQJXfq9yEoGY8ct/CRSDkkyWurFDf1xOAuJmT0hMI4v6eekc5d/LxqNdjk18oGzSPq/zIv/uZqfNYUCj5rQ148KkHYS3tJJJ/llII62pp4tG88xIal5zbF7N8fT7/nSKBHRzsuL7I/iPODyU=
+	t=1758113997; cv=none; b=U+8Zbpz67S/rpUT1+LOu3DHQoL4uulwUQ3Q8SrpMN2h4h1bF/EBoCrRNL4N4cw5/vpoZOga1sBHKg0jIsvQhv8/Xx6T7BgfNO3a+QabSe9Kv59igVIucX0+TbTnpwazpOMkqjLTZjKqCjItnIPmLEAR5ktD5oy/aCj0MsyoBAZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758113809; c=relaxed/simple;
-	bh=zEj2Rp5RyjDVROtWpXDizElasqtxRk4iUytBJagOPEA=;
+	s=arc-20240116; t=1758113997; c=relaxed/simple;
+	bh=O/3KyCZXB9bUpKW0JLg6l7WwA0FWJdFKRYxf/Jz8kLQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OagbvW+bUWMW+x3ALyl+5fweevgQ3PY1d8+0yLcV9uovczkfZRQp4b4BOX4A1A3Jusc9cYKdbmSdnlil4gOghNi/cNYoYoSDmCf4ojJyU+x2O0b/au3jyrzWlPhvdvmsEhW2HrJLXiATnis0eTv/4HSDH+DfsS8fB9Fw+laR6l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V/PC3TTo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A91C4CEF0;
-	Wed, 17 Sep 2025 12:56:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758113807;
-	bh=zEj2Rp5RyjDVROtWpXDizElasqtxRk4iUytBJagOPEA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V/PC3TToIpCiYCLixtG9bxfOoxSmZNunsRNfIuI216czk9XQfcLnlmY/z0Nj0A3OL
-	 CBnJqlEq9/EgmcxydSJ6Cel7fCmZvBCDDGR/4ymTjlxLEWcrKOMdAtYdDZxHMNyyNU
-	 hkmXjHDx1XWhKlHGpN02/cqy/LyQAi0LkzXs7LemV9sLyrnZMOmQbLyslyyzQc+rE2
-	 P+UEjjDEiIO6ttCVinYjNdi8L1TXG3ewjbtQsQvqgUFIIMirPxomTrukncdDzaO7ne
-	 KfQ3FCWXVoPHBXrPnZOv95Vqx2i+txPfrNJsXM74Gqbk9fgVfiTCzWkwdTfkq77XYE
-	 PezoyfUxMoMHg==
-Date: Wed, 17 Sep 2025 13:56:41 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH net-next V2 10/10] net/mlx5e: Use the 'num_doorbells'
- devlink param
-Message-ID: <20250917125641.GK394836@horms.kernel.org>
-References: <1758031904-634231-1-git-send-email-tariqt@nvidia.com>
- <1758031904-634231-11-git-send-email-tariqt@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BQabs1pHwhWQqcU/S0JOp1yHm1VXMpq5LaZr7zXjFLaF6lXJQCSlPiIVedo98lI6Hr54GeopbgM0kVjcvQkjy6wxT0Cpq4PFshoj286bhvy6/BuZdsojFI3b+kXXtmTO8KfRhmRo2BMyJy+BYoa3IlnuKVOX/TzoO/nXDF7DDCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from localhost (unknown [180.158.240.90])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dlan)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id 3B17B340E2A;
+	Wed, 17 Sep 2025 12:59:54 +0000 (UTC)
+Date: Wed, 17 Sep 2025 20:59:47 +0800
+From: Yixun Lan <dlan@gentoo.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Vivian Wang <wangruikang@iscas.ac.cn>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alex Elder <elder@riscstar.com>,
+	Networking <netdev@vger.kernel.org>,
+	Guodong Xu <guodong@riscstar.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the net-next tree with the spacemit
+ tree
+Message-ID: <20250917125947-GYA1266976@gentoo.org>
+References: <aMqby4Cz8hn6lZgv@sirena.org.uk>
+ <597466da-643d-4a75-b2e8-00cf7cf3fcd0@iscas.ac.cn>
+ <76970eed-cb88-4a42-864a-8c2290624b72@sirena.org.uk>
+ <20250917123045-GYA1265885@gentoo.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,20 +62,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1758031904-634231-11-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <20250917123045-GYA1265885@gentoo.org>
 
-On Tue, Sep 16, 2025 at 05:11:44PM +0300, Tariq Toukan wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
+Hi Mark,
+
+On 20:30 Wed 17 Sep     , Yixun Lan wrote:
+> Hi Mark,
 > 
-> Use the new devlink param to control how many doorbells mlx5e devices
-> allocate and use. The maximum number of doorbells configurable is capped
-> to the maximum number of channels. This only applies to the Ethernet
-> part, the RDMA devices using mlx5 manage their own doorbells.
+> On 13:03 Wed 17 Sep     , Mark Brown wrote:
+> > On Wed, Sep 17, 2025 at 07:48:34PM +0800, Vivian Wang wrote:
+> > 
+> > > Just FYI, Yixun has proposed for net-next to back out of the DTS changes
+> > > and taking them up through the spacemit tree instead [1], resolving the
+> > > conflicts in the spacemit tree. This would certainly mean less headaches
+> > > while managing pull requests, as well as allowing Yixun to take care of
+> > > code style concerns like node order. However, I do not know what the
+> > > norms here are.
+> > 
+> > Thanks.  They're pretty trivial conflicts so I'm not sure it's critical,
+> > though like you say node order might easily end up the wrong way round
+> > depending on how the conflict resolution gets done.
 > 
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> Thanks for the help and fixing this, but ..
+> 
+> If it's possible to revert the DT patch 3-5, then I'd be happy to take,
+> but if this is too much job, e.g. the net-next's main branch is imuutable
+> and reverting it will cause too much trouble, then I'm fine with current
+> solution - carry the fix via net-next tree..
+> 
+> But please use commit: 0f084b221e2c5ba16eca85b3d2497f9486bd0329 of
+> https://github.com/spacemit-com/linux/tree/k1/dt-for-next as the merge
+> parent, which I'm about to send to Arnd (the SoC tree)
+> 
+No matter which way choose to go, I've created an immutable tag here,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+https://github.com/spacemit-com/linux/ spacemit-dt-for-6.18-1
 
+> BTW, The 'for-next' branch is a merged branch contains clock and DT patches
+> for SpacemiT SoC tree's which isn't immutable..
+> 
+> Let me know what I should proceed, thank you
+> 
+
+-- 
+Yixun Lan (dlan)
 
