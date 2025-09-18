@@ -1,127 +1,139 @@
-Return-Path: <netdev+bounces-224219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54679B826FB
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 02:47:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A7CB8270E
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 02:48:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8AD11C248A8
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 00:47:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3721E1C27847
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 00:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E73E1E1A17;
-	Thu, 18 Sep 2025 00:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B0C192598;
+	Thu, 18 Sep 2025 00:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KzGvJlF3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m5OCRe7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8336D1DF748
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 00:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027AB148832
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 00:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758156378; cv=none; b=o5E/bxmplgGxYRrqDYlYSZGJWpUvx2xfz3a4zwRwRjGXOcGKI48VikdN2ZfbzRBFr2Tved4qbkfGdAXYHLhGP63NICLNphZjRnccH2RFvMkZKTNcCPJlU2urzG1CzwHc9c004IURltqRF/mAyUUWdMf/5bGCCMwQLHMYktdKTzY=
+	t=1758156401; cv=none; b=FvvBkKozLjvMflyklTZVl6255EIy/MwJnDbKsmNekzXGoVflyPzWllKSCtk1B6XXOqQOqHjoH+utMJS8lCiyV5Ci58qtnf5KocNBFrVc3nYOC+qZ3vPcUjUMFF6jVvgnCJJ/YcXeKV2xx7UjdHt7qaiv/3tufpRmvJNOIwtZ2oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758156378; c=relaxed/simple;
-	bh=UIo7RA/G/xDD02JBTiyBlQlJJd9IfyisvvvnbSKMNJE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=grCnLt8nKCotH9VNFhkVqvbE5oWwy/FQi08dlaTLUecIRnflIezQPfjMVAw8FK3bCTB00+Y3ihjsl8VI+msY0wMo/opN4J1ZrR298kamuVu/SLY18hJe1Wso3nuFYvZ4QSQDd8cXzRsCTBlf2ty33o5J+J0fzCutDQ92F+dsZZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KzGvJlF3; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b0787fa12e2so61758466b.2
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:46:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758156375; x=1758761175; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ScdSoNWwYp7Lx1FqF0sJinLc5HuMMzMbeEOteqLeKGY=;
-        b=KzGvJlF3KPV470aj9p2+WGc+dHQyYumQ/n1JBBocmuZJA49YLeiUqmwy+/yYPZgQZj
-         ssXCb7z6YgYiOutrT3AfsrRikN0B83+7ruvziWNhCwsz2ELTIiizmfls7PvsFdkvcJLT
-         qpJdXp6xZhBTLS5nekg+F1LDSdhm19EysHMtk07fabj1P6oLuOyCMfvOGen6jT1eBwbP
-         6pMnjF6KJT+0XEj91pCTwQujjt7F6ghOtnCnJ+EU2+tXugoJTsFgk+QsjwfhKOKRRjgu
-         d9FePQZs61kpvgUTD0qeflLnFiVK5p7eAvAv3yf1sOrJiE6TsrG+zJ2UIlYBCl4PmRtc
-         hKkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758156375; x=1758761175;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ScdSoNWwYp7Lx1FqF0sJinLc5HuMMzMbeEOteqLeKGY=;
-        b=qMx/7lIRib48Y7q+qscE9mmQi7INmgvrpMPjx5jkC8kSGsnoerV2x3xk+LB2VUnRIT
-         N79FkdRNlAk9VqIbXpZ0wPsUyevaISKRRuxuElWIQ1N8o4wMLUBklLnsIO1CWu8ubryp
-         F7TJTyWv+I2b7v0w8HZmbGMkgBiA99zQlNNU9g0quhRWJJQNapDyaj0lL/fjpogSmxEL
-         w8uFH8JXDykXLcY7DNfIkJEqlp1XcmUYHRUD6yFE+aCzDKJ7l2tpoMDjDdp3yaJ0ACOd
-         94l3VTRtpFzcWFuX9gSwtACTb4ql8Adi+QfmvV6b5RFxevB26w8GqEs3Qcr+qc9YlaAh
-         /S7w==
-X-Forwarded-Encrypted: i=1; AJvYcCVG3AHHLSziXV4+3RCuvYVregFsXkkNNTyVYHEj3339qd4kBhirOABav8DxaLs/SuVFQQhcXok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRnPl0ho7wUrl4Awbuda6eo+mKxSWuK+qmnip/szu7g701SwLS
-	aEfal3jI2Ay0MqMd0YTM7vzqZdm9HoTq+a4Z1P0GKNoOx3o1C43bKhHB
-X-Gm-Gg: ASbGncu6U79RObt1e1tiYSZQ1IW+eYWmgg0znL6Mg5s+DJ1WyeyIzdB1zSJUzAGqb95
-	xsxkoinVKB/gKOB5wspiYdqXol0FvvqYQ+J4NgbWMJyAJLkgIhG/4/rCpfCA3R4DuIExQHnuy+Z
-	D3zAsY/gfCD0EqlxBN8EctGjNGW8T9FMQaXOFrOnYvO1HjXzlETFf9FsRveqScFMiQTiDHqkPng
-	8UCL1q+VpiwluML3kRBmUrLjoTQd2KizF/G+ALsM7/p/yVr/squV51vXzMMkUtZCxSQLCkeK4uc
-	/crEZFdk7jdVtUhY3Qz6y5B1CvK8J34aXlUh7QJfrbbXQN/T7ufKqtbttMHROQg8oMlCm9Dn46E
-	aN4N+QiUOejrtaJIogtOIa8YXxWbq89whmb1Qhg==
-X-Google-Smtp-Source: AGHT+IGtolM3WpmMOfPkC5aQN2+QGXojyD9zctBgGDhejOP10KXv+fVObxP+zNTcUHL0l2vGVmYa+w==
-X-Received: by 2002:a17:907:7291:b0:b07:c28f:19c8 with SMTP id a640c23a62f3a-b1bb7d419c3mr514517266b.30.1758156374473;
-        Wed, 17 Sep 2025 17:46:14 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b1fd271ead3sm73266366b.101.2025.09.17.17.46.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 17:46:14 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: brauner@kernel.org
-Cc: amir73il@gmail.com,
-	axboe@kernel.dk,
-	cgroups@vger.kernel.org,
-	chuck.lever@oracle.com,
-	cyphar@cyphar.com,
-	daan.j.demeyer@gmail.com,
-	edumazet@google.com,
-	hannes@cmpxchg.org,
-	horms@kernel.org,
-	jack@suse.cz,
-	jlayton@kernel.org,
-	josef@toxicpanda.com,
-	kuba@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	me@yhndnzj.com,
-	mkoutny@suse.com,
-	mzxreary@0pointer.de,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	tj@kernel.org,
-	viro@zeniv.linux.org.uk,
-	zbyszek@in.waw.pl
-Subject: Re: [PATCH 17/32] mnt: support iterator
-Date: Thu, 18 Sep 2025 03:46:06 +0300
-Message-ID: <20250918004606.1081264-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250910-work-namespace-v1-17-4dd56e7359d8@kernel.org>
-References: <20250910-work-namespace-v1-17-4dd56e7359d8@kernel.org>
+	s=arc-20240116; t=1758156401; c=relaxed/simple;
+	bh=lNGmY3o1ccmZCWS4874pPo4nNHHvU2+63aqEDcNOe50=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dQGHCxo9U3uTmnld7enzmHCviM3aGODi6jfEG68aHwPOxj8Js2pdZxw+h+/IlocMTLTtvksgI/D1ymWOdWr78ze308/uVIIwL1yLosxWteIVpMZ8LmP7P+c9Ada+BU4fd77kkr1T6soN752ANhAhMmX5erLUMoEYUBNIkTqrjE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5OCRe7f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF572C4CEE7;
+	Thu, 18 Sep 2025 00:46:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758156400;
+	bh=lNGmY3o1ccmZCWS4874pPo4nNHHvU2+63aqEDcNOe50=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m5OCRe7f97f9q2GvQL96b8tJOFvbI7MsmOZYfL4R69lL4n0/qZzzM4tI/NA6fRrqh
+	 N3V75EJ4q1S4JEBq1a5VjNiQNx/HL21tkQDB6qqdsmAsF5p+m/J24lUgCRbC2SZBsm
+	 vYPF3wQcxWV0fVVnZpNv2lMvop3R8JgddXNEORGIJdREyFgyV1mMFhJ3RPfvBRUARq
+	 M5qq9uMvQ95602uEp3B0jeFT/9ado+g4ydlMGLz4a2FYsrU+vWE6aK+Woa/zkGyt4P
+	 oTF/sSMW5nO1fmKN1ULrRmAHBjDcz7NgREDWjTmiDOIX+ykqF5oI1VPKDSezlGAW9G
+	 sQoY/LVOVQ8Ow==
+Date: Wed, 17 Sep 2025 17:46:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org, Donald
+ Hunter <donald.hunter@gmail.com>, Carolina Jubran <cjubran@nvidia.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, Yael Chemla <ychemla@nvidia.com>, Dragos Tatulea
+ <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next v3 3/4] net/mlx5e: Add logic to read RS-FEC
+ histogram bin ranges from PPHCR
+Message-ID: <20250917174638.238fa5fc@kernel.org>
+In-Reply-To: <20250916191257.13343-4-vadim.fedorenko@linux.dev>
+References: <20250916191257.13343-1-vadim.fedorenko@linux.dev>
+	<20250916191257.13343-4-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Move the mount namespace to the generic iterator.
-> This allows us to drop a bunch of members from struct mnt_namespace.
->                                                                       t
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+On Tue, 16 Sep 2025 19:12:56 +0000 Vadim Fedorenko wrote:
+> From: Carolina Jubran <cjubran@nvidia.com>
+> 
+> Introduce support for querying the Ports Phy Histogram Configuration
+> Register (PPHCR) to retrieve RS-FEC histogram bin ranges. The ranges
+> are stored in a static array and will be used to map histogram counters
+> to error levels.
+> 
+> The actual RS-FEC histogram statistics are not yet reported in this
+> commit and will be handled in a downstream patch.
 
-There is weird "t" here floating at the right
+> @@ -6246,8 +6246,17 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
+>  	if (!priv->channel_stats)
+>  		goto err_free_tx_rates;
+>  
+> +	priv->fec_ranges = kcalloc_node(ETHTOOL_FEC_HIST_MAX,
+> +					sizeof(*priv->fec_ranges),
+> +					GFP_KERNEL,
+> +					node);
 
--- 
-Askar Safin
+Why bother allocating his on the device node? We have no reason to
+believe user will pin eth process that reads these stats to the node
+where the device is :\
+
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> index aae0022e8736..476689cb0c1f 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> @@ -1490,8 +1490,63 @@ static void fec_set_corrected_bits_total(struct mlx5e_priv *priv,
+>  				      phy_corrected_bits);
+>  }
+>  
+> +#define MLX5E_FEC_RS_HIST_MAX 16
+> +
+> +static u8
+> +fec_rs_histogram_fill_ranges(struct mlx5e_priv *priv,
+> +			     const struct ethtool_fec_hist_range **ranges)
+> +{
+> +	struct mlx5_core_dev *mdev = priv->mdev;
+> +	u32 out[MLX5_ST_SZ_DW(pphcr_reg)] = {0};
+> +	u32 in[MLX5_ST_SZ_DW(pphcr_reg)] = {0};
+> +	int sz = MLX5_ST_SZ_BYTES(pphcr_reg);
+> +	u8 active_hist_type, num_of_bins;
+> +
+> +	memset(priv->fec_ranges, 0,
+> +	       ETHTOOL_FEC_HIST_MAX * sizeof(*priv->fec_ranges));
+> +	MLX5_SET(pphcr_reg, in, local_port, 1);
+> +	if (mlx5_core_access_reg(mdev, in, sz, out, sz, MLX5_REG_PPHCR, 0, 0))
+> +		return 0;
+> +
+> +	active_hist_type = MLX5_GET(pphcr_reg, out, active_hist_type);
+> +	if (!active_hist_type)
+> +		return 0;
+> +
+> +	num_of_bins = MLX5_GET(pphcr_reg, out, num_of_bins);
+> +	if (WARN_ON_ONCE(num_of_bins > MLX5E_FEC_RS_HIST_MAX))
+
+why does MLX5E_FEC_RS_HIST_MAX exist?
+We care that bins_cnt <= ETHTOOL_FEC_HIST_MAX - 1
+or is there something in the interface that hardcodes 16?
+
+> +		return 0;
+
+> @@ -2619,3 +2675,4 @@ unsigned int mlx5e_nic_stats_grps_num(struct mlx5e_priv *priv)
+>  {
+>  	return ARRAY_SIZE(mlx5e_nic_stats_grps);
+>  }
+> +
+
+spurious change
 
