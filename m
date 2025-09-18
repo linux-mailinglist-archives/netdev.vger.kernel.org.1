@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-224594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA061B869DB
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:06:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50906B869E1
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E9421B25B21
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:06:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 112161B25BB1
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6432A23C4E0;
-	Thu, 18 Sep 2025 19:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E295727F4D5;
+	Thu, 18 Sep 2025 19:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+ibkjzI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O9WnJ5fk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395D94A2D;
-	Thu, 18 Sep 2025 19:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95534A2D;
+	Thu, 18 Sep 2025 19:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758222371; cv=none; b=WCrPhKQj+wnpYEzUWeTYa0LZBPKvm6/lS0HqcPk80GZNkfg6SoQp7ObAULqLq9SpoHIKVErq5/xTRkRd+6B8HcmDu5RQGsAhDrHtmA7YLlVIqm+F+47b2CrxsUMGML8EY/kR/ZZayhtfFxtalK6SZtyexfGMKQj7cIyoCD3PC6A=
+	t=1758222412; cv=none; b=in4RK4Kmt67soCWr9af6wnKu9D1wkxDNGmHmbF6Y+y8cc1/It5VRl1U8QlhyWLKoQshIUtsPhIAwmwy24hniIGVEc/TJO/g3ZRaTQf/5oe+nqcF/YLMRv/m+Vs8rqjytsYSkMrErEPztF6jHj8mVcfZ24XhZhBPL3WuXG6hii6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758222371; c=relaxed/simple;
-	bh=mcMpLeS3K+Px3yW5q4lpYSSclMu5cVJ/n7WoXdEJH64=;
+	s=arc-20240116; t=1758222412; c=relaxed/simple;
+	bh=kNq2BBV7RX/0piN88LUKeCXvz59XV/A1jAaDcvjFWys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O+Nz/Tp7Yp1DdoWBD9OoqTtKyPjulYvCW/km2PPOFkQq0rmwt5zVZk2HGO75kjGDJghZfjNaXw+6Qks4AZba/b/W0t8YZaKEMZcKd9gx5tf/YjxNyzr15SaJAm1Ewz9WF+GvXudUrhm7DYu9QB7FH5WI/jJj624HPkTYCisFwmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+ibkjzI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 515EFC4CEE7;
-	Thu, 18 Sep 2025 19:06:08 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=L3s62uLxvihvcDBkmk9B6IGbW8h9sOIdmjis9at+Ni3m8e0loCw44eipkWgkZceIWEWA360ideUGBvM9/KcmmbAgZQHeICAgMEPqq4MoEGFbOKhOBJAmA597zVitxAiJQP3QY0DV05iJ51xKgHvhj5woBZmYFmgSKcVUOi7DE58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O9WnJ5fk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D31C4CEE7;
+	Thu, 18 Sep 2025 19:06:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758222370;
-	bh=mcMpLeS3K+Px3yW5q4lpYSSclMu5cVJ/n7WoXdEJH64=;
+	s=k20201202; t=1758222412;
+	bh=kNq2BBV7RX/0piN88LUKeCXvz59XV/A1jAaDcvjFWys=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g+ibkjzIVF+1FhJ1udqpCLC/XMdR4bBb8R+C/Uv+cKKXdHxGQnS/DkaERxSQIhcoL
-	 HqeiwvLfXjZkzUbF2zIfKi1twDmn8QfZGS7XU+kRGFDdCIH6dSguUjvUegR4OMREgO
-	 QKDMwnWXkXAwkxEdPJSGB2vc5JyhZrOyI66Sg1o/riAj47ZxATmiDMp+wCiPgDv3VA
-	 NvikKHTHRlAfhRw8nFz9KHNsm1ZxGUoIK5g41CeA3yek6y7XjwUrWFcHqbvPLrL/y4
-	 s7/I7FCUacl9uV8KcSyHDBz9w8po0I7WKErvI8aRfNXnLNHFyMU3QZ1JDLQ/uy/5rT
-	 Qcf91iG7jXEiQ==
-Date: Thu, 18 Sep 2025 20:06:06 +0100
+	b=O9WnJ5fkhNYH3JTptjLK9oyXJgL9XM4u3NQMviefKGT0ACqwsosPKXEr6XR2CNFYv
+	 alm73Mmqcpnv5YJ1LormxgrLP745lglkCDYTggX+MFKOTCNfDdMJaNCuTIQpqHHZXI
+	 TmUyQ5vs9yK+tFXJ19BJtGFr0z5ws1a29MQYNOm6swKdGkTnzXIPCJ5gex95Ke3W4V
+	 loB+RN2zpZKVlhvd+rlFJfUQusiCQPeQAvo40hojXOyjMUAfncC8p1SpW5MhXdq/bK
+	 9TC8sHa/15nJ5ZZ00ksmEg/5FFMe4X0bdsDieCZ7RW+ZYaGjY2b/BrnahBe9kjYAJ1
+	 Jlth69CRQ/M6A==
+Date: Thu, 18 Sep 2025 20:06:47 +0100
 From: Simon Horman <horms@kernel.org>
 To: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -50,13 +50,12 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
 	vikas.gupta@broadcom.com,
 	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [v7, net-next 01/10] bng_en: make bnge_alloc_ring() self-unwind
- on failure
-Message-ID: <20250918190606.GA589538@horms.kernel.org>
+Subject: Re: [v7, net-next 08/10] bng_en: Register rings with the firmware
+Message-ID: <20250918190647.GB589538@horms.kernel.org>
 References: <20250911193505.24068-1-bhargava.marreddy@broadcom.com>
- <20250911193505.24068-2-bhargava.marreddy@broadcom.com>
- <20250916151257.GI224143@horms.kernel.org>
- <CANXQDtbXG2XjBa2ja1LY7gdALg-PnEyvQBWPAiXQqD0hvtwp=g@mail.gmail.com>
+ <20250911193505.24068-9-bhargava.marreddy@broadcom.com>
+ <20250916155130.GK224143@horms.kernel.org>
+ <CANXQDtYdxMq_EAPqu_WvnYqZ5SKW2k139Hwm+jW=kZpSQQgRtQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,30 +65,57 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANXQDtbXG2XjBa2ja1LY7gdALg-PnEyvQBWPAiXQqD0hvtwp=g@mail.gmail.com>
+In-Reply-To: <CANXQDtYdxMq_EAPqu_WvnYqZ5SKW2k139Hwm+jW=kZpSQQgRtQ@mail.gmail.com>
 
-On Thu, Sep 18, 2025 at 03:20:09PM +0530, Bhargava Chenna Marreddy wrote:
-> On Tue, Sep 16, 2025 at 8:43 PM Simon Horman <horms@kernel.org> wrote:
+On Thu, Sep 18, 2025 at 04:11:12PM +0530, Bhargava Chenna Marreddy wrote:
+> On Tue, Sep 16, 2025 at 9:21 PM Simon Horman <horms@kernel.org> wrote:
 > >
-> > On Fri, Sep 12, 2025 at 01:04:56AM +0530, Bhargava Marreddy wrote:
-> > > Ensure bnge_alloc_ring() frees any intermediate allocations
-> > > when it fails. This enables later patches to rely on this
-> > > self-unwinding behavior.
+> > On Fri, Sep 12, 2025 at 01:05:03AM +0530, Bhargava Marreddy wrote:
+> > > Enable ring functionality by registering RX, AGG, TX, CMPL, and
+> > > NQ rings with the firmware. Initialise the doorbells associated
+> > > with the rings.
 > > >
 > > > Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 > > > Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
 > > > Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 > >
-> > Without this patch(set), does the code correctly release resources on error?
+> > ...
 > >
-> > If not, I think this should be considered a fix for net with appropriate
-> > Fixes tag(s).
+> > > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_db.h b/drivers/net/ethernet/broadcom/bnge/bnge_db.h
+> > > new file mode 100644
+> > > index 00000000000..950ed582f1d
+> > > --- /dev/null
+> > > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_db.h
+> > > @@ -0,0 +1,34 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > +/* Copyright (c) 2025 Broadcom */
+> > > +
+> > > +#ifndef _BNGE_DB_H_
+> > > +#define _BNGE_DB_H_
+> > > +
+> > > +/* 64-bit doorbell */
+> > > +#define DBR_EPOCH_SFT                                        24
+> > > +#define DBR_TOGGLE_SFT                                       25
+> > > +#define DBR_XID_SFT                                  32
+> > > +#define DBR_PATH_L2                                  (0x1ULL << 56)
+> > > +#define DBR_VALID                                    (0x1ULL << 58)
+> > > +#define DBR_TYPE_SQ                                  (0x0ULL << 60)
+> > > +#define DBR_TYPE_SRQ                                 (0x2ULL << 60)
+> > > +#define DBR_TYPE_CQ                                  (0x4ULL << 60)
+> > > +#define DBR_TYPE_CQ_ARMALL                           (0x6ULL << 60)
+> > > +#define DBR_TYPE_NQ                                  (0xaULL << 60)
+> > > +#define DBR_TYPE_NQ_ARM                                      (0xbULL << 60)
+> > > +#define DBR_TYPE_NQ_MASK                             (0xeULL << 60)
+> >
+> > Perhaps BIT_ULL() and GENMASK_ULL() can be used here?
 > 
-> Thanks for your feedback, Simon. This patch doesn't introduce a fix;
-> the code already frees resources correctly.
-> Instead, it modifies error handling by changing from caller-unwind to
-> self-unwind within this function
+> Thanks for the suggestion, Simon. Some macros have non-contiguous
+> bits, requiring combinations with "|",
+> which would make the definitions longer and harder to follow. Since
+> these Doorbell Register (DBR) values
+> are hardware-specified, I believe it's better to keep them as they
+> are. Please let me know if you see any issues.
 
-Thanks for the clarification.
-In that case, this looks good to me.
+Thanks, understood.
+If you prefer the current approach, that is fine by me.
 
