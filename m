@@ -1,118 +1,112 @@
-Return-Path: <netdev+bounces-224315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB016B83B82
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:13:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2403B83BBE
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:16:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79E551C07F88
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:14:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA32F1C21E56
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA9E2FE564;
-	Thu, 18 Sep 2025 09:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6803009F7;
+	Thu, 18 Sep 2025 09:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VwC2kYCD";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kRC17PKP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQor4PqF"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECCD2FF16D;
-	Thu, 18 Sep 2025 09:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74676301025
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 09:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758186826; cv=none; b=Ve2cYQFW5ypKT8sZwxqVG/Oucw4COn3wXADCu1KK8evbE0Y0To1atUfEuGxYAbkbqe41q1WyqGFAXuEA53LbNgpfEiJ3DFMlqNCRk4sxmBm8obHmEnOg9s2ZL3go3VDA+92nuPDfhvK9NNrMCeFG6tgk1NDhcOi9q1q4X0m4eMc=
+	t=1758186975; cv=none; b=abC2ajrwPSKPTXhBdMMN0TSpTZ28bZCTwzDhFg8cszxKr8GnpHQN8fhGw1bWnU2jEmCcjP311afFqm6HvUqElWuIfUE9jlSj3vweF1otJDjkWiPp0VaGipwNNClixnksm8cu5LIttCMqenrCMBZkcAG5tN3jUmDA7i17dx+cSYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758186826; c=relaxed/simple;
-	bh=v5M0KVbOs0+0BL/1Au1GWe2T0G2C337d/G6AKfJclMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DK2URKc6+0l2bV0MR/mbFpNYB0/VlOCl/9wmhV94drgOjxPMS5YR3Emzzun9Fg1/Pn4De9q36xMKS5KEvjRLdIYNs8uhGtjrieBQYgFeSh8rwjMXGKlAontDlVUj+wVCMOcNR3QMk9ldJpNGWbsENKukq7yyOgA4/cM8XXLKaeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VwC2kYCD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kRC17PKP; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 18 Sep 2025 11:13:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1758186822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4rI6MarwTjIECPHNDT6nYXfKNfdgGybieY2MAwuVSSU=;
-	b=VwC2kYCDnAmg7pqSUYgyWBaXT8jlTN+tC/5v2iKarJs6pN1KFhddN8J8PpMjDyfz3ooJpv
-	vZjzaSw7uW+bPNTipxB1bN3vnaF0hNbBwIF5jjNEM4Sp6pMRIoZ8umTBnSr4FiMaxZ7K9v
-	6NA+YTNS4rFP6sYbT4l9dhruFjVGmZsB1054tGZdqUA2cIlPa4tVAZtW+u0Rcqg7X7X+5M
-	j7ZGu5ZwvZY6LXfCV7+EsKAqjmj+12qjk+b1U933BgFwpHYkb3DpS92Ov/nrbKBR6mgltG
-	eofRjuOIXU0mBiVKNQTesPlEjeJkuB43yq9x1UKqOvY0CPCJ0cR8b6hSQsIY2w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1758186822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4rI6MarwTjIECPHNDT6nYXfKNfdgGybieY2MAwuVSSU=;
-	b=kRC17PKPNGrHDCN1JtgSeQoLHsDtQncZgecqJa9CX1g+vXf9/Nnh3VnRziDLfffITkhu9H
-	xkp6B6izdQGy/fAw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net-next] page_pool: add debug for release to cache from
- wrong CPU
-Message-ID: <20250918091341.n6_OgbOW@linutronix.de>
-References: <20250918084823.372000-1-dtatulea@nvidia.com>
+	s=arc-20240116; t=1758186975; c=relaxed/simple;
+	bh=98ttZ9eR6hr3IbsV5simrsu42v4AubUjHgHeWfeLngI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UazXBXn+ELA3G9sZ/Fzc/yrmdqJpWUiMLeFd96OpH8RxbZFRi32NDvQpSVFQM/QHNtgzENwxcuOfxPTh4sxcMB5ki0rt6B3X9xQYPSKEZ7eCcFUiOdMaWguSA+AqzmY9t4U0nYXRb1qmz7UVWEDD6gTCVh4iHOXlC/wL32FEvfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mQor4PqF; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-570d0c280e4so891776e87.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 02:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758186971; x=1758791771; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VIlkc3NgcPLT5S0ahC7Hvw1WQpOkC1g6Xkj1YjAKs/k=;
+        b=mQor4PqFw0M+qI+QzJmoH8xTPZsM42HXVEpu3SKN+MxsvfV9A+Mm5oq7qhS679SXSl
+         M+qz8DUOZ0lSUk04BbLm7zUK+wVVmFnYc64sLSrOW9uMJ8VPgEQOFTKNK9URHF7LsxtO
+         J6kh+hgeVQfXvV78ctPWZnaoRdv8aNx4V98EBlRW3QQHq1sVZw4busXV7PnepLlm4n91
+         EKOd4EeL2kIaNZQAWdmJZT+Lc5qv+6K7nMWiF1CUIiv3cpj0I11lqrvTctytrPUYlAl9
+         cc9ON/mTQoo2zazV75QG514rO8EcwcFrsRdSzy0sBGHIcc/kM4XDKMsHj2d1HRBMwZ7L
+         3mPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758186971; x=1758791771;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VIlkc3NgcPLT5S0ahC7Hvw1WQpOkC1g6Xkj1YjAKs/k=;
+        b=m/PInVBCuXp4aFiL9Q0p9wGlHOV/n+iBmvn7VEmrKNLGJNV9sUzQBz6uNGSGK6yie9
+         TX0h9FF2am4Cg5vHalIf6j34HOuORvX8kkX7gEOy7SizRwiWK7Aic45zwMElZwGvieQy
+         KzIT8ZO7T6f3tg65oERIQnDtirdCkjlpgvJHGcPd4YXX+VD+g74oqO2SY15STf+jGe1b
+         ih4Eki2D08uCYI+ZzTukqzd1e878UUUrTLw1uxd20g1fvmjeVXYYvdJ//iI/QpfpXDh7
+         BzYpkL+jMpdRWipzHSdOkpqSnGJHi6hipGB50C8cPL93bJXzZN34eEaq/MoR2tSVLC7M
+         l1lw==
+X-Gm-Message-State: AOJu0YzOCSa1u5IvMIhhG6YKL8y0NAI8hy4+g3bqIqLSsDgZIXJC2yIK
+	bteCP6Srcl7OnyHyckV82oBNpuexbeXeonDzxCZaS634ovVIeYrS50Vk6k5SWW2Q
+X-Gm-Gg: ASbGnctaNj57PpBXf/o4JCGLTosr//e3esgyBiua53oFBUKwKPZ2hIG4NQAXB27FaV2
+	NOIDo79sXO9hWC5oYYmu3hW8fHzit0+hwTooQfQF3quG40I84wD8Z740icX96WHxWnNdkrUqwJr
+	IWXsAZCQw+PGdGBcem8WNaE7FbNuwoecJ9qdx92RqCmg5u4T4I/wyGZtKKZmZx4ekAuM6aVLpPh
+	VpNhHzbHmu5FYzjmMGncuLbll0MxiKmWrSTgI9rZTe+Vb5YZNJfNnOomTDEvkjZaptY1z7TVtPv
+	u7+aV0cqSH4jXk8biNdm/K50au3XFBhTZxGtBssHarchN9PkgRf136ZQrJNVk01HtvQnfpNW02q
+	RDciIStLTrywtLl2NFvvvh/WcAr5YiEDZtIrt7MGxROmo9f+PROuLfVLxXsgoITsBN/LpTUHobw
+	==
+X-Google-Smtp-Source: AGHT+IHJv7z9kXEmV1yxyHzlOQKZQwKv5LmhZV0vksquca82KneC8BfNOeaB8qm7yBwCzEoLIevJYA==
+X-Received: by 2002:a05:6512:6090:b0:55f:4b01:30ab with SMTP id 2adb3069b0e04-577943b9964mr1578614e87.0.1758186970808;
+        Thu, 18 Sep 2025 02:16:10 -0700 (PDT)
+Received: from X220-Tablet.. ([176.106.253.74])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-578a65070c4sm522846e87.34.2025.09.18.02.16.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Sep 2025 02:16:09 -0700 (PDT)
+From: Denis Kirjanov <kirjanov@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	dsterba@suse.cz,
+	Denis Kirjanov <kirjanov@gmail.com>
+Subject: [PATCH] MAINTAINERS: update sundance entry
+Date: Thu, 18 Sep 2025 12:15:56 +0300
+Message-ID: <20250918091556.11800-1-kirjanov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250918084823.372000-1-dtatulea@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On 2025-09-18 11:48:21 [+0300], Dragos Tatulea wrote:
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index ba70569bd4b0..404064d893d6 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -768,6 +795,18 @@ static bool page_pool_recycle_in_cache(netmem_ref netmem,
->  		return false;
->  	}
->  
-> +#ifdef CONFIG_DEBUG_PAGE_POOL_CACHE_RELEASE
-> +	if (unlikely(!page_pool_napi_local(pool))) {
+Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+---
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-if you do IS_ENABLED(CONFIG_DEBUG_PAGE_POOL_CACHE_RELEASE) you could
-avoid the ifdef.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6bbe4b4f8ec0..5e975d90480c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -24259,7 +24259,7 @@ F:	Documentation/devicetree/bindings/input/allwinner,sun4i-a10-lradc-keys.yaml
+ F:	drivers/input/keyboard/sun4i-lradc-keys.c
+ 
+ SUNDANCE NETWORK DRIVER
+-M:	Denis Kirjanov <dkirjanov@suse.de>
++M:	Denis Kirjanov <kirjanov@gmail.com>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	drivers/net/ethernet/dlink/sundance.c
+-- 
+2.43.0
 
-A quick question, where is this allow_direct argument supposed to come
-from? I just noticed that mlx5 does
-   page_pool_put_unrefed_netmem(, true);
-
-which then does not consider page_pool_napi_local(). But your proposed
-change here will complain as it should.
-
-> +		u32 pp_cpuid = READ_ONCE(pool->cpuid);
-> +		u32 cpuid = smp_processor_id();
-> +
-> +		WARN_RATELIMIT(1, "page_pool %d: direct page release from wrong CPU %d, expected CPU %d",
-> +			       pool->user.id, cpuid, pp_cpuid);
-> +
-> +		return false;
-> +	}
-> +#endif
-> +
->  	/* Caller MUST have verified/know (page_ref_count(page) == 1) */
->  	pool->alloc.cache[pool->alloc.count++] = netmem;
->  	recycle_stat_inc(pool, cached);
-
-Sebastian
 
