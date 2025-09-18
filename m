@@ -1,109 +1,146 @@
-Return-Path: <netdev+bounces-224275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEFF2B83694
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DDC1B836AC
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0F811C81C84
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:02:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA5D81C81C43
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0D02EB85E;
-	Thu, 18 Sep 2025 08:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8DF2EFDBA;
+	Thu, 18 Sep 2025 08:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qMDEwphS"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="XPy0yXI+"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458BB2BE7BE;
-	Thu, 18 Sep 2025 08:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B802EE272;
+	Thu, 18 Sep 2025 08:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758182503; cv=none; b=eSfb5QXFcteQnZMw9EMQzdO545AGoKA6vry5vA/mZdU13PAe/yNE4/UYUF2ZD3NGzjIQ7UEXHcTN0QYDaBuK205oqg+Yco8XWttIpZ9L8GD2Aa0Za/ClQo5FT6jQ/U5dD3ScsQINGI6VjZAfmpq2LaeKZ/Hmk0vwdf/tCpEa9gk=
+	t=1758182638; cv=none; b=KY2zEwTN0S2Qy0gVmfFouB1FrYSOlSRc12xarHSC4IRSxBUHtxUkkwAV0JP/kKQTu+ohQIuws5OFrAFUw+vacnxXM5vIk1RmsvduMil1Ud2ckQOI2AoVEA+PKjAbXfMv94b+idRCjKiRXQATEJ2lsHm97QqFyjjziKgmmfO2hfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758182503; c=relaxed/simple;
-	bh=GitsJ9J2ZxRBpzFRs9d6d4RHKJvAuTWGEya7GTtLh3Y=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OOGuJGGsOpSHKSA/BZ2UmM7L/NQGkfayyDjw6ISuriGBQgzf8b86XOJdYYmQNblizLH608SuDLcFIC2ITOvfb7s3Ll1jpkBxxoxSoo1iLtzWfU4VowtMNvbvzSJEl2iXJ3/wEm8oNTC3whGAYU4RuNHq5VutMRZKixd64Cw1roE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qMDEwphS; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1758182501; x=1789718501;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GitsJ9J2ZxRBpzFRs9d6d4RHKJvAuTWGEya7GTtLh3Y=;
-  b=qMDEwphSj7uYkllYNTvjq+G2OIq5FOakF5PMJmSs2IymF+wIOYH9Gy/p
-   MNv6+XkJCWW6kpl4+PM5tL1HeRgKzCTrM3vRREkSjvnTc88l3MH9Owv7a
-   PzOvrQCR3jfNkyomj3DT9xT6BSWiDmFmSBQpZYOS/iACkndm0/gyvp29T
-   ZJf9/6/NCwEv5jgfbvdt0QBKh1Bd3iYLlmhERE0p5QdR04x0liTXMBsMj
-   px44CfBEAsoJJk6EGAGjd5N/NIES7zZv/lJNkoGg5o8aagP7yrHRSGfyg
-   tXG+bA5rCbSmK5G7LiXl3duLV/1FndyXz9oXm7fgAh0TI11XABDvuA3Hc
-   A==;
-X-CSE-ConnectionGUID: hokfViyiR5iF+MmU87atWw==
-X-CSE-MsgGUID: TamkIHysT26rgc6+80UfDA==
-X-IronPort-AV: E=Sophos;i="6.18,274,1751266800"; 
-   d="scan'208";a="46084901"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Sep 2025 01:01:35 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 18 Sep 2025 01:01:04 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Thu, 18 Sep 2025 01:01:02 -0700
-Date: Thu, 18 Sep 2025 08:01:01 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Robert Marko <robert.marko@sartura.hr>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <Steen.Hegelund@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<luka.perkov@sartura.hr>, <benjamin.ryzman@canonical.com>
-Subject: Re: [PATCH net-next] net: ethernet: microchip: sparx5: make it
- selectable for ARCH_LAN969X
-Message-ID: <20250918080101.ejpdio7bxary44rj@DEN-DL-M70577>
-References: <20250917110106.55219-1-robert.marko@sartura.hr>
+	s=arc-20240116; t=1758182638; c=relaxed/simple;
+	bh=YQZTH7tPL5tZOiDigTtIiUXnn7Zl/OqHBVf/WRWvy6E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rBrPJPDGbMb5vAxvtrOoAhbIzGHjWqJ5gE5ENKuMM5YMnAQO2ePDPajOPD8m1aKhenuFLvEqge+KL4AAxc9m+1SEn2JuIVW5sWcvYE9O03dJM3UF3TOe8UdhiiH4mhlW4PegUnSJPbxdS5RntdlAfBVRbto3EJTdEHAW+rF9vno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=XPy0yXI+; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1758182627; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=o8zVttKRsDZXMwAMsefgpttoLLuOJgFi3OBVDXrLxLA=;
+	b=XPy0yXI+VKFx1rEAnVYam6AopG2UyZ/bVTc5JPYb6zo3NAaVH971WOqnttHLq5eflayqZm8GI37RscD0H+ktVP8ZnWO5WMIPigESe8fwCdcfBSxF2rvAKmpqhBKdEX3WwkSfpoE+QnPoQJz3l3o7jq+llAuVdEC/wKNpfQqIw5A=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WoFEU0W_1758182622 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 18 Sep 2025 16:03:45 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	pabeni@redhat.com,
+	song@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	yhs@fb.com,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	jolsa@kernel.org,
+	mjambigi@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: bpf@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	sidraya@linux.ibm.com,
+	jaka@linux.ibm.com
+Subject: [PATCH bpf-next v2 0/4] net/smc: Introduce smc_hs_ctrl
+Date: Thu, 18 Sep 2025 16:03:37 +0800
+Message-ID: <20250918080342.25041-1-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250917110106.55219-1-robert.marko@sartura.hr>
+Content-Transfer-Encoding: 8bit
 
-> LAN969x switchdev support depends on the SparX-5 core,so make it selectable
-> for ARCH_LAN969X.
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
->  drivers/net/ethernet/microchip/sparx5/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/sparx5/Kconfig b/drivers/net/ethernet/microchip/sparx5/Kconfig
-> index 35e1c0cf345e..a4d6706590d2 100644
-> --- a/drivers/net/ethernet/microchip/sparx5/Kconfig
-> +++ b/drivers/net/ethernet/microchip/sparx5/Kconfig
-> @@ -3,7 +3,7 @@ config SPARX5_SWITCH
->         depends on NET_SWITCHDEV
->         depends on HAS_IOMEM
->         depends on OF
-> -       depends on ARCH_SPARX5 || COMPILE_TEST
-> +       depends on ARCH_SPARX5 || ARCH_LAN969X || COMPILE_TEST
->         depends on PTP_1588_CLOCK_OPTIONAL
->         depends on BRIDGE || BRIDGE=n
->         select PHYLINK
-> --
-> 2.51.0
->
+This patch aims to introduce BPF injection capabilities for SMC and
+includes a self-test to ensure code stability.
 
-Reviewed-by: Daniel Machon <daniel.machon@microchip.com> 
+Since the SMC protocol isn't ideal for every situation, especially
+short-lived ones, most applications can't guarantee the absence of
+such scenarios. Consequently, applications may need specific strategies
+to decide whether to use SMC. For example, an application might limit SMC
+usage to certain IP addresses or ports.
+
+To maintain the principle of transparent replacement, we want applications
+to remain unaffected even if they need specific SMC strategies. In other
+words, they should not require recompilation of their code.
+
+Additionally, we need to ensure the scalability of strategy implementation.
+While using socket options or sysctl might be straightforward, it could
+complicate future expansions.
+
+Fortunately, BPF addresses these concerns effectively. Users can write
+their own strategies in eBPF to determine whether to use SMC, and they can
+easily modify those strategies in the future.
+
+This is a rework of the series from [1]. Changes since [1] are limited to
+the SMC parts:
+
+1. Rename smc_ops to smc_hs_ctrl and change interface name.
+2. Squash SMC patches, removing standalone non-BPF hook capability.
+3. Fix typos
+
+[1]: https://lore.kernel.org/bpf/20250123015942.94810-1-alibuda@linux.alibaba.com/#t
+
+v2 -> v1:
+  - Removed the fixes patch, which have already been merged on current branch.
+  - Fixed compilation warning of smc_call_hsbpf() when CONFIG_SMC_HS_CTRL_BPF
+    is not enabled.
+  - Changed the default value of CONFIG_SMC_HS_CTRL_BPF to Y.
+  - Fix typo and renamed some variables
+
+D. Wythe (4):
+  bpf: export necessary symbols for modules with struct_ops
+  net/smc: bpf: Introduce generic hook for handshake flow
+  libbpf: fix error when st-prefix_ops and ops from differ btf
+  bpf/selftests: add selftest for bpf_smc_hs_ctrl
+
+ include/net/netns/smc.h                       |   3 +
+ include/net/smc.h                             |  53 +++
+ kernel/bpf/bpf_struct_ops.c                   |   2 +
+ kernel/bpf/syscall.c                          |   1 +
+ net/ipv4/tcp_output.c                         |  36 +-
+ net/smc/Kconfig                               |  10 +
+ net/smc/Makefile                              |   1 +
+ net/smc/af_smc.c                              |  10 +
+ net/smc/smc_hs_bpf.c                          | 137 ++++++
+ net/smc/smc_hs_bpf.h                          |  31 ++
+ net/smc/smc_sysctl.c                          |  91 ++++
+ tools/lib/bpf/libbpf.c                        |  37 +-
+ tools/testing/selftests/bpf/config            |   4 +
+ .../selftests/bpf/prog_tests/test_bpf_smc.c   | 396 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/bpf_smc.c   | 117 ++++++
+ 15 files changed, 896 insertions(+), 33 deletions(-)
+ create mode 100644 net/smc/smc_hs_bpf.c
+ create mode 100644 net/smc/smc_hs_bpf.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+
+-- 
+2.45.0
+
 
