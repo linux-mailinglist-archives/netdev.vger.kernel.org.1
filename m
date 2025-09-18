@@ -1,124 +1,79 @@
-Return-Path: <netdev+bounces-224587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78B3EB8663E
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:11:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AFB07B86681
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:23:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3974D4E280E
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:11:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70390587176
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FEB2D193C;
-	Thu, 18 Sep 2025 18:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2E928C03B;
+	Thu, 18 Sep 2025 18:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Vkm+kIAv";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3hyIwmIB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkUaf0vI"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7072A20B22;
-	Thu, 18 Sep 2025 18:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AB7145B16;
+	Thu, 18 Sep 2025 18:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758219111; cv=none; b=I7scrJCk2VN1Q5UjYvcPdeHAYuE4e6EfhARJFGS/OXjwYTz4eyriUCyOd2xBi6N+3oGLrBvpthW8ddbywATO/68SDu7+1vMtPcBQYwN9jJwwiG7DcsrDAfm2JSNGAFgT5O08dKaJhfjAHYHGm1FazD/JvIr7NIU/l7ky8lHXEXk=
+	t=1758219794; cv=none; b=O83d20eB39Cy3Z/zpBWsvqQyvVqtB2HX58fW8xqgylTb9xZqUP/C4j7PQC46RHiei4PIPnDO60kSiAddmj98eg1CmXXdRRMmdOpyrIm7V/qZVJOZWt2GANNkf0x6+nmyFAQbONVYme6N1XVUXr33svf9VVy8gePPykmhoCrE9iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758219111; c=relaxed/simple;
-	bh=FDj0o4uvGmvVWSbb4/BTil/cWx+IZKPSGgi0hq+daHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=axph9NRgkjeQ4G69mZaTD/j8yQQiP5/m4jR9TEUjtcy/fUtOh91cFRhx88/feAh/mnXzDuvIjdWqPje25ucw3+0LuHbw8PsG/j/TMhZoIcyuqvWacBd65rvVZxrmoCpdce3Qxq5ZVK/T2+8/5I4G56znhjlwFHqOg4hmGGJv79Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Vkm+kIAv; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3hyIwmIB; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 18 Sep 2025 20:11:44 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1758219106;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WylLr81+eOUPKIEZ98NrrKbcMLPx3p4b8pKON1aZeSU=;
-	b=Vkm+kIAvqYLsuPDTVjneg0VmIxPizaPJECAdq+snDUxnq0OF1vVxS2DAgEQriq9OKLoLOU
-	DNM6klCbIcD5Vvn2GyqXM4EaKL+wpRTW54/H2FSZIvBtgQWTeY1XR6vkBf2ayFz+Lg6SVw
-	nQ7aK5XufuVOZfOrPbeUhwoZzBUb20r/RKSPIRZZmDOWMRU7veZmi9L+VbHAHf8ijgsuHD
-	0ilRIWMNrGo2Iv62DtHPaxdIhpvCrnXNQFisb+3oW8GUA9vxhdoDToELmEaLXj6r+xb5Nv
-	LQhxTbs8+6ceBh1hUx03XLJb/6jio+kPPfY5e7d7HoICdQZQwMJV5C2SKhi4mw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1758219106;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WylLr81+eOUPKIEZ98NrrKbcMLPx3p4b8pKON1aZeSU=;
-	b=3hyIwmIBAnIpY8l7Z3ElWrWZYqYGI6KvKJ1KIj+Uc4TUCDH1jjHKj5M8WqUR2h3Cboynbs
-	RFV6WdaP53YjcFCQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] vhost: Take a reference on the task that is reference in
- struct vhost_task.
-Message-ID: <20250918181144.Ygo8BZ-R@linutronix.de>
-References: <20250827194107.4142164-1-seanjc@google.com>
- <20250827201059.EmmdDFB_@linutronix.de>
- <20250918110828-mutt-send-email-mst@kernel.org>
- <20250918154826.oUc0cW0Y@linutronix.de>
- <20250918120607-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1758219794; c=relaxed/simple;
+	bh=CJdLFLoYwtICAPEYTDkI6w8fMoAoBg+xEeLWAL4/m9w=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=YGS/zaGi+en2g0qiFbUUw4RjzauAR3io5lY9WTsTdGpjQEhtA/0jhPPQrDdh9zj39afq1MxcysgHoovC7kAewKcB7WbEdOO0mzcXdZ7v/MlgXjVO0LhN9GaHtbgYE4Dn0UqsdMCNlN+jficTSG9gUExWhGMwrwNAbJ7ORjR5RAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkUaf0vI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 708E8C4CEE7;
+	Thu, 18 Sep 2025 18:23:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758219794;
+	bh=CJdLFLoYwtICAPEYTDkI6w8fMoAoBg+xEeLWAL4/m9w=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=mkUaf0vIvuWdk5tBcY4rDJDdfe95sa33X+IHGiwCnE6znQOUe1XiQ7qvyhQpfJqac
+	 V3GRS4q3uLNBPUKwF5qocpufSIN9sil5r5JFI1hwCfiGo2Y3fokbzaKHO19XEvlbw2
+	 lWAyxJhiZ3/icyHUTK8vUn04Co0VgevhGm83efvF1c2mjkdhxzVmlVfrCibTrXawXW
+	 MMwSMEkrAHh4RuW1mmhHzXB3Kv0c/9AXBDeOdsaKRL76ALQr84ZJEWETgF9DxdICzg
+	 RB02OMQ5zSAaI7Fi7F8IleB3ABxQT/e7w/xhIq+BidYvGWwctjTd3Et0dj3fiiZ2Je
+	 uhDJozKfX9LcA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE23839D0C20;
+	Thu, 18 Sep 2025 18:23:15 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.17-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250918153538.192731-1-kuba@kernel.org>
+References: <20250918153538.192731-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250918153538.192731-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc7
+X-PR-Tracked-Commit-Id: f8b4687151021db61841af983f1cb7be6915d4ef
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: cbf658dd09419f1ef9de11b9604e950bdd5c170b
+Message-Id: <175821979423.2895822.9377376181467206062.pr-tracker-bot@kernel.org>
+Date: Thu, 18 Sep 2025 18:23:14 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250918120607-mutt-send-email-mst@kernel.org>
 
-vhost_task_create() creates a task and keeps a reference to its
-task_struct. That task may exit early via a signal and its task_struct
-will be released.
-A pending vhost_task_wake() will then attempt to wake the task and
-access a task_struct which is no longer there.
+The pull request you sent on Thu, 18 Sep 2025 08:35:38 -0700:
 
-Acquire a reference on the task_struct while creating the thread and
-release the reference while the struct vhost_task itself is removed.
-If the task exits early due to a signal, then the vhost_task_wake() will
-still access a valid task_struct. The wake is safe and will be skipped
-in this case.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc7
 
-Fixes: f9010dbdce911 ("fork, vhost: Use CLONE_THREAD to fix freezer/ps regression")
-Reported-by: Sean Christopherson <seanjc@google.com>
-Closes: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com/
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- kernel/vhost_task.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/cbf658dd09419f1ef9de11b9604e950bdd5c170b
 
-diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
-index bc738fa90c1d6..27107dcc1cbfe 100644
---- a/kernel/vhost_task.c
-+++ b/kernel/vhost_task.c
-@@ -100,6 +100,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
- 	 * freeing it below.
- 	 */
- 	wait_for_completion(&vtsk->exited);
-+	put_task_struct(vtsk->task);
- 	kfree(vtsk);
- }
- EXPORT_SYMBOL_GPL(vhost_task_stop);
-@@ -148,7 +149,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
- 		return ERR_CAST(tsk);
- 	}
- 
--	vtsk->task = tsk;
-+	vtsk->task = get_task_struct(tsk);
- 	return vtsk;
- }
- EXPORT_SYMBOL_GPL(vhost_task_create);
+Thank you!
+
 -- 
-2.51.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
