@@ -1,61 +1,50 @@
-Return-Path: <netdev+bounces-224611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF29DB86EA3
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 22:33:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277BBB86EE2
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 22:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A2DC1BC253C
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:34:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E69151C87C5A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6B32EACF3;
-	Thu, 18 Sep 2025 20:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F402EFDB1;
+	Thu, 18 Sep 2025 20:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mfU0A6Fn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1b2fAVN/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FDB2D63E4
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 20:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF5B22D7A1
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 20:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758227615; cv=none; b=pL4KhfHjv+00gjvlo/ceMgBXpJ2CmM0Mfalh5zV/cCDe//SnmtUty0V8wMc8n9CP53+82axGsoMN7Yes+fct8LalHMXn9ZWN3mJ/Iom2fUt9i49rNlQrvYct+nDTxdQEYx21A4nQGX1krkqSvOWypjuK2iOpq8d8vBb1CQWZtvM=
+	t=1758227910; cv=none; b=pvZWiOCZqmt8NriQlDcosjy523aHuDwspD8xy0vi1VhAjOtL3hEEOld7EiYTfpOCCbRQtXtQxhOkmuavBm6KU+/UBeyv9lFV6XlQ46N0zaxXRTE98XmHNWrtd+Vv84pZTK2X5RNbl57v3Wm/AvA8xoO0IkeykGtin9AUD9ZpJow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758227615; c=relaxed/simple;
-	bh=nLYn6PL0mHXKcvdGMKCiFs8JnrZRHrwFk+5bwFVPUjs=;
+	s=arc-20240116; t=1758227910; c=relaxed/simple;
+	bh=hrsKWnTQ0PNsXbMEb/LIFyMTwebl1ydbZtBV/7P/jbA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FYdcmXLwuKWEa67cBrhyOJIqRggnz0rLL0+83w2mT8htdcHmzVqvMzImd9CqpPK4pT/KrWlmuXu19vbI+EikQiY3nh20aZxLvqIFqfZJszpzMq5HDoXSCyzwNI6qn1XCE0NGPPLhrLxYxD8q+HcZRjSfbMe3238DEIbtkWgvBCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mfU0A6Fn; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wK57dgWVpMmulX+ZOs5o8wOp1BZEg0cFaZiFXUtxZng=; b=mfU0A6Fn8dSYv9axll2oxSQKol
-	sbc+Bdnsfgc9SUkyuvRKMaDVkZU/NkCnnNzaOMDSh44BcfQRqnZrD8TSLv5FhVBTlHhOkMOvoZ0Qt
-	22mmmaXY7c6dfVi+GBdslImPAUmJzLlDnJSNGoywNr1NR1TVMZGbWVU7sRaafKjBOGdZ+E+biaS/I
-	DEbC+ep77yhZ5Sxz3GpU/uAjZApWCEcc1GIInbHBO08kjLZGYw06olDl1C9ZlO86qtgQONZcn+QrR
-	eesqfTFuqR0fK61bGJV5G1bZpF923+0XVyi8E9Rd7MD3/s9BSy6/JGBA0HgUqpuk3EZgyWcG8WO8k
-	jVAh5lUQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33094)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uzLJq-0000000028w-0xfm;
-	Thu, 18 Sep 2025 21:33:30 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uzLJo-000000001Ur-02kq;
-	Thu, 18 Sep 2025 21:33:28 +0100
-Date: Thu, 18 Sep 2025 21:33:27 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GwLclyjQ/14tS0p5GGIn3CmKPHXEQY29JmOgy1nkxqCVbcDUseUFEGbybzraURLnT1pdOutZctRhGbsEJJ9E0G3tT76MHXXE8PPjFcMM42ye1UqKgRwDj2DeEL/HhHjM/w3tB1v5hvdvYjfwzL7mqNFNib4xj//pVvFjuC0W3Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1b2fAVN/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UfJzu2rGQb0UJch70VQkkTuugIH/dfMRyWL6+VWVqYQ=; b=1b2fAVN/SceLIEOd52yVXTzMnP
+	fqW2tIlsbQF6tDLTCpHFL58XDvBuY0HA2t1m72kX3qAoWTOWo36OZsO+39Bd86dHy3CP2ZZ8rQNbb
+	2KvIuXF4lG0b3/bv468u3cxZ87v/F6EcRnifhqbEIq3S/p+ich3x/mvHY38hyRJX0ISA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uzLOZ-008sHr-Iw; Thu, 18 Sep 2025 22:38:23 +0200
+Date: Thu, 18 Sep 2025 22:38:23 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -63,11 +52,11 @@ Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Richard Cochran <richardcochran@gmail.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH RFC net-next 03/20] net: phy: marvell: add PHY PTP support
-Message-ID: <aMxsl4v-Aio6R20R@shell.armlinux.org.uk>
+Subject: Re: [PATCH RFC net-next 02/20] net: phy: add hwtstamp_get() method
+ for mii timestampers
+Message-ID: <3e9e7c36-cadc-4e00-ba62-e224e805b0df@lunn.ch>
 References: <aMxDh17knIDhJany@shell.armlinux.org.uk>
- <E1uzIb5-00000006mzK-0aob@rmk-PC.armlinux.org.uk>
- <299f61cc-b5a7-48a6-b16d-f1f5d639af85@lunn.ch>
+ <E1uzIb0-00000006mzE-03Vf@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,60 +65,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <299f61cc-b5a7-48a6-b16d-f1f5d639af85@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <E1uzIb0-00000006mzE-03Vf@rmk-PC.armlinux.org.uk>
 
-On Thu, Sep 18, 2025 at 10:12:02PM +0200, Andrew Lunn wrote:
-> > +static u64 marvell_phy_tai_clock_read(struct device *dev,
-> > +				      struct ptp_system_timestamp *sts)
-> > +{
-> > +	struct phy_device *phydev = to_phy_device(dev);
-> > +	int err, oldpage, lo, hi;
-> > +
-> > +	oldpage = phy_select_page(phydev, MARVELL_PAGE_PTP_GLOBAL);
-> > +	if (oldpage >= 0) {
-> > +		/* 88e151x says to write 0x8e0e */
-> > +		ptp_read_system_prets(sts);
-> > +		err = __phy_write(phydev, PTPG_READPLUS_COMMAND, 0x8e0e);
-> > +		ptp_read_system_postts(sts);
-> > +		lo = __phy_read(phydev, PTPG_READPLUS_DATA);
-> > +		hi = __phy_read(phydev, PTPG_READPLUS_DATA);
-> > +	}
-> > +	err = phy_restore_page(phydev, oldpage, err);
-> > +
-> > +	if (err || lo < 0 || hi < 0)
-> > +		return 0;
-> > +
-> > +	return lo | hi << 16;
+On Thu, Sep 18, 2025 at 06:39:02PM +0100, Russell King (Oracle) wrote:
+> Add the missing hwtstamp_get() method for mii timestampers so PHYs can
+> report their configuration back to userspace.
 > 
-> What happens when hi is >= 0x8000? Doesn't that result in undefined
-> behaviour for 32 bit machines? The u64 result we are trying to return
-> is big enough to hold the value. Does the hi need promoting to u64
-> before doing the shift?
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Good point - looking at the generated code, it gets sign-extended
-to a 64 bit value. So, hi=0x8000 results in 0xffffffff8000XXXX
-being returned.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Does it matter? There are two functions that call the cyclecounter
-->read() method. timecounter_init() sets ->cycle_last from the
-value, and timecounter_read_delta() does this:
-
-	cycle_delta = (cycle_now - tc->cycle_last) & tc->cc->mask;
-
-before updating ->cycle_last with the returned value. As the
-mask is initialised thusly:
-
-	tai->cyclecounter.mask = CYCLECOUNTER_MASK(32);
-
-this masks off the sign-extended high 32-bits, giving us back
-a value of 0x8000XXXX.
-
-So, while the sign extension is undesirable, it has no effect on
-the operation. Is it worth throwing casts in the code? I suspect
-that's a matter of personal opinion.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
 
