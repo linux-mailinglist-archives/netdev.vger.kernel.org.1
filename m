@@ -1,124 +1,103 @@
-Return-Path: <netdev+bounces-224362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DED6B840A1
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:23:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DF38B840FF
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:25:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEB377BE4B6
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:20:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D662D544413
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF39A2E040C;
-	Thu, 18 Sep 2025 10:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5397B30214D;
+	Thu, 18 Sep 2025 10:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iof7L387"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="JlbqH5kP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78CD27E7FC
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB49301704;
+	Thu, 18 Sep 2025 10:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758190818; cv=none; b=Muwn7LZ9G6qvPb6NtMviE3AKdxUjGUiPUgUU0vVJmdfAKrR1THlf1k1Jo5x71W5QinchxeHSdpZfVEwa8rEIqJii/S4H7I3EdP4CWW7PH4xiKlKtDSSOwQ0u5LJFLgLa4WQgiNs8SbUbxHNr/S+y4/KRR41fM32GLPW/Gk7erNs=
+	t=1758190918; cv=none; b=AvhWU7odjD5uECngmlw+I24M3BIfkphm0mnDCMQxNUVdIefXtMkctiNlw/NLAV4L1D49YWqhV3vuFnbop89qejWlHzaILPEeB1pxeyWzd+W+zKkllccoTD7suH1FTTNJzqB7zBklyOuO2Pv8aKSRGC7vzbnUT7rtNvWsf5cdvlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758190818; c=relaxed/simple;
-	bh=pREYdj7nvkNdpges0cXDiqZPr8+LSXMzC4W3szojw50=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LivzoP0sT2IHhC5UT+w15ixUybYREd2Z2UbP32HaBYAHzMw+nr6uEOrBIYzUIl7rPH8EnKYhHTZutagacLcm7pdE9rdQrbIt+p6MT8hopQGlW0Ib839pxPpfAB7U3PtPrl1u7U9RdVyiD/8Adsh6od1OJARfo2bavBh+mivdWrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iof7L387; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D06ECC4CEE7;
-	Thu, 18 Sep 2025 10:20:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758190815;
-	bh=pREYdj7nvkNdpges0cXDiqZPr8+LSXMzC4W3szojw50=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iof7L387+nbnpsTlZlwOkyD9E/8c9cqaOwPHZd62+deF5lu6yIHB9GxUZNhvU+0i6
-	 kqT7Bi3z8dWf4Nm+KAmg2MuSBr0KHDcqDddAZZJiN8d1BrJrr/9cKeJqafZ9/TpabJ
-	 H5HpVrrs4q2FURR7fBsqO1LvX/ZdnfoEbKz42CsYIfbPSJj3x6hKQ0D3UcZQWw5P6r
-	 6Tyn19z5Xj/oTlNBB7wB1Bk0TiO3nehEhFx/xUkkmVsBpPitt6I4aOL/0XlBP38FM7
-	 ioeZ/sscjQmcwF4DloPAv2hnj3pRspu738/Js3PnuKZwZQoBfaYuLHYiy19Bap6nQf
-	 wWwtwLWgcQtDA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFEB39D0C28;
-	Thu, 18 Sep 2025 10:20:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758190918; c=relaxed/simple;
+	bh=JVxHPcfJfVl6A1+dmVC9RPmT2FTxshJoQpsITEGE8fw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gkIFNGP8Z/uvHKpd/Qdy468U6cg6DJ6RNiwhLWodsPZEKHuFpJLYT9U/Lz5zGls2v1Mh1I9g1Naukwdp/aK/+MNC3oBF0G7E1EOTM4RxujC5n7GKQcradYpHu6tYyhNM5ifsevOEhREHu96PFOdCN+6qmQtZUdijAvfi62Fqlj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=JlbqH5kP; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=aZv6FIi9eSL3qL8XnJAHoRLOgxGsENUIhrCigdKOHjg=; b=JlbqH5kPKBogwyqvqm+gOFw9bJ
+	JEiP18zKRxPI8FNwu2/nyDL+/WYfntAJ84yKQHfd91iHJTQo5x9J+QOENNmHf93S2VzFH0yWREr6H
+	6St3yGbjH8XpKzkbPPHo0wz/89CL9fBbLVSNBlrHmRiiUOtIzpRidFYkNzAvm28KA2UazEMfTIK+C
+	SSnYgbeUpM1EBl4oKPJrdyjnf6qsZXOYmTLrenmX6rpfBeou1SdzwVbusIolkvWtX4wR6UX1v9xuF
+	rEdR54rjDASIhOxHbYE+bzViwIoZhLb5YGYEZcJk4tfP7nlcIt5k1Q5GUX5SvY6wV52A56+kSoaJd
+	KjdbOnxg==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uzBlt-00000000gJc-2j8J;
+	Thu, 18 Sep 2025 10:21:49 +0000
+Date: Thu, 18 Sep 2025 11:21:49 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 18/33] mnt: support ns lookup
+Message-ID: <20250918102149.GH39973@ZenIV>
+References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+ <20250912-work-namespace-v2-18-1a247645cef5@kernel.org>
+ <20250916035633.GM39973@ZenIV>
+ <20250916035949.GO39973@ZenIV>
+ <20250916044648.GP39973@ZenIV>
+ <20250917-garten-nirgendwo-f65f951a9268@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/9] eth: fbnic: add devlink health support
- for FW
- crashes and OTP mem corruptions
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175819081475.2354627.7445984699761115470.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 10:20:14 +0000
-References: <20250916231420.1693955-1-kuba@kernel.org>
-In-Reply-To: <20250916231420.1693955-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- alexanderduyck@fb.com, lee@trager.us
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917-garten-nirgendwo-f65f951a9268@brauner>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-Hello:
+On Wed, Sep 17, 2025 at 11:50:29AM +0200, Christian Brauner wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> Perfect, thank you!
 
-On Tue, 16 Sep 2025 16:14:11 -0700 you wrote:
-> Add support for FW crash detection and a corresponding devlink health
-> reporter. Add a reporter for checking OTP memory health.
-> 
-> The output is not particularly exciting:
-> 
->   # devlink  health show
->   pci/0000:01:00.0:
->     reporter fw
->       state healthy error 0 recover 0 auto_dump true
->     reporter otp
->       state healthy error 0 recover 0 auto_dump true
->   # devlink health diagnose pci/0000:01:00.0 reporter fw
->    FW uptime: 0
->   # devlink health dump show pci/0000:01:00.0 reporter fw
->    FW coredump:
->       5a 45 01 00 04 00 06 00 00 00 00 00 4d 01 00 d0
->       .. lots of hex follows ..
->   # devlink health dump show pci/0000:01:00.0 reporter otp
->    OTP:
->      Status: 0 Data: 0 ECC: 0
-> 
-> [...]
+All right, #work.mount contains this now:
 
-Here is the summary with links:
-  - [net-next,v3,1/9] eth: fbnic: make fbnic_fw_log_write() parameter const
-    https://git.kernel.org/netdev/net-next/c/e6c8ab0a1129
-  - [net-next,v3,2/9] eth: fbnic: use fw uptime to detect fw crashes
-    https://git.kernel.org/netdev/net-next/c/7fd1f7bac2b8
-  - [net-next,v3,3/9] eth: fbnic: factor out clearing the action TCAM
-    https://git.kernel.org/netdev/net-next/c/504f8b7119eb
-  - [net-next,v3,4/9] eth: fbnic: reprogram TCAMs after FW crash
-    https://git.kernel.org/netdev/net-next/c/6ae7da8e9e06
-  - [net-next,v3,5/9] eth: fbnic: support allocating FW completions with extra space
-    https://git.kernel.org/netdev/net-next/c/a8896d14fc0c
-  - [net-next,v3,6/9] eth: fbnic: support FW communication for core dump
-    https://git.kernel.org/netdev/net-next/c/5df1d0a08483
-  - [net-next,v3,7/9] eth: fbnic: add FW health reporter
-    https://git.kernel.org/netdev/net-next/c/005a54722e9d
-  - [net-next,v3,8/9] eth: fbnic: report FW uptime in health diagnose
-    https://git.kernel.org/netdev/net-next/c/6da8344f92df
-  - [net-next,v3,9/9] eth: fbnic: add OTP health reporter
-    https://git.kernel.org/netdev/net-next/c/e6afcd60c26f
+commit 1b966c4471e6c3862a14f80aeb316ef636d40f84
+Merge: 57a7b5b0b6d9 38f4885088fc
+Author: Al Viro <viro@zeniv.linux.org.uk>
+Date:   Wed Sep 17 15:58:06 2025 -0400
+ 
+    Merge branch 'no-rebase-mnt_ns_tree_remove' into work.mount
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+and vfs/vfs.git #no-rebase-mnt_ns_tree_remove is 38f4885088fc
 
-
+IOW, merge it into your branch and do your regular changes on top of that -
+should be no conflicts in mnt_ns_tree_remove() after that (diff between
+no-rebase-mnt_ns_tree_remove and work.mount has nothing in that function)
 
