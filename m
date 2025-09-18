@@ -1,98 +1,129 @@
-Return-Path: <netdev+bounces-224299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE21B8396B
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:50:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9EE0B83986
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0A927AFF9A
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:48:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 521313AD10B
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759442F7446;
-	Thu, 18 Sep 2025 08:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E969E2FF144;
+	Thu, 18 Sep 2025 08:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWzYt53A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rrWsTO03"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435892FDC31;
-	Thu, 18 Sep 2025 08:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9CD2FE594;
+	Thu, 18 Sep 2025 08:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758185406; cv=none; b=Vvc79GlWF95xcDry9Y0xjxoDrYMT0pCjDOsnc2m3QiAKkkjhiRmdTnp904igIwAfwtDlzEeOLVZmJRJE6pB+x7Dd1N35P86EkI2bj5j9SebFZOoK9ZqfE79ItrQ9v55WqA3O3xHQCoyo7WHx0V+wBYBad6NISRvL6bEr3KAyY8o=
+	t=1758185490; cv=none; b=Hjwvzgw6y8winIqgNtoBFEUf6xYLeWtmt8SC6XkkpHIPTFz4wc+jqCwX0OXeobys6Y19ihDzRwSP/iFEP3gX9b4kG/Ksv6jQkB8DnHlHzP+ymMtd6G0nocYligOZfLMtGvnpHZtc1hNbh4C6yA9O9WqX5iSQs7m2VXNsmaSeqgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758185406; c=relaxed/simple;
-	bh=G1GCeshk4QsyKNSYTqiJ/79uKcB4QREhZTsb19sHev8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bt/J5v7LOh3qIhgwLv3Bmpt0whV0T4kZwaGHskhnT20CADoIHAHyj8I+Def9lzrnr2MidPrYc6ZhXLFf7tTO6NbAK3dHvd+5ekZqOw8fYLEPLipGB9FAAoV2ezALnk0jN1FVFXkGNBGjM1lYebGMR9xjk2IHU6SpHT2jJaIuq80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWzYt53A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C151BC4CEE7;
-	Thu, 18 Sep 2025 08:50:05 +0000 (UTC)
+	s=arc-20240116; t=1758185490; c=relaxed/simple;
+	bh=EOhcyQviMMRhx2W39PIzcaMVrFvf9rRwgBG7ZlEa5Qk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=niAkxSFmXvPA00pic9rjsnVSPtdUvh5W9NLJgwYlECWOcQCWgMKX7DsDorqTzB9yzk5ZMEyeWqwm9Pmm32YmnRoBBeWgIv4A542FFLiTr3su3yDaexf160dW3Ds8XZJ9+ut+NyZczFlLTHVkJdbwTpT28b0/iMnT8wwsROUKUP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rrWsTO03; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF19C4CEF7;
+	Thu, 18 Sep 2025 08:51:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758185405;
-	bh=G1GCeshk4QsyKNSYTqiJ/79uKcB4QREhZTsb19sHev8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OWzYt53AKXcVhAAcWIIkBnuz3UyDHmYsUOsxbzQm/4R5dqDCINVI5bw1GaA6aEBsF
-	 2osTHHDUcY9FWrplKoBLPjC6QEcejo+wjis5KA/R/jdxZ+GKEm72W4txsT8dD65tll
-	 EwIMmNNbjOhhagRsFE1w8N9gQQ94ozT1N3d63s8F3S/lcZHPTCtMZbvZe12msCz8gw
-	 j/7ammcOEuawuITOq3m9S0rI7JELC5OBhG9PhXjUgFuZaDMMCq6JxtFheeiL7ytK2k
-	 XhMx0kv2qYvd9RuFMF5RBhHR/xOs4tlgQ+rDvOptVbBaIvkq5rXwrUeXcSEo5d4UAj
-	 C6QhqE9gaayKg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E9639D0C28;
-	Thu, 18 Sep 2025 08:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1758185490;
+	bh=EOhcyQviMMRhx2W39PIzcaMVrFvf9rRwgBG7ZlEa5Qk=;
+	h=From:Date:Subject:To:Cc:From;
+	b=rrWsTO03uNLR2OpUo2Y+lCxaOienaLS0y3f5lE2pdbvNZrvJ9gXyEgyx6CNIHoCn/
+	 CeNwxbahgBoqvIm/FxvphGRWISHEdb8kzeOvArQLXBzZNZ4tZS9WCNn5yuifS75F/h
+	 G6vg04mIcgPZ9DHskv7HAl30TAzDvSdWpKAvAfwTH3rEPmVVAG1sb6902PZMszKkeL
+	 Mh9A9WvXDPFlxRHoLckAeMl143/a1IM8Gend6hpFpgK2va6LsQ57pYlbIM6a57UWR9
+	 b6Yd615bm8+ygtDJvLSccESMHjHv3SZ4kUk+5sZA0oN5QHvMwrFK/7uVhAgyKZkJI+
+	 CrwSaTPPanSQg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Thu, 18 Sep 2025 10:50:18 +0200
+Subject: [PATCH net-next] mptcp: reset blackhole on success with
+ non-loopback ifaces
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND net-next v2] net: renesas: rswitch: simplify
- rswitch_stop()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175818540600.2325622.11829783040903406814.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 08:50:06 +0000
-References: <20250916163516.486827-1-yury.norov@gmail.com>
-In-Reply-To: <20250916163516.486827-1-yury.norov@gmail.com>
-To: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-Cc: yoshihiro.shimoda.uh@renesas.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- nikita.yoush@cogentembedded.com, michal.swiatkowski@linux.intel.com,
- geert+renesas@glider.be, u.kleine-koenig@baylibre.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250918-net-next-mptcp-blackhole-reset-loopback-v1-1-bf5818326639@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAMnHy2gC/zWNwQqDMBBEf0X23IUkVIj+SulB46qLaRKSUATx3
+ 10ED3N4M/DmgEKZqUDfHJDpz4VjENCvBtw6hIWQJ2EwyrSq0xYDVcle8ZeqSzj6wW1r9ISZikw
+ +xjRKhZM1rtWW3qqbQWwp08z7/fSBRwLf87wAanYj6IMAAAA=
+X-Change-ID: 20250918-net-next-mptcp-blackhole-reset-loopback-d82c518e409f
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2035; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=EOhcyQviMMRhx2W39PIzcaMVrFvf9rRwgBG7ZlEa5Qk=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDJOn+Cbx3R/a6HmPg7hL8vc48p7vu/ViJORv6Q589HC0
+ xPiOWuyOkpZGMS4GGTFFFmk2yLzZz6v4i3x8rOAmcPKBDKEgYtTACZyPJaR4YRHFLd78r/U1cmt
+ 927t4DXVYLR7+e7qhQ0rWKsjZ4XaVjEyXM8u37p/S6S0h+qvmCq9N/+FW9TvpCoXMAjVLmLJff2
+ fFwA=
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Hello:
+When a first MPTCP connection gets successfully established after a
+blackhole period, 'active_disable_times' was supposed to be reset when
+this connection was done via any non-loopback interfaces.
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Unfortunately, the opposite condition was checked: only reset when the
+connection was established via a loopback interface. Fixing this by
+simply looking at the opposite.
 
-On Tue, 16 Sep 2025 12:35:16 -0400 you wrote:
-> rswitch_stop() opencodes for_each_set_bit().
-> 
-> CC: Simon Horman <horms@kernel.org>
-> Reviewed-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> ---
-> v1: https://lore.kernel.org/all/20250913181345.204344-1-yury.norov@gmail.com/
-> v2: Rebase on top of net-next/main
-> 
-> [...]
+This is similar to what is done with TCP FastOpen, see
+tcp_fastopen_active_disable_ofo_check().
 
-Here is the summary with links:
-  - [RESEND,net-next,v2] net: renesas: rswitch: simplify rswitch_stop()
-    https://git.kernel.org/netdev/net-next/c/18cfe3c1a121
+This patch is a follow-up of a previous discussion linked to commit
+893c49a78d9f ("mptcp: Use __sk_dst_get() and dst_dev_rcu() in
+mptcp_active_enable()."), see [1].
 
-You are awesome, thank you!
+Fixes: 27069e7cb3d1 ("mptcp: disable active MPTCP in case of blackhole")
+Cc: stable@vger.kernel.org
+Link: https://lore.kernel.org/4209a283-8822-47bd-95b7-87e96d9b7ea3@kernel.org [1]
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Note: sending this fix to net-next, similar to commits 108a86c71c93
+("mptcp: Call dst_release() in mptcp_active_enable().") and 893c49a78d9f
+("mptcp: Use __sk_dst_get() and dst_dev_rcu() in mptcp_active_enable().").
+Also to avoid conflicts, and because we are close to the merge windows.
+---
+ net/mptcp/ctrl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
+index e8ffa62ec183f3cd8156e3969ac4a7d0213a990b..d96130e49942e2fb878cd1897ad43c1d420fb233 100644
+--- a/net/mptcp/ctrl.c
++++ b/net/mptcp/ctrl.c
+@@ -507,7 +507,7 @@ void mptcp_active_enable(struct sock *sk)
+ 		rcu_read_lock();
+ 		dst = __sk_dst_get(sk);
+ 		dev = dst ? dst_dev_rcu(dst) : NULL;
+-		if (dev && (dev->flags & IFF_LOOPBACK))
++		if (!(dev && (dev->flags & IFF_LOOPBACK)))
+ 			atomic_set(&pernet->active_disable_times, 0);
+ 		rcu_read_unlock();
+ 	}
+
+---
+base-commit: b127e355f1af1e4a635ed8f78cb0d11c916613cf
+change-id: 20250918-net-next-mptcp-blackhole-reset-loopback-d82c518e409f
+
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
